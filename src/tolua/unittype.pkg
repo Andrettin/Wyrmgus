@@ -1,0 +1,18 @@
+class CUnitType
+{
+	std::string Ident;
+	std::string Name;
+	tolua_readonly int Slot;
+
+	int MinAttackRange;
+	int ClicksToExplode;
+
+	int GivesResource;
+	int Supply;
+	int Demand;
+};
+
+CUnitType *UnitTypeByIdent(const std::string ident);
+
+extern CUnitType *UnitTypeHumanWall;
+extern CUnitType *UnitTypeOrcWall;

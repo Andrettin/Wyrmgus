@@ -1,0 +1,26 @@
+$#include "tileset.h"
+
+class CMapInfo
+{
+	string Description;
+	int MapWidth;
+	int MapHeight;
+	int PlayerType[PlayerMax];
+};
+
+class CTileset
+{
+	string Name;
+};
+
+
+class CMap
+{
+	CMapInfo Info;
+	CTileset *Tileset;
+};
+
+extern CMap Map;
+
+void SetTile(int tile, int w, int h, int value = 0);
+

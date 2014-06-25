@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!--
+----	(c) Copyright 2001-2011 by Lutz Sammer, Francois Beerten,
+----				Nehal Mistry and Pali Rohár
+
+----    This program is free software; you can redistribute it and/or modify
+----    it under the terms of the GNU General Public License as published by
+----    the Free Software Foundation; only version 2 of the License.
+----
+----    This program is distributed in the hope that it will be useful,
+----    but WITHOUT ANY WARRANTY; without even the implied warranty of
+----    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+----    GNU General Public License for more details.
+----
+----    You should have received a copy of the GNU General Public License
+----    along with this program; if not, write to the Free Software
+----    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+----    02111-1307, USA.
+-->
+    <title>Development for Stratagus</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+
+<pre width=80>
+         _________ __                 __
+        /   _____//  |_____________ _/  |______     ____  __ __  ______
+        \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+        /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
+       /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+               \/                  \/          \//_____/            \/
+    ______________________                           ______________________
+                          T H E   W A R   B E G I N S
+           Stratagus - A free fantasy real time strategy game engine
+</pre>
+<hr>
+
+<h1>Development for Stratagus</h1>
+<hr>
+
+This file should give you some information to help with development of Stratagus.<p>
+
+<h2>Bugs</h2>
+
+You can find <a
+href="https://bugs.launchpad.net/stratagus">known bugs</a>
+on the <a href="https://launchpad.net/stratagus">Launchpad pages for Stratagus</a>.<p>
+
+<h2>Building Stratagus</h2>
+
+<h3>Getting Stratagus from Launchpad Bazaar branches</h3>
+
+<h4>How do I get the latest source code of Stratagus?</h4>
+
+The instructions for accessing the source code are on the
+<a href="https://code.launchpad.net/stratagus">launchpad project</a> page.<br>
+<p>
+
+For example:<p>
+
+<pre>bzr branch lp:stratagus</pre>
+<p>
+
+This is done only once. To update your working copy, go into
+the directory and type 'bzr pull'.<p>
+
+<h3>Getting Stratagus without Bazaar</h3>
+
+<h3>Compiling Stratagus</h3>
+
+You can find instructions for compiling Stratagus at
+<a href="install.html">install.html</a>.<br>
+Since you already have a copy of the source, you may skip
+ahead to Installation Step 2.
+
+<h2>Source code documentation</h2>
+
+Valery Shchedrin has introduced tagged source
+documentation for Stratagus.<p>
+
+You need
+<a href="http://www.doxygen.org">DoxyGen</a>
+to generate source code documentation.<p>
+
+Having DoxyGen installed, compile Stratagus with option ENABLE_DOC=ON<br>
+(e.g, inside build directory, run 'cmake -DENABLE_DOC=ON .. &amp;&amp; make').<p>
+
+Source documents are initially generated inside the build directory, as done for binaries.<p>
+
+After installing stratagus (using 'make install') you can find all these html files in<br>
+<u>share/doc/stratagus</u> directory.<p>
+
+When installing Stratagus html these files are copied into <u>PREFIX/share/stratagus/doc</u>.<br>
+Doxygen documentation is copied into <u>PREFIX/share/stratagus/doc/doxygen</u>.<p>
+
+If you are viewing installed stratagus documentation, Doxygen documentation is here: <a href="doxygen/index.html">doxygen/index.html</a>
+
+<h3>Tags used in source code</h3>
+
+We use the doc++ tags:<p>
+Multi line source code documentation: /** ... */<br/>
+Single line source code documentation: /// ... <br/>
+Start grouping: //@{ or /*@{*/<br/>
+End grouping: //@} or /*@}*/<br/>
+
+<ul>
+    <li>@name Name of file or group.</li>
+    <li>@param Describes function/macro parameter</li>
+    <li>@return Describes function return</li>
+    <li>@see Links to other section</li>
+</ul><p>
+
+Please read the doxygen/doc++ documentation.
+
+<h2>Empty C++ prototype file</h2>
+
+<pre>
+//       _________ __                 __
+//      /   _____//  |_____________ _/  |______     ____  __ __  ______
+//      \_____  \\   __\_  __ \__  \\   __\__  \   / ___\|  |  \/  ___/
+//      /        \|  |  |  | \// __ \|  |  / __ \_/ /_/  >  |  /\___ \
+//     /_______  /|__|  |__|  (____  /__| (____  /\___  /|____//____  >
+//             \/                  \/          \//_____/            \/
+//  ______________________                           ______________________
+//                        T H E   W A R   B E G I N S
+//  Stratagus - A free fantasy real time strategy game engine
+//
+/**@name {filename}.cpp	-	{One line description of this file} */
+//
+//  (c) Copyright {year} by {insert your name here}
+//
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; only version 2 of the License.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 51 Franklin St, Fifth Floor,
+//  Boston, MA  02110-1301  USA
+//
+
+//@{
+
+#include "stratagus.h"
+
+// More game includes.
+
+// Global and local variables of this module.
+
+// Local and global functions of this module.
+
+//@}
+</pre>
+
+<h2>Coding style</h2>
+
+We use <a href="http://astyle.sourceforge.net/">AStyle</a> to harmonize style in the code.<br/>
+<code>AStyle --options=tools/astylerc --recursive "src/*.cpp" "src/*.h"</code>
+
+<h2>Sending a patch</h2>
+
+Use Stratagus launchpad <a href="https://bugs.launchpad.net/stratagus">bug tracker</a>
+<br/>
+NOTE: If you make big changes please always extend the copyright with your name,
+and always update the copyright year if required.<p>
+
+<hr>
+(C) Copyright 1998-2013 by The <a href="https://launchpad.net/stratagus">Stratagus</a> Project under the <a href="gpl.html">GNU General Public License</a>.<br>
+All trademarks and copyrights on this page are owned by their respective owners.<br>
+</body>
+</html>
