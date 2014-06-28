@@ -43,6 +43,9 @@
 #include "netconnect.h"
 #include "editor.h"
 #include "sound.h"
+//Wyrmgus start
+#include "player.h"
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -421,6 +424,142 @@ void ImageButton::adjustSize()
 		Button::adjustSize();
 	}
 }
+
+//Wyrmgus start
+/*----------------------------------------------------------------------------
+--  PlayerColorImageButtonImageButton
+----------------------------------------------------------------------------*/
+
+
+/**
+**  PlayerColorImageButton constructor
+*/
+PlayerColorImageButton::PlayerColorImageButton() :
+	Button(), normalImage(NULL), pressedImage(NULL),
+	disabledImage(NULL), ButtonPlayerColor("")
+{
+	setForegroundColor(0xffffff);
+}
+
+/**
+**  PlayerColorImageButton constructor
+**
+**  @param caption  Caption text
+*/
+PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const std::string &playercolor) :
+	Button(caption), normalImage(NULL), pressedImage(NULL),
+	disabledImage(NULL), ButtonPlayerColor(playercolor)
+{
+	setForegroundColor(0xffffff);
+}
+
+/**
+**  Draw the image button
+**
+**  @param graphics  Graphics object to draw with
+*/
+void PlayerColorImageButton::draw(gcn::Graphics *graphics)
+{
+	if (!normalImage) {
+		Button::draw(graphics);
+		return;
+	}
+
+	gcn::Image *img;
+
+	if (!isEnabled()) {
+		img = disabledImage ? disabledImage : normalImage;
+	} else if (isPressed()) {
+		img = pressedImage ? pressedImage : normalImage;
+	} else if (0 && hasMouse()) {
+		// FIXME: add mouse-over image
+		img = NULL;
+	} else {
+		img = normalImage;
+	}
+
+	if (img) {
+		// make the button's image be player-colored
+		WidgetGraphicPlayerPixels(ButtonPlayerColor, *((CPlayerColorGraphic *)img));
+	}
+
+	graphics->drawImage(img, 0, 0, 0, 0,
+						img->getWidth(), img->getHeight());
+
+	graphics->setColor(getForegroundColor());
+
+	int textX;
+	int textY = getHeight() / 2 - getFont()->getHeight() / 2;
+
+	switch (getAlignment()) {
+		case gcn::Graphics::LEFT:
+			textX = 4;
+			break;
+		case gcn::Graphics::CENTER:
+			textX = getWidth() / 2;
+			break;
+		case gcn::Graphics::RIGHT:
+			textX = getWidth() - 4;
+			break;
+		default:
+			textX = 0;
+			Assert(!"Unknown alignment.");
+			//throw GCN_EXCEPTION("Unknown alignment.");
+	}
+
+	graphics->setFont(getFont());
+	if (isPressed()) {
+		graphics->drawText(getCaption(), textX + 4, textY + 4, getAlignment());
+	} else {
+		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment());
+	}
+
+	if (hasFocus()) {
+		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+	}
+}
+
+/**
+**  Automatically adjust the size of an image button
+*/
+void PlayerColorImageButton::adjustSize()
+{
+	if (normalImage) {
+		setWidth(normalImage->getWidth());
+		setHeight(normalImage->getHeight());
+	} else {
+		Button::adjustSize();
+	}
+}
+
+/**
+**  Change current color set to new player.
+**
+**  FIXME: use function pointer here.
+**
+**  @param player  Pointer to player.
+**  @param sprite  The sprite in which the colors should be changed.
+*/
+void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const CGraphic &sprite)
+{
+	Assert(PlayerColorIndexCount);
+
+	int WidgetPlayerColorIndexFromName = 15;
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (PlayerColorNames[i] == WidgetPlayerColorName) {
+			WidgetPlayerColorIndexFromName = i;
+		}
+	}
+
+	SDL_LockSurface(sprite.Surface);
+	std::vector<SDL_Color> sdlColors(PlayerColorsRGB[WidgetPlayerColorIndexFromName].begin(), PlayerColorsRGB[WidgetPlayerColorIndexFromName].end());
+	SDL_SetColors(sprite.Surface, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
+	if (sprite.SurfaceFlip) {
+		SDL_SetColors(sprite.SurfaceFlip, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
+	}
+	SDL_UnlockSurface(sprite.Surface);
+}
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  ImageRadioButton

@@ -108,6 +108,27 @@ public:
 	gcn::Image *disabledImage;
 };
 
+//Wyrmgus start
+class PlayerColorImageButton : public gcn::Button
+{
+public:
+	PlayerColorImageButton();
+	explicit PlayerColorImageButton(const std::string &caption, const std::string &playercolor);
+
+	virtual void draw(gcn::Graphics *graphics);
+	virtual void adjustSize();
+
+	void setNormalImage(gcn::Image *image) { normalImage = image; adjustSize(); }
+	void setPressedImage(gcn::Image *image) { pressedImage = image; }
+	void setDisabledImage(gcn::Image *image) { disabledImage = image; }
+
+	gcn::Image *normalImage;
+	gcn::Image *pressedImage;
+	gcn::Image *disabledImage;
+	std::string ButtonPlayerColor;
+};
+//Wyrmgus end
+
 class ImageRadioButton : public gcn::RadioButton
 {
 public:
@@ -330,5 +351,13 @@ private:
 	LuaActionListener *logiclistener;
 	bool drawUnder;
 };
+
+//Wyrmgus start
+/*----------------------------------------------------------------------------
+--  Functions
+----------------------------------------------------------------------------*/
+
+extern void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const CGraphic &sprite);
+//Wyrmgus end
 
 #endif

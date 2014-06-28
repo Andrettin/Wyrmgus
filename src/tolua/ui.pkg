@@ -328,6 +328,18 @@ class ImageButton : public Button
 	void setDisabledImage(CGraphic *image);
 };
 
+// Wyrmgus start
+class PlayerColorImageButton : public Button
+{
+	PlayerColorImageButton();
+	PlayerColorImageButton(const std::string caption, const std::string playercolor);
+
+	void setNormalImage(CPlayerColorGraphic *image);
+	void setPressedImage(CPlayerColorGraphic *image);
+	void setDisabledImage(CPlayerColorGraphic *image);
+};
+// Wyrmgus end
+
 class RadioButton : public Widget
 {
 	RadioButton();
