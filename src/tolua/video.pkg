@@ -24,10 +24,7 @@ class CGraphic
 public:
 	static CGraphic *New(const std::string file, int w = 0, int h = 0);
 	static void Free(CGraphic *);
-	//Wyrmgus start
-//	void Load();
-	void Load(bool grayscale = false);
-	//Wyrmgus end
+	void Load();
 	void Resize(int w, int h);
 };
 

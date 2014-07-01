@@ -379,6 +379,40 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	graphics->drawImage(img, 0, 0, 0, 0,
 						img->getWidth(), img->getHeight());
 
+	if (hasFrame()) {
+		int iOffset = 0;
+		if (isPressed()) {
+			iOffset = 1;
+		}
+		// make the button's image have an icon-like frame
+		Video.DrawHLine(ColorWhite, getX() - 1 - iOffset, getY() - 1 - iOffset, 49);
+		Video.DrawVLine(ColorWhite, getX() - 1 - iOffset, getY() - iOffset, 40);
+		Video.DrawVLine(ColorWhite, getX() - iOffset, getY() + 38 - iOffset, 2);
+		Video.DrawHLine(ColorWhite, getX() + 46 - iOffset, getY() - iOffset, 2);
+
+		// Bottom and Right edge of Icon
+		Video.DrawHLine(ColorGray, getX() + 1 - iOffset, getY() + 38 - iOffset, 47);
+		Video.DrawHLine(ColorGray, getX() + 1 - iOffset, getY() + 39 - iOffset, 47);
+		Video.DrawVLine(ColorGray, getX() + 46 - iOffset, getY() + 1 - iOffset, 37);
+		Video.DrawVLine(ColorGray, getX() + 47 - iOffset, getY() + 1 - iOffset, 37);
+
+		Video.DrawRectangle(ColorBlack, getX() - 3 - iOffset, getY() - 3 - iOffset, 52, 44);
+		Video.DrawRectangle(ColorBlack, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
+
+		if (hasMouse()) {
+			Video.DrawRectangle(ColorGray, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
+		}
+
+		if (isPressed()) {
+			Video.DrawRectangle(ColorGray, getX() - iOffset, getY() - iOffset, 48, 40);
+			Video.DrawVLine(ColorDarkGray, getX() - 1 - iOffset, getY() - 1 - iOffset, 40);
+			Video.DrawHLine(ColorDarkGray, getX() - 1 - iOffset, getY() - 1 - iOffset, 49);
+			Video.DrawHLine(ColorDarkGray, getX() - 1 - iOffset, getY() + 39 - iOffset, 2);
+
+			Video.DrawRectangle(ColorGray, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
+		}
+	}
+
 	graphics->setColor(getForegroundColor());
 
 	int textX;
@@ -407,7 +441,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment());
 	}
 
-	if (hasFocus()) {
+	if (hasFocus() && hasFrame() == false) {
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 	}
 }
@@ -486,6 +520,40 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 	graphics->drawImage(img, 0, 0, 0, 0,
 						img->getWidth(), img->getHeight());
 
+	if (hasFrame()) {
+		int iOffset = 0;
+		if (isPressed()) {
+			iOffset = 1;
+		}
+		// make the button's image have an icon-like frame
+		Video.DrawHLine(ColorWhite, getX() - 1 - iOffset, getY() - 1 - iOffset, 49);
+		Video.DrawVLine(ColorWhite, getX() - 1 - iOffset, getY() - iOffset, 40);
+		Video.DrawVLine(ColorWhite, getX() - iOffset, getY() + 38 - iOffset, 2);
+		Video.DrawHLine(ColorWhite, getX() + 46 - iOffset, getY() - iOffset, 2);
+
+		// Bottom and Right edge of Icon
+		Video.DrawHLine(ColorGray, getX() + 1 - iOffset, getY() + 38 - iOffset, 47);
+		Video.DrawHLine(ColorGray, getX() + 1 - iOffset, getY() + 39 - iOffset, 47);
+		Video.DrawVLine(ColorGray, getX() + 46 - iOffset, getY() + 1 - iOffset, 37);
+		Video.DrawVLine(ColorGray, getX() + 47 - iOffset, getY() + 1 - iOffset, 37);
+
+		Video.DrawRectangle(ColorBlack, getX() - 3 - iOffset, getY() - 3 - iOffset, 52, 44);
+		Video.DrawRectangle(ColorBlack, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
+
+		if (hasMouse()) {
+			Video.DrawRectangle(ColorGray, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
+		}
+
+		if (isPressed()) {
+			Video.DrawRectangle(ColorGray, getX() - iOffset, getY() - iOffset, 48, 40);
+			Video.DrawVLine(ColorDarkGray, getX() - 1 - iOffset, getY() - 1 - iOffset, 40);
+			Video.DrawHLine(ColorDarkGray, getX() - 1 - iOffset, getY() - 1 - iOffset, 49);
+			Video.DrawHLine(ColorDarkGray, getX() - 1 - iOffset, getY() + 39 - iOffset, 2);
+
+			Video.DrawRectangle(ColorGray, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
+		}
+	}
+
 	graphics->setColor(getForegroundColor());
 
 	int textX;
@@ -514,7 +582,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment());
 	}
 
-	if (hasFocus()) {
+	if (hasFocus() && hasFrame() == false) {
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 	}
 }

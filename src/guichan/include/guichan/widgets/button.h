@@ -116,6 +116,31 @@ namespace gcn
          */
         virtual unsigned int getAlignment() const;
 
+		//Wyrmgus start
+        /**
+         * Sets the Button tooltip.
+         *
+         * @param tooltip the Button tooltip.
+         */
+        virtual void setTooltip(const std::string& tooltip);
+
+        /**
+         * Gets the Button tooltip.
+         *
+         * @return the Button tooltip.
+         */
+        virtual const std::string& getTooltip() const;
+
+        virtual void setFrame(bool frame);
+
+        /**
+         * Checks if the button has an icon-like frame.
+         *
+         * @return true if the button is set to have an icon-like frame.
+         */
+        virtual bool hasFrame() const;
+		//Wyrmgus end
+
         /**
          * Adjusts the buttons size to fit the content.
          */
@@ -148,6 +173,10 @@ namespace gcn
 
         virtual void mouseRelease(int x, int y, int button);
 
+        //Wyrmgus start
+        virtual void mouseMotion(int x, int y);
+        //Wyrmgus end
+
 
         // Inherited from KeyListener
 
@@ -157,7 +186,11 @@ namespace gcn
 
     protected:
         std::string mCaption;
-        bool mMouseDown, mKeyDown, mHotKeyDown;
+        //Wyrmgus start
+//        bool mMouseDown, mKeyDown, mHotKeyDown;
+        std::string mTooltip;
+        bool mMouseDown, mKeyDown, mHotKeyDown, mFrame;
+        //Wyrmgus end
         unsigned int mAlignment;
     };
 }

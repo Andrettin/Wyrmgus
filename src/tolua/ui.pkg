@@ -308,6 +308,11 @@ class ImageWidget : public Widget
 
 class Button : public Widget
 {
+	//Wyrmgus start
+	virtual void setTooltip(const std::string tooltip);
+	virtual const std::string &getTooltip() const;
+	virtual void setFrame(bool frame);
+	//Wyrmgus end
 };
 
 class ButtonWidget : public Button

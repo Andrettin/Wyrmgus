@@ -59,6 +59,11 @@
 #include "guichan/widgets/button.h"
 #include "guichan/exception.h"
 #include "guichan/mouseinput.h"
+//Wyrmgus start
+#include "stratagus.h"
+#include "font.h"
+#include "video.h"
+//Wyrmgus end
 
 namespace gcn
 {
@@ -74,6 +79,9 @@ namespace gcn
     Button::Button(const std::string& caption)
     {
         mCaption = caption;
+        //Wyrmgus start
+        mTooltip = "";
+        //Wyrmgus end
         mAlignment = Graphics::CENTER;
         setFocusable(true);
         adjustSize();
@@ -82,6 +90,9 @@ namespace gcn
         mMouseDown = false;
         mKeyDown = false;
         mHotKeyDown = false;
+        //Wyrmgus start
+        mFrame = false;
+        //Wyrmgus end
 
         addMouseListener(this);
         addKeyListener(this);
@@ -107,6 +118,28 @@ namespace gcn
     {
         return mAlignment;
     }
+
+    //Wyrmgus start
+    void Button::setTooltip(const std::string& tooltip)
+    {
+        mTooltip = tooltip;
+    }
+
+    const std::string& Button::getTooltip() const
+    {
+        return mTooltip;
+    }
+
+    void Button::setFrame(bool frame)
+    {
+        mFrame = frame;
+    }
+
+    bool Button::hasFrame() const
+    {
+        return mFrame;
+    }
+    //Wyrmgus end
 
     void Button::draw(Graphics* graphics)
     {
@@ -242,6 +275,13 @@ namespace gcn
         if (button == MouseInput::LEFT && hasMouse())
         {
             mMouseDown = true;
+            //Wyrmgus start
+			if (hasFrame())
+			{
+				setX(getX() + 1);
+				setY(getY() + 1);
+	        }
+            //Wyrmgus end
         }
     }
 
@@ -250,8 +290,26 @@ namespace gcn
         if (button == MouseInput::LEFT)
         {
             mMouseDown = false;
+            //Wyrmgus start
+			if (hasFrame())
+			{
+				setX(getX() - 1);
+				setY(getY() - 1);
+	        }
+            //Wyrmgus end
         }
     }
+
+    //Wyrmgus start
+    void Button::mouseMotion(int x, int y)
+    {
+        if (hasMouse() && getTooltip() != "") //if mouse is hovering the button, show tooltip
+        {
+			CLabel label(GetGameFont());
+			label.Draw(2 + 176, Video.Height + 2 - 16, getTooltip());
+        }
+    }
+    //Wyrmgus end
 
     bool Button::keyPress(const Key& key)
     {
@@ -261,6 +319,13 @@ namespace gcn
         {
             mKeyDown = true;
             ret = true;
+            //Wyrmgus start
+			if (hasFrame())
+			{
+				setX(getX() + 1);
+				setY(getY() + 1);
+	        }
+            //Wyrmgus end
         }
 
         mHotKeyDown = false;
@@ -277,6 +342,13 @@ namespace gcn
             mKeyDown = false;
             generateAction();
             ret = true;
+            //Wyrmgus start
+			if (hasFrame())
+			{
+				setX(getX() - 1);
+				setY(getY() - 1);
+	        }
+            //Wyrmgus end
         }
         return ret;
     }
@@ -285,6 +357,13 @@ namespace gcn
     {
         mHotKeyDown = true;
         mMouseDown = false;
+		//Wyrmgus start
+		if (hasFrame())
+		{
+			setX(getX() + 1);
+			setY(getY() + 1);
+		}
+		//Wyrmgus end
     }
 
     void Button::hotKeyRelease()
@@ -293,6 +372,13 @@ namespace gcn
         {
             mHotKeyDown = false;
             generateAction();
+            //Wyrmgus start
+			if (hasFrame())
+			{
+				setX(getX() - 1);
+				setY(getY() - 1);
+	        }
+            //Wyrmgus end
         }
     }
 
