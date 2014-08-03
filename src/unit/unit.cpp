@@ -207,7 +207,7 @@
 **
 **  Contains the binary angle (0-255) in which the direction the
 **  unit looks. 0, 32, 64, 128, 160, 192, 224, 256 corresponds to
-**  0�, 45�, 90�, 135�, 180�, 225�, 270�, 315�, 360� or north,
+**  0?, 45?, 90?, 135?, 180?, 225?, 270?, 315?, 360? or north,
 **  north-east, east, south-east, south, south-west, west,
 **  north-west, north. Currently only 8 directions are used, this
 **  is more for the future.
@@ -427,6 +427,9 @@ void CUnit::Init()
 	pathFinderData->input.SetUnit(*this);
 
 	Colors = NULL;
+	//Wyrmgus start
+	Variation = 0;
+	//Wyrmgus end
 	IX = 0;
 	IY = 0;
 	Frame = 0;
@@ -582,6 +585,20 @@ void CUnit::Init(const CUnitType &type)
 
 	//  Initialise unit structure (must be zero filled!)
 	Type = &type;
+
+	//Wyrmgus start
+	int TypeVariationCount = 0;
+	for (int i = 0; i < VariationMax; ++i) {
+		VariationInfo *varinfo = type.VarInfo[i];
+		if (!varinfo) {
+			continue;
+		}
+		TypeVariationCount += 1;
+	}
+	if (TypeVariationCount > 0) {
+		Variation = SyncRand(TypeVariationCount);
+	}
+	//Wyrmgus end
 
 	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
 

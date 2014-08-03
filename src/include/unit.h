@@ -337,6 +337,9 @@ public:
 	// DISPLAY:
 	int         Frame;      /// Image frame: <0 is mirrored
 	CUnitColors *Colors;    /// Player colors
+	//Wyrmgus start
+	int Variation;      /// Which of the variations of its unit type this unit has
+	//Wyrmgus end
 
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position
@@ -426,7 +429,7 @@ class CPreference
 {
 public:
 	CPreference() : ShowSightRange(false), ShowReactionRange(false),
-		ShowAttackRange(false), ShowMessages(true), BigScreen(false), 
+		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false),
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
@@ -438,7 +441,7 @@ public:
 	bool BigScreen;			 /// If true, shows the big screen(without panels)
 	bool PauseOnLeave;       /// If true, game pauses when cursor is gone
 	bool AiExplores;         /// If true, AI sends explorers to search for resources (almost useless thing)
-	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc 
+	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc
 	bool IconsShift;         /// Shift icons slightly when you press on them
 
 	int  ShowOrders;         /// How many second show orders of unit on map.

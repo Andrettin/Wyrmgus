@@ -877,6 +877,15 @@ void CUnit::Draw(const CViewport &vp) const
 			}
 		}
 	}
+	//Wyrmgus start
+	// Adjust sprite for variations.
+	VariationInfo *varinfo = type->VarInfo[this->Variation];
+	if (varinfo) {
+		if (varinfo->Sprite) {
+			sprite = varinfo->Sprite;
+		}
+	}
+	//Wyrmgus end
 
 	//
 	// Now draw!

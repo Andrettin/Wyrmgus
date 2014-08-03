@@ -154,6 +154,9 @@ extern const char NameLine[];
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
 #define MAX_RACES 8
+//Wyrmgus start
+#define VariationMax 6 //maximum number of variations a unit can have
+//Wyrmgus end
 
 /// Frames per second to display (original 30-40)
 #define FRAMES_PER_SECOND  30  // 1/30s

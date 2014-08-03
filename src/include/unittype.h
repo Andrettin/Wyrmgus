@@ -108,6 +108,22 @@ public:
 	CPlayerColorGraphic *SpriteWhenEmpty;  /// The graphic corresponding to FileWhenEmpty
 };
 
+//Wyrmgus start
+//unit variations
+class VariationInfo
+{
+public:
+	VariationInfo() : VariationId(""),
+		Sprite(NULL)
+	{}
+
+	std::string VariationId;		/// Variation's name.
+	std::string File;				/// Variation's graphics.
+	IconConfig Icon;				/// Icon to display for this unit
+	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
+};
+//Wyrmgus end
+
 /**
 **  User defined variable type.
 **
@@ -581,6 +597,9 @@ public:
 	int CanStore[MaxCosts];             /// Resources that we can store here.
 	int GivesResource;                  /// The resource this unit gives.
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
+	//Wyrmgus start
+	VariationInfo *VarInfo[VariationMax];    /// Variation information.
+	//Wyrmgus end
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.

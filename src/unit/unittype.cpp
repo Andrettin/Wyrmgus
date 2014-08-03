@@ -640,6 +640,9 @@ CUnitType::CUnitType() :
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
 	memset(ResInfo, 0, sizeof(ResInfo));
+	//Wyrmgus start
+	memset(VarInfo, 0, sizeof(VarInfo));
+	//Wyrmgus end
 	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 }
@@ -682,6 +685,17 @@ CUnitType::~CUnitType()
 			delete this->ResInfo[res];
 		}
 	}
+
+	//Wyrmgus start
+	for (int var = 0; var < VariationMax; ++var) {
+		if (this->VarInfo[var]->Sprite) {
+			CGraphic::Free(this->VarInfo[var]->Sprite);
+		}
+		if (this->VarInfo[var]) {
+			delete this->VarInfo[var];
+		}
+	}
+	//Wyrmgus end
 
 	CGraphic::Free(Sprite);
 	CGraphic::Free(ShadowSprite);
@@ -1098,6 +1112,23 @@ void LoadUnitTypeSprite(CUnitType &type)
 		}
 	}
 
+	//Wyrmgus start
+	for (int i = 0; i < VariationMax; ++i) {
+		VariationInfo *varinfo = type.VarInfo[i];
+		if (!varinfo) {
+			continue;
+		}
+		if (!varinfo->File.empty()) {
+			varinfo->Sprite = CPlayerColorGraphic::New(varinfo->File,
+																	 type.Width, type.Height);
+			varinfo->Sprite->Load();
+			if (type.Flip) {
+				varinfo->Sprite->Flip();
+			}
+		}
+	}
+	//Wyrmgus end
+
 	if (!type.File.empty()) {
 		type.Sprite = CPlayerColorGraphic::New(type.File, type.Width, type.Height);
 		type.Sprite->Load();
@@ -1129,6 +1160,19 @@ void LoadUnitTypes()
 
 		// Lookup icons.
 		type.Icon.Load();
+
+		//Wyrmgus start
+		for (int j = 0; j < VariationMax; ++j) {
+			VariationInfo *varinfo = type.VarInfo[j];
+			if (!varinfo) {
+				continue;
+			}
+			if (!varinfo->Icon.Name.empty()) {
+				varinfo->Icon.Load();
+			}
+		}
+		//Wyrmgus end
+
 		// Lookup missiles.
 		type.Missile.MapMissile();
 		type.Explosion.MapMissile();

@@ -1035,6 +1035,36 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "Unsupported sound tag: %s" _C_ value);
 				}
 			}
+		//Wyrmgus start
+		} else if (!strcmp(value, "Variations")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				VariationInfo *var = new VariationInfo;
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument");
+				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "variation-id")) {
+						var->VariationId = LuaToString(l, -1, k + 1);
+						type->VarInfo[j] = var;
+					} else if (!strcmp(value, "file")) {
+						var->File = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "icon")) {
+						var->Icon.Name = LuaToString(l, -1, k + 1);
+						var->Icon.Icon = NULL;
+					} else {
+						printf("\n%s\n", type->Name.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+//				Assert(var->VariationId);
+				lua_pop(l, 1);
+			}
+		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
 			if (index != -1) { // valid index

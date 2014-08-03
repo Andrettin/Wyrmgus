@@ -407,7 +407,15 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
 						 (IconActive | (MouseButtons & LeftButton)) : 0;
 
-		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+		//Wyrmgus start
+//		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+		VariationInfo *varinfo = type.VarInfo[unit.Variation];
+		if (varinfo && !varinfo->Icon.Name.empty()) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+			varinfo->Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+		} else {
+			type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
+		}
+		//Wyrmgus end
 	}
 }
 
@@ -460,7 +468,15 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
-		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
+		//Wyrmgus start
+//		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
+		VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
+		if (varinfo && !varinfo->Icon.Name.empty()) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+			varinfo->Icon.Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
+		} else {
+			icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
+		}
+		//Wyrmgus end
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 			UiDrawManaBar(*uins, pos.x, pos.y);
@@ -1097,11 +1113,11 @@ static void InfoPanel_draw_no_selection()
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			if (Players[i].Type != PlayerNobody) {
 				if (ThisPlayer->IsAllied(Players[i])) {
-					label.SetNormalColor(FontGreen); 
+					label.SetNormalColor(FontGreen);
 				} else if (ThisPlayer->IsEnemy(Players[i])) {
-					label.SetNormalColor(FontRed); 
+					label.SetNormalColor(FontRed);
 				} else {
-					label.SetNormalColor(nc); 
+					label.SetNormalColor(nc);
 				}
 				label.Draw(x + 15, y, i);
 
@@ -1153,10 +1169,26 @@ static void InfoPanel_draw_multiple_selection()
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
 		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
+		//Wyrmgus start
+		/*
 		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
 						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
+		*/
+		VariationInfo *varinfo = Selected[i]->Type->VarInfo[Selected[i]->Variation];
+		if (varinfo && !varinfo->Icon.Name.empty()) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+			varinfo->Icon.Icon->DrawUnitIcon(*UI.SelectedButtons[i].Style,
+							  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
+							  (IconActive | (MouseButtons & LeftButton)) : 0,
+							  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
+		} else {
+			icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
+							  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
+							  (IconActive | (MouseButtons & LeftButton)) : 0,
+							  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
+		}
+		//Wyrmgus end
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
