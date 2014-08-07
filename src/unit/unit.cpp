@@ -586,6 +586,19 @@ void CUnit::Init(const CUnitType &type)
 	//  Initialise unit structure (must be zero filled!)
 	Type = &type;
 
+	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
+
+	Frame = type.StillFrame;
+
+	if (UnitTypeVar.GetNumberVariable()) {
+		Assert(!Variable);
+		const unsigned int size = UnitTypeVar.GetNumberVariable();
+		Variable = new CVariable[size];
+		std::copy(type.DefaultStat.Variables, type.DefaultStat.Variables + size, Variable);
+	} else {
+		Variable = NULL;
+	}
+
 	//Wyrmgus start
 	int TypeVariationCount = 0;
 	for (int i = 0; i < VariationMax; ++i) {
@@ -599,19 +612,6 @@ void CUnit::Init(const CUnitType &type)
 		Variation = SyncRand(TypeVariationCount);
 	}
 	//Wyrmgus end
-
-	Seen.Frame = UnitNotSeen; // Unit isn't yet seen
-
-	Frame = type.StillFrame;
-
-	if (UnitTypeVar.GetNumberVariable()) {
-		Assert(!Variable);
-		const unsigned int size = UnitTypeVar.GetNumberVariable();
-		Variable = new CVariable[size];
-		std::copy(type.DefaultStat.Variables, type.DefaultStat.Variables + size, Variable);
-	} else {
-		Variable = NULL;
-	}
 
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction

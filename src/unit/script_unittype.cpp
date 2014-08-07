@@ -133,6 +133,9 @@ static const char SHIELDPIERCING_KEY[] = "ShieldPiercing";
 static const char ISALIVE_KEY[] = "IsAlive";
 static const char PLAYER_KEY[] = "Player";
 static const char PRIORITY_KEY[] = "Priority";
+//Wyrmgus
+static const char VARIATION_KEY[] = "Variation";
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -170,7 +173,10 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
 							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
-							   PRIORITY_KEY
+//Wyrmgus
+//							   PRIORITY_KEY
+							   PRIORITY_KEY, VARIATION_KEY
+//Wyrmgus end
 							  };
 
 	for (int i = 0; i < NVARALREADYDEFINED; ++i) {
@@ -1037,6 +1043,9 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "Variations")) {
+			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
+			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
+			type->DefaultStat.Variables[VARIATION_INDEX].Max = VariationMax;
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
@@ -1595,13 +1604,22 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX
 			|| i == SHIELD_INDEX || i == POINTS_INDEX || i == MAXHARVESTERS_INDEX
 			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
-			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
+			//Wyrmgus
+//			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
+			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == VARIATION_INDEX) {
+			//Wyrmgus end
 			continue;
 		}
 		unit.Variable[i].Value = 0;
 		unit.Variable[i].Max = 0;
 		unit.Variable[i].Enable = 1;
 	}
+
+	//Wyrmgus
+	unit.Variable[VARIATION_INDEX].Max = VariationMax;
+	unit.Variable[VARIATION_INDEX].Enable = 1;
+	unit.Variable[VARIATION_INDEX].Value = unit.Variation;
+	//Wyrmgus end
 
 	// Shield permeability
 	unit.Variable[SHIELDPERMEABILITY_INDEX].Max = 100;
