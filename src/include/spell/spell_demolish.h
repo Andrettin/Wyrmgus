@@ -41,7 +41,10 @@
 class Spell_Demolish : public SpellActionType
 {
 public:
-	Spell_Demolish() : Damage(0), Range(0) {};
+	//Wyrmgus start
+//	Spell_Demolish() : Damage(0), Range(0) {};
+	Spell_Demolish() : Damage(0), Range(0), DamageSelf(true) {};
+	//Wyrmgus end
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
@@ -49,6 +52,9 @@ public:
 private:
 	int Damage; /// Damage for every unit in range.
 	int Range;  /// Range of the explosion.
+	//Wyrmgus start
+	bool DamageSelf;   /// If true, damages self when casting spell
+	//Wyrmgus end
 };
 
 

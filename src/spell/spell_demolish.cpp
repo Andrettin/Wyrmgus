@@ -48,6 +48,10 @@
 			this->Range = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "damage")) {
 			this->Damage = LuaToNumber(l, -1, j + 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "damage-self")) {
+			this->DamageSelf = LuaToBoolean(l, -1, j + 1);
+		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported demolish tag: %s" _C_ value);
 		}
@@ -67,8 +71,12 @@
 {
 	// Allow error margins. (Lame, I know)
 	const Vec2i offset(this->Range + 2, this->Range + 2);
-	Vec2i minpos = goalPos - offset;
-	Vec2i maxpos = goalPos + offset;
+	//Wyrmgus start
+//	Vec2i minpos = goalPos - offset;
+//	Vec2i maxpos = goalPos + offset;
+	Vec2i minpos = caster.tilePos - offset;
+	Vec2i maxpos = caster.tilePos + offset;
+	//Wyrmgus end
 
 	Map.FixSelectionArea(minpos, maxpos);
 
@@ -79,7 +87,10 @@
 	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 			const CMapField &mf = *Map.Field(ipos);
-			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
+			//Wyrmgus start
+//			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
+			if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
+			//Wyrmgus end
 				// Not in circle range
 				continue;
 			} else if (mf.isAWall()) {
@@ -101,7 +112,10 @@
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()
-				&& unit.MapDistanceTo(goalPos) <= this->Range) {
+				//Wyrmgus start
+//				&& unit.MapDistanceTo(goalPos) <= this->Range) {
+				&& unit.MapDistanceTo(caster.tilePos) <= this->Range && UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) {
+				//Wyrmgus end
 				// Don't hit flying units!
 				HitUnit(&caster, unit, this->Damage);
 			}
