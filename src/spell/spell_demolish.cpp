@@ -51,6 +51,10 @@
 		//Wyrmgus start
 		} else if (!strcmp(value, "damage-self")) {
 			this->DamageSelf = LuaToBoolean(l, -1, j + 1);
+		} else if (!strcmp(value, "damage-friendly")) {
+			this->DamageFriendly = LuaToBoolean(l, -1, j + 1);
+		} else if (!strcmp(value, "damage-terrain")) {
+			this->DamageTerrain = LuaToBoolean(l, -1, j + 1);
 		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported demolish tag: %s" _C_ value);
@@ -83,14 +87,13 @@
 	//
 	// Terrain effect of the explosion
 	//
+	//Wyrmgus start
+	/*
 	Vec2i ipos;
 	for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 		for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 			const CMapField &mf = *Map.Field(ipos);
-			//Wyrmgus start
-//			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
-			if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
-			//Wyrmgus end
+			if (SquareDistance(ipos, goalPos) > square(this->Range)) {
 				// Not in circle range
 				continue;
 			} else if (mf.isAWall()) {
@@ -102,6 +105,27 @@
 			}
 		}
 	}
+	*/
+
+	if (this->DamageTerrain) {
+		Vec2i ipos;
+		for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
+			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
+				const CMapField &mf = *Map.Field(ipos);
+				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
+					// Not in circle range
+					continue;
+				} else if (mf.isAWall()) {
+					Map.RemoveWall(ipos);
+				} else if (mf.RockOnMap()) {
+					Map.ClearRockTile(ipos);
+				} else if (mf.ForestOnMap()) {
+					Map.ClearWoodTile(ipos);
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 
 	//
 	//  Effect of the explosion on units. Don't bother if damage is 0
@@ -114,7 +138,7 @@
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()
 				//Wyrmgus start
 //				&& unit.MapDistanceTo(goalPos) <= this->Range) {
-				&& unit.MapDistanceTo(caster.tilePos) <= this->Range && UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) {
+				&& unit.MapDistanceTo(caster.tilePos) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && ((!caster.IsAllied(unit) && unit.Player != caster.Player) || this->DamageFriendly)) {
 				//Wyrmgus end
 				// Don't hit flying units!
 				HitUnit(&caster, unit, this->Damage);

@@ -43,7 +43,7 @@ class Spell_Demolish : public SpellActionType
 public:
 	//Wyrmgus start
 //	Spell_Demolish() : Damage(0), Range(0) {};
-	Spell_Demolish() : Damage(0), Range(0), DamageSelf(true) {};
+	Spell_Demolish() : Damage(0), Range(0), DamageSelf(true), DamageFriendly(true), DamageTerrain(true) {};
 	//Wyrmgus end
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
@@ -54,6 +54,8 @@ private:
 	int Range;  /// Range of the explosion.
 	//Wyrmgus start
 	bool DamageSelf;   /// If true, damages self when casting spell
+	bool DamageFriendly;   /// If true, damages friendly units when casting spell
+	bool DamageTerrain;   /// If true, damages terrain when casting spell
 	//Wyrmgus end
 };
 
