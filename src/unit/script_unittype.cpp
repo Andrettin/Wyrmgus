@@ -1320,6 +1320,90 @@ static int CclSetUnitTypeName(lua_State *l)
 	return 1;
 }
 
+//Wyrmgus start
+// ----------------------------------------------------------------------------
+
+/**
+**  Get unit type data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetUnitTypeData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	lua_pushvalue(l, 1);
+	const CUnitType *type = CclGetUnitType(l);
+	lua_pop(l, 1);
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, type->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "DrawLevel")) {
+		lua_pushnumber(l, type->DrawLevel);
+		return 1;
+	} else if (!strcmp(data, "ComputerReactionRange")) {
+		lua_pushnumber(l, type->ReactRangeComputer);
+		return 1;
+	} else if (!strcmp(data, "PersonReactionRange")) {
+		lua_pushnumber(l, type->ReactRangePerson);
+		return 1;
+	} else if (!strcmp(data, "Missile")) {
+		lua_pushstring(l, type->Missile.Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "MinAttackRange")) {
+		lua_pushnumber(l, type->MinAttackRange);
+		return 1;
+	} else if (!strcmp(data, "MaxAttackRange")) {
+		lua_pushnumber(l, type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value);
+		return 1;
+	} else if (!strcmp(data, "Priority")) {
+		lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
+		return 1;
+	} else if (!strcmp(data, "Demand")) {
+		lua_pushnumber(l, type->Demand);
+		return 1;
+	} else if (!strcmp(data, "Supply")) {
+		lua_pushnumber(l, type->Supply);
+		return 1;
+	} else if (!strcmp(data, "Corpse")) {
+		lua_pushstring(l, type->CorpseName.c_str());
+		return 1;
+	} else if (!strcmp(data, "CanAttack")) {
+		lua_pushboolean(l, type->CanAttack);
+		return 1;
+	} else if (!strcmp(data, "LandUnit")) {
+		lua_pushboolean(l, type->LandUnit);
+		return 1;
+	} else if (!strcmp(data, "SelectableByRectangle")) {
+		lua_pushboolean(l, type->SelectableByRectangle);
+		return 1;
+	} else if (!strcmp(data, "organic")) {
+		lua_pushboolean(l, type->Organic);
+		return 1;
+	} else {
+		int index = UnitTypeVar.VariableNameLookup[data];
+		if (index != -1) { // valid index
+			lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
+			return 1;
+//			continue;
+		}
+
+		index = UnitTypeVar.BoolFlagNameLookup[data];
+		if (index != -1) {
+			lua_pushboolean(l, type->BoolFlag[index].value);
+			return 1;
+		} else {
+			LuaError(l, "Invalid field: %s" _C_ data);
+		}
+	}
+
+	return 0;
+}
+//Wyrmgus end
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -1731,6 +1815,9 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
 	lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
 	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
+	//Wyrmgus start
+	lua_register(Lua, "GetUnitTypeData", CclGetUnitTypeData);
+	//Wyrmgus end
 }
 
 //@}
