@@ -382,6 +382,12 @@ static int CclDefineUnitType(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			type->Name = LuaToString(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "Class")) {
+			type->Class = LuaToString(l, -1);
+		} else if (!strcmp(value, "Civilization")) {
+			type->Civilization = LuaToString(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1340,6 +1346,12 @@ static int CclGetUnitTypeData(lua_State *l)
 
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, type->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Class")) {
+		lua_pushstring(l, type->Class.c_str());
+		return 1;
+	} else if (!strcmp(data, "Civilization")) {
+		lua_pushstring(l, type->Civilization.c_str());
 		return 1;
 	} else if (!strcmp(data, "DrawLevel")) {
 		lua_pushnumber(l, type->DrawLevel);

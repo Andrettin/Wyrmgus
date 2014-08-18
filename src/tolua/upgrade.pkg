@@ -4,6 +4,10 @@ class CUpgrade
   static CUpgrade *Get(const std::string ident);
 
   std::string Name;
+  //Wyrmgus start
+  std::string Class;
+  std::string Civilization;
+  //Wyrmgus end
   int Costs[MaxCosts];
   CIcon *Icon;
 };

@@ -162,6 +162,10 @@ public:
 
 	std::string Ident;                /// identifier
 	std::string Name;                 /// upgrade label
+	//Wyrmgus start
+	std::string Class;                /// upgrade class (i.e. siege weapon projectile I)
+	std::string Civilization;         /// civilization the upgrade belongs to
+	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
 	// TODO: not used by buttons

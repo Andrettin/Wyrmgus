@@ -763,7 +763,10 @@ static void DrawEditorPanel_UnitsIcon()
 		}
 	}
 	// FIXME: wrong button style
-	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
+	//Wyrmgus start
+//	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
+	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
+	//Wyrmgus end
 }
 
 static void DrawEditorPanel_StartIcon()

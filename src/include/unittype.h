@@ -463,6 +463,10 @@ public:
 public:
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
+	//Wyrmgus start
+	std::string Class;              /// Class identifier (i.e. infantry, archer, etc.)
+	std::string Civilization;       /// Which civilization this unit belongs to, if any
+	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files
 	std::string ShadowFile;         /// Shadow file
