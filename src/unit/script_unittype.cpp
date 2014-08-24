@@ -387,6 +387,10 @@ static int CclDefineUnitType(lua_State *l)
 			type->Class = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			type->Civilization = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			type->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			type->Background = LuaToString(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
@@ -1353,6 +1357,15 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Civilization")) {
 		lua_pushstring(l, type->Civilization.c_str());
 		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, type->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, type->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Icon")) {
+		lua_pushstring(l, type->Icon.Name.c_str());
+		return 1;
 	} else if (!strcmp(data, "DrawLevel")) {
 		lua_pushnumber(l, type->DrawLevel);
 		return 1;
@@ -1385,6 +1398,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "CanAttack")) {
 		lua_pushboolean(l, type->CanAttack);
+		return 1;
+	} else if (!strcmp(data, "Building")) {
+		lua_pushboolean(l, type->Building);
 		return 1;
 	} else if (!strcmp(data, "LandUnit")) {
 		lua_pushboolean(l, type->LandUnit);

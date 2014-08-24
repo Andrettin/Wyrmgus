@@ -7,6 +7,8 @@ class CUpgrade
   //Wyrmgus start
   std::string Class;
   std::string Civilization;
+  std::string Description;
+  std::string Background;
   //Wyrmgus end
   int Costs[MaxCosts];
   CIcon *Icon;
