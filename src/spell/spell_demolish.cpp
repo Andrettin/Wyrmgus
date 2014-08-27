@@ -49,6 +49,10 @@
 		} else if (!strcmp(value, "damage")) {
 			this->Damage = LuaToNumber(l, -1, j + 1);
 		//Wyrmgus start
+		} else if (!strcmp(value, "basic-damage")) {
+			this->BasicDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "piercing-damage")) {
+			this->PiercingDamage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "damage-self")) {
 			this->DamageSelf = LuaToBoolean(l, -1, j + 1);
 		} else if (!strcmp(value, "damage-friendly")) {
@@ -130,7 +134,10 @@
 	//
 	//  Effect of the explosion on units. Don't bother if damage is 0
 	//
-	if (this->Damage) {
+	//Wyrmgus start
+	//if (this->Damage) {
+	if (this->Damage || this->BasicDamage || this->PiercingDamage) {
+	//Wyrmgus end
 		std::vector<CUnit *> table;
 		SelectFixed(minpos, maxpos, table);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -138,10 +145,18 @@
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()
 				//Wyrmgus start
 //				&& unit.MapDistanceTo(goalPos) <= this->Range) {
-				&& unit.MapDistanceTo(caster.tilePos) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && ((!caster.IsAllied(unit) && unit.Player != caster.Player) || this->DamageFriendly)) {
-				//Wyrmgus end
 				// Don't hit flying units!
-				HitUnit(&caster, unit, this->Damage);
+//				HitUnit(&caster, unit, this->Damage);
+				&& unit.MapDistanceTo(caster.tilePos) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && ((!caster.IsAllied(unit) && unit.Player != caster.Player) || this->DamageFriendly)) {
+
+				int damage = 0;
+				if (this->BasicDamage || this->PiercingDamage) {
+					damage = std::max<int>(this->BasicDamage - unit.Stats->Variables[ARMOR_INDEX].Value, 1);
+					damage += this->PiercingDamage;
+					damage -= SyncRand() % ((damage + 2) / 2);
+				}
+				HitUnit(&caster, unit, this->Damage + damage);
+				//Wyrmgus end
 			}
 		}
 	}
