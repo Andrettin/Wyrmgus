@@ -136,8 +136,9 @@ static const char SHIELDPIERCING_KEY[] = "ShieldPiercing";
 static const char ISALIVE_KEY[] = "IsAlive";
 static const char PLAYER_KEY[] = "Player";
 static const char PRIORITY_KEY[] = "Priority";
-//Wyrmgus
+//Wyrmgus start
 static const char VARIATION_KEY[] = "Variation";
+static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -181,7 +182,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
 //Wyrmgus
 //							   PRIORITY_KEY
-							   PRIORITY_KEY, VARIATION_KEY
+							   PRIORITY_KEY, VARIATION_KEY, HITPOINTHEALING_KEY
 //Wyrmgus end
 							  };
 
@@ -1421,6 +1422,14 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "LandUnit")) {
 		lua_pushboolean(l, type->LandUnit);
 		return 1;
+	} else if (!strcmp(data, "GivesResource")) {
+		if (type->GivesResource > 0) {
+			lua_pushstring(l, DefaultResourceNames[type->GivesResource].c_str());
+			return 1;
+		} else {
+			lua_pushstring(l, "");
+			return 1;
+		}
 	} else if (!strcmp(data, "SelectableByRectangle")) {
 		lua_pushboolean(l, type->SelectableByRectangle);
 		return 1;
@@ -1734,7 +1743,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
 			//Wyrmgus
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
-			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == VARIATION_INDEX) {
+			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX) {
 			//Wyrmgus end
 			continue;
 		}

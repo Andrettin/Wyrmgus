@@ -956,14 +956,27 @@ static int CclGetUnits(lua_State *l)
 */
 static int CclGetUnitsAroundUnit(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	//Wyrmgus start
+//	LuaCheckArgs(l, 2);
+	LuaCheckArgs(l, 3); //allow a third argument, for whether the player should be the same as the original unit or not
+	//Wyrmgus end
 
 	const int slot = LuaToNumber(l, 1);
 	const CUnit &unit = UnitManager.GetSlotUnit(slot);
 	const int range = LuaToNumber(l, 2);
+	//Wyrmgus start
+	const bool same_player = LuaToBoolean(l, 3);
+	//Wyrmgus end
 	lua_newtable(l);
 	std::vector<CUnit *> table;
-	SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.Player));
+	//Wyrmgus start
+//	SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.Player));
+	if (same_player) {
+		SelectAroundUnit(unit, range, table, HasSamePlayerAs(*unit.Player));
+	} else {
+		SelectAroundUnit(unit, range, table);
+	}
+	//Wyrmgus end
 	size_t n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
 		if (table[i]->IsAliveOnMap()) {

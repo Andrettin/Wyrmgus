@@ -278,11 +278,17 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	}
 
 	if (TransformUnitIntoType(unit, newtype) == 0) {
-		player.Notify(NotifyYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
+		//Wyrmgus start
+		//I think it is too much to notify the player whenever an individual upgrade is cancelled
+//		player.Notify(NotifyYellow, unit.tilePos, _("Upgrade to %s canceled"), newtype.Name.c_str());
+		//Wyrmgus end
 		this->Finished = true;
 		return ;
 	}
-	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->Name.c_str());
+	//Wyrmgus start
+	//I think it is too much to notify the player whenever an individual upgrade is completed
+//	player.Notify(NotifyGreen, unit.tilePos, _("Upgrade to %s complete"), unit.Type->Name.c_str());
+	//Wyrmgus end
 
 	//  Warn AI.
 	if (player.AiEnabled) {

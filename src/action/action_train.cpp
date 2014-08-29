@@ -227,7 +227,10 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 
 	DropOutOnSide(*newUnit, LookingW, &unit);
-	player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
+	//Wyrmgus start
+	//we don't need to send the player a message every time a new unit is ready
+	//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
+	//Wyrmgus end
 	if (&player == ThisPlayer) {
 		PlayUnitSound(*newUnit, VoiceReady);
 	}
