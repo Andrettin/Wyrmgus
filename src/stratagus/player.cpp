@@ -1018,7 +1018,10 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 			const char *name = DefaultResourceNames[i].c_str();
 			const char *actionName = DefaultActions[i].c_str();
 
-			Notify(_("Not enough %s...%s more %s."), _(name), _(actionName), _(name));
+			//Wyrmgus start
+//			Notify(_("Not enough %s...%s more %s."), _(name), _(actionName), _(name));
+			Notify(_("Not enough %s... %s more %s."), _(name), _(actionName), _(name)); //added extra space to look better
+			//Wyrmgus end
 
 			if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound) {
 				PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound, MaxSampleVolume);

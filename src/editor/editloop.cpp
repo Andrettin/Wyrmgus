@@ -995,7 +995,10 @@ static void DrawEditorInfo()
 	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
+	//Wyrmgus start
+//	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 264, UI.StatusLine.TextY - 16, buf);
+	//Wyrmgus end
 #endif
 }
 

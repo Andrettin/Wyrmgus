@@ -60,6 +60,9 @@ struct lua_State;
 #define MapFieldAirUnit  0x2000  /// Air unit on field
 #define MapFieldSeaUnit  0x4000  /// Water unit on field
 #define MapFieldBuilding 0x8000  /// Building on field
+//Wyrmgus start
+#define MapFieldItem 0x0004		/// Item on field
+//Wyrmgus end
 
 /**
 **  These are used for lookup tiles types

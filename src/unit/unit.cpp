@@ -2443,10 +2443,17 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				HelpMeLastX = target.tilePos.x;
 				HelpMeLastY = target.tilePos.y;
 				PlayUnitSound(target, VoiceHelpMe);
+				//Wyrmgus start
+				//attacked messages now only appear if the "help" sound would be played too
+				target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
+				//Wyrmgus end
 			}
 		}
 	}
-	target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
+	//Wyrmgus start
+//	target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
+	//moved this because it was causing message spam
+	//Wyrmgus end
 
 	if (attacker && !target.Type->Building) {
 		if (target.Player->AiEnabled) {

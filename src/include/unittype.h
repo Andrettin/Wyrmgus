@@ -184,6 +184,9 @@ enum {
 	WALL_INDEX,
 	NORANDOMPLACING_INDEX,
 	ORGANIC_INDEX,
+	//Wyrmgus start
+	ITEM_INDEX,
+	//Wyrmgus end
 	NBARALREADYDEFINED
 };
 
@@ -593,6 +596,9 @@ public:
 	unsigned Wall : 1;                  /// Use special logic for Direction field.
 	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
 	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
+	//Wyrmgus start
+	unsigned Item : 1;					/// Item
+	//Wyrmgus end
 
 	CUnitStats DefaultStat;
 	struct BoolFlags {

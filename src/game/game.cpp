@@ -151,7 +151,10 @@ void StartMap(const std::string &filename, bool clean)
 	CreateGame(filename, &Map);
 
 	UI.StatusLine.Set(NameLine);
-	SetMessage("%s", _("Do it! Do it now!"));
+	//Wyrmgus start
+	//commented this out because it seemed superfluous
+//	SetMessage("%s", _("Do it! Do it now!"));
+	//Wyrmgus end
 
 	//  Play the game.
 	GameMainLoop();
