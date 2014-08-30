@@ -139,6 +139,7 @@ static const char PRIORITY_KEY[] = "Priority";
 //Wyrmgus start
 static const char VARIATION_KEY[] = "Variation";
 static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
+static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -182,7 +183,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
 //Wyrmgus
 //							   PRIORITY_KEY
-							   PRIORITY_KEY, VARIATION_KEY, HITPOINTHEALING_KEY
+							   PRIORITY_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY
 //Wyrmgus end
 							  };
 
@@ -1743,7 +1744,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
 			//Wyrmgus
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
-			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX) {
+			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX) {
 			//Wyrmgus end
 			continue;
 		}

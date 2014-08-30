@@ -292,16 +292,40 @@ Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, co
 **
 **  @return                damage inflicted to goal.
 */
-static int CalculateDamageStats(const CUnitStats &attacker_stats,
-								const CUnitStats &goal_stats, int bloodlust)
+//Wyrmgus start
+//static int CalculateDamageStats(const CUnitStats &attacker_stats,
+//								const CUnitStats &goal_stats, int bloodlust)
+static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_stats)
+//Wyrmgus end
 {
-	int basic_damage = attacker_stats.Variables[BASICDAMAGE_INDEX].Value;
-	int piercing_damage = attacker_stats.Variables[PIERCINGDAMAGE_INDEX].Value;
+	//Wyrmgus start
+//	int basic_damage = attacker_stats.Variables[BASICDAMAGE_INDEX].Value;
+//	int piercing_damage = attacker_stats.Variables[PIERCINGDAMAGE_INDEX].Value;
+	int basic_damage = attacker.Stats->Variables[BASICDAMAGE_INDEX].Value;
+	int piercing_damage = attacker.Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
+	//Wyrmgus end
 
+	//Wyrmgus start
+	/*
 	if (bloodlust) {
 		basic_damage *= 2;
 		piercing_damage *= 2;
 	}
+	*/
+	int damage_modifier = 100;
+	if (attacker.Variable[BLOODLUST_INDEX].Value > 0) {
+		damage_modifier += 100;
+	}
+	if (attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value > 0) {
+		if (SyncRand(100) < attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value) {
+			damage_modifier += 100;
+		}
+	}
+	basic_damage *= damage_modifier;
+	basic_damage /= 100;
+	piercing_damage *= damage_modifier;
+	piercing_damage /= 100;
+	//Wyrmgus end
 
 	int damage = std::max<int>(basic_damage - goal_stats.Variables[ARMOR_INDEX].Value, 1);
 	damage += piercing_damage;
@@ -323,8 +347,11 @@ static int CalculateDamageStats(const CUnitStats &attacker_stats,
 int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula)
 {
 	if (!formula) { // Use old method.
-		return CalculateDamageStats(*attacker.Stats, *goal.Stats,
-									attacker.Variable[BLOODLUST_INDEX].Value);
+		//Wyrmgus start
+//		return CalculateDamageStats(*attacker.Stats, *goal.Stats,
+//									attacker.Variable[BLOODLUST_INDEX].Value);
+		return CalculateDamageStats(attacker, *goal.Stats);
+		//Wyrmgus end
 	}
 	Assert(formula);
 
@@ -373,12 +400,20 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			if (Map.WallOnMap(goalPos)) {
 				if (Map.HumanWallOnMap(goalPos)) {
 					Map.HitWall(goalPos,
-								CalculateDamageStats(*unit.Stats,
-													 *UnitTypeHumanWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
+								//Wyrmgus start
+//								CalculateDamageStats(*unit.Stats,
+//													 *UnitTypeHumanWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
+								CalculateDamageStats(unit,
+													 *UnitTypeHumanWall->Stats));
+								//Wyrmgus end
 				} else {
 					Map.HitWall(goalPos,
-								CalculateDamageStats(*unit.Stats,
-													 *UnitTypeOrcWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
+								//Wyrmgus start
+//								CalculateDamageStats(*unit.Stats,
+//													 *UnitTypeOrcWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
+								CalculateDamageStats(unit,
+													 *UnitTypeOrcWall->Stats));
+								//Wyrmgus end
 				}
 				return;
 			}
@@ -873,7 +908,10 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		Assert(Map.OrcWallOnMap(tilePos));
 		stats = UnitTypeOrcWall->Stats;
 	}
-	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit->Stats, *stats, 0) / splash);
+	//Wyrmgus start
+//	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit->Stats, *stats, 0) / splash);
+	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats) / splash);
+	//Wyrmgus end
 }
 
 /**

@@ -445,6 +445,13 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 		}
 	}
 
+	//Wyrmgus start
+	//don't draw decorations on the minimap
+	if (type->Decoration) {
+		return;
+	}
+	//Wyrmgus end
+
 	Uint32 color;
 	if (unit.Player->Index == PlayerNumNeutral) {
 		color = Video.MapRGB(TheScreen->format, type->NeutralMinimapColorRGB);
