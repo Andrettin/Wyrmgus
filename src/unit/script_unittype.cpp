@@ -1757,6 +1757,8 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[VARIATION_INDEX].Max = VariationMax;
 	unit.Variable[VARIATION_INDEX].Enable = 1;
 	unit.Variable[VARIATION_INDEX].Value = unit.Variation;
+
+	unit.Variable[CRITICALSTRIKECHANCE_INDEX].Max = 100;
 	//Wyrmgus end
 
 	// Shield permeability

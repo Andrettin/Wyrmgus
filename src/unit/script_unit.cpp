@@ -917,6 +917,30 @@ static int CclKillUnitAt(lua_State *l)
 	return 1;
 }
 
+//Wyrmgus start
+/**
+**  Change the owner of a unit
+**
+**  @param l  Lua state.
+*/
+static int CclChangeUnitOwner(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	const int value = LuaToNumber(l, 2);
+	unit->ChangeOwner(Players[value]);
+
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Get a player's units
 **
@@ -1161,6 +1185,9 @@ void UnitCclRegister()
 	lua_register(Lua, "OrderUnit", CclOrderUnit);
 	lua_register(Lua, "KillUnit", CclKillUnit);
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
+	//Wyrmgus start
+	lua_register(Lua, "ChangeUnitOwner", CclChangeUnitOwner);
+	//Wyrmgus end
 
 	lua_register(Lua, "GetUnits", CclGetUnits);
 	lua_register(Lua, "GetUnitsAroundUnit", CclGetUnitsAroundUnit);

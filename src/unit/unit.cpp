@@ -1687,10 +1687,20 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	}
 
 	// Rescue all units in buildings/transporters.
-	CUnit *uins = UnitInside;
-	for (int i = InsideCount; i; --i, uins = uins->NextContained) {
-		uins->ChangeOwner(newplayer);
+	//Wyrmgus start
+//	CUnit *uins = UnitInside;
+//	for (int i = InsideCount; i; --i, uins = uins->NextContained) {
+//		uins->ChangeOwner(newplayer);
+//	}
+
+	//only rescue units inside if the player is actually a rescuable player (to avoid, for example, unintended worker owner changes when a depot changes hands)
+	if (oldplayer->Type == PlayerRescueActive || oldplayer->Type == PlayerRescuePassive) {
+		CUnit *uins = UnitInside;
+		for (int i = InsideCount; i; --i, uins = uins->NextContained) {
+			uins->ChangeOwner(newplayer);
+		}
 	}
+	//Wyrmgus end
 
 	//  Must change food/gold and other.
 	UnitLost(*this);
