@@ -574,8 +574,27 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
 		}
 	}
 
-	*fogTile = FogTable[fogTileIndex];
-	*blackFogTile = FogTable[blackFogTileIndex];
+	//Wyrmgus start
+//	*fogTile = FogTable[fogTileIndex];
+//	*blackFogTile = FogTable[blackFogTileIndex];
+	//apply variation according to tile index (sx is equal to the tile index, so let's use it)
+	int FogTileVariation = 0;
+	if (sx % 3 == 0 && Map.FogGraphic->Surface->h / 32 >= 3) {
+		FogTileVariation = 2;
+	} else if (sx % 2 == 0 && Map.FogGraphic->Surface->h / 32 >= 2) {
+		FogTileVariation = 1;
+	}
+	if (FogTable[fogTileIndex]) {
+		*fogTile = FogTable[fogTileIndex] + (FogTileVariation * 16);
+	} else {
+		*fogTile = FogTable[fogTileIndex];
+	}
+	if (FogTable[blackFogTileIndex]) {
+		*blackFogTile = FogTable[blackFogTileIndex] + (FogTileVariation * 16);
+	} else {
+		*blackFogTile = FogTable[blackFogTileIndex];
+	}
+	//Wyrmgus end
 }
 
 /**
@@ -704,7 +723,10 @@ void CMap::InitFogOfWar()
 		} else {
 			// Copy the top row to a new surface
 			SDL_PixelFormat *f = FogGraphic->Surface->format;
-			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, PixelTileSize.y,
+			//Wyrmgus start
+//			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, PixelTileSize.y,
+			s = SDL_CreateRGBSurface(SDL_SWSURFACE, FogGraphic->Surface->w, FogGraphic->Surface->h,
+			//Wyrmgus end
 									 f->BitsPerPixel, f->Rmask, f->Gmask, f->Bmask, f->Amask);
 			SDL_LockSurface(s);
 			SDL_LockSurface(FogGraphic->Surface);
@@ -725,7 +747,14 @@ void CMap::InitFogOfWar()
 
 					Video.GetRGBA(c, s->format, &r, &g, &b, &a);
 					if (a) {
-						c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
+						//Wyrmgus start
+//						c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
+						if (a >= 255) {
+							c = Video.MapRGBA(s->format, r, g, b, FogOfWarOpacity);
+						} else {
+							c = Video.MapRGBA(s->format, r, g, b, a / (256 / FogOfWarOpacity));
+						}
+						//Wyrmgus end
 						*reinterpret_cast<Uint32 *>(&reinterpret_cast<Uint8 *>(s->pixels)[i * 4 + j * s->pitch]) = c;
 					}
 				}
@@ -738,7 +767,10 @@ void CMap::InitFogOfWar()
 		AlphaFogG->Height = PixelTileSize.y;
 		AlphaFogG->GraphicWidth = s->w;
 		AlphaFogG->GraphicHeight = s->h;
-		AlphaFogG->NumFrames = 16;//1;
+		//Wyrmgus start
+//		AlphaFogG->NumFrames = 16;//1;
+		AlphaFogG->NumFrames = 16 * (s->h / 32);//1;
+		//Wyrmgus end
 		AlphaFogG->GenFramesMap();
 		AlphaFogG->UseDisplayFormat();
 	}

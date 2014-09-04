@@ -314,6 +314,10 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "convert-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			um->ConvertTo = UnitTypeByIdent(value);
+		//Wyrmgus start
+		} else if (!strcmp(key, "research-speed")) {
+			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
+		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
 			if (index != -1) {
@@ -532,6 +536,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	Assert(um);
 
 	int pn = player.Index;
+
+	//Wyrmgus start
+	if (um->SpeedResearch != 0) {
+		player.SpeedResearch += um->SpeedResearch;
+	}
+	//Wyrmgus end
 
 	for (int z = 0; z < UpgradeMax; ++z) {
 		// allow/forbid upgrades for player.  only if upgrade is not acquired

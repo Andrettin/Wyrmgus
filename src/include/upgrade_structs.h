@@ -186,7 +186,10 @@ public:
 class CUpgradeModifier
 {
 public:
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL)
+	//Wyrmgus start
+//	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL)
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL), SpeedResearch(0)
+	//Wyrmgus end
 	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
 		memset(ChangeUpgrades, 0, sizeof(ChangeUpgrades));
@@ -211,6 +214,10 @@ public:
 	char ApplyTo[UnitTypeMax];          /// which unit types are affected
 
 	CUnitType *ConvertTo;               /// convert to this unit-type.
+
+	//Wyrmgus start
+	int SpeedResearch;					/// how much the modifier changes research speed by
+	//Wyrmgus end
 };
 
 /**
