@@ -1214,7 +1214,10 @@ static void InfoPanel_draw_multiple_selection()
 */
 void CInfoPanel::Draw()
 {
-	if (UnitUnderCursor && Selected.empty()) {
+	//Wyrmgus start
+//	if (UnitUnderCursor && Selected.empty()) {
+	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->IsNotSelectable) {
+	//Wyrmgus end
 		InfoPanel_draw_single_selection(UnitUnderCursor);
 	} else {
 		switch (Selected.size()) {

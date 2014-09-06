@@ -189,7 +189,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		unit.ResourcesHeld = type.StartingResources;
 	}
 
-	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
+	//Wyrmgus start
+	//we don't need to notify the player for every building constructed
+//	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
+	//Wyrmgus end
 	if (&player == ThisPlayer) {
 		if (type.Sound.Ready.Sound) {
 			PlayUnitSound(unit, VoiceReady);
