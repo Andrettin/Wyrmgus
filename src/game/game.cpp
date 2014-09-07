@@ -504,7 +504,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 				for (int j = 0; j < map.Info.MapWidth; ++j) {
 					const CMapField &mf = map.Fields[j + i * map.Info.MapWidth];
 					const int tile = mf.getGraphicTile();
-					const int n = map.Tileset->findTileIndexByTile(tile);
+					//Wyrmgus start
+//					const int n = map.Tileset->findTileIndexByTile(tile);
+					const int n = mf.getTileIndex();
+					//Wyrmgus end
 					const int value = mf.Value;
 					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
 				}

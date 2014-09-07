@@ -46,9 +46,11 @@
 #include "unit_manager.h"
 
 CMapField::CMapField() :
-#ifdef DEBUG
+//Wyrmgus start
+//#ifdef DEBUG
 	tilesetTile(0),
-#endif
+//#endif
+//Wyrmgus end
 	tile(0),
 	Flags(0),
 	cost(0),
@@ -89,9 +91,11 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	this->Flags |= tile.flag;
 #endif
 	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
-#ifdef DEBUG
+	//Wyrmgus start
+//#ifdef DEBUG
 	this->tilesetTile = tileIndex;
-#endif
+//#endif
+	//Wyrmgus start
 }
 
 void CMapField::Save(CFile &file) const

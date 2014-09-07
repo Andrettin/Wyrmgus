@@ -195,6 +195,10 @@ public:
 
 	unsigned int getGraphicTile() const { return tile; }
 
+	//Wyrmgus start
+	unsigned int getTileIndex() const { return tilesetTile; }
+	//Wyrmgus end
+
 	/// Check if a field flags.
 	bool CheckMask(int mask) const;
 
@@ -222,9 +226,11 @@ public:
 	unsigned int getFlag() const { return Flags; }
 	void setGraphicTile(unsigned int tile) { this->tile = tile; }
 private:
-#ifdef DEBUG
+//Wyrmgus start
+//#ifdef DEBUG
 	unsigned int tilesetTile;  /// tileset tile number
-#endif
+//#endif
+//Wyrmgus end
 	unsigned short tile;       /// graphic tile number
 public:
 	unsigned short Flags;      /// field flags

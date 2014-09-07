@@ -263,6 +263,9 @@ public:
 	std::string TileModelsFileName; /// lua filename that loads all tilemodels
 	CGraphic *TileGraphic;     /// graphic for all the tiles
 	static CGraphic *FogGraphic;      /// graphic for fog of war
+	//Wyrmgus start
+	CGraphic *SolidTileGraphics[16];   /// separate graphics for solid tiles
+	//Wyrmgus end
 
 	CMapInfo Info;             /// descriptive information
 };

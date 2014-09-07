@@ -434,6 +434,14 @@ static int CclDefineTileset(lua_State *l)
 	ShowLoadProgress(_("Tileset `%s'"), Map.Tileset->ImageFile.c_str());
 	Map.TileGraphic = CGraphic::New(Map.Tileset->ImageFile, PixelTileSize.x, PixelTileSize.y);
 	Map.TileGraphic->Load();
+	//Wyrmgus start
+	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
+		if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
+			Map.SolidTileGraphics[i] = CGraphic::New(Map.Tileset->solidTerrainTypes[i].ImageFile, PixelTileSize.x, PixelTileSize.y);
+			Map.SolidTileGraphics[i]->Load();
+		}
+	}
+	//Wyrmgus end
 	return 0;
 }
 /**
@@ -488,7 +496,10 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	const CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
-	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
+	//Wyrmgus start
+//	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
+	const int index = mf.getTileIndex();
+	//Wyrmgus end
 	Assert(index != -1);
 	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 

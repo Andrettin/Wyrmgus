@@ -39,6 +39,9 @@
 #include "particle.h"
 #include "pathfinder.h"
 #include "player.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "unit.h"
 #include "unittype.h"
 #include "ui.h"
@@ -266,7 +269,14 @@ void CViewport::DrawMapBackgroundInViewport() const
 			} else {
 				tile = mf.playerInfo.SeenTile;
 			}
-			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
+			//Wyrmgus start
+//			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
+			if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].ImageFile.empty()) {
+				Map.SolidTileGraphics[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain]->DrawFrameClip(tile, dx, dy);
+			} else {
+				Map.TileGraphic->DrawFrameClip(tile, dx, dy);
+			}
+			//Wyrmgus end
 			++sx;
 			dx += PixelTileSize.x;
 		}

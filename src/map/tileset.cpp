@@ -601,9 +601,14 @@ unsigned int CTileset::getTileNumber(int basic, bool random, bool filler) const
 **  If the tile is 3/4 light grass and dark grass(0x06) in upper left corner
 **    the value is 0x06050505.
 */
-unsigned CTileset::getQuadFromTile(unsigned int tile) const
+//Wyrmgus start
+//unsigned CTileset::getQuadFromTile(unsigned int tile) const
+unsigned CTileset::getQuadFromTile(unsigned int tileIndex) const
+//Wyrmgus end
 {
-	const int tileIndex = findTileIndexByTile(tile);
+	//Wyrmgus start
+//	const int tileIndex = findTileIndexByTile(tile);
+	//Wyrmgus end
 	Assert(tileIndex != -1);
 
 	const unsigned base = tiles[tileIndex].tileinfo.BaseTerrain;

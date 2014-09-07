@@ -83,8 +83,11 @@ void ChangeTile(const Vec2i &pos, int tile)
 static unsigned QuadFromTile(const Vec2i &pos)
 {
 	// find the abstact tile number
-	const int tile = Map.Field(pos)->getGraphicTile();
-	return Map.Tileset->getQuadFromTile(tile);
+	//Wyrmgus start
+//	const int tile = Map.Field(pos)->getGraphicTile();
+//	return Map.Tileset->getQuadFromTile(tile);
+	return Map.Tileset->getQuadFromTile(Map.Field(pos)->getTileIndex());
+	//Wyrmgus end
 }
 
 /**

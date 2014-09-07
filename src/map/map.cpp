@@ -349,6 +349,15 @@ void CMap::Clean()
 	this->Info.Clear();
 	this->Fields = NULL;
 	this->NoFogOfWar = false;
+	//Wyrmgus start
+	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
+		if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
+			CGraphic::Free(this->SolidTileGraphics[i]);
+			this->SolidTileGraphics[i] = NULL;
+		}
+	}
+	memset(SolidTileGraphics, 0, sizeof(SolidTileGraphics));
+	//Wyrmgus end
 	this->Tileset->clear();
 	this->TileModelsFileName.clear();
 	CGraphic::Free(this->TileGraphic);

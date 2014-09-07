@@ -104,6 +104,9 @@ public:
 struct SolidTerrainInfo {
 	std::string TerrainName;  /// Name of the terrain
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
+	//Wyrmgus start
+	std::string ImageFile;		/// File containing image data
+	//Wyrmgus end
 };
 
 class CTile
@@ -154,7 +157,10 @@ public:
 	unsigned int getTileNumber(int basic, bool random, bool filler) const;
 	void fillSolidTiles(std::vector<unsigned int> *solidTiles) const;
 
-	unsigned getQuadFromTile(unsigned int tile) const;
+	//Wyrmgus start
+//	unsigned getQuadFromTile(unsigned int tile) const;
+	unsigned getQuadFromTile(unsigned int tileIndex) const;
+	//Wyrmgus end
 	int getTileBySurrounding(unsigned short type,
 							 int up, int right,
 							 int bottom, int left) const;
@@ -183,9 +189,14 @@ public:
 
 	// TODO: currently hardcoded
 	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
+	//Wyrmgus start
+	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
+	//Wyrmgus end
 private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel
-	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
+	//Wyrmgus start
+//	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
+	//Wyrmgus end
 #if 1
 	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
 	unsigned topOneTreeTile;   /// Tile for one tree top
