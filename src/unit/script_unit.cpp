@@ -46,6 +46,9 @@
 #include "script.h"
 #include "spells.h"
 #include "trigger.h"
+//Wyrmgus start
+#include "ui.h"
+//Wyrmgus end
 #include "unit_find.h"
 #include "unit_manager.h"
 #include "unittype.h"
@@ -1151,6 +1154,11 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 	}
 	lua_pushnumber(l, value);
+	//Wyrmgus start
+	if (IsOnlySelected(*unit)) {
+		UI.ButtonPanel.Update();
+	}
+	//Wyrmgus end
 	return 1;
 }
 
