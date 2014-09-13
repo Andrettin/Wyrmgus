@@ -1173,6 +1173,28 @@ static int CclSlotUsage(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+**
+**  Get whether the unit is idle or not.
+**
+**  @param l  Lua state.
+**
+**  @return   Whether the unit is idle or not.
+*/
+static int CclIsUnitIdle(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+
+	lua_pushvalue(l, 1);
+	const CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	lua_pushboolean(l, unit->IsIdle());
+	return 1;
+}
+//Wyrmgus end
+
 /**
 **  Register CCL features for unit.
 */
@@ -1206,6 +1228,9 @@ void UnitCclRegister()
 	lua_register(Lua, "SetUnitVariable", CclSetUnitVariable);
 
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
+	//Wyrmgus start
+	lua_register(Lua, "IsUnitIdle", CclIsUnitIdle);
+	//Wyrmgus end
 }
 
 //@}

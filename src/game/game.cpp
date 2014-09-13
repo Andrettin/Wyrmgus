@@ -637,6 +637,10 @@ static void LoadMap(const std::string &filename, CMap &map)
 */
 void SetGamePaused(bool paused)
 {
+	//Wyrmgus start
+	KeyScrollState = MouseScrollState = ScrollNone;
+	//Wyrmgus end
+
 	GamePaused = paused;
 }
 
