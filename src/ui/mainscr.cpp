@@ -1022,7 +1022,10 @@ void DrawCosts()
 	int x = UI.StatusLine.TextX + 268;
 	CLabel label(GetGameFont());
 	if (Costs[ManaResCost]) {
-		UI.Resources[ManaResCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
+		//Wyrmgus start
+//		UI.Resources[ManaResCost].G->DrawFrameClip(3, x, UI.StatusLine.TextY);
+		UI.Resources[ManaResCost].G->DrawFrameClip(UI.Resources[ManaResCost].IconFrame, x, UI.StatusLine.TextY);
+		//Wyrmgus end
 
 		x += 20;
 		x += label.Draw(x, UI.StatusLine.TextY, Costs[ManaResCost]);

@@ -969,7 +969,10 @@ static void DrawEditorInfo()
 	// Flags info
 	//
 	const unsigned flag = mf.getFlag();
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	//Wyrmgus start
+//	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	//Wyrmgus start
 			mf.Value, flag,
 			flag & MapFieldUnpassable   ? 'u' : '-',
 			flag & MapFieldNoBuilding   ? 'n' : '-',
@@ -983,7 +986,11 @@ static void DrawEditorInfo()
 			flag & MapFieldLandUnit     ? 'l' : '-',
 			flag & MapFieldAirUnit      ? 'a' : '-',
 			flag & MapFieldSeaUnit      ? 's' : '-',
-			flag & MapFieldBuilding     ? 'b' : '-');
+			//Wyrmgus start
+//			flag & MapFieldBuilding     ? 'b' : '-');
+			flag & MapFieldBuilding     ? 'b' : '-',
+			flag & MapFieldItem         ? 'i' : '-');
+			//Wyrmgus end
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 16, buf);
 
 	// Tile info
@@ -1000,7 +1007,7 @@ static void DrawEditorInfo()
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 264, UI.StatusLine.TextY - 16, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 288, UI.StatusLine.TextY - 16, buf);
 	//Wyrmgus end
 #endif
 }
