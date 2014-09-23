@@ -942,6 +942,33 @@ static int CclChangeUnitOwner(lua_State *l)
 
 	return 0;
 }
+
+/**
+**  Convert unit to a new unit type
+**
+**  @param l  Lua state.
+*/
+static int CclConvertUnit(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	lua_pushvalue(l, 2);
+	CUnitType *unittype = CclGetUnitType(l);
+	if (unittype == NULL) {
+		LuaError(l, "Bad unittype");
+	}
+	CommandTransformIntoType(*unit, *unittype);
+
+	return 0;
+}
 //Wyrmgus end
 
 /**
@@ -1217,6 +1244,7 @@ void UnitCclRegister()
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
 	//Wyrmgus start
 	lua_register(Lua, "ChangeUnitOwner", CclChangeUnitOwner);
+	lua_register(Lua, "ConvertUnit", CclConvertUnit);
 	//Wyrmgus end
 
 	lua_register(Lua, "GetUnits", CclGetUnits);
