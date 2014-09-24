@@ -308,7 +308,10 @@ extern CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top = t
 extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
 
 /// Check map for obstacles in a line between 2 tiles
-extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = NULL);
+//Wyrmgus start
+//extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = NULL);
+extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int *distance = NULL);
+//Wyrmgus end
 /// Find best enemy in numeric range to attack
 extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool onlyBuildings = false);
 /// Find best enemy in attack range to attack

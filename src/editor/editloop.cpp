@@ -971,10 +971,13 @@ static void DrawEditorInfo()
 	const unsigned flag = mf.getFlag();
 	//Wyrmgus start
 //	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 	//Wyrmgus start
 			mf.Value, flag,
 			flag & MapFieldUnpassable   ? 'u' : '-',
+			//Wyrmgus start
+			flag & MapFieldAirUnpassable   ? 'A' : '-',
+			//Wyrmgus end
 			flag & MapFieldNoBuilding   ? 'n' : '-',
 			flag & MapFieldHuman        ? 'h' : '-',
 			flag & MapFieldWall         ? 'w' : '-',

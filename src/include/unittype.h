@@ -632,8 +632,12 @@ public:
 
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 
-	unsigned FieldFlags;            /// Unit map field flags
-	unsigned MovementMask;          /// Unit check this map flags for move
+	//Wyrmgus start
+//	unsigned FieldFlags;            /// Unit map field flags
+//	unsigned MovementMask;          /// Unit check this map flags for move
+	unsigned long FieldFlags;            /// Unit map field flags
+	unsigned long MovementMask;          /// Unit check this map flags for move
+	//Wyrmgus end
 
 	/// @todo This stats should? be moved into the player struct
 	CUnitStats Stats[PlayerMax];     /// Unit status for each player

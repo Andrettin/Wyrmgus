@@ -233,7 +233,10 @@ private:
 //Wyrmgus end
 	unsigned short tile;       /// graphic tile number
 public:
-	unsigned short Flags;      /// field flags
+	//Wyrmgus start
+//	unsigned short Flags;      /// field flags
+	unsigned long Flags;      /// field flags
+	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile
 public:

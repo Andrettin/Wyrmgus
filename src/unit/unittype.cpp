@@ -788,7 +788,12 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				MapFieldUnpassable;
 			break;
 		case UnitTypeFly:                               // in air
-			type.MovementMask = MapFieldAirUnit; // already occuppied
+			//Wyrmgus start
+//			type.MovementMask = MapFieldAirUnit; // already occuppied
+			type.MovementMask =
+				MapFieldAirUnit | // already occuppied
+				MapFieldAirUnpassable;
+			//Wyrmgus end
 			break;
 		case UnitTypeNaval:                             // on water
 			if (type.CanTransport()) {

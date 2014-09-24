@@ -41,6 +41,8 @@
 
 struct lua_State;
 
+//Wyrmgus start
+/*
 // Not used until now:
 #define MapFieldSpeedMask 0x0007  /// Move faster on this tile
 
@@ -60,8 +62,29 @@ struct lua_State;
 #define MapFieldAirUnit  0x2000  /// Air unit on field
 #define MapFieldSeaUnit  0x4000  /// Water unit on field
 #define MapFieldBuilding 0x8000  /// Building on field
-//Wyrmgus start
-#define MapFieldItem 0x0004		/// Item on field
+*/
+#define MapFieldItem 0x00000004		/// Item on field
+
+#define MapFieldSpeedMask 0x00000007  /// Move faster on this tile
+
+#define MapFieldHuman 0x00000008  /// Human is owner of the field (walls)
+
+#define MapFieldLandAllowed  0x00000010  /// Land units allowed
+#define MapFieldCoastAllowed 0x00000020  /// Coast (transporter) units allowed
+#define MapFieldWaterAllowed 0x00000040  /// Water units allowed
+#define MapFieldNoBuilding   0x00000080  /// No buildings allowed
+
+#define MapFieldUnpassable 0x00000100  /// Field is movement blocked
+#define MapFieldWall       0x00000200  /// Field contains wall
+#define MapFieldRocks      0x00000400  /// Field contains rocks
+#define MapFieldForest     0x00000800  /// Field contains forest
+
+#define MapFieldLandUnit 0x00001000  /// Land unit on field
+#define MapFieldAirUnit  0x00002000  /// Air unit on field
+#define MapFieldSeaUnit  0x00004000  /// Water unit on field
+#define MapFieldBuilding 0x00008000  /// Building on field
+
+#define MapFieldAirUnpassable 0x00010000  /// Field is movement blocked
 //Wyrmgus end
 
 /**
@@ -116,7 +139,10 @@ public:
 
 public:
 	unsigned short tile;  /// graphical pos
-	unsigned short flag;  /// Flag
+	//Wyrmgus start
+//	unsigned short flag;  /// Flag
+	unsigned long flag;  /// Flag
+	//Wyrmgus end
 	CTileInfo tileinfo;   /// Tile descriptions
 };
 

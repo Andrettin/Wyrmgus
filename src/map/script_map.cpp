@@ -523,7 +523,10 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
-	unsigned short flag = 0;
+	//Wyrmgus start
+//	unsigned short flag = 0;
+	unsigned long flag = 0;
+	//Wyrmgus end
 	const char *flag_name = LuaToString(l, 3);
 	if (!strcmp(flag_name, "water")) {
 		flag = MapFieldWaterAllowed;
@@ -535,6 +538,10 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		flag = MapFieldNoBuilding;
 	} else if (!strcmp(flag_name, "unpassable")) {
 		flag = MapFieldUnpassable;
+	//Wyrmgus start
+	} else if (!strcmp(flag_name, "air-unpassable")) {
+		flag = MapFieldAirUnpassable;
+	//Wyrmgus end
 	} else if (!strcmp(flag_name, "wall")) {
 		flag = MapFieldWall;
 	} else if (!strcmp(flag_name, "rock")) {
