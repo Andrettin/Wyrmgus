@@ -400,6 +400,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Civilization = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			type->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			type->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
 		//Wyrmgus end
@@ -1374,6 +1376,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, type->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, type->Quote.c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, type->Background.c_str());

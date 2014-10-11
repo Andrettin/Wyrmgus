@@ -8,6 +8,7 @@ class CUpgrade
   std::string Class;
   std::string Civilization;
   std::string Description;
+  std::string Quote;
   std::string Background;
   //Wyrmgus end
   int Costs[MaxCosts];

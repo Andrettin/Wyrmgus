@@ -472,7 +472,8 @@ public:
 	std::string Class;				/// Class identifier (i.e. infantry, archer, etc.)
 	std::string Civilization;		/// Which civilization this unit belongs to, if any
 	std::string Description;		/// Description of the unit type
-	std::string Background;	/// Encyclopedia entry for the unit type
+	std::string Quote;				/// Quote of the unit type
+	std::string Background;			/// Encyclopedia entry for the unit type
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files

@@ -1127,7 +1127,10 @@ static void InfoPanel_draw_no_selection()
 				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
 				Video.FillRectangleClip(Players[i].Color, x + 1, y + 1, 10, 10);
 
-				label.Draw(x + 27, y, Players[i].Name);
+				//Wyrmgus start
+//				label.Draw(x + 27, y, Players[i].Name);
+				label.Draw(x + 27, y, _(Players[i].Name.c_str()));
+				//Wyrmgus end
 				label.Draw(x + 117, y, Players[i].Score);
 				y += 14;
 			}

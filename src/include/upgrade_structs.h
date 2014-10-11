@@ -166,7 +166,8 @@ public:
 	std::string Class;				/// upgrade class (i.e. siege weapon projectile I)
 	std::string Civilization;		/// civilization the upgrade belongs to
 	std::string Description;		/// Description of the upgrade
-	std::string Background;	/// Encyclopedia entry for the upgrade
+	std::string Quote;				/// Quote of the upgrade
+	std::string Background;			/// Encyclopedia entry for the upgrade
 	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
