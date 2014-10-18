@@ -123,6 +123,9 @@ public:
 	virtual void *_getData() const { return Surface; }
 	virtual int getWidth() const { return Width; }
 	virtual int getHeight() const { return Height; }
+	//Wyrmgus start
+	virtual std::string getFile() const { return File; }
+	//Wyrmgus end
 
 	std::string File;          /// Filename
 	std::string HashFile;      /// Filename used in hash

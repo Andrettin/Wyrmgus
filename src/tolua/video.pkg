@@ -26,6 +26,9 @@ public:
 	static void Free(CGraphic *);
 	void Load();
 	void Resize(int w, int h);
+	//Wyrmgus start
+	virtual std::string &getFile();
+	//Wyrmgus end
 };
 
 class CPlayerColorGraphic : public CGraphic
