@@ -610,6 +610,9 @@ int GetResourceIdByName(lua_State *l, const char *resourceName)
 CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
+	//Wyrmgus start
+	TechnologyPointCost(0),
+	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
 	TeleportCost(0), TeleportEffectIn(NULL), TeleportEffectOut(NULL),

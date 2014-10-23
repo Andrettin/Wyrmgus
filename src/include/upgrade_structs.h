@@ -171,6 +171,9 @@ public:
 	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
+	//Wyrmgus start
+	int   TechnologyPointCost;		/// technology point cost
+	//Wyrmgus end
 	// TODO: not used by buttons
 	CIcon *Icon;                      /// icon to display to the user
 };

@@ -1069,6 +1069,8 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		//Wyrmgus start
+		} else if (!strcmp(value, "TechnologyPointCost")) {
+			type->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Variations")) {
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
@@ -1385,6 +1387,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, type->Icon.Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "TechnologyPointCost")) {
+		lua_pushnumber(l, type->TechnologyPointCost);
 		return 1;
 	} else if (!strcmp(data, "DrawLevel")) {
 		lua_pushnumber(l, type->DrawLevel);

@@ -488,6 +488,9 @@ public:
 	int ShadowHeight;                                     /// Shadow sprite height
 	int ShadowOffsetX;                                    /// Shadow horizontal offset
 	int ShadowOffsetY;                                    /// Shadow vertical offset
+	//Wyrmgus start
+	int TechnologyPointCost;								/// Technology point cost
+	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
 	CAnimations *Animations;        /// Animation scripts

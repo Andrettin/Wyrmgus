@@ -12,6 +12,9 @@ class CUpgrade
   std::string Background;
   //Wyrmgus end
   int Costs[MaxCosts];
+  //Wyrmgus start
+  int TechnologyPointCost;
+  //Wyrmgus end
   CIcon *Icon;
 };
 

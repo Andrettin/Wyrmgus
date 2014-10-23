@@ -70,7 +70,7 @@ struct SoundChannel {
 	void (*FinishedCallback)(int channel); /// Callback for when a sample finishes playing
 };
 
-#define MaxChannels 32     /// How many channels are supported
+#define MaxChannels 64     /// How many channels are supported
 
 static SoundChannel Channels[MaxChannels];
 static int NextFreeChannel;
