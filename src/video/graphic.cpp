@@ -284,6 +284,46 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 	}
 }
 
+//Wyrmgus start
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha)
+{
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		if (!PlayerColorTextures[player]) {
+			MakePlayerColorTexture(this, player);
+		}
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glColor4ub(255, 255, 255, alpha);
+		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	} else
+#endif
+	{
+		GraphicPlayerPixels(Players[player], *this);
+		DrawFrameClipTrans(frame, x, y, alpha);
+	}
+}
+
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha)
+{
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		if (!PlayerColorTextures[player]) {
+			MakePlayerColorTexture(this, player);
+		}
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glColor4ub(255, 255, 255, alpha);
+		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	} else
+#endif
+	{
+		GraphicPlayerPixels(Players[player], *this);
+		DrawFrameClipTransX(frame, x, y, alpha);
+	}
+}
+//Wyrmgus end
+
 /**
 **  Draw graphic object unclipped and flipped in X direction.
 **
@@ -395,6 +435,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	} else
 #endif
 	{
+		/*
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
 		const int oldx = x;
@@ -409,6 +450,21 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
+		*/
+		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
+
+		const int oldx = x;
+		const int oldy = y;
+		CLIP_RECTANGLE(x, y, srect.w, srect.h);
+		srect.x += x - oldx;
+		srect.y += y - oldy;
+
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+		const int oldalpha = SurfaceFlip->format->alpha;
+
+		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, alpha);
+		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, oldalpha);
 	}
 }
 

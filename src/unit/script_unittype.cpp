@@ -93,6 +93,7 @@ static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
 static const char ORGANIC_KEY[] = "organic";
 //Wyrmgus start
 static const char ITEM_KEY[] = "Item";
+static const char TRANSPARENT_KEY[] = "Transparent";
 //Wyrmgus end
 
 // names of the variable.
@@ -158,7 +159,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY, TRANSPARENT_KEY
 	//Wyrmgus end
 							  };
 
@@ -359,6 +360,7 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
 	//Wyrmgus start
 	type.BoolFlag[ITEM_INDEX].value                  = type.Item;
+	type.BoolFlag[TRANSPARENT_INDEX].value           = type.Transparent;
 	//Wyrmgus end
 }
 
@@ -734,6 +736,8 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "Item")) {
 			type->Item = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Transparent")) {
+			type->Transparent = LuaToBoolean(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "VisibleUnderFog")) {
 			type->VisibleUnderFog = LuaToBoolean(l, -1);
@@ -1429,6 +1433,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Item")) {
 		lua_pushboolean(l, type->Item);
+		return 1;
+	} else if (!strcmp(data, "Transparent")) {
+		lua_pushboolean(l, type->Transparent);
 		return 1;
 	} else if (!strcmp(data, "LandUnit")) {
 		lua_pushboolean(l, type->LandUnit);

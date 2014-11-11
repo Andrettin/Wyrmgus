@@ -165,6 +165,10 @@ protected:
 public:
 	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
+	//Wyrmgus start
+	void DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha);
+	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha);
+	//Wyrmgus end
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);

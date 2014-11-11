@@ -636,6 +636,7 @@ CUnitType::CUnitType() :
 	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
 	//Wyrmgus start
 	Item(0),
+	Transparent(0),
 	//Wyrmgus end
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
@@ -1017,6 +1018,8 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;
 
+	//Wyrmgus start
+	/*
 	if (type.Flip) {
 		if (frame < 0) {
 			sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
@@ -1033,6 +1036,36 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 		}
 		sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 	}
+	*/
+	if (type.Flip) {
+		if (frame < 0) {
+			if (type.Transparent) {
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, 128);
+			} else {
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
+			}
+		} else {
+			if (type.Transparent) {
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, 128);
+			} else {
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+			}
+		}
+	} else {
+		const int row = type.NumDirections / 2 + 1;
+
+		if (frame < 0) {
+			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+		} else {
+			frame = (frame / row) * type.NumDirections + frame % row;
+		}
+		if (type.Transparent) {
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, 128);
+		} else {
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+		}
+	}
+	//Wyrmgus end
 }
 
 /**

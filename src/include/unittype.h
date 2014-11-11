@@ -186,6 +186,7 @@ enum {
 	ORGANIC_INDEX,
 	//Wyrmgus start
 	ITEM_INDEX,
+	TRANSPARENT_INDEX,
 	//Wyrmgus end
 	NBARALREADYDEFINED
 };
@@ -604,6 +605,7 @@ public:
 	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
 	//Wyrmgus start
 	unsigned Item : 1;					/// Item
+	unsigned Transparent : 1;			/// Transparent
 	//Wyrmgus end
 
 	CUnitStats DefaultStat;
