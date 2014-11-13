@@ -1422,6 +1422,17 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Supply")) {
 		lua_pushnumber(l, type->Supply);
 		return 1;
+	} else if (!strcmp(data, "Type")) {
+		if (type->UnitType == UnitTypeLand) {
+			lua_pushstring(l, "land");
+			return 1;
+		} else if (type->UnitType == UnitTypeFly) {
+			lua_pushstring(l, "fly");
+			return 1;
+		} else if (type->UnitType == UnitTypeNaval) {
+			lua_pushstring(l, "naval");
+			return 1;
+		}
 	} else if (!strcmp(data, "Corpse")) {
 		lua_pushstring(l, type->CorpseName.c_str());
 		return 1;
