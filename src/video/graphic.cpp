@@ -435,6 +435,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	} else
 #endif
 	{
+		//Wyrmgus start
 		/*
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
@@ -465,6 +466,7 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, oldalpha);
+		//Wyrmgus end
 	}
 }
 

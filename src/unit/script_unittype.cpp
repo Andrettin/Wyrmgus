@@ -1398,6 +1398,12 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "DrawLevel")) {
 		lua_pushnumber(l, type->DrawLevel);
 		return 1;
+	} else if (!strcmp(data, "TileWidth")) {
+		lua_pushnumber(l, type->TileWidth);
+		return 1;
+	} else if (!strcmp(data, "TileHeight")) {
+		lua_pushnumber(l, type->TileHeight);
+		return 1;
 	} else if (!strcmp(data, "ComputerReactionRange")) {
 		lua_pushnumber(l, type->ReactRangeComputer);
 		return 1;
