@@ -1025,7 +1025,10 @@ static void ShowUnitInfo(const CUnit &unit)
 	char buf[256];
 
 	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
-					unit.Type->Name.c_str(), unit.Player->Index,
+					//Wyrmgus start
+//					unit.Type->Name.c_str(), unit.Player->Index,
+					unit.Type->DefaultName.empty() ? unit.Type->Name.c_str() : unit.Type->DefaultName.c_str(), unit.Player->Index,
+					//Wyrmgus end
 					unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
 		sprintf(buf + n, _(" Amount %d"), unit.ResourcesHeld);
@@ -1515,7 +1518,10 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			char buf[256];
 			snprintf(buf, sizeof(buf), "%s \"%s\"",
 					 Editor.ShownUnitTypes[i]->Ident.c_str(),
-					 Editor.ShownUnitTypes[i]->Name.c_str());
+					 //Wyrmgus start
+//					 Editor.ShownUnitTypes[i]->Name.c_str());
+					 Editor.ShownUnitTypes[i]->DefaultName.empty() ? Editor.ShownUnitTypes[i]->Name.c_str() : Editor.ShownUnitTypes[i]->DefaultName.c_str());
+					 //Wyrmgus end
 			UI.StatusLine.Set(buf);
 			Editor.CursorUnitIndex = i;
 			return true;

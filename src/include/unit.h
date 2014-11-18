@@ -338,6 +338,7 @@ public:
 	int         Frame;      /// Image frame: <0 is mirrored
 	CUnitColors *Colors;    /// Player colors
 	//Wyrmgus start
+	std::string Name;	/// Unit's personal name (if any)
 	int Variation;      /// Which of the variations of its unit type this unit has
 	//Wyrmgus end
 

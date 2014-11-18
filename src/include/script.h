@@ -140,6 +140,9 @@ enum EString {
 	EString_InverseVideo, /// Inverse video for the string ("a" -> "~<a~>").
 	EString_If,           /// If cond then String1 else String2.
 	EString_UnitName,     /// UnitType Name.
+	//Wyrmgus start
+	EString_UnitTypeName,     /// UnitType Name, if EString_UnitName is occupied by the unit's personal name.
+	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.
 	EString_PlayerName    /// player name.

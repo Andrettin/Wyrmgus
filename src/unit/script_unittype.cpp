@@ -395,18 +395,6 @@ static int CclDefineUnitType(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			type->Name = LuaToString(l, -1);
-		//Wyrmgus start
-		} else if (!strcmp(value, "Class")) {
-			type->Class = LuaToString(l, -1);
-		} else if (!strcmp(value, "Civilization")) {
-			type->Civilization = LuaToString(l, -1);
-		} else if (!strcmp(value, "Description")) {
-			type->Description = LuaToString(l, -1);
-		} else if (!strcmp(value, "Quote")) {
-			type->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "Background")) {
-			type->Background = LuaToString(l, -1);
-		//Wyrmgus end
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1073,6 +1061,33 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		//Wyrmgus start
+		} else if (!strcmp(value, "Class")) {
+			type->Class = LuaToString(l, -1);
+		} else if (!strcmp(value, "Civilization")) {
+			type->Civilization = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			type->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			type->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			type->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "DefaultName")) {
+			type->DefaultName = LuaToString(l, -1);
+		} else if (!strcmp(value, "PersonalNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				type->PersonalNames[j] = LuaToString(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "PersonalNamePrefixes")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				type->PersonalNamePrefixes[j] = LuaToString(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "PersonalNameSuffixes")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				type->PersonalNameSuffixes[j] = LuaToString(l, -1, j + 1);
+			}
 		} else if (!strcmp(value, "TechnologyPointCost")) {
 			type->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Variations")) {

@@ -544,6 +544,38 @@ static int CclDefineRaceNames(lua_State *l)
 					PlayerRaces.Display[i] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "visible")) {
 					PlayerRaces.Visible[i] = 1;
+				//Wyrmgus start
+				} else if (!strcmp(value, "personal_names")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.PersonalNames[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "personal_name_prefixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.PersonalNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "personal_name_suffixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.PersonalNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				//Wyrmgus end
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}

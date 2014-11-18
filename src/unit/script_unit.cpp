@@ -1093,8 +1093,12 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
 		lua_pushnumber(l, unit->ResourcesHeld);
-	} else if (!strcmp(value, "Name")) {
+	//Wyrmgus
+	} else if (!strcmp(value, "TypeName")) {
 		lua_pushstring(l, unit->Type->Name.c_str());
+	} else if (!strcmp(value, "Name")) {
+		lua_pushstring(l, unit->Name.c_str());
+	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
@@ -1202,6 +1206,26 @@ static int CclSlotUsage(lua_State *l)
 
 //Wyrmgus start
 /**
+**  Set the name of the unit structure.
+**
+**  @param l  Lua state.
+**
+**  @return   The name of the unit.
+*/
+static int CclSetUnitName(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	unit->Name = LuaToString(l, 2);
+
+	lua_pushvalue(l, 2);
+	return 1;
+}
+
+/**
 **
 **  Get whether the unit is idle or not.
 **
@@ -1257,6 +1281,7 @@ void UnitCclRegister()
 
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
 	//Wyrmgus start
+	lua_register(Lua, "SetUnitName", CclSetUnitName);
 	lua_register(Lua, "IsUnitIdle", CclIsUnitIdle);
 	//Wyrmgus end
 }

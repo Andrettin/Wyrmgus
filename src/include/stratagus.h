@@ -156,6 +156,7 @@ extern const char NameLine[];
 #define MAX_RACES 8
 //Wyrmgus start
 #define VariationMax 32 //maximum number of variations a unit can have
+#define PersonalNameMax 1024 //maximum number of personal names a civilization can have
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)

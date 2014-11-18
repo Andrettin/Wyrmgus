@@ -811,6 +811,11 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitName")) {
 			res->e = EString_UnitName;
 			res->D.Unit = CclParseUnitDesc(l);
+		//Wyrmgus start
+		} else if (!strcmp(key, "UnitTypeName")) {
+			res->e = EString_UnitTypeName;
+			res->D.Unit = CclParseUnitDesc(l);
+		//Wyrmgus end
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
 			if (lua_rawlen(l, -1) != 2 && lua_rawlen(l, -1) != 3) {
@@ -1059,10 +1064,26 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
-				return unit->Type->Name;
+				//Wyrmgus
+//				return unit->Type->Name;
+				if (!unit->Name.empty()) {
+					return unit->Name;
+				} else {
+					return unit->Type->Name;
+				}
+				//Wyrmgus end
 			} else { // ERROR.
 				return std::string("");
 			}
+		//Wyrmgus start
+		case EString_UnitTypeName : // name of the UnitType
+			unit = EvalUnit(s->D.Unit);
+			if (unit != NULL && !unit->Name.empty()) {
+				return unit->Type->Name;
+			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
+				return std::string("");
+			}
+		//Wyrmgus end
 		case EString_If : // cond ? True : False;
 			if (EvalNumber(s->D.If.Cond)) {
 				return EvalString(s->D.If.BTrue);
@@ -1246,6 +1267,12 @@ void FreeStringDesc(StringDesc *s)
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
 			break;
+		//Wyrmgus start
+		case EString_UnitTypeName : // Name of the UnitType
+			FreeUnitDesc(s->D.Unit);
+			delete s->D.Unit;
+			break;
+		//Wyrmgus end
 		case EString_If : // cond ? True : False;
 			FreeNumberDesc(s->D.If.Cond);
 			delete s->D.If.Cond;
@@ -1701,6 +1728,21 @@ static int CclUnitName(lua_State *l)
 	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitName");
 }
+//Wyrmgus start
+/**
+**  Return equivalent lua table for UnitName.
+**  {"UnitTypeName", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitTypeName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitTypeName");
+}
+//Wyrmgus end
 /**
 **  Return equivalent lua table for If.
 **  {"If", {arg1}}
@@ -1887,6 +1929,9 @@ static void AliasRegister()
 	lua_register(Lua, "String", CclString);
 	lua_register(Lua, "InverseVideo", CclInverseVideo);
 	lua_register(Lua, "UnitName", CclUnitName);
+	//Wyrmgus start
+	lua_register(Lua, "UnitTypeName", CclUnitTypeName);
+	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);
 	lua_register(Lua, "GameInfo", CclGameInfo);

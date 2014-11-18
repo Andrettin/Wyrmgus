@@ -257,6 +257,11 @@ public:
 	bool Visible[MAX_RACES];        /// race should be visible in pulldown
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
+	//Wyrmgus start
+	std::string PersonalNames[MAX_RACES][PersonalNameMax];	/// personal names
+	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];	/// personal prefixes
+	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];	/// personal suffixes
+	//Wyrmgus end
 	unsigned int Count;             /// number of races
 };
 

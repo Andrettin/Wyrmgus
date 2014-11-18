@@ -475,6 +475,10 @@ public:
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
+	std::string DefaultName;		/// Default personal name of the unit type (used by heroes)
+	std::string PersonalNames[PersonalNameMax];	/// personal names
+	std::string PersonalNamePrefixes[PersonalNameMax];	/// personal name prefixes
+	std::string PersonalNameSuffixes[PersonalNameMax];	/// personal name suffixes
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files
