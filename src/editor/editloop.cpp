@@ -187,7 +187,10 @@ static void EditTile(const Vec2i &pos, int tile)
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	const CTileset &tileset = *Map.Tileset;
-	const int baseTileIndex = tileset.findTileIndexByTile(tile);
+	//Wyrmgus start
+//	const int baseTileIndex = tileset.findTileIndexByTile(tile);
+	const int baseTileIndex = tile;
+	//Wyrmgus end
 	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	CMapField &mf = *Map.Field(pos);
 	mf.setTileIndex(tileset, tileIndex, 0);
@@ -636,7 +639,14 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 
 	x += 4;
 	y += 4;
-	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
+	//Wyrmgus start
+//	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
+	if (Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tilenum].tileinfo.BaseTerrain].ImageFile.empty()) {
+		Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
+	} else {
+		Map.SolidTileGraphics[Map.Tileset->tiles[tilenum].tileinfo.BaseTerrain]->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
+	}
+	//Wyrmgus end
 
 	if (flags & IconSelected) {
 		Video.DrawRectangleClip(ColorGreen, x, y, PixelTileSize.x, PixelTileSize.y);
@@ -709,9 +719,19 @@ static void DrawTileIcons()
 			if (i >= (int) Editor.ShownTileTypes.size()) {
 				break;
 			}
-			const unsigned int tile = Editor.ShownTileTypes[i];
+			//Wyrmgus start
+//			const unsigned int tile = Editor.ShownTileTypes[i];
 
-			Map.TileGraphic->DrawFrameClip(tile, x, y);
+//			Map.TileGraphic->DrawFrameClip(tile, x, y);
+
+			const unsigned int tile = Map.Tileset->tiles[Editor.ShownTileTypes[i]].tile;
+
+			if (Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[Editor.ShownTileTypes[i]].tileinfo.BaseTerrain].ImageFile.empty()) {
+				Map.TileGraphic->DrawFrameClip(tile, x, y);
+			} else {
+				Map.SolidTileGraphics[Map.Tileset->tiles[Editor.ShownTileTypes[i]].tileinfo.BaseTerrain]->DrawFrameClip(tile, x, y);
+			}
+			//Wyrmgus end
 			Video.DrawRectangleClip(ColorGray, x, y, PixelTileSize.x, PixelTileSize.y);
 
 			if (i == Editor.SelectedTileIndex) {
@@ -878,7 +898,10 @@ static void DrawMapCursor()
 		const PixelPos screenPos = UI.MouseViewport->TilePosToScreen_TopLeft(tilePos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
-			const unsigned short tile = Editor.ShownTileTypes[Editor.SelectedTileIndex];
+			//Wyrmgus start
+//			const unsigned short tile = Editor.ShownTileTypes[Editor.SelectedTileIndex];
+			const unsigned short tile = Map.Tileset->tiles[Editor.ShownTileTypes[Editor.SelectedTileIndex]].tile;
+			//Wyrmgus end
 			PushClipping();
 			UI.MouseViewport->SetClipping();
 
@@ -893,7 +916,15 @@ static void DrawMapCursor()
 					if (screenPosIt.x >= UI.MouseViewport->GetBottomRightPos().x) {
 						break;
 					}
-					Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
+					//Wyrmgus start
+//					Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
+
+					if (Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[Editor.ShownTileTypes[Editor.SelectedTileIndex]].tileinfo.BaseTerrain].ImageFile.empty()) {
+						Map.TileGraphic->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
+					} else {
+						Map.SolidTileGraphics[Map.Tileset->tiles[Editor.ShownTileTypes[Editor.SelectedTileIndex]].tileinfo.BaseTerrain]->DrawFrameClip(tile, screenPosIt.x, screenPosIt.y);
+					}
+					//Wyrmgus end
 				}
 			}
 			Video.DrawRectangleClip(ColorWhite, screenPos.x, screenPos.y, PixelTileSize.x * TileCursorSize, PixelTileSize.y * TileCursorSize);
@@ -1263,7 +1294,10 @@ static void EditorCallbackButtonDown(unsigned button)
 
 			if (Editor.State == EditorEditTile &&
 				Editor.SelectedTileIndex != -1) {
+				//Wyrmgus start
+//				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+				//Wyrmgus end
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
@@ -1558,8 +1592,12 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 			}
 			if (bx < screenPos.x && screenPos.x < bx + PixelTileSize.x
 				&& by < screenPos.y && screenPos.y < by + PixelTileSize.y) {
-				const int tile = Editor.ShownTileTypes[i];
-				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
+				//Wyrmgus start
+//				const int tile = Editor.ShownTileTypes[i];
+//				const int tileindex = Map.Tileset->findTileIndexByTile(tile);
+				const int tile = Map.Tileset->tiles[Editor.ShownTileTypes[i]].tile;
+				const int tileindex = Editor.ShownTileTypes[i];
+				//Wyrmgus end
 				const int base = Map.Tileset->tiles[tileindex].tileinfo.BaseTerrain;
 				UI.StatusLine.Set(Map.Tileset->getTerrainName(base));
 				Editor.CursorTileIndex = i;
@@ -1655,7 +1693,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
+			//Wyrmgus start
+//			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
 			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+			//Wyrmgus end
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {

@@ -644,7 +644,10 @@ void CTileset::fillSolidTiles(std::vector<unsigned int> *solidTiles) const
 		const CTileInfo &info = tiles[i].tileinfo;
 
 		if (info.BaseTerrain && info.MixTerrain == 0) {
-			solidTiles->push_back(tiles[i].tile);
+			//Wyrmgus start
+//			solidTiles->push_back(tiles[i].tile);
+			solidTiles->push_back(i);
+			//Wyrmgus end
 		}
 	}
 }
