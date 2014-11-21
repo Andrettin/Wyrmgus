@@ -254,16 +254,34 @@ bool CTileset::isARaceWallTile(unsigned tile, bool human) const
 
 bool CTileset::isAWoodTile(unsigned tile) const
 {
+	//Wyrmgus start
+	/*
 	if (TileTypeTable.empty() == false) {
 		return TileTypeTable[tile] == TileTypeWood;
 	}
+	*/
+	for (int i = 0; i < 20; ++i) {
+		if (woodTable[i] == tile) {
+			return true;
+		}
+	}
+	//Wyrmgus end
 	return false;
 }
 bool CTileset::isARockTile(unsigned tile) const
 {
+	//Wyrmgus start
+	/*
 	if (TileTypeTable.empty() == false) {
 		return TileTypeTable[tile] == TileTypeRock;
 	}
+	*/
+	for (int i = 0; i < 20; ++i) {
+		if (rockTable[i] == tile) {
+			return true;
+		}
+	}
+	//Wyrmgus end
 	return false;
 }
 

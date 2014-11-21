@@ -425,12 +425,22 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	unsigned int index = getIndex(pos);
 	CMapField &mf = *this->Field(index);
 
+	//Wyrmgus start
+	/*
 	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.playerInfo.SeenTile))
 		  || (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile)))) {
 		if (seen) {
 			return;
 		}
 	}
+	*/
+	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.playerInfo.SeenTile) && (mf.getFlag() & type))
+		  || (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile) && (mf.getFlag() & type)))) {
+		if (seen) {
+			return;
+		}
+	}
+	//Wyrmgus end
 	if (!seen && !(mf.getFlag() & type)) {
 		return;
 	}
