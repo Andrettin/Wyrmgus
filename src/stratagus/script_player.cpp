@@ -588,6 +588,76 @@ static int CclDefineRaceNames(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+**  Define a civilization's factions
+**
+**  @param l  Lua state.
+*/
+static int CclDefineCivilizationFactions(lua_State *l)
+{
+	int args = lua_gettop(l);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	for (int j = 1; j < args; ++j) {
+		const char *value = LuaToString(l, j + 1);
+		if (!strcmp(value, "faction")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, j + 1, k + 1);
+				if (!strcmp(value, "name")) {
+					++k;
+					PlayerRaces.FactionNames[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "color")) {
+					++k;
+					PlayerRaces.FactionColors[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "secondary_color")) {
+					++k;
+					PlayerRaces.FactionSecondaryColors[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
+				} else {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+
+	return 0;
+}
+
+/**
+**  Get a civilization's factions.
+**
+**  @param l  Lua state.
+*/
+static int CclGetCivilizationFactionNames(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	lua_pop(l, 1);
+
+	int FactionCount = 0;
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (!PlayerRaces.FactionNames[civilization][i].empty()) {
+			FactionCount += 1;
+		}
+	}
+
+	lua_createtable(l, FactionCount, 0);
+	for (int i = 1; i <= FactionCount; ++i)
+	{
+		lua_pushstring(l, PlayerRaces.FactionNames[civilization][i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	
+	return 1;
+}
+//Wyrmgus end
+
 /**
 **  Define player colors
 **
@@ -817,10 +887,38 @@ static int CclSetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "RaceName")) {
 		const char *racename = LuaToString(l, 3);
 		p->Race = PlayerRaces.GetRaceIndexByName(racename);
-
+		
 		if (p->Race == -1) {
 			LuaError(l, "invalid race name '%s'" _C_ racename);
 		}
+		
+		//Wyrmgus start
+		// set random name from the civilization's factions
+		int FactionCount = 0;
+		int LocalFactions[PlayerMax];
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (!PlayerRaces.FactionNames[p->Race][i].empty()) {
+				bool faction_used = false;
+				for (int j = 0; j < PlayerMax; ++j) {
+					if (p->Index != j && Players[j].Name == PlayerRaces.FactionNames[p->Race][i]) {
+						faction_used = true;
+					}		
+				}
+				if (!faction_used) {
+					LocalFactions[FactionCount] = i;
+					FactionCount += 1;
+				}
+			}
+		}
+		if (FactionCount > 0) {
+			int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
+			p->SetFaction(PlayerRaces.FactionNames[p->Race][ChosenFaction]);
+		}
+		//Wyrmgus end
+	//Wyrmgus start
+	} else if (!strcmp(data, "Faction")) {
+		p->SetFaction(LuaToString(l, 3));
+	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 4);
 
@@ -933,6 +1031,10 @@ void PlayerCclRegister()
 	lua_register(Lua, "SharedVision", CclSharedVision);
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
+	//Wyrmgus start
+	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
+	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
+	//Wyrmgus end
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);
 

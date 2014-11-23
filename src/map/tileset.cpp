@@ -261,7 +261,7 @@ bool CTileset::isAWoodTile(unsigned tile) const
 	}
 	*/
 	for (int i = 0; i < 20; ++i) {
-		if (woodTable[i] == tile) {
+		if (woodTable[i] != -1 && woodTable[i] == tile) {
 			return true;
 		}
 	}
@@ -277,7 +277,7 @@ bool CTileset::isARockTile(unsigned tile) const
 	}
 	*/
 	for (int i = 0; i < 20; ++i) {
-		if (rockTable[i] == tile) {
+		if (rockTable[i] != -1 && rockTable[i] == tile) {
 			return true;
 		}
 	}

@@ -341,6 +341,18 @@ void PlayerRace::Clean()
 		this->Name[i].clear();
 		this->Display[i].clear();
 		this->Visible[i] = false;
+		//Wyrmgus start
+		for (unsigned int j = 0; j < PlayerMax; ++j) {
+			this->FactionNames[i][j].clear();
+			this->FactionColors[i][j].clear();
+			this->FactionSecondaryColors[i][j].clear();
+		}
+		for (unsigned int j = 0; j < PersonalNameMax; ++j) {
+			this->PersonalNames[i][j].clear();
+			this->PersonalNamePrefixes[i][j].clear();
+			this->PersonalNameSuffixes[i][j].clear();
+		}
+		//Wyrmgus end
 	}
 	this->Count = 0;
 }
@@ -639,6 +651,9 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	this->Type = type;
 	this->Race = 0;
+	//Wyrmgus start
+	this->Faction = -1;
+	//Wyrmgus end
 	this->Team = team;
 	this->Enemy = 0;
 	this->Allied = 0;
@@ -728,6 +743,45 @@ void CPlayer::SetName(const std::string &name)
 	Name = name;
 }
 
+//Wyrmgus start
+/**
+**  Change player faction.
+**
+**  @param faction    New faction.
+*/
+void CPlayer::SetFaction(const std::string &faction)
+{
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (!PlayerRaces.FactionNames[this->Race][i].empty() && PlayerRaces.FactionNames[this->Race][i] == faction) {
+			this->SetName(faction);
+			this->Faction = i;
+			int PrimaryColor;
+			int SecondaryColor;
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (PlayerColorNames[j] == PlayerRaces.FactionColors[this->Race][i]) {
+					PrimaryColor = j;
+				} else if (PlayerColorNames[j] == PlayerRaces.FactionSecondaryColors[this->Race][i]) {
+					SecondaryColor = j;
+				}
+			}
+			bool color_used = false;
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (this->Index != j && Players[j].Faction != -1 && Players[j].Color == PlayerColors[PrimaryColor][0]) {
+					color_used = true;
+				}		
+			}
+			if (!color_used) {
+				this->Color = PlayerColors[PrimaryColor][0];
+				this->UnitColors.Colors = PlayerColorsRGB[PrimaryColor];
+			} else {
+				this->Color = PlayerColors[SecondaryColor][0];
+				this->UnitColors.Colors = PlayerColorsRGB[SecondaryColor];
+			}
+		}
+	}
+}
+//Wyrmgus end
+
 /**
 **  Clear all player data excepts members which don't change.
 **
@@ -740,6 +794,9 @@ void CPlayer::Clear()
 	Name.clear();
 	Type = 0;
 	Race = 0;
+	//Wyrmgus start
+	Faction = -1;
+	//Wyrmgus end
 	AiName.clear();
 	Team = 0;
 	Enemy = 0;
@@ -1218,7 +1275,12 @@ void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
 void SetPlayersPalette()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		Players[i].UnitColors.Colors = PlayerColorsRGB[i];
+		//Wyrmgus start
+//		Players[i].UnitColors.Colors = PlayerColorsRGB[i];
+		if (Players[i].Faction == -1) {
+			Players[i].UnitColors.Colors = PlayerColorsRGB[i];
+		}
+		//Wyrmgus end
 	}
 }
 

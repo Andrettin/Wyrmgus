@@ -84,6 +84,9 @@ public:
 
 	int   Type;         /// type of player (human,computer,...)
 	int   Race;         /// race of player (orc,human,...)
+	//Wyrmgus start
+	int Faction;		/// faction of player
+	//Wyrmgus end
 	std::string AiName; /// AI for computer
 
 	// friend enemy detection
@@ -140,6 +143,10 @@ public:
 
 	/// Change player name
 	void SetName(const std::string &name);
+	
+	//Wyrmgus start
+	void SetFaction(const std::string &faction);
+	//Wyrmgus end
 
 	/// Clear turn related player data
 	void Clear();
@@ -258,7 +265,10 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
-	std::string PersonalNames[MAX_RACES][PersonalNameMax];	/// personal names
+	std::string FactionNames[MAX_RACES][PlayerMax];    				/// faction names
+	std::string FactionColors[MAX_RACES][PlayerMax];    			/// faction colors
+	std::string FactionSecondaryColors[MAX_RACES][PlayerMax];    	/// faction colors
+	std::string PersonalNames[MAX_RACES][PersonalNameMax];			/// personal names
 	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];	/// personal prefixes
 	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];	/// personal suffixes
 	//Wyrmgus end
