@@ -170,6 +170,8 @@ static bool MoveRandomly(CUnit &unit)
 	// pick random location
 	Vec2i pos = unit.tilePos;
 
+	//Wyrmgus start
+	/*
 	switch ((SyncRand() >> 12) & 15) {
 		case 0: pos.x++; break;
 		case 1: pos.y++; break;
@@ -182,6 +184,10 @@ static bool MoveRandomly(CUnit &unit)
 		default:
 			break;
 	}
+	*/
+	pos.x += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
+	pos.y += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
+	//Wyrmgus end
 
 	// restrict to map
 	Map.Clamp(pos);

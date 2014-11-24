@@ -621,7 +621,10 @@ CUnitType::CUnitType() :
 	MinAttackRange(0), ReactRangeComputer(0), ReactRangePerson(0),
 	BurnPercent(0), BurnDamageRate(0), RepairRange(0),
 	CanCastSpell(NULL), AutoCastActive(NULL),
-	AutoBuildRate(0), RandomMovementProbability(0), ClicksToExplode(0),
+	//Wyrmgus start
+//	AutoBuildRate(0), RandomMovementProbability(0), ClicksToExplode(0),
+	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(0), ClicksToExplode(0),
+	//Wyrmgus start
 	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),
