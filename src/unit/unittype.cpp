@@ -802,6 +802,15 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				MapFieldAirUnpassable;
 			//Wyrmgus end
 			break;
+		//Wyrmgus start
+		case UnitTypeFlyLow:                               // in low air
+			type.MovementMask =
+				MapFieldLandUnit |
+				MapFieldSeaUnit |
+				MapFieldBuilding |
+				MapFieldUnpassable |
+				MapFieldAirUnpassable;
+			break;
 		case UnitTypeNaval:                             // on water
 			if (type.CanTransport()) {
 				type.MovementMask =
@@ -863,6 +872,11 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			case UnitTypeFly: // in air
 				type.FieldFlags = MapFieldAirUnit;
 				break;
+			//Wyrmgus start
+			case UnitTypeFlyLow: // in low air
+				type.FieldFlags = MapFieldLandUnit;
+				break;
+			//Wyrmgus end
 			case UnitTypeNaval: // on water
 				type.FieldFlags = MapFieldSeaUnit;
 				break;

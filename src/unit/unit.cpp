@@ -2969,6 +2969,11 @@ int CanTarget(const CUnitType &source, const CUnitType &dest)
 	if (dest.UnitType == UnitTypeFly) {
 		return source.CanTarget & CanTargetAir;
 	}
+	//Wyrmgus start
+	if (dest.UnitType == UnitTypeFlyLow) {
+		return (source.CanTarget & CanTargetLand) || (source.CanTarget & CanTargetAir) || (source.CanTarget & CanTargetSea);
+	}
+	//Wyrmgus end
 	if (dest.UnitType == UnitTypeNaval) {
 		return source.CanTarget & CanTargetSea;
 	}

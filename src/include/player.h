@@ -347,9 +347,14 @@ extern int NumPlayers;             /// How many player slots used
 extern CPlayer Players[PlayerMax];  /// All players
 extern CPlayer *ThisPlayer;         /// Player on local computer
 extern bool NoRescueCheck;          /// Disable rescue check
-extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors
-extern std::vector<IntColor> PlayerColors[PlayerMax]; /// Player colors
-extern std::string PlayerColorNames[PlayerMax];  /// Player color names
+//Wyrmgus start
+//extern std::vector<CColor> PlayerColorsRGB[PlayerMax]; /// Player colors
+//extern std::vector<IntColor> PlayerColors[PlayerMax]; /// Player colors
+//extern std::string PlayerColorNames[PlayerMax];  /// Player color names
+extern std::vector<CColor> PlayerColorsRGB[PlayerColorMax]; /// Player colors
+extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
+extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
+//Wyrmgus end
 
 extern PlayerRace PlayerRaces;  /// Player races
 

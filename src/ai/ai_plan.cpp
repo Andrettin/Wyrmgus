@@ -473,10 +473,16 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 			if (flyeronly) {
 				continue;
 			}
-			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeLand) {
+			//Wyrmgus start
+//			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeLand) {
+			if ((request.Mask & MapFieldLandUnit) && type.UnitType != UnitTypeLand && type.UnitType != UnitTypeFlyLow) {
+			//Wyrmgus end
 				continue;
 			}
-			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeNaval) {
+			//Wyrmgus start
+//			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeNaval) {
+			if ((request.Mask & MapFieldSeaUnit) && type.UnitType != UnitTypeNaval && type.UnitType != UnitTypeFlyLow) {
+			//Wyrmgus end
 				continue;
 			}
 		} else {

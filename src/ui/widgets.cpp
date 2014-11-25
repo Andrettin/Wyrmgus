@@ -613,7 +613,7 @@ void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const C
 	Assert(PlayerColorIndexCount);
 
 	int WidgetPlayerColorIndexFromName = 15;
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColorNames[i] == WidgetPlayerColorName) {
 			WidgetPlayerColorIndexFromName = i;
 		}

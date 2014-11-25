@@ -961,6 +961,11 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 				case UnitTypeFly:
 					exploremask |= MapFieldAirUnit;
 					break;
+				//Wyrmgus start
+				case UnitTypeFlyLow:
+					exploremask |= MapFieldLandUnit;
+					break;
+				//Wyrmgus end
 				case UnitTypeNaval:
 					exploremask |= MapFieldSeaUnit;
 					break;

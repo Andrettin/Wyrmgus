@@ -343,6 +343,9 @@ public:
 enum UnitTypeType {
 	UnitTypeLand,  /// Unit lives on land
 	UnitTypeFly,   /// Unit lives in air
+	//Wyrmgus start
+	UnitTypeFlyLow,   /// Unit lives in air, but flies low, so that it can be attacked by melee land units and cannot fly over rocks
+	//Wyrmgus end
 	UnitTypeNaval  /// Unit lives on water
 };
 

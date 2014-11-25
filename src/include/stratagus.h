@@ -155,6 +155,7 @@ extern const char NameLine[];
 #define UpgradeMax   2048                /// How many upgrades supported
 #define MAX_RACES 8
 //Wyrmgus start
+#define PlayerColorMax 32                 // How many player colors are supported
 #define VariationMax 32 //maximum number of variations a unit can have
 #define PersonalNameMax 1024 //maximum number of personal names a civilization can have
 //Wyrmgus end

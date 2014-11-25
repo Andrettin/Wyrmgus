@@ -612,6 +612,10 @@ static int CclDefineUnitType(lua_State *l)
 				type->UnitType = UnitTypeLand;
 			} else if (!strcmp(value, "fly")) {
 				type->UnitType = UnitTypeFly;
+			//Wyrmgus start
+			} else if (!strcmp(value, "fly-low")) {
+				type->UnitType = UnitTypeFlyLow;
+			//Wyrmgus end
 			} else if (!strcmp(value, "naval")) {
 				type->UnitType = UnitTypeNaval;
 			} else {
@@ -1458,6 +1462,9 @@ static int CclGetUnitTypeData(lua_State *l)
 			return 1;
 		} else if (type->UnitType == UnitTypeFly) {
 			lua_pushstring(l, "fly");
+			return 1;
+		} else if (type->UnitType == UnitTypeFlyLow) {
+			lua_pushstring(l, "fly-low");
 			return 1;
 		} else if (type->UnitType == UnitTypeNaval) {
 			lua_pushstring(l, "naval");

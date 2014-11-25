@@ -823,7 +823,11 @@ static void DrawEditorPanel_StartIcon()
 		const PixelPos lb(x, y + IconHeight - 2);
 		const PixelPos rt(x + IconHeight - 2, y);
 		const PixelPos rb(x + IconHeight - 2, y + IconHeight - 2);
-		const Uint32 color = PlayerColors[Editor.SelectedPlayer][0];
+		//Wyrmgus start
+//		const Uint32 color = PlayerColors[Editor.SelectedPlayer][0];
+		const Uint32 color = Players[Editor.SelectedPlayer].Color;
+
+		//Wyrmgus end
 
 		Video.DrawLineClip(color, lt, rb);
 		Video.DrawLineClip(color, rt, lb);
@@ -970,7 +974,10 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
-					DrawCross(startScreenPos, PixelTileSize, PlayerColors[i][0]);
+					//Wyrmgus start
+//					DrawCross(startScreenPos, PixelTileSize, PlayerColors[i][0]);
+					DrawCross(startScreenPos, PixelTileSize, Players[i].Color);
+					//Wyrmgus end
 				}
 			}
 		}

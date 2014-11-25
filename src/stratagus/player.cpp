@@ -317,10 +317,16 @@ bool NoRescueCheck;               /// Disable rescue check
 /**
 **  Colors used for minimap.
 */
-std::vector<CColor> PlayerColorsRGB[PlayerMax];
-std::vector<IntColor> PlayerColors[PlayerMax];
+//Wyrmgus start
+//std::vector<CColor> PlayerColorsRGB[PlayerMax];
+//std::vector<IntColor> PlayerColors[PlayerMax];
 
-std::string PlayerColorNames[PlayerMax];
+//std::string PlayerColorNames[PlayerMax];
+std::vector<CColor> PlayerColorsRGB[PlayerColorMax];
+std::vector<IntColor> PlayerColors[PlayerColorMax];
+
+std::string PlayerColorNames[PlayerColorMax];
+//Wyrmgus end
 
 /**
 **  Which indexes to replace with player color
@@ -378,10 +384,19 @@ void InitPlayers()
 		if (!Players[p].Type) {
 			Players[p].Type = PlayerNobody;
 		}
+		//Wyrmgus start
+//		for (int x = 0; x < PlayerColorIndexCount; ++x) {
+//			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
+//		}
+		//Wyrmgus end
+	}
+	//Wyrmgus start
+	for (int p = 0; p < PlayerColorMax; ++p) {
 		for (int x = 0; x < PlayerColorIndexCount; ++x) {
 			PlayerColors[p][x] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[p][x]);
 		}
 	}
+	//Wyrmgus end
 }
 
 /**
@@ -402,9 +417,17 @@ void FreePlayerColors()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
 		Players[i].UnitColors.Colors.clear();
+		//Wyrmgus start
+//		PlayerColorsRGB[i].clear();
+//		PlayerColors[i].clear();
+		//Wyrmgus end
+	}
+	//Wyrmgus start
+	for (int i = 0; i < PlayerColorMax; ++i) {
 		PlayerColorsRGB[i].clear();
 		PlayerColors[i].clear();
 	}
+	//Wyrmgus end
 }
 #endif
 
@@ -757,7 +780,7 @@ void CPlayer::SetFaction(const std::string &faction)
 			this->Faction = i;
 			int PrimaryColor;
 			int SecondaryColor;
-			for (int j = 0; j < PlayerMax; ++j) {
+			for (int j = 0; j < PlayerColorMax; ++j) {
 				if (PlayerColorNames[j] == PlayerRaces.FactionColors[this->Race][i]) {
 					PrimaryColor = j;
 				} else if (PlayerColorNames[j] == PlayerRaces.FactionSecondaryColors[this->Race][i]) {

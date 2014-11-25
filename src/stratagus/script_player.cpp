@@ -716,7 +716,10 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 	PlayerColorIndexStart = LuaToNumber(l, 1);
 	PlayerColorIndexCount = LuaToNumber(l, 2);
 
-	for (int i = 0; i < PlayerMax; ++i) {
+	//Wyrmgus start
+//	for (int i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < PlayerColorMax; ++i) {
+	//Wyrmgus end
 		PlayerColorsRGB[i].clear();
 		PlayerColorsRGB[i].resize(PlayerColorIndexCount);
 		PlayerColors[i].clear();
