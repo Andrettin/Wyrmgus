@@ -164,6 +164,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"direction\", %d,\n  ", unit.Direction);
 	file.printf("\"damage-type\", %d,", unit.DamagedType);
 	file.printf("\"attacked\", %lu,\n ", unit.Attacked);
+	//Wyrmgus start
+	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
+	//Wyrmgus end
 	file.printf(" \"current-sight-range\", %d,", unit.CurrentSightRange);
 	if (unit.Burning) {
 		file.printf(" \"burning\",");

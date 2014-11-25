@@ -308,6 +308,10 @@ static int CclUnit(lua_State *l)
 			unit->Active = 0;
 			unit->Removed = 0;
 			Assert(UnitNumber(*unit) == slot);
+		//Wyrmgus start
+		} else if (!strcmp(value, "personal-name")) {
+			unit->Name = LuaToString(l, 2, j + 1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "refs")) {

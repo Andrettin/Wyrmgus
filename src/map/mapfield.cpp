@@ -100,7 +100,10 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 
 void CMapField::Save(CFile &file) const
 {
-	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
+	//Wyrmgus start
+//	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
+	file.printf("  {%3d, %3d, %3d, %2d, %2d", tilesetTile, tile, playerInfo.SeenTile, Value, cost);
+	//Wyrmgus end
 	for (int i = 0; i != PlayerMax; ++i) {
 		if (playerInfo.Visible[i] == 1) {
 			file.printf(", \"explored\", %d", i);
@@ -160,16 +163,31 @@ void CMapField::parse(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	const int len = lua_rawlen(l, -1);
-	if (len < 4) {
+	//Wyrmgus start
+//	if (len < 4) {
+	if (len < 5) {
+	//Wyrmgus end
 		LuaError(l, "incorrect argument");
 	}
 
+	//Wyrmgus start
+	/*
 	this->tile = LuaToNumber(l, -1, 1);
 	this->playerInfo.SeenTile = LuaToNumber(l, -1, 2);
 	this->Value = LuaToNumber(l, -1, 3);
 	this->cost = LuaToNumber(l, -1, 4);
+	*/
+	this->tilesetTile = LuaToNumber(l, -1, 1);
+	this->tile = LuaToNumber(l, -1, 2);
+	this->playerInfo.SeenTile = LuaToNumber(l, -1, 3);
+	this->Value = LuaToNumber(l, -1, 4);
+	this->cost = LuaToNumber(l, -1, 5);
+	//Wyrmgus end
 
-	for (int j = 4; j < len; ++j) {
+	//Wyrmgus start
+//	for (int j = 4; j < len; ++j) {
+	for (int j = 5; j < len; ++j) {
+	//Wyrmgus end
 		const char *value = LuaToString(l, -1, j + 1);
 
 		if (!strcmp(value, "explored")) {
