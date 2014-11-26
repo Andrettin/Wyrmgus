@@ -413,25 +413,6 @@ static int CclDefineAllow(lua_State *l)
 	return 0;
 }
 
-//Wyrmgus start
-/**
-**  Acquire an upgrade
-*/
-static int CclAcquireUpgrade(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	const int plynr = LuaToNumber(l, 1);
-	const char *ident = LuaToString(l, 2);
-
-	if (!strncmp(ident, "upgrade-", 8)) {
-		UpgradeAcquire(Players[plynr], CUpgrade::Get(ident));
-	} else {
-		DebugPrint(" wrong ident %s\n" _C_ ident);
-	}
-	return 0;
-}
-//Wyrmgus end
-
 /**
 **  Register CCL features for upgrades.
 */
@@ -440,9 +421,6 @@ void UpgradesCclRegister()
 	lua_register(Lua, "DefineModifier", CclDefineModifier);
 	lua_register(Lua, "DefineAllow", CclDefineAllow);
 	lua_register(Lua, "DefineUnitAllow", CclDefineUnitAllow);
-	//Wyrmgus start
-	lua_register(Lua, "AcquireUpgrade", CclAcquireUpgrade);
-	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------
@@ -653,6 +631,137 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	}
 }
 
+//Wyrmgus start
+/**
+**  Remove the modifiers of an upgrade.
+**
+**  This function will unmark upgrade as done and undo all required modifications
+**  to unit types and will modify allow/forbid maps back
+**
+**  @param player  Player that get all the upgrades.
+**  @param um      Upgrade modifier that do the effects
+*/
+static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
+{
+	Assert(um);
+
+	int pn = player.Index;
+
+	if (um->SpeedResearch != 0) {
+		player.SpeedResearch -= um->SpeedResearch;
+	}
+
+	for (int z = 0; z < UpgradeMax; ++z) {
+		// allow/forbid upgrades for player.  only if upgrade is not acquired
+
+		// FIXME: check if modify is allowed
+
+		if (player.Allow.Upgrades[z] != 'R') {
+			if (um->ChangeUpgrades[z] == 'A') {
+				player.Allow.Upgrades[z] = 'F';
+			}
+			if (um->ChangeUpgrades[z] == 'F') {
+				player.Allow.Upgrades[z] = 'A';
+			}
+			// we can even have upgrade acquired w/o costs
+			if (um->ChangeUpgrades[z] == 'R') {
+				player.Allow.Upgrades[z] = 'A';
+			}
+		}
+	}
+
+	for (size_t z = 0; z < UnitTypes.size(); ++z) {
+		CUnitStats &stat = UnitTypes[z]->Stats[pn];
+		// add/remove allowed units
+
+		// FIXME: check if modify is allowed
+
+		player.Allow.Units[z] -= um->ChangeUnits[z];
+
+		Assert(um->ApplyTo[z] == '?' || um->ApplyTo[z] == 'X');
+
+		// this modifier should be applied to unittype id == z
+		if (um->ApplyTo[z] == 'X') {
+
+			// If Sight range is upgraded, we need to change EVERY unit
+			// to the new range, otherwise the counters get confused.
+			if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && !unit.Removed) {
+						MapUnmarkUnitSight(unit);
+						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max -
+												 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+						MapMarkUnitSight(unit);
+					}
+				}
+			}
+			// upgrade costs :)
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				stat.Costs[j] -= um->Modifier.Costs[j];
+				stat.Storing[j] -= um->Modifier.Storing[j];
+			}
+
+			int varModified = 0;
+			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+				varModified |= um->Modifier.Variables[j].Value
+							   | um->Modifier.Variables[j].Max
+							   | um->Modifier.Variables[j].Increase
+							   | um->Modifier.Variables[j].Enable
+							   | um->ModifyPercent[j];
+				stat.Variables[j].Enable |= um->Modifier.Variables[j].Enable;
+				if (um->ModifyPercent[j]) {
+					stat.Variables[j].Value = stat.Variables[j].Value * 100 / (100 + um->ModifyPercent[j]);
+					stat.Variables[j].Max = stat.Variables[j].Max * 100 / (100 + um->ModifyPercent[j]);
+				} else {
+					stat.Variables[j].Value -= um->Modifier.Variables[j].Value;
+					stat.Variables[j].Max -= um->Modifier.Variables[j].Max;
+					stat.Variables[j].Increase -= um->Modifier.Variables[j].Increase;
+				}
+
+				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
+				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+			}
+
+			// And now modify ingame units
+			if (varModified) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+
+					if (unit.Player->Index != player.Index) {
+						continue;
+					}
+					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+						unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
+						if (um->ModifyPercent[j]) {
+							unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
+							unit.Variable[j].Max = unit.Variable[j].Max * 100 / (100 + um->ModifyPercent[j]);
+						} else {
+							unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
+							unit.Variable[j].Increase -= um->Modifier.Variables[j].Increase;
+						}
+
+						unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
+						unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
+
+						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+					}
+				}
+			}
+			if (um->ConvertTo) {
+				ConvertUnitTypeTo(player, *um->ConvertTo, *UnitTypes[z]);
+			}
+		}
+	}
+}
+//Wyrmgus end
+
 /**
 **  Handle that an upgrade was acquired.
 **
@@ -679,20 +788,42 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	}
 }
 
-#if 0 // UpgradeLost not implemented.
+//Wyrmgus start
+//#if 0 // UpgradeLost not implemented.
+//Wyrmgus end
 /**
 **  for now it will be empty?
 **  perhaps acquired upgrade can be lost if (for example) a building is lost
 **  (lumber mill? stronghold?)
 **  this function will apply all modifiers in reverse way
 */
-void UpgradeLost(Player &player, int id)
+//Wyrmgus start
+//void UpgradeLost(Player &player, int id)
+void UpgradeLost(CPlayer &player, int id)
+//Wyrmgus end
 {
 	player.UpgradeTimers.Upgrades[id] = 0;
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
 	// FIXME: here we should reverse apply upgrade...
+	
+	//Wyrmgus start
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == id) {
+			RemoveUpgradeModifier(player, UpgradeModifiers[z]);
+		}
+	}
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (&player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+	//Wyrmgus end
 }
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Allow(s)

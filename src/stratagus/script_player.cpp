@@ -982,6 +982,21 @@ static int CclSetPlayerData(lua_State *l)
 		p->SpeedUpgrade = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "SpeedResearch")) {
 		p->SpeedResearch = LuaToNumber(l, 3);
+	//Wyrmgus start
+	} else if (!strcmp(data, "HasUpgrade")) {
+		const char *ident = LuaToString(l, 3);
+		const bool acquire = LuaToBoolean(l, 4);
+
+		if (!strncmp(ident, "upgrade-", 8)) {
+			if (acquire && UpgradeIdentAllowed(*p, ident) != 'R') {
+				UpgradeAcquire(*p, CUpgrade::Get(ident));
+			} else if (!acquire && UpgradeIdentAllowed(*p, ident) == 'R') {
+				UpgradeLost(*p, CUpgrade::Get(ident)->ID);
+			}
+		} else {
+			DebugPrint(" wrong ident %s\n" _C_ ident);
+		}
+	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
