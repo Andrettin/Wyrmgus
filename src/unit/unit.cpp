@@ -64,6 +64,9 @@
 #include "unitsound.h"
 #include "unittype.h"
 #include "video.h"
+//Wyrmgus start
+#include "upgrade.h"
+//Wyrmgus end
 
 #include <math.h>
 
@@ -601,18 +604,6 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	//Wyrmgus start
-	int TypeVariationCount = 0;
-	for (int i = 0; i < VariationMax; ++i) {
-		VariationInfo *varinfo = type.VarInfo[i];
-		if (!varinfo) {
-			continue;
-		}
-		TypeVariationCount += 1;
-	}
-	if (TypeVariationCount > 0) {
-		Variation = SyncRand(TypeVariationCount);
-	}
-
 	if (!type.DefaultName.empty()) {
 		Name = type.DefaultName;
 	} else if (!type.PersonalNames[0].empty() || !type.PersonalNamePrefixes[0].empty()) {
@@ -824,6 +815,45 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	// Only Assign if a Player was specified
 	if (player) {
 		unit->AssignToPlayer(*player);
+
+		//Wyrmgus start
+		int TypeVariationCount = 0;
+		int LocalTypeVariations[VariationMax];
+		for (int i = 0; i < VariationMax; ++i) {
+			VariationInfo *varinfo = type.VarInfo[i];
+			if (!varinfo) {
+				continue;
+			}
+			bool UpgradesCheck = true;
+			if (GameCycle != 0) {
+				for (int u = 0; u < VariationMax; ++u) {
+					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*player, varinfo->UpgradesRequired[u].c_str()) != 'R') {
+						UpgradesCheck = false;
+						break;
+					}
+					if (!varinfo->UpgradesForbidden[u].empty() && UpgradeIdentAllowed(*player, varinfo->UpgradesForbidden[u].c_str()) == 'R') {
+						UpgradesCheck = false;
+						break;
+					}
+				}
+			} else {
+				for (int u = 0; u < VariationMax; ++u) {
+					if (!varinfo->UpgradesRequired[u].empty()) {
+						UpgradesCheck = false;
+						break;
+					}
+				}
+			}
+			if (UpgradesCheck == false) {
+				continue;
+			}
+			LocalTypeVariations[TypeVariationCount] = i;
+			TypeVariationCount += 1;
+		}
+		if (TypeVariationCount > 0) {
+			unit->Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+		}
+		//Wyrmgus end
 	}
 
 	if (unit->Type->OnInit) {

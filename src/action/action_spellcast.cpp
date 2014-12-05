@@ -350,7 +350,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			this->State = 1;
 		// FALL THROUGH
 		case 1:                         // Move to the target.
-			if (spell.Range != INFINITE_RANGE) {
+			//Wyrmgus start
+//			if (spell.Range != INFINITE_RANGE) {
+			if (spell.Range != INFINITE_RANGE && spell.Range != 0) {
+			//Wyrmgus end
 				if (SpellMoveToTarget(unit) == true) {
 					if (!unit.RestoreOrder()) {
 						this->Finished = true;

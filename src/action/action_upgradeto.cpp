@@ -47,6 +47,9 @@
 #include "translate.h"
 #include "unit.h"
 #include "unittype.h"
+//Wyrmgus start
+#include "upgrade.h"
+//Wyrmgus end
 
 /// How many resources the player gets back if canceling upgrade
 #define CancelUpgradeCostsFactor   100
@@ -137,6 +140,43 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		}
 	}
 
+	//Wyrmgus start
+	//change variation if upgrading (new unit type may have different variations
+	VariationInfo *current_varinfo = oldtype.VarInfo[unit.Variation];
+	int TypeVariationCount = 0;
+	int LocalTypeVariations[VariationMax];
+	for (int i = 0; i < VariationMax; ++i) {
+		VariationInfo *varinfo = newtype.VarInfo[i];
+		if (!varinfo) {
+			continue;
+		}
+		bool UpgradesCheck = true;
+		for (int u = 0; u < VariationMax; ++u) {
+			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R') {
+				UpgradesCheck = false;
+				break;
+			}
+			if (!varinfo->UpgradesForbidden[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R') {
+				UpgradesCheck = false;
+				break;
+			}
+		}
+		if (UpgradesCheck == false) {
+			continue;
+		}
+		if (current_varinfo && varinfo->VariationId == current_varinfo->VariationId) { // if the old variation has the same ident as a viable one of the new unit type, chose the latter automatically
+			unit.Variation = i;
+			TypeVariationCount = 0;
+			break;
+		}
+		LocalTypeVariations[TypeVariationCount] = i;
+		TypeVariationCount += 1;
+	}
+	if (TypeVariationCount > 0) {
+		unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+	}
+	//Wyrmgus end
+	
 	unit.Type = const_cast<CUnitType *>(&newtype);
 	unit.Stats = &unit.Type->Stats[player.Index];
 
