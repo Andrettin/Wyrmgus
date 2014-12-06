@@ -3039,7 +3039,10 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 
 	// Can transport only allied unit.
 	// FIXME : should be parametrable.
-	if (!transporter.IsTeamed(unit)) {
+	//Wyrmgus start
+//	if (!transporter.IsTeamed(unit)) {
+	if (!transporter.IsTeamed(unit) && !transporter.IsAllied(unit) && transporter.Player->Type != PlayerNeutral) {
+	//Wyrmgus end
 		return 0;
 	}
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {

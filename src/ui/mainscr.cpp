@@ -461,7 +461,10 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 	size_t j = 0;
 
 	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
-		if (!uins->Boarded || j >= UI.TransportingButtons.size()) {
+		//Wyrmgus start
+//		if (!uins->Boarded || j >= UI.TransportingButtons.size()) {
+		if (!uins->Boarded || j >= UI.TransportingButtons.size() || (unit.Player != ThisPlayer && uins->Player != ThisPlayer)) {
+		//Wyrmgus end
 			continue;
 		}
 		CIcon &icon = *uins->Type->Icon.Icon;
@@ -514,7 +517,10 @@ static void DrawUnitInfo(CUnit &unit)
 	// Draw IconUnit
 	DrawUnitInfo_portrait(unit);
 
-	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player)) {
+	//Wyrmgus start
+//	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player)) {
+	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player) && unit.Player->Type != PlayerNeutral) {
+	//Wyrmgus end
 		return;
 	}
 

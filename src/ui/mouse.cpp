@@ -1739,7 +1739,10 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  clicked on button panel
 		} else if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
 			//  for transporter
-			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			//Wyrmgus start
+//			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->IsAllied(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
 					for (int i = ButtonUnderCursor; i; uins = uins->NextContained) {
@@ -1749,7 +1752,12 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 					}
 					Assert(uins->Boarded);
 					const int flush = !(KeyModifiers & ModifierShift);
-					SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+					//Wyrmgus start
+//					SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+					if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+						SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+					}
+					//Wyrmgus end
 				}
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
