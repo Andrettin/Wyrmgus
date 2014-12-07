@@ -2901,11 +2901,19 @@ int CUnit::MapDistanceTo(const Vec2i &pos) const
 
 	if (pos.x <= tilePos.x) {
 		dx = tilePos.x - pos.x;
+	//Wyrmgus start
+	} else if (this->Container) { //if unit is within another, use the tile size of the transporter to calculate the distance
+		dx = std::max<int>(0, pos.x - tilePos.x - this->Container->Type->TileWidth + 1);
+	//Wyrmgus end
 	} else {
 		dx = std::max<int>(0, pos.x - tilePos.x - Type->TileWidth + 1);
 	}
 	if (pos.y <= tilePos.y) {
 		dy = tilePos.y - pos.y;
+	//Wyrmgus start
+	} else if (this->Container) {
+		dy = std::max<int>(0, pos.y - tilePos.y - this->Container->Type->TileHeight + 1);
+	//Wyrmgus end
 	} else {
 		dy = std::max<int>(0, pos.y - tilePos.y - Type->TileHeight + 1);
 	}

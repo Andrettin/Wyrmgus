@@ -361,7 +361,10 @@ bool AutoAttack(CUnit &unit)
 {
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed
-		&& (unit.Container == NULL || unit.Container->Type->AttackFromTransporter == false)) {
+		//Wyrmgus start
+//		&& (unit.Container == NULL || unit.Container->Type->AttackFromTransporter == false)) {
+		&& (unit.Container == NULL || unit.Container->Type->AttackFromTransporter == false || unit.Type->AttackFromTransporter == false)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
+		//Wyrmgus end
 		return ;
 	}
 	this->Finished = false;

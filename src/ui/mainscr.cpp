@@ -481,7 +481,10 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		}
 		//Wyrmgus end
 		UiDrawLifeBar(*uins, pos.x, pos.y);
-		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
+		//Wyrmgus start
+//		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
+		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Enable && uins->Variable[MANA_INDEX].Max) {
+		//Wyrmgus end
 			UiDrawManaBar(*uins, pos.x, pos.y);
 		}
 		if (ButtonAreaUnderCursor == ButtonAreaTransporting
