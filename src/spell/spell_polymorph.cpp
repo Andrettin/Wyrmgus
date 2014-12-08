@@ -38,6 +38,9 @@
 #include "map.h"
 #include "script.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 
 /* virtual */ void Spell_Polymorph::Parse(lua_State *l, int startIndex, int endIndex)
 {
@@ -93,12 +96,36 @@
 		} else {
 			caster.Player->TotalKills++;
 		}
+		//Wyrmgus start
+		/*
 		if (UseHPForXp) {
 			caster.Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;
 		} else {
 			caster.Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value;
 		}
 		caster.Variable[XP_INDEX].Value = caster.Variable[XP_INDEX].Max;
+		*/
+		
+		//distribute experience between nearby units belonging to the same player
+		std::vector<CUnit *> table;
+		SelectAroundUnit(caster, 6, table, MakeAndPredicate(HasSamePlayerAs(*caster.Player), IsNotBuildingType()));
+
+		if (UseHPForXp) {
+			caster.Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value / (table.size() + 1);
+		} else {
+			caster.Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value / (table.size() + 1);
+		}
+		caster.Variable[XP_INDEX].Value = caster.Variable[XP_INDEX].Max;
+
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (UseHPForXp) {
+				table[i]->Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value / (table.size() + 1);
+			} else {
+				table[i]->Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value / (table.size() + 1);
+			}
+			table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
+		}
+		//Wyrmgus end
 		caster.Variable[KILL_INDEX].Value++;
 		caster.Variable[KILL_INDEX].Max++;
 		caster.Variable[KILL_INDEX].Enable = 1;

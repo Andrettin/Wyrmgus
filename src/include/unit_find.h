@@ -125,6 +125,20 @@ public:
 	bool operator()(const CUnit *unit) const { return unit->Type->Building; }
 };
 
+//Wyrmgus start
+class IsNotBuildingType
+{
+public:
+	bool operator()(const CUnit *unit) const { return !unit->Type->Building; }
+};
+
+class IsOrganicType
+{
+public:
+	bool operator()(const CUnit *unit) const { return unit->Type->Organic; }
+};
+//Wyrmgus end
+
 class OutOfMinRange
 {
 public:

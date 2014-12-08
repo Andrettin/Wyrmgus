@@ -2581,12 +2581,36 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	} else {
 		attacker.Player->TotalKills++;
 	}
+	//Wyrmgus start
+	/*
 	if (UseHPForXp) {
 		attacker.Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value;
 	} else {
 		attacker.Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value;
 	}
 	attacker.Variable[XP_INDEX].Value = attacker.Variable[XP_INDEX].Max;
+	*/
+	
+	//distribute experience between nearby units belonging to the same player
+	std::vector<CUnit *> table;
+	SelectAroundUnit(attacker, 6, table, MakeAndPredicate(HasSamePlayerAs(*attacker.Player), IsNotBuildingType()));
+
+	if (UseHPForXp) {
+		attacker.Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value / (table.size() + 1);
+	} else {
+		attacker.Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value / (table.size() + 1);
+	}
+	attacker.Variable[XP_INDEX].Value = attacker.Variable[XP_INDEX].Max;
+
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (UseHPForXp) {
+			table[i]->Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value / (table.size() + 1);
+		} else {
+			table[i]->Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value / (table.size() + 1);
+		}
+		table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
+	}
+	//Wyrmgus end
 	attacker.Variable[KILL_INDEX].Value++;
 	attacker.Variable[KILL_INDEX].Max++;
 	attacker.Variable[KILL_INDEX].Enable = 1;
@@ -2606,10 +2630,29 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 		}
 		target.Variable[HP_INDEX].Value -= damage - shieldDamage;
 	}
+	//Wyrmgus start
+	/*
 	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
 		attacker->Variable[XP_INDEX].Value += damage;
 		attacker->Variable[XP_INDEX].Max += damage;
 	}
+	*/
+	
+	//distribute experience between nearby units belonging to the same player
+
+	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
+		std::vector<CUnit *> table;
+		SelectAroundUnit(*attacker, 6, table, MakeAndPredicate(HasSamePlayerAs(*attacker->Player), IsNotBuildingType()));
+
+		attacker->Variable[XP_INDEX].Value += damage / (table.size() + 1);
+		attacker->Variable[XP_INDEX].Max += damage / (table.size() + 1);
+
+		for (size_t i = 0; i != table.size(); ++i) {
+			table[i]->Variable[XP_INDEX].Value += damage / (table.size() + 1);
+			table[i]->Variable[XP_INDEX].Max += damage / (table.size() + 1);
+		}
+	}
+	//Wyrmgus end
 }
 
 static void HitUnit_BuildingCapture(CUnit *attacker, CUnit &target, int damage)
