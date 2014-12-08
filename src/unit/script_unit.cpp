@@ -679,6 +679,75 @@ static int CclCreateUnit(lua_State *l)
 	}
 }
 
+//Wyrmgus start
+/**
+**  Create a unit and place it within a transporter unit
+**
+**  @param l  Lua state.
+**
+**  @return   Returns the slot number of the made unit.
+*/
+static int CclCreateUnitInTransporter(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+
+	lua_pushvalue(l, 1);
+	CUnitType *unittype = CclGetUnitType(l);
+	if (unittype == NULL) {
+		LuaError(l, "Bad unittype");
+	}
+	lua_pop(l, 1);
+
+	lua_pushvalue(l, 2);
+	const int playerno = TriggerGetPlayer(l);
+	lua_pop(l, 1);
+
+	lua_pushvalue(l, 3);
+	CUnit *transporter = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	Vec2i ipos;
+	ipos.x = transporter->tilePos.x;
+	ipos.y = transporter->tilePos.y;
+
+	if (playerno == -1) {
+		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
+		LuaError(l, "bad player");
+		return 0;
+	}
+	if (Players[playerno].Type == PlayerNobody) {
+		printf("CreateUnit: player %d does not exist\n", playerno);
+		LuaError(l, "bad player");
+		return 0;
+	}
+	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	if (unit == NULL || !CanTransport(*transporter, *unit)) {
+		DebugPrint("Unable to allocate unit");
+		return 0;
+	} else {
+		if (UnitCanBeAt(*unit, ipos)
+			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
+			unit->Place(ipos);
+		} else {
+			const int heading = SyncRand() % 256;
+
+			unit->tilePos = ipos;
+			DropOutOnSide(*unit, heading, NULL);
+		}
+
+		// Place the unit inside the transporter.
+		unit->Remove(transporter);
+		transporter->BoardCount += unit->Type->BoardSize;
+		unit->Boarded = 1;
+
+		UpdateForNewUnit(*unit, 0);
+
+		lua_pushnumber(l, UnitNumber(*unit));
+		return 1;
+	}
+}
+//Wyrmgus end
+
 /**
 **  Damages unit, additionally using another unit as first's attacker
 **
@@ -1271,6 +1340,7 @@ void UnitCclRegister()
 	lua_register(Lua, "KillUnit", CclKillUnit);
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
 	//Wyrmgus start
+	lua_register(Lua, "CreateUnitInTransporter", CclCreateUnitInTransporter);
 	lua_register(Lua, "ChangeUnitOwner", CclChangeUnitOwner);
 	lua_register(Lua, "ConvertUnit", CclConvertUnit);
 	//Wyrmgus end
