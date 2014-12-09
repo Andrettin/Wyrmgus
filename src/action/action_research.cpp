@@ -135,7 +135,10 @@
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
 		if (upgrade.Name.empty()) {
 			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
-		} else {
+		//Wyrmgus start
+//		} else {
+		} else if (!upgrade.Ability) { //don't show this message when abilities get learned
+		//Wyrmgus end
 			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), upgrade.Name.c_str());
 		}
 		if (&player == ThisPlayer) {
@@ -148,7 +151,14 @@
 		if (player.AiEnabled) {
 			AiResearchComplete(unit, &upgrade);
 		}
-		UpgradeAcquire(player, &upgrade);
+		//Wyrmgus start
+//		UpgradeAcquire(player, &upgrade);
+		if (!upgrade.Ability) {
+			UpgradeAcquire(player, &upgrade);
+		} else {
+			AbilityAcquire(unit, &upgrade);
+		}
+		//Wyrmgus end
 		this->Finished = true;
 		return ;
 	}

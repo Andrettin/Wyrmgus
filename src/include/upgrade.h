@@ -39,6 +39,9 @@
 class CFile;
 class CPlayer;
 class CUpgrade;
+//Wyrmgus start
+class CUnit;
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -80,6 +83,10 @@ extern void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade);
 /// (lumber mill? stronghold?)
 /// this function will apply all modifiers in reverse way
 extern void UpgradeLost(CPlayer &player, int id);
+
+//Wyrmgus start
+extern void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade);
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Allow(s)

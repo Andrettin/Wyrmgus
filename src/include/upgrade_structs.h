@@ -168,6 +168,7 @@ public:
 	std::string Description;		/// Description of the upgrade
 	std::string Quote;				/// Quote of the upgrade
 	std::string Background;			/// Encyclopedia entry for the upgrade
+	bool Ability;
 	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade

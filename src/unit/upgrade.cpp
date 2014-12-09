@@ -51,6 +51,9 @@
 #include "script.h"
 #include "unit.h"
 #include "unit_find.h"
+//Wyrmgus start
+#include "unit_manager.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "util.h"
 
@@ -413,6 +416,26 @@ static int CclDefineAllow(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+** Acquire an ability
+*/
+static int CclAcquireAbility(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	lua_pushvalue(l, 1);
+	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
+	lua_pop(l, 1);
+	const char *ident = LuaToString(l, 2);
+	if (!strncmp(ident, "upgrade-", 8)) {
+		AbilityAcquire(*unit, CUpgrade::Get(ident));
+	} else {
+		DebugPrint(" wrong ident %s\n" _C_ ident);
+	}
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Register CCL features for upgrades.
 */
@@ -421,6 +444,9 @@ void UpgradesCclRegister()
 	lua_register(Lua, "DefineModifier", CclDefineModifier);
 	lua_register(Lua, "DefineAllow", CclDefineAllow);
 	lua_register(Lua, "DefineUnitAllow", CclDefineUnitAllow);
+	//Wyrmgus start
+	lua_register(Lua, "AcquireAbility", CclAcquireAbility);
+	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------
@@ -807,6 +833,34 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 	}
 }
+
+/**
+**  Apply the modifiers of an ability.
+**
+**  This function will mark upgrade done and do all required modifications
+**  to unit types and will modify allow/forbid maps
+**
+**  @param player  Player that get all the upgrades.
+**  @param um      Upgrade modifier that do the effects
+*/
+static void ApplyAbilityModifier(CUnit &unit, const CUpgradeModifier *um)
+{
+	Assert(um);
+
+	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
+		if (um->ModifyPercent[j]) {
+			unit.Variable[j].Value += unit.Variable[j].Value * um->ModifyPercent[j] / 100;
+			unit.Variable[j].Max += unit.Variable[j].Max * um->ModifyPercent[j] / 100;
+		} else {
+			unit.Variable[j].Value += um->Modifier.Variables[j].Value;
+			unit.Variable[j].Increase += um->Modifier.Variables[j].Increase;
+		}
+		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
+		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
+		clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+	}
+}
 //Wyrmgus end
 
 /**
@@ -870,6 +924,35 @@ void UpgradeLost(CPlayer &player, int id)
 }
 //Wyrmgus start
 //#endif
+//Wyrmgus end
+
+//Wyrmgus start
+/**
+**  Handle that an ability was acquired.
+**
+**  @param unit     Unit learning the upgrade.
+**  @param upgrade  Upgrade ready researched.
+*/
+void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade)
+{
+	int id = upgrade->ID;
+	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+	unit.Variable[LEVELUP_INDEX].Value -= 1;
+	unit.LearnedAbilities[id] = true;	// learning done
+
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == id) {
+			ApplyAbilityModifier(unit, UpgradeModifiers[z]);
+		}
+	}
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (unit.Player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+}
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------

@@ -90,6 +90,21 @@ bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 	return UpgradeIdentAllowed(*unit.Player, button.AllowStr) == 'R';
 }
 
+//Wyrmgus start
+/**
+**  Check for button enabled, if upgrade is ready.
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
+*/
+bool ButtonCheckAbility(const CUnit &unit, const ButtonAction &button)
+{
+	return unit.LearnedAbilities[UpgradeIdByIdent(button.AllowStr)];
+}
+//Wyrmgus end
+
 /**
 **  Check for button enabled, if unit's variables pass the condition check.
 **

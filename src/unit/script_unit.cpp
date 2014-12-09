@@ -1317,6 +1317,28 @@ static int CclIsUnitIdle(lua_State *l)
 	lua_pushboolean(l, unit->IsIdle());
 	return 1;
 }
+
+/**
+**
+**  Get whether the unit is idle or not.
+**
+**  @param l  Lua state.
+**
+**  @return   Whether the unit is idle or not.
+*/
+static int CclUnitHasAbility(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	lua_pushvalue(l, 1);
+	const CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+
+	const char *ident = LuaToString(l, 2);	
+	
+	lua_pushboolean(l, unit->LearnedAbilities[CUpgrade::Get(ident)->ID]);
+	return 1;
+}
 //Wyrmgus end
 
 /**
@@ -1357,6 +1379,7 @@ void UnitCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "SetUnitName", CclSetUnitName);
 	lua_register(Lua, "IsUnitIdle", CclIsUnitIdle);
+	lua_register(Lua, "UnitHasAbility", CclUnitHasAbility);
 	//Wyrmgus end
 }
 

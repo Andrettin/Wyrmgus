@@ -136,6 +136,11 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 			case ButtonResearch:
 				ba->Value = UpgradeIdByIdent(value);
 				break;
+			//Wyrmgus start
+			case ButtonLearnAbility:
+				ba->Value = UpgradeIdByIdent(value);
+				break;
+			//Wyrmgus end
 			case ButtonUpgradeTo:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
@@ -919,6 +924,14 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
 			}
 			break;
+		//Wyrmgus start
+		case ButtonLearnAbility:
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
+			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
+				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && !unit.LearnedAbilities[buttonaction.Value] && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			}
+			break;
+		//Wyrmgus end
 		case ButtonSpellCast:
 			res = SpellIsAvailable(*unit.Player, buttonaction.Value);
 			break;
@@ -1055,7 +1068,7 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 			&& UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'R') {
 			researchCheck = false;
 		}
-
+		
 		// is button allowed after all?
 		if ((buttonaction.AlwaysShow && (*buttonActions)[pos - 1].Pos == -1 && researchCheck) || allow) {
 			// OverWrite, So take last valid button.
@@ -1381,6 +1394,9 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonTrain: { DoClicked_Train(button); break; }
 		case ButtonUpgradeTo: { DoClicked_UpgradeTo(button); break; }
 		case ButtonResearch: { DoClicked_Research(button); break; }
+		//Wyrmgus start
+		case ButtonLearnAbility: { DoClicked_Research(button); break; }
+		//Wyrmgus end
 	}
 }
 

@@ -293,6 +293,9 @@ private:
 	void DoClicked_Train(int button);
 	void DoClicked_UpgradeTo(int button);
 	void DoClicked_Research(int button);
+	//Wyrmgus start
+	void DoClicked_LearnAbility(int button);
+	//Wyrmgus end
 
 
 public:

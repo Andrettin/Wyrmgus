@@ -10,6 +10,7 @@ class CUpgrade
   std::string Description;
   std::string Quote;
   std::string Background;
+  bool Ability;
   //Wyrmgus end
   int Costs[MaxCosts];
   //Wyrmgus start

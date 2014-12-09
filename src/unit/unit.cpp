@@ -433,6 +433,7 @@ void CUnit::Init()
 	//Wyrmgus start
 	Name = "";
 	Variation = 0;
+	memset(LearnedAbilities, 0, sizeof(LearnedAbilities));
 	//Wyrmgus end
 	IX = 0;
 	IY = 0;
@@ -604,6 +605,11 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	//Wyrmgus start
+	for (int i = 0; i < UpgradeMax; ++i) { //initialize individual upgrades (setting all of them to false)
+		LearnedAbilities[i] = false;
+	}
+
+	//set the unit's personal name, if applicable
 	if (!type.DefaultName.empty()) {
 		Name = type.DefaultName;
 	} else if (!type.PersonalNames[0].empty() || !type.PersonalNamePrefixes[0].empty()) {

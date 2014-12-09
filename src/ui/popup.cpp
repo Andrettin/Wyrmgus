@@ -502,6 +502,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->ButtonAction = ButtonSpellCast;
 			} else if (!strcmp(value, "research")) {
 				condition->ButtonAction = ButtonResearch;
+			//Wyrmgus start
+			} else if (!strcmp(value, "learn-ability")) {
+				condition->ButtonAction = ButtonLearnAbility;
+			//Wyrmgus end
 			} else if (!strcmp(value, "upgrade-to")) {
 				condition->ButtonAction = ButtonUpgradeTo;
 			} else if (!strcmp(value, "unload")) {

@@ -340,6 +340,7 @@ public:
 	//Wyrmgus start
 	std::string Name;	/// Unit's personal name (if any)
 	int Variation;      /// Which of the variations of its unit type this unit has
+	bool LearnedAbilities[UpgradeMax];      /// individual upgrades which the unit has
 	//Wyrmgus end
 
 	signed char IX;         /// X image displacement to map position

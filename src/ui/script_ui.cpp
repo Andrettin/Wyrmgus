@@ -936,6 +936,10 @@ static int CclDefineButton(lua_State *l)
 				ba.Action = ButtonSpellCast;
 			} else if (!strcmp(value, "research")) {
 				ba.Action = ButtonResearch;
+			//Wyrmgus start
+			} else if (!strcmp(value, "learn-ability")) {
+				ba.Action = ButtonLearnAbility;
+			//Wyrmgus end
 			} else if (!strcmp(value, "upgrade-to")) {
 				ba.Action = ButtonUpgradeTo;
 			} else if (!strcmp(value, "unload")) {
@@ -973,6 +977,10 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckFalse;
 			} else if (!strcmp(value, "check-upgrade")) {
 				ba.Allowed = ButtonCheckUpgrade;
+			//Wyrmgus start
+			} else if (!strcmp(value, "check-ability")) {
+				ba.Allowed = ButtonCheckAbility;
+			//Wyrmgus end
 			} else if (!strcmp(value, "check-unit-variable")) {
 				ba.Allowed = ButtonCheckUnitVariable;
 			} else if (!strcmp(value, "check-units-or")) {

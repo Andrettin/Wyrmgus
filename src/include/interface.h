@@ -72,6 +72,9 @@ enum ButtonCmd {
 	ButtonStandGround,    /// order stand ground
 	ButtonReturn,         /// order return goods
 	ButtonResearch,       /// order reseach
+	//Wyrmgus start
+	ButtonLearnAbility,   /// order learn ability
+	//Wyrmgus end
 	ButtonUpgradeTo,      /// order upgrade
 	ButtonCancel,         /// cancel
 	ButtonCancelUpgrade,  /// cancel upgrade
@@ -403,6 +406,10 @@ extern bool ButtonCheckTrue(const CUnit &unit, const ButtonAction &button);
 extern bool ButtonCheckFalse(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed upgrade is ready
 extern bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button);
+//Wyrmgus start
+/// Check if allowed ability is ready
+extern bool ButtonCheckAbility(const CUnit &unit, const ButtonAction &button);
+//Wyrmgus end
 /// Check if unit's variables pass the condition check
 extern bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed units exists
