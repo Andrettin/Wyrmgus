@@ -1417,6 +1417,9 @@ static int CclGetUnitTypeData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, type->Name.c_str());
 		return 1;
+	} else if (!strcmp(data, "DefaultName")) {
+		lua_pushstring(l, type->DefaultName.c_str());
+		return 1;
 	} else if (!strcmp(data, "Class")) {
 		lua_pushstring(l, type->Class.c_str());
 		return 1;
@@ -1434,6 +1437,12 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, type->Icon.Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Costs")) {
+		LuaCheckArgs(l, 3);
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		lua_pushnumber(l, type->DefaultStat.Costs[resId]);
 		return 1;
 	} else if (!strcmp(data, "TechnologyPointCost")) {
 		lua_pushnumber(l, type->TechnologyPointCost);
