@@ -142,6 +142,7 @@ enum EString {
 	EString_UnitName,     /// UnitType Name.
 	//Wyrmgus start
 	EString_UnitTypeName,     /// UnitType Name, if EString_UnitName is occupied by the unit's personal name.
+	EString_UnitTrait,     /// Unit Trait
 	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.

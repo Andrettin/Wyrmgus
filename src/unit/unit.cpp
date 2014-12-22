@@ -1005,7 +1005,10 @@ void UpdateUnitSightRange(CUnit &unit)
 	if (unit.Constructed) { // Units under construction have no sight range.
 		unit.CurrentSightRange = 1;
 	} else if (!unit.Container) { // proper value.
-		unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
+		//Wyrmgus start
+//		unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
+		unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max;
+		//Wyrmgus end
 	} else { // value of it container.
 		unit.CurrentSightRange = unit.Container->CurrentSightRange;
 	}

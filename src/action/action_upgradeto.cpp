@@ -123,8 +123,13 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 	//  adjust Variables with percent.
 	const CUnitStats &newstats = newtype.Stats[player.Index];
+	//Wyrmgus start
+	const CUnitStats &oldstats = oldtype.Stats[player.Index];
+	//Wyrmgus end
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+		//Wyrmgus start
+		/*
 		if (unit.Variable[i].Max && unit.Variable[i].Value) {
 			unit.Variable[i].Value = newstats.Variables[i].Max *
 									 unit.Variable[i].Value / unit.Variable[i].Max;
@@ -138,6 +143,20 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			unit.Variable[i].Increase = newstats.Variables[i].Increase;
 			unit.Variable[i].Enable = newstats.Variables[i].Enable;
 		}
+		*/
+		if (unit.Variable[i].Max && unit.Variable[i].Value) {
+			unit.Variable[i].Value += newstats.Variables[i].Max - oldstats.Variables[i].Max;
+		} else {
+			unit.Variable[i].Value += newstats.Variables[i].Value - oldstats.Variables[i].Value;
+		}
+		if (i == KILL_INDEX || i == XP_INDEX) {
+			unit.Variable[i].Value = unit.Variable[i].Max;
+		} else {
+			unit.Variable[i].Max += newstats.Variables[i].Max - oldstats.Variables[i].Max;
+			unit.Variable[i].Increase += newstats.Variables[i].Increase - oldstats.Variables[i].Increase;
+			unit.Variable[i].Enable = newstats.Variables[i].Enable;
+		}
+		//Wyrmgus end
 	}
 
 	//Wyrmgus start

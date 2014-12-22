@@ -1171,6 +1171,8 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Name.c_str());
 	} else if (!strcmp(value, "Name")) {
 		lua_pushstring(l, unit->Name.c_str());
+	} else if (!strcmp(value, "Trait")) {
+		lua_pushstring(l, unit->Trait.c_str());
 	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables

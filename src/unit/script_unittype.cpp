@@ -1833,7 +1833,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
 			//Wyrmgus
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
-			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX) {
+			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -1884,9 +1884,13 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[DEMAND_INDEX].Max = unit.Player->Demand;
 	unit.Variable[DEMAND_INDEX].Enable = unit.Type->Demand > 0;
 
+	//Wyrmgus start
+	/*
 	// SightRange
 	unit.Variable[SIGHTRANGE_INDEX].Value = type->DefaultStat.Variables[SIGHTRANGE_INDEX].Value;
 	unit.Variable[SIGHTRANGE_INDEX].Max = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
+	*/
+	//Wyrmgus end
 
 	// AttackRange
 	unit.Variable[ATTACKRANGE_INDEX].Value = type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;

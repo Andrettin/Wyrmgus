@@ -434,6 +434,26 @@ static int CclAcquireAbility(lua_State *l)
 	}
 	return 0;
 }
+
+/**
+** Set the unit's trait
+*/
+static int CclAcquireTrait(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	lua_pushvalue(l, 1);
+	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
+	lua_pop(l, 1);
+	const char *ident = LuaToString(l, 2);
+	if (!strncmp(ident, "upgrade-", 8)) {
+		unit->Variable[LEVELUP_INDEX].Value += 1;
+		AbilityAcquire(*unit, CUpgrade::Get(ident));
+		unit->Trait = CUpgrade::Get(ident)->Name;
+	} else {
+		DebugPrint(" wrong ident %s\n" _C_ ident);
+	}
+	return 0;
+}
 //Wyrmgus end
 
 /**
@@ -446,6 +466,7 @@ void UpgradesCclRegister()
 	lua_register(Lua, "DefineUnitAllow", CclDefineUnitAllow);
 	//Wyrmgus start
 	lua_register(Lua, "AcquireAbility", CclAcquireAbility);
+	lua_register(Lua, "AcquireTrait", CclAcquireTrait);
 	//Wyrmgus end
 }
 
@@ -589,7 +610,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					CUnit &unit = *unitupgrade[j];
 					if (unit.Player->Index == pn && !unit.Removed) {
 						MapUnmarkUnitSight(unit);
-						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max +
+						//Wyrmgus start
+//						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max +
+						unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max +
+						//Wyrmgus end
 												 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
 						MapMarkUnitSight(unit);
 					}
@@ -766,7 +790,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					CUnit &unit = *unitupgrade[j];
 					if (unit.Player->Index == pn && !unit.Removed) {
 						MapUnmarkUnitSight(unit);
-						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max -
+						//Wyrmgus start
+//						unit.CurrentSightRange = stat.Variables[SIGHTRANGE_INDEX].Max -
+						unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max -
+						//Wyrmgus end
 												 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
 						MapMarkUnitSight(unit);
 					}
@@ -846,6 +873,15 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 static void ApplyAbilityModifier(CUnit &unit, const CUpgradeModifier *um)
 {
 	Assert(um);
+
+	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
+		if (!unit.Removed) {
+			MapUnmarkUnitSight(unit);
+			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value +
+									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+			MapMarkUnitSight(unit);
+		}
+	}
 
 	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;

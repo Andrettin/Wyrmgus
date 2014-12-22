@@ -815,6 +815,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitTypeName")) {
 			res->e = EString_UnitTypeName;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitTrait")) {
+			res->e = EString_UnitTrait;
+			res->D.Unit = CclParseUnitDesc(l);
 		//Wyrmgus end
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
@@ -1083,6 +1086,13 @@ std::string EvalString(const StringDesc *s)
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string("");
 			}
+		case EString_UnitTrait : // name of the unit's trait
+			unit = EvalUnit(s->D.Unit);
+			if (unit != NULL) {
+				return unit->Trait;
+			} else { // ERROR.
+				return std::string("");
+			}
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;
 			if (EvalNumber(s->D.If.Cond)) {
@@ -1269,6 +1279,10 @@ void FreeStringDesc(StringDesc *s)
 			break;
 		//Wyrmgus start
 		case EString_UnitTypeName : // Name of the UnitType
+			FreeUnitDesc(s->D.Unit);
+			delete s->D.Unit;
+			break;
+		case EString_UnitTrait : // Trait of the unit
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
 			break;
@@ -1730,7 +1744,7 @@ static int CclUnitName(lua_State *l)
 }
 //Wyrmgus start
 /**
-**  Return equivalent lua table for UnitName.
+**  Return equivalent lua table for UnitTypeName.
 **  {"UnitTypeName", {arg1}}
 **
 **  @param l  Lua state.
@@ -1741,6 +1755,20 @@ static int CclUnitTypeName(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitTypeName");
+}
+
+/**
+**  Return equivalent lua table for UnitTrait.
+**  {"UnitTrait", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitTrait(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitTrait");
 }
 //Wyrmgus end
 /**
@@ -1931,6 +1959,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitName", CclUnitName);
 	//Wyrmgus start
 	lua_register(Lua, "UnitTypeName", CclUnitTypeName);
+	lua_register(Lua, "UnitTrait", CclUnitTrait);
 	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);

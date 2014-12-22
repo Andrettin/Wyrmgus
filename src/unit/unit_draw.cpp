@@ -670,7 +670,10 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		const PixelPos center(screenPos + type.GetPixelSize() / 2);
 
 		if (Preference.ShowSightRange) {
-			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
+			//Wyrmgus start
+//			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
+			const int value = unit.Variable[SIGHTRANGE_INDEX].Max;
+			//Wyrmgus end
 			const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
 
 			if (value) {
