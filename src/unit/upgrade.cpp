@@ -693,11 +693,11 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								}
 								bool UpgradesCheck = true;
 								for (int u = 0; u < VariationMax; ++u) {
-									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R') {
+									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
 										UpgradesCheck = false;
 										break;
 									}
-									if (!varinfo->UpgradesForbidden[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R') {
+									if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
 										UpgradesCheck = false;
 										break;
 									}
@@ -852,6 +852,51 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
 					}
+					//change variation if current one becomes forbidden
+					VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
+					if (current_varinfo) {
+						bool RequiredUpgrade = false;
+						for (int u = 0; u < VariationMax; ++u) {
+							if (!current_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesRequired[u])->ID) {
+								RequiredUpgrade = true;
+								break;
+							}
+						}
+						if (RequiredUpgrade == true) {
+							int TypeVariationCount = 0;
+							int LocalTypeVariations[VariationMax];
+							for (int i = 0; i < VariationMax; ++i) {
+								VariationInfo *varinfo = UnitTypes[z]->VarInfo[i];
+								if (!varinfo) {
+									continue;
+								}
+								bool UpgradesCheck = true;
+								for (int u = 0; u < VariationMax; ++u) {
+									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+										UpgradesCheck = false;
+										break;
+									}
+									if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+										UpgradesCheck = false;
+										break;
+									}
+								}
+								if (UpgradesCheck == false) {
+									continue;
+								}
+								if (varinfo->VariationId == current_varinfo->VariationId) { // if this variation has the same ident as the one incompatible with this upgrade, choose it automatically
+									unit.Variation = i;
+									TypeVariationCount = 0;
+									break;
+								}
+								LocalTypeVariations[TypeVariationCount] = i;
+								TypeVariationCount += 1;
+							}
+							if (TypeVariationCount > 0) {
+								unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+							}
+						}
+					}
 				}
 			}
 			if (um->ConvertTo) {
@@ -895,6 +940,52 @@ static void ApplyAbilityModifier(CUnit &unit, const CUpgradeModifier *um)
 		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 		clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+	}
+	
+	//change variation if current one becomes forbidden
+	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
+	if (current_varinfo) {
+		bool ForbiddenUpgrade = false;
+		for (int u = 0; u < VariationMax; ++u) {
+			if (!current_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesForbidden[u])->ID) {
+				ForbiddenUpgrade = true;
+				break;
+			}
+		}
+		if (ForbiddenUpgrade == true) {
+			int TypeVariationCount = 0;
+			int LocalTypeVariations[VariationMax];
+			for (int i = 0; i < VariationMax; ++i) {
+				VariationInfo *varinfo = unit.Type->VarInfo[i];
+				if (!varinfo) {
+					continue;
+				}
+				bool UpgradesCheck = true;
+				for (int u = 0; u < VariationMax; ++u) {
+					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+						UpgradesCheck = false;
+						break;
+					}
+					if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+						UpgradesCheck = false;
+						break;
+					}
+				}
+				if (UpgradesCheck == false) {
+					continue;
+				}
+				if (varinfo->VariationId == current_varinfo->VariationId) { // if this variation has the same ident as the one incompatible with this upgrade, choose it automatically
+					unit.Variation = i;
+					TypeVariationCount = 0;
+					break;
+				}
+				LocalTypeVariations[TypeVariationCount] = i;
+				TypeVariationCount += 1;
+			}
+			if (TypeVariationCount > 0) {
+				unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+			}
+		}
 	}
 }
 //Wyrmgus end
