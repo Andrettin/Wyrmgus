@@ -348,8 +348,9 @@ void PlayerRace::Clean()
 		this->Display[i].clear();
 		this->Visible[i] = false;
 		//Wyrmgus start
-		for (unsigned int j = 0; j < PlayerMax; ++j) {
+		for (unsigned int j = 0; j < FactionMax; ++j) {
 			this->FactionNames[i][j].clear();
+			this->FactionTypes[i][j].clear();
 			this->FactionColors[i][j].clear();
 			this->FactionSecondaryColors[i][j].clear();
 		}
@@ -774,7 +775,7 @@ void CPlayer::SetName(const std::string &name)
 */
 void CPlayer::SetFaction(const std::string &faction)
 {
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < FactionMax; ++i) {
 		if (!PlayerRaces.FactionNames[this->Race][i].empty() && PlayerRaces.FactionNames[this->Race][i] == faction) {
 			this->SetName(faction);
 			this->Faction = i;
@@ -783,7 +784,8 @@ void CPlayer::SetFaction(const std::string &faction)
 			for (int j = 0; j < PlayerColorMax; ++j) {
 				if (PlayerColorNames[j] == PlayerRaces.FactionColors[this->Race][i]) {
 					PrimaryColor = j;
-				} else if (PlayerColorNames[j] == PlayerRaces.FactionSecondaryColors[this->Race][i]) {
+				}
+				if (PlayerColorNames[j] == PlayerRaces.FactionSecondaryColors[this->Race][i]) {
 					SecondaryColor = j;
 				}
 			}

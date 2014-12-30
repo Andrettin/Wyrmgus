@@ -611,6 +611,9 @@ static int CclDefineCivilizationFactions(lua_State *l)
 				if (!strcmp(value, "name")) {
 					++k;
 					PlayerRaces.FactionNames[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "type")) {
+					++k;
+					PlayerRaces.FactionTypes[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "color")) {
 					++k;
 					PlayerRaces.FactionColors[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
@@ -641,7 +644,7 @@ static int CclGetCivilizationFactionNames(lua_State *l)
 	lua_pop(l, 1);
 
 	int FactionCount = 0;
-	for (int i = 0; i < PlayerMax; ++i) {
+	for (int i = 0; i < FactionMax; ++i) {
 		if (!PlayerRaces.FactionNames[civilization][i].empty()) {
 			FactionCount += 1;
 		}
@@ -655,6 +658,41 @@ static int CclGetCivilizationFactionNames(lua_State *l)
 	}
 	
 	return 1;
+}
+
+/**
+**  Get faction data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetFactionData(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+	const int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	const char *faction_name = LuaToString(l, 2);
+	int civilization_faction = 0;
+	for (int i = 0; i < FactionMax; ++i) {
+		if (PlayerRaces.FactionNames[civilization][i].compare(faction_name) == 0) {
+			civilization_faction = i;
+			break;
+		}
+	}
+	const char *data = LuaToString(l, 3);
+
+	if (!strcmp(data, "Type")) {
+		lua_pushstring(l, PlayerRaces.FactionTypes[civilization][civilization_faction].c_str());
+		return 1;
+	} else if (!strcmp(data, "Color")) {
+		lua_pushstring(l, PlayerRaces.FactionColors[civilization][civilization_faction].c_str());
+		return 1;
+	} else if (!strcmp(data, "SecondaryColor")) {
+		lua_pushstring(l, PlayerRaces.FactionSecondaryColors[civilization][civilization_faction].c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
 }
 //Wyrmgus end
 
@@ -898,8 +936,8 @@ static int CclSetPlayerData(lua_State *l)
 		//Wyrmgus start
 		// set random name from the civilization's factions
 		int FactionCount = 0;
-		int LocalFactions[PlayerMax];
-		for (int i = 0; i < PlayerMax; ++i) {
+		int LocalFactions[FactionMax];
+		for (int i = 0; i < FactionMax; ++i) {
 			if (!PlayerRaces.FactionNames[p->Race][i].empty()) {
 				bool faction_used = false;
 				for (int j = 0; j < PlayerMax; ++j) {
@@ -907,7 +945,7 @@ static int CclSetPlayerData(lua_State *l)
 						faction_used = true;
 					}		
 				}
-				if (!faction_used) {
+				if (!faction_used && PlayerRaces.FactionTypes[p->Race][i] == "tribe") {
 					LocalFactions[FactionCount] = i;
 					FactionCount += 1;
 				}
@@ -1052,6 +1090,7 @@ void PlayerCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
+	lua_register(Lua, "GetFactionData", CclGetFactionData);
 	//Wyrmgus end
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);
