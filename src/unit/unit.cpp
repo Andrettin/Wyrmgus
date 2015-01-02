@@ -891,6 +891,8 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 								MapMarkerFunc *f, MapMarkerFunc *f2)
 {
 	Assert(f);
+	//Wyrmgus start
+	/*
 	MapSight(*unit.Player, pos, width, height,
 			 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
 
@@ -898,6 +900,16 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 		MapSight(*unit.Player, pos, width, height,
 				 unit.Container ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
 	}
+	*/
+
+	MapSight(*unit.Player, pos, width, height,
+			 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
+
+	if (unit.Type && unit.Type->DetectCloak && f2) {
+		MapSight(*unit.Player, pos, width, height,
+				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
+	}
+	//Wyrmgus end
 
 	CUnit *unit_inside = unit.UnitInside;
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
@@ -1010,7 +1022,15 @@ void UpdateUnitSightRange(CUnit &unit)
 		unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max;
 		//Wyrmgus end
 	} else { // value of it container.
-		unit.CurrentSightRange = unit.Container->CurrentSightRange;
+		//Wyrmgus start
+//		unit.CurrentSightRange = unit.Container->CurrentSightRange;
+		//if a unit is inside a container, then use the sight of the unit or the container, whichever is greater
+		if (unit.Variable[SIGHTRANGE_INDEX].Max <= unit.Container->CurrentSightRange) {
+			unit.CurrentSightRange = unit.Container->CurrentSightRange;
+		} else {
+			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max;
+		}
+		//Wyrmgus end
 	}
 
 	CUnit *unit_inside = unit.UnitInside;
