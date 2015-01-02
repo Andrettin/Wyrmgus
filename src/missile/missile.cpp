@@ -295,7 +295,7 @@ Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, co
 //Wyrmgus start
 //static int CalculateDamageStats(const CUnitStats &attacker_stats,
 //								const CUnitStats &goal_stats, int bloodlust)
-static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_stats)
+static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -319,6 +319,12 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	if (attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value > 0) {
 		if (SyncRand(100) < attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value) {
 			damage_modifier += 100;
+		}
+	}
+	if (goal != NULL) {
+		// extra backstab damage (only works against units (that are organic and non-building, and that have 8 facing directions) facing opposite to the attacker
+		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && attacker.Direction == goal->Direction && goal->Type->Organic && !goal->Type->Building && goal->Type->NumDirections == 8) {
+			damage_modifier += attacker.Variable[BACKSTAB_INDEX].Value;
 		}
 	}
 	basic_damage *= damage_modifier;
@@ -350,7 +356,7 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 		//Wyrmgus start
 //		return CalculateDamageStats(*attacker.Stats, *goal.Stats,
 //									attacker.Variable[BLOODLUST_INDEX].Value);
-		return CalculateDamageStats(attacker, *goal.Stats);
+		return CalculateDamageStats(attacker, *goal.Stats, &goal);
 		//Wyrmgus end
 	}
 	Assert(formula);
@@ -404,7 +410,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 //								CalculateDamageStats(*unit.Stats,
 //													 *UnitTypeHumanWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
 								CalculateDamageStats(unit,
-													 *UnitTypeHumanWall->Stats));
+													 *UnitTypeHumanWall->Stats, NULL));
 								//Wyrmgus end
 				} else {
 					Map.HitWall(goalPos,
@@ -412,7 +418,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 //								CalculateDamageStats(*unit.Stats,
 //													 *UnitTypeOrcWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
 								CalculateDamageStats(unit,
-													 *UnitTypeOrcWall->Stats));
+													 *UnitTypeOrcWall->Stats, NULL));
 								//Wyrmgus end
 				}
 				return;
@@ -910,7 +916,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 	}
 	//Wyrmgus start
 //	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit->Stats, *stats, 0) / splash);
-	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats) / splash);
+	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, NULL) / splash);
 	//Wyrmgus end
 }
 

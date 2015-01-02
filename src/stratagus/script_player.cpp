@@ -786,6 +786,11 @@ static int CclGetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, p->Name.c_str());
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "Faction")) {
+		lua_pushstring(l, PlayerRaces.FactionNames[p->Race][p->Faction].c_str());
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "RaceName")) {
 		lua_pushstring(l, PlayerRaces.Name[p->Race].c_str());
 		return 1;

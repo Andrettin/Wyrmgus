@@ -142,6 +142,7 @@ static const char LEVELUP_KEY[] = "LevelUp";
 static const char VARIATION_KEY[] = "Variation";
 static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
 static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
+static const char BACKSTAB_KEY[] = "Backstab";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -185,7 +186,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
 //Wyrmgus
 //							   PRIORITY_KEY
-							   PRIORITY_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY
+							   PRIORITY_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY, BACKSTAB_KEY
 //Wyrmgus end
 							  };
 
@@ -1833,7 +1834,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
 			//Wyrmgus
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
-			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX) {
+			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX || i == BACKSTAB_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -1848,6 +1849,8 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[VARIATION_INDEX].Value = unit.Variation;
 
 	unit.Variable[CRITICALSTRIKECHANCE_INDEX].Max = 100;
+
+	unit.Variable[BACKSTAB_INDEX].Max = 1000;
 
 	unit.Variable[LEVELUP_INDEX].Max = 255;
 	//Wyrmgus end
