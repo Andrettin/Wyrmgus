@@ -3121,7 +3121,7 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	// FIXME : should be parametrable.
 	//Wyrmgus start
 //	if (!transporter.IsTeamed(unit)) {
-	if (!transporter.IsTeamed(unit) && !transporter.IsAllied(unit) && transporter.Player->Type != PlayerNeutral) {
+	if (!transporter.IsTeamed(unit) && !transporter.IsAllied(unit) && transporter.Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral) {
 	//Wyrmgus end
 		return 0;
 	}

@@ -187,7 +187,10 @@ bool COrder_Board::WaitForTransporter(CUnit &unit)
 		return false;
 	}
 
-	if (!trans->IsVisibleAsGoal(*unit.Player)) {
+	//Wyrmgus start
+//	if (!trans->IsVisibleAsGoal(*unit.Player)) {
+	if (!trans->IsVisibleAsGoal(*unit.Player) && unit.Player->Type != PlayerNeutral) { // neutral units continue waiting for the transporter even if it is not visible
+	//Wyrmgus end
 		DebugPrint("Transporter Gone\n");
 		this->ClearGoal();
 		unit.Wait = 6;
@@ -273,7 +276,10 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 			this->State = 1;
 		// FALL THROUGH
 		default: { // Move to transporter
-			if (this->State <= State_MoveToTransporterMax) {
+			//Wyrmgus start
+//			if (this->State <= State_MoveToTransporterMax) {
+			if (unit.CanMove() && this->State <= State_MoveToTransporterMax) {
+			//Wyrmgus end
 				const int pathRet = MoveToTransporter(unit);
 				// FIXME: if near transporter wait for enter
 				if (pathRet) {
@@ -290,6 +296,10 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 						this->State = State_WaitForTransporter;
 					}
 				}
+			//Wyrmgus start
+			} else if (!unit.CanMove()) { // if the unit can't move, go directly to the state of waiting for the transporter
+				this->State = State_WaitForTransporter;
+			//Wyrmgus end
 			}
 			break;
 		}
