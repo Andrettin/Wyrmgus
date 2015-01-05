@@ -14,6 +14,7 @@ class CUpgrade
   //Wyrmgus end
   int Costs[MaxCosts];
   //Wyrmgus start
+  int GrandStrategyCosts[MaxCosts];
   int TechnologyPointCost;
   //Wyrmgus end
   CIcon *Icon;

@@ -130,6 +130,9 @@ CUpgrade::CUpgrade(const std::string &ident) :
 	Ident(ident), ID(0)
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
+	//Wyrmgus start
+	memset(this->GrandStrategyCosts, 0, sizeof(this->GrandStrategyCosts));
+	//Wyrmgus end
 }
 
 CUpgrade::~CUpgrade()

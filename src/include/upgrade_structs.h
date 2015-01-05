@@ -67,6 +67,10 @@ enum CostType {
 	Cost5,                                  /// resource 5
 	Cost6,                                  /// resource 6
 
+	//Wyrmgus start
+	Cost7,                               	/// resource 7 (research in Wyrmsun)
+	//Wyrmgus end
+
 	MaxCosts                                /// how many different costs
 };
 
@@ -173,6 +177,7 @@ public:
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
 	//Wyrmgus start
+	int   GrandStrategyCosts[MaxCosts];	/// costs for the upgrade for grand strategy mode
 	int   TechnologyPointCost;		/// technology point cost
 	//Wyrmgus end
 	// TODO: not used by buttons
