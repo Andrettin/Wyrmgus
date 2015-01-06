@@ -611,6 +611,7 @@ static int CclDefineCivilizationFactions(lua_State *l)
 				if (!strcmp(value, "name")) {
 					++k;
 					PlayerRaces.FactionNames[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
+					PlayerRaces.FactionPlayability[civilization][(j - 1) / 2] = true; //factions are playable by default
 				} else if (!strcmp(value, "type")) {
 					++k;
 					PlayerRaces.FactionTypes[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
@@ -620,6 +621,9 @@ static int CclDefineCivilizationFactions(lua_State *l)
 				} else if (!strcmp(value, "secondary_color")) {
 					++k;
 					PlayerRaces.FactionSecondaryColors[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "playable")) {
+					++k;
+					PlayerRaces.FactionPlayability[civilization][(j - 1) / 2] = LuaToBoolean(l, j + 1, k + 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -687,6 +691,9 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "SecondaryColor")) {
 		lua_pushstring(l, PlayerRaces.FactionSecondaryColors[civilization][civilization_faction].c_str());
+		return 1;
+	} else if (!strcmp(data, "Playable")) {
+		lua_pushboolean(l, PlayerRaces.FactionPlayability[civilization][civilization_faction]);
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -950,7 +957,7 @@ static int CclSetPlayerData(lua_State *l)
 						faction_used = true;
 					}		
 				}
-				if (!faction_used && PlayerRaces.FactionTypes[p->Race][i] == "tribe") {
+				if (!faction_used && PlayerRaces.FactionTypes[p->Race][i] == "tribe" && PlayerRaces.FactionPlayability[p->Race][i]) {
 					LocalFactions[FactionCount] = i;
 					FactionCount += 1;
 				}

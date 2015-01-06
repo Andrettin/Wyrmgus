@@ -883,6 +883,14 @@ static int CclOrderUnit(lua_State *l)
 					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
 				} else if (!strcmp(order, "patrol")) {
 					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
+				//Wyrmgus start
+				} else if (!strcmp(order, "board")) {
+					CUnit &transporter = *TargetOnMap(unit, dpos1, dpos2);
+
+					CommandBoard(unit, transporter, 1);
+				} else if (!strcmp(order, "unload")) {
+					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1);
+				//Wyrmgus end
 				} else {
 					LuaError(l, "Unsupported order: %s" _C_ order);
 				}
@@ -1113,6 +1121,32 @@ static int CclGetUnitsAroundUnit(lua_State *l)
 	}
 	return 1;
 }
+
+//Wyrmgus start
+/**
+**  Get a player's units inside another unit
+**
+**  @param l  Lua state.
+**
+**  @return   Array of units.
+*/
+static int CclGetUnitsInsideUnit(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+
+	const int slot = LuaToNumber(l, 1);
+	const CUnit &transporter = UnitManager.GetSlotUnit(slot);
+	
+	lua_newtable(l);
+	
+	CUnit *unit = transporter.UnitInside;
+	for (int i = 0; i < transporter.InsideCount; ++i, unit = unit->NextContained) {
+		lua_pushnumber(l, UnitNumber(*unit));
+		lua_rawseti(l, -2, i + 1);
+	}
+	return 1;
+}
+//Wyrmgus end
 
 /**
 **
@@ -1371,6 +1405,9 @@ void UnitCclRegister()
 
 	lua_register(Lua, "GetUnits", CclGetUnits);
 	lua_register(Lua, "GetUnitsAroundUnit", CclGetUnitsAroundUnit);
+	//Wyrmgus start
+	lua_register(Lua, "GetUnitsInsideUnit", CclGetUnitsInsideUnit);
+	//Wyrmgus end
 
 	// unit member access functions
 	lua_register(Lua, "GetUnitBoolFlag", CclGetUnitBoolFlag);

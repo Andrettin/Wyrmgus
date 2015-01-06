@@ -353,6 +353,7 @@ void PlayerRace::Clean()
 			this->FactionTypes[i][j].clear();
 			this->FactionColors[i][j].clear();
 			this->FactionSecondaryColors[i][j].clear();
+			this->FactionPlayability[i][j] = false;
 		}
 		for (unsigned int j = 0; j < PersonalNameMax; ++j) {
 			this->PersonalNames[i][j].clear();

@@ -301,8 +301,8 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	//Wyrmgus start
 //	int basic_damage = attacker_stats.Variables[BASICDAMAGE_INDEX].Value;
 //	int piercing_damage = attacker_stats.Variables[PIERCINGDAMAGE_INDEX].Value;
-	int basic_damage = attacker.Stats->Variables[BASICDAMAGE_INDEX].Value;
-	int piercing_damage = attacker.Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
+	int basic_damage = attacker.Variable[BASICDAMAGE_INDEX].Value;
+	int piercing_damage = attacker.Variable[PIERCINGDAMAGE_INDEX].Value;
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -337,7 +337,15 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	piercing_damage /= 100;
 	//Wyrmgus end
 
-	int damage = std::max<int>(basic_damage - goal_stats.Variables[ARMOR_INDEX].Value, 1);
+	//Wyrmgus start
+//	int damage = std::max<int>(basic_damage - goal_stats.Variables[ARMOR_INDEX].Value, 1);
+	int damage = 0;
+	if (goal != NULL) {
+		damage = std::max<int>(basic_damage - goal->Variable[ARMOR_INDEX].Value, 1);
+	} else {
+		damage = std::max<int>(basic_damage - goal_stats.Variables[ARMOR_INDEX].Value, 1);
+	}
+	//Wyrmgus end
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
 	Assert(damage >= 0);

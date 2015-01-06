@@ -267,11 +267,12 @@ public:
 	//Wyrmgus start
 	std::string FactionNames[MAX_RACES][FactionMax];    				/// faction names
 	std::string FactionTypes[MAX_RACES][FactionMax];    				/// faction types (tribe or polity)
-	std::string FactionColors[MAX_RACES][FactionMax];    			/// faction colors
-	std::string FactionSecondaryColors[MAX_RACES][FactionMax];    	/// faction secondary colors
-	std::string PersonalNames[MAX_RACES][PersonalNameMax];			/// personal names
-	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];	/// personal prefixes
-	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];	/// personal suffixes
+	std::string FactionColors[MAX_RACES][FactionMax];    				/// faction colors
+	std::string FactionSecondaryColors[MAX_RACES][FactionMax]; 		   	/// faction secondary colors
+	bool FactionPlayability[MAX_RACES][FactionMax];    					/// faction playability
+	std::string PersonalNames[MAX_RACES][PersonalNameMax];				/// personal names
+	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];		/// personal prefixes
+	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];		/// personal suffixes
 	//Wyrmgus end
 	unsigned int Count;             /// number of races
 };
