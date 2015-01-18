@@ -238,6 +238,20 @@ static int CclSavePreferences(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+**  Save extra preferences
+**
+**  @param l  Lua state.
+*/
+static int CclSaveExtraPreferences(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	SaveExtraPreferences(LuaToString(l, 1));
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Load a file and execute it.
 **
@@ -2413,6 +2427,54 @@ void SavePreferences()
 	}
 }
 
+//Wyrmgus start
+/**
+**  Save extra user preferences
+*/
+void SaveExtraPreferences(const std::string &filename)
+{
+	std::vector<std::string> blockTableNames;
+
+	if (!GameName.empty()) {
+		lua_getglobal(Lua, GameName.c_str());
+		if (lua_type(Lua, -1) == LUA_TTABLE) {
+			blockTableNames.push_back(GameName);
+			lua_pushstring(Lua, filename.c_str());
+			lua_gettable(Lua, -2);
+		} else {
+			lua_getglobal(Lua, filename.c_str());
+		}
+	} else {
+		lua_getglobal(Lua, filename.c_str());
+	}
+	blockTableNames.push_back(filename.c_str());
+	if (lua_type(Lua, -1) == LUA_TTABLE) {
+		std::string path = Parameters::Instance.GetUserDirectory();
+
+		if (!GameName.empty()) {
+			path += "/";
+			path += GameName;
+		}
+		path += "/";
+		path += filename.c_str();
+		path += ".lua";
+
+		FILE *fd = fopen(path.c_str(), "w");
+		if (!fd) {
+			DebugPrint("Cannot open file %s for writing\n" _C_ path.c_str());
+			return;
+		}
+
+		std::string s = SaveGlobal(Lua, false, blockTableNames);
+		if (!GameName.empty()) {
+			fprintf(fd, "if (%s == nil) then %s = {} end\n", GameName.c_str(), GameName.c_str());
+		}
+		fprintf(fd, "%s\n", s.c_str());
+		fclose(fd);
+	}
+}
+//Wyrmgus end
+
 /**
 **  Load stratagus config file.
 */
@@ -2445,6 +2507,9 @@ void ScriptRegister()
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
+	//Wyrmgus start
+	lua_register(Lua, "SaveExtraPreferences", CclSaveExtraPreferences);
+	//Wyrmgus end
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 
