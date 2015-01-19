@@ -451,7 +451,7 @@ static int CclAcquireTrait(lua_State *l)
 	if (!strncmp(ident, "upgrade-", 8)) {
 		unit->Variable[LEVELUP_INDEX].Value += 1;
 		AbilityAcquire(*unit, CUpgrade::Get(ident));
-		unit->Trait = CUpgrade::Get(ident)->Name;
+		unit->Trait = ident;
 	} else {
 		DebugPrint(" wrong ident %s\n" _C_ ident);
 	}

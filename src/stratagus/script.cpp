@@ -1103,7 +1103,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitTrait : // name of the unit's trait
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
-				return unit->Trait;
+				return CUpgrade::Get(unit->Trait)->Name;
 			} else { // ERROR.
 				return std::string("");
 			}
