@@ -153,8 +153,9 @@ extern const char NameLine[];
 #define PlayerMax    16                 /// How many players are supported
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
-#define MAX_RACES 8
 //Wyrmgus start
+//#define MAX_RACES 8
+#define MAX_RACES 32
 #define FactionMax 128 //maximum number of factions a civilization can have
 #define PlayerColorMax 32                 // How many player colors are supported
 #define VariationMax 32 //maximum number of variations a unit can have

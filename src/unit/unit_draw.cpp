@@ -716,11 +716,16 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 **  @param frame   Frame number to draw.
 **  @param screenPos  screen (top left) position of the unit.
 */
-static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
+//Wyrmgus start
+//static void DrawConstructionShadow(const CUnitType &type, const CConstructionFrame *cframe,
+static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, const CConstructionFrame *cframe,
+//Wyrmgus end
 								   int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileConstruction) {
+		//Wyrmgus start
+		/*
 		if (type.Construction->ShadowSprite) {
 			pos.x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
 			pos.x += type.OffsetX;
@@ -732,6 +737,34 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 				type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
 			}
 		}
+		*/
+		VariationInfo *varinfo = type.VarInfo[unit.Variation];
+		if (varinfo && varinfo->Construction) {
+			if (varinfo->Construction->ShadowSprite) {
+				pos.x -= (varinfo->Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
+				pos.x += type.OffsetX;
+				pos.y -= (varinfo->Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
+				pos.y += type.OffsetY;
+				if (frame < 0) {
+					varinfo->Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				} else {
+					varinfo->Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+				}
+			}
+		} else {
+			if (type.Construction->ShadowSprite) {
+				pos.x -= (type.Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
+				pos.x += type.OffsetX;
+				pos.y -= (type.Construction->Height - type.TileHeight * PixelTileSize.y) / 2;
+				pos.y += type.OffsetY;
+				if (frame < 0) {
+					type.Construction->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				} else {
+					type.Construction->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+				}
+			}
+		}
+		//Wyrmgus end
 	} else {
 		if (type.ShadowSprite) {
 			pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
@@ -757,11 +790,21 @@ static void DrawConstructionShadow(const CUnitType &type, const CConstructionFra
 **  @param screenPos  screen (top left) position of the unit.
 */
 static void DrawConstruction(const int player, const CConstructionFrame *cframe,
-							 const CUnitType &type, int frame, const PixelPos &screenPos)
+							//Wyrmgus start
+//							 const CUnitType &type, int frame, const PixelPos &screenPos)
+							 const CUnit &unit, const CUnitType &type, int frame, const PixelPos &screenPos)
+							//Wyrmgus end
 {
 	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileConstruction) {
-		const CConstruction &construction = *type.Construction;
+		//Wyrmgus start
+//		const CConstruction &construction = *type.Construction;
+		CConstruction &construction = *type.Construction;
+		VariationInfo *varinfo = type.VarInfo[unit.Variation];
+		if (varinfo && varinfo->Construction) {
+			construction = *varinfo->Construction;
+		}
+		//Wyrmgus end
 		pos.x -= construction.Width / 2;
 		pos.y -= construction.Height / 2;
 		if (frame < 0) {
@@ -775,7 +818,15 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		if (frame < 0) {
 			frame = -frame - 1;
 		}
-		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+		//Wyrmgus start
+//		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+		VariationInfo *varinfo = type.VarInfo[unit.Variation];
+		if (varinfo && varinfo->Sprite) {
+			varinfo->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+		} else {
+			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+		}
+		//Wyrmgus end
 	}
 }
 
@@ -852,7 +903,10 @@ void CUnit::Draw(const CViewport &vp) const
 
 
 	if (state == 1 && constructed) {
-		DrawConstructionShadow(*type, cframe, frame, screenPos);
+		//Wyrmgus start
+//		DrawConstructionShadow(*type, cframe, frame, screenPos);
+		DrawConstructionShadow(*this, *type, cframe, frame, screenPos);
+		//Wyrmgus end
 	} else {
 		if (action != UnitActionDie) {
 			DrawShadow(*type, frame, screenPos);
@@ -897,7 +951,10 @@ void CUnit::Draw(const CViewport &vp) const
 	if (state == 1) {
 		if (constructed) {
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
-			DrawConstruction(player, cframe, *type, frame, pos);
+			//Wyrmgus start
+//			DrawConstruction(player, cframe, *type, frame, pos);
+			DrawConstruction(player, cframe, *this, *type, frame, pos);
+			//Wyrmgus end
 		} else {
 			DrawUnitType(*type, sprite, player, frame, screenPos);
 		}

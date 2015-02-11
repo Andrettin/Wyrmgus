@@ -76,7 +76,16 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
-	CConstructionFrame *cframe = unit.Type->Construction->Frames;
+	//Wyrmgus start
+//	CConstructionFrame *cframe = unit.Type->Construction->Frames;
+	CConstructionFrame *cframe;
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Construction) {
+		cframe = varinfo->Construction->Frames;
+	} else {
+		cframe = unit.Type->Construction->Frames;
+	}
+	//Wyrmgus end
 	int frame = 0;
 	while (cframe != this->Frame) {
 		cframe = cframe->Next;
@@ -107,7 +116,16 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	} else if (!strcmp(value, "frame")) {
 		++j;
 		int frame = LuaToNumber(l, -1, j + 1);
-		CConstructionFrame *cframe = unit.Type->Construction->Frames;
+		//Wyrmgus start
+//		CConstructionFrame *cframe = unit.Type->Construction->Frames;
+		CConstructionFrame *cframe;
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Construction) {
+			cframe = varinfo->Construction->Frames;
+		} else {
+			cframe = unit.Type->Construction->Frames;
+		}
+		//Wyrmgus end
 		while (frame-- && cframe->Next != NULL) {
 			cframe = cframe->Next;
 		}
@@ -330,7 +348,15 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 {
 	const CUnitType &type = *unit.Type;
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
-	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
+	//Wyrmgus start
+//	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
+	CConstruction &construction = *type.Construction;
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Construction) {
+		construction = *varinfo->Construction;
+	}
+	const CConstructionFrame *cframe = FindCFramePercent(*construction.Frames, percent);
+	//Wyrmgus end
 
 	Assert(cframe != NULL);
 

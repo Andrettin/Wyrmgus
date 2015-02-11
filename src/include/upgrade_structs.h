@@ -69,6 +69,7 @@ enum CostType {
 
 	//Wyrmgus start
 	Cost7,                               	/// resource 7 (research in Wyrmsun)
+	Cost8,                               	/// resource 8 (prestige in Wyrmsun)
 	//Wyrmgus end
 
 	MaxCosts                                /// how many different costs

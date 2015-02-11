@@ -539,12 +539,24 @@ static int CclDefineRaceNames(lua_State *l)
 				if (!strcmp(value, "name")) {
 					++k;
 					PlayerRaces.Name[i] = LuaToString(l, j + 1, k + 1);
+					//Wyrmgus start
+					PlayerRaces.Playable[i] = true; //civilizations are playable by default
+					//Wyrmgus end
 				} else if (!strcmp(value, "display")) {
 					++k;
 					PlayerRaces.Display[i] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "visible")) {
 					PlayerRaces.Visible[i] = 1;
 				//Wyrmgus start
+				} else if (!strcmp(value, "playable")) {
+					++k;
+					PlayerRaces.Playable[i] = LuaToBoolean(l, j + 1, k + 1);
+				} else if (!strcmp(value, "species")) {
+					++k;
+					PlayerRaces.Species[i] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "parent-civilization")) {
+					++k;
+					PlayerRaces.ParentCivilization[i] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "personal_names")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
@@ -589,6 +601,51 @@ static int CclDefineRaceNames(lua_State *l)
 }
 
 //Wyrmgus start
+/**
+**  Get whether a civilization is playable or not.
+**
+**  @param l  Lua state.
+*/
+static int CclIsCivilizationPlayable(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	lua_pop(l, 1);
+
+	lua_pushboolean(l, PlayerRaces.Playable[civilization]);
+	return 1;
+}
+
+/**
+**  Get a civilization's species.
+**
+**  @param l  Lua state.
+*/
+static int CclGetCivilizationSpecies(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	lua_pop(l, 1);
+
+	lua_pushstring(l, PlayerRaces.Species[civilization].c_str());
+	return 1;
+}
+
+/**
+**  Get a civilization's parent civilization.
+**
+**  @param l  Lua state.
+*/
+static int CclGetParentCivilization(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	lua_pop(l, 1);
+
+	lua_pushstring(l, PlayerRaces.ParentCivilization[civilization].c_str());
+	return 1;
+}
+
 /**
 **  Define a civilization's factions
 **
@@ -1100,6 +1157,9 @@ void PlayerCclRegister()
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
 	//Wyrmgus start
+	lua_register(Lua, "IsCivilizationPlayable", CclIsCivilizationPlayable);
+	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
+	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);

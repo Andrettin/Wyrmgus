@@ -255,6 +255,9 @@ public:
 	PlayerRace() : Count(0)
 	{
 		memset(Visible, 0, sizeof(Visible));
+		//Wyrmgus start
+		memset(Playable, 0, sizeof(Playable));
+		//Wyrmgus end
 	}
 
 	void Clean();
@@ -265,6 +268,9 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
+	bool Playable[MAX_RACES];											/// civilization is playable?
+	std::string Species[MAX_RACES];										/// civilization's parent civilization, if any
+	std::string ParentCivilization[MAX_RACES];							/// civilization's parent civilization, if any
 	std::string FactionNames[MAX_RACES][FactionMax];    				/// faction names
 	std::string FactionTypes[MAX_RACES][FactionMax];    				/// faction types (tribe or polity)
 	std::string FactionColors[MAX_RACES][FactionMax];    				/// faction colors

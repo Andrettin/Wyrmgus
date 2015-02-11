@@ -121,6 +121,7 @@ public:
 	std::string File;				/// Variation's graphics.
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
+	CConstruction *Construction;    /// What is shown in construction phase
 
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation

@@ -348,6 +348,9 @@ void PlayerRace::Clean()
 		this->Display[i].clear();
 		this->Visible[i] = false;
 		//Wyrmgus start
+		this->Playable[i] = false;
+		this->Species[i].clear();
+		this->ParentCivilization[i].clear();
 		for (unsigned int j = 0; j < FactionMax; ++j) {
 			this->FactionNames[i][j].clear();
 			this->FactionTypes[i][j].clear();
