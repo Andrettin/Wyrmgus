@@ -199,7 +199,7 @@ class CUpgradeModifier
 public:
 	//Wyrmgus start
 //	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL)
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL), SpeedResearch(0)
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL), SpeedResearch(0), ChangeCivilizationTo(-1)
 	//Wyrmgus end
 	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
@@ -228,6 +228,7 @@ public:
 
 	//Wyrmgus start
 	int SpeedResearch;					/// how much the modifier changes research speed by
+	int ChangeCivilizationTo;			/// changes the player's civilization to this one
 	//Wyrmgus end
 };
 

@@ -48,6 +48,9 @@
 #include "unit.h"
 #include "unittype.h"
 #include "video.h"
+//Wyrmgus start
+#include "upgrade.h"
+//Wyrmgus end
 
 #include <vector>
 
@@ -182,8 +185,45 @@ static void DrawBuildingCursor()
 	PushClipping();
 	vp.SetClipping();
 	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
-	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
-				 CursorBuilding->StillFrame, screenPos);
+	//Wyrmgus start
+//	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
+//				 CursorBuilding->StillFrame, screenPos);
+	// get the first variation which has the proper upgrades for this player (to have the proper appearance of buildings drawn in the cursor, according to the upgrades)
+	bool FoundVariation = false;
+	for (int i = 0; i < VariationMax; ++i) {
+		VariationInfo *varinfo = CursorBuilding->VarInfo[i];
+		if (!varinfo) {
+			continue;
+		}
+		bool UpgradesCheck = true;
+		for (int u = 0; u < VariationMax; ++u) {
+			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*ThisPlayer, varinfo->UpgradesRequired[u].c_str()) != 'R') {
+				UpgradesCheck = false;
+				break;
+			}
+			if (!varinfo->UpgradesForbidden[u].empty() && UpgradeIdentAllowed(*ThisPlayer, varinfo->UpgradesForbidden[u].c_str()) == 'R') {
+				UpgradesCheck = false;
+				break;
+			}
+		}
+		if (UpgradesCheck == false) {
+			continue;
+		}
+		FoundVariation = true;
+		if (varinfo->Sprite) {
+			DrawUnitType(*CursorBuilding, varinfo->Sprite, ThisPlayer->Index,
+					CursorBuilding->StillFrame, screenPos);
+		} else {
+			DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
+					CursorBuilding->StillFrame, screenPos);
+		}
+		break;
+	}
+	if (FoundVariation == false) {
+		DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
+				CursorBuilding->StillFrame, screenPos);
+	}
+	//Wyrmgus end
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->GetPixelSize() / 2);
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1;

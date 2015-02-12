@@ -52,6 +52,7 @@
 #include "unit.h"
 #include "unit_find.h"
 //Wyrmgus start
+#include "ui.h"
 #include "unit_manager.h"
 //Wyrmgus end
 #include "unittype.h"
@@ -323,6 +324,13 @@ static int CclDefineModifier(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(key, "research-speed")) {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
+		} else if (!strcmp(key, "change-civilization-to")) {
+			const char *civilization_name = LuaToString(l, j + 1, 2);
+			um->ChangeCivilizationTo = PlayerRaces.GetRaceIndexByName(civilization_name);
+			
+			if (um->ChangeCivilizationTo == -1) {
+				LuaError(l, "invalid civilization name '%s'" _C_ civilization_name);
+			}
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[key]; // variable index;
@@ -528,6 +536,9 @@ int UpgradeIdByIdent(const std::string &ident)
 */
 static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &dst)
 {
+	//Wyrmgus start
+	player.Allow.Units[src.Slot] = 0; //forbid the previous unit type when converting
+	//Wyrmgus end
 	for (int i = 0; i < player.GetUnitCount(); ++i) {
 		CUnit &unit = player.GetUnit(i);
 
@@ -568,6 +579,42 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	//Wyrmgus start
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch += um->SpeedResearch;
+	}
+	if (um->ChangeCivilizationTo != -1) {
+		player.Race = um->ChangeCivilizationTo;
+		
+		//if the civilization of the person player changed, update the UI
+		if (ThisPlayer && ThisPlayer->Index == player.Index) {
+			LoadCursors(PlayerRaces.Name[player.Race]);
+			UI.Load();
+		}
+		
+		// set random faction from new civilization
+		int FactionCount = 0;
+		int LocalFactions[FactionMax];
+		for (int i = 0; i < FactionMax; ++i) {
+			if (!PlayerRaces.FactionNames[player.Race][i].empty()) {
+				bool faction_used = false;
+				for (int j = 0; j < PlayerMax; ++j) {
+					if (player.Index != j && Players[j].Name == PlayerRaces.FactionNames[player.Race][i]) {
+						faction_used = true;
+					}		
+				}
+				if (!faction_used && PlayerRaces.FactionTypes[player.Race][i] == "tribe" && PlayerRaces.FactionPlayability[player.Race][i]) {
+					LocalFactions[FactionCount] = i;
+					FactionCount += 1;
+				}
+				if (player.Name == PlayerRaces.FactionNames[player.Race][i]) { // if this faction has the same name as the one already had before, then choose it automatically
+					player.SetFaction(PlayerRaces.FactionNames[player.Race][i]);
+					FactionCount = 0;
+					break;
+				}
+			}
+		}
+		if (FactionCount > 0) {
+			int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
+			player.SetFaction(PlayerRaces.FactionNames[player.Race][ChosenFaction]);
+		}
 	}
 	//Wyrmgus end
 
@@ -749,6 +796,42 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch -= um->SpeedResearch;
+	}
+	if (um->ChangeCivilizationTo != -1) {
+		player.Race = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str()); // restore old civilization
+		
+		//if the civilization of the person player changed, update the UI
+		if (ThisPlayer && ThisPlayer->Index == player.Index) {
+			LoadCursors(PlayerRaces.Name[player.Race]);
+			UI.Load();
+		}
+		
+		// set random faction from the old civilization
+		int FactionCount = 0;
+		int LocalFactions[FactionMax];
+		for (int i = 0; i < FactionMax; ++i) {
+			if (!PlayerRaces.FactionNames[player.Race][i].empty()) {
+				bool faction_used = false;
+				for (int j = 0; j < PlayerMax; ++j) {
+					if (player.Index != j && Players[j].Name == PlayerRaces.FactionNames[player.Race][i]) {
+						faction_used = true;
+					}		
+				}
+				if (!faction_used && PlayerRaces.FactionTypes[player.Race][i] == "tribe" && PlayerRaces.FactionPlayability[player.Race][i]) {
+					LocalFactions[FactionCount] = i;
+					FactionCount += 1;
+				}
+				if (player.Name == PlayerRaces.FactionNames[player.Race][i]) { // if this faction has the same name as the one already had before, then choose it automatically
+					player.SetFaction(PlayerRaces.FactionNames[player.Race][i]);
+					FactionCount = 0;
+					break;
+				}
+			}
+		}
+		if (FactionCount > 0) {
+			int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
+			player.SetFaction(PlayerRaces.FactionNames[player.Race][ChosenFaction]);
+		}
 	}
 
 	for (int z = 0; z < UpgradeMax; ++z) {

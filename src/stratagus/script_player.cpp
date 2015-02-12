@@ -48,6 +48,7 @@
 #include "video.h"
 //Wyrmgus start
 #include "upgrade.h"
+#include "ui.h"
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -960,13 +961,28 @@ static int CclGetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "Allow")) {
 		LuaCheckArgs(l, 3);
-		const std::string ident = LuaToString(l, 3);
-		if (UpgradeIdentAllowed(Players[p->Index], ident.c_str()) == 'A') {
-			lua_pushstring(l, "A");
-		} else if (UpgradeIdentAllowed(Players[p->Index], ident.c_str()) == 'R') {
-			lua_pushstring(l, "R");
-		} else if (UpgradeIdentAllowed(Players[p->Index], ident.c_str()) == 'F') {
-			lua_pushstring(l, "F");
+		const char *ident = LuaToString(l, 3);
+		if (!strncmp(ident, "unit-", 5)) {
+			int id = UnitTypeIdByIdent(ident);
+			if (UnitIdAllowed(Players[p->Index], id) > 0) {
+				lua_pushstring(l, "A");
+			} else if (UnitIdAllowed(Players[p->Index], id) == 0) {
+				lua_pushstring(l, "F");
+			} else {
+				DebugPrint(" wrong ident %s\n" _C_ ident);
+			}
+		} else if (!strncmp(ident, "upgrade-", 8)) {
+			if (UpgradeIdentAllowed(Players[p->Index], ident) == 'A') {
+				lua_pushstring(l, "A");
+			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'R') {
+				lua_pushstring(l, "R");
+			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'F') {
+				lua_pushstring(l, "F");
+			} else {
+				DebugPrint(" wrong ident %s\n" _C_ ident);
+			}
+		} else {
+			DebugPrint(" wrong ident %s\n" _C_ ident);
 		}
 		return 1;
 	//Wyrmgus end
@@ -1003,6 +1019,17 @@ static int CclSetPlayerData(lua_State *l)
 		}
 		
 		//Wyrmgus start
+		//if the civilization of the person player changed, update the UI
+		if (ThisPlayer) {
+			if (ThisPlayer->Index == p->Index) {
+				LoadCursors(PlayerRaces.Name[p->Race]);
+				UI.Load();
+			}
+		} else if (p->Index == 0) {
+			LoadCursors(PlayerRaces.Name[p->Race]);
+			UI.Load();
+		}
+		
 		// set random name from the civilization's factions
 		int FactionCount = 0;
 		int LocalFactions[FactionMax];
