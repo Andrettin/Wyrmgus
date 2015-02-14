@@ -489,7 +489,15 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		}
 		if (ButtonAreaUnderCursor == ButtonAreaTransporting
 			&& static_cast<size_t>(ButtonUnderCursor) == j) {
-			UI.StatusLine.Set(uins->Type->Name);
+			//Wyrmgus start
+//			UI.StatusLine.Set(uins->Type->Name);
+			VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
+			if (varinfo && !varinfo->TypeName.empty()) {
+				UI.StatusLine.Set(varinfo->TypeName);
+			} else {
+				UI.StatusLine.Set(uins->Type->Name);
+			}
+			//Wyrmgus end
 		}
 		++j;
 	}
@@ -1173,7 +1181,15 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	DrawInfoPanelBackground(panelIndex);
 	DrawUnitInfo(unit);
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
-		UI.StatusLine.Set(unit.Type->Name);
+		//Wyrmgus start
+//		UI.StatusLine.Set(unit.Type->Name);
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && !varinfo->TypeName.empty()) {
+			UI.StatusLine.Set(varinfo->TypeName);
+		} else {
+			UI.StatusLine.Set(unit.Type->Name);
+		}
+		//Wyrmgus end
 	}
 }
 
@@ -1207,7 +1223,15 @@ static void InfoPanel_draw_multiple_selection()
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
-			UI.StatusLine.Set(Selected[i]->Type->Name);
+			//Wyrmgus start
+//			UI.StatusLine.Set(Selected[i]->Type->Name);
+			VariationInfo *varinfo = Selected[i]->Type->VarInfo[Selected[i]->Variation];
+			if (varinfo && !varinfo->TypeName.empty()) {
+				UI.StatusLine.Set(varinfo->TypeName);
+			} else {
+				UI.StatusLine.Set(Selected[i]->Type->Name);
+			}
+			//Wyrmgus end
 		}
 	}
 	if (Selected.size() > UI.SelectedButtons.size()) {
@@ -1229,10 +1253,7 @@ static void InfoPanel_draw_multiple_selection()
 */
 void CInfoPanel::Draw()
 {
-	//Wyrmgus start
-//	if (UnitUnderCursor && Selected.empty()) {
 	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->IsNotSelectable) {
-	//Wyrmgus end
 		InfoPanel_draw_single_selection(UnitUnderCursor);
 	} else {
 		switch (Selected.size()) {

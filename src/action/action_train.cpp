@@ -204,7 +204,15 @@ static void AnimateActionTrain(CUnit &unit)
 	CUnit *newUnit = MakeUnit(nType, &player);
 
 	if (newUnit == NULL) { // No more memory :/
-		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
+		//Wyrmgus start
+//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
+		VariationInfo *varinfo = nType.GetDefaultVariation(player);
+		if (varinfo && !varinfo->TypeName.empty()) {
+			player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), varinfo->TypeName.c_str());
+		} else {
+			player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
+		}
+		//Wyrmgus end
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
 	}

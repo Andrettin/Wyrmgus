@@ -39,6 +39,10 @@
 
 #include "sound_server.h"
 
+#ifdef USE_FLUIDSYNTH
+#include "fluidsynth.h"
+#endif
+
 #include "iocompat.h"
 #include "iolib.h"
 
@@ -159,6 +163,11 @@ static void MixMusicToStereo32(int *buffer, int size)
 
 		if (n < len) { // End reached
 			MusicPlaying = false;
+#ifdef USE_FLUIDSYNTH
+			if (GetFluidSynthState() == StatePlaying) {
+				CleanFluidSynth(true);
+			}
+#endif
 			delete MusicChannel.Sample;
 			MusicChannel.Sample = NULL;
 
@@ -509,6 +518,12 @@ static CSample *LoadSample(const char *name, enum _play_audio_flags_ flag)
 		return sampleMikMod;
 	}
 #endif
+#ifdef USE_FLUIDSYNTH
+	CSample *sampleFluidSynth = LoadFluidSynth(name, flag);
+	if (sampleFluidSynth) {
+		return sampleFluidSynth;
+	}
+#endif
 	return NULL;
 }
 
@@ -807,6 +822,9 @@ void QuitSound()
 	SoundInitialized = false;
 	delete[] MixerBuffer;
 	MixerBuffer = NULL;
+#ifdef USE_FLUIDSYNTH
+	CleanFluidSynth();
+#endif
 }
 
 //@}

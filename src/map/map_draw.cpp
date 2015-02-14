@@ -314,11 +314,26 @@ static void ShowUnitName(const CViewport &vp, PixelPos pos, CUnit *unit, bool hi
 		} else {
 			backgroundColor = Video.MapRGB(TheScreen->format, 176, 176, 176);
 		}
-		width = font.getWidth(unit->Type->Name) + 10;
+		//Wyrmgus start
+//		width = font.getWidth(unit->Type->Name) + 10;
+		VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
+		if (varinfo && !varinfo->TypeName.empty()) {
+			width = font.getWidth(varinfo->TypeName) + 10;
+		} else {
+			width = font.getWidth(unit->Type->Name) + 10;
+		}
+		//Wyrmgus end
 		x = std::min<int>(GameCursor->G->Width + pos.x, vp.BottomRightPos.x - 1 - width);
 		Video.FillTransRectangle(backgroundColor, x, y, width, height, 128);
 		Video.DrawRectangle(ColorWhite, x, y, width, height);
-		label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
+		//Wyrmgus start
+//		label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
+		if (varinfo && !varinfo->TypeName.empty()) {
+			label.DrawCentered(x + width / 2, y + 3, varinfo->TypeName);
+		} else {
+			label.DrawCentered(x + width / 2, y + 3, unit->Type->Name);
+		}
+		//Wyrmgus end
 	} else if (hidden) {
 		const std::string str("Unrevealed terrain");
 		width = font.getWidth(str) + 10;

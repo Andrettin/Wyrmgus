@@ -169,7 +169,15 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	const CUnitType &type = *unit.Type;
 	CPlayer &player = *unit.Player;
 
-	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str());
+	//Wyrmgus start
+//	DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str());
+	VariationInfo *varinfo = type.GetDefaultVariation(player);
+	if (varinfo && !varinfo->TypeName.empty()) {
+		DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ varinfo->TypeName.c_str());
+	} else {
+		DebugPrint("%d: Building %s(%s) ready.\n" _C_ player.Index _C_ type.Ident.c_str() _C_ type.Name.c_str());
+	}
+	//Wyrmgus end
 
 	// HACK: the building is ready now
 	player.UnitTypesCount[type.Slot]++;
@@ -277,7 +285,15 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	// Check if construction should be canceled...
 	if (this->IsCancelled || this->ProgressCounter < 0) {
-		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
+		//Wyrmgus start
+//		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && !varinfo->TypeName.empty()) {
+			DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ varinfo->TypeName.c_str());
+		} else {
+			DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
+		}
+		//Wyrmgus end
 
 		CancelBuilt(*this, unit);
 		return ;

@@ -46,8 +46,8 @@
 #include "unit.h"
 #include "unit_find.h"
 #include "video.h"
-//Wyrmgus start
 #include "upgrade.h"
+//Wyrmgus start
 #include "ui.h"
 //Wyrmgus end
 
@@ -959,6 +959,16 @@ static int CclGetPlayerData(lua_State *l)
 		lua_pushnumber(l, p->SpeedResearch);
 		return 1;
 	//Wyrmgus start
+	/*
+	} else if (!strcmp(data, "Allow")) {
+		LuaCheckArgs(l, 3);
+		const std::string ident = LuaToString(l, 3);
+		char b[2];
+		b[0] = UpgradeIdentAllowed(Players[p->Index], ident.c_str());
+		b[1] = 0;
+		lua_pushstring(l, b);
+		return 1;
+	*/
 	} else if (!strcmp(data, "Allow")) {
 		LuaCheckArgs(l, 3);
 		const char *ident = LuaToString(l, 3);
@@ -968,8 +978,6 @@ static int CclGetPlayerData(lua_State *l)
 				lua_pushstring(l, "A");
 			} else if (UnitIdAllowed(Players[p->Index], id) == 0) {
 				lua_pushstring(l, "F");
-			} else {
-				DebugPrint(" wrong ident %s\n" _C_ ident);
 			}
 		} else if (!strncmp(ident, "upgrade-", 8)) {
 			if (UpgradeIdentAllowed(Players[p->Index], ident) == 'A') {
@@ -978,8 +986,6 @@ static int CclGetPlayerData(lua_State *l)
 				lua_pushstring(l, "R");
 			} else if (UpgradeIdentAllowed(Players[p->Index], ident) == 'F') {
 				lua_pushstring(l, "F");
-			} else {
-				DebugPrint(" wrong ident %s\n" _C_ ident);
 			}
 		} else {
 			DebugPrint(" wrong ident %s\n" _C_ ident);
@@ -1116,21 +1122,23 @@ static int CclSetPlayerData(lua_State *l)
 		p->SpeedUpgrade = LuaToNumber(l, 3);
 	} else if (!strcmp(data, "SpeedResearch")) {
 		p->SpeedResearch = LuaToNumber(l, 3);
-	//Wyrmgus start
-	} else if (!strcmp(data, "HasUpgrade")) {
+	} else if (!strcmp(data, "Allow")) {
+		LuaCheckArgs(l, 4);
 		const char *ident = LuaToString(l, 3);
-		const bool acquire = LuaToBoolean(l, 4);
+		const std::string acquire = LuaToString(l, 4);
 
 		if (!strncmp(ident, "upgrade-", 8)) {
-			if (acquire && UpgradeIdentAllowed(*p, ident) != 'R') {
+			if (acquire == "R" && UpgradeIdentAllowed(*p, ident) != 'R') {
 				UpgradeAcquire(*p, CUpgrade::Get(ident));
-			} else if (!acquire && UpgradeIdentAllowed(*p, ident) == 'R') {
-				UpgradeLost(*p, CUpgrade::Get(ident)->ID);
+			} else if (acquire == "F" || acquire == "A") {
+				if (UpgradeIdentAllowed(*p, ident) == 'R') {
+					UpgradeLost(*p, CUpgrade::Get(ident)->ID);
+				}
+				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
 			}
 		} else {
-			DebugPrint(" wrong ident %s\n" _C_ ident);
+			LuaError(l, " wrong ident %s\n" _C_ ident);
 		}
-	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

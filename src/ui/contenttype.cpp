@@ -92,7 +92,15 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	}
 
 	if (this->ShowName) {
-		label.DrawCentered(x, y, unit.Type->Name);
+		//Wyrmgus start
+//		label.DrawCentered(x, y, unit.Type->Name);
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && !varinfo->TypeName.empty()) {
+			label.DrawCentered(x, y, varinfo->TypeName);
+		} else {
+			label.DrawCentered(x, y, unit.Type->Name);
+		}
+		//Wyrmgus end
 		return;
 	}
 

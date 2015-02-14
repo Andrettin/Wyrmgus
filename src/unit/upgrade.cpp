@@ -63,7 +63,6 @@
 ----------------------------------------------------------------------------*/
 
 static void AllowUnitId(CPlayer &player, int id, int units);
-static void AllowUpgradeId(CPlayer &player, int id, char af);
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -778,7 +777,6 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	}
 }
 
-//Wyrmgus start
 /**
 **  Remove the modifiers of an upgrade.
 **
@@ -797,6 +795,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch -= um->SpeedResearch;
 	}
+	//Wyrmgus start
 	if (um->ChangeCivilizationTo != -1) {
 		player.Race = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str()); // restore old civilization
 		
@@ -833,6 +832,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			player.SetFaction(PlayerRaces.FactionNames[player.Race][ChosenFaction]);
 		}
 	}
+	//Wyrmgus end
 
 	for (int z = 0; z < UpgradeMax; ++z) {
 		// allow/forbid upgrades for player.  only if upgrade is not acquired
@@ -938,6 +938,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
 					}
+					//Wyrmgus start
 					//change variation if current one becomes forbidden
 					VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
 					if (current_varinfo) {
@@ -983,6 +984,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							}
 						}
 					}
+					//Wyrmgus end
 				}
 			}
 			if (um->ConvertTo) {
@@ -992,6 +994,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	}
 }
 
+//Wyrmgus start
 /**
 **  Apply the modifiers of an ability.
 **
@@ -1102,25 +1105,14 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	}
 }
 
-//Wyrmgus start
-//#if 0 // UpgradeLost not implemented.
-//Wyrmgus end
-/**
-**  for now it will be empty?
-**  perhaps acquired upgrade can be lost if (for example) a building is lost
-**  (lumber mill? stronghold?)
-**  this function will apply all modifiers in reverse way
-*/
-//Wyrmgus start
-//void UpgradeLost(Player &player, int id)
 void UpgradeLost(CPlayer &player, int id)
-//Wyrmgus end
 {
 	player.UpgradeTimers.Upgrades[id] = 0;
+	//Wyrmgus start
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
+	//Wyrmgus end
 	// FIXME: here we should reverse apply upgrade...
 	
-	//Wyrmgus start
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
 			RemoveUpgradeModifier(player, UpgradeModifiers[z]);
@@ -1133,11 +1125,7 @@ void UpgradeLost(CPlayer &player, int id)
 	if (&player == ThisPlayer) {
 		SelectedUnitChanged();
 	}
-	//Wyrmgus end
 }
-//Wyrmgus start
-//#endif
-//Wyrmgus end
 
 //Wyrmgus start
 /**
@@ -1193,7 +1181,7 @@ static void AllowUnitId(CPlayer &player, int id, int units)
 **  @param id      upgrade id
 **  @param af      `A'llow/`F'orbid/`R'eseached
 */
-static void AllowUpgradeId(CPlayer &player, int id, char af)
+void AllowUpgradeId(CPlayer &player, int id, char af)
 {
 	Assert(af == 'A' || af == 'F' || af == 'R');
 	player.Allow.Upgrades[id] = af;

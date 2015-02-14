@@ -1200,9 +1200,14 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
 		lua_pushnumber(l, unit->ResourcesHeld);
-	//Wyrmgus
+	//Wyrmgus start
 	} else if (!strcmp(value, "TypeName")) {
-		lua_pushstring(l, unit->Type->Name.c_str());
+		VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
+		if (varinfo && !varinfo->TypeName.empty()) {
+			lua_pushstring(l, varinfo->TypeName.c_str());
+		} else {
+			lua_pushstring(l, unit->Type->Name.c_str());
+		}
 	} else if (!strcmp(value, "Name")) {
 		lua_pushstring(l, unit->Name.c_str());
 	} else if (!strcmp(value, "Trait")) {

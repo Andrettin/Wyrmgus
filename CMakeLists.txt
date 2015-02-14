@@ -9,7 +9,7 @@
 #         Stratagus - A free fantasy real time strategy game engine
 #
 #    CMakeLists.txt
-#    Copyright (C) 2011-2013  Pali Rohár <pali.rohar@gmail.com>
+#    Copyright (C) 2011-2014  Pali Rohár <pali.rohar@gmail.com>, cybermind <cybermindid@gmail.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -253,6 +253,7 @@ set(pathfinder_SRCS
 source_group(pathfinder FILES ${pathfinder_SRCS})
 
 set(sound_SRCS
+	src/sound/fluidsynth.cpp
 	src/sound/mikmod.cpp
 	src/sound/music.cpp
 	src/sound/ogg.cpp
@@ -603,6 +604,9 @@ set(stratagus_HDRS
 	version-generated.h # This line is needed for CMake when generating Doxygen documentation
 )
 
+# Configuration types
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
 # Additional platform checks
 
 if(UNIX AND CMAKE_SYSTEM_NAME MATCHES BSD)
@@ -647,6 +651,7 @@ if(WIN32)
 endif()
 
 find_package(BZip2)
+find_package(FluidSynth)
 find_package(Mikmod)
 find_package(MNG)
 find_package(OggVorbis)
@@ -687,6 +692,7 @@ endif()
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)
+option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" ON)
 option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
 option(WITH_MNG "Compile Stratagus with MNG image library" ON)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
@@ -698,7 +704,8 @@ option(ENABLE_DOC "Generate Stratagus source code documentation with Doxygen" OF
 option(ENABLE_DEV "Install Stratagus game development headers files" OFF)
 option(ENABLE_UPX "Compress Stratagus executable binary with UPX packer" OFF)
 option(ENABLE_STRIP "Strip all symbols from executables" OFF)
-option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" OFF)
+option(ENABLE_USEGAMEDIR "Place all files created by Stratagus(logs, savegames) in game directory(old behavior), otherwise place everything in user directory(new behavior)" ON)
+option(ENABLE_MULTIBUILD "Compile Stratagus on all CPU cores simltaneously in MSVC" ON)
 
 if(NOT WITH_RENDERER)
 	if(OPENGL_FOUND)
@@ -739,6 +746,12 @@ if(WITH_BZIP2 AND BZIP2_FOUND)
 	add_definitions(-DUSE_BZ2LIB ${BZIP2_DEFINITIONS})
 	include_directories(${BZIP2_INCLUDE_DIR})
 	set(stratagus_LIBS ${stratagus_LIBS} ${BZIP2_LIBRARIES})
+endif()
+
+if(WITH_FLUIDSYNTH AND FLUIDSYNTH_FOUND)
+	add_definitions(-DUSE_FLUIDSYNTH ${FLUIDSYNTH_DEFINITIONS})
+	include_directories(${FLUIDSYNTH_INCLUDE_DIR})
+	set(stratagus_LIBS ${stratagus_LIBS} ${FLUIDSYNTH_LIBRARY})
 endif()
 
 if(WITH_MIKMOD AND MIKMOD_FOUND)
@@ -907,6 +920,12 @@ if(ENABLE_TOUCHSCREEN)
 	add_definitions(-DUSE_TOUCHSCREEN)
 endif()
 
+if(ENABLE_MULTIBUILD)
+	if(WIN32 AND MSVC)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+		message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+	endif()
+endif()
 # Print compile info
 
 message("==================================")
@@ -943,6 +962,12 @@ if(ENABLE_USEGAMEDIR)
 	message("Place game files in: game directory (Place in user directory with -DENABLE_USEGAMEDIR=OFF)")
 else()
 	message("Place game files in: user directory (Place in game directory with -DENABLE_USEGAMEDIR=ON)")
+endif()
+
+if(ENABLE_MULTIBUILD)
+	message("Parallel building in MSVC: Yes (Disable by param -DENABLE_MULTIBUILD=OFF)")
+else()
+	message("Parallel building in MSVC: No (Enable by param -DENABLE_MULTIBUILD=ON)")
 endif()
 
 if(WIN32 AND MSVC)
@@ -1006,6 +1031,7 @@ else()
 endif()
 
 log_package("Bzip2" "BZIP2")
+log_package("FluidSynth" "FLUIDSYNTH")
 log_package("MikMod" "MIKMOD")
 log_package("Mng" "MNG")
 log_package("Ogg/Vorbis" "OGGVORBIS")

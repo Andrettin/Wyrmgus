@@ -435,23 +435,6 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 	} else
 #endif
 	{
-		//Wyrmgus start
-		/*
-		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
-
-		const int oldx = x;
-		const int oldy = y;
-		CLIP_RECTANGLE(x, y, srect.w, srect.h);
-		srect.x += x - oldx;
-		srect.y += y - oldy;
-
-		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		const int oldalpha = Surface->format->alpha;
-
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
-		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
-		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
-		*/
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
 		const int oldx = x;
@@ -466,7 +449,6 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, oldalpha);
-		//Wyrmgus end
 	}
 }
 

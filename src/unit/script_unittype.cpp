@@ -1094,6 +1094,8 @@ static int CclDefineUnitType(lua_State *l)
 					if (!strcmp(value, "variation-id")) {
 						var->VariationId = LuaToString(l, -1, k + 1);
 						type->VarInfo[j] = var;
+					} else if (!strcmp(value, "type-name")) {
+						var->TypeName = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file")) {
 						var->File = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "icon")) {

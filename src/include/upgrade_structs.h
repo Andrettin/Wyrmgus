@@ -70,6 +70,7 @@ enum CostType {
 	//Wyrmgus start
 	Cost7,                               	/// resource 7 (research in Wyrmsun)
 	Cost8,                               	/// resource 8 (prestige in Wyrmsun)
+	Cost9,                               	/// resource 9 (timber in Wyrmsun)
 	//Wyrmgus end
 
 	MaxCosts                                /// how many different costs
@@ -198,8 +199,8 @@ class CUpgradeModifier
 {
 public:
 	//Wyrmgus start
-//	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL)
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), ConvertTo(NULL), SpeedResearch(0), ChangeCivilizationTo(-1)
+//	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL)
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL), ChangeCivilizationTo(-1)
 	//Wyrmgus end
 	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
@@ -214,7 +215,8 @@ public:
 	int UpgradeId;                      /// used to filter required modifier
 
 	CUnitStats Modifier;                /// modifier of unit stats.
-	int *ModifyPercent;                /// use for percent modifiers
+	int *ModifyPercent;					/// use for percent modifiers
+	int SpeedResearch;					/// speed factor for researching
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow
@@ -227,7 +229,6 @@ public:
 	CUnitType *ConvertTo;               /// convert to this unit-type.
 
 	//Wyrmgus start
-	int SpeedResearch;					/// how much the modifier changes research speed by
 	int ChangeCivilizationTo;			/// changes the player's civilization to this one
 	//Wyrmgus end
 };

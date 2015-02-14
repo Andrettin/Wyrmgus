@@ -55,6 +55,9 @@
 #include "unitsound.h"
 #include "util.h"
 #include "video.h"
+//Wyrmgus start
+#include "upgrade.h"
+//Wyrmgus end
 
 #include <ctype.h>
 
@@ -756,6 +759,35 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 	}
 	return false;
 }
+
+//Wyrmgus start
+VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player) const
+{
+	for (int i = 0; i < VariationMax; ++i) {
+		VariationInfo *varinfo = this->VarInfo[i];
+		if (!varinfo) {
+			break;
+		}
+		bool UpgradesCheck = true;
+		for (int u = 0; u < VariationMax; ++u) {
+			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R') {
+				UpgradesCheck = false;
+				break;
+			}
+			if (!varinfo->UpgradesForbidden[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R') {
+				UpgradesCheck = false;
+				break;
+			}
+		}
+		if (UpgradesCheck == false) {
+			continue;
+		}
+		return varinfo;
+	}
+	VariationInfo *varinfo;
+	return varinfo;
+}
+//Wyrmgus end
 
 void UpdateUnitStats(CUnitType &type, int reset)
 {

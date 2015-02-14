@@ -179,7 +179,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 			*resultPos = pos;
 		}
 	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (type.ShoreBuilding || CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -428,8 +428,18 @@ static bool AiFindMiningPlace(const CUnit &worker,
 bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos)
 {
 	// Find a good place for a new hall
-	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index
-			   _C_ type.Ident.c_str() _C_ type.Name.c_str());
+	//Wyrmgus start
+//	DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index
+//			   _C_ type.Ident.c_str() _C_ type.Name.c_str());
+	VariationInfo *varinfo = type.GetDefaultVariation(*AiPlayer->Player);
+	if (varinfo && !varinfo->TypeName.empty()) {
+		DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index
+				   _C_ type.Ident.c_str() _C_ varinfo->TypeName.c_str());
+	} else {
+		DebugPrint("%d: Want to build a %s(%s)\n" _C_ AiPlayer->Player->Index
+				   _C_ type.Ident.c_str() _C_ type.Name.c_str());
+	}
+	//Wyrmgus end
 
 	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
 

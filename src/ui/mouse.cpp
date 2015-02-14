@@ -2082,13 +2082,41 @@ void UIHandleButtonUp(unsigned button)
 				if (Selected[0]->Player == ThisPlayer) {
 					char buf[64];
 					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
+						//Wyrmgus start
+						/*
 						snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
 								 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 								 Selected[0]->Type->Name.c_str());
+						*/
+						VariationInfo *varinfo = Selected[0]->Type->VarInfo[Selected[0]->Variation];
+						if (varinfo && !varinfo->TypeName.empty()) {
+							snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
+									 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
+									 varinfo->TypeName.c_str());
+						} else {
+							snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
+									 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
+									 Selected[0]->Type->Name.c_str());
+						}
+						//Wyrmgus end
 					} else {
+						//Wyrmgus start
+						/*
 						snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
 								 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 								 Selected[0]->Type->Name.c_str());
+						*/
+						VariationInfo *varinfo = Selected[0]->Type->VarInfo[Selected[0]->Variation];
+						if (varinfo && !varinfo->TypeName.empty()) {
+							snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
+									 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
+									 varinfo->TypeName.c_str());
+						} else {
+							snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
+									 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
+									 Selected[0]->Type->Name.c_str());
+						}
+						//Wyrmgus end
 					}
 					UI.StatusLine.Set(buf);
 				}

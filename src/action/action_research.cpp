@@ -71,13 +71,13 @@
 
 /* virtual */ void COrder_Research::Save(CFile &file, const CUnit &unit) const
 {
-	file.printf("{\"action-research\"");
+	file.printf("{\"action-research\",");
 
 	if (this->Finished) {
 		file.printf(" \"finished\", ");
 	}
 	if (this->Upgrade) {
-		file.printf(", \"upgrade\", \"%s\"", this->Upgrade->Ident.c_str());
+		file.printf(" \"upgrade\", \"%s\"", this->Upgrade->Ident.c_str());
 	}
 	file.printf("}");
 }
@@ -134,7 +134,15 @@
 	player.UpgradeTimers.Upgrades[upgrade.ID] += std::max(1, player.SpeedResearch / SPEEDUP_FACTOR);
 	if (player.UpgradeTimers.Upgrades[upgrade.ID] >= upgrade.Costs[TimeCost]) {
 		if (upgrade.Name.empty()) {
-			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
+			//Wyrmgus start
+//			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
+			VariationInfo *varinfo = type.GetDefaultVariation(player);
+			if (varinfo && !varinfo->TypeName.empty()) {
+				player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), varinfo->TypeName.c_str());
+			} else {
+				player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
+			}
+			//Wyrmgus end
 		//Wyrmgus start
 //		} else {
 		} else if (!upgrade.Ability) { //don't show this message when abilities get learned

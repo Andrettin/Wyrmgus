@@ -902,7 +902,7 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 
 
-	if (state == 1 && constructed) {
+	if (state == 1 && constructed && cframe) {
 		//Wyrmgus start
 //		DrawConstructionShadow(*type, cframe, frame, screenPos);
 		DrawConstructionShadow(*this, *type, cframe, frame, screenPos);
@@ -949,7 +949,7 @@ void CUnit::Draw(const CViewport &vp) const
 	// Buildings under construction/upgrade/ready.
 	//
 	if (state == 1) {
-		if (constructed) {
+		if (constructed && cframe) {
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
 			//Wyrmgus start
 //			DrawConstruction(player, cframe, *type, frame, pos);

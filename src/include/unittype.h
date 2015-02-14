@@ -118,6 +118,7 @@ public:
 	{}
 
 	std::string VariationId;		/// Variation's name.
+	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
@@ -474,6 +475,10 @@ public:
 	bool CanMove() const;
 
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
+	
+	//Wyrmgus start
+	VariationInfo *GetDefaultVariation(CPlayer &player) const;
+	//Wyrmgus end
 
 public:
 	std::string Ident;              /// Identifier

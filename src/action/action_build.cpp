@@ -225,15 +225,35 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 	// Check if enough resources for the building.
 	if (player.CheckUnitType(type)) {
 		// FIXME: Better tell what is missing?
-		player.Notify(NotifyYellow, unit.tilePos,
-					  _("Not enough resources to build %s"), type.Name.c_str());
+		//Wyrmgus start
+//		player.Notify(NotifyYellow, unit.tilePos,
+//					  _("Not enough resources to build %s"), type.Name.c_str());
+		VariationInfo *varinfo = type.GetDefaultVariation(Players[player.Index]);
+		if (varinfo && !varinfo->TypeName.empty()) {
+			player.Notify(NotifyYellow, unit.tilePos,
+				_("Not enough resources to build %s"), varinfo->TypeName.c_str());
+		} else {
+			player.Notify(NotifyYellow, unit.tilePos,
+				_("Not enough resources to build %s"), type.Name.c_str());
+		}
+		//Wyrmgus end
 		isOk = false;
 	}
 
 	// Check if hiting any limits for the building.
 	if (player.CheckLimits(type) < 0) {
-		player.Notify(NotifyYellow, unit.tilePos,
-					  _("Can't build more units %s"), type.Name.c_str());
+		//Wyrmgus start
+//		player.Notify(NotifyYellow, unit.tilePos,
+//					  _("Can't build more units %s"), type.Name.c_str());
+		VariationInfo *varinfo = type.GetDefaultVariation(Players[player.Index]);
+		if (varinfo && !varinfo->TypeName.empty()) {
+			player.Notify(NotifyYellow, unit.tilePos,
+						  _("Can't build more units %s"), varinfo->TypeName.c_str());
+		} else {
+			player.Notify(NotifyYellow, unit.tilePos,
+						  _("Can't build more units %s"), type.Name.c_str());
+		}
+		//Wyrmgus end
 		isOk = false;
 	}
 	if (isOk == false && player.AiEnabled) {
@@ -287,10 +307,26 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
 	if (building != NULL) {
 		if (unit.CurrentOrder() == this) {
+			//Wyrmgus start
+			/*
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
 					   _C_ unit.Player->Index _C_ unit.Slot
 					   _C_ building->Type->Name.c_str()
 					   _C_ building->Slot);
+			*/
+			VariationInfo *varinfo = building->Type->GetDefaultVariation(unit.Player);
+			if (varinfo && !varinfo->TypeName.empty()) {
+				DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
+						   _C_ unit.Player->Index _C_ unit.Slot
+						   _C_ varinfo->TypeName.c_str()
+						   _C_ building->Slot);
+			} else {
+				DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
+						   _C_ unit.Player->Index _C_ unit.Slot
+						   _C_ building->Type->Name.c_str()
+						   _C_ building->Slot);
+			}
+			//Wyrmgus end
 
 			delete this; // Bad
 			unit.Orders[0] = COrder::NewActionRepair(unit, *building);
@@ -318,8 +354,18 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	// If unable to make unit, stop, and report message
 	if (build == NULL) {
 		// FIXME: Should we retry this?
-		unit.Player->Notify(NotifyYellow, unit.tilePos,
-							_("Unable to create building %s"), type.Name.c_str());
+		//Wyrmgus start
+//		unit.Player->Notify(NotifyYellow, unit.tilePos,
+//							_("Unable to create building %s"), type.Name.c_str());
+		VariationInfo *varinfo = type.GetDefaultVariation(*unit.Player);
+		if (varinfo && !varinfo->TypeName.empty()) {
+			unit.Player->Notify(NotifyYellow, unit.tilePos,
+								_("Unable to create building %s"), varinfo->TypeName.c_str());
+		} else {
+			unit.Player->Notify(NotifyYellow, unit.tilePos,
+								_("Unable to create building %s"), type.Name.c_str());
+		}
+		//Wyrmgus end
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}
@@ -448,8 +494,18 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		}
 	}
 	if (this->State == State_StartBuilding_Failed) {
-		unit.Player->Notify(NotifyYellow, unit.tilePos,
-							_("You cannot build %s here"), type.Name.c_str());
+		//Wyrmgus start
+//		unit.Player->Notify(NotifyYellow, unit.tilePos,
+//							_("You cannot build %s here"), type.Name.c_str());
+		VariationInfo *varinfo = type.GetDefaultVariation(*unit.Player);
+		if (varinfo && !varinfo->TypeName.empty()) {
+			unit.Player->Notify(NotifyYellow, unit.tilePos,
+								_("You cannot build %s here"), varinfo->TypeName.c_str());
+		} else {
+			unit.Player->Notify(NotifyYellow, unit.tilePos,
+								_("You cannot build %s here"), type.Name.c_str());
+		}
+		//Wyrmgus end
 		if (unit.Player->AiEnabled) {
 			AiCanNotBuild(unit, type);
 		}

@@ -517,10 +517,7 @@ static void DrawPlayers()
 	y += 18 * 1 + 4;
 	if (Editor.SelectedPlayer != -1) {
 		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
-		//Wyrmgus start
-//				 PlayerRaces.Name[Map.Info.PlayerSide[Editor.SelectedPlayer]].c_str());
 				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
-		//Wyrmgus end
 		// Players[SelectedPlayer].RaceName);
 
 		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
@@ -1065,7 +1062,10 @@ static void ShowUnitInfo(const CUnit &unit)
 	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
 					//Wyrmgus start
 //					unit.Type->Name.c_str(), unit.Player->Index,
-					unit.Type->DefaultName.empty() ? unit.Type->Name.c_str() : unit.Type->DefaultName.c_str(), unit.Player->Index,
+					unit.Type->DefaultName.empty() ?
+					unit.Type->GetDefaultVariation(*unit.Player) && !unit.Type->GetDefaultVariation(*unit.Player)->TypeName.empty() ? unit.Type->GetDefaultVariation(*unit.Player)->TypeName.c_str() : unit.Type->Name.c_str() :
+					unit.Type->DefaultName.c_str(),
+					unit.Player->Index,
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
