@@ -1136,6 +1136,16 @@ static int CclSetPlayerData(lua_State *l)
 				}
 				AllowUpgradeId(*p, UpgradeIdByIdent(ident), acquire[0]);
 			}
+		//Wyrmgus start
+		} else if (!strncmp(ident, "unit-", 5)) {
+			const int UnitMax = 65536; /// How many units supported
+			int id = UnitTypeIdByIdent(ident);
+			if (acquire == "A" || acquire == "R") {
+				AllowUnitId(*p, id, UnitMax);
+			} else if (acquire == "F") {
+				AllowUnitId(*p, id, 0);
+			}
+		//Wyrmgus end
 		} else {
 			LuaError(l, " wrong ident %s\n" _C_ ident);
 		}

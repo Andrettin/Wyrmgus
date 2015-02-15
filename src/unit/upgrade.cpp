@@ -62,7 +62,9 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-static void AllowUnitId(CPlayer &player, int id, int units);
+//Wyrmgus start
+//static void AllowUnitId(CPlayer &player, int id, int units);
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -1105,6 +1107,13 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	}
 }
 
+/**
+**  Upgrade will be lost
+**
+**  @param player   Player researching the upgrade.
+**  @param id       Upgrade to be lost.
+**  
+*/
 void UpgradeLost(CPlayer &player, int id)
 {
 	player.UpgradeTimers.Upgrades[id] = 0;
@@ -1124,6 +1133,33 @@ void UpgradeLost(CPlayer &player, int id)
 	//
 	if (&player == ThisPlayer) {
 		SelectedUnitChanged();
+	}
+}
+
+/**
+**  Apply researched upgrades when map is loading
+**
+**  @return:   void
+*/
+void ApplyUpgrades()
+{
+	for (std::vector<CUpgrade *>::size_type j = 0; j < AllUpgrades.size(); ++j) {
+		CUpgrade *upgrade = AllUpgrades[j];
+		if (upgrade) {
+			for (int p = 0; p < PlayerMax; ++p) {
+				if (Players[p].Allow.Upgrades[j] == 'R') {
+					int id = upgrade->ID;
+					Players[p].UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+					AllowUpgradeId(Players[p], id, 'R');  // research done
+
+					for (int z = 0; z < NumUpgradeModifiers; ++z) {
+						if (UpgradeModifiers[z]->UpgradeId == id) {
+							ApplyUpgradeModifier(Players[p], UpgradeModifiers[z]);
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -1169,7 +1205,10 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade)
 **  @param id      unit type id
 **  @param units   maximum amount of units allowed
 */
-static void AllowUnitId(CPlayer &player, int id, int units)
+//Wyrmgus start
+//static void AllowUnitId(CPlayer &player, int id, int units)
+void AllowUnitId(CPlayer &player, int id, int units)
+//Wyrmgus end
 {
 	player.Allow.Units[id] = units;
 }

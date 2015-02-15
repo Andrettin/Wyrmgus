@@ -45,6 +45,7 @@
 
 #include "iocompat.h"
 #include "iolib.h"
+#include "unit.h"
 
 #include "SDL.h"
 
@@ -163,11 +164,6 @@ static void MixMusicToStereo32(int *buffer, int size)
 
 		if (n < len) { // End reached
 			MusicPlaying = false;
-#ifdef USE_FLUIDSYNTH
-			if (GetFluidSynthState() == StatePlaying) {
-				CleanFluidSynth(true);
-			}
-#endif
 			delete MusicChannel.Sample;
 			MusicChannel.Sample = NULL;
 
@@ -430,6 +426,9 @@ int SetChannelVolume(int channel, int volume)
 */
 int SetChannelStereo(int channel, int stereo)
 {
+	if (Preference.StereoSound == false) {
+		stereo = 0;
+	}
 	if (channel < 0 || channel >= MaxChannels) {
 		return -1;
 	}

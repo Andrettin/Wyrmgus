@@ -78,11 +78,10 @@ extern int UpgradeIdByIdent(const std::string &sid);
 /// Upgrade will be acquired
 extern void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade);
 
-/// for now it will be empty?
-/// perhaps acquired upgrade can be lost if (for example) a building is lost
-/// (lumber mill? stronghold?)
-/// this function will apply all modifiers in reverse way
+/// Upgrade will be lost
 extern void UpgradeLost(CPlayer &player, int id);
+/// Apply researched upgrades when map is loading
+extern void ApplyUpgrades();
 
 //Wyrmgus start
 extern void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade);
@@ -96,6 +95,9 @@ extern void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade);
 // id -- unit type id, af -- `A'llow/`F'orbid
 
 extern int UnitIdAllowed(const CPlayer &player, int id);
+//Wyrmgus start
+extern void AllowUnitId(CPlayer &player, int id, int units);
+//Wyrmgus end
 extern void AllowUpgradeId(CPlayer &player, int id, char af);
 
 extern char UpgradeIdAllowed(const CPlayer &player, int id);
