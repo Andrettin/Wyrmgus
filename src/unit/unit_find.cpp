@@ -216,9 +216,18 @@ class BestDepotFinder
 					return;
 				}
 
+				if (best_dist == INT_MAX) {
+					best_depot = dest;
+				}
+				
 				// calck real travel distance
-				if (!worker->Container) {
-					d = UnitReachable(*worker, *dest, 1);
+
+				if (worker->Container) {
+					UnmarkUnitFieldFlags(*worker->Container);
+				}
+				d = UnitReachable(*worker, *dest, 1);
+				if (worker->Container) {
+					MarkUnitFieldFlags(*worker->Container);
 				}
 				//
 				// Take this depot?
