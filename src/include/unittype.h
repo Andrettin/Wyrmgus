@@ -114,7 +114,7 @@ class VariationInfo
 {
 public:
 	VariationInfo() : VariationId(""),
-		Sprite(NULL)
+		Animations(NULL), Sprite(NULL)
 	{}
 
 	std::string VariationId;		/// Variation's name.
@@ -122,6 +122,7 @@ public:
 	std::string File;				/// Variation's graphics.
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
+	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
 
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation

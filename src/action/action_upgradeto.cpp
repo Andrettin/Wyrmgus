@@ -310,6 +310,12 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 static void AnimateActionUpgradeTo(CUnit &unit)
 {
 	CAnimations &animations = *unit.Type->Animations;
+	//Wyrmgus start
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Animations) {
+		animations = *varinfo->Animations;
+	}
+	//Wyrmgus end
 
 	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
 }

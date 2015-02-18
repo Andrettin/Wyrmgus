@@ -207,7 +207,14 @@
 */
 static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 {
-	const CAnimations *animations = unit.Type->Animations;
+	//Wyrmgus start
+//	const CAnimations *animations = unit.Type->Animations;
+	CAnimations *animations = unit.Type->Animations;
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Animations) {
+		animations = varinfo->Animations;
+	}
+	//Wyrmgus end
 
 	if (!animations || (!animations->Attack && !animations->SpellCast)) {
 		// if don't have animations just cast spell
@@ -302,7 +309,15 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		//Wyrmgus start
+//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
+			UnitShowAnimation(unit, varinfo->Animations->Still);
+		} else {
+			UnitShowAnimation(unit, unit.Type->Animations->Still);
+		}
+		//Wyrmgus end
 		unit.Wait--;
 		return;
 	}

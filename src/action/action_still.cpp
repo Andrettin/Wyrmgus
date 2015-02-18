@@ -369,9 +369,19 @@ bool AutoAttack(CUnit &unit)
 	}
 	this->Finished = false;
 
+	//Wyrmgus start
+	CAnimations *animations = unit.Type->Animations;
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Animations) {
+		animations = varinfo->Animations;
+	}
+	//Wyrmgus end
 	switch (this->State) {
 		case SUB_STILL_STANDBY:
-			UnitShowAnimation(unit, unit.Type->Animations->Still);
+			//Wyrmgus start
+//			UnitShowAnimation(unit, unit.Type->Animations->Still);
+			UnitShowAnimation(unit, animations->Still);
+			//Wyrmgus end
 			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
 			AnimateActionAttack(unit, *this);

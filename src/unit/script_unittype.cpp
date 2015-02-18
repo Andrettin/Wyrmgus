@@ -1101,6 +1101,11 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "icon")) {
 						var->Icon.Name = LuaToString(l, -1, k + 1);
 						var->Icon.Icon = NULL;
+					} else if (!strcmp(value, "animations")) {
+						var->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
+						if (!var->Animations) {
+							DebugPrint("Warning animation `%s' not found\n" _C_ LuaToString(l, -1, k + 1));
+						}
 					} else if (!strcmp(value, "construction")) {
 						var->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
 					} else if (!strcmp(value, "upgrade-required")) {

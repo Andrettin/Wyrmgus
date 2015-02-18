@@ -139,7 +139,15 @@ int DoActionMove(CUnit &unit)
 
 	Assert(unit.CanMove());
 
-	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+	//Wyrmgus start
+	CAnimations *animations = unit.Type->Animations;
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Animations) {
+		animations = varinfo->Animations;
+	}
+//	if (!unit.Moving && (unit.Type->Animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+	if (!unit.Moving && (animations->Move != unit.Anim.CurrAnim || !unit.Anim.Wait)) {
+	//Wyrmgus end
 		Assert(!unit.Anim.Unbreakable);
 
 		// FIXME: So units flying up and down are not affected.
@@ -204,7 +212,10 @@ int DoActionMove(CUnit &unit)
 	}
 
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
-	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
+	//Wyrmgus start
+//	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
+	int move = UnitShowAnimationScaled(unit, animations->Move, Map.Field(unit.Offset)->getCost());
+	//Wyrmgus end
 
 	unit.IX += posd.x * move;
 	unit.IY += posd.y * move;
@@ -228,7 +239,15 @@ int DoActionMove(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		//Wyrmgus start
+//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
+			UnitShowAnimation(unit, varinfo->Animations->Still);
+		} else {
+			UnitShowAnimation(unit, unit.Type->Animations->Still);
+		}
+		//Wyrmgus end
 		unit.Wait--;
 		return;
 	}

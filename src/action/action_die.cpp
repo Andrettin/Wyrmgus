@@ -78,7 +78,14 @@
 
 static bool AnimateActionDie(CUnit &unit)
 {
-	const CAnimations *animations = unit.Type->Animations;
+	//Wyrmgus start
+//	const CAnimations *animations = unit.Type->Animations;
+	CAnimations *animations = unit.Type->Animations;
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Animations) {
+		animations = varinfo->Animations;
+	}
+	//Wyrmgus end
 
 	if (animations == NULL) {
 		return false;

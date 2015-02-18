@@ -166,11 +166,25 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 
 static void AnimateActionTrain(CUnit &unit)
 {
+	//Wyrmgus start
+	/*
 	if (unit.Type->Animations->Train) {
 		UnitShowAnimation(unit, unit.Type->Animations->Train);
 	} else {
 		UnitShowAnimation(unit, unit.Type->Animations->Still);
 	}
+	*/
+	CAnimations *animations = unit.Type->Animations;
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Animations) {
+		animations = varinfo->Animations;
+	}
+	if (animations->Train) {
+		UnitShowAnimation(unit, animations->Train);
+	} else {
+		UnitShowAnimation(unit, animations->Still);
+	}
+	//Wyrmgus end
 }
 
 /* virtual */ void COrder_Train::Execute(CUnit &unit)

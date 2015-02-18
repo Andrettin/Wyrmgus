@@ -161,7 +161,15 @@ enum {
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		//Wyrmgus start
+//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
+			UnitShowAnimation(unit, varinfo->Animations->Still);
+		} else {
+			UnitShowAnimation(unit, unit.Type->Animations->Still);
+		}
+		//Wyrmgus end
 		unit.Wait--;
 		return;
 	}

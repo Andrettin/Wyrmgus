@@ -402,7 +402,15 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	// We need somebody to work on it.
 	if (!type.BuilderOutside) {
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		//Wyrmgus start
+//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
+			UnitShowAnimation(unit, varinfo->Animations->Still);
+		} else {
+			UnitShowAnimation(unit, unit.Type->Animations->Still);
+		}
+		//Wyrmgus end
 		unit.Remove(build);
 		this->State = State_BuildFromInside;
 		if (unit.Selected) {
@@ -420,6 +428,12 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 static void AnimateActionBuild(CUnit &unit)
 {
 	CAnimations *animations = unit.Type->Animations;
+	//Wyrmgus start
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Animations) {
+		animations = varinfo->Animations;
+	}
+	//Wyrmgus end
 
 	if (animations == NULL) {
 		return ;
@@ -466,7 +480,15 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		//Wyrmgus start
+//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
+			UnitShowAnimation(unit, varinfo->Animations->Still);
+		} else {
+			UnitShowAnimation(unit, unit.Type->Animations->Still);
+		}
+		//Wyrmgus end
 		unit.Wait--;
 		return;
 	}

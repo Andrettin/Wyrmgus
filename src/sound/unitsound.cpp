@@ -132,6 +132,33 @@ static void MapAnimSounds(CUnitType &type)
 	for (int i = 0; i < MaxCosts; ++i) {
 		MapAnimSounds2(type.Animations->Harvest[i]);
 	}
+	//Wyrmgus start
+	for (int var_i = 0; var_i < VariationMax; ++var_i) {
+		VariationInfo *varinfo = type.VarInfo[var_i];
+		if (!varinfo) {
+			continue;
+		}
+		if (!varinfo->Animations) {
+			continue;
+		}
+		MapAnimSounds2(varinfo->Animations->Start);
+		MapAnimSounds2(varinfo->Animations->Still);
+		MapAnimSounds2(varinfo->Animations->Move);
+		MapAnimSounds2(varinfo->Animations->Attack);
+		MapAnimSounds2(varinfo->Animations->SpellCast);
+		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
+			MapAnimSounds2(varinfo->Animations->Death[i]);
+		}
+		MapAnimSounds2(varinfo->Animations->Repair);
+		MapAnimSounds2(varinfo->Animations->Train);
+		MapAnimSounds2(varinfo->Animations->Research);
+		MapAnimSounds2(varinfo->Animations->Upgrade);
+		MapAnimSounds2(varinfo->Animations->Build);
+		for (int i = 0; i < MaxCosts; ++i) {
+			MapAnimSounds2(varinfo->Animations->Harvest[i]);
+		}
+	}
+	//Wyrmgus end
 }
 
 /**

@@ -83,11 +83,25 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	//  No animation.
 	//  So direct fire missile.
 	//  FIXME : wait a little.
+	//Wyrmgus start
+	/*
 	if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
 		order.OnAnimationAttack(unit);
 		return;
 	}
 	UnitShowAnimation(unit, unit.Type->Animations->Attack);
+	*/
+	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+	if (varinfo && varinfo->Animations && varinfo->Animations->Attack) {
+		UnitShowAnimation(unit, varinfo->Animations->Attack);
+	} else {
+		if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
+			order.OnAnimationAttack(unit);
+			return;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Attack);
+	}
+	//Wyrmgus end
 }
 
 /* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target)
@@ -566,7 +580,15 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			unit.Waiting = 1;
 			unit.WaitBackup = unit.Anim;
 		}
-		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		//Wyrmgus start
+//		UnitShowAnimation(unit, unit.Type->Animations->Still);
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
+			UnitShowAnimation(unit, varinfo->Animations->Still);
+		} else {
+			UnitShowAnimation(unit, unit.Type->Animations->Still);
+		}
+		//Wyrmgus end
 		unit.Wait--;
 		return;
 	}
