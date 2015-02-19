@@ -114,7 +114,7 @@ class VariationInfo
 {
 public:
 	VariationInfo() : VariationId(""),
-		Animations(NULL), Sprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL)
 	{}
 
 	std::string VariationId;		/// Variation's name.
