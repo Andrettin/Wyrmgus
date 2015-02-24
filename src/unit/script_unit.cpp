@@ -388,7 +388,10 @@ static int CclUnit(lua_State *l)
 			unit->Summoned = 1;
 			--j;
 		} else if (!strcmp(value, "waiting")) {
-			unit->Summoned = 1;
+			unit->Waiting = 1;
+			--j;
+		} else if (!strcmp(value, "mine-low")) {
+			unit->MineLow = 1;
 			--j;
 		} else if (!strcmp(value, "rescued-from")) {
 			unit->RescuedFrom = &Players[LuaToNumber(l, 2, j + 1)];
@@ -791,6 +794,9 @@ static int CclSetResourcesHeld(lua_State *l)
 	lua_pop(l, 1);
 	const int value = LuaToNumber(l, 2);
 	unit->ResourcesHeld = value;
+	unit->Variable[GIVERESOURCE_INDEX].Value = value;
+	unit->Variable[GIVERESOURCE_INDEX].Max = value;
+	unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 
 	return 0;
 }
