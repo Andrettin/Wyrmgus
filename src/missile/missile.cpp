@@ -347,7 +347,10 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	}
 	//Wyrmgus end
 	damage += piercing_damage;
-	damage -= SyncRand() % ((damage + 2) / 2);
+	//Wyrmgus start
+//	damage -= SyncRand() % ((damage + 2) / 2);
+	damage = SyncRand(damage + 2);
+	//Wyrmgus end
 	Assert(damage >= 0);
 
 	return damage;

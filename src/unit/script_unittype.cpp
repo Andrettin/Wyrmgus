@@ -612,14 +612,26 @@ static int CclDefineUnitType(lua_State *l)
 			value = LuaToString(l, -1);
 			if (!strcmp(value, "land")) {
 				type->UnitType = UnitTypeLand;
+				//Wyrmgus start
+				type->LandUnit = true;
+				//Wyrmgus end
 			} else if (!strcmp(value, "fly")) {
 				type->UnitType = UnitTypeFly;
+				//Wyrmgus start
+				type->AirUnit = true;
+				//Wyrmgus end
 			//Wyrmgus start
 			} else if (!strcmp(value, "fly-low")) {
 				type->UnitType = UnitTypeFlyLow;
+				//Wyrmgus start
+				type->AirUnit = true;
+				//Wyrmgus end
 			//Wyrmgus end
 			} else if (!strcmp(value, "naval")) {
 				type->UnitType = UnitTypeNaval;
+				//Wyrmgus start
+				type->SeaUnit = true;
+				//Wyrmgus end
 			} else {
 				LuaError(l, "Unsupported Type: %s" _C_ value);
 			}
@@ -779,12 +791,16 @@ static int CclDefineUnitType(lua_State *l)
 			type->AutoBuildRate = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ShoreBuilding")) {
 			type->ShoreBuilding = LuaToBoolean(l, -1);
+		//Wyrmgus start
+		/*
 		} else if (!strcmp(value, "LandUnit")) {
 			type->LandUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AirUnit")) {
 			type->AirUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SeaUnit")) {
 			type->SeaUnit = LuaToBoolean(l, -1);
+		*/
+		//Wyrmgus end
 		} else if (!strcmp(value, "RandomMovementProbability")) {
 			type->RandomMovementProbability = LuaToNumber(l, -1);
 			//Wyrmgus start
