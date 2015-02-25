@@ -192,7 +192,6 @@ enum {
 	ORGANIC_INDEX,
 	//Wyrmgus start
 	ITEM_INDEX,
-	TRANSPARENT_INDEX,
 	//Wyrmgus end
 	NBARALREADYDEFINED
 };
@@ -245,6 +244,7 @@ enum {
 	HITPOINTHEALING_INDEX,
 	CRITICALSTRIKECHANCE_INDEX,
 	BACKSTAB_INDEX,
+	TRANSPARENCY_INDEX,
 	//Wyrmgus end
 	NVARALREADYDEFINED
 };
@@ -485,6 +485,7 @@ public:
 	std::string Ident;              /// Identifier
 	std::string Name;               /// Pretty name shown from the engine
 	//Wyrmgus start
+	std::string Parent;				/// Parent unit type
 	std::string Class;				/// Class identifier (i.e. infantry, archer, etc.)
 	std::string Civilization;		/// Which civilization this unit belongs to, if any
 	std::string Description;		/// Description of the unit type
@@ -627,7 +628,6 @@ public:
 	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
 	//Wyrmgus start
 	unsigned Item : 1;					/// Item
-	unsigned Transparent : 1;			/// Transparent
 	//Wyrmgus end
 
 	CUnitStats DefaultStat;

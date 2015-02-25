@@ -642,7 +642,6 @@ CUnitType::CUnitType() :
 	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
 	//Wyrmgus start
 	Item(0),
-	Transparent(0),
 	//Wyrmgus end
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
@@ -1088,14 +1087,14 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	*/
 	if (type.Flip) {
 		if (frame < 0) {
-			if (type.Transparent) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, 128);
+			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
 			} else {
 				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
 			}
 		} else {
-			if (type.Transparent) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, 128);
+			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
 			} else {
 				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 			}
@@ -1108,8 +1107,8 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 		} else {
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
-		if (type.Transparent) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, 128);
+		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
 		} else {
 			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		}

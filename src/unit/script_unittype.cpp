@@ -93,7 +93,6 @@ static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
 static const char ORGANIC_KEY[] = "organic";
 //Wyrmgus start
 static const char ITEM_KEY[] = "Item";
-static const char TRANSPARENT_KEY[] = "Transparent";
 //Wyrmgus end
 
 // names of the variable.
@@ -143,6 +142,7 @@ static const char VARIATION_KEY[] = "Variation";
 static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
 static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
 static const char BACKSTAB_KEY[] = "Backstab";
+static const char TRANSPARENCY_KEY[] = "Transparency";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -161,7 +161,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY, TRANSPARENT_KEY
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY
 	//Wyrmgus end
 							  };
 
@@ -186,7 +186,8 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
 //Wyrmgus
 //							   PRIORITY_KEY
-							   PRIORITY_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY, BACKSTAB_KEY
+							   PRIORITY_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY, BACKSTAB_KEY,
+							   TRANSPARENCY_KEY
 //Wyrmgus end
 							  };
 
@@ -362,7 +363,6 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
 	//Wyrmgus start
 	type.BoolFlag[ITEM_INDEX].value                  = type.Item;
-	type.BoolFlag[TRANSPARENT_INDEX].value           = type.Transparent;
 	//Wyrmgus end
 }
 
@@ -730,8 +730,6 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "Item")) {
 			type->Item = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Transparent")) {
-			type->Transparent = LuaToBoolean(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "VisibleUnderFog")) {
 			type->VisibleUnderFog = LuaToBoolean(l, -1);
@@ -1130,6 +1128,73 @@ static int CclDefineUnitType(lua_State *l)
 				// Assert(var->VariationId);
 				lua_pop(l, 1);
 			}
+		} else if (!strcmp(value, "Parent")) {
+			type->Parent = LuaToString(l, -1);
+			CUnitType *parent_type = UnitTypeByIdent(type->Parent);
+			type->Class = parent_type->Class;
+			type->DrawLevel = parent_type->DrawLevel;
+			type->TileWidth = parent_type->TileWidth;
+			type->TileHeight = parent_type->TileHeight;
+			type->BoxWidth = parent_type->BoxWidth;
+			type->BoxHeight = parent_type->BoxHeight;
+			type->BoxOffsetX = parent_type->BoxOffsetX;
+			type->BoxOffsetY = parent_type->BoxOffsetY;
+			type->Construction = parent_type->Construction;
+			type->UnitType = parent_type->UnitType;
+			type->Demand = parent_type->Demand;
+			type->Supply = parent_type->Supply;
+			type->Missile.Name = parent_type->Missile.Name;
+			type->Missile.Missile = NULL;
+			type->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
+			type->Explosion.Name = parent_type->Explosion.Name;
+			type->Explosion.Missile = NULL;
+			type->CorpseName = parent_type->CorpseName;
+			type->CorpseType = NULL;
+			type->ReactRangeComputer = parent_type->ReactRangeComputer;
+			type->ReactRangePerson = parent_type->ReactRangePerson;
+			type->MinAttackRange = parent_type->MinAttackRange;
+			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
+			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value;
+			type->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
+			type->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
+			type->TechnologyPointCost = parent_type->TechnologyPointCost;
+			type->MaxOnBoard = parent_type->MaxOnBoard;
+			type->RepairRange = parent_type->RepairRange;
+			type->RepairHP = parent_type->RepairHP;
+			type->MouseAction = parent_type->MouseAction;
+			type->GroundAttack = parent_type->GroundAttack;
+			type->CanAttack = parent_type->CanAttack;
+			type->CanTarget = parent_type->CanTarget;
+			type->LandUnit = parent_type->LandUnit;
+			type->SeaUnit = parent_type->SeaUnit;
+			type->AirUnit = parent_type->AirUnit;
+			type->Building = parent_type->Building;
+			type->Organic = parent_type->Organic;
+			type->VisibleUnderFog = parent_type->VisibleUnderFog;
+			type->Coward = parent_type->Coward;
+			type->DetectCloak = parent_type->DetectCloak;
+			type->AttackFromTransporter = parent_type->AttackFromTransporter;
+			type->SaveCargo = parent_type->SaveCargo;
+			type->SelectableByRectangle = parent_type->SelectableByRectangle;
+			type->Animations = parent_type->Animations;
+			type->BuildingRules = parent_type->BuildingRules;
+			type->AiBuildingRules = parent_type->AiBuildingRules;
+			type->Sound = parent_type->Sound;
+			type->CanCastSpell = parent_type->CanCastSpell;
+			for (unsigned int i = 0; i < MaxCosts; ++i) {
+				type->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
+				type->RepairCosts[i] = parent_type->RepairCosts[i];
+				type->ImproveIncomes[i] = parent_type->ImproveIncomes[i];
+				type->CanStore[i] = parent_type->CanStore[i];
+			}
+			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+				type->DefaultStat.Variables[i] = parent_type->DefaultStat.Variables[i];
+			}
+			for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) {
+				type->BoolFlag[i].value = parent_type->BoolFlag[i].value;
+				type->BoolFlag[i].CanTransport = parent_type->BoolFlag[i].CanTransport;
+			}
 		} else if (!strcmp(value, "Class")) {
 			type->Class = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
@@ -1430,6 +1495,9 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "DefaultName")) {
 		lua_pushstring(l, type->DefaultName.c_str());
 		return 1;
+	} else if (!strcmp(data, "Parent")) {
+		lua_pushstring(l, type->Parent.c_str());
+		return 1;
 	} else if (!strcmp(data, "Class")) {
 		lua_pushstring(l, type->Class.c_str());
 		return 1;
@@ -1515,9 +1583,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Item")) {
 		lua_pushboolean(l, type->Item);
-		return 1;
-	} else if (!strcmp(data, "Transparent")) {
-		lua_pushboolean(l, type->Transparent);
 		return 1;
 	} else if (!strcmp(data, "LandUnit")) {
 		lua_pushboolean(l, type->LandUnit);
@@ -1843,7 +1908,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
 			//Wyrmgus
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
-			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX || i == BACKSTAB_INDEX) {
+			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX || i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -1860,6 +1925,8 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[CRITICALSTRIKECHANCE_INDEX].Max = 100;
 
 	unit.Variable[BACKSTAB_INDEX].Max = 1000;
+
+	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 
 	unit.Variable[LEVELUP_INDEX].Max = 255;
 	//Wyrmgus end

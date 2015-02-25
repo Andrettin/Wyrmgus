@@ -2121,11 +2121,11 @@ void UIHandleButtonUp(unsigned button)
 						*/
 						VariationInfo *varinfo = Selected[0]->Type->VarInfo[Selected[0]->Variation];
 						if (varinfo && !varinfo->TypeName.empty()) {
-							snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
+							snprintf(buf, sizeof(buf), _("You have ~<%d~> %s"),
 									 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 									 varinfo->TypeName.c_str());
 						} else {
-							snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
+							snprintf(buf, sizeof(buf), _("You have ~<%d~> %s"),
 									 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
 									 Selected[0]->Type->Name.c_str());
 						}
