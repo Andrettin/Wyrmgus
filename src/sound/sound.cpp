@@ -166,6 +166,16 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			} else {
 				return unit.Type->Sound.Acknowledgement.Sound;
 			}
+		//Wyrmgus start
+		case VoiceHit:
+			return unit.Type->Sound.Hit.Sound;
+		case VoiceMiss:
+			if (unit.Type->Sound.Miss.Sound) {
+				return unit.Type->Sound.Miss.Sound;
+			} else {
+				return unit.Type->Sound.Hit.Sound;
+			}
+		//Wyrmgus end
 		case VoiceBuild:
 			return unit.Type->Sound.Build.Sound;
 		case VoiceReady:

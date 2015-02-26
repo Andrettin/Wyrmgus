@@ -69,6 +69,10 @@ enum UnitVoiceGroup {
 	VoiceRepairing,         /// repairing
 	VoiceHarvesting,        /// harvesting
 	VoiceAttack,            /// Attack command
+	//Wyrmgus start
+	VoiceHit,				/// Hit another unit
+	VoiceMiss,				/// Attacked another unit, but missed
+	//Wyrmgus end
 	VoiceBuild              /// worker goes to build a building
 };
 

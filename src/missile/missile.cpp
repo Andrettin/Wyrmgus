@@ -347,8 +347,8 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	}
 	//Wyrmgus end
 	damage += piercing_damage;
-	//Wyrmgus start
 	damage -= SyncRand() % ((damage + 2) / 2);
+	//Wyrmgus start
 	int accuracy = SyncRand(attacker.Variable[ACCURACY_INDEX].Value);
 	if (accuracy == 0) {
 		damage = 0;
@@ -429,24 +429,31 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 
 	// No missile hits immediately!
 	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
+		//Wyrmgus start
+		int damage = 0;
+		//Wyrmgus end
 		// No goal, take target coordinates
 		if (!goal) {
 			if (Map.WallOnMap(goalPos)) {
 				if (Map.HumanWallOnMap(goalPos)) {
+					//Wyrmgus start
+					damage = CalculateDamageStats(unit, *UnitTypeHumanWall->Stats, NULL);
+					//Wyrmgus end
 					Map.HitWall(goalPos,
 								//Wyrmgus start
 //								CalculateDamageStats(*unit.Stats,
 //													 *UnitTypeHumanWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
-								CalculateDamageStats(unit,
-													 *UnitTypeHumanWall->Stats, NULL));
+								damage);
 								//Wyrmgus end
 				} else {
+					//Wyrmgus start
+					damage = CalculateDamageStats(unit, *UnitTypeOrcWall->Stats, NULL);
+					//Wyrmgus end
 					Map.HitWall(goalPos,
 								//Wyrmgus start
 //								CalculateDamageStats(*unit.Stats,
 //													 *UnitTypeOrcWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
-								CalculateDamageStats(unit,
-													 *UnitTypeOrcWall->Stats, NULL));
+								damage);
 								//Wyrmgus end
 				}
 				return;
@@ -454,7 +461,16 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			DebugPrint("Missile-none hits no unit, shouldn't happen!\n");
 			return;
 		}
-		HitUnit(&unit, *goal, CalculateDamage(unit, *goal, Damage));
+		//Wyrmgus start
+//		HitUnit(&unit, *goal, CalculateDamage(unit, *goal, Damage));
+		damage = CalculateDamage(unit, *goal, Damage);
+		HitUnit(&unit, *goal, damage);
+		if (damage) {
+			PlayUnitSound(unit, VoiceHit);
+		} else {
+			PlayUnitSound(unit, VoiceMiss);
+		}
+		//Wyrmgus end
 		return;
 	}
 

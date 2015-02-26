@@ -181,6 +181,10 @@ void MapUnitSounds()
 		type.Sound.Acknowledgement.MapSound();
 		// type.Sound.Acknowledgement.SetSoundRange(INFINITE_SOUND_RANGE);
 		type.Sound.Attack.MapSound();
+		//Wyrmgus start
+		type.Sound.Hit.MapSound();
+		type.Sound.Miss.MapSound();
+		//Wyrmgus end
 		type.Sound.Build.MapSound();
 		type.Sound.Ready.MapSound();
 		type.Sound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);

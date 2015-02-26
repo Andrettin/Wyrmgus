@@ -76,6 +76,10 @@ public:
 	SoundConfig Selected;           /// selected by user
 	SoundConfig Acknowledgement;    /// acknowledge of use command
 	SoundConfig Attack;             /// attack confirm command
+	//Wyrmgus start
+	SoundConfig Hit;				/// hit another unit
+	SoundConfig Miss;				/// attcked another unit, but missed
+	//Wyrmgus end
 	SoundConfig Build;              /// build confirm command
 	SoundConfig Ready;              /// unit training... ready
 	SoundConfig Repair;             /// unit repairing

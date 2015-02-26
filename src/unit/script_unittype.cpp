@@ -1060,6 +1060,12 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Acknowledgement.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "attack")) {
 					type->Sound.Attack.Name = LuaToString(l, -1, k + 1);
+				//Wyrmgus start
+				} else if (!strcmp(value, "hit")) {
+					type->Sound.Hit.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "miss")) {
+					type->Sound.Miss.Name = LuaToString(l, -1, k + 1);
+				//Wyrmgus end
 				} else if (!strcmp(value, "build")) {
 					type->Sound.Build.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "ready")) {
