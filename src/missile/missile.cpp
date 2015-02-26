@@ -348,8 +348,21 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	//Wyrmgus end
 	damage += piercing_damage;
 	//Wyrmgus start
-//	damage -= SyncRand() % ((damage + 2) / 2);
-	damage = SyncRand(damage + 2);
+	damage -= SyncRand() % ((damage + 2) / 2);
+	int accuracy = SyncRand(attacker.Variable[ACCURACY_INDEX].Value);
+	if (accuracy == 0) {
+		damage = 0;
+	} else {
+		if (goal != NULL) {
+			if (goal->Variable[EVASION_INDEX].Value > 0 && accuracy < SyncRand(goal->Variable[EVASION_INDEX].Value)) {
+				damage = 0;
+			}
+		} else {
+			if (goal_stats.Variables[EVASION_INDEX].Value > 0 && accuracy < SyncRand(goal_stats.Variables[EVASION_INDEX].Value)) {
+				damage = 0;
+			}
+		}
+	}
 	//Wyrmgus end
 	Assert(damage >= 0);
 

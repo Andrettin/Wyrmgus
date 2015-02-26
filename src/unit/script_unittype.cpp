@@ -137,6 +137,8 @@ static const char ISALIVE_KEY[] = "IsAlive";
 static const char PLAYER_KEY[] = "Player";
 static const char PRIORITY_KEY[] = "Priority";
 //Wyrmgus start
+static const char ACCURACY_KEY[] = "Accuracy";
+static const char EVASION_KEY[] = "Evasion";
 static const char LEVELUP_KEY[] = "LevelUp";
 static const char VARIATION_KEY[] = "Variation";
 static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
@@ -186,8 +188,9 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
 //Wyrmgus
 //							   PRIORITY_KEY
-							   PRIORITY_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY, BACKSTAB_KEY,
-							   TRANSPARENCY_KEY
+							   PRIORITY_KEY,
+							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
+							   BACKSTAB_KEY, TRANSPARENCY_KEY
 //Wyrmgus end
 							  };
 
@@ -1198,6 +1201,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->AiBuildingRules = parent_type->AiBuildingRules;
 			type->Sound = parent_type->Sound;
 			type->CanCastSpell = parent_type->CanCastSpell;
+			type->AutoCastActive = parent_type->AutoCastActive;
 			for (unsigned int i = 0; i < MaxCosts; ++i) {
 				type->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 				type->RepairCosts[i] = parent_type->RepairCosts[i];
@@ -1924,7 +1928,9 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == POISON_INDEX || i == SHIELDPERMEABILITY_INDEX || i == SHIELDPIERCING_INDEX
 			//Wyrmgus
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
-			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX || i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX) {
+			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == ACCURACY_INDEX || i == EVASION_INDEX
+			|| i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
+			|| i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
