@@ -348,22 +348,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	//Wyrmgus end
 	damage += piercing_damage;
 	damage -= SyncRand() % ((damage + 2) / 2);
-	//Wyrmgus start
-	int accuracy = SyncRand(attacker.Variable[ACCURACY_INDEX].Value);
-	if (accuracy == 0) {
-		damage = 0;
-	} else {
-		if (goal != NULL) {
-			if (goal->Variable[EVASION_INDEX].Value > 0 && accuracy < SyncRand(goal->Variable[EVASION_INDEX].Value)) {
-				damage = 0;
-			}
-		} else {
-			if (goal_stats.Variables[EVASION_INDEX].Value > 0 && accuracy < SyncRand(goal_stats.Variables[EVASION_INDEX].Value)) {
-				damage = 0;
-			}
-		}
-	}
-	//Wyrmgus end
+
 	Assert(damage >= 0);
 
 	return damage;
@@ -398,6 +383,33 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 	TriggerData.Defender = NULL;
 	return res;
 }
+
+//Wyrmgus start
+/**
+**  Calculate hit.
+**
+**  @return                whether the target was hit or not.
+*/
+static int CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal)
+{
+	int accuracy = SyncRand(attacker.Variable[ACCURACY_INDEX].Value);
+	if (accuracy == 0) {
+		return false;
+	} else {
+		if (goal != NULL) {
+			if (goal->Variable[EVASION_INDEX].Value > 0 && accuracy < SyncRand(goal->Variable[EVASION_INDEX].Value)) {
+				return false;
+			}
+		} else {
+			if (goal_stats.Variables[EVASION_INDEX].Value > 0 && accuracy < SyncRand(goal_stats.Variables[EVASION_INDEX].Value)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+//Wyrmgus end
 
 /**
 **  Fire missile.
@@ -435,7 +447,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		// No goal, take target coordinates
 		if (!goal) {
 			if (Map.WallOnMap(goalPos)) {
-				if (Map.HumanWallOnMap(goalPos)) {
+				//Wyrmgus start
+//				if (Map.HumanWallOnMap(goalPos)) {
+				if (Map.HumanWallOnMap(goalPos) && CalculateHit(unit, *UnitTypeHumanWall->Stats, NULL) == true) {
+				//Wyrmgus end
 					//Wyrmgus start
 					damage = CalculateDamageStats(unit, *UnitTypeHumanWall->Stats, NULL);
 					//Wyrmgus end
@@ -445,7 +460,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 //													 *UnitTypeHumanWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
 								damage);
 								//Wyrmgus end
-				} else {
+				//Wyrmgus start
+//				} else {
+				} else if (Map.OrcWallOnMap(goalPos) && CalculateHit(unit, *UnitTypeOrcWall->Stats, NULL) == true) {
+				//Wyrmgus end
 					//Wyrmgus start
 					damage = CalculateDamageStats(unit, *UnitTypeOrcWall->Stats, NULL);
 					//Wyrmgus end
@@ -463,9 +481,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 		}
 		//Wyrmgus start
 //		HitUnit(&unit, *goal, CalculateDamage(unit, *goal, Damage));
-		damage = CalculateDamage(unit, *goal, Damage);
-		HitUnit(&unit, *goal, damage);
-		if (damage) {
+		if (CalculateHit(unit, *goal->Stats, goal) == true) {
+			damage = CalculateDamage(unit, *goal, Damage);
+			HitUnit(&unit, *goal, damage);
 			PlayUnitSound(unit, VoiceHit);
 		} else {
 			PlayUnitSound(unit, VoiceMiss);
@@ -907,6 +925,16 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 	if (!missile.Type->CanHitOwner && missile.SourceUnit == &goal) {
 		return;
 	}
+	
+	//Wyrmgus start
+	if (CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
+		if (splash == 1 && missile.Type->SplashFactor == 0) {
+			return;
+		} else if (splash == 1 && missile.Type->SplashFactor > 0) {
+			splash = missile.Type->SplashFactor; // if missile has splash factor but missed, apply splash damage
+		}
+	}
+	//Wyrmgus end
 
 	if (goal.CurrentAction() != UnitActionDie) {
 		int damage;
@@ -958,6 +986,17 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		Assert(Map.OrcWallOnMap(tilePos));
 		stats = UnitTypeOrcWall->Stats;
 	}
+
+	//Wyrmgus start
+	if (CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
+		if (splash == 1 && missile.Type->SplashFactor == 0) {
+			return;
+		} else if (splash == 1 && missile.Type->SplashFactor > 0) {
+			splash = missile.Type->SplashFactor; // if missile has splash factor but missed, apply splash damage
+		}
+	}
+	//Wyrmgus end
+
 	//Wyrmgus start
 //	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit->Stats, *stats, 0) / splash);
 	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, NULL) / splash);
