@@ -700,10 +700,18 @@ CUnitType::~CUnitType()
 
 	//Wyrmgus start
 	for (int var = 0; var < VariationMax; ++var) {
-		if (this->VarInfo[var]->Sprite) {
-			CGraphic::Free(this->VarInfo[var]->Sprite);
-		}
 		if (this->VarInfo[var]) {
+			if (this->VarInfo[var]->Sprite) {
+				CGraphic::Free(this->VarInfo[var]->Sprite);
+			}
+			for (int res = 0; res < MaxCosts; ++res) {
+				if (this->VarInfo[var]->SpriteWhenLoaded[res]) {
+					CGraphic::Free(this->VarInfo[var]->SpriteWhenLoaded[res]);
+				}
+				if (this->VarInfo[var]->SpriteWhenEmpty[res]) {
+					CGraphic::Free(this->VarInfo[var]->SpriteWhenEmpty[res]);
+				}
+			}
 			delete this->VarInfo[var];
 		}
 	}
@@ -1227,6 +1235,24 @@ void LoadUnitTypeSprite(CUnitType &type)
 			varinfo->Sprite->Load();
 			if (type.Flip) {
 				varinfo->Sprite->Flip();
+			}
+		}
+		for (int j = 0; j < MaxCosts; ++j) {
+			if (!varinfo->FileWhenLoaded[j].empty()) {
+				varinfo->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(varinfo->FileWhenLoaded[j],
+																		 type.Width, type.Height);
+				varinfo->SpriteWhenLoaded[j]->Load();
+				if (type.Flip) {
+					varinfo->SpriteWhenLoaded[j]->Flip();
+				}
+			}
+			if (!varinfo->FileWhenEmpty[j].empty()) {
+				varinfo->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(varinfo->FileWhenEmpty[j],
+																		 type.Width, type.Height);
+				varinfo->SpriteWhenEmpty[j]->Load();
+				if (type.Flip) {
+					varinfo->SpriteWhenEmpty[j]->Flip();
+				}
 			}
 		}
 	}

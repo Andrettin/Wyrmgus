@@ -265,7 +265,11 @@ template <typename Pred>
 void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
 {
 	const Vec2i offset(range, range);
-	const Vec2i typeSize(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1);
+	//Wyrmgus start
+//	const Vec2i typeSize(unit.Type->TileWidth - 1, unit.Type->TileHeight - 1);
+	const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
+	const Vec2i typeSize(firstContainer->Type->TileWidth - 1, firstContainer->Type->TileHeight - 1);
+	//Wyrmgus end
 
 	Select(unit.tilePos - offset,
 		   unit.tilePos + typeSize + offset, around,

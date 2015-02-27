@@ -1121,6 +1121,14 @@ static int CclDefineUnitType(lua_State *l)
 						var->TypeName = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file")) {
 						var->File = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "file-when-loaded")) {
+						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
+						++k;
+						var->FileWhenLoaded[res] = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "file-when-empty")) {
+						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
+						++k;
+						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "icon")) {
 						var->Icon.Name = LuaToString(l, -1, k + 1);
 						var->Icon.Icon = NULL;

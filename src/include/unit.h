@@ -271,7 +271,11 @@ public:
 	 */
 	int MapDistanceTo(const CUnit &dst) const
 	{
-		return MapDistanceBetweenTypes(*Type, tilePos, *dst.Type, dst.tilePos);
+		//Wyrmgus start
+//		return MapDistanceBetweenTypes(*Type, tilePos, *dst.Type, dst.tilePos);
+		const CUnitType *distance_unit_type = Container ? Container->Type : Type;
+		return MapDistanceBetweenTypes(*distance_unit_type, tilePos, *dst.Type, dst.tilePos);
+		//Wyrmgus end
 	}
 
 	int MapDistanceTo(const Vec2i &pos) const;
@@ -447,7 +451,7 @@ public:
 	bool AiExplores;         /// If true, AI sends explorers to search for resources (almost useless thing)
 	bool GrayscaleIcons;     /// Use grayscaled icons for unavailable units, upgrades, etc
 	bool IconsShift;         /// Shift icons slightly when you press on them
-	bool StereoSound;        /// Enables/diables stereo sound effects	
+	bool StereoSound;        /// Enables/disables stereo sound effects	
 	bool MineNotifications;  /// Show mine is running low/depleted messages
 
 	int  ShowOrders;         /// How many second show orders of unit on map.

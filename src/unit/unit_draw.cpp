@@ -941,6 +941,17 @@ void CUnit::Draw(const CViewport &vp) const
 		if (varinfo->Sprite) {
 			sprite = varinfo->Sprite;
 		}
+		if (type->Harvester && this->CurrentResource) {
+			if (this->ResourcesHeld) {
+				if (varinfo->SpriteWhenLoaded[this->CurrentResource]) {
+					sprite = varinfo->SpriteWhenLoaded[this->CurrentResource];
+				}
+			} else {
+				if (varinfo->SpriteWhenEmpty[this->CurrentResource]) {
+					sprite = varinfo->SpriteWhenEmpty[this->CurrentResource];
+				}
+			}
+		}
 	}
 	//Wyrmgus end
 

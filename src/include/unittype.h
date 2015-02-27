@@ -115,7 +115,10 @@ class VariationInfo
 public:
 	VariationInfo() : VariationId(""),
 		Animations(NULL), Construction(NULL), Sprite(NULL)
-	{}
+	{
+		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
+		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));		
+	}
 
 	std::string VariationId;		/// Variation's name.
 	std::string TypeName;			/// Type name.
@@ -127,6 +130,11 @@ public:
 
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
+
+	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
+	std::string FileWhenEmpty[MaxCosts];      /// Change the graphic when the unit is empty.
+	CPlayerColorGraphic *SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
+	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
 };
 //Wyrmgus end
 
