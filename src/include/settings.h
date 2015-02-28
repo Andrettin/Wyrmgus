@@ -78,6 +78,9 @@ struct Settings {
 	bool Inside;     /// If game uses interior tileset
 	int RevealMap;   /// Reveal map
 	int MapRichness; /// Map richness
+	//Wyrmgus start
+	bool NoRandomness; /// No randomness
+	//Wyrmgus end
 };
 
 #define SettingsPresetMapDefault  -1  /// Special: Use map supplied

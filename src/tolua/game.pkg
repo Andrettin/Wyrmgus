@@ -64,6 +64,9 @@ class Settings {
 	bool Inside;
 	int RevealMap;
 	int MapRichness;
+	//Wyrmgus start
+	bool NoRandomness;
+	//Wyrmgus end
 };
 
 extern Settings GameSettings;

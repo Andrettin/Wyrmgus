@@ -115,7 +115,10 @@ public:
 	FullReplay() :
 		MapId(0), Type(0), Race(0), LocalPlayer(0),
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
-		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
+		//Wyrmgus start
+//		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
+		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), Commands(NULL)
+		//Wyrmgus end
 	{
 		memset(Engine, 0, sizeof(Engine));
 		memset(Network, 0, sizeof(Network));
@@ -142,6 +145,9 @@ public:
 	int MapRichness;
 	int GameType;
 	int Opponents;
+	//Wyrmgus start
+	bool NoRandomness;
+	//Wyrmgus end
 	int Engine[3];
 	int Network[3];
 	LogEntry *Commands;
@@ -216,6 +222,9 @@ static FullReplay *StartReplay()
 	replay->RevealMap = GameSettings.RevealMap;
 	replay->MapRichness = GameSettings.MapRichness;
 	replay->Opponents = GameSettings.Opponents;
+	//Wyrmgus start
+	replay->NoRandomness = GameSettings.NoRandomness;
+	//Wyrmgus end
 
 	replay->Engine[0] = StratagusMajorVersion;
 	replay->Engine[1] = StratagusMinorVersion;
@@ -264,6 +273,9 @@ static void ApplyReplaySettings()
 	FlagRevealMap = GameSettings.RevealMap = CurrentReplay->RevealMap;
 	GameSettings.MapRichness = CurrentReplay->MapRichness;
 	GameSettings.Opponents = CurrentReplay->Opponents;
+	//Wyrmgus start
+	GameSettings.NoRandomness = CurrentReplay->NoRandomness;
+	//Wyrmgus end
 
 	// FIXME : check engine version
 	// FIXME : FIXME: check network version
@@ -357,6 +369,9 @@ static void SaveFullLog(CFile &file)
 	file.printf("  GameType = %d,\n", CurrentReplay->GameType);
 	file.printf("  Opponents = %d,\n", CurrentReplay->Opponents);
 	file.printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
+	//Wyrmgus start
+	file.printf("  NoRandomness = %s,\n", CurrentReplay->NoRandomness ? "true" : "false");
+	//Wyrmgus end
 	file.printf("  Engine = { %d, %d, %d },\n",
 				CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
 	file.printf("  Network = { %d, %d, %d }\n",
@@ -652,6 +667,10 @@ static int CclReplayLog(lua_State *l)
 			replay->GameType = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Opponents")) {
 			replay->Opponents = LuaToNumber(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "NoRandomness")) {
+			replay->NoRandomness = LuaToBoolean(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "MapRichness")) {
 			replay->MapRichness = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Engine")) {

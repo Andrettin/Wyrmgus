@@ -91,6 +91,9 @@ public:
 	uint8_t Difficulty;            /// Difficulty option
 	uint8_t MapRichness;           /// Map richness option
 	uint8_t Opponents;             /// Number of AI opponents
+	//Wyrmgus start
+	uint8_t NoRandomness;          /// No randomness option
+	//Wyrmgus end
 	uint8_t CompOpt[PlayerMax];    /// Free slot option selection  {"Available", "Computer", "Closed" }
 	uint8_t Ready[PlayerMax];      /// Client ready state
 	uint8_t Race[PlayerMax];       /// Client race selection

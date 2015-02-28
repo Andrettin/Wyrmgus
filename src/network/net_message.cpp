@@ -231,6 +231,9 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 	p += serialize8(p, this->Difficulty);
 	p += serialize8(p, this->MapRichness);
 	p += serialize8(p, this->Opponents);
+	//Wyrmgus start
+	p += serialize8(p, this->NoRandomness);
+	//Wyrmgus end
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += serialize8(p, this->CompOpt[i]);
 	}
@@ -256,6 +259,9 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	p += deserialize8(p, &this->Difficulty);
 	p += deserialize8(p, &this->MapRichness);
 	p += deserialize8(p, &this->Opponents);
+	//Wyrmgus start
+	p += deserialize8(p, &this->NoRandomness);
+	//Wyrmgus end
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, &this->CompOpt[i]);
 	}
@@ -280,6 +286,9 @@ void CServerSetup::Clear()
 	Difficulty = 0;
 	MapRichness = 0;
 	Opponents = 0;
+	//Wyrmgus start
+	NoRandomness = 0;
+	//Wyrmgus end
 	memset(CompOpt, 0, sizeof(CompOpt));
 	memset(Ready, 0, sizeof(Ready));
 	memset(Race, 0, sizeof(Race));
@@ -297,6 +306,9 @@ bool CServerSetup::operator == (const CServerSetup &rhs) const
 			&& Difficulty == rhs.Difficulty
 			&& MapRichness == rhs.MapRichness
 			&& Opponents == rhs.Opponents
+			//Wyrmgus start
+			&& NoRandomness == rhs.NoRandomness
+			//Wyrmgus end
 			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
 			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0
 			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);

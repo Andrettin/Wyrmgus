@@ -49,6 +49,9 @@
 #include "map.h"
 #include "player.h"
 #include "script.h"
+//Wyrmgus start
+#include "settings.h"
+//Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
 //Wyrmgus start
@@ -458,8 +461,7 @@ static int CclAcquireTrait(lua_State *l)
 	lua_pop(l, 1);
 	const char *ident = LuaToString(l, 2);
 	if (!strncmp(ident, "upgrade-", 8)) {
-		unit->Variable[LEVELUP_INDEX].Value += 1;
-		AbilityAcquire(*unit, CUpgrade::Get(ident));
+		TraitAcquire(*unit, CUpgrade::Get(ident));
 		unit->Trait = ident;
 	} else {
 		DebugPrint(" wrong ident %s\n" _C_ ident);
@@ -1180,6 +1182,28 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade)
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
 			ApplyAbilityModifier(unit, UpgradeModifiers[z]);
+		}
+	}
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (unit.Player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+}
+
+void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
+{
+	int id = upgrade->ID;
+	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+	unit.LearnedAbilities[id] = true;	// learning done
+
+	if (!GameSettings.NoRandomness || !unit.Type->DefaultName.empty()) { // if in no randomness setting, only apply trait modifiers if the unit is a hero
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (UpgradeModifiers[z]->UpgradeId == id) {
+				ApplyAbilityModifier(unit, UpgradeModifiers[z]);
+			}
 		}
 	}
 

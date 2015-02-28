@@ -124,6 +124,9 @@ void SaveGameSettings(CFile &file)
 	file.printf("GameSettings.RevealMap = %d\n", GameSettings.RevealMap);
 	file.printf("GameSettings.MapRichness = %d\n", GameSettings.MapRichness);
 	file.printf("GameSettings.Inside = %s\n", GameSettings.Inside ? "true" : "false");
+	//Wyrmgus start
+	file.printf("GameSettings.NoRandomness = %s\n", GameSettings.NoRandomness ? "true" : "false");
+	//Wyrmgus end
 	file.printf("\n");
 }
 

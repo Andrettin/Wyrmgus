@@ -24,6 +24,9 @@ class CServerSetup {
 	unsigned char Difficulty;
 	unsigned char MapRichness;
 	unsigned char Opponents;
+	//Wyrmgus start
+	unsigned char NoRandomness;
+	//Wyrmgus end
 	unsigned short CompOpt[PlayerMax]; // cannot use char since tolua interpret variable as string else.
 	unsigned short Ready[PlayerMax];   // cannot use char since tolua interpret variable as string else.
 	unsigned short Race[PlayerMax];    // cannot use char since tolua interpret variable as string else.

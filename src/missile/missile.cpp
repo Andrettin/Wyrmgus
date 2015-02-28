@@ -46,6 +46,9 @@
 #include "luacallback.h"
 #include "map.h"
 #include "player.h"
+//Wyrmgus start
+#include "settings.h"
+//Wyrmgus end
 #include "sound.h"
 #include "spells.h"
 #include "trigger.h"
@@ -317,8 +320,12 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		damage_modifier += 100;
 	}
 	if (attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value > 0) {
-		if (SyncRand(100) < attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value) {
-			damage_modifier += 100;
+		if (GameSettings.NoRandomness) {
+			damage_modifier += attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value;	//if no randomness setting is used, then critical strike chance will be used as a constant damage modifier, instead of being a chance of doubling the damage
+		} else {
+			if (SyncRand(100) < attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value) {
+				damage_modifier += 100;
+			}
 		}
 	}
 	if (goal != NULL) {
@@ -347,7 +354,24 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	}
 	//Wyrmgus end
 	damage += piercing_damage;
-	damage -= SyncRand() % ((damage + 2) / 2);
+	if (GameSettings.NoRandomness) {
+		if (attacker.Variable[ACCURACY_INDEX].Value > 0) { //if no randomness setting is used, and both the attacker's accuracy and the target's evasion are greater than 0, then apply accuracy as a damage bonus and evasion as a damage malus
+			if (goal != NULL) {
+				if (goal->Variable[EVASION_INDEX].Value > 0) {
+					damage += attacker.Variable[ACCURACY_INDEX].Value;
+					damage -= goal->Variable[EVASION_INDEX].Value;
+				}
+			} else {
+				if (goal_stats.Variables[EVASION_INDEX].Value > 0) {
+					damage += attacker.Variable[ACCURACY_INDEX].Value;
+					damage -= goal_stats.Variables[EVASION_INDEX].Value;
+				}
+			}
+		}
+		damage -= ((damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
+	} else {
+		damage -= SyncRand() % ((damage + 2) / 2);
+	}
 
 	Assert(damage >= 0);
 
@@ -390,8 +414,12 @@ int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *
 **
 **  @return                whether the target was hit or not.
 */
-static int CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal)
+static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal)
 {
+	if (GameSettings.NoRandomness) {
+		return true;
+	}
+	
 	int accuracy = SyncRand(attacker.Variable[ACCURACY_INDEX].Value);
 	if (accuracy == 0) {
 		return false;

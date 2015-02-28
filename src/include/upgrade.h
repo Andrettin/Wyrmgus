@@ -85,6 +85,7 @@ extern void ApplyUpgrades();
 
 //Wyrmgus start
 extern void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade);
+extern void TraitAcquire(CUnit &unit, const CUpgrade *upgrade);
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
