@@ -134,10 +134,7 @@ static void CreateMinimapTexture()
 void CMinimap::Create()
 {
 	// Scale to biggest value.
-	//Wyrmgus start
-//	const int n = std::max(Map.Info.MapWidth, Map.Info.MapHeight);
 	const int n = std::max(std::max(Map.Info.MapWidth, Map.Info.MapHeight), 32);
-	//Wyrmgus end
 
 	MinimapScaleX = (W * MINIMAP_FAC + n - 1) / n;
 	MinimapScaleY = (H * MINIMAP_FAC + n - 1) / n;

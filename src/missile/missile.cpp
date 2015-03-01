@@ -480,6 +480,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 				if (Map.HumanWallOnMap(goalPos) && CalculateHit(unit, *UnitTypeHumanWall->Stats, NULL) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
+					PlayUnitSound(unit, VoiceHit);
 					damage = CalculateDamageStats(unit, *UnitTypeHumanWall->Stats, NULL);
 					//Wyrmgus end
 					Map.HitWall(goalPos,
@@ -493,6 +494,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 				} else if (Map.OrcWallOnMap(goalPos) && CalculateHit(unit, *UnitTypeOrcWall->Stats, NULL) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
+					PlayUnitSound(unit, VoiceHit);
 					damage = CalculateDamageStats(unit, *UnitTypeOrcWall->Stats, NULL);
 					//Wyrmgus end
 					Map.HitWall(goalPos,
