@@ -283,6 +283,10 @@ public:
 
 	unsigned int Index;     /// Index of the variable. @see DefineVariables
 
+	//Wyrmgus start
+	int MinValue;			/// Minimum value of the variable
+	//Wyrmgus end
+
 	int OffsetX;            /// Offset in X coord.
 	int OffsetY;            /// Offset in Y coord.
 

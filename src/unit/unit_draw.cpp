@@ -535,7 +535,10 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (unit.Player->Type == PlayerNeutral && var.HideNeutral)
 			  || (ThisPlayer->IsEnemy(unit) && !var.ShowOpponent)
 			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var.HideAllied)
-			  || max == 0)) {
+			  //Wyrmgus start
+//			  || max == 0)) {
+			  || max == 0 || max < var.MinValue)) {
+			  //Wyrmgus end
 			var.Draw(
 				x + var.OffsetX + var.OffsetXPercent * unit.Type->TileWidth * PixelTileSize.x / 100,
 				y + var.OffsetY + var.OffsetYPercent * unit.Type->TileHeight * PixelTileSize.y / 100,

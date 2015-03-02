@@ -1757,6 +1757,9 @@ static int CclDefineDecorations(lua_State *l)
 {
 	struct {
 		int Index;
+		//Wyrmgus start
+		int MinValue;
+		//Wyrmgus end
 		int OffsetX;
 		int OffsetY;
 		int OffsetXPercent;
@@ -1785,6 +1788,10 @@ static int CclDefineDecorations(lua_State *l)
 				const char *const value = LuaToString(l, -1);
 				tmp.Index = UnitTypeVar.VariableNameLookup[value];// User variables
 				Assert(tmp.Index != -1);
+			//Wyrmgus start
+			} else if (!strcmp(key, "MinValue")) {
+				tmp.MinValue = LuaToNumber(l, -1);
+			//Wyrmgus end
 			} else if (!strcmp(key, "Offset")) {
 				CclGetPos(l, &tmp.OffsetX, &tmp.OffsetY);
 			} else if (!strcmp(key, "OffsetPercent")) {
@@ -1886,6 +1893,9 @@ static int CclDefineDecorations(lua_State *l)
 			lua_pop(l, 1); // Pop the value
 		}
 		decovar->Index = tmp.Index;
+		//Wyrmgus start
+		decovar->MinValue = tmp.MinValue;
+		//Wyrmgus end
 		decovar->OffsetX = tmp.OffsetX;
 		decovar->OffsetY = tmp.OffsetY;
 		decovar->OffsetXPercent = tmp.OffsetXPercent;
@@ -1900,7 +1910,20 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->HideNeutral = tmp.HideNeutral;
 		decovar->HideAllied = tmp.HideAllied;
 		decovar->ShowOpponent = tmp.ShowOpponent;
-		UnitTypeVar.DecoVar.push_back(decovar);
+		//Wyrmgus start
+//		UnitTypeVar.DecoVar.push_back(decovar);
+		bool already_defined = false;
+		for (std::vector<CDecoVar *>::iterator it = UnitTypeVar.DecoVar.begin();
+			 it != UnitTypeVar.DecoVar.end(); ++it) {
+			if ((*it)->Index == tmp.Index) { // replace other decorations which use the same variable
+				*it = decovar;
+				already_defined = true;
+			}
+		}
+		if (!already_defined) {
+			UnitTypeVar.DecoVar.push_back(decovar);
+		}
+		//Wyrmgus end
 	}
 	Assert(lua_gettop(l));
 	return 0;

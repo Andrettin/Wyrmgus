@@ -1398,6 +1398,9 @@ void UnitLost(CUnit &unit)
 				DebugPrint("Unable to allocate Unit");
 			} else {
 				temp->ResourcesHeld = unit.ResourcesHeld;
+				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
+				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
+				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
 			}
 		}
 	}
