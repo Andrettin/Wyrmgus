@@ -729,8 +729,9 @@ size_t CNetworkPacketHeader::Serialize(unsigned char *p) const
 			p += serialize8(p, this->Type[i]);
 		}
 		p += serialize8(p, this->Cycle);
+		p += serialize8(p, this->OrigPlayer);
 	}
-	return MaxNetworkCommands + 1;
+	return MaxNetworkCommands + 1 + 1;
 }
 
 size_t CNetworkPacketHeader::Deserialize(const unsigned char *buf)
@@ -741,6 +742,7 @@ size_t CNetworkPacketHeader::Deserialize(const unsigned char *buf)
 		p += deserialize8(p, &this->Type[i]);
 	}
 	p += deserialize8(p, &this->Cycle);
+	p += deserialize8(p, &this->OrigPlayer);
 	return p - buf;
 }
 
