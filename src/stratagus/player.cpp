@@ -473,6 +473,9 @@ void CPlayer::Save(CFile &file) const
 		default:                  file.printf("%d,", p.Type); break;
 	}
 	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
+	//Wyrmgus start
+	file.printf(" \"faction\", %d,", p.Faction);
+	//Wyrmgus end
 	file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
 	file.printf("  \"team\", %d,", p.Team);
 
@@ -781,7 +784,9 @@ void CPlayer::SetFaction(const std::string &faction)
 {
 	for (int i = 0; i < FactionMax; ++i) {
 		if (!PlayerRaces.FactionNames[this->Race][i].empty() && PlayerRaces.FactionNames[this->Race][i] == faction) {
-			this->SetName(faction);
+			if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
+				this->SetName(faction);
+			}
 			this->Faction = i;
 			int PrimaryColor;
 			int SecondaryColor;

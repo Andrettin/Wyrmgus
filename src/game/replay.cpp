@@ -98,10 +98,16 @@ public:
 class MPPlayer
 {
 public:
-	MPPlayer() : Race(0), Team(0), Type(0) {}
+	//Wyrmgus start
+//	MPPlayer() : Race(0), Team(0), Type(0) {}
+	MPPlayer() : Race(0), Faction(-1), Team(0), Type(0) {}
+	//Wyrmgus end
 
 	std::string Name;
 	int Race;
+	//Wyrmgus start
+	int Faction;
+	//Wyrmgus end
 	int Team;
 	int Type;
 };
@@ -113,7 +119,10 @@ class FullReplay
 {
 public:
 	FullReplay() :
-		MapId(0), Type(0), Race(0), LocalPlayer(0),
+		//Wyrmgus start
+//		MapId(0), Type(0), Race(0), LocalPlayer(0),
+		MapId(0), Type(0), Race(0), Faction(-1), LocalPlayer(0),
+		//Wyrmgus end
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
 		//Wyrmgus start
 //		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
@@ -133,6 +142,9 @@ public:
 
 	int Type;
 	int Race;
+	//Wyrmgus start
+	int Faction;
+	//Wyrmgus end
 	int LocalPlayer;
 	MPPlayer Players[PlayerMax];
 
@@ -203,6 +215,9 @@ static FullReplay *StartReplay()
 	for (int i = 0; i < PlayerMax; ++i) {
 		replay->Players[i].Name = Players[i].Name;
 		replay->Players[i].Race = GameSettings.Presets[i].Race;
+		//Wyrmgus start
+		replay->Players[i].Faction = Players[i].Faction;
+		//Wyrmgus end
 		replay->Players[i].Team = GameSettings.Presets[i].Team;
 		replay->Players[i].Type = GameSettings.Presets[i].Type;
 	}
@@ -255,6 +270,9 @@ static void ApplyReplaySettings()
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
+		//Wyrmgus start
+		Players[i].Faction = CurrentReplay->Players[i].Faction; // should use a game settings preset instead
+		//Wyrmgus end
 		GameSettings.Presets[i].Team = CurrentReplay->Players[i].Team;
 		GameSettings.Presets[i].Type = CurrentReplay->Players[i].Type;
 	}
@@ -346,6 +364,9 @@ static void SaveFullLog(CFile &file)
 	file.printf("  MapId = %u,\n", CurrentReplay->MapId);
 	file.printf("  Type = %d,\n", CurrentReplay->Type);
 	file.printf("  Race = %d,\n", CurrentReplay->Race);
+	//Wyrmgus start
+	file.printf("  Faction = %d,\n", CurrentReplay->Faction);
+	//Wyrmgus end
 	file.printf("  LocalPlayer = %d,\n", CurrentReplay->LocalPlayer);
 	file.printf("  Players = {\n");
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -355,6 +376,9 @@ static void SaveFullLog(CFile &file)
 			file.printf("\t{");
 		}
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
+		//Wyrmgus start
+		file.printf(" Faction = %d,", CurrentReplay->Players[i].Faction);
+		//Wyrmgus end
 		file.printf(" Team = %d,", CurrentReplay->Players[i].Team);
 		file.printf(" Type = %d }%s", CurrentReplay->Players[i].Type,
 					i != PlayerMax - 1 ? ",\n" : "\n");
@@ -619,6 +643,10 @@ static int CclReplayLog(lua_State *l)
 			replay->Type = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Race")) {
 			replay->Race = LuaToNumber(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "Faction")) {
+			replay->Faction = LuaToNumber(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "LocalPlayer")) {
 			replay->LocalPlayer = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Players")) {
@@ -640,6 +668,10 @@ static int CclReplayLog(lua_State *l)
 						replay->Players[j].Name = LuaToString(l, -1);
 					} else if (!strcmp(value, "Race")) {
 						replay->Players[j].Race = LuaToNumber(l, -1);
+					//Wyrmgus start
+					} else if (!strcmp(value, "Faction")) {
+						replay->Players[j].Faction = LuaToNumber(l, -1);
+					//Wyrmgus end
 					} else if (!strcmp(value, "Team")) {
 						replay->Players[j].Team = LuaToNumber(l, -1);
 					} else if (!strcmp(value, "Type")) {

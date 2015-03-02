@@ -130,6 +130,10 @@ void CPlayer::Load(lua_State *l)
 			if (this->Race == -1) {
 				LuaError(l, "Unsupported race: %s" _C_ raceName);
 			}
+		//Wyrmgus start
+		} else if (!strcmp(value, "faction")) {
+			this->SetFaction(PlayerRaces.FactionNames[this->Race][LuaToNumber(l, j + 1)]);
+		//Wyrmgus end
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "team")) {
