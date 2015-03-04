@@ -482,6 +482,75 @@ void CUnit::Init()
 	Goal = NULL;
 }
 
+//Wyrmgus start
+/**
+**  Generates the unit's personal name.
+*/
+void CUnit::GeneratePersonalName()
+{
+	const CUnitType &type = *Type;
+
+	if (!type.DefaultName.empty()) {
+		Name = type.DefaultName;
+	} else if (!type.PersonalNames[0].empty() || !type.PersonalNamePrefixes[0].empty()) {
+		int PersonalNameCount = 0;
+		int PersonalNamePrefixCount = 0;
+		int PersonalNameSuffixCount = 0;
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!type.PersonalNames[i].empty()) {
+				PersonalNameCount += 1;
+			}
+		}
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!type.PersonalNamePrefixes[i].empty()) {
+				PersonalNamePrefixCount += 1;
+			}
+		}
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!type.PersonalNameSuffixes[i].empty()) {
+				PersonalNameSuffixCount += 1;
+			}
+		}
+		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0) {
+			int PersonalNameProbability = PersonalNameCount * 10000 / (PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount));
+			if (SyncRand(10000) < PersonalNameProbability) {
+				Name = type.PersonalNames[SyncRand(PersonalNameCount)];
+			} else {
+				Name = type.PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
+				Name += type.PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
+			}
+		}
+	} else if (type.Organic && !type.Civilization.empty() && (!PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty() || !PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty())) {
+		int PersonalNameCount = 0;
+		int PersonalNamePrefixCount = 0;
+		int PersonalNameSuffixCount = 0;
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
+				PersonalNameCount += 1;
+			}
+		}
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
+				PersonalNamePrefixCount += 1;
+			}
+		}
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.PersonalNameSuffixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
+				PersonalNameSuffixCount += 1;
+			}
+		}
+		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0) {
+			int PersonalNameProbability = PersonalNameCount * 10000 / (PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount));
+			if (SyncRand(10000) < PersonalNameProbability) {
+				Name = PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNameCount)];
+			} else {
+				Name = PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNamePrefixCount)];
+				Name += PlayerRaces.PersonalNameSuffixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNameSuffixCount)];
+			}
+		}
+	}
+}
+//Wyrmgus end
 
 /**
 **  Release an unit.
@@ -611,65 +680,7 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	//set the unit's personal name, if applicable
-	if (!type.DefaultName.empty()) {
-		Name = type.DefaultName;
-	} else if (!type.PersonalNames[0].empty() || !type.PersonalNamePrefixes[0].empty()) {
-		int PersonalNameCount = 0;
-		int PersonalNamePrefixCount = 0;
-		int PersonalNameSuffixCount = 0;
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!type.PersonalNames[i].empty()) {
-				PersonalNameCount += 1;
-			}
-		}
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!type.PersonalNamePrefixes[i].empty()) {
-				PersonalNamePrefixCount += 1;
-			}
-		}
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!type.PersonalNameSuffixes[i].empty()) {
-				PersonalNameSuffixCount += 1;
-			}
-		}
-		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0) {
-			int PersonalNameProbability = PersonalNameCount * 10000 / (PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount));
-			if (SyncRand(10000) < PersonalNameProbability) {
-				Name = type.PersonalNames[SyncRand(PersonalNameCount)];
-			} else {
-				Name = type.PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
-				Name += type.PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
-			}
-		}
-	} else if (type.Organic && !type.Civilization.empty() && (!PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty() || !PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty())) {
-		int PersonalNameCount = 0;
-		int PersonalNamePrefixCount = 0;
-		int PersonalNameSuffixCount = 0;
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
-				PersonalNameCount += 1;
-			}
-		}
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
-				PersonalNamePrefixCount += 1;
-			}
-		}
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.PersonalNameSuffixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
-				PersonalNameSuffixCount += 1;
-			}
-		}
-		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0) {
-			int PersonalNameProbability = PersonalNameCount * 10000 / (PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount));
-			if (SyncRand(10000) < PersonalNameProbability) {
-				Name = PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNameCount)];
-			} else {
-				Name = PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNamePrefixCount)];
-				Name += PlayerRaces.PersonalNameSuffixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNameSuffixCount)];
-			}
-		}
-	}
+	GeneratePersonalName();
 	//Wyrmgus end
 
 	// Set a heading for the unit if it Handles Directions

@@ -159,9 +159,13 @@ public:
 	void AssignWorkerToMine(CUnit &mine);
 	void DeAssignWorkerFromMine(CUnit &mine);
 
+	//Wyrmgus start
+	void GeneratePersonalName();
+	//Wyrmgus end
+
 	/// Release a unit
 	void Release(bool final = false);
-
+	
 	bool RestoreOrder();
 	bool CanStoreOrder(COrder *order);
 
@@ -532,7 +536,6 @@ extern void CorrectWallNeighBours(CUnit &unit);
 extern void UnitUpdateHeading(CUnit &unit);
 /// Heading and frame from delta direction
 extern void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta);
-
 
 /// @todo more docu
 extern void DropOutOnSide(CUnit &unit, int heading, const CUnit *container);

@@ -160,7 +160,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 
 	//Wyrmgus start
-	//change variation if upgrading (new unit type may have different variations
+	//change variation if upgrading (new unit type may have different variations)
 	VariationInfo *current_varinfo = oldtype.VarInfo[unit.Variation];
 	int TypeVariationCount = 0;
 	int LocalTypeVariations[VariationMax];
@@ -198,6 +198,16 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	
 	unit.Type = const_cast<CUnitType *>(&newtype);
 	unit.Stats = &unit.Type->Stats[player.Index];
+	
+	//Wyrmgus start
+	//change personal name if new unit type's civilization is different from old unit type's civilization
+	if (
+		(!oldtype.Civilization.empty() && !newtype.Civilization.empty() && oldtype.Civilization != newtype.Civilization)
+		|| (!oldtype.PersonalNames[0].empty() || !oldtype.PersonalNamePrefixes[0].empty()) && (!newtype.PersonalNames[0].empty() || !newtype.PersonalNamePrefixes[0].empty())
+	) {
+		unit.GeneratePersonalName();
+	}
+	//Wyrmgus end
 
 	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
 		unit.AutoCastSpell = new char[SpellTypeTable.size()];
