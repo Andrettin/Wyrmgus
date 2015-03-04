@@ -145,7 +145,10 @@ public:
 	static COrder *NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast = false);
 	static COrder *NewActionStandGround();
 	static COrder *NewActionStill();
-	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type);
+	//Wyrmgus start
+//	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type);
+	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type, int player);
+	//Wyrmgus end
 	static COrder *NewActionTransformInto(CUnitType &type);
 	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
 	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);

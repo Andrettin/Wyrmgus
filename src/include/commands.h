@@ -93,7 +93,10 @@ extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command return
 extern void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush);
 /// Prepare command train
-extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
+//Wyrmgus start
+//extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
+extern void CommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush);
+//Wyrmgus end
 /// Prepare command cancel training
 extern void CommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 /// Prepare command upgrade to
@@ -161,7 +164,10 @@ extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Send return goods command
 extern void SendCommandReturnGoods(CUnit &unit, CUnit *dest, int flush);
 /// Send train command
-extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
+//Wyrmgus start
+//extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush);
+extern void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush);
+//Wyrmgus end
 /// Send cancel training command
 extern void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *type);
 /// Send upgrade to command
@@ -183,7 +189,10 @@ extern void SendCommandSharedVision(int player, bool state, int opponent);
 
 /// Execute a command (from network).
 extern void ExecCommand(unsigned char type, UnitRef unum, unsigned short x,
-						unsigned short y, UnitRef dest);
+						//Wyrmgus start
+//						unsigned short y, UnitRef dest);
+						unsigned short y, UnitRef dest, unsigned short player);
+						//Wyrmgus end
 /// Execute an extended command (from network).
 extern void ExecExtendedCommand(unsigned char type, int status, unsigned char arg1,
 								unsigned short arg2, unsigned short arg3,

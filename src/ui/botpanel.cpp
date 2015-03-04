@@ -756,6 +756,12 @@ void CButtonPanel::Draw()
 			continue;
 		}
 		Assert(buttons[i].Pos == i + 1);
+		//Wyrmgus start
+		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
+		if (Selected[0]->Player != ThisPlayer && !ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type == PlayerNeutral && buttons[i].Action != ButtonTrain && buttons[i].Action != ButtonCancelTrain) {
+			continue;
+		}
+		//Wyrmgus end
 		bool gray = false;
 		bool cooldownSpell = false;
 		int maxCooldown = 0;
@@ -798,6 +804,12 @@ void CButtonPanel::Draw()
 			int player = -1;
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
 				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
+				//Wyrmgus start
+				//if unit is neutral, set color to that of the person player
+				if (Players[player].Type == PlayerNeutral) {
+					player = ThisPlayer->Index;
+				}
+				//Wyrmgus end
 			}
 			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
@@ -830,8 +842,19 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 		case ButtonTrain:
 		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
-			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
-			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Demand, stats.Costs);
+			//Wyrmgus start
+//			const CUnitStats &stats = UnitTypes[button.Value]->Stats[ThisPlayer->Index];
+//			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Demand, stats.Costs);
+			int modified_costs[MaxCosts];
+			for (int i = 1; i < MaxCosts; ++i) {
+				modified_costs[i] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs[i];
+				if (UnitTypes[button.Value]->TrainQuantity) 
+				{
+					modified_costs[i] *= UnitTypes[button.Value]->TrainQuantity;
+				}
+			}
+			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Demand * (UnitTypes[button.Value]->TrainQuantity ? UnitTypes[button.Value]->TrainQuantity : 1), modified_costs);
+			//Wyrmgus end
 			break;
 		}
 		case ButtonResearch:
@@ -1091,7 +1114,10 @@ void CButtonPanel::Update()
 
 	CUnit &unit = *Selected[0];
 	// foreign unit
-	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
+	//Wyrmgus start
+//	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
+	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit) && unit.Player->Type != PlayerNeutral) {
+	//Wyrmgus end
 		CurrentButtons.clear();
 		return;
 	}
@@ -1304,16 +1330,31 @@ void CButtonPanel::DoClicked_Train(int button)
 	// FIXME: training queue full check is not correct for network.
 	// FIXME: this can be correct written, with a little more code.
 	if (Selected[0]->CurrentAction() == UnitActionTrain && !EnableTrainingQueue) {
-		Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
-	} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
+		//Wyrmgus start
+//		Selected[0]->Player->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
+		ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, "%s", _("Unit training queue is full"));
+		//Wyrmgus end
+	//Wyrmgus start
+//	} else if (Selected[0]->Player->CheckLimits(type) >= 0 && !Selected[0]->Player->CheckUnitType(type)) {
+	} else if (ThisPlayer->CheckLimits(type) >= 0 && !ThisPlayer->CheckUnitType(type)) {
+	//Wyrmgus end
 		//PlayerSubUnitType(player,type);
-		SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
+		//Wyrmgus start
+//		SendCommandTrainUnit(*Selected[0], type, !(KeyModifiers & ModifierShift));
+		SendCommandTrainUnit(*Selected[0], type, ThisPlayer->Index, !(KeyModifiers & ModifierShift));
+		//Wyrmgus end
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
-	} else if (Selected[0]->Player->CheckLimits(type) == -3) {
-		if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
-			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
+	//Wyrmgus start
+//	} else if (Selected[0]->Player->CheckLimits(type) == -3) {
+//		if (GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound) {
+//			PlayGameSound(GameSounds.NotEnoughFood[Selected[0]->Player->Race].Sound, MaxSampleVolume);
+//		}
+	} else if (ThisPlayer->CheckLimits(type) == -3) {
+		if (GameSounds.NotEnoughFood[ThisPlayer->Race].Sound) {
+			PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound, MaxSampleVolume);
 		}
+	//Wyrmgus end
 	}
 }
 
@@ -1364,7 +1405,10 @@ void CButtonPanel::DoClicked(int button)
 	//  Button not available.
 	//  or Not Teamed
 	//
-	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
+	//Wyrmgus start
+//	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
+	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type != PlayerNeutral)) { //allow neutral units to be used
+	//Wyrmgus end
 		return;
 	}
 	PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);

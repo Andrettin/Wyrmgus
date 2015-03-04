@@ -620,15 +620,22 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 **  @param type   unit type to train.
 **  @param flush  if true, flush command queue.
 */
-void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
+//Wyrmgus start
+//void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
+void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
+//Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	// Check if enough resources remains? (NETWORK!)
 	// FIXME: wrong if append to message queue!!!
-	if (unit.Player->CheckLimits(type) < 0
-		|| unit.Player->CheckUnitType(type)) {
+	//Wyrmgus start
+//	if (unit.Player->CheckLimits(type) < 0
+//		|| unit.Player->CheckUnitType(type)) {
+	if (Players[player].CheckLimits(type) < 0
+		|| Players[player].CheckUnitType(type)) {
+	//Wyrmgus end
 		return;
 	}
 	// Not already training?
@@ -643,7 +650,10 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int)
 	if (order == NULL) {
 		return;
 	}
-	*order = COrder::NewActionTrain(unit, type);
+	//Wyrmgus start
+//	*order = COrder::NewActionTrain(unit, type);
+	*order = COrder::NewActionTrain(unit, type, player);
+	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 

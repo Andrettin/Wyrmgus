@@ -84,8 +84,12 @@ extern void NetworkRecover();   /// Recover network
 extern void NetworkCommands();  /// Get all network commands
 extern void NetworkSendChatMessage(const std::string &msg);  /// Send chat message
 /// Send network command.
+//Wyrmgus start
+//extern void NetworkSendCommand(int command, const CUnit &unit, int x,
+//							   int y, const CUnit *dest, const CUnitType *type, int status);
 extern void NetworkSendCommand(int command, const CUnit &unit, int x,
-							   int y, const CUnit *dest, const CUnitType *type, int status);
+							   int y, const CUnit *dest, const CUnitType *type, int status, int player = 0);
+//Wyrmgus end
 /// Send extended network command.
 extern void NetworkSendExtendedCommand(int command, int arg1, int arg2,
 									   int arg3, int arg4, int status);

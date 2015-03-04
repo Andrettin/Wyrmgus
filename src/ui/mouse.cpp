@@ -1721,7 +1721,10 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 			//  clicked on training button
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			//Wyrmgus start
+//			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			//Wyrmgus end
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
 					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
@@ -1771,7 +1774,10 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				}
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			//Wyrmgus start
+//			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			//Wyrmgus end
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
 		}
@@ -1953,7 +1959,10 @@ void UIHandleButtonUp(unsigned button)
 				}
 			}
 		}
-		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && ThisPlayer->IsTeamed(*Selected[0])) {
+		//Wyrmgus start
+//		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && ThisPlayer->IsTeamed(*Selected[0])) {
+		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+		//Wyrmgus end
 			if (OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 				OldButtonUnderCursor = -1;

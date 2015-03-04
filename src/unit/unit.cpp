@@ -874,6 +874,16 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		&& unit->Type->NoRandomPlacing == false && (MyRand() & 1) != 0) {
 		unit->Frame = -unit->Frame - 1;
 	}
+	
+	//Wyrmgus start
+	// make mercenary units only be available once per match
+	if (type.Mercenary) {
+		for (int p = 0; p < PlayerMax; ++p) {
+			AllowUnitId(Players[p], type.Slot, 0);
+		}
+	}
+	//Wyrmgus end
+	
 	return unit;
 }
 

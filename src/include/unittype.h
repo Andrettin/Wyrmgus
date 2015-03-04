@@ -200,6 +200,7 @@ enum {
 	ORGANIC_INDEX,
 	//Wyrmgus start
 	ITEM_INDEX,
+	MERCENARY_INDEX,
 	//Wyrmgus end
 	NBARALREADYDEFINED
 };
@@ -525,6 +526,7 @@ public:
 	int ShadowOffsetY;                                    /// Shadow vertical offset
 	//Wyrmgus start
 	int TechnologyPointCost;								/// Technology point cost
+	int TrainQuantity;										/// Quantity to be trained
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
@@ -642,6 +644,7 @@ public:
 	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
 	//Wyrmgus start
 	unsigned Item : 1;					/// Item
+	unsigned Mercenary : 1;				/// Mercenary
 	//Wyrmgus end
 
 	CUnitStats DefaultStat;

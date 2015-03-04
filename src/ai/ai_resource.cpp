@@ -632,7 +632,10 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 		CUnit &unit = *table[i];
 
 		if (unit.IsIdle()) {
-			CommandTrainUnit(unit, what, FlushCommands);
+			//Wyrmgus start
+//			CommandTrainUnit(unit, what, FlushCommands);
+			CommandTrainUnit(unit, what, AiPlayer->Player->Index, FlushCommands);
+			//Wyrmgus end
 			return true;
 		}
 	}

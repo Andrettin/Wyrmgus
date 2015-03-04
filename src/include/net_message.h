@@ -333,8 +333,12 @@ enum _extended_message_type_ {
 class CNetworkCommand
 {
 public:
-	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
-	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
+	//Wyrmgus start
+//	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
+//	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
+	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0), Player(0) {}
+	void Clear() { this->Unit = this->X = this->Y = this->Dest = this->Player = 0; }
+	//Wyrmgus end
 
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
@@ -345,6 +349,9 @@ public:
 	uint16_t X;            /// Map position X
 	uint16_t Y;            /// Map position Y
 	uint16_t Dest;         /// Destination unit
+	//Wyrmgus start
+	uint16_t Player;	   /// Player
+	//Wyrmgus end
 };
 
 /**

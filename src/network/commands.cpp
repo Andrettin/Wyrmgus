@@ -345,13 +345,23 @@ void SendCommandReturnGoods(CUnit &unit, CUnit *goal, int flush)
 ** @param what    pointer to unit-type of the unit to be trained.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
+//Wyrmgus start
+//void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int flush)
+void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
-		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
-		CommandTrainUnit(unit, what, flush);
+		//Wyrmgus start
+//		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+//		CommandTrainUnit(unit, what, flush);
+		CommandLog("train", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), player);
+		CommandTrainUnit(unit, what, player, flush);
+		//Wyrmgus end
 	} else {
-		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, &what, flush);
+		//Wyrmgus start
+//		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, &what, flush);
+		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, &what, flush, player);
+		//Wyrmgus end
 	}
 }
 
@@ -557,12 +567,18 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 ** @param dstnr    optional destination unit.
 */
 void ExecCommand(unsigned char msgnr, UnitRef unum,
-				 unsigned short x, unsigned short y, UnitRef dstnr)
+				//Wyrmgus start
+//				 unsigned short x, unsigned short y, UnitRef dstnr)
+				 unsigned short x, unsigned short y, UnitRef dstnr, unsigned short player)
+				//Wyrmgus end
 {
 	CUnit &unit = UnitManager.GetSlotUnit(unum);
 	const Vec2i pos(x, y);
 	const int arg1 = x;
 	const int arg2 = y;
+	//Wyrmgus start
+	const int arg3 = player;
+	//Wyrmgus end
 	//
 	// Check if unit is already killed?
 	//
@@ -692,8 +708,12 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandTrain:
-			CommandLog("train", &unit, status, -1, -1, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
+			//Wyrmgus start
+//			CommandLog("train", &unit, status, -1, -1, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), -1);
+//			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
+			CommandLog("train", &unit, status, -1, -1, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), arg3);
+			CommandTrainUnit(unit, *UnitTypes[dstnr], arg3, status);
+			//Wyrmgus end
 			break;
 		case MessageCommandCancelTrain:
 			// We need (short)x for the last slot -1

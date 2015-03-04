@@ -898,7 +898,10 @@ static void DoNextReplay()
 	} else if (!strcmp(action, "return")) {
 		SendCommandReturnGoods(*unit, dunit, flags);
 	} else if (!strcmp(action, "train")) {
-		SendCommandTrainUnit(*unit, *UnitTypeByIdent(val), flags);
+		//Wyrmgus start
+//		SendCommandTrainUnit(*unit, *UnitTypeByIdent(val), flags);
+		SendCommandTrainUnit(*unit, *UnitTypeByIdent(val), num, flags);
+		//Wyrmgus end
 	} else if (!strcmp(action, "cancel-train")) {
 		SendCommandCancelTraining(*unit, num, (val && *val) ? UnitTypeByIdent(val) : NULL);
 	} else if (!strcmp(action, "upgrade-to")) {

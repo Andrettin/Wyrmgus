@@ -1074,7 +1074,10 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 		Notify("%s", _("Unit Limit Reached"));
 		return -2;
 	}
-	if (this->Demand + type.Demand > this->Supply && type.Demand) {
+	//Wyrmgus start
+//	if (this->Demand + type.Demand > this->Supply && type.Demand) {
+	if (this->Demand + (type.Demand * (type.TrainQuantity ? type.TrainQuantity : 1)) > this->Supply && type.Demand) {
+	//Wyrmgus end
 		Notify("%s", _("Insufficient Supply, increase Supply."));
 		return -3;
 	}
@@ -1132,7 +1135,18 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 */
 int CPlayer::CheckUnitType(const CUnitType &type) const
 {
-	return this->CheckCosts(type.Stats[this->Index].Costs);
+	//Wyrmgus start
+//	return this->CheckCosts(type.Stats[this->Index].Costs);
+	int modified_costs[MaxCosts];
+	for (int i = 1; i < MaxCosts; ++i) {
+		modified_costs[i] = type.Stats[this->Index].Costs[i];
+		if (type.TrainQuantity) 
+		{
+			modified_costs[i] *= type.TrainQuantity;
+		}
+	}
+	return this->CheckCosts(modified_costs);
+	//Wyrmgus end
 }
 
 /**
@@ -1189,7 +1203,10 @@ void CPlayer::SubCosts(const int *costs)
 */
 void CPlayer::SubUnitType(const CUnitType &type)
 {
-	this->SubCosts(type.Stats[this->Index].Costs);
+	//Wyrmgus start
+//	this->SubCosts(type.Stats[this->Index].Costs);
+	this->SubCostsFactor(type.Stats[this->Index].Costs, 100 * (type.TrainQuantity ? type.TrainQuantity : 1));
+	//Wyrmgus end
 }
 
 /**

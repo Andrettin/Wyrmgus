@@ -93,6 +93,7 @@ static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
 static const char ORGANIC_KEY[] = "organic";
 //Wyrmgus start
 static const char ITEM_KEY[] = "Item";
+static const char MERCENARY_KEY[] = "Mercenary";
 //Wyrmgus end
 
 // names of the variable.
@@ -163,7 +164,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY, MERCENARY_KEY
 	//Wyrmgus end
 							  };
 
@@ -366,6 +367,7 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
 	//Wyrmgus start
 	type.BoolFlag[ITEM_INDEX].value                  = type.Item;
+	type.BoolFlag[MERCENARY_INDEX].value             = type.Mercenary;
 	//Wyrmgus end
 }
 
@@ -745,6 +747,8 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "Item")) {
 			type->Item = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Mercenary")) {
+			type->Mercenary = LuaToBoolean(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "VisibleUnderFog")) {
 			type->VisibleUnderFog = LuaToBoolean(l, -1);
@@ -1192,6 +1196,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
 			type->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
 			type->TechnologyPointCost = parent_type->TechnologyPointCost;
+			type->TrainQuantity = parent_type->TrainQuantity;
 			type->MaxOnBoard = parent_type->MaxOnBoard;
 			type->RepairRange = parent_type->RepairRange;
 			type->RepairHP = parent_type->RepairHP;
@@ -1204,6 +1209,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->AirUnit = parent_type->AirUnit;
 			type->Building = parent_type->Building;
 			type->Organic = parent_type->Organic;
+			type->Item = parent_type->Item;
+			type->Mercenary = parent_type->Mercenary;
 			type->VisibleUnderFog = parent_type->VisibleUnderFog;
 			type->Coward = parent_type->Coward;
 			type->DetectCloak = parent_type->DetectCloak;
@@ -1258,6 +1265,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "TechnologyPointCost")) {
 			type->TechnologyPointCost = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "TrainQuantity")) {
+			type->TrainQuantity = LuaToNumber(l, -1);
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
@@ -1559,6 +1568,9 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "TechnologyPointCost")) {
 		lua_pushnumber(l, type->TechnologyPointCost);
 		return 1;
+	} else if (!strcmp(data, "TrainQuantity")) {
+		lua_pushnumber(l, type->TrainQuantity);
+		return 1;
 	} else if (!strcmp(data, "DrawLevel")) {
 		lua_pushnumber(l, type->DrawLevel);
 		return 1;
@@ -1617,6 +1629,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Item")) {
 		lua_pushboolean(l, type->Item);
+		return 1;
+	} else if (!strcmp(data, "Mercenary")) {
+		lua_pushboolean(l, type->Mercenary);
 		return 1;
 	} else if (!strcmp(data, "LandUnit")) {
 		lua_pushboolean(l, type->LandUnit);

@@ -55,13 +55,20 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
+//Wyrmgus start
+// /* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type)
+/* static */ COrder *COrder::NewActionTrain(CUnit &trainer, CUnitType &type, int player)
+//Wyrmgus end
 {
 	COrder_Train *order = new COrder_Train;
 
 	order->Type = &type;
 	// FIXME: if you give quick an other order, the resources are lost!
-	trainer.Player->SubUnitType(type);
+	//Wyrmgus start
+	order->Player = player;
+//	trainer.Player->SubUnitType(type);
+	Players[player].SubUnitType(type);
+	//Wyrmgus end
 
 	return order;
 }
@@ -73,6 +80,9 @@
 		file.printf(" \"finished\", ");
 	}
 	file.printf("\"type\", \"%s\",", this->Type->Ident.c_str());
+	//Wyrmgus start
+	file.printf("\"player\", %d", this->Player);
+	//Wyrmgus end
 	file.printf("\"ticks\", %d", this->Ticks);
 	file.printf("}");
 }
@@ -82,6 +92,11 @@
 	if (!strcmp(value, "type")) {
 		++j;
 		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+	//Wyrmgus start
+	} else if (!strcmp(value, "player")) {
+		++j;
+		this->Player = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else if (!strcmp(value, "ticks")) {
 		++j;
 		this->Ticks = LuaToNumber(l, -1, j + 1);
@@ -105,9 +120,15 @@
 /* virtual */ void COrder_Train::Cancel(CUnit &unit)
 {
 	DebugPrint("Cancel training\n");
-	CPlayer &player = *unit.Player;
+	//Wyrmgus start
+//	CPlayer &player = *unit.Player;
+	CPlayer &player = *(&Players[this->Player]);
+	//Wyrmgus end
 
-	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor);
+	//Wyrmgus start
+//	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor);
+	player.AddCostsFactor(this->Type->Stats[player.Index].Costs, CancelTrainingCostsFactor * (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1));
+	//Wyrmgus end
 }
 
 /* virtual */ void COrder_Train::UpdateUnitVariables(CUnit &unit) const
@@ -115,12 +136,18 @@
 	Assert(unit.CurrentOrder() == this);
 
 	unit.Variable[TRAINING_INDEX].Value = this->Ticks;
-	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
+	//Wyrmgus start
+//	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
+	unit.Variable[TRAINING_INDEX].Max = this->Type->Stats[this->Player].Costs[TimeCost];
+	//Wyrmgus end
 }
 
 void COrder_Train::ConvertUnitType(const CUnit &unit, CUnitType &newType)
 {
-	const CPlayer &player = *unit.Player;
+	//Wyrmgus start
+//	const CPlayer &player = *unit.Player;
+	const CPlayer &player = *(&Players[this->Player]);
+	//Wyrmgus end
 	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
 	const int newCost = newType.Stats[player.Index].Costs[TimeCost];
 
@@ -194,7 +221,10 @@ static void AnimateActionTrain(CUnit &unit)
 		unit.Wait--;
 		return ;
 	}
-	CPlayer &player = *unit.Player;
+	//Wyrmgus start
+//	CPlayer &player = *unit.Player;
+	CPlayer &player = *(&Players[this->Player]);
+	//Wyrmgus end
 	const CUnitType &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
 	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
@@ -215,6 +245,8 @@ static void AnimateActionTrain(CUnit &unit)
 		return ;
 	}
 
+	//Wyrmgus start
+	/*
 	CUnit *newUnit = MakeUnit(nType, &player);
 
 	if (newUnit == NULL) { // No more memory :/
@@ -238,8 +270,10 @@ static void AnimateActionTrain(CUnit &unit)
 	if (unit.Type->DecayRate) {
 		newUnit->TTL = GameCycle + unit.Type->DecayRate * 6 * CYCLES_PER_SECOND;
 	}
-
+	*/
+	
 	/* Auto Group Add */
+	/*
 	if (!unit.Player->AiEnabled && unit.GroupId) {
 		int num = 0;
 		while (!(unit.GroupId & (1 << num))) {
@@ -274,6 +308,69 @@ static void AnimateActionTrain(CUnit &unit)
 		// Tell the unit to rigth-click ?
 #endif
 	}
+	*/
+	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
+		CUnit *newUnit = MakeUnit(nType, &player);
+
+		if (newUnit == NULL) { // No more memory :/
+			//Wyrmgus start
+	//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
+			VariationInfo *varinfo = nType.GetDefaultVariation(player);
+			if (varinfo && !varinfo->TypeName.empty()) {
+				player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), varinfo->TypeName.c_str());
+			} else {
+				player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
+			}
+			//Wyrmgus end
+			unit.Wait = CYCLES_PER_SECOND / 6;
+			return ;
+		}
+
+		// New unit might supply food
+		UpdateForNewUnit(*newUnit, 0);
+
+		// Set life span
+		if (unit.Type->DecayRate) {
+			newUnit->TTL = GameCycle + unit.Type->DecayRate * 6 * CYCLES_PER_SECOND;
+		}
+		
+		/* Auto Group Add */
+		if (!unit.Player->AiEnabled && unit.GroupId) {
+			int num = 0;
+			while (!(unit.GroupId & (1 << num))) {
+				++num;
+			}
+			AddToGroup(&newUnit, 1, num);
+		}
+
+		DropOutOnSide(*newUnit, LookingW, &unit);
+		//Wyrmgus start
+		//we don't need to send the player a message every time a new unit is ready
+		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
+		//Wyrmgus end
+		if (&player == ThisPlayer) {
+			PlayUnitSound(*newUnit, VoiceReady);
+		}
+		if (unit.Player->AiEnabled) {
+			AiTrainingComplete(unit, *newUnit);
+		}
+
+		if (unit.NewOrder && unit.NewOrder->HasGoal()
+			&& unit.NewOrder->GetGoal()->Destroyed) {
+			delete unit.NewOrder;
+			unit.NewOrder = NULL;
+		}
+
+		if (CanHandleOrder(*newUnit, unit.NewOrder) == true) {
+			delete newUnit->Orders[0];
+			newUnit->Orders[0] = unit.NewOrder->Clone();
+		} else {
+	#if 0
+			// Tell the unit to rigth-click ?
+	#endif
+		}
+	}
+	//Wyrmgus end
 	this->Finished = true;
 	if (IsOnlySelected(unit)) {
 		UI.ButtonPanel.Update();
