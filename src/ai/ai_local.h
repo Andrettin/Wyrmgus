@@ -280,7 +280,7 @@ class PlayerAi
 public:
 	PlayerAi() : Player(NULL), AiType(NULL),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
-		ScriptDebug(false), LastExplorationGameCycle(0),
+		ScriptDebug(false), BuildDepots(true), LastExplorationGameCycle(0),
 		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
 	{
 		memset(Reserve, 0, sizeof(Reserve));
@@ -305,7 +305,8 @@ public:
 	int Collect[MaxCosts]; /// Collect % of resources
 	int NeededMask;        /// Mask for needed resources
 	bool NeedSupply;       /// Flag need food
-	bool ScriptDebug;      /// Flag script debuging on/off
+	bool ScriptDebug;      /// Flag script debugging on/off
+	bool BuildDepots;      /// Build new depots if necessary
 
 	std::vector<AiExplorationRequest> FirstExplorationRequest;/// Requests for exploration
 	unsigned long LastExplorationGameCycle;       /// When did the last explore occur?
