@@ -235,6 +235,17 @@ void CUserInterface::Load()
 		PieMenu.G->UseDisplayFormat();
 	}
 
+	//Wyrmgus start
+	if (Preference.IconFrameG) {
+		Preference.IconFrameG->Load();
+		Preference.IconFrameG->UseDisplayFormat();
+	}
+	if (Preference.PressedIconFrameG) {
+		Preference.PressedIconFrameG->Load();
+		Preference.PressedIconFrameG->UseDisplayFormat();
+	}
+	//Wyrmgus end
+	
 	//  Resolve cursors
 	Point.Load();
 	Glass.Load();
@@ -319,6 +330,11 @@ void CleanUserInterface()
 		delete *panel;
 	}
 	UI.InfoPanelContents.clear();
+	
+	//Wyrmgus start
+	CGraphic::Free(Preference.IconFrameG);
+	CGraphic::Free(Preference.PressedIconFrameG);
+	//Wyrmgus end
 
 	// Button Popups
 	for (std::vector<CPopup *>::iterator popup = UI.ButtonPopups.begin();

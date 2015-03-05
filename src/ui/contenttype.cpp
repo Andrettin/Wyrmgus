@@ -286,24 +286,47 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	}
 
 	Uint32 color;
+	//Wyrmgus start
+	Uint32 lighter_color;
+	//Wyrmgus end
 	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 
 	if (f > 75) {
 		color = ColorDarkGreen;
+		//Wyrmgus start
+		lighter_color = Video.MapRGB(TheScreen->format, 67, 137, 8);
+		//Wyrmgus end
 	} else if (f > 50) {
 		color = ColorYellow;
+		//Wyrmgus start
+		lighter_color = ColorYellow;
+		//Wyrmgus end
 	} else if (f > 25) {
 		color = ColorOrange;
+		//Wyrmgus start
+		lighter_color = ColorOrange;
+		//Wyrmgus end
 	} else {
 		color = ColorRed;
+		//Wyrmgus start
+		lighter_color = ColorRed;
+		//Wyrmgus end
 	}
 
 	// Border
-	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
-							this->Width + 3, this->Height + 3);
+	//Wyrmgus start
+//	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
+//							this->Width + 3, this->Height + 3);
+	Video.FillRectangleClip(ColorBlack, this->Pos.x - 3, this->Pos.y - 3,
+							this->Width + 4, this->Height + 4);
+	//Wyrmgus end
 
 	Video.FillRectangleClip(color, this->Pos.x - 1, this->Pos.y - 1,
 							(f * this->Width) / 100, this->Height);
+	//Wyrmgus start
+	Video.FillRectangleClip(lighter_color, this->Pos.x - 1, this->Pos.y - 1,
+							(f * this->Width) / 100, 1);
+	//Wyrmgus end
 }
 
 /**

@@ -145,7 +145,14 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 {
 	// FIXME: add icon borders
 	int hBar, hAll;
-	if (Preference.IconsShift) {
+	//Wyrmgus start
+	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
+//	if (Preference.IconsShift) {
+		hBar = 4;
+		hAll = 8;
+		y += 2;
+	} else if (Preference.IconsShift) {
+	//Wyrmgus end
 		hBar = 6;
 		hAll = 10;
 	} else {
@@ -158,21 +165,40 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 
 	if (unit.Variable[HP_INDEX].Value) {
 		Uint32 color;
+		//Wyrmgus start
+		Uint32 lighter_color;
+		//Wyrmgus end
 		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 
 		if (f > 75) {
 			color = ColorDarkGreen;
+			//Wyrmgus start
+			lighter_color = Video.MapRGB(TheScreen->format, 67, 137, 8);
+			//Wyrmgus end
 		} else if (f > 50) {
 			color = ColorYellow;
+			//Wyrmgus start
+			lighter_color = ColorYellow;
+			//Wyrmgus end
 		} else if (f > 25) {
 			color = ColorOrange;
+			//Wyrmgus start
+			lighter_color = ColorOrange;
+			//Wyrmgus end
 		} else {
 			color = ColorRed;
+			//Wyrmgus start
+			lighter_color = ColorRed;
+			//Wyrmgus end
 		}
 
 		f = (f * (unit.Type->Icon.Icon->G->Width + 6)) / 100;
 		Video.FillRectangleClip(color, x - 2, y + 4,
 			f > 1 ? f - 2 : 0, hBar);
+		//Wyrmgus start
+		Video.FillRectangleClip(lighter_color, x - 2, y + 4,
+			f > 1 ? f - 2 : 0, 1);
+		//Wyrmgus end
 	}
 }
 

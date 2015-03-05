@@ -35,6 +35,11 @@ class CPreference
 	unsigned int  ShowNameTime;
 	
 	std::string SF2Soundfont;
+	
+	//Wyrmgus start
+	CGraphic *IconFrameG;
+	CGraphic *PressedIconFrameG;
+	//Wyrmgus end
 };
 
 class CUnitManager

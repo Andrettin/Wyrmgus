@@ -141,8 +141,12 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 	}
 	if (p->BorderSize) {
 		for (int i = 0; i < p->BorderSize; ++i) {
-			Video.DrawRectangleClip(p->BorderColor, x - i, y - i,
-									style->Width + 2 * i, style->Height + 2 * i);
+			//Wyrmgus start
+//			Video.DrawRectangleClip(p->BorderColor, x - i, y - i,
+//									style->Width + 2 * i, style->Height + 2 * i);
+			Video.DrawRectangleClip(p->BorderColor, x - i - 1, y - i - 1,
+									(style->Width + 2 * i) + 2, (style->Height + 2 * i) + 2);
+			//Wyrmgus end
 		}
 	}
 }

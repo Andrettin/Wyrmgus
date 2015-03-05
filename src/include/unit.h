@@ -444,7 +444,11 @@ public:
 		ShowAttackRange(false), ShowMessages(true), BigScreen(false),
 		PauseOnLeave(true), AiExplores(true), GrayscaleIcons(false),
 		IconsShift(false), StereoSound(true), MineNotifications(false),
-		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
+		//Wyrmgus start
+//		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
+		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0),
+		IconFrameG(NULL), PressedIconFrameG(NULL) {};
+		//Wyrmgus end
 
 	bool ShowSightRange;     /// Show sight range.
 	bool ShowReactionRange;  /// Show reaction range.
@@ -462,6 +466,10 @@ public:
 	int  ShowNameDelay;      /// How many cycles need to wait until unit's name popup will appear.
 	int  ShowNameTime;       /// How many cycles need to show unit's name popup.
 	std::string SF2Soundfont;/// Path to SF2 soundfont
+	//Wyrmgus start
+	CGraphic *IconFrameG;
+	CGraphic *PressedIconFrameG;
+	//Wyrmgus end
 };
 
 extern CPreference Preference;
