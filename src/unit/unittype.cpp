@@ -791,8 +791,7 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player) const
 		}
 		return varinfo;
 	}
-	VariationInfo *varinfo;
-	return varinfo;
+	return this->VarInfo[VariationMax];
 }
 //Wyrmgus end
 
@@ -1223,6 +1222,26 @@ void LoadUnitTypeSprite(CUnitType &type)
 		}
 	}
 
+	if (!type.File.empty()) {
+		type.Sprite = CPlayerColorGraphic::New(type.File, type.Width, type.Height);
+		type.Sprite->Load();
+		if (type.Flip) {
+			type.Sprite->Flip();
+		}
+	}
+
+#ifdef USE_MNG
+	if (type.Portrait.Num) {
+		for (int i = 0; i < type.Portrait.Num; ++i) {
+			type.Portrait.Mngs[i] = new Mng;
+			type.Portrait.Mngs[i]->Load(type.Portrait.Files[i]);
+		}
+		// FIXME: should be configurable
+		type.Portrait.CurrMng = 0;
+		type.Portrait.NumIterations = SyncRand() % 16 + 1;
+	}
+#endif
+
 	//Wyrmgus start
 	for (int i = 0; i < VariationMax; ++i) {
 		VariationInfo *varinfo = type.VarInfo[i];
@@ -1257,26 +1276,6 @@ void LoadUnitTypeSprite(CUnitType &type)
 		}
 	}
 	//Wyrmgus end
-
-	if (!type.File.empty()) {
-		type.Sprite = CPlayerColorGraphic::New(type.File, type.Width, type.Height);
-		type.Sprite->Load();
-		if (type.Flip) {
-			type.Sprite->Flip();
-		}
-	}
-
-#ifdef USE_MNG
-	if (type.Portrait.Num) {
-		for (int i = 0; i < type.Portrait.Num; ++i) {
-			type.Portrait.Mngs[i] = new Mng;
-			type.Portrait.Mngs[i]->Load(type.Portrait.Files[i]);
-		}
-		// FIXME: should be configurable
-		type.Portrait.CurrMng = 0;
-		type.Portrait.NumIterations = SyncRand() % 16 + 1;
-	}
-#endif
 }
 
 /**

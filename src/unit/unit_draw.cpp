@@ -801,13 +801,8 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 	PixelPos pos = screenPos;
 	if (cframe->File == ConstructionFileConstruction) {
 		//Wyrmgus start
-//		const CConstruction &construction = *type.Construction;
-		CConstruction &construction = *type.Construction;
-		VariationInfo *varinfo = type.VarInfo[unit.Variation];
-		if (varinfo && varinfo->Construction) {
-			construction = *varinfo->Construction;
-		}
-		//Wyrmgus end
+		/*
+		const CConstruction &construction = *type.Construction;
 		pos.x -= construction.Width / 2;
 		pos.y -= construction.Height / 2;
 		if (frame < 0) {
@@ -815,6 +810,28 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		} else {
 			construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		}
+		*/
+		VariationInfo *varinfo = type.VarInfo[unit.Variation];
+		if (varinfo && varinfo->Construction) {
+			const CConstruction &construction = *varinfo->Construction;
+			pos.x -= construction.Width / 2;
+			pos.y -= construction.Height / 2;
+			if (frame < 0) {
+				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
+			} else {
+				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+			}
+		} else {
+			const CConstruction &construction = *type.Construction;
+			pos.x -= construction.Width / 2;
+			pos.y -= construction.Height / 2;
+			if (frame < 0) {
+				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
+			} else {
+				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+			}
+		}
+		//Wyrmgus end
 	} else {
 		pos.x += type.OffsetX - type.Width / 2;
 		pos.y += type.OffsetY - type.Height / 2;
