@@ -130,15 +130,6 @@ namespace gcn
          * @return the Button tooltip.
          */
         virtual const std::string& getTooltip() const;
-
-        virtual void setFrame(bool frame);
-
-        /**
-         * Checks if the button has an icon-like frame.
-         *
-         * @return true if the button is set to have an icon-like frame.
-         */
-        virtual bool hasFrame() const;
 		//Wyrmgus end
 
         /**
@@ -187,10 +178,9 @@ namespace gcn
     protected:
         std::string mCaption;
         //Wyrmgus start
-//        bool mMouseDown, mKeyDown, mHotKeyDown;
         std::string mTooltip;
-        bool mMouseDown, mKeyDown, mHotKeyDown, mFrame;
         //Wyrmgus end
+        bool mMouseDown, mKeyDown, mHotKeyDown;
         unsigned int mAlignment;
     };
 }

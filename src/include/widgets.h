@@ -104,6 +104,7 @@ public:
 	void setDisabledImage(gcn::Image *image) { disabledImage = image; }
 	//Wyrmgus start
 	void setFrameImage(gcn::Image *image) { frameImage = image; adjustSize(); }
+	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
 	virtual void setPosition(int x, int y);
 	//Wyrmgus end
 
@@ -112,6 +113,7 @@ public:
 	gcn::Image *disabledImage;
 	//Wyrmgus start
 	gcn::Image *frameImage;
+	gcn::Image *pressedframeImage;
 	//Wyrmgus end
 };
 
@@ -129,12 +131,14 @@ public:
 	void setPressedImage(gcn::Image *image) { pressedImage = image; }
 	void setDisabledImage(gcn::Image *image) { disabledImage = image; }
 	void setFrameImage(gcn::Image *image) { frameImage = image; adjustSize(); }
+	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
 	virtual void setPosition(int x, int y);
 
 	gcn::Image *normalImage;
 	gcn::Image *pressedImage;
 	gcn::Image *disabledImage;
 	gcn::Image *frameImage;	
+	gcn::Image *pressedframeImage;	
 	std::string ButtonPlayerColor;
 };
 //Wyrmgus end

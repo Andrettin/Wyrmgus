@@ -320,7 +320,6 @@ class Button : public Widget
 	//Wyrmgus start
 	virtual void setTooltip(const std::string tooltip);
 	virtual const std::string &getTooltip() const;
-	virtual void setFrame(bool frame);
 	//Wyrmgus end
 };
 
@@ -342,6 +341,7 @@ class ImageButton : public Button
 	void setDisabledImage(CGraphic *image);
 	//Wyrmgus start
 	void setFrameImage(CGraphic *image);
+	void setPressedFrameImage(CGraphic *image);
 	//Wyrmgus end
 };
 
@@ -355,6 +355,7 @@ class PlayerColorImageButton : public Button
 	void setPressedImage(CPlayerColorGraphic *image);
 	void setDisabledImage(CPlayerColorGraphic *image);
 	void setFrameImage(CGraphic *image);
+	void setPressedFrameImage(CGraphic *image);
 };
 // Wyrmgus end
 

@@ -90,9 +90,6 @@ namespace gcn
         mMouseDown = false;
         mKeyDown = false;
         mHotKeyDown = false;
-        //Wyrmgus start
-        mFrame = false;
-        //Wyrmgus end
 
         addMouseListener(this);
         addKeyListener(this);
@@ -128,16 +125,6 @@ namespace gcn
     const std::string& Button::getTooltip() const
     {
         return mTooltip;
-    }
-
-    void Button::setFrame(bool frame)
-    {
-        mFrame = frame;
-    }
-
-    bool Button::hasFrame() const
-    {
-        return mFrame;
     }
     //Wyrmgus end
 
@@ -275,13 +262,6 @@ namespace gcn
         if (button == MouseInput::LEFT && hasMouse())
         {
             mMouseDown = true;
-            //Wyrmgus start
-			if (hasFrame())
-			{
-				setX(getX() + 1);
-				setY(getY() + 1);
-	        }
-            //Wyrmgus end
         }
     }
 
@@ -290,13 +270,6 @@ namespace gcn
         if (button == MouseInput::LEFT)
         {
             mMouseDown = false;
-            //Wyrmgus start
-			if (hasFrame())
-			{
-				setX(getX() - 1);
-				setY(getY() - 1);
-	        }
-            //Wyrmgus end
         }
     }
 
@@ -319,13 +292,6 @@ namespace gcn
         {
             mKeyDown = true;
             ret = true;
-            //Wyrmgus start
-			if (hasFrame())
-			{
-				setX(getX() + 1);
-				setY(getY() + 1);
-	        }
-            //Wyrmgus end
         }
 
         mHotKeyDown = false;
@@ -342,13 +308,6 @@ namespace gcn
             mKeyDown = false;
             generateAction();
             ret = true;
-            //Wyrmgus start
-			if (hasFrame())
-			{
-				setX(getX() - 1);
-				setY(getY() - 1);
-	        }
-            //Wyrmgus end
         }
         return ret;
     }
@@ -357,13 +316,6 @@ namespace gcn
     {
         mHotKeyDown = true;
         mMouseDown = false;
-		//Wyrmgus start
-		if (hasFrame())
-		{
-			setX(getX() + 1);
-			setY(getY() + 1);
-		}
-		//Wyrmgus end
     }
 
     void Button::hotKeyRelease()
@@ -372,13 +324,6 @@ namespace gcn
         {
             mHotKeyDown = false;
             generateAction();
-            //Wyrmgus start
-			if (hasFrame())
-			{
-				setX(getX() - 1);
-				setY(getY() - 1);
-	        }
-            //Wyrmgus end
         }
     }
 

@@ -337,7 +337,7 @@ ImageButton::ImageButton() :
 	Button(), normalImage(NULL), pressedImage(NULL),
 	//Wyrmgus start
 //	disabledImage(NULL)
-	disabledImage(NULL), frameImage(NULL)
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL)
 	//Wyrmgus end
 {
 	setForegroundColor(0xffffff);
@@ -352,7 +352,7 @@ ImageButton::ImageButton(const std::string &caption) :
 	Button(caption), normalImage(NULL), pressedImage(NULL),
 	//Wyrmgus start
 //	disabledImage(NULL)
-	disabledImage(NULL), frameImage(NULL)
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL)
 	//Wyrmgus end
 {
 	setForegroundColor(0xffffff);
@@ -390,8 +390,17 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	if (frameImage) {
 		graphics->drawImage(frameImage, 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight());
-		graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-							img->getWidth(), img->getHeight());
+		if (isPressed()) {
+			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
+								img->getWidth(), img->getHeight());
+			if (pressedframeImage) {
+				graphics->drawImage(pressedframeImage, 0, 0, 1, 1,
+									pressedframeImage->getWidth(), pressedframeImage->getHeight());
+			}
+		} else {
+			graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
+								img->getWidth(), img->getHeight());
+		}
 	} else {
 		graphics->drawImage(img, 0, 0, 0, 0,
 							img->getWidth(), img->getHeight());
@@ -428,7 +437,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 
 	//Wyrmgus start
 //	if (hasFocus()) {
-	if (hasFocus() && hasFrame() == false) {
+	if (hasFocus() && !frameImage) {
 	//Wyrmgus end
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 	}
@@ -476,7 +485,7 @@ void ImageButton::setPosition(int x, int y)
 */
 PlayerColorImageButton::PlayerColorImageButton() :
 	Button(), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), frameImage(NULL), ButtonPlayerColor("")
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor("")
 {
 	setForegroundColor(0xffffff);
 }
@@ -488,7 +497,7 @@ PlayerColorImageButton::PlayerColorImageButton() :
 */
 PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const std::string &playercolor) :
 	Button(caption), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), frameImage(NULL), ButtonPlayerColor(playercolor)
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(playercolor)
 {
 	setForegroundColor(0xffffff);
 }
@@ -526,8 +535,17 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 	if (frameImage) {
 		graphics->drawImage(frameImage, 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight());
-		graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-							img->getWidth(), img->getHeight());
+		if (isPressed()) {
+			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
+								img->getWidth(), img->getHeight());
+			if (pressedframeImage) {
+				graphics->drawImage(pressedframeImage, 0, 0, 1, 1,
+									pressedframeImage->getWidth(), pressedframeImage->getHeight());
+			}
+		} else {
+			graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
+								img->getWidth(), img->getHeight());
+		}
 	} else {
 		graphics->drawImage(img, 0, 0, 0, 0,
 							img->getWidth(), img->getHeight());
