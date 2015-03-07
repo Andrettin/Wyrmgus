@@ -335,7 +335,10 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 */
 ImageButton::ImageButton() :
 	Button(), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL)
+	//Wyrmgus start
+//	disabledImage(NULL)
+	disabledImage(NULL), frameImage(NULL)
+	//Wyrmgus end
 {
 	setForegroundColor(0xffffff);
 }
@@ -347,7 +350,10 @@ ImageButton::ImageButton() :
 */
 ImageButton::ImageButton(const std::string &caption) :
 	Button(caption), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL)
+	//Wyrmgus start
+//	disabledImage(NULL)
+	disabledImage(NULL), frameImage(NULL)
+	//Wyrmgus end
 {
 	setForegroundColor(0xffffff);
 }
@@ -376,42 +382,21 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	} else {
 		img = normalImage;
 	}
-	graphics->drawImage(img, 0, 0, 0, 0,
-						img->getWidth(), img->getHeight());
+	
+	//Wyrmgus start
+//	graphics->drawImage(img, 0, 0, 0, 0,
+//						img->getWidth(), img->getHeight());
 
-	if (hasFrame()) {
-		int iOffset = 0;
-		if (isPressed()) {
-			iOffset = 1;
-		}
-		// make the button's image have an icon-like frame
-		Video.DrawHLine(ColorWhite, getX() - 1 - iOffset, getY() - 1 - iOffset, 49);
-		Video.DrawVLine(ColorWhite, getX() - 1 - iOffset, getY() - iOffset, 40);
-		Video.DrawVLine(ColorWhite, getX() - iOffset, getY() + 38 - iOffset, 2);
-		Video.DrawHLine(ColorWhite, getX() + 46 - iOffset, getY() - iOffset, 2);
-
-		// Bottom and Right edge of Icon
-		Video.DrawHLine(ColorGray, getX() + 1 - iOffset, getY() + 38 - iOffset, 47);
-		Video.DrawHLine(ColorGray, getX() + 1 - iOffset, getY() + 39 - iOffset, 47);
-		Video.DrawVLine(ColorGray, getX() + 46 - iOffset, getY() + 1 - iOffset, 37);
-		Video.DrawVLine(ColorGray, getX() + 47 - iOffset, getY() + 1 - iOffset, 37);
-
-		Video.DrawRectangle(ColorBlack, getX() - 3 - iOffset, getY() - 3 - iOffset, 52, 44);
-		Video.DrawRectangle(ColorBlack, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
-
-		if (hasMouse()) {
-			Video.DrawRectangle(ColorGray, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
-		}
-
-		if (isPressed()) {
-			Video.DrawRectangle(ColorGray, getX() - iOffset, getY() - iOffset, 48, 40);
-			Video.DrawVLine(ColorDarkGray, getX() - 1 - iOffset, getY() - 1 - iOffset, 40);
-			Video.DrawHLine(ColorDarkGray, getX() - 1 - iOffset, getY() - 1 - iOffset, 49);
-			Video.DrawHLine(ColorDarkGray, getX() - 1 - iOffset, getY() + 39 - iOffset, 2);
-
-			Video.DrawRectangle(ColorGray, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
-		}
+	if (frameImage) {
+		graphics->drawImage(frameImage, 0, 0, 0, 0,
+							frameImage->getWidth(), frameImage->getHeight());
+		graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
+							img->getWidth(), img->getHeight());
+	} else {
+		graphics->drawImage(img, 0, 0, 0, 0,
+							img->getWidth(), img->getHeight());
 	}
+	//Wyrmgus end
 
 	graphics->setColor(getForegroundColor());
 
@@ -441,7 +426,10 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment());
 	}
 
+	//Wyrmgus start
+//	if (hasFocus()) {
 	if (hasFocus() && hasFrame() == false) {
+	//Wyrmgus end
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 	}
 }
@@ -451,7 +439,14 @@ void ImageButton::draw(gcn::Graphics *graphics)
 */
 void ImageButton::adjustSize()
 {
-	if (normalImage) {
+	//Wyrmgus start
+//	if (normalImage) {
+	if (frameImage) {
+		setWidth(frameImage->getWidth());
+		setHeight(frameImage->getHeight());
+		setPosition(getX(), getY()); //reset position, to make it appropriate for the frame image
+	} else if (normalImage) {
+	//Wyrmgus end
 		setWidth(normalImage->getWidth());
 		setHeight(normalImage->getHeight());
 	} else {
@@ -460,6 +455,17 @@ void ImageButton::adjustSize()
 }
 
 //Wyrmgus start
+void ImageButton::setPosition(int x, int y)
+{
+	if (frameImage) {
+		mDimension.x = x - ((frameImage->getWidth() - normalImage->getWidth()) / 2);
+		mDimension.y = y - ((frameImage->getHeight() - normalImage->getWidth()) / 2);
+	} else {
+		mDimension.x = x;
+		mDimension.y = y;
+	}
+}
+
 /*----------------------------------------------------------------------------
 --  PlayerColorImageButtonImageButton
 ----------------------------------------------------------------------------*/
@@ -470,7 +476,7 @@ void ImageButton::adjustSize()
 */
 PlayerColorImageButton::PlayerColorImageButton() :
 	Button(), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), ButtonPlayerColor("")
+	disabledImage(NULL), frameImage(NULL), ButtonPlayerColor("")
 {
 	setForegroundColor(0xffffff);
 }
@@ -482,7 +488,7 @@ PlayerColorImageButton::PlayerColorImageButton() :
 */
 PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const std::string &playercolor) :
 	Button(caption), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), ButtonPlayerColor(playercolor)
+	disabledImage(NULL), frameImage(NULL), ButtonPlayerColor(playercolor)
 {
 	setForegroundColor(0xffffff);
 }
@@ -517,41 +523,14 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		WidgetGraphicPlayerPixels(ButtonPlayerColor, *((CPlayerColorGraphic *)img));
 	}
 
-	graphics->drawImage(img, 0, 0, 0, 0,
-						img->getWidth(), img->getHeight());
-
-	if (hasFrame()) {
-		int iOffset = 0;
-		if (isPressed()) {
-			iOffset = 1;
-		}
-		// make the button's image have an icon-like frame
-		Video.DrawHLine(ColorWhite, getX() - 1 - iOffset, getY() - 1 - iOffset, 49);
-		Video.DrawVLine(ColorWhite, getX() - 1 - iOffset, getY() - iOffset, 40);
-		Video.DrawVLine(ColorWhite, getX() - iOffset, getY() + 38 - iOffset, 2);
-		Video.DrawHLine(ColorWhite, getX() + 46 - iOffset, getY() - iOffset, 2);
-
-		// Bottom and Right edge of Icon
-		Video.DrawHLine(ColorGray, getX() + 1 - iOffset, getY() + 38 - iOffset, 47);
-		Video.DrawHLine(ColorGray, getX() + 1 - iOffset, getY() + 39 - iOffset, 47);
-		Video.DrawVLine(ColorGray, getX() + 46 - iOffset, getY() + 1 - iOffset, 37);
-		Video.DrawVLine(ColorGray, getX() + 47 - iOffset, getY() + 1 - iOffset, 37);
-
-		Video.DrawRectangle(ColorBlack, getX() - 3 - iOffset, getY() - 3 - iOffset, 52, 44);
-		Video.DrawRectangle(ColorBlack, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
-
-		if (hasMouse()) {
-			Video.DrawRectangle(ColorGray, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
-		}
-
-		if (isPressed()) {
-			Video.DrawRectangle(ColorGray, getX() - iOffset, getY() - iOffset, 48, 40);
-			Video.DrawVLine(ColorDarkGray, getX() - 1 - iOffset, getY() - 1 - iOffset, 40);
-			Video.DrawHLine(ColorDarkGray, getX() - 1 - iOffset, getY() - 1 - iOffset, 49);
-			Video.DrawHLine(ColorDarkGray, getX() - 1 - iOffset, getY() + 39 - iOffset, 2);
-
-			Video.DrawRectangle(ColorGray, getX() - 4 - iOffset, getY() - 4 - iOffset, 54, 46);
-		}
+	if (frameImage) {
+		graphics->drawImage(frameImage, 0, 0, 0, 0,
+							frameImage->getWidth(), frameImage->getHeight());
+		graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
+							img->getWidth(), img->getHeight());
+	} else {
+		graphics->drawImage(img, 0, 0, 0, 0,
+							img->getWidth(), img->getHeight());
 	}
 
 	graphics->setColor(getForegroundColor());
@@ -582,7 +561,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment());
 	}
 
-	if (hasFocus() && hasFrame() == false) {
+	if (hasFocus() && !frameImage) {
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 	}
 }
@@ -592,11 +571,26 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 */
 void PlayerColorImageButton::adjustSize()
 {
-	if (normalImage) {
+	if (frameImage) {
+		setWidth(frameImage->getWidth());
+		setHeight(frameImage->getHeight());
+		setPosition(getX(), getY()); //reset position, to make it appropriate for the frame image
+	} else if (normalImage) {
 		setWidth(normalImage->getWidth());
 		setHeight(normalImage->getHeight());
 	} else {
 		Button::adjustSize();
+	}
+}
+
+void PlayerColorImageButton::setPosition(int x, int y)
+{
+	if (frameImage) {
+		mDimension.x = x - ((frameImage->getWidth() - normalImage->getWidth()) / 2);
+		mDimension.y = y - ((frameImage->getHeight() - normalImage->getWidth()) / 2);
+	} else {
+		mDimension.x = x;
+		mDimension.y = y;
 	}
 }
 

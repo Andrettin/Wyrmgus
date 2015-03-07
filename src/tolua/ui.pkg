@@ -340,6 +340,9 @@ class ImageButton : public Button
 	void setNormalImage(CGraphic *image);
 	void setPressedImage(CGraphic *image);
 	void setDisabledImage(CGraphic *image);
+	//Wyrmgus start
+	void setFrameImage(CGraphic *image);
+	//Wyrmgus end
 };
 
 // Wyrmgus start
@@ -351,6 +354,7 @@ class PlayerColorImageButton : public Button
 	void setNormalImage(CPlayerColorGraphic *image);
 	void setPressedImage(CPlayerColorGraphic *image);
 	void setDisabledImage(CPlayerColorGraphic *image);
+	void setFrameImage(CGraphic *image);
 };
 // Wyrmgus end
 

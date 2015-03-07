@@ -962,17 +962,6 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "SpeedResearch")) {
 		lua_pushnumber(l, p->SpeedResearch);
 		return 1;
-	//Wyrmgus start
-	/*
-	} else if (!strcmp(data, "Allow")) {
-		LuaCheckArgs(l, 3);
-		const std::string ident = LuaToString(l, 3);
-		char b[2];
-		b[0] = UpgradeIdentAllowed(Players[p->Index], ident.c_str());
-		b[1] = 0;
-		lua_pushstring(l, b);
-		return 1;
-	*/
 	} else if (!strcmp(data, "Allow")) {
 		LuaCheckArgs(l, 3);
 		const char *ident = LuaToString(l, 3);
@@ -995,7 +984,6 @@ static int CclGetPlayerData(lua_State *l)
 			DebugPrint(" wrong ident %s\n" _C_ ident);
 		}
 		return 1;
-	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

@@ -104,6 +104,7 @@ public:
 	//Wyrmgus end
 
 	std::string Name;
+	std::string AIScript;
 	int Race;
 	//Wyrmgus start
 	int Faction;
@@ -214,6 +215,7 @@ static FullReplay *StartReplay()
 
 	for (int i = 0; i < PlayerMax; ++i) {
 		replay->Players[i].Name = Players[i].Name;
+		replay->Players[i].AIScript = GameSettings.Presets[i].AIScript;
 		replay->Players[i].Race = GameSettings.Presets[i].Race;
 		//Wyrmgus start
 		replay->Players[i].Faction = Players[i].Faction;
@@ -269,6 +271,7 @@ static void ApplyReplaySettings()
 	}
 
 	for (int i = 0; i < PlayerMax; ++i) {
+		GameSettings.Presets[i].AIScript = CurrentReplay->Players[i].AIScript;
 		GameSettings.Presets[i].Race = CurrentReplay->Players[i].Race;
 		//Wyrmgus start
 		Players[i].Faction = CurrentReplay->Players[i].Faction; // should use a game settings preset instead
