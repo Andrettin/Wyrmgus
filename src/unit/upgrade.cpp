@@ -722,8 +722,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 						unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 						unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
-
-						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+						if (unit.Variable[j].Max > 0) {
+							clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+						}
 					}
 					//Wyrmgus start
 					//change variation if current one becomes forbidden
@@ -1032,7 +1033,10 @@ static void ApplyAbilityModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
-		clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+		if (unit.Variable[j].Max > 0) {
+			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+		}
+
 	}
 	
 	//change variation if current one becomes forbidden
