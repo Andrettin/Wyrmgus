@@ -205,6 +205,36 @@ static bool MoveRandomly(CUnit &unit)
 	return false;
 }
 
+//Wyrmgus start
+/**
+**  Mate with another animal of same species and opposite gender
+**
+**  @return  true if the unit moves, false otherwise
+*/
+static bool Mate(CUnit &unit)
+{
+	if (unit.Type->Organic == false
+		|| unit.Player->Type != PlayerNeutral //only for fauna
+		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
+		|| ((SyncRand() % 200) >= 1)) {
+		return false;
+	}
+
+	// look for an adjacent unit of the same type
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, 1, table, HasSamePlayerAndTypeAs(unit));
+
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (table[i]->Variable[GENDER_INDEX].Value != unit.Variable[GENDER_INDEX].Value) {
+			CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
+			DropOutOnSide(*newUnit, LookingW, &unit);
+			return true;
+		}
+	}
+	return false;
+}
+//Wyrmgus end
+
 /**
 **  Auto cast a spell if possible
 **
@@ -404,7 +434,10 @@ bool AutoAttack(CUnit &unit)
 	} else {
 		if (AutoCast(unit) || (unit.IsAgressive() && AutoAttack(unit))
 			|| AutoRepair(unit)
-			|| MoveRandomly(unit)) {
+			//Wyrmgus start
+//			|| MoveRandomly(unit)) {
+			|| MoveRandomly(unit)|| Mate(unit)) {
+			//Wyrmgus end
 		}
 	}
 }

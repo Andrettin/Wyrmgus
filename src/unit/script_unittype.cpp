@@ -146,6 +146,7 @@ static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
 static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
 static const char BACKSTAB_KEY[] = "Backstab";
 static const char TRANSPARENCY_KEY[] = "Transparency";
+static const char GENDER_KEY[] = "Gender";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -191,7 +192,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 //							   PRIORITY_KEY
 							   PRIORITY_KEY,
 							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
-							   BACKSTAB_KEY, TRANSPARENCY_KEY
+							   BACKSTAB_KEY, TRANSPARENCY_KEY, GENDER_KEY
 //Wyrmgus end
 							  };
 
@@ -1983,7 +1984,7 @@ void UpdateUnitVariables(CUnit &unit)
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
 			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == ACCURACY_INDEX || i == EVASION_INDEX
 			|| i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
-			|| i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX) {
+			|| i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -2004,6 +2005,12 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 
 	unit.Variable[LEVELUP_INDEX].Max = 255;
+
+	unit.Variable[GENDER_INDEX].Max = 2;
+	if (unit.Variable[GENDER_INDEX].Value == 0 && unit.Type->Organic) { // Gender: 0 = Not Set, 1 = Male, 2 = Female
+		unit.Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
+		unit.Variable[GENDER_INDEX].Enable = 1;
+	}
 	//Wyrmgus end
 
 	// Shield permeability
