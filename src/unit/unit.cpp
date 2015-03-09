@@ -2820,7 +2820,10 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	const int threshold = 30;
 	COrder *savedOrder = NULL;
 
-	if (target.Player->AiEnabled == false) {
+	//Wyrmgus start
+//	if (target.Player->AiEnabled == false) {
+	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
+	//Wyrmgus end
 		if (target.CurrentAction() == UnitActionAttack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
 			if (order.IsWeakTargetSelected() == false) {
@@ -2857,7 +2860,10 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 					  && (ThreatCalculate(target, attacker) < ThreatCalculate(target, *best))))) {
 		best = &attacker;
 	}
-	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
+	//Wyrmgus start
+//	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
+	if (best && best != oldgoal && (best->Player != target.Player || target.Player->Type == PlayerNeutral) && best->IsAllied(target) == false) {
+	//Wyrmgus end
 		CommandAttack(target, best->tilePos, best, FlushCommands);
 		// Set threshold value only for aggressive units
 		if (best->IsAgressive()) {
@@ -3195,7 +3201,16 @@ bool CUnit::IsEnemy(const CPlayer &player) const
 */
 bool CUnit::IsEnemy(const CUnit &unit) const
 {
-	return IsEnemy(*unit.Player);
+	//Wyrmgus start
+//	return IsEnemy(*unit.Player);
+	if (this->Player->Type == PlayerNeutral && this->Type->Class == "predator" && unit.Type->Class != "predator" && unit.Type->Organic) {
+		return true;
+	} else if (unit.Player->Type == PlayerNeutral && unit.Type->Class == "predator" && this->Type->Class != "predator" && this->Player->Type != PlayerNeutral) {
+		return true;
+	} else {
+		return IsEnemy(*unit.Player);
+	}
+	//Wyrmgus end
 }
 
 /**

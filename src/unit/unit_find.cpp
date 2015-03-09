@@ -713,7 +713,10 @@ private:
 		const CUnitType &dtype = *dest->Type;
 		const int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
 
-		if (!player.IsEnemy(*dest) // a friend or neutral
+		//Wyrmgus start
+//		if (!player.IsEnemy(*dest) // a friend or neutral
+		if (!attacker->IsEnemy(*dest) // a friend or neutral
+		//Wyrmgus end
 			|| !dest->IsVisibleAsGoal(player)
 			|| !CanTarget(type, dtype)) {
 			return INT_MAX;
@@ -861,7 +864,10 @@ public:
 				hp_damage_evaluate = attacker->Stats->Variables[BASICDAMAGE_INDEX].Value
 									 + attacker->Stats->Variables[PIERCINGDAMAGE_INDEX].Value;
 			}
-			if (!player.IsEnemy(*dest)) { // a friend or neutral
+			//Wyrmgus start
+//			if (!player.IsEnemy(*dest)) { // a friend or neutral
+			if (!attacker->IsEnemy(*dest)) { // a friend or neutral
+			//Wyrmgus end
 				dest->CacheLock = 1;
 
 				// Calc a negative cost
@@ -1140,7 +1146,10 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 		const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
 		std::vector<CUnit *> table;
 		SelectAroundUnit(*firstContainer, missile_range, table,
-			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+			//Wyrmgus start
+//			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+			pred);
+			//Wyrmgus end
 
 		if (table.empty() == false) {
 			return BestRangeTargetFinder(unit, range).Find(table);
@@ -1152,7 +1161,10 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 		std::vector<CUnit *> table;
 
 		SelectAroundUnit(*firstContainer, range, table,
-			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+			//Wyrmgus start
+//			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
+			pred);
+			//Wyrmgus end
 
 		const int n = static_cast<int>(table.size());
 		if (range > 25 && table.size() > 9) {
