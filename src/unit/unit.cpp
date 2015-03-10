@@ -641,13 +641,9 @@ bool CUnit::IsAlive() const
 
 int CUnit::GetDrawLevel() const
 {
-	//Wyrmgus start
-//	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
-//			Type->CorpseType->DrawLevel : Type->DrawLevel);
 	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
-	Type->CorpseType->DrawLevel :
+		Type->CorpseType->DrawLevel :
 	((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));
-	//Wyrmgus end
 }
 
 /**

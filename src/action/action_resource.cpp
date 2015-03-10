@@ -776,12 +776,13 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				// Don't destroy the resource twice.
 				// This only happens when it's empty.
 				if (!dead) {
-					//Wyrmgus start
-//					if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index) {
-					if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index && source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
-//						unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
-						unit.Player->Notify(NotifyYellow, source->tilePos, _("Our %s has been depleted!"), source->Type->Name.c_str());
-					//Wyrmgus end
+					if (Preference.MineNotifications
+						&& unit.Player->Index == ThisPlayer->Index
+						&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
+							//Wyrmgus start
+//							unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
+							unit.Player->Notify(NotifyYellow, source->tilePos, _("Our %s has been depleted!"), source->Type->Name.c_str());
+							//Wyrmgus end
 					}
 					LetUnitDie(*source);
 					// FIXME: make the workers inside look for a new resource.
@@ -853,12 +854,14 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		this->Resource.Mine = source;
 		
 		if (Preference.MineNotifications && unit.Player->Index == ThisPlayer->Index 
-			//Wyrmgus start
-//			&& source->IsAlive() && !source->MineLow && source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10) {
-			&& source->IsAlive() && !source->MineLow && source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10 && source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
+			&& source->IsAlive()
+			&& !source->MineLow
+			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
+			&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
+				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				unit.Player->Notify(NotifyYellow, source->tilePos, _("Our %s is nearing depletion!"), source->Type->Name.c_str());
-			//Wyrmgus end
+				//Wyrmgus end
 				source->MineLow = 1;
 		}
 
