@@ -641,8 +641,13 @@ bool CUnit::IsAlive() const
 
 int CUnit::GetDrawLevel() const
 {
+	//Wyrmgus start
+//	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
+//			Type->CorpseType->DrawLevel : Type->DrawLevel);
 	return ((Type->CorpseType && CurrentAction() == UnitActionDie) ?
-			Type->CorpseType->DrawLevel : Type->DrawLevel);
+	Type->CorpseType->DrawLevel :
+	((CurrentAction() == UnitActionDie) ? Type->DrawLevel - 10 : Type->DrawLevel));
+	//Wyrmgus end
 }
 
 /**
@@ -1774,14 +1779,31 @@ bool CUnit::IsVisibleOnMinimap() const
 bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 {
 	// Check if the graphic is inside the viewport.
-	int x = tilePos.x * PixelTileSize.x + IX - (Type->Width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
-	int y = tilePos.y * PixelTileSize.y + IY - (Type->Height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
+	//Wyrmgus start
+//	int x = tilePos.x * PixelTileSize.x + IX - (Type->Width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
+//	int y = tilePos.y * PixelTileSize.y + IY - (Type->Height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
+
+	int frame_width = Type->Width;
+	int frame_height = Type->Height;
+	VariationInfo *varinfo = Type->VarInfo[Variation];
+	if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight) {
+		frame_width = varinfo->FrameWidth;
+		frame_height = varinfo->FrameHeight;
+	}
+
+	int x = tilePos.x * PixelTileSize.x + IX - (frame_width - Type->TileWidth * PixelTileSize.x) / 2 + Type->OffsetX;
+	int y = tilePos.y * PixelTileSize.y + IY - (frame_height - Type->TileHeight * PixelTileSize.y) / 2 + Type->OffsetY;
+	//Wyrmgus end
 	const PixelSize vpSize = vp.GetPixelSize();
 	const PixelPos vpTopLeftMapPos = Map.TilePosToMapPixelPos_TopLeft(vp.MapPos) + vp.Offset;
 	const PixelPos vpBottomRightMapPos = vpTopLeftMapPos + vpSize;
 
-	if (x + Type->Width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
-		|| y + Type->Height < vpTopLeftMapPos.y || y > vpBottomRightMapPos.y) {
+	//Wyrmgus start
+//	if (x + Type->Width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
+//		|| y + Type->Height < vpTopLeftMapPos.y || y > vpBottomRightMapPos.y) {
+	if (x + frame_width < vpTopLeftMapPos.x || x > vpBottomRightMapPos.x
+		|| y + frame_height < vpTopLeftMapPos.y || y > vpBottomRightMapPos.y) {
+	//Wyrmgus end
 		return false;
 	}
 
@@ -2370,6 +2392,15 @@ CUnit *UnitOnScreen(int x, int y)
 						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
 		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
 						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
+		//Wyrmgus start
+		VariationInfo *varinfo = type.VarInfo[unit.Variation];
+		if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight && !varinfo->File.empty()) {
+			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
+							  (varinfo->FrameWidth - varinfo->Sprite->Width) / 2 + type.BoxOffsetX;
+			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
+							  (varinfo->FrameHeight - varinfo->Sprite->Height) / 2 + type.BoxOffsetY;
+		}
+		//Wyrmgus end
 		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.BoxWidth
 			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
 			// Check if there are other units on this place
@@ -2712,7 +2743,10 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 	
 	//distribute experience between nearby units belonging to the same player
 
-	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
+	//Wyrmgus start
+//	if (UseHPForXp && attacker && target.IsEnemy(*attacker)) {
+	if (UseHPForXp && attacker && (target.IsEnemy(*attacker) || target.Player->Type == PlayerNeutral)) {
+	//Wyrmgus end
 		std::vector<CUnit *> table;
 		SelectAroundUnit(*attacker, 6, table, MakeAndPredicate(HasSamePlayerAs(*attacker->Player), IsNotBuildingType()));
 
@@ -2822,7 +2856,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 
 	//Wyrmgus start
 //	if (target.Player->AiEnabled == false) {
-	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral) { // allow neutral units to strike back
+	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral && attacker.Player->Type != PlayerNeutral) { // allow neutral units to strike back, or units to strike back from neutral units
 	//Wyrmgus end
 		if (target.CurrentAction() == UnitActionAttack) {
 			COrder_Attack &order = dynamic_cast<COrder_Attack &>(*target.CurrentOrder());
@@ -2952,7 +2986,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		if (attacker) {
 			//  Setting ai threshold counter to 0 so it can target other units
 			attacker->Threshold = 0;
-			if (target.IsEnemy(*attacker)) {
+			//Wyrmgus start
+//			if (target.IsEnemy(*attacker)) {
+			if (target.IsEnemy(*attacker) || target.Player->Type == PlayerNeutral) {
+			//Wyrmgus end
 				HitUnit_IncreaseScoreForKill(*attacker, target);
 			}
 		}
@@ -3203,9 +3240,11 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 {
 	//Wyrmgus start
 //	return IsEnemy(*unit.Player);
-	if (this->Player->Type == PlayerNeutral && this->Type->Class == "predator" && unit.Type->Class != "predator" && unit.Type->Organic) {
+	if (this->Player->Type == PlayerNeutral && this->Type->Civilization.empty() && this->Type->Organic && this->Type->Class == "predator" && unit.Type->Class != "predator" && unit.Type->Class != "slime" && unit.Type->Organic && this->Type != unit.Type) {
 		return true;
-	} else if (unit.Player->Type == PlayerNeutral && unit.Type->Class == "predator" && this->Type->Class != "predator" && this->Player->Type != PlayerNeutral) {
+	} else if (unit.Player->Type == PlayerNeutral && unit.Type->Civilization.empty() && unit.Type->Organic && unit.Type->Class == "predator" && this->Type->Class != "predator" && this->Player->Type != PlayerNeutral && this->Type != unit.Type) {
+		return true;
+	} else if (this->Player->Type == PlayerNeutral && this->Type->Civilization.empty() && this->Type->Organic && (this->Type->Class == "grazer" || this->Type->Class == "slime") && unit.Type->Organic && unit.Player->Type != PlayerNeutral && this->Type != unit.Type && this->MapDistanceTo(unit) <= 1) {
 		return true;
 	} else {
 		return IsEnemy(*unit.Player);

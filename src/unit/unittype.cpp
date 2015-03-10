@@ -1068,8 +1068,12 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 {
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
-	pos.x -= (type.Width - type.TileWidth * PixelTileSize.x) / 2;
-	pos.y -= (type.Height - type.TileHeight * PixelTileSize.y) / 2;
+	//Wyrmgus start
+//	pos.x -= (type.Width - type.TileWidth * PixelTileSize.x) / 2;
+//	pos.y -= (type.Height - type.TileHeight * PixelTileSize.y) / 2;
+	pos.x -= (sprite->Width - type.TileWidth * PixelTileSize.x) / 2;
+	pos.y -= (sprite->Height - type.TileHeight * PixelTileSize.y) / 2;
+	//Wyrmgus end
 	pos.x += type.OffsetX;
 	pos.y += type.OffsetY;
 
@@ -1248,9 +1252,15 @@ void LoadUnitTypeSprite(CUnitType &type)
 		if (!varinfo) {
 			continue;
 		}
+		int frame_width = type.Width;
+		int frame_height = type.Height;
+		if (varinfo->FrameWidth && varinfo->FrameHeight) {
+			frame_width = varinfo->FrameWidth;
+			frame_height = varinfo->FrameHeight;
+		}
 		if (!varinfo->File.empty()) {
 			varinfo->Sprite = CPlayerColorGraphic::New(varinfo->File,
-																	 type.Width, type.Height);
+																	 frame_width, frame_height);
 			varinfo->Sprite->Load();
 			if (type.Flip) {
 				varinfo->Sprite->Flip();
@@ -1259,7 +1269,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (!varinfo->FileWhenLoaded[j].empty()) {
 				varinfo->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(varinfo->FileWhenLoaded[j],
-																		 type.Width, type.Height);
+																		 frame_width, frame_height);
 				varinfo->SpriteWhenLoaded[j]->Load();
 				if (type.Flip) {
 					varinfo->SpriteWhenLoaded[j]->Flip();
@@ -1267,7 +1277,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 			if (!varinfo->FileWhenEmpty[j].empty()) {
 				varinfo->SpriteWhenEmpty[j] = CPlayerColorGraphic::New(varinfo->FileWhenEmpty[j],
-																		 type.Width, type.Height);
+																		 frame_width, frame_height);
 				varinfo->SpriteWhenEmpty[j]->Load();
 				if (type.Flip) {
 					varinfo->SpriteWhenEmpty[j]->Flip();

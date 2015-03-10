@@ -1135,6 +1135,10 @@ static int CclDefineUnitType(lua_State *l)
 						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
 						++k;
 						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "frame-size")) {
+						lua_rawgeti(l, -1, k + 1);
+						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
+						lua_pop(l, 1);
 					} else if (!strcmp(value, "icon")) {
 						var->Icon.Name = LuaToString(l, -1, k + 1);
 						var->Icon.Icon = NULL;

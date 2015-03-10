@@ -197,6 +197,27 @@ static bool MoveRandomly(CUnit &unit)
 		UnmarkUnitFieldFlags(unit);
 		if (UnitCanBeAt(unit, pos)) {
 			MarkUnitFieldFlags(unit);
+			//Wyrmgus start
+			if (unit.Type->Class != "vermin") {
+				std::vector<CUnit *> table;
+				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+				if (!table.size()) { //only avoid going near a settled area if isn't already surrounded by civilizations' units
+					//don't go near settled areas
+					Vec2i minpos = pos;
+					Vec2i maxpos = pos;
+					minpos.x = pos.x - std::max(6, unit.Type->RandomMovementDistance);
+					minpos.y = pos.y - std::max(6, unit.Type->RandomMovementDistance);
+					maxpos.x = pos.x + std::max(6, unit.Type->RandomMovementDistance);
+					maxpos.y = pos.y + std::max(6, unit.Type->RandomMovementDistance);
+					std::vector<CUnit *> second_table;
+					Select(minpos, maxpos, second_table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+
+					if (second_table.size() > 0) {
+						return false;
+					}
+				}
+			}
+			//Wyrmgus end
 			CommandMove(unit, pos, FlushCommands);
 			return true;
 		}
@@ -207,14 +228,14 @@ static bool MoveRandomly(CUnit &unit)
 
 //Wyrmgus start
 /**
-**  Mate with another animal of same species and opposite gender
+**  Breed with another animal of same species and opposite gender
 **
 **  @return  true if the unit moves, false otherwise
 */
-static bool Mate(CUnit &unit)
+static bool Breed(CUnit &unit)
 {
 	if (unit.Type->Organic == false
-		|| unit.Player->Type != PlayerNeutral //only for fauna
+		|| unit.Player->Type != PlayerNeutral || !unit.Type->Civilization.empty() //only for fauna
 		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
 		|| ((SyncRand() % 200) >= 1)) {
 		return false;
@@ -436,7 +457,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| MoveRandomly(unit)|| Mate(unit)) {
+			|| MoveRandomly(unit)|| Breed(unit)) {
 			//Wyrmgus end
 		}
 	}

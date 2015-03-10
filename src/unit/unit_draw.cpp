@@ -161,8 +161,23 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	const CUnitType &type = *unit.Type;
 	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
-	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
-	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
+	//Wyrmgus start
+//	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
+//	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
+	int frame_width = type.Width;
+	int frame_height = type.Height;
+	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
+	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
+	VariationInfo *varinfo = type.VarInfo[unit.Variation];
+	if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight) {
+		frame_width = varinfo->FrameWidth;
+		frame_height = varinfo->FrameHeight;
+		sprite_width = (varinfo->Sprite ? varinfo->Sprite->Width : 0);
+		sprite_height = (varinfo->Sprite ? varinfo->Sprite->Height : 0);
+	}
+	const int x = screenPos.x - type.BoxWidth / 2 - (frame_width - sprite_width) / 2;
+	const int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
+	//Wyrmgus end
 
 	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX, y + type.BoxHeight + type.BoxOffsetY);
 }
@@ -833,14 +848,24 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		}
 		//Wyrmgus end
 	} else {
-		pos.x += type.OffsetX - type.Width / 2;
-		pos.y += type.OffsetY - type.Height / 2;
+		//Wyrmgus start
+//		pos.x += type.OffsetX - type.Width / 2;
+//		pos.y += type.OffsetY - type.Height / 2;
+		int frame_width = type.Width;
+		int frame_height = type.Height;
+		VariationInfo *varinfo = type.VarInfo[unit.Variation];
+		if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight) {
+			frame_width = varinfo->FrameWidth;
+			frame_height = varinfo->FrameHeight;
+		}
+		pos.x += type.OffsetX - frame_width / 2;
+		pos.y += type.OffsetY - frame_height / 2;
+		//Wyrmgus end
 		if (frame < 0) {
 			frame = -frame - 1;
 		}
 		//Wyrmgus start
 //		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
-		VariationInfo *varinfo = type.VarInfo[unit.Variation];
 		if (varinfo && varinfo->Sprite) {
 			varinfo->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		} else {

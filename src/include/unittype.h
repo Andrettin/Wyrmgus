@@ -114,6 +114,7 @@ class VariationInfo
 {
 public:
 	VariationInfo() : VariationId(""),
+		FrameWidth(0), FrameHeight(0),
 		Animations(NULL), Construction(NULL), Sprite(NULL)
 	{
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
@@ -123,6 +124,8 @@ public:
 	std::string VariationId;		/// Variation's name.
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
+	int FrameWidth;
+	int FrameHeight;
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
 	CAnimations *Animations;        /// Animation scripts
