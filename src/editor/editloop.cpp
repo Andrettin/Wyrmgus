@@ -1068,9 +1068,10 @@ static void ShowUnitInfo(const CUnit &unit)
 	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
 					//Wyrmgus start
 //					unit.Type->Name.c_str(), unit.Player->Index,
-					unit.Type->DefaultName.empty() ?
-					unit.Type->GetDefaultVariation(*unit.Player) && !unit.Type->GetDefaultVariation(*unit.Player)->TypeName.empty() ? unit.Type->GetDefaultVariation(*unit.Player)->TypeName.c_str() : unit.Type->Name.c_str() :
-					unit.Type->DefaultName.c_str(),
+					(unit.Type->DefaultName.empty() ?
+					((unit.Type->VarInfo[unit.Variation] && !unit.Type->VarInfo[unit.Variation]->TypeName.empty()) ?
+					unit.Type->VarInfo[unit.Variation]->TypeName.c_str() : unit.Type->Name.c_str()) :
+					unit.Type->DefaultName.c_str()),
 					unit.Player->Index,
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
@@ -1895,9 +1896,15 @@ void CEditor::Init()
 		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
 
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();
+		//Wyrmgus start
+		const CTileset &tileset = *Map.Tileset;
+		//Wyrmgus end
 
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
+			//Wyrmgus start
+//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
+			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
+			//Wyrmgus end
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
 		CreateGame("", &Map);
@@ -2119,6 +2126,12 @@ void StartEditor(const char *filename)
 		// Map.Info.MapHeight = 64;
 	}
 
+	//Wyrmgus start
+	if (!TileToolRandom) {
+		TileToolRandom ^= 1;
+	}
+	//Wyrmgus end
+	
 	// Run the editor.
 	EditorMainLoop();
 

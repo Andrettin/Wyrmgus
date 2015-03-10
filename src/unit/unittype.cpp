@@ -791,7 +791,7 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player) const
 		}
 		return varinfo;
 	}
-	return this->VarInfo[VariationMax];
+	return this->VarInfo[VariationMax - 1];
 }
 //Wyrmgus end
 

@@ -189,37 +189,10 @@ static void DrawBuildingCursor()
 //	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 //				 CursorBuilding->StillFrame, screenPos);
 	// get the first variation which has the proper upgrades for this player (to have the proper appearance of buildings drawn in the cursor, according to the upgrades)
-	bool FoundVariation = false;
-	for (int i = 0; i < VariationMax; ++i) {
-		VariationInfo *varinfo = CursorBuilding->VarInfo[i];
-		if (!varinfo) {
-			continue;
-		}
-		bool UpgradesCheck = true;
-		for (int u = 0; u < VariationMax; ++u) {
-			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*ThisPlayer, varinfo->UpgradesRequired[u].c_str()) != 'R') {
-				UpgradesCheck = false;
-				break;
-			}
-			if (!varinfo->UpgradesForbidden[u].empty() && UpgradeIdentAllowed(*ThisPlayer, varinfo->UpgradesForbidden[u].c_str()) == 'R') {
-				UpgradesCheck = false;
-				break;
-			}
-		}
-		if (UpgradesCheck == false) {
-			continue;
-		}
-		FoundVariation = true;
-		if (varinfo->Sprite) {
-			DrawUnitType(*CursorBuilding, varinfo->Sprite, ThisPlayer->Index,
-					CursorBuilding->StillFrame, screenPos);
-		} else {
-			DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
-					CursorBuilding->StillFrame, screenPos);
-		}
-		break;
-	}
-	if (FoundVariation == false) {
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->Sprite) {
+		DrawUnitType(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->Sprite, ThisPlayer->Index,
+				CursorBuilding->StillFrame, screenPos);
+	} else {
 		DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 				CursorBuilding->StillFrame, screenPos);
 	}
