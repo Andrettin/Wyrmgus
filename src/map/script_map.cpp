@@ -524,6 +524,11 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	//Wyrmgus start
+	if (pos.x < 0 || pos.x >= Map.Info.MapWidth || pos.y < 0 || pos.y >= Map.Info.MapHeight) {
+		lua_pushboolean(l, 0);
+		return 1;
+	}
+	
 //	unsigned short flag = 0;
 	unsigned long flag = 0;
 	//Wyrmgus end
