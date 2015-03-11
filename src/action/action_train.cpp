@@ -81,7 +81,7 @@
 	}
 	file.printf("\"type\", \"%s\",", this->Type->Ident.c_str());
 	//Wyrmgus start
-	file.printf("\"player\", %d", this->Player);
+	file.printf("\"player\", %d,", this->Player);
 	//Wyrmgus end
 	file.printf("\"ticks\", %d", this->Ticks);
 	file.printf("}");
