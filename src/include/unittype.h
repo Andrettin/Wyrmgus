@@ -204,6 +204,10 @@ enum {
 	//Wyrmgus start
 	ITEM_INDEX,
 	MERCENARY_INDEX,
+	FAUNA_INDEX,
+	PREDATOR_INDEX,
+	SLIME_INDEX,
+	PEOPLEAVERSION_INDEX,
 	//Wyrmgus end
 	NBARALREADYDEFINED
 };
@@ -260,6 +264,7 @@ enum {
 	BACKSTAB_INDEX,
 	TRANSPARENCY_INDEX,
 	GENDER_INDEX,
+	BIRTHCYCLE_INDEX,
 	//Wyrmgus end
 	NVARALREADYDEFINED
 };
@@ -511,6 +516,7 @@ public:
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string DefaultName;		/// Default personal name of the unit type (used by heroes)
+	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	std::string PersonalNames[PersonalNameMax];	/// personal names
 	std::string PersonalNamePrefixes[PersonalNameMax];	/// personal name prefixes
 	std::string PersonalNameSuffixes[PersonalNameMax];	/// personal name suffixes
@@ -643,10 +649,8 @@ public:
 	unsigned NonSolid : 1;              /// Unit can be entered by other units.
 	unsigned Wall : 1;                  /// Use special logic for Direction field.
 	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
-	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
 	//Wyrmgus start
-	unsigned Item : 1;					/// Item
-	unsigned Mercenary : 1;				/// Mercenary
+//	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
 	//Wyrmgus end
 
 	CUnitStats DefaultStat;

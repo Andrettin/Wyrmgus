@@ -330,7 +330,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	}
 	if (goal != NULL) {
 		// extra backstab damage (only works against units (that are organic and non-building, and that have 8 facing directions) facing opposite to the attacker
-		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && goal->Type->Organic && !goal->Type->Building && goal->Type->NumDirections == 8) {
+		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) {
 			if (attacker.Direction == goal->Direction) {
 				damage_modifier += attacker.Variable[BACKSTAB_INDEX].Value;
 			} else if (goal->Direction == (attacker.Direction - 32) || goal->Direction == (attacker.Direction + 32) || (attacker.Direction == 0 && goal->Direction == 224) || (attacker.Direction == 224 && goal->Direction == 0)) {

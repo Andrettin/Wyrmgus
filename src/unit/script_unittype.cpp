@@ -51,6 +51,9 @@
 #include "unit.h"
 #include "unitsound.h"
 #include "unit_manager.h"
+//Wyrmgus start
+#include "upgrade.h"
+//Wyrmgus end
 #include "video.h"
 
 /*----------------------------------------------------------------------------
@@ -94,6 +97,10 @@ static const char ORGANIC_KEY[] = "organic";
 //Wyrmgus start
 static const char ITEM_KEY[] = "Item";
 static const char MERCENARY_KEY[] = "Mercenary";
+static const char FAUNA_KEY[] = "Fauna";
+static const char PREDATOR_KEY[] = "Predator";
+static const char SLIME_KEY[] = "Slime";
+static const char PEOPLEAVERSION_KEY[] = "PeopleAversion";
 //Wyrmgus end
 
 // names of the variable.
@@ -147,6 +154,7 @@ static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
 static const char BACKSTAB_KEY[] = "Backstab";
 static const char TRANSPARENCY_KEY[] = "Transparency";
 static const char GENDER_KEY[] = "Gender";
+static const char BIRTHCYCLE_KEY[] = "BirthCycle";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -165,7 +173,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY, MERCENARY_KEY
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY, MERCENARY_KEY,
+							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY
 	//Wyrmgus end
 							  };
 
@@ -192,7 +201,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 //							   PRIORITY_KEY
 							   PRIORITY_KEY,
 							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
-							   BACKSTAB_KEY, TRANSPARENCY_KEY, GENDER_KEY
+							   BACKSTAB_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY
 //Wyrmgus end
 							  };
 
@@ -365,10 +374,8 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[NONSOLID_INDEX].value              = type.NonSolid;
 	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
 	type.BoolFlag[NORANDOMPLACING_INDEX].value       = type.NoRandomPlacing;
-	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
 	//Wyrmgus start
-	type.BoolFlag[ITEM_INDEX].value                  = type.Item;
-	type.BoolFlag[MERCENARY_INDEX].value             = type.Mercenary;
+//	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
 	//Wyrmgus end
 }
 
@@ -746,12 +753,6 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Building")) {
 			type->Building = LuaToBoolean(l, -1);
-		//Wyrmgus start
-		} else if (!strcmp(value, "Item")) {
-			type->Item = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Mercenary")) {
-			type->Mercenary = LuaToBoolean(l, -1);
-		//Wyrmgus end
 		} else if (!strcmp(value, "VisibleUnderFog")) {
 			type->VisibleUnderFog = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BuildingRules")) {
@@ -1042,8 +1043,10 @@ static int CclDefineUnitType(lua_State *l)
 			type->Wall = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NoRandomPlacing")) {
 			type->NoRandomPlacing = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "organic")) {
-			type->Organic = LuaToBoolean(l, -1);
+		//Wyrmgus start
+//		} else if (!strcmp(value, "organic")) {
+//			type->Organic = LuaToBoolean(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "Sounds")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1207,9 +1210,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->SeaUnit = parent_type->SeaUnit;
 			type->AirUnit = parent_type->AirUnit;
 			type->Building = parent_type->Building;
-			type->Organic = parent_type->Organic;
-			type->Item = parent_type->Item;
-			type->Mercenary = parent_type->Mercenary;
 			type->VisibleUnderFog = parent_type->VisibleUnderFog;
 			type->Coward = parent_type->Coward;
 			type->DetectCloak = parent_type->DetectCloak;
@@ -1266,6 +1266,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
 			type->TrainQuantity = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ChildUpgrade")) {
+			type->ChildUpgrade = LuaToString(l, -1);
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
@@ -1627,10 +1629,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushboolean(l, type->Building);
 		return 1;
 	} else if (!strcmp(data, "Item")) {
-		lua_pushboolean(l, type->Item);
+		lua_pushboolean(l, type->BoolFlag[ITEM_INDEX].value);
 		return 1;
 	} else if (!strcmp(data, "Mercenary")) {
-		lua_pushboolean(l, type->Mercenary);
+		lua_pushboolean(l, type->BoolFlag[MERCENARY_INDEX].value);
 		return 1;
 	} else if (!strcmp(data, "LandUnit")) {
 		lua_pushboolean(l, type->LandUnit);
@@ -1647,7 +1649,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushboolean(l, type->SelectableByRectangle);
 		return 1;
 	} else if (!strcmp(data, "organic")) {
-		lua_pushboolean(l, type->Organic);
+		lua_pushboolean(l, type->BoolFlag[ORGANIC_INDEX].value);
 		return 1;
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
@@ -1981,7 +1983,7 @@ void UpdateUnitVariables(CUnit &unit)
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
 			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == ACCURACY_INDEX || i == EVASION_INDEX
 			|| i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
-			|| i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX) {
+			|| i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -2003,10 +2005,16 @@ void UpdateUnitVariables(CUnit &unit)
 
 	unit.Variable[LEVELUP_INDEX].Max = 255;
 
-	unit.Variable[GENDER_INDEX].Max = 2;
-	if (unit.Variable[GENDER_INDEX].Value == 0 && unit.Type->Organic) { // Gender: 0 = Not Set, 1 = Male, 2 = Female
+	unit.Variable[GENDER_INDEX].Enable = 1;
+	unit.Variable[GENDER_INDEX].Max = 10;
+	if (unit.Variable[GENDER_INDEX].Value == 0 && unit.Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
 		unit.Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
 		unit.Variable[GENDER_INDEX].Enable = 1;
+	}
+	
+	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
+		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
+		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->ChildUpgrade));
 	}
 	//Wyrmgus end
 

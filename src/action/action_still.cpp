@@ -50,6 +50,9 @@
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"
+//Wyrmgus start
+#include "upgrade.h"
+//Wyrmgus end
 #include "video.h"
 
 enum {
@@ -182,7 +185,7 @@ static bool MoveRandomly(CUnit &unit)
 		if (UnitCanBeAt(unit, pos)) {
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
-			if (unit.Type->Class != "vermin") {
+			if (unit.Type->BoolFlag[PEOPLEAVERSION_INDEX].value) {
 				std::vector<CUnit *> table;
 				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 				if (!table.size()) { //only avoid going near a settled area if isn't already surrounded by civilizations' units
@@ -218,23 +221,41 @@ static bool MoveRandomly(CUnit &unit)
 */
 static bool Breed(CUnit &unit)
 {
-	if (unit.Type->Organic == false
-		|| unit.Player->Type != PlayerNeutral || !unit.Type->Civilization.empty() //only for fauna
+	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
+		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value //only for fauna
 		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
 		|| ((SyncRand() % 200) >= 1)) {
 		return false;
 	}
 
-	// look for an adjacent unit of the same type
-	std::vector<CUnit *> table;
-	SelectAroundUnit(unit, 1, table, HasSamePlayerAndTypeAs(unit));
+	if (unit.LearnedAbilities[CUpgrade::Get(unit.Type->ChildUpgrade)->ID]) { //children can't reproduce
+		return false;
+	}
+	
+	if (unit.Variable[GENDER_INDEX].Value == 1 || unit.Variable[GENDER_INDEX].Value == 2) { //if is male or female, check if has a potential mate nearby
+		// look for an adjacent unit of the same type
+		std::vector<CUnit *> table;
+		SelectAroundUnit(unit, 1, table, HasSamePlayerAndTypeAs(unit));
 
-	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->Variable[GENDER_INDEX].Value != unit.Variable[GENDER_INDEX].Value) {
-			CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
-			DropOutOnSide(*newUnit, LookingW, &unit);
-			return true;
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (table[i]->Variable[GENDER_INDEX].Value != unit.Variable[GENDER_INDEX].Value) {
+				CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
+				DropOutOnSide(*newUnit, LookingW, &unit);
+				newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
+				newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
+				newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
+				IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
+				return true;
+			}
 		}
+	} else if (unit.Variable[GENDER_INDEX].Value == 3 && (SyncRand() % 5) < 1) { //if is asexual (like slimes), reproduce endogenously (with a lower chance than normal reproduction
+		CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
+		DropOutOnSide(*newUnit, LookingW, &unit);
+		newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
+		newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
+		newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
+		IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
+		return true;
 	}
 	return false;
 }

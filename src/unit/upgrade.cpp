@@ -1009,7 +1009,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void ApplyAbilityModifier(CUnit &unit, const CUpgradeModifier *um)
+static void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 {
 	Assert(um);
 
@@ -1045,6 +1045,83 @@ static void ApplyAbilityModifier(CUnit &unit, const CUpgradeModifier *um)
 		bool ForbiddenUpgrade = false;
 		for (int u = 0; u < VariationMax; ++u) {
 			if (!current_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesForbidden[u])->ID) {
+				ForbiddenUpgrade = true;
+				break;
+			}
+		}
+		if (ForbiddenUpgrade == true) {
+			int TypeVariationCount = 0;
+			int LocalTypeVariations[VariationMax];
+			for (int i = 0; i < VariationMax; ++i) {
+				VariationInfo *varinfo = unit.Type->VarInfo[i];
+				if (!varinfo) {
+					continue;
+				}
+				bool UpgradesCheck = true;
+				for (int u = 0; u < VariationMax; ++u) {
+					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+						UpgradesCheck = false;
+						break;
+					}
+					if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+						UpgradesCheck = false;
+						break;
+					}
+				}
+				if (UpgradesCheck == false) {
+					continue;
+				}
+				if (varinfo->VariationId == current_varinfo->VariationId) { // if this variation has the same ident as the one incompatible with this upgrade, choose it automatically
+					unit.Variation = i;
+					TypeVariationCount = 0;
+					break;
+				}
+				LocalTypeVariations[TypeVariationCount] = i;
+				TypeVariationCount += 1;
+			}
+			if (TypeVariationCount > 0) {
+				unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+			}
+		}
+	}
+}
+
+static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
+{
+	Assert(um);
+
+	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
+		if (!unit.Removed) {
+			MapUnmarkUnitSight(unit);
+			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value -
+									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+			MapMarkUnitSight(unit);
+		}
+	}
+
+	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
+		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
+		if (um->ModifyPercent[j]) {
+			unit.Variable[j].Value = unit.Variable[j].Value * 100 / (100 + um->ModifyPercent[j]);
+			unit.Variable[j].Max = unit.Variable[j].Max * 100 / (100 + um->ModifyPercent[j]);
+		} else {
+			unit.Variable[j].Value -= um->Modifier.Variables[j].Value;
+			unit.Variable[j].Increase -= um->Modifier.Variables[j].Increase;
+		}
+		unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
+		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
+		if (unit.Variable[j].Max > 0) {
+			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+		}
+
+	}
+	
+	//change variation if current one becomes forbidden
+	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
+	if (current_varinfo) {
+		bool ForbiddenUpgrade = false;
+		for (int u = 0; u < VariationMax; ++u) {
+			if (!current_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesRequired[u])->ID) {
 				ForbiddenUpgrade = true;
 				break;
 			}
@@ -1185,7 +1262,7 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade)
 
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
-			ApplyAbilityModifier(unit, UpgradeModifiers[z]);
+			ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
 		}
 	}
 
@@ -1206,8 +1283,48 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 	if (!GameSettings.NoRandomness || !unit.Type->DefaultName.empty()) { // if in no randomness setting, only apply trait modifiers if the unit is a hero
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (UpgradeModifiers[z]->UpgradeId == id) {
-				ApplyAbilityModifier(unit, UpgradeModifiers[z]);
+				ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
 			}
+		}
+	}
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (unit.Player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+}
+
+void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
+{
+	int id = upgrade->ID;
+	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
+	unit.LearnedAbilities[id] = true;	// learning done
+
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == id) {
+			ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
+		}
+	}
+
+	//
+	//  Upgrades could change the buttons displayed.
+	//
+	if (unit.Player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+}
+
+void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
+{
+	int id = upgrade->ID;
+	unit.Player->UpgradeTimers.Upgrades[id] = 0;
+	unit.LearnedAbilities[id] = false;	// learning undone
+
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == id) {
+			RemoveIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
 		}
 	}
 

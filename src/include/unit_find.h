@@ -147,7 +147,7 @@ public:
 class IsOrganicType : public CUnitFilter
 {
 public:
-	bool operator()(const CUnit *unit) const { return unit->Type->Organic; }
+	bool operator()(const CUnit *unit) const { return unit->Type->BoolFlag[ORGANIC_INDEX].value; }
 };
 //Wyrmgus end
 

@@ -636,9 +636,9 @@ CUnitType::CUnitType() :
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
 	Indestructible(0), Teleporter(0), SaveCargo(0),
-	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
 	//Wyrmgus start
-	Item(0), Mercenary(0),
+//	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
+	NonSolid(0), Wall(0), NoRandomPlacing(0),
 	//Wyrmgus end
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	Sprite(NULL), ShadowSprite(NULL)
@@ -889,7 +889,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.FieldFlags = MapFieldNoBuilding;
 		}
 	//Wyrmgus start
-	} else if (type.Item) {
+	} else if (type.BoolFlag[ITEM_INDEX].value) {
 		type.MovementMask = MapFieldLandUnit |
 							MapFieldSeaUnit |
 							MapFieldBuilding |

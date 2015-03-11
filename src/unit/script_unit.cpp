@@ -1265,6 +1265,11 @@ static int CclSetUnitVariable(lua_State *l)
 	if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
+	//Wyrmgus start
+	} else if (!strcmp(name, "Variation")) {
+		unit->Variation = LuaToNumber(l, 3);
+		unit->Variable[VARIATION_INDEX].Value = unit->Variation;
+	//Wyrmgus end
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
 		if (index == -1) {

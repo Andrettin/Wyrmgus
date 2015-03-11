@@ -520,7 +520,7 @@ void CUnit::GeneratePersonalName()
 				Name += type.PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
 			}
 		}
-	} else if (type.Organic && !type.Civilization.empty() && (!PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty() || !PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty())) {
+	} else if (type.BoolFlag[ORGANIC_INDEX].value && !type.Civilization.empty() && (!PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty() || !PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty())) {
 		int PersonalNameCount = 0;
 		int PersonalNamePrefixCount = 0;
 		int PersonalNameSuffixCount = 0;
@@ -889,7 +889,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	
 	//Wyrmgus start
 	// make mercenary units only be available once per match
-	if (type.Mercenary) {
+	if (type.BoolFlag[MERCENARY_INDEX].value) {
 		for (int p = 0; p < PlayerMax; ++p) {
 			AllowUnitId(Players[p], type.Slot, 0);
 		}
@@ -2384,17 +2384,22 @@ CUnit *UnitOnScreen(int x, int y)
 		// Check if mouse is over the unit.
 		//
 		PixelPos unitSpritePos = unit.GetMapPixelPosCenter();
-		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
-						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
-		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
-						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		//Wyrmgus start
+//		unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
+//						  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
+//		unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
+//						  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		VariationInfo *varinfo = type.VarInfo[unit.Variation];
 		if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight && !varinfo->File.empty()) {
 			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
 							  (varinfo->FrameWidth - varinfo->Sprite->Width) / 2 + type.BoxOffsetX;
 			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
 							  (varinfo->FrameHeight - varinfo->Sprite->Height) / 2 + type.BoxOffsetY;
+		} else {
+			unitSpritePos.x = unitSpritePos.x - type.BoxWidth / 2 -
+							  (type.Width - type.Sprite->Width) / 2 + type.BoxOffsetX;
+			unitSpritePos.y = unitSpritePos.y - type.BoxHeight / 2 -
+							  (type.Height - type.Sprite->Height) / 2 + type.BoxOffsetY;
 		}
 		//Wyrmgus end
 		if (x >= unitSpritePos.x && x < unitSpritePos.x + type.BoxWidth
@@ -3236,11 +3241,11 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 {
 	//Wyrmgus start
 //	return IsEnemy(*unit.Player);
-	if (this->Player->Type == PlayerNeutral && this->Type->Civilization.empty() && this->Type->Organic && this->Type->Class == "predator" && unit.Type->Class != "predator" && unit.Type->Class != "slime" && unit.Type->Organic && this->Type != unit.Type) {
+	if (this->Player->Type == PlayerNeutral && this->Type->BoolFlag[FAUNA_INDEX].value && this->Type->BoolFlag[ORGANIC_INDEX].value && this->Type->BoolFlag[PREDATOR_INDEX].value && !unit.Type->BoolFlag[PREDATOR_INDEX].value && !unit.Type->BoolFlag[SLIME_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && this->Type != unit.Type) {
 		return true;
-	} else if (unit.Player->Type == PlayerNeutral && unit.Type->Civilization.empty() && unit.Type->Organic && unit.Type->Class == "predator" && this->Type->Class != "predator" && this->Player->Type != PlayerNeutral && this->Type != unit.Type) {
+	} else if (unit.Player->Type == PlayerNeutral && unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->BoolFlag[PREDATOR_INDEX].value && !this->Type->BoolFlag[PREDATOR_INDEX].value && this->Player->Type != PlayerNeutral && this->Type != unit.Type) {
 		return true;
-	} else if (this->Player->Type == PlayerNeutral && this->Type->Civilization.empty() && this->Type->Organic && (this->Type->Class == "grazer" || this->Type->Class == "slime") && unit.Type->Organic && unit.Player->Type != PlayerNeutral && this->Type != unit.Type && this->MapDistanceTo(unit) <= 1) {
+	} else if (this->Player->Type == PlayerNeutral && this->Type->BoolFlag[FAUNA_INDEX].value && this->Type->BoolFlag[ORGANIC_INDEX].value && this->Type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Player->Type != PlayerNeutral && this->Type != unit.Type && this->MapDistanceTo(unit) <= 1) {
 		return true;
 	} else {
 		return IsEnemy(*unit.Player);
