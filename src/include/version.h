@@ -38,7 +38,4 @@
 #define LICENSE "GPL v2"
 
 /// Copyright
-//Wyrmgus start
-//#define COPYRIGHT "Copyright (c) 1998-2015 by The Stratagus Project"
-#define COPYRIGHT "Stratagus Copyright (c) 1998-2015 by The Stratagus Project"
-//Wyrmgus end
+#define COPYRIGHT "Copyright (c) 1998-2015 by The Stratagus Project"

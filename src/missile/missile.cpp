@@ -420,7 +420,10 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 		return true;
 	}
 	
-	int accuracy = SyncRand(attacker.Variable[ACCURACY_INDEX].Value);
+	int accuracy = 0;
+	if (attacker.Variable[ACCURACY_INDEX].Value) {
+		accuracy = SyncRand(attacker.Variable[ACCURACY_INDEX].Value);
+	}
 	if (accuracy == 0) {
 		return false;
 	} else {

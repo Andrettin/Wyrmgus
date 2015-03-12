@@ -279,7 +279,7 @@ namespace gcn
         if (hasMouse() && getTooltip() != "") //if mouse is hovering the button, show tooltip
         {
 			CLabel label(GetGameFont());
-			label.Draw(2 + 176, Video.Height + 2 - 16, getTooltip());
+			label.Draw(2 + 16, Video.Height + 2 - 16, getTooltip());
         }
     }
     //Wyrmgus end
