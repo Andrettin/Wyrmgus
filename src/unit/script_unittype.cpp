@@ -1566,6 +1566,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, type->DefaultStat.Costs[resId]);
 		return 1;
+	} else if (!strcmp(data, "ChildUpgrade")) {
+		lua_pushstring(l, type->ChildUpgrade.c_str());
+		return 1;
 	} else if (!strcmp(data, "TechnologyPointCost")) {
 		lua_pushnumber(l, type->TechnologyPointCost);
 		return 1;

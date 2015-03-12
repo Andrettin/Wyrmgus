@@ -468,6 +468,24 @@ static int CclAcquireTrait(lua_State *l)
 	}
 	return 0;
 }
+
+/**
+** Add an individual upgrade to the unit
+*/
+static int CclAcquireIndividualUpgrade(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	lua_pushvalue(l, 1);
+	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
+	lua_pop(l, 1);
+	const char *ident = LuaToString(l, 2);
+	if (!strncmp(ident, "upgrade-", 8)) {
+		IndividualUpgradeAcquire(*unit, CUpgrade::Get(ident));
+	} else {
+		DebugPrint(" wrong ident %s\n" _C_ ident);
+	}
+	return 0;
+}
 //Wyrmgus end
 
 /**
@@ -481,6 +499,7 @@ void UpgradesCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "AcquireAbility", CclAcquireAbility);
 	lua_register(Lua, "AcquireTrait", CclAcquireTrait);
+	lua_register(Lua, "AcquireIndividualUpgrade", CclAcquireIndividualUpgrade);
 	//Wyrmgus end
 }
 

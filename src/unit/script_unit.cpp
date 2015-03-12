@@ -40,6 +40,7 @@
 #include "animation.h"
 #include "commands.h"
 #include "construct.h"
+#include "interface.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -128,7 +129,16 @@ static int CclResourcesMultiBuildersMultiplier(lua_State *l)
 */
 static CUnit *CclGetUnit(lua_State *l)
 {
-	return &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
+	int num = LuaToNumber(l, -1);
+	if (num == -1) {
+		if (!Selected.empty()) {
+			return Selected[0];
+		} else if (UnitUnderCursor) {
+			return UnitUnderCursor;
+		}
+		return NULL;
+	}
+	return &UnitManager.GetSlotUnit(num);
 }
 
 /**
@@ -1207,7 +1217,15 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Type->Ident.c_str());
 	} else if (!strcmp(value, "ResourcesHeld")) {
 		lua_pushnumber(l, unit->ResourcesHeld);
+	} else if (!strcmp(value, "GiveResourceType")) {
+		lua_pushnumber(l, unit->Type->GivesResource);
+	} else if (!strcmp(value, "CurrentResource")) {
+		lua_pushnumber(l, unit->CurrentResource);
 	//Wyrmgus start
+	} else if (!strcmp(value, "GiveResourceTypeName")) {
+		lua_pushstring(l, DefaultResourceNames[unit->Type->GivesResource].c_str());
+	} else if (!strcmp(value, "CurrentResourceName")) {
+		lua_pushstring(l, DefaultResourceNames[unit->CurrentResource].c_str());
 	} else if (!strcmp(value, "TypeName")) {
 		VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
 		if (varinfo && !varinfo->TypeName.empty()) {
