@@ -408,6 +408,8 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 
 	if (this->Index != -1) {
 		CUnitType &type = *UnitTypes[button.Value];
+		//Wyrmgus start
+		/*
 		int value = type.DefaultStat.Variables[this->Index].Value;
 		int diff = type.Stats[ThisPlayer->Index].Variables[this->Index].Value - value;
 
@@ -418,6 +420,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			snprintf(buf, sizeof(buf), diff > 0 ? "%d~<+%d~>" : "%d~<-%d~>", value, diff);
 			label.Draw(x, y, buf);
 		}
+		*/
+		int value = type.Stats[ThisPlayer->Index].Variables[this->Index].Value;
+		label.Draw(x, y, value);
+		//Wyrmgus end
 	}
 }
 
