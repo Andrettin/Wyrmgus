@@ -320,6 +320,8 @@ class Button : public Widget
 	//Wyrmgus start
 	virtual void setTooltip(const std::string tooltip);
 	virtual const std::string &getTooltip() const;
+	virtual void setActsPressed(bool actsPressed);
+	virtual bool actsPressed() const;
 	//Wyrmgus end
 };
 

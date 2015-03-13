@@ -90,6 +90,9 @@ namespace gcn
         mMouseDown = false;
         mKeyDown = false;
         mHotKeyDown = false;
+        //Wyrmgus start
+        mActsPressed = false;
+        //Wyrmgus end
 
         addMouseListener(this);
         addKeyListener(this);
@@ -125,6 +128,16 @@ namespace gcn
     const std::string& Button::getTooltip() const
     {
         return mTooltip;
+    }
+
+    void Button::setActsPressed(bool actsPressed)
+    {
+        mActsPressed = actsPressed;
+    }
+
+    bool Button::actsPressed() const
+    {
+        return mActsPressed;
     }
     //Wyrmgus end
 
@@ -292,10 +305,17 @@ namespace gcn
         {
             mKeyDown = true;
             ret = true;
+			//Wyrmgus start
+			if (actsPressed()) //generate an action if it is pressed (held down)
+			{
+				generateAction();
+			}
+			//Wyrmgus end
         }
 
         mHotKeyDown = false;
         mMouseDown = false;
+
         return ret;
     }
 
@@ -316,6 +336,12 @@ namespace gcn
     {
         mHotKeyDown = true;
         mMouseDown = false;
+		//Wyrmgus start
+		if (actsPressed()) //generate an action if it is pressed (held down)
+		{
+			generateAction();
+		}
+		//Wyrmgus end
     }
 
     void Button::hotKeyRelease()

@@ -130,6 +130,20 @@ namespace gcn
          * @return the Button tooltip.
          */
         virtual const std::string& getTooltip() const;
+
+        /**
+         * Sets whether the Button continuously generates an action while pressed.
+         *
+         * @param bool.
+         */
+        virtual void setActsPressed(bool actsPressed);
+
+        /**
+         * Gets whether the Button generates an action just by being pressed.
+         *
+         * @return true or false.
+         */
+        virtual bool actsPressed() const;
 		//Wyrmgus end
 
         /**
@@ -181,6 +195,9 @@ namespace gcn
         std::string mTooltip;
         //Wyrmgus end
         bool mMouseDown, mKeyDown, mHotKeyDown;
+        //Wyrmgus start
+        bool mActsPressed;
+        //Wyrmgus end
         unsigned int mAlignment;
     };
 }
