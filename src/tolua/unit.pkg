@@ -30,9 +30,7 @@ class CPreference
 	bool StereoSound;
 	bool MineNotifications;
 	bool DeselectInMine;
-	//Wyrmgus start
 	bool NoStatusLineTooltips;
-	//Wyrmgus end
 
 	unsigned int ShowOrders;
 	unsigned int  ShowNameDelay;
