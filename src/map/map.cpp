@@ -614,13 +614,24 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		mf.setGraphicTile(this->Tileset->getBottomOneTreeTile());
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		//Wyrmgus start
+		mf.playerInfo.SeenTile = mf.getGraphicTile(); //FIXME: a better solution should be sought to fix the issue with seen tiles from regrown forests not updating (changing MarkSeenTile itself, for instance
+		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
+		//Wyrmgus end
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			MarkSeenTile(mf);
 		}
 		const Vec2i offset(0, -1);
 		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(mf);
+			//Wyrmgus start
+//			MarkSeenTile(mf);
+			MarkSeenTile(topMf);
+			//Wyrmgus end
 		}
+		//Wyrmgus start
+		FixNeighbors(MapFieldForest, 1, pos);
+		FixNeighbors(MapFieldForest, 1, pos + offset);
+		//Wyrmgus end
 	}
 }
 
