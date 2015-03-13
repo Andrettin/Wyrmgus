@@ -326,7 +326,13 @@ namespace gcn
         if ((key.getValue() == Key::K_ENTER || key.getValue() == Key::K_SPACE) && mKeyDown)
         {
             mKeyDown = false;
-            generateAction();
+			//Wyrmgus start
+//            generateAction();		
+			if (!actsPressed()) //generate an action if it is pressed (held down)
+			{
+				generateAction();
+			}
+			//Wyrmgus end
             ret = true;
         }
         return ret;
@@ -349,7 +355,13 @@ namespace gcn
         if (mHotKeyDown)
         {
             mHotKeyDown = false;
-            generateAction();
+			//Wyrmgus start
+//            generateAction();		
+			if (!actsPressed()) //generate an action if it is pressed (held down)
+			{
+				generateAction();
+			}
+			//Wyrmgus end
         }
     }
 
