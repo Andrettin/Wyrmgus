@@ -360,6 +360,22 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 				if (goal->Variable[EVASION_INDEX].Value > 0) {
 					damage += attacker.Variable[ACCURACY_INDEX].Value;
 					damage -= goal->Variable[EVASION_INDEX].Value;
+					
+					if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building) { //flanking
+						std::vector<CUnit *> table;
+						SelectAroundUnit(*goal, 1, table, MakeAndPredicate(HasSamePlayerAs(*attacker.Player), IsNotBuildingType()));
+
+						Vec2i attacker_pos = attacker.tilePos;
+						for (size_t i = 0; i != table.size(); ++i) {
+							Vec2i flanker_pos = table[i]->tilePos;
+							
+							if ((flanker_pos.x == (attacker_pos.x - 2) && flanker_pos.y == attacker_pos.y) || (flanker_pos.x == (attacker_pos.x + 2) && flanker_pos.y == attacker_pos.y) || (flanker_pos.x == attacker_pos.x && flanker_pos.y == (attacker_pos.y - 2)) || (flanker_pos.x == attacker_pos.x && flanker_pos.y == (attacker_pos.y + 2))) {
+								if (table[i]->Direction == (attacker.Direction - 128) || table[i]->Direction == (attacker.Direction + 128) || (attacker.Direction == 0 && table[i]->Direction == 128) || (attacker.Direction == 128 && table[i]->Direction == 0)) {
+									damage += 2;
+								}
+							}
+						}
+					}					
 				}
 			} else {
 				if (goal_stats.Variables[EVASION_INDEX].Value > 0) {
@@ -427,14 +443,33 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 	if (accuracy == 0) {
 		return false;
 	} else {
+		int evasion = 0;
 		if (goal != NULL) {
-			if (goal->Variable[EVASION_INDEX].Value > 0 && accuracy < SyncRand(goal->Variable[EVASION_INDEX].Value)) {
-				return false;
+			if (goal->Variable[EVASION_INDEX].Value) {
+				evasion = SyncRand(goal->Variable[EVASION_INDEX].Value);
+			}
+			if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building) { //flanking
+				std::vector<CUnit *> table;
+				SelectAroundUnit(*goal, 1, table, MakeAndPredicate(HasSamePlayerAs(*attacker.Player), IsNotBuildingType()));
+
+				Vec2i attacker_pos = attacker.tilePos;
+				for (size_t i = 0; i != table.size(); ++i) {
+					Vec2i flanker_pos = table[i]->tilePos;
+					
+					if ((flanker_pos.x == (attacker_pos.x - 2) && flanker_pos.y == attacker_pos.y) || (flanker_pos.x == (attacker_pos.x + 2) && flanker_pos.y == attacker_pos.y) || (flanker_pos.x == attacker_pos.x && flanker_pos.y == (attacker_pos.y - 2)) || (flanker_pos.x == attacker_pos.x && flanker_pos.y == (attacker_pos.y + 2))) {
+						if (table[i]->Direction == (attacker.Direction - 128) || table[i]->Direction == (attacker.Direction + 128) || (attacker.Direction == 0 && table[i]->Direction == 128) || (attacker.Direction == 128 && table[i]->Direction == 0)) {
+							evasion -= 2;
+						}
+					}
+				}
 			}
 		} else {
-			if (goal_stats.Variables[EVASION_INDEX].Value > 0 && accuracy < SyncRand(goal_stats.Variables[EVASION_INDEX].Value)) {
-				return false;
+			if (goal_stats.Variables[EVASION_INDEX].Value > 0) {
+				evasion = SyncRand(goal_stats.Variables[EVASION_INDEX].Value);
 			}
+		}
+		if (evasion > 0 && accuracy < evasion) {
+			return false;
 		}
 	}
 

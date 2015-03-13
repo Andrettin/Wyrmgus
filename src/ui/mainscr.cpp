@@ -178,17 +178,17 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		} else if (f > 50) {
 			color = ColorYellow;
 			//Wyrmgus start
-			lighter_color = ColorYellow;
+			lighter_color = Video.MapRGB(TheScreen->format, 255, 255, 210);
 			//Wyrmgus end
 		} else if (f > 25) {
 			color = ColorOrange;
 			//Wyrmgus start
-			lighter_color = ColorOrange;
+			lighter_color = Video.MapRGB(TheScreen->format, 255, 180, 90);
 			//Wyrmgus end
 		} else {
 			color = ColorRed;
 			//Wyrmgus start
-			lighter_color = ColorRed;
+			lighter_color = Video.MapRGB(TheScreen->format, 255, 100, 100);
 			//Wyrmgus end
 		}
 
