@@ -911,7 +911,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 
 	// Find and send to resource deposit.
 	CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
-	if (!depot || !unit.ResourcesHeld) {
+	if (!depot || !unit.ResourcesHeld || this->Finished) {
 		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
 			Assert(unit.Container);
 			DropOutOnSide(unit, LookingW, source);
@@ -956,14 +956,6 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	CPlayer &player = *unit.Player;
 	Assert(&goal);
 
-	//Wyrmgus start
-	/*
-	if (this->Finished) {
-		return 0; // Could happen when mining near to depot
-	}
-	*/
-	//Wyrmgus end
-	
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			return -1;

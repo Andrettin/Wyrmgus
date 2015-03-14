@@ -115,7 +115,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->MinRange = attacker.Type->MinAttackRange;
 
 	//Wyrmgus start
-	if (!target.IsEnemy(attacker) && (target.Player->Type == PlayerComputer || target.Player->Type == PlayerPerson) && (attacker.Player->Type == PlayerComputer || attacker.Player->Type == PlayerPerson)) {
+	if (!target.IsEnemy(attacker) && (target.Player->Type == PlayerComputer) && (attacker.Player->Type == PlayerComputer || attacker.Player->Type == PlayerPerson)) {
 		target.Player->SetDiplomacyEnemyWith(*attacker.Player);
 		attacker.Player->SetDiplomacyEnemyWith(*target.Player);
 	}
