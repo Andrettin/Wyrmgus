@@ -310,6 +310,9 @@ enum _message_type_ {
 	MessageCommandCancelTrain,     /// Unit command cancel training
 	MessageCommandUpgrade,         /// Unit command upgrade
 	MessageCommandCancelUpgrade,   /// Unit command cancel upgrade
+	//Wyrmgus start
+	MessageCommandTransform,         /// Unit command transform
+	//Wyrmgus end
 	MessageCommandResearch,        /// Unit command research
 	MessageCommandCancelResearch,  /// Unit command cancel research
 

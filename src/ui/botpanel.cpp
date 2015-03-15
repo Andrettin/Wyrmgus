@@ -140,6 +140,9 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 			case ButtonLearnAbility:
 				ba->Value = UpgradeIdByIdent(value);
 				break;
+			case ButtonExperienceUpgradeTo:
+				ba->Value = UnitTypeIdByIdent(value);
+				break;
 			//Wyrmgus end
 			case ButtonUpgradeTo:
 				ba->Value = UnitTypeIdByIdent(value);
@@ -842,6 +845,9 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 	switch (button.Action) {
 		case ButtonBuild:
 		case ButtonTrain:
+		//Wyrmgus start
+		case ButtonExperienceUpgradeTo:
+		//Wyrmgus end
 		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
 			//Wyrmgus start
@@ -950,6 +956,12 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			}
 			break;
 		//Wyrmgus start
+		case ButtonExperienceUpgradeTo:
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
+			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
+				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			}
+			break;
 		case ButtonLearnAbility:
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
@@ -1377,6 +1389,26 @@ void CButtonPanel::DoClicked_UpgradeTo(int button)
 	}
 }
 
+//Wyrmgus start
+void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
+{
+	// FIXME: store pointer in button table!
+	CUnitType &type = *UnitTypes[CurrentButtons[button].Value];
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->CheckLimits(type) != -6) { //ugly way to make the checklimits message only appear when it should
+			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
+				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
+				SendCommandTransformInto(*Selected[i], type, !(KeyModifiers & ModifierShift));
+				UI.StatusLine.Clear();
+				UI.StatusLine.ClearCosts();
+			}
+		} else {
+			break;
+		}
+	}
+}
+//Wyrmgus end
+
 void CButtonPanel::DoClicked_Research(int button)
 {
 	const int index = CurrentButtons[button].Value;
@@ -1442,6 +1474,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonResearch: { DoClicked_Research(button); break; }
 		//Wyrmgus start
 		case ButtonLearnAbility: { DoClicked_Research(button); break; }
+		case ButtonExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
 		//Wyrmgus end
 	}
 }

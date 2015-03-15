@@ -174,6 +174,10 @@ extern void SendCommandCancelTraining(CUnit &unit, int slot, const CUnitType *ty
 extern void SendCommandUpgradeTo(CUnit &unit, CUnitType &what, int flush);
 /// Send cancel upgrade to command
 extern void SendCommandCancelUpgradeTo(CUnit &unit);
+//Wyrmgus start
+/// Send transform into command
+extern void SendCommandTransformInto(CUnit &unit, CUnitType &what, int flush);
+//Wyrmgus end
 /// Send research command
 extern void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush);
 /// Send cancel research command

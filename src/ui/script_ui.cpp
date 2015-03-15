@@ -962,6 +962,8 @@ static int CclDefineButton(lua_State *l)
 			//Wyrmgus start
 			} else if (!strcmp(value, "learn-ability")) {
 				ba.Action = ButtonLearnAbility;
+			} else if (!strcmp(value, "experience-upgrade-to")) {
+				ba.Action = ButtonExperienceUpgradeTo;
 			//Wyrmgus end
 			} else if (!strcmp(value, "upgrade-to")) {
 				ba.Action = ButtonUpgradeTo;

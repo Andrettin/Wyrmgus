@@ -74,6 +74,7 @@ enum ButtonCmd {
 	ButtonResearch,       /// order reseach
 	//Wyrmgus start
 	ButtonLearnAbility,   /// order learn ability
+	ButtonExperienceUpgradeTo,   /// order upgrade (experience)
 	//Wyrmgus end
 	ButtonUpgradeTo,      /// order upgrade
 	ButtonCancel,         /// cancel

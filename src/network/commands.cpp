@@ -417,6 +417,25 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 	}
 }
 
+//Wyrmgus start
+/**
+** Send command: Building starts upgrading to.
+**
+** @param unit     pointer to unit.
+** @param what     pointer to unit-type of the unit upgrade.
+** @param flush    Flag flush all pending commands.
+*/
+void SendCommandTransformInto(CUnit &unit, CUnitType &what, int flush)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("transform-into", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+		CommandTransformIntoType(unit, what);
+	} else {
+		NetworkSendCommand(MessageCommandTransform, unit, 0, 0, NoUnitP, &what, flush);
+	}
+}
+//Wyrmgus end
+
 /**
 ** Send command: Building/unit research.
 **
@@ -735,6 +754,13 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 			CommandCancelUpgradeTo(unit);
 			break;
+		//Wyrmgus start
+		case MessageCommandTransform:
+			CommandLog("transform-into", &unit, status, -1, -1, NoUnitP,
+					   UnitTypes[dstnr]->Ident.c_str(), -1);
+			CommandTransformIntoType(unit, *UnitTypes[dstnr]);
+			break;
+		//Wyrmgus end
 		case MessageCommandResearch:
 			CommandLog("research", &unit, status, -1, -1, NoUnitP,
 					   AllUpgrades[arg1]->Ident.c_str(), -1);

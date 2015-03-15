@@ -911,6 +911,10 @@ static void DoNextReplay()
 		SendCommandUpgradeTo(*unit, *UnitTypeByIdent(val), flags);
 	} else if (!strcmp(action, "cancel-upgrade-to")) {
 		SendCommandCancelUpgradeTo(*unit);
+	//Wyrmgus start
+	} else if (!strcmp(action, "transform-into")) {
+		SendCommandTransformInto(*unit, *UnitTypeByIdent(val), flags);
+	//Wyrmgus end
 	} else if (!strcmp(action, "research")) {
 		SendCommandResearch(*unit, *CUpgrade::Get(val), flags);
 	} else if (!strcmp(action, "cancel-research")) {
