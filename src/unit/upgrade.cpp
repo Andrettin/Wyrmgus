@@ -778,7 +778,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								if (UpgradesCheck == false) {
 									continue;
 								}
-								if (varinfo->VariationId == current_varinfo->VariationId) { // if this variation has the same ident as the one incompatible with this upgrade, choose it automatically
+								if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
 									unit.Variation = i;
 									TypeVariationCount = 0;
 									break;
@@ -995,7 +995,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								if (UpgradesCheck == false) {
 									continue;
 								}
-								if (varinfo->VariationId == current_varinfo->VariationId) { // if this variation has the same ident as the one incompatible with this upgrade, choose it automatically
+								if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
 									unit.Variation = i;
 									TypeVariationCount = 0;
 									break;
@@ -1090,7 +1090,7 @@ static void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *
 				if (UpgradesCheck == false) {
 					continue;
 				}
-				if (varinfo->VariationId == current_varinfo->VariationId) { // if this variation has the same ident as the one incompatible with this upgrade, choose it automatically
+				if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
 					unit.Variation = i;
 					TypeVariationCount = 0;
 					break;
@@ -1167,7 +1167,7 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 				if (UpgradesCheck == false) {
 					continue;
 				}
-				if (varinfo->VariationId == current_varinfo->VariationId) { // if this variation has the same ident as the one incompatible with this upgrade, choose it automatically
+				if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
 					unit.Variation = i;
 					TypeVariationCount = 0;
 					break;

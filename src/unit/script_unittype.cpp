@@ -101,6 +101,7 @@ static const char FAUNA_KEY[] = "Fauna";
 static const char PREDATOR_KEY[] = "Predator";
 static const char SLIME_KEY[] = "Slime";
 static const char PEOPLEAVERSION_KEY[] = "PeopleAversion";
+static const char MOUNTED_KEY[] = "Mounted";
 //Wyrmgus end
 
 // names of the variable.
@@ -174,7 +175,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
 							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY, MERCENARY_KEY,
-							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY
+							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY
 	//Wyrmgus end
 							  };
 

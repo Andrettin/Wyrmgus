@@ -183,7 +183,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		if (UpgradesCheck == false) {
 			continue;
 		}
-		if (current_varinfo && varinfo->VariationId == current_varinfo->VariationId) { // if the old variation has the same ident as a viable one of the new unit type, chose the latter automatically
+		if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if the old variation's ident is included in that of a viable one of the new unit type, chose the latter automatically
 			unit.Variation = i;
 			TypeVariationCount = 0;
 			break;
