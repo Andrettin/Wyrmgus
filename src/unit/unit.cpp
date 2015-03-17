@@ -2995,6 +2995,11 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 			}
 		}
 		LetUnitDie(target);
+		//Wyrmgus start
+		if (attacker->Type->BoolFlag[PREDATOR_INDEX].value) { //stop predators so that they can consume the corpse
+			CommandStopUnit(*attacker);
+		}
+		//Wyrmgus end
 		return;
 	}
 
@@ -3241,7 +3246,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 {
 	//Wyrmgus start
 //	return IsEnemy(*unit.Player);
-	if (this->Player->Type == PlayerNeutral && this->Type->BoolFlag[FAUNA_INDEX].value && this->Type->BoolFlag[ORGANIC_INDEX].value && this->Type->BoolFlag[PREDATOR_INDEX].value && !unit.Type->BoolFlag[PREDATOR_INDEX].value && !unit.Type->BoolFlag[SLIME_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && this->Type->Slot != unit.Type->Slot) {
+	if (this->Player->Type == PlayerNeutral && this->Type->BoolFlag[FAUNA_INDEX].value && this->Type->BoolFlag[ORGANIC_INDEX].value && this->Type->BoolFlag[PREDATOR_INDEX].value && this->Variable[HUNGER_INDEX].Value > 250 && !unit.Type->BoolFlag[PREDATOR_INDEX].value && unit.Type->BoolFlag[FLESH_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && this->Type->Slot != unit.Type->Slot) {
 		return true;
 	} else if (unit.Player->Type == PlayerNeutral && unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->BoolFlag[PREDATOR_INDEX].value && !this->Type->BoolFlag[FAUNA_INDEX].value && !this->Type->BoolFlag[PREDATOR_INDEX].value && this->Player->Type != PlayerNeutral && this->Type->Slot != unit.Type->Slot) {
 		return true;

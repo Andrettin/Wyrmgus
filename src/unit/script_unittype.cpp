@@ -102,6 +102,14 @@ static const char PREDATOR_KEY[] = "Predator";
 static const char SLIME_KEY[] = "Slime";
 static const char PEOPLEAVERSION_KEY[] = "PeopleAversion";
 static const char MOUNTED_KEY[] = "Mounted";
+static const char DETRITUS_KEY[] = "Detritus";
+static const char FLESH_KEY[] = "Flesh";
+static const char VEGETABLE_KEY[] = "Vegetable";
+static const char INSECT_KEY[] = "Insect";
+static const char DETRITIVORE_KEY[] = "Detritivore";
+static const char CARNIVORE_KEY[] = "Carnivore";
+static const char HERBIVORE_KEY[] = "Herbivore";
+static const char INSECTIVORE_KEY[] = "Insectivore";
 //Wyrmgus end
 
 // names of the variable.
@@ -156,6 +164,7 @@ static const char BACKSTAB_KEY[] = "Backstab";
 static const char TRANSPARENCY_KEY[] = "Transparency";
 static const char GENDER_KEY[] = "Gender";
 static const char BIRTHCYCLE_KEY[] = "BirthCycle";
+static const char HUNGER_KEY[] = "Hunger";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -175,7 +184,9 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
 							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, ITEM_KEY, MERCENARY_KEY,
-							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY
+							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY,
+							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY,
+							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY
 	//Wyrmgus end
 							  };
 
@@ -202,7 +213,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 //							   PRIORITY_KEY
 							   PRIORITY_KEY,
 							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
-							   BACKSTAB_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY
+							   BACKSTAB_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY
 //Wyrmgus end
 							  };
 
@@ -1992,7 +2003,7 @@ void UpdateUnitVariables(CUnit &unit)
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
 			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == ACCURACY_INDEX || i == EVASION_INDEX
 			|| i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
-			|| i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX) {
+			|| i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -2024,6 +2035,12 @@ void UpdateUnitVariables(CUnit &unit)
 	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
 		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->ChildUpgrade));
+	}
+
+	if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->BoolFlag[FAUNA_INDEX].value) { // only fauna can have a hunger value
+		unit.Variable[HUNGER_INDEX].Enable = 1;
+		unit.Variable[HUNGER_INDEX].Max = 1000;
+		unit.Variable[HUNGER_INDEX].Increase = 1;
 	}
 	//Wyrmgus end
 

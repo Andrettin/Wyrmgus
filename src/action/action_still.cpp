@@ -215,6 +215,52 @@ static bool MoveRandomly(CUnit &unit)
 
 //Wyrmgus start
 /**
+**  Feed
+**
+**  @return  true if the unit breeds, false otherwise
+*/
+static bool Feed(CUnit &unit)
+{
+	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
+		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value //only for fauna
+		|| unit.Variable[HUNGER_INDEX].Value < 250 //don't feed if not hungry enough
+		) {
+		return false;
+	}
+
+	// look for nearby food
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, unit.CurrentSightRange, table);
+
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
+			if (
+				((table[i]->Type->BoolFlag[DETRITUS_INDEX].value || (table[i]->CurrentAction() == UnitActionDie && table[i]->Type->BoolFlag[FLESH_INDEX].value)) && unit.Type->BoolFlag[DETRITIVORE_INDEX].value)
+				|| (table[i]->Type->BoolFlag[FLESH_INDEX].value && (table[i]->Type->BoolFlag[ITEM_INDEX].value || table[i]->CurrentAction() == UnitActionDie) && unit.Type->BoolFlag[CARNIVORE_INDEX].value)
+				|| (table[i]->Type->BoolFlag[VEGETABLE_INDEX].value && unit.Type->BoolFlag[HERBIVORE_INDEX].value)
+				|| (table[i]->Type->BoolFlag[INSECT_INDEX].value && unit.Type->BoolFlag[INSECTIVORE_INDEX].value)
+			) {
+				int distance = unit.MapDistanceTo(table[i]->tilePos);
+				int reach = 1;
+				if (table[i]->Type->BoolFlag[NONSOLID_INDEX].value || unit.Type->BoolFlag[NONSOLID_INDEX].value || table[i]->CurrentAction() == UnitActionDie) {
+					reach = 0;
+				}
+				if (reach < distance) {
+					CommandMove(unit, table[i]->tilePos, FlushCommands);
+				} else {
+					if (!table[i]->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value && !unit.Type->BoolFlag[INSECT_INDEX].value) { //if food is non-indestructible, and isn't too tiny to consume the food, kill the food object
+						LetUnitDie(*table[i]);
+					}
+					unit.Variable[HUNGER_INDEX].Value = 0;
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/**
 **  Excrete
 **
 **  @return  true if the unit excretes, false otherwise
@@ -223,11 +269,41 @@ static bool Excrete(CUnit &unit)
 {
 	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Type->Excrement.empty()
+		|| unit.Variable[HUNGER_INDEX].Value > 250 //only excrete if well-fed
 		|| ((SyncRand() % 500) >= 1)) {
 		return false;
 	}
 
-	CUnit *newUnit = MakeUnitAndPlace(unit.tilePos, *UnitTypeByIdent(unit.Type->Excrement), &Players[PlayerNumNeutral]);
+	Vec2i pos = unit.tilePos;
+
+	/*
+	if (unit.Direction == LookingN) {
+		pos.y += 1;
+	} else if (unit.Direction == LookingNE) {
+		pos.x -= 1;
+		pos.y += 1;
+	} else if (unit.Direction == LookingE) {
+		pos.x -= 1;
+	} else if (unit.Direction == LookingSE) {
+		pos.x -= 1;
+		pos.y -= 1;
+	} else if (unit.Direction == LookingS) {
+		pos.y -= 1;
+	} else if (unit.Direction == LookingSW) {
+		pos.x += 1;
+		pos.y -= 1;
+	} else if (unit.Direction == LookingW) {
+		pos.x += 1;
+	} else if (unit.Direction == LookingNW) {
+		pos.x += 1;
+		pos.y += 1;
+	}
+	*/
+
+	// restrict to map
+	Map.Clamp(pos);
+	
+	CUnit *newUnit = MakeUnitAndPlace(pos, *UnitTypeByIdent(unit.Type->Excrement), &Players[PlayerNumNeutral]);
 	return true;
 }
 
@@ -241,6 +317,7 @@ static bool Breed(CUnit &unit)
 	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value //only for fauna
 		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
+		|| unit.Variable[HUNGER_INDEX].Value > 500 //only breed if not hungry
 		|| ((SyncRand() % 200) >= 1)) {
 		return false;
 	}
@@ -479,7 +556,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| MoveRandomly(unit) || Excrete(unit) || Breed(unit)) {
+			|| Feed(unit) || MoveRandomly(unit) || Excrete(unit) || Breed(unit)) {
 			//Wyrmgus end
 		}
 	}

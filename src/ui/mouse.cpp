@@ -1761,22 +1761,6 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
-					//Wyrmgus start
-					/*
-					for (int i = ButtonUnderCursor; i; uins = uins->NextContained) {
-						if (uins->Boarded) {
-							--i;
-						}
-					}
-					Assert(uins->Boarded);
-					const int flush = !(KeyModifiers & ModifierShift);
-					//Wyrmgus start
-//					SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
-					if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
-						SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
-					}
-					//Wyrmgus end
-					*/
 					size_t j = 0;
 
 					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
@@ -1793,7 +1777,6 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 						}
 						++j;
 					}
-					//Wyrmgus end
 				}
 			}
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
