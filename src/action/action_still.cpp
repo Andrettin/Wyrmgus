@@ -215,9 +215,26 @@ static bool MoveRandomly(CUnit &unit)
 
 //Wyrmgus start
 /**
+**  Excrete
+**
+**  @return  true if the unit excretes, false otherwise
+*/
+static bool Excrete(CUnit &unit)
+{
+	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
+		|| unit.Type->Excrement.empty()
+		|| ((SyncRand() % 500) >= 1)) {
+		return false;
+	}
+
+	CUnit *newUnit = MakeUnitAndPlace(unit.tilePos, *UnitTypeByIdent(unit.Type->Excrement), &Players[PlayerNumNeutral]);
+	return true;
+}
+
+/**
 **  Breed with another animal of same species and opposite gender
 **
-**  @return  true if the unit moves, false otherwise
+**  @return  true if the unit breeds, false otherwise
 */
 static bool Breed(CUnit &unit)
 {
@@ -462,7 +479,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| MoveRandomly(unit)|| Breed(unit)) {
+			|| MoveRandomly(unit) || Excrete(unit) || Breed(unit)) {
 			//Wyrmgus end
 		}
 	}

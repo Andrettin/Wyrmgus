@@ -1269,6 +1269,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->TrainQuantity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			type->ChildUpgrade = LuaToString(l, -1);
+		} else if (!strcmp(value, "Excrement")) {
+			type->Excrement = LuaToString(l, -1);
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
@@ -1569,6 +1571,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, type->ChildUpgrade.c_str());
+		return 1;
+	} else if (!strcmp(data, "Excrement")) {
+		lua_pushstring(l, type->Excrement.c_str());
 		return 1;
 	} else if (!strcmp(data, "TechnologyPointCost")) {
 		lua_pushnumber(l, type->TechnologyPointCost);

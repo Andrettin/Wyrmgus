@@ -518,6 +518,7 @@ public:
 	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string DefaultName;		/// Default personal name of the unit type (used by heroes)
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
+	std::string Excrement;			/// Excrement unit for this unit type
 	std::string PersonalNames[PersonalNameMax];	/// personal names
 	std::string PersonalNamePrefixes[PersonalNameMax];	/// personal name prefixes
 	std::string PersonalNameSuffixes[PersonalNameMax];	/// personal name suffixes

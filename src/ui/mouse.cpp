@@ -1761,6 +1761,8 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
+					//Wyrmgus start
+					/*
 					for (int i = ButtonUnderCursor; i; uins = uins->NextContained) {
 						if (uins->Boarded) {
 							--i;
@@ -1772,6 +1774,24 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 //					SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
 					if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
 						SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+					}
+					//Wyrmgus end
+					*/
+					size_t j = 0;
+
+					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
+							continue;
+						}
+						if (ButtonAreaUnderCursor == ButtonAreaTransporting
+							&& static_cast<size_t>(ButtonUnderCursor) == j) {
+								Assert(uins->Boarded);
+								const int flush = !(KeyModifiers & ModifierShift);
+								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+								}
+						}
+						++j;
 					}
 					//Wyrmgus end
 				}
