@@ -202,6 +202,19 @@ static bool MoveRandomly(CUnit &unit)
 					if (second_table.size() > 0) {
 						return false;
 					}
+				} else { //even if is already in a settled area, don't go to places adjacent to units owned by players other than the neutral player
+					Vec2i minpos = pos;
+					Vec2i maxpos = pos;
+					minpos.x = pos.x - 1;
+					minpos.y = pos.y - 1;
+					maxpos.x = pos.x + 1;
+					maxpos.y = pos.y + 1;
+					std::vector<CUnit *> second_table;
+					Select(minpos, maxpos, second_table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+
+					if (second_table.size() > 0) {
+						return false;
+					}
 				}
 			}
 			//Wyrmgus end
@@ -269,8 +282,10 @@ static bool Excrete(CUnit &unit)
 {
 	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Type->Excrement.empty()
-		|| unit.Variable[HUNGER_INDEX].Value > 250 //only excrete if well-fed
-		|| ((SyncRand() % 500) >= 1)) {
+		|| unit.Variable[HUNGER_INDEX].Value > 100 //only excrete if well-fed
+		|| ((SyncRand() % 500) >= 1)
+		|| (unit.Player->Type != PlayerNeutral && (SyncRand() % 10) >= 1) //since non-fauna units (i.e. cavalry) don't get hungry, there needs to be an extra limitation, to make them not excrete too often
+	) {
 		return false;
 	}
 
@@ -304,6 +319,8 @@ static bool Excrete(CUnit &unit)
 	Map.Clamp(pos);
 	
 	CUnit *newUnit = MakeUnitAndPlace(pos, *UnitTypeByIdent(unit.Type->Excrement), &Players[PlayerNumNeutral]);
+	newUnit->Direction = unit.Direction;
+	UnitUpdateHeading(*newUnit);
 	return true;
 }
 

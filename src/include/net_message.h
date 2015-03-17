@@ -345,7 +345,10 @@ public:
 
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
-	static size_t Size() { return 2 + 2 + 2 + 2; }
+	//Wyrmgus start
+//	static size_t Size() { return 2 + 2 + 2 + 2; }
+	static size_t Size() { return 2 + 2 + 2 + 2 + 2; }
+	//Wyrmgus end
 
 public:
 	uint16_t Unit;         /// Command for unit
