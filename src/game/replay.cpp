@@ -378,6 +378,7 @@ static void SaveFullLog(CFile &file)
 		} else {
 			file.printf("\t{");
 		}
+		file.printf(" AIScript = \"%s\",", CurrentReplay->Players[i].AIScript.c_str());
 		file.printf(" Race = %d,", CurrentReplay->Players[i].Race);
 		//Wyrmgus start
 		file.printf(" Faction = %d,", CurrentReplay->Players[i].Faction);
@@ -669,6 +670,8 @@ static int CclReplayLog(lua_State *l)
 					value = LuaToString(l, -2);
 					if (!strcmp(value, "Name")) {
 						replay->Players[j].Name = LuaToString(l, -1);
+					} else if (!strcmp(value, "AIScript")) {
+						replay->Players[j].AIScript = LuaToString(l, -1);
 					} else if (!strcmp(value, "Race")) {
 						replay->Players[j].Race = LuaToNumber(l, -1);
 					//Wyrmgus start
