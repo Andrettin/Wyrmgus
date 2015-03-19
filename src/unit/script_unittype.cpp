@@ -1248,6 +1248,9 @@ static int CclDefineUnitType(lua_State *l)
 				type->BoolFlag[i].value = parent_type->BoolFlag[i].value;
 				type->BoolFlag[i].CanTransport = parent_type->BoolFlag[i].CanTransport;
 			}
+			for (unsigned int i = 0; i < UnitTypeMax; ++i) {
+				type->Drops[i] = parent_type->Drops[i];
+			}
 		} else if (!strcmp(value, "Class")) {
 			type->Class = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
@@ -1283,6 +1286,16 @@ static int CclDefineUnitType(lua_State *l)
 			type->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "Excrement")) {
 			type->Excrement = LuaToString(l, -1);
+		} else if (!strcmp(value, "Drops")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CUnitType *drop_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (drop_type) {
+					type->Drops[drop_type->Slot] = true;
+				} else { // Error
+					LuaError(l, "incorrect drop unit-type");
+				}
+			}
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];

@@ -1028,7 +1028,7 @@ static int CclSetPlayerData(lua_State *l)
 			UI.Load();
 		}
 		
-		// set random name from the civilization's factions
+		// set random one from the civilization's factions
 		int FactionCount = 0;
 		int LocalFactions[FactionMax];
 		for (int i = 0; i < FactionMax; ++i) {

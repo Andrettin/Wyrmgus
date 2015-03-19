@@ -2495,6 +2495,27 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		DestroyAllInside(unit);
 	}
 
+	//Wyrmgus start
+	//drop items upon death
+	if (SyncRand(100) >= 66) { //66% chance nothing will be dropped
+		Vec2i drop_pos = unit.tilePos;
+		drop_pos.x += SyncRand(unit.Type->TileWidth);
+		drop_pos.y += SyncRand(unit.Type->TileHeight);
+		int DropCount = 0;
+		int LocalDrops[UnitTypeMax];
+		for (int i = 0; i < UnitTypeMax; ++i) {
+			if (unit.Type->Drops[i]) {
+				LocalDrops[DropCount] = i;
+				DropCount += 1;
+			}
+		}
+		if (DropCount > 0) {
+			int ChosenDrop = LocalDrops[SyncRand(DropCount)];
+			CUnit *droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[ChosenDrop], &Players[PlayerNumNeutral]);
+		}		
+	}
+	//Wyrmgus end
+
 	unit.Remove(NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);

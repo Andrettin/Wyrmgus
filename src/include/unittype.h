@@ -532,6 +532,7 @@ public:
 	std::string PersonalNames[PersonalNameMax];	/// personal names
 	std::string PersonalNamePrefixes[PersonalNameMax];	/// personal name prefixes
 	std::string PersonalNameSuffixes[PersonalNameMax];	/// personal name suffixes
+	bool Drops[UnitTypeMax];		/// Units spawned upon death (i.e. items).
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files
