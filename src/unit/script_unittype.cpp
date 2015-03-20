@@ -103,10 +103,12 @@ static const char PREDATOR_KEY[] = "Predator";
 static const char SLIME_KEY[] = "Slime";
 static const char PEOPLEAVERSION_KEY[] = "PeopleAversion";
 static const char MOUNTED_KEY[] = "Mounted";
+static const char DIMINUTIVE_KEY[] = "Diminutive";
 static const char DETRITUS_KEY[] = "Detritus";
 static const char FLESH_KEY[] = "Flesh";
 static const char VEGETABLE_KEY[] = "Vegetable";
 static const char INSECT_KEY[] = "Insect";
+static const char DAIRY_KEY[] = "Dairy";
 static const char DETRITIVORE_KEY[] = "Detritivore";
 static const char CARNIVORE_KEY[] = "Carnivore";
 static const char HERBIVORE_KEY[] = "Herbivore";
@@ -185,8 +187,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
 							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, ITEM_KEY, MERCENARY_KEY,
-							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY,
-							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY,
+							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY,
+							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY
 	//Wyrmgus end
 							  };

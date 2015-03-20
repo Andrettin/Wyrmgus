@@ -822,6 +822,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	//  As side effect we calculate the movement flags/mask here.
 	switch (type.UnitType) {
 		case UnitTypeLand:                              // on land
+			//Wyrmgus start
+			/*
 			type.MovementMask =
 				MapFieldLandUnit |
 				MapFieldSeaUnit |
@@ -829,23 +831,56 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				MapFieldCoastAllowed |
 				MapFieldWaterAllowed | // can't move on this
 				MapFieldUnpassable;
+			*/
+			if (type.BoolFlag[DIMINUTIVE_INDEX].value) { // diminutive units can enter tiles occupied by other units and vice-versa
+				type.MovementMask =
+					MapFieldBuilding | // already occuppied
+					MapFieldCoastAllowed |
+					MapFieldWaterAllowed | // can't move on this
+					MapFieldUnpassable;
+			} else {
+				type.MovementMask =
+					MapFieldLandUnit |
+					MapFieldSeaUnit |
+					MapFieldBuilding | // already occuppied
+					MapFieldCoastAllowed |
+					MapFieldWaterAllowed | // can't move on this
+					MapFieldUnpassable;
+			}
+			//Wyrmgus end
 			break;
 		case UnitTypeFly:                               // in air
 			//Wyrmgus start
-//			type.MovementMask = MapFieldAirUnit; // already occuppied
-			type.MovementMask =
+			/*
+			type.MovementMask = MapFieldAirUnit; // already occuppied
 				MapFieldAirUnit | // already occuppied
 				MapFieldAirUnpassable;
+			*/
+			if (type.BoolFlag[DIMINUTIVE_INDEX].value) {
+				type.MovementMask =
+					MapFieldAirUnpassable;
+			} else {
+				type.MovementMask =
+					MapFieldAirUnit | // already occuppied
+					MapFieldAirUnpassable;
+			}
 			//Wyrmgus end
 			break;
 		//Wyrmgus start
 		case UnitTypeFlyLow:                               // in low air
-			type.MovementMask =
-				MapFieldLandUnit |
-				MapFieldSeaUnit |
-				MapFieldBuilding |
-				MapFieldUnpassable |
-				MapFieldAirUnpassable;
+			if (type.BoolFlag[DIMINUTIVE_INDEX].value) {
+				type.MovementMask =
+					MapFieldBuilding |
+					MapFieldUnpassable |
+					MapFieldAirUnpassable;
+			} else {
+				type.MovementMask =
+					MapFieldLandUnit |
+					MapFieldSeaUnit |
+					MapFieldBuilding |
+					MapFieldUnpassable |
+					MapFieldAirUnpassable;
+			}
 			break;
 		case UnitTypeNaval:                             // on water
 			if (type.CanTransport()) {
@@ -855,6 +890,14 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldBuilding | // already occuppied
 					MapFieldLandAllowed; // can't move on this
 				// Johns: MapFieldUnpassable only for land units?
+			//Wyrmgus start
+			} else if (type.BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
+				type.MovementMask =
+					MapFieldBuilding | // already occuppied
+					MapFieldCoastAllowed |
+					MapFieldLandAllowed | // can't move on this
+					MapFieldUnpassable;
+			//Wyrmgus end
 			} else {
 				type.MovementMask =
 					MapFieldLandUnit |
@@ -900,7 +943,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 							MapFieldItem;
 		type.FieldFlags = MapFieldItem;
 	//Wyrmgus end
-	} else {
+	//Wyrmgus start
+//	} else {
+	} else if (!type.BoolFlag[DIMINUTIVE_INDEX].value) {
+	//Wyrmgus end
 		switch (type.UnitType) {
 			case UnitTypeLand: // on land
 				type.FieldFlags = MapFieldLandUnit;

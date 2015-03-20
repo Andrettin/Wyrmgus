@@ -252,16 +252,17 @@ static bool Feed(CUnit &unit)
 				|| (table[i]->Type->BoolFlag[FLESH_INDEX].value && (table[i]->Type->BoolFlag[ITEM_INDEX].value || table[i]->CurrentAction() == UnitActionDie) && unit.Type->BoolFlag[CARNIVORE_INDEX].value)
 				|| (table[i]->Type->BoolFlag[VEGETABLE_INDEX].value && unit.Type->BoolFlag[HERBIVORE_INDEX].value)
 				|| (table[i]->Type->BoolFlag[INSECT_INDEX].value && unit.Type->BoolFlag[INSECTIVORE_INDEX].value)
+				|| (table[i]->Type->BoolFlag[DAIRY_INDEX].value && (unit.Type->BoolFlag[HERBIVORE_INDEX].value || unit.Type->BoolFlag[CARNIVORE_INDEX].value || unit.Type->BoolFlag[DETRITIVORE_INDEX].value || unit.Type->BoolFlag[INSECTIVORE_INDEX].value) && unit.Variable[HUNGER_INDEX].Value >= 900) //animals only eat cheese when very hungry
 			) {
 				int distance = unit.MapDistanceTo(table[i]->tilePos);
 				int reach = 1;
-				if (table[i]->Type->BoolFlag[NONSOLID_INDEX].value || unit.Type->BoolFlag[NONSOLID_INDEX].value || table[i]->CurrentAction() == UnitActionDie) {
+				if (table[i]->Type->BoolFlag[DIMINUTIVE_INDEX].value || unit.Type->BoolFlag[DIMINUTIVE_INDEX].value || table[i]->CurrentAction() == UnitActionDie) {
 					reach = 0;
 				}
 				if (reach < distance) {
 					CommandMove(unit, table[i]->tilePos, FlushCommands);
 				} else {
-					if (!table[i]->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value && !unit.Type->BoolFlag[INSECT_INDEX].value) { //if food is non-indestructible, and isn't too tiny to consume the food, kill the food object
+					if (!table[i]->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value && !unit.Type->BoolFlag[DIMINUTIVE_INDEX].value) { //if food is non-indestructible, and isn't too tiny to consume the food, kill the food object
 						LetUnitDie(*table[i]);
 					}
 					unit.Variable[HUNGER_INDEX].Value = 0;
