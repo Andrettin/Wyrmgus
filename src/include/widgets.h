@@ -106,6 +106,7 @@ public:
 	void setFrameImage(gcn::Image *image) { frameImage = image; adjustSize(); }
 	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
 	virtual void setPosition(int x, int y);
+	void setTransparency(int alpha) { Transparency = alpha; }
 	//Wyrmgus end
 
 	gcn::Image *normalImage;
@@ -114,6 +115,7 @@ public:
 	//Wyrmgus start
 	gcn::Image *frameImage;
 	gcn::Image *pressedframeImage;
+	int Transparency;
 	//Wyrmgus end
 };
 
@@ -133,6 +135,7 @@ public:
 	void setFrameImage(gcn::Image *image) { frameImage = image; adjustSize(); }
 	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
 	virtual void setPosition(int x, int y);
+	void setTransparency(int alpha) { Transparency = alpha; }
 
 	gcn::Image *normalImage;
 	gcn::Image *pressedImage;
@@ -140,6 +143,7 @@ public:
 	gcn::Image *frameImage;	
 	gcn::Image *pressedframeImage;	
 	std::string ButtonPlayerColor;
+	int Transparency;
 };
 //Wyrmgus end
 
@@ -511,6 +515,7 @@ private:
 ----------------------------------------------------------------------------*/
 
 extern void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const CGraphic &sprite);
+extern void WidgetGraphicTransparency(int alpha, const CGraphic &sprite);
 //Wyrmgus end
 
 #endif

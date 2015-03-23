@@ -337,7 +337,7 @@ ImageButton::ImageButton() :
 	Button(), normalImage(NULL), pressedImage(NULL),
 	//Wyrmgus start
 //	disabledImage(NULL)
-	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL)
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), Transparency(0)
 	//Wyrmgus end
 {
 	setForegroundColor(0xffffff);
@@ -352,7 +352,7 @@ ImageButton::ImageButton(const std::string &caption) :
 	Button(caption), normalImage(NULL), pressedImage(NULL),
 	//Wyrmgus start
 //	disabledImage(NULL)
-	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL)
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), Transparency(0)
 	//Wyrmgus end
 {
 	setForegroundColor(0xffffff);
@@ -384,6 +384,12 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	}
 	
 	//Wyrmgus start
+	if (img) {
+		if (Transparency) {
+			WidgetGraphicTransparency(int(256 - 2.56 * Transparency), *((CGraphic *)img));
+		}
+	}
+
 //	graphics->drawImage(img, 0, 0, 0, 0,
 //						img->getWidth(), img->getHeight());
 
@@ -441,6 +447,11 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	//Wyrmgus end
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 	}
+	
+	//Wyrmgus start
+	//restore old alpha
+	WidgetGraphicTransparency(255, *((CGraphic *)img));
+	//Wyrmgus end
 }
 
 /**
@@ -485,7 +496,7 @@ void ImageButton::setPosition(int x, int y)
 */
 PlayerColorImageButton::PlayerColorImageButton() :
 	Button(), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor("")
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(""), Transparency(0)
 {
 	setForegroundColor(0xffffff);
 }
@@ -497,7 +508,7 @@ PlayerColorImageButton::PlayerColorImageButton() :
 */
 PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const std::string &playercolor) :
 	Button(caption), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(playercolor)
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(playercolor), Transparency(0)
 {
 	setForegroundColor(0xffffff);
 }
@@ -530,6 +541,9 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 	if (img) {
 		// make the button's image be player-colored
 		WidgetGraphicPlayerPixels(ButtonPlayerColor, *((CPlayerColorGraphic *)img));
+		if (Transparency) {
+			WidgetGraphicTransparency(int(256 - 2.56 * Transparency), *((CPlayerColorGraphic *)img));
+		}
 	}
 
 	if (frameImage) {
@@ -582,6 +596,9 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 	if (hasFocus() && !frameImage) {
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 	}
+
+	//restore old alpha
+	WidgetGraphicTransparency(255, *((CGraphic *)img));
 }
 
 /**
@@ -637,6 +654,22 @@ void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const C
 	if (sprite.SurfaceFlip) {
 		SDL_SetColors(sprite.SurfaceFlip, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	}
+	SDL_UnlockSurface(sprite.Surface);
+}
+
+/**
+**  Set transparency.
+**
+**  FIXME: use function pointer here.
+**
+**  @param player  Pointer to player.
+**  @param sprite  The sprite in which the colors should be changed.
+*/
+void WidgetGraphicTransparency(int alpha, const CGraphic &sprite)
+{
+	SDL_LockSurface(sprite.Surface);
+//	int oldalpha = Surface->format->alpha;
+	SDL_SetAlpha(sprite.Surface, SDL_SRCALPHA, alpha);
 	SDL_UnlockSurface(sprite.Surface);
 }
 //Wyrmgus end
