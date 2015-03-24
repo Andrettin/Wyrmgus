@@ -48,6 +48,7 @@
 #include "video.h"
 #include "upgrade.h"
 //Wyrmgus start
+#include "font.h"
 #include "ui.h"
 //Wyrmgus end
 
@@ -1110,6 +1111,7 @@ static int CclSetPlayerData(lua_State *l)
 			LoadCursors(PlayerRaces.Name[p->Race]);
 			UI.Load();
 		}
+		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 		
 		// set random one from the civilization's factions
 		int FactionCount = 0;

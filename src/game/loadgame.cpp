@@ -199,7 +199,10 @@ void LoadGame(const std::string &filename)
 	CommandLogDisabled = true;
 	SaveGameLoading = true;
 
-	SetDefaultTextColors(FontYellow, FontWhite);
+	//Wyrmgus start
+//	SetDefaultTextColors(FontYellow, FontWhite);
+	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
+	//Wyrmgus end
 	LoadFonts();
 
 	LuaGarbageCollect();
