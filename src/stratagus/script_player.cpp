@@ -607,6 +607,89 @@ static int CclDefineRaceNames(lua_State *l)
 
 //Wyrmgus start
 /**
+**  Define new race names
+**
+**  @param l  Lua state.
+*/
+static int CclDefineNewRaceNames(lua_State *l)
+{
+	int args = lua_gettop(l);
+	for (int j = 0; j < args; ++j) {
+		const char *value = LuaToString(l, j + 1);
+		if (!strcmp(value, "race")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			int i = PlayerRaces.Count++;
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, j + 1, k + 1);
+				if (!strcmp(value, "name")) {
+					++k;
+					PlayerRaces.Name[i] = LuaToString(l, j + 1, k + 1);
+					//Wyrmgus start
+					PlayerRaces.Playable[i] = true; //civilizations are playable by default
+					//Wyrmgus end
+				} else if (!strcmp(value, "display")) {
+					++k;
+					PlayerRaces.Display[i] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "visible")) {
+					PlayerRaces.Visible[i] = 1;
+				//Wyrmgus start
+				} else if (!strcmp(value, "playable")) {
+					++k;
+					PlayerRaces.Playable[i] = LuaToBoolean(l, j + 1, k + 1);
+				} else if (!strcmp(value, "species")) {
+					++k;
+					PlayerRaces.Species[i] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "parent-civilization")) {
+					++k;
+					PlayerRaces.ParentCivilization[i] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "personal_names")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.PersonalNames[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "personal_name_prefixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.PersonalNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "personal_name_suffixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.PersonalNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				//Wyrmgus end
+				} else {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+
+	return 0;
+}
+
+/**
 **  Get whether a civilization is playable or not.
 **
 **  @param l  Lua state.
@@ -1194,6 +1277,7 @@ void PlayerCclRegister()
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
 	//Wyrmgus start
+	lua_register(Lua, "DefineNewRaceNames", CclDefineNewRaceNames);
 	lua_register(Lua, "IsCivilizationPlayable", CclIsCivilizationPlayable);
 	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
 	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
