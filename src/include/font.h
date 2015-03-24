@@ -92,7 +92,10 @@ public:
 
 	virtual int getHeight() const { return Height(); }
 	virtual int getWidth(const std::string &text) const { return Width(text); }
-	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y);
+	//Wyrmgus start
+//	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y);
+	virtual void drawString(gcn::Graphics *graphics, const std::string &text, int x, int y, bool is_normal = true);
+	//Wyrmgus end
 
 	void Load();
 	void Reload() const;
@@ -207,7 +210,10 @@ public:
 	int Draw(int x, int y, int number) const;
 	/// Draw text/number clipped
 	int DrawClip(int x, int y, const char *const text) const;
-	int DrawClip(int x, int y, const std::string &text) const;
+	//Wyrmgus start
+//	int DrawClip(int x, int y, const std::string &text) const;
+	int DrawClip(int x, int y, const std::string &text, bool is_normal = true) const;
+	//Wyrmgus end
 	int DrawClip(int x, int y, int number) const;
 	/// Draw reverse text/number unclipped
 	int DrawReverse(int x, int y, const char *const text) const;

@@ -247,8 +247,12 @@ namespace gcn
          * @param alignment Graphics::LEFT, Graphics::CENTER or Graphics::RIGHT.
          * @throws Exception when no Font is set.
          */
+		//Wyrmgus start
+//        virtual void drawText(const std::string& text, int x, int y,
+//                              unsigned int alignment = LEFT);
         virtual void drawText(const std::string& text, int x, int y,
-                              unsigned int alignment = LEFT);
+                              unsigned int alignment = LEFT, bool is_normal = true);
+		//Wyrmgus end
         /**
          * Alignments for text drawing.
          */

@@ -78,7 +78,10 @@ namespace gcn
         return 8;
     }
 
-    void DefaultFont::drawString(Graphics* graphics, const std::string& text, int x, int y)
+	//Wyrmgus start
+//    void DefaultFont::drawString(Graphics* graphics, const std::string& text, int x, int y)
+    void DefaultFont::drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal)
+	//Wyrmgus end
     {
         unsigned int i;
 

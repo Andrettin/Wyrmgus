@@ -129,8 +129,12 @@ namespace gcn
         mFont = font;
     }
 
+	//Wyrmgus start
+//    void Graphics::drawText(const std::string& text, int x, int y,
+//                            unsigned int alignment)
     void Graphics::drawText(const std::string& text, int x, int y,
-                            unsigned int alignment)
+                            unsigned int alignment, bool is_normal)
+	//Wyrmgus end
     {
         if (mFont == NULL)
         {
@@ -141,13 +145,22 @@ namespace gcn
         switch (alignment)
         {
           case LEFT:
-              mFont->drawString(this, text, x, y);
+			  //Wyrmgus start
+//              mFont->drawString(this, text, x, y);
+              mFont->drawString(this, text, x, y, is_normal);
+			  //Wyrmgus end
               break;
           case CENTER:
-              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y);
+			  //Wyrmgus start
+//              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y);
+              mFont->drawString(this, text, x - mFont->getWidth(text) / 2, y, is_normal);
+			  //Wyrmgus end
               break;
           case RIGHT:
-              mFont->drawString(this, text, x - mFont->getWidth(text), y);
+			  //Wyrmgus start
+//              mFont->drawString(this, text, x - mFont->getWidth(text), y);
+              mFont->drawString(this, text, x - mFont->getWidth(text), y, is_normal);
+			  //Wyrmgus end
               break;
           default:
           	assert(!"Unknown alignment.");

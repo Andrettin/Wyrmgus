@@ -92,7 +92,10 @@ namespace gcn
 
         // Inherited from Font
 
-        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y);
+		//Wyrmgus start
+//        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y);
+        virtual void drawString(Graphics* graphics, const std::string& text, int x, int y, bool is_normal = true);
+		//Wyrmgus end
 
         virtual int getWidth(const std::string& text) const;
 
