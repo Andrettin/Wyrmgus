@@ -55,6 +55,9 @@ include_directories(
 	src/include
 	src/guichan/include
 	src/guichan/include/guichan
+	#Wyrmgus start
+	src/xbrz/include
+	#Wyrmgus end
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -353,6 +356,13 @@ set(video_SRCS
 )
 source_group(video FILES ${video_SRCS})
 
+#Wyrmgus start
+set(xbrz_SRCS
+	src/xbrz/xbrz.cpp
+)
+source_group(xbrz FILES ${xbrz_SRCS})
+#Wyrmgus end
+
 set(win32_SRCS
 	src/win32/attachconsole.cpp
 	src/win32/stratagus.rc
@@ -402,6 +412,9 @@ set(stratagus_SRCS
 	${ui_SRCS}
 	${unit_SRCS}
 	${video_SRCS}
+	#Wyrmgus start
+	${xbrz_SRCS}
+	#Wyrmgus end
 	${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp
 )
 
@@ -511,6 +524,13 @@ set(stratagus_spell_HDRS
 	src/include/spell/spell_teleport.h
 )
 
+#Wyrmgus start
+set(stratagus_xbrz_HDRS
+	src/xbrz/include/config.h
+	src/xbrz/include/xbrz.h
+)
+#Wyrmgus end
+
 set(stratagus_generic_HDRS
 	src/ai/ai_local.h
 	src/video/intern_video.h
@@ -586,12 +606,14 @@ set(stratagus_generic_HDRS
 	src/include/widgets.h
 )
 
-
 source_group(include FILES ${stratagus_generic_HDRS})
 source_group(include\\action FILES ${stratagus_action_HDRS})
 source_group(include\\animation FILES ${stratagus_animation_HDRS})
 source_group(include\\guichan FILES ${stratagus_guichan_HDRS})
 source_group(include\\spell FILES ${stratagus_spell_HDRS})
+#Wyrmgus start
+source_group(include\\xbrz FILES ${stratagus_xbrz_HDRS})
+#Wyrmgus end
 
 
 set(stratagus_HDRS
@@ -600,6 +622,9 @@ set(stratagus_HDRS
 	${stratagus_animation_HDRS}
 	${stratagus_guichan_HDRS}
 	${stratagus_spell_HDRS}
+	#Wyrmgus start
+	${stratagus_xbrz_HDRS}
+	#Wyrmgus end
 	${CMAKE_CURRENT_BINARY_DIR}/version-generated.h
 	version-generated.h # This line is needed for CMake when generating Doxygen documentation
 )
