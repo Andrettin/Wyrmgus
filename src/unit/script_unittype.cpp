@@ -1120,6 +1120,13 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
 			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
 			type->DefaultStat.Variables[VARIATION_INDEX].Max = VariationMax;
+			//remove previously defined variations, if any
+			for (int var_n = 0; var_n < VariationMax; ++var_n) {
+				if (type->VarInfo[var_n]) {
+					VariationInfo *var = new VariationInfo;
+					type->VarInfo[var_n] = var;
+				}
+			}
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
@@ -1187,6 +1194,9 @@ static int CclDefineUnitType(lua_State *l)
 			CUnitType *parent_type = UnitTypeByIdent(type->Parent);
 			type->Class = parent_type->Class;
 			type->DrawLevel = parent_type->DrawLevel;
+			type->File = parent_type->File;
+			type->Width = parent_type->Width;
+			type->Height = parent_type->Height;
 			type->TileWidth = parent_type->TileWidth;
 			type->TileHeight = parent_type->TileHeight;
 			type->BoxWidth = parent_type->BoxWidth;
@@ -1252,6 +1262,11 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (unsigned int i = 0; i < UnitTypeMax; ++i) {
 				type->Drops[i] = parent_type->Drops[i];
+			}
+			for (unsigned int var = 0; var < VariationMax; ++var) {
+				if (parent_type->VarInfo[var]) {
+					type->VarInfo[var] = parent_type->VarInfo[var];
+				}
 			}
 		} else if (!strcmp(value, "Class")) {
 			type->Class = LuaToString(l, -1);
