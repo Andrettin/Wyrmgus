@@ -36,16 +36,77 @@ T abs(T value)
 const uint32_t redMask   = 0xff0000;
 const uint32_t greenMask = 0x00ff00;
 const uint32_t blueMask  = 0x0000ff;
+const uint32_t alphaMask  = 0xff000000;
 
 template <unsigned int N, unsigned int M> inline
 void alphaBlend(uint32_t& dst, uint32_t col) //blend color over destination with opacity N / M
 {
-    static_assert(N < 256, "possible overflow of (col & redMask) * N");
-    static_assert(M < 256, "possible overflow of (col & redMask  ) * N + (dst & redMask  ) * (M - N)");
-    static_assert(0 < N && N < M, "");
-    dst = (redMask   & ((col & redMask  ) * N + (dst & redMask  ) * (M - N)) / M) | //this works because 8 upper bits are free
-          (greenMask & ((col & greenMask) * N + (dst & greenMask) * (M - N)) / M) |
-          (blueMask  & ((col & blueMask ) * N + (dst & blueMask ) * (M - N)) / M);
+    //static_assert(N < 256, "possible overflow of (col & redMask) * N");
+    //static_assert(M < 256, "possible overflow of (col & redMask  ) * N + (dst & redMask  ) * (M - N)");
+    //static_assert(0 < N && N < M, "");
+
+    //Note: I had to change this to perform alpha compositing -- xbrz assumes there is no alpha channel (and sets it to zero when it blends), our
+    //sprites have alpha however.
+    uint32_t col_alpha = col >> 24; // & with alphaMask is unnecessary
+
+    if (!col_alpha) return;
+
+    uint32_t dst_alpha = dst >> 24;
+
+    if (!dst_alpha) {
+        dst = col;
+        return;
+    }
+
+    //uint32_t out_alpha = 0xffff - (((0xff - col_alpha)* (0xff - dst_alpha)) >> 8);
+
+    //TODO: Figure out if there's some way to combine the multiplicative approached with the "averaged alpha", and to feedback the
+    // alpha into the colors, without making it all very slow. Current approach looks okay, but I think shadows could be better,
+    // also I think some units are getting 'black outlines' now because their black pixels with 0 alpha (background) are getting
+    // averaged with their foreground.
+
+    dst = (redMask   & ((col & redMask   ) * N + (dst & redMask   ) * (M - N)) / M) | //this works because 8 upper bits are free
+          (greenMask & ((col & greenMask ) * N + (dst & greenMask ) * (M - N)) / M) |
+          (blueMask  & ((col & blueMask  ) * N + (dst & blueMask  ) * (M - N)) / M) |
+          (alphaMask & (((col_alpha       * N + dst_alpha * (M - N)) / M) << 24)); // need to downshift and upshift because of overflow
+
+/*
+    if (!(dst >> 24)) {
+	dst = (col & (redMask | greenMask | blueMask)) |
+              (((((col >> 24) * N) / M) << 24) & alphaMask);
+	return;
+    }
+*/
+/*
+
+    double src_alpha = static_cast<double>(col >> 24) / 256; //xbrz basically assumes there is no alpha channel, our sprites have alpha however.
+    double dst_alpha = static_cast<double>(dst >> 24) / 256;
+
+    src_alpha = 1 - ((1 - src_alpha) * (1 - (N/M))); //apply blending arguments
+
+    // For discussion of alpha compositing, see here: http://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator
+    double out_alpha = 1 - ((1- src_alpha) * (1-dst_alpha));
+
+    double src_coeff = src_alpha / out_alpha;
+
+    double dst_coeff = dst_alpha / out_alpha;
+
+
+
+    uint32_t red_val = (((col & redMask  ) >> 16) * src_coeff) + (((dst & redMask  ) >> 16) * dst_coeff);
+
+    uint32_t grn_val = (((col & greenMask) >> 8 ) * src_coeff) + (((dst & greenMask) >> 8 ) * dst_coeff);
+
+    uint32_t blu_val = (((col & blueMask ) >> 0 ) * src_coeff) + (((dst & blueMask ) >> 0 ) * dst_coeff);
+
+
+
+    dst = (red_val << 16) |
+          (grn_val << 8 ) |
+          (blu_val << 0) |
+          (alphaMask & (static_cast<uint32_t>(256 * out_alpha) << 24));
+//	  0xff000000; //adding this to try to get rid of black outlines, there are code comments that say 0 is transparent for SDL, not 255 -- iceiceice
+*/
 }
 
 

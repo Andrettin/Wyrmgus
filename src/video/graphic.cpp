@@ -46,6 +46,9 @@
 #include "iocompat.h"
 #include "iolib.h"
 #include "ui.h"
+//Wyrmgus start
+#include "xbrz.h"
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -96,6 +99,56 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+		//Wyrmgus start
+		//code for drawing a scaled image under xBRZ - use later for implementing zoom mode
+		/*
+		SDL_Rect srect = {Sint16(gx * 2), Sint16(gy * 2), Uint16(w * 2), Uint16(h * 2)};
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+		SDL_LockSurface(Surface);
+		
+		SDL_Surface *neutral_surface = SDL_CreateRGBSurface(SDL_SWSURFACE,1,1,32,0xFF0000,0xFF00,0xFF,0xFF000000);
+		SDL_PixelFormat format = *neutral_surface->format;
+		
+		int Rmask = format.Rmask;
+		int Gmask = format.Gmask;
+		int Bmask = format.Bmask;
+		int Amask = format.Amask;
+		int bpp = format.BitsPerPixel;
+		
+		SDL_Surface *src = SDL_ConvertSurface(Surface,&format,SDL_SWSURFACE);
+							 
+		SDL_Surface *dst = SDL_CreateRGBSurface(SDL_SWSURFACE, Width * 2, Height * 2,
+							 bpp, Rmask, Gmask, Bmask, Amask);
+		SDL_LockSurface(src);
+		SDL_LockSurface(dst);
+		const Uint32* old_pixels = reinterpret_cast<const Uint32*>(src->pixels);
+		Uint32* new_pixels = reinterpret_cast<Uint32*>(dst->pixels);
+		xbrz::scale(2, old_pixels, new_pixels, Width, Height);
+		SDL_SetAlpha(SDL_DisplayFormatAlpha(dst),SDL_SRCALPHA|SDL_RLEACCEL,SDL_ALPHA_OPAQUE);
+		SDL_UnlockSurface(Surface);
+		SDL_UnlockSurface(src);
+		SDL_UnlockSurface(dst);
+		SDL_BlitSurface(dst, &srect, TheScreen, &drect);
+
+		unsigned char *src_pixels = NULL;
+
+		if (src->flags & SDL_PREALLOC) {
+			src_pixels = (unsigned char *)src->pixels;
+		}
+		SDL_FreeSurface(src);
+		delete[] src_pixels;
+		src = NULL;
+
+		unsigned char *dst_pixels = NULL;
+
+		if (dst->flags & SDL_PREALLOC) {
+			dst_pixels = (unsigned char *)dst->pixels;
+		}
+		SDL_FreeSurface(dst);
+		delete[] dst_pixels;
+		dst = NULL;
+		*/
+		//Wyrmgus end
 	}
 }
 

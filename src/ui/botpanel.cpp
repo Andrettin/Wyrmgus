@@ -1441,7 +1441,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type != PlayerNeutral)) { //allow neutral units to be used
+	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type != PlayerNeutral) || (Selected[0]->Player->Type == PlayerNeutral && CurrentButtons[button].Action != ButtonTrain && CurrentButtons[button].Action != ButtonCancelTrain)) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}
