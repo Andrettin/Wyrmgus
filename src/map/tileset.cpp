@@ -230,6 +230,29 @@ unsigned int CTileset::getDefaultTileIndex() const
 	return 0x50;
 }
 
+//Wyrmgus start
+unsigned int CTileset::getDefaultWoodTileIndex() const
+{
+	const int n = tiles.size();
+	int solid = 0;
+	for (int i = 0; i < n;) {
+		const CTile &tile = tiles[i];
+		const CTileInfo &tileinfo = tile.tileinfo;
+		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
+			i += 256;
+		} else {
+			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
+				if (tile.flag & MapFieldForest) {
+					solid = i;
+				}
+			}
+			i += 16;
+		}
+	}
+	return solid;
+}
+//Wyrmgus end
+
 bool CTileset::isAWallTile(unsigned tile) const
 {
 	if (TileTypeTable.empty() == false) {

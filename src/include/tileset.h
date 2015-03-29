@@ -155,6 +155,9 @@ public:
 	unsigned int getTileCount() const { return tiles.size(); }
 
 	unsigned int getDefaultTileIndex() const;
+	//Wyrmgus start
+	unsigned int getDefaultWoodTileIndex() const;
+	//Wyrmgus end
 
 	bool isAWallTile(unsigned tile) const;
 	bool isARaceWallTile(unsigned tile, bool human) const;
