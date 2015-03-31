@@ -337,6 +337,10 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 				damage_modifier += attacker.Variable[BACKSTAB_INDEX].Value / 2;
 			}
 		}
+		//add bonus against mounted
+		if (attacker.Variable[BONUSAGAINSTMOUNTED_INDEX].Value > 0 && goal->Type->BoolFlag[MOUNTED_INDEX].value) {
+			damage_modifier += attacker.Variable[BONUSAGAINSTMOUNTED_INDEX].Value;
+		}
 	}
 	basic_damage *= damage_modifier;
 	basic_damage /= 100;

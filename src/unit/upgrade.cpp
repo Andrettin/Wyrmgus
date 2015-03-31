@@ -1299,7 +1299,7 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	unit.LearnedAbilities[id] = true;	// learning done
 
-	if (!GameSettings.NoRandomness || !unit.Type->DefaultName.empty()) { // if in no randomness setting, only apply trait modifiers if the unit is a hero
+	if (!GameSettings.NoRandomness || unit.Type->BoolFlag[HERO_INDEX].value) { // if in no randomness setting, only apply trait modifiers if the unit is a hero
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (UpgradeModifiers[z]->UpgradeId == id) {
 				ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);

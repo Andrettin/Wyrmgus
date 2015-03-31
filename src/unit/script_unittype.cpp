@@ -97,6 +97,7 @@ static const char ORGANIC_KEY[] = "organic";
 static const char SIDEATTACK_KEY[] = "SideAttack";
 //Wyrmgus start
 static const char ITEM_KEY[] = "Item";
+static const char HERO_KEY[] = "Hero";
 static const char MERCENARY_KEY[] = "Mercenary";
 static const char FAUNA_KEY[] = "Fauna";
 static const char PREDATOR_KEY[] = "Predator";
@@ -164,6 +165,7 @@ static const char VARIATION_KEY[] = "Variation";
 static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
 static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
 static const char BACKSTAB_KEY[] = "Backstab";
+static const char BONUSAGAINSTMOUNTED_KEY[] = "BonusAgainstMounted";
 static const char TRANSPARENCY_KEY[] = "Transparency";
 static const char GENDER_KEY[] = "Gender";
 static const char BIRTHCYCLE_KEY[] = "BirthCycle";
@@ -186,7 +188,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, ITEM_KEY, MERCENARY_KEY,
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, ITEM_KEY,
+							   HERO_KEY, MERCENARY_KEY,
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY
@@ -216,7 +219,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 //							   PRIORITY_KEY
 							   PRIORITY_KEY,
 							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
-							   BACKSTAB_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY
+							   BACKSTAB_KEY, BONUSAGAINSTMOUNTED_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY
 //Wyrmgus end
 							  };
 
@@ -2034,7 +2037,7 @@ void UpdateUnitVariables(CUnit &unit)
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
 			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == ACCURACY_INDEX || i == EVASION_INDEX
 			|| i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
-			|| i == BACKSTAB_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX) {
+			|| i == BACKSTAB_INDEX || i == BONUSAGAINSTMOUNTED_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -2051,6 +2054,7 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[CRITICALSTRIKECHANCE_INDEX].Max = 100;
 
 	unit.Variable[BACKSTAB_INDEX].Max = 1000;
+	unit.Variable[BONUSAGAINSTMOUNTED_INDEX].Max = 1000;
 
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 

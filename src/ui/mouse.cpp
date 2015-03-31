@@ -2106,7 +2106,7 @@ void UIHandleButtonUp(unsigned button)
 				}
 				//Wyrmgus start
 //				if (Selected[0]->Player == ThisPlayer) {
-				if (Selected[0]->Player == ThisPlayer && Selected[0]->Type->DefaultName.empty()) { // don't display this for heroes
+				if (Selected[0]->Player == ThisPlayer && !Selected[0]->Type->BoolFlag[HERO_INDEX].value) { // don't display this for heroes
 				//Wyrmgus end
 					char buf[64];
 					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
