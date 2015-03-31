@@ -837,6 +837,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitTrait")) {
 			res->e = EString_UnitTrait;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "TypeClass")) {
+			res->e = EString_TypeClass;
+			res->D.Type = CclParseTypeDesc(l);
 		//Wyrmgus end
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
@@ -1060,6 +1063,9 @@ std::string EvalString(const StringDesc *s)
 	std::string res;    // Result string.
 	std::string tmp1;   // Temporary string.
 	const CUnit *unit;  // Temporary unit
+	//Wyrmgus start
+	CUnitType **type;	// Temporary unit type
+	//Wyrmgus end
 
 	Assert(s);
 	switch (s->e) {
@@ -1119,6 +1125,20 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
 				return CUpgrade::Get(unit->Trait)->Name;
+			} else { // ERROR.
+				return std::string("");
+			}
+		case EString_TypeClass : // name of the unit type's class
+			type = s->D.Type;
+			if (type != NULL) {
+				std::string str = (**type).Class.c_str();
+				str[0] = toupper(str[0]);
+				size_t loc = str.find("-");
+				if (loc != std::string::npos) {
+					str.replace(loc, 1, " ");
+					str[loc + 1] = toupper(str[loc + 1]);
+				}
+				return str;
 			} else { // ERROR.
 				return std::string("");
 			}
@@ -1314,6 +1334,9 @@ void FreeStringDesc(StringDesc *s)
 		case EString_UnitTrait : // Trait of the unit
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
+			break;
+		case EString_TypeClass : // Class of the unit type
+			delete s->D.Type;
 			break;
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;
@@ -1825,6 +1848,19 @@ static int CclUnitTrait(lua_State *l)
 	LuaCheckArgs(l, 1);
 	return Alias(l, "UnitTrait");
 }
+
+/**
+**  Return equivalent lua table for TypeClass.
+**  {"TypeClass", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclTypeClass(lua_State *l)
+{
+	return Alias(l, "TypeClass");
+}
 //Wyrmgus end
 /**
 **  Return equivalent lua table for If.
@@ -2015,6 +2051,7 @@ static void AliasRegister()
 	//Wyrmgus start
 	lua_register(Lua, "UnitTypeName", CclUnitTypeName);
 	lua_register(Lua, "UnitTrait", CclUnitTrait);
+	lua_register(Lua, "TypeClass", CclTypeClass);
 	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);

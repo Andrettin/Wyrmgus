@@ -143,6 +143,7 @@ enum EString {
 	//Wyrmgus start
 	EString_UnitTypeName,     /// UnitType Name, if EString_UnitName is occupied by the unit's personal name.
 	EString_UnitTrait,     /// Unit Trait
+	EString_TypeClass,     /// Unit Trait
 	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.
@@ -271,6 +272,9 @@ struct StringDesc {
 		NumberDesc *Number;  /// Number.
 		StringDesc *String;  /// String.
 		UnitDesc *Unit;      /// Unit desciption.
+		//Wyrmgus start
+		CUnitType **Type;           /// Which unit type.
+		//Wyrmgus end
 		struct {
 			NumberDesc *Cond;  /// Branch condition.
 			StringDesc *BTrue;  /// String if Cond is true.
