@@ -465,7 +465,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 		//Wyrmgus start
 //		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 		VariationInfo *varinfo = type.VarInfo[unit.Variation];
-		if (varinfo && !varinfo->Icon.Name.empty()) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
 			varinfo->Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 		} else {
 			type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
@@ -529,7 +529,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
 		VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
-		if (varinfo && !varinfo->Icon.Name.empty()) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
 			varinfo->Icon.Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
 		} else {
 			icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
@@ -1193,7 +1193,7 @@ static void InfoPanel_draw_multiple_selection()
 						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
 		*/
 		VariationInfo *varinfo = Selected[i]->Type->VarInfo[Selected[i]->Variation];
-		if (varinfo && !varinfo->Icon.Name.empty()) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
 			varinfo->Icon.Icon->DrawUnitIcon(*UI.SelectedButtons[i].Style,
 							  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 							  (IconActive | (MouseButtons & LeftButton)) : 0,
