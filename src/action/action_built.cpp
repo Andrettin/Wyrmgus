@@ -63,9 +63,12 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	}
 	order->UpdateConstructionFrame(unit);
 
-	if (unit.Type->BuilderOutside == false) {
+	//Wyrmgus start
+	//workers building from outside shouldn't be treated differently in this instance
+//	if (unit.Type->BuilderOutside == false) {
 		order->Worker = &builder;
-	}
+//	}
+	//Wyrmgus end
 	return order;
 }
 
@@ -156,7 +159,12 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	if (worker != NULL) {
 		worker->ClearAction();
 
-		DropOutOnSide(*worker, LookingW, &unit);
+		//Wyrmgus start
+//		DropOutOnSide(*worker, LookingW, &unit);
+		if (unit.Type->BuilderOutside == false) {
+			DropOutOnSide(*worker, LookingW, &unit);
+		}
+		//Wyrmgus end
 	}
 	// Player gets back 75% of the original cost for a building.
 	unit.Player->AddCostsFactor(unit.Stats->Costs, CancelBuildingCostsFactor);
@@ -197,7 +205,12 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		} else { // Drop out the worker.
 			worker->ClearAction();
 
-			DropOutOnSide(*worker, LookingW, &unit);
+			//Wyrmgus start
+//			DropOutOnSide(*worker, LookingW, &unit);
+			if (unit.Type->BuilderOutside == false) {
+				DropOutOnSide(*worker, LookingW, &unit);
+			}
+			//Wyrmgus end
 
 			// If we can harvest from the new building, do it.
 			if (worker->Type->ResInfo[type.GivesResource]) {
@@ -224,8 +237,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			PlayUnitSound(unit, VoiceReady);
 		} else if (worker) {
 			PlayUnitSound(*worker, VoiceWorkCompleted);
-		} else {
-			PlayUnitSound(unit, VoiceBuilding);
+		//Wyrmgus start
+		// why play the under-construction sound if the building has just been completed?
+//		} else {
+//			PlayUnitSound(unit, VoiceBuilding);
+		//Wyrmgus end
 		}
 	}
 

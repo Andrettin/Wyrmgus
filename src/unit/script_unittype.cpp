@@ -1244,6 +1244,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->AttackFromTransporter = parent_type->AttackFromTransporter;
 			type->SaveCargo = parent_type->SaveCargo;
 			type->SelectableByRectangle = parent_type->SelectableByRectangle;
+			type->BuilderOutside = parent_type->BuilderOutside;
+			type->BuilderLost = parent_type->BuilderLost;
+			type->AutoBuildRate = parent_type->AutoBuildRate;
 			type->Animations = parent_type->Animations;
 			type->BuildingRules = parent_type->BuildingRules;
 			type->AiBuildingRules = parent_type->AiBuildingRules;
