@@ -1251,8 +1251,20 @@ static int CclDefineUnitType(lua_State *l)
 			type->BuildingRules = parent_type->BuildingRules;
 			type->AiBuildingRules = parent_type->AiBuildingRules;
 			type->Sound = parent_type->Sound;
-			type->CanCastSpell = parent_type->CanCastSpell;
-			type->AutoCastActive = parent_type->AutoCastActive;
+			if (parent_type->CanCastSpell) {
+				type->CanCastSpell = new char[SpellTypeTable.size()];
+				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
+				for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
+					type->CanCastSpell[i] = parent_type->CanCastSpell[i];
+				}
+			}
+			if (parent_type->AutoCastActive) {
+				type->AutoCastActive = new char[SpellTypeTable.size()];
+				memset(type->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
+				for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
+					type->AutoCastActive[i] = parent_type->AutoCastActive[i];
+				}
+			}
 			for (unsigned int i = 0; i < MaxCosts; ++i) {
 				type->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 				type->RepairCosts[i] = parent_type->RepairCosts[i];
