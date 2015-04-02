@@ -1285,7 +1285,8 @@ static int CclSetUnitVariable(lua_State *l)
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
 	//Wyrmgus start
 	} else if (!strcmp(name, "Variation")) {
-		unit->Variation = LuaToNumber(l, 3);
+		value = LuaToNumber(l, 3);
+		unit->Variation = value;
 		unit->Variable[VARIATION_INDEX].Value = unit->Variation;
 	//Wyrmgus end
 	} else {

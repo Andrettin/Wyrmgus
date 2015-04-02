@@ -1336,7 +1336,7 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Unit;
 			break;
 		case EString_TypeClass : // Class of the unit type
-			delete s->D.Type;
+			delete *s->D.Type;
 			break;
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;

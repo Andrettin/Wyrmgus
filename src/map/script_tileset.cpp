@@ -604,6 +604,8 @@ void CTileset::buildWallReplacementTable()
 	orcWallTable[14] = 0x9A0;
 	orcWallTable[15] = 0x0C0;
 
+	//Wyrmgus start
+	/*
 	// Set destroyed walls to TileTypeUnknown
 	for (int i = 0; i < 16; ++i) {
 		int n = 0;
@@ -630,6 +632,37 @@ void CTileset::buildWallReplacementTable()
 			++n;
 		}
 	}
+	*/
+	// this only needs to happen if there are actual wall tiles being used
+	if (tiles[humanWallTable[0]].tile) {
+		// Set destroyed walls to TileTypeUnknown
+		for (int i = 0; i < 16; ++i) {
+			int n = 0;
+			unsigned int tileIndex = humanWallTable[i];
+			while (tiles[tileIndex].tile) { // Skip good tiles
+				++tileIndex;
+				++n;
+			}
+			while (!tiles[tileIndex].tile) { // Skip separator
+				++tileIndex;
+				++n;
+			}
+			while (tiles[tileIndex].tile) { // Skip good tiles
+				++tileIndex;
+				++n;
+			}
+			while (!tiles[tileIndex].tile) { // Skip separator
+				++tileIndex;
+				++n;
+			}
+			while (n < 16 && tiles[tileIndex].tile) {
+				TileTypeTable[tiles[tileIndex].tile] = TileTypeUnknown;
+				++tileIndex;
+				++n;
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 //@}

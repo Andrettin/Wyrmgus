@@ -1341,7 +1341,12 @@ void LoadUnitTypes()
 		CUnitType &type = *UnitTypes[i];
 
 		// Lookup icons.
-		type.Icon.Load();
+		//Wyrmgus start
+//		type.Icon.Load();
+		if (!type.Icon.Name.empty()) {
+			type.Icon.Load();
+		}
+		//Wyrmgus end
 
 		//Wyrmgus start
 		for (int j = 0; j < VariationMax; ++j) {
