@@ -42,6 +42,9 @@
 #include "player.h"
 #include "tileset.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unit_manager.h"
 #include "ui.h"
 #include "version.h"
@@ -552,6 +555,17 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
+	
+	//Wyrmgus start
+	//remove decorations if a wall, tree or rock was removed from the tile
+	std::vector<CUnit *> table;
+	Select(pos, pos, table);
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->Decoration) {
+			LetUnitDie(*table[i]);			
+		}
+	}
+	//Wyrmgus end
 }
 /// Remove rock from the map.
 void CMap::ClearRockTile(const Vec2i &pos)
@@ -570,6 +584,17 @@ void CMap::ClearRockTile(const Vec2i &pos)
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
+	
+	//Wyrmgus start
+	//remove decorations if a wall, tree or rock was removed from the tile
+	std::vector<CUnit *> table;
+	Select(pos, pos, table);
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->Decoration) {
+			LetUnitDie(*table[i]);			
+		}
+	}
+	//Wyrmgus end
 }
 
 

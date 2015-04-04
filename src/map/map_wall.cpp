@@ -40,6 +40,9 @@
 #include "tileset.h"
 #include "ui.h"
 #include "player.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------
@@ -221,6 +224,17 @@ void CMap::RemoveWall(const Vec2i &pos)
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(mf);
 	}
+	
+	//Wyrmgus start
+	//remove decorations if a wall, tree or rock was removed from the tile
+	std::vector<CUnit *> table;
+	Select(pos, pos, table);
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->Decoration) {
+			LetUnitDie(*table[i]);			
+		}
+	}
+	//Wyrmgus end
 }
 
 /**

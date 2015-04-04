@@ -1014,6 +1014,25 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
 		}
+		
+		//Wyrmgus start
+		if (show && Selected.size() >= 1 && Selected[0]->Player == ThisPlayer) {
+			bool has_terrain_resource = false;
+			const CViewport &vp = *UI.MouseViewport;
+			const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
+			for (int res = 0; res < MaxCosts; ++res) {
+				if (Selected[0]->Type->ResInfo[res]
+					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
+					&& Map.Field(tilePos)->IsTerrainResourceOnMap(res)
+				) {
+					has_terrain_resource = true;
+				}
+			}
+			if (has_terrain_resource) {
+				GameCursor = UI.YellowHair.Cursor;
+			}
+		}
+		//Wyrmgus end
 	} else if (CursorOn == CursorOnMinimap) {
 		const Vec2i tilePos = UI.Minimap.ScreenToTilePos(cursorPos);
 
@@ -1042,13 +1061,22 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
 					} else {
-						GameCursor = UI.YellowHair.Cursor;
+						//Wyrmgus start
+//						GameCursor = UI.YellowHair.Cursor;
+						GameCursor = UI.GreenHair.Cursor;
+						//Wyrmgus end
 					}
-				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
+				//Wyrmgus start
+//				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
+				} else if (ThisPlayer->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value) {
+				//Wyrmgus end
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
 					} else {
-						GameCursor = UI.YellowHair.Cursor;
+						//Wyrmgus start
+//						GameCursor = UI.YellowHair.Cursor;
+						GameCursor = UI.RedHair.Cursor;
+						//Wyrmgus end
 					}
 				}
 			}
@@ -1067,7 +1095,22 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		//  Map
 		if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration
 			&& (UnitUnderCursor->IsVisible(*ThisPlayer) || ReplayRevealMap)) {
-			GameCursor = UI.Glass.Cursor;
+			//Wyrmgus start
+//			GameCursor = UI.Glass.Cursor;
+			if (
+				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer && Selected[0]->IsAgressive() && UnitUnderCursor->Player != ThisPlayer
+				&& Selected[0]->IsEnemy(*UnitUnderCursor) && (UnitUnderCursor->Player->Index != PlayerNumNeutral || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value)
+			) {
+				GameCursor = UI.RedHair.Cursor;
+			} else if (
+				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer &&
+				UnitUnderCursor->Type->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->Type->GivesResource] && UnitUnderCursor->Type->CanHarvest && (UnitUnderCursor->Player == ThisPlayer || UnitUnderCursor->Player->Index == PlayerNumNeutral)
+			) {
+				GameCursor = UI.YellowHair.Cursor;
+			} else {
+				GameCursor = UI.Glass.Cursor;
+			}
+			//Wyrmgus end
 		}
 		return;
 	}
