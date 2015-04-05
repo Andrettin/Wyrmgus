@@ -184,6 +184,10 @@ void MapUnitSounds()
 		//Wyrmgus start
 		type.Sound.Hit.MapSound();
 		type.Sound.Miss.MapSound();
+		type.Sound.Step.MapSound();
+		type.Sound.StepGrass.MapSound();
+		type.Sound.StepMud.MapSound();
+		type.Sound.StepRock.MapSound();
 		//Wyrmgus end
 		type.Sound.Build.MapSound();
 		type.Sound.Ready.MapSound();

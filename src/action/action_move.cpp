@@ -214,6 +214,7 @@ int DoActionMove(CUnit &unit)
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
 	//Wyrmgus start
 //	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
+	PlayUnitSound(unit, VoiceStep);	
 	int move = UnitShowAnimationScaled(unit, animations->Move, Map.Field(unit.Offset)->getCost());
 	//Wyrmgus end
 

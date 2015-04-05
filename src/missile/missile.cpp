@@ -359,7 +359,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	//Wyrmgus end
 	damage += piercing_damage;
 	if (GameSettings.NoRandomness) {
-		if (attacker.Variable[ACCURACY_INDEX].Value > 0) { //if no randomness setting is used, and both the attacker's accuracy and the target's evasion are greater than 0, then apply accuracy as a damage bonus and evasion as a damage malus
+		if (attacker.Variable[ACCURACY_INDEX].Value > 0) { //if no randomness setting is used, and the attacker's accuracy and is greater than 0, then apply accuracy as a damage bonus and evasion as a damage malus
 			if (goal != NULL) {
 				if (goal->Variable[EVASION_INDEX].Value > 0) {
 					damage += attacker.Variable[ACCURACY_INDEX].Value;

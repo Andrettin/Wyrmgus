@@ -78,7 +78,11 @@ public:
 	SoundConfig Attack;             /// attack confirm command
 	//Wyrmgus start
 	SoundConfig Hit;				/// hit another unit
-	SoundConfig Miss;				/// attcked another unit, but missed
+	SoundConfig Miss;				/// attacked another unit, but missed
+	SoundConfig Step;				/// stepped
+	SoundConfig StepGrass;			/// stepped on grass
+	SoundConfig StepMud;			/// stepped on mud
+	SoundConfig StepRock;			/// stepped on rock
 	//Wyrmgus end
 	SoundConfig Build;              /// build confirm command
 	SoundConfig Ready;              /// unit training... ready
