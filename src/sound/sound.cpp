@@ -162,10 +162,6 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 {
 	//Wyrmgus start
 	const CMapField &mf = *Map.Field(unit.tilePos);
-	const CTileset &tileset = *Map.Tileset;
-	const int index = mf.getTileIndex();
-	Assert(index != -1);
-	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	//Wyrmgus end
 	switch (voice) {
 		case VoiceAcknowledging:
@@ -186,11 +182,11 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				return unit.Type->Sound.Hit.Sound;
 			}
 		case VoiceStep:
-			if (unit.Type->Sound.StepGrass.Sound && (tileset.getTerrainName(baseTerrainIdx) == "grass" || tileset.getTerrainName(baseTerrainIdx) == "dark-grass" || tileset.getTerrainName(baseTerrainIdx) == "tree" || tileset.getTerrainName(baseTerrainIdx) == "pine-tree" || tileset.getTerrainName(baseTerrainIdx) == "fairlimbed-tree" || tileset.getTerrainName(baseTerrainIdx) == "rug")) { // rather clunky to use the terrain's name to obtain which stepping sound it should make, perhaps should add a map field instead?
+			if (unit.Type->Sound.StepGrass.Sound && mf.getFlag() & MapFieldGrass) {
 				return unit.Type->Sound.StepGrass.Sound;
-			} else if (unit.Type->Sound.StepMud.Sound && (tileset.getTerrainName(baseTerrainIdx) == "mud" || tileset.getTerrainName(baseTerrainIdx) == "dry-mud" || tileset.getTerrainName(baseTerrainIdx) == "dirt" || tileset.getTerrainName(baseTerrainIdx) == "dark-dirt")) {
+			} else if (unit.Type->Sound.StepMud.Sound && mf.getFlag() & MapFieldMud) {
 				return unit.Type->Sound.StepMud.Sound;
-			} else if (unit.Type->Sound.StepRock.Sound && (tileset.getTerrainName(baseTerrainIdx) == "rock" || tileset.getTerrainName(baseTerrainIdx) == "cave-floor" || tileset.getTerrainName(baseTerrainIdx) == "rockbound-cave-floor" || tileset.getTerrainName(baseTerrainIdx) == "cave-wall" || tileset.getTerrainName(baseTerrainIdx) == "floor" || tileset.getTerrainName(baseTerrainIdx) == "gold-pile")) {
+			} else if (unit.Type->Sound.StepRock.Sound && mf.getFlag() & MapFieldRockFloor) {
 				return unit.Type->Sound.StepRock.Sound;
 			} else {
 				return unit.Type->Sound.Step.Sound;

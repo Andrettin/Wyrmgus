@@ -84,7 +84,10 @@ struct lua_State;
 #define MapFieldSeaUnit  0x00004000  /// Water unit on field
 #define MapFieldBuilding 0x00008000  /// Building on field
 
-#define MapFieldAirUnpassable 0x00010000  /// Field is movement blocked
+#define MapFieldAirUnpassable 0x00010000	/// Field is movement blocked
+#define MapFieldGrass 0x00020000			/// Used for playing grass step sounds
+#define MapFieldMud 0x00040000			/// Used for playing mud step sounds
+#define MapFieldRockFloor 0x00080000		/// Used for playing rock step sounds
 //Wyrmgus end
 
 /**

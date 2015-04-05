@@ -217,6 +217,9 @@ void CMap::RemoveWall(const Vec2i &pos)
 
 	MapFixWallTile(pos);
 	mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
+	//Wyrmgus start
+	mf.Flags |= MapFieldRockFloor;
+	//Wyrmgus end
 	MapFixWallNeighbors(pos);
 	UI.Minimap.UpdateXY(pos);
 

@@ -545,6 +545,9 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 
 	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
 	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
+	//Wyrmgus start
+	mf.Flags |= MapFieldGrass;
+	//Wyrmgus end
 	mf.Value = 0;
 
 	UI.Minimap.UpdateXY(pos);
@@ -574,6 +577,9 @@ void CMap::ClearRockTile(const Vec2i &pos)
 
 	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
 	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
+	//Wyrmgus start
+	mf.Flags |= MapFieldRockFloor;
+	//Wyrmgus end
 	mf.Value = 0;
 
 	UI.Minimap.UpdateXY(pos);
@@ -641,6 +647,9 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
 		topMf.Value = 0;
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
+		//Wyrmgus start
+		topMf.Flags &= ~(MapFieldGrass);
+		//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
 		
@@ -653,6 +662,9 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		//Wyrmgus start
+		mf.Flags &= ~(MapFieldGrass);
+		//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
