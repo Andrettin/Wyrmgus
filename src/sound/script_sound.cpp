@@ -346,6 +346,24 @@ static int CclSetSoundRange(lua_State *l)
 	return 1;
 }
 
+//Wyrmgus start
+/**
+**  Set the volume percent of a given sound (useful for easily correcting how loud a sound is).
+**
+**  @param l  Lua state.
+*/
+static int CclSetSoundVolumePercent(lua_State *l)
+{
+
+	LuaCheckArgs(l, 2);
+
+	lua_pushvalue(l, 1);
+	CSound *id = CclGetSound(l);
+	SetSoundVolumePercent(id, LuaToNumber(l, 2));
+	return 1;
+}
+//Wyrmgus end
+
 /**
 **  Register CCL features for sound.
 */
@@ -356,6 +374,9 @@ void SoundCclRegister()
 	lua_register(Lua, "MapSound", CclMapSound);
 	lua_register(Lua, "SoundForName", CclSoundForName);
 	lua_register(Lua, "SetSoundRange", CclSetSoundRange);
+	//Wyrmgus start
+	lua_register(Lua, "SetSoundVolumePercent", CclSetSoundVolumePercent);
+	//Wyrmgus end
 	lua_register(Lua, "MakeSound", CclMakeSound);
 	lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);
 	lua_register(Lua, "PlaySound", CclPlaySound);

@@ -189,6 +189,9 @@ int DoActionMove(CUnit &unit)
 		}
 		Vec2i pos = unit.tilePos + posd;
 		unit.MoveToXY(pos);
+		//Wyrmgus start
+		PlayUnitSound(unit, VoiceStep);			
+		//Wyrmgus end
 
 		// Remove unit from the current selection
 		if (unit.Selected && !Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -214,7 +217,6 @@ int DoActionMove(CUnit &unit)
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
 	//Wyrmgus start
 //	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
-	PlayUnitSound(unit, VoiceStep);	
 	int move = UnitShowAnimationScaled(unit, animations->Move, Map.Field(unit.Offset)->getCost());
 	//Wyrmgus end
 

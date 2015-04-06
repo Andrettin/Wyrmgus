@@ -308,7 +308,10 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	bool selection = (voice == VoiceSelected || voice == VoiceBuilding);
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 
-	if (UnitSoundIsPlaying(&source)) {
+	//Wyrmgus start
+//	if (UnitSoundIsPlaying(&source)) {
+	if (UnitSoundIsPlaying(&source) && voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep) {
+	//Wyrmgus end
 		return;
 	}
 
@@ -316,8 +319,14 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
+	//Wyrmgus start
+//	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range));
+	SetChannelVolume(channel, CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range) * sound->VolumePercent / 100);
+	//Wyrmgus end
 	SetChannelStereo(channel, CalculateStereo(unit));
+	//Wyrmgus start
+	SetChannelVoiceGroup(channel, voice);
+	//Wyrmgus end
 }
 
 /**
@@ -334,7 +343,10 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 		return;
 	}
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);
+	//Wyrmgus start
+//	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);
+	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range) * sound->VolumePercent / 100;
+	//Wyrmgus end
 	if (volume == 0) {
 		return;
 	}
@@ -364,7 +376,10 @@ void PlayMissileSound(const Missile &missile, CSound *sound)
 	clamp(&stereo, -128, 127);
 
 	Origin source = {NULL, 0};
-	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
+	//Wyrmgus start
+//	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range);
+	unsigned char volume = CalculateVolume(false, ViewPointDistanceToMissile(missile), sound->Range) * sound->VolumePercent / 100;
+	//Wyrmgus end
 	if (volume == 0) {
 		return;
 	}
@@ -400,7 +415,10 @@ void PlayGameSound(CSound *sound, unsigned char volume, bool always)
 	if (channel == -1) {
 		return;
 	}
-	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
+	//Wyrmgus start
+//	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range));
+	SetChannelVolume(channel, CalculateVolume(true, volume, sound->Range) * sound->VolumePercent / 100);
+	//Wyrmgus end
 }
 
 static std::map<int, LuaActionListener *> ChannelMap;
@@ -455,6 +473,21 @@ void SetSoundRange(CSound *sound, unsigned char range)
 	}
 }
 
+//Wyrmgus start
+/**
+**  Ask the sound server to change the volume percent of a sound.
+**
+**  @param sound  the id of the sound to modify.
+**  @param volume_percent  the new volume percent for this sound.
+*/
+void SetSoundVolumePercent(CSound *sound, int volume_percent)
+{
+	if (sound != NO_SOUND) {
+		sound->VolumePercent = volume_percent;
+	}
+}
+//Wyrmgus end
+
 /**
 **  Ask the sound server to register a sound (and currently to load it)
 **  and to return an unique identifier for it. The unique identifier is
@@ -493,6 +526,9 @@ CSound *RegisterSound(const std::vector<std::string> &files)
 		id->Number = ONE_SOUND;
 	}
 	id->Range = MAX_SOUND_RANGE;
+	//Wyrmgus start
+	id->VolumePercent = 100;
+	//Wyrmgus end
 	return id;
 }
 
@@ -514,6 +550,9 @@ CSound *RegisterTwoGroups(CSound *first, CSound *second)
 	id->Sound.TwoGroups.First = first;
 	id->Sound.TwoGroups.Second = second;
 	id->Range = MAX_SOUND_RANGE;
+	//Wyrmgus start
+	id->VolumePercent = 100;
+	//Wyrmgus end
 
 	return id;
 }

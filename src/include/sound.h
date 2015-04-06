@@ -103,7 +103,10 @@ public:
 class CSound
 {
 public:
-	CSound() : Mapref(0), Range(0), Number(0)
+	//Wyrmgus start
+//	CSound() : Mapref(0), Range(0), Number(0)
+	CSound() : Mapref(0), Range(0), Number(0), VolumePercent(0)
+	//Wyrmgus end
 	{
 		memset(&Sound, 0, sizeof(Sound));
 	}
@@ -115,6 +118,9 @@ public:
 	*/
 	unsigned char Range;        /// Range is a multiplier for DistanceSilent
 	unsigned char Number;       /// single, group, or table of sounds.
+	//Wyrmgus start
+	int VolumePercent;
+	//Wyrmgus end
 	union {
 		CSample *OneSound;       /// if it's only a simple sound
 		CSample **OneGroup;      /// when it's a simple group
@@ -184,6 +190,11 @@ extern int PlayFile(const std::string &name, LuaActionListener *listener = NULL)
 
 /// Modify the range of a given sound.
 extern void SetSoundRange(CSound *sound, unsigned char range);
+
+//Wyrmgus start
+/// Modify the volume percent of a given sound.
+extern void SetSoundVolumePercent(CSound *sound, int volume_percent);
+//Wyrmgus end
 
 /// Register a sound (can be a simple sound or a group)
 extern CSound *RegisterSound(const std::vector<std::string> &files);

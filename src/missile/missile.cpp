@@ -365,19 +365,15 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 					damage += attacker.Variable[ACCURACY_INDEX].Value;
 					damage -= goal->Variable[EVASION_INDEX].Value;
 					
-					if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building) { //flanking
-						std::vector<CUnit *> table;
-						SelectAroundUnit(*goal, 1, table, MakeAndPredicate(HasSamePlayerAs(*attacker.Player), IsNotBuildingType()));
-
-						Vec2i attacker_pos = attacker.tilePos;
-						for (size_t i = 0; i != table.size(); ++i) {
-							Vec2i flanker_pos = table[i]->tilePos;
-							
-							if ((flanker_pos.x == (attacker_pos.x - 2) && flanker_pos.y == attacker_pos.y) || (flanker_pos.x == (attacker_pos.x + 2) && flanker_pos.y == attacker_pos.y) || (flanker_pos.x == attacker_pos.x && flanker_pos.y == (attacker_pos.y - 2)) || (flanker_pos.x == attacker_pos.x && flanker_pos.y == (attacker_pos.y + 2))) {
-								if (table[i]->Direction == (attacker.Direction - 128) || table[i]->Direction == (attacker.Direction + 128) || (attacker.Direction == 0 && table[i]->Direction == 128) || (attacker.Direction == 128 && table[i]->Direction == 0)) {
-									damage += 2;
-								}
-							}
+					if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) { //flanking
+						if (attacker.Direction == goal->Direction) {
+							damage += 4;
+						} else if (goal->Direction == (attacker.Direction - 32) || goal->Direction == (attacker.Direction + 32) || (attacker.Direction == 0 && goal->Direction == 224) || (attacker.Direction == 224 && goal->Direction == 0)) {
+							damage += 3;
+						} else if (goal->Direction == (attacker.Direction - 64) || goal->Direction == (attacker.Direction + 64) || (attacker.Direction == 0 && goal->Direction == 192) || (attacker.Direction == 192 && goal->Direction == 0)) {
+							damage += 2;
+						} else if (goal->Direction == (attacker.Direction - 96) || goal->Direction == (attacker.Direction + 96) || (attacker.Direction == 0 && goal->Direction == 160) || (attacker.Direction == 160 && goal->Direction == 0)) {
+							damage += 1;
 						}
 					}					
 				}
@@ -452,19 +448,15 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 			if (goal->Variable[EVASION_INDEX].Value) {
 				evasion = SyncRand(goal->Variable[EVASION_INDEX].Value);
 			}
-			if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building) { //flanking
-				std::vector<CUnit *> table;
-				SelectAroundUnit(*goal, 1, table, MakeAndPredicate(HasSamePlayerAs(*attacker.Player), IsNotBuildingType()));
-
-				Vec2i attacker_pos = attacker.tilePos;
-				for (size_t i = 0; i != table.size(); ++i) {
-					Vec2i flanker_pos = table[i]->tilePos;
-					
-					if ((flanker_pos.x == (attacker_pos.x - 2) && flanker_pos.y == attacker_pos.y) || (flanker_pos.x == (attacker_pos.x + 2) && flanker_pos.y == attacker_pos.y) || (flanker_pos.x == attacker_pos.x && flanker_pos.y == (attacker_pos.y - 2)) || (flanker_pos.x == attacker_pos.x && flanker_pos.y == (attacker_pos.y + 2))) {
-						if (table[i]->Direction == (attacker.Direction - 128) || table[i]->Direction == (attacker.Direction + 128) || (attacker.Direction == 0 && table[i]->Direction == 128) || (attacker.Direction == 128 && table[i]->Direction == 0)) {
-							evasion -= 2;
-						}
-					}
+			if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) { //flanking
+				if (attacker.Direction == goal->Direction) {
+					evasion -= 4;
+				} else if (goal->Direction == (attacker.Direction - 32) || goal->Direction == (attacker.Direction + 32) || (attacker.Direction == 0 && goal->Direction == 224) || (attacker.Direction == 224 && goal->Direction == 0)) {
+					evasion -= 3;
+				} else if (goal->Direction == (attacker.Direction - 64) || goal->Direction == (attacker.Direction + 64) || (attacker.Direction == 0 && goal->Direction == 192) || (attacker.Direction == 192 && goal->Direction == 0)) {
+					evasion -= 2;
+				} else if (goal->Direction == (attacker.Direction - 96) || goal->Direction == (attacker.Direction + 96) || (attacker.Direction == 0 && goal->Direction == 160) || (attacker.Direction == 160 && goal->Direction == 0)) {
+					evasion -= 1;
 				}
 			}
 		} else {

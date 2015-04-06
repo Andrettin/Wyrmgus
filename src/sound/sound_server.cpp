@@ -68,6 +68,9 @@ struct SoundChannel {
 	Origin *Unit;          /// pointer to unit, who plays the sound, if any
 	unsigned char Volume;  /// Volume of this channel
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
+	//Wyrmgus start
+	UnitVoiceGroup Voice;  /// Voice group of this channel (for identifying voice types)
+	//Wyrmgus end
 
 	bool Playing;          /// channel is currently playing
 	int Point;             /// point in sample if playing or next free channel
@@ -338,7 +341,11 @@ bool UnitSoundIsPlaying(Origin *origin)
 {
 	for (int i = 0; i < MaxChannels; ++i) {
 		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
-			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
+			//Wyrmgus start
+//			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
+			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing
+			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceStep) {
+			//Wyrmgus end
 			return true;
 		}
 	}
@@ -356,7 +363,7 @@ static void ChannelFinished(int channel)
 
 	delete Channels[channel].Unit;
 	Channels[channel].Unit = NULL;
-
+	
 	Channels[channel].Playing = false;
 	Channels[channel].Point = NextFreeChannel;
 	NextFreeChannel = channel;
@@ -442,6 +449,28 @@ int SetChannelStereo(int channel, int stereo)
 	}
 	return stereo;
 }
+
+//Wyrmgus start
+/**
+**  Set the channel voice group
+**
+**  @param channel  Channel to set
+**
+**  @return         Current stereo of the channel, -1 for error
+*/
+int SetChannelVoiceGroup(int channel, UnitVoiceGroup voice)
+{
+	if (channel < 0 || channel >= MaxChannels) {
+		return -1;
+	}
+
+	SDL_LockAudio();
+	Channels[channel].Voice = voice;
+	SDL_UnlockAudio();
+	
+	return voice;
+}
+//Wyrmgus end
 
 /**
 **  Set the channel's callback for when a sound finishes playing

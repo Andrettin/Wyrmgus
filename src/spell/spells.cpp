@@ -533,7 +533,10 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 			if (spell.Target == TargetSelf) {
 				PlayUnitSound(caster, spell.SoundWhenCast.Sound);
 			} else {
-				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));
+				//Wyrmgus start
+//				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range));
+				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range) * spell.SoundWhenCast.Sound->VolumePercent / 100);
+				//Wyrmgus end
 			}
 		}
 		for (std::vector<SpellActionType *>::const_iterator act = spell.Action.begin();
