@@ -450,7 +450,10 @@ int COrder_Resource::MoveToResource(CUnit &unit)
 {
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
 
-	if (resinfo.TerrainHarvester) {
+	//Wyrmgus start
+//	if (resinfo.TerrainHarvester) {
+	if (Map.Info.IsPointOnMap(this->goalPos)) {
+	//Wyrmgus end
 		return MoveToResource_Terrain(unit);
 	} else {
 		return MoveToResource_Unit(unit);
@@ -485,7 +488,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	Assert(!unit.IX);
 	Assert(!unit.IY);
 
-	if (resinfo.TerrainHarvester) {
+	//Wyrmgus start
+//	if (resinfo.TerrainHarvester) {
+	if (Map.Info.IsPointOnMap(this->goalPos)) {
+	//Wyrmgus end
 		// This shouldn't happened?
 #if 0
 		if (!Map.IsTerrainResourceOnMap(unit.Orders->goalPos, this->CurrentResource)) {
@@ -684,7 +690,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
 	int addload;
 
-	if (resinfo.HarvestFromOutside || resinfo.TerrainHarvester) {
+	//Wyrmgus start
+//	if (resinfo.HarvestFromOutside || resinfo.TerrainHarvester) {
+	if (resinfo.HarvestFromOutside || Map.Info.IsPointOnMap(this->goalPos)) {
+	//Wyrmgus end
 		AnimateActionHarvest(unit);
 	} else {
 		unit.Anim.CurrAnim = NULL;
@@ -693,12 +702,18 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	this->TimeToHarvest--;
 
 	if (this->DoneHarvesting) {
-		Assert(resinfo.HarvestFromOutside || resinfo.TerrainHarvester);
+		//Wyrmgus start
+//		Assert(resinfo.HarvestFromOutside || resinfo.TerrainHarvester);
+		Assert(resinfo.HarvestFromOutside || Map.Info.IsPointOnMap(this->goalPos));
+		//Wyrmgus end
 		return !unit.Anim.Unbreakable;
 	}
 
 	// Target gone?
-	if (resinfo.TerrainHarvester && !Map.Field(this->goalPos)->IsTerrainResourceOnMap(this->CurrentResource)) {
+	//Wyrmgus start
+//	if (resinfo.TerrainHarvester && !Map.Field(this->goalPos)->IsTerrainResourceOnMap(this->CurrentResource)) {
+	if (Map.Info.IsPointOnMap(this->goalPos) && !Map.Field(this->goalPos)->IsTerrainResourceOnMap(this->CurrentResource)) {
+	//Wyrmgus end
 		if (!unit.Anim.Unbreakable) {
 			// Action now breakable, move to resource again.
 			this->State = SUB_MOVE_TO_RESOURCE;
@@ -729,7 +744,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			addload = resinfo.ResourceCapacity - unit.ResourcesHeld;
 		}
 
-		if (resinfo.TerrainHarvester) {
+		//Wyrmgus start
+//		if (resinfo.TerrainHarvester) {
+		if (Map.Info.IsPointOnMap(this->goalPos)) {
+		//Wyrmgus end
 			unit.ResourcesHeld += addload;
 
 			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
@@ -791,7 +809,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				return 0;
 			}
 		}
-		if (resinfo.TerrainHarvester) {
+		//Wyrmgus start
+//		if (resinfo.TerrainHarvester) {
+		if (Map.Info.IsPointOnMap(this->goalPos)) {
+		//Wyrmgus end
 			if (unit.ResourcesHeld == resinfo.ResourceCapacity) {
 				// Mark as complete.
 				this->DoneHarvesting = true;
@@ -841,7 +862,10 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	CUnit *source = 0;
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
 
-	if (!resinfo.TerrainHarvester) {
+	//Wyrmgus start
+//	if (!resinfo.TerrainHarvester) {
+	if (!Map.Info.IsPointOnMap(this->goalPos)) {
+	//Wyrmgus end
 		if (resinfo.HarvestFromOutside) {
 			source = this->GetGoal();
 			this->ClearGoal();
@@ -912,7 +936,10 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	// Find and send to resource deposit.
 	CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
 	if (!depot || !unit.ResourcesHeld || this->Finished) {
-		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
+		//Wyrmgus start
+//		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
+		if (!(resinfo.HarvestFromOutside || Map.Info.IsPointOnMap(this->goalPos))) {
+		//Wyrmgus end
 			Assert(unit.Container);
 			DropOutOnSide(unit, LookingW, source);
 		}
@@ -928,7 +955,10 @@ int COrder_Resource::StopGathering(CUnit &unit)
 		this->Finished = true;
 		return 0;
 	} else {
-		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
+		//Wyrmgus start
+//		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
+		if (!(resinfo.HarvestFromOutside || Map.Info.IsPointOnMap(this->goalPos))) {
+		//Wyrmgus end
 			Assert(unit.Container);
 			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(), source);
 		}
@@ -1052,7 +1082,10 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	//Assert(depot);
 
 	// Range hardcoded. don't stray too far though
-	if (resinfo.TerrainHarvester) {
+	//Wyrmgus start
+//	if (resinfo.TerrainHarvester) {
+	if (!this->Resource.Mine) {
+	//Wyrmgus end
 		Vec2i pos = this->Resource.Pos;
 
 		if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 10, *unit.Player, pos, &pos)) {
@@ -1134,7 +1167,10 @@ void COrder_Resource::DropResource(CUnit &unit)
 	if (unit.CurrentResource) {
 		const ResourceInfo &resinfo = *unit.Type->ResInfo[unit.CurrentResource];
 
-		if (!resinfo.TerrainHarvester) {
+		//Wyrmgus start
+//		if (!resinfo.TerrainHarvester) {
+		if (!Map.Info.IsPointOnMap(this->goalPos)) {
+		//Wyrmgus end
 			CUnit *mine = this->Resource.Mine;
 			if (mine) {
 				unit.DeAssignWorkerFromMine(*mine);
@@ -1173,7 +1209,10 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 	if (this->CurrentResource) {
 		const ResourceInfo *resinfo = unit.Type->ResInfo[this->CurrentResource];
 		if (resinfo) {
-			if (!resinfo->TerrainHarvester) {
+			//Wyrmgus start
+	//		if (!resinfo.TerrainHarvester) {
+			if (!Map.Info.IsPointOnMap(this->goalPos)) {
+			//Wyrmgus end
 				CUnit *newGoal = UnitFindResource(unit, this->Resource.Mine ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
 
 				if (newGoal) {

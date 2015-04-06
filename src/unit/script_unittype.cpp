@@ -901,9 +901,13 @@ static int CclDefineUnitType(lua_State *l)
 						res->WaitAtDepot = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "resource-capacity")) {
 						res->ResourceCapacity = LuaToNumber(l, -1, k + 1);
+					//Wyrmgus start
+					/*
 					} else if (!strcmp(value, "terrain-harvester")) {
 						res->TerrainHarvester = 1;
 						--k;
+					*/
+					//Wyrmgus end
 					} else if (!strcmp(value, "lose-resources")) {
 						res->LoseResources = 1;
 						--k;

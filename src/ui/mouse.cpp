@@ -253,7 +253,9 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 	// FIXME: support harvesting more types of terrain.
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (type.ResInfo[res]
-			&& type.ResInfo[res]->TerrainHarvester
+			//Wyrmgus start
+//			&& type.ResInfo[res]->TerrainHarvester
+			//Wyrmgus end
 			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
 			&& ((unit.CurrentResource != res)
 				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
@@ -1022,7 +1024,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);
 			for (int res = 0; res < MaxCosts; ++res) {
 				if (Selected[0]->Type->ResInfo[res]
-					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
+					//Wyrmgus start
+//					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
+					//Wyrmgus end
 					&& Map.Field(tilePos)->IsTerrainResourceOnMap(res)
 				) {
 					has_terrain_resource = true;
@@ -1331,7 +1335,9 @@ static int SendResource(const Vec2i &pos)
 			} else {
 				for (res = 0; res < MaxCosts; ++res) {
 					if (unit.Type->ResInfo[res]
-						&& unit.Type->ResInfo[res]->TerrainHarvester
+						//Wyrmgus start
+//						&& unit.Type->ResInfo[res]->TerrainHarvester
+						//Wyrmgus start
 						&& mf.playerInfo.IsExplored(*unit.Player)
 						&& mf.IsTerrainResourceOnMap(res)
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity

@@ -452,7 +452,10 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 		ResourceInfo *resinfo = worker.Type->ResInfo[i];
 		//Depots
 		if (type.CanStore[i]) {
-			if (resinfo && resinfo->TerrainHarvester) {
+			//Wyrmgus start
+//			if (resinfo && resinfo->TerrainHarvester) {
+			if (resinfo && i == WoodCost) {
+			//Wyrmgus end
 				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos);
 			} else {
 				return AiFindHallPlace(worker, type, startPos, i, resultPos);

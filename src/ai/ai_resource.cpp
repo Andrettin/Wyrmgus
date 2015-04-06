@@ -1000,7 +1000,11 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource];
 	Assert(&resinfo);
 
-	if (resinfo.TerrainHarvester) {
+	//Wyrmgus start
+//	if (resinfo.TerrainHarvester) {
+	Vec2i forestPos;
+	if (resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
+	//Wyrmgus end
 		return AiAssignHarvesterFromTerrain(unit, resource);
 	} else {
 		return AiAssignHarvesterFromUnit(unit, resource);

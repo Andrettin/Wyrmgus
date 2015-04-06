@@ -87,7 +87,10 @@ class ResourceInfo
 public:
 	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
-		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
+		//Wyrmgus start
+//		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
+		LoseResources(0), HarvestFromOutside(0),
+		//Wyrmgus end
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
 
@@ -99,7 +102,9 @@ public:
 	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
 	unsigned FinalResource;         /// Convert resource when delivered.
-	unsigned char TerrainHarvester;    /// Unit will harvest terrain(wood only for now).
+	//Wyrmgus start
+//	unsigned char TerrainHarvester;    /// Unit will harvest terrain(wood only for now).
+	//Wyrmgus end
 	unsigned char LoseResources;       /// The unit will lose it's resource when distracted.
 	unsigned char HarvestFromOutside;  /// Unit harvests without entering the building.
 	unsigned char RefineryHarvester;   /// Unit have to build Refinery buildings for harvesting.
