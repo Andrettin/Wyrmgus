@@ -438,7 +438,7 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 	
 	int accuracy = 0;
 	if (attacker.Variable[ACCURACY_INDEX].Value) {
-		accuracy = SyncRand(attacker.Variable[ACCURACY_INDEX].Value);
+		accuracy = attacker.Variable[ACCURACY_INDEX].Value;
 	}
 	if (accuracy == 0) {
 		return false;
@@ -446,7 +446,7 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 		int evasion = 0;
 		if (goal != NULL) {
 			if (goal->Variable[EVASION_INDEX].Value) {
-				evasion = SyncRand(goal->Variable[EVASION_INDEX].Value);
+				evasion = goal->Variable[EVASION_INDEX].Value;
 			}
 			if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) { //flanking
 				if (attacker.Direction == goal->Direction) {
@@ -461,10 +461,16 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 			}
 		} else {
 			if (goal_stats.Variables[EVASION_INDEX].Value > 0) {
-				evasion = SyncRand(goal_stats.Variables[EVASION_INDEX].Value);
+				evasion = goal_stats.Variables[EVASION_INDEX].Value;
 			}
 		}
-		if (evasion > 0 && accuracy < evasion) {
+		if (accuracy > 0) {
+			accuracy = SyncRand(accuracy);
+		}
+		if (evasion > 0) {
+			evasion = SyncRand(evasion);
+		}
+		if (evasion > 0 && (accuracy < evasion || accuracy == 0)) {
 			return false;
 		}
 	}
