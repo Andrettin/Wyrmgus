@@ -762,6 +762,9 @@ int COrder_Resource::GatherResource(CUnit &unit)
 
 			Assert(source);
 			Assert(source->ResourcesHeld <= 655350);
+			//Wyrmgus start
+			UpdateUnitVariables(*source); //update resource source's variables
+			//Wyrmgus end
 			bool is_visible = source->IsVisibleAsGoal(*unit.Player);
 			// Target is not dead, getting resources.
 			if (is_visible) {

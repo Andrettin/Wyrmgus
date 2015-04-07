@@ -2118,7 +2118,10 @@ void UpdateUnitVariables(CUnit &unit)
 	// Resources.
 	if (unit.Type->GivesResource) {
 		unit.Variable[GIVERESOURCE_INDEX].Value = unit.ResourcesHeld;
-		unit.Variable[GIVERESOURCE_INDEX].Max = unit.ResourcesHeld > unit.Variable[GIVERESOURCE_INDEX].Max ? 0x7FFFFFFF : unit.Variable[GIVERESOURCE_INDEX].Max;
+		unit.Variable[GIVERESOURCE_INDEX].Max = unit.ResourcesHeld > unit.Variable[GIVERESOURCE_INDEX].Max ? unit.ResourcesHeld : unit.Variable[GIVERESOURCE_INDEX].Max;
+		//Wyrmgus start
+		unit.Variable[GIVERESOURCE_INDEX].Enable = 1;
+		//Wyrmgus end
 	}
 	if (unit.Type->Harvester && unit.CurrentResource) {
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
