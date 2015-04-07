@@ -532,6 +532,9 @@ int CTileset::getTileBySurrounding(unsigned short type,
 	tile += ((ttright & 0x01) && (ttdown & 0x04)) * 2;
 	tile += ((ttleft & 0x02) && (ttdown & 0x08)) * 1;
 
+	//Wyrmgus start
+	// don't produce single top-tiles or single top-tiles, as the graphical results are wonky
+	/*
 	//Test if we have top tree, or bottom tree, they are special
 	if ((ttdown & 0x10) != 0) {
 		tile |= (ttleft & 0x06) != 0 ? 1 : 0;
@@ -542,6 +545,8 @@ int CTileset::getTileBySurrounding(unsigned short type,
 		tile |= (ttleft & 0x06) != 0 ? 8 : 0;
 		tile |= (ttright & 0x09) != 0 ? 4 : 0;
 	}
+	*/
+	//Wyrmgus end
 
 	Assert(type == MapFieldForest || type == MapFieldRocks);
 #ifdef _MSC_VER
@@ -551,6 +556,9 @@ int CTileset::getTileBySurrounding(unsigned short type,
 #endif
 	tile = lookuptable[tile];
 
+	//Wyrmgus start
+	// don't produce single top-tiles or single top-tiles, as the graphical results are wonky
+	/*
 	//If tile is -1, then we should check if we are to draw just one tree
 	//Check for tile about, or below or both...
 	if (tile == -1) {
@@ -559,6 +567,8 @@ int CTileset::getTileBySurrounding(unsigned short type,
 		tile += ((ttdown & 0x04) || (ttdown & 0x08)) * 2;
 		tile = lookuptable[tile];
 	}
+	*/
+	//Wyrmgus end
 	return tile;
 }
 

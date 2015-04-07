@@ -492,6 +492,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 					  i, DefaultResourceNames[OilCost].c_str(),
 					  Players[i].Resources[OilCost]);
+			//Wyrmgus start
+			f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
+					  i, DefaultResourceNames[StoneCost].c_str(),
+					  Players[i].Resources[StoneCost]);
+			//Wyrmgus end
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 					  i, PlayerRaces.Name[Players[i].Race].c_str());
 			f->printf("SetAiType(%d, \"%s\")\n",

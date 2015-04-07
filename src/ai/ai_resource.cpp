@@ -599,6 +599,11 @@ static bool AiRequestSupply()
 				case OilCost:
 					needed += "Oil<";
 					break;
+				//Wyrmgus start
+				case StoneCost:
+					needed += "Stone<";
+					break;
+				//Wyrmgus end
 				default:
 					needed += "unknown<";
 					break;
@@ -918,12 +923,24 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 {
 	// TODO : hardcoded forest
 	Vec2i forestPos;
+	//Wyrmgus start
+	Vec2i rockPos;
+	//Wyrmgus end
 
 	// Code for terrain harvesters. Search for piece of terrain to mine.
-	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
+	//Wyrmgus start
+//	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
+	if (resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
+	//Wyrmgus end
 		CommandResourceLoc(unit, forestPos, FlushCommands);
 		return 1;
 	}
+	//Wyrmgus start
+	if (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, 1000, *unit.Player, unit.tilePos, &rockPos)) {
+		CommandResourceLoc(unit, rockPos, FlushCommands);
+		return 1;
+	}
+	//Wyrmgus end
 	// Ask the AI to explore...
 	AiExplore(unit.tilePos, MapFieldLandUnit);
 
@@ -1003,7 +1020,8 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester) {
 	Vec2i forestPos;
-	if (resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
+	Vec2i rockPos;
+	if ((resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) || (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, 1000, *unit.Player, unit.tilePos, &rockPos))) {
 	//Wyrmgus end
 		return AiAssignHarvesterFromTerrain(unit, resource);
 	} else {

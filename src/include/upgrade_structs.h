@@ -64,7 +64,10 @@ enum CostType {
 	OilCost,                                /// oil   resource
 	// extensions
 	Cost4,                                  /// resource 4
-	Cost5,                                  /// resource 5
+	//Wyrmgus start
+//	Cost5,                                  /// resource 5
+	StoneCost,								/// stone resource
+	//Wyrmgus end
 	Cost6,                                  /// resource 6
 
 	//Wyrmgus start

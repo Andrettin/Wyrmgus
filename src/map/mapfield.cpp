@@ -63,6 +63,10 @@ bool CMapField::IsTerrainResourceOnMap(int resource) const
 	// TODO: Hard coded stuff.
 	if (resource == WoodCost) {
 		return this->ForestOnMap();
+	//Wyrmgus start
+	} else if (resource == StoneCost) {
+		return this->RockOnMap();
+	//Wyrmgus end
 	}
 	return false;
 }

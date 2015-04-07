@@ -98,18 +98,30 @@ void CMap::MarkSeenTile(CMapField &mf)
 #endif
 
 		//  Handle wood changes. FIXME: check if for growing wood correct?
-		if (tile == this->Tileset->getRemovedTreeTile()) {
+		//Wyrmgus start
+//		if (tile == this->Tileset->getRemovedTreeTile()) {
+		if (tile == this->Tileset->getRemovedTreeTile() && mf.getFlag() & MapFieldGrass) {
+		//Wyrmgus end
 			FixNeighbors(MapFieldForest, 1, pos);
-		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
+		//Wyrmgus start
+//		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
+		} else if (seentile == this->Tileset->getRemovedTreeTile() && ((mf.getFlag() & MapFieldGrass) || (mf.getFlag() & MapFieldForest))) {
+		//Wyrmgus end
 			FixTile(MapFieldForest, 1, pos);
 		} else if (mf.ForestOnMap()) {
 			FixTile(MapFieldForest, 1, pos);
 			FixNeighbors(MapFieldForest, 1, pos);
 
 			// Handle rock changes.
-		} else if (tile == Tileset->getRemovedRockTile()) {
+		//Wyrmgus start
+//		} else if (tile == Tileset->getRemovedRockTile()) {
+		} else if (tile == Tileset->getRemovedRockTile() && mf.getFlag() & MapFieldRockFloor) {
+		//Wyrmgus end
 			FixNeighbors(MapFieldRocks, 1, pos);
-		} else if (seentile == Tileset->getRemovedRockTile()) {
+		//Wyrmgus start
+//		} else if (seentile == Tileset->getRemovedRockTile()) {
+		} else if (seentile == Tileset->getRemovedRockTile() && ((mf.getFlag() & MapFieldRockFloor) || (mf.getFlag() & MapFieldRocks))) {
+		//Wyrmgus end
 			FixTile(MapFieldRocks, 1, pos);
 		} else if (mf.RockOnMap()) {
 			FixTile(MapFieldRocks, 1, pos);
