@@ -412,6 +412,11 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	const int f = (100 * unit.Variable[this->varIndex].Value) / unit.Variable[this->varIndex].Max;
 
 	if (!this->hasBorder) {
+		//Wyrmgus start
+		if (Preference.ProgressBarG) {
+			Preference.ProgressBarG->DrawClip(this->Pos.x - 4, this->Pos.y - 5);
+		}
+		//Wyrmgus end
 		Video.FillRectangleClip(color, x, y, f * w / 100, h);
 		if (UI.CompletedBarShadow) {
 			// Shadow

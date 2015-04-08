@@ -256,6 +256,10 @@ void CUserInterface::Load()
 		Preference.InfoPanelFrameG->Load();
 		Preference.InfoPanelFrameG->UseDisplayFormat();
 	}
+	if (Preference.ProgressBarG) {
+		Preference.ProgressBarG->Load();
+		Preference.ProgressBarG->UseDisplayFormat();
+	}
 	//Wyrmgus end
 	
 	//  Resolve cursors
@@ -349,6 +353,7 @@ void CleanUserInterface()
 	CGraphic::Free(Preference.CommandButtonFrameG);
 	CGraphic::Free(Preference.BarFrameG);
 	CGraphic::Free(Preference.InfoPanelFrameG);
+	CGraphic::Free(Preference.ProgressBarG);
 	//Wyrmgus end
 
 	// Button Popups

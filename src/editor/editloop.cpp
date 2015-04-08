@@ -1124,15 +1124,32 @@ void EditorUpdateDisplay()
 
 	DrawStartLocations();
 
+	//Wyrmgus start
+	/*
 	// Fillers
 	for (size_t i = 0; i != UI.Fillers.size(); ++i) {
 		UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
 	}
+	*/
+	//Wyrmgus end
 
 	if (CursorOn == CursorOnMap && Gui->getTop() == editorContainer && !GamePaused) {
 		DrawMapCursor(); // cursor on map
 	}
 
+	//Wyrmgus start
+	if (CursorBuilding) {
+		DrawCursor();
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	// Fillers
+	for (size_t i = 0; i != UI.Fillers.size(); ++i) {
+		UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
+	}
+	//Wyrmgus end
+	
 	// Menu button
 	const int flag_active = ButtonAreaUnderCursor == ButtonAreaMenu
 							&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0;
@@ -1172,7 +1189,12 @@ void EditorUpdateDisplay()
 
 	// DrawPopup();
 
-	DrawCursor();
+	//Wyrmgus start
+//	DrawCursor();
+	if (!CursorBuilding) {
+		DrawCursor();
+	}
+	//Wyrmgus end
 
 	// refresh entire screen, so no further invalidate needed
 	Invalidate();
@@ -1858,10 +1880,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 
 	// Map
 	UnitUnderCursor = NULL;
-	//Wyrmgus start
-//	if (UI.MapArea.Contains(screenPos)) {
-	if (UI.MapArea.Contains(screenPos) && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UI.MouseViewport->IsInsideMapArea(PixelPos(CursorScreenPos.x + 32, CursorScreenPos.y + 32))) {
-	//Wyrmgus end
+	if (UI.MapArea.Contains(screenPos)) {
 		CViewport *vp = GetViewport(screenPos);
 		Assert(vp);
 		if (UI.MouseViewport != vp) { // viewport changed

@@ -171,7 +171,10 @@ void UpdateDisplay()
 		DrawMapArea();
 		DrawMessages();
 
-		if (CursorState == CursorStateRectangle) {
+		//Wyrmgus start
+//		if (CursorState == CursorStateRectangle) {
+		if (CursorState == CursorStateRectangle || CursorBuilding) {
+		//Wyrmgus end
 			DrawCursor();
 		}
 
@@ -206,7 +209,10 @@ void UpdateDisplay()
 
 	DrawGuichanWidgets();
 
-	if (CursorState != CursorStateRectangle) {
+	//Wyrmgus start
+//	if (CursorState != CursorStateRectangle) {
+	if (CursorState != CursorStateRectangle && !CursorBuilding) {
+	//Wyrmgus end
 		DrawCursor();
 	}
 

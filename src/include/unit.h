@@ -448,7 +448,7 @@ public:
 		//Wyrmgus start
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0),
-		IconFrameG(NULL), PressedIconFrameG(NULL), CommandButtonFrameG(NULL), BarFrameG(NULL), InfoPanelFrameG(NULL) {};
+		IconFrameG(NULL), PressedIconFrameG(NULL), CommandButtonFrameG(NULL), BarFrameG(NULL), InfoPanelFrameG(NULL), ProgressBarG(NULL) {};
 		//Wyrmgus end
 
 	bool ShowSightRange;     /// Show sight range.
@@ -475,6 +475,7 @@ public:
 	CGraphic *CommandButtonFrameG;
 	CGraphic *BarFrameG;
 	CGraphic *InfoPanelFrameG;
+	CGraphic *ProgressBarG;
 	//Wyrmgus end
 };
 
