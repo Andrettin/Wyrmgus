@@ -93,6 +93,9 @@
 #define IconSelected 4  /// this the selected icon
 #define IconDisabled 8  /// icon disabled
 #define IconAutoCast 16 /// auto cast icon
+//Wyrmgus start
+#define IconCommandButton 32 /// is the icon a command button
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Declarations

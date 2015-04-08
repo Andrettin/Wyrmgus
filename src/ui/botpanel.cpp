@@ -238,6 +238,10 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 		}
 	}
 
+	//Wyrmgus start
+	res |= IconCommandButton;
+	//Wyrmgus end
+	
 	unsigned int action = UnitActionNone;
 	switch (button.Action) {
 		case ButtonStop:

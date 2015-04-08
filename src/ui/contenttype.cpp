@@ -282,16 +282,28 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 /* virtual */ void CContentTypeLifeBar::Draw(const CUnit &unit, CFont *) const
 {
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
-	if (!unit.Variable[this->Index].Max) {
+	//Wyrmgus start
+	int max = 0;
+	if (this->Index == XP_INDEX) {
+		max = unit.Variable[XPREQUIRED_INDEX].Value;
+	} else {
+		max = unit.Variable[this->Index].Max;
+	}
+//	if (!unit.Variable[this->Index].Max) {
+	if (!max) {
+	//Wyrmgus end
 		return;
 	}
 
 	Uint32 color;
 	//Wyrmgus start
 	Uint32 lighter_color;
+//	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
+	int f = (100 * unit.Variable[this->Index].Value) / max;
 	//Wyrmgus end
-	int f = (100 * unit.Variable[this->Index].Value) / unit.Variable[this->Index].Max;
 
+	//Wyrmgus start
+	/*
 	if (f > 75) {
 		color = ColorDarkGreen;
 		//Wyrmgus start
@@ -313,13 +325,54 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		lighter_color = Video.MapRGB(TheScreen->format, 255, 100, 100);
 		//Wyrmgus end
 	}
+	*/
+
+	if (this->Index == HP_INDEX) {
+		if (f > 75) {
+			color = ColorDarkGreen;
+			//Wyrmgus start
+			lighter_color = Video.MapRGB(TheScreen->format, 67, 137, 8);
+			//Wyrmgus end
+		} else if (f > 50) {
+			color = ColorYellow;
+			//Wyrmgus start
+			lighter_color = Video.MapRGB(TheScreen->format, 255, 255, 210);
+			//Wyrmgus end
+		} else if (f > 25) {
+			color = ColorOrange;
+			//Wyrmgus start
+			lighter_color = Video.MapRGB(TheScreen->format, 255, 180, 90);
+			//Wyrmgus end
+		} else {
+			color = ColorRed;
+			//Wyrmgus start
+			lighter_color = Video.MapRGB(TheScreen->format, 255, 100, 100);
+			//Wyrmgus end
+		}
+	} else if (this->Index == MANA_INDEX) {
+		color = Video.MapRGB(TheScreen->format, 4, 70, 100);
+		lighter_color = Video.MapRGB(TheScreen->format, 8, 97, 137);
+	} else if (this->Index == XP_INDEX) {
+		color = Video.MapRGB(TheScreen->format, 97, 103, 0);
+		lighter_color = Video.MapRGB(TheScreen->format, 132, 141, 3);
+	} else {
+		color = ColorDarkGreen;
+		lighter_color = Video.MapRGB(TheScreen->format, 67, 137, 8);
+	}
+	//Wyrmgus end
 
 	// Border
 	//Wyrmgus start
 //	Video.FillRectangleClip(ColorBlack, this->Pos.x - 2, this->Pos.y - 2,
 //							this->Width + 3, this->Height + 3);
-	Video.FillRectangleClip(ColorBlack, this->Pos.x - 3, this->Pos.y - 3,
-							this->Width + 4, this->Height + 4);
+	if (Preference.BarFrameG) {
+		Preference.BarFrameG->DrawClip(this->Pos.x - 1 - 4, this->Pos.y - 1 - 4);
+		Video.FillRectangleClip(ColorBlack, this->Pos.x - 1, this->Pos.y - 1,
+								this->Width, this->Height);
+	} else {
+		Video.FillRectangleClip(ColorBlack, this->Pos.x - 3, this->Pos.y - 3,
+								this->Width + 4, this->Height + 4);
+	}
 	//Wyrmgus end
 
 	Video.FillRectangleClip(color, this->Pos.x - 1, this->Pos.y - 1,

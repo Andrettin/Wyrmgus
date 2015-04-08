@@ -200,12 +200,14 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	//Wyrmgus end
 	//Wyrmgus start
 	if (Preference.IconsShift && Preference.IconFrameG && Preference.PressedIconFrameG) {
-		if (!(flags & IconClicked)) {
+		if (Preference.CommandButtonFrameG && (flags & IconCommandButton)) {
+			Preference.CommandButtonFrameG->DrawClip(pos.x - 5, pos.y - 4);
+		} else if (!(flags & IconClicked)) {
 			Preference.IconFrameG->DrawClip(pos.x - 4, pos.y - 4);
 		}
 		
 		if (flags & IconActive) { // Code to make a border appear around the icon when the mouse hovers over it.
-			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
+//			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
 		}
 
@@ -214,8 +216,10 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 48, 40);
 			}			
-			Preference.PressedIconFrameG->DrawClip(pos.x - 3, pos.y - 3);
-			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
+			if (!Preference.CommandButtonFrameG || !(flags & IconCommandButton)) {
+				Preference.PressedIconFrameG->DrawClip(pos.x - 3, pos.y - 3);
+			}
+//			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 		} else {
 			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
 			if (flags & IconSelected) {

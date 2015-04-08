@@ -2154,17 +2154,17 @@ void UIHandleButtonUp(unsigned button)
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				}
 				//Wyrmgus start
+				/*
+				//Wyrmgus start
 //				if (Selected[0]->Player == ThisPlayer) {
 				if (Selected[0]->Player == ThisPlayer && !Selected[0]->Type->BoolFlag[HERO_INDEX].value) { // don't display this for heroes
 				//Wyrmgus end
 					char buf[64];
 					if (Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot] > 1) {
 						//Wyrmgus start
-						/*
-						snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
-								 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
-								 Selected[0]->Type->Name.c_str());
-						*/
+--						snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
+--								 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
+--								 Selected[0]->Type->Name.c_str());
 						VariationInfo *varinfo = Selected[0]->Type->VarInfo[Selected[0]->Variation];
 						if (varinfo && !varinfo->TypeName.empty()) {
 							snprintf(buf, sizeof(buf), _("You have ~<%d~> %ss"),
@@ -2178,11 +2178,9 @@ void UIHandleButtonUp(unsigned button)
 						//Wyrmgus end
 					} else {
 						//Wyrmgus start
-						/*
-						snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
-								 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
-								 Selected[0]->Type->Name.c_str());
-						*/
+--						snprintf(buf, sizeof(buf), _("You have ~<%d~> %s(s)"),
+--								 Selected[0]->Player->UnitTypesCount[Selected[0]->Type->Slot],
+--								 Selected[0]->Type->Name.c_str());
 						VariationInfo *varinfo = Selected[0]->Type->VarInfo[Selected[0]->Variation];
 						if (varinfo && !varinfo->TypeName.empty()) {
 							snprintf(buf, sizeof(buf), _("You have ~<%d~> %s"),
@@ -2197,6 +2195,8 @@ void UIHandleButtonUp(unsigned button)
 					}
 					UI.StatusLine.Set(buf);
 				}
+				*/
+				//Wyrmgus end
 			}
 		}
 

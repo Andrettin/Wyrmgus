@@ -41,6 +41,9 @@ class CPreference
 	//Wyrmgus start
 	CGraphic *IconFrameG;
 	CGraphic *PressedIconFrameG;
+	CGraphic *CommandButtonFrameG;
+	CGraphic *BarFrameG;
+	CGraphic *InfoPanelFrameG;
 	//Wyrmgus end
 };
 

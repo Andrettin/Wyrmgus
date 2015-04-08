@@ -161,6 +161,7 @@ static const char PRIORITY_KEY[] = "Priority";
 static const char ACCURACY_KEY[] = "Accuracy";
 static const char EVASION_KEY[] = "Evasion";
 static const char LEVELUP_KEY[] = "LevelUp";
+static const char XPREQUIRED_KEY[] = "XpRequired";
 static const char VARIATION_KEY[] = "Variation";
 static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
 static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
@@ -218,7 +219,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 //Wyrmgus
 //							   PRIORITY_KEY
 							   PRIORITY_KEY,
-							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
+							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, XPREQUIRED_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
 							   BACKSTAB_KEY, BONUSAGAINSTMOUNTED_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY
 //Wyrmgus end
 							  };
@@ -2063,7 +2064,7 @@ void UpdateUnitVariables(CUnit &unit)
 			//Wyrmgus
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
 			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == ACCURACY_INDEX || i == EVASION_INDEX
-			|| i == LEVELUP_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
+			|| i == LEVELUP_INDEX || i == XPREQUIRED_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
 			|| i == BACKSTAB_INDEX || i == BONUSAGAINSTMOUNTED_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX) {
 			//Wyrmgus end
 			continue;
@@ -2087,6 +2088,14 @@ void UpdateUnitVariables(CUnit &unit)
 
 	unit.Variable[LEVELUP_INDEX].Max = 255;
 
+	if (unit.Type->BoolFlag[ORGANIC_INDEX].value) {
+		unit.Variable[XPREQUIRED_INDEX].Max = 43500;
+		if (unit.Variable[XPREQUIRED_INDEX].Value == 0) {
+			unit.Variable[XPREQUIRED_INDEX].Value = 200;
+		}
+		unit.Variable[XPREQUIRED_INDEX].Enable = 1;
+	}
+	
 	unit.Variable[GENDER_INDEX].Enable = 1;
 	unit.Variable[GENDER_INDEX].Max = 10;
 	if (unit.Variable[GENDER_INDEX].Value == 0 && unit.Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual

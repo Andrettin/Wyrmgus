@@ -160,8 +160,20 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		hAll = 7;
 	}
 	y += unit.Type->Icon.Icon->G->Height;
+	//Wyrmgus start
+	/*
 	Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
 		unit.Type->Icon.Icon->G->Width + 8, hAll);
+	*/
+	if (Preference.BarFrameG) {
+		Preference.BarFrameG->DrawClip(x - 2 - 4, y + 4 - 4);
+		Video.FillRectangleClip(ColorBlack, x - 2, y + 4,
+			unit.Type->Icon.Icon->G->Width + 6 - 2, hBar);
+	} else {
+		Video.FillRectangleClip(ColorBlack, x - 4, y + 2,
+			unit.Type->Icon.Icon->G->Width + 8, hAll);
+	}
+	//Wyrmgus end
 
 	if (unit.Variable[HP_INDEX].Value) {
 		Uint32 color;
@@ -566,6 +578,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 static void DrawUnitInfo(CUnit &unit)
 {
 	UpdateUnitVariables(unit);
+	
 	for (size_t i = 0; i != UI.InfoPanelContents.size(); ++i) {
 		if (CanShowContent(UI.InfoPanelContents[i]->Condition, unit)) {
 			for (std::vector<CContentType *>::const_iterator content = UI.InfoPanelContents[i]->Contents.begin();
@@ -1164,6 +1177,12 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		panelIndex = 0;
 	}
 	DrawInfoPanelBackground(panelIndex);
+	//Wyrmgus start
+	//draw icon panel frame, if any
+	if (Preference.InfoPanelFrameG) {
+		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4, UI.InfoPanel.Y + 93);
+	}
+	//Wyrmgus end	
 	DrawUnitInfo(unit);
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 		//Wyrmgus start

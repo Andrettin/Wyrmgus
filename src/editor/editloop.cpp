@@ -591,17 +591,29 @@ static void DrawUnitIcons()
 				flag = IconClicked;
 			}
 		}
+		
+		//Wyrmgus start
+		flag |= IconCommandButton;
+		//Wyrmgus end
 
 		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index);
 
-		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
+		//Wyrmgus start
+//		Video.DrawRectangleClip(ColorGray, x, y, icon.G->Width, icon.G->Height);
+		//Wyrmgus end
 		if (i == Editor.SelectedUnitIndex) {
-			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
-									icon.G->Width - 2, icon.G->Height - 2);
+			//Wyrmgus start
+//			Video.DrawRectangleClip(ColorGreen, x + 1, y + 1,
+//									icon.G->Width - 2, icon.G->Height - 2);
+			Video.DrawRectangleClip(ColorGreen, x, y,
+									icon.G->Width, icon.G->Height);
+			//Wyrmgus end
 		}
 		if (i == Editor.CursorUnitIndex) {
-			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
-									icon.G->Width + 2, icon.G->Height + 2);
+			//Wyrmgus start
+//			Video.DrawRectangleClip(ColorWhite, x - 1, y - 1,
+//									icon.G->Width + 2, icon.G->Height + 2);
+			//Wyrmgus end
 			Editor.PopUpX = x;
 			Editor.PopUpY = y;
 		}
@@ -768,6 +780,11 @@ static void DrawEditorPanel_SelectIcon()
 			flag = IconClicked;
 		}
 	}
+	
+	//Wyrmgus start
+	flag |= IconCommandButton;
+	//Wyrmgus end
+		
 	// FIXME: wrong button style
 	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
 }
@@ -785,6 +802,11 @@ static void DrawEditorPanel_UnitsIcon()
 			flag = IconClicked;
 		}
 	}
+	
+	//Wyrmgus start
+	flag |= IconCommandButton;
+	//Wyrmgus end
+		
 	// FIXME: wrong button style
 	//Wyrmgus start
 //	icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "");
@@ -810,6 +832,10 @@ static void DrawEditorPanel_StartIcon()
 			}
 		}
 
+		//Wyrmgus start
+		flag |= IconCommandButton;
+		//Wyrmgus end
+		
 		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
 	} else {
 		//  No unit specified : draw a cross.
@@ -1004,7 +1030,10 @@ static void DrawEditorInfo()
 
 	char buf[256];
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 16, buf);
+	//Wyrmgus start
+//	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 16, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY, buf);
+	//Wyrmgus end
 	const CMapField &mf = *Map.Field(pos);
 	//
 	// Flags info
@@ -1035,7 +1064,10 @@ static void DrawEditorInfo()
 			flag & MapFieldBuilding     ? 'b' : '-',
 			flag & MapFieldItem         ? 'i' : '-');
 			//Wyrmgus end
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 16, buf);
+	//Wyrmgus start
+//	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 16, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY, buf);
+	//Wyrmgus end
 
 	// Tile info
 	const CTileset &tileset = *Map.Tileset;
@@ -1051,7 +1083,7 @@ static void DrawEditorInfo()
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 288, UI.StatusLine.TextY - 16, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 288, UI.StatusLine.TextY, buf);
 	//Wyrmgus end
 #endif
 }
@@ -1126,7 +1158,10 @@ void EditorUpdateDisplay()
 	}
 	DrawEditorPanel();
 
-	if (CursorOn == CursorOnMap) {
+	//Wyrmgus start
+//	if (CursorOn == CursorOnMap) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor == NULL) {
+	//Wyrmgus end
 		DrawEditorInfo();
 	}
 
@@ -1284,7 +1319,10 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 
 	// Click on map area
-	if (CursorOn == CursorOnMap) {
+	//Wyrmgus start
+//	if (CursorOn == CursorOnMap) {
+	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+	//Wyrmgus end
 		if (MouseButtons & RightButton) {
 			if (Editor.State == EditorEditUnit && Editor.SelectedUnitIndex != -1) {
 				Editor.SelectedUnitIndex = -1;
@@ -1522,7 +1560,10 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	if (UI.ButtonPanel.X + 4 < CursorScreenPos.x
 		&& CursorScreenPos.x < UI.ButtonPanel.X + 176 - 4
 		&& UI.ButtonPanel.Y + 4 < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.ButtonPanel.Y + 24) {
+		//Wyrmgus start
+//		&& CursorScreenPos.y < UI.ButtonPanel.Y + 24) {
+		&& CursorScreenPos.y < UI.ButtonPanel.Y) {
+		//Wyrmgus end
 		return true;
 	}
 	int bx = UI.InfoPanel.X + 8;
@@ -1817,7 +1858,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 
 	// Map
 	UnitUnderCursor = NULL;
-	if (UI.MapArea.Contains(screenPos)) {
+	//Wyrmgus start
+//	if (UI.MapArea.Contains(screenPos)) {
+	if (UI.MapArea.Contains(screenPos) && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UI.MouseViewport->IsInsideMapArea(PixelPos(CursorScreenPos.x + 32, CursorScreenPos.y + 32))) {
+	//Wyrmgus end
 		CViewport *vp = GetViewport(screenPos);
 		Assert(vp);
 		if (UI.MouseViewport != vp) { // viewport changed
@@ -2032,8 +2076,12 @@ void EditorMainLoop()
 			first_init = false;
 			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
 			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
-			editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
-			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
+			//Wyrmgus start
+//			editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
+//			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
+			editorContainer->add(editorUnitSlider, UI.InfoPanel.X + 12, UI.InfoPanel.Y + 160 - 24);
+			editorContainer->add(editorSlider, UI.InfoPanel.X + 12, UI.InfoPanel.Y + 160 - 24);
+			//Wyrmgus end
 		}
 		//ProcessMenu("menu-editor-tips", 1);
 		InterfaceState = IfaceStateNormal;

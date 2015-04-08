@@ -174,6 +174,18 @@ static void DrawBuildingCursor()
 
 	CUnit *ontop = NULL;
 
+	//Wyrmgus start
+	//hardcoded (= bad) way of making building cursors not appear over the interface
+	if (
+		((screenPos + CursorBuilding->GetPixelSize()).x <= 380 && (screenPos + CursorBuilding->GetPixelSize()).y >= (Video.Height - 186))
+		|| (screenPos.x <= 380 && (screenPos + CursorBuilding->GetPixelSize()).y >= (Video.Height - 186))
+		|| ((screenPos + CursorBuilding->GetPixelSize()).x <= 380 && screenPos.y >= (Video.Height - 186))
+		|| ((screenPos + CursorBuilding->GetPixelSize()).x >= (Video.Width - 243) && (screenPos + CursorBuilding->GetPixelSize()).y >= (Video.Height - 186))
+	) {
+		return;
+	}
+	//Wyrmgus end
+	
 	//
 	//  Draw building
 	//
@@ -197,11 +209,15 @@ static void DrawBuildingCursor()
 				CursorBuilding->StillFrame, screenPos);
 	}
 	//Wyrmgus end
+	//Wyrmgus start
+	/*
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->GetPixelSize() / 2);
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);
 	}
+	*/
+	//Wyrmgus end
 
 	//
 	//  Draw the allow overlay
@@ -261,7 +277,10 @@ void DrawCursor()
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);
-	} else if (CursorBuilding && CursorOn == CursorOnMap) {
+	//Wyrmgus start
+//	} else if (CursorBuilding && CursorOn == CursorOnMap) {
+	} else if (CursorBuilding && CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
+	//Wyrmgus end
 		// Selecting position for building
 		DrawBuildingCursor();
 	}

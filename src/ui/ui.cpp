@@ -244,6 +244,18 @@ void CUserInterface::Load()
 		Preference.PressedIconFrameG->Load();
 		Preference.PressedIconFrameG->UseDisplayFormat();
 	}
+	if (Preference.CommandButtonFrameG) {
+		Preference.CommandButtonFrameG->Load();
+		Preference.CommandButtonFrameG->UseDisplayFormat();
+	}
+	if (Preference.BarFrameG) {
+		Preference.BarFrameG->Load();
+		Preference.BarFrameG->UseDisplayFormat();
+	}
+	if (Preference.InfoPanelFrameG) {
+		Preference.InfoPanelFrameG->Load();
+		Preference.InfoPanelFrameG->UseDisplayFormat();
+	}
 	//Wyrmgus end
 	
 	//  Resolve cursors
@@ -334,6 +346,9 @@ void CleanUserInterface()
 	//Wyrmgus start
 	CGraphic::Free(Preference.IconFrameG);
 	CGraphic::Free(Preference.PressedIconFrameG);
+	CGraphic::Free(Preference.CommandButtonFrameG);
+	CGraphic::Free(Preference.BarFrameG);
+	CGraphic::Free(Preference.InfoPanelFrameG);
 	//Wyrmgus end
 
 	// Button Popups
