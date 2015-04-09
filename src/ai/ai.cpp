@@ -482,11 +482,15 @@ void AiInit(CPlayer &player)
 	pai->AiType = ait;
 	pai->Script = ait->Script;
 
-	pai->Collect[GoldCost] = 50;
-	pai->Collect[WoodCost] = 50;
+	//Wyrmgus start
+//	pai->Collect[GoldCost] = 50;
+//	pai->Collect[WoodCost] = 50;
+	pai->Collect[GoldCost] = 40;
+	pai->Collect[WoodCost] = 40;
+	//Wyrmgus end
 	pai->Collect[OilCost] = 0;
 	//Wyrmgus start
-	pai->Collect[StoneCost] = 50;
+	pai->Collect[StoneCost] = 20;
 	//Wyrmgus end
 
 	player.Ai = pai;
