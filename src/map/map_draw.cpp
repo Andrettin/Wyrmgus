@@ -106,17 +106,6 @@ bool CViewport::AnyMapAreaVisibleInViewport(const Vec2i &boxmin, const Vec2i &bo
 
 bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
-	//Wyrmgus start
-	//hardcoded (bad = makes baby kittens cry) but gets the job done
-	//this is to make the parts of the screen occupied by the minimap, infopanel and buttonpanel not be considered parts of the map area
-	if (
-		(screenPixelPos.x <= 380 && screenPixelPos.y >= (Video.Height - 186))
-		|| (screenPixelPos.x >= (Video.Width - 243) && screenPixelPos.y >= (Video.Height - 186))
-	) {
-		return false;
-	}
-	//Wyrmgus end
-	
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
 
 	return Map.Info.IsPointOnMap(tilePos);

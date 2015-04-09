@@ -2497,7 +2497,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	//Wyrmgus start
 	//drop items upon death
-	if (SyncRand(100) >= 66) { //66% chance nothing will be dropped
+	if (unit.CurrentAction() != UnitActionBuilt && SyncRand(100) >= 66) { //66% chance nothing will be dropped
 		Vec2i drop_pos = unit.tilePos;
 		drop_pos.x += SyncRand(unit.Type->TileWidth);
 		drop_pos.y += SyncRand(unit.Type->TileHeight);

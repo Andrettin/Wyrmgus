@@ -168,6 +168,10 @@ void DrawMapArea()
 void UpdateDisplay()
 {
 	if (GameRunning || Editor.Running == EditorEditing) {
+		//Wyrmgus start
+		Video.FillRectangleClip(ColorBlack, 0, 0, Video.Width, Video.Height); //to prevent empty spaces in the UI
+		//Wyrmgus end
+		
 		DrawMapArea();
 		DrawMessages();
 

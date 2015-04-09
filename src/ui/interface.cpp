@@ -98,7 +98,10 @@ CUnit *LastIdleWorker;               /// Last called idle worker
 */
 static void ShowInput()
 {
-	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), Input);
+	//Wyrmgus start
+//	snprintf(InputStatusLine, sizeof(InputStatusLine), _("MESSAGE:%s~!_"), Input);
+	snprintf(InputStatusLine, sizeof(InputStatusLine), _("Message: %s~!_"), Input);
+	//Wyrmgus end
 	char *input = InputStatusLine;
 	// FIXME: This is slow!
 	while (UI.StatusLine.Font->Width(input) > UI.StatusLine.Width) {

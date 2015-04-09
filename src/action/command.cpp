@@ -94,7 +94,10 @@ static void ReleaseOrders(CUnit &unit)
 */
 static COrderPtr *GetNextOrder(CUnit &unit, int flush)
 {
-	if (flush) {
+	//Wyrmgus start
+//	if (flush) {
+	if (flush && unit.CurrentAction() != UnitActionUpgradeTo && unit.CurrentAction() != UnitActionTrain && unit.CurrentAction() != UnitActionResearch) { //training, researching and upgrading must be canceled manually
+	//Wyrmgus end
 		// empty command queue
 		ReleaseOrders(unit);
 	}

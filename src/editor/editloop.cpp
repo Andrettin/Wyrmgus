@@ -1175,10 +1175,7 @@ void EditorUpdateDisplay()
 	}
 	DrawEditorPanel();
 
-	//Wyrmgus start
-//	if (CursorOn == CursorOnMap) {
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor == NULL) {
-	//Wyrmgus end
+	if (CursorOn == CursorOnMap) {
 		DrawEditorInfo();
 	}
 
@@ -1341,10 +1338,7 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 
 	// Click on map area
-	//Wyrmgus start
-//	if (CursorOn == CursorOnMap) {
-	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
-	//Wyrmgus end
+	if (CursorOn == CursorOnMap) {
 		if (MouseButtons & RightButton) {
 			if (Editor.State == EditorEditUnit && Editor.SelectedUnitIndex != -1) {
 				Editor.SelectedUnitIndex = -1;
