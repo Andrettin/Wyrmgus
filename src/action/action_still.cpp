@@ -533,7 +533,7 @@ bool AutoAttack(CUnit &unit)
 	if (unit.Removed
 		//Wyrmgus start
 //		&& (unit.Container == NULL || unit.Container->Type->AttackFromTransporter == false)) {
-		&& (unit.Container == NULL || unit.Container->Type->AttackFromTransporter == false || unit.Type->AttackFromTransporter == false)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
+		&& (unit.Container == NULL || !unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
 		//Wyrmgus end
 		return ;
 	}

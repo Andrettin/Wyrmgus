@@ -120,7 +120,7 @@ class VariationInfo
 public:
 	VariationInfo() : VariationId(""),
 		FrameWidth(0), FrameHeight(0),
-		Animations(NULL), Construction(NULL), Sprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL), HairSprite(NULL), ShieldSprite(NULL)
 	{
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));		
@@ -129,10 +129,14 @@ public:
 	std::string VariationId;		/// Variation's name.
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
+	std::string HairFile;			/// Variation's hair graphics.
+	std::string ShieldFile;			/// Variation's shield graphics.
 	int FrameWidth;
 	int FrameHeight;
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
+	CPlayerColorGraphic *HairSprite;	/// The graphic corresponding to HairFile.
+	CPlayerColorGraphic *ShieldSprite;	/// The graphic corresponding to ShieldFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
 
@@ -547,6 +551,10 @@ public:
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files
 	std::string ShadowFile;         /// Shadow file
+	//Wyrmgus start
+	std::string HairFile;         	/// Hair file
+	std::string ShieldFile;         /// Shield file
+	//Wyrmgus end
 
 	int Width;                                            /// Sprite width
 	int Height;                                           /// Sprite height
@@ -558,6 +566,14 @@ public:
 	int ShadowOffsetX;                                    /// Shadow horizontal offset
 	int ShadowOffsetY;                                    /// Shadow vertical offset
 	//Wyrmgus start
+	int HairWidth;                                  	  /// Hair sprite width
+	int HairHeight;                                       /// Hair sprite height
+	int HairOffsetX;                                      /// Hair horizontal offset
+	int HairOffsetY;                                      /// Hair vertical offset
+	int ShieldWidth;                                      /// Shield sprite width
+	int ShieldHeight;                                     /// Shield sprite height
+	int ShieldOffsetX;                                    /// Shield horizontal offset
+	int ShieldOffsetY;                                    /// Shield vertical offset
 	int TechnologyPointCost;								/// Technology point cost
 	int TrainQuantity;										/// Quantity to be trained
 	//Wyrmgus end
@@ -651,8 +667,10 @@ public:
 	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
 	unsigned PermanentCloak : 1;    /// Is only visible by CloakDetectors.
 	unsigned DetectCloak : 1;       /// Can see Cloaked units.
-	unsigned Coward : 1;            /// Unit will only attack if instructed.
-	unsigned AttackFromTransporter : 1;  /// Can attack from transporter
+	//Wyrmgus start
+//	unsigned Coward : 1;            /// Unit will only attack if instructed.
+//	unsigned AttackFromTransporter : 1;  /// Can attack from transporter
+	//Wyrmgus end
 	unsigned Vanishes : 1;          /// Corpes & destroyed places.
 	unsigned GroundAttack : 1;      /// Can do command ground attack.
 	unsigned ShoreBuilding : 1;     /// Building must be build on coast.
@@ -718,6 +736,10 @@ public:
 
 	CPlayerColorGraphic *Sprite;     /// Sprite images
 	CGraphic *ShadowSprite;          /// Shadow sprite image
+	//Wyrmgus start
+	CPlayerColorGraphic *HairSprite;          /// Shield sprite image
+	CPlayerColorGraphic *ShieldSprite;          /// Shield sprite image
+	//Wyrmgus end
 };
 
 /*----------------------------------------------------------------------------

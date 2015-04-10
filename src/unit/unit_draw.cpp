@@ -621,6 +621,49 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
 	}
 }
 
+//Wyrmgus start
+void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, int offset_x, int offset_y)
+{
+	if (!sprite) {
+		return;
+	}
+	PixelPos pos = screenPos;
+	// FIXME: move this calculation to high level.
+	pos.x -= (sprite->Width - type.TileWidth * PixelTileSize.x) / 2;
+	pos.y -= (sprite->Height - type.TileHeight * PixelTileSize.y) / 2;
+	pos.x += type.OffsetX + offset_x;
+	pos.y += type.OffsetY + offset_y;
+
+	if (type.Flip) {
+		if (frame < 0) {
+			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+			} else {
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
+			}
+		} else {
+			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+			} else {
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+			}
+		}
+	} else {
+		const int row = type.NumDirections / 2 + 1;
+
+		if (frame < 0) {
+			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+		} else {
+			frame = (frame / row) * type.NumDirections + frame % row;
+		}
+		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+		} else {
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+		}
+	}
+}
+//Wyrmgus end
 
 /**
 **  Show the current order of a unit.
@@ -1020,6 +1063,30 @@ void CUnit::Draw(const CViewport &vp) const
 	} else {
 		DrawUnitType(*type, sprite, player, frame, screenPos);
 	}
+	
+	//Wyrmgus start
+	CPlayerColorGraphic *hair_sprite = type->HairSprite;
+	// Adjust sprite for variations.
+	if (varinfo) {
+		if (varinfo->HairSprite) {
+			hair_sprite = varinfo->HairSprite;
+		}
+	}
+	if (hair_sprite) {
+		DrawOverlay(*type, hair_sprite, player, frame, screenPos, type->HairOffsetX, type->HairOffsetY);
+	}
+
+	CPlayerColorGraphic *shield_sprite = type->ShieldSprite;
+	// Adjust sprite for variations.
+	if (varinfo) {
+		if (varinfo->ShieldSprite) {
+			shield_sprite = varinfo->ShieldSprite;
+		}
+	}
+	if (shield_sprite) {
+		DrawOverlay(*type, shield_sprite, player, frame, screenPos, type->ShieldOffsetX, type->ShieldOffsetY);
+	}
+	//Wyrmgus end
 
 	// Unit's extras not fully supported.. need to be decorations themselves.
 	DrawInformations(*this, *type, screenPos);

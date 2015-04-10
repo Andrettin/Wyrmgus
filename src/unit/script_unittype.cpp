@@ -364,7 +364,9 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 static void UpdateDefaultBoolFlags(CUnitType &type)
 {
 	// BoolFlag
-	type.BoolFlag[COWARD_INDEX].value                = type.Coward;
+	//Wyrmgus start
+//	type.BoolFlag[COWARD_INDEX].value                = type.Coward;
+	//Wyrmgus end
 	type.BoolFlag[BUILDING_INDEX].value              = type.Building;
 	type.BoolFlag[FLIP_INDEX].value                  = type.Flip;
 	type.BoolFlag[REVEALER_INDEX].value              = type.Revealer;
@@ -375,7 +377,9 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[VISIBLEUNDERFOG_INDEX].value       = type.VisibleUnderFog;
 	type.BoolFlag[PERMANENTCLOAK_INDEX].value        = type.PermanentCloak;
 	type.BoolFlag[DETECTCLOAK_INDEX].value           = type.DetectCloak;
-	type.BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value = type.AttackFromTransporter;
+	//Wyrmgus start
+//	type.BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value = type.AttackFromTransporter;
+	//Wyrmgus end
 	type.BoolFlag[VANISHES_INDEX].value              = type.Vanishes;
 	type.BoolFlag[GROUNDATTACK_INDEX].value          = type.GroundAttack;
 	type.BoolFlag[SHOREBUILDING_INDEX].value         = type.ShoreBuilding;
@@ -479,6 +483,62 @@ static int CclDefineUnitType(lua_State *l)
 				CGraphic::Free(type->ShadowSprite);
 				type->ShadowSprite = NULL;
 			}
+		//Wyrmgus start
+		} else if (!strcmp(value, "HairImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->HairFile = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "size")) {
+					lua_rawgeti(l, -1, k + 1);
+					CclGetPos(l, &type->HairWidth, &type->HairHeight);
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "offset")) {
+					lua_rawgeti(l, -1, k + 1);
+					CclGetPos(l, &type->HairOffsetX, &type->HairOffsetY);
+					lua_pop(l, 1);
+				} else {
+					LuaError(l, "Unsupported hair tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->HairSprite) {
+				CGraphic::Free(type->HairSprite);
+				type->HairSprite = NULL;
+			}
+		} else if (!strcmp(value, "ShieldImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->ShieldFile = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "size")) {
+					lua_rawgeti(l, -1, k + 1);
+					CclGetPos(l, &type->ShieldWidth, &type->ShieldHeight);
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "offset")) {
+					lua_rawgeti(l, -1, k + 1);
+					CclGetPos(l, &type->ShieldOffsetX, &type->ShieldOffsetY);
+					lua_pop(l, 1);
+				} else {
+					LuaError(l, "Unsupported shield tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->ShieldSprite) {
+				CGraphic::Free(type->ShieldSprite);
+				type->ShieldSprite = NULL;
+			}
+		//Wyrmgus end
 		} else if (!strcmp(value, "Offset")) {
 			CclGetPos(l, &type->OffsetX, &type->OffsetY);
 		} else if (!strcmp(value, "Flip")) {
@@ -869,10 +929,14 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				LuaError(l, "Unsupported flag tag for CanTransport: %s" _C_ value);
 			}
+		//Wyrmgus start
+		/*
 		} else if (!strcmp(value, "AttackFromTransporter")) {
 			type->AttackFromTransporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Coward")) {
 			type->Coward = LuaToBoolean(l, -1);
+		*/
+		//Wyrmgus end
 		} else if (!strcmp(value, "CanGatherResources")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -1169,6 +1233,10 @@ static int CclDefineUnitType(lua_State *l)
 						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
 						++k;
 						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "hair-file")) {
+						var->HairFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "shield-file")) {
+						var->ShieldFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
 						lua_rawgeti(l, -1, k + 1);
 						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
@@ -1213,6 +1281,23 @@ static int CclDefineUnitType(lua_State *l)
 			type->File = parent_type->File;
 			type->Width = parent_type->Width;
 			type->Height = parent_type->Height;
+			type->OffsetX = parent_type->OffsetX;
+			type->OffsetY = parent_type->OffsetY;
+			type->ShadowFile = parent_type->ShadowFile;
+			type->ShadowWidth = parent_type->ShadowWidth;
+			type->ShadowHeight = parent_type->ShadowHeight;
+			type->ShadowOffsetX = parent_type->ShadowOffsetX;
+			type->ShadowOffsetY = parent_type->ShadowOffsetY;
+			type->HairFile = parent_type->HairFile;
+			type->HairWidth = parent_type->HairWidth;
+			type->HairHeight = parent_type->HairHeight;
+			type->HairOffsetX = parent_type->HairOffsetX;
+			type->HairOffsetY = parent_type->HairOffsetY;
+			type->ShieldFile = parent_type->ShieldFile;
+			type->ShieldWidth = parent_type->ShieldWidth;
+			type->ShieldHeight = parent_type->ShieldHeight;
+			type->ShieldOffsetX = parent_type->ShieldOffsetX;
+			type->ShieldOffsetY = parent_type->ShieldOffsetY;
 			type->TileWidth = parent_type->TileWidth;
 			type->TileHeight = parent_type->TileHeight;
 			type->BoxWidth = parent_type->BoxWidth;
@@ -1252,9 +1337,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->AirUnit = parent_type->AirUnit;
 			type->Building = parent_type->Building;
 			type->VisibleUnderFog = parent_type->VisibleUnderFog;
-			type->Coward = parent_type->Coward;
 			type->DetectCloak = parent_type->DetectCloak;
-			type->AttackFromTransporter = parent_type->AttackFromTransporter;
 			type->SaveCargo = parent_type->SaveCargo;
 			type->SelectableByRectangle = parent_type->SelectableByRectangle;
 			type->BuilderOutside = parent_type->BuilderOutside;

@@ -172,7 +172,10 @@ public:
 	// Cowards and invisible units don't attack unless ordered.
 	bool IsAgressive() const
 	{
-		return (Type->CanAttack && !Type->Coward
+		//Wyrmgus start
+//		return (Type->CanAttack && !Type->Coward
+		return (Type->CanAttack && !Type->BoolFlag[COWARD_INDEX].value
+		//Wyrmgus end
 				&& Variable[INVISIBLE_INDEX].Value == 0);
 	}
 
@@ -630,6 +633,10 @@ extern void CleanDecorations();
 
 /// Draw unit's shadow
 extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos);
+//Wyrmgus start
+/// Draw unit's overlay
+extern void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, int offset_x, int offset_y);
+//Wyrmgus end
 /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);
 

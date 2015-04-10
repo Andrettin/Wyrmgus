@@ -627,7 +627,10 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	Assert(Map.Info.IsPointOnMap(pos));
 	CMapField &mf = *this->Field(pos);
 
-	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {
+	//Wyrmgus start
+//	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {
+	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile() || !(mf.getFlag() & MapFieldGrass)) {
+	//Wyrmgus end
 		return;
 	}
 

@@ -614,6 +614,8 @@ CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
+	HairWidth(0), HairHeight(0), HairOffsetX(0), HairOffsetY(0),
+	ShieldWidth(0), ShieldHeight(0), ShieldOffsetX(0), ShieldOffsetY(0),
 	TechnologyPointCost(0), TrainQuantity(0),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
@@ -631,7 +633,9 @@ CUnitType::CUnitType() :
 	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
 	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 	PermanentCloak(0), DetectCloak(0),
-	Coward(0), AttackFromTransporter(0),
+	//Wyrmgus start
+//	Coward(0), AttackFromTransporter(0),
+	//Wyrmgus end
 	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
 	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
@@ -641,7 +645,10 @@ CUnitType::CUnitType() :
 	NonSolid(0), Wall(0), NoRandomPlacing(0),
 	//Wyrmgus end
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
-	Sprite(NULL), ShadowSprite(NULL)
+	//Wyrmgus start
+//	Sprite(NULL), ShadowSprite(NULL)
+	Sprite(NULL), ShadowSprite(NULL), HairSprite(NULL), ShieldSprite(NULL)
+	//Wyrmgus end
 {
 #ifdef USE_MNG
 	memset(&Portrait, 0, sizeof(Portrait));
@@ -702,6 +709,12 @@ CUnitType::~CUnitType()
 			if (this->VarInfo[var]->Sprite) {
 				CGraphic::Free(this->VarInfo[var]->Sprite);
 			}
+			if (this->VarInfo[var]->HairSprite) {
+				CGraphic::Free(this->VarInfo[var]->HairSprite);
+			}
+			if (this->VarInfo[var]->ShieldSprite) {
+				CGraphic::Free(this->VarInfo[var]->ShieldSprite);
+			}
 			for (int res = 0; res < MaxCosts; ++res) {
 				if (this->VarInfo[var]->SpriteWhenLoaded[res]) {
 					CGraphic::Free(this->VarInfo[var]->SpriteWhenLoaded[res]);
@@ -717,6 +730,10 @@ CUnitType::~CUnitType()
 
 	CGraphic::Free(Sprite);
 	CGraphic::Free(ShadowSprite);
+	//Wyrmgus start
+	CGraphic::Free(HairSprite);
+	CGraphic::Free(ShieldSprite);
+	//Wyrmgus end
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
 		for (int j = 0; j < this->Portrait.Num; ++j) {
@@ -1291,6 +1308,23 @@ void LoadUnitTypeSprite(CUnitType &type)
 #endif
 
 	//Wyrmgus start
+	if (!type.HairFile.empty()) {
+		type.HairSprite = CPlayerColorGraphic::New(type.HairFile, type.HairWidth, type.HairHeight);
+		type.HairSprite->Load();
+		if (type.Flip) {
+			type.HairSprite->Flip();
+		}
+	}
+	if (!type.ShieldFile.empty()) {
+		type.ShieldSprite = CPlayerColorGraphic::New(type.ShieldFile, type.ShieldWidth, type.ShieldHeight);
+		type.ShieldSprite->Load();
+		if (type.Flip) {
+			type.ShieldSprite->Flip();
+		}
+	}
+	//Wyrmgus end
+
+	//Wyrmgus start
 	for (int i = 0; i < VariationMax; ++i) {
 		VariationInfo *varinfo = type.VarInfo[i];
 		if (!varinfo) {
@@ -1308,6 +1342,20 @@ void LoadUnitTypeSprite(CUnitType &type)
 			varinfo->Sprite->Load();
 			if (type.Flip) {
 				varinfo->Sprite->Flip();
+			}
+		}
+		if (!varinfo->HairFile.empty()) {
+			varinfo->HairSprite = CPlayerColorGraphic::New(varinfo->HairFile, frame_width, frame_height);
+			varinfo->HairSprite->Load();
+			if (type.Flip) {
+				varinfo->HairSprite->Flip();
+			}
+		}
+		if (!varinfo->ShieldFile.empty()) {
+			varinfo->ShieldSprite = CPlayerColorGraphic::New(varinfo->ShieldFile, frame_width, frame_height);
+			varinfo->ShieldSprite->Load();
+			if (type.Flip) {
+				varinfo->ShieldSprite->Flip();
 			}
 		}
 		for (int j = 0; j < MaxCosts; ++j) {

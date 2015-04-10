@@ -197,6 +197,21 @@ static void DrawBuildingCursor()
 				CursorBuilding->StillFrame, screenPos);
 	}
 	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->HairSprite) {
+		DrawOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->HairSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, CursorBuilding->HairOffsetX, CursorBuilding->HairOffsetY);
+	} else if (CursorBuilding->HairSprite) {
+		DrawOverlay(*CursorBuilding, CursorBuilding->HairSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, CursorBuilding->HairOffsetX, CursorBuilding->HairOffsetY);
+	}
+
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite) {
+		DrawOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, CursorBuilding->ShieldOffsetX, CursorBuilding->ShieldOffsetY);
+	} else if (CursorBuilding->ShieldSprite) {
+		DrawOverlay(*CursorBuilding, CursorBuilding->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos, CursorBuilding->ShieldOffsetX, CursorBuilding->ShieldOffsetY);
+	}
+	//Wyrmgus end
+	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
 		const PixelPos center(screenPos + CursorBuilding->GetPixelSize() / 2);
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1;
