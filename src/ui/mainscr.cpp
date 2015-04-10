@@ -421,8 +421,14 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 		if (UI.SingleTrainingButton) {
 			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
 			CIcon &icon = *order.GetUnitType().Icon.Icon;
-			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
+			//Wyrmgus start
+//			const unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
+			unsigned int flags = (ButtonAreaUnderCursor == ButtonAreaTraining && ButtonUnderCursor == 0) ?
+			//Wyrmgus end
 									   (IconActive | (MouseButtons & LeftButton)) : 0;
+			//Wyrmgus start
+			flags |= IconCommandButton;
+			//Wyrmgus end
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
 			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 		}
@@ -437,10 +443,16 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 				if (unit.Orders[i]->Action == UnitActionTrain) {
 					const COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[i]);
 					CIcon &icon = *order.GetUnitType().Icon.Icon;
-					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
+					//Wyrmgus start
+//					const int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
+					int flag = (ButtonAreaUnderCursor == ButtonAreaTraining
+					//Wyrmgus end
 									  && static_cast<size_t>(ButtonUnderCursor) == i) ?
 									 (IconActive | (MouseButtons & LeftButton)) : 0;
 					const PixelPos pos(UI.TrainingButtons[i].X, UI.TrainingButtons[i].Y);
+					//Wyrmgus start
+					flag |= IconCommandButton;
+					//Wyrmgus end
 					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 				}
 			}
@@ -501,6 +513,9 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 									 && ButtonUnderCursor == 0) ?
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
+				//Wyrmgus start
+				flag = IconCommandButton;
+				//Wyrmgus end
 				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 			}
 			return true;
@@ -513,6 +528,9 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 							&& ButtonUnderCursor == 0) ?
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
+				//Wyrmgus start
+				flag = IconCommandButton;
+				//Wyrmgus end
 				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 			}
 			return true;

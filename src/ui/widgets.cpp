@@ -394,13 +394,15 @@ void ImageButton::draw(gcn::Graphics *graphics)
 //						img->getWidth(), img->getHeight());
 
 	if (frameImage) {
+        graphics->setColor(ColorBlack);
+		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()));
 		graphics->drawImage(frameImage, 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
 			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth(), img->getHeight());
+								img->getWidth() - 1, img->getHeight() - 1);
 			if (pressedframeImage) {
-				graphics->drawImage(pressedframeImage, 0, 0, 1, 1,
+				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
 									pressedframeImage->getWidth(), pressedframeImage->getHeight());
 			}
 		} else {
@@ -560,13 +562,15 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 	}
 
 	if (frameImage) {
+        graphics->setColor(ColorBlack);
+		graphics->fillRectangle(gcn::Rectangle((frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2, img->getWidth(), img->getHeight()));
 		graphics->drawImage(frameImage, 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
 			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth(), img->getHeight());
+								img->getWidth() - 1, img->getHeight() - 1);
 			if (pressedframeImage) {
-				graphics->drawImage(pressedframeImage, 0, 0, 1, 1,
+				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
 									pressedframeImage->getWidth(), pressedframeImage->getHeight());
 			}
 		} else {
