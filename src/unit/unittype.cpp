@@ -1259,7 +1259,12 @@ void LoadUnitTypeSprite(CUnitType &type)
 		if (type.Flip) {
 			type.ShadowSprite->Flip();
 		}
-		type.ShadowSprite->MakeShadow();
+		//Wyrmgus start
+//		type.ShadowSprite->MakeShadow();
+		if (type.ShadowSprite->Surface->format->BytesPerPixel == 1) {
+			type.ShadowSprite->MakeShadow();
+		}
+		//Wyrmgus end
 	}
 
 	if (type.Harvester) {

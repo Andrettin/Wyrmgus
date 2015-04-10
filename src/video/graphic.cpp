@@ -966,6 +966,9 @@ void CGraphic::Flip()
 			}
 			break;
 		case 3:
+		//Wyrmgus start
+		case 4: // doesn't work, but at least doesn't cause a crash
+		//Wyrmgus end
 			for (int i = 0; i < s->h; ++i) {
 				for (int j = 0; j < s->w; ++j) {
 					memcpy(&((char *)s->pixels)[j + i * s->pitch],
@@ -973,6 +976,8 @@ void CGraphic::Flip()
 				}
 			}
 			break;
+		//Wyrmgus start
+		/*
 		case 4: {
 			unsigned int p0 = s->pitch;
 			unsigned int p1 = Surface->pitch;
@@ -1027,6 +1032,8 @@ void CGraphic::Flip()
 			}
 		}
 		break;
+		*/
+		//Wyrmgus end
 	}
 	SDL_UnlockSurface(Surface);
 	SDL_UnlockSurface(s);
@@ -1510,7 +1517,10 @@ void CGraphic::MakeShadow()
 	memset(colors, 0, sizeof(colors));
 
 	SDL_SetPalette(Surface, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
-	SDL_SetAlpha(Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	//Wyrmgus start
+//	SDL_SetAlpha(Surface, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+	SDL_SetAlpha(Surface, SDL_SRCALPHA | SDL_RLEACCEL, 192);
+	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -1525,7 +1535,10 @@ void CGraphic::MakeShadow()
 	{
 		if (SurfaceFlip) {
 			SDL_SetPalette(SurfaceFlip, SDL_LOGPAL | SDL_PHYSPAL, colors, 0, 256);
-			SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+			//Wyrmgus start
+//			SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+			SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA | SDL_RLEACCEL, 192);
+			//Wyrmgus end
 		}
 	}
 }
