@@ -614,8 +614,6 @@ CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
-	HairWidth(0), HairHeight(0), HairOffsetX(0), HairOffsetY(0),
-	ShieldWidth(0), ShieldHeight(0), ShieldOffsetX(0), ShieldOffsetY(0),
 	TechnologyPointCost(0), TrainQuantity(0),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
@@ -647,7 +645,7 @@ CUnitType::CUnitType() :
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
 //	Sprite(NULL), ShadowSprite(NULL)
-	Sprite(NULL), ShadowSprite(NULL), HairSprite(NULL), ShieldSprite(NULL)
+	Sprite(NULL), ShadowSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
 	//Wyrmgus end
 {
 #ifdef USE_MNG
@@ -712,6 +710,9 @@ CUnitType::~CUnitType()
 			if (this->VarInfo[var]->HairSprite) {
 				CGraphic::Free(this->VarInfo[var]->HairSprite);
 			}
+			if (this->VarInfo[var]->PantsSprite) {
+				CGraphic::Free(this->VarInfo[var]->PantsSprite);
+			}
 			if (this->VarInfo[var]->ShieldSprite) {
 				CGraphic::Free(this->VarInfo[var]->ShieldSprite);
 			}
@@ -732,6 +733,7 @@ CUnitType::~CUnitType()
 	CGraphic::Free(ShadowSprite);
 	//Wyrmgus start
 	CGraphic::Free(HairSprite);
+	CGraphic::Free(PantsSprite);
 	CGraphic::Free(ShieldSprite);
 	//Wyrmgus end
 #ifdef USE_MNG
@@ -1314,14 +1316,21 @@ void LoadUnitTypeSprite(CUnitType &type)
 
 	//Wyrmgus start
 	if (!type.HairFile.empty()) {
-		type.HairSprite = CPlayerColorGraphic::New(type.HairFile, type.HairWidth, type.HairHeight);
+		type.HairSprite = CPlayerColorGraphic::New(type.HairFile, type.Width, type.Height);
 		type.HairSprite->Load();
 		if (type.Flip) {
 			type.HairSprite->Flip();
 		}
 	}
+	if (!type.PantsFile.empty()) {
+		type.PantsSprite = CPlayerColorGraphic::New(type.PantsFile, type.Width, type.Height);
+		type.PantsSprite->Load();
+		if (type.Flip) {
+			type.PantsSprite->Flip();
+		}
+	}
 	if (!type.ShieldFile.empty()) {
-		type.ShieldSprite = CPlayerColorGraphic::New(type.ShieldFile, type.ShieldWidth, type.ShieldHeight);
+		type.ShieldSprite = CPlayerColorGraphic::New(type.ShieldFile, type.Width, type.Height);
 		type.ShieldSprite->Load();
 		if (type.Flip) {
 			type.ShieldSprite->Flip();
@@ -1354,6 +1363,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 			varinfo->HairSprite->Load();
 			if (type.Flip) {
 				varinfo->HairSprite->Flip();
+			}
+		}
+		if (!varinfo->PantsFile.empty()) {
+			varinfo->PantsSprite = CPlayerColorGraphic::New(varinfo->PantsFile, frame_width, frame_height);
+			varinfo->PantsSprite->Load();
+			if (type.Flip) {
+				varinfo->PantsSprite->Flip();
 			}
 		}
 		if (!varinfo->ShieldFile.empty()) {

@@ -120,7 +120,7 @@ class VariationInfo
 public:
 	VariationInfo() : VariationId(""),
 		FrameWidth(0), FrameHeight(0),
-		Animations(NULL), Construction(NULL), Sprite(NULL), HairSprite(NULL), ShieldSprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
 	{
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));		
@@ -130,12 +130,14 @@ public:
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
 	std::string HairFile;			/// Variation's hair graphics.
+	std::string PantsFile;			/// Variation's pants graphics.
 	std::string ShieldFile;			/// Variation's shield graphics.
 	int FrameWidth;
 	int FrameHeight;
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
 	CPlayerColorGraphic *HairSprite;	/// The graphic corresponding to HairFile.
+	CPlayerColorGraphic *PantsSprite;	/// The graphic corresponding to PantsFile.
 	CPlayerColorGraphic *ShieldSprite;	/// The graphic corresponding to ShieldFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
@@ -553,6 +555,7 @@ public:
 	std::string ShadowFile;         /// Shadow file
 	//Wyrmgus start
 	std::string HairFile;         	/// Hair file
+	std::string PantsFile;         	/// Pants file
 	std::string ShieldFile;         /// Shield file
 	//Wyrmgus end
 
@@ -566,14 +569,6 @@ public:
 	int ShadowOffsetX;                                    /// Shadow horizontal offset
 	int ShadowOffsetY;                                    /// Shadow vertical offset
 	//Wyrmgus start
-	int HairWidth;                                  	  /// Hair sprite width
-	int HairHeight;                                       /// Hair sprite height
-	int HairOffsetX;                                      /// Hair horizontal offset
-	int HairOffsetY;                                      /// Hair vertical offset
-	int ShieldWidth;                                      /// Shield sprite width
-	int ShieldHeight;                                     /// Shield sprite height
-	int ShieldOffsetX;                                    /// Shield horizontal offset
-	int ShieldOffsetY;                                    /// Shield vertical offset
 	int TechnologyPointCost;								/// Technology point cost
 	int TrainQuantity;										/// Quantity to be trained
 	//Wyrmgus end
@@ -737,7 +732,8 @@ public:
 	CPlayerColorGraphic *Sprite;     /// Sprite images
 	CGraphic *ShadowSprite;          /// Shadow sprite image
 	//Wyrmgus start
-	CPlayerColorGraphic *HairSprite;          /// Shield sprite image
+	CPlayerColorGraphic *HairSprite;          	/// Hair sprite image
+	CPlayerColorGraphic *PantsSprite;          	/// Pants sprite image
 	CPlayerColorGraphic *ShieldSprite;          /// Shield sprite image
 	//Wyrmgus end
 };

@@ -622,7 +622,7 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
 }
 
 //Wyrmgus start
-void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, int offset_x, int offset_y)
+void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
 {
 	if (!sprite) {
 		return;
@@ -631,8 +631,8 @@ void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player,
 	// FIXME: move this calculation to high level.
 	pos.x -= (sprite->Width - type.TileWidth * PixelTileSize.x) / 2;
 	pos.y -= (sprite->Height - type.TileHeight * PixelTileSize.y) / 2;
-	pos.x += type.OffsetX + offset_x;
-	pos.y += type.OffsetY + offset_y;
+	pos.x += type.OffsetX;
+	pos.y += type.OffsetY;
 
 	if (type.Flip) {
 		if (frame < 0) {
@@ -996,9 +996,13 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawConstructionShadow(*this, *type, cframe, frame, screenPos);
 		//Wyrmgus end
 	} else {
-		if (action != UnitActionDie) {
+		//Wyrmgus start
+//		if (action != UnitActionDie) {
+		//Wyrmgus end
 			DrawShadow(*type, frame, screenPos);
-		}
+		//Wyrmgus start
+//		}
+		//Wyrmgus end
 	}
 
 	//
@@ -1066,25 +1070,33 @@ void CUnit::Draw(const CViewport &vp) const
 	
 	//Wyrmgus start
 	CPlayerColorGraphic *hair_sprite = type->HairSprite;
-	// Adjust sprite for variations.
 	if (varinfo) {
 		if (varinfo->HairSprite) {
 			hair_sprite = varinfo->HairSprite;
 		}
 	}
 	if (hair_sprite) {
-		DrawOverlay(*type, hair_sprite, player, frame, screenPos, type->HairOffsetX, type->HairOffsetY);
+		DrawOverlay(*type, hair_sprite, player, frame, screenPos);
+	}
+
+	CPlayerColorGraphic *pants_sprite = type->PantsSprite;
+	if (varinfo) {
+		if (varinfo->PantsSprite) {
+			pants_sprite = varinfo->PantsSprite;
+		}
+	}
+	if (pants_sprite) {
+		DrawOverlay(*type, pants_sprite, player, frame, screenPos);
 	}
 
 	CPlayerColorGraphic *shield_sprite = type->ShieldSprite;
-	// Adjust sprite for variations.
 	if (varinfo) {
 		if (varinfo->ShieldSprite) {
 			shield_sprite = varinfo->ShieldSprite;
 		}
 	}
 	if (shield_sprite) {
-		DrawOverlay(*type, shield_sprite, player, frame, screenPos, type->ShieldOffsetX, type->ShieldOffsetY);
+		DrawOverlay(*type, shield_sprite, player, frame, screenPos);
 	}
 	//Wyrmgus end
 

@@ -495,14 +495,6 @@ static int CclDefineUnitType(lua_State *l)
 
 				if (!strcmp(value, "file")) {
 					type->HairFile = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "size")) {
-					lua_rawgeti(l, -1, k + 1);
-					CclGetPos(l, &type->HairWidth, &type->HairHeight);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "offset")) {
-					lua_rawgeti(l, -1, k + 1);
-					CclGetPos(l, &type->HairOffsetX, &type->HairOffsetY);
-					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported hair tag: %s" _C_ value);
 				}
@@ -510,6 +502,25 @@ static int CclDefineUnitType(lua_State *l)
 			if (redefine && type->HairSprite) {
 				CGraphic::Free(type->HairSprite);
 				type->HairSprite = NULL;
+			}
+		} else if (!strcmp(value, "PantsImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->PantsFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported pants tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->PantsSprite) {
+				CGraphic::Free(type->PantsSprite);
+				type->PantsSprite = NULL;
 			}
 		} else if (!strcmp(value, "ShieldImage")) {
 			if (!lua_istable(l, -1)) {
@@ -522,14 +533,6 @@ static int CclDefineUnitType(lua_State *l)
 
 				if (!strcmp(value, "file")) {
 					type->ShieldFile = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "size")) {
-					lua_rawgeti(l, -1, k + 1);
-					CclGetPos(l, &type->ShieldWidth, &type->ShieldHeight);
-					lua_pop(l, 1);
-				} else if (!strcmp(value, "offset")) {
-					lua_rawgeti(l, -1, k + 1);
-					CclGetPos(l, &type->ShieldOffsetX, &type->ShieldOffsetY);
-					lua_pop(l, 1);
 				} else {
 					LuaError(l, "Unsupported shield tag: %s" _C_ value);
 				}
@@ -1235,6 +1238,8 @@ static int CclDefineUnitType(lua_State *l)
 						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "hair-file")) {
 						var->HairFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "pants-file")) {
+						var->PantsFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "shield-file")) {
 						var->ShieldFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
@@ -1289,15 +1294,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->ShadowOffsetX = parent_type->ShadowOffsetX;
 			type->ShadowOffsetY = parent_type->ShadowOffsetY;
 			type->HairFile = parent_type->HairFile;
-			type->HairWidth = parent_type->HairWidth;
-			type->HairHeight = parent_type->HairHeight;
-			type->HairOffsetX = parent_type->HairOffsetX;
-			type->HairOffsetY = parent_type->HairOffsetY;
+			type->PantsFile = parent_type->PantsFile;
 			type->ShieldFile = parent_type->ShieldFile;
-			type->ShieldWidth = parent_type->ShieldWidth;
-			type->ShieldHeight = parent_type->ShieldHeight;
-			type->ShieldOffsetX = parent_type->ShieldOffsetX;
-			type->ShieldOffsetY = parent_type->ShieldOffsetY;
 			type->TileWidth = parent_type->TileWidth;
 			type->TileHeight = parent_type->TileHeight;
 			type->BoxWidth = parent_type->BoxWidth;
