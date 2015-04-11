@@ -107,7 +107,10 @@ public:
 class CAnimations
 {
 public:
-	CAnimations() : Attack(NULL), Build(NULL), Move(NULL), Repair(NULL),
+	//Wyrmgus start
+//	CAnimations() : Attack(NULL), Build(NULL), Move(NULL), Repair(NULL),
+	CAnimations() : Attack(NULL), RangedAttack(NULL), Build(NULL), Move(NULL), Repair(NULL),
+	//Wyrmgus end
 		Research(NULL), SpellCast(NULL), Start(NULL), Still(NULL),
 		Train(NULL), Upgrade(NULL)
 	{
@@ -118,6 +121,9 @@ public:
 	~CAnimations()
 	{
 		delete Attack;
+		//Wyrmgus start
+		delete RangedAttack;
+		//Wyrmgus end
 		delete Build;
 		for (int i = 0; i < ANIMATIONS_DEATHTYPES + 1; ++i) {
 			delete Death[i];
@@ -141,6 +147,9 @@ public:
 
 public:
 	CAnimation *Attack;
+	//Wyrmgus start
+	CAnimation *RangedAttack;
+	//Wyrmgus end
 	CAnimation *Build;
 	CAnimation *Death[ANIMATIONS_DEATHTYPES + 1];
 	CAnimation *Harvest[MaxCosts];

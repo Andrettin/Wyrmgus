@@ -554,7 +554,14 @@ bool AutoAttack(CUnit &unit)
 			//Wyrmgus end
 			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
-			AnimateActionAttack(unit, *this);
+			//Wyrmgus start
+//			AnimateActionAttack(unit, *this);
+			bool ranged = false;
+			if (this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) > 1) {
+				ranged = true;
+			}
+			AnimateActionAttack(unit, *this, ranged);
+			//Wyrmgus end
 			break;
 	}
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here

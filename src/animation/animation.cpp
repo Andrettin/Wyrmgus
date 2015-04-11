@@ -703,6 +703,10 @@ static int CclDefineAnimations(lua_State *l)
 			}
 		} else if (!strcmp(value, "Attack")) {
 			anims->Attack = ParseAnimation(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "RangedAttack")) {
+			anims->RangedAttack = ParseAnimation(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "SpellCast")) {
 			anims->SpellCast = ParseAnimation(l, -1);
 		} else if (!strcmp(value, "Move")) {
@@ -732,6 +736,9 @@ static int CclDefineAnimations(lua_State *l)
 		AddAnimationToArray(anims->Death[i]);
 	}
 	AddAnimationToArray(anims->Attack);
+	//Wyrmgus start
+	AddAnimationToArray(anims->RangedAttack);
+	//Wyrmgus end
 	AddAnimationToArray(anims->SpellCast);
 	AddAnimationToArray(anims->Move);
 	AddAnimationToArray(anims->Repair);

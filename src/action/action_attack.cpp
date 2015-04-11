@@ -78,7 +78,10 @@
 **
 **  @todo manage correctly unit with no animation attack.
 */
-void AnimateActionAttack(CUnit &unit, COrder &order)
+//Wyrmgus start
+//void AnimateActionAttack(CUnit &unit, COrder &order)
+void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged)
+//Wyrmgus end
 {
 	//  No animation.
 	//  So direct fire missile.
@@ -91,15 +94,28 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	}
 	UnitShowAnimation(unit, unit.Type->Animations->Attack);
 	*/
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations && varinfo->Animations->Attack) {
-		UnitShowAnimation(unit, varinfo->Animations->Attack);
-	} else {
-		if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
-			order.OnAnimationAttack(unit);
-			return;
+	if (ranged && ((unit.Type->Animations && unit.Type->Animations->RangedAttack) || (unit.Type->VarInfo[unit.Variation]->Animations && unit.Type->VarInfo[unit.Variation]->Animations->RangedAttack))) {
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Animations && varinfo->Animations->RangedAttack) {
+			UnitShowAnimation(unit, varinfo->Animations->RangedAttack);
+		} else {
+			if (!unit.Type->Animations || !unit.Type->Animations->RangedAttack) {
+				order.OnAnimationAttack(unit);
+				return;
+			}
+			UnitShowAnimation(unit, unit.Type->Animations->RangedAttack);
 		}
-		UnitShowAnimation(unit, unit.Type->Animations->Attack);
+	} else {
+		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+		if (varinfo && varinfo->Animations && varinfo->Animations->Attack) {
+			UnitShowAnimation(unit, varinfo->Animations->Attack);
+		} else {
+			if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
+				order.OnAnimationAttack(unit);
+				return;
+			}
+			UnitShowAnimation(unit, unit.Type->Animations->Attack);
+		}
 	}
 	//Wyrmgus end
 }
@@ -490,7 +506,14 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 {
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
-	AnimateActionAttack(unit, *this);
+	//Wyrmgus start
+//	AnimateActionAttack(unit, *this);
+	bool ranged = false;
+	if (this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) > 1) {
+		ranged = true;
+	}
+	AnimateActionAttack(unit, *this, ranged);
+	//Wyrmgus end
 	if (unit.Anim.Unbreakable) {
 		return;
 	}

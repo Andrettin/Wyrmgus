@@ -41,6 +41,9 @@
 
 #include "action/action_spellcast.h"
 #include "actions.h"
+//Wyrmgus start
+#include "animation.h"
+//Wyrmgus end
 #include "font.h"
 #include "iolib.h"
 #include "luacallback.h"
@@ -508,7 +511,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 	}
 
 	// No missile hits immediately!
-	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
+	//Wyrmgus start
+//	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
+	if (unit.Type->Missile.Missile->Class == MissileClassNone || (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && unit.MapDistanceTo(*goal) <= 1)) { // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
+	//Wyrmgus end
 		//Wyrmgus start
 		int damage = 0;
 		//Wyrmgus end

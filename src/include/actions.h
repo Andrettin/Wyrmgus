@@ -185,7 +185,10 @@ extern void UnHideUnit(CUnit &unit);
 /// Generic move action
 extern int DoActionMove(CUnit &unit);
 /// Show attack animation
-extern void AnimateActionAttack(CUnit &unit, COrder &order);
+//Wyrmgus start
+//extern void AnimateActionAttack(CUnit &unit, COrder &order);
+extern void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged);
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Actions: actions.c
