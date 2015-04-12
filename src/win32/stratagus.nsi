@@ -51,7 +51,7 @@
 
 ;--------------------------------
 
-!define ICON "stratagus.ico"
+!define ICON "wyrmsun.ico"
 !define EXE "stratagus.exe"
 !define SDL "SDL.dll"
 !define UNINSTALL "uninstall.exe"

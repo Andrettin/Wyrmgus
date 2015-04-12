@@ -48,7 +48,7 @@ override_dh_install:
 	dh_install
 	dh_auto_install --builddirectory=obj-$(DEB_BUILD_GNU_TYPE)-dbg --destdir=debian/stratagus-dbg
 	rm -f debian/stratagus-dbg/usr/bin/png2stratagus debian/stratagus-dbg/usr/sbin/metaserver
-	convert src/win32/stratagus.ico debian/stratagus/usr/share/pixmaps/stratagus.png
+	convert src/win32/wyrmsun.ico debian/stratagus/usr/share/pixmaps/wyrmsun.png
 
 override_dh_shlibdeps:
 	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
@@ -74,7 +74,7 @@ override_dh_gencontrol:
 	echo "Bugtracker: https://bugs.launchpad.net/stratagus" >> debian/stratagus/DEBIAN/control
 	echo "Maemo-Display-Name: Stratagus" >> debian/stratagus/DEBIAN/control
 	echo "Maemo-Icon-26:" >> debian/stratagus/DEBIAN/control
-	for line in $(shell convert src/win32/stratagus.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
+	for line in $(shell convert src/win32/wyrmsun.ico -resize 48x48 png:- | uuencode -m - | tail -n +2 | head -n -1); do \
 		echo " $$line" >> debian/stratagus/DEBIAN/control; \
 	done
 	sed -n -e "/^Depends:.*$$/,\$$p" debian/stratagus/DEBIAN/control.orig | tail -n +2 >> debian/stratagus/DEBIAN/control

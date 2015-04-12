@@ -364,7 +364,7 @@ source_group(xbrz FILES ${xbrz_SRCS})
 #Wyrmgus end
 
 set(win32_SRCS
-	src/win32/attachconsole.cpp
+	src/win32/SetupConsole_win32.cpp
 	src/win32/stratagus.rc
 )
 source_group(win32 FILES ${win32_SRCS})
@@ -604,6 +604,7 @@ set(stratagus_generic_HDRS
 	src/include/viewport.h
 	src/include/wav.h
 	src/include/widgets.h
+	src/include/SetupConsole_win32.h
 )
 
 source_group(include FILES ${stratagus_generic_HDRS})
@@ -1163,6 +1164,14 @@ source_group(metaserver FILES ${metaserver_SRCS} ${metaserver_HDRS})
 if(SQLITE_FOUND)
 	add_executable(metaserver ${metaserver_SRCS} ${metaserver_HDRS})
 	target_link_libraries(metaserver ${SDL_LIBRARY} ${SQLITE_LIBRARIES})
+	
+	if(WIN32)
+		target_link_libraries(metaserver winmm ws2_32)
+	endif()
+	
+	if(WIN32 AND MINGW)
+		target_link_libraries(metaserver dxguid)
+	endif()
 
 	if(WIN32 AND MINGW AND ENABLE_STATIC)
 		set_target_properties(metaserver PROPERTIES LINK_FLAGS "${LINK_FLAGS} -static-libgcc -static-libstdc++")
@@ -1246,10 +1255,10 @@ endif()
 
 if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
 	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/wyrmsun.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	add_custom_command(OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
-		COMMAND ${MAKENSIS} ARGS ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
-		DEPENDS src/win32/stratagus.nsi stratagus COPYING
+		COMMAND ${MAKENSIS} ARGS ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/wyrmsun.nsi
+		DEPENDS src/win32/wyrmsun.nsi stratagus COPYING
 		COMMENT "Generating Stratagus Windows NSIS Installer"
 		VERBATIM
 	)

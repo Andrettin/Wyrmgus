@@ -1010,7 +1010,10 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 static int AiAssignHarvester(CUnit &unit, int resource)
 {
 	// It can't.
-	if (unit.Removed) {
+	//Wyrmgus start
+//	if (unit.Removed) {
+	if (unit.Removed || unit.CurrentAction() == UnitActionBuild) { //prevent units building from outside to being assigned to gather a resource, and then leaving the construction unbuilt forever and ever
+	//Wyrmgus end
 		return 0;
 	}
 

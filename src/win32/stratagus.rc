@@ -1,6 +1,6 @@
 #include "version.h"
 
-#define ICO "stratagus.ico"
+#define ICO "wyrmsun.ico"
 #define EXE "stratagus.exe"
 
 1 ICON ICO
