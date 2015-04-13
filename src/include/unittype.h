@@ -89,7 +89,7 @@ public:
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
 		//Wyrmgus start
 //		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
-		LoseResources(0), HarvestFromOutside(0),
+		LoseResources(0),
 		//Wyrmgus end
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
@@ -106,7 +106,9 @@ public:
 //	unsigned char TerrainHarvester;    /// Unit will harvest terrain(wood only for now).
 	//Wyrmgus end
 	unsigned char LoseResources;       /// The unit will lose it's resource when distracted.
-	unsigned char HarvestFromOutside;  /// Unit harvests without entering the building.
+	//Wyrmgus start
+//	unsigned char HarvestFromOutside;  /// Unit harvests without entering the building.
+	//Wyrmgus end
 	unsigned char RefineryHarvester;   /// Unit have to build Refinery buildings for harvesting.
 	//  Runtime info:
 	CPlayerColorGraphic *SpriteWhenLoaded; /// The graphic corresponding to FileWhenLoaded.
@@ -120,7 +122,7 @@ class VariationInfo
 public:
 	VariationInfo() : VariationId(""),
 		FrameWidth(0), FrameHeight(0),
-		Animations(NULL), Construction(NULL), Sprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
 	{
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));		
@@ -129,6 +131,7 @@ public:
 	std::string VariationId;		/// Variation's name.
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
+	std::string ShadowFile;			/// Variation's shadow graphics.
 	std::string HairFile;			/// Variation's hair graphics.
 	std::string PantsFile;			/// Variation's pants graphics.
 	std::string ShieldFile;			/// Variation's shield graphics.
@@ -136,6 +139,7 @@ public:
 	int FrameHeight;
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
+	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
 	CPlayerColorGraphic *HairSprite;	/// The graphic corresponding to HairFile.
 	CPlayerColorGraphic *PantsSprite;	/// The graphic corresponding to PantsFile.
 	CPlayerColorGraphic *ShieldSprite;	/// The graphic corresponding to ShieldFile.
@@ -232,6 +236,7 @@ enum {
 	CARNIVORE_INDEX,
 	HERBIVORE_INDEX,
 	INSECTIVORE_INDEX,
+	HARVESTFROMOUTSIDE_INDEX,
 	//Wyrmgus end
 	NBARALREADYDEFINED
 };

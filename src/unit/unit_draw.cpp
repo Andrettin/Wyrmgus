@@ -592,10 +592,16 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 **
 **  @todo FIXME: combine new shadow code with old shadow code.
 */
-void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
+//Wyrmgus start
+//void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
+void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelPos &screenPos)
+//Wyrmgus end
 {
 	// Draw normal shadow sprite if available
-	if (!type.ShadowSprite) {
+	//Wyrmgus start
+//	if (!type.ShadowSprite) {
+	if (!sprite) {
+	//Wyrmgus end
 		return;
 	}
 	PixelPos pos = screenPos;
@@ -606,9 +612,15 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
 
 	if (type.Flip) {
 		if (frame < 0) {
-			type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+			//Wyrmgus start
+//			type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+			sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+			//Wyrmgus end
 		} else {
-			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+			//Wyrmgus start
+//			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+			sprite->DrawFrameClip(frame, pos.x, pos.y);
+			//Wyrmgus end
 		}
 	} else {
 		int row = type.NumDirections / 2 + 1;
@@ -617,7 +629,10 @@ void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos)
 		} else {
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
-		type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+		//Wyrmgus start
+//		type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+		sprite->DrawFrameClip(frame, pos.x, pos.y);
+		//Wyrmgus end
 	}
 }
 
@@ -784,6 +799,9 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 								   int frame, const PixelPos &screenPos)
 {
 	PixelPos pos = screenPos;
+	//Wyrmgus start
+	VariationInfo *varinfo = type.VarInfo[unit.Variation];
+	//Wyrmgus end
 	if (cframe->File == ConstructionFileConstruction) {
 		//Wyrmgus start
 		/*
@@ -799,7 +817,6 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 			}
 		}
 		*/
-		VariationInfo *varinfo = type.VarInfo[unit.Variation];
 		if (varinfo && varinfo->Construction) {
 			if (varinfo->Construction->ShadowSprite) {
 				pos.x -= (varinfo->Construction->Width - type.TileWidth * PixelTileSize.x) / 2;
@@ -827,7 +844,20 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 		}
 		//Wyrmgus end
 	} else {
-		if (type.ShadowSprite) {
+		//Wyrmgus start
+		if (varinfo && varinfo->ShadowSprite) {
+			pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
+			pos.x += type.ShadowOffsetX + type.OffsetX;
+			pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
+			pos.y += type.ShadowOffsetY + type.OffsetY;
+			if (frame < 0) {
+				varinfo->ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+			} else {
+				varinfo->ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
+			}
+//		if (type.ShadowSprite) {
+		} else if (type.ShadowSprite) {
+		//Wyrmgus end
 			pos.x -= (type.ShadowWidth - type.TileWidth * PixelTileSize.x) / 2;
 			pos.x += type.ShadowOffsetX + type.OffsetX;
 			pos.y -= (type.ShadowHeight - type.TileHeight * PixelTileSize.y) / 2;
@@ -989,6 +1019,9 @@ void CUnit::Draw(const CViewport &vp) const
 		return;
 	}
 
+	//Wyrmgus start
+	VariationInfo *varinfo = type->VarInfo[this->Variation];
+	//Wyrmgus end
 
 	if (state == 1 && constructed && cframe) {
 		//Wyrmgus start
@@ -999,7 +1032,14 @@ void CUnit::Draw(const CViewport &vp) const
 		//Wyrmgus start
 //		if (action != UnitActionDie) {
 		//Wyrmgus end
-			DrawShadow(*type, frame, screenPos);
+			//Wyrmgus start
+//			DrawShadow(*type, frame, screenPos);
+			if (varinfo && varinfo->ShadowSprite) {
+				DrawShadow(*type, varinfo->ShadowSprite, frame, screenPos);
+			} else if (type->ShadowSprite) {
+				DrawShadow(*type, type->ShadowSprite, frame, screenPos);
+			}
+			//Wyrmgus end
 		//Wyrmgus start
 //		}
 		//Wyrmgus end
@@ -1028,7 +1068,6 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 	//Wyrmgus start
 	// Adjust sprite for variations.
-	VariationInfo *varinfo = type->VarInfo[this->Variation];
 	if (varinfo) {
 		if (varinfo->Sprite) {
 			sprite = varinfo->Sprite;

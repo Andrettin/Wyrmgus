@@ -114,6 +114,7 @@ static const char DETRITIVORE_KEY[] = "Detritivore";
 static const char CARNIVORE_KEY[] = "Carnivore";
 static const char HERBIVORE_KEY[] = "Herbivore";
 static const char INSECTIVORE_KEY[] = "Insectivore";
+static const char HARVESTFROMOUTSIDE_KEY[] = "HarvestFromOutside";
 //Wyrmgus end
 
 // names of the variable.
@@ -193,7 +194,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   HERO_KEY, MERCENARY_KEY,
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
-							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY
+							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
+							   HARVESTFROMOUTSIDE_KEY
 	//Wyrmgus end
 							  };
 
@@ -979,9 +981,13 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "lose-resources")) {
 						res->LoseResources = 1;
 						--k;
+					//Wyrmgus start
+					/*
 					} else if (!strcmp(value, "harvest-from-outside")) {
 						res->HarvestFromOutside = 1;
 						--k;
+					*/
+					//Wyrmgus end
 					} else if (!strcmp(value, "refinery-harvester")) {
 						res->RefineryHarvester = 1;
 						--k;
@@ -1236,6 +1242,8 @@ static int CclDefineUnitType(lua_State *l)
 						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
 						++k;
 						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "shadow-file")) {
+						var->ShadowFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "hair-file")) {
 						var->HairFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "pants-file")) {

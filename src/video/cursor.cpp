@@ -184,7 +184,14 @@ static void DrawBuildingCursor()
 #endif
 	PushClipping();
 	vp.SetClipping();
-	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
+	//Wyrmgus start
+//	DrawShadow(*CursorBuilding, CursorBuilding->StillFrame, screenPos);
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShadowSprite) {
+		DrawShadow(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShadowSprite, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->ShadowSprite) {
+		DrawShadow(*CursorBuilding, CursorBuilding->ShadowSprite, CursorBuilding->StillFrame, screenPos);
+	}
+	//Wyrmgus end
 	//Wyrmgus start
 //	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 //				 CursorBuilding->StillFrame, screenPos);

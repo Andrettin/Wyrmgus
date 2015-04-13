@@ -707,6 +707,9 @@ CUnitType::~CUnitType()
 			if (this->VarInfo[var]->Sprite) {
 				CGraphic::Free(this->VarInfo[var]->Sprite);
 			}
+			if (this->VarInfo[var]->ShadowSprite) {
+				CGraphic::Free(this->VarInfo[var]->ShadowSprite);
+			}
 			if (this->VarInfo[var]->HairSprite) {
 				CGraphic::Free(this->VarInfo[var]->HairSprite);
 			}
@@ -1356,6 +1359,16 @@ void LoadUnitTypeSprite(CUnitType &type)
 			varinfo->Sprite->Load();
 			if (type.Flip) {
 				varinfo->Sprite->Flip();
+			}
+		}
+		if (!varinfo->ShadowFile.empty()) {
+			varinfo->ShadowSprite = CGraphic::New(varinfo->ShadowFile, type.ShadowWidth, type.ShadowHeight);
+			varinfo->ShadowSprite->Load();
+			if (type.Flip) {
+				varinfo->ShadowSprite->Flip();
+			}
+			if (varinfo->ShadowSprite->Surface->format->BytesPerPixel == 1) {
+				varinfo->ShadowSprite->MakeShadow();
 			}
 		}
 		if (!varinfo->HairFile.empty()) {

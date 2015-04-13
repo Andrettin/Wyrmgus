@@ -366,7 +366,10 @@ private:
 bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 {
 	return mine.Type->CanHarvest && mine.ResourcesHeld
-		   && (resinfo.HarvestFromOutside
+			//Wyrmgus start
+//		   && (resinfo.HarvestFromOutside
+		   && (mine.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value
+			//Wyrmgus end
 			   || mine.Player->Index == PlayerMax - 1
 			   || mine.Player == worker.Player
 			   || (worker.IsAllied(mine) && mine.IsAllied(worker)));

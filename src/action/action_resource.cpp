@@ -577,7 +577,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	}
 
 	// Place unit inside the resource
-	if (!resinfo.HarvestFromOutside) {
+	//Wyrmgus start
+//	if (!resinfo.HarvestFromOutside) {
+	if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+	//Wyrmgus end
 		if (goal->Variable[MAXHARVESTERS_INDEX].Value == 0 || goal->Variable[MAXHARVESTERS_INDEX].Value > goal->InsideCount) {
 			this->ClearGoal();
 			int selected = unit.Selected;
@@ -604,7 +607,14 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	goal->Resource.Active++;
 
 	if (resinfo.WaitAtResource) {
-		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+		//Wyrmgus start
+//		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+		int wait_at_resource = resinfo.WaitAtResource;
+		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+			wait_at_resource = resinfo.WaitAtResource / 2 * 100 / 8;
+		}
+		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+		//Wyrmgus end
 	} else {
 		this->TimeToHarvest = 1;
 	}
@@ -645,16 +655,26 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	CUnit *depot;
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
 
-	Assert((unit.Container == &source && !resinfo.HarvestFromOutside)
-		   || (!unit.Container && resinfo.HarvestFromOutside));
+	//Wyrmgus start
+//	Assert((unit.Container == &source && !resinfo.HarvestFromOutside)
+//		   || (!unit.Container && resinfo.HarvestFromOutside));
+	Assert((unit.Container == &source && !source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value)
+		   || (!unit.Container && source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value));
+	//Wyrmgus end
 
-	if (resinfo.HarvestFromOutside) {
+	//Wyrmgus start
+//	if (resinfo.HarvestFromOutside) {
+	if (source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+	//Wyrmgus end
 		this->ClearGoal();
 		--source.Resource.Active;
 	}
 
 	// Continue to harvest if we aren't fully loaded
-	if (resinfo.HarvestFromOutside && unit.ResourcesHeld < resinfo.ResourceCapacity) {
+	//Wyrmgus start
+//	if (resinfo.HarvestFromOutside && unit.ResourcesHeld < resinfo.ResourceCapacity) {
+	if (source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value && unit.ResourcesHeld < resinfo.ResourceCapacity) {
+	//Wyrmgus end
 		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1);
 
 		if (goal) {
@@ -684,7 +704,10 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	// No depot found, or harvester empty
 	// Dump the unit outside and look for something to do.
 	if (unit.Container) {
-		Assert(!resinfo.HarvestFromOutside);
+		//Wyrmgus start
+//		Assert(!resinfo.HarvestFromOutside);
+		Assert(!source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
+		//Wyrmgus end
 		DropOutOnSide(unit, LookingW, &source);
 	}
 	this->goalPos.x = -1;
@@ -719,8 +742,9 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	int addload;
 
 	//Wyrmgus start
+	bool harvest_from_outside = (this->GetGoal() && this->GetGoal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
 //	if (resinfo.HarvestFromOutside || resinfo.TerrainHarvester) {
-	if (resinfo.HarvestFromOutside || Map.Info.IsPointOnMap(this->goalPos)) {
+	if (harvest_from_outside || Map.Info.IsPointOnMap(this->goalPos)) {
 	//Wyrmgus end
 		AnimateActionHarvest(unit);
 	} else {
@@ -732,7 +756,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	if (this->DoneHarvesting) {
 		//Wyrmgus start
 //		Assert(resinfo.HarvestFromOutside || resinfo.TerrainHarvester);
-		Assert(resinfo.HarvestFromOutside || Map.Info.IsPointOnMap(this->goalPos));
+		Assert(harvest_from_outside || Map.Info.IsPointOnMap(this->goalPos));
 		//Wyrmgus end
 		return !unit.Anim.Unbreakable;
 	}
@@ -756,13 +780,23 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	while (!this->DoneHarvesting && this->TimeToHarvest < 0) {
 		//FIXME: rb - how should it look for WaitAtResource == 0
 		if (resinfo.WaitAtResource) {
-			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+			// Wyrmgus start
+//			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+			int wait_at_resource = resinfo.WaitAtResource;
+			if (!harvest_from_outside) {
+				wait_at_resource = resinfo.WaitAtResource / 2 * 100 / 8; // so that a harvesting speed from outside of 24 equals a harvesting speed from inside of 150
+			}
+			this->TimeToHarvest += std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+			//Wyrmgus end
 		} else {
 			this->TimeToHarvest += 1;
 		}
 
 		// Calculate how much we can load.
-		if (resinfo.ResourceStep) {
+		//Wyrmgus start
+//		if (resinfo.ResourceStep) {
+		if (resinfo.ResourceStep && harvest_from_outside) {
+		//Wyrmgus end
 			addload = resinfo.ResourceStep;
 		} else {
 			addload = resinfo.ResourceCapacity;
@@ -789,7 +823,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				//Wyrmgus end
 			}
 		} else {
-			if (resinfo.HarvestFromOutside) {
+			//Wyrmgus start
+//			if (resinfo.HarvestFromOutside) {
+			if (harvest_from_outside) {
+			//Wyrmgus end
 				source = this->GetGoal();
 			} else {
 				source = unit.Container;
@@ -857,7 +894,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			}
 			return 0;
 		} else {
-			if (resinfo.HarvestFromOutside) {
+			//Wyrmgus start
+//			if (resinfo.HarvestFromOutside) {
+			if (harvest_from_outside) {
+			//Wyrmgus end
 				if ((unit.ResourcesHeld == resinfo.ResourceCapacity) || (source == NULL)) {
 					// Mark as complete.
 					this->DoneHarvesting = true;
@@ -904,7 +944,10 @@ int COrder_Resource::StopGathering(CUnit &unit)
 //	if (!resinfo.TerrainHarvester) {
 	if (!Map.Info.IsPointOnMap(this->goalPos)) {
 	//Wyrmgus end
-		if (resinfo.HarvestFromOutside) {
+		//Wyrmgus start
+//		if (resinfo.HarvestFromOutside) {
+		if (this->GetGoal() && this->GetGoal()->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+		//Wyrmgus end
 			source = this->GetGoal();
 			this->ClearGoal();
 		} else {
@@ -976,7 +1019,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	if (!depot || !unit.ResourcesHeld || this->Finished) {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
-		if (!(resinfo.HarvestFromOutside || Map.Info.IsPointOnMap(this->goalPos))) {
+		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || Map.Info.IsPointOnMap(this->goalPos))) {
 		//Wyrmgus end
 			Assert(unit.Container);
 			DropOutOnSide(unit, LookingW, source);
@@ -995,7 +1038,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 	} else {
 		//Wyrmgus start
 //		if (!(resinfo.HarvestFromOutside || resinfo.TerrainHarvester)) {
-		if (!(resinfo.HarvestFromOutside || Map.Info.IsPointOnMap(this->goalPos))) {
+		if (!((source && source->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) || Map.Info.IsPointOnMap(this->goalPos))) {
 		//Wyrmgus end
 			Assert(unit.Container);
 			DropOutNearest(unit, depot->tilePos + depot->Type->GetHalfTileSize(), source);

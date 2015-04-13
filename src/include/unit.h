@@ -632,7 +632,10 @@ extern void LoadDecorations();
 extern void CleanDecorations();
 
 /// Draw unit's shadow
-extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos);
+//Wyrmgus start
+//extern void DrawShadow(const CUnitType &type, int frame, const PixelPos &screenPos);
+extern void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelPos &screenPos);
+//Wyrmgus end
 //Wyrmgus start
 /// Draw unit's overlay
 extern void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos);
