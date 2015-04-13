@@ -319,15 +319,19 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 static void AnimateActionUpgradeTo(CUnit &unit)
 {
-	CAnimations &animations = *unit.Type->Animations;
 	//Wyrmgus start
+//	CAnimations &animations = *unit.Type->Animations;
 	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
 	if (varinfo && varinfo->Animations) {
-		animations = *varinfo->Animations;
+		UnitShowAnimation(unit, varinfo->Animations->Upgrade ? varinfo->Animations->Upgrade : varinfo->Animations->Still);
+	} else {
+		UnitShowAnimation(unit, unit.Type->Animations->Upgrade ? unit.Type->Animations->Upgrade : unit.Type->Animations->Still);
 	}
 	//Wyrmgus end
 
-	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
+	//Wyrmgus start
+//	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
+	//Wyrmgus end
 }
 
 /* virtual */ void COrder_UpgradeTo::Execute(CUnit &unit)

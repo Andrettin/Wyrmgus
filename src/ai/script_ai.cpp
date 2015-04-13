@@ -964,7 +964,12 @@ static int CclAiResearch(lua_State *l)
 		LuaError(l, "Upgrade needed");
 		upgrade = NULL;
 	}
-	InsertResearchRequests(upgrade);
+	//Wyrmgus start
+//	InsertResearchRequests(upgrade);
+	if (UpgradeIdentAllowed(*AiPlayer->Player, str) != 'R') {
+		InsertResearchRequests(upgrade);
+	}
+	//Wyrmgus end
 	lua_pushboolean(l, 0);
 	return 1;
 }

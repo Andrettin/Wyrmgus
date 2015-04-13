@@ -1380,6 +1380,8 @@ static int CclDefineUnitType(lua_State *l)
 					type->VarInfo[var] = parent_type->VarInfo[var];
 				}
 			}
+			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
+			type->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
 		} else if (!strcmp(value, "Class")) {
 			type->Class = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {

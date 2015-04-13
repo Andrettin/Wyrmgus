@@ -428,6 +428,13 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	return true;
 }
 
+//Wyrmgus start
+void COrder_Build::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+{
+	this->Type = &newType;
+}
+//Wyrmgus end
+
 static void AnimateActionBuild(CUnit &unit)
 {
 	CAnimations *animations = unit.Type->Animations;

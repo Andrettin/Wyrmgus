@@ -54,6 +54,10 @@ public:
 	virtual void Execute(CUnit &unit);
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input);
+	
+	//Wyrmgus start
+	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+	//Wyrmgus end
 
 	virtual void AiUnitKilled(CUnit &unit);
 

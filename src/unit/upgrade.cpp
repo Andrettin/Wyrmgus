@@ -41,7 +41,13 @@
 
 #include "upgrade.h"
 
+//Wyrmgus start
+#include "action/action_build.h"
+//Wyrmgus end
 #include "action/action_train.h"
+//Wyrmgus start
+#include "../ai/ai_local.h"
+//Wyrmgus end
 #include "commands.h"
 #include "depend.h"
 #include "interface.h"
@@ -560,6 +566,37 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 {
 	//Wyrmgus start
 	player.Allow.Units[src.Slot] = 0; //forbid the previous unit type when converting
+	
+	if (player.AiEnabled) {
+		//if is AI player, convert all requests from the old unit type to the new one; FIXME: if already has requests of the new unit type, then the count of the old one should be added to the new one, instead of merely changing the type of the old one to the new one
+		for (unsigned int i = 0; i < player.Ai->UnitTypeRequests.size(); ++i) {
+			if (player.Ai->UnitTypeRequests[i].Type->Slot == src.Slot) {
+				player.Ai->UnitTypeRequests[i].Type = &dst;
+			}
+		}
+
+		for (unsigned int i = 0; i < player.Ai->UpgradeToRequests.size(); ++i) {
+			if (player.Ai->UpgradeToRequests[i]->Slot == src.Slot) {
+				player.Ai->UpgradeToRequests[i] = &dst;
+			}
+		}
+		
+		for (unsigned int i = 0; i < player.Ai->Force.Size(); ++i) {
+			AiForce &force = player.Ai->Force[i];
+
+			for (unsigned int j = 0; j < force.UnitTypes.size(); ++j) {
+				if (force.UnitTypes[j].Type->Slot == src.Slot) {
+					force.UnitTypes[j].Type = &dst;
+				}
+			}
+		}
+
+		for (unsigned int i = 0; i < player.Ai->UnitTypeBuilt.size(); ++i) {
+			if (player.Ai->UnitTypeBuilt[i].Type->Slot == src.Slot) {
+				player.Ai->UnitTypeBuilt[i].Type = &dst;
+			}
+		}
+	}
 	//Wyrmgus end
 	for (int i = 0; i < player.GetUnitCount(); ++i) {
 		CUnit &unit = player.GetUnit(i);
@@ -577,6 +614,15 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 					if (&order.GetUnitType() == &src) {
 						order.ConvertUnitType(unit, dst);
 					}
+				//Wyrmgus start
+				// convert building orders as well
+				} else if (unit.Orders[j]->Action == UnitActionBuild) {
+					COrder_Build &order = *static_cast<COrder_Build *>(unit.Orders[j]);
+
+					if (&order.GetUnitType() == &src) {
+						order.ConvertUnitType(unit, dst);
+					}
+				//Wyrmgus end
 				}
 			}
 		}
