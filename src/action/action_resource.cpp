@@ -871,7 +871,10 @@ int COrder_Resource::GatherResource(CUnit &unit)
 				if (!dead) {
 					if (Preference.MineNotifications
 						&& unit.Player->Index == ThisPlayer->Index
-						&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
+						//Wyrmgus start
+//						&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
+						&& source->Variable[GIVERESOURCE_INDEX].Max > (DefaultIncomes[this->CurrentResource] * 10)) {
+						//Wyrmgus end
 							//Wyrmgus start
 //							unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
 							unit.Player->Notify(NotifyYellow, source->tilePos, _("Our %s has been depleted!"), source->Type->Name.c_str());
@@ -962,7 +965,10 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			&& source->IsAlive()
 			&& !source->MineLow
 			&& source->ResourcesHeld * 100 / source->Variable[GIVERESOURCE_INDEX].Max <= 10
-			&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
+			//Wyrmgus start
+//			&& source->Variable[GIVERESOURCE_INDEX].Max > DefaultIncomes[this->CurrentResource]) {
+			&& source->Variable[GIVERESOURCE_INDEX].Max > (DefaultIncomes[this->CurrentResource] * 10)) {
+			//Wyrmgus end
 				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
 				unit.Player->Notify(NotifyYellow, source->tilePos, _("Our %s is nearing depletion!"), source->Type->Name.c_str());
