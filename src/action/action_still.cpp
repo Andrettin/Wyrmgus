@@ -557,7 +557,7 @@ bool AutoAttack(CUnit &unit)
 			//Wyrmgus start
 //			AnimateActionAttack(unit, *this);
 			bool ranged = false;
-			if (this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) > 1 && unit.Variable[ATTACKRANGE_INDEX].Value > 1) {
+			if (((this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) > 1) || unit.Container) && unit.Variable[ATTACKRANGE_INDEX].Value > 1) {
 				ranged = true;
 			}
 			AnimateActionAttack(unit, *this, ranged);
