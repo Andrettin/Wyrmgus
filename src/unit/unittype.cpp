@@ -1267,7 +1267,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 		//Wyrmgus start
 //		type.ShadowSprite->MakeShadow();
 		if (type.ShadowSprite->Surface->format->BytesPerPixel == 1) {
-			type.ShadowSprite->MakeShadow();
+//			type.ShadowSprite->MakeShadow();
 		}
 		//Wyrmgus end
 	}
@@ -1368,7 +1368,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 				varinfo->ShadowSprite->Flip();
 			}
 			if (varinfo->ShadowSprite->Surface->format->BytesPerPixel == 1) {
-				varinfo->ShadowSprite->MakeShadow();
+//				varinfo->ShadowSprite->MakeShadow();
 			}
 		}
 		if (!varinfo->HairFile.empty()) {
