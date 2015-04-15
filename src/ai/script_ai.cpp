@@ -451,6 +451,24 @@ static AiRequestType *FindInUnitTypeRequests(const CUnitType *type)
 	return NULL;
 }
 
+//Wyrmgus start
+/**
+**  Remove unit-type in request table.
+**
+**  @param type  Unit-type to be removed.
+*/
+static void RemoveFromUnitTypeRequests(const CUnitType *type)
+{
+	std::vector<AiRequestType>::iterator i;
+
+	for (i = AiPlayer->UnitTypeRequests.begin(); i != AiPlayer->UnitTypeRequests.end(); ++i) {
+		if (type == (*i).Type) {
+			AiPlayer->UnitTypeRequests.erase(i);
+		}
+	}
+}
+//Wyrmgus end
+
 /**
 **  Find unit-type in upgrade-to table.
 **
@@ -610,7 +628,13 @@ static int CclAiSet(lua_State *l)
 	lua_pop(l, 1);
 
 	AiRequestType *autt = FindInUnitTypeRequests(type);
-	if (autt) {
+	//Wyrmgus start
+	int set_count = LuaToNumber(l, 2);
+//	if (autt) {
+	if (autt && set_count <= 0) {
+		RemoveFromUnitTypeRequests(type);
+	} else if (autt) {
+	//Wyrmgus end
 		autt->Count = LuaToNumber(l, 2);
 		// FIXME: 0 should remove it.
 	} else {
