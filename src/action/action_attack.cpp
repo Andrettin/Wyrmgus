@@ -94,7 +94,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged)
 	}
 	UnitShowAnimation(unit, unit.Type->Animations->Attack);
 	*/
-	if (ranged && ((unit.Type->Animations && unit.Type->Animations->RangedAttack) || (unit.Type->VarInfo[unit.Variation]->Animations && unit.Type->VarInfo[unit.Variation]->Animations->RangedAttack))) {
+	if (ranged && ((unit.Type->Animations && unit.Type->Animations->RangedAttack) || (unit.Type->VarInfo[unit.Variation] && unit.Type->VarInfo[unit.Variation]->Animations && unit.Type->VarInfo[unit.Variation]->Animations->RangedAttack))) {
 		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
 		if (varinfo && varinfo->Animations && varinfo->Animations->RangedAttack) {
 			UnitShowAnimation(unit, varinfo->Animations->RangedAttack);
