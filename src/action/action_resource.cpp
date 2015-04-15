@@ -611,7 +611,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 //		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 		int wait_at_resource = resinfo.WaitAtResource;
 		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
-			wait_at_resource = resinfo.WaitAtResource / 2 * 100 / 8;
+			wait_at_resource = resinfo.WaitAtResource * 100 / resinfo.ResourceStep;
 		}
 		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 		//Wyrmgus end
@@ -784,7 +784,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 			int wait_at_resource = resinfo.WaitAtResource;
 			if (!Map.Info.IsPointOnMap(this->goalPos) && !harvest_from_outside) {
-				wait_at_resource = resinfo.WaitAtResource / 2 * 100 / 8; // so that a harvesting speed from outside of 24 equals a harvesting speed from inside of 150
+				wait_at_resource = resinfo.WaitAtResource * 100 / resinfo.ResourceStep;
 			}
 			this->TimeToHarvest += std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 			//Wyrmgus end
