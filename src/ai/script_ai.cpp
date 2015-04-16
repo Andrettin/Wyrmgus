@@ -464,6 +464,7 @@ static void RemoveFromUnitTypeRequests(const CUnitType *type)
 	for (i = AiPlayer->UnitTypeRequests.begin(); i != AiPlayer->UnitTypeRequests.end(); ++i) {
 		if (type == (*i).Type) {
 			AiPlayer->UnitTypeRequests.erase(i);
+			break;
 		}
 	}
 }
