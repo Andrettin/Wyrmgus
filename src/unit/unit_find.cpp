@@ -530,7 +530,10 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool ev
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
 
-		if (unit.Type == &type && !unit.IsUnusable(everybody)) {
+		//Wyrmgus start
+//		if (unit.Type == &type && !unit.IsUnusable(everybody)) {
+		if (unit.Type == &type && (!unit.IsUnusable(everybody) || (everybody && unit.IsAlive()))) {
+		//Wyrmgus end
 			units.push_back(&unit);
 		}
 	}
