@@ -3057,7 +3057,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
+	//Wyrmgus start
+//	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
+	if (target.Threshold == 0 && (target.IsAgressive() || (target.Type->CanAttack && target.Type->BoolFlag[COWARD_INDEX].value && attacker->Type->BoolFlag[COWARD_INDEX].value)) && target.CanMove() && !target.ReCast) {
+	//Wyrmgus end
 		// Attack units in range (which or the attacker?)
 		// Don't bother unit if it casting repeatable spell
 		HitUnit_AttackBack(*attacker, target);

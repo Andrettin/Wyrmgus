@@ -288,7 +288,10 @@ void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged)
 		if (goal == attacker) {
 			return true;
 		}
-		if (goal->CurrentAction() == UnitActionAttack) {
+		//Wyrmgus start
+//		if (goal->CurrentAction() == UnitActionAttack) {
+		if (goal->CurrentAction() == UnitActionAttack && unit.MapDistanceTo(*goal) <= unit.Variable[ATTACKRANGE_INDEX].Value) {
+		//Wyrmgus end
 			const COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
 			if (order.GetGoal() == &unit) {
 				//we already fight with one of attackers;
