@@ -3061,7 +3061,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 //	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
 	if (
 		target.Threshold == 0
-		&& (target.IsAgressive() || (target.Type->CanAttack && target.Type->BoolFlag[COWARD_INDEX].value && (attacker->Type->BoolFlag[COWARD_INDEX].value || attacker->Variable[HP_INDEX].value <= 3))) // attacks back if isn't coward, or if attacker is also coward, or if attacker has 3 HP or less 
+		&& (target.IsAgressive() || (target.Type->CanAttack && target.Type->BoolFlag[COWARD_INDEX].value && (attacker->Type->BoolFlag[COWARD_INDEX].value || attacker->Variable[HP_INDEX].Value <= 3))) // attacks back if isn't coward, or if attacker is also coward, or if attacker has 3 HP or less 
 		&& target.CanMove()
 		&& !target.ReCast
 	) {

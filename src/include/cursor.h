@@ -187,6 +187,10 @@ extern CCursor *CursorByIdent(const std::string &ident);
 
 /// Draw any cursor
 extern void DrawCursor();
+//Wyrmgus start
+/// Draw building cursor
+extern void DrawBuildingCursor();
+//Wyrmgus end
 /// Hide the cursor
 extern void HideCursor();
 /// Animate the cursor

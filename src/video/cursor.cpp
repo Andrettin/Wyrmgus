@@ -165,7 +165,10 @@ static void DrawVisibleRectangleCursor(PixelPos corner1, PixelPos corner2)
 /**
 **  Draw cursor for selecting building position.
 */
-static void DrawBuildingCursor()
+//Wyrmgus start
+//static void DrawBuildingCursor()
+void DrawBuildingCursor()
+//Wyrmgus end
 {
 	// Align to grid
 	const CViewport &vp = *UI.MouseViewport;
@@ -289,9 +292,13 @@ void DrawCursor()
 		const PixelPos cursorStartScreenPos = UI.MouseViewport->MapToScreenPixelPos(CursorStartMapPos);
 
 		DrawVisibleRectangleCursor(cursorStartScreenPos, CursorScreenPos);
+	//Wyrmgus start
+	/*
 	} else if (CursorBuilding && CursorOn == CursorOnMap) {
 		// Selecting position for building
 		DrawBuildingCursor();
+	*/
+	//Wyrmgus end
 	}
 
 	//  Cursor may not exist if we are loading a game or something.

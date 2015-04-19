@@ -175,13 +175,16 @@ void UpdateDisplay()
 		DrawMapArea();
 		DrawMessages();
 
-		//Wyrmgus start
-//		if (CursorState == CursorStateRectangle) {
-		if (CursorState == CursorStateRectangle || CursorBuilding) {
-		//Wyrmgus end
+		if (CursorState == CursorStateRectangle) {
 			DrawCursor();
 		}
 
+		//Wyrmgus start
+		if (CursorBuilding && CursorOn == CursorOnMap) {
+			DrawBuildingCursor();
+		}
+		//Wyrmgus end
+	
 		if ((Preference.BigScreen && !BigMapMode) || (!Preference.BigScreen && BigMapMode)) {
 			UiToggleBigMap();
 		}
@@ -213,10 +216,7 @@ void UpdateDisplay()
 
 	DrawGuichanWidgets();
 
-	//Wyrmgus start
-//	if (CursorState != CursorStateRectangle) {
-	if (CursorState != CursorStateRectangle && !CursorBuilding) {
-	//Wyrmgus end
+	if (CursorState != CursorStateRectangle) {
 		DrawCursor();
 	}
 

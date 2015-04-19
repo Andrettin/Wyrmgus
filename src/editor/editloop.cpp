@@ -1138,8 +1138,8 @@ void EditorUpdateDisplay()
 	}
 
 	//Wyrmgus start
-	if (CursorBuilding) {
-		DrawCursor();
+	if (CursorBuilding && CursorOn == CursorOnMap) {
+		DrawBuildingCursor();
 	}
 	//Wyrmgus end
 	
@@ -1186,12 +1186,7 @@ void EditorUpdateDisplay()
 
 	// DrawPopup();
 
-	//Wyrmgus start
-//	DrawCursor();
-	if (!CursorBuilding) {
-		DrawCursor();
-	}
-	//Wyrmgus end
+	DrawCursor();
 
 	// refresh entire screen, so no further invalidate needed
 	Invalidate();
