@@ -450,10 +450,25 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		is_normal = false;
 	}
 	if (isPressed()) {
-		graphics->drawText(getCaption(), textX + 4, textY + 4, getAlignment(), is_normal);
+		textX += 4;
+		textY += 4;
+		if ((textY + 11) > (getHeight() - 2)) {
+			textY += (getHeight() - 2) - (textY + 11);
+		}
+		if (textY < 1) {
+			textY = 1;
+		}
 	} else {
-		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment(), is_normal);
+		textX += 2;
+		textY += 2;
+		if ((textY + 11) > (getHeight() - 3)) {
+			textY += (getHeight() - 3) - (textY + 11);
+		}
+		if (textY < 0) {
+			textY = 0;
+		}
 	}
+	graphics->drawText(getCaption(), textX, textY, getAlignment(), is_normal);
 	//Wyrmgus end
 
 	//Wyrmgus start
