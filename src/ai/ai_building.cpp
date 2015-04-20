@@ -463,7 +463,10 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 		} else {
 			//mines
 			if (type.GivesResource == i) {
-				if (resinfo && resinfo->RefineryHarvester) {
+				//Wyrmgus start
+//				if (resinfo && resinfo->RefineryHarvester) {
+				if (resinfo) {
+				//Wyrmgus end
 					//Mine have to be build ONTOP resources
 					return AiFindMiningPlace(worker, type, startPos, i, resultPos);
 				} else {
