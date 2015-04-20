@@ -1478,7 +1478,10 @@ static void SendCommand(const Vec2i &tilePos)
 	if (ret) {
 		// Acknowledge the command with first selected unit.
 		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround || CursorAction == ButtonSpellCast) {
+			//Wyrmgus start
+//			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround || CursorAction == ButtonSpellCast) {
+			if (CursorAction == ButtonAttack || CursorAction == ButtonAttackGround) {
+			//Wyrmgus end
 				if (Selected[i]->Type->Sound.Attack.Sound) {
 					PlayUnitSound(*Selected[i], VoiceAttack);
 					break;
