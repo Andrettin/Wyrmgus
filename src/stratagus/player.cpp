@@ -1103,6 +1103,9 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 */
 int CPlayer::CheckCosts(const int *costs, bool notify) const
 {
+	//Wyrmgus start
+	bool sound_played = false;
+	//Wyrmgus end
 	int err = 0;
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (this->Resources[i] + this->StoredResources[i] >= costs[i]) {
@@ -1117,7 +1120,11 @@ int CPlayer::CheckCosts(const int *costs, bool notify) const
 			Notify(_("Not enough %s... %s more %s."), _(name), _(actionName), _(name)); //added extra space to look better
 			//Wyrmgus end
 
-			if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound) {
+			//Wyrmgus start
+//			if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound) {
+			if (this == ThisPlayer && GameSounds.NotEnoughRes[this->Race][i].Sound && !sound_played) {
+				sound_played = true;
+			//Wyrmgus end
 				PlayGameSound(GameSounds.NotEnoughRes[this->Race][i].Sound, MaxSampleVolume);
 			}
 		}
