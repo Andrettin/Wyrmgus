@@ -2181,9 +2181,6 @@ void UpdateUnitVariables(CUnit &unit)
 
 	if (unit.Type->BoolFlag[ORGANIC_INDEX].value) {
 		unit.Variable[XPREQUIRED_INDEX].Max = 43500;
-		if (unit.Variable[XPREQUIRED_INDEX].Value == 0) {
-			unit.Variable[XPREQUIRED_INDEX].Value = 200;
-		}
 		unit.Variable[XPREQUIRED_INDEX].Enable = 1;
 	}
 	
