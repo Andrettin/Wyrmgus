@@ -191,6 +191,8 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			} else {
 				return unit.Type->Sound.Step.Sound;
 			}
+		case VoiceUsed:
+			return unit.Type->Sound.Used.Sound;
 		//Wyrmgus end
 		case VoiceBuild:
 			return unit.Type->Sound.Build.Sound;

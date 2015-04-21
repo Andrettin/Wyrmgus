@@ -97,6 +97,7 @@ static const char ORGANIC_KEY[] = "organic";
 static const char SIDEATTACK_KEY[] = "SideAttack";
 //Wyrmgus start
 static const char ITEM_KEY[] = "Item";
+static const char TRAP_KEY[] = "Trap";
 static const char HERO_KEY[] = "Hero";
 static const char MERCENARY_KEY[] = "Mercenary";
 static const char FAUNA_KEY[] = "Fauna";
@@ -115,6 +116,7 @@ static const char CARNIVORE_KEY[] = "Carnivore";
 static const char HERBIVORE_KEY[] = "Herbivore";
 static const char INSECTIVORE_KEY[] = "Insectivore";
 static const char HARVESTFROMOUTSIDE_KEY[] = "HarvestFromOutside";
+static const char SLOWS_KEY[] = "Slows";
 //Wyrmgus end
 
 // names of the variable.
@@ -190,12 +192,12 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
 	//Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, ITEM_KEY,
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, ITEM_KEY, TRAP_KEY,
 							   HERO_KEY, MERCENARY_KEY,
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
-							   HARVESTFROMOUTSIDE_KEY
+							   HARVESTFROMOUTSIDE_KEY, SLOWS_KEY
 	//Wyrmgus end
 							  };
 
@@ -1171,6 +1173,8 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.StepMud.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "step-rock")) {
 					type->Sound.StepRock.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "used")) {
+					type->Sound.Used.Name = LuaToString(l, -1, k + 1);
 				//Wyrmgus end
 				} else if (!strcmp(value, "build")) {
 					type->Sound.Build.Name = LuaToString(l, -1, k + 1);
@@ -2191,7 +2195,7 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[GENDER_INDEX].Enable = 1;
 	}
 	
-	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
+	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && !unit.Type->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
 		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->ChildUpgrade));
 	}

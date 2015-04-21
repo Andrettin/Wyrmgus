@@ -73,6 +73,7 @@ enum UnitVoiceGroup {
 	VoiceHit,				/// Hit another unit
 	VoiceMiss,				/// Attacked another unit, but missed
 	VoiceStep,				/// Stepped
+	VoiceUsed,				/// Used (for items)
 	//Wyrmgus end
 	VoiceBuild              /// worker goes to build a building
 };

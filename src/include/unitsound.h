@@ -83,6 +83,7 @@ public:
 	SoundConfig StepGrass;			/// stepped on grass
 	SoundConfig StepMud;			/// stepped on mud
 	SoundConfig StepRock;			/// stepped on rock
+	SoundConfig Used;				/// used (for items)
 	//Wyrmgus end
 	SoundConfig Build;              /// build confirm command
 	SoundConfig Ready;              /// unit training... ready
