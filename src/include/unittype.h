@@ -89,7 +89,7 @@ public:
 		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
 		//Wyrmgus start
 //		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
-		LoseResources(0),
+		FinalResourceConversionRate(0), LoseResources(0),
 		//Wyrmgus end
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
@@ -104,6 +104,7 @@ public:
 	unsigned FinalResource;         /// Convert resource when delivered.
 	//Wyrmgus start
 //	unsigned char TerrainHarvester;    /// Unit will harvest terrain(wood only for now).
+	unsigned FinalResourceConversionRate;         /// Rate at which the resource is converted when delivered.
 	//Wyrmgus end
 	unsigned char LoseResources;       /// The unit will lose it's resource when distracted.
 	//Wyrmgus start

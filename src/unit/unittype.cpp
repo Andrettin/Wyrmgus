@@ -504,6 +504,11 @@
 **    a fisherman who harvests fish, but it all turns to food at the
 **    depot.
 **
+**  ResourceInfo::FinalResourceConversionRate
+**
+**    The rate at which the resource is converted to the final resource at the depot. Useful for
+**    silver mines returning a lower amount of gold.
+**
 **  ResourceInfo::WaitAtResource
 **
 **    Cycles the unit waits while inside a resource.
