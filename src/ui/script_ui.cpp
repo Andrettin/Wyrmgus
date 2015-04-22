@@ -1152,6 +1152,32 @@ static int CclAddMessage(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+**  Add a new objective.
+**
+**  @param l  Lua state.
+*/
+static int CclAddObjective(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	SetObjective("%s", LuaToString(l, 1));
+	return 0;
+}
+
+/**
+**  Clean objectives.
+**
+**  @param l  Lua state.
+*/
+static int CclClearObjectives(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+	CleanObjectives();
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Set the keys which are use for grouping units, helpful for other keyboards
 **
@@ -1202,6 +1228,10 @@ void UserInterfaceCclRegister()
 {
 	CursorCclRegister();
 	lua_register(Lua, "AddMessage", CclAddMessage);
+	//Wyrmgus start
+	lua_register(Lua, "AddObjective", CclAddObjective);
+	lua_register(Lua, "ClearObjectives", CclClearObjectives);
+	//Wyrmgus end
 
 	lua_register(Lua, "SetKeyScrollSpeed", CclSetKeyScrollSpeed);
 	lua_register(Lua, "GetKeyScrollSpeed", CclGetKeyScrollSpeed);

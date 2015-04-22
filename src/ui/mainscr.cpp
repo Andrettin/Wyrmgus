@@ -717,12 +717,21 @@ public:
 		showBuilList = false;
 #endif
 		CleanMessages();
+		//Wyrmgus start
+		CleanObjectives();
+		//Wyrmgus end
 	}
 
 	void UpdateMessages();
 	void AddUniqueMessage(const char *s);
+	//Wyrmgus start
+	void AddObjective(const char *msg);
+	//Wyrmgus end
 	void DrawMessages();
 	void CleanMessages();
+	//Wyrmgus start
+	void CleanObjectives();
+	//Wyrmgus end
 	void ToggleShowMessages() { show = !show; }
 #ifdef DEBUG
 	void ToggleShowBuilListMessages() { showBuilList = !showBuilList; }
@@ -738,6 +747,10 @@ private:
 	int  MessagesCount;                       /// Number of messages
 	int  MessagesSameCount;                   /// Counts same message repeats
 	int  MessagesScrollY;
+	//Wyrmgus start
+	char Objectives[MESSAGES_MAX][256];         /// Array of objectives
+	int  ObjectivesCount;                       /// Number of objectives
+	//Wyrmgus end
 	unsigned long MessagesFrameTimeout;       /// Frame to expire message
 	bool show;
 #ifdef DEBUG
@@ -798,8 +811,12 @@ void MessagesDisplay::DrawMessages()
 			for (int z = 0; z < count; ++z) {
 				if (z == 0) {
 					PushClipping();
+					//Wyrmgus start
+//					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8,
+//								Video.Width - 1, Video.Height - 1);
 					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8,
-								Video.Width - 1, Video.Height - 1);
+								UI.MapArea.X + 8, UI.MapArea.EndY - 16);
+					//Wyrmgus end
 				}
 
 				snprintf(buffer, 256, "%s (%d/%d) Wait %lu [%d,%d]",
@@ -811,7 +828,10 @@ void MessagesDisplay::DrawMessages()
 						 ThisPlayer->Ai->UnitTypeBuilt[z].Pos.y);
 
 				label.DrawClip(UI.MapArea.X + 8,
-							   UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1),
+				//Wyrmgus start
+//							   UI.MapArea.Y + 8 + z * (UI.MessageFont->Height() + 1),
+							   UI.MapArea.EndY - 16 - (UI.MessageFont->Height() + 1) + (z * -1) * (UI.MessageFont->Height() + 1),
+				//Wyrmgus end
 							   buffer);
 
 				if (z == 0) {
@@ -824,6 +844,8 @@ void MessagesDisplay::DrawMessages()
 			if (MessagesCount) {
 				int textHeight = MessagesCount * (UI.MessageFont->Height() + 1);
 				Uint32 color = Video.MapRGB(TheScreen->format, 38, 38, 78);
+				//Wyrmgus start
+				/*
 				Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.Y + 7,
 											 UI.MapArea.EndX - UI.MapArea.X - 16,
 											 textHeight - MessagesScrollY + 1, 0x80);
@@ -831,14 +853,27 @@ void MessagesDisplay::DrawMessages()
 				Video.DrawRectangle(color, UI.MapArea.X + 6, UI.MapArea.Y + 6,
 									UI.MapArea.EndX - UI.MapArea.X - 15,
 									textHeight - MessagesScrollY + 2);
+				*/
+				Video.FillTransRectangleClip(color, UI.MapArea.X + 7, UI.MapArea.EndY - 16 - 1 - textHeight + MessagesScrollY,
+											 UI.MapArea.EndX - UI.MapArea.X - 16,
+											 textHeight + 1, 0x80);
+
+				Video.DrawRectangle(color, UI.MapArea.X + 6, UI.MapArea.EndY - 16 - 2 - textHeight + MessagesScrollY,
+									UI.MapArea.EndX - UI.MapArea.X - 15,
+									textHeight + 2);
+				//Wyrmgus end
 			}
 
 			// Draw message line(s)
 			for (int z = 0; z < MessagesCount; ++z) {
 				if (z == 0) {
 					PushClipping();
+					//Wyrmgus start
+//					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
+//								Video.Height - 1);
 					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
-								Video.Height - 1);
+								UI.MapArea.EndY - 16);
+					//Wyrmgus end
 				}
 				/*
 				 * Due parallel drawing we have to force message copy due temp
@@ -846,8 +881,12 @@ void MessagesDisplay::DrawMessages()
 				 * char * pointer may change during text drawing.
 				 */
 				label.DrawClip(UI.MapArea.X + 8,
-							   UI.MapArea.Y + 8 +
-							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
+								//Wyrmgus start
+//							   UI.MapArea.Y + 8 +
+//							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
+							   UI.MapArea.EndY - 16 - (UI.MessageFont->Height() + 1) +
+							   (z * -1) * (UI.MessageFont->Height() + 1) + MessagesScrollY,
+								//Wyrmgus end
 							   std::string(Messages[z]));
 				if (z == 0) {
 					PopClipping();
@@ -856,6 +895,29 @@ void MessagesDisplay::DrawMessages()
 			if (MessagesCount < 1) {
 				MessagesSameCount = 0;
 			}
+			
+			//Wyrmgus start
+			// Draw objectives
+			for (int z = 0; z < ObjectivesCount; ++z) {
+				if (z == 0) {
+					PushClipping();
+					SetClipping(UI.MapArea.X + 8, UI.MapArea.Y + 8, Video.Width - 1,
+								Video.Height - 1);
+				}
+				/*
+				 * Due parallel drawing we have to force message copy due temp
+				 * std::string(Objectives[z]) creation because
+				 * char * pointer may change during text drawing.
+				 */
+				label.DrawClip(UI.MapArea.X + 8,
+							   UI.MapArea.Y + 8 +
+							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
+							   std::string(Objectives[z]));
+				if (z == 0) {
+					PopClipping();
+				}
+			}
+			//Wyrmgus end
 #ifdef DEBUG
 		}
 #endif
@@ -952,6 +1014,9 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 		++MessagesSameCount;
 		return true;
 	}
+	//Wyrmgus start
+	// we don't need a message that messages have repeated X times on top of the repeated messages
+	/*
 	if (MessagesSameCount > 0) {
 		char temp[256];
 		int n = MessagesSameCount;
@@ -961,8 +1026,73 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 		snprintf(temp, sizeof(temp), _("Last message repeated ~<%d~> times"), n + 1);
 		AddMessage(temp);
 	}
+	*/
+	//Wyrmgus end
 	return false;
 }
+
+//Wyrmgus start
+/**
+**  Adds objective to the stack
+**
+**  @param msg  Objective to add.
+*/
+void MessagesDisplay::AddObjective(const char *msg)
+{
+	char *ptr;
+	char *next;
+	char *message = Objectives[ObjectivesCount];
+	// Split long message into lines
+	if (strlen(msg) >= sizeof(Objectives[0])) {
+		strncpy(message, msg, sizeof(Objectives[0]) - 1);
+		ptr = message + sizeof(Objectives[0]) - 1;
+		*ptr-- = '\0';
+		next = ptr + 1;
+		while (ptr >= message) {
+			if (*ptr == ' ') {
+				*ptr = '\0';
+				next = ptr + 1;
+				break;
+			}
+			--ptr;
+		}
+		if (ptr < message) {
+			ptr = next - 1;
+		}
+	} else {
+		strcpy_s(message, sizeof(Objectives[ObjectivesCount]), msg);
+		next = ptr = message + strlen(message);
+	}
+
+	while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+		while (1) {
+			--ptr;
+			if (*ptr == ' ') {
+				*ptr = '\0';
+				next = ptr + 1;
+				break;
+			} else if (ptr == message) {
+				break;
+			}
+		}
+		// No space found, wrap in the middle of a word
+		if (ptr == message) {
+			ptr = next - 1;
+			while (UI.MessageFont->Width(message) + 8 >= UI.MapArea.EndX - UI.MapArea.X) {
+				*--ptr = '\0';
+			}
+			next = ptr + 1;
+			break;
+		}
+	}
+
+	++ObjectivesCount;
+
+	if (strlen(msg) != (size_t)(ptr - message)) {
+		AddObjective(msg + (next - message));
+	}
+}
+//Wyrmgus end
 
 /**
 **  Add a new message to display only if it differs from the preceding one.
@@ -983,10 +1113,23 @@ void MessagesDisplay::CleanMessages()
 	MessagesSameCount = 0;
 	MessagesScrollY = 0;
 	MessagesFrameTimeout = 0;
+	//Wyrmgus start
+	ObjectivesCount = 0;
+	//Wyrmgus end
 
 	MessagesEventCount = 0;
 	MessagesEventIndex = 0;
 }
+
+//Wyrmgus start
+/**
+**  Clean up objectives.
+*/
+void MessagesDisplay::CleanObjectives()
+{
+	ObjectivesCount = 0;
+}
+//Wyrmgus end
 
 static MessagesDisplay allmessages;
 
@@ -1005,6 +1148,16 @@ void CleanMessages()
 {
 	allmessages.CleanMessages();
 }
+
+//Wyrmgus start
+/**
+**  Clean messages
+*/
+void CleanObjectives()
+{
+	allmessages.CleanObjectives();
+}
+//Wyrmgus end
 
 /**
 **  Draw messages
@@ -1076,6 +1229,25 @@ void SetMessageEvent(const Vec2i &pos, const char *fmt, ...)
 	MessagesEventIndex = MessagesEventCount;
 	++MessagesEventCount;
 }
+
+//Wyrmgus start
+/**
+**  Set objective to display.
+**
+**  @param fmt  To be displayed in text overlay.
+*/
+void SetObjective(const char *fmt, ...)
+{
+	char temp[512];
+	va_list va;
+
+	va_start(va, fmt);
+	vsnprintf(temp, sizeof(temp) - 1, fmt, va);
+	temp[sizeof(temp) - 1] = '\0';
+	va_end(va);
+	allmessages.AddObjective(temp);
+}
+//Wyrmgus end
 
 /**
 **  Goto message origin.

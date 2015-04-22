@@ -370,10 +370,18 @@ extern void DrawResources();
 extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 /// Set message to display with event point
 extern void SetMessageEvent(const Vec2i &pos, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(2, 3);
+//Wyrmgus start
+/// Set objective to display
+extern void SetObjective(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
+//Wyrmgus end
 /// Center view-point on last event message
 extern void CenterOnMessage();
 /// Cleanup all messages
 extern void CleanMessages();
+//Wyrmgus start
+/// Cleanup all objectives
+extern void CleanObjectives();
+//Wyrmgus end
 /// show/hide messages
 extern void ToggleShowMessages();
 
