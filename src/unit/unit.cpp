@@ -2877,6 +2877,8 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 	COrder *savedOrder = NULL;
 
 	//Wyrmgus start
+	/*
+	//Wyrmgus start
 //	if (target.Player->AiEnabled == false) {
 	if (target.Player->AiEnabled == false && target.Player->Type != PlayerNeutral && attacker.Player->Type != PlayerNeutral) { // allow neutral units to strike back, or units to strike back from neutral units
 	//Wyrmgus end
@@ -2889,6 +2891,8 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			return;
 		}
 	}
+	*/
+	//Wyrmgus end
 	if (target.CanStoreOrder(target.CurrentOrder())) {
 		savedOrder = target.CurrentOrder()->Clone();
 	}

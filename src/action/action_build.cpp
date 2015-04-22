@@ -299,7 +299,9 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	if (ontop != NULL) {
 		return ontop;
 	}
-#if 0
+//Wyrmgus start
+//#if 0
+//Wyrmgus end
 	/*
 	 * FIXME: rb - CheckAlreadyBuilding should be somehow
 	 * enabled/disable via game lua scripting
@@ -314,17 +316,27 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 					   _C_ building->Type->Name.c_str()
 					   _C_ building->Slot);
 			*/
-			VariationInfo *varinfo = building->Type->GetDefaultVariation(unit.Player);
+			VariationInfo *varinfo = building->Type->GetDefaultVariation(*unit.Player);
 			if (varinfo && !varinfo->TypeName.empty()) {
 				DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
-						   _C_ unit.Player->Index _C_ unit.Slot
+						   //Wyrmgus start
+//						   _C_ unit.Player->Index _C_ unit.Slot
+//						   _C_ varinfo->TypeName.c_str()
+//						   _C_ building->Slot);
+						   _C_ unit.Player->Index _C_ UnitNumber(unit)
 						   _C_ varinfo->TypeName.c_str()
-						   _C_ building->Slot);
+						   _C_ UnitNumber(*building));
+						   //Wyrmgus end
 			} else {
 				DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
-						   _C_ unit.Player->Index _C_ unit.Slot
+						   //Wyrmgus start
+//						   _C_ unit.Player->Index _C_ unit.Slot
+//						   _C_ building->Type->Name.c_str()
+//						   _C_ building->Slot);
+						   _C_ unit.Player->Index _C_ UnitNumber(unit)
 						   _C_ building->Type->Name.c_str()
-						   _C_ building->Slot);
+						   _C_ UnitNumber(*building));
+						   //Wyrmgus end
 			}
 			//Wyrmgus end
 
@@ -333,7 +345,9 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 			return NULL;
 		}
 	}
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 	// Some tries to build the building.
 	this->State++;
 	// To keep the load low, retry each 10 cycles
