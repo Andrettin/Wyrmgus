@@ -1975,6 +1975,9 @@ static int CclDefineDecorations(lua_State *l)
 		bool ShowOnlySelected;
 		bool HideNeutral;
 		bool HideAllied;
+		//Wyrmgus start
+		bool HideSelf;
+		//Wyrmgus end
 		bool ShowOpponent;
 	} tmp;
 
@@ -2016,6 +2019,10 @@ static int CclDefineDecorations(lua_State *l)
 				tmp.HideNeutral = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "HideAllied")) {
 				tmp.HideAllied = LuaToBoolean(l, -1);
+			//Wyrmgus start
+			} else if (!strcmp(key, "HideSelf")) {
+				tmp.HideSelf = LuaToBoolean(l, -1);
+			//Wyrmgus end
 			} else if (!strcmp(key, "ShowOpponent")) {
 				tmp.ShowOpponent = LuaToBoolean(l, -1);
 			} else if (!strcmp(key, "Method")) {
@@ -2111,6 +2118,9 @@ static int CclDefineDecorations(lua_State *l)
 		decovar->ShowOnlySelected = tmp.ShowOnlySelected;
 		decovar->HideNeutral = tmp.HideNeutral;
 		decovar->HideAllied = tmp.HideAllied;
+		//Wyrmgus start
+		decovar->HideSelf = tmp.HideSelf;
+		//Wyrmgus end
 		decovar->ShowOpponent = tmp.ShowOpponent;
 		//Wyrmgus start
 //		UnitTypeVar.DecoVar.push_back(decovar);

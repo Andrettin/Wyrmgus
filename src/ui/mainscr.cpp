@@ -1198,7 +1198,7 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	DrawInfoPanelBackground(panelIndex);
 	//Wyrmgus start
 	//draw icon panel frame, if any
-	if (Preference.InfoPanelFrameG && unit.CurrentAction() != UnitActionTrain && unit.CurrentAction() != UnitActionUpgradeTo && unit.CurrentAction() != UnitActionResearch && unit.CurrentAction() != UnitActionBuilt && !unit.IsEnemy(*ThisPlayer) && unit.Player->Type != PlayerNeutral) {
+	if (Preference.InfoPanelFrameG && unit.CurrentAction() != UnitActionTrain && unit.CurrentAction() != UnitActionUpgradeTo && unit.CurrentAction() != UnitActionResearch && unit.CurrentAction() != UnitActionBuilt && !unit.IsEnemy(*ThisPlayer) && (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)) {
 		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4, UI.InfoPanel.Y + 93);
 	}
 	//Wyrmgus end	

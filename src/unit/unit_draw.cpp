@@ -551,6 +551,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (ThisPlayer->IsEnemy(unit) && !var.ShowOpponent)
 			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var.HideAllied)
 			  //Wyrmgus start
+			  || (unit.Player == ThisPlayer && var.HideSelf)
 //			  || max == 0)) {
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end

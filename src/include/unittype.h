@@ -349,6 +349,9 @@ public:
 
 	bool HideNeutral;       /// if true, don't show for neutral unit.
 	bool HideAllied;        /// if true, don't show for allied unit. (but show own units)
+	//Wyrmgus start
+	bool HideSelf;			/// if true, don't show for own units.
+	//Wyrmgus end
 	bool ShowOpponent;      /// if true, show for opponent unit.
 };
 
