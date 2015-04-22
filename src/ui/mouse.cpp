@@ -240,6 +240,35 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					return true;
 				}
 			}
+	//Wyrmgus start
+	// make unit build harvesting building on top if right-clicked
+	} else if (res && type.ResInfo[res] && !dest.Type->CanHarvest
+		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
+			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+				for (size_t z = 0; z < UnitTypes.size(); ++z) {
+					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->CanHarvest && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1)) {
+						dest.Blink = 4;
+						SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush);
+						if (!acknowledged) {
+							PlayUnitSound(unit, VoiceBuild);
+							acknowledged = 1;
+						}
+					}
+				}
+				return true;
+			} else {
+				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				if (depot) {
+					dest.Blink = 4;
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
+					SendCommandReturnGoods(unit, depot, flush);
+					return true;
+				}
+			}
+	//Wyrmgus end
 	}
 	return false;
 }
@@ -1108,7 +1137,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				GameCursor = UI.RedHair.Cursor;
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer &&
-				UnitUnderCursor->Type->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->Type->GivesResource] && UnitUnderCursor->Type->CanHarvest && (UnitUnderCursor->Player == ThisPlayer || UnitUnderCursor->Player->Index == PlayerNumNeutral)
+				UnitUnderCursor->Type->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->Type->GivesResource] && (UnitUnderCursor->Player == ThisPlayer || UnitUnderCursor->Player->Index == PlayerNumNeutral)
 			) {
 				GameCursor = UI.YellowHair.Cursor;
 			} else {
