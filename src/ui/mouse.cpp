@@ -343,6 +343,22 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 		return true;
 	}
+	//Wyrmgus start
+	// make workers attack enemy units if those are right-clicked upon
+	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAttack);
+			acknowledged = 1;
+		}
+		if (CanTarget(type, *dest->Type)) {
+			SendCommandAttack(unit, pos, dest, flush);
+		} else { // No valid target
+			SendCommandAttack(unit, pos, NoUnitP, flush);
+		}
+		return true;
+	}
+	//Wyrmgus end
 	// Move
 	if (!acknowledged) {
 		PlayUnitSound(unit, VoiceAcknowledging);
@@ -357,7 +373,10 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	const CUnitType &type = *unit.Type;
 	const int action = type.MouseAction;
 
-	if (action == MouseActionSpellCast || unit.IsEnemy(dest)) {
+	//Wyrmgus start
+//	if (action == MouseActionSpellCast || unit.IsEnemy(dest)) {
+	if (action == MouseActionSpellCast || unit.IsEnemy(dest) || dest.Type->BoolFlag[OBSTACLE_INDEX].value) {
+	//Wyrmgus end
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAttack);
@@ -1101,7 +1120,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					}
 				//Wyrmgus start
 //				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
-				} else if (ThisPlayer->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value) {
+				} else if (ThisPlayer->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
@@ -1131,8 +1150,8 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			//Wyrmgus start
 //			GameCursor = UI.Glass.Cursor;
 			if (
-				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer && Selected[0]->IsAgressive() && UnitUnderCursor->Player != ThisPlayer
-				&& Selected[0]->IsEnemy(*UnitUnderCursor) && (UnitUnderCursor->Player->Index != PlayerNumNeutral || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value)
+				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer && UnitUnderCursor->Player != ThisPlayer
+				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) && (UnitUnderCursor->Player->Index != PlayerNumNeutral || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
 			) {
 				GameCursor = UI.RedHair.Cursor;
 			} else if (

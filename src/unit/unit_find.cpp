@@ -1113,7 +1113,10 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 
 		if (Map.Info.IsPointOnMap(pos) == false) {
 			DebugPrint("outside of map\n");
-		} else if (Map.Field(pos)->Flags & flags) {
+		//Wyrmgus start
+//		} else if (Map.Field(pos)->Flags & flags) {
+		} else if ((Map.Field(pos)->Flags & flags) && pos != goalPos) { // the goal's tile itself shouldn't be checked for an obstacle
+		//Wyrmgus end
 			if (distance) {
 				*distance = Distance(unitPos, pos);
 			}

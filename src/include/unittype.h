@@ -239,6 +239,8 @@ enum {
 	HERBIVORE_INDEX,
 	INSECTIVORE_INDEX,
 	HARVESTFROMOUTSIDE_INDEX,
+	OBSTACLE_INDEX,
+	AIRUNPASSABLE_INDEX,
 	SLOWS_INDEX,
 	//Wyrmgus end
 	NBARALREADYDEFINED
@@ -534,7 +536,10 @@ public:
 	PixelSize GetPixelSize() const;
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;
-	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
+	//Wyrmgus start
+//	bool CanTransport() const { return MaxOnBoard > 0 && !GivesResource; }
+	bool CanTransport() const { return MaxOnBoard > 0; }
+	//Wyrmgus end
 	bool CanMove() const;
 
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
