@@ -118,7 +118,14 @@
 
 	int distance = this->Range;
 	if (GameSettings.Inside) {
-		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
+		//Wyrmgus start
+//		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
+		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest | MapFieldAirUnpassable, &distance);
+		//Wyrmgus end
+	//Wyrmgus start
+	} else {
+		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, &distance);
+	//Wyrmgus end
 	}
 	input.SetMaxRange(distance);
 	input.SetMinRange(0);

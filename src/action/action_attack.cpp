@@ -262,7 +262,14 @@ void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged)
 	input.SetMinRange(this->MinRange);
 	int distance = this->Range;
 	if (GameSettings.Inside) {
-		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
+		//Wyrmgus start
+//		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
+		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest | MapFieldAirUnpassable, &distance);
+		//Wyrmgus end
+	//Wyrmgus start
+	} else {
+		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, &distance);
+	//Wyrmgus end
 	}
 	input.SetMaxRange(distance);
 }
@@ -423,7 +430,10 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == 0 && !this->HasGoal()) {
 		// Check if we're in range when attacking a location and we are waiting
 		if (unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			//Wyrmgus start
+//			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+			//Wyrmgus end
 				err = PF_REACHED;
 			}
 		}
@@ -438,7 +448,10 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		CUnit *goal = this->GetGoal();
 		// Have reached target? FIXME: could use the new return code?
 		if (goal && unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			//Wyrmgus start
+//			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+			//Wyrmgus end
 				// Reached another unit, now attacking it
 				unsigned char oldDir = unit.Direction;
 				const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
@@ -461,7 +474,10 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		if (((goal && goal->Type && goal->Type->Wall)
 			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			//Wyrmgus start
+//			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+			//Wyrmgus end
 				// Reached wall or ground, now attacking it
 				unsigned char oldDir = unit.Direction;
 				UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
@@ -581,7 +597,11 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	// Still near to target, if not goto target.
 	const int dist = unit.MapDistanceTo(*goal);
 	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max
+		//Wyrmgus start
+//		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
+		|| CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldAirUnpassable) == false
 		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
+		//Wyrmgus end
 		// towers don't chase after goal
 		if (unit.CanMove()) {
 			if (unit.CanStoreOrder(this)) {
@@ -669,7 +689,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 
 				if (unit.Type->MinAttackRange < dist &&
 					dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-					if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+					//Wyrmgus start
+//					if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
+					if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+					//Wyrmgus end
 						const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
 						unsigned char oldDir = unit.Direction;
 						UnitHeadingFromDeltaXY(unit, dir);

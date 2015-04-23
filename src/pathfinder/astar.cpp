@@ -543,10 +543,10 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 				} else {
 					// for non moving unit Always Fail unless goal is unit, or unit can attack the target
 					if (&unit != goal) {
-						//Wyrmgus start
-//						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
-						if (unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type) //units now fight back, even if attacked by a non-enemy player (important for fauna counterattacks)
-						//Wyrmgus end
+						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
+							//Wyrmgus start
+							&& unit.MapDistanceTo(*goal) <= unit.Variable[ATTACKRANGE_INDEX].Max
+							//Wyrmgus end
 							&& goal->Variable[UNHOLYARMOR_INDEX].Value == 0 && goal->IsVisibleAsGoal(*unit.Player)) {
 								cost += 2 * AStarMovingUnitCrossingCost;
 						} else {
