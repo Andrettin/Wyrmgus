@@ -1191,6 +1191,8 @@ static int CclDefineUnitType(lua_State *l)
 				} else if (!strcmp(value, "attack")) {
 					type->Sound.Attack.Name = LuaToString(l, -1, k + 1);
 				//Wyrmgus start
+				} else if (!strcmp(value, "idle")) {
+					type->Sound.Idle.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "hit")) {
 					type->Sound.Hit.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "miss")) {

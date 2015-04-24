@@ -77,6 +77,7 @@ public:
 	SoundConfig Acknowledgement;    /// acknowledge of use command
 	SoundConfig Attack;             /// attack confirm command
 	//Wyrmgus start
+	SoundConfig Idle;				/// idle
 	SoundConfig Hit;				/// hit another unit
 	SoundConfig Miss;				/// attacked another unit, but missed
 	SoundConfig Step;				/// stepped

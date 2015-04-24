@@ -45,6 +45,9 @@
 #include "player.h"
 #include "script.h"
 #include "settings.h"
+//Wyrmgus start
+#include "sound.h"
+//Wyrmgus end
 #include "spells.h"
 #include "tileset.h"
 #include "unit.h"
@@ -554,6 +557,9 @@ bool AutoAttack(CUnit &unit)
 			//Wyrmgus start
 //			UnitShowAnimation(unit, unit.Type->Animations->Still);
 			UnitShowAnimation(unit, animations->Still);
+			if (SyncRand(1000) == 0) {
+				PlayUnitSound(unit, VoiceIdle);
+			}
 			//Wyrmgus end
 			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.

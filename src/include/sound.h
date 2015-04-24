@@ -70,6 +70,7 @@ enum UnitVoiceGroup {
 	VoiceHarvesting,        /// harvesting
 	VoiceAttack,            /// Attack command
 	//Wyrmgus start
+	VoiceIdle,				/// Idle sound
 	VoiceHit,				/// Hit another unit
 	VoiceMiss,				/// Attacked another unit, but missed
 	VoiceStep,				/// Stepped
