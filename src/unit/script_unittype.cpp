@@ -400,10 +400,10 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	type.BoolFlag[INDESTRUCTIBLE_INDEX].value        = type.Indestructible;
 	type.BoolFlag[TELEPORTER_INDEX].value            = type.Teleporter;
 	type.BoolFlag[SAVECARGO_INDEX].value             = type.SaveCargo;
-	type.BoolFlag[NONSOLID_INDEX].value              = type.NonSolid;
-	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
-	type.BoolFlag[NORANDOMPLACING_INDEX].value       = type.NoRandomPlacing;
 	//Wyrmgus start
+//	type.BoolFlag[NONSOLID_INDEX].value              = type.NonSolid;
+//	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
+//	type.BoolFlag[NORANDOMPLACING_INDEX].value       = type.NoRandomPlacing;
 //	type.BoolFlag[ORGANIC_INDEX].value               = type.Organic;
 	//Wyrmgus end
 }
@@ -490,6 +490,25 @@ static int CclDefineUnitType(lua_State *l)
 				type->ShadowSprite = NULL;
 			}
 		//Wyrmgus start
+		} else if (!strcmp(value, "LightImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->LightFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported light tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->LightSprite) {
+				CGraphic::Free(type->LightSprite);
+				type->LightSprite = NULL;
+			}
 		} else if (!strcmp(value, "HairImage")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1146,13 +1165,13 @@ static int CclDefineUnitType(lua_State *l)
 			type->Teleporter = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SaveCargo")) {
 			type->SaveCargo = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "NonSolid")) {
-			type->NonSolid = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Wall")) {
-			type->Wall = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "NoRandomPlacing")) {
-			type->NoRandomPlacing = LuaToBoolean(l, -1);
 		//Wyrmgus start
+//		} else if (!strcmp(value, "NonSolid")) {
+//			type->NonSolid = LuaToBoolean(l, -1);
+//		} else if (!strcmp(value, "Wall")) {
+//			type->Wall = LuaToBoolean(l, -1);
+//		} else if (!strcmp(value, "NoRandomPlacing")) {
+//			type->NoRandomPlacing = LuaToBoolean(l, -1);
 //		} else if (!strcmp(value, "organic")) {
 //			type->Organic = LuaToBoolean(l, -1);
 		//Wyrmgus end
@@ -1316,6 +1335,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->ShadowHeight = parent_type->ShadowHeight;
 			type->ShadowOffsetX = parent_type->ShadowOffsetX;
 			type->ShadowOffsetY = parent_type->ShadowOffsetY;
+			type->LightFile = parent_type->LightFile;
 			type->HairFile = parent_type->HairFile;
 			type->PantsFile = parent_type->PantsFile;
 			type->ShieldFile = parent_type->ShieldFile;

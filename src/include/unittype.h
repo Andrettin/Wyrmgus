@@ -570,6 +570,7 @@ public:
 	std::string File;               /// Sprite files
 	std::string ShadowFile;         /// Shadow file
 	//Wyrmgus start
+	std::string LightFile;         	/// Light file
 	std::string HairFile;         	/// Hair file
 	std::string PantsFile;         	/// Pants file
 	std::string ShieldFile;         /// Shield file
@@ -698,10 +699,10 @@ public:
 	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 	unsigned Teleporter : 1;            /// Can teleport other units.
 	unsigned SaveCargo : 1;             /// Unit unloads his passengers after death.
-	unsigned NonSolid : 1;              /// Unit can be entered by other units.
-	unsigned Wall : 1;                  /// Use special logic for Direction field.
-	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
 	//Wyrmgus start
+//	unsigned NonSolid : 1;              /// Unit can be entered by other units.
+//	unsigned Wall : 1;                  /// Use special logic for Direction field.
+//	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
 //	unsigned Organic : 1;               /// Organic unit (used for death coil spell)
 	//Wyrmgus end
 
@@ -748,6 +749,7 @@ public:
 	CPlayerColorGraphic *Sprite;     /// Sprite images
 	CGraphic *ShadowSprite;          /// Shadow sprite image
 	//Wyrmgus start
+	CGraphic *LightSprite;          			/// Light sprite image
 	CPlayerColorGraphic *HairSprite;          	/// Hair sprite image
 	CPlayerColorGraphic *PantsSprite;          	/// Pants sprite image
 	CPlayerColorGraphic *ShieldSprite;          /// Shield sprite image

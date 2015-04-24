@@ -471,7 +471,10 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			}
 		}
 		// Attacking wall or ground.
-		if (((goal && goal->Type && goal->Type->Wall)
+		//Wyrmgus start
+//		if (((goal && goal->Type && goal->Type->Wall)
+		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
+		//Wyrmgus end
 			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			//Wyrmgus start

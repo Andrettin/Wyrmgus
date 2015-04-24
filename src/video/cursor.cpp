@@ -210,21 +210,25 @@ void DrawBuildingCursor()
 	
 	//Wyrmgus start
 	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->HairSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->HairSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->HairSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	} else if (CursorBuilding->HairSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->HairSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->HairSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 
 	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->PantsSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->PantsSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->PantsSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	} else if (CursorBuilding->PantsSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->PantsSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->PantsSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 
 	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	} else if (CursorBuilding->ShieldSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+	
+	if (CursorBuilding->LightSprite) {
+		DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 	//Wyrmgus end
 	

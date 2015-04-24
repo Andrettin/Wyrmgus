@@ -638,7 +638,8 @@ extern void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const
 //Wyrmgus end
 //Wyrmgus start
 /// Draw unit's overlay
-extern void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos);
+extern void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos);
+extern void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos);
 //Wyrmgus end
 /// Draw all units visible on map in viewport
 extern int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table);

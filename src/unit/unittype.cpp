@@ -645,12 +645,11 @@ CUnitType::CUnitType() :
 	Indestructible(0), Teleporter(0), SaveCargo(0),
 	//Wyrmgus start
 //	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
-	NonSolid(0), Wall(0), NoRandomPlacing(0),
 	//Wyrmgus end
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
 //	Sprite(NULL), ShadowSprite(NULL)
-	Sprite(NULL), ShadowSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
+	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
 	//Wyrmgus end
 {
 #ifdef USE_MNG
@@ -740,6 +739,7 @@ CUnitType::~CUnitType()
 	CGraphic::Free(Sprite);
 	CGraphic::Free(ShadowSprite);
 	//Wyrmgus start
+	CGraphic::Free(LightSprite);
 	CGraphic::Free(HairSprite);
 	CGraphic::Free(PantsSprite);
 	CGraphic::Free(ShieldSprite);
@@ -829,7 +829,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	}
 
 	// Non-solid units can always be entered and they don't block anything
-	if (type.NonSolid) {
+	//Wyrmgus start
+//	if (type.NonSolid) {
+	if (type.BoolFlag[NONSOLID_INDEX].value) {
+	//Wyrmgus end
 		if (type.Building) {
 			type.MovementMask = MapFieldLandUnit |
 								MapFieldSeaUnit |
@@ -1341,6 +1344,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 #endif
 
 	//Wyrmgus start
+	if (!type.LightFile.empty()) {
+		type.LightSprite = CGraphic::New(type.LightFile, type.Width, type.Height);
+		type.LightSprite->Load();
+		if (type.Flip) {
+			type.LightSprite->Flip();
+		}
+	}
 	if (!type.HairFile.empty()) {
 		type.HairSprite = CPlayerColorGraphic::New(type.HairFile, type.Width, type.Height);
 		type.HairSprite->Load();

@@ -338,7 +338,10 @@ int GetNumOpponents(int player)
 		if ((Players[player].IsEnemy(Players[i])) || (Players[i].IsEnemy(Players[player]))) {
 			// Don't count walls
 			for (int j = 0; j < unitCount; ++j) {
-				if (Players[i].GetUnit(j).Type->Wall == false) {
+				//Wyrmgus start
+//				if (Players[i].GetUnit(j).Type->Wall == false) {
+				if (Players[i].GetUnit(j).Type->BoolFlag[WALL_INDEX].value == false) {
+				//Wyrmgus end
 					++n;
 					break;
 				}

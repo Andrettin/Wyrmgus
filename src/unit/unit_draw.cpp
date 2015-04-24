@@ -638,7 +638,7 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 }
 
 //Wyrmgus start
-void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
 {
 	if (!sprite) {
 		return;
@@ -676,6 +676,48 @@ void DrawOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player,
 			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
 		} else {
 			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+		}
+	}
+}
+
+void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+{
+	if (!sprite) {
+		return;
+	}
+	PixelPos pos = screenPos;
+	// FIXME: move this calculation to high level.
+	pos.x -= (sprite->Width - type.TileWidth * PixelTileSize.x) / 2;
+	pos.y -= (sprite->Height - type.TileHeight * PixelTileSize.y) / 2;
+	pos.x += type.OffsetX;
+	pos.y += type.OffsetY;
+
+	if (type.Flip) {
+		if (frame < 0) {
+			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+			} else {
+				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+			}
+		} else {
+			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+				sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+			} else {
+				sprite->DrawFrameClip(frame, pos.x, pos.y);
+			}
+		}
+	} else {
+		const int row = type.NumDirections / 2 + 1;
+
+		if (frame < 0) {
+			frame = ((-frame - 1) / row) * type.NumDirections + type.NumDirections - (-frame - 1) % row;
+		} else {
+			frame = (frame / row) * type.NumDirections + frame % row;
+		}
+		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
+			sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+		} else {
+			sprite->DrawFrameClip(frame, pos.x, pos.y);
 		}
 	}
 }
@@ -1116,7 +1158,7 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 	}
 	if (hair_sprite) {
-		DrawOverlay(*type, hair_sprite, player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, hair_sprite, player, frame, screenPos);
 	}
 
 	CPlayerColorGraphic *pants_sprite = type->PantsSprite;
@@ -1126,7 +1168,7 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 	}
 	if (pants_sprite) {
-		DrawOverlay(*type, pants_sprite, player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, pants_sprite, player, frame, screenPos);
 	}
 
 	CPlayerColorGraphic *shield_sprite = type->ShieldSprite;
@@ -1136,7 +1178,12 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 	}
 	if (shield_sprite) {
-		DrawOverlay(*type, shield_sprite, player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, shield_sprite, player, frame, screenPos);
+	}
+	
+	CGraphic *light_sprite = type->LightSprite;
+	if (light_sprite) {
+		DrawOverlay(*type, light_sprite, player, frame, screenPos);
 	}
 	//Wyrmgus end
 
