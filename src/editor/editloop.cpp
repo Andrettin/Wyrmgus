@@ -1032,7 +1032,7 @@ static void DrawEditorInfo()
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 16, buf);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 12, buf);
 	//Wyrmgus end
 	const CMapField &mf = *Map.Field(pos);
 	//
@@ -1066,7 +1066,7 @@ static void DrawEditorInfo()
 			//Wyrmgus end
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 16, buf);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 12, buf);
 	//Wyrmgus end
 
 	// Tile info
@@ -1083,7 +1083,7 @@ static void DrawEditorInfo()
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 288, UI.StatusLine.TextY, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 288, UI.StatusLine.TextY - 12, buf);
 	//Wyrmgus end
 #endif
 }
@@ -1367,7 +1367,10 @@ static void EditorCallbackButtonDown(unsigned button)
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
-						UI.StatusLine.Set(_("Unit can't be placed here."));
+						//Wyrmgus start
+//						UI.StatusLine.Set(_("Unit can't be placed here."));
+						UI.StatusLine.Set(_("Unit cannot be placed here."));
+						//Wyrmgus end
 						PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
 									  MaxSampleVolume);
 					}
