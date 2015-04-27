@@ -86,8 +86,11 @@ struct lua_State;
 
 #define MapFieldAirUnpassable 0x00010000	/// Field is movement blocked
 #define MapFieldGrass 0x00020000			/// Used for playing grass step sounds
-#define MapFieldMud 0x00040000			/// Used for playing mud step sounds
-#define MapFieldRockFloor 0x00080000		/// Used for playing rock step sounds
+#define MapFieldMud 0x00040000				/// Used for playing mud step sounds
+#define MapFieldStoneFloor 0x00080000		/// Used for playing stone step sounds
+
+#define MapFieldDirt 0x00100000				/// Used for playing dirt step sounds
+#define MapFieldGravel 0x00200000			/// Used for playing gravel step sounds
 //Wyrmgus end
 
 /**

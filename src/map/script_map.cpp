@@ -546,12 +546,16 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(flag_name, "air-unpassable")) {
 		flag = MapFieldAirUnpassable;
+	} else if (!strcmp(flag_name, "dirt")) {
+		flag = MapFieldDirt;
 	} else if (!strcmp(flag_name, "grass")) {
 		flag = MapFieldGrass;
+	} else if (!strcmp(flag_name, "gravel")) {
+		flag = MapFieldGravel;
 	} else if (!strcmp(flag_name, "mud")) {
 		flag = MapFieldMud;
-	} else if (!strcmp(flag_name, "rock-floor")) {
-		flag = MapFieldRockFloor;
+	} else if (!strcmp(flag_name, "stone-floor")) {
+		flag = MapFieldStoneFloor;
 	//Wyrmgus end
 	} else if (!strcmp(flag_name, "wall")) {
 		flag = MapFieldWall;

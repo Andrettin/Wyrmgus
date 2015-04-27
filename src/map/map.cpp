@@ -115,12 +115,12 @@ void CMap::MarkSeenTile(CMapField &mf)
 			// Handle rock changes.
 		//Wyrmgus start
 //		} else if (tile == Tileset->getRemovedRockTile()) {
-		} else if (tile == Tileset->getRemovedRockTile() && mf.getFlag() & MapFieldRockFloor) {
+		} else if (tile == Tileset->getRemovedRockTile() && mf.getFlag() & MapFieldGravel) {
 		//Wyrmgus end
 			FixNeighbors(MapFieldRocks, 1, pos);
 		//Wyrmgus start
 //		} else if (seentile == Tileset->getRemovedRockTile()) {
-		} else if (seentile == Tileset->getRemovedRockTile() && ((mf.getFlag() & MapFieldRockFloor) || (mf.getFlag() & MapFieldRocks))) {
+		} else if (seentile == Tileset->getRemovedRockTile() && ((mf.getFlag() & MapFieldGravel) || (mf.getFlag() & MapFieldRocks))) {
 		//Wyrmgus end
 			FixTile(MapFieldRocks, 1, pos);
 		} else if (mf.RockOnMap()) {
@@ -590,7 +590,7 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
 	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
 	//Wyrmgus start
-	mf.Flags |= MapFieldRockFloor;
+	mf.Flags |= MapFieldGravel;
 	//Wyrmgus end
 	mf.Value = 0;
 

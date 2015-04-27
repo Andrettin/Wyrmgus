@@ -81,9 +81,11 @@ public:
 	SoundConfig Hit;				/// hit another unit
 	SoundConfig Miss;				/// attacked another unit, but missed
 	SoundConfig Step;				/// stepped
+	SoundConfig StepDirt;			/// stepped on dirt
 	SoundConfig StepGrass;			/// stepped on grass
+	SoundConfig StepGravel;			/// stepped on gravel
 	SoundConfig StepMud;			/// stepped on mud
-	SoundConfig StepRock;			/// stepped on rock
+	SoundConfig StepStone;			/// stepped on stone
 	SoundConfig Used;				/// used (for items)
 	//Wyrmgus end
 	SoundConfig Build;              /// build confirm command

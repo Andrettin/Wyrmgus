@@ -1199,12 +1199,16 @@ static int CclDefineUnitType(lua_State *l)
 					type->Sound.Miss.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "step")) {
 					type->Sound.Step.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step-dirt")) {
+					type->Sound.StepDirt.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "step-grass")) {
 					type->Sound.StepGrass.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step-gravel")) {
+					type->Sound.StepGravel.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "step-mud")) {
 					type->Sound.StepMud.Name = LuaToString(l, -1, k + 1);
-				} else if (!strcmp(value, "step-rock")) {
-					type->Sound.StepRock.Name = LuaToString(l, -1, k + 1);
+				} else if (!strcmp(value, "step-stone")) {
+					type->Sound.StepStone.Name = LuaToString(l, -1, k + 1);
 				} else if (!strcmp(value, "used")) {
 					type->Sound.Used.Name = LuaToString(l, -1, k + 1);
 				//Wyrmgus end

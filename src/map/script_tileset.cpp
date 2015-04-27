@@ -56,9 +56,11 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 		{"unpassable", MapFieldUnpassable},
 		//Wyrmgus start
 		{"air-unpassable", MapFieldAirUnpassable},
+		{"dirt", MapFieldDirt},
 		{"grass", MapFieldGrass},
+		{"gravel", MapFieldGravel},
 		{"mud", MapFieldMud},
-		{"rock-floor", MapFieldRockFloor},
+		{"stone-floor", MapFieldStoneFloor},
 		//Wyrmgus end
 		{"wall", MapFieldWall},
 		{"rock", MapFieldRocks},
