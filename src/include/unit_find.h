@@ -318,7 +318,10 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 
 /// Find resource
 extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
-							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
+								//Wyrmgus Start
+//							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
+							   int resource, bool check_usage = false, const CUnit *deposit = NULL, bool mine_on_top = true);
+								//Wyrmgus end
 
 /// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);

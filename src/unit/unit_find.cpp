@@ -312,14 +312,21 @@ private:
 class ResourceUnitFinder
 {
 public:
-	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
+	//Wyrmgus start
+//	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool mine_on_top) :
+	//Wyrmgus end
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
 		deposit(deposit),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		maxRange(maxRange),
 		check_usage(check_usage),
-		res_finder(resource, 1),
+		//Wyrmgus start
+		mine_on_top(mine_on_top),
+//		res_finder(resource, 1),
+		res_finder(resource, mine_on_top),
+		//Wyrmgus end
 		resultMine(resultMine)
 	{
 		bestCost.SetToMax();
@@ -358,6 +365,9 @@ private:
 	unsigned int movemask;
 	int maxRange;
 	bool check_usage;
+	//Wyrmgus start
+	bool mine_on_top;
+	//Wyrmgus end
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
 	CUnit **resultMine;
@@ -365,7 +375,10 @@ private:
 
 bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 {
-	return mine.Type->CanHarvest && mine.ResourcesHeld
+	//Wyrmgus start
+//	return mine.Type->CanHarvest && mine.ResourcesHeld
+	return (mine_on_top ? mine.Type->CanHarvest : !mine.Type->CanHarvest) && mine.ResourcesHeld
+	//Wyrmgus end
 			//Wyrmgus start
 //		   && (resinfo.HarvestFromOutside
 		   && (mine.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value
@@ -433,7 +446,10 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 **  @return            NULL or resource unit
 */
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
-						bool check_usage, const CUnit *deposit)
+						//Wyrmgus start
+//						bool check_usage, const CUnit *deposit)
+						bool check_usage, const CUnit *deposit, bool mine_on_top)
+						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
 		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource);
@@ -448,7 +464,10 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	CUnit *resultMine = NULL;
 
-	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
+	//Wyrmgus start
+//	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
+	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, mine_on_top);
+	//Wyrmgus end
 
 	terrainTraversal.Run(resourceUnitFinder);
 	return resultMine;

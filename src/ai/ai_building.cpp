@@ -290,6 +290,14 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 			return VisitResult_Finished;
 		}
 	}
+	//Wyrmgus start
+	CUnit *deposit = ResourceOnMap(pos, resource, false);
+	if (deposit && IsAUsableMine(*deposit)) {
+		if (AiFindBuildingPlace2(worker, type, pos, deposit, true, resultPos)) {
+			return VisitResult_Finished;
+		}
+	}
+	//Wyrmgus end
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;
 	} else { // unreachable
