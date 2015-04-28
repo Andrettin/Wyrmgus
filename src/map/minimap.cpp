@@ -271,7 +271,9 @@ void CMinimap::UpdateTerrain()
 		//Wyrmgus end
 	}
 
-	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+	//Wyrmgus start
+//	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -294,10 +296,15 @@ void CMinimap::UpdateTerrain()
 	//
 	for (int my = YOffset; my < H - YOffset; ++my) {
 		for (int mx = XOffset; mx < W - XOffset; ++mx) {
-			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getGraphicTile();
 			//Wyrmgus start
 			const int tile_index = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getTileIndex();
+			
+			int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+			if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain].ImageFile.empty()) {
+				tilepitch = Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->w / PixelTileSize.x;
+			}
 			//Wyrmgus end
+			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getGraphicTile();
 			const int xofs = PixelTileSize.x * (tile % tilepitch);
 			const int yofs = PixelTileSize.y * (tile / tilepitch);
 
@@ -411,7 +418,9 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 		scaley = 1;
 	}
 
-	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+	//Wyrmgus start
+//	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+	//Wyrmgus end
 	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 
 	//
@@ -458,12 +467,17 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 				tile = Map.Fields[x + y].getGraphicTile();
 			}
 
-			const int xofs = PixelTileSize.x * (tile % tilepitch);
-			const int yofs = PixelTileSize.y * (tile / tilepitch);
-
 			//Wyrmgus start
 			const int tile_index = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getTileIndex();
+
+			int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+			if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain].ImageFile.empty()) {
+				tilepitch = Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->w / PixelTileSize.x;
+			}
 			//Wyrmgus end
+	
+			const int xofs = PixelTileSize.x * (tile % tilepitch);
+			const int yofs = PixelTileSize.y * (tile / tilepitch);
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {
