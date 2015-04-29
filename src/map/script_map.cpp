@@ -511,6 +511,32 @@ static int CclGetTileTerrainName(lua_State *l)
 }
 
 /**
+**  Get the name of the mixed terrain of the tile.
+**
+**  @param l  Lua state.
+**
+**  @return   The name of the terrain of the tile.
+*/
+static int CclGetTileTerrainMixedName(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
+
+	const CMapField &mf = *Map.Field(pos);
+	const CTileset &tileset = *Map.Tileset;
+	//Wyrmgus start
+//	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
+	const int index = mf.getTileIndex();
+	//Wyrmgus end
+	Assert(index != -1);
+	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
+
+	lua_pushstring(l, mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "");
+	return 1;
+}
+
+/**
 **  Check if the tile's terrain has a particular flag.
 **
 **  @param l  Lua state.
@@ -605,6 +631,7 @@ void MapCclRegister()
 	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
 
 	lua_register(Lua, "GetTileTerrainName", CclGetTileTerrainName);
+	lua_register(Lua, "GetTileTerrainMixedName", CclGetTileTerrainMixedName);
 	lua_register(Lua, "GetTileTerrainHasFlag", CclGetTileTerrainHasFlag);
 }
 
