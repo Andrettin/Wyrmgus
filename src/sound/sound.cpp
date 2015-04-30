@@ -184,12 +184,12 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 				return unit.Type->Sound.Hit.Sound;
 			}
 		case VoiceStep:
-			if (unit.Type->Sound.StepGrass.Sound && mf.getFlag() & MapFieldGrass) {
+			if (unit.Type->Sound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
+				return unit.Type->Sound.StepGravel.Sound;
+			} else if (unit.Type->Sound.StepGrass.Sound && ((mf.getFlag() & MapFieldGrass) || (mf.getFlag() & MapFieldStumps))) {
 				return unit.Type->Sound.StepGrass.Sound;
 			} else if (unit.Type->Sound.StepDirt.Sound && mf.getFlag() & MapFieldDirt) {
 				return unit.Type->Sound.StepDirt.Sound;
-			} else if (unit.Type->Sound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
-				return unit.Type->Sound.StepGravel.Sound;
 			} else if (unit.Type->Sound.StepMud.Sound && mf.getFlag() & MapFieldMud) {
 				return unit.Type->Sound.StepMud.Sound;
 			} else if (unit.Type->Sound.StepStone.Sound && mf.getFlag() & MapFieldStoneFloor) {

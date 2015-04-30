@@ -979,12 +979,13 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	//Wyrmgus end
 		switch (type.UnitType) {
 			case UnitTypeLand: // on land
+				type.FieldFlags = MapFieldLandUnit;			
 				//Wyrmgus start
-//				type.FieldFlags = MapFieldLandUnit;			
 				if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
-					type.FieldFlags = MapFieldLandUnit | MapFieldAirUnpassable;
-				} else {
-					type.FieldFlags = MapFieldLandUnit;			
+					type.FieldFlags |= MapFieldAirUnpassable;
+				}
+				if (type.BoolFlag[GRAVEL_INDEX].value) {
+					type.FieldFlags |= MapFieldGravel;
 				}
 				//Wyrmgus end
 				break;
@@ -993,20 +994,17 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				break;
 			//Wyrmgus start
 			case UnitTypeFlyLow: // in low air
+				type.FieldFlags = MapFieldLandUnit;			
 				if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
-					type.FieldFlags = MapFieldLandUnit | MapFieldAirUnpassable;
-				} else {
-					type.FieldFlags = MapFieldLandUnit;			
+					type.FieldFlags |= MapFieldAirUnpassable;
 				}
 				break;
 			//Wyrmgus end
 			case UnitTypeNaval: // on water
+				type.FieldFlags = MapFieldSeaUnit;
 				//Wyrmgus start
-//				type.FieldFlags = MapFieldSeaUnit;
 				if (type.BoolFlag[AIRUNPASSABLE_INDEX].value) { // for air unpassable units (i.e. doors)
-					type.FieldFlags = MapFieldSeaUnit | MapFieldAirUnpassable;
-				} else {
-					type.FieldFlags = MapFieldSeaUnit;
+					type.FieldFlags |= MapFieldAirUnpassable;
 				}
 				//Wyrmgus end
 				break;

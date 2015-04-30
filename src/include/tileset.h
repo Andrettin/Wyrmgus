@@ -91,6 +91,7 @@ struct lua_State;
 
 #define MapFieldDirt 0x00100000				/// Used for playing dirt step sounds
 #define MapFieldGravel 0x00200000			/// Used for playing gravel step sounds
+#define MapFieldStumps 0x00400000			/// Used for playing stumps step sounds
 //Wyrmgus end
 
 /**

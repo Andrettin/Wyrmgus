@@ -119,6 +119,7 @@ static const char HARVESTFROMOUTSIDE_KEY[] = "HarvestFromOutside";
 static const char OBSTACLE_KEY[] = "Obstacle";
 static const char AIRUNPASSABLE_KEY[] = "AirUnpassable";
 static const char SLOWS_KEY[] = "Slows";
+static const char GRAVEL_KEY[] = "Gravel";
 //Wyrmgus end
 
 // names of the variable.
@@ -199,7 +200,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
-							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY
+							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY
 	//Wyrmgus end
 							  };
 

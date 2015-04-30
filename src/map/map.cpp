@@ -100,12 +100,12 @@ void CMap::MarkSeenTile(CMapField &mf)
 		//  Handle wood changes. FIXME: check if for growing wood correct?
 		//Wyrmgus start
 //		if (tile == this->Tileset->getRemovedTreeTile()) {
-		if (tile == this->Tileset->getRemovedTreeTile() && mf.getFlag() & MapFieldGrass) {
+		if (tile == this->Tileset->getRemovedTreeTile() && mf.getFlag() & MapFieldStumps) {
 		//Wyrmgus end
 			FixNeighbors(MapFieldForest, 1, pos);
 		//Wyrmgus start
 //		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
-		} else if (seentile == this->Tileset->getRemovedTreeTile() && ((mf.getFlag() & MapFieldGrass) || (mf.getFlag() & MapFieldForest))) {
+		} else if (seentile == this->Tileset->getRemovedTreeTile() && ((mf.getFlag() & MapFieldStumps) || (mf.getFlag() & MapFieldForest))) {
 		//Wyrmgus end
 			FixTile(MapFieldForest, 1, pos);
 		} else if (mf.ForestOnMap()) {
@@ -558,7 +558,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
 	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
 	//Wyrmgus start
-	mf.Flags |= MapFieldGrass;
+	mf.Flags |= MapFieldStumps;
 	//Wyrmgus end
 	mf.Value = 0;
 
@@ -629,7 +629,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 
 	//Wyrmgus start
 //	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {
-	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile() || !(mf.getFlag() & MapFieldGrass)) {
+	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile() || !(mf.getFlag() & MapFieldStumps)) {
 	//Wyrmgus end
 		return;
 	}
@@ -663,7 +663,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		topMf.Value = 0;
 		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
 		//Wyrmgus start
-		topMf.Flags &= ~(MapFieldGrass);
+		topMf.Flags &= ~(MapFieldStumps);
 		//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
@@ -678,7 +678,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		mf.Value = 0;
 		mf.Flags |= MapFieldForest | MapFieldUnpassable;
 		//Wyrmgus start
-		mf.Flags &= ~(MapFieldGrass);
+		mf.Flags &= ~(MapFieldStumps);
 		//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);

@@ -582,6 +582,8 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		flag = MapFieldMud;
 	} else if (!strcmp(flag_name, "stone-floor")) {
 		flag = MapFieldStoneFloor;
+	} else if (!strcmp(flag_name, "stumps")) {
+		flag = MapFieldStumps;
 	//Wyrmgus end
 	} else if (!strcmp(flag_name, "wall")) {
 		flag = MapFieldWall;
