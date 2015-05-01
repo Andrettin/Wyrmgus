@@ -1041,7 +1041,7 @@ static void DrawEditorInfo()
 	const unsigned flag = mf.getFlag();
 	//Wyrmgus start
 //	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c",
-	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	sprintf(buf, "%02X|%04X|%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 	//Wyrmgus start
 			mf.Value, flag,
 			flag & MapFieldUnpassable   ? 'u' : '-',
@@ -1062,7 +1062,9 @@ static void DrawEditorInfo()
 			//Wyrmgus start
 //			flag & MapFieldBuilding     ? 'b' : '-');
 			flag & MapFieldBuilding     ? 'b' : '-',
-			flag & MapFieldItem         ? 'i' : '-');
+			flag & MapFieldItem         ? 'i' : '-',
+			flag & MapFieldStumps       ? 't' : '-',
+			flag & MapFieldGravel       ? 'g' : '-');
 			//Wyrmgus end
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 118, UI.StatusLine.TextY - 16, buf);

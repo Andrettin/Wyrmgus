@@ -91,7 +91,12 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 #else
 	this->Flags &= ~(MapFieldHuman | MapFieldLandAllowed | MapFieldCoastAllowed |
 					 MapFieldWaterAllowed | MapFieldNoBuilding | MapFieldUnpassable |
-					 MapFieldWall | MapFieldRocks | MapFieldForest);
+					 //Wyrmgus start
+//					 MapFieldWall | MapFieldRocks | MapFieldForest);
+					 MapFieldWall | MapFieldRocks | MapFieldForest |
+					 MapFieldAirUnpassable | MapFieldDirt | MapFieldGrass |
+					 MapFieldGravel | MapFieldMud | MapFieldStoneFloor | MapFieldStumps);
+					 //Wyrmgus end
 	this->Flags |= tile.flag;
 #endif
 	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
@@ -126,7 +131,10 @@ void CMapField::Save(CFile &file) const
 		file.printf(", \"water\"");
 	}
 	if (Flags & MapFieldNoBuilding) {
-		file.printf(", \"mud\"");
+		//Wyrmgus start
+//		file.printf(", \"mud\"");
+		file.printf(", \"no-building\"");
+		//Wyrmgus end
 	}
 	if (Flags & MapFieldUnpassable) {
 		file.printf(", \"block\"");
@@ -140,6 +148,29 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldForest) {
 		file.printf(", \"wood\"");
 	}
+	//Wyrmgus start
+	if (Flags & MapFieldAirUnpassable) {
+		file.printf(", \"air-unpassable\"");
+	}
+	if (Flags & MapFieldDirt) {
+		file.printf(", \"dirt\"");
+	}
+	if (Flags & MapFieldGrass) {
+		file.printf(", \"grass\"");
+	}
+	if (Flags & MapFieldGravel) {
+		file.printf(", \"gravel\"");
+	}
+	if (Flags & MapFieldMud) {
+		file.printf(", \"mud\"");
+	}
+	if (Flags & MapFieldStoneFloor) {
+		file.printf(", \"stone-floor\"");
+	}
+	if (Flags & MapFieldStumps) {
+		file.printf(", \"stumps\"");
+	}
+	//Wyrmgus end
 #if 1
 	// Not Required for save
 	// These are required for now, UnitType::FieldFlags is 0 until
@@ -205,7 +236,10 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldCoastAllowed;
 		} else if (!strcmp(value, "water")) {
 			this->Flags |= MapFieldWaterAllowed;
-		} else if (!strcmp(value, "mud")) {
+		//Wyrmgus start
+//		} else if (!strcmp(value, "mud")) {
+		} else if (!strcmp(value, "no-building")) {
+		//Wyrmgus end
 			this->Flags |= MapFieldNoBuilding;
 		} else if (!strcmp(value, "block")) {
 			this->Flags |= MapFieldUnpassable;
@@ -223,6 +257,22 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldSeaUnit;
 		} else if (!strcmp(value, "building")) {
 			this->Flags |= MapFieldBuilding;
+		//Wyrmgus start
+		} else if (!strcmp(value, "air-unpassable")) {
+			this->Flags |= MapFieldAirUnpassable;
+		} else if (!strcmp(value, "dirt")) {
+			this->Flags |= MapFieldDirt;
+		} else if (!strcmp(value, "grass")) {
+			this->Flags |= MapFieldGrass;
+		} else if (!strcmp(value, "gravel")) {
+			this->Flags |= MapFieldGravel;
+		} else if (!strcmp(value, "mud")) {
+			this->Flags |= MapFieldMud;
+		} else if (!strcmp(value, "stone-floor")) {
+			this->Flags |= MapFieldStoneFloor;
+		} else if (!strcmp(value, "stumps")) {
+			this->Flags |= MapFieldStumps;
+		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
