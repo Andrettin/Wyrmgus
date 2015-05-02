@@ -961,7 +961,10 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 	// Try to find the nearest depot first.
 	CUnit *depot = FindDeposit(unit, 1000, resource);
 	// Find a resource to harvest from.
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
+	//Wyrmgus start
+//	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 32, resource, true); //search nearby first
+	//Wyrmgus end
 
 	if (mine) {
 		CommandResource(unit, *mine, FlushCommands);
@@ -969,7 +972,30 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 	}
 	
 	//Wyrmgus start
-	CUnit *deposit = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true, NULL, false);
+	CUnit *deposit = UnitFindResource(unit, depot ? *depot : unit, 32, resource, true, NULL, false);
+	
+	if (deposit) {
+		const int n = AiHelpers.Refinery[resource - 1].size();
+
+		for (int i = 0; i < n; ++i) {
+			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
+
+			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
+				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+				return 1;
+			}
+		}
+	}
+	
+	//if didn't find anything nearby, search with unlimited range 
+	mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
+
+	if (mine) {
+		CommandResource(unit, *mine, FlushCommands);
+		return 1;
+	}
+	
+	deposit = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true, NULL, false);
 	
 	if (deposit) {
 		const int n = AiHelpers.Refinery[resource - 1].size();
