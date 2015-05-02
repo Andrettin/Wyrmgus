@@ -911,7 +911,7 @@ void MessagesDisplay::DrawMessages()
 				 */
 				label.DrawClip(UI.MapArea.X + 8,
 							   UI.MapArea.Y + 8 +
-							   z * (UI.MessageFont->Height() + 1) - MessagesScrollY,
+							   z * (UI.MessageFont->Height() + 1),
 							   std::string(Objectives[z]));
 				if (z == 0) {
 					PopClipping();
