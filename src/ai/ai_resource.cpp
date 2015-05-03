@@ -1422,7 +1422,10 @@ static void AiCheckRepair()
 		// Unit damaged?
 		// Don't repair attacked unit (wait 5 sec before repairing)
 		if (unit.Type->RepairHP
-			&& unit.CurrentAction() != UnitActionBuilt
+			//Wyrmgus start
+//			&& unit.CurrentAction() != UnitActionBuilt
+			&& (unit.CurrentAction() != UnitActionBuilt || unit.Type->BuilderOutside)
+			//Wyrmgus end
 			&& unit.CurrentAction() != UnitActionUpgradeTo
 			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
 			&& unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
