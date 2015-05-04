@@ -1225,6 +1225,25 @@ static int CclGetUnitsInsideUnit(lua_State *l)
 	}
 	return 1;
 }
+
+/**
+**  Get selected units
+**
+**  @param l  Lua state.
+**
+**  @return   Array of selected units
+*/
+static int CclGetSelectedUnits(lua_State *l)
+{
+	lua_newtable(l);
+	if (!Selected.empty()) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
+			lua_pushnumber(l, UnitNumber(*Selected[i]));
+			lua_rawseti(l, -2, i + 1);
+		}
+	}
+	return 1;
+}
 //Wyrmgus end
 
 /**
@@ -1506,6 +1525,7 @@ void UnitCclRegister()
 	lua_register(Lua, "GetUnitsAroundUnit", CclGetUnitsAroundUnit);
 	//Wyrmgus start
 	lua_register(Lua, "GetUnitsInsideUnit", CclGetUnitsInsideUnit);
+	lua_register(Lua, "GetSelectedUnits", CclGetSelectedUnits);
 	//Wyrmgus end
 
 	// unit member access functions
