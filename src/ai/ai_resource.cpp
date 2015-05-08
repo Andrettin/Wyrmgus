@@ -981,8 +981,10 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
 
 			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
-				return 1;
+				if (!AiCheckUnitTypeCosts(type)) {
+					CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+					return 1;
+				}
 			}
 		}
 	}
@@ -1004,8 +1006,10 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
 
 			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
-				return 1;
+				if (!AiCheckUnitTypeCosts(type)) {
+					CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+					return 1;
+				}
 			}
 		}
 	}
