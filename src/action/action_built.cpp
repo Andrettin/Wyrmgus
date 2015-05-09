@@ -43,6 +43,9 @@
 #include "sound.h"
 #include "translate.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unittype.h"
 
 /// How many resources the player gets back if canceling building
@@ -220,6 +223,24 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			if (worker->CurrentResource && worker->ResourcesHeld > 0 && type.CanStore[worker->CurrentResource]) {
 				CommandReturnGoods(*worker, &unit, 0);
 			}
+			
+			//Wyrmgus start
+			//make workers that are helping build the building also harvest/return goods to it, if applicable
+			std::vector<CUnit *> table;
+			SelectAroundUnit(unit, 2, table);
+			for (size_t i = 0; i != table.size(); ++i) {
+				if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+					// If we can harvest from the new building, do it.
+					if (table[i]->Type->ResInfo[type.GivesResource]) {
+						CommandResource(*table[i], unit, 0);
+					}
+					// If we can reurn goods to a new depot, do it.
+					if (table[i]->CurrentResource && table[i]->ResourcesHeld > 0 && type.CanStore[table[i]->CurrentResource]) {
+						CommandReturnGoods(*table[i], &unit, 0);
+					}
+				}
+			}
+			//Wyrmgus end
 		}
 	}
 
