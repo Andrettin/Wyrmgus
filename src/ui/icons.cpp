@@ -210,6 +210,8 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 48, 40);
+			} else if (flags & IconAutoCast) {
+				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 48, 40);
 			}
 			if (!Preference.CommandButtonFrameG || !(flags & IconCommandButton)) {
 				Preference.PressedIconFrameG->DrawClip(pos.x - 4, pos.y - 4);
@@ -221,6 +223,8 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46, 38);
+			} else if (flags & IconAutoCast) {
+				Video.DrawRectangle(Video.MapRGB(TheScreen->format, UI.ButtonPanel.AutoCastBorderColorRGB), pos.x, pos.y, 46, 38);
 			}
 			if (Preference.CommandButtonFrameG && (flags & IconCommandButton)) {
 				Preference.CommandButtonFrameG->DrawClip(pos.x - 5, pos.y - 4);
