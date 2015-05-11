@@ -645,6 +645,9 @@ static bool CommandKey(int key)
 				break;
 			}
 			UiToggleGrabMouse();
+			//Wyrmgus start
+			HandleCommandKey(key);
+			//Wyrmgus end
 			break;
 
 		case 'i':
@@ -661,6 +664,13 @@ static bool CommandKey(int key)
 				UiToggleMusic();
 				SavePreferences();
 				break;
+			//Wyrmgus start
+			} else {
+				if (HandleCommandKey(key)) {
+					break;
+				}
+				return false;
+			//Wyrmgus end
 			}
 			break;
 
@@ -678,6 +688,13 @@ static bool CommandKey(int key)
 				UiToggleSound();
 				SavePreferences();
 				break;
+			//Wyrmgus start
+			} else {
+				if (HandleCommandKey(key)) {
+					break;
+				}
+				return false;
+			//Wyrmgus end
 			}
 			break;
 

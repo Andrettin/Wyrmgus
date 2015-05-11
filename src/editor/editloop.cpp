@@ -1450,6 +1450,11 @@ static void EditorCallbackKeyDown(unsigned key, unsigned keychar)
 						UI.StatusLine.Set(_("Mirror editing disabled"));
 						break;
 				}
+			//Wyrmgus start
+			} else {
+				HandleCommandKey(key);
+				return;
+			//Wyrmgus end
 			}
 			break;
 		case 'x': // ALT+X, CTRL+X: Exit editor
