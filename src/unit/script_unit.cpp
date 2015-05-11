@@ -1013,7 +1013,10 @@ static int CclKillUnitAt(lua_State *l)
 			|| (unittype == ALL_FOODUNITS && !unit.Type->Building)
 			|| (unittype == ALL_BUILDINGS && unit.Type->Building)
 			|| unittype == unit.Type) {
-			if (plynr == -1 || plynr == unit.Player->Index) {
+			//Wyrmgus start
+//			if (plynr == -1 || plynr == unit.Player->Index) {
+			if ((plynr == -1 || plynr == unit.Player->Index) && unit.IsAlive()) {
+			//Wyrmgus end
 				LetUnitDie(unit);
 				++s;
 			}
