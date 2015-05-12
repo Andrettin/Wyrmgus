@@ -461,6 +461,10 @@ void CPlayer::Save(CFile &file) const
 {
 	const CPlayer &p = *this;
 	file.printf("Player(%d,\n", this->Index);
+	//Wyrmgus start
+	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
+	file.printf(" \"faction\", %d,", p.Faction);
+	//Wyrmgus end
 	file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
 	file.printf("  \"type\", ");
 	switch (p.Type) {
@@ -472,9 +476,8 @@ void CPlayer::Save(CFile &file) const
 		case PlayerRescueActive:  file.printf("\"rescue-active\","); break;
 		default:                  file.printf("%d,", p.Type); break;
 	}
-	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
 	//Wyrmgus start
-	file.printf(" \"faction\", %d,", p.Faction);
+//	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
 	//Wyrmgus end
 	file.printf(" \"ai-name\", \"%s\",\n", p.AiName.c_str());
 	file.printf("  \"team\", %d,", p.Team);
