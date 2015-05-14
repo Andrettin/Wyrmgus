@@ -673,8 +673,10 @@ void scalePixel(const Kernel_3x3& ker,
 #define i get_i<rotDeg>(ker)
 
 #ifndef NDEBUG
+# ifdef _WIN32
     if (breakIntoDebugger)
         __debugbreak(); //__asm int 3;
+# endif
 #endif
 
     const unsigned char blend = rotateBlendInfo<rotDeg>(blendInfo);
