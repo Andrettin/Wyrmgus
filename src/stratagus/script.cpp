@@ -2100,7 +2100,10 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	}
 
 	// security: disallow all special characters
-	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
+	//Wyrmgus start
+//	if (strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) {
+	if ((strpbrk(userdir, ":*?\"<>|") != 0 || strstr(userdir, "..") != 0) && (strstr(userdir, "workshop") == 0 || strstr(userdir, "content") == 0 || strstr(userdir, "370070") == 0)) { //special case for Wyrmsun's workshop folder
+	//Wyrmgus end
 		LuaError(l, "Forbidden directory");
 	}
 	char directory[PATH_MAX];
