@@ -40,7 +40,7 @@ set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
 
 project(stratagus)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1)
 
 set(STRATAGUS_VERSION "${STRATAGUS_MAJOR_VERSION}.${STRATAGUS_MINOR_VERSION}.${STRATAGUS_PATCH_LEVEL}")
 set(STRATAGUS_VERSION_FULL "${STRATAGUS_VERSION}.${STRATAGUS_PATCH_LEVEL2}")
@@ -896,6 +896,10 @@ if(CMAKE_COMPILER_IS_GNUC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsigned-char")
 endif()
 # TODO: Add support for other compilers
+
+#Wyrmgus start
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
+#Wyrmgus end
 
 check_type_size(errno_t ERRNOT)
 check_function_exists("strcpy_s" HAVE_STRCPYS)
