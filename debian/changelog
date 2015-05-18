@@ -137,7 +137,7 @@ stratagus (2.3.0-1) unstable; urgency=low
   * Added autocast by variable priority (heal the wounded ones, bloodlust for strong ones...) (from cybermind)
   * Make OpenGL support optional. (from Pali Rohár)
   * Fix bug #1117852: Fixed version compilation for MSVC. (from cybermind)
-  * Correct handling for Warcraft 2 timed spells and health loss for time-to-live ability : the values change every cycle, not every second. (from cybermind)
+  * Correct handling for timed spells and health loss for time-to-live ability : the values change every cycle, not every second. (from cybermind)
   * Aility to change values in animation "set-var" by percent. (from cybermind)
   * Added poison damage which will slowly drain health for POISON_INDEX tics. (from cybermind)
   * Added fade time in "static-sprite" of DefineDecorations as third argument in table. (from cybermind)
@@ -683,8 +683,8 @@ freecraft (1.17pre1build17-1) unstable; urgency=medium
     remaining part of #137338 and closes #140882, so closes: #137338, #140882.
     Still remain probably many errors about signedness of other data types.
     Please report them and send patches if you can.
-  * Also included the tools in /usr/lib/games/freecraft for converting the
-    original WarCraft II artwork to data format understood by freecraft, but
+  * Also included the tools in /usr/lib/games/freecraft for converting
+    to data format understood by freecraft, but
     I'm not really supporting them yet (you're warned).
   * debian/rules: Added support for debian/patches.
   * Moved most of my modifications to debian/patches, as well as the CVS patch.
@@ -774,8 +774,7 @@ freecraft (1.17pre1build16-1) unstable; urgency=low
     here.
   * New upstream release and name change (closes: #94202).
   * New maintainer (closes: #119258).
-  * Built with HAVE_EXPANSION, for preparing it for an eventual use
-    with non-free data (e.g. WarCraft II(tm) CD).
+  * Built with HAVE_EXPANSION.
   * debian/ files rewritten from scratch.
   * debian/control:
     - Added doc++ dependency for building the documentation.

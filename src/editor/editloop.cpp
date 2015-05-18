@@ -681,7 +681,10 @@ static void DrawTileIcons()
 	int x = UI.InfoPanel.X + 46;
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 11;
 
-	if (CursorOn == CursorOnButton && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
+	//Wyrmgus start
+//	if (CursorOn == CursorOnButton && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
+	if (CursorOn == CursorOnButton && 300 <= ButtonUnderCursor && ButtonUnderCursor != 304 && ButtonUnderCursor < 306) {
+	//Wyrmgus end
 		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
 	}
 
@@ -709,11 +712,15 @@ static void DrawTileIcons()
 		label.DrawCentered(x, y, "4x4");
 	}
 	y += 20;
+	//Wyrmgus start
+	/*
 	if (TileToolRandom) {
 		label.DrawReverseCentered(x, y, "Random");
 	} else {
 		label.DrawCentered(x, y, "Random");
 	}
+	*/
+	//Wyrmgus end
 	y += 20;
 	if (TileToolDecoration) {
 		label.DrawReverseCentered(x, y, "Filler");
@@ -1294,7 +1301,9 @@ static void EditorCallbackButtonDown(unsigned button)
 				case 301: TileCursorSize = 2; return;
 				case 302: TileCursorSize = 3; return;
 				case 303: TileCursorSize = 4; return;
-				case 304: TileToolRandom ^= 1; return;
+				//Wyrmgus start
+//				case 304: TileToolRandom ^= 1; return;
+				//Wyrmgus end
 				case 305: TileToolDecoration ^= 1; return;
 			}
 		}

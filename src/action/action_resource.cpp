@@ -570,7 +570,6 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		// FIXME: Determine somehow when the resource will be free to use
 		// FIXME: Could we somehow find another resource? Think minerals
 		// FIXME: We should add a flag for that, and a limited range.
-		// FIXME: Think minerals in st*rcr*ft!!
 		// However the CPU usage is really low (no pathfinding stuff).
 		unit.Wait = 10;
 		return 0;
