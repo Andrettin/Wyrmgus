@@ -513,8 +513,9 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			//Wyrmgus start
 			if (type == MapFieldForest) {
 				mf.Flags |= MapFieldStumps;
-			} else if (type == MapFieldForest) {
+			} else if (type == MapFieldRocks) {
 				mf.Flags |= MapFieldGravel;
+				mf.Flags |= MapFieldNoBuilding;
 			}
 			//Wyrmgus end
 			mf.Value = 0;
@@ -598,6 +599,7 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
 	//Wyrmgus start
 	mf.Flags |= MapFieldGravel;
+	mf.Flags |= MapFieldNoBuilding;
 	//Wyrmgus end
 	mf.Value = 0;
 
