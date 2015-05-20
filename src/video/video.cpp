@@ -310,6 +310,13 @@ bool CVideo::ResizeScreen(int w, int h)
 		Height = h;
 		SetClipping(0, 0, Video.Width - 1, Video.Height - 1);
 #endif
+
+		//Wyrmgus start
+		if (GameRunning) {
+			InitUserInterface();
+			UI.Load();
+		}
+		//Wyrmgus end
 		return true;
 	}
 	return false;
