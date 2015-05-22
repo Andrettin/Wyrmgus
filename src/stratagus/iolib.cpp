@@ -579,14 +579,14 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 
 	// In user home directory
 	if (!GameName.empty()) {
-		sprintf(buffer, "%s/%s/%s", Parameters::Instance.GetUserDirectory().c_str(), GameName.c_str(), file);
+		snprintf(buffer, PATH_MAX, "%s/%s/%s", Parameters::Instance.GetUserDirectory().c_str(), GameName.c_str(), file);
 		if (FindFileWithExtension(buffer)) {
 			return;
 		}
 	}
 
 	// In global shared directory
-	sprintf(buffer, "%s/%s", StratagusLibPath.c_str(), file);
+	snprintf(buffer, PATH_MAX, "%s/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -594,11 +594,11 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	// Support for graphics in default graphics dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	sprintf(buffer, "graphics/%s", file);
+	snprintf(buffer, PATH_MAX, "graphics/%s", file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
-	sprintf(buffer, "%s/graphics/%s", StratagusLibPath.c_str(), file);
+	snprintf(buffer, PATH_MAX, "%s/graphics/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
@@ -606,11 +606,11 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	// Support for sounds in default sounds dir.
 	// They could be anywhere now, but check if they haven't
 	// got full paths.
-	sprintf(buffer, "sounds/%s", file);
+	snprintf(buffer, PATH_MAX, "sounds/%s", file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
-	sprintf(buffer, "%s/sounds/%s", StratagusLibPath.c_str(), file);
+	snprintf(buffer, PATH_MAX, "%s/sounds/%s", StratagusLibPath.c_str(), file);
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
