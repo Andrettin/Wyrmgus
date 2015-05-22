@@ -678,8 +678,8 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 //		&& topMf.Value >= ForestRegeneration
 //		&& !(topMf.Flags & occupedFlag)) {
 	if (((topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (topMf.getFlag() & MapFieldStumps) && topMf.Value >= ForestRegeneration && !(topMf.Flags & occupedFlag)) || (topMf.getFlag() & MapFieldForest))
-		&& ((topleftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (topleftMf.getFlag() & MapFieldStumps) && topleftMf.Value >= ForestRegeneration && !(topleftMf.Flags & occupedFlag)) || (topleftMf.getFlag() & MapFieldForest))
-		&& ((leftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (leftMf.getFlag() & MapFieldStumps) && leftMf.Value >= ForestRegeneration && !(leftMf.Flags & occupedFlag)) || (leftMf.getFlag() & MapFieldForest))) {
+		&& this->Info.IsPointOnMap(pos + topleftOffset) && ((topleftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (topleftMf.getFlag() & MapFieldStumps) && topleftMf.Value >= ForestRegeneration && !(topleftMf.Flags & occupedFlag)) || (topleftMf.getFlag() & MapFieldForest))
+		&& this->Info.IsPointOnMap(pos + leftOffset) && ((leftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (leftMf.getFlag() & MapFieldStumps) && leftMf.Value >= ForestRegeneration && !(leftMf.Flags & occupedFlag)) || (leftMf.getFlag() & MapFieldForest))) {
 		//Wyrmgus end
 		DebugPrint("Real place wood\n");
 		//Wyrmgus start
@@ -745,8 +745,8 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		FixNeighbors(MapFieldForest, 0, pos);
 	//Wyrmgus start
 	} else if (((topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (topMf.getFlag() & MapFieldStumps) && topMf.Value >= ForestRegeneration && !(topMf.Flags & occupedFlag)) || (topMf.getFlag() & MapFieldForest))
-		&& ((toprightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (toprightMf.getFlag() & MapFieldStumps) && toprightMf.Value >= ForestRegeneration && !(toprightMf.Flags & occupedFlag)) || (toprightMf.getFlag() & MapFieldForest))
-		&& ((rightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (rightMf.getFlag() & MapFieldStumps) && rightMf.Value >= ForestRegeneration && !(rightMf.Flags & occupedFlag)) || (rightMf.getFlag() & MapFieldForest))) {
+		&& this->Info.IsPointOnMap(pos + toprightOffset) && ((toprightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (toprightMf.getFlag() & MapFieldStumps) && toprightMf.Value >= ForestRegeneration && !(toprightMf.Flags & occupedFlag)) || (toprightMf.getFlag() & MapFieldForest))
+		&& this->Info.IsPointOnMap(pos + rightOffset) && ((rightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (rightMf.getFlag() & MapFieldStumps) && rightMf.Value >= ForestRegeneration && !(rightMf.Flags & occupedFlag)) || (rightMf.getFlag() & MapFieldForest))) {
 		DebugPrint("Real place wood\n");
 		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		topMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
@@ -793,9 +793,9 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		FixNeighbors(MapFieldForest, 0, pos + rightOffset);
 		FixNeighbors(MapFieldForest, 0, pos + offset);
 		FixNeighbors(MapFieldForest, 0, pos);
-	} else if (((bottomMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomMf.getFlag() & MapFieldStumps) && bottomMf.Value >= ForestRegeneration && !(bottomMf.Flags & occupedFlag)) || (bottomMf.getFlag() & MapFieldForest))
-		&& ((bottomleftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomleftMf.getFlag() & MapFieldStumps) && bottomleftMf.Value >= ForestRegeneration && !(bottomleftMf.Flags & occupedFlag)) || (bottomleftMf.getFlag() & MapFieldForest))
-		&& ((leftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (leftMf.getFlag() & MapFieldStumps) && leftMf.Value >= ForestRegeneration && !(leftMf.Flags & occupedFlag)) || (leftMf.getFlag() & MapFieldForest))) {
+	} else if (this->Info.IsPointOnMap(pos + bottomOffset) && ((bottomMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomMf.getFlag() & MapFieldStumps) && bottomMf.Value >= ForestRegeneration && !(bottomMf.Flags & occupedFlag)) || (bottomMf.getFlag() & MapFieldForest))
+		&& this->Info.IsPointOnMap(pos + bottomleftOffset) && ((bottomleftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomleftMf.getFlag() & MapFieldStumps) && bottomleftMf.Value >= ForestRegeneration && !(bottomleftMf.Flags & occupedFlag)) || (bottomleftMf.getFlag() & MapFieldForest))
+		&& this->Info.IsPointOnMap(pos + leftOffset) && ((leftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (leftMf.getFlag() & MapFieldStumps) && leftMf.Value >= ForestRegeneration && !(leftMf.Flags & occupedFlag)) || (leftMf.getFlag() & MapFieldForest))) {
 		DebugPrint("Real place wood\n");
 		bottomMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		bottomMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
@@ -842,9 +842,9 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		FixNeighbors(MapFieldForest, 0, pos + leftOffset);
 		FixNeighbors(MapFieldForest, 0, pos + offset);
 		FixNeighbors(MapFieldForest, 0, pos);
-	} else if (((bottomMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomMf.getFlag() & MapFieldStumps) && bottomMf.Value >= ForestRegeneration && !(bottomMf.Flags & occupedFlag)) || (bottomMf.getFlag() & MapFieldForest))
-		&& ((bottomrightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomrightMf.getFlag() & MapFieldStumps) && bottomrightMf.Value >= ForestRegeneration && !(bottomrightMf.Flags & occupedFlag)) || (bottomrightMf.getFlag() & MapFieldForest))
-		&& ((rightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (rightMf.getFlag() & MapFieldStumps) && rightMf.Value >= ForestRegeneration && !(rightMf.Flags & occupedFlag)) || (rightMf.getFlag() & MapFieldForest))) {
+	} else if (this->Info.IsPointOnMap(pos + bottomOffset) && ((bottomMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomMf.getFlag() & MapFieldStumps) && bottomMf.Value >= ForestRegeneration && !(bottomMf.Flags & occupedFlag)) || (bottomMf.getFlag() & MapFieldForest))
+		&& this->Info.IsPointOnMap(pos + bottomrightOffset) && ((bottomrightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomrightMf.getFlag() & MapFieldStumps) && bottomrightMf.Value >= ForestRegeneration && !(bottomrightMf.Flags & occupedFlag)) || (bottomrightMf.getFlag() & MapFieldForest))
+		&& this->Info.IsPointOnMap(pos + rightOffset) && ((rightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (rightMf.getFlag() & MapFieldStumps) && rightMf.Value >= ForestRegeneration && !(rightMf.Flags & occupedFlag)) || (rightMf.getFlag() & MapFieldForest))) {
 		DebugPrint("Real place wood\n");
 		bottomMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
 		bottomMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
