@@ -529,13 +529,23 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	const CUnitType &type = this->GetUnitType();
 
 	if (State_NearOfLocation <= this->State && this->State < State_StartBuilding_Failed) {
+		//Wyrmgus start
+		/*
 		if (CheckLimit(unit, type) == false) {
 			this->Finished = true;
 			return ;
 		}
+		*/
+		//Wyrmgus end
 		CUnit *ontop = this->CheckCanBuild(unit);
 
 		if (ontop != NULL) {
+			//Wyrmgus start
+			if (CheckLimit(unit, type) == false) {
+				this->Finished = true;
+				return ;
+			}
+			//Wyrmgus end
 			this->StartBuilding(unit, *ontop);
 		}
 	}
