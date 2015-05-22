@@ -926,7 +926,8 @@ void LoadStratagusMapInfo(const std::string &mapname)
 		Map.Info.Filename.replace(loc, 4, ".sms");
 	}
 
-	LuaLoadFile(mapname);
+	const std::string filename = LibraryFileName(mapname.c_str());
+	LuaLoadFile(filename);
 }
 
 //@}
