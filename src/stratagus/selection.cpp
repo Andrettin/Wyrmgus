@@ -572,6 +572,19 @@ int SelectGroupFromUnit(CUnit &unit)
 static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 {
 	unsigned int n = 0;
+	
+	//Wyrmgus start
+	//check if has non-building
+	bool hasNonBuilding = false;
+	
+	for (size_t i = 0; i != table.size(); ++i) {
+		CUnit &unit = *table[i];
+		
+		if (!unit.Type->Building) {
+			hasNonBuilding = true;
+		}
+	}
+	//Wyrmgus end
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
@@ -585,6 +598,12 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
+		//Wyrmgus start
+		//only select buildings if another building of the same type is already selected
+		if (unit.Type->Building && ((i != 0 && unit.Type != table[0]->Type) || hasNonBuilding)) {
+			continue;
+		}
+		//Wyrmgus end
 		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;

@@ -335,6 +335,7 @@ static void AnimateActionTrain(CUnit &unit)
 		}
 		
 		/* Auto Group Add */
+		/*
 		if (!unit.Player->AiEnabled && unit.GroupId) {
 			int num = 0;
 			while (!(unit.GroupId & (1 << num))) {
@@ -342,6 +343,7 @@ static void AnimateActionTrain(CUnit &unit)
 			}
 			AddToGroup(&newUnit, 1, num);
 		}
+		*/
 
 		DropOutOnSide(*newUnit, LookingW, &unit);
 		//Wyrmgus start
