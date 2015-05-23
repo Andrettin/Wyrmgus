@@ -557,12 +557,12 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 		//Wyrmgus start
-//		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
+//		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
 		VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
 		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
-			varinfo->Icon.Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
+			varinfo->Icon.Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
 		} else {
-			icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : uins->Player->Index);
+			icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
 		}
 		//Wyrmgus end
 		UiDrawLifeBar(*uins, pos.x, pos.y);
