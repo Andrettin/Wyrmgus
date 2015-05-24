@@ -386,7 +386,13 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	//Wyrmgus start
 	if (img) {
 		if (Transparency) {
-			WidgetGraphicTransparency(int(256 - 2.56 * Transparency), *((CGraphic *)img));
+		#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (UseOpenGL) {
+			} else
+		#endif
+			{
+				WidgetGraphicTransparency(int(256 - 2.56 * Transparency), *((CGraphic *)img));
+			}
 		}
 	}
 
@@ -399,19 +405,64 @@ void ImageButton::draw(gcn::Graphics *graphics)
 		graphics->drawImage(frameImage, 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
+			if (Transparency) {
+			#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
+				}
+			#endif
+			}
 			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1);
+			if (Transparency) {
+			#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				}
+			#endif
+			}
 			if (pressedframeImage) {
 				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
 									pressedframeImage->getWidth(), pressedframeImage->getHeight());
 			}
 		} else {
+			if (Transparency) {
+			#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
+				}
+			#endif
+			}
 			graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight());
+			if (Transparency) {
+			#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				}
+			#endif
+			}
 		}
 	} else {
+		if (Transparency) {
+		#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (UseOpenGL) {
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
+			}
+		#endif
+		}
 		graphics->drawImage(img, 0, 0, 0, 0,
 							img->getWidth(), img->getHeight());
+		if (Transparency) {
+		#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (UseOpenGL) {
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			}
+		#endif
+		}
 	}
 	//Wyrmgus end
 
@@ -480,7 +531,13 @@ void ImageButton::draw(gcn::Graphics *graphics)
 	
 	//Wyrmgus start
 	//restore old alpha
-	WidgetGraphicTransparency(255, *((CGraphic *)img));
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+	} else
+#endif
+	{
+		WidgetGraphicTransparency(255, *((CGraphic *)img));
+	}
 	//Wyrmgus end
 }
 
@@ -570,9 +627,32 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 
 	if (img) {
 		// make the button's image be player-colored
-		WidgetGraphicPlayerPixels(ButtonPlayerColor, *((CPlayerColorGraphic *)img));
+	#if defined(USE_OPENGL) || defined(USE_GLES)
+		if (UseOpenGL) {
+			int WidgetPlayerColorIndexFromName = 0;
+			for (int i = 0; i < PlayerColorMax; ++i) {
+				if (PlayerColorNames[i] == ButtonPlayerColor) {
+					WidgetPlayerColorIndexFromName = i;
+					break;
+				}
+			}
+			if (!((CPlayerColorGraphic *)img)->PlayerColorTextures[WidgetPlayerColorIndexFromName]) {
+				MakePlayerColorTexture(((CPlayerColorGraphic *)img), WidgetPlayerColorIndexFromName);
+			}
+			((CPlayerColorGraphic *)img)->Textures = ((CPlayerColorGraphic *)img)->PlayerColorTextures[WidgetPlayerColorIndexFromName];
+		} else
+	#endif
+		{
+			WidgetGraphicPlayerPixels(ButtonPlayerColor, *((CPlayerColorGraphic *)img));
+		}
 		if (Transparency) {
-			WidgetGraphicTransparency(int(256 - 2.56 * Transparency), *((CPlayerColorGraphic *)img));
+		#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (UseOpenGL) {
+			} else
+		#endif
+			{
+				WidgetGraphicTransparency(int(256 - 2.56 * Transparency), *((CPlayerColorGraphic *)img));
+			}
 		}
 	}
 
@@ -582,19 +662,64 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		graphics->drawImage(frameImage, 0, 0, 0, 0,
 							frameImage->getWidth(), frameImage->getHeight());
 		if (isPressed()) {
+			if (Transparency) {
+			#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
+				}
+			#endif
+			}
 			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1);
+			if (Transparency) {
+			#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				}
+			#endif
+			}
 			if (pressedframeImage) {
 				graphics->drawImage(pressedframeImage, 0, 0, 0, 0,
 									pressedframeImage->getWidth(), pressedframeImage->getHeight());
 			}
 		} else {
+			if (Transparency) {
+			#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+					glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
+				}
+			#endif
+			}
 			graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight());
+			if (Transparency) {
+			#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				}
+			#endif
+			}
 		}
 	} else {
+		if (Transparency) {
+		#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (UseOpenGL) {
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glColor4ub(255, 255, 255, int(256 - 2.56 * Transparency));
+			}
+		#endif
+		}
 		graphics->drawImage(img, 0, 0, 0, 0,
 							img->getWidth(), img->getHeight());
+		if (Transparency) {
+		#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (UseOpenGL) {
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			}
+		#endif
+		}
 	}
 
 	graphics->setColor(getForegroundColor());
@@ -634,7 +759,13 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 	}
 
 	//restore old alpha
-	WidgetGraphicTransparency(255, *((CGraphic *)img));
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+	} else
+#endif
+	{
+		WidgetGraphicTransparency(255, *((CGraphic *)img));
+	}
 }
 
 /**
@@ -681,6 +812,7 @@ void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const C
 	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColorNames[i] == WidgetPlayerColorName) {
 			WidgetPlayerColorIndexFromName = i;
+			break;
 		}
 	}
 

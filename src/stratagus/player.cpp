@@ -1315,12 +1315,18 @@ void PlayersEachSecond(int playerIdx)
 **  @param player  Pointer to player.
 **  @param sprite  The sprite in which the colors should be changed.
 */
-void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
+//Wyrmgus start
+//void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite)
+void GraphicPlayerPixels(int player, const CGraphic &sprite)
+//Wyrmgus end
 {
 	Assert(PlayerColorIndexCount);
 
 	SDL_LockSurface(sprite.Surface);
-	std::vector<SDL_Color> sdlColors(player.UnitColors.Colors.begin(), player.UnitColors.Colors.end());
+	//Wyrmgus start
+//	std::vector<SDL_Color> sdlColors(player.UnitColors.Colors.begin(), player.UnitColors.Colors.end());
+	std::vector<SDL_Color> sdlColors(PlayerColorsRGB[player].begin(), PlayerColorsRGB[player].end());
+	//Wyrmgus end
 	SDL_SetColors(sprite.Surface, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {
 		SDL_SetColors(sprite.SurfaceFlip, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);

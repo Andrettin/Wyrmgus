@@ -395,7 +395,10 @@ extern void PlayersEachCycle();
 extern void PlayersEachSecond(int player);
 
 /// Change current color set to new player of the sprite
-extern void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite);
+//Wyrmgus start
+//extern void GraphicPlayerPixels(CPlayer &player, const CGraphic &sprite);
+extern void GraphicPlayerPixels(int player, const CGraphic &sprite);
+//Wyrmgus end
 
 /// Output debug informations for players
 extern void DebugPlayers();

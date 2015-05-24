@@ -323,6 +323,14 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 												   int x, int y)
 {
+	//Wyrmgus start
+	for (int i = 0; i < PlayerColorMax; ++i) {
+		if (PlayerColors[i][0] == Players[player].Color) {
+			player = i;
+			break;
+		}		
+	}
+	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		if (!PlayerColorTextures[player]) {
@@ -332,7 +340,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 	} else
 #endif
 	{
-		GraphicPlayerPixels(Players[player], *this);
+		//Wyrmgus start
+//		GraphicPlayerPixels(Players[player], *this);
+		GraphicPlayerPixels(player, *this);
+		//Wyrmgus end
 		DrawFrameClip(frame, x, y);
 	}
 }
@@ -340,6 +351,12 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 //Wyrmgus start
 void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha)
 {
+	for (int i = 0; i < PlayerColorMax; ++i) {
+		if (PlayerColors[i][0] == Players[player].Color) {
+			player = i;
+			break;
+		}		
+	}
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		if (!PlayerColorTextures[player]) {
@@ -352,13 +369,24 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 	} else
 #endif
 	{
-		GraphicPlayerPixels(Players[player], *this);
+		//Wyrmgus start
+//		GraphicPlayerPixels(Players[player], *this);
+		GraphicPlayerPixels(player, *this);
+		//Wyrmgus end
 		DrawFrameClipTrans(frame, x, y, alpha);
 	}
 }
 
 void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha)
 {
+	//Wyrmgus start
+	for (int i = 0; i < PlayerColorMax; ++i) {
+		if (PlayerColors[i][0] == Players[player].Color) {
+			player = i;
+			break;
+		}		
+	}
+	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		if (!PlayerColorTextures[player]) {
@@ -371,7 +399,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 	} else
 #endif
 	{
-		GraphicPlayerPixels(Players[player], *this);
+		//Wyrmgus start
+//		GraphicPlayerPixels(Players[player], *this);
+		GraphicPlayerPixels(player, *this);
+		//Wyrmgus end
 		DrawFrameClipTransX(frame, x, y, alpha);
 	}
 }
@@ -516,6 +547,14 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 													int x, int y)
 {
+	//Wyrmgus start
+	for (int i = 0; i < PlayerColorMax; ++i) {
+		if (PlayerColors[i][0] == Players[player].Color) {
+			player = i;
+			break;
+		}		
+	}
+	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		if (!PlayerColorTextures[player]) {
@@ -525,7 +564,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 	} else
 #endif
 	{
-		GraphicPlayerPixels(Players[player], *this);
+		//Wyrmgus start
+//		GraphicPlayerPixels(Players[player], *this);
+		GraphicPlayerPixels(player, *this);
+		//Wyrmgus end
 		DrawFrameClipX(frame, x, y);
 	}
 }
@@ -1284,7 +1326,12 @@ void MakePlayerColorTexture(CPlayerColorGraphic *g, int player)
 		return;
 	}
 
-	MakeTextures(g, player, &Players[player].UnitColors);
+	//Wyrmgus start
+//	MakeTextures(g, player, &Players[player].UnitColors);
+	CUnitColors texture_unit_colors;
+	texture_unit_colors.Colors = PlayerColorsRGB[player];
+	MakeTextures(g, player, &texture_unit_colors);
+	//Wyrmgus end
 }
 
 #endif
