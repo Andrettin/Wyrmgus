@@ -1126,13 +1126,9 @@ void ToggleFullScreen()
 	h = TheScreen->h;
 	bpp = TheScreen->format->BitsPerPixel;
 
-	//Wyrmgus start
-	/*
 	if (!SDL_VideoModeOK(w, h, bpp,	flags ^ SDL_FULLSCREEN)) {
 		return;
 	}
-	*/
-	//Wyrmgus end
 
 	SDL_GetClipRect(TheScreen, &clip);
 
