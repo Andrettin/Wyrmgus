@@ -44,6 +44,9 @@
 #include "player.h"
 #include "script.h"
 #include "spells.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "unit.h"
 #include "unittype.h"
@@ -169,6 +172,9 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	for (int i = 0; i < VariationMax; ++i) {
 		VariationInfo *varinfo = newtype.VarInfo[i];
 		if (!varinfo) {
+			continue;
+		}
+		if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
 			continue;
 		}
 		bool UpgradesCheck = true;

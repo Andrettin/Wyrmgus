@@ -136,6 +136,7 @@ public:
 	std::string HairFile;			/// Variation's hair graphics.
 	std::string PantsFile;			/// Variation's pants graphics.
 	std::string ShieldFile;			/// Variation's shield graphics.
+	std::string Tileset;			/// Variation's tileset.
 	int FrameWidth;
 	int FrameHeight;
 	IconConfig Icon;				/// Icon to display for this unit

@@ -1319,6 +1319,8 @@ static int CclDefineUnitType(lua_State *l)
 								break;
 							}
 						}
+					} else if (!strcmp(value, "tileset")) {
+						var->Tileset = LuaToString(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", type->Name.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);

@@ -57,6 +57,7 @@
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"
+#include "tileset.h"
 //Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
@@ -813,6 +814,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								if (!varinfo) {
 									continue;
 								}
+								if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
+									continue;
+								}
 								bool UpgradesCheck = true;
 								for (int u = 0; u < VariationMax; ++u) {
 									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
@@ -1030,6 +1034,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								if (!varinfo) {
 									continue;
 								}
+								if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
+									continue;
+								}
 								bool UpgradesCheck = true;
 								for (int u = 0; u < VariationMax; ++u) {
 									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
@@ -1125,6 +1132,9 @@ static void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *
 				if (!varinfo) {
 					continue;
 				}
+				if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
+					continue;
+				}
 				bool UpgradesCheck = true;
 				for (int u = 0; u < VariationMax; ++u) {
 					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
@@ -1200,6 +1210,9 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 			for (int i = 0; i < VariationMax; ++i) {
 				VariationInfo *varinfo = unit.Type->VarInfo[i];
 				if (!varinfo) {
+					continue;
+				}
+				if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
 					continue;
 				}
 				bool UpgradesCheck = true;

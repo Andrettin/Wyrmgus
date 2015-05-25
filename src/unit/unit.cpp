@@ -57,6 +57,9 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "ui.h"
 #include "unit_find.h"
@@ -850,6 +853,9 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		for (int i = 0; i < VariationMax; ++i) {
 			VariationInfo *varinfo = type.VarInfo[i];
 			if (!varinfo) {
+				continue;
+			}
+			if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
 				continue;
 			}
 			bool UpgradesCheck = true;
