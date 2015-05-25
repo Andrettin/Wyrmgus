@@ -506,7 +506,10 @@ int CLabel::DoDrawText(int x, int y,
 	const CFontColor *backup = fc;
 	bool isColor = false;
 	font->DynamicLoad();
-	CGraphic *g = font->GetFontColorGraphic(*FontColor);
+	//Wyrmgus start
+//	CGraphic *g = font->GetFontColorGraphic(*FontColor);
+	CGraphic *g = font->GetFontColorGraphic(*fc);
+	//Wyrmgus end
 
 	while (GetUTF8(text, len, pos, utf8)) {
 		tab = false;
