@@ -567,7 +567,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 	//Wyrmgus start
 	player.Allow.Units[src.Slot] = 0; //forbid the previous unit type when converting
 	
-	if (player.AiEnabled) {
+	if (player.AiEnabled && GameCycle > 0) {
 		//if is AI player, convert all requests from the old unit type to the new one; FIXME: if already has requests of the new unit type, then the count of the old one should be added to the new one, instead of merely changing the type of the old one to the new one
 		for (unsigned int i = 0; i < player.Ai->UnitTypeRequests.size(); ++i) {
 			if (player.Ai->UnitTypeRequests[i].Type->Slot == src.Slot) {
@@ -606,7 +606,10 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 			CommandTransformIntoType(unit, dst);
 			//  Convert trained units to this type.
 			//  FIXME: what about buildings?
-		} else {
+		//Wyrmgus start
+//		} else {
+		} else if (GameCycle > 0) {
+		//Wyrmgus end
 			for (size_t j = 0; j < unit.Orders.size(); ++j) {
 				if (unit.Orders[j]->Action == UnitActionTrain) {
 					COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[j]);
