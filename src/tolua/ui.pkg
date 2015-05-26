@@ -315,6 +315,13 @@ class ImageWidget : public Widget
 	ImageWidget(CGraphic *image);
 };
 
+//Wyrmgus start
+class PlayerColorImageWidget : public Widget
+{
+	PlayerColorImageWidget(CGraphic *image, const std::string playercolor);
+};
+//Wyrmgus end
+
 class Button : public Widget
 {
 	//Wyrmgus start

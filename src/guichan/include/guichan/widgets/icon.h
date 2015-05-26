@@ -81,7 +81,9 @@ namespace gcn
 
         virtual void drawBorder(Graphics* graphics);
 
-    private:
+	//Wyrmgus start
+//    private:
+	//Wyrmgus end
         Image* mImage;
     };
 }

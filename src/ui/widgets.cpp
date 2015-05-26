@@ -325,6 +325,37 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 
 #endif
 
+//Wyrmgus start
+/*----------------------------------------------------------------------------
+--  PlayerColorImageWidget
+----------------------------------------------------------------------------*/
+
+void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
+{
+	// make the widget's image be player-colored
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		int WidgetPlayerColorIndexFromName = 0;
+		for (int i = 0; i < PlayerColorMax; ++i) {
+			if (PlayerColorNames[i] == WidgetPlayerColor) {
+				WidgetPlayerColorIndexFromName = i;
+				break;
+			}
+		}
+		if (!((CPlayerColorGraphic *)mImage)->PlayerColorTextures[WidgetPlayerColorIndexFromName]) {
+			MakePlayerColorTexture(((CPlayerColorGraphic *)mImage), WidgetPlayerColorIndexFromName);
+		}
+		((CPlayerColorGraphic *)mImage)->Textures = ((CPlayerColorGraphic *)mImage)->PlayerColorTextures[WidgetPlayerColorIndexFromName];
+	} else
+#endif
+	{
+		WidgetGraphicPlayerPixels(WidgetPlayerColor, *((CPlayerColorGraphic *)mImage));
+	}
+		
+	graphics->drawImage(mImage, 0, 0);
+}
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  ImageButton
 ----------------------------------------------------------------------------*/

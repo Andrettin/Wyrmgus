@@ -1318,6 +1318,14 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->Name.c_str());
 	} else if (!strcmp(value, "Trait")) {
 		lua_pushstring(l, unit->Trait.c_str());
+	} else if (!strcmp(value, "Icon")) {
+		VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
+		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+			lua_pushstring(l, varinfo->Icon.Name.c_str());
+		} else {
+			lua_pushstring(l, unit->Type->Icon.Name.c_str());
+		}
+		return 1;
 	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables

@@ -81,6 +81,18 @@ public:
 	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
 };
 
+//Wyrmgus start
+class PlayerColorImageWidget : public gcn::Icon
+{
+public:
+	explicit PlayerColorImageWidget(gcn::Image *img, const std::string &playercolor) : gcn::Icon(img), WidgetPlayerColor(playercolor) {}
+
+	virtual void draw(gcn::Graphics *graphics);
+
+	std::string WidgetPlayerColor;
+};
+//Wyrmgus end
+
 class ButtonWidget : public gcn::Button
 {
 public:

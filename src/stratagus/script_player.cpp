@@ -947,6 +947,16 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "RaceName")) {
 		lua_pushstring(l, PlayerRaces.Name[p->Race].c_str());
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "Color")) {
+		for (int i = 0; i < PlayerColorMax; ++i) {
+			if (PlayerColors[i][0] == p->Color) {
+				lua_pushstring(l, PlayerColorNames[i].c_str());
+				break;
+			}		
+		}
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 3);
 
