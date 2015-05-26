@@ -141,6 +141,9 @@ static const char SIGHTRANGE_KEY[] = "SightRange";
 static const char ATTACKRANGE_KEY[] = "AttackRange";
 static const char PIERCINGDAMAGE_KEY[] = "PiercingDamage";
 static const char BASICDAMAGE_KEY[] = "BasicDamage";
+//Wyrmgus start
+static const char THORNSDAMAGE_KEY[] = "ThornsDamage";
+//Wyrmgus end
 static const char POSX_KEY[] = "PosX";
 static const char POSY_KEY[] = "PosY";
 static const char TARGETPOSX_KEY[] = "TargetPosX";
@@ -219,7 +222,10 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   RESEARCH_KEY, TRAINING_KEY, UPGRADETO_KEY, GIVERESOURCE_KEY,
 							   CARRYRESOURCE_KEY, XP_KEY, KILL_KEY,	SUPPLY_KEY, DEMAND_KEY, ARMOR_KEY,
 							   SIGHTRANGE_KEY, ATTACKRANGE_KEY, PIERCINGDAMAGE_KEY,
-							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
+							   //Wyrmgus start
+//							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
+							   BASICDAMAGE_KEY, THORNSDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
+							   //Wyrmgus end
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
 							   MAXHARVESTERS_KEY, POISON_KEY, SHIELDPERMEABILITY_KEY, SHIELDPIERCING_KEY, ISALIVE_KEY, PLAYER_KEY,
@@ -2201,6 +2207,9 @@ void UpdateUnitVariables(CUnit &unit)
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
+			//Wyrmgus start
+			|| i == THORNSDAMAGE_INDEX
+			//Wyrmgus end
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX || i == GIVERESOURCE_INDEX
 			|| i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == HP_INDEX

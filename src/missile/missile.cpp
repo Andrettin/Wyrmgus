@@ -561,6 +561,17 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			damage = CalculateDamage(unit, *goal, Damage);
 			HitUnit(&unit, *goal, damage);
 			PlayUnitSound(unit, VoiceHit);
+			
+			//apply Thorns damage if attacker is at melee range
+			if (goal && goal->Variable[THORNSDAMAGE_INDEX].Value && unit.MapDistanceTo(*goal) <= 1) {
+				int thorns_damage = std::max<int>(goal->Variable[THORNSDAMAGE_INDEX].Value - unit.Variable[ARMOR_INDEX].Value, 1);
+				if (GameSettings.NoRandomness) {
+					thorns_damage -= ((thorns_damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
+				} else {
+					thorns_damage -= SyncRand() % ((thorns_damage + 2) / 2);
+				}
+				HitUnit(goal, unit, thorns_damage);
+			}
 		} else {
 			PlayUnitSound(unit, VoiceMiss);
 		}
@@ -1031,6 +1042,19 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		}
 
 		HitUnit(missile.SourceUnit, goal, damage, &missile);
+		
+		//Wyrmgus start
+		//apply Thorns damage if attacker is at melee range
+		if (&goal && goal.Variable[THORNSDAMAGE_INDEX].Value && missile.SourceUnit->MapDistanceTo(goal) <= 1) {
+			int thorns_damage = std::max<int>(goal.Variable[THORNSDAMAGE_INDEX].Value - missile.SourceUnit->Variable[ARMOR_INDEX].Value, 1);
+			if (GameSettings.NoRandomness) {
+				thorns_damage -= ((thorns_damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
+			} else {
+				thorns_damage -= SyncRand() % ((thorns_damage + 2) / 2);
+			}
+			HitUnit(&goal, *missile.SourceUnit, thorns_damage);
+		}
+		//Wyrmgus end
 	}
 }
 
