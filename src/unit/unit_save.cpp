@@ -332,6 +332,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 		file.printf("}");
 	}
+	//Wyrmgus start
+	file.printf(",\n  \"variation\", %d,", unit.Variation);
+	//Wyrmgus end
 
 	file.printf("})\n");
 }

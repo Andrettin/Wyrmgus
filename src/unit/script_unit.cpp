@@ -578,6 +578,11 @@ static int CclUnit(lua_State *l)
 				unit->SpellCoolDownTimers[k] = LuaToNumber(l, -1, k + 1);
 			}
 			lua_pop(l, 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "variation")) {
+			// FIXME : unsigned long should be better handled
+			unit->Variation = LuaToNumber(l, 2, j + 1);
+		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (index != -1) { // Valid index
