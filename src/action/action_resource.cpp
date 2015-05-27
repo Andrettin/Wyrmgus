@@ -655,15 +655,17 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
 
 	//Wyrmgus start
+	const CUnitType &source_type = *source.Type;
+	
 //	Assert((unit.Container == &source && !resinfo.HarvestFromOutside)
 //		   || (!unit.Container && resinfo.HarvestFromOutside));
-	Assert((unit.Container == &source && !source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value)
-		   || (!unit.Container && source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value));
+	Assert((unit.Container == &source && !source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value)
+		   || (!unit.Container && source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value));
 	//Wyrmgus end
 
 	//Wyrmgus start
 //	if (resinfo.HarvestFromOutside) {
-	if (source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
+	if (source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 	//Wyrmgus end
 		this->ClearGoal();
 		--source.Resource.Active;
@@ -672,7 +674,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	// Continue to harvest if we aren't fully loaded
 	//Wyrmgus start
 //	if (resinfo.HarvestFromOutside && unit.ResourcesHeld < resinfo.ResourceCapacity) {
-	if (source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value && unit.ResourcesHeld < resinfo.ResourceCapacity) {
+	if (source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value && unit.ResourcesHeld < resinfo.ResourceCapacity) {
 	//Wyrmgus end
 		CUnit *goal = UnitFindResource(unit, unit, 15, this->CurrentResource, 1);
 
@@ -705,7 +707,7 @@ void COrder_Resource::LoseResource(CUnit &unit, CUnit &source)
 	if (unit.Container) {
 		//Wyrmgus start
 //		Assert(!resinfo.HarvestFromOutside);
-		Assert(!source.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
+		Assert(!source_type.BoolFlag[HARVESTFROMOUTSIDE_INDEX].value);
 		//Wyrmgus end
 		DropOutOnSide(unit, LookingW, &source);
 	}
