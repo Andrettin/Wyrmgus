@@ -75,7 +75,10 @@ public:
 	CServerSetup() { Clear(); }
 	size_t Serialize(unsigned char *p) const;
 	size_t Deserialize(const unsigned char *p);
-	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
+	//Wyrmgus start
+//	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
+	static size_t Size() { return 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 * PlayerMax + 1 * PlayerMax + 1 * PlayerMax; }
+	//Wyrmgus end
 	void Clear();
 
 	bool operator == (const CServerSetup &rhs) const;
