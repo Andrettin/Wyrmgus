@@ -1400,8 +1400,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->BuilderLost = parent_type->BuilderLost;
 			type->AutoBuildRate = parent_type->AutoBuildRate;
 			type->Animations = parent_type->Animations;
-			type->BuildingRules = parent_type->BuildingRules;
-			type->AiBuildingRules = parent_type->AiBuildingRules;
 			type->Sound = parent_type->Sound;
 			if (parent_type->CanCastSpell) {
 				type->CanCastSpell = new char[SpellTypeTable.size()];
@@ -1424,7 +1422,9 @@ static int CclDefineUnitType(lua_State *l)
 				type->CanStore[i] = parent_type->CanStore[i];
 			}
 			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-				type->DefaultStat.Variables[i] = parent_type->DefaultStat.Variables[i];
+				type->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
+				type->DefaultStat.Variables[i].Value = parent_type->DefaultStat.Variables[i].Value;
+				type->DefaultStat.Variables[i].Max = parent_type->DefaultStat.Variables[i].Max;
 			}
 			for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) {
 				type->BoolFlag[i].value = parent_type->BoolFlag[i].value;
