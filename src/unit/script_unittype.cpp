@@ -1433,9 +1433,36 @@ static int CclDefineUnitType(lua_State *l)
 			for (unsigned int i = 0; i < UnitTypeMax; ++i) {
 				type->Drops[i] = parent_type->Drops[i];
 			}
-			for (unsigned int var = 0; var < VariationMax; ++var) {
-				if (parent_type->VarInfo[var]) {
-					type->VarInfo[var] = parent_type->VarInfo[var];
+			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
+				if (parent_type->VarInfo[var_n]) {
+					VariationInfo *var = new VariationInfo;
+					
+					type->VarInfo[var_n] = var;
+					
+					var->VariationId = parent_type->VarInfo[var_n]->VariationId;
+					var->TypeName = parent_type->VarInfo[var_n]->TypeName;
+					var->File = parent_type->VarInfo[var_n]->File;
+					for (unsigned int i = 0; i < MaxCosts; ++i) {
+						var->FileWhenLoaded[i] = parent_type->VarInfo[var_n]->FileWhenLoaded[i];
+						var->FileWhenEmpty[i] = parent_type->VarInfo[var_n]->FileWhenEmpty[i];
+					}
+					var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
+					var->HairFile = parent_type->VarInfo[var_n]->HairFile;
+					var->PantsFile = parent_type->VarInfo[var_n]->PantsFile;
+					var->ShieldFile = parent_type->VarInfo[var_n]->ShieldFile;
+					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
+					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
+					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
+					var->Icon.Icon = NULL;
+					if (parent_type->VarInfo[var_n]->Animations) {
+						var->Animations = parent_type->VarInfo[var_n]->Animations;
+					}
+					var->Construction = parent_type->VarInfo[var_n]->Construction;
+					for (int u = 0; u < VariationMax; ++u) {
+						var->UpgradesRequired[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
+						var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
+					}
+					var->Tileset = parent_type->VarInfo[var_n]->Tileset;
 				}
 			}
 			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
