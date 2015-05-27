@@ -685,40 +685,42 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		//Wyrmgus start
 //		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
 //		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		topMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		//Wyrmgus end
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
-		topMf.Value = 0;
 		//Wyrmgus start
+//		topMf.Value = 0;
+		topMf.Value = 100;
 //		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
 		//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
 		
 		//Wyrmgus start
-		topleftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		topleftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		topleftMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		topleftMf.playerInfo.SeenTile = topleftMf.getGraphicTile();
-		topleftMf.Value = 0;
+		topleftMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + topleftOffset);
 		UI.Minimap.UpdateXY(pos + topleftOffset);
 		
-		leftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		leftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		leftMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		leftMf.playerInfo.SeenTile = leftMf.getGraphicTile();
-		leftMf.Value = 0;
+		leftMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + leftOffset);
 		UI.Minimap.UpdateXY(pos + leftOffset);
 		
 //		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
 //		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		//Wyrmgus end
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 0;
 		//Wyrmgus start
+//		mf.Value = 0;
+		mf.Value = 100;
 //		mf.Flags |= MapFieldForest | MapFieldUnpassable;
 		//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos);
@@ -748,31 +750,31 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		&& this->Info.IsPointOnMap(pos + toprightOffset) && ((toprightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (toprightMf.getFlag() & MapFieldStumps) && toprightMf.Value >= ForestRegeneration && !(toprightMf.Flags & occupedFlag)) || (toprightMf.getFlag() & MapFieldForest))
 		&& this->Info.IsPointOnMap(pos + rightOffset) && ((rightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (rightMf.getFlag() & MapFieldStumps) && rightMf.Value >= ForestRegeneration && !(rightMf.Flags & occupedFlag)) || (rightMf.getFlag() & MapFieldForest))) {
 		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		topMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
-		topMf.Value = 0;
+		topMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
 		
-		toprightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		toprightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		toprightMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		toprightMf.playerInfo.SeenTile = toprightMf.getGraphicTile();
-		toprightMf.Value = 0;
+		toprightMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + toprightOffset);
 		UI.Minimap.UpdateXY(pos + toprightOffset);
 		
-		rightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		rightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		rightMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		rightMf.playerInfo.SeenTile = rightMf.getGraphicTile();
-		rightMf.Value = 0;
+		rightMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + rightOffset);
 		UI.Minimap.UpdateXY(pos + rightOffset);
 		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 0;
+		mf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);
 		
@@ -797,31 +799,31 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		&& this->Info.IsPointOnMap(pos + bottomleftOffset) && ((bottomleftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomleftMf.getFlag() & MapFieldStumps) && bottomleftMf.Value >= ForestRegeneration && !(bottomleftMf.Flags & occupedFlag)) || (bottomleftMf.getFlag() & MapFieldForest))
 		&& this->Info.IsPointOnMap(pos + leftOffset) && ((leftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (leftMf.getFlag() & MapFieldStumps) && leftMf.Value >= ForestRegeneration && !(leftMf.Flags & occupedFlag)) || (leftMf.getFlag() & MapFieldForest))) {
 		DebugPrint("Real place wood\n");
-		bottomMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		bottomMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		bottomMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		bottomMf.playerInfo.SeenTile = bottomMf.getGraphicTile();
-		bottomMf.Value = 0;
+		bottomMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
 		
-		bottomleftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		bottomleftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		bottomleftMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		bottomleftMf.playerInfo.SeenTile = bottomleftMf.getGraphicTile();
-		bottomleftMf.Value = 0;
+		bottomleftMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + bottomleftOffset);
 		UI.Minimap.UpdateXY(pos + bottomleftOffset);
 		
-		leftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		leftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		leftMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		leftMf.playerInfo.SeenTile = leftMf.getGraphicTile();
-		leftMf.Value = 0;
+		leftMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + leftOffset);
 		UI.Minimap.UpdateXY(pos + leftOffset);
 		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 0;
+		mf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);
 		
@@ -846,31 +848,31 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 		&& this->Info.IsPointOnMap(pos + bottomrightOffset) && ((bottomrightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomrightMf.getFlag() & MapFieldStumps) && bottomrightMf.Value >= ForestRegeneration && !(bottomrightMf.Flags & occupedFlag)) || (bottomrightMf.getFlag() & MapFieldForest))
 		&& this->Info.IsPointOnMap(pos + rightOffset) && ((rightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (rightMf.getFlag() & MapFieldStumps) && rightMf.Value >= ForestRegeneration && !(rightMf.Flags & occupedFlag)) || (rightMf.getFlag() & MapFieldForest))) {
 		DebugPrint("Real place wood\n");
-		bottomMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		bottomMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		bottomMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		bottomMf.playerInfo.SeenTile = bottomMf.getGraphicTile();
-		bottomMf.Value = 0;
+		bottomMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + offset);
 		UI.Minimap.UpdateXY(pos + offset);
 		
-		bottomrightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		bottomrightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		bottomrightMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		bottomrightMf.playerInfo.SeenTile = bottomrightMf.getGraphicTile();
-		bottomrightMf.Value = 0;
+		bottomrightMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + bottomrightOffset);
 		UI.Minimap.UpdateXY(pos + bottomrightOffset);
 		
-		rightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		rightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		rightMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		rightMf.playerInfo.SeenTile = rightMf.getGraphicTile();
-		rightMf.Value = 0;
+		rightMf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos + rightOffset);
 		UI.Minimap.UpdateXY(pos + rightOffset);
 		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 0);
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
 		mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 0;
+		mf.Value = 100;
 		UI.Minimap.UpdateSeenXY(pos);
 		UI.Minimap.UpdateXY(pos);
 		

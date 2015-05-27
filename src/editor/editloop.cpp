@@ -193,7 +193,14 @@ static void EditTile(const Vec2i &pos, int tile)
 	//Wyrmgus end
 	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	CMapField &mf = *Map.Field(pos);
-	mf.setTileIndex(tileset, tileIndex, 0);
+	//Wyrmgus start
+	int value = 0;
+	if ((tileset.tiles[tileIndex].flag & MapFieldForest) || (tileset.tiles[tileIndex].flag & MapFieldRocks)) {
+		value = 100;
+	}
+//	mf.setTileIndex(tileset, tileIndex, 0);
+	mf.setTileIndex(tileset, tileIndex, value);
+	//Wyrmgus end
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);
@@ -1974,7 +1981,11 @@ void CEditor::Init()
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			//Wyrmgus start
 //			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
-			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
+			int value = 0;
+			if ((tileset.tiles[tileset.getTileNumber(defaultTile, true, false)].flag & MapFieldForest) || (tileset.tiles[tileset.getTileNumber(defaultTile, true, false)].flag & MapFieldRocks)) {
+				value = 100;
+			}
+			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), value);
 			//Wyrmgus end
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;

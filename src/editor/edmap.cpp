@@ -122,7 +122,14 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 		Assert(i != 16);
 		tile += i;
 	}
-	mf.setTileIndex(*Map.Tileset, tile, 0);
+	//Wyrmgus start
+//	mf.setTileIndex(*Map.Tileset, tile, 0);
+	int value = 0;
+	if ((Map.Tileset->tiles[tile].flag & MapFieldForest) || (Map.Tileset->tiles[tile].flag & MapFieldRocks)) {
+		value = 100;
+	}
+	mf.setTileIndex(*Map.Tileset, tile, value);
+	//Wyrmgus end
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 
 	UI.Minimap.UpdateSeenXY(pos);

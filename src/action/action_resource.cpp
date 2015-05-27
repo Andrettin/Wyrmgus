@@ -809,9 +809,19 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //		if (resinfo.TerrainHarvester) {
 		if (Map.Info.IsPointOnMap(this->goalPos)) {
 		//Wyrmgus end
+			//Wyrmgus start
+			CMapField &mf = *Map.Field(this->goalPos);
+			if (addload > mf.Value) {
+				addload = mf.Value;
+			}
+			mf.Value -= addload;
+			//Wyrmgus end
 			unit.ResourcesHeld += addload;
 
-			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
+			//Wyrmgus start
+//			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
+			if (mf.Value <= 0) {
+			//Wyrmgus end
 				//Wyrmgus start
 //				Map.ClearWoodTile(this->goalPos);
 				if (this->CurrentResource == WoodCost) {

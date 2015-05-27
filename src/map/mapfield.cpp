@@ -104,7 +104,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 //#ifdef DEBUG
 	this->tilesetTile = tileIndex;
 //#endif
-	//Wyrmgus start
+	//Wyrmgus end
 }
 
 void CMapField::Save(CFile &file) const
