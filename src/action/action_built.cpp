@@ -254,10 +254,19 @@ static void Finish(COrder_Built &order, CUnit &unit)
 //	player.Notify(NotifyGreen, unit.tilePos, _("New %s done"), type.Name.c_str());
 	//Wyrmgus end
 	if (&player == ThisPlayer) {
+		//Wyrmgus start
+		/*
 		if (type.Sound.Ready.Sound) {
 			PlayUnitSound(unit, VoiceReady);
 		} else if (worker) {
 			PlayUnitSound(*worker, VoiceWorkCompleted);
+		*/
+		if (type.Sound.Ready.Sound) {
+			PlayUnitSound(unit, VoiceReady);
+		}
+		if (worker) {
+			PlayUnitSound(*worker, VoiceWorkCompleted);
+		//Wyrmgus end
 		//Wyrmgus start
 		// why play the under-construction sound if the building has just been completed?
 //		} else {

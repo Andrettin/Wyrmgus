@@ -559,7 +559,7 @@ CSound *RegisterTwoGroups(CSound *first, CSound *second)
 	id->Sound.TwoGroups.Second = second;
 	id->Range = MAX_SOUND_RANGE;
 	//Wyrmgus start
-	id->VolumePercent = 100;
+	id->VolumePercent = first->VolumePercent + second->VolumePercent / 2;
 	//Wyrmgus end
 
 	return id;

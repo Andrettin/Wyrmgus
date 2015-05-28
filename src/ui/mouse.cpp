@@ -2163,8 +2163,14 @@ void UIHandleButtonUp(unsigned button)
 					// Don't allow mixing buildings
 				} else if (KeyModifiers & ModifierShift
 						   && (unit->Player == ThisPlayer || ThisPlayer->IsTeamed(*unit))
-						   && !unit->Type->Building
-						   && (Selected.size() != 1 || !Selected[0]->Type->Building)
+						   //Wyrmgus start
+//						   && !unit->Type->Building
+						   && (!unit->Type->Building || unit->Type == Selected[0]->Type)
+						   //Wyrmgus end
+						   //Wyrmgus start
+//						   && (Selected.size() != 1 || !Selected[0]->Type->Building)
+						   && (!Selected[0]->Type->Building || unit->Type == Selected[0]->Type)
+						   //Wyrmgus end
 						   && (Selected.size() != 1 || Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0]))) {
 					num = ToggleSelectUnit(*unit);
 					if (!num) {
