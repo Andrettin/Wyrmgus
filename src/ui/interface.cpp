@@ -42,6 +42,9 @@
 #include "cursor.h"
 #include "font.h"
 #include "iolib.h"
+//Wyrmgus start
+#include "map.h"
+//Wyrmgus end
 #include "network.h"
 #include "player.h"
 #include "replay.h"
@@ -1176,12 +1179,25 @@ void HandleKeyRepeat(unsigned, unsigned keychar)
 */
 bool HandleMouseScrollArea(const PixelPos &mousePos)
 {
-	if (mousePos.x < SCROLL_LEFT) {
-		if (mousePos.y < SCROLL_UP) {
+	//Wyrmgus start
+	const PixelPos top_left_pos(UI.MapArea.X + (PixelTileSize.x - 1), UI.MapArea.Y + (PixelTileSize.y - 1));
+	const Vec2i top_left_tile_pos = UI.MouseViewport->ScreenToTilePos(top_left_pos);
+	const PixelPos bottom_right_pos(UI.MapArea.EndX - (PixelTileSize.x - 1), UI.MapArea.EndY - (PixelTileSize.y - 1));
+	const Vec2i bottom_right_tile_pos = UI.MouseViewport->ScreenToTilePos(bottom_right_pos);
+//	if (mousePos.x < SCROLL_LEFT) {
+	if (mousePos.x < SCROLL_LEFT && top_left_tile_pos.x > 0) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		if (mousePos.y < SCROLL_UP) {
+		if (mousePos.y < SCROLL_UP && top_left_tile_pos.y > 0) {
+		//Wyrmgus end
 			CursorOn = CursorOnScrollLeftUp;
 			MouseScrollState = ScrollLeftUp;
 			GameCursor = UI.ArrowNW.Cursor;
-		} else if (mousePos.y > SCROLL_DOWN) {
+		//Wyrmgus start
+//		} else if (mousePos.y > SCROLL_DOWN) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_tile_pos.y < (Map.Info.MapHeight - 1)) {
+		//Wyrmgus end
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
 			GameCursor = UI.ArrowSW.Cursor;
@@ -1190,12 +1206,21 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			MouseScrollState = ScrollLeft;
 			GameCursor = UI.ArrowW.Cursor;
 		}
-	} else if (mousePos.x > SCROLL_RIGHT) {
-		if (mousePos.y < SCROLL_UP) {
+	//Wyrmgus start
+//	} else if (mousePos.x > SCROLL_RIGHT) {
+	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_tile_pos.x < (Map.Info.MapWidth - 1)) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		if (mousePos.y < SCROLL_UP) {
+		if (mousePos.y < SCROLL_UP && top_left_tile_pos.y > 0) {
+		//Wyrmgus end
 			CursorOn = CursorOnScrollRightUp;
 			MouseScrollState = ScrollRightUp;
 			GameCursor = UI.ArrowNE.Cursor;
-		} else if (mousePos.y > SCROLL_DOWN) {
+		//Wyrmgus start
+//		} else if (mousePos.y > SCROLL_DOWN) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_tile_pos.y < (Map.Info.MapHeight - 1)) {
+		//Wyrmgus end
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
 			GameCursor = UI.ArrowSE.Cursor;
@@ -1205,11 +1230,17 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 			GameCursor = UI.ArrowE.Cursor;
 		}
 	} else {
-		if (mousePos.y < SCROLL_UP) {
+		//Wyrmgus start
+//		if (mousePos.y < SCROLL_UP) {
+		if (mousePos.y < SCROLL_UP && top_left_tile_pos.y > 0) {
+		//Wyrmgus end
 			CursorOn = CursorOnScrollUp;
 			MouseScrollState = ScrollUp;
 			GameCursor = UI.ArrowN.Cursor;
-		} else if (mousePos.y > SCROLL_DOWN) {
+		//Wyrmgus start
+//		} else if (mousePos.y > SCROLL_DOWN) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_tile_pos.y < (Map.Info.MapHeight - 1)) {
+		//Wyrmgus end
 			CursorOn = CursorOnScrollDown;
 			MouseScrollState = ScrollDown;
 			GameCursor = UI.ArrowS.Cursor;
