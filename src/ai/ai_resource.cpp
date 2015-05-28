@@ -867,8 +867,8 @@ static void AiCheckingWork()
 	// Look to the build requests, what can be done.
 	const int sz = AiPlayer->UnitTypeBuilt.size();
 	for (int i = 0; i < sz; ++i) {
-		AiBuildQueue &queue = AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-		CUnitType &type = *queue.Type;
+		AiBuildQueue *queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
+		CUnitType &type = *queuep->Type;
 
 		// FIXME: must check if requirements are fulfilled.
 		// Buildings can be destroyed.
@@ -877,9 +877,11 @@ static void AiCheckingWork()
 		if (type.Demand && !AiCheckSupply(*AiPlayer, type)) {
 			AiPlayer->NeedSupply = true;
 			AiRequestSupply();
+			// AiRequestSupply can change UnitTypeBuilt so recalculate queuep
+			queuep = &AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
 		}
 		// Check limits, AI should be broken if reached.
-		if (queue.Want > queue.Made && AiPlayer->Player->CheckLimits(type) < 0) {
+		if (queuep->Want > queuep->Made && AiPlayer->Player->CheckLimits(type) < 0) {
 			continue;
 		}
 		// Check if resources available.
@@ -889,18 +891,16 @@ static void AiCheckingWork()
 			// NOTE: we can continue and build things with lesser
 			//  resource or other resource need!
 			continue;
-		} else if (queue.Want > queue.Made && queue.Wait <= GameCycle) {
-			if (AiMakeUnit(type, queue.Pos)) {
-				// AiRequestSupply can change UnitTypeBuilt so recalculate queue
-				AiBuildQueue &queue2 = AiPlayer->UnitTypeBuilt[AiPlayer->UnitTypeBuilt.size() - sz + i];
-				++queue2.Made;
-				queue2.Wait = 0;
-			} else if (queue.Type->Building) {
+		} else if (queuep->Want > queuep->Made && queuep->Wait <= GameCycle) {
+			if (AiMakeUnit(type, queuep->Pos)) {
+				++queuep->Made;
+				queuep->Wait = 0;
+			} else if (queuep->Type->Building) {
 				// Finding a building place is costly, don't try again for a while
-				if (queue.Wait == 0) {
-					queue.Wait = GameCycle + 150;
+				if (queuep->Wait == 0) {
+					queuep->Wait = GameCycle + 150;
 				} else {
-					queue.Wait = GameCycle + 450;
+					queuep->Wait = GameCycle + 450;
 				}
 			}
 		}
