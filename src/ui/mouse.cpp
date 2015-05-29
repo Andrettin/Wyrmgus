@@ -345,7 +345,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus start
 	// make workers attack enemy units if those are right-clicked upon
-	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
+	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value || dest->Type->BoolFlag[FAUNA_INDEX].value)) { //fauna is attacked as the default right-click action
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAttack);
@@ -375,7 +375,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 
 	//Wyrmgus start
 //	if (action == MouseActionSpellCast || unit.IsEnemy(dest)) {
-	if (action == MouseActionSpellCast || unit.IsEnemy(dest) || dest.Type->BoolFlag[OBSTACLE_INDEX].value) {
+	if (action == MouseActionSpellCast || unit.IsEnemy(dest) || dest.Type->BoolFlag[OBSTACLE_INDEX].value || dest.Type->BoolFlag[FAUNA_INDEX].value) { //fauna is attacked as the default right-click action
 	//Wyrmgus end
 		dest.Blink = 4;
 		if (!acknowledged) {
@@ -1156,7 +1156,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				GameCursor = UI.RedHair.Cursor;
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer &&
-				UnitUnderCursor->Type->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->Type->GivesResource] && (UnitUnderCursor->Player == ThisPlayer || UnitUnderCursor->Player->Index == PlayerNumNeutral)
+				((UnitUnderCursor->Type->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->Type->GivesResource] && (UnitUnderCursor->Player == ThisPlayer || UnitUnderCursor->Player->Index == PlayerNumNeutral)) || UnitUnderCursor->Type->BoolFlag[FAUNA_INDEX].value)
 			) {
 				GameCursor = UI.YellowHair.Cursor;
 			} else {

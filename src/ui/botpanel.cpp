@@ -849,9 +849,6 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 	switch (button.Action) {
 		case ButtonBuild:
 		case ButtonTrain:
-		//Wyrmgus start
-		case ButtonExperienceUpgradeTo:
-		//Wyrmgus end
 		case ButtonUpgradeTo: {
 			// FIXME: store pointer in button table!
 			//Wyrmgus start
@@ -961,7 +958,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		//Wyrmgus start
 		case ButtonExperienceUpgradeTo:
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, true);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			}

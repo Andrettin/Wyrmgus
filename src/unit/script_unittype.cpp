@@ -1338,6 +1338,9 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Parent")) {
 			type->Parent = LuaToString(l, -1);
 			CUnitType *parent_type = UnitTypeByIdent(type->Parent);
+			if (!parent_type) {
+				LuaError(l, "Unit type %s not defined" _C_ type->Parent);
+			}
 			type->Class = parent_type->Class;
 			type->DrawLevel = parent_type->DrawLevel;
 			type->File = parent_type->File;

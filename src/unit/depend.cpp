@@ -178,7 +178,10 @@ static void AddDependency(const std::string &target, const std::string &required
 **
 **  @return        True if available, false otherwise.
 */
-static bool CheckDependByRule(const CPlayer &player, DependRule &rule)
+//Wyrmgus start
+//static bool CheckDependByRule(const CPlayer &player, DependRule &rule)
+static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool ignore_units)
+//Wyrmgus end
 {
 	//  Find rule
 	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
@@ -203,10 +206,20 @@ static bool CheckDependByRule(const CPlayer &player, DependRule &rule)
 		while (temp) {
 			switch (temp->Type) {
 				case DependRuleUnitType:
+					//Wyrmgus start
+					/*
 					i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
 					if (temp->Count ? i < temp->Count : i) {
 						goto try_or;
 					}
+					*/
+					if (!ignore_units) {
+						i = player.HaveUnitTypeByType(*temp->Kind.UnitType);
+						if (temp->Count ? i < temp->Count : i) {
+							goto try_or;
+						}
+					}
+					//Wyrmgus end
 					break;
 				case DependRuleUpgrade:
 					i = UpgradeIdAllowed(player, temp->Kind.Upgrade->ID) != 'R';
@@ -323,7 +336,10 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByIdent(const CPlayer &player, const std::string &target)
+//Wyrmgus start
+//bool CheckDependByIdent(const CPlayer &player, const std::string &target)
+bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units)
+//Wyrmgus end
 {
 	DependRule rule;
 
@@ -348,7 +364,10 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target)
 		DebugPrint("target `%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
 	}
-	return CheckDependByRule(player, rule);
+	//Wyrmgus start
+//	return CheckDependByRule(player, rule);
+	return CheckDependByRule(player, rule, ignore_units);
+	//Wyrmgus end
 }
 
 /**
@@ -359,7 +378,10 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target)
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByType(const CPlayer &player, const CUnitType &type)
+//Wyrmgus start
+//bool CheckDependByType(const CPlayer &player, const CUnitType &type)
+bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore_units)
+//Wyrmgus end
 {
 	if (UnitIdAllowed(player, type.Slot) == 0) {
 		return false;
@@ -368,7 +390,10 @@ bool CheckDependByType(const CPlayer &player, const CUnitType &type)
 
 	rule.Kind.UnitType = &type;
 	rule.Type = DependRuleUnitType;
-	return CheckDependByRule(player, rule);
+	//Wyrmgus start
+//	return CheckDependByRule(player, rule);
+	return CheckDependByRule(player, rule, ignore_units);
+	//Wyrmgus end
 }
 
 /**
