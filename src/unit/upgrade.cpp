@@ -106,6 +106,9 @@ const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		this->Costs[i] = rhs.Costs[i];
 		this->Storing[i] = rhs.Storing[i];
+		//Wyrmgus start
+		this->ImproveIncomes[i] = rhs.ImproveIncomes[i];
+		//Wyrmgus end
 	}
 	delete [] this->Variables;
 	const unsigned int size = UnitTypeVar.GetNumberVariable();
@@ -124,6 +127,11 @@ bool CUnitStats::operator == (const CUnitStats &rhs) const
 		if (this->Storing[i] != rhs.Storing[i]) {
 			return false;
 		}
+		//Wyrmgus start
+		if (this->ImproveIncomes[i] != rhs.ImproveIncomes[i]) {
+			return false;
+		}
+		//Wyrmgus end
 	}
 	for (unsigned int i = 0; i != UnitTypeVar.GetNumberVariable(); ++i) {
 		if (this->Variables[i] != rhs.Variables[i]) {
@@ -311,6 +319,12 @@ static int CclDefineModifier(lua_State *l)
 			const char *value = LuaToString(l, j + 1, 1);
 			const int resId = GetResourceIdByName(l, value);
 			um->Modifier.Storing[resId] = LuaToNumber(l, j + 1, 2);
+		//Wyrmgus start
+		} else if (!strcmp(key, "improve-production")) {
+			const char *value = LuaToString(l, j + 1, 2);
+			const int resId = GetResourceIdByName(l, value);
+			um->Modifier.ImproveIncomes[resId] = LuaToNumber(l, j + 1, 3);
+		//Wyrmgus end
 		} else if (!strcmp(key, "allow-unit")) {
 			const char *value = LuaToString(l, j + 1, 2);
 
@@ -745,6 +759,21 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				stat.Costs[j] += um->Modifier.Costs[j];
 				stat.Storing[j] += um->Modifier.Storing[j];
+				//Wyrmgus start
+				if (um->Modifier.ImproveIncomes[j]) {
+					if (!stat.ImproveIncomes[j]) {
+						stat.ImproveIncomes[j] += DefaultIncomes[j] + um->Modifier.ImproveIncomes[j];
+					} else {
+						stat.ImproveIncomes[j] += um->Modifier.ImproveIncomes[j];
+					}
+					//update player's income
+					std::vector<CUnit *> unitupgrade;
+					FindUnitsByType(*UnitTypes[z], unitupgrade);
+					if (unitupgrade.size() > 0) {
+						player.Incomes[j] = std::max(player.Incomes[j], stat.ImproveIncomes[j]);
+					}
+				}
+				//Wyrmgus end
 			}
 
 			int varModified = 0;
@@ -966,6 +995,18 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				stat.Costs[j] -= um->Modifier.Costs[j];
 				stat.Storing[j] -= um->Modifier.Storing[j];
+				//Wyrmgus start
+				stat.ImproveIncomes[j] -= um->Modifier.ImproveIncomes[j];
+				//if this was the highest improve income, search for another
+				if (player.Incomes[j] && (stat.ImproveIncomes[j] + um->Modifier.ImproveIncomes[j]) == player.Incomes[j]) {
+					int m = DefaultIncomes[j];
+
+					for (int k = 0; k < player.GetUnitCount(); ++k) {
+						m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
+					}
+					player.Incomes[j] = m;
+				}
+				//Wyrmgus end
 			}
 
 			int varModified = 0;

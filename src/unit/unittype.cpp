@@ -661,8 +661,8 @@ CUnitType::CUnitType() :
 	//Wyrmgus start
 	memset(VarInfo, 0, sizeof(VarInfo));
 	memset(Drops, 0, sizeof(Drops));
+//	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	//Wyrmgus end
-	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 }
 
@@ -1070,6 +1070,15 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Storing[i]);
 	}
+	//Wyrmgus start
+	file.printf("},\n\"improve-production\", {");
+	for (unsigned int i = 0; i < MaxCosts; ++i) {
+		if (i) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ImproveIncomes[i]);
+	}
+	//Wyrmgus end
 	file.printf("}})\n");
 	return true;
 }

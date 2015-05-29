@@ -634,7 +634,10 @@ static int CclDefineUnitType(lua_State *l)
 				const int res = CclGetResourceByName(l);
 				lua_pop(l, 1);
 				++k;
-				type->ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1, k + 1);
+				//Wyrmgus start
+//				type->ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1, k + 1);
+				type->DefaultStat.ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1, k + 1);
+				//Wyrmgus end
 			}
 		} else if (!strcmp(value, "Construction")) {
 			// FIXME: What if constructions aren't yet loaded?
@@ -1421,7 +1424,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (unsigned int i = 0; i < MaxCosts; ++i) {
 				type->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
 				type->RepairCosts[i] = parent_type->RepairCosts[i];
-				type->ImproveIncomes[i] = parent_type->ImproveIncomes[i];
+				type->DefaultStat.ImproveIncomes[i] = parent_type->DefaultStat.ImproveIncomes[i];
 				type->CanStore[i] = parent_type->CanStore[i];
 			}
 			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
@@ -1620,6 +1623,23 @@ static int CclDefineUnitStats(lua_State *l)
 				stats->Storing[resId] = LuaToNumber(l, -1, k + 1);
 				lua_pop(l, 1);
 			}
+		//Wyrmgus start
+		} else if (!strcmp(value, "improve-production")) {
+			lua_rawgeti(l, 3, j + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, 3, j + 1);
+				value = LuaToString(l, -1, k + 1);
+				++k;
+				const int resId = GetResourceIdByName(l, value);
+				stats->ImproveIncomes[resId] = LuaToNumber(l, -1, k + 1);
+				lua_pop(l, 1);
+			}
+		//Wyrmgus end
 		} else {
 			int i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // valid index
