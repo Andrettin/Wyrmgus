@@ -129,6 +129,30 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 {
 	IntColor color;
 
+	//Wyrmgus start
+	const CUnitType &type = *unit.Type;
+	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
+	int frame_width = type.Width;
+	int frame_height = type.Height;
+	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
+	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
+	VariationInfo *varinfo = type.VarInfo[unit.Variation];
+	if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight) {
+		frame_width = varinfo->FrameWidth;
+		frame_height = varinfo->FrameHeight;
+		sprite_width = (varinfo->Sprite ? varinfo->Sprite->Width : 0);
+		sprite_height = (varinfo->Sprite ? varinfo->Sprite->Height : 0);
+	}
+	const int x = screenPos.x - type.BoxWidth / 2 - (frame_width - sprite_width) / 2;
+	const int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
+	
+	// show player color circle below unit if that is activated
+	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral) {
+//		DrawSelectionCircle(unit.Player->Color, x + type.BoxOffsetX + 1, y + type.BoxOffsetY + 1, x + type.BoxWidth + type.BoxOffsetX - 1, y + type.BoxHeight + type.BoxOffsetY - 1);
+		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
+	}
+	//Wyrmgus end
+	
 	// FIXME: make these colors customizable with scripts.
 
 	if (Editor.Running && UnitUnderCursor == &unit && Editor.State == EditorSelecting) {
@@ -159,9 +183,10 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		return;
 	}
 
+	//Wyrmgus start
+	/*
 	const CUnitType &type = *unit.Type;
 	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
-	//Wyrmgus start
 //	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
 //	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
 	int frame_width = type.Width;
@@ -177,8 +202,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	}
 	const int x = screenPos.x - type.BoxWidth / 2 - (frame_width - sprite_width) / 2;
 	const int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
+	*/
 	//Wyrmgus end
-
+	
 	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX, y + type.BoxHeight + type.BoxOffsetY);
 }
 
@@ -1083,6 +1109,14 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 
 	//Wyrmgus start
+	//
+	// Show that the unit is selected
+	//
+	// draw it under everything else
+	DrawUnitSelection(vp, *this);
+	//Wyrmgus end
+
+	//Wyrmgus start
 	VariationInfo *varinfo = type->VarInfo[this->Variation];
 	//Wyrmgus end
 
@@ -1108,10 +1142,12 @@ void CUnit::Draw(const CViewport &vp) const
 		//Wyrmgus end
 	}
 
+	//Wyrmgus start
 	//
 	// Show that the unit is selected
 	//
-	DrawUnitSelection(vp, *this);
+//	DrawUnitSelection(vp, *this);
+	//Wyrmgus end
 
 	//
 	// Adjust sprite for Harvesters.
@@ -1206,7 +1242,7 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawOverlay(*type, light_sprite, player, frame, screenPos);
 	}
 	//Wyrmgus end
-
+	
 	// Unit's extras not fully supported.. need to be decorations themselves.
 	DrawInformations(*this, *type, screenPos);
 }

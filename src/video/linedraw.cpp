@@ -1512,14 +1512,20 @@ void DrawRectangleClip(Uint32 color, int x, int y,
 	// Draw (part of) rectangle sides
 	// Note: _hline and _vline should be able to handle zero width/height
 	if (top) {
-		DrawHLine(color, x, y, w);
+		//Wyrmgus start
+//		DrawHLine(color, x, y, w);
+		DrawHLine(color, x, y, w - 1);
+		//Wyrmgus end
 		if (!--h) {
 			return;                    // rectangle as horizontal line
 		}
 		++y;
 	}
 	if (bottom) {
-		DrawHLine(color, x, y + h - 1, w);
+		//Wyrmgus start
+//		DrawHLine(color, x, y + h - 1, w);
+		DrawHLine(color, x, y + h - 1, w - 1);
+		//Wyrmgus end
 		--h;
 	}
 	if (left) {
