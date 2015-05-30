@@ -90,6 +90,9 @@ namespace gcn
         mBackgroundColor = Color(0xffffff);
         mBaseColor = Color(0x808090);
         mBorderSize = 0;
+        //Wyrmgus start
+        mTooltip = "";
+        //Wyrmgus end
         mFocusHandler = NULL;
         mFocusable = false;
         mClickTimeStamp = 0;
@@ -189,6 +192,18 @@ namespace gcn
     {
         return mBorderSize;
     }
+	
+	//Wyrmgus start
+    void Widget::setTooltip(const std::string& tooltip)
+    {
+        mTooltip = tooltip;
+    }
+
+    const std::string& Widget::getTooltip() const
+    {
+        return mTooltip;
+    }
+	//Wyrmgus end
 
     const Rectangle& Widget::getDimension() const
     {

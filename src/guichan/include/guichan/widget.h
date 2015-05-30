@@ -241,6 +241,22 @@ namespace gcn
          */
         virtual unsigned int getBorderSize() const;
 
+		//Wyrmgus start
+        /**
+         * Sets the Widget tooltip.
+         *
+         * @param tooltip the Widget tooltip.
+         */
+        virtual void setTooltip(const std::string& tooltip);
+
+        /**
+         * Gets the Widget tooltip.
+         *
+         * @return the Widget tooltip.
+         */
+        virtual const std::string& getTooltip() const;
+		//Wyrmgus end
+		
         /**
          * Gets the dimension of the Widget. It is relative to it's parent.
          *
@@ -694,6 +710,9 @@ namespace gcn
         BasicContainer* mParent;
         Rectangle mDimension;
         unsigned int mBorderSize;
+        //Wyrmgus start
+        std::string mTooltip;
+        //Wyrmgus end
         std::string mEventId;
         int mClickTimeStamp;
         int mClickCount;

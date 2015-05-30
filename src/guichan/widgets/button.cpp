@@ -59,11 +59,6 @@
 #include "guichan/widgets/button.h"
 #include "guichan/exception.h"
 #include "guichan/mouseinput.h"
-//Wyrmgus start
-#include "stratagus.h"
-#include "font.h"
-#include "video.h"
-//Wyrmgus end
 
 namespace gcn
 {
@@ -120,16 +115,6 @@ namespace gcn
     }
 
     //Wyrmgus start
-    void Button::setTooltip(const std::string& tooltip)
-    {
-        mTooltip = tooltip;
-    }
-
-    const std::string& Button::getTooltip() const
-    {
-        return mTooltip;
-    }
-
     void Button::setActsPressed(bool actsPressed)
     {
         mActsPressed = actsPressed;
@@ -285,17 +270,6 @@ namespace gcn
             mMouseDown = false;
         }
     }
-
-    //Wyrmgus start
-    void Button::mouseMotion(int x, int y)
-    {
-        if (hasMouse() && getTooltip() != "") //if mouse is hovering the button, show tooltip
-        {
-			CLabel label(GetGameFont());
-			label.Draw(2 + 16, Video.Height + 2 - 16, getTooltip());
-        }
-    }
-    //Wyrmgus end
 
     bool Button::keyPress(const Key& key)
     {

@@ -58,6 +58,11 @@
 #include <assert.h>
 #include "guichan/exception.h"
 #include "guichan/widgets/container.h"
+//Wyrmgus start
+#include "stratagus.h"
+#include "font.h"
+#include "video.h"
+//Wyrmgus end
 
 namespace gcn
 {
@@ -148,6 +153,18 @@ namespace gcn
                 graphics->popClipArea();
             }
         }
+		
+		//Wyrmgus start
+		//if mouse is hovering the widget, show tooltip
+        for (iter = mWidgets.begin(); iter != mWidgets.end(); iter++)
+        {
+            if ((*iter)->hasMouse() && (*iter)->getTooltip() != "")
+            {
+				CLabel label(GetGameFont());
+				label.Draw(2 + 16, Video.Height + 2 - 16, (*iter)->getTooltip());
+            }
+        }
+		//Wyrmgus end
     }
 
     void Container::setOpaque(bool opaque)

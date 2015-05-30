@@ -118,20 +118,6 @@ namespace gcn
 
 		//Wyrmgus start
         /**
-         * Sets the Button tooltip.
-         *
-         * @param tooltip the Button tooltip.
-         */
-        virtual void setTooltip(const std::string& tooltip);
-
-        /**
-         * Gets the Button tooltip.
-         *
-         * @return the Button tooltip.
-         */
-        virtual const std::string& getTooltip() const;
-
-        /**
          * Sets whether the Button continuously generates an action while pressed.
          *
          * @param bool.
@@ -178,10 +164,6 @@ namespace gcn
 
         virtual void mouseRelease(int x, int y, int button);
 
-        //Wyrmgus start
-        virtual void mouseMotion(int x, int y);
-        //Wyrmgus end
-
 
         // Inherited from KeyListener
 
@@ -191,9 +173,6 @@ namespace gcn
 
     protected:
         std::string mCaption;
-        //Wyrmgus start
-        std::string mTooltip;
-        //Wyrmgus end
         bool mMouseDown, mKeyDown, mHotKeyDown;
         //Wyrmgus start
         bool mActsPressed;
