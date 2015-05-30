@@ -128,6 +128,12 @@ CCursor *CursorByIdent(const std::string &ident)
 		if (cursor.Ident != ident || !cursor.G->IsLoaded()) {
 			continue;
 		}
+		//Wyrmgus start
+		if (!ThisPlayer && cursor.Race != PlayerRaces.Name[Players[0].Race]) {
+			continue;
+		}
+		//Wyrmgus end
+		
 		if (cursor.Race.empty() || !ThisPlayer || cursor.Race == PlayerRaces.Name[ThisPlayer->Race]) {
 			return &cursor;
 		}
