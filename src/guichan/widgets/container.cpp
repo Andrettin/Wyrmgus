@@ -319,7 +319,9 @@ namespace gcn
                 return;
             }
         }
-		assert(!"There is no such widget in this container.");
+		//Wyrmgus start
+//		assert(!"There is no such widget in this container."); //maybe restore this later after improves to ui.pkg's widget remove?
+		//Wyrmgus end
         //throw GCN_EXCEPTION("There is no such widget in this container.");
     }
 

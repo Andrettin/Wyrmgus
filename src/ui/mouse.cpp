@@ -330,7 +330,10 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	// Follow another unit
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
-		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
+		//Wyrmgus start
+//		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
+		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || (dest->Player->Index == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value && !dest->Type->BoolFlag[FAUNA_INDEX].value))) {
+		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
