@@ -147,9 +147,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	const int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
-	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral) {
-//		DrawSelectionCircle(unit.Player->Color, x + type.BoxOffsetX + 1, y + type.BoxOffsetY + 1, x + type.BoxWidth + type.BoxOffsetX - 1, y + type.BoxHeight + type.BoxOffsetY - 1);
-		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
+	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitActionDie) {
+		DrawSelectionCircleWithTrans(unit.Player->Color, x + type.BoxOffsetX + 1, y + type.BoxOffsetY + 1, x + type.BoxWidth + type.BoxOffsetX - 1, y + type.BoxHeight + type.BoxOffsetY - 1);
+//		DrawSelectionRectangle(unit.Player->Color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX + 1, y + type.BoxHeight + type.BoxOffsetY + 1);
 	}
 	//Wyrmgus end
 	
@@ -243,8 +243,12 @@ void DrawSelectionCircleWithTrans(IntColor color, int x1, int y1, int x2, int y2
 {
 	Video.FillTransCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 							  std::min((x2 - x1) / 2, (y2 - y1) / 2), 95);
+	//Wyrmgus start
+	/*
 	Video.DrawCircleClip(color, (x1 + x2) / 2, (y1 + y2) / 2,
 						 std::min((x2 - x1) / 2, (y2 - y1) / 2));
+	*/
+	//Wyrmgus end
 }
 
 /**

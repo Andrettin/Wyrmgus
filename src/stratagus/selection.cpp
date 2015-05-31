@@ -577,6 +577,14 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 	//check if has non-building
 	bool hasNonBuilding = false;
 	
+	if (Selected.size()) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
+			if (!Selected[i]->Type->Building) {
+				hasNonBuilding = true;
+			}
+		}
+	}
+		
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 		
@@ -600,7 +608,11 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 		}
 		//Wyrmgus start
 		//only select buildings if another building of the same type is already selected
-		if (unit.Type->Building && ((i != 0 && unit.Type != table[0]->Type) || hasNonBuilding)) {
+		if (unit.Type->Building && ((i != 0 && unit.Type != table[0]->Type) || (Selected.size() && unit.Type != Selected[0]->Type) || hasNonBuilding)) {
+			continue;
+		}
+		//don't select units if a building is selected
+		if (!unit.Type->Building && Selected.size() && Selected[0]->Type->Building) {
 			continue;
 		}
 		//Wyrmgus end
