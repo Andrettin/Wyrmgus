@@ -1180,23 +1180,26 @@ void HandleKeyRepeat(unsigned, unsigned keychar)
 bool HandleMouseScrollArea(const PixelPos &mousePos)
 {
 	//Wyrmgus start
-	const PixelPos top_left_pos(UI.MapArea.X + (PixelTileSize.x - 1), UI.MapArea.Y + (PixelTileSize.y - 1));
-	const Vec2i top_left_tile_pos = UI.MouseViewport->ScreenToTilePos(top_left_pos);
-	const PixelPos bottom_right_pos(UI.MapArea.EndX - (PixelTileSize.x - 1), UI.MapArea.EndY - (PixelTileSize.y - 1));
-	const Vec2i bottom_right_tile_pos = UI.MouseViewport->ScreenToTilePos(bottom_right_pos);
+	if (!UI.MapArea.EndX || !UI.MapArea.EndY || !UI.SelectedViewport) {
+		return false;
+	}
+	const PixelPos top_left_pos(UI.MapArea.X, UI.MapArea.Y);
+	const PixelPos top_left_map_pos = UI.SelectedViewport->ScreenToMapPixelPos(top_left_pos);
+	const PixelPos bottom_right_pos(UI.MapArea.EndX, UI.MapArea.EndY);
+	const PixelPos bottom_right_map_pos = UI.SelectedViewport->ScreenToMapPixelPos(bottom_right_pos);
 //	if (mousePos.x < SCROLL_LEFT) {
-	if (mousePos.x < SCROLL_LEFT && top_left_tile_pos.x > 0) {
+	if (mousePos.x < SCROLL_LEFT && top_left_map_pos.x > 0) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
-		if (mousePos.y < SCROLL_UP && top_left_tile_pos.y > 0) {
+		if (mousePos.y < SCROLL_UP && top_left_map_pos.y > 0) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollLeftUp;
 			MouseScrollState = ScrollLeftUp;
 			GameCursor = UI.ArrowNW.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_tile_pos.y < (Map.Info.MapHeight - 1)) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeight * PixelTileSize.y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollLeftDown;
 			MouseScrollState = ScrollLeftDown;
@@ -1208,18 +1211,18 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 		}
 	//Wyrmgus start
 //	} else if (mousePos.x > SCROLL_RIGHT) {
-	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_tile_pos.x < (Map.Info.MapWidth - 1)) {
+	} else if (mousePos.x > SCROLL_RIGHT && bottom_right_map_pos.x < (Map.Info.MapWidth * PixelTileSize.x) - 1) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
-		if (mousePos.y < SCROLL_UP && top_left_tile_pos.y > 0) {
+		if (mousePos.y < SCROLL_UP && top_left_map_pos.y > 0) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollRightUp;
 			MouseScrollState = ScrollRightUp;
 			GameCursor = UI.ArrowNE.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_tile_pos.y < (Map.Info.MapHeight - 1)) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeight * PixelTileSize.y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollRightDown;
 			MouseScrollState = ScrollRightDown;
@@ -1232,14 +1235,14 @@ bool HandleMouseScrollArea(const PixelPos &mousePos)
 	} else {
 		//Wyrmgus start
 //		if (mousePos.y < SCROLL_UP) {
-		if (mousePos.y < SCROLL_UP && top_left_tile_pos.y > 0) {
+		if (mousePos.y < SCROLL_UP && top_left_map_pos.y > 0) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollUp;
 			MouseScrollState = ScrollUp;
 			GameCursor = UI.ArrowN.Cursor;
 		//Wyrmgus start
 //		} else if (mousePos.y > SCROLL_DOWN) {
-		} else if (mousePos.y > SCROLL_DOWN && bottom_right_tile_pos.y < (Map.Info.MapHeight - 1)) {
+		} else if (mousePos.y > SCROLL_DOWN && bottom_right_map_pos.y < (Map.Info.MapHeight * PixelTileSize.y) - 1) {
 		//Wyrmgus end
 			CursorOn = CursorOnScrollDown;
 			MouseScrollState = ScrollDown;
