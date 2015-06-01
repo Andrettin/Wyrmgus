@@ -634,10 +634,6 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 		if (added_table == false && unit.Type->Building && ((i != 0 && unit.Type != table[0]->Type) || hasNonBuilding)) {
 			continue;
 		}
-		//don't select units if a building is selected
-		if (added_table == false && !unit.Type->Building && i != 0 && table[0]->Type->Building) {
-			continue;
-		}
 		//Wyrmgus end
 		table[n++] = &unit;
 		if (n == MaxSelectable) {
