@@ -307,6 +307,11 @@ int ToggleSelectUnit(CUnit &unit)
 		UnSelectUnit(unit);
 		return 0;
 	}
+	//Wyrmgus start
+	if (Selected.size() && ((Selected[0]->Type->Building && (!unit.Type->Building || unit.Type != Selected[0]->Type)) || Selected[0]->Type->Building != unit.Type->Building)) {
+		return 0;
+	}
+	//Wyrmgus end
 	SelectUnit(unit);
 	return 1;
 }
@@ -432,6 +437,12 @@ int ToggleUnitsByType(CUnit &base)
 		return 0;
 	}
 
+	//Wyrmgus start
+	if (Selected.size() && ((Selected[0]->Type->Building && (!base.Type->Building || base.Type != Selected[0]->Type)) || Selected[0]->Type->Building != base.Type->Building)) {
+		return 0;
+	}
+	//Wyrmgus end
+	
 	if (!SelectUnit(base)) { // Add base to selection
 		return 0;
 	}
@@ -469,6 +480,15 @@ int ToggleUnitsByType(CUnit &base)
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
+		//Wyrmgus start
+		if (unit.Type->Building && Selected.size() && (!Selected[0]->Type->Building || unit.Type != Selected[0]->Type)) {
+			continue;
+		}
+		//don't select units if a building is selected
+		if (!unit.Type->Building && Selected.size() && Selected[0]->Type->Building) {
+			continue;
+		}
+		//Wyrmgus end
 		if (!SelectUnit(unit)) { // add unit to selection
 			return Selected.size();
 		}
@@ -527,6 +547,12 @@ int AddGroupFromUnitToSelection(CUnit &unit)
 	if (!group) { // belongs to no group
 		return 0;
 	}
+	
+	//Wyrmgus start
+	if (Selected.size() && ((Selected[0]->Type->Building && (!unit.Type->Building || unit.Type != Selected[0]->Type)) || Selected[0]->Type->Building != unit.Type->Building)) {
+		return 0;
+	}
+	//Wyrmgus end
 
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
@@ -569,7 +595,10 @@ int SelectGroupFromUnit(CUnit &unit)
 **
 **  return true if at least a unit is found;
 */
-static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
+//Wyrmgus start
+//static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
+static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_table)
+//Wyrmgus end
 {
 	unsigned int n = 0;
 	
@@ -577,19 +606,13 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 	//check if has non-building
 	bool hasNonBuilding = false;
 	
-	if (Selected.size()) {
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			if (!Selected[i]->Type->Building) {
+	if (added_table == false) {
+		for (size_t i = 0; i != table.size(); ++i) {
+			CUnit &unit = *table[i];
+			
+			if (!unit.Type->Building) {
 				hasNonBuilding = true;
 			}
-		}
-	}
-		
-	for (size_t i = 0; i != table.size(); ++i) {
-		CUnit &unit = *table[i];
-		
-		if (!unit.Type->Building) {
-			hasNonBuilding = true;
 		}
 	}
 	//Wyrmgus end
@@ -608,11 +631,11 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table)
 		}
 		//Wyrmgus start
 		//only select buildings if another building of the same type is already selected
-		if (unit.Type->Building && ((i != 0 && unit.Type != table[0]->Type) || (Selected.size() && unit.Type != Selected[0]->Type) || hasNonBuilding)) {
+		if (added_table == false && unit.Type->Building && ((i != 0 && unit.Type != table[0]->Type) || hasNonBuilding)) {
 			continue;
 		}
 		//don't select units if a building is selected
-		if (!unit.Type->Building && Selected.size() && Selected[0]->Type->Building) {
+		if (added_table == false && !unit.Type->Building && i != 0 && table[0]->Type->Building) {
 			continue;
 		}
 		//Wyrmgus end
@@ -687,7 +710,10 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	// 1) search for the player units selectable with rectangle
-	if (SelectOrganicUnitsInTable(table)) {
+	//Wyrmgus start
+//	if (SelectOrganicUnitsInTable(table)) {
+	if (SelectOrganicUnitsInTable(table, false)) {
+	//Wyrmgus end
 		const int size = static_cast<int>(table.size());
 		ChangeSelectedUnits(&table[0], size);
 		return size;
@@ -780,11 +806,23 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 
 	// Now we should only have mobile (organic) units belonging to us,
 	// so if there's no such units in the rectangle, do nothing.
-	if (SelectOrganicUnitsInTable(table) == false) {
+	//Wyrmgus start
+//	if (SelectOrganicUnitsInTable(table) == false) {
+	if (SelectOrganicUnitsInTable(table, true) == false) {
+	//Wyrmgus end
 		return Selected.size();
 	}
 
 	for (size_t i = 0; i < table.size() && Selected.size() < MaxSelectable; ++i) {
+		//Wyrmgus start
+		if (table[i]->Type->Building && Selected.size() && (!Selected[0]->Type->Building || table[i]->Type != Selected[0]->Type)) {
+			continue;
+		}
+		//don't select units if a building is selected
+		if (!table[i]->Type->Building && Selected.size() && Selected[0]->Type->Building) {
+			continue;
+		}
+		//Wyrmgus end
 		SelectUnit(*table[i]);
 	}
 	return Selected.size();
@@ -824,6 +862,11 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
+		//Wyrmgus start
+		if (unit.Type->Building) { //this selection mode is not for buildings
+			continue;
+		}
+		//Wyrmgus end
 		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
@@ -867,6 +910,11 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
+		//Wyrmgus start
+		if (unit.Type->Building) { //this selection mode is not for buildings
+			continue;
+		}
+		//Wyrmgus end
 		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
@@ -899,7 +947,10 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	}
 
 	// If there is no selected unit yet, do a simple selection.
-	if (Selected.empty()) {
+	//Wyrmgus start
+//	if (Selected.empty()) {
+	if (Selected.empty() || (Selected.size() && Selected[0]->Type->Building)) {
+	//Wyrmgus end
 		return SelectGroundUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
@@ -928,6 +979,11 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
+		//Wyrmgus start
+		if (unit.Type->Building) { //this selection mode is not for buildings
+			continue;
+		}
+		//Wyrmgus end
 		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
@@ -961,7 +1017,10 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	}
 
 	// If there is no selected unit yet, do a simple selection.
-	if (Selected.empty()) {
+	//Wyrmgus start
+//	if (Selected.empty()) {
+	if (Selected.empty() || (Selected.size() && Selected[0]->Type->Building)) {
+	//Wyrmgus end
 		return SelectAirUnitsInRectangle(corner_topleft, corner_bottomright);
 	}
 
@@ -988,6 +1047,11 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 		if (unit.TeamSelected) { // Somebody else onteam has this unit
 			continue;
 		}
+		//Wyrmgus start
+		if (unit.Type->Building) { //this selection mode is not for buildings
+			continue;
+		}
+		//Wyrmgus end
 		table[n++] = &unit;
 		if (n == MaxSelectable) {
 			break;
