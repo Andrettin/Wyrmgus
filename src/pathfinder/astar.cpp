@@ -463,8 +463,7 @@ static void AStarReplaceNode(int pos)
 	// Remove the outdated node
 	node = OpenSet[pos];
 	OpenSetSize--;
-	//memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
-	memcpy(&OpenSet[pos], &OpenSet[pos + 1], sizeof(Open) * (OpenSetSize - pos));
+	memmove(&OpenSet[pos], &OpenSet[pos+1], sizeof(Open) * (OpenSetSize-pos));
 
 	// Re-add the node with the new cost
 	AStarAddNode(node.pos, node.O, node.Costs);
