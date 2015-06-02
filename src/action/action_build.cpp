@@ -194,7 +194,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
 			// Some tries to reach the goal
-			if (this->State++ < 10) {
+			if (this->State++ < State_MoveToLocationMax) {
 				// To keep the load low, retry each 1/4 second.
 				// NOTE: we can already inform the AI about this problem?
 				unit.Wait = CYCLES_PER_SECOND / 4;
