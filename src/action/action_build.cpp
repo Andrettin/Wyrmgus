@@ -194,7 +194,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
 			// Some tries to reach the goal
-			if (this->State++ < 10) {
+			if (this->State++ < State_MoveToLocationMax) {
 				// To keep the load low, retry each 1/4 second.
 				// NOTE: we can already inform the AI about this problem?
 				unit.Wait = CYCLES_PER_SECOND / 4;
@@ -286,8 +286,10 @@ private:
 **  Check if the unit can build
 **
 **  @param unit  Unit to check
+**
+**  @return OnTop or NULL
 */
-CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
+CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 {
 	const Vec2i pos = this->goalPos;
 	const CUnitType &type = this->GetUnitType();
@@ -299,6 +301,17 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	if (ontop != NULL) {
 		return ontop;
 	}
+	return NULL;
+}
+
+/**
+**  Replaces this build command with repair.
+**
+**  @param unit     Builder who got this build order
+**  @param building Building to repair
+*/
+void COrder_Build::HelpBuild(CUnit &unit, CUnit &building)
+{
 //Wyrmgus start
 //#if 0
 //Wyrmgus end
@@ -306,54 +319,46 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit)
 	 * FIXME: rb - CheckAlreadyBuilding should be somehow
 	 * enabled/disable via game lua scripting
 	 */
-	CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
-	if (building != NULL) {
-		if (unit.CurrentOrder() == this) {
-			//Wyrmgus start
-			/*
+	if (unit.CurrentOrder() == this) {
+		//Wyrmgus start
+		/*
+		  DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
+		  _C_ unit.Player->Index _C_ unit.Slot
+		  _C_ building->Type->Name.c_str()
+		  _C_ building->Slot);
+		*/
+		VariationInfo *varinfo = building.Type->GetDefaultVariation(*unit.Player);
+		if (varinfo && !varinfo->TypeName.empty()) {
 			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
-					   _C_ unit.Player->Index _C_ unit.Slot
-					   _C_ building->Type->Name.c_str()
-					   _C_ building->Slot);
-			*/
-			VariationInfo *varinfo = building->Type->GetDefaultVariation(*unit.Player);
-			if (varinfo && !varinfo->TypeName.empty()) {
-				DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
-						   //Wyrmgus start
-//						   _C_ unit.Player->Index _C_ unit.Slot
-//						   _C_ varinfo->TypeName.c_str()
-//						   _C_ building->Slot);
-						   _C_ unit.Player->Index _C_ UnitNumber(unit)
-						   _C_ varinfo->TypeName.c_str()
-						   _C_ UnitNumber(*building));
-						   //Wyrmgus end
-			} else {
-				DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
-						   //Wyrmgus start
-//						   _C_ unit.Player->Index _C_ unit.Slot
-//						   _C_ building->Type->Name.c_str()
-//						   _C_ building->Slot);
-						   _C_ unit.Player->Index _C_ UnitNumber(unit)
-						   _C_ building->Type->Name.c_str()
-						   _C_ UnitNumber(*building));
-						   //Wyrmgus end
-			}
+					   //Wyrmgus start
+					   //						   _C_ unit.Player->Index _C_ unit.Slot
+					   //						   _C_ varinfo->TypeName.c_str()
+					   //						   _C_ building.Slot);
+					   _C_ unit.Player->Index _C_ UnitNumber(unit)
+					   _C_ varinfo->TypeName.c_str()
+					   _C_ UnitNumber(building));
 			//Wyrmgus end
-
-			delete this; // Bad
-			unit.Orders[0] = COrder::NewActionRepair(unit, *building);
-			return NULL;
+		} else {
+			DebugPrint("%d: Worker [%d] is helping build: %s [%d]\n"
+					   //Wyrmgus start
+					   //						   _C_ unit.Player->Index _C_ unit.Slot
+					   //						   _C_ building.Type->Name.c_str()
+					   //						   _C_ building.Slot);
+					   _C_ unit.Player->Index _C_ UnitNumber(unit)
+					   _C_ building.Type->Name.c_str()
+					   _C_ UnitNumber(building));
+			//Wyrmgus end
 		}
+		//Wyrmgus end
+
+		// shortcut to replace order, without inserting and removing in front of Orders
+		delete this; // Bad
+		unit.Orders[0] = COrder::NewActionRepair(unit, building);
+		return ;
 	}
 //Wyrmgus start
 //#endif
 //Wyrmgus end
-	// Some tries to build the building.
-	this->State++;
-	// To keep the load low, retry each 10 cycles
-	// NOTE: we can already inform the AI about this problem?
-	unit.Wait = 10;
-	return NULL;
 }
 
 
@@ -547,6 +552,25 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			}
 			//Wyrmgus end
 			this->StartBuilding(unit, *ontop);
+		}
+		else { /* can't be built */
+			// Check if already building
+			const Vec2i pos = this->goalPos;
+			const CUnitType &type = this->GetUnitType();
+
+			CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
+
+			if (building != NULL) {
+				this->HelpBuild(unit, *building);
+				// HelpBuild replaces this command so return immediately
+				return ;
+			}
+
+			// failed, retry later
+			this->State++;
+			// To keep the load low, retry each 10 cycles
+			// NOTE: we can already inform the AI about this problem?
+			unit.Wait = 10;
 		}
 	}
 	if (this->State == State_StartBuilding_Failed) {

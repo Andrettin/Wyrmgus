@@ -66,9 +66,10 @@ public:
 
 private:
 	bool MoveToLocation(CUnit &unit);
-	CUnit *CheckCanBuild(CUnit &unit);
+	CUnit *CheckCanBuild(CUnit &unit) const;
 	bool StartBuilding(CUnit &unit, CUnit &ontop);
 	bool BuildFromOutside(CUnit &unit) const;
+	void HelpBuild(CUnit &unit, CUnit &building);
 private:
 	CUnitType *Type;        /// build a unit of this unit-type
 	CUnitPtr BuildingUnit;  /// unit builded.
