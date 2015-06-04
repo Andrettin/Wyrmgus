@@ -249,7 +249,7 @@ static bool Feed(CUnit &unit)
 	SelectAroundUnit(unit, unit.CurrentSightRange, table);
 
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
+		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
 			if (
 				((table[i]->Type->BoolFlag[DETRITUS_INDEX].value || (table[i]->CurrentAction() == UnitActionDie && table[i]->Type->BoolFlag[FLESH_INDEX].value)) && unit.Type->BoolFlag[DETRITIVORE_INDEX].value)
 				|| (table[i]->Type->BoolFlag[FLESH_INDEX].value && (table[i]->Type->BoolFlag[ITEM_INDEX].value || table[i]->CurrentAction() == UnitActionDie) && unit.Type->BoolFlag[CARNIVORE_INDEX].value)
@@ -266,7 +266,9 @@ static bool Feed(CUnit &unit)
 					CommandMove(unit, table[i]->tilePos, FlushCommands);
 				} else {
 					if (!table[i]->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value && !unit.Type->BoolFlag[DIMINUTIVE_INDEX].value) { //if food is non-indestructible, and isn't too tiny to consume the food, kill the food object
-						LetUnitDie(*table[i]);
+						if (table[i]->IsAlive()) {
+							LetUnitDie(*table[i]);
+						}
 					}
 					unit.Variable[HUNGER_INDEX].Value = 0;
 				}
