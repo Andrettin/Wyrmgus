@@ -308,6 +308,11 @@ static char CalculateStereo(const CUnit &unit)
 */
 void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 {
+	//Wyrmgus start
+	if (!&unit) {
+		return;
+	}
+	//Wyrmgus end
 	CSound *sound = ChooseUnitVoiceSound(unit, voice);
 	if (!sound) {
 		return;
@@ -317,6 +322,9 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 
 	//Wyrmgus start
+	if (!&source) {
+		return;
+	}
 //	if (UnitSoundIsPlaying(&source)) {
 	if (UnitSoundIsPlaying(&source) && voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep) {
 	//Wyrmgus end
