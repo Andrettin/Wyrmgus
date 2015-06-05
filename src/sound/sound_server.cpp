@@ -342,6 +342,7 @@ bool UnitSoundIsPlaying(Origin *origin)
 	for (int i = 0; i < MaxChannels; ++i) {
 		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
 			//Wyrmgus start
+			&& Channels[i].Voice
 //			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
 			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing
 			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceStep) {
