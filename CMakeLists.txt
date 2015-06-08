@@ -40,7 +40,7 @@ set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
 
 project(stratagus)
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.6)
 
 set(STRATAGUS_VERSION "${STRATAGUS_MAJOR_VERSION}.${STRATAGUS_MINOR_VERSION}.${STRATAGUS_PATCH_LEVEL}")
 set(STRATAGUS_VERSION_FULL "${STRATAGUS_VERSION}.${STRATAGUS_PATCH_LEVEL2}")
