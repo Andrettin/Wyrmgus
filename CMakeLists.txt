@@ -905,7 +905,7 @@ if(MSVC)
     # Optimisation flags can be added if deemed useful
 else()
     include(CheckCXXCompilerFlag)
-    if(NOT OD_CXX11_FLAGS)
+    if(NOT WS_CXX11_FLAGS)
         CHECK_CXX_COMPILER_FLAG("-std=c++11" WS_CXX11_FLAG_SUPPORTED)
         # MinGW supports CXX11 flag but do not compile with it. However, it works with gnu++11
         if(WS_CXX11_FLAG_SUPPORTED AND NOT MINGW)
