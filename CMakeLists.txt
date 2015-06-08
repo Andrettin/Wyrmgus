@@ -40,7 +40,7 @@ set(STRATAGUS_PATCH_LEVEL2 0)
 #########################
 
 project(stratagus)
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.0)
 
 set(STRATAGUS_VERSION "${STRATAGUS_MAJOR_VERSION}.${STRATAGUS_MINOR_VERSION}.${STRATAGUS_PATCH_LEVEL}")
 set(STRATAGUS_VERSION_FULL "${STRATAGUS_VERSION}.${STRATAGUS_PATCH_LEVEL2}")
@@ -654,7 +654,7 @@ endif()
 
 # Find all libraries
 
-option(ENABLE_STATIC "Compile Stratagus as static executable" OFF)
+option(ENABLE_STATIC "Compile Stratagus as static executable" ON)
 
 if(ENABLE_STATIC)
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;.a")
@@ -898,7 +898,25 @@ endif()
 # TODO: Add support for other compilers
 
 #Wyrmgus start
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
+set(WS_CXX11_FLAGS CACHE STRING "Compilation flags to enable C++11 support")
+
+if(MSVC)
+    # C++11 compilation flag is activated by default
+    # Optimisation flags can be added if deemed useful
+else()
+    include(CheckCXXCompilerFlag)
+    if(NOT OD_CXX11_FLAGS)
+        CHECK_CXX_COMPILER_FLAG("-std=c++11" WS_CXX11_FLAG_SUPPORTED)
+        # MinGW supports CXX11 flag but do not compile with it. However, it works with gnu++11
+        if(WS_CXX11_FLAG_SUPPORTED AND NOT MINGW)
+            set(WS_CXX11_FLAGS "-std=c++11" CACHE STRING "Compilation flags to enable C++11 support" FORCE)
+        else()
+            set(WS_CXX11_FLAGS "-std=gnu++11" CACHE STRING "Compilation flags to enable C++11 support" FORCE)
+        endif()
+    endif()
+endif()
+
+set(CMAKE_CXX_FLAGS "${WS_CXX11_FLAGS} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
 #Wyrmgus end
 
 check_type_size(errno_t ERRNOT)
@@ -1261,8 +1279,8 @@ if(WIN32 AND ENABLE_NSIS AND MAKENSIS_FOUND)
 	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/COPYING DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/wyrmsun.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	add_custom_command(OUTPUT Stratagus-${STRATAGUS_VERSION}${MAKENSIS_SUFFIX}
-		COMMAND ${MAKENSIS} ARGS ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/wyrmsun.nsi
-		DEPENDS src/win32/wyrmsun.nsi stratagus COPYING
+		COMMAND ${MAKENSIS} ARGS ${MAKENSIS_FLAGS} -DVERSION=${STRATAGUS_VERSION} -DVIVERSION=${STRATAGUS_VERSION_FULL} ${CMAKE_CURRENT_SOURCE_DIR}/src/win32/stratagus.nsi
+		DEPENDS src/win32/stratagus.nsi stratagus COPYING
 		COMMENT "Generating Stratagus Windows NSIS Installer"
 		VERBATIM
 	)
