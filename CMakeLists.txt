@@ -654,7 +654,11 @@ endif()
 
 # Find all libraries
 
-option(ENABLE_STATIC "Compile Stratagus as static executable" ON)
+if(WIN32)
+	option(ENABLE_STATIC "Compile Stratagus as static executable" ON)
+else()
+	option(ENABLE_STATIC "Compile Stratagus as static executable" OFF)
+endif()
 
 if(ENABLE_STATIC)
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;.a")
