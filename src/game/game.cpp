@@ -875,6 +875,15 @@ void CreateGame(const std::string &filename, CMap *map)
 	} else {
 		GameTimeOfDay = 7; // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 	}
+	//update the sight of all units
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (!unit.Destroyed) {
+			MapUnmarkUnitSight(unit);
+			UpdateUnitSightRange(unit);
+			MapMarkUnitSight(unit);
+		}
+	}
 	//Wyrmgus end
 	SyncHash = 0;
 	InitSyncRand();

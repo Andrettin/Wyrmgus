@@ -1055,21 +1055,27 @@ void UpdateUnitSightRange(CUnit &unit)
 	Assert(!SaveGameLoading);
 #endif
 	// FIXME : these values must be configurable.
+	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
+	if (unit_sight_range > 1) {
+		if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+			unit_sight_range -= unit.Variable[NIGHTSIGHTRANGEMALUS_INDEX].Value;
+		}
+	}
 	if (unit.Constructed) { // Units under construction have no sight range.
 		unit.CurrentSightRange = 1;
 	} else if (!unit.Container) { // proper value.
 		//Wyrmgus start
 //		unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
-		unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max;
+		unit.CurrentSightRange = unit_sight_range;
 		//Wyrmgus end
 	} else { // value of it container.
 		//Wyrmgus start
 //		unit.CurrentSightRange = unit.Container->CurrentSightRange;
 		//if a unit is inside a container, then use the sight of the unit or the container, whichever is greater
-		if (unit.Variable[SIGHTRANGE_INDEX].Max <= unit.Container->CurrentSightRange) {
+		if (unit_sight_range <= unit.Container->CurrentSightRange) {
 			unit.CurrentSightRange = unit.Container->CurrentSightRange;
 		} else {
-			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max;
+			unit.CurrentSightRange = unit_sight_range;
 		}
 		//Wyrmgus end
 	}

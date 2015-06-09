@@ -198,6 +198,9 @@ static int CclShowMapLocation(lua_State *l)
 		target->tilePos.y = LuaToNumber(l, 2);
 		target->TTL = GameCycle + LuaToNumber(l, 4);
 		target->CurrentSightRange = LuaToNumber(l, 3);
+		//Wyrmgus start
+		UpdateUnitSightRange(*target);
+		//Wyrmgus end
 		MapMarkUnitSight(*target);
 	} else {
 		DebugPrint("Unable to allocate Unit");

@@ -316,6 +316,9 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	}
 	MapUnmarkUnitSight(unit);
 	unit.CurrentSightRange = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
+	//Wyrmgus start
+	UpdateUnitSightRange(unit);
+	//Wyrmgus end
 	MapMarkUnitSight(unit);
 	order.Finished = true;
 }

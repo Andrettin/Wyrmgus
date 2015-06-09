@@ -751,6 +751,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max +
 						//Wyrmgus end
 												 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+						//Wyrmgus start
+						UpdateUnitSightRange(unit);
+						//Wyrmgus end
 						MapMarkUnitSight(unit);
 					}
 				}
@@ -987,6 +990,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Max -
 						//Wyrmgus end
 												 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+						//Wyrmgus start
+						UpdateUnitSightRange(unit);
+						//Wyrmgus end
 						MapMarkUnitSight(unit);
 					}
 				}
@@ -1134,6 +1140,9 @@ static void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *
 			MapUnmarkUnitSight(unit);
 			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value +
 									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+			//Wyrmgus start
+			UpdateUnitSightRange(unit);
+			//Wyrmgus end
 			MapMarkUnitSight(unit);
 		}
 	}
@@ -1214,6 +1223,9 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 			MapUnmarkUnitSight(unit);
 			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value -
 									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
+			//Wyrmgus start
+			UpdateUnitSightRange(unit);
+			//Wyrmgus end
 			MapMarkUnitSight(unit);
 		}
 	}

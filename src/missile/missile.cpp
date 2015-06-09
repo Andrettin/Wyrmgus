@@ -680,6 +680,10 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 	}
 #endif
 
+	//Wyrmgus start
+	this->G->SetTimeOfDay(GameTimeOfDay);	
+	//Wyrmgus end
+
 	if (this->Flip) {
 		if (frame < 0) {
 			if (this->Transparency > 0) {
