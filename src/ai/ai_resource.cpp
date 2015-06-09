@@ -972,6 +972,19 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 	}
 	
 	//Wyrmgus start
+	
+	//didn't find anything? see if there are resources which convert to this one nearby
+	for (int c = 0; c < MaxCosts; ++c) {
+		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
+			mine = UnitFindResource(unit, depot ? *depot : unit, 32, c, true);
+
+			if (mine) {
+				CommandResource(unit, *mine, FlushCommands);
+				return 1;
+			}
+		}
+	}
+	
 	CUnit *deposit = UnitFindResource(unit, depot ? *depot : unit, 32, resource, true, NULL, false);
 	
 	if (deposit) {
@@ -987,12 +1000,44 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 		}
 	}
 	
+	//didn't find anything? see if there are resource deposits which convert to this one nearby
+	for (int c = 0; c < MaxCosts; ++c) {
+		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
+			deposit = UnitFindResource(unit, depot ? *depot : unit, 32, c, true, NULL, false);
+			
+			if (deposit) {
+				const int n = AiHelpers.Refinery[c - 1].size();
+
+				for (int i = 0; i < n; ++i) {
+					CUnitType &type = *AiHelpers.Refinery[c - 1][i];
+
+					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
+						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+						return 1;
+					}
+				}
+			}
+		}
+	}
+	
 	//if didn't find anything nearby, search with unlimited range 
 	mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
 
 	if (mine) {
 		CommandResource(unit, *mine, FlushCommands);
 		return 1;
+	}
+	
+	//search for equivalent resources at infinite range
+	for (int c = 0; c < MaxCosts; ++c) {
+		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
+			mine = UnitFindResource(unit, depot ? *depot : unit, 1000, c, true);
+
+			if (mine) {
+				CommandResource(unit, *mine, FlushCommands);
+				return 1;
+			}
+		}
 	}
 	
 	deposit = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true, NULL, false);
@@ -1006,6 +1051,26 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
 				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
 				return 1;
+			}
+		}
+	}
+	
+	//search for equivalent resource deposits at infinite range
+	for (int c = 0; c < MaxCosts; ++c) {
+		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
+			deposit = UnitFindResource(unit, depot ? *depot : unit, 1000, c, true, NULL, false);
+			
+			if (deposit) {
+				const int n = AiHelpers.Refinery[c - 1].size();
+
+				for (int i = 0; i < n; ++i) {
+					CUnitType &type = *AiHelpers.Refinery[c - 1][i];
+
+					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
+						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+						return 1;
+					}
+				}
 			}
 		}
 	}
