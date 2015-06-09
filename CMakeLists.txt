@@ -654,7 +654,11 @@ endif()
 
 # Find all libraries
 
-option(ENABLE_STATIC "Compile Stratagus as static executable" ON)
+if(WIN32)
+	option(ENABLE_STATIC "Compile Stratagus as static executable" ON)
+else()
+	option(ENABLE_STATIC "Compile Stratagus as static executable" OFF)
+endif()
 
 if(ENABLE_STATIC)
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib;.a")
@@ -716,15 +720,16 @@ if(WIN32)
 	option(ENABLE_NSIS "Create Stratagus Window NSIS Installer" OFF)
 endif()
 
+option(ENABLE_METASERVER "Build Stratagus metaserver (requires Sqlite3)" OFF)
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
-option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" ON)
+option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
 option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" ON)
 option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
-option(WITH_MNG "Compile Stratagus with MNG image library" ON)
+option(WITH_MNG "Compile Stratagus with MNG image library" OFF)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
-option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" ON)
+option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
 
@@ -1062,6 +1067,16 @@ else()
 	message("Touchscreen input: No (Enable by param -DENABLE_TOUCHSCREEN=ON)")
 endif()
 
+if(ENABLE_METASERVER)
+	if(SQLITE_FOUND)
+		message("Metaserver: Yes (Disable by param -DENABLE_METASERVER=OFF)")
+	else()
+		message("Metaserver: No (Sqlite3 dependency not found)")
+	endif()
+else()
+	message("Metaserver: No (Enable by param -DENABLE_METASERVER=ON)")
+endif()
+
 if(ENABLE_DOC AND DOXYGEN_FOUND)
 	message("Doxygen documentation: Yes (Disable by param -DENABLE_DOC=OFF)")
 else()
@@ -1183,7 +1198,11 @@ set(metaserver_HDRS
 
 source_group(metaserver FILES ${metaserver_SRCS} ${metaserver_HDRS})
 
-if(SQLITE_FOUND)
+if(NOT SQLITE_FOUND)
+	set(ENABLE_METASERVER OFF)
+endif()
+
+if(ENABLE_METASERVER)
 	add_executable(metaserver ${metaserver_SRCS} ${metaserver_HDRS})
 	target_link_libraries(metaserver ${SDL_LIBRARY} ${SQLITE_LIBRARIES})
 	
@@ -1268,7 +1287,7 @@ endmacro()
 if(ENABLE_UPX AND SELF_PACKER_FOR_EXECUTABLE)
 	self_packer(stratagus)
 	self_packer(png2stratagus)
-	if(SQLITE_FOUND)
+	if(ENABLE_METASERVER)
 		self_packer(metaserver)
 	endif()
 endif()
@@ -1292,7 +1311,7 @@ endif()
 install(TARGETS stratagus DESTINATION ${GAMEDIR})
 install(TARGETS png2stratagus DESTINATION ${BINDIR})
 
-if(SQLITE_FOUND)
+if(ENABLE_METASERVER)
 	install(TARGETS metaserver DESTINATION ${SBINDIR})
 endif()
 
