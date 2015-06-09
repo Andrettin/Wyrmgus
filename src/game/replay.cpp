@@ -72,13 +72,19 @@ extern void StartMap(const std::string &filename, bool clean);
 class LogEntry
 {
 public:
-	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
+	//Wyrmgus start
+//	LogEntry() : GameCycle(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
+	LogEntry() : GameCycle(0), GameTimeOfDay(0), Flush(0), PosX(0), PosY(0), DestUnitNumber(0),
+	//Wyrmgus end
 		Num(0), SyncRandSeed(0), Next(NULL)
 	{
 		UnitNumber = 0;
 	}
 
 	unsigned long GameCycle;
+	//Wyrmgus start
+	int GameTimeOfDay;
+	//Wyrmgus end
 	int UnitNumber;
 	std::string UnitIdent;
 	std::string Action;
@@ -324,6 +330,9 @@ static void PrintLogCommand(const LogEntry &log, CFile &file)
 {
 	file.printf("Log( { ");
 	file.printf("GameCycle = %lu, ", log.GameCycle);
+	//Wyrmgus start
+	file.printf("GameTimeOfDay = %lu, ", log.GameTimeOfDay);
+	//Wyrmgus end
 	if (log.UnitNumber != -1) {
 		file.printf("UnitNumber = %d, ", log.UnitNumber);
 	}
@@ -509,6 +518,9 @@ void CommandLog(const char *action, const CUnit *unit, int flush,
 	// Frame, unit, (type-ident only to be better readable).
 	//
 	log->GameCycle = GameCycle;
+	//Wyrmgus start
+	log->GameTimeOfDay = GameTimeOfDay;
+	//Wyrmgus end
 
 	log->UnitNumber = (unit ? UnitNumber(*unit) : -1);
 	log->UnitIdent = (unit ? unit->Type->Ident.c_str() : "");
@@ -571,6 +583,10 @@ static int CclLog(lua_State *l)
 		value = LuaToString(l, -2);
 		if (!strcmp(value, "GameCycle")) {
 			log->GameCycle = LuaToNumber(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "GameTimeOfDay")) {
+			log->GameTimeOfDay = LuaToNumber(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "UnitNumber")) {
 			log->UnitNumber = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "UnitIdent")) {

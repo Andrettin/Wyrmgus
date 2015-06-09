@@ -92,6 +92,9 @@ std::string FullGameName;
 
 unsigned long GameCycle;             /// Game simulation cycle counter
 unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
+//Wyrmgus start
+int GameTimeOfDay;
+//Wyrmgus end
 
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 
@@ -866,6 +869,13 @@ void CreateGame(const std::string &filename, CMap *map)
 
 	GameCycle = 0;
 	FastForwardCycle = 0;
+	//Wyrmgus start
+	if (!GameSettings.Inside) {
+		GameTimeOfDay = 3; // begin at midday
+	} else {
+		GameTimeOfDay = 7; // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
+	}
+	//Wyrmgus end
 	SyncHash = 0;
 	InitSyncRand();
 

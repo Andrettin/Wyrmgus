@@ -44,6 +44,9 @@
 #include "particle.h"
 #include "replay.h"
 #include "results.h"
+//Wyrmgus start
+#include "settings.h"
+//Wyrmgus end
 #include "sound.h"
 #include "trigger.h"
 #include "ui.h"
@@ -301,6 +304,20 @@ static void GameLogicLoop()
 				}
 			}
 		}
+		
+		//Wyrmgus start
+		if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * 10 * 3) == 0) { // every 10 seconds of gameplay = 1 hour for time of day calculations, change time of day every three hours
+			if (!GameSettings.Inside) { // only change the time of the day if outdoors
+				GameTimeOfDay += 1;
+				if (GameTimeOfDay == 9) {
+					GameTimeOfDay = 1; // maximum time of day is 8
+				}
+			} else {
+				// indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
+				GameTimeOfDay = 7;
+			}
+		}
+		//Wyrmgus end
 	}
 
 	UpdateMessages();     // update messages
@@ -443,6 +460,9 @@ void GameMainLoop()
 	EndReplayLog();
 
 	GameCycle = 0;//????
+	//Wyrmgus start
+	GameTimeOfDay = 0;//????
+	//Wyrmgus end
 	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

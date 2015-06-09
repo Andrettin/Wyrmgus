@@ -67,7 +67,10 @@ class CGraphic : public gcn::Image
 protected:
 	CGraphic() : Surface(NULL), SurfaceFlip(NULL), frame_map(NULL),
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
-		Refs(1), Resized(false)
+		//Wyrmgus start
+//		Refs(1), Resized(false)
+		Refs(1), TimeOfDay(0), Resized(false)
+		//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0)
 #endif
@@ -115,6 +118,10 @@ public:
 	void UseDisplayFormat();
 	void Resize(int w, int h);
 	void SetOriginalSize();
+	//Wyrmgus start
+	void SetTimeOfDay(int time);
+	void ResetTimeOfDay();
+	//Wyrmgus end
 	bool TransparentPixel(int x, int y);
 	void MakeShadow();
 
@@ -141,6 +148,9 @@ public:
 	int GraphicWidth;          /// Original graphic width
 	int GraphicHeight;         /// Original graphic height
 	int Refs;                  /// Uses of this graphic
+	//Wyrmgus start
+	int TimeOfDay;				/// Time of day of this graphic (0 = normal/none, 1 = dawn, 2 = morning, 3 = midday, 4 = afternoon, 5 = dusk, 6 = first watch, 7 = midnight, 8 = second watch)
+	//Wyrmgus end
 	bool Resized;              /// Image has been resized
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -164,11 +174,13 @@ protected:
 	}
 
 public:
-	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
-	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
 	//Wyrmgus start
-	void DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha);
-	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha);
+//	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
+//	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
+	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true);
+	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true);
+	void DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true);
+	void DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true);
 	//Wyrmgus end
 
 	static CPlayerColorGraphic *New(const std::string &file, int w = 0, int h = 0);

@@ -40,6 +40,9 @@ extern bool GameEstablishing;
 
 extern unsigned long GameCycle;
 extern unsigned long FastForwardCycle;
+//Wyrmgus start
+extern int GameTimeOfDay;
+//Wyrmgus end
 
 
 $#include "settings.h"

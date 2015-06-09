@@ -272,8 +272,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 			//Wyrmgus start
 //			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 			if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].ImageFile.empty()) {
+				Map.SolidTileGraphics[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain]->SetTimeOfDay(GameTimeOfDay);
 				Map.SolidTileGraphics[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain]->DrawFrameClip(tile, dx, dy);
 			} else {
+				Map.TileGraphic->SetTimeOfDay(GameTimeOfDay);
 				Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 			}
 			//Wyrmgus end

@@ -158,6 +158,9 @@ int SaveGame(const std::string &filename)
 
 	// FIXME: probably not the right place for this
 	file.printf("GameCycle = %lu\n", GameCycle);
+	//Wyrmgus start
+	file.printf("GameTimeOfDay = %lu\n", GameTimeOfDay);
+	//Wyrmgus end
 
 	file.printf("SetGodMode(%s)\n", GodMode ? "true" : "false");
 

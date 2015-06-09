@@ -321,7 +321,10 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
 **  @param y       y coordinate on the screen
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
-												   int x, int y)
+//Wyrmgus start
+//												   int x, int y)
+												   int x, int y, bool ignore_time_of_day)
+//Wyrmgus end
 {
 	//Wyrmgus start
 	for (int i = 0; i < PlayerColorMax; ++i) {
@@ -333,6 +336,11 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
+		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
+		//Wyrmgus end
 		if (!PlayerColorTextures[player]) {
 			MakePlayerColorTexture(this, player);
 		}
@@ -341,15 +349,21 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 #endif
 	{
 		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			ResetTimeOfDay();
+		}
 //		GraphicPlayerPixels(Players[player], *this);
 		GraphicPlayerPixels(player, *this);
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
 		//Wyrmgus end
 		DrawFrameClip(frame, x, y);
 	}
 }
 
 //Wyrmgus start
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day)
 {
 	for (int i = 0; i < PlayerColorMax; ++i) {
 		if (PlayerColors[i][0] == Players[player].Color) {
@@ -359,6 +373,11 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 	}
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
+		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
+		//Wyrmgus end
 		if (!PlayerColorTextures[player]) {
 			MakePlayerColorTexture(this, player);
 		}
@@ -370,14 +389,23 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 #endif
 	{
 		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			ResetTimeOfDay();
+		}
 //		GraphicPlayerPixels(Players[player], *this);
 		GraphicPlayerPixels(player, *this);
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
 		//Wyrmgus end
 		DrawFrameClipTrans(frame, x, y, alpha);
 	}
 }
 
-void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha)
+//Wyrmgus start
+//void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha)
+void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned frame, int x, int y, int alpha, bool ignore_time_of_day)
+//Wyrmgus end
 {
 	//Wyrmgus start
 	for (int i = 0; i < PlayerColorMax; ++i) {
@@ -389,6 +417,11 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
+		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
+		//Wyrmgus end
 		if (!PlayerColorTextures[player]) {
 			MakePlayerColorTexture(this, player);
 		}
@@ -400,8 +433,14 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 #endif
 	{
 		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			ResetTimeOfDay();
+		}
 //		GraphicPlayerPixels(Players[player], *this);
 		GraphicPlayerPixels(player, *this);
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
 		//Wyrmgus end
 		DrawFrameClipTransX(frame, x, y, alpha);
 	}
@@ -545,7 +584,10 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) cons
 **  @param y       y coordinate on the screen
 */
 void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
-													int x, int y)
+//Wyrmgus start
+//												   int x, int y)
+												   int x, int y, bool ignore_time_of_day)
+//Wyrmgus end
 {
 	//Wyrmgus start
 	for (int i = 0; i < PlayerColorMax; ++i) {
@@ -557,6 +599,11 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
+		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
+		//Wyrmgus end
 		if (!PlayerColorTextures[player]) {
 			MakePlayerColorTexture(this, player);
 		}
@@ -565,8 +612,14 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 #endif
 	{
 		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			ResetTimeOfDay();
+		}
 //		GraphicPlayerPixels(Players[player], *this);
 		GraphicPlayerPixels(player, *this);
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
 		//Wyrmgus end
 		DrawFrameClipX(frame, x, y);
 	}
@@ -1177,6 +1230,46 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	Uint32 b;
 	Uint32 c;
 	Uint32 pc;
+	
+	//Wyrmgus start
+	int time_of_day_red = 0;
+	int time_of_day_green = 0;
+	int time_of_day_blue = 0;
+	
+	if (g->TimeOfDay == 1) { // dawn
+		time_of_day_red = -20;
+		time_of_day_green = -20;
+		time_of_day_blue = 0;
+	} else if (g->TimeOfDay == 2) { // morning
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (g->TimeOfDay == 3) { // midday
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (g->TimeOfDay == 4) { // afternoon
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (g->TimeOfDay == 5) { // dusk
+		time_of_day_red = 0;
+		time_of_day_green = -20;
+		time_of_day_blue = -20;
+	} else if (g->TimeOfDay == 6) { // first watch
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	} else if (g->TimeOfDay == 7) { // midnight
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	} else if (g->TimeOfDay == 8) { // second watch
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	}
+	//Wyrmgus end
 
 	for (int i = 0; i < maxh; ++i) {
 		sp = (const unsigned char *)g->Surface->pixels + ow * bpp +
@@ -1197,9 +1290,16 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					for (int z = 0; z < PlayerColorIndexCount; ++z) {
 						if (*sp == PlayerColorIndexStart + z) {
 							SDL_Color p = colors->Colors[z];
+							//Wyrmgus start
+							/*
 							tp[0] = p.r;
 							tp[1] = p.g;
 							tp[2] = p.b;
+							*/
+							tp[0] = std::max<int>(0,std::min<int>(255,int(p.r) + time_of_day_red));
+							tp[1] = std::max<int>(0,std::min<int>(255,int(p.g) + time_of_day_green));
+							tp[2] = std::max<int>(0,std::min<int>(255,int(p.b) + time_of_day_blue));;
+							//Wyrmgus end
 							tp[3] = 0xff;
 							break;
 						}
@@ -1221,9 +1321,16 @@ static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					b = (c & f->Bmask) >> f->Bshift;
 					if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
 						((c & f->Gmask) >> f->Gshift) == b) {
+						//Wyrmgus start
+						/*
 						pc = ((colors->Colors[0].R * b / 255) << f->Rshift) |
 							 ((colors->Colors[0].G * b / 255) << f->Gshift) |
 							 ((colors->Colors[0].B * b / 255) << f->Bshift);
+						*/
+						pc = ((std::max<int>(0,std::min<int>(255,int(colors->Colors[0].R) + time_of_day_red)) * b / 255) << f->Rshift) |
+							 ((std::max<int>(0,std::min<int>(255,int(colors->Colors[0].G) + time_of_day_green)) * b / 255) << f->Gshift) |
+							 ((std::max<int>(0,std::min<int>(255,int(colors->Colors[0].B) + time_of_day_blue)) * b / 255) << f->Bshift);
+						//Wyrmgus end
 						if (bpp == 4) {
 							pc |= (c & f->Amask);
 						} else {
@@ -1515,6 +1622,156 @@ void CGraphic::SetOriginalSize()
 
 	Resized = false;
 }
+
+//Wyrmgus start
+/**
+**  Set a graphic's time of day
+**
+**  @param time  New time of day of graphic.
+*/
+void CGraphic::SetTimeOfDay(int time)
+{
+	Assert(Surface); // can't resize before it's been loaded
+
+	if (TimeOfDay == time) {
+		return;
+	}
+
+	// If the image has already had a time of day change, get a clean copy first
+	if (TimeOfDay) {
+		this->ResetTimeOfDay();
+		if (TimeOfDay == time) {
+			return;
+		}
+	}
+
+	TimeOfDay = time;
+	
+	int time_of_day_red = 0;
+	int time_of_day_green = 0;
+	int time_of_day_blue = 0;
+	
+	if (time == 1) { // dawn
+		time_of_day_red = -20;
+		time_of_day_green = -20;
+		time_of_day_blue = 0;
+	} else if (time == 2) { // morning
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (time == 3) { // midday
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (time == 4) { // afternoon
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (time == 5) { // dusk
+		time_of_day_red = 0;
+		time_of_day_green = -20;
+		time_of_day_blue = -20;
+	} else if (time == 6) { // first watch
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	} else if (time == 7) { // midnight
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	} else if (time == 8) { // second watch
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	}
+	
+	if (time && (time_of_day_red != 0 || time_of_day_green != 0 || time_of_day_blue != 0)) {
+		const int bpp = Surface->format->BytesPerPixel;
+		if (bpp == 1) {
+			SDL_LockSurface(Surface);
+			SDL_Color colors[256];
+			SDL_Palette &pal = *Surface->format->palette;
+			for (int i = 0; i < 256; ++i) {
+				colors[i].r = std::max<int>(0,std::min<int>(255,int(pal.colors[i].r) + time_of_day_red));
+				colors[i].g = std::max<int>(0,std::min<int>(255,int(pal.colors[i].g) + time_of_day_green));
+				colors[i].b = std::max<int>(0,std::min<int>(255,int(pal.colors[i].b) + time_of_day_blue));
+			}
+			SDL_SetColors(Surface, &colors[0], 0, 256);
+			if (SurfaceFlip) {
+				SDL_SetColors(SurfaceFlip, &colors[0], 0, 256);
+			}
+			SDL_UnlockSurface(Surface);
+		} else if (bpp == 4) {
+		}
+	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL && Textures) {
+		glDeleteTextures(NumTextures, Textures);
+		delete[] Textures;
+		Textures = NULL;
+		MakeTexture(this);
+	}
+#endif
+}
+
+/**
+**  Resets time of day for a graphic
+**
+*/
+void CGraphic::ResetTimeOfDay()
+{
+	Assert(Surface); // can't resize before it's been loaded
+
+	if (!TimeOfDay) {
+		return;
+	}
+	
+	bool flip_surface = false;
+
+	if (Surface) {
+		FreeSurface(&Surface);
+		Surface = NULL;
+	}
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
+		if (SurfaceFlip) {
+			flip_surface = true;
+			FreeSurface(&SurfaceFlip);
+			SurfaceFlip = NULL;
+		}
+	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL && Textures) {
+		glDeleteTextures(NumTextures, Textures);
+		delete[] Textures;
+		Textures = NULL;
+		
+		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(this);
+		if (cg) {
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (cg->PlayerColorTextures[j]) {
+					delete[] cg->PlayerColorTextures[j];
+					cg->PlayerColorTextures[j] = NULL;
+				}
+			}
+		}
+	}
+#endif
+
+	this->Surface = NULL;
+	this->Load();
+	
+	if (flip_surface) {
+		this->Flip();
+	}
+
+	TimeOfDay = 0;	
+}
+//Wyrmgus end
 
 /**
 **  Check if a pixel is transparent

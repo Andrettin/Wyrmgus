@@ -1201,15 +1201,15 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y);
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
 			}
 		}
 	} else {
@@ -1221,9 +1221,9 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
 		}
 	}
 	//Wyrmgus end
