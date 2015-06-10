@@ -350,13 +350,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 	{
 		//Wyrmgus start
 		if (!ignore_time_of_day) {
-			ResetTimeOfDay();
+			SetTimeOfDay(GameTimeOfDay);
 		}
 //		GraphicPlayerPixels(Players[player], *this);
 		GraphicPlayerPixels(player, *this);
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(GameTimeOfDay);
-		}
 		//Wyrmgus end
 		DrawFrameClip(frame, x, y);
 	}
@@ -390,13 +387,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 	{
 		//Wyrmgus start
 		if (!ignore_time_of_day) {
-			ResetTimeOfDay();
+			SetTimeOfDay(GameTimeOfDay);
 		}
 //		GraphicPlayerPixels(Players[player], *this);
 		GraphicPlayerPixels(player, *this);
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(GameTimeOfDay);
-		}
 		//Wyrmgus end
 		DrawFrameClipTrans(frame, x, y, alpha);
 	}
@@ -434,13 +428,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 	{
 		//Wyrmgus start
 		if (!ignore_time_of_day) {
-			ResetTimeOfDay();
+			SetTimeOfDay(GameTimeOfDay);
 		}
 //		GraphicPlayerPixels(Players[player], *this);
 		GraphicPlayerPixels(player, *this);
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(GameTimeOfDay);
-		}
 		//Wyrmgus end
 		DrawFrameClipTransX(frame, x, y, alpha);
 	}
@@ -613,13 +604,10 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 	{
 		//Wyrmgus start
 		if (!ignore_time_of_day) {
-			ResetTimeOfDay();
+			SetTimeOfDay(GameTimeOfDay);
 		}
 //		GraphicPlayerPixels(Players[player], *this);
 		GraphicPlayerPixels(player, *this);
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(GameTimeOfDay);
-		}
 		//Wyrmgus end
 		DrawFrameClipX(frame, x, y);
 	}

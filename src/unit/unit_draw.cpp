@@ -861,7 +861,10 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		}
 		if (type.CanAttack) {
 			if (Preference.ShowReactionRange) {
-				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
+				//Wyrmgus start
+//				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
+				const int value = unit.CurrentSightRange;
+				//Wyrmgus end
 				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
 
 				if (value) {

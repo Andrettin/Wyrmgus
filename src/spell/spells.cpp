@@ -344,7 +344,10 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 			for (size_t i = 0; i != table.size(); ++i) {
 				// Check if unit in battle
 				if (autocast->Attacker == CONDITION_ONLY) {
-					const int range = table[i]->Player->Type == PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
+					//Wyrmgus start
+//					const int range = table[i]->Player->Type == PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
+					const int range = table[i]->CurrentSightRange;
+					//Wyrmgus end
 					if ((table[i]->CurrentAction() != UnitActionAttack
 						 && table[i]->CurrentAction() != UnitActionAttackGround
 						 && table[i]->CurrentAction() != UnitActionSpellCast)

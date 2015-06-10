@@ -1055,12 +1055,15 @@ void UpdateUnitSightRange(CUnit &unit)
 	Assert(!SaveGameLoading);
 #endif
 	// FIXME : these values must be configurable.
+	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
-	if (unit_sight_range > 1) {
-		if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
-			unit_sight_range -= unit.Variable[NIGHTSIGHTRANGEMALUS_INDEX].Value;
-		}
+	if (GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
+	} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 	}
+	unit_sight_range = std::max<int>(1, unit_sight_range);
+	//Wyrmgus end
 	if (unit.Constructed) { // Units under construction have no sight range.
 		unit.CurrentSightRange = 1;
 	} else if (!unit.Container) { // proper value.

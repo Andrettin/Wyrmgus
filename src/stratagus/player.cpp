@@ -1326,6 +1326,53 @@ void GraphicPlayerPixels(int player, const CGraphic &sprite)
 	//Wyrmgus start
 //	std::vector<SDL_Color> sdlColors(player.UnitColors.Colors.begin(), player.UnitColors.Colors.end());
 	std::vector<SDL_Color> sdlColors(PlayerColorsRGB[player].begin(), PlayerColorsRGB[player].end());
+	
+	//convert colors according to time of day
+	int time_of_day_red = 0;
+	int time_of_day_green = 0;
+	int time_of_day_blue = 0;
+	
+	if (sprite.TimeOfDay == 1) { // dawn
+		time_of_day_red = -20;
+		time_of_day_green = -20;
+		time_of_day_blue = 0;
+	} else if (sprite.TimeOfDay == 2) { // morning
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (sprite.TimeOfDay == 3) { // midday
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (sprite.TimeOfDay == 4) { // afternoon
+		time_of_day_red = 0;
+		time_of_day_green = 0;
+		time_of_day_blue = 0;
+	} else if (sprite.TimeOfDay == 5) { // dusk
+		time_of_day_red = 0;
+		time_of_day_green = -20;
+		time_of_day_blue = -20;
+	} else if (sprite.TimeOfDay == 6) { // first watch
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	} else if (sprite.TimeOfDay == 7) { // midnight
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	} else if (sprite.TimeOfDay == 8) { // second watch
+		time_of_day_red = -45;
+		time_of_day_green = -35;
+		time_of_day_blue = -10;
+	}
+	
+	if (sprite.TimeOfDay && (time_of_day_red != 0 || time_of_day_green != 0 || time_of_day_blue != 0)) {
+		for (int i = 0; i < PlayerColorIndexCount; ++i) {
+			sdlColors[i].r = std::max<int>(0,std::min<int>(255,int(sdlColors[i].r) + time_of_day_red));
+			sdlColors[i].g = std::max<int>(0,std::min<int>(255,int(sdlColors[i].g) + time_of_day_green));
+			sdlColors[i].b = std::max<int>(0,std::min<int>(255,int(sdlColors[i].b) + time_of_day_blue));
+		}
+	}
 	//Wyrmgus end
 	SDL_SetColors(sprite.Surface, &sdlColors[0], PlayerColorIndexStart, PlayerColorIndexCount);
 	if (sprite.SurfaceFlip) {

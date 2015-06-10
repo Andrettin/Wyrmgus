@@ -176,7 +176,8 @@ static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
 static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
 static const char BACKSTAB_KEY[] = "Backstab";
 static const char BONUSAGAINSTMOUNTED_KEY[] = "BonusAgainstMounted";
-static const char NIGHTSIGHTRANGEMALUS_KEY[] = "NightSightRangeMalus";
+static const char DAYSIGHTRANGEBONUS_KEY[] = "DaySightRangeBonus";
+static const char NIGHTSIGHTRANGEBONUS_KEY[] = "NightSightRangeBonus";
 static const char TRANSPARENCY_KEY[] = "Transparency";
 static const char GENDER_KEY[] = "Gender";
 static const char BIRTHCYCLE_KEY[] = "BirthCycle";
@@ -234,7 +235,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 //							   PRIORITY_KEY
 							   PRIORITY_KEY,
 							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, XPREQUIRED_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
-							   BACKSTAB_KEY, BONUSAGAINSTMOUNTED_KEY, NIGHTSIGHTRANGEMALUS_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY
+							   BACKSTAB_KEY, BONUSAGAINSTMOUNTED_KEY, DAYSIGHTRANGEBONUS_KEY, NIGHTSIGHTRANGEBONUS_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY
 //Wyrmgus end
 							  };
 
@@ -2270,7 +2271,7 @@ void UpdateUnitVariables(CUnit &unit)
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
 			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == SIGHTRANGE_INDEX || i == ACCURACY_INDEX || i == EVASION_INDEX
 			|| i == LEVELUP_INDEX || i == XPREQUIRED_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
-			|| i == BACKSTAB_INDEX || i == BONUSAGAINSTMOUNTED_INDEX || i == NIGHTSIGHTRANGEMALUS_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX) {
+			|| i == BACKSTAB_INDEX || i == BONUSAGAINSTMOUNTED_INDEX || i == DAYSIGHTRANGEBONUS_INDEX || i == NIGHTSIGHTRANGEBONUS_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -2288,7 +2289,6 @@ void UpdateUnitVariables(CUnit &unit)
 
 	unit.Variable[BACKSTAB_INDEX].Max = 1000;
 	unit.Variable[BONUSAGAINSTMOUNTED_INDEX].Max = 1000;
-	unit.Variable[NIGHTSIGHTRANGEMALUS_INDEX].Max = 100;
 
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 

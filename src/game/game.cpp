@@ -871,7 +871,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	FastForwardCycle = 0;
 	//Wyrmgus start
 	if (!GameSettings.Inside) {
-		GameTimeOfDay = 3; // begin at midday
+		GameTimeOfDay = SyncRand(8) + 1; // begin at a random time of day
 	} else {
 		GameTimeOfDay = 7; // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 	}
