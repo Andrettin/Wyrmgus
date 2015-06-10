@@ -305,7 +305,7 @@ static void AnimateActionTrain(CUnit &unit)
 		newUnit->Orders[0] = unit.NewOrder->Clone();
 	} else {
 #if 0
-		// Tell the unit to rigth-click ?
+		// Tell the unit to right-click ?
 #endif
 	}
 	*/
@@ -368,7 +368,7 @@ static void AnimateActionTrain(CUnit &unit)
 			newUnit->Orders[0] = unit.NewOrder->Clone();
 		} else {
 	#if 0
-			// Tell the unit to rigth-click ?
+			// Tell the unit to right-click ?
 	#endif
 		}
 	}
