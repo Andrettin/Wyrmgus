@@ -1311,7 +1311,11 @@ static void InfoPanel_draw_no_selection()
 		y += 16;
 		label.Draw(x, y,  _("Cycle:"));
 		label.Draw(x + 48, y, GameCycle);
-		label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+		//Wyrmgus start
+//		label.Draw(x + 110, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+		label.Draw(x + 110, y, _("Speed:"));
+		label.Draw(x + 110 + 53, y, CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+		//Wyrmgus end
 		y += 20;
 
 		std::string nc;

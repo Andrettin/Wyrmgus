@@ -325,7 +325,10 @@ void UiToggleBigMap()
 
 		SetViewportMode(UI.ViewportMode);
 
-		UI.StatusLine.Set(_("Returning to old map"));
+		//Wyrmgus start
+//		UI.StatusLine.Set(_("Returning to old map"));
+		UI.StatusLine.Set(_("Returning to the old map"));
+		//Wyrmgus end
 	}
 }
 
@@ -339,7 +342,12 @@ static void UiIncreaseGameSpeed()
 	}
 	VideoSyncSpeed += 10;
 	SetVideoSync();
-	UI.StatusLine.Set(_("Faster"));
+	//Wyrmgus start
+//	UI.StatusLine.Set(_("Faster"));
+	char buf[256];
+	snprintf(buf, sizeof(buf), _("Game speed increased to %d"), CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+	UI.StatusLine.Set(buf);
+	//Wyrmgus end
 }
 
 /**
@@ -358,7 +366,12 @@ static void UiDecreaseGameSpeed()
 		VideoSyncSpeed -= 10;
 	}
 	SetVideoSync();
-	UI.StatusLine.Set(_("Slower"));
+	//Wyrmgus start
+//	UI.StatusLine.Set(_("Slower"));
+	char buf[256];
+	snprintf(buf, sizeof(buf), _("Game speed decreased to %d"), CYCLES_PER_SECOND * VideoSyncSpeed / 100);
+	UI.StatusLine.Set(buf);
+	//Wyrmgus end
 }
 
 /**
@@ -371,7 +384,10 @@ static void UiSetDefaultGameSpeed()
 	}
 	VideoSyncSpeed = 100;
 	SetVideoSync();
-	UI.StatusLine.Set(_("Set default game speed"));
+	//Wyrmgus start
+//	UI.StatusLine.Set(_("Set default game speed"));
+	UI.StatusLine.Set(_("Default game speed set"));
+	//Wyrmgus end
 }
 
 /**
@@ -686,6 +702,18 @@ static bool CommandKey(int key)
 			UiTogglePause();
 			break;
 
+		//Wyrmgus start
+		case 'q': // select all army units (FIXME: still need to add functionality)
+			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+				break;
+			} else {
+				if (HandleCommandKey(key)) {
+					break;
+				}
+				return false;
+			}
+		//Wyrmgus end
+		
 		case 's': // CTRL+S - Turn sound on / off
 			if (KeyModifiers & ModifierControl) {
 				UiToggleSound();

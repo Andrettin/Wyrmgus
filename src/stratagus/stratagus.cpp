@@ -238,7 +238,10 @@ extern void beos_init(int argc, char **argv);
 std::string StratagusLibPath;        /// Path for data directory
 
 /// Name, Version, Copyright
-const char NameLine[] = NAME " V" VERSION ", " COPYRIGHT;
+//Wyrmgus start
+//const char NameLine[] = NAME " V" VERSION ", " COPYRIGHT;
+const char NameLine[] = NAME " v" VERSION ", " COPYRIGHT;
+//Wyrmgus end
 
 std::string CliMapName;          /// Filename of the map given on the command line
 std::string MenuRace;
