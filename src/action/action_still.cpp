@@ -362,6 +362,8 @@ static bool Breed(CUnit &unit)
 				newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
 				newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
 				IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
+				unit.Variable[HUNGER_INDEX].Value += 100;
+				table[i]->Variable[HUNGER_INDEX].Value += 100;
 				return true;
 			}
 		}
@@ -372,6 +374,7 @@ static bool Breed(CUnit &unit)
 		newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
 		newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
 		IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
+		unit.Variable[HUNGER_INDEX].Value += 100;
 		return true;
 	}
 	return false;
