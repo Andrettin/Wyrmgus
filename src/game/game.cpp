@@ -881,7 +881,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	if (!GameSettings.Inside) {
 		GameTimeOfDay = SyncRand(8) + 1; // begin at a random time of day
 	} else {
-		GameTimeOfDay = 7; // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
+		GameTimeOfDay = 0; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 	}
 	//update the sight of all units
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {

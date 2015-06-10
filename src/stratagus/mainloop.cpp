@@ -317,7 +317,7 @@ static void GameLogicLoop()
 				}
 			} else {
 				// indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
-				GameTimeOfDay = 7;
+				GameTimeOfDay = 0; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day"
 			}
 			//update the sight of all units
 			for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
