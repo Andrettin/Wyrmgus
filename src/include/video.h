@@ -170,6 +170,11 @@ protected:
 	{
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
+		//Wyrmgus start
+		memset(PlayerColorTexturesDawn, 0, sizeof(PlayerColorTexturesDawn));
+		memset(PlayerColorTexturesDusk, 0, sizeof(PlayerColorTexturesDusk));
+		memset(PlayerColorTexturesNight, 0, sizeof(PlayerColorTexturesNight));
+		//Wyrmgus end
 #endif
 	}
 
@@ -190,6 +195,11 @@ public:
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
+	//Wyrmgus start
+	GLuint *PlayerColorTexturesDawn[PlayerMax];/// Textures with player colors (dawn)
+	GLuint *PlayerColorTexturesDusk[PlayerMax];/// Textures with player colors (dusk)
+	GLuint *PlayerColorTexturesNight[PlayerMax];/// Textures with player colors (night)
+	//Wyrmgus end
 #endif
 };
 
@@ -453,7 +463,10 @@ extern int LoadGraphicPNG(CGraphic *g);
 /// Make an OpenGL texture
 extern void MakeTexture(CGraphic *graphic);
 /// Make an OpenGL texture of the player color pixels only.
-extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
+//Wyrmgus start
+//extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
+extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player, int time_of_day = 0);
+//Wyrmgus end
 
 /// Regenerate Window screen if needed
 extern void ValidateOpenGLScreen();
