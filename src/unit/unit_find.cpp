@@ -380,6 +380,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 	return (mine_on_top ? mine.Type->CanHarvest : !mine.Type->CanHarvest) && mine.ResourcesHeld
 	//Wyrmgus end
 			//Wyrmgus start
+		   && !mine.IsUnusable(false)
 //		   && (resinfo.HarvestFromOutside
 		   && (mine.Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value
 			//Wyrmgus end
