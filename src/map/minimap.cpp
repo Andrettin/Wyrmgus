@@ -699,6 +699,25 @@ void CMinimap::Update()
 
 	for (int my = 0; my < H; ++my) {
 		for (int mx = 0; mx < W; ++mx) {
+			//Wyrmgus start
+			if (mx < XOffset || mx >= W - XOffset || my < YOffset || my >= H - YOffset) {
+#if defined(USE_OPENGL) || defined(USE_GLES)
+				if (UseOpenGL) {
+					*(Uint32 *)&(MinimapSurfaceGL[(mx + my * MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
+				} else
+#endif
+				{
+					const int index = mx * bpp + my * MinimapSurface->pitch;
+					if (bpp == 2) {
+						*(Uint16 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
+					} else {
+						*(Uint32 *)&((Uint8 *)MinimapSurface->pixels)[index] = ColorBlack;
+					}
+				}
+				continue;
+			}
+			//Wyrmgus end
+			
 			int visiontype; // 0 unexplored, 1 explored, >1 visible.
 
 			if (ReplayRevealMap) {
