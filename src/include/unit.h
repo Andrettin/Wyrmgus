@@ -696,7 +696,10 @@ extern void UnSelectUnit(CUnit &unit);
 /// Add a unit to selected if not already selected, remove it otherwise
 extern int ToggleSelectUnit(CUnit &unit);
 /// Select units from the same type (if selectable by rectangle)
-extern int SelectUnitsByType(CUnit &base);
+//Wyrmgus start
+//extern int SelectUnitsByType(CUnit &base);
+extern int SelectUnitsByType(CUnit &base, bool only_visible = true);
+//Wyrmgus end
 /// Toggle units from the same type (if selectable by rectangle)
 extern int ToggleUnitsByType(CUnit &base);
 /// Select the units belonging to a particular group
@@ -705,6 +708,10 @@ extern int SelectGroup(int group_number, GroupSelectionMode mode = SELECTABLE_BY
 extern int AddGroupFromUnitToSelection(CUnit &unit);
 /// Select the units from the same group as the one in parameter
 extern int SelectGroupFromUnit(CUnit &unit);
+//Wyrmgus start
+/// Select entire army
+extern int SelectArmy();
+//Wyrmgus end
 /// Select the units in the selection rectangle
 extern int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corner_bottomright);
 /// Select ground units in the selection rectangle

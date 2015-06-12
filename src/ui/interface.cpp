@@ -705,6 +705,16 @@ static bool CommandKey(int key)
 		//Wyrmgus start
 		case 'q': // select all army units (FIXME: still need to add functionality)
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+				if (GameObserve || GamePaused || GameEstablishing) {
+					break;
+				}
+
+				SelectArmy();
+				
+				UI.StatusLine.Clear();
+				UI.StatusLine.ClearCosts();
+				CurrentButtonLevel = 0;
+				SelectionChanged();
 				break;
 			} else {
 				if (HandleCommandKey(key)) {
@@ -744,6 +754,36 @@ static bool CommandKey(int key)
 			}
 			break;
 
+		//Wyrmgus start
+		case 'w': // select all units of the same type as the first currently selected one (FIXME: still need to add functionality)
+			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+				if (GameObserve || GamePaused || GameEstablishing) {
+					break;
+				}
+
+				if (Selected.size() < 1) {
+					break;
+				}
+				
+				if (KeyModifiers & ModifierDoublePress) {
+					SelectUnitsByType(*Selected[0], false);
+				} else {
+					SelectUnitsByType(*Selected[0], true);
+				}
+				
+				UI.StatusLine.Clear();
+				UI.StatusLine.ClearCosts();
+				CurrentButtonLevel = 0;
+				SelectionChanged();
+				break;
+			} else {
+				if (HandleCommandKey(key)) {
+					break;
+				}
+				return false;
+			}
+		//Wyrmgus end
+		
 		case 'e': // CTRL+E Turn messages on / off
 			if (KeyModifiers & ModifierControl) {
 				ToggleShowMessages();

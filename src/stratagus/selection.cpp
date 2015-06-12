@@ -330,7 +330,10 @@ int ToggleSelectUnit(CUnit &unit)
 **
 **  FIXME: should always select the nearest 9 units to the base!
 */
-int SelectUnitsByType(CUnit &base)
+//Wyrmgus start
+//int SelectUnitsByType(CUnit &base)
+int SelectUnitsByType(CUnit &base, bool only_visible)
+//Wyrmgus end
 {
 	const CUnitType &type = *base.Type;
 	const CViewport *vp = UI.MouseViewport;
@@ -373,9 +376,24 @@ int SelectUnitsByType(CUnit &base)
 	/* FIXME: this should probably be cleaner implemented if SelectUnitsByType()
 	 * took parameters of the selection rectangle as arguments */
 	const Vec2i offset(1, 1);
-	const Vec2i minPos = vp->MapPos - offset;
+	//Wyrmgus start
+//	const Vec2i minPos = vp->MapPos - offset;
+	Vec2i minPos = vp->MapPos - offset;
+	//Wyrmgus end
 	const Vec2i vpSize(vp->MapWidth, vp->MapHeight);
-	const Vec2i maxPos = vp->MapPos + vpSize + offset;
+	//Wyrmgus start
+//	const Vec2i maxPos = vp->MapPos + vpSize + offset;
+	Vec2i maxPos = vp->MapPos + vpSize + offset;
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (!only_visible) {
+		minPos.x = 0;
+		minPos.y = 0;
+		maxPos.x = Map.Info.MapWidth - 1;
+		maxPos.y = Map.Info.MapHeight - 1;
+	}
+	//Wyrmgus end
 	Select(minPos, maxPos, table, HasSameTypeAs(type));
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
@@ -765,6 +783,55 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 	}
 	return 0;
 }
+
+//Wyrmgus start
+/**
+**  Select entire army.
+**
+**
+**  @return     the number of units found.
+*/
+int SelectArmy()
+{
+	const Vec2i minPos(0, 0);
+	const Vec2i maxPos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
+	std::vector<CUnit *> table;
+
+	Select(minPos, maxPos, table);
+
+	unsigned int n = 0;
+	for (size_t i = 0; i != table.size(); ++i) {
+		CUnit &unit = *table[i];
+
+		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+			continue;
+		}
+		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
+			continue;
+		}
+		if (unit.Type->UnitType == UnitTypeNaval || unit.Type->UnitType == UnitTypeFly) {
+			continue;
+		}
+		if (unit.TeamSelected) { // Somebody else on team has this unit
+			continue;
+		}
+		if (unit.Type->Building) { //this selection mode is not for buildings
+			continue;
+		}
+		if (unit.Type->Harvester && unit.Type->ResInfo) { //this selection mode is not for workers
+			continue;
+		}
+		table[n++] = &unit;
+		if (n == MaxSelectable) {
+			break;
+		}
+	}
+	if (n) {
+		ChangeSelectedUnits(&table[0], n);
+	}
+	return n;
+}
+//Wyrmgus end
 
 /**
 **  Add the units in the rectangle to the current selection
