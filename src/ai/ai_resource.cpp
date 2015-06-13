@@ -1318,14 +1318,21 @@ static void AiCollectResources()
 						|| (wanted[src_c] == wanted[c]
 							&& num_units_assigned[src_c] <= num_units_assigned[c] + 1)) {
 					*/
-					// only reassign if the priority is at least twice as high as that of the lower priority resource, to prevent constant AI reshuffling of workers
-					if (wanted[src_c] && (num_units_assigned[src_c] * 100 / wanted[src_c]) * 2 >= (num_units_assigned[c] * 100 / wanted[c])) { // what matters is the percent of "wanted" fulfilled, not the absolute quantity of needed workers for that resource
+					if (wanted[src_c] && ((num_units_assigned[src_c] + 1) * 100 / wanted[src_c]) >= (num_units_assigned[c] * 100 / wanted[c])) { // what matters is the percent of "wanted" fulfilled, not the absolute quantity of needed workers for that resource; add one worker to num_units_assigned[src_c] so that you won't get one worker being shuffled back and forth
 					//Wyrmgus end
 						continue;
 					}
 					
-					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
+					//Wyrmgus start
+//					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
+					for (int k = num_units_assigned[src_c] - 1; k >= 0; --k) { // unit may be NULL now, continue instead of breaking loop if so
+					//Wyrmgus end
 						unit = units_assigned[src_c][k];
+						//Wyrmgus start
+						if (!unit) {
+							continue;
+						}
+						//Wyrmgus end
 
 						Assert(unit->CurrentAction() == UnitActionResource);
 						COrder_Resource &order = *static_cast<COrder_Resource *>(unit->CurrentOrder());
@@ -1335,8 +1342,25 @@ static void AiCollectResources()
 							continue;
 						}
 
+						//Wyrmgus start
+						if (unit->Removed || unit->CurrentAction() == UnitActionBuild) { //if unit is removed or is currently building something, it can't be told to harvest (do this here so that AiAssignHarvester returning false later on is only because of unit type not being able to harvest something)
+							unit = NULL;
+							continue;
+						}
+						//Wyrmgus end
+						
 						// unit can't harvest : next one
 						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
+							//Wyrmgus start
+							for (int l = num_units_assigned[src_c] - 1; l >= 0; --l) {
+								if (!units_assigned[src_c][l]) {
+									continue;
+								}
+								if (units_assigned[src_c][l]->Type == unit->Type) { // no need to recalculate for units of the same type
+									units_assigned[src_c][l] = NULL;
+								}
+							}
+							//Wyrmgus end
 							unit = NULL;
 							continue;
 						}
