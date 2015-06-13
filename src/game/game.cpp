@@ -164,6 +164,10 @@ void StartMap(const std::string &filename, bool clean)
 	//commented this out because it seemed superfluous
 //	SetMessage("%s", _("Do it! Do it now!"));
 	//Wyrmgus end
+	
+	//Wyrmgus start
+	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos));
+	//Wyrmgus end
 
 	//  Play the game.
 	GameMainLoop();

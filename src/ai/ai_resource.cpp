@@ -1262,7 +1262,7 @@ static void AiCollectResources()
 		}
 		unit = NULL;
 
-		// Try to complete each ressource in the priority order
+		// Try to complete each resource in the priority order
 		for (int i = 0; i < MaxCosts; ++i) {
 			int c = priority_resource[i];
 
@@ -1304,13 +1304,26 @@ static void AiCollectResources()
 					// Try to move worker from src_c to c
 					const int src_c = priority_resource[j];
 
+					//Wyrmgus start
+					// don't reassign if the src_c resource already has less workers than desired, or if has no workers, or if the new resource has 0 "wanted"
+					if (num_units_assigned[src_c] == 0 || num_units_assigned[src_c] <= wanted[src_c] || !wanted[c]) {
+						continue;
+					}
+					//Wyrmgus end
+
 					// Don't complete with lower priority ones...
+					//Wyrmgus start
+					/*
 					if (wanted[src_c] > wanted[c]
 						|| (wanted[src_c] == wanted[c]
 							&& num_units_assigned[src_c] <= num_units_assigned[c] + 1)) {
+					*/
+					// only reassign if the priority is at least twice as high as that of the lower priority resource, to prevent constant AI reshuffling of workers
+					if (wanted[src_c] && (num_units_assigned[src_c] * 100 / wanted[src_c]) * 2 >= (num_units_assigned[c] * 100 / wanted[c])) { // what matters is the percent of "wanted" fulfilled, not the absolute quantity of needed workers for that resource
+					//Wyrmgus end
 						continue;
 					}
-
+					
 					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
 						unit = units_assigned[src_c][k];
 
