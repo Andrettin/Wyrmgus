@@ -705,6 +705,28 @@ int GetGameSpeed()
 --  Game types
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+/**
+**  Melee
+*/
+static void GameTypeMelee()
+{
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			if (Players[i].Type == PlayerComputer && Players[j].Type == PlayerComputer) {
+				CommandDiplomacy(i, DiplomacyAllied, j);
+				Players[i].ShareVisionWith(Players[j]);
+				CommandDiplomacy(j, DiplomacyAllied, i);
+				Players[j].ShareVisionWith(Players[i]);
+			} else {
+				CommandDiplomacy(i, DiplomacyEnemy, j);
+				CommandDiplomacy(j, DiplomacyEnemy, i);
+			}
+		}
+	}
+}
+//Wyrmgus end
+
 /**
 **  Free for all
 */

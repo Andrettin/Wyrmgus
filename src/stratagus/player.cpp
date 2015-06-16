@@ -702,10 +702,16 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 				break;
 			case PlayerComputer:
 				// Computer allied with computer and enemy of all persons.
+				//Wyrmgus start
+				/*
 				if (Players[i].Type == PlayerComputer) {
 					this->Allied |= (1 << i);
 					Players[i].Allied |= (1 << NumPlayers);
 				} else if (Players[i].Type == PlayerPerson || Players[i].Type == PlayerRescueActive) {
+				*/
+				// make computer players be hostile to each other by default
+				if (Players[i].Type == PlayerComputer || Players[i].Type == PlayerPerson || Players[i].Type == PlayerRescueActive) {
+				//Wyrmgus end
 					this->Enemy |= (1 << i);
 					Players[i].Enemy |= (1 << NumPlayers);
 				}
