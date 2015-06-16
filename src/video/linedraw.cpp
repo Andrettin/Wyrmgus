@@ -1417,10 +1417,16 @@ void DrawRectangle(Uint32 color, int x, int y, int w, int h)
 #ifdef USE_OPENGL
 	glBegin(GL_LINES);
 	glVertex2i(x, y);
-	glVertex2i(x + w, y);
+	//Wyrmgus start
+//	glVertex2i(x + w, y);
+	glVertex2i(x + w - 1, y);
+	//Wyrmgus end
 
 	glVertex2i(x + w - 1, y + 1);
-	glVertex2i(x + w - 1, y + h);
+	//Wyrmgus start
+//	glVertex2i(x + w - 1, y + h);
+	glVertex2i(x + w - 1, y + h - 1);
+	//Wyrmgus end
 
 	glVertex2i(x + w - 1, y + h - 1);
 	glVertex2i(x, y + h - 1);
