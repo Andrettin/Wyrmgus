@@ -648,6 +648,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->DrawLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxOnBoard")) {
 			type->MaxOnBoard = LuaToNumber(l, -1);
+			//Wyrmgus start
+			type->DefaultStat.Variables[TRANSPORT_INDEX].Max = type->MaxOnBoard;
+			//Wyrmgus end
 		} else if (!strcmp(value, "BoardSize")) {
 			type->BoardSize = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ButtonLevelForTransporter")) {
@@ -950,6 +953,9 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			if (type->MaxOnBoard == 0) { // set default value.
 				type->MaxOnBoard = 1;
+				//Wyrmgus start
+				type->DefaultStat.Variables[TRANSPORT_INDEX].Max = type->MaxOnBoard;
+				//Wyrmgus end
 			}
 
 			if (type->BoolFlag.size() < UnitTypeVar.GetNumberBoolFlag()) {

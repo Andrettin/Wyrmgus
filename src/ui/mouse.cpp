@@ -589,6 +589,19 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		return;
 	}
 
+	//Wyrmgus start
+	//  Ctrl + right click on an empty space moves + stand ground
+	if ((KeyModifiers & ModifierControl) && !dest) {
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandMove(unit, pos, flush);
+		SendCommandStandGround(unit, 0);
+		return;
+	}
+	//Wyrmgus end
+	
 	if (DoRightButton_Transporter(unit, dest, flush, acknowledged)) {
 		return;
 	}
@@ -1235,6 +1248,17 @@ static int SendMove(const Vec2i &tilePos)
 			SendCommandDefend(*unit, *goal, flush);
 			ret = 1;
 		}
+	//Wyrmgus start
+	//  Ctrl + click on an empty space moves + stand ground
+	} else if (!goal && (KeyModifiers & ModifierControl)) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
+			CUnit *unit = Selected[i];
+
+			SendCommandMove(*unit, tilePos, flush);
+			SendCommandStandGround(*unit, 0);
+			ret = 1;
+		}
+	//Wyrmgus end
 	} else {
 		// Move to a transporter.
 		if (goal && goal->Type->CanTransport()) {
