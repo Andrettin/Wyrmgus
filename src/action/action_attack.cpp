@@ -239,9 +239,16 @@ void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged)
 	} else {
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	Video.FillCircleClip(ColorRed, lastScreenPos, 2);
-	Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
-	Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
+	//Wyrmgus start
+//	Video.FillCircleClip(ColorRed, lastScreenPos, 2);
+//	Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
+//	Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
+	if (Preference.ShowPathlines) {
+		Video.FillCircleClip(ColorRed, lastScreenPos, 2);
+		Video.DrawLineClip(ColorRed, lastScreenPos, targetPos);
+		Video.FillCircleClip(IsWeakTargetSelected() ? ColorBlue : ColorRed, targetPos, 3);
+	}
+	//Wyrmgus end
 	return targetPos;
 }
 

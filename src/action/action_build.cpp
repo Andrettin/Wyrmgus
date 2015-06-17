@@ -149,9 +149,16 @@ enum {
 	const int w = this->GetUnitType().BoxWidth;
 	const int h = this->GetUnitType().BoxHeight;
 	DrawSelection(ColorGray, targetPos.x - w / 2, targetPos.y - h / 2, targetPos.x + w / 2, targetPos.y + h / 2);
-	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
-	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
-	Video.FillCircleClip(ColorGreen, targetPos, 3);
+	//Wyrmgus start
+//	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+//	Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
+//	Video.FillCircleClip(ColorGreen, targetPos, 3);
+	if (Preference.ShowPathlines) {
+		Video.FillCircleClip(ColorGreen, lastScreenPos, 2);
+		Video.DrawLineClip(ColorGreen, lastScreenPos, targetPos);
+		Video.FillCircleClip(ColorGreen, targetPos, 3);
+	}
+	//Wyrmgus end
 	return targetPos;
 }
 

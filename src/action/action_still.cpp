@@ -108,11 +108,22 @@ enum {
 
 /* virtual */ PixelPos COrder_Still::Show(const CViewport &, const PixelPos &lastScreenPos) const
 {
+	//Wyrmgus start
+	/*
 	if (this->Action == UnitActionStandGround) {
 		Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
 	} else {
 		Video.FillCircleClip(ColorGray, lastScreenPos, 2);
 	}
+	*/
+	if (Preference.ShowPathlines) {
+		if (this->Action == UnitActionStandGround) {
+			Video.FillCircleClip(ColorBlack, lastScreenPos, 2);
+		} else {
+			Video.FillCircleClip(ColorGray, lastScreenPos, 2);
+		}
+	}
+	//Wyrmgus end
 	return lastScreenPos;
 }
 

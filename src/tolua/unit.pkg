@@ -33,6 +33,7 @@ class CPreference
 	bool NoStatusLineTooltips;
 	//Wyrmgus start
 	bool PlayerColorCircle;
+	bool ShowPathlines;
 	//Wyrmgus end
 
 	unsigned int ShowOrders;

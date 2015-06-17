@@ -147,9 +147,16 @@
 	} else {
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
-	Video.FillCircleClip(ColorBlue, lastScreenPos, 2);
-	Video.DrawLineClip(ColorBlue, lastScreenPos, targetPos);
-	Video.FillCircleClip(ColorBlue, targetPos, 3);
+	//Wyrmgus start
+//	Video.FillCircleClip(ColorBlue, lastScreenPos, 2);
+//	Video.DrawLineClip(ColorBlue, lastScreenPos, targetPos);
+//	Video.FillCircleClip(ColorBlue, targetPos, 3);
+	if (Preference.ShowPathlines) {
+		Video.FillCircleClip(ColorBlue, lastScreenPos, 2);
+		Video.DrawLineClip(ColorBlue, lastScreenPos, targetPos);
+		Video.FillCircleClip(ColorBlue, targetPos, 3);
+	}
+	//Wyrmgus end
 	return targetPos;
 }
 

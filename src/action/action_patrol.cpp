@@ -115,10 +115,18 @@
 	const PixelPos pos1 = vp.TilePosToScreen_Center(this->goalPos);
 	const PixelPos pos2 = vp.TilePosToScreen_Center(this->WayPoint);
 
-	Video.DrawLineClip(ColorGreen, lastScreenPos, pos1);
-	Video.FillCircleClip(ColorBlue, pos1, 2);
-	Video.DrawLineClip(ColorBlue, pos1, pos2);
-	Video.FillCircleClip(ColorBlue, pos2, 3);
+	//Wyrmgus start
+//	Video.DrawLineClip(ColorGreen, lastScreenPos, pos1);
+//	Video.FillCircleClip(ColorBlue, pos1, 2);
+//	Video.DrawLineClip(ColorBlue, pos1, pos2);
+//	Video.FillCircleClip(ColorBlue, pos2, 3);
+	if (Preference.ShowPathlines) {
+		Video.DrawLineClip(ColorGreen, lastScreenPos, pos1);
+		Video.FillCircleClip(ColorBlue, pos1, 2);
+		Video.DrawLineClip(ColorBlue, pos1, pos2);
+		Video.FillCircleClip(ColorBlue, pos2, 3);
+	}
+	//Wyrmgus end
 	return pos2;
 }
 

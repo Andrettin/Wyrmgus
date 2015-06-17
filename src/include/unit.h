@@ -450,6 +450,7 @@ public:
 		DeselectInMine(false), NoStatusLineTooltips(false),
 		//Wyrmgus start
 		PlayerColorCircle(false),
+		ShowPathlines(false),
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0),
 		IconFrameG(NULL), PressedIconFrameG(NULL), CommandButtonFrameG(NULL), BarFrameG(NULL), InfoPanelFrameG(NULL), ProgressBarG(NULL) {};
@@ -470,6 +471,7 @@ public:
 	bool NoStatusLineTooltips;	/// Don't show messages on status line
 	//Wyrmgus start
 	bool PlayerColorCircle;  /// Show a player color circle below each unit
+	bool ShowPathlines;  /// Show order pathlines
 	//Wyrmgus end
 
 	int  ShowOrders;         /// How many second show orders of unit on map.
