@@ -38,6 +38,9 @@
 #include "commands.h"
 
 #include "actions.h"
+//Wyrmgus start
+#include "map.h" //It contains map width and height
+//Wyrmgus end
 #include "net_message.h"
 #include "network.h"
 #include "replay.h"
@@ -46,7 +49,121 @@
 #include "unit_manager.h"
 #include "unittype.h"
 
-/*----------------------------------------------------------------------------
+//Wyrmgus start
+#include <cmath>
+
+/**
+**  Call the lua function that defines what the commands (move, attack, etc.) do. It was designed to be used for formations.
+**
+** @param origpos			Location we are moving the unit to
+*/
+void AdjustCommandPosForFormation(std::vector<CUnit *> &table, const Vec2i &origpos)
+{
+	if (!table.size()) {
+		return;
+	}
+	
+	for (size_t i = 0; i != table.size(); ++i) {
+		table[i]->FormationGoalPos = origpos;
+	}
+	
+	if (table.size() == 1) {
+		return;
+	}
+	
+	//return now, because the rest of the formation code is not complete (facing still needs to be changed)
+	return;
+	
+	//Only do this once per command. This is just for keeping the wanted units in the back and the others in the front and for calculating the facing of our formation.
+	std::vector<int> unitarrangement(table.size()); //Numbers of the table's units
+	std::vector<int> tmpattackranges(table.size()); //Attack ranges for sorting
+	for (size_t i = 0; i != table.size(); ++i) {
+		tmpattackranges[i] = table[i]->Variable[ATTACKRANGE_INDEX].Value;
+	}
+	std::sort(tmpattackranges.begin(), tmpattackranges.end()); //Sort the attack ranges
+		
+	for (size_t i = 0; i != table.size(); ++i) { //Assign units to their respective attack range
+		for (size_t k = 0; k != table.size(); ++k) {
+			if (table[i]->Variable[ATTACKRANGE_INDEX].Value == tmpattackranges[k]) {
+				unitarrangement[k] = i; //We have to swap the values and keys temporarily so that the values would correspond to the ones in the table
+				tmpattackranges[k] = -1; //Make sure we won't assign a unit to this attack range twice
+				break;
+			}
+		}
+	}
+	int range = table[unitarrangement[table.size() - 1]]->Variable[ATTACKRANGE_INDEX].Value;
+	int h = table.size() - 1;
+	while (range > 0) { //In theory this should sort the units even further by their current health
+		while (h > 0 && table[unitarrangement[h]]->Variable[ATTACKRANGE_INDEX].Value == range) {
+			int j = h - 1;
+			while (j > 0 && table[unitarrangement[j]]->Variable[ATTACKRANGE_INDEX].Value == range) {
+				if (table[unitarrangement[j]]->Variable[HP_INDEX].Value < table[unitarrangement[h]]->Variable[HP_INDEX].Value) {
+					unitarrangement[j], unitarrangement[h] = unitarrangement[h], unitarrangement[j];
+				}
+				j = j - 1;
+			}
+			h = h - 1;
+		}
+		range = range - 1;
+	}
+	std::vector<int> selectionarrangement(table.size()); //And now we swap the values with keys again to get the actual unit arrangement.
+	for (size_t i = 0; i != table.size(); ++i) {
+		selectionarrangement[unitarrangement[i]] = i;
+	}
+	for (size_t i = 0; i != table.size(); ++i) {
+		unitarrangement[i] = selectionarrangement[i];
+	}
+	for (size_t i = 0; i != table.size(); ++i) { //And let's keep this table for rotating our formation
+		selectionarrangement[unitarrangement[i]] = i;
+	}
+
+	//Calculate some things necessary for modifying where our formation is facing
+	int originx = table[selectionarrangement[0]]->tilePos.x;
+	int originy = table[selectionarrangement[0]]->tilePos.y;
+		
+	double radius_argument = (originx - origpos.x)^2 + (originy - origpos.y)^2;
+	double radius = sqrt(radius_argument); //Distance between the the first unit's origin and the central point of our formation
+
+	double atan2_y = origpos.y - (originy - radius);
+	double atan2_x = origpos.x - originx;
+	double formationangle = atan2(atan2_y, atan2_x); //Angle in radians for where we want our formation to face
+
+	if (table[0]->Formation == 1) { // square formation
+		//Let's make a box formation
+		double sidelength_ceil_argument = table.size();
+		int sidelength = ceil(sqrt(sidelength_ceil_argument));
+		double offset_floor_argument = sidelength / 2;
+		int offset = floor(offset_floor_argument);
+
+		
+		for (size_t i = 0; i != table.size(); ++i) {
+			double newpos_x_ceil_argument = unitarrangement[i]/sidelength;
+			table[i]->FormationGoalPos.x = origpos.x - ceil(newpos_x_ceil_argument) + offset + 1;
+			table[i]->FormationGoalPos.y = origpos.y - unitarrangement[i] % sidelength + offset;
+		}
+//	else
+	}
+	//Let's modify our formation's facing, one unit at a time
+	/*
+	for (size_t i = 0; i != table.size(); ++i) {
+		int rotx = table[i]->FormationGoalPos.x - origpos.x; //Position of our unit inside the formation
+		int roty = table[i]->FormationGoalPos.y - origpos.y;
+
+		double radius_unit_argument = (rotx)^2 + (roty)^2;
+		double radius_unit = sqrt(radius_unit_argument); //Distance of our unit from the center of the formation
+
+		double oldangle = atan2(roty - radius_unit, rotx);
+
+		double newangle = oldangle + formationangle;
+
+		table[i]->FormationGoalPos.x = radius_unit * cos(newangle) + origpos.x;
+		table[i]->FormationGoalPos.y = radius_unit * sin(newangle) + origpos.y;
+	}
+	*/
+}
+//Wyrmgus end
+
+ /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 

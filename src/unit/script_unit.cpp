@@ -583,8 +583,9 @@ static int CclUnit(lua_State *l)
 			lua_pop(l, 1);
 		//Wyrmgus start
 		} else if (!strcmp(value, "variation")) {
-			// FIXME : unsigned long should be better handled
 			unit->Variation = LuaToNumber(l, 2, j + 1);
+		} else if (!strcmp(value, "formation")) {
+			unit->Formation = LuaToNumber(l, 2, j + 1);
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
@@ -1385,6 +1386,9 @@ static int CclSetUnitVariable(lua_State *l)
 		value = LuaToNumber(l, 3);
 		unit->Variation = value;
 		unit->Variable[VARIATION_INDEX].Value = unit->Variation;
+	} else if (!strcmp(name, "Formation")) {
+		value = LuaToNumber(l, 3);
+		unit->Formation = value;
 	//Wyrmgus end
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables

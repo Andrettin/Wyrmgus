@@ -119,7 +119,10 @@ enum _directions_ {
 class CUnit
 {
 public:
-	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	//Wyrmgus start
+//	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	CUnit() : tilePos(-1, -1), FormationGoalPos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	//Wyrmgus end
 
 	void Init();
 
@@ -334,6 +337,9 @@ public:
 	} Resource; /// Resource still
 
 	Vec2i tilePos; /// Map position X
+	//Wyrmgus start
+	Vec2i FormationGoalPos; /// used for storing formation position
+	//Wyrmgus end
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
 
@@ -352,6 +358,7 @@ public:
 	std::string Name;	/// Unit's personal name (if any)
 	std::string Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
+	int Formation;      /// Which formation this unit has
 	bool LearnedAbilities[UpgradeMax];      /// individual upgrades which the unit has
 	//Wyrmgus end
 

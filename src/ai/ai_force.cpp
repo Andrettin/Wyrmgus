@@ -435,6 +435,18 @@ void AiForce::Attack(const Vec2i &pos)
 		this->State = AiForceAttackingState_Attacking;
 	}
 	//  Send all units in the force to enemy.
+	
+	//Wyrmgus start
+	// use formation
+	std::vector<CUnit *> table;
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit &unit = *this->Units[i];
+
+		unit.Formation = 1;
+		table.push_back(&unit);
+	}
+	AdjustCommandPosForFormation(table, this->GoalPos);
+	//Wyrmgus end
 
 	CUnit *leader = NULL;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
@@ -445,6 +457,7 @@ void AiForce::Attack(const Vec2i &pos)
 			break;
 		}
 	}
+
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
 
@@ -453,12 +466,18 @@ void AiForce::Attack(const Vec2i &pos)
 
 			unit->Wait = delay;
 			if (unit->IsAgressive()) {
-				CommandAttack(*unit, this->GoalPos,  NULL, FlushCommands);
+				//Wyrmgus start
+//				CommandAttack(*unit, this->GoalPos,  NULL, FlushCommands);
+				CommandAttack(*unit, unit->FormationGoalPos,  NULL, FlushCommands);
+				//Wyrmgus end
 			} else {
 				if (leader) {
 					CommandDefend(*unit, *leader, FlushCommands);
 				} else {
-					CommandMove(*unit, this->GoalPos, FlushCommands);
+					//Wyrmgus start
+//					CommandMove(*unit, this->GoalPos, FlushCommands);
+					CommandMove(*unit, unit->FormationGoalPos, FlushCommands);
+					//Wyrmgus end
 				}
 			}
 		}
@@ -965,6 +984,17 @@ void AiForce::Update()
 				}
 			}
 			this->GoalPos = unit->tilePos;
+			
+			//Wyrmgus start
+			// use formation
+			std::vector<CUnit *> table;
+			for (size_t i = 0; i != this->Size(); ++i) {
+				CUnit &unit = *this->Units[i];
+				table.push_back(&unit);
+			}
+			AdjustCommandPosForFormation(table, this->GoalPos);
+			//Wyrmgus end
+			
 			State = AiForceAttackingState_Attacking;
 			for (size_t i = 0; i != this->Size(); ++i) {
 				CUnit &aiunit = *this->Units[i];
@@ -972,12 +1002,18 @@ void AiForce::Update()
 
 				aiunit.Wait = delay;
 				if (aiunit.IsAgressive()) {
-					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+					//Wyrmgus start
+//					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+					CommandAttack(aiunit, aiunit.FormationGoalPos, NULL, FlushCommands);
+					//Wyrmgus end
 				} else {
 					if (leader) {
 						CommandDefend(aiunit, *leader, FlushCommands);
 					} else {
-						CommandMove(aiunit, this->GoalPos, FlushCommands);
+						//Wyrmgus start
+//						CommandMove(aiunit, this->GoalPos, FlushCommands);
+						CommandMove(aiunit, aiunit.FormationGoalPos, FlushCommands);
+						//Wyrmgus end
 					}
 				}
 			}

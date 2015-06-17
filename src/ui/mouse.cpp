@@ -690,11 +690,30 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	}
 
 	int acknowledged = 0; // to play sound
+	//Wyrmgus start
+	// make units walk in a square formation
+	std::vector<CUnit *> table;
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		Assert(Selected[i]);
 		CUnit &unit = *Selected[i];
 
-		DoRightButton_ForSelectedUnit(unit, dest, pos, acknowledged);
+		unit.Formation = 1;
+		table.push_back(&unit);
+	}
+	AdjustCommandPosForFormation(table, pos);
+	//Wyrmgus end
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		Assert(Selected[i]);
+		CUnit &unit = *Selected[i];
+
+		//Wyrmgus start
+//		DoRightButton_ForSelectedUnit(unit, dest, pos, acknowledged);
+		if (dest) {
+			DoRightButton_ForSelectedUnit(unit, dest, pos, acknowledged);
+		} else {
+			DoRightButton_ForSelectedUnit(unit, dest, unit.FormationGoalPos, acknowledged);
+		}
+		//Wyrmgus end
 	}
 	ShowOrdersCount = GameCycle + Preference.ShowOrders * CYCLES_PER_SECOND;
 }

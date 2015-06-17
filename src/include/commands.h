@@ -31,6 +31,10 @@
 #define __COMMANDS_H__
 
 //@{
+	
+//Wyrmgus start
+#include <vector>
+//Wyrmgus end
 
 #include "vec2i.h"
 
@@ -190,6 +194,9 @@ extern void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on);
 extern void SendCommandDiplomacy(int player, int state, int opponent);
 /// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
+//Wyrmgus start
+extern void AdjustCommandPosForFormation(std::vector<CUnit *> &table, const Vec2i &pos);
+//Wyrmgus end
 
 /// Execute a command (from network).
 extern void ExecCommand(unsigned char type, UnitRef unum, unsigned short x,

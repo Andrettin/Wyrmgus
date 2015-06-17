@@ -423,6 +423,10 @@ void CUnit::Init()
 
 	tilePos.x = 0;
 	tilePos.y = 0;
+	//Wyrmgus start
+	FormationGoalPos.x = 0;
+	FormationGoalPos.y = 0;
+	//Wyrmgus end
 	Offset = 0;
 	Type = NULL;
 	Player = NULL;
@@ -436,6 +440,7 @@ void CUnit::Init()
 	//Wyrmgus start
 	Name = "";
 	Variation = 0;
+	Formation = 0;
 	memset(LearnedAbilities, 0, sizeof(LearnedAbilities));
 	//Wyrmgus end
 	IX = 0;
