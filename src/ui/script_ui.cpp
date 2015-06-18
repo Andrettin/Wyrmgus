@@ -969,6 +969,10 @@ static int CclDefineButton(lua_State *l)
 				ba.Action = ButtonUpgradeTo;
 			} else if (!strcmp(value, "unload")) {
 				ba.Action = ButtonUnload;
+			//Wyrmgus start
+			} else if (!strcmp(value, "rally-point")) {
+				ba.Action = ButtonRallyPoint;
+			//Wyrmgus end
 			} else if (!strcmp(value, "cancel")) {
 				ba.Action = ButtonCancel;
 			} else if (!strcmp(value, "cancel-upgrade")) {

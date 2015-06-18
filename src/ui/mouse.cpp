@@ -556,6 +556,13 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	//  Right mouse with SHIFT appends command to old commands.
 	const int flush = !(KeyModifiers & ModifierShift);
 
+	//Wyrmgus start
+	if (action == MouseActionRallyPoint) {
+		unit.RallyPointPos = pos;
+		return;
+	}
+	//Wyrmgus end
+	
 	//  Control + alt click - ground attack
 	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
 		if (unit.Type->GroundAttack) {
@@ -1529,6 +1536,30 @@ static int SendSpellCast(const Vec2i &tilePos)
 	return ret;
 }
 
+//Wyrmgus start
+/**
+**  Set point as rally point for selected units.
+**
+**  @param tilePos  tile map position.
+**
+**  @todo To reduce the CPU load for pathfinder, we should check if
+**        the destination is reachable and handle nice group movements.
+*/
+static int SendRallyPoint(const Vec2i &tilePos)
+{
+	int ret = 0;
+
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		CUnit *unit = Selected[i];
+
+		unit->RallyPointPos = tilePos;
+		ret = 1;
+	}
+	
+	return ret;
+}
+//Wyrmgus end
+
 /**
 **  Send a command to selected units.
 **
@@ -1565,6 +1596,11 @@ static void SendCommand(const Vec2i &tilePos)
 		case ButtonSpellCast:
 			ret = SendSpellCast(tilePos);
 			break;
+		//Wyrmgus start
+		case ButtonRallyPoint:
+			ret = SendRallyPoint(tilePos);
+			break;
+		//Wyrmgus end
 		default:
 			DebugPrint("Unsupported send action %d\n" _C_ CursorAction);
 			break;

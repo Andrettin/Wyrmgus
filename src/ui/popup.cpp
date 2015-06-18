@@ -518,6 +518,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->ButtonAction = ButtonUpgradeTo;
 			} else if (!strcmp(value, "unload")) {
 				condition->ButtonAction = ButtonUnload;
+			//Wyrmgus start
+			} else if (!strcmp(value, "rally-point")) {
+				condition->ButtonAction = ButtonRallyPoint;
+			//Wyrmgus end
 			} else if (!strcmp(value, "cancel")) {
 				condition->ButtonAction = ButtonCancel;
 			} else if (!strcmp(value, "cancel-upgrade")) {

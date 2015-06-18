@@ -38,6 +38,9 @@
 #include "action/action_unload.h"
 
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -211,6 +214,12 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 	unit.Boarded = 0;
 	unit.Place(pos);
 	transporter.BoardCount -= unit.Type->BoardSize;
+	//Wyrmgus start
+	//if transporter has a rally point (useful for towers), send the unloaded unit there
+	if (transporter.RallyPointPos.x != -1 && transporter.RallyPointPos.y != -1 && unit.CanMove()) {
+		CommandMove(unit, transporter.RallyPointPos, FlushCommands);
+	}
+	//Wyrmgus end
 	return true;
 }
 

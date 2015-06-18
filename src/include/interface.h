@@ -77,6 +77,9 @@ enum ButtonCmd {
 	ButtonExperienceUpgradeTo,   /// order upgrade (experience)
 	//Wyrmgus end
 	ButtonUpgradeTo,      /// order upgrade
+	//Wyrmgus start
+	ButtonRallyPoint,		/// set rally point
+	//Wyrmgus end
 	ButtonCancel,         /// cancel
 	ButtonCancelUpgrade,  /// cancel upgrade
 	ButtonCancelTrain,    /// cancel training

@@ -910,6 +910,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonStandGround:
 		case ButtonButton:
 		case ButtonMove:
+		//Wyrmgus start
+		case ButtonRallyPoint:
+		//Wyrmgus end
 			res = true;
 			break;
 		case ButtonRepair:
@@ -1493,6 +1496,9 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonPatrol:  // Follow Next
 		case ButtonHarvest: // Follow Next
 		case ButtonAttack:  // Follow Next
+		//Wyrmgus start
+		case ButtonRallyPoint:
+		//Wyrmgus end
 		case ButtonAttackGround: { DoClicked_SelectTarget(button); break; }
 		case ButtonReturn: { DoClicked_Return(); break; }
 		case ButtonStop: { DoClicked_Stop(); break; }

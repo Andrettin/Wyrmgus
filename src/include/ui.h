@@ -296,6 +296,7 @@ private:
 	//Wyrmgus start
 	void DoClicked_LearnAbility(int button);
 	void DoClicked_ExperienceUpgradeTo(int button);
+	void DoClicked_RallyPoint(int button);
 	//Wyrmgus end
 
 

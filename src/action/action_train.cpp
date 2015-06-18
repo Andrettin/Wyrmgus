@@ -39,6 +39,9 @@
 
 #include "ai.h"
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "player.h"
 #include "sound.h"
@@ -346,10 +349,10 @@ static void AnimateActionTrain(CUnit &unit)
 		*/
 
 		DropOutOnSide(*newUnit, LookingW, &unit);
-		//Wyrmgus start
+
 		//we don't need to send the player a message every time a new unit is ready
 		//player.Notify(NotifyGreen, newUnit->tilePos, _("New %s ready"), nType.Name.c_str());
-		//Wyrmgus end
+
 		if (&player == ThisPlayer) {
 			PlayUnitSound(*newUnit, VoiceReady);
 		}
@@ -357,6 +360,7 @@ static void AnimateActionTrain(CUnit &unit)
 			AiTrainingComplete(unit, *newUnit);
 		}
 
+		/*
 		if (unit.NewOrder && unit.NewOrder->HasGoal()
 			&& unit.NewOrder->GetGoal()->Destroyed) {
 			delete unit.NewOrder;
@@ -370,6 +374,11 @@ static void AnimateActionTrain(CUnit &unit)
 	#if 0
 			// Tell the unit to right-click ?
 	#endif
+		}
+		*/
+		
+		if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && newUnit->CanMove()) {
+			CommandMove(*newUnit, unit.RallyPointPos, FlushCommands);
 		}
 	}
 	//Wyrmgus end

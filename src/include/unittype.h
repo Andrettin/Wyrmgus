@@ -671,6 +671,9 @@ public:
 #define MouseActionHarvest   3      /// Harvest resources
 #define MouseActionSpellCast 5      /// Cast the first spell known
 #define MouseActionSail      6      /// Sail
+//Wyrmgus start
+#define MouseActionRallyPoint 7		/// Rally point
+//Wyrmgus end
 	int CanTarget;                  /// Which units can it attack
 #define CanTargetLand 1             /// Can attack land units
 #define CanTargetSea  2             /// Can attack sea units

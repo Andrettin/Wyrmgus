@@ -447,6 +447,18 @@ void CViewport::Draw() const
 			ShowOrder(*Selected[i]);
 		}
 	}
+	
+	//Wyrmgus start
+	//if a selected unit has a rally point, show it
+	//better to not show it all the time, so that there's no clutter
+	/*
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		if (!Selected[i]Destroyed && !Selected[i]Removed && Selected[i]->RallyPointPos.x != -1 && Selected[i]->RallyPointPos.y != -1) {
+			Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(Selected[i]->RallyPointPos), 3);
+		}
+	}
+	*/
+	//Wyrmgus end
 
 	//
 	// Draw unit's name popup

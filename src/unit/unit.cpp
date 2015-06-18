@@ -426,6 +426,8 @@ void CUnit::Init()
 	//Wyrmgus start
 	FormationGoalPos.x = 0;
 	FormationGoalPos.y = 0;
+	RallyPointPos.x = -1;
+	RallyPointPos.y = -1;
 	//Wyrmgus end
 	Offset = 0;
 	Type = NULL;
