@@ -518,6 +518,44 @@ static int CclDefineUnitType(lua_State *l)
 				CGraphic::Free(type->LightSprite);
 				type->LightSprite = NULL;
 			}
+		} else if (!strcmp(value, "LeftArmImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->LeftArmFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported left arm tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->LeftArmSprite) {
+				CGraphic::Free(type->LeftArmSprite);
+				type->LeftArmSprite = NULL;
+			}
+		} else if (!strcmp(value, "RightArmImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->RightArmFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported right arm tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->RightArmSprite) {
+				CGraphic::Free(type->RightArmSprite);
+				type->RightArmSprite = NULL;
+			}
 		} else if (!strcmp(value, "HairImage")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1306,6 +1344,10 @@ static int CclDefineUnitType(lua_State *l)
 						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "shadow-file")) {
 						var->ShadowFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "left-arm-file")) {
+						var->LeftArmFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "right-arm-file")) {
+						var->RightArmFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "hair-file")) {
 						var->HairFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "pants-file")) {
@@ -1369,6 +1411,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->ShadowOffsetX = parent_type->ShadowOffsetX;
 			type->ShadowOffsetY = parent_type->ShadowOffsetY;
 			type->LightFile = parent_type->LightFile;
+			type->LeftArmFile = parent_type->LeftArmFile;
+			type->RightArmFile = parent_type->RightArmFile;
 			type->HairFile = parent_type->HairFile;
 			type->PantsFile = parent_type->PantsFile;
 			type->ShieldFile = parent_type->ShieldFile;
@@ -1465,6 +1509,8 @@ static int CclDefineUnitType(lua_State *l)
 						var->FileWhenEmpty[i] = parent_type->VarInfo[var_n]->FileWhenEmpty[i];
 					}
 					var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
+					var->LeftArmFile = parent_type->VarInfo[var_n]->LeftArmFile;
+					var->RightArmFile = parent_type->VarInfo[var_n]->RightArmFile;
 					var->HairFile = parent_type->VarInfo[var_n]->HairFile;
 					var->PantsFile = parent_type->VarInfo[var_n]->PantsFile;
 					var->ShieldFile = parent_type->VarInfo[var_n]->ShieldFile;

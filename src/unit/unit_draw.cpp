@@ -1171,6 +1171,48 @@ void CUnit::Draw(const CViewport &vp) const
 	//
 //	DrawUnitSelection(vp, *this);
 	//Wyrmgus end
+	
+	//Wyrmgus start
+	CPlayerColorGraphic *left_arm_sprite = type->LeftArmSprite;
+	if (varinfo) {
+		if (varinfo->LeftArmSprite) {
+			left_arm_sprite = varinfo->LeftArmSprite;
+		}
+	}
+	
+	CPlayerColorGraphic *right_arm_sprite = type->RightArmSprite;
+	if (varinfo) {
+		if (varinfo->RightArmSprite) {
+			right_arm_sprite = varinfo->RightArmSprite;
+		}
+	}
+
+	CPlayerColorGraphic *shield_sprite = type->ShieldSprite;
+	if (varinfo) {
+		if (varinfo->ShieldSprite) {
+			shield_sprite = varinfo->ShieldSprite;
+		}
+	}
+	
+	//draw the left arm before the body if not facing south (or the still frame, since that also faces south)
+	if (this->Direction != LookingS && frame != type->StillFrame) {
+		//draw the shield before the left arm if not facing south
+		if (shield_sprite) {
+			DrawPlayerColorOverlay(*type, shield_sprite, player, frame, screenPos);
+		}
+		
+		if (left_arm_sprite) {
+			DrawPlayerColorOverlay(*type, left_arm_sprite, player, frame, screenPos);
+		}
+	}
+		
+	//draw the right arm before the body if facing north
+	if (this->Direction == LookingN) {
+		if (right_arm_sprite) {
+			DrawPlayerColorOverlay(*type, right_arm_sprite, player, frame, screenPos);
+		}
+	}
+	//Wyrmgus end
 
 	//
 	// Adjust sprite for Harvesters.
@@ -1250,16 +1292,23 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawPlayerColorOverlay(*type, pants_sprite, player, frame, screenPos);
 	}
 
-	CPlayerColorGraphic *shield_sprite = type->ShieldSprite;
-	if (varinfo) {
-		if (varinfo->ShieldSprite) {
-			shield_sprite = varinfo->ShieldSprite;
+	//draw the left arm just after the body if facing south
+	if (this->Direction == LookingS || frame == type->StillFrame) {
+		if (left_arm_sprite) {
+			DrawPlayerColorOverlay(*type, left_arm_sprite, player, frame, screenPos);
+		}
+		if (shield_sprite) {
+			DrawPlayerColorOverlay(*type, shield_sprite, player, frame, screenPos);
 		}
 	}
-	if (shield_sprite) {
-		DrawPlayerColorOverlay(*type, shield_sprite, player, frame, screenPos);
+
+	//draw the right arm just after the body if not facing north
+	if (this->Direction != LookingN) {
+		if (right_arm_sprite) {
+			DrawPlayerColorOverlay(*type, right_arm_sprite, player, frame, screenPos);
+		}
 	}
-	
+
 	CGraphic *light_sprite = type->LightSprite;
 	if (light_sprite) {
 		DrawOverlay(*type, light_sprite, player, frame, screenPos);

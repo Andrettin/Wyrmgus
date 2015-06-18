@@ -123,7 +123,7 @@ class VariationInfo
 public:
 	VariationInfo() : VariationId(""),
 		FrameWidth(0), FrameHeight(0),
-		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
 	{
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));		
@@ -133,6 +133,8 @@ public:
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
 	std::string ShadowFile;			/// Variation's shadow graphics.
+	std::string LeftArmFile;		/// Variation's left arm graphics.
+	std::string RightArmFile;		/// Variation's right arm graphics.
 	std::string HairFile;			/// Variation's hair graphics.
 	std::string PantsFile;			/// Variation's pants graphics.
 	std::string ShieldFile;			/// Variation's shield graphics.
@@ -142,6 +144,8 @@ public:
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
 	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
+	CPlayerColorGraphic *LeftArmSprite;	/// The graphic corresponding to LeftArmFile.
+	CPlayerColorGraphic *RightArmSprite;	/// The graphic corresponding to RightArmFile.
 	CPlayerColorGraphic *HairSprite;	/// The graphic corresponding to HairFile.
 	CPlayerColorGraphic *PantsSprite;	/// The graphic corresponding to PantsFile.
 	CPlayerColorGraphic *ShieldSprite;	/// The graphic corresponding to ShieldFile.
@@ -577,10 +581,12 @@ public:
 	std::string File;               /// Sprite files
 	std::string ShadowFile;         /// Shadow file
 	//Wyrmgus start
-	std::string LightFile;         	/// Light file
-	std::string HairFile;         	/// Hair file
-	std::string PantsFile;         	/// Pants file
-	std::string ShieldFile;         /// Shield file
+	std::string LightFile;			/// Light file
+	std::string LeftArmFile;		/// Left arm file
+	std::string RightArmFile;		/// Right arm file
+	std::string HairFile;			/// Hair file
+	std::string PantsFile;			/// Pants file
+	std::string ShieldFile;			/// Shield file
 	//Wyrmgus end
 
 	int Width;                                            /// Sprite width
@@ -761,10 +767,12 @@ public:
 	CPlayerColorGraphic *Sprite;     /// Sprite images
 	CGraphic *ShadowSprite;          /// Shadow sprite image
 	//Wyrmgus start
-	CGraphic *LightSprite;          			/// Light sprite image
-	CPlayerColorGraphic *HairSprite;          	/// Hair sprite image
-	CPlayerColorGraphic *PantsSprite;          	/// Pants sprite image
-	CPlayerColorGraphic *ShieldSprite;          /// Shield sprite image
+	CGraphic *LightSprite;						/// Light sprite image
+	CPlayerColorGraphic *LeftArmSprite;			/// Left arm sprite image
+	CPlayerColorGraphic *RightArmSprite;		/// Right arm sprite image
+	CPlayerColorGraphic *HairSprite;			/// Hair sprite image
+	CPlayerColorGraphic *PantsSprite;			/// Pants sprite image
+	CPlayerColorGraphic *ShieldSprite;			/// Shield sprite image
 	//Wyrmgus end
 };
 

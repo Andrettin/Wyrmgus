@@ -649,7 +649,7 @@ CUnitType::CUnitType() :
 	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
 //	Sprite(NULL), ShadowSprite(NULL)
-	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
+	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
 	//Wyrmgus end
 {
 #ifdef USE_MNG
@@ -714,6 +714,12 @@ CUnitType::~CUnitType()
 			if (this->VarInfo[var]->ShadowSprite) {
 				CGraphic::Free(this->VarInfo[var]->ShadowSprite);
 			}
+			if (this->VarInfo[var]->LeftArmSprite) {
+				CGraphic::Free(this->VarInfo[var]->LeftArmSprite);
+			}
+			if (this->VarInfo[var]->RightArmSprite) {
+				CGraphic::Free(this->VarInfo[var]->RightArmSprite);
+			}
 			if (this->VarInfo[var]->HairSprite) {
 				CGraphic::Free(this->VarInfo[var]->HairSprite);
 			}
@@ -740,6 +746,8 @@ CUnitType::~CUnitType()
 	CGraphic::Free(ShadowSprite);
 	//Wyrmgus start
 	CGraphic::Free(LightSprite);
+	CGraphic::Free(LeftArmSprite);
+	CGraphic::Free(RightArmSprite);
 	CGraphic::Free(HairSprite);
 	CGraphic::Free(PantsSprite);
 	CGraphic::Free(ShieldSprite);
@@ -1361,6 +1369,20 @@ void LoadUnitTypeSprite(CUnitType &type)
 			type.LightSprite->Flip();
 		}
 	}
+	if (!type.LeftArmFile.empty()) {
+		type.LeftArmSprite = CPlayerColorGraphic::New(type.LeftArmFile, type.Width, type.Height);
+		type.LeftArmSprite->Load();
+		if (type.Flip) {
+			type.LeftArmSprite->Flip();
+		}
+	}
+	if (!type.RightArmFile.empty()) {
+		type.RightArmSprite = CPlayerColorGraphic::New(type.RightArmFile, type.Width, type.Height);
+		type.RightArmSprite->Load();
+		if (type.Flip) {
+			type.RightArmSprite->Flip();
+		}
+	}
 	if (!type.HairFile.empty()) {
 		type.HairSprite = CPlayerColorGraphic::New(type.HairFile, type.Width, type.Height);
 		type.HairSprite->Load();
@@ -1412,6 +1434,20 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 			if (varinfo->ShadowSprite->Surface->format->BytesPerPixel == 1) {
 //				varinfo->ShadowSprite->MakeShadow();
+			}
+		}
+		if (!varinfo->LeftArmFile.empty()) {
+			varinfo->LeftArmSprite = CPlayerColorGraphic::New(varinfo->LeftArmFile, frame_width, frame_height);
+			varinfo->LeftArmSprite->Load();
+			if (type.Flip) {
+				varinfo->LeftArmSprite->Flip();
+			}
+		}
+		if (!varinfo->RightArmFile.empty()) {
+			varinfo->RightArmSprite = CPlayerColorGraphic::New(varinfo->RightArmFile, frame_width, frame_height);
+			varinfo->RightArmSprite->Load();
+			if (type.Flip) {
+				varinfo->RightArmSprite->Flip();
 			}
 		}
 		if (!varinfo->HairFile.empty()) {

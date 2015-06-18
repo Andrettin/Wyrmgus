@@ -227,12 +227,24 @@ void DrawBuildingCursor()
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->PantsSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->LeftArmSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->LeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->LeftArmSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->LeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
 	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite) {
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	} else if (CursorBuilding->ShieldSprite) {
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 	
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->RightArmSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->RightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->RightArmSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->RightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
 	if (CursorBuilding->LightSprite) {
 		DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
