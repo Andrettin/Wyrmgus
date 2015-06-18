@@ -313,9 +313,6 @@ enum _message_type_ {
 	MessageCommandCancelTrain,     /// Unit command cancel training
 	MessageCommandUpgrade,         /// Unit command upgrade
 	MessageCommandCancelUpgrade,   /// Unit command cancel upgrade
-	//Wyrmgus start
-	MessageCommandTransform,         /// Unit command transform
-	//Wyrmgus end
 	MessageCommandResearch,        /// Unit command research
 	MessageCommandCancelResearch,  /// Unit command cancel research
 
@@ -339,28 +336,18 @@ enum _extended_message_type_ {
 class CNetworkCommand
 {
 public:
-	//Wyrmgus start
-//	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
-//	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
-	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0), Player(0) {}
-	void Clear() { this->Unit = this->X = this->Y = this->Dest = this->Player = 0; }
-	//Wyrmgus end
+	CNetworkCommand() : Unit(0), X(0), Y(0), Dest(0) {}
+	void Clear() { this->Unit = this->X = this->Y = this->Dest = 0; }
 
 	size_t Serialize(unsigned char *buf) const;
 	size_t Deserialize(const unsigned char *buf);
-	//Wyrmgus start
-//	static size_t Size() { return 2 + 2 + 2 + 2; }
-	static size_t Size() { return 2 + 2 + 2 + 2 + 2; }
-	//Wyrmgus end
+	static size_t Size() { return 2 + 2 + 2 + 2; }
 
 public:
 	uint16_t Unit;         /// Command for unit
 	uint16_t X;            /// Map position X
 	uint16_t Y;            /// Map position Y
 	uint16_t Dest;         /// Destination unit
-	//Wyrmgus start
-	uint16_t Player;	   /// Player
-	//Wyrmgus end
 };
 
 /**

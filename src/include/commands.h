@@ -200,10 +200,7 @@ extern void AdjustCommandPosForFormation(std::vector<CUnit *> &table, const Vec2
 
 /// Execute a command (from network).
 extern void ExecCommand(unsigned char type, UnitRef unum, unsigned short x,
-						//Wyrmgus start
-//						unsigned short y, UnitRef dest);
-						unsigned short y, UnitRef dest, unsigned short player);
-						//Wyrmgus end
+						unsigned short y, UnitRef dest);
 /// Execute an extended command (from network).
 extern void ExecExtendedCommand(unsigned char type, int status, unsigned char arg1,
 								unsigned short arg2, unsigned short arg3,

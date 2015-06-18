@@ -477,7 +477,7 @@ void SendCommandTrainUnit(CUnit &unit, CUnitType &what, int player, int flush)
 	} else {
 		//Wyrmgus start
 //		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, &what, flush);
-		NetworkSendCommand(MessageCommandTrain, unit, 0, 0, NoUnitP, &what, flush, player);
+		NetworkSendCommand(MessageCommandTrain, unit, player, 0, NoUnitP, &what, flush);
 		//Wyrmgus end
 	}
 }
@@ -548,7 +548,7 @@ void SendCommandTransformInto(CUnit &unit, CUnitType &what, int flush)
 		CommandLog("transform-into", &unit, flush, -1, -1, NoUnitP, what.Ident.c_str(), -1);
 		CommandTransformIntoType(unit, what);
 	} else {
-		NetworkSendCommand(MessageCommandTransform, unit, 0, 0, NoUnitP, &what, flush);
+		NetworkSendCommand(MessageCommandUpgrade, unit, 2, 0, NoUnitP, &what, flush); //use X as a way to mark that this is a transformation and not an upgrade
 	}
 }
 //Wyrmgus end
@@ -703,18 +703,12 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 ** @param dstnr    optional destination unit.
 */
 void ExecCommand(unsigned char msgnr, UnitRef unum,
-				//Wyrmgus start
-//				 unsigned short x, unsigned short y, UnitRef dstnr)
-				 unsigned short x, unsigned short y, UnitRef dstnr, unsigned short player)
-				//Wyrmgus end
+				 unsigned short x, unsigned short y, UnitRef dstnr)
 {
 	CUnit &unit = UnitManager.GetSlotUnit(unum);
 	const Vec2i pos(x, y);
 	const int arg1 = x;
 	const int arg2 = y;
-	//Wyrmgus start
-	const int arg3 = player;
-	//Wyrmgus end
 	//
 	// Check if unit is already killed?
 	//
@@ -847,8 +841,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			//Wyrmgus start
 //			CommandLog("train", &unit, status, -1, -1, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), -1);
 //			CommandTrainUnit(unit, *UnitTypes[dstnr], status);
-			CommandLog("train", &unit, status, -1, -1, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), arg3);
-			CommandTrainUnit(unit, *UnitTypes[dstnr], arg3, status);
+			CommandLog("train", &unit, status, -1, -1, NoUnitP, UnitTypes[dstnr]->Ident.c_str(), arg1); // use X as a way to mark the player
+			CommandTrainUnit(unit, *UnitTypes[dstnr], arg1, status);
 			//Wyrmgus end
 			break;
 		case MessageCommandCancelTrain:
@@ -863,21 +857,28 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			}
 			break;
 		case MessageCommandUpgrade:
+			//Wyrmgus start
+			/*
 			CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
 					   UnitTypes[dstnr]->Ident.c_str(), -1);
 			CommandUpgradeTo(unit, *UnitTypes[dstnr], status);
 			break;
+			*/
+			if (arg1 == 2) { //use X as a way to mark whether this is an upgrade or a transformation
+				CommandLog("transform-into", &unit, status, -1, -1, NoUnitP,
+						   UnitTypes[dstnr]->Ident.c_str(), -1);
+				CommandTransformIntoType(unit, *UnitTypes[dstnr]);
+			} else {
+				CommandLog("upgrade-to", &unit, status, -1, -1, NoUnitP,
+						   UnitTypes[dstnr]->Ident.c_str(), -1);
+				CommandUpgradeTo(unit, *UnitTypes[dstnr], status);
+			}
+			break;
+			//Wyrmgus end
 		case MessageCommandCancelUpgrade:
 			CommandLog("cancel-upgrade-to", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 			CommandCancelUpgradeTo(unit);
 			break;
-		//Wyrmgus start
-		case MessageCommandTransform:
-			CommandLog("transform-into", &unit, status, -1, -1, NoUnitP,
-					   UnitTypes[dstnr]->Ident.c_str(), -1);
-			CommandTransformIntoType(unit, *UnitTypes[dstnr]);
-			break;
-		//Wyrmgus end
 		case MessageCommandResearch:
 			CommandLog("research", &unit, status, -1, -1, NoUnitP,
 					   AllUpgrades[arg1]->Ident.c_str(), -1);

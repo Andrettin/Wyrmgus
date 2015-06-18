@@ -581,9 +581,6 @@ size_t CNetworkCommand::Serialize(unsigned char *buf) const
 	p += serialize16(p, this->X);
 	p += serialize16(p, this->Y);
 	p += serialize16(p, this->Dest);
-	//Wyrmgus start
-	p += serialize16(p, this->Player);
-	//Wyrmgus end
 	return p - buf;
 }
 
@@ -594,9 +591,6 @@ size_t CNetworkCommand::Deserialize(const unsigned char *buf)
 	p += deserialize16(p, &this->X);
 	p += deserialize16(p, &this->Y);
 	p += deserialize16(p, &this->Dest);
-	//Wyrmgus start
-	p += deserialize16(p, &this->Player);
-	//Wyrmgus end
 	return p - buf;
 }
 

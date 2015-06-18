@@ -527,12 +527,8 @@ void NetworkOnStartGame()
 **
 **  @warning  Destination and unit-type shares the same network slot.
 */
-//Wyrmgus start
-//void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
-//						const CUnit *dest, const CUnitType *type, int status)
 void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
-						const CUnit *dest, const CUnitType *type, int status, int player)
-//Wyrmgus end
+						const CUnit *dest, const CUnitType *type, int status)
 {
 	CNetworkCommandQueue ncq;
 
@@ -553,9 +549,6 @@ void NetworkSendCommand(int command, const CUnit &unit, int x, int y,
 	} else {
 		nc.Dest = 0xFFFF; // -1
 	}
-	//Wyrmgus start
-	nc.Player = player;
-	//Wyrmgus end
 	ncq.Data.resize(nc.Size());
 	nc.Serialize(&ncq.Data[0]);
 	// Check for duplicate command in queue
@@ -986,10 +979,7 @@ static void NetworkExecCommand_Command(const CNetworkCommandQueue &ncq)
 	CNetworkCommand nc;
 
 	nc.Deserialize(&ncq.Data[0]);
-	//Wyrmgus start
-//	ExecCommand(ncq.Type, nc.Unit, nc.X, nc.Y, nc.Dest);
-	ExecCommand(ncq.Type, nc.Unit, nc.X, nc.Y, nc.Dest, nc.Player);
-	//Wyrmgus end
+	ExecCommand(ncq.Type, nc.Unit, nc.X, nc.Y, nc.Dest);
 }
 
 /**
