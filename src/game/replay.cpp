@@ -942,6 +942,10 @@ static void DoNextReplay()
 		SendCommandSpellCast(*unit, pos, dunit, num, flags);
 	} else if (!strcmp(action, "auto-spell-cast")) {
 		SendCommandAutoSpellCast(*unit, num, arg1);
+	//Wyrmgus start
+	} else if (!strcmp(action, "rally-point")) {
+		SendCommandRallyPoint(*unit, pos);
+	//Wyrmgus end
 	} else if (!strcmp(action, "diplomacy")) {
 		int state;
 		if (!strcmp(val, "neutral")) {

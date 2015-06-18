@@ -249,6 +249,24 @@ void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
 	}
 }
 
+//Wyrmgus start
+/**
+** Send command: Set new rally point for unit.
+**
+** @param unit    pointer to unit.
+** @param pos     map tile position to move to.
+*/
+void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("rally-point", &unit, 0, pos.x, pos.y, NoUnitP, NULL, -1);
+		CommandRallyPoint(unit, pos);
+	} else {
+		NetworkSendCommand(MessageCommandMove, unit, pos.x, pos.y, NoUnitP, 0, 0);
+	}
+}
+//Wyrmgus end
+
 /**
 ** Send command: Unit repair.
 **
@@ -756,8 +774,17 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			break;
 		}
 		case MessageCommandMove:
-			CommandLog("move", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
-			CommandMove(unit, pos, status);
+			//Wyrmgus start
+//			CommandLog("move", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
+//			CommandMove(unit, pos, status);
+			if (!unit.CanMove()) { //FIXME: find better way to identify whether the unit should move or set a rally point
+				CommandLog("rally-point", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
+				CommandRallyPoint(unit, pos);
+			} else {
+				CommandLog("move", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
+				CommandMove(unit, pos, status);
+			}
+			//Wyrmgus end
 			break;
 		case MessageCommandRepair: {
 			CUnit *dest = NoUnitP;

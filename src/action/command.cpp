@@ -281,6 +281,24 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 	ClearSavedAction(unit);
 }
 
+//Wyrmgus start
+/**
+**  Set new rally point for unit
+**
+**  @param unit   pointer to unit.
+**  @param pos    new rally point map position.
+*/
+void CommandRallyPoint(CUnit &unit, const Vec2i &pos)
+{
+	Assert(Map.Info.IsPointOnMap(pos));
+	
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	unit.RallyPointPos = pos;
+}
+//Wyrmgus end
+
 /**
 **  Repair unit
 **

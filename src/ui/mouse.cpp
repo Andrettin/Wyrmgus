@@ -558,7 +558,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 
 	//Wyrmgus start
 	if (action == MouseActionRallyPoint) {
-		unit.RallyPointPos = pos;
+		SendCommandRallyPoint(unit, pos);
 		return;
 	}
 	//Wyrmgus end
@@ -1552,7 +1552,7 @@ static int SendRallyPoint(const Vec2i &tilePos)
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit *unit = Selected[i];
 
-		unit->RallyPointPos = tilePos;
+		SendCommandRallyPoint(*unit, tilePos);
 		ret = 1;
 	}
 	

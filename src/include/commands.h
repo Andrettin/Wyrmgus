@@ -72,6 +72,10 @@ extern void CommandDefend(CUnit &unit, CUnit &dest, int flush);
 extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command move
 extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+/// Prepare command rally point
+extern void CommandRallyPoint(CUnit &unit, const Vec2i &pos);
+//Wyrmgus end
 /// Prepare command repair
 extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
 /// Send auto repair command
@@ -143,6 +147,10 @@ extern void SendCommandDefend(CUnit &unit, CUnit &dest, int flush);
 extern void SendCommandFollow(CUnit &unit, CUnit &dest, int flush);
 /// Send move command
 extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+/// Send rally point command
+extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos);
+//Wyrmgus end
 /// Send repair command
 extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
 /// Send auto repair command
