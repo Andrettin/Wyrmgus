@@ -451,7 +451,10 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 */
 bool AutoRepair(CUnit &unit)
 {
-	const int repairRange = unit.Type->DefaultStat.Variables[AUTOREPAIRRANGE_INDEX].Value;
+	//Wyrmgus start
+//	const int repairRange = unit.Type->DefaultStat.Variables[AUTOREPAIRRANGE_INDEX].Value;
+	const int repairRange = unit.Variable[AUTOREPAIRRANGE_INDEX].Value;
+	//Wyrmgus end
 
 	if (unit.AutoRepair == false || repairRange == 0) {
 		return false;

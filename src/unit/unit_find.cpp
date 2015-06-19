@@ -772,7 +772,10 @@ private:
 		int cost = 0;
 
 		// Priority 0-255
-		cost -= dtype.DefaultStat.Variables[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
+		//Wyrmgus start
+//		cost -= dtype.DefaultStat.Variables[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
+		cost -= dest->Variable[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
+		//Wyrmgus end
 		// Remaining HP (Health) 0-65535
 		cost += dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max * HEALTH_FACTOR;
 
@@ -909,7 +912,10 @@ public:
 				cost = -cost;
 			} else {
 				//  Priority 0-255
-				cost += dtype.DefaultStat.Variables[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
+				//Wyrmgus start
+//				cost += dtype.DefaultStat.Variables[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
+				cost += dest->Variable[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
+				//Wyrmgus end
 
 				for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); i++) {
 					if (type.BoolFlag[i].AiPriorityTarget != CONDITION_TRUE) {
