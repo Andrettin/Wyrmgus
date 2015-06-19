@@ -137,6 +137,9 @@ static std::vector<CUnitType *> getSupplyUnits()
 			unsigned int cost = 0;
 
 			for (unsigned j = 0; j < MaxCosts; ++j) {
+				//Wyrmgus start
+				//cannot be MapDefaultStat because this is called when the AiHelper is defined, rather than when a game is started
+				//Wyrmgus end
 				cost += type.DefaultStat.Costs[j];
 			}
 			const float score = ((float) type.Supply) / cost;

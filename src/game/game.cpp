@@ -538,6 +538,21 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			}
 		}
 
+		//Wyrmgus start
+		f->printf("-- set map default stat for unit types\n");
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+			const CUnitType &type = *UnitTypes[i];
+			for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
+				if (type.MapDefaultStat.Variables[j] != type.DefaultStat.Variables[j]) {
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Value\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Value);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Max\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Max);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Enable\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Enable);
+					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Increase\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Increase);
+				}
+			}
+		}
+		//Wyrmgus end
+		
 		f->printf("-- place units\n");
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		std::vector<CUnit *> teleporters;

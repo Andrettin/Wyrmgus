@@ -69,7 +69,10 @@ static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dir
 	if (humanWall) {
 		if (value == 0) {
 			tileIndex = tileset.getHumanWallTileIndex_destroyed(dirFlag);
-		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		//Wyrmgus start
+//		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		} else if (UnitTypeHumanWall && value <= UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
+		//Wyrmgus end
 			tileIndex = tileset.getHumanWallTileIndex_broken(dirFlag);
 		} else {
 			tileIndex = tileset.getHumanWallTileIndex(dirFlag);
@@ -77,7 +80,10 @@ static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dir
 	} else { // orcWall
 		if (value == 0) {
 			tileIndex = tileset.getOrcWallTileIndex_destroyed(dirFlag);
-		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		//Wyrmgus start
+//		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max / 2) {
+		} else if (UnitTypeOrcWall && value <= UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
+		//Wyrmgus end
 			tileIndex = tileset.getOrcWallTileIndex_broken(dirFlag);
 		} else {
 			tileIndex = tileset.getOrcWallTileIndex(dirFlag);
@@ -253,10 +259,16 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 	CMapField &mf = *Field(pos);
 
 	if (humanwall) {
-		const int value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
+		//Wyrmgus start
+//		const int value = UnitTypeHumanWall->DefaultStat.Variables[HP_INDEX].Max;
+		const int value = UnitTypeHumanWall->MapDefaultStat.Variables[HP_INDEX].Max;
+		//Wyrmgus end
 		mf.setTileIndex(*Tileset, Tileset->getHumanWallTileIndex(0), value);
 	} else {
-		const int value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
+		//Wyrmgus start
+//		const int value = UnitTypeOrcWall->DefaultStat.Variables[HP_INDEX].Max;
+		const int value = UnitTypeOrcWall->MapDefaultStat.Variables[HP_INDEX].Max;
+		//Wyrmgus end
 		mf.setTileIndex(*Tileset, Tileset->getOrcWallTileIndex(0), value);
 	}
 

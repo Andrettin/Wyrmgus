@@ -191,7 +191,10 @@ class UnitTypePrioritySorter_Decreasing
 public:
 	bool operator()(int lhs, int rhs) const
 	{
-		return UnitTypes[lhs]->DefaultStat.Variables[PRIORITY_INDEX].Value > UnitTypes[rhs]->DefaultStat.Variables[PRIORITY_INDEX].Value;
+		//Wyrmgus start
+//		return UnitTypes[lhs]->DefaultStat.Variables[PRIORITY_INDEX].Value > UnitTypes[rhs]->DefaultStat.Variables[PRIORITY_INDEX].Value;
+		return UnitTypes[lhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value > UnitTypes[rhs]->MapDefaultStat.Variables[PRIORITY_INDEX].Value;
+		//Wyrmgus end
 	}
 };
 

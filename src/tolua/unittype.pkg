@@ -19,3 +19,7 @@ CUnitType *UnitTypeByIdent(const std::string ident);
 
 extern CUnitType *UnitTypeHumanWall;
 extern CUnitType *UnitTypeOrcWall;
+
+//Wyrmgus start
+void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type);
+//Wyrmgus end

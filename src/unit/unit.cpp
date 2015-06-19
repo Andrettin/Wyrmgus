@@ -680,7 +680,10 @@ void CUnit::Init(const CUnitType &type)
 		Assert(!Variable);
 		const unsigned int size = UnitTypeVar.GetNumberVariable();
 		Variable = new CVariable[size];
-		std::copy(type.DefaultStat.Variables, type.DefaultStat.Variables + size, Variable);
+		//Wyrmgus start
+//		std::copy(type.DefaultStat.Variables, type.DefaultStat.Variables + size, Variable);
+		std::copy(type.MapDefaultStat.Variables, type.MapDefaultStat.Variables + size, Variable);
+		//Wyrmgus end
 	} else {
 		Variable = NULL;
 	}

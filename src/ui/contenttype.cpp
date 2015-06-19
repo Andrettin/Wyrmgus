@@ -122,7 +122,10 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 					Assert(0);
 			}
 		} else {
-			int value = unit.Type->DefaultStat.Variables[this->Index].Value;
+			//Wyrmgus start
+//			int value = unit.Type->DefaultStat.Variables[this->Index].Value;
+			int value = unit.Type->MapDefaultStat.Variables[this->Index].Value;
+			//Wyrmgus end
 			int diff = unit.Stats->Variables[this->Index].Value - value;
 
 			if (!diff) {

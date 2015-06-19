@@ -1889,7 +1889,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		lua_pushnumber(l, type->DefaultStat.Costs[resId]);
+		if (!GameRunning) {
+			lua_pushnumber(l, type->DefaultStat.Costs[resId]);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.Costs[resId]);
+		}
 		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, type->ChildUpgrade.c_str());
@@ -1925,10 +1929,18 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->MinAttackRange);
 		return 1;
 	} else if (!strcmp(data, "MaxAttackRange")) {
-		lua_pushnumber(l, type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value);
+		if (!GameRunning) {
+			lua_pushnumber(l, type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Value);
+		}
 		return 1;
 	} else if (!strcmp(data, "Priority")) {
-		lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
+		if (!GameRunning) {
+			lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.Variables[PRIORITY_INDEX].Value);
+		}
 		return 1;
 	} else if (!strcmp(data, "Demand")) {
 		lua_pushnumber(l, type->Demand);
@@ -1985,7 +1997,11 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
 		if (index != -1) { // valid index
-			lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
+			if (!GameRunning) {
+				lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
+			} else {
+				lua_pushnumber(l, type->MapDefaultStat.Variables[index].Value);
+			}
 			return 1;
 //			continue;
 		}
@@ -2422,11 +2438,17 @@ void UpdateUnitVariables(CUnit &unit)
 	//Wyrmgus end
 
 	// AttackRange
-	unit.Variable[ATTACKRANGE_INDEX].Value = type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+	//Wyrmgus start
+//	unit.Variable[ATTACKRANGE_INDEX].Value = type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+	unit.Variable[ATTACKRANGE_INDEX].Value = type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+	//Wyrmgus end
 	unit.Variable[ATTACKRANGE_INDEX].Max = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 
 	// Priority
-	unit.Variable[PRIORITY_INDEX].Value = type->DefaultStat.Variables[PRIORITY_INDEX].Max;
+	//Wyrmgus start
+//	unit.Variable[PRIORITY_INDEX].Value = type->DefaultStat.Variables[PRIORITY_INDEX].Max;
+	unit.Variable[PRIORITY_INDEX].Value = type->MapDefaultStat.Variables[PRIORITY_INDEX].Max;
+	//Wyrmgus end
 	unit.Variable[PRIORITY_INDEX].Max = unit.Stats->Variables[PRIORITY_INDEX].Max;
 
 	// Position
@@ -2473,6 +2495,52 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 }
+
+//Wyrmgus start
+/**
+**  Set the map default stat for a unit type
+**
+**  @param ident			Unit type ident
+**  @param variable_key		Key of the desired variable
+**  @param value			Value to set to
+**  @param variable_type	Type to be modified (i.e. "Value", "Max", etc.)
+*/
+void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type)
+{
+	const CUnitType *type = UnitTypeByIdent(ident.c_str());
+	
+	int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];
+	if (variable_index != -1) { // valid index
+		if (variable_type == "Value") {
+			type->MapDefaultStat.Variables[variable_index].Value = value;
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].Variables[variable_index].Value = type->MapDefaultStat.Variables[variable_index].Value;
+			}
+		} else if (variable_type == "Max") {
+			type->MapDefaultStat.Variables[variable_index].Max = value;
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].Variables[variable_index].Max = type->MapDefaultStat.Variables[variable_index].Max;
+			}
+		} else if (variable_type == "Increase") {
+			type->MapDefaultStat.Variables[variable_index].Increase = value;
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].Variables[variable_index].Increase = type->MapDefaultStat.Variables[variable_index].Increase;
+			}
+		} else if (variable_type == "Enable") {
+			type->MapDefaultStat.Variables[variable_index].Enable = value;
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].Variables[variable_index].Enable = type->MapDefaultStat.Variables[variable_index].Enable;
+			}
+		} else {
+			fprintf(stderr, "Invalid type: %s\n", variable_type.c_str());
+			return;
+		}
+	} else {
+		fprintf(stderr, "Invalid variable: %s\n", variable_key.c_str());
+		return;
+	}
+}
+//Wyrmgus end
 
 /**
 **  Register CCL features for unit-type.

@@ -723,6 +723,9 @@ public:
 	//Wyrmgus end
 
 	CUnitStats DefaultStat;
+	//Wyrmgus start
+	CUnitStats MapDefaultStat;
+	//Wyrmgus end
 	struct BoolFlags {
 		bool value;             /// User defined flag. Used for (dis)allow target.
 		char CanTransport;      /// Can transport units with this flag.
@@ -937,6 +940,10 @@ extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
 
 /// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(CUnit &unit);
+
+//Wyrmgus start
+extern void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type);
+//Wyrmgus end
 
 //@}
 
