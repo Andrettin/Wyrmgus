@@ -432,9 +432,21 @@ void CViewport::Draw() const
 			particletable[k]->draw();
 		}
 		ParticleManager.endDraw();
+		//Wyrmgus start
+		//draw fog of war below the "click missile"
+		this->DrawMapFogOfWar();
+		j = 0;
+		for (; j < nmissiles; ++j) {
+			if (!ClickMissile.empty() && ClickMissile == missiletable[j]->Type->Ident) {
+				missiletable[j]->DrawMissile(*this); //draw click missile again to make it appear on top of the fog of war
+			}
+		}
+		//Wyrmgus end
 	}
 
-	this->DrawMapFogOfWar();
+	//Wyrmgus start
+//	this->DrawMapFogOfWar();
+	//Wyrmgus end
 
 	//
 	// Draw orders of selected units.
