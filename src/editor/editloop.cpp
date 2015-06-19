@@ -1335,11 +1335,28 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on unit area
 	if (Editor.State == EditorEditUnit) {
 		// Cursor on unit icons
+		//Wyrmgus start
+		/*
 		if (Editor.CursorUnitIndex != -1) {
 			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
 			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
 			return;
 		}
+		*/
+		if (Editor.CursorUnitIndex != -1) {
+			if ((MouseButtons & LeftButton)) {
+				Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
+				CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+				return;
+			} else if ((MouseButtons & RightButton)) {
+				char buf[256];
+				snprintf(buf, sizeof(buf), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
+				Editor.CursorUnitIndex = -1;
+				CclCommand(buf);
+				return;
+			}
+		}
+		//Wyrmgus end
 	}
 
 	// Right click on a resource

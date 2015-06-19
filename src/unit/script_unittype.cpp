@@ -40,6 +40,9 @@
 #include "actions.h"
 #include "animation.h"
 #include "construct.h"
+//Wyrmgus start
+#include "editor.h"
+//Wyrmgus end
 #include "font.h"
 #include "luacallback.h"
 #include "map.h"
@@ -1889,7 +1892,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaCheckArgs(l, 3);
 		const std::string res = LuaToString(l, 3);
 		const int resId = GetResourceIdByName(l, res.c_str());
-		if (!GameRunning) {
+		if (!GameRunning && Editor.Running != EditorEditing) {
 			lua_pushnumber(l, type->DefaultStat.Costs[resId]);
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.Costs[resId]);
@@ -1929,14 +1932,14 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->MinAttackRange);
 		return 1;
 	} else if (!strcmp(data, "MaxAttackRange")) {
-		if (!GameRunning) {
+		if (!GameRunning && Editor.Running != EditorEditing) {
 			lua_pushnumber(l, type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value);
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Value);
 		}
 		return 1;
 	} else if (!strcmp(data, "Priority")) {
-		if (!GameRunning) {
+		if (!GameRunning && Editor.Running != EditorEditing) {
 			lua_pushnumber(l, type->DefaultStat.Variables[PRIORITY_INDEX].Value);
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.Variables[PRIORITY_INDEX].Value);
@@ -1997,7 +2000,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
 		if (index != -1) { // valid index
-			if (!GameRunning) {
+			if (!GameRunning && Editor.Running != EditorEditing) {
 				lua_pushnumber(l, type->DefaultStat.Variables[index].Value);
 			} else {
 				lua_pushnumber(l, type->MapDefaultStat.Variables[index].Value);
