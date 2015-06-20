@@ -539,9 +539,19 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		}
 
 		//Wyrmgus start
-		f->printf("-- set map default stat for unit types\n");
+		f->printf("\n-- set map default stat for unit types\n");
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 			const CUnitType &type = *UnitTypes[i];
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (type.MapDefaultStat.Costs[j] != type.DefaultStat.Costs[j]) {
+					f->printf("SetMapStat(\"%s\", \"Costs\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.Costs[j], DefaultResourceNames[j].c_str());
+				}
+			}
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (type.MapDefaultStat.ImproveIncomes[j] != type.DefaultStat.ImproveIncomes[j]) {
+					f->printf("SetMapStat(\"%s\", \"ImproveProduction\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.ImproveIncomes[j], DefaultResourceNames[j].c_str());
+				}
+			}
 			for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
 				if (type.MapDefaultStat.Variables[j] != type.DefaultStat.Variables[j]) {
 					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Value\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Value);
@@ -553,7 +563,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		}
 		//Wyrmgus end
 		
-		f->printf("-- place units\n");
+		//Wyrmgus start
+//		f->printf("-- place units\n");
+		f->printf("\n-- place units\n");
+		//Wyrmgus end
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		std::vector<CUnit *> teleporters;
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {

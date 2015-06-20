@@ -274,6 +274,7 @@ enum {
 	BASICDAMAGE_INDEX,
 	//Wyrmgus start
 	THORNSDAMAGE_INDEX,
+	SPEED_INDEX,
 	//Wyrmgus end
 	POSX_INDEX,
 	POSY_INDEX,

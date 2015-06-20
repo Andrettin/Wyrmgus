@@ -146,6 +146,7 @@ static const char PIERCINGDAMAGE_KEY[] = "PiercingDamage";
 static const char BASICDAMAGE_KEY[] = "BasicDamage";
 //Wyrmgus start
 static const char THORNSDAMAGE_KEY[] = "ThornsDamage";
+static const char SPEED_KEY[] = "Speed";
 //Wyrmgus end
 static const char POSX_KEY[] = "PosX";
 static const char POSY_KEY[] = "PosY";
@@ -229,7 +230,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   SIGHTRANGE_KEY, ATTACKRANGE_KEY, PIERCINGDAMAGE_KEY,
 							   //Wyrmgus start
 //							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
-							   BASICDAMAGE_KEY, THORNSDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
+							   BASICDAMAGE_KEY, THORNSDAMAGE_KEY, SPEED_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
 							   //Wyrmgus end
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
@@ -1898,6 +1899,16 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_pushnumber(l, type->MapDefaultStat.Costs[resId]);
 		}
 		return 1;
+	} else if (!strcmp(data, "ImproveProduction")) {
+		LuaCheckArgs(l, 3);
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		if (!GameRunning && Editor.Running != EditorEditing) {
+			lua_pushnumber(l, type->DefaultStat.ImproveIncomes[resId]);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.ImproveIncomes[resId]);
+		}
+		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, type->ChildUpgrade.c_str());
 		return 1;
@@ -2335,7 +2346,7 @@ void UpdateUnitVariables(CUnit &unit)
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
 			//Wyrmgus start
-			|| i == THORNSDAMAGE_INDEX
+			|| i == THORNSDAMAGE_INDEX || i == SPEED_INDEX
 			//Wyrmgus end
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX || i == GIVERESOURCE_INDEX
 			//Wyrmgus start
@@ -2506,41 +2517,55 @@ void UpdateUnitVariables(CUnit &unit)
 **  @param ident			Unit type ident
 **  @param variable_key		Key of the desired variable
 **  @param value			Value to set to
-**  @param variable_type	Type to be modified (i.e. "Value", "Max", etc.)
+**  @param variable_type	Type to be modified (i.e. "Value", "Max", etc.); alternatively, resource type if variable_key equals "Costs"
 */
 void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type)
 {
-	const CUnitType *type = UnitTypeByIdent(ident.c_str());
+	CUnitType *type = UnitTypeByIdent(ident.c_str());
 	
-	int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];
-	if (variable_index != -1) { // valid index
-		if (variable_type == "Value") {
-			type->MapDefaultStat.Variables[variable_index].Value = value;
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].Variables[variable_index].Value = type->MapDefaultStat.Variables[variable_index].Value;
-			}
-		} else if (variable_type == "Max") {
-			type->MapDefaultStat.Variables[variable_index].Max = value;
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].Variables[variable_index].Max = type->MapDefaultStat.Variables[variable_index].Max;
-			}
-		} else if (variable_type == "Increase") {
-			type->MapDefaultStat.Variables[variable_index].Increase = value;
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].Variables[variable_index].Increase = type->MapDefaultStat.Variables[variable_index].Increase;
-			}
-		} else if (variable_type == "Enable") {
-			type->MapDefaultStat.Variables[variable_index].Enable = value;
-			for (int player = 0; player < PlayerMax; ++player) {
-				type->Stats[player].Variables[variable_index].Enable = type->MapDefaultStat.Variables[variable_index].Enable;
-			}
-		} else {
-			fprintf(stderr, "Invalid type: %s\n", variable_type.c_str());
-			return;
+	if (variable_key == "Costs") {
+		const int resId = GetResourceIdByName(variable_type.c_str());
+		type->MapDefaultStat.Costs[resId] = value;
+		for (int player = 0; player < PlayerMax; ++player) {
+			type->Stats[player].Costs[resId] = type->MapDefaultStat.Costs[resId];
+		}
+	} else if (variable_key == "ImproveProduction") {
+		const int resId = GetResourceIdByName(variable_type.c_str());
+		type->MapDefaultStat.ImproveIncomes[resId] = value;
+		for (int player = 0; player < PlayerMax; ++player) {
+			type->Stats[player].ImproveIncomes[resId] = type->MapDefaultStat.ImproveIncomes[resId];
 		}
 	} else {
-		fprintf(stderr, "Invalid variable: %s\n", variable_key.c_str());
-		return;
+		int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];
+		if (variable_index != -1) { // valid index
+			if (variable_type == "Value") {
+				type->MapDefaultStat.Variables[variable_index].Value = value;
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].Value = type->MapDefaultStat.Variables[variable_index].Value;
+				}
+			} else if (variable_type == "Max") {
+				type->MapDefaultStat.Variables[variable_index].Max = value;
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].Max = type->MapDefaultStat.Variables[variable_index].Max;
+				}
+			} else if (variable_type == "Increase") {
+				type->MapDefaultStat.Variables[variable_index].Increase = value;
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].Increase = type->MapDefaultStat.Variables[variable_index].Increase;
+				}
+			} else if (variable_type == "Enable") {
+				type->MapDefaultStat.Variables[variable_index].Enable = value;
+				for (int player = 0; player < PlayerMax; ++player) {
+					type->Stats[player].Variables[variable_index].Enable = type->MapDefaultStat.Variables[variable_index].Enable;
+				}
+			} else {
+				fprintf(stderr, "Invalid type: %s\n", variable_type.c_str());
+				return;
+			}
+		} else {
+			fprintf(stderr, "Invalid variable: %s\n", variable_key.c_str());
+			return;
+		}
 	}
 }
 //Wyrmgus end

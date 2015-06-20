@@ -159,7 +159,7 @@ public:
 	int Costs[MaxCosts];            /// current costs of the unit
 	int Storing[MaxCosts];          /// storage increasing
 	//Wyrmgus start
-	int ImproveIncomes[MaxCosts];   /// storage increasing
+	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
 	//Wyrmgus end
 };
 
