@@ -70,6 +70,10 @@ static bool ModifyFlag(const char *flagName, unsigned int *flag)
 		{"air-unit", MapFieldAirUnit},
 		{"sea-unit", MapFieldSeaUnit},
 		{"building", MapFieldBuilding},
+		//Wyrmgus start
+		{"item", MapFieldItem},
+		{"bridge", MapFieldBridge},
+		//Wyrmgus end
 		{"human", MapFieldHuman}
 	};
 

@@ -893,6 +893,10 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.MovementMask = MapFieldLandUnit |
 								MapFieldSeaUnit |
 								MapFieldBuilding |
+								//Wyrmgus start
+								MapFieldItem |
+								MapFieldBridge |
+								//Wyrmgus end
 								MapFieldCoastAllowed |
 								MapFieldWaterAllowed |
 								MapFieldNoBuilding |
@@ -974,12 +978,18 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
 					MapFieldBuilding | // already occuppied
+					//Wyrmgus start
+					MapFieldBridge |
+					//Wyrmgus end
 					MapFieldLandAllowed; // can't move on this
 				// Johns: MapFieldUnpassable only for land units?
 			//Wyrmgus start
 			} else if (type.BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
 				type.MovementMask =
 					MapFieldBuilding | // already occuppied
+					//Wyrmgus start
+					MapFieldBridge |
+					//Wyrmgus end
 					MapFieldCoastAllowed |
 					MapFieldLandAllowed | // can't move on this
 					MapFieldUnpassable;
@@ -989,6 +999,9 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
 					MapFieldBuilding | // already occuppied
+					//Wyrmgus start
+					MapFieldBridge |
+					//Wyrmgus end
 					MapFieldCoastAllowed |
 					MapFieldLandAllowed | // can't move on this
 					MapFieldUnpassable;
@@ -1012,6 +1025,9 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				MapFieldLandUnit |
 				MapFieldSeaUnit |
 				MapFieldBuilding | // already occuppied
+				//Wyrmgus start
+				MapFieldBridge |
+				//Wyrmgus end
 				MapFieldLandAllowed; // can't build on this
 		}
 		type.MovementMask |= MapFieldNoBuilding;
@@ -1037,6 +1053,13 @@ void UpdateUnitStats(CUnitType &type, int reset)
 							MapFieldUnpassable |
 							MapFieldItem;
 		type.FieldFlags = MapFieldItem;
+	} else if (type.BoolFlag[BRIDGE_INDEX].value) {
+		type.MovementMask = MapFieldSeaUnit |
+							MapFieldBuilding |
+							MapFieldLandAllowed |
+							MapFieldUnpassable |
+							MapFieldBridge;
+		type.FieldFlags = MapFieldBridge;
 	//Wyrmgus end
 	//Wyrmgus start
 //	} else {

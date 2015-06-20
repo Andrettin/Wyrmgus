@@ -524,7 +524,15 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 		const CMapField *mf = Map.Field(index);
 		int i = w;
 		do {
-			const int flag = mf->Flags & mask;
+			//Wyrmgus start
+//			const int flag = mf->Flags & mask;
+			//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
+			int check_flags = mf->Flags;
+			if (check_flags & MapFieldBridge) {
+				check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
+			}
+			const int flag = check_flags & mask;
+			//Wyrmgus end
 			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsExplored(*unit.Player))) {
 				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things

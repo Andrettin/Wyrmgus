@@ -187,6 +187,14 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldBuilding) {
 		file.printf(", \"building\"");
 	}
+	//Wyrmgus start
+	if (Flags & MapFieldItem) {
+		file.printf(", \"item\"");
+	}
+	if (Flags & MapFieldBridge) {
+		file.printf(", \"bridge\"");
+	}
+	//Wyrmgus end
 #endif
 	file.printf("}");
 }
@@ -258,6 +266,10 @@ void CMapField::parse(lua_State *l)
 		} else if (!strcmp(value, "building")) {
 			this->Flags |= MapFieldBuilding;
 		//Wyrmgus start
+		} else if (!strcmp(value, "item")) {
+			this->Flags |= MapFieldItem;
+		} else if (!strcmp(value, "bridge")) {
+			this->Flags |= MapFieldBridge;
 		} else if (!strcmp(value, "air-unpassable")) {
 			this->Flags |= MapFieldAirUnpassable;
 		} else if (!strcmp(value, "dirt")) {
@@ -282,7 +294,15 @@ void CMapField::parse(lua_State *l)
 /// Check if a field flags.
 bool CMapField::CheckMask(int mask) const
 {
-	return (this->Flags & mask) != 0;
+	//Wyrmgus start
+	//for purposes of this check, don't count MapFieldWaterAllowed and MapFieldCoastAllowed if there is a bridge present
+	int check_flags = this->Flags;
+	if (check_flags & MapFieldBridge) {
+		check_flags &= ~(MapFieldWaterAllowed | MapFieldCoastAllowed);
+	}
+//	return (this->Flags & mask) != 0;
+	return (check_flags & mask) != 0;
+	//Wyrmgus end
 }
 
 /// Returns true, if water on the map tile field
