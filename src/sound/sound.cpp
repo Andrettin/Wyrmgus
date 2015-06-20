@@ -165,55 +165,88 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 	//Wyrmgus end
 	switch (voice) {
 		case VoiceAcknowledging:
-			return unit.Type->Sound.Acknowledgement.Sound;
+			//Wyrmgus start
+//			return unit.Type->Sound.Acknowledgement.Sound;
+			return unit.Type->MapSound.Acknowledgement.Sound;
+			//Wyrmgus end
 		case VoiceAttack:
+			//Wyrmgus start
+			/*
 			if (unit.Type->Sound.Attack.Sound) {
 				return unit.Type->Sound.Attack.Sound;
 			} else {
 				return unit.Type->Sound.Acknowledgement.Sound;
 			}
+			*/
+			if (unit.Type->MapSound.Attack.Sound) {
+				return unit.Type->MapSound.Attack.Sound;
+			} else {
+				return unit.Type->MapSound.Acknowledgement.Sound;
+			}
+			//Wyrmgus end
 		//Wyrmgus start
 		case VoiceIdle:
-			return unit.Type->Sound.Idle.Sound;
+			return unit.Type->MapSound.Idle.Sound;
 		case VoiceHit:
-			return unit.Type->Sound.Hit.Sound;
+			return unit.Type->MapSound.Hit.Sound;
 		case VoiceMiss:
-			if (unit.Type->Sound.Miss.Sound) {
-				return unit.Type->Sound.Miss.Sound;
+			if (unit.Type->MapSound.Miss.Sound) {
+				return unit.Type->MapSound.Miss.Sound;
 			} else {
-				return unit.Type->Sound.Hit.Sound;
+				return unit.Type->MapSound.Hit.Sound;
 			}
 		case VoiceStep:
-			if (unit.Type->Sound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
-				return unit.Type->Sound.StepGravel.Sound;
-			} else if (unit.Type->Sound.StepGrass.Sound && ((mf.getFlag() & MapFieldGrass) || (mf.getFlag() & MapFieldStumps))) {
-				return unit.Type->Sound.StepGrass.Sound;
-			} else if (unit.Type->Sound.StepDirt.Sound && mf.getFlag() & MapFieldDirt) {
-				return unit.Type->Sound.StepDirt.Sound;
-			} else if (unit.Type->Sound.StepMud.Sound && mf.getFlag() & MapFieldMud) {
-				return unit.Type->Sound.StepMud.Sound;
-			} else if (unit.Type->Sound.StepStone.Sound && mf.getFlag() & MapFieldStoneFloor) {
-				return unit.Type->Sound.StepStone.Sound;
+			if (unit.Type->MapSound.StepGravel.Sound && mf.getFlag() & MapFieldGravel) {
+				return unit.Type->MapSound.StepGravel.Sound;
+			} else if (unit.Type->MapSound.StepGrass.Sound && ((mf.getFlag() & MapFieldGrass) || (mf.getFlag() & MapFieldStumps))) {
+				return unit.Type->MapSound.StepGrass.Sound;
+			} else if (unit.Type->MapSound.StepDirt.Sound && mf.getFlag() & MapFieldDirt) {
+				return unit.Type->MapSound.StepDirt.Sound;
+			} else if (unit.Type->MapSound.StepMud.Sound && mf.getFlag() & MapFieldMud) {
+				return unit.Type->MapSound.StepMud.Sound;
+			} else if (unit.Type->MapSound.StepStone.Sound && mf.getFlag() & MapFieldStoneFloor) {
+				return unit.Type->MapSound.StepStone.Sound;
 			} else {
-				return unit.Type->Sound.Step.Sound;
+				return unit.Type->MapSound.Step.Sound;
 			}
 		case VoiceUsed:
-			return unit.Type->Sound.Used.Sound;
+			return unit.Type->MapSound.Used.Sound;
 		//Wyrmgus end
 		case VoiceBuild:
-			return unit.Type->Sound.Build.Sound;
+			//Wyrmgus start
+//			return unit.Type->Sound.Build.Sound;
+			return unit.Type->MapSound.Build.Sound;
+			//Wyrmgus end
 		case VoiceReady:
-			return unit.Type->Sound.Ready.Sound;
+			//Wyrmgus start
+//			return unit.Type->Sound.Ready.Sound;
+			return unit.Type->MapSound.Ready.Sound;
+			//Wyrmgus end
 		case VoiceSelected:
-			return unit.Type->Sound.Selected.Sound;
+			//Wyrmgus start
+//			return unit.Type->Sound.Selected.Sound;
+			return unit.Type->MapSound.Selected.Sound;
+			//Wyrmgus end
 		case VoiceHelpMe:
-			return unit.Type->Sound.Help.Sound;
+			//Wyrmgus start
+//			return unit.Type->Sound.Help.Sound;
+			return unit.Type->MapSound.Help.Sound;
+			//Wyrmgus end
 		case VoiceDying:
+			//Wyrmgus start
+			/*
 			if (unit.Type->Sound.Dead[unit.DamagedType].Sound) {
 				return unit.Type->Sound.Dead[unit.DamagedType].Sound;
 			} else {
 				return unit.Type->Sound.Dead[ANIMATIONS_DEATHTYPES].Sound;
 			}
+			*/
+			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
+				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
+			} else {
+				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
+			}
+			//Wyrmgus end
 		case VoiceWorkCompleted:
 			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
 		case VoiceBuilding:
@@ -221,20 +254,38 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceDocking:
 			return GameSounds.Docking.Sound;
 		case VoiceRepairing:
+			//Wyrmgus start
+			/*
 			if (unit.Type->Sound.Repair.Sound) {
 				return unit.Type->Sound.Repair.Sound;
 			} else {
 				return unit.Type->Sound.Acknowledgement.Sound;
 			}
+			*/
+			if (unit.Type->MapSound.Repair.Sound) {
+				return unit.Type->MapSound.Repair.Sound;
+			} else {
+				return unit.Type->MapSound.Acknowledgement.Sound;
+			}
+			//Wyrmgus end
 		case VoiceHarvesting:
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitActionResource) {
 					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
+					//Wyrmgus start
+					/*
 					if (unit.Type->Sound.Harvest[order.GetCurrentResource()].Sound) {
 						return unit.Type->Sound.Harvest[order.GetCurrentResource()].Sound;
 					} else {
 						return unit.Type->Sound.Acknowledgement.Sound;
 					}
+					*/
+					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
+						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
+					} else {
+						return unit.Type->MapSound.Acknowledgement.Sound;
+					}
+					//Wyrmgus end
 				}
 			}
 	}

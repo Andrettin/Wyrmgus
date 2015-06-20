@@ -38,6 +38,11 @@
 
 #include "unitsound.h"
 
+//Wyrmgus start
+#include <string>
+#include <map>
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -171,6 +176,10 @@ extern bool CallbackMusic;  /// flag true callback ccl if stops
 
 /// global range control (max cut off distance for sound)
 extern int DistanceSilent;
+
+//Wyrmgus start
+extern std::map<std::string, CSound *> SoundMap;
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Functions

@@ -261,7 +261,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		} else if (worker) {
 			PlayUnitSound(*worker, VoiceWorkCompleted);
 		*/
-		if (type.Sound.Ready.Sound) {
+		if (type.MapSound.Ready.Sound) {
 			PlayUnitSound(unit, VoiceReady);
 		}
 		if (worker) {

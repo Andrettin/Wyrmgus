@@ -844,6 +844,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 		for (int player = 0; player < PlayerMax; ++player) {
 			type.Stats[player] = type.MapDefaultStat;
 		}
+		type.MapSound = type.Sound;
 		//Wyrmgus end
 	}
 

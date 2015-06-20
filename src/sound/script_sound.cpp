@@ -362,6 +362,25 @@ static int CclSetSoundVolumePercent(lua_State *l)
 	SetSoundVolumePercent(id, LuaToNumber(l, 2));
 	return 1;
 }
+
+/**
+**  Get sound idents
+**
+**  @param l  Lua state.
+*/
+static int CclGetSounds(lua_State *l)
+{
+	lua_createtable(l, SoundMap.size(), 0);
+	std::map<std::string, CSound *>::iterator i;
+	int j = 1;
+	for (i = SoundMap.begin(); i != SoundMap.end(); ++i) {
+		lua_pushstring(l, (*i).first.c_str());
+		lua_rawseti(l, -2, j);
+		++j;
+	}
+	
+	return 1;
+}
 //Wyrmgus end
 
 /**
@@ -376,6 +395,7 @@ void SoundCclRegister()
 	lua_register(Lua, "SetSoundRange", CclSetSoundRange);
 	//Wyrmgus start
 	lua_register(Lua, "SetSoundVolumePercent", CclSetSoundVolumePercent);
+	lua_register(Lua, "GetSounds", CclGetSounds);
 	//Wyrmgus end
 	lua_register(Lua, "MakeSound", CclMakeSound);
 	lua_register(Lua, "MakeSoundGroup", CclMakeSoundGroup);

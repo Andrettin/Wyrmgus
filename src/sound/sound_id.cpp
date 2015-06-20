@@ -46,7 +46,10 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static std::map<std::string, CSound *> SoundMap;
+//Wyrmgus start
+//static std::map<std::string, CSound *> SoundMap;
+std::map<std::string, CSound *> SoundMap;
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 -- Functions

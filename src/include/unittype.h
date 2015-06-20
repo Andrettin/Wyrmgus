@@ -745,7 +745,10 @@ public:
 	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
-	CUnitSound Sound;               /// Sounds for events
+	CUnitSound Sound;				/// Sounds for events
+	//Wyrmgus start
+	CUnitSound MapSound;			/// Sounds for events, map-specific
+	//Wyrmgus end
 
 	int Supply;                     /// Food supply
 	int Demand;                     /// Food demand
@@ -944,6 +947,7 @@ extern void UpdateUnitVariables(CUnit &unit);
 
 //Wyrmgus start
 extern void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type);
+extern void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
 //Wyrmgus end
 
 //@}

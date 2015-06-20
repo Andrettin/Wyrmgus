@@ -2008,6 +2008,152 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "organic")) {
 		lua_pushboolean(l, type->BoolFlag[ORGANIC_INDEX].value);
 		return 1;
+	} else if (!strcmp(data, "Sounds")) {
+		LuaCheckArgs(l, 3);
+		const std::string sound_type = LuaToString(l, 3);
+		if (sound_type == "selected") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Selected.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Selected.Name.c_str());
+			}
+		} else if (sound_type == "acknowledge") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Acknowledgement.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Acknowledgement.Name.c_str());
+			}
+		} else if (sound_type == "attack") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Attack.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Attack.Name.c_str());
+			}
+		} else if (sound_type == "idle") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Idle.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Idle.Name.c_str());
+			}
+		} else if (sound_type == "hit") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Hit.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Hit.Name.c_str());
+			}
+		} else if (sound_type == "miss") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Miss.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Miss.Name.c_str());
+			}
+		} else if (sound_type == "step") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Step.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Step.Name.c_str());
+			}
+		} else if (sound_type == "step-dirt") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.StepDirt.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.StepDirt.Name.c_str());
+			}
+		} else if (sound_type == "step-grass") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.StepGrass.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.StepGrass.Name.c_str());
+			}
+		} else if (sound_type == "step-gravel") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.StepGravel.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.StepGravel.Name.c_str());
+			}
+		} else if (sound_type == "step-mud") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.StepMud.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.StepMud.Name.c_str());
+			}
+		} else if (sound_type == "step-stone") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.StepStone.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.StepStone.Name.c_str());
+			}
+		} else if (sound_type == "used") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Used.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Used.Name.c_str());
+			}
+		} else if (sound_type == "build") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Build.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Build.Name.c_str());
+			}
+		} else if (sound_type == "ready") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Ready.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Ready.Name.c_str());
+			}
+		} else if (sound_type == "repair") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Repair.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Repair.Name.c_str());
+			}
+		} else if (sound_type == "harvest") {
+			LuaCheckArgs(l, 4);
+			const std::string sound_subtype = LuaToString(l, 4);
+			const int resId = GetResourceIdByName(sound_subtype.c_str());
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Harvest[resId].Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Harvest[resId].Name.c_str());
+			}
+		} else if (sound_type == "help") {
+			if (!GameRunning && Editor.Running != EditorEditing) {
+				lua_pushstring(l, type->Sound.Help.Name.c_str());
+			} else {
+				lua_pushstring(l, type->MapSound.Help.Name.c_str());
+			}
+		} else if (sound_type == "dead") {
+			if (lua_gettop(l) < 4) {
+				if (!GameRunning && Editor.Running != EditorEditing) {
+					lua_pushstring(l, type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+				} else {
+					lua_pushstring(l, type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+				}
+			} else {
+				int death;
+				const std::string sound_subtype = LuaToString(l, 4);
+
+				for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+					if (sound_subtype == ExtraDeathTypes[death]) {
+						break;
+					}
+				}
+				if (death == ANIMATIONS_DEATHTYPES) {
+					if (!GameRunning && Editor.Running != EditorEditing) {
+						lua_pushstring(l, type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+					} else {
+						lua_pushstring(l, type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+					}
+				} else {
+					if (!GameRunning && Editor.Running != EditorEditing) {
+						lua_pushstring(l, type->Sound.Dead[death].Name.c_str());
+					} else {
+						lua_pushstring(l, type->MapSound.Dead[death].Name.c_str());
+					}
+				}
+			}
+		}
+		return 1;
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
 		if (index != -1) { // valid index
@@ -2565,6 +2711,73 @@ void SetMapStat(std::string ident, std::string variable_key, int value, std::str
 		} else {
 			fprintf(stderr, "Invalid variable: %s\n", variable_key.c_str());
 			return;
+		}
+	}
+}
+
+/**
+**  Set the map sound for a unit type
+**
+**  @param ident			Unit type ident
+**  @param sound_type		Type of the sound
+**  @param sound			The sound to be set for that type
+*/
+void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype)
+{
+	if (sound.empty()) {
+		return;
+	}
+	CUnitType *type = UnitTypeByIdent(ident.c_str());
+	
+	if (sound_type == "selected") {
+		type->MapSound.Selected.Name = sound;
+	} else if (sound_type == "acknowledge") {
+		type->MapSound.Acknowledgement.Name = sound;
+	} else if (sound_type == "attack") {
+		type->MapSound.Attack.Name = sound;
+	} else if (sound_type == "idle") {
+		type->MapSound.Idle.Name = sound;
+	} else if (sound_type == "hit") {
+		type->MapSound.Hit.Name = sound;
+	} else if (sound_type == "miss") {
+		type->MapSound.Miss.Name = sound;
+	} else if (sound_type == "step") {
+		type->MapSound.Step.Name = sound;
+	} else if (sound_type == "step-dirt") {
+		type->MapSound.StepDirt.Name = sound;
+	} else if (sound_type == "step-grass") {
+		type->MapSound.StepGrass.Name = sound;
+	} else if (sound_type == "step-gravel") {
+		type->MapSound.StepGravel.Name = sound;
+	} else if (sound_type == "step-mud") {
+		type->MapSound.StepMud.Name = sound;
+	} else if (sound_type == "step-stone") {
+		type->MapSound.StepStone.Name = sound;
+	} else if (sound_type == "used") {
+		type->MapSound.Used.Name = sound;
+	} else if (sound_type == "build") {
+		type->MapSound.Build.Name = sound;
+	} else if (sound_type == "ready") {
+		type->MapSound.Ready.Name = sound;
+	} else if (sound_type == "repair") {
+		type->MapSound.Repair.Name = sound;
+	} else if (sound_type == "harvest") {
+		const int resId = GetResourceIdByName(sound_subtype.c_str());
+		type->MapSound.Harvest[resId].Name = sound;
+	} else if (sound_type == "help") {
+		type->MapSound.Help.Name = sound;
+	} else if (sound_type == "dead") {
+		int death;
+
+		for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+			if (sound_subtype == ExtraDeathTypes[death]) {
+				break;
+			}
+		}
+		if (death == ANIMATIONS_DEATHTYPES) {
+			type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name = sound;
+		} else {
+			type->MapSound.Dead[death].Name = sound;
 		}
 	}
 }

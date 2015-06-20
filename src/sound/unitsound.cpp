@@ -183,22 +183,31 @@ void MapUnitSounds()
 
 		MapAnimSounds(type);
 
+		//Wyrmgus start
+		/*
 		type.Sound.Selected.MapSound();
 		type.Sound.Acknowledgement.MapSound();
 		// type.Sound.Acknowledgement.SetSoundRange(INFINITE_SOUND_RANGE);
 		type.Sound.Attack.MapSound();
-		//Wyrmgus start
-		type.Sound.Idle.MapSound();
-		type.Sound.Hit.MapSound();
-		type.Sound.Miss.MapSound();
-		type.Sound.Step.MapSound();
-		type.Sound.StepDirt.MapSound();
-		type.Sound.StepGrass.MapSound();
-		type.Sound.StepGravel.MapSound();
-		type.Sound.StepMud.MapSound();
-		type.Sound.StepStone.MapSound();
-		type.Sound.Used.MapSound();
+		*/
+		type.MapSound.Selected.MapSound();
+		type.MapSound.Acknowledgement.MapSound();
+		type.MapSound.Attack.MapSound();
 		//Wyrmgus end
+		//Wyrmgus start
+		type.MapSound.Idle.MapSound();
+		type.MapSound.Hit.MapSound();
+		type.MapSound.Miss.MapSound();
+		type.MapSound.Step.MapSound();
+		type.MapSound.StepDirt.MapSound();
+		type.MapSound.StepGrass.MapSound();
+		type.MapSound.StepGravel.MapSound();
+		type.MapSound.StepMud.MapSound();
+		type.MapSound.StepStone.MapSound();
+		type.MapSound.Used.MapSound();
+		//Wyrmgus end
+		//Wyrmgus start
+		/*
 		type.Sound.Build.MapSound();
 		type.Sound.Ready.MapSound();
 		type.Sound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
@@ -212,6 +221,21 @@ void MapUnitSounds()
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 			type.Sound.Dead[i].MapSound();
 		}
+		*/
+		type.MapSound.Build.MapSound();
+		type.MapSound.Ready.MapSound();
+		type.MapSound.Ready.SetSoundRange(INFINITE_SOUND_RANGE);
+		type.MapSound.Repair.MapSound();
+		for (int i = 0; i < MaxCosts; ++i) {
+			type.MapSound.Harvest[i].MapSound();
+		}
+		type.MapSound.Help.MapSound();
+		type.MapSound.Help.SetSoundRange(INFINITE_SOUND_RANGE);
+
+		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
+			type.MapSound.Dead[i].MapSound();
+		}
+		//Wyrmgus end
 	}
 }
 
