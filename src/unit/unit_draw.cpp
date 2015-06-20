@@ -1259,10 +1259,6 @@ void CUnit::Draw(const CViewport &vp) const
 		if (left_arm_sprite) {
 			DrawPlayerColorOverlay(*type, left_arm_sprite, player, frame, screenPos);
 		}
-		
-		if (clothing_left_arm_sprite) {
-			DrawPlayerColorOverlay(*type, clothing_left_arm_sprite, player, frame, screenPos);
-		}
 	}
 		
 	//draw the right arm before the body if facing north
@@ -1272,9 +1268,6 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 		if (right_arm_sprite) {
 			DrawPlayerColorOverlay(*type, right_arm_sprite, player, frame, screenPos);
-		}
-		if (clothing_right_arm_sprite) {
-			DrawPlayerColorOverlay(*type, clothing_right_arm_sprite, player, frame, screenPos);
 		}
 	}
 	//Wyrmgus end
@@ -1345,6 +1338,18 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 	if (hair_sprite) {
 		DrawPlayerColorOverlay(*type, hair_sprite, player, frame, screenPos);
+	}
+	
+	//draw the left arm and right arm clothing after the body, even if the arms were drawn before
+	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
+		if (clothing_left_arm_sprite) {
+			DrawPlayerColorOverlay(*type, clothing_left_arm_sprite, player, frame, screenPos);
+		}
+	}
+	if (this->Direction == LookingN && this->CurrentAction() != UnitActionDie) {
+		if (clothing_right_arm_sprite) {
+			DrawPlayerColorOverlay(*type, clothing_right_arm_sprite, player, frame, screenPos);
+		}
 	}
 
 	if (pants_sprite) {
