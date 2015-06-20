@@ -227,10 +227,34 @@ void DrawBuildingCursor()
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->PantsSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->ClothingSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ClothingSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->HelmetSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->HelmetSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->HelmetSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->HelmetSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShoesSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShoesSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->ShoesSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ShoesSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
 	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->LeftArmSprite) {
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->LeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	} else if (CursorBuilding->LeftArmSprite) {
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->LeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingLeftArmSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingLeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->ClothingLeftArmSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ClothingLeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 
 	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite) {
@@ -243,6 +267,18 @@ void DrawBuildingCursor()
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->RightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	} else if (CursorBuilding->RightArmSprite) {
 		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->RightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingRightArmSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingRightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->ClothingRightArmSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ClothingRightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->WeaponSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->WeaponSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->WeaponSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->WeaponSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	}
 
 	if (CursorBuilding->LightSprite) {

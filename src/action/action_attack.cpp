@@ -411,7 +411,10 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		}
 	}
 
-	Assert(!unit.Type->Vanishes && !unit.Destroyed && !unit.Removed);
+	//Wyrmgus start
+//	Assert(!unit.Type->Vanishes && !unit.Destroyed && !unit.Removed);
+	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
+	//Wyrmgus end
 	return false;
 }
 
@@ -422,7 +425,10 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 */
 void COrder_Attack::MoveToTarget(CUnit &unit)
 {
-	Assert(!unit.Type->Vanishes && !unit.Destroyed && !unit.Removed);
+	//Wyrmgus start
+//	Assert(!unit.Type->Vanishes && !unit.Destroyed && !unit.Removed);
+	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
+	//Wyrmgus end
 	Assert(unit.CurrentOrder() == this);
 	Assert(unit.CanMove());
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));

@@ -283,7 +283,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 	}
 
 	// Must be checked before oil!
-	if (type.ShoreBuilding) {
+	//Wyrmgus start
+//	if (type.ShoreBuilding) {
+	if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
+	//Wyrmgus end
 		const int width = type.TileWidth;
 		int h = type.TileHeight;
 		bool success = false;

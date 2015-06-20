@@ -1075,14 +1075,20 @@ void CUnit::Draw(const CViewport &vp) const
 	const CConstructionFrame *cframe;
 	const CUnitType *type;
 
-	if (this->Destroyed || this->Container || this->Type->Revealer) { // Revealers are not drawn
+	//Wyrmgus start
+//	if (this->Destroyed || this->Container || this->Type->Revealer) { // Revealers are not drawn
+	if (this->Destroyed || this->Container || this->Type->BoolFlag[REVEALER_INDEX].value) { // Revealers are not drawn
+	//Wyrmgus end
 		return;
 	}
 
 	bool IsVisible = this->IsVisible(*ThisPlayer);
 
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
-	Assert(ReplayRevealMap || this->Type->VisibleUnderFog || IsVisible);
+	//Wyrmgus start
+//	Assert(ReplayRevealMap || this->Type->VisibleUnderFog || IsVisible);
+	Assert(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);
+	//Wyrmgus end
 
 	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
 	int action = this->CurrentAction();
@@ -1187,6 +1193,48 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 	}
 
+	CPlayerColorGraphic *pants_sprite = type->PantsSprite;
+	if (varinfo) {
+		if (varinfo->PantsSprite) {
+			pants_sprite = varinfo->PantsSprite;
+		}
+	}
+	
+	CPlayerColorGraphic *clothing_sprite = type->ClothingSprite;
+	if (varinfo) {
+		if (varinfo->ClothingSprite) {
+			clothing_sprite = varinfo->ClothingSprite;
+		}
+	}
+	
+	CPlayerColorGraphic *clothing_left_arm_sprite = type->ClothingLeftArmSprite;
+	if (varinfo) {
+		if (varinfo->ClothingLeftArmSprite) {
+			clothing_left_arm_sprite = varinfo->ClothingLeftArmSprite;
+		}
+	}
+	
+	CPlayerColorGraphic *clothing_right_arm_sprite = type->ClothingRightArmSprite;
+	if (varinfo) {
+		if (varinfo->ClothingRightArmSprite) {
+			clothing_right_arm_sprite = varinfo->ClothingRightArmSprite;
+		}
+	}
+	
+	CPlayerColorGraphic *shoes_sprite = type->ShoesSprite;
+	if (varinfo) {
+		if (varinfo->ShoesSprite) {
+			shoes_sprite = varinfo->ShoesSprite;
+		}
+	}
+	
+	CPlayerColorGraphic *weapon_sprite = type->WeaponSprite;
+	if (varinfo) {
+		if (varinfo->WeaponSprite) {
+			weapon_sprite = varinfo->WeaponSprite;
+		}
+	}
+
 	CPlayerColorGraphic *shield_sprite = type->ShieldSprite;
 	if (varinfo) {
 		if (varinfo->ShieldSprite) {
@@ -1194,8 +1242,15 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 	}
 	
+	CPlayerColorGraphic *helmet_sprite = type->HelmetSprite;
+	if (varinfo) {
+		if (varinfo->HelmetSprite) {
+			helmet_sprite = varinfo->HelmetSprite;
+		}
+	}
+	
 	//draw the left arm before the body if not facing south (or the still frame, since that also faces south)
-	if (this->Direction != LookingS && frame != type->StillFrame) {
+	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
 		//draw the shield before the left arm if not facing south
 		if (shield_sprite) {
 			DrawPlayerColorOverlay(*type, shield_sprite, player, frame, screenPos);
@@ -1204,12 +1259,22 @@ void CUnit::Draw(const CViewport &vp) const
 		if (left_arm_sprite) {
 			DrawPlayerColorOverlay(*type, left_arm_sprite, player, frame, screenPos);
 		}
+		
+		if (clothing_left_arm_sprite) {
+			DrawPlayerColorOverlay(*type, clothing_left_arm_sprite, player, frame, screenPos);
+		}
 	}
 		
 	//draw the right arm before the body if facing north
-	if (this->Direction == LookingN) {
+	if (this->Direction == LookingN && this->CurrentAction() != UnitActionDie) {
+		if (weapon_sprite) {
+			DrawPlayerColorOverlay(*type, weapon_sprite, player, frame, screenPos);
+		}
 		if (right_arm_sprite) {
 			DrawPlayerColorOverlay(*type, right_arm_sprite, player, frame, screenPos);
+		}
+		if (clothing_right_arm_sprite) {
+			DrawPlayerColorOverlay(*type, clothing_right_arm_sprite, player, frame, screenPos);
 		}
 	}
 	//Wyrmgus end
@@ -1282,20 +1347,29 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawPlayerColorOverlay(*type, hair_sprite, player, frame, screenPos);
 	}
 
-	CPlayerColorGraphic *pants_sprite = type->PantsSprite;
-	if (varinfo) {
-		if (varinfo->PantsSprite) {
-			pants_sprite = varinfo->PantsSprite;
-		}
-	}
 	if (pants_sprite) {
 		DrawPlayerColorOverlay(*type, pants_sprite, player, frame, screenPos);
 	}
 
+	if (clothing_sprite) {
+		DrawPlayerColorOverlay(*type, clothing_sprite, player, frame, screenPos);
+	}
+
+	if (helmet_sprite) {
+		DrawPlayerColorOverlay(*type, helmet_sprite, player, frame, screenPos);
+	}
+
+	if (shoes_sprite) {
+		DrawPlayerColorOverlay(*type, shoes_sprite, player, frame, screenPos);
+	}
+	
 	//draw the left arm just after the body if facing south
-	if (this->Direction == LookingS || frame == type->StillFrame) {
+	if ((this->Direction == LookingS && this->CurrentAction() != UnitActionDie) || frame == type->StillFrame) {
 		if (left_arm_sprite) {
 			DrawPlayerColorOverlay(*type, left_arm_sprite, player, frame, screenPos);
+		}		
+		if (clothing_left_arm_sprite) {
+			DrawPlayerColorOverlay(*type, clothing_left_arm_sprite, player, frame, screenPos);
 		}
 		if (shield_sprite) {
 			DrawPlayerColorOverlay(*type, shield_sprite, player, frame, screenPos);
@@ -1303,9 +1377,15 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 
 	//draw the right arm just after the body if not facing north
-	if (this->Direction != LookingN) {
+	if (this->Direction != LookingN || this->CurrentAction() == UnitActionDie) {
+		if (weapon_sprite) {
+			DrawPlayerColorOverlay(*type, weapon_sprite, player, frame, screenPos);
+		}
 		if (right_arm_sprite) {
 			DrawPlayerColorOverlay(*type, right_arm_sprite, player, frame, screenPos);
+		}
+		if (clothing_right_arm_sprite) {
+			DrawPlayerColorOverlay(*type, clothing_right_arm_sprite, player, frame, screenPos);
 		}
 	}
 

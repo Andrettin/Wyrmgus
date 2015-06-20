@@ -128,7 +128,10 @@ public:
 
 	void operator()(CUnit *const unit) const
 	{
-		if (cloak != (int)unit->Type->PermanentCloak) {
+		//Wyrmgus start
+//		if (cloak != (int)unit->Type->PermanentCloak) {
+		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
+		//Wyrmgus end
 			return ;
 		}
 		const int p = player->Index;

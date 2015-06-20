@@ -350,7 +350,10 @@ static int CclUnit(lua_State *l)
 			h = LuaToNumber(l, -1, 4);
 			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
 			// Detectcloak works in container
-			if (unit->Type->DetectCloak) {
+			//Wyrmgus start
+//			if (unit->Type->DetectCloak) {
+			if (unit->Type->BoolFlag[DETECTCLOAK_INDEX].value) {
+			//Wyrmgus end
 				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
 			}
 			// Radar(Jammer) not.
@@ -611,7 +614,10 @@ static int CclUnit(lua_State *l)
 	}
 
 	//  Revealers are units that can see while removed
-	if (unit->Removed && unit->Type->Revealer) {
+	//Wyrmgus start
+//	if (unit->Removed && unit->Type->Revealer) {
+	if (unit->Removed && unit->Type->BoolFlag[REVEALER_INDEX].value) {
+	//Wyrmgus end
 		MapMarkUnitSight(*unit);
 	}
 
@@ -838,7 +844,10 @@ static int CclSetTeleportDestination(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	if (unit->Type->Teleporter == false) {
+	//Wyrmgus start
+//	if (unit->Type->Teleporter == false) {
+	if (unit->Type->BoolFlag[TELEPORTER_INDEX].value == false) {
+	//Wyrmgus end
 		LuaError(l, "Unit not a teleporter");
 	}
 	lua_pushvalue(l, 2);

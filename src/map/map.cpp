@@ -584,7 +584,7 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	std::vector<CUnit *> table;
 	Select(pos, pos, table);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->Decoration) {
+		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 			LetUnitDie(*table[i]);			
 		}
 	}
@@ -617,7 +617,7 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	std::vector<CUnit *> table;
 	Select(pos, pos, table);
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->Decoration) {
+		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 			LetUnitDie(*table[i]);			
 		}
 	}

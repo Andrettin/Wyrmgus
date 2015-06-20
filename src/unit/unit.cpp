@@ -795,7 +795,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	const CUnitType &type = *Type;
 
 	// Build player unit table
-	if (!type.Vanishes && CurrentAction() != UnitActionDie) {
+	//Wyrmgus start
+//	if (!type.Vanishes && CurrentAction() != UnitActionDie) {
+	if (!type.BoolFlag[VANISHES_INDEX].value && CurrentAction() != UnitActionDie) {
+	//Wyrmgus end
 		player.AddUnit(*this);
 		if (!SaveGameLoading) {
 			// If unit is dying, it's already been lost by all players
@@ -956,7 +959,7 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 	MapSight(*unit.Player, pos, width, height,
 			 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
 
-	if (unit.Type && unit.Type->DetectCloak && f2) {
+	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
 		MapSight(*unit.Player, pos, width, height,
 				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
 	}
@@ -1111,7 +1114,10 @@ void MarkUnitFieldFlags(const CUnit &unit)
 	const int width = unit.Type->TileWidth; // Tile width of the unit.
 	unsigned int index = unit.Offset;
 
-	if (unit.Type->Vanishes) {
+	//Wyrmgus start
+//	if (unit.Type->Vanishes) {
+	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
+	//Wyrmgus end
 		return ;
 	}
 	do {
@@ -1155,7 +1161,10 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 	int h = unit.Type->TileHeight;
 	unsigned int index = unit.Offset;
 
-	if (unit.Type->Vanishes) {
+	//Wyrmgus start
+//	if (unit.Type->Vanishes) {
+	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
+	//Wyrmgus end
 		return ;
 	}
 	do {
@@ -1465,7 +1474,10 @@ void UnitLost(CUnit &unit)
 	//  Remove the unit from the player's units table.
 
 	const CUnitType &type = *unit.Type;
-	if (!type.Vanishes) {
+	//Wyrmgus start
+//	if (!type.Vanishes) {
+	if (!type.BoolFlag[VANISHES_INDEX].value) {
+	//Wyrmgus end
 		player.RemoveUnit(unit);
 
 		if (type.Building) {
@@ -1710,7 +1722,10 @@ void CorrectWallNeighBours(CUnit &unit)
 */
 void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 {
-	if (unit.Type->VisibleUnderFog) {
+	//Wyrmgus start
+//	if (unit.Type->VisibleUnderFog) {
+	if (unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
+	//Wyrmgus end
 		if (player.Type == PlayerPerson && !unit.Destroyed) {
 			unit.RefsIncrease();
 		}
@@ -1751,7 +1766,10 @@ void UnitGoesUnderFog(CUnit &unit, const CPlayer &player)
 */
 void UnitGoesOutOfFog(CUnit &unit, const CPlayer &player)
 {
-	if (!unit.Type->VisibleUnderFog) {
+	//Wyrmgus start
+//	if (!unit.Type->VisibleUnderFog) {
+	if (!unit.Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value) {
+	//Wyrmgus end
 		return;
 	}
 	if (unit.Seen.ByPlayer & (1 << (player.Index))) {
@@ -1799,7 +1817,10 @@ void UnitCountSeen(CUnit &unit)
 				CMapField *mf = Map.Field(index);
 				int x = width;
 				do {
-					if (unit.Type->PermanentCloak && unit.Player != &Players[p]) {
+					//Wyrmgus start
+//					if (unit.Type->PermanentCloak && unit.Player != &Players[p]) {
+					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != &Players[p]) {
+					//Wyrmgus end
 						if (mf->playerInfo.VisCloak[p]) {
 							newv++;
 						}
@@ -1878,7 +1899,10 @@ bool CUnit::IsVisibleOnMinimap() const
 	if (IsVisible(*ThisPlayer) || ReplayRevealMap || IsVisibleOnRadar(*ThisPlayer)) {
 		return IsAliveOnMap();
 	} else {
-		return Type->VisibleUnderFog && Seen.State != 3
+		//Wyrmgus start
+//		return Type->VisibleUnderFog && Seen.State != 3
+		return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3
+		//Wyrmgus end
 			   && (Seen.ByPlayer & (1 << ThisPlayer->Index))
 			   && !(Seen.Destroyed & (1 << ThisPlayer->Index));
 	}
@@ -1943,7 +1967,10 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 		// Unit has to be 'discovered'
 		// Destroyed units ARE visible under fog of war, if we haven't seen them like that.
 		if (!Destroyed || !(Seen.Destroyed & (1 << ThisPlayer->Index))) {
-			return (Type->VisibleUnderFog && (Seen.ByPlayer & (1 << ThisPlayer->Index)));
+			//Wyrmgus start
+//			return (Type->VisibleUnderFog && (Seen.ByPlayer & (1 << ThisPlayer->Index)));
+			return (Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && (Seen.ByPlayer & (1 << ThisPlayer->Index)));
+			//Wyrmgus end
 		} else {
 			return false;
 		}
@@ -2533,7 +2560,10 @@ CUnit *UnitOnScreen(int x, int y)
 			&& y >= unitSpritePos.y  && y < unitSpritePos.y + type.BoxHeight) {
 			// Check if there are other units on this place
 			candidate = &unit;
-			if (IsOnlySelected(*candidate) || candidate->Type->IsNotSelectable) {
+			//Wyrmgus start
+//			if (IsOnlySelected(*candidate) || candidate->Type->IsNotSelectable) {
+			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+			//Wyrmgus end
 				continue;
 			} else {
 				break;
@@ -2607,7 +2637,10 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		MakeMissile(*type->Missile.Missile, pixelPos, pixelPos);
 	}
 	// Handle Teleporter Destination Removal
-	if (type->Teleporter && unit.Goal) {
+	//Wyrmgus start
+//	if (type->Teleporter && unit.Goal) {
+	if (type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
+	//Wyrmgus end
 		unit.Goal->Remove(NULL);
 		UnitLost(*unit.Goal);
 		UnitClearOrders(*unit.Goal);
@@ -2616,7 +2649,10 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	}
 
 	// Transporters lose or save their units and building their workers
-	if (unit.UnitInside && unit.Type->SaveCargo) {
+	//Wyrmgus start
+//	if (unit.UnitInside && unit.Type->SaveCargo) {
+	if (unit.UnitInside && unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
+	//Wyrmgus end
 		DropOutAll(unit);
 	} else if (unit.UnitInside) {
 		DestroyAllInside(unit);
@@ -2724,7 +2760,10 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 
 	// Buildings, non-aggressive and invincible units have the lowest priority
 	if (dest.IsAgressive() == false || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
-		|| dest.Type->Indestructible) {
+		//Wyrmgus start
+//		|| dest.Type->Indestructible) {
+		|| dest.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+		//Wyrmgus end
 		if (dest.Type->CanMove() == false) {
 			return INT_MAX;
 		} else {
@@ -3080,7 +3119,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.Type->Indestructible) {
+	//Wyrmgus start
+//	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.Type->Indestructible) {
+	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+	//Wyrmgus end
 		// vladi: units with active UnholyArmour are invulnerable
 		return;
 	}
@@ -3089,7 +3131,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		return;
 	}
 
-	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->Vanishes);
+	//Wyrmgus start
+//	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->Vanishes);
+	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->BoolFlag[VANISHES_INDEX].value);
+	//Wyrmgus end
 
 	if (GodMode) {
 		if (attacker && attacker->Player == ThisPlayer) {
@@ -3328,7 +3373,10 @@ int CanTarget(const CUnitType &source, const CUnitType &dest)
 		}
 	}
 	if (dest.UnitType == UnitTypeLand) {
-		if (dest.ShoreBuilding) {
+		//Wyrmgus start
+//		if (dest.ShoreBuilding) {
+		if (dest.BoolFlag[SHOREBUILDING_INDEX].value) {
+		//Wyrmgus end
 			return source.CanTarget & (CanTargetLand | CanTargetSea);
 		}
 		return source.CanTarget & CanTargetLand;

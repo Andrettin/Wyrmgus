@@ -80,7 +80,10 @@ enum {
 		order->Range = builder.Type->RepairRange;
 	} else {
 		// If building inside, but be next to stop
-		if (building.ShoreBuilding && builder.Type->UnitType == UnitTypeLand) {
+		//Wyrmgus start
+//		if (building.ShoreBuilding && builder.Type->UnitType == UnitTypeLand) {
+		if (building.BoolFlag[SHOREBUILDING_INDEX].value && builder.Type->UnitType == UnitTypeLand) {
+		//Wyrmgus end
 			// Peon won't dive :-)
 			order->Range = 1;
 		}

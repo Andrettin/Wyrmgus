@@ -641,7 +641,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (unit.Type->GivesResource) {
 				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 			}
-			if (unit.Type->Teleporter && unit.Goal) {
+			//Wyrmgus start
+//			if (unit.Type->Teleporter && unit.Goal) {
+			if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
+			//Wyrmgus end
 				teleporters.push_back(*it);
 			}
 		}

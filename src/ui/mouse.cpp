@@ -339,7 +339,10 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
+		//Wyrmgus start
+//		if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
+		if (dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) {
+		//Wyrmgus end
 			SendCommandMove(unit, pos, flush);
 		} else {
 			SendCommandFollow(unit, *dest, flush);
@@ -407,7 +410,10 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		if (!dest.Type->CanMove() && !dest.Type->Teleporter) {
+		//Wyrmgus start
+//		if (!dest.Type->CanMove() && !dest.Type->Teleporter) {
+		if (!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
+		//Wyrmgus end
 			SendCommandMove(unit, pos, flush);
 		} else {
 			SendCommandFollow(unit, dest, flush);
@@ -476,7 +482,10 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		if (dest.Type->CanMove() == false && !dest.Type->Teleporter) {
+		//Wyrmgus start
+//		if (dest.Type->CanMove() == false && !dest.Type->Teleporter) {
+		if (dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
+		//Wyrmgus end
 			SendCommandMove(unit, dest.tilePos, flush);
 		} else {
 			SendCommandFollow(unit, dest, flush);
@@ -565,7 +574,10 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	
 	//  Control + alt click - ground attack
 	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
-		if (unit.Type->GroundAttack) {
+		//Wyrmgus start
+//		if (unit.Type->GroundAttack) {
+		if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
+		//Wyrmgus end
 			if (!acknowledged) {
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
@@ -666,7 +678,10 @@ void DoRightButton(const PixelPos &mapPixelPos)
 	const Vec2i pos = Map.MapPixelPosToTilePos(mapPixelPos);
 	CUnit *dest;            // unit under the cursor if any.
 
-	if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
+	//Wyrmgus start
+//	if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
+	if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
+	//Wyrmgus end
 		dest = UnitUnderCursor;
 	} else {
 		dest = NULL;
@@ -1149,7 +1164,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			} else {
 				GameCursor = UI.YellowHair.Cursor;
 			}
-			if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
+			//Wyrmgus start
+//			if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration) {
+			if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
+			//Wyrmgus end
 				if (UnitUnderCursor->Player == ThisPlayer ||
 					ThisPlayer->IsAllied(*UnitUnderCursor)) {
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
@@ -1187,7 +1205,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	//  Cursor pointing.
 	if (CursorOn == CursorOnMap) {
 		//  Map
-		if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration
+		//Wyrmgus start
+//		if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->Decoration
+		if (UnitUnderCursor != NULL && !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value
+		//Wyrmgus end
 			&& (UnitUnderCursor->IsVisible(*ThisPlayer) || ReplayRevealMap)) {
 			//Wyrmgus start
 //			GameCursor = UI.Glass.Cursor;
@@ -1341,7 +1362,10 @@ static int SendAttack(const Vec2i &tilePos)
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
-	if (dest && dest->Type->Decoration) {
+	//Wyrmgus start
+//	if (dest && dest->Type->Decoration) {
+	if (dest && dest->Type->BoolFlag[DECORATION_INDEX].value) {
+	//Wyrmgus end
 		dest = NULL;
 	}
 	for (size_t i = 0; i != Selected.size(); ++i) {
@@ -1846,7 +1870,10 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
 			if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1))
-				&& !UnitUnderCursor->Type->Decoration) {
+				//Wyrmgus start
+//				&& !UnitUnderCursor->Type->Decoration) {
+				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
+				//Wyrmgus end
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
 				if (!ClickMissile.empty()) {

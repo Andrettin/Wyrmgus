@@ -1458,7 +1458,10 @@ static void InfoPanel_draw_multiple_selection()
 */
 void CInfoPanel::Draw()
 {
-	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->IsNotSelectable
+	//Wyrmgus start
+//	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->IsNotSelectable
+	if (UnitUnderCursor && Selected.empty() && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value
+	//Wyrmgus end
 		&& (ReplayRevealMap || UnitUnderCursor->IsVisible(*ThisPlayer))) {
 			InfoPanel_draw_single_selection(UnitUnderCursor);
 	} else {

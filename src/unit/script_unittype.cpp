@@ -92,7 +92,10 @@ static const char DECORATION_KEY[] = "Decoration";
 static const char INDESTRUCTIBLE_KEY[] = "Indestructible";
 static const char TELEPORTER_KEY[] = "Teleporter";
 static const char SHIELDPIERCE_KEY[] = "ShieldPiercing";
-static const char SAVECARGO_KEY[] = "LoseCargo";
+//Wyrmgus start
+//static const char SAVECARGO_KEY[] = "LoseCargo";
+static const char SAVECARGO_KEY[] = "SaveCargo";
+//Wyrmgus end
 static const char NONSOLID_KEY[] = "NonSolid";
 static const char WALL_KEY[] = "Wall";
 static const char NORANDOMPLACING_KEY[] = "NoRandomPlacing";
@@ -388,32 +391,34 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	//Wyrmgus end
 	type.BoolFlag[BUILDING_INDEX].value              = type.Building;
 	type.BoolFlag[FLIP_INDEX].value                  = type.Flip;
-	type.BoolFlag[REVEALER_INDEX].value              = type.Revealer;
+	//Wyrmgus start
+//	type.BoolFlag[REVEALER_INDEX].value              = type.Revealer;
+	//Wyrmgus end
 	type.BoolFlag[LANDUNIT_INDEX].value              = type.LandUnit;
 	type.BoolFlag[AIRUNIT_INDEX].value               = type.AirUnit;
 	type.BoolFlag[SEAUNIT_INDEX].value               = type.SeaUnit;
 	type.BoolFlag[EXPLODEWHENKILLED_INDEX].value     = type.ExplodeWhenKilled;
-	type.BoolFlag[VISIBLEUNDERFOG_INDEX].value       = type.VisibleUnderFog;
-	type.BoolFlag[PERMANENTCLOAK_INDEX].value        = type.PermanentCloak;
-	type.BoolFlag[DETECTCLOAK_INDEX].value           = type.DetectCloak;
 	//Wyrmgus start
+//	type.BoolFlag[VISIBLEUNDERFOG_INDEX].value       = type.VisibleUnderFog;
+//	type.BoolFlag[PERMANENTCLOAK_INDEX].value        = type.PermanentCloak;
+//	type.BoolFlag[DETECTCLOAK_INDEX].value           = type.DetectCloak;
 //	type.BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value = type.AttackFromTransporter;
+//	type.BoolFlag[VANISHES_INDEX].value              = type.Vanishes;
+//	type.BoolFlag[GROUNDATTACK_INDEX].value          = type.GroundAttack;
+//	type.BoolFlag[SHOREBUILDING_INDEX].value         = type.ShoreBuilding;
 	//Wyrmgus end
-	type.BoolFlag[VANISHES_INDEX].value              = type.Vanishes;
-	type.BoolFlag[GROUNDATTACK_INDEX].value          = type.GroundAttack;
-	type.BoolFlag[SHOREBUILDING_INDEX].value         = type.ShoreBuilding;
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
 	type.BoolFlag[BUILDEROUTSIDE_INDEX].value        = type.BuilderOutside;
 	type.BoolFlag[BUILDERLOST_INDEX].value           = type.BuilderLost;
 	type.BoolFlag[CANHARVEST_INDEX].value            = type.CanHarvest;
 	type.BoolFlag[HARVESTER_INDEX].value             = type.Harvester;
 	type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value = type.SelectableByRectangle;
-	type.BoolFlag[ISNOTSELECTABLE_INDEX].value       = type.IsNotSelectable;
-	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
-	type.BoolFlag[INDESTRUCTIBLE_INDEX].value        = type.Indestructible;
-	type.BoolFlag[TELEPORTER_INDEX].value            = type.Teleporter;
-	type.BoolFlag[SAVECARGO_INDEX].value             = type.SaveCargo;
 	//Wyrmgus start
+//	type.BoolFlag[ISNOTSELECTABLE_INDEX].value       = type.IsNotSelectable;
+//	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
+//	type.BoolFlag[INDESTRUCTIBLE_INDEX].value        = type.Indestructible;
+//	type.BoolFlag[TELEPORTER_INDEX].value            = type.Teleporter;
+//	type.BoolFlag[SAVECARGO_INDEX].value             = type.SaveCargo;
 //	type.BoolFlag[NONSOLID_INDEX].value              = type.NonSolid;
 //	type.BoolFlag[WALL_INDEX].value                  = type.Wall;
 //	type.BoolFlag[NORANDOMPLACING_INDEX].value       = type.NoRandomPlacing;
@@ -579,6 +584,63 @@ static int CclDefineUnitType(lua_State *l)
 				CGraphic::Free(type->HairSprite);
 				type->HairSprite = NULL;
 			}
+		} else if (!strcmp(value, "ClothingImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->ClothingFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported clothing tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->ClothingSprite) {
+				CGraphic::Free(type->ClothingSprite);
+				type->ClothingSprite = NULL;
+			}
+		} else if (!strcmp(value, "ClothingLeftArmImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->ClothingLeftArmFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported clothing left arm tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->ClothingLeftArmSprite) {
+				CGraphic::Free(type->ClothingLeftArmSprite);
+				type->ClothingLeftArmSprite = NULL;
+			}
+		} else if (!strcmp(value, "ClothingRightArmImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->ClothingRightArmFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported clothing right arm tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->ClothingRightArmSprite) {
+				CGraphic::Free(type->ClothingRightArmSprite);
+				type->ClothingRightArmSprite = NULL;
+			}
 		} else if (!strcmp(value, "PantsImage")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -598,6 +660,44 @@ static int CclDefineUnitType(lua_State *l)
 				CGraphic::Free(type->PantsSprite);
 				type->PantsSprite = NULL;
 			}
+		} else if (!strcmp(value, "ShoesImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->ShoesFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported shoes tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->ShoesSprite) {
+				CGraphic::Free(type->ShoesSprite);
+				type->ShoesSprite = NULL;
+			}
+		} else if (!strcmp(value, "WeaponImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->WeaponFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported weapon tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->WeaponSprite) {
+				CGraphic::Free(type->WeaponSprite);
+				type->WeaponSprite = NULL;
+			}
 		} else if (!strcmp(value, "ShieldImage")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -616,6 +716,25 @@ static int CclDefineUnitType(lua_State *l)
 			if (redefine && type->ShieldSprite) {
 				CGraphic::Free(type->ShieldSprite);
 				type->ShieldSprite = NULL;
+			}
+		} else if (!strcmp(value, "HelmetImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->HelmetFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported helmet tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->HelmetSprite) {
+				CGraphic::Free(type->HelmetSprite);
+				type->HelmetSprite = NULL;
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "Offset")) {
@@ -718,8 +837,10 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "TileSize")) {
 			CclGetPos(l, &type->TileWidth, &type->TileHeight);
-		} else if (!strcmp(value, "Decoration")) {
-			type->Decoration = LuaToBoolean(l, -1);
+		//Wyrmgus start
+//		} else if (!strcmp(value, "Decoration")) {
+//			type->Decoration = LuaToBoolean(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "NeutralMinimapColor")) {
 			type->NeutralMinimapColorRGB.Parse(l);
 		} else if (!strcmp(value, "BoxSize")) {
@@ -728,12 +849,14 @@ static int CclDefineUnitType(lua_State *l)
 			CclGetPos(l, &type->BoxOffsetX, &type->BoxOffsetY);
 		} else if (!strcmp(value, "NumDirections")) {
 			type->NumDirections = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Revealer")) {
-			type->Revealer = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "ComputerReactionRange")) {
-			type->ReactRangeComputer = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "PersonReactionRange")) {
-			type->ReactRangePerson = LuaToNumber(l, -1);
+		//Wyrmgus start
+//		} else if (!strcmp(value, "Revealer")) {
+//			type->Revealer = LuaToBoolean(l, -1);
+//		} else if (!strcmp(value, "ComputerReactionRange")) {
+//			type->ReactRangeComputer = LuaToNumber(l, -1);
+//		} else if (!strcmp(value, "PersonReactionRange")) {
+//			type->ReactRangePerson = LuaToNumber(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "Missile")) {
 			type->Missile.Name = LuaToString(l, -1);
 			type->Missile.Missile = NULL;
@@ -881,8 +1004,10 @@ static int CclDefineUnitType(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported RightMouseAction: %s" _C_ value);
 			}
-		} else if (!strcmp(value, "CanGroundAttack")) {
-			type->GroundAttack = LuaToBoolean(l, -1);
+		//Wyrmgus start
+//		} else if (!strcmp(value, "CanGroundAttack")) {
+//			type->GroundAttack = LuaToBoolean(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "CanAttack")) {
 			type->CanAttack = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RepairRange")) {
@@ -921,8 +1046,12 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "Building")) {
 			type->Building = LuaToBoolean(l, -1);
+		//Wyrmgus start
+		/*
 		} else if (!strcmp(value, "VisibleUnderFog")) {
 			type->VisibleUnderFog = LuaToBoolean(l, -1);
+		*/
+		//Wyrmgus end
 		} else if (!strcmp(value, "BuildingRules")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -967,10 +1096,10 @@ static int CclDefineUnitType(lua_State *l)
 			type->BuilderLost = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AutoBuildRate")) {
 			type->AutoBuildRate = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "ShoreBuilding")) {
-			type->ShoreBuilding = LuaToBoolean(l, -1);
 		//Wyrmgus start
 		/*
+		} else if (!strcmp(value, "ShoreBuilding")) {
+			type->ShoreBuilding = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "LandUnit")) {
 			type->LandUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AirUnit")) {
@@ -985,12 +1114,16 @@ static int CclDefineUnitType(lua_State *l)
 			type->RandomMovementDistance = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ClicksToExplode")) {
 			type->ClicksToExplode = LuaToNumber(l, -1);
+		//Wyrmgus start
+		/*
 		} else if (!strcmp(value, "Indestructible")) {
 			type->Indestructible = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PermanentCloak")) {
 			type->PermanentCloak = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DetectCloak")) {
 			type->DetectCloak = LuaToBoolean(l, -1);
+		*/
+		//Wyrmgus end
 		} else if (!strcmp(value, "CanTransport")) {
 			//  Warning: CanTransport should only be used AFTER all bool flags
 			//  have been defined.
@@ -1119,8 +1252,10 @@ static int CclDefineUnitType(lua_State *l)
 				type->CanStore[CclGetResourceByName(l)] = 1;
 				lua_pop(l, 1);
 			}
-		} else if (!strcmp(value, "Vanishes")) {
-			type->Vanishes = LuaToBoolean(l, -1);
+		//Wyrmgus start
+//		} else if (!strcmp(value, "Vanishes")) {
+//			type->Vanishes = LuaToBoolean(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "CanCastSpell")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1221,15 +1356,17 @@ static int CclDefineUnitType(lua_State *l)
 				}
 				LuaError(l, "Unsupported flag tag for ai-priority-target: %s" _C_ value);
 			}
-		} else if (!strcmp(value, "IsNotSelectable")) {
-			type->IsNotSelectable = LuaToBoolean(l, -1);
+		//Wyrmgus start
+//		} else if (!strcmp(value, "IsNotSelectable")) {
+//			type->IsNotSelectable = LuaToBoolean(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "SelectableByRectangle")) {
 			type->SelectableByRectangle = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Teleporter")) {
-			type->Teleporter = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SaveCargo")) {
-			type->SaveCargo = LuaToBoolean(l, -1);
 		//Wyrmgus start
+//		} else if (!strcmp(value, "Teleporter")) {
+//			type->Teleporter = LuaToBoolean(l, -1);
+//		} else if (!strcmp(value, "SaveCargo")) {
+//			type->SaveCargo = LuaToBoolean(l, -1);
 //		} else if (!strcmp(value, "NonSolid")) {
 //			type->NonSolid = LuaToBoolean(l, -1);
 //		} else if (!strcmp(value, "Wall")) {
@@ -1354,10 +1491,22 @@ static int CclDefineUnitType(lua_State *l)
 						var->RightArmFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "hair-file")) {
 						var->HairFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "clothing-file")) {
+						var->ClothingFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "clothing-left-arm-file")) {
+						var->ClothingLeftArmFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "clothing-right-arm-file")) {
+						var->ClothingRightArmFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "pants-file")) {
 						var->PantsFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "shoes-file")) {
+						var->ShoesFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "weapon-file")) {
+						var->WeaponFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "shield-file")) {
 						var->ShieldFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "helmet-file")) {
+						var->HelmetFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
 						lua_rawgeti(l, -1, k + 1);
 						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
@@ -1418,8 +1567,14 @@ static int CclDefineUnitType(lua_State *l)
 			type->LeftArmFile = parent_type->LeftArmFile;
 			type->RightArmFile = parent_type->RightArmFile;
 			type->HairFile = parent_type->HairFile;
+			type->ClothingFile = parent_type->ClothingFile;
+			type->ClothingLeftArmFile = parent_type->ClothingLeftArmFile;
+			type->ClothingRightArmFile = parent_type->ClothingRightArmFile;
 			type->PantsFile = parent_type->PantsFile;
+			type->ShoesFile = parent_type->ShoesFile;
+			type->WeaponFile = parent_type->WeaponFile;
 			type->ShieldFile = parent_type->ShieldFile;
+			type->HelmetFile = parent_type->HelmetFile;
 			type->TileWidth = parent_type->TileWidth;
 			type->TileHeight = parent_type->TileHeight;
 			type->BoxWidth = parent_type->BoxWidth;
@@ -1437,8 +1592,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Explosion.Missile = NULL;
 			type->CorpseName = parent_type->CorpseName;
 			type->CorpseType = NULL;
-			type->ReactRangeComputer = parent_type->ReactRangeComputer;
-			type->ReactRangePerson = parent_type->ReactRangePerson;
+//			type->ReactRangeComputer = parent_type->ReactRangeComputer;
+//			type->ReactRangePerson = parent_type->ReactRangePerson;
 			type->MinAttackRange = parent_type->MinAttackRange;
 			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
 			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
@@ -1451,16 +1606,12 @@ static int CclDefineUnitType(lua_State *l)
 			type->RepairRange = parent_type->RepairRange;
 			type->RepairHP = parent_type->RepairHP;
 			type->MouseAction = parent_type->MouseAction;
-			type->GroundAttack = parent_type->GroundAttack;
 			type->CanAttack = parent_type->CanAttack;
 			type->CanTarget = parent_type->CanTarget;
 			type->LandUnit = parent_type->LandUnit;
 			type->SeaUnit = parent_type->SeaUnit;
 			type->AirUnit = parent_type->AirUnit;
 			type->Building = parent_type->Building;
-			type->VisibleUnderFog = parent_type->VisibleUnderFog;
-			type->DetectCloak = parent_type->DetectCloak;
-			type->SaveCargo = parent_type->SaveCargo;
 			type->SelectableByRectangle = parent_type->SelectableByRectangle;
 			type->BuilderOutside = parent_type->BuilderOutside;
 			type->BuilderLost = parent_type->BuilderLost;
@@ -1516,8 +1667,14 @@ static int CclDefineUnitType(lua_State *l)
 					var->LeftArmFile = parent_type->VarInfo[var_n]->LeftArmFile;
 					var->RightArmFile = parent_type->VarInfo[var_n]->RightArmFile;
 					var->HairFile = parent_type->VarInfo[var_n]->HairFile;
+					var->ClothingFile = parent_type->VarInfo[var_n]->ClothingFile;
+					var->ClothingLeftArmFile = parent_type->VarInfo[var_n]->ClothingLeftArmFile;
+					var->ClothingRightArmFile = parent_type->VarInfo[var_n]->ClothingRightArmFile;
 					var->PantsFile = parent_type->VarInfo[var_n]->PantsFile;
+					var->ShoesFile = parent_type->VarInfo[var_n]->ShoesFile;
+					var->WeaponFile = parent_type->VarInfo[var_n]->WeaponFile;
 					var->ShieldFile = parent_type->VarInfo[var_n]->ShieldFile;
+					var->HelmetFile = parent_type->VarInfo[var_n]->HelmetFile;
 					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
 					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
 					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
@@ -1930,12 +2087,14 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "TileHeight")) {
 		lua_pushnumber(l, type->TileHeight);
 		return 1;
+	/*
 	} else if (!strcmp(data, "ComputerReactionRange")) {
 		lua_pushnumber(l, type->ReactRangeComputer);
 		return 1;
 	} else if (!strcmp(data, "PersonReactionRange")) {
 		lua_pushnumber(l, type->ReactRangePerson);
 		return 1;
+	*/
 	} else if (!strcmp(data, "Missile")) {
 		lua_pushstring(l, type->Missile.Name.c_str());
 		return 1;

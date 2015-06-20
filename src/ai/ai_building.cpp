@@ -132,7 +132,10 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 		++obstacleCount;
 	}
 
-	if (!type.ShoreBuilding) {
+	//Wyrmgus start
+//	if (!type.ShoreBuilding) {
+	if (!type.BoolFlag[SHOREBUILDING_INDEX].value) {
+	//Wyrmgus end
 		backupok = obstacleCount < 5;
 	} else {
 		// Shore building have at least 2 obstacles : sea->ground & ground->sea
@@ -147,7 +150,10 @@ public:
 	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
-			& ~((type.ShoreBuilding ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
+			//Wyrmgus start
+//			& ~((type.ShoreBuilding ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
+			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
+			//Wyrmgus end
 			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		checkSurround(checkSurround),
 		resultPos(resultPos)
@@ -225,7 +231,10 @@ public:
 	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask
-			& ~((type.ShoreBuilding ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
+			//Wyrmgus start
+//			& ~((type.ShoreBuilding ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
+			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
+			//Wyrmgus end
 			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		resource(resource),
 		resultPos(resultPos)

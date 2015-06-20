@@ -581,7 +581,7 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 
 	//Wyrmgus start
 	//don't draw decorations on the minimap
-	if (type->Decoration) {
+	if (type->BoolFlag[DECORATION_INDEX].value) {
 		return;
 	}
 	//Wyrmgus end

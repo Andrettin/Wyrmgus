@@ -204,7 +204,10 @@ public:
 	bool operator()(const CUnit *const unit) const
 	{
 		const CUnitType &type = *unit->Type;
-		if (type.Vanishes || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
+		//Wyrmgus start
+//		if (type.Vanishes || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
+		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
+		//Wyrmgus end
 			return false;
 		}
 		return true;

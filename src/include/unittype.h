@@ -123,7 +123,7 @@ class VariationInfo
 public:
 	VariationInfo() : VariationId(""),
 		FrameWidth(0), FrameHeight(0),
-		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), PantsSprite(NULL), ShieldSprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL), WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL)
 	{
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));		
@@ -136,8 +136,14 @@ public:
 	std::string LeftArmFile;		/// Variation's left arm graphics.
 	std::string RightArmFile;		/// Variation's right arm graphics.
 	std::string HairFile;			/// Variation's hair graphics.
+	std::string ClothingFile;		/// Variation's clothing graphics.
+	std::string ClothingLeftArmFile;	/// Variation's clothing left arm graphics.
+	std::string ClothingRightArmFile;	/// Variation's clothing right arm graphics.
 	std::string PantsFile;			/// Variation's pants graphics.
+	std::string ShoesFile;			/// Variation's shoes graphics.
+	std::string WeaponFile;			/// Variation's weapon graphics.
 	std::string ShieldFile;			/// Variation's shield graphics.
+	std::string HelmetFile;			/// Variation's helmet graphics.
 	std::string Tileset;			/// Variation's tileset.
 	int FrameWidth;
 	int FrameHeight;
@@ -147,8 +153,14 @@ public:
 	CPlayerColorGraphic *LeftArmSprite;	/// The graphic corresponding to LeftArmFile.
 	CPlayerColorGraphic *RightArmSprite;	/// The graphic corresponding to RightArmFile.
 	CPlayerColorGraphic *HairSprite;	/// The graphic corresponding to HairFile.
+	CPlayerColorGraphic *ClothingSprite;	/// The graphic corresponding to ClothingFile.
+	CPlayerColorGraphic *ClothingLeftArmSprite;	/// The graphic corresponding to ClothingLeftArmFile.
+	CPlayerColorGraphic *ClothingRightArmSprite;	/// The graphic corresponding to ClothingRightArmFile.
 	CPlayerColorGraphic *PantsSprite;	/// The graphic corresponding to PantsFile.
+	CPlayerColorGraphic *ShoesSprite;	/// The graphic corresponding to ShoesFile.
+	CPlayerColorGraphic *WeaponSprite;	/// The graphic corresponding to WeaponFile.
 	CPlayerColorGraphic *ShieldSprite;	/// The graphic corresponding to ShieldFile.
+	CPlayerColorGraphic *HelmetSprite;	/// The graphic corresponding to HelmetFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
 
@@ -586,8 +598,14 @@ public:
 	std::string LeftArmFile;		/// Left arm file
 	std::string RightArmFile;		/// Right arm file
 	std::string HairFile;			/// Hair file
+	std::string ClothingFile;		/// Clothing file
+	std::string ClothingLeftArmFile;	/// Clothing left arm file
+	std::string ClothingRightArmFile;	/// Clothing right arm file
 	std::string PantsFile;			/// Pants file
+	std::string ShoesFile;			/// Shoes file
+	std::string WeaponFile;			/// Weapon file
 	std::string ShieldFile;			/// Shield file
+	std::string HelmetFile;			/// Helmet file
 	//Wyrmgus end
 
 	int Width;                                            /// Sprite width
@@ -650,8 +668,12 @@ public:
 	int BoxOffsetY;                 /// Selected box size vertical offset
 	int NumDirections;              /// Number of directions unit can face
 	int MinAttackRange;             /// Minimal attack range
+	//Wyrmgus start
+	/*
 	int ReactRangeComputer;         /// Reacts on enemy for computer
 	int ReactRangePerson;           /// Reacts on enemy for person player
+	*/
+	//Wyrmgus end
 	int BurnPercent;                /// Burning percent.
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
@@ -687,22 +709,24 @@ public:
 #define CanTargetAir  4             /// Can attack air units
 
 	unsigned Flip : 1;              /// Flip image when facing left
-	unsigned Revealer : 1;          /// reveal the fog of war
+	//Wyrmgus start
+//	unsigned Revealer : 1;          /// reveal the fog of war
+	//Wyrmgus end
 	unsigned LandUnit : 1;          /// Land animated
 	unsigned AirUnit : 1;           /// Air animated
 	unsigned SeaUnit : 1;           /// Sea animated
 	unsigned ExplodeWhenKilled : 1; /// Death explosion animated
 	unsigned Building : 1;          /// Building
-	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
-	unsigned PermanentCloak : 1;    /// Is only visible by CloakDetectors.
-	unsigned DetectCloak : 1;       /// Can see Cloaked units.
 	//Wyrmgus start
+//	unsigned VisibleUnderFog : 1;   /// Unit is visible under fog of war.
+//	unsigned PermanentCloak : 1;    /// Is only visible by CloakDetectors.
+//	unsigned DetectCloak : 1;       /// Can see Cloaked units.
 //	unsigned Coward : 1;            /// Unit will only attack if instructed.
 //	unsigned AttackFromTransporter : 1;  /// Can attack from transporter
+//	unsigned Vanishes : 1;          /// Corpes & destroyed places.
+//	unsigned GroundAttack : 1;      /// Can do command ground attack.
+//	unsigned ShoreBuilding : 1;     /// Building must be build on coast.
 	//Wyrmgus end
-	unsigned Vanishes : 1;          /// Corpes & destroyed places.
-	unsigned GroundAttack : 1;      /// Can do command ground attack.
-	unsigned ShoreBuilding : 1;     /// Building must be build on coast.
 	unsigned CanAttack : 1;         /// Unit can attack.
 	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
 	unsigned BuilderLost : 1;       /// The builder is lost after the build.
@@ -711,12 +735,12 @@ public:
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
 	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
-	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
-	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
-	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
-	unsigned Teleporter : 1;            /// Can teleport other units.
-	unsigned SaveCargo : 1;             /// Unit unloads his passengers after death.
 	//Wyrmgus start
+//	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
+//	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
+//	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
+//	unsigned Teleporter : 1;            /// Can teleport other units.
+//	unsigned SaveCargo : 1;             /// Unit unloads his passengers after death.
 //	unsigned NonSolid : 1;              /// Unit can be entered by other units.
 //	unsigned Wall : 1;                  /// Use special logic for Direction field.
 //	unsigned NoRandomPlacing : 1;       /// Don't use random frame rotation
@@ -778,8 +802,14 @@ public:
 	CPlayerColorGraphic *LeftArmSprite;			/// Left arm sprite image
 	CPlayerColorGraphic *RightArmSprite;		/// Right arm sprite image
 	CPlayerColorGraphic *HairSprite;			/// Hair sprite image
+	CPlayerColorGraphic *ClothingSprite;		/// Clothing sprite image
+	CPlayerColorGraphic *ClothingLeftArmSprite;		/// Clothing left arm sprite image
+	CPlayerColorGraphic *ClothingRightArmSprite;	/// Clothing right arm sprite image
 	CPlayerColorGraphic *PantsSprite;			/// Pants sprite image
+	CPlayerColorGraphic *ShoesSprite;			/// Shoes sprite image
+	CPlayerColorGraphic *WeaponSprite;			/// Weapon sprite image
 	CPlayerColorGraphic *ShieldSprite;			/// Shield sprite image
+	CPlayerColorGraphic *HelmetSprite;			/// Helmet sprite image
 	//Wyrmgus end
 };
 
