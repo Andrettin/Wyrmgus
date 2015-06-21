@@ -451,8 +451,12 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	} else {
 		this->State = State_BuildFromOutside;
 		this->BuildingUnit = build;
-		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
-		UnitUpdateHeading(unit);
+		//Wyrmgus start
+//		unit.Direction = DirectionToHeading(build->tilePos - unit.tilePos);
+//		UnitUpdateHeading(unit);
+		const Vec2i dir = Vec2i(build->tilePos.x * PixelTileSize.x, build->tilePos.y * PixelTileSize.y) + build->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize();
+		UnitHeadingFromDeltaXY(unit, dir);
+		//Wyrmgus end
 	}
 	return true;
 }

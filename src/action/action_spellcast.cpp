@@ -291,7 +291,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 
 	if (goal && unit.MapDistanceTo(*goal) <= this->Range) {
 		// there is goal and it is in range
-		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
+		//Wyrmgus start
+//		UnitHeadingFromDeltaXY(unit, goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos);
+		UnitHeadingFromDeltaXY(unit, Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize());
+		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;
 	} else if (!goal && unit.MapDistanceTo(this->goalPos) <= this->Range) {

@@ -502,7 +502,10 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	}
 	this->State = SUB_STILL_ATTACK; // Mark attacking.
 	this->SetGoal(autoAttackUnit);
-	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
+	//Wyrmgus start
+//	UnitHeadingFromDeltaXY(unit, autoAttackUnit->tilePos + autoAttackUnit->Type->GetHalfTileSize() - unit.tilePos);
+	UnitHeadingFromDeltaXY(unit, Vec2i(autoAttackUnit->tilePos.x * PixelTileSize.x, autoAttackUnit->tilePos.y * PixelTileSize.y) + autoAttackUnit->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize());
+	//Wyrmgus end
 	return true;
 }
 

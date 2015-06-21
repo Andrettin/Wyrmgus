@@ -569,7 +569,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 	Assert(unit.MapDistanceTo(*goal) <= 1);
 
 	// Update the heading of a harvesting unit to looks straight at the resource.
-	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
+	//Wyrmgus start
+//	UnitHeadingFromDeltaXY(unit, goal->tilePos - unit.tilePos + goal->Type->GetHalfTileSize());
+	UnitHeadingFromDeltaXY(unit, Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - unit.Type->GetHalfTilePixelSize());
+	//Wyrmgus end
 
 	// If resource is still under construction, wait!
 	if ((goal->Type->MaxOnBoard && goal->Resource.Active >= goal->Type->MaxOnBoard)

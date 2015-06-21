@@ -49,6 +49,9 @@
 #endif
 
 #include "color.h"
+//Wyrmgus start
+#include "map.h"	//required for PixelTileSize
+//Wyrmgus end
 #include "missileconfig.h"
 #include "vec2i.h"
 
@@ -558,6 +561,9 @@ public:
 	~CUnitType();
 
 	Vec2i GetHalfTileSize() const { return Vec2i(TileWidth / 2, TileHeight / 2); }
+	//Wyrmgus start
+	Vec2i GetHalfTilePixelSize() const { return Vec2i(TileWidth * PixelTileSize.x / 2, TileHeight * PixelTileSize.y / 2); }
+	//Wyrmgus end
 	PixelSize GetPixelSize() const;
 
 	bool CheckUserBoolFlags(const char *BoolFlags) const;

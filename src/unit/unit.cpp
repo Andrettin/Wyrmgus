@@ -2315,7 +2315,14 @@ void UnitUpdateHeading(CUnit &unit)
 */
 void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
 {
-	unit.Direction = DirectionToHeading(delta);
+	//Wyrmgus start
+//	unit.Direction = DirectionToHeading(delta);
+	int heading = DirectionToHeading(delta) + ((256 / unit.Type->NumDirections) / 2);
+	if (heading % (256 / unit.Type->NumDirections) != 0) {
+		heading = heading - (heading % (256 / unit.Type->NumDirections));
+	}
+	unit.Direction = heading;
+	//Wyrmgus end
 	UnitUpdateHeading(unit);
 }
 

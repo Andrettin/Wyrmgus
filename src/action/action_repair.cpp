@@ -282,7 +282,10 @@ static void AnimateActionRepair(CUnit &unit)
 					&& goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
 					this->State = 2;
 					this->RepairCycle = 0;
-					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
+					//Wyrmgus start
+//					const Vec2i dir = goal->tilePos + goal->Type->GetHalfTileSize() - unit.tilePos;
+					const Vec2i dir = Vec2i(goal->tilePos.x * PixelTileSize.x, goal->tilePos.y * PixelTileSize.y) + goal->Type->GetHalfTilePixelSize() - Vec2i(unit.tilePos.x * PixelTileSize.x, unit.tilePos.y * PixelTileSize.y) - unit.Type->GetHalfTilePixelSize();
+					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
 					this->Finished = true;
