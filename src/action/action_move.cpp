@@ -358,6 +358,7 @@ int DoActionMove(CUnit &unit)
 					Select(unit.tilePos, unit.tilePos, table);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+							CommandStopUnit(*table[i]);
 							CommandMove(*table[i], this->goalPos, FlushCommands);
 						}
 					}
@@ -366,6 +367,7 @@ int DoActionMove(CUnit &unit)
 					Select(unit.tilePos, unit.tilePos, table);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand && table[i]->CanMove()) {
+							CommandStopUnit(*table[i]);
 							CommandMove(*table[i], this->goalPos, FlushCommands);
 						}
 					}
