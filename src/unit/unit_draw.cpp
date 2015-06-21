@@ -1330,16 +1330,6 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 	
 	//Wyrmgus start
-	CPlayerColorGraphic *hair_sprite = type->HairSprite;
-	if (varinfo) {
-		if (varinfo->HairSprite) {
-			hair_sprite = varinfo->HairSprite;
-		}
-	}
-	if (hair_sprite) {
-		DrawPlayerColorOverlay(*type, hair_sprite, player, frame, screenPos);
-	}
-	
 	//draw the left arm and right arm clothing after the body, even if the arms were drawn before
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
 		if (clothing_left_arm_sprite) {
@@ -1360,6 +1350,16 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawPlayerColorOverlay(*type, clothing_sprite, player, frame, screenPos);
 	}
 
+	CPlayerColorGraphic *hair_sprite = type->HairSprite;
+	if (varinfo) {
+		if (varinfo->HairSprite) {
+			hair_sprite = varinfo->HairSprite;
+		}
+	}
+	if (hair_sprite) {
+		DrawPlayerColorOverlay(*type, hair_sprite, player, frame, screenPos);
+	}
+	
 	if (helmet_sprite) {
 		DrawPlayerColorOverlay(*type, helmet_sprite, player, frame, screenPos);
 	}
