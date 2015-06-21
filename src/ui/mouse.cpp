@@ -341,7 +341,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 		//Wyrmgus start
 //		if (dest->Type->CanMove() == false && !dest->Type->Teleporter) {
-		if (dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) {
+		if ((dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) || dest->Type->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
 			SendCommandMove(unit, pos, flush);
 		} else {
@@ -412,7 +412,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 		}
 		//Wyrmgus start
 //		if (!dest.Type->CanMove() && !dest.Type->Teleporter) {
-		if (!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
+		if ((!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
 			SendCommandMove(unit, pos, flush);
 		} else {
@@ -484,7 +484,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 		}
 		//Wyrmgus start
 //		if (dest.Type->CanMove() == false && !dest.Type->Teleporter) {
-		if (dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
+		if ((dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
 			SendCommandMove(unit, dest.tilePos, flush);
 		} else {

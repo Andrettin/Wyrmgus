@@ -45,10 +45,16 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "spells.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "upgrade.h"
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unit_manager.h"
 #include "unittype.h"
 
@@ -266,6 +272,27 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &new_mf = *Map.Field(pos);
+	//if the unit is a land unit over a raft, move the raft instead of the unit
+	if ((mf.Flags & MapFieldBridge) && ((new_mf.Flags & MapFieldWaterAllowed) || (new_mf.Flags & MapFieldCoastAllowed)) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				if (!unit.Moving) {
+					UnitClearOrders(unit);
+				}
+				if (!table[i]->Moving) {
+					UnitClearOrders(*table[i]);
+				}
+				CommandMove(*table[i], pos, flush);
+				return;
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (!unit.CanMove()) {
