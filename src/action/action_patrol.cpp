@@ -38,12 +38,21 @@
 #include "action/action_patrol.h"
 
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "script.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "video.h"
 
@@ -168,6 +177,21 @@
 			this->WaitingCycle = 0;
 			break;
 		case PF_UNREACHABLE:
+			//Wyrmgus start
+			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->goalPos, FlushCommands);
+						}
+						return;
+					}
+				}
+			}
+			//Wyrmgus end
 			// Increase range and try again
 			this->WaitingCycle = 1;
 			this->Range++;

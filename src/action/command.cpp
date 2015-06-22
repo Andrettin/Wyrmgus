@@ -216,6 +216,18 @@ void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (!unit.CanMove()) {
@@ -243,6 +255,18 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (!unit.CanMove()) {
@@ -282,7 +306,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
-				if ((new_mf.Flags & MapFieldWaterAllowed) || (new_mf.Flags & MapFieldCoastAllowed)) {
+				if ((new_mf.Flags & MapFieldWaterAllowed) || (new_mf.Flags & MapFieldCoastAllowed) || (mf.Flags & MapFieldWaterAllowed)) { // if is standing on water, tell the raft to go to the nearest coast, even if the ultimate goal is on land
 					CommandStopUnit(unit);
 					CommandMove(*table[i], pos, flush);
 					return;
@@ -337,6 +361,18 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (unit.Type->Building) {
@@ -384,6 +420,19 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &new_mf = *Map.Field(pos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 
 	COrderPtr *order;
 
@@ -418,6 +467,18 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (!unit.Type->CanAttack) {
@@ -449,6 +510,18 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (!unit.CanMove()) {
@@ -480,6 +553,18 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 	if (dest.Destroyed) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (unit.Type->Building) {
@@ -530,6 +615,18 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (unit.Type->Building && !what.BuilderOutside && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
@@ -578,6 +675,18 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 		ClearSavedAction(unit);
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (unit.Type->Building) {
@@ -612,6 +721,18 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 		ClearSavedAction(unit);
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order;
 
 	if (unit.Type->Building) {
@@ -872,6 +993,18 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellTyp
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
 	COrderPtr *order = GetNextOrder(unit, flush);
 
 	if (order == NULL) {

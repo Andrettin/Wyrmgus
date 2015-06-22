@@ -39,6 +39,9 @@
 
 #include "ai.h"
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "interface.h"
 #include "iolib.h"
 #include "map.h"
@@ -406,6 +409,22 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 	}
 	switch (DoActionMove(unit)) {
 		case PF_UNREACHABLE:
+			//Wyrmgus start
+			//if is unreachable and is on a raft, see if the raft can move closer
+			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+						}
+						return 0;
+					}
+				}
+			}
+			//Wyrmgus end
 			unit.Wait = 10;
 			if (unit.Player->AiEnabled) {
 				this->Range++;
@@ -453,6 +472,22 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
+			//Wyrmgus start
+			//if is unreachable and is on a raft, see if the raft can move closer
+			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+						}
+						return 0;
+					}
+				}
+			}
+			//Wyrmgus end
 			return -1;
 		case PF_REACHED:
 			break;
@@ -1096,6 +1131,22 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
+			//Wyrmgus start
+			//if is unreachable and is on a raft, see if the raft can move closer
+			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+						}
+						return 0;
+					}
+				}
+			}
+			//Wyrmgus end
 			return -1;
 		case PF_REACHED:
 			break;

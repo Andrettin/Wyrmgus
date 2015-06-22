@@ -44,8 +44,14 @@
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "video.h"
 
@@ -299,6 +305,22 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 				// FIXME: if near transporter wait for enter
 				if (pathRet) {
 					if (pathRet == PF_UNREACHABLE) {
+						//Wyrmgus start
+						//if is unreachable and is on a raft, see if the raft can move closer to the "transporter"
+						if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+							std::vector<CUnit *> table;
+							Select(unit.tilePos, unit.tilePos, table);
+							for (size_t i = 0; i != table.size(); ++i) {
+								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+									if (table[i]->CurrentAction() == UnitActionStill) {
+										CommandStopUnit(*table[i]);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+									}
+									return;
+								}
+							}
+						}
+						//Wyrmgus end
 						if (++this->State == State_MoveToTransporterMax) {
 							this->Finished = true;
 							return;

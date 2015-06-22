@@ -43,6 +43,9 @@
 #include "action/action_spellcast.h"
 
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "missile.h"
@@ -51,9 +54,15 @@
 #include "script.h"
 #include "sound.h"
 #include "spells.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "video.h"
 
@@ -303,6 +312,22 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		this->State++; // cast the spell
 		return false;
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
+		//Wyrmgus start
+		//if is unreachable and is on a raft, see if the raft can move closer to the target
+		if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			std::vector<CUnit *> table;
+			Select(unit.tilePos, unit.tilePos, table);
+			for (size_t i = 0; i != table.size(); ++i) {
+				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (table[i]->CurrentAction() == UnitActionStill) {
+						CommandStopUnit(*table[i]);
+						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+					}
+					return false;
+				}
+			}
+		}
+		//Wyrmgus end
 		// goal/spot unreachable and out of range -- give up
 		return true;
 	}

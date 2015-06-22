@@ -38,11 +38,17 @@
 #include "action/action_follow.h"
 
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "luacallback.h"
 #include "missile.h"
 #include "pathfinder.h"
 #include "script.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "ui.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -222,6 +228,21 @@ enum {
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
+			//Wyrmgus start
+			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+						}
+						return;
+					}
+				}
+			}
+			//Wyrmgus end
 			// Some tries to reach the goal
 			this->Range++;
 			break;

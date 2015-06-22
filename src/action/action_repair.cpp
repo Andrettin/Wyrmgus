@@ -39,14 +39,23 @@
 
 #include "action/action_built.h"
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "ui.h"
 #include "unittype.h"
 #include "video.h"
@@ -288,6 +297,24 @@ static void AnimateActionRepair(CUnit &unit)
 					//Wyrmgus end
 					UnitHeadingFromDeltaXY(unit, dir);
 				} else if (err < 0) {
+					//Wyrmgus start
+					//if is unreachable and is on a raft, see if the raft can move closer
+					if (err == PF_UNREACHABLE) {
+						if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+							std::vector<CUnit *> table;
+							Select(unit.tilePos, unit.tilePos, table);
+							for (size_t i = 0; i != table.size(); ++i) {
+								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+									if (table[i]->CurrentAction() == UnitActionStill) {
+										CommandStopUnit(*table[i]);
+										CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+									}
+									return;
+								}
+							}
+						}
+					}
+					//Wyrmgus end
 					this->Finished = true;
 					return ;
 				}

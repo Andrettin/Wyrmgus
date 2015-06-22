@@ -43,6 +43,9 @@
 #include "action/action_attack.h"
 
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "missile.h"
@@ -519,6 +522,22 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	// Unreachable.
 
 	if (err == PF_UNREACHABLE) {
+		//Wyrmgus start
+		//if is unreachable and is on a raft, see if the raft can move closer to the enemy
+		if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			std::vector<CUnit *> table;
+			Select(unit.tilePos, unit.tilePos, table);
+			for (size_t i = 0; i != table.size(); ++i) {
+				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+					if (table[i]->CurrentAction() == UnitActionStill) {
+						CommandStopUnit(*table[i]);
+						CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+					}
+					return;
+				}
+			}
+		}
+		//Wyrmgus end
 		if (!this->HasGoal()) {
 			// When attack-moving we have to allow a bigger range
 			this->Range++;

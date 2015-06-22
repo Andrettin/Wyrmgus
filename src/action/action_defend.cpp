@@ -38,12 +38,21 @@
 #include "action/action_defend.h"
 
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "script.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "video.h"
 
@@ -199,6 +208,22 @@ enum {
 
 	switch (DoActionMove(unit)) {
 		case PF_UNREACHABLE:
+			//Wyrmgus start
+			//if is unreachable and is on a raft, see if the raft can move closer to the enemy
+			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+						}
+						return;
+					}
+				}
+			}
+			//Wyrmgus end
 			// Some tries to reach the goal
 			this->Range++;
 			break;

@@ -41,14 +41,23 @@
 #include "action/action_built.h"
 #include "ai.h"
 #include "animation.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
 #include "script.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "video.h"
 
@@ -203,6 +212,21 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
+			//Wyrmgus start
+			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+				std::vector<CUnit *> table;
+				Select(unit.tilePos, unit.tilePos, table);
+				for (size_t i = 0; i != table.size(); ++i) {
+					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+						if (table[i]->CurrentAction() == UnitActionStill) {
+							CommandStopUnit(*table[i]);
+							CommandMove(*table[i], this->goalPos, FlushCommands);
+						}
+						return false;
+					}
+				}
+			}
+			//Wyrmgus end
 			// Some tries to reach the goal
 			if (this->State++ < State_MoveToLocationMax) {
 				// To keep the load low, retry each 1/4 second.

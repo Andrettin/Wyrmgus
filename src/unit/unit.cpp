@@ -2569,7 +2569,7 @@ CUnit *UnitOnScreen(int x, int y)
 			candidate = &unit;
 			//Wyrmgus start
 //			if (IsOnlySelected(*candidate) || candidate->Type->IsNotSelectable) {
-			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || candidate->Player->Type == PlayerNeutral) { // don't select a neutral unit if there's a player-owned unit there as well
 			//Wyrmgus end
 				continue;
 			} else {
@@ -2664,6 +2664,27 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	} else if (unit.UnitInside) {
 		DestroyAllInside(unit);
 	}
+	
+	//Wyrmgus start
+	//if is a raft or bridge, destroy all land units on it
+	if (unit.Type->BoolFlag[BRIDGE_INDEX].value) {
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+				table[i]->Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);
+				table[i]->Moving = 0;
+				table[i]->TTL = 0;
+				table[i]->Anim.Unbreakable = 0;
+				PlayUnitSound(*table[i], VoiceDying);
+				table[i]->Remove(NULL);
+				UnitLost(*table[i]);
+				UnitClearOrders(*table[i]);
+				table[i]->Release();
+			}
+		}
+	}
+	//Wyrmgus end
 
 	//Wyrmgus start
 	//drop items upon death
@@ -3234,7 +3255,10 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	}
 
 	// Can't attack run away.
-	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount) {
+	//Wyrmgus start
+//	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount) {
+	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount && !target.Type->BoolFlag[BRIDGE_INDEX].value) {
+	//Wyrmgus end
 		HitUnit_RunAway(target, *attacker);
 	}
 
