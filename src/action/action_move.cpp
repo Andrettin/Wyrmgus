@@ -127,6 +127,9 @@
 	input.SetGoal(this->goalPos, tileSize);
 
 	int distance = this->Range;
+	//Wyrmgus start
+	// why alter the distance by checking for obstacles to missiles moving in a straight line when a unit is moving?
+	/*
 	if (GameSettings.Inside) {
 		//Wyrmgus start
 //		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldRocks | MapFieldForest, &distance);
@@ -137,6 +140,8 @@
 		CheckObstaclesBetweenTiles(input.GetUnitPos(), this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, MapFieldAirUnpassable, &distance);
 	//Wyrmgus end
 	}
+	*/
+	//Wyrmgus end
 	input.SetMaxRange(distance);
 	input.SetMinRange(0);
 }
