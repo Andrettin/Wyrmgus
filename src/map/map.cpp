@@ -648,7 +648,10 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	//  FIXME: a better looking result would be fine
 	//    Allow general updates to any tiletype that regrows
 
-	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding);
+	//Wyrmgus start
+//	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding);
+	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding | MapFieldItem); // don't regrow forests under items
+	//Wyrmgus end
 	++mf.Value;
 	if (mf.Value < ForestRegeneration) {
 		return;

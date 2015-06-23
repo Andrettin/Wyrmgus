@@ -2568,8 +2568,10 @@ CUnit *UnitOnScreen(int x, int y)
 			// Check if there are other units on this place
 			candidate = &unit;
 			//Wyrmgus start
+			std::vector<CUnit *> table;
+			Select(candidate->tilePos, candidate->tilePos, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 //			if (IsOnlySelected(*candidate) || candidate->Type->IsNotSelectable) {
-			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || candidate->Player->Type == PlayerNeutral) { // don't select a neutral unit if there's a player-owned unit there as well
+			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || (candidate->Player->Type == PlayerNeutral && table.size())) { // don't select a neutral unit if there's a player-owned unit there as well
 			//Wyrmgus end
 				continue;
 			} else {
