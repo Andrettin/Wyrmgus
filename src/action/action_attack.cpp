@@ -571,7 +571,14 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	//Wyrmgus start
 //	AnimateActionAttack(unit, *this);
 	bool ranged = false;
-	if (((this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) > 1) || (!this->HasGoal() && Map.Info.IsPointOnMap(this->goalPos) && unit.MapDistanceTo(this->goalPos) > 1) || unit.Container) && unit.Variable[ATTACKRANGE_INDEX].Value > 1) {
+	if (
+		(
+			(this->GetGoal() && (unit.MapDistanceTo(*this->GetGoal()) > 1 || (unit.Type->UnitType != UnitTypeFly && this->GetGoal()->Type->UnitType == UnitTypeFly) || (unit.Type->UnitType == UnitTypeFly && this->GetGoal()->Type->UnitType != UnitTypeFly)))
+			|| (!this->HasGoal() && Map.Info.IsPointOnMap(this->goalPos) && unit.MapDistanceTo(this->goalPos) > 1)
+			|| unit.Container
+		)
+		&& unit.Variable[ATTACKRANGE_INDEX].Value > 1
+	) {
 		ranged = true;
 	}
 	AnimateActionAttack(unit, *this, ranged);
