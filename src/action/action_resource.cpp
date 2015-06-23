@@ -1274,7 +1274,10 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		CUnit *goal = NULL;
 		const bool longWay = unit.pathFinderData->output.Cycles > 500;
 
-		if (unit.Player->AiEnabled && AiPlayer && AiPlayer->BuildDepots) {
+		//Wyrmgus start
+//		if (unit.Player->AiEnabled && AiPlayer && AiPlayer->BuildDepots) {
+		if (depot && unit.Player->AiEnabled && AiPlayer && AiPlayer->BuildDepots) { //check if the depot is valid
+		//Wyrmgus end
 			// If the depot is overused, we need first to try to switch into another depot
 			// Use depot's ref counter for that
 			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
