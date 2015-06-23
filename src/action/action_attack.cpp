@@ -441,6 +441,25 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(unit.CanMove());
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
+	//Wyrmgus start
+	//if is on a moving raft and target is now within range, stop the raft
+	if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				if (table[i]->CurrentAction() == UnitActionMove) {
+					if ((this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) || (!this->HasGoal() && unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+							CommandStopUnit(*table[i]);
+						}
+					}
+				}
+			}
+		}
+	}
+	//Wyrmgus end
+				
 	int err = DoActionMove(unit);
 
 	if (unit.Anim.Unbreakable) {
