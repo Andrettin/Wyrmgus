@@ -768,6 +768,10 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			if (lua_rawlen(l, -1) == 3) {
 				lua_rawgeti(l, -1, 3); // Res type.
 				res->D.PlayerData.ResType = CclParseStringDesc(l);
+			//Wyrmgus start
+			} else {
+				res->D.PlayerData.ResType = NULL;
+			//Wyrmgus end
 			}
 			lua_pop(l, 1); // table.
 		} else {
@@ -1043,7 +1047,13 @@ int EvalNumber(const NumberDesc *number)
 		case ENumber_PlayerData : // getplayerdata(player, data, res);
 			int player = EvalNumber(number->D.PlayerData.Player);
 			std::string data = EvalString(number->D.PlayerData.DataType);
-			std::string res = EvalString(number->D.PlayerData.ResType);
+			//Wyrmgus start
+//			std::string res = EvalString(number->D.PlayerData.ResType);
+			std::string res;
+			if (number->D.PlayerData.ResType != NULL) {
+				res = EvalString(number->D.PlayerData.ResType);
+			}
+			//Wyrmgus end
 			return GetPlayerData(player, data.c_str(), res.c_str());
 	}
 	return 0;

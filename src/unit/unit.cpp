@@ -816,7 +816,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			}
 		}
 		player.UnitTypesCount[type.Slot]++;
-		player.Demand += type.Demand; // food needed
+		//Wyrmgus start
+//		player.Demand += type.Demand; // food needed
+		player.Demand += type.Stats[player.Index].Variables[DEMAND_INDEX].Value; // food needed
+		//Wyrmgus end
 	}
 
 	// Don't Add the building if it's dying, used to load a save game
@@ -1495,11 +1498,17 @@ void UnitLost(CUnit &unit)
 	}
 
 	//  Handle unit demand. (Currently only food supported.)
-	player.Demand -= type.Demand;
+	//Wyrmgus start
+//	player.Demand -= type.Demand;
+	player.Demand -= type.Stats[player.Index].Variables[DEMAND_INDEX].Value;
+	//Wyrmgus end
 
 	//  Update information.
 	if (unit.CurrentAction() != UnitActionBuilt) {
-		player.Supply -= type.Supply;
+		//Wyrmgus start
+//		player.Supply -= type.Supply;
+		player.Supply -= type.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
+		//Wyrmgus end
 		// Decrease resource limit
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (player.MaxResources[i] != -1 && type.Stats[player.Index].Storing[i]) {
@@ -1580,7 +1589,10 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	// Handle unit supply and max resources.
 	// Note an upgraded unit can't give more supply.
 	if (!upgrade) {
-		player.Supply += type.Supply;
+		//Wyrmgus start
+//		player.Supply += type.Supply;
+		player.Supply += type.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
+		//Wyrmgus end
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (player.MaxResources[i] != -1 && type.Stats[player.Index].Storing[i]) {
 				player.MaxResources[i] += type.Stats[player.Index].Storing[i];
@@ -2039,8 +2051,12 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	if (Type->GivesResource) {
 		DebugPrint("Resource transfer not supported\n");
 	}
-	newplayer.Demand += Type->Demand;
-	newplayer.Supply += Type->Supply;
+	//Wyrmgus start
+//	newplayer.Demand += Type->Demand;
+//	newplayer.Supply += Type->Supply;
+	newplayer.Demand += Type->Stats[newplayer.Index].Variables[SUPPLY_INDEX].Value;
+	newplayer.Supply += Type->Stats[newplayer.Index].Variables[SUPPLY_INDEX].Value;
+	//Wyrmgus end
 	// Increase resource limit
 	for (int i = 0; i < MaxCosts; ++i) {
 		if (newplayer.MaxResources[i] != -1 && Type->Stats[newplayer.Index].Storing[i]) {

@@ -781,8 +781,10 @@ public:
 	CUnitSound MapSound;			/// Sounds for events, map-specific
 	//Wyrmgus end
 
-	int Supply;                     /// Food supply
-	int Demand;                     /// Food demand
+	//Wyrmgus start
+//	int Supply;                     /// Food supply
+//	int Demand;                     /// Food demand
+	//Wyrmgus end
 
 	int PoisonDrain;                /// How much health is drained every second when poisoned
 

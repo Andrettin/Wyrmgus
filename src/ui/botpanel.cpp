@@ -441,7 +441,11 @@ void DrawPopupUnitInfo(const CUnitType *type,
 
 	//detect max Width
 	int popupWidth = GetPopupCostsWidth(font, stats->Costs);
-	if (type->Demand) {
+	//Wyrmgus start
+//	if (type->Demand) {
+	if (stats->Variables[DEMAND_INDEX].Value) {
+		
+	//Wyrmgus end
 		if (UI.Resources[FoodCost].IconWidth != -1) {
 			popupWidth += (UI.Resources[FoodCost].IconWidth + 5);
 		} else {
@@ -450,7 +454,10 @@ void DrawPopupUnitInfo(const CUnitType *type,
 				popupWidth += (G->Width + 5);
 			}
 		}
-		popupWidth += (font->Width(type->Demand) + 5);
+		//Wyrmgus start
+//		popupWidth += (font->Width(type->Demand) + 5);
+		popupWidth += (font->Width(stats->Variables[DEMAND_INDEX].Value) + 5);
+		//Wyrmgus end
 	}
 	popupWidth += 10;
 	popupWidth = std::max<int>(popupWidth, font->Width(type->Name) + 10);
@@ -478,7 +485,10 @@ void DrawPopupUnitInfo(const CUnitType *type,
 	// Costs
 	x = DrawPopupCosts(x + 5, y, label,  stats->Costs);
 
-	if (type->Demand) {
+	//Wyrmgus start
+//	if (type->Demand) {
+	if (stats->Variables[DEMAND_INDEX].Value) {
+	//Wyrmgus end
 		int y_offset = 0;
 		G = UI.Resources[FoodCost].G;
 		if (G) {
@@ -489,7 +499,10 @@ void DrawPopupUnitInfo(const CUnitType *type,
 			y_offset -= font->Height();
 			y_offset /= 2;
 		}
-		label.Draw(x, y + y_offset, type->Demand);
+		//Wyrmgus start
+//		label.Draw(x, y + y_offset, type->Demand);
+		label.Draw(x, y + y_offset, stats->Variables[DEMAND_INDEX].Value);
+		//Wyrmgus end
 		//x += 5;
 	}
 
@@ -582,7 +595,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		case ButtonUpgradeTo:
 			memcpy(Costs, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs,
 				   sizeof(UnitTypes[button.Value]->Stats[ThisPlayer->Index].Costs));
-			Costs[FoodCost] = UnitTypes[button.Value]->Demand;
+			//Wyrmgus start
+//			Costs[FoodCost] = UnitTypes[button.Value]->Demand;
+			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
+			//Wyrmgus end
 			break;
 		default:
 			break;
@@ -862,7 +878,7 @@ void UpdateStatusLineForButton(const ButtonAction &button)
 					modified_costs[i] *= UnitTypes[button.Value]->TrainQuantity;
 				}
 			}
-			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Demand * (UnitTypes[button.Value]->TrainQuantity ? UnitTypes[button.Value]->TrainQuantity : 1), modified_costs);
+			UI.StatusLine.SetCosts(0, UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value * (UnitTypes[button.Value]->TrainQuantity ? UnitTypes[button.Value]->TrainQuantity : 1), modified_costs);
 			//Wyrmgus end
 			break;
 		}

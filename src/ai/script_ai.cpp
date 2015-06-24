@@ -123,7 +123,10 @@ static std::vector<CUnitType *> getSupplyUnits()
 	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
-		if (type.Supply > 0) {
+		//Wyrmgus start
+//		if (type.Supply > 0) {
+		if (type.DefaultStat.Variables[SUPPLY_INDEX].Value > 0) {
+		//Wyrmgus end
 			res.push_back(&type);
 		}
 	}
@@ -142,7 +145,10 @@ static std::vector<CUnitType *> getSupplyUnits()
 				//Wyrmgus end
 				cost += type.DefaultStat.Costs[j];
 			}
-			const float score = ((float) type.Supply) / cost;
+			//Wyrmgus start
+//			const float score = ((float) type.Supply) / cost;
+			const float score = ((float) type.DefaultStat.Variables[SUPPLY_INDEX].Value) / cost;
+			//Wyrmgus end
 			if (score > bestscore) {
 				bestscore = score;
 				besttype = &type;

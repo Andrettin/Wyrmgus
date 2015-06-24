@@ -879,10 +879,12 @@ static int CclDefineUnitType(lua_State *l)
 			type->AiAdjacentRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DecayRate")) {
 			type->DecayRate = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Demand")) {
-			type->Demand = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Supply")) {
-			type->Supply = LuaToNumber(l, -1);
+		//Wyrmgus start
+//		} else if (!strcmp(value, "Demand")) {
+//			type->Demand = LuaToNumber(l, -1);
+//		} else if (!strcmp(value, "Supply")) {
+//			type->Supply = LuaToNumber(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "Corpse")) {
 			type->CorpseName = LuaToString(l, -1);
 			type->CorpseType = NULL;
@@ -1584,8 +1586,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->BoxOffsetY = parent_type->BoxOffsetY;
 			type->Construction = parent_type->Construction;
 			type->UnitType = parent_type->UnitType;
-			type->Demand = parent_type->Demand;
-			type->Supply = parent_type->Supply;
+//			type->Demand = parent_type->Demand;
+//			type->Supply = parent_type->Supply;
 			type->Missile.Name = parent_type->Missile.Name;
 			type->Missile.Missile = NULL;
 			type->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
@@ -2117,10 +2119,18 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Demand")) {
-		lua_pushnumber(l, type->Demand);
+		if (!GameRunning && Editor.Running != EditorEditing) {
+			lua_pushnumber(l, type->DefaultStat.Variables[DEMAND_INDEX].Value);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.Variables[DEMAND_INDEX].Value);
+		}
 		return 1;
 	} else if (!strcmp(data, "Supply")) {
-		lua_pushnumber(l, type->Supply);
+		if (!GameRunning && Editor.Running != EditorEditing) {
+			lua_pushnumber(l, type->DefaultStat.Variables[SUPPLY_INDEX].Value);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.Variables[SUPPLY_INDEX].Value);
+		}
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		if (type->UnitType == UnitTypeLand) {
@@ -2652,6 +2662,7 @@ void UpdateUnitVariables(CUnit &unit)
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
 			//Wyrmgus start
+			|| i == SUPPLY_INDEX || i == DEMAND_INDEX
 			|| i == THORNSDAMAGE_INDEX || i == SPEED_INDEX
 			//Wyrmgus end
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX || i == GIVERESOURCE_INDEX
@@ -2736,6 +2747,8 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
 	}
 
+	//Wyrmgus start
+	/*
 	// Supply
 	unit.Variable[SUPPLY_INDEX].Value = unit.Type->Supply;
 	unit.Variable[SUPPLY_INDEX].Max = unit.Player->Supply;
@@ -2748,6 +2761,8 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[DEMAND_INDEX].Value = unit.Type->Demand;
 	unit.Variable[DEMAND_INDEX].Max = unit.Player->Demand;
 	unit.Variable[DEMAND_INDEX].Enable = unit.Type->Demand > 0;
+	*/
+	//Wyrmgus end
 
 	//Wyrmgus start
 	/*

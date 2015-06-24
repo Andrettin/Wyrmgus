@@ -8,8 +8,10 @@ class CUnitType
 	int ClicksToExplode;
 
 	int GivesResource;
-	int Supply;
-	int Demand;
+	//Wyrmgus start
+//	int Supply;
+//	int Demand;
+	//Wyrmgus end
 	
 	int TileWidth;
 	int TileHeight;

@@ -113,8 +113,12 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	player.UnitTypesCount[oldtype.Slot]--;
 	player.UnitTypesCount[newtype.Slot]++;
 
-	player.Demand += newtype.Demand - oldtype.Demand;
-	player.Supply += newtype.Supply - oldtype.Supply;
+	//Wyrmgus start
+//	player.Demand += newtype.Demand - oldtype.Demand;
+//	player.Supply += newtype.Supply - oldtype.Supply;
+	player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
+	player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;
+	//Wyrmgus end
 
 	// Change resource limit
 	for (int i = 0; i < MaxCosts; ++i) {

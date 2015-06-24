@@ -758,6 +758,35 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
+			
+			//Wyrmgus start
+			// if a unit type's supply is changed, we need to update the player's supply accordingly
+			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && unit.IsAlive()) {
+						unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+					}
+				}
+			}
+			
+			// if a unit type's demand is changed, we need to update the player's demand accordingly
+			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && unit.IsAlive()) {
+						unit.Player->Demand += um->Modifier.Variables[DEMAND_INDEX].Value;
+					}
+				}
+			}
+			//Wyrmgus end
+			
 			// upgrade costs :)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				stat.Costs[j] += um->Modifier.Costs[j];
@@ -997,6 +1026,35 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
+			
+			//Wyrmgus start
+			// if a unit type's supply is changed, we need to update the player's supply accordingly
+			if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && unit.IsAlive()) {
+						unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+					}
+				}
+			}
+			
+			// if a unit type's demand is changed, we need to update the player's demand accordingly
+			if (um->Modifier.Variables[DEMAND_INDEX].Value) {
+				std::vector<CUnit *> unitupgrade;
+
+				FindUnitsByType(*UnitTypes[z], unitupgrade);
+				for (size_t j = 0; j != unitupgrade.size(); ++j) {
+					CUnit &unit = *unitupgrade[j];
+					if (unit.Player->Index == pn && unit.IsAlive()) {
+						unit.Player->Demand -= um->Modifier.Variables[DEMAND_INDEX].Value;
+					}
+				}
+			}
+			//Wyrmgus end
+			
 			// upgrade costs :)
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
 				stat.Costs[j] -= um->Modifier.Costs[j];

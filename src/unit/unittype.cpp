@@ -653,8 +653,9 @@ CUnitType::CUnitType() :
 //	Indestructible(0), Teleporter(0), SaveCargo(0),
 //	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
 	//Wyrmgus end
-	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
+//	GivesResource(0), Supply(0), Demand(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
+	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 //	Sprite(NULL), ShadowSprite(NULL)
 	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL),
 	ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL),
