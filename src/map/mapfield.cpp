@@ -98,6 +98,16 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 					 MapFieldGravel | MapFieldMud | MapFieldStoneFloor | MapFieldStumps);
 					 //Wyrmgus end
 	this->Flags |= tile.flag;
+	//Wyrmgus start
+	// restore MapFieldAirUnpassable related to units (i.e. doors)
+	const CUnitCache &cache = this->UnitCache;
+	for (size_t i = 0; i != cache.size(); ++i) {
+		CUnit &unit = *cache[i];
+		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
+			this->Flags |= MapFieldAirUnpassable;
+		}
+	}
+	//Wyrmgus end
 #endif
 	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
 	//Wyrmgus start

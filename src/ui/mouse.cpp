@@ -430,6 +430,9 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			return;
 		}
 	}
+	//Wyrmgus start
+	// don't automatically attack wall tiles
+	/*
 	if (Map.WallOnMap(pos)) {
 		if (unit.Player->Race == PlayerRaceHuman && Map.OrcWallOnMap(pos)) {
 			SendCommandAttack(unit, pos, NoUnitP, flush);
@@ -440,6 +443,8 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			return;
 		}
 	}
+	*/
+	//Wyrmgus end
 	// empty space
 	if ((KeyModifiers & ModifierControl)) {
 		if (RightButtonAttacks) {
