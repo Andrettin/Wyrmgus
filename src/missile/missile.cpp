@@ -680,22 +680,30 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 	}
 #endif
 
-	//Wyrmgus start
-	this->G->SetTimeOfDay(GameTimeOfDay);	
-	//Wyrmgus end
-
 	if (this->Flip) {
 		if (frame < 0) {
 			if (this->Transparency > 0) {
-				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency));
+				//Wyrmgus start
+//				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency));
+				this->G->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * Transparency), false);
+				//Wyrmgus end
 			} else {
-				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				//Wyrmgus start
+//				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				this->G->DrawFrameClipX(-frame - 1, pos.x, pos.y, false);
+				//Wyrmgus end
 			}
 		} else {
 			if (this->Transparency > 0) {
-				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
+				//Wyrmgus start
+//				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
+				this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency), false);
+				//Wyrmgus end
 			} else {
-				this->G->DrawFrameClip(frame, pos.x, pos.y);
+				//Wyrmgus start
+//				this->G->DrawFrameClip(frame, pos.x, pos.y);
+				this->G->DrawFrameClip(frame, pos.x, pos.y, false);
+				//Wyrmgus end
 			}
 		}
 	} else {
@@ -707,9 +715,15 @@ void MissileType::DrawMissileType(int frame, const PixelPos &pos) const
 			frame = (frame / row) * this->NumDirections + frame % row;
 		}
 		if (this->Transparency > 0) {
-			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
+			//Wyrmgus start
+//			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency));
+			this->G->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * Transparency), false);
+			//Wyrmgus end
 		} else {
-			this->G->DrawFrameClip(frame, pos.x, pos.y);
+			//Wyrmgus start
+//			this->G->DrawFrameClip(frame, pos.x, pos.y);
+			this->G->DrawFrameClip(frame, pos.x, pos.y, false);
+			//Wyrmgus end
 		}
 	}
 }

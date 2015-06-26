@@ -280,7 +280,10 @@
 	for (unsigned int i = 1; i <= MaxCosts; ++i) {
 		if (Costs[i]) {
 			int y_offset = 0;
-			const CGraphic *G = UI.Resources[i].G;
+			//Wyrmgus start
+//			const CGraphic *G = UI.Resources[i].G;
+			CGraphic *G = UI.Resources[i].G;
+			//Wyrmgus end
 			if (G) {
 				int x_offset = UI.Resources[i].IconWidth;
 				G->DrawFrameClip(UI.Resources[i].IconFrame,	x , y);
@@ -295,7 +298,10 @@
 	}
 	if (Costs[ManaResCost]) {
 		const SpellType &spell = *SpellTypeTable[button.Value];
-		const CGraphic *G = UI.Resources[ManaResCost].G;
+		//Wyrmgus start
+//		const CGraphic *G = UI.Resources[ManaResCost].G;
+		CGraphic *G = UI.Resources[ManaResCost].G;
+		//Wyrmgus end
 		if (spell.ManaCost) {
 			int y_offset = 0;
 			if (G) {

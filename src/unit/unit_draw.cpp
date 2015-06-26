@@ -665,13 +665,11 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 		if (frame < 0) {
 			//Wyrmgus start
 //			type.ShadowSprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
-			sprite->SetTimeOfDay(GameTimeOfDay);
 			sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
 			//Wyrmgus end
 		} else {
 			//Wyrmgus start
 //			type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
-			sprite->SetTimeOfDay(GameTimeOfDay);
 			sprite->DrawFrameClip(frame, pos.x, pos.y);
 			//Wyrmgus end
 		}
@@ -684,7 +682,6 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 		}
 		//Wyrmgus start
 //		type.ShadowSprite->DrawFrameClip(frame, pos.x, pos.y);
-		sprite->SetTimeOfDay(GameTimeOfDay);
 		sprite->DrawFrameClip(frame, pos.x, pos.y);
 		//Wyrmgus end
 	}
@@ -748,19 +745,15 @@ void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame,
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->SetTimeOfDay(GameTimeOfDay);
-				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+				sprite->DrawFrameClipTransX(-frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 			} else {
-				sprite->SetTimeOfDay(GameTimeOfDay);
-				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y);
+				sprite->DrawFrameClipX(-frame - 1, pos.x, pos.y, false);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->SetTimeOfDay(GameTimeOfDay);
-				sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+				sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 			} else {
-				sprite->SetTimeOfDay(GameTimeOfDay);
-				sprite->DrawFrameClip(frame, pos.x, pos.y);
+				sprite->DrawFrameClip(frame, pos.x, pos.y, false);
 			}
 		}
 	} else {
@@ -772,11 +765,9 @@ void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame,
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->SetTimeOfDay(GameTimeOfDay);
-			sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value));
+			sprite->DrawFrameClipTrans(frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
 		} else {
-			sprite->SetTimeOfDay(GameTimeOfDay);
-			sprite->DrawFrameClip(frame, pos.x, pos.y);
+			sprite->DrawFrameClip(frame, pos.x, pos.y, false);
 		}
 	}
 }

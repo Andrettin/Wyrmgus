@@ -267,14 +267,42 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrameClip(unsigned frame, int x, int y) const
+//Wyrmgus start
+//void CGraphic::DrawFrameClip(unsigned frame, int x, int y) const
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day)
+//Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		DoDrawFrameClip(Textures, frame, x, y);
+		//Wyrmgus start
+//		DoDrawFrameClip(Textures, frame, x, y);
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+			DoDrawFrameClip(Textures, frame, x, y);
+		} else if (GameTimeOfDay == 1) {
+			if (!TexturesDawn) {
+				MakeTexture(this, GameTimeOfDay);
+			}
+			DoDrawFrameClip(TexturesDawn, frame, x, y);
+		} else if (GameTimeOfDay == 5) {
+			if (!TexturesDusk) {
+				MakeTexture(this, GameTimeOfDay);
+			}
+			DoDrawFrameClip(TexturesDusk, frame, x, y);
+		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+			if (!TexturesNight) {
+				MakeTexture(this, GameTimeOfDay);
+			}
+			DoDrawFrameClip(TexturesNight, frame, x, y);
+		}
+		//Wyrmgus end
 	} else
 #endif
 	{
+		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
+		//Wyrmgus end
 		DrawSubClip(frame_map[frame].x, frame_map[frame].y,
 					Width, Height, x, y);
 	}
@@ -296,17 +324,28 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 	}
 }
 
-void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
+//Wyrmgus start
+//void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day)
+//Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glColor4ub(255, 255, 255, alpha);
-		DrawFrameClip(frame, x, y);
+		//Wyrmgus start
+//		DrawFrameClip(frame, x, y);
+		DrawFrameClip(frame, x, y, ignore_time_of_day);
+		//Wyrmgus end
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	} else
 #endif
 	{
+		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
+		//Wyrmgus end
 		DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
 						 Width, Height, x, y, alpha);
 	}
@@ -569,14 +608,42 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 **  @param x       x coordinate on the screen
 **  @param y       y coordinate on the screen
 */
-void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
+//Wyrmgus start
+//void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day)
+//Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		DoDrawFrameClipX(Textures, frame, x, y);
+		//Wyrmgus start
+		//DoDrawFrameClipX(Textures, frame, x, y);
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+			DoDrawFrameClipX(Textures, frame, x, y);
+		} else if (GameTimeOfDay == 1) {
+			if (!TexturesDawn) {
+				MakeTexture(this, GameTimeOfDay);
+			}
+			DoDrawFrameClipX(TexturesDawn, frame, x, y);
+		} else if (GameTimeOfDay == 5) {
+			if (!TexturesDusk) {
+				MakeTexture(this, GameTimeOfDay);
+			}
+			DoDrawFrameClipX(TexturesDusk, frame, x, y);
+		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+			if (!TexturesNight) {
+				MakeTexture(this, GameTimeOfDay);
+			}
+			DoDrawFrameClipX(TexturesNight, frame, x, y);
+		}
+		//Wyrmgus end
 	} else
 #endif
 	{
+		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
+		//Wyrmgus end
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
 		const int oldx = x;
@@ -612,17 +679,28 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 	}
 }
 
-void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
+//Wyrmgus start
+//void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
+void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day)
+//Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glColor4ub(255, 255, 255, alpha);
-		DrawFrameClipX(frame, x, y);
+		//Wyrmgus start
+//		DrawFrameClipX(frame, x, y);
+		DrawFrameClipX(frame, x, y, ignore_time_of_day);
+		//Wyrmgus end
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	} else
 #endif
 	{
+		//Wyrmgus start
+		if (!ignore_time_of_day) {
+			SetTimeOfDay(GameTimeOfDay);
+		}
+		//Wyrmgus end
 		SDL_Rect srect = {frameFlip_map[frame].x, frameFlip_map[frame].y, Uint16(Width), Uint16(Height)};
 
 		const int oldx = x;
@@ -1027,6 +1105,20 @@ void CGraphic::Free(CGraphic *g)
 				glDeleteTextures(g->NumTextures, g->Textures);
 				delete[] g->Textures;
 			}
+			//Wyrmgus start
+			if (g->TexturesDawn) {
+				glDeleteTextures(g->NumTextures, g->TexturesDawn);
+				delete[] g->TexturesDawn;
+			}
+			if (g->TexturesDusk) {
+				glDeleteTextures(g->NumTextures, g->TexturesDusk);
+				delete[] g->TexturesDusk;
+			}
+			if (g->TexturesNight) {
+				glDeleteTextures(g->NumTextures, g->TexturesNight);
+				delete[] g->TexturesNight;
+			}
+			//Wyrmgus end
 			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 			if (cg) {
 				for (int i = 0; i < PlayerMax; ++i) {
@@ -1086,6 +1178,17 @@ void FreeOpenGLGraphics()
 		if ((*i)->Textures) {
 			glDeleteTextures((*i)->NumTextures, (*i)->Textures);
 		}
+		//Wyrmgus start
+		if ((*i)->TexturesDawn) {
+			glDeleteTextures((*i)->NumTextures, (*i)->TexturesDawn);
+		}
+		if ((*i)->TexturesDusk) {
+			glDeleteTextures((*i)->NumTextures, (*i)->TexturesDusk);
+		}
+		if ((*i)->TexturesNight) {
+			glDeleteTextures((*i)->NumTextures, (*i)->TexturesNight);
+		}
+		//Wyrmgus end
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
 			for (int j = 0; j < PlayerMax; ++j) {
@@ -1120,6 +1223,23 @@ void ReloadGraphics()
 			(*i)->Textures = NULL;
 			MakeTexture(*i);
 		}
+		//Wyrmgus start
+		if ((*i)->TexturesDawn) {
+			delete[](*i)->TexturesDawn;
+			(*i)->TexturesDawn = NULL;
+			MakeTexture(*i, 1);
+		}
+		if ((*i)->TexturesDusk) {
+			delete[](*i)->TexturesDusk;
+			(*i)->TexturesDusk = NULL;
+			MakeTexture(*i, 5);
+		}
+		if ((*i)->TexturesNight) {
+			delete[](*i)->TexturesNight;
+			(*i)->TexturesNight = NULL;
+			MakeTexture(*i, 7);
+		}
+		//Wyrmgus end
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
 			for (int j = 0; j < PlayerMax; ++j) {
@@ -1530,8 +1650,23 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, int time_
 	CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 	GLuint *textures;
 	if (!colors || !cg) {
-		textures = g->Textures = new GLuint[g->NumTextures];
-		glGenTextures(g->NumTextures, g->Textures);
+		//Wyrmgus start
+//		textures = g->Textures = new GLuint[g->NumTextures];
+//		glGenTextures(g->NumTextures, g->Textures);
+		if (time_of_day == 1) {
+			textures = g->TexturesDawn = new GLuint[g->NumTextures];
+			glGenTextures(g->NumTextures, g->TexturesDawn);
+		} else if (time_of_day == 5) {
+			textures = g->TexturesDusk = new GLuint[g->NumTextures];
+			glGenTextures(g->NumTextures, g->TexturesDusk);
+		} else if (time_of_day == 6 || time_of_day == 7 || time_of_day == 8) {
+			textures = g->TexturesNight = new GLuint[g->NumTextures];
+			glGenTextures(g->NumTextures, g->TexturesNight);
+		} else {
+			textures = g->Textures = new GLuint[g->NumTextures];
+			glGenTextures(g->NumTextures, g->Textures);
+		}
+		//Wyrmgus end
 	//Wyrmgus start
 	} else if (time_of_day == 1) {
 		textures = cg->PlayerColorTexturesDawn[player] = new GLuint[cg->NumTextures];
@@ -1563,15 +1698,37 @@ static void MakeTextures(CGraphic *g, int player, CUnitColors *colors, int time_
 **
 **  @param g  The graphic object.
 */
-void MakeTexture(CGraphic *g)
+//Wyrmgus start
+//void MakeTexture(CGraphic *g)
+void MakeTexture(CGraphic *g, int time_of_day)
+//Wyrmgus end
 {
-	if (g->Textures) {
-		return;
+	//Wyrmgus start
+//	if (g->Textures) {
+//		return;
+//	}
+	if (time_of_day == 1) {
+		if (g->TexturesDawn) {
+			return;
+		}
+	} else if (time_of_day == 5) {
+		if (g->TexturesDusk) {
+			return;
+		}
+	} else if (time_of_day == 6 || time_of_day == 7 || time_of_day == 8) {
+		if (g->TexturesNight) {
+			return;
+		}
+	} else {
+		if (g->Textures) {
+			return;
+		}
 	}
+	//Wyrmgus end
 
 	//Wyrmgus start
 //	MakeTextures(g, 0, NULL);
-	MakeTextures(g, 0, NULL, 0);
+	MakeTextures(g, 0, NULL, time_of_day);
 	//Wyrmgus end
 }
 
@@ -1882,15 +2039,6 @@ void CGraphic::SetTimeOfDay(int time)
 		} else if (bpp == 4) {
 		}
 	}
-
-#if defined(USE_OPENGL) || defined(USE_GLES)
-	if (UseOpenGL && Textures) {
-		glDeleteTextures(NumTextures, Textures);
-		delete[] Textures;
-		Textures = NULL;
-		MakeTexture(this);
-	}
-#endif
 }
 
 /**
@@ -1927,6 +2075,26 @@ void CGraphic::ResetTimeOfDay()
 		glDeleteTextures(NumTextures, Textures);
 		delete[] Textures;
 		Textures = NULL;
+		
+		//Wyrmgus start
+		if (TexturesDawn) {
+			glDeleteTextures(NumTextures, TexturesDawn);
+			delete[] TexturesDawn;
+			TexturesDawn = NULL;
+		}
+		
+		if (TexturesDusk) {
+			glDeleteTextures(NumTextures, TexturesDusk);
+			delete[] TexturesDusk;
+			TexturesDusk = NULL;
+		}
+		
+		if (TexturesNight) {
+			glDeleteTextures(NumTextures, TexturesNight);
+			delete[] TexturesNight;
+			TexturesNight = NULL;
+		}
+		//Wyrmgus end
 		
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(this);
 		if (cg) {

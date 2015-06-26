@@ -72,7 +72,10 @@ protected:
 		Refs(1), TimeOfDay(0), Resized(false)
 		//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0)
+		//Wyrmgus start
+//		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), NumTextures(0)
+		, TextureWidth(0.f), TextureHeight(0.f), Textures(NULL), TexturesDawn(NULL), TexturesDusk(NULL), TexturesNight(NULL), NumTextures(0)
+		//Wyrmgus end
 #endif
 	{
 		frameFlip_map = NULL;
@@ -94,18 +97,30 @@ public:
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	void DoDrawFrameClip(GLuint *textures, unsigned frame, int x, int y) const;
 #endif
-	void DrawFrameClip(unsigned frame, int x, int y) const;
+	//Wyrmgus start
+//	void DrawFrameClip(unsigned frame, int x, int y) const;
+	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true);
+	//Wyrmgus end
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
+	//Wyrmgus start
+//	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true);
+	//Wyrmgus end
 
 	// Draw frame flipped horizontally
 	void DrawFrameX(unsigned frame, int x, int y) const;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	void DoDrawFrameClipX(GLuint *textures, unsigned frame, int x, int y) const;
 #endif
-	void DrawFrameClipX(unsigned frame, int x, int y) const;
+	//Wyrmgus start
+//	void DrawFrameClipX(unsigned frame, int x, int y) const;
+	void DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day = true);
+	//Wyrmgus end
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
+	//Wyrmgus start
+//	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true);
+	//Wyrmgus end
 
 
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
@@ -157,6 +172,11 @@ public:
 	GLfloat TextureWidth;      /// Width of the texture
 	GLfloat TextureHeight;     /// Height of the texture
 	GLuint *Textures;          /// Texture names
+	//Wyrmgus start
+	GLuint *TexturesDawn;          /// Texture names (dawn)
+	GLuint *TexturesDusk;          /// Texture names (dusk)
+	GLuint *TexturesNight;          /// Texture names (night)
+	//Wyrmgus end
 	int NumTextures;           /// Number of textures
 #endif
 
@@ -461,7 +481,10 @@ extern int LoadGraphicPNG(CGraphic *g);
 #if defined(USE_OPENGL) || defined(USE_GLES)
 
 /// Make an OpenGL texture
-extern void MakeTexture(CGraphic *graphic);
+//Wyrmgus start
+//extern void MakeTexture(CGraphic *graphic);
+extern void MakeTexture(CGraphic *graphic, int time_of_day = 0);
+//Wyrmgus end
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start
 //extern void MakePlayerColorTexture(CPlayerColorGraphic *graphic, int player);
