@@ -724,6 +724,10 @@ static int CclCreateUnit(lua_State *l)
 static int CclCreateUnitInTransporter(lua_State *l)
 {
 	LuaCheckArgs(l, 3);
+	
+	if (lua_isnil(l, 3)) {
+		return 0;
+	}
 
 	lua_pushvalue(l, 1);
 	CUnitType *unittype = CclGetUnitType(l);

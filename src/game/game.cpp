@@ -1009,7 +1009,7 @@ void CreateGame(const std::string &filename, CMap *map)
 	GameCycle = 0;
 	FastForwardCycle = 0;
 	//Wyrmgus start
-	if (!GameSettings.Inside) {
+	if (!GameSettings.Inside && Editor.Running == EditorNotRunning) {
 		GameTimeOfDay = SyncRand(8) + 1; // begin at a random time of day
 	} else {
 		GameTimeOfDay = 0; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
