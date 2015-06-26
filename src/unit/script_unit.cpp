@@ -1126,18 +1126,18 @@ static int CclAcquireItem(lua_State *l)
 		} else if (item->Variable[HITPOINTHEALING_INDEX].Value > 0 && unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max) {
 			int hp_healed = std::min(item->Variable[HITPOINTHEALING_INDEX].Value, (unit->Variable[HP_INDEX].Max - unit->Variable[HP_INDEX].Value));
 			if (unit->Player == ThisPlayer) {
-				unit->Player->Notify(NotifyGreen, unit->tilePos, _("%s healed %d HP"), unit->Name.c_str(), hp_healed);
+				unit->Player->Notify(NotifyGreen, unit->tilePos, _("%s healed for %d HP"), unit->Name.c_str(), hp_healed);
 			}
 			unit->Variable[HP_INDEX].Value += hp_healed;
 		} else if (item->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow) {
 			if (unit->Player == ThisPlayer) {
-				unit->Player->Notify(NotifyRed, unit->tilePos, _("%s suffered %d HP loss"), unit->Name.c_str(), item->Variable[HITPOINTHEALING_INDEX].Value);
+				unit->Player->Notify(NotifyRed, unit->tilePos, _("%s suffered a %d HP loss"), unit->Name.c_str(), (item->Variable[HITPOINTHEALING_INDEX].Value * -1));
 			}
 			HitUnit(item, *unit, item->Variable[HITPOINTHEALING_INDEX].Value);
 		} else if (item->Type->BoolFlag[SLOWS_INDEX].value && unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow) {
 			unit->Variable[SLOW_INDEX].Value = 1000;
 			if (unit->Player == ThisPlayer) {
-				unit->Player->Notify(NotifyRed, unit->tilePos, _("%s slowed"), unit->Name.c_str());
+				unit->Player->Notify(NotifyRed, unit->tilePos, _("%s has been slowed"), unit->Name.c_str());
 			}
 		} else {
 			return 0;

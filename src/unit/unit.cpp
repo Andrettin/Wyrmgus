@@ -2652,6 +2652,9 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
 
 		type->DeathExplosion->pushPreamble();
+		//Wyrmgus start
+		type->DeathExplosion->pushInteger(UnitNumber(unit));
+		//Wyrmgus end
 		type->DeathExplosion->pushInteger(pixelPos.x);
 		type->DeathExplosion->pushInteger(pixelPos.y);
 		type->DeathExplosion->run();
