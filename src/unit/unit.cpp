@@ -2333,9 +2333,10 @@ void UnitHeadingFromDeltaXY(CUnit &unit, const Vec2i &delta)
 {
 	//Wyrmgus start
 //	unit.Direction = DirectionToHeading(delta);
-	int heading = DirectionToHeading(delta) + ((256 / unit.Type->NumDirections) / 2);
-	if (heading % (256 / unit.Type->NumDirections) != 0) {
-		heading = heading - (heading % (256 / unit.Type->NumDirections));
+	int num_dir = std::max<int>(8, unit.Type->NumDirections);
+	int heading = DirectionToHeading(delta) + ((256 / num_dir) / 2);
+	if (heading % (256 / num_dir) != 0) {
+		heading = heading - (heading % (256 / num_dir));
 	}
 	unit.Direction = heading;
 	//Wyrmgus end
