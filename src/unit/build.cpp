@@ -250,6 +250,12 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 			if (builder == *it2) {
 				continue;
 			}
+			//Wyrmgus start
+			// allow to build if a decoration is present under the deposit
+			if ((*it2)->Type->BoolFlag[DECORATION_INDEX].value) {
+				continue;
+			}
+			//Wyrmgus end
 			if (found.Type->UnitType == (*it2)->Type->UnitType) {
 				return false;
 			}
