@@ -642,6 +642,17 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 			}
 			//Wyrmgus start
+			if (!unit.Active) { //Active is true by default
+				f->printf("SetUnitActive(unit, false)\n");
+			}
+			if (unit.Name != unit.Type->DefaultName) {
+				f->printf("SetUnitName(unit, \"%s\")\n", unit.Name.c_str());
+			}
+			if (!unit.Trait.empty()) {
+				f->printf("AcquireTrait(unit, \"%s\")\n", unit.Trait.c_str());
+			}
+			//Wyrmgus end
+			//Wyrmgus start
 //			if (unit.Type->Teleporter && unit.Goal) {
 			if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
 			//Wyrmgus end

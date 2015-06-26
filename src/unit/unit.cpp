@@ -500,7 +500,7 @@ void CUnit::GeneratePersonalName()
 {
 	const CUnitType &type = *Type;
 
-	if (!type.DefaultName.empty()) {
+	if (!type.DefaultName.empty() || Editor.Running == EditorEditing) { // always set the personal name to the default name if in the editor
 		Name = type.DefaultName;
 	} else if (!type.PersonalNames[0].empty() || !type.PersonalNamePrefixes[0].empty()) {
 		int PersonalNameCount = 0;

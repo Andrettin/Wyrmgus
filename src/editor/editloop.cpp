@@ -1114,7 +1114,10 @@ static void ShowUnitInfo(const CUnit &unit)
 {
 	char buf[256];
 
-	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
+	//Wyrmgus start
+//	int n = sprintf(buf, _("#%d '%s' Player:#%d %s"), UnitNumber(unit),
+	int n = sprintf(buf, _("#%d '%s' Player: #%d %s"), UnitNumber(unit),
+	//Wyrmgus end
 					//Wyrmgus start
 //					unit.Type->Name.c_str(), unit.Player->Index,
 					(unit.Type->DefaultName.empty() ?
@@ -1858,7 +1861,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set(_("Select mode"));
+		//Wyrmgus start
+//		UI.StatusLine.Set(_("Select mode"));
+		UI.StatusLine.Set(_("Select Mode"));
+		//Wyrmgus end
 		return;
 	}
 	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorScreenPos.x
@@ -1868,7 +1874,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set(_("Unit mode"));
+		//Wyrmgus start
+//		UI.StatusLine.Set(_("Unit mode"));
+		UI.StatusLine.Set(_("Unit Mode"));
+		//Wyrmgus end
 		return;
 	}
 	if (Editor.TerrainEditable) {
@@ -1879,7 +1888,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = CursorOnButton;
-			UI.StatusLine.Set(_("Tile mode"));
+			//Wyrmgus start
+//			UI.StatusLine.Set(_("Tile mode"));
+			UI.StatusLine.Set(_("Tile Mode"));
+			//Wyrmgus end
 			return;
 		}
 	}
@@ -1895,7 +1907,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
-		UI.StatusLine.Set(_("Set start location mode"));
+		//Wyrmgus start
+//		UI.StatusLine.Set(_("Set start location mode"));
+		UI.StatusLine.Set(_("Set Start Location"));
+		//Wyrmgus end
 		return;
 	}
 	if (UI.MenuButton.X != -1 && UI.MenuButton.Contains(screenPos)) {

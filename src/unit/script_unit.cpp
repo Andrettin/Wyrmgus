@@ -1467,20 +1467,42 @@ static int CclSlotUsage(lua_State *l)
 **  Set the name of the unit structure.
 **
 **  @param l  Lua state.
-**
-**  @return   The name of the unit.
 */
 static int CclSetUnitName(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+	
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	unit->Name = LuaToString(l, 2);
 
-	lua_pushvalue(l, 2);
-	return 1;
+	return 0;
+}
+
+/**
+**  Set whether the unit is active for the AI or not.
+**
+**  @param l  Lua state.
+*/
+static int CclSetUnitActive(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+	
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	unit->Active = LuaToBoolean(l, 2);
+
+	return 0;
 }
 
 /**
@@ -1568,6 +1590,7 @@ void UnitCclRegister()
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
 	//Wyrmgus start
 	lua_register(Lua, "SetUnitName", CclSetUnitName);
+	lua_register(Lua, "SetUnitActive", CclSetUnitActive);
 	lua_register(Lua, "IsUnitIdle", CclIsUnitIdle);
 	lua_register(Lua, "UnitHasAbility", CclUnitHasAbility);
 	//Wyrmgus end

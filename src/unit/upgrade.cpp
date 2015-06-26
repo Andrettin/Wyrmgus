@@ -459,6 +459,11 @@ static int CclDefineAllow(lua_State *l)
 static int CclAcquireAbility(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
+	
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+	
 	lua_pushvalue(l, 1);
 	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
 	lua_pop(l, 1);
@@ -477,12 +482,24 @@ static int CclAcquireAbility(lua_State *l)
 static int CclAcquireTrait(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
+	
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+	
 	lua_pushvalue(l, 1);
 	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
 	lua_pop(l, 1);
 	const char *ident = LuaToString(l, 2);
 	if (!strncmp(ident, "upgrade-", 8)) {
 		TraitAcquire(*unit, CUpgrade::Get(ident));
+		unit->Trait = ident;
+	} else if (ident == "") {
+		if (!unit->Trait.empty()) { //remove previous trait, if any
+			if (!GameSettings.NoRandomness || unit->Type->BoolFlag[HERO_INDEX].value) { // if in no randomness setting, only change trait modifiers if the unit is a hero
+				IndividualUpgradeLost(*unit, CUpgrade::Get(unit->Trait));
+			}
+		}
 		unit->Trait = ident;
 	} else {
 		DebugPrint(" wrong ident %s\n" _C_ ident);
@@ -1468,6 +1485,18 @@ void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade)
 
 void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
+	if (!unit.Trait.empty()) { //remove previous trait, if any
+		int old_id = CUpgrade::Get(unit.Trait)->ID;
+		unit.LearnedAbilities[old_id] = false;
+		if (!GameSettings.NoRandomness || unit.Type->BoolFlag[HERO_INDEX].value) { // if in no randomness setting, only change trait modifiers if the unit is a hero
+			for (int z = 0; z < NumUpgradeModifiers; ++z) {
+				if (UpgradeModifiers[z]->UpgradeId == old_id) {
+					RemoveIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
+				}
+			}
+		}
+	}
+
 	int id = upgrade->ID;
 	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	unit.LearnedAbilities[id] = true;	// learning done
