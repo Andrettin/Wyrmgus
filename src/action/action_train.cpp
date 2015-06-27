@@ -48,6 +48,9 @@
 #include "translate.h"
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unitsound.h"
 #include "unittype.h"
 
@@ -378,7 +381,47 @@ static void AnimateActionTrain(CUnit &unit)
 		*/
 		
 		if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && newUnit->CanMove()) {
-			CommandMove(*newUnit, unit.RallyPointPos, FlushCommands);
+			bool command_found = false;
+			std::vector<CUnit *> table;
+			Select(unit.RallyPointPos, unit.RallyPointPos, table);
+			for (size_t j = 0; j != table.size(); ++j) {
+				if (!table[j]->IsAliveOnMap() || table[j]->Type->BoolFlag[DECORATION_INDEX].value) {
+					continue;
+				}
+				if (newUnit->Type->RepairRange && table[j]->Type->RepairHP && table[j]->Variable[HP_INDEX].Value < table[j]->Variable[HP_INDEX].Max && (table[j]->Player == newUnit->Player || newUnit->IsAllied(*table[j]))) { //see if can repair
+					SendCommandRepair(*newUnit, unit.RallyPointPos, table[j], FlushCommands);
+					command_found = true;
+				} else if (newUnit->Type->Harvester && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && table[j]->Type->CanHarvest && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can harvest
+					SendCommandResource(*newUnit, *table[j], FlushCommands);
+					command_found = true;
+				} else if (newUnit->Type->Harvester && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->CanHarvest && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
+					for (size_t z = 0; z < UnitTypes.size(); ++z) {
+						if (UnitTypes[z] && UnitTypes[z]->GivesResource == table[j]->Type->GivesResource && UnitTypes[z]->CanHarvest && CanBuildUnitType(newUnit, *UnitTypes[z], table[j]->tilePos, 1)) {
+							SendCommandBuildBuilding(*newUnit, table[j]->tilePos, *UnitTypes[z], FlushCommands);
+							command_found = true;
+							break;
+						}
+					}
+				}
+				
+				if (command_found) {
+					break;
+				}
+			}
+			
+			if (!command_found && Map.Field(unit.RallyPointPos)->playerInfo.IsExplored(*newUnit->Player)) { // see if can harvest terrain
+				for (int res = 0; res < MaxCosts; ++res) {
+					if (newUnit->Type->ResInfo[res] && Map.Field(unit.RallyPointPos)->IsTerrainResourceOnMap(res)) {
+						SendCommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands);
+						command_found = true;
+						break;
+					}
+				}
+			}
+			
+			if (!command_found) {
+				CommandMove(*newUnit, unit.RallyPointPos, FlushCommands);
+			}
 		}
 	}
 	//Wyrmgus end
