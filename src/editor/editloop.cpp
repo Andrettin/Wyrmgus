@@ -529,8 +529,13 @@ static void DrawPlayers()
 	x = UI.InfoPanel.X + 4;
 	y += 18 * 1 + 4;
 	if (Editor.SelectedPlayer != -1) {
-		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
-				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
+		//Wyrmgus start
+//		snprintf(buf, sizeof(buf), "Plyr %d %s ", Editor.SelectedPlayer,
+//				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
+		std::string civ_str = PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str();
+		civ_str[0] = toupper(civ_str[0]);
+		snprintf(buf, sizeof(buf), "Player %d %s ", Editor.SelectedPlayer, civ_str.c_str());
+		//Wyrmgus end
 		// Players[SelectedPlayer].RaceName);
 
 		switch (Map.Info.PlayerType[Editor.SelectedPlayer]) {
@@ -729,11 +734,15 @@ static void DrawTileIcons()
 	*/
 	//Wyrmgus end
 	y += 20;
+	//Wyrmgus start
+	/*
 	if (TileToolDecoration) {
 		label.DrawReverseCentered(x, y, "Filler");
 	} else {
 		label.DrawCentered(x, y, "Filler");
 	}
+	*/
+	//Wyrmgus end
 	y += 20;
 
 	int i = Editor.TileIndex;
@@ -1314,8 +1323,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				case 303: TileCursorSize = 4; return;
 				//Wyrmgus start
 //				case 304: TileToolRandom ^= 1; return;
+//				case 305: TileToolDecoration ^= 1; return;
 				//Wyrmgus end
-				case 305: TileToolDecoration ^= 1; return;
 			}
 		}
 		if (Editor.CursorTileIndex != -1) {
