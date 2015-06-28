@@ -2260,6 +2260,10 @@ void StartEditor(const char *filename)
 	}
 	//Wyrmgus end
 	
+	//Wyrmgus start
+	CleanPlayers(); //clean players, as they could not have been cleant after a scenario
+	//Wyrmgus end
+	
 	// Run the editor.
 	EditorMainLoop();
 

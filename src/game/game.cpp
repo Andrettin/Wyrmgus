@@ -177,9 +177,6 @@ void StartMap(const std::string &filename, bool clean)
 	Invalidate();
 
 	CleanGame();
-	//Wyrmgus start
-	CleanPlayers(); //clean players after scenario (as the editor does)
-	//Wyrmgus end
 	InterfaceState = IfaceStateMenu;
 	SetDefaultTextColors(nc, rc);
 
