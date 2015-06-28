@@ -399,12 +399,7 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 		if (output.Fast) {
 			output.Fast--;
 			AstarDebugPrint("WAIT at %d\n" _C_ output.Fast);
-			//Wyrmgus start
-//			result = PF_WAIT;
-			if (output.Fast) {
-				result = PF_WAIT;
-			}
-			//Wyrmgus end
+			result = PF_WAIT;
 		} else {
 			output.Fast = 10;
 			AstarDebugPrint("SET WAIT to 10\n");
