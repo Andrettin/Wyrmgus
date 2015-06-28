@@ -984,6 +984,14 @@ static int CclGetPlayerData(lua_State *l)
 		Assert(type);
 		lua_pushnumber(l, p->UnitTypesCount[type->Slot]);
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "UnitTypesAiActiveCount")) {
+		LuaCheckArgs(l, 3);
+		CUnitType *type = CclGetUnitType(l);
+		Assert(type);
+		lua_pushnumber(l, p->UnitTypesAiActiveCount[type->Slot]);
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "AiEnabled")) {
 		lua_pushboolean(l, p->AiEnabled);
 		return 1;

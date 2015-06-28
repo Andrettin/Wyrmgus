@@ -455,6 +455,11 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type.Slot]--;
+	//Wyrmgus start
+	if (build->Active) {
+		build->Player->UnitTypesAiActiveCount[type.Slot]--;
+	}
+	//Wyrmgus end
 
 	// We need somebody to work on it.
 	if (!type.BuilderOutside) {

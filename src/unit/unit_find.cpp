@@ -566,10 +566,18 @@ void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool ev
 **  @param type    type of unit requested
 **  @param table   table in which we have to store the units
 */
-void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table)
+//Wyrmgus start
+//void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table)
+void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &table, bool ai_active)
+//Wyrmgus end
 {
 	const int nunits = player.GetUnitCount();
 	int typecount = player.UnitTypesCount[type.Slot];
+	//Wyrmgus start
+	if (ai_active) {
+		typecount = player.UnitTypesAiActiveCount[type.Slot];
+	}
+	//Wyrmgus end
 
 	if (typecount == 0) {
 		return;

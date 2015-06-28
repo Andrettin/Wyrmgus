@@ -322,6 +322,9 @@ static int CclUnit(lua_State *l)
 			unit->Init(*type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
+			//Wyrmgus start
+			unit->Player->UnitTypesAiActiveCount[type->Slot]--;
+			//Wyrmgus end
 			unit->Removed = 0;
 			Assert(UnitNumber(*unit) == slot);
 		//Wyrmgus start
@@ -447,6 +450,9 @@ static int CclUnit(lua_State *l)
 			unit->Seen.State = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "active")) {
 			unit->Active = 1;
+			//Wyrmgus start
+			unit->Player->UnitTypesAiActiveCount[type->Slot]++;
+			//Wyrmgus end
 			--j;
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
@@ -545,6 +551,11 @@ static int CclUnit(lua_State *l)
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
+				//Wyrmgus start
+				if (unit->Active) {
+					unit->Player->UnitTypesAiActiveCount[type->Slot]--;
+				}
+				//Wyrmgus end
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_rawgeti(l, 2, j + 1);
@@ -1504,7 +1515,15 @@ static int CclSetUnitActive(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	unit->Active = LuaToBoolean(l, 2);
+	bool ai_active = LuaToBoolean(l, 2);
+	if (ai_active != unit->Active) {
+		if (ai_active) {
+			unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]++;
+		} else {
+			unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]--;
+		}
+	}
+	unit->Active = ai_active;
 
 	return 0;
 }

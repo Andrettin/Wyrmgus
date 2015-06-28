@@ -192,6 +192,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 	// HACK: the building is ready now
 	player.UnitTypesCount[type.Slot]++;
+	//Wyrmgus start
+	if (unit.Active) {
+		player.UnitTypesAiActiveCount[type.Slot]++;
+	}
+	//Wyrmgus end
 	unit.Constructed = 0;
 	if (unit.Frame < 0) {
 		unit.Frame = -1;

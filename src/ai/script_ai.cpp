@@ -665,7 +665,10 @@ static int CclAiWait(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	const CUnitType *type = CclGetUnitType(l);
-	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
+	//Wyrmgus start
+//	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
+	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
+	//Wyrmgus end
 	const AiRequestType *autt = FindInUnitTypeRequests(type);
 	if (!autt) {
 		// Look if we have this unit-type.

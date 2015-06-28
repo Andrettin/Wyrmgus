@@ -270,8 +270,6 @@ void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size)
 	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(unit);
 	Assert(unit->IsAliveOnMap());
-//	fprintf(stdout, "PathFinderInput::SetGoal Pos: %d, %d.\n", pos.x, pos.y); // debugging help
-//	fprintf(stdout, "PathFinderInput::SetGoal Unit Type: %s.\n", unit->Type->Ident.c_str());
 	//Wyrmgus end
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here

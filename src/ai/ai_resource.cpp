@@ -282,7 +282,10 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 {
 	std::vector<CUnit *> table;
 
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	//Wyrmgus start
+//	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
+	//Wyrmgus end
 
 	int num = 0;
 
@@ -328,7 +331,10 @@ static bool AiRequestedTypeAllowed(const CPlayer &player, const CUnitType &type)
 	for (size_t i = 0; i != size; ++i) {
 		CUnitType &builder = *AiHelpers.Build[type.Slot][i];
 
-		if (player.UnitTypesCount[builder.Slot] > 0
+		//Wyrmgus start
+//		if (player.UnitTypesCount[builder.Slot] > 0
+		if (player.UnitTypesAiActiveCount[builder.Slot] > 0
+		//Wyrmgus end
 			&& CheckDependByType(player, type)) {
 			return true;
 		}
@@ -648,7 +654,10 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 {
 	std::vector<CUnit *> table;
 
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	//Wyrmgus start
+//	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
+	//Wyrmgus end
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -705,7 +714,10 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 			continue;
 		}
 
-		const int *unit_count = AiPlayer->Player->UnitTypesCount;
+		//Wyrmgus start
+//		const int *unit_count = AiPlayer->Player->UnitTypesCount;
+		const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+		//Wyrmgus end
 		for (unsigned int i = 0; i < table.size(); ++i) {
 			//
 			// The type for builder/trainer is available
@@ -740,7 +752,10 @@ static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 {
 	std::vector<CUnit *> table;
 
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	//Wyrmgus start
+//	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
+	//Wyrmgus end
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -784,7 +799,10 @@ void AiAddResearchRequest(CUpgrade *upgrade)
 		return;
 	}
 
-	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	//Wyrmgus start
+//	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+	//Wyrmgus end
 	for (unsigned int i = 0; i < table.size(); ++i) {
 		// The type is available
 		if (unit_count[table[i]->Slot]
@@ -809,7 +827,10 @@ static bool AiUpgradeTo(const CUnitType &type, CUnitType &what)
 	std::vector<CUnit *> table;
 
 	// Remove all units already doing something.
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	//Wyrmgus start
+//	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
+	//Wyrmgus end
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -855,7 +876,10 @@ void AiAddUpgradeToRequest(CUnitType &type)
 		return;
 	}
 
-	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	//Wyrmgus start
+//	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+	//Wyrmgus end
 	for (unsigned int i = 0; i < table.size(); ++i) {
 		//
 		// The type is available
@@ -1447,7 +1471,10 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	// AI shouldn't send workers that are far away from repair point
 	// Selection of mining workers.
 	std::vector<CUnit *> table;
-	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	//Wyrmgus start
+//	FindPlayerUnitsByType(*AiPlayer->Player, type, table);
+	FindPlayerUnitsByType(*AiPlayer->Player, type, table, true);
+	//Wyrmgus end
 	int num = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
@@ -1505,7 +1532,10 @@ static int AiRepairUnit(CUnit &unit)
 		return 0;
 	}
 
-	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	//Wyrmgus start
+//	const int *unit_count = AiPlayer->Player->UnitTypesCount;
+	const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+	//Wyrmgus end
 	for (unsigned int i = 0; i < table.size(); ++i) {
 		//
 		// The type is available

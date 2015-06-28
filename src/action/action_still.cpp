@@ -372,6 +372,7 @@ static bool Breed(CUnit &unit)
 				newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
 				newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
 				newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
+				newUnit->Variable[HUNGER_INDEX].Value = 500; //children start off with 50% hunger
 				IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
 				unit.Variable[HUNGER_INDEX].Value += 100;
 				table[i]->Variable[HUNGER_INDEX].Value += 100;
@@ -384,6 +385,7 @@ static bool Breed(CUnit &unit)
 		newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
 		newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
 		newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
+		newUnit->Variable[HUNGER_INDEX].Value = 500; //children start off with 50% hunger
 		IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
 		unit.Variable[HUNGER_INDEX].Value += 100;
 		return true;

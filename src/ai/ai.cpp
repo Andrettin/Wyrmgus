@@ -203,7 +203,10 @@ static void AiCheckUnits()
 			counter[unit.Type->Slot]--;
 		}
 	}
-	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
+	//Wyrmgus start
+//	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
+	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
+	//Wyrmgus end
 
 	//  Look if some unit-types are missing.
 	int n = AiPlayer->UnitTypeRequests.size();
