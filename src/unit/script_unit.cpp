@@ -322,9 +322,6 @@ static int CclUnit(lua_State *l)
 			unit->Init(*type);
 			unit->Seen.Type = seentype;
 			unit->Active = 0;
-			//Wyrmgus start
-			unit->Player->UnitTypesAiActiveCount[type->Slot]--;
-			//Wyrmgus end
 			unit->Removed = 0;
 			Assert(UnitNumber(*unit) == slot);
 		//Wyrmgus start
@@ -450,9 +447,6 @@ static int CclUnit(lua_State *l)
 			unit->Seen.State = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "active")) {
 			unit->Active = 1;
-			//Wyrmgus start
-			unit->Player->UnitTypesAiActiveCount[type->Slot]++;
-			//Wyrmgus end
 			--j;
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled

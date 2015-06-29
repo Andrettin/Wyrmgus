@@ -503,7 +503,10 @@ static void DrawPlayers()
 	char buf[256];
 	CLabel label(GetSmallFont());
 
-	int x = UI.InfoPanel.X + 8;
+	//Wyrmgus start
+//	int x = UI.InfoPanel.X + 8;
+	int x = UI.InfoPanel.X + 26;
+	//Wyrmgus end
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -526,7 +529,10 @@ static void DrawPlayers()
 		label.DrawCentered(x + i % 8 * 20 + 10, y + 7, buf);
 	}
 
-	x = UI.InfoPanel.X + 4;
+	//Wyrmgus start
+//	x = UI.InfoPanel.X + 4;
+	x = UI.InfoPanel.X + 22;
+	//Wyrmgus end
 	y += 18 * 1 + 4;
 	if (Editor.SelectedPlayer != -1) {
 		//Wyrmgus start
@@ -643,6 +649,8 @@ static void DrawUnitIcons()
 */
 static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flags)
 {
+	//Wyrmgus start
+	/*
 	Uint32 color = (flags & IconActive) ? ColorGray : ColorBlack;
 
 	Video.DrawRectangleClip(color, x, y, PixelTileSize.x + 7, PixelTileSize.y + 7);
@@ -658,6 +666,23 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	Video.DrawHLine(color, x + 5, y + 4, PixelTileSize.x + 1);
 	Video.DrawVLine(color, x + 3, y + 3, PixelTileSize.y + 3);
 	Video.DrawVLine(color, x + 4, y + 3, PixelTileSize.y + 3);
+	*/
+	Video.DrawVLine(ColorGray, x + PixelTileSize.x + 4 - 1, y + 5 - 1, PixelTileSize.y - 1 - 1); // _|
+	Video.DrawVLine(ColorGray, x + PixelTileSize.x + 5 - 1, y + 5 - 1, PixelTileSize.y - 1 - 1);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + PixelTileSize.y + 4 - 1, PixelTileSize.x + 1 - 1);
+	Video.DrawHLine(ColorGray, x + 5 - 1, y + PixelTileSize.y + 5 - 1, PixelTileSize.x + 1 - 1);
+
+	Uint32 color = (flags & IconClicked) ? ColorGray : ColorWhite;
+	Video.DrawHLine(color, x + 5 - 1, y + 3 - 1, PixelTileSize.x + 1 - 1);
+	Video.DrawHLine(color, x + 5 - 1, y + 4 - 1, PixelTileSize.x + 1 - 1);
+	Video.DrawVLine(color, x + 3 - 1, y + 3 - 1, PixelTileSize.y + 3 - 1);
+	Video.DrawVLine(color, x + 4 - 1, y + 3 - 1, PixelTileSize.y + 3 - 1);
+	
+	color = (flags & IconActive) ? ColorGray : ColorBlack;
+
+	Video.DrawRectangleClip(color, x, y, PixelTileSize.x + 7, PixelTileSize.y + 7);
+	Video.DrawRectangleClip(ColorBlack, x + 1, y + 1, PixelTileSize.x + 5, PixelTileSize.y + 5);
+	//Wyrmgus end
 
 	if (flags & IconClicked) {
 		++x;
@@ -667,6 +692,8 @@ static void DrawTileIcon(unsigned tilenum, unsigned x, unsigned y, unsigned flag
 	x += 4;
 	y += 4;
 	//Wyrmgus start
+	x -= 1;
+	y -= 1;
 //	Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
 	if (Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tilenum].tileinfo.BaseTerrain].ImageFile.empty()) {
 		Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[tilenum].tile, x, y);
@@ -693,10 +720,7 @@ static void DrawTileIcons()
 	int x = UI.InfoPanel.X + 46;
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 11;
 
-	//Wyrmgus start
-//	if (CursorOn == CursorOnButton && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
-	if (CursorOn == CursorOnButton && 300 <= ButtonUnderCursor && ButtonUnderCursor != 304 && ButtonUnderCursor < 306) {
-	//Wyrmgus end
+	if (CursorOn == CursorOnButton && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
 		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
 	}
 
@@ -732,6 +756,11 @@ static void DrawTileIcons()
 		label.DrawCentered(x, y, "Random");
 	}
 	*/
+	if (TileCursorSize == 5) {
+		label.DrawReverseCentered(x, y, "5x5");
+	} else {
+		label.DrawCentered(x, y, "5x5");
+	}
 	//Wyrmgus end
 	y += 20;
 	//Wyrmgus start
@@ -742,6 +771,11 @@ static void DrawTileIcons()
 		label.DrawCentered(x, y, "Filler");
 	}
 	*/
+	if (TileCursorSize == 10) {
+		label.DrawReverseCentered(x, y, "10x10");
+	} else {
+		label.DrawCentered(x, y, "10x10");
+	}
 	//Wyrmgus end
 	y += 20;
 
@@ -752,7 +786,10 @@ static void DrawTileIcons()
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
-		x = UI.ButtonPanel.X + 10;
+		//Wyrmgus start
+//		x = UI.ButtonPanel.X + 10;
+		x = UI.ButtonPanel.X + 10 + 6;
+		//Wyrmgus end
 		while (x < UI.ButtonPanel.X + ButtonPanelWidth - PixelTileSize.x) {
 			if (i >= (int) Editor.ShownTileTypes.size()) {
 				break;
@@ -783,16 +820,25 @@ static void DrawTileIcons()
 				Editor.PopUpY = y;
 			}
 
-			x += PixelTileSize.x + 8;
+			//Wyrmgus start
+//			x += PixelTileSize.x + 8;
+			x += PixelTileSize.x + 30; // to allow 5 tile types per row with the new UI
+			//Wyrmgus end
 			++i;
 		}
-		y += PixelTileSize.y + 2;
+		//Wyrmgus start
+//		y += PixelTileSize.y + 2;
+		y += PixelTileSize.y + 18; // make this space a little larger (as large as the space between the top of the panel and the first icon, minus the parts of the panel which are "lower" so to speak)
+		//Wyrmgus end
 	}
 }
 
 static void DrawEditorPanel_SelectIcon()
 {
-	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
+	//Wyrmgus start
+//	const PixelPos pos(UI.InfoPanel.X + 4, UI.InfoPanel.Y + 4);
+	const PixelPos pos(UI.InfoPanel.X + 11, UI.InfoPanel.Y + 7);
+	//Wyrmgus end
 	CIcon *icon = Editor.Select.Icon;
 	Assert(icon);
 	unsigned int flag = 0;
@@ -814,7 +860,10 @@ static void DrawEditorPanel_SelectIcon()
 
 static void DrawEditorPanel_UnitsIcon()
 {
-	const PixelPos pos(UI.InfoPanel.X + 4 + UNIT_ICON_X, UI.InfoPanel.Y + 4 + UNIT_ICON_Y);
+	//Wyrmgus start
+//	const PixelPos pos(UI.InfoPanel.X + 4 + UNIT_ICON_X, UI.InfoPanel.Y + 4 + UNIT_ICON_Y);
+	const PixelPos pos(UI.InfoPanel.X + 11 + UNIT_ICON_X, UI.InfoPanel.Y + 7 + UNIT_ICON_Y);
+	//Wyrmgus end
 	CIcon *icon = Editor.Units.Icon;
 	Assert(icon);
 	unsigned int flag = 0;
@@ -839,8 +888,11 @@ static void DrawEditorPanel_UnitsIcon()
 
 static void DrawEditorPanel_StartIcon()
 {
-	int x = UI.InfoPanel.X + 4;
-	int y = UI.InfoPanel.Y + 4;
+	//Wyrmgus start
+//	int x = UI.InfoPanel.X + 4;
+	int x = UI.InfoPanel.X + 11;
+	//Wyrmgus end
+	int y = UI.InfoPanel.Y + 5;
 
 	if (Editor.StartUnit) {
 		CIcon *icon = Editor.StartUnit->Icon.Icon;
@@ -872,8 +924,12 @@ static void DrawEditorPanel_StartIcon()
 		Video.FillRectangleClip(ColorBlack, x, y, IconHeight - 2, IconHeight - 2);
 
 		const PixelPos lt(x, y);
-		const PixelPos lb(x, y + IconHeight - 2);
-		const PixelPos rt(x + IconHeight - 2, y);
+		//Wyrmgus start
+//		const PixelPos lb(x, y + IconHeight - 2);
+//		const PixelPos rt(x + IconHeight - 2, y);
+		const PixelPos lb(x, y + IconHeight - 3);
+		const PixelPos rt(x + IconHeight - 3, y);
+		//Wyrmgus end
 		const PixelPos rb(x + IconHeight - 2, y + IconHeight - 2);
 		//Wyrmgus start
 //		const Uint32 color = PlayerColors[Editor.SelectedPlayer][0];
@@ -896,7 +952,10 @@ static void DrawEditorPanel()
 	DrawEditorPanel_UnitsIcon();
 
 	if (Editor.TerrainEditable) {
-		const int x = UI.InfoPanel.X + TILE_ICON_X + 4;
+		//Wyrmgus start
+//		const int x = UI.InfoPanel.X + TILE_ICON_X + 4;
+		const int x = UI.InfoPanel.X + TILE_ICON_X + 11;
+		//Wyrmgus end
 		const int y = UI.InfoPanel.Y + TILE_ICON_Y + 4;
 
 		DrawTileIcon(0x10 + 4 * 16, x, y,
@@ -1324,6 +1383,8 @@ static void EditorCallbackButtonDown(unsigned button)
 				//Wyrmgus start
 //				case 304: TileToolRandom ^= 1; return;
 //				case 305: TileToolDecoration ^= 1; return;
+				case 304: TileCursorSize = 5; return;
+				case 305: TileCursorSize = 10; return;
 				//Wyrmgus end
 			}
 		}
@@ -1633,11 +1694,17 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		//Wyrmgus end
 		return true;
 	}
-	int bx = UI.InfoPanel.X + 8;
+	//Wyrmgus start
+//	int bx = UI.InfoPanel.X + 8;
+	int bx = UI.InfoPanel.X + 26;
+	//Wyrmgus end
 	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (i == PlayerMax / 2) {
-			bx = UI.InfoPanel.X + 8;
+			//Wyrmgus start
+//			bx = UI.InfoPanel.X + 8;
+			bx = UI.InfoPanel.X + 26;
+			//Wyrmgus end
 			by += 20;
 		}
 		if (bx < screenPos.x && screenPos.x < bx + 20 && by < screenPos.y && screenPos.y < by + 20) {
@@ -1686,7 +1753,10 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 
 static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 {
-	int bx = UI.InfoPanel.X + 4;
+	//Wyrmgus start
+//	int bx = UI.InfoPanel.X + 4;
+	int bx = UI.InfoPanel.X + 11;
+	//Wyrmgus end
 	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
 	for (int i = 0; i < 6; ++i) {
@@ -1704,7 +1774,10 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 		if (i >= (int)Editor.ShownTileTypes.size()) {
 			break;
 		}
-		bx = UI.ButtonPanel.X + 10;
+		//Wyrmgus start
+//		bx = UI.ButtonPanel.X + 10;
+		bx = UI.ButtonPanel.X + 10 + 6;
+		//Wyrmgus end
 		while (bx < UI.ButtonPanel.X + ButtonPanelWidth - PixelTileSize.x) {
 			if (i >= (int)Editor.ShownTileTypes.size()) {
 				break;
@@ -1722,10 +1795,16 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 				Editor.CursorTileIndex = i;
 				return true;
 			}
-			bx += PixelTileSize.x + 8;
+			//Wyrmgus start
+//			bx += PixelTileSize.x + 8;
+			bx += PixelTileSize.x + 30;
+			//Wyrmgus end
 			i++;
 		}
-		by += PixelTileSize.y + 2;
+		//Wyrmgus start
+//		by += PixelTileSize.y + 2;
+		by += PixelTileSize.y + 18;
+		//Wyrmgus end
 	}
 	return false;
 }
@@ -1862,10 +1941,18 @@ static void EditorCallbackMouse(const PixelPos &pos)
 	}
 
 	// Handle buttons
-	if (UI.InfoPanel.X + 4 < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + Editor.Select.Icon->G->Width
-		&& UI.InfoPanel.Y + 4 < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + Editor.Select.Icon->G->Width) {
+	//Wyrmgus start
+//	if (UI.InfoPanel.X + 4 < CursorScreenPos.x
+	if (UI.InfoPanel.X + 11 < CursorScreenPos.x
+	//Wyrmgus end
+		//Wyrmgus start
+//		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + Editor.Select.Icon->G->Width
+//		&& UI.InfoPanel.Y + 4 < CursorScreenPos.y
+//		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + Editor.Select.Icon->G->Width) {
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 + Editor.Select.Icon->G->Width
+		&& UI.InfoPanel.Y + 7 < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 + Editor.Select.Icon->G->Width) {
+		//Wyrmgus end
 		// FIXME: what is this button?
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
@@ -1876,10 +1963,16 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		//Wyrmgus end
 		return;
 	}
-	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + UNIT_ICON_X + Editor.Units.Icon->G->Width
-		&& UI.InfoPanel.Y + 4 + UNIT_ICON_Y < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + UNIT_ICON_Y + Editor.Units.Icon->G->Height) {
+	//Wyrmgus start
+//	if (UI.InfoPanel.X + 4 + UNIT_ICON_X < CursorScreenPos.x
+//		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + UNIT_ICON_X + Editor.Units.Icon->G->Width
+//		&& UI.InfoPanel.Y + 4 + UNIT_ICON_Y < CursorScreenPos.y
+//		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + UNIT_ICON_Y + Editor.Units.Icon->G->Height) {
+	if (UI.InfoPanel.X + 11 + UNIT_ICON_X < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 + UNIT_ICON_X + Editor.Units.Icon->G->Width
+		&& UI.InfoPanel.Y + 7 + UNIT_ICON_Y < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 7 + UNIT_ICON_Y + Editor.Units.Icon->G->Height) {
+	//Wyrmgus end
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
@@ -1890,8 +1983,12 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		return;
 	}
 	if (Editor.TerrainEditable) {
-		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorScreenPos.x
-			&& CursorScreenPos.x < UI.InfoPanel.X + 4 + TILE_ICON_X + PixelTileSize.x + 7
+		//Wyrmgus start
+//		if (UI.InfoPanel.X + 4 + TILE_ICON_X < CursorScreenPos.x
+//			&& CursorScreenPos.x < UI.InfoPanel.X + 4 + TILE_ICON_X + PixelTileSize.x + 7
+		if (UI.InfoPanel.X + 11 + TILE_ICON_X < CursorScreenPos.x
+			&& CursorScreenPos.x < UI.InfoPanel.X + 11 + TILE_ICON_X + PixelTileSize.x + 7
+		//Wyrmgus end
 			&& UI.InfoPanel.Y + 4 + TILE_ICON_Y < CursorScreenPos.y
 			&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + TILE_ICON_Y + PixelTileSize.y + 7) {
 			ButtonAreaUnderCursor = -1;
@@ -1909,10 +2006,16 @@ static void EditorCallbackMouse(const PixelPos &pos)
 						 Editor.StartUnit->Icon.Icon->G->Width : PixelTileSize.x + 7;
 	int StartUnitHeight = Editor.StartUnit ?
 						  Editor.StartUnit->Icon.Icon->G->Height : PixelTileSize.y + 7;
-	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorScreenPos.x
-		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth
-		&& UI.InfoPanel.Y + 4 + START_ICON_Y < CursorScreenPos.y
-		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + START_ICON_Y + StartUnitHeight) {
+	//Wyrmgus start
+//	if (UI.InfoPanel.X + 4 + START_ICON_X < CursorScreenPos.x
+//		&& CursorScreenPos.x < UI.InfoPanel.X + 4 + START_ICON_X + StartUnitWidth
+//		&& UI.InfoPanel.Y + 4 + START_ICON_Y < CursorScreenPos.y
+//		&& CursorScreenPos.y < UI.InfoPanel.Y + 4 + START_ICON_Y + StartUnitHeight) {
+	if (UI.InfoPanel.X + 11 + START_ICON_X < CursorScreenPos.x
+		&& CursorScreenPos.x < UI.InfoPanel.X + 11 + START_ICON_X + StartUnitWidth
+		&& UI.InfoPanel.Y + 5 + START_ICON_Y < CursorScreenPos.y
+		&& CursorScreenPos.y < UI.InfoPanel.Y + 5 + START_ICON_Y + StartUnitHeight) {
+	//Wyrmgus end
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
@@ -2050,8 +2153,13 @@ void CEditor::Init()
 			}
 		}
 	}
-	ButtonPanelWidth = 170;//200;
-	ButtonPanelHeight = 160 + (Video.Height - 480);
+	//Wyrmgus start
+//	ButtonPanelWidth = 170;//200;
+//	ButtonPanelHeight = 160 + (Video.Height - 480);
+	// adapt to new UI size, should make this more scriptable
+	ButtonPanelWidth = 243;
+	ButtonPanelHeight = 186;
+	//Wyrmgus end
 
 	CalculateMaxIconSize();
 	VisibleUnitIcons = CalculateVisibleIcons();
@@ -2154,8 +2262,12 @@ void EditorMainLoop()
 
 		if (first_init) {
 			first_init = false;
-			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
-			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
+			//Wyrmgus start
+//			editorUnitSlider->setSize(ButtonPanelWidth/*176*/, 16);
+//			editorSlider->setSize(ButtonPanelWidth/*176*/, 16);
+			editorUnitSlider->setSize(218 - 24 - 6, 16); // adapt to new UI size, should make this more scriptable
+			editorSlider->setSize(218 - 24 - 6, 16);
+			//Wyrmgus end
 			//Wyrmgus start
 //			editorContainer->add(editorUnitSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
 //			editorContainer->add(editorSlider, UI.ButtonPanel.X + 2, UI.ButtonPanel.Y - 16);
@@ -2261,7 +2373,7 @@ void StartEditor(const char *filename)
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	CleanPlayers(); //clean players, as they could not have been cleant after a scenario
+	CleanPlayers(); //clean players, as they could not have been cleansed after a scenario
 	//Wyrmgus end
 	
 	// Run the editor.
