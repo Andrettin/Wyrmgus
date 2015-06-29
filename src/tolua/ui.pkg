@@ -590,6 +590,10 @@ class DropDown : public BasicContainer
 	virtual ScrollArea *getScrollArea();
 	virtual void setListBox(ListBox* listBox);
 	virtual ListBox *getListBox();
+	//Wyrmgus start
+	virtual void setTooltip(const std::string tooltip);
+	virtual const std::string &getTooltip() const;
+	//Wyrmgus end
 };
 
 class DropDownWidget : public DropDown
