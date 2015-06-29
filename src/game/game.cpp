@@ -974,6 +974,13 @@ void CreateGame(const std::string &filename, CMap *map)
 	}
 
 	InitPlayers();
+	
+	//Wyrmgus start
+	if (IsNetworkGame()) { // if is a network game, it is necessary to reinitialize the syncrand variables before beginning to load the map, due to random map generation
+		SyncHash = 0;
+		InitSyncRand();
+	}
+	//Wyrmgus end
 
 	if (Map.Info.Filename.empty() && !filename.empty()) {
 		const std::string path = LibraryFileName(filename.c_str());
@@ -1029,12 +1036,16 @@ void CreateGame(const std::string &filename, CMap *map)
 
 	if (IsNetworkGame()) { // Prepare network play
 		NetworkOnStartGame();
+	//Wyrmgus start
+	/*
 	} else {
 		const std::string &localPlayerName = Parameters::Instance.LocalPlayerName;
 
 		if (!localPlayerName.empty() && localPlayerName != "Anonymous") {
 			ThisPlayer->SetName(localPlayerName);
 		}
+	*/
+	//Wyrmgus end
 	}
 
 	CallbackMusicOn();

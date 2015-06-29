@@ -224,16 +224,16 @@ size_t CServerSetup::Serialize(unsigned char *buf) const
 	p += serialize8(p, this->ResourcesOption);
 	p += serialize8(p, this->UnitsOption);
 	p += serialize8(p, this->FogOfWar);
-	p += serialize8(p, this->Inside);
+	//Wyrmgus start
+//	p += serialize8(p, this->Inside);
+	p += serialize8(p, this->NoRandomness);
+	//Wyrmgus end
 	p += serialize8(p, this->RevealMap);
 	p += serialize8(p, this->TilesetSelection);
 	p += serialize8(p, this->GameTypeOption);
 	p += serialize8(p, this->Difficulty);
 	p += serialize8(p, this->MapRichness);
 	p += serialize8(p, this->Opponents);
-	//Wyrmgus start
-	p += serialize8(p, this->NoRandomness);
-	//Wyrmgus end
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += serialize8(p, this->CompOpt[i]);
 	}
@@ -252,16 +252,16 @@ size_t CServerSetup::Deserialize(const unsigned char *p)
 	p += deserialize8(p, &this->ResourcesOption);
 	p += deserialize8(p, &this->UnitsOption);
 	p += deserialize8(p, &this->FogOfWar);
-	p += deserialize8(p, &this->Inside);
+	//Wyrmgus start
+//	p += deserialize8(p, &this->Inside);
+	p += deserialize8(p, &this->NoRandomness);
+	//Wyrmgus end
 	p += deserialize8(p, &this->RevealMap);
 	p += deserialize8(p, &this->TilesetSelection);
 	p += deserialize8(p, &this->GameTypeOption);
 	p += deserialize8(p, &this->Difficulty);
 	p += deserialize8(p, &this->MapRichness);
 	p += deserialize8(p, &this->Opponents);
-	//Wyrmgus start
-	p += deserialize8(p, &this->NoRandomness);
-	//Wyrmgus end
 	for (int i = 0; i < PlayerMax; ++i) {
 		p += deserialize8(p, &this->CompOpt[i]);
 	}
@@ -279,16 +279,16 @@ void CServerSetup::Clear()
 	ResourcesOption = 0;
 	UnitsOption = 0;
 	FogOfWar = 0;
-	Inside = 0;
+	//Wyrmgus start
+//	Inside = 0;
+	NoRandomness = 0;
+	//Wyrmgus end
 	RevealMap = 0;
 	TilesetSelection = 0;
 	GameTypeOption = 0;
 	Difficulty = 0;
 	MapRichness = 0;
 	Opponents = 0;
-	//Wyrmgus start
-	NoRandomness = 0;
-	//Wyrmgus end
 	memset(CompOpt, 0, sizeof(CompOpt));
 	memset(Ready, 0, sizeof(Ready));
 	memset(Race, 0, sizeof(Race));
@@ -299,16 +299,16 @@ bool CServerSetup::operator == (const CServerSetup &rhs) const
 	return (ResourcesOption == rhs.ResourcesOption
 			&& UnitsOption == rhs.UnitsOption
 			&& FogOfWar == rhs.FogOfWar
-			&& Inside == rhs.Inside
+			//Wyrmgus start
+//			&& Inside == rhs.Inside
+			&& NoRandomness == rhs.NoRandomness
+			//Wyrmgus end
 			&& RevealMap == rhs.RevealMap
 			&& TilesetSelection == rhs.TilesetSelection
 			&& GameTypeOption == rhs.GameTypeOption
 			&& Difficulty == rhs.Difficulty
 			&& MapRichness == rhs.MapRichness
 			&& Opponents == rhs.Opponents
-			//Wyrmgus start
-			&& NoRandomness == rhs.NoRandomness
-			//Wyrmgus end
 			&& memcmp(CompOpt, rhs.CompOpt, sizeof(CompOpt)) == 0
 			&& memcmp(Ready, rhs.Ready, sizeof(Ready)) == 0
 			&& memcmp(Race, rhs.Race, sizeof(Race)) == 0);
