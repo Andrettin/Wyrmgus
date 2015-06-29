@@ -161,13 +161,25 @@ static void ChangeSelectedUnits(CUnit **units, unsigned int count)
 			return ;
 		}
 	}
+	//Wyrmgus start
+	bool suitable_selectee = false;
+	for (unsigned int i = 0; i < count; ++i) {
+		CUnit &unit = *units[i];
+		if (!unit.Removed && !unit.TeamSelected && !unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
+			suitable_selectee = true;
+		}
+	}
+	if (!suitable_selectee) {
+		return;
+	}
+	//Wyrmgus end
 	UnSelectAll();
 	NetworkSendSelection(units, count);
 	for (unsigned int i = 0; i < count; ++i) {
 		CUnit &unit = *units[i];
 		//Wyrmgus start
 //		if (!unit.Removed && !unit.TeamSelected && !unit.Type->IsNotSelectable) {
-		if (!unit.Removed && !unit.TeamSelected && !unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+		if (!unit.Removed && !unit.TeamSelected && !unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
 		//Wyrmgus end
 			Selected.push_back(&unit);
 			unit.Selected = 1;
@@ -198,7 +210,7 @@ void ChangeTeamSelectedUnits(CPlayer &player, const std::vector<CUnit *> &units)
 		Assert(!unit.Removed);
 		//Wyrmgus start
 //		if (!unit.Type->IsNotSelectable) {
-		if (!unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
+		if (!unit.Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && unit.IsAlive()) {
 		//Wyrmgus end
 			TeamSelected[player.Index].push_back(&unit);
 			unit.TeamSelected |= 1 << player.Index;
@@ -246,6 +258,12 @@ int SelectUnit(CUnit &unit)
 		return 0;
 	}
 
+	//Wyrmgus start
+	if (!unit.IsAlive()) { // don't select dead units
+		return 0;
+	}
+	//Wyrmgus end
+	
 	Selected.push_back(&unit);
 	unit.Selected = 1;
 	if (Selected.size() > 1) {
@@ -374,6 +392,12 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 	if (base.TeamSelected) { // Somebody else onteam has this unit
 		return 0;
 	}
+	
+	//Wyrmgus start
+	if (!base.IsAlive()) { // dead units cannot be selected
+		return 0;
+	}
+	//Wyrmgus end
 
 	UnSelectAll();
 	Selected.push_back(&base);

@@ -2601,7 +2601,7 @@ CUnit *UnitOnScreen(int x, int y)
 			std::vector<CUnit *> table;
 			Select(candidate->tilePos, candidate->tilePos, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 //			if (IsOnlySelected(*candidate) || candidate->Type->IsNotSelectable) {
-			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || (candidate->Player->Type == PlayerNeutral && table.size())) { // don't select a neutral unit if there's a player-owned unit there as well
+			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || (candidate->Player->Type == PlayerNeutral && table.size()) || !candidate->IsAlive()) { // don't select a neutral unit if there's a player-owned unit there as well; don't selected a dead unit
 			//Wyrmgus end
 				continue;
 			} else {

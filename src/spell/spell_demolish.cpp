@@ -83,7 +83,7 @@
 //	Vec2i minpos = goalPos - offset;
 //	Vec2i maxpos = goalPos + offset;
 	Vec2i minpos = caster.tilePos - offset;
-	Vec2i maxpos = caster.tilePos + offset;
+	Vec2i maxpos = caster.tilePos + Vec2i(caster.Type->TileWidth - 1, caster.Type->TileHeight - 1) + offset;
 	//Wyrmgus end
 
 	Map.FixSelectionArea(minpos, maxpos);
@@ -116,7 +116,10 @@
 		for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
 				const CMapField &mf = *Map.Field(ipos);
-				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
+				//Wyrmgus start
+//				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
+				if (caster.MapDistanceTo(ipos) > this->Range) {
+				//Wyrmgus end
 					// Not in circle range
 					continue;
 				} else if (mf.isAWall()) {
@@ -147,7 +150,7 @@
 //				&& unit.MapDistanceTo(goalPos) <= this->Range) {
 				// Don't hit flying units!
 //				HitUnit(&caster, unit, this->Damage);
-				&& unit.MapDistanceTo(caster.tilePos) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && ((!caster.IsAllied(unit) && unit.Player != caster.Player) || this->DamageFriendly)) {
+				&& unit.MapDistanceTo(caster) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && (caster.IsEnemy(unit) || this->DamageFriendly)) {
 
 				int damage = 0;
 				if (this->BasicDamage || this->PiercingDamage) {

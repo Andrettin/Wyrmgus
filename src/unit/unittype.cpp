@@ -974,6 +974,8 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			}
 			break;
 		case UnitTypeNaval:                             // on water
+			//Wyrmgus start
+			/*
 			if (type.CanTransport()) {
 				type.MovementMask =
 					MapFieldLandUnit |
@@ -984,13 +986,26 @@ void UpdateUnitStats(CUnitType &type, int reset)
 					//Wyrmgus end
 					MapFieldLandAllowed; // can't move on this
 				// Johns: MapFieldUnpassable only for land units?
-			//Wyrmgus start
-			} else if (type.BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
-				type.MovementMask =
+			*/
+			if (type.BoolFlag[CANDOCK_INDEX].value) {
+					MapFieldLandUnit |
+					MapFieldSeaUnit |
 					MapFieldBuilding | // already occuppied
 					//Wyrmgus start
 					MapFieldBridge |
 					//Wyrmgus end
+					MapFieldLandAllowed | // can't move on this
+					MapFieldUnpassable;
+			} else if (type.BoolFlag[CANDOCK_INDEX].value && type.BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
+				type.MovementMask =
+					MapFieldBuilding | // already occuppied
+					MapFieldBridge |
+					MapFieldLandAllowed | // can't move on this
+					MapFieldUnpassable;
+			} else if (type.BoolFlag[DIMINUTIVE_INDEX].value) { //should add case for when is a transporter and is diminutive?
+				type.MovementMask =
+					MapFieldBuilding | // already occuppied
+					MapFieldBridge |
 					MapFieldCoastAllowed |
 					MapFieldLandAllowed | // can't move on this
 					MapFieldUnpassable;
