@@ -50,6 +50,9 @@
 #include "player.h"
 #include "script.h"
 #include "sound.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -143,8 +146,8 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 		sprite_width = (varinfo->Sprite ? varinfo->Sprite->Width : 0);
 		sprite_height = (varinfo->Sprite ? varinfo->Sprite->Height : 0);
 	}
-	const int x = screenPos.x - type.BoxWidth / 2 - (frame_width - sprite_width) / 2;
-	const int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
+	int x = screenPos.x - type.BoxWidth / 2 - (frame_width - sprite_width) / 2;
+	int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
 	
 	// show player color circle below unit if that is activated
 	if (Preference.PlayerColorCircle && unit.Player->Index != PlayerNumNeutral && unit.CurrentAction() != UnitActionDie) {
@@ -185,27 +188,32 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 
 	//Wyrmgus start
 	/*
-	const CUnitType &type = *unit.Type;
-	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
+//	const CUnitType &type = *unit.Type;
+//	const PixelPos screenPos = vp.MapToScreenPixelPos(unit.GetMapPixelPosCenter());
 //	const int x = screenPos.x - type.BoxWidth / 2 - (type.Width - (type.Sprite ? type.Sprite->Width : 0)) / 2;
 //	const int y = screenPos.y - type.BoxHeight / 2 - (type.Height - (type.Sprite ? type.Sprite->Height : 0)) / 2;
-	int frame_width = type.Width;
-	int frame_height = type.Height;
-	int sprite_width = (type.Sprite ? type.Sprite->Width : 0);
-	int sprite_height = (type.Sprite ? type.Sprite->Height : 0);
-	VariationInfo *varinfo = type.VarInfo[unit.Variation];
-	if (varinfo && varinfo->FrameWidth && varinfo->FrameHeight) {
-		frame_width = varinfo->FrameWidth;
-		frame_height = varinfo->FrameHeight;
-		sprite_width = (varinfo->Sprite ? varinfo->Sprite->Width : 0);
-		sprite_height = (varinfo->Sprite ? varinfo->Sprite->Height : 0);
-	}
-	const int x = screenPos.x - type.BoxWidth / 2 - (frame_width - sprite_width) / 2;
-	const int y = screenPos.y - type.BoxHeight / 2 - (frame_height - sprite_height) / 2;
 	*/
 	//Wyrmgus end
+
+	//Wyrmgus start
+	int box_width = type.BoxWidth;
+	int box_height = type.BoxHeight;
+	if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->BoxWidth > box_width && table[i]->Type->BoxHeight > box_height) {
+				box_width = table[i]->Type->BoxWidth;
+				box_height = table[i]->Type->BoxHeight;
+			}
+		}
+	}
+	x = screenPos.x - box_width / 2 - (frame_width - sprite_width) / 2;
+	y = screenPos.y - box_height / 2 - (frame_height - sprite_height) / 2;
 	
-	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX, y + type.BoxHeight + type.BoxOffsetY);
+//	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + type.BoxWidth + type.BoxOffsetX, y + type.BoxHeight + type.BoxOffsetY);
+	DrawSelection(color, x + type.BoxOffsetX, y + type.BoxOffsetY, x + box_width + type.BoxOffsetX, y + box_height + type.BoxOffsetY);
+	//Wyrmgus end
 }
 
 /**
