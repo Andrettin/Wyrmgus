@@ -98,11 +98,16 @@ size_t serialize(unsigned char *buf, const std::string &s)
 		buf += serialize16(buf, uint16_t(s.size()));
 		memcpy(buf, s.c_str(), s.size());
 		buf += s.size();
-		if ((s.size() & 0x03) != 0) {
-			memset(buf, 0, s.size() & 0x03);
-		}
+		//Wyrmgus start
+//		if ((s.size() & 0x03) != 0) {
+//			memset(buf, 0, s.size() & 0x03);
+//		}
+		//Wyrmgus end
 	}
-	return 2 + ((s.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+	//Wyrmgus start
+//	return 2 + ((s.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+	return 2 + (s.size() + 3);
+	//Wyrmgus end
 }
 size_t serialize(unsigned char *buf, const std::vector<unsigned char> &data)
 {
@@ -113,11 +118,16 @@ size_t serialize(unsigned char *buf, const std::vector<unsigned char> &data)
 		buf += serialize16(buf, uint16_t(data.size()));
 		memcpy(buf, &data[0], data.size());
 		buf += data.size();
-		if ((data.size() & 0x03) != 0) {
-			memset(buf, 0, data.size() & 0x03);
-		}
+		//Wyrmgus start
+//		if ((data.size() & 0x03) != 0) {
+//			memset(buf, 0, data.size() & 0x03);
+//		}
+		//Wyrmgus end
 	}
-	return 2 + ((data.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+	//Wyrmgus start
+//	return 2 + ((data.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+	return 2 + (data.size() + 3);
+	//Wyrmgus end
 }
 
 size_t deserialize32(const unsigned char *buf, uint32_t *data)
@@ -162,7 +172,10 @@ size_t deserialize(const unsigned char *buf, std::string &s)
 
 	buf += deserialize16(buf, &size);
 	s = std::string(reinterpret_cast<const char *>(buf), size);
-	return 2 + ((s.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+	//Wyrmgus start
+//	return 2 + ((s.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+	return 2 + (s.size() + 3);
+	//Wyrmgus end
 }
 size_t deserialize(const unsigned char *buf, std::vector<unsigned char> &data)
 {
@@ -170,7 +183,10 @@ size_t deserialize(const unsigned char *buf, std::vector<unsigned char> &data)
 
 	buf += deserialize16(buf, &size);
 	data.assign(buf, buf + size);
-	return 2 + ((data.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+	//Wyrmgus start
+//	return 2 + ((data.size() + 3) & ~0x03); // round up to multiple of 4 for alignment.
+	return 2 + (data.size() + 3);
+	//Wyrmgus end
 }
 
 //
@@ -642,10 +658,7 @@ size_t CNetworkChat::Size() const
 {
 	size_t size = 0;
 	size += serialize(NULL, this->Text);
-	//Wyrmgus start
-//	return size;
-	return size * 2; // to prevent the message from going over the buffer limit
-	//Wyrmgus end
+	return size;
 }
 
 //
