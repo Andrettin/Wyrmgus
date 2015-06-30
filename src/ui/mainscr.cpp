@@ -1020,20 +1020,20 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 		++MessagesSameCount;
 		return true;
 	}
-	//Wyrmgus start
-	// we don't need a message that messages have repeated X times on top of the repeated messages
-	/*
 	if (MessagesSameCount > 0) {
 		char temp[256];
 		int n = MessagesSameCount;
 
 		MessagesSameCount = 0;
 		// NOTE: vladi: yep it's a tricky one, but should work fine prbably :)
+		//Wyrmgus start
+		// we don't need a message that messages have repeated X times on top of the repeated messages
+		/*
 		snprintf(temp, sizeof(temp), _("Last message repeated ~<%d~> times"), n + 1);
 		AddMessage(temp);
+		*/
+		//Wyrmgus end
 	}
-	*/
-	//Wyrmgus end
 	return false;
 }
 

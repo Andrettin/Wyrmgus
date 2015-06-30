@@ -642,7 +642,10 @@ size_t CNetworkChat::Size() const
 {
 	size_t size = 0;
 	size += serialize(NULL, this->Text);
-	return size;
+	//Wyrmgus start
+//	return size;
+	return size * 2; // to prevent the message from going over the buffer limit
+	//Wyrmgus end
 }
 
 //

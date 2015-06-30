@@ -950,8 +950,21 @@ static int InputKey(int key)
 				// Replace ~ with ~~
 				ReplaceTildeBy2Tilde(Input);
 				char chatMessage[sizeof(Input) + 40];
+				//Wyrmgus start
+				/*
 				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
 						 PlayerColorNames[ThisPlayer->Index].c_str(),
+				*/
+				int player_color; // make the player color be correct for the faction
+				for (int j = 0; j < PlayerColorMax; ++j) {
+					if (PlayerColors[j][0] == ThisPlayer->Color) {
+						player_color = j;
+						break;
+					}
+				}
+				snprintf(chatMessage, sizeof(chatMessage), "~%s~<%s>~> %s",
+						 PlayerColorNames[player_color].c_str(),
+				//Wyrmgus end
 						 ThisPlayer->Name.c_str(), Input);
 				// FIXME: only to selected players ...
 				NetworkSendChatMessage(chatMessage);
