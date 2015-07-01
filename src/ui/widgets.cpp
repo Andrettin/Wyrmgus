@@ -555,9 +555,16 @@ void ImageButton::draw(gcn::Graphics *graphics)
 
 	//Wyrmgus start
 //	if (hasFocus()) {
-	if (hasFocus() && !frameImage) {
+	if (isPressed() && !frameImage) {
 	//Wyrmgus end
-		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+		//Wyrmgus start
+//		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+		if (getWidth() == getHeight() && getWidth() > 64 && getHeight() > 64) {
+			graphics->drawRectangle(gcn::Rectangle(0 + ((getWidth() - 64) / 2), 0 + ((getHeight() - 64) / 2), getWidth() - (getWidth() - 64), getHeight() - (getHeight() - 64))); //hack to make it appear properly in grand strategy mode
+		} else {
+			graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+		}
+		//Wyrmgus end
 	}
 	
 	//Wyrmgus start
@@ -785,8 +792,13 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		graphics->drawText(getCaption(), textX + 2, textY + 2, getAlignment(), is_normal);
 	}
 
-	if (hasFocus() && !frameImage) {
-		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+	if (isPressed() && !frameImage) {
+//		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+		if (getWidth() == getHeight() && getWidth() > 64 && getHeight() > 64) {
+			graphics->drawRectangle(gcn::Rectangle(0 + ((getWidth() - 64) / 2), 0 + ((getHeight() - 64) / 2), getWidth() - (getWidth() - 64), getHeight() - (getHeight() - 64))); //hack to make it appear properly in grand strategy mode
+		} else {
+			graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+		}
 	}
 
 	//restore old alpha

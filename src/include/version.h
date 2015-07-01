@@ -1,6 +1,8 @@
 #include "version-generated.h"
 
 /// Name
+//Wyrmgus start
+/*
 #ifdef _WIN64
 #define NAME "Stratagus (64 bit)"
 #else
@@ -9,6 +11,17 @@
 
 /// Description
 #define DESCRIPTION NAME " - Strategy Gaming Engine"
+*/
+
+#ifdef _WIN64
+#define NAME "Wyrmsun (64 bit)"
+#else
+#define NAME "Wyrmsun"
+#endif
+
+/// Description
+#define DESCRIPTION NAME ""
+//Wyrmgus end
 
 #define _version_stringify_(s) #s
 #define _version_stringify(s) _version_stringify_(s)

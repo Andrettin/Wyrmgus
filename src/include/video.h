@@ -125,6 +125,9 @@ public:
 
 	static CGraphic *New(const std::string &file, int w = 0, int h = 0);
 	static CGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
+	//Wyrmgus start
+	static CGraphic *Get(const std::string &file);
+	//Wyrmgus end
 
 	static void Free(CGraphic *g);
 
@@ -212,6 +215,10 @@ public:
 	static CPlayerColorGraphic *ForceNew(const std::string &file, int w = 0, int h = 0);
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
+	
+	//Wyrmgus start
+	static CPlayerColorGraphic *Get(const std::string &file);
+	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors

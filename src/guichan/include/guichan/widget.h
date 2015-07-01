@@ -492,6 +492,10 @@ namespace gcn
          */
         virtual    void removeActionListener(ActionListener* actionListener);
 
+		//Wyrmgus start
+        virtual void clearActionListeners();
+		//Wyrmgus end
+		
         /**
          * Adds a MouseListener to the Widget. When a mouse message is
          * recieved, it will be sent to the Widget's MouseListeners.

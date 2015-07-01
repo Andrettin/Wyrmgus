@@ -937,6 +937,46 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 	return g;
 }
 
+//Wyrmgus start
+/**
+**  Get a graphic object.
+**
+**  @param filename  Filename
+**
+**  @return      Graphic object
+*/
+CGraphic *CGraphic::Get(const std::string &filename)
+{
+	if (filename.empty()) {
+		return NULL;
+	}
+
+	const std::string file = LibraryFileName(filename.c_str());
+	CGraphic *&g = GraphicHash[file];
+
+	return g;
+}
+
+/**
+**  Get a player color graphic object.
+**
+**  @param filename  Filename
+**
+**  @return      Graphic object
+*/
+CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
+{
+	if (filename.empty()) {
+		return NULL;
+	}
+
+	const std::string file = LibraryFileName(filename.c_str());
+	CPlayerColorGraphic *g = dynamic_cast<CPlayerColorGraphic *>(GraphicHash[file]);
+
+	return g;
+}
+//Wyrmgus end
+
 void CGraphic::GenFramesMap()
 {
 	Assert(NumFrames != 0);

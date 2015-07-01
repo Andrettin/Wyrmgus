@@ -372,6 +372,13 @@ namespace gcn
         mActionListeners.remove(actionListener);
     }
 
+	//Wyrmgus start
+    void Widget::clearActionListeners()
+    {
+        mActionListeners.clear();
+    }
+	//Wyrmgus end
+	
     void Widget::addKeyListener(KeyListener* keyListener)
     {
         mKeyListeners.push_back(keyListener);
