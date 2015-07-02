@@ -900,6 +900,8 @@ static int CclOrderUnit(lua_State *l)
 	} else {
 		pos2 = pos1;
 	}
+	//Wyrmgus start
+	/*
 	if (!lua_istable(l, 4)) {
 		LuaError(l, "incorrect argument");
 	}
@@ -913,6 +915,20 @@ static int CclOrderUnit(lua_State *l)
 	} else {
 		dpos2 = dpos1;
 	}
+	*/
+	Vec2i dpos1;
+	Vec2i dpos2;
+	if (lua_istable(l, 4)) {
+		dpos1.x = LuaToNumber(l, 4, 1);
+		dpos1.y = LuaToNumber(l, 4, 2);
+		if (lua_rawlen(l, 4) == 4) {
+			dpos2.x = LuaToNumber(l, 4, 3);
+			dpos2.y = LuaToNumber(l, 4, 4);
+		} else {
+			dpos2 = dpos1;
+		}
+	}
+	//Wyrmgus end
 	const char *order = LuaToString(l, 5);
 	std::vector<CUnit *> table;
 	Select(pos1, pos2, table);
@@ -930,6 +946,10 @@ static int CclOrderUnit(lua_State *l)
 					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
 
 					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
+				//Wyrmgus start
+				} else if (!strcmp(order, "attack-ground")) {
+					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1);
+				//Wyrmgus end
 				} else if (!strcmp(order, "patrol")) {
 					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
 				//Wyrmgus start
@@ -939,6 +959,8 @@ static int CclOrderUnit(lua_State *l)
 					CommandBoard(unit, transporter, 1);
 				} else if (!strcmp(order, "unload")) {
 					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1);
+				} else if (!strcmp(order, "stop")) {					
+					CommandStopUnit(unit);
 				//Wyrmgus end
 				} else {
 					LuaError(l, "Unsupported order: %s" _C_ order);
