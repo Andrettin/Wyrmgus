@@ -518,7 +518,10 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 //		if (((goal && goal->Type && goal->Type->Wall)
 		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
 		//Wyrmgus end
-			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
+			//Wyrmgus start
+//			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
+			 || (!goal && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))))
+			//Wyrmgus end
 			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			//Wyrmgus start
 //			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
@@ -786,6 +789,28 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 						return;
 					}
 				}
+			//Wyrmgus start
+			// add instance for attack ground without moving
+			} else if (this->Action == UnitActionAttackGround && unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+				if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+					// Reached wall or ground, now attacking it
+					unsigned char oldDir = unit.Direction;
+					UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
+					if (unit.Type->BoolFlag[SIDEATTACK_INDEX].value) {
+						unsigned char leftTurn = (unit.Direction - 2 * NextDirection) % (NextDirection * 8);
+						unsigned char rightTurn = (unit.Direction + 2 * NextDirection) % (NextDirection * 8);
+						if (abs(leftTurn - oldDir) < abs(rightTurn - oldDir)) {
+							unit.Direction = leftTurn;
+						} else {
+							unit.Direction = rightTurn;
+						}
+						UnitUpdateHeading(unit);
+					}
+					this->State &= WEAK_TARGET;
+					this->State |= ATTACK_TARGET;
+					return;
+				}
+			//Wyrmgus end
 			}
 			this->State = MOVE_TO_TARGET;
 			// FIXME: should use a reachable place to reduce pathfinder time.

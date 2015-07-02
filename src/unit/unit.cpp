@@ -3292,7 +3292,13 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 	// Can't attack run away.
 	//Wyrmgus start
 //	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount) {
-	if (!target.IsAgressive() && target.CanMove() && target.CurrentAction() == UnitActionStill && !target.BoardCount && !target.Type->BoolFlag[BRIDGE_INDEX].value) {
+	if (
+		(!target.IsAgressive() || attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value)
+		&& target.CanMove()
+		&& target.CurrentAction() == UnitActionStill
+		&& !target.BoardCount
+		&& !target.Type->BoolFlag[BRIDGE_INDEX].value
+	) {
 	//Wyrmgus end
 		HitUnit_RunAway(target, *attacker);
 	}
@@ -3311,6 +3317,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 		&& (target.IsAgressive() || (target.Type->CanAttack && target.Type->BoolFlag[COWARD_INDEX].value && (attacker->Type->BoolFlag[COWARD_INDEX].value || attacker->Variable[HP_INDEX].Value <= 3))) // attacks back if isn't coward, or if attacker is also coward, or if attacker has 3 HP or less 
 		&& target.CanMove()
 		&& !target.ReCast
+		&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
 	) {
 	//Wyrmgus end
 		// Attack units in range (which or the attacker?)
