@@ -563,7 +563,7 @@ static int CclDefineRaceNames(lua_State *l)
 				} else if (!strcmp(value, "parent-civilization")) {
 					++k;
 					PlayerRaces.ParentCivilization[i] = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "personal_names")) {
+				} else if (!strcmp(value, "personal-names")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
@@ -573,7 +573,7 @@ static int CclDefineRaceNames(lua_State *l)
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.PersonalNames[i][n] = LuaToString(l, -1, n + 1);
 					}
-				} else if (!strcmp(value, "personal_name_prefixes")) {
+				} else if (!strcmp(value, "personal-name-prefixes")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
@@ -583,7 +583,7 @@ static int CclDefineRaceNames(lua_State *l)
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.PersonalNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
 					}
-				} else if (!strcmp(value, "personal_name_suffixes")) {
+				} else if (!strcmp(value, "personal-name-suffixes")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
@@ -592,6 +592,90 @@ static int CclDefineRaceNames(lua_State *l)
 					int subsubargs = lua_rawlen(l, -1);
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.PersonalNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "province-names")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNames[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "province-name-prefixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "province-name-suffixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "settlement-names")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNames[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "settlement-name-prefixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "settlement-name-suffixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "settlement-name-prefix-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNamePrefixTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //prefix to be translated
+						++n;
+						PlayerRaces.SettlementNamePrefixTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //prefix translation
+					}
+				} else if (!strcmp(value, "settlement-name-suffix-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNameSuffixTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //suffix to be translated
+						++n;
+						PlayerRaces.SettlementNameSuffixTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //suffix translation
 					}
 				//Wyrmgus end
 				} else {
@@ -629,15 +713,12 @@ static int CclDefineNewRaceNames(lua_State *l)
 				if (!strcmp(value, "name")) {
 					++k;
 					PlayerRaces.Name[i] = LuaToString(l, j + 1, k + 1);
-					//Wyrmgus start
 					PlayerRaces.Playable[i] = true; //civilizations are playable by default
-					//Wyrmgus end
 				} else if (!strcmp(value, "display")) {
 					++k;
 					PlayerRaces.Display[i] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "visible")) {
 					PlayerRaces.Visible[i] = 1;
-				//Wyrmgus start
 				} else if (!strcmp(value, "playable")) {
 					++k;
 					PlayerRaces.Playable[i] = LuaToBoolean(l, j + 1, k + 1);
@@ -647,7 +728,7 @@ static int CclDefineNewRaceNames(lua_State *l)
 				} else if (!strcmp(value, "parent-civilization")) {
 					++k;
 					PlayerRaces.ParentCivilization[i] = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "personal_names")) {
+				} else if (!strcmp(value, "personal-names")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
@@ -657,7 +738,7 @@ static int CclDefineNewRaceNames(lua_State *l)
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.PersonalNames[i][n] = LuaToString(l, -1, n + 1);
 					}
-				} else if (!strcmp(value, "personal_name_prefixes")) {
+				} else if (!strcmp(value, "personal-name-prefixes")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
@@ -667,7 +748,7 @@ static int CclDefineNewRaceNames(lua_State *l)
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.PersonalNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
 					}
-				} else if (!strcmp(value, "personal_name_suffixes")) {
+				} else if (!strcmp(value, "personal-name-suffixes")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
@@ -677,7 +758,90 @@ static int CclDefineNewRaceNames(lua_State *l)
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.PersonalNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
 					}
-				//Wyrmgus end
+				} else if (!strcmp(value, "province-names")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNames[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "province-name-prefixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "province-name-suffixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "settlement-names")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNames[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "settlement-name-prefixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "settlement-name-suffixes")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
+					}
+				} else if (!strcmp(value, "settlement-name-prefix-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNamePrefixTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //prefix to be translated
+						++n;
+						PlayerRaces.SettlementNamePrefixTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //prefix translation
+					}
+				} else if (!strcmp(value, "settlement-name-suffix-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNameSuffixTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //suffix to be translated
+						++n;
+						PlayerRaces.SettlementNameSuffixTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //suffix translation
+					}
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -732,6 +896,132 @@ static int CclGetParentCivilization(lua_State *l)
 	lua_pop(l, 1);
 
 	lua_pushstring(l, PlayerRaces.ParentCivilization[civilization].c_str());
+	return 1;
+}
+
+/**
+**  Generate a province name for the civilization.
+**
+**  @param l  Lua state.
+*/
+static int CclGenerateProvinceName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	lua_pop(l, 1);
+
+	std::string ProvinceName;
+	
+	if ((!PlayerRaces.ProvinceNames[civilization][0].empty() || !PlayerRaces.ProvinceNamePrefixes[civilization][0].empty())) {
+		int ProvinceNameCount = 0;
+		int ProvinceNamePrefixCount = 0;
+		int ProvinceNameSuffixCount = 0;
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.ProvinceNames[civilization][i].empty()) {
+				ProvinceNameCount += 1;
+			}
+		}
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.ProvinceNamePrefixes[civilization][i].empty()) {
+				ProvinceNamePrefixCount += 1;
+			}
+		}
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.ProvinceNameSuffixes[civilization][i].empty()) {
+				ProvinceNameSuffixCount += 1;
+			}
+		}
+		if (ProvinceNameCount > 0 || ProvinceNamePrefixCount > 0) {
+			int ProvinceNameProbability = ProvinceNameCount * 10000 / (ProvinceNameCount + (ProvinceNamePrefixCount * ProvinceNameSuffixCount));
+			if (SyncRand(10000) < ProvinceNameProbability) {
+				ProvinceName = PlayerRaces.ProvinceNames[civilization][SyncRand(ProvinceNameCount)];
+			} else {
+				ProvinceName = PlayerRaces.ProvinceNamePrefixes[civilization][SyncRand(ProvinceNamePrefixCount)];
+				ProvinceName += PlayerRaces.ProvinceNameSuffixes[civilization][SyncRand(ProvinceNameSuffixCount)];
+			}
+		}
+	}
+	
+	lua_pushstring(l, ProvinceName.c_str());
+	return 1;
+}
+
+/**
+**  Generate a settlement name for the civilization.
+**
+**  @param l  Lua state.
+*/
+static int CclGenerateSettlementName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	lua_pop(l, 1);
+
+	std::string SettlementName;
+	
+	if ((!PlayerRaces.SettlementNames[civilization][0].empty() || !PlayerRaces.SettlementNamePrefixes[civilization][0].empty())) {
+		int SettlementNameCount = 0;
+		int SettlementNamePrefixCount = 0;
+		int SettlementNameSuffixCount = 0;
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.SettlementNames[civilization][i].empty()) {
+				SettlementNameCount += 1;
+			}
+		}
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.SettlementNamePrefixes[civilization][i].empty()) {
+				SettlementNamePrefixCount += 1;
+			}
+		}
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.SettlementNameSuffixes[civilization][i].empty()) {
+				SettlementNameSuffixCount += 1;
+			}
+		}
+		if (SettlementNameCount > 0 || SettlementNamePrefixCount > 0) {
+			int SettlementNameProbability = SettlementNameCount * 10000 / (SettlementNameCount + (SettlementNamePrefixCount * SettlementNameSuffixCount));
+			if (SyncRand(10000) < SettlementNameProbability) {
+				SettlementName = PlayerRaces.SettlementNames[civilization][SyncRand(SettlementNameCount)];
+			} else {
+				SettlementName = PlayerRaces.SettlementNamePrefixes[civilization][SyncRand(SettlementNamePrefixCount)];
+				SettlementName += PlayerRaces.SettlementNameSuffixes[civilization][SyncRand(SettlementNameSuffixCount)];
+			}
+		}
+	}
+	
+	lua_pushstring(l, SettlementName.c_str());
+	return 1;
+}
+
+/**
+**  "Translate" (that is, adapt) a settlement name from one culture (civilization) to another.
+**
+**  @param l  Lua state.
+*/
+static int CclTranslateSettlementName(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	std::string settlement_name = LuaToString(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
+	
+	std::string new_settlement_name;
+
+	if (!PlayerRaces.SettlementNamePrefixTranslations[civilization][0][0].empty() && !PlayerRaces.SettlementNameSuffixTranslations[civilization][0][0].empty()) {
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0].empty() && PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0] == settlement_name.substr(0, PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0].size())) {
+				for (int j = 0; j < PersonalNameMax; ++j) {
+					if (!PlayerRaces.SettlementNameSuffixTranslations[civilization][j][0].empty() && PlayerRaces.SettlementNameSuffixTranslations[civilization][j][0] == settlement_name.substr(PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0].size(), PlayerRaces.SettlementNameSuffixTranslations[civilization][j][0].size())) {
+						new_settlement_name = PlayerRaces.SettlementNamePrefixTranslations[civilization][i][1];
+						new_settlement_name += PlayerRaces.SettlementNameSuffixTranslations[civilization][j][1];
+						lua_pushstring(l, new_settlement_name.c_str());
+						return 1;
+					}
+				}
+			}
+		}
+	}
+	
+	lua_pushstring(l, new_settlement_name.c_str());
 	return 1;
 }
 
@@ -1299,8 +1589,11 @@ void PlayerCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "DefineNewRaceNames", CclDefineNewRaceNames);
 	lua_register(Lua, "IsCivilizationPlayable", CclIsCivilizationPlayable);
-	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
 	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
+	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
+	lua_register(Lua, "GenerateProvinceName", CclGenerateProvinceName);
+	lua_register(Lua, "GenerateSettlementName", CclGenerateSettlementName);
+	lua_register(Lua, "TranslateSettlementName", CclTranslateSettlementName);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);

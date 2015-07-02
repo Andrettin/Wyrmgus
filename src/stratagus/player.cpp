@@ -362,6 +362,16 @@ void PlayerRace::Clean()
 			this->PersonalNames[i][j].clear();
 			this->PersonalNamePrefixes[i][j].clear();
 			this->PersonalNameSuffixes[i][j].clear();
+			this->ProvinceNames[i][j].clear();
+			this->ProvinceNamePrefixes[i][j].clear();
+			this->ProvinceNameSuffixes[i][j].clear();
+			this->SettlementNames[i][j].clear();
+			this->SettlementNamePrefixes[i][j].clear();
+			this->SettlementNameSuffixes[i][j].clear();
+			for (unsigned int k = 0; k < 2; ++k) {
+				this->SettlementNamePrefixTranslations[i][j][k].clear();
+				this->SettlementNameSuffixTranslations[i][j][k].clear();
+			}
 		}
 		//Wyrmgus end
 	}

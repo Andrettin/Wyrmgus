@@ -280,8 +280,16 @@ public:
 	std::string FactionSecondaryColors[MAX_RACES][FactionMax]; 		   	/// faction secondary colors
 	bool FactionPlayability[MAX_RACES][FactionMax];    					/// faction playability
 	std::string PersonalNames[MAX_RACES][PersonalNameMax];				/// personal names
-	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];		/// personal prefixes
-	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];		/// personal suffixes
+	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];		/// personal name prefixes
+	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];		/// personal name suffixes
+	std::string ProvinceNames[MAX_RACES][PersonalNameMax];				/// province names
+	std::string ProvinceNamePrefixes[MAX_RACES][PersonalNameMax];		/// province name prefixes
+	std::string ProvinceNameSuffixes[MAX_RACES][PersonalNameMax];		/// province name suffixes
+	std::string SettlementNames[MAX_RACES][PersonalNameMax];			/// settlement names
+	std::string SettlementNamePrefixes[MAX_RACES][PersonalNameMax];		/// settlement name prefixes
+	std::string SettlementNameSuffixes[MAX_RACES][PersonalNameMax];		/// settlement name suffixes
+	std::string SettlementNamePrefixTranslations[MAX_RACES][PersonalNameMax][2];	/// settlement name prefix translations (2 values: one for the prefix to be translated, and another for the translation)
+	std::string SettlementNameSuffixTranslations[MAX_RACES][PersonalNameMax][2];	/// settlement name suffix translations (2 values: one for the prefix to be translated, and another for the translation)
 	//Wyrmgus end
 	unsigned int Count;             /// number of races
 };
