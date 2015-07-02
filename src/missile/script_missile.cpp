@@ -83,6 +83,9 @@ void MissileType::Load(lua_State *l)
 	this->Flip = true;
 	// Ensure we don't divide by zero.
 	this->SplashFactor = 100;
+	//Wyrmgus start
+	this->AttackSpeed = 10; //default attack speed (used by whirlwind missiles) is 10
+	//Wyrmgus end
 
 	// Parse the arguments
 	std::string file;
@@ -141,6 +144,10 @@ void MissileType::Load(lua_State *l)
 			this->Speed = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BlizzardSpeed")) {
 			this->BlizzardSpeed = LuaToNumber(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "AttackSpeed")) {
+			this->AttackSpeed = LuaToNumber(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "TTL")) {
 			this->TTL = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Damage")) {

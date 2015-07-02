@@ -1590,7 +1590,10 @@ MissileType::MissileType(const std::string &ident) :
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
 	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
 	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
-	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
+	//Wyrmgus start
+//	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
+	Sleep(0), Speed(0), BlizzardSpeed(0), AttackSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),
+	//Wyrmgus end
 	MissileStopFlags(0), Damage(NULL), Range(0), SplashFactor(0),
 	ImpactParticle(NULL), SmokeParticle(NULL), OnImpact(NULL),
 	G(NULL)

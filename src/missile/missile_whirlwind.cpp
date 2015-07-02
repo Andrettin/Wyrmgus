@@ -61,7 +61,10 @@ void MissileWhirlwind::Action()
 	const PixelPos centerOffset(PixelTileSize.x / 2, PixelTileSize.y);
 	const Vec2i center = Map.MapPixelPosToTilePos(pixelCenter + centerOffset);
 
-	if (!(this->TTL % CYCLES_PER_SECOND / 10)) {
+	//Wyrmgus start
+//	if (!(this->TTL % CYCLES_PER_SECOND / 10)) {
+	if (!(this->TTL % CYCLES_PER_SECOND / this->Type->AttackSpeed)) { //AttackSpeed is by default 10
+	//Wyrmgus end
 		this->MissileHit();
 	}
 	// Changes direction every 3 seconds (approx.)
