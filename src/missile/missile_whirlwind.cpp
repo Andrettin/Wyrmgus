@@ -62,6 +62,7 @@ void MissileWhirlwind::Action()
 	const Vec2i center = Map.MapPixelPosToTilePos(pixelCenter + centerOffset);
 
 	//Wyrmgus start
+	Assert(this->Type->AttackSpeed);
 //	if (!(this->TTL % CYCLES_PER_SECOND / 10)) {
 	if (!(this->TTL % CYCLES_PER_SECOND / this->Type->AttackSpeed)) { //AttackSpeed is by default 10
 	//Wyrmgus end
