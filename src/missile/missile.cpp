@@ -1213,7 +1213,10 @@ void Missile::MissileHit(CUnit *unit)
 	}
 	if (!mtype.Range) {
 		if (this->TargetUnit && (mtype.FriendlyFire == false
-								 || this->TargetUnit->Player->Index != this->SourceUnit->Player->Index)) {
+								//Wyrmgus start
+//								 || this->TargetUnit->Player->Index != this->SourceUnit->Player->Index)) {
+								 || this->TargetUnit->IsEnemy(*this->SourceUnit))) {
+								//Wyrmgus end
 			//
 			// Missiles without range only hits the goal always.
 			//
@@ -1252,7 +1255,10 @@ void Missile::MissileHit(CUnit *unit)
 			// Also check CorrectSphashDamage so land explosions can't hit the air units
 			//
 			if (CanTarget(*this->SourceUnit->Type, *goal.Type)
-				&& (mtype.FriendlyFire == false || goal.Player->Index != this->SourceUnit->Player->Index)) {
+				//Wyrmgus start
+//				&& (mtype.FriendlyFire == false || goal.Player->Index != this->SourceUnit->Player->Index)) {
+				&& (mtype.FriendlyFire == false || goal.IsEnemy(*this->SourceUnit))) {
+				//Wyrmgus end
 				bool shouldHit = true;
 
 				if (mtype.Pierce && mtype.PierceOnce) {
