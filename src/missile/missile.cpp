@@ -1036,10 +1036,13 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 	
 	//Wyrmgus start
 	if (CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
-		if (splash == 1 && missile.Type->SplashFactor == 0) {
+		if (splash == 1 && missile.Type->Range <= 1) {
 			return;
-		} else if (splash == 1 && missile.Type->SplashFactor > 0) {
-			splash = missile.Type->SplashFactor; // if missile has splash factor but missed, apply splash damage
+		} else if (splash == 1 && missile.Type->Range > 1) {
+			splash = missile.Type->SplashFactor; // if missile has splash but missed, apply splash damage
+			if (missile.Type->SplashFactor == 0) {
+				splash = 1;
+			}
 		}
 	}
 	//Wyrmgus end
@@ -1110,10 +1113,13 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 
 	//Wyrmgus start
 	if (CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
-		if (splash == 1 && missile.Type->SplashFactor == 0) {
+		if (splash == 1 && missile.Type->Range <= 1) {
 			return;
-		} else if (splash == 1 && missile.Type->SplashFactor > 0) {
-			splash = missile.Type->SplashFactor; // if missile has splash factor but missed, apply splash damage
+		} else if (splash == 1 && missile.Type->Range > 1) {
+			splash = missile.Type->SplashFactor; // if missile has splash but missed, apply splash damage
+			if (missile.Type->SplashFactor == 0) {
+				splash = 1;
+			}
 		}
 	}
 	//Wyrmgus end
@@ -1284,6 +1290,11 @@ void Missile::MissileHit(CUnit *unit)
 
 					if (splash) {
 						splash *= mtype.SplashFactor;
+						//Wyrmgus start
+						if (splash == 0) { // if splash factor is set to 0, cause constant splash damage, regardless of distance
+							splash = 1;
+						}
+						//Wyrmgus end
 					} else {
 						splash = 1;
 					}
