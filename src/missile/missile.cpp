@@ -875,7 +875,10 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 		CUnit &unit = **it;
 
 		if (unit.IsAliveOnMap()
-			&& (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player))) {
+			//Wyrmgus start
+//			&& (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player))) {
+			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit->Player))) {
+			//Wyrmgus end
 			missile.MissileHit(&unit);
 		}
 	}
@@ -923,7 +926,10 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					if (unit.IsAliveOnMap() == false || unit.Type->BoolFlag[NONSOLID_INDEX].value) {
 						continue;
 					}
-					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player)) {
+					//Wyrmgus start
+//					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player)) {
+					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit->Player)) {
+					//Wyrmgus end
 						missile.TargetUnit = &unit;
 						if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
 							missile.position = Map.TilePosToMapPixelPos_TopLeft(unit.tilePos);
@@ -1212,7 +1218,10 @@ void Missile::MissileHit(CUnit *unit)
 		return;
 	}
 	if (!mtype.Range) {
-		if (this->TargetUnit && (mtype.FriendlyFire == false
+		//Wyrmgus start
+//		if (this->TargetUnit && (mtype.FriendlyFire == false
+		if (this->TargetUnit && (mtype.FriendlyFire == true
+		//Wyrmgus end
 								//Wyrmgus start
 //								 || this->TargetUnit->Player->Index != this->SourceUnit->Player->Index)) {
 								 || this->TargetUnit->IsEnemy(*this->SourceUnit))) {
@@ -1257,7 +1266,7 @@ void Missile::MissileHit(CUnit *unit)
 			if (CanTarget(*this->SourceUnit->Type, *goal.Type)
 				//Wyrmgus start
 //				&& (mtype.FriendlyFire == false || goal.Player->Index != this->SourceUnit->Player->Index)) {
-				&& (mtype.FriendlyFire == false || goal.IsEnemy(*this->SourceUnit))) {
+				&& (mtype.FriendlyFire == true || goal.IsEnemy(*this->SourceUnit))) {
 				//Wyrmgus end
 				bool shouldHit = true;
 
@@ -1587,7 +1596,10 @@ void InitMissileTypes()
 MissileType::MissileType(const std::string &ident) :
 	Ident(ident), Transparency(0), DrawLevel(0),
 	SpriteFrames(0), NumDirections(0), ChangeVariable(-1), ChangeAmount(0), ChangeMax(false),
-	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
+	//Wyrmgus start
+//	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(false),
+	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(true),
+	//Wyrmgus end
 	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
 	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
 	//Wyrmgus start
