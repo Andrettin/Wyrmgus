@@ -1021,7 +1021,9 @@ bool MessagesDisplay::CheckRepeatMessage(const char *msg)
 		return true;
 	}
 	if (MessagesSameCount > 0) {
-		char temp[256];
+		//Wyrmgus start
+//		char temp[256];
+		//Wyrmgus end
 		int n = MessagesSameCount;
 
 		MessagesSameCount = 0;

@@ -50,6 +50,7 @@
 //Wyrmgus start
 #include "font.h"
 #include "ui.h"
+#include "util.h"
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -653,6 +654,54 @@ static int CclDefineRaceNames(lua_State *l)
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.SettlementNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
 					}
+				} else if (!strcmp(value, "province-name-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNameTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //name to be translated
+						++n;
+						PlayerRaces.ProvinceNameTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //name translation
+					}
+				} else if (!strcmp(value, "province-name-prefix-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNamePrefixTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //prefix to be translated
+						++n;
+						PlayerRaces.ProvinceNamePrefixTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //prefix translation
+					}
+				} else if (!strcmp(value, "province-name-suffix-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNameSuffixTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //suffix to be translated
+						++n;
+						PlayerRaces.ProvinceNameSuffixTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //suffix translation
+					}
+				} else if (!strcmp(value, "settlement-name-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNameTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //name to be translated
+						++n;
+						PlayerRaces.SettlementNameTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //name translation
+					}
 				} else if (!strcmp(value, "settlement-name-prefix-translations")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
@@ -818,6 +867,54 @@ static int CclDefineNewRaceNames(lua_State *l)
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.SettlementNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
 					}
+				} else if (!strcmp(value, "province-name-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNameTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //name to be translated
+						++n;
+						PlayerRaces.ProvinceNameTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //name translation
+					}
+				} else if (!strcmp(value, "province-name-prefix-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNamePrefixTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //prefix to be translated
+						++n;
+						PlayerRaces.ProvinceNamePrefixTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //prefix translation
+					}
+				} else if (!strcmp(value, "province-name-suffix-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.ProvinceNameSuffixTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //suffix to be translated
+						++n;
+						PlayerRaces.ProvinceNameSuffixTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //suffix translation
+					}
+				} else if (!strcmp(value, "settlement-name-translations")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.SettlementNameTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //name to be translated
+						++n;
+						PlayerRaces.SettlementNameTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //name translation
+					}
 				} else if (!strcmp(value, "settlement-name-prefix-translations")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
@@ -844,6 +941,426 @@ static int CclDefineNewRaceNames(lua_State *l)
 					}
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+
+	return 0;
+}
+
+
+/**
+**  Define a civilization's language
+**
+**  @param l  Lua state.
+*/
+static int CclDefineCivilizationLanguage(lua_State *l)
+{
+	int args = lua_gettop(l);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	
+	if (civilization == -1) { //if the civilization is invalid, don't define the language
+		return 0;
+	}
+	
+	for (int j = 1; j < args; ++j) {
+		const char *value = LuaToString(l, j + 1);
+		if (!strcmp(value, "nouns")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				LanguageNoun *noun = new LanguageNoun;
+				noun->Word = LuaToString(l, j + 1, k + 1);
+				PlayerRaces.LanguageNouns[civilization][k / 2] = noun;
+				++k;
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table)");
+				}
+				int subsubargs = lua_rawlen(l, -1);
+				for (int n = 0; n < subsubargs; ++n) {
+					const char *value = LuaToString(l, -1, n + 1);
+					if (!strcmp(value, "meaning")) {
+						++n;
+						noun->Meaning = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "verb")) {
+						++n;
+						noun->Verb = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "adjective")) {
+						++n;
+						noun->Adjective = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-nominative")) {
+						++n;
+						noun->SingularNominative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-accusative")) {
+						++n;
+						noun->SingularAccusative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-dative")) {
+						++n;
+						noun->SingularDative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-genitive")) {
+						++n;
+						noun->SingularGenitive = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-nominative")) {
+						++n;
+						noun->PluralNominative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-accusative")) {
+						++n;
+						noun->PluralAccusative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-dative")) {
+						++n;
+						noun->PluralDative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-genitive")) {
+						++n;
+						noun->PluralGenitive = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "gender")) {
+						++n;
+						noun->Gender = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "uncountable")) {
+						++n;
+						noun->Uncountable = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-singular")) {
+						++n;
+						noun->PrefixSingular = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-plural")) {
+						++n;
+						noun->PrefixPlural = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-personal-name")) {
+						++n;
+						noun->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-settlement-name")) {
+						++n;
+						noun->PrefixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-province-name")) {
+						++n;
+						noun->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-singular")) {
+						++n;
+						noun->SuffixSingular = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-plural")) {
+						++n;
+						noun->SuffixPlural = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-personal-name")) {
+						++n;
+						noun->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-settlement-name")) {
+						++n;
+						noun->SuffixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-province-name")) {
+						++n;
+						noun->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else {
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+			}
+		} else if (!strcmp(value, "verbs")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				LanguageVerb *verb = new LanguageVerb;
+				verb->Word = LuaToString(l, j + 1, k + 1);
+				PlayerRaces.LanguageVerbs[civilization][k / 2] = verb;
+				++k;
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table)");
+				}
+				int subsubargs = lua_rawlen(l, -1);
+				for (int n = 0; n < subsubargs; ++n) {
+					const char *value = LuaToString(l, -1, n + 1);
+					if (!strcmp(value, "meaning")) {
+						++n;
+						verb->Meaning = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "noun")) {
+						++n;
+						verb->Noun = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "adjective")) {
+						++n;
+						verb->Adjective = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "infinitive")) {
+						++n;
+						verb->Infinitive = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-first-person-present")) {
+						++n;
+						verb->SingularFirstPersonPresent = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-second-person-present")) {
+						++n;
+						verb->SingularSecondPersonPresent = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-third-person-present")) {
+						++n;
+						verb->SingularThirdPersonPresent = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-first-person-present")) {
+						++n;
+						verb->PluralFirstPersonPresent = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-second-person-present")) {
+						++n;
+						verb->PluralSecondPersonPresent = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-third-person-present")) {
+						++n;
+						verb->PluralThirdPersonPresent = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-first-person-past")) {
+						++n;
+						verb->SingularFirstPersonPast = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-second-person-past")) {
+						++n;
+						verb->SingularSecondPersonPast = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-third-person-past")) {
+						++n;
+						verb->SingularThirdPersonPast = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-first-person-past")) {
+						++n;
+						verb->PluralFirstPersonPast = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-second-person-past")) {
+						++n;
+						verb->PluralSecondPersonPast = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-third-person-past")) {
+						++n;
+						verb->PluralThirdPersonPast = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-first-person-future")) {
+						++n;
+						verb->SingularFirstPersonFuture = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-second-person-future")) {
+						++n;
+						verb->SingularSecondPersonFuture = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "singular-third-person-future")) {
+						++n;
+						verb->SingularThirdPersonFuture = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-first-person-future")) {
+						++n;
+						verb->PluralFirstPersonFuture = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-second-person-future")) {
+						++n;
+						verb->PluralSecondPersonFuture = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "plural-third-person-future")) {
+						++n;
+						verb->PluralThirdPersonFuture = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "participle-present")) {
+						++n;
+						verb->ParticiplePresent = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "participle-past")) {
+						++n;
+						verb->ParticiplePast = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-personal-name")) {
+						++n;
+						verb->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-settlement-name")) {
+						++n;
+						verb->PrefixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-province-name")) {
+						++n;
+						verb->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-personal-name")) {
+						++n;
+						verb->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-settlement-name")) {
+						++n;
+						verb->SuffixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-province-name")) {
+						++n;
+						verb->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else {
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+			}
+		} else if (!strcmp(value, "adjectives")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				LanguageAdjective *adjective = new LanguageAdjective;
+				adjective->Word = LuaToString(l, j + 1, k + 1);
+				PlayerRaces.LanguageAdjectives[civilization][k / 2] = adjective;
+				++k;
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table)");
+				}
+				int subsubargs = lua_rawlen(l, -1);
+				for (int n = 0; n < subsubargs; ++n) {
+					const char *value = LuaToString(l, -1, n + 1);
+					if (!strcmp(value, "meaning")) {
+						++n;
+						adjective->Meaning = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "noun")) {
+						++n;
+						adjective->Noun = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "verb")) {
+						++n;
+						adjective->Verb = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "comparative")) {
+						++n;
+						adjective->Comparative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-personal-name")) {
+						++n;
+						adjective->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-settlement-name")) {
+						++n;
+						adjective->PrefixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-province-name")) {
+						++n;
+						adjective->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-personal-name")) {
+						++n;
+						adjective->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-settlement-name")) {
+						++n;
+						adjective->SuffixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-province-name")) {
+						++n;
+						adjective->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else {
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+			}
+		} else if (!strcmp(value, "pronouns")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				LanguagePronoun *pronoun = new LanguagePronoun;
+				pronoun->Word = LuaToString(l, j + 1, k + 1);
+				PlayerRaces.LanguagePronouns[civilization][k / 2] = pronoun;
+				++k;
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table)");
+				}
+				int subsubargs = lua_rawlen(l, -1);
+				for (int n = 0; n < subsubargs; ++n) {
+					const char *value = LuaToString(l, -1, n + 1);
+					if (!strcmp(value, "meaning")) {
+						++n;
+						pronoun->Meaning = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "nominative")) {
+						++n;
+						pronoun->Nominative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "accusative")) {
+						++n;
+						pronoun->Accusative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "dative")) {
+						++n;
+						pronoun->Dative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "genitive")) {
+						++n;
+						pronoun->Genitive = LuaToString(l, -1, n + 1);
+					} else {
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+			}
+		} else if (!strcmp(value, "adverbs")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				LanguageAdverb *adverb = new LanguageAdverb;
+				adverb->Word = LuaToString(l, j + 1, k + 1);
+				PlayerRaces.LanguageAdverbs[civilization][k / 2] = adverb;
+				++k;
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table)");
+				}
+				int subsubargs = lua_rawlen(l, -1);
+				for (int n = 0; n < subsubargs; ++n) {
+					const char *value = LuaToString(l, -1, n + 1);
+					if (!strcmp(value, "meaning")) {
+						++n;
+						adverb->Meaning = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "adjective")) {
+						++n;
+						adverb->Adjective = LuaToString(l, -1, n + 1);
+					} else {
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+			}
+		} else if (!strcmp(value, "conjunctions")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				LanguageConjunction *conjunction = new LanguageConjunction;
+				conjunction->Word = LuaToString(l, j + 1, k + 1);
+				PlayerRaces.LanguageConjunctions[civilization][k / 2] = conjunction;
+				++k;
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table)");
+				}
+				int subsubargs = lua_rawlen(l, -1);
+				for (int n = 0; n < subsubargs; ++n) {
+					const char *value = LuaToString(l, -1, n + 1);
+					if (!strcmp(value, "meaning")) {
+						++n;
+						conjunction->Meaning = LuaToString(l, -1, n + 1);
+					} else {
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+			}
+		} else if (!strcmp(value, "numerals")) {
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				LanguageNumeral *numeral = new LanguageNumeral;
+				numeral->Word = LuaToString(l, j + 1, k + 1);
+				PlayerRaces.LanguageNumerals[civilization][k / 2] = numeral;
+				++k;
+				lua_rawgeti(l, j + 1, k + 1);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table)");
+				}
+				int subsubargs = lua_rawlen(l, -1);
+				for (int n = 0; n < subsubargs; ++n) {
+					const char *value = LuaToString(l, -1, n + 1);
+					if (!strcmp(value, "number")) {
+						++n;
+						numeral->Number = LuaToNumber(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-personal-name")) {
+						++n;
+						numeral->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-settlement-name")) {
+						++n;
+						numeral->PrefixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-province-name")) {
+						++n;
+						numeral->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-personal-name")) {
+						++n;
+						numeral->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-settlement-name")) {
+						++n;
+						numeral->SuffixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-province-name")) {
+						++n;
+						numeral->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else {
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
 				}
 			}
 		} else {
@@ -912,35 +1429,166 @@ static int CclGenerateProvinceName(lua_State *l)
 
 	std::string ProvinceName;
 	
-	if ((!PlayerRaces.ProvinceNames[civilization][0].empty() || !PlayerRaces.ProvinceNamePrefixes[civilization][0].empty())) {
+	if (
+		!PlayerRaces.ProvinceNames[civilization][0].empty()
+		|| !PlayerRaces.ProvinceNamePrefixes[civilization][0].empty()
+		|| PlayerRaces.LanguageNouns[civilization][0]
+		|| PlayerRaces.LanguageVerbs[civilization][0]
+		|| PlayerRaces.LanguageAdjectives[civilization][0]
+	) {
 		int ProvinceNameCount = 0;
+		std::string ProvinceNames[PersonalNameMax];
 		int ProvinceNamePrefixCount = 0;
+		std::string ProvinceNamePrefixes[PersonalNameMax];
 		int ProvinceNameSuffixCount = 0;
+		std::string ProvinceNameSuffixes[PersonalNameMax];
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.ProvinceNames[civilization][i].empty()) {
-				ProvinceNameCount += 1;
+			if (PlayerRaces.ProvinceNames[civilization][i].empty()) {
+				break;
 			}
+			ProvinceNames[ProvinceNameCount] = PlayerRaces.ProvinceNames[civilization][i];
+			ProvinceNameCount += 1;
 		}
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.ProvinceNamePrefixes[civilization][i].empty()) {
-				ProvinceNamePrefixCount += 1;
+			if (PlayerRaces.ProvinceNamePrefixes[civilization][i].empty()) {
+				break;
 			}
+			ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.ProvinceNamePrefixes[civilization][i];
+			ProvinceNamePrefixCount += 1;
 		}
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.ProvinceNameSuffixes[civilization][i].empty()) {
-				ProvinceNameSuffixCount += 1;
+			if (PlayerRaces.ProvinceNameSuffixes[civilization][i].empty()) {
+				break;
+			}
+			ProvinceNameSuffixes[ProvinceNameSuffixCount] = PlayerRaces.ProvinceNameSuffixes[civilization][i];
+			ProvinceNameSuffixCount += 1;
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageNouns[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->PrefixProvinceName) {
+				if (PlayerRaces.LanguageNouns[civilization][i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive
+					if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+						ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+						ProvinceNamePrefixCount += 1;
+					}
+					if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+						ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+						ProvinceNamePrefixCount += 1;
+					}
+				} else {
+					if (!PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+						ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive;
+						ProvinceNamePrefixCount += 1;
+					}
+					if (!PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+						ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
+						ProvinceNamePrefixCount += 1;
+					}
+				}
+			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->SuffixProvinceName) {
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixSingular) {
+					ProvinceNameSuffixes[ProvinceNameSuffixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					ProvinceNameSuffixCount += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixPlural) {
+					ProvinceNameSuffixes[ProvinceNameSuffixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+					ProvinceNameSuffixCount += 1;
+				}
 			}
 		}
-		if (ProvinceNameCount > 0 || ProvinceNamePrefixCount > 0) {
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageVerbs[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->PrefixProvinceName) { // only using verb participles for now; maybe should add more possibilities?
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					ProvinceNamePrefixCount += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					ProvinceNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->SuffixProvinceName) {
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					ProvinceNameSuffixes[ProvinceNameSuffixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					ProvinceNameSuffixCount += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					ProvinceNameSuffixes[ProvinceNameSuffixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					ProvinceNameSuffixCount += 1;
+				}
+			}
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixProvinceName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					ProvinceNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->SuffixProvinceName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					ProvinceNameSuffixes[ProvinceNameSuffixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					ProvinceNameSuffixCount += 1;
+				}
+			}
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageNumerals[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageNumerals[civilization][i]->PrefixProvinceName) {
+				if (!PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
+					ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNumerals[civilization][i]->Word;
+					ProvinceNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageNumerals[civilization][i]->SuffixProvinceName) {
+				if (!PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
+					ProvinceNameSuffixes[ProvinceNameSuffixCount] = PlayerRaces.LanguageNumerals[civilization][i]->Word;
+					ProvinceNameSuffixCount += 1;
+				}
+			}
+		}
+		
+		if (ProvinceNameCount > 0 || ProvinceNamePrefixCount > 0 || ProvinceNameSuffixCount > 0) {
 			int ProvinceNameProbability = ProvinceNameCount * 10000 / (ProvinceNameCount + (ProvinceNamePrefixCount * ProvinceNameSuffixCount));
 			if (SyncRand(10000) < ProvinceNameProbability) {
-				ProvinceName = PlayerRaces.ProvinceNames[civilization][SyncRand(ProvinceNameCount)];
+				ProvinceName = ProvinceNames[SyncRand(ProvinceNameCount)];
 			} else {
-				ProvinceName = PlayerRaces.ProvinceNamePrefixes[civilization][SyncRand(ProvinceNamePrefixCount)];
-				ProvinceName += PlayerRaces.ProvinceNameSuffixes[civilization][SyncRand(ProvinceNameSuffixCount)];
+				std::string prefix = ProvinceNamePrefixes[SyncRand(ProvinceNamePrefixCount)];
+				std::string suffix = ProvinceNameSuffixes[SyncRand(ProvinceNameSuffixCount)];
+				
+				if (PlayerRaces.RequiresPlural(prefix, civilization)) {
+					suffix = PlayerRaces.GetPluralForm(suffix, civilization);
+				}
+				
+				suffix[0] = tolower(suffix[0]);
+				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
+				}
+				if (prefix.substr(prefix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
+					prefix = FindAndReplaceStringEnding(prefix, "s", "");
+				}
+				ProvinceName = prefix;
+				ProvinceName += suffix;
 			}
 		}
 	}
+	
+	ProvinceName = TransliterateText(ProvinceName);
 	
 	lua_pushstring(l, ProvinceName.c_str());
 	return 1;
@@ -959,37 +1607,212 @@ static int CclGenerateSettlementName(lua_State *l)
 
 	std::string SettlementName;
 	
-	if ((!PlayerRaces.SettlementNames[civilization][0].empty() || !PlayerRaces.SettlementNamePrefixes[civilization][0].empty())) {
+	if (
+		!PlayerRaces.SettlementNames[civilization][0].empty()
+		|| !PlayerRaces.SettlementNamePrefixes[civilization][0].empty()
+		|| PlayerRaces.LanguageNouns[civilization][0]
+		|| PlayerRaces.LanguageVerbs[civilization][0]
+		|| PlayerRaces.LanguageAdjectives[civilization][0]
+	) {
 		int SettlementNameCount = 0;
+		std::string SettlementNames[PersonalNameMax];
 		int SettlementNamePrefixCount = 0;
+		std::string SettlementNamePrefixes[PersonalNameMax];
 		int SettlementNameSuffixCount = 0;
+		std::string SettlementNameSuffixes[PersonalNameMax];
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.SettlementNames[civilization][i].empty()) {
-				SettlementNameCount += 1;
+			if (PlayerRaces.SettlementNames[civilization][i].empty()) {
+				break;
 			}
+			SettlementNames[SettlementNameCount] = PlayerRaces.SettlementNames[civilization][i];
+			SettlementNameCount += 1;
 		}
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.SettlementNamePrefixes[civilization][i].empty()) {
-				SettlementNamePrefixCount += 1;
+			if (PlayerRaces.SettlementNamePrefixes[civilization][i].empty()) {
+				break;
 			}
+			SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.SettlementNamePrefixes[civilization][i];
+			SettlementNamePrefixCount += 1;
 		}
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.SettlementNameSuffixes[civilization][i].empty()) {
-				SettlementNameSuffixCount += 1;
+			if (PlayerRaces.SettlementNameSuffixes[civilization][i].empty()) {
+				break;
+			}
+			SettlementNameSuffixes[SettlementNameSuffixCount] = PlayerRaces.SettlementNameSuffixes[civilization][i];
+			SettlementNameSuffixCount += 1;
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageNouns[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->PrefixSettlementName) {
+				if (PlayerRaces.LanguageNouns[civilization][i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive
+					if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+						SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+						SettlementNamePrefixCount += 1;
+					}
+					if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+						SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+						SettlementNamePrefixCount += 1;
+					}
+				} else {
+					if (!PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+						SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive;
+						SettlementNamePrefixCount += 1;
+					}
+					if (!PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+						SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
+						SettlementNamePrefixCount += 1;
+					}
+				}
+			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->SuffixSettlementName) {
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixSingular) {
+					SettlementNameSuffixes[SettlementNameSuffixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					SettlementNameSuffixCount += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixPlural) {
+					SettlementNameSuffixes[SettlementNameSuffixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+					SettlementNameSuffixCount += 1;
+				}
 			}
 		}
-		if (SettlementNameCount > 0 || SettlementNamePrefixCount > 0) {
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageVerbs[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->PrefixSettlementName) { // only using verb participles for now; maybe should add more possibilities?
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					SettlementNamePrefixCount += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					SettlementNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->SuffixSettlementName) {
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					SettlementNameSuffixes[SettlementNameSuffixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					SettlementNameSuffixCount += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					SettlementNameSuffixes[SettlementNameSuffixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					SettlementNameSuffixCount += 1;
+				}
+			}
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixSettlementName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					SettlementNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->SuffixSettlementName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					SettlementNameSuffixes[SettlementNameSuffixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					SettlementNameSuffixCount += 1;
+				}
+			}
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageNumerals[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageNumerals[civilization][i]->PrefixSettlementName) {
+				if (!PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
+					SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNumerals[civilization][i]->Word;
+					SettlementNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageNumerals[civilization][i]->SuffixSettlementName) {
+				if (!PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
+					SettlementNameSuffixes[SettlementNameSuffixCount] = PlayerRaces.LanguageNumerals[civilization][i]->Word;
+					SettlementNameSuffixCount += 1;
+				}
+			}
+		}
+		
+		if (SettlementNameCount > 0 || SettlementNamePrefixCount > 0 || SettlementNameSuffixCount > 0) {
 			int SettlementNameProbability = SettlementNameCount * 10000 / (SettlementNameCount + (SettlementNamePrefixCount * SettlementNameSuffixCount));
 			if (SyncRand(10000) < SettlementNameProbability) {
-				SettlementName = PlayerRaces.SettlementNames[civilization][SyncRand(SettlementNameCount)];
+				SettlementName = SettlementNames[SyncRand(SettlementNameCount)];
 			} else {
-				SettlementName = PlayerRaces.SettlementNamePrefixes[civilization][SyncRand(SettlementNamePrefixCount)];
-				SettlementName += PlayerRaces.SettlementNameSuffixes[civilization][SyncRand(SettlementNameSuffixCount)];
+				std::string prefix = SettlementNamePrefixes[SyncRand(SettlementNamePrefixCount)];
+				std::string suffix = SettlementNameSuffixes[SyncRand(SettlementNameSuffixCount)];
+				
+				if (PlayerRaces.RequiresPlural(prefix, civilization)) {
+					suffix = PlayerRaces.GetPluralForm(suffix, civilization);
+				}
+				
+				suffix[0] = tolower(suffix[0]);
+				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
+				}
+				if (prefix.substr(prefix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
+					prefix = FindAndReplaceStringEnding(prefix, "s", "");
+				}
+				SettlementName = prefix;
+				SettlementName += suffix;
 			}
 		}
 	}
 	
+	SettlementName = TransliterateText(SettlementName);
+	
 	lua_pushstring(l, SettlementName.c_str());
+	return 1;
+}
+
+/**
+**  "Translate" (that is, adapt) a province name from one culture (civilization) to another.
+**
+**  @param l  Lua state.
+*/
+static int CclTranslateProvinceName(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	std::string province_name = LuaToString(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
+	
+	std::string new_province_name;
+
+	// try to translate the entire name, as a particular translation for it may exist
+	if (!PlayerRaces.ProvinceNameTranslations[civilization][0][0].empty()) {
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.ProvinceNameTranslations[civilization][i][0].empty() && PlayerRaces.ProvinceNameTranslations[civilization][i][0] == province_name) {
+				new_province_name = PlayerRaces.ProvinceNameTranslations[civilization][i][1];
+				lua_pushstring(l, new_province_name.c_str());
+				return 1;
+			}
+		}
+	}
+	
+	//if adapting the entire name failed, try to match prefixes and suffixes
+	if (!PlayerRaces.ProvinceNamePrefixTranslations[civilization][0][0].empty() && !PlayerRaces.ProvinceNameSuffixTranslations[civilization][0][0].empty()) {
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][0].empty() && PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][0] == province_name.substr(0, PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][0].size())) {
+				for (int j = 0; j < PersonalNameMax; ++j) {
+					if (!PlayerRaces.ProvinceNameSuffixTranslations[civilization][j][0].empty() && PlayerRaces.ProvinceNameSuffixTranslations[civilization][j][0] == province_name.substr(PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][0].size(), PlayerRaces.ProvinceNameSuffixTranslations[civilization][j][0].size())) {
+						new_province_name = PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][1];
+						new_province_name += PlayerRaces.ProvinceNameSuffixTranslations[civilization][j][1];
+						lua_pushstring(l, new_province_name.c_str());
+						return 1;
+					}
+				}
+			}
+		}
+	}
+	
+	lua_pushstring(l, new_province_name.c_str());
 	return 1;
 }
 
@@ -1006,6 +1829,18 @@ static int CclTranslateSettlementName(lua_State *l)
 	
 	std::string new_settlement_name;
 
+	// try to translate the entire name, as a particular translation for it may exist
+	if (!PlayerRaces.SettlementNameTranslations[civilization][0][0].empty()) {
+		for (int i = 0; i < PersonalNameMax; ++i) {
+			if (!PlayerRaces.SettlementNameTranslations[civilization][i][0].empty() && PlayerRaces.SettlementNameTranslations[civilization][i][0] == settlement_name) {
+				new_settlement_name = PlayerRaces.SettlementNameTranslations[civilization][i][1];
+				lua_pushstring(l, new_settlement_name.c_str());
+				return 1;
+			}
+		}
+	}
+	
+	//if adapting the entire name failed, try to match prefixes and suffixes
 	if (!PlayerRaces.SettlementNamePrefixTranslations[civilization][0][0].empty() && !PlayerRaces.SettlementNameSuffixTranslations[civilization][0][0].empty()) {
 		for (int i = 0; i < PersonalNameMax; ++i) {
 			if (!PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0].empty() && PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0] == settlement_name.substr(0, PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0].size())) {
@@ -1588,11 +2423,13 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
 	//Wyrmgus start
 	lua_register(Lua, "DefineNewRaceNames", CclDefineNewRaceNames);
+	lua_register(Lua, "DefineCivilizationLanguage", CclDefineCivilizationLanguage);
 	lua_register(Lua, "IsCivilizationPlayable", CclIsCivilizationPlayable);
 	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
 	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
 	lua_register(Lua, "GenerateProvinceName", CclGenerateProvinceName);
 	lua_register(Lua, "GenerateSettlementName", CclGenerateSettlementName);
+	lua_register(Lua, "TranslateProvinceName", CclTranslateProvinceName);
 	lua_register(Lua, "TranslateSettlementName", CclTranslateSettlementName);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);

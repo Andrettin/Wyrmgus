@@ -146,4 +146,10 @@ int UTF8GetPrev(const std::string &text, int curpos);
 
 //@}
 
+//Wyrmgus start
+extern std::string FindAndReplaceString(std::string text, const std::string& find, const std::string& replace);
+extern std::string FindAndReplaceStringEnding(std::string text, const std::string& find, const std::string& replace);
+extern std::string TransliterateText(std::string text);				/// Convert special characters into ones more legible for English-speakers
+//Wyrmgus end
+
 #endif /* __UTIL_H__ */

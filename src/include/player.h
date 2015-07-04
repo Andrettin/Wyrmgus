@@ -248,6 +248,188 @@ private:
 	unsigned int SharedVision;  /// shared vision bit field
 };
 
+//Wyrmgus start
+class LanguageNoun
+{
+public:
+	LanguageNoun() : Word(""),
+		Meaning(""), Verb(""), Adjective(""),
+		SingularNominative(""), SingularAccusative(""), SingularDative(""), SingularGenitive(""),
+		PluralNominative(""), PluralAccusative(""), PluralDative(""), PluralGenitive(""),
+		Gender(""),
+		Uncountable(false),
+		PrefixSingular(false), PrefixPlural(false),
+		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
+		SuffixSingular(false), SuffixPlural(false),
+		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
+		
+	{
+	}
+
+	std::string Word;				/// Word name / ID.
+	std::string Meaning;			/// Meaning of the word in English.
+	std::string Verb;				/// Equivalent verb, if any.
+	std::string Adjective;			/// Equivalent adjective, if any.
+	std::string SingularNominative;
+	std::string SingularAccusative;
+	std::string SingularDative;
+	std::string SingularGenitive;
+	std::string PluralNominative;
+	std::string PluralAccusative;
+	std::string PluralDative;
+	std::string PluralGenitive;
+	std::string Gender;				/// What is the gender of the noun (Male, Female or Neutral)
+	bool Uncountable;				/// Whether the noun is uncountable or not.
+	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
+	bool PrefixPlural;				/// Whether the noun's plural form can be used as a prefix
+	bool PrefixPersonalName;		/// Whether the noun can be used as a prefix for personal names
+	bool PrefixSettlementName;		/// Whether the noun can be used as a prefix for settlement names
+	bool PrefixProvinceName;		/// Whether the noun can be used as a prefix for province names
+	bool SuffixSingular;			/// Whether the noun's singular form can be used as a suffix
+	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
+	bool SuffixPersonalName;		/// Whether the noun can be used as a suffix for personal names
+	bool SuffixSettlementName;		/// Whether the noun can be used as a suffix for settlement names
+	bool SuffixProvinceName;		/// Whether the noun can be used as a suffix for province names
+};
+
+class LanguageVerb
+{
+public:
+	LanguageVerb() : Word(""),
+		Meaning(""), Noun(""), Adjective(""),
+		Infinitive(""),
+		SingularFirstPersonPresent(""), SingularSecondPersonPresent(""), SingularThirdPersonPresent(""),
+		PluralFirstPersonPresent(""), PluralSecondPersonPresent(""), PluralThirdPersonPresent(""),
+		SingularFirstPersonPast(""), SingularSecondPersonPast(""), SingularThirdPersonPast(""),
+		PluralFirstPersonPast(""), PluralSecondPersonPast(""), PluralThirdPersonPast(""),
+		SingularFirstPersonFuture(""), SingularSecondPersonFuture(""), SingularThirdPersonFuture(""),
+		PluralFirstPersonFuture(""), PluralSecondPersonFuture(""), PluralThirdPersonFuture(""),
+		ParticiplePresent(""), ParticiplePast(""),
+		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
+		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
+	{
+	}
+
+	std::string Word;								/// Word name / ID.
+	std::string Meaning;							/// Meaning of the word in English.
+	std::string Noun;								/// Equivalent noun, if any.
+	std::string Adjective;							/// Equivalent adjective, if any.
+	std::string Infinitive;
+	std::string SingularFirstPersonPresent;
+	std::string SingularSecondPersonPresent;
+	std::string SingularThirdPersonPresent;
+	std::string PluralFirstPersonPresent;
+	std::string PluralSecondPersonPresent;
+	std::string PluralThirdPersonPresent;
+	std::string SingularFirstPersonPast;
+	std::string SingularSecondPersonPast;
+	std::string SingularThirdPersonPast;
+	std::string PluralFirstPersonPast;
+	std::string PluralSecondPersonPast;
+	std::string PluralThirdPersonPast;
+	std::string SingularFirstPersonFuture;
+	std::string SingularSecondPersonFuture;
+	std::string SingularThirdPersonFuture;
+	std::string PluralFirstPersonFuture;
+	std::string PluralSecondPersonFuture;
+	std::string PluralThirdPersonFuture;
+	std::string ParticiplePresent;
+	std::string ParticiplePast;
+	bool PrefixPersonalName;		/// Whether the verb can be used as a prefix for personal names
+	bool PrefixSettlementName;		/// Whether the verb can be used as a prefix for settlement names
+	bool PrefixProvinceName;		/// Whether the verb can be used as a prefix for province names
+	bool SuffixPersonalName;		/// Whether the verb can be used as a suffix for personal names
+	bool SuffixSettlementName;		/// Whether the verb can be used as a suffix for settlement names
+	bool SuffixProvinceName;		/// Whether the verb can be used as a suffix for province names
+};
+
+class LanguageAdjective
+{
+public:
+	LanguageAdjective() : Word(""),
+		Meaning(""), Noun(""), Verb(""),
+		Comparative(""),
+		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
+		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
+	{
+	}
+
+	std::string Word;				/// Word name / ID.
+	std::string Meaning;			/// Meaning of the word in English.
+	std::string Noun;				/// Equivalent noun, if any.
+	std::string Verb;				/// Equivalent verb, if any.
+	std::string Comparative;		/// Comparative form of the adjective.
+	bool PrefixPersonalName;		/// Whether the adjective can be used as a prefix for personal names
+	bool PrefixSettlementName;		/// Whether the adjective can be used as a prefix for settlement names
+	bool PrefixProvinceName;		/// Whether the adjective can be used as a prefix for province names
+	bool SuffixPersonalName;		/// Whether the adjective can be used as a suffix for personal names
+	bool SuffixSettlementName;		/// Whether the adjective can be used as a suffix for settlement names
+	bool SuffixProvinceName;		/// Whether the adjective can be used as a suffix for province names
+};
+
+class LanguagePronoun
+{
+public:
+	LanguagePronoun() : Word(""),
+		Meaning(""),
+		Nominative(""), Accusative(""), Dative(""), Genitive("")
+	{
+	}
+
+	std::string Word;				/// Word name / ID.
+	std::string Meaning;			/// Meaning of the word in English.
+	std::string Nominative;			/// Nominative case for the pronoun (if any)
+	std::string Accusative;			/// Accusative case for the pronoun (if any)
+	std::string Dative;				/// Dative case for the pronoun (if any)
+	std::string Genitive;			/// Genitive case for the pronoun (if any)
+};
+
+class LanguageAdverb
+{
+public:
+	LanguageAdverb() : Word(""),
+		Meaning(""), Adjective("")
+	{
+	}
+
+	std::string Word;				/// Word name / ID.
+	std::string Meaning;			/// Meaning of the word in English.
+	std::string Adjective;			/// Equivalent adjective, if any (i.e. "beautifully"'s equivalent adjective would be "beautiful".
+};
+
+class LanguageConjunction
+{
+public:
+	LanguageConjunction() : Word(""),
+		Meaning("")
+	{
+	}
+
+	std::string Word;				/// Word name / ID.
+	std::string Meaning;			/// Meaning of the word in English.
+};
+
+class LanguageNumeral
+{
+public:
+	LanguageNumeral() : Word(""),
+		Number(-1),
+		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
+		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
+	{
+	}
+
+	std::string Word;				/// Word name / ID.
+	int Number;
+	bool PrefixPersonalName;		/// Whether the adjective can be used as a prefix for personal names
+	bool PrefixSettlementName;		/// Whether the adjective can be used as a prefix for settlement names
+	bool PrefixProvinceName;		/// Whether the adjective can be used as a prefix for province names
+	bool SuffixPersonalName;		/// Whether the adjective can be used as a suffix for personal names
+	bool SuffixSettlementName;		/// Whether the adjective can be used as a suffix for settlement names
+	bool SuffixProvinceName;		/// Whether the adjective can be used as a suffix for province names
+};
+//Wyrmgus end
+
 /**
 **  Races for the player
 **  Mapped with #PlayerRaces to a symbolic name.
@@ -265,6 +447,10 @@ public:
 
 	void Clean();
 	int GetRaceIndexByName(const char *raceName) const;
+	//Wyrmgus start
+	bool RequiresPlural(std::string word, int civilization) const;
+	std::string GetPluralForm(std::string word, int civilization) const;
+	//Wyrmgus end
 
 public:
 	bool Visible[MAX_RACES];        /// race should be visible in pulldown
@@ -288,8 +474,19 @@ public:
 	std::string SettlementNames[MAX_RACES][PersonalNameMax];			/// settlement names
 	std::string SettlementNamePrefixes[MAX_RACES][PersonalNameMax];		/// settlement name prefixes
 	std::string SettlementNameSuffixes[MAX_RACES][PersonalNameMax];		/// settlement name suffixes
+	std::string SettlementNameTranslations[MAX_RACES][PersonalNameMax][2];	/// settlement name translations (2 values: one for the name to be translated, and another for the translation)
 	std::string SettlementNamePrefixTranslations[MAX_RACES][PersonalNameMax][2];	/// settlement name prefix translations (2 values: one for the prefix to be translated, and another for the translation)
 	std::string SettlementNameSuffixTranslations[MAX_RACES][PersonalNameMax][2];	/// settlement name suffix translations (2 values: one for the prefix to be translated, and another for the translation)
+	std::string ProvinceNameTranslations[MAX_RACES][PersonalNameMax][2];	/// province name translations (2 values: one for the name to be translated, and another for the translation)
+	std::string ProvinceNamePrefixTranslations[MAX_RACES][PersonalNameMax][2];	/// province name prefix translations (2 values: one for the prefix to be translated, and another for the translation)
+	std::string ProvinceNameSuffixTranslations[MAX_RACES][PersonalNameMax][2];	/// province name suffix translations (2 values: one for the prefix to be translated, and another for the translation)
+	LanguageNoun *LanguageNouns[MAX_RACES][LanguageWordMax];				/// nouns of the civilization's language
+	LanguageVerb *LanguageVerbs[MAX_RACES][LanguageWordMax];				/// verbs of the civilization's language
+	LanguageAdjective *LanguageAdjectives[MAX_RACES][LanguageWordMax];		/// adjectives of the civilization's language
+	LanguagePronoun *LanguagePronouns[MAX_RACES][LanguageWordMax];			/// pronouns of the civilization's language
+	LanguageAdverb *LanguageAdverbs[MAX_RACES][LanguageWordMax];			/// adverbs of the civilization's language
+	LanguageConjunction *LanguageConjunctions[MAX_RACES][LanguageWordMax];	/// conjunctions of the civilization's language
+	LanguageNumeral *LanguageNumerals[MAX_RACES][LanguageWordMax];			/// numerals of the civilization's language
 	//Wyrmgus end
 	unsigned int Count;             /// number of races
 };

@@ -66,6 +66,9 @@
 #include "unit_manager.h"
 #include "unitsound.h"
 #include "unittype.h"
+//Wyrmgus start
+#include "util.h"
+//Wyrmgus end
 #include "video.h"
 //Wyrmgus start
 #include "upgrade.h"
@@ -499,6 +502,7 @@ void CUnit::Init()
 void CUnit::GeneratePersonalName()
 {
 	const CUnitType &type = *Type;
+	int civilization = PlayerRaces.GetRaceIndexByName(type.Civilization.c_str());
 
 	if (!type.DefaultName.empty() || Editor.Running == EditorEditing) { // always set the personal name to the default name if in the editor
 		Name = type.DefaultName;
@@ -530,35 +534,129 @@ void CUnit::GeneratePersonalName()
 				Name += type.PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
 			}
 		}
-	} else if (type.BoolFlag[ORGANIC_INDEX].value && !type.Civilization.empty() && (!PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty() || !PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][0].empty())) {
+	} else if (
+		type.BoolFlag[ORGANIC_INDEX].value
+		&& !type.Civilization.empty()
+		&& (
+			!PlayerRaces.PersonalNames[civilization][0].empty()
+			|| !PlayerRaces.PersonalNamePrefixes[civilization][0].empty()
+			|| PlayerRaces.LanguageNouns[civilization][0]
+			|| PlayerRaces.LanguageVerbs[civilization][0]
+			|| PlayerRaces.LanguageAdjectives[civilization][0]
+		)
+	) {
 		int PersonalNameCount = 0;
+		std::string PersonalNames[PersonalNameMax];
 		int PersonalNamePrefixCount = 0;
+		std::string PersonalNamePrefixes[PersonalNameMax];
 		int PersonalNameSuffixCount = 0;
+		std::string PersonalNameSuffixes[PersonalNameMax];
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
-				PersonalNameCount += 1;
+			if (PlayerRaces.PersonalNames[civilization][i].empty()) {
+				break;
 			}
+			PersonalNames[PersonalNameCount] = PlayerRaces.PersonalNames[civilization][i];
+			PersonalNameCount += 1;
 		}
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
-				PersonalNamePrefixCount += 1;
+			if (PlayerRaces.PersonalNamePrefixes[civilization][i].empty()) {
+				break;
 			}
+			PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.PersonalNamePrefixes[civilization][i];
+			PersonalNamePrefixCount += 1;
 		}
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.PersonalNameSuffixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][i].empty()) {
-				PersonalNameSuffixCount += 1;
+			if (PlayerRaces.PersonalNameSuffixes[civilization][i].empty()) {
+				break;
+			}
+			PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.PersonalNameSuffixes[civilization][i];
+			PersonalNameSuffixCount += 1;
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageNouns[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->PrefixPersonalName) {
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative; //using the nominative, is it always the best choice?
+					PersonalNamePrefixCount += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+					PersonalNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->SuffixPersonalName) {
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixSingular) {
+					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					PersonalNameSuffixCount += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixPlural) {
+					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+					PersonalNameSuffixCount += 1;
+				}
 			}
 		}
-		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0) {
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageVerbs[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->PrefixPersonalName) { // only using verb participles for now; maybe should add more possibilities?
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					PersonalNamePrefixCount += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					PersonalNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->SuffixPersonalName) {
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					PersonalNameSuffixCount += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					PersonalNameSuffixCount += 1;
+				}
+			}
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixPersonalName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					PersonalNamePrefixCount += 1;
+				}
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->SuffixPersonalName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					PersonalNameSuffixCount += 1;
+				}
+			}
+		}
+		
+		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0 || PersonalNameSuffixCount > 0) {
 			int PersonalNameProbability = PersonalNameCount * 10000 / (PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount));
 			if (SyncRand(10000) < PersonalNameProbability) {
-				Name = PlayerRaces.PersonalNames[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNameCount)];
+				Name = PersonalNames[SyncRand(PersonalNameCount)];
 			} else {
-				Name = PlayerRaces.PersonalNamePrefixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNamePrefixCount)];
-				Name += PlayerRaces.PersonalNameSuffixes[PlayerRaces.GetRaceIndexByName(type.Civilization.c_str())][SyncRand(PersonalNameSuffixCount)];
+				Name = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
+				std::string suffix = PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
+				suffix[0] = tolower(suffix[0]);
+				Name += suffix;
 			}
 		}
 	}
+	
+	Name = TransliterateText(Name);
 }
 //Wyrmgus end
 

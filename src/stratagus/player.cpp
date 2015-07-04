@@ -369,8 +369,32 @@ void PlayerRace::Clean()
 			this->SettlementNamePrefixes[i][j].clear();
 			this->SettlementNameSuffixes[i][j].clear();
 			for (unsigned int k = 0; k < 2; ++k) {
+				this->SettlementNameTranslations[i][j][k].clear();
 				this->SettlementNamePrefixTranslations[i][j][k].clear();
 				this->SettlementNameSuffixTranslations[i][j][k].clear();
+			}
+		}
+		for (int j = 0; j < LanguageWordMax; ++j) {
+			if (this->LanguageNouns[i][j]) {
+				delete this->LanguageNouns[i][j];
+			}
+			if (this->LanguageVerbs[i][j]) {
+				delete this->LanguageVerbs[i][j];
+			}
+			if (this->LanguageAdjectives[i][j]) {
+				delete this->LanguageAdjectives[i][j];
+			}
+			if (this->LanguagePronouns[i][j]) {
+				delete this->LanguagePronouns[i][j];
+			}
+			if (this->LanguageAdverbs[i][j]) {
+				delete this->LanguageAdverbs[i][j];
+			}
+			if (this->LanguageConjunctions[i][j]) {
+				delete this->LanguageConjunctions[i][j];
+			}
+			if (this->LanguageNumerals[i][j]) {
+				delete this->LanguageNumerals[i][j];
 			}
 		}
 		//Wyrmgus end
@@ -388,6 +412,89 @@ int PlayerRace::GetRaceIndexByName(const char *raceName) const
 	return -1;
 }
 
+//Wyrmgus start
+bool PlayerRace::RequiresPlural(std::string word, int civilization) const
+{
+	for (int i = 0; i < LanguageWordMax; ++i) {
+		if (!PlayerRaces.LanguageNumerals[civilization][i]) { //we only need to check numerals, as other sorts of words don't require plural
+			break;
+		}
+		if (!PlayerRaces.LanguageNumerals[civilization][i]->Word.empty() && PlayerRaces.LanguageNumerals[civilization][i]->Word == word) {
+			if (PlayerRaces.LanguageNumerals[civilization][i]->Number > 1) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	return false;
+}
+
+std::string PlayerRace::GetPluralForm(std::string word, int civilization) const
+{
+	Assert(!word.empty());
+	if (word.empty()) { //why is an empty word being used as an argument?
+		return word;
+	}
+	
+	for (int i = 0; i < LanguageWordMax; ++i) {
+		if (!PlayerRaces.LanguageNouns[civilization][i]) {
+			break;
+		}
+		if (PlayerRaces.LanguageNouns[civilization][i]->SingularNominative == word && !PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty()) {
+			return PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->SingularAccusative == word && !PlayerRaces.LanguageNouns[civilization][i]->PluralAccusative.empty()) {
+			return PlayerRaces.LanguageNouns[civilization][i]->PluralAccusative;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->SingularDative == word && !PlayerRaces.LanguageNouns[civilization][i]->PluralDative.empty()) {
+			return PlayerRaces.LanguageNouns[civilization][i]->PluralDative;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive == word && !PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty()) {
+			return PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
+		// check if the word isn't already a plural one, and if so, just return it back
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->PluralNominative == word) {
+			return word;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->PluralAccusative == word) {
+			return word;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->PluralDative == word) {
+			return word;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive == word) {
+			return word;
+		}
+	}
+	
+	for (int i = 0; i < LanguageWordMax; ++i) {
+		if (!PlayerRaces.LanguageVerbs[civilization][i]) {
+			break;
+		}
+		// if is a participle, just return the word back
+		if (PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent == word) {
+			return word;
+		} else if (PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast == word) {
+			return word;
+		}
+	}
+	
+	for (int i = 0; i < LanguageWordMax; ++i) {
+		if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
+			break;
+		}
+		// if is an adjective, just return the word back
+		if (PlayerRaces.LanguageAdjectives[civilization][i]->Word == word) {
+			return word;
+		}
+	}
+	
+	for (int i = 0; i < LanguageWordMax; ++i) {
+		if (!PlayerRaces.LanguageNumerals[civilization][i]) {
+			break;
+		}
+		if (PlayerRaces.LanguageNumerals[civilization][i]->Word == word) {
+			return word; // for numerals, just return the original word
+		}
+	}
+	
+	return word;
+}
+//Wyrmgus end
 
 /**
 **  Init players.
