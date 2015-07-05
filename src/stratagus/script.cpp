@@ -2599,6 +2599,54 @@ void LoadCcl(const std::string &filename)
 
 //Wyrmgus start
 //Grand Strategy elements
+
+/**
+**  Define the world map terrain types
+**
+**  @param l  Lua state.
+*/
+static int CclDefineWorldMapTerrainTypes(lua_State *l)
+{
+	int args = lua_gettop(l);
+	for (int j = 0; j < args; ++j) {
+		const char *value = LuaToString(l, j + 1);
+		if (!strcmp(value, "terrain-type")) {
+			WorldMapTerrainType *terrain_type = new WorldMapTerrainType;
+			GrandStrategy.TerrainTypes[j / 2] = terrain_type;
+			++j;
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, j + 1, k + 1);
+				if (!strcmp(value, "name")) {
+					++k;
+					GrandStrategy.TerrainTypes[(j - 1) / 2]->Name = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "tag")) {
+					++k;
+					GrandStrategy.TerrainTypes[(j - 1) / 2]->Tag = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "has-transitions")) {
+					++k;
+					GrandStrategy.TerrainTypes[(j - 1) / 2]->HasTransitions = LuaToBoolean(l, j + 1, k + 1);
+				} else if (!strcmp(value, "base-tile")) {
+					++k;
+					GrandStrategy.TerrainTypes[(j - 1) / 2]->BaseTile = GetWorldMapTerrainTypeId(LuaToString(l, j + 1, k + 1));
+				} else if (!strcmp(value, "variations")) {
+					++k;
+					GrandStrategy.TerrainTypes[(j - 1) / 2]->Variations = LuaToNumber(l, j + 1, k + 1);
+				} else {
+					LuaError(l, "Unsupported tag: %s" _C_ value);
+				}
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+
+	return 0;
+}
+
 /**
 **  Set the terrain of the world map tiles
 **
@@ -2622,21 +2670,23 @@ static int CclSetWorldMapTerrain(lua_State *l)
 		for (int j = 0; j < subargs; ++j) {
 			const char *value = LuaToString(l, -1, j + 1);
 			if (!strcmp(value, "Plns")) {
-				SetWorldMapTileTerrain(j, i, "Plains");
+				SetWorldMapTileTerrain(j, i, GetWorldMapTerrainTypeId("Plains"));
 			} else if (!strcmp(value, "DkPl")) {
-				SetWorldMapTileTerrain(j, i, "Dark Plains");
+				SetWorldMapTileTerrain(j, i, GetWorldMapTerrainTypeId("Dark Plains"));
 			} else if (!strcmp(value, "CnFr")) {
-				SetWorldMapTileTerrain(j, i, "Conifer Forest");
+				SetWorldMapTileTerrain(j, i, GetWorldMapTerrainTypeId("Conifer Forest"));
 			} else if (!strcmp(value, "ScFr")) {
-				SetWorldMapTileTerrain(j, i, "Scrub Forest");
+				SetWorldMapTileTerrain(j, i, GetWorldMapTerrainTypeId("Scrub Forest"));
 			} else if (!strcmp(value, "Hill")) {
-				SetWorldMapTileTerrain(j, i, "Hills");
+				SetWorldMapTileTerrain(j, i, GetWorldMapTerrainTypeId("Hills"));
 			} else if (!strcmp(value, "Mntn")) {
-				SetWorldMapTileTerrain(j, i, "Mountains");
+				SetWorldMapTileTerrain(j, i, GetWorldMapTerrainTypeId("Mountains"));
 			} else if (!strcmp(value, "Watr")) {
-				SetWorldMapTileTerrain(j, i, "Water");
+				SetWorldMapTileTerrain(j, i, GetWorldMapTerrainTypeId("Water"));
+			} else if (!strcmp(value, "")) {
+				SetWorldMapTileTerrain(j, i, -1);
 			} else {
-				SetWorldMapTileTerrain(j, i, value);
+				LuaError(l, "Unsupported tag: %s" _C_ value);
 			}
 		}
 	}
@@ -2667,6 +2717,7 @@ void ScriptRegister()
 	
 	//Wyrmgus start
 	lua_register(Lua, "SetWorldMapTerrain", CclSetWorldMapTerrain);
+	lua_register(Lua, "DefineWorldMapTerrainTypes", CclDefineWorldMapTerrainTypes);
 	//Wyrmgus end
 }
 

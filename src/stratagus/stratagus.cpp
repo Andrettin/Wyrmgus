@@ -825,6 +825,12 @@ void GrandStrategyGame::Clean()
 	}
 	this->WorldMapWidth = 0;
 	this->WorldMapHeight = 0;
+	
+	for (int i = 0; i < WorldMapTerrainTypeMax; ++i) {
+		if (this->TerrainTypes[i]) {
+			delete this->TerrainTypes[i];
+		}
+	}
 }
 
 /**
@@ -848,30 +854,19 @@ int GetWorldMapHeight()
 */
 std::string GetWorldMapTileTerrain(int x, int y)
 {
-//	Assert(GrandStrategy.WorldMapTiles[x][y]);
-//	Assert(!GrandStrategy.WorldMapTiles[x][y]->Terrain.empty());
 	
-	if (x >= 0 && x < GrandStrategy.WorldMapWidth && y >= 0 && y < GrandStrategy.WorldMapHeight) {
-		return GrandStrategy.WorldMapTiles[x][y]->Terrain;
-	} else if (x < 0 && y >= 0 && y < GrandStrategy.WorldMapHeight) {
-		return GrandStrategy.WorldMapTiles[0][y]->Terrain;
-	} else if (x >= GrandStrategy.WorldMapWidth && y >= 0 && y < GrandStrategy.WorldMapHeight) {
-		return GrandStrategy.WorldMapTiles[GrandStrategy.WorldMapWidth - 1][y]->Terrain;
-	} else if (x >= 0 && x < GrandStrategy.WorldMapWidth && y < 0) {
-		return GrandStrategy.WorldMapTiles[x][0]->Terrain;
-	} else if (x >= 0 && x < GrandStrategy.WorldMapWidth && y >= GrandStrategy.WorldMapHeight) {
-		return GrandStrategy.WorldMapTiles[x][GrandStrategy.WorldMapHeight - 1]->Terrain;
-	} else if (x < 0 && y < 0) {
-		return GrandStrategy.WorldMapTiles[0][0]->Terrain;
-	} else if (x >= GrandStrategy.WorldMapWidth && y < 0) {
-		return GrandStrategy.WorldMapTiles[GrandStrategy.WorldMapWidth - 1][0]->Terrain;
-	} else if (x < 0 && y >= GrandStrategy.WorldMapHeight) {
-		return GrandStrategy.WorldMapTiles[0][GrandStrategy.WorldMapHeight - 1]->Terrain;
-	} else if (x >= GrandStrategy.WorldMapWidth && y >= GrandStrategy.WorldMapHeight) {
-		return GrandStrategy.WorldMapTiles[GrandStrategy.WorldMapWidth - 1][GrandStrategy.WorldMapHeight - 1]->Terrain;
-	} else {
+	clamp(&x, 0, GrandStrategy.WorldMapWidth);
+	clamp(&y, 0, GrandStrategy.WorldMapHeight);
+
+	Assert(GrandStrategy.WorldMapTiles[x][y]);
+	
+	if (GrandStrategy.WorldMapTiles[x][y]->Terrain == -1) {
 		return "";
 	}
+	
+	Assert(GrandStrategy.WorldMapTiles[x][y]->Terrain != -1);
+
+	return GrandStrategy.TerrainTypes[GrandStrategy.WorldMapTiles[x][y]->Terrain]->Name;
 }
 
 /**
@@ -880,10 +875,27 @@ std::string GetWorldMapTileTerrain(int x, int y)
 int GetWorldMapTileTerrainVariation(int x, int y)
 {
 	Assert(GrandStrategy.WorldMapTiles[x][y]);
-	Assert(!GrandStrategy.WorldMapTiles[x][y]->Terrain.empty());
+	Assert(GrandStrategy.WorldMapTiles[x][y]->Terrain != -1);
 	Assert(GrandStrategy.WorldMapTiles[x][y]->Variation != -1);
 	
 	return GrandStrategy.WorldMapTiles[x][y]->Variation + 1;
+}
+
+/**
+**  Get the ID of a world map terrain type
+*/
+int GetWorldMapTerrainTypeId(std::string terrain_type_name)
+{
+	for (int i = 0; i < WorldMapTerrainTypeMax; ++i) {
+		if (!GrandStrategy.TerrainTypes[i]) {
+			break;
+		}
+		
+		if (GrandStrategy.TerrainTypes[i]->Name == terrain_type_name) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 /**
@@ -910,7 +922,7 @@ void SetWorldMapSize(int width, int height)
 /**
 **  Set the terrain type of a world map tile.
 */
-void SetWorldMapTileTerrain(int x, int y, std::string terrain)
+void SetWorldMapTileTerrain(int x, int y, int terrain)
 {
 //	Assert(GrandStrategy.WorldMapTile[x][y]);
 //	Assert(!GrandStrategy.WorldMapTile[x][y]->Terrain.empty());
@@ -922,15 +934,11 @@ void SetWorldMapTileTerrain(int x, int y, std::string terrain)
 	
 	GrandStrategy.WorldMapTiles[x][y]->Terrain = terrain;
 	
-	//randomly select a variation for the world map tile
-	if (GrandStrategy.WorldMapTiles[x][y]->Terrain == "Conifer Forest") { // implement variations for conifer forest tiles
-		GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(2);
-	} else if (GetWorldMapTileTerrain(x, y) == "Scrub Forest") { // implement variations for scrub forest tiles
-		GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(4);
-	} else if (GetWorldMapTileTerrain(x, y) == "Mountains") { // implement variations for mountain tiles
-		GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(1);
-	} else if (GetWorldMapTileTerrain(x, y) == "Water") { // implement variations for water tiles
-		GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(3);
+	if (terrain != -1 && GrandStrategy.TerrainTypes[terrain]) {
+		//randomly select a variation for the world map tile
+		if (GrandStrategy.TerrainTypes[terrain]->Variations > 0) {
+			GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(GrandStrategy.TerrainTypes[terrain]->Variations);
+		}
 	}
 }
 
@@ -939,7 +947,15 @@ void SetWorldMapTileTerrain(int x, int y, std::string terrain)
 */
 void CleanGrandStrategyGame()
 {
-	GrandStrategy.Clean();
+	for (int x = 0; x < WorldMapWidthMax; ++x) {
+		for (int y = 0; y < WorldMapHeightMax; ++y) {
+			if (GrandStrategy.WorldMapTiles[x][y]) {
+				delete GrandStrategy.WorldMapTiles[x][y];
+			}
+		}
+	}
+	GrandStrategy.WorldMapWidth = 0;
+	GrandStrategy.WorldMapHeight = 0;
 }
 //Wyrmgus end
 

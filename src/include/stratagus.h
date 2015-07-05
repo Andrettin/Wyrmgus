@@ -156,13 +156,15 @@ extern const char NameLine[];
 //Wyrmgus start
 //#define MAX_RACES 8
 #define MAX_RACES 32
-#define FactionMax 128			/// Maximum number of factions a civilization can have
-#define PlayerColorMax 32		/// How many player colors are supported
-#define VariationMax 32			/// Maximum number of variations a unit can have
-#define PersonalNameMax 1024	/// Maximum number of personal names a civilization can have
-#define LanguageWordMax 1024	/// Maximum number of words a civilization's language can have
-#define WorldMapWidthMax 256	/// Maximum width the grand strategy world map can have
-#define WorldMapHeightMax 256	/// Maximum height the grand strategy world map can have
+#define FactionMax 128				/// Maximum number of factions a civilization can have
+#define PlayerColorMax 32			/// How many player colors are supported
+#define VariationMax 32				/// Maximum number of variations a unit can have
+#define PersonalNameMax 1024		/// Maximum number of personal names a civilization can have
+#define LanguageWordMax 1024		/// Maximum number of words a civilization's language can have
+
+#define WorldMapWidthMax 256		/// Maximum width the grand strategy world map can have
+#define WorldMapHeightMax 256		/// Maximum height the grand strategy world map can have
+#define WorldMapTerrainTypeMax 32	/// Maximum height the grand strategy world map can have
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)
@@ -194,15 +196,30 @@ extern int stratagusMain(int argc, char **argv); /// main entry
 //Wyrmgus start
 //Grand Strategy elements
 
+class WorldMapTerrainType
+{
+public:
+	WorldMapTerrainType() :
+		Name(""), Tag(""), HasTransitions(false), BaseTile(-1), Variations(0)
+	{
+	}
+
+	std::string Name;
+	std::string Tag;				/// used to locate graphic files
+	bool HasTransitions;
+	int BaseTile;
+	int Variations;					/// quantity of variations
+};
+
 class WorldMapTile
 {
 public:
 	WorldMapTile() :
-		Terrain(""), Variation(0)
+		Terrain(-1), Variation(-1)
 	{
 	}
 
-	std::string Terrain;			/// Tile terrain (i.e. plains).
+	int Terrain;					/// Tile terrain (i.e. plains).
 	int Variation;					/// Tile variation
 };
 
@@ -222,6 +239,7 @@ public:
 public:
 	int WorldMapWidth;
 	int WorldMapHeight;
+	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];				/// 256x256 is the maximum grand strategy world map size
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];				/// 256x256 is the maximum grand strategy world map size
 };
 
@@ -232,8 +250,9 @@ extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();
 extern std::string GetWorldMapTileTerrain(int x, int y);
 extern int GetWorldMapTileTerrainVariation(int x, int y);
+extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern void SetWorldMapSize(int width, int height);
-extern void SetWorldMapTileTerrain(int x, int y, std::string terrain);
+extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void CleanGrandStrategyGame();
 //Wyrmgus end
 

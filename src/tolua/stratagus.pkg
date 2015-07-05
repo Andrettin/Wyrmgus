@@ -112,7 +112,8 @@ extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();
 extern std::string GetWorldMapTileTerrain(int x, int y);
 extern int GetWorldMapTileTerrainVariation(int x, int y);
+extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern void SetWorldMapSize(int width, int height);
-extern void SetWorldMapTileTerrain(int x, int y, std::string terrain);
+extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void CleanGrandStrategyGame();
 //Wyrmgus end
