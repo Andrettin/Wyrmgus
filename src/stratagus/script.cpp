@@ -2612,7 +2612,7 @@ static int CclDefineWorldMapTerrainTypes(lua_State *l)
 		const char *value = LuaToString(l, j + 1);
 		if (!strcmp(value, "terrain-type")) {
 			WorldMapTerrainType *terrain_type = new WorldMapTerrainType;
-			GrandStrategy.TerrainTypes[j / 2] = terrain_type;
+			GrandStrategyGame.TerrainTypes[j / 2] = terrain_type;
 			++j;
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -2622,19 +2622,19 @@ static int CclDefineWorldMapTerrainTypes(lua_State *l)
 				value = LuaToString(l, j + 1, k + 1);
 				if (!strcmp(value, "name")) {
 					++k;
-					GrandStrategy.TerrainTypes[(j - 1) / 2]->Name = LuaToString(l, j + 1, k + 1);
+					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->Name = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "tag")) {
 					++k;
-					GrandStrategy.TerrainTypes[(j - 1) / 2]->Tag = LuaToString(l, j + 1, k + 1);
+					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->Tag = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "has-transitions")) {
 					++k;
-					GrandStrategy.TerrainTypes[(j - 1) / 2]->HasTransitions = LuaToBoolean(l, j + 1, k + 1);
+					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->HasTransitions = LuaToBoolean(l, j + 1, k + 1);
 				} else if (!strcmp(value, "base-tile")) {
 					++k;
-					GrandStrategy.TerrainTypes[(j - 1) / 2]->BaseTile = GetWorldMapTerrainTypeId(LuaToString(l, j + 1, k + 1));
+					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->BaseTile = GetWorldMapTerrainTypeId(LuaToString(l, j + 1, k + 1));
 				} else if (!strcmp(value, "variations")) {
 					++k;
-					GrandStrategy.TerrainTypes[(j - 1) / 2]->Variations = LuaToNumber(l, j + 1, k + 1);
+					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->Variations = LuaToNumber(l, j + 1, k + 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -2665,8 +2665,8 @@ static int CclSetWorldMapTerrain(lua_State *l)
 			LuaError(l, "incorrect argument (expected table)");
 		}
 		int subargs = lua_rawlen(l, -1);
-		GrandStrategy.WorldMapWidth = subargs;
-		GrandStrategy.WorldMapHeight = args;
+		GrandStrategyGame.WorldMapWidth = subargs;
+		GrandStrategyGame.WorldMapHeight = args;
 		for (int j = 0; j < subargs; ++j) {
 			const char *value = LuaToString(l, -1, j + 1);
 			if (!strcmp(value, "Plns")) {

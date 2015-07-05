@@ -215,22 +215,23 @@ class WorldMapTile
 {
 public:
 	WorldMapTile() :
-		Terrain(-1), Variation(-1)
+		Terrain(-1), Variation(-1), GraphicTile("")
 	{
 	}
 
 	int Terrain;					/// Tile terrain (i.e. plains).
 	int Variation;					/// Tile variation
+	std::string GraphicTile;		/// The tile image used by this tile
 };
 
 /**
 **  Grand Strategy game instance
 **  Mapped with #GrandStrategy to a symbolic name.
 */
-class GrandStrategyGame
+class CGrandStrategyGame
 {
 public:
-	GrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0)
+	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0)
 	{
 	}
 
@@ -243,16 +244,18 @@ public:
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];				/// 256x256 is the maximum grand strategy world map size
 };
 
-//extern bool GrandStrategy;					/// if the game is in grand strategy mode
-extern GrandStrategyGame GrandStrategy;			/// Grand strategy game
+extern bool GrandStrategy;								/// if the game is in grand strategy mode
+extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 
 extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();
 extern std::string GetWorldMapTileTerrain(int x, int y);
 extern int GetWorldMapTileTerrainVariation(int x, int y);
+extern std::string GetWorldMapTileGraphicTile(int x, int y);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern void SetWorldMapSize(int width, int height);
 extern void SetWorldMapTileTerrain(int x, int y, int terrain);
+extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void CleanGrandStrategyGame();
 //Wyrmgus end
 

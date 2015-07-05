@@ -88,7 +88,7 @@ void CleanModules()
 	FreeAi();
 	PlayerRaces.Clean();
 	//Wyrmgus start
-	GrandStrategy.Clean();
+	GrandStrategyGame.Clean();
 	//Wyrmgus end
 	CleanConstructions();
 	CleanDecorations();

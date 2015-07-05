@@ -807,14 +807,13 @@ int stratagusMain(int argc, char **argv)
 //Wyrmgus start
 //Grand Strategy elements
 
-GrandStrategyGame GrandStrategy;
-
-//bool GrandStrategy = false;			///if the game is in grand strategy mode
+bool GrandStrategy = false;				///if the game is in grand strategy mode
+CGrandStrategyGame GrandStrategyGame;
 
 /**
 **  Clean up the GrandStrategy elements.
 */
-void GrandStrategyGame::Clean()
+void CGrandStrategyGame::Clean()
 {
 	for (int x = 0; x < WorldMapWidthMax; ++x) {
 		for (int y = 0; y < WorldMapHeightMax; ++y) {
@@ -838,7 +837,7 @@ void GrandStrategyGame::Clean()
 */
 int GetWorldMapWidth()
 {
-	return GrandStrategy.WorldMapWidth;
+	return GrandStrategyGame.WorldMapWidth;
 }
 
 /**
@@ -846,7 +845,7 @@ int GetWorldMapWidth()
 */
 int GetWorldMapHeight()
 {
-	return GrandStrategy.WorldMapHeight;
+	return GrandStrategyGame.WorldMapHeight;
 }
 
 /**
@@ -855,18 +854,18 @@ int GetWorldMapHeight()
 std::string GetWorldMapTileTerrain(int x, int y)
 {
 	
-	clamp(&x, 0, GrandStrategy.WorldMapWidth);
-	clamp(&y, 0, GrandStrategy.WorldMapHeight);
+	clamp(&x, 0, GrandStrategyGame.WorldMapWidth);
+	clamp(&y, 0, GrandStrategyGame.WorldMapHeight);
 
-	Assert(GrandStrategy.WorldMapTiles[x][y]);
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
-	if (GrandStrategy.WorldMapTiles[x][y]->Terrain == -1) {
+	if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain == -1) {
 		return "";
 	}
 	
-	Assert(GrandStrategy.WorldMapTiles[x][y]->Terrain != -1);
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1);
 
-	return GrandStrategy.TerrainTypes[GrandStrategy.WorldMapTiles[x][y]->Terrain]->Name;
+	return GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 }
 
 /**
@@ -874,11 +873,31 @@ std::string GetWorldMapTileTerrain(int x, int y)
 */
 int GetWorldMapTileTerrainVariation(int x, int y)
 {
-	Assert(GrandStrategy.WorldMapTiles[x][y]);
-	Assert(GrandStrategy.WorldMapTiles[x][y]->Terrain != -1);
-	Assert(GrandStrategy.WorldMapTiles[x][y]->Variation != -1);
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1);
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Variation != -1);
 	
-	return GrandStrategy.WorldMapTiles[x][y]->Variation + 1;
+	return GrandStrategyGame.WorldMapTiles[x][y]->Variation + 1;
+}
+
+/**
+**  Get the graphic tile of a world map tile.
+*/
+std::string GetWorldMapTileGraphicTile(int x, int y)
+{
+	
+	clamp(&x, 0, GrandStrategyGame.WorldMapWidth);
+	clamp(&y, 0, GrandStrategyGame.WorldMapHeight);
+
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain == -1) {
+		return "";
+	}
+	
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1);
+
+	return GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile;
 }
 
 /**
@@ -887,11 +906,11 @@ int GetWorldMapTileTerrainVariation(int x, int y)
 int GetWorldMapTerrainTypeId(std::string terrain_type_name)
 {
 	for (int i = 0; i < WorldMapTerrainTypeMax; ++i) {
-		if (!GrandStrategy.TerrainTypes[i]) {
+		if (!GrandStrategyGame.TerrainTypes[i]) {
 			break;
 		}
 		
-		if (GrandStrategy.TerrainTypes[i]->Name == terrain_type_name) {
+		if (GrandStrategyGame.TerrainTypes[i]->Name == terrain_type_name) {
 			return i;
 		}
 	}
@@ -905,15 +924,15 @@ void SetWorldMapSize(int width, int height)
 {
 	Assert(width <= WorldMapWidthMax);
 	Assert(height <= WorldMapHeightMax);
-	GrandStrategy.WorldMapWidth = width;
-	GrandStrategy.WorldMapHeight = height;
+	GrandStrategyGame.WorldMapWidth = width;
+	GrandStrategyGame.WorldMapHeight = height;
 	
 	//create new world map tile objects for the size, if necessary
 	for (int x = 0; x < WorldMapWidthMax; ++x) {
 		for (int y = 0; y < WorldMapHeightMax; ++y) {
-			if (!GrandStrategy.WorldMapTiles[x][y]) {
+			if (!GrandStrategyGame.WorldMapTiles[x][y]) {
 				WorldMapTile *world_map_tile = new WorldMapTile;
-				GrandStrategy.WorldMapTiles[x][y] = world_map_tile;
+				GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
 			}
 		}
 	}
@@ -924,21 +943,189 @@ void SetWorldMapSize(int width, int height)
 */
 void SetWorldMapTileTerrain(int x, int y, int terrain)
 {
-//	Assert(GrandStrategy.WorldMapTile[x][y]);
-//	Assert(!GrandStrategy.WorldMapTile[x][y]->Terrain.empty());
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	//if tile doesn't exist, create it now
-	if (!GrandStrategy.WorldMapTiles[x][y]) {
+	if (!GrandStrategyGame.WorldMapTiles[x][y]) {
 		WorldMapTile *world_map_tile = new WorldMapTile;
-		GrandStrategy.WorldMapTiles[x][y] = world_map_tile;
+		GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
 	}
 	
-	GrandStrategy.WorldMapTiles[x][y]->Terrain = terrain;
+	GrandStrategyGame.WorldMapTiles[x][y]->Terrain = terrain;
 	
-	if (terrain != -1 && GrandStrategy.TerrainTypes[terrain]) {
+	if (terrain != -1 && GrandStrategyGame.TerrainTypes[terrain]) {
 		//randomly select a variation for the world map tile
-		if (GrandStrategy.TerrainTypes[terrain]->Variations > 0) {
-			GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(GrandStrategy.TerrainTypes[terrain]->Variations);
+		if (GrandStrategyGame.TerrainTypes[terrain]->Variations > 0) {
+			GrandStrategyGame.WorldMapTiles[x][y]->Variation = SyncRand(GrandStrategyGame.TerrainTypes[terrain]->Variations);
+		} else {
+			GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
 		}
+	}
+}
+
+/**
+**  Set the terrain type of a world map tile.
+*/
+void CalculateWorldMapTileGraphicTile(int x, int y)
+{
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1);
+	
+	int terrain = GrandStrategyGame.WorldMapTiles[x][y]->Terrain;
+	
+	if (terrain != -1 && GrandStrategyGame.TerrainTypes[terrain]) {
+		//set the GraphicTile for this world map tile
+		std::string graphic_tile = "tilesets/world/terrain/";
+		graphic_tile += GrandStrategyGame.TerrainTypes[terrain]->Tag;
+		
+		if (GrandStrategyGame.TerrainTypes[terrain]->HasTransitions) {
+			graphic_tile += "/";
+			graphic_tile += GrandStrategyGame.TerrainTypes[terrain]->Tag;
+			if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_north";
+			} else if (GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_south";
+			} else if (GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_west";
+			} else if (GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_east";
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_outer";
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northeast_outer";
+			} else if (GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_southwest_outer";
+			} else if (GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_southeast_outer";
+			} else if (GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_southwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_north_south";
+			} else if (GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_west_east";
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_northeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_southwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northeast_southwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northeast_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_southwest_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_northeast_southwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_northeast_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_southwest_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northeast_southwest_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_northeast_southwest_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_north_southwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_north_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_west_northeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_west_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_east_northwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_east_southwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_south_northwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_south_northeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = std::min(GrandStrategyGame.WorldMapTiles[x][y]->Variation, 1);
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_northeast_outer";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_southwest_outer";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northeast_southeast_outer";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_southwest_southeast_outer";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northwest_outer_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_northeast_outer_southwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_southwest_outer_northeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_southeast_outer_northwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_north_southwest_inner_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_south_northwest_inner_northeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_west_northeast_inner_southeast_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y - 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) == GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y - 1) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_east_northwest_inner_southwest_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else if (GetWorldMapTileTerrain(x, y - 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x + 1, y) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x, y + 1) != GetWorldMapTileTerrain(x, y) && GetWorldMapTileTerrain(x - 1, y) != GetWorldMapTileTerrain(x, y)) {
+				graphic_tile += "_outer";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			} else {
+				graphic_tile += "_inner";
+				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
+			}
+		}
+		
+		if (GrandStrategyGame.WorldMapTiles[x][y]->Variation != -1) {
+			graphic_tile += "_";
+			graphic_tile += std::to_string((_Longlong)GrandStrategyGame.WorldMapTiles[x][y]->Variation + 1);
+		}
+		
+		graphic_tile += ".png";
+		
+		if (!CanAccessFile(graphic_tile.c_str())) {
+			graphic_tile = FindAndReplaceString(graphic_tile, "2", "1");
+		}
+		
+		GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = graphic_tile;
 	}
 }
 
@@ -949,13 +1136,13 @@ void CleanGrandStrategyGame()
 {
 	for (int x = 0; x < WorldMapWidthMax; ++x) {
 		for (int y = 0; y < WorldMapHeightMax; ++y) {
-			if (GrandStrategy.WorldMapTiles[x][y]) {
-				delete GrandStrategy.WorldMapTiles[x][y];
+			if (GrandStrategyGame.WorldMapTiles[x][y]) {
+				delete GrandStrategyGame.WorldMapTiles[x][y];
 			}
 		}
 	}
-	GrandStrategy.WorldMapWidth = 0;
-	GrandStrategy.WorldMapHeight = 0;
+	GrandStrategyGame.WorldMapWidth = 0;
+	GrandStrategyGame.WorldMapHeight = 0;
 }
 //Wyrmgus end
 
