@@ -102,3 +102,17 @@ void Exit(int err);
 $extern std::string CliMapName;
 extern std::string CliMapName;
 extern std::string StratagusLibPath;
+
+//Wyrmgus start
+//Grand Strategy elements
+
+//extern bool GrandStrategy;
+
+extern int GetWorldMapWidth();
+extern int GetWorldMapHeight();
+extern std::string GetWorldMapTileTerrain(int x, int y);
+extern int GetWorldMapTileTerrainVariation(int x, int y);
+extern void SetWorldMapSize(int width, int height);
+extern void SetWorldMapTileTerrain(int x, int y, std::string terrain);
+extern void CleanGrandStrategyGame();
+//Wyrmgus end

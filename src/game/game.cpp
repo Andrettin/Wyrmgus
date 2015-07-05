@@ -93,7 +93,7 @@ std::string FullGameName;
 unsigned long GameCycle;             /// Game simulation cycle counter
 unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
 //Wyrmgus start
-int GameTimeOfDay;
+int GameTimeOfDay;					/// which time of the day the game is in (dusk, night, etc.)
 //Wyrmgus end
 
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.

@@ -156,11 +156,13 @@ extern const char NameLine[];
 //Wyrmgus start
 //#define MAX_RACES 8
 #define MAX_RACES 32
-#define FactionMax 128 //maximum number of factions a civilization can have
-#define PlayerColorMax 32                 // How many player colors are supported
-#define VariationMax 32 //maximum number of variations a unit can have
-#define PersonalNameMax 1024 //maximum number of personal names a civilization can have
-#define LanguageWordMax 1024 //maximum number of words a civilization's language can have
+#define FactionMax 128			/// Maximum number of factions a civilization can have
+#define PlayerColorMax 32		/// How many player colors are supported
+#define VariationMax 32			/// Maximum number of variations a unit can have
+#define PersonalNameMax 1024	/// Maximum number of personal names a civilization can have
+#define LanguageWordMax 1024	/// Maximum number of words a civilization's language can have
+#define WorldMapWidthMax 256	/// Maximum width the grand strategy world map can have
+#define WorldMapHeightMax 256	/// Maximum height the grand strategy world map can have
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)
@@ -188,6 +190,52 @@ extern void UpdateDisplay();            /// Game display update
 extern void DrawMapArea();              /// Draw the map area
 extern void GameMainLoop();             /// Game main loop
 extern int stratagusMain(int argc, char **argv); /// main entry
+
+//Wyrmgus start
+//Grand Strategy elements
+
+class WorldMapTile
+{
+public:
+	WorldMapTile() :
+		Terrain(""), Variation(0)
+	{
+	}
+
+	std::string Terrain;			/// Tile terrain (i.e. plains).
+	int Variation;					/// Tile variation
+};
+
+/**
+**  Grand Strategy game instance
+**  Mapped with #GrandStrategy to a symbolic name.
+*/
+class GrandStrategyGame
+{
+public:
+	GrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0)
+	{
+	}
+
+	void Clean();
+
+public:
+	int WorldMapWidth;
+	int WorldMapHeight;
+	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];				/// 256x256 is the maximum grand strategy world map size
+};
+
+//extern bool GrandStrategy;					/// if the game is in grand strategy mode
+extern GrandStrategyGame GrandStrategy;			/// Grand strategy game
+
+extern int GetWorldMapWidth();
+extern int GetWorldMapHeight();
+extern std::string GetWorldMapTileTerrain(int x, int y);
+extern int GetWorldMapTileTerrainVariation(int x, int y);
+extern void SetWorldMapSize(int width, int height);
+extern void SetWorldMapTileTerrain(int x, int y, std::string terrain);
+extern void CleanGrandStrategyGame();
+//Wyrmgus end
 
 //@}
 

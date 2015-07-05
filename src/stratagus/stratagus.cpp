@@ -804,4 +804,143 @@ int stratagusMain(int argc, char **argv)
 	return 0;
 }
 
+//Wyrmgus start
+//Grand Strategy elements
+
+GrandStrategyGame GrandStrategy;
+
+//bool GrandStrategy = false;			///if the game is in grand strategy mode
+
+/**
+**  Clean up the GrandStrategy elements.
+*/
+void GrandStrategyGame::Clean()
+{
+	for (int x = 0; x < WorldMapWidthMax; ++x) {
+		for (int y = 0; y < WorldMapHeightMax; ++y) {
+			if (this->WorldMapTiles[x][y]) {
+				delete this->WorldMapTiles[x][y];
+			}
+		}
+	}
+	this->WorldMapWidth = 0;
+	this->WorldMapHeight = 0;
+}
+
+/**
+**  Get the width of the world map.
+*/
+int GetWorldMapWidth()
+{
+	return GrandStrategy.WorldMapWidth;
+}
+
+/**
+**  Get the height of the world map.
+*/
+int GetWorldMapHeight()
+{
+	return GrandStrategy.WorldMapHeight;
+}
+
+/**
+**  Get the terrain type of a world map tile.
+*/
+std::string GetWorldMapTileTerrain(int x, int y)
+{
+//	Assert(GrandStrategy.WorldMapTiles[x][y]);
+//	Assert(!GrandStrategy.WorldMapTiles[x][y]->Terrain.empty());
+	
+	if (x >= 0 && x < GrandStrategy.WorldMapWidth && y >= 0 && y < GrandStrategy.WorldMapHeight) {
+		return GrandStrategy.WorldMapTiles[x][y]->Terrain;
+	} else if (x < 0 && y >= 0 && y < GrandStrategy.WorldMapHeight) {
+		return GrandStrategy.WorldMapTiles[0][y]->Terrain;
+	} else if (x >= GrandStrategy.WorldMapWidth && y >= 0 && y < GrandStrategy.WorldMapHeight) {
+		return GrandStrategy.WorldMapTiles[GrandStrategy.WorldMapWidth - 1][y]->Terrain;
+	} else if (x >= 0 && x < GrandStrategy.WorldMapWidth && y < 0) {
+		return GrandStrategy.WorldMapTiles[x][0]->Terrain;
+	} else if (x >= 0 && x < GrandStrategy.WorldMapWidth && y >= GrandStrategy.WorldMapHeight) {
+		return GrandStrategy.WorldMapTiles[x][GrandStrategy.WorldMapHeight - 1]->Terrain;
+	} else if (x < 0 && y < 0) {
+		return GrandStrategy.WorldMapTiles[0][0]->Terrain;
+	} else if (x >= GrandStrategy.WorldMapWidth && y < 0) {
+		return GrandStrategy.WorldMapTiles[GrandStrategy.WorldMapWidth - 1][0]->Terrain;
+	} else if (x < 0 && y >= GrandStrategy.WorldMapHeight) {
+		return GrandStrategy.WorldMapTiles[0][GrandStrategy.WorldMapHeight - 1]->Terrain;
+	} else if (x >= GrandStrategy.WorldMapWidth && y >= GrandStrategy.WorldMapHeight) {
+		return GrandStrategy.WorldMapTiles[GrandStrategy.WorldMapWidth - 1][GrandStrategy.WorldMapHeight - 1]->Terrain;
+	} else {
+		return "";
+	}
+}
+
+/**
+**  Get the terrain variation of a world map tile.
+*/
+int GetWorldMapTileTerrainVariation(int x, int y)
+{
+	Assert(GrandStrategy.WorldMapTiles[x][y]);
+	Assert(!GrandStrategy.WorldMapTiles[x][y]->Terrain.empty());
+	Assert(GrandStrategy.WorldMapTiles[x][y]->Variation != -1);
+	
+	return GrandStrategy.WorldMapTiles[x][y]->Variation + 1;
+}
+
+/**
+**  Set the size of the world map.
+*/
+void SetWorldMapSize(int width, int height)
+{
+	Assert(width <= WorldMapWidthMax);
+	Assert(height <= WorldMapHeightMax);
+	GrandStrategy.WorldMapWidth = width;
+	GrandStrategy.WorldMapHeight = height;
+	
+	//create new world map tile objects for the size, if necessary
+	for (int x = 0; x < WorldMapWidthMax; ++x) {
+		for (int y = 0; y < WorldMapHeightMax; ++y) {
+			if (!GrandStrategy.WorldMapTiles[x][y]) {
+				WorldMapTile *world_map_tile = new WorldMapTile;
+				GrandStrategy.WorldMapTiles[x][y] = world_map_tile;
+			}
+		}
+	}
+}
+
+/**
+**  Set the terrain type of a world map tile.
+*/
+void SetWorldMapTileTerrain(int x, int y, std::string terrain)
+{
+//	Assert(GrandStrategy.WorldMapTile[x][y]);
+//	Assert(!GrandStrategy.WorldMapTile[x][y]->Terrain.empty());
+	//if tile doesn't exist, create it now
+	if (!GrandStrategy.WorldMapTiles[x][y]) {
+		WorldMapTile *world_map_tile = new WorldMapTile;
+		GrandStrategy.WorldMapTiles[x][y] = world_map_tile;
+	}
+	
+	GrandStrategy.WorldMapTiles[x][y]->Terrain = terrain;
+	
+	//randomly select a variation for the world map tile
+	if (GrandStrategy.WorldMapTiles[x][y]->Terrain == "Conifer Forest") { // implement variations for conifer forest tiles
+		GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(2);
+	} else if (GetWorldMapTileTerrain(x, y) == "Scrub Forest") { // implement variations for scrub forest tiles
+		GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(4);
+	} else if (GetWorldMapTileTerrain(x, y) == "Mountains") { // implement variations for mountain tiles
+		GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(1);
+	} else if (GetWorldMapTileTerrain(x, y) == "Water") { // implement variations for water tiles
+		GrandStrategy.WorldMapTiles[x][y]->Variation = SyncRand(3);
+	}
+}
+
+/**
+**  Clean the grand strategy variables.
+*/
+void CleanGrandStrategyGame()
+{
+	GrandStrategy.Clean();
+}
+//Wyrmgus end
+
 //@}

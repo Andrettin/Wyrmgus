@@ -2597,6 +2597,53 @@ void LoadCcl(const std::string &filename)
 	LuaGarbageCollect();
 }
 
+//Wyrmgus start
+//Grand Strategy elements
+/**
+**  Set the terrain of the world map tiles
+**
+**  @param l  Lua state.
+*/
+static int CclSetWorldMapTerrain(lua_State *l)
+{
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+	
+	int args = lua_rawlen(l, 1);
+	for (int i = 0; i < args; ++i) {
+		lua_rawgeti(l, 1, i + 1);
+		if (!lua_istable(l, -1)) {
+			LuaError(l, "incorrect argument (expected table)");
+		}
+		int subargs = lua_rawlen(l, -1);
+		GrandStrategy.WorldMapWidth = subargs;
+		GrandStrategy.WorldMapHeight = args;
+		for (int j = 0; j < subargs; ++j) {
+			const char *value = LuaToString(l, -1, j + 1);
+			if (!strcmp(value, "Plns")) {
+				SetWorldMapTileTerrain(j, i, "Plains");
+			} else if (!strcmp(value, "DkPl")) {
+				SetWorldMapTileTerrain(j, i, "Dark Plains");
+			} else if (!strcmp(value, "CnFr")) {
+				SetWorldMapTileTerrain(j, i, "Conifer Forest");
+			} else if (!strcmp(value, "ScFr")) {
+				SetWorldMapTileTerrain(j, i, "Scrub Forest");
+			} else if (!strcmp(value, "Hill")) {
+				SetWorldMapTileTerrain(j, i, "Hills");
+			} else if (!strcmp(value, "Mntn")) {
+				SetWorldMapTileTerrain(j, i, "Mountains");
+			} else if (!strcmp(value, "Watr")) {
+				SetWorldMapTileTerrain(j, i, "Water");
+			} else {
+				SetWorldMapTileTerrain(j, i, value);
+			}
+		}
+	}
+
+	return 0;
+}
+//Wyrmgus end
 
 void ScriptRegister()
 {
@@ -2617,6 +2664,10 @@ void ScriptRegister()
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
+	
+	//Wyrmgus start
+	lua_register(Lua, "SetWorldMapTerrain", CclSetWorldMapTerrain);
+	//Wyrmgus end
 }
 
 //@}
