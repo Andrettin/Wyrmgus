@@ -107,6 +107,11 @@ extern std::string StratagusLibPath;
 //Grand Strategy elements
 
 extern bool GrandStrategy;
+extern std::string GrandStrategyWorld;
+extern int WorldMapOffsetX;
+extern int WorldMapOffsetY;
+extern bool GrandStrategyMapWidthIndent;
+extern bool GrandStrategyMapHeightIndent;
 
 extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();

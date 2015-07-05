@@ -69,6 +69,17 @@ static void MenuHandleButtonDown(unsigned)
 }
 static void MenuHandleButtonUp(unsigned)
 {
+	//Wyrmgus start
+	if (GrandStrategy) {
+		//if clicked on a tile, update the grand strategy interface
+		if (UI.MapArea.Contains(CursorScreenPos) && !(MouseButtons & LeftButton) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
+			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (SetSelectedProvince ~= nil) then SetSelectedProvince(GetTileProvince(%d, %d)) end;", GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+			CclCommand(buf);
+		}
+	}
+	//Wyrmgus end
 }
 static void MenuHandleMouseMove(const PixelPos &screenPos)
 {
@@ -175,9 +186,15 @@ void DrawGuichanWidgets()
 {
 	if (Gui) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
+		//Wyrmgus start
+//		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
+		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running && !GrandStrategy);
+		//Wyrmgus end
 #else
-		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
+		//Wyrmgus start
+//		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
+		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running && !GrandStrategy);
+		//Wyrmgus end
 #endif
 		Gui->draw();
 	}

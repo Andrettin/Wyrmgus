@@ -181,6 +181,9 @@ extern void beos_init(int argc, char **argv);
 
 #include "ai.h"
 #include "editor.h"
+//Wyrmgus start
+#include "font.h"	// for grand strategy mode tooltip drawing
+//Wyrmgus end
 #include "game.h"
 #include "guichan.h"
 #include "interface.h"
@@ -808,6 +811,11 @@ int stratagusMain(int argc, char **argv)
 //Grand Strategy elements
 
 bool GrandStrategy = false;				///if the game is in grand strategy mode
+std::string GrandStrategyWorld;
+int WorldMapOffsetX;
+int WorldMapOffsetY;
+bool GrandStrategyMapWidthIndent;
+bool GrandStrategyMapHeightIndent;
 CGrandStrategyGame GrandStrategyGame;
 
 /**
@@ -833,6 +841,113 @@ void CGrandStrategyGame::Clean()
 }
 
 /**
+**  Draw the grand strategy map.
+*/
+void CGrandStrategyGame::DrawMap()
+{
+	int grand_strategy_map_width = Video.Width + 64;
+	int grand_strategy_map_height = Video.Height - 16 - 186;
+	
+	int width_indent = 0;
+	int height_indent = 0;
+	if (GrandStrategyMapWidthIndent) {
+		width_indent = -32;
+	}
+	if (GrandStrategyMapHeightIndent) {
+		height_indent = -32;
+	}
+	
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + floor(static_cast<double>(grand_strategy_map_width / 64))); ++x) {
+		for (int y = WorldMapOffsetY; y <= std::min((WorldMapOffsetY + static_cast<int>(floor(static_cast<double>(grand_strategy_map_height / 64)))), (GetWorldMapHeight() - 1)); ++y) {
+			if (!GetWorldMapTileGraphicTile(x, y).empty()) {
+				if (GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->BaseTile != -1) { // should be changed into a more dynamic setting than being based on GrandStrategyWorld
+					std::string base_tile_filename;
+					if (GrandStrategyWorld == "Nidavellir") {
+						base_tile_filename = "tilesets/world/terrain/dark_plains.png";
+					} else {
+						base_tile_filename = "tilesets/world/terrain/plains.png";
+					}
+					if (CGraphic::Get(base_tile_filename) == NULL) {
+						CGraphic *base_tile_graphic = CGraphic::New(base_tile_filename, 64, 64);
+						base_tile_graphic->Load();
+					}
+					CGraphic::Get(base_tile_filename)->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+				}
+				
+				if (CGraphic::Get(GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile) == NULL) {
+					CGraphic *tile_graphic = CGraphic::New(GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile, 64, 64);
+					tile_graphic->Load();
+				}
+				CGraphic::Get(GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile)->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+			}
+		}
+	}
+	
+	//if is clicking on a tile, draw a square on its borders
+	if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1 && (MouseButtons & LeftButton)) {
+		int tile_screen_x = ((GrandStrategyGame.GetTileUnderCursor().x - WorldMapOffsetX) * 64) + UI.MapArea.X + width_indent;
+		int tile_screen_y = ((GrandStrategyGame.GetTileUnderCursor().y - WorldMapOffsetY) * 64) + UI.MapArea.Y + height_indent;
+			
+//		clamp(&tile_screen_x, 0, Video.Width);
+//		clamp(&tile_screen_y, 0, Video.Height);
+			
+		Video.DrawRectangle(ColorWhite, tile_screen_x, tile_screen_y, 64, 64);
+	}
+	
+	
+	std::string fog_graphic_tile = "tilesets/world/terrain/fog.png";
+	if (CGraphic::Get(fog_graphic_tile) == NULL) {
+		CGraphic *fog_tile_graphic = CGraphic::New(fog_graphic_tile, 96, 96);
+		fog_tile_graphic->Load();
+	}
+	//draw fog over terra incognita
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + floor(static_cast<double>(grand_strategy_map_width / 64))); ++x) {
+		for (int y = WorldMapOffsetY; y <= std::min((WorldMapOffsetY + static_cast<int>(floor(static_cast<double>(grand_strategy_map_height / 64)))), (GetWorldMapHeight() - 1)); ++y) {
+			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain == -1) {
+				CGraphic::Get(fog_graphic_tile)->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 16, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 16, true);
+			}
+		}
+	}
+}
+
+/**
+**  Draw the grand strategy tile tooltip.
+*/
+void CGrandStrategyGame::DrawTileTooltip(int x, int y)
+{
+	std::string tile_tooltip = GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+	//province?
+	tile_tooltip += " (";
+	tile_tooltip += std::to_string((_Longlong)x);
+	tile_tooltip += ", ";
+	tile_tooltip += std::to_string((_Longlong)y);
+	tile_tooltip += ")";
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY, tile_tooltip);
+}
+
+/**
+**  Draw the grand strategy tile tooltip.
+*/
+Vec2i CGrandStrategyGame::GetTileUnderCursor()
+{
+	Vec2i tile_under_cursor(0, 0);
+	
+	int width_indent = 0;
+	int height_indent = 0;
+	if (GrandStrategyMapWidthIndent) {
+		width_indent = -32;
+	}
+	if (GrandStrategyMapHeightIndent) {
+		height_indent = -32;
+	}
+			
+	tile_under_cursor.x = WorldMapOffsetX + ((CursorScreenPos.x - UI.MapArea.X - width_indent) / 64);
+	tile_under_cursor.y = WorldMapOffsetY + ((CursorScreenPos.y - UI.MapArea.Y - height_indent) / 64);
+	
+	return tile_under_cursor;
+}
+
+/**
 **  Get the width of the world map.
 */
 int GetWorldMapWidth()
@@ -854,8 +969,8 @@ int GetWorldMapHeight()
 std::string GetWorldMapTileTerrain(int x, int y)
 {
 	
-	clamp(&x, 0, GrandStrategyGame.WorldMapWidth);
-	clamp(&y, 0, GrandStrategyGame.WorldMapHeight);
+	clamp(&x, 0, GrandStrategyGame.WorldMapWidth - 1);
+	clamp(&y, 0, GrandStrategyGame.WorldMapHeight - 1);
 
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
@@ -863,8 +978,6 @@ std::string GetWorldMapTileTerrain(int x, int y)
 		return "";
 	}
 	
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1);
-
 	return GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 }
 
@@ -886,8 +999,8 @@ int GetWorldMapTileTerrainVariation(int x, int y)
 std::string GetWorldMapTileGraphicTile(int x, int y)
 {
 	
-	clamp(&x, 0, GrandStrategyGame.WorldMapWidth);
-	clamp(&y, 0, GrandStrategyGame.WorldMapHeight);
+	clamp(&x, 0, GrandStrategyGame.WorldMapWidth - 1);
+	clamp(&y, 0, GrandStrategyGame.WorldMapHeight - 1);
 
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	

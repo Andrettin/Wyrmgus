@@ -196,6 +196,8 @@ extern int stratagusMain(int argc, char **argv); /// main entry
 //Wyrmgus start
 //Grand Strategy elements
 
+#include "vec2i.h"
+
 class WorldMapTerrainType
 {
 public:
@@ -236,6 +238,9 @@ public:
 	}
 
 	void Clean();
+	void DrawMap();              /// Draw the map area
+	void DrawTileTooltip(int x, int y);              /// Draw the map area
+	Vec2i GetTileUnderCursor();
 
 public:
 	int WorldMapWidth;
@@ -245,6 +250,11 @@ public:
 };
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
+extern std::string GrandStrategyWorld;
+extern int WorldMapOffsetX;
+extern int WorldMapOffsetY;
+extern bool GrandStrategyMapWidthIndent;
+extern bool GrandStrategyMapHeightIndent;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 
 extern int GetWorldMapWidth();

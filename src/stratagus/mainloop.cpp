@@ -216,11 +216,24 @@ void UpdateDisplay()
 		}
 
 		DrawTimer();
+	//Wyrmgus start
+	} else if (GrandStrategy) {
+		GrandStrategyGame.DrawMap();
+	//Wyrmgus end
 	}
 
 	DrawPieMenu(); // draw pie menu only if needed
 
 	DrawGuichanWidgets();
+	
+	//Wyrmgus start
+	//draw grand strategy tooltips here so that they appear over the guichan interface grand strategy mode uses
+	if (GrandStrategy) {
+		if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
+			GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+		}
+	}
+	//Wyrmgus end
 
 	if (CursorState != CursorStateRectangle) {
 		DrawCursor();
