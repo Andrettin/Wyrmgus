@@ -165,6 +165,8 @@ extern const char NameLine[];
 #define WorldMapWidthMax 256		/// Maximum width the grand strategy world map can have
 #define WorldMapHeightMax 256		/// Maximum height the grand strategy world map can have
 #define WorldMapTerrainTypeMax 32	/// Maximum height the grand strategy world map can have
+#define ProvinceMax 128				/// Maximum quantity of provinces in a grand strategy game
+#define ProvinceTileMax 64			/// Maximum quantity of tiles a province can have
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)
@@ -197,6 +199,7 @@ extern int stratagusMain(int argc, char **argv); /// main entry
 //Grand Strategy elements
 
 #include "vec2i.h"
+#include "video.h"
 
 class WorldMapTerrainType
 {
@@ -217,13 +220,46 @@ class WorldMapTile
 {
 public:
 	WorldMapTile() :
-		Terrain(-1), Variation(-1), GraphicTile("")
+		Terrain(-1), Province(-1), Variation(-1), GraphicTile(NULL)
 	{
 	}
 
-	int Terrain;					/// Tile terrain (i.e. plains).
-	int Variation;					/// Tile variation
-	std::string GraphicTile;		/// The tile image used by this tile
+	int Terrain;						/// Tile terrain (i.e. plains)
+	int Province;						/// Province to which the tile belongs
+	int Variation;						/// Tile variation
+//	std::string GraphicTile;			/// The tile image used by this tile
+	CGraphic *GraphicTile;				/// The tile image used by this tile
+};
+
+class CProvince
+{
+public:
+	CProvince() :
+		Name(""), SettlementName(""),
+		Civilization(-1), ReferenceProvince(-1),
+		Water(false), SettlementLocation(-1, -1)
+	{
+		memset(Owner, -1, sizeof(Owner));
+	}
+	
+	std::string GetCulturalName();										/// Get the province's cultural name.
+	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
+	std::string GenerateProvinceName(int civilization);
+	std::string GenerateSettlementName(int civilization);
+	std::string TranslateProvinceName(std::string province_name, int civilization);
+	std::string TranslateSettlementName(std::string province_name, int civilization);
+	
+	std::string Name;
+	std::string SettlementName;
+	int Civilization;													/// Civilization of the province (-1 = no one).
+	int Owner[2];														/// Owner of the province, first number for the owner's civilization, and the second one for the faction itself (-1, -1 = no one).
+	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
+	bool Water;															/// Whether the province is a water province or not
+	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
+	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
+	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
+	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
+	std::string FactionCulturalSettlementNames[MAX_RACES][FactionMax];	/// Names for the province's settlement for each different faction
 };
 
 /**
@@ -233,7 +269,7 @@ public:
 class CGrandStrategyGame
 {
 public:
-	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0)
+	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), BaseTile(NULL)
 	{
 	}
 
@@ -245,8 +281,12 @@ public:
 public:
 	int WorldMapWidth;
 	int WorldMapHeight;
-	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];				/// 256x256 is the maximum grand strategy world map size
-	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];				/// 256x256 is the maximum grand strategy world map size
+	int ProvinceCount;
+	CGraphic *BaseTile;
+	CGraphic *FogTile;
+	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
+	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
+	CProvince *Provinces[ProvinceMax];
 };
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
@@ -261,11 +301,30 @@ extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();
 extern std::string GetWorldMapTileTerrain(int x, int y);
 extern int GetWorldMapTileTerrainVariation(int x, int y);
-extern std::string GetWorldMapTileGraphicTile(int x, int y);
+extern std::string GetWorldMapTileProvinceName(int x, int y);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
+extern int GetProvinceId(std::string province_name);
 extern void SetWorldMapSize(int width, int height);
 extern void SetWorldMapTileTerrain(int x, int y, int terrain);
+extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
+extern std::string GetProvinceCulturalName(std::string province_name);
+extern std::string GetProvinceCivilizationCulturalName(std::string province_name, std::string civilization_name);
+extern std::string GetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name);
+extern std::string GetProvinceCulturalSettlementName(std::string province_name);
+extern std::string GetProvinceCivilizationCulturalSettlementName(std::string province_name, std::string civilization_name);
+extern std::string GetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name);
+extern void SetProvinceName(std::string old_province_name, std::string new_province_name);
+extern void SetProvinceWater(std::string province_name, bool water);
+extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
+extern void SetProvinceCivilization(std::string province_name, std::string civilization_name);
+extern void SetProvinceSettlementName(std::string province_name, std::string settlement_name);
+extern void SetProvinceSettlementLocation(std::string province_name, int x, int y);
+extern void SetProvinceCulturalName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
+extern void SetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
+extern void SetProvinceCulturalSettlementName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
+extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
+extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void CleanGrandStrategyGame();
 //Wyrmgus end
 

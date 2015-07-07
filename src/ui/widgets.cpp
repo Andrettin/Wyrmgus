@@ -46,6 +46,9 @@
 //Wyrmgus start
 #include "player.h"
 //Wyrmgus end
+//Wyrmgus start
+#include "results.h"
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 -- Variables
@@ -70,7 +73,7 @@ static void MenuHandleButtonDown(unsigned)
 static void MenuHandleButtonUp(unsigned)
 {
 	//Wyrmgus start
-	if (GrandStrategy) {
+	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) {
 		//if clicked on a tile, update the grand strategy interface
 		if (UI.MapArea.Contains(CursorScreenPos) && !(MouseButtons & LeftButton) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
@@ -186,15 +189,9 @@ void DrawGuichanWidgets()
 {
 	if (Gui) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		//Wyrmgus start
-//		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
-		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running && !GrandStrategy);
-		//Wyrmgus end
+		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
 #else
-		//Wyrmgus start
-//		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
-		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running && !GrandStrategy);
-		//Wyrmgus end
+		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
 #endif
 		Gui->draw();
 	}

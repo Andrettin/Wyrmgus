@@ -448,6 +448,7 @@ public:
 	void Clean();
 	int GetRaceIndexByName(const char *raceName) const;
 	//Wyrmgus start
+	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
 	bool RequiresPlural(std::string word, int civilization) const;
 	std::string GetPluralForm(std::string word, int civilization) const;
 	//Wyrmgus end
@@ -462,8 +463,8 @@ public:
 	std::string ParentCivilization[MAX_RACES];							/// civilization's parent civilization, if any
 	std::string FactionNames[MAX_RACES][FactionMax];    				/// faction names
 	std::string FactionTypes[MAX_RACES][FactionMax];    				/// faction types (tribe or polity)
-	std::string FactionColors[MAX_RACES][FactionMax];    				/// faction colors
-	std::string FactionSecondaryColors[MAX_RACES][FactionMax]; 		   	/// faction secondary colors
+	int FactionColors[MAX_RACES][FactionMax];    						/// faction colors
+	int FactionSecondaryColors[MAX_RACES][FactionMax]; 		   			/// faction secondary colors
 	bool FactionPlayability[MAX_RACES][FactionMax];    					/// faction playability
 	std::string PersonalNames[MAX_RACES][PersonalNameMax];				/// personal names
 	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];		/// personal name prefixes

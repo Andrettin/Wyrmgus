@@ -354,8 +354,8 @@ void PlayerRace::Clean()
 		for (unsigned int j = 0; j < FactionMax; ++j) {
 			this->FactionNames[i][j].clear();
 			this->FactionTypes[i][j].clear();
-			this->FactionColors[i][j].clear();
-			this->FactionSecondaryColors[i][j].clear();
+			this->FactionColors[i][j] = 0;
+			this->FactionSecondaryColors[i][j] = 0;
 			this->FactionPlayability[i][j] = false;
 		}
 		for (unsigned int j = 0; j < PersonalNameMax; ++j) {
@@ -413,6 +413,25 @@ int PlayerRace::GetRaceIndexByName(const char *raceName) const
 }
 
 //Wyrmgus start
+int PlayerRace::GetFactionIndexByName(const int civilization, const std::string faction_name) const
+{
+	if (civilization == -1) {
+		return -1;
+	}
+	
+	for (unsigned int i = 0; i != FactionMax; ++i) {
+		if (this->FactionNames[civilization][i].empty()) {
+			break;
+		}
+		
+		if (this->FactionNames[civilization][i] == faction_name) {
+			return i;
+		}
+	}
+	
+	return -1;
+}
+
 bool PlayerRace::RequiresPlural(std::string word, int civilization) const
 {
 	for (int i = 0; i < LanguageWordMax; ++i) {
@@ -917,16 +936,8 @@ void CPlayer::SetFaction(const std::string &faction)
 				this->SetName(faction);
 			}
 			this->Faction = i;
-			int PrimaryColor;
-			int SecondaryColor;
-			for (int j = 0; j < PlayerColorMax; ++j) {
-				if (PlayerColorNames[j] == PlayerRaces.FactionColors[this->Race][i]) {
-					PrimaryColor = j;
-				}
-				if (PlayerColorNames[j] == PlayerRaces.FactionSecondaryColors[this->Race][i]) {
-					SecondaryColor = j;
-				}
-			}
+			int PrimaryColor = PlayerRaces.FactionColors[this->Race][i];
+			int SecondaryColor = PlayerRaces.FactionSecondaryColors[this->Race][i];
 			bool color_used = false;
 			for (int j = 0; j < PlayerMax; ++j) {
 				if (this->Index != j && Players[j].Faction != -1 && Players[j].Color == PlayerColors[PrimaryColor][0]) {

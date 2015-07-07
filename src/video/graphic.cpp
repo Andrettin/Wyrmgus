@@ -45,6 +45,9 @@
 #include "intern_video.h"
 #include "iocompat.h"
 #include "iolib.h"
+//Wyrmgus start
+#include "results.h"
+//Wyrmgus end
 #include "ui.h"
 //Wyrmgus start
 #include "xbrz.h"
@@ -366,12 +369,16 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 //Wyrmgus end
 {
 	//Wyrmgus start
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColors[i][0] == Players[player].Color) {
-			player = i;
-			break;
-		}		
+	if (!(GrandStrategy && !GameRunning && GameResult == GameNoResult)) {
+		for (int i = 0; i < PlayerColorMax; ++i) {
+			if (PlayerColors[i][0] == Players[player].Color) {
+				player = i;
+				break;
+			}		
+		}
 	}
+	//if in grand strategy mode, then treat the "player" variable as the player color index (necessary for drawing a player color graphic outside of a game)
+	
 	//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {

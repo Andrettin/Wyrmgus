@@ -217,7 +217,7 @@ void UpdateDisplay()
 
 		DrawTimer();
 	//Wyrmgus start
-	} else if (GrandStrategy) {
+	} else if (GrandStrategy && !GameRunning && GameResult == GameNoResult) {
 		GrandStrategyGame.DrawMap();
 	//Wyrmgus end
 	}
@@ -228,7 +228,7 @@ void UpdateDisplay()
 	
 	//Wyrmgus start
 	//draw grand strategy tooltips here so that they appear over the guichan interface grand strategy mode uses
-	if (GrandStrategy) {
+	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) {
 		if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
 			GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
 		}
