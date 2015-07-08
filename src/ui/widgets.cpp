@@ -91,6 +91,61 @@ static void MenuHandleMouseMove(const PixelPos &screenPos)
 }
 static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
+	//Wyrmgus start
+	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { // if in grand strategy mode, scroll the map if a directional key was pressed
+		bool scrolled = false;
+		if (key == SDLK_UP || key == SDLK_KP8) {
+			if (WorldMapOffsetY > 0) {
+				if (GrandStrategyMapHeightIndent == 0) {
+					WorldMapOffsetY = WorldMapOffsetY - 1;
+				}
+				GrandStrategyMapHeightIndent -= 32;
+			}
+			scrolled = true;
+		} else if (key == SDLK_DOWN || key == SDLK_KP2) {
+			if (WorldMapOffsetY < GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64)) {
+				if (GrandStrategyMapHeightIndent == -32) {
+					WorldMapOffsetY = WorldMapOffsetY + 1;
+				}
+				GrandStrategyMapHeightIndent += 32;
+			}
+			scrolled = true;
+		} else if (key == SDLK_LEFT || key == SDLK_KP4) {
+			if (WorldMapOffsetX > 0) {
+				if (GrandStrategyMapWidthIndent == 0) {
+					WorldMapOffsetX = WorldMapOffsetX - 1;
+				}
+				GrandStrategyMapWidthIndent -= 32;
+			}
+			scrolled = true;
+		} else if (key == SDLK_RIGHT || key == SDLK_KP6) {
+			if (WorldMapOffsetX < GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64)) {
+				if (GrandStrategyMapWidthIndent == -32) {
+					WorldMapOffsetX = WorldMapOffsetX + 1;
+				}
+				GrandStrategyMapWidthIndent += 32;
+			}
+			scrolled = true;
+		}
+		if (scrolled) {
+			if (GrandStrategyMapWidthIndent <= -64) {
+				GrandStrategyMapWidthIndent = 0;
+			}
+			if (GrandStrategyMapHeightIndent <= -64) {
+				GrandStrategyMapHeightIndent = 0;
+			}
+			if (GrandStrategyMapWidthIndent > 0) {
+				GrandStrategyMapWidthIndent *= -1;
+			}
+			if (GrandStrategyMapHeightIndent > 0) {
+				GrandStrategyMapHeightIndent *= -1;
+			}
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (DrawOnScreenTiles ~= nil) then DrawOnScreenTiles() end;");
+			CclCommand(buf);
+		}
+	}
+	//Wyrmgus end
 	HandleKeyModifiersDown(key, keychar);
 }
 static void MenuHandleKeyUp(unsigned key, unsigned keychar)
@@ -100,6 +155,61 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
 	Input->processKeyRepeat();
+	//Wyrmgus start
+	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { // if in grand strategy mode, scroll the map if a directional key was pressed
+		bool scrolled = false;
+		if (key == SDLK_UP || key == SDLK_KP8) {
+			if (WorldMapOffsetY > 0) {
+				if (GrandStrategyMapHeightIndent == 0) {
+					WorldMapOffsetY = WorldMapOffsetY - 1;
+				}
+				GrandStrategyMapHeightIndent -= 32;
+			}
+			scrolled = true;
+		} else if (key == SDLK_DOWN || key == SDLK_KP2) {
+			if (WorldMapOffsetY < GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64)) {
+				if (GrandStrategyMapHeightIndent == -32) {
+					WorldMapOffsetY = WorldMapOffsetY + 1;
+				}
+				GrandStrategyMapHeightIndent += 32;
+			}
+			scrolled = true;
+		} else if (key == SDLK_LEFT || key == SDLK_KP4) {
+			if (WorldMapOffsetX > 0) {
+				if (GrandStrategyMapWidthIndent == 0) {
+					WorldMapOffsetX = WorldMapOffsetX - 1;
+				}
+				GrandStrategyMapWidthIndent -= 32;
+			}
+			scrolled = true;
+		} else if (key == SDLK_RIGHT || key == SDLK_KP6) {
+			if (WorldMapOffsetX < GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64)) {
+				if (GrandStrategyMapWidthIndent == -32) {
+					WorldMapOffsetX = WorldMapOffsetX + 1;
+				}
+				GrandStrategyMapWidthIndent += 32;
+			}
+			scrolled = true;
+		}
+		if (scrolled) {
+			if (GrandStrategyMapWidthIndent <= -64) {
+				GrandStrategyMapWidthIndent = 0;
+			}
+			if (GrandStrategyMapHeightIndent <= -64) {
+				GrandStrategyMapHeightIndent = 0;
+			}
+			if (GrandStrategyMapWidthIndent > 0) {
+				GrandStrategyMapWidthIndent *= -1;
+			}
+			if (GrandStrategyMapHeightIndent > 0) {
+				GrandStrategyMapHeightIndent *= -1;
+			}
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (DrawOnScreenTiles ~= nil) then DrawOnScreenTiles() end;");
+			CclCommand(buf);
+		}
+	}
+	//Wyrmgus end
 	HandleKeyModifiersDown(key, keychar);
 }
 

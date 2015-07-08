@@ -217,7 +217,84 @@ void UpdateDisplay()
 
 		DrawTimer();
 	//Wyrmgus start
-	} else if (GrandStrategy && !GameRunning && GameResult == GameNoResult) {
+	} else if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { //grand strategy mode
+		//scroll map if mouse is in the scroll area
+		int scroll_up = 15;
+		int scroll_down = (Video.Height - 16);
+		int scroll_left = 15;
+		int scroll_right = (Video.Width - 16);
+		bool scrolled = false;
+		if (CursorScreenPos.y < scroll_up) {
+			if (WorldMapOffsetY > 0) {
+				if (GrandStrategyMapHeightIndent == 0) {
+					WorldMapOffsetY = WorldMapOffsetY - 1;
+				}
+				GrandStrategyMapHeightIndent -= 32;
+			}
+			GameCursor = UI.ArrowN.Cursor;
+			scrolled = true;
+		} else if (CursorScreenPos.y > scroll_down) {
+			if (WorldMapOffsetY < GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64)) {
+				if (GrandStrategyMapHeightIndent == -32) {
+					WorldMapOffsetY = WorldMapOffsetY + 1;
+				}
+				GrandStrategyMapHeightIndent += 32;
+			}
+			GameCursor = UI.ArrowS.Cursor;
+			scrolled = true;
+		}
+		if (CursorScreenPos.x < scroll_left) {
+			if (WorldMapOffsetX > 0) {
+				if (GrandStrategyMapWidthIndent == 0) {
+					WorldMapOffsetX = WorldMapOffsetX - 1;
+				}
+				GrandStrategyMapWidthIndent -= 32;
+			}
+			if (GameCursor == UI.ArrowN.Cursor) {
+				GameCursor = UI.ArrowNW.Cursor;
+			} else if (GameCursor == UI.ArrowS.Cursor) {
+				GameCursor = UI.ArrowSW.Cursor;
+			} else {
+				GameCursor = UI.ArrowW.Cursor;
+			}
+			scrolled = true;
+		} else if (CursorScreenPos.x > scroll_right) {
+			if (WorldMapOffsetX < GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64)) {
+				if (GrandStrategyMapWidthIndent == -32) {
+					WorldMapOffsetX = WorldMapOffsetX + 1;
+				}
+				GrandStrategyMapWidthIndent += 32;
+			}
+			if (GameCursor == UI.ArrowN.Cursor) {
+				GameCursor = UI.ArrowNE.Cursor;
+			} else if (GameCursor == UI.ArrowS.Cursor) {
+				GameCursor = UI.ArrowSE.Cursor;
+			} else {
+				GameCursor = UI.ArrowE.Cursor;
+			}
+			scrolled = true;
+		}
+		if (scrolled) {
+			if (GrandStrategyMapWidthIndent <= -64) {
+				GrandStrategyMapWidthIndent = 0;
+			}
+			if (GrandStrategyMapHeightIndent <= -64) {
+				GrandStrategyMapHeightIndent = 0;
+			}
+			if (GrandStrategyMapWidthIndent > 0) {
+				GrandStrategyMapWidthIndent *= -1;
+			}
+			if (GrandStrategyMapHeightIndent > 0) {
+				GrandStrategyMapHeightIndent *= -1;
+			}
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (DrawOnScreenTiles ~= nil) then DrawOnScreenTiles() end;");
+			CclCommand(buf);
+		} else {
+			GameCursor = UI.Point.Cursor;
+		}
+		
+		//draw map
 		GrandStrategyGame.DrawMap();
 	//Wyrmgus end
 	}

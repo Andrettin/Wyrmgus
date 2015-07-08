@@ -817,8 +817,8 @@ bool GrandStrategy = false;				///if the game is in grand strategy mode
 std::string GrandStrategyWorld;
 int WorldMapOffsetX;
 int WorldMapOffsetY;
-bool GrandStrategyMapWidthIndent;
-bool GrandStrategyMapHeightIndent;
+int GrandStrategyMapWidthIndent;
+int GrandStrategyMapHeightIndent;
 CGrandStrategyGame GrandStrategyGame;
 
 /**
@@ -858,14 +858,8 @@ void CGrandStrategyGame::DrawMap()
 	int grand_strategy_map_width = UI.MapArea.EndX - UI.MapArea.X;
 	int grand_strategy_map_height = UI.MapArea.EndY - UI.MapArea.Y;
 	
-	int width_indent = 0;
-	int height_indent = 0;
-	if (GrandStrategyMapWidthIndent) {
-		width_indent = -32;
-	}
-	if (GrandStrategyMapHeightIndent) {
-		height_indent = -32;
-	}
+	int width_indent = GrandStrategyMapWidthIndent;
+	int height_indent = GrandStrategyMapHeightIndent;
 	
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64)) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64)) && y < GetWorldMapHeight(); ++y) {
@@ -967,14 +961,8 @@ Vec2i CGrandStrategyGame::GetTileUnderCursor()
 {
 	Vec2i tile_under_cursor(0, 0);
 	
-	int width_indent = 0;
-	int height_indent = 0;
-	if (GrandStrategyMapWidthIndent) {
-		width_indent = -32;
-	}
-	if (GrandStrategyMapHeightIndent) {
-		height_indent = -32;
-	}
+	int width_indent = GrandStrategyMapWidthIndent;
+	int height_indent = GrandStrategyMapHeightIndent;
 			
 	tile_under_cursor.x = WorldMapOffsetX + ((CursorScreenPos.x - UI.MapArea.X - width_indent) / 64);
 	tile_under_cursor.y = WorldMapOffsetY + ((CursorScreenPos.y - UI.MapArea.Y - height_indent) / 64);

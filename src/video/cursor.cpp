@@ -129,7 +129,7 @@ CCursor *CursorByIdent(const std::string &ident)
 			continue;
 		}
 		//Wyrmgus start
-		if (!ThisPlayer && cursor.Race != PlayerRaces.Name[Players[0].Race]) {
+		if (!ThisPlayer && cursor.Race != PlayerRaces.Name[Players[0].Race] && !cursor.Race.empty()) {
 			continue;
 		}
 		//Wyrmgus end

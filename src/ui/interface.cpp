@@ -703,7 +703,7 @@ static bool CommandKey(int key)
 			break;
 
 		//Wyrmgus start
-		case 'q': // select all army units (FIXME: still need to add functionality)
+		case 'q': // select all army units
 			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
 				if (GameObserve || GamePaused || GameEstablishing) {
 					break;

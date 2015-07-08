@@ -310,8 +310,8 @@ extern bool GrandStrategy;								/// if the game is in grand strategy mode
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
 extern int WorldMapOffsetY;
-extern bool GrandStrategyMapWidthIndent;
-extern bool GrandStrategyMapHeightIndent;
+extern int GrandStrategyMapWidthIndent;
+extern int GrandStrategyMapHeightIndent;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 
 extern int GetWorldMapWidth();
