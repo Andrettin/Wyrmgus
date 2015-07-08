@@ -592,6 +592,11 @@ int DefaultResourceMaxAmounts[MaxCosts];
 */
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
+//Wyrmgus start
+std::string UnitTypeClasses[UnitTypeClassMax];
+std::map<std::string, int> UnitTypeClassStringToIndex;
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -1225,6 +1230,18 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 	}
 	return NULL;
 }
+
+//Wyrmgus start
+int GetUnitTypeClassIndexByName(const std::string &class_name)
+{
+	return UnitTypeClassStringToIndex[class_name];
+}
+
+void SetUnitTypeClassStringToIndex(std::string class_name, int class_id)
+{
+	UnitTypeClassStringToIndex[class_name] = class_id;
+}
+//Wyrmgus end
 
 /**
 **  Allocate an empty unit-type slot.

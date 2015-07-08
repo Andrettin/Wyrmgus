@@ -348,9 +348,12 @@ void PlayerRace::Clean()
 		this->Display[i].clear();
 		this->Visible[i] = false;
 		//Wyrmgus start
+		for (int j = 0; j < UnitTypeClassMax; ++j) {
+			this->CivilizationClassUnitTypes[i][j] = -1;
+		}
 		this->Playable[i] = false;
 		this->Species[i].clear();
-		this->ParentCivilization[i].clear();
+		this->ParentCivilization[i] = -1;
 		for (unsigned int j = 0; j < FactionMax; ++j) {
 			this->FactionNames[i][j].clear();
 			this->FactionTypes[i][j].clear();
@@ -426,6 +429,26 @@ int PlayerRace::GetFactionIndexByName(const int civilization, const std::string 
 		
 		if (this->FactionNames[civilization][i] == faction_name) {
 			return i;
+		}
+	}
+	
+	return -1;
+}
+
+int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
+{
+	if (civilization == -1 || class_id == -1) {
+		return -1;
+	}
+	
+	if (CivilizationClassUnitTypes[civilization][class_id] != -1) {
+		return CivilizationClassUnitTypes[civilization][class_id];
+	}
+	
+	if (PlayerRaces.ParentCivilization[civilization] != -1) {
+		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
+		if (parent_civilization != -1) {
+			return GetCivilizationClassUnitType(parent_civilization, class_id);
 		}
 	}
 	

@@ -154,6 +154,7 @@ extern const char NameLine[];
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
 //Wyrmgus start
+#define UnitTypeClassMax  128		/// How many unit type classes are supported
 //#define MAX_RACES 8
 #define MAX_RACES 32
 #define FactionMax 128				/// Maximum number of factions a civilization can have
@@ -247,8 +248,10 @@ public:
 		Water(false), SettlementLocation(-1, -1)
 	{
 		memset(Owner, -1, sizeof(Owner));
+		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
 	}
 	
+	bool HasBuildingClass(std::string building_class_name);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);
@@ -263,6 +266,7 @@ public:
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	bool Water;															/// Whether the province is a water province or not
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
+	int SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
 	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
@@ -344,6 +348,7 @@ extern void SetProvinceFactionCulturalName(std::string province_name, std::strin
 extern void SetProvinceCulturalSettlementName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
 extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
+extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
 //Wyrmgus end

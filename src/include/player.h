@@ -441,6 +441,12 @@ public:
 	{
 		memset(Visible, 0, sizeof(Visible));
 		//Wyrmgus start
+		for (int i = 0; i < MAX_RACES; ++i) {
+			ParentCivilization[i] = -1;
+			for (int j = 0; j < UnitTypeClassMax; ++j) {
+				CivilizationClassUnitTypes[i][j] = -1;
+			}
+		}
 		memset(Playable, 0, sizeof(Playable));
 		//Wyrmgus end
 	}
@@ -449,6 +455,7 @@ public:
 	int GetRaceIndexByName(const char *raceName) const;
 	//Wyrmgus start
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
+	int GetCivilizationClassUnitType(int civilization, int class_id);
 	bool RequiresPlural(std::string word, int civilization) const;
 	std::string GetPluralForm(std::string word, int civilization) const;
 	//Wyrmgus end
@@ -458,9 +465,10 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
+	int CivilizationClassUnitTypes[MAX_RACES][UnitTypeClassMax];		/// the unit type slot of a particular class for a particular civilization
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's parent civilization, if any
-	std::string ParentCivilization[MAX_RACES];							/// civilization's parent civilization, if any
+	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
 	std::string FactionNames[MAX_RACES][FactionMax];    				/// faction names
 	std::string FactionTypes[MAX_RACES][FactionMax];    				/// faction types (tribe or polity)
 	int FactionColors[MAX_RACES][FactionMax];    						/// faction colors

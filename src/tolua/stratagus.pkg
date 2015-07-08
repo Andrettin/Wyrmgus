@@ -143,6 +143,7 @@ extern void SetProvinceFactionCulturalName(std::string province_name, std::strin
 extern void SetProvinceCulturalSettlementName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
 extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
+extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
 //Wyrmgus end

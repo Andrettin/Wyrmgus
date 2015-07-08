@@ -2578,7 +2578,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 		fprintf(fd, "SetWorldMapSize(%d, %d)\n", GetWorldMapWidth(), GetWorldMapHeight()); //save world map size
 		for (int x = 0; x < GetWorldMapWidth(); ++x) {
 			for (int y = 0; y < GetWorldMapHeight(); ++y) {
-				fprintf(fd, "SetWorldMapTileTerrain(%d, %d, %d)\n", x, y, GrandStrategyGame.WorldMapTiles[x][y]->Terrain); //save tile terrain
+				if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
+					fprintf(fd, "SetWorldMapTileTerrain(%d, %d, %d)\n", x, y, GrandStrategyGame.WorldMapTiles[x][y]->Terrain); //save tile terrain
+				}
 			}
 		}
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -2587,6 +2589,15 @@ void SaveGrandStrategyGame(const std::string &filename)
 					break;
 				} else {
 					fprintf(fd, "AddWorldMapResource(\"%s\", %d, %d, %s)\n", DefaultResourceNames[i].c_str(), GrandStrategyGame.WorldMapResources[i][j][0], GrandStrategyGame.WorldMapResources[i][j][1], GrandStrategyGame.WorldMapResources[i][j][2] ? "true" : "false"); //save world map resource
+				}
+			}
+		}
+		for (int i = 0; i < ProvinceMax; ++i) { //save province information
+			if (GrandStrategyGame.Provinces[i]) {
+				for (size_t j = 0; j < UnitTypes.size(); ++j) {
+					if (GrandStrategyGame.Provinces[i]->SettlementBuildings[j] != 0) {
+						fprintf(fd, "SetProvinceSettlementBuilding(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->SettlementBuildings[j]); //save settlement building
+					}
 				}
 			}
 		}

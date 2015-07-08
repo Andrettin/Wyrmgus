@@ -92,9 +92,15 @@ void ShowLoadProgress(const char *fmt, ...)
 				*s = ' ';
 			}
 		}
-		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
+		//Wyrmgus start
+//		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
+		Video.FillRectangle(ColorBlack, 0, Video.Height - 18, Video.Width, 18);
+		//Wyrmgus end
 		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
-		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
+		//Wyrmgus start
+//		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
+		InvalidateArea(0, Video.Height - 18, Video.Width, 18);
+		//Wyrmgus end
 		RealizeVideoMemory();
 	} else {
 		DebugPrint("!!!!%s\n" _C_ temp);

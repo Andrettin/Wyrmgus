@@ -958,6 +958,10 @@ public:
 
 extern CUnitTypeVar UnitTypeVar;
 
+//Wyrmgus start
+extern std::string UnitTypeClasses[UnitTypeClassMax]; //list of unit type classes; built with CclDefineUnitType
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -967,6 +971,10 @@ extern void UnitTypeCclRegister();               /// Register ccl features
 extern void UpdateUnitStats(CUnitType &type, int reset_to_default);       /// Update unit stats
 extern void UpdateStats(int reset_to_default);       /// Update unit stats
 extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by ident
+//Wyrmgus start
+extern int GetUnitTypeClassIndexByName(const std::string &class_name);
+extern void SetUnitTypeClassStringToIndex(std::string class_name, int class_id);
+//Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot

@@ -203,6 +203,7 @@ extern void beos_init(int argc, char **argv);
 #include "ui.h"
 #include "unit_manager.h"
 //Wyrmgus start
+#include "unittype.h"	// for grand strategy elements
 #include "upgrade.h"	// for grand strategy elements
 //Wyrmgus end
 #include "version.h"
@@ -879,7 +880,7 @@ void CGrandStrategyGame::DrawMap()
 					int civilization = GrandStrategyGame.Provinces[province_id]->Civilization;
 					if (civilization != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
 						//draw the province's settlement
-						if (GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
+						if (GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
 							int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
 							
 							GrandStrategyGame.SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
@@ -902,8 +903,8 @@ void CGrandStrategyGame::DrawMap()
 	}
 	
 	//draw fog over terra incognita
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + floor(static_cast<double>(grand_strategy_map_width / 64))); ++x) {
-		for (int y = WorldMapOffsetY; y <= std::min((WorldMapOffsetY + static_cast<int>(floor(static_cast<double>(grand_strategy_map_height / 64)))), (GetWorldMapHeight() - 1)); ++y) {
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64)) && x < GetWorldMapWidth(); ++x) {
+		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64)) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain == -1) {
 				GrandStrategyGame.FogTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 16, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 16, true);
 			}
@@ -919,7 +920,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	std::string tile_tooltip;
 	
 	int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1 && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1 && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
 		tile_tooltip += "Settlement";
 		if (!GrandStrategyGame.Provinces[province_id]->GetCulturalSettlementName().empty()) {
 			tile_tooltip += " of ";
@@ -980,6 +981,26 @@ bool WorldMapTile::HasResource(int resource, bool ignore_prospection)
 	}
 	return false;
 }
+
+bool CProvince::HasBuildingClass(std::string building_class_name)
+{
+	if (this->Civilization == -1 || building_class_name.empty()) {
+		return false;
+	}
+	
+	int building_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(building_class_name));
+	
+	if (building_type == -1 && building_class_name == "mercenary-camp") { //special case for mercenary camps, which are a neutral building
+		building_type = UnitTypeIdByIdent("unit-mercenary-camp");
+	}
+	
+	if (building_type != -1 && this->SettlementBuildings[building_type] == 2) {
+		return true;
+	}
+
+	return false;
+}
+
 
 /**
 **  Get the province's cultural name.
@@ -2085,6 +2106,17 @@ void SetProvinceReferenceProvince(std::string province_name, std::string referen
 	}
 }
 
+void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value)
+{
+	int province_id = GetProvinceId(province_name);
+	int settlement_building = UnitTypeIdByIdent(settlement_building_ident);
+	clamp(&value, 0, 2); //the value can only be equal to 0 (not constructed), 1 (under construction) or 2 (constructed)
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && settlement_building != -1) {
+		GrandStrategyGame.Provinces[province_id]->SettlementBuildings[settlement_building] = value;
+	}
+}
+
 /**
 **  Clean the grand strategy variables.
 */
@@ -2122,6 +2154,9 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.Provinces[i]->FactionCulturalNames[j][k] = "";
 					GrandStrategyGame.Provinces[i]->FactionCulturalSettlementNames[j][k] = "";
 				}
+			}
+			for (size_t j = 0; j < UnitTypes.size(); ++j) {
+				GrandStrategyGame.Provinces[i]->SettlementBuildings[j] = 0;
 			}
 		}
 	}
@@ -2172,8 +2207,8 @@ void InitializeGrandStrategyGame()
 		std::string settlement_graphics_file = "tilesets/world/sites/";
 		settlement_graphics_file += PlayerRaces.Name[i];
 		settlement_graphics_file += "_settlement.png";
-		if (!CanAccessFile(settlement_graphics_file.c_str()) && !PlayerRaces.ParentCivilization[i].empty()) {
-			settlement_graphics_file = FindAndReplaceString(settlement_graphics_file, PlayerRaces.Name[i], PlayerRaces.ParentCivilization[i]);
+		if (!CanAccessFile(settlement_graphics_file.c_str()) && PlayerRaces.ParentCivilization[i] != -1) {
+			settlement_graphics_file = FindAndReplaceString(settlement_graphics_file, PlayerRaces.Name[i], PlayerRaces.Name[PlayerRaces.ParentCivilization[i]]);
 		}
 		if (CanAccessFile(settlement_graphics_file.c_str())) {
 			if (CPlayerColorGraphic::Get(settlement_graphics_file) == NULL) {

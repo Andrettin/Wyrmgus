@@ -563,7 +563,7 @@ static int CclDefineRaceNames(lua_State *l)
 					PlayerRaces.Species[i] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "parent-civilization")) {
 					++k;
-					PlayerRaces.ParentCivilization[i] = LuaToString(l, j + 1, k + 1);
+					PlayerRaces.ParentCivilization[i] = PlayerRaces.GetRaceIndexByName(LuaToString(l, j + 1, k + 1));
 				} else if (!strcmp(value, "personal-names")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
@@ -776,7 +776,7 @@ static int CclDefineNewRaceNames(lua_State *l)
 					PlayerRaces.Species[i] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "parent-civilization")) {
 					++k;
-					PlayerRaces.ParentCivilization[i] = LuaToString(l, j + 1, k + 1);
+					PlayerRaces.ParentCivilization[i] = PlayerRaces.GetRaceIndexByName(LuaToString(l, j + 1, k + 1));
 				} else if (!strcmp(value, "personal-names")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
@@ -1411,8 +1411,14 @@ static int CclGetParentCivilization(lua_State *l)
 	LuaCheckArgs(l, 1);
 	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
 	lua_pop(l, 1);
+	
+	std::string parent_civilization_name;
+	int parent_civilization = PlayerRaces.ParentCivilization[civilization];
+	if (parent_civilization != -1) {
+		parent_civilization_name = PlayerRaces.Name[parent_civilization];
+	}
 
-	lua_pushstring(l, PlayerRaces.ParentCivilization[civilization].c_str());
+	lua_pushstring(l, parent_civilization_name.c_str());
 	return 1;
 }
 

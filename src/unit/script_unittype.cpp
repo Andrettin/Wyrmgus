@@ -1777,6 +1777,28 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 	}
+	
+	//Wyrmgus start
+	if (!type->Class.empty() && !type->Civilization.empty()) { //if class and civilization are defined, then use this unit type to help build the classes table, and add this unit to the civilization class table
+		int class_id = -1;
+		for (unsigned int i = 0; i != UnitTypeClassMax; ++i) {
+			if (UnitTypeClasses[i] == type->Class) {
+				class_id = i;
+				break;
+			}
+			if (UnitTypeClasses[i].empty()) { //if reached a blank slot, then the class isn't recorded yet; do so now
+				UnitTypeClasses[i] = type->Class;
+				SetUnitTypeClassStringToIndex(type->Class, i);
+				class_id = i;
+				break;
+			}
+		}
+		int civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
+		Assert(civilization_id != -1);
+		Assert(class_id != -1);
+		PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
+	}
+	//Wyrmgus end
 
 	// If number of directions is not specified, make a guess
 	// Building have 1 direction and units 8
