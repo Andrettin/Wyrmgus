@@ -299,9 +299,15 @@ void DrawGuichanWidgets()
 {
 	if (Gui) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
-		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
+		//Wyrmgus start
+//		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
+		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running && !GrandStrategy);
+		//Wyrmgus end
 #else
-		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
+		//Wyrmgus start
+//		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
+		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running && !GrandStrategy);
+		//Wyrmgus end
 #endif
 		Gui->draw();
 	}
