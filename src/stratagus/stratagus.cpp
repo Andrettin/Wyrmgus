@@ -884,6 +884,10 @@ void CGrandStrategyGame::DrawMap()
 							int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
 							
 							GrandStrategyGame.SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+							
+							if (GrandStrategyGame.BarracksGraphics[civilization] && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("barracks")) {
+								GrandStrategyGame.BarracksGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+							}
 						}
 					}
 				}
@@ -2216,6 +2220,20 @@ void InitializeGrandStrategyGame()
 				settlement_graphics->Load();
 			}
 			GrandStrategyGame.SettlementGraphics[i] = CPlayerColorGraphic::Get(settlement_graphics_file);
+		}
+		
+		std::string barracks_graphics_file = "tilesets/world/sites/";
+		barracks_graphics_file += PlayerRaces.Name[i];
+		barracks_graphics_file += "_barracks.png";
+		if (!CanAccessFile(barracks_graphics_file.c_str()) && PlayerRaces.ParentCivilization[i] != -1) {
+			barracks_graphics_file = FindAndReplaceString(barracks_graphics_file, PlayerRaces.Name[i], PlayerRaces.Name[PlayerRaces.ParentCivilization[i]]);
+		}
+		if (CanAccessFile(barracks_graphics_file.c_str())) {
+			if (CPlayerColorGraphic::Get(barracks_graphics_file) == NULL) {
+				CPlayerColorGraphic *barracks_graphics = CPlayerColorGraphic::New(barracks_graphics_file, 64, 64);
+				barracks_graphics->Load();
+			}
+			GrandStrategyGame.BarracksGraphics[i] = CPlayerColorGraphic::Get(barracks_graphics_file);
 		}
 	}
 }

@@ -304,6 +304,7 @@ public:
 	CGraphic *FogTile;
 	CGraphic *GoldMineGraphics;
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
+	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	CProvince *Provinces[ProvinceMax];
