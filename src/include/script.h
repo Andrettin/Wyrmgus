@@ -321,7 +321,7 @@ extern void InitLua();                /// Initialise Lua
 extern void LoadCcl(const std::string &filename);  /// Load ccl config file
 extern void SavePreferences();        /// Save user preferences
 //Wyrmgus start
-extern void SaveExtraPreferences(const std::string &filename);        /// Save extra user preferences
+extern void SaveGrandStrategyGame(const std::string &filename);        /// Save extra user preferences
 //Wyrmgus end
 extern int CclCommand(const std::string &command, bool exitOnError = true);
 

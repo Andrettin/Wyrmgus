@@ -244,10 +244,10 @@ static int CclSavePreferences(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclSaveExtraPreferences(lua_State *l)
+static int CclSaveGrandStrategyGame(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
-	SaveExtraPreferences(LuaToString(l, 1));
+	SaveGrandStrategyGame(LuaToString(l, 1));
 	return 0;
 }
 //Wyrmgus end
@@ -2534,7 +2534,7 @@ void SavePreferences()
 /**
 **  Save extra user preferences
 */
-void SaveExtraPreferences(const std::string &filename)
+void SaveGrandStrategyGame(const std::string &filename)
 {
 	std::vector<std::string> blockTableNames;
 
@@ -2573,6 +2573,24 @@ void SaveExtraPreferences(const std::string &filename)
 			fprintf(fd, "if (%s == nil) then %s = {} end\n", GameName.c_str(), GameName.c_str());
 		}
 		fprintf(fd, "%s\n", s.c_str());
+		 //the global variables pertaining to the grand strategy game have been saved, now get to the grand strategy variables stored by the engine directly
+		 
+		fprintf(fd, "SetWorldMapSize(%d, %d)\n", GetWorldMapWidth(), GetWorldMapHeight()); //save world map size
+		for (int x = 0; x < GetWorldMapWidth(); ++x) {
+			for (int y = 0; y < GetWorldMapHeight(); ++y) {
+				fprintf(fd, "SetWorldMapTileTerrain(%d, %d, %d)\n", x, y, GrandStrategyGame.WorldMapTiles[x][y]->Terrain); //save tile terrain
+			}
+		}
+		for (int i = 0; i < MaxCosts; ++i) {
+			for (int j = 0; j < WorldMapResourceMax; ++j) {
+				if (GrandStrategyGame.WorldMapResources[i][j][0] == -1 && GrandStrategyGame.WorldMapResources[i][j][1] == -1 && GrandStrategyGame.WorldMapResources[i][j][2] == 0) { //if reached a blank spot, stop the loop
+					break;
+				} else {
+					fprintf(fd, "AddWorldMapResource(\"%s\", %d, %d, %s)\n", DefaultResourceNames[i].c_str(), GrandStrategyGame.WorldMapResources[i][j][0], GrandStrategyGame.WorldMapResources[i][j][1], GrandStrategyGame.WorldMapResources[i][j][2] ? "true" : "false"); //save world map resource
+				}
+			}
+		}
+		
 		fclose(fd);
 	}
 }
@@ -2708,7 +2726,7 @@ void ScriptRegister()
 
 	lua_register(Lua, "SavePreferences", CclSavePreferences);
 	//Wyrmgus start
-	lua_register(Lua, "SaveExtraPreferences", CclSaveExtraPreferences);
+	lua_register(Lua, "SaveGrandStrategyGame", CclSaveGrandStrategyGame);
 	//Wyrmgus end
 	lua_register(Lua, "Load", CclLoad);
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
