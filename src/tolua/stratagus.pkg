@@ -124,6 +124,8 @@ extern void SetWorldMapSize(int width, int height);
 extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
+extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
+extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);
 extern std::string GetProvinceCulturalName(std::string province_name);
 extern std::string GetProvinceCivilizationCulturalName(std::string province_name, std::string civilization_name);
 extern std::string GetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name);
@@ -142,4 +144,5 @@ extern void SetProvinceCulturalSettlementName(std::string province_name, std::st
 extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void CleanGrandStrategyGame();
+extern void InitializeGrandStrategyGame();
 //Wyrmgus end

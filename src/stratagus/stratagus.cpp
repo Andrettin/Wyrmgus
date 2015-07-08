@@ -876,6 +876,10 @@ void CGrandStrategyGame::DrawMap()
 				
 				GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 				
+				if (GrandStrategyGame.WorldMapTiles[x][y]->HasResource(GoldCost, false)) {
+					GrandStrategyGame.GoldMineGraphics->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+				}
+				
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 				if (province_id != -1) {
 					int civilization = GrandStrategyGame.Provinces[province_id]->Civilization;
@@ -884,18 +888,7 @@ void CGrandStrategyGame::DrawMap()
 						if (GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
 							int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
 							
-							std::string settlement_graphic_file = "tilesets/world/sites/";
-							settlement_graphic_file += PlayerRaces.Name[civilization];
-							settlement_graphic_file += "_settlement.png";
-							if (!CanAccessFile(settlement_graphic_file.c_str()) && !PlayerRaces.ParentCivilization[civilization].empty()) {
-								int parent_civilization = PlayerRaces.GetRaceIndexByName(PlayerRaces.ParentCivilization[civilization].c_str());
-								settlement_graphic_file = FindAndReplaceString(settlement_graphic_file, PlayerRaces.Name[civilization], PlayerRaces.ParentCivilization[civilization]);
-							}
-							if (CPlayerColorGraphic::Get(settlement_graphic_file) == NULL) {
-								CPlayerColorGraphic *tile_graphic = CPlayerColorGraphic::New(settlement_graphic_file, 64, 64);
-								tile_graphic->Load();
-							}
-							CPlayerColorGraphic::Get(settlement_graphic_file)->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+							GrandStrategyGame.SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 						}
 					}
 				}
@@ -941,6 +934,11 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		tile_tooltip += " (";
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		tile_tooltip += ")";
+	} else if (GrandStrategyGame.WorldMapTiles[x][y]->HasResource(GoldCost, false)) {
+		tile_tooltip += "Gold Mine";
+		tile_tooltip += " (";
+		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+		tile_tooltip += ")";
 	} else {
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 	}	
@@ -982,6 +980,17 @@ Vec2i CGrandStrategyGame::GetTileUnderCursor()
 	tile_under_cursor.y = WorldMapOffsetY + ((CursorScreenPos.y - UI.MapArea.Y - height_indent) / 64);
 	
 	return tile_under_cursor;
+}
+
+/**
+**  Get whether the tile has a resource
+*/
+bool WorldMapTile::HasResource(int resource, bool ignore_prospection)
+{
+	if (resource == this->Resource && (this->ResourceProspected || ignore_prospection)) {
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -1554,6 +1563,8 @@ void SetWorldMapSize(int width, int height)
 			if (!GrandStrategyGame.WorldMapTiles[x][y]) {
 				WorldMapTile *world_map_tile = new WorldMapTile;
 				GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
+				GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
+				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
 			}
 		}
 	}
@@ -1569,6 +1580,8 @@ void SetWorldMapTileTerrain(int x, int y, int terrain)
 	if (!GrandStrategyGame.WorldMapTiles[x][y]) {
 		WorldMapTile *world_map_tile = new WorldMapTile;
 		GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
+		GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
+		GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
 	}
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->Terrain = terrain;
@@ -1595,27 +1608,6 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 */
 void CalculateWorldMapTileGraphicTile(int x, int y)
 {
-	//set the base tile here, if it hasn't been gotten yet
-	std::string base_tile_filename;
-	if (GrandStrategyWorld == "Nidavellir") {
-		base_tile_filename = "tilesets/world/terrain/dark_plains.png";
-	} else {
-		base_tile_filename = "tilesets/world/terrain/plains.png";
-	}
-	if (CGraphic::Get(base_tile_filename) == NULL) {
-		CGraphic *base_tile_graphic = CGraphic::New(base_tile_filename, 64, 64);
-		base_tile_graphic->Load();
-	}
-	GrandStrategyGame.BaseTile = CGraphic::Get(base_tile_filename);
-	
-	//do the same for the fog tile now
-	std::string fog_graphic_tile = "tilesets/world/terrain/fog.png";
-	if (CGraphic::Get(fog_graphic_tile) == NULL) {
-		CGraphic *fog_tile_graphic = CGraphic::New(fog_graphic_tile, 96, 96);
-		fog_tile_graphic->Load();
-	}
-	GrandStrategyGame.FogTile = CGraphic::Get(fog_graphic_tile);
-	
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1);
 	
@@ -1779,6 +1771,39 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 			tile_graphic->Load();
 		}
 		GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = CGraphic::Get(graphic_tile);
+	}
+}
+
+void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (resource != -1) {
+		for (int i = 0; i < WorldMapResourceMax; ++i) {
+			if (GrandStrategyGame.WorldMapResources[resource][i][0] == -1 && GrandStrategyGame.WorldMapResources[resource][i][1] == -1 && GrandStrategyGame.WorldMapResources[resource][i][2] == 0) { //if this spot for a world map resource is blank
+				GrandStrategyGame.WorldMapResources[resource][i][0] = x;
+				GrandStrategyGame.WorldMapResources[resource][i][1] = y;
+				GrandStrategyGame.WorldMapResources[resource][i][2] = discovered ? 1 : 0;
+				GrandStrategyGame.WorldMapTiles[x][y]->Resource = resource;
+				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = discovered;
+				break;
+			}
+		}
+	}
+}
+
+void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (resource != -1) {
+		for (int i = 0; i < WorldMapResourceMax; ++i) {
+			if (GrandStrategyGame.WorldMapResources[resource][i][0] == x && GrandStrategyGame.WorldMapResources[resource][i][1] == y) {
+				GrandStrategyGame.WorldMapResources[resource][i][2] = discovered ? 1 : 0;
+				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = discovered;
+				break;
+			}
+		}
 	}
 }
 
@@ -2081,15 +2106,19 @@ void CleanGrandStrategyGame()
 		for (int y = 0; y < WorldMapHeightMax; ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]) {
 				GrandStrategyGame.WorldMapTiles[x][y]->Terrain = -1;
+				GrandStrategyGame.WorldMapTiles[x][y]->Province = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
 //				GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = "";
-				GrandStrategyGame.WorldMapTiles[x][y]->Province = -1;
+				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
+				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
+				GrandStrategyGame.WorldMapTiles[x][y]->Position.x = -1;
+				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = -1;
 			}
 		}
 	}
 	for (int i = 0; i < ProvinceMax; ++i) {
 		if (GrandStrategyGame.Provinces[i]) {
-			//GrandStrategyGame.Provinces[i]->Name = ""; //this cannot be set to "", or else the game will create a new province for this whenever it creates a new game
+			GrandStrategyGame.Provinces[i]->Name = "";
 			GrandStrategyGame.Provinces[i]->SettlementName = "";
 			GrandStrategyGame.Provinces[i]->Civilization = -1;
 			GrandStrategyGame.Provinces[i]->Owner[0] = -1;
@@ -2108,9 +2137,64 @@ void CleanGrandStrategyGame()
 			}
 		}
 	}
+	for (int i = 0; i < MaxCosts; ++i) {
+		for (int j = 0; j < WorldMapResourceMax; ++j) {
+			GrandStrategyGame.WorldMapResources[i][j][0] = -1;
+			GrandStrategyGame.WorldMapResources[i][j][1] = -1;
+			GrandStrategyGame.WorldMapResources[i][j][2] = 0;
+		}
+	}
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
 	GrandStrategyGame.ProvinceCount = 0;
+}
+
+void InitializeGrandStrategyGame()
+{
+	//set the base tile here, if it hasn't been gotten yet
+	std::string base_tile_filename;
+	if (GrandStrategyWorld == "Nidavellir") {
+		base_tile_filename = "tilesets/world/terrain/dark_plains.png";
+	} else {
+		base_tile_filename = "tilesets/world/terrain/plains.png";
+	}
+	if (CGraphic::Get(base_tile_filename) == NULL) {
+		CGraphic *base_tile_graphic = CGraphic::New(base_tile_filename, 64, 64);
+		base_tile_graphic->Load();
+	}
+	GrandStrategyGame.BaseTile = CGraphic::Get(base_tile_filename);
+	
+	//do the same for the fog tile now
+	std::string fog_graphic_tile = "tilesets/world/terrain/fog.png";
+	if (CGraphic::Get(fog_graphic_tile) == NULL) {
+		CGraphic *fog_tile_graphic = CGraphic::New(fog_graphic_tile, 96, 96);
+		fog_tile_graphic->Load();
+	}
+	GrandStrategyGame.FogTile = CGraphic::Get(fog_graphic_tile);
+	
+	//and for the gold mine
+	std::string gold_mine_graphics_file = "tilesets/world/sites/gold_mine.png";
+	if (CGraphic::Get(gold_mine_graphics_file) == NULL) {
+		CGraphic *gold_mine_graphics = CGraphic::New(gold_mine_graphics_file, 64, 64);
+		gold_mine_graphics->Load();
+	}
+	GrandStrategyGame.GoldMineGraphics = CGraphic::Get(gold_mine_graphics_file);
+	
+	for (int i = 0; i < MAX_RACES; ++i) {
+		std::string settlement_graphics_file = "tilesets/world/sites/";
+		settlement_graphics_file += PlayerRaces.Name[i];
+		settlement_graphics_file += "_settlement.png";
+		if (!CanAccessFile(settlement_graphics_file.c_str()) && !PlayerRaces.ParentCivilization[i].empty()) {
+			settlement_graphics_file = FindAndReplaceString(settlement_graphics_file, PlayerRaces.Name[i], PlayerRaces.ParentCivilization[i]);
+		}
+		if (CanAccessFile(settlement_graphics_file.c_str())) {
+			if (CPlayerColorGraphic::Get(settlement_graphics_file) == NULL) {
+				CPlayerColorGraphic *settlement_graphics = CPlayerColorGraphic::New(settlement_graphics_file, 64, 64);
+				settlement_graphics->Load();
+			}
+			GrandStrategyGame.SettlementGraphics[i] = CPlayerColorGraphic::Get(settlement_graphics_file);
+		}
+	}
 }
 //Wyrmgus end
 

@@ -165,8 +165,9 @@ extern const char NameLine[];
 #define WorldMapWidthMax 256		/// Maximum width the grand strategy world map can have
 #define WorldMapHeightMax 256		/// Maximum height the grand strategy world map can have
 #define WorldMapTerrainTypeMax 32	/// Maximum height the grand strategy world map can have
-#define ProvinceMax 128				/// Maximum quantity of provinces in a grand strategy game
-#define ProvinceTileMax 64			/// Maximum quantity of tiles a province can have
+#define ProvinceMax 256				/// Maximum quantity of provinces in a grand strategy game
+#define ProvinceTileMax 128			/// Maximum quantity of tiles a province can have
+#define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)
@@ -200,6 +201,7 @@ extern int stratagusMain(int argc, char **argv); /// main entry
 
 #include "vec2i.h"
 #include "video.h"
+#include "upgrade_structs.h"
 
 class WorldMapTerrainType
 {
@@ -220,13 +222,18 @@ class WorldMapTile
 {
 public:
 	WorldMapTile() :
-		Terrain(-1), Province(-1), Variation(-1), GraphicTile(NULL)
+		Terrain(-1), Province(-1), Variation(-1), Resource(-1), ResourceProspected(false), Position(-1, -1), GraphicTile(NULL)
 	{
 	}
 
+	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
+	
 	int Terrain;						/// Tile terrain (i.e. plains)
 	int Province;						/// Province to which the tile belongs
 	int Variation;						/// Tile variation
+	int Resource;						/// The tile's resource, if any
+	bool ResourceProspected;			/// Whether the tile's resource has been discovered
+	Vec2i Position;						/// Position of the tile
 //	std::string GraphicTile;			/// The tile image used by this tile
 	CGraphic *GraphicTile;				/// The tile image used by this tile
 };
@@ -271,6 +278,13 @@ class CGrandStrategyGame
 public:
 	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), BaseTile(NULL)
 	{
+		for (int i = 0; i < MaxCosts; ++i) {
+			for (int j = 0; j < WorldMapResourceMax; ++j) {
+				WorldMapResources[i][j][0] = -1;
+				WorldMapResources[i][j][1] = -1;
+				WorldMapResources[i][j][2] = 0;
+			}
+		}
 	}
 
 	void Clean();
@@ -284,9 +298,12 @@ public:
 	int ProvinceCount;
 	CGraphic *BaseTile;
 	CGraphic *FogTile;
+	CGraphic *GoldMineGraphics;
+	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	CProvince *Provinces[ProvinceMax];
+	int WorldMapResources[MaxCosts][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 };
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
@@ -308,6 +325,8 @@ extern void SetWorldMapSize(int width, int height);
 extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
+extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
+extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);
 extern std::string GetProvinceCulturalName(std::string province_name);
 extern std::string GetProvinceCivilizationCulturalName(std::string province_name, std::string civilization_name);
 extern std::string GetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name);
@@ -326,6 +345,7 @@ extern void SetProvinceCulturalSettlementName(std::string province_name, std::st
 extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void CleanGrandStrategyGame();
+extern void InitializeGrandStrategyGame();
 //Wyrmgus end
 
 //@}
