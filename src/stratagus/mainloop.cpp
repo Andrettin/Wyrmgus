@@ -249,6 +249,8 @@ void UpdateDisplay()
 					WorldMapOffsetX = WorldMapOffsetX - 1;
 				}
 				GrandStrategyMapWidthIndent -= 32;
+			} else if (WorldMapOffsetX == 0 && GrandStrategyMapWidthIndent == -32) { //this is to make the entire x 0 tiles be shown scrolling to the westmost part of the map
+				GrandStrategyMapWidthIndent -= 32;
 			}
 			if (GameCursor == UI.ArrowN.Cursor) {
 				GameCursor = UI.ArrowNW.Cursor;

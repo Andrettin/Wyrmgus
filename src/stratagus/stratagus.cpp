@@ -873,8 +873,8 @@ void CGrandStrategyGame::DrawMap()
 	int width_indent = GrandStrategyMapWidthIndent;
 	int height_indent = GrandStrategyMapHeightIndent;
 	
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64)) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64)) && y < GetWorldMapHeight(); ++y) {
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
+		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile) {
 				if (GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->BaseTile != -1) { // should be changed into a more dynamic setting than being based on GrandStrategyWorld
 					GrandStrategyGame.BaseTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
@@ -901,14 +901,19 @@ void CGrandStrategyGame::DrawMap()
 							}
 						}
 					}
+					
+					//draw symbol that the province is being attacked by the human player, if that is the case
+					if (GrandStrategyGame.Provinces[province_id]->AttackedBy[0] != -1 && GrandStrategyGame.Provinces[province_id]->AttackedBy[1] != -1 &&GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
+						GrandStrategyGame.SymbolAttack->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					}
 				}
 			}
 		}
 	}
 	
-	//draw the tile borders (they need to be drawn here, so that they appear over the tiles)
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64)) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64)) && y < GetWorldMapHeight(); ++y) {
+	//draw the tile borders (they need to be drawn here, so that they appear over all tiles, as they go beyond their own tile)
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
+		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 			if (province_id != -1) {
 				//draw the tile's borders
@@ -997,8 +1002,8 @@ void CGrandStrategyGame::DrawMap()
 	}
 	
 	//draw fog over terra incognita
-	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64)) && x < GetWorldMapWidth(); ++x) {
-		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64)) && y < GetWorldMapHeight(); ++y) {
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
+		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain == -1) {
 				GrandStrategyGame.FogTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 16, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 16, true);
 			}
@@ -2450,6 +2455,14 @@ void InitializeGrandStrategyGame()
 		}
 		GrandStrategyGame.NationalBorderGraphics[i] = CPlayerColorGraphic::Get(national_border_graphics_file);
 	}
+	
+	//load the attack symbol
+	std::string attack_symbol_filename = "tilesets/world/sites/attack.png";
+	if (CGraphic::Get(attack_symbol_filename) == NULL) {
+		CGraphic *attack_symbol_graphic = CGraphic::New(attack_symbol_filename, 64, 64);
+		attack_symbol_graphic->Load();
+	}
+	GrandStrategyGame.SymbolAttack = CGraphic::Get(attack_symbol_filename);
 }
 
 void CalculateProvinceBorders()

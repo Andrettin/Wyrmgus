@@ -316,6 +316,7 @@ public:
 	int ProvinceCount;
 	CGraphic *BaseTile;
 	CGraphic *FogTile;
+	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
 	CGraphic *GoldMineGraphics;
 	CGraphic *BorderGraphics[8];								///one for each direction, 0 = North, 1 = Northeast, 2 = East, 3 = Southeast, 4 = South, 5 = Southwest, 6 = West, 7 = Northwest
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
