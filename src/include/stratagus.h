@@ -223,7 +223,8 @@ class WorldMapTile
 {
 public:
 	WorldMapTile() :
-		Terrain(-1), Province(-1), Variation(-1), Resource(-1), ResourceProspected(false), Position(-1, -1), GraphicTile(NULL)
+		Terrain(-1), Province(-1), Variation(-1), Resource(-1),
+		ResourceProspected(false), BorderTile(false), Position(-1, -1), GraphicTile(NULL)
 	{
 	}
 
@@ -234,6 +235,7 @@ public:
 	int Variation;						/// Tile variation
 	int Resource;						/// The tile's resource, if any
 	bool ResourceProspected;			/// Whether the tile's resource has been discovered
+	bool BorderTile;					/// Whether this tile borders a tile of another province
 	Vec2i Position;						/// Position of the tile
 //	std::string GraphicTile;			/// The tile image used by this tile
 	CGraphic *GraphicTile;				/// The tile image used by this tile
@@ -249,9 +251,16 @@ public:
 	{
 		memset(Owner, -1, sizeof(Owner));
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
+		memset(BorderProvinces, 0, sizeof(BorderProvinces));
+		for (int i = 0; i < ProvinceTileMax; ++i) {
+			Tiles[i].x = -1;
+			Tiles[i].y = -1;
+		}
 	}
 	
 	bool HasBuildingClass(std::string building_class_name);
+	bool BordersProvince(int province_id);
+	bool BordersFaction(int faction_civilization, int faction);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);
@@ -265,12 +274,15 @@ public:
 	int Owner[2];														/// Owner of the province, first number for the owner's civilization, and the second one for the faction itself (-1, -1 = no one).
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	bool Water;															/// Whether the province is a water province or not
+	bool Coastal;														/// Whether the province is a coastal province or not
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
 	int SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
+	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
 	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
 	std::string FactionCulturalSettlementNames[MAX_RACES][FactionMax];	/// Names for the province's settlement for each different faction
+	Vec2i Tiles[ProvinceTileMax];
 };
 
 /**
@@ -303,8 +315,10 @@ public:
 	CGraphic *BaseTile;
 	CGraphic *FogTile;
 	CGraphic *GoldMineGraphics;
+	CGraphic *BorderGraphics[8];								///one for each direction, 0 = North, 1 = Northeast, 2 = East, 3 = Southeast, 4 = South, 5 = Southwest, 6 = West, 7 = Northwest
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
 	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
+	CPlayerColorGraphic *NationalBorderGraphics[8];				///one for each direction, 0 = North, 1 = Northeast, 2 = East, 3 = Southeast, 4 = South, 5 = Southwest, 6 = West, 7 = Northwest
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	CProvince *Provinces[ProvinceMax];
@@ -352,6 +366,9 @@ extern void SetProvinceReferenceProvince(std::string province_name, std::string 
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
+extern void CalculateProvinceBorders();
+extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
+extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 //Wyrmgus end
 
 //@}

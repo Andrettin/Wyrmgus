@@ -201,6 +201,9 @@ extern void beos_init(int argc, char **argv);
 #include "title.h"
 #include "translate.h"
 #include "ui.h"
+//Wyrmgus start
+#include "unit.h"	// for grand strategy elements
+//Wyrmgus end
 #include "unit_manager.h"
 //Wyrmgus start
 #include "unittype.h"	// for grand strategy elements
@@ -849,6 +852,14 @@ void CGrandStrategyGame::Clean()
 		}
 	}
 	this->ProvinceCount = 0;
+	
+	for (int i = 0; i < MaxCosts; ++i) {
+		for (int j = 0; j < WorldMapResourceMax; ++j) {
+			GrandStrategyGame.WorldMapResources[i][j][0] = -1;
+			GrandStrategyGame.WorldMapResources[i][j][1] = -1;
+			GrandStrategyGame.WorldMapResources[i][j][2] = 0;
+		}
+	}	
 }
 
 /**
@@ -887,6 +898,85 @@ void CGrandStrategyGame::DrawMap()
 							
 							if (GrandStrategyGame.BarracksGraphics[civilization] && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("barracks")) {
 								GrandStrategyGame.BarracksGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	//draw the tile borders (they need to be drawn here, so that they appear over the tiles)
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64)) && x < GetWorldMapWidth(); ++x) {
+		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64)) && y < GetWorldMapHeight(); ++y) {
+			int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
+			if (province_id != -1) {
+				//draw the tile's borders
+				if (GrandStrategyGame.WorldMapTiles[x][y]->BorderTile) {
+					// first check if is an inner tile or not
+					bool inner = true;
+					for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+						if ((x + sub_x) < 0 || (x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
+							continue;
+						}
+						for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+							if ((y + sub_y) < 0 || (y + sub_y) >= GrandStrategyGame.WorldMapHeight || !GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]) {
+								continue;
+							}
+						
+							int second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
+							if (!(sub_x == 0 && sub_y == 0) && second_province_id != -1 && second_province_id != province_id && GrandStrategyGame.Provinces[province_id]->Water == GrandStrategyGame.Provinces[second_province_id]->Water) {
+								int direction = DirectionToHeading(Vec2i(x + sub_x, y + sub_y) - Vec2i(x, y)) + (32 / 2);
+								if (direction % 32 != 0) {
+									direction = direction - (direction % 32);
+								}
+								direction = direction / 32;
+								
+								if (direction == 0 || direction == 2 || direction == 4 || direction == 6) {
+									inner = false;
+									break;
+								}
+							}
+						}
+						if (!inner) {
+							break;
+						}
+					}
+					for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+						if ((x + sub_x) < 0 || (x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
+							continue;
+						}
+						for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+							if ((y + sub_y) < 0 || (y + sub_y) >= GrandStrategyGame.WorldMapHeight || !GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]) {
+								continue;
+							}
+						
+							int second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
+							if (!(sub_x == 0 && sub_y == 0) && second_province_id != -1 && second_province_id != province_id && GrandStrategyGame.Provinces[province_id]->Water == GrandStrategyGame.Provinces[second_province_id]->Water) {
+								int direction = DirectionToHeading(Vec2i(x + sub_x, y + sub_y) - Vec2i(x, y)) + (32 / 2);
+								if (direction % 32 != 0) {
+									direction = direction - (direction % 32);
+								}
+								direction = direction / 32;
+								
+								if (direction == 1 || direction == 3 || direction == 5 || direction == 7) {
+									if (!inner) {
+										continue;
+									}
+								}
+									
+								if (GrandStrategyGame.Provinces[province_id]->Owner[0] == GrandStrategyGame.Provinces[second_province_id]->Owner[0] && GrandStrategyGame.Provinces[province_id]->Owner[1] == GrandStrategyGame.Provinces[second_province_id]->Owner[1]) { // is not a national border
+									GrandStrategyGame.BorderGraphics[direction]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+								} else {
+									int player_color;
+									if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
+										player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+									} else {
+										player_color = 15;
+									}
+										
+									GrandStrategyGame.NationalBorderGraphics[direction]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+								}
 							}
 						}
 					}
@@ -1005,6 +1095,33 @@ bool CProvince::HasBuildingClass(std::string building_class_name)
 	return false;
 }
 
+bool CProvince::BordersProvince(int province_id)
+{
+	for (int i = 0; i < ProvinceMax; ++i) {
+		if (this->BorderProvinces[i] != -1) {
+			if (this->BorderProvinces[i] == province_id) {
+				return true;
+			}
+		} else {
+			break;
+		}
+	}
+	return false;
+}
+
+bool CProvince::BordersFaction(int faction_civilization, int faction)
+{
+	for (int i = 0; i < ProvinceMax; ++i) {
+		if (this->BorderProvinces[i] != -1) {
+			if (GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner[0] == faction_civilization && GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner[1] == faction) {
+				return true;
+			}
+		} else {
+			break;
+		}
+	}
+	return false;
+}
 
 /**
 **  Get the province's cultural name.
@@ -1613,7 +1730,20 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
-	GrandStrategyGame.WorldMapTiles[x][y]->Province = GetProvinceId(province_name);
+	int province_id = GetProvinceId(province_name);
+	GrandStrategyGame.WorldMapTiles[x][y]->Province = province_id;
+	
+	//now add the tile to the province's tiles array
+	for (int i = 0; i < ProvinceTileMax; ++i) {
+		if (GrandStrategyGame.Provinces[province_id]->Tiles[i].x == x && GrandStrategyGame.Provinces[province_id]->Tiles[i].y == y) { //if tile is there already, stop
+			break;
+		}
+		if (GrandStrategyGame.Provinces[province_id]->Tiles[i].x == -1 && GrandStrategyGame.Provinces[province_id]->Tiles[i].y == -1) { // if this a blank tile slot
+			GrandStrategyGame.Provinces[province_id]->Tiles[i].x = x;
+			GrandStrategyGame.Provinces[province_id]->Tiles[i].y = y;
+			break;
+		}
+	}
 }
 
 /**
@@ -2135,6 +2265,7 @@ void CleanGrandStrategyGame()
 //				GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = "";
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
+				GrandStrategyGame.WorldMapTiles[x][y]->BorderTile = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Position.x = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = -1;
 			}
@@ -2161,6 +2292,13 @@ void CleanGrandStrategyGame()
 			}
 			for (size_t j = 0; j < UnitTypes.size(); ++j) {
 				GrandStrategyGame.Provinces[i]->SettlementBuildings[j] = 0;
+			}
+			for (int j = 0; j < ProvinceMax; ++j) {
+				GrandStrategyGame.Provinces[i]->BorderProvinces[j] = -1;
+			}
+			for (int j = 0; j < ProvinceTileMax; ++j) {
+				GrandStrategyGame.Provinces[i]->Tiles[j].x = -1;
+				GrandStrategyGame.Provinces[i]->Tiles[j].y = -1;
 			}
 		}
 	}
@@ -2207,6 +2345,7 @@ void InitializeGrandStrategyGame()
 	}
 	GrandStrategyGame.GoldMineGraphics = CGraphic::Get(gold_mine_graphics_file);
 	
+	// set the settlement graphics
 	for (int i = 0; i < MAX_RACES; ++i) {
 		std::string settlement_graphics_file = "tilesets/world/sites/";
 		settlement_graphics_file += PlayerRaces.Name[i];
@@ -2236,6 +2375,136 @@ void InitializeGrandStrategyGame()
 			GrandStrategyGame.BarracksGraphics[i] = CPlayerColorGraphic::Get(barracks_graphics_file);
 		}
 	}
+	
+	// set the border graphics
+	for (int i = 0; i < 8; ++i) {
+		std::string border_graphics_file = "tilesets/world/terrain/";
+		border_graphics_file += "province_border_";
+		
+		std::string national_border_graphics_file = "tilesets/world/terrain/";
+		national_border_graphics_file += "province_national_border_";
+		
+		if (i == 0) {
+			border_graphics_file += "north";
+			national_border_graphics_file += "north";
+		} else if (i == 1) {
+			border_graphics_file += "northeast_inner";
+			national_border_graphics_file += "northeast_inner";
+		} else if (i == 2) {
+			border_graphics_file += "east";
+			national_border_graphics_file += "east";
+		} else if (i == 3) {
+			border_graphics_file += "southeast_inner";
+			national_border_graphics_file += "southeast_inner";
+		} else if (i == 4) {
+			border_graphics_file += "south";
+			national_border_graphics_file += "south";
+		} else if (i == 5) {
+			border_graphics_file += "southwest_inner";
+			national_border_graphics_file += "southwest_inner";
+		} else if (i == 6) {
+			border_graphics_file += "west";
+			national_border_graphics_file += "west";
+		} else if (i == 7) {
+			border_graphics_file += "northwest_inner";
+			national_border_graphics_file += "northwest_inner";
+		}
+		
+		border_graphics_file += ".png";
+		national_border_graphics_file += ".png";
+		
+		if (CGraphic::Get(border_graphics_file) == NULL) {
+			CGraphic *border_graphics = CGraphic::New(border_graphics_file, 84, 84);
+			border_graphics->Load();
+		}
+		GrandStrategyGame.BorderGraphics[i] = CGraphic::Get(border_graphics_file);
+		
+		if (CPlayerColorGraphic::Get(national_border_graphics_file) == NULL) {
+			CPlayerColorGraphic *national_border_graphics = CPlayerColorGraphic::New(national_border_graphics_file, 84, 84);
+			national_border_graphics->Load();
+		}
+		GrandStrategyGame.NationalBorderGraphics[i] = CPlayerColorGraphic::Get(national_border_graphics_file);
+	}
+}
+
+void CalculateProvinceBorders()
+{
+	for (int i = 0; i < ProvinceMax; ++i) {
+		if (GrandStrategyGame.Provinces[i] && !GrandStrategyGame.Provinces[i]->Name.empty()) {
+			for (int j = 0; j < ProvinceTileMax; ++j) {
+				if (GrandStrategyGame.Provinces[i]->Tiles[j].x != -1 && GrandStrategyGame.Provinces[i]->Tiles[j].y != -1) {
+					GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->Province = i; //tell the tile it belongs to this province
+				} else {
+					break;
+				}
+			}
+			
+			for (int j = 0; j < ProvinceMax; ++j) { //clean border provinces
+				if (GrandStrategyGame.Provinces[i]->BorderProvinces[j] == -1) {
+					break;
+				}
+				GrandStrategyGame.Provinces[i]->BorderProvinces[j] = -1;
+			}
+			
+			//calculate which of the province's tiles are border tiles, and which provinces it borders; also whether the province borders water (is coastal) or not
+			int border_province_count = 0;
+			for (int j = 0; j < ProvinceTileMax; ++j) {
+				if (GrandStrategyGame.Provinces[i]->Tiles[j].x != -1 && GrandStrategyGame.Provinces[i]->Tiles[j].y != -1) {
+					for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+						if ((GrandStrategyGame.Provinces[i]->Tiles[j].x + sub_x) < 0 || (GrandStrategyGame.Provinces[i]->Tiles[j].x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
+							continue;
+						}
+							
+						for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+							if ((GrandStrategyGame.Provinces[i]->Tiles[j].y + sub_y) < 0 || (GrandStrategyGame.Provinces[i]->Tiles[j].y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
+								continue;
+							}
+							
+							if (!GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x + sub_x][GrandStrategyGame.Provinces[i]->Tiles[j].y + sub_y] || GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x + sub_x][GrandStrategyGame.Provinces[i]->Tiles[j].y + sub_y]->Province == -1) {
+								continue;
+							}
+							
+							if (!(sub_x == 0 && sub_y == 0) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x + sub_x][GrandStrategyGame.Provinces[i]->Tiles[j].y + sub_y]->Province != i) {
+								GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->BorderTile = true;
+								
+								if (!GrandStrategyGame.Provinces[i]->BordersProvince(GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x + sub_x][GrandStrategyGame.Provinces[i]->Tiles[j].y + sub_y]->Province)) { //if isn't added yet to the border provinces, do so now
+									GrandStrategyGame.Provinces[i]->BorderProvinces[border_province_count] = GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x + sub_x][GrandStrategyGame.Provinces[i]->Tiles[j].y + sub_y]->Province;
+									border_province_count += 1;
+								}
+								
+								if (GrandStrategyGame.Provinces[i]->Water == false && GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x + sub_x][GrandStrategyGame.Provinces[i]->Tiles[j].y + sub_y]->Province]->Water == true) {
+									GrandStrategyGame.Provinces[i]->Coastal = true;
+								}
+							}
+						}
+					}
+				} else {
+					break;
+				}
+			}
+		}
+	}				
+}
+
+bool ProvinceBordersProvince(std::string province_name, std::string second_province_name)
+{
+	int province = GetProvinceId(province_name);
+	int second_province = GetProvinceId(second_province_name);
+	
+	return GrandStrategyGame.Provinces[province]->BordersProvince(second_province);
+}
+
+bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name)
+{
+	int province = GetProvinceId(province_name);
+	int civilization = PlayerRaces.GetRaceIndexByName(faction_civilization_name.c_str());
+	int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	
+	if (civilization == -1 || faction == -1) {
+		return false;
+	}
+	
+	return GrandStrategyGame.Provinces[province]->BordersFaction(civilization, faction);
 }
 //Wyrmgus end
 
