@@ -2052,6 +2052,19 @@ std::string GetProvinceFactionCulturalSettlementName(std::string province_name, 
 	return "";
 }
 
+std::string GetProvinceAttackedBy(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		if (GrandStrategyGame.Provinces[province_id]->AttackedBy[0] != -1 && GrandStrategyGame.Provinces[province_id]->AttackedBy[1] != -1) {
+			return PlayerRaces.FactionNames[GrandStrategyGame.Provinces[province_id]->AttackedBy[0]][GrandStrategyGame.Provinces[province_id]->AttackedBy[1]];
+		}
+	}
+	
+	return "";
+}
+
 void SetProvinceName(std::string old_province_name, std::string new_province_name)
 {
 	int province_id = GetProvinceId(old_province_name);
@@ -2251,6 +2264,16 @@ void SetProvinceSettlementBuilding(std::string province_name, std::string settle
 	}
 }
 
+void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		GrandStrategyGame.Provinces[province_id]->AttackedBy[0] = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		GrandStrategyGame.Provinces[province_id]->AttackedBy[1] = PlayerRaces.GetFactionIndexByName(GrandStrategyGame.Provinces[province_id]->AttackedBy[0], faction_name);
+	}
+}
+
 /**
 **  Clean the grand strategy variables.
 */
@@ -2279,6 +2302,8 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->Owner[0] = -1;
 			GrandStrategyGame.Provinces[i]->Owner[1] = -1;
 			GrandStrategyGame.Provinces[i]->ReferenceProvince = -1;
+			GrandStrategyGame.Provinces[i]->AttackedBy[0] = -1;
+			GrandStrategyGame.Provinces[i]->AttackedBy[1] = -1;
 			GrandStrategyGame.Provinces[i]->Water = false;
 			GrandStrategyGame.Provinces[i]->SettlementLocation.x = -1;
 			GrandStrategyGame.Provinces[i]->SettlementLocation.y = -1;

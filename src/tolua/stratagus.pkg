@@ -132,6 +132,7 @@ extern std::string GetProvinceFactionCulturalName(std::string province_name, std
 extern std::string GetProvinceCulturalSettlementName(std::string province_name);
 extern std::string GetProvinceCivilizationCulturalSettlementName(std::string province_name, std::string civilization_name);
 extern std::string GetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name);
+extern std::string GetProvinceAttackedBy(std::string province_name);
 extern void SetProvinceName(std::string old_province_name, std::string new_province_name);
 extern void SetProvinceWater(std::string province_name, bool water);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
@@ -144,6 +145,7 @@ extern void SetProvinceCulturalSettlementName(std::string province_name, std::st
 extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value);
+extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
 extern void CalculateProvinceBorders();

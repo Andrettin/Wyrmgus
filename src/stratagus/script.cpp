@@ -2593,7 +2593,29 @@ void SaveGrandStrategyGame(const std::string &filename)
 			}
 		}
 		for (int i = 0; i < ProvinceMax; ++i) { //save province information
-			if (GrandStrategyGame.Provinces[i]) {
+			if (GrandStrategyGame.Provinces[i] && !GrandStrategyGame.Provinces[i]->Name.empty()) {
+				fprintf(fd, "SetProvinceName(\"\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str()); //this will define a new province for the engine
+				if (GrandStrategyGame.Provinces[i]->Water) { //provinces are non-water provinces by default
+					fprintf(fd, "SetProvinceWater(\"%s\", %s)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), "true"); //save whether the province is a water province
+				}
+				if (!GrandStrategyGame.Provinces[i]->SettlementName.empty()) {
+					fprintf(fd, "SetProvinceSettlementName(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->SettlementName.c_str()); //save the province's settlement name
+				}
+				if (GrandStrategyGame.Provinces[i]->Civilization != -1) {
+					fprintf(fd, "SetProvinceCivilization(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Civilization].c_str()); //save the province's civilization
+				}
+				if (GrandStrategyGame.Provinces[i]->Owner[0] != -1 && GrandStrategyGame.Provinces[i]->Owner[1] != -1) {
+					fprintf(fd, "SetProvinceOwner(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Owner[0]].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Provinces[i]->Owner[0]][GrandStrategyGame.Provinces[i]->Owner[1]].c_str()); //save province owner
+				}
+				if (GrandStrategyGame.Provinces[i]->ReferenceProvince != -1) {
+					fprintf(fd, "SetProvinceReferenceProvince(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[i]->ReferenceProvince]->Name.c_str()); //save the province's reference province (for water provinces' cultural name)
+				}
+				if (GrandStrategyGame.Provinces[i]->AttackedBy[0] != -1 && GrandStrategyGame.Provinces[i]->AttackedBy[1] != -1) {
+					fprintf(fd, "SetProvinceAttackedBy(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->AttackedBy[0]].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Provinces[i]->AttackedBy[0]][GrandStrategyGame.Provinces[i]->AttackedBy[1]].c_str()); //save attacked by
+				}
+				if (GrandStrategyGame.Provinces[i]->SettlementLocation.x != -1 && GrandStrategyGame.Provinces[i]->SettlementLocation.y != -1) {
+					fprintf(fd, "SetProvinceSettlementLocation(\"%s\", %d, %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->SettlementLocation.x, GrandStrategyGame.Provinces[i]->SettlementLocation.y); //save province settlement location
+				}
 				for (size_t j = 0; j < UnitTypes.size(); ++j) {
 					if (GrandStrategyGame.Provinces[i]->SettlementBuildings[j] != 0) {
 						fprintf(fd, "SetProvinceSettlementBuilding(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->SettlementBuildings[j]); //save settlement building

@@ -250,6 +250,7 @@ public:
 		Water(false), SettlementLocation(-1, -1)
 	{
 		memset(Owner, -1, sizeof(Owner));
+		memset(AttackedBy, -1, sizeof(Owner));
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
 		memset(BorderProvinces, 0, sizeof(BorderProvinces));
 		for (int i = 0; i < ProvinceTileMax; ++i) {
@@ -273,6 +274,7 @@ public:
 	int Civilization;													/// Civilization of the province (-1 = no one).
 	int Owner[2];														/// Owner of the province, first number for the owner's civilization, and the second one for the faction itself (-1, -1 = no one).
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
+	int AttackedBy[2];													/// Which faction the province is being attacked by (-1, -1 = none); first number for the faction's civilization, and the second number is for the faction itself.
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
@@ -352,6 +354,7 @@ extern std::string GetProvinceFactionCulturalName(std::string province_name, std
 extern std::string GetProvinceCulturalSettlementName(std::string province_name);
 extern std::string GetProvinceCivilizationCulturalSettlementName(std::string province_name, std::string civilization_name);
 extern std::string GetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name);
+extern std::string GetProvinceAttackedBy(std::string province_name);
 extern void SetProvinceName(std::string old_province_name, std::string new_province_name);
 extern void SetProvinceWater(std::string province_name, bool water);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
@@ -364,6 +367,7 @@ extern void SetProvinceCulturalSettlementName(std::string province_name, std::st
 extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value);
+extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
 extern void CalculateProvinceBorders();
