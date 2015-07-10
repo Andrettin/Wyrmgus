@@ -1203,6 +1203,9 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "comparative")) {
 						++n;
 						adjective->Comparative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "superlative")) {
+						++n;
+						adjective->Superlative = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-personal-name")) {
 						++n;
 						adjective->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);

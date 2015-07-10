@@ -551,10 +551,16 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ǽ", "ae");
 	text = FindAndReplaceString(text, "Ð", "D");
 	text = FindAndReplaceString(text, "ð", "d");
+	text = FindAndReplaceString(text, "Ḍ", "D");
+	text = FindAndReplaceString(text, "ḍ", "d");
 	text = FindAndReplaceString(text, "Ē", "E");
 	text = FindAndReplaceString(text, "ē", "e");
+	text = FindAndReplaceString(text, "Ê", "E");
+	text = FindAndReplaceString(text, "ê", "e");
 	text = FindAndReplaceString(text, "Ī", "I");
 	text = FindAndReplaceString(text, "ī", "i");
+	text = FindAndReplaceString(text, "Ĭ", "I");
+	text = FindAndReplaceString(text, "ĭ", "i");
 	text = FindAndReplaceString(text, "Ī̆", "I");
 	text = FindAndReplaceString(text, "ī̆", "i");
 	text = FindAndReplaceString(text, "Ō", "O");
@@ -563,18 +569,49 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "Ū", "U");
-	text = FindAndReplaceString(text, "ū", "u");
-	text = FindAndReplaceString(text, "Ȳ", "Y");
-	text = FindAndReplaceString(text, "ȳ", "y");
+	text = FindAndReplaceString(text, "ß", "ss"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Þ", "Th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "þ", "th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "ß", "ss"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "Ū", "U");
+	text = FindAndReplaceString(text, "ū", "u");
+	text = FindAndReplaceString(text, "Ŭ", "U");
+	text = FindAndReplaceString(text, "ŭ", "u");
+	text = FindAndReplaceString(text, "Ȳ", "Y");
+	text = FindAndReplaceString(text, "ȳ", "y");
+	text = FindAndReplaceString(text, "Ž", "Z");
+	text = FindAndReplaceString(text, "ž", "z");
+	
 	
 	//replace endings in -r after consonants (which happens in the nominative for Old Norse); Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceStringEnding(text, "dr", "d");
 	text = FindAndReplaceStringEnding(text, "gr", "g");
 	text = FindAndReplaceStringEnding(text, "kr", "k");
+	text = FindAndReplaceStringEnding(text, "nr", "n");
+	
+	//Greek characters
+	text = FindAndReplaceStringEnding(text, "Α", "A");
+	text = FindAndReplaceStringEnding(text, "α", "a");
+	text = FindAndReplaceStringEnding(text, "Χ", "Ch");
+	text = FindAndReplaceStringEnding(text, "χ", "ch");
+	text = FindAndReplaceStringEnding(text, "Έ", "E");
+	text = FindAndReplaceStringEnding(text, "έ", "e");
+	text = FindAndReplaceStringEnding(text, "Ι", "I");
+	text = FindAndReplaceStringEnding(text, "ι", "i");
+	text = FindAndReplaceStringEnding(text, "Μ", "M");
+	text = FindAndReplaceStringEnding(text, "μ", "m");
+	text = FindAndReplaceStringEnding(text, "Ν", "N");
+	text = FindAndReplaceStringEnding(text, "ν", "n");
+	text = FindAndReplaceStringEnding(text, "Ο", "O");
+	text = FindAndReplaceStringEnding(text, "ο", "o");
+	text = FindAndReplaceStringEnding(text, "Ό", "O");
+	text = FindAndReplaceStringEnding(text, "ό", "o");
+	text = FindAndReplaceStringEnding(text, "Σ", "S");
+	text = FindAndReplaceStringEnding(text, "σ", "s");
+	text = FindAndReplaceStringEnding(text, "ς", "s");
+	text = FindAndReplaceStringEnding(text, "Θ", "Th");
+	text = FindAndReplaceStringEnding(text, "θ", "th");
+	text = FindAndReplaceStringEnding(text, "Ύ", "Y");
+	text = FindAndReplaceStringEnding(text, "ύ", "y");
 	
 	return text;
 }

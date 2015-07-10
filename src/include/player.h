@@ -348,7 +348,7 @@ class LanguageAdjective
 public:
 	LanguageAdjective() : Word(""),
 		Meaning(""), Noun(""), Verb(""),
-		Comparative(""),
+		Comparative(""), Superlative(""),
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
 	{
@@ -359,6 +359,7 @@ public:
 	std::string Noun;				/// Equivalent noun, if any.
 	std::string Verb;				/// Equivalent verb, if any.
 	std::string Comparative;		/// Comparative form of the adjective.
+	std::string Superlative;		/// Superlative form of the adjective.
 	bool PrefixPersonalName;		/// Whether the adjective can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the adjective can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the adjective can be used as a prefix for province names
