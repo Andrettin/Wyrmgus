@@ -622,7 +622,9 @@ void CPlayer::Save(CFile &file) const
 	file.printf("Player(%d,\n", this->Index);
 	//Wyrmgus start
 	file.printf(" \"race\", \"%s\",", PlayerRaces.Name[p.Race].c_str());
-	file.printf(" \"faction\", %d,", p.Faction);
+	if (p.Faction != -1) {
+		file.printf(" \"faction\", %d,", p.Faction);
+	}
 	//Wyrmgus end
 	file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
 	file.printf("  \"type\", ");

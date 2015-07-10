@@ -48,6 +48,9 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"
+//Wyrmgus start
+#include "translate.h"
+//Wyrmgus end
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -420,6 +423,11 @@ static void GameLogicLoop()
 					MapMarkUnitSight(unit);
 				}
 			}
+		}
+		
+		if (!IsNetworkGame() && Preference.Autosave && GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * 60 * 5) == 0) { // autosave every five minutes, if the option is enabled
+			UI.StatusLine.Set(_("Autosave"));
+			SaveGame("autosave.sav");
 		}
 		//Wyrmgus end
 	}

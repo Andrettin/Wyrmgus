@@ -466,7 +466,7 @@ public:
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
 		//Wyrmgus start
-		PlayerColorCircle(false),
+		Autosave(true), PlayerColorCircle(false),
 		ShowPathlines(false),
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0) {};
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0),
@@ -487,8 +487,9 @@ public:
 	bool DeselectInMine;     /// Deselect peasants in mines
 	bool NoStatusLineTooltips;	/// Don't show messages on status line
 	//Wyrmgus start
-	bool PlayerColorCircle;  /// Show a player color circle below each unit
-	bool ShowPathlines;  /// Show order pathlines
+	bool Autosave;				/// Autosave the game
+	bool PlayerColorCircle;		/// Show a player color circle below each unit
+	bool ShowPathlines;			/// Show order pathlines
 	//Wyrmgus end
 
 	int  ShowOrders;         /// How many second show orders of unit on map.

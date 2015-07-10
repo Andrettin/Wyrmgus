@@ -32,6 +32,7 @@ class CPreference
 	bool DeselectInMine;
 	bool NoStatusLineTooltips;
 	//Wyrmgus start
+	bool Autosave;
 	bool PlayerColorCircle;
 	bool ShowPathlines;
 	//Wyrmgus end
