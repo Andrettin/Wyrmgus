@@ -1927,7 +1927,7 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 		
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Variation != -1) {
 			graphic_tile += "_";
-			graphic_tile += std::to_string((_Longlong)GrandStrategyGame.WorldMapTiles[x][y]->Variation + 1);
+			graphic_tile += std::to_string((long long) GrandStrategyGame.WorldMapTiles[x][y]->Variation + 1);
 		}
 		
 		graphic_tile += ".png";
