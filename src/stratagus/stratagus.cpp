@@ -1047,9 +1047,9 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		}
 	}
 	tile_tooltip += " (";
-	tile_tooltip += std::to_string(static_cast<long long>(x));
+	tile_tooltip += std::to_string((long long) x);
 	tile_tooltip += ", ";
-	tile_tooltip += std::to_string(static_cast<long long>(y));
+	tile_tooltip += std::to_string((long long) y);
 	tile_tooltip += ")";
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY, tile_tooltip);
 }
