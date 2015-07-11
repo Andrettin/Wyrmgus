@@ -1227,13 +1227,23 @@ std::string CProvince::GenerateProvinceName(int civilization)
 						ProvinceNamePrefixCount += 1;
 					}
 				} else {
-					if (!PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
-						ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive;
-						ProvinceNamePrefixCount += 1;
+					if (PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+						if (!PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive.empty()) {
+							ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive;
+							ProvinceNamePrefixCount += 1;
+						} else if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty()) { //if no genitive is present, use the nominative instead
+							ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+							ProvinceNamePrefixCount += 1;
+						}
 					}
-					if (!PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
-						ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
-						ProvinceNamePrefixCount += 1;
+					if (PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+						if (!PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty()) {
+							ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
+							ProvinceNamePrefixCount += 1;
+						} else if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty()) { //if no genitive is present, use the nominative instead
+							ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+							ProvinceNamePrefixCount += 1;
+						}
 					}
 				}
 			}
@@ -1323,6 +1333,7 @@ std::string CProvince::GenerateProvinceName(int civilization)
 					suffix = PlayerRaces.GetPluralForm(suffix, civilization);
 				}
 				
+				suffix = TransliterateText(suffix); //first transliterate before doing "to lower", because some special characters don't get lowered properly
 				suffix[0] = tolower(suffix[0]);
 				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
@@ -1400,13 +1411,23 @@ std::string CProvince::GenerateSettlementName(int civilization)
 						SettlementNamePrefixCount += 1;
 					}
 				} else {
-					if (!PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
-						SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive;
-						SettlementNamePrefixCount += 1;
+					if (PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+						if (!PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive.empty()) {
+							SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive;
+							SettlementNamePrefixCount += 1;
+						} else if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty()) { //if no genitive is present, use the nominative instead
+							SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+							SettlementNamePrefixCount += 1;
+						}
 					}
-					if (!PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
-						SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
-						SettlementNamePrefixCount += 1;
+					if (PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+						if (!PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty()) {
+							SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
+							SettlementNamePrefixCount += 1;
+						} else if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty()) { //if no genitive is present, use the nominative instead
+							SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+							SettlementNamePrefixCount += 1;
+						}
 					}
 				}
 			}
@@ -1496,6 +1517,7 @@ std::string CProvince::GenerateSettlementName(int civilization)
 					suffix = PlayerRaces.GetPluralForm(suffix, civilization);
 				}
 				
+				suffix = TransliterateText(suffix); //first transliterate before doing "to lower", because some special characters don't get lowered properly
 				suffix[0] = tolower(suffix[0]);
 				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");

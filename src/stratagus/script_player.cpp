@@ -134,7 +134,8 @@ void CPlayer::Load(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
-			this->SetFaction(PlayerRaces.FactionNames[this->Race][LuaToNumber(l, j + 1)]);
+			int faction_id = LuaToNumber(l, j + 1);
+			this->SetFaction(PlayerRaces.FactionNames[this->Race][faction_id]);
 		//Wyrmgus end
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);

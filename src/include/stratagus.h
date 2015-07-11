@@ -167,7 +167,7 @@ extern const char NameLine[];
 #define WorldMapHeightMax 256		/// Maximum height the grand strategy world map can have
 #define WorldMapTerrainTypeMax 32	/// Maximum height the grand strategy world map can have
 #define ProvinceMax 256				/// Maximum quantity of provinces in a grand strategy game
-#define ProvinceTileMax 128			/// Maximum quantity of tiles a province can have
+#define ProvinceTileMax 2048		/// Maximum quantity of tiles a province can have
 #define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
 //Wyrmgus end
 
