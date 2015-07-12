@@ -906,6 +906,9 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "uncountable")) {
 						++n;
 						noun->Uncountable = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "personal-name")) {
+						++n;
+						noun->PersonalName = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-singular")) {
 						++n;
 						noun->PrefixSingular = LuaToBoolean(l, -1, n + 1);

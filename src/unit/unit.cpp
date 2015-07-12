@@ -577,6 +577,12 @@ void CUnit::GeneratePersonalName()
 			if (!PlayerRaces.LanguageNouns[civilization][i]) {
 				break;
 			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->PersonalName) { // nouns which can be used as personal names without compounding
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty()) {
+					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					PersonalNameCount += 1;
+				}
+			}
 			if (PlayerRaces.LanguageNouns[civilization][i]->PrefixPersonalName) {
 				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
 					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative; //using the nominative, is it always the best choice?

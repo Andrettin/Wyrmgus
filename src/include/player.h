@@ -258,6 +258,7 @@ public:
 		PluralNominative(""), PluralAccusative(""), PluralDative(""), PluralGenitive(""),
 		Gender(""),
 		Uncountable(false),
+		PersonalName(false), 
 		PrefixSingular(false), PrefixPlural(false),
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixSingular(false), SuffixPlural(false),
@@ -281,6 +282,7 @@ public:
 	std::string PluralGenitive;
 	std::string Gender;				/// What is the gender of the noun (Male, Female or Neutral)
 	bool Uncountable;				/// Whether the noun is uncountable or not.
+	bool PersonalName;				/// Whether the noun can be used as a personal name
 	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
 	bool PrefixPlural;				/// Whether the noun's plural form can be used as a prefix
 	bool PrefixPersonalName;		/// Whether the noun can be used as a prefix for personal names
