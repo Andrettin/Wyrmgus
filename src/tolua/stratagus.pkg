@@ -123,6 +123,8 @@ extern int GetProvinceId(std::string province_name);
 extern void SetWorldMapSize(int width, int height);
 extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
+extern void SetWorldMapTileName(int x, int y, std::string name);
+extern void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, std::string cultural_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);

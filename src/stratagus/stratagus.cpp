@@ -1034,7 +1034,14 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		tile_tooltip += ")";
 	} else {
-		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+		if (!GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
+			tile_tooltip += GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName();
+			tile_tooltip += " (";
+			tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+			tile_tooltip += ")";
+		} else {
+			tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+		}
 	}	
 	
 	if (province_id != -1) {
@@ -1079,6 +1086,24 @@ bool WorldMapTile::HasResource(int resource, bool ignore_prospection)
 		return true;
 	}
 	return false;
+}
+
+/**
+**  Get the tile's cultural name.
+*/
+std::string WorldMapTile::GetCulturalName()
+{
+	if (!GrandStrategyGame.Provinces[this->Province]->Water && GrandStrategyGame.Provinces[this->Province]->Civilization != -1 && !this->CulturalNames[GrandStrategyGame.Provinces[this->Province]->Civilization].empty()) {
+		return this->CulturalNames[GrandStrategyGame.Provinces[this->Province]->Civilization];
+	} else if (
+		GrandStrategyGame.Provinces[this->Province]->Water && GrandStrategyGame.Provinces[this->Province]->ReferenceProvince != -1
+		&& GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[this->Province]->ReferenceProvince]->Civilization != -1
+		&& !this->CulturalNames[GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[this->Province]->ReferenceProvince]->Civilization].empty()
+	) {
+		return this->CulturalNames[GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[this->Province]->ReferenceProvince]->Civilization];
+	} else {
+		return this->Name;
+	}
 }
 
 bool CProvince::HasBuildingClass(std::string building_class_name)
@@ -1176,6 +1201,11 @@ std::string CProvince::GetCulturalSettlementName()
 std::string CProvince::GenerateProvinceName(int civilization)
 {
 	std::string province_name;
+
+	//10% chance that the province will be named after its settlement
+	if (!this->CulturalSettlementNames[civilization].empty() && SyncRand(100) < 10) {
+		return this->CulturalSettlementNames[civilization];
+	}
 	
 	if (
 		!PlayerRaces.ProvinceNames[civilization][0].empty()
@@ -1361,6 +1391,11 @@ std::string CProvince::GenerateSettlementName(int civilization)
 {
 	std::string settlement_name;
 	
+	//10% chance that the settlement will be named after a named terrain feature in its tile, if there is any
+	if (!GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization].empty() && SyncRand(100) < 10) {
+		return GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization];
+	}
+	
 	if (
 		!PlayerRaces.SettlementNames[civilization][0].empty()
 		|| !PlayerRaces.SettlementNamePrefixes[civilization][0].empty()
@@ -1537,73 +1572,239 @@ std::string CProvince::GenerateSettlementName(int civilization)
 }
 
 /**
-**  "Translate" (that is, adapt) a province name from one culture (civilization) to another.
+**  Generate a settlement name for the civilization.
+**
+**  @param l  Lua state.
 */
-std::string CProvince::TranslateProvinceName(std::string province_name, int civilization)
+std::string CProvince::GenerateTileName(int civilization, int terrain)
 {
-	std::string new_province_name;
-
-	// try to translate the entire name, as a particular translation for it may exist
-	if (!PlayerRaces.ProvinceNameTranslations[civilization][0][0].empty()) {
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.ProvinceNameTranslations[civilization][i][0].empty() && PlayerRaces.ProvinceNameTranslations[civilization][i][0] == province_name) {
-				new_province_name = PlayerRaces.ProvinceNameTranslations[civilization][i][1];
-				return new_province_name;
-			}
-		}
-	}
+	std::string tile_name;
 	
-	//if adapting the entire name failed, try to match prefixes and suffixes
-	if (!PlayerRaces.ProvinceNamePrefixTranslations[civilization][0][0].empty() && !PlayerRaces.ProvinceNameSuffixTranslations[civilization][0][0].empty()) {
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][0].empty() && PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][0] == province_name.substr(0, PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][0].size())) {
-				for (int j = 0; j < PersonalNameMax; ++j) {
-					if (!PlayerRaces.ProvinceNameSuffixTranslations[civilization][j][0].empty() && PlayerRaces.ProvinceNameSuffixTranslations[civilization][j][0] == province_name.substr(PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][0].size(), PlayerRaces.ProvinceNameSuffixTranslations[civilization][j][0].size())) {
-						new_province_name = PlayerRaces.ProvinceNamePrefixTranslations[civilization][i][1];
-						new_province_name += PlayerRaces.ProvinceNameSuffixTranslations[civilization][j][1];
-						return new_province_name;
+	if (
+		PlayerRaces.LanguageNouns[civilization][0]
+		|| PlayerRaces.LanguageVerbs[civilization][0]
+		|| PlayerRaces.LanguageAdjectives[civilization][0]
+		|| PlayerRaces.LanguageNumerals[civilization][0]
+	) {
+		int noun_prefix_count = 0;
+		std::string noun_prefixes[PersonalNameMax];
+		int noun_prefix_ids[PersonalNameMax];
+		int verb_prefix_count = 0;
+		std::string verb_prefixes[PersonalNameMax];
+		int verb_prefix_ids[PersonalNameMax];
+		int adjective_prefix_count = 0;
+		std::string adjective_prefixes[PersonalNameMax];
+		int adjective_prefix_ids[PersonalNameMax];
+		int numeral_prefix_count = 0;
+		std::string numeral_prefixes[PersonalNameMax];
+		int numeral_prefix_ids[PersonalNameMax];
+
+		int noun_suffix_count = 0;
+		std::string noun_suffixes[PersonalNameMax];
+		int noun_suffix_ids[PersonalNameMax];
+		int verb_suffix_count = 0;
+		std::string verb_suffixes[PersonalNameMax];
+		int verb_suffix_ids[PersonalNameMax];
+		int adjective_suffix_count = 0;
+		std::string adjective_suffixes[PersonalNameMax];
+		int adjective_suffix_ids[PersonalNameMax];
+		int numeral_suffix_count = 0;
+		std::string numeral_suffixes[PersonalNameMax];
+		int numeral_suffix_ids[PersonalNameMax];
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageNouns[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->PrefixTerrainName[terrain]) {
+				if (PlayerRaces.LanguageNouns[civilization][i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive
+					if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+						noun_prefixes[noun_prefix_count] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+						noun_prefix_ids[noun_prefix_count] = i;
+						noun_prefix_count += 1;
+					}
+					if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+						noun_prefixes[noun_prefix_count] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+						noun_prefix_count += 1;
+					}
+				} else {
+					if (PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
+						if (!PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive.empty()) {
+							noun_prefixes[noun_prefix_count] = PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive;
+							noun_prefix_ids[noun_prefix_count] = i;
+							noun_prefix_count += 1;
+						} else if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty()) { //if no genitive is present, use the nominative instead
+							noun_prefixes[noun_prefix_count] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+							noun_prefix_ids[noun_prefix_count] = i;
+							noun_prefix_count += 1;
+						}
+					}
+					if (PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
+						if (!PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty()) {
+							noun_prefixes[noun_prefix_count] = PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
+							noun_prefix_ids[noun_prefix_count] = i;
+							noun_prefix_count += 1;
+						} else if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty()) { //if no genitive is present, use the nominative instead
+							noun_prefixes[noun_prefix_count] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+							noun_prefix_ids[noun_prefix_count] = i;
+							noun_prefix_count += 1;
+						}
 					}
 				}
 			}
-		}
-	}
-	
-	return new_province_name;
-}
-
-/**
-**  "Translate" (that is, adapt) a settlement name from one culture (civilization) to another.
-*/
-std::string CProvince::TranslateSettlementName(std::string settlement_name, int civilization)
-{
-	std::string new_settlement_name;
-
-	// try to translate the entire name, as a particular translation for it may exist
-	if (!PlayerRaces.SettlementNameTranslations[civilization][0][0].empty()) {
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.SettlementNameTranslations[civilization][i][0].empty() && PlayerRaces.SettlementNameTranslations[civilization][i][0] == settlement_name) {
-				new_settlement_name = PlayerRaces.SettlementNameTranslations[civilization][i][1];
-				return new_settlement_name;
-			}
-		}
-	}
-	
-	//if adapting the entire name failed, try to match prefixes and suffixes
-	if (!PlayerRaces.SettlementNamePrefixTranslations[civilization][0][0].empty() && !PlayerRaces.SettlementNameSuffixTranslations[civilization][0][0].empty()) {
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0].empty() && PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0] == settlement_name.substr(0, PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0].size())) {
-				for (int j = 0; j < PersonalNameMax; ++j) {
-					if (!PlayerRaces.SettlementNameSuffixTranslations[civilization][j][0].empty() && PlayerRaces.SettlementNameSuffixTranslations[civilization][j][0] == settlement_name.substr(PlayerRaces.SettlementNamePrefixTranslations[civilization][i][0].size(), PlayerRaces.SettlementNameSuffixTranslations[civilization][j][0].size())) {
-						new_settlement_name = PlayerRaces.SettlementNamePrefixTranslations[civilization][i][1];
-						new_settlement_name += PlayerRaces.SettlementNameSuffixTranslations[civilization][j][1];
-						return new_settlement_name;
-					}
+			if (PlayerRaces.LanguageNouns[civilization][i]->SuffixTerrainName[terrain]) {
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixSingular) {
+					noun_suffixes[noun_suffix_count] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					noun_suffix_ids[noun_prefix_count] = i;
+					noun_suffix_count += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixPlural) {
+					noun_suffixes[noun_suffix_count] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+					noun_suffix_ids[noun_prefix_count] = i;
+					noun_suffix_count += 1;
 				}
 			}
 		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageVerbs[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->PrefixTerrainName[terrain]) { // only using verb participles for now; maybe should add more possibilities?
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					verb_prefixes[verb_prefix_count] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					verb_prefix_ids[noun_prefix_count] = i;
+					verb_prefix_count += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					verb_prefixes[verb_prefix_count] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					verb_prefix_ids[noun_prefix_count] = i;
+					verb_prefix_count += 1;
+				}
+			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->SuffixTerrainName[terrain]) {
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					verb_suffixes[verb_suffix_count] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					verb_suffix_ids[noun_prefix_count] = i;
+					verb_suffix_count += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					verb_suffixes[verb_suffix_count] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					verb_suffix_ids[noun_prefix_count] = i;
+					verb_suffix_count += 1;
+				}
+			}
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixTerrainName[terrain]) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					adjective_prefixes[adjective_prefix_count] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					adjective_prefix_ids[noun_prefix_count] = i;
+					adjective_prefix_count += 1;
+				}
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->SuffixTerrainName[terrain]) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					adjective_suffixes[adjective_suffix_count] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					adjective_suffix_ids[noun_prefix_count] = i;
+					adjective_suffix_count += 1;
+				}
+			}
+		}
+		
+		for (int i = 0; i < LanguageWordMax; ++i) {
+			if (!PlayerRaces.LanguageNumerals[civilization][i]) {
+				break;
+			}
+			if (PlayerRaces.LanguageNumerals[civilization][i]->PrefixTerrainName[terrain]) {
+				if (!PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
+					numeral_prefixes[numeral_prefix_count] = PlayerRaces.LanguageNumerals[civilization][i]->Word;
+					numeral_prefix_ids[noun_prefix_count] = i;
+					numeral_prefix_count += 1;
+				}
+			}
+			if (PlayerRaces.LanguageNumerals[civilization][i]->SuffixTerrainName[terrain]) {
+				if (!PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
+					numeral_suffixes[numeral_suffix_count] = PlayerRaces.LanguageNumerals[civilization][i]->Word;
+					numeral_suffix_ids[noun_prefix_count] = i;
+					numeral_suffix_count += 1;
+				}
+			}
+		}
+		
+		if (noun_prefix_count > 0 || verb_prefix_count > 0 || adjective_prefix_count > 0 || numeral_prefix_count > 0) {
+			std::string prefix;
+			std::string suffix;
+			int prefix_id;
+			int suffix_id;
+			std::string prefix_word_type;
+			std::string suffix_word_type;
+			
+			//choose the word type of the prefix, and the prefix itself
+			int random_number = SyncRand(noun_prefix_count + verb_prefix_count + adjective_prefix_count + numeral_prefix_count);
+			if (random_number < noun_prefix_count) {
+				prefix_word_type = "noun";
+				prefix_id = SyncRand(noun_prefix_count);
+				prefix = noun_prefixes[prefix_id];
+			} else if (random_number < (noun_prefix_count + verb_prefix_count)) {
+				prefix_word_type = "verb";
+				prefix_id = SyncRand(verb_prefix_count);
+				prefix = verb_prefixes[prefix_id];
+			} else if (random_number < (noun_prefix_count + verb_prefix_count + adjective_prefix_count)) {
+				prefix_word_type = "adjective";
+				prefix_id = SyncRand(adjective_prefix_count);
+				prefix = adjective_prefixes[prefix_id];
+			} else if (random_number < (noun_prefix_count + verb_prefix_count + adjective_prefix_count + numeral_prefix_count)) {
+				prefix_word_type = "numeral";
+				prefix_id = SyncRand(numeral_prefix_count);
+				prefix = numeral_prefixes[prefix_id];
+			}
+
+			//choose the word type of the suffix, and the suffix itself
+			random_number = SyncRand(noun_suffix_count + verb_suffix_count + adjective_suffix_count + numeral_suffix_count);
+			if (random_number < noun_suffix_count) {
+				suffix_word_type = "noun";
+				suffix_id = SyncRand(noun_suffix_count);
+				suffix = noun_suffixes[suffix_id];
+			} else if (random_number < (noun_suffix_count + verb_suffix_count)) {
+				suffix_word_type = "verb";
+				suffix_id = SyncRand(verb_suffix_count);
+				suffix = verb_suffixes[suffix_id];
+			} else if (random_number < (noun_suffix_count + verb_suffix_count + adjective_suffix_count)) {
+				suffix_word_type = "adjective";
+				suffix_id = SyncRand(adjective_suffix_count);
+				suffix = adjective_suffixes[suffix_id];
+			} else if (random_number < (noun_suffix_count + verb_suffix_count + adjective_suffix_count + numeral_suffix_count)) {
+				suffix_word_type = "numeral";
+				suffix_id = SyncRand(numeral_suffix_count);
+				suffix = numeral_suffixes[suffix_id];
+			}
+
+			if (prefix_word_type == "numeral" && PlayerRaces.LanguageNumerals[civilization][numeral_prefix_ids[prefix_id]]->Number > 1 && suffix_word_type == "noun") { // if requires plural (by being a numeral greater than one) and suffix is a noun
+				//then replace the suffix with its plural form
+				suffix = PlayerRaces.LanguageNouns[civilization][noun_suffix_ids[suffix_id]]->PluralNominative;
+			}
+				
+			suffix = TransliterateText(suffix); //first transliterate before doing "to lower", because some special characters don't get lowered properly
+			suffix[0] = tolower(suffix[0]);
+			if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+				prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
+			}
+			if (prefix.substr(prefix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
+				prefix = FindAndReplaceStringEnding(prefix, "s", "");
+			}
+			tile_name = prefix;
+			tile_name += suffix;
+		}
 	}
 	
-	return new_settlement_name;
+	tile_name = TransliterateText(tile_name);
+	
+	return tile_name;
 }
 
 /**
@@ -1770,6 +1971,29 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 			GrandStrategyGame.Provinces[province_id]->Tiles[i].y = y;
 			break;
 		}
+	}
+}
+
+/**
+**  Set the name of a world map tile.
+*/
+void SetWorldMapTileName(int x, int y, std::string name)
+{
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	GrandStrategyGame.WorldMapTiles[x][y]->Name = name;
+}
+
+/**
+**  Set the cultural name of a world map tile for a particular civilization.
+*/
+void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, std::string cultural_name)
+{
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	if (civilization != -1) {
+		GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = cultural_name;
 	}
 }
 
@@ -2136,32 +2360,38 @@ void SetProvinceCivilization(std::string province_name, std::string civilization
 		GrandStrategyGame.Provinces[province_id]->Civilization = civilization;
 			
 		if (civilization != -1) {
-			// create a new cultural name for the province, if there isn't any
-			if (
-				GrandStrategyGame.Provinces[province_id]->Owner[1] != -1
-				&& GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]].empty()
-				&& GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization].empty()
-			) {
-				std::string new_province_name = "";
-				// first see if can translate the cultural name of the old civilization
-				if (old_civilization != -1 && !GrandStrategyGame.Provinces[province_id]->CulturalNames[old_civilization].empty()) {
-					new_province_name = GrandStrategyGame.Provinces[province_id]->TranslateProvinceName(GrandStrategyGame.Provinces[province_id]->CulturalNames[old_civilization], civilization);
+			// create new cultural names for the province's terrain features, if there aren't any
+			for (int i = 0; i < ProvinceTileMax; ++i) {
+				int x = GrandStrategyGame.Provinces[province_id]->Tiles[i].x;
+				int y = GrandStrategyGame.Provinces[province_id]->Tiles[i].y;
+				if (x == -1 || y == -1) {
+					break;
 				}
-				if (new_province_name == "") { // try to translate any cultural name
-					for (int i = 0; i < MAX_RACES; ++i) {
-						if (!GrandStrategyGame.Provinces[province_id]->CulturalNames[i].empty()) {
-							new_province_name = GrandStrategyGame.Provinces[province_id]->TranslateProvinceName(GrandStrategyGame.Provinces[province_id]->CulturalNames[i], civilization);
-							if (!new_province_name.empty()) {
-								break;
+				if (
+					GrandStrategyGame.Provinces[province_id]->Owner[1] != -1
+					&& GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization].empty()
+				) {
+					std::string new_tile_name = "";
+					// first see if can translate the cultural name of the old civilization
+					if (old_civilization != -1 && !GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization].empty()) {
+						new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], civilization); //is using TranslateSettlementName function, should move translation to a general function
+					}
+					if (new_tile_name == "") { // try to translate any cultural name
+						for (int i = 0; i < MAX_RACES; ++i) {
+							if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].empty()) {
+								new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i], civilization);
+								if (!new_tile_name.empty()) {
+									break;
+								}
 							}
 						}
 					}
-				}
-				if (new_province_name == "") { // if trying to translate all cultural names failed, generate a new name
-					new_province_name = GrandStrategyGame.Provinces[province_id]->GenerateProvinceName(civilization);
-				}
-				if (new_province_name != "") {
-					GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization] = new_province_name;
+					if (new_tile_name == "") { // if trying to translate all cultural names failed, generate a new name
+						new_tile_name = GrandStrategyGame.Provinces[province_id]->GenerateTileName(civilization, GrandStrategyGame.WorldMapTiles[x][y]->Terrain);
+					}
+					if (new_tile_name != "") {
+						GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = new_tile_name;
+					}
 				}
 			}
 			
@@ -2174,12 +2404,12 @@ void SetProvinceCivilization(std::string province_name, std::string civilization
 				std::string new_settlement_name = "";
 				// first see if can translate the cultural name of the old civilization
 				if (old_civilization != -1 && !GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[old_civilization].empty()) {
-					new_settlement_name = GrandStrategyGame.Provinces[province_id]->TranslateSettlementName(GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[old_civilization], civilization);
+					new_settlement_name = PlayerRaces.TranslateName(GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[old_civilization], civilization);
 				}
 				if (new_settlement_name == "") { // try to translate any cultural name
 					for (int i = 0; i < MAX_RACES; ++i) {
 						if (!GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[i].empty()) {
-							new_settlement_name = GrandStrategyGame.Provinces[province_id]->TranslateSettlementName(GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[i], civilization);
+							new_settlement_name = PlayerRaces.TranslateName(GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[i], civilization);
 							if (!new_settlement_name.empty()) {
 								break;
 							}
@@ -2191,6 +2421,35 @@ void SetProvinceCivilization(std::string province_name, std::string civilization
 				}
 				if (new_settlement_name != "") {
 					GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[civilization] = new_settlement_name;
+				}
+			}
+			
+			// create a new cultural name for the province, if there isn't any
+			if (
+				GrandStrategyGame.Provinces[province_id]->Owner[1] != -1
+				&& GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]].empty()
+				&& GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization].empty()
+			) {
+				std::string new_province_name = "";
+				// first see if can translate the cultural name of the old civilization
+				if (old_civilization != -1 && !GrandStrategyGame.Provinces[province_id]->CulturalNames[old_civilization].empty()) {
+					new_province_name = PlayerRaces.TranslateName(GrandStrategyGame.Provinces[province_id]->CulturalNames[old_civilization], civilization);
+				}
+				if (new_province_name == "") { // try to translate any cultural name
+					for (int i = 0; i < MAX_RACES; ++i) {
+						if (!GrandStrategyGame.Provinces[province_id]->CulturalNames[i].empty()) {
+							new_province_name = PlayerRaces.TranslateName(GrandStrategyGame.Provinces[province_id]->CulturalNames[i], civilization);
+							if (!new_province_name.empty()) {
+								break;
+							}
+						}
+					}
+				}
+				if (new_province_name == "") { // if trying to translate all cultural names failed, generate a new name
+					new_province_name = GrandStrategyGame.Provinces[province_id]->GenerateProvinceName(civilization);
+				}
+				if (new_province_name != "") {
+					GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization] = new_province_name;
 				}
 			}
 		}
@@ -2312,12 +2571,15 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.WorldMapTiles[x][y]->Terrain = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Province = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
-//				GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = "";
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->BorderTile = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Position.x = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = -1;
+				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
+				for (int i = 0; i < MAX_RACES; ++i) {
+					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i] = "";
+				}
 			}
 		}
 	}

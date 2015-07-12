@@ -2581,6 +2581,14 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
 					fprintf(fd, "SetWorldMapTileTerrain(%d, %d, %d)\n", x, y, GrandStrategyGame.WorldMapTiles[x][y]->Terrain); //save tile terrain
 				}
+				if (!GrandStrategyGame.WorldMapTiles[x][y]->Name.empty()) {
+					fprintf(fd, "SetWorldMapTileName(%d, %d, \"%s\")\n", x, y, GrandStrategyGame.WorldMapTiles[x][y]->Name.c_str()); //save tile name
+				}
+				for (int i = 0; i < MAX_RACES; ++i) {
+					if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].empty()) {
+						fprintf(fd, "SetWorldMapTileCulturalName(%d, %d, \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[i].c_str(), GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].c_str()); //save tile cultural name
+					}
+				}
 			}
 		}
 		for (int i = 0; i < MaxCosts; ++i) {

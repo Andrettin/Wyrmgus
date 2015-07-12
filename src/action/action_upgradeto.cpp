@@ -223,7 +223,13 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		(!oldtype.Civilization.empty() && !newtype.Civilization.empty() && oldtype.Civilization != newtype.Civilization)
 		|| (!oldtype.PersonalNames[0].empty() || !oldtype.PersonalNamePrefixes[0].empty()) && (!newtype.PersonalNames[0].empty() || !newtype.PersonalNamePrefixes[0].empty())
 	) {
-		unit.GeneratePersonalName();
+		// first see if can translate the current personal name
+		std::string new_personal_name = PlayerRaces.TranslateName(unit.Name, PlayerRaces.GetRaceIndexByName(newtype.Civilization.c_str()));
+		if (!new_personal_name.empty()) {
+			unit.Name = new_personal_name;
+		} else {
+			unit.GeneratePersonalName();
+		}
 	}
 	//Wyrmgus end
 

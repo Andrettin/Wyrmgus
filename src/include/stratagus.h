@@ -229,16 +229,18 @@ public:
 	}
 
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
+	std::string GetCulturalName();										/// Get the tile's cultural name.
 	
-	int Terrain;						/// Tile terrain (i.e. plains)
-	int Province;						/// Province to which the tile belongs
-	int Variation;						/// Tile variation
-	int Resource;						/// The tile's resource, if any
-	bool ResourceProspected;			/// Whether the tile's resource has been discovered
-	bool BorderTile;					/// Whether this tile borders a tile of another province
-	Vec2i Position;						/// Position of the tile
-//	std::string GraphicTile;			/// The tile image used by this tile
-	CGraphic *GraphicTile;				/// The tile image used by this tile
+	int Terrain;							/// Tile terrain (i.e. plains)
+	int Province;							/// Province to which the tile belongs
+	int Variation;							/// Tile variation
+	int Resource;							/// The tile's resource, if any
+	bool ResourceProspected;				/// Whether the tile's resource has been discovered
+	bool BorderTile;						/// Whether this tile borders a tile of another province
+	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
+	Vec2i Position;							/// Position of the tile
+	CGraphic *GraphicTile;					/// The tile image used by this tile
+	std::string CulturalNames[MAX_RACES];	/// Names for the tile for each different culture/civilization
 };
 
 class CProvince
@@ -266,8 +268,7 @@ public:
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);
 	std::string GenerateSettlementName(int civilization);
-	std::string TranslateProvinceName(std::string province_name, int civilization);
-	std::string TranslateSettlementName(std::string province_name, int civilization);
+	std::string GenerateTileName(int civilization, int terrain);
 	
 	std::string Name;
 	std::string SettlementName;
@@ -346,6 +347,8 @@ extern int GetProvinceId(std::string province_name);
 extern void SetWorldMapSize(int width, int height);
 extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
+extern void SetWorldMapTileName(int x, int y, std::string name);
+extern void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, std::string cultural_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);

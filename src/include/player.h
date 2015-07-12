@@ -262,8 +262,9 @@ public:
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixSingular(false), SuffixPlural(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
-		
 	{
+		memset(PrefixTerrainName, 0, sizeof(PrefixTerrainName));
+		memset(SuffixTerrainName, 0, sizeof(SuffixTerrainName));
 	}
 
 	std::string Word;				/// Word name / ID.
@@ -285,11 +286,13 @@ public:
 	bool PrefixPersonalName;		/// Whether the noun can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the noun can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the noun can be used as a prefix for province names
+	bool PrefixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a prefix for names of particular terrain features
 	bool SuffixSingular;			/// Whether the noun's singular form can be used as a suffix
 	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
 	bool SuffixPersonalName;		/// Whether the noun can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the noun can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the noun can be used as a suffix for province names
+	bool SuffixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a suffix for names of particular terrain features
 };
 
 class LanguageVerb
@@ -308,6 +311,8 @@ public:
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
 	{
+		memset(PrefixTerrainName, 0, sizeof(PrefixTerrainName));
+		memset(SuffixTerrainName, 0, sizeof(SuffixTerrainName));
 	}
 
 	std::string Word;								/// Word name / ID.
@@ -338,9 +343,11 @@ public:
 	bool PrefixPersonalName;		/// Whether the verb can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the verb can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the verb can be used as a prefix for province names
+	bool PrefixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a prefix for names of particular terrain features
 	bool SuffixPersonalName;		/// Whether the verb can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the verb can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the verb can be used as a suffix for province names
+	bool SuffixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a suffix for names of particular terrain features
 };
 
 class LanguageAdjective
@@ -352,6 +359,8 @@ public:
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
 	{
+		memset(PrefixTerrainName, 0, sizeof(PrefixTerrainName));
+		memset(SuffixTerrainName, 0, sizeof(SuffixTerrainName));
 	}
 
 	std::string Word;				/// Word name / ID.
@@ -360,12 +369,14 @@ public:
 	std::string Verb;				/// Equivalent verb, if any.
 	std::string Comparative;		/// Comparative form of the adjective.
 	std::string Superlative;		/// Superlative form of the adjective.
-	bool PrefixPersonalName;		/// Whether the adjective can be used as a prefix for personal names
-	bool PrefixSettlementName;		/// Whether the adjective can be used as a prefix for settlement names
-	bool PrefixProvinceName;		/// Whether the adjective can be used as a prefix for province names
-	bool SuffixPersonalName;		/// Whether the adjective can be used as a suffix for personal names
-	bool SuffixSettlementName;		/// Whether the adjective can be used as a suffix for settlement names
-	bool SuffixProvinceName;		/// Whether the adjective can be used as a suffix for province names
+	bool PrefixPersonalName;		/// Whether the verb can be used as a prefix for personal names
+	bool PrefixSettlementName;		/// Whether the verb can be used as a prefix for settlement names
+	bool PrefixProvinceName;		/// Whether the verb can be used as a prefix for province names
+	bool PrefixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a prefix for names of particular terrain features
+	bool SuffixPersonalName;		/// Whether the verb can be used as a suffix for personal names
+	bool SuffixSettlementName;		/// Whether the verb can be used as a suffix for settlement names
+	bool SuffixProvinceName;		/// Whether the verb can be used as a suffix for province names
+	bool SuffixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a suffix for names of particular terrain features
 };
 
 class LanguagePronoun
@@ -418,16 +429,20 @@ public:
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false)
 	{
+		memset(PrefixTerrainName, 0, sizeof(PrefixTerrainName));
+		memset(SuffixTerrainName, 0, sizeof(SuffixTerrainName));
 	}
 
 	std::string Word;				/// Word name / ID.
 	int Number;
-	bool PrefixPersonalName;		/// Whether the adjective can be used as a prefix for personal names
-	bool PrefixSettlementName;		/// Whether the adjective can be used as a prefix for settlement names
-	bool PrefixProvinceName;		/// Whether the adjective can be used as a prefix for province names
-	bool SuffixPersonalName;		/// Whether the adjective can be used as a suffix for personal names
-	bool SuffixSettlementName;		/// Whether the adjective can be used as a suffix for settlement names
-	bool SuffixProvinceName;		/// Whether the adjective can be used as a suffix for province names
+	bool PrefixPersonalName;		/// Whether the verb can be used as a prefix for personal names
+	bool PrefixSettlementName;		/// Whether the verb can be used as a prefix for settlement names
+	bool PrefixProvinceName;		/// Whether the verb can be used as a prefix for province names
+	bool PrefixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a prefix for names of particular terrain features
+	bool SuffixPersonalName;		/// Whether the verb can be used as a suffix for personal names
+	bool SuffixSettlementName;		/// Whether the verb can be used as a suffix for settlement names
+	bool SuffixProvinceName;		/// Whether the verb can be used as a suffix for province names
+	bool SuffixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a suffix for names of particular terrain features
 };
 //Wyrmgus end
 
@@ -459,6 +474,7 @@ public:
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	bool RequiresPlural(std::string word, int civilization) const;
 	std::string GetPluralForm(std::string word, int civilization) const;
+	std::string TranslateName(std::string name, int civilization);
 	//Wyrmgus end
 
 public:
@@ -484,12 +500,7 @@ public:
 	std::string SettlementNames[MAX_RACES][PersonalNameMax];			/// settlement names
 	std::string SettlementNamePrefixes[MAX_RACES][PersonalNameMax];		/// settlement name prefixes
 	std::string SettlementNameSuffixes[MAX_RACES][PersonalNameMax];		/// settlement name suffixes
-	std::string SettlementNameTranslations[MAX_RACES][PersonalNameMax][2];	/// settlement name translations (2 values: one for the name to be translated, and another for the translation)
-	std::string SettlementNamePrefixTranslations[MAX_RACES][PersonalNameMax][2];	/// settlement name prefix translations (2 values: one for the prefix to be translated, and another for the translation)
-	std::string SettlementNameSuffixTranslations[MAX_RACES][PersonalNameMax][2];	/// settlement name suffix translations (2 values: one for the prefix to be translated, and another for the translation)
-	std::string ProvinceNameTranslations[MAX_RACES][PersonalNameMax][2];	/// province name translations (2 values: one for the name to be translated, and another for the translation)
-	std::string ProvinceNamePrefixTranslations[MAX_RACES][PersonalNameMax][2];	/// province name prefix translations (2 values: one for the prefix to be translated, and another for the translation)
-	std::string ProvinceNameSuffixTranslations[MAX_RACES][PersonalNameMax][2];	/// province name suffix translations (2 values: one for the prefix to be translated, and another for the translation)
+	std::string NameTranslations[MAX_RACES][PersonalNameMax][2];		/// name translations (2 values: one for the name to be translated, and another for the translation)
 	LanguageNoun *LanguageNouns[MAX_RACES][LanguageWordMax];				/// nouns of the civilization's language
 	LanguageVerb *LanguageVerbs[MAX_RACES][LanguageWordMax];				/// verbs of the civilization's language
 	LanguageAdjective *LanguageAdjectives[MAX_RACES][LanguageWordMax];		/// adjectives of the civilization's language
