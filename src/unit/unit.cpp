@@ -656,8 +656,7 @@ void CUnit::GeneratePersonalName()
 			} else {
 				Name = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
 				std::string suffix = PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
-				suffix = TransliterateText(suffix); //first transliterate before doing "to lower", because some special characters don't get lowered properly
-				suffix[0] = tolower(suffix[0]);
+				suffix = DecapitalizeString(suffix);
 				Name += suffix;
 			}
 		}

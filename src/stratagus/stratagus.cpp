@@ -1203,7 +1203,7 @@ std::string CProvince::GenerateProvinceName(int civilization)
 	std::string province_name;
 
 	//10% chance that the province will be named after its settlement
-	if (!this->CulturalSettlementNames[civilization].empty() && SyncRand(100) < 10) {
+	if (civilization != -1 && !this->CulturalSettlementNames[civilization].empty() && SyncRand(100) < 10) {
 		return this->CulturalSettlementNames[civilization];
 	}
 	
@@ -1363,8 +1363,7 @@ std::string CProvince::GenerateProvinceName(int civilization)
 					suffix = PlayerRaces.GetPluralForm(suffix, civilization);
 				}
 				
-				suffix = TransliterateText(suffix); //first transliterate before doing "to lower", because some special characters don't get lowered properly
-				suffix[0] = tolower(suffix[0]);
+				suffix = DecapitalizeString(suffix);
 				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
 				}
@@ -1392,7 +1391,7 @@ std::string CProvince::GenerateSettlementName(int civilization)
 	std::string settlement_name;
 	
 	//10% chance that the settlement will be named after a named terrain feature in its tile, if there is any
-	if (!GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization].empty() && SyncRand(100) < 10) {
+	if (civilization != -1 && this->SettlementLocation.x != -1 && this->SettlementLocation.y != -1 && !GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization].empty() && SyncRand(100) < 10) {
 		return GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization];
 	}
 	
@@ -1552,8 +1551,7 @@ std::string CProvince::GenerateSettlementName(int civilization)
 					suffix = PlayerRaces.GetPluralForm(suffix, civilization);
 				}
 				
-				suffix = TransliterateText(suffix); //first transliterate before doing "to lower", because some special characters don't get lowered properly
-				suffix[0] = tolower(suffix[0]);
+				suffix = DecapitalizeString(suffix);
 				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
 				}
@@ -1789,8 +1787,7 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 				suffix = PlayerRaces.LanguageNouns[civilization][noun_suffix_ids[suffix_id]]->PluralNominative;
 			}
 				
-			suffix = TransliterateText(suffix); //first transliterate before doing "to lower", because some special characters don't get lowered properly
-			suffix[0] = tolower(suffix[0]);
+			suffix = DecapitalizeString(suffix);
 			if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 				prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
 			}

@@ -539,6 +539,14 @@ std::string FindAndReplaceStringEnding(std::string text, const std::string& find
     return text;
 }
 
+std::string FindAndReplaceStringBeginning(std::string text, const std::string& find, const std::string& replace) {
+	size_t pos = text.find(find, 0);
+	if (pos != std::string::npos && pos == 0) {
+		text.replace(pos, find.length(), replace);
+	}
+    return text;
+}
+
 std::string TransliterateText(std::string text) //convert special characters into ones more legible for English-speakers
 {
 	text = FindAndReplaceString(text, "Ā", "A");
@@ -598,29 +606,75 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceStringEnding(text, "nr", "n");
 	
 	//Greek characters
-	text = FindAndReplaceStringEnding(text, "Α", "A");
-	text = FindAndReplaceStringEnding(text, "α", "a");
-	text = FindAndReplaceStringEnding(text, "Χ", "Ch");
-	text = FindAndReplaceStringEnding(text, "χ", "ch");
-	text = FindAndReplaceStringEnding(text, "Έ", "E");
-	text = FindAndReplaceStringEnding(text, "έ", "e");
-	text = FindAndReplaceStringEnding(text, "Ι", "I");
-	text = FindAndReplaceStringEnding(text, "ι", "i");
-	text = FindAndReplaceStringEnding(text, "Μ", "M");
-	text = FindAndReplaceStringEnding(text, "μ", "m");
-	text = FindAndReplaceStringEnding(text, "Ν", "N");
-	text = FindAndReplaceStringEnding(text, "ν", "n");
-	text = FindAndReplaceStringEnding(text, "Ο", "O");
-	text = FindAndReplaceStringEnding(text, "ο", "o");
-	text = FindAndReplaceStringEnding(text, "Ό", "O");
-	text = FindAndReplaceStringEnding(text, "ό", "o");
-	text = FindAndReplaceStringEnding(text, "Σ", "S");
-	text = FindAndReplaceStringEnding(text, "σ", "s");
-	text = FindAndReplaceStringEnding(text, "ς", "s");
-	text = FindAndReplaceStringEnding(text, "Θ", "Th");
-	text = FindAndReplaceStringEnding(text, "θ", "th");
-	text = FindAndReplaceStringEnding(text, "Ύ", "Y");
-	text = FindAndReplaceStringEnding(text, "ύ", "y");
+	text = FindAndReplaceString(text, "Α", "A");
+	text = FindAndReplaceString(text, "α", "a");
+	text = FindAndReplaceString(text, "Χ", "Ch");
+	text = FindAndReplaceString(text, "χ", "ch");
+	text = FindAndReplaceString(text, "Έ", "E");
+	text = FindAndReplaceString(text, "έ", "e");
+	text = FindAndReplaceString(text, "Ι", "I");
+	text = FindAndReplaceString(text, "ι", "i");
+	text = FindAndReplaceString(text, "Μ", "M");
+	text = FindAndReplaceString(text, "μ", "m");
+	text = FindAndReplaceString(text, "Ν", "N");
+	text = FindAndReplaceString(text, "ν", "n");
+	text = FindAndReplaceString(text, "Ο", "O");
+	text = FindAndReplaceString(text, "ο", "o");
+	text = FindAndReplaceString(text, "Ό", "O");
+	text = FindAndReplaceString(text, "ό", "o");
+	text = FindAndReplaceString(text, "Σ", "S");
+	text = FindAndReplaceString(text, "σ", "s");
+	text = FindAndReplaceString(text, "ς", "s");
+	text = FindAndReplaceString(text, "Θ", "Th");
+	text = FindAndReplaceString(text, "θ", "th");
+	text = FindAndReplaceString(text, "Ύ", "Y");
+	text = FindAndReplaceString(text, "ύ", "y");
+	
+	return text;
+}
+
+std::string DecapitalizeString(std::string text)
+{
+	text[0] = tolower(text[0]);
+	
+	// replace special characters which may not have been lowered with the previous method
+	text = FindAndReplaceStringBeginning(text, "Ā", "ā");
+	text = FindAndReplaceStringBeginning(text, "Â", "â");
+	text = FindAndReplaceStringBeginning(text, "Æ", "æ");
+	text = FindAndReplaceStringBeginning(text, "Ǣ", "ǣ");
+	text = FindAndReplaceStringBeginning(text, "Ǽ", "ǽ");
+	text = FindAndReplaceStringBeginning(text, "Ð", "ð");
+	text = FindAndReplaceStringBeginning(text, "Ḍ", "ḍ");
+	text = FindAndReplaceStringBeginning(text, "Ē", "ē");
+	text = FindAndReplaceStringBeginning(text, "Ê", "ê");
+	text = FindAndReplaceStringBeginning(text, "Ě", "ě");
+	text = FindAndReplaceStringBeginning(text, "Ī", "ī");
+	text = FindAndReplaceStringBeginning(text, "Î", "î");
+	text = FindAndReplaceStringBeginning(text, "Ĭ", "ĭ");
+	text = FindAndReplaceStringBeginning(text, "Ī̆", "ī̆");
+	text = FindAndReplaceStringBeginning(text, "Ō", "ō");
+	text = FindAndReplaceStringBeginning(text, "Ô", "ô");
+	text = FindAndReplaceStringBeginning(text, "Ø", "ø");
+	text = FindAndReplaceStringBeginning(text, "Ǫ", "ǫ");
+	text = FindAndReplaceStringBeginning(text, "Þ", "þ");
+	text = FindAndReplaceStringBeginning(text, "Ū", "ū");
+	text = FindAndReplaceStringBeginning(text, "Û", "û");
+	text = FindAndReplaceStringBeginning(text, "Ŭ", "ŭ");
+	text = FindAndReplaceStringBeginning(text, "Ȳ", "ȳ");
+	text = FindAndReplaceStringBeginning(text, "Ž", "ž");
+	
+	//Greek characters
+	text = FindAndReplaceStringBeginning(text, "Α", "α");
+	text = FindAndReplaceStringBeginning(text, "Χ", "χ");
+	text = FindAndReplaceStringBeginning(text, "Έ", "έ");
+	text = FindAndReplaceStringBeginning(text, "Ι", "ι");
+	text = FindAndReplaceStringBeginning(text, "Μ", "μ");
+	text = FindAndReplaceStringBeginning(text, "Ν", "ν");
+	text = FindAndReplaceStringBeginning(text, "Ο", "ο");
+	text = FindAndReplaceStringBeginning(text, "Ό", "ό");
+	text = FindAndReplaceStringBeginning(text, "Σ", "σ");
+	text = FindAndReplaceStringBeginning(text, "Θ", "θ");
+	text = FindAndReplaceStringBeginning(text, "Ύ", "ύ");
 	
 	return text;
 }
