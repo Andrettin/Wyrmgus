@@ -551,6 +551,8 @@ void CUnit::GeneratePersonalName()
 		std::string PersonalNamePrefixes[PersonalNameMax];
 		int PersonalNameSuffixCount = 0;
 		std::string PersonalNameSuffixes[PersonalNameMax];
+		int PersonalNameInfixCount = 0;
+		std::string PersonalNameInfixes[PersonalNameMax];
 		for (int i = 0; i < PersonalNameMax; ++i) {
 			if (PlayerRaces.PersonalNames[civilization][i].empty()) {
 				break;
@@ -603,6 +605,16 @@ void CUnit::GeneratePersonalName()
 					PersonalNameSuffixCount += 1;
 				}
 			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->InfixPersonalName) {
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->InfixSingular) {
+					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					PersonalNameInfixCount += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->InfixPlural) {
+					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+					PersonalNameInfixCount += 1;
+				}
+			}
 		}
 		
 		for (int i = 0; i < LanguageWordMax; ++i) {
@@ -629,6 +641,16 @@ void CUnit::GeneratePersonalName()
 					PersonalNameSuffixCount += 1;
 				}
 			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->InfixPersonalName) {
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					PersonalNameInfixCount += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					PersonalNameInfixCount += 1;
+				}
+			}
 		}
 		
 		for (int i = 0; i < LanguageWordMax; ++i) {
@@ -647,14 +669,28 @@ void CUnit::GeneratePersonalName()
 					PersonalNameSuffixCount += 1;
 				}
 			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->InfixPersonalName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					PersonalNameInfixCount += 1;
+				}
+			}
 		}
 		
 		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0 || PersonalNameSuffixCount > 0) {
-			int PersonalNameProbability = PersonalNameCount * 10000 / (PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount));
-			if (SyncRand(10000) < PersonalNameProbability) {
+			int random_number = SyncRand(PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (PersonalNamePrefixCount * PersonalNameSuffixCount));
+			if (random_number < PersonalNameCount) { //entire name
 				Name = PersonalNames[SyncRand(PersonalNameCount)];
-			} else {
+			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount)) { //prefix + suffix
 				Name = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
+				std::string suffix = PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
+				suffix = DecapitalizeString(suffix);
+				Name += suffix;
+			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (PersonalNamePrefixCount * PersonalNameInfixCount * PersonalNameSuffixCount)) { //prefix + infix + suffix
+				Name = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
+				std::string infix = PersonalNameInfixes[SyncRand(PersonalNameInfixCount)];
+				infix = DecapitalizeString(infix);
+				Name += infix;
 				std::string suffix = PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
 				suffix = DecapitalizeString(suffix);
 				Name += suffix;

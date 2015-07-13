@@ -949,6 +949,26 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						noun->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-singular")) {
+						++n;
+						noun->InfixSingular = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-plural")) {
+						++n;
+						noun->InfixPlural = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-personal-name")) {
+						++n;
+						noun->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-settlement-name")) {
+						++n;
+						noun->InfixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-province-name")) {
+						++n;
+						noun->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-terrain-name")) {
+						++n;
+						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
+						++n;
+						noun->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1072,6 +1092,20 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						verb->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-personal-name")) {
+						++n;
+						verb->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-settlement-name")) {
+						++n;
+						verb->InfixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-province-name")) {
+						++n;
+						verb->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-terrain-name")) {
+						++n;
+						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
+						++n;
+						verb->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1138,6 +1172,20 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						adjective->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-personal-name")) {
+						++n;
+						adjective->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-settlement-name")) {
+						++n;
+						adjective->InfixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-province-name")) {
+						++n;
+						adjective->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-terrain-name")) {
+						++n;
+						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
+						++n;
+						adjective->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1285,6 +1333,20 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						numeral->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-personal-name")) {
+						++n;
+						numeral->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-settlement-name")) {
+						++n;
+						numeral->InfixSettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-province-name")) {
+						++n;
+						numeral->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-terrain-name")) {
+						++n;
+						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
+						++n;
+						numeral->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
