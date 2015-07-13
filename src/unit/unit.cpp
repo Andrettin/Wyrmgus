@@ -678,7 +678,7 @@ void CUnit::GeneratePersonalName()
 		}
 		
 		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0 || PersonalNameSuffixCount > 0) {
-			int random_number = SyncRand(PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (PersonalNamePrefixCount * PersonalNameSuffixCount));
+			int random_number = SyncRand(PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (PersonalNamePrefixCount * PersonalNameInfixCount * PersonalNameSuffixCount));
 			if (random_number < PersonalNameCount) { //entire name
 				Name = PersonalNames[SyncRand(PersonalNameCount)];
 			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount)) { //prefix + suffix
@@ -687,14 +687,28 @@ void CUnit::GeneratePersonalName()
 				suffix = DecapitalizeString(suffix);
 				Name += suffix;
 			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (PersonalNamePrefixCount * PersonalNameInfixCount * PersonalNameSuffixCount)) { //prefix + infix + suffix
-				Name = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
+				std::string prefix = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
 				std::string infix = PersonalNameInfixes[SyncRand(PersonalNameInfixCount)];
 				infix = DecapitalizeString(infix);
-				Name += infix;
 				std::string suffix = PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
 				suffix = DecapitalizeString(suffix);
+				if (prefix.substr(prefix.size() - 1, 1) == "d" && infix.substr(0, 1) == "d") { //if the prefix ends with "d" and the infix begins with "d", eliminate one instance of "d"
+					prefix = FindAndReplaceStringEnding(prefix, "d", "");
+				}
+				if (infix.substr(infix.size() - 2, 2) == "th" && suffix.substr(0, 2) == "th") { //if the last two characters of the infix are "th", and the suffix begins with "th", then eliminate the infix's "th", to make this be just one instance of "th"
+					infix = FindAndReplaceStringEnding(infix, "th", "");
+				}
+				if (infix.substr(infix.size() - 1, 1) == "d" && suffix.substr(0, 1) == "d") { //if the infix ends with "d" and the suffix begins with "d", eliminate one instance of "d"
+					infix = FindAndReplaceStringEnding(infix, "d", "");
+				}
+				Name = prefix;
+				Name += infix;
 				Name += suffix;
 			}
+		}
+		
+		if (Name.length() > 12) { //if name is too long, generate again
+			this->GeneratePersonalName();
 		}
 	}
 	
