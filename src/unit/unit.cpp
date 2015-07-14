@@ -678,7 +678,7 @@ void CUnit::GeneratePersonalName()
 		}
 		
 		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0 || PersonalNameSuffixCount > 0) {
-			int random_number = SyncRand(PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (PersonalNamePrefixCount * PersonalNameInfixCount * PersonalNameSuffixCount));
+			int random_number = SyncRand(PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (((PersonalNamePrefixCount + PersonalNameSuffixCount) / 2) * PersonalNameInfixCount));
 			if (random_number < PersonalNameCount) { //entire name
 				Name = PersonalNames[SyncRand(PersonalNameCount)];
 			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount)) { //prefix + suffix
@@ -686,7 +686,7 @@ void CUnit::GeneratePersonalName()
 				std::string suffix = PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
 				suffix = DecapitalizeString(suffix);
 				Name += suffix;
-			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (PersonalNamePrefixCount * PersonalNameInfixCount * PersonalNameSuffixCount)) { //prefix + infix + suffix
+			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (((PersonalNamePrefixCount + PersonalNameSuffixCount) / 2) * PersonalNameInfixCount)) { //prefix + infix + suffix
 				std::string prefix = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
 				std::string infix = PersonalNameInfixes[SyncRand(PersonalNameInfixCount)];
 				infix = DecapitalizeString(infix);
@@ -705,10 +705,6 @@ void CUnit::GeneratePersonalName()
 				Name += infix;
 				Name += suffix;
 			}
-		}
-		
-		if (Name.length() > 12) { //if name is too long, generate again
-			this->GeneratePersonalName();
 		}
 	}
 	

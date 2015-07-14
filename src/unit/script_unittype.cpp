@@ -1794,9 +1794,11 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 		int civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
-		Assert(civilization_id != -1);
-		Assert(class_id != -1);
-		PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
+//		Assert(civilization_id != -1);
+//		Assert(class_id != -1);
+		if (civilization_id != -1 && class_id != -1) {
+			PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
+		}
 	}
 	//Wyrmgus end
 
