@@ -649,6 +649,8 @@ int GetItemTypeIdByName(std::string item_type)
 		return AmuletItemType;
 	} else if (item_type == "Ring") {
 		return RingItemType;
+	} else if (item_type == "Potion") {
+		return PotionItemType;
 	}
 
 	return -1;

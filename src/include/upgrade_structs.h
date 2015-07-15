@@ -107,6 +107,8 @@ enum ItemType {
 
 	AmuletItemType,
 	RingItemType,
+	
+	PotionItemType,
 
 	MaxItemTypes
 };
