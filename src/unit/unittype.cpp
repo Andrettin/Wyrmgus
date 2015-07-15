@@ -620,6 +620,41 @@ int GetResourceIdByName(lua_State *l, const char *resourceName)
 	return res;
 }
 
+//Wyrmgus start
+int GetItemTypeIdByName(std::string item_type)
+{
+	if (item_type == "Sword") {
+		return SwordItemType;
+	} else if (item_type == "Axe") {
+		return AxeItemType;
+	} else if (item_type == "Mace") {
+		return MaceItemType;
+	} else if (item_type == "Spear") {
+		return SpearItemType;
+	} else if (item_type == "Bow") {
+		return BowItemType;
+	} else if (item_type == "Throwing Axe") {
+		return ThrowingAxeItemType;
+	} else if (item_type == "Javelin") {
+		return JavelinItemType;
+	} else if (item_type == "Shield") {
+		return ShieldItemType;
+	} else if (item_type == "Helmet") {
+		return HelmetItemType;
+	} else if (item_type == "Armor") {
+		return ArmorItemType;
+	} else if (item_type == "Shoes") {
+		return ShoesItemType;
+	} else if (item_type == "Amulet") {
+		return AmuletItemType;
+	} else if (item_type == "Ring") {
+		return RingItemType;
+	}
+
+	return -1;
+}
+//Wyrmgus end
+
 CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),

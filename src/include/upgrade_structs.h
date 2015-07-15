@@ -86,6 +86,32 @@ enum CostType {
 #define ManaResCost (MaxCosts + 2)
 #define FreeWorkersCount (MaxCosts + 3)
 
+//Wyrmgus start
+/**
+**  Indexes into item type array.
+*/
+enum ItemType {
+	SwordItemType,
+	AxeItemType,
+	MaceItemType,
+	SpearItemType,
+	BowItemType,
+	ThrowingAxeItemType,
+	JavelinItemType,
+
+	ShieldItemType,
+
+	HelmetItemType,
+	ArmorItemType,
+	ShoesItemType,
+
+	AmuletItemType,
+	RingItemType,
+
+	MaxItemTypes
+};
+//Wyrmgus end
+
 /**
 **  Default resources for a new player.
 */
@@ -133,6 +159,10 @@ extern int DefaultResourceMaxAmounts[MaxCosts];
 
 extern int GetResourceIdByName(const char *resourceName);
 extern int GetResourceIdByName(lua_State *l, const char *resourceName);
+
+//Wyrmgus start
+extern int GetItemTypeIdByName(std::string item_type);
+//Wyrmgus end
 
 /**
 **  These are the current stats of a unit. Upgraded or downgraded.

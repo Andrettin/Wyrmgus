@@ -909,6 +909,16 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "personal-name")) {
 						++n;
 						noun->PersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "terrain-name")) {
+						++n;
+						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
+						++n;
+						noun->TerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						noun->ItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-singular")) {
 						++n;
 						noun->PrefixSingular = LuaToBoolean(l, -1, n + 1);
@@ -929,6 +939,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						noun->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						noun->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-singular")) {
 						++n;
 						noun->SuffixSingular = LuaToBoolean(l, -1, n + 1);
@@ -949,6 +964,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						noun->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						noun->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-singular")) {
 						++n;
 						noun->InfixSingular = LuaToBoolean(l, -1, n + 1);
@@ -969,6 +989,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						noun->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						noun->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1078,6 +1103,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						verb->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						verb->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
 						++n;
 						verb->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1092,6 +1122,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						verb->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						verb->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
 						++n;
 						verb->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1106,6 +1141,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						verb->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						verb->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1158,6 +1198,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						adjective->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						adjective->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
 						++n;
 						adjective->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1172,6 +1217,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						adjective->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						adjective->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
 						++n;
 						adjective->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1186,6 +1236,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						adjective->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						adjective->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1319,6 +1374,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						numeral->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "prefix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						numeral->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
 						++n;
 						numeral->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1333,6 +1393,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						numeral->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "suffix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						numeral->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
 						++n;
 						numeral->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1347,6 +1412,11 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
 						++n;
 						numeral->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "infix-item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						numeral->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
