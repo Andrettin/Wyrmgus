@@ -100,6 +100,8 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 					WorldMapOffsetY = WorldMapOffsetY - 1;
 				}
 				GrandStrategyMapHeightIndent -= 32;
+			} else if (WorldMapOffsetY == 0 && GrandStrategyMapHeightIndent == -32) { //this is to make the entire y 0 tiles be shown scrolling to the northmost part of the map
+				GrandStrategyMapHeightIndent -= 32;
 			}
 			scrolled = true;
 		} else if (key == SDLK_DOWN || key == SDLK_KP2) {
@@ -107,6 +109,8 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 				if (GrandStrategyMapHeightIndent == -32) {
 					WorldMapOffsetY = WorldMapOffsetY + 1;
 				}
+				GrandStrategyMapHeightIndent += 32;
+			} else if (WorldMapOffsetY == GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64) && GrandStrategyMapHeightIndent == 0) {
 				GrandStrategyMapHeightIndent += 32;
 			}
 			scrolled = true;
@@ -116,6 +120,8 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 					WorldMapOffsetX = WorldMapOffsetX - 1;
 				}
 				GrandStrategyMapWidthIndent -= 32;
+			} else if (WorldMapOffsetX == 0 && GrandStrategyMapWidthIndent == -32) { //this is to make the entire x 0 tiles be shown scrolling to the westmost part of the map
+				GrandStrategyMapWidthIndent -= 32;
 			}
 			scrolled = true;
 		} else if (key == SDLK_RIGHT || key == SDLK_KP6) {
@@ -123,6 +129,8 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 				if (GrandStrategyMapWidthIndent == -32) {
 					WorldMapOffsetX = WorldMapOffsetX + 1;
 				}
+				GrandStrategyMapWidthIndent += 32;
+			} else if (WorldMapOffsetX == GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64) && GrandStrategyMapWidthIndent == 0) {
 				GrandStrategyMapWidthIndent += 32;
 			}
 			scrolled = true;
@@ -164,6 +172,8 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 					WorldMapOffsetY = WorldMapOffsetY - 1;
 				}
 				GrandStrategyMapHeightIndent -= 32;
+			} else if (WorldMapOffsetY == 0 && GrandStrategyMapHeightIndent == -32) { //this is to make the entire y 0 tiles be shown scrolling to the northmost part of the map
+				GrandStrategyMapHeightIndent -= 32;
 			}
 			scrolled = true;
 		} else if (key == SDLK_DOWN || key == SDLK_KP2) {
@@ -171,6 +181,8 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 				if (GrandStrategyMapHeightIndent == -32) {
 					WorldMapOffsetY = WorldMapOffsetY + 1;
 				}
+				GrandStrategyMapHeightIndent += 32;
+			} else if (WorldMapOffsetY == GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64) && GrandStrategyMapHeightIndent == 0) {
 				GrandStrategyMapHeightIndent += 32;
 			}
 			scrolled = true;
@@ -180,6 +192,8 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 					WorldMapOffsetX = WorldMapOffsetX - 1;
 				}
 				GrandStrategyMapWidthIndent -= 32;
+			} else if (WorldMapOffsetX == 0 && GrandStrategyMapWidthIndent == -32) { //this is to make the entire x 0 tiles be shown scrolling to the westmost part of the map
+				GrandStrategyMapWidthIndent -= 32;
 			}
 			scrolled = true;
 		} else if (key == SDLK_RIGHT || key == SDLK_KP6) {
@@ -187,6 +201,8 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 				if (GrandStrategyMapWidthIndent == -32) {
 					WorldMapOffsetX = WorldMapOffsetX + 1;
 				}
+				GrandStrategyMapWidthIndent += 32;
+			} else if (WorldMapOffsetX == GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64) && GrandStrategyMapWidthIndent == 0) {
 				GrandStrategyMapWidthIndent += 32;
 			}
 			scrolled = true;
