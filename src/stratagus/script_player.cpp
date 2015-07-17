@@ -915,6 +915,12 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "personal-name")) {
 						++n;
 						noun->PersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "settlement-name")) {
+						++n;
+						noun->SettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "province-name")) {
+						++n;
+						noun->ProvinceName = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "terrain-name")) {
 						++n;
 						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));

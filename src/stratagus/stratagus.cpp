@@ -1246,6 +1246,16 @@ std::string CProvince::GenerateProvinceName(int civilization)
 			if (!PlayerRaces.LanguageNouns[civilization][i]) {
 				break;
 			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->ProvinceName) { // nouns which can be used as province names without compounding
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NameSingular) {
+					ProvinceNames[ProvinceNameCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					ProvinceNameCount += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NamePlural) {
+					ProvinceNames[ProvinceNameCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+					ProvinceNameCount += 1;
+				}
+			}
 			if (PlayerRaces.LanguageNouns[civilization][i]->PrefixProvinceName) {
 				if (PlayerRaces.LanguageNouns[civilization][i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive
 					if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
@@ -1433,6 +1443,16 @@ std::string CProvince::GenerateSettlementName(int civilization)
 		for (int i = 0; i < LanguageWordMax; ++i) {
 			if (!PlayerRaces.LanguageNouns[civilization][i]) {
 				break;
+			}
+			if (PlayerRaces.LanguageNouns[civilization][i]->SettlementName) { // nouns which can be used as settlement names without compounding
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NameSingular) {
+					SettlementNames[SettlementNameCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					SettlementNameCount += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NamePlural) {
+					SettlementNames[SettlementNameCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+					SettlementNameCount += 1;
+				}
 			}
 			if (PlayerRaces.LanguageNouns[civilization][i]->PrefixSettlementName) {
 				if (PlayerRaces.LanguageNouns[civilization][i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive

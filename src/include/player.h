@@ -259,7 +259,7 @@ public:
 		Gender(""),
 		Uncountable(false),
 		NameSingular(false), NamePlural(false),
-		PersonalName(false), 
+		PersonalName(false), SettlementName(false), ProvinceName(false), 
 		PrefixSingular(false), PrefixPlural(false),
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixSingular(false), SuffixPlural(false),
@@ -294,6 +294,8 @@ public:
 	bool NameSingular;				/// Whether the noun's singular form can be used as a name
 	bool NamePlural;				/// Whether the noun's plural form can be used as a name
 	bool PersonalName;				/// Whether the noun can be used as a personal name
+	bool SettlementName;			/// Whether the noun can be used as a settlement name
+	bool ProvinceName;				/// Whether the noun can be used as a province name
 	bool TerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a name of particular terrain features
 	bool ItemName[MaxItemTypes];	/// Whether the noun can be used as an item name
 	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
