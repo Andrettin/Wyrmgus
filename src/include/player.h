@@ -396,11 +396,13 @@ public:
 	LanguageAdjective() : Word(""),
 		Meaning(""), Noun(""), Verb(""),
 		Comparative(""), Superlative(""),
-		PersonalName(false), 
+		PersonalName(false), SettlementName(false), ProvinceName(false), 
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
 		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
 	{
+		memset(TerrainName, 0, sizeof(TerrainName));
+		memset(ItemName, 0, sizeof(ItemName));
 		memset(PrefixTerrainName, 0, sizeof(PrefixTerrainName));
 		memset(PrefixItemName, 0, sizeof(PrefixItemName));
 		memset(SuffixTerrainName, 0, sizeof(SuffixTerrainName));
@@ -416,6 +418,10 @@ public:
 	std::string Comparative;		/// Comparative form of the adjective.
 	std::string Superlative;		/// Superlative form of the adjective.
 	bool PersonalName;				/// Whether the word can be used as a personal name
+	bool SettlementName;			/// Whether the word can be used as a settlement name
+	bool ProvinceName;				/// Whether the word can be used as a province name
+	bool TerrainName[MaxItemTypes];	/// Whether the word can be used as an item name
+	bool ItemName[MaxItemTypes];	/// Whether the word can be used as an item name
 	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names

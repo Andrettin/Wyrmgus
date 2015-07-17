@@ -1202,6 +1202,22 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "personal-name")) {
 						++n;
 						adjective->PersonalName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "settlement-name")) {
+						++n;
+						adjective->SettlementName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "province-name")) {
+						++n;
+						adjective->ProvinceName = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "terrain-name")) {
+						++n;
+						int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, n + 1));
+						++n;
+						adjective->TerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "item-name")) {
+						++n;
+						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						++n;
+						adjective->ItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-personal-name")) {
 						++n;
 						adjective->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);

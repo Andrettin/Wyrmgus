@@ -1329,6 +1329,12 @@ std::string CProvince::GenerateProvinceName(int civilization)
 			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
 				break;
 			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->ProvinceName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					ProvinceNames[ProvinceNameCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					ProvinceNameCount += 1;
+				}
+			}
 			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixProvinceName) {
 				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
 					ProvinceNamePrefixes[ProvinceNamePrefixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
@@ -1527,6 +1533,12 @@ std::string CProvince::GenerateSettlementName(int civilization)
 			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
 				break;
 			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->SettlementName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					SettlementNames[SettlementNameCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					SettlementNameCount += 1;
+				}
+			}
 			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixSettlementName) {
 				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
 					SettlementNamePrefixes[SettlementNamePrefixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
@@ -1607,6 +1619,9 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 		int noun_name_count = 0;
 		std::string noun_names[PersonalNameMax];
 		int noun_name_ids[PersonalNameMax];
+		int adjective_name_count = 0;
+		std::string adjective_names[PersonalNameMax];
+		int adjective_name_ids[PersonalNameMax];
 		
 		int noun_prefix_count = 0;
 		std::string noun_prefixes[PersonalNameMax];
@@ -1771,6 +1786,13 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
 				break;
 			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->TerrainName[terrain]) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					adjective_names[adjective_name_count] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					adjective_name_ids[adjective_name_count] = i;
+					adjective_name_count += 1;
+				}
+			}
 			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixTerrainName[terrain]) {
 				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
 					adjective_prefixes[adjective_prefix_count] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
@@ -1821,13 +1843,18 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 			}
 		}
 		
-		if (noun_name_count > 0 || noun_prefix_count > 0 || verb_prefix_count > 0 || adjective_prefix_count > 0 || numeral_prefix_count > 0) {
+		if (noun_name_count > 0 || adjective_name_count > 0 || noun_prefix_count > 0 || verb_prefix_count > 0 || adjective_prefix_count > 0 || numeral_prefix_count > 0) {
 			int total_prefix_count = noun_prefix_count + verb_prefix_count + adjective_prefix_count + numeral_prefix_count;
 			int total_suffix_count = noun_suffix_count + verb_suffix_count + adjective_suffix_count + numeral_suffix_count;
 			int total_infix_count = noun_infix_count + verb_infix_count + adjective_infix_count + numeral_infix_count;
-			int random_number = SyncRand(noun_name_count + (total_prefix_count * total_suffix_count) + ((total_prefix_count * total_suffix_count) / 2) * total_infix_count);
-			if (random_number < noun_name_count) { //entire name
-				tile_name = noun_names[SyncRand(noun_name_count)];
+			int random_number = SyncRand(noun_name_count + adjective_name_count + (total_prefix_count * total_suffix_count) + ((total_prefix_count * total_suffix_count) / 2) * total_infix_count);
+			if (random_number < noun_name_count + adjective_name_count) { //entire name
+				random_number = SyncRand(noun_name_count + adjective_name_count);
+				if (random_number < noun_name_count) {
+					tile_name = noun_names[SyncRand(noun_name_count)];
+				} else {
+					tile_name = adjective_names[SyncRand(adjective_name_count)];
+				}
 			} else if (random_number < (noun_name_count + (total_prefix_count * total_suffix_count))) { //prefix + suffix
 				std::string prefix;
 				std::string suffix;
