@@ -906,6 +906,12 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "uncountable")) {
 						++n;
 						noun->Uncountable = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "name-singular")) {
+						++n;
+						noun->NameSingular = LuaToBoolean(l, -1, n + 1);
+					} else if (!strcmp(value, "name-plural")) {
+						++n;
+						noun->NamePlural = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "personal-name")) {
 						++n;
 						noun->PersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1089,6 +1095,9 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "participle-past")) {
 						++n;
 						verb->ParticiplePast = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "personal-name")) {
+						++n;
+						verb->PersonalName = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-personal-name")) {
 						++n;
 						verb->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1184,6 +1193,9 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "superlative")) {
 						++n;
 						adjective->Superlative = LuaToString(l, -1, n + 1);
+					} else if (!strcmp(value, "personal-name")) {
+						++n;
+						adjective->PersonalName = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-personal-name")) {
 						++n;
 						adjective->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);

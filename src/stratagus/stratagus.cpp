@@ -1632,8 +1632,13 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 				break;
 			}
 			if (PlayerRaces.LanguageNouns[civilization][i]->TerrainName[terrain]) { // nouns which can be used as terrain names for this terrain type without compounding
-				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty()) {
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NameSingular) {
 					noun_names[noun_name_count] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					noun_name_ids[noun_name_count] = i;
+					noun_name_count += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NamePlural) {
+					noun_names[noun_name_count] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
 					noun_name_ids[noun_name_count] = i;
 					noun_name_count += 1;
 				}

@@ -258,6 +258,7 @@ public:
 		PluralNominative(""), PluralAccusative(""), PluralDative(""), PluralGenitive(""),
 		Gender(""),
 		Uncountable(false),
+		NameSingular(false), NamePlural(false),
 		PersonalName(false), 
 		PrefixSingular(false), PrefixPlural(false),
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
@@ -290,6 +291,8 @@ public:
 	std::string PluralGenitive;
 	std::string Gender;				/// What is the gender of the noun (Male, Female or Neutral)
 	bool Uncountable;				/// Whether the noun is uncountable or not.
+	bool NameSingular;				/// Whether the noun's singular form can be used as a name
+	bool NamePlural;				/// Whether the noun's plural form can be used as a name
 	bool PersonalName;				/// Whether the noun can be used as a personal name
 	bool TerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a name of particular terrain features
 	bool ItemName[MaxItemTypes];	/// Whether the noun can be used as an item name
@@ -329,6 +332,7 @@ public:
 		SingularFirstPersonFuture(""), SingularSecondPersonFuture(""), SingularThirdPersonFuture(""),
 		PluralFirstPersonFuture(""), PluralSecondPersonFuture(""), PluralThirdPersonFuture(""),
 		ParticiplePresent(""), ParticiplePast(""),
+		PersonalName(false), 
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
 		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
@@ -366,6 +370,7 @@ public:
 	std::string PluralThirdPersonFuture;
 	std::string ParticiplePresent;
 	std::string ParticiplePast;
+	bool PersonalName;				/// Whether the word can be used as a personal name
 	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
@@ -389,6 +394,7 @@ public:
 	LanguageAdjective() : Word(""),
 		Meaning(""), Noun(""), Verb(""),
 		Comparative(""), Superlative(""),
+		PersonalName(false), 
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
 		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
@@ -407,6 +413,7 @@ public:
 	std::string Verb;				/// Equivalent verb, if any.
 	std::string Comparative;		/// Comparative form of the adjective.
 	std::string Superlative;		/// Superlative form of the adjective.
+	bool PersonalName;				/// Whether the word can be used as a personal name
 	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names

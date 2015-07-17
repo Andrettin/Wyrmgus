@@ -651,6 +651,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (!unit.Trait.empty()) {
 				f->printf("AcquireTrait(unit, \"%s\")\n", unit.Trait.c_str());
 			}
+			if (unit.Variable[HP_INDEX].Value != unit.Variable[HP_INDEX].Max) {
+				f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit.Variable[HP_INDEX].Value);
+			}
 			//Wyrmgus end
 			//Wyrmgus start
 //			if (unit.Type->Teleporter && unit.Goal) {

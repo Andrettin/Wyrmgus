@@ -580,8 +580,12 @@ void CUnit::GeneratePersonalName()
 				break;
 			}
 			if (PlayerRaces.LanguageNouns[civilization][i]->PersonalName) { // nouns which can be used as personal names without compounding
-				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty()) {
+				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NameSingular) {
 					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
+					PersonalNameCount += 1;
+				}
+				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NamePlural) {
+					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
 					PersonalNameCount += 1;
 				}
 			}
@@ -621,6 +625,16 @@ void CUnit::GeneratePersonalName()
 			if (!PlayerRaces.LanguageVerbs[civilization][i]) {
 				break;
 			}
+			if (PlayerRaces.LanguageVerbs[civilization][i]->PersonalName) { // only using verb participles for now; maybe should add more possibilities?
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
+					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
+					PersonalNameCount += 1;
+				}
+				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
+					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
+					PersonalNameCount += 1;
+				}
+			}
 			if (PlayerRaces.LanguageVerbs[civilization][i]->PrefixPersonalName) { // only using verb participles for now; maybe should add more possibilities?
 				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
 					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
@@ -656,6 +670,12 @@ void CUnit::GeneratePersonalName()
 		for (int i = 0; i < LanguageWordMax; ++i) {
 			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
 				break;
+			}
+			if (PlayerRaces.LanguageAdjectives[civilization][i]->PersonalName) {
+				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
+					PersonalNameCount += 1;
+				}
 			}
 			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixPersonalName) {
 				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
