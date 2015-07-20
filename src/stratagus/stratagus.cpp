@@ -1061,9 +1061,35 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY, tile_tooltip);
 }
 
-/**
-**  Draw the grand strategy tile tooltip.
-*/
+void CGrandStrategyGame::DoTurn()
+{
+	//this function takes care only of some things for now, move the rest from Lua later
+	for (int i = 0; i < ProvinceMax; ++i) {
+		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
+			for (size_t j = 0; j < UnitTypes.size(); ++j) {
+				// construct buildings
+				if (IsGrandStrategyBuilding(*UnitTypes[j]) && this->Provinces[i]->SettlementBuildings[j] == 1) {
+					this->Provinces[i]->SettlementBuildings[j] = 2;
+					if (UnitTypes[j]->Class == "town-hall" || UnitTypes[j]->Class == "lumber-mill" || UnitTypes[j]->Class == "smithy") { //recalculate the faction incomes if an income-altering building was constructed
+						char buf[256];
+						snprintf(buf, sizeof(buf), "if (CalculateFactionIncomes ~= nil) then CalculateFactionIncomes() end;");
+						CclCommand(buf);
+					}
+				}
+			}
+			// if the province has a town hall, a barracks and a smithy, give it a mercenary camp; not for Earth for now, since there are no recruitable mercenaries for Earth
+			int mercenary_camp_id = UnitTypeIdByIdent("unit-mercenary-camp");
+			if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == 0 && GrandStrategyWorld != "Earth") {
+				if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->HasBuildingClass("barracks") && this->Provinces[i]->HasBuildingClass("smithy")) {
+					this->Provinces[i]->SettlementBuildings[mercenary_camp_id] = 1;
+				}
+			}
+		} else { //end of valid provinces
+			break;
+		}
+	}
+}
+
 Vec2i CGrandStrategyGame::GetTileUnderCursor()
 {
 	Vec2i tile_under_cursor(0, 0);
@@ -2967,6 +2993,11 @@ void SetGrandStrategyWorld(std::string world)
 	
 }
 
+void DoGrandStrategyTurn()
+{
+	GrandStrategyGame.DoTurn();
+}
+
 void CalculateProvinceBorders()
 {
 	for (int i = 0; i < ProvinceMax; ++i) {
@@ -3045,6 +3076,29 @@ bool ProvinceBordersFaction(std::string province_name, std::string faction_civil
 	}
 	
 	return GrandStrategyGame.Provinces[province]->BordersFaction(civilization, faction);
+}
+
+bool ProvinceHasBuildingClass(std::string province_name, std::string building_class)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	return GrandStrategyGame.Provinces[province_id]->HasBuildingClass(building_class);
+}
+
+bool IsGrandStrategyBuilding(const CUnitType &type)
+{
+	if (type.BoolFlag[BUILDING_INDEX].value && !type.Class.empty() && type.Class != "farm" && type.Class != "watch-tower" && type.Class != "guard-tower") {
+		return true;
+	}
+	return false;
+}
+
+int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident)
+{
+	int province_id = GetProvinceId(province_name);
+	int building_id = UnitTypeIdByIdent(building_ident);
+	
+	return GrandStrategyGame.Provinces[province_id]->SettlementBuildings[building_id];
 }
 //Wyrmgus end
 

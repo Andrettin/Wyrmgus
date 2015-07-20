@@ -307,8 +307,9 @@ public:
 	}
 
 	void Clean();
-	void DrawMap();              /// Draw the map area
-	void DrawTileTooltip(int x, int y);              /// Draw the map area
+	void DrawMap();							/// Draw the map area
+	void DrawTileTooltip(int x, int y);		/// Draw the tooltip for a tile
+	void DoTurn();							/// Process the grand strategy turn
 	Vec2i GetTileUnderCursor();
 
 public:
@@ -375,9 +376,13 @@ extern void SetProvinceAttackedBy(std::string province_name, std::string civiliz
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
 extern void SetGrandStrategyWorld(std::string world);
+extern void DoGrandStrategyTurn();
 extern void CalculateProvinceBorders();
+extern bool IsGrandStrategyBuilding(const CUnitType &type);
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
+extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
+extern int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident);
 //Wyrmgus end
 
 //@}
