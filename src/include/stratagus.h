@@ -163,8 +163,8 @@ extern const char NameLine[];
 #define PersonalNameMax 1024		/// Maximum number of personal names a civilization can have
 #define LanguageWordMax 1024		/// Maximum number of words a civilization's language can have
 
-#define WorldMapWidthMax 256		/// Maximum width the grand strategy world map can have
-#define WorldMapHeightMax 256		/// Maximum height the grand strategy world map can have
+#define WorldMapWidthMax 512		/// Maximum width the grand strategy world map can have
+#define WorldMapHeightMax 512		/// Maximum height the grand strategy world map can have
 #define WorldMapTerrainTypeMax 32	/// Maximum height the grand strategy world map can have
 #define ProvinceMax 256				/// Maximum quantity of provinces in a grand strategy game
 #define ProvinceTileMax 2048		/// Maximum quantity of tiles a province can have
@@ -374,6 +374,7 @@ extern void SetProvinceSettlementBuilding(std::string province_name, std::string
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
+extern void SetGrandStrategyWorld(std::string world);
 extern void CalculateProvinceBorders();
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);

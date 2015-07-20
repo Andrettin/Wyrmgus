@@ -2842,19 +2842,6 @@ void CleanGrandStrategyGame()
 
 void InitializeGrandStrategyGame()
 {
-	//set the base tile here, if it hasn't been gotten yet
-	std::string base_tile_filename;
-	if (GrandStrategyWorld == "Nidavellir") {
-		base_tile_filename = "tilesets/world/terrain/dark_plains.png";
-	} else {
-		base_tile_filename = "tilesets/world/terrain/plains.png";
-	}
-	if (CGraphic::Get(base_tile_filename) == NULL) {
-		CGraphic *base_tile_graphic = CGraphic::New(base_tile_filename, 64, 64);
-		base_tile_graphic->Load();
-	}
-	GrandStrategyGame.BaseTile = CGraphic::Get(base_tile_filename);
-	
 	//do the same for the fog tile now
 	std::string fog_graphic_tile = "tilesets/world/terrain/fog.png";
 	if (CGraphic::Get(fog_graphic_tile) == NULL) {
@@ -2959,6 +2946,25 @@ void InitializeGrandStrategyGame()
 		attack_symbol_graphic->Load();
 	}
 	GrandStrategyGame.SymbolAttack = CGraphic::Get(attack_symbol_filename);
+}
+
+void SetGrandStrategyWorld(std::string world)
+{
+	GrandStrategyWorld = world;
+	
+	//set the base tile here, if it hasn't been gotten yet
+	std::string base_tile_filename;
+	if (GrandStrategyWorld == "Nidavellir") {
+		base_tile_filename = "tilesets/world/terrain/dark_plains.png";
+	} else {
+		base_tile_filename = "tilesets/world/terrain/plains.png";
+	}
+	if (CGraphic::Get(base_tile_filename) == NULL) {
+		CGraphic *base_tile_graphic = CGraphic::New(base_tile_filename, 64, 64);
+		base_tile_graphic->Load();
+	}
+	GrandStrategyGame.BaseTile = CGraphic::Get(base_tile_filename);
+	
 }
 
 void CalculateProvinceBorders()

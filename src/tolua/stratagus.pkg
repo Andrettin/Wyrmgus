@@ -150,6 +150,7 @@ extern void SetProvinceSettlementBuilding(std::string province_name, std::string
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
+extern void SetGrandStrategyWorld(std::string world);
 extern void CalculateProvinceBorders();
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
