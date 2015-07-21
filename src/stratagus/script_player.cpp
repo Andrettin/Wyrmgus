@@ -1803,7 +1803,7 @@ static int CclDefineLanguageVerb(lua_State *l)
 }
 
 /**
-**  Define a noun for a particular civilization's language.
+**  Define an adjective for a particular civilization's language.
 **
 **  @param l  Lua state.
 */
@@ -1939,6 +1939,160 @@ static int CclDefineLanguageAdjective(lua_State *l)
 				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				adjective->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
+**  Define an adverb for a particular civilization's language.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineLanguageAdverb(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	LanguageAdverb *adverb = new LanguageAdverb;
+	adverb->Word = LuaToString(l, 1);
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Civilization")) {
+			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			
+			for (int i = 0; i < LanguageWordMax; ++i) {
+				if (!PlayerRaces.LanguageAdverbs[civilization][i] || PlayerRaces.LanguageAdverbs[civilization][i]->Word.empty()) {
+					PlayerRaces.LanguageAdverbs[civilization][i] = adverb;
+					break;
+				}
+			}
+		} else if (!strcmp(value, "Meaning")) {
+			adverb->Meaning = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
+**  Define a numeral for a particular civilization's language.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineLanguageNumeral(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	LanguageNumeral *numeral = new LanguageNumeral;
+	numeral->Word = LuaToString(l, 1);
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Civilization")) {
+			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			
+			for (int i = 0; i < LanguageWordMax; ++i) {
+				if (!PlayerRaces.LanguageNumerals[civilization][i] || PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
+					PlayerRaces.LanguageNumerals[civilization][i] = numeral;
+					break;
+				}
+			}
+		} else if (!strcmp(value, "Number")) {
+			numeral->Number = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "PrefixPersonalName")) {
+			numeral->PrefixPersonalName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "PrefixSettlementName")) {
+			numeral->PrefixSettlementName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "PrefixProvinceName")) {
+			numeral->PrefixProvinceName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "PrefixTerrainName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, k + 1));
+				++k;
+				numeral->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, k + 1);
+			}
+		} else if (!strcmp(value, "PrefixItemName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				numeral->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
+			}
+		} else if (!strcmp(value, "SuffixPersonalName")) {
+			numeral->SuffixPersonalName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SuffixSettlementName")) {
+			numeral->SuffixSettlementName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SuffixProvinceName")) {
+			numeral->SuffixProvinceName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SuffixTerrainName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, k + 1));
+				++k;
+				numeral->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, k + 1);
+			}
+		} else if (!strcmp(value, "SuffixItemName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				numeral->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
+			}
+		} else if (!strcmp(value, "InfixPersonalName")) {
+			numeral->InfixPersonalName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "InfixSettlementName")) {
+			numeral->InfixSettlementName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "InfixProvinceName")) {
+			numeral->InfixProvinceName = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "InfixTerrainName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int terrain_type = GetWorldMapTerrainTypeId(LuaToString(l, -1, k + 1));
+				++k;
+				numeral->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, k + 1);
+			}
+		} else if (!strcmp(value, "InfixItemName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				numeral->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2578,6 +2732,8 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineLanguageNoun", CclDefineLanguageNoun);
 	lua_register(Lua, "DefineLanguageVerb", CclDefineLanguageVerb);
 	lua_register(Lua, "DefineLanguageAdjective", CclDefineLanguageAdjective);
+	lua_register(Lua, "DefineLanguageAdverb", CclDefineLanguageAdverb);
+	lua_register(Lua, "DefineLanguageNumeral", CclDefineLanguageNumeral);
 	lua_register(Lua, "IsCivilizationPlayable", CclIsCivilizationPlayable);
 	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
 	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
