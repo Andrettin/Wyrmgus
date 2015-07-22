@@ -2154,13 +2154,15 @@ void SetWorldMapSize(int width, int height)
 	GrandStrategyGame.WorldMapHeight = height;
 	
 	//create new world map tile objects for the size, if necessary
-	for (int x = 0; x < WorldMapWidthMax; ++x) {
-		for (int y = 0; y < WorldMapHeightMax; ++y) {
-			if (!GrandStrategyGame.WorldMapTiles[x][y]) {
-				WorldMapTile *world_map_tile = new WorldMapTile;
-				GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
-				GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
-				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
+	if (!GrandStrategyGame.WorldMapTiles[width - 1][height - 1]) {
+		for (int x = 0; x < GrandStrategyGame.WorldMapWidth; ++x) {
+			for (int y = 0; y < GrandStrategyGame.WorldMapHeight; ++y) {
+				if (!GrandStrategyGame.WorldMapTiles[x][y]) {
+					WorldMapTile *world_map_tile = new WorldMapTile;
+					GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
+					GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
+					GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
+				}
 			}
 		}
 	}
@@ -2805,19 +2807,19 @@ void CleanGrandStrategyGame()
 {
 	for (int x = 0; x < WorldMapWidthMax; ++x) {
 		for (int y = 0; y < WorldMapHeightMax; ++y) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]) {
+			if (GrandStrategyGame.WorldMapTiles[x][y] && GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
 				GrandStrategyGame.WorldMapTiles[x][y]->Terrain = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Province = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->BorderTile = false;
-				GrandStrategyGame.WorldMapTiles[x][y]->Position.x = -1;
-				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
 				for (int i = 0; i < MAX_RACES; ++i) {
 					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i] = "";
 				}
+			} else {
+				break;
 			}
 		}
 	}

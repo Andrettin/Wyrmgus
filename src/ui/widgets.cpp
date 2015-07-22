@@ -77,9 +77,11 @@ static void MenuHandleButtonUp(unsigned)
 		//if clicked on a tile, update the grand strategy interface
 		if (UI.MapArea.Contains(CursorScreenPos) && !(MouseButtons & LeftButton) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (SetSelectedProvince ~= nil) then SetSelectedProvince(GetTileProvince(%d, %d)) end;", GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
-			CclCommand(buf);
+			if (GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province != -1) {
+				char buf[256];
+				snprintf(buf, sizeof(buf), "if (SetSelectedProvince ~= nil) then SetSelectedProvince(GetTileProvince(%d, %d)) end;", GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+				CclCommand(buf);
+			}
 		}
 	}
 	//Wyrmgus end
