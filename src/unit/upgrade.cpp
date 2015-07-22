@@ -83,11 +83,17 @@
 std::vector<CUpgrade *> AllUpgrades;           /// The main user useable upgrades
 
 /// How many upgrades modifiers supported
-#define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
+//Wyrmgus start
+//#define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
 /// Upgrades modifiers
-static CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
+//static CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
+CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
+//Wyrmgus end
 /// Number of upgrades modifiers used
-static int NumUpgradeModifiers;
+//Wyrmgus start
+//static int NumUpgradeModifiers;
+int NumUpgradeModifiers;
+//Wyrmgus end
 
 std::map<std::string, CUpgrade *> Upgrades;
 
@@ -1206,7 +1212,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 **  @param player  Player that get all the upgrades.
 **  @param um      Upgrade modifier that do the effects
 */
-static void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
+void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 {
 	Assert(um);
 
@@ -1286,6 +1292,10 @@ static void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *
 				unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
 			}
 		}
+	}
+	
+	if (um->ConvertTo) {
+		CommandTransformIntoType(unit, *um->ConvertTo);
 	}
 }
 

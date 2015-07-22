@@ -47,6 +47,14 @@ class CUnit;
 --  Variables
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+#define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
+
+extern CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
+
+extern int NumUpgradeModifiers;
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -84,6 +92,7 @@ extern void UpgradeLost(CPlayer &player, int id);
 extern void ApplyUpgrades();
 
 //Wyrmgus start
+extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um);
 extern void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade);
 extern void TraitAcquire(CUnit &unit, const CUpgrade *upgrade);
 extern void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade);
