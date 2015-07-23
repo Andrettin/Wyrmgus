@@ -176,6 +176,15 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 }
 static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 {
+	//Wyrmgus start
+	if (key == 'f') { // ALT+F and CTRL+F toggle fullscreen
+		if (KeyModifiers & (ModifierAlt | ModifierControl)) {
+			ToggleFullScreen();
+			CclCommand("wyr.preferences.VideoFullScreen = Video.FullScreen;");
+			SavePreferences();
+		}
+	}
+	//Wyrmgus end
 	HandleKeyModifiersUp(key, keychar);
 }
 static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)

@@ -656,6 +656,9 @@ static bool CommandKey(int key)
 				break;
 			}
 			ToggleFullScreen();
+			//Wyrmgus start
+			CclCommand("wyr.preferences.VideoFullScreen = Video.FullScreen;");
+			//Wyrmgus end
 			SavePreferences();
 			break;
 
@@ -664,6 +667,10 @@ static bool CommandKey(int key)
 				break;
 			}
 			UiToggleGrabMouse();
+			//Wyrmgus start
+			CclCommand("wyr.preferences.GrabMouse = GetGrabMouse();");
+			SavePreferences();
+			//Wyrmgus end
 			//Wyrmgus start
 			HandleCommandKey(key);
 			//Wyrmgus end
