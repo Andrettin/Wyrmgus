@@ -228,6 +228,7 @@ public:
 	{
 	}
 
+	void UpdateMinimap();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	std::string GetCulturalName();										/// Get the tile's cultural name.
 	
@@ -261,6 +262,7 @@ public:
 		}
 	}
 	
+	void UpdateMinimap();
 	bool HasBuildingClass(std::string building_class_name);
 	bool BordersProvince(int province_id);
 	bool BordersFaction(int faction_civilization, int faction);
@@ -308,8 +310,13 @@ public:
 
 	void Clean();
 	void DrawMap();							/// Draw the map area
+	void DrawMinimap();						/// Draw the minimap
 	void DrawTileTooltip(int x, int y);		/// Draw the tooltip for a tile
 	void DoTurn();							/// Process the grand strategy turn
+	#if defined(USE_OPENGL) || defined(USE_GLES)
+	void CreateMinimapTexture();
+	#endif
+	void UpdateMinimap();
 	Vec2i GetTileUnderCursor();
 
 public:
@@ -328,6 +335,20 @@ public:
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	CProvince *Provinces[ProvinceMax];
 	int WorldMapResources[MaxCosts][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
+
+	int MinimapTextureWidth;
+	int MinimapTextureHeight;
+	int MinimapTileWidth;										/// minimap tile width (per mil)
+	int MinimapTileHeight;										/// minimap tile height (per mil)
+	int MinimapOffsetX;
+	int MinimapOffsetY;
+
+	#if defined(USE_OPENGL) || defined(USE_GLES)
+	unsigned char *MinimapSurfaceGL;
+	GLuint MinimapTexture;
+	#endif
+
+	SDL_Surface *MinimapSurface;
 };
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
@@ -373,15 +394,18 @@ extern void SetProvinceFactionCulturalSettlementName(std::string province_name, 
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
+extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
+extern void InitializeGrandStrategyMinimap();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
 extern void CalculateProvinceBorders();
-extern bool IsGrandStrategyBuilding(const CUnitType &type);
+extern void CenterGrandStrategyMapOnTile(int x, int y);
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
+extern bool IsGrandStrategyBuilding(const CUnitType &type);
 extern int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident);
 //Wyrmgus end
 

@@ -83,6 +83,22 @@ static void MenuHandleButtonUp(unsigned)
 				CclCommand(buf);
 			}
 		}
+		
+		//if clicked on the minimap, go to that part of the map
+		if (
+			CursorScreenPos.x >= UI.Minimap.X + GrandStrategyGame.MinimapOffsetX
+			&& CursorScreenPos.x < UI.Minimap.X + GrandStrategyGame.MinimapOffsetX + GrandStrategyGame.MinimapTextureWidth
+			&& CursorScreenPos.y >= UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY
+			&& CursorScreenPos.y < UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY + GrandStrategyGame.MinimapTextureHeight
+			&& !(MouseButtons & LeftButton)
+			&& GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]
+		) {
+			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
+			CenterGrandStrategyMapOnTile(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (DrawOnScreenTiles ~= nil) then DrawOnScreenTiles() end;");
+			CclCommand(buf);
+		}
 	}
 	//Wyrmgus end
 }

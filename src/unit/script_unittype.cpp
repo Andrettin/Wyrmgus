@@ -1779,7 +1779,7 @@ static int CclDefineUnitType(lua_State *l)
 	}
 	
 	//Wyrmgus start
-	if (!type->Class.empty() && !type->Civilization.empty()) { //if class and civilization are defined, then use this unit type to help build the classes table, and add this unit to the civilization class table
+	if (!type->Class.empty()) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
 		int class_id = -1;
 		for (unsigned int i = 0; i != UnitTypeClassMax; ++i) {
 			if (UnitTypeClasses[i] == type->Class) {
@@ -1793,11 +1793,11 @@ static int CclDefineUnitType(lua_State *l)
 				break;
 			}
 		}
-		int civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
-//		Assert(civilization_id != -1);
-//		Assert(class_id != -1);
-		if (civilization_id != -1 && class_id != -1) {
-			PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
+		if (!type->Civilization.empty()) {
+			int civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
+			if (civilization_id != -1 && class_id != -1) {
+				PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
+			}
 		}
 	}
 	//Wyrmgus end

@@ -315,9 +315,11 @@ void UpdateDisplay()
 	DrawGuichanWidgets();
 	
 	//Wyrmgus start
-	//draw grand strategy tooltips here so that they appear over the guichan interface grand strategy mode uses
+	//draw grand strategy tooltips and minimap here so that they appear over the guichan interface grand strategy mode uses
 	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) {
-		if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
+		GrandStrategyGame.DrawMinimap();
+		
+		if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]) {
 			GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
 		}
 	}

@@ -148,11 +148,14 @@ extern void SetProvinceFactionCulturalSettlementName(std::string province_name, 
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
+extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
+extern void InitializeGrandStrategyMinimap();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
 extern void CalculateProvinceBorders();
+extern void CenterGrandStrategyMapOnTile(int x, int y);
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);

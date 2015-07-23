@@ -855,11 +855,29 @@ void CGrandStrategyGame::Clean()
 	
 	for (int i = 0; i < MaxCosts; ++i) {
 		for (int j = 0; j < WorldMapResourceMax; ++j) {
-			GrandStrategyGame.WorldMapResources[i][j][0] = -1;
-			GrandStrategyGame.WorldMapResources[i][j][1] = -1;
-			GrandStrategyGame.WorldMapResources[i][j][2] = 0;
+			this->WorldMapResources[i][j][0] = -1;
+			this->WorldMapResources[i][j][1] = -1;
+			this->WorldMapResources[i][j][2] = 0;
 		}
-	}	
+	}
+	
+	//destroy minimap surface
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		if (this->MinimapSurfaceGL) {
+			glDeleteTextures(1, &this->MinimapTexture);
+			delete[] this->MinimapSurfaceGL;
+			this->MinimapSurfaceGL = NULL;
+		}
+	} else
+#endif
+	{
+		if (this->MinimapSurface) {
+			VideoPaletteListRemove(this->MinimapSurface);
+			SDL_FreeSurface(this->MinimapSurface);
+			this->MinimapSurface = NULL;
+		}
+	}
 }
 
 /**
@@ -1012,6 +1030,62 @@ void CGrandStrategyGame::DrawMap()
 }
 
 /**
+**  Draw the grand strategy map.
+*/
+void CGrandStrategyGame::DrawMinimap()
+{
+	#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		glBindTexture(GL_TEXTURE_2D, this->MinimapTexture);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->MinimapTextureWidth, this->MinimapTextureHeight,
+						GL_RGBA, GL_UNSIGNED_BYTE, this->MinimapSurfaceGL);
+
+	#ifdef USE_GLES
+		float texCoord[] = {
+			0.0f, 0.0f,
+			(float)this->MinimapTextureWidth / this->MinimapTextureWidth, 0.0f,
+			0.0f, (float)this->MinimapTextureHeight / this->MinimapTextureHeight,
+			(float)this->MinimapTextureWidth / this->MinimapTextureWidth, (float)this->MinimapTextureHeight / this->MinimapTextureHeight
+		};
+
+		float vertex[] = {
+			2.0f / (GLfloat)Video.Width *(UI.Minimap.X + this->MinimapOffsetX) - 1.0f, -2.0f / (GLfloat)Video.Height *(UI.Minimap.Y + this->MinimapOffsetY) + 1.0f,
+			2.0f / (GLfloat)Video.Width *(UI.Minimap.X + this->MinimapOffsetX + this->MinimapTextureWidth) - 1.0f, -2.0f / (GLfloat)Video.Height *(UI.Minimap.Y + this->MinimapOffsetY) + 1.0f,
+			2.0f / (GLfloat)Video.Width *(UI.Minimap.X + this->MinimapOffsetX) - 1.0f, -2.0f / (GLfloat)Video.Height *(UI.Minimap.Y + this->MinimapOffsetY + this->MinimapTextureHeight) + 1.0f,
+			2.0f / (GLfloat)Video.Width *(UI.Minimap.X + this->MinimapOffsetX + this->MinimapTextureWidth) - 1.0f, -2.0f / (GLfloat)Video.Height *(UI.Minimap.Y + this->MinimapOffsetY + this->MinimapTextureHeight) + 1.0f
+		};
+
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
+
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
+		glVertexPointer(2, GL_FLOAT, 0, vertex);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);
+#endif
+#ifdef USE_OPENGL
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex2i(UI.Minimap.X + this->MinimapOffsetX, UI.Minimap.Y + this->MinimapOffsetY);
+		glTexCoord2f(0.0f, (float)this->MinimapTextureHeight / this->MinimapTextureHeight);
+		glVertex2i(UI.Minimap.X + this->MinimapOffsetX, UI.Minimap.Y + this->MinimapOffsetY + this->MinimapTextureHeight);
+		glTexCoord2f((float)this->MinimapTextureWidth / this->MinimapTextureWidth, (float)this->MinimapTextureHeight / this->MinimapTextureHeight);
+		glVertex2i(UI.Minimap.X + this->MinimapOffsetX + this->MinimapTextureWidth, UI.Minimap.Y + this->MinimapOffsetY + this->MinimapTextureHeight);
+		glTexCoord2f((float)this->MinimapTextureWidth / this->MinimapTextureWidth, 0.0f);
+		glVertex2i(UI.Minimap.X + this->MinimapOffsetX + this->MinimapTextureWidth, UI.Minimap.Y + this->MinimapOffsetY);
+		glEnd();
+#endif
+	} else
+#endif
+	{
+		SDL_Rect drect = {Sint16(UI.Minimap.X + this->MinimapOffsetX), Sint16(UI.Minimap.Y + this->MinimapOffsetY), 0, 0};
+		SDL_BlitSurface(this->MinimapSurface, NULL, TheScreen, &drect);
+	}
+}
+
+/**
 **  Draw the grand strategy tile tooltip.
 */
 void CGrandStrategyGame::DrawTileTooltip(int x, int y)
@@ -1033,7 +1107,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		tile_tooltip += " (";
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		tile_tooltip += ")";
-	} else {
+	} else if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
 		if (!GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
 			tile_tooltip += GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName();
 			tile_tooltip += " (";
@@ -1042,7 +1116,9 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		} else {
 			tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		}
-	}	
+	} else {
+		tile_tooltip += "Unexplored";
+	}
 	
 	if (province_id != -1) {
 		tile_tooltip += ", ";
@@ -1093,14 +1169,231 @@ void CGrandStrategyGame::DoTurn()
 Vec2i CGrandStrategyGame::GetTileUnderCursor()
 {
 	Vec2i tile_under_cursor(0, 0);
-	
-	int width_indent = GrandStrategyMapWidthIndent;
-	int height_indent = GrandStrategyMapHeightIndent;
-			
-	tile_under_cursor.x = WorldMapOffsetX + ((CursorScreenPos.x - UI.MapArea.X - width_indent) / 64);
-	tile_under_cursor.y = WorldMapOffsetY + ((CursorScreenPos.y - UI.MapArea.Y - height_indent) / 64);
+
+	if (UI.MapArea.Contains(CursorScreenPos)) {
+		int width_indent = GrandStrategyMapWidthIndent;
+		int height_indent = GrandStrategyMapHeightIndent;
+
+		tile_under_cursor.x = WorldMapOffsetX + ((CursorScreenPos.x - UI.MapArea.X - width_indent) / 64);
+		tile_under_cursor.y = WorldMapOffsetY + ((CursorScreenPos.y - UI.MapArea.Y - height_indent) / 64);
+	} else if (
+		CursorScreenPos.x >= UI.Minimap.X + GrandStrategyGame.MinimapOffsetX
+		&& CursorScreenPos.x < UI.Minimap.X + GrandStrategyGame.MinimapOffsetX + GrandStrategyGame.MinimapTextureWidth
+		&& CursorScreenPos.y >= UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY
+		&& CursorScreenPos.y < UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY + GrandStrategyGame.MinimapTextureHeight
+	) {
+		tile_under_cursor.x = (CursorScreenPos.x - UI.Minimap.X - GrandStrategyGame.MinimapOffsetX) * 1000 / this->MinimapTileWidth;
+		tile_under_cursor.y = (CursorScreenPos.y - UI.Minimap.Y - GrandStrategyGame.MinimapOffsetY) * 1000 / this->MinimapTileHeight;
+	}
 	
 	return tile_under_cursor;
+}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+/**
+**  Create the minimap texture
+*/
+void CGrandStrategyGame::CreateMinimapTexture()
+{
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glGenTextures(1, &this->MinimapTexture);
+	glBindTexture(GL_TEXTURE_2D, this->MinimapTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->MinimapTextureWidth,
+				 this->MinimapTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+				 this->MinimapSurfaceGL);
+}
+#endif
+
+void CGrandStrategyGame::UpdateMinimap()
+{
+	// Clear Minimap background if not transparent
+	#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		memset(this->MinimapSurfaceGL, 0, this->MinimapTextureWidth * this->MinimapTextureHeight * 4);
+	} else
+	#endif
+	{
+		SDL_FillRect(this->MinimapSurface, NULL, SDL_MapRGB(this->MinimapSurface->format, 0, 0, 0));
+	}
+
+	int bpp;
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		bpp = 0;
+	} else
+#endif
+	{
+		bpp = this->MinimapSurface->format->BytesPerPixel;
+	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
+		SDL_LockSurface(this->MinimapSurface);
+	}
+
+	for (int my = 0; my < this->MinimapTextureHeight; ++my) {
+		for (int mx = 0; mx < this->MinimapTextureWidth; ++mx) {
+			int tile_x = mx * 1000 / this->MinimapTileWidth;
+			int tile_y = my * 1000 / this->MinimapTileHeight;
+#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (UseOpenGL) {
+				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != -1) {
+					int province_id = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
+					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
+						int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
+					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
+						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
+					} else {
+						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 255, 255, 255);
+					}
+				} else {
+					*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
+				}
+			} else
+#endif
+			{
+				const int index = mx * bpp + my * this->MinimapSurface->pitch;
+				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != -1) {
+					int province_id = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
+					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
+						int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+						if (bpp == 2) {
+							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
+						} else {
+							*(Uint32 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
+						}
+					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
+						if (bpp == 2) {
+							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 171, 198, 217);
+						} else {
+							*(Uint32 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 171, 198, 217);
+						}
+					} else {
+						if (bpp == 2) {
+							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 255, 255, 255);
+						} else {
+							*(Uint32 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 255, 255, 255);
+						}
+					}
+				} else {
+					if (bpp == 2) {
+						*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = ColorBlack;
+					} else {
+						*(Uint32 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = ColorBlack;
+					}
+				}
+			}
+		}
+	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
+		SDL_UnlockSurface(this->MinimapSurface);
+	}
+}
+
+void WorldMapTile::UpdateMinimap()
+{
+	if (!(
+		(GetWorldMapWidth() <= UI.Minimap.X && GetWorldMapHeight() <= UI.Minimap.Y)
+		|| (
+			(this->Position.x % std::max(1000 / GrandStrategyGame.MinimapTileWidth, 1)) == 0
+			&& (this->Position.y % std::max(1000 / GrandStrategyGame.MinimapTileHeight, 1)) == 0
+		)
+	)) {
+		return;
+	}
+	
+	int bpp;
+	#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		bpp = 0;
+	} else
+	#endif
+	{
+		bpp = GrandStrategyGame.MinimapSurface->format->BytesPerPixel;
+	}
+
+	#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+	#endif
+	{
+		SDL_LockSurface(GrandStrategyGame.MinimapSurface);
+	}
+
+	int minimap_tile_width = std::max(GrandStrategyGame.MinimapTileWidth / 1000, 1);
+	int minimap_tile_height = std::max(GrandStrategyGame.MinimapTileHeight / 1000, 1);
+	for (int sub_x = 0; sub_x < minimap_tile_width; ++sub_x) {
+		for (int sub_y = 0; sub_y < minimap_tile_height; ++sub_y) {
+			int mx = (this->Position.x * GrandStrategyGame.MinimapTileWidth / 1000) + sub_x;
+			int my = (this->Position.y * GrandStrategyGame.MinimapTileHeight / 1000) + sub_y;
+#if defined(USE_OPENGL) || defined(USE_GLES)
+			if (UseOpenGL) {
+				if (this->Province != -1) {
+					int province_id = this->Province;
+					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
+						int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
+					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
+						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
+					} else {
+						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 255, 255, 255);
+					}
+				} else {
+					*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(0, 0, 0, 0);
+				}
+			} else
+#endif
+			{
+				const int index = mx * bpp + my * GrandStrategyGame.MinimapSurface->pitch;
+				if (this->Province != -1) {
+					int province_id = this->Province;
+					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
+						int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+						if (bpp == 2) {
+							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
+						} else {
+							*(Uint32 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
+						}
+					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
+						if (bpp == 2) {
+							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 171, 198, 217);
+						} else {
+							*(Uint32 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 171, 198, 217);
+						}
+					} else {
+						if (bpp == 2) {
+							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 255, 255, 255);
+						} else {
+							*(Uint32 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, 255, 255, 255);
+						}
+					}
+				} else {
+					if (bpp == 2) {
+						*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = ColorBlack;
+					} else {
+						*(Uint32 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = ColorBlack;
+					}
+				}
+			}
+		}
+	}
+
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (!UseOpenGL)
+#endif
+	{
+		SDL_UnlockSurface(GrandStrategyGame.MinimapSurface);
+	}
 }
 
 /**
@@ -1129,6 +1422,20 @@ std::string WorldMapTile::GetCulturalName()
 		return this->CulturalNames[GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[this->Province]->ReferenceProvince]->Civilization];
 	} else {
 		return this->Name;
+	}
+}
+
+void CProvince::UpdateMinimap()
+{
+	for (int i = 0; i < ProvinceTileMax; ++i) {
+		int x = this->Tiles[i].x;
+		int y = this->Tiles[i].y;
+		if (x == -1 || y == -1) {
+			break;
+		}
+		if (GrandStrategyGame.WorldMapTiles[x][y]) {
+			GrandStrategyGame.WorldMapTiles[x][y]->UpdateMinimap();
+		}
 	}
 }
 
@@ -2800,6 +3107,15 @@ void SetProvinceAttackedBy(std::string province_name, std::string civilization_n
 	}
 }
 
+void UpdateProvinceMinimap(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		GrandStrategyGame.Provinces[province_id]->UpdateMinimap();
+	}
+}
+
 /**
 **  Clean the grand strategy variables.
 */
@@ -2866,6 +3182,36 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
 	GrandStrategyGame.ProvinceCount = 0;
+	
+	//destroy minimap surface
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		if (GrandStrategyGame.MinimapSurfaceGL) {
+			glDeleteTextures(1, &GrandStrategyGame.MinimapTexture);
+			delete[] GrandStrategyGame.MinimapSurfaceGL;
+			GrandStrategyGame.MinimapSurfaceGL = NULL;
+		}
+	} else
+#endif
+	{
+		if (GrandStrategyGame.MinimapSurface) {
+			VideoPaletteListRemove(GrandStrategyGame.MinimapSurface);
+			SDL_FreeSurface(GrandStrategyGame.MinimapSurface);
+			GrandStrategyGame.MinimapSurface = NULL;
+		}
+	}
+	
+	GrandStrategyGame.MinimapTextureWidth = 0;
+	GrandStrategyGame.MinimapTextureHeight = 0;
+	GrandStrategyGame.MinimapTileWidth = 0;
+	GrandStrategyGame.MinimapTileHeight = 0;
+	GrandStrategyGame.MinimapOffsetX = 0;
+	GrandStrategyGame.MinimapOffsetY = 0;
+	
+	WorldMapOffsetX = 0;
+	WorldMapOffsetY = 0;
+	GrandStrategyMapWidthIndent = 0;
+	GrandStrategyMapHeightIndent = 0;
 }
 
 void InitializeGrandStrategyGame()
@@ -2976,6 +3322,62 @@ void InitializeGrandStrategyGame()
 	GrandStrategyGame.SymbolAttack = CGraphic::Get(attack_symbol_filename);
 }
 
+void InitializeGrandStrategyMinimap()
+{
+	//calculate the minimap texture width and height
+	if (GrandStrategyGame.WorldMapWidth >= GrandStrategyGame.WorldMapHeight) {
+		GrandStrategyGame.MinimapTextureWidth = UI.Minimap.W;
+		GrandStrategyGame.MinimapTextureHeight = UI.Minimap.H * GrandStrategyGame.WorldMapHeight / GrandStrategyGame.WorldMapWidth;
+	} else {
+		GrandStrategyGame.MinimapTextureWidth = UI.Minimap.W * GrandStrategyGame.WorldMapWidth / GrandStrategyGame.WorldMapHeight;
+		GrandStrategyGame.MinimapTextureHeight = UI.Minimap.H;
+	}
+
+	//calculate the minimap tile width and height
+	GrandStrategyGame.MinimapTileWidth = UI.Minimap.W * 1000 / GetWorldMapWidth();
+	GrandStrategyGame.MinimapTileHeight = UI.Minimap.H * 1000 / GetWorldMapHeight();
+	if (GetWorldMapWidth() >= GetWorldMapHeight()) {
+		GrandStrategyGame.MinimapTileHeight = GrandStrategyGame.MinimapTileWidth;
+	} else {
+		GrandStrategyGame.MinimapTileWidth = GrandStrategyGame.MinimapTileHeight;
+	}
+
+	// create minimap surface
+	#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		if (!GrandStrategyGame.MinimapSurfaceGL) {
+			GrandStrategyGame.MinimapSurfaceGL = new unsigned char[GrandStrategyGame.MinimapTextureWidth * GrandStrategyGame.MinimapTextureHeight * 4];
+			memset(GrandStrategyGame.MinimapSurfaceGL, 0, GrandStrategyGame.MinimapTextureWidth * GrandStrategyGame.MinimapTextureHeight * 4);
+		}
+		GrandStrategyGame.CreateMinimapTexture();
+	} else
+	#endif
+	{
+		if (!GrandStrategyGame.MinimapSurface) {
+			MinimapTerrainSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, GrandStrategyGame.MinimapTextureWidth, GrandStrategyGame.MinimapTextureHeight, 32, TheScreen->format->Rmask, TheScreen->format->Gmask, TheScreen->format->Bmask, 0);
+			MinimapSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,  GrandStrategyGame.MinimapTextureWidth, GrandStrategyGame.MinimapTextureHeight, 32, TheScreen->format->Rmask, TheScreen->format->Gmask, TheScreen->format->Bmask, 0);
+		}
+	}
+
+	GrandStrategyGame.UpdateMinimap();
+	
+	GrandStrategyGame.MinimapOffsetX = 0;
+	GrandStrategyGame.MinimapOffsetY = 0;
+	if (GetWorldMapWidth() <= UI.Minimap.W && GetWorldMapHeight() <= UI.Minimap.H) {
+		if (GetWorldMapWidth() >= GetWorldMapHeight()) {
+			GrandStrategyGame.MinimapOffsetY = (UI.Minimap.H - (GetWorldMapHeight() * std::max(GrandStrategyGame.MinimapTileHeight / 1000, 1))) / 2;
+		} else {
+			GrandStrategyGame.MinimapOffsetX = (UI.Minimap.W - (GetWorldMapWidth() * std::max(GrandStrategyGame.MinimapTileWidth / 1000, 1))) / 2;
+		}
+	} else {
+		if (GetWorldMapWidth() >= GetWorldMapHeight()) {
+			GrandStrategyGame.MinimapOffsetY = (UI.Minimap.H - ((GetWorldMapHeight() / std::max(1000 / GrandStrategyGame.MinimapTileHeight, 1)) * std::max(GrandStrategyGame.MinimapTileHeight / 1000, 1))) / 2;
+		} else {
+			GrandStrategyGame.MinimapOffsetX = (UI.Minimap.H - ((GetWorldMapWidth() / std::max(1000 / GrandStrategyGame.MinimapTileWidth, 1)) * std::max(GrandStrategyGame.MinimapTileWidth / 1000, 1))) / 2;
+		}
+	}
+}
+
 void SetGrandStrategyWorld(std::string world)
 {
 	GrandStrategyWorld = world;
@@ -3057,6 +3459,23 @@ void CalculateProvinceBorders()
 			}
 		}
 	}				
+}
+
+void CenterGrandStrategyMapOnTile(int x, int y)
+{
+	WorldMapOffsetX = x - (((UI.MapArea.EndX - UI.MapArea.X) / 64) / 2);
+	if (WorldMapOffsetX < 0) {
+		WorldMapOffsetX = 0;
+	} else if (WorldMapOffsetX > GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64)) {
+		WorldMapOffsetX = GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64);
+	}
+
+	WorldMapOffsetY = y - (((UI.MapArea.EndY - UI.MapArea.Y) / 64) / 2);
+	if (WorldMapOffsetY < 0) {
+		WorldMapOffsetY = 0;
+	} else if (WorldMapOffsetY > GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64)) {
+		WorldMapOffsetY = GetWorldMapHeight() - 1 - ((UI.MapArea.EndY - UI.MapArea.Y) / 64);
+	}
 }
 
 bool ProvinceBordersProvince(std::string province_name, std::string second_province_name)
