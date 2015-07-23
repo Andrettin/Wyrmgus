@@ -1083,6 +1083,13 @@ void CGrandStrategyGame::DrawMinimap()
 		SDL_Rect drect = {Sint16(UI.Minimap.X + this->MinimapOffsetX), Sint16(UI.Minimap.Y + this->MinimapOffsetY), 0, 0};
 		SDL_BlitSurface(this->MinimapSurface, NULL, TheScreen, &drect);
 	}
+
+	int start_x = UI.Minimap.X + GrandStrategyGame.MinimapOffsetX + (WorldMapOffsetX * this->MinimapTileWidth / 1000);
+	int start_y = UI.Minimap.Y + GrandStrategyGame.MinimapOffsetY + (WorldMapOffsetY * this->MinimapTileHeight / 1000);
+	int rectangle_width = (((UI.MapArea.EndX - UI.MapArea.X) / 64) + 1) * this->MinimapTileWidth / 1000;
+	int rectangle_height = (((UI.MapArea.EndY - UI.MapArea.Y) / 64) + 1) * this->MinimapTileHeight / 1000;
+
+	Video.DrawRectangle(ColorGray, start_x, start_y, rectangle_width, rectangle_height);
 }
 
 /**
