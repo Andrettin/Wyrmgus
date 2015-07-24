@@ -183,6 +183,14 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 			CclCommand("wyr.preferences.VideoFullScreen = Video.FullScreen;");
 			SavePreferences();
 		}
+	/*
+	} else if (key == 'g') { // ALT+G, CTRL+G grab mouse pointer
+		if (KeyModifiers & (ModifierAlt | ModifierControl)) {
+			UiToggleGrabMouse();
+			CclCommand("wyr.preferences.GrabMouse = GetGrabMouse();");
+			SavePreferences();
+		}
+	*/
 	}
 	//Wyrmgus end
 	HandleKeyModifiersUp(key, keychar);
