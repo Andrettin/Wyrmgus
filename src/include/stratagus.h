@@ -204,6 +204,19 @@ extern int stratagusMain(int argc, char **argv); /// main entry
 #include "video.h"
 #include "upgrade_structs.h"
 
+enum Directions {
+	North,
+	Northeast,
+	East,
+	Southeast,
+	South,
+	Southwest,
+	West,
+	Northwest,
+	
+	MaxDirections
+};
+
 class WorldMapTerrainType
 {
 public:
@@ -224,8 +237,11 @@ class WorldMapTile
 public:
 	WorldMapTile() :
 		Terrain(-1), Province(-1), Variation(-1), Resource(-1),
-		ResourceProspected(false), BorderTile(false), Position(-1, -1), GraphicTile(NULL)
+		ResourceProspected(false), Position(-1, -1), GraphicTile(NULL)
 	{
+		memset(Borders, 0, sizeof(Borders));
+		memset(River, 0, sizeof(River));
+		memset(Road, 0, sizeof(Road));
 	}
 
 	void UpdateMinimap();
@@ -237,10 +253,12 @@ public:
 	int Variation;							/// Tile variation
 	int Resource;							/// The tile's resource, if any
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
-	bool BorderTile;						/// Whether this tile borders a tile of another province
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	Vec2i Position;							/// Position of the tile
 	CGraphic *GraphicTile;					/// The tile image used by this tile
+	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
+	bool River[MaxDirections];				/// Whether this tile has a river to a particular direction
+	bool Road[MaxDirections];				/// Whether this tile has a road to a particular direction
 	std::string CulturalNames[MAX_RACES];	/// Names for the tile for each different culture/civilization
 };
 
@@ -327,10 +345,13 @@ public:
 	CGraphic *FogTile;
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
 	CGraphic *GoldMineGraphics;
-	CGraphic *BorderGraphics[8];								///one for each direction, 0 = North, 1 = Northeast, 2 = East, 3 = Southeast, 4 = South, 5 = Southwest, 6 = West, 7 = Northwest
+	CGraphic *BorderGraphics[MaxDirections];					///one for each direction
+	CGraphic *RiverGraphics[MaxDirections];
+	CGraphic *RiverMouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
+	CGraphic *RoadGraphics[MaxDirections];
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
 	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
-	CPlayerColorGraphic *NationalBorderGraphics[8];				///one for each direction, 0 = North, 1 = Northeast, 2 = East, 3 = Southeast, 4 = South, 5 = Southwest, 6 = West, 7 = Northwest
+	CPlayerColorGraphic *NationalBorderGraphics[MaxDirections];	///one for each direction
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	CProvince *Provinces[ProvinceMax];
@@ -371,6 +392,8 @@ extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
 extern void SetWorldMapTileName(int x, int y, std::string name);
 extern void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, std::string cultural_name);
+extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, bool has_river);
+extern void SetWorldMapTileRoad(int x, int y, std::string direction_name, bool has_road);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);

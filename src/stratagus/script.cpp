@@ -2589,6 +2589,32 @@ void SaveGrandStrategyGame(const std::string &filename)
 						fprintf(fd, "SetWorldMapTileCulturalName(%d, %d, \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[i].c_str(), GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].c_str()); //save tile cultural name
 					}
 				}
+				for (int i = 0; i < MaxDirections; ++i) {
+					std::string direction_name;
+					if (i == North) {
+						direction_name = "north";
+					} else if (i == Northeast) {
+						direction_name = "northeast_inner";
+					} else if (i == East) {
+						direction_name = "east";
+					} else if (i == Southeast) {
+						direction_name = "southeast_inner";
+					} else if (i == South) {
+						direction_name = "south";
+					} else if (i == Southwest) {
+						direction_name = "southwest_inner";
+					} else if (i == West) {
+						direction_name = "west";
+					} else if (i == Northwest) {
+						direction_name = "northwest_inner";
+					}
+					if (GrandStrategyGame.WorldMapTiles[x][y]->River[i]) {
+						fprintf(fd, "SetWorldMapTileRiver(%d, %d, \"%s\", %s)\n", x, y, direction_name.c_str(), "true"); //save tile river data
+					}
+					if (GrandStrategyGame.WorldMapTiles[x][y]->Road[i]) {
+						fprintf(fd, "SetWorldMapTileRoad(%d, %d, \"%s\", %s)\n", x, y, direction_name.c_str(), "true"); //save tile road data
+					}
+				}
 			}
 		}
 		for (int i = 0; i < MaxCosts; ++i) {
