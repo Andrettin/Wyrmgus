@@ -241,6 +241,7 @@ public:
 	{
 		memset(Borders, 0, sizeof(Borders));
 		memset(River, 0, sizeof(River));
+		memset(Riverhead, 0, sizeof(Riverhead));
 		memset(Road, 0, sizeof(Road));
 	}
 
@@ -258,6 +259,7 @@ public:
 	CGraphic *GraphicTile;					/// The tile image used by this tile
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
 	bool River[MaxDirections];				/// Whether this tile has a river to a particular direction
+	bool Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction
 	bool Road[MaxDirections];				/// Whether this tile has a road to a particular direction
 	std::string CulturalNames[MAX_RACES];	/// Names for the tile for each different culture/civilization
 };
@@ -347,7 +349,8 @@ public:
 	CGraphic *GoldMineGraphics;
 	CGraphic *BorderGraphics[MaxDirections];					///one for each direction
 	CGraphic *RiverGraphics[MaxDirections];
-	CGraphic *RiverMouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
+	CGraphic *RivermouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
+	CGraphic *RiverheadGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
 	CGraphic *RoadGraphics[MaxDirections];
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
 	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
@@ -393,6 +396,7 @@ extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
 extern void SetWorldMapTileName(int x, int y, std::string name);
 extern void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, std::string cultural_name);
 extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, bool has_river);
+extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, bool has_riverhead);
 extern void SetWorldMapTileRoad(int x, int y, std::string direction_name, bool has_road);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);

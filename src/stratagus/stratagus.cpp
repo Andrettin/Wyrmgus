@@ -921,7 +921,7 @@ void CGrandStrategyGame::DrawMap()
 						}
 						
 						if (GrandStrategyGame.WorldMapTiles[x][y]->Province != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Water) { //water tiles always use rivermouth graphics if they have a river
-							//see to which direction the river mouth runs
+							//see from which direction the rivermouth comes
 							bool flipped = false;
 							if (i == North) {
 								if (GrandStrategyGame.WorldMapTiles[x - 1][y] && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[North]) {
@@ -942,9 +942,35 @@ void CGrandStrategyGame::DrawMap()
 							}
 							
 							if (flipped) {
-								GrandStrategyGame.RiverMouthGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+								GrandStrategyGame.RivermouthGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 							} else {
-								GrandStrategyGame.RiverMouthGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+								GrandStrategyGame.RivermouthGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+							}
+						} else if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]) {
+							//see to which direction the riverhead runs
+							bool flipped = false;
+							if (i == North) {
+								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest]) {
+									flipped = true;
+								}
+							} else if (i == East) {
+								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast]) {
+									flipped = true;
+								}
+							} else if (i == South) {
+								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest]) {
+									flipped = true;
+								}
+							} else if (i == West) {
+								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest]) {
+									flipped = true;
+								}
+							}
+							
+							if (flipped) {
+								GrandStrategyGame.RiverheadGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+							} else {
+								GrandStrategyGame.RiverheadGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 							}
 						} else {
 							GrandStrategyGame.RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
@@ -2655,7 +2681,44 @@ void SetWorldMapTileRiver(int x, int y, std::string direction_name, bool has_riv
 }
 
 /**
-**  Set river data for a world map tile.
+**  Set riverhead data for a world map tile.
+*/
+void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, bool has_riverhead)
+{
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	if (direction_name == "north") {
+		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[North] = has_riverhead;
+	} else if (direction_name == "northeast") {
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northeast] = has_riverhead;
+	} else if (direction_name == "east") {
+		GrandStrategyGame.WorldMapTiles[x][y]->River[East] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[East] = has_riverhead;
+	} else if (direction_name == "southeast") {
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Southeast] = has_riverhead;
+	} else if (direction_name == "south") {
+		GrandStrategyGame.WorldMapTiles[x][y]->River[South] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[South] = has_riverhead;
+	} else if (direction_name == "southwest") {
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Southwest] = has_riverhead;
+	} else if (direction_name == "west") {
+		GrandStrategyGame.WorldMapTiles[x][y]->River[West] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[West] = has_riverhead;
+	} else if (direction_name == "northwest") {
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northwest] = has_riverhead;
+	} else {
+		fprintf(stderr, "Error: Wrong direction set for river.\n");
+	}
+	
+}
+
+/**
+**  Set road data for a world map tile.
 */
 void SetWorldMapTileRoad(int x, int y, std::string direction_name, bool has_road)
 {
@@ -3278,6 +3341,7 @@ void CleanGrandStrategyGame()
 				for (int i = 0; i < MaxDirections; ++i) {
 					GrandStrategyGame.WorldMapTiles[x][y]->Borders[i] = false;
 					GrandStrategyGame.WorldMapTiles[x][y]->River[i] = false;
+					GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] = false;
 					GrandStrategyGame.WorldMapTiles[x][y]->Road[i] = false;
 				}
 			} else {
@@ -3467,50 +3531,67 @@ void InitializeGrandStrategyGame()
 		std::string rivermouth_graphics_file = "tilesets/world/terrain/";
 		rivermouth_graphics_file += "rivermouth_";
 		
+		std::string riverhead_graphics_file = "tilesets/world/terrain/";
+		riverhead_graphics_file += "riverhead_";
+		
 		std::string road_graphics_file = "tilesets/world/terrain/";
 		road_graphics_file += "road_";
 		
 		if (i == North) {
 			river_graphics_file += "north";
 			rivermouth_graphics_file += "north";
+			riverhead_graphics_file += "north";
 			road_graphics_file += "north";
 		} else if (i == Northeast) {
 			river_graphics_file += "northeast_inner";
 			rivermouth_graphics_file += "northeast";
+			riverhead_graphics_file += "northeast";
 			road_graphics_file += "northeast";
 		} else if (i == East) {
 			river_graphics_file += "east";
 			rivermouth_graphics_file += "east";
+			riverhead_graphics_file += "east";
 			road_graphics_file += "east";
 		} else if (i == Southeast) {
 			river_graphics_file += "southeast_inner";
 			rivermouth_graphics_file += "southeast";
+			riverhead_graphics_file += "southeast";
 			road_graphics_file += "southeast";
 		} else if (i == South) {
 			river_graphics_file += "south";
 			rivermouth_graphics_file += "south";
+			riverhead_graphics_file += "south";
 			road_graphics_file += "south";
 		} else if (i == Southwest) {
 			river_graphics_file += "southwest_inner";
 			rivermouth_graphics_file += "southwest";
+			riverhead_graphics_file += "southwest";
 			road_graphics_file += "southwest";
 		} else if (i == West) {
 			river_graphics_file += "west";
 			rivermouth_graphics_file += "west";
+			riverhead_graphics_file += "west";
 			road_graphics_file += "west";
 		} else if (i == Northwest) {
 			river_graphics_file += "northwest_inner";
 			rivermouth_graphics_file += "northwest";
+			riverhead_graphics_file += "northwest";
 			road_graphics_file += "northwest";
 		}
 		
 		std::string rivermouth_flipped_graphics_file;
-		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get flipped river mouth graphics
+		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get flipped rivermouth graphics
 			rivermouth_flipped_graphics_file = rivermouth_graphics_file + "_flipped" + ".png";
+		}
+		
+		std::string riverhead_flipped_graphics_file;
+		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get flipped riverhead graphics
+			riverhead_flipped_graphics_file = riverhead_graphics_file + "_flipped" + ".png";
 		}
 		
 		river_graphics_file += ".png";
 		rivermouth_graphics_file += ".png";
+		riverhead_graphics_file += ".png";
 		road_graphics_file += ".png";
 		
 		if (CGraphic::Get(river_graphics_file) == NULL) {
@@ -3523,14 +3604,28 @@ void InitializeGrandStrategyGame()
 			CGraphic *rivermouth_graphics = CGraphic::New(rivermouth_graphics_file, 84, 84);
 			rivermouth_graphics->Load();
 		}
-		GrandStrategyGame.RiverMouthGraphics[i][0] = CGraphic::Get(rivermouth_graphics_file);
+		GrandStrategyGame.RivermouthGraphics[i][0] = CGraphic::Get(rivermouth_graphics_file);
 		
 		if (!rivermouth_flipped_graphics_file.empty()) {
 			if (CGraphic::Get(rivermouth_flipped_graphics_file) == NULL) {
 				CGraphic *rivermouth_flipped_graphics = CGraphic::New(rivermouth_flipped_graphics_file, 84, 84);
 				rivermouth_flipped_graphics->Load();
 			}
-			GrandStrategyGame.RiverMouthGraphics[i][1] = CGraphic::Get(rivermouth_flipped_graphics_file);
+			GrandStrategyGame.RivermouthGraphics[i][1] = CGraphic::Get(rivermouth_flipped_graphics_file);
+		}
+		
+		if (CGraphic::Get(riverhead_graphics_file) == NULL) {
+			CGraphic *riverhead_graphics = CGraphic::New(riverhead_graphics_file, 84, 84);
+			riverhead_graphics->Load();
+		}
+		GrandStrategyGame.RiverheadGraphics[i][0] = CGraphic::Get(riverhead_graphics_file);
+		
+		if (!riverhead_flipped_graphics_file.empty()) {
+			if (CGraphic::Get(riverhead_flipped_graphics_file) == NULL) {
+				CGraphic *riverhead_flipped_graphics = CGraphic::New(riverhead_flipped_graphics_file, 84, 84);
+				riverhead_flipped_graphics->Load();
+			}
+			GrandStrategyGame.RiverheadGraphics[i][1] = CGraphic::Get(riverhead_flipped_graphics_file);
 		}
 		
 		if (CGraphic::Get(road_graphics_file) == NULL) {

@@ -2608,7 +2608,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 					} else if (i == Northwest) {
 						direction_name = "northwest_inner";
 					}
-					if (GrandStrategyGame.WorldMapTiles[x][y]->River[i]) {
+					if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]) {
+						fprintf(fd, "SetWorldMapTileRiverhead(%d, %d, \"%s\", %s)\n", x, y, direction_name.c_str(), "true"); //save tile riverhead data
+					} else if (GrandStrategyGame.WorldMapTiles[x][y]->River[i]) {
 						fprintf(fd, "SetWorldMapTileRiver(%d, %d, \"%s\", %s)\n", x, y, direction_name.c_str(), "true"); //save tile river data
 					}
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Road[i]) {
