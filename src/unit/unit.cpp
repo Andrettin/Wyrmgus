@@ -3394,7 +3394,12 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	//Wyrmgus start
 //	if (attacker && !target.Type->Wall && target.Player->AiEnabled) {
-	if (attacker && !target.Type->BoolFlag[WALL_INDEX].value && target.Player->AiEnabled) {
+	if (
+		attacker
+		&& !target.Type->BoolFlag[WALL_INDEX].value
+		&& target.Player->AiEnabled
+		&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
+	) {
 	//Wyrmgus end
 		AiHelpMe(attacker, target);
 	}
