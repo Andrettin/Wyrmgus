@@ -1211,15 +1211,32 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	}
 	
 	if (province_id != -1 && !GrandStrategyGame.Provinces[province_id]->Water) {
+		int tooltip_rivers[MaxDirections];
+		memset(tooltip_rivers, -1, sizeof(tooltip_rivers));
+		int tooltip_river_count = 0;
 		for (int i = 0; i < MaxDirections; ++i) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
-				tile_tooltip += " (";
-				if (!GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->GetCulturalName(GrandStrategyGame.Provinces[province_id]->Civilization).empty()) {
-					tile_tooltip += GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->GetCulturalName(GrandStrategyGame.Provinces[province_id]->Civilization) + " ";
+				bool already_in_tooltip = false;
+				for (int j = 0; j < MaxDirections; ++j) {
+					if (tooltip_rivers[j] == -1) { //reached blank spot, no need to continue the loop
+						break;
+					}
+
+					if (tooltip_rivers[j] == GrandStrategyGame.WorldMapTiles[x][y]->River[i]) {
+						already_in_tooltip = true;
+						break;
+					}
 				}
-				tile_tooltip += "River";
-				tile_tooltip += ")";
-				break;
+				if (!already_in_tooltip) {
+					tooltip_rivers[tooltip_river_count] = GrandStrategyGame.WorldMapTiles[x][y]->River[i];
+					tooltip_river_count += 1;
+					tile_tooltip += " (";
+					if (!GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->GetCulturalName(GrandStrategyGame.Provinces[province_id]->Civilization).empty()) {
+						tile_tooltip += GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->GetCulturalName(GrandStrategyGame.Provinces[province_id]->Civilization) + " ";
+					}
+					tile_tooltip += "River";
+					tile_tooltip += ")";
+				}
 			}
 		}
 	}
@@ -3171,7 +3188,7 @@ void SetProvinceCivilization(std::string province_name, std::string civilization
 					std::string new_tile_name = "";
 					// first see if can translate the cultural name of the old civilization
 					if (old_civilization != -1 && !GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization].empty()) {
-						new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], civilization); //is using TranslateSettlementName function, should move translation to a general function
+						new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], civilization);
 					}
 					if (new_tile_name == "") { // try to translate any cultural name
 						for (int i = 0; i < MAX_RACES; ++i) {
