@@ -908,15 +908,15 @@ void CGrandStrategyGame::DrawMap()
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
 				for (int i = 0; i < MaxDirections; ++i) {
-					if (GrandStrategyGame.WorldMapTiles[x][y]->River[i]) {
+					if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
 						//only draw diagonal directions if inner
-						if (i == Northeast && (GrandStrategyGame.WorldMapTiles[x][y]->River[North] || GrandStrategyGame.WorldMapTiles[x][y]->River[East])) {
+						if (i == Northeast && (GrandStrategyGame.WorldMapTiles[x][y]->River[North] != -1 || GrandStrategyGame.WorldMapTiles[x][y]->River[East] != -1)) {
 							continue;
-						} else if (i == Southeast && (GrandStrategyGame.WorldMapTiles[x][y]->River[South] || GrandStrategyGame.WorldMapTiles[x][y]->River[East])) {
+						} else if (i == Southeast && (GrandStrategyGame.WorldMapTiles[x][y]->River[South] != -1 || GrandStrategyGame.WorldMapTiles[x][y]->River[East] != -1)) {
 							continue;
-						} else if (i == Southwest && (GrandStrategyGame.WorldMapTiles[x][y]->River[South] || GrandStrategyGame.WorldMapTiles[x][y]->River[West])) {
+						} else if (i == Southwest && (GrandStrategyGame.WorldMapTiles[x][y]->River[South] != -1 || GrandStrategyGame.WorldMapTiles[x][y]->River[West] != -1)) {
 							continue;
-						} else if (i == Northwest && (GrandStrategyGame.WorldMapTiles[x][y]->River[North] || GrandStrategyGame.WorldMapTiles[x][y]->River[West])) {
+						} else if (i == Northwest && (GrandStrategyGame.WorldMapTiles[x][y]->River[North] != -1 || GrandStrategyGame.WorldMapTiles[x][y]->River[West] != -1)) {
 							continue;
 						}
 						
@@ -924,19 +924,19 @@ void CGrandStrategyGame::DrawMap()
 							//see from which direction the rivermouth comes
 							bool flipped = false;
 							if (i == North) {
-								if (GrandStrategyGame.WorldMapTiles[x - 1][y] && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[North]) {
+								if (GrandStrategyGame.WorldMapTiles[x - 1][y] && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[North] != -1) {
 									flipped = true;
 								}
 							} else if (i == East) {
-								if (GrandStrategyGame.WorldMapTiles[x][y - 1] && GrandStrategyGame.WorldMapTiles[x][y - 1]->River[East]) {
+								if (GrandStrategyGame.WorldMapTiles[x][y - 1] && GrandStrategyGame.WorldMapTiles[x][y - 1]->River[East] != -1) {
 									flipped = true;
 								}
 							} else if (i == South) {
-								if (GrandStrategyGame.WorldMapTiles[x - 1][y] && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[South]) {
+								if (GrandStrategyGame.WorldMapTiles[x - 1][y] && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[South] != -1) {
 									flipped = true;
 								}
 							} else if (i == West) {
-								if (GrandStrategyGame.WorldMapTiles[x][y - 1] && GrandStrategyGame.WorldMapTiles[x][y - 1]->River[West]) {
+								if (GrandStrategyGame.WorldMapTiles[x][y - 1] && GrandStrategyGame.WorldMapTiles[x][y - 1]->River[West] != -1) {
 									flipped = true;
 								}
 							}
@@ -946,23 +946,23 @@ void CGrandStrategyGame::DrawMap()
 							} else {
 								GrandStrategyGame.RivermouthGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 							}
-						} else if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]) {
+						} else if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] != -1) {
 							//see to which direction the riverhead runs
 							bool flipped = false;
 							if (i == North) {
-								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest]) {
+								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] != -1) {
 									flipped = true;
 								}
 							} else if (i == East) {
-								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast]) {
+								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] != -1) {
 									flipped = true;
 								}
 							} else if (i == South) {
-								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest]) {
+								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] != -1) {
 									flipped = true;
 								}
 							} else if (i == West) {
-								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest]) {
+								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] != -1) {
 									flipped = true;
 								}
 							}
@@ -1068,9 +1068,12 @@ void CGrandStrategyGame::DrawMap()
 							sub_y = -1;
 						}
 						
-						int second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
+						int second_province_id = -1;
+						if (GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]) {
+							second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
+						}
 						
-						if (GrandStrategyGame.Provinces[province_id]->Owner[0] == GrandStrategyGame.Provinces[second_province_id]->Owner[0] && GrandStrategyGame.Provinces[province_id]->Owner[1] == GrandStrategyGame.Provinces[second_province_id]->Owner[1]) { // is not a national border
+						if (second_province_id == -1 || (GrandStrategyGame.Provinces[province_id]->Owner[0] == GrandStrategyGame.Provinces[second_province_id]->Owner[0] && GrandStrategyGame.Provinces[province_id]->Owner[1] == GrandStrategyGame.Provinces[second_province_id]->Owner[1])) { // is not a national border
 							GrandStrategyGame.BorderGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 						} else {
 							int player_color;
@@ -1209,8 +1212,11 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	
 	if (province_id != -1 && !GrandStrategyGame.Provinces[province_id]->Water) {
 		for (int i = 0; i < MaxDirections; ++i) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[i]) {
+			if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
 				tile_tooltip += " (";
+				if (!GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->GetCulturalName(GrandStrategyGame.Provinces[province_id]->Civilization).empty()) {
+					tile_tooltip += GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->GetCulturalName(GrandStrategyGame.Provinces[province_id]->Civilization) + " ";
+				}
 				tile_tooltip += "River";
 				tile_tooltip += ")";
 				break;
@@ -1519,6 +1525,18 @@ std::string WorldMapTile::GetCulturalName()
 		&& !this->CulturalNames[GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[this->Province]->ReferenceProvince]->Civilization].empty()
 	) {
 		return this->CulturalNames[GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[this->Province]->ReferenceProvince]->Civilization];
+	} else {
+		return this->Name;
+	}
+}
+
+/**
+**  Get a river's cultural name.
+*/
+std::string CRiver::GetCulturalName(int civilization)
+{
+	if (civilization != -1 && !this->CulturalNames[civilization].empty()) {
+		return this->CulturalNames[civilization];
 	} else {
 		return this->Name;
 	}
@@ -2643,37 +2661,62 @@ void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, st
 	}
 }
 
+int GetRiverId(std::string river_name)
+{
+	for (int i = 0; i < RiverMax; ++i) {
+		if (!GrandStrategyGame.Rivers[i] || GrandStrategyGame.Rivers[i]->Name.empty()) {
+			if (!river_name.empty()) { //if the name is not empty and reached a blank spot, create a new river and return its ID
+				if (!GrandStrategyGame.Rivers[i]) { //if river doesn't exist, create it now
+					CRiver *river = new CRiver;
+					GrandStrategyGame.Rivers[i] = river;
+				}
+				GrandStrategyGame.Rivers[i]->Name = river_name;
+				return i;
+			}
+			break;
+		}
+		
+		if (!GrandStrategyGame.Rivers[i]->Name.empty() && GrandStrategyGame.Rivers[i]->Name == river_name) {
+			return i;
+		}
+	}
+	
+	return -1;
+}
+
 /**
 **  Set river data for a world map tile.
 */
-void SetWorldMapTileRiver(int x, int y, std::string direction_name, bool has_river)
+void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
+	int river_id = GetRiverId(river_name);
+	
 	if (direction_name == "north") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = has_river;
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = has_river;
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = has_river;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = river_id;
 	} else if (direction_name == "northeast") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = has_river;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = river_id;
 	} else if (direction_name == "east") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[East] = has_river;
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = has_river;
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = has_river;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[East] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = river_id;
 	} else if (direction_name == "southeast") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = has_river;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = river_id;
 	} else if (direction_name == "south") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[South] = has_river;
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = has_river;
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = has_river;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[South] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = river_id;
 	} else if (direction_name == "southwest") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = has_river;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = river_id;
 	} else if (direction_name == "west") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[West] = has_river;
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = has_river;
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = has_river;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[West] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = river_id;
 	} else if (direction_name == "northwest") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = has_river;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = river_id;
 	} else {
 		fprintf(stderr, "Error: Wrong direction set for river.\n");
 	}
@@ -2683,34 +2726,36 @@ void SetWorldMapTileRiver(int x, int y, std::string direction_name, bool has_riv
 /**
 **  Set riverhead data for a world map tile.
 */
-void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, bool has_riverhead)
+void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
+	int river_id = GetRiverId(river_name);
+	
 	if (direction_name == "north") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = has_riverhead;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[North] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[North] = river_id;
 	} else if (direction_name == "northeast") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = has_riverhead;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northeast] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northeast] = river_id;
 	} else if (direction_name == "east") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[East] = has_riverhead;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[East] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[East] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[East] = river_id;
 	} else if (direction_name == "southeast") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = has_riverhead;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Southeast] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southeast] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Southeast] = river_id;
 	} else if (direction_name == "south") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[South] = has_riverhead;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[South] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[South] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[South] = river_id;
 	} else if (direction_name == "southwest") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = has_riverhead;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Southwest] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Southwest] = river_id;
 	} else if (direction_name == "west") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[West] = has_riverhead;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[West] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[West] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[West] = river_id;
 	} else if (direction_name == "northwest") {
-		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = has_riverhead;
-		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northwest] = has_riverhead;
+		GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] = river_id;
+		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northwest] = river_id;
 	} else {
 		fprintf(stderr, "Error: Wrong direction set for river.\n");
 	}
@@ -3340,8 +3385,8 @@ void CleanGrandStrategyGame()
 				}
 				for (int i = 0; i < MaxDirections; ++i) {
 					GrandStrategyGame.WorldMapTiles[x][y]->Borders[i] = false;
-					GrandStrategyGame.WorldMapTiles[x][y]->River[i] = false;
-					GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] = false;
+					GrandStrategyGame.WorldMapTiles[x][y]->River[i] = -1;
+					GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] = -1;
 					GrandStrategyGame.WorldMapTiles[x][y]->Road[i] = false;
 				}
 			} else {
@@ -3379,6 +3424,14 @@ void CleanGrandStrategyGame()
 			for (int j = 0; j < ProvinceTileMax; ++j) {
 				GrandStrategyGame.Provinces[i]->Tiles[j].x = -1;
 				GrandStrategyGame.Provinces[i]->Tiles[j].y = -1;
+			}
+		}
+	}
+	for (int i = 0; i < RiverMax; ++i) {
+		if (GrandStrategyGame.Rivers[i]) {
+			GrandStrategyGame.Rivers[i]->Name = "";
+			for (int j = 0; j < MAX_RACES; ++j) {
+				GrandStrategyGame.Rivers[i]->CulturalNames[j] = "";
 			}
 		}
 	}
@@ -3758,12 +3811,9 @@ void CalculateProvinceBorders()
 								continue;
 							}
 							
-							if (!GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y] || GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province == -1) {
-								continue;
-							}
-							
-							if (!(sub_x == 0 && sub_y == 0) && GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province != i) {
-								if (GrandStrategyGame.Provinces[i]->Water == GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province]->Water) {
+							int second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
+							if (!(sub_x == 0 && sub_y == 0) && second_province_id != i && GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain != -1) {
+								if (second_province_id == -1 || GrandStrategyGame.Provinces[i]->Water == GrandStrategyGame.Provinces[second_province_id]->Water) {
 									int direction = DirectionToHeading(Vec2i(x + sub_x, y + sub_y) - Vec2i(x, y)) + (32 / 2);
 									if (direction % 32 != 0) {
 										direction = direction - (direction % 32);
@@ -3773,12 +3823,12 @@ void CalculateProvinceBorders()
 									GrandStrategyGame.WorldMapTiles[x][y]->Borders[direction] = true;
 								}
 								
-								if (!GrandStrategyGame.Provinces[i]->BordersProvince(GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province)) { //if isn't added yet to the border provinces, do so now
-									GrandStrategyGame.Provinces[i]->BorderProvinces[border_province_count] = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
+								if (second_province_id != -1 && !GrandStrategyGame.Provinces[i]->BordersProvince(second_province_id)) { //if isn't added yet to the border provinces, do so now
+									GrandStrategyGame.Provinces[i]->BorderProvinces[border_province_count] = second_province_id;
 									border_province_count += 1;
 								}
 								
-								if (GrandStrategyGame.Provinces[i]->Water == false && GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province]->Water == true) {
+								if (second_province_id != -1 && GrandStrategyGame.Provinces[i]->Water == false && GrandStrategyGame.Provinces[second_province_id]->Water == true) {
 									GrandStrategyGame.Provinces[i]->Coastal = true;
 								}
 							}

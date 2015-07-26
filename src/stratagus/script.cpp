@@ -2608,10 +2608,10 @@ void SaveGrandStrategyGame(const std::string &filename)
 					} else if (i == Northwest) {
 						direction_name = "northwest_inner";
 					}
-					if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]) {
-						fprintf(fd, "SetWorldMapTileRiverhead(%d, %d, \"%s\", %s)\n", x, y, direction_name.c_str(), "true"); //save tile riverhead data
-					} else if (GrandStrategyGame.WorldMapTiles[x][y]->River[i]) {
-						fprintf(fd, "SetWorldMapTileRiver(%d, %d, \"%s\", %s)\n", x, y, direction_name.c_str(), "true"); //save tile river data
+					if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] != -1) {
+						fprintf(fd, "SetWorldMapTileRiverhead(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]]->Name.c_str()); //save tile riverhead data
+					} else if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
+						fprintf(fd, "SetWorldMapTileRiver(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]]->Name.c_str()); //save tile river data
 					}
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Road[i]) {
 						fprintf(fd, "SetWorldMapTileRoad(%d, %d, \"%s\", %s)\n", x, y, direction_name.c_str(), "true"); //save tile road data

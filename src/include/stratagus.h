@@ -168,6 +168,7 @@ extern const char NameLine[];
 #define WorldMapTerrainTypeMax 32	/// Maximum height the grand strategy world map can have
 #define ProvinceMax 256				/// Maximum quantity of provinces in a grand strategy game
 #define ProvinceTileMax 2048		/// Maximum quantity of tiles a province can have
+#define RiverMax 256				/// Maximum quantity of rivers in a grand strategy game
 #define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
 //Wyrmgus end
 
@@ -240,8 +241,8 @@ public:
 		ResourceProspected(false), Position(-1, -1), GraphicTile(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
-		memset(River, 0, sizeof(River));
-		memset(Riverhead, 0, sizeof(Riverhead));
+		memset(River, -1, sizeof(River));
+		memset(Riverhead, -1, sizeof(Riverhead));
 		memset(Road, 0, sizeof(Road));
 	}
 
@@ -258,8 +259,8 @@ public:
 	Vec2i Position;							/// Position of the tile
 	CGraphic *GraphicTile;					/// The tile image used by this tile
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
-	bool River[MaxDirections];				/// Whether this tile has a river to a particular direction
-	bool Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction
+	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
+	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
 	bool Road[MaxDirections];				/// Whether this tile has a road to a particular direction
 	std::string CulturalNames[MAX_RACES];	/// Names for the tile for each different culture/civilization
 };
@@ -310,6 +311,20 @@ public:
 	Vec2i Tiles[ProvinceTileMax];
 };
 
+class CRiver
+{
+public:
+	CRiver() :
+		Name("")
+	{
+	}
+	
+	std::string GetCulturalName(int civilization);						/// Get the river's cultural name for a particular civilization.
+	
+	std::string Name;
+	std::string CulturalNames[MAX_RACES];								/// Names for the river for each different culture/civilization
+};
+
 /**
 **  Grand Strategy game instance
 **  Mapped with #GrandStrategy to a symbolic name.
@@ -358,6 +373,7 @@ public:
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	CProvince *Provinces[ProvinceMax];
+	CRiver *Rivers[RiverMax];
 	int WorldMapResources[MaxCosts][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 
 	int MinimapTextureWidth;
@@ -395,8 +411,9 @@ extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
 extern void SetWorldMapTileName(int x, int y, std::string name);
 extern void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, std::string cultural_name);
-extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, bool has_river);
-extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, bool has_riverhead);
+extern int GetRiverId(std::string river_name);
+extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name);
+extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);
 extern void SetWorldMapTileRoad(int x, int y, std::string direction_name, bool has_road);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
