@@ -311,6 +311,24 @@ public:
 	Vec2i Tiles[ProvinceTileMax];
 };
 
+class CGrandStrategyFaction
+{
+public:
+	CGrandStrategyFaction() :
+		Faction(-1), Civilization(-1)
+	{
+		memset(Technologies, 0, sizeof(Technologies));
+		memset(Income, 0, sizeof(Income));
+	}
+	
+	void SetTechnologyState(int upgrade_id, int state);									/// 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
+	
+	int Faction;														/// The faction's ID (-1 = none).
+	int Civilization;													/// Civilization of the faction (-1 = none).
+	int Technologies[UpgradeMax];										/// Whether a faction has a particualr technology or not; 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
+	int Income[MaxCosts];												/// Income of each resource for the faction.
+};
+
 class CRiver
 {
 public:
@@ -373,6 +391,7 @@ public:
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	CProvince *Provinces[ProvinceMax];
+	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
 	int WorldMapResources[MaxCosts][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 
@@ -451,6 +470,8 @@ extern bool ProvinceBordersFaction(std::string province_name, std::string factio
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
 extern bool IsGrandStrategyBuilding(const CUnitType &type);
 extern int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident);
+extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, int value);
+extern int GetFactionTechnologyState(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 //Wyrmgus end
 
 //@}

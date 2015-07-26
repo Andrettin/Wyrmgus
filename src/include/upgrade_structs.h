@@ -71,11 +71,11 @@ enum CostType {
 	Cost6,                                  /// resource 6
 
 	//Wyrmgus start
-	Cost7,                               	/// resource 7 (research in Wyrmsun)
-	Cost8,                               	/// resource 8 (prestige in Wyrmsun)
-	Cost9,                               	/// resource 9 (timber in Wyrmsun)
-	Cost10,                               	/// resource 10 (silver in Wyrmsun)
-	Cost11,                               	/// resource 11 (copper in Wyrmsun)
+	ResearchCost,							/// research resource
+	PrestigeCost,							/// prestige resource
+	Cost9,									/// resource 9 (timber in Wyrmsun)
+	Cost10,									/// resource 10 (silver in Wyrmsun)
+	Cost11,									/// resource 11 (copper in Wyrmsun)
 	//Wyrmgus end
 
 	MaxCosts                                /// how many different costs

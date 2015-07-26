@@ -163,4 +163,6 @@ extern bool ProvinceBordersProvince(std::string province_name, std::string secon
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
 extern int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident);
+extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, int value);
+extern int GetFactionTechnologyState(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 //Wyrmgus end

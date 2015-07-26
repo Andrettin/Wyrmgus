@@ -2611,7 +2611,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] != -1) {
 						fprintf(fd, "SetWorldMapTileRiverhead(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]]->Name.c_str()); //save tile riverhead data
 					} else if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
-						fprintf(fd, "SetWorldMapTileRiver(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]]->Name.c_str()); //save tile river data
+						fprintf(fd, "SetWorldMapTileRiver(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->Name.c_str()); //save tile river data
 					}
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Road[i]) {
 						fprintf(fd, "SetWorldMapTileRoad(%d, %d, \"%s\", %s)\n", x, y, direction_name.c_str(), "true"); //save tile road data
@@ -2657,9 +2657,25 @@ void SaveGrandStrategyGame(const std::string &filename)
 						fprintf(fd, "SetProvinceSettlementBuilding(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->SettlementBuildings[j]); //save settlement building
 					}
 				}
+			} else {
+				break;
 			}
 		}
 		
+		for (int i = 0; i < MAX_RACES; ++i) {
+			for (int j = 0; j < FactionMax; ++j) {
+				if (GrandStrategyGame.Factions[i][j]) {
+					for (size_t k = 0; k < AllUpgrades.size(); ++k) {
+						if (GrandStrategyGame.Factions[i][j]->Technologies[k] != 0) {
+							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction].c_str(), AllUpgrades[k]->Ident.c_str(), GrandStrategyGame.Factions[i][j]->Technologies[k]); //save faction technology data
+						}
+					}
+				} else {
+					break;
+				}
+			}
+		}
+	
 		fclose(fd);
 	}
 }

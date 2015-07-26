@@ -1285,6 +1285,24 @@ void CGrandStrategyGame::DoTurn()
 			break;
 		}
 	}
+	
+	//research technologies
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (GrandStrategyGame.Factions[i][j]) {
+				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
+					if (GrandStrategyGame.Factions[i][j]->Technologies[k] == 1) {
+						GrandStrategyGame.Factions[i][j]->SetTechnologyState(k, 2);
+						if (AllUpgrades[k]->Class == "coinage") {
+							CclCommand("if (CalculateFactionIncomes ~= nil) then CalculateFactionIncomes() end");
+						}
+					}
+				}
+			} else { //end of valid factions
+				break;
+			}
+		}
+	}
 }
 
 Vec2i CGrandStrategyGame::GetTileUnderCursor()
@@ -2486,6 +2504,23 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 	return tile_name;
 }
 
+void CGrandStrategyFaction::SetTechnologyState(int upgrade_id, int state)
+{
+	clamp(&state, 0, 2); //the state can only be equal to 0 (not researched), 1 (under research) or 2 (researched)
+	
+	this->Technologies[upgrade_id] = state;
+	
+	if (state == 2) { //if value is 2, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
+		if (!AllUpgrades[upgrade_id]->Class.empty()) {
+			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+				if (AllUpgrades[upgrade_id]->Class == AllUpgrades[i]->Class) {
+					this->Technologies[i] = state;
+				}
+			}
+		}
+	}
+}
+
 /**
 **  Get the width of the world map.
 */
@@ -3411,6 +3446,7 @@ void CleanGrandStrategyGame()
 			}
 		}
 	}
+	
 	for (int i = 0; i < ProvinceMax; ++i) {
 		if (GrandStrategyGame.Provinces[i]) {
 			GrandStrategyGame.Provinces[i]->Name = "";
@@ -3442,16 +3478,37 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Provinces[i]->Tiles[j].x = -1;
 				GrandStrategyGame.Provinces[i]->Tiles[j].y = -1;
 			}
+		} else {
+			break;
 		}
 	}
+	
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (GrandStrategyGame.Factions[i][j]) {
+				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
+					GrandStrategyGame.Factions[i][j]->Technologies[k] = 0;
+				}
+				for (int k = 0; k < MaxCosts; ++k) {
+					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+	
 	for (int i = 0; i < RiverMax; ++i) {
 		if (GrandStrategyGame.Rivers[i]) {
 			GrandStrategyGame.Rivers[i]->Name = "";
 			for (int j = 0; j < MAX_RACES; ++j) {
 				GrandStrategyGame.Rivers[i]->CulturalNames[j] = "";
 			}
+		} else {
+			break;
 		}
 	}
+	
 	for (int i = 0; i < MaxCosts; ++i) {
 		for (int j = 0; j < WorldMapResourceMax; ++j) {
 			GrandStrategyGame.WorldMapResources[i][j][0] = -1;
@@ -3712,6 +3769,25 @@ void InitializeGrandStrategyGame()
 		attack_symbol_graphic->Load();
 	}
 	GrandStrategyGame.SymbolAttack = CGraphic::Get(attack_symbol_filename);
+	
+	//create grand strategy faction instances for all defined factions
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (GrandStrategyGame.Factions[i][j]) { // no need to create a grand strategy instance for an already-creted faction again
+				continue;
+			}
+			
+			if (!PlayerRaces.FactionNames[i][j].empty()) { //if the faction is defined
+				CGrandStrategyFaction *faction = new CGrandStrategyFaction;
+				GrandStrategyGame.Factions[i][j] = faction;
+				
+				GrandStrategyGame.Factions[i][j]->Civilization = i;
+				GrandStrategyGame.Factions[i][j]->Faction = j;
+			} else {
+				break;
+			}
+		}
+	}
 }
 
 void InitializeGrandStrategyMinimap()
@@ -3918,6 +3994,72 @@ int GetProvinceSettlementBuildingState(std::string province_name, std::string bu
 	int building_id = UnitTypeIdByIdent(building_ident);
 	
 	return GrandStrategyGame.Provinces[province_id]->SettlementBuildings[building_id];
+}
+
+int CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (faction == -1 || resource == -1) {
+		return 0;
+	}
+	
+	int income = 0;
+	
+	for (int i = 0; i < MaxCosts; ++i) {
+		for (int j = 0; j < WorldMapResourceMax; ++j) {
+			if (GrandStrategyGame.WorldMapResources[i][j][0] != -1 && GrandStrategyGame.WorldMapResources[i][j][1] != -1) {
+				if (GrandStrategyGame.WorldMapResources[i][j][3]) { //non-discovered resources don't grant income
+					continue;
+				}
+				
+				int x = GrandStrategyGame.WorldMapResources[i][j][0];
+				int y = GrandStrategyGame.WorldMapResources[i][j][1];
+				
+				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
+				
+				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] == civilization && GrandStrategyGame.Provinces[province_id]->Owner[1] == faction) {
+					income += 100; //still need to account for different incomes for different resources, and for province efficiencies
+				}
+			} else {
+				break;
+			}
+		}
+	}
+	
+	return income;
+}
+
+void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, int value)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+	if (civilization != -1 && upgrade_id != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			GrandStrategyGame.Factions[civilization][faction]->SetTechnologyState(upgrade_id, value);
+		}
+	}
+}
+
+int GetFactionTechnologyState(std::string civilization_name, std::string faction_name, std::string upgrade_ident)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+	if (civilization != -1 && upgrade_id != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			return GrandStrategyGame.Factions[civilization][faction]->Technologies[upgrade_id];
+		}
+	}
+	
+	return 0;
 }
 //Wyrmgus end
 
