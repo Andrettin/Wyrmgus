@@ -714,6 +714,11 @@ extern void PlayerCclRegister();
 /// Allowed to select multiple units, maybe not mine
 inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == ThisPlayer || ThisPlayer->IsTeamed(player); }
 
+//Wyrmgus start
+extern void SetCivilizationStringToIndex(std::string civilization_name, int civilization_id);
+extern void SetFactionStringToIndex(int civilization, std::string faction_name, int faction_id);
+//Wyrmgus end
+
 //@}
 
 #endif // !__PLAYER_H__

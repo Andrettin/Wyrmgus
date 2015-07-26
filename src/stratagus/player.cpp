@@ -334,6 +334,12 @@ std::string PlayerColorNames[PlayerColorMax];
 int PlayerColorIndexStart;
 int PlayerColorIndexCount;
 
+//Wyrmgus start
+std::map<std::string, int> CivilizationStringToIndex;
+std::map<std::string, int> FactionStringToIndex[MAX_RACES];
+//Wyrmgus end
+
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -405,32 +411,33 @@ void PlayerRace::Clean()
 
 int PlayerRace::GetRaceIndexByName(const char *raceName) const
 {
+	//Wyrmgus start
+	/*
 	for (unsigned int i = 0; i != this->Count; ++i) {
 		if (this->Name[i].compare(raceName) == 0) {
 			return i;
 		}
 	}
 	return -1;
+	*/
+	std::string civilization_name(raceName);
+	
+	if (civilization_name.empty()) {
+		return -1;
+	}
+	
+	return CivilizationStringToIndex[civilization_name];
+	//Wyrmgus end
 }
 
 //Wyrmgus start
 int PlayerRace::GetFactionIndexByName(const int civilization, const std::string faction_name) const
 {
-	if (civilization == -1) {
+	if (civilization == -1 || faction_name.empty()) {
 		return -1;
 	}
 	
-	for (unsigned int i = 0; i != FactionMax; ++i) {
-		if (this->FactionNames[civilization][i].empty()) {
-			break;
-		}
-		
-		if (this->FactionNames[civilization][i] == faction_name) {
-			return i;
-		}
-	}
-	
-	return -1;
+	return FactionStringToIndex[civilization][faction_name];
 }
 
 int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
@@ -1842,5 +1849,17 @@ bool CPlayer::IsTeamed(const CUnit &unit) const
 {
 	return IsTeamed(*unit.Player);
 }
+
+//Wyrmgus start
+void SetCivilizationStringToIndex(std::string civilization_name, int civilization_id)
+{
+	CivilizationStringToIndex[civilization_name] = civilization_id;
+}
+
+void SetFactionStringToIndex(int civilization, std::string faction_name, int faction_id)
+{
+	FactionStringToIndex[civilization][faction_name] = faction_id;
+}
+//Wyrmgus end
 
 //@}

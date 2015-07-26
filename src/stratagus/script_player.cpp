@@ -549,6 +549,7 @@ static int CclDefineRaceNames(lua_State *l)
 					PlayerRaces.Name[i] = LuaToString(l, j + 1, k + 1);
 					//Wyrmgus start
 					PlayerRaces.Playable[i] = true; //civilizations are playable by default
+					SetCivilizationStringToIndex(PlayerRaces.Name[i], i);
 					//Wyrmgus end
 				} else if (!strcmp(value, "display")) {
 					++k;
@@ -704,6 +705,7 @@ static int CclDefineNewRaceNames(lua_State *l)
 					++k;
 					PlayerRaces.Name[i] = LuaToString(l, j + 1, k + 1);
 					PlayerRaces.Playable[i] = true; //civilizations are playable by default
+					SetCivilizationStringToIndex(PlayerRaces.Name[i], i);
 				} else if (!strcmp(value, "display")) {
 					++k;
 					PlayerRaces.Display[i] = LuaToString(l, j + 1, k + 1);
@@ -2176,6 +2178,7 @@ static int CclDefineCivilizationFactions(lua_State *l)
 					++k;
 					PlayerRaces.FactionNames[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
 					PlayerRaces.FactionPlayability[civilization][(j - 1) / 2] = true; //factions are playable by default
+					SetFactionStringToIndex(civilization, PlayerRaces.FactionNames[civilization][(j - 1) / 2], (j - 1) / 2);
 				} else if (!strcmp(value, "type")) {
 					++k;
 					PlayerRaces.FactionTypes[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
