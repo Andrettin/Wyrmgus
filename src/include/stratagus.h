@@ -270,7 +270,7 @@ class CProvince
 public:
 	CProvince() :
 		Name(""), SettlementName(""),
-		Civilization(-1), ReferenceProvince(-1),
+		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
 		Water(false), SettlementLocation(-1, -1)
 	{
 		memset(Owner, -1, sizeof(Owner));
@@ -298,6 +298,7 @@ public:
 	int Civilization;													/// Civilization of the province (-1 = no one).
 	int Owner[2];														/// Owner of the province, first number for the owner's civilization, and the second one for the faction itself (-1, -1 = no one).
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
+	int CurrentConstruction;											/// Building currently under construction (unit type index).
 	int AttackedBy[2];													/// Which faction the province is being attacked by (-1, -1 = none); first number for the faction's civilization, and the second number is for the faction itself.
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
@@ -315,7 +316,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1)
+		Faction(-1), Civilization(-1), CurrentResearch(-1)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Income, 0, sizeof(Income));
@@ -325,6 +326,7 @@ public:
 	
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).
+	int CurrentResearch;												/// Currently researched technology (upgrade index).
 	int Technologies[UpgradeMax];										/// Whether a faction has a particualr technology or not; 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
 	int Income[MaxCosts];												/// Income of each resource for the faction.
 };
@@ -472,6 +474,7 @@ extern bool IsGrandStrategyBuilding(const CUnitType &type);
 extern int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, int value);
 extern int GetFactionTechnologyState(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
+extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
 //Wyrmgus end
 
 //@}

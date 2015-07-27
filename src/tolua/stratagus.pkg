@@ -165,4 +165,5 @@ extern bool ProvinceHasBuildingClass(std::string province_name, std::string buil
 extern int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, int value);
 extern int GetFactionTechnologyState(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
+extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
 //Wyrmgus end

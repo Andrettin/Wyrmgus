@@ -3455,6 +3455,7 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->Owner[0] = -1;
 			GrandStrategyGame.Provinces[i]->Owner[1] = -1;
 			GrandStrategyGame.Provinces[i]->ReferenceProvince = -1;
+			GrandStrategyGame.Provinces[i]->CurrentConstruction = -1;
 			GrandStrategyGame.Provinces[i]->AttackedBy[0] = -1;
 			GrandStrategyGame.Provinces[i]->AttackedBy[1] = -1;
 			GrandStrategyGame.Provinces[i]->Water = false;
@@ -3486,6 +3487,7 @@ void CleanGrandStrategyGame()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (GrandStrategyGame.Factions[i][j]) {
+				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 					GrandStrategyGame.Factions[i][j]->Technologies[k] = 0;
 				}
@@ -4060,6 +4062,23 @@ int GetFactionTechnologyState(std::string civilization_name, std::string faction
 	}
 	
 	return 0;
+}
+
+void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name)
+{
+	int civilization_from = PlayerRaces.GetRaceIndexByName(civilization_from_name.c_str());
+	int civilization_to = PlayerRaces.GetRaceIndexByName(civilization_to_name.c_str());
+	if (civilization_from != -1 && civilization_to != -1) {
+		int faction_from = PlayerRaces.GetFactionIndexByName(civilization_from, faction_from_name);
+		int faction_to = PlayerRaces.GetFactionIndexByName(civilization_to, faction_to_name);
+		if (faction_from != -1 && faction_to != -1) {
+			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+				if (GrandStrategyGame.Factions[civilization_from][faction_from]->Technologies[i] == 2) {
+					GrandStrategyGame.Factions[civilization_to][faction_to]->SetTechnologyState(i, 2);
+				}
+			}
+		}
+	}
 }
 //Wyrmgus end
 
