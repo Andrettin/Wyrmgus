@@ -2594,19 +2594,19 @@ void SaveGrandStrategyGame(const std::string &filename)
 					if (i == North) {
 						direction_name = "north";
 					} else if (i == Northeast) {
-						direction_name = "northeast_inner";
+						direction_name = "northeast";
 					} else if (i == East) {
 						direction_name = "east";
 					} else if (i == Southeast) {
-						direction_name = "southeast_inner";
+						direction_name = "southeast";
 					} else if (i == South) {
 						direction_name = "south";
 					} else if (i == Southwest) {
-						direction_name = "southwest_inner";
+						direction_name = "southwest";
 					} else if (i == West) {
 						direction_name = "west";
 					} else if (i == Northwest) {
-						direction_name = "northwest_inner";
+						direction_name = "northwest";
 					}
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] != -1) {
 						fprintf(fd, "SetWorldMapTileRiverhead(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]]->Name.c_str()); //save tile riverhead data
@@ -2652,9 +2652,12 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Provinces[i]->SettlementLocation.x != -1 && GrandStrategyGame.Provinces[i]->SettlementLocation.y != -1) {
 					fprintf(fd, "SetProvinceSettlementLocation(\"%s\", %d, %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->SettlementLocation.x, GrandStrategyGame.Provinces[i]->SettlementLocation.y); //save province settlement location
 				}
+				if (GrandStrategyGame.Provinces[i]->CurrentConstruction != -1) {
+					fprintf(fd, "SetProvinceCurrentConstruction(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[GrandStrategyGame.Provinces[i]->CurrentConstruction]->Ident.c_str()); //save province current construction
+				}
 				for (size_t j = 0; j < UnitTypes.size(); ++j) {
-					if (GrandStrategyGame.Provinces[i]->SettlementBuildings[j] != 0) {
-						fprintf(fd, "SetProvinceSettlementBuilding(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->SettlementBuildings[j]); //save settlement building
+					if (GrandStrategyGame.Provinces[i]->SettlementBuildings[j] != false) {
+						fprintf(fd, "SetProvinceSettlementBuilding(\"%s\", \"%s\", %s)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), "true"); //save settlement building
 					}
 				}
 			} else {
@@ -2665,9 +2668,12 @@ void SaveGrandStrategyGame(const std::string &filename)
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (int j = 0; j < FactionMax; ++j) {
 				if (GrandStrategyGame.Factions[i][j]) {
+					if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
+						fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction].c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
+					}
 					for (size_t k = 0; k < AllUpgrades.size(); ++k) {
-						if (GrandStrategyGame.Factions[i][j]->Technologies[k] != 0) {
-							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction].c_str(), AllUpgrades[k]->Ident.c_str(), GrandStrategyGame.Factions[i][j]->Technologies[k]); //save faction technology data
+						if (GrandStrategyGame.Factions[i][j]->Technologies[k] != false) {
+							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction].c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
 						}
 					}
 				} else {

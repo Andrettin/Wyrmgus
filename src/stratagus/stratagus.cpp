@@ -1263,22 +1263,22 @@ void CGrandStrategyGame::DoTurn()
 	//this function takes care only of some things for now, move the rest from Lua later
 	for (int i = 0; i < ProvinceMax; ++i) {
 		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
-			for (size_t j = 0; j < UnitTypes.size(); ++j) {
-				// construct buildings
-				if (IsGrandStrategyBuilding(*UnitTypes[j]) && this->Provinces[i]->SettlementBuildings[j] == 1) {
-					this->Provinces[i]->SettlementBuildings[j] = 2;
-					if (UnitTypes[j]->Class == "town-hall" || UnitTypes[j]->Class == "lumber-mill" || UnitTypes[j]->Class == "smithy") { //recalculate the faction incomes if an income-altering building was constructed
-						char buf[256];
-						snprintf(buf, sizeof(buf), "if (CalculateFactionIncomes ~= nil) then CalculateFactionIncomes() end;");
-						CclCommand(buf);
-					}
+			// construct buildings
+			if (this->Provinces[i]->CurrentConstruction != -1) {
+				this->Provinces[i]->SettlementBuildings[this->Provinces[i]->CurrentConstruction] = true;
+				if (UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "town-hall" || UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "lumber-mill" || UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "smithy") { //recalculate the faction incomes if an income-altering building was constructed
+					char buf[256];
+					snprintf(buf, sizeof(buf), "if (CalculateFactionIncomes ~= nil) then CalculateFactionIncomes() end;");
+					CclCommand(buf);
 				}
+				this->Provinces[i]->CurrentConstruction = -1;
 			}
-			// if the province has a town hall, a barracks and a smithy, give it a mercenary camp; not for Earth for now, since there are no recruitable mercenaries for Earth
+				
+			// if the province has a town hall, a barracks and a smithy, give it a mercenary camp; not for Earth for now, since there are no recruitable mercenaries for Earth yet
 			int mercenary_camp_id = UnitTypeIdByIdent("unit-mercenary-camp");
-			if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == 0 && GrandStrategyWorld != "Earth") {
+			if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == false && GrandStrategyWorld != "Earth") {
 				if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->HasBuildingClass("barracks") && this->Provinces[i]->HasBuildingClass("smithy")) {
-					this->Provinces[i]->SettlementBuildings[mercenary_camp_id] = 1;
+					this->Provinces[i]->SettlementBuildings[mercenary_camp_id] = true;
 				}
 			}
 		} else { //end of valid provinces
@@ -1290,13 +1290,12 @@ void CGrandStrategyGame::DoTurn()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (GrandStrategyGame.Factions[i][j]) {
-				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
-					if (GrandStrategyGame.Factions[i][j]->Technologies[k] == 1) {
-						GrandStrategyGame.Factions[i][j]->SetTechnologyState(k, 2);
-						if (AllUpgrades[k]->Class == "coinage") {
-							CclCommand("if (CalculateFactionIncomes ~= nil) then CalculateFactionIncomes() end");
-						}
+				if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
+					GrandStrategyGame.Factions[i][j]->SetTechnology(GrandStrategyGame.Factions[i][j]->CurrentResearch, true);
+					if (AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Class == "coinage") {
+						CclCommand("if (CalculateFactionIncomes ~= nil) then CalculateFactionIncomes() end");
 					}
+					GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				}
 			} else { //end of valid factions
 				break;
@@ -1603,7 +1602,7 @@ bool CProvince::HasBuildingClass(std::string building_class_name)
 		building_type = UnitTypeIdByIdent("unit-mercenary-camp");
 	}
 	
-	if (building_type != -1 && this->SettlementBuildings[building_type] == 2) {
+	if (building_type != -1 && this->SettlementBuildings[building_type] == true) {
 		return true;
 	}
 
@@ -2504,17 +2503,15 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 	return tile_name;
 }
 
-void CGrandStrategyFaction::SetTechnologyState(int upgrade_id, int state)
+void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology)
 {
-	clamp(&state, 0, 2); //the state can only be equal to 0 (not researched), 1 (under research) or 2 (researched)
+	this->Technologies[upgrade_id] = has_technology;
 	
-	this->Technologies[upgrade_id] = state;
-	
-	if (state == 2) { //if value is 2, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
+	if (has_technology) { //if value is true, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
 		if (!AllUpgrades[upgrade_id]->Class.empty()) {
 			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 				if (AllUpgrades[upgrade_id]->Class == AllUpgrades[i]->Class) {
-					this->Technologies[i] = state;
+					this->Technologies[i] = has_technology;
 				}
 			}
 		}
@@ -3388,14 +3385,27 @@ void SetProvinceReferenceProvince(std::string province_name, std::string referen
 	}
 }
 
-void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value)
+void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building)
 {
 	int province_id = GetProvinceId(province_name);
 	int settlement_building = UnitTypeIdByIdent(settlement_building_ident);
-	clamp(&value, 0, 2); //the value can only be equal to 0 (not constructed), 1 (under construction) or 2 (constructed)
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && settlement_building != -1) {
-		GrandStrategyGame.Provinces[province_id]->SettlementBuildings[settlement_building] = value;
+		GrandStrategyGame.Provinces[province_id]->SettlementBuildings[settlement_building] = has_settlement_building;
+	}
+}
+
+void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident)
+{
+	int province_id = GetProvinceId(province_name);
+	int settlement_building;
+	if (!settlement_building_ident.empty()) {
+		settlement_building = UnitTypeIdByIdent(settlement_building_ident);
+	} else {
+		settlement_building = -1;
+	}
+	if (province_id != -1) {
+		GrandStrategyGame.Provinces[province_id]->CurrentConstruction = settlement_building;
 	}
 }
 
@@ -3470,7 +3480,7 @@ void CleanGrandStrategyGame()
 				}
 			}
 			for (size_t j = 0; j < UnitTypes.size(); ++j) {
-				GrandStrategyGame.Provinces[i]->SettlementBuildings[j] = 0;
+				GrandStrategyGame.Provinces[i]->SettlementBuildings[j] = false;
 			}
 			for (int j = 0; j < ProvinceMax; ++j) {
 				GrandStrategyGame.Provinces[i]->BorderProvinces[j] = -1;
@@ -3489,7 +3499,7 @@ void CleanGrandStrategyGame()
 			if (GrandStrategyGame.Factions[i][j]) {
 				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
-					GrandStrategyGame.Factions[i][j]->Technologies[k] = 0;
+					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
 				}
 				for (int k = 0; k < MaxCosts; ++k) {
 					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
@@ -3990,12 +4000,24 @@ bool IsGrandStrategyBuilding(const CUnitType &type)
 	return false;
 }
 
-int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident)
+bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident)
 {
 	int province_id = GetProvinceId(province_name);
 	int building_id = UnitTypeIdByIdent(building_ident);
 	
 	return GrandStrategyGame.Provinces[province_id]->SettlementBuildings[building_id];
+}
+
+std::string GetProvinceCurrentConstruction(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	if (province_id != -1) {
+		if (GrandStrategyGame.Provinces[province_id]->CurrentConstruction != -1) {
+			return UnitTypes[GrandStrategyGame.Provinces[province_id]->CurrentConstruction]->Ident;
+		}
+	}
+	
+	return "";
 }
 
 int CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)
@@ -4038,19 +4060,19 @@ int CalculateFactionIncome(std::string civilization_name, std::string faction_na
 	return income;
 }
 
-void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, int value)
+void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int upgrade_id = UpgradeIdByIdent(upgrade_ident);
 	if (civilization != -1 && upgrade_id != -1) {
 		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 		if (faction != -1) {
-			GrandStrategyGame.Factions[civilization][faction]->SetTechnologyState(upgrade_id, value);
+			GrandStrategyGame.Factions[civilization][faction]->SetTechnology(upgrade_id, has_technology);
 		}
 	}
 }
 
-int GetFactionTechnologyState(std::string civilization_name, std::string faction_name, std::string upgrade_ident)
+bool GetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int upgrade_id = UpgradeIdByIdent(upgrade_ident);
@@ -4061,7 +4083,39 @@ int GetFactionTechnologyState(std::string civilization_name, std::string faction
 		}
 	}
 	
-	return 0;
+	return false;
+}
+
+void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int upgrade_id;
+	if (!upgrade_ident.empty()) {
+		upgrade_id = UpgradeIdByIdent(upgrade_ident);
+	} else {
+		upgrade_id = -1;
+	}
+	if (civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			GrandStrategyGame.Factions[civilization][faction]->CurrentResearch = upgrade_id;
+		}
+	}
+}
+
+std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	if (civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			if (GrandStrategyGame.Factions[civilization][faction]->CurrentResearch != -1) {
+				return AllUpgrades[GrandStrategyGame.Factions[civilization][faction]->CurrentResearch]->Ident;
+			}
+		}
+	}
+	
+	return "";
 }
 
 void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name)
@@ -4073,8 +4127,8 @@ void AcquireFactionTechnologies(std::string civilization_from_name, std::string 
 		int faction_to = PlayerRaces.GetFactionIndexByName(civilization_to, faction_to_name);
 		if (faction_from != -1 && faction_to != -1) {
 			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (GrandStrategyGame.Factions[civilization_from][faction_from]->Technologies[i] == 2) {
-					GrandStrategyGame.Factions[civilization_to][faction_to]->SetTechnologyState(i, 2);
+				if (GrandStrategyGame.Factions[civilization_from][faction_from]->Technologies[i]) {
+					GrandStrategyGame.Factions[civilization_to][faction_to]->SetTechnology(i, true);
 				}
 			}
 		}

@@ -303,7 +303,7 @@ public:
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
-	int SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
+	bool SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
@@ -322,12 +322,12 @@ public:
 		memset(Income, 0, sizeof(Income));
 	}
 	
-	void SetTechnologyState(int upgrade_id, int state);									/// 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
+	void SetTechnology(int upgrade_id, bool has_technology);
 	
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
-	int Technologies[UpgradeMax];										/// Whether a faction has a particualr technology or not; 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
+	bool Technologies[UpgradeMax];										/// Whether a faction has a particualr technology or not; 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
 	int Income[MaxCosts];												/// Income of each resource for the faction.
 };
 
@@ -457,7 +457,8 @@ extern void SetProvinceFactionCulturalName(std::string province_name, std::strin
 extern void SetProvinceCulturalSettlementName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
 extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
-extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, int value);
+extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
+extern void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
@@ -471,9 +472,12 @@ extern bool ProvinceBordersProvince(std::string province_name, std::string secon
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
 extern bool IsGrandStrategyBuilding(const CUnitType &type);
-extern int GetProvinceSettlementBuildingState(std::string province_name, std::string building_ident);
-extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, int value);
-extern int GetFactionTechnologyState(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
+extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
+extern std::string GetProvinceCurrentConstruction(std::string province_name);
+extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
+extern bool GetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
+extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
+extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
 //Wyrmgus end
 
