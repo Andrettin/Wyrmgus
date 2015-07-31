@@ -41,6 +41,7 @@ class CPlayer;
 class CUpgrade;
 //Wyrmgus start
 class CUnit;
+class CUpgradeModifier;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------

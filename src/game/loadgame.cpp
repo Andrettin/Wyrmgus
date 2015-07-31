@@ -41,6 +41,9 @@
 #include "construct.h"
 #include "depend.h"
 #include "font.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "map.h"
 #include "minimap.h"
 #include "missile.h"

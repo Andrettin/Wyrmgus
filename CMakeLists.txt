@@ -289,6 +289,9 @@ source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
 	src/stratagus/construct.cpp
+	#Wyrmgus start
+	src/stratagus/grand_strategy.cpp
+	#Wyrmgus end
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
@@ -374,6 +377,9 @@ set(tolua_FILES
 	src/tolua/editor.pkg
 	src/tolua/font.pkg
 	src/tolua/game.pkg
+	#Wyrmgus start
+	src/tolua/grand_strategy.pkg
+	#Wyrmgus end
 	src/tolua/map.pkg
 	src/tolua/master.pkg
 	src/tolua/minimap.pkg
@@ -546,6 +552,9 @@ set(stratagus_generic_HDRS
 	src/include/editor.h
 	src/include/font.h
 	src/include/game.h
+	#Wyrmgus start
+	src/include/grand_strategy.h
+	#Wyrmgus end
 	src/include/icons.h
 	src/include/interface.h
 	src/include/iocompat.h

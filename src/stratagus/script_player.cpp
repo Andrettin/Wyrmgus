@@ -40,6 +40,10 @@
 #include "actions.h"
 #include "ai.h"
 #include "commands.h"
+//Wyrmgus start
+#include "font.h"
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "map.h"
 #include "script.h"
 #include "unittype.h"
@@ -48,7 +52,6 @@
 #include "video.h"
 #include "upgrade.h"
 //Wyrmgus start
-#include "font.h"
 #include "ui.h"
 #include "util.h"
 //Wyrmgus end

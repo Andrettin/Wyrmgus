@@ -38,6 +38,9 @@
 #include "actions.h"
 #include "editor.h"
 #include "game.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "map.h"
 #include "missile.h"
 #include "network.h"

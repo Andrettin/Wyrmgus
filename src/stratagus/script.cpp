@@ -42,6 +42,9 @@
 #include "animation/animation_setplayervar.h"
 #include "font.h"
 #include "game.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
 #include "map.h"

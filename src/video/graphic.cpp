@@ -40,6 +40,9 @@
 #include <map>
 #include <list>
 
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "video.h"
 #include "player.h"
 #include "intern_video.h"

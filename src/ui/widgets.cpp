@@ -36,6 +36,9 @@
 #include "stratagus.h"
 #include "video.h"
 #include "font.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "cursor.h"
 #include "ui.h"
 #include "widgets.h"
