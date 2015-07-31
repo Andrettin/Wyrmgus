@@ -5,6 +5,7 @@ extern int WorldMapOffsetX;
 extern int WorldMapOffsetY;
 extern int GrandStrategyMapWidthIndent;
 extern int GrandStrategyMapHeightIndent;
+extern int BattalionMultiplier;
 
 extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();
@@ -44,6 +45,11 @@ extern void SetProvinceFactionCulturalSettlementName(std::string province_name, 
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident);
+extern void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
+extern void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
+extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
+extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
+extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
@@ -58,8 +64,13 @@ extern bool ProvinceBordersFaction(std::string province_name, std::string factio
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
 extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
 extern std::string GetProvinceCurrentConstruction(std::string province_name);
+extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident);
+extern int GetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident);
+extern int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident);
+extern int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
 extern bool GetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
+extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);

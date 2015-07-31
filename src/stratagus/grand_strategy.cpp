@@ -63,6 +63,7 @@ int WorldMapOffsetX;
 int WorldMapOffsetY;
 int GrandStrategyMapWidthIndent;
 int GrandStrategyMapHeightIndent;
+int BattalionMultiplier;
 CGrandStrategyGame GrandStrategyGame;
 
 /*----------------------------------------------------------------------------
@@ -1857,6 +1858,11 @@ int GetProvinceId(std::string province_name)
 			return i;
 		}
 	}
+	
+	if (!province_name.empty()) {
+		fprintf(stderr, "Can't find %s province.\n", province_name.c_str());
+	}
+	
 	return -1;
 }
 
@@ -2653,6 +2659,56 @@ void SetProvinceCurrentConstruction(std::string province_name, std::string settl
 	}
 }
 
+void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
+		GrandStrategyGame.Provinces[province_id]->Units[unit_type] = quantity;
+	}
+}
+
+void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
+		GrandStrategyGame.Provinces[province_id]->Units[unit_type] += quantity;
+	}
+}
+
+void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
+		GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type] = quantity;
+	}
+}
+
+void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
+		GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type] = quantity;
+	}
+}
+
+void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
+		GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type] = quantity;
+	}
+}
+
 void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name)
 {
 	int province_id = GetProvinceId(province_name);
@@ -2725,6 +2781,10 @@ void CleanGrandStrategyGame()
 			}
 			for (size_t j = 0; j < UnitTypes.size(); ++j) {
 				GrandStrategyGame.Provinces[i]->SettlementBuildings[j] = false;
+				GrandStrategyGame.Provinces[i]->Units[j] = 0;
+				GrandStrategyGame.Provinces[i]->UnderConstructionUnits[j] = 0;
+				GrandStrategyGame.Provinces[i]->MovingUnits[j] = 0;
+				GrandStrategyGame.Provinces[i]->AttackingUnits[j] = 0;
 			}
 			for (int j = 0; j < ProvinceMax; ++j) {
 				GrandStrategyGame.Provinces[i]->BorderProvinces[j] = -1;
@@ -3264,6 +3324,38 @@ std::string GetProvinceCurrentConstruction(std::string province_name)
 	return "";
 }
 
+int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	return GrandStrategyGame.Provinces[province_id]->Units[unit_type];
+}
+
+int GetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	return GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type];
+}
+
+int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	return GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type];
+}
+
+int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	return GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type];
+}
+
 int CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -3373,6 +3465,57 @@ void AcquireFactionTechnologies(std::string civilization_from_name, std::string 
 			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 				if (GrandStrategyGame.Factions[civilization_from][faction_from]->Technologies[i]) {
 					GrandStrategyGame.Factions[civilization_to][faction_to]->SetTechnology(i, true);
+				}
+			}
+		}
+	}
+}
+
+bool IsMilitaryUnit(const CUnitType &type)
+{
+	if (!type.BoolFlag[BUILDING_INDEX].value && !type.BoolFlag[HERO_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && !type.Class.empty() && type.Class != "worker" && type.Class != "caravan") {
+		return true;
+	}
+	return false;
+}
+
+void CreateProvinceUnits(std::string province_name, int player, int divisor, bool attacking_units, bool ignore_militia)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id == -1) {
+		return;
+	}
+	
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (IsMilitaryUnit(*UnitTypes[i]) && (UnitTypes[i]->Class != "militia" || !ignore_militia)) {
+			int units_to_be_created = 0;
+			if (!attacking_units) {
+				units_to_be_created = GrandStrategyGame.Provinces[province_id]->Units[i] / divisor;
+				GrandStrategyGame.Provinces[province_id]->Units[i] -= units_to_be_created;
+			} else {
+				units_to_be_created = GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] / divisor;
+				GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] -= units_to_be_created;
+			}
+			
+			if (units_to_be_created > 0) {
+				units_to_be_created *= BattalionMultiplier;
+				for (int j = 0; j < units_to_be_created; ++j) {
+					CUnit *unit = MakeUnit(*UnitTypes[i], &Players[player]);
+					if (unit == NULL) {
+						DebugPrint("Unable to allocate unit");
+						return;
+					} else {
+						if (UnitCanBeAt(*unit, Players[player].StartPos)) {
+							unit->Place(Players[player].StartPos);
+						} else {
+							const int heading = SyncRand() % 256;
+
+							unit->tilePos = Players[player].StartPos;
+							DropOutOnSide(*unit, heading, NULL);
+						}
+						UpdateForNewUnit(*unit, 0);
+					}
 				}
 			}
 		}

@@ -2662,6 +2662,18 @@ void SaveGrandStrategyGame(const std::string &filename)
 					if (GrandStrategyGame.Provinces[i]->SettlementBuildings[j] != false) {
 						fprintf(fd, "SetProvinceSettlementBuilding(\"%s\", \"%s\", %s)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), "true"); //save settlement building
 					}
+					if (GrandStrategyGame.Provinces[i]->Units[j] != 0) {
+						fprintf(fd, "SetProvinceUnitQuantity(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->Units[j]); //save province units
+					}
+					if (GrandStrategyGame.Provinces[i]->UnderConstructionUnits[j] != 0) {
+						fprintf(fd, "SetProvinceUnderConstructionUnitQuantity(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->UnderConstructionUnits[j]); //save province under construction units
+					}
+					if (GrandStrategyGame.Provinces[i]->MovingUnits[j] != 0) {
+						fprintf(fd, "SetProvinceMovingUnitQuantity(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->MovingUnits[j]); //save province moving units
+					}
+					if (GrandStrategyGame.Provinces[i]->AttackingUnits[j] != 0) {
+						fprintf(fd, "SetProvinceAttackingUnitQuantity(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->AttackingUnits[j]); //save province attacking units
+					}
 				}
 			} else {
 				break;
