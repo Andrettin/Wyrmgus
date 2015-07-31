@@ -3096,7 +3096,14 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 	//Wyrmgus end
 
 	if (attacker && !target.Type->Building) {
-		if (target.Player->AiEnabled) {
+		//Wyrmgus start
+//		if (target.Player->AiEnabled) {
+		if (
+			target.Player->AiEnabled
+			&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
+		) {
+
+		//Wyrmgus end
 			AiHelpMe(attacker, target);
 		}
 	}
