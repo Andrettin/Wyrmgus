@@ -36,6 +36,11 @@
 #include "stratagus.h"
 
 #include "actions.h"
+//Wyrmgus start
+#include "action/action_research.h"
+#include "action/action_train.h"
+#include "action/action_upgradeto.h"
+//Wyrmgus end
 #include "depend.h"
 #include "interface.h"
 #include "network.h"
@@ -272,9 +277,15 @@ bool ButtonCheckNoNetwork(const CUnit &, const ButtonAction &)
 bool ButtonCheckNoWork(const CUnit &unit, const ButtonAction &)
 {
 	int action = unit.CurrentAction();
-	return action != UnitActionTrain
-		   && action != UnitActionUpgradeTo
-		   && action != UnitActionResearch;
+	//Wyrmgus start
+//	return action != UnitActionTrain
+//		   && action != UnitActionUpgradeTo
+//		   && action != UnitActionResearch;
+	//don't stop showing the button for a quick moment if the time cost is 0
+	return (action != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
+		   && (action != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
+		   && (action != UnitActionResearch || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0);
+	//Wyrmgus end
 }
 
 /**

@@ -39,6 +39,11 @@
 #include "ui.h"
 
 #include "actions.h"
+//Wyrmgus start
+#include "action/action_research.h"
+#include "action/action_train.h"
+#include "action/action_upgradeto.h"
+//Wyrmgus end
 #include "commands.h"
 #include "depend.h"
 #include "font.h"
@@ -1002,11 +1007,19 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = true;
 			break;
 		case ButtonCancelUpgrade:
-			res = unit.CurrentAction() == UnitActionUpgradeTo
-				  || unit.CurrentAction() == UnitActionResearch;
+			//Wyrmgus start
+//			res = unit.CurrentAction() == UnitActionUpgradeTo
+//				  || unit.CurrentAction() == UnitActionResearch;
+			//don't show the cancel button for a quick moment if the time cost is 0
+			res = (unit.CurrentAction() == UnitActionUpgradeTo && static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] > 0)
+				|| (unit.CurrentAction() == UnitActionResearch && static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] > 0);
+			//Wyrmgus end
 			break;
 		case ButtonCancelTrain:
-			res = unit.CurrentAction() == UnitActionTrain;
+			//Wyrmgus start
+//			res = unit.CurrentAction() == UnitActionTrain;
+			res = unit.CurrentAction() == UnitActionTrain && static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] > 0; //don't show the cancel button for a quick moment if the time cost is 0
+			//Wyrmgus end
 			break;
 		case ButtonCancelBuild:
 			res = unit.CurrentAction() == UnitActionBuilt;

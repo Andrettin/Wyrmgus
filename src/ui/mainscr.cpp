@@ -508,12 +508,25 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 {
 	switch (unit.CurrentAction()) {
 		case UnitActionTrain: { //  Building training units.
+			//Wyrmgus start
+			const COrder_Train &order = *static_cast<COrder_Train *>(unit.CurrentOrder());
+			if (order.GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) { //don't show the training button for a quick moment if the time cost is 0
+				return false;
+			}
+			//Wyrmgus end
 			DrawUnitInfo_Training(unit);
 			return true;
 		}
 		case UnitActionUpgradeTo: { //  Building upgrading to better type.
 			if (UI.UpgradingButton) {
 				const COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.CurrentOrder());
+				
+				//Wyrmgus start
+				if (order.GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) { //don't show the upgrading button for a quick moment if the time cost is 0
+					return false;
+				}
+				//Wyrmgus end
+
 				CIcon &icon = *order.GetUnitType().Icon.Icon;
 				unsigned int flag = (ButtonAreaUnderCursor == ButtonAreaUpgrading
 									 && ButtonUnderCursor == 0) ?
@@ -529,6 +542,13 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 		case UnitActionResearch: { //  Building research new technology.
 			if (UI.ResearchingButton) {
 				COrder_Research &order = *static_cast<COrder_Research *>(unit.CurrentOrder());
+				
+				//Wyrmgus start
+				if (order.GetUpgrade().Costs[TimeCost] == 0) { //don't show the researching button for a quick moment if the time cost is 0
+					return false;
+				}
+				//Wyrmgus end
+				
 				CIcon &icon = *order.GetUpgrade().Icon;
 				int flag = (ButtonAreaUnderCursor == ButtonAreaResearching
 							&& ButtonUnderCursor == 0) ?
@@ -1382,7 +1402,15 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	DrawInfoPanelBackground(panelIndex);
 	//Wyrmgus start
 	//draw icon panel frame, if any
-	if (Preference.InfoPanelFrameG && unit.CurrentAction() != UnitActionTrain && unit.CurrentAction() != UnitActionUpgradeTo && unit.CurrentAction() != UnitActionResearch && unit.CurrentAction() != UnitActionBuilt && !unit.IsEnemy(*ThisPlayer) && (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)) {
+	if (
+		Preference.InfoPanelFrameG
+		&& (unit.CurrentAction() != UnitActionTrain || static_cast<COrder_Train *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0) //don't stop showing the info panel frame for a quick moment if the time cost is 0
+		&& (unit.CurrentAction() != UnitActionUpgradeTo || static_cast<COrder_UpgradeTo *>(unit.CurrentOrder())->GetUnitType().Stats[unit.Player->Index].Costs[TimeCost] == 0)
+		&& (unit.CurrentAction() != UnitActionResearch || static_cast<COrder_Research *>(unit.CurrentOrder())->GetUpgrade().Costs[TimeCost] == 0)
+		&& unit.CurrentAction() != UnitActionBuilt
+		&& !unit.IsEnemy(*ThisPlayer)
+		&& (unit.Player->Type != PlayerNeutral || unit.Type->GivesResource)
+	) {
 		Preference.InfoPanelFrameG->DrawClip(UI.InfoPanel.X - 4, UI.InfoPanel.Y + 93);
 	}
 	//Wyrmgus end	

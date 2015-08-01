@@ -252,6 +252,11 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 
 	//Wyrmgus start
+	int owner_player = this->Player;
+	if (this->Type->BoolFlag[ITEM_INDEX].value) { //items should always be owned by the neutral player
+		owner_player = PlayerNumNeutral;
+	}
+
 	/*
 	CUnit *newUnit = MakeUnit(nType, &player);
 
@@ -316,7 +321,10 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	*/
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
-		CUnit *newUnit = MakeUnit(nType, &player);
+		//Wyrmgus start
+//		CUnit *newUnit = MakeUnit(nType, &player);
+		CUnit *newUnit = MakeUnit(nType, &Players[owner_player]);
+		//Wyrmgus end
 
 		if (newUnit == NULL) { // No more memory :/
 			//Wyrmgus start
