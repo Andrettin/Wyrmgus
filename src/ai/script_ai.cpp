@@ -647,7 +647,10 @@ static int CclAiSet(lua_State *l)
 	//Wyrmgus end
 		autt->Count = LuaToNumber(l, 2);
 		// FIXME: 0 should remove it.
-	} else {
+	//Wyrmgus start
+//	} else {
+	} else if (set_count > 0) {
+	//Wyrmgus end
 		InsertUnitTypeRequests(type, LuaToNumber(l, 2));
 	}
 	lua_pushboolean(l, 0);

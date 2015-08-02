@@ -577,6 +577,10 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 	if (ai_active) {
 		typecount = player.UnitTypesAiActiveCount[type.Slot];
 	}
+	
+	if (typecount < 0) { // if unit type count is negative, something wrong happened
+		fprintf(stderr, "Player %d has a negative %s unit type count of %d.\n", player.Index, type.Ident.c_str(), typecount);
+	}
 	//Wyrmgus end
 
 	if (typecount == 0) {

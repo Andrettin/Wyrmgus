@@ -195,6 +195,9 @@ static void AiCheckUnits()
 	AiGetBuildRequestsCount(*AiPlayer, counter);
 
 	//  Remove non active units.
+	//Wyrmgus start
+	// non-active units are already not included now
+	/*
 	const int unitCount = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < unitCount; ++i) {
 		const CUnit &unit = AiPlayer->Player->GetUnit(i);
@@ -203,6 +206,8 @@ static void AiCheckUnits()
 			counter[unit.Type->Slot]--;
 		}
 	}
+	*/
+	//Wyrmgus end
 	//Wyrmgus start
 //	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
 	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
