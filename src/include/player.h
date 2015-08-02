@@ -149,6 +149,8 @@ public:
 	
 	//Wyrmgus start
 	void SetFaction(const std::string &faction);
+	void SetRandomFaction();
+	bool HasUpgradeClass(std::string upgrade_class_name);
 	//Wyrmgus end
 
 	/// Clear turn related player data
@@ -533,6 +535,7 @@ public:
 			ParentCivilization[i] = -1;
 			for (int j = 0; j < UnitTypeClassMax; ++j) {
 				CivilizationClassUnitTypes[i][j] = -1;
+				CivilizationClassUpgrades[i][j] = -1;
 			}
 		}
 		memset(Playable, 0, sizeof(Playable));
@@ -544,6 +547,7 @@ public:
 	//Wyrmgus start
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
+	int GetCivilizationClassUpgrade(int civilization, int class_id);
 	bool RequiresPlural(std::string word, int civilization) const;
 	std::string GetPluralForm(std::string word, int civilization) const;
 	std::string TranslateName(std::string name, int civilization);
@@ -555,6 +559,7 @@ public:
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
 	int CivilizationClassUnitTypes[MAX_RACES][UnitTypeClassMax];		/// the unit type slot of a particular class for a particular civilization
+	int CivilizationClassUpgrades[MAX_RACES][UnitTypeClassMax];			/// the upgrade slot of a particular class for a particular civilization
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's parent civilization, if any
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any

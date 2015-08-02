@@ -960,6 +960,7 @@ extern CUnitTypeVar UnitTypeVar;
 
 //Wyrmgus start
 extern std::string UnitTypeClasses[UnitTypeClassMax]; //list of unit type classes; built with CclDefineUnitType
+extern std::string UpgradeClasses[UnitTypeClassMax]; //list of upgrade classes; built with CclDefineModifier
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -974,6 +975,8 @@ extern CUnitType *UnitTypeByIdent(const std::string &ident);/// Get unit-type by
 //Wyrmgus start
 extern int GetUnitTypeClassIndexByName(const std::string &class_name);
 extern void SetUnitTypeClassStringToIndex(std::string class_name, int class_id);
+extern int GetUpgradeClassIndexByName(const std::string &class_name);
+extern void SetUpgradeClassStringToIndex(std::string class_name, int class_id);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table

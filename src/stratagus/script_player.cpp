@@ -2568,26 +2568,7 @@ static int CclSetPlayerData(lua_State *l)
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 		
 		// set random one from the civilization's factions
-		int FactionCount = 0;
-		int LocalFactions[FactionMax];
-		for (int i = 0; i < FactionMax; ++i) {
-			if (!PlayerRaces.FactionNames[p->Race][i].empty()) {
-				bool faction_used = false;
-				for (int j = 0; j < PlayerMax; ++j) {
-					if (p->Index != j && Players[j].Name == PlayerRaces.FactionNames[p->Race][i]) {
-						faction_used = true;
-					}		
-				}
-				if (!faction_used && PlayerRaces.FactionTypes[p->Race][i] == "tribe" && PlayerRaces.FactionPlayability[p->Race][i]) {
-					LocalFactions[FactionCount] = i;
-					FactionCount += 1;
-				}
-			}
-		}
-		if (FactionCount > 0) {
-			int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
-			p->SetFaction(PlayerRaces.FactionNames[p->Race][ChosenFaction]);
-		}
+		p->SetRandomFaction();
 		//Wyrmgus end
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {

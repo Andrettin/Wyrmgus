@@ -287,11 +287,11 @@
 **
 **    Contains which unit-types and upgrades are allowed for the
 **    player. Possible values are:
-**    @li  `A' -- allowed,
-**    @li  `F' -- forbidden,
-**    @li  `R' -- acquired, perhaps other values
-**    @li  `Q' -- acquired but forbidden (does it make sense?:))
-**    @li  `E' -- enabled, allowed by level but currently forbidden
+**    @li  'A' -- allowed,
+**    @li  'F' -- forbidden,
+**    @li  'R' -- acquired, perhaps other values
+**    @li  'Q' -- acquired but forbidden (does it make sense?:))
+**    @li  'E' -- enabled, allowed by level but currently forbidden
 **    @see CAllow
 **
 **  CPlayer::UpgradeTimers
@@ -356,6 +356,7 @@ void PlayerRace::Clean()
 		//Wyrmgus start
 		for (int j = 0; j < UnitTypeClassMax; ++j) {
 			this->CivilizationClassUnitTypes[i][j] = -1;
+			this->CivilizationClassUpgrades[i][j] = -1;
 		}
 		this->Playable[i] = false;
 		this->Species[i].clear();
@@ -454,6 +455,26 @@ int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
 		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
 		if (parent_civilization != -1) {
 			return GetCivilizationClassUnitType(parent_civilization, class_id);
+		}
+	}
+	
+	return -1;
+}
+
+int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
+{
+	if (civilization == -1 || class_id == -1) {
+		return -1;
+	}
+	
+	if (CivilizationClassUpgrades[civilization][class_id] != -1) {
+		return CivilizationClassUpgrades[civilization][class_id];
+	}
+	
+	if (PlayerRaces.ParentCivilization[civilization] != -1) {
+		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
+		if (parent_civilization != -1) {
+			return GetCivilizationClassUpgrade(parent_civilization, class_id);
 		}
 	}
 	
@@ -1032,6 +1053,54 @@ void CPlayer::SetFaction(const std::string &faction)
 			}
 		}
 	}
+}
+
+/**
+**  Change player faction to a randomly chosen one.
+**
+**  @param faction    New faction.
+*/
+void CPlayer::SetRandomFaction()
+{
+	// set random one from the civilization's factions
+	int FactionCount = 0;
+	int LocalFactions[FactionMax];
+	for (int i = 0; i < FactionMax; ++i) {
+		if (!PlayerRaces.FactionNames[this->Race][i].empty()) {
+			bool faction_used = false;
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (this->Index != j && Players[j].Name == PlayerRaces.FactionNames[this->Race][i]) {
+					faction_used = true;
+				}		
+			}
+			if (!faction_used
+				&& ((PlayerRaces.FactionTypes[this->Race][i] == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.FactionTypes[this->Race][i] == "polity" && this->HasUpgradeClass("writing"))))
+				&& PlayerRaces.FactionPlayability[this->Race][i]
+			) {
+				LocalFactions[FactionCount] = i;
+				FactionCount += 1;
+			}
+		}
+	}
+	if (FactionCount > 0) {
+		int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
+		this->SetFaction(PlayerRaces.FactionNames[this->Race][ChosenFaction]);
+	}
+}
+
+bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
+{
+	if (this->Race == -1 || upgrade_class_name.empty()) {
+		return false;
+	}
+	
+	int upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(this->Race, GetUpgradeClassIndexByName(upgrade_class_name));
+	
+	if (upgrade_id != -1 && this->Allow.Upgrades[upgrade_id] == 'R') {
+		return true;
+	}
+
+	return false;
 }
 //Wyrmgus end
 

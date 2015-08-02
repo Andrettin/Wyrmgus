@@ -595,6 +595,8 @@ std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 //Wyrmgus start
 std::string UnitTypeClasses[UnitTypeClassMax];
 std::map<std::string, int> UnitTypeClassStringToIndex;
+std::string UpgradeClasses[UnitTypeClassMax];
+std::map<std::string, int> UpgradeClassStringToIndex;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -1277,6 +1279,16 @@ int GetUnitTypeClassIndexByName(const std::string &class_name)
 void SetUnitTypeClassStringToIndex(std::string class_name, int class_id)
 {
 	UnitTypeClassStringToIndex[class_name] = class_id;
+}
+
+int GetUpgradeClassIndexByName(const std::string &class_name)
+{
+	return UpgradeClassStringToIndex[class_name];
+}
+
+void SetUpgradeClassStringToIndex(std::string class_name, int class_id)
+{
+	UpgradeClassStringToIndex[class_name] = class_id;
 }
 //Wyrmgus end
 

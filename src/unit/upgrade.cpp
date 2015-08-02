@@ -391,6 +391,31 @@ static int CclDefineModifier(lua_State *l)
 	}
 
 	UpgradeModifiers[NumUpgradeModifiers++] = um;
+	
+	//Wyrmgus start
+	//set the upgrade's civilization and class here, for lack of a better place
+	if (!AllUpgrades[um->UpgradeId]->Class.empty()) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		int class_id = -1;
+		for (unsigned int i = 0; i != UnitTypeClassMax; ++i) {
+			if (UpgradeClasses[i] == AllUpgrades[um->UpgradeId]->Class) {
+				class_id = i;
+				break;
+			}
+			if (UpgradeClasses[i].empty()) { //if reached a blank slot, then the class isn't recorded yet; do so now
+				UpgradeClasses[i] = AllUpgrades[um->UpgradeId]->Class;
+				SetUpgradeClassStringToIndex(AllUpgrades[um->UpgradeId]->Class, i);
+				class_id = i;
+				break;
+			}
+		}
+		if (!AllUpgrades[um->UpgradeId]->Civilization.empty()) {
+			int civilization_id = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str());
+			if (civilization_id != -1 && class_id != -1) {
+				PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = um->UpgradeId;
+			}
+		}
+	}
+	//Wyrmgus end
 
 	return 0;
 }
@@ -699,31 +724,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set random faction from new civilization
-		int FactionCount = 0;
-		int LocalFactions[FactionMax];
-		for (int i = 0; i < FactionMax; ++i) {
-			if (!PlayerRaces.FactionNames[player.Race][i].empty()) {
-				bool faction_used = false;
-				for (int j = 0; j < PlayerMax; ++j) {
-					if (player.Index != j && Players[j].Name == PlayerRaces.FactionNames[player.Race][i]) {
-						faction_used = true;
-					}		
-				}
-				if (!faction_used && PlayerRaces.FactionTypes[player.Race][i] == "tribe" && PlayerRaces.FactionPlayability[player.Race][i]) {
-					LocalFactions[FactionCount] = i;
-					FactionCount += 1;
-				}
-				if (player.Name == PlayerRaces.FactionNames[player.Race][i]) { // if this faction has the same name as the one already had before, then choose it automatically
-					player.SetFaction(PlayerRaces.FactionNames[player.Race][i]);
-					FactionCount = 0;
-					break;
-				}
-			}
-		}
-		if (FactionCount > 0) {
-			int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
-			player.SetFaction(PlayerRaces.FactionNames[player.Race][ChosenFaction]);
-		}
+		player.SetRandomFaction();
 	}
 	//Wyrmgus end
 
@@ -967,31 +968,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set random faction from the old civilization
-		int FactionCount = 0;
-		int LocalFactions[FactionMax];
-		for (int i = 0; i < FactionMax; ++i) {
-			if (!PlayerRaces.FactionNames[player.Race][i].empty()) {
-				bool faction_used = false;
-				for (int j = 0; j < PlayerMax; ++j) {
-					if (player.Index != j && Players[j].Name == PlayerRaces.FactionNames[player.Race][i]) {
-						faction_used = true;
-					}		
-				}
-				if (!faction_used && PlayerRaces.FactionTypes[player.Race][i] == "tribe" && PlayerRaces.FactionPlayability[player.Race][i]) {
-					LocalFactions[FactionCount] = i;
-					FactionCount += 1;
-				}
-				if (player.Name == PlayerRaces.FactionNames[player.Race][i]) { // if this faction has the same name as the one already had before, then choose it automatically
-					player.SetFaction(PlayerRaces.FactionNames[player.Race][i]);
-					FactionCount = 0;
-					break;
-				}
-			}
-		}
-		if (FactionCount > 0) {
-			int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
-			player.SetFaction(PlayerRaces.FactionNames[player.Race][ChosenFaction]);
-		}
+		player.SetRandomFaction();
 	}
 	//Wyrmgus end
 
@@ -1594,12 +1571,19 @@ void AllowUnitId(CPlayer &player, int id, int units)
 **
 **  @param player  Player to change
 **  @param id      upgrade id
-**  @param af      `A'llow/`F'orbid/`R'eseached
+**  @param af      'A'llow/'F'orbid/'R'eseached
 */
 void AllowUpgradeId(CPlayer &player, int id, char af)
 {
 	Assert(af == 'A' || af == 'F' || af == 'R');
 	player.Allow.Upgrades[id] = af;
+	
+	//Wyrmgus start
+	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe
+	if (af == 'R' && AllUpgrades[id]->Class == "writing" && PlayerRaces.FactionTypes[player.Race][player.Faction] == "tribe") {
+		player.SetRandomFaction();
+	}
+	//Wyrmgus end
 }
 
 /**
