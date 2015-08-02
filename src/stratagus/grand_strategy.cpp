@@ -3356,6 +3356,17 @@ int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit
 	return GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type];
 }
 
+std::string GetProvinceOwner(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id == -1 || GrandStrategyGame.Provinces[province_id]->Owner[0] == -1 || GrandStrategyGame.Provinces[province_id]->Owner[1] == -1) {
+		return "";
+	}
+	
+	return PlayerRaces.FactionNames[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+}
+
 int CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
