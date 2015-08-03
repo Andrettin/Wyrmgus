@@ -50,6 +50,9 @@
 //Wyrmgus end
 #include "commands.h"
 #include "depend.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "interface.h"
 #include "iolib.h"
 #include "map.h"
@@ -1579,8 +1582,8 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 	player.Allow.Upgrades[id] = af;
 	
 	//Wyrmgus start
-	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe
-	if (af == 'R' && AllUpgrades[id]->Class == "writing" && PlayerRaces.FactionTypes[player.Race][player.Faction] == "tribe") {
+	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
+	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && PlayerRaces.FactionTypes[player.Race][player.Faction] == "tribe") {
 		player.SetRandomFaction();
 	}
 	//Wyrmgus end
