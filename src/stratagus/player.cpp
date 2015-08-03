@@ -1061,28 +1061,62 @@ void CPlayer::SetFaction(const std::string &faction)
 void CPlayer::SetRandomFaction()
 {
 	// set random one from the civilization's factions
-	int FactionCount = 0;
-	int LocalFactions[FactionMax];
-	for (int i = 0; i < FactionMax; ++i) {
-		if (PlayerRaces.Factions[this->Race][i] && !PlayerRaces.Factions[this->Race][i]->Name.empty()) {
-			bool faction_used = false;
-			for (int j = 0; j < PlayerMax; ++j) {
-				if (this->Index != j && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
-					faction_used = true;
-				}		
+	int faction_count = 0;
+	int local_factions[FactionMax];
+	
+	// first search for valid factions in the current faction's "develops to" list, and only if that fails search in all factions of the civilization
+	if (this->Faction != -1) {
+		for (int i = 0; i < DevelopsToMax; ++i) {
+			if (PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo[i].empty()) {
+				break;
 			}
-			if (!faction_used
-				&& ((PlayerRaces.Factions[this->Race][i]->Type == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == "polity" && this->HasUpgradeClass("writing"))))
-				&& PlayerRaces.Factions[this->Race][i]->Playable
-			) {
-				LocalFactions[FactionCount] = i;
-				FactionCount += 1;
+			
+			int faction_id = PlayerRaces.GetFactionIndexByName(this->Race, PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo[i]);
+			if (faction_id != -1) {
+				bool faction_used = false;
+				for (int j = 0; j < PlayerMax; ++j) {
+					if (this->Index != j && Players[j].Name == PlayerRaces.Factions[this->Race][faction_id]->Name) {
+						faction_used = true;
+					}		
+				}
+				if (
+					!faction_used
+					&& ((PlayerRaces.Factions[this->Race][faction_id]->Type == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][faction_id]->Type == "polity" && this->HasUpgradeClass("writing"))))
+					&& PlayerRaces.Factions[this->Race][faction_id]->Playable
+				) {
+					local_factions[faction_count] = faction_id;
+					faction_count += 1;
+				}
 			}
 		}
 	}
-	if (FactionCount > 0) {
-		int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
-		this->SetFaction(PlayerRaces.Factions[this->Race][ChosenFaction]->Name);
+	
+	if (faction_count == 0) {
+		for (int i = 0; i < FactionMax; ++i) {
+			if (PlayerRaces.Factions[this->Race][i] && !PlayerRaces.Factions[this->Race][i]->Name.empty()) {
+				bool faction_used = false;
+				for (int j = 0; j < PlayerMax; ++j) {
+					if (this->Index != j && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
+						faction_used = true;
+					}		
+				}
+				if (
+					!faction_used
+					&& ((PlayerRaces.Factions[this->Race][i]->Type == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == "polity" && this->HasUpgradeClass("writing"))))
+					&& PlayerRaces.Factions[this->Race][i]->Playable
+				) {
+					local_factions[faction_count] = i;
+					faction_count += 1;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+	
+	if (faction_count > 0) {
+		int chosen_faction = local_factions[SyncRand(faction_count)];
+		this->SetFaction(PlayerRaces.Factions[this->Race][chosen_faction]->Name);
 	}
 }
 

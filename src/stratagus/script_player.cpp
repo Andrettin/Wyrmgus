@@ -2207,6 +2207,16 @@ static int CclDefineCivilizationFactions(lua_State *l)
 				} else if (!strcmp(value, "playable")) {
 					++k;
 					PlayerRaces.Factions[civilization][(j - 1) / 2]->Playable = LuaToBoolean(l, j + 1, k + 1);
+				} else if (!strcmp(value, "develops-to")) {
+					++k;
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
+					}
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						PlayerRaces.Factions[civilization][(j - 1) / 2]->DevelopsTo[n] = LuaToString(l, -1, n + 1);
+					}
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -2569,6 +2579,7 @@ static int CclSetPlayerData(lua_State *l)
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 		
 		// set random one from the civilization's factions
+		p->Faction = -1;
 		p->SetRandomFaction();
 		//Wyrmgus end
 	//Wyrmgus start

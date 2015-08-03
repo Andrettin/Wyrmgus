@@ -261,11 +261,12 @@ public:
 	{
 	}
 
-	std::string Name;    												/// faction name
-	std::string Type;    												/// faction type (tribe or polity)
-	int Color;    														/// faction color
-	int SecondaryColor; 		   										/// faction secondary color
-	bool Playable;    													/// faction playability
+	std::string Name;													/// faction name
+	std::string Type;													/// faction type (tribe or polity)
+	int Color;															/// faction color
+	int SecondaryColor;													/// faction secondary color
+	bool Playable;														/// faction playability
+	std::string DevelopsTo[DevelopsToMax];								/// to which factions this faction can develop
 };
 
 class LanguageNoun

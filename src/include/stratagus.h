@@ -158,6 +158,7 @@ extern const char NameLine[];
 //#define MAX_RACES 8
 #define MAX_RACES 32
 #define FactionMax 128				/// Maximum number of factions a civilization can have
+#define DevelopsToMax 8				/// Maximum number of factions a faction can have in its "develops to" list
 #define PlayerColorMax 32			/// How many player colors are supported
 #define VariationMax 32				/// Maximum number of variations a unit can have
 #define PersonalNameMax 1024		/// Maximum number of personal names a civilization can have

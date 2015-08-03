@@ -727,6 +727,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set random faction from new civilization
+		player.Faction = -1;		
 		player.SetRandomFaction();
 	}
 	//Wyrmgus end
@@ -971,6 +972,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set random faction from the old civilization
+		player.Faction = -1;		
 		player.SetRandomFaction();
 	}
 	//Wyrmgus end
