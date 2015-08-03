@@ -2644,13 +2644,13 @@ void SaveGrandStrategyGame(const std::string &filename)
 					fprintf(fd, "SetProvinceCivilization(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Civilization].c_str()); //save the province's civilization
 				}
 				if (GrandStrategyGame.Provinces[i]->Owner[0] != -1 && GrandStrategyGame.Provinces[i]->Owner[1] != -1) {
-					fprintf(fd, "SetProvinceOwner(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Owner[0]].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Provinces[i]->Owner[0]][GrandStrategyGame.Provinces[i]->Owner[1]].c_str()); //save province owner
+					fprintf(fd, "SetProvinceOwner(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Owner[0]].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner[0]][GrandStrategyGame.Provinces[i]->Owner[1]]->Name.c_str()); //save province owner
 				}
 				if (GrandStrategyGame.Provinces[i]->ReferenceProvince != -1) {
 					fprintf(fd, "SetProvinceReferenceProvince(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[i]->ReferenceProvince]->Name.c_str()); //save the province's reference province (for water provinces' cultural name)
 				}
 				if (GrandStrategyGame.Provinces[i]->AttackedBy[0] != -1 && GrandStrategyGame.Provinces[i]->AttackedBy[1] != -1) {
-					fprintf(fd, "SetProvinceAttackedBy(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->AttackedBy[0]].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Provinces[i]->AttackedBy[0]][GrandStrategyGame.Provinces[i]->AttackedBy[1]].c_str()); //save attacked by
+					fprintf(fd, "SetProvinceAttackedBy(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->AttackedBy[0]].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->AttackedBy[0]][GrandStrategyGame.Provinces[i]->AttackedBy[1]]->Name.c_str()); //save attacked by
 				}
 				if (GrandStrategyGame.Provinces[i]->SettlementLocation.x != -1 && GrandStrategyGame.Provinces[i]->SettlementLocation.y != -1) {
 					fprintf(fd, "SetProvinceSettlementLocation(\"%s\", %d, %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->SettlementLocation.x, GrandStrategyGame.Provinces[i]->SettlementLocation.y); //save province settlement location
@@ -2684,11 +2684,11 @@ void SaveGrandStrategyGame(const std::string &filename)
 			for (int j = 0; j < FactionMax; ++j) {
 				if (GrandStrategyGame.Factions[i][j]) {
 					if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
-						fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction].c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
+						fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
 					}
 					for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 						if (GrandStrategyGame.Factions[i][j]->Technologies[k] != false) {
-							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.FactionNames[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction].c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
+							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
 						}
 					}
 				} else {

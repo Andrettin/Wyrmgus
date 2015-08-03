@@ -251,6 +251,23 @@ private:
 };
 
 //Wyrmgus start
+class CFaction
+{
+public:
+	CFaction() : 
+		Name(""), Type(""),
+		Color(-1), SecondaryColor(-1),
+		Playable(true) //factions are playable by default
+	{
+	}
+
+	std::string Name;    												/// faction name
+	std::string Type;    												/// faction type (tribe or polity)
+	int Color;    														/// faction color
+	int SecondaryColor; 		   										/// faction secondary color
+	bool Playable;    													/// faction playability
+};
+
 class LanguageNoun
 {
 public:
@@ -563,11 +580,7 @@ public:
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's parent civilization, if any
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
-	std::string FactionNames[MAX_RACES][FactionMax];    				/// faction names
-	std::string FactionTypes[MAX_RACES][FactionMax];    				/// faction types (tribe or polity)
-	int FactionColors[MAX_RACES][FactionMax];    						/// faction colors
-	int FactionSecondaryColors[MAX_RACES][FactionMax]; 		   			/// faction secondary colors
-	bool FactionPlayability[MAX_RACES][FactionMax];    					/// faction playability
+	CFaction *Factions[MAX_RACES][FactionMax];    						/// factions
 	std::string PersonalNames[MAX_RACES][PersonalNameMax];				/// personal names
 	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];		/// personal name prefixes
 	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];		/// personal name suffixes

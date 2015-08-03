@@ -253,7 +253,7 @@ void CGrandStrategyGame::DrawMap()
 					if (civilization != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
 						//draw the province's settlement
 						if (GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
-							int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+							int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
 							
 							GrandStrategyGame.SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 							
@@ -323,7 +323,7 @@ void CGrandStrategyGame::DrawMap()
 						} else {
 							int player_color;
 							if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-								player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+								player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
 							} else {
 								player_color = 15;
 							}
@@ -492,7 +492,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		
 		if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
 			tile_tooltip += ", ";
-			tile_tooltip += PlayerRaces.FactionNames[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+			tile_tooltip += PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Name;
 		}
 	}
 	tile_tooltip += " (";
@@ -629,7 +629,7 @@ void CGrandStrategyGame::UpdateMinimap()
 				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != -1) {
 					int province_id = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
 					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-						int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
 						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
 						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
@@ -646,7 +646,7 @@ void CGrandStrategyGame::UpdateMinimap()
 				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != -1) {
 					int province_id = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
 					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-						int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
 						if (bpp == 2) {
 							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 						} else {
@@ -724,7 +724,7 @@ void WorldMapTile::UpdateMinimap()
 				if (this->Province != -1) {
 					int province_id = this->Province;
 					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-						int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
 						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
 						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
@@ -741,7 +741,7 @@ void WorldMapTile::UpdateMinimap()
 				if (this->Province != -1) {
 					int province_id = this->Province;
 					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-						int player_color = PlayerRaces.FactionColors[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
 						if (bpp == 2) {
 							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 						} else {
@@ -2405,7 +2405,7 @@ std::string GetProvinceAttackedBy(std::string province_name)
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		if (GrandStrategyGame.Provinces[province_id]->AttackedBy[0] != -1 && GrandStrategyGame.Provinces[province_id]->AttackedBy[1] != -1) {
-			return PlayerRaces.FactionNames[GrandStrategyGame.Provinces[province_id]->AttackedBy[0]][GrandStrategyGame.Provinces[province_id]->AttackedBy[1]];
+			return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->AttackedBy[0]][GrandStrategyGame.Provinces[province_id]->AttackedBy[1]]->Name;
 		}
 	}
 	
@@ -3093,7 +3093,7 @@ void InitializeGrandStrategyGame()
 				continue;
 			}
 			
-			if (!PlayerRaces.FactionNames[i][j].empty()) { //if the faction is defined
+			if (PlayerRaces.Factions[i][j] && !PlayerRaces.Factions[i][j]->Name.empty()) { //if the faction is defined
 				CGrandStrategyFaction *faction = new CGrandStrategyFaction;
 				GrandStrategyGame.Factions[i][j] = faction;
 				
@@ -3364,7 +3364,7 @@ std::string GetProvinceOwner(std::string province_name)
 		return "";
 	}
 	
-	return PlayerRaces.FactionNames[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]];
+	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Name;
 }
 
 int CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)

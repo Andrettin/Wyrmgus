@@ -138,7 +138,7 @@ void CPlayer::Load(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
 			int faction_id = LuaToNumber(l, j + 1);
-			this->SetFaction(PlayerRaces.FactionNames[this->Race][faction_id]);
+			this->SetFaction(PlayerRaces.Factions[this->Race][faction_id]->Name);
 		//Wyrmgus end
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);
@@ -2174,23 +2174,24 @@ static int CclDefineCivilizationFactions(lua_State *l)
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
 			}
+			CFaction *faction = new CFaction;
+			PlayerRaces.Factions[civilization][(j - 1) / 2] = faction;
 			int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
 				value = LuaToString(l, j + 1, k + 1);
 				if (!strcmp(value, "name")) {
 					++k;
-					PlayerRaces.FactionNames[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
-					PlayerRaces.FactionPlayability[civilization][(j - 1) / 2] = true; //factions are playable by default
-					SetFactionStringToIndex(civilization, PlayerRaces.FactionNames[civilization][(j - 1) / 2], (j - 1) / 2);
+					PlayerRaces.Factions[civilization][(j - 1) / 2]->Name = LuaToString(l, j + 1, k + 1);
+					SetFactionStringToIndex(civilization, PlayerRaces.Factions[civilization][(j - 1) / 2]->Name, (j - 1) / 2);
 				} else if (!strcmp(value, "type")) {
 					++k;
-					PlayerRaces.FactionTypes[civilization][(j - 1) / 2] = LuaToString(l, j + 1, k + 1);
+					PlayerRaces.Factions[civilization][(j - 1) / 2]->Type = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "color")) {
 					++k;
 					std::string color_name = LuaToString(l, j + 1, k + 1);
 					for (int c = 0; c < PlayerColorMax; ++c) {
 						if (PlayerColorNames[c] == color_name) {
-							PlayerRaces.FactionColors[civilization][(j - 1) / 2] = c;
+							PlayerRaces.Factions[civilization][(j - 1) / 2]->Color = c;
 							break;
 						}
 					}
@@ -2199,13 +2200,13 @@ static int CclDefineCivilizationFactions(lua_State *l)
 					std::string color_name = LuaToString(l, j + 1, k + 1);
 					for (int c = 0; c < PlayerColorMax; ++c) {
 						if (PlayerColorNames[c] == color_name) {
-							PlayerRaces.FactionSecondaryColors[civilization][(j - 1) / 2] = c;
+							PlayerRaces.Factions[civilization][(j - 1) / 2]->SecondaryColor = c;
 							break;
 						}
 					}
 				} else if (!strcmp(value, "playable")) {
 					++k;
-					PlayerRaces.FactionPlayability[civilization][(j - 1) / 2] = LuaToBoolean(l, j + 1, k + 1);
+					PlayerRaces.Factions[civilization][(j - 1) / 2]->Playable = LuaToBoolean(l, j + 1, k + 1);
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -2231,7 +2232,7 @@ static int CclGetCivilizationFactionNames(lua_State *l)
 
 	int FactionCount = 0;
 	for (int i = 0; i < FactionMax; ++i) {
-		if (!PlayerRaces.FactionNames[civilization][i].empty()) {
+		if (PlayerRaces.Factions[civilization][i] && !PlayerRaces.Factions[civilization][i]->Name.empty()) {
 			FactionCount += 1;
 		}
 	}
@@ -2239,7 +2240,7 @@ static int CclGetCivilizationFactionNames(lua_State *l)
 	lua_createtable(l, FactionCount, 0);
 	for (int i = 1; i <= FactionCount; ++i)
 	{
-		lua_pushstring(l, PlayerRaces.FactionNames[civilization][i-1].c_str());
+		lua_pushstring(l, PlayerRaces.Factions[civilization][i-1]->Name.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	
@@ -2258,7 +2259,7 @@ static int CclGetFactionData(lua_State *l)
 	const char *faction_name = LuaToString(l, 2);
 	int civilization_faction = 0;
 	for (int i = 0; i < FactionMax; ++i) {
-		if (PlayerRaces.FactionNames[civilization][i].compare(faction_name) == 0) {
+		if (PlayerRaces.Factions[civilization][i] && PlayerRaces.Factions[civilization][i]->Name.compare(faction_name) == 0) {
 			civilization_faction = i;
 			break;
 		}
@@ -2266,16 +2267,16 @@ static int CclGetFactionData(lua_State *l)
 	const char *data = LuaToString(l, 3);
 
 	if (!strcmp(data, "Type")) {
-		lua_pushstring(l, PlayerRaces.FactionTypes[civilization][civilization_faction].c_str());
+		lua_pushstring(l, PlayerRaces.Factions[civilization][civilization_faction]->Type.c_str());
 		return 1;
 	} else if (!strcmp(data, "Color")) {
-		lua_pushstring(l, PlayerColorNames[PlayerRaces.FactionColors[civilization][civilization_faction]].c_str());
+		lua_pushstring(l, PlayerColorNames[PlayerRaces.Factions[civilization][civilization_faction]->Color].c_str());
 		return 1;
 	} else if (!strcmp(data, "SecondaryColor")) {
-		lua_pushstring(l, PlayerColorNames[PlayerRaces.FactionSecondaryColors[civilization][civilization_faction]].c_str());
+		lua_pushstring(l, PlayerColorNames[PlayerRaces.Factions[civilization][civilization_faction]->SecondaryColor].c_str());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
-		lua_pushboolean(l, PlayerRaces.FactionPlayability[civilization][civilization_faction]);
+		lua_pushboolean(l, PlayerRaces.Factions[civilization][civilization_faction]->Playable);
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -2377,7 +2378,7 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
-		lua_pushstring(l, PlayerRaces.FactionNames[p->Race][p->Faction].c_str());
+		lua_pushstring(l, PlayerRaces.Factions[p->Race][p->Faction]->Name.c_str());
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "RaceName")) {

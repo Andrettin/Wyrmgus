@@ -362,11 +362,9 @@ void PlayerRace::Clean()
 		this->Species[i].clear();
 		this->ParentCivilization[i] = -1;
 		for (unsigned int j = 0; j < FactionMax; ++j) {
-			this->FactionNames[i][j].clear();
-			this->FactionTypes[i][j].clear();
-			this->FactionColors[i][j] = 0;
-			this->FactionSecondaryColors[i][j] = 0;
-			this->FactionPlayability[i][j] = false;
+			if (this->Factions[i][j]) {
+				delete this->Factions[i][j];
+			}
 		}
 		for (unsigned int j = 0; j < PersonalNameMax; ++j) {
 			this->PersonalNames[i][j].clear();
@@ -1031,13 +1029,13 @@ void CPlayer::SetName(const std::string &name)
 void CPlayer::SetFaction(const std::string &faction)
 {
 	for (int i = 0; i < FactionMax; ++i) {
-		if (!PlayerRaces.FactionNames[this->Race][i].empty() && PlayerRaces.FactionNames[this->Race][i] == faction) {
+		if (PlayerRaces.Factions[this->Race][i] && !PlayerRaces.Factions[this->Race][i]->Name.empty() && PlayerRaces.Factions[this->Race][i]->Name == faction) {
 			if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
 				this->SetName(faction);
 			}
 			this->Faction = i;
-			int PrimaryColor = PlayerRaces.FactionColors[this->Race][i];
-			int SecondaryColor = PlayerRaces.FactionSecondaryColors[this->Race][i];
+			int PrimaryColor = PlayerRaces.Factions[this->Race][i]->Color;
+			int SecondaryColor = PlayerRaces.Factions[this->Race][i]->SecondaryColor;
 			bool color_used = false;
 			for (int j = 0; j < PlayerMax; ++j) {
 				if (this->Index != j && Players[j].Faction != -1 && Players[j].Color == PlayerColors[PrimaryColor][0]) {
@@ -1066,16 +1064,16 @@ void CPlayer::SetRandomFaction()
 	int FactionCount = 0;
 	int LocalFactions[FactionMax];
 	for (int i = 0; i < FactionMax; ++i) {
-		if (!PlayerRaces.FactionNames[this->Race][i].empty()) {
+		if (PlayerRaces.Factions[this->Race][i] && !PlayerRaces.Factions[this->Race][i]->Name.empty()) {
 			bool faction_used = false;
 			for (int j = 0; j < PlayerMax; ++j) {
-				if (this->Index != j && Players[j].Name == PlayerRaces.FactionNames[this->Race][i]) {
+				if (this->Index != j && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
 					faction_used = true;
 				}		
 			}
 			if (!faction_used
-				&& ((PlayerRaces.FactionTypes[this->Race][i] == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.FactionTypes[this->Race][i] == "polity" && this->HasUpgradeClass("writing"))))
-				&& PlayerRaces.FactionPlayability[this->Race][i]
+				&& ((PlayerRaces.Factions[this->Race][i]->Type == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == "polity" && this->HasUpgradeClass("writing"))))
+				&& PlayerRaces.Factions[this->Race][i]->Playable
 			) {
 				LocalFactions[FactionCount] = i;
 				FactionCount += 1;
@@ -1084,7 +1082,7 @@ void CPlayer::SetRandomFaction()
 	}
 	if (FactionCount > 0) {
 		int ChosenFaction = LocalFactions[SyncRand(FactionCount)];
-		this->SetFaction(PlayerRaces.FactionNames[this->Race][ChosenFaction]);
+		this->SetFaction(PlayerRaces.Factions[this->Race][ChosenFaction]->Name);
 	}
 }
 
