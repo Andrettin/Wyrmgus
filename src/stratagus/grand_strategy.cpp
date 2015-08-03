@@ -537,7 +537,7 @@ void CGrandStrategyGame::DoTurn()
 			if (GrandStrategyGame.Factions[i][j]) {
 				if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
 					GrandStrategyGame.Factions[i][j]->SetTechnology(GrandStrategyGame.Factions[i][j]->CurrentResearch, true);
-					if (AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Class == "coinage") {
+					if (AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Class == "coinage" || AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Class == "writing") {
 						CclCommand("if (CalculateFactionIncomes ~= nil) then CalculateFactionIncomes() end");
 					}
 					GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
@@ -2463,10 +2463,7 @@ void SetProvinceCivilization(std::string province_name, std::string civilization
 				if (x == -1 || y == -1) {
 					break;
 				}
-				if (
-					GrandStrategyGame.Provinces[province_id]->Owner[1] != -1
-					&& GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization].empty()
-				) {
+				if (GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization].empty()) {
 					std::string new_tile_name = "";
 					// first see if can translate the cultural name of the old civilization
 					if (old_civilization != -1 && !GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization].empty()) {
@@ -2492,11 +2489,7 @@ void SetProvinceCivilization(std::string province_name, std::string civilization
 			}
 			
 			// create a new cultural name for the province's settlement, if there isn't any
-			if (
-				GrandStrategyGame.Provinces[province_id]->Owner[1] != -1
-				&& GrandStrategyGame.Provinces[province_id]->FactionCulturalSettlementNames[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]].empty()
-				&& GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[civilization].empty()
-			) {
+			if (GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[civilization].empty()) {
 				std::string new_settlement_name = "";
 				// first see if can translate the cultural name of the old civilization
 				if (old_civilization != -1 && !GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[old_civilization].empty()) {
@@ -2521,11 +2514,7 @@ void SetProvinceCivilization(std::string province_name, std::string civilization
 			}
 			
 			// create a new cultural name for the province, if there isn't any
-			if (
-				GrandStrategyGame.Provinces[province_id]->Owner[1] != -1
-				&& GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]].empty()
-				&& GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization].empty()
-			) {
+			if (GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization].empty()) {
 				std::string new_province_name = "";
 				// first see if can translate the cultural name of the old civilization
 				if (old_civilization != -1 && !GrandStrategyGame.Provinces[province_id]->CulturalNames[old_civilization].empty()) {
