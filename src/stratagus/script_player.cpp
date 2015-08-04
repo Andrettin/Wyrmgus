@@ -137,8 +137,11 @@ void CPlayer::Load(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "faction")) {
-			int faction_id = LuaToNumber(l, j + 1);
-			this->SetFaction(PlayerRaces.Factions[this->Race][faction_id]->Name);
+			this->Faction = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "color")) {
+			int color_id = LuaToNumber(l, j + 1);
+			this->Color = PlayerColors[color_id][0];
+			this->UnitColors.Colors = PlayerColorsRGB[color_id];
 		//Wyrmgus end
 		} else if (!strcmp(value, "ai-name")) {
 			this->AiName = LuaToString(l, j + 1);
@@ -309,6 +312,8 @@ void CPlayer::Load(lua_State *l)
 			this->SpeedUpgrade = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "speed-research")) {
 			this->SpeedResearch = LuaToNumber(l, j + 1);
+		//Wyrmgus start
+		/*
 		} else if (!strcmp(value, "color")) {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 3) {
 				LuaError(l, "incorrect argument");
@@ -317,6 +322,8 @@ void CPlayer::Load(lua_State *l)
 			const int g = LuaToNumber(l, j + 1, 2);
 			const int b = LuaToNumber(l, j + 1, 3);
 			this->Color = Video.MapRGB(TheScreen->format, r, g, b);
+		*/
+		//Wyrmgus end
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

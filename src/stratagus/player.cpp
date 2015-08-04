@@ -698,6 +698,12 @@ void CPlayer::Save(CFile &file) const
 	if (p.Faction != -1) {
 		file.printf(" \"faction\", %d,", p.Faction);
 	}
+	for (int i = 0; i < PlayerColorMax; ++i) {
+		if (PlayerColors[i][0] == this->Color) {
+			file.printf(" \"color\", %d,", i);
+			break;
+		}
+	}
 	//Wyrmgus end
 	file.printf("  \"name\", \"%s\",\n", p.Name.c_str());
 	file.printf("  \"type\", ");
@@ -824,10 +830,14 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"speed-upgrade\", %d,", p.SpeedUpgrade);
 	file.printf("\n  \"speed-research\", %d,", p.SpeedResearch);
 
+	//Wyrmgus start
+	/*
 	Uint8 r, g, b;
 
 	SDL_GetRGB(p.Color, TheScreen->format, &r, &g, &b);
 	file.printf("\n  \"color\", { %d, %d, %d },", r, g, b);
+	*/
+	//Wyrmgus end
 
 	// UnitColors done by init code.
 	// Allow saved by allow.
