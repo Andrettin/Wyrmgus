@@ -877,7 +877,7 @@ void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 		if (unit.IsAliveOnMap()
 			//Wyrmgus start
 //			&& (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player))) {
-			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit->Player))) {
+			&& (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit))) {
 			//Wyrmgus end
 			missile.MissileHit(&unit);
 		}
@@ -928,7 +928,7 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 					}
 					//Wyrmgus start
 //					if (missile.Type->FriendlyFire == false || unit.IsEnemy(*missile.SourceUnit->Player)) {
-					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit->Player)) {
+					if (missile.Type->FriendlyFire == true || unit.IsEnemy(*missile.SourceUnit)) {
 					//Wyrmgus end
 						missile.TargetUnit = &unit;
 						if (unit.Type->TileWidth == 1 || unit.Type->TileHeight == 1) {
