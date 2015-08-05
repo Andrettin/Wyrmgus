@@ -486,12 +486,16 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 		return false;
 	}
 	// Removed units can only attack in AttackRange, from bunker
-	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
+	//Wyrmgus start
+	//if unit is in a container which is attacking, and the container has a goal, use that goal (if possible) instead
+//	CUnit *autoAttackUnit = AttackUnitsInRange(unit);
+	CUnit *autoAttackUnit = unit.Container && unit.Container->CurrentAction() == UnitActionAttack && unit.Container->CurrentOrder()->HasGoal() ? unit.Container->CurrentOrder()->GetGoal() : AttackUnitsInRange(unit);
+	//Wyrmgus end
 
 	if (autoAttackUnit == NULL) {
 		return false;
 	}
-	// If unit is removed, use containers x and y
+	// If unit is removed, use container's x and y
 	const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
 	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 		return false;
