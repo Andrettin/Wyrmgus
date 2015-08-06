@@ -64,6 +64,7 @@ class WorldMapTile
 public:
 	WorldMapTile() :
 		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
+		BaseProduction(0),
 		ResourceProspected(false), Position(-1, -1), BaseTile(NULL), GraphicTile(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
@@ -81,6 +82,7 @@ public:
 	int BaseTileVariation;					/// Base tile variation
 	int Variation;							/// Tile variation
 	int Resource;							/// The tile's resource, if any
+	int BaseProduction;						/// How much the tile produces of its resource (if any)
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	Vec2i Position;							/// Position of the tile
@@ -109,6 +111,7 @@ public:
 		memset(MovingUnits, 0, sizeof(MovingUnits));
 		memset(AttackingUnits, 0, sizeof(AttackingUnits));
 		memset(BorderProvinces, 0, sizeof(BorderProvinces));
+		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		for (int i = 0; i < ProvinceTileMax; ++i) {
 			Tiles[i].x = -1;
 			Tiles[i].y = -1;
@@ -116,6 +119,7 @@ public:
 	}
 	
 	void UpdateMinimap();
+	void SetSettlementBuilding(int building_id, bool has_settlement_building);
 	bool HasBuildingClass(std::string building_class_name);
 	bool BordersProvince(int province_id);
 	bool BordersFaction(int faction_civilization, int faction);
@@ -141,6 +145,7 @@ public:
 	int MovingUnits[UnitTypeMax];										/// Quantity of units of a particular unit type moving to the province
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
+	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
 	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
@@ -152,10 +157,12 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), CurrentResearch(-1)
+		Faction(-1), Civilization(-1), CurrentResearch(-1), ProvinceCount(0)
 	{
+		memset(OwnedProvinces, -1, sizeof(OwnedProvinces));
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Income, 0, sizeof(Income));
+		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 	}
 	
 	void SetTechnology(int upgrade_id, bool has_technology);
@@ -163,8 +170,11 @@ public:
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
+	int ProvinceCount;													/// Quantity of provinces owned by this faction.
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particualr technology or not; 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
+	int OwnedProvinces[ProvinceMax];									/// Provinces owned by this faction
 	int Income[MaxCosts];												/// Income of each resource for the faction.
+	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 };
 
 class CRiver
@@ -325,6 +335,7 @@ extern bool GetFactionTechnology(std::string civilization_name, std::string fact
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
+extern int CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
 //Wyrmgus end

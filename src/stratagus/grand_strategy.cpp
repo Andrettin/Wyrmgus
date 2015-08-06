@@ -510,7 +510,7 @@ void CGrandStrategyGame::DoTurn()
 		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
 			// construct buildings
 			if (this->Provinces[i]->CurrentConstruction != -1) {
-				this->Provinces[i]->SettlementBuildings[this->Provinces[i]->CurrentConstruction] = true;
+				this->Provinces[i]->SetSettlementBuilding(this->Provinces[i]->CurrentConstruction, true);
 				if (UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "town-hall" || UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "lumber-mill" || UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "smithy") { //recalculate the faction incomes if an income-altering building was constructed
 					char buf[256];
 					snprintf(buf, sizeof(buf), "if (CalculateFactionIncomes ~= nil) then CalculateFactionIncomes() end;");
@@ -523,7 +523,7 @@ void CGrandStrategyGame::DoTurn()
 			int mercenary_camp_id = UnitTypeIdByIdent("unit-mercenary-camp");
 			if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == false && GrandStrategyWorld != "Earth") {
 				if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->HasBuildingClass("barracks") && this->Provinces[i]->HasBuildingClass("smithy")) {
-					this->Provinces[i]->SettlementBuildings[mercenary_camp_id] = true;
+					this->Provinces[i]->SetSettlementBuilding(mercenary_camp_id, true);
 				}
 			}
 		} else { //end of valid provinces
@@ -832,6 +832,20 @@ void CProvince::UpdateMinimap()
 		if (GrandStrategyGame.WorldMapTiles[x][y]) {
 			GrandStrategyGame.WorldMapTiles[x][y]->UpdateMinimap();
 		}
+	}
+}
+
+void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
+{
+	if (this->SettlementBuildings[building_id] == has_settlement_building) {
+		return;
+	}
+	
+	this->SettlementBuildings[building_id] = has_settlement_building;
+	
+	int change = has_settlement_building ? 1 : -1;
+	if (UnitTypes[building_id]->Class == "lumber-mill") {
+		this->ProductionEfficiencyModifier[WoodCost] += 25 * change;
 	}
 }
 
@@ -1750,6 +1764,10 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 
 void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology)
 {
+	if (this->Technologies[upgrade_id] == has_technology) {
+		return;
+	}
+	
 	this->Technologies[upgrade_id] = has_technology;
 	
 	if (has_technology) { //if value is true, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
@@ -1760,6 +1778,13 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology)
 				}
 			}
 		}
+	}
+	
+	int change = has_technology ? 1 : -1;
+	if (AllUpgrades[upgrade_id]->Class == "coinage") {
+		this->ProductionEfficiencyModifier[GoldCost] += 10 * change;
+	} else if (AllUpgrades[upgrade_id]->Class == "writing") {
+		this->ProductionEfficiencyModifier[ResearchCost] += 50 * change;
 	}
 }
 
@@ -2300,6 +2325,13 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 				GrandStrategyGame.WorldMapResources[resource][i][2] = discovered ? 1 : 0;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = resource;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = discovered;
+				if (resource == GoldCost) {
+					GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 200;
+				} else if (resource == StoneCost) {
+					GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 10;
+				} else {
+					GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 100;
+				}
 				break;
 			}
 		}
@@ -2462,10 +2494,33 @@ void SetProvinceWater(std::string province_name, bool water)
 void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name)
 {
 	int province_id = GetProvinceId(province_name);
+	int civilization_id = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, faction_name);
 	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->Owner[0] = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		GrandStrategyGame.Provinces[province_id]->Owner[1] = PlayerRaces.GetFactionIndexByName(GrandStrategyGame.Provinces[province_id]->Owner[0], faction_name);
+	if (province_id == -1 || !GrandStrategyGame.Provinces[province_id]) {
+		return;
+	}
+	
+	if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) { //if province has a previous owner, remove it from the owner's province list
+		int old_civilization_id = GrandStrategyGame.Provinces[province_id]->Owner[0];
+		int old_faction_id = GrandStrategyGame.Provinces[province_id]->Owner[1];
+		for (int i = 0; i < GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount; ++i) {
+			if (GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[i] == province_id) {
+				//if this owned province is the one we are changing the owner of, push every element of the array after it back one step
+				for (int j = i; j < GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount; ++j) {
+					GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[j] = GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[j + 1];
+				}
+				break;
+			}
+		}
+		GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount -= 1;
+	}
+
+	GrandStrategyGame.Provinces[province_id]->Owner[0] = civilization_id;
+	GrandStrategyGame.Provinces[province_id]->Owner[1] = faction_id;
+	if (civilization_id != -1 && faction_id != -1) {
+		GrandStrategyGame.Factions[civilization_id][faction_id]->OwnedProvinces[GrandStrategyGame.Factions[civilization_id][faction_id]->ProvinceCount] = province_id;
+		GrandStrategyGame.Factions[civilization_id][faction_id]->ProvinceCount += 1;
 	}
 }
 
@@ -2654,7 +2709,7 @@ void SetProvinceSettlementBuilding(std::string province_name, std::string settle
 	int settlement_building = UnitTypeIdByIdent(settlement_building_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && settlement_building != -1) {
-		GrandStrategyGame.Provinces[province_id]->SettlementBuildings[settlement_building] = has_settlement_building;
+		GrandStrategyGame.Provinces[province_id]->SetSettlementBuilding(settlement_building, has_settlement_building);
 	}
 }
 
@@ -2754,6 +2809,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
+				GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 0;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
 				for (int i = 0; i < MAX_RACES; ++i) {
@@ -2807,6 +2863,9 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Provinces[i]->Tiles[j].x = -1;
 				GrandStrategyGame.Provinces[i]->Tiles[j].y = -1;
 			}
+			for (int j = 0; j < MaxCosts; ++j) {
+				GrandStrategyGame.Provinces[i]->ProductionEfficiencyModifier[j] = 0;
+			}
 		} else {
 			break;
 		}
@@ -2816,11 +2875,16 @@ void CleanGrandStrategyGame()
 		for (int j = 0; j < FactionMax; ++j) {
 			if (GrandStrategyGame.Factions[i][j]) {
 				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
+				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
 				}
 				for (int k = 0; k < MaxCosts; ++k) {
 					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
+					GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
+				}
+				for (int k = 0; k < ProvinceMax; ++k) {
+					GrandStrategyGame.Factions[i][j]->OwnedProvinces[k] = -1;
 				}
 			} else {
 				break;
@@ -2846,6 +2910,7 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.WorldMapResources[i][j][2] = 0;
 		}
 	}
+	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
 	GrandStrategyGame.ProvinceCount = 0;
@@ -3377,26 +3442,52 @@ int CalculateFactionIncome(std::string civilization_name, std::string faction_na
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
 	
-	if (faction == -1 || resource == -1) {
+	if (faction == -1 || resource == -1 || GrandStrategyGame.Factions[civilization][faction]->ProvinceCount == 0) {
 		return 0;
 	}
 	
 	int income = 0;
 	
-	for (int i = 0; i < MaxCosts; ++i) {
-		for (int j = 0; j < WorldMapResourceMax; ++j) {
-			if (GrandStrategyGame.WorldMapResources[i][j][0] != -1 && GrandStrategyGame.WorldMapResources[i][j][1] != -1) {
-				if (GrandStrategyGame.WorldMapResources[i][j][3]) { //non-discovered resources don't grant income
+	if (resource == ResearchCost) {
+		for (int i = 0; i < GrandStrategyGame.Factions[civilization][faction]->ProvinceCount; ++i) {
+			int province_id = GrandStrategyGame.Factions[civilization][faction]->OwnedProvinces[i];
+			
+			int province_research = 0;
+			
+			// faction's research is 10 if all provinces have town halls, lumber mills and smithies
+			if (GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
+				province_research += 6;
+			}
+			if (GrandStrategyGame.Provinces[province_id]->HasBuildingClass("lumber-mill")) {
+				province_research += 2;
+			}
+			if (GrandStrategyGame.Provinces[province_id]->HasBuildingClass("smithy")) {
+				province_research += 2;
+			}
+			
+			int culture_penalty = GrandStrategyGame.Provinces[province_id]->Civilization == GrandStrategyGame.Provinces[province_id]->Owner[0] ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to production
+			
+			income += province_research * (100 + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + culture_penalty) / 100;
+		}
+		income *= 100 + GrandStrategyGame.Factions[civilization][faction]->ProductionEfficiencyModifier[resource];
+		income /= 100;
+		income /= GrandStrategyGame.Factions[civilization][faction]->ProvinceCount;
+	} else {
+		for (int i = 0; i < WorldMapResourceMax; ++i) {
+			if (GrandStrategyGame.WorldMapResources[resource][i][0] != -1 && GrandStrategyGame.WorldMapResources[resource][i][1] != -1) {
+				if (!GrandStrategyGame.WorldMapResources[resource][i][2]) { //non-discovered resources don't grant income
 					continue;
 				}
-				
-				int x = GrandStrategyGame.WorldMapResources[i][j][0];
-				int y = GrandStrategyGame.WorldMapResources[i][j][1];
-				
+					
+				int x = GrandStrategyGame.WorldMapResources[resource][i][0];
+				int y = GrandStrategyGame.WorldMapResources[resource][i][1];
+					
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-				
-				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] == civilization && GrandStrategyGame.Provinces[province_id]->Owner[1] == faction) {
-					income += 100; //still need to account for different incomes for different resources, and for province efficiencies
+					
+				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] == civilization && GrandStrategyGame.Provinces[province_id]->Owner[1] == faction && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
+					int culture_penalty = GrandStrategyGame.Provinces[province_id]->Civilization == GrandStrategyGame.Provinces[province_id]->Owner[0] ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to production
+						
+					income += GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction * (100 + GrandStrategyGame.Factions[civilization][faction]->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + culture_penalty) / 100;
 				}
 			} else {
 				break;
