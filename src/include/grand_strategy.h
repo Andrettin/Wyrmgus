@@ -63,8 +63,8 @@ class WorldMapTile
 {
 public:
 	WorldMapTile() :
-		Terrain(-1), Province(-1), Variation(-1), Resource(-1),
-		ResourceProspected(false), Position(-1, -1), GraphicTile(NULL)
+		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
+		ResourceProspected(false), Position(-1, -1), BaseTile(NULL), GraphicTile(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
 		memset(River, -1, sizeof(River));
@@ -78,11 +78,13 @@ public:
 	
 	int Terrain;							/// Tile terrain (i.e. plains)
 	int Province;							/// Province to which the tile belongs
+	int BaseTileVariation;					/// Base tile variation
 	int Variation;							/// Tile variation
 	int Resource;							/// The tile's resource, if any
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	Vec2i Position;							/// Position of the tile
+	CGraphic *BaseTile;
 	CGraphic *GraphicTile;					/// The tile image used by this tile
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
 	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
@@ -186,7 +188,7 @@ public:
 class CGrandStrategyGame
 {
 public:
-	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), BaseTile(NULL)
+	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0)
 	{
 		for (int i = 0; i < MaxCosts; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
@@ -212,7 +214,6 @@ public:
 	int WorldMapWidth;
 	int WorldMapHeight;
 	int ProvinceCount;
-	CGraphic *BaseTile;
 	CGraphic *FogTile;
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
 	CGraphic *GoldMineGraphics;
