@@ -145,7 +145,7 @@ public:
 	int MovingUnits[UnitTypeMax];										/// Quantity of units of a particular unit type moving to the province
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
-	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
+	int ProductionEfficiencyModifier[MaxCosts + 1];						/// Efficiency modifier for each resource.
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
 	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
@@ -166,6 +166,8 @@ public:
 	}
 	
 	void SetTechnology(int upgrade_id, bool has_technology);
+	void CalculateIncome(int resource);
+	void CalculateIncomes();
 	
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).
@@ -173,8 +175,8 @@ public:
 	int ProvinceCount;													/// Quantity of provinces owned by this faction.
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particualr technology or not; 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
 	int OwnedProvinces[ProvinceMax];									/// Provinces owned by this faction
-	int Income[MaxCosts];												/// Income of each resource for the faction.
-	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
+	int Income[MaxCosts + 1];											/// Income of each resource for the faction ("+ 1" because of food).
+	int ProductionEfficiencyModifier[MaxCosts + 1];						/// Efficiency modifier for each resource.
 };
 
 class CRiver
@@ -200,7 +202,7 @@ class CGrandStrategyGame
 public:
 	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0)
 	{
-		for (int i = 0; i < MaxCosts; ++i) {
+		for (int i = 0; i < MaxCosts + 1; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
 				WorldMapResources[i][j][0] = -1;
 				WorldMapResources[i][j][1] = -1;
@@ -240,7 +242,7 @@ public:
 	CProvince *Provinces[ProvinceMax];
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
-	int WorldMapResources[MaxCosts][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
+	int WorldMapResources[MaxCosts + 1][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 
 	int MinimapTextureWidth;
 	int MinimapTextureHeight;
@@ -335,7 +337,9 @@ extern bool GetFactionTechnology(std::string civilization_name, std::string fact
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
-extern int CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
+extern void CalculateFactionIncomes(std::string civilization_name, std::string faction_name);
+extern void CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
+extern int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
 //Wyrmgus end
