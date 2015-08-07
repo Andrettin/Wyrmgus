@@ -3575,7 +3575,7 @@ void AcquireFactionTechnologies(std::string civilization_from_name, std::string 
 
 bool IsMilitaryUnit(const CUnitType &type)
 {
-	if (!type.BoolFlag[BUILDING_INDEX].value && !type.BoolFlag[HERO_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && !type.Class.empty() && type.Class != "worker" && type.Class != "caravan") {
+	if (!type.BoolFlag[BUILDING_INDEX].value && !type.BoolFlag[HERO_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.Class != "worker" && type.Class != "caravan") {
 		return true;
 	}
 	return false;
