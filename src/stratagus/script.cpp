@@ -2622,7 +2622,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 			}
 		}
-		for (int i = 0; i < MaxCosts; ++i) {
+		for (int i = 0; i < MaxCosts + 1; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
 				if (GrandStrategyGame.WorldMapResources[i][j][0] == -1 && GrandStrategyGame.WorldMapResources[i][j][1] == -1 && GrandStrategyGame.WorldMapResources[i][j][2] == 0) { //if reached a blank spot, stop the loop
 					break;
@@ -2689,6 +2689,11 @@ void SaveGrandStrategyGame(const std::string &filename)
 					for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 						if (GrandStrategyGame.Factions[i][j]->Technologies[k] != false) {
 							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
+						}
+					}
+					for (int k = 0; k < MaxCosts + 1; ++k) {
+						if (GrandStrategyGame.Factions[i][j]->Resources[k] > 0) {
+							fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), k == FoodCost ? "food" : DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction technology data
 						}
 					}
 				} else {

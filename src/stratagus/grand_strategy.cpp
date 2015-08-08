@@ -511,17 +511,6 @@ void CGrandStrategyGame::DoTurn()
 			// construct buildings
 			if (this->Provinces[i]->CurrentConstruction != -1) {
 				this->Provinces[i]->SetSettlementBuilding(this->Provinces[i]->CurrentConstruction, true);
-				//recalculate the faction incomes if an income-altering building was constructed
-				int owner_civilization = this->Provinces[i]->Owner[0];
-				int owner_faction = this->Provinces[i]->Owner[1];
-				if (UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "town-hall") {
-					GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncomes();
-				} else if (UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "lumber-mill") {
-					GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(WoodCost);
-					GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(ResearchCost);
-				} else if (UnitTypes[this->Provinces[i]->CurrentConstruction]->Class == "smithy") {
-					GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(ResearchCost);
-				}
 				this->Provinces[i]->CurrentConstruction = -1;
 			}
 				
@@ -543,11 +532,6 @@ void CGrandStrategyGame::DoTurn()
 			if (GrandStrategyGame.Factions[i][j]) {
 				if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
 					GrandStrategyGame.Factions[i][j]->SetTechnology(GrandStrategyGame.Factions[i][j]->CurrentResearch, true);
-					if (AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Class == "coinage") {
-						GrandStrategyGame.Factions[i][j]->CalculateIncome(GoldCost);
-					} else if (AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Class == "writing") {
-						GrandStrategyGame.Factions[i][j]->CalculateIncome(ResearchCost);
-					}
 					GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				}
 			} else { //end of valid factions
@@ -854,6 +838,20 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 	int change = has_settlement_building ? 1 : -1;
 	if (UnitTypes[building_id]->Class == "lumber-mill") {
 		this->ProductionEfficiencyModifier[WoodCost] += 25 * change;
+	}
+	
+	//recalculate the faction incomes if an income-altering building was constructed
+	int owner_civilization = this->Owner[0];
+	int owner_faction = this->Owner[1];
+	if (owner_civilization != -1 && owner_faction != -1) {
+		if (UnitTypes[building_id]->Class == "town-hall") {
+			GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncomes();
+		} else if (UnitTypes[building_id]->Class == "lumber-mill") {
+			GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(WoodCost);
+			GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(ResearchCost);
+		} else if (UnitTypes[building_id]->Class == "smithy") {
+			GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(ResearchCost);
+		}
 	}
 }
 
@@ -1793,6 +1791,12 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology)
 		this->ProductionEfficiencyModifier[GoldCost] += 10 * change;
 	} else if (AllUpgrades[upgrade_id]->Class == "writing") {
 		this->ProductionEfficiencyModifier[ResearchCost] += 50 * change;
+	}
+	
+	if (AllUpgrades[upgrade_id]->Class == "coinage") {
+		this->CalculateIncome(GoldCost);
+	} else if (AllUpgrades[upgrade_id]->Class == "writing") {
+		this->CalculateIncome(ResearchCost);
 	}
 }
 
@@ -2964,6 +2968,7 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
 				}
 				for (int k = 0; k < MaxCosts + 1; ++k) {
+					GrandStrategyGame.Factions[i][j]->Resources[k] = 0;
 					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
 					GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
 				}
@@ -3516,6 +3521,66 @@ std::string GetProvinceOwner(std::string province_name)
 	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Name;
 }
 
+void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (faction == -1 || resource == -1) {
+		return;
+	}
+	
+	GrandStrategyGame.Factions[civilization][faction]->Resources[resource] = resource_quantity;
+}
+
+void ChangeFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (faction == -1 || resource == -1) {
+		return;
+	}
+	
+	GrandStrategyGame.Factions[civilization][faction]->Resources[resource] += resource_quantity;
+}
+
+int GetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (faction == -1 || resource == -1) {
+		return 0;
+	}
+	
+	return GrandStrategyGame.Factions[civilization][faction]->Resources[resource];
+}
+
 void CalculateFactionIncomes(std::string civilization_name, std::string faction_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -3529,26 +3594,6 @@ void CalculateFactionIncomes(std::string civilization_name, std::string faction_
 	}
 	
 	GrandStrategyGame.Factions[civilization][faction]->CalculateIncomes();
-}
-
-void CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)
-{
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	int faction = -1;
-	if (civilization != -1) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-	}
-	
-	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
-	
-	if (faction == -1 || resource == -1 || GrandStrategyGame.Factions[civilization][faction]->ProvinceCount == 0) {
-		return;
-	}
-	
-	GrandStrategyGame.Factions[civilization][faction]->CalculateIncome(resource);
 }
 
 int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)

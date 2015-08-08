@@ -159,8 +159,9 @@ public:
 	CGrandStrategyFaction() :
 		Faction(-1), Civilization(-1), CurrentResearch(-1), ProvinceCount(0)
 	{
-		memset(OwnedProvinces, -1, sizeof(OwnedProvinces));
 		memset(Technologies, 0, sizeof(Technologies));
+		memset(OwnedProvinces, -1, sizeof(OwnedProvinces));
+		memset(Resources, 0, sizeof(Resources));
 		memset(Income, 0, sizeof(Income));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 	}
@@ -175,6 +176,7 @@ public:
 	int ProvinceCount;													/// Quantity of provinces owned by this faction.
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particualr technology or not; 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
 	int OwnedProvinces[ProvinceMax];									/// Provinces owned by this faction
+	int Resources[MaxCosts + 1];										/// Amount of each resource stored by the faction ("+ 1" because of food).
 	int Income[MaxCosts + 1];											/// Income of each resource for the faction ("+ 1" because of food).
 	int ProductionEfficiencyModifier[MaxCosts + 1];						/// Efficiency modifier for each resource.
 };
@@ -337,8 +339,10 @@ extern bool GetFactionTechnology(std::string civilization_name, std::string fact
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
+extern void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
+extern void ChangeFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
+extern int GetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern void CalculateFactionIncomes(std::string civilization_name, std::string faction_name);
-extern void CalculateFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
