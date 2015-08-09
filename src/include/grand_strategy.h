@@ -119,6 +119,7 @@ public:
 	}
 	
 	void UpdateMinimap();
+	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
 	bool HasBuildingClass(std::string building_class_name);
 	bool BordersProvince(int province_id);
@@ -131,6 +132,7 @@ public:
 	
 	std::string Name;
 	std::string SettlementName;
+	int ID;																/// ID of this province
 	int Civilization;													/// Civilization of the province (-1 = no one).
 	int Owner[2];														/// Owner of the province, first number for the owner's civilization, and the second one for the faction itself (-1, -1 = no one).
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
@@ -346,6 +348,7 @@ extern void CalculateFactionIncomes(std::string civilization_name, std::string f
 extern int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
+extern void ChangeFactionCulture(std::string old_civilization_name, std::string faction_name, std::string new_civilization_name);
 //Wyrmgus end
 
 //@}

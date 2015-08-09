@@ -80,3 +80,4 @@ extern int GetFactionResource(std::string civilization_name, std::string faction
 extern void CalculateFactionIncomes(std::string civilization_name, std::string faction_name);
 extern int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
+extern void ChangeFactionCulture(std::string old_civilization_name, std::string faction_name, std::string new_civilization_name);

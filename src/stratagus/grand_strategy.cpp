@@ -827,6 +827,31 @@ void CProvince::UpdateMinimap()
 	}
 }
 
+void CProvince::SetOwner(int civilization_id, int faction_id)
+{
+	if (this->Owner[0] != -1 && this->Owner[1] != -1) { //if province has a previous owner, remove it from the owner's province list
+		int old_civilization_id = this->Owner[0];
+		int old_faction_id = this->Owner[1];
+		for (int i = 0; i < GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount; ++i) {
+			if (GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[i] == this->ID) {
+				//if this owned province is the one we are changing the owner of, push every element of the array after it back one step
+				for (int j = i; j < GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount; ++j) {
+					GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[j] = GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[j + 1];
+				}
+				break;
+			}
+		}
+		GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount -= 1;
+	}
+
+	this->Owner[0] = civilization_id;
+	this->Owner[1] = faction_id;
+	if (civilization_id != -1 && faction_id != -1) {
+		GrandStrategyGame.Factions[civilization_id][faction_id]->OwnedProvinces[GrandStrategyGame.Factions[civilization_id][faction_id]->ProvinceCount] = this->ID;
+		GrandStrategyGame.Factions[civilization_id][faction_id]->ProvinceCount += 1;
+	}
+}
+
 void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
 {
 	if (this->SettlementBuildings[building_id] == has_settlement_building) {
@@ -2586,6 +2611,7 @@ void SetProvinceName(std::string old_province_name, std::string new_province_nam
 		CProvince *province = new CProvince;
 		province_id = GrandStrategyGame.ProvinceCount;
 		GrandStrategyGame.Provinces[province_id] = province;
+		GrandStrategyGame.Provinces[province_id]->ID = province_id;
 		GrandStrategyGame.ProvinceCount += 1;
 	}
 	
@@ -2611,27 +2637,7 @@ void SetProvinceOwner(std::string province_name, std::string civilization_name, 
 		return;
 	}
 	
-	if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) { //if province has a previous owner, remove it from the owner's province list
-		int old_civilization_id = GrandStrategyGame.Provinces[province_id]->Owner[0];
-		int old_faction_id = GrandStrategyGame.Provinces[province_id]->Owner[1];
-		for (int i = 0; i < GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount; ++i) {
-			if (GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[i] == province_id) {
-				//if this owned province is the one we are changing the owner of, push every element of the array after it back one step
-				for (int j = i; j < GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount; ++j) {
-					GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[j] = GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[j + 1];
-				}
-				break;
-			}
-		}
-		GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount -= 1;
-	}
-
-	GrandStrategyGame.Provinces[province_id]->Owner[0] = civilization_id;
-	GrandStrategyGame.Provinces[province_id]->Owner[1] = faction_id;
-	if (civilization_id != -1 && faction_id != -1) {
-		GrandStrategyGame.Factions[civilization_id][faction_id]->OwnedProvinces[GrandStrategyGame.Factions[civilization_id][faction_id]->ProvinceCount] = province_id;
-		GrandStrategyGame.Factions[civilization_id][faction_id]->ProvinceCount += 1;
-	}
+	GrandStrategyGame.Provinces[province_id]->SetOwner(civilization_id, faction_id);
 }
 
 void SetProvinceCivilization(std::string province_name, std::string civilization_name)
@@ -2941,6 +2947,7 @@ void CleanGrandStrategyGame()
 		if (GrandStrategyGame.Provinces[i]) {
 			GrandStrategyGame.Provinces[i]->Name = "";
 			GrandStrategyGame.Provinces[i]->SettlementName = "";
+			GrandStrategyGame.Provinces[i]->ID = -1;
 			GrandStrategyGame.Provinces[i]->Civilization = -1;
 			GrandStrategyGame.Provinces[i]->Owner[0] = -1;
 			GrandStrategyGame.Provinces[i]->Owner[1] = -1;
@@ -3761,6 +3768,57 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 				}
 			}
 		}
+	}
+}
+
+void ChangeFactionCulture(std::string old_civilization_name, std::string faction_name, std::string new_civilization_name)
+{
+	int old_civilization = PlayerRaces.GetRaceIndexByName(old_civilization_name.c_str());
+	int old_faction = -1;
+	if (old_civilization != -1) {
+		old_faction = PlayerRaces.GetFactionIndexByName(old_civilization, faction_name);
+	}
+	
+	int new_civilization = PlayerRaces.GetRaceIndexByName(new_civilization_name.c_str());
+	int new_faction = -1;
+	if (new_civilization != -1) {
+		new_faction = PlayerRaces.GetFactionIndexByName(new_civilization, faction_name);
+	}
+	
+	if (old_faction == -1 || new_faction == -1) {
+		return;
+	}
+	
+	AcquireFactionTechnologies(old_civilization_name, faction_name, new_civilization_name, faction_name);
+	
+	if (GrandStrategyGame.Factions[old_civilization][old_faction]->ProvinceCount > 0) {
+		// replace existent units from the previous civilization with units of the new civilization
+		
+		for (int i = (GrandStrategyGame.Factions[old_civilization][old_faction]->ProvinceCount - 1); i >= 0; --i) {
+			int province_id = GrandStrategyGame.Factions[old_civilization][old_faction]->OwnedProvinces[i];
+			
+			for (size_t j = 0; j < UnitTypes.size(); ++j) {
+				if (
+					!UnitTypes[j]->Class.empty()
+					&& !UnitTypes[j]->Civilization.empty()
+					&& !UnitTypes[j]->BoolFlag[BUILDING_INDEX].value
+					&& UnitTypes[j]->DefaultStat.Variables[DEMAND_INDEX].Value > 0
+					&& UnitTypes[j]->Civilization == old_civilization_name
+					&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != -1
+					&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) // don't replace if both civilizations use the same unit type
+				) {
+					GrandStrategyGame.Provinces[province_id]->Units[PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class))] += GrandStrategyGame.Provinces[province_id]->Units[j];
+					GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class))] += GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j];
+					GrandStrategyGame.Provinces[province_id]->Units[j] = 0;
+					GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j] = 0;
+					GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < MaxCosts + 1; ++i) {
+		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[i] = GrandStrategyGame.Factions[old_civilization][old_faction]->Resources[i];
 	}
 }
 
