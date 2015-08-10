@@ -2395,7 +2395,11 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
-		lua_pushstring(l, PlayerRaces.Factions[p->Race][p->Faction]->Name.c_str());
+		if (p->Race != -1 && p->Faction != -1) {
+			lua_pushstring(l, PlayerRaces.Factions[p->Race][p->Faction]->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "RaceName")) {
