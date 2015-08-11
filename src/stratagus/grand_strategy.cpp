@@ -2850,6 +2850,7 @@ void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_id
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
 		GrandStrategyGame.Provinces[province_id]->Units[unit_type] = quantity;
+		GrandStrategyGame.Provinces[province_id]->Units[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->Units[unit_type]);
 	}
 }
 
@@ -2860,6 +2861,7 @@ void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
 		GrandStrategyGame.Provinces[province_id]->Units[unit_type] += quantity;
+		GrandStrategyGame.Provinces[province_id]->Units[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->Units[unit_type]);
 	}
 }
 
@@ -2870,6 +2872,7 @@ void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::st
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
 		GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type] = quantity;
+		GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type]);
 	}
 }
 
@@ -2880,6 +2883,7 @@ void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_t
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
 		GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type] = quantity;
+		GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type]);
 	}
 }
 
@@ -2890,6 +2894,7 @@ void SetProvinceAttackingUnitQuantity(std::string province_name, std::string uni
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
 		GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type] = quantity;
+		GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type]);
 	}
 }
 
