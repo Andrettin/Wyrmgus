@@ -87,6 +87,9 @@
 #include "editor.h"
 #include "font.h"
 #include "game.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "interface.h"
 #include "minimap.h"
 #include "network.h"
@@ -334,6 +337,11 @@ void ReloadOpenGL()
 	ReloadGraphics();
 	ReloadFonts();
 	UI.Minimap.Reload();
+	//Wyrmgus start
+	if (GrandStrategy) {
+		InitializeGrandStrategyMinimap();
+	}
+	//Wyrmgus end
 }
 
 #endif
