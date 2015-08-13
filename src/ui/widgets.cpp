@@ -76,7 +76,7 @@ static void MenuHandleButtonDown(unsigned)
 static void MenuHandleButtonUp(unsigned)
 {
 	//Wyrmgus start
-	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) {
+	if (GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) {
 		//if clicked on a tile, update the grand strategy interface
 		if (UI.MapArea.Contains(CursorScreenPos) && !(MouseButtons & LeftButton) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);

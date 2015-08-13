@@ -58,6 +58,7 @@
 ----------------------------------------------------------------------------*/
 
 bool GrandStrategy = false;				///if the game is in grand strategy mode
+bool GrandStrategyGamePaused = false;
 std::string GrandStrategyWorld;
 int WorldMapOffsetX;
 int WorldMapOffsetY;
@@ -337,7 +338,7 @@ void CGrandStrategyGame::DrawMap()
 	}
 	
 	//if is clicking on a tile, draw a square on its borders
-	if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1 && (MouseButtons & LeftButton)) {
+	if (!GrandStrategyGamePaused && UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1 && (MouseButtons & LeftButton)) {
 		int tile_screen_x = ((GrandStrategyGame.GetTileUnderCursor().x - WorldMapOffsetX) * 64) + UI.MapArea.X + width_indent;
 		int tile_screen_y = ((GrandStrategyGame.GetTileUnderCursor().y - WorldMapOffsetY) * 64) + UI.MapArea.Y + height_indent;
 			

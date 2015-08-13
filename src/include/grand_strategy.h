@@ -264,6 +264,7 @@ public:
 };
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
+extern bool GrandStrategyGamePaused;					/// if grand strategy game is paused
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
 extern int WorldMapOffsetY;

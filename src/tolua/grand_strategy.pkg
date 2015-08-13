@@ -1,5 +1,6 @@
 
 extern bool GrandStrategy;
+extern bool GrandStrategyGamePaused;
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
 extern int WorldMapOffsetY;

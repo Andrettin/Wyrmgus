@@ -310,6 +310,17 @@ void UpdateDisplay()
 		
 		//draw map
 		GrandStrategyGame.DrawMap();
+		
+		// Fillers
+		for (size_t i = 0; i != UI.Fillers.size(); ++i) {
+			UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
+		}
+		
+		GrandStrategyGame.DrawMinimap();
+		
+		if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y] && !GrandStrategyGamePaused) {
+			GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+		}
 	//Wyrmgus end
 	}
 
@@ -317,17 +328,6 @@ void UpdateDisplay()
 
 	DrawGuichanWidgets();
 	
-	//Wyrmgus start
-	//draw grand strategy tooltips and minimap here so that they appear over the guichan interface grand strategy mode uses
-	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) {
-		GrandStrategyGame.DrawMinimap();
-		
-		if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]) {
-			GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
-		}
-	}
-	//Wyrmgus end
-
 	if (CursorState != CursorStateRectangle) {
 		DrawCursor();
 	}
