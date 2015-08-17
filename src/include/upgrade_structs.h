@@ -159,6 +159,10 @@ extern int DefaultResourceAmounts[MaxCosts];
 */
 extern int DefaultResourceMaxAmounts[MaxCosts];
 
+//Wyrmgus start
+extern int DefaultResourcePrices[MaxCosts + 1];
+//Wyrmgus end
+
 extern int GetResourceIdByName(const char *resourceName);
 extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 

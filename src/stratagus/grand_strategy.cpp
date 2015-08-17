@@ -507,7 +507,9 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 void CGrandStrategyGame::DoTurn()
 {
 	//this function takes care only of some things for now, move the rest from Lua later
-	for (int i = 0; i < ProvinceMax; ++i) {
+	this->DoTrade();
+	
+	for (int i = 0; i < this->ProvinceCount; ++i) {
 		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
 			// construct buildings
 			if (this->Provinces[i]->CurrentConstruction != -1) {
@@ -522,7 +524,7 @@ void CGrandStrategyGame::DoTurn()
 					this->Provinces[i]->SetSettlementBuilding(mercenary_camp_id, true);
 				}
 			}
-		} else { //end of valid provinces
+		} else { //if a somehow invalid province is reached
 			break;
 		}
 	}
@@ -530,16 +532,227 @@ void CGrandStrategyGame::DoTurn()
 	//research technologies
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) {
-				if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
-					GrandStrategyGame.Factions[i][j]->SetTechnology(GrandStrategyGame.Factions[i][j]->CurrentResearch, true);
-					GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
+			if (this->Factions[i][j]) {
+				if (this->Factions[i][j]->CurrentResearch != -1) {
+					this->Factions[i][j]->SetTechnology(this->Factions[i][j]->CurrentResearch, true);
+					this->Factions[i][j]->CurrentResearch = -1;
 				}
 			} else { //end of valid factions
 				break;
 			}
 		}
 	}
+}
+
+void CGrandStrategyGame::DoTrade()
+{
+	bool province_consumed_commodity[MaxCosts + 1][ProvinceMax] = { false };
+	
+	// first sell to domestic provinces, then to other factions, and only then to foreign provinces
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (this->Factions[i][j]) {
+				if (this->Factions[i][j]->ProvinceCount > 0) {
+					for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
+						int province_id = this->Factions[i][j]->OwnedProvinces[k];
+						if (province_consumed_commodity[WoodCost][province_id] == false && this->Factions[i][j]->Trade[WoodCost] >= this->Provinces[province_id]->GetResourceDemand(WoodCost) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
+							this->Factions[i][j]->Resources[WoodCost] -= this->Provinces[province_id]->GetResourceDemand(WoodCost);
+							this->Factions[i][j]->Resources[GoldCost] += this->Provinces[province_id]->GetResourceDemand(WoodCost) * this->CommodityPrices[WoodCost] / 100;
+							this->Factions[i][j]->Trade[WoodCost] -= this->Provinces[province_id]->GetResourceDemand(WoodCost);
+							province_consumed_commodity[WoodCost][province_id] = true;
+						}
+						
+						if (province_consumed_commodity[StoneCost][province_id] == false && this->Factions[i][j]->Trade[StoneCost] >= this->Provinces[province_id]->GetResourceDemand(StoneCost) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
+							this->Factions[i][j]->Resources[StoneCost] -= this->Provinces[province_id]->GetResourceDemand(StoneCost);
+							this->Factions[i][j]->Resources[GoldCost] += this->Provinces[province_id]->GetResourceDemand(StoneCost) * this->CommodityPrices[StoneCost] / 100;
+							this->Factions[i][j]->Trade[StoneCost] -= this->Provinces[province_id]->GetResourceDemand(StoneCost);
+							province_consumed_commodity[StoneCost][province_id] = true;
+						}
+					}
+				}
+			} else { //end of valid factions
+				break;
+			}
+		}
+	}
+	
+	CGrandStrategyFaction *factions_by_prestige[MAX_RACES * FactionMax];
+	int factions_by_prestige_count = 0;
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (this->Factions[i][j]) {
+				if (this->Factions[i][j]->ProvinceCount > 0) {
+					factions_by_prestige[factions_by_prestige_count] = const_cast<CGrandStrategyFaction *>(&(*this->Factions[i][j]));
+					factions_by_prestige_count += 1;
+				}
+			} else { //end of valid factions
+				break;
+			}
+		}
+	}
+	
+	//sort factions by prestige
+	bool swapped = true;
+	for (int passes = 0; passes < factions_by_prestige_count && swapped; ++passes) {
+		swapped = false;
+		for (int i = 0; i < factions_by_prestige_count - 1; ++i) {
+			if (factions_by_prestige[i] && factions_by_prestige[i + 1]) {
+				if (!TradePriority(*factions_by_prestige[i], *factions_by_prestige[i + 1])) {
+					CGrandStrategyFaction *temp_faction = const_cast<CGrandStrategyFaction *>(&(*factions_by_prestige[i]));
+					factions_by_prestige[i] = const_cast<CGrandStrategyFaction *>(&(*factions_by_prestige[i + 1]));
+					factions_by_prestige[i + 1] = const_cast<CGrandStrategyFaction *>(&(*temp_faction));
+					swapped = true;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+
+	for (int i = 0; i < factions_by_prestige_count; ++i) {
+		if (factions_by_prestige[i]) {
+			if (factions_by_prestige[i]->Trade[WoodCost] < 0) { // if wants to import lumber
+				for (int j = 0; j < factions_by_prestige_count; ++j) {
+					if (j != i && factions_by_prestige[j]) {
+						if (factions_by_prestige[j]->Trade[WoodCost] > 0) { // if second faction wants to export lumber
+							this->PerformTrade(*factions_by_prestige[i], *factions_by_prestige[j], WoodCost);
+						}
+					} else {
+						break;
+					}
+				}
+			} else if (factions_by_prestige[i]->Trade[WoodCost] > 0) { // if wants to export lumber
+				for (int j = 0; j < factions_by_prestige_count; ++j) {
+					if (j != i && factions_by_prestige[j]) {
+						if (factions_by_prestige[j]->Trade[WoodCost] < 0) { // if second faction wants to import lumber
+							this->PerformTrade(*factions_by_prestige[j], *factions_by_prestige[i], WoodCost);
+						}
+					} else {
+						break;
+					}
+				}
+			}
+			
+			if (factions_by_prestige[i]->Trade[StoneCost] < 0) { // if wants to import stone
+				for (int j = 0; j < factions_by_prestige_count; ++j) {
+					if (j != i && factions_by_prestige[j]) {
+						if (factions_by_prestige[j]->Trade[StoneCost] > 0) { // if second faction wants to export stone
+							this->PerformTrade(*factions_by_prestige[i], *factions_by_prestige[j], StoneCost);
+						}
+					} else {
+						break;
+					}
+				}
+			} else if (factions_by_prestige[i]->Trade[StoneCost] > 0) { // if wants to export stone
+				for (int j = 0; j < factions_by_prestige_count; ++j) {
+					if (j != i && factions_by_prestige[j]) {
+						if (factions_by_prestige[j]->Trade[StoneCost] < 0) { // if second faction wants to import stone
+							this->PerformTrade(*factions_by_prestige[j], *factions_by_prestige[i], StoneCost);
+						}
+					} else {
+						break;
+					}
+				}
+			}
+		} else {
+			break;
+		}
+	}
+	
+	//sell to foreign provinces
+	for (int i = 0; i < factions_by_prestige_count; ++i) {
+		if (factions_by_prestige[i]) {
+			for (int j = 0; j < factions_by_prestige_count; ++j) {
+				if (j != i && factions_by_prestige[j]) {
+					for (int k = 0; k < factions_by_prestige[j]->ProvinceCount; ++k) {
+						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
+						if (province_consumed_commodity[WoodCost][province_id] == false && factions_by_prestige[i]->Trade[WoodCost] >= this->Provinces[province_id]->GetResourceDemand(WoodCost) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
+							factions_by_prestige[i]->Resources[WoodCost] -= this->Provinces[province_id]->GetResourceDemand(WoodCost);
+							factions_by_prestige[i]->Resources[GoldCost] += this->Provinces[province_id]->GetResourceDemand(WoodCost) * this->CommodityPrices[WoodCost] / 100;
+							factions_by_prestige[i]->Trade[WoodCost] -= this->Provinces[province_id]->GetResourceDemand(WoodCost);
+							province_consumed_commodity[WoodCost][province_id] = true;
+						}
+						
+						if (province_consumed_commodity[StoneCost][province_id] == false && factions_by_prestige[i]->Trade[StoneCost] >= this->Provinces[province_id]->GetResourceDemand(StoneCost) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
+							factions_by_prestige[i]->Resources[StoneCost] -= this->Provinces[province_id]->GetResourceDemand(StoneCost);
+							factions_by_prestige[i]->Resources[GoldCost] += this->Provinces[province_id]->GetResourceDemand(StoneCost) * this->CommodityPrices[StoneCost] / 100;
+							factions_by_prestige[i]->Trade[StoneCost] -= this->Provinces[province_id]->GetResourceDemand(StoneCost);
+							province_consumed_commodity[StoneCost][province_id] = true;
+						}
+					}
+				} else {
+					break;
+				}
+			}
+		} else {
+			break;
+		}
+	}
+
+	// check whether offers or bids have been greater, and change the commodity's price accordingly
+	int remaining_wanted_trade[MaxCosts + 1] = { 0 };
+	for (int i = 0; i < factions_by_prestige_count; ++i) {
+		if (factions_by_prestige[i]) {
+			remaining_wanted_trade[WoodCost] += factions_by_prestige[i]->Trade[WoodCost];
+			remaining_wanted_trade[StoneCost] += factions_by_prestige[i]->Trade[StoneCost];
+		} else {
+			break;
+		}
+	}
+	
+	for (int i = 0; i < this->ProvinceCount; ++i) {
+		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
+			if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->Owner[0] != -1 && this->Provinces[i]->Owner[1] != -1) {
+				if (province_consumed_commodity[WoodCost][i] == false) {
+					remaining_wanted_trade[WoodCost] -= this->Provinces[i]->GetResourceDemand(WoodCost);
+				}
+				if (province_consumed_commodity[StoneCost][i] == false) {
+					remaining_wanted_trade[StoneCost] -= this->Provinces[i]->GetResourceDemand(StoneCost);
+				}
+			}
+		} else { //if a somehow invalid province is reached
+			break;
+		}
+	}
+	
+	if (remaining_wanted_trade[WoodCost] > 0 && this->CommodityPrices[WoodCost] > 1) { // more offers than bids
+		this->CommodityPrices[WoodCost] -= 1;
+	} else if (remaining_wanted_trade[WoodCost] < 0) { // more bids than offers
+		this->CommodityPrices[WoodCost] += 1;
+	}
+	if (remaining_wanted_trade[StoneCost] > 0 && this->CommodityPrices[StoneCost] > 1) { // more offers than bids
+		this->CommodityPrices[StoneCost] -= 1;
+	} else if (remaining_wanted_trade[StoneCost] < 0) { // more bids than offers
+		this->CommodityPrices[StoneCost] += 1;
+	}
+}
+
+void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource)
+{
+	if (abs(importer_faction.Trade[resource]) > exporter_faction.Trade[resource]) {
+		importer_faction.Resources[resource] += exporter_faction.Trade[resource];
+		exporter_faction.Resources[resource] -= exporter_faction.Trade[resource];
+
+		importer_faction.Resources[GoldCost] -= exporter_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
+		exporter_faction.Resources[GoldCost] += exporter_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
+		
+		importer_faction.Trade[resource] += exporter_faction.Trade[resource];
+		exporter_faction.Trade[resource] = 0;
+	} else {
+		importer_faction.Resources[resource] += importer_faction.Trade[resource];
+		exporter_faction.Resources[resource] -= importer_faction.Trade[resource];
+
+		importer_faction.Resources[GoldCost] -= importer_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
+		exporter_faction.Resources[GoldCost] += importer_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
+		
+		exporter_faction.Trade[resource] += importer_faction.Trade[resource];
+		importer_faction.Trade[resource] = 0;
+	}
+}
+
+bool CGrandStrategyGame::TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b)
+{
+	return faction_a.Resources[PrestigeCost] > faction_b.Resources[PrestigeCost];
 }
 
 Vec2i CGrandStrategyGame::GetTileUnderCursor()
@@ -926,6 +1139,26 @@ bool CProvince::BordersFaction(int faction_civilization, int faction)
 		}
 	}
 	return false;
+}
+
+int CProvince::GetResourceDemand(int resource)
+{
+	int quantity = 0;
+	if (resource == WoodCost) {
+		quantity = 50;
+		if (this->HasBuildingClass("lumber-mill")) {
+			quantity += 50; // increase the province's lumber demand if it has a lumber mill built
+		}
+	} else if (resource == StoneCost) {
+		quantity = 25;
+	}
+	
+	if (quantity > 0 && GrandStrategyGame.CommodityPrices[resource] > 0) {
+		quantity *= DefaultResourcePrices[resource];
+		quantity /= GrandStrategyGame.CommodityPrices[resource];
+	}
+
+	return quantity;
 }
 
 /**
@@ -3006,6 +3239,7 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.Factions[i][j]->Resources[k] = 0;
 					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
 					GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
+					GrandStrategyGame.Factions[i][j]->Trade[k] = 0;
 				}
 				for (int k = 0; k < ProvinceMax; ++k) {
 					GrandStrategyGame.Factions[i][j]->OwnedProvinces[k] = -1;
@@ -3033,6 +3267,7 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.WorldMapResources[i][j][1] = -1;
 			GrandStrategyGame.WorldMapResources[i][j][2] = 0;
 		}
+		GrandStrategyGame.CommodityPrices[i] = 0;
 	}
 	
 	GrandStrategyGame.WorldMapWidth = 0;
@@ -3306,6 +3541,11 @@ void InitializeGrandStrategyGame()
 				break;
 			}
 		}
+	}
+	
+	//set resource prices to base prices
+	for (int i = 0; i < MaxCosts + 1; ++i) {
+		GrandStrategyGame.CommodityPrices[i] = DefaultResourcePrices[i];
 	}
 }
 
@@ -3826,6 +4066,94 @@ void ChangeFactionCulture(std::string old_civilization_name, std::string faction
 	for (int i = 0; i < MaxCosts + 1; ++i) {
 		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[i] = GrandStrategyGame.Factions[old_civilization][old_faction]->Resources[i];
 	}
+}
+
+void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (faction == -1 || resource == -1) {
+		return;
+	}
+	
+	GrandStrategyGame.Factions[civilization][faction]->Trade[resource] = quantity;
+}
+
+void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (faction == -1 || resource == -1) {
+		return;
+	}
+	
+	GrandStrategyGame.Factions[civilization][faction]->Trade[resource] += quantity;
+}
+
+int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (faction == -1 || resource == -1) {
+		return 0;
+	}
+	
+	return GrandStrategyGame.Factions[civilization][faction]->Trade[resource];
+}
+
+int GetCommodityPrice(std::string resource_name)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (resource == -1) {
+		return 0;
+	}
+	
+	return GrandStrategyGame.CommodityPrices[resource];
+}
+
+void SetResourceBasePrice(std::string resource_name, int price)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (resource == -1) {
+		return;
+	}
+	
+	DefaultResourcePrices[resource] = price;
 }
 
 //@}

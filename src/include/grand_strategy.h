@@ -124,6 +124,7 @@ public:
 	bool HasBuildingClass(std::string building_class_name);
 	bool BordersProvince(int province_id);
 	bool BordersFaction(int faction_civilization, int faction);
+	int GetResourceDemand(int resource);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);
@@ -166,6 +167,7 @@ public:
 		memset(Resources, 0, sizeof(Resources));
 		memset(Income, 0, sizeof(Income));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
+		memset(Trade, 0, sizeof(Trade));
 	}
 	
 	void SetTechnology(int upgrade_id, bool has_technology);
@@ -176,11 +178,12 @@ public:
 	int Civilization;													/// Civilization of the faction (-1 = none).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
 	int ProvinceCount;													/// Quantity of provinces owned by this faction.
-	bool Technologies[UpgradeMax];										/// Whether a faction has a particualr technology or not; 0 = technology hasn't been acquired, 1 = technology is under research, 2 = technology has been researched
+	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
 	int OwnedProvinces[ProvinceMax];									/// Provinces owned by this faction
 	int Resources[MaxCosts + 1];										/// Amount of each resource stored by the faction ("+ 1" because of food).
 	int Income[MaxCosts + 1];											/// Income of each resource for the faction ("+ 1" because of food).
 	int ProductionEfficiencyModifier[MaxCosts + 1];						/// Efficiency modifier for each resource.
+	int Trade[MaxCosts + 1];											/// How much of each resource the faction wants to trade ("+ 1" because of food); negative values are imports and positive ones exports
 };
 
 class CRiver
@@ -213,6 +216,7 @@ public:
 				WorldMapResources[i][j][2] = 0;
 			}
 		}
+		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
 
 	void Clean();
@@ -220,10 +224,13 @@ public:
 	void DrawMinimap();						/// Draw the minimap
 	void DrawTileTooltip(int x, int y);		/// Draw the tooltip for a tile
 	void DoTurn();							/// Process the grand strategy turn
+	void DoTrade();							/// Process trade deals
+	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
 	#if defined(USE_OPENGL) || defined(USE_GLES)
 	void CreateMinimapTexture();
 	#endif
 	void UpdateMinimap();
+	bool TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b);
 	Vec2i GetTileUnderCursor();
 
 public:
@@ -247,6 +254,7 @@ public:
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
 	int WorldMapResources[MaxCosts + 1][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
+	int CommodityPrices[MaxCosts + 1];								///price for every 100 of each commodity
 
 	int MinimapTextureWidth;
 	int MinimapTextureHeight;
@@ -350,7 +358,11 @@ extern int GetFactionIncome(std::string civilization_name, std::string faction_n
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
 extern void ChangeFactionCulture(std::string old_civilization_name, std::string faction_name, std::string new_civilization_name);
-//Wyrmgus end
+extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
+extern void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
+extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);
+extern int GetCommodityPrice(std::string resource_name);
+extern void SetResourceBasePrice(std::string resource_name, int price);
 
 //@}
 

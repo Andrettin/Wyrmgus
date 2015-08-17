@@ -587,6 +587,10 @@ int DefaultResourceAmounts[MaxCosts];
 */
 int DefaultResourceMaxAmounts[MaxCosts];
 
+//Wyrmgus start
+int DefaultResourcePrices[MaxCosts + 1];
+//Wyrmgus end
+
 /**
 **  Default names for the resources.
 */
