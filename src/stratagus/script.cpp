@@ -2623,6 +2623,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 			}
 		}
 		for (int i = 0; i < MaxCosts + 1; ++i) {
+			if (GrandStrategyGame.CommodityPrices[i] != DefaultResourcePrices[i]) {
+				fprintf(fd, "SetCommodityPrice(\"%s\", %d)\n", DefaultResourceNames[i].c_str(), GrandStrategyGame.CommodityPrices[i]); //save commodity prices
+			}
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
 				if (GrandStrategyGame.WorldMapResources[i][j][0] == -1 && GrandStrategyGame.WorldMapResources[i][j][1] == -1 && GrandStrategyGame.WorldMapResources[i][j][2] == 0) { //if reached a blank spot, stop the loop
 					break;

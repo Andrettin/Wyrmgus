@@ -361,6 +361,7 @@ extern void ChangeFactionCulture(std::string old_civilization_name, std::string 
 extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);
+extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);
 

@@ -546,7 +546,12 @@ void CGrandStrategyGame::DoTurn()
 
 void CGrandStrategyGame::DoTrade()
 {
-	bool province_consumed_commodity[MaxCosts + 1][ProvinceMax] = { false };
+	bool province_consumed_commodity[MaxCosts + 1][ProvinceMax];
+	for (int i = 0; i < MaxCosts + 1; ++i) {
+		for (int j = 0; j < this->ProvinceCount; ++j) {
+			province_consumed_commodity[i][j] = false;
+		}
+	}
 	
 	// first sell to domestic provinces, then to other factions, and only then to foreign provinces
 	for (int i = 0; i < MAX_RACES; ++i) {
@@ -690,7 +695,8 @@ void CGrandStrategyGame::DoTrade()
 	}
 
 	// check whether offers or bids have been greater, and change the commodity's price accordingly
-	int remaining_wanted_trade[MaxCosts + 1] = { 0 };
+	int remaining_wanted_trade[MaxCosts + 1];
+	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			remaining_wanted_trade[WoodCost] += factions_by_prestige[i]->Trade[WoodCost];
@@ -739,11 +745,11 @@ void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, C
 		importer_faction.Trade[resource] += exporter_faction.Trade[resource];
 		exporter_faction.Trade[resource] = 0;
 	} else {
-		importer_faction.Resources[resource] += importer_faction.Trade[resource];
-		exporter_faction.Resources[resource] -= importer_faction.Trade[resource];
+		importer_faction.Resources[resource] += abs(importer_faction.Trade[resource]);
+		exporter_faction.Resources[resource] -= abs(importer_faction.Trade[resource]);
 
-		importer_faction.Resources[GoldCost] -= importer_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
-		exporter_faction.Resources[GoldCost] += importer_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
+		importer_faction.Resources[GoldCost] -= abs(importer_faction.Trade[resource]) * this->CommodityPrices[resource] / 100;
+		exporter_faction.Resources[GoldCost] += abs(importer_faction.Trade[resource]) * this->CommodityPrices[resource] / 100;
 		
 		exporter_faction.Trade[resource] += importer_faction.Trade[resource];
 		importer_faction.Trade[resource] = 0;
@@ -4126,6 +4132,20 @@ int GetFactionCommodityTrade(std::string civilization_name, std::string faction_
 	}
 	
 	return GrandStrategyGame.Factions[civilization][faction]->Trade[resource];
+}
+
+void SetCommodityPrice(std::string resource_name, int price)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (resource == -1) {
+		return;
+	}
+	
+	GrandStrategyGame.CommodityPrices[resource] = price;
 }
 
 int GetCommodityPrice(std::string resource_name)
