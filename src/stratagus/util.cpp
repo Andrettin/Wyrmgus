@@ -633,6 +633,52 @@ std::string TransliterateText(std::string text) //convert special characters int
 	return text;
 }
 
+std::string CapitalizeString(std::string text)
+{
+	text[0] = toupper(text[0]);
+	
+	// replace special characters which may not have been uppered with the previous method
+	text = FindAndReplaceStringBeginning(text, "ā", "Ā");
+	text = FindAndReplaceStringBeginning(text, "â", "Â");
+	text = FindAndReplaceStringBeginning(text, "æ", "Æ");
+	text = FindAndReplaceStringBeginning(text, "ǣ", "Ǣ");
+	text = FindAndReplaceStringBeginning(text, "ǽ", "Ǽ");
+	text = FindAndReplaceStringBeginning(text, "ð", "Ð");
+	text = FindAndReplaceStringBeginning(text, "ḍ", "Ḍ");
+	text = FindAndReplaceStringBeginning(text, "ē", "Ē");
+	text = FindAndReplaceStringBeginning(text, "ê", "Ê");
+	text = FindAndReplaceStringBeginning(text, "ě", "Ě");
+	text = FindAndReplaceStringBeginning(text, "ī", "Ī");
+	text = FindAndReplaceStringBeginning(text, "î", "Î");
+	text = FindAndReplaceStringBeginning(text, "ĭ", "Ĭ");
+	text = FindAndReplaceStringBeginning(text, "ī̆", "Ī̆");
+	text = FindAndReplaceStringBeginning(text, "ō", "Ō");
+	text = FindAndReplaceStringBeginning(text, "ô", "Ô");
+	text = FindAndReplaceStringBeginning(text, "ø", "Ø");
+	text = FindAndReplaceStringBeginning(text, "ǫ", "Ǫ");
+	text = FindAndReplaceStringBeginning(text, "þ", "Þ");
+	text = FindAndReplaceStringBeginning(text, "ū", "Ū");
+	text = FindAndReplaceStringBeginning(text, "û", "Û");
+	text = FindAndReplaceStringBeginning(text, "ŭ", "Ŭ");
+	text = FindAndReplaceStringBeginning(text, "ȳ", "Ȳ");
+	text = FindAndReplaceStringBeginning(text, "ž", "Ž");
+	
+	//Greek characters
+	text = FindAndReplaceStringBeginning(text, "α", "Α");
+	text = FindAndReplaceStringBeginning(text, "χ", "Χ");
+	text = FindAndReplaceStringBeginning(text, "έ", "Έ");
+	text = FindAndReplaceStringBeginning(text, "ι", "Ι");
+	text = FindAndReplaceStringBeginning(text, "μ", "Μ");
+	text = FindAndReplaceStringBeginning(text, "ν", "Ν");
+	text = FindAndReplaceStringBeginning(text, "ο", "Ο");
+	text = FindAndReplaceStringBeginning(text, "ό", "Ό");
+	text = FindAndReplaceStringBeginning(text, "σ", "Σ");
+	text = FindAndReplaceStringBeginning(text, "θ", "Θ");
+	text = FindAndReplaceStringBeginning(text, "ύ", "Ύ");
+	
+	return text;
+}
+
 std::string DecapitalizeString(std::string text)
 {
 	text[0] = tolower(text[0]);

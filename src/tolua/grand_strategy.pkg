@@ -7,6 +7,7 @@ extern int WorldMapOffsetY;
 extern int GrandStrategyMapWidthIndent;
 extern int GrandStrategyMapHeightIndent;
 extern int BattalionMultiplier;
+extern std::string GrandStrategyInterfaceState;
 
 extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();
@@ -52,6 +53,7 @@ extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, 
 extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
+extern void SetSelectedProvince(std::string province_name);
 extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();

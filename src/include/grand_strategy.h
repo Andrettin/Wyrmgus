@@ -125,6 +125,7 @@ public:
 	bool BordersProvince(int province_id);
 	bool BordersFaction(int faction_civilization, int faction);
 	int GetResourceDemand(int resource);
+	int GetAdministrativeEfficiencyModifier();
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);
@@ -207,7 +208,7 @@ public:
 class CGrandStrategyGame
 {
 public:
-	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0)
+	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), SelectedProvince(-1)
 	{
 		for (int i = 0; i < MaxCosts + 1; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
@@ -222,6 +223,7 @@ public:
 	void Clean();
 	void DrawMap();							/// Draw the map area
 	void DrawMinimap();						/// Draw the minimap
+	void DrawInterface();					/// Draw the interface
 	void DrawTileTooltip(int x, int y);		/// Draw the tooltip for a tile
 	void DoTurn();							/// Process the grand strategy turn
 	void DoTrade();							/// Process trade deals
@@ -237,6 +239,7 @@ public:
 	int WorldMapWidth;
 	int WorldMapHeight;
 	int ProvinceCount;
+	int SelectedProvince;
 	CGraphic *FogTile;
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
 	CGraphic *GoldMineGraphics;
@@ -279,6 +282,7 @@ extern int WorldMapOffsetY;
 extern int GrandStrategyMapWidthIndent;
 extern int GrandStrategyMapHeightIndent;
 extern int BattalionMultiplier;
+extern std::string GrandStrategyInterfaceState;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 
 extern int GetWorldMapWidth();
@@ -326,6 +330,7 @@ extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, 
 extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
+extern void SetSelectedProvince(std::string province_name);
 extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();

@@ -65,6 +65,7 @@ int WorldMapOffsetY;
 int GrandStrategyMapWidthIndent;
 int GrandStrategyMapHeightIndent;
 int BattalionMultiplier;
+std::string GrandStrategyInterfaceState;
 CGrandStrategyGame GrandStrategyGame;
 
 /*----------------------------------------------------------------------------
@@ -419,6 +420,24 @@ void CGrandStrategyGame::DrawMinimap()
 	int rectangle_height = (((UI.MapArea.EndY - UI.MapArea.Y) / 64) + 1) * this->MinimapTileHeight / 1000;
 
 	Video.DrawRectangle(ColorGray, start_x, start_y, rectangle_width, rectangle_height);
+}
+
+void CGrandStrategyGame::DrawInterface()
+{
+	if (this->SelectedProvince != -1) {
+		if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
+			int item_y = -2;
+			
+			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization != -1) {
+				std::string province_culture_string = "Province Culture: " + CapitalizeString(PlayerRaces.Name[GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization]);
+				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(province_culture_string) / 2), UI.InfoPanel.Y + 180 + (item_y * 47), province_culture_string);
+				item_y += 1;
+			}
+			
+			std::string administrative_efficiency_string = "Administrative Efficiency: " + std::to_string((long long) 100 + GrandStrategyGame.Provinces[this->SelectedProvince]->GetAdministrativeEfficiencyModifier()) + "%";
+			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(administrative_efficiency_string) / 2), UI.InfoPanel.Y + 180 + (item_y * 47), administrative_efficiency_string);
+		}
+	}
 }
 
 /**
@@ -1167,6 +1186,17 @@ int CProvince::GetResourceDemand(int resource)
 	return quantity;
 }
 
+int CProvince::GetAdministrativeEfficiencyModifier()
+{
+	int modifier = 0;
+	
+	if (this->Civilization != -1 && this->Owner[0] != -1 && this->Owner[1] != -1) {
+		modifier += this->Civilization == this->Owner[0] ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to its administrative efficiency modifier
+	}
+	
+	return modifier;
+}
+			
 /**
 **  Get the province's cultural name.
 */
@@ -2095,9 +2125,7 @@ void CGrandStrategyFaction::CalculateIncome(int resource)
 				province_research += 2;
 			}
 			
-			int culture_penalty = GrandStrategyGame.Provinces[province_id]->Civilization == GrandStrategyGame.Provinces[province_id]->Owner[0] ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to production
-			
-			income += province_research * (100 + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + culture_penalty) / 100;
+			income += province_research * (100 + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->GetAdministrativeEfficiencyModifier()) / 100;
 		}
 		income *= 100 + this->ProductionEfficiencyModifier[resource];
 		income /= 100;
@@ -2115,9 +2143,7 @@ void CGrandStrategyFaction::CalculateIncome(int resource)
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 					
 				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] == this->Civilization && GrandStrategyGame.Provinces[province_id]->Owner[1] == this->Faction && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
-					int culture_penalty = GrandStrategyGame.Provinces[province_id]->Civilization == GrandStrategyGame.Provinces[province_id]->Owner[0] ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to production
-						
-					income += GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction * (100 + this->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + culture_penalty) / 100;
+					income += GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction * (100 + this->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->GetAdministrativeEfficiencyModifier()) / 100;
 				}
 			} else {
 				break;
@@ -3148,6 +3174,15 @@ void SetProvinceAttackedBy(std::string province_name, std::string civilization_n
 	}
 }
 
+void SetSelectedProvince(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		GrandStrategyGame.SelectedProvince = province_id;
+	}
+}
+
 void UpdateProvinceMinimap(std::string province_name)
 {
 	int province_id = GetProvinceId(province_name);
@@ -3279,6 +3314,7 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
 	GrandStrategyGame.ProvinceCount = 0;
+	GrandStrategyGame.SelectedProvince = -1;
 	
 	//destroy minimap surface
 #if defined(USE_OPENGL) || defined(USE_GLES)

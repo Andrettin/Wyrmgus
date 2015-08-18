@@ -82,7 +82,7 @@ static void MenuHandleButtonUp(unsigned)
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
 			if (GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province != -1) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), "if (SetSelectedProvince ~= nil) then SetSelectedProvince(GetTileProvince(%d, %d)) end;", GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+				snprintf(buf, sizeof(buf), "if (SetSelectedProvinceLua ~= nil) then SetSelectedProvinceLua(GetTileProvince(%d, %d)) end;", GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
 				CclCommand(buf);
 			}
 		}

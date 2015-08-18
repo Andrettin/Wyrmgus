@@ -318,6 +318,8 @@ void UpdateDisplay()
 		
 		GrandStrategyGame.DrawMinimap();
 		
+		GrandStrategyGame.DrawInterface();
+		
 		if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y] && !GrandStrategyGamePaused) {
 			GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
 		}
