@@ -426,16 +426,20 @@ void CGrandStrategyGame::DrawInterface()
 {
 	if (this->SelectedProvince != -1) {
 		if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
-			int item_y = -2;
+			int item_y = 0;
 			
 			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization != -1) {
 				std::string province_culture_string = "Province Culture: " + CapitalizeString(PlayerRaces.Name[GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization]);
-				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(province_culture_string) / 2), UI.InfoPanel.Y + 180 + (item_y * 47), province_culture_string);
+				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(province_culture_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), province_culture_string);
 				item_y += 1;
 			}
 			
 			std::string administrative_efficiency_string = "Administrative Efficiency: " + std::to_string((long long) 100 + GrandStrategyGame.Provinces[this->SelectedProvince]->GetAdministrativeEfficiencyModifier()) + "%";
-			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(administrative_efficiency_string) / 2), UI.InfoPanel.Y + 180 + (item_y * 47), administrative_efficiency_string);
+			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(administrative_efficiency_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), administrative_efficiency_string);
+			item_y += 1;
+			
+			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetRevoltRisk()) + "%";
+			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
 		}
 	}
 }
@@ -541,6 +545,39 @@ void CGrandStrategyGame::DoTurn()
 			if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == false && GrandStrategyWorld != "Earth") {
 				if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->HasBuildingClass("barracks") && this->Provinces[i]->HasBuildingClass("smithy")) {
 					this->Provinces[i]->SetSettlementBuilding(mercenary_camp_id, true);
+				}
+			}
+			
+			if (this->Provinces[i]->Owner[0] != -1 && this->Provinces[i]->Owner[1] != -1) {
+				//check revolt risk and potentially trigger a revolt
+				if (this->Provinces[i]->GetRevoltRisk() > 0 && SyncRand(100) < this->Provinces[i]->GetRevoltRisk() && this->Provinces[i]->AttackedBy[0] == -1 && this->Provinces[i]->AttackedBy[1] == -1) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn)
+					int possible_revolters[FactionMax];
+					int possible_revolter_count = 0;
+					for (int j = 0; j < this->Provinces[i]->ClaimCount; ++j) {
+						if (
+							this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Civilization
+							&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j][1]]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner[0]][this->Provinces[i]->Owner[1]]->Type
+							&& !(this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Owner[0] && this->Provinces[i]->Claims[j][1] == this->Provinces[i]->Owner[1])
+						) { //if faction which has a claim on this province has the same civilization as the province, and if it is of the same faction type as the province's owner
+							possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j][1];
+							possible_revolter_count += 1;
+						}
+					}
+					if (possible_revolter_count > 0) {
+						int revolter_faction = possible_revolters[SyncRand(possible_revolter_count)];
+						this->Provinces[i]->AttackedBy[0] = this->Provinces[i]->Civilization;
+						this->Provinces[i]->AttackedBy[1] = revolter_faction;
+						
+						int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
+						
+						if (infantry_id != -1) {
+							this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(12) + 1; // ideally should be militia, but only the dwarves have that sort of unit
+						}
+					}
+				}
+				
+				if (!this->Provinces[i]->HasFactionClaim(this->Provinces[i]->Owner[0], this->Provinces[i]->Owner[1]) && SyncRand(100) < 1) { // 1% chance the owner of this province will get a claim on it
+					this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner[0], this->Provinces[i]->Owner[1]);
 				}
 			}
 		} else { //if a somehow invalid province is reached
@@ -1119,6 +1156,28 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 	}
 }
 
+void CProvince::AddFactionClaim(int civilization_id, int faction_id)
+{
+	this->Claims[this->ClaimCount][0] = civilization_id;
+	this->Claims[this->ClaimCount][1] = faction_id;
+	this->ClaimCount += 1;
+}
+
+void CProvince::RemoveFactionClaim(int civilization_id, int faction_id)
+{
+	for (int i = 0; i < this->ClaimCount; ++i) {
+		if (this->Claims[i][0] == civilization_id && this->Claims[i][1] == faction_id) {
+			//if this claim's faction is the one we are removing, push every element of the array after it back one step
+			for (int j = i; j < this->ClaimCount; ++j) {
+				this->Claims[j][0] = this->Claims[j + 1][0];
+				this->Claims[j][1] = this->Claims[j + 1][1];
+			}
+			break;
+		}
+	}
+	this->ClaimCount -= 1;
+}
+
 bool CProvince::HasBuildingClass(std::string building_class_name)
 {
 	if (this->Civilization == -1 || building_class_name.empty()) {
@@ -1135,6 +1194,16 @@ bool CProvince::HasBuildingClass(std::string building_class_name)
 		return true;
 	}
 
+	return false;
+}
+
+bool CProvince::HasFactionClaim(int civilization_id, int faction_id)
+{
+	for (int i = 0; i < this->ClaimCount; ++i) {
+		if (this->Claims[i][0] == civilization_id && this->Claims[i][1] == faction_id) {
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -1196,7 +1265,24 @@ int CProvince::GetAdministrativeEfficiencyModifier()
 	
 	return modifier;
 }
-			
+
+int CProvince::GetRevoltRisk()
+{
+	int revolt_risk = 0;
+	
+	if (this->Civilization != -1 && this->Owner[0] != -1 && this->Owner[1] != -1) {
+		if (this->Civilization != this->Owner[0]) {
+			revolt_risk += 3; //if the province is of a different culture than its owner, it gets plus 3% revolt risk
+		}
+		
+		if (!this->HasFactionClaim(this->Owner[0], this->Owner[1])) {
+			revolt_risk += 2; //if the owner does not have a claim to the province, it gets plus 2% revolt risk
+		}
+	}
+	
+	return revolt_risk;
+}
+
 /**
 **  Get the province's cultural name.
 */
@@ -3137,8 +3223,7 @@ void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::st
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type] = quantity;
-		GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type]);
+		GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[unit_type] = std::max(0, quantity);
 	}
 }
 
@@ -3148,8 +3233,7 @@ void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_t
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type] = quantity;
-		GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type]);
+		GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type] = std::max(0, quantity);
 	}
 }
 
@@ -3159,8 +3243,7 @@ void SetProvinceAttackingUnitQuantity(std::string province_name, std::string uni
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type] = quantity;
-		GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type]);
+		GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type] = std::max(0, quantity);
 	}
 }
 
@@ -3180,6 +3263,36 @@ void SetSelectedProvince(std::string province_name)
 
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		GrandStrategyGame.SelectedProvince = province_id;
+	}
+}
+
+void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		if (civilization != -1) {
+			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			if (faction != -1) {
+				GrandStrategyGame.Provinces[province_id]->AddFactionClaim(civilization, faction);
+			}
+		}
+	}
+}
+
+void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		if (civilization != -1) {
+			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			if (faction != -1) {
+				GrandStrategyGame.Provinces[province_id]->RemoveFactionClaim(civilization, faction);
+			}
+		}
 	}
 }
 
@@ -3235,6 +3348,7 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->CurrentConstruction = -1;
 			GrandStrategyGame.Provinces[i]->AttackedBy[0] = -1;
 			GrandStrategyGame.Provinces[i]->AttackedBy[1] = -1;
+			GrandStrategyGame.Provinces[i]->ClaimCount = 0;
 			GrandStrategyGame.Provinces[i]->Water = false;
 			GrandStrategyGame.Provinces[i]->SettlementLocation.x = -1;
 			GrandStrategyGame.Provinces[i]->SettlementLocation.y = -1;
@@ -3245,6 +3359,10 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.Provinces[i]->FactionCulturalNames[j][k] = "";
 					GrandStrategyGame.Provinces[i]->FactionCulturalSettlementNames[j][k] = "";
 				}
+			}
+			for (int j = 0; j < MAX_RACES * FactionMax; ++j) {
+				GrandStrategyGame.Provinces[i]->Claims[j][0] = -1;
+				GrandStrategyGame.Provinces[i]->Claims[j][1] = -1;
 			}
 			for (size_t j = 0; j < UnitTypes.size(); ++j) {
 				GrandStrategyGame.Provinces[i]->SettlementBuildings[j] = false;
@@ -3765,6 +3883,19 @@ bool ProvinceHasBuildingClass(std::string province_name, std::string building_cl
 	int province_id = GetProvinceId(province_name);
 	
 	return GrandStrategyGame.Provinces[province_id]->HasBuildingClass(building_class);
+}
+
+bool ProvinceHasClaim(std::string province_name, std::string faction_civilization_name, std::string faction_name)
+{
+	int province = GetProvinceId(province_name);
+	int civilization = PlayerRaces.GetRaceIndexByName(faction_civilization_name.c_str());
+	int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	
+	if (civilization == -1 || faction == -1) {
+		return false;
+	}
+	
+	return GrandStrategyGame.Provinces[province]->HasFactionClaim(civilization, faction);
 }
 
 bool IsGrandStrategyBuilding(const CUnitType &type)

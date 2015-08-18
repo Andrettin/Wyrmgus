@@ -100,7 +100,7 @@ class CProvince
 public:
 	CProvince() :
 		Name(""), SettlementName(""),
-		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
+		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1), ClaimCount(0),
 		Water(false), SettlementLocation(-1, -1)
 	{
 		memset(Owner, -1, sizeof(Owner));
@@ -116,16 +116,24 @@ public:
 			Tiles[i].x = -1;
 			Tiles[i].y = -1;
 		}
+		for (int i = 0; i < MAX_RACES * FactionMax; ++i) {
+			Claims[i][0] = -1;
+			Claims[i][1] = -1;
+		}
 	}
 	
 	void UpdateMinimap();
 	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
+	void AddFactionClaim(int civilization_id, int faction_id);
+	void RemoveFactionClaim(int civilization_id, int faction_id);
 	bool HasBuildingClass(std::string building_class_name);
+	bool HasFactionClaim(int civilization_id, int faction_id);
 	bool BordersProvince(int province_id);
 	bool BordersFaction(int faction_civilization, int faction);
 	int GetResourceDemand(int resource);
 	int GetAdministrativeEfficiencyModifier();
+	int GetRevoltRisk();
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);
@@ -140,6 +148,7 @@ public:
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	int CurrentConstruction;											/// Building currently under construction (unit type index).
 	int AttackedBy[2];													/// Which faction the province is being attacked by (-1, -1 = none); first number for the faction's civilization, and the second number is for the faction itself.
+	int ClaimCount;
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
@@ -150,6 +159,7 @@ public:
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
 	int ProductionEfficiencyModifier[MaxCosts + 1];						/// Efficiency modifier for each resource.
+	int Claims[MAX_RACES * FactionMax][2];								/// Factions which claim this province
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
 	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
@@ -331,6 +341,8 @@ extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetSelectedProvince(std::string province_name);
+extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
+extern void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
@@ -342,6 +354,7 @@ extern void CenterGrandStrategyMapOnTile(int x, int y);
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
+extern bool ProvinceHasClaim(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool IsGrandStrategyBuilding(const CUnitType &type);
 extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
 extern std::string GetProvinceCurrentConstruction(std::string province_name);

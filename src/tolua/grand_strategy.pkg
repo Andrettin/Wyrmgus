@@ -54,6 +54,8 @@ extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetSelectedProvince(std::string province_name);
+extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
+extern void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
@@ -65,6 +67,7 @@ extern void CenterGrandStrategyMapOnTile(int x, int y);
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
+extern bool ProvinceHasClaim(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
 extern std::string GetProvinceCurrentConstruction(std::string province_name);
 extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident);
