@@ -558,6 +558,7 @@ void CGrandStrategyGame::DoTurn()
 							this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Civilization
 							&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j][1]]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner[0]][this->Provinces[i]->Owner[1]]->Type
 							&& !(this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Owner[0] && this->Provinces[i]->Claims[j][1] == this->Provinces[i]->Owner[1])
+							&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j][0]][GrandStrategyGame.Provinces[i]->Claims[j][1]]->Name != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner[0]][GrandStrategyGame.Provinces[i]->Owner[1]]->Name // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
 						) { //if faction which has a claim on this province has the same civilization as the province, and if it is of the same faction type as the province's owner
 							possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j][1];
 							possible_revolter_count += 1;
