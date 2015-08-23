@@ -1129,6 +1129,128 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 	}
 }
 
+void CProvince::SetCivilization(int civilization)
+{
+	int old_civilization = this->Civilization;
+	
+	this->Civilization = civilization;
+	
+	if (civilization != -1) {
+		// create new cultural names for the province's terrain features, if there aren't any
+		for (int i = 0; i < ProvinceTileMax; ++i) {
+			int x = this->Tiles[i].x;
+			int y = this->Tiles[i].y;
+			if (x == -1 || y == -1) {
+				break;
+			}
+			if (GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization].empty()) {
+				std::string new_tile_name = "";
+				// first see if can translate the cultural name of the old civilization
+				if (old_civilization != -1 && !GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization].empty()) {
+					new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], civilization);
+				}
+				if (new_tile_name == "") { // try to translate any cultural name
+					for (int i = 0; i < MAX_RACES; ++i) {
+						if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].empty()) {
+							new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i], civilization);
+							if (!new_tile_name.empty()) {
+								break;
+							}
+						}
+					}
+				}
+				if (new_tile_name == "") { // if trying to translate all cultural names failed, generate a new name
+					new_tile_name = this->GenerateTileName(civilization, GrandStrategyGame.WorldMapTiles[x][y]->Terrain);
+				}
+				if (new_tile_name != "") {
+					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = new_tile_name;
+				}
+			}
+		}
+			
+		// create a new cultural name for the province's settlement, if there isn't any
+		if (this->CulturalSettlementNames[civilization].empty()) {
+			std::string new_settlement_name = "";
+			// first see if can translate the cultural name of the old civilization
+			if (old_civilization != -1 && !this->CulturalSettlementNames[old_civilization].empty()) {
+				new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[old_civilization], civilization);
+			}
+			if (new_settlement_name == "") { // try to translate any cultural name
+				for (int i = 0; i < MAX_RACES; ++i) {
+					if (!this->CulturalSettlementNames[i].empty()) {
+						new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[i], civilization);
+						if (!new_settlement_name.empty()) {
+							break;
+						}
+					}
+				}
+			}
+			if (new_settlement_name == "") { // if trying to translate all cultural names failed, generate a new name
+				new_settlement_name = this->GenerateSettlementName(civilization);
+			}
+			if (new_settlement_name != "") {
+				this->CulturalSettlementNames[civilization] = new_settlement_name;
+			}
+		}
+			
+		// create a new cultural name for the province, if there isn't any
+		if (this->CulturalNames[civilization].empty()) {
+			std::string new_province_name = "";
+			// first see if can translate the cultural name of the old civilization
+			if (old_civilization != -1 && !this->CulturalNames[old_civilization].empty()) {
+				new_province_name = PlayerRaces.TranslateName(this->CulturalNames[old_civilization], civilization);
+			}
+			if (new_province_name == "") { // try to translate any cultural name
+				for (int i = 0; i < MAX_RACES; ++i) {
+					if (!this->CulturalNames[i].empty()) {
+						new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], civilization);
+						if (!new_province_name.empty()) {
+							break;
+						}
+					}
+				}
+			}
+			if (new_province_name == "") { // if trying to translate all cultural names failed, generate a new name
+				new_province_name = this->GenerateProvinceName(civilization);
+			}
+			if (new_province_name != "") {
+				this->CulturalNames[civilization] = new_province_name;
+			}
+		}
+		
+		for (size_t i = 0; i < UnitTypes.size(); ++i) {
+			// replace existent buildings from other civilizations with buildings of the new civilization
+			if (IsGrandStrategyBuilding(*UnitTypes[i]) && !UnitTypes[i]->Civilization.empty()) {
+				if (this->SettlementBuildings[i] && PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
+					this->SetSettlementBuilding(i, false); // remove building from other civilization
+					if (PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
+						this->SetSettlementBuilding(PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), true);
+					}
+				}
+			// replace existent units from the previous civilization with units of the new civilization
+			} else if (
+				IsGrandStrategyUnit(*UnitTypes[i])
+				&& !UnitTypes[i]->Class.empty()
+				&& !UnitTypes[i]->Civilization.empty()
+				&& PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
+				&& PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
+				&& PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) // don't replace if both civilizations use the same unit type
+			) {
+				this->Units[PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->Units[i];
+				this->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
+				this->Units[i] = 0;
+				this->UnderConstructionUnits[i] = 0;
+			}
+		}
+	}
+	
+	this->CurrentConstruction = -1; // under construction buildings get canceled
+	
+	if (this->Owner[0] != -1 && this->Owner[1] != -1) {
+		GrandStrategyGame.Factions[this->Owner[0]][this->Owner[1]]->CalculateIncomes();
+	}
+}
+
 void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
 {
 	if (this->SettlementBuildings[building_id] == has_settlement_building) {
@@ -2997,95 +3119,9 @@ void SetProvinceCivilization(std::string province_name, std::string civilization
 {
 	int province_id = GetProvinceId(province_name);
 	
-	int old_civilization = GrandStrategyGame.Provinces[province_id]->Civilization;
-	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		GrandStrategyGame.Provinces[province_id]->Civilization = civilization;
-			
-		if (civilization != -1) {
-			// create new cultural names for the province's terrain features, if there aren't any
-			for (int i = 0; i < ProvinceTileMax; ++i) {
-				int x = GrandStrategyGame.Provinces[province_id]->Tiles[i].x;
-				int y = GrandStrategyGame.Provinces[province_id]->Tiles[i].y;
-				if (x == -1 || y == -1) {
-					break;
-				}
-				if (GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization].empty()) {
-					std::string new_tile_name = "";
-					// first see if can translate the cultural name of the old civilization
-					if (old_civilization != -1 && !GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization].empty()) {
-						new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], civilization);
-					}
-					if (new_tile_name == "") { // try to translate any cultural name
-						for (int i = 0; i < MAX_RACES; ++i) {
-							if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].empty()) {
-								new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i], civilization);
-								if (!new_tile_name.empty()) {
-									break;
-								}
-							}
-						}
-					}
-					if (new_tile_name == "") { // if trying to translate all cultural names failed, generate a new name
-						new_tile_name = GrandStrategyGame.Provinces[province_id]->GenerateTileName(civilization, GrandStrategyGame.WorldMapTiles[x][y]->Terrain);
-					}
-					if (new_tile_name != "") {
-						GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = new_tile_name;
-					}
-				}
-			}
-			
-			// create a new cultural name for the province's settlement, if there isn't any
-			if (GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[civilization].empty()) {
-				std::string new_settlement_name = "";
-				// first see if can translate the cultural name of the old civilization
-				if (old_civilization != -1 && !GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[old_civilization].empty()) {
-					new_settlement_name = PlayerRaces.TranslateName(GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[old_civilization], civilization);
-				}
-				if (new_settlement_name == "") { // try to translate any cultural name
-					for (int i = 0; i < MAX_RACES; ++i) {
-						if (!GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[i].empty()) {
-							new_settlement_name = PlayerRaces.TranslateName(GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[i], civilization);
-							if (!new_settlement_name.empty()) {
-								break;
-							}
-						}
-					}
-				}
-				if (new_settlement_name == "") { // if trying to translate all cultural names failed, generate a new name
-					new_settlement_name = GrandStrategyGame.Provinces[province_id]->GenerateSettlementName(civilization);
-				}
-				if (new_settlement_name != "") {
-					GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[civilization] = new_settlement_name;
-				}
-			}
-			
-			// create a new cultural name for the province, if there isn't any
-			if (GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization].empty()) {
-				std::string new_province_name = "";
-				// first see if can translate the cultural name of the old civilization
-				if (old_civilization != -1 && !GrandStrategyGame.Provinces[province_id]->CulturalNames[old_civilization].empty()) {
-					new_province_name = PlayerRaces.TranslateName(GrandStrategyGame.Provinces[province_id]->CulturalNames[old_civilization], civilization);
-				}
-				if (new_province_name == "") { // try to translate any cultural name
-					for (int i = 0; i < MAX_RACES; ++i) {
-						if (!GrandStrategyGame.Provinces[province_id]->CulturalNames[i].empty()) {
-							new_province_name = PlayerRaces.TranslateName(GrandStrategyGame.Provinces[province_id]->CulturalNames[i], civilization);
-							if (!new_province_name.empty()) {
-								break;
-							}
-						}
-					}
-				}
-				if (new_province_name == "") { // if trying to translate all cultural names failed, generate a new name
-					new_province_name = GrandStrategyGame.Provinces[province_id]->GenerateProvinceName(civilization);
-				}
-				if (new_province_name != "") {
-					GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization] = new_province_name;
-				}
-			}
-		}
+		GrandStrategyGame.Provinces[province_id]->SetCivilization(civilization);
 	}
 }
 
@@ -3907,6 +3943,17 @@ bool IsGrandStrategyBuilding(const CUnitType &type)
 	return false;
 }
 
+std::string GetProvinceCivilization(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (GrandStrategyGame.Provinces[province_id]->Civilization != -1) {
+		return PlayerRaces.Name[GrandStrategyGame.Provinces[province_id]->Civilization];
+	} else {
+		return "";
+	}
+}
+
 bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident)
 {
 	int province_id = GetProvinceId(province_name);
@@ -4140,9 +4187,17 @@ void AcquireFactionTechnologies(std::string civilization_from_name, std::string 
 	}
 }
 
+bool IsGrandStrategyUnit(const CUnitType &type)
+{
+	if (!type.BoolFlag[BUILDING_INDEX].value && !type.BoolFlag[HERO_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.Class != "caravan") {
+		return true;
+	}
+	return false;
+}
+
 bool IsMilitaryUnit(const CUnitType &type)
 {
-	if (!type.BoolFlag[BUILDING_INDEX].value && !type.BoolFlag[HERO_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.Class != "worker" && type.Class != "caravan") {
+	if (IsGrandStrategyUnit(type) && type.Class != "worker") {
 		return true;
 	}
 	return false;

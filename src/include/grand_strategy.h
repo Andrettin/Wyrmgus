@@ -124,6 +124,7 @@ public:
 	
 	void UpdateMinimap();
 	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
+	void SetCivilization(int civilization);
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
@@ -356,6 +357,7 @@ extern bool ProvinceBordersFaction(std::string province_name, std::string factio
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
 extern bool ProvinceHasClaim(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool IsGrandStrategyBuilding(const CUnitType &type);
+extern std::string GetProvinceCivilization(std::string province_name);
 extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
 extern std::string GetProvinceCurrentConstruction(std::string province_name);
 extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident);
@@ -373,6 +375,7 @@ extern void ChangeFactionResource(std::string civilization_name, std::string fac
 extern int GetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern void CalculateFactionIncomes(std::string civilization_name, std::string faction_name);
 extern int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
+extern bool IsGrandStrategyUnit(const CUnitType &type);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
 extern void ChangeFactionCulture(std::string old_civilization_name, std::string faction_name, std::string new_civilization_name);

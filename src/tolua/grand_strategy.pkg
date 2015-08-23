@@ -68,6 +68,7 @@ extern bool ProvinceBordersProvince(std::string province_name, std::string secon
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
 extern bool ProvinceHasClaim(std::string province_name, std::string faction_civilization_name, std::string faction_name);
+extern std::string GetProvinceCivilization(std::string province_name);
 extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
 extern std::string GetProvinceCurrentConstruction(std::string province_name);
 extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident);
