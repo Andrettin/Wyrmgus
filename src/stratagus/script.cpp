@@ -2683,6 +2683,22 @@ void SaveGrandStrategyGame(const std::string &filename)
 						fprintf(fd, "AddProvinceClaim(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Claims[j][0]].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j][0]][GrandStrategyGame.Provinces[i]->Claims[j][1]]->Name.c_str());
 					}
 				}
+				for (int j = 0; j < MAX_RACES; ++j) {
+					if (!GrandStrategyGame.Provinces[i]->CulturalNames[j].empty()) {
+						fprintf(fd, "SetProvinceCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Provinces[i]->CulturalNames[j].c_str());
+					}
+					if (!GrandStrategyGame.Provinces[i]->CulturalSettlementNames[j].empty()) {
+						fprintf(fd, "SetProvinceCulturalSettlementName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Provinces[i]->CulturalSettlementNames[j].c_str());
+					}
+					for (int k = 0; k < FactionMax; ++k) {
+						if (!GrandStrategyGame.Provinces[i]->FactionCulturalNames[j][k].empty()) {
+							fprintf(fd, "SetProvinceFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Name.c_str(), GrandStrategyGame.Provinces[i]->FactionCulturalNames[j][k].c_str());
+						}
+						if (!GrandStrategyGame.Provinces[i]->FactionCulturalSettlementNames[j][k].empty()) {
+							fprintf(fd, "SetProvinceFactionCulturalSettlementName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Name.c_str(), GrandStrategyGame.Provinces[i]->FactionCulturalSettlementNames[j][k].c_str());
+						}
+					}
+				}
 			} else {
 				break;
 			}
