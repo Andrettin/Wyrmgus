@@ -130,6 +130,7 @@ public:
 	void RemoveFactionClaim(int civilization_id, int faction_id);
 	bool HasBuildingClass(std::string building_class_name);
 	bool HasFactionClaim(int civilization_id, int faction_id);
+	bool HasResource(int resource, bool ignore_prospection = false);
 	bool BordersProvince(int province_id);
 	bool BordersFaction(int faction_civilization, int faction);
 	int GetResourceDemand(int resource);
@@ -238,6 +239,7 @@ public:
 	void DrawTileTooltip(int x, int y);		/// Draw the tooltip for a tile
 	void DoTurn();							/// Process the grand strategy turn
 	void DoTrade();							/// Process trade deals
+	void DoProspection();					/// Process prospection for the turn
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
 	#if defined(USE_OPENGL) || defined(USE_GLES)
 	void CreateMinimapTexture();
@@ -267,6 +269,7 @@ public:
 	CProvince *Provinces[ProvinceMax];
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
+	CGrandStrategyFaction *PlayerFaction;
 	int WorldMapResources[MaxCosts + 1][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts + 1];								///price for every 100 of each commodity
 
@@ -301,6 +304,7 @@ extern int GetWorldMapHeight();
 extern std::string GetWorldMapTileTerrain(int x, int y);
 extern int GetWorldMapTileTerrainVariation(int x, int y);
 extern std::string GetWorldMapTileProvinceName(int x, int y);
+extern bool WorldMapTileHasResource(int x, int y, std::string resource_name, bool ignore_prospection);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern int GetProvinceId(std::string province_name);
 extern void SetWorldMapSize(int width, int height);
@@ -350,12 +354,14 @@ extern void InitializeGrandStrategyGame();
 extern void InitializeGrandStrategyMinimap();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
+extern void DoProspection();
 extern void CalculateProvinceBorders();
 extern void CenterGrandStrategyMapOnTile(int x, int y);
 extern bool ProvinceBordersProvince(std::string province_name, std::string second_province_name);
 extern bool ProvinceBordersFaction(std::string province_name, std::string faction_civilization_name, std::string faction_name);
 extern bool ProvinceHasBuildingClass(std::string province_name, std::string building_class);
 extern bool ProvinceHasClaim(std::string province_name, std::string faction_civilization_name, std::string faction_name);
+extern bool ProvinceHasResource(std::string province_name, std::string resource_name, bool ignore_prospection);
 extern bool IsGrandStrategyBuilding(const CUnitType &type);
 extern std::string GetProvinceCivilization(std::string province_name);
 extern bool GetProvinceSettlementBuilding(std::string province_name, std::string building_ident);
@@ -370,6 +376,7 @@ extern bool GetFactionTechnology(std::string civilization_name, std::string fact
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
+extern void SetPlayerFaction(std::string civilization_name, std::string faction_name);
 extern void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
 extern void ChangeFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
 extern int GetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name);

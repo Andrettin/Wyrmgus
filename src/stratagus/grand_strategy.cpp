@@ -790,6 +790,48 @@ void CGrandStrategyGame::DoTrade()
 	}
 }
 
+void CGrandStrategyGame::DoProspection()
+{
+	for (int i = 0; i < MaxCosts + 1; ++i) {
+		for (int j = 0; j < WorldMapResourceMax; ++j) {
+			if (GrandStrategyGame.WorldMapResources[i][j][0] != -1 && GrandStrategyGame.WorldMapResources[i][j][1] != -1) {
+				if (GrandStrategyGame.WorldMapResources[i][j][2]) { //already discovered
+					continue;
+				}
+
+				int x = GrandStrategyGame.WorldMapResources[i][j][0];
+				int y = GrandStrategyGame.WorldMapResources[i][j][1];
+				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
+						
+				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1 && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
+					if (SyncRand(100) < 1) { // 1% chance of discovery per turn
+						GrandStrategyGame.WorldMapResources[i][j][2] = 1;
+						GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = true;
+						GrandStrategyGame.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->CalculateIncome(i);
+						if (GrandStrategyGame.PlayerFaction == GrandStrategyGame.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]) {
+							char buf[256];
+							snprintf(
+								buf, sizeof(buf), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(GetTileProvince(\"%s\", \"%s\")) end;",
+								(CapitalizeString(i == FoodCost ? "food" : DefaultResourceNames[i]) + " found in " + GrandStrategyGame.Provinces[province_id]->GetCulturalName()).c_str(),
+								("My lord, " + CapitalizeString(i == FoodCost ? "food" : DefaultResourceNames[i]) + " has been found in the " + DecapitalizeString(GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name) + " of " + GrandStrategyGame.Provinces[province_id]->GetCulturalName() + "!").c_str()
+							);
+							CclCommand(buf);
+							
+							/*
+							if (wyr.preferences.ShowTips) {
+								Tip("Gold Discovery in Province", "Congratulations! You have found gold in one of your provinces. Each gold mine provides you with 200 gold per turn, if a town hall is built in its province.")
+							}
+							*/
+						}
+					}
+				}
+			} else {
+				break;
+			}
+		}
+	}
+}
+
 void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource)
 {
 	if (abs(importer_faction.Trade[resource]) > exporter_faction.Trade[resource]) {
@@ -1324,6 +1366,21 @@ bool CProvince::HasFactionClaim(int civilization_id, int faction_id)
 {
 	for (int i = 0; i < this->ClaimCount; ++i) {
 		if (this->Claims[i][0] == civilization_id && this->Claims[i][1] == faction_id) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CProvince::HasResource(int resource, bool ignore_prospection)
+{
+	for (int i = 0; i < ProvinceTileMax; ++i) {
+		int x = this->Tiles[i].x;
+		int y = this->Tiles[i].y;
+		if (x == -1 || y == -1) {
+			break;
+		}
+		if (GrandStrategyGame.WorldMapTiles[x][y] && GrandStrategyGame.WorldMapTiles[x][y]->HasResource(resource, ignore_prospection)) {
 			return true;
 		}
 	}
@@ -2416,9 +2473,6 @@ int GetWorldMapTileTerrainVariation(int x, int y)
 	return GrandStrategyGame.WorldMapTiles[x][y]->Variation + 1;
 }
 
-/**
-**  Get the graphic tile of a world map tile.
-*/
 std::string GetWorldMapTileProvinceName(int x, int y)
 {
 	
@@ -2432,6 +2486,25 @@ std::string GetWorldMapTileProvinceName(int x, int y)
 	} else {
 		return "";
 	}
+}
+
+bool WorldMapTileHasResource(int x, int y, std::string resource_name, bool ignore_prospection)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (resource == -1) {
+		return false;
+	}
+	
+	clamp(&x, 0, GrandStrategyGame.WorldMapWidth - 1);
+	clamp(&y, 0, GrandStrategyGame.WorldMapHeight - 1);
+
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	return GrandStrategyGame.WorldMapTiles[x][y]->HasResource(resource, ignore_prospection);
 }
 
 /**
@@ -3811,6 +3884,11 @@ void DoGrandStrategyTurn()
 	GrandStrategyGame.DoTurn();
 }
 
+void DoProspection()
+{
+	GrandStrategyGame.DoProspection();
+}
+
 void CalculateProvinceBorders()
 {
 	for (int i = 0; i < ProvinceMax; ++i) {
@@ -3935,6 +4013,21 @@ bool ProvinceHasClaim(std::string province_name, std::string faction_civilizatio
 	return GrandStrategyGame.Provinces[province]->HasFactionClaim(civilization, faction);
 }
 
+bool ProvinceHasResource(std::string province_name, std::string resource_name, bool ignore_prospection)
+{
+	int province_id = GetProvinceId(province_name);
+	int resource = GetResourceIdByName(resource_name.c_str());
+	if (resource_name == "food") {
+		resource = FoodCost;
+	}
+	
+	if (resource == -1) {
+		return false;
+	}
+	
+	return GrandStrategyGame.Provinces[province_id]->HasResource(resource, ignore_prospection);
+}
+
 bool IsGrandStrategyBuilding(const CUnitType &type)
 {
 	if (type.BoolFlag[BUILDING_INDEX].value && !type.Class.empty() && type.Class != "farm" && type.Class != "watch-tower" && type.Class != "guard-tower") {
@@ -4015,6 +4108,21 @@ std::string GetProvinceOwner(std::string province_name)
 	}
 	
 	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Name;
+}
+
+void SetPlayerFaction(std::string civilization_name, std::string faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	if (faction == -1) {
+		return;
+	}
+	
+	GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization][faction]));
 }
 
 void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity)
@@ -4294,6 +4402,10 @@ void ChangeFactionCulture(std::string old_civilization_name, std::string faction
 
 	for (int i = 0; i < MaxCosts + 1; ++i) {
 		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[i] = GrandStrategyGame.Factions[old_civilization][old_faction]->Resources[i];
+	}
+	
+	if (GrandStrategyGame.Factions[old_civilization][old_faction] == GrandStrategyGame.PlayerFaction) {
+		GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[new_civilization][new_faction]));
 	}
 }
 
