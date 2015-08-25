@@ -245,7 +245,7 @@ void UpdateDisplay()
 	//Wyrmgus start
 	} else if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { //grand strategy mode
 		//scroll map if mouse is in the scroll area
-		int scroll_up = 15;
+		int scroll_up = 7; //the scroll area in the upper part of the screen is smaller to allow clicking on the menu buttons and etc. more comfortably
 		int scroll_down = (Video.Height - 16);
 		int scroll_left = 15;
 		int scroll_right = (Video.Width - 16);
