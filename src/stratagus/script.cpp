@@ -2704,6 +2704,15 @@ void SaveGrandStrategyGame(const std::string &filename)
 			}
 		}
 		
+		//now that the provinces are defined, loop through the tiles again and save their provinces
+		for (int x = 0; x < GetWorldMapWidth(); ++x) {
+			for (int y = 0; y < GetWorldMapHeight(); ++y) {
+				if (GrandStrategyGame.WorldMapTiles[x][y]->Province != -1) {
+					fprintf(fd, "SetWorldMapTileProvince(%d, %d, \"%s\")\n", x, y, GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Name.c_str());
+				}
+			}
+		}
+		
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (int j = 0; j < FactionMax; ++j) {
 				if (GrandStrategyGame.Factions[i][j]) {
