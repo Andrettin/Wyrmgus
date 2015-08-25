@@ -44,6 +44,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CGrandStrategyFaction;
+
 class WorldMapTerrainType
 {
 public:
@@ -101,10 +103,9 @@ public:
 	CProvince() :
 		Name(""), SettlementName(""),
 		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1), ClaimCount(0),
-		Water(false), SettlementLocation(-1, -1)
+		Water(false), SettlementLocation(-1, -1),
+		Owner(NULL), AttackedBy(NULL)
 	{
-		memset(Owner, -1, sizeof(Owner));
-		memset(AttackedBy, -1, sizeof(Owner));
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
 		memset(Units, 0, sizeof(Units));
 		memset(UnderConstructionUnits, 0, sizeof(UnderConstructionUnits));
@@ -146,10 +147,10 @@ public:
 	std::string SettlementName;
 	int ID;																/// ID of this province
 	int Civilization;													/// Civilization of the province (-1 = no one).
-	int Owner[2];														/// Owner of the province, first number for the owner's civilization, and the second one for the faction itself (-1, -1 = no one).
+	CGrandStrategyFaction *Owner;										/// Owner of the province
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	int CurrentConstruction;											/// Building currently under construction (unit type index).
-	int AttackedBy[2];													/// Which faction the province is being attacked by (-1, -1 = none); first number for the faction's civilization, and the second number is for the faction itself.
+	CGrandStrategyFaction *AttackedBy;									/// Which faction the province is being attacked by.
 	int ClaimCount;
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
@@ -220,7 +221,7 @@ public:
 class CGrandStrategyGame
 {
 public:
-	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), SelectedProvince(-1)
+	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), SelectedProvince(-1), PlayerFaction(NULL)
 	{
 		for (int i = 0; i < MaxCosts + 1; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {

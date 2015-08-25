@@ -252,10 +252,10 @@ void CGrandStrategyGame::DrawMap()
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 				if (province_id != -1) {
 					int civilization = GrandStrategyGame.Provinces[province_id]->Civilization;
-					if (civilization != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
+					if (civilization != -1 && GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
 						//draw the province's settlement
 						if (GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
-							int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
+							int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
 							
 							GrandStrategyGame.SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 							
@@ -266,7 +266,7 @@ void CGrandStrategyGame::DrawMap()
 					}
 					
 					//draw symbol that the province is being attacked by the human player, if that is the case
-					if (GrandStrategyGame.Provinces[province_id]->AttackedBy[0] != -1 && GrandStrategyGame.Provinces[province_id]->AttackedBy[1] != -1 &&GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
+					if (GrandStrategyGame.Provinces[province_id]->AttackedBy != NULL && GrandStrategyGame.Provinces[province_id]->AttackedBy ==GrandStrategyGame.PlayerFaction && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
 						GrandStrategyGame.SymbolAttack->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 				}
@@ -320,12 +320,12 @@ void CGrandStrategyGame::DrawMap()
 							second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
 						}
 						
-						if (second_province_id == -1 || (GrandStrategyGame.Provinces[province_id]->Owner[0] == GrandStrategyGame.Provinces[second_province_id]->Owner[0] && GrandStrategyGame.Provinces[province_id]->Owner[1] == GrandStrategyGame.Provinces[second_province_id]->Owner[1])) { // is not a national border
+						if (second_province_id == -1 || (GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.Provinces[second_province_id]->Owner)) { // is not a national border
 							GrandStrategyGame.BorderGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 						} else {
 							int player_color;
-							if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-								player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
+							if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
+								player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
 							} else {
 								player_color = 15;
 							}
@@ -452,7 +452,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	std::string tile_tooltip;
 	
 	int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1 && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner != NULL && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
 		tile_tooltip += "Settlement";
 		if (!GrandStrategyGame.Provinces[province_id]->GetCulturalSettlementName().empty()) {
 			tile_tooltip += " of ";
@@ -514,9 +514,9 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		tile_tooltip += ", ";
 		tile_tooltip += GrandStrategyGame.Provinces[province_id]->GetCulturalName();
 		
-		if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
+		if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
 			tile_tooltip += ", ";
-			tile_tooltip += PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Name;
+			tile_tooltip += PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Name;
 		}
 	}
 	tile_tooltip += " (";
@@ -548,17 +548,17 @@ void CGrandStrategyGame::DoTurn()
 				}
 			}
 			
-			if (this->Provinces[i]->Owner[0] != -1 && this->Provinces[i]->Owner[1] != -1) {
+			if (this->Provinces[i]->Owner != NULL) {
 				//check revolt risk and potentially trigger a revolt
-				if (this->Provinces[i]->GetRevoltRisk() > 0 && SyncRand(100) < this->Provinces[i]->GetRevoltRisk() && this->Provinces[i]->AttackedBy[0] == -1 && this->Provinces[i]->AttackedBy[1] == -1) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn)
+				if (this->Provinces[i]->GetRevoltRisk() > 0 && SyncRand(100) < this->Provinces[i]->GetRevoltRisk() && this->Provinces[i]->AttackedBy == NULL) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn)
 					int possible_revolters[FactionMax];
 					int possible_revolter_count = 0;
 					for (int j = 0; j < this->Provinces[i]->ClaimCount; ++j) {
 						if (
 							this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Civilization
-							&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j][1]]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner[0]][this->Provinces[i]->Owner[1]]->Type
-							&& !(this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Owner[0] && this->Provinces[i]->Claims[j][1] == this->Provinces[i]->Owner[1])
-							&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j][0]][GrandStrategyGame.Provinces[i]->Claims[j][1]]->Name != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner[0]][GrandStrategyGame.Provinces[i]->Owner[1]]->Name // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
+							&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j][1]]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner->Civilization][this->Provinces[i]->Owner->Faction]->Type
+							&& !(this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Owner->Civilization && this->Provinces[i]->Claims[j][1] == this->Provinces[i]->Owner->Faction)
+							&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j][0]][GrandStrategyGame.Provinces[i]->Claims[j][1]]->Name != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Name // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
 						) { //if faction which has a claim on this province has the same civilization as the province, and if it is of the same faction type as the province's owner
 							possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j][1];
 							possible_revolter_count += 1;
@@ -566,8 +566,7 @@ void CGrandStrategyGame::DoTurn()
 					}
 					if (possible_revolter_count > 0) {
 						int revolter_faction = possible_revolters[SyncRand(possible_revolter_count)];
-						this->Provinces[i]->AttackedBy[0] = this->Provinces[i]->Civilization;
-						this->Provinces[i]->AttackedBy[1] = revolter_faction;
+						this->Provinces[i]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[this->Provinces[i]->Civilization][revolter_faction]));
 						
 						int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
 						
@@ -577,8 +576,8 @@ void CGrandStrategyGame::DoTurn()
 					}
 				}
 				
-				if (!this->Provinces[i]->HasFactionClaim(this->Provinces[i]->Owner[0], this->Provinces[i]->Owner[1]) && SyncRand(100) < 1) { // 1% chance the owner of this province will get a claim on it
-					this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner[0], this->Provinces[i]->Owner[1]);
+				if (!this->Provinces[i]->HasFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction) && SyncRand(100) < 1) { // 1% chance the owner of this province will get a claim on it
+					this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction);
 				}
 			}
 		} else { //if a somehow invalid province is reached
@@ -765,7 +764,7 @@ void CGrandStrategyGame::DoTrade()
 	
 	for (int i = 0; i < this->ProvinceCount; ++i) {
 		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
-			if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->Owner[0] != -1 && this->Provinces[i]->Owner[1] != -1) {
+			if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->Owner != NULL) {
 				if (province_consumed_commodity[WoodCost][i] == false) {
 					remaining_wanted_trade[WoodCost] -= this->Provinces[i]->GetResourceDemand(WoodCost);
 				}
@@ -803,12 +802,12 @@ void CGrandStrategyGame::DoProspection()
 				int y = GrandStrategyGame.WorldMapResources[i][j][1];
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 						
-				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1 && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
+				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner != NULL && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
 					if (SyncRand(100) < 1) { // 1% chance of discovery per turn
 						GrandStrategyGame.WorldMapResources[i][j][2] = 1;
 						GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = true;
-						GrandStrategyGame.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->CalculateIncome(i);
-						if (GrandStrategyGame.PlayerFaction == GrandStrategyGame.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]) {
+						GrandStrategyGame.Provinces[province_id]->Owner->CalculateIncome(i);
+						if (GrandStrategyGame.PlayerFaction == GrandStrategyGame.Provinces[province_id]->Owner) {
 							char buf[256];
 							snprintf(
 								buf, sizeof(buf), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
@@ -939,8 +938,8 @@ void CGrandStrategyGame::UpdateMinimap()
 			if (UseOpenGL) {
 				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != -1) {
 					int province_id = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
-					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
+					if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
 						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
 						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
@@ -956,8 +955,8 @@ void CGrandStrategyGame::UpdateMinimap()
 				const int index = mx * bpp + my * this->MinimapSurface->pitch;
 				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != -1) {
 					int province_id = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
-					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
+					if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
 						if (bpp == 2) {
 							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 						} else {
@@ -1034,8 +1033,8 @@ void WorldMapTile::UpdateMinimap()
 			if (UseOpenGL) {
 				if (this->Province != -1) {
 					int province_id = this->Province;
-					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
+					if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
 						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
 						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
@@ -1051,8 +1050,8 @@ void WorldMapTile::UpdateMinimap()
 				const int index = mx * bpp + my * GrandStrategyGame.MinimapSurface->pitch;
 				if (this->Province != -1) {
 					int province_id = this->Province;
-					if (GrandStrategyGame.Provinces[province_id]->Owner[0] != -1 && GrandStrategyGame.Provinces[province_id]->Owner[1] != -1) {
-						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Color;
+					if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
 						if (bpp == 2) {
 							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 						} else {
@@ -1148,26 +1147,25 @@ void CProvince::UpdateMinimap()
 
 void CProvince::SetOwner(int civilization_id, int faction_id)
 {
-	if (this->Owner[0] != -1 && this->Owner[1] != -1) { //if province has a previous owner, remove it from the owner's province list
-		int old_civilization_id = this->Owner[0];
-		int old_faction_id = this->Owner[1];
-		for (int i = 0; i < GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount; ++i) {
-			if (GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[i] == this->ID) {
+	if (this->Owner != NULL) { //if province has a previous owner, remove it from the owner's province list
+		for (int i = 0; i < this->Owner->ProvinceCount; ++i) {
+			if (this->Owner->OwnedProvinces[i] == this->ID) {
 				//if this owned province is the one we are changing the owner of, push every element of the array after it back one step
-				for (int j = i; j < GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount; ++j) {
-					GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[j] = GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->OwnedProvinces[j + 1];
+				for (int j = i; j < this->Owner->ProvinceCount; ++j) {
+					this->Owner->OwnedProvinces[j] = this->Owner->OwnedProvinces[j + 1];
 				}
 				break;
 			}
 		}
-		GrandStrategyGame.Factions[old_civilization_id][old_faction_id]->ProvinceCount -= 1;
+		this->Owner->ProvinceCount -= 1;
 	}
 
-	this->Owner[0] = civilization_id;
-	this->Owner[1] = faction_id;
 	if (civilization_id != -1 && faction_id != -1) {
-		GrandStrategyGame.Factions[civilization_id][faction_id]->OwnedProvinces[GrandStrategyGame.Factions[civilization_id][faction_id]->ProvinceCount] = this->ID;
-		GrandStrategyGame.Factions[civilization_id][faction_id]->ProvinceCount += 1;
+		this->Owner = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization_id][faction_id]));
+		this->Owner->OwnedProvinces[this->Owner->ProvinceCount] = this->ID;
+		this->Owner->ProvinceCount += 1;
+	} else {
+		this->Owner = NULL;
 	}
 }
 
@@ -1288,8 +1286,8 @@ void CProvince::SetCivilization(int civilization)
 	
 	this->CurrentConstruction = -1; // under construction buildings get canceled
 	
-	if (this->Owner[0] != -1 && this->Owner[1] != -1) {
-		GrandStrategyGame.Factions[this->Owner[0]][this->Owner[1]]->CalculateIncomes();
+	if (this->Owner != NULL) {
+		this->Owner->CalculateIncomes();
 	}
 }
 
@@ -1307,16 +1305,14 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 	}
 	
 	//recalculate the faction incomes if an income-altering building was constructed
-	int owner_civilization = this->Owner[0];
-	int owner_faction = this->Owner[1];
-	if (owner_civilization != -1 && owner_faction != -1) {
+	if (this->Owner != NULL) {
 		if (UnitTypes[building_id]->Class == "town-hall") {
-			GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncomes();
+			this->Owner->CalculateIncomes();
 		} else if (UnitTypes[building_id]->Class == "lumber-mill") {
-			GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(WoodCost);
-			GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(ResearchCost);
+			this->Owner->CalculateIncome(WoodCost);
+			this->Owner->CalculateIncome(ResearchCost);
 		} else if (UnitTypes[building_id]->Class == "smithy") {
-			GrandStrategyGame.Factions[owner_civilization][owner_faction]->CalculateIncome(ResearchCost);
+			this->Owner->CalculateIncome(ResearchCost);
 		}
 	}
 }
@@ -1405,7 +1401,10 @@ bool CProvince::BordersFaction(int faction_civilization, int faction)
 {
 	for (int i = 0; i < ProvinceMax; ++i) {
 		if (this->BorderProvinces[i] != -1) {
-			if (GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner[0] == faction_civilization && GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner[1] == faction) {
+			if (GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner == NULL) {
+				continue;
+			}
+			if (GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner->Civilization == faction_civilization && GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner->Faction == faction) {
 				return true;
 			}
 		} else {
@@ -1439,8 +1438,8 @@ int CProvince::GetAdministrativeEfficiencyModifier()
 {
 	int modifier = 0;
 	
-	if (this->Civilization != -1 && this->Owner[0] != -1 && this->Owner[1] != -1) {
-		modifier += this->Civilization == this->Owner[0] ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to its administrative efficiency modifier
+	if (this->Civilization != -1 && this->Owner != NULL) {
+		modifier += this->Civilization == this->Owner->Civilization ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to its administrative efficiency modifier
 	}
 	
 	return modifier;
@@ -1450,12 +1449,12 @@ int CProvince::GetRevoltRisk()
 {
 	int revolt_risk = 0;
 	
-	if (this->Civilization != -1 && this->Owner[0] != -1 && this->Owner[1] != -1) {
-		if (this->Civilization != this->Owner[0]) {
+	if (this->Civilization != -1 && this->Owner != NULL) {
+		if (this->Civilization != this->Owner->Civilization) {
 			revolt_risk += 3; //if the province is of a different culture than its owner, it gets plus 3% revolt risk
 		}
 		
-		if (!this->HasFactionClaim(this->Owner[0], this->Owner[1])) {
+		if (!this->HasFactionClaim(this->Owner->Civilization, this->Owner->Faction)) {
 			revolt_risk += 2; //if the owner does not have a claim to the province, it gets plus 2% revolt risk
 		}
 	}
@@ -1468,18 +1467,18 @@ int CProvince::GetRevoltRisk()
 */
 std::string CProvince::GetCulturalName()
 {
-	if (this->Owner[0] != -1 && this->Owner[1] != -1 && !this->Water && !this->FactionCulturalNames[this->Owner[0]][this->Owner[1]].empty() && this->Civilization == this->Owner[0]) {
-		return this->FactionCulturalNames[this->Owner[0]][this->Owner[1]];
+	if (this->Owner != NULL && !this->Water && !this->FactionCulturalNames[this->Owner->Civilization][this->Owner->Faction].empty() && this->Civilization == this->Owner->Civilization) {
+		return this->FactionCulturalNames[this->Owner->Civilization][this->Owner->Faction];
 	} else if (!this->Water && this->Civilization != -1 && !this->CulturalNames[this->Civilization].empty()) {
 		return this->CulturalNames[this->Civilization];
 	} else if (
 		this->Water && this->ReferenceProvince != -1
-		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner[1] != -1
+		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner != NULL
 		&& !GrandStrategyGame.Provinces[this->ReferenceProvince]->Water
-		&& !this->FactionCulturalNames[GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner[0]][GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner[1]].empty()
-		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization == GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner[0]
+		&& !this->FactionCulturalNames[GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Civilization][GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Faction].empty()
+		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization == GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Civilization
 	) {
-		return this->FactionCulturalNames[GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner[0]][GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner[1]];
+		return this->FactionCulturalNames[GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Civilization][GrandStrategyGame.Provinces[this->ReferenceProvince]->Owner->Faction];
 	} else if (
 		this->Water && this->ReferenceProvince != -1
 		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization != -1
@@ -1496,8 +1495,8 @@ std::string CProvince::GetCulturalName()
 */
 std::string CProvince::GetCulturalSettlementName()
 {
-	if (!this->Water && this->Owner[0] != -1 && this->Owner[1] != -1 && !this->FactionCulturalSettlementNames[this->Owner[0]][this->Owner[1]].empty() && this->Civilization == this->Owner[0]) {
-		return this->FactionCulturalSettlementNames[this->Owner[0]][this->Owner[1]];
+	if (!this->Water && this->Owner != NULL && !this->FactionCulturalSettlementNames[this->Owner->Civilization][this->Owner->Faction].empty() && this->Civilization == this->Owner->Civilization) {
+		return this->FactionCulturalSettlementNames[this->Owner->Civilization][this->Owner->Faction];
 	} else if (!this->Water && this->Civilization != -1 && !this->CulturalSettlementNames[this->Civilization].empty()) {
 		return this->CulturalSettlementNames[this->Civilization];
 	} else {
@@ -2408,7 +2407,7 @@ void CGrandStrategyFaction::CalculateIncome(int resource)
 					
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 					
-				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner[0] == this->Civilization && GrandStrategyGame.Provinces[province_id]->Owner[1] == this->Faction && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
+				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner == this && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
 					income += GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction * (100 + this->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->GetAdministrativeEfficiencyModifier()) / 100;
 				}
 			} else {
@@ -3143,8 +3142,8 @@ std::string GetProvinceAttackedBy(std::string province_name)
 	int province_id = GetProvinceId(province_name);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		if (GrandStrategyGame.Provinces[province_id]->AttackedBy[0] != -1 && GrandStrategyGame.Provinces[province_id]->AttackedBy[1] != -1) {
-			return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->AttackedBy[0]][GrandStrategyGame.Provinces[province_id]->AttackedBy[1]]->Name;
+		if (GrandStrategyGame.Provinces[province_id]->AttackedBy != NULL) {
+			return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->AttackedBy->Civilization][GrandStrategyGame.Provinces[province_id]->AttackedBy->Faction]->Name;
 		}
 	}
 	
@@ -3362,8 +3361,13 @@ void SetProvinceAttackedBy(std::string province_name, std::string civilization_n
 	int province_id = GetProvinceId(province_name);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->AttackedBy[0] = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		GrandStrategyGame.Provinces[province_id]->AttackedBy[1] = PlayerRaces.GetFactionIndexByName(GrandStrategyGame.Provinces[province_id]->AttackedBy[0], faction_name);
+		int civilization_id = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, faction_name);
+		if (civilization_id != -1 && faction_id != -1) {
+			GrandStrategyGame.Provinces[province_id]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization_id][faction_id]));
+		} else {
+			GrandStrategyGame.Provinces[province_id]->AttackedBy = NULL;
+		}
 	}
 }
 
@@ -3452,12 +3456,10 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->SettlementName = "";
 			GrandStrategyGame.Provinces[i]->ID = -1;
 			GrandStrategyGame.Provinces[i]->Civilization = -1;
-			GrandStrategyGame.Provinces[i]->Owner[0] = -1;
-			GrandStrategyGame.Provinces[i]->Owner[1] = -1;
+			GrandStrategyGame.Provinces[i]->Owner = NULL;
 			GrandStrategyGame.Provinces[i]->ReferenceProvince = -1;
 			GrandStrategyGame.Provinces[i]->CurrentConstruction = -1;
-			GrandStrategyGame.Provinces[i]->AttackedBy[0] = -1;
-			GrandStrategyGame.Provinces[i]->AttackedBy[1] = -1;
+			GrandStrategyGame.Provinces[i]->AttackedBy = NULL;
 			GrandStrategyGame.Provinces[i]->ClaimCount = 0;
 			GrandStrategyGame.Provinces[i]->Water = false;
 			GrandStrategyGame.Provinces[i]->SettlementLocation.x = -1;
@@ -3543,6 +3545,7 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.WorldMapHeight = 0;
 	GrandStrategyGame.ProvinceCount = 0;
 	GrandStrategyGame.SelectedProvince = -1;
+	GrandStrategyGame.PlayerFaction = NULL;
 	
 	//destroy minimap surface
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -4103,11 +4106,11 @@ std::string GetProvinceOwner(std::string province_name)
 {
 	int province_id = GetProvinceId(province_name);
 	
-	if (province_id == -1 || GrandStrategyGame.Provinces[province_id]->Owner[0] == -1 || GrandStrategyGame.Provinces[province_id]->Owner[1] == -1) {
+	if (province_id == -1 || GrandStrategyGame.Provinces[province_id]->Owner == NULL) {
 		return "";
 	}
 	
-	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]->Name;
+	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Name;
 }
 
 void SetPlayerFaction(std::string civilization_name, std::string faction_name)
