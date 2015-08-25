@@ -533,7 +533,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 									(IconActive | (MouseButtons & LeftButton)) : 0;
 				const PixelPos pos(UI.UpgradingButton->X, UI.UpgradingButton->Y);
 				//Wyrmgus start
-				flag = IconCommandButton;
+				flag |= IconCommandButton;
 				//Wyrmgus end
 				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 			}
@@ -555,7 +555,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 						   (IconActive | (MouseButtons & LeftButton)) : 0;
 				PixelPos pos(UI.ResearchingButton->X, UI.ResearchingButton->Y);
 				//Wyrmgus start
-				flag = IconCommandButton;
+				flag |= IconCommandButton;
 				//Wyrmgus end
 				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 			}

@@ -906,6 +906,15 @@ static void HandleMouseOn(const PixelPos screenPos)
 		}
 	}
 
+	//Wyrmgus start
+	if (UI.IdleWorkerButton && UI.IdleWorkerButton->Contains(screenPos) && !ThisPlayer->FreeWorkers.empty()) {
+		ButtonAreaUnderCursor = ButtonAreaIdleWorker;
+		ButtonUnderCursor = 0;
+		CursorOn = CursorOnButton;
+		return;
+	}
+	//Wyrmgus end
+	
 	//  Minimap
 	if (UI.Minimap.Contains(screenPos)) {
 		CursorOn = CursorOnMinimap;
@@ -1692,7 +1701,10 @@ static void DoSelectionButtons(int num, unsigned)
 		return;
 	}
 
-	if (static_cast<size_t>(num) >= Selected.size() || !(MouseButtons & LeftButton)) {
+	//Wyrmgus start
+//	if (static_cast<size_t>(num) >= Selected.size() || !(MouseButtons & LeftButton)) {
+	if (static_cast<size_t>(num) >= Selected.size()) {
+	//Wyrmgus end
 		return;
 	}
 
@@ -1921,9 +1933,14 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 static void UIHandleButtonDown_OnButton(unsigned button)
 {
 	// clicked on info panel - selection shown
+	//Wyrmgus start
+	/*
 	if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
 		DoSelectionButtons(ButtonUnderCursor, button);
 	} else if ((MouseButtons & LeftButton)) {
+	*/
+	if ((MouseButtons & LeftButton)) {
+	//Wyrmgus end
 		//  clicked on menu button
 		if (ButtonAreaUnderCursor == ButtonAreaMenu) {
 			if ((ButtonUnderCursor == ButtonUnderMenu || ButtonUnderCursor == ButtonUnderNetworkMenu)
@@ -1945,7 +1962,103 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				}
 			}
 			//  clicked on selected button
+		//Wyrmgus start
+		/*
 		} else if (ButtonAreaUnderCursor == ButtonAreaSelected) {
+			//  clicked on single unit shown
+			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
+				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
+			}
+			//  clicked on training button
+		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
+			//Wyrmgus start
+//			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			//Wyrmgus end
+				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
+					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
+					const COrder_Train &order = *static_cast<COrder_Train *>(Selected[0]->Orders[ButtonUnderCursor]);
+
+					DebugPrint("Cancel slot %d %s\n" _C_ ButtonUnderCursor _C_ order.GetUnitType().Ident.c_str());
+					SendCommandCancelTraining(*Selected[0], ButtonUnderCursor, &order.GetUnitType());
+				}
+			}
+			//  clicked on upgrading button
+		} else if (ButtonAreaUnderCursor == ButtonAreaUpgrading) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
+					DebugPrint("Cancel upgrade %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					SendCommandCancelUpgradeTo(*Selected[0]);
+				}
+			}
+			//  clicked on researching button
+		} else if (ButtonAreaUnderCursor == ButtonAreaResearching) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+				if (ButtonUnderCursor == 0 && Selected.size() == 1) {
+					DebugPrint("Cancel research %s\n" _C_ Selected[0]->Type->Ident.c_str());
+					SendCommandCancelResearch(*Selected[0]);
+				}
+			}
+			//  clicked on button panel
+		} else if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
+			//  for transporter
+			//Wyrmgus start
+//			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->IsAllied(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			//Wyrmgus end
+				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
+					CUnit *uins = Selected[0]->UnitInside;
+					size_t j = 0;
+
+					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+						if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
+							continue;
+						}
+						if (ButtonAreaUnderCursor == ButtonAreaTransporting
+							&& static_cast<size_t>(ButtonUnderCursor) == j) {
+								Assert(uins->Boarded);
+								const int flush = !(KeyModifiers & ModifierShift);
+								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+								}
+						}
+						++j;
+					}
+				}
+			}
+		*/
+		//Wyrmgus end
+		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
+			//Wyrmgus start
+//			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			//Wyrmgus end
+				OldButtonUnderCursor = ButtonUnderCursor;
+			}
+		}
+	} else if ((MouseButtons & MiddleButton)) {
+		//  clicked on info panel - single unit shown
+		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1) {
+			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+			if (UI.SelectedViewport->Unit == Selected[0]) {
+				UI.SelectedViewport->Unit = NULL;
+			} else {
+				UI.SelectedViewport->Unit = Selected[0];
+			}
+		}
+	} else if ((MouseButtons & RightButton)) {
+	}
+}
+
+//Wyrmgus start
+static void UIHandleButtonUp_OnButton(unsigned button)
+{
+	// clicked on info panel - selection shown
+	if (Selected.size() > 1 && ButtonAreaUnderCursor == ButtonAreaSelected) {
+		DoSelectionButtons(ButtonUnderCursor, button);
+	} else {
+		if (ButtonAreaUnderCursor == ButtonAreaSelected) {
 			//  clicked on single unit shown
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
@@ -2015,20 +2128,17 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//Wyrmgus end
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
-		}
-	} else if ((MouseButtons & MiddleButton)) {
-		//  clicked on info panel - single unit shown
-		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1) {
-			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-			if (UI.SelectedViewport->Unit == Selected[0]) {
-				UI.SelectedViewport->Unit = NULL;
-			} else {
-				UI.SelectedViewport->Unit = Selected[0];
+		//Wyrmgus start
+		} else if (ButtonAreaUnderCursor == ButtonAreaIdleWorker) {
+			if (ButtonUnderCursor == 0) {
+				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				UiFindIdleWorker();
 			}
+		//Wyrmgus end
 		}
-	} else if ((MouseButtons & RightButton)) {
 	}
 }
+//Wyrmgus end
 
 /**
 **  Called if mouse button pressed down.
@@ -2210,6 +2320,9 @@ void UIHandleButtonUp(unsigned button)
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
 				return;
 			}
+			//Wyrmgus start
+			UIHandleButtonUp_OnButton(button);
+			//Wyrmgus end
 		}
 	}
 

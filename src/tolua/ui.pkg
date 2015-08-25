@@ -171,6 +171,10 @@ class CUserInterface
 	CUIButton *UpgradingButton;
 	CUIButton *ResearchingButton;
 	vector<CUIButton> TransportingButtons;
+	
+	//Wyrmgus start
+	CUIButton *IdleWorkerButton;
+	//Wyrmgus end
 
 	CColor CompletedBarColorRGB;
 	bool CompletedBarShadow;

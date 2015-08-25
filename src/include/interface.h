@@ -124,6 +124,9 @@ enum _button_area_ {
 	ButtonAreaTransporting,  /// Transporting button
 	ButtonAreaButton,        /// Button panel button
 	ButtonAreaMenu,          /// Menu button
+	//Wyrmgus start
+	ButtonAreaIdleWorker,	 /// Idle worker button
+	//Wyrmgus end
 	ButtonAreaUser           /// User buttons
 };
 

@@ -433,6 +433,10 @@ public:
 
 	std::vector<CUIButton> TransportingButtons;/// Button info for transporting
 
+	//Wyrmgus start
+	CUIButton *IdleWorkerButton;		/// Button for the idle worker notification
+	//Wyrmgus end
+	
 	// Completed bar
 	CColor CompletedBarColorRGB;     /// color for completed bar
 	IntColor CompletedBarColor;      /// color for completed bar

@@ -220,8 +220,28 @@ void UpdateDisplay()
 			UI.StatusLine.DrawCosts();
 			UI.ButtonPanel.Draw();
 		}
-
+		
 		DrawTimer();
+		
+		//Wyrmgus start
+		//draw worker icon if there are idle workers
+		if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
+			int worker_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(ThisPlayer->Race, GetUnitTypeClassIndexByName("worker"));
+			if (worker_unit_type_id != -1) {
+				const CUnitType &type = *UnitTypes[worker_unit_type_id];
+				
+				const PixelPos pos(UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
+				const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
+								 
+				VariationInfo *varinfo = type.GetDefaultVariation(*ThisPlayer);
+				if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+					varinfo->Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, "", ThisPlayer->Index);
+				} else {
+					type.Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, "", ThisPlayer->Index);
+				}
+			}
+		}
+		//Wyrmgus end
 	//Wyrmgus start
 	} else if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { //grand strategy mode
 		//scroll map if mouse is in the scroll area
