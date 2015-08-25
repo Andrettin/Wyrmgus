@@ -811,7 +811,7 @@ void CGrandStrategyGame::DoProspection()
 						if (GrandStrategyGame.PlayerFaction == GrandStrategyGame.Factions[GrandStrategyGame.Provinces[province_id]->Owner[0]][GrandStrategyGame.Provinces[province_id]->Owner[1]]) {
 							char buf[256];
 							snprintf(
-								buf, sizeof(buf), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(GetTileProvince(\"%s\", \"%s\")) end;",
+								buf, sizeof(buf), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
 								(CapitalizeString(i == FoodCost ? "food" : DefaultResourceNames[i]) + " found in " + GrandStrategyGame.Provinces[province_id]->GetCulturalName()).c_str(),
 								("My lord, " + CapitalizeString(i == FoodCost ? "food" : DefaultResourceNames[i]) + " has been found in the " + DecapitalizeString(GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name) + " of " + GrandStrategyGame.Provinces[province_id]->GetCulturalName() + "!").c_str()
 							);
