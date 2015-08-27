@@ -372,6 +372,7 @@ extern int GetProvinceUnderConstructionUnitQuantity(std::string province_name, s
 extern int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern std::string GetProvinceOwner(std::string province_name);
+extern bool GetProvinceWater(std::string province_name);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
 extern bool GetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);

@@ -4113,6 +4113,17 @@ std::string GetProvinceOwner(std::string province_name)
 	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Name;
 }
 
+bool GetProvinceWater(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id == -1) {
+		return false;
+	}
+	
+	return GrandStrategyGame.Provinces[province_id]->Water;
+}
+
 void SetPlayerFaction(std::string civilization_name, std::string faction_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
