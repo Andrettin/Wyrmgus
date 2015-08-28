@@ -699,3 +699,7 @@ void UiTrackUnit();
 void SetNewViewportMode(ViewportModeType new_mode);
 
 void SetDefaultTextColors(const std::string &normal, const std::string &reverse);
+
+//Wyrmgus start
+extern bool IsMouseLeftButtonPressed();
+//Wyrmgus end

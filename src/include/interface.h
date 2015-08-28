@@ -350,6 +350,10 @@ extern void UiFindIdleWorker();
 /// Track unit, the viewport follows the unit.
 extern void UiTrackUnit();
 
+//Wyrmgus start
+extern bool IsMouseLeftButtonPressed();
+//Wyrmgus end
+
 /// Handle cheats
 extern int HandleCheats(const std::string &input);
 

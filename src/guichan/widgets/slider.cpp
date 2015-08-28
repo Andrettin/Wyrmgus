@@ -224,10 +224,7 @@ namespace gcn
             }
 
             mMouseDrag = true;
-			//Wyrmgus start
-			//sliders now generate their actions when the mouse is released, not pressed
-//			generateAction();
-			//Wyrmgus end
+			generateAction();
         }
         else
         {
@@ -273,10 +270,7 @@ namespace gcn
                 setValue(markerPositionToValue(getHeight() - y - getMarkerLength() / 2));
             }
 
-			//Wyrmgus start
-			//sliders now generate their actions when the mouse is released, not pressed
-//			generateAction();
-			//Wyrmgus end
+			generateAction();
             setDirty(true);
         }
     }

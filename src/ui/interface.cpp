@@ -504,6 +504,13 @@ void UiTrackUnit()
 	}
 }
 
+//Wyrmgus start
+bool IsMouseLeftButtonPressed()
+{
+	return MouseButtons & LeftButton;
+}
+//Wyrmgus end
+
 /**
 **  Call the lua function HandleCommandKey
 */
