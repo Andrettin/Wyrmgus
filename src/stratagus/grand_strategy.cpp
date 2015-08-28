@@ -2610,18 +2610,39 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
+	int old_province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
+	if (old_province_id != -1) { //if the tile is already assigned to a province, remove it from that province's tile array
+		for (int i = 0; i < ProvinceTileMax; ++i) {
+			if (GrandStrategyGame.Provinces[old_province_id]->Tiles[i].x == x && GrandStrategyGame.Provinces[old_province_id]->Tiles[i].y == y) { //if tile was found, push every element of the array after it back one step
+				for (int j = i; j < ProvinceTileMax; ++j) {
+					GrandStrategyGame.Provinces[old_province_id]->Tiles[j].x = GrandStrategyGame.Provinces[old_province_id]->Tiles[j + 1].x;
+					GrandStrategyGame.Provinces[old_province_id]->Tiles[j].y = GrandStrategyGame.Provinces[old_province_id]->Tiles[j + 1].y;
+					if (GrandStrategyGame.Provinces[old_province_id]->Tiles[j].x == -1 && GrandStrategyGame.Provinces[old_province_id]->Tiles[j].y == -1) { // if this is a blank tile slot
+						break;
+					}
+				}
+				break;
+			}
+			if (GrandStrategyGame.Provinces[old_province_id]->Tiles[i].x == -1 && GrandStrategyGame.Provinces[old_province_id]->Tiles[i].y == -1) { // if this is a blank tile slot
+				break;
+			}
+		}
+	}
+
 	int province_id = GetProvinceId(province_name);
 	GrandStrategyGame.WorldMapTiles[x][y]->Province = province_id;
 	
-	//now add the tile to the province's tiles array
-	for (int i = 0; i < ProvinceTileMax; ++i) {
-		if (GrandStrategyGame.Provinces[province_id]->Tiles[i].x == x && GrandStrategyGame.Provinces[province_id]->Tiles[i].y == y) { //if tile is there already, stop
-			break;
-		}
-		if (GrandStrategyGame.Provinces[province_id]->Tiles[i].x == -1 && GrandStrategyGame.Provinces[province_id]->Tiles[i].y == -1) { // if this a blank tile slot
-			GrandStrategyGame.Provinces[province_id]->Tiles[i].x = x;
-			GrandStrategyGame.Provinces[province_id]->Tiles[i].y = y;
-			break;
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		//now add the tile to the province's tiles array
+		for (int i = 0; i < ProvinceTileMax; ++i) {
+			if (GrandStrategyGame.Provinces[province_id]->Tiles[i].x == x && GrandStrategyGame.Provinces[province_id]->Tiles[i].y == y) { //if tile is there already, stop
+				break;
+			}
+			if (GrandStrategyGame.Provinces[province_id]->Tiles[i].x == -1 && GrandStrategyGame.Provinces[province_id]->Tiles[i].y == -1) { // if this is a blank tile slot
+				GrandStrategyGame.Provinces[province_id]->Tiles[i].x = x;
+				GrandStrategyGame.Provinces[province_id]->Tiles[i].y = y;
+				break;
+			}
 		}
 	}
 }

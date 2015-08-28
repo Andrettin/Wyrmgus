@@ -224,7 +224,10 @@ namespace gcn
             }
 
             mMouseDrag = true;
-            generateAction();
+			//Wyrmgus start
+			//sliders now generate their actions when the mouse is released, not pressed
+//			generateAction();
+			//Wyrmgus end
         }
         else
         {
@@ -232,13 +235,28 @@ namespace gcn
         }
     }
 
-    void Slider::mouseRelease(int, int, int)
+	//Wyrmgus start
+//    void Slider::mouseRelease(int, int, int)
+    void Slider::mouseRelease(int x, int y, int button)
+	//Wyrmgus end
     {
+		//Wyrmgus start
+        if (mMouseDrag) {
+			//sliders now generate their actions when the mouse is released, not pressed
+			generateAction();
+        }
+		//Wyrmgus end
         mMouseDrag = false;
     }
 
     void Slider::lostFocus()
     {
+		//Wyrmgus start
+        if (mMouseDrag) {
+			//sliders now generate their actions when the mouse is released, not pressed
+			generateAction();
+        }
+		//Wyrmgus end
         mMouseDrag = false;
     }
 
@@ -255,7 +273,10 @@ namespace gcn
                 setValue(markerPositionToValue(getHeight() - y - getMarkerLength() / 2));
             }
 
-            generateAction();
+			//Wyrmgus start
+			//sliders now generate their actions when the mouse is released, not pressed
+//			generateAction();
+			//Wyrmgus end
             setDirty(true);
         }
     }
