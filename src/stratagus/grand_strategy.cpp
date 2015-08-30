@@ -525,6 +525,10 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	tile_tooltip += ", ";
 	tile_tooltip += std::to_string((long long) y);
 	tile_tooltip += ")";
+
+	if (!Preference.NoStatusLineTooltips) {
+		CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY, tile_tooltip);
+	}
 	
 	//draw tile tooltip as a popup
 	DrawGenericPopup(tile_tooltip, 0, UI.InfoPanel.Y);

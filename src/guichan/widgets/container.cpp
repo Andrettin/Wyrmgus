@@ -61,6 +61,8 @@
 //Wyrmgus start
 #include "stratagus.h"
 #include "font.h"
+#include "interface.h"
+#include "unit.h"
 #include "video.h"
 //Wyrmgus end
 
@@ -160,8 +162,14 @@ namespace gcn
         {
             if ((*iter)->hasMouse() && (*iter)->getTooltip() != "")
             {
-				CLabel label(GetGameFont());
-				label.Draw(2 + 16, Video.Height + 2 - 16, (*iter)->getTooltip());
+				if (!Preference.NoStatusLineTooltips) {
+					CLabel label(GetGameFont());
+					label.Draw(2 + 16, Video.Height + 2 - 16, (*iter)->getTooltip());
+				}
+				int popup_x;
+				int popup_y;
+				(*iter)->getAbsolutePosition(popup_x, popup_y);
+				DrawGenericPopup((*iter)->getTooltip(), popup_x, popup_y);
             }
         }
 		//Wyrmgus end

@@ -37,9 +37,13 @@
 
 #include "actions.h"
 #include "editor.h"
+//Wyrmgus start
+#include "font.h"
+//Wyrmgus end
 #include "game.h"
 //Wyrmgus start
 #include "grand_strategy.h"
+#include "interface.h"
 //Wyrmgus end
 #include "map.h"
 #include "missile.h"
@@ -235,9 +239,18 @@ void UpdateDisplay()
 								 
 				VariationInfo *varinfo = type.GetDefaultVariation(*ThisPlayer);
 				if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
-					varinfo->Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, "", ThisPlayer->Index);
+					varinfo->Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index);
 				} else {
-					type.Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, "", ThisPlayer->Index);
+					type.Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index);
+				}
+				
+				if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
+					std::string idle_worker_tooltip = "Find Idle Worker (~!.)";
+					if (!Preference.NoStatusLineTooltips) {
+						CLabel label(GetGameFont());
+						label.Draw(2 + 16, Video.Height + 2 - 16, idle_worker_tooltip);
+					}
+					DrawGenericPopup(idle_worker_tooltip, UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
 				}
 			}
 		}

@@ -901,7 +901,10 @@ void CButtonPanel::Draw()
 		//
 		if (ShowCommandKey) {
 			if (buttons[i].Key == gcn::Key::K_ESCAPE) {
-				strcpy_s(buf, sizeof(buf), "ESC");
+				//Wyrmgus start
+//				strcpy_s(buf, sizeof(buf), "ESC");
+				strcpy_s(buf, sizeof(buf), "Esc");
+				//Wyrmgus end
 			} else {
 				buf[0] = toupper(buttons[i].Key);
 				buf[1] = '\0';
