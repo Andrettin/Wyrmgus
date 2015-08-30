@@ -755,6 +755,98 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 #endif
 }
 
+//Wyrmgus start
+/**
+**  Draw popup
+*/
+void DrawGenericPopup(std::string popup_text, int x, int y)
+{
+	const CFont &font = GetGameFont();
+	
+	int MaxWidth = 0;
+
+	int i;
+		
+	//calculate content width
+	int content_width = 0;
+	if (MaxWidth) {
+		content_width = std::min(font.getWidth(popup_text), MaxWidth);
+	} else {
+		std::string content_width_sub;
+		i = 1;
+		while (!(content_width_sub = GetLineFont(i++, popup_text, 0, &font)).empty()) {
+			content_width = std::max(content_width, font.getWidth(content_width_sub));
+		}
+	}
+	
+	//calculate content height
+	int content_height = 0;
+	i = 1;
+	while ((GetLineFont(i++, popup_text, MaxWidth, &font)).length()) {
+		content_height += font.Height() + 2;
+	}
+	
+	int popupWidth, popupHeight;
+
+	int contentWidth = MARGIN_X;
+	int contentHeight = 0;
+	int maxContentWidth = 0;
+	int maxContentHeight = 0;
+	popupWidth = MARGIN_X;
+	popupHeight = MARGIN_Y;
+	PixelPos pos(0, 0);
+	
+	bool wrap = true;
+
+	// Automatically write the calculated coordinates.
+	pos.x = contentWidth + MARGIN_X;
+	pos.y = popupHeight + MARGIN_Y;
+
+	contentWidth += std::max(0, 2 * MARGIN_X + content_width);
+	contentHeight = std::max(0, 2 * MARGIN_Y + content_height);
+	maxContentHeight = std::max(contentHeight, maxContentHeight);
+	if (wrap) {
+		popupWidth += std::max(0, contentWidth - maxContentWidth);
+		popupHeight += maxContentHeight;
+		maxContentWidth = std::max(maxContentWidth, contentWidth);
+		contentWidth = MARGIN_X;
+		maxContentHeight = 0;
+	}
+
+	popupWidth += MARGIN_X;
+	popupHeight += MARGIN_Y;
+	
+	popupWidth = std::max(popupWidth, MaxWidth);
+	popupHeight = std::max(popupHeight, 0);
+
+	x = std::min<int>(x, Video.Width - 1 - popupWidth);
+	clamp<int>(&x, 0, Video.Width - 1);
+	y = y - popupHeight - 10;
+	clamp<int>(&y, 0, Video.Height - 1);
+
+	// Background
+	IntColor BackgroundColor = Video.MapRGBA(TheScreen->format, 28, 28, 28, 208);
+	IntColor BorderColor = Video.MapRGBA(TheScreen->format, 93, 93, 93, 160);
+	Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, BackgroundColor >> ASHIFT);
+	Video.DrawRectangle(BorderColor, x, y, popupWidth, popupHeight);
+
+	// Contents
+	x += pos.x;
+	y += pos.y;
+	CLabel label(font, "white", "yellow");
+	std::string sub;
+	i = 0;
+	int y_off = y;
+	unsigned int width = MaxWidth
+						 ? std::min(MaxWidth, popupWidth - 2 * MARGIN_X)
+						 : 0;
+	while ((sub = GetLineFont(++i, popup_text, width, &font)).length()) {
+		label.Draw(x, y_off, sub);
+		y_off += font.Height() + 2;
+	}
+}
+//Wyrmgus end
+
 /**
 **  Draw button panel.
 **

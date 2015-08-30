@@ -405,6 +405,9 @@ extern void UpdateStatusLineForButton(const ButtonAction &button);
 extern void DrawPieMenu();
 /// Draw the button popup
 extern void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x = 0, int y = 0);
+//Wyrmgus start
+extern void DrawGenericPopup(std::string popup_text, int x = 0, int y = 0);
+//Wyrmgus end
 
 /// Handle the mouse in scroll area
 extern bool HandleMouseScrollArea(const PixelPos &mousePos);

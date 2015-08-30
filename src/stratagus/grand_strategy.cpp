@@ -38,6 +38,7 @@
 #include "grand_strategy.h"
 
 #include "font.h"	// for grand strategy mode tooltip drawing
+#include "interface.h"
 #include "iolib.h"
 #include "player.h"
 #include "results.h"
@@ -511,20 +512,22 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	}
 				
 	if (province_id != -1) {
-		tile_tooltip += ", ";
+		tile_tooltip += ",\n";
 		tile_tooltip += GrandStrategyGame.Provinces[province_id]->GetCulturalName();
 		
 		if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
-			tile_tooltip += ", ";
+			tile_tooltip += ",\n";
 			tile_tooltip += PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Name;
 		}
 	}
-	tile_tooltip += " (";
+	tile_tooltip += "\n(";
 	tile_tooltip += std::to_string((long long) x);
 	tile_tooltip += ", ";
 	tile_tooltip += std::to_string((long long) y);
 	tile_tooltip += ")";
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY, tile_tooltip);
+	
+	//draw tile tooltip as a popup
+	DrawGenericPopup(tile_tooltip, 0, UI.InfoPanel.Y);
 }
 
 void CGrandStrategyGame::DoTurn()
