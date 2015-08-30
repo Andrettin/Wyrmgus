@@ -1,22 +1,23 @@
 class CUpgrade
 {
-  static CUpgrade *New(const std::string ident);
-  static CUpgrade *Get(const std::string ident);
+	static CUpgrade *New(const std::string ident);
+	static CUpgrade *Get(const std::string ident);
 
-  std::string Name;
-  //Wyrmgus start
-  std::string Class;
-  std::string Civilization;
-  std::string Description;
-  std::string Quote;
-  std::string Background;
-  bool Ability;
-  //Wyrmgus end
-  int Costs[MaxCosts];
-  //Wyrmgus start
-  int GrandStrategyCosts[MaxCosts];
-  int TechnologyPointCost;
-  //Wyrmgus end
-  CIcon *Icon;
+	std::string Name;
+	//Wyrmgus start
+	std::string Class;
+	std::string Civilization;
+	std::string Description;
+	std::string Quote;
+	std::string Background;
+	bool Ability;
+	//Wyrmgus end
+	int Costs[MaxCosts];
+	//Wyrmgus start
+	int GrandStrategyCosts[MaxCosts];
+	int GrandStrategyProductionEfficiencyModifier[MaxCosts];
+	int TechnologyPointCost;
+	//Wyrmgus end
+	CIcon *Icon;
 };
 

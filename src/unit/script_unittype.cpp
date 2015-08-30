@@ -1262,6 +1262,20 @@ static int CclDefineUnitType(lua_State *l)
 				lua_pop(l, 1);
 			}
 		//Wyrmgus start
+		} else if (!strcmp(value, "GrandStrategyProductionEfficiencyModifier")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, -1, k + 1);
+				const int res = CclGetResourceByName(l);
+				lua_pop(l, 1);
+				++k;
+				type->GrandStrategyProductionEfficiencyModifier[res] = LuaToNumber(l, -1, k + 1);
+			}
+		//Wyrmgus end
+		//Wyrmgus start
 //		} else if (!strcmp(value, "Vanishes")) {
 //			type->Vanishes = LuaToBoolean(l, -1);
 		//Wyrmgus end
@@ -1646,6 +1660,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->RepairCosts[i] = parent_type->RepairCosts[i];
 				type->DefaultStat.ImproveIncomes[i] = parent_type->DefaultStat.ImproveIncomes[i];
 				type->CanStore[i] = parent_type->CanStore[i];
+				type->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
 			}
 			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 				type->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;

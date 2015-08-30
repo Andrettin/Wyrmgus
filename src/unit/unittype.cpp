@@ -715,6 +715,9 @@ CUnitType::CUnitType() :
 #endif
 	memset(RepairCosts, 0, sizeof(RepairCosts));
 	memset(CanStore, 0, sizeof(CanStore));
+	//Wyrmgus start
+	memset(GrandStrategyProductionEfficiencyModifier, 0, sizeof(GrandStrategyProductionEfficiencyModifier));
+	//Wyrmgus end
 	memset(ResInfo, 0, sizeof(ResInfo));
 	//Wyrmgus start
 	memset(VarInfo, 0, sizeof(VarInfo));

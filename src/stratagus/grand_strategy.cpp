@@ -1306,16 +1306,20 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 	this->SettlementBuildings[building_id] = has_settlement_building;
 	
 	int change = has_settlement_building ? 1 : -1;
-	if (UnitTypes[building_id]->Class == "lumber-mill") {
-		this->ProductionEfficiencyModifier[WoodCost] += 25 * change;
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
+			this->ProductionEfficiencyModifier[i] += UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
+			if (this->Owner != NULL) {
+				this->Owner->CalculateIncome(i);
+			}
+		}
 	}
 	
-	//recalculate the faction incomes if an income-altering building was constructed
+	//recalculate the faction incomes if a town hall or a building that provides research was constructed
 	if (this->Owner != NULL) {
 		if (UnitTypes[building_id]->Class == "town-hall") {
 			this->Owner->CalculateIncomes();
 		} else if (UnitTypes[building_id]->Class == "lumber-mill") {
-			this->Owner->CalculateIncome(WoodCost);
 			this->Owner->CalculateIncome(ResearchCost);
 		} else if (UnitTypes[building_id]->Class == "smithy") {
 			this->Owner->CalculateIncome(ResearchCost);
@@ -2353,16 +2357,12 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology)
 	}
 	
 	int change = has_technology ? 1 : -1;
-	if (AllUpgrades[upgrade_id]->Class == "coinage") {
-		this->ProductionEfficiencyModifier[GoldCost] += 10 * change;
-	} else if (AllUpgrades[upgrade_id]->Class == "writing") {
-		this->ProductionEfficiencyModifier[ResearchCost] += 50 * change;
-	}
 	
-	if (AllUpgrades[upgrade_id]->Class == "coinage") {
-		this->CalculateIncome(GoldCost);
-	} else if (AllUpgrades[upgrade_id]->Class == "writing") {
-		this->CalculateIncome(ResearchCost);
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (AllUpgrades[upgrade_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
+			this->ProductionEfficiencyModifier[i] += AllUpgrades[upgrade_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
+			this->CalculateIncome(i);
+		}
 	}
 }
 
@@ -3182,9 +3182,11 @@ void SetProvinceName(std::string old_province_name, std::string new_province_nam
 	int province_id = GetProvinceId(old_province_name);
 	
 	if (province_id == -1 || !GrandStrategyGame.Provinces[province_id]) { //if province doesn't exist, create it now
-		CProvince *province = new CProvince;
 		province_id = GrandStrategyGame.ProvinceCount;
-		GrandStrategyGame.Provinces[province_id] = province;
+		if (!GrandStrategyGame.Provinces[province_id]) {
+			CProvince *province = new CProvince;
+			GrandStrategyGame.Provinces[province_id] = province;
+		}
 		GrandStrategyGame.Provinces[province_id]->ID = province_id;
 		GrandStrategyGame.ProvinceCount += 1;
 	}
@@ -3827,7 +3829,7 @@ void InitializeGrandStrategyGame()
 	//create grand strategy faction instances for all defined factions
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) { // no need to create a grand strategy instance for an already-creted faction again
+			if (GrandStrategyGame.Factions[i][j]) { // no need to create a grand strategy instance for an already-created faction again
 				continue;
 			}
 			

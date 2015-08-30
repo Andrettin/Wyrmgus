@@ -161,6 +161,7 @@ CUpgrade::CUpgrade(const std::string &ident) :
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
 	memset(this->GrandStrategyCosts, 0, sizeof(this->GrandStrategyCosts));
+	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
 	//Wyrmgus end
 }
 

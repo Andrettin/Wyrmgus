@@ -771,6 +771,9 @@ public:
 
 	int CanStore[MaxCosts];             /// Resources that we can store here.
 	int GivesResource;                  /// The resource this unit gives.
+	//Wyrmgus start
+	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode (used for buildings)
+	//Wyrmgus end
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
 	//Wyrmgus start
 	VariationInfo *VarInfo[VariationMax];    /// Variation information.
