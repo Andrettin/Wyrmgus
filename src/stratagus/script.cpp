@@ -2622,15 +2622,15 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 			}
 		}
-		for (int i = 0; i < MaxCosts + 1; ++i) {
+		for (int i = 0; i < MaxCosts; ++i) {
 			if (GrandStrategyGame.CommodityPrices[i] != DefaultResourcePrices[i]) {
-				fprintf(fd, "SetCommodityPrice(\"%s\", %d)\n", i == FoodCost ? "food" : DefaultResourceNames[i].c_str(), GrandStrategyGame.CommodityPrices[i]); //save commodity prices
+				fprintf(fd, "SetCommodityPrice(\"%s\", %d)\n", DefaultResourceNames[i].c_str(), GrandStrategyGame.CommodityPrices[i]); //save commodity prices
 			}
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
 				if (GrandStrategyGame.WorldMapResources[i][j][0] == -1 && GrandStrategyGame.WorldMapResources[i][j][1] == -1 && GrandStrategyGame.WorldMapResources[i][j][2] == 0) { //if reached a blank spot, stop the loop
 					break;
 				} else {
-					fprintf(fd, "AddWorldMapResource(\"%s\", %d, %d, %s)\n", i == FoodCost ? "food" : DefaultResourceNames[i].c_str(), GrandStrategyGame.WorldMapResources[i][j][0], GrandStrategyGame.WorldMapResources[i][j][1], GrandStrategyGame.WorldMapResources[i][j][2] ? "true" : "false"); //save world map resource
+					fprintf(fd, "AddWorldMapResource(\"%s\", %d, %d, %s)\n", DefaultResourceNames[i].c_str(), GrandStrategyGame.WorldMapResources[i][j][0], GrandStrategyGame.WorldMapResources[i][j][1], GrandStrategyGame.WorldMapResources[i][j][2] ? "true" : "false"); //save world map resource
 				}
 			}
 		}
@@ -2724,12 +2724,12 @@ void SaveGrandStrategyGame(const std::string &filename)
 							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
 						}
 					}
-					for (int k = 0; k < MaxCosts + 1; ++k) {
+					for (int k = 0; k < MaxCosts; ++k) {
 						if (GrandStrategyGame.Factions[i][j]->Resources[k] > 0) {
-							fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), k == FoodCost ? "food" : DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
+							fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
 						}
 						if (GrandStrategyGame.Factions[i][j]->Trade[k] != 0) {
-							fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), k == FoodCost ? "food" : DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
+							fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
 						}
 					}
 				} else {

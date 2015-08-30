@@ -161,7 +161,7 @@ public:
 	int MovingUnits[UnitTypeMax];										/// Quantity of units of a particular unit type moving to the province
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
-	int ProductionEfficiencyModifier[MaxCosts + 1];						/// Efficiency modifier for each resource.
+	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Claims[MAX_RACES * FactionMax][2];								/// Factions which claim this province
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
@@ -194,10 +194,10 @@ public:
 	int ProvinceCount;													/// Quantity of provinces owned by this faction.
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
 	int OwnedProvinces[ProvinceMax];									/// Provinces owned by this faction
-	int Resources[MaxCosts + 1];										/// Amount of each resource stored by the faction ("+ 1" because of food).
-	int Income[MaxCosts + 1];											/// Income of each resource for the faction ("+ 1" because of food).
-	int ProductionEfficiencyModifier[MaxCosts + 1];						/// Efficiency modifier for each resource.
-	int Trade[MaxCosts + 1];											/// How much of each resource the faction wants to trade ("+ 1" because of food); negative values are imports and positive ones exports
+	int Resources[MaxCosts];											/// Amount of each resource stored by the faction.
+	int Income[MaxCosts];												/// Income of each resource for the faction.
+	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
+	int Trade[MaxCosts];												/// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
 };
 
 class CRiver
@@ -223,7 +223,7 @@ class CGrandStrategyGame
 public:
 	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), SelectedProvince(-1), PlayerFaction(NULL)
 	{
-		for (int i = 0; i < MaxCosts + 1; ++i) {
+		for (int i = 0; i < MaxCosts; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
 				WorldMapResources[i][j][0] = -1;
 				WorldMapResources[i][j][1] = -1;
@@ -271,8 +271,8 @@ public:
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
 	CGrandStrategyFaction *PlayerFaction;
-	int WorldMapResources[MaxCosts + 1][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
-	int CommodityPrices[MaxCosts + 1];								///price for every 100 of each commodity
+	int WorldMapResources[MaxCosts][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
+	int CommodityPrices[MaxCosts];								///price for every 100 of each commodity
 
 	int MinimapTextureWidth;
 	int MinimapTextureHeight;

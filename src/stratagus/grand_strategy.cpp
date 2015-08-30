@@ -100,7 +100,7 @@ void CGrandStrategyGame::Clean()
 	}
 	this->ProvinceCount = 0;
 	
-	for (int i = 0; i < MaxCosts + 1; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		for (int j = 0; j < WorldMapResourceMax; ++j) {
 			this->WorldMapResources[i][j][0] = -1;
 			this->WorldMapResources[i][j][1] = -1;
@@ -605,13 +605,13 @@ void CGrandStrategyGame::DoTrade()
 	//store the human player's trade settings
 	int player_trade_preferences[MaxCosts];
 	if (this->PlayerFaction != NULL) {
-		for (int i = 0; i < MaxCosts + 1; ++i) {
+		for (int i = 0; i < MaxCosts; ++i) {
 			player_trade_preferences[i] = this->PlayerFaction->Trade[i];
 		}
 	}
 	
-	bool province_consumed_commodity[MaxCosts + 1][ProvinceMax];
-	for (int i = 0; i < MaxCosts + 1; ++i) {
+	bool province_consumed_commodity[MaxCosts][ProvinceMax];
+	for (int i = 0; i < MaxCosts; ++i) {
 		for (int j = 0; j < this->ProvinceCount; ++j) {
 			province_consumed_commodity[i][j] = false;
 		}
@@ -624,7 +624,7 @@ void CGrandStrategyGame::DoTrade()
 				if (this->Factions[i][j]->ProvinceCount > 0) {
 					for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
 						int province_id = this->Factions[i][j]->OwnedProvinces[k];
-						for (int res = 0; res < MaxCosts + 1; ++res) {
+						for (int res = 0; res < MaxCosts; ++res) {
 							if (res == GoldCost || res == ResearchCost || res == PrestigeCost) {
 								continue;
 							}
@@ -679,7 +679,7 @@ void CGrandStrategyGame::DoTrade()
 
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
-			for (int res = 0; res < MaxCosts + 1; ++res) {
+			for (int res = 0; res < MaxCosts; ++res) {
 				if (res == GoldCost || res == ResearchCost || res == PrestigeCost) {
 					continue;
 				}
@@ -719,7 +719,7 @@ void CGrandStrategyGame::DoTrade()
 					for (int k = 0; k < factions_by_prestige[j]->ProvinceCount; ++k) {
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
-						for (int res = 0; res < MaxCosts + 1; ++res) {
+						for (int res = 0; res < MaxCosts; ++res) {
 							if (res == GoldCost || res == ResearchCost || res == PrestigeCost) {
 								continue;
 							}
@@ -742,9 +742,9 @@ void CGrandStrategyGame::DoTrade()
 	}
 
 	// check whether offers or bids have been greater, and change the commodity's price accordingly
-	int remaining_wanted_trade[MaxCosts + 1];
+	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
-	for (int res = 0; res < MaxCosts + 1; ++res) {
+	for (int res = 0; res < MaxCosts; ++res) {
 		if (res == GoldCost || res == ResearchCost || res == PrestigeCost) {
 			continue;
 		}
@@ -778,7 +778,7 @@ void CGrandStrategyGame::DoTrade()
 	
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
-		for (int i = 0; i < MaxCosts + 1; ++i) {
+		for (int i = 0; i < MaxCosts; ++i) {
 			if (i == GoldCost || i == ResearchCost || i == PrestigeCost) {
 				continue;
 			}
@@ -797,7 +797,7 @@ void CGrandStrategyGame::DoTrade()
 
 void CGrandStrategyGame::DoProspection()
 {
-	for (int i = 0; i < MaxCosts + 1; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		for (int j = 0; j < WorldMapResourceMax; ++j) {
 			if (GrandStrategyGame.WorldMapResources[i][j][0] != -1 && GrandStrategyGame.WorldMapResources[i][j][1] != -1) {
 				if (GrandStrategyGame.WorldMapResources[i][j][2]) { //already discovered
@@ -817,8 +817,8 @@ void CGrandStrategyGame::DoProspection()
 							char buf[256];
 							snprintf(
 								buf, sizeof(buf), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
-								(CapitalizeString(i == FoodCost ? "food" : DefaultResourceNames[i]) + " found in " + GrandStrategyGame.Provinces[province_id]->GetCulturalName()).c_str(),
-								("My lord, " + CapitalizeString(i == FoodCost ? "food" : DefaultResourceNames[i]) + " has been found in the " + DecapitalizeString(GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name) + " of " + GrandStrategyGame.Provinces[province_id]->GetCulturalName() + "!").c_str()
+								(CapitalizeString(DefaultResourceNames[i]) + " found in " + GrandStrategyGame.Provinces[province_id]->GetCulturalName()).c_str(),
+								("My lord, " + CapitalizeString(DefaultResourceNames[i]) + " has been found in the " + DecapitalizeString(GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name) + " of " + GrandStrategyGame.Provinces[province_id]->GetCulturalName() + "!").c_str()
 							);
 							CclCommand(buf);
 							
@@ -2427,7 +2427,7 @@ void CGrandStrategyFaction::CalculateIncome(int resource)
 
 void CGrandStrategyFaction::CalculateIncomes()
 {
-	for (int i = 0; i < MaxCosts + 1; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		this->CalculateIncome(i);
 	}
 }
@@ -2496,9 +2496,6 @@ std::string GetWorldMapTileProvinceName(int x, int y)
 bool WorldMapTileHasResource(int x, int y, std::string resource_name, bool ignore_prospection)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (resource == -1) {
 		return false;
@@ -3019,9 +3016,6 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (resource != -1) {
 		for (int i = 0; i < WorldMapResourceMax; ++i) {
@@ -3047,9 +3041,6 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (resource != -1) {
 		for (int i = 0; i < WorldMapResourceMax; ++i) {
@@ -3519,7 +3510,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Provinces[i]->Tiles[j].x = -1;
 				GrandStrategyGame.Provinces[i]->Tiles[j].y = -1;
 			}
-			for (int j = 0; j < MaxCosts + 1; ++j) {
+			for (int j = 0; j < MaxCosts; ++j) {
 				GrandStrategyGame.Provinces[i]->ProductionEfficiencyModifier[j] = 0;
 			}
 		} else {
@@ -3535,7 +3526,7 @@ void CleanGrandStrategyGame()
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
 				}
-				for (int k = 0; k < MaxCosts + 1; ++k) {
+				for (int k = 0; k < MaxCosts; ++k) {
 					GrandStrategyGame.Factions[i][j]->Resources[k] = 0;
 					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
 					GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
@@ -3561,7 +3552,7 @@ void CleanGrandStrategyGame()
 		}
 	}
 	
-	for (int i = 0; i < MaxCosts + 1; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		for (int j = 0; j < WorldMapResourceMax; ++j) {
 			GrandStrategyGame.WorldMapResources[i][j][0] = -1;
 			GrandStrategyGame.WorldMapResources[i][j][1] = -1;
@@ -3846,7 +3837,7 @@ void InitializeGrandStrategyGame()
 	}
 	
 	//set resource prices to base prices
-	for (int i = 0; i < MaxCosts + 1; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		GrandStrategyGame.CommodityPrices[i] = DefaultResourcePrices[i];
 	}
 }
@@ -4049,9 +4040,6 @@ bool ProvinceHasResource(std::string province_name, std::string resource_name, b
 {
 	int province_id = GetProvinceId(province_name);
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (resource == -1) {
 		return false;
@@ -4177,9 +4165,6 @@ void SetFactionResource(std::string civilization_name, std::string faction_name,
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (faction == -1 || resource == -1) {
 		return;
@@ -4197,9 +4182,6 @@ void ChangeFactionResource(std::string civilization_name, std::string faction_na
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (faction == -1 || resource == -1) {
 		return;
@@ -4217,9 +4199,6 @@ int GetFactionResource(std::string civilization_name, std::string faction_name, 
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (faction == -1 || resource == -1) {
 		return 0;
@@ -4252,9 +4231,6 @@ int GetFactionIncome(std::string civilization_name, std::string faction_name, st
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (faction == -1 || resource == -1) {
 		return 0;
@@ -4443,7 +4419,7 @@ void ChangeFactionCulture(std::string old_civilization_name, std::string faction
 		}
 	}
 
-	for (int i = 0; i < MaxCosts + 1; ++i) {
+	for (int i = 0; i < MaxCosts; ++i) {
 		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[i] = GrandStrategyGame.Factions[old_civilization][old_faction]->Resources[i];
 	}
 	
@@ -4461,9 +4437,6 @@ void SetFactionCommodityTrade(std::string civilization_name, std::string faction
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (faction == -1 || resource == -1) {
 		return;
@@ -4481,9 +4454,6 @@ void ChangeFactionCommodityTrade(std::string civilization_name, std::string fact
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (faction == -1 || resource == -1) {
 		return;
@@ -4501,9 +4471,6 @@ int GetFactionCommodityTrade(std::string civilization_name, std::string faction_
 	}
 	
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (faction == -1 || resource == -1) {
 		return 0;
@@ -4515,9 +4482,6 @@ int GetFactionCommodityTrade(std::string civilization_name, std::string faction_
 void SetCommodityPrice(std::string resource_name, int price)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (resource == -1) {
 		return;
@@ -4529,9 +4493,6 @@ void SetCommodityPrice(std::string resource_name, int price)
 int GetCommodityPrice(std::string resource_name)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (resource == -1) {
 		return 0;
@@ -4543,9 +4504,6 @@ int GetCommodityPrice(std::string resource_name)
 void SetResourceBasePrice(std::string resource_name, int price)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());
-	if (resource_name == "food") {
-		resource = FoodCost;
-	}
 	
 	if (resource == -1) {
 		return;
