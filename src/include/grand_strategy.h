@@ -44,6 +44,8 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+#define BasePopulationGrowthPermyriad 4					/// Base population growth per 10,000
+
 class CGrandStrategyFaction;
 
 class WorldMapTerrainType
@@ -127,6 +129,8 @@ public:
 	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
 	void SetCivilization(int civilization);
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
+	void SetUnitQuantity(int unit_type_id, int quantity);
+	void ChangeUnitQuantity(int unit_type_id, int quantity);
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
 	bool HasBuildingClass(std::string building_class_name);
@@ -134,6 +138,7 @@ public:
 	bool HasResource(int resource, bool ignore_prospection = false);
 	bool BordersProvince(int province_id);
 	bool BordersFaction(int faction_civilization, int faction);
+	int GetPopulation();
 	int GetResourceDemand(int resource);
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRisk();
@@ -151,6 +156,8 @@ public:
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	int CurrentConstruction;											/// Building currently under construction (unit type index).
 	CGrandStrategyFaction *AttackedBy;									/// Which faction the province is being attacked by.
+	int TotalUnits;														/// Total quantity of units in the province
+	int PopulationGrowthProgress;										/// Progress (out of 10,000) of current population growth; when reaching 10,000 a new worker unit will be created
 	int ClaimCount;
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
@@ -340,6 +347,7 @@ extern void SetProvinceFactionCulturalSettlementName(std::string province_name, 
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident);
+extern void SetProvincePopulation(std::string province_name, int quantity);
 extern void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);

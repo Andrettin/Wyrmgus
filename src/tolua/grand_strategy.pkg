@@ -48,6 +48,7 @@ extern void SetProvinceFactionCulturalSettlementName(std::string province_name, 
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident);
+extern void SetProvincePopulation(std::string province_name, int quantity);
 extern void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);

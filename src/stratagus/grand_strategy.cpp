@@ -441,6 +441,10 @@ void CGrandStrategyGame::DrawInterface()
 			
 			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetRevoltRisk()) + "%";
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
+			item_y += 1;
+			
+			std::string population_string = "Population: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetPopulation());
+			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(population_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), population_string);
 		}
 	}
 }
@@ -541,50 +545,66 @@ void CGrandStrategyGame::DoTurn()
 	
 	for (int i = 0; i < this->ProvinceCount; ++i) {
 		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
-			// construct buildings
-			if (this->Provinces[i]->CurrentConstruction != -1) {
-				this->Provinces[i]->SetSettlementBuilding(this->Provinces[i]->CurrentConstruction, true);
-				this->Provinces[i]->CurrentConstruction = -1;
-			}
-				
-			// if the province has a town hall, a barracks and a smithy, give it a mercenary camp; not for Earth for now, since there are no recruitable mercenaries for Earth yet
-			int mercenary_camp_id = UnitTypeIdByIdent("unit-mercenary-camp");
-			if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == false && GrandStrategyWorld != "Earth") {
-				if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->HasBuildingClass("barracks") && this->Provinces[i]->HasBuildingClass("smithy")) {
-					this->Provinces[i]->SetSettlementBuilding(mercenary_camp_id, true);
+			if (this->Provinces[i]->Civilization != -1) { // if this province has a culture
+				int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
+					
+				// construct buildings
+				if (this->Provinces[i]->CurrentConstruction != -1) {
+					this->Provinces[i]->SetSettlementBuilding(this->Provinces[i]->CurrentConstruction, true);
+					this->Provinces[i]->CurrentConstruction = -1;
 				}
-			}
-			
-			if (this->Provinces[i]->Owner != NULL) {
-				//check revolt risk and potentially trigger a revolt
-				if (this->Provinces[i]->GetRevoltRisk() > 0 && SyncRand(100) < this->Provinces[i]->GetRevoltRisk() && this->Provinces[i]->AttackedBy == NULL) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn)
-					int possible_revolters[FactionMax];
-					int possible_revolter_count = 0;
-					for (int j = 0; j < this->Provinces[i]->ClaimCount; ++j) {
-						if (
-							this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Civilization
-							&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j][1]]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner->Civilization][this->Provinces[i]->Owner->Faction]->Type
-							&& !(this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Owner->Civilization && this->Provinces[i]->Claims[j][1] == this->Provinces[i]->Owner->Faction)
-							&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j][0]][GrandStrategyGame.Provinces[i]->Claims[j][1]]->Name != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Name // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
-						) { //if faction which has a claim on this province has the same civilization as the province, and if it is of the same faction type as the province's owner
-							possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j][1];
-							possible_revolter_count += 1;
-						}
-					}
-					if (possible_revolter_count > 0) {
-						int revolter_faction = possible_revolters[SyncRand(possible_revolter_count)];
-						this->Provinces[i]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[this->Provinces[i]->Civilization][revolter_faction]));
-						
-						int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
-						
-						if (infantry_id != -1) {
-							this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(12) + 1; // ideally should be militia, but only the dwarves have that sort of unit
-						}
+					
+				// if the province has a town hall, a barracks and a smithy, give it a mercenary camp; not for Earth for now, since there are no recruitable mercenaries for Earth yet
+				int mercenary_camp_id = UnitTypeIdByIdent("unit-mercenary-camp");
+				if (mercenary_camp_id != -1 && this->Provinces[i]->SettlementBuildings[mercenary_camp_id] == false && GrandStrategyWorld != "Earth") {
+					if (this->Provinces[i]->HasBuildingClass("town-hall") && this->Provinces[i]->HasBuildingClass("barracks") && this->Provinces[i]->HasBuildingClass("smithy")) {
+						this->Provinces[i]->SetSettlementBuilding(mercenary_camp_id, true);
 					}
 				}
 				
-				if (!this->Provinces[i]->HasFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction) && SyncRand(100) < 1) { // 1% chance the owner of this province will get a claim on it
-					this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction);
+				if (this->Provinces[i]->Owner != NULL) {
+					//check revolt risk and potentially trigger a revolt
+					if (this->Provinces[i]->GetRevoltRisk() > 0 && SyncRand(100) < this->Provinces[i]->GetRevoltRisk() && this->Provinces[i]->AttackedBy == NULL && this->Provinces[i]->Units[worker_unit_type] > 0) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn, and the quantity of revolting units is based on the quantity of workers in the province)
+						int possible_revolters[FactionMax];
+						int possible_revolter_count = 0;
+						for (int j = 0; j < this->Provinces[i]->ClaimCount; ++j) {
+							if (
+								this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Civilization
+								&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j][1]]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner->Civilization][this->Provinces[i]->Owner->Faction]->Type
+								&& !(this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Owner->Civilization && this->Provinces[i]->Claims[j][1] == this->Provinces[i]->Owner->Faction)
+								&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j][0]][GrandStrategyGame.Provinces[i]->Claims[j][1]]->Name != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Name // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
+							) { //if faction which has a claim on this province has the same civilization as the province, and if it is of the same faction type as the province's owner
+								possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j][1];
+								possible_revolter_count += 1;
+							}
+						}
+						if (possible_revolter_count > 0) {
+							int revolter_faction = possible_revolters[SyncRand(possible_revolter_count)];
+							this->Provinces[i]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[this->Provinces[i]->Civilization][revolter_faction]));
+							
+							int militia_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("militia"));
+							int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
+							
+							if (militia_id != -1) {
+								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(this->Provinces[i]->Units[worker_unit_type]) + 1;
+							} else if (infantry_id != -1) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
+								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->Units[worker_unit_type]) + 1) / 2;
+							}
+						}
+					}
+					
+					if (!this->Provinces[i]->HasFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction) && SyncRand(100) < 1) { // 1% chance the owner of this province will get a claim on it
+						this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction);
+					}
+				}
+				
+				//population growth
+				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 4) * BasePopulationGrowthPermyriad / 10000;
+				if (this->Provinces[i]->PopulationGrowthProgress >= 10000) { //if population growth progress is greater than or equal to 10,000, create a new worker unit
+					int new_units = this->Provinces[i]->PopulationGrowthProgress / 10000;
+					this->Provinces[i]->PopulationGrowthProgress -= 10000 * new_units;
+					
+					this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
 				}
 			}
 		} else { //if a somehow invalid province is reached
@@ -1177,6 +1197,10 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 		this->Owner = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization_id][faction_id]));
 		this->Owner->OwnedProvinces[this->Owner->ProvinceCount] = this->ID;
 		this->Owner->ProvinceCount += 1;
+		
+		if (this->Civilization == -1) { // if province has no civilization/culture defined, then make its culture that of its owner
+			this->Civilization = this->Owner->Civilization;
+		}
 	} else {
 		this->Owner = NULL;
 	}
@@ -1289,9 +1313,9 @@ void CProvince::SetCivilization(int civilization)
 				&& PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
 				&& PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) // don't replace if both civilizations use the same unit type
 			) {
-				this->Units[PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->Units[i];
+				this->ChangeUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), this->Units[i]);
 				this->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
-				this->Units[i] = 0;
+				this->SetUnitQuantity(i, 0);
 				this->UnderConstructionUnits[i] = 0;
 			}
 		}
@@ -1332,6 +1356,22 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 			this->Owner->CalculateIncome(ResearchCost);
 		}
 	}
+}
+
+void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
+{
+	quantity = std::max(0, quantity);
+	
+	this->TotalUnits += quantity - this->Units[unit_type_id];
+	
+	this->Units[unit_type_id] = quantity;
+}
+
+void CProvince::ChangeUnitQuantity(int unit_type_id, int quantity)
+{
+	quantity = std::max(0, quantity);
+	
+	this->SetUnitQuantity(unit_type_id, this->Units[unit_type_id] + quantity);
 }
 
 void CProvince::AddFactionClaim(int civilization_id, int faction_id)
@@ -1429,6 +1469,11 @@ bool CProvince::BordersFaction(int faction_civilization, int faction)
 		}
 	}
 	return false;
+}
+
+int CProvince::GetPopulation()
+{
+	return (this->TotalUnits * 10000 + this->PopulationGrowthProgress) * 4;
 }
 
 int CProvince::GetResourceDemand(int resource)
@@ -3331,14 +3376,36 @@ void SetProvinceCurrentConstruction(std::string province_name, std::string settl
 	}
 }
 
+void SetProvincePopulation(std::string province_name, int quantity)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		if (GrandStrategyGame.Provinces[province_id]->Civilization == -1) {
+			return;
+		}
+		int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(GrandStrategyGame.Provinces[province_id]->Civilization, GetUnitTypeClassIndexByName("worker"));
+	
+		if (quantity > 0) {
+			quantity /= 10000; // each population unit represents 10,000 people
+			quantity /= 4; // for now at least, only adult males are represented, so around a fourth of the total population
+			quantity = std::max(1, quantity);
+		}
+	
+		quantity -= GrandStrategyGame.Provinces[province_id]->TotalUnits - GrandStrategyGame.Provinces[province_id]->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
+		quantity = std::max(0, quantity);
+			
+		GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(worker_unit_type, quantity);
+	}
+}
+
 void SetProvinceUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity)
 {
 	int province_id = GetProvinceId(province_name);
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->Units[unit_type] = quantity;
-		GrandStrategyGame.Provinces[province_id]->Units[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->Units[unit_type]);
+		GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(unit_type, quantity);
 	}
 }
 
@@ -3348,8 +3415,7 @@ void ChangeProvinceUnitQuantity(std::string province_name, std::string unit_type
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->Units[unit_type] += quantity;
-		GrandStrategyGame.Provinces[province_id]->Units[unit_type] = std::max(0, GrandStrategyGame.Provinces[province_id]->Units[unit_type]);
+		GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(unit_type, quantity);
 	}
 }
 
@@ -3487,6 +3553,8 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->ReferenceProvince = -1;
 			GrandStrategyGame.Provinces[i]->CurrentConstruction = -1;
 			GrandStrategyGame.Provinces[i]->AttackedBy = NULL;
+			GrandStrategyGame.Provinces[i]->TotalUnits = 0;
+			GrandStrategyGame.Provinces[i]->PopulationGrowthProgress = 0;
 			GrandStrategyGame.Provinces[i]->ClaimCount = 0;
 			GrandStrategyGame.Provinces[i]->Water = false;
 			GrandStrategyGame.Provinces[i]->SettlementLocation.x = -1;
@@ -4350,7 +4418,7 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 			int units_to_be_created = 0;
 			if (!attacking_units) {
 				units_to_be_created = GrandStrategyGame.Provinces[province_id]->Units[i] / divisor;
-				GrandStrategyGame.Provinces[province_id]->Units[i] -= units_to_be_created;
+				GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(i, - units_to_be_created);
 			} else {
 				units_to_be_created = GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] / divisor;
 				GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] -= units_to_be_created;
@@ -4416,9 +4484,9 @@ void ChangeFactionCulture(std::string old_civilization_name, std::string faction
 					&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != -1
 					&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) // don't replace if both civilizations use the same unit type
 				) {
-					GrandStrategyGame.Provinces[province_id]->Units[PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class))] += GrandStrategyGame.Provinces[province_id]->Units[j];
+					GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)), GrandStrategyGame.Provinces[province_id]->Units[j]);
 					GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class))] += GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j];
-					GrandStrategyGame.Provinces[province_id]->Units[j] = 0;
+					GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(j, 0);
 					GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j] = 0;
 					GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
 				}
