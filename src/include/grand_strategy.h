@@ -44,7 +44,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
-#define BasePopulationGrowthPermyriad 4					/// Base population growth per 10,000
+#define BasePopulationGrowthPermyriad 12					/// Base population growth per 10,000
 
 class CGrandStrategyFaction;
 

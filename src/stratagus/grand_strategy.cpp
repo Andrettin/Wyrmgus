@@ -564,7 +564,12 @@ void CGrandStrategyGame::DoTurn()
 				
 				if (this->Provinces[i]->Owner != NULL) {
 					//check revolt risk and potentially trigger a revolt
-					if (this->Provinces[i]->GetRevoltRisk() > 0 && SyncRand(100) < this->Provinces[i]->GetRevoltRisk() && this->Provinces[i]->AttackedBy == NULL && this->Provinces[i]->Units[worker_unit_type] > 0) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn, and the quantity of revolting units is based on the quantity of workers in the province)
+					if (
+						this->Provinces[i]->GetRevoltRisk() > 0
+						&& SyncRand(100) < this->Provinces[i]->GetRevoltRisk()
+						&& this->Provinces[i]->AttackedBy == NULL
+//						&& this->Provinces[i]->Units[worker_unit_type] > 0
+					) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn, and the quantity of revolting units is based on the quantity of workers in the province)
 						int possible_revolters[FactionMax];
 						int possible_revolter_count = 0;
 						for (int j = 0; j < this->Provinces[i]->ClaimCount; ++j) {
@@ -586,9 +591,11 @@ void CGrandStrategyGame::DoTurn()
 							int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
 							
 							if (militia_id != -1) {
-								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(this->Provinces[i]->Units[worker_unit_type]) + 1;
+//								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(this->Provinces[i]->Units[worker_unit_type]) + 1;
+								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(12) + 1;
 							} else if (infantry_id != -1) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
-								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->Units[worker_unit_type]) + 1) / 2;
+//								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->Units[worker_unit_type]) + 1) / 2;
+								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(12) + 1) / 2;
 							}
 						}
 					}
@@ -599,7 +606,7 @@ void CGrandStrategyGame::DoTurn()
 				}
 				
 				//population growth
-				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 4) * BasePopulationGrowthPermyriad / 10000;
+				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 2) * BasePopulationGrowthPermyriad / 10000;
 				if (this->Provinces[i]->PopulationGrowthProgress >= 10000) { //if population growth progress is greater than or equal to 10,000, create a new worker unit
 					int new_units = this->Provinces[i]->PopulationGrowthProgress / 10000;
 					this->Provinces[i]->PopulationGrowthProgress -= 10000 * new_units;
@@ -1473,7 +1480,7 @@ bool CProvince::BordersFaction(int faction_civilization, int faction)
 
 int CProvince::GetPopulation()
 {
-	return (this->TotalUnits * 10000 + this->PopulationGrowthProgress) * 4;
+	return (this->TotalUnits * 10000 + this->PopulationGrowthProgress) * 2;
 }
 
 int CProvince::GetResourceDemand(int resource)
@@ -3388,7 +3395,7 @@ void SetProvincePopulation(std::string province_name, int quantity)
 	
 		if (quantity > 0) {
 			quantity /= 10000; // each population unit represents 10,000 people
-			quantity /= 4; // for now at least, only adult males are represented, so around a fourth of the total population
+			quantity /= 2; // only (working-age) adults are represented, so around half of the total population
 			quantity = std::max(1, quantity);
 		}
 	
