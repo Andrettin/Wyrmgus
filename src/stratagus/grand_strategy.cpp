@@ -2564,16 +2564,20 @@ std::string GetWorldMapTileProvinceName(int x, int y)
 
 bool WorldMapTileHasResource(int x, int y, std::string resource_name, bool ignore_prospection)
 {
+	clamp(&x, 0, GrandStrategyGame.WorldMapWidth - 1);
+	clamp(&y, 0, GrandStrategyGame.WorldMapHeight - 1);
+
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	if (resource_name == "any") {
+		return GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected || ignore_prospection);
+	}
+	
 	int resource = GetResourceIdByName(resource_name.c_str());
 	
 	if (resource == -1) {
 		return false;
 	}
-	
-	clamp(&x, 0, GrandStrategyGame.WorldMapWidth - 1);
-	clamp(&y, 0, GrandStrategyGame.WorldMapHeight - 1);
-
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
 	return GrandStrategyGame.WorldMapTiles[x][y]->HasResource(resource, ignore_prospection);
 }
