@@ -246,8 +246,8 @@ void CGrandStrategyGame::DrawMap()
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
-				if (GrandStrategyGame.WorldMapTiles[x][y]->HasResource(GoldCost, false)) {
-					GrandStrategyGame.GoldMineGraphics->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+				if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
+					GrandStrategyGame.ResourceBuildingGraphics[GrandStrategyGame.WorldMapTiles[x][y]->Resource]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 				}
 				
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
@@ -466,8 +466,18 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		tile_tooltip += " (";
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		tile_tooltip += ")";
-	} else if (GrandStrategyGame.WorldMapTiles[x][y]->HasResource(GoldCost, false)) {
-		tile_tooltip += "Gold Mine";
+	} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
+		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == GoldCost) {
+			tile_tooltip += "Gold Mine";
+		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == WoodCost) {
+			tile_tooltip += "Timber Lodge";
+		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == StoneCost) {
+			tile_tooltip += "Quarry";
+		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == GrainCost) {
+			tile_tooltip += "Grain Farm";
+		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == MushroomCost) {
+			tile_tooltip += "Mushroom Farm";
+		}
 		tile_tooltip += " (";
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		tile_tooltip += ")";
@@ -3086,8 +3096,6 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = discovered;
 				if (resource == GoldCost) {
 					GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 200;
-				} else if (resource == StoneCost) {
-					GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 10;
 				} else {
 					GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 100;
 				}
@@ -3690,13 +3698,17 @@ void InitializeGrandStrategyGame()
 	}
 	GrandStrategyGame.FogTile = CGraphic::Get(fog_graphic_tile);
 	
-	//and for the gold mine
-	std::string gold_mine_graphics_file = "tilesets/world/sites/gold_mine.png";
-	if (CGraphic::Get(gold_mine_graphics_file) == NULL) {
-		CGraphic *gold_mine_graphics = CGraphic::New(gold_mine_graphics_file, 64, 64);
-		gold_mine_graphics->Load();
+	//and for the resource buildings
+	for (int i = 0; i < MaxCosts; ++i) {
+		std::string resource_building_graphics_file = "tilesets/world/sites/resource_building_" + DefaultResourceNames[i] + ".png";
+		if (CanAccessFile(resource_building_graphics_file.c_str())) {
+			if (CGraphic::Get(resource_building_graphics_file) == NULL) {
+				CGraphic *resource_building_graphics = CGraphic::New(resource_building_graphics_file, 64, 64);
+				resource_building_graphics->Load();
+			}
+			GrandStrategyGame.ResourceBuildingGraphics[i] = CGraphic::Get(resource_building_graphics_file);
+		}
 	}
-	GrandStrategyGame.GoldMineGraphics = CGraphic::Get(gold_mine_graphics_file);
 	
 	// set the settlement graphics
 	for (int i = 0; i < MAX_RACES; ++i) {

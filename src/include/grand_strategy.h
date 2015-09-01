@@ -263,7 +263,7 @@ public:
 	int SelectedProvince;
 	CGraphic *FogTile;
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
-	CGraphic *GoldMineGraphics;
+	CGraphic *ResourceBuildingGraphics[MaxCosts];
 	CGraphic *BorderGraphics[MaxDirections];					///one for each direction
 	CGraphic *RiverGraphics[MaxDirections];
 	CGraphic *RivermouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not

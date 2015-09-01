@@ -76,6 +76,8 @@ enum CostType {
 	Cost9,									/// resource 9 (timber in Wyrmsun)
 	Cost10,									/// resource 10 (silver in Wyrmsun)
 	Cost11,									/// resource 11 (copper in Wyrmsun)
+	GrainCost,								/// grain resource
+	MushroomCost,							/// mushroom resource
 	//Wyrmgus end
 
 	MaxCosts                                /// how many different costs
