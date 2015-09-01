@@ -3468,6 +3468,16 @@ void SetProvinceAttackingUnitQuantity(std::string province_name, std::string uni
 	}
 }
 
+void SetProvinceHero(std::string province_name, std::string hero_ident, int value)
+{
+	int province_id = GetProvinceId(province_name);
+	int unit_type_id = UnitTypeIdByIdent(hero_ident);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type_id != -1) {
+		GrandStrategyGame.Provinces[province_id]->Heroes[unit_type_id] = value;
+	}
+}
+
 void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name)
 {
 	int province_id = GetProvinceId(province_name);
@@ -3596,6 +3606,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Provinces[i]->UnderConstructionUnits[j] = 0;
 				GrandStrategyGame.Provinces[i]->MovingUnits[j] = 0;
 				GrandStrategyGame.Provinces[i]->AttackingUnits[j] = 0;
+				GrandStrategyGame.Provinces[i]->Heroes[j] = 0;
 			}
 			for (int j = 0; j < ProvinceMax; ++j) {
 				GrandStrategyGame.Provinces[i]->BorderProvinces[j] = -1;
@@ -4212,9 +4223,28 @@ int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_ty
 int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident)
 {
 	int province_id = GetProvinceId(province_name);
-	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 	
-	return GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type];
+	return GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type_id];
+}
+
+int GetProvinceHero(std::string province_name, std::string hero_ident)
+{
+	int province_id = GetProvinceId(province_name);
+
+	if (province_id == -1) {
+		fprintf(stderr, "Can't find %s province.\n", province_name.c_str());
+		return 0;
+	}
+	
+	int unit_type_id = UnitTypeIdByIdent(hero_ident);
+	
+	if (unit_type_id == -1) {
+		fprintf(stderr, "Can't find %s unit type.\n", hero_ident.c_str());
+		return 0;
+	}
+	
+	return GrandStrategyGame.Provinces[province_id]->Heroes[unit_type_id];
 }
 
 std::string GetProvinceOwner(std::string province_name)

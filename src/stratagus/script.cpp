@@ -2677,6 +2677,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 					if (GrandStrategyGame.Provinces[i]->AttackingUnits[j] != 0) {
 						fprintf(fd, "SetProvinceAttackingUnitQuantity(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->AttackingUnits[j]); //save province attacking units
 					}
+					if (GrandStrategyGame.Provinces[i]->Heroes[j] != 0) {
+						fprintf(fd, "SetProvinceHero(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->Heroes[j]); //save province heroes
+					}
 				}
 				if (GrandStrategyGame.Provinces[i]->ClaimCount > 0) {
 					for (int j = 0; j < GrandStrategyGame.Provinces[i]->ClaimCount; ++j) {

@@ -113,6 +113,7 @@ public:
 		memset(UnderConstructionUnits, 0, sizeof(UnderConstructionUnits));
 		memset(MovingUnits, 0, sizeof(MovingUnits));
 		memset(AttackingUnits, 0, sizeof(AttackingUnits));
+		memset(Heroes, 0, sizeof(Heroes));
 		memset(BorderProvinces, 0, sizeof(BorderProvinces));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		for (int i = 0; i < ProvinceTileMax; ++i) {
@@ -167,6 +168,7 @@ public:
 	int UnderConstructionUnits[UnitTypeMax];							/// Quantity of units of a particular unit type being trained/constructed in the province
 	int MovingUnits[UnitTypeMax];										/// Quantity of units of a particular unit type moving to the province
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
+	int Heroes[UnitTypeMax];											/// Hero in the province, 0 = hero isn't here, 1 = hero is moving here, 2 = hero is here, 3 = hero is attacking the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Claims[MAX_RACES * FactionMax][2];								/// Factions which claim this province
@@ -353,6 +355,7 @@ extern void ChangeProvinceUnitQuantity(std::string province_name, std::string un
 extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
+extern void SetProvinceHero(std::string province_name, std::string hero_ident, int value);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetSelectedProvince(std::string province_name);
 extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
@@ -379,6 +382,7 @@ extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_t
 extern int GetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident);
+extern int GetProvinceHero(std::string province_name, std::string hero_ident);
 extern std::string GetProvinceOwner(std::string province_name);
 extern bool GetProvinceWater(std::string province_name);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
