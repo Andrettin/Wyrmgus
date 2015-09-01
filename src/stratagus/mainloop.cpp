@@ -334,9 +334,6 @@ void UpdateDisplay()
 			if (GrandStrategyMapHeightIndent > 0) {
 				GrandStrategyMapHeightIndent *= -1;
 			}
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (DrawOnScreenTiles ~= nil) then DrawOnScreenTiles() end;");
-			CclCommand(buf);
 		} else {
 			GameCursor = UI.Point.Cursor;
 		}

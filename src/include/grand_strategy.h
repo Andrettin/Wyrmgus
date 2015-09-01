@@ -47,6 +47,7 @@
 #define BasePopulationGrowthPermyriad 12					/// Base population growth per 10,000
 
 class CGrandStrategyFaction;
+class CGrandStrategyHero;
 
 class WorldMapTerrainType
 {
@@ -105,7 +106,7 @@ public:
 	CProvince() :
 		Name(""), SettlementName(""),
 		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1), ClaimCount(0),
-		Water(false), SettlementLocation(-1, -1),
+		Water(false), Coastal(false), Movement(false), SettlementLocation(-1, -1),
 		Owner(NULL), AttackedBy(NULL)
 	{
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
@@ -113,7 +114,6 @@ public:
 		memset(UnderConstructionUnits, 0, sizeof(UnderConstructionUnits));
 		memset(MovingUnits, 0, sizeof(MovingUnits));
 		memset(AttackingUnits, 0, sizeof(AttackingUnits));
-		memset(Heroes, 0, sizeof(Heroes));
 		memset(BorderProvinces, 0, sizeof(BorderProvinces));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		for (int i = 0; i < ProvinceTileMax; ++i) {
@@ -162,13 +162,14 @@ public:
 	int ClaimCount;
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
+	bool Movement;														/// Whether a unit or hero is currently moving to the province
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
 	bool SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
 	int Units[UnitTypeMax];												/// Quantity of units of a particular unit type in the province
 	int UnderConstructionUnits[UnitTypeMax];							/// Quantity of units of a particular unit type being trained/constructed in the province
 	int MovingUnits[UnitTypeMax];										/// Quantity of units of a particular unit type moving to the province
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
-	int Heroes[UnitTypeMax];											/// Hero in the province, 0 = hero isn't here, 1 = hero is moving here, 2 = hero is here, 3 = hero is attacking the province
+	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Claims[MAX_RACES * FactionMax][2];								/// Factions which claim this province
@@ -223,6 +224,20 @@ public:
 	std::string CulturalNames[MAX_RACES];								/// Names for the river for each different culture/civilization
 };
 
+class CGrandStrategyHero
+{
+public:
+	CGrandStrategyHero() :
+		State(0),
+		Type(NULL), Province(NULL)
+	{
+	}
+	
+	int State;															/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province
+	CUnitType *Type;
+	CProvince *Province;
+};
+
 /**
 **  Grand Strategy game instance
 **  Mapped with #GrandStrategy to a symbolic name.
@@ -264,7 +279,9 @@ public:
 	int ProvinceCount;
 	int SelectedProvince;
 	CGraphic *FogTile;
+	CGraphic *SymbolMove;										///symbol that units are moving to the province (drawn at the settlement location)
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
+	CGraphic *SymbolHero;										///symbol that a hero is present in the province (drawn at the settlement location)
 	CGraphic *ResourceBuildingGraphics[MaxCosts];
 	CGraphic *BorderGraphics[MaxDirections];					///one for each direction
 	CGraphic *RiverGraphics[MaxDirections];
@@ -279,6 +296,7 @@ public:
 	CProvince *Provinces[ProvinceMax];
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
+	std::vector<CGrandStrategyHero *> Heroes;
 	CGrandStrategyFaction *PlayerFaction;
 	int WorldMapResources[MaxCosts][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts];								///price for every 100 of each commodity

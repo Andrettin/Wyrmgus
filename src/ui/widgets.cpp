@@ -98,9 +98,6 @@ static void MenuHandleButtonUp(unsigned)
 		) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
 			CenterGrandStrategyMapOnTile(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (DrawOnScreenTiles ~= nil) then DrawOnScreenTiles() end;");
-			CclCommand(buf);
 		}
 	}
 	//Wyrmgus end
@@ -169,9 +166,6 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 			if (GrandStrategyMapHeightIndent > 0) {
 				GrandStrategyMapHeightIndent *= -1;
 			}
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (DrawOnScreenTiles ~= nil) then DrawOnScreenTiles() end;");
-			CclCommand(buf);
 		}
 	}
 	//Wyrmgus end
@@ -258,9 +252,6 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 			if (GrandStrategyMapHeightIndent > 0) {
 				GrandStrategyMapHeightIndent *= -1;
 			}
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (DrawOnScreenTiles ~= nil) then DrawOnScreenTiles() end;");
-			CclCommand(buf);
 		}
 	}
 	//Wyrmgus end

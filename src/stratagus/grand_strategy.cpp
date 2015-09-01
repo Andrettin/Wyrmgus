@@ -267,8 +267,14 @@ void CGrandStrategyGame::DrawMap()
 					}
 					
 					//draw symbol that the province is being attacked by the human player, if that is the case
-					if (GrandStrategyGame.Provinces[province_id]->AttackedBy != NULL && GrandStrategyGame.Provinces[province_id]->AttackedBy ==GrandStrategyGame.PlayerFaction && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
+					if (GrandStrategyGame.Provinces[province_id]->AttackedBy != NULL && GrandStrategyGame.Provinces[province_id]->AttackedBy == GrandStrategyGame.PlayerFaction && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
 						GrandStrategyGame.SymbolAttack->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					} else if (GrandStrategyGame.Provinces[province_id]->Movement && GrandStrategyGame.Provinces[province_id]->Owner != NULL && GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
+						GrandStrategyGame.SymbolMove->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					}
+					
+					if (GrandStrategyGame.Provinces[province_id]->Heroes.size() > 0 && GrandStrategyGame.Provinces[province_id]->Owner != NULL && GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
+						GrandStrategyGame.SymbolHero->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 				}
 			}
@@ -550,6 +556,21 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 
 void CGrandStrategyGame::DoTurn()
 {
+	//faction income
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (this->Factions[i][j]) {
+				if (this->Factions[i][j]->ProvinceCount > 0) {
+					for (int k = 0; k < MaxCosts; ++k) {
+						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
+					}
+				}
+			} else { //end of valid factions
+				break;
+			}
+		}
+	}
+	
 	//this function takes care only of some things for now, move the rest from Lua later
 	this->DoTrade();
 	
@@ -624,6 +645,7 @@ void CGrandStrategyGame::DoTurn()
 					this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
 				}
 			}
+			this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
 		} else { //if a somehow invalid province is reached
 			break;
 		}
@@ -3454,6 +3476,9 @@ void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_t
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
+		if (quantity > 0) {
+			GrandStrategyGame.Provinces[province_id]->Movement = true;
+		}
 		GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type] = std::max(0, quantity);
 	}
 }
@@ -3474,7 +3499,38 @@ void SetProvinceHero(std::string province_name, std::string hero_ident, int valu
 	int unit_type_id = UnitTypeIdByIdent(hero_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type_id != -1) {
-		GrandStrategyGame.Provinces[province_id]->Heroes[unit_type_id] = value;
+		if (value == 1) {
+			GrandStrategyGame.Provinces[province_id]->Movement = true;
+		}
+		bool found_hero = false;
+		//update the hero
+		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+			if (GrandStrategyGame.Heroes[i]->Type->Slot == UnitTypes[unit_type_id]->Slot) {
+				GrandStrategyGame.Heroes[i]->State = value;
+				if (GrandStrategyGame.Provinces[province_id] != GrandStrategyGame.Heroes[i]->Province || value == 0) { //if the new province is different from the hero's current province
+					if (GrandStrategyGame.Heroes[i]->Province != NULL) {
+						GrandStrategyGame.Heroes[i]->Province->Heroes.erase(std::remove(GrandStrategyGame.Heroes[i]->Province->Heroes.begin(), GrandStrategyGame.Heroes[i]->Province->Heroes.end(), GrandStrategyGame.Heroes[i]), GrandStrategyGame.Heroes[i]->Province->Heroes.end());  //remove the hero from the last province
+					}
+					GrandStrategyGame.Heroes[i]->Province = value != 0 ? const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_id])) : NULL;
+					if (GrandStrategyGame.Heroes[i]->Province != NULL) {
+						GrandStrategyGame.Heroes[i]->Province->Heroes.push_back(GrandStrategyGame.Heroes[i]); //add the hero to the new province
+					}
+				}
+				found_hero = true;
+				break;
+			}
+		}
+		//if the hero hasn't been defined yet, do so now
+		if (found_hero == false) {
+			CGrandStrategyHero *hero = new CGrandStrategyHero;
+			hero->State = value;
+			hero->Province = value != 0 ? const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_id])) : NULL;
+			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+			GrandStrategyGame.Heroes.push_back(hero);
+			if (hero->Province != NULL) {
+				GrandStrategyGame.Provinces[province_id]->Heroes.push_back(hero);
+			}
+		}
 	}
 }
 
@@ -3586,6 +3642,8 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->PopulationGrowthProgress = 0;
 			GrandStrategyGame.Provinces[i]->ClaimCount = 0;
 			GrandStrategyGame.Provinces[i]->Water = false;
+			GrandStrategyGame.Provinces[i]->Coastal = false;
+			GrandStrategyGame.Provinces[i]->Movement = false;
 			GrandStrategyGame.Provinces[i]->SettlementLocation.x = -1;
 			GrandStrategyGame.Provinces[i]->SettlementLocation.y = -1;
 			for (int j = 0; j < MAX_RACES; ++j) {
@@ -3606,7 +3664,6 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Provinces[i]->UnderConstructionUnits[j] = 0;
 				GrandStrategyGame.Provinces[i]->MovingUnits[j] = 0;
 				GrandStrategyGame.Provinces[i]->AttackingUnits[j] = 0;
-				GrandStrategyGame.Provinces[i]->Heroes[j] = 0;
 			}
 			for (int j = 0; j < ProvinceMax; ++j) {
 				GrandStrategyGame.Provinces[i]->BorderProvinces[j] = -1;
@@ -3618,6 +3675,7 @@ void CleanGrandStrategyGame()
 			for (int j = 0; j < MaxCosts; ++j) {
 				GrandStrategyGame.Provinces[i]->ProductionEfficiencyModifier[j] = 0;
 			}
+			GrandStrategyGame.Provinces[i]->Heroes.clear();
 		} else {
 			break;
 		}
@@ -3666,6 +3724,11 @@ void CleanGrandStrategyGame()
 		GrandStrategyGame.CommodityPrices[i] = 0;
 	}
 	
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		GrandStrategyGame.Heroes[i]->State = 0;
+		GrandStrategyGame.Heroes[i]->Province = NULL;
+	}
+			
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
 	GrandStrategyGame.ProvinceCount = 0;
@@ -3918,6 +3981,14 @@ void InitializeGrandStrategyGame()
 		GrandStrategyGame.RoadGraphics[i] = CGraphic::Get(road_graphics_file);
 	}
 	
+	//load the move symbol
+	std::string move_symbol_filename = "tilesets/world/sites/move.png";
+	if (CGraphic::Get(move_symbol_filename) == NULL) {
+		CGraphic *move_symbol_graphic = CGraphic::New(move_symbol_filename, 64, 64);
+		move_symbol_graphic->Load();
+	}
+	GrandStrategyGame.SymbolMove = CGraphic::Get(move_symbol_filename);
+	
 	//load the attack symbol
 	std::string attack_symbol_filename = "tilesets/world/sites/attack.png";
 	if (CGraphic::Get(attack_symbol_filename) == NULL) {
@@ -3925,6 +3996,14 @@ void InitializeGrandStrategyGame()
 		attack_symbol_graphic->Load();
 	}
 	GrandStrategyGame.SymbolAttack = CGraphic::Get(attack_symbol_filename);
+	
+	//load the hero symbol
+	std::string hero_symbol_filename = "tilesets/world/sites/hero.png";
+	if (CGraphic::Get(hero_symbol_filename) == NULL) {
+		CGraphic *hero_symbol_graphic = CGraphic::New(hero_symbol_filename, 64, 64);
+		hero_symbol_graphic->Load();
+	}
+	GrandStrategyGame.SymbolHero = CGraphic::Get(hero_symbol_filename);
 	
 	//create grand strategy faction instances for all defined factions
 	for (int i = 0; i < MAX_RACES; ++i) {
@@ -4244,7 +4323,12 @@ int GetProvinceHero(std::string province_name, std::string hero_ident)
 		return 0;
 	}
 	
-	return GrandStrategyGame.Provinces[province_id]->Heroes[unit_type_id];
+	for (size_t i = 0; i < GrandStrategyGame.Provinces[province_id]->Heroes.size(); ++i) {
+		if (GrandStrategyGame.Provinces[province_id]->Heroes[i]->Type->Slot == UnitTypes[unit_type_id]->Slot) {
+			return GrandStrategyGame.Provinces[province_id]->Heroes[i]->State;
+		}
+	}
+	return 0;
 }
 
 std::string GetProvinceOwner(std::string province_name)
