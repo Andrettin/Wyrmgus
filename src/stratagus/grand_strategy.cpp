@@ -1490,18 +1490,18 @@ void CProvince::CalculateIncome(int resource)
 				if (!GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) { //non-discovered resources don't grant income
 					continue;
 				}
-					
-					
+
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 					
 				if (province_id == this->ID && this->HasBuildingClass("town-hall")) {
-					income = GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction;
+					int tile_income = GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction;
 					int production_modifier = this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource];
 					if (resource != GrainCost && resource != MushroomCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
 						production_modifier += this->GetAdministrativeEfficiencyModifier();
 					}
-					income *= 100 + production_modifier;
-					income /= 100;
+					tile_income *= 100 + production_modifier;
+					tile_income /= 100;
+					income += tile_income;
 				}
 			} else {
 				break;
@@ -4719,8 +4719,8 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 	}
 	
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (IsMilitaryUnit(*UnitTypes[i]) && (UnitTypes[i]->Class != "militia" || !ignore_militia)) {
-			int units_to_be_created = 0;
+		int units_to_be_created = 0;
+		if (IsMilitaryUnit(*UnitTypes[i]) && UnitTypes[i]->Class != "militia") {
 			if (!attacking_units) {
 				units_to_be_created = GrandStrategyGame.Provinces[province_id]->Units[i] / divisor;
 				GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(i, - units_to_be_created);
@@ -4728,25 +4728,32 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 				units_to_be_created = GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] / divisor;
 				GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] -= units_to_be_created;
 			}
+		} else if (!attacking_units && UnitTypes[i]->Class == "worker" && !ignore_militia && !UnitTypes[i]->Civilization.empty()) { // create militia in the province depending on the amount of workers
 			
-			if (units_to_be_created > 0) {
-				units_to_be_created *= BattalionMultiplier;
-				for (int j = 0; j < units_to_be_created; ++j) {
-					CUnit *unit = MakeUnit(*UnitTypes[i], &Players[player]);
-					if (unit == NULL) {
-						DebugPrint("Unable to allocate unit");
-						return;
+			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(PlayerRaces.GetRaceIndexByName(UnitTypes[i]->Civilization.c_str()), GetUnitTypeClassIndexByName("militia"));
+			
+			if (militia_unit_type != -1) {
+				units_to_be_created = GrandStrategyGame.Provinces[province_id]->Units[militia_unit_type] / 2 / divisor; //half of the worker population as militia
+			}
+		}
+		
+		if (units_to_be_created > 0) {
+			units_to_be_created *= BattalionMultiplier;
+			for (int j = 0; j < units_to_be_created; ++j) {
+				CUnit *unit = MakeUnit(*UnitTypes[i], &Players[player]);
+				if (unit == NULL) {
+					DebugPrint("Unable to allocate unit");
+					return;
+				} else {
+					if (UnitCanBeAt(*unit, Players[player].StartPos)) {
+						unit->Place(Players[player].StartPos);
 					} else {
-						if (UnitCanBeAt(*unit, Players[player].StartPos)) {
-							unit->Place(Players[player].StartPos);
-						} else {
-							const int heading = SyncRand() % 256;
+						const int heading = SyncRand() % 256;
 
-							unit->tilePos = Players[player].StartPos;
-							DropOutOnSide(*unit, heading, NULL);
-						}
-						UpdateForNewUnit(*unit, 0);
+						unit->tilePos = Players[player].StartPos;
+						DropOutOnSide(*unit, heading, NULL);
 					}
+					UpdateForNewUnit(*unit, 0);
 				}
 			}
 		}
