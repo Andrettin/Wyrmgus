@@ -658,13 +658,18 @@ void CGrandStrategyGame::DoTurn()
 				
 				//population growth
 //				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 2) * BasePopulationGrowthPermyriad / 10000;
-				this->Provinces[i]->PopulationGrowthProgress += this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] - this->Provinces[i]->FoodConsumption;
+				int province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] - this->Provinces[i]->FoodConsumption;
+				this->Provinces[i]->PopulationGrowthProgress += province_food_income;
 				if (this->Provinces[i]->PopulationGrowthProgress >= PopulationGrowthThreshold) { //if population growth progress is greater than or equal to the population growth threshold, create a new worker unit
-					int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
-					int new_units = this->Provinces[i]->PopulationGrowthProgress / PopulationGrowthThreshold;
-					this->Provinces[i]->PopulationGrowthProgress -= PopulationGrowthThreshold * new_units;
-					
-					this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
+					if (province_food_income >= 100) { //if province food income is enough to support a new unit
+						int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
+						int new_units = this->Provinces[i]->PopulationGrowthProgress / PopulationGrowthThreshold;
+						this->Provinces[i]->PopulationGrowthProgress -= PopulationGrowthThreshold * new_units;
+						
+						this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
+					} else { //if the province's food income is positive, but not enough to sustain a new unit, keep it at the population growth threshold
+						this->Provinces[i]->PopulationGrowthProgress = PopulationGrowthThreshold;
+					}
 				}
 			}
 			this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
@@ -1490,7 +1495,13 @@ void CProvince::CalculateIncome(int resource)
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 					
 				if (province_id == this->ID && this->HasBuildingClass("town-hall")) {
-					income += GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction * (100 + this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource] + this->GetAdministrativeEfficiencyModifier()) / 100;
+					income = GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction;
+					int production_modifier = this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource];
+					if (resource != GrainCost && resource != MushroomCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
+						production_modifier += this->GetAdministrativeEfficiencyModifier();
+					}
+					income *= 100 + production_modifier;
+					income /= 100;
 				}
 			} else {
 				break;
@@ -3669,6 +3680,15 @@ void SetProvinceHero(std::string province_name, std::string hero_ident, int valu
 				GrandStrategyGame.Provinces[province_id]->Heroes.push_back(hero);
 			}
 		}
+	}
+}
+
+void SetProvinceFood(std::string province_name, int quantity)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress = std::max(0, quantity);
 	}
 }
 

@@ -2663,6 +2663,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Provinces[i]->CurrentConstruction != -1) {
 					fprintf(fd, "SetProvinceCurrentConstruction(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[GrandStrategyGame.Provinces[i]->CurrentConstruction]->Ident.c_str()); //save province current construction
 				}
+				if (GrandStrategyGame.Provinces[i]->PopulationGrowthProgress > 0) {
+					fprintf(fd, "SetProvinceFood(\"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->PopulationGrowthProgress);
+				}
 				for (size_t j = 0; j < UnitTypes.size(); ++j) {
 					if (GrandStrategyGame.Provinces[i]->SettlementBuildings[j] != false) {
 						fprintf(fd, "SetProvinceSettlementBuilding(\"%s\", \"%s\", %s)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), "true"); //save settlement building

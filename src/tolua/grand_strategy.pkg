@@ -55,6 +55,7 @@ extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, 
 extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceHero(std::string province_name, std::string hero_ident, int value);
+extern void SetProvinceFood(std::string province_name, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetSelectedProvince(std::string province_name);
 extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
