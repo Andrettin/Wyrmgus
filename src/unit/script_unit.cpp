@@ -665,6 +665,24 @@ static int CclMoveUnit(lua_State *l)
 }
 
 /**
+**  Remove unit from the map.
+**
+**  @param l  Lua state.
+**
+**  @return   Returns 1.
+*/
+static int CclRemoveUnit(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	unit->Remove(NULL);
+	lua_pushvalue(l, 1);
+	return 1;
+}
+
+/**
 **  Create a unit and place it on the map
 **
 **  @param l  Lua state.
@@ -790,6 +808,26 @@ static int CclCreateUnitInTransporter(lua_State *l)
 	}
 }
 //Wyrmgus end
+
+/**
+**  'Upgrade' a unit in place to a unit of different type.
+**
+**  @param l  Lua state.
+**
+**  @return   Returns success.
+*/
+static int CclTransformUnit(lua_State *l)
+{
+	lua_pushvalue(l, 1);
+	CUnit *targetUnit = CclGetUnit(l);
+	lua_pop(l, 1);
+	lua_pushvalue(l, 2);
+	const CUnitType *unittype = TriggerGetUnitType(l);
+	lua_pop(l, 1);
+	CommandUpgradeTo(*targetUnit, *(CUnitType*)unittype, 1);
+	lua_pushvalue(l, 1);
+	return 1;
+}
 
 /**
 **  Damages unit, additionally using another unit as first's attacker
@@ -1603,7 +1641,9 @@ void UnitCclRegister()
 	lua_register(Lua, "Unit", CclUnit);
 
 	lua_register(Lua, "MoveUnit", CclMoveUnit);
+	lua_register(Lua, "RemoveUnit", CclRemoveUnit);
 	lua_register(Lua, "CreateUnit", CclCreateUnit);
+	lua_register(Lua, "TransformUnit", CclTransformUnit);
 	lua_register(Lua, "DamageUnit", CclDamageUnit);
 	lua_register(Lua, "SetResourcesHeld", CclSetResourcesHeld);
 	lua_register(Lua, "SetTeleportDestination", CclSetTeleportDestination);
