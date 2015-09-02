@@ -646,7 +646,7 @@ void CGrandStrategyGame::DoTurn()
 							if (militia_id != -1) {
 								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(this->Provinces[i]->TotalWorkers) + 1;
 							} else if (infantry_id != -1) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
-								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->TotalWorkers) + 1) / 2;
+								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->TotalWorkers / 2) + 1);
 							}
 						}
 					}
@@ -1447,8 +1447,6 @@ void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
 
 void CProvince::ChangeUnitQuantity(int unit_type_id, int quantity)
 {
-	quantity = std::max(0, quantity);
-	
 	this->SetUnitQuantity(unit_type_id, this->Units[unit_type_id] + quantity);
 }
 
@@ -1620,7 +1618,7 @@ bool CProvince::BordersFaction(int faction_civilization, int faction)
 
 int CProvince::GetPopulation()
 {
-	return (this->TotalUnits * 10000) * 2;
+	return (this->TotalWorkers * 10000) * 2;
 }
 
 int CProvince::GetResourceDemand(int resource)
