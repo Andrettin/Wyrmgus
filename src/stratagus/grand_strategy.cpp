@@ -3582,7 +3582,9 @@ void SetProvincePopulation(std::string province_name, int quantity)
 			quantity = std::max(1, quantity);
 		}
 	
-		quantity -= GrandStrategyGame.Provinces[province_id]->TotalUnits - GrandStrategyGame.Provinces[province_id]->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
+//		quantity -= GrandStrategyGame.Provinces[province_id]->TotalUnits - GrandStrategyGame.Provinces[province_id]->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
+		// don't take military units in consideration for this population count for now (since they don't cost food anyway)
+		quantity -= GrandStrategyGame.Provinces[province_id]->TotalWorkers - GrandStrategyGame.Provinces[province_id]->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
 		quantity = std::max(0, quantity);
 			
 		GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(worker_unit_type, quantity);
