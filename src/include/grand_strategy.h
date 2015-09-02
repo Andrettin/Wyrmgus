@@ -123,6 +123,12 @@ public:
 			Tiles[i].x = -1;
 			Tiles[i].y = -1;
 		}
+		for (int i = 0; i < MaxCosts; ++i) {
+			for (int j = 0; j < ProvinceTileMax; ++j) {
+				ResourceTiles[i][j].x = -1;
+				ResourceTiles[i][j].y = -1;
+			}
+		}
 		for (int i = 0; i < MAX_RACES * FactionMax; ++i) {
 			Claims[i][0] = -1;
 			Claims[i][1] = -1;
@@ -186,6 +192,7 @@ public:
 	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
 	std::string FactionCulturalSettlementNames[MAX_RACES][FactionMax];	/// Names for the province's settlement for each different faction
 	Vec2i Tiles[ProvinceTileMax];
+	Vec2i ResourceTiles[MaxCosts][ProvinceTileMax];						///resources tiles in the province
 };
 
 class CGrandStrategyFaction
@@ -257,9 +264,8 @@ public:
 	{
 		for (int i = 0; i < MaxCosts; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
-				WorldMapResources[i][j][0] = -1;
-				WorldMapResources[i][j][1] = -1;
-				WorldMapResources[i][j][2] = 0;
+				WorldMapResources[i][j].x = -1;
+				WorldMapResources[i][j].y = -1;
 			}
 		}
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
@@ -306,7 +312,7 @@ public:
 	CRiver *Rivers[RiverMax];
 	std::vector<CGrandStrategyHero *> Heroes;
 	CGrandStrategyFaction *PlayerFaction;
-	int WorldMapResources[MaxCosts][WorldMapResourceMax][3];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
+	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts];								///price for every 100 of each commodity
 
 	int MinimapTextureWidth;

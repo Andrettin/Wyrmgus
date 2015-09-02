@@ -2627,10 +2627,12 @@ void SaveGrandStrategyGame(const std::string &filename)
 				fprintf(fd, "SetCommodityPrice(\"%s\", %d)\n", DefaultResourceNames[i].c_str(), GrandStrategyGame.CommodityPrices[i]); //save commodity prices
 			}
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
-				if (GrandStrategyGame.WorldMapResources[i][j][0] == -1 && GrandStrategyGame.WorldMapResources[i][j][1] == -1 && GrandStrategyGame.WorldMapResources[i][j][2] == 0) { //if reached a blank spot, stop the loop
+				int x = GrandStrategyGame.WorldMapResources[i][j].x;
+				int y = GrandStrategyGame.WorldMapResources[i][j].y;
+				if (x == -1 && y == -1) { //if reached a blank spot, stop the loop
 					break;
 				} else {
-					fprintf(fd, "AddWorldMapResource(\"%s\", %d, %d, %s)\n", DefaultResourceNames[i].c_str(), GrandStrategyGame.WorldMapResources[i][j][0], GrandStrategyGame.WorldMapResources[i][j][1], GrandStrategyGame.WorldMapResources[i][j][2] ? "true" : "false"); //save world map resource
+					fprintf(fd, "AddWorldMapResource(\"%s\", %d, %d, %s)\n", DefaultResourceNames[i].c_str(), x, y, GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected ? "true" : "false"); //save world map resource
 				}
 			}
 		}
