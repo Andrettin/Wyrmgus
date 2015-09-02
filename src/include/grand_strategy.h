@@ -45,6 +45,7 @@
 ----------------------------------------------------------------------------*/
 
 #define BasePopulationGrowthPermyriad 12					/// Base population growth per 10,000
+#define PopulationGrowthThreshold 1000						/// How much population growth progress must be accumulated before a new worker unit is created in the province
 
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
@@ -105,7 +106,8 @@ class CProvince
 public:
 	CProvince() :
 		Name(""), SettlementName(""),
-		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1), ClaimCount(0),
+		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
+		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), ClaimCount(0),
 		Water(false), Coastal(false), Movement(false), SettlementLocation(-1, -1),
 		Owner(NULL), AttackedBy(NULL)
 	{
@@ -115,6 +117,7 @@ public:
 		memset(MovingUnits, 0, sizeof(MovingUnits));
 		memset(AttackingUnits, 0, sizeof(AttackingUnits));
 		memset(BorderProvinces, 0, sizeof(BorderProvinces));
+		memset(Income, 0, sizeof(Income));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		for (int i = 0; i < ProvinceTileMax; ++i) {
 			Tiles[i].x = -1;
@@ -132,6 +135,8 @@ public:
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
 	void SetUnitQuantity(int unit_type_id, int quantity);
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
+	void CalculateIncome(int resource);
+	void CalculateIncomes();
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
 	bool HasBuildingClass(std::string building_class_name);
@@ -158,7 +163,9 @@ public:
 	int CurrentConstruction;											/// Building currently under construction (unit type index).
 	CGrandStrategyFaction *AttackedBy;									/// Which faction the province is being attacked by.
 	int TotalUnits;														/// Total quantity of units in the province
-	int PopulationGrowthProgress;										/// Progress (out of 10,000) of current population growth; when reaching 10,000 a new worker unit will be created
+	int TotalWorkers;													/// Total quantity of workers in the province
+	int PopulationGrowthProgress;										/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
+	int FoodConsumption;												/// How much food the people in the province consume
 	int ClaimCount;
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
@@ -171,6 +178,7 @@ public:
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
+	int Income[MaxCosts];												/// Income for each resource.
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Claims[MAX_RACES * FactionMax][2];								/// Factions which claim this province
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization

@@ -431,10 +431,13 @@ void CGrandStrategyGame::DrawMinimap()
 
 void CGrandStrategyGame::DrawInterface()
 {
+	int item_y = 0;
+	
 	if (this->SelectedProvince != -1) {
-		if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
-			int item_y = 0;
-			
+		if (GrandStrategyInterfaceState == "Province") {
+//			UI.Resources[FoodCost].G->DrawFrameClip(0, 16, Video.Height - 14 - 5, true);
+//			CLabel(GetGameFont()).Draw(16 + 14 + 2, Video.Height - 14 - 5, "1000");
+		} else if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
 			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization != -1) {
 				std::string province_culture_string = "Province Culture: " + CapitalizeString(PlayerRaces.Name[GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization]);
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(province_culture_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), province_culture_string);
@@ -445,12 +448,28 @@ void CGrandStrategyGame::DrawInterface()
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(administrative_efficiency_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), administrative_efficiency_string);
 			item_y += 1;
 			
-			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetRevoltRisk()) + "%";
-			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
-			item_y += 1;
-			
 			std::string population_string = "Population: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetPopulation());
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(population_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), population_string);
+			item_y += 1;
+			
+			std::string food_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->PopulationGrowthProgress) + "/" + std::to_string((long long) PopulationGrowthThreshold);
+			int food_change = GrandStrategyGame.Provinces[this->SelectedProvince]->Income[GrainCost] + GrandStrategyGame.Provinces[this->SelectedProvince]->Income[MushroomCost] - GrandStrategyGame.Provinces[this->SelectedProvince]->FoodConsumption;
+
+			if (food_change > 0) {
+				food_string += "+" + std::to_string((long long) food_change);
+			} else if (food_change < 0) {
+				food_string += "-" + std::to_string((long long) food_change * -1);
+			}
+			
+			UI.Resources[FoodCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
+			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), food_string);
+		} else if (GrandStrategyInterfaceState == "barracks") {
+			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetRevoltRisk()) + "%";
+			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
+		} else if (GrandStrategyInterfaceState == "lumber-mill" || GrandStrategyInterfaceState == "smithy") {
+			std::string labor_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->TotalWorkers * 100);
+			UI.Resources[LaborCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
+			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), labor_string);
 		}
 	}
 }
@@ -562,7 +581,13 @@ void CGrandStrategyGame::DoTurn()
 			if (this->Factions[i][j]) {
 				if (this->Factions[i][j]->ProvinceCount > 0) {
 					for (int k = 0; k < MaxCosts; ++k) {
-						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
+						if (k == GrainCost || k == MushroomCost) { //food resources are not added to the faction's storage, being stored at the province level instead
+							continue;
+						} else if (k == ResearchCost) {
+							this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->ProvinceCount;
+						} else {
+							this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
+						}
 					}
 				}
 			} else { //end of valid factions
@@ -577,8 +602,6 @@ void CGrandStrategyGame::DoTurn()
 	for (int i = 0; i < this->ProvinceCount; ++i) {
 		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
 			if (this->Provinces[i]->Civilization != -1) { // if this province has a culture
-				int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
-					
 				// construct buildings
 				if (this->Provinces[i]->CurrentConstruction != -1) {
 					this->Provinces[i]->SetSettlementBuilding(this->Provinces[i]->CurrentConstruction, true);
@@ -599,7 +622,7 @@ void CGrandStrategyGame::DoTurn()
 						this->Provinces[i]->GetRevoltRisk() > 0
 						&& SyncRand(100) < this->Provinces[i]->GetRevoltRisk()
 						&& this->Provinces[i]->AttackedBy == NULL
-//						&& this->Provinces[i]->Units[worker_unit_type] > 0
+						&& this->Provinces[i]->TotalWorkers > 0
 					) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn, and the quantity of revolting units is based on the quantity of workers in the province)
 						int possible_revolters[FactionMax];
 						int possible_revolter_count = 0;
@@ -622,11 +645,9 @@ void CGrandStrategyGame::DoTurn()
 							int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
 							
 							if (militia_id != -1) {
-//								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(this->Provinces[i]->Units[worker_unit_type]) + 1;
-								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(12) + 1;
+								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(this->Provinces[i]->TotalWorkers) + 1;
 							} else if (infantry_id != -1) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
-//								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->Units[worker_unit_type]) + 1) / 2;
-								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(12) + 1) / 2;
+								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->TotalWorkers) + 1) / 2;
 							}
 						}
 					}
@@ -637,10 +658,12 @@ void CGrandStrategyGame::DoTurn()
 				}
 				
 				//population growth
-				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 2) * BasePopulationGrowthPermyriad / 10000;
-				if (this->Provinces[i]->PopulationGrowthProgress >= 10000) { //if population growth progress is greater than or equal to 10,000, create a new worker unit
-					int new_units = this->Provinces[i]->PopulationGrowthProgress / 10000;
-					this->Provinces[i]->PopulationGrowthProgress -= 10000 * new_units;
+//				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 2) * BasePopulationGrowthPermyriad / 10000;
+				this->Provinces[i]->PopulationGrowthProgress += this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] - this->Provinces[i]->FoodConsumption;
+				if (this->Provinces[i]->PopulationGrowthProgress >= PopulationGrowthThreshold) { //if population growth progress is greater than or equal to the population growth threshold, create a new worker unit
+					int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
+					int new_units = this->Provinces[i]->PopulationGrowthProgress / PopulationGrowthThreshold;
+					this->Provinces[i]->PopulationGrowthProgress -= PopulationGrowthThreshold * new_units;
 					
 					this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
 				}
@@ -691,7 +714,7 @@ void CGrandStrategyGame::DoTrade()
 					for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
 						int province_id = this->Factions[i][j]->OwnedProvinces[k];
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == ResearchCost || res == PrestigeCost) {
+							if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost) {
 								continue;
 							}
 							
@@ -746,7 +769,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == GoldCost || res == ResearchCost || res == PrestigeCost) {
+				if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost) {
 					continue;
 				}
 				
@@ -786,7 +809,7 @@ void CGrandStrategyGame::DoTrade()
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == ResearchCost || res == PrestigeCost) {
+							if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost) {
 								continue;
 							}
 							
@@ -811,7 +834,7 @@ void CGrandStrategyGame::DoTrade()
 	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == GoldCost || res == ResearchCost || res == PrestigeCost) {
+		if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost) {
 			continue;
 		}
 		
@@ -845,7 +868,7 @@ void CGrandStrategyGame::DoTrade()
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == GoldCost || i == ResearchCost || i == PrestigeCost) {
+			if (i == GoldCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || i == GrainCost || i == MushroomCost) {
 				continue;
 			}
 		
@@ -878,7 +901,7 @@ void CGrandStrategyGame::DoProspection()
 					if (SyncRand(100) < 1) { // 1% chance of discovery per turn
 						GrandStrategyGame.WorldMapResources[i][j][2] = 1;
 						GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = true;
-						GrandStrategyGame.Provinces[province_id]->Owner->CalculateIncome(i);
+						GrandStrategyGame.Provinces[province_id]->CalculateIncome(i);
 						if (GrandStrategyGame.PlayerFaction == GrandStrategyGame.Provinces[province_id]->Owner) {
 							char buf[256];
 							snprintf(
@@ -1230,6 +1253,14 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 			}
 		}
 		this->Owner->ProvinceCount -= 1;
+		
+		//also remove its resource incomes from the owner's incomes, and reset the province's income so it won't be deduced from the new owner's income when recalculating it
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (this->Income[i] != 0) {
+				this->Owner->Income[i] -= this->Income[i];
+				this->Income[i] = 0;
+			}
+		}
 	}
 
 	if (civilization_id != -1 && faction_id != -1) {
@@ -1243,6 +1274,8 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 	} else {
 		this->Owner = NULL;
 	}
+	
+	this->CalculateIncomes();
 }
 
 void CProvince::SetCivilization(int civilization)
@@ -1362,9 +1395,7 @@ void CProvince::SetCivilization(int civilization)
 	
 	this->CurrentConstruction = -1; // under construction buildings get canceled
 	
-	if (this->Owner != NULL) {
-		this->Owner->CalculateIncomes();
-	}
+	this->CalculateIncomes();
 }
 
 void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
@@ -1380,7 +1411,7 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 		if (UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
 			this->ProductionEfficiencyModifier[i] += UnitTypes[building_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
 			if (this->Owner != NULL) {
-				this->Owner->CalculateIncome(i);
+				this->CalculateIncome(i);
 			}
 		}
 	}
@@ -1388,11 +1419,11 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 	//recalculate the faction incomes if a town hall or a building that provides research was constructed
 	if (this->Owner != NULL) {
 		if (UnitTypes[building_id]->Class == "town-hall") {
-			this->Owner->CalculateIncomes();
+			this->CalculateIncomes();
 		} else if (UnitTypes[building_id]->Class == "lumber-mill") {
-			this->Owner->CalculateIncome(ResearchCost);
+			this->CalculateIncome(ResearchCost);
 		} else if (UnitTypes[building_id]->Class == "smithy") {
-			this->Owner->CalculateIncome(ResearchCost);
+			this->CalculateIncome(ResearchCost);
 		}
 	}
 }
@@ -1402,6 +1433,10 @@ void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
 	quantity = std::max(0, quantity);
 	
 	this->TotalUnits += quantity - this->Units[unit_type_id];
+	if (UnitTypes[unit_type_id]->Class == "worker") {
+		this->TotalWorkers += quantity - this->Units[unit_type_id];
+		this->FoodConsumption = this->TotalWorkers * 100;
+	}
 	
 	this->Units[unit_type_id] = quantity;
 }
@@ -1411,6 +1446,68 @@ void CProvince::ChangeUnitQuantity(int unit_type_id, int quantity)
 	quantity = std::max(0, quantity);
 	
 	this->SetUnitQuantity(unit_type_id, this->Units[unit_type_id] + quantity);
+}
+
+void CProvince::CalculateIncome(int resource)
+{
+	if (resource == -1) {
+		return;
+	}
+	
+	if (this->Owner == NULL) {
+		this->Income[resource] = 0;
+		return;
+	}
+	
+	this->Owner->Income[resource] -= this->Income[resource]; //first, remove the old income from the owner's income
+	
+	int income = 0;
+	
+	if (resource == ResearchCost) {
+		// faction's research is 10 if all provinces have town halls, lumber mills and smithies
+		if (this->HasBuildingClass("town-hall")) {
+			income += 6;
+		}
+		if (this->HasBuildingClass("lumber-mill")) {
+			income += 2;
+		}
+		if (this->HasBuildingClass("smithy")) {
+			income += 2;
+		}
+			
+		income *= 100 + this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource] + this->GetAdministrativeEfficiencyModifier();
+		income /= 100;
+	} else {
+		for (int i = 0; i < WorldMapResourceMax; ++i) {
+			if (GrandStrategyGame.WorldMapResources[resource][i][0] != -1 && GrandStrategyGame.WorldMapResources[resource][i][1] != -1) {
+				if (!GrandStrategyGame.WorldMapResources[resource][i][2]) { //non-discovered resources don't grant income
+					continue;
+				}
+					
+				int x = GrandStrategyGame.WorldMapResources[resource][i][0];
+				int y = GrandStrategyGame.WorldMapResources[resource][i][1];
+					
+				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
+					
+				if (province_id == this->ID && this->HasBuildingClass("town-hall")) {
+					income += GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction * (100 + this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource] + this->GetAdministrativeEfficiencyModifier()) / 100;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+	
+	this->Income[resource] = income;
+	
+	this->Owner->Income[resource] += this->Income[resource]; //add the new income to the owner's income
+}
+
+void CProvince::CalculateIncomes()
+{
+	for (int i = 0; i < MaxCosts; ++i) {
+		this->CalculateIncome(i);
+	}
 }
 
 void CProvince::AddFactionClaim(int civilization_id, int faction_id)
@@ -1512,7 +1609,7 @@ bool CProvince::BordersFaction(int faction_civilization, int faction)
 
 int CProvince::GetPopulation()
 {
-	return (this->TotalUnits * 10000 + this->PopulationGrowthProgress) * 2;
+	return (this->TotalUnits * 10000) * 2;
 }
 
 int CProvince::GetResourceDemand(int resource)
@@ -2468,52 +2565,10 @@ void CGrandStrategyFaction::CalculateIncome(int resource)
 		return;
 	}
 	
-	int income = 0;
-	
-	if (resource == ResearchCost) {
-		for (int i = 0; i < this->ProvinceCount; ++i) {
-			int province_id = this->OwnedProvinces[i];
-			
-			int province_research = 0;
-			
-			// faction's research is 10 if all provinces have town halls, lumber mills and smithies
-			if (GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
-				province_research += 6;
-			}
-			if (GrandStrategyGame.Provinces[province_id]->HasBuildingClass("lumber-mill")) {
-				province_research += 2;
-			}
-			if (GrandStrategyGame.Provinces[province_id]->HasBuildingClass("smithy")) {
-				province_research += 2;
-			}
-			
-			income += province_research * (100 + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->GetAdministrativeEfficiencyModifier()) / 100;
-		}
-		income *= 100 + this->ProductionEfficiencyModifier[resource];
-		income /= 100;
-		income /= this->ProvinceCount;
-	} else {
-		for (int i = 0; i < WorldMapResourceMax; ++i) {
-			if (GrandStrategyGame.WorldMapResources[resource][i][0] != -1 && GrandStrategyGame.WorldMapResources[resource][i][1] != -1) {
-				if (!GrandStrategyGame.WorldMapResources[resource][i][2]) { //non-discovered resources don't grant income
-					continue;
-				}
-					
-				int x = GrandStrategyGame.WorldMapResources[resource][i][0];
-				int y = GrandStrategyGame.WorldMapResources[resource][i][1];
-					
-				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-					
-				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner == this && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
-					income += GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction * (100 + this->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->ProductionEfficiencyModifier[resource] + GrandStrategyGame.Provinces[province_id]->GetAdministrativeEfficiencyModifier()) / 100;
-				}
-			} else {
-				break;
-			}
-		}
+	for (int i = 0; i < this->ProvinceCount; ++i) {
+		int province_id = this->OwnedProvinces[i];
+		GrandStrategyGame.Provinces[province_id]->CalculateIncome(resource);
 	}
-	
-	this->Income[resource] = income;
 }
 
 void CGrandStrategyFaction::CalculateIncomes()
@@ -3639,7 +3694,9 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->CurrentConstruction = -1;
 			GrandStrategyGame.Provinces[i]->AttackedBy = NULL;
 			GrandStrategyGame.Provinces[i]->TotalUnits = 0;
+			GrandStrategyGame.Provinces[i]->TotalWorkers = 0;
 			GrandStrategyGame.Provinces[i]->PopulationGrowthProgress = 0;
+			GrandStrategyGame.Provinces[i]->FoodConsumption = 0;
 			GrandStrategyGame.Provinces[i]->ClaimCount = 0;
 			GrandStrategyGame.Provinces[i]->Water = false;
 			GrandStrategyGame.Provinces[i]->Coastal = false;
@@ -3673,6 +3730,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Provinces[i]->Tiles[j].y = -1;
 			}
 			for (int j = 0; j < MaxCosts; ++j) {
+				GrandStrategyGame.Provinces[i]->Income[j] = 0;
 				GrandStrategyGame.Provinces[i]->ProductionEfficiencyModifier[j] = 0;
 			}
 			GrandStrategyGame.Provinces[i]->Heroes.clear();

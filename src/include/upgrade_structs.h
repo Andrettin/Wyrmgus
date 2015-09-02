@@ -78,6 +78,7 @@ enum CostType {
 	Cost11,									/// resource 11 (copper in Wyrmsun)
 	GrainCost,								/// grain resource
 	MushroomCost,							/// mushroom resource
+	LaborCost,								/// labor resource
 	//Wyrmgus end
 
 	MaxCosts                                /// how many different costs
