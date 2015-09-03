@@ -103,3 +103,5 @@ extern int GetFactionCommodityTrade(std::string civilization_name, std::string f
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);
+extern void SetResourceBaseLaborInput(std::string resource_name, int input);
+extern void SetResourceBaseOutput(std::string resource_name, int output);

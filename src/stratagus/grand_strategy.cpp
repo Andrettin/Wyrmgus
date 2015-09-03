@@ -1456,7 +1456,7 @@ void CProvince::CalculateIncome(int resource)
 		return;
 	}
 	
-	if (this->Owner == NULL) {
+	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //don't produce resources if no town hall is in place
 		this->Income[resource] = 0;
 		return;
 	}
@@ -1480,30 +1480,14 @@ void CProvince::CalculateIncome(int resource)
 		income *= 100 + this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource] + this->GetAdministrativeEfficiencyModifier();
 		income /= 100;
 	} else {
-		for (int i = 0; i < ProvinceTileMax; ++i) {
-			if (this->ResourceTiles[resource][i].x != -1 && this->ResourceTiles[resource][i].y != -1) {
-				int x = this->ResourceTiles[resource][i].x;
-				int y = this->ResourceTiles[resource][i].y;
-				
-				if (!GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) { //non-discovered resources don't grant income
-					continue;
-				}
-
-				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-					
-				if (province_id == this->ID && this->HasBuildingClass("town-hall")) {
-					int tile_income = GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction;
-					int production_modifier = this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource];
-					if (resource != GrainCost && resource != MushroomCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
-						production_modifier += this->GetAdministrativeEfficiencyModifier();
-					}
-					tile_income *= 100 + production_modifier;
-					tile_income /= 100;
-					income += tile_income;
-				}
-			} else {
-				break;
+		if (this->ProductionCapacity[resource] > 0) {
+			income = DefaultResourceOutputs[resource] * this->ProductionCapacity[resource];
+			int production_modifier = this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource];
+			if (resource != GrainCost && resource != MushroomCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
+				production_modifier += this->GetAdministrativeEfficiencyModifier();
 			}
+			income *= 100 + production_modifier;
+			income /= 100;
 		}
 	}
 	
@@ -2792,6 +2776,7 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 		
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
 			int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
+			GrandStrategyGame.Provinces[old_province_id]->ProductionCapacity[res] -= 1;
 			for (int i = 0; i < ProvinceTileMax; ++i) {
 				if (GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][i].x == x && GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][i].y == y) { //if tile was found, push every element of the array after it back one step
 					for (int j = i; j < ProvinceTileMax; ++j) {
@@ -2828,6 +2813,7 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 		
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
 			int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
+			GrandStrategyGame.Provinces[province_id]->ProductionCapacity[res] += 1;
 			for (int i = 0; i < ProvinceTileMax; ++i) {
 				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].y == y) { //if tile is there already, stop
 					break;
@@ -3226,8 +3212,9 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 			}
 		}
 	
-		if (province_id != -1) { //remove it from the province's resource tile array
-			for (int i = 0; i < ProvinceTileMax; ++i) {
+		if (province_id != -1) {
+			GrandStrategyGame.Provinces[province_id]->ProductionCapacity[old_resource] -= 1;
+			for (int i = 0; i < ProvinceTileMax; ++i) { //remove it from the province's resource tile array
 				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][i].y == y) { //if tile was found, push every element of the array after it back one step
 					for (int j = i; j < ProvinceTileMax; ++j) {
 						GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][j].x = GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][j + 1].x;
@@ -3254,15 +3241,11 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 				GrandStrategyGame.WorldMapResources[resource][i].y = y;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = resource;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = discovered;
-				if (resource == GoldCost) {
-					GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 200;
-				} else {
-					GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 100;
-				}
 				break;
 			}
 		}
 		if (province_id != -1) {
+			GrandStrategyGame.Provinces[province_id]->ProductionCapacity[resource] += 1;
 			for (int i = 0; i < ProvinceTileMax; ++i) { //add tile to the province's respective resource tile array
 				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].y == y) { //if tile is there already, stop
 					break;
@@ -3768,7 +3751,6 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
-				GrandStrategyGame.WorldMapTiles[x][y]->BaseProduction = 0;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
 				for (int i = 0; i < MAX_RACES; ++i) {
@@ -3834,6 +3816,7 @@ void CleanGrandStrategyGame()
 			}
 			for (int j = 0; j < MaxCosts; ++j) {
 				GrandStrategyGame.Provinces[i]->Income[j] = 0;
+				GrandStrategyGame.Provinces[i]->ProductionCapacity[j] = 0;
 				GrandStrategyGame.Provinces[i]->ProductionEfficiencyModifier[j] = 0;
 				for (int k = 0; k < ProvinceTileMax; ++k) {
 					GrandStrategyGame.Provinces[i]->ResourceTiles[j][k].x = -1;
@@ -4897,6 +4880,28 @@ void SetResourceBasePrice(std::string resource_name, int price)
 	}
 	
 	DefaultResourcePrices[resource] = price;
+}
+
+void SetResourceBaseLaborInput(std::string resource_name, int input)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (resource == -1) {
+		return;
+	}
+	
+	DefaultResourceLaborInputs[resource] = input;
+}
+
+void SetResourceBaseOutput(std::string resource_name, int output)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (resource == -1) {
+		return;
+	}
+	
+	DefaultResourceOutputs[resource] = output;
 }
 
 //@}

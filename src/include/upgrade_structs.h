@@ -164,6 +164,8 @@ extern int DefaultResourceMaxAmounts[MaxCosts];
 
 //Wyrmgus start
 extern int DefaultResourcePrices[MaxCosts];
+extern int DefaultResourceLaborInputs[MaxCosts];
+extern int DefaultResourceOutputs[MaxCosts];
 //Wyrmgus end
 
 extern int GetResourceIdByName(const char *resourceName);

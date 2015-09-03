@@ -589,6 +589,8 @@ int DefaultResourceMaxAmounts[MaxCosts];
 
 //Wyrmgus start
 int DefaultResourcePrices[MaxCosts];
+int DefaultResourceLaborInputs[MaxCosts];
+int DefaultResourceOutputs[MaxCosts];
 //Wyrmgus end
 
 /**

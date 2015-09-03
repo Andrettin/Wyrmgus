@@ -69,8 +69,7 @@ class WorldMapTile
 {
 public:
 	WorldMapTile() :
-		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
-		BaseProduction(0),
+		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1)
 		ResourceProspected(false), Position(-1, -1), BaseTile(NULL), GraphicTile(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
@@ -88,7 +87,6 @@ public:
 	int BaseTileVariation;					/// Base tile variation
 	int Variation;							/// Tile variation
 	int Resource;							/// The tile's resource, if any
-	int BaseProduction;						/// How much the tile produces of its resource (if any)
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	Vec2i Position;							/// Position of the tile
@@ -118,6 +116,7 @@ public:
 		memset(AttackingUnits, 0, sizeof(AttackingUnits));
 		memset(BorderProvinces, 0, sizeof(BorderProvinces));
 		memset(Income, 0, sizeof(Income));
+		memset(ProductionCapacity, 0, sizeof(ProductionCapacity));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		for (int i = 0; i < ProvinceTileMax; ++i) {
 			Tiles[i].x = -1;
@@ -185,6 +184,7 @@ public:
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
 	int Income[MaxCosts];												/// Income for each resource.
+	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Claims[MAX_RACES * FactionMax][2];								/// Factions which claim this province
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
@@ -439,6 +439,8 @@ extern int GetFactionCommodityTrade(std::string civilization_name, std::string f
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);
+extern void SetResourceBaseLaborInput(std::string resource_name, int input);
+extern void SetResourceBaseOutput(std::string resource_name, int output);
 
 //@}
 
