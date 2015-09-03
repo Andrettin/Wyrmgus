@@ -69,7 +69,7 @@ class WorldMapTile
 {
 public:
 	WorldMapTile() :
-		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1)
+		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
 		ResourceProspected(false), Position(-1, -1), BaseTile(NULL), GraphicTile(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));

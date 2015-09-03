@@ -452,7 +452,7 @@ void CGrandStrategyGame::DrawInterface()
 			item_y += 1;
 			
 			std::string food_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->PopulationGrowthProgress) + "/" + std::to_string((long long) PopulationGrowthThreshold);
-			int food_change = GrandStrategyGame.Provinces[this->SelectedProvince]->Income[GrainCost] + GrandStrategyGame.Provinces[this->SelectedProvince]->Income[MushroomCost] - GrandStrategyGame.Provinces[this->SelectedProvince]->FoodConsumption;
+			int food_change = GrandStrategyGame.Provinces[this->SelectedProvince]->Income[GrainCost] + GrandStrategyGame.Provinces[this->SelectedProvince]->Income[MushroomCost] + GrandStrategyGame.Provinces[this->SelectedProvince]->Income[FishCost] - GrandStrategyGame.Provinces[this->SelectedProvince]->FoodConsumption;
 
 			if (food_change > 0) {
 				food_string += "+" + std::to_string((long long) food_change);
@@ -580,7 +580,7 @@ void CGrandStrategyGame::DoTurn()
 			if (this->Factions[i][j]) {
 				if (this->Factions[i][j]->ProvinceCount > 0) {
 					for (int k = 0; k < MaxCosts; ++k) {
-						if (k == GrainCost || k == MushroomCost) { //food resources are not added to the faction's storage, being stored at the province level instead
+						if (k == GrainCost || k == MushroomCost || k == FishCost) { //food resources are not added to the faction's storage, being stored at the province level instead
 							continue;
 						} else if (k == ResearchCost) {
 							this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->ProvinceCount;
@@ -658,7 +658,7 @@ void CGrandStrategyGame::DoTurn()
 				
 				//population growth
 //				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 2) * BasePopulationGrowthPermyriad / 10000;
-				int province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] - this->Provinces[i]->FoodConsumption;
+				int province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] + this->Provinces[i]->Income[FishCost] - this->Provinces[i]->FoodConsumption;
 				this->Provinces[i]->PopulationGrowthProgress += province_food_income;
 				if (this->Provinces[i]->PopulationGrowthProgress >= PopulationGrowthThreshold) { //if population growth progress is greater than or equal to the population growth threshold, create a new worker unit
 					if (province_food_income >= 100) { //if province food income is enough to support a new unit
@@ -718,7 +718,7 @@ void CGrandStrategyGame::DoTrade()
 					for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
 						int province_id = this->Factions[i][j]->OwnedProvinces[k];
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost) {
+							if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
 								continue;
 							}
 							
@@ -773,7 +773,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost) {
+				if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
 					continue;
 				}
 				
@@ -813,7 +813,7 @@ void CGrandStrategyGame::DoTrade()
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost) {
+							if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
 								continue;
 							}
 							
@@ -838,7 +838,7 @@ void CGrandStrategyGame::DoTrade()
 	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost) {
+		if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
 			continue;
 		}
 		
@@ -872,7 +872,7 @@ void CGrandStrategyGame::DoTrade()
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == GoldCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || i == GrainCost || i == MushroomCost) {
+			if (i == GoldCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || i == GrainCost || i == MushroomCost || i == FishCost) {
 				continue;
 			}
 		
@@ -1483,7 +1483,7 @@ void CProvince::CalculateIncome(int resource)
 		if (this->ProductionCapacity[resource] > 0) {
 			income = DefaultResourceOutputs[resource] * this->ProductionCapacity[resource];
 			int production_modifier = this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource];
-			if (resource != GrainCost && resource != MushroomCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
+			if (resource != GrainCost && resource != MushroomCost && resource != FishCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
 				production_modifier += this->GetAdministrativeEfficiencyModifier();
 			}
 			income *= 100 + production_modifier;
@@ -3456,6 +3456,23 @@ void SetProvinceSettlementLocation(std::string province_name, int x, int y)
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		GrandStrategyGame.Provinces[province_id]->SettlementLocation.x = x;
 		GrandStrategyGame.Provinces[province_id]->SettlementLocation.y = y;
+		
+		GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost] = 0;
+		for (int sub_x = -1; sub_x <= 1; ++sub_x) { //add 1 capacity in fish production for every water tile adjacent to the settlement location
+			if ((x + sub_x) < 0 || (x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
+				continue;
+			}
+							
+			for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+				if ((y + sub_y) < 0 || (y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
+					continue;
+				}
+							
+				if (!(sub_x == 0 && sub_y == 0) && GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain != -1 && GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain]->Name == "Water") {
+					GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost] += 1;
+				}
+			}
+		}
 	}
 }
 
