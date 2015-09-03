@@ -45,7 +45,7 @@
 ----------------------------------------------------------------------------*/
 
 #define BasePopulationGrowthPermyriad 12					/// Base population growth per 10,000
-#define PopulationGrowthThreshold 1000						/// How much population growth progress must be accumulated before a new worker unit is created in the province
+#define PopulationGrowthThreshold 10000						/// How much population growth progress must be accumulated before a new worker unit is created in the province
 
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
@@ -105,7 +105,8 @@ public:
 	CProvince() :
 		Name(""), SettlementName(""),
 		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
-		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), ClaimCount(0),
+		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
+		ClaimCount(0),
 		Water(false), Coastal(false), Movement(false), SettlementLocation(-1, -1),
 		Owner(NULL), AttackedBy(NULL)
 	{
@@ -117,6 +118,7 @@ public:
 		memset(BorderProvinces, 0, sizeof(BorderProvinces));
 		memset(Income, 0, sizeof(Income));
 		memset(ProductionCapacity, 0, sizeof(ProductionCapacity));
+		memset(ProductionCapacityFulfilled, 0, sizeof(ProductionCapacityFulfilled));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		for (int i = 0; i < ProvinceTileMax; ++i) {
 			Tiles[i].x = -1;
@@ -140,6 +142,8 @@ public:
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
 	void SetUnitQuantity(int unit_type_id, int quantity);
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
+	void AllocateLabor();
+	void AllocateLaborToResource(int resource);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
 	void AddFactionClaim(int civilization_id, int faction_id);
@@ -171,6 +175,7 @@ public:
 	int TotalWorkers;													/// Total quantity of workers in the province
 	int PopulationGrowthProgress;										/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
 	int FoodConsumption;												/// How much food the people in the province consume
+	int Labor;															/// How much labor available this province has
 	int ClaimCount;
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
@@ -185,6 +190,7 @@ public:
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
 	int Income[MaxCosts];												/// Income for each resource.
 	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
+	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Claims[MAX_RACES * FactionMax][2];								/// Factions which claim this province
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization

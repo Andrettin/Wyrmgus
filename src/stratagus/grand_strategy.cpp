@@ -466,7 +466,7 @@ void CGrandStrategyGame::DrawInterface()
 			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetRevoltRisk()) + "%";
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
 		} else if (GrandStrategyInterfaceState == "lumber-mill" || GrandStrategyInterfaceState == "smithy") {
-			std::string labor_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->TotalWorkers * 100);
+			std::string labor_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->Labor);
 			UI.Resources[LaborCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), labor_string);
 		}
@@ -574,6 +574,17 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 
 void CGrandStrategyGame::DoTurn()
 {
+	//allocate labor
+	for (int i = 0; i < this->ProvinceCount; ++i) {
+		if (this->Provinces[i] && !this->Provinces[i]->Name.empty()) { //if this is a valid province
+			if (this->Provinces[i]->Civilization != -1 && this->Provinces[i]->Owner != NULL && this->Provinces[i]->Labor > 0) { // if this province has a culture and an owner, and has surplus labor
+				this->Provinces[i]->AllocateLabor();
+			}
+		} else { //if a somehow invalid province is reached
+			break;
+		}
+	}
+	
 	//faction income
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
@@ -1440,6 +1451,18 @@ void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
 	if (UnitTypes[unit_type_id]->Class == "worker") {
 		this->TotalWorkers += quantity - this->Units[unit_type_id];
 		this->FoodConsumption = this->TotalWorkers * 100;
+		int labor_change = (quantity - this->Units[unit_type_id]) * 100;
+		if (labor_change >= 0) {
+			this->Labor += labor_change;
+			this->AllocateLabor();
+		} else { //if workers are being removed from the province, reallocate labor
+			for (int i = 0; i < MaxCosts; ++i) {
+				this->ProductionCapacityFulfilled[i] = 0;
+			}
+			this->Labor = this->TotalWorkers * 100;
+			this->AllocateLabor();
+		}
+		
 	}
 	
 	this->Units[unit_type_id] = quantity;
@@ -1448,6 +1471,58 @@ void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
 void CProvince::ChangeUnitQuantity(int unit_type_id, int quantity)
 {
 	this->SetUnitQuantity(unit_type_id, this->Units[unit_type_id] + quantity);
+}
+
+void CProvince::AllocateLabor()
+{
+	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //no production if no town hall is in place, or if the province has no owner
+		return;
+	}
+	
+	if (this->Labor == 0) { //if there's no labor, nothing to allocate
+		return;
+	}
+	
+	//first, try to allocate as many workers as possible in food production, to increase the population, then allocate workers to gold, and then to other goods
+//	std::vector<int> resources_by_priority = {GrainCost, MushroomCost, FishCost, GoldCost, WoodCost, StoneCost};
+	std::vector<int> resources_by_priority;
+	resources_by_priority.push_back(GrainCost);
+	resources_by_priority.push_back(MushroomCost);
+	resources_by_priority.push_back(FishCost);
+	resources_by_priority.push_back(GoldCost);
+	resources_by_priority.push_back(WoodCost);
+	resources_by_priority.push_back(StoneCost);
+
+	for (size_t i = 0; i < resources_by_priority.size(); ++i) {
+		this->AllocateLaborToResource(resources_by_priority[i]);
+		if (this->Labor == 0) { //labor depleted
+			return;
+		}
+	}
+}
+
+void CProvince::AllocateLaborToResource(int resource)
+{
+	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //no production if no town hall is in place, or if the province has no owner
+		return;
+	}
+	
+	if (this->Labor == 0) { //if there's no labor, nothing to allocate
+		return;
+	}
+	
+	if (this->ProductionCapacity[resource] > this->ProductionCapacityFulfilled[resource] && this->Labor >= DefaultResourceLaborInputs[resource]) {
+		int employment_change = std::min(this->Labor / DefaultResourceLaborInputs[resource], this->ProductionCapacity[resource] - ProductionCapacityFulfilled[resource]);
+		this->Labor -= employment_change * DefaultResourceLaborInputs[resource];
+		ProductionCapacityFulfilled[resource] += employment_change;
+		this->CalculateIncome(resource);
+	}
+	
+	//recalculate food consumption (workers employed in producing food don't need to consume food)
+	FoodConsumption = this->TotalWorkers * 100;
+	FoodConsumption -= (this->ProductionCapacityFulfilled[GrainCost] * DefaultResourceLaborInputs[GrainCost]);
+	FoodConsumption -= (this->ProductionCapacityFulfilled[MushroomCost] * DefaultResourceLaborInputs[MushroomCost]);
+	FoodConsumption -= (this->ProductionCapacityFulfilled[FishCost] * DefaultResourceLaborInputs[FishCost]);
 }
 
 void CProvince::CalculateIncome(int resource)
@@ -1480,8 +1555,8 @@ void CProvince::CalculateIncome(int resource)
 		income *= 100 + this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource] + this->GetAdministrativeEfficiencyModifier();
 		income /= 100;
 	} else {
-		if (this->ProductionCapacity[resource] > 0) {
-			income = DefaultResourceOutputs[resource] * this->ProductionCapacity[resource];
+		if (this->ProductionCapacityFulfilled[resource] > 0) {
+			income = DefaultResourceOutputs[resource] * this->ProductionCapacityFulfilled[resource];
 			int production_modifier = this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource];
 			if (resource != GrainCost && resource != MushroomCost && resource != FishCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
 				production_modifier += this->GetAdministrativeEfficiencyModifier();
@@ -3799,6 +3874,7 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->TotalWorkers = 0;
 			GrandStrategyGame.Provinces[i]->PopulationGrowthProgress = 0;
 			GrandStrategyGame.Provinces[i]->FoodConsumption = 0;
+			GrandStrategyGame.Provinces[i]->Labor = 0;
 			GrandStrategyGame.Provinces[i]->ClaimCount = 0;
 			GrandStrategyGame.Provinces[i]->Water = false;
 			GrandStrategyGame.Provinces[i]->Coastal = false;
@@ -3834,6 +3910,7 @@ void CleanGrandStrategyGame()
 			for (int j = 0; j < MaxCosts; ++j) {
 				GrandStrategyGame.Provinces[i]->Income[j] = 0;
 				GrandStrategyGame.Provinces[i]->ProductionCapacity[j] = 0;
+				GrandStrategyGame.Provinces[i]->ProductionCapacityFulfilled[j] = 0;
 				GrandStrategyGame.Provinces[i]->ProductionEfficiencyModifier[j] = 0;
 				for (int k = 0; k < ProvinceTileMax; ++k) {
 					GrandStrategyGame.Provinces[i]->ResourceTiles[j][k].x = -1;
