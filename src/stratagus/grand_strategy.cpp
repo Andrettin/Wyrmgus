@@ -66,6 +66,7 @@ int WorldMapOffsetY;
 int GrandStrategyMapWidthIndent;
 int GrandStrategyMapHeightIndent;
 int BattalionMultiplier;
+int PopulationGrowthThreshold = 1000;
 std::string GrandStrategyInterfaceState;
 CGrandStrategyGame GrandStrategyGame;
 
@@ -465,6 +466,7 @@ void CGrandStrategyGame::DrawInterface()
 		} else if (GrandStrategyInterfaceState == "barracks") {
 			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetRevoltRisk()) + "%";
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
+			item_y += 1;
 		} else if (GrandStrategyInterfaceState == "lumber-mill" || GrandStrategyInterfaceState == "smithy") {
 			std::string labor_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->Labor);
 			UI.Resources[LaborCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
@@ -655,8 +657,8 @@ void CGrandStrategyGame::DoTurn()
 							int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
 							
 							if (militia_id != -1) {
-								this->Provinces[i]->AttackingUnits[infantry_id] = SyncRand(this->Provinces[i]->TotalWorkers) + 1;
-							} else if (infantry_id != -1) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
+								this->Provinces[i]->AttackingUnits[militia_id] = SyncRand(this->Provinces[i]->TotalWorkers) + 1;
+							} else if (infantry_id != -1 && this->Provinces[i]->TotalWorkers >= 2) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
 								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->TotalWorkers / 2) + 1);
 							}
 						}
@@ -665,22 +667,26 @@ void CGrandStrategyGame::DoTurn()
 					if (!this->Provinces[i]->HasFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction) && SyncRand(100) < 1) { // 1% chance the owner of this province will get a claim on it
 						this->Provinces[i]->AddFactionClaim(this->Provinces[i]->Owner->Civilization, this->Provinces[i]->Owner->Faction);
 					}
-				}
-				
-				//population growth
-//				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 2) * BasePopulationGrowthPermyriad / 10000;
-				int province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] + this->Provinces[i]->Income[FishCost] - this->Provinces[i]->FoodConsumption;
-				this->Provinces[i]->PopulationGrowthProgress += province_food_income;
-				if (this->Provinces[i]->PopulationGrowthProgress >= PopulationGrowthThreshold) { //if population growth progress is greater than or equal to the population growth threshold, create a new worker unit
-					if (province_food_income >= 100) { //if province food income is enough to support a new unit
-						int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
-						int new_units = this->Provinces[i]->PopulationGrowthProgress / PopulationGrowthThreshold;
-						this->Provinces[i]->PopulationGrowthProgress -= PopulationGrowthThreshold * new_units;
-						
-						this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
-					} else { //if the province's food income is positive, but not enough to sustain a new unit, keep it at the population growth threshold
-						this->Provinces[i]->PopulationGrowthProgress = PopulationGrowthThreshold;
+					
+					
+					//population growth
+	//				this->Provinces[i]->PopulationGrowthProgress += (this->Provinces[i]->GetPopulation() / 2) * BasePopulationGrowthPermyriad / 10000;
+					int province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] + this->Provinces[i]->Income[FishCost] - this->Provinces[i]->FoodConsumption;
+					this->Provinces[i]->PopulationGrowthProgress += province_food_income;
+					if (this->Provinces[i]->PopulationGrowthProgress >= PopulationGrowthThreshold) { //if population growth progress is greater than or equal to the population growth threshold, create a new worker unit
+						if (province_food_income >= 100) { //if province food income is enough to support a new unit
+							int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
+							int new_units = this->Provinces[i]->PopulationGrowthProgress / PopulationGrowthThreshold;
+							this->Provinces[i]->PopulationGrowthProgress -= PopulationGrowthThreshold * new_units;
+							
+							this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, new_units);
+						} else { //if the province's food income is positive, but not enough to sustain a new unit, keep it at the population growth threshold
+							this->Provinces[i]->PopulationGrowthProgress = PopulationGrowthThreshold;
+						}
+					} else if (province_food_income < 0) { // if the province's food income is negative, then try to reallocate labor
+						this->Provinces[i]->ReallocateLabor();
 					}
+					this->Provinces[i]->PopulationGrowthProgress = std::max(0, this->Provinces[i]->PopulationGrowthProgress);
 				}
 			}
 			this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
@@ -1284,10 +1290,14 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 		this->Owner->ProvinceCount += 1;
 		
 		if (this->Civilization == -1) { // if province has no civilization/culture defined, then make its culture that of its owner
-			this->Civilization = this->Owner->Civilization;
+			this->SetCivilization(this->Owner->Civilization);
 		}
 	} else {
 		this->Owner = NULL;
+	}
+	
+	if (this->Owner != NULL && this->Labor > 0 && this->HasBuildingClass("town-hall")) {
+		this->AllocateLabor();
 	}
 	
 	this->CalculateIncomes();
@@ -1406,6 +1416,16 @@ void CProvince::SetCivilization(int civilization)
 				this->UnderConstructionUnits[i] = 0;
 			}
 		}
+		
+		if (old_civilization == -1 && this->TotalWorkers == 0) {
+			//if the province had no culture set and thus has no worker, give it one worker
+			this->SetUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName("worker")), 1);
+		}
+	} else {
+		//if province is being set to no culture, remove all workers
+		if (old_civilization != -1) {
+			this->SetUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName("worker")), 0);
+		}
 	}
 	
 	this->CurrentConstruction = -1; // under construction buildings get canceled
@@ -1441,6 +1461,11 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 			this->CalculateIncome(ResearchCost);
 		}
 	}
+
+	// allocate labor (in case building a town hall or another building may have allowed a new sort of production)
+	if (this->Owner != NULL && this->Labor > 0 && this->HasBuildingClass("town-hall")) {
+		this->AllocateLabor();
+	}
 }
 
 void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
@@ -1450,17 +1475,12 @@ void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
 	this->TotalUnits += quantity - this->Units[unit_type_id];
 	if (UnitTypes[unit_type_id]->Class == "worker") {
 		this->TotalWorkers += quantity - this->Units[unit_type_id];
-		this->FoodConsumption = this->TotalWorkers * 100;
 		int labor_change = (quantity - this->Units[unit_type_id]) * 100;
 		if (labor_change >= 0) {
 			this->Labor += labor_change;
 			this->AllocateLabor();
 		} else { //if workers are being removed from the province, reallocate labor
-			for (int i = 0; i < MaxCosts; ++i) {
-				this->ProductionCapacityFulfilled[i] = 0;
-			}
-			this->Labor = this->TotalWorkers * 100;
-			this->AllocateLabor();
+			this->ReallocateLabor();
 		}
 		
 	}
@@ -1523,6 +1543,15 @@ void CProvince::AllocateLaborToResource(int resource)
 	FoodConsumption -= (this->ProductionCapacityFulfilled[GrainCost] * DefaultResourceLaborInputs[GrainCost]);
 	FoodConsumption -= (this->ProductionCapacityFulfilled[MushroomCost] * DefaultResourceLaborInputs[MushroomCost]);
 	FoodConsumption -= (this->ProductionCapacityFulfilled[FishCost] * DefaultResourceLaborInputs[FishCost]);
+}
+
+void CProvince::ReallocateLabor()
+{
+	for (int i = 0; i < MaxCosts; ++i) {
+		this->ProductionCapacityFulfilled[i] = 0;
+	}
+	this->Labor = this->TotalWorkers * 100;
+	this->AllocateLabor();
 }
 
 void CProvince::CalculateIncome(int resource)
@@ -1955,7 +1984,7 @@ std::string CProvince::GenerateProvinceName(int civilization)
 				}
 				
 				suffix = DecapitalizeString(suffix);
-				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "KÃ¶niggrÃ¤tz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
 				}
 				if (prefix.substr(prefix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
@@ -2159,7 +2188,7 @@ std::string CProvince::GenerateSettlementName(int civilization)
 				}
 				
 				suffix = DecapitalizeString(suffix);
-				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "KÃ¶niggrÃ¤tz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
 				}
 				if (prefix.substr(prefix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
@@ -2484,7 +2513,7 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 				}
 					
 				suffix = DecapitalizeString(suffix);
-				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+				if (prefix.substr(prefix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "KÃ¶niggrÃ¤tz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
 				}
 				if (prefix.substr(prefix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
@@ -2570,13 +2599,13 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 					
 				infix = DecapitalizeString(suffix);
 				suffix = DecapitalizeString(suffix);
-				if (prefix.substr(prefix.size() - 2, 2) == "gs" && infix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the infix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+				if (prefix.substr(prefix.size() - 2, 2) == "gs" && infix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the infix is "g", then remove the final "s" from the prefix (as in "KÃ¶niggrÃ¤tz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
 				}
 				if (prefix.substr(prefix.size() - 1, 1) == "s" && infix.substr(0, 1) == "s") { //if the prefix ends in "s" and the infix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
 					prefix = FindAndReplaceStringEnding(prefix, "s", "");
 				}
-				if (infix.substr(infix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the infix are "gs", and the first character of the suffix is "g", then remove the final "s" from the infix (as in "Königgrätz")
+				if (infix.substr(infix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the infix are "gs", and the first character of the suffix is "g", then remove the final "s" from the infix (as in "KÃ¶niggrÃ¤tz")
 					infix = FindAndReplaceStringEnding(infix, "gs", "g");
 				}
 				if (infix.substr(infix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the infix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the infix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
@@ -3537,15 +3566,22 @@ void SetProvinceSettlementLocation(std::string province_name, int x, int y)
 			if ((x + sub_x) < 0 || (x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
 				continue;
 			}
-							
 			for (int sub_y = -1; sub_y <= 1; ++sub_y) {
 				if ((y + sub_y) < 0 || (y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
 					continue;
 				}
-							
-				if (!(sub_x == 0 && sub_y == 0) && GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain != -1 && GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain]->Name == "Water") {
-					GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost] += 1;
+				if (!(sub_x == 0 && sub_y == 0)) {
+					if (GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain != -1 && GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain]->Name == "Water") {
+						GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost] += 1;
+					}
 				}
+			}
+		}
+		
+		for (int i = 0; i < MaxDirections; ++i) { //if the settlement location has a river, add one fish production capacity
+			if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
+				GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost] += 1;
+				break;
 			}
 		}
 	}
@@ -3767,6 +3803,16 @@ void SetProvinceFood(std::string province_name, int quantity)
 	}
 }
 
+void ChangeProvinceFood(std::string province_name, int quantity)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress += quantity;
+		GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress = std::max(0, GrandStrategyGame.Provinces[province_id]->PopulationGrowthProgress);
+	}
+}
+
 void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name)
 {
 	int province_id = GetProvinceId(province_name);
@@ -3801,8 +3847,14 @@ void AddProvinceClaim(std::string province_name, std::string civilization_name, 
 			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 			if (faction != -1) {
 				GrandStrategyGame.Provinces[province_id]->AddFactionClaim(civilization, faction);
+			} else {
+				fprintf(stderr, "Can't find %s faction (%s) to add claim to province %s.\n", faction_name.c_str(), civilization_name.c_str(), province_name.c_str());
 			}
+		} else {
+			fprintf(stderr, "Can't find %s civilization to add the claim of its %s faction claim to province %s.\n", civilization_name.c_str(), faction_name.c_str(), province_name.c_str());
 		}
+	} else {
+		fprintf(stderr, "Can't find %s province to add %s faction (%s) claim to.\n", province_name.c_str(), faction_name.c_str(), civilization_name.c_str());
 	}
 }
 
@@ -4574,6 +4626,27 @@ int GetProvinceHero(std::string province_name, std::string hero_ident)
 		}
 	}
 	return 0;
+}
+
+int GetProvinceLabor(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	return GrandStrategyGame.Provinces[province_id]->Labor;
+}
+
+int GetProvinceAvailableWorkersForTraining(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	return GrandStrategyGame.Provinces[province_id]->Labor / 100;
+}
+
+int GetProvinceTotalWorkers(std::string province_name)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	return GrandStrategyGame.Provinces[province_id]->TotalWorkers;
 }
 
 std::string GetProvinceOwner(std::string province_name)

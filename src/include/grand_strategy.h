@@ -45,7 +45,6 @@
 ----------------------------------------------------------------------------*/
 
 #define BasePopulationGrowthPermyriad 12					/// Base population growth per 10,000
-#define PopulationGrowthThreshold 10000						/// How much population growth progress must be accumulated before a new worker unit is created in the province
 
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
@@ -144,6 +143,7 @@ public:
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
 	void AllocateLabor();
 	void AllocateLaborToResource(int resource);
+	void ReallocateLabor();
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
 	void AddFactionClaim(int civilization_id, int faction_id);
@@ -344,6 +344,8 @@ extern int WorldMapOffsetY;
 extern int GrandStrategyMapWidthIndent;
 extern int GrandStrategyMapHeightIndent;
 extern int BattalionMultiplier;
+extern int PopulationGrowthThreshold;					/// How much population growth progress must be accumulated before a new worker unit is created in the province
+
 extern std::string GrandStrategyInterfaceState;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 
@@ -395,6 +397,7 @@ extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceHero(std::string province_name, std::string hero_ident, int value);
 extern void SetProvinceFood(std::string province_name, int quantity);
+extern void ChangeProvinceFood(std::string province_name, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetSelectedProvince(std::string province_name);
 extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
@@ -422,6 +425,9 @@ extern int GetProvinceUnderConstructionUnitQuantity(std::string province_name, s
 extern int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceHero(std::string province_name, std::string hero_ident);
+extern int GetProvinceLabor(std::string province_name);
+extern int GetProvinceAvailableWorkersForTraining(std::string province_name);
+extern int GetProvinceTotalWorkers(std::string province_name);
 extern std::string GetProvinceOwner(std::string province_name);
 extern bool GetProvinceWater(std::string province_name);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
