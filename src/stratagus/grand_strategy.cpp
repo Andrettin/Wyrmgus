@@ -229,20 +229,22 @@ void CGrandStrategyGame::DrawMap()
 		}
 	}
 	
-	// draw roads (has to be drawn separately so that they appear over the terrain of the adjacent tiles they go over)
+	// draw pathways (has to be drawn separately so that they appear over the terrain of the adjacent tiles they go over)
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
 				for (int i = 0; i < MaxDirections; ++i) {
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Road[i]) {
 						GrandStrategyGame.RoadGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					} else if (GrandStrategyGame.WorldMapTiles[x][y]->Trail[i]) {
+						GrandStrategyGame.TrailGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 				}
 			}
 		}
 	}
 	
-	//draw settlement and resource graphics after rivers and roads so that they appear over them
+	//draw settlement and resource graphics after rivers and pathways so that they appear over them
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
@@ -685,6 +687,12 @@ void CGrandStrategyGame::DoTurn()
 						}
 					} else if (province_food_income < 0) { // if the province's food income is negative, then try to reallocate labor
 						this->Provinces[i]->ReallocateLabor();
+						province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] + this->Provinces[i]->Income[FishCost] - this->Provinces[i]->FoodConsumption;
+						//if the food income is still negative after reallocating labor (this shouldn't happen most of the time!) then decrease the population by 1 due to starvation; only do this if the population is above 1 (to prevent provinces from being entirely depopulated and unable to grow a population afterwards)
+						if (province_food_income < 0) {
+							int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
+							this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, -1);
+						}
 					}
 					this->Provinces[i]->PopulationGrowthProgress = std::max(0, this->Provinces[i]->PopulationGrowthProgress);
 				}
@@ -921,8 +929,7 @@ void CGrandStrategyGame::DoProspection()
 						
 				if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner != NULL && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
 					if (SyncRand(100) < 1) { // 1% chance of discovery per turn
-						GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = true;
-						GrandStrategyGame.Provinces[province_id]->CalculateIncome(i);
+						GrandStrategyGame.WorldMapTiles[x][y]->SetResourceProspected(i, true);
 						if (GrandStrategyGame.PlayerFaction == GrandStrategyGame.Provinces[province_id]->Owner) {
 							char buf[256];
 							snprintf(
@@ -1205,6 +1212,27 @@ void WorldMapTile::UpdateMinimap()
 	}
 }
 
+void WorldMapTile::SetResourceProspected(int resource_id, bool discovered)
+{
+	if (this->ResourceProspected == discovered) { //no change, return
+		return;
+	}
+	
+	if (resource_id != -1 && this->Resource == resource_id) {
+		this->ResourceProspected = discovered;
+		
+		if (this->Province != -1) {
+			if (this->ResourceProspected) {
+				GrandStrategyGame.Provinces[this->Province]->ProductionCapacity[resource_id] += 1;
+				GrandStrategyGame.Provinces[this->Province]->AllocateLabor(); //allocate labor so that the 
+			} else {
+				GrandStrategyGame.Provinces[this->Province]->ProductionCapacity[resource_id] -= 1;
+				GrandStrategyGame.Provinces[this->Province]->ReallocateLabor();
+			}
+		}
+	}
+}
+
 /**
 **  Get whether the tile has a resource
 */
@@ -1294,6 +1322,7 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 		}
 	} else {
 		this->Owner = NULL;
+		this->SetCivilization(-1); //if there is no owner, change the civilization to none
 	}
 	
 	if (this->Owner != NULL && this->Labor > 0 && this->HasBuildingClass("town-hall")) {
@@ -2880,7 +2909,9 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 		
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
 			int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
-			GrandStrategyGame.Provinces[old_province_id]->ProductionCapacity[res] -= 1;
+			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
+				GrandStrategyGame.Provinces[old_province_id]->ProductionCapacity[res] -= 1;
+			}
 			for (int i = 0; i < ProvinceTileMax; ++i) {
 				if (GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][i].x == x && GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][i].y == y) { //if tile was found, push every element of the array after it back one step
 					for (int j = i; j < ProvinceTileMax; ++j) {
@@ -2917,7 +2948,9 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 		
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
 			int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
-			GrandStrategyGame.Provinces[province_id]->ProductionCapacity[res] += 1;
+			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
+				GrandStrategyGame.Provinces[province_id]->ProductionCapacity[res] += 1;
+			}
 			for (int i = 0; i < ProvinceTileMax; ++i) {
 				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].y == y) { //if tile is there already, stop
 					break;
@@ -3054,6 +3087,38 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 		fprintf(stderr, "Error: Wrong direction set for river.\n");
 	}
 	
+}
+
+/**
+**  Set trail data for a world map tile.
+*/
+void SetWorldMapTileTrail(int x, int y, std::string direction_name, bool has_trail)
+{
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	int direction;
+	if (direction_name == "north") {
+		direction = North;
+	} else if (direction_name == "northeast") {
+		direction = Northeast;
+	} else if (direction_name == "east") {
+		direction = East;
+	} else if (direction_name == "southeast") {
+		direction = Southeast;
+	} else if (direction_name == "south") {
+		direction = South;
+	} else if (direction_name == "southwest") {
+		direction = Southwest;
+	} else if (direction_name == "west") {
+		direction = West;
+	} else if (direction_name == "northwest") {
+		direction = Northwest;
+	} else {
+		fprintf(stderr, "Error: Wrong direction set for trail.\n");
+		return;
+	}
+	
+	GrandStrategyGame.WorldMapTiles[x][y]->Trail[direction] = has_trail;
 }
 
 /**
@@ -3317,7 +3382,9 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 		}
 	
 		if (province_id != -1) {
-			GrandStrategyGame.Provinces[province_id]->ProductionCapacity[old_resource] -= 1;
+			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
+				GrandStrategyGame.Provinces[province_id]->ProductionCapacity[old_resource] -= 1;
+			}
 			for (int i = 0; i < ProvinceTileMax; ++i) { //remove it from the province's resource tile array
 				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][i].y == y) { //if tile was found, push every element of the array after it back one step
 					for (int j = i; j < ProvinceTileMax; ++j) {
@@ -3344,12 +3411,11 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 				GrandStrategyGame.WorldMapResources[resource][i].x = x;
 				GrandStrategyGame.WorldMapResources[resource][i].y = y;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = resource;
-				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = discovered;
+				GrandStrategyGame.WorldMapTiles[x][y]->SetResourceProspected(resource, discovered);
 				break;
 			}
 		}
 		if (province_id != -1) {
-			GrandStrategyGame.Provinces[province_id]->ProductionCapacity[resource] += 1;
 			for (int i = 0; i < ProvinceTileMax; ++i) { //add tile to the province's respective resource tile array
 				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].y == y) { //if tile is there already, stop
 					break;
@@ -3360,7 +3426,6 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 					break;
 				}
 			}
-			GrandStrategyGame.Provinces[province_id]->CalculateIncome(resource);
 		}
 	}
 }
@@ -3370,13 +3435,7 @@ void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool
 	int resource = GetResourceIdByName(resource_name.c_str());
 	
 	if (resource != -1) {
-		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == resource) {
-			GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = discovered;
-		}
-		int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-		if (province_id != -1) {
-			GrandStrategyGame.Provinces[province_id]->CalculateIncome(resource);
-		}
+		GrandStrategyGame.WorldMapTiles[x][y]->SetResourceProspected(resource, discovered);
 	}
 }
 
@@ -3904,6 +3963,7 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.WorldMapTiles[x][y]->Borders[i] = false;
 					GrandStrategyGame.WorldMapTiles[x][y]->River[i] = -1;
 					GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] = -1;
+					GrandStrategyGame.WorldMapTiles[x][y]->Trail[i] = false;
 					GrandStrategyGame.WorldMapTiles[x][y]->Road[i] = false;
 				}
 			} else {
@@ -4177,6 +4237,9 @@ void InitializeGrandStrategyGame()
 		std::string riverhead_graphics_file = "tilesets/world/terrain/";
 		riverhead_graphics_file += "riverhead_";
 		
+		std::string trail_graphics_file = "tilesets/world/terrain/";
+		trail_graphics_file += "trail_";
+		
 		std::string road_graphics_file = "tilesets/world/terrain/";
 		road_graphics_file += "road_";
 		
@@ -4184,41 +4247,49 @@ void InitializeGrandStrategyGame()
 			river_graphics_file += "north";
 			rivermouth_graphics_file += "north";
 			riverhead_graphics_file += "north";
+			trail_graphics_file += "north";
 			road_graphics_file += "north";
 		} else if (i == Northeast) {
 			river_graphics_file += "northeast_inner";
 			rivermouth_graphics_file += "northeast";
 			riverhead_graphics_file += "northeast";
+			trail_graphics_file += "northeast";
 			road_graphics_file += "northeast";
 		} else if (i == East) {
 			river_graphics_file += "east";
 			rivermouth_graphics_file += "east";
 			riverhead_graphics_file += "east";
+			trail_graphics_file += "east";
 			road_graphics_file += "east";
 		} else if (i == Southeast) {
 			river_graphics_file += "southeast_inner";
 			rivermouth_graphics_file += "southeast";
 			riverhead_graphics_file += "southeast";
+			trail_graphics_file += "southeast";
 			road_graphics_file += "southeast";
 		} else if (i == South) {
 			river_graphics_file += "south";
 			rivermouth_graphics_file += "south";
 			riverhead_graphics_file += "south";
+			trail_graphics_file += "south";
 			road_graphics_file += "south";
 		} else if (i == Southwest) {
 			river_graphics_file += "southwest_inner";
 			rivermouth_graphics_file += "southwest";
 			riverhead_graphics_file += "southwest";
+			trail_graphics_file += "southwest";
 			road_graphics_file += "southwest";
 		} else if (i == West) {
 			river_graphics_file += "west";
 			rivermouth_graphics_file += "west";
 			riverhead_graphics_file += "west";
+			trail_graphics_file += "west";
 			road_graphics_file += "west";
 		} else if (i == Northwest) {
 			river_graphics_file += "northwest_inner";
 			rivermouth_graphics_file += "northwest";
 			riverhead_graphics_file += "northwest";
+			trail_graphics_file += "northwest";
 			road_graphics_file += "northwest";
 		}
 		
@@ -4235,6 +4306,7 @@ void InitializeGrandStrategyGame()
 		river_graphics_file += ".png";
 		rivermouth_graphics_file += ".png";
 		riverhead_graphics_file += ".png";
+		trail_graphics_file += ".png";
 		road_graphics_file += ".png";
 		
 		if (CGraphic::Get(river_graphics_file) == NULL) {
@@ -4270,6 +4342,12 @@ void InitializeGrandStrategyGame()
 			}
 			GrandStrategyGame.RiverheadGraphics[i][1] = CGraphic::Get(riverhead_flipped_graphics_file);
 		}
+		
+		if (CGraphic::Get(road_graphics_file) == NULL) { //use road graphics file for trails for now
+			CGraphic *trail_graphics = CGraphic::New(road_graphics_file, 64, 64);
+			trail_graphics->Load();
+		}
+		GrandStrategyGame.TrailGraphics[i] = CGraphic::Get(road_graphics_file);
 		
 		if (CGraphic::Get(road_graphics_file) == NULL) {
 			CGraphic *road_graphics = CGraphic::New(road_graphics_file, 64, 64);
