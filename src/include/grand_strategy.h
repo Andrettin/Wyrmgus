@@ -49,6 +49,16 @@
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
 
+/**
+**  Indexes into pathway array.
+*/
+enum Pathways {
+	PathwayTrail,
+	PathwayRoad,
+	
+	MaxPathways
+};
+
 class WorldMapTerrainType
 {
 public:
@@ -74,8 +84,7 @@ public:
 		memset(Borders, 0, sizeof(Borders));
 		memset(River, -1, sizeof(River));
 		memset(Riverhead, -1, sizeof(Riverhead));
-		memset(Trail, 0, sizeof(Trail));
-		memset(Road, 0, sizeof(Road));
+		memset(Pathway, -1, sizeof(Pathway));
 	}
 
 	void UpdateMinimap();
@@ -96,8 +105,7 @@ public:
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
 	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
 	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
-	bool Trail[MaxDirections];				/// Whether this tile has a trail to a particular direction
-	bool Road[MaxDirections];				/// Whether this tile has a road to a particular direction
+	int Pathway[MaxDirections];				/// Whether this tile has a pathway (trail or road) to a particular direction
 	std::string CulturalNames[MAX_RACES];	/// Names for the tile for each different culture/civilization
 };
 
@@ -310,8 +318,7 @@ public:
 	CGraphic *RiverGraphics[MaxDirections];
 	CGraphic *RivermouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
 	CGraphic *RiverheadGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
-	CGraphic *TrailGraphics[MaxDirections];
-	CGraphic *RoadGraphics[MaxDirections];
+	CGraphic *PathwayGraphics[MaxPathways][MaxDirections];
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
 	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
 	CPlayerColorGraphic *NationalBorderGraphics[MaxDirections];	///one for each direction
@@ -369,8 +376,7 @@ extern void SetWorldMapTileCulturalName(int x, int y, std::string civilization_n
 extern int GetRiverId(std::string river_name);
 extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name);
 extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);
-extern void SetWorldMapTileTrail(int x, int y, std::string direction_name, bool has_trail);
-extern void SetWorldMapTileRoad(int x, int y, std::string direction_name, bool has_road);
+extern void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::string pathway_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);

@@ -234,10 +234,8 @@ void CGrandStrategyGame::DrawMap()
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
 				for (int i = 0; i < MaxDirections; ++i) {
-					if (GrandStrategyGame.WorldMapTiles[x][y]->Road[i]) {
-						GrandStrategyGame.RoadGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					} else if (GrandStrategyGame.WorldMapTiles[x][y]->Trail[i]) {
-						GrandStrategyGame.TrailGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] != -1) {
+						GrandStrategyGame.PathwayGraphics[GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i]][i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 				}
 			}
@@ -3090,9 +3088,9 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 }
 
 /**
-**  Set trail data for a world map tile.
+**  Set pathway data for a world map tile.
 */
-void SetWorldMapTileTrail(int x, int y, std::string direction_name, bool has_trail)
+void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::string pathway_name)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
@@ -3114,43 +3112,24 @@ void SetWorldMapTileTrail(int x, int y, std::string direction_name, bool has_tra
 	} else if (direction_name == "northwest") {
 		direction = Northwest;
 	} else {
-		fprintf(stderr, "Error: Wrong direction set for trail.\n");
+		fprintf(stderr, "Wrong direction (\"%s\") set for pathway.\n", direction_name.c_str());
 		return;
 	}
 	
-	GrandStrategyGame.WorldMapTiles[x][y]->Trail[direction] = has_trail;
-}
-
-/**
-**  Set road data for a world map tile.
-*/
-void SetWorldMapTileRoad(int x, int y, std::string direction_name, bool has_road)
-{
-	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	int pathway_id;
 	
-	int direction;
-	if (direction_name == "north") {
-		direction = North;
-	} else if (direction_name == "northeast") {
-		direction = Northeast;
-	} else if (direction_name == "east") {
-		direction = East;
-	} else if (direction_name == "southeast") {
-		direction = Southeast;
-	} else if (direction_name == "south") {
-		direction = South;
-	} else if (direction_name == "southwest") {
-		direction = Southwest;
-	} else if (direction_name == "west") {
-		direction = West;
-	} else if (direction_name == "northwest") {
-		direction = Northwest;
+	if (pathway_name == "none") {
+		pathway_id = -1;
+	} else if (pathway_name == "trail") {
+		pathway_id = PathwayTrail;
+	} else if (pathway_name == "road") {
+		pathway_id = PathwayRoad;
 	} else {
-		fprintf(stderr, "Error: Wrong direction set for road.\n");
+		fprintf(stderr, "Pathway \"%s\" does not exist.\n", pathway_name.c_str());
 		return;
 	}
 	
-	GrandStrategyGame.WorldMapTiles[x][y]->Road[direction] = has_road;
+	GrandStrategyGame.WorldMapTiles[x][y]->Pathway[direction] = pathway_id;
 }
 
 /**
@@ -3963,8 +3942,7 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.WorldMapTiles[x][y]->Borders[i] = false;
 					GrandStrategyGame.WorldMapTiles[x][y]->River[i] = -1;
 					GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] = -1;
-					GrandStrategyGame.WorldMapTiles[x][y]->Trail[i] = false;
-					GrandStrategyGame.WorldMapTiles[x][y]->Road[i] = false;
+					GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] = -1;
 				}
 			} else {
 				break;
@@ -4347,13 +4325,13 @@ void InitializeGrandStrategyGame()
 			CGraphic *trail_graphics = CGraphic::New(road_graphics_file, 64, 64);
 			trail_graphics->Load();
 		}
-		GrandStrategyGame.TrailGraphics[i] = CGraphic::Get(road_graphics_file);
+		GrandStrategyGame.PathwayGraphics[PathwayTrail][i] = CGraphic::Get(road_graphics_file);
 		
 		if (CGraphic::Get(road_graphics_file) == NULL) {
 			CGraphic *road_graphics = CGraphic::New(road_graphics_file, 64, 64);
 			road_graphics->Load();
 		}
-		GrandStrategyGame.RoadGraphics[i] = CGraphic::Get(road_graphics_file);
+		GrandStrategyGame.PathwayGraphics[PathwayRoad][i] = CGraphic::Get(road_graphics_file);
 	}
 	
 	//load the move symbol
