@@ -117,6 +117,7 @@ public:
 		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		ClaimCount(0),
+		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
 		Water(false), Coastal(false), Movement(false), SettlementLocation(-1, -1),
 		Owner(NULL), AttackedBy(NULL)
 	{
@@ -152,6 +153,9 @@ public:
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
 	void SetUnitQuantity(int unit_type_id, int quantity);
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
+	void SetAttackingUnitQuantity(int unit_type_id, int quantity);
+	void ChangeAttackingUnitQuantity(int unit_type_id, int quantity);
+	void SetHero(int unit_type_id, int value);
 	void AllocateLabor();
 	void AllocateLaborToResource(int resource);
 	void ReallocateLabor();
@@ -188,6 +192,9 @@ public:
 	int FoodConsumption;												/// How much food the people in the province consume
 	int Labor;															/// How much labor available this province has
 	int ClaimCount;
+	int MilitaryScore;													/// Military score of the forces in the province (including fortifications and militia)
+	int OffensiveMilitaryScore;											/// Military score of the forces in the province which can attack other provinces
+	int AttackingMilitaryScore;											/// Military score of the forces attacking the province
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
 	bool Movement;														/// Whether a unit or hero is currently moving to the province
@@ -224,9 +231,10 @@ public:
 		memset(Income, 0, sizeof(Income));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		memset(Trade, 0, sizeof(Trade));
+		memset(MilitaryScoreBonus, 0, sizeof(MilitaryScoreBonus));
 	}
 	
-	void SetTechnology(int upgrade_id, bool has_technology);
+	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
 	
@@ -240,6 +248,7 @@ public:
 	int Income[MaxCosts];												/// Income of each resource for the faction.
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Trade[MaxCosts];												/// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
+	int MilitaryScoreBonus[UnitTypeMax];
 };
 
 class CRiver
@@ -439,6 +448,7 @@ extern int GetProvinceHero(std::string province_name, std::string hero_ident);
 extern int GetProvinceLabor(std::string province_name);
 extern int GetProvinceAvailableWorkersForTraining(std::string province_name);
 extern int GetProvinceTotalWorkers(std::string province_name);
+extern int GetProvinceMilitaryScore(std::string province_name, bool attacker, bool count_defenders);
 extern std::string GetProvinceOwner(std::string province_name);
 extern bool GetProvinceWater(std::string province_name);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);

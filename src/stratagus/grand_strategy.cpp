@@ -657,9 +657,9 @@ void CGrandStrategyGame::DoTurn()
 							int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
 							
 							if (militia_id != -1) {
-								this->Provinces[i]->AttackingUnits[militia_id] = SyncRand(this->Provinces[i]->TotalWorkers) + 1;
+								this->Provinces[i]->SetAttackingUnitQuantity(militia_id, SyncRand(this->Provinces[i]->TotalWorkers) + 1);
 							} else if (infantry_id != -1 && this->Provinces[i]->TotalWorkers >= 2) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
-								this->Provinces[i]->AttackingUnits[infantry_id] = (SyncRand(this->Provinces[i]->TotalWorkers / 2) + 1);
+								this->Provinces[i]->SetAttackingUnitQuantity(infantry_id, (SyncRand(this->Provinces[i]->TotalWorkers / 2) + 1));
 							}
 						}
 					}
@@ -1309,6 +1309,26 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 			}
 		}
 	}
+	
+	for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
+		if (IsMilitaryUnit(*UnitTypes[i])) {
+			int old_owner_military_score_bonus = (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[i] : 0);
+			int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[i] : 0);
+			if (old_owner_military_score_bonus != new_owner_military_score_bonus) {
+				this->MilitaryScore += this->Units[i] * (new_owner_military_score_bonus - old_owner_military_score_bonus);
+				this->OffensiveMilitaryScore += this->Units[i] * new_owner_military_score_bonus - old_owner_military_score_bonus;
+			}
+		} else if (UnitTypes[i]->Class == "worker") {
+			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(PlayerRaces.GetRaceIndexByName(UnitTypes[i]->Civilization.c_str()), GetUnitTypeClassIndexByName("militia"));
+			if (militia_unit_type != -1) {
+				int old_owner_military_score_bonus = (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0);
+				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type] : 0);
+				if (old_owner_military_score_bonus != new_owner_military_score_bonus) {
+					this->MilitaryScore += this->Units[i] * ((new_owner_military_score_bonus - old_owner_military_score_bonus) / 2);
+				}
+			}
+		}
+	}
 
 	if (civilization_id != -1 && faction_id != -1) {
 		this->Owner = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization_id][faction_id]));
@@ -1488,6 +1508,10 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 			this->CalculateIncome(ResearchCost);
 		}
 	}
+	
+	if (UnitTypes[building_id]->Class == "stronghold") { //increase the military score of the province, if this building is a stronghold
+		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
+	}
 
 	// allocate labor (in case building a town hall or another building may have allowed a new sort of production)
 	if (this->Owner != NULL && this->Labor > 0 && this->HasBuildingClass("town-hall")) {
@@ -1499,17 +1523,31 @@ void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
 {
 	quantity = std::max(0, quantity);
 	
-	this->TotalUnits += quantity - this->Units[unit_type_id];
+	int change = quantity - this->Units[unit_type_id];
+	
+	this->TotalUnits += change;
+	
+	if (IsMilitaryUnit(*UnitTypes[unit_type_id])) {
+		this->MilitaryScore += change * (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+		this->OffensiveMilitaryScore += change * (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+	}
+	
 	if (UnitTypes[unit_type_id]->Class == "worker") {
-		this->TotalWorkers += quantity - this->Units[unit_type_id];
-		int labor_change = (quantity - this->Units[unit_type_id]) * 100;
+		this->TotalWorkers += change;
+		
+		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
+		int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(PlayerRaces.GetRaceIndexByName(UnitTypes[unit_type_id]->Civilization.c_str()), GetUnitTypeClassIndexByName("militia"));
+		if (militia_unit_type != -1) {
+			this->MilitaryScore += change * ((UnitTypes[militia_unit_type]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
+		}
+		
+		int labor_change = change * 100;
 		if (labor_change >= 0) {
 			this->Labor += labor_change;
 			this->AllocateLabor();
 		} else { //if workers are being removed from the province, reallocate labor
 			this->ReallocateLabor();
-		}
-		
+		}		
 	}
 	
 	this->Units[unit_type_id] = quantity;
@@ -1520,6 +1558,76 @@ void CProvince::ChangeUnitQuantity(int unit_type_id, int quantity)
 	this->SetUnitQuantity(unit_type_id, this->Units[unit_type_id] + quantity);
 }
 
+void CProvince::SetAttackingUnitQuantity(int unit_type_id, int quantity)
+{
+	quantity = std::max(0, quantity);
+	
+	int change = quantity - this->AttackingUnits[unit_type_id];
+	
+	if (IsMilitaryUnit(*UnitTypes[unit_type_id])) {
+		this->AttackingMilitaryScore += change * (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->AttackedBy != NULL ? this->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
+	}
+		
+	this->AttackingUnits[unit_type_id] = quantity;
+}
+
+void CProvince::ChangeAttackingUnitQuantity(int unit_type_id, int quantity)
+{
+	this->SetAttackingUnitQuantity(unit_type_id, this->AttackingUnits[unit_type_id] + quantity);
+}
+
+void CProvince::SetHero(int unit_type_id, int value)
+{
+	if (value == 1) {
+		this->Movement = true;
+	}
+	bool found_hero = false;
+	//update the hero
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		if (GrandStrategyGame.Heroes[i]->Type->Slot == UnitTypes[unit_type_id]->Slot) {
+			if (GrandStrategyGame.Heroes[i]->Province != NULL) {
+				if (GrandStrategyGame.Heroes[i]->State == 2) {
+					GrandStrategyGame.Heroes[i]->Province->MilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (GrandStrategyGame.Heroes[i]->Province->Owner != NULL ? GrandStrategyGame.Heroes[i]->Province->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+				} else if (GrandStrategyGame.Heroes[i]->State == 3) {
+					GrandStrategyGame.Heroes[i]->Province->AttackingMilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (GrandStrategyGame.Heroes[i]->Province->AttackedBy != NULL ? GrandStrategyGame.Heroes[i]->Province->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
+				}
+			}
+			GrandStrategyGame.Heroes[i]->State = value;
+			
+			if (this != GrandStrategyGame.Heroes[i]->Province || value == 0) { //if the new province is different from the hero's current province
+				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
+					GrandStrategyGame.Heroes[i]->Province->Heroes.erase(std::remove(GrandStrategyGame.Heroes[i]->Province->Heroes.begin(), GrandStrategyGame.Heroes[i]->Province->Heroes.end(), GrandStrategyGame.Heroes[i]), GrandStrategyGame.Heroes[i]->Province->Heroes.end());  //remove the hero from the last province
+				}
+				GrandStrategyGame.Heroes[i]->Province = value != 0 ? const_cast<CProvince *>(&(*this)) : NULL;
+				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
+					GrandStrategyGame.Heroes[i]->Province->Heroes.push_back(GrandStrategyGame.Heroes[i]); //add the hero to the new province
+				}
+			}
+			
+			found_hero = true;
+			break;
+		}
+	}
+	
+	//if the hero hasn't been defined yet, do so now
+	if (found_hero == false) {
+		CGrandStrategyHero *hero = new CGrandStrategyHero;
+		hero->State = value;
+		hero->Province = value != 0 ? const_cast<CProvince *>(&(*this)) : NULL;
+		hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+		GrandStrategyGame.Heroes.push_back(hero);
+		if (hero->Province != NULL) {
+			this->Heroes.push_back(hero);
+		}
+	}
+	
+	if (value == 2) {
+		this->MilitaryScore += (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+	} else if (value == 3) {
+		this->AttackingMilitaryScore += (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->AttackedBy != NULL ? this->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
+	}
+}
+		
 void CProvince::AllocateLabor()
 {
 	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //no production if no town hall is in place, or if the province has no owner
@@ -2650,7 +2758,7 @@ std::string CProvince::GenerateTileName(int civilization, int terrain)
 	return tile_name;
 }
 
-void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology)
+void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting)
 {
 	if (this->Technologies[upgrade_id] == has_technology) {
 		return;
@@ -2658,22 +2766,40 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology)
 	
 	this->Technologies[upgrade_id] = has_technology;
 	
-	if (has_technology) { //if value is true, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
-		if (!AllUpgrades[upgrade_id]->Class.empty()) {
-			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (AllUpgrades[upgrade_id]->Class == AllUpgrades[i]->Class) {
-					this->Technologies[i] = has_technology;
+	int change = has_technology ? 1 : -1;
+		
+	//add military score bonuses
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == upgrade_id) {
+			for (size_t i = 0; i < UnitTypes.size(); ++i) {
+				
+				Assert(UpgradeModifiers[z]->ApplyTo[i] == '?' || UpgradeModifiers[z]->ApplyTo[i] == 'X');
+
+				if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+					if (UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
+						this->MilitaryScoreBonus[i] += UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
+					}
 				}
 			}
 		}
 	}
 	
-	int change = has_technology ? 1 : -1;
-	
-	for (int i = 0; i < MaxCosts; ++i) {
-		if (AllUpgrades[upgrade_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
-			this->ProductionEfficiencyModifier[i] += AllUpgrades[upgrade_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
-			this->CalculateIncome(i);
+	if (!secondary_setting) { //if this technology is not being set as a result of another technology of the same class being researched
+		if (has_technology) { //if value is true, mark technologies from other civilizations that are of the same class as researched too, so that the player doesn't need to research the same type of technology every time
+			if (!AllUpgrades[upgrade_id]->Class.empty()) {
+				for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+					if (AllUpgrades[upgrade_id]->Class == AllUpgrades[i]->Class) {
+						this->SetTechnology(i, has_technology, true);
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (AllUpgrades[upgrade_id]->GrandStrategyProductionEfficiencyModifier[i] != 0) {
+				this->ProductionEfficiencyModifier[i] += AllUpgrades[upgrade_id]->GrandStrategyProductionEfficiencyModifier[i] * change;
+				this->CalculateIncome(i);
+			}
 		}
 	}
 }
@@ -3787,7 +3913,7 @@ void SetProvinceAttackingUnitQuantity(std::string province_name, std::string uni
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type] = std::max(0, quantity);
+		GrandStrategyGame.Provinces[province_id]->SetAttackingUnitQuantity(unit_type, quantity);
 	}
 }
 
@@ -3797,38 +3923,7 @@ void SetProvinceHero(std::string province_name, std::string hero_ident, int valu
 	int unit_type_id = UnitTypeIdByIdent(hero_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type_id != -1) {
-		if (value == 1) {
-			GrandStrategyGame.Provinces[province_id]->Movement = true;
-		}
-		bool found_hero = false;
-		//update the hero
-		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-			if (GrandStrategyGame.Heroes[i]->Type->Slot == UnitTypes[unit_type_id]->Slot) {
-				GrandStrategyGame.Heroes[i]->State = value;
-				if (GrandStrategyGame.Provinces[province_id] != GrandStrategyGame.Heroes[i]->Province || value == 0) { //if the new province is different from the hero's current province
-					if (GrandStrategyGame.Heroes[i]->Province != NULL) {
-						GrandStrategyGame.Heroes[i]->Province->Heroes.erase(std::remove(GrandStrategyGame.Heroes[i]->Province->Heroes.begin(), GrandStrategyGame.Heroes[i]->Province->Heroes.end(), GrandStrategyGame.Heroes[i]), GrandStrategyGame.Heroes[i]->Province->Heroes.end());  //remove the hero from the last province
-					}
-					GrandStrategyGame.Heroes[i]->Province = value != 0 ? const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_id])) : NULL;
-					if (GrandStrategyGame.Heroes[i]->Province != NULL) {
-						GrandStrategyGame.Heroes[i]->Province->Heroes.push_back(GrandStrategyGame.Heroes[i]); //add the hero to the new province
-					}
-				}
-				found_hero = true;
-				break;
-			}
-		}
-		//if the hero hasn't been defined yet, do so now
-		if (found_hero == false) {
-			CGrandStrategyHero *hero = new CGrandStrategyHero;
-			hero->State = value;
-			hero->Province = value != 0 ? const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_id])) : NULL;
-			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-			GrandStrategyGame.Heroes.push_back(hero);
-			if (hero->Province != NULL) {
-				GrandStrategyGame.Provinces[province_id]->Heroes.push_back(hero);
-			}
-		}
+		GrandStrategyGame.Provinces[province_id]->SetHero(unit_type_id, value);
 	}
 }
 
@@ -3966,6 +4061,9 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->FoodConsumption = 0;
 			GrandStrategyGame.Provinces[i]->Labor = 0;
 			GrandStrategyGame.Provinces[i]->ClaimCount = 0;
+			GrandStrategyGame.Provinces[i]->MilitaryScore = 0;
+			GrandStrategyGame.Provinces[i]->OffensiveMilitaryScore = 0;
+			GrandStrategyGame.Provinces[i]->AttackingMilitaryScore = 0;
 			GrandStrategyGame.Provinces[i]->Water = false;
 			GrandStrategyGame.Provinces[i]->Coastal = false;
 			GrandStrategyGame.Provinces[i]->Movement = false;
@@ -4029,6 +4127,9 @@ void CleanGrandStrategyGame()
 				}
 				for (int k = 0; k < ProvinceMax; ++k) {
 					GrandStrategyGame.Factions[i][j]->OwnedProvinces[k] = -1;
+				}
+				for (size_t k = 0; k < UnitTypes.size(); ++k) {
+					GrandStrategyGame.Factions[i][j]->MilitaryScoreBonus[k] = 0;
 				}
 			} else {
 				break;
@@ -4705,6 +4806,24 @@ int GetProvinceTotalWorkers(std::string province_name)
 	return GrandStrategyGame.Provinces[province_id]->TotalWorkers;
 }
 
+int GetProvinceMilitaryScore(std::string province_name, bool attacker, bool count_defenders)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	int military_score = 0;
+	if (province_id != -1) {
+		if (attacker) {
+			military_score = GrandStrategyGame.Provinces[province_id]->AttackingMilitaryScore;
+		} else if (count_defenders) {
+			military_score = GrandStrategyGame.Provinces[province_id]->MilitaryScore;
+		} else {
+			military_score = GrandStrategyGame.Provinces[province_id]->OffensiveMilitaryScore;
+		}
+	}
+	
+	return std::max(1, military_score); // military score must be at least one, since it is a divider in some instances, and we don't want to divide by 0
+}
+
 std::string GetProvinceOwner(std::string province_name)
 {
 	int province_id = GetProvinceId(province_name);
@@ -4932,7 +5051,7 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 				GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(i, - units_to_be_created);
 			} else {
 				units_to_be_created = GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] / divisor;
-				GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] -= units_to_be_created;
+				GrandStrategyGame.Provinces[province_id]->ChangeAttackingUnitQuantity(i, - units_to_be_created);
 			}
 		} else if (!attacking_units && UnitTypes[i]->Class == "worker" && !ignore_militia && !UnitTypes[i]->Civilization.empty()) { // create militia in the province depending on the amount of workers
 			
