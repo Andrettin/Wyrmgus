@@ -388,7 +388,8 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 			return VisitResult_Finished;
 		}
 	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (CanMoveToMask(pos, movemask)
+		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BuilderOutside)) { // reachable, or unit can build from outside and anywhere
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;

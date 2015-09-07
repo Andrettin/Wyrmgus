@@ -543,7 +543,7 @@ public:
 class CBuildRestrictionDistance : public CBuildRestriction
 {
 public:
-	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(NULL) {};
+	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(NULL), Diagonal(true) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
 	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
@@ -554,6 +554,7 @@ public:
 	std::string RestrictTypeOwner;
 	CUnitType *RestrictType;
 	bool CheckBuilder;
+	bool Diagonal;
 };
 
 class CBuildRestrictionHasUnit : public CBuildRestriction
@@ -568,6 +569,24 @@ public:
 	DistanceTypeType CountType;
 	std::string RestrictTypeName;
 	CUnitType *RestrictType;
+};
+
+class CBuildRestrictionSurroundedBy : public CBuildRestriction
+{
+public:
+	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(NULL), CheckBuilder(false) {};
+	virtual ~CBuildRestrictionSurroundedBy() {};
+	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	
+	int Distance;
+	DistanceTypeType DistanceType;
+	int Count;
+	DistanceTypeType CountType;
+	std::string RestrictTypeName;
+	std::string RestrictTypeOwner;
+	CUnitType *RestrictType;
+	bool CheckBuilder;
 };
 
 /// Base structure of unit-type
@@ -702,6 +721,7 @@ public:
 	int BurnPercent;                /// Burning percent.
 	int BurnDamageRate;             /// HP burn rate per sec
 	int RepairRange;                /// Units repair range.
+#define InfiniteRepairRange INT_MAX
 	char *CanCastSpell;             /// Unit is able to use spells.
 	char *AutoCastActive;           /// Default value for autocast.
 	int AutoBuildRate;              /// The rate at which the building builds itself
