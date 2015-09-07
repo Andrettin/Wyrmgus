@@ -421,7 +421,7 @@ static void ParseBuildingRules(lua_State *l, std::vector<CBuildRestriction *> &b
 				}
 			}
 			andlist->push_back(b);
-		else if (!strcmp(value, "surrounded-by")) {
+		} else if (!strcmp(value, "surrounded-by")) {
 			CBuildRestrictionSurroundedBy *b = new CBuildRestrictionSurroundedBy;
 
 			for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
