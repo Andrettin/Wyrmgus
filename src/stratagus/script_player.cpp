@@ -2312,6 +2312,32 @@ static int CclDefineFaction(lua_State *l)
 }
 
 /**
+**  Get the civilizations.
+**
+**  @param l  Lua state.
+*/
+static int CclGetCivilizations(lua_State *l)
+{
+	LuaCheckArgs(l, 0);
+
+	int civilization_count = 0;
+	for (int i = 0; i < MAX_RACES; ++i) {
+		if (!PlayerRaces.Name[i].empty() && PlayerRaces.Visible[i]) { //require visibility to ignore the neutral civilization
+			civilization_count += 1;
+		}
+	}
+
+	lua_createtable(l, civilization_count, 0);
+	for (int i = 1; i <= civilization_count; ++i)
+	{
+		lua_pushstring(l, PlayerRaces.Name[i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	
+	return 1;
+}
+
+/**
 **  Get a civilization's factions.
 **
 **  @param l  Lua state.
@@ -2824,6 +2850,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
+	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
 	//Wyrmgus end
