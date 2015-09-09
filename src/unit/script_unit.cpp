@@ -1459,7 +1459,13 @@ static int CclSetUnitVariable(lua_State *l)
 	lua_pop(l, 1);
 	const char *const name = LuaToString(l, 2);
 	int value;
-	if (!strcmp(name, "RegenerationRate")) {
+	if (!strcmp(name, "Player")) {
+		unit->AssignToPlayer(Players[LuaToNumber(l, 3)]);
+	//Wyrmgus start
+//	}
+//	if (!strcmp(name, "RegenerationRate")) {
+	} else if (!strcmp(name, "RegenerationRate")) {
+	//Wyrmgus end
 		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
 	//Wyrmgus start
