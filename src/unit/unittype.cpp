@@ -629,6 +629,28 @@ int GetResourceIdByName(lua_State *l, const char *resourceName)
 }
 
 //Wyrmgus start
+std::string GetGovernmentTypeNameById(int government_type)
+{
+	if (government_type == GovernmentTypeMonarchy) {
+		return "monarchy";
+	} else if (government_type == GovernmentTypeRepublic) {
+		return "republic";
+	}
+
+	return "";
+}
+
+int GetGovernmentTypeIdByName(std::string government_type)
+{
+	if (government_type == "monarchy") {
+		return GovernmentTypeMonarchy;
+	} else if (government_type == "republic") {
+		return GovernmentTypeRepublic;
+	}
+
+	return -1;
+}
+
 int GetItemTypeIdByName(std::string item_type)
 {
 	if (item_type == "Sword") {

@@ -2237,6 +2237,81 @@ static int CclDefineCivilizationFactions(lua_State *l)
 }
 
 /**
+**  Define a faction.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineFaction(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	CFaction *faction = new CFaction;
+	faction->Name = LuaToString(l, 1);
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Civilization")) {
+			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			
+			for (int i = 0; i < FactionMax; ++i) {
+				if (!PlayerRaces.Factions[civilization][i] || PlayerRaces.Factions[civilization][i]->Name.empty()) {
+					PlayerRaces.Factions[civilization][i] = faction;
+					SetFactionStringToIndex(civilization, PlayerRaces.Factions[civilization][i]->Name, i);
+					break;
+				}
+			}
+		} else if (!strcmp(value, "Type")) {
+			faction->Type = LuaToString(l, -1);
+		} else if (!strcmp(value, "Color")) {
+			std::string color_name = LuaToString(l, -1);
+			for (int c = 0; c < PlayerColorMax; ++c) {
+				if (PlayerColorNames[c] == color_name) {
+					faction->Color = c;
+					break;
+				}
+			}
+		} else if (!strcmp(value, "SecondaryColor")) {
+			std::string color_name = LuaToString(l, -1);
+			for (int c = 0; c < PlayerColorMax; ++c) {
+				if (PlayerColorNames[c] == color_name) {
+					faction->SecondaryColor = c;
+					break;
+				}
+			}
+		} else if (!strcmp(value, "Playable")) {
+			faction->Playable = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "DevelopsTo")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				faction->DevelopsTo[k] = LuaToString(l, -1, k + 1);
+			}
+		} else if (!strcmp(value, "Titles")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				faction->Titles[government_type] = LuaToString(l, -1, k + 1);
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Get a civilization's factions.
 **
 **  @param l  Lua state.
@@ -2748,6 +2823,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
 	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
+	lua_register(Lua, "DefineFaction", CclDefineFaction);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
 	//Wyrmgus end

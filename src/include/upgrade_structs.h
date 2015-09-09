@@ -173,6 +173,8 @@ extern int GetResourceIdByName(const char *resourceName);
 extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 
 //Wyrmgus start
+extern std::string GetGovernmentTypeNameById(int government_type);
+extern int GetGovernmentTypeIdByName(std::string government_type);
 extern int GetItemTypeIdByName(std::string item_type);
 //Wyrmgus end
 

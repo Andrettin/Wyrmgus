@@ -557,7 +557,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		
 		if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
 			tile_tooltip += ",\n";
-			tile_tooltip += PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Name;
+			tile_tooltip += GrandStrategyGame.Provinces[province_id]->Owner->GetFullName();
 		}
 	}
 	tile_tooltip += "\n(";
@@ -687,7 +687,7 @@ void CGrandStrategyGame::DoTurn()
 						this->Provinces[i]->ReallocateLabor();
 						province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] + this->Provinces[i]->Income[FishCost] - this->Provinces[i]->FoodConsumption;
 						//if the food income is still negative after reallocating labor (this shouldn't happen most of the time!) then decrease the population by 1 due to starvation; only do this if the population is above 1 (to prevent provinces from being entirely depopulated and unable to grow a population afterwards)
-						if (province_food_income < 0) {
+						if (province_food_income < 0 && this->Provinces[i]->TotalWorkers > 1) {
 							int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
 							this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, -1);
 						}
@@ -2828,6 +2828,27 @@ void CGrandStrategyFaction::CalculateIncomes()
 	}
 }
 
+std::string CGrandStrategyFaction::GetFullName()
+{
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+		return PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
+	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
+		std::string faction_title;
+		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType].empty()) {
+			faction_title = PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType];
+		} else {
+			if (this->GovernmentType == GovernmentTypeMonarchy) {
+				faction_title = "Kingdom";
+			} else if (this->GovernmentType == GovernmentTypeRepublic) {
+				faction_title = "Republic";
+			}
+		}
+		return faction_title + " of " + PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
+	}
+	
+	return "";
+}
+
 /**
 **  Get the width of the world map.
 */
@@ -4114,6 +4135,11 @@ void CleanGrandStrategyGame()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (GrandStrategyGame.Factions[i][j]) {
+				if (PlayerRaces.Factions[i][j]->Type == "tribe") {
+					GrandStrategyGame.Factions[i][j]->GovernmentType = -1;
+				} else if (PlayerRaces.Factions[i][j]->Type == "polity") {
+					GrandStrategyGame.Factions[i][j]->GovernmentType = GovernmentTypeMonarchy; //monarchy is the default government type for polities
+				}
 				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
@@ -4970,6 +4996,24 @@ bool GetFactionTechnology(std::string civilization_name, std::string faction_nam
 	return false;
 }
 
+void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	
+	int government_type_id = GetGovernmentTypeIdByName(government_type_name);
+	
+	if (government_type_id == -1) {
+		return;
+	}
+
+	if (civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			GrandStrategyGame.Factions[civilization][faction]->GovernmentType = government_type_id;
+		}
+	}
+}
+
 void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -4996,6 +5040,19 @@ std::string GetFactionCurrentResearch(std::string civilization_name, std::string
 			if (GrandStrategyGame.Factions[civilization][faction]->CurrentResearch != -1) {
 				return AllUpgrades[GrandStrategyGame.Factions[civilization][faction]->CurrentResearch]->Ident;
 			}
+		}
+	}
+	
+	return "";
+}
+
+std::string GetFactionFullName(std::string civilization_name, std::string faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	if (civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			return GrandStrategyGame.Factions[civilization][faction]->GetFullName();
 		}
 	}
 	

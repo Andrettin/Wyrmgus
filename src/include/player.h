@@ -251,6 +251,13 @@ private:
 };
 
 //Wyrmgus start
+enum GovernmentTypes {
+	GovernmentTypeMonarchy,
+	GovernmentTypeRepublic,
+	
+	MaxGovernmentTypes
+};
+
 class CFaction
 {
 public:
@@ -267,6 +274,7 @@ public:
 	int SecondaryColor;													/// faction secondary color
 	bool Playable;														/// faction playability
 	std::string DevelopsTo[DevelopsToMax];								/// to which factions this faction can develop
+	std::string Titles[MaxGovernmentTypes];								/// this faction's title for each government type
 };
 
 class LanguageNoun

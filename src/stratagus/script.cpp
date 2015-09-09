@@ -2732,6 +2732,10 @@ void SaveGrandStrategyGame(const std::string &filename)
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (int j = 0; j < FactionMax; ++j) {
 				if (GrandStrategyGame.Factions[i][j]) {
+					if (GrandStrategyGame.Factions[i][j]->GovernmentType != -1) {
+						std::string government_type_name = GetGovernmentTypeNameById(GrandStrategyGame.Factions[i][j]->GovernmentType);
+						fprintf(fd, "SetFactionGovernmentType(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), government_type_name.c_str());
+					}
 					if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
 						fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
 					}

@@ -237,9 +237,11 @@ public:
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
+	std::string GetFullName();
 	
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).
+	int GovernmentType;													/// Government type of the faction (-1 = none).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
 	int ProvinceCount;													/// Quantity of provinces owned by this faction.
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
@@ -453,8 +455,10 @@ extern std::string GetProvinceOwner(std::string province_name);
 extern bool GetProvinceWater(std::string province_name);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
 extern bool GetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
+extern void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name);
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
+extern std::string GetFactionFullName(std::string civilization_name, std::string faction_name);
 extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
 extern void SetPlayerFaction(std::string civilization_name, std::string faction_name);
 extern void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
