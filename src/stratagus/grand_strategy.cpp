@@ -690,6 +690,15 @@ void CGrandStrategyGame::DoTurn()
 						if (province_food_income < 0 && this->Provinces[i]->TotalWorkers > 1) {
 							int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
 							this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, -1);
+							if (this->Provinces[i]->Owner == this->PlayerFaction) { //if this is one of the player's provinces, display a message about the population starving
+								char buf[256];
+								snprintf(
+									buf, sizeof(buf), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
+									("Starvation in " + this->Provinces[i]->GetCulturalName()).c_str(),
+									("My lord, food stocks have been depleted in " + this->Provinces[i]->GetCulturalName() + ". The local population is starving!").c_str()
+								);
+								CclCommand(buf);
+							}
 						}
 					}
 					this->Provinces[i]->PopulationGrowthProgress = std::max(0, this->Provinces[i]->PopulationGrowthProgress);
