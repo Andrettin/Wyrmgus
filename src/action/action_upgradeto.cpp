@@ -248,6 +248,10 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		RestoreSelection();
 	} else {
 		MapMarkUnitSight(unit);
+		//Wyrmgus start
+		//if unit has a container, update the container's attack range, as the unit's range may have been changed with the upgrade
+		container->UpdateContainerAttackRange();
+		//Wyrmgus end
 	}
 	//
 	// Update possible changed buttons.

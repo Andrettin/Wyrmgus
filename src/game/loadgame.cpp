@@ -194,6 +194,13 @@ static void PlaceUnits()
 			unit.Removed = 1;
 			unit.Place(unit.tilePos);
 		}
+		
+		//Wyrmgus start
+		//calculate attack range for containers now, as when loading a game it couldn't be done when the container was initially loaded
+		if (unit.BoardCount > 0 && unit.InsideCount > 0) {
+			unit.UpdateContainerAttackRange();
+		}
+		//Wyrmgus end
 	}
 }
 

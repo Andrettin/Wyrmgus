@@ -161,6 +161,11 @@
 		goal->Variable[index].Value = goal->Variable[index].Max * value / 100;
 	}
 	clamp(&goal->Variable[index].Value, 0, goal->Variable[index].Max);
+	//Wyrmgus start
+	if (index == ATTACKRANGE_INDEX && goal->Container) {
+		goal->Container->UpdateContainerAttackRange();
+	}
+	//Wyrmgus end
 }
 
 /*

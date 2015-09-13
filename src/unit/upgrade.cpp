@@ -884,6 +884,11 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						if (unit.Variable[j].Max > 0) {
 							clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
 						}
+						//Wyrmgus start
+						if (j == ATTACKRANGE_INDEX && unit.Container) {
+							unit.Container->UpdateContainerAttackRange();
+						}
+						//Wyrmgus end
 					}
 					//Wyrmgus start
 					//change variation if current one becomes forbidden
@@ -1125,6 +1130,11 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 
 						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+						//Wyrmgus start
+						if (j == ATTACKRANGE_INDEX && unit.Container) {
+							unit.Container->UpdateContainerAttackRange();
+						}
+						//Wyrmgus end
 					}
 					//Wyrmgus start
 					//change variation if current one becomes forbidden
@@ -1225,7 +1235,11 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		if (unit.Variable[j].Max > 0) {
 			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
 		}
-
+		//Wyrmgus start
+		if (j == ATTACKRANGE_INDEX && unit.Container) {
+			unit.Container->UpdateContainerAttackRange();
+		}
+		//Wyrmgus end
 	}
 	
 	//change variation if current one becomes forbidden
@@ -1312,7 +1326,11 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 		if (unit.Variable[j].Max > 0) {
 			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
 		}
-
+		//Wyrmgus start
+		if (j == ATTACKRANGE_INDEX && unit.Container) {
+			unit.Container->UpdateContainerAttackRange();
+		}
+		//Wyrmgus end
 	}
 	
 	//change variation if current one becomes forbidden

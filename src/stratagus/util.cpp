@@ -585,7 +585,11 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "Ș", "S");
+	text = FindAndReplaceString(text, "ș", "s");
 	text = FindAndReplaceString(text, "ß", "ss"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "Ț", "T");
+	text = FindAndReplaceString(text, "ț", "t");
 	text = FindAndReplaceString(text, "Þ", "Th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "þ", "th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ū", "U");
@@ -656,6 +660,8 @@ std::string CapitalizeString(std::string text)
 	text = FindAndReplaceStringBeginning(text, "ô", "Ô");
 	text = FindAndReplaceStringBeginning(text, "ø", "Ø");
 	text = FindAndReplaceStringBeginning(text, "ǫ", "Ǫ");
+	text = FindAndReplaceStringBeginning(text, "ș", "Ș");
+	text = FindAndReplaceStringBeginning(text, "ț", "Ț");
 	text = FindAndReplaceStringBeginning(text, "þ", "Þ");
 	text = FindAndReplaceStringBeginning(text, "ū", "Ū");
 	text = FindAndReplaceStringBeginning(text, "û", "Û");

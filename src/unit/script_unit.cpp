@@ -530,6 +530,10 @@ static int CclUnit(lua_State *l)
 				lua_rawgeti(l, -1, k + 1);
 				CUnit *u = CclGetUnitFromRef(l);
 				lua_pop(l, 1);
+				//Wyrmgus start
+				Assert(u != NULL);
+				Assert(unit != NULL);
+				//Wyrmgus end
 				u->AddInContainer(*unit);
 			}
 			lua_pop(l, 1);
@@ -1515,6 +1519,11 @@ static int CclSetUnitVariable(lua_State *l)
 			} else {
 				LuaError(l, "Bad variable type '%s'\n" _C_ type);
 			}
+			//Wyrmgus start
+			if (index == ATTACKRANGE_INDEX && unit->Container) {
+				unit->Container->UpdateContainerAttackRange();
+			}
+			//Wyrmgus end
 		}
 	}
 	lua_pushnumber(l, value);

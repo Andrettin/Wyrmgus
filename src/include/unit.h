@@ -153,6 +153,9 @@ public:
 	void MoveToXY(const Vec2i &pos);
 	/// Add a unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit &host);
+	//Wyrmgus start
+	void UpdateContainerAttackRange();
+	//Wyrmgus end
 	/// Change owner of unit
 	void ChangeOwner(CPlayer &newplayer);
 

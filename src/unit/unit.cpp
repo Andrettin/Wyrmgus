@@ -1378,9 +1378,8 @@ void CUnit::AddInContainer(CUnit &host)
 	host.UnitInside = this;
 	host.InsideCount++;
 	//Wyrmgus start
-	if (host.Stats->Variables[ATTACKRANGE_INDEX].Max == 0 && this->Variable[ATTACKRANGE_INDEX].Value > host.Variable[ATTACKRANGE_INDEX].Value && host.Type->CanAttack && host.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if host has no range by itself, but the unit has range, and the unit can attack from a transporter, change the host's range to the unit's
-		host.Variable[ATTACKRANGE_INDEX].Max = this->Variable[ATTACKRANGE_INDEX].Max;
-		host.Variable[ATTACKRANGE_INDEX].Value = this->Variable[ATTACKRANGE_INDEX].Value;
+	if (!SaveGameLoading) { //if host has no range by itself, but the unit has range, and the unit can attack from a transporter, change the host's range to the unit's; but don't do this while loading, as it causes a crash (since one unit needs to be loaded before the other, and when this function is processed both won't already have their variables set)
+		host.UpdateContainerAttackRange();
 	}
 	//Wyrmgus end
 }
@@ -1409,22 +1408,29 @@ static void RemoveUnitFromContainer(CUnit &unit)
 	unit.Container = NULL;
 	//Wyrmgus start
 	//reset host attack range
-	if (host->Stats->Variables[ATTACKRANGE_INDEX].Max == 0 && host->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && host->Type->CanAttack && unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {
-		host->Variable[ATTACKRANGE_INDEX].Max = 0;
-		host->Variable[ATTACKRANGE_INDEX].Value = 0;
-		if (host->BoardCount > 0) {
-			CUnit *boarded_unit = host->UnitInside;
-			for (int i = 0; i < host->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
-				if (boarded_unit->Variable[ATTACKRANGE_INDEX].Value > host->Variable[ATTACKRANGE_INDEX].Value && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if host has no range by itself, but the unit has range, and the unit can attack from a transporter, change the host's range to the unit's
-					host->Variable[ATTACKRANGE_INDEX].Max = boarded_unit->Variable[ATTACKRANGE_INDEX].Max;
-					host->Variable[ATTACKRANGE_INDEX].Value = boarded_unit->Variable[ATTACKRANGE_INDEX].Value;
+	host->UpdateContainerAttackRange();
+	//Wyrmgus end
+}
+
+//Wyrmgus start
+void CUnit::UpdateContainerAttackRange()
+{
+	//reset attack range, if this unit is a container from which units can attack, but which doesn't have a native attack range
+	if (this->Stats->Variables[ATTACKRANGE_INDEX].Max == 0 && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->CanAttack) {
+		this->Variable[ATTACKRANGE_INDEX].Max = 0;
+		this->Variable[ATTACKRANGE_INDEX].Value = 0;
+		if (this->BoardCount > 0) {
+			CUnit *boarded_unit = this->UnitInside;
+			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
+				if (boarded_unit->Variable[ATTACKRANGE_INDEX].Value > this->Variable[ATTACKRANGE_INDEX].Value && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if container has no range by itself, but the unit has range, and the unit can attack from a transporter, change the container's range to the unit's
+					this->Variable[ATTACKRANGE_INDEX].Max = boarded_unit->Variable[ATTACKRANGE_INDEX].Max;
+					this->Variable[ATTACKRANGE_INDEX].Value = boarded_unit->Variable[ATTACKRANGE_INDEX].Value;
 				}
 			}
 		}
 	}
-	//Wyrmgus end
 }
-
+//Wyrmgus end
 
 /**
 **  Affect Tile coord of a unit (with units inside) to tile (x, y).
@@ -3281,6 +3287,12 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 			target.Variable[var].Value = target.Variable[var].Max;
 		}
 	}
+	
+	//Wyrmgus start
+	if (var == ATTACKRANGE_INDEX && target.Container) {
+		target.Container->UpdateContainerAttackRange();
+	}
+	//Wyrmgus end
 }
 
 
