@@ -5479,11 +5479,14 @@ int GetDiplomacyStateIdByName(std::string diplomacy_state)
 	} else if (diplomacy_state == "war") {
 		return DiplomacyStateWar;
 	} else if (diplomacy_state == "alliance") {
-		return DiplomacyStateAlliance;
+//		return DiplomacyStateAlliance; //deactivated for now until this diplomacy state is properly implemented
+		return DiplomacyStatePeace;
 	} else if (diplomacy_state == "vassal") {
-		return DiplomacyStateVassal;
+//		return DiplomacyStateVassal;
+		return DiplomacyStatePeace;
 	} else if (diplomacy_state == "sovereign") {
-		return DiplomacyStateSovereign;
+//		return DiplomacyStateSovereign;
+		return DiplomacyStatePeace;
 	}
 
 	return -1;
