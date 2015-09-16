@@ -79,7 +79,7 @@ class WorldMapTile
 public:
 	WorldMapTile() :
 		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
-		ResourceProspected(false), Position(-1, -1), BaseTile(NULL), GraphicTile(NULL)
+		ResourceProspected(false), Position(-1, -1), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
 		memset(River, -1, sizeof(River));
@@ -102,6 +102,7 @@ public:
 	Vec2i Position;							/// Position of the tile
 	CGraphic *BaseTile;
 	CGraphic *GraphicTile;					/// The tile image used by this tile
+	CGraphic *ResourceBuildingGraphics;
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
 	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
 	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
@@ -324,7 +325,6 @@ public:
 	CGraphic *SymbolMove;										///symbol that units are moving to the province (drawn at the settlement location)
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
 	CGraphic *SymbolHero;										///symbol that a hero is present in the province (drawn at the settlement location)
-	CGraphic *ResourceBuildingGraphics[MaxCosts];
 	CGraphic *BorderGraphics[MaxDirections];					///one for each direction
 	CGraphic *RiverGraphics[MaxDirections];
 	CGraphic *RivermouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
@@ -367,7 +367,6 @@ extern int GrandStrategyMapWidthIndent;
 extern int GrandStrategyMapHeightIndent;
 extern int BattalionMultiplier;
 extern int PopulationGrowthThreshold;					/// How much population growth progress must be accumulated before a new worker unit is created in the province
-
 extern std::string GrandStrategyInterfaceState;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 
@@ -478,6 +477,8 @@ extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);
 extern void SetResourceBaseLaborInput(std::string resource_name, int input);
 extern void SetResourceBaseOutput(std::string resource_name, int output);
+extern void SetResourceGrandStrategyBuildingVariations(std::string resource_name, int variation_quantity);
+extern void SetResourceGrandStrategyBuildingTerrainSpecificGraphic(std::string resource_name, std::string terrain_type_name, bool has_terrain_specific_graphic);
 
 //@}
 

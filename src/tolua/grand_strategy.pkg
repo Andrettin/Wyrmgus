@@ -113,3 +113,5 @@ extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);
 extern void SetResourceBaseLaborInput(std::string resource_name, int input);
 extern void SetResourceBaseOutput(std::string resource_name, int output);
+extern void SetResourceGrandStrategyBuildingVariations(std::string resource_name, int variation_quantity);
+extern void SetResourceGrandStrategyBuildingTerrainSpecificGraphic(std::string resource_name, std::string terrain_type_name, bool has_terrain_specific_graphic);

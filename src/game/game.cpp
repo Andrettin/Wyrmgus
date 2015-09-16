@@ -1512,6 +1512,19 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	for (unsigned int i = 0; i < MaxCosts && i < args; ++i) {
 		DefaultResourceNames[i] = LuaToString(l, i + 1);
 	}
+	
+	//Wyrmgus start
+	//initialize these variables here, for lack of a better place
+	for (int i = 0; i < MaxCosts; ++i) {
+		ResourceGrandStrategyBuildingVariations[i] = 0;
+	}
+	for (int i = 0; i < MaxCosts; ++i) {
+		for (int j = 0; j < WorldMapTerrainTypeMax; ++j) {
+			ResourceGrandStrategyBuildingTerrainSpecificGraphic[i][j] = false;
+		}
+	}
+	//Wyrmgus end
+	
 	return 0;
 }
 

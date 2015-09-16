@@ -247,7 +247,7 @@ void CGrandStrategyGame::DrawMap()
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
 				if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
-					GrandStrategyGame.ResourceBuildingGraphics[GrandStrategyGame.WorldMapTiles[x][y]->Resource]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphics->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 				}
 				
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
@@ -2953,6 +2953,11 @@ int GetWorldMapTerrainTypeId(std::string terrain_type_name)
 			return i;
 		}
 	}
+	
+	if (!terrain_type_name.empty()) {
+		fprintf(stderr, "Can't find terrain type \"%s\".\n", terrain_type_name.c_str());
+	}
+	
 	return -1;
 }
 
@@ -3437,7 +3442,6 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Variation != -1) {
 			graphic_tile += "_";
 			graphic_tile += std::to_string((long long) GrandStrategyGame.WorldMapTiles[x][y]->Variation + 1);
-			
 		}
 		
 		if (GrandStrategyGame.TerrainTypes[terrain]->BaseTile != -1 && GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation != -1) {
@@ -3491,6 +3495,30 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 				base_tile_graphic->Load();
 			}
 			GrandStrategyGame.WorldMapTiles[x][y]->BaseTile = CGraphic::Get(base_tile_filename);
+		}
+		
+		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
+			std::string resource_building_filename = "tilesets/world/sites/resource_building_";
+			resource_building_filename += DefaultResourceNames[GrandStrategyGame.WorldMapTiles[x][y]->Resource];
+			
+			//see if the resource has a graphic specific for this tile's terrain, and if so, use it
+			if (ResourceGrandStrategyBuildingTerrainSpecificGraphic[GrandStrategyGame.WorldMapTiles[x][y]->Resource][terrain]) {
+				resource_building_filename += "_";
+				resource_building_filename += GrandStrategyGame.TerrainTypes[terrain]->Tag;
+			}
+			
+			if (ResourceGrandStrategyBuildingVariations[GrandStrategyGame.WorldMapTiles[x][y]->Resource] > 0 && CanAccessFile((resource_building_filename + "_" + std::to_string((long long) ResourceGrandStrategyBuildingVariations[GrandStrategyGame.WorldMapTiles[x][y]->Resource]) + ".png").c_str())) { //see if the resource has variations, and if so, choose a random one
+				resource_building_filename += "_";
+				resource_building_filename += std::to_string((long long) SyncRand(ResourceGrandStrategyBuildingVariations[GrandStrategyGame.WorldMapTiles[x][y]->Resource]) + 1);
+			}
+			
+			resource_building_filename += ".png";
+			
+			if (CGraphic::Get(resource_building_filename) == NULL) {
+				CGraphic *resource_building_graphics = CGraphic::New(resource_building_filename, 64, 64);
+				resource_building_graphics->Load();
+			}
+			GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphics = CGraphic::Get(resource_building_filename);
 		}
 	}
 }
@@ -4246,18 +4274,6 @@ void InitializeGrandStrategyGame()
 		fog_tile_graphic->Load();
 	}
 	GrandStrategyGame.FogTile = CGraphic::Get(fog_graphic_tile);
-	
-	//and for the resource buildings
-	for (int i = 0; i < MaxCosts; ++i) {
-		std::string resource_building_graphics_file = "tilesets/world/sites/resource_building_" + DefaultResourceNames[i] + ".png";
-		if (CanAccessFile(resource_building_graphics_file.c_str())) {
-			if (CGraphic::Get(resource_building_graphics_file) == NULL) {
-				CGraphic *resource_building_graphics = CGraphic::New(resource_building_graphics_file, 64, 64);
-				resource_building_graphics->Load();
-			}
-			GrandStrategyGame.ResourceBuildingGraphics[i] = CGraphic::Get(resource_building_graphics_file);
-		}
-	}
 	
 	// set the settlement graphics
 	for (int i = 0; i < MAX_RACES; ++i) {
@@ -5310,6 +5326,28 @@ void SetResourceBaseOutput(std::string resource_name, int output)
 	}
 	
 	DefaultResourceOutputs[resource] = output;
+}
+
+void SetResourceGrandStrategyBuildingVariations(std::string resource_name, int variation_quantity)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (resource == -1) {
+		return;
+	}
+	
+	ResourceGrandStrategyBuildingVariations[resource] = variation_quantity;
+}
+
+void SetResourceGrandStrategyBuildingTerrainSpecificGraphic(std::string resource_name, std::string terrain_type_name, bool has_terrain_specific_graphic)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	int terrain_type = GetWorldMapTerrainTypeId(terrain_type_name);
+	if (resource == -1 || terrain_type == -1) {
+		return;
+	}
+	
+	ResourceGrandStrategyBuildingTerrainSpecificGraphic[resource][terrain_type] = has_terrain_specific_graphic;
 }
 
 //@}

@@ -591,6 +591,8 @@ int DefaultResourceMaxAmounts[MaxCosts];
 int DefaultResourcePrices[MaxCosts];
 int DefaultResourceLaborInputs[MaxCosts];
 int DefaultResourceOutputs[MaxCosts];
+int ResourceGrandStrategyBuildingVariations[MaxCosts];
+int ResourceGrandStrategyBuildingTerrainSpecificGraphic[MaxCosts][WorldMapTerrainTypeMax];
 //Wyrmgus end
 
 /**

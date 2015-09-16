@@ -167,6 +167,8 @@ extern int DefaultResourceMaxAmounts[MaxCosts];
 extern int DefaultResourcePrices[MaxCosts];
 extern int DefaultResourceLaborInputs[MaxCosts];
 extern int DefaultResourceOutputs[MaxCosts];
+extern int ResourceGrandStrategyBuildingVariations[MaxCosts];
+extern int ResourceGrandStrategyBuildingTerrainSpecificGraphic[MaxCosts][WorldMapTerrainTypeMax];
 //Wyrmgus end
 
 extern int GetResourceIdByName(const char *resourceName);
