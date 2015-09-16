@@ -2752,6 +2752,13 @@ void SaveGrandStrategyGame(const std::string &filename)
 							fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
 						}
 					}
+					for (int k = i; k < MAX_RACES; ++k) { //the function sets the state for both parties, so we only need to do it once for one of them
+						for (int n = j + 1; n < FactionMax; ++n) {
+							if (GrandStrategyGame.Factions[k][n] && GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] != DiplomacyStatePeace) {
+								fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Name.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n]).c_str()); //save faction trade data
+							}
+						}
+					}
 				} else {
 					break;
 				}

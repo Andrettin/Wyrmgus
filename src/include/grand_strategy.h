@@ -59,6 +59,19 @@ enum Pathways {
 	MaxPathways
 };
 
+/**
+**  Indexes into diplomacy state array.
+*/
+enum DiplomacyStates {
+	DiplomacyStatePeace,
+	DiplomacyStateWar,
+	DiplomacyStateAlliance,
+	DiplomacyStateVassal,
+	DiplomacyStateSovereign,
+	
+	MaxDiplomacyStates
+};
+
 class WorldMapTerrainType
 {
 public:
@@ -233,6 +246,12 @@ public:
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		memset(Trade, 0, sizeof(Trade));
 		memset(MilitaryScoreBonus, 0, sizeof(MilitaryScoreBonus));
+		for (int i = 0; i < MAX_RACES; ++i) {
+			for (int j = 0; j < FactionMax; ++j) {
+				DiplomacyState[i][j] = DiplomacyStatePeace;
+				DiplomacyStateProposal[i][j] = -1;
+			}
+		}
 	}
 	
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
@@ -252,6 +271,8 @@ public:
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Trade[MaxCosts];												/// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
 	int MilitaryScoreBonus[UnitTypeMax];
+	int DiplomacyState[MAX_RACES][FactionMax];							/// Diplomacy state between this faction and each other faction
+	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
 };
 
 class CRiver
@@ -370,6 +391,8 @@ extern int PopulationGrowthThreshold;					/// How much population growth progres
 extern std::string GrandStrategyInterfaceState;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 
+extern std::string GetDiplomacyStateNameById(int diplomacy_state);
+extern int GetDiplomacyStateIdByName(std::string diplomacy_state);
 extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();
 extern std::string GetWorldMapTileTerrain(int x, int y);
@@ -455,6 +478,10 @@ extern bool GetProvinceWater(std::string province_name);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
 extern bool GetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name);
+extern void SetFactionDiplomacyState(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name);
+extern std::string GetFactionDiplomacyState(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
+extern void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name);
+extern std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern std::string GetFactionFullName(std::string civilization_name, std::string faction_name);

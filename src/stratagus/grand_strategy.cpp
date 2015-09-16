@@ -4202,6 +4202,12 @@ void CleanGrandStrategyGame()
 				for (size_t k = 0; k < UnitTypes.size(); ++k) {
 					GrandStrategyGame.Factions[i][j]->MilitaryScoreBonus[k] = 0;
 				}
+				for (int k = 0; k < MAX_RACES; ++k) {
+					for (int n = 0; n < FactionMax; ++n) {
+						GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] = DiplomacyStatePeace;
+						GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[k][n] = -1;
+					}
+				}
 			} else {
 				break;
 			}
@@ -5047,6 +5053,84 @@ void SetFactionGovernmentType(std::string civilization_name, std::string faction
 	}
 }
 
+void SetFactionDiplomacyState(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int second_civilization = PlayerRaces.GetRaceIndexByName(second_civilization_name.c_str());
+	
+	int diplomacy_state_id = GetDiplomacyStateIdByName(diplomacy_state_name);
+	
+	if (diplomacy_state_id == -1) {
+		return;
+	}
+
+	int second_diplomacy_state_id; // usually the second diplomacy state is the same as the first, but there are asymmetrical diplomacy states (such as vassal/sovereign relationships)
+	if (diplomacy_state_id == DiplomacyStateVassal) {
+		second_diplomacy_state_id = DiplomacyStateSovereign;
+	} else if (diplomacy_state_id == DiplomacyStateSovereign) {
+		second_diplomacy_state_id = DiplomacyStateVassal;
+	} else {
+		second_diplomacy_state_id = diplomacy_state_id;
+	}
+
+	if (civilization != -1 && second_civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
+		if (faction != -1 && second_faction != -1) {
+			GrandStrategyGame.Factions[civilization][faction]->DiplomacyState[second_civilization][second_faction] = diplomacy_state_id;
+			GrandStrategyGame.Factions[second_civilization][second_faction]->DiplomacyState[civilization][faction] = second_diplomacy_state_id;
+		}
+	}
+}
+
+std::string GetFactionDiplomacyState(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int second_civilization = PlayerRaces.GetRaceIndexByName(second_civilization_name.c_str());
+	
+	if (civilization != -1 && second_civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
+		if (faction != -1 && second_faction != -1) {
+			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization][faction]->DiplomacyState[second_civilization][second_faction]);
+		}
+	}
+	
+	return "";
+}
+
+void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int second_civilization = PlayerRaces.GetRaceIndexByName(second_civilization_name.c_str());
+	
+	int diplomacy_state_id = GetDiplomacyStateIdByName(diplomacy_state_name);
+	
+	if (civilization != -1 && second_civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
+		if (faction != -1 && second_faction != -1) {
+			GrandStrategyGame.Factions[civilization][faction]->DiplomacyStateProposal[second_civilization][second_faction] = diplomacy_state_id;
+		}
+	}
+}
+
+std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int second_civilization = PlayerRaces.GetRaceIndexByName(second_civilization_name.c_str());
+	
+	if (civilization != -1 && second_civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
+		if (faction != -1 && second_faction != -1) {
+			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization][faction]->DiplomacyStateProposal[second_civilization][second_faction]);
+		}
+	}
+	
+	return "";
+}
+
 void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -5228,6 +5312,17 @@ void ChangeFactionCulture(std::string old_civilization_name, std::string faction
 	if (GrandStrategyGame.Factions[old_civilization][old_faction] == GrandStrategyGame.PlayerFaction) {
 		GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[new_civilization][new_faction]));
 	}
+	
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (GrandStrategyGame.Factions[i][j]) {
+				GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyState[i][j] = DiplomacyStatePeace;
+				GrandStrategyGame.Factions[i][j]->DiplomacyState[old_civilization][old_faction] = DiplomacyStatePeace;
+				GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStateProposal[i][j] = -1;
+				GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[old_civilization][old_faction] = -1;
+			}
+		}
+	}
 }
 
 void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity)
@@ -5356,6 +5451,42 @@ void SetResourceGrandStrategyBuildingTerrainSpecificGraphic(std::string resource
 	}
 	
 	ResourceGrandStrategyBuildingTerrainSpecificGraphic[resource][terrain_type] = has_terrain_specific_graphic;
+}
+
+std::string GetDiplomacyStateNameById(int diplomacy_state)
+{
+	if (diplomacy_state == DiplomacyStatePeace) {
+		return "peace";
+	} else if (diplomacy_state == DiplomacyStateWar) {
+		return "war";
+	} else if (diplomacy_state == DiplomacyStateAlliance) {
+		return "alliance";
+	} else if (diplomacy_state == DiplomacyStateVassal) {
+		return "vassal";
+	} else if (diplomacy_state == DiplomacyStateSovereign) {
+		return "sovereign";
+	} else if (diplomacy_state == -1) {
+		return "";
+	}
+
+	return "";
+}
+
+int GetDiplomacyStateIdByName(std::string diplomacy_state)
+{
+	if (diplomacy_state == "peace") {
+		return DiplomacyStatePeace;
+	} else if (diplomacy_state == "war") {
+		return DiplomacyStateWar;
+	} else if (diplomacy_state == "alliance") {
+		return DiplomacyStateAlliance;
+	} else if (diplomacy_state == "vassal") {
+		return DiplomacyStateVassal;
+	} else if (diplomacy_state == "sovereign") {
+		return DiplomacyStateSovereign;
+	}
+
+	return -1;
 }
 
 //@}
