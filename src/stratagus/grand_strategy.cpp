@@ -1298,6 +1298,14 @@ void CProvince::UpdateMinimap()
 
 void CProvince::SetOwner(int civilization_id, int faction_id)
 {
+	//if new owner is the same as the current owner, return
+	if (
+		(this->Owner != NULL && this->Owner->Civilization == civilization_id && this->Owner->Faction == faction_id)
+		|| (this->Owner == NULL && civilization_id == -1 && faction_id == -1)
+	) {
+		return;
+	}
+	
 	if (this->Owner != NULL) { //if province has a previous owner, remove it from the owner's province list
 		for (int i = 0; i < this->Owner->ProvinceCount; ++i) {
 			if (this->Owner->OwnedProvinces[i] == this->ID) {
