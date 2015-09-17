@@ -1397,6 +1397,8 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "CurrentResource")) {
 		lua_pushnumber(l, unit->CurrentResource);
 	//Wyrmgus start
+//	} else if (!strcmp(value, "Name")) {
+//		lua_pushstring(l, unit->Type->Name.c_str());
 	} else if (!strcmp(value, "GiveResourceTypeName")) {
 		lua_pushstring(l, DefaultResourceNames[unit->Type->GivesResource].c_str());
 	} else if (!strcmp(value, "CurrentResourceName")) {
@@ -1421,6 +1423,8 @@ static int CclGetUnitVariable(lua_State *l)
 		}
 		return 1;
 	//Wyrmgus end
+	} else if (!strcmp(value, "PlayerType")) {
+		lua_pushinteger(l, unit->Player->Type);
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {

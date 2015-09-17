@@ -570,6 +570,7 @@ public:
 	DistanceTypeType CountType;
 	std::string RestrictTypeName;
 	CUnitType *RestrictType;
+	std::string RestrictTypeOwner;
 };
 
 class CBuildRestrictionSurroundedBy : public CBuildRestriction
