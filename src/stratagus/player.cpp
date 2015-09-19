@@ -1076,11 +1076,7 @@ void CPlayer::SetRandomFaction()
 	
 	// first search for valid factions in the current faction's "develops to" list, and only if that fails search in all factions of the civilization
 	if (this->Faction != -1) {
-		for (int i = 0; i < DevelopsToMax; ++i) {
-			if (PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo[i].empty()) {
-				break;
-			}
-			
+		for (size_t i = 0; i < PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo.size(); ++i) {
 			int faction_id = PlayerRaces.GetFactionIndexByName(this->Race, PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo[i]);
 			if (faction_id != -1) {
 				bool faction_used = false;

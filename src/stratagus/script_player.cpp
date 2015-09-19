@@ -2222,7 +2222,7 @@ static int CclDefineCivilizationFactions(lua_State *l)
 					}
 					int subsubargs = lua_rawlen(l, -1);
 					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.Factions[civilization][(j - 1) / 2]->DevelopsTo[n] = LuaToString(l, -1, n + 1);
+						PlayerRaces.Factions[civilization][(j - 1) / 2]->DevelopsTo.push_back(LuaToString(l, -1, n + 1));
 					}
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2291,7 +2291,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				faction->DevelopsTo[k] = LuaToString(l, -1, k + 1);
+				faction->DevelopsTo.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else if (!strcmp(value, "Titles")) {
 			if (!lua_istable(l, -1)) {

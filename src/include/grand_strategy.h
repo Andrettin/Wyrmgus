@@ -130,7 +130,6 @@ public:
 		Name(""), SettlementName(""),
 		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
-		ClaimCount(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
 		Water(false), Coastal(false), Movement(false), SettlementLocation(-1, -1),
 		Owner(NULL), AttackedBy(NULL)
@@ -154,10 +153,6 @@ public:
 				ResourceTiles[i][j].x = -1;
 				ResourceTiles[i][j].y = -1;
 			}
-		}
-		for (int i = 0; i < MAX_RACES * FactionMax; ++i) {
-			Claims[i][0] = -1;
-			Claims[i][1] = -1;
 		}
 	}
 	
@@ -205,7 +200,6 @@ public:
 	int PopulationGrowthProgress;										/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
 	int FoodConsumption;												/// How much food the people in the province consume
 	int Labor;															/// How much labor available this province has
-	int ClaimCount;
 	int MilitaryScore;													/// Military score of the forces in the province (including fortifications and militia)
 	int OffensiveMilitaryScore;											/// Military score of the forces in the province which can attack other provinces
 	int AttackingMilitaryScore;											/// Military score of the forces attacking the province
@@ -224,7 +218,7 @@ public:
 	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
 	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
-	int Claims[MAX_RACES * FactionMax][2];								/// Factions which claim this province
+	std::vector<CGrandStrategyFaction *> Claims;						/// Factions which claim this province
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
 	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
@@ -257,6 +251,12 @@ public:
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
+	void CheckFormableFactions(int civilization);
+	void FormFaction(int civilization, int faction);
+	void AcquireFactionTechnologies(int civilization, int faction);
+	bool IsAlive();
+	bool HasTechnologyClass(std::string technology_class_name);
+	bool CanFormFaction(int civilization, int faction);
 	std::string GetFullName();
 	
 	int Faction;														/// The faction's ID (-1 = none).
@@ -273,6 +273,7 @@ public:
 	int MilitaryScoreBonus[UnitTypeMax];
 	int DiplomacyState[MAX_RACES][FactionMax];							/// Diplomacy state between this faction and each other faction
 	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
+	std::vector<CProvince *> Claims;									/// Provinces which this faction claims
 };
 
 class CRiver
@@ -495,7 +496,7 @@ extern int GetFactionIncome(std::string civilization_name, std::string faction_n
 extern bool IsGrandStrategyUnit(const CUnitType &type);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
-extern void ChangeFactionCulture(std::string old_civilization_name, std::string faction_name, std::string new_civilization_name);
+extern void FormFaction(std::string old_civilization_name, std::string old_faction_name, std::string new_civilization_name, std::string new_faction_name);
 extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);

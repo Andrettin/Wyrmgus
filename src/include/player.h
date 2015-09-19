@@ -273,7 +273,7 @@ public:
 	int Color;															/// faction color
 	int SecondaryColor;													/// faction secondary color
 	bool Playable;														/// faction playability
-	std::string DevelopsTo[DevelopsToMax];								/// to which factions this faction can develop
+	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
 	std::string Titles[MaxGovernmentTypes];								/// this faction's title for each government type
 };
 

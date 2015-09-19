@@ -591,7 +591,7 @@ void CGrandStrategyGame::DoTurn()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (this->Factions[i][j]) {
-				if (this->Factions[i][j]->ProvinceCount > 0) {
+				if (this->Factions[i][j]->IsAlive()) {
 					for (int k = 0; k < MaxCosts; ++k) {
 						if (k == GrainCost || k == MushroomCost || k == FishCost) { //food resources are not added to the faction's storage, being stored at the province level instead
 							continue;
@@ -638,14 +638,14 @@ void CGrandStrategyGame::DoTurn()
 					) { //if a revolt is triggered this turn (a revolt can only happen if the province is not being attacked that turn, and the quantity of revolting units is based on the quantity of workers in the province)
 						int possible_revolters[FactionMax];
 						int possible_revolter_count = 0;
-						for (int j = 0; j < this->Provinces[i]->ClaimCount; ++j) {
+						for (size_t j = 0; j < this->Provinces[i]->Claims.size(); ++j) {
 							if (
-								this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Civilization
-								&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j][1]]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner->Civilization][this->Provinces[i]->Owner->Faction]->Type
-								&& !(this->Provinces[i]->Claims[j][0] == this->Provinces[i]->Owner->Civilization && this->Provinces[i]->Claims[j][1] == this->Provinces[i]->Owner->Faction)
-								&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j][0]][GrandStrategyGame.Provinces[i]->Claims[j][1]]->Name != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Name // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
+								this->Provinces[i]->Claims[j]->Civilization == this->Provinces[i]->Civilization
+								&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j]->Faction]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner->Civilization][this->Provinces[i]->Owner->Faction]->Type
+								&& !(this->Provinces[i]->Claims[j] == this->Provinces[i]->Owner)
+								&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Name != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Name // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
 							) { //if faction which has a claim on this province has the same civilization as the province, and if it is of the same faction type as the province's owner
-								possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j][1];
+								possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j]->Faction;
 								possible_revolter_count += 1;
 							}
 						}
@@ -714,9 +714,14 @@ void CGrandStrategyGame::DoTurn()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (this->Factions[i][j]) {
-				if (this->Factions[i][j]->CurrentResearch != -1) {
-					this->Factions[i][j]->SetTechnology(this->Factions[i][j]->CurrentResearch, true);
-					this->Factions[i][j]->CurrentResearch = -1;
+				if (this->Factions[i][j]->IsAlive()) {
+					if (this->Factions[i][j]->CurrentResearch != -1) {
+						this->Factions[i][j]->SetTechnology(this->Factions[i][j]->CurrentResearch, true);
+						this->Factions[i][j]->CurrentResearch = -1;
+					}
+					
+					//see if this faction can form a faction
+					this->Factions[i][j]->CheckFormableFactions(i);
 				}
 			} else { //end of valid factions
 				break;
@@ -746,7 +751,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (this->Factions[i][j]) {
-				if (this->Factions[i][j]->ProvinceCount > 0) {
+				if (this->Factions[i][j]->IsAlive()) {
 					for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
 						int province_id = this->Factions[i][j]->OwnedProvinces[k];
 						for (int res = 0; res < MaxCosts; ++res) {
@@ -774,7 +779,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (this->Factions[i][j]) {
-				if (this->Factions[i][j]->ProvinceCount > 0) {
+				if (this->Factions[i][j]->IsAlive()) {
 					factions_by_prestige[factions_by_prestige_count] = const_cast<CGrandStrategyFaction *>(&(*this->Factions[i][j]));
 					factions_by_prestige_count += 1;
 				}
@@ -1761,24 +1766,14 @@ void CProvince::CalculateIncomes()
 
 void CProvince::AddFactionClaim(int civilization_id, int faction_id)
 {
-	this->Claims[this->ClaimCount][0] = civilization_id;
-	this->Claims[this->ClaimCount][1] = faction_id;
-	this->ClaimCount += 1;
+	this->Claims.push_back(GrandStrategyGame.Factions[civilization_id][faction_id]);
+	GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.push_back(this);
 }
 
 void CProvince::RemoveFactionClaim(int civilization_id, int faction_id)
 {
-	for (int i = 0; i < this->ClaimCount; ++i) {
-		if (this->Claims[i][0] == civilization_id && this->Claims[i][1] == faction_id) {
-			//if this claim's faction is the one we are removing, push every element of the array after it back one step
-			for (int j = i; j < this->ClaimCount; ++j) {
-				this->Claims[j][0] = this->Claims[j + 1][0];
-				this->Claims[j][1] = this->Claims[j + 1][1];
-			}
-			break;
-		}
-	}
-	this->ClaimCount -= 1;
+	this->Claims.erase(std::remove(this->Claims.begin(), this->Claims.end(), GrandStrategyGame.Factions[civilization_id][faction_id]), this->Claims.end());
+	GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.erase(std::remove(GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.begin(), GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.end(), this), GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.end());
 }
 
 bool CProvince::HasBuildingClass(std::string building_class_name)
@@ -1802,8 +1797,8 @@ bool CProvince::HasBuildingClass(std::string building_class_name)
 
 bool CProvince::HasFactionClaim(int civilization_id, int faction_id)
 {
-	for (int i = 0; i < this->ClaimCount; ++i) {
-		if (this->Claims[i][0] == civilization_id && this->Claims[i][1] == faction_id) {
+	for (size_t i = 0; i < this->Claims.size(); ++i) {
+		if (this->Claims[i]->Civilization == civilization_id && this->Claims[i]->Faction == faction_id) {
 			return true;
 		}
 	}
@@ -2843,6 +2838,177 @@ void CGrandStrategyFaction::CalculateIncomes()
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->CalculateIncome(i);
 	}
+}
+
+void CGrandStrategyFaction::CheckFormableFactions(int civilization)
+{
+	for (size_t i = 0; i < PlayerRaces.Factions[this->Civilization][this->Faction]->DevelopsTo.size(); ++i) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, PlayerRaces.Factions[this->Civilization][this->Faction]->DevelopsTo[i]);
+		if (faction != -1 && GrandStrategyGame.Factions[civilization][faction]) {
+			if (GrandStrategyGame.Factions[civilization][faction] != this && !GrandStrategyGame.Factions[civilization][faction]->IsAlive()) {
+				if (CanFormFaction(civilization, faction)) {
+					FormFaction(civilization, faction);
+				}
+			}
+		}
+	}
+}
+
+void CGrandStrategyFaction::FormFaction(int civilization, int faction)
+{
+	int old_civilization = this->Civilization;
+	int old_faction = this->Faction;
+	
+	int new_civilization = civilization;
+	int new_faction = faction;
+	
+	GrandStrategyGame.Factions[new_civilization][new_faction]->AcquireFactionTechnologies(old_civilization, old_faction);
+	
+	if (this->ProvinceCount > 0) {
+		for (int i = (this->ProvinceCount - 1); i >= 0; --i) {
+			int province_id = this->OwnedProvinces[i];
+
+			//GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
+			if (old_civilization != new_civilization) {
+				GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
+			} else {
+				char buf[256];
+				snprintf(
+					buf, sizeof(buf), "AcquireProvince(GetProvinceFromName(\"%s\"), \"%s\");",
+					(GrandStrategyGame.Provinces[province_id]->Name).c_str(),
+					(PlayerRaces.Factions[new_civilization][new_faction]->Name).c_str()
+				);
+				CclCommand(buf);
+			}
+			
+			// replace existing units from the previous civilization with units of the new civilization, if the civilizations are different
+			if (old_civilization != new_civilization) {
+				for (size_t j = 0; j < UnitTypes.size(); ++j) {
+					if (
+						!UnitTypes[j]->Class.empty()
+						&& !UnitTypes[j]->Civilization.empty()
+						&& !UnitTypes[j]->BoolFlag[BUILDING_INDEX].value
+						&& UnitTypes[j]->DefaultStat.Variables[DEMAND_INDEX].Value > 0
+						&& UnitTypes[j]->Civilization == PlayerRaces.Name[old_civilization]
+						&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != -1
+						&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) // don't replace if both civilizations use the same unit type
+					) {
+						GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)), GrandStrategyGame.Provinces[province_id]->Units[j]);
+						GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class))] += GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j];
+						GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(j, 0);
+						GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j] = 0;
+					}
+				}
+			}
+		}
+	}
+	
+	for (int i = 0; i < MaxCosts; ++i) {
+		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[i] = this->Resources[i];
+	}
+	
+	GrandStrategyGame.Factions[new_civilization][new_faction]->CurrentResearch = GrandStrategyGame.Factions[old_civilization][old_faction]->CurrentResearch;
+
+	for (size_t i = 0; i < this->Claims.size(); ++i) { // the new faction gets the claims of the old one
+		this->Claims[i]->AddFactionClaim(new_civilization, new_faction);
+	}
+
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (GrandStrategyGame.Factions[i][j]) {
+				GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyState[i][j] = DiplomacyStatePeace;
+				GrandStrategyGame.Factions[i][j]->DiplomacyState[old_civilization][old_faction] = DiplomacyStatePeace;
+				GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStateProposal[i][j] = -1;
+				GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[old_civilization][old_faction] = -1;
+			}
+		}
+	}
+	
+	GrandStrategyGame.Factions[old_civilization][old_faction]->CalculateIncomes();
+	GrandStrategyGame.Factions[new_civilization][new_faction]->CalculateIncomes();
+
+	//if the faction is civilizing, grant 10 prestige
+	if (PlayerRaces.Factions[old_civilization][old_faction]->Type == "tribe" && PlayerRaces.Factions[new_civilization][new_faction]->Type == "polity") {
+		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[PrestigeCost] += 10;
+	}
+		
+	if (this == GrandStrategyGame.PlayerFaction) {
+		GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[new_civilization][new_faction]));
+		
+		char buf[256];
+		snprintf(
+			buf, sizeof(buf), "GrandStrategyFaction = GetFactionFromName(\"%s\");",
+			(PlayerRaces.Factions[new_civilization][new_faction]->Name).c_str()
+		);
+		CclCommand(buf);
+		
+		std::string dialog_tooltip = "Our faction becomes the " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName();
+		if (PlayerRaces.Factions[old_civilization][old_faction]->Type == "tribe" && PlayerRaces.Factions[new_civilization][new_faction]->Type == "polity") {
+			dialog_tooltip += ", +10 Prestige";
+		}
+		char buf_2[256];
+		snprintf(
+			buf_2, sizeof(buf_2), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
+			("The " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName()).c_str(),
+			("From the halls of our capital the formation of a new realm has been declared, the " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName() + "!").c_str(),
+			dialog_tooltip.c_str()
+		);
+		CclCommand(buf_2);
+	}
+}
+
+void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int faction)
+{
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+		if (GrandStrategyGame.Factions[civilization][faction]->Technologies[i]) {
+			this->SetTechnology(i, true);
+		}
+	}
+}
+
+bool CGrandStrategyFaction::IsAlive()
+{
+	return this->ProvinceCount > 0;
+}
+
+bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name)
+{
+	if (this->Civilization == -1 || technology_class_name.empty()) {
+		return false;
+	}
+	
+	int technology_id = PlayerRaces.GetCivilizationClassUpgrade(this->Civilization, GetUpgradeClassIndexByName(technology_class_name));
+	
+	if (technology_id != -1 && this->Technologies[technology_id] == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
+{
+	bool civilized = this->HasTechnologyClass("writing") && this->HasTechnologyClass("masonry");
+	
+	if ((PlayerRaces.Factions[civilization][faction]->Type == "polity") != civilized) {
+		return false;
+	}
+	
+	//check if owns the majority of the formable faction's claims
+	if (GrandStrategyGame.Factions[civilization][faction]->Claims.size() > 0) {
+		int owned_claims = 0;
+		for (size_t i = 0; i < GrandStrategyGame.Factions[civilization][faction]->Claims.size(); ++i) {
+			if (GrandStrategyGame.Factions[civilization][faction]->Claims[i]->Owner == this) {
+				owned_claims += 1;
+			}
+		}
+		
+		if (owned_claims <= (GrandStrategyGame.Factions[civilization][faction]->Claims.size() / 2)) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 std::string CGrandStrategyFaction::GetFullName()
@@ -4126,7 +4292,6 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Provinces[i]->PopulationGrowthProgress = 0;
 			GrandStrategyGame.Provinces[i]->FoodConsumption = 0;
 			GrandStrategyGame.Provinces[i]->Labor = 0;
-			GrandStrategyGame.Provinces[i]->ClaimCount = 0;
 			GrandStrategyGame.Provinces[i]->MilitaryScore = 0;
 			GrandStrategyGame.Provinces[i]->OffensiveMilitaryScore = 0;
 			GrandStrategyGame.Provinces[i]->AttackingMilitaryScore = 0;
@@ -4142,10 +4307,6 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.Provinces[i]->FactionCulturalNames[j][k] = "";
 					GrandStrategyGame.Provinces[i]->FactionCulturalSettlementNames[j][k] = "";
 				}
-			}
-			for (int j = 0; j < MAX_RACES * FactionMax; ++j) {
-				GrandStrategyGame.Provinces[i]->Claims[j][0] = -1;
-				GrandStrategyGame.Provinces[i]->Claims[j][1] = -1;
 			}
 			for (size_t j = 0; j < UnitTypes.size(); ++j) {
 				GrandStrategyGame.Provinces[i]->SettlementBuildings[j] = false;
@@ -4171,6 +4332,7 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.Provinces[i]->ResourceTiles[j][k].y = -1;
 				}
 			}
+			GrandStrategyGame.Provinces[i]->Claims.clear();
 			GrandStrategyGame.Provinces[i]->Heroes.clear();
 		} else {
 			break;
@@ -4208,6 +4370,7 @@ void CleanGrandStrategyGame()
 						GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[k][n] = -1;
 					}
 				}
+				GrandStrategyGame.Factions[i][j]->Claims.clear();
 			} else {
 				break;
 			}
@@ -5184,11 +5347,7 @@ void AcquireFactionTechnologies(std::string civilization_from_name, std::string 
 		int faction_from = PlayerRaces.GetFactionIndexByName(civilization_from, faction_from_name);
 		int faction_to = PlayerRaces.GetFactionIndexByName(civilization_to, faction_to_name);
 		if (faction_from != -1 && faction_to != -1) {
-			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-				if (GrandStrategyGame.Factions[civilization_from][faction_from]->Technologies[i]) {
-					GrandStrategyGame.Factions[civilization_to][faction_to]->SetTechnology(i, true);
-				}
-			}
+			GrandStrategyGame.Factions[civilization_to][faction_to]->AcquireFactionTechnologies(civilization_from, faction_from);
 		}
 	}
 }
@@ -5259,70 +5418,25 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 	}
 }
 
-void ChangeFactionCulture(std::string old_civilization_name, std::string faction_name, std::string new_civilization_name)
+void FormFaction(std::string old_civilization_name, std::string old_faction_name, std::string new_civilization_name, std::string new_faction_name)
 {
 	int old_civilization = PlayerRaces.GetRaceIndexByName(old_civilization_name.c_str());
 	int old_faction = -1;
 	if (old_civilization != -1) {
-		old_faction = PlayerRaces.GetFactionIndexByName(old_civilization, faction_name);
+		old_faction = PlayerRaces.GetFactionIndexByName(old_civilization, old_faction_name);
 	}
 	
 	int new_civilization = PlayerRaces.GetRaceIndexByName(new_civilization_name.c_str());
 	int new_faction = -1;
 	if (new_civilization != -1) {
-		new_faction = PlayerRaces.GetFactionIndexByName(new_civilization, faction_name);
+		new_faction = PlayerRaces.GetFactionIndexByName(new_civilization, new_faction_name);
 	}
 	
 	if (old_faction == -1 || new_faction == -1) {
 		return;
 	}
 	
-	AcquireFactionTechnologies(old_civilization_name, faction_name, new_civilization_name, faction_name);
-	
-	if (GrandStrategyGame.Factions[old_civilization][old_faction]->ProvinceCount > 0) {
-		// replace existent units from the previous civilization with units of the new civilization
-		
-		for (int i = (GrandStrategyGame.Factions[old_civilization][old_faction]->ProvinceCount - 1); i >= 0; --i) {
-			int province_id = GrandStrategyGame.Factions[old_civilization][old_faction]->OwnedProvinces[i];
-			
-			for (size_t j = 0; j < UnitTypes.size(); ++j) {
-				if (
-					!UnitTypes[j]->Class.empty()
-					&& !UnitTypes[j]->Civilization.empty()
-					&& !UnitTypes[j]->BoolFlag[BUILDING_INDEX].value
-					&& UnitTypes[j]->DefaultStat.Variables[DEMAND_INDEX].Value > 0
-					&& UnitTypes[j]->Civilization == old_civilization_name
-					&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != -1
-					&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) // don't replace if both civilizations use the same unit type
-				) {
-					GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)), GrandStrategyGame.Provinces[province_id]->Units[j]);
-					GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class))] += GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j];
-					GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(j, 0);
-					GrandStrategyGame.Provinces[province_id]->UnderConstructionUnits[j] = 0;
-					GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
-				}
-			}
-		}
-	}
-
-	for (int i = 0; i < MaxCosts; ++i) {
-		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[i] = GrandStrategyGame.Factions[old_civilization][old_faction]->Resources[i];
-	}
-	
-	if (GrandStrategyGame.Factions[old_civilization][old_faction] == GrandStrategyGame.PlayerFaction) {
-		GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[new_civilization][new_faction]));
-	}
-	
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) {
-				GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyState[i][j] = DiplomacyStatePeace;
-				GrandStrategyGame.Factions[i][j]->DiplomacyState[old_civilization][old_faction] = DiplomacyStatePeace;
-				GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStateProposal[i][j] = -1;
-				GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[old_civilization][old_faction] = -1;
-			}
-		}
-	}
+	GrandStrategyGame.Factions[old_civilization][old_faction]->FormFaction(new_civilization, new_faction);
 }
 
 void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity)

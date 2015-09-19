@@ -2694,9 +2694,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 						}
 					}
 				}
-				if (GrandStrategyGame.Provinces[i]->ClaimCount > 0) {
-					for (int j = 0; j < GrandStrategyGame.Provinces[i]->ClaimCount; ++j) {
-						fprintf(fd, "AddProvinceClaim(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Claims[j][0]].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j][0]][GrandStrategyGame.Provinces[i]->Claims[j][1]]->Name.c_str());
+				if (GrandStrategyGame.Provinces[i]->Claims.size() > 0) {
+					for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Claims.size(); ++j) {
+						fprintf(fd, "AddProvinceClaim(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Name.c_str());
 					}
 				}
 				for (int j = 0; j < MAX_RACES; ++j) {
