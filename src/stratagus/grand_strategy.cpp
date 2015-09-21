@@ -246,8 +246,14 @@ void CGrandStrategyGame::DrawMap()
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
+				int player_color = GrandStrategyGame.WorldMapTiles[x][y]->Province != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Owner != NULL ? PlayerRaces.Factions[GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Owner->Civilization][GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Owner->Faction]->Color : 15;
+				
 				if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
 					GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphics->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					
+					if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor != NULL) {
+						GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					}
 				}
 				
 				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
@@ -256,8 +262,6 @@ void CGrandStrategyGame::DrawMap()
 					if (civilization != -1 && GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
 						//draw the province's settlement
 						if (GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
-							int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
-							
 							GrandStrategyGame.SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 							
 							if (GrandStrategyGame.BarracksGraphics[civilization] && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("barracks")) {
@@ -3686,6 +3690,7 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 				resource_building_filename += std::to_string((long long) SyncRand(ResourceGrandStrategyBuildingVariations[GrandStrategyGame.WorldMapTiles[x][y]->Resource]) + 1);
 			}
 			
+			std::string resource_building_player_color_filename = resource_building_filename + "_player_color.png";
 			resource_building_filename += ".png";
 			
 			if (CGraphic::Get(resource_building_filename) == NULL) {
@@ -3693,6 +3698,14 @@ void CalculateWorldMapTileGraphicTile(int x, int y)
 				resource_building_graphics->Load();
 			}
 			GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphics = CGraphic::Get(resource_building_filename);
+			
+			if (CanAccessFile(resource_building_player_color_filename.c_str())) {
+				if (CPlayerColorGraphic::Get(resource_building_player_color_filename) == NULL) {
+					CPlayerColorGraphic *resource_building_graphics_player_color = CPlayerColorGraphic::New(resource_building_player_color_filename, 64, 64);
+					resource_building_graphics_player_color->Load();
+				}
+				GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor = CPlayerColorGraphic::Get(resource_building_player_color_filename);
+			}
 		}
 	}
 }

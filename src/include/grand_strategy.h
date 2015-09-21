@@ -92,7 +92,8 @@ class WorldMapTile
 public:
 	WorldMapTile() :
 		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
-		ResourceProspected(false), Position(-1, -1), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL)
+		ResourceProspected(false), Position(-1, -1),
+		BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
 		memset(River, -1, sizeof(River));
@@ -116,6 +117,7 @@ public:
 	CGraphic *BaseTile;
 	CGraphic *GraphicTile;					/// The tile image used by this tile
 	CGraphic *ResourceBuildingGraphics;
+	CPlayerColorGraphic *ResourceBuildingGraphicsPlayerColor;
 	bool Borders[MaxDirections];			/// Whether this tile borders a tile of another province to a particular direction
 	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
 	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
