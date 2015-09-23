@@ -2823,6 +2823,9 @@ static int CclDefineWorldMapTerrainTypes(lua_State *l)
 				} else if (!strcmp(value, "has-transitions")) {
 					++k;
 					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->HasTransitions = LuaToBoolean(l, j + 1, k + 1);
+				} else if (!strcmp(value, "water")) {
+					++k;
+					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->Water = LuaToBoolean(l, j + 1, k + 1);
 				} else if (!strcmp(value, "base-tile")) {
 					++k;
 					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->BaseTile = GetWorldMapTerrainTypeId(LuaToString(l, j + 1, k + 1));

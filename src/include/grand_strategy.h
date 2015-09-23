@@ -76,13 +76,14 @@ class WorldMapTerrainType
 {
 public:
 	WorldMapTerrainType() :
-		Name(""), Tag(""), HasTransitions(false), BaseTile(-1), Variations(0)
+		Name(""), Tag(""), HasTransitions(false), Water(false), BaseTile(-1), Variations(0)
 	{
 	}
 
 	std::string Name;
 	std::string Tag;				/// used to locate graphic files
 	bool HasTransitions;
+	bool Water;
 	int BaseTile;
 	int Variations;					/// quantity of variations
 };
@@ -103,6 +104,7 @@ public:
 
 	void UpdateMinimap();
 	void SetResourceProspected(int resource_id, bool discovered);
+	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	std::string GetCulturalName();										/// Get the tile's cultural name.
 	
@@ -337,6 +339,7 @@ public:
 	void CreateMinimapTexture();
 	#endif
 	void UpdateMinimap();
+	bool IsPointOnMap(int x, int y);
 	bool TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b);
 	Vec2i GetTileUnderCursor();
 
