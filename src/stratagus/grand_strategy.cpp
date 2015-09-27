@@ -2867,7 +2867,7 @@ void CGrandStrategyFaction::CheckFormableFactions(int civilization)
 		if (faction != -1 && GrandStrategyGame.Factions[civilization][faction]) {
 			if (GrandStrategyGame.Factions[civilization][faction] != this && !GrandStrategyGame.Factions[civilization][faction]->IsAlive()) {
 				if (CanFormFaction(civilization, faction)) {
-					FormFaction(civilization, faction);
+					this->FormFaction(civilization, faction);
 				}
 			}
 		}
@@ -2889,17 +2889,13 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 			int province_id = this->OwnedProvinces[i];
 
 			//GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
-			if (old_civilization != new_civilization) {
-				GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
-			} else {
-				char buf[256];
-				snprintf(
-					buf, sizeof(buf), "AcquireProvince(GetProvinceFromName(\"%s\"), \"%s\");",
-					(GrandStrategyGame.Provinces[province_id]->Name).c_str(),
-					(PlayerRaces.Factions[new_civilization][new_faction]->Name).c_str()
-				);
-				CclCommand(buf);
-			}
+			char buf[256];
+			snprintf(
+				buf, sizeof(buf), "AcquireProvince(GetProvinceFromName(\"%s\"), \"%s\");",
+				(GrandStrategyGame.Provinces[province_id]->Name).c_str(),
+				(PlayerRaces.Factions[new_civilization][new_faction]->Name).c_str()
+			);
+			CclCommand(buf);
 			
 			// replace existing units from the previous civilization with units of the new civilization, if the civilizations are different
 			if (old_civilization != new_civilization) {
