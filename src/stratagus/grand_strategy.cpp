@@ -3010,6 +3010,10 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 		return false;
 	}
 	
+	if (this->FactionTier > GrandStrategyGame.Factions[civilization][faction]->FactionTier && !(PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && civilized)) { //only form factions of the same tier or higher, unless is civilizing
+		return false;
+	}
+	
 	//check if owns the majority of the formable faction's claims
 	if (GrandStrategyGame.Factions[civilization][faction]->Claims.size() > 0) {
 		int owned_claims = 0;
