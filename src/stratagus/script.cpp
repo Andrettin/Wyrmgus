@@ -2640,6 +2640,17 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 			}
 		}
+		for (int i = 0; i < RiverMax; ++i) { //save river information
+			if (GrandStrategyGame.Rivers[i] && !GrandStrategyGame.Rivers[i]->Name.empty()) {
+				for (int j = 0; j < MAX_RACES; ++j) {
+					if (!GrandStrategyGame.Rivers[i]->CulturalNames[j].empty()) {
+						fprintf(fd, "SetRiverCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Rivers[i]->CulturalNames[j].c_str());
+					}
+				}
+			} else {
+				break;
+			}
+		}			
 		for (int i = 0; i < ProvinceMax; ++i) { //save province information
 			if (GrandStrategyGame.Provinces[i] && !GrandStrategyGame.Provinces[i]->Name.empty()) {
 				fprintf(fd, "SetProvinceName(\"\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str()); //this will define a new province for the engine

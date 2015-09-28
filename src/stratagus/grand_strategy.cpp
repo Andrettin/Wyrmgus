@@ -3507,6 +3507,18 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 	}
 }
 
+void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name)
+{
+	int river_id = GetRiverId(river_name);
+	
+	if (river_id != -1 && GrandStrategyGame.Rivers[river_id]) {
+		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		if (civilization != -1) {
+			GrandStrategyGame.Rivers[river_id]->CulturalNames[civilization] = cultural_name;
+		}
+	}
+}
+
 /**
 **  Set pathway data for a world map tile.
 */
