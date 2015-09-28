@@ -2734,22 +2734,26 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Factions[i][j]) {
 					if (GrandStrategyGame.Factions[i][j]->GovernmentType != -1) {
 						std::string government_type_name = GetGovernmentTypeNameById(GrandStrategyGame.Factions[i][j]->GovernmentType);
-						fprintf(fd, "SetFactionGovernmentType(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), government_type_name.c_str());
+						fprintf(fd, "SetFactionGovernmentType(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), government_type_name.c_str());
+					}
+					if (GrandStrategyGame.Factions[i][j]->FactionTier != -1) {
+						std::string faction_tier_name = GetFactionTierNameById(GrandStrategyGame.Factions[i][j]->FactionTier);
+						fprintf(fd, "SetFactionTier(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), faction_tier_name.c_str());
 					}
 					if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
-						fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
+						fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
 					}
 					for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 						if (GrandStrategyGame.Factions[i][j]->Technologies[k] != false) {
-							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
+							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
 						}
 					}
 					for (int k = 0; k < MaxCosts; ++k) {
 						if (GrandStrategyGame.Factions[i][j]->Resources[k] > 0) {
-							fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
+							fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
 						}
 						if (GrandStrategyGame.Factions[i][j]->Trade[k] != 0) {
-							fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[GrandStrategyGame.Factions[i][j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Factions[i][j]->Civilization][GrandStrategyGame.Factions[i][j]->Faction]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
+							fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
 						}
 					}
 					for (int k = i; k < MAX_RACES; ++k) { //the function sets the state for both parties, so we only need to do it once for one of them

@@ -2283,6 +2283,8 @@ static int CclDefineFaction(lua_State *l)
 					break;
 				}
 			}
+		} else if (!strcmp(value, "DefaultTier")) {
+			faction->DefaultTier = GetFactionTierIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DevelopsTo")) {
@@ -2301,7 +2303,9 @@ static int CclDefineFaction(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
 				++k;
-				faction->Titles[government_type] = LuaToString(l, -1, k + 1);
+				int faction_tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				faction->Titles[government_type][faction_tier] = LuaToString(l, -1, k + 1);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

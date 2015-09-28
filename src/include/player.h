@@ -258,12 +258,23 @@ enum GovernmentTypes {
 	MaxGovernmentTypes
 };
 
+enum FactionTiers {
+	FactionTierBarony,
+	FactionTierCounty,
+	FactionTierDuchy,
+	FactionTierGrandDuchy,
+	FactionTierKingdom,
+	FactionTierEmpire,
+	
+	MaxFactionTiers
+};
+
 class CFaction
 {
 public:
 	CFaction() : 
 		Name(""), Type(""),
-		Color(-1), SecondaryColor(-1),
+		Color(-1), SecondaryColor(-1), DefaultTier(FactionTierBarony),
 		Playable(true) //factions are playable by default
 	{
 	}
@@ -272,9 +283,10 @@ public:
 	std::string Type;													/// faction type (tribe or polity)
 	int Color;															/// faction color
 	int SecondaryColor;													/// faction secondary color
+	int DefaultTier;													/// default faction tier
 	bool Playable;														/// faction playability
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
-	std::string Titles[MaxGovernmentTypes];								/// this faction's title for each government type
+	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 };
 
 class LanguageNoun

@@ -97,6 +97,8 @@ extern void SetFactionDiplomacyState(std::string civilization_name, std::string 
 extern std::string GetFactionDiplomacyState(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
 extern void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name);
 extern std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
+extern void SetFactionTier(std::string civilization_name, std::string faction_name, std::string faction_tier_name);
+extern std::string GetFactionTier(std::string civilization_name, std::string faction_name);
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern std::string GetFactionFullName(std::string civilization_name, std::string faction_name);

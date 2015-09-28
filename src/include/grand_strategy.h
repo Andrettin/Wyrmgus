@@ -38,6 +38,7 @@
 
 #include "vec2i.h"
 #include "video.h"
+#include "player.h"
 #include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
@@ -235,7 +236,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), CurrentResearch(-1), ProvinceCount(0)
+		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), ProvinceCount(0)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(OwnedProvinces, -1, sizeof(OwnedProvinces));
@@ -266,6 +267,7 @@ public:
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).
 	int GovernmentType;													/// Government type of the faction (-1 = none).
+	int FactionTier;													/// What is the tier of this faction (barony, etc.).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
 	int ProvinceCount;													/// Quantity of provinces owned by this faction.
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
@@ -399,6 +401,8 @@ extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 
 extern std::string GetDiplomacyStateNameById(int diplomacy_state);
 extern int GetDiplomacyStateIdByName(std::string diplomacy_state);
+extern std::string GetFactionTierNameById(int faction_tier);
+extern int GetFactionTierIdByName(std::string faction_tier);
 extern int GetWorldMapWidth();
 extern int GetWorldMapHeight();
 extern std::string GetWorldMapTileTerrain(int x, int y);
@@ -488,6 +492,8 @@ extern void SetFactionDiplomacyState(std::string civilization_name, std::string 
 extern std::string GetFactionDiplomacyState(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
 extern void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name, std::string diplomacy_state_name);
 extern std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std::string faction_name, std::string second_civilization_name, std::string second_faction_name);
+extern void SetFactionTier(std::string civilization_name, std::string faction_name, std::string faction_tier_name);
+extern std::string GetFactionTier(std::string civilization_name, std::string faction_name);
 extern void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern std::string GetFactionCurrentResearch(std::string civilization_name, std::string faction_name);
 extern std::string GetFactionFullName(std::string civilization_name, std::string faction_name);

@@ -3033,11 +3033,23 @@ std::string CGrandStrategyFaction::GetFullName()
 		return PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
 	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
 		std::string faction_title;
-		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType].empty()) {
-			faction_title = PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType];
+		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType][this->FactionTier].empty()) {
+			faction_title = PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType][this->FactionTier];
 		} else {
 			if (this->GovernmentType == GovernmentTypeMonarchy) {
-				faction_title = "Kingdom";
+				if (this->FactionTier == FactionTierBarony) {
+					faction_title = "Barony";
+				} else if (this->FactionTier == FactionTierCounty) {
+					faction_title = "County";
+				} else if (this->FactionTier == FactionTierDuchy) {
+					faction_title = "Duchy";
+				} else if (this->FactionTier == FactionTierGrandDuchy) {
+					faction_title = "Grand Duchy";
+				} else if (this->FactionTier == FactionTierKingdom) {
+					faction_title = "Kingdom";
+				} else if (this->FactionTier == FactionTierEmpire) {
+					faction_title = "Empire";
+				}
 			} else if (this->GovernmentType == GovernmentTypeRepublic) {
 				faction_title = "Republic";
 			}
@@ -4425,6 +4437,7 @@ void CleanGrandStrategyGame()
 				} else if (PlayerRaces.Factions[i][j]->Type == "polity") {
 					GrandStrategyGame.Factions[i][j]->GovernmentType = GovernmentTypeMonarchy; //monarchy is the default government type for polities
 				}
+				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
 				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
@@ -4778,6 +4791,7 @@ void InitializeGrandStrategyGame()
 				
 				GrandStrategyGame.Factions[i][j]->Civilization = i;
 				GrandStrategyGame.Factions[i][j]->Faction = j;
+				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
 			} else {
 				break;
 			}
@@ -5372,6 +5386,37 @@ std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std:
 	return "";
 }
 
+void SetFactionTier(std::string civilization_name, std::string faction_name, std::string faction_tier_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	
+	int faction_tier_id = GetFactionTierIdByName(faction_tier_name);
+	
+	if (faction_tier_id == -1) {
+		return;
+	}
+
+	if (civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			GrandStrategyGame.Factions[civilization][faction]->FactionTier = faction_tier_id;
+		}
+	}
+}
+
+std::string GetFactionTier(std::string civilization_name, std::string faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	if (civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			return GetFactionTierNameById(GrandStrategyGame.Factions[civilization][faction]->FactionTier);
+		}
+	}
+	
+	return "";
+}
+
 void SetFactionCurrentResearch(std::string civilization_name, std::string faction_name, std::string upgrade_ident)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -5679,6 +5724,44 @@ int GetDiplomacyStateIdByName(std::string diplomacy_state)
 	} else if (diplomacy_state == "sovereign") {
 //		return DiplomacyStateSovereign;
 		return DiplomacyStatePeace;
+	}
+
+	return -1;
+}
+
+std::string GetFactionTierNameById(int faction_tier)
+{
+	if (faction_tier == FactionTierBarony) {
+		return "barony";
+	} else if (faction_tier == FactionTierCounty) {
+		return "county";
+	} else if (faction_tier == FactionTierDuchy) {
+		return "duchy";
+	} else if (faction_tier == FactionTierGrandDuchy) {
+		return "grand duchy";
+	} else if (faction_tier == FactionTierKingdom) {
+		return "kingdom";
+	} else if (faction_tier == FactionTierEmpire) {
+		return "empire";
+	}
+
+	return "";
+}
+
+int GetFactionTierIdByName(std::string faction_tier)
+{
+	if (faction_tier == "barony") {
+		return FactionTierBarony;
+	} else if (faction_tier == "county") {
+		return FactionTierCounty;
+	} else if (faction_tier == "duchy") {
+		return FactionTierDuchy;
+	} else if (faction_tier == "grand duchy") {
+		return FactionTierGrandDuchy;
+	} else if (faction_tier == "kingdom") {
+		return FactionTierKingdom;
+	} else if (faction_tier == "empire") {
+		return FactionTierEmpire;
 	}
 
 	return -1;
