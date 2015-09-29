@@ -555,6 +555,44 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		}
 	}
 				
+	if (province_id != -1 && !GrandStrategyGame.Provinces[province_id]->Water) {
+		int tooltip_pathways[MaxDirections];
+		memset(tooltip_pathways, -1, sizeof(tooltip_pathways));
+		int tooltip_pathway_count = 0;
+		for (int i = 0; i < MaxDirections; ++i) {
+			if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] != -1) {
+				bool already_in_tooltip = false;
+				for (int j = 0; j < MaxDirections; ++j) {
+					if (tooltip_pathways[j] == -1) { //reached blank spot, no need to continue the loop
+						break;
+					}
+
+					if (tooltip_pathways[j] == GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i]) {
+						already_in_tooltip = true;
+						break;
+					}
+				}
+				if (!already_in_tooltip) {
+					tooltip_pathways[tooltip_pathway_count] = GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i];
+					tooltip_pathway_count += 1;
+					tile_tooltip += " (";
+					if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] == PathwayTrail) {
+						tile_tooltip += "Trail";
+					} else if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] == PathwayRoad) {
+						tile_tooltip += "Road";
+					}
+					tile_tooltip += ")";
+				}
+			}
+		}
+	}
+	
+	if (GrandStrategyGame.WorldMapTiles[x][y]->Port) {
+		tile_tooltip += " (";
+		tile_tooltip += "Port";
+		tile_tooltip += ")";
+	}
+	
 	if (province_id != -1) {
 		tile_tooltip += ",\n";
 		tile_tooltip += GrandStrategyGame.Provinces[province_id]->GetCulturalName();
