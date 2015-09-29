@@ -1257,6 +1257,26 @@ void WorldMapTile::SetResourceProspected(int resource_id, bool discovered)
 	}
 }
 
+void WorldMapTile::SetPort(bool has_port)
+{
+	if (this->Port == has_port) {
+		return;
+	}
+	
+	this->Port = has_port;
+	
+	//if the tile is the same as the province's settlement location, create a dock for the province's settlement, if its civilization has one
+	if (this->Province != -1 && GrandStrategyGame.Provinces[this->Province]->SettlementLocation == this->Position) {
+		int civilization = GrandStrategyGame.Provinces[this->Province]->Civilization;
+		if (civilization != -1) {
+			int building_type = PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName("dock"));
+			if (building_type != -1) {
+				GrandStrategyGame.Provinces[this->Province]->SetSettlementBuilding(building_type, has_port);
+			}
+		}
+	}
+}
+
 bool WorldMapTile::IsWater()
 {
 	if (this->Terrain != -1) {
@@ -1379,6 +1399,14 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 		
 		if (this->Civilization == -1) { // if province has no civilization/culture defined, then make its culture that of its owner
 			this->SetCivilization(this->Owner->Civilization);
+			
+			//if province's settlement location tile has a port but not the province, create a dock for the province's settlement, if its civilization has one
+			if (GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
+				int dock_building_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName("dock"));
+				if (dock_building_type != -1) {
+					this->SetSettlementBuilding(dock_building_type, true);
+				}
+			}
 		}
 	} else {
 		this->Owner = NULL;
@@ -1524,6 +1552,11 @@ void CProvince::SetCivilization(int civilization)
 
 void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
 {
+	if (building_id == -1) {
+		fprintf(stderr, "Invalid building type being set for the settlement of \"%s\".\n", this->Name.c_str());
+		return;
+	}
+	
 	if (this->SettlementBuildings[building_id] == has_settlement_building) {
 		return;
 	}
@@ -1553,6 +1586,8 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 	
 	if (UnitTypes[building_id]->Class == "stronghold") { //increase the military score of the province, if this building is a stronghold
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
+	} else if (UnitTypes[building_id]->Class == "dock") { //place a port in the province's settlement location, if the building is a dock
+		GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port = has_settlement_building;
 	}
 
 	// allocate labor (in case building a town hall or another building may have allowed a new sort of production)
@@ -3562,6 +3597,13 @@ void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::strin
 	}
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->Pathway[direction] = pathway_id;
+}
+
+void SetWorldMapTilePort(int x, int y, bool has_port)
+{
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	GrandStrategyGame.WorldMapTiles[x][y]->SetPort(has_port);
 }
 
 /**

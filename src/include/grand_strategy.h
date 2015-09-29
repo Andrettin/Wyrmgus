@@ -94,7 +94,8 @@ class WorldMapTile
 public:
 	WorldMapTile() :
 		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
-		ResourceProspected(false), Position(-1, -1),
+		ResourceProspected(false), Port(false),
+		Position(-1, -1),
 		BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
@@ -105,6 +106,7 @@ public:
 
 	void UpdateMinimap();
 	void SetResourceProspected(int resource_id, bool discovered);
+	void SetPort(bool has_port);
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	std::string GetCulturalName();										/// Get the tile's cultural name.
@@ -115,6 +117,7 @@ public:
 	int Variation;							/// Tile variation
 	int Resource;							/// The tile's resource, if any
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
+	bool Port;								/// Whether the tile has a port
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	Vec2i Position;							/// Position of the tile
 	CGraphic *BaseTile;
@@ -421,6 +424,7 @@ extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::
 extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);
 extern void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name);
 extern void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::string pathway_name);
+extern void SetWorldMapTilePort(int x, int y, bool has_port);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);

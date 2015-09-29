@@ -2623,6 +2623,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 							fprintf(fd, "SetWorldMapTilePathway(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), "road");
 						}
 					}
+					if (GrandStrategyGame.WorldMapTiles[x][y]->Port) { //save tile port data
+						fprintf(fd, "SetWorldMapTilePort(%d, %d, true)\n", x, y);
+					}
 				}
 			}
 		}
