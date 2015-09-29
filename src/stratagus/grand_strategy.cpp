@@ -4409,6 +4409,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
+				GrandStrategyGame.WorldMapTiles[x][y]->Port = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
 				for (int i = 0; i < MAX_RACES; ++i) {
 					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i] = "";
