@@ -358,6 +358,11 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		if (attacker.Variable[BONUSAGAINSTBUILDINGS_INDEX].Value > 0 && goal->Type->BoolFlag[BUILDING_INDEX].value) {
 			damage_modifier += attacker.Variable[BONUSAGAINSTBUILDINGS_INDEX].Value;
 		}
+		
+		//add bonus against giants, if applicable
+		if (attacker.Variable[BONUSAGAINSTGIANTS_INDEX].Value > 0 && goal->Type->BoolFlag[GIANT_INDEX].value) {
+			damage_modifier += attacker.Variable[BONUSAGAINSTGIANTS_INDEX].Value;
+		}
 	} else {
 		// apply resistances to fire/cold damage
 		fire_damage *= 100 - goal_stats.Variables[FIRERESISTANCE_INDEX].Value;
