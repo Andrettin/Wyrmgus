@@ -43,7 +43,8 @@ class Spell_Demolish : public SpellActionType
 public:
 	//Wyrmgus start
 //	Spell_Demolish() : Damage(0), Range(0) {};
-	Spell_Demolish() : Damage(0), BasicDamage(0), PiercingDamage(0), Range(0), DamageSelf(true), DamageFriendly(true), DamageTerrain(true) {};
+	Spell_Demolish() : Damage(0), BasicDamage(0), PiercingDamage(0), FireDamage(0), ColdDamage(0), Range(0),
+	HackDamage(true), PierceDamage(true), BluntDamage(true), DamageSelf(true), DamageFriendly(true), DamageTerrain(true) {};
 	//Wyrmgus end
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
@@ -55,6 +56,11 @@ private:
 	//Wyrmgus start
 	int BasicDamage; /// Basic damage for every unit in range.
 	int PiercingDamage; /// Piercing damage for every unit in range.
+	int FireDamage;
+	int ColdDamage;
+	bool HackDamage;
+	bool PierceDamage;
+	bool BluntDamage;
 	bool DamageSelf;   /// If true, damages self when casting spell
 	bool DamageFriendly;   /// If true, damages friendly units when casting spell
 	bool DamageTerrain;   /// If true, damages terrain when casting spell

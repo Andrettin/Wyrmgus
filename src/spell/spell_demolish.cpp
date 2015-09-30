@@ -53,6 +53,16 @@
 			this->BasicDamage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "piercing-damage")) {
 			this->PiercingDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "fire-damage")) {
+			this->FireDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "cold-damage")) {
+			this->ColdDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "hack-damage")) {
+			this->HackDamage = LuaToBoolean(l, -1, j + 1);
+		} else if (!strcmp(value, "pierce-damage")) {
+			this->PierceDamage = LuaToBoolean(l, -1, j + 1);
+		} else if (!strcmp(value, "blunt-damage")) {
+			this->BluntDamage = LuaToBoolean(l, -1, j + 1);
 		} else if (!strcmp(value, "damage-self")) {
 			this->DamageSelf = LuaToBoolean(l, -1, j + 1);
 		} else if (!strcmp(value, "damage-friendly")) {
@@ -139,7 +149,7 @@
 	//
 	//Wyrmgus start
 	//if (this->Damage) {
-	if (this->Damage || this->BasicDamage || this->PiercingDamage) {
+	if (this->Damage || this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage) {
 	//Wyrmgus end
 		std::vector<CUnit *> table;
 		SelectFixed(minpos, maxpos, table);
@@ -153,9 +163,23 @@
 				&& unit.MapDistanceTo(caster) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && (caster.IsEnemy(unit) || this->DamageFriendly)) {
 
 				int damage = 0;
-				if (this->BasicDamage || this->PiercingDamage) {
-					damage = std::max<int>(this->BasicDamage - unit.Stats->Variables[ARMOR_INDEX].Value, 1);
+				if (this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage) {
+					damage = std::max<int>(this->BasicDamage - unit->Variable[ARMOR_INDEX].Value, 1);
 					damage += this->PiercingDamage;
+					//apply resistances
+					if (this->HackDamage) {
+						damage *= 100 - unit->Variable[HACKRESISTANCE_INDEX].Value;
+						damage /= 100;
+					} else if (this->PierceDamage) {
+						damage *= 100 - unit->Variable[PIERCERESISTANCE_INDEX].Value;
+						damage /= 100;
+					} else if (this->BluntDamage) {
+						damage *= 100 - unit->Variable[BLUNTRESISTANCE_INDEX].Value;
+						damage /= 100;
+					}
+					//apply fire and cold damage
+					damage += this->FireDamage * (100 - unit->Variable[FIRERESISTANCE_INDEX].Value) / 100;
+					damage += this->ColdDamage * (100 - unit->Variable[COLDRESISTANCE_INDEX].Value) / 100;
 					damage -= SyncRand() % ((damage + 2) / 2);
 				}
 				HitUnit(&caster, unit, this->Damage + damage);
