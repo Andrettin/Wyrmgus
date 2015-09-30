@@ -311,6 +311,11 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	int piercing_damage = attacker.Variable[PIERCINGDAMAGE_INDEX].Value;
 	int fire_damage = attacker.Variable[FIREDAMAGE_INDEX].Value;
 	int cold_damage = attacker.Variable[COLDDAMAGE_INDEX].Value;
+	int arcane_damage = attacker.Variable[ARCANEDAMAGE_INDEX].Value;
+	int lightning_damage = attacker.Variable[LIGHTNINGDAMAGE_INDEX].Value;
+	int air_damage = attacker.Variable[AIRDAMAGE_INDEX].Value;
+	int earth_damage = attacker.Variable[EARTHDAMAGE_INDEX].Value;
+	int water_damage = attacker.Variable[WATERDAMAGE_INDEX].Value;
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -339,6 +344,16 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		fire_damage /= 100;
 		cold_damage *= 100 - goal->Variable[COLDRESISTANCE_INDEX].Value;
 		cold_damage /= 100;
+		arcane_damage *= 100 - goal->Variable[ARCANERESISTANCE_INDEX].Value;
+		arcane_damage /= 100;
+		lightning_damage *= 100 - goal->Variable[LIGHTNINGRESISTANCE_INDEX].Value;
+		lightning_damage /= 100;
+		air_damage *= 100 - goal->Variable[AIRRESISTANCE_INDEX].Value;
+		air_damage /= 100;
+		earth_damage *= 100 - goal->Variable[EARTHRESISTANCE_INDEX].Value;
+		earth_damage /= 100;
+		water_damage *= 100 - goal->Variable[WATERRESISTANCE_INDEX].Value;
+		water_damage /= 100;
 		
 		// extra backstab damage (only works against units (that are organic and non-building, and that have 8 facing directions) facing opposite to the attacker
 		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) {
@@ -369,6 +384,16 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		fire_damage /= 100;
 		cold_damage *= 100 - goal_stats.Variables[COLDRESISTANCE_INDEX].Value;
 		cold_damage /= 100;
+		arcane_damage *= 100 - goal_stats.Variables[ARCANERESISTANCE_INDEX].Value;
+		arcane_damage /= 100;
+		lightning_damage *= 100 - goal_stats.Variables[LIGHTNINGRESISTANCE_INDEX].Value;
+		lightning_damage /= 100;
+		air_damage *= 100 - goal_stats.Variables[AIRRESISTANCE_INDEX].Value;
+		air_damage /= 100;
+		earth_damage *= 100 - goal_stats.Variables[EARTHRESISTANCE_INDEX].Value;
+		earth_damage /= 100;
+		water_damage *= 100 - goal_stats.Variables[WATERRESISTANCE_INDEX].Value;
+		water_damage /= 100;
 	}
 	
 	basic_damage *= damage_modifier;
@@ -376,6 +401,11 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	
 	piercing_damage += fire_damage;
 	piercing_damage += cold_damage;
+	piercing_damage += arcane_damage;
+	piercing_damage += lightning_damage;
+	piercing_damage += air_damage;
+	piercing_damage += earth_damage;
+	piercing_damage += water_damage;
 	piercing_damage *= damage_modifier;
 	piercing_damage /= 100;
 	//Wyrmgus end

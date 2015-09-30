@@ -57,6 +57,16 @@
 			this->FireDamage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "cold-damage")) {
 			this->ColdDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "arcane-damage")) {
+			this->ArcaneDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "lightning-damage")) {
+			this->LightningDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "air-damage")) {
+			this->AirDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "earth-damage")) {
+			this->EarthDamage = LuaToNumber(l, -1, j + 1);
+		} else if (!strcmp(value, "water-damage")) {
+			this->WaterDamage = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "hack-damage")) {
 			this->HackDamage = LuaToBoolean(l, -1, j + 1);
 		} else if (!strcmp(value, "pierce-damage")) {
@@ -149,7 +159,7 @@
 	//
 	//Wyrmgus start
 	//if (this->Damage) {
-	if (this->Damage || this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage) {
+	if (this->Damage || this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage || this->ArcaneDamage || this->LightningDamage || this->AirDamage || this->EarthDamage || this->WaterDamage) {
 	//Wyrmgus end
 		std::vector<CUnit *> table;
 		SelectFixed(minpos, maxpos, table);
@@ -163,7 +173,7 @@
 				&& unit.MapDistanceTo(caster) <= this->Range && (UnitNumber(unit) != UnitNumber(caster) || this->DamageSelf) && (caster.IsEnemy(unit) || this->DamageFriendly)) {
 
 				int damage = 0;
-				if (this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage) {
+				if (this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage || this->ArcaneDamage || this->LightningDamage || this->AirDamage || this->EarthDamage || this->WaterDamage) {
 					damage = std::max<int>(this->BasicDamage - unit.Variable[ARMOR_INDEX].Value, 1);
 					damage += this->PiercingDamage;
 					//apply resistances
@@ -180,6 +190,11 @@
 					//apply fire and cold damage
 					damage += this->FireDamage * (100 - unit.Variable[FIRERESISTANCE_INDEX].Value) / 100;
 					damage += this->ColdDamage * (100 - unit.Variable[COLDRESISTANCE_INDEX].Value) / 100;
+					damage += this->ArcaneDamage * (100 - unit.Variable[ARCANERESISTANCE_INDEX].Value) / 100;
+					damage += this->LightningDamage * (100 - unit.Variable[LIGHTNINGRESISTANCE_INDEX].Value) / 100;
+					damage += this->AirDamage * (100 - unit.Variable[AIRRESISTANCE_INDEX].Value) / 100;
+					damage += this->EarthDamage * (100 - unit.Variable[EARTHRESISTANCE_INDEX].Value) / 100;
+					damage += this->WaterDamage * (100 - unit.Variable[WATERRESISTANCE_INDEX].Value) / 100;
 					damage -= SyncRand() % ((damage + 2) / 2);
 				}
 				HitUnit(&caster, unit, this->Damage + damage);
