@@ -309,6 +309,8 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 //	int piercing_damage = attacker_stats.Variables[PIERCINGDAMAGE_INDEX].Value;
 	int basic_damage = attacker.Variable[BASICDAMAGE_INDEX].Value;
 	int piercing_damage = attacker.Variable[PIERCINGDAMAGE_INDEX].Value;
+	int fire_damage = attacker.Variable[FIREDAMAGE_INDEX].Value;
+	int cold_damage = attacker.Variable[COLDDAMAGE_INDEX].Value;
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -332,6 +334,12 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		}
 	}
 	if (goal != NULL) {
+		// apply resistances to fire/cold damage
+		fire_damage *= 100 - goal->Variable[FIRERESISTANCE_INDEX].Value;
+		fire_damage /= 100;
+		cold_damage *= 100 - goal->Variable[COLDRESISTANCE_INDEX].Value;
+		cold_damage /= 100;
+		
 		// extra backstab damage (only works against units (that are organic and non-building, and that have 8 facing directions) facing opposite to the attacker
 		if (attacker.Variable[BACKSTAB_INDEX].Value > 0 && goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) {
 			if (attacker.Direction == goal->Direction) {
@@ -350,9 +358,19 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		if (attacker.Variable[BONUSAGAINSTBUILDINGS_INDEX].Value > 0 && goal->Type->BoolFlag[BUILDING_INDEX].value) {
 			damage_modifier += attacker.Variable[BONUSAGAINSTBUILDINGS_INDEX].Value;
 		}
+	} else {
+		// apply resistances to fire/cold damage
+		fire_damage *= 100 - goal_stats.Variables[FIRERESISTANCE_INDEX].Value;
+		fire_damage /= 100;
+		cold_damage *= 100 - goal_stats.Variables[COLDRESISTANCE_INDEX].Value;
+		cold_damage /= 100;
 	}
+	
 	basic_damage *= damage_modifier;
 	basic_damage /= 100;
+	
+	piercing_damage += fire_damage;
+	piercing_damage += cold_damage;
 	piercing_damage *= damage_modifier;
 	piercing_damage /= 100;
 	//Wyrmgus end
@@ -393,11 +411,44 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 				}
 			}
 		}
+		
+		//Wyrmgus start
+		//apply hack/pierce/blunt resistances
+		if (goal != NULL) {
+			if (attacker.Type->BoolFlag[HACKDAMAGE_INDEX].value) {
+				damage *= 100 - goal->Variable[HACKRESISTANCE_INDEX].Value;
+				damage /= 100;
+			} else if (attacker.Type->BoolFlag[PIERCEDAMAGE_INDEX].value) {
+				damage *= 100 - goal->Variable[PIERCERESISTANCE_INDEX].Value;
+				damage /= 100;
+			} else if (attacker.Type->BoolFlag[BLUNTDAMAGE_INDEX].value) {
+				damage *= 100 - goal->Variable[BLUNTRESISTANCE_INDEX].Value;
+				damage /= 100;
+			}
+		}
+		//Wyrmgus end
+		
 		damage -= ((damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness
 	} else {
+		//Wyrmgus start
+		//apply hack/pierce/blunt resistances
+		if (goal != NULL) {
+			if (attacker.Type->BoolFlag[HACKDAMAGE_INDEX].value) {
+				damage *= 100 - goal->Variable[HACKRESISTANCE_INDEX].Value;
+				damage /= 100;
+			} else if (attacker.Type->BoolFlag[PIERCEDAMAGE_INDEX].value) {
+				damage *= 100 - goal->Variable[PIERCERESISTANCE_INDEX].Value;
+				damage /= 100;
+			} else if (attacker.Type->BoolFlag[BLUNTDAMAGE_INDEX].value) {
+				damage *= 100 - goal->Variable[BLUNTRESISTANCE_INDEX].Value;
+				damage /= 100;
+			}
+		}
+		//Wyrmgus end
+		
 		damage -= SyncRand() % ((damage + 2) / 2);
 	}
-
+	
 	Assert(damage >= 0);
 
 	return damage;

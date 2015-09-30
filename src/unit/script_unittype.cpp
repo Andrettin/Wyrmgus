@@ -130,6 +130,9 @@ static const char OBSTACLE_KEY[] = "Obstacle";
 static const char AIRUNPASSABLE_KEY[] = "AirUnpassable";
 static const char SLOWS_KEY[] = "Slows";
 static const char GRAVEL_KEY[] = "Gravel";
+static const char HACKDAMAGE_KEY[] = "HackDamage";
+static const char PIERCEDAMAGE_KEY[] = "PierceDamage";
+static const char BLUNTDAMAGE_KEY[] = "BluntDamage";
 //Wyrmgus end
 
 // names of the variable.
@@ -153,7 +156,14 @@ static const char PIERCINGDAMAGE_KEY[] = "PiercingDamage";
 static const char BASICDAMAGE_KEY[] = "BasicDamage";
 //Wyrmgus start
 static const char THORNSDAMAGE_KEY[] = "ThornsDamage";
+static const char FIREDAMAGE_KEY[] = "FireDamage";
+static const char COLDDAMAGE_KEY[] = "ColdDamage";
 static const char SPEED_KEY[] = "Speed";
+static const char FIRERESISTANCE_KEY[] = "FireResistance";
+static const char COLDRESISTANCE_KEY[] = "ColdResistance";
+static const char HACKRESISTANCE_KEY[] = "HackResistance";
+static const char PIERCERESISTANCE_KEY[] = "PierceResistance";
+static const char BLUNTRESISTANCE_KEY[] = "BluntResistance";
 //Wyrmgus end
 static const char POSX_KEY[] = "PosX";
 static const char POSY_KEY[] = "PosY";
@@ -220,7 +230,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
-							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY
+							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY,
+							   HACKDAMAGE_KEY, PIERCEDAMAGE_KEY, BLUNTDAMAGE_KEY
 							   //Wyrmgus end
 							  };
 
@@ -241,7 +252,9 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   SIGHTRANGE_KEY, ATTACKRANGE_KEY, PIERCINGDAMAGE_KEY,
 							   //Wyrmgus start
 //							   BASICDAMAGE_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
-							   BASICDAMAGE_KEY, THORNSDAMAGE_KEY, SPEED_KEY, POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
+							   BASICDAMAGE_KEY, THORNSDAMAGE_KEY, FIREDAMAGE_KEY, COLDDAMAGE_KEY,
+							   SPEED_KEY, FIRERESISTANCE_KEY, COLDRESISTANCE_KEY, HACKRESISTANCE_KEY, PIERCERESISTANCE_KEY, BLUNTRESISTANCE_KEY,
+							   POSX_KEY, POSY_KEY, TARGETPOSX_KEY, TARGETPOSY_KEY, RADARRANGE_KEY,
 							   //Wyrmgus end
 							   RADARJAMMERRANGE_KEY, AUTOREPAIRRANGE_KEY, BLOODLUST_KEY, HASTE_KEY,
 							   SLOW_KEY, INVISIBLE_KEY, UNHOLYARMOR_KEY, SLOT_KEY, SHIELD_KEY, POINTS_KEY,
@@ -2812,7 +2825,9 @@ void UpdateUnitVariables(CUnit &unit)
 		if (i == ARMOR_INDEX || i == PIERCINGDAMAGE_INDEX || i == BASICDAMAGE_INDEX
 			//Wyrmgus start
 			|| i == SUPPLY_INDEX || i == DEMAND_INDEX
-			|| i == THORNSDAMAGE_INDEX || i == SPEED_INDEX
+			|| i == THORNSDAMAGE_INDEX || i == FIREDAMAGE_INDEX || i == COLDDAMAGE_INDEX
+			|| i == SPEED_INDEX
+			|| i == FIRERESISTANCE_INDEX || i == COLDRESISTANCE_INDEX || i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
 			//Wyrmgus end
 			|| i == MANA_INDEX || i == KILL_INDEX || i == XP_INDEX || i == GIVERESOURCE_INDEX
 			//Wyrmgus start
