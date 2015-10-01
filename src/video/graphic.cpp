@@ -1171,7 +1171,10 @@ void CGraphic::Free(CGraphic *g)
 			//Wyrmgus end
 			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
 			if (cg) {
-				for (int i = 0; i < PlayerMax; ++i) {
+				//Wyrmgus start
+//				for (int i = 0; i < PlayerMax; ++i) {
+				for (int i = 0; i < PlayerColorMax; ++i) {
+				//Wyrmgus end
 					if (cg->PlayerColorTextures[i]) {
 						glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[i]);
 						delete[] cg->PlayerColorTextures[i];
@@ -1241,7 +1244,10 @@ void FreeOpenGLGraphics()
 		//Wyrmgus end
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
-			for (int j = 0; j < PlayerMax; ++j) {
+			//Wyrmgus start
+//			for (int j = 0; j < PlayerMax; ++j) {
+			for (int j = 0; j < PlayerColorMax; ++j) {
+			//Wyrmgus end
 				if (cg->PlayerColorTextures[j]) {
 					glDeleteTextures(cg->NumTextures, cg->PlayerColorTextures[j]);
 				}
@@ -1292,7 +1298,10 @@ void ReloadGraphics()
 		//Wyrmgus end
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(*i);
 		if (cg) {
-			for (int j = 0; j < PlayerMax; ++j) {
+			//Wyrmgus start
+//			for (int j = 0; j < PlayerMax; ++j) {
+			for (int j = 0; j < PlayerColorMax; ++j) {
+			//Wyrmgus end
 				if (cg->PlayerColorTextures[j]) {
 					delete[] cg->PlayerColorTextures[j];
 					cg->PlayerColorTextures[j] = NULL;
@@ -1490,7 +1499,10 @@ static int PowerOf2(int x)
 **  @param ow       Offset width.
 **  @param oh       Offset height.
 */
-static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
+//Wyrmgus start
+//static void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
+void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
+//Wyrmgus end
 						//Wyrmgus start
 //						  int ow, int oh)
 						  int ow, int oh, int time_of_day)
@@ -2148,7 +2160,10 @@ void CGraphic::ResetTimeOfDay()
 		
 		CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(this);
 		if (cg) {
-			for (int j = 0; j < PlayerMax; ++j) {
+			//Wyrmgus start
+//			for (int j = 0; j < PlayerMax; ++j) {
+			for (int j = 0; j < PlayerColorMax; ++j) {
+			//Wyrmgus end
 				if (cg->PlayerColorTextures[j]) {
 					delete[] cg->PlayerColorTextures[j];
 					cg->PlayerColorTextures[j] = NULL;

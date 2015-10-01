@@ -221,11 +221,12 @@ public:
 	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
-	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
 	//Wyrmgus start
-	GLuint *PlayerColorTexturesDawn[PlayerMax];/// Textures with player colors (dawn)
-	GLuint *PlayerColorTexturesDusk[PlayerMax];/// Textures with player colors (dusk)
-	GLuint *PlayerColorTexturesNight[PlayerMax];/// Textures with player colors (night)
+//	GLuint *PlayerColorTextures[PlayerMax];/// Textures with player colors
+	GLuint *PlayerColorTextures[PlayerColorMax];/// Textures with player colors
+	GLuint *PlayerColorTexturesDawn[PlayerColorMax];/// Textures with player colors (dawn)
+	GLuint *PlayerColorTexturesDusk[PlayerColorMax];/// Textures with player colors (dusk)
+	GLuint *PlayerColorTexturesNight[PlayerColorMax];/// Textures with player colors (night)
 	//Wyrmgus end
 #endif
 };
@@ -491,6 +492,9 @@ extern int LoadGraphicPNG(CGraphic *g);
 //Wyrmgus start
 //extern void MakeTexture(CGraphic *graphic);
 extern void MakeTexture(CGraphic *graphic, int time_of_day = 0);
+//Wyrmgus end
+//Wyrmgus start
+extern void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors, int ow, int oh, int time_of_day = 0);
 //Wyrmgus end
 /// Make an OpenGL texture of the player color pixels only.
 //Wyrmgus start
