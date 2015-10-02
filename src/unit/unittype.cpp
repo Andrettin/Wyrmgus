@@ -637,6 +637,8 @@ std::string GetGovernmentTypeNameById(int government_type)
 		return "monarchy";
 	} else if (government_type == GovernmentTypeRepublic) {
 		return "republic";
+	} else if (government_type == GovernmentTypeTheocracy) {
+		return "theocracy";
 	}
 
 	return "";
@@ -648,6 +650,8 @@ int GetGovernmentTypeIdByName(std::string government_type)
 		return GovernmentTypeMonarchy;
 	} else if (government_type == "republic") {
 		return GovernmentTypeRepublic;
+	} else if (government_type == "theocracy") {
+		return GovernmentTypeTheocracy;
 	}
 
 	return -1;

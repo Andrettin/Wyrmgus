@@ -3129,6 +3129,8 @@ std::string CGrandStrategyFaction::GetFullName()
 				}
 			} else if (this->GovernmentType == GovernmentTypeRepublic) {
 				faction_title = "Republic";
+			} else if (this->GovernmentType == GovernmentTypeTheocracy) {
+				faction_title = "Theocracy";
 			}
 		}
 		return faction_title + " of " + PlayerRaces.Factions[this->Civilization][this->Faction]->Name;

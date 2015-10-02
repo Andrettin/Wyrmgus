@@ -254,6 +254,7 @@ private:
 enum GovernmentTypes {
 	GovernmentTypeMonarchy,
 	GovernmentTypeRepublic,
+	GovernmentTypeTheocracy,
 	
 	MaxGovernmentTypes
 };
