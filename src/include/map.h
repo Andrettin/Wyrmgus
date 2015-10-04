@@ -372,6 +372,13 @@ extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTer
 /// Load map presentation
 extern void LoadStratagusMapInfo(const std::string &mapname);
 
+//Wyrmgus start
+/// Convert a map from 0 AD
+extern void Convert0ADMap(const std::string &mapname);
+
+extern std::string Convert0ADTextureToTileType(const std::string zero_ad_texture);
+//Wyrmgus end
+
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
 /// Returns true, if the unit-type can enter the field

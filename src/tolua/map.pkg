@@ -24,3 +24,6 @@ extern CMap Map;
 
 void SetTile(int tile, int w, int h, int value = 0);
 
+//Wyrmgus start
+extern void Convert0ADMap(const std::string &mapname);
+//Wyrmgus end

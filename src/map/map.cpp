@@ -39,6 +39,9 @@
 #include "map.h"
 
 #include "iolib.h"
+//Wyrmgus start
+#include <fstream> //for the 0 AD map conversion
+//Wyrmgus end
 #include "player.h"
 #include "tileset.h"
 #include "unit.h"
@@ -934,5 +937,323 @@ void LoadStratagusMapInfo(const std::string &mapname)
 	const std::string filename = LibraryFileName(mapname.c_str());
 	LuaLoadFile(filename);
 }
+
+//Wyrmgus start
+/**
+**  Convert 0 AD map
+**
+**  @param mapname  map filename
+*/
+void Convert0ADMap(const std::string &mapname)
+{
+	const std::string filename = LibraryFileName(mapname.c_str());
+	
+	std::ifstream is(filename, std::ifstream::binary);
+	if (is) {
+		is.seekg (0, is.end);
+		int length = is.tellg();
+		is.seekg (0, is.beg);
+
+		char * buffer = new char [length];
+
+		is.read(buffer,length);
+
+		if (!is) {
+			fprintf(stderr, ("File " + filename + " loading error.").c_str());
+		}
+		
+		int current_byte = 0;
+		current_byte += 4; //char magic[4]; // == "PSMP"
+		current_byte += 4; //u32 version; // == 6
+		current_byte += 4; //u32 data_size; // == filesize-12
+		
+		int map_size = 0;
+		map_size = (map_size << 8) + buffer[current_byte + 3];
+		map_size = (map_size << 8) + buffer[current_byte + 2];
+		map_size = (map_size << 8) + buffer[current_byte + 1];
+		map_size = (map_size << 8) + buffer[current_byte + 0];
+		current_byte += 4; //u32 map_size; // number of patches (16x16 tiles) per side
+		
+		int tile_heights[256 * 256];
+		for (int i = 0; i < ((map_size * 16 + 1) * (map_size * 16 + 1)); ++i) { //u16 heightmap[(mapsize*16 + 1)*(mapsize*16 + 1)]; // vertex heights
+			int height = 0;
+			height = (height << 8) + buffer[current_byte + 1];
+			height = (height << 8) + buffer[current_byte + 0];
+			current_byte += 2;
+			
+			tile_heights[i] = height;
+		}
+		
+		int num_terrain_textures = 0;
+		num_terrain_textures = (num_terrain_textures << 8) + buffer[current_byte + 3];
+		num_terrain_textures = (num_terrain_textures << 8) + buffer[current_byte + 2];
+		num_terrain_textures = (num_terrain_textures << 8) + buffer[current_byte + 1];
+		num_terrain_textures = (num_terrain_textures << 8) + buffer[current_byte + 0];
+		current_byte += 4; //u32 num_terrain_textures;
+		
+		std::string terrain_texture_names[1024];
+		for (int i = 0; i < num_terrain_textures; ++i) { //String terrain_textures[num_terrain_textures]; // filenames (no path), e.g. "cliff1.dds"
+			int string_length = 0;
+			string_length = (string_length << 8) + buffer[current_byte + 3];
+			string_length = (string_length << 8) + buffer[current_byte + 2];
+			string_length = (string_length << 8) + buffer[current_byte + 1];
+			string_length = (string_length << 8) + buffer[current_byte + 0];
+			current_byte += 4; //u32 length;
+			
+			char string_data[256];
+			for (int j = 0; j < string_length; ++j) {
+				string_data[j] = buffer[current_byte + j];
+			}
+			string_data[string_length] = '\0';
+			current_byte += string_length; //char data[length]; // not NUL-terminated
+			
+			terrain_texture_names[i] = std::string(string_data);
+		}
+
+		//begin writing the map setup
+		FileWriter *f = NULL;
+		std::string sms_filename = FindAndReplaceStringEnding(filename, ".pmp", ".sms");
+
+		try {
+			f = CreateFileWriter(sms_filename);
+
+			f->printf("-- Stratagus Map Setup\n");
+			f->printf("-- Map converted from 0 AD's map format by the Stratagus built-in map converter.\n");
+			f->printf("-- File licensed under the GNU GPL version 2.\n\n");
+
+			f->printf("-- load tilesets\n");
+			f->printf("LoadTileModels(\"%s\")\n\n", "scripts/tilesets/conifer_forest_summer.lua");
+			
+			int patch_quantity = map_size * map_size;
+			for (int i = 0; i < patch_quantity; ++i) { //Patch patches[mapsize^2];
+				int tile_quantity = 16 * 16;
+				for (int j = 0; j < tile_quantity; ++j) { //Tile tiles[16*16];
+					int texture1 = 0;
+					texture1 = (texture1 << 8) + buffer[current_byte + 1];
+					texture1 = (texture1 << 8) + buffer[current_byte + 0];
+					current_byte += 2; //u16 texture1; // index into terrain_textures[]
+					
+					int texture2 = 0;
+					texture2 = (texture2 << 8) + buffer[current_byte + 1];
+					texture2 = (texture2 << 8) + buffer[current_byte + 0];
+					current_byte += 2; //u16 texture2; // index, or 0xFFFF for 'none'
+					
+					current_byte += 4; //u32 priority; // Used for blending between edges of tiles with different textures. A higher priority is blended on top of a lower priority.
+					
+					int patch_x = i % map_size;
+					int x = (patch_x * 16) + (j % 16);
+					
+					int patch_y = i / map_size;
+					int y = (map_size * 16) - 1 - ((patch_y * 16) + (j / 16));
+					
+					std::string tile_type;
+					
+					int height = tile_heights[(y * (map_size * 16)) + x];
+					if (height < 20) {
+						tile_type = "Water";
+					} else {
+						if (texture1 >= 0) {
+							std::string texture1_string = terrain_texture_names[texture1];
+							tile_type = Convert0ADTextureToTileType(texture1_string);
+						}
+						
+						if (texture2 >= 0) {
+							std::string texture2_string = terrain_texture_names[texture2];
+						}
+					}
+
+					f->printf("SetRawTile(%d, %d, \"%s\")\n", x, y, tile_type.c_str());
+				}
+			}
+			
+			f->printf("ApplyRawTiles()\n");
+
+			f->printf("-- player configuration\n");
+			/*
+			for (int i = 0; i < PlayerMax; ++i) {
+				if (Map.Info.PlayerType[i] == PlayerNobody) {
+					continue;
+				}
+				f->printf("SetStartView(%d, %d, %d)\n", i, Players[i].StartPos.x, Players[i].StartPos.y);
+				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
+						  i, DefaultResourceNames[WoodCost].c_str(),
+						  Players[i].Resources[WoodCost]);
+				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
+						  i, DefaultResourceNames[GoldCost].c_str(),
+						  Players[i].Resources[GoldCost]);
+				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
+						  i, DefaultResourceNames[OilCost].c_str(),
+						  Players[i].Resources[OilCost]);
+				//Wyrmgus start
+				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
+						  i, DefaultResourceNames[StoneCost].c_str(),
+						  Players[i].Resources[StoneCost]);
+				//Wyrmgus end
+				f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
+						  i, PlayerRaces.Name[Players[i].Race].c_str());
+				f->printf("SetAiType(%d, \"%s\")\n",
+						  i, Players[i].AiName.c_str());
+			}
+			*/
+			f->printf("SetStartView(%d, %d, %d)\n", 0, 16, 16);
+			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
+						  0, "germanic");
+			f->printf("SetStartView(%d, %d, %d)\n", 1, 160, 16);
+			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
+						  1, "germanic");
+			f->printf("\n");
+		} catch (const FileException &) {
+			fprintf(stderr, "Can't save map setup : '%s' \n", sms_filename);
+			delete f;
+			return;
+		}
+		
+		delete f; // end of the writing of the map setup
+		
+		//write the map presentation
+		std::string smp_filename = FindAndReplaceStringEnding(filename, ".pmp", ".smp");
+		FileWriter *f_smp = NULL;
+
+		const char *type[] = {"", "", "neutral", "nobody",
+							  "computer", "person", "rescue-passive", "rescue-active"
+							 };
+
+		int numplayers = 0;
+		int topplayer = PlayerMax - 2;
+
+		try {
+			f_smp = CreateFileWriter(smp_filename);
+			f_smp->printf("-- Stratagus Map Presentation\n");
+			f_smp->printf("-- Map converted from 0 AD's map format by the Stratagus built-in map converter.\n");
+			f_smp->printf("-- File licensed under the GNU GPL version 2.\n\n");
+
+			f_smp->printf("DefinePlayerTypes(\"person\", \"person\"");
+			/*
+			while (topplayer > 0 && map.Info.PlayerType[topplayer] == PlayerNobody) {
+				--topplayer;
+			}
+			for (int i = 0; i <= topplayer; ++i) {
+				f_smp->printf("%s\"%s\"", (i ? ", " : ""), type[map.Info.PlayerType[i]]);
+				if (map.Info.PlayerType[i] == PlayerPerson) {
+					++numplayers;
+				}
+			}
+			*/
+			f_smp->printf(")\n");
+
+			f_smp->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
+					  "0 AD Map", 2, map_size * 16, map_size * 16, 1);
+		} catch (const FileException &) {
+			fprintf(stderr, "ERROR: cannot write the map presentation\n");
+			delete f_smp;
+			return;
+		}
+
+		delete f_smp;
+		//end of map presentation writing
+		
+		is.close();
+
+		// ...buffer contains the entire file...
+
+		delete[] buffer;
+	}
+}
+
+std::string Convert0ADTextureToTileType(const std::string zero_ad_texture)
+{
+	//Mediterranean biome
+	if (zero_ad_texture == "medit_city_pavement") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_cliff_aegean") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_cliff_aegean_shrubs") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_cliff_grass") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_cliff_greek") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_cliff_greek_2") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_cliff_italia_grass") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_dirt") {
+		return "Rough";
+	} else if (zero_ad_texture == "medit_dirt_b") {
+		return "Rough";
+	} else if (zero_ad_texture == "medit_dirt_c") {
+		return "Rough";
+	} else if (zero_ad_texture == "medit_dirt_d") {
+		return "Rough";
+	} else if (zero_ad_texture == "medit_dirt_e") {
+		return "Rough";
+	} else if (zero_ad_texture == "medit_forestfloor_a") {
+		return "Tree";
+	} else if (zero_ad_texture == "medit_grass_field") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_grass_field_a") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_grass_field_b") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_grass_field_brown") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_grass_field_dry") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_grass_flowers") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_grass_shrubs") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_grass_wild") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_riparian_mud") {
+		return "Rough";
+	} else if (zero_ad_texture == "medit_rocks") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_rocks_grass") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_rocks_grass_shrubs") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_rocks_shrubs") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_rocks_wet") {
+		return "Rock";
+	} else if (zero_ad_texture == "medit_sand_messy") {
+		return "Rough";
+	} else if (zero_ad_texture == "medit_sea_coral_deep") {
+		return "Water";
+	} else if (zero_ad_texture == "medit_sea_coral_plants") {
+		return "Water";
+	} else if (zero_ad_texture == "medit_sea_depths") {
+		return "Water";
+	} else if (zero_ad_texture == "medit_shrubs") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_shrubs_dry") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_shrubs_golden") {
+		return "Land";
+	//City
+	} else if (zero_ad_texture == "medit_city_tile") {
+		return "Land";
+	} else if (zero_ad_texture == "medit_road_broken") {
+		return "Land";
+	} else if (zero_ad_texture == "savanna_tile_a") {
+		return "Land";
+	} else if (zero_ad_texture == "savanna_tile_a_red") {
+		return "Land";
+	} else if (zero_ad_texture == "temp_road_muddy") {
+		return "Land";
+	} else if (zero_ad_texture == "tropic_citytile_a") {
+		return "Land";
+	//Grass
+	} else if (zero_ad_texture == "grass1_spring") {
+		return "Land";
+	//Special
+	} else if (zero_ad_texture == "farmland_a") {
+		return "Land";
+	} else {
+		return "";
+	}
+}
+//Wyrmgus end
 
 //@}
