@@ -373,10 +373,16 @@ extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTer
 extern void LoadStratagusMapInfo(const std::string &mapname);
 
 //Wyrmgus start
+extern std::string RawTiles[MaxMapWidth][MaxMapHeight];
+
 /// Convert a map from 0 AD
 extern void Convert0ADMap(const std::string &mapname);
 
 extern std::string Convert0ADTextureToTileType(const std::string zero_ad_texture);
+extern std::string Convert0ADTemplateToUnitTypeIdent(const std::string zero_ad_template);
+extern std::string Convert0ADCivilizationToCivilization(const std::string zero_ad_civilization);
+extern void AdjustRawTileMapIrregularities(int map_width, int map_height);
+extern void AdjustRawTileMapTransitions(int map_width, int map_height);
 //Wyrmgus end
 
 /// Returns true, if the unit-type(mask can enter field with bounds check
