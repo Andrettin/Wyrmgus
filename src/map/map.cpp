@@ -1375,6 +1375,7 @@ std::string Convert0ADTextureToTileType(const std::string zero_ad_texture)
 	} else if (zero_ad_texture == "farmland_a") {
 		return "Land";
 	} else {
+		fprintf(stderr, ("0 AD terrain texture \"" + zero_ad_texture + "\" not recognized.").c_str());
 		return "";
 	}
 }
@@ -1389,10 +1390,10 @@ std::string Convert0ADTemplateToUnitTypeIdent(const std::string zero_ad_template
 	} else if (zero_ad_template == "gaia/fauna_goat") {
 		return "unit-rat";
 	//Flora
-	} else if (zero_ad_template == "gaia/flora_tree_apple") {
-		return "";
 	} else if (zero_ad_template == "gaia/flora_bush_grapes") {
 		return "";
+	} else if (zero_ad_template == "gaia/flora_tree_apple") {
+		return "Tree";
 	} else if (zero_ad_template == "gaia/flora_tree_carob") {
 		return "Tree";
 	} else if (zero_ad_template == "gaia/flora_tree_cypress") {
@@ -1551,6 +1552,7 @@ std::string Convert0ADTemplateToUnitTypeIdent(const std::string zero_ad_template
 	} else if (zero_ad_template == "actor|props/flora/water_lillies.xml") {
 		return "";
 	} else {
+		fprintf(stderr, ("0 AD template \"" + zero_ad_template + "\" not recognized.").c_str());
 		return "";
 	}
 }
@@ -1562,6 +1564,7 @@ std::string Convert0ADCivilizationToCivilization(const std::string zero_ad_civil
 	} else if (zero_ad_civilization == "hele") {
 		return "greek";
 	} else {
+		fprintf(stderr, ("0 AD civilization \"" + zero_ad_civilization + "\" not recognized.").c_str());
 		return "";
 	}
 }
@@ -1573,82 +1576,75 @@ void AdjustRawTileMapIrregularities(int map_width, int map_height)
 		no_irregularities_found = true;
 		for (int x = 0; x < map_width; ++x) {
 			for (int y = 0; y < map_height; ++y) {
-				if (RawTiles[x][y] == "Rock") {
-					int horizontal_adjacent_tiles = 0;
-					if ((x - 1) >= 0 && RawTiles[x - 1][y] != "Rock") {
-						horizontal_adjacent_tiles += 1;
-					}
-					if ((x + 1) < map_width && RawTiles[x + 1][y] != "Rock") {
-						horizontal_adjacent_tiles += 1;
-					}
-					int vertical_adjacent_tiles = 0;
-					if ((y - 1) >= 0 && RawTiles[x][y - 1] != "Rock") {
-						vertical_adjacent_tiles += 1;
-					}
-					if ((y + 1) < map_height && RawTiles[x][y + 1] != "Rock") {
-						vertical_adjacent_tiles += 1;
-					}
-					if (horizontal_adjacent_tiles >= 2 || vertical_adjacent_tiles >= 2) {
-						RawTiles[x][y] = "Rough";
-						no_irregularities_found = false;
-					}
+				if (RawTiles[x][y] == "Land") {
+					continue;
+				}
+				std::vector<std::string> acceptable_adjacent_tile_types;
+				acceptable_adjacent_tile_types.push_back(RawTiles[x][y]);
+				std::string base_tile;
+				
+				if (RawTiles[x][y] == "Rough") {
+					acceptable_adjacent_tile_types.push_back("Rock");
+					acceptable_adjacent_tile_types.push_back("Water");
+					base_tile = "Land";
+				} else if (RawTiles[x][y] == "Rock") {
+					base_tile = "Rough";
 				} else if (RawTiles[x][y] == "Water") {
-					int horizontal_adjacent_tiles = 0;
-					if ((x - 1) >= 0 && RawTiles[x - 1][y] != "Water") {
-						horizontal_adjacent_tiles += 1;
-					}
-					if ((x + 1) < map_width && RawTiles[x + 1][y] != "Water") {
-						horizontal_adjacent_tiles += 1;
-					}
-					int vertical_adjacent_tiles = 0;
-					if ((y - 1) >= 0 && RawTiles[x][y - 1] != "Water") {
-						vertical_adjacent_tiles += 1;
-					}
-					if ((y + 1) < map_height && RawTiles[x][y + 1] != "Water") {
-						vertical_adjacent_tiles += 1;
-					}
-					if (horizontal_adjacent_tiles >= 2 || vertical_adjacent_tiles >= 2) {
-						RawTiles[x][y] = "Rough";
-						no_irregularities_found = false;
-					}
-				} else if (RawTiles[x][y] == "Rough") {
-					int horizontal_adjacent_tiles = 0;
-					if ((x - 1) >= 0 && RawTiles[x - 1][y] != "Rough" && RawTiles[x - 1][y] != "Rock" && RawTiles[x - 1][y] != "Water") {
-						horizontal_adjacent_tiles += 1;
-					}
-					if ((x + 1) < map_width && RawTiles[x + 1][y] != "Rough" && RawTiles[x + 1][y] != "Rock" && RawTiles[x + 1][y] != "Water") {
-						horizontal_adjacent_tiles += 1;
-					}
-					int vertical_adjacent_tiles = 0;
-					if ((y - 1) >= 0 && RawTiles[x][y - 1] != "Rough" && RawTiles[x][y - 1] != "Rock" && RawTiles[x][y - 1] != "Water") {
-						vertical_adjacent_tiles += 1;
-					}
-					if ((y + 1) < map_height && RawTiles[x][y + 1] != "Rough" && RawTiles[x][y + 1] != "Rock" && RawTiles[x][y + 1] != "Water") {
-						vertical_adjacent_tiles += 1;
-					}
-					if (horizontal_adjacent_tiles >= 2 || vertical_adjacent_tiles >= 2) {
-						RawTiles[x][y] = "Land";
-						no_irregularities_found = false;
-					}
+					base_tile = "Rough";
 				} else if (RawTiles[x][y] == "Tree") {
-					int horizontal_adjacent_tiles = 0;
-					if ((x - 1) >= 0 && RawTiles[x - 1][y] != "Tree") {
-						horizontal_adjacent_tiles += 1;
-					}
-					if ((x + 1) < map_width && RawTiles[x + 1][y] != "Tree") {
-						horizontal_adjacent_tiles += 1;
-					}
-					int vertical_adjacent_tiles = 0;
-					if ((y - 1) >= 0 && RawTiles[x][y - 1] != "Tree") {
-						vertical_adjacent_tiles += 1;
-					}
-					if ((y + 1) < map_height && RawTiles[x][y + 1] != "Tree") {
-						vertical_adjacent_tiles += 1;
-					}
-					if (horizontal_adjacent_tiles >= 2 || vertical_adjacent_tiles >= 2) {
-						RawTiles[x][y] = "Land";
-						no_irregularities_found = false;
-					}
+					base_tile = "Land";
+				}
+				
+				int horizontal_adjacent_tiles = 0;
+				int vertical_adjacent_tiles = 0;
+				int nw_quadrant_adjacent_tiles = 0; //should be 4 if the wrong tile types are present in X-1,Y; X-1,Y-1; X,Y-1; and X+1,Y+1
+				int ne_quadrant_adjacent_tiles = 0;
+				int sw_quadrant_adjacent_tiles = 0;
+				int se_quadrant_adjacent_tiles = 0;
+				
+				if ((x - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), RawTiles[x - 1][y]) == acceptable_adjacent_tile_types.end()) {
+					horizontal_adjacent_tiles += 1;
+					nw_quadrant_adjacent_tiles += 1;
+					sw_quadrant_adjacent_tiles += 1;
+				}
+				if ((x + 1) < map_width && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), RawTiles[x + 1][y]) == acceptable_adjacent_tile_types.end()) {
+					horizontal_adjacent_tiles += 1;
+					ne_quadrant_adjacent_tiles += 1;
+					se_quadrant_adjacent_tiles += 1;
+				}
+				
+				if ((y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), RawTiles[x][y - 1]) == acceptable_adjacent_tile_types.end()) {
+					vertical_adjacent_tiles += 1;
+					nw_quadrant_adjacent_tiles += 1;
+					ne_quadrant_adjacent_tiles += 1;
+				}
+				if ((y + 1) < map_height && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), RawTiles[x][y + 1]) == acceptable_adjacent_tile_types.end()) {
+					vertical_adjacent_tiles += 1;
+					sw_quadrant_adjacent_tiles += 1;
+					se_quadrant_adjacent_tiles += 1;
+				}
+
+				if ((x - 1) >= 0 && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), RawTiles[x - 1][y - 1]) == acceptable_adjacent_tile_types.end()) {
+					nw_quadrant_adjacent_tiles += 1;
+					se_quadrant_adjacent_tiles += 1;
+				}
+				if ((x - 1) >= 0 && (y + 1) < map_height && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), RawTiles[x - 1][y + 1]) == acceptable_adjacent_tile_types.end()) {
+					sw_quadrant_adjacent_tiles += 1;
+					ne_quadrant_adjacent_tiles += 1;
+				}
+				if ((x + 1) < map_width && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), RawTiles[x + 1][y - 1]) == acceptable_adjacent_tile_types.end()) {
+					ne_quadrant_adjacent_tiles += 1;
+					sw_quadrant_adjacent_tiles += 1;
+				}
+				if ((x + 1) < map_width && (y + 1) < map_height && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), RawTiles[x + 1][y + 1]) == acceptable_adjacent_tile_types.end()) {
+					se_quadrant_adjacent_tiles += 1;
+					nw_quadrant_adjacent_tiles += 1;
+				}
+				
+				
+				if (horizontal_adjacent_tiles >= 2 || vertical_adjacent_tiles >= 2 || nw_quadrant_adjacent_tiles >= 4 || ne_quadrant_adjacent_tiles >= 4 || sw_quadrant_adjacent_tiles >= 4 || se_quadrant_adjacent_tiles >= 4) {
+					RawTiles[x][y] = base_tile;
+					no_irregularities_found = false;
 				}
 			}
 		}
