@@ -943,6 +943,7 @@ void LoadStratagusMapInfo(const std::string &mapname)
 
 //Wyrmgus start
 std::string RawTiles[MaxMapWidth][MaxMapHeight];
+
 /**
 **  Convert 0 AD map
 **
@@ -950,7 +951,8 @@ std::string RawTiles[MaxMapWidth][MaxMapHeight];
 */
 void Convert0ADMap(const std::string &mapname)
 {
-	const std::string filename = LibraryFileName(mapname.c_str());
+	const std::string xml_filename = LibraryFileName(mapname.c_str());
+	std::string pmp_filename = FindAndReplaceStringEnding(xml_filename, ".xml", ".pmp");
 	
 	for (int x = 0; x < MaxMapWidth; ++x) {
 		for (int y = 0; y < MaxMapHeight; ++y) {
@@ -959,8 +961,12 @@ void Convert0ADMap(const std::string &mapname)
 	}
 	int map_size = 0;
 	int tile_heights_xy[MaxMapWidth][MaxMapHeight];
-		
-	std::ifstream is_pmp(filename, std::ifstream::binary);
+
+	if (!CanAccessFile(pmp_filename.c_str())) {
+		fprintf(stderr, ("File \"" + pmp_filename + "\" not found.").c_str());
+	}
+	
+	std::ifstream is_pmp(pmp_filename, std::ifstream::binary);
 	if (is_pmp) {
 		is_pmp.seekg (0, is_pmp.end);
 		int length = is_pmp.tellg();
@@ -971,7 +977,7 @@ void Convert0ADMap(const std::string &mapname)
 		is_pmp.read(buffer,length);
 
 		if (!is_pmp) {
-			fprintf(stderr, ("File " + filename + " loading error.").c_str());
+			fprintf(stderr, ("Error loading file \"" + pmp_filename + "\".").c_str());
 		}
 		
 		int current_byte = 0;
@@ -985,7 +991,7 @@ void Convert0ADMap(const std::string &mapname)
 		map_size = (map_size << 8) + buffer[current_byte + 0];
 		current_byte += 4; //u32 map_size; // number of patches (16x16 tiles) per side
 		
-		int tile_heights[MaxMapWidth * MaxMapHeight];
+		int tile_heights[(MaxMapWidth + 1) * (MaxMapHeight + 1)];
 		for (int i = 0; i < ((map_size * 16 + 1) * (map_size * 16 + 1)); ++i) { //u16 heightmap[(mapsize*16 + 1)*(mapsize*16 + 1)]; // vertex heights
 			int height = 0;
 			height = (height << 8) + buffer[current_byte + 1];
@@ -1075,8 +1081,12 @@ void Convert0ADMap(const std::string &mapname)
 	int player_quantity = 0;
 	Vec2i player_start_points[PlayerMax];
 	std::string player_civilizations[PlayerMax];
+	std::string player_factions[PlayerMax];
 	
-	std::string xml_filename = LibraryFileName(FindAndReplaceStringEnding(filename, ".pmp", ".xml").c_str());
+	if (!CanAccessFile(xml_filename.c_str())) {
+		fprintf(stderr, ("File \"" + xml_filename + "\" not found.").c_str());
+	}
+	
 	std::ifstream is_xml(xml_filename);
 	
 	std::string processing_state;
@@ -1110,6 +1120,9 @@ void Convert0ADMap(const std::string &mapname)
 				line_contents = FindAndReplaceString(line_contents, "\"", "");
 				line_contents = FindAndReplaceString(line_contents, ",", "");
 				player_civilizations[player_quantity] = Convert0ADCivilizationToCivilization(line_contents);
+				if (Convert0ADCivilizationToFaction(line_contents) != "") {
+					player_factions[player_quantity] = Convert0ADCivilizationToFaction(line_contents);
+				}
 				player_quantity += 1;
 			} else if (line_contents.find("],", 0) != std::string::npos) {
 				processing_state = "<ScriptSettings>";
@@ -1185,9 +1198,46 @@ void Convert0ADMap(const std::string &mapname)
 	for (size_t i = 0; i < units_unit_types.size(); ++i) {
 		if (units_unit_types[i] == "Tree") {
 			RawTiles[units_positions[i].x][units_positions[i].y] = "Tree";
-			units_unit_types.erase(units_unit_types.begin() + i);
-			units_players.erase(units_players.begin() + i);
-			units_positions.erase(units_positions.begin() + i);
+			if ((units_positions[i].x + 1) < (map_size * 16) && (RawTiles[units_positions[i].x + 1][units_positions[i].y] == "Land" || RawTiles[units_positions[i].x + 1][units_positions[i].y] == "Rough")) {
+				RawTiles[units_positions[i].x + 1][units_positions[i].y] = "Tree";
+			}
+			if ((units_positions[i].y + 1) < (map_size * 16) && (RawTiles[units_positions[i].x][units_positions[i].y + 1] == "Land" || RawTiles[units_positions[i].x][units_positions[i].y + 1] == "Rough")) {
+				RawTiles[units_positions[i].x][units_positions[i].y + 1] = "Tree";
+			}
+			if ((units_positions[i].x + 1) < (map_size * 16) && (units_positions[i].y + 1) < (map_size * 16) && (RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] == "Land" || RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] == "Rough")) {
+				RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] = "Tree";
+			}
+		} else if (units_unit_types[i] == "Rock") {
+			RawTiles[units_positions[i].x][units_positions[i].y] = "Rock";
+			if ((units_positions[i].x + 1) < (map_size * 16) && (RawTiles[units_positions[i].x + 1][units_positions[i].y] == "Land" || RawTiles[units_positions[i].x + 1][units_positions[i].y] == "Rough")) {
+				RawTiles[units_positions[i].x + 1][units_positions[i].y] = "Rock";
+			}
+			if ((units_positions[i].y + 1) < (map_size * 16) && (RawTiles[units_positions[i].x][units_positions[i].y + 1] == "Land" || RawTiles[units_positions[i].x][units_positions[i].y + 1] == "Rough")) {
+				RawTiles[units_positions[i].x][units_positions[i].y + 1] = "Rock";
+			}
+			if ((units_positions[i].x + 1) < (map_size * 16) && (units_positions[i].y + 1) < (map_size * 16) && (RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] == "Land" || RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] == "Rough")) {
+				RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] = "Rock";
+			}
+		} else if (!units_unit_types[i].empty()) {
+			int unit_type_id = UnitTypeIdByIdent(units_unit_types[i]);
+			if (UnitTypes[unit_type_id]->BoolFlag[BUILDING_INDEX].value) { //if is a building, set the terrain below it to buildable land
+				int unit_tile_width = UnitTypes[unit_type_id]->TileWidth;
+				int unit_tile_height = UnitTypes[unit_type_id]->TileHeight;
+				int unit_x_offset = - ((unit_tile_width - 1) / 2); //0 AD units' position is mapped to their center
+				int unit_y_offset = - ((unit_tile_height - 1) / 2);
+				int x = units_positions[i].x + unit_x_offset;
+				int y = units_positions[i].y + unit_y_offset;
+				for (int sub_x = 0; sub_x < unit_tile_width; ++sub_x) {
+					for (int sub_y = 0; sub_y < unit_tile_height; ++sub_y) {
+						if ((x + sub_x) >= (map_size * 16) || (y + sub_y) >= (map_size * 16)) {
+							continue;
+						}
+						if (RawTiles[x + sub_x][y + sub_y] != "Land" && RawTiles[x + sub_x][y + sub_y] != "Dark-Land") {
+							RawTiles[x + sub_x][y + sub_y] = "Land";
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -1196,7 +1246,7 @@ void Convert0ADMap(const std::string &mapname)
 	AdjustRawTileMapIrregularities(map_size * 16, map_size * 16);
 		
 	//write the map presentation
-	std::string smp_filename = FindAndReplaceStringEnding(filename, ".pmp", ".smp");
+	std::string smp_filename = FindAndReplaceStringEnding(xml_filename, ".xml", ".smp");
 	FileWriter *f_smp = NULL;
 
 	try {
@@ -1214,7 +1264,7 @@ void Convert0ADMap(const std::string &mapname)
 		f_smp->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
 				  map_title.c_str(), player_quantity, map_size * 16, map_size * 16, 1);
 	} catch (const FileException &) {
-		fprintf(stderr, "ERROR: cannot write the map presentation\n");
+		fprintf(stderr, "Error: cannot write the map presentation\n");
 		delete f_smp;
 		return;
 	}
@@ -1224,7 +1274,7 @@ void Convert0ADMap(const std::string &mapname)
 
 	//begin writing the map setup
 	FileWriter *f = NULL;
-	std::string sms_filename = FindAndReplaceStringEnding(filename, ".pmp", ".sms");
+	std::string sms_filename = FindAndReplaceStringEnding(xml_filename, ".xml", ".sms");
 
 	try {
 		f = CreateFileWriter(sms_filename);
@@ -1259,6 +1309,10 @@ void Convert0ADMap(const std::string &mapname)
 			f->printf("SetStartView(%d, %d, %d)\n", i, player_start_points[i].x, player_start_points[i].y);
 			f->printf("SetPlayerData(%d, \"RaceName\", \"%s\")\n",
 					  i, player_civilizations[i].c_str());
+			if (!player_factions[i].empty()) {
+				f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
+						  i, player_factions[i].c_str());
+			}
 			f->printf("SetAiType(%d, \"%s\")\n",
 					  i, "land-attack");
 		}
@@ -1276,7 +1330,7 @@ void Convert0ADMap(const std::string &mapname)
 
 		f->printf("\n");
 	} catch (const FileException &) {
-		fprintf(stderr, "Can't save map setup : '%s' \n", sms_filename);
+		fprintf(stderr, "Couldn't save map setup : '%s' \n", sms_filename);
 		delete f;
 		return;
 	}
@@ -1311,6 +1365,8 @@ std::string Convert0ADTextureToTileType(const std::string zero_ad_texture)
 		return "Rough";
 	} else if (zero_ad_texture == "medit_dirt_e") {
 		return "Rough";
+	} else if (zero_ad_texture == "medit_farmland") {
+		return "Land";
 	} else if (zero_ad_texture == "medit_forestfloor_a") {
 		return "Tree";
 	} else if (zero_ad_texture == "medit_grass_field") {
@@ -1329,6 +1385,8 @@ std::string Convert0ADTextureToTileType(const std::string zero_ad_texture)
 		return "Land";
 	} else if (zero_ad_texture == "medit_grass_wild") {
 		return "Land";
+	} else if (zero_ad_texture == "medit_plants_dirt") {
+		return "Rough";
 	} else if (zero_ad_texture == "medit_riparian_mud") {
 		return "Rough";
 	} else if (zero_ad_texture == "medit_rocks") {
@@ -1355,6 +1413,9 @@ std::string Convert0ADTextureToTileType(const std::string zero_ad_texture)
 		return "Land";
 	} else if (zero_ad_texture == "medit_shrubs_golden") {
 		return "Land";
+	//Temperate biome
+	} else if (zero_ad_texture == "temp_dirt_a") {
+		return "Rough";
 	//City
 	} else if (zero_ad_texture == "medit_city_tile") {
 		return "Land";
@@ -1375,196 +1436,58 @@ std::string Convert0ADTextureToTileType(const std::string zero_ad_texture)
 	} else if (zero_ad_texture == "farmland_a") {
 		return "Land";
 	} else {
-		fprintf(stderr, ("0 AD terrain texture \"" + zero_ad_texture + "\" not recognized.").c_str());
+		fprintf(stderr, ("0 AD terrain texture \"" + zero_ad_texture + "\" not recognized.\n").c_str());
 		return "";
 	}
 }
 
-std::string Convert0ADTemplateToUnitTypeIdent(const std::string zero_ad_template)
+std::map<std::string, std::string> ZeroADTemplateUnitTypeEquivalency;
+
+void Set0ADTemplateUnitTypeEquivalency(const std::string zero_ad_template, const std::string unit_type_ident)
 {
-	//Fauna
-	if (zero_ad_template == "gaia/fauna_deer") {
-		return "unit-rat";
-	} else if (zero_ad_template == "gaia/fauna_fish") {
-		return "";
-	} else if (zero_ad_template == "gaia/fauna_goat") {
-		return "unit-rat";
-	//Flora
-	} else if (zero_ad_template == "gaia/flora_bush_grapes") {
-		return "";
-	} else if (zero_ad_template == "gaia/flora_tree_apple") {
-		return "Tree";
-	} else if (zero_ad_template == "gaia/flora_tree_carob") {
-		return "Tree";
-	} else if (zero_ad_template == "gaia/flora_tree_cypress") {
-		return "Tree";
-	} else if (zero_ad_template == "gaia/flora_tree_euro_beech") {
-		return "Tree";
-	} else if (zero_ad_template == "gaia/flora_tree_medit_fan_palm") {
-		return "Tree";
-	} else if (zero_ad_template == "gaia/flora_tree_oak") {
-		return "Tree";
-	} else if (zero_ad_template == "gaia/flora_tree_pine") {
-		return "Tree";
-	} else if (zero_ad_template == "gaia/flora_tree_poplar_lombardy") {
-		return "Tree";
-	//Geology
-	} else if (zero_ad_template == "gaia/geology_metal_mediterranean_slabs") {
-		return "unit-gold-deposit";
-	} else if (zero_ad_template == "gaia/geology_stone_mediterranean") {
-		return "Rock";
-	//Special neutral units
-	} else if (zero_ad_template == "gaia/special_treasure_pegasus") {
-		return "unit-gold-chest";
-	} else if (zero_ad_template == "gaia/special_treasure_golden_fleece") {
-		return "unit-gold-chest";
-	//Hellene units
-	} else if (zero_ad_template == "units/hele_support_female_citizen") {
-		return "unit-teuton-worker";
-	} else if (zero_ad_template == "units/hele_infantry_spearman_b") {
-		return "unit-teuton-swordsman";
-	} else if (zero_ad_template == "units/hele_infantry_spearman_a") { //advanced greek spearman
-		return "unit-teuton-swordsman";
-	} else if (zero_ad_template == "units/hele_infantry_spearman_e") { //elite greek spearman
-		return "unit-teuton-swordsman";
-	} else if (zero_ad_template == "units/hele_infantry_archer_b") {
-		return "unit-teuton-archer";
-	} else if (zero_ad_template == "units/hele_infantry_javelinist_b") {
-		return "unit-teuton-archer";
-	} else if (zero_ad_template == "units/hele_cavalry_swordsman_e") { //cavalry swordsman
-		return "unit-teuton-swordsman";
-	} else if (zero_ad_template == "units/hele_cavalry_swordsman_e") { //advanced cavalry swordsman
-		return "unit-teuton-swordsman";
-	} else if (zero_ad_template == "units/hele_cavalry_swordsman_e") { //elite cavalry swordsman
-		return "unit-teuton-swordsman";
-	} else if (zero_ad_template == "units/hele_cavalry_javelinist_b") { //javelinist cavalry
-		return "unit-teuton-archer";
-	} else if (zero_ad_template == "units/hele_cavalry_javelinist_a") { //advanced javelinist cavalry
-		return "unit-teuton-archer";
-	} else if (zero_ad_template == "units/hele_cavalry_javelinist_e") { //elite javelinist cavalry
-		return "unit-teuton-archer";
-	//Hellene structures
-	} else if (zero_ad_template == "structures/hele_civil_centre") {
-		return "unit-teuton-town-hall";
-	} else if (zero_ad_template == "structures/hele_field") {
-		return "";
-	} else if (zero_ad_template == "structures/hele_defense_tower") {
-		return "unit-teuton-guard-tower";
-	} else if (zero_ad_template == "other/hellenic_stoa") {
-		return "unit-teuton-farm"; //maybe a market would be a better fitting building, but its effect is similar to that of a farm
-	} else if (zero_ad_template == "other/hellenic_royal_stoa") {
-		return "unit-teuton-barracks"; //maybe a market would be a better fitting building for its description, but it allows recruiting military units; otherwise its effect is similar to that of a farm
-	} else if (zero_ad_template == "other/unfinished_greek_temple") {
-		return ""; //should be a temple
-	//Hellene heroes
-	} else if (zero_ad_template == "units/hele_hero_themistocles") {
-		return "unit-teuton-swordsman";
-	//Theban units
-	} else if (zero_ad_template == "units/thebes_sacred_band_hoplitai") { //champion spearman
-		return "unit-teuton-swordsman";
-	//Celt units
-	} else if (zero_ad_template == "units/celt_fanatic") {
-		return "unit-germanic-warrior";
-	//Celt structures
-	} else if (zero_ad_template == "structures/celt_field") {
-		return "";
-	} else if (zero_ad_template == "other/celt_hut") {
-		return "unit-celt-farm";
-	} else if (zero_ad_template == "other/celt_longhouse") {
-		return "unit-celt-farm";
-	//Gaul units
-	} else if (zero_ad_template == "units/gaul_support_female_citizen") {
-		return "unit-germanic-worker";
-	} else if (zero_ad_template == "units/gaul_infantry_spearman_b") {
-		return "unit-germanic-warrior";
-	} else if (zero_ad_template == "units/gaul_infantry_spearman_a") {
-		return "unit-germanic-warrior";
-	} else if (zero_ad_template == "units/gaul_infantry_spearman_e") {
-		return "unit-germanic-warrior";
-	} else if (zero_ad_template == "units/gaul_infantry_javelinist_b") {
-		return "unit-germanic-archer";
-	} else if (zero_ad_template == "units/gaul_infantry_javelinist_a") {
-		return "unit-germanic-archer";
-	} else if (zero_ad_template == "units/gaul_infantry_javelinist_e") {
-		return "unit-germanic-archer";
-	} else if (zero_ad_template == "units/gaul_cavalry_swordsman_b") {
-		return "unit-germanic-warrior";
-	} else if (zero_ad_template == "units/gaul_cavalry_swordsman_a") {
-		return "unit-germanic-warrior";
-	} else if (zero_ad_template == "units/gaul_cavalry_swordsman_e") {
-		return "unit-germanic-warrior";
-	} else if (zero_ad_template == "units/gaul_cavalry_javelinist_b") {
-		return "unit-germanic-archer";
-	} else if (zero_ad_template == "units/gaul_cavalry_javelinist_a") {
-		return "unit-germanic-archer";
-	} else if (zero_ad_template == "units/gaul_cavalry_javelinist_e") {
-		return "unit-germanic-archer";
-	//Gaul structures
-	} else if (zero_ad_template == "structures/gaul_civil_centre") {
-		return "unit-germanic-town-hall";
-	} else if (zero_ad_template == "structures/gaul_defense_tower") {
-		return "unit-teuton-guard-tower";
-	} else if (zero_ad_template == "structures/gaul_tavern") {
-		return "unit-germanic-farm";
-	//Gaul heroes
-	} else if (zero_ad_template == "units/gaul_hero_brennus") {
-		return "unit-germanic-warrior";
-	//Miscellaneous structures
-	} else if (zero_ad_template == "other/column_doric") {
-		return "unit-small-rocks";
-	} else if (zero_ad_template == "other/column_doric_fallen") {
-		return "unit-small-rocks";
-	} else if (zero_ad_template == "other/column_doric_fallen_b") {
-		return "unit-small-rocks";
-	} else if (zero_ad_template == "other/fence_long") {
-		return ""; //should be a palisade?
-	} else if (zero_ad_template == "other/fence_short") {
-		return ""; //should be a palisade?
-	//Props
-	} else if (zero_ad_template == "actor|geology/stone_medit_med.xml") {
-		return "unit-small-rocks";
-	} else if (zero_ad_template == "actor|props/flora/bush_medit_sm.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/bush_medit_sm_dry.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/bush_medit_sm_lush.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/bush_medit_underbrush.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/grass_medit_field.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/grass_soft_dry_small.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/grass_soft_dry_small_tall.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/grass_soft_large.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/grass_soft_large_tall.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/grass_soft_small.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/grass_soft_small_tall.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/grass_soft_tuft_a.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/pond_lillies_large.xml") {
-		return "";
-	} else if (zero_ad_template == "actor|props/flora/water_lillies.xml") {
-		return "";
+	ZeroADTemplateUnitTypeEquivalency[zero_ad_template] = unit_type_ident;
+}
+
+std::string Convert0ADTemplateToUnitTypeIdent(const std::string zero_ad_template)
+{	
+	if (ZeroADTemplateUnitTypeEquivalency.find(zero_ad_template) != ZeroADTemplateUnitTypeEquivalency.end()) {
+		return ZeroADTemplateUnitTypeEquivalency[zero_ad_template];
 	} else {
-		fprintf(stderr, ("0 AD template \"" + zero_ad_template + "\" not recognized.").c_str());
+		fprintf(stderr, ("0 AD template \"" + zero_ad_template + "\" not recognized.\n").c_str());
 		return "";
 	}
+}
+
+std::map<std::string, std::string> ZeroADCivilizationEquivalency;
+
+void Set0ADCivilizationEquivalency(const std::string zero_ad_civilization, const std::string civilization)
+{
+	ZeroADCivilizationEquivalency[zero_ad_civilization] = civilization;
 }
 
 std::string Convert0ADCivilizationToCivilization(const std::string zero_ad_civilization)
 {
-	if (zero_ad_civilization == "gaul") {
-		return "celt";
-	} else if (zero_ad_civilization == "hele") {
-		return "greek";
+	if (ZeroADCivilizationEquivalency.find(zero_ad_civilization) != ZeroADCivilizationEquivalency.end()) {
+		return ZeroADCivilizationEquivalency[zero_ad_civilization];
 	} else {
-		fprintf(stderr, ("0 AD civilization \"" + zero_ad_civilization + "\" not recognized.").c_str());
+		fprintf(stderr, ("0 AD civilization \"" + zero_ad_civilization + "\" not recognized.\n").c_str());
+		return "";
+	}
+}
+
+std::map<std::string, std::string> ZeroADCivilizationFactionEquivalency;
+
+void Set0ADCivilizationFactionEquivalency(const std::string zero_ad_civilization, const std::string faction)
+{
+	ZeroADCivilizationFactionEquivalency[zero_ad_civilization] = faction;
+}
+
+std::string Convert0ADCivilizationToFaction(const std::string zero_ad_civilization)
+{
+	if (ZeroADCivilizationFactionEquivalency.find(zero_ad_civilization) != ZeroADCivilizationFactionEquivalency.end()) {
+		return ZeroADCivilizationFactionEquivalency[zero_ad_civilization];
+	} else {
+		fprintf(stderr, ("0 AD civilization \"" + zero_ad_civilization + "\" not recognized.\n").c_str());
 		return "";
 	}
 }
@@ -1576,7 +1499,7 @@ void AdjustRawTileMapIrregularities(int map_width, int map_height)
 		no_irregularities_found = true;
 		for (int x = 0; x < map_width; ++x) {
 			for (int y = 0; y < map_height; ++y) {
-				if (RawTiles[x][y] == "Land") {
+				if (RawTiles[x][y] == "Land" || RawTiles[x][y] == "") {
 					continue;
 				}
 				std::vector<std::string> acceptable_adjacent_tile_types;

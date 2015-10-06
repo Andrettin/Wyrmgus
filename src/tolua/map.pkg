@@ -26,4 +26,7 @@ void SetTile(int tile, int w, int h, int value = 0);
 
 //Wyrmgus start
 extern void Convert0ADMap(const std::string &mapname);
+extern void Set0ADTemplateUnitTypeEquivalency(const std::string zero_ad_template, const std::string unit_type_ident);
+extern void Set0ADCivilizationEquivalency(const std::string zero_ad_civilization, const std::string civilization);
+extern void Set0ADCivilizationFactionEquivalency(const std::string zero_ad_civilization, const std::string faction);
 //Wyrmgus end
