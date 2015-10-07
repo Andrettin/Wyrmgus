@@ -177,7 +177,6 @@ void CPlayerColorGraphic::DrawPlayerColorSub(int player, int gx, int gy, int w, 
 		if (!PlayerColorTextures[player]) {
 			MakePlayerColorTexture(this, player);
 		}
-		fprintf(stderr, "Player %d.\n", player);
 		DrawTexture(this, PlayerColorTextures[player], gx, gy, gx + w, gy + h, x, y, 0);
 		//Wyrmgus end
 	} else
@@ -1123,7 +1122,7 @@ void CGraphic::Load(bool grayscale)
 
 	// TODO: More formats?
 	if (LoadGraphicPNG(this) == -1) {
-		fprintf(stderr, "Can't load the graphic `%s'\n", File.c_str());
+		fprintf(stderr, "Can't load the graphic '%s'\n", File.c_str());
 		ExitFatal(-1);
 	}
 

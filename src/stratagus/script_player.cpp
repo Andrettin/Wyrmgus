@@ -2061,6 +2061,44 @@ static int CclGetParentCivilization(lua_State *l)
 }
 
 /**
+**  Get a civilization's species.
+**
+**  @param l  Lua state.
+*/
+static int CclGetCivilizationClassUnitType(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	std::string class_name = LuaToString(l, 1);
+	int class_id = GetUnitTypeClassIndexByName(class_name);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
+	std::string unit_type_ident;
+	if (civilization != -1 && class_id != -1) {
+		int unit_type_id = PlayerRaces.GetCivilizationClassUnitType(civilization, class_id);
+		if (unit_type_id != -1) {
+			unit_type_ident = UnitTypes[unit_type_id]->Ident;
+		}
+	}
+		
+	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
+		class_id = GetUpgradeClassIndexByName(class_name);
+		if (class_id != -1) {
+			int upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(civilization, class_id);
+			if (upgrade_id != -1) {
+				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
+			}
+		}
+	}
+	
+	if (!unit_type_ident.empty()) {
+		lua_pushstring(l, unit_type_ident.c_str());
+	} else {
+		lua_pushnil(l);
+	}
+
+	return 1;
+}
+
+/**
 **  Define a civilization's factions
 **
 **  @param l  Lua state.
@@ -2747,6 +2785,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "IsCivilizationPlayable", CclIsCivilizationPlayable);
 	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
 	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
+	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
