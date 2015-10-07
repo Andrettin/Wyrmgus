@@ -2221,7 +2221,7 @@ static int CclGetCivilizations(lua_State *l)
 
 	int civilization_count = 0;
 	for (int i = 0; i < MAX_RACES; ++i) {
-		if (!PlayerRaces.Name[i].empty() && PlayerRaces.Visible[i]) { //require visibility to ignore the neutral civilization
+		if (!PlayerRaces.Name[i].empty()) { //require visibility to ignore the neutral civilization
 			civilization_count += 1;
 		}
 	}
