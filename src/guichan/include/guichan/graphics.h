@@ -176,14 +176,20 @@ namespace gcn
          */
         virtual void drawImage(const Image* image, int srcX, int srcY,
                                int dstX, int dstY, int width,
-                               int height) = 0;
+							   //Wyrmgus start
+//                               int height) = 0;
+                               int height, int player = -1) = 0;
+							   //Wyrmgus end
         /**
          * Draws an image. A simplified version of the other drawImage.
          * It will draw a whole image at the coordinate you specify.
          * It is equivalent to calling:
          * @code drawImage(myImage, 0, 0, dstX, dstY, image->getWidth(), image->getHeight()); @endcode
          */
-        virtual void drawImage(const Image* image, int dstX, int dstY);
+		//Wyrmgus start
+//        virtual void drawImage(const Image* image, int dstX, int dstY);
+        virtual void drawImage(const Image* image, int dstX, int dstY, int player = -1);
+		//Wyrmgus end
 
         /**
          * Draws a single point/pixel.

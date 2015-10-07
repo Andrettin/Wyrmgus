@@ -119,9 +119,15 @@ namespace gcn
         return mClipStack.top();
     }
 
-    void Graphics::drawImage(const Image* image, int dstX, int dstY)
+	//Wyrmgus start
+//    void Graphics::drawImage(const Image* image, int dstX, int dstY)
+    void Graphics::drawImage(const Image* image, int dstX, int dstY, int player)
+	//Wyrmgus end
     {
-        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight());
+		//Wyrmgus start
+//        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight());
+        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player);
+		//Wyrmgus end
     }
 
     void Graphics::setFont(Font* font)

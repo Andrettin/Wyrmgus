@@ -121,7 +121,10 @@ namespace gcn
 
         virtual void drawImage(const Image* image, int srcX, int srcY,
                                int dstX, int dstY, int width,
-                               int height);
+		//Wyrmgus start
+//                               int height);
+                               int height, int player = -1);
+		//Wyrmgus end
 
         virtual void drawPoint(int x, int y);
 

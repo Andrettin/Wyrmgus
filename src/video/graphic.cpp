@@ -158,6 +158,39 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 	}
 }
 
+//Wyrmgus start
+/**
+**  Video draw part of a player color graphic.
+**
+**  @param player  player number
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X screen position
+**  @param y   Y screen position
+*/
+void CPlayerColorGraphic::DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y)
+{
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		if (!PlayerColorTextures[player]) {
+			MakePlayerColorTexture(this, player);
+		}
+		fprintf(stderr, "Player %d.\n", player);
+		DrawTexture(this, PlayerColorTextures[player], gx, gy, gx + w, gy + h, x, y, 0);
+		//Wyrmgus end
+	} else
+#endif
+	{
+		GraphicPlayerPixels(player, *this);
+		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
+		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+	}
+}
+//Wyrmgus end
+
 /**
 **  Video draw part of graphic clipped.
 **
@@ -175,6 +208,26 @@ void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
 	CLIP_RECTANGLE(x, y, w, h);
 	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
 }
+
+//Wyrmgus start
+/**
+**  Video draw part of graphic clipped.
+**
+**  @param gx  X offset into object
+**  @param gy  Y offset into object
+**  @param w   width to display
+**  @param h   height to display
+**  @param x   X screen position
+**  @param y   Y screen position
+*/
+void CPlayerColorGraphic::DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y)
+{
+	int oldx = x;
+	int oldy = y;
+	CLIP_RECTANGLE(x, y, w, h);
+	DrawPlayerColorSub(player, gx + x - oldx, gy + y - oldy, w, h, x, y);
+}
+//Wyrmgus end
 
 /**
 **  Video draw part of graphic with alpha.

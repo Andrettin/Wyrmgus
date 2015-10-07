@@ -203,6 +203,8 @@ protected:
 
 public:
 	//Wyrmgus start
+	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y);
+	void DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y);
 //	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
 //	void DrawPlayerColorFrameClip(int player, unsigned frame, int x, int y);
 	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y, bool ignore_time_of_day = true);

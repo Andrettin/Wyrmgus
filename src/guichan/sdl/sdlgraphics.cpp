@@ -140,7 +140,10 @@ namespace gcn
 
     void SDLGraphics::drawImage(const Image* image, int srcX,
                                 int srcY, int dstX, int dstY,
-                                int width, int height)
+								//Wyrmgus start
+//                                int width, int height)
+                                int width, int height, int player)
+								//Wyrmgus end
     {
         ClipRectangle top = mClipStack.top();
         SDL_Rect src;

@@ -416,8 +416,12 @@ void MyOpenGLGraphics::_endDraw()
 	popClipArea();
 }
 
+//Wyrmgus start
+//void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
+//								 int dstX, int dstY, int width, int height)
 void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
-								 int dstX, int dstY, int width, int height)
+								 int dstX, int dstY, int width, int height, int player)
+//Wyrmgus end
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
 	int right = std::min<int>(r.x + r.width - 1, Video.Width - 1);
@@ -429,8 +433,17 @@ void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
 
 	PushClipping();
 	SetClipping(r.x, r.y, right, bottom);
-	((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
-									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+	//Wyrmgus start
+//	((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
+//									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+	if (player != -1) {
+		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(player, srcX, srcY, width, height,
+										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+	} else {
+		((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
+										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+	}
+	//Wyrmgus end
 	PopClipping();
 }
 
@@ -510,47 +523,28 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 
 void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 {
+	int WidgetPlayerColorIndexFromName = -1;
+	for (int i = 0; i < PlayerColorMax; ++i) {
+		if (PlayerColorNames[i] == WidgetPlayerColor) {
+			WidgetPlayerColorIndexFromName = i;
+			break;
+		}
+	}
+	if (WidgetPlayerColorIndexFromName == -1) {
+		fprintf(stderr, "Color %s not defined\n", WidgetPlayerColor.c_str());
+		ExitFatal(1);
+	}
+	
 	// make the widget's image be player-colored
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-		int WidgetPlayerColorIndexFromName = -1;
-		for (int i = 0; i < PlayerColorMax; ++i) {
-			if (PlayerColorNames[i] == WidgetPlayerColor) {
-				WidgetPlayerColorIndexFromName = i;
-				break;
-			}
-		}
-		if (WidgetPlayerColorIndexFromName == -1) {
-			fprintf(stderr, "Color %s not defined\n", WidgetPlayerColor.c_str());
-			ExitFatal(1);
-		}
-		if (!((CPlayerColorGraphic *)mImage)->PlayerColorTextures[WidgetPlayerColorIndexFromName]) {
-			MakePlayerColorTexture(((CPlayerColorGraphic *)mImage), WidgetPlayerColorIndexFromName);
-		}
-		
-		//work-aroundish way to make the proper player color be displayed by the button
-		if (((CPlayerColorGraphic *)mImage)->Textures) {
-			delete[]((CPlayerColorGraphic *)mImage)->Textures;
-			((CPlayerColorGraphic *)mImage)->Textures = NULL;
-		}
-		CUnitColors texture_unit_colors;
-		texture_unit_colors.Colors = PlayerColorsRGB[WidgetPlayerColorIndexFromName];
-		int tw = (((CPlayerColorGraphic *)mImage)->GraphicWidth - 1) / GLMaxTextureSize + 1;
-		const int th = (((CPlayerColorGraphic *)mImage)->GraphicHeight - 1) / GLMaxTextureSize + 1;
-		((CPlayerColorGraphic *)mImage)->Textures = new GLuint[((CPlayerColorGraphic *)mImage)->NumTextures];
-		glGenTextures(((CPlayerColorGraphic *)mImage)->NumTextures, ((CPlayerColorGraphic *)mImage)->Textures);
-		for (int j = 0; j < th; ++j) {
-			for (int i = 0; i < tw; ++i) {
-				MakeTextures2(((CPlayerColorGraphic *)mImage), ((CPlayerColorGraphic *)mImage)->Textures[j * tw + i], &texture_unit_colors, GLMaxTextureSize * i, GLMaxTextureSize * j, 0);
-			}
-		}		
 	} else
 #endif
 	{
 		WidgetGraphicPlayerPixels(WidgetPlayerColor, *((CPlayerColorGraphic *)mImage));
 	}
-		
-	graphics->drawImage(mImage, 0, 0);
+	
+	graphics->drawImage(mImage, 0, 0, WidgetPlayerColorIndexFromName);
 }
 //Wyrmgus end
 
@@ -861,46 +855,28 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		img = normalImage;
 	}
 
+	int WidgetPlayerColorIndexFromName = -1;
+	for (int i = 0; i < PlayerColorMax; ++i) {
+		if (PlayerColorNames[i] == ButtonPlayerColor) {
+			WidgetPlayerColorIndexFromName = i;
+			break;
+		}
+	}
+	if (WidgetPlayerColorIndexFromName == -1) {
+		fprintf(stderr, "Color %s not defined\n", ButtonPlayerColor.c_str());
+		ExitFatal(1);
+	}
+		
 	if (img) {
 		// make the button's image be player-colored
 	#if defined(USE_OPENGL) || defined(USE_GLES)
 		if (UseOpenGL) {
-			int WidgetPlayerColorIndexFromName = -1;
-			for (int i = 0; i < PlayerColorMax; ++i) {
-				if (PlayerColorNames[i] == ButtonPlayerColor) {
-					WidgetPlayerColorIndexFromName = i;
-					break;
-				}
-			}
-			if (WidgetPlayerColorIndexFromName == -1) {
-				fprintf(stderr, "Color %s not defined\n", ButtonPlayerColor.c_str());
-				ExitFatal(1);
-			}
-			if (!((CPlayerColorGraphic *)img)->PlayerColorTextures[WidgetPlayerColorIndexFromName]) {
-				MakePlayerColorTexture(((CPlayerColorGraphic *)img), WidgetPlayerColorIndexFromName);
-			}
-			
-			//work-aroundish way to make the proper player color be displayed by the button
-			if (((CPlayerColorGraphic *)img)->Textures) {
-				delete[]((CPlayerColorGraphic *)img)->Textures;
-				((CPlayerColorGraphic *)img)->Textures = NULL;
-			}
-			CUnitColors texture_unit_colors;
-			texture_unit_colors.Colors = PlayerColorsRGB[WidgetPlayerColorIndexFromName];
-			int tw = (((CPlayerColorGraphic *)img)->GraphicWidth - 1) / GLMaxTextureSize + 1;
-			const int th = (((CPlayerColorGraphic *)img)->GraphicHeight - 1) / GLMaxTextureSize + 1;
-			((CPlayerColorGraphic *)img)->Textures = new GLuint[((CPlayerColorGraphic *)img)->NumTextures];
-			glGenTextures(((CPlayerColorGraphic *)img)->NumTextures, ((CPlayerColorGraphic *)img)->Textures);
-			for (int j = 0; j < th; ++j) {
-				for (int i = 0; i < tw; ++i) {
-					MakeTextures2(((CPlayerColorGraphic *)img), ((CPlayerColorGraphic *)img)->Textures[j * tw + i], &texture_unit_colors, GLMaxTextureSize * i, GLMaxTextureSize * j, 0);
-				}
-			}
 		} else
 	#endif
 		{
 			WidgetGraphicPlayerPixels(ButtonPlayerColor, *((CPlayerColorGraphic *)img));
 		}
+		
 		if (Transparency) {
 		#if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {
@@ -927,7 +903,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			#endif
 			}
 			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1);
+								img->getWidth() - 1, img->getHeight() - 1, WidgetPlayerColorIndexFromName);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
@@ -949,7 +925,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			#endif
 			}
 			graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight());
+								img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
@@ -968,7 +944,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		#endif
 		}
 		graphics->drawImage(img, 0, 0, 0, 0,
-							img->getWidth(), img->getHeight());
+							img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName);
 		if (Transparency) {
 		#if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {

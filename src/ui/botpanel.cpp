@@ -827,7 +827,14 @@ void DrawGenericPopup(std::string popup_text, int x, int y)
 	// Background
 	IntColor BackgroundColor = Video.MapRGBA(TheScreen->format, 28, 28, 28, 208);
 	IntColor BorderColor = Video.MapRGBA(TheScreen->format, 93, 93, 93, 160);
-	Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, BackgroundColor >> ASHIFT);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, BackgroundColor >> ASHIFT);
+	} else
+#endif
+	{
+		Video.FillTransRectangle(BackgroundColor, x, y, popupWidth, popupHeight, 208);
+	}
 	Video.DrawRectangle(BorderColor, x, y, popupWidth, popupHeight);
 
 	// Contents

@@ -193,7 +193,10 @@ namespace gcn
 
     void OpenGLGraphics::drawImage(const Image* image, int srcX, int srcY,
                                    int dstX, int dstY, int width,
-                                   int height)
+								   //Wyrmgus start
+//                                   int height)
+                                   int height, int player)
+								   //Wyrmgus end
     {
         dstX += mClipStack.top().xOffset;
         dstY += mClipStack.top().yOffset;

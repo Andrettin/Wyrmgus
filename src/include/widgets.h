@@ -60,7 +60,10 @@ public:
 	virtual void _endDraw();
 
 	virtual void drawImage(const gcn::Image *image, int srcX, int srcY,
-						   int dstX, int dstY, int width, int height);
+						   //Wyrmgus start
+//						   int dstX, int dstY, int width, int height);
+						   int dstX, int dstY, int width, int height, int player = -1);
+						   //Wyrmgus end
 
 	virtual void drawPoint(int x, int y);
 	virtual void drawLine(int x1, int y1, int x2, int y2);
