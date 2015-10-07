@@ -329,7 +329,9 @@ class ImageWidget : public Widget
 //Wyrmgus start
 class PlayerColorImageWidget : public Widget
 {
-	PlayerColorImageWidget(CGraphic *image, const std::string playercolor);
+	PlayerColorImageWidget(CPlayerColorGraphic *image, const std::string playercolor);
+	
+	void setImageOrigin(int x, int y);
 };
 //Wyrmgus end
 
@@ -378,6 +380,7 @@ class PlayerColorImageButton : public Button
 	void setFrameImage(CGraphic *image);
 	void setPressedFrameImage(CGraphic *image);
 	void setTransparency(int alpha);
+	void setImageOrigin(int x, int y);
 };
 // Wyrmgus end
 

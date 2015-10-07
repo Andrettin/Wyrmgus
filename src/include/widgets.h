@@ -88,11 +88,13 @@ public:
 class PlayerColorImageWidget : public gcn::Icon
 {
 public:
-	explicit PlayerColorImageWidget(gcn::Image *img, const std::string &playercolor) : gcn::Icon(img), WidgetPlayerColor(playercolor) {}
+	explicit PlayerColorImageWidget(gcn::Image *img, const std::string &playercolor) : gcn::Icon(img), WidgetPlayerColor(playercolor) {ImageOrigin.x = 0; ImageOrigin.y = 0;}
 
 	virtual void draw(gcn::Graphics *graphics);
+	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
 	std::string WidgetPlayerColor;
+	Vec2i ImageOrigin;
 };
 //Wyrmgus end
 
@@ -151,6 +153,7 @@ public:
 	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
 	virtual void setPosition(int x, int y);
 	void setTransparency(int alpha) { Transparency = alpha; }
+	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 
 	gcn::Image *normalImage;
 	gcn::Image *pressedImage;
@@ -159,6 +162,7 @@ public:
 	gcn::Image *pressedframeImage;	
 	std::string ButtonPlayerColor;
 	int Transparency;
+	Vec2i ImageOrigin;
 };
 //Wyrmgus end
 

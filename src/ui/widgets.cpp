@@ -544,7 +544,7 @@ void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 		WidgetGraphicPlayerPixels(WidgetPlayerColor, *((CPlayerColorGraphic *)mImage));
 	}
 	
-	graphics->drawImage(mImage, 0, 0, WidgetPlayerColorIndexFromName);
+	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), WidgetPlayerColorIndexFromName);
 }
 //Wyrmgus end
 
@@ -816,6 +816,8 @@ PlayerColorImageButton::PlayerColorImageButton() :
 	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(""), Transparency(0)
 {
 	setForegroundColor(0xffffff);
+	ImageOrigin.x = 0;
+	ImageOrigin.y = 0;
 }
 
 /**
@@ -828,6 +830,8 @@ PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const
 	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(playercolor), Transparency(0)
 {
 	setForegroundColor(0xffffff);
+	ImageOrigin.x = 0;
+	ImageOrigin.y = 0;
 }
 
 /**
@@ -902,7 +906,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 				}
 			#endif
 			}
-			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
+			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1, WidgetPlayerColorIndexFromName);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
@@ -924,7 +928,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 				}
 			#endif
 			}
-			graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
+			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
@@ -943,7 +947,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			}
 		#endif
 		}
-		graphics->drawImage(img, 0, 0, 0, 0,
+		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
 							img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName);
 		if (Transparency) {
 		#if defined(USE_OPENGL) || defined(USE_GLES)

@@ -151,6 +151,8 @@ public:
 	virtual int getHeight() const { return Height; }
 	//Wyrmgus start
 	virtual std::string getFile() const { return File; }
+	virtual int getGraphicWidth() const { return GraphicWidth; }
+	virtual int getGraphicHeight() const { return GraphicHeight; }
 	//Wyrmgus end
 
 	std::string File;          /// Filename

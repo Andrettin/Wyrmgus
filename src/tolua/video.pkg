@@ -31,6 +31,8 @@ public:
 	void Resize(int w, int h);
 	//Wyrmgus start
 	virtual std::string &getFile();
+	virtual int &getGraphicWidth();
+	virtual int &getGraphicHeight();
 	//Wyrmgus end
 };
 
