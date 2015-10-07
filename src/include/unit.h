@@ -613,7 +613,10 @@ extern void DestroyAllInside(CUnit &source);
 /// Calculate some value to measure the unit's priority for AI
 extern int ThreatCalculate(const CUnit &unit, const CUnit &dest);
 /// Hit unit with damage, if destroyed give attacker the points
-extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL);
+//Wyrmgus start
+//extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL);
+extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL, bool show_damage = true);
+//Wyrmgus end
 
 /// Calculate the distance from current view point to coordinate
 extern int ViewPointDistance(const Vec2i &pos);

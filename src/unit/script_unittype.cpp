@@ -1768,6 +1768,12 @@ static int CclDefineUnitType(lua_State *l)
 			type->SeaUnit = parent_type->SeaUnit;
 			type->AirUnit = parent_type->AirUnit;
 			type->Building = parent_type->Building;
+			type->BoardSize = parent_type->BoardSize;
+			type->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
+			type->StartingResources = parent_type->StartingResources;
+			type->BurnPercent = parent_type->BurnPercent;
+			type->BurnDamageRate = parent_type->BurnDamageRate;
+			type->PoisonDrain = parent_type->PoisonDrain;
 			type->SelectableByRectangle = parent_type->SelectableByRectangle;
 			type->BuilderOutside = parent_type->BuilderOutside;
 			type->BuilderLost = parent_type->BuilderLost;
@@ -1799,6 +1805,7 @@ static int CclDefineUnitType(lua_State *l)
 				type->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
 				type->DefaultStat.Variables[i].Value = parent_type->DefaultStat.Variables[i].Value;
 				type->DefaultStat.Variables[i].Max = parent_type->DefaultStat.Variables[i].Max;
+				type->DefaultStat.Variables[i].Increase = parent_type->DefaultStat.Variables[i].Increase;
 			}
 			for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) {
 				type->BoolFlag[i].value = parent_type->BoolFlag[i].value;

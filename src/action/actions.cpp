@@ -323,7 +323,10 @@ static bool HandleBurnAndPoison(CUnit &unit)
 	// Burn & poison
 	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 	if (hpPercent <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
-		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
+		//Wyrmgus start
+//		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);
+		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate, NULL, false); //a bit too repetitive to show damage every single time the burn effect is applied
+		//Wyrmgus end
 		return true;
 	}
 	if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {

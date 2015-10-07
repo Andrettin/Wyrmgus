@@ -3394,7 +3394,10 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 **  @param damage      How many damage to take.
 **  @param missile     Which missile took the damage.
 */
-void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
+//Wyrmgus start
+//void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
+void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile, bool show_damage)
+//Wyrmgus end
 {
 	if (!damage) {
 		// Can now happen by splash damage
@@ -3495,11 +3498,19 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile)
 
 	HitUnit_ApplyDamage(attacker, target, damage);
 	HitUnit_BuildingCapture(attacker, target, damage);
-	HitUnit_ShowDamageMissile(target, damage);
+	//Wyrmgus start
+//	HitUnit_ShowDamageMissile(target, damage);
+	if (show_damage) {
+		HitUnit_ShowDamageMissile(target, damage);
+	}
+	//Wyrmgus end
 
 	HitUnit_ShowImpactMissile(target);
 
-	if (type->Building && !target.Burning) {
+	//Wyrmgus start
+//	if (type->Building && !target.Burning) {
+	if (type->Building && !target.Burning && !target.Constructed) { //the building shouldn't burn if it's still under construction
+	//Wyrmgus end
 		HitUnit_Burning(target);
 	}
 
