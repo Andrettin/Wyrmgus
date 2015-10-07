@@ -693,157 +693,52 @@ static int CclDefineRaceNames(lua_State *l)
 
 //Wyrmgus start
 /**
-**  Define new race names
+**  Define a civilization.
 **
 **  @param l  Lua state.
 */
-static int CclDefineNewRaceNames(lua_State *l)
+static int CclDefineCivilization(lua_State *l)
 {
-	int args = lua_gettop(l);
-	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, j + 1);
-		if (!strcmp(value, "race")) {
-			++j;
-			if (!lua_istable(l, j + 1)) {
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	int civilization = PlayerRaces.Count++;
+	PlayerRaces.Name[civilization] = LuaToString(l, 1);
+	PlayerRaces.Playable[civilization] = true; //civilizations are playable by default
+	SetCivilizationStringToIndex(PlayerRaces.Name[civilization], civilization);
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		if (!strcmp(value, "Display")) {
+			PlayerRaces.Display[civilization] = LuaToString(l, -1);
+		} else if (!strcmp(value, "Visible")) {
+			PlayerRaces.Visible[civilization] = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Playable")) {
+			PlayerRaces.Playable[civilization] = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Species")) {
+			PlayerRaces.Species[civilization] = LuaToString(l, -1);
+		} else if (!strcmp(value, "ParentCivilization")) {
+			PlayerRaces.ParentCivilization[civilization] = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "NameTranslations")) {
+			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			int subargs = lua_rawlen(l, j + 1);
-			int i = PlayerRaces.Count++;
+			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, j + 1, k + 1);
-				if (!strcmp(value, "name")) {
-					++k;
-					PlayerRaces.Name[i] = LuaToString(l, j + 1, k + 1);
-					PlayerRaces.Playable[i] = true; //civilizations are playable by default
-					SetCivilizationStringToIndex(PlayerRaces.Name[i], i);
-				} else if (!strcmp(value, "display")) {
-					++k;
-					PlayerRaces.Display[i] = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "visible")) {
-					PlayerRaces.Visible[i] = 1;
-				} else if (!strcmp(value, "playable")) {
-					++k;
-					PlayerRaces.Playable[i] = LuaToBoolean(l, j + 1, k + 1);
-				} else if (!strcmp(value, "species")) {
-					++k;
-					PlayerRaces.Species[i] = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "parent-civilization")) {
-					++k;
-					PlayerRaces.ParentCivilization[i] = PlayerRaces.GetRaceIndexByName(LuaToString(l, j + 1, k + 1));
-				} else if (!strcmp(value, "personal-names")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.PersonalNames[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "personal-name-prefixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.PersonalNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "personal-name-suffixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.PersonalNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "province-names")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.ProvinceNames[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "province-name-prefixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.ProvinceNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "province-name-suffixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.ProvinceNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "settlement-names")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.SettlementNames[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "settlement-name-prefixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.SettlementNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "settlement-name-suffixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.SettlementNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "name-translations")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.NameTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //name to be translated
-						++n;
-						PlayerRaces.NameTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //name translation
-					}
-				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
+				PlayerRaces.NameTranslations[civilization][k / 2][0] = LuaToString(l, -1, k + 1); //name to be translated
+				++k;
+				PlayerRaces.NameTranslations[civilization][(k - 1) / 2][1] = LuaToString(l, -1, k + 1); //name translation
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
-
+	
 	return 0;
 }
-
 
 /**
 **  Define a civilization's language
@@ -2842,7 +2737,7 @@ void PlayerCclRegister()
 
 	lua_register(Lua, "DefineRaceNames", CclDefineRaceNames);
 	//Wyrmgus start
-	lua_register(Lua, "DefineNewRaceNames", CclDefineNewRaceNames);
+	lua_register(Lua, "DefineCivilization", CclDefineCivilization);
 	lua_register(Lua, "DefineCivilizationLanguage", CclDefineCivilizationLanguage);
 	lua_register(Lua, "DefineLanguageNoun", CclDefineLanguageNoun);
 	lua_register(Lua, "DefineLanguageVerb", CclDefineLanguageVerb);
