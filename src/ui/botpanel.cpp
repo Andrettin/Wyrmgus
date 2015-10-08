@@ -603,6 +603,12 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			//Wyrmgus start
 //			Costs[FoodCost] = UnitTypes[button.Value]->Demand;
 			Costs[FoodCost] = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
+			if (button.Action == ButtonTrain && UnitTypes[button.Value]->TrainQuantity > 1) { //if more than one unit is trained in a batch, multiply the costs
+				for (int i = 1; i < MaxCosts; ++i) {
+					Costs[i] *= UnitTypes[button.Value]->TrainQuantity;
+				}
+				Costs[FoodCost] *= UnitTypes[button.Value]->TrainQuantity;
+			}
 			//Wyrmgus end
 			break;
 		default:

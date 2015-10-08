@@ -777,6 +777,11 @@ NumberDesc *CclParseNumberDesc(lua_State *l)
 			//Wyrmgus end
 			}
 			lua_pop(l, 1); // table.
+		//Wyrmgus start
+		} else if (!strcmp(key, "TypeTrainQuantity")) {
+			res->e = ENumber_TypeTrainQuantity;
+			res->D.Type = CclParseTypeDesc(l);
+		//Wyrmgus end
 		} else {
 			lua_pop(l, 1);
 			LuaError(l, "unknow condition '%s'" _C_ key);
@@ -1047,6 +1052,15 @@ int EvalNumber(const NumberDesc *number)
 			} else {
 				return 0;
 			}
+		//Wyrmgus start
+		case ENumber_TypeTrainQuantity : // name of the unit type's class
+			type = number->D.Type;
+			if (type != NULL) {
+				return (**type).TrainQuantity;
+			} else { // ERROR.
+				return 0;
+			}
+		//Wyrmgus end
 		case ENumber_PlayerData : // getplayerdata(player, data, res);
 			int player = EvalNumber(number->D.PlayerData.Player);
 			std::string data = EvalString(number->D.PlayerData.DataType);
@@ -1297,6 +1311,11 @@ void FreeNumberDesc(NumberDesc *number)
 			FreeStringDesc(number->D.PlayerData.ResType);
 			delete number->D.PlayerData.ResType;
 			break;
+		//Wyrmgus start
+		case ENumber_TypeTrainQuantity : // Class of the unit type
+			delete *number->D.Type;
+			break;
+		//Wyrmgus end
 	}
 }
 
@@ -1874,6 +1893,11 @@ static int CclTypeClass(lua_State *l)
 {
 	return Alias(l, "TypeClass");
 }
+
+static int CclTypeTrainQuantity(lua_State *l)
+{
+	return Alias(l, "TypeTrainQuantity");
+}
 //Wyrmgus end
 /**
 **  Return equivalent lua table for If.
@@ -2065,6 +2089,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitTypeName", CclUnitTypeName);
 	lua_register(Lua, "UnitTrait", CclUnitTrait);
 	lua_register(Lua, "TypeClass", CclTypeClass);
+	lua_register(Lua, "TypeTrainQuantity", CclTypeTrainQuantity);
 	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);

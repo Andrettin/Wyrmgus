@@ -81,7 +81,16 @@ private:
 class ImageWidget : public gcn::Icon
 {
 public:
-	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
+	//Wyrmgus start
+//	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) {}
+	explicit ImageWidget(gcn::Image *img) : gcn::Icon(img) { ImageOrigin.x = 0; ImageOrigin.y = 0; }
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
+	
+	Vec2i ImageOrigin;
+	//Wyrmgus end
 };
 
 //Wyrmgus start

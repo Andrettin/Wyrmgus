@@ -119,6 +119,9 @@ enum ENumber {
 
 	ENumber_UnitStat,    /// Property of Unit.
 	ENumber_TypeStat,    /// Property of UnitType.
+	//Wyrmgus start
+	ENumber_TypeTrainQuantity,	/// Unit type's trained quantity
+	//Wyrmgus end
 
 	ENumber_NumIf,       /// If cond then Number1 else Number2.
 
@@ -143,7 +146,7 @@ enum EString {
 	//Wyrmgus start
 	EString_UnitTypeName,     /// UnitType Name, if EString_UnitName is occupied by the unit's personal name.
 	EString_UnitTrait,     /// Unit Trait
-	EString_TypeClass,     /// Unit Trait
+	EString_TypeClass,     /// Unit type's class
 	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.
@@ -213,6 +216,9 @@ struct NumberDesc {
 		unsigned int Index; /// index of the lua function.
 		int Val;       /// Direct value.
 		NumberDesc *N; /// Other number.
+		//Wyrmgus start
+		CUnitType **Type;           /// Which unit type.
+		//Wyrmgus end
 		BinOp binOp;   /// For binary operand.
 		struct {
 			UnitDesc *Unit;            /// Which unit.

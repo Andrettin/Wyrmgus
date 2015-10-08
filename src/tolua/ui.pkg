@@ -324,6 +324,10 @@ class ScrollArea : public BasicContainer
 class ImageWidget : public Widget
 {
 	ImageWidget(CGraphic *image);
+	
+	//Wyrmgus start
+	void setImageOrigin(int x, int y);
+	//Wyrmgus end
 };
 
 //Wyrmgus start
