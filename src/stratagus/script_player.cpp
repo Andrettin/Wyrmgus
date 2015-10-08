@@ -573,6 +573,9 @@ static int CclDefineRaceNames(lua_State *l)
 				} else if (!strcmp(value, "species")) {
 					++k;
 					PlayerRaces.Species[i] = LuaToString(l, j + 1, k + 1);
+				} else if (!strcmp(value, "default-color")) {
+					++k;
+					PlayerRaces.DefaultColor[i] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "parent-civilization")) {
 					++k;
 					PlayerRaces.ParentCivilization[i] = PlayerRaces.GetRaceIndexByName(LuaToString(l, j + 1, k + 1));
@@ -722,6 +725,8 @@ static int CclDefineCivilization(lua_State *l)
 			PlayerRaces.Species[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentCivilization")) {
 			PlayerRaces.ParentCivilization[civilization] = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "DefaultColor")) {
+			PlayerRaces.DefaultColor[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "NameTranslations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2061,7 +2066,22 @@ static int CclGetParentCivilization(lua_State *l)
 }
 
 /**
-**  Get a civilization's species.
+**  Get a civilization's default color.
+**
+**  @param l  Lua state.
+*/
+static int CclGetCivilizationDefaultColor(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	lua_pop(l, 1);
+
+	lua_pushstring(l, PlayerRaces.DefaultColor[civilization].c_str());
+	return 1;
+}
+
+/**
+**  Get a civilization's unit type/upgrade of a certain class.
 **
 **  @param l  Lua state.
 */
@@ -2785,6 +2805,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "IsCivilizationPlayable", CclIsCivilizationPlayable);
 	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
 	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
+	lua_register(Lua, "GetCivilizationDefaultColor", CclGetCivilizationDefaultColor);
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);

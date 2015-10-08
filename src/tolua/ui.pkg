@@ -365,6 +365,7 @@ class ImageButton : public Button
 	void setFrameImage(CGraphic *image);
 	void setPressedFrameImage(CGraphic *image);
 	void setTransparency(int alpha);
+	void setImageOrigin(int x, int y);
 	//Wyrmgus end
 };
 

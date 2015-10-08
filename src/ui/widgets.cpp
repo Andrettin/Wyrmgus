@@ -564,6 +564,10 @@ ImageButton::ImageButton() :
 	//Wyrmgus end
 {
 	setForegroundColor(0xffffff);
+	//Wyrmgus start
+	ImageOrigin.x = 0;
+	ImageOrigin.y = 0;
+	//Wyrmgus end
 }
 
 /**
@@ -579,6 +583,10 @@ ImageButton::ImageButton(const std::string &caption) :
 	//Wyrmgus end
 {
 	setForegroundColor(0xffffff);
+	//Wyrmgus start
+	ImageOrigin.x = 0;
+	ImageOrigin.y = 0;
+	//Wyrmgus end
 }
 
 /**
@@ -636,7 +644,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 				}
 			#endif
 			}
-			graphics->drawImage(img, 0, 0, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
+			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
 								img->getWidth() - 1, img->getHeight() - 1);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
@@ -658,7 +666,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 				}
 			#endif
 			}
-			graphics->drawImage(img, 0, 0, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
+			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
 								img->getWidth(), img->getHeight());
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
@@ -677,7 +685,7 @@ void ImageButton::draw(gcn::Graphics *graphics)
 			}
 		#endif
 		}
-		graphics->drawImage(img, 0, 0, 0, 0,
+		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
 							img->getWidth(), img->getHeight());
 		if (Transparency) {
 		#if defined(USE_OPENGL) || defined(USE_GLES)

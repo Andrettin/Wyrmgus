@@ -360,6 +360,7 @@ void PlayerRace::Clean()
 		}
 		this->Playable[i] = false;
 		this->Species[i].clear();
+		this->DefaultColor[i].clear();
 		this->ParentCivilization[i] = -1;
 		for (unsigned int j = 0; j < FactionMax; ++j) {
 			if (this->Factions[i][j]) {

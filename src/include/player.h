@@ -600,7 +600,8 @@ public:
 	int CivilizationClassUnitTypes[MAX_RACES][UnitTypeClassMax];		/// the unit type slot of a particular class for a particular civilization
 	int CivilizationClassUpgrades[MAX_RACES][UnitTypeClassMax];			/// the upgrade slot of a particular class for a particular civilization
 	bool Playable[MAX_RACES];											/// civilization is playable?
-	std::string Species[MAX_RACES];										/// civilization's parent civilization, if any
+	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
+	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
 	CFaction *Factions[MAX_RACES][FactionMax];    						/// factions
 	std::string PersonalNames[MAX_RACES][PersonalNameMax];				/// personal names

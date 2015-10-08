@@ -124,6 +124,7 @@ public:
 	void setPressedFrameImage(gcn::Image *image) { pressedframeImage = image; }
 	virtual void setPosition(int x, int y);
 	void setTransparency(int alpha) { Transparency = alpha; }
+	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
 	//Wyrmgus end
 
 	gcn::Image *normalImage;
@@ -133,6 +134,7 @@ public:
 	gcn::Image *frameImage;
 	gcn::Image *pressedframeImage;
 	int Transparency;
+	Vec2i ImageOrigin;
 	//Wyrmgus end
 };
 
