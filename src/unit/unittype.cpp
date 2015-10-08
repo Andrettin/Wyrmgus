@@ -1304,13 +1304,19 @@ CUnitType *UnitTypeByIdent(const std::string &ident)
 	if (ret != UnitTypeMap.end()) {
 		return (*ret).second;
 	}
+	//Wyrmgus start
+//	fprintf(stderr, "Unit type \"%s\" does not exist.\n", ident.c_str());
+	//Wyrmgus end
 	return NULL;
 }
 
 //Wyrmgus start
 int GetUnitTypeClassIndexByName(const std::string &class_name)
 {
-	return UnitTypeClassStringToIndex[class_name];
+	if (UnitTypeClassStringToIndex.find(class_name) != UnitTypeClassStringToIndex.end()) {
+		return UnitTypeClassStringToIndex[class_name];
+	}
+	return -1;
 }
 
 void SetUnitTypeClassStringToIndex(std::string class_name, int class_id)
@@ -1320,7 +1326,10 @@ void SetUnitTypeClassStringToIndex(std::string class_name, int class_id)
 
 int GetUpgradeClassIndexByName(const std::string &class_name)
 {
-	return UpgradeClassStringToIndex[class_name];
+	if (UpgradeClassStringToIndex.find(class_name) != UpgradeClassStringToIndex.end()) {
+		return UpgradeClassStringToIndex[class_name];
+	}
+	return -1;
 }
 
 void SetUpgradeClassStringToIndex(std::string class_name, int class_id)

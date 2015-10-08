@@ -1164,7 +1164,7 @@ void Convert0ADMap(const std::string &mapname)
 					units_players.push_back(15);
 				}
 				
-				if (!units_unit_types[units_unit_types.size() - 1].empty() && units_unit_types[units_unit_types.size() - 1] != "Tree" && units_unit_types[units_unit_types.size() - 1] != "Rock" && UnitTypes[UnitTypeIdByIdent(units_unit_types[units_unit_types.size() - 1])]->Class == "town-hall" && units_players[units_players.size() - 1] != 15) { //if this is a town hall building not belonging to the neutral player, set its owner's starting position to it
+				if (!units_unit_types[units_unit_types.size() - 1].empty() && units_unit_types[units_unit_types.size() - 1] != "Tree" && units_unit_types[units_unit_types.size() - 1] != "Rock" && units_unit_types[units_unit_types.size() - 1] != "Gold" && UnitTypes[UnitTypeIdByIdent(units_unit_types[units_unit_types.size() - 1])]->Class == "town-hall" && units_players[units_players.size() - 1] != 15) { //if this is a town hall building not belonging to the neutral player, set its owner's starting position to it
 					int start_point_player = units_players[units_players.size() - 1];
 					player_start_points[start_point_player].x = x_position;
 					player_start_points[start_point_player].y = y_position;
@@ -1217,6 +1217,15 @@ void Convert0ADMap(const std::string &mapname)
 			}
 			if ((units_positions[i].x + 1) < (map_size * 16) && (units_positions[i].y + 1) < (map_size * 16) && (RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] == "Land" || RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] == "Rough")) {
 				RawTiles[units_positions[i].x + 1][units_positions[i].y + 1] = "Rock";
+			}
+		} else if (units_unit_types[i] == "Gold") {
+			units_unit_types.push_back("unit-gold-deposit");
+			units_positions.push_back(units_positions[i]);
+			units_players.push_back(units_players[i]);
+			for (int j = 0; j < 5; ++j) {
+				units_unit_types.push_back("unit-gold-rock");
+				units_positions.push_back(units_positions[i]);
+				units_players.push_back(units_players[i]);
 			}
 		} else if (!units_unit_types[i].empty()) {
 			int unit_type_id = UnitTypeIdByIdent(units_unit_types[i]);
@@ -1318,7 +1327,7 @@ void Convert0ADMap(const std::string &mapname)
 		}
 					  
 		for (size_t i = 0; i < units_unit_types.size(); ++i) {
-			if (!units_unit_types[i].empty() && units_unit_types[i] != "Tree" && units_unit_types[i] != "Rock") {
+			if (!units_unit_types[i].empty() && units_unit_types[i] != "Tree" && units_unit_types[i] != "Rock" && units_unit_types[i] != "Gold") {
 				int unit_x_offset = - ((UnitTypes[UnitTypeIdByIdent(units_unit_types[i])]->TileWidth - 1) / 2); //0 AD units' position is mapped to their center
 				int unit_y_offset = - ((UnitTypes[UnitTypeIdByIdent(units_unit_types[i])]->TileHeight - 1) / 2);
 				f->printf("unit = CreateUnit(\"%s\", %d, {%d, %d})\n",

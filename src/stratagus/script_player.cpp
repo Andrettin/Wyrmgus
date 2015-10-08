@@ -2101,7 +2101,7 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 		
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
 		class_id = GetUpgradeClassIndexByName(class_name);
-		if (class_id != -1) {
+		if (civilization != -1 && class_id != -1) {
 			int upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(civilization, class_id);
 			if (upgrade_id != -1) {
 				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
