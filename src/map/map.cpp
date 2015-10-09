@@ -1273,7 +1273,7 @@ void Convert0ADMap(const std::string &mapname)
 		f_smp->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
 				  map_title.c_str(), player_quantity, map_size * 16, map_size * 16, 1);
 	} catch (const FileException &) {
-		fprintf(stderr, "Error: cannot write the map presentation\n");
+		fprintf(stderr, "Couldn't write the map presentation: '%s'\n", smp_filename.c_str());
 		delete f_smp;
 		return;
 	}
@@ -1339,7 +1339,7 @@ void Convert0ADMap(const std::string &mapname)
 
 		f->printf("\n");
 	} catch (const FileException &) {
-		fprintf(stderr, "Couldn't save map setup : '%s' \n", sms_filename);
+		fprintf(stderr, "Couldn't write the map setup: '%s'\n", sms_filename.c_str());
 		delete f;
 		return;
 	}
