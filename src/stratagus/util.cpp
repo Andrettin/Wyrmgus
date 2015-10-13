@@ -549,6 +549,8 @@ std::string FindAndReplaceStringBeginning(std::string text, const std::string& f
 
 std::string TransliterateText(std::string text) //convert special characters into ones more legible for English-speakers
 {
+	text = FindAndReplaceString(text, "Ä", "A");
+	text = FindAndReplaceString(text, "ä", "a");
 	text = FindAndReplaceString(text, "Ā", "A");
 	text = FindAndReplaceString(text, "ā", "a");
 	text = FindAndReplaceString(text, "Â", "A");
@@ -569,6 +571,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ê", "e");
 	text = FindAndReplaceString(text, "Ě", "E");
 	text = FindAndReplaceString(text, "ě", "e");
+	text = FindAndReplaceString(text, "Í", "I");
+	text = FindAndReplaceString(text, "í", "i");
 	text = FindAndReplaceString(text, "Ī", "I");
 	text = FindAndReplaceString(text, "ī", "i");
 	text = FindAndReplaceString(text, "Î", "I");
@@ -577,6 +581,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ĭ", "i");
 	text = FindAndReplaceString(text, "Ī̆", "I");
 	text = FindAndReplaceString(text, "ī̆", "i");
+	text = FindAndReplaceString(text, "Ö", "O");
+	text = FindAndReplaceString(text, "ö", "o");
+	text = FindAndReplaceString(text, "Ó", "O");
+	text = FindAndReplaceString(text, "ó", "o");
 	text = FindAndReplaceString(text, "Ō", "O");
 	text = FindAndReplaceString(text, "ō", "o");
 	text = FindAndReplaceString(text, "Ô", "O");
@@ -592,6 +600,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ț", "t");
 	text = FindAndReplaceString(text, "Þ", "Th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "þ", "th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "Ü", "U");
+	text = FindAndReplaceString(text, "ü", "u");
 	text = FindAndReplaceString(text, "Ū", "U");
 	text = FindAndReplaceString(text, "ū", "u");
 	text = FindAndReplaceString(text, "Û", "U");

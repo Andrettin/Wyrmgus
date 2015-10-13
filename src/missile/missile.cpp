@@ -374,6 +374,11 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 			damage_modifier += attacker.Variable[BONUSAGAINSTBUILDINGS_INDEX].Value;
 		}
 		
+		//add bonus against air, if applicable
+		if (attacker.Variable[BONUSAGAINSTAIR_INDEX].Value > 0 && goal->Type->BoolFlag[AIRUNIT_INDEX].value) {
+			damage_modifier += attacker.Variable[BONUSAGAINSTAIR_INDEX].Value;
+		}
+		
 		//add bonus against giants, if applicable
 		if (attacker.Variable[BONUSAGAINSTGIANTS_INDEX].Value > 0 && goal->Type->BoolFlag[GIANT_INDEX].value) {
 			damage_modifier += attacker.Variable[BONUSAGAINSTGIANTS_INDEX].Value;

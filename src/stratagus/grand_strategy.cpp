@@ -3430,7 +3430,7 @@ void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, st
 	
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	if (civilization != -1) {
-		GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = cultural_name;
+		GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = TransliterateText(cultural_name);
 	}
 }
 
@@ -3589,7 +3589,7 @@ void SetRiverCulturalName(std::string river_name, std::string civilization_name,
 	if (river_id != -1 && GrandStrategyGame.Rivers[river_id]) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
-			GrandStrategyGame.Rivers[river_id]->CulturalNames[civilization] = cultural_name;
+			GrandStrategyGame.Rivers[river_id]->CulturalNames[civilization] = TransliterateText(cultural_name);
 		}
 	}
 }
@@ -4133,7 +4133,7 @@ void SetProvinceSettlementName(std::string province_name, std::string settlement
 	int province_id = GetProvinceId(province_name);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->SettlementName = settlement_name;
+		GrandStrategyGame.Provinces[province_id]->SettlementName = TransliterateText(settlement_name);
 	}
 }
 
@@ -4178,7 +4178,7 @@ void SetProvinceCulturalName(std::string province_name, std::string civilization
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
-			GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization] = province_cultural_name;
+			GrandStrategyGame.Provinces[province_id]->CulturalNames[civilization] = TransliterateText(province_cultural_name);
 		}
 	}
 }
@@ -4192,7 +4192,7 @@ void SetProvinceFactionCulturalName(std::string province_name, std::string civil
 		if (civilization != -1) {
 			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 			if (faction != -1) {
-				GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[civilization][faction] = province_cultural_name;
+				GrandStrategyGame.Provinces[province_id]->FactionCulturalNames[civilization][faction] = TransliterateText(province_cultural_name);
 			}
 		}
 	}
@@ -4205,7 +4205,7 @@ void SetProvinceCulturalSettlementName(std::string province_name, std::string ci
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
-			GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[civilization] = province_cultural_name;
+			GrandStrategyGame.Provinces[province_id]->CulturalSettlementNames[civilization] = TransliterateText(province_cultural_name);
 		}
 	}
 }
@@ -4219,7 +4219,7 @@ void SetProvinceFactionCulturalSettlementName(std::string province_name, std::st
 		if (civilization != -1) {
 			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 			if (faction != -1) {
-				GrandStrategyGame.Provinces[province_id]->FactionCulturalSettlementNames[civilization][faction] = province_cultural_name;
+				GrandStrategyGame.Provinces[province_id]->FactionCulturalSettlementNames[civilization][faction] = TransliterateText(province_cultural_name);
 			}
 		}
 	}
