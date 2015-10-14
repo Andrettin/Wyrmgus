@@ -3489,7 +3489,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		}
 		LetUnitDie(target);
 		//Wyrmgus start
-		if (attacker->Type->BoolFlag[PREDATOR_INDEX].value) { //stop predators so that they can consume the corpse
+		if (attacker && attacker->Type->BoolFlag[PREDATOR_INDEX].value) { //stop predators so that they can consume the corpse
 			CommandStopUnit(*attacker);
 		}
 		//Wyrmgus end
