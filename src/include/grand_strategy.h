@@ -364,6 +364,7 @@ public:
 	CGraphic *PathwayGraphics[MaxPathways][MaxDirections];
 	CPlayerColorGraphic *SettlementGraphics[MAX_RACES];
 	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
+	CPlayerColorGraphic *SettlementMasonryGraphics[MAX_RACES];
 	CPlayerColorGraphic *NationalBorderGraphics[MaxDirections];	///one for each direction
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
