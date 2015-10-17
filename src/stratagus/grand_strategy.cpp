@@ -141,12 +141,12 @@ void CGrandStrategyGame::DrawMap()
 	
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile) {
-				if (GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->BaseTile != -1 && GrandStrategyGame.WorldMapTiles[x][y]->BaseTile) {
-					GrandStrategyGame.WorldMapTiles[x][y]->BaseTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+			if (this->WorldMapTiles[x][y]->GraphicTile) {
+				if (this->TerrainTypes[this->WorldMapTiles[x][y]->Terrain]->BaseTile != -1 && this->WorldMapTiles[x][y]->BaseTile) {
+					this->WorldMapTiles[x][y]->BaseTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 				}
 				
-				GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+				this->WorldMapTiles[x][y]->GraphicTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 			}
 		}
 	}
@@ -154,74 +154,74 @@ void CGrandStrategyGame::DrawMap()
 	// draw rivers (has to be drawn separately so that they appear over the terrain of the adjacent tiles they go over)
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
+			if (this->WorldMapTiles[x][y]->Terrain != -1) {
 				for (int i = 0; i < MaxDirections; ++i) {
-					if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
+					if (this->WorldMapTiles[x][y]->River[i] != -1) {
 						//only draw diagonal directions if inner
-						if (i == Northeast && (GrandStrategyGame.WorldMapTiles[x][y]->River[North] != -1 || GrandStrategyGame.WorldMapTiles[x][y]->River[East] != -1)) {
+						if (i == Northeast && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[East] != -1)) {
 							continue;
-						} else if (i == Southeast && (GrandStrategyGame.WorldMapTiles[x][y]->River[South] != -1 || GrandStrategyGame.WorldMapTiles[x][y]->River[East] != -1)) {
+						} else if (i == Southeast && (this->WorldMapTiles[x][y]->River[South] != -1 || this->WorldMapTiles[x][y]->River[East] != -1)) {
 							continue;
-						} else if (i == Southwest && (GrandStrategyGame.WorldMapTiles[x][y]->River[South] != -1 || GrandStrategyGame.WorldMapTiles[x][y]->River[West] != -1)) {
+						} else if (i == Southwest && (this->WorldMapTiles[x][y]->River[South] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
 							continue;
-						} else if (i == Northwest && (GrandStrategyGame.WorldMapTiles[x][y]->River[North] != -1 || GrandStrategyGame.WorldMapTiles[x][y]->River[West] != -1)) {
+						} else if (i == Northwest && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
 							continue;
 						}
 						
-						if (GrandStrategyGame.WorldMapTiles[x][y]->Province != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Water) { //water tiles always use rivermouth graphics if they have a river
+						if (this->WorldMapTiles[x][y]->Province != -1 && this->Provinces[this->WorldMapTiles[x][y]->Province]->Water) { //water tiles always use rivermouth graphics if they have a river
 							//see from which direction the rivermouth comes
 							bool flipped = false;
 							if (i == North) {
-								if (GrandStrategyGame.WorldMapTiles[x - 1][y] && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[North] != -1) {
+								if (this->WorldMapTiles[x - 1][y] && this->WorldMapTiles[x - 1][y]->River[North] != -1) {
 									flipped = true;
 								}
 							} else if (i == East) {
-								if (GrandStrategyGame.WorldMapTiles[x][y - 1] && GrandStrategyGame.WorldMapTiles[x][y - 1]->River[East] != -1) {
+								if (this->WorldMapTiles[x][y - 1] && this->WorldMapTiles[x][y - 1]->River[East] != -1) {
 									flipped = true;
 								}
 							} else if (i == South) {
-								if (GrandStrategyGame.WorldMapTiles[x - 1][y] && GrandStrategyGame.WorldMapTiles[x - 1][y]->River[South] != -1) {
+								if (this->WorldMapTiles[x - 1][y] && this->WorldMapTiles[x - 1][y]->River[South] != -1) {
 									flipped = true;
 								}
 							} else if (i == West) {
-								if (GrandStrategyGame.WorldMapTiles[x][y - 1] && GrandStrategyGame.WorldMapTiles[x][y - 1]->River[West] != -1) {
+								if (this->WorldMapTiles[x][y - 1] && this->WorldMapTiles[x][y - 1]->River[West] != -1) {
 									flipped = true;
 								}
 							}
 							
 							if (flipped) {
-								GrandStrategyGame.RivermouthGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+								this->RivermouthGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 							} else {
-								GrandStrategyGame.RivermouthGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+								this->RivermouthGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 							}
-						} else if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] != -1) {
+						} else if (this->WorldMapTiles[x][y]->Riverhead[i] != -1) {
 							//see to which direction the riverhead runs
 							bool flipped = false;
 							if (i == North) {
-								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] != -1) {
+								if (this->WorldMapTiles[x][y]->River[Northwest] != -1) {
 									flipped = true;
 								}
 							} else if (i == East) {
-								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northeast] != -1) {
+								if (this->WorldMapTiles[x][y]->River[Northeast] != -1) {
 									flipped = true;
 								}
 							} else if (i == South) {
-								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Southwest] != -1) {
+								if (this->WorldMapTiles[x][y]->River[Southwest] != -1) {
 									flipped = true;
 								}
 							} else if (i == West) {
-								if (GrandStrategyGame.WorldMapTiles[x][y]->River[Northwest] != -1) {
+								if (this->WorldMapTiles[x][y]->River[Northwest] != -1) {
 									flipped = true;
 								}
 							}
 							
 							if (flipped) {
-								GrandStrategyGame.RiverheadGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+								this->RiverheadGraphics[i][1]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 							} else {
-								GrandStrategyGame.RiverheadGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+								this->RiverheadGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 							}
 						} else {
-							GrandStrategyGame.RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+							this->RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 						}
 					}
 				}
@@ -232,10 +232,10 @@ void CGrandStrategyGame::DrawMap()
 	// draw pathways (has to be drawn separately so that they appear over the terrain of the adjacent tiles they go over)
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
+			if (this->WorldMapTiles[x][y]->Terrain != -1) {
 				for (int i = 0; i < MaxDirections; ++i) {
-					if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] != -1) {
-						GrandStrategyGame.PathwayGraphics[GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i]][i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					if (this->WorldMapTiles[x][y]->Pathway[i] != -1) {
+						this->PathwayGraphics[this->WorldMapTiles[x][y]->Pathway[i]][i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 				}
 			}
@@ -245,44 +245,49 @@ void CGrandStrategyGame::DrawMap()
 	//draw settlement and resource graphics after rivers and pathways so that they appear over them
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
-				int player_color = GrandStrategyGame.WorldMapTiles[x][y]->Province != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Owner != NULL ? PlayerRaces.Factions[GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Owner->Civilization][GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Owner->Faction]->Color : 15;
+			if (this->WorldMapTiles[x][y]->Terrain != -1) {
+				int player_color = this->WorldMapTiles[x][y]->Province != -1 && this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner != NULL ? PlayerRaces.Factions[this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner->Civilization][this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner->Faction]->Color : 15;
 				
-				if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
-					GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphics->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+				int province_id = this->WorldMapTiles[x][y]->Province;
+				
+				if (this->WorldMapTiles[x][y]->Resource != -1 && this->WorldMapTiles[x][y]->ResourceProspected) {
+					this->WorldMapTiles[x][y]->ResourceBuildingGraphics->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					
-					if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor != NULL) {
-						GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					if (this->WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor != NULL) {
+						this->WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					}
+					
+					if (!this->WorldMapTiles[x][y]->Worked && province_id != -1 && this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner == this->PlayerFaction) {
+						this->SymbolResourceNotWorked->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 				}
 				
-				int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 				if (province_id != -1) {
-					int civilization = GrandStrategyGame.Provinces[province_id]->Civilization;
-					if (civilization != -1 && GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
+					int civilization = this->Provinces[province_id]->Civilization;
+					if (civilization != -1 && this->Provinces[province_id]->Owner != NULL) {
 						//draw the province's settlement
-						if (GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
-							if (GrandStrategyGame.Provinces[province_id]->Owner->HasTechnologyClass("masonry") && GrandStrategyGame.SettlementMasonryGraphics[civilization]) {
-								GrandStrategyGame.SettlementMasonryGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+						if (this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
+							if (this->Provinces[province_id]->Owner->HasTechnologyClass("masonry") && this->SettlementMasonryGraphics[civilization]) {
+								this->SettlementMasonryGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 							} else {
-								GrandStrategyGame.SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+								this->SettlementGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 								
-								if (GrandStrategyGame.BarracksGraphics[civilization] && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("barracks")) {
-									GrandStrategyGame.BarracksGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+								if (this->BarracksGraphics[civilization] && this->Provinces[province_id]->HasBuildingClass("barracks")) {
+									this->BarracksGraphics[civilization]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 								}
 							}
 						}
 					}
 					
 					//draw symbol that the province is being attacked by the human player, if that is the case
-					if (GrandStrategyGame.Provinces[province_id]->AttackedBy != NULL && GrandStrategyGame.Provinces[province_id]->AttackedBy == GrandStrategyGame.PlayerFaction && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
-						GrandStrategyGame.SymbolAttack->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
-					} else if (GrandStrategyGame.Provinces[province_id]->Movement && GrandStrategyGame.Provinces[province_id]->Owner != NULL && GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
-						GrandStrategyGame.SymbolMove->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					if (this->Provinces[province_id]->AttackedBy != NULL && this->Provinces[province_id]->AttackedBy == this->PlayerFaction && this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
+						this->SymbolAttack->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					} else if (this->Provinces[province_id]->Movement && this->Provinces[province_id]->Owner != NULL && this->Provinces[province_id]->Owner == this->PlayerFaction && this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
+						this->SymbolMove->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 					
-					if (GrandStrategyGame.Provinces[province_id]->Heroes.size() > 0 && GrandStrategyGame.Provinces[province_id]->Owner != NULL && GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y) {
-						GrandStrategyGame.SymbolHero->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					if (this->Provinces[province_id]->Heroes.size() > 0 && this->Provinces[province_id]->Owner != NULL && this->Provinces[province_id]->Owner == this->PlayerFaction && this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
+						this->SymbolHero->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 				}
 			}
@@ -292,18 +297,18 @@ void CGrandStrategyGame::DrawMap()
 	//draw the tile borders (they need to be drawn here, so that they appear over all tiles, as they go beyond their own tile)
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
+			int province_id = this->WorldMapTiles[x][y]->Province;
 			if (province_id != -1) {
 				for (int i = 0; i < MaxDirections; ++i) {
-					if (GrandStrategyGame.WorldMapTiles[x][y]->Borders[i]) {
+					if (this->WorldMapTiles[x][y]->Borders[i]) {
 						//only draw diagonal directions if inner
-						if (i == Northeast && (GrandStrategyGame.WorldMapTiles[x][y]->Borders[North] || GrandStrategyGame.WorldMapTiles[x][y]->Borders[East])) {
+						if (i == Northeast && (this->WorldMapTiles[x][y]->Borders[North] || this->WorldMapTiles[x][y]->Borders[East])) {
 							continue;
-						} else if (i == Southeast && (GrandStrategyGame.WorldMapTiles[x][y]->Borders[South] || GrandStrategyGame.WorldMapTiles[x][y]->Borders[East])) {
+						} else if (i == Southeast && (this->WorldMapTiles[x][y]->Borders[South] || this->WorldMapTiles[x][y]->Borders[East])) {
 							continue;
-						} else if (i == Southwest && (GrandStrategyGame.WorldMapTiles[x][y]->Borders[South] || GrandStrategyGame.WorldMapTiles[x][y]->Borders[West])) {
+						} else if (i == Southwest && (this->WorldMapTiles[x][y]->Borders[South] || this->WorldMapTiles[x][y]->Borders[West])) {
 							continue;
-						} else if (i == Northwest && (GrandStrategyGame.WorldMapTiles[x][y]->Borders[North] || GrandStrategyGame.WorldMapTiles[x][y]->Borders[West])) {
+						} else if (i == Northwest && (this->WorldMapTiles[x][y]->Borders[North] || this->WorldMapTiles[x][y]->Borders[West])) {
 							continue;
 						}
 						int sub_x = 0;
@@ -331,21 +336,21 @@ void CGrandStrategyGame::DrawMap()
 						}
 						
 						int second_province_id = -1;
-						if (GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]) {
-							second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
+						if (this->WorldMapTiles[x + sub_x][y + sub_y]) {
+							second_province_id = this->WorldMapTiles[x + sub_x][y + sub_y]->Province;
 						}
 						
-						if (second_province_id == -1 || (GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.Provinces[second_province_id]->Owner)) { // is not a national border
-							GrandStrategyGame.BorderGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+						if (second_province_id == -1 || (this->Provinces[province_id]->Owner == this->Provinces[second_province_id]->Owner)) { // is not a national border
+							this->BorderGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 						} else {
 							int player_color;
-							if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
-								player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
+							if (this->Provinces[province_id]->Owner != NULL) {
+								player_color = PlayerRaces.Factions[this->Provinces[province_id]->Owner->Civilization][this->Provinces[province_id]->Owner->Faction]->Color;
 							} else {
 								player_color = 15;
 							}
 										
-							GrandStrategyGame.NationalBorderGraphics[i]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+							this->NationalBorderGraphics[i]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 						}
 					}
 				}
@@ -354,9 +359,9 @@ void CGrandStrategyGame::DrawMap()
 	}
 	
 	//if is clicking on a tile, draw a square on its borders
-	if (!GrandStrategyGamePaused && UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1 && (MouseButtons & LeftButton)) {
-		int tile_screen_x = ((GrandStrategyGame.GetTileUnderCursor().x - WorldMapOffsetX) * 64) + UI.MapArea.X + width_indent;
-		int tile_screen_y = ((GrandStrategyGame.GetTileUnderCursor().y - WorldMapOffsetY) * 64) + UI.MapArea.Y + height_indent;
+	if (!GrandStrategyGamePaused && UI.MapArea.Contains(CursorScreenPos) && this->WorldMapTiles[this->GetTileUnderCursor().x][this->GetTileUnderCursor().y]->Terrain != -1 && (MouseButtons & LeftButton)) {
+		int tile_screen_x = ((this->GetTileUnderCursor().x - WorldMapOffsetX) * 64) + UI.MapArea.X + width_indent;
+		int tile_screen_y = ((this->GetTileUnderCursor().y - WorldMapOffsetY) * 64) + UI.MapArea.Y + height_indent;
 			
 //		clamp(&tile_screen_x, 0, Video.Width);
 //		clamp(&tile_screen_y, 0, Video.Height);
@@ -367,8 +372,8 @@ void CGrandStrategyGame::DrawMap()
 	//draw fog over terra incognita
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain == -1) {
-				GrandStrategyGame.FogTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 16, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 16, true);
+			if (this->WorldMapTiles[x][y]->Terrain == -1) {
+				this->FogTile->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 16, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 16, true);
 			}
 		}
 	}
@@ -501,6 +506,10 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		tile_tooltip += ")";
 	} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
+		if (!GrandStrategyGame.WorldMapTiles[x][y]->Worked && province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.PlayerFaction) {
+			tile_tooltip += "Unused ";
+		}
+		
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == GoldCost) {
 			tile_tooltip += "Gold Mine";
 		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == WoodCost) {
@@ -1790,6 +1799,20 @@ void CProvince::AllocateLaborToResource(int resource)
 		this->Labor -= employment_change * DefaultResourceLaborInputs[resource];
 		ProductionCapacityFulfilled[resource] += employment_change;
 		this->CalculateIncome(resource);
+		
+		//set new worked tiles
+		int new_worked_tiles = employment_change;
+		for (int i = 0; i < ProvinceTileMax; ++i) {
+			int x = this->ResourceTiles[resource][i].x;
+			int y = this->ResourceTiles[resource][i].y;
+			if (x == -1 || y == -1 || new_worked_tiles == 0) {
+				break;
+			}
+			if (GrandStrategyGame.WorldMapTiles[x][y] && GrandStrategyGame.WorldMapTiles[x][y]->Worked == false) {
+				GrandStrategyGame.WorldMapTiles[x][y]->Worked = true;
+				new_worked_tiles -= 1;
+			}
+		}	
 	}
 	
 	//recalculate food consumption (workers employed in producing food don't need to consume food)
@@ -1803,6 +1826,17 @@ void CProvince::ReallocateLabor()
 {
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->ProductionCapacityFulfilled[i] = 0;
+		
+		for (int j = 0; j < ProvinceTileMax; ++j) {
+			int x = this->ResourceTiles[i][j].x;
+			int y = this->ResourceTiles[i][j].y;
+			if (x == -1 || y == -1) {
+				break;
+			}
+			if (GrandStrategyGame.WorldMapTiles[x][y]) {
+				GrandStrategyGame.WorldMapTiles[x][y]->Worked = false;
+			}
+		}	
 	}
 	this->Labor = this->TotalWorkers * 100;
 	this->AllocateLabor();
@@ -4454,6 +4488,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Port = false;
+				GrandStrategyGame.WorldMapTiles[x][y]->Worked = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
 				for (int i = 0; i < MAX_RACES; ++i) {
 					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i] = "";
@@ -4892,6 +4927,14 @@ void InitializeGrandStrategyGame()
 		hero_symbol_graphic->Load();
 	}
 	GrandStrategyGame.SymbolHero = CGraphic::Get(hero_symbol_filename);
+	
+	//load the resource not worked symbol
+	std::string resource_not_worked_symbol_filename = "tilesets/world/sites/resource_not_worked.png";
+	if (CGraphic::Get(resource_not_worked_symbol_filename) == NULL) {
+		CGraphic *resource_not_worked_symbol_graphic = CGraphic::New(resource_not_worked_symbol_filename, 64, 64);
+		resource_not_worked_symbol_graphic->Load();
+	}
+	GrandStrategyGame.SymbolResourceNotWorked = CGraphic::Get(resource_not_worked_symbol_filename);
 	
 	//create grand strategy faction instances for all defined factions
 	for (int i = 0; i < MAX_RACES; ++i) {

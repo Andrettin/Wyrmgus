@@ -94,7 +94,7 @@ class WorldMapTile
 public:
 	WorldMapTile() :
 		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
-		ResourceProspected(false), Port(false),
+		ResourceProspected(false), Port(false), Worked(false),
 		Position(-1, -1),
 		BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
@@ -118,6 +118,7 @@ public:
 	int Resource;							/// The tile's resource, if any
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	bool Port;								/// Whether the tile has a port
+	bool Worked;							/// Whether the tile is worked by a worker
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	Vec2i Position;							/// Position of the tile
 	CGraphic *BaseTile;
@@ -357,6 +358,7 @@ public:
 	CGraphic *SymbolMove;										///symbol that units are moving to the province (drawn at the settlement location)
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
 	CGraphic *SymbolHero;										///symbol that a hero is present in the province (drawn at the settlement location)
+	CGraphic *SymbolResourceNotWorked;							///symbol that a resource is not being worked
 	CGraphic *BorderGraphics[MaxDirections];					///one for each direction
 	CGraphic *RiverGraphics[MaxDirections];
 	CGraphic *RivermouthGraphics[MaxDirections][2];				///the two values are whether it is flipped or not
