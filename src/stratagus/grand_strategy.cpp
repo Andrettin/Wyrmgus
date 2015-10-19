@@ -5324,6 +5324,28 @@ bool GetProvinceWater(std::string province_name)
 	return GrandStrategyGame.Provinces[province_id]->Water;
 }
 
+int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food)
+{
+	int province_id = GetProvinceId(province_name);
+	
+	if (province_id == -1) {
+		return false;
+	}
+	
+	int food_capacity = 0;
+	food_capacity += GrandStrategyGame.Provinces[province_id]->ProductionCapacity[GrainCost];
+	food_capacity += GrandStrategyGame.Provinces[province_id]->ProductionCapacity[MushroomCost];
+	food_capacity += GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost];
+	
+	if (subtract_non_food) {
+		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[GoldCost];
+		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[WoodCost];
+		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[StoneCost];
+	}
+	
+	return food_capacity;
+}
+
 void SetPlayerFaction(std::string civilization_name, std::string faction_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());

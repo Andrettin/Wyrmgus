@@ -92,6 +92,7 @@ extern int GetProvinceTotalWorkers(std::string province_name);
 extern int GetProvinceMilitaryScore(std::string province_name, bool attacker, bool count_defenders);
 extern std::string GetProvinceOwner(std::string province_name);
 extern bool GetProvinceWater(std::string province_name);
+extern int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food = false);
 extern void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology);
 extern bool GetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident);
 extern void SetFactionGovernmentType(std::string civilization_name, std::string faction_name, std::string government_type_name);
