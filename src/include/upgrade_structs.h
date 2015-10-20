@@ -74,8 +74,8 @@ enum CostType {
 	ResearchCost,							/// research resource
 	PrestigeCost,							/// prestige resource
 	Cost9,									/// resource 9 (timber in Wyrmsun)
-	Cost10,									/// resource 10 (silver in Wyrmsun)
-	Cost11,									/// resource 11 (copper in Wyrmsun)
+	SilverCost,								/// silver resource
+	CopperCost,								/// copper resource
 	GrainCost,								/// grain resource
 	MushroomCost,							/// mushroom resource
 	LaborCost,								/// labor resource
