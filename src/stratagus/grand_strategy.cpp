@@ -3504,6 +3504,8 @@ void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string 
 	
 	int river_id = GetRiverId(river_name);
 	
+	return; //deactivate this for now, while there aren't proper graphics for the rivers
+	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
 		if (!GrandStrategyGame.WorldMapTiles[x][y]->IsWater()) {
@@ -3591,6 +3593,8 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 	
 	int river_id = GetRiverId(river_name);
 	
+	return; //deactivate this for now, while there aren't proper graphics for the rivers
+	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
 		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[North] = river_id;
@@ -3639,6 +3643,8 @@ void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::strin
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
+	return; //deactivate this for now, while there aren't proper graphics for the pathways
+	
 	int direction;
 	if (direction_name == "north") {
 		direction = North;
@@ -3680,6 +3686,8 @@ void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::strin
 void SetWorldMapTilePort(int x, int y, bool has_port)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	return; //deactivate this for now, while there aren't proper graphics for the ports
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->SetPort(has_port);
 }
