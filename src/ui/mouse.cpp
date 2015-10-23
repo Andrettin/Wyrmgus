@@ -2259,7 +2259,9 @@ void UIHandleButtonUp(unsigned button)
 					// FIXME: Not if, in input mode.
 					if (!IsNetworkGame()) {
 						GamePaused = true;
-						UI.StatusLine.Set(_("Game Paused"));
+						//Wyrmgus start
+//						UI.StatusLine.Set(_("Game Paused"));
+						//Wyrmgus end
 					}
 					if (ButtonUnderCursor == ButtonUnderMenu) {
 						if (UI.MenuButton.Callback) {
