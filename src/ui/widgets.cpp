@@ -113,7 +113,7 @@ static void MenuHandleMouseMove(const PixelPos &screenPos)
 static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 {
 	//Wyrmgus start
-	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { // if in grand strategy mode, scroll the map if a directional key was pressed
+	if (GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) { // if in grand strategy mode, scroll the map if a directional key was pressed
 		bool scrolled = false;
 		if (key == SDLK_UP || key == SDLK_KP8) {
 			if (WorldMapOffsetY > 0) {
@@ -199,7 +199,7 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 {
 	Input->processKeyRepeat();
 	//Wyrmgus start
-	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { // if in grand strategy mode, scroll the map if a directional key was pressed
+	if (GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) { // if in grand strategy mode, scroll the map if a directional key was pressed
 		bool scrolled = false;
 		if (key == SDLK_UP || key == SDLK_KP8) {
 			if (WorldMapOffsetY > 0) {
@@ -349,12 +349,12 @@ void DrawGuichanWidgets()
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		//Wyrmgus start
 //		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running);
-		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running && !GrandStrategy);
+		Gui->setUseDirtyDrawing(!UseOpenGL && !GameRunning && !Editor.Running && (!GrandStrategy || GrandStrategyGamePaused));
 		//Wyrmgus end
 #else
 		//Wyrmgus start
 //		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
-		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running && !GrandStrategy);
+		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running && (!GrandStrategy || GrandStrategyGamePaused);
 		//Wyrmgus end
 #endif
 		Gui->draw();
