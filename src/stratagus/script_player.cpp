@@ -2465,11 +2465,16 @@ static int CclGetPlayerData(lua_State *l)
 		return 1;
 	//Wyrmgus start
 	} else if (!strcmp(data, "Color")) {
+		bool found_color = false;
 		for (int i = 0; i < PlayerColorMax; ++i) {
 			if (PlayerColors[i][0] == p->Color) {
 				lua_pushstring(l, PlayerColorNames[i].c_str());
+				found_color = true;
 				break;
 			}		
+		}
+		if (!found_color) {
+			LuaError(l, "Player %d has no color." _C_ p->Index);
 		}
 		return 1;
 	//Wyrmgus end

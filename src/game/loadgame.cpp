@@ -224,6 +224,10 @@ void LoadGame(const std::string &filename)
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 	//Wyrmgus end
 	LoadFonts();
+	
+	//Wyrmgus start
+	InitPlayers();
+	//Wyrmgus end
 
 	LuaGarbageCollect();
 	InitUnitTypes(1);
