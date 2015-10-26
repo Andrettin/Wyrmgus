@@ -496,6 +496,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	std::string tile_tooltip;
 	
 	int province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
+	int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner != NULL && GrandStrategyGame.Provinces[province_id]->SettlementLocation.x == x && GrandStrategyGame.Provinces[province_id]->SettlementLocation.y == y && GrandStrategyGame.Provinces[province_id]->HasBuildingClass("town-hall")) {
 		tile_tooltip += "Settlement";
 		if (!GrandStrategyGame.Provinces[province_id]->GetCulturalSettlementName().empty()) {
@@ -505,25 +506,39 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		tile_tooltip += " (";
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		tile_tooltip += ")";
-	} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
+		if (GrandStrategyGame.Provinces[province_id]->ProductionCapacityFulfilled[FishCost] > 0 && GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.PlayerFaction) {
+			tile_tooltip += " (COST_";
+			tile_tooltip += std::to_string((long long) FishCost);
+			tile_tooltip += " ";
+			tile_tooltip += std::to_string((long long) GrandStrategyGame.Provinces[province_id]->Income[FishCost]);
+			tile_tooltip += ")";
+		}
+	} else if (res != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
 		if (!GrandStrategyGame.WorldMapTiles[x][y]->Worked && province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.PlayerFaction) {
 			tile_tooltip += "Unused ";
 		}
 		
-		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == GoldCost) {
+		if (res == GoldCost) {
 			tile_tooltip += "Gold Mine";
-		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == WoodCost) {
+		} else if (res == WoodCost) {
 			tile_tooltip += "Timber Lodge";
-		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == StoneCost) {
+		} else if (res == StoneCost) {
 			tile_tooltip += "Quarry";
-		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == GrainCost) {
+		} else if (res == GrainCost) {
 			tile_tooltip += "Grain Farm";
-		} else if (GrandStrategyGame.WorldMapTiles[x][y]->Resource == MushroomCost) {
+		} else if (res == MushroomCost) {
 			tile_tooltip += "Mushroom Farm";
 		}
 		tile_tooltip += " (";
 		tile_tooltip += GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
 		tile_tooltip += ")";
+		if (GrandStrategyGame.WorldMapTiles[x][y]->Worked && province_id != -1 && GrandStrategyGame.Provinces[province_id]->Owner == GrandStrategyGame.PlayerFaction) {
+			tile_tooltip += " (COST_";
+			tile_tooltip += std::to_string((long long) res);
+			tile_tooltip += " ";
+			tile_tooltip += std::to_string((long long) GrandStrategyGame.Provinces[province_id]->Income[res] / GrandStrategyGame.Provinces[province_id]->ProductionCapacityFulfilled[res]);
+			tile_tooltip += ")";
+		}
 	} else if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
 		if (!GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
 			tile_tooltip += GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName();

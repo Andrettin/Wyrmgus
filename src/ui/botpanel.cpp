@@ -781,7 +781,14 @@ void DrawGenericPopup(std::string popup_text, int x, int y)
 		std::string content_width_sub;
 		i = 1;
 		while (!(content_width_sub = GetLineFont(i++, popup_text, 0, &font)).empty()) {
-			content_width = std::max(content_width, font.getWidth(content_width_sub));
+			int line_width = font.getWidth(content_width_sub);
+			int cost_symbol_pos = content_width_sub.find("COST_", 0);
+			if (cost_symbol_pos != std::string::npos) {
+				int res = std::stoi(content_width_sub.substr(cost_symbol_pos + 5, content_width_sub.find(" ", cost_symbol_pos) - (cost_symbol_pos + 5) + 1));
+				line_width -= font.getWidth("COST_" + std::to_string((long long) res));
+				line_width += UI.Resources[res].G->Width;
+			}
+			content_width = std::max(content_width, line_width);
 		}
 	}
 	
@@ -854,7 +861,20 @@ void DrawGenericPopup(std::string popup_text, int x, int y)
 						 ? std::min(MaxWidth, popupWidth - 2 * MARGIN_X)
 						 : 0;
 	while ((sub = GetLineFont(++i, popup_text, width, &font)).length()) {
-		label.Draw(x, y_off, sub);
+		int cost_symbol_pos = sub.find("COST_", 0);
+		if (cost_symbol_pos != std::string::npos) {
+			int x_offset = 0;
+			int res = std::stoi(sub.substr(cost_symbol_pos + 5, sub.find(" ", cost_symbol_pos) - (cost_symbol_pos + 5) + 1));
+			std::string sub_first = sub.substr(0, cost_symbol_pos);
+			std::string sub_second = sub.substr(cost_symbol_pos + 5 + std::to_string((long long) res).length(), sub.length() - cost_symbol_pos - (5 + std::to_string((long long) res).length()));
+			label.Draw(x, y_off, sub_first);
+			x_offset += font.getWidth(sub_first);
+			UI.Resources[res].G->DrawFrameClip(UI.Resources[res].IconFrame, x + x_offset, y + ((font.getHeight() - UI.Resources[res].G->Height) / 2), true);
+			x_offset += UI.Resources[res].G->Width;
+			label.Draw(x + x_offset, y_off, sub_second);
+		} else {
+			label.Draw(x, y_off, sub);
+		}
 		y_off += font.Height() + 2;
 	}
 }
