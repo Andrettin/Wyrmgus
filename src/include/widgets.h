@@ -112,7 +112,12 @@ class ButtonWidget : public gcn::Button
 public:
 	explicit ButtonWidget(const std::string &caption) : Button(caption)
 	{
-		this->setHotKey(GetHotKey(caption));
+		//Wyrmgus start
+//		this->setHotKey(GetHotKey(caption));
+		if (!caption.empty()) {
+			this->setHotKey(GetHotKey(caption));
+		}
+		//Wyrmgus end
 	}
 };
 
