@@ -21,3 +21,7 @@ class CUpgrade
 	CIcon *Icon;
 };
 
+//Wyrmgus start
+extern int GetResourceIdByName(const char *resourceName);
+extern std::string GetResourceNameById(int resource_id);
+//Wyrmgus end

@@ -310,9 +310,20 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	}
 	if (unit != NULL) {
 		if (type.GivesResource) {
-			unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
-			unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
-			unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
+			//Wyrmgus start
+//			unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
+//			unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
+//			unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
+			if (type.StartingResources != 0) {
+				unit->ResourcesHeld = type.StartingResources;
+				unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
+				unit->Variable[GIVERESOURCE_INDEX].Max = type.StartingResources;
+			} else {
+				unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
+				unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
+				unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
+			}
+			//Wyrmgus end
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
 	} else {

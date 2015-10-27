@@ -631,6 +631,15 @@ int GetResourceIdByName(lua_State *l, const char *resourceName)
 }
 
 //Wyrmgus start
+std::string GetResourceNameById(int resource_id)
+{
+	if (resource_id > 0 && resource_id < MaxCosts) {
+		return DefaultResourceNames[resource_id];
+	} else {
+		return "";
+	}
+}
+
 std::string GetGovernmentTypeNameById(int government_type)
 {
 	if (government_type == GovernmentTypeMonarchy) {

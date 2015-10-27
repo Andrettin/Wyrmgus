@@ -173,6 +173,9 @@ extern int ResourceGrandStrategyBuildingTerrainSpecificGraphic[MaxCosts][WorldMa
 
 extern int GetResourceIdByName(const char *resourceName);
 extern int GetResourceIdByName(lua_State *l, const char *resourceName);
+//Wyrmgus start
+extern std::string GetResourceNameById(int resource_id);
+//Wyrmgus end
 
 //Wyrmgus start
 extern std::string GetGovernmentTypeNameById(int government_type);
