@@ -520,6 +520,10 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		
 		if (res == GoldCost) {
 			tile_tooltip += "Gold Mine";
+		} else if (res == SilverCost) {
+			tile_tooltip += "Silver Mine";
+		} else if (res == CopperCost) {
+			tile_tooltip += "Copper Mine";
 		} else if (res == WoodCost) {
 			tile_tooltip += "Timber Lodge";
 		} else if (res == StoneCost) {
@@ -663,7 +667,7 @@ void CGrandStrategyGame::DoTurn()
 			if (this->Factions[i][j]) {
 				if (this->Factions[i][j]->IsAlive()) {
 					for (int k = 0; k < MaxCosts; ++k) {
-						if (k == GrainCost || k == MushroomCost || k == FishCost) { //food resources are not added to the faction's storage, being stored at the province level instead
+						if (k == GrainCost || k == MushroomCost || k == FishCost || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
 							continue;
 						} else if (k == ResearchCost) {
 							this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->ProvinceCount;
@@ -825,7 +829,7 @@ void CGrandStrategyGame::DoTrade()
 					for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
 						int province_id = this->Factions[i][j]->OwnedProvinces[k];
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+							if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
 								continue;
 							}
 							
@@ -880,7 +884,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+				if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
 					continue;
 				}
 				
@@ -920,7 +924,7 @@ void CGrandStrategyGame::DoTrade()
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+							if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
 								continue;
 							}
 							
@@ -945,7 +949,7 @@ void CGrandStrategyGame::DoTrade()
 	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == GoldCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+		if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
 			continue;
 		}
 		
@@ -979,7 +983,7 @@ void CGrandStrategyGame::DoTrade()
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == GoldCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || i == GrainCost || i == MushroomCost || i == FishCost) {
+			if (i == GoldCost || i == SilverCost || i == CopperCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || i == GrainCost || i == MushroomCost || i == FishCost) {
 				continue;
 			}
 		
@@ -1788,8 +1792,10 @@ void CProvince::AllocateLabor()
 	resources_by_priority.push_back(MushroomCost);
 	resources_by_priority.push_back(FishCost);
 	resources_by_priority.push_back(GoldCost);
+	resources_by_priority.push_back(SilverCost);
 	resources_by_priority.push_back(WoodCost);
 	resources_by_priority.push_back(StoneCost);
+	resources_by_priority.push_back(CopperCost);
 
 	for (size_t i = 0; i < resources_by_priority.size(); ++i) {
 		this->AllocateLaborToResource(resources_by_priority[i]);
@@ -1869,6 +1875,11 @@ void CProvince::CalculateIncome(int resource)
 	}
 	
 	this->Owner->Income[resource] -= this->Income[resource]; //first, remove the old income from the owner's income
+	if (resource == SilverCost) { //silver and copper are converted to gold
+		this->Owner->Income[GoldCost] -= this->Income[resource] / 2;
+	} else if (resource == CopperCost) {
+		this->Owner->Income[GoldCost] -= this->Income[resource] / 4;
+	}
 	
 	int income = 0;
 	
@@ -1901,6 +1912,11 @@ void CProvince::CalculateIncome(int resource)
 	this->Income[resource] = income;
 	
 	this->Owner->Income[resource] += this->Income[resource]; //add the new income to the owner's income
+	if (resource == SilverCost) { //silver and copper are converted to gold
+		this->Owner->Income[GoldCost] += this->Income[resource] / 2;
+	} else if (resource == CopperCost) {
+		this->Owner->Income[GoldCost] += this->Income[resource] / 4;
+	}
 }
 
 void CProvince::CalculateIncomes()
@@ -5362,6 +5378,8 @@ int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food)
 	
 	if (subtract_non_food) {
 		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[GoldCost];
+		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[SilverCost];
+		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[CopperCost];
 		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[WoodCost];
 		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[StoneCost];
 	}
