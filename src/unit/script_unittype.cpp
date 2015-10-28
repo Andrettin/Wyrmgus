@@ -1321,7 +1321,15 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						res->ResourceId = CclGetResourceByName(l);
 						lua_pop(l, 1);
-						type->ResInfo[res->ResourceId] = res;
+						//Wyrmgus start
+//						type->ResInfo[res->ResourceId] = res;
+						//allow redefinition
+						if (type->ResInfo[res->ResourceId]) {
+							res = type->ResInfo[res->ResourceId];
+						} else {
+							type->ResInfo[res->ResourceId] = res;
+						}
+						//Wyrmgus end
 					} else if (!strcmp(value, "resource-step")) {
 						res->ResourceStep = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "final-resource")) {
@@ -1781,6 +1789,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->AutoBuildRate = parent_type->AutoBuildRate;
 			type->Animations = parent_type->Animations;
 			type->Sound = parent_type->Sound;
+			type->Harvester = parent_type->Harvester;
 			if (parent_type->CanCastSpell) {
 				type->CanCastSpell = new char[SpellTypeTable.size()];
 				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
@@ -1801,6 +1810,22 @@ static int CclDefineUnitType(lua_State *l)
 				type->DefaultStat.ImproveIncomes[i] = parent_type->DefaultStat.ImproveIncomes[i];
 				type->CanStore[i] = parent_type->CanStore[i];
 				type->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
+				
+				if (parent_type->ResInfo[i]) {
+					ResourceInfo *res = new ResourceInfo;
+					res->ResourceId = i;
+					type->ResInfo[i] = res;
+					res->ResourceStep = parent_type->ResInfo[i]->ResourceStep;
+					res->FinalResource = parent_type->ResInfo[i]->FinalResource;
+					res->FinalResourceConversionRate = parent_type->ResInfo[i]->FinalResourceConversionRate;
+					res->WaitAtResource = parent_type->ResInfo[i]->WaitAtResource;
+					res->WaitAtDepot = parent_type->ResInfo[i]->WaitAtDepot;
+					res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
+					res->LoseResources = parent_type->ResInfo[i]->LoseResources;
+					res->RefineryHarvester = parent_type->ResInfo[i]->RefineryHarvester;
+					res->FileWhenEmpty = parent_type->ResInfo[i]->FileWhenEmpty;
+					res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
+				}
 			}
 			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 				type->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
