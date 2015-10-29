@@ -701,11 +701,16 @@ int SaveStratagusMap(const std::string &mapName, CMap &map, int writeTerrain)
 		fprintf(stderr, "%s: invalid Stratagus map filename\n", mapName.c_str());
 	}
 
+	//Wyrmgus start
+	//don't write map previews
+	/*
 	char previewName[PATH_MAX];
 	strcpy_s(previewName, sizeof(previewName), mapName.c_str());
 	char *previewExtension = strstr(previewName, ".smp");
 	memcpy(previewExtension, ".png\0", 5 * sizeof(char));
 	WriteMapPreview(previewName, map);
+	*/
+	//Wyrmgus end
 
 	memcpy(setupExtension, ".sms", 4 * sizeof(char));
 	if (WriteMapPresentation(mapName, map) == -1) {
