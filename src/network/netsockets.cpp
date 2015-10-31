@@ -59,7 +59,10 @@ std::string CHost::toString() const
 
 bool CHost::isValid() const
 {
-	return ip != 0 && port != 0;
+	//Wyrmgus start
+//	return ip != 0 && port != 0;
+	return ip != 0 && ip != INADDR_NONE && port != 0;
+	//Wyrmgus end
 }
 
 //
