@@ -1049,7 +1049,7 @@ void CPlayer::SetFaction(const std::string &faction)
 			int SecondaryColor = PlayerRaces.Factions[this->Race][i]->SecondaryColor;
 			bool color_used = false;
 			for (int j = 0; j < PlayerMax; ++j) {
-				if (this->Index != j && Players[j].Faction != -1 && Players[j].Color == PlayerColors[PrimaryColor][0]) {
+				if (this->Index != j && Players[j].Faction != -1 && Players[j].Type != PlayerNobody && Players[j].Color == PlayerColors[PrimaryColor][0]) {
 					color_used = true;
 				}		
 			}
@@ -1082,7 +1082,7 @@ void CPlayer::SetRandomFaction()
 			if (faction_id != -1) {
 				bool faction_used = false;
 				for (int j = 0; j < PlayerMax; ++j) {
-					if (this->Index != j && Players[j].Name == PlayerRaces.Factions[this->Race][faction_id]->Name) {
+					if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][faction_id]->Name) {
 						faction_used = true;
 					}		
 				}
@@ -1103,7 +1103,7 @@ void CPlayer::SetRandomFaction()
 			if (PlayerRaces.Factions[this->Race][i] && !PlayerRaces.Factions[this->Race][i]->Name.empty()) {
 				bool faction_used = false;
 				for (int j = 0; j < PlayerMax; ++j) {
-					if (this->Index != j && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
+					if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
 						faction_used = true;
 					}		
 				}

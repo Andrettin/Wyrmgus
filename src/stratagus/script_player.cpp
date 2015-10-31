@@ -2628,6 +2628,13 @@ static int CclSetPlayerData(lua_State *l)
 	CPlayer *p = CclGetPlayer(l);
 	lua_pop(l, 1);
 	const char *data = LuaToString(l, 2);
+	
+	//Wyrmgus start
+	//if player is unused, return
+	if (p->Type == PlayerNobody) {
+		return 0;
+	}
+	//Wyrmgus end
 
 	if (!strcmp(data, "Name")) {
 		p->SetName(LuaToString(l, 3));
