@@ -1710,6 +1710,34 @@ static int CclDefineUnitType(lua_State *l)
 				// Assert(var->VariationId);
 				lua_pop(l, 1);
 			}
+		} else if (!strcmp(value, "ShieldAnimation")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				OverlayAnimation *shield_anim = new OverlayAnimation;
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument");
+				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "frame")) {
+						shield_anim->Frame = LuaToNumber(l, -1, k + 1);
+						type->ShieldAnimation[shield_anim->Frame] = shield_anim;
+					} else if (!strcmp(value, "overlay-frame")) {
+						shield_anim->OverlayFrame = LuaToNumber(l, -1, k + 1);
+					} else if (!strcmp(value, "x-offset")) {
+						shield_anim->XOffset = LuaToNumber(l, -1, k + 1);
+					} else if (!strcmp(value, "y-offset")) {
+						shield_anim->YOffset = LuaToNumber(l, -1, k + 1);
+					} else {
+						printf("\n%s\n", type->Name.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				lua_pop(l, 1);
+			}
 		} else if (!strcmp(value, "Parent")) {
 			type->Parent = LuaToString(l, -1);
 			CUnitType *parent_type = UnitTypeByIdent(type->Parent);
@@ -1878,6 +1906,18 @@ static int CclDefineUnitType(lua_State *l)
 						var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
 					}
 					var->Tileset = parent_type->VarInfo[var_n]->Tileset;
+				}
+			}
+			for (unsigned int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
+				if (parent_type->ShieldAnimation[anim_n]) {
+					OverlayAnimation *shield_anim = new OverlayAnimation;
+					
+					type->ShieldAnimation[anim_n] = shield_anim;
+					
+					shield_anim->Frame = parent_type->ShieldAnimation[anim_n]->Frame;
+					shield_anim->OverlayFrame = parent_type->ShieldAnimation[anim_n]->OverlayFrame;
+					shield_anim->XOffset = parent_type->ShieldAnimation[anim_n]->XOffset;
+					shield_anim->YOffset = parent_type->ShieldAnimation[anim_n]->YOffset;
 				}
 			}
 			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit

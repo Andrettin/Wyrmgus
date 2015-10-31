@@ -168,6 +168,10 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 				return goal->Resource.Active;
 			} else if (!strcmp(cur, "_Distance")) {
 				return unit.MapDistanceTo(*goal);
+			//Wyrmgus start
+			} else if (!strcmp(cur, "Direction")) {
+				return goal->Direction;
+			//Wyrmgus end
 			}
 			fprintf(stderr, "Bad variable name '%s'\n", cur);
 			ExitFatal(1);

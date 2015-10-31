@@ -1185,6 +1185,8 @@ void CUnit::Draw(const CViewport &vp) const
 	//Wyrmgus end
 	
 	//Wyrmgus start
+	int base_frame = frame >= 0 ? frame : abs(frame) - 1;
+	
 	CPlayerColorGraphic *left_arm_sprite = type->LeftArmSprite;
 	if (varinfo) {
 		if (varinfo->LeftArmSprite) {
@@ -1247,6 +1249,18 @@ void CUnit::Draw(const CViewport &vp) const
 			shield_sprite = varinfo->ShieldSprite;
 		}
 	}
+	int shield_frame = frame;
+	PixelPos shield_offset(0, 0);
+	if (type->ShieldAnimation[base_frame]) {
+		shield_frame = type->ShieldAnimation[base_frame]->OverlayFrame;
+		shield_offset.x = type->ShieldAnimation[base_frame]->XOffset;
+		shield_offset.y = type->ShieldAnimation[base_frame]->YOffset;
+		if (frame < 0) {
+			shield_frame *= -1;
+			shield_frame -= 1;
+			shield_offset.x *= -1;
+		}
+	}
 	
 	CPlayerColorGraphic *helmet_sprite = type->HelmetSprite;
 	if (varinfo) {
@@ -1259,7 +1273,7 @@ void CUnit::Draw(const CViewport &vp) const
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
 		//draw the shield before the left arm if not facing south
 		if (shield_sprite) {
-			DrawPlayerColorOverlay(*type, shield_sprite, player, frame, screenPos);
+			DrawPlayerColorOverlay(*type, shield_sprite, player, shield_frame, screenPos + shield_offset);
 		}
 		
 		if (left_arm_sprite) {
@@ -1383,7 +1397,7 @@ void CUnit::Draw(const CViewport &vp) const
 			DrawPlayerColorOverlay(*type, clothing_left_arm_sprite, player, frame, screenPos);
 		}
 		if (shield_sprite) {
-			DrawPlayerColorOverlay(*type, shield_sprite, player, frame, screenPos);
+			DrawPlayerColorOverlay(*type, shield_sprite, player, shield_frame, screenPos + shield_offset);
 		}
 	}
 

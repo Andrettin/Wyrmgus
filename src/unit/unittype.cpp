@@ -858,6 +858,12 @@ CUnitType::~CUnitType()
 			delete this->VarInfo[var];
 		}
 	}
+	
+	for (int i = 0; i < AnimationFrameMax; ++i) {
+		if (this->ShieldAnimation[i]) {
+			delete this->ShieldAnimation[i];
+		}
+	}
 	//Wyrmgus end
 
 	CGraphic::Free(Sprite);

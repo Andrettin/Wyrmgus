@@ -50,6 +50,7 @@
 
 #include "color.h"
 //Wyrmgus start
+#include "animation.h"	//required for the overlay animation arrays
 #include "map.h"	//required for PixelTileSize
 //Wyrmgus end
 #include "missileconfig.h"
@@ -837,7 +838,8 @@ public:
 	//Wyrmgus end
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
 	//Wyrmgus start
-	VariationInfo *VarInfo[VariationMax];    /// Variation information.
+	VariationInfo *VarInfo[VariationMax];			/// Variation information.
+	OverlayAnimation *ShieldAnimation[AnimationFrameMax];	/// shield animation data
 	//Wyrmgus end
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.
