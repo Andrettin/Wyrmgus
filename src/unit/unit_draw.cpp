@@ -534,6 +534,12 @@ void CDecoVarSpriteBar::Draw(int x, int y, const CUnitType &/*type*/, const CVar
 	x += decosprite.HotPos.x; // in addition of OffsetX... Useful ?
 	y += decosprite.HotPos.y; // in addition of OffsetY... Useful ?
 
+	//Wyrmgus start
+	if (!decosprite.Sprite) {
+		fprintf(stderr, "Tried to load non-existent DecoSprite\n");
+	}
+	//Wyrmgus end
+	
 	int n = sprite.NumFrames - 1; // frame of the sprite to show.
 	n -= (n * var.Value) / var.Max;
 
