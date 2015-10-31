@@ -610,6 +610,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var.HideAllied)
 			  //Wyrmgus start
 			  || (unit.Player == ThisPlayer && var.HideSelf)
+			  || unit.Type->BoolFlag[DECORATION_INDEX].value // don't show decorations for decoration units
 //			  || max == 0)) {
 			  || max == 0 || max < var.MinValue)) {
 			  //Wyrmgus end
