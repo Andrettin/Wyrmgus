@@ -41,6 +41,9 @@
 #include "action/action_build.h"
 #include "action/action_built.h"
 #include "action/action_upgradeto.h"
+//Wyrmgus start
+#include "animation.h"
+//Wyrmgus end
 #include "construct.h"
 #include "cursor.h"
 #include "editor.h"

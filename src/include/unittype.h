@@ -50,7 +50,6 @@
 
 #include "color.h"
 //Wyrmgus start
-#include "animation.h"	//required for the overlay animation arrays
 #include "map.h"	//required for PixelTileSize
 //Wyrmgus end
 #include "missileconfig.h"
@@ -70,6 +69,9 @@ class CPlayerColorGraphic;
 class CConstruction;
 class MissileType;
 class CFile;
+//Wyrmgus start
+class OverlayAnimation;
+//Wyrmgus end
 struct lua_State;
 #ifdef USE_MNG
 class Mng;

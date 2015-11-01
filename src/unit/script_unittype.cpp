@@ -1724,9 +1724,15 @@ static int CclDefineUnitType(lua_State *l)
 					++k;
 					if (!strcmp(value, "frame")) {
 						shield_anim->Frame = LuaToNumber(l, -1, k + 1);
+						if (shield_anim->Frame < 0) {
+							LuaError(l, "ShieldAnimation Frame cannot be negative");
+						}
 						type->ShieldAnimation[shield_anim->Frame] = shield_anim;
 					} else if (!strcmp(value, "overlay-frame")) {
 						shield_anim->OverlayFrame = LuaToNumber(l, -1, k + 1);
+						if (shield_anim->OverlayFrame < 0) {
+							LuaError(l, "ShieldAnimation OverlayFrame cannot be negative");
+						}
 					} else if (!strcmp(value, "x-offset")) {
 						shield_anim->XOffset = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "y-offset")) {
