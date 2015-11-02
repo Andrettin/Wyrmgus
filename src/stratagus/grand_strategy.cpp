@@ -767,7 +767,7 @@ void CGrandStrategyGame::DoTurn()
 							if (this->Provinces[i]->Owner == this->PlayerFaction) { //if this is one of the player's provinces, display a message about the population starving
 								char buf[256];
 								snprintf(
-									buf, sizeof(buf), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
+									buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 									("Starvation in " + this->Provinces[i]->GetCulturalName()).c_str(),
 									("My lord, food stocks have been depleted in " + this->Provinces[i]->GetCulturalName() + ". The local population is starving!").c_str()
 								);
@@ -1019,7 +1019,7 @@ void CGrandStrategyGame::DoProspection()
 						if (GrandStrategyGame.PlayerFaction == GrandStrategyGame.Provinces[province_id]->Owner) {
 							char buf[256];
 							snprintf(
-								buf, sizeof(buf), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
+								buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 								(CapitalizeString(DefaultResourceNames[i]) + " found in " + GrandStrategyGame.Provinces[province_id]->GetCulturalName()).c_str(),
 								("My lord, " + CapitalizeString(DefaultResourceNames[i]) + " has been found in the " + DecapitalizeString(GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name) + " of " + GrandStrategyGame.Provinces[province_id]->GetCulturalName() + "!").c_str()
 							);
@@ -3113,7 +3113,7 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		dialog_text += GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName() + "!";
 		char buf_2[256];
 		snprintf(
-			buf_2, sizeof(buf_2), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
+			buf_2, sizeof(buf_2), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 			("The " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName()).c_str(),
 			dialog_text.c_str(),
 			dialog_tooltip.c_str()
