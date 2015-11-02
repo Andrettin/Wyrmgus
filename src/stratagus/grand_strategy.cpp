@@ -3104,11 +3104,18 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		if (PlayerRaces.Factions[old_civilization][old_faction]->Type == "tribe" && PlayerRaces.Factions[new_civilization][new_faction]->Type == "polity") {
 			dialog_tooltip += ", +10 Prestige";
 		}
+		std::string dialog_text;
+		if (PlayerRaces.Factions[new_civilization][new_faction]->Type == "polity") {
+			dialog_text = "From the halls of our capital the formation of a new realm has been declared, the ";
+		} else if (PlayerRaces.Factions[new_civilization][new_faction]->Type == "tribe") {
+			dialog_text = "Our council of elders has declared the formation of a new tribe, the ";
+		}
+		dialog_text += GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName() + "!";
 		char buf_2[256];
 		snprintf(
 			buf_2, sizeof(buf_2), "if (GrandStrategyDialog ~= nil) then GrandStrategyDialog(\"%s\", \"%s\") end;",
 			("The " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName()).c_str(),
-			("From the halls of our capital the formation of a new realm has been declared, the " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName() + "!").c_str(),
+			dialog_text.c_str(),
 			dialog_tooltip.c_str()
 		);
 		CclCommand(buf_2);
