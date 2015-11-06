@@ -738,7 +738,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
 				CclCommand(buf);
 			}
-		} else {
+		} else if (player.AiEnabled) {
 			player.SetRandomFaction();
 		}
 	}
@@ -999,7 +999,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
 				CclCommand(buf);
 			}
-		} else {
+		} else if (player.AiEnabled) {
 			player.SetRandomFaction();
 		}
 	}
@@ -1635,7 +1635,7 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", player.Race != -1 ? PlayerRaces.Name[player.Race].c_str() : "", (player.Race != -1 && old_faction != -1) ? PlayerRaces.Factions[player.Race][old_faction]->Name.c_str() : "");
 				CclCommand(buf);
 			}
-		} else {
+		} else if (player.AiEnabled) {
 			player.SetRandomFaction();
 		}
 	}

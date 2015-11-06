@@ -2687,7 +2687,7 @@ static int CclSetPlayerData(lua_State *l)
 		
 		p->Faction = -1;
 		// if is AI, set random one from the civilization's factions
-		if (!ThisPlayer || ThisPlayer->Index != p->Index) {
+		if (p->AiEnabled) {
 			p->SetRandomFaction();
 		}
 		//Wyrmgus end
