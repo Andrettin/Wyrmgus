@@ -549,12 +549,12 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 //	type.BoolFlag[SHOREBUILDING_INDEX].value         = type.ShoreBuilding;
 	//Wyrmgus end
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
-	type.BoolFlag[BUILDEROUTSIDE_INDEX].value        = type.BuilderOutside;
-	type.BoolFlag[BUILDERLOST_INDEX].value           = type.BuilderLost;
-	type.BoolFlag[CANHARVEST_INDEX].value            = type.CanHarvest;
-	type.BoolFlag[HARVESTER_INDEX].value             = type.Harvester;
-	type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value = type.SelectableByRectangle;
 	//Wyrmgus start
+//	type.BoolFlag[BUILDEROUTSIDE_INDEX].value        = type.BuilderOutside;
+//	type.BoolFlag[BUILDERLOST_INDEX].value           = type.BuilderLost;
+//	type.BoolFlag[CANHARVEST_INDEX].value            = type.CanHarvest;
+//	type.BoolFlag[HARVESTER_INDEX].value             = type.Harvester;
+//	type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value = type.SelectableByRectangle;
 //	type.BoolFlag[ISNOTSELECTABLE_INDEX].value       = type.IsNotSelectable;
 //	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
 //	type.BoolFlag[INDESTRUCTIBLE_INDEX].value        = type.Indestructible;
@@ -598,6 +598,372 @@ static int CclDefineUnitType(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Name")) {
 			type->Name = LuaToString(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "Parent")) {
+			type->Parent = LuaToString(l, -1);
+			CUnitType *parent_type = UnitTypeByIdent(type->Parent);
+			if (!parent_type) {
+				LuaError(l, "Unit type %s not defined" _C_ type->Parent.c_str());
+			}
+			type->Class = parent_type->Class;
+			type->DrawLevel = parent_type->DrawLevel;
+			type->File = parent_type->File;
+			type->Width = parent_type->Width;
+			type->Height = parent_type->Height;
+			type->OffsetX = parent_type->OffsetX;
+			type->OffsetY = parent_type->OffsetY;
+			type->ShadowFile = parent_type->ShadowFile;
+			type->ShadowWidth = parent_type->ShadowWidth;
+			type->ShadowHeight = parent_type->ShadowHeight;
+			type->ShadowOffsetX = parent_type->ShadowOffsetX;
+			type->ShadowOffsetY = parent_type->ShadowOffsetY;
+			type->LightFile = parent_type->LightFile;
+			type->LeftArmFile = parent_type->LeftArmFile;
+			type->RightArmFile = parent_type->RightArmFile;
+			type->HairFile = parent_type->HairFile;
+			type->ClothingFile = parent_type->ClothingFile;
+			type->ClothingLeftArmFile = parent_type->ClothingLeftArmFile;
+			type->ClothingRightArmFile = parent_type->ClothingRightArmFile;
+			type->PantsFile = parent_type->PantsFile;
+			type->ShoesFile = parent_type->ShoesFile;
+			type->WeaponFile = parent_type->WeaponFile;
+			type->ShieldFile = parent_type->ShieldFile;
+			type->HelmetFile = parent_type->HelmetFile;
+			type->TileWidth = parent_type->TileWidth;
+			type->TileHeight = parent_type->TileHeight;
+			type->BoxWidth = parent_type->BoxWidth;
+			type->BoxHeight = parent_type->BoxHeight;
+			type->BoxOffsetX = parent_type->BoxOffsetX;
+			type->BoxOffsetY = parent_type->BoxOffsetY;
+			type->Construction = parent_type->Construction;
+			type->UnitType = parent_type->UnitType;
+//			type->Demand = parent_type->Demand;
+//			type->Supply = parent_type->Supply;
+			type->Missile.Name = parent_type->Missile.Name;
+			type->Missile.Missile = NULL;
+			type->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
+			type->Explosion.Name = parent_type->Explosion.Name;
+			type->Explosion.Missile = NULL;
+			type->CorpseName = parent_type->CorpseName;
+			type->CorpseType = NULL;
+//			type->ReactRangeComputer = parent_type->ReactRangeComputer;
+//			type->ReactRangePerson = parent_type->ReactRangePerson;
+			type->MinAttackRange = parent_type->MinAttackRange;
+			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
+			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
+			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value;
+			type->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
+			type->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
+			type->TechnologyPointCost = parent_type->TechnologyPointCost;
+			type->TrainQuantity = parent_type->TrainQuantity;
+			type->MaxOnBoard = parent_type->MaxOnBoard;
+			type->RepairRange = parent_type->RepairRange;
+			type->RepairHP = parent_type->RepairHP;
+			type->MouseAction = parent_type->MouseAction;
+			type->CanAttack = parent_type->CanAttack;
+			type->CanTarget = parent_type->CanTarget;
+			type->LandUnit = parent_type->LandUnit;
+			type->SeaUnit = parent_type->SeaUnit;
+			type->AirUnit = parent_type->AirUnit;
+			type->Building = parent_type->Building;
+			type->BoardSize = parent_type->BoardSize;
+			type->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
+			type->StartingResources = parent_type->StartingResources;
+			type->BurnPercent = parent_type->BurnPercent;
+			type->BurnDamageRate = parent_type->BurnDamageRate;
+			type->PoisonDrain = parent_type->PoisonDrain;
+			type->AutoBuildRate = parent_type->AutoBuildRate;
+			type->Animations = parent_type->Animations;
+			type->Sound = parent_type->Sound;
+			if (parent_type->CanCastSpell) {
+				type->CanCastSpell = new char[SpellTypeTable.size()];
+				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
+				for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
+					type->CanCastSpell[i] = parent_type->CanCastSpell[i];
+				}
+			}
+			if (parent_type->AutoCastActive) {
+				type->AutoCastActive = new char[SpellTypeTable.size()];
+				memset(type->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
+				for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
+					type->AutoCastActive[i] = parent_type->AutoCastActive[i];
+				}
+			}
+			for (unsigned int i = 0; i < MaxCosts; ++i) {
+				type->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
+				type->RepairCosts[i] = parent_type->RepairCosts[i];
+				type->DefaultStat.ImproveIncomes[i] = parent_type->DefaultStat.ImproveIncomes[i];
+				type->CanStore[i] = parent_type->CanStore[i];
+				type->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
+				
+				if (parent_type->ResInfo[i]) {
+					ResourceInfo *res = new ResourceInfo;
+					res->ResourceId = i;
+					type->ResInfo[i] = res;
+					res->ResourceStep = parent_type->ResInfo[i]->ResourceStep;
+					res->FinalResource = parent_type->ResInfo[i]->FinalResource;
+					res->FinalResourceConversionRate = parent_type->ResInfo[i]->FinalResourceConversionRate;
+					res->WaitAtResource = parent_type->ResInfo[i]->WaitAtResource;
+					res->WaitAtDepot = parent_type->ResInfo[i]->WaitAtDepot;
+					res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
+					res->LoseResources = parent_type->ResInfo[i]->LoseResources;
+					res->RefineryHarvester = parent_type->ResInfo[i]->RefineryHarvester;
+					res->FileWhenEmpty = parent_type->ResInfo[i]->FileWhenEmpty;
+					res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
+				}
+			}
+			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+				type->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
+				type->DefaultStat.Variables[i].Value = parent_type->DefaultStat.Variables[i].Value;
+				type->DefaultStat.Variables[i].Max = parent_type->DefaultStat.Variables[i].Max;
+				type->DefaultStat.Variables[i].Increase = parent_type->DefaultStat.Variables[i].Increase;
+			}
+			for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) {
+				type->BoolFlag[i].value = parent_type->BoolFlag[i].value;
+				type->BoolFlag[i].CanTransport = parent_type->BoolFlag[i].CanTransport;
+			}
+			for (unsigned int i = 0; i < UnitTypeMax; ++i) {
+				type->Drops[i] = parent_type->Drops[i];
+			}
+			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
+				if (parent_type->VarInfo[var_n]) {
+					VariationInfo *var = new VariationInfo;
+					
+					type->VarInfo[var_n] = var;
+					
+					var->VariationId = parent_type->VarInfo[var_n]->VariationId;
+					var->TypeName = parent_type->VarInfo[var_n]->TypeName;
+					var->File = parent_type->VarInfo[var_n]->File;
+					for (unsigned int i = 0; i < MaxCosts; ++i) {
+						var->FileWhenLoaded[i] = parent_type->VarInfo[var_n]->FileWhenLoaded[i];
+						var->FileWhenEmpty[i] = parent_type->VarInfo[var_n]->FileWhenEmpty[i];
+					}
+					var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
+					var->LeftArmFile = parent_type->VarInfo[var_n]->LeftArmFile;
+					var->RightArmFile = parent_type->VarInfo[var_n]->RightArmFile;
+					var->HairFile = parent_type->VarInfo[var_n]->HairFile;
+					var->ClothingFile = parent_type->VarInfo[var_n]->ClothingFile;
+					var->ClothingLeftArmFile = parent_type->VarInfo[var_n]->ClothingLeftArmFile;
+					var->ClothingRightArmFile = parent_type->VarInfo[var_n]->ClothingRightArmFile;
+					var->PantsFile = parent_type->VarInfo[var_n]->PantsFile;
+					var->ShoesFile = parent_type->VarInfo[var_n]->ShoesFile;
+					var->WeaponFile = parent_type->VarInfo[var_n]->WeaponFile;
+					var->ShieldFile = parent_type->VarInfo[var_n]->ShieldFile;
+					var->HelmetFile = parent_type->VarInfo[var_n]->HelmetFile;
+					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
+					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
+					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
+					var->Icon.Icon = NULL;
+					if (parent_type->VarInfo[var_n]->Animations) {
+						var->Animations = parent_type->VarInfo[var_n]->Animations;
+					}
+					var->Construction = parent_type->VarInfo[var_n]->Construction;
+					for (int u = 0; u < VariationMax; ++u) {
+						var->UpgradesRequired[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
+						var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
+					}
+					var->Tileset = parent_type->VarInfo[var_n]->Tileset;
+					
+					for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
+						if (parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]) {
+							OverlayAnimation *shield_anim = new OverlayAnimation;
+							
+							var->ShieldAnimation[anim_n] = shield_anim;
+							
+							shield_anim->Frame = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->Frame;
+							shield_anim->OverlayFrame = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->OverlayFrame;
+							shield_anim->XOffset = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->XOffset;
+							shield_anim->YOffset = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->YOffset;
+						}
+					}
+				}
+			}
+			for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
+				if (parent_type->ShieldAnimation[anim_n]) {
+					OverlayAnimation *shield_anim = new OverlayAnimation;
+					
+					type->ShieldAnimation[anim_n] = shield_anim;
+					
+					shield_anim->Frame = parent_type->ShieldAnimation[anim_n]->Frame;
+					shield_anim->OverlayFrame = parent_type->ShieldAnimation[anim_n]->OverlayFrame;
+					shield_anim->XOffset = parent_type->ShieldAnimation[anim_n]->XOffset;
+					shield_anim->YOffset = parent_type->ShieldAnimation[anim_n]->YOffset;
+				}
+			}
+			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
+			type->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
+		} else if (!strcmp(value, "Variations")) {
+			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
+			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
+			type->DefaultStat.Variables[VARIATION_INDEX].Max = VariationMax;
+			//remove previously defined variations, if any
+			for (int var_n = 0; var_n < VariationMax; ++var_n) {
+				if (type->VarInfo[var_n]) {
+					delete type->VarInfo[var_n];
+				}
+			}
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				VariationInfo *var = new VariationInfo;
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table for variations)");
+				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "variation-id")) {
+						var->VariationId = LuaToString(l, -1, k + 1);
+						type->VarInfo[j] = var;
+					} else if (!strcmp(value, "type-name")) {
+						var->TypeName = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "file")) {
+						var->File = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "file-when-loaded")) {
+						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
+						++k;
+						var->FileWhenLoaded[res] = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "file-when-empty")) {
+						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
+						++k;
+						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "shadow-file")) {
+						var->ShadowFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "left-arm-file")) {
+						var->LeftArmFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "right-arm-file")) {
+						var->RightArmFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "hair-file")) {
+						var->HairFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "clothing-file")) {
+						var->ClothingFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "clothing-left-arm-file")) {
+						var->ClothingLeftArmFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "clothing-right-arm-file")) {
+						var->ClothingRightArmFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "pants-file")) {
+						var->PantsFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "shoes-file")) {
+						var->ShoesFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "weapon-file")) {
+						var->WeaponFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "shield-file")) {
+						var->ShieldFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "helmet-file")) {
+						var->HelmetFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "frame-size")) {
+						lua_rawgeti(l, -1, k + 1);
+						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
+						lua_pop(l, 1);
+					} else if (!strcmp(value, "icon")) {
+						var->Icon.Name = LuaToString(l, -1, k + 1);
+						var->Icon.Icon = NULL;
+					} else if (!strcmp(value, "animations")) {
+						var->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
+						if (!var->Animations) {
+							DebugPrint("Warning animation `%s' not found\n" _C_ LuaToString(l, -1, k + 1));
+						}
+					} else if (!strcmp(value, "construction")) {
+						var->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
+					} else if (!strcmp(value, "upgrade-required")) {
+						for (int u = 0; u < VariationMax; ++u) {
+							if (var->UpgradesRequired[u].empty()) {
+								var->UpgradesRequired[u] = LuaToString(l, -1, k + 1);
+								break;
+							}
+						}
+					} else if (!strcmp(value, "upgrade-forbidden")) {
+						for (int u = 0; u < VariationMax; ++u) {
+							if (var->UpgradesForbidden[u].empty()) {
+								var->UpgradesForbidden[u] = LuaToString(l, -1, k + 1);
+								break;
+							}
+						}
+					} else if (!strcmp(value, "tileset")) {
+						var->Tileset = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "shield-animation")) {
+						lua_rawgeti(l, -1, k + 1);
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument (expected table for shield animations)");
+						}
+						OverlayAnimation *shield_anim = new OverlayAnimation;
+						const int subsubargs = lua_rawlen(l, -1);
+						for (int n = 0; n < subsubargs; ++n) {
+							lua_rawgeti(l, -1, n + 1);
+							if (!lua_istable(l, -1)) {
+								LuaError(l, "incorrect argument (expected table for shield animation frames)");
+							}
+							const int subsubsubargs = lua_rawlen(l, -1);
+							for (int o = 0; o < subsubsubargs; ++o) {
+								value = LuaToString(l, -1, o + 1);
+								++o;
+								if (!strcmp(value, "frame")) {
+									shield_anim->Frame = LuaToNumber(l, -1, o + 1);
+									if (shield_anim->Frame < 0) {
+										LuaError(l, "ShieldAnimation Frame cannot be negative");
+									}
+									var->ShieldAnimation[shield_anim->Frame] = shield_anim;
+								} else if (!strcmp(value, "overlay-frame")) {
+									shield_anim->OverlayFrame = LuaToNumber(l, -1, o + 1);
+									if (shield_anim->OverlayFrame < 0) {
+										LuaError(l, "ShieldAnimation OverlayFrame cannot be negative");
+									}
+								} else if (!strcmp(value, "x-offset")) {
+									shield_anim->XOffset = LuaToNumber(l, -1, o + 1);
+								} else if (!strcmp(value, "y-offset")) {
+									shield_anim->YOffset = LuaToNumber(l, -1, o + 1);
+								} else {
+									printf("\n%s\n", type->Name.c_str());
+									LuaError(l, "Unsupported tag: %s" _C_ value);
+								}
+							}
+							lua_pop(l, 1);
+						}
+						lua_pop(l, 1);
+					} else {
+						printf("\n%s\n", type->Name.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				// Assert(var->VariationId);
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "ShieldAnimation")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				OverlayAnimation *shield_anim = new OverlayAnimation;
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument");
+				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "frame")) {
+						shield_anim->Frame = LuaToNumber(l, -1, k + 1);
+						if (shield_anim->Frame < 0) {
+							LuaError(l, "ShieldAnimation Frame cannot be negative");
+						}
+						type->ShieldAnimation[shield_anim->Frame] = shield_anim;
+					} else if (!strcmp(value, "overlay-frame")) {
+						shield_anim->OverlayFrame = LuaToNumber(l, -1, k + 1);
+						if (shield_anim->OverlayFrame < 0) {
+							LuaError(l, "ShieldAnimation OverlayFrame cannot be negative");
+						}
+					} else if (!strcmp(value, "x-offset")) {
+						shield_anim->XOffset = LuaToNumber(l, -1, k + 1);
+					} else if (!strcmp(value, "y-offset")) {
+						shield_anim->YOffset = LuaToNumber(l, -1, k + 1);
+					} else {
+						printf("\n%s\n", type->Name.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				lua_pop(l, 1);
+			}
+		//Wyrmgus end
 		} else if (!strcmp(value, "Image")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1233,10 +1599,14 @@ static int CclDefineUnitType(lua_State *l)
 				ParseBuildingRules(l, type->AiBuildingRules);
 				lua_pop(l, 1);
 			}
+		//Wyrmgus start
+		/*
 		} else if (!strcmp(value, "BuilderOutside")) {
 			type->BuilderOutside = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BuilderLost")) {
 			type->BuilderLost = LuaToBoolean(l, -1);
+		*/
+		//Wyrmgus end
 		} else if (!strcmp(value, "AutoBuildRate")) {
 			type->AutoBuildRate = LuaToNumber(l, -1);
 		//Wyrmgus start
@@ -1386,13 +1756,20 @@ static int CclDefineUnitType(lua_State *l)
 				Assert(res->ResourceId);
 				lua_pop(l, 1);
 			}
-			type->Harvester = 1;
+			//Wyrmgus start
+//			type->Harvester = 1;
+			type->BoolFlag[HARVESTER_INDEX].value = 1;
+			//Wyrmgus end
 		} else if (!strcmp(value, "GivesResource")) {
 			lua_pushvalue(l, -1);
 			type->GivesResource = CclGetResourceByName(l);
 			lua_pop(l, 1);
+		//Wyrmgus start
+		/*
 		} else if (!strcmp(value, "CanHarvest")) {
 			type->CanHarvest = LuaToBoolean(l, -1);
+		*/
+		//Wyrmgus end
 		} else if (!strcmp(value, "CanStore")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1524,10 +1901,8 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus start
 //		} else if (!strcmp(value, "IsNotSelectable")) {
 //			type->IsNotSelectable = LuaToBoolean(l, -1);
-		//Wyrmgus end
-		} else if (!strcmp(value, "SelectableByRectangle")) {
-			type->SelectableByRectangle = LuaToBoolean(l, -1);
-		//Wyrmgus start
+//		} else if (!strcmp(value, "SelectableByRectangle")) {
+//			type->SelectableByRectangle = LuaToBoolean(l, -1);
 //		} else if (!strcmp(value, "Teleporter")) {
 //			type->Teleporter = LuaToBoolean(l, -1);
 //		} else if (!strcmp(value, "SaveCargo")) {
@@ -1611,323 +1986,6 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		//Wyrmgus start
-		} else if (!strcmp(value, "Variations")) {
-			type->DefaultStat.Variables[VARIATION_INDEX].Enable = 1;
-			type->DefaultStat.Variables[VARIATION_INDEX].Value = 0;
-			type->DefaultStat.Variables[VARIATION_INDEX].Max = VariationMax;
-			//remove previously defined variations, if any
-			for (int var_n = 0; var_n < VariationMax; ++var_n) {
-				if (type->VarInfo[var_n]) {
-					VariationInfo *var = new VariationInfo;
-					type->VarInfo[var_n] = var;
-				}
-			}
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				lua_rawgeti(l, -1, j + 1);
-				VariationInfo *var = new VariationInfo;
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
-				const int subargs = lua_rawlen(l, -1);
-				for (int k = 0; k < subargs; ++k) {
-					value = LuaToString(l, -1, k + 1);
-					++k;
-					if (!strcmp(value, "variation-id")) {
-						var->VariationId = LuaToString(l, -1, k + 1);
-						type->VarInfo[j] = var;
-					} else if (!strcmp(value, "type-name")) {
-						var->TypeName = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "file")) {
-						var->File = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "file-when-loaded")) {
-						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
-						++k;
-						var->FileWhenLoaded[res] = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "file-when-empty")) {
-						const int res = GetResourceIdByName(LuaToString(l, -1, k + 1));
-						++k;
-						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "shadow-file")) {
-						var->ShadowFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "left-arm-file")) {
-						var->LeftArmFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "right-arm-file")) {
-						var->RightArmFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "hair-file")) {
-						var->HairFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "clothing-file")) {
-						var->ClothingFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "clothing-left-arm-file")) {
-						var->ClothingLeftArmFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "clothing-right-arm-file")) {
-						var->ClothingRightArmFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "pants-file")) {
-						var->PantsFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "shoes-file")) {
-						var->ShoesFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "weapon-file")) {
-						var->WeaponFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "shield-file")) {
-						var->ShieldFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "helmet-file")) {
-						var->HelmetFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "frame-size")) {
-						lua_rawgeti(l, -1, k + 1);
-						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
-						lua_pop(l, 1);
-					} else if (!strcmp(value, "icon")) {
-						var->Icon.Name = LuaToString(l, -1, k + 1);
-						var->Icon.Icon = NULL;
-					} else if (!strcmp(value, "animations")) {
-						var->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
-						if (!var->Animations) {
-							DebugPrint("Warning animation `%s' not found\n" _C_ LuaToString(l, -1, k + 1));
-						}
-					} else if (!strcmp(value, "construction")) {
-						var->Construction = ConstructionByIdent(LuaToString(l, -1, k + 1));
-					} else if (!strcmp(value, "upgrade-required")) {
-						for (int u = 0; u < VariationMax; ++u) {
-							if (var->UpgradesRequired[u].empty()) {
-								var->UpgradesRequired[u] = LuaToString(l, -1, k + 1);
-								break;
-							}
-						}
-					} else if (!strcmp(value, "upgrade-forbidden")) {
-						for (int u = 0; u < VariationMax; ++u) {
-							if (var->UpgradesForbidden[u].empty()) {
-								var->UpgradesForbidden[u] = LuaToString(l, -1, k + 1);
-								break;
-							}
-						}
-					} else if (!strcmp(value, "tileset")) {
-						var->Tileset = LuaToString(l, -1, k + 1);
-					} else {
-						printf("\n%s\n", type->Name.c_str());
-						LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-				}
-				// Assert(var->VariationId);
-				lua_pop(l, 1);
-			}
-		} else if (!strcmp(value, "ShieldAnimation")) {
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				lua_rawgeti(l, -1, j + 1);
-				OverlayAnimation *shield_anim = new OverlayAnimation;
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
-				const int subargs = lua_rawlen(l, -1);
-				for (int k = 0; k < subargs; ++k) {
-					value = LuaToString(l, -1, k + 1);
-					++k;
-					if (!strcmp(value, "frame")) {
-						shield_anim->Frame = LuaToNumber(l, -1, k + 1);
-						if (shield_anim->Frame < 0) {
-							LuaError(l, "ShieldAnimation Frame cannot be negative");
-						}
-						type->ShieldAnimation[shield_anim->Frame] = shield_anim;
-					} else if (!strcmp(value, "overlay-frame")) {
-						shield_anim->OverlayFrame = LuaToNumber(l, -1, k + 1);
-						if (shield_anim->OverlayFrame < 0) {
-							LuaError(l, "ShieldAnimation OverlayFrame cannot be negative");
-						}
-					} else if (!strcmp(value, "x-offset")) {
-						shield_anim->XOffset = LuaToNumber(l, -1, k + 1);
-					} else if (!strcmp(value, "y-offset")) {
-						shield_anim->YOffset = LuaToNumber(l, -1, k + 1);
-					} else {
-						printf("\n%s\n", type->Name.c_str());
-						LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-				}
-				lua_pop(l, 1);
-			}
-		} else if (!strcmp(value, "Parent")) {
-			type->Parent = LuaToString(l, -1);
-			CUnitType *parent_type = UnitTypeByIdent(type->Parent);
-			if (!parent_type) {
-				LuaError(l, "Unit type %s not defined" _C_ type->Parent.c_str());
-			}
-			type->Class = parent_type->Class;
-			type->DrawLevel = parent_type->DrawLevel;
-			type->File = parent_type->File;
-			type->Width = parent_type->Width;
-			type->Height = parent_type->Height;
-			type->OffsetX = parent_type->OffsetX;
-			type->OffsetY = parent_type->OffsetY;
-			type->ShadowFile = parent_type->ShadowFile;
-			type->ShadowWidth = parent_type->ShadowWidth;
-			type->ShadowHeight = parent_type->ShadowHeight;
-			type->ShadowOffsetX = parent_type->ShadowOffsetX;
-			type->ShadowOffsetY = parent_type->ShadowOffsetY;
-			type->LightFile = parent_type->LightFile;
-			type->LeftArmFile = parent_type->LeftArmFile;
-			type->RightArmFile = parent_type->RightArmFile;
-			type->HairFile = parent_type->HairFile;
-			type->ClothingFile = parent_type->ClothingFile;
-			type->ClothingLeftArmFile = parent_type->ClothingLeftArmFile;
-			type->ClothingRightArmFile = parent_type->ClothingRightArmFile;
-			type->PantsFile = parent_type->PantsFile;
-			type->ShoesFile = parent_type->ShoesFile;
-			type->WeaponFile = parent_type->WeaponFile;
-			type->ShieldFile = parent_type->ShieldFile;
-			type->HelmetFile = parent_type->HelmetFile;
-			type->TileWidth = parent_type->TileWidth;
-			type->TileHeight = parent_type->TileHeight;
-			type->BoxWidth = parent_type->BoxWidth;
-			type->BoxHeight = parent_type->BoxHeight;
-			type->BoxOffsetX = parent_type->BoxOffsetX;
-			type->BoxOffsetY = parent_type->BoxOffsetY;
-			type->Construction = parent_type->Construction;
-			type->UnitType = parent_type->UnitType;
-//			type->Demand = parent_type->Demand;
-//			type->Supply = parent_type->Supply;
-			type->Missile.Name = parent_type->Missile.Name;
-			type->Missile.Missile = NULL;
-			type->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
-			type->Explosion.Name = parent_type->Explosion.Name;
-			type->Explosion.Missile = NULL;
-			type->CorpseName = parent_type->CorpseName;
-			type->CorpseType = NULL;
-//			type->ReactRangeComputer = parent_type->ReactRangeComputer;
-//			type->ReactRangePerson = parent_type->ReactRangePerson;
-			type->MinAttackRange = parent_type->MinAttackRange;
-			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value;
-			type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max = parent_type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
-			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value;
-			type->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
-			type->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
-			type->TechnologyPointCost = parent_type->TechnologyPointCost;
-			type->TrainQuantity = parent_type->TrainQuantity;
-			type->MaxOnBoard = parent_type->MaxOnBoard;
-			type->RepairRange = parent_type->RepairRange;
-			type->RepairHP = parent_type->RepairHP;
-			type->MouseAction = parent_type->MouseAction;
-			type->CanAttack = parent_type->CanAttack;
-			type->CanTarget = parent_type->CanTarget;
-			type->LandUnit = parent_type->LandUnit;
-			type->SeaUnit = parent_type->SeaUnit;
-			type->AirUnit = parent_type->AirUnit;
-			type->Building = parent_type->Building;
-			type->BoardSize = parent_type->BoardSize;
-			type->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
-			type->StartingResources = parent_type->StartingResources;
-			type->BurnPercent = parent_type->BurnPercent;
-			type->BurnDamageRate = parent_type->BurnDamageRate;
-			type->PoisonDrain = parent_type->PoisonDrain;
-			type->SelectableByRectangle = parent_type->SelectableByRectangle;
-			type->BuilderOutside = parent_type->BuilderOutside;
-			type->BuilderLost = parent_type->BuilderLost;
-			type->AutoBuildRate = parent_type->AutoBuildRate;
-			type->Animations = parent_type->Animations;
-			type->Sound = parent_type->Sound;
-			type->Harvester = parent_type->Harvester;
-			if (parent_type->CanCastSpell) {
-				type->CanCastSpell = new char[SpellTypeTable.size()];
-				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
-				for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
-					type->CanCastSpell[i] = parent_type->CanCastSpell[i];
-				}
-			}
-			if (parent_type->AutoCastActive) {
-				type->AutoCastActive = new char[SpellTypeTable.size()];
-				memset(type->AutoCastActive, 0, SpellTypeTable.size() * sizeof(char));
-				for (unsigned int i = 0; i < SpellTypeTable.size(); ++i) {
-					type->AutoCastActive[i] = parent_type->AutoCastActive[i];
-				}
-			}
-			for (unsigned int i = 0; i < MaxCosts; ++i) {
-				type->DefaultStat.Costs[i] = parent_type->DefaultStat.Costs[i];
-				type->RepairCosts[i] = parent_type->RepairCosts[i];
-				type->DefaultStat.ImproveIncomes[i] = parent_type->DefaultStat.ImproveIncomes[i];
-				type->CanStore[i] = parent_type->CanStore[i];
-				type->GrandStrategyProductionEfficiencyModifier[i] = parent_type->GrandStrategyProductionEfficiencyModifier[i];
-				
-				if (parent_type->ResInfo[i]) {
-					ResourceInfo *res = new ResourceInfo;
-					res->ResourceId = i;
-					type->ResInfo[i] = res;
-					res->ResourceStep = parent_type->ResInfo[i]->ResourceStep;
-					res->FinalResource = parent_type->ResInfo[i]->FinalResource;
-					res->FinalResourceConversionRate = parent_type->ResInfo[i]->FinalResourceConversionRate;
-					res->WaitAtResource = parent_type->ResInfo[i]->WaitAtResource;
-					res->WaitAtDepot = parent_type->ResInfo[i]->WaitAtDepot;
-					res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
-					res->LoseResources = parent_type->ResInfo[i]->LoseResources;
-					res->RefineryHarvester = parent_type->ResInfo[i]->RefineryHarvester;
-					res->FileWhenEmpty = parent_type->ResInfo[i]->FileWhenEmpty;
-					res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
-				}
-			}
-			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-				type->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
-				type->DefaultStat.Variables[i].Value = parent_type->DefaultStat.Variables[i].Value;
-				type->DefaultStat.Variables[i].Max = parent_type->DefaultStat.Variables[i].Max;
-				type->DefaultStat.Variables[i].Increase = parent_type->DefaultStat.Variables[i].Increase;
-			}
-			for (unsigned int i = 0; i < UnitTypeVar.GetNumberBoolFlag(); ++i) {
-				type->BoolFlag[i].value = parent_type->BoolFlag[i].value;
-				type->BoolFlag[i].CanTransport = parent_type->BoolFlag[i].CanTransport;
-			}
-			for (unsigned int i = 0; i < UnitTypeMax; ++i) {
-				type->Drops[i] = parent_type->Drops[i];
-			}
-			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
-				if (parent_type->VarInfo[var_n]) {
-					VariationInfo *var = new VariationInfo;
-					
-					type->VarInfo[var_n] = var;
-					
-					var->VariationId = parent_type->VarInfo[var_n]->VariationId;
-					var->TypeName = parent_type->VarInfo[var_n]->TypeName;
-					var->File = parent_type->VarInfo[var_n]->File;
-					for (unsigned int i = 0; i < MaxCosts; ++i) {
-						var->FileWhenLoaded[i] = parent_type->VarInfo[var_n]->FileWhenLoaded[i];
-						var->FileWhenEmpty[i] = parent_type->VarInfo[var_n]->FileWhenEmpty[i];
-					}
-					var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
-					var->LeftArmFile = parent_type->VarInfo[var_n]->LeftArmFile;
-					var->RightArmFile = parent_type->VarInfo[var_n]->RightArmFile;
-					var->HairFile = parent_type->VarInfo[var_n]->HairFile;
-					var->ClothingFile = parent_type->VarInfo[var_n]->ClothingFile;
-					var->ClothingLeftArmFile = parent_type->VarInfo[var_n]->ClothingLeftArmFile;
-					var->ClothingRightArmFile = parent_type->VarInfo[var_n]->ClothingRightArmFile;
-					var->PantsFile = parent_type->VarInfo[var_n]->PantsFile;
-					var->ShoesFile = parent_type->VarInfo[var_n]->ShoesFile;
-					var->WeaponFile = parent_type->VarInfo[var_n]->WeaponFile;
-					var->ShieldFile = parent_type->VarInfo[var_n]->ShieldFile;
-					var->HelmetFile = parent_type->VarInfo[var_n]->HelmetFile;
-					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
-					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
-					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
-					var->Icon.Icon = NULL;
-					if (parent_type->VarInfo[var_n]->Animations) {
-						var->Animations = parent_type->VarInfo[var_n]->Animations;
-					}
-					var->Construction = parent_type->VarInfo[var_n]->Construction;
-					for (int u = 0; u < VariationMax; ++u) {
-						var->UpgradesRequired[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
-						var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
-					}
-					var->Tileset = parent_type->VarInfo[var_n]->Tileset;
-				}
-			}
-			for (unsigned int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
-				if (parent_type->ShieldAnimation[anim_n]) {
-					OverlayAnimation *shield_anim = new OverlayAnimation;
-					
-					type->ShieldAnimation[anim_n] = shield_anim;
-					
-					shield_anim->Frame = parent_type->ShieldAnimation[anim_n]->Frame;
-					shield_anim->OverlayFrame = parent_type->ShieldAnimation[anim_n]->OverlayFrame;
-					shield_anim->XOffset = parent_type->ShieldAnimation[anim_n]->XOffset;
-					shield_anim->YOffset = parent_type->ShieldAnimation[anim_n]->YOffset;
-				}
-			}
-			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
-			type->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
 		} else if (!strcmp(value, "Class")) {
 			type->Class = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
@@ -2429,9 +2487,6 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_pushstring(l, "");
 			return 1;
 		}
-	} else if (!strcmp(data, "SelectableByRectangle")) {
-		lua_pushboolean(l, type->SelectableByRectangle);
-		return 1;
 	} else if (!strcmp(data, "organic")) {
 		lua_pushboolean(l, type->BoolFlag[ORGANIC_INDEX].value);
 		return 1;
@@ -3007,7 +3062,10 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[GIVERESOURCE_INDEX].Enable = 1;
 		//Wyrmgus end
 	}
-	if (unit.Type->Harvester && unit.CurrentResource) {
+	//Wyrmgus start
+//	if (unit.Type->Harvester && unit.CurrentResource) {
+	if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.CurrentResource) {
+	//Wyrmgus end
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
 		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
 	}

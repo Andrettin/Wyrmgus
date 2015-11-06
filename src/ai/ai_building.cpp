@@ -389,7 +389,10 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 		}
 	}
 	if (CanMoveToMask(pos, movemask)
-		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BuilderOutside)) { // reachable, or unit can build from outside and anywhere
+		//Wyrmgus start
+//		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BuilderOutside)) { // reachable, or unit can build from outside and anywhere
+		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BoolFlag[BUILDEROUTSIDE_INDEX].value)) { // reachable, or unit can build from outside and anywhere
+		//Wyrmgus end
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;

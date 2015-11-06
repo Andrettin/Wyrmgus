@@ -85,7 +85,10 @@ enum {
 	COrder_Build *order = new COrder_Build;
 
 	order->goalPos = pos;
-	if (building.BuilderOutside) {
+	//Wyrmgus start
+//	if (building.BuilderOutside) {
+	if (building.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
+	//Wyrmgus end
 		order->Range = builder.Type->RepairRange;
 	} else {
 		// If building inside, but be next to stop
@@ -176,7 +179,10 @@ enum {
 
 /* virtual */ void COrder_Build::UpdatePathFinderData(PathFinderInput &input)
 {
-	input.SetMinRange(this->Type->BuilderOutside ? 1 : 0);
+	//Wyrmgus start
+//	input.SetMinRange(this->Type->BuilderOutside ? 1 : 0);
+	input.SetMinRange(this->Type->BoolFlag[BUILDEROUTSIDE_INDEX].value ? 1 : 0);
+	//Wyrmgus end
 	input.SetMaxRange(this->Range);
 
 	const Vec2i tileSize(this->Type->TileWidth, this->Type->TileHeight);
@@ -462,7 +468,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	//Wyrmgus end
 
 	// We need somebody to work on it.
-	if (!type.BuilderOutside) {
+	//Wyrmgus start
+//	if (!type.BuilderOutside) {
+	if (!type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
+	//Wyrmgus end
 		//Wyrmgus start
 //		UnitShowAnimation(unit, unit.Type->Animations->Still);
 		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];

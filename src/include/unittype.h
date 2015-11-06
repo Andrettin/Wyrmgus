@@ -132,9 +132,12 @@ public:
 		FrameWidth(0), FrameHeight(0),
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL), WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL)
 	{
-		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
-		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));		
+		memset(SpriteWhenLoaded, NULL, sizeof(SpriteWhenLoaded));		
+		memset(SpriteWhenEmpty, NULL, sizeof(SpriteWhenEmpty));	
+		memset(ShieldAnimation, NULL, sizeof(ShieldAnimation));
 	}
+	
+	~VariationInfo();
 
 	std::string VariationId;		/// Variation's name.
 	std::string TypeName;			/// Type name.
@@ -170,6 +173,7 @@ public:
 	CPlayerColorGraphic *HelmetSprite;	/// The graphic corresponding to HelmetFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
+	OverlayAnimation *ShieldAnimation[AnimationFrameMax];	/// shield animation data	
 
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
@@ -802,14 +806,16 @@ public:
 //	unsigned ShoreBuilding : 1;     /// Building must be build on coast.
 	//Wyrmgus end
 	unsigned CanAttack : 1;         /// Unit can attack.
-	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
-	unsigned BuilderLost : 1;       /// The builder is lost after the build.
-	unsigned CanHarvest : 1;        /// Resource can be harvested.
-	unsigned Harvester : 1;         /// unit is a resource harvester.
+	//Wyrmgus start
+//	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
+//	unsigned BuilderLost : 1;       /// The builder is lost after the build.
+//	unsigned CanHarvest : 1;        /// Resource can be harvested.
+//	unsigned Harvester : 1;         /// unit is a resource harvester.
+	//Wyrmgus end
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
-	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
 	//Wyrmgus start
+//	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
 //	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
 //	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 //	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).

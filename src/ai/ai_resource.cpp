@@ -452,7 +452,10 @@ public:
 	explicit IsAWorker() {}
 	bool operator()(const CUnit *const unit) const
 	{
-		return (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed);
+		//Wyrmgus start
+//		return (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed);
+		return (unit->Type->BoolFlag[HARVESTER_INDEX].value && unit->Type->ResInfo && !unit->Removed);
+		//Wyrmgus end
 	}
 };
 
@@ -1218,7 +1221,10 @@ static void AiCollectResources()
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (!unit.Type->Harvester) {
+		//Wyrmgus start
+//		if (!unit.Type->Harvester) {
+		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+		//Wyrmgus end
 			continue;
 		}
 
@@ -1578,7 +1584,7 @@ static void AiCheckRepair()
 		if (unit.Type->RepairHP
 			//Wyrmgus start
 //			&& unit.CurrentAction() != UnitActionBuilt
-			&& (unit.CurrentAction() != UnitActionBuilt || unit.Type->BuilderOutside)
+			&& (unit.CurrentAction() != UnitActionBuilt || unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value)
 			//Wyrmgus end
 			&& unit.CurrentAction() != UnitActionUpgradeTo
 			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max

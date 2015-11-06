@@ -1243,7 +1243,10 @@ void CPlayer::UpdateFreeWorkers()
 
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (unit.IsAlive() && unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
+		//Wyrmgus start
+//		if (unit.IsAlive() && unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
+		if (unit.IsAlive() && unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.Type->ResInfo && !unit.Removed) {
+		//Wyrmgus end
 			if (unit.CurrentAction() == UnitActionStill) {
 				FreeWorkers.push_back(&unit);
 			}

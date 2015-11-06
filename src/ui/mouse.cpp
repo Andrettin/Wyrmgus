@@ -131,10 +131,16 @@ static void DoRightButton_ForForeignUnit(CUnit *dest)
 	const int res = unit.Type->GivesResource;
 
 	if (res
-		&& dest->Type->Harvester
+		//Wyrmgus start
+//		&& dest->Type->Harvester
+		&& dest->Type->BoolFlag[HARVESTER_INDEX].value
+		//Wyrmgus end
 		&& dest->Type->ResInfo[res]
 		&& dest->ResourcesHeld < dest->Type->ResInfo[res]->ResourceCapacity
-		&& unit.Type->CanHarvest) {
+		//Wyrmgus start
+//		&& unit.Type->CanHarvest) {
+		&& unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
+		//Wyrmgus end
 		unit.Blink = 4;
 		//  Right mouse with SHIFT appends command to old commands.
 		const int flush = !(KeyModifiers & ModifierShift);
@@ -218,7 +224,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	// Go and harvest from a unit
 	const int res = dest.Type->GivesResource;
 	const CUnitType &type = *unit.Type;
-	if (res && type.ResInfo[res] && dest.Type->CanHarvest
+	//Wyrmgus start
+//	if (res && type.ResInfo[res] && dest.Type->CanHarvest
+	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
+	//Wyrmgus end
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
 			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 				dest.Blink = 4;
@@ -242,11 +251,11 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			}
 	//Wyrmgus start
 	// make unit build harvesting building on top if right-clicked
-	} else if (res && type.ResInfo[res] && !dest.Type->CanHarvest
+	} else if (res && type.ResInfo[res] && !dest.Type->BoolFlag[CANHARVEST_INDEX].value
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
 			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
-					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->CanHarvest && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1)) {
+					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1)) {
 						dest.Blink = 4;
 						SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush);
 						if (!acknowledged) {
@@ -317,7 +326,10 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		return true;
 	}
 	// Harvest
-	if (type.Harvester) {
+	//Wyrmgus start
+//	if (type.Harvester) {
+	if (type.BoolFlag[HARVESTER_INDEX].value) {
+	//Wyrmgus end
 		if (dest != NULL) {
 			if (DoRightButton_Harvest_Unit(unit, *dest, flush, acknowledged)) {
 				return true;
@@ -521,7 +533,10 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 	if (res
 		&& dest.Type->ResInfo[res]
 		&& dest.ResourcesHeld < dest.Type->ResInfo[res]->ResourceCapacity
-		&& type.CanHarvest
+		//Wyrmgus start
+//		&& type.CanHarvest
+		&& type.BoolFlag[CANHARVEST_INDEX].value
+		//Wyrmgus end
 		&& dest.Player == unit.Player) {
 		unit.Blink = 4;
 		SendCommandResource(dest, unit, flush);
@@ -533,7 +548,10 @@ static bool DoRightButton_Harvest_Reverse(CUnit &unit, CUnit &dest, int flush, i
 static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, int flush, int &acknowledged)
 {
 	// Go and harvest from a unit
-	if (dest != NULL && dest->Type->GivesResource && dest->Type->CanHarvest
+	//Wyrmgus start
+//	if (dest != NULL && dest->Type->GivesResource && dest->Type->CanHarvest
+	if (dest != NULL && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
+	//Wyrmgus end
 		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -650,7 +668,10 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	}
 
 	// Manage harvester from the destination side.
-	if (dest != NULL && dest->Type->Harvester) {
+	//Wyrmgus start
+//	if (dest != NULL && dest->Type->Harvester) {
+	if (dest != NULL && dest->Type->BoolFlag[HARVESTER_INDEX].value) {
+	//Wyrmgus end
 		if (DoRightButton_Harvest_Reverse(unit, *dest, flush, acknowledged)) {
 			return;
 		}
@@ -1460,12 +1481,18 @@ static int SendResource(const Vec2i &pos)
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 
-		if (unit.Type->Harvester) {
+		//Wyrmgus start
+//		if (unit.Type->Harvester) {
+		if (unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+		//Wyrmgus end
 			if (dest
 				&& (res = dest->Type->GivesResource) != 0
 				&& unit.Type->ResInfo[res]
 				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
-				&& dest->Type->CanHarvest
+				//Wyrmgus start
+//				&& dest->Type->CanHarvest
+				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
+				//Wyrmgus end
 				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
 				dest->Blink = 4;
 				SendCommandResource(unit, *dest, flush);
@@ -1492,7 +1519,10 @@ static int SendResource(const Vec2i &pos)
 			}
 		}
 		if (!unit.CanMove()) {
-			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
+			//Wyrmgus start
+//			if (dest && dest->Type->GivesResource && dest->Type->CanHarvest) {
+			if (dest && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value) {
+			//Wyrmgus end
 				dest->Blink = 4;
 				SendCommandResource(unit, *dest, flush);
 				ret = 1;

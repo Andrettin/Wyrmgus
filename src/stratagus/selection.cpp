@@ -405,7 +405,10 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 
 	// if unit isn't belonging to the player or allied player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (!CanSelectMultipleUnits(*base.Player) || !type.SelectableByRectangle) {
+	//Wyrmgus start
+//	if (!CanSelectMultipleUnits(*base.Player) || !type.SelectableByRectangle) {
+	if (!CanSelectMultipleUnits(*base.Player) || !type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+	//Wyrmgus end
 		return Selected.size();
 	}
 
@@ -493,7 +496,10 @@ int ToggleUnitsByType(CUnit &base)
 	}
 	// if unit isn't belonging to the player, or is a static unit
 	// (like a building), only 1 unit can be selected at the same time.
-	if (!CanSelectMultipleUnits(*base.Player) || !type.SelectableByRectangle) {
+	//Wyrmgus start
+//	if (!CanSelectMultipleUnits(*base.Player) || !type.SelectableByRectangle) {
+	if (!CanSelectMultipleUnits(*base.Player) || !type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+	//Wyrmgus end
 		return 0;
 	}
 
@@ -680,7 +686,10 @@ static bool SelectOrganicUnitsInTable(std::vector<CUnit *> &table, bool added_ta
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+		//Wyrmgus start
+//		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		//Wyrmgus end
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
@@ -845,7 +854,10 @@ int SelectArmy()
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+		//Wyrmgus start
+//		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		//Wyrmgus end
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
@@ -860,7 +872,10 @@ int SelectArmy()
 		if (unit.Type->Building) { //this selection mode is not for buildings
 			continue;
 		}
-		if (unit.Type->Harvester && unit.Type->ResInfo) { //this selection mode is not for workers
+		//Wyrmgus start
+//		if (unit.Type->Harvester && unit.Type->ResInfo) { //this selection mode is not for workers
+		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.Type->ResInfo) { //this selection mode is not for workers
+		//Wyrmgus end
 			continue;
 		}
 		table[n++] = &unit;
@@ -890,7 +905,10 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	// In this case, do nothing.
 	if (Selected.size() == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->SelectableByRectangle)) {
+			//Wyrmgus start
+//			|| !Selected[0]->Type->SelectableByRectangle)) {
+			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+			//Wyrmgus end
 		return Selected.empty();
 	}
 	// If there is no selected unit yet, do a simple selection.
@@ -955,7 +973,10 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+		//Wyrmgus start
+//		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		//Wyrmgus end
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
@@ -1003,7 +1024,10 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 	unsigned int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
-		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+		//Wyrmgus start
+//		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->SelectableByRectangle) {
+		if (!CanSelectMultipleUnits(*unit.Player) || !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		//Wyrmgus end
 			continue;
 		}
 		if (unit.IsUnusable()) { // guess SelectUnits doesn't check this
@@ -1047,7 +1071,10 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	// In this case, do nothing.
 	if (Selected.size() == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->SelectableByRectangle)) {
+			//Wyrmgus start
+//			|| !Selected[0]->Type->SelectableByRectangle)) {
+			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+			//Wyrmgus end
 		return Selected.size();
 	}
 
@@ -1072,7 +1099,10 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 		CUnit &unit = *table[i];
 
 		if (!CanSelectMultipleUnits(*unit.Player) ||
-			!unit.Type->SelectableByRectangle) {
+			//Wyrmgus start
+//			!unit.Type->SelectableByRectangle) {
+			!unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+			//Wyrmgus end
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this
@@ -1117,7 +1147,10 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	// In this case, do nothing.
 	if (Selected.size() == 1
 		&& (!CanSelectMultipleUnits(*Selected[0]->Player)
-			|| !Selected[0]->Type->SelectableByRectangle)) {
+			//Wyrmgus start
+//			|| !Selected[0]->Type->SelectableByRectangle)) {
+			|| !Selected[0]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value)) {
+			//Wyrmgus end
 		return Selected.size();
 	}
 
@@ -1140,7 +1173,10 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	for (size_t i = 0; i < table.size(); ++i) {
 		CUnit &unit = *table[i];
 		if (!CanSelectMultipleUnits(*unit.Player) ||
-			!unit.Type->SelectableByRectangle) {
+			//Wyrmgus start
+//			!unit.Type->SelectableByRectangle) {
+			!unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+			//Wyrmgus end
 			continue;
 		}
 		if (unit.IsUnusable()) {  // guess SelectUnits doesn't check this

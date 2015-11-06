@@ -1254,7 +1254,16 @@ void CUnit::Draw(const CViewport &vp) const
 	}
 	int shield_frame = frame;
 	PixelPos shield_offset(0, 0);
-	if (type->ShieldAnimation[base_frame]) {
+	if (varinfo && varinfo->ShieldAnimation[base_frame]) {
+		shield_frame = varinfo->ShieldAnimation[base_frame]->OverlayFrame;
+		shield_offset.x = varinfo->ShieldAnimation[base_frame]->XOffset;
+		shield_offset.y = varinfo->ShieldAnimation[base_frame]->YOffset;
+		if (frame < 0) {
+			shield_frame *= -1;
+			shield_frame -= 1;
+			shield_offset.x *= -1;
+		}
+	} else if (type->ShieldAnimation[base_frame]) {
 		shield_frame = type->ShieldAnimation[base_frame]->OverlayFrame;
 		shield_offset.x = type->ShieldAnimation[base_frame]->XOffset;
 		shield_offset.y = type->ShieldAnimation[base_frame]->YOffset;
@@ -1299,7 +1308,10 @@ void CUnit::Draw(const CViewport &vp) const
 	// Adjust sprite for Harvesters.
 	//
 	CPlayerColorGraphic *sprite = type->Sprite;
-	if (type->Harvester && this->CurrentResource) {
+	//Wyrmgus start
+//	if (type->Harvester && this->CurrentResource) {
+	if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
+	//Wyrmgus end
 		ResourceInfo *resinfo = type->ResInfo[this->CurrentResource];
 		if (this->ResourcesHeld) {
 			if (resinfo->SpriteWhenLoaded) {
@@ -1317,7 +1329,10 @@ void CUnit::Draw(const CViewport &vp) const
 		if (varinfo->Sprite) {
 			sprite = varinfo->Sprite;
 		}
-		if (type->Harvester && this->CurrentResource) {
+		//Wyrmgus start
+//		if (type->Harvester && this->CurrentResource) {
+		if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
+		//Wyrmgus end
 			if (this->ResourcesHeld) {
 				if (varinfo->SpriteWhenLoaded[this->CurrentResource]) {
 					sprite = varinfo->SpriteWhenLoaded[this->CurrentResource];

@@ -73,7 +73,10 @@ public:
 	{
 		if (ThisPlayer->IsTeamed(unit)) {
 			if (!tainted) {
-				tainted = unit.Type->SelectableByRectangle != true;
+				//Wyrmgus start
+//				tainted = unit.Type->SelectableByRectangle != true;
+				tainted = unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value != true;
+				//Wyrmgus end
 			}
 			units.push_back(&unit);
 			unit.GroupId |= (1 << num);
@@ -89,7 +92,10 @@ public:
 		units.pop_back();
 
 		// Update tainted flag.
-		if (tainted && !unit.Type->SelectableByRectangle) {
+		//Wyrmgus start
+//		if (tainted && !unit.Type->SelectableByRectangle) {
+		if (tainted && !unit.Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+		//Wyrmgus end
 			updateTainted();
 		}
 	}
@@ -99,7 +105,10 @@ private:
 	{
 		tainted = false;
 		for (size_t i = 0; i != units.size(); ++i) {
-			if (units[i]->Type && !units[i]->Type->SelectableByRectangle) {
+			//Wyrmgus start
+//			if (units[i]->Type && !units[i]->Type->SelectableByRectangle) {
+			if (units[i]->Type && !units[i]->Type->BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value) {
+			//Wyrmgus end
 				tainted = true;
 			}
 		}

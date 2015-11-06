@@ -300,7 +300,10 @@ public:
 		const CUnitType &type = *unit->Type;
 		return (type.GivesResource == resource
 				&& unit->ResourcesHeld != 0
-				&& (mine_on_top ? type.CanHarvest : !type.CanHarvest)
+				//Wyrmgus start
+//				&& (mine_on_top ? type.CanHarvest : !type.CanHarvest)
+				&& (mine_on_top ? type.BoolFlag[CANHARVEST_INDEX].value : !type.BoolFlag[CANHARVEST_INDEX].value)
+				//Wyrmgus end
 				&& !unit->IsUnusable(true) //allow mines under construction
 			   );
 	}
@@ -377,7 +380,7 @@ bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 {
 	//Wyrmgus start
 //	return mine.Type->CanHarvest && mine.ResourcesHeld
-	return (mine_on_top ? mine.Type->CanHarvest : !mine.Type->CanHarvest) && mine.ResourcesHeld
+	return (mine_on_top ? mine.Type->BoolFlag[CANHARVEST_INDEX].value : !mine.Type->BoolFlag[CANHARVEST_INDEX].value) && mine.ResourcesHeld
 	//Wyrmgus end
 			//Wyrmgus start
 		   && !mine.IsUnusable(false)
@@ -518,7 +521,10 @@ CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last)
 
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = player.GetUnit(i);
-		if (unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
+		//Wyrmgus start
+//		if (unit.Type->Harvester && unit.Type->ResInfo && !unit.Removed) {
+		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.Type->ResInfo && !unit.Removed) {
+		//Wyrmgus end
 			if (unit.CurrentAction() == UnitActionStill) {
 				if (SelectNextUnit && !IsOnlySelected(unit)) {
 					return &unit;

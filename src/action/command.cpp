@@ -629,7 +629,10 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 	//Wyrmgus end
 	COrderPtr *order;
 
-	if (unit.Type->Building && !what.BuilderOutside && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
+	//Wyrmgus start
+//	if (unit.Type->Building && !what.BuilderOutside && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
+	if (unit.Type->Building && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
+	//Wyrmgus end
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -671,7 +674,10 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	if (!unit.Type->Building && !unit.Type->Harvester) {
+	//Wyrmgus start
+//	if (!unit.Type->Building && !unit.Type->Harvester) {
+	if (!unit.Type->Building && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+	//Wyrmgus end
 		ClearSavedAction(unit);
 		return ;
 	}
@@ -717,7 +723,10 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 	if (dest.Destroyed) {
 		return ;
 	}
-	if (!unit.Type->Building && !unit.Type->Harvester) {
+	//Wyrmgus start
+//	if (!unit.Type->Building && !unit.Type->Harvester) {
+	if (!unit.Type->Building && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+	//Wyrmgus end
 		ClearSavedAction(unit);
 		return ;
 	}
@@ -760,8 +769,12 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	if ((unit.Type->Harvester && unit.ResourcesHeld == 0)
-		|| (!unit.Type->Building && !unit.Type->Harvester)) {
+	//Wyrmgus start
+//	if ((unit.Type->Harvester && unit.ResourcesHeld == 0)
+//		|| (!unit.Type->Building && !unit.Type->Harvester)) {
+	if ((unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.ResourcesHeld == 0)
+		|| (!unit.Type->Building && !unit.Type->BoolFlag[HARVESTER_INDEX].value)) {
+	//Wyrmgus end
 		ClearSavedAction(unit);
 		return ;
 	}

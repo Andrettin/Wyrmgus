@@ -591,7 +591,7 @@ static int AiRemoveFromBuilt2(PlayerAi *pai, const CUnitType &type)
 static void AiRemoveFromBuilt(PlayerAi *pai, const CUnitType &type)
 {
 	//Wyrmgus start
-	if (type.GivesResource && type.CanHarvest) {
+	if (type.GivesResource && type.BoolFlag[CANHARVEST_INDEX].value) {
 		return; //don't reduce refineries from the build request, they should be built dynamically via the resource gathering code without being request
 	}
 	//Wyrmgus end
@@ -644,7 +644,7 @@ static bool AiReduceMadeInBuilt2(PlayerAi &pai, const CUnitType &type)
 void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type)
 {
 	//Wyrmgus start
-	if (type.GivesResource && type.CanHarvest) {
+	if (type.GivesResource && type.BoolFlag[CANHARVEST_INDEX].value) {
 		return; //don't reduce refineries from the build request, they should be built dynamically via the resource gathering code without being request
 	}
 	//Wyrmgus end

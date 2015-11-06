@@ -733,10 +733,12 @@ CUnitType::CUnitType() :
 //	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
 	CanAttack(0),
 	//Wyrmgus end
-	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
+	//Wyrmgus start
+//	BuilderOutside(0), BuilderLost(0), CanHarvest(0), Harvester(0),
+	//Wyrmgus end
 	//Wyrmgus start
 //	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
-	Neutral(0), SelectableByRectangle(0),
+	Neutral(0),
 //	Indestructible(0), Teleporter(0), SaveCargo(0),
 //	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
 	//Wyrmgus end
@@ -764,6 +766,9 @@ CUnitType::CUnitType() :
 //	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	//Wyrmgus end
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
+	//Wyrmgus start
+	memset(ShieldAnimation, NULL, sizeof(ShieldAnimation));
+	//Wyrmgus end
 }
 
 CUnitType::~CUnitType()
@@ -808,53 +813,6 @@ CUnitType::~CUnitType()
 	//Wyrmgus start
 	for (int var = 0; var < VariationMax; ++var) {
 		if (this->VarInfo[var]) {
-			if (this->VarInfo[var]->Sprite) {
-				CGraphic::Free(this->VarInfo[var]->Sprite);
-			}
-			if (this->VarInfo[var]->ShadowSprite) {
-				CGraphic::Free(this->VarInfo[var]->ShadowSprite);
-			}
-			if (this->VarInfo[var]->LeftArmSprite) {
-				CGraphic::Free(this->VarInfo[var]->LeftArmSprite);
-			}
-			if (this->VarInfo[var]->RightArmSprite) {
-				CGraphic::Free(this->VarInfo[var]->RightArmSprite);
-			}
-			if (this->VarInfo[var]->HairSprite) {
-				CGraphic::Free(this->VarInfo[var]->HairSprite);
-			}
-			if (this->VarInfo[var]->ClothingSprite) {
-				CGraphic::Free(this->VarInfo[var]->ClothingSprite);
-			}
-			if (this->VarInfo[var]->ClothingLeftArmSprite) {
-				CGraphic::Free(this->VarInfo[var]->ClothingLeftArmSprite);
-			}
-			if (this->VarInfo[var]->ClothingRightArmSprite) {
-				CGraphic::Free(this->VarInfo[var]->ClothingRightArmSprite);
-			}
-			if (this->VarInfo[var]->PantsSprite) {
-				CGraphic::Free(this->VarInfo[var]->PantsSprite);
-			}
-			if (this->VarInfo[var]->ShoesSprite) {
-				CGraphic::Free(this->VarInfo[var]->ShoesSprite);
-			}
-			if (this->VarInfo[var]->WeaponSprite) {
-				CGraphic::Free(this->VarInfo[var]->WeaponSprite);
-			}
-			if (this->VarInfo[var]->ShieldSprite) {
-				CGraphic::Free(this->VarInfo[var]->ShieldSprite);
-			}
-			if (this->VarInfo[var]->HelmetSprite) {
-				CGraphic::Free(this->VarInfo[var]->HelmetSprite);
-			}
-			for (int res = 0; res < MaxCosts; ++res) {
-				if (this->VarInfo[var]->SpriteWhenLoaded[res]) {
-					CGraphic::Free(this->VarInfo[var]->SpriteWhenLoaded[res]);
-				}
-				if (this->VarInfo[var]->SpriteWhenEmpty[res]) {
-					CGraphic::Free(this->VarInfo[var]->SpriteWhenEmpty[res]);
-				}
-			}
 			delete this->VarInfo[var];
 		}
 	}
@@ -923,9 +881,15 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 	//Wyrmgus end
 		switch (mode) {
 			case SELECTABLE_BY_RECTANGLE_ONLY:
-				return SelectableByRectangle;
+				//Wyrmgus start
+//				return SelectableByRectangle;
+				return BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
+				//Wyrmgus end
 			case NON_SELECTABLE_BY_RECTANGLE_ONLY:
-				return !SelectableByRectangle;
+				//Wyrmgus start
+//				return !SelectableByRectangle;
+				return !BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
+				//Wyrmgus end
 			default:
 				return true;
 		}
@@ -1536,7 +1500,10 @@ void LoadUnitTypeSprite(CUnitType &type)
 		//Wyrmgus end
 	}
 
-	if (type.Harvester) {
+	//Wyrmgus start
+//	if (type.Harvester) {
+	if (type.BoolFlag[HARVESTER_INDEX].value) {
+	//Wyrmgus end
 		for (int i = 0; i < MaxCosts; ++i) {
 			ResourceInfo *resinfo = type.ResInfo[i];
 			if (!resinfo) {
@@ -1889,5 +1856,63 @@ void CleanUnitTypes()
 	UnitTypeHumanWall = NULL;
 	UnitTypeOrcWall = NULL;
 }
+
+//Wyrmgus start
+VariationInfo::~VariationInfo()
+{
+	if (this->Sprite) {
+		CGraphic::Free(this->Sprite);
+	}
+	if (this->ShadowSprite) {
+		CGraphic::Free(this->ShadowSprite);
+	}
+	if (this->LeftArmSprite) {
+		CGraphic::Free(this->LeftArmSprite);
+	}
+	if (this->RightArmSprite) {
+		CGraphic::Free(this->RightArmSprite);
+	}
+	if (this->HairSprite) {
+		CGraphic::Free(this->HairSprite);
+	}
+	if (this->ClothingSprite) {
+		CGraphic::Free(this->ClothingSprite);
+	}
+	if (this->ClothingLeftArmSprite) {
+		CGraphic::Free(this->ClothingLeftArmSprite);
+	}
+	if (this->ClothingRightArmSprite) {
+		CGraphic::Free(this->ClothingRightArmSprite);
+	}
+	if (this->PantsSprite) {
+		CGraphic::Free(this->PantsSprite);
+	}
+	if (this->ShoesSprite) {
+		CGraphic::Free(this->ShoesSprite);
+	}
+	if (this->WeaponSprite) {
+		CGraphic::Free(this->WeaponSprite);
+	}
+	if (this->ShieldSprite) {
+		CGraphic::Free(this->ShieldSprite);
+	}
+	if (this->HelmetSprite) {
+		CGraphic::Free(this->HelmetSprite);
+	}
+	for (int res = 0; res < MaxCosts; ++res) {
+		if (this->SpriteWhenLoaded[res]) {
+			CGraphic::Free(this->SpriteWhenLoaded[res]);
+		}
+		if (this->SpriteWhenEmpty[res]) {
+			CGraphic::Free(this->SpriteWhenEmpty[res]);
+		}
+	}
+	for (int i = 0; i < AnimationFrameMax; ++i) {
+		if (this->ShieldAnimation[i]) {
+			delete this->ShieldAnimation[i];
+		}
+	}
+}
+//Wyrmgus end
 
 //@}

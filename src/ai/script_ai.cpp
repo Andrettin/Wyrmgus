@@ -177,7 +177,10 @@ static std::vector<CUnitType *> getRefineryUnits()
 	for (std::vector<CUnitType *>::const_iterator i = UnitTypes.begin(); i != UnitTypes.end(); ++i) {
 		CUnitType &type = **i;
 
-		if (type.GivesResource > 0 && type.CanHarvest) {
+		//Wyrmgus start
+//		if (type.GivesResource > 0 && type.CanHarvest) {
+		if (type.GivesResource > 0 && type.BoolFlag[CANHARVEST_INDEX].value) {
+		//Wyrmgus end
 			res.push_back(&type);
 		}
 	}

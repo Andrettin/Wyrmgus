@@ -164,7 +164,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 
 		//Wyrmgus start
 //		DropOutOnSide(*worker, LookingW, &unit);
-		if (unit.Type->BuilderOutside == false) {
+		if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
 			DropOutOnSide(*worker, LookingW, &unit);
 		}
 		//Wyrmgus end
@@ -206,7 +206,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	CUnit *worker = order.GetWorkerPtr();
 
 	if (worker != NULL) {
-		if (type.BuilderLost) {
+		//Wyrmgus start
+//		if (type.BuilderLost) {
+		if (type.BoolFlag[BUILDERLOST_INDEX].value) {
+		//Wyrmgus end
 			// Bye bye worker.
 			LetUnitDie(*worker);
 			worker = NULL;
@@ -215,7 +218,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 
 			//Wyrmgus start
 //			DropOutOnSide(*worker, LookingW, &unit);
-			if (unit.Type->BuilderOutside == false) {
+			if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
 				DropOutOnSide(*worker, LookingW, &unit);
 			}
 			//Wyrmgus end
@@ -334,7 +337,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	const CUnitType &type = *unit.Type;
 
 	int amount;
-	if (type.BuilderOutside) {
+	//Wyrmgus start
+//	if (type.BuilderOutside) {
+	if (type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
+	//Wyrmgus end
 		amount = type.AutoBuildRate;
 	} else {
 		// FIXME: implement this below:

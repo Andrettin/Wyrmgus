@@ -178,7 +178,10 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 	}
 	if (order->Action == UnitActionResource) {
 		//  Check if new unit can harvest.
-		if (!unit.Type->Harvester) {
+		//Wyrmgus start
+//		if (!unit.Type->Harvester) {
+		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+		//Wyrmgus end
 			return false;
 		}
 		//  Also check if new unit can harvest this specific resource.
@@ -399,12 +402,12 @@ static void AnimateActionTrain(CUnit &unit)
 				if (newUnit->Type->RepairRange && table[j]->Type->RepairHP && table[j]->Variable[HP_INDEX].Value < table[j]->Variable[HP_INDEX].Max && (table[j]->Player == newUnit->Player || newUnit->IsAllied(*table[j]))) { //see if can repair
 					CommandRepair(*newUnit, unit.RallyPointPos, table[j], FlushCommands);
 					command_found = true;
-				} else if (newUnit->Type->Harvester && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && table[j]->Type->CanHarvest && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can harvest
+				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can harvest
 					CommandResource(*newUnit, *table[j], FlushCommands);
 					command_found = true;
-				} else if (newUnit->Type->Harvester && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->CanHarvest && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
+				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
 					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z] && UnitTypes[z]->GivesResource == table[j]->Type->GivesResource && UnitTypes[z]->CanHarvest && CanBuildUnitType(newUnit, *UnitTypes[z], table[j]->tilePos, 1)) {
+						if (UnitTypes[z] && UnitTypes[z]->GivesResource == table[j]->Type->GivesResource && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *UnitTypes[z], table[j]->tilePos, 1)) {
 							CommandBuildBuilding(*newUnit, table[j]->tilePos, *UnitTypes[z], FlushCommands);
 							command_found = true;
 							break;
