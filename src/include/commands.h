@@ -203,6 +203,7 @@ extern void SendCommandDiplomacy(int player, int state, int opponent);
 /// Send shared vision command
 extern void SendCommandSharedVision(int player, bool state, int opponent);
 //Wyrmgus start
+extern void SendCommandSetFaction(int player, int faction);
 extern void AdjustCommandPosForFormation(std::vector<CUnit *> &table, const Vec2i &pos);
 //Wyrmgus end
 

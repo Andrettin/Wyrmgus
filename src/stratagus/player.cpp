@@ -42,6 +42,9 @@
 #include "action/action_upgradeto.h"
 #include "actions.h"
 #include "ai.h"
+//Wyrmgus start
+#include "commands.h" //for faction setting
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "network.h"
@@ -1041,30 +1044,28 @@ void CPlayer::SetName(const std::string &name)
 **
 **  @param faction    New faction.
 */
-void CPlayer::SetFaction(const std::string &faction)
+void CPlayer::SetFaction(const std::string faction_name)
 {
-	for (int i = 0; i < FactionMax; ++i) {
-		if (PlayerRaces.Factions[this->Race][i] && !PlayerRaces.Factions[this->Race][i]->Name.empty() && PlayerRaces.Factions[this->Race][i]->Name == faction) {
-			if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
-				this->SetName(faction);
-			}
-			this->Faction = i;
-			int PrimaryColor = PlayerRaces.Factions[this->Race][i]->Color;
-			int SecondaryColor = PlayerRaces.Factions[this->Race][i]->SecondaryColor;
-			bool color_used = false;
-			for (int j = 0; j < PlayerMax; ++j) {
-				if (this->Index != j && Players[j].Faction != -1 && Players[j].Type != PlayerNobody && Players[j].Color == PlayerColors[PrimaryColor][0]) {
-					color_used = true;
-				}		
-			}
-			if (!color_used) {
-				this->Color = PlayerColors[PrimaryColor][0];
-				this->UnitColors.Colors = PlayerColorsRGB[PrimaryColor];
-			} else {
-				this->Color = PlayerColors[SecondaryColor][0];
-				this->UnitColors.Colors = PlayerColorsRGB[SecondaryColor];
-			}
-		}
+	int faction = PlayerRaces.GetFactionIndexByName(this->Race, faction_name);
+	
+	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
+		this->SetName(faction_name);
+	}
+	this->Faction = faction;
+	int PrimaryColor = PlayerRaces.Factions[this->Race][faction]->Color;
+	int SecondaryColor = PlayerRaces.Factions[this->Race][faction]->SecondaryColor;
+	bool color_used = false;
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (this->Index != i && Players[i].Faction != -1 && Players[i].Type != PlayerNobody && Players[i].Color == PlayerColors[PrimaryColor][0]) {
+			color_used = true;
+		}		
+	}
+	if (!color_used) {
+		this->Color = PlayerColors[PrimaryColor][0];
+		this->UnitColors.Colors = PlayerColorsRGB[PrimaryColor];
+	} else {
+		this->Color = PlayerColors[SecondaryColor][0];
+		this->UnitColors.Colors = PlayerColorsRGB[SecondaryColor];
 	}
 }
 
@@ -1980,6 +1981,12 @@ void SetCivilizationStringToIndex(std::string civilization_name, int civilizatio
 void SetFactionStringToIndex(int civilization, std::string faction_name, int faction_id)
 {
 	FactionStringToIndex[civilization][faction_name] = faction_id;
+}
+
+void NetworkSetFaction(int player, std::string faction_name)
+{
+	int faction = PlayerRaces.GetFactionIndexByName(Players[player].Race, faction_name);
+	SendCommandSetFaction(player, faction);
 }
 //Wyrmgus end
 

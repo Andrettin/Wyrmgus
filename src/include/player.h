@@ -148,7 +148,7 @@ public:
 	void SetName(const std::string &name);
 	
 	//Wyrmgus start
-	void SetFaction(const std::string &faction);
+	void SetFaction(const std::string faction_name);
 	void SetRandomFaction();
 	bool HasUpgradeClass(std::string upgrade_class_name);
 	//Wyrmgus end
@@ -758,6 +758,7 @@ inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == Th
 //Wyrmgus start
 extern void SetCivilizationStringToIndex(std::string civilization_name, int civilization_id);
 extern void SetFactionStringToIndex(int civilization, std::string faction_name, int faction_id);
+extern void NetworkSetFaction(int player, std::string faction_name);
 //Wyrmgus end
 
 //@}

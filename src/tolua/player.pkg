@@ -71,3 +71,6 @@ class CPlayer
 extern CPlayer Players[PlayerMax];
 extern CPlayer *ThisPlayer;
 
+//Wyrmgus start
+extern void NetworkSetFaction(int player, std::string faction_name);
+//Wyrmgus end

@@ -702,6 +702,24 @@ void SendCommandSharedVision(int player, bool state, int opponent)
 	}
 }
 
+//Wyrmgus start
+/**
+** Send command: Faction changed.
+**
+** @param player     Player which changes his faction.
+** @param faction    New faction.
+*/
+void SendCommandSetFaction(int player, int faction)
+{
+	if (!IsNetworkGame()) {
+		//FIXME: should add log of faction change here
+		Players[player].SetFaction(PlayerRaces.Factions[Players[player].Race][faction]->Name);
+	} else {
+		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player, faction, 0, 0);
+	}
+}
+//Wyrmgus end
+
 //@}
 
 //----------------------------------------------------------------------------
@@ -973,6 +991,13 @@ void ExecExtendedCommand(unsigned char type, int status,
 			}
 			CommandSharedVision(arg2, arg3 ? true : false, arg4);
 			break;
+		//Wyrmgus start
+		case ExtendedMessageSetFaction: {
+			//FIXME: should add log for faction change here
+			Players[arg2].SetFaction(PlayerRaces.Factions[Players[arg2].Race][arg3]->Name);
+			break;
+		}
+		//Wyrmgus end
 		default:
 			DebugPrint("Unknown extended message %u/%s %u %u %u %u\n" _C_
 					   type _C_ status ? "flush" : "-" _C_
