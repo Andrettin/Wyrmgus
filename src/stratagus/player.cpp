@@ -437,7 +437,11 @@ int PlayerRace::GetFactionIndexByName(const int civilization, const std::string 
 		return -1;
 	}
 	
-	return FactionStringToIndex[civilization][faction_name];
+	if (FactionStringToIndex[civilization].find(faction_name) != FactionStringToIndex[civilization].end()) {
+		return FactionStringToIndex[civilization][faction_name];
+	} else {
+		return -1;
+	}		
 }
 
 int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)

@@ -597,6 +597,15 @@ void GameMainLoop()
 	CclCommand("if (GameStarting ~= nil) then GameStarting() end");
 
 	MultiPlayerReplayEachCycle();
+	
+	//Wyrmgus start
+	//if the person player has no faction, bring up the faction choice interface
+	if (ThisPlayer) {
+		char buf[256];
+		snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", ThisPlayer->Race != -1 ? PlayerRaces.Name[ThisPlayer->Race].c_str() : "", "");
+		CclCommand(buf);
+	}
+	//Wyrmgus end
 
 	SingleGameLoop();
 

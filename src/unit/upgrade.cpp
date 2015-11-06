@@ -719,6 +719,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		player.SpeedResearch += um->SpeedResearch;
 	}
 	if (um->ChangeCivilizationTo != -1) {
+		int old_civilization = player.Race;
+		int old_faction = player.Faction;
+		
 		player.Race = um->ChangeCivilizationTo;
 		
 		//if the civilization of the person player changed, update the UI
@@ -728,8 +731,16 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set random faction from new civilization
-		player.Faction = -1;		
-		player.SetRandomFaction();
+		player.Faction = -1;
+		if (ThisPlayer && ThisPlayer->Index == player.Index) {
+			if (GameCycle != 0) {
+				char buf[256];
+				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
+				CclCommand(buf);
+			}
+		} else {
+			player.SetRandomFaction();
+		}
 	}
 	//Wyrmgus end
 
@@ -969,6 +980,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	}
 	//Wyrmgus start
 	if (um->ChangeCivilizationTo != -1) {
+		int old_civilization = player.Race;
+		int old_faction = player.Faction;
+		
 		player.Race = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str()); // restore old civilization
 		
 		//if the civilization of the person player changed, update the UI
@@ -978,8 +992,16 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set random faction from the old civilization
-		player.Faction = -1;		
-		player.SetRandomFaction();
+		player.Faction = -1;
+		if (ThisPlayer && ThisPlayer->Index == player.Index) {
+			if (GameCycle != 0) {
+				char buf[256];
+				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
+				CclCommand(buf);
+			}
+		} else {
+			player.SetRandomFaction();
+		}
 	}
 	//Wyrmgus end
 
@@ -1605,7 +1627,17 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 	//Wyrmgus start
 	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
 	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == "tribe")) {
-		player.SetRandomFaction();
+		int old_faction = player.Faction;
+		player.Faction = -1;
+		if (ThisPlayer && ThisPlayer->Index == player.Index) {
+			if (GameCycle != 0) {
+				char buf[256];
+				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", player.Race != -1 ? PlayerRaces.Name[player.Race].c_str() : "", (player.Race != -1 && old_faction != -1) ? PlayerRaces.Factions[player.Race][old_faction]->Name.c_str() : "");
+				CclCommand(buf);
+			}
+		} else {
+			player.SetRandomFaction();
+		}
 	}
 	//Wyrmgus end
 }

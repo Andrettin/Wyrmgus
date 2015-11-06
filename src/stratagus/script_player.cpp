@@ -2359,6 +2359,32 @@ static int CclGetFactionData(lua_State *l)
 
 	return 0;
 }
+
+static int CclGetFactionDevelopsTo(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, 2));
+	int current_civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 3));
+
+	int faction_count = 0;
+	std::string develops_to_factions[FactionMax];
+	for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction]->DevelopsTo.size(); ++i) {
+		if (PlayerRaces.GetFactionIndexByName(current_civilization, PlayerRaces.Factions[civilization][faction]->DevelopsTo[i]) != -1) {
+			develops_to_factions[faction_count] = PlayerRaces.Factions[civilization][faction]->DevelopsTo[i];
+			faction_count += 1;
+		}
+	}
+
+	lua_createtable(l, faction_count, 0);
+	for (int i = 1; i <= faction_count; ++i)
+	{
+		lua_pushstring(l, develops_to_factions[i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	
+	return 1;
+}
 //Wyrmgus end
 
 /**
@@ -2659,9 +2685,11 @@ static int CclSetPlayerData(lua_State *l)
 		}
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 		
-		// set random one from the civilization's factions
 		p->Faction = -1;
-		p->SetRandomFaction();
+		// if is AI, set random one from the civilization's factions
+		if (!ThisPlayer || ThisPlayer->Index != p->Index) {
+			p->SetRandomFaction();
+		}
 		//Wyrmgus end
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
@@ -2824,6 +2852,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
+	lua_register(Lua, "GetFactionDevelopsTo", CclGetFactionDevelopsTo);
 	//Wyrmgus end
 	lua_register(Lua, "DefinePlayerColors", CclDefinePlayerColors);
 	lua_register(Lua, "DefinePlayerColorIndex", CclDefinePlayerColorIndex);

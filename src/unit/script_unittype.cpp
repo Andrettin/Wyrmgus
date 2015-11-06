@@ -800,6 +800,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int var_n = 0; var_n < VariationMax; ++var_n) {
 				if (type->VarInfo[var_n]) {
 					delete type->VarInfo[var_n];
+					type->VarInfo[var_n] = NULL;
 				}
 			}
 			const int args = lua_rawlen(l, -1);
