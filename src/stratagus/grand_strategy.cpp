@@ -1440,6 +1440,26 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 				this->Income[i] = 0;
 			}
 		}
+		
+		//set the province's faction-specific units back to the corresponding units of the province's civilization
+		if (this->Owner->Civilization == this->Civilization) {
+			for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
+				if (
+					IsGrandStrategyUnit(*UnitTypes[i])
+					&& !UnitTypes[i]->Class.empty()
+					&& !UnitTypes[i]->Civilization.empty()
+					&& !UnitTypes[i]->Faction.empty()
+					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
+					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
+					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))
+				) {
+					this->ChangeUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), this->Units[i]);
+					this->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
+					this->SetUnitQuantity(i, 0);
+					this->UnderConstructionUnits[i] = 0;
+				}
+			}
+		}
 	}
 	
 	for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
@@ -1475,6 +1495,26 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 				int dock_building_type = this->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
 				if (dock_building_type != -1) {
 					this->SetSettlementBuilding(dock_building_type, true);
+				}
+			}
+		}
+		
+		//set the province's units to their faction-specific equivalents (if any)
+		if (this->Owner->Civilization == this->Civilization) {
+			for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
+				if (
+					IsGrandStrategyUnit(*UnitTypes[i])
+					&& !UnitTypes[i]->Class.empty()
+					&& !UnitTypes[i]->Civilization.empty()
+					&& UnitTypes[i]->Faction.empty()
+					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
+					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
+					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))
+				) {
+					this->ChangeUnitQuantity(PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), this->Units[i]);
+					this->UnderConstructionUnits[PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
+					this->SetUnitQuantity(i, 0);
+					this->UnderConstructionUnits[i] = 0;
 				}
 			}
 		}
