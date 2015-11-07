@@ -2685,6 +2685,21 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Provinces[i]->Water) { //provinces are non-water provinces by default
 					fprintf(fd, "SetProvinceWater(\"%s\", %s)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), "true"); //save whether the province is a water province
 				}
+			}
+		}
+		
+		//now that the provinces are defined, loop through the tiles again and save their provinces
+		for (int x = 0; x < GetWorldMapWidth(); ++x) {
+			for (int y = 0; y < GetWorldMapHeight(); ++y) {
+				if (GrandStrategyGame.WorldMapTiles[x][y]->Province != -1) {
+					fprintf(fd, "SetWorldMapTileProvince(%d, %d, \"%s\")\n", x, y, GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Name.c_str());
+				}
+			}
+		}
+		
+		//now save the provinces' data
+		for (int i = 0; i < ProvinceMax; ++i) { //save province information
+			if (GrandStrategyGame.Provinces[i] && !GrandStrategyGame.Provinces[i]->Name.empty()) {
 				if (!GrandStrategyGame.Provinces[i]->SettlementName.empty()) {
 					fprintf(fd, "SetProvinceSettlementName(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->SettlementName.c_str()); //save the province's settlement name
 				}
@@ -2757,16 +2772,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 			} else {
 				break;
 			}
-		}
-		
-		//now that the provinces are defined, loop through the tiles again and save their provinces
-		for (int x = 0; x < GetWorldMapWidth(); ++x) {
-			for (int y = 0; y < GetWorldMapHeight(); ++y) {
-				if (GrandStrategyGame.WorldMapTiles[x][y]->Province != -1) {
-					fprintf(fd, "SetWorldMapTileProvince(%d, %d, \"%s\")\n", x, y, GrandStrategyGame.Provinces[GrandStrategyGame.WorldMapTiles[x][y]->Province]->Name.c_str());
-				}
-			}
-		}
+		}		
 		
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (int j = 0; j < FactionMax; ++j) {
