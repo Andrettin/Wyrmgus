@@ -275,7 +275,7 @@ class CFaction
 public:
 	CFaction() : 
 		Name(""), Type(""),
-		Color(-1), SecondaryColor(-1), DefaultTier(FactionTierBarony),
+		Color(-1), SecondaryColor(-1), DefaultTier(FactionTierBarony), ParentFaction (-1),
 		Playable(true) //factions are playable by default
 	{
 	}
@@ -285,6 +285,7 @@ public:
 	int Color;															/// faction color
 	int SecondaryColor;													/// faction secondary color
 	int DefaultTier;													/// default faction tier
+	int ParentFaction;													/// parent faction of this faction
 	bool Playable;														/// faction playability
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
@@ -576,6 +577,12 @@ public:
 				CivilizationClassUnitTypes[i][j] = -1;
 				CivilizationClassUpgrades[i][j] = -1;
 			}
+			for (int j = 0; j < FactionMax; ++j) {
+				for (int k = 0; k < UnitTypeClassMax; ++k) {
+					FactionClassUnitTypes[i][j][k] = -1;
+					FactionClassUpgrades[i][j][k] = -1;
+				}
+			}
 		}
 		memset(Playable, 0, sizeof(Playable));
 		//Wyrmgus end
@@ -587,6 +594,8 @@ public:
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
+	int GetFactionClassUnitType(int civilization, int faction, int class_id);
+	int GetFactionClassUpgrade(int civilization, int faction, int class_id);
 	bool RequiresPlural(std::string word, int civilization) const;
 	std::string GetPluralForm(std::string word, int civilization) const;
 	std::string TranslateName(std::string name, int civilization);
@@ -599,6 +608,8 @@ public:
 	//Wyrmgus start
 	int CivilizationClassUnitTypes[MAX_RACES][UnitTypeClassMax];		/// the unit type slot of a particular class for a particular civilization
 	int CivilizationClassUpgrades[MAX_RACES][UnitTypeClassMax];			/// the upgrade slot of a particular class for a particular civilization
+	int FactionClassUnitTypes[MAX_RACES][FactionMax][UnitTypeClassMax];	/// the unit type slot of a particular class for a particular faction
+	int FactionClassUpgrades[MAX_RACES][FactionMax][UnitTypeClassMax];	/// the upgrade slot of a particular class for a particular faction
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)

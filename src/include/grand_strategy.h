@@ -190,6 +190,7 @@ public:
 	int GetResourceDemand(int resource);
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRisk();
+	int GetClassUnitType(int class_id);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);

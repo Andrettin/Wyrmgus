@@ -727,8 +727,8 @@ void CGrandStrategyGame::DoTurn()
 							int revolter_faction = possible_revolters[SyncRand(possible_revolter_count)];
 							this->Provinces[i]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[this->Provinces[i]->Civilization][revolter_faction]));
 							
-							int militia_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("militia"));
-							int infantry_id = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("infantry"));
+							int militia_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("militia"));
+							int infantry_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"));
 							
 							if (militia_id != -1) {
 								this->Provinces[i]->SetAttackingUnitQuantity(militia_id, SyncRand(this->Provinces[i]->TotalWorkers) + 1);
@@ -749,7 +749,7 @@ void CGrandStrategyGame::DoTurn()
 					this->Provinces[i]->PopulationGrowthProgress += province_food_income;
 					if (this->Provinces[i]->PopulationGrowthProgress >= PopulationGrowthThreshold) { //if population growth progress is greater than or equal to the population growth threshold, create a new worker unit
 						if (province_food_income >= 100) { //if province food income is enough to support a new unit
-							int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
+							int worker_unit_type = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker"));
 							int new_units = this->Provinces[i]->PopulationGrowthProgress / PopulationGrowthThreshold;
 							this->Provinces[i]->PopulationGrowthProgress -= PopulationGrowthThreshold * new_units;
 							
@@ -762,7 +762,7 @@ void CGrandStrategyGame::DoTurn()
 						province_food_income = this->Provinces[i]->Income[GrainCost] + this->Provinces[i]->Income[MushroomCost] + this->Provinces[i]->Income[FishCost] - this->Provinces[i]->FoodConsumption;
 						//if the food income is still negative after reallocating labor (this shouldn't happen most of the time!) then decrease the population by 1 due to starvation; only do this if the population is above 1 (to prevent provinces from being entirely depopulated and unable to grow a population afterwards)
 						if (province_food_income < 0 && this->Provinces[i]->TotalWorkers > 1) {
-							int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(this->Provinces[i]->Civilization, GetUnitTypeClassIndexByName("worker"));
+							int worker_unit_type = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker"));
 							this->Provinces[i]->ChangeUnitQuantity(worker_unit_type, -1);
 							if (this->Provinces[i]->Owner == this->PlayerFaction) { //if this is one of the player's provinces, display a message about the population starving
 								char buf[256];
@@ -1339,7 +1339,7 @@ void WorldMapTile::SetPort(bool has_port)
 	if (this->Province != -1 && GrandStrategyGame.Provinces[this->Province]->SettlementLocation == this->Position) {
 		int civilization = GrandStrategyGame.Provinces[this->Province]->Civilization;
 		if (civilization != -1) {
-			int building_type = PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName("dock"));
+			int building_type = GrandStrategyGame.Provinces[this->Province]->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
 			if (building_type != -1) {
 				GrandStrategyGame.Provinces[this->Province]->SetSettlementBuilding(building_type, has_port);
 			}
@@ -1472,7 +1472,7 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 			
 			//if province's settlement location tile has a port but not the province, create a dock for the province's settlement, if its civilization has one
 			if (GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
-				int dock_building_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName("dock"));
+				int dock_building_type = this->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
 				if (dock_building_type != -1) {
 					this->SetSettlementBuilding(dock_building_type, true);
 				}
@@ -1582,10 +1582,10 @@ void CProvince::SetCivilization(int civilization)
 		for (size_t i = 0; i < UnitTypes.size(); ++i) {
 			// replace existent buildings from other civilizations with buildings of the new civilization
 			if (IsGrandStrategyBuilding(*UnitTypes[i]) && !UnitTypes[i]->Civilization.empty()) {
-				if (this->SettlementBuildings[i] && PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
+				if (this->SettlementBuildings[i] && this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
 					this->SetSettlementBuilding(i, false); // remove building from other civilization
-					if (PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
-						this->SetSettlementBuilding(PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), true);
+					if (this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
+						this->SetSettlementBuilding(this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), true);
 					}
 				}
 			// replace existent units from the previous civilization with units of the new civilization
@@ -1594,11 +1594,11 @@ void CProvince::SetCivilization(int civilization)
 				&& !UnitTypes[i]->Class.empty()
 				&& !UnitTypes[i]->Civilization.empty()
 				&& PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
-				&& PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
-				&& PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) // don't replace if both civilizations use the same unit type
+				&& this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
+				&& this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) // don't replace if both civilizations use the same unit type
 			) {
-				this->ChangeUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), this->Units[i]);
-				this->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
+				this->ChangeUnitQuantity(this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), this->Units[i]);
+				this->UnderConstructionUnits[this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
 				this->SetUnitQuantity(i, 0);
 				this->UnderConstructionUnits[i] = 0;
 			}
@@ -1606,7 +1606,7 @@ void CProvince::SetCivilization(int civilization)
 		
 		if (old_civilization == -1 && this->TotalWorkers == 0) {
 			//if the province had no culture set and thus has no worker, give it one worker
-			this->SetUnitQuantity(PlayerRaces.GetCivilizationClassUnitType(civilization, GetUnitTypeClassIndexByName("worker")), 1);
+			this->SetUnitQuantity(this->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), 1);
 		}
 	} else {
 		//if province is being set to no culture, remove all workers
@@ -1944,7 +1944,7 @@ bool CProvince::HasBuildingClass(std::string building_class_name)
 		return false;
 	}
 	
-	int building_type = PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(building_class_name));
+	int building_type = this->GetClassUnitType(GetUnitTypeClassIndexByName(building_class_name));
 	
 	if (building_type == -1 && building_class_name == "mercenary-camp") { //special case for mercenary camps, which are a neutral building
 		building_type = UnitTypeIdByIdent("unit-mercenary-camp");
@@ -2064,6 +2064,15 @@ int CProvince::GetRevoltRisk()
 	}
 	
 	return revolt_risk;
+}
+
+int CProvince::GetClassUnitType(int class_id)
+{
+	if (this->Owner != NULL && this->Civilization == this->Owner->Civilization) {
+		return PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, class_id);
+	} else {
+		return PlayerRaces.GetCivilizationClassUnitType(this->Civilization, class_id);
+	}
 }
 
 /**
@@ -3142,7 +3151,7 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 		return false;
 	}
 	
-	int technology_id = PlayerRaces.GetCivilizationClassUpgrade(this->Civilization, GetUpgradeClassIndexByName(technology_class_name));
+	int technology_id = PlayerRaces.GetFactionClassUpgrade(this->Civilization, this->Faction, GetUpgradeClassIndexByName(technology_class_name));
 	
 	if (technology_id != -1 && this->Technologies[technology_id] == true) {
 		return true;
@@ -4351,7 +4360,7 @@ void SetProvincePopulation(std::string province_name, int quantity)
 		if (GrandStrategyGame.Provinces[province_id]->Civilization == -1) {
 			return;
 		}
-		int worker_unit_type = PlayerRaces.GetCivilizationClassUnitType(GrandStrategyGame.Provinces[province_id]->Civilization, GetUnitTypeClassIndexByName("worker"));
+		int worker_unit_type = GrandStrategyGame.Provinces[province_id]->GetClassUnitType(GetUnitTypeClassIndexByName("worker"));
 	
 		if (quantity > 0) {
 			quantity /= 10000; // each population unit represents 10,000 people

@@ -1991,6 +1991,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->Class = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			type->Civilization = LuaToString(l, -1);
+		} else if (!strcmp(value, "Faction")) {
+			type->Faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			type->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
@@ -2081,8 +2083,16 @@ static int CclDefineUnitType(lua_State *l)
 		}
 		if (!type->Civilization.empty()) {
 			int civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
-			if (civilization_id != -1 && class_id != -1) {
-				PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
+			
+			if (!type->Faction.empty()) {
+				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, type->Faction);
+				if (civilization_id != -1 && faction_id != -1 && class_id != -1) {
+					PlayerRaces.FactionClassUnitTypes[civilization_id][faction_id][class_id] = type->Slot;
+				}
+			} else {
+				if (civilization_id != -1 && class_id != -1) {
+					PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
+				}
 			}
 		}
 	}
@@ -2352,6 +2362,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		lua_pushstring(l, type->Civilization.c_str());
+		return 1;
+	} else if (!strcmp(data, "Faction")) {
+		lua_pushstring(l, type->Faction.c_str());
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, type->Description.c_str());

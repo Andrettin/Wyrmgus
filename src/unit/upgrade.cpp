@@ -414,8 +414,16 @@ static int CclDefineModifier(lua_State *l)
 		}
 		if (!AllUpgrades[um->UpgradeId]->Civilization.empty()) {
 			int civilization_id = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str());
-			if (civilization_id != -1 && class_id != -1) {
-				PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = um->UpgradeId;
+			
+			if (!AllUpgrades[um->UpgradeId]->Faction.empty()) {
+				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, AllUpgrades[um->UpgradeId]->Faction);
+				if (civilization_id != -1 && faction_id != -1 && class_id != -1) {
+					PlayerRaces.FactionClassUpgrades[civilization_id][faction_id][class_id] = um->UpgradeId;
+				}
+			} else {
+				if (civilization_id != -1 && class_id != -1) {
+					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = um->UpgradeId;
+				}
 			}
 		}
 	}

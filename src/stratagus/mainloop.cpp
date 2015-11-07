@@ -230,7 +230,7 @@ void UpdateDisplay()
 		//Wyrmgus start
 		//draw worker icon if there are idle workers
 		if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
-			int worker_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(ThisPlayer->Race, GetUnitTypeClassIndexByName("worker"));
+			int worker_unit_type_id = PlayerRaces.GetFactionClassUnitType(ThisPlayer->Race, ThisPlayer->Faction, GetUnitTypeClassIndexByName("worker"));
 			if (worker_unit_type_id != -1) {
 				const CUnitType &type = *UnitTypes[worker_unit_type_id];
 				
@@ -600,7 +600,7 @@ void GameMainLoop()
 	
 	//Wyrmgus start
 	//if the person player has no faction, bring up the faction choice interface
-	if (ThisPlayer) {
+	if (ThisPlayer && ThisPlayer->Faction == -1) {
 		char buf[256];
 		snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", ThisPlayer->Race != -1 ? PlayerRaces.Name[ThisPlayer->Race].c_str() : "", "");
 		CclCommand(buf);

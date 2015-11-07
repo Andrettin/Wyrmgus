@@ -2118,6 +2118,46 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 	return 1;
 }
 
+
+/**
+**  Get a faction's unit type/upgrade of a certain class.
+**
+**  @param l  Lua state.
+*/
+static int CclGetFactionClassUnitType(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+	std::string class_name = LuaToString(l, 1);
+	int class_id = GetUnitTypeClassIndexByName(class_name);
+	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
+	int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, 3));
+	std::string unit_type_ident;
+	if (civilization != -1 && faction != -1 && class_id != -1) {
+		int unit_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, class_id);
+		if (unit_type_id != -1) {
+			unit_type_ident = UnitTypes[unit_type_id]->Ident;
+		}
+	}
+		
+	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
+		class_id = GetUpgradeClassIndexByName(class_name);
+		if (civilization != -1 && class_id != -1) {
+			int upgrade_id = PlayerRaces.GetFactionClassUpgrade(civilization, faction, class_id);
+			if (upgrade_id != -1) {
+				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
+			}
+		}
+	}
+	
+	if (!unit_type_ident.empty()) {
+		lua_pushstring(l, unit_type_ident.c_str());
+	} else {
+		lua_pushnil(l);
+	}
+
+	return 1;
+}
+
 /**
 **  Define a civilization's factions
 **
@@ -2203,13 +2243,15 @@ static int CclDefineFaction(lua_State *l)
 
 	CFaction *faction = new CFaction;
 	faction->Name = LuaToString(l, 1);
+	int civilization = -1;
+	std::string parent_faction;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Civilization")) {
-			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 			
 			for (int i = 0; i < FactionMax; ++i) {
 				if (!PlayerRaces.Factions[civilization][i] || PlayerRaces.Factions[civilization][i]->Name.empty()) {
@@ -2238,6 +2280,8 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "DefaultTier")) {
 			faction->DefaultTier = GetFactionTierIdByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "ParentFaction")) {
+			parent_faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DevelopsTo")) {
@@ -2263,6 +2307,10 @@ static int CclDefineFaction(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
+	}
+	
+	if (civilization != -1 && !parent_faction.empty()) { //process this here, since we have no guarantee that the civilization will get processed before the parent faction
+		faction->ParentFaction = PlayerRaces.GetFactionIndexByName(civilization, parent_faction);
 	}
 	
 	return 0;
@@ -2847,6 +2895,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
 	lua_register(Lua, "GetCivilizationDefaultColor", CclGetCivilizationDefaultColor);
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
+	lua_register(Lua, "GetFactionClassUnitType", CclGetFactionClassUnitType);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);

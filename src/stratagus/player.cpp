@@ -361,6 +361,12 @@ void PlayerRace::Clean()
 			this->CivilizationClassUnitTypes[i][j] = -1;
 			this->CivilizationClassUpgrades[i][j] = -1;
 		}
+		for (int j = 0; j < FactionMax; ++j) {
+			for (int k = 0; k < UnitTypeClassMax; ++k) {
+				FactionClassUnitTypes[i][j][k] = -1;
+				FactionClassUpgrades[i][j][k] = -1;
+			}
+		}
 		this->Playable[i] = false;
 		this->Species[i].clear();
 		this->DefaultColor[i].clear();
@@ -485,6 +491,40 @@ int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
 	}
 	
 	return -1;
+}
+
+int PlayerRace::GetFactionClassUnitType(int civilization, int faction, int class_id)
+{
+	if (civilization == -1 || faction == -1 || class_id == -1) {
+		return -1;
+	}
+	
+	if (FactionClassUnitTypes[civilization][faction][class_id] != -1) {
+		return FactionClassUnitTypes[civilization][faction][class_id];
+	}
+	
+	if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
+		return GetFactionClassUnitType(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction, class_id);
+	}
+	
+	return GetCivilizationClassUnitType(civilization, class_id);
+}
+
+int PlayerRace::GetFactionClassUpgrade(int civilization, int faction, int class_id)
+{
+	if (civilization == -1 || faction == -1 || class_id == -1) {
+		return -1;
+	}
+	
+	if (FactionClassUpgrades[civilization][faction][class_id] != -1) {
+		return FactionClassUpgrades[civilization][faction][class_id];
+	}
+	
+	if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
+		return GetFactionClassUpgrade(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction, class_id);
+	}
+	
+	return GetCivilizationClassUpgrade(civilization, class_id);
 }
 
 bool PlayerRace::RequiresPlural(std::string word, int civilization) const
@@ -1134,11 +1174,11 @@ void CPlayer::SetRandomFaction()
 
 bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
 {
-	if (this->Race == -1 || upgrade_class_name.empty()) {
+	if (this->Race == -1 || this->Faction == -1 || upgrade_class_name.empty()) {
 		return false;
 	}
 	
-	int upgrade_id = PlayerRaces.GetCivilizationClassUpgrade(this->Race, GetUpgradeClassIndexByName(upgrade_class_name));
+	int upgrade_id = PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, GetUpgradeClassIndexByName(upgrade_class_name));
 	
 	if (upgrade_id != -1 && this->Allow.Upgrades[upgrade_id] == 'R') {
 		return true;

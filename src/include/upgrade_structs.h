@@ -230,7 +230,8 @@ public:
 	std::string Name;                 /// upgrade label
 	//Wyrmgus start
 	std::string Class;				/// upgrade class (i.e. siege weapon projectile I)
-	std::string Civilization;		/// civilization the upgrade belongs to
+	std::string Civilization;		/// which civilization this upgrade belongs to, if any
+	std::string Faction;			/// which faction this upgrade belongs to, if any
 	std::string Description;		/// Description of the upgrade
 	std::string Quote;				/// Quote of the upgrade
 	std::string Background;			/// Encyclopedia entry for the upgrade
