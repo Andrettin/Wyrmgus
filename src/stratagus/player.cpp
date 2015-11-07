@@ -54,6 +54,9 @@
 #include "unitsound.h"
 #include "unittype.h"
 #include "unit.h"
+//Wyrmgus start
+#include "upgrade.h"
+//Wyrmgus end
 #include "ui.h"
 #include "video.h"
 
@@ -1086,6 +1089,17 @@ void CPlayer::SetName(const std::string &name)
 */
 void CPlayer::SetFaction(const std::string faction_name)
 {
+	if (this->Faction != -1) {
+		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {
+			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade)->ID);
+		}
+	}
+	
+	if (faction_name.empty()) {
+		this->Faction = -1;
+		return;
+	}
+	
 	int faction = PlayerRaces.GetFactionIndexByName(this->Race, faction_name);
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
@@ -1106,6 +1120,12 @@ void CPlayer::SetFaction(const std::string faction_name)
 	} else {
 		this->Color = PlayerColors[SecondaryColor][0];
 		this->UnitColors.Colors = PlayerColorsRGB[SecondaryColor];
+	}
+	
+	if (this->Faction != -1) {
+		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {
+			UpgradeAcquire(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade));
+		}
 	}
 }
 

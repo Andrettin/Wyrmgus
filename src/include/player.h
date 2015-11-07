@@ -274,14 +274,15 @@ class CFaction
 {
 public:
 	CFaction() : 
-		Name(""), Type(""),
-		Color(-1), SecondaryColor(-1), DefaultTier(FactionTierBarony), ParentFaction (-1),
+		Name(""), Type(""), FactionUpgrade(""),
+		Color(-1), SecondaryColor(-1), DefaultTier(FactionTierBarony), ParentFaction(-1),
 		Playable(true) //factions are playable by default
 	{
 	}
 
 	std::string Name;													/// faction name
 	std::string Type;													/// faction type (tribe or polity)
+	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	int Color;															/// faction color
 	int SecondaryColor;													/// faction secondary color
 	int DefaultTier;													/// default faction tier

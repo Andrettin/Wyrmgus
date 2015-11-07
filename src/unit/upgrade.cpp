@@ -730,6 +730,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		int old_civilization = player.Race;
 		int old_faction = player.Faction;
 		
+		player.SetFaction("");
+		
 		player.Race = um->ChangeCivilizationTo;
 		
 		//if the civilization of the person player changed, update the UI
@@ -738,8 +740,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			UI.Load();
 		}
 		
-		// set random faction from new civilization
-		player.Faction = -1;
+		// set new faction from new civilization
 		if (ThisPlayer && ThisPlayer->Index == player.Index) {
 			if (GameCycle != 0) {
 				char buf[256];
@@ -991,6 +992,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		int old_civilization = player.Race;
 		int old_faction = player.Faction;
 		
+		player.SetFaction("");
+		
 		player.Race = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str()); // restore old civilization
 		
 		//if the civilization of the person player changed, update the UI
@@ -999,8 +1002,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			UI.Load();
 		}
 		
-		// set random faction from the old civilization
-		player.Faction = -1;
+		// set faction from the old civilization
 		if (ThisPlayer && ThisPlayer->Index == player.Index) {
 			if (GameCycle != 0) {
 				char buf[256];
@@ -1453,7 +1455,6 @@ void UpgradeLost(CPlayer &player, int id)
 	//Wyrmgus start
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
 	//Wyrmgus end
-	// FIXME: here we should reverse apply upgrade...
 	
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
@@ -1636,7 +1637,7 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
 	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == "tribe")) {
 		int old_faction = player.Faction;
-		player.Faction = -1;
+		player.SetFaction("");
 		if (ThisPlayer && ThisPlayer->Index == player.Index) {
 			if (GameCycle != 0) {
 				char buf[256];

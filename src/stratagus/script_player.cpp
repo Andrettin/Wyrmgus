@@ -2304,6 +2304,8 @@ static int CclDefineFaction(lua_State *l)
 				++k;
 				faction->Titles[government_type][faction_tier] = LuaToString(l, -1, k + 1);
 			}
+		} else if (!strcmp(value, "FactionUpgrade")) {
+			faction->FactionUpgrade = LuaToString(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -2713,6 +2715,8 @@ static int CclSetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		p->SetName(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
+		p->SetFaction("");
+		
 		const char *racename = LuaToString(l, 3);
 		p->Race = PlayerRaces.GetRaceIndexByName(racename);
 		
@@ -2733,7 +2737,6 @@ static int CclSetPlayerData(lua_State *l)
 		}
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 		
-		p->Faction = -1;
 		// if is AI, set random one from the civilization's factions
 		if (p->AiEnabled) {
 			p->SetRandomFaction();
