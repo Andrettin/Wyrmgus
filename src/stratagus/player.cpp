@@ -2048,6 +2048,124 @@ void NetworkSetFaction(int player, std::string faction_name)
 	int faction = PlayerRaces.GetFactionIndexByName(Players[player].Race, faction_name);
 	SendCommandSetFaction(player, faction);
 }
+
+std::string GetFactionEffectsString(std::string civilization_name, std::string faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	if (civilization != -1) {
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		if (faction != -1) {
+			std::string faction_effects_string;
+			
+			//check if the faction has a different unit type from its civilization
+			bool first_element = true;
+			for (int i = 0; i < UnitTypeClassMax; ++i) {
+				int unit_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, i);
+				int base_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(civilization, i);
+				if (unit_type_id != -1 && unit_type_id != base_unit_type_id) {
+					if (!first_element) {
+						faction_effects_string += ", ";
+					} else {
+						first_element = false;
+					}
+					
+					faction_effects_string += UnitTypes[unit_type_id]->Name;
+					faction_effects_string += " (";
+					
+					if (UnitTypes[unit_type_id]->Name != UnitTypes[base_unit_type_id]->Name) {
+						faction_effects_string += FindAndReplaceString(CapitalizeString(UnitTypes[unit_type_id]->Class), "-", " ");
+						faction_effects_string += ", ";
+					}
+					
+					bool first_var = true;
+					for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
+						if (j == PRIORITY_INDEX || j == POINTS_INDEX) {
+							continue;
+						}
+						
+						if (UnitTypes[unit_type_id]->DefaultStat.Variables[j].Value != UnitTypes[base_unit_type_id]->DefaultStat.Variables[j].Value) {
+							if (!first_var) {
+								faction_effects_string += ", ";
+							} else {
+								first_var = false;
+							}
+							
+							int variable_difference = UnitTypes[unit_type_id]->DefaultStat.Variables[j].Value - UnitTypes[base_unit_type_id]->DefaultStat.Variables[j].Value;
+							if (variable_difference > 0) {
+								faction_effects_string += "+";
+							}
+							faction_effects_string += std::to_string((long long) variable_difference);
+							faction_effects_string += " ";
+							
+							std::string variable_name = UnitTypeVar.VariableNameLookup[j];
+							variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+							variable_name = SeparateCapitalizedStringElements(variable_name);
+							faction_effects_string += variable_name;
+						}
+					}
+					
+					faction_effects_string += ")";
+				}
+			}
+			
+			//check if the faction's upgrade makes modifications to any units
+			if (!PlayerRaces.Factions[civilization][faction]->FactionUpgrade.empty()) {
+				int faction_upgrade_id = CUpgrade::Get(PlayerRaces.Factions[civilization][faction]->FactionUpgrade)->ID;
+				
+				for (int z = 0; z < NumUpgradeModifiers; ++z) {
+					if (UpgradeModifiers[z]->UpgradeId == faction_upgrade_id && !UpgradeModifiers[z]->ConvertTo) {
+						for (size_t i = 0; i < UnitTypes.size(); ++i) {
+							Assert(UpgradeModifiers[z]->ApplyTo[i] == '?' || UpgradeModifiers[z]->ApplyTo[i] == 'X');
+
+							if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+								if (!first_element) {
+									faction_effects_string += ", ";
+								} else {
+									first_element = false;
+								}
+									
+								faction_effects_string += UnitTypes[i]->Name;
+								faction_effects_string += " (";
+
+								bool first_var = true;
+								for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
+									if (j == PRIORITY_INDEX || j == POINTS_INDEX) {
+										continue;
+									}
+						
+									if (UpgradeModifiers[z]->Modifier.Variables[j].Value != 0) {
+										if (!first_var) {
+											faction_effects_string += ", ";
+										} else {
+											first_var = false;
+										}
+											
+										if (UpgradeModifiers[z]->Modifier.Variables[j].Value > 0) {
+											faction_effects_string += "+";
+										}
+										faction_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[j].Value);
+										faction_effects_string += " ";
+											
+										std::string variable_name = UnitTypeVar.VariableNameLookup[j];
+										variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+										variable_name = SeparateCapitalizedStringElements(variable_name);
+										faction_effects_string += variable_name;
+									}
+								}
+						
+								faction_effects_string += ")";
+							}
+						}
+					}
+				}
+			}
+			
+			return faction_effects_string;
+		}
+	}
+	
+	return "";
+}
 //Wyrmgus end
 
 //@}

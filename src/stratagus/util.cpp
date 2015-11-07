@@ -740,4 +740,15 @@ std::string DecapitalizeString(std::string text)
 	
 	return text;
 }
+
+std::string SeparateCapitalizedStringElements(std::string text)
+{
+	for (size_t pos = 1; pos < text.length(); ++pos) {
+		if (isupper(text[pos])) {
+			text.replace(pos, 1, " " + text.substr(pos, 1));
+			pos += 1;
+		}
+	}
+    return text;
+}
 //Wyrmgus end

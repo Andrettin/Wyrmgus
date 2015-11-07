@@ -153,6 +153,7 @@ extern std::string FindAndReplaceStringBeginning(std::string text, const std::st
 extern std::string TransliterateText(std::string text);				/// Convert special characters into ones more legible for English-speakers
 extern std::string CapitalizeString(std::string text);				/// Make the string become capitalized
 extern std::string DecapitalizeString(std::string text);			/// Make the string lose capitalization
+extern std::string SeparateCapitalizedStringElements(std::string text);	/// Make the string's capitalized elements become separated
 //Wyrmgus end
 
 #endif /* __UTIL_H__ */
