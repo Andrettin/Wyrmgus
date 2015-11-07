@@ -305,6 +305,14 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	this->Finished = true;
 }
 
+//Wyrmgus start
+void COrder_TransformInto::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+{
+	const CPlayer &player = *unit.Player;
+	this->Type = &newType;
+}
+//Wyrmgus end
+
 #endif
 
 #if 1  //  COrder_UpgradeTo
@@ -419,5 +427,18 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 	unit.Variable[UPGRADINGTO_INDEX].Max = this->Type->Stats[unit.Player->Index].Costs[TimeCost];
 }
 
+//Wyrmgus start
+void COrder_UpgradeTo::ConvertUnitType(const CUnit &unit, CUnitType &newType)
+{
+	const CPlayer &player = *unit.Player;
+	const int oldCost = this->Type->Stats[player.Index].Costs[TimeCost];
+	const int newCost = newType.Stats[player.Index].Costs[TimeCost];
+
+	// Must Adjust Ticks to the fraction that was upgraded
+	this->Ticks = this->Ticks * newCost / oldCost;
+	this->Type = &newType;
+}
+
+//Wyrmgus end
 #endif
 //@}

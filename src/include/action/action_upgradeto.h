@@ -51,6 +51,11 @@ public:
 	virtual PixelPos Show(const CViewport &vp, const PixelPos &lastScreenPos) const;
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
+	//Wyrmgus start
+	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+	const CUnitType &GetUnitType() const { return *Type; }
+	//Wyrmgus end
+
 private:
 	CUnitType *Type; /// Transform unit into this unit-type
 };
@@ -75,7 +80,11 @@ public:
 	virtual void UpdatePathFinderData(PathFinderInput &input) { UpdatePathFinderData_NotCalled(input); }
 
 	virtual void UpdateUnitVariables(CUnit &unit) const;
-
+	
+	//Wyrmgus start
+	void ConvertUnitType(const CUnit &unit, CUnitType &newType);
+	//Wyrmgus end
+	
 	const CUnitType &GetUnitType() const { return *Type; }
 private:
 	CUnitType *Type; /// upgrade to this unit-type

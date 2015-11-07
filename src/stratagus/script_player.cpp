@@ -2313,6 +2313,10 @@ static int CclDefineFaction(lua_State *l)
 	
 	if (civilization != -1 && !parent_faction.empty()) { //process this here, since we have no guarantee that the civilization will get processed before the parent faction
 		faction->ParentFaction = PlayerRaces.GetFactionIndexByName(civilization, parent_faction);
+		
+		if (faction->ParentFaction != -1 && faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
+			faction->FactionUpgrade = PlayerRaces.Factions[civilization][faction->ParentFaction]->FactionUpgrade;
+		}
 	}
 	
 	return 0;
@@ -2716,7 +2720,7 @@ static int CclSetPlayerData(lua_State *l)
 		p->SetName(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		p->SetFaction("");
-		
+
 		const char *racename = LuaToString(l, 3);
 		p->Race = PlayerRaces.GetRaceIndexByName(racename);
 		

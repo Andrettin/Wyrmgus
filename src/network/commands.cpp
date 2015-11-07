@@ -713,7 +713,11 @@ void SendCommandSetFaction(int player, int faction)
 {
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of faction change here
-		Players[player].SetFaction(PlayerRaces.Factions[Players[player].Race][faction]->Name);
+		if (faction != -1) {
+			Players[player].SetFaction(PlayerRaces.Factions[Players[player].Race][faction]->Name);
+		} else {
+			Players[player].SetFaction("");
+		}
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player, faction, 0, 0);
 	}

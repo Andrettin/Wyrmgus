@@ -46,6 +46,7 @@
 //Wyrmgus end
 #include "action/action_train.h"
 //Wyrmgus start
+#include "action/action_upgradeto.h"
 #include "../ai/ai_local.h"
 //Wyrmgus end
 #include "commands.h"
@@ -640,6 +641,10 @@ int UpgradeIdByIdent(const std::string &ident)
 static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &dst)
 {
 	//Wyrmgus start
+	if (player.Allow.Units[dst.Slot] == 0) { //if the unit being converted to is disallowed, make it as allowed as the source unit
+		player.Allow.Units[dst.Slot] = player.Allow.Units[src.Slot];
+	}
+
 	player.Allow.Units[src.Slot] = 0; //forbid the previous unit type when converting
 	
 	if (player.AiEnabled && GameCycle > 0) {
@@ -685,6 +690,17 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 //		} else {
 		} else if (GameCycle > 0) {
 		//Wyrmgus end
+			//Wyrmgus start
+			// convert transformation order
+			if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTransformInto) {
+				COrder_TransformInto &order = *static_cast<COrder_TransformInto *>(unit.CriticalOrder);
+
+				if (&order.GetUnitType() == &src) {
+					order.ConvertUnitType(unit, dst);
+				}
+			}
+			//Wyrmgus end
+			
 			for (size_t j = 0; j < unit.Orders.size(); ++j) {
 				if (unit.Orders[j]->Action == UnitActionTrain) {
 					COrder_Train &order = *static_cast<COrder_Train *>(unit.Orders[j]);
@@ -696,6 +712,13 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 				// convert building orders as well
 				} else if (unit.Orders[j]->Action == UnitActionBuild) {
 					COrder_Build &order = *static_cast<COrder_Build *>(unit.Orders[j]);
+
+					if (&order.GetUnitType() == &src) {
+						order.ConvertUnitType(unit, dst);
+					}
+				// also convert upgrade orders
+				} else if (unit.Orders[j]->Action == UnitActionUpgradeTo) {
+					COrder_UpgradeTo &order = *static_cast<COrder_UpgradeTo *>(unit.Orders[j]);
 
 					if (&order.GetUnitType() == &src) {
 						order.ConvertUnitType(unit, dst);
@@ -1626,7 +1649,7 @@ void AllowUnitId(CPlayer &player, int id, int units)
 **
 **  @param player  Player to change
 **  @param id      upgrade id
-**  @param af      'A'llow/'F'orbid/'R'eseached
+**  @param af      'A'llow/'F'orbid/'R'esearched
 */
 void AllowUpgradeId(CPlayer &player, int id, char af)
 {
@@ -1637,7 +1660,6 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
 	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == "tribe")) {
 		int old_faction = player.Faction;
-		player.SetFaction("");
 		if (ThisPlayer && ThisPlayer->Index == player.Index) {
 			if (GameCycle != 0) {
 				char buf[256];
