@@ -2719,7 +2719,9 @@ static int CclSetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		p->SetName(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
-		p->SetFaction("");
+		if (ThisPlayer) { //a way to check if this is in-game or not
+			p->SetFaction("");
+		}
 
 		const char *racename = LuaToString(l, 3);
 		p->Race = PlayerRaces.GetRaceIndexByName(racename);
@@ -2742,8 +2744,10 @@ static int CclSetPlayerData(lua_State *l)
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 		
 		// if is AI, set random one from the civilization's factions
-		if (p->AiEnabled) {
-			p->SetRandomFaction();
+		if (ThisPlayer) { //a way to check if this is in-game or not
+			if (p->AiEnabled) {
+				p->SetRandomFaction();
+			}
 		}
 		//Wyrmgus end
 	//Wyrmgus start
