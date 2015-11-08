@@ -3174,7 +3174,7 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int faction)
 {
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (GrandStrategyGame.Factions[civilization][faction]->Technologies[i]) {
+		if (GrandStrategyGame.Factions[civilization][faction]->Technologies[i] && AllUpgrades[i]->Ident != PlayerRaces.Factions[civilization][faction]->FactionUpgrade) { //don't acquire the faction's faction-specific upgrade
 			this->SetTechnology(i, true);
 		}
 	}
@@ -5034,19 +5034,21 @@ void InitializeGrandStrategyGame()
 	//create grand strategy faction instances for all defined factions
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) { // no need to create a grand strategy instance for an already-created faction again
-				continue;
+			if (!GrandStrategyGame.Factions[i][j]) { // no need to create a grand strategy instance for an already-created faction again
+				if (PlayerRaces.Factions[i][j] && !PlayerRaces.Factions[i][j]->Name.empty()) { //if the faction is defined
+					CGrandStrategyFaction *faction = new CGrandStrategyFaction;
+					GrandStrategyGame.Factions[i][j] = faction;
+					
+					GrandStrategyGame.Factions[i][j]->Civilization = i;
+					GrandStrategyGame.Factions[i][j]->Faction = j;
+					GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
+				} else {
+					break;
+				}
 			}
 			
-			if (PlayerRaces.Factions[i][j] && !PlayerRaces.Factions[i][j]->Name.empty()) { //if the faction is defined
-				CGrandStrategyFaction *faction = new CGrandStrategyFaction;
-				GrandStrategyGame.Factions[i][j] = faction;
-				
-				GrandStrategyGame.Factions[i][j]->Civilization = i;
-				GrandStrategyGame.Factions[i][j]->Faction = j;
-				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
-			} else {
-				break;
+			if (!PlayerRaces.Factions[i][j]->FactionUpgrade.empty()) { //if faction has a faction upgrade, apply it
+				GrandStrategyGame.Factions[i][j]->SetTechnology(UpgradeIdByIdent(PlayerRaces.Factions[i][j]->FactionUpgrade), true);
 			}
 		}
 	}

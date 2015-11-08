@@ -2099,6 +2099,8 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 							
 							std::string variable_name = UnitTypeVar.VariableNameLookup[j];
 							variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+							variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
+							variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
 							variable_name = SeparateCapitalizedStringElements(variable_name);
 							faction_effects_string += variable_name;
 						}
@@ -2148,6 +2150,8 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 											
 										std::string variable_name = UnitTypeVar.VariableNameLookup[j];
 										variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+										variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
+										variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
 										variable_name = SeparateCapitalizedStringElements(variable_name);
 										faction_effects_string += variable_name;
 									}
