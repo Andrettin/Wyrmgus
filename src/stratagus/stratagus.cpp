@@ -375,7 +375,10 @@ static void PrintHeader()
 	fprintf(stdout,
 			"%s\n  written by Lutz Sammer, Fabrice Rossi, Vladi Shabanski, Patrice Fortier,\n"
 			"  Jon Gabrielson, Andreas Arens, Nehal Mistry, Jimmy Salmon, Pali Rohar,\n"
-			"  cybermind and others.\n"
+			//Wyrmgus start
+//			"  cybermind and others.\n"
+			"  cybermind, Andrettin and others.\n"
+			//Wyrmgus end
 			"\t" HOMEPAGE "\n"
 			"Compile options %s",
 			NameLine, CompileOptions.c_str());

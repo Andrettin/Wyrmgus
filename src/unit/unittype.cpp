@@ -761,7 +761,7 @@ CUnitType::CUnitType() :
 	//Wyrmgus end
 	memset(ResInfo, 0, sizeof(ResInfo));
 	//Wyrmgus start
-	memset(VarInfo, 0, sizeof(VarInfo));
+	memset(VarInfo, NULL, sizeof(VarInfo));
 	memset(Drops, 0, sizeof(Drops));
 //	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	//Wyrmgus end

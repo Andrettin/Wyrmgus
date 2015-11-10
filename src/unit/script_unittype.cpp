@@ -605,6 +605,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!parent_type) {
 				LuaError(l, "Unit type %s not defined" _C_ type->Parent.c_str());
 			}
+			type->Civilization = parent_type->Civilization;
 			type->Class = parent_type->Class;
 			type->DrawLevel = parent_type->DrawLevel;
 			type->File = parent_type->File;
@@ -776,6 +777,8 @@ static int CclDefineUnitType(lua_State *l)
 							shield_anim->YOffset = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->YOffset;
 						}
 					}
+				} else {
+					break;
 				}
 			}
 			for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
@@ -888,13 +891,13 @@ static int CclDefineUnitType(lua_State *l)
 						if (!lua_istable(l, -1)) {
 							LuaError(l, "incorrect argument (expected table for shield animations)");
 						}
-						OverlayAnimation *shield_anim = new OverlayAnimation;
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
 							lua_rawgeti(l, -1, n + 1);
 							if (!lua_istable(l, -1)) {
 								LuaError(l, "incorrect argument (expected table for shield animation frames)");
 							}
+							OverlayAnimation *shield_anim = new OverlayAnimation;
 							const int subsubsubargs = lua_rawlen(l, -1);
 							for (int o = 0; o < subsubsubargs; ++o) {
 								value = LuaToString(l, -1, o + 1);
