@@ -2314,6 +2314,10 @@ static int CclDefineFaction(lua_State *l)
 	if (civilization != -1 && !parent_faction.empty()) { //process this here, since we have no guarantee that the civilization will get processed before the parent faction
 		faction->ParentFaction = PlayerRaces.GetFactionIndexByName(civilization, parent_faction);
 		
+		if (faction->ParentFaction == -1) { //if a parent faction was set but wasn't found, give an error
+			LuaError(l, "Faction %s doesn't exist" _C_ parent_faction.c_str());
+		}
+		
 		if (faction->ParentFaction != -1 && faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
 			faction->FactionUpgrade = PlayerRaces.Factions[civilization][faction->ParentFaction]->FactionUpgrade;
 		}
