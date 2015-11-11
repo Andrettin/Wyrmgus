@@ -298,7 +298,7 @@ static int CclDefineModifier(lua_State *l)
 	um->UpgradeId = UpgradeIdByIdent(upgrade_name);
 	
 	if (um->UpgradeId == -1) {
-		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_name);
+		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_name.c_str());
 	}
 	//Wyrmgus end
 
