@@ -508,6 +508,15 @@ void CGrandStrategyGame::DrawInterface()
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), labor_string);
 		} else if (GrandStrategyInterfaceState == "Ruler") {
 			interface_state_name = GrandStrategyInterfaceState;
+			
+			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler != NULL) {
+				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Name;
+				if (!GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Dynasty.empty()) {
+					ruler_name_string += " " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Dynasty;
+				}
+				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
+				item_y += 1;
+			}
 		}
 		
 		if (!interface_state_name.empty()) {
@@ -5982,6 +5991,34 @@ bool FactionHasHero(std::string civilization_name, std::string faction_name, std
 		}
 	}
 	return false;
+}
+
+void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	if (faction == -1) {
+		return;
+	}
+	
+	if (hero_name.empty() && hero_dynasty.empty()) {
+		GrandStrategyGame.Factions[civilization][faction]->Ruler = NULL;
+		return;
+	}
+	
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
+			if (GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner != NULL) {
+				if (GrandStrategyGame.Heroes[i]->Province->Owner->Civilization == civilization && GrandStrategyGame.Heroes[i]->Province->Owner->Faction == faction) {
+					GrandStrategyGame.Factions[civilization][faction]->Ruler = const_cast<CGrandStrategyHero *>(&(*GrandStrategyGame.Heroes[i]));
+				}
+			}
+		}
+	}
 }
 
 std::string GetHeroUnitType(std::string hero_name, std::string hero_dynasty)
