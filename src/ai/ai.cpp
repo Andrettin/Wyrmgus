@@ -1056,6 +1056,13 @@ void AiEachSecond(CPlayer &player)
 	}
 #endif
 
+	//Wyrmgus start
+	//if doesn't have a faction, set a random one for the AI
+	if (player.Faction == -1) {
+		player.SetRandomFaction();
+	}
+	//Wyrmgus end
+
 	//  Advance script
 	AiExecuteScript();
 

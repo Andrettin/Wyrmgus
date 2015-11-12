@@ -1252,7 +1252,10 @@ void EditorUpdateDisplay()
 	// Menu button
 	const int flag_active = ButtonAreaUnderCursor == ButtonAreaMenu
 							&& ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0;
-	const int flag_clicked = GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0;
+	//Wyrmgus start
+//	const int flag_clicked = GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0;
+	const int flag_clicked = UI.MenuButton.Clicked ? MI_FLAGS_CLICKED : 0;
+	//Wyrmgus end
 	DrawUIButton(UI.MenuButton.Style,
 				 flag_active | flag_clicked,
 				 UI.MenuButton.X, UI.MenuButton.Y,
@@ -1307,8 +1310,14 @@ static void EditorCallbackButtonUp(unsigned button)
 		return;
 	}
 
-	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
-		GameMenuButtonClicked = false;
+	//Wyrmgus start
+//	if ((1 << button) == LeftButton && GameMenuButtonClicked) {
+	if ((1 << button) == LeftButton && UI.MenuButton.Clicked) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		GameMenuButtonClicked = false;
+		UI.MenuButton.Clicked = false;
+		//Wyrmgus end
 		if (ButtonUnderCursor == ButtonUnderMenu) {
 			if (UI.MenuButton.Callback) {
 				UI.MenuButton.Callback->action("");
@@ -1336,9 +1345,15 @@ static void EditorCallbackButtonDown(unsigned button)
 	}
 	// Click on menu button
 	if (CursorOn == CursorOnButton && ButtonAreaUnderCursor == ButtonAreaMenu &&
-		(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
+		//Wyrmgus start
+//		(MouseButtons & LeftButton) && !GameMenuButtonClicked) {
+		(MouseButtons & LeftButton) && !UI.MenuButton.Clicked) {
+		//Wyrmgus end
 		PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-		GameMenuButtonClicked = true;
+		//Wyrmgus start
+//		GameMenuButtonClicked = true;
+		UI.MenuButton.Clicked = true;
+		//Wyrmgus end
 		return;
 	}
 	// Click on minimap

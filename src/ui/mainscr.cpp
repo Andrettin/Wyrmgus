@@ -75,7 +75,10 @@ static void DrawMenuButtonArea_noNetwork()
 		DrawUIButton(UI.MenuButton.Style,
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
 					  && ButtonUnderCursor == ButtonUnderMenu ? MI_FLAGS_ACTIVE : 0) |
-					 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 //Wyrmgus start
+//					 (GameMenuButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 (UI.MenuButton.Clicked ? MI_FLAGS_CLICKED : 0),
+					 //Wyrmgus end
 					 UI.MenuButton.X, UI.MenuButton.Y,
 					 UI.MenuButton.Text);
 	}
@@ -83,6 +86,8 @@ static void DrawMenuButtonArea_noNetwork()
 
 static void DrawMenuButtonArea_Network()
 {
+	//Wyrmgus start
+	/*
 	if (UI.NetworkMenuButton.X != -1) {
 		DrawUIButton(UI.NetworkMenuButton.Style,
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
@@ -91,11 +96,24 @@ static void DrawMenuButtonArea_Network()
 					 UI.NetworkMenuButton.X, UI.NetworkMenuButton.Y,
 					 UI.NetworkMenuButton.Text);
 	}
+	*/
+	if (UI.MenuButton.X != -1) {
+		DrawUIButton(UI.MenuButton.Style,
+					 (ButtonAreaUnderCursor == ButtonAreaMenu
+					  && ButtonUnderCursor == ButtonUnderNetworkMenu ? MI_FLAGS_ACTIVE : 0) |
+					 (UI.MenuButton.Clicked ? MI_FLAGS_CLICKED : 0),
+					 UI.MenuButton.X, UI.MenuButton.Y,
+					 UI.MenuButton.Text);
+	}
+	//Wyrmgus end
 	if (UI.NetworkDiplomacyButton.X != -1) {
 		DrawUIButton(UI.NetworkDiplomacyButton.Style,
 					 (ButtonAreaUnderCursor == ButtonAreaMenu
 					  && ButtonUnderCursor == ButtonUnderNetworkDiplomacy ? MI_FLAGS_ACTIVE : 0) |
-					 (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
+					//Wyrmgus start
+//					 (GameDiplomacyButtonClicked ? MI_FLAGS_CLICKED : 0),
+					 (UI.NetworkDiplomacyButton.Clicked ? MI_FLAGS_CLICKED : 0),
+					//Wyrmgus end
 					 UI.NetworkDiplomacyButton.X, UI.NetworkDiplomacyButton.Y,
 					 UI.NetworkDiplomacyButton.Text);
 	}

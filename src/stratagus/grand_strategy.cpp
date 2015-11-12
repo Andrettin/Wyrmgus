@@ -40,6 +40,7 @@
 #include "font.h"	// for grand strategy mode tooltip drawing
 #include "interface.h"
 #include "iolib.h"
+#include "menus.h"
 #include "player.h"
 #include "results.h"
 #include "ui.h"
@@ -447,9 +448,19 @@ void CGrandStrategyGame::DrawInterface()
 	int item_y = 0;
 	
 	if (this->SelectedProvince != -1) {
+		std::string interface_state_name;
+		
 		if (GrandStrategyInterfaceState == "Province") {
-//			UI.Resources[FoodCost].G->DrawFrameClip(0, 16, Video.Height - 14 - 5, true);
-//			CLabel(GetGameFont()).Draw(16 + 14 + 2, Video.Height - 14 - 5, "1000");
+			//draw show heroes button
+			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Heroes.size() > 0 && UI.GrandStrategyShowHeroesButton.X != -1) {
+				DrawUIButton(
+					UI.GrandStrategyShowHeroesButton.Style,
+					(UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
+					(UI.GrandStrategyShowHeroesButton.Clicked || UI.GrandStrategyShowHeroesButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
+					UI.GrandStrategyShowHeroesButton.X, UI.GrandStrategyShowHeroesButton.Y,
+					UI.GrandStrategyShowHeroesButton.Text
+				);
+			}
 		} else if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
 			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization != -1) {
 				std::string province_culture_string = "Province Culture: " + CapitalizeString(PlayerRaces.Name[GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization]);
@@ -476,6 +487,17 @@ void CGrandStrategyGame::DrawInterface()
 			
 			UI.Resources[FoodCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), food_string);
+			
+			//draw show ruler button to return to the province interface
+			if (UI.GrandStrategyShowRulerButton.X != -1) {
+				DrawUIButton(
+					UI.GrandStrategyShowRulerButton.Style,
+					(UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
+					(UI.GrandStrategyShowRulerButton.Clicked || UI.GrandStrategyShowRulerButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
+					UI.GrandStrategyShowRulerButton.X, UI.GrandStrategyShowRulerButton.Y,
+					UI.GrandStrategyShowRulerButton.Text
+				);
+			}
 		} else if (GrandStrategyInterfaceState == "barracks") {
 			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetRevoltRisk()) + "%";
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
@@ -484,7 +506,46 @@ void CGrandStrategyGame::DrawInterface()
 			std::string labor_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->Labor);
 			UI.Resources[LaborCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), labor_string);
+		} else if (GrandStrategyInterfaceState == "Ruler") {
+			interface_state_name = GrandStrategyInterfaceState;
 		}
+		
+		if (!interface_state_name.empty()) {
+			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + 109 - (GetGameFont().Width(interface_state_name) / 2), UI.InfoPanel.Y + 53, interface_state_name);
+		}
+		
+		if (GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy") {
+			//draw "OK" button to return to the province interface
+			if (UI.GrandStrategyOKButton.X != -1) {
+				DrawUIButton(
+					UI.GrandStrategyOKButton.Style,
+					(UI.GrandStrategyOKButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
+					(UI.GrandStrategyOKButton.Clicked || UI.GrandStrategyOKButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
+					UI.GrandStrategyOKButton.X, UI.GrandStrategyOKButton.Y,
+					UI.GrandStrategyOKButton.Text
+				);
+			}
+		}
+	}
+	
+	if (UI.MenuButton.X != -1) {
+		DrawUIButton(
+			UI.MenuButton.Style,
+			(UI.MenuButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
+			(UI.MenuButton.Clicked || UI.MenuButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
+			UI.MenuButton.X, UI.MenuButton.Y,
+			UI.MenuButton.Text
+		);
+	}
+	
+	if (UI.GrandStrategyEndTurnButton.X != -1) {
+		DrawUIButton(
+			UI.GrandStrategyEndTurnButton.Style,
+			(UI.GrandStrategyEndTurnButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
+			(UI.GrandStrategyEndTurnButton.Clicked || UI.GrandStrategyEndTurnButton.HotkeyPressed ? MI_FLAGS_CLICKED : 0),
+			UI.GrandStrategyEndTurnButton.X, UI.GrandStrategyEndTurnButton.Y,
+			UI.GrandStrategyEndTurnButton.Text
+		);
 	}
 }
 
@@ -3214,7 +3275,7 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 	
 	//check if owns the majority of the formable faction's claims
 	if (GrandStrategyGame.Factions[civilization][faction]->Claims.size() > 0) {
-		int owned_claims = 0;
+		size_t owned_claims = 0;
 		for (size_t i = 0; i < GrandStrategyGame.Factions[civilization][faction]->Claims.size(); ++i) {
 			if (GrandStrategyGame.Factions[civilization][faction]->Claims[i]->Owner == this) {
 				owned_claims += 1;

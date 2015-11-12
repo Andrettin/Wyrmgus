@@ -124,7 +124,10 @@ public:
 class CUIButton
 {
 public:
-	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
+	//Wyrmgus start
+//	CUIButton() : X(0), Y(0), Style(NULL), Callback(NULL) {}
+	CUIButton() : X(0), Y(0), Clicked(false), HotkeyPressed(false), Style(NULL), Callback(NULL) {}
+	//Wyrmgus end
 	~CUIButton() {}
 
 	bool Contains(const PixelPos &screenPos) const;
@@ -132,6 +135,10 @@ public:
 public:
 	int X;                          /// x coordinate on the screen
 	int Y;                          /// y coordinate on the screen
+	//Wyrmgus start
+	bool Clicked;					/// whether the button is currently clicked or not
+	bool HotkeyPressed;				/// whether the button's hotkey is currently pressed or not
+	//Wyrmgus end
 	std::string Text;               /// button text
 	ButtonStyle *Style;             /// button style
 	LuaActionListener *Callback;    /// callback function
@@ -460,8 +467,16 @@ public:
 
 	// Menu buttons
 	CUIButton MenuButton;               /// menu button
-	CUIButton NetworkMenuButton;        /// network menu button
+	//Wyrmgus start
+//	CUIButton NetworkMenuButton;        /// network menu button
+	//Wyrmgus end
 	CUIButton NetworkDiplomacyButton;   /// network diplomacy button
+	//Wyrmgus start
+	CUIButton GrandStrategyOKButton;			/// Grand strategy OK button (returns from province interface)
+	CUIButton GrandStrategyEndTurnButton;		/// Grand strategy end turn button
+	CUIButton GrandStrategyShowHeroesButton;	/// Grand strategy show heroes button
+	CUIButton GrandStrategyShowRulerButton;		/// Grand strategy show ruler button
+	//Wyrmgus end
 
 	// Used defined buttons
 	std::vector<CUIUserButton> UserButtons; /// User buttons

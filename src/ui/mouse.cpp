@@ -78,8 +78,12 @@ CUnit *UnitUnderCursor;                      /// Unit under cursor
 int ButtonAreaUnderCursor = -1;              /// Button area under cursor
 int ButtonUnderCursor = -1;                  /// Button under cursor
 int OldButtonUnderCursor = -1;               /// Button under cursor
+//Wyrmgus start
+/*
 bool GameMenuButtonClicked;                  /// Menu button was clicked
 bool GameDiplomacyButtonClicked;             /// Diplomacy button was clicked
+*/
+//Wyrmgus end
 bool LeaveStops;                             /// Mouse leaves windows stops scroll
 
 enum _cursor_on_ CursorOn = CursorOnUnknown; /// Cursor on field
@@ -811,8 +815,14 @@ static void HandleMouseOn(const PixelPos screenPos)
 			}
 		}
 	} else {
-		if (UI.NetworkMenuButton.X != -1) {
-			if (UI.NetworkMenuButton.Contains(screenPos)) {
+		//Wyrmgus start
+//		if (UI.NetworkMenuButton.X != -1) {
+		if (UI.MenuButton.X != -1) {
+		//Wyrmgus end
+			//Wyrmgus start
+//			if (UI.NetworkMenuButton.Contains(screenPos)) {
+			if (UI.MenuButton.Contains(screenPos)) {
+			//Wyrmgus end
 				ButtonAreaUnderCursor = ButtonAreaMenu;
 				ButtonUnderCursor = ButtonUnderNetworkMenu;
 				CursorOn = CursorOnButton;
@@ -1079,7 +1089,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 	}
 
 	//  User may be draging with button pressed.
-	if (GameMenuButtonClicked || GameDiplomacyButtonClicked) {
+	//Wyrmgus start
+//	if (GameMenuButtonClicked || GameDiplomacyButtonClicked) {
+	if (UI.MenuButton.Clicked || UI.NetworkDiplomacyButton.Clicked) {
+	//Wyrmgus end
 		return;
 	} else {
 		for (size_t i = 0; i < UI.UserButtons.size(); ++i) {
@@ -1974,12 +1987,24 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		//  clicked on menu button
 		if (ButtonAreaUnderCursor == ButtonAreaMenu) {
 			if ((ButtonUnderCursor == ButtonUnderMenu || ButtonUnderCursor == ButtonUnderNetworkMenu)
-				&& !GameMenuButtonClicked) {
+				//Wyrmgus start
+//				&& !GameMenuButtonClicked) {
+				&& !UI.MenuButton.Clicked) {
+				//Wyrmgus end
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-				GameMenuButtonClicked = true;
-			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !GameDiplomacyButtonClicked) {
+				//Wyrmgus start
+//				GameMenuButtonClicked = true;
+				UI.MenuButton.Clicked = true;
+				//Wyrmgus end
+			//Wyrmgus start
+//			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !GameDiplomacyButtonClicked) {
+			} else if (ButtonUnderCursor == ButtonUnderNetworkDiplomacy && !UI.NetworkDiplomacyButton.Clicked) {
+			//Wyrmgus end
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-				GameDiplomacyButtonClicked = true;
+				//Wyrmgus start
+//				GameDiplomacyButtonClicked = true;
+				UI.NetworkDiplomacyButton.Clicked = true;
+				//Wyrmgus end
 			}
 			//  clicked on user buttons
 		} else if (ButtonAreaUnderCursor == ButtonAreaUser) {
@@ -2282,8 +2307,14 @@ void UIHandleButtonUp(unsigned button)
 		//
 		//  Menu (F10) button
 		//
-		if (GameMenuButtonClicked) {
-			GameMenuButtonClicked = false;
+		//Wyrmgus start
+//		if (GameMenuButtonClicked) {
+		if (UI.MenuButton.Clicked) {
+		//Wyrmgus end
+			//Wyrmgus start
+//			GameMenuButtonClicked = false;
+			UI.MenuButton.Clicked = false;
+			//Wyrmgus end
 			if (ButtonAreaUnderCursor == ButtonAreaMenu) {
 				if (ButtonUnderCursor == ButtonUnderMenu || ButtonUnderCursor == ButtonUnderNetworkMenu) {
 					// FIXME: Not if, in input mode.
@@ -2298,9 +2329,14 @@ void UIHandleButtonUp(unsigned button)
 							UI.MenuButton.Callback->action("");
 						}
 					} else {
-						if (UI.NetworkMenuButton.Callback) {
-							UI.NetworkMenuButton.Callback->action("");
+						//Wyrmgus start
+//						if (UI.NetworkMenuButton.Callback) {
+//							UI.NetworkMenuButton.Callback->action("");
+//						}
+						if (UI.MenuButton.Callback) {
+							UI.MenuButton.Callback->action("");
 						}
+						//Wyrmgus end
 					}
 					return;
 				}
@@ -2310,8 +2346,14 @@ void UIHandleButtonUp(unsigned button)
 		//
 		//  Diplomacy button
 		//
-		if (GameDiplomacyButtonClicked) {
-			GameDiplomacyButtonClicked = false;
+		//Wyrmgus start
+//		if (GameDiplomacyButtonClicked) {
+		if (UI.NetworkDiplomacyButton.Clicked) {
+		//Wyrmgus end
+			//Wyrmgus start
+//			GameDiplomacyButtonClicked = false;
+			UI.NetworkDiplomacyButton.Clicked = false;
+			//Wyrmgus end
 			if (ButtonAreaUnderCursor == ButtonAreaMenu && ButtonUnderCursor == ButtonUnderNetworkDiplomacy) {
 				if (UI.NetworkDiplomacyButton.Callback) {
 					UI.NetworkDiplomacyButton.Callback->action("");

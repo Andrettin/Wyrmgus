@@ -21,6 +21,9 @@ class CUIButton
 
 	int X;
 	int Y;
+	//Wyrmgus start
+	bool Clicked;
+	//Wyrmgus end
 	string Text;
 	ButtonStyle *Style;
 	LuaActionListener *Callback;
@@ -190,8 +193,16 @@ class CUserInterface
 	int MessageScrollSpeed;
 
 	CUIButton MenuButton;
-	CUIButton NetworkMenuButton;
+	//Wyrmgus start
+//	CUIButton NetworkMenuButton;
+	//Wyrmgus end
 	CUIButton NetworkDiplomacyButton;
+	//Wyrmgus start
+	CUIButton GrandStrategyOKButton;
+	CUIButton GrandStrategyEndTurnButton;
+	CUIButton GrandStrategyShowHeroesButton;
+	CUIButton GrandStrategyShowRulerButton;
+	//Wyrmgus end
 
 	vector<CUIUserButton> UserButtons;
 

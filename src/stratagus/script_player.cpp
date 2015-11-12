@@ -2746,13 +2746,6 @@ static int CclSetPlayerData(lua_State *l)
 			UI.Load();
 		}
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
-		
-		// if is AI, set random one from the civilization's factions
-		if (ThisPlayer) { //a way to check if this is in-game or not
-			if (p->AiEnabled) {
-				p->SetRandomFaction();
-			}
-		}
 		//Wyrmgus end
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
