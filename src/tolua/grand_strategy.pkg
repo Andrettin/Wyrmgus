@@ -57,7 +57,7 @@ extern void ChangeProvinceUnitQuantity(std::string province_name, std::string un
 extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
-extern void SetProvinceHero(std::string province_name, std::string hero_ident, int value);
+extern void SetProvinceHero(std::string province_name, std::string hero_name, std::string hero_dynasty, std::string hero_ident, int value);
 extern void SetProvinceFood(std::string province_name, int quantity);
 extern void ChangeProvinceFood(std::string province_name, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
@@ -85,7 +85,7 @@ extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_t
 extern int GetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident);
-extern int GetProvinceHero(std::string province_name, std::string hero_ident);
+extern int GetProvinceHero(std::string province_name, std::string hero_name, std::string hero_dynasty);
 extern int GetProvinceLabor(std::string province_name);
 extern int GetProvinceAvailableWorkersForTraining(std::string province_name);
 extern int GetProvinceTotalWorkers(std::string province_name);
@@ -117,6 +117,8 @@ extern void FormFaction(std::string old_civilization_name, std::string old_facti
 extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);
+extern bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty);
+extern std::string GetHeroUnitType(std::string hero_name, std::string hero_dynasty);
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);

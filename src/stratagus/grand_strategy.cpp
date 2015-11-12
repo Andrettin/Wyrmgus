@@ -452,7 +452,7 @@ void CGrandStrategyGame::DrawInterface()
 		
 		if (GrandStrategyInterfaceState == "Province") {
 			//draw show heroes button
-			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Heroes.size() > 0 && UI.GrandStrategyShowHeroesButton.X != -1) {
+			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner == this->PlayerFaction && UI.GrandStrategyShowHeroesButton.X != -1) {
 				DrawUIButton(
 					UI.GrandStrategyShowHeroesButton.Style,
 					(UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
@@ -1824,7 +1824,7 @@ void CProvince::ChangeAttackingUnitQuantity(int unit_type_id, int quantity)
 	this->SetAttackingUnitQuantity(unit_type_id, this->AttackingUnits[unit_type_id] + quantity);
 }
 
-void CProvince::SetHero(int unit_type_id, int value)
+void CProvince::SetHero(std::string hero_name, std::string hero_dynasty, int unit_type_id, int value)
 {
 	if (value == 1) {
 		this->Movement = true;
@@ -1832,7 +1832,7 @@ void CProvince::SetHero(int unit_type_id, int value)
 	bool found_hero = false;
 	//update the hero
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		if (GrandStrategyGame.Heroes[i]->Type->Slot == UnitTypes[unit_type_id]->Slot) {
+		if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
 			if (GrandStrategyGame.Heroes[i]->Province != NULL) {
 				if (GrandStrategyGame.Heroes[i]->State == 2) {
 					GrandStrategyGame.Heroes[i]->Province->MilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (GrandStrategyGame.Heroes[i]->Province->Owner != NULL ? GrandStrategyGame.Heroes[i]->Province->Owner->MilitaryScoreBonus[unit_type_id] : 0));
@@ -1841,6 +1841,11 @@ void CProvince::SetHero(int unit_type_id, int value)
 				}
 			}
 			GrandStrategyGame.Heroes[i]->State = value;
+			
+			//if the hero's unit type changed
+			if (UnitTypes[unit_type_id] != GrandStrategyGame.Heroes[i]->Type) {
+				GrandStrategyGame.Heroes[i]->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+			}
 			
 			if (this != GrandStrategyGame.Heroes[i]->Province || value == 0) { //if the new province is different from the hero's current province
 				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
@@ -1860,6 +1865,8 @@ void CProvince::SetHero(int unit_type_id, int value)
 	//if the hero hasn't been defined yet, do so now
 	if (found_hero == false) {
 		CGrandStrategyHero *hero = new CGrandStrategyHero;
+		hero->Name = hero_name;
+		hero->Dynasty = hero_dynasty;
 		hero->State = value;
 		hero->Province = value != 0 ? const_cast<CProvince *>(&(*this)) : NULL;
 		hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
@@ -3325,6 +3332,11 @@ std::string CGrandStrategyFaction::GetFullName()
 	return "";
 }
 
+std::string CGrandStrategyHero::GetFullName()
+{
+	return (this->Name + " " + this->Dynasty);
+}
+
 /**
 **  Get the width of the world map.
 */
@@ -4531,13 +4543,13 @@ void SetProvinceAttackingUnitQuantity(std::string province_name, std::string uni
 	}
 }
 
-void SetProvinceHero(std::string province_name, std::string hero_ident, int value)
+void SetProvinceHero(std::string province_name, std::string hero_name, std::string hero_dynasty, std::string hero_ident, int value)
 {
 	int province_id = GetProvinceId(province_name);
 	int unit_type_id = UnitTypeIdByIdent(hero_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type_id != -1) {
-		GrandStrategyGame.Provinces[province_id]->SetHero(unit_type_id, value);
+		GrandStrategyGame.Provinces[province_id]->SetHero(hero_name, hero_dynasty, unit_type_id, value);
 	}
 }
 
@@ -4788,6 +4800,7 @@ void CleanGrandStrategyGame()
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		GrandStrategyGame.Heroes[i]->State = 0;
 		GrandStrategyGame.Heroes[i]->Province = NULL;
+		GrandStrategyGame.Heroes[i]->Type = NULL;
 	}
 			
 	GrandStrategyGame.WorldMapWidth = 0;
@@ -5397,7 +5410,7 @@ int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit
 	return GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type_id];
 }
 
-int GetProvinceHero(std::string province_name, std::string hero_ident)
+int GetProvinceHero(std::string province_name, std::string hero_name, std::string hero_dynasty)
 {
 	int province_id = GetProvinceId(province_name);
 
@@ -5406,15 +5419,8 @@ int GetProvinceHero(std::string province_name, std::string hero_ident)
 		return 0;
 	}
 	
-	int unit_type_id = UnitTypeIdByIdent(hero_ident);
-	
-	if (unit_type_id == -1) {
-		fprintf(stderr, "Can't find %s unit type.\n", hero_ident.c_str());
-		return 0;
-	}
-	
 	for (size_t i = 0; i < GrandStrategyGame.Provinces[province_id]->Heroes.size(); ++i) {
-		if (GrandStrategyGame.Provinces[province_id]->Heroes[i]->Type->Slot == UnitTypes[unit_type_id]->Slot) {
+		if (GrandStrategyGame.Provinces[province_id]->Heroes[i]->Name == hero_name && GrandStrategyGame.Provinces[province_id]->Heroes[i]->Dynasty == hero_dynasty) {
 			return GrandStrategyGame.Provinces[province_id]->Heroes[i]->State;
 		}
 	}
@@ -5951,6 +5957,43 @@ int GetFactionCommodityTrade(std::string civilization_name, std::string faction_
 	}
 	
 	return GrandStrategyGame.Factions[civilization][faction]->Trade[resource];
+}
+
+bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	if (faction == -1) {
+		return 0;
+	}
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
+			if (GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner != NULL) {
+				if (GrandStrategyGame.Heroes[i]->Province->Owner->Civilization == civilization && GrandStrategyGame.Heroes[i]->Province->Owner->Faction == faction) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+std::string GetHeroUnitType(std::string hero_name, std::string hero_dynasty)
+{
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
+			if (GrandStrategyGame.Heroes[i]->Type != NULL) {
+				return GrandStrategyGame.Heroes[i]->Type->Ident;
+			}
+		}
+	}
+	return "";
 }
 
 void SetCommodityPrice(std::string resource_name, int price)

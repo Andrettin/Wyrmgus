@@ -78,15 +78,15 @@ static void MenuHandleButtonDown(unsigned button)
 	//Wyrmgus start
 	if ((1 << button) == LeftButton && GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) {
 		//if clicked on the "OK" button in the province interface
-		if (UI.GrandStrategyOKButton.Contains(CursorScreenPos) && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy") {
+		if (GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyOKButton.Contains(CursorScreenPos) && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy") {
 			UI.GrandStrategyOKButton.Clicked = true;
 		} else if (UI.MenuButton.Contains(CursorScreenPos)) {
 			UI.MenuButton.Clicked = true;
 		} else if (UI.GrandStrategyEndTurnButton.Contains(CursorScreenPos)) {
 			UI.GrandStrategyEndTurnButton.Clicked = true;
-		} else if (UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) && GrandStrategyInterfaceState == "Province") {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.PlayerFaction && UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) && GrandStrategyInterfaceState == "Province") {
 			UI.GrandStrategyShowHeroesButton.Clicked = true;
-		} else if (UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
 			UI.GrandStrategyShowRulerButton.Clicked = true;
 		}
 	}
@@ -100,7 +100,7 @@ static void MenuHandleButtonUp(unsigned button)
 	//Wyrmgus start
 	if ((1 << button) == LeftButton && GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) {
 		//if clicked on the "OK" button in a province's interface
-		if (!(MouseButtons & LeftButton) && UI.GrandStrategyOKButton.Clicked && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy") {
+		if (GrandStrategyGame.SelectedProvince != -1 && !(MouseButtons & LeftButton) && UI.GrandStrategyOKButton.Clicked && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy") {
 			UI.GrandStrategyOKButton.Clicked = false;
 			if (UI.GrandStrategyOKButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
 				if (UI.GrandStrategyOKButton.Callback) {
@@ -121,14 +121,14 @@ static void MenuHandleButtonUp(unsigned button)
 					UI.GrandStrategyEndTurnButton.Callback->action("");
 				}
 			}
-		} else if (!(MouseButtons & LeftButton) && UI.GrandStrategyShowHeroesButton.Clicked && GrandStrategyInterfaceState == "Province") {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && !(MouseButtons & LeftButton) && UI.GrandStrategyShowHeroesButton.Clicked && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyInterfaceState == "Province") {
 			UI.GrandStrategyShowHeroesButton.Clicked = false;
 			if (UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
 				if (UI.GrandStrategyShowHeroesButton.Callback) {
 					UI.GrandStrategyShowHeroesButton.Callback->action("");
 				}
 			}
-		} else if (!(MouseButtons & LeftButton) && UI.GrandStrategyShowRulerButton.Clicked && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && !(MouseButtons & LeftButton) && UI.GrandStrategyShowRulerButton.Clicked && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
 			UI.GrandStrategyShowRulerButton.Clicked = false;
 			if (UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
 				if (UI.GrandStrategyShowRulerButton.Callback) {
@@ -210,16 +210,16 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 			}
 			scrolled = true;
 		//if pressed the hotkey of the "OK" button in the province interface
-		} else if (GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy" && key == 'o') {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy" && key == 'o') {
 			UI.GrandStrategyOKButton.HotkeyPressed = true;
 		//if pressed the hotkey of the menu button
 		} else if (key == SDLK_F10) {
 			UI.MenuButton.HotkeyPressed = true;
 		} else if (key == 'e') {
 			UI.GrandStrategyEndTurnButton.HotkeyPressed = true;
-		} else if (GrandStrategyInterfaceState == "Province" && key == 'h') {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyInterfaceState == "Province" && key == 'h') {
 			UI.GrandStrategyShowHeroesButton.HotkeyPressed = true;
-		} else if ((GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") && key == 'r') {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") && key == 'r') {
 			UI.GrandStrategyShowRulerButton.HotkeyPressed = true;
 		}
 		
@@ -262,7 +262,7 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 	//Wyrmgus end
 	//Wyrmgus start
 	if (GrandStrategy && !GameRunning && GameResult == GameNoResult && !GrandStrategyGamePaused) {// if in grand strategy mode
-		if (GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy" && key == 'o' && UI.GrandStrategyOKButton.HotkeyPressed) {
+		if (GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy" && key == 'o' && GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyOKButton.HotkeyPressed) {
 			UI.GrandStrategyOKButton.HotkeyPressed = false;
 			if (UI.GrandStrategyOKButton.Callback) {
 				UI.GrandStrategyOKButton.Callback->action("");
@@ -277,12 +277,12 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 			if (UI.GrandStrategyEndTurnButton.Callback) {
 				UI.GrandStrategyEndTurnButton.Callback->action("");
 			}
-		} else if (key == 'h' && UI.GrandStrategyShowHeroesButton.HotkeyPressed && GrandStrategyInterfaceState == "Province") {
+		} else if (key == 'h' && GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyShowHeroesButton.HotkeyPressed && GrandStrategyGame.SelectedProvince != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyInterfaceState == "Province") {
 			UI.GrandStrategyShowHeroesButton.HotkeyPressed = false;
 			if (UI.GrandStrategyShowHeroesButton.Callback) {
 				UI.GrandStrategyShowHeroesButton.Callback->action("");
 			}
-		} else if (key == 'r' && UI.GrandStrategyShowRulerButton.HotkeyPressed && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
+		} else if (key == 'r' && GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyShowRulerButton.HotkeyPressed && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
 			UI.GrandStrategyShowRulerButton.HotkeyPressed = false;
 			if (UI.GrandStrategyShowRulerButton.Callback) {
 				UI.GrandStrategyShowRulerButton.Callback->action("");
