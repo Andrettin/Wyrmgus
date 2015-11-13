@@ -145,6 +145,7 @@
 #include "actions.h"
 #include "action/action_attack.h"
 #include "commands.h"
+#include "grand_strategy.h"
 #include "iolib.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -1058,7 +1059,7 @@ void AiEachSecond(CPlayer &player)
 
 	//Wyrmgus start
 	//if doesn't have a faction, set a random one for the AI
-	if (player.Faction == -1) {
+	if (player.Faction == -1 && !GrandStrategy) {
 		player.SetRandomFaction();
 	}
 	//Wyrmgus end

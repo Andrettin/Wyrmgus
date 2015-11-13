@@ -507,7 +507,7 @@ void UiTrackUnit()
 //Wyrmgus start
 bool IsMouseLeftButtonPressed()
 {
-	return MouseButtons & LeftButton;
+	return (MouseButtons & LeftButton) ? true : false;
 }
 //Wyrmgus end
 

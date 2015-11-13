@@ -1469,12 +1469,9 @@ std::string CRiver::GetCulturalName(int civilization)
 
 void CProvince::UpdateMinimap()
 {
-	for (int i = 0; i < ProvinceTileMax; ++i) {
+	for (size_t i = 0; i < this->Tiles.size(); ++i) {
 		int x = this->Tiles[i].x;
 		int y = this->Tiles[i].y;
-		if (x == -1 || y == -1) {
-			break;
-		}
 		if (GrandStrategyGame.WorldMapTiles[x][y]) {
 			GrandStrategyGame.WorldMapTiles[x][y]->UpdateMinimap();
 		}
@@ -1608,12 +1605,9 @@ void CProvince::SetCivilization(int civilization)
 	
 	if (civilization != -1) {
 		// create new cultural names for the province's terrain features, if there aren't any
-		for (int i = 0; i < ProvinceTileMax; ++i) {
+		for (size_t i = 0; i < this->Tiles.size(); ++i) {
 			int x = this->Tiles[i].x;
 			int y = this->Tiles[i].y;
-			if (x == -1 || y == -1) {
-				break;
-			}
 			if (GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization].empty()) {
 				std::string new_tile_name = "";
 				// first see if can translate the cultural name of the old civilization
@@ -1621,9 +1615,9 @@ void CProvince::SetCivilization(int civilization)
 					new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], civilization);
 				}
 				if (new_tile_name == "") { // try to translate any cultural name
-					for (int i = 0; i < MAX_RACES; ++i) {
-						if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].empty()) {
-							new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i], civilization);
+					for (int j = 0; j < MAX_RACES; ++j) {
+						if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[j].empty()) {
+							new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[j], civilization);
 							if (!new_tile_name.empty()) {
 								break;
 							}
@@ -1940,12 +1934,9 @@ void CProvince::AllocateLaborToResource(int resource)
 		
 		//set new worked tiles
 		int new_worked_tiles = employment_change;
-		for (int i = 0; i < ProvinceTileMax; ++i) {
+		for (size_t i = 0; i < this->ResourceTiles[resource].size(); ++i) {
 			int x = this->ResourceTiles[resource][i].x;
 			int y = this->ResourceTiles[resource][i].y;
-			if (x == -1 || y == -1 || new_worked_tiles == 0) {
-				break;
-			}
 			if (GrandStrategyGame.WorldMapTiles[x][y] && GrandStrategyGame.WorldMapTiles[x][y]->Worked == false) {
 				GrandStrategyGame.WorldMapTiles[x][y]->Worked = true;
 				new_worked_tiles -= 1;
@@ -1965,12 +1956,9 @@ void CProvince::ReallocateLabor()
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->ProductionCapacityFulfilled[i] = 0;
 		
-		for (int j = 0; j < ProvinceTileMax; ++j) {
+		for (size_t j = 0; j < this->ResourceTiles[i].size(); ++j) {
 			int x = this->ResourceTiles[i][j].x;
 			int y = this->ResourceTiles[i][j].y;
-			if (x == -1 || y == -1) {
-				break;
-			}
 			if (GrandStrategyGame.WorldMapTiles[x][y]) {
 				GrandStrategyGame.WorldMapTiles[x][y]->Worked = false;
 			}
@@ -2086,12 +2074,9 @@ bool CProvince::HasFactionClaim(int civilization_id, int faction_id)
 
 bool CProvince::HasResource(int resource, bool ignore_prospection)
 {
-	for (int i = 0; i < ProvinceTileMax; ++i) {
+	for (size_t i = 0; i < this->Tiles.size(); ++i) {
 		int x = this->Tiles[i].x;
 		int y = this->Tiles[i].y;
-		if (x == -1 || y == -1) {
-			break;
-		}
 		if (GrandStrategyGame.WorldMapTiles[x][y] && GrandStrategyGame.WorldMapTiles[x][y]->HasResource(resource, ignore_prospection)) {
 			return true;
 		}
@@ -3341,6 +3326,35 @@ std::string CGrandStrategyFaction::GetFullName()
 	return "";
 }
 
+void CGrandStrategyHero::Die()
+{
+	if (this->Province != NULL) {
+		if (this->State == 2) {
+			this->Province->MilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->Owner != NULL ? this->Province->Owner->MilitaryScoreBonus[this->Type->Slot] : 0));
+		} else if (this->State == 3) {
+			this->Province->AttackingMilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->AttackedBy != NULL ? this->Province->AttackedBy->MilitaryScoreBonus[this->Type->Slot] : 0));
+		}
+		
+		this->Province->Heroes.erase(std::remove(this->Province->Heroes.begin(), this->Province->Heroes.end(), this), this->Province->Heroes.end());  //remove the hero from its province
+	}
+	this->Province = NULL;
+	
+	this->State = 0;
+	
+	//check if the hero is the ruler of a faction, and if so, remove it from that position
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (GrandStrategyGame.Factions[i][j]) {
+				if (GrandStrategyGame.Factions[i][j]->Ruler == this) {
+					GrandStrategyGame.Factions[i][j]->Ruler = NULL;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+}
+
 std::string CGrandStrategyHero::GetFullName()
 {
 	return (this->Name + " " + this->Dynasty);
@@ -3454,17 +3468,17 @@ int GetWorldMapTerrainTypeId(std::string terrain_type_name)
 */
 int GetProvinceId(std::string province_name)
 {
-	for (int i = 0; i < ProvinceMax; ++i) {
-		if (!GrandStrategyGame.Provinces[i]) {
-			break;
-		}
-		
-		if (!GrandStrategyGame.Provinces[i]->Name.empty() && GrandStrategyGame.Provinces[i]->Name == province_name) {
-			return i;
-		}
-	}
-	
 	if (!province_name.empty()) {
+		for (int i = 0; i < ProvinceMax; ++i) {
+			if (!GrandStrategyGame.Provinces[i]) {
+				break;
+			}
+			
+			if (!GrandStrategyGame.Provinces[i]->Name.empty() && GrandStrategyGame.Provinces[i]->Name == province_name) {
+				return i;
+			}
+		}
+	
 		fprintf(stderr, "Can't find %s province.\n", province_name.c_str());
 	}
 	
@@ -3544,42 +3558,14 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 	
 	int old_province_id = GrandStrategyGame.WorldMapTiles[x][y]->Province;
 	if (old_province_id != -1) { //if the tile is already assigned to a province, remove it from that province's tile arrays
-		for (int i = 0; i < ProvinceTileMax; ++i) {
-			if (GrandStrategyGame.Provinces[old_province_id]->Tiles[i].x == x && GrandStrategyGame.Provinces[old_province_id]->Tiles[i].y == y) { //if tile was found, push every element of the array after it back one step
-				for (int j = i; j < ProvinceTileMax; ++j) {
-					GrandStrategyGame.Provinces[old_province_id]->Tiles[j].x = GrandStrategyGame.Provinces[old_province_id]->Tiles[j + 1].x;
-					GrandStrategyGame.Provinces[old_province_id]->Tiles[j].y = GrandStrategyGame.Provinces[old_province_id]->Tiles[j + 1].y;
-					if (GrandStrategyGame.Provinces[old_province_id]->Tiles[j].x == -1 && GrandStrategyGame.Provinces[old_province_id]->Tiles[j].y == -1) { // if this is a blank tile slot
-						break;
-					}
-				}
-				break;
-			}
-			if (GrandStrategyGame.Provinces[old_province_id]->Tiles[i].x == -1 && GrandStrategyGame.Provinces[old_province_id]->Tiles[i].y == -1) { // if this is a blank tile slot
-				break;
-			}
-		}
+		GrandStrategyGame.Provinces[old_province_id]->Tiles.erase(std::remove(GrandStrategyGame.Provinces[old_province_id]->Tiles.begin(), GrandStrategyGame.Provinces[old_province_id]->Tiles.end(), Vec2i(x, y)), GrandStrategyGame.Provinces[old_province_id]->Tiles.end());
 		
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
 			int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
 			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
 				GrandStrategyGame.Provinces[old_province_id]->ProductionCapacity[res] -= 1;
 			}
-			for (int i = 0; i < ProvinceTileMax; ++i) {
-				if (GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][i].x == x && GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][i].y == y) { //if tile was found, push every element of the array after it back one step
-					for (int j = i; j < ProvinceTileMax; ++j) {
-						GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][j].x = GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][j + 1].x;
-						GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][j].y = GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][j + 1].y;
-						if (GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][j].x == -1 && GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][j].y == -1) { // if this is a blank tile slot
-							break;
-						}
-					}
-					break;
-				}
-				if (GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][i].x == -1 && GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res][i].y == -1) { // if this is a blank tile slot
-					break;
-				}
-			}
+			GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res].erase(std::remove(GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res].begin(), GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res].end(), Vec2i(x, y)), GrandStrategyGame.Provinces[old_province_id]->ResourceTiles[res].end());
 		}
 	}
 
@@ -3588,32 +3574,14 @@ void SetWorldMapTileProvince(int x, int y, std::string province_name)
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		//now add the tile to the province's tile arrays
-		for (int i = 0; i < ProvinceTileMax; ++i) {
-			if (GrandStrategyGame.Provinces[province_id]->Tiles[i].x == x && GrandStrategyGame.Provinces[province_id]->Tiles[i].y == y) { //if tile is there already, stop
-				break;
-			}
-			if (GrandStrategyGame.Provinces[province_id]->Tiles[i].x == -1 && GrandStrategyGame.Provinces[province_id]->Tiles[i].y == -1) { // if this is a blank tile slot
-				GrandStrategyGame.Provinces[province_id]->Tiles[i].x = x;
-				GrandStrategyGame.Provinces[province_id]->Tiles[i].y = y;
-				break;
-			}
-		}
+		GrandStrategyGame.Provinces[province_id]->Tiles.push_back(Vec2i(x, y));
 		
 		if (GrandStrategyGame.WorldMapTiles[x][y]->Resource != -1) {
 			int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
 			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
 				GrandStrategyGame.Provinces[province_id]->ProductionCapacity[res] += 1;
 			}
-			for (int i = 0; i < ProvinceTileMax; ++i) {
-				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].y == y) { //if tile is there already, stop
-					break;
-				}
-				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].x == -1 && GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].y == -1) { // if this is a blank tile slot
-					GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].x = x;
-					GrandStrategyGame.Provinces[province_id]->ResourceTiles[res][i].y = y;
-					break;
-				}
-			}
+			GrandStrategyGame.Provinces[province_id]->ResourceTiles[res].push_back(Vec2i(x, y));
 		}
 	}
 }
@@ -4125,21 +4093,7 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 			if (GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
 				GrandStrategyGame.Provinces[province_id]->ProductionCapacity[old_resource] -= 1;
 			}
-			for (int i = 0; i < ProvinceTileMax; ++i) { //remove it from the province's resource tile array
-				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][i].y == y) { //if tile was found, push every element of the array after it back one step
-					for (int j = i; j < ProvinceTileMax; ++j) {
-						GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][j].x = GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][j + 1].x;
-						GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][j].y = GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][j + 1].y;
-						if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][j].x == -1 && GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][j].y == -1) { // if this is a blank tile slot
-							break;
-						}
-					}
-					break;
-				}
-				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][i].x == -1 && GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource][i].y == -1) { // if this is a blank tile slot
-					break;
-				}
-			}
+			GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource].erase(std::remove(GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource].begin(), GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource].end(), Vec2i(x, y)), GrandStrategyGame.Provinces[province_id]->ResourceTiles[old_resource].end());
 		}
 	}
 	
@@ -4156,16 +4110,7 @@ void AddWorldMapResource(std::string resource_name, int x, int y, bool discovere
 			}
 		}
 		if (province_id != -1) {
-			for (int i = 0; i < ProvinceTileMax; ++i) { //add tile to the province's respective resource tile array
-				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].x == x && GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].y == y) { //if tile is there already, stop
-					break;
-				}
-				if (GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].x == -1 && GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].y == -1) { // if this is a blank tile slot
-					GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].x = x;
-					GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource][i].y = y;
-					break;
-				}
-			}
+			GrandStrategyGame.Provinces[province_id]->ResourceTiles[resource].push_back(Vec2i(x, y));
 		}
 	}
 }
@@ -4297,9 +4242,12 @@ std::string GetProvinceAttackedBy(std::string province_name)
 void SetProvinceName(std::string old_province_name, std::string new_province_name)
 {
 	int province_id = GetProvinceId(old_province_name);
-	
+
 	if (province_id == -1 || !GrandStrategyGame.Provinces[province_id]) { //if province doesn't exist, create it now
 		province_id = GrandStrategyGame.ProvinceCount;
+		if (GrandStrategyGame.ProvinceCount >= ProvinceMax) {
+			fprintf(stderr, "Max province limit of %d reached.\n", ProvinceMax);
+		}
 		if (!GrandStrategyGame.Provinces[province_id]) {
 			CProvince *province = new CProvince;
 			GrandStrategyGame.Provinces[province_id] = province;
@@ -4307,7 +4255,6 @@ void SetProvinceName(std::string old_province_name, std::string new_province_nam
 		GrandStrategyGame.Provinces[province_id]->ID = province_id;
 		GrandStrategyGame.ProvinceCount += 1;
 	}
-	
 	GrandStrategyGame.Provinces[province_id]->Name = new_province_name;
 }
 
@@ -4667,6 +4614,10 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.WorldMapTiles[x][y]->Port = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Worked = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
+				GrandStrategyGame.WorldMapTiles[x][y]->BaseTile = NULL;
+				GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = NULL;
+				GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphics = NULL;
+				GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor = NULL;
 				for (int i = 0; i < MAX_RACES; ++i) {
 					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i] = "";
 				}
@@ -4723,22 +4674,16 @@ void CleanGrandStrategyGame()
 			for (int j = 0; j < ProvinceMax; ++j) {
 				GrandStrategyGame.Provinces[i]->BorderProvinces[j] = -1;
 			}
-			for (int j = 0; j < ProvinceTileMax; ++j) {
-				GrandStrategyGame.Provinces[i]->Tiles[j].x = -1;
-				GrandStrategyGame.Provinces[i]->Tiles[j].y = -1;
-			}
 			for (int j = 0; j < MaxCosts; ++j) {
 				GrandStrategyGame.Provinces[i]->Income[j] = 0;
 				GrandStrategyGame.Provinces[i]->ProductionCapacity[j] = 0;
 				GrandStrategyGame.Provinces[i]->ProductionCapacityFulfilled[j] = 0;
 				GrandStrategyGame.Provinces[i]->ProductionEfficiencyModifier[j] = 0;
-				for (int k = 0; k < ProvinceTileMax; ++k) {
-					GrandStrategyGame.Provinces[i]->ResourceTiles[j][k].x = -1;
-					GrandStrategyGame.Provinces[i]->ResourceTiles[j][k].y = -1;
-				}
+				GrandStrategyGame.Provinces[i]->ResourceTiles[j].clear();
 			}
 			GrandStrategyGame.Provinces[i]->Claims.clear();
 			GrandStrategyGame.Provinces[i]->Heroes.clear();
+			GrandStrategyGame.Provinces[i]->Tiles.clear();
 		} else {
 			break;
 		}
@@ -4755,6 +4700,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
 				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
+				GrandStrategyGame.Factions[i][j]->Ruler = NULL;
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
 				}
@@ -5216,12 +5162,8 @@ void CalculateProvinceBorders()
 {
 	for (int i = 0; i < ProvinceMax; ++i) {
 		if (GrandStrategyGame.Provinces[i] && !GrandStrategyGame.Provinces[i]->Name.empty()) {
-			for (int j = 0; j < ProvinceTileMax; ++j) {
-				if (GrandStrategyGame.Provinces[i]->Tiles[j].x != -1 && GrandStrategyGame.Provinces[i]->Tiles[j].y != -1) {
-					GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->Province = i; //tell the tile it belongs to this province
-				} else {
-					break;
-				}
+			for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) {
+				GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->Province = i; //tell the tile it belongs to this province
 			}
 			
 			for (int j = 0; j < ProvinceMax; ++j) { //clean border provinces
@@ -5233,45 +5175,41 @@ void CalculateProvinceBorders()
 			
 			//calculate which of the province's tiles are border tiles, and which provinces it borders; also whether the province borders water (is coastal) or not
 			int border_province_count = 0;
-			for (int j = 0; j < ProvinceTileMax; ++j) {
-				if (GrandStrategyGame.Provinces[i]->Tiles[j].x != -1 && GrandStrategyGame.Provinces[i]->Tiles[j].y != -1) {
-					int x = GrandStrategyGame.Provinces[i]->Tiles[j].x;
-					int y = GrandStrategyGame.Provinces[i]->Tiles[j].y;
-					for (int sub_x = -1; sub_x <= 1; ++sub_x) {
-						if ((x + sub_x) < 0 || (x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
+			for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) {
+				int x = GrandStrategyGame.Provinces[i]->Tiles[j].x;
+				int y = GrandStrategyGame.Provinces[i]->Tiles[j].y;
+				for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+					if ((x + sub_x) < 0 || (x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
+						continue;
+					}
+							
+					for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+						if ((y + sub_y) < 0 || (y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
 							continue;
 						}
 							
-						for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-							if ((y + sub_y) < 0 || (y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
-								continue;
-							}
-							
-							int second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
-							if (!(sub_x == 0 && sub_y == 0) && second_province_id != i && GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain != -1) {
-								if (second_province_id == -1 || GrandStrategyGame.Provinces[i]->Water == GrandStrategyGame.Provinces[second_province_id]->Water) {
-									int direction = DirectionToHeading(Vec2i(x + sub_x, y + sub_y) - Vec2i(x, y)) + (32 / 2);
-									if (direction % 32 != 0) {
-										direction = direction - (direction % 32);
-									}
-									direction = direction / 32;
+						int second_province_id = GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Province;
+						if (!(sub_x == 0 && sub_y == 0) && second_province_id != i && GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->Terrain != -1) {
+							if (second_province_id == -1 || GrandStrategyGame.Provinces[i]->Water == GrandStrategyGame.Provinces[second_province_id]->Water) {
+								int direction = DirectionToHeading(Vec2i(x + sub_x, y + sub_y) - Vec2i(x, y)) + (32 / 2);
+								if (direction % 32 != 0) {
+									direction = direction - (direction % 32);
+								}
+								direction = direction / 32;
 									
-									GrandStrategyGame.WorldMapTiles[x][y]->Borders[direction] = true;
-								}
+								GrandStrategyGame.WorldMapTiles[x][y]->Borders[direction] = true;
+							}
 								
-								if (second_province_id != -1 && !GrandStrategyGame.Provinces[i]->BordersProvince(second_province_id)) { //if isn't added yet to the border provinces, do so now
-									GrandStrategyGame.Provinces[i]->BorderProvinces[border_province_count] = second_province_id;
-									border_province_count += 1;
-								}
+							if (second_province_id != -1 && !GrandStrategyGame.Provinces[i]->BordersProvince(second_province_id)) { //if isn't added yet to the border provinces, do so now
+								GrandStrategyGame.Provinces[i]->BorderProvinces[border_province_count] = second_province_id;
+								border_province_count += 1;
+							}
 								
-								if (second_province_id != -1 && GrandStrategyGame.Provinces[i]->Water == false && GrandStrategyGame.Provinces[second_province_id]->Water == true) {
-									GrandStrategyGame.Provinces[i]->Coastal = true;
-								}
+							if (second_province_id != -1 && GrandStrategyGame.Provinces[i]->Water == false && GrandStrategyGame.Provinces[second_province_id]->Water == true) {
+								GrandStrategyGame.Provinces[i]->Coastal = true;
 							}
 						}
 					}
-				} else {
-					break;
 				}
 			}
 		}

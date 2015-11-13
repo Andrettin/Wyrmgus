@@ -132,9 +132,9 @@ public:
 		FrameWidth(0), FrameHeight(0),
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL), WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL)
 	{
-		memset(SpriteWhenLoaded, NULL, sizeof(SpriteWhenLoaded));		
-		memset(SpriteWhenEmpty, NULL, sizeof(SpriteWhenEmpty));	
-		memset(ShieldAnimation, NULL, sizeof(ShieldAnimation));
+		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
+		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));	
+		memset(ShieldAnimation, 0, sizeof(ShieldAnimation));
 	}
 	
 	~VariationInfo();

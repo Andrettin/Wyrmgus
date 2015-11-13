@@ -772,14 +772,16 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set new faction from new civilization
-		if (ThisPlayer && ThisPlayer->Index == player.Index) {
-			if (GameCycle != 0) {
-				char buf[256];
-				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
-				CclCommand(buf);
+		if (!GrandStrategy) {
+			if (ThisPlayer && ThisPlayer->Index == player.Index) {
+				if (GameCycle != 0) {
+					char buf[256];
+					snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
+					CclCommand(buf);
+				}
+			} else if (player.AiEnabled) {
+				player.SetRandomFaction();
 			}
-		} else if (player.AiEnabled) {
-			player.SetRandomFaction();
 		}
 	}
 	//Wyrmgus end
@@ -1034,14 +1036,16 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set faction from the old civilization
-		if (ThisPlayer && ThisPlayer->Index == player.Index) {
-			if (GameCycle != 0) {
-				char buf[256];
-				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
-				CclCommand(buf);
+		if (!GrandStrategy) {
+			if (ThisPlayer && ThisPlayer->Index == player.Index) {
+				if (GameCycle != 0) {
+					char buf[256];
+					snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
+					CclCommand(buf);
+				}
+			} else if (player.AiEnabled) {
+				player.SetRandomFaction();
 			}
-		} else if (player.AiEnabled) {
-			player.SetRandomFaction();
 		}
 	}
 	//Wyrmgus end
@@ -1667,15 +1671,17 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 	//Wyrmgus start
 	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
 	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == "tribe")) {
-		int old_faction = player.Faction;
-		if (ThisPlayer && ThisPlayer->Index == player.Index) {
-			if (GameCycle != 0) {
-				char buf[256];
-				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", player.Race != -1 ? PlayerRaces.Name[player.Race].c_str() : "", (player.Race != -1 && old_faction != -1) ? PlayerRaces.Factions[player.Race][old_faction]->Name.c_str() : "");
-				CclCommand(buf);
+		if (!GrandStrategy) {
+			int old_faction = player.Faction;
+			if (ThisPlayer && ThisPlayer->Index == player.Index) {
+				if (GameCycle != 0) {
+					char buf[256];
+					snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", player.Race != -1 ? PlayerRaces.Name[player.Race].c_str() : "", (player.Race != -1 && old_faction != -1) ? PlayerRaces.Factions[player.Race][old_faction]->Name.c_str() : "");
+					CclCommand(buf);
+				}
+			} else if (player.AiEnabled) {
+				player.SetRandomFaction();
 			}
-		} else if (player.AiEnabled) {
-			player.SetRandomFaction();
 		}
 	}
 	//Wyrmgus end

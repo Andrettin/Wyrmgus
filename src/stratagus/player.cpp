@@ -498,16 +498,18 @@ int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
 
 int PlayerRace::GetFactionClassUnitType(int civilization, int faction, int class_id)
 {
-	if (civilization == -1 || faction == -1 || class_id == -1) {
+	if (civilization == -1 || class_id == -1) {
 		return -1;
 	}
 	
-	if (FactionClassUnitTypes[civilization][faction][class_id] != -1) {
-		return FactionClassUnitTypes[civilization][faction][class_id];
-	}
-	
-	if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
-		return GetFactionClassUnitType(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction, class_id);
+	if (faction != -1) {
+		if (FactionClassUnitTypes[civilization][faction][class_id] != -1) {
+			return FactionClassUnitTypes[civilization][faction][class_id];
+		}
+		
+		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
+			return GetFactionClassUnitType(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction, class_id);
+		}
 	}
 	
 	return GetCivilizationClassUnitType(civilization, class_id);
@@ -515,16 +517,18 @@ int PlayerRace::GetFactionClassUnitType(int civilization, int faction, int class
 
 int PlayerRace::GetFactionClassUpgrade(int civilization, int faction, int class_id)
 {
-	if (civilization == -1 || faction == -1 || class_id == -1) {
+	if (civilization == -1 || class_id == -1) {
 		return -1;
 	}
 	
-	if (FactionClassUpgrades[civilization][faction][class_id] != -1) {
-		return FactionClassUpgrades[civilization][faction][class_id];
-	}
-	
-	if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
-		return GetFactionClassUpgrade(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction, class_id);
+	if (faction != -1) {
+		if (FactionClassUpgrades[civilization][faction][class_id] != -1) {
+			return FactionClassUpgrades[civilization][faction][class_id];
+		}
+		
+		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
+			return GetFactionClassUpgrade(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction, class_id);
+		}
 	}
 	
 	return GetCivilizationClassUpgrade(civilization, class_id);

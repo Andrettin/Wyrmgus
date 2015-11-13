@@ -2132,7 +2132,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
 	int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, 3));
 	std::string unit_type_ident;
-	if (civilization != -1 && faction != -1 && class_id != -1) {
+	if (civilization != -1 && class_id != -1) {
 		int unit_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, class_id);
 		if (unit_type_id != -1) {
 			unit_type_ident = UnitTypes[unit_type_id]->Ident;
@@ -2747,6 +2747,10 @@ static int CclSetPlayerData(lua_State *l)
 		}
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 		//Wyrmgus end
+		
+		if (GrandStrategy && ThisPlayer) {
+			p->SetRandomFaction();
+		}
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		p->SetFaction(LuaToString(l, 3));

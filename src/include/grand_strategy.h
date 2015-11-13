@@ -137,7 +137,7 @@ class CProvince
 public:
 	CProvince() :
 		Name(""), SettlementName(""),
-		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
+		ID(-1), Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
 		Water(false), Coastal(false), Movement(false), SettlementLocation(-1, -1),
@@ -153,16 +153,6 @@ public:
 		memset(ProductionCapacity, 0, sizeof(ProductionCapacity));
 		memset(ProductionCapacityFulfilled, 0, sizeof(ProductionCapacityFulfilled));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
-		for (int i = 0; i < ProvinceTileMax; ++i) {
-			Tiles[i].x = -1;
-			Tiles[i].y = -1;
-		}
-		for (int i = 0; i < MaxCosts; ++i) {
-			for (int j = 0; j < ProvinceTileMax; ++j) {
-				ResourceTiles[i][j].x = -1;
-				ResourceTiles[i][j].y = -1;
-			}
-		}
 	}
 	
 	void UpdateMinimap();
@@ -201,10 +191,8 @@ public:
 	std::string SettlementName;
 	int ID;																/// ID of this province
 	int Civilization;													/// Civilization of the province (-1 = no one).
-	CGrandStrategyFaction *Owner;										/// Owner of the province
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	int CurrentConstruction;											/// Building currently under construction (unit type index).
-	CGrandStrategyFaction *AttackedBy;									/// Which faction the province is being attacked by.
 	int TotalUnits;														/// Total quantity of units in the province
 	int TotalWorkers;													/// Total quantity of workers in the province
 	int PopulationGrowthProgress;										/// Progress of current population growth; when reaching the population growth threshold a new worker unit will be created
@@ -217,6 +205,8 @@ public:
 	bool Coastal;														/// Whether the province is a coastal province or not
 	bool Movement;														/// Whether a unit or hero is currently moving to the province
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
+	CGrandStrategyFaction *Owner;										/// Owner of the province
+	CGrandStrategyFaction *AttackedBy;									/// Which faction the province is being attacked by.
 	bool SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
 	int Units[UnitTypeMax];												/// Quantity of units of a particular unit type in the province
 	int UnderConstructionUnits[UnitTypeMax];							/// Quantity of units of a particular unit type being trained/constructed in the province
@@ -233,8 +223,8 @@ public:
 	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
 	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
 	std::string FactionCulturalSettlementNames[MAX_RACES][FactionMax];	/// Names for the province's settlement for each different faction
-	Vec2i Tiles[ProvinceTileMax];
-	Vec2i ResourceTiles[MaxCosts][ProvinceTileMax];						///resources tiles in the province
+	std::vector<Vec2i> Tiles;
+	std::vector<Vec2i> ResourceTiles[MaxCosts];							///resources tiles in the province
 };
 
 class CGrandStrategyFaction
@@ -311,6 +301,7 @@ public:
 	{
 	}
 	
+	void Die();
 	std::string GetFullName();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province
@@ -327,7 +318,10 @@ public:
 class CGrandStrategyGame
 {
 public:
-	CGrandStrategyGame() : WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), SelectedProvince(-1), PlayerFaction(NULL)
+	CGrandStrategyGame() : 
+		WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), SelectedProvince(-1),
+		FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
+		PlayerFaction(NULL)
 	{
 		for (int i = 0; i < MaxCosts; ++i) {
 			for (int j = 0; j < WorldMapResourceMax; ++j) {
@@ -335,6 +329,35 @@ public:
 				WorldMapResources[i][j].y = -1;
 			}
 		}
+		for (int i = 0; i < MaxDirections; ++i) {
+			for (int j = 0; j < 2; ++j) {
+				RivermouthGraphics[i][j] = NULL;
+				RiverheadGraphics[i][j] = NULL;
+			}
+		}
+		for (int i = 0; i < MaxPathways; ++i) {
+			for (int j = 0; j < MaxDirections; ++j) {
+				PathwayGraphics[i][j] = NULL;
+			}
+		}
+		for (int x = 0; x < WorldMapWidthMax; ++x) {
+			for (int y = 0; y < WorldMapHeightMax; ++y) {
+				WorldMapTiles[x][y] = NULL;
+			}
+		}
+		for (int i = 0; i < MAX_RACES; ++i) {
+			for (int j = 0; j < FactionMax; ++j) {
+				Factions[i][j] = NULL;
+			}
+		}
+		memset(BorderGraphics, 0, sizeof(BorderGraphics));
+		memset(SettlementGraphics, 0, sizeof(SettlementGraphics));
+		memset(BarracksGraphics, 0, sizeof(BarracksGraphics));
+		memset(SettlementMasonryGraphics, 0, sizeof(SettlementMasonryGraphics));
+		memset(NationalBorderGraphics, 0, sizeof(NationalBorderGraphics));
+		memset(TerrainTypes, 0, sizeof(TerrainTypes));
+		memset(Provinces, 0, sizeof(Provinces));
+		memset(Rivers, 0, sizeof(Rivers));
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
 
