@@ -546,7 +546,7 @@ static int CclAcquireTrait(lua_State *l)
 	if (!strncmp(ident, "upgrade-", 8)) {
 		TraitAcquire(*unit, CUpgrade::Get(ident));
 		unit->Trait = ident;
-	} else if (ident == "") {
+	} else if (strlen(ident) == 0) {
 		if (!unit->Trait.empty()) { //remove previous trait, if any
 			if (!GameSettings.NoRandomness || unit->Type->BoolFlag[HERO_INDEX].value) { // if in no randomness setting, only change trait modifiers if the unit is a hero
 				IndividualUpgradeLost(*unit, CUpgrade::Get(unit->Trait));
