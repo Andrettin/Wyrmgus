@@ -59,6 +59,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <cstring>
 
 /*----------------------------------------------------------------------------
 --  Declarations

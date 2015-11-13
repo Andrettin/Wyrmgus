@@ -63,6 +63,7 @@
 
 #include <string>
 #include <map>
+#include <cstring>
 
 /*----------------------------------------------------------------------------
 -- Documentation
