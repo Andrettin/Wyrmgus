@@ -1110,23 +1110,23 @@ void CPlayer::SetFaction(const std::string faction_name)
 		this->SetName(faction_name);
 	}
 	this->Faction = faction;
-	int PrimaryColor = PlayerRaces.Factions[this->Race][faction]->Color;
-	int SecondaryColor = PlayerRaces.Factions[this->Race][faction]->SecondaryColor;
-	bool color_used = false;
-	for (int i = 0; i < PlayerMax; ++i) {
-		if (this->Index != i && Players[i].Faction != -1 && Players[i].Type != PlayerNobody && Players[i].Color == PlayerColors[PrimaryColor][0]) {
-			color_used = true;
-		}		
-	}
-	if (!color_used) {
-		this->Color = PlayerColors[PrimaryColor][0];
-		this->UnitColors.Colors = PlayerColorsRGB[PrimaryColor];
-	} else {
-		this->Color = PlayerColors[SecondaryColor][0];
-		this->UnitColors.Colors = PlayerColorsRGB[SecondaryColor];
-	}
-	
 	if (this->Faction != -1) {
+		int PrimaryColor = PlayerRaces.Factions[this->Race][faction]->Color;
+		int SecondaryColor = PlayerRaces.Factions[this->Race][faction]->SecondaryColor;
+		bool color_used = false;
+		for (int i = 0; i < PlayerMax; ++i) {
+			if (this->Index != i && Players[i].Faction != -1 && Players[i].Type != PlayerNobody && Players[i].Color == PlayerColors[PrimaryColor][0]) {
+				color_used = true;
+			}		
+		}
+		if (!color_used) {
+			this->Color = PlayerColors[PrimaryColor][0];
+			this->UnitColors.Colors = PlayerColorsRGB[PrimaryColor];
+		} else {
+			this->Color = PlayerColors[SecondaryColor][0];
+			this->UnitColors.Colors = PlayerColorsRGB[SecondaryColor];
+		}
+	
 		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {
 			UpgradeAcquire(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade));
 		}
