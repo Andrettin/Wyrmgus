@@ -2741,13 +2741,6 @@ void SaveGrandStrategyGame(const std::string &filename)
 						fprintf(fd, "SetProvinceAttackingUnitQuantity(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->AttackingUnits[j]); //save province attacking units
 					}
 				}
-				if (GrandStrategyGame.Provinces[i]->Heroes.size() > 0) {
-					for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Heroes.size(); ++j) {
-						if (GrandStrategyGame.Provinces[i]->Heroes[j]->State != 0) {
-							fprintf(fd, "SetProvinceHero(\"%s\", \"%s\", \"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->Heroes[j]->Name.c_str(), GrandStrategyGame.Provinces[i]->Heroes[j]->Dynasty.c_str(), GrandStrategyGame.Provinces[i]->Heroes[j]->Type->Ident.c_str(), GrandStrategyGame.Provinces[i]->Heroes[j]->State); //save province heroes
-						}
-					}
-				}
 				if (GrandStrategyGame.Provinces[i]->Claims.size() > 0) {
 					for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Claims.size(); ++j) {
 						fprintf(fd, "AddProvinceClaim(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Name.c_str());
@@ -2807,6 +2800,27 @@ void SaveGrandStrategyGame(const std::string &filename)
 								fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Name.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n]).c_str()); //save faction trade data
 							}
 						}
+					}
+				} else {
+					break;
+				}
+			}
+		}
+		
+		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+			if (GrandStrategyGame.Heroes[i]->State != 0) {
+				fprintf(fd, "CreateGrandStrategyHero(\"%s\")\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str()); //save existing heroes
+				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
+					fprintf(fd, "SetProvinceHero(\"%s\", \"%s\", \"%s\", %d)\n", GrandStrategyGame.Heroes[i]->Province->Name.c_str(), GrandStrategyGame.Heroes[i]->GetFullName().c_str(), GrandStrategyGame.Heroes[i]->Type->Ident.c_str(), GrandStrategyGame.Heroes[i]->State); //save province heroes
+				}
+			}
+		}
+		
+		for (int i = 0; i < MAX_RACES; ++i) {
+			for (int j = 0; j < FactionMax; ++j) {
+				if (GrandStrategyGame.Factions[i][j]) {
+					if (GrandStrategyGame.Factions[i][j]->Ruler != NULL) {
+						fprintf(fd, "SetFactionRuler(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GrandStrategyGame.Factions[i][j]->Ruler->GetFullName().c_str()); //save faction rulers
 					}
 				} else {
 					break;

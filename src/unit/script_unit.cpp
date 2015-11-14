@@ -1677,8 +1677,8 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			hero->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Dynasty")) {
 			hero->Dynasty = LuaToString(l, -1);
-		} else if (!strcmp(value, "Type")) {
-			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[UnitTypeIdByIdent(LuaToString(l, -1))]));
+		} else if (!strcmp(value, "DefaultType")) {
+			hero->DefaultType = const_cast<CUnitType *>(&(*UnitTypes[UnitTypeIdByIdent(LuaToString(l, -1))]));
 		} else if (!strcmp(value, "Year")) {
 			hero->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DeathYear")) {
@@ -1686,7 +1686,7 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			hero->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "ProvinceOfOrigin")) {
-			hero->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[GetProvinceId(LuaToString(l, -1))]));
+			hero->ProvinceOfOrigin = LuaToString(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

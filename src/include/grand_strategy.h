@@ -297,8 +297,8 @@ class CGrandStrategyHero
 public:
 	CGrandStrategyHero() :
 		State(0), Year(0), DeathYear(0), Civilization(-1),
-		Name(""), Dynasty(""),
-		Type(NULL), Province(NULL), ProvinceOfOrigin(NULL)
+		Name(""), Dynasty(""), ProvinceOfOrigin(""),
+		DefaultType(NULL), Type(NULL), Province(NULL)
 	{
 	}
 	
@@ -312,9 +312,10 @@ public:
 	int Civilization;	/// Culture to which the hero belongs
 	std::string Name;	/// given name of the hero
 	std::string Dynasty;	/// name of the hero's dynasty
+	std::string ProvinceOfOrigin;	/// province from which the hero originates
+	CUnitType *DefaultType;
 	CUnitType *Type;
 	CProvince *Province;
-	CProvince *ProvinceOfOrigin;
 };
 
 /**
@@ -560,6 +561,7 @@ extern int GetFactionCommodityTrade(std::string civilization_name, std::string f
 extern bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_full_name);
 extern void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_full_name);
 extern std::string GetFactionRuler(std::string civilization_name, std::string faction_name);
+extern void CreateGrandStrategyHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);
 extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
 extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);
