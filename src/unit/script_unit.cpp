@@ -40,6 +40,9 @@
 #include "animation.h"
 #include "commands.h"
 #include "construct.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "interface.h"
 #include "map.h"
 #include "pathfinder.h"
@@ -1645,6 +1648,52 @@ static int CclUnitHasAbility(lua_State *l)
 	lua_pushboolean(l, unit->LearnedAbilities[CUpgrade::Get(ident)->ID]);
 	return 1;
 }
+
+/**
+**  Define a grand strategy hero.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineGrandStrategyHero(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string hero_full_name = LuaToString(l, 1);
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (!hero) {
+		hero = new CGrandStrategyHero;
+		GrandStrategyGame.Heroes.push_back(hero);
+	}
+	hero->State = 0; //newly-defined heroes have a state of 2 (meaning they are alive but not moving or attacking)
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			hero->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Dynasty")) {
+			hero->Dynasty = LuaToString(l, -1);
+		} else if (!strcmp(value, "Type")) {
+			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[UnitTypeIdByIdent(LuaToString(l, -1))]));
+		} else if (!strcmp(value, "Year")) {
+			hero->Year = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "DeathYear")) {
+			hero->DeathYear = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Civilization")) {
+			hero->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "ProvinceOfOrigin")) {
+			hero->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[GetProvinceId(LuaToString(l, -1))]));
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
 //Wyrmgus end
 
 /**
@@ -1694,6 +1743,7 @@ void UnitCclRegister()
 	lua_register(Lua, "SetUnitActive", CclSetUnitActive);
 	lua_register(Lua, "IsUnitIdle", CclIsUnitIdle);
 	lua_register(Lua, "UnitHasAbility", CclUnitHasAbility);
+	lua_register(Lua, "DefineGrandStrategyHero", CclDefineGrandStrategyHero);
 	//Wyrmgus end
 }
 

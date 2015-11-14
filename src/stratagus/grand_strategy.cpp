@@ -61,6 +61,7 @@
 
 bool GrandStrategy = false;				///if the game is in grand strategy mode
 bool GrandStrategyGamePaused = false;
+int GrandStrategyYear = 0;
 std::string GrandStrategyWorld;
 int WorldMapOffsetX;
 int WorldMapOffsetY;
@@ -510,10 +511,7 @@ void CGrandStrategyGame::DrawInterface()
 			interface_state_name = GrandStrategyInterfaceState;
 			
 			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler != NULL) {
-				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Name;
-				if (!GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Dynasty.empty()) {
-					ruler_name_string += " " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Dynasty;
-				}
+				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->GetFullName();
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
 				item_y += 1;
 			}
@@ -872,6 +870,23 @@ void CGrandStrategyGame::DoTurn()
 			}
 		}
 	}
+	
+	//check if any heroes should begin activity or die in this year
+	for (size_t i = 0; i < this->Heroes.size(); ++i) {
+		if (
+			// for historical personages to appear, they require three things: the year of their historical rise to prominence, ownership of the province in which they were born or raised, and that that province be of the correct culture for them, if they belonged to the cultural majority
+			this->Heroes[i]->Year == GrandStrategyYear
+			&& this->Heroes[i]->ProvinceOfOrigin != NULL
+			&& this->Heroes[i]->ProvinceOfOrigin->Owner != NULL
+			&& this->Heroes[i]->ProvinceOfOrigin->Civilization == this->Heroes[i]->Civilization
+		) {
+			//make heroes appear in their start year
+			this->Heroes[i]->Create();
+		}
+		if (this->Heroes[i]->DeathYear == GrandStrategyYear) {
+			this->Heroes[i]->Die();
+		}
+	}
 }
 
 void CGrandStrategyGame::DoTrade()
@@ -1167,6 +1182,16 @@ Vec2i CGrandStrategyGame::GetTileUnderCursor()
 	}
 	
 	return tile_under_cursor;
+}
+
+CGrandStrategyHero *CGrandStrategyGame::GetHero(std::string hero_full_name)
+{
+	for (size_t i = 0; i < this->Heroes.size(); ++i) {
+		if (hero_full_name == this->Heroes[i]->GetFullName()) {
+			return this->Heroes[i];
+		}
+	}
+	return NULL;
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -1827,57 +1852,46 @@ void CProvince::ChangeAttackingUnitQuantity(int unit_type_id, int quantity)
 	this->SetAttackingUnitQuantity(unit_type_id, this->AttackingUnits[unit_type_id] + quantity);
 }
 
-void CProvince::SetHero(std::string hero_name, std::string hero_dynasty, int unit_type_id, int value)
+void CProvince::SetHero(std::string hero_full_name, int unit_type_id, int value)
 {
 	if (value == 1) {
 		this->Movement = true;
 	}
-	bool found_hero = false;
-	//update the hero
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
-			if (GrandStrategyGame.Heroes[i]->Province != NULL) {
-				if (GrandStrategyGame.Heroes[i]->State == 2) {
-					GrandStrategyGame.Heroes[i]->Province->MilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (GrandStrategyGame.Heroes[i]->Province->Owner != NULL ? GrandStrategyGame.Heroes[i]->Province->Owner->MilitaryScoreBonus[unit_type_id] : 0));
-				} else if (GrandStrategyGame.Heroes[i]->State == 3) {
-					GrandStrategyGame.Heroes[i]->Province->AttackingMilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (GrandStrategyGame.Heroes[i]->Province->AttackedBy != NULL ? GrandStrategyGame.Heroes[i]->Province->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
-				}
-			}
-			GrandStrategyGame.Heroes[i]->State = value;
-			
-			//if the hero's unit type changed
-			if (UnitTypes[unit_type_id] != GrandStrategyGame.Heroes[i]->Type) {
-				GrandStrategyGame.Heroes[i]->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-			}
-			
-			if (this != GrandStrategyGame.Heroes[i]->Province || value == 0) { //if the new province is different from the hero's current province
-				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
-					GrandStrategyGame.Heroes[i]->Province->Heroes.erase(std::remove(GrandStrategyGame.Heroes[i]->Province->Heroes.begin(), GrandStrategyGame.Heroes[i]->Province->Heroes.end(), GrandStrategyGame.Heroes[i]), GrandStrategyGame.Heroes[i]->Province->Heroes.end());  //remove the hero from the last province
-				}
-				GrandStrategyGame.Heroes[i]->Province = value != 0 ? const_cast<CProvince *>(&(*this)) : NULL;
-				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
-					GrandStrategyGame.Heroes[i]->Province->Heroes.push_back(GrandStrategyGame.Heroes[i]); //add the hero to the new province
-				}
-			}
-			
-			found_hero = true;
-			break;
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		//update the hero
+		if (value == 0) {
+			hero->Die();
+			return;
 		}
+		if (hero->Province != NULL) {
+			if (hero->State == 2) {
+				hero->Province->MilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (hero->Province->Owner != NULL ? hero->Province->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+			} else if (hero->State == 3) {
+				hero->Province->AttackingMilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (hero->Province->AttackedBy != NULL ? hero->Province->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
+			}
+		}
+		hero->State = value;
+			
+		//if the hero's unit type changed
+		if (unit_type_id != hero->Type->Slot) {
+			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+		}
+			
+		if (this != hero->Province || value == 0) { //if the new province is different from the hero's current province
+			if (hero->Province != NULL) {
+				hero->Province->Heroes.erase(std::remove(hero->Province->Heroes.begin(), hero->Province->Heroes.end(), hero), hero->Province->Heroes.end());  //remove the hero from the last province
+			}
+			hero->Province = value != 0 ? const_cast<CProvince *>(&(*this)) : NULL;
+			if (hero->Province != NULL) {
+				hero->Province->Heroes.push_back(hero); //add the hero to the new province
+			}
+		}
+	} else {
+		//if the hero hasn't been defined yet, give an error message
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 	}
 	
-	//if the hero hasn't been defined yet, do so now
-	if (found_hero == false) {
-		CGrandStrategyHero *hero = new CGrandStrategyHero;
-		hero->Name = hero_name;
-		hero->Dynasty = hero_dynasty;
-		hero->State = value;
-		hero->Province = value != 0 ? const_cast<CProvince *>(&(*this)) : NULL;
-		hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-		GrandStrategyGame.Heroes.push_back(hero);
-		if (hero->Province != NULL) {
-			this->Heroes.push_back(hero);
-		}
-	}
 	
 	if (value == 2) {
 		this->MilitaryScore += (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
@@ -3326,8 +3340,55 @@ std::string CGrandStrategyFaction::GetFullName()
 	return "";
 }
 
+void CGrandStrategyHero::Create()
+{
+	//show message that the hero has appeared
+	if (
+		this->ProvinceOfOrigin != NULL && this->ProvinceOfOrigin->Owner != NULL && this->ProvinceOfOrigin->Owner == GrandStrategyGame.PlayerFaction
+	) {
+		char buf[256];
+		snprintf(
+			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
+			(this->Type->Name + " " + this->GetFullName()).c_str(),
+			("My lord, the hero " + this->GetFullName() + " has come to renown in " + this->ProvinceOfOrigin->GetCulturalName() + " and has entered our services.").c_str()
+		);
+		CclCommand(buf);	
+	}
+	
+	this->State = 2;
+	
+	if (this->ProvinceOfOrigin != NULL && this->Type->BoolFlag[HERO_INDEX].value) { //if the hero has its own unit type, add it to its province of origin
+		this->ProvinceOfOrigin->SetHero(this->GetFullName(), this->Type->Slot, 2);
+	}
+}
+
 void CGrandStrategyHero::Die()
 {
+	//show message that the hero has died
+	if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ruler == this) {
+		char buf[256];
+		snprintf(
+			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
+			("Ruler" + this->GetFullName() + " Dies").c_str(),
+			("Our ruler " + this->GetFullName() + " has died! May his soul rest in peace!").c_str()
+		);
+		CclCommand(buf);	
+	} else if (
+		this->Province != NULL
+		&& (
+			((this->State == 1 || this->State == 2) && this->Province->Owner == GrandStrategyGame.PlayerFaction)
+			|| (this->State == 3 && this->Province->AttackedBy == GrandStrategyGame.PlayerFaction)
+		)
+	) {
+		char buf[256];
+		snprintf(
+			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
+			(this->GetFullName() + " Dies").c_str(),
+			("My lord, the hero " + this->GetFullName() + " has died!").c_str()
+		);
+		CclCommand(buf);	
+	}
+	
 	if (this->Province != NULL) {
 		if (this->State == 2) {
 			this->Province->MilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->Owner != NULL ? this->Province->Owner->MilitaryScoreBonus[this->Type->Slot] : 0));
@@ -3337,6 +3398,7 @@ void CGrandStrategyHero::Die()
 		
 		this->Province->Heroes.erase(std::remove(this->Province->Heroes.begin(), this->Province->Heroes.end(), this), this->Province->Heroes.end());  //remove the hero from its province
 	}
+	
 	this->Province = NULL;
 	
 	this->State = 0;
@@ -3357,7 +3419,11 @@ void CGrandStrategyHero::Die()
 
 std::string CGrandStrategyHero::GetFullName()
 {
-	return (this->Name + " " + this->Dynasty);
+	if (!this->Dynasty.empty()) {
+		return (this->Name + " " + this->Dynasty);
+	} else {
+		return this->Name;
+	}
 }
 
 /**
@@ -4499,13 +4565,13 @@ void SetProvinceAttackingUnitQuantity(std::string province_name, std::string uni
 	}
 }
 
-void SetProvinceHero(std::string province_name, std::string hero_name, std::string hero_dynasty, std::string hero_ident, int value)
+void SetProvinceHero(std::string province_name, std::string hero_full_name, std::string hero_ident, int value)
 {
 	int province_id = GetProvinceId(province_name);
 	int unit_type_id = UnitTypeIdByIdent(hero_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type_id != -1) {
-		GrandStrategyGame.Provinces[province_id]->SetHero(hero_name, hero_dynasty, unit_type_id, value);
+		GrandStrategyGame.Provinces[province_id]->SetHero(hero_full_name, unit_type_id, value);
 	}
 }
 
@@ -5357,7 +5423,7 @@ int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit
 	return GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type_id];
 }
 
-int GetProvinceHero(std::string province_name, std::string hero_name, std::string hero_dynasty)
+int GetProvinceHero(std::string province_name, std::string hero_full_name)
 {
 	int province_id = GetProvinceId(province_name);
 
@@ -5366,10 +5432,9 @@ int GetProvinceHero(std::string province_name, std::string hero_name, std::strin
 		return 0;
 	}
 	
-	for (size_t i = 0; i < GrandStrategyGame.Provinces[province_id]->Heroes.size(); ++i) {
-		if (GrandStrategyGame.Provinces[province_id]->Heroes[i]->Name == hero_name && GrandStrategyGame.Provinces[province_id]->Heroes[i]->Dynasty == hero_dynasty) {
-			return GrandStrategyGame.Provinces[province_id]->Heroes[i]->State;
-		}
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero && hero->Province != NULL && hero->Province->ID == province_id) {
+		return hero->State;
 	}
 	return 0;
 }
@@ -5906,7 +5971,7 @@ int GetFactionCommodityTrade(std::string civilization_name, std::string faction_
 	return GrandStrategyGame.Factions[civilization][faction]->Trade[resource];
 }
 
-bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty)
+bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_full_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
@@ -5917,21 +5982,20 @@ bool FactionHasHero(std::string civilization_name, std::string faction_name, std
 	if (faction == -1) {
 		return 0;
 	}
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
-			if (GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner != NULL) {
-				if (GrandStrategyGame.Heroes[i]->Province->Owner->Civilization == civilization && GrandStrategyGame.Heroes[i]->Province->Owner->Faction == faction) {
-					return true;
-				} else {
-					return false;
-				}
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		if (hero->Province != NULL && hero->Province->Owner != NULL) {
+			if (hero->Province->Owner->Civilization == civilization && hero->Province->Owner->Faction == faction) {
+				return true;
+			} else {
+				return false;
 			}
 		}
 	}
 	return false;
 }
 
-void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty)
+void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_full_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
@@ -5943,43 +6007,70 @@ void SetFactionRuler(std::string civilization_name, std::string faction_name, st
 		return;
 	}
 	
-	if (hero_name.empty() && hero_dynasty.empty()) {
+	if (hero_full_name.empty()) {
 		GrandStrategyGame.Factions[civilization][faction]->Ruler = NULL;
 		return;
 	}
 	
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
-			if (GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner != NULL) {
-				if (GrandStrategyGame.Heroes[i]->Province->Owner->Civilization == civilization && GrandStrategyGame.Heroes[i]->Province->Owner->Faction == faction) {
-					GrandStrategyGame.Factions[civilization][faction]->Ruler = const_cast<CGrandStrategyHero *>(&(*GrandStrategyGame.Heroes[i]));
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		if (hero->Province != NULL && hero->Province->Owner != NULL) {
+			if (hero->Province->Owner->Civilization == civilization && hero->Province->Owner->Faction == faction) {
+				GrandStrategyGame.Factions[civilization][faction]->Ruler = const_cast<CGrandStrategyHero *>(&(*hero));
+			}
+		}
+	}
+}
+
+std::string GetFactionRuler(std::string civilization_name, std::string faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	if (faction == -1) {
+		return "";
+	}
+	
+	if (GrandStrategyGame.Factions[civilization][faction]->Ruler != NULL) {
+		return GrandStrategyGame.Factions[civilization][faction]->Ruler->GetFullName();
+	} else {
+		return "";
+	}
+}
+
+void KillGrandStrategyHero(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		hero->Die();
+	}
+}
+
+void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+		if (unit_type_id != -1) {
+			if (hero->Province != NULL) {
+				hero->Province->SetHero(hero_full_name, unit_type_id, hero->State);
+			} else {
+				if (unit_type_id != hero->Type->Slot) {
+					hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
 				}
 			}
 		}
 	}
 }
 
-void SetHeroUnitType(std::string hero_name, std::string hero_dynasty, std::string unit_type_ident)
+std::string GetGrandStrategyHeroUnitType(std::string hero_full_name)
 {
-	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-	if (unit_type_id != -1) {
-		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-			if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
-				GrandStrategyGame.Heroes[i]->Province->SetHero(hero_name, hero_dynasty, unit_type_id, GrandStrategyGame.Heroes[i]->State);
-				break;
-			}
-		}
-	}
-}
-
-std::string GetHeroUnitType(std::string hero_name, std::string hero_dynasty)
-{
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
-			if (GrandStrategyGame.Heroes[i]->Type != NULL) {
-				return GrandStrategyGame.Heroes[i]->Type->Ident;
-			}
-		}
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero && hero->Type != NULL) {
+		return hero->Type->Ident;
 	}
 	return "";
 }

@@ -163,7 +163,7 @@ public:
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
 	void SetAttackingUnitQuantity(int unit_type_id, int quantity);
 	void ChangeAttackingUnitQuantity(int unit_type_id, int quantity);
-	void SetHero(std::string hero_name, std::string hero_dynasty, int unit_type_id, int value);
+	void SetHero(std::string hero_full_name, int unit_type_id, int value);
 	void AllocateLabor();
 	void AllocateLaborToResource(int resource);
 	void ReallocateLabor();
@@ -296,19 +296,25 @@ class CGrandStrategyHero
 {
 public:
 	CGrandStrategyHero() :
-		State(0), Name(""), Dynasty(""),
-		Type(NULL), Province(NULL)
+		State(0), Year(0), DeathYear(0), Civilization(-1),
+		Name(""), Dynasty(""),
+		Type(NULL), Province(NULL), ProvinceOfOrigin(NULL)
 	{
 	}
 	
+	void Create();
 	void Die();
 	std::string GetFullName();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province
+	int Year;			/// Year in which the hero historically starts being active
+	int DeathYear;		/// Year in which the hero dies of natural causes
+	int Civilization;	/// Culture to which the hero belongs
 	std::string Name;	/// given name of the hero
 	std::string Dynasty;	/// name of the hero's dynasty
 	CUnitType *Type;
 	CProvince *Province;
+	CProvince *ProvinceOfOrigin;
 };
 
 /**
@@ -377,6 +383,7 @@ public:
 	bool IsPointOnMap(int x, int y);
 	bool TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b);
 	Vec2i GetTileUnderCursor();
+	CGrandStrategyHero *GetHero(std::string hero_full_name);
 
 public:
 	int WorldMapWidth;
@@ -424,6 +431,7 @@ public:
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
 extern bool GrandStrategyGamePaused;					/// if grand strategy game is paused
+extern int GrandStrategyYear;
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
 extern int WorldMapOffsetY;
@@ -486,7 +494,7 @@ extern void ChangeProvinceUnitQuantity(std::string province_name, std::string un
 extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
-extern void SetProvinceHero(std::string province_name, std::string hero_name, std::string hero_dynasty, std::string hero_ident, int value);
+extern void SetProvinceHero(std::string province_name, std::string hero_full_name, std::string hero_ident, int value);
 extern void SetProvinceFood(std::string province_name, int quantity);
 extern void ChangeProvinceFood(std::string province_name, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
@@ -515,7 +523,7 @@ extern int GetProvinceUnitQuantity(std::string province_name, std::string unit_t
 extern int GetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident);
 extern int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident);
-extern int GetProvinceHero(std::string province_name, std::string hero_name, std::string hero_dynasty);
+extern int GetProvinceHero(std::string province_name, std::string hero_full_name);
 extern int GetProvinceLabor(std::string province_name);
 extern int GetProvinceAvailableWorkersForTraining(std::string province_name);
 extern int GetProvinceTotalWorkers(std::string province_name);
@@ -549,10 +557,12 @@ extern void FormFaction(std::string old_civilization_name, std::string old_facti
 extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);
-extern bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty);
-extern void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty);
-extern void SetHeroUnitType(std::string hero_name, std::string hero_dynasty, std::string unit_type_ident);
-extern std::string GetHeroUnitType(std::string hero_name, std::string hero_dynasty);
+extern bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_full_name);
+extern void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_full_name);
+extern std::string GetFactionRuler(std::string civilization_name, std::string faction_name);
+extern void KillGrandStrategyHero(std::string hero_full_name);
+extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
+extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);
