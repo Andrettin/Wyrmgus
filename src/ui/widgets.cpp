@@ -86,7 +86,7 @@ static void MenuHandleButtonDown(unsigned button)
 			UI.GrandStrategyEndTurnButton.Clicked = true;
 		} else if (GrandStrategyGame.SelectedProvince != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.PlayerFaction && UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) && GrandStrategyInterfaceState == "Province") {
 			UI.GrandStrategyShowHeroesButton.Clicked = true;
-		} else if (GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyShowRulerButton.X != -1 && UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
 			UI.GrandStrategyShowRulerButton.Clicked = true;
 		}
 	}
@@ -128,7 +128,7 @@ static void MenuHandleButtonUp(unsigned button)
 					UI.GrandStrategyShowHeroesButton.Callback->action("");
 				}
 			}
-		} else if (GrandStrategyGame.SelectedProvince != -1 && !(MouseButtons & LeftButton) && UI.GrandStrategyShowRulerButton.Clicked && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && !(MouseButtons & LeftButton) && UI.GrandStrategyShowRulerButton.Clicked && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") && UI.GrandStrategyShowRulerButton.X != -1) {
 			UI.GrandStrategyShowRulerButton.Clicked = false;
 			if (UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos)) { //if the mouse is still on the button, fire its action
 				if (UI.GrandStrategyShowRulerButton.Callback) {
@@ -219,7 +219,7 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 			UI.GrandStrategyEndTurnButton.HotkeyPressed = true;
 		} else if (GrandStrategyGame.SelectedProvince != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyInterfaceState == "Province" && key == 'h') {
 			UI.GrandStrategyShowHeroesButton.HotkeyPressed = true;
-		} else if (GrandStrategyGame.SelectedProvince != -1 && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") && key == 'r') {
+		} else if (GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyShowRulerButton.X != -1 && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") && key == 'r') {
 			UI.GrandStrategyShowRulerButton.HotkeyPressed = true;
 		}
 		
@@ -282,7 +282,7 @@ static void MenuHandleKeyUp(unsigned key, unsigned keychar)
 			if (UI.GrandStrategyShowHeroesButton.Callback) {
 				UI.GrandStrategyShowHeroesButton.Callback->action("");
 			}
-		} else if (key == 'r' && GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyShowRulerButton.HotkeyPressed && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
+		} else if (key == 'r' && GrandStrategyGame.SelectedProvince != -1 && UI.GrandStrategyShowRulerButton.X != -1 && UI.GrandStrategyShowRulerButton.HotkeyPressed && (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold")) {
 			UI.GrandStrategyShowRulerButton.HotkeyPressed = false;
 			if (UI.GrandStrategyShowRulerButton.Callback) {
 				UI.GrandStrategyShowRulerButton.Callback->action("");

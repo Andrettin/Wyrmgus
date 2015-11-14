@@ -551,6 +551,7 @@ extern void ChangeFactionCommodityTrade(std::string civilization_name, std::stri
 extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty);
 extern void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_name, std::string hero_dynasty);
+extern void SetHeroUnitType(std::string hero_name, std::string hero_dynasty, std::string unit_type_ident);
 extern std::string GetHeroUnitType(std::string hero_name, std::string hero_dynasty);
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);

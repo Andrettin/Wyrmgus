@@ -5959,6 +5959,19 @@ void SetFactionRuler(std::string civilization_name, std::string faction_name, st
 	}
 }
 
+void SetHeroUnitType(std::string hero_name, std::string hero_dynasty, std::string unit_type_ident)
+{
+	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+	if (unit_type_id != -1) {
+		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+			if (hero_name == GrandStrategyGame.Heroes[i]->Name && hero_dynasty == GrandStrategyGame.Heroes[i]->Dynasty) {
+				GrandStrategyGame.Heroes[i]->Province->SetHero(hero_name, hero_dynasty, unit_type_id, GrandStrategyGame.Heroes[i]->State);
+				break;
+			}
+		}
+	}
+}
+
 std::string GetHeroUnitType(std::string hero_name, std::string hero_dynasty)
 {
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
