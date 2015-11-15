@@ -255,6 +255,7 @@ public:
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction);
 	void SetRuler(std::string hero_full_name);
+	void RulerSuccession();
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
 	bool CanFormFaction(int civilization, int faction);
@@ -298,8 +299,10 @@ class CGrandStrategyHero
 public:
 	CGrandStrategyHero() :
 		State(0), Year(0), DeathYear(0), Civilization(-1),
+		Generated(false),
 		Name(""), Dynasty(""), ProvinceOfOrigin(""),
-		DefaultType(NULL), Type(NULL), Province(NULL)
+		DefaultType(NULL), Type(NULL), Province(NULL),
+		Father(NULL), Mother(NULL)
 	{
 	}
 	
@@ -311,12 +314,16 @@ public:
 	int Year;			/// Year in which the hero historically starts being active
 	int DeathYear;		/// Year in which the hero dies of natural causes
 	int Civilization;	/// Culture to which the hero belongs
-	std::string Name;	/// given name of the hero
-	std::string Dynasty;	/// name of the hero's dynasty
-	std::string ProvinceOfOrigin;	/// province from which the hero originates
+	bool Generated;		/// Whether the hero has been generated during gameplay or is a preset hero
+	std::string Name;	/// Given name of the hero
+	std::string Dynasty;	/// Name of the hero's dynasty
+	std::string ProvinceOfOrigin;	/// Province from which the hero originates
 	CUnitType *DefaultType;
 	CUnitType *Type;
 	CProvince *Province;
+	CGrandStrategyHero *Father;					/// Hero's father
+	CGrandStrategyHero *Mother;					/// Hero's mother
+	std::vector<CGrandStrategyHero *> Children;	/// Children of the hero
 };
 
 /**

@@ -1661,7 +1661,7 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string hero_full_name = LuaToString(l, 1);
+	std::string hero_full_name = TransliterateText(LuaToString(l, 1));
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 	if (!hero) {
 		hero = new CGrandStrategyHero;
@@ -1674,9 +1674,9 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			hero->Name = LuaToString(l, -1);
+			hero->Name = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "Dynasty")) {
-			hero->Dynasty = LuaToString(l, -1);
+			hero->Dynasty = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultType")) {
 			hero->DefaultType = const_cast<CUnitType *>(&(*UnitTypes[UnitTypeIdByIdent(LuaToString(l, -1))]));
 		} else if (!strcmp(value, "Year")) {
@@ -1687,6 +1687,24 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			hero->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "ProvinceOfOrigin")) {
 			hero->ProvinceOfOrigin = LuaToString(l, -1);
+		} else if (!strcmp(value, "Father")) {
+			std::string father_name = TransliterateText(LuaToString(l, -1));
+			CGrandStrategyHero *father = GrandStrategyGame.GetHero(father_name);
+			if (father) {
+				hero->Father = const_cast<CGrandStrategyHero *>(&(*father));
+				father->Children.push_back(hero);
+			} else {
+				LuaError(l, "Hero \"%s\" doesn't exist." _C_ father_name.c_str());
+			}
+		} else if (!strcmp(value, "Mother")) {
+			std::string mother_name = TransliterateText(LuaToString(l, -1));
+			CGrandStrategyHero *mother = GrandStrategyGame.GetHero(mother_name);
+			if (mother) {
+				hero->Mother = const_cast<CGrandStrategyHero *>(&(*mother));
+				mother->Children.push_back(hero);
+			} else {
+				LuaError(l, "Hero \"%s\" doesn't exist." _C_ mother_name.c_str());
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

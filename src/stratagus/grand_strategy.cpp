@@ -514,6 +514,10 @@ void CGrandStrategyGame::DrawInterface()
 				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->GetFullName();
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
 				item_y += 1;
+				
+				std::string ruler_class_string = "Class: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Type->Name;
+				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_class_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_class_string);
+				item_y += 1;
 			}
 		}
 		
@@ -871,7 +875,7 @@ void CGrandStrategyGame::DoTurn()
 		}
 	}
 	
-	//check if any heroes should begin activity or die in this year
+	//check if any heroes should begin activity this year
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		int province_of_origin_id = GetProvinceId(this->Heroes[i]->ProvinceOfOrigin);
 		if (
@@ -885,6 +889,10 @@ void CGrandStrategyGame::DoTurn()
 			//make heroes appear in their start year
 			this->Heroes[i]->Create();
 		}
+	}
+	
+	//check if any heroes should die this year (this needs to be done as its own loop to allow new rulers to appear in the same year their predecessor dies, and succeede him)
+	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		if (
 			this->Heroes[i]->DeathYear == GrandStrategyYear
 			&& this->Heroes[i]->State != 0
@@ -3264,7 +3272,7 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 {
 	if (hero_full_name.empty()) {
-		this->Ruler = NULL;
+		this->RulerSuccession();
 		return;
 	}
 	
@@ -3282,11 +3290,43 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 		char buf[256];
 		snprintf(
 			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-			("Ruler " + this->GetFullName()).c_str(),
-			("A new ruler has come to power in our realm, " + this->GetFullName() + "!").c_str()
+			("Ruler " + this->Ruler->GetFullName()).c_str(),
+			("A new ruler has come to power in our realm, " + this->Ruler->GetFullName() + "!").c_str()
 		);
 		CclCommand(buf);	
 	}
+}
+
+void CGrandStrategyFaction::RulerSuccession()
+{
+	if (this->GovernmentType == GovernmentTypeMonarchy) { //if is a monarchy, put the next in line on the throne
+		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) {
+			if (this->Ruler->Children[i]->State != 0) {
+				this->SetRuler(this->Ruler->Children[i]->GetFullName());
+				return;
+			}
+		}
+	}
+	
+	std::vector<CGrandStrategyHero *> ruler_candidates;
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		int province_of_origin_id = GetProvinceId(GrandStrategyGame.Heroes[i]->ProvinceOfOrigin);
+		if (
+			GrandStrategyGame.Heroes[i]->State != 0
+			&& (
+				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
+				|| (GrandStrategyGame.Heroes[i]->Province == NULL && province_of_origin_id != -1 && GrandStrategyGame.Provinces[province_of_origin_id]->Owner == this)
+			)
+		) {
+			ruler_candidates.push_back(GrandStrategyGame.Heroes[i]);
+		}
+	}
+	if (ruler_candidates.size() > 0) {
+		this->SetRuler(ruler_candidates[SyncRand(ruler_candidates.size())]->GetFullName());
+		return;
+	}
+		
+	this->Ruler = NULL;
 }
 
 bool CGrandStrategyFaction::IsAlive()
@@ -3406,8 +3446,8 @@ void CGrandStrategyHero::Die()
 		char buf[256];
 		snprintf(
 			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-			("Ruler" + this->GetFullName() + " Dies").c_str(),
-			("Our ruler " + this->GetFullName() + " has died! May his soul rest in peace!").c_str()
+			("Ruler " + this->GetFullName() + " Dies").c_str(),
+			("Tragic news spread throughout our realm. Our ruler, " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
 		);
 		CclCommand(buf);	
 	} else if (
@@ -3445,7 +3485,7 @@ void CGrandStrategyHero::Die()
 		for (int j = 0; j < FactionMax; ++j) {
 			if (GrandStrategyGame.Factions[i][j]) {
 				if (GrandStrategyGame.Factions[i][j]->Ruler == this) {
-					GrandStrategyGame.Factions[i][j]->Ruler = NULL;
+					GrandStrategyGame.Factions[i][j]->SetRuler("");
 				}
 			} else {
 				break;
@@ -4859,8 +4899,28 @@ void CleanGrandStrategyGame()
 		GrandStrategyGame.Heroes[i]->State = 0;
 		GrandStrategyGame.Heroes[i]->Province = NULL;
 		GrandStrategyGame.Heroes[i]->Type = NULL;
+		for (size_t j = 0; j < GrandStrategyGame.Heroes[i]->Children.size(); ++j) {
+			if (GrandStrategyGame.Heroes[i]->Children[j]->Generated) { //remove children generated during gameplay
+				GrandStrategyGame.Heroes[i]->Children.erase(GrandStrategyGame.Heroes[i]->Children.begin() + j);
+			}
+		}
+		if (GrandStrategyGame.Heroes[i]->Father && GrandStrategyGame.Heroes[i]->Father->Generated) {
+			GrandStrategyGame.Heroes[i]->Father = NULL;
+		}
+		if (GrandStrategyGame.Heroes[i]->Mother && GrandStrategyGame.Heroes[i]->Mother->Generated) {
+			GrandStrategyGame.Heroes[i]->Mother = NULL;
+		}
 	}
 			
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size();) {
+		if (GrandStrategyGame.Heroes[i]->Generated) { //if hero was generated during the game, delete it
+			delete GrandStrategyGame.Heroes[i];
+			GrandStrategyGame.Heroes.erase(GrandStrategyGame.Heroes.begin() + i);
+		} else {
+			++i;
+		}
+	}
+	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
 	GrandStrategyGame.ProvinceCount = 0;
