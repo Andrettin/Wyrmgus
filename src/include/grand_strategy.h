@@ -573,6 +573,7 @@ extern void CreateGrandStrategyHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);
 extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
 extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);
+extern bool GrandStrategyHeroIsAlive(std::string hero_full_name);
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);

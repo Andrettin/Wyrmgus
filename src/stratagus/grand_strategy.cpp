@@ -733,11 +733,11 @@ void CGrandStrategyGame::DoTurn()
 		}
 	}
 	
-	//faction income
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (this->Factions[i][j]) {
 				if (this->Factions[i][j]->IsAlive()) {
+					//faction income
 					for (int k = 0; k < MaxCosts; ++k) {
 						if (k == GrainCost || k == MushroomCost || k == FishCost || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
 							continue;
@@ -746,6 +746,11 @@ void CGrandStrategyGame::DoTurn()
 						} else {
 							this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
 						}
+					}
+					
+					// try to perform ruler succession for existent factions without rulers
+					if (this->Factions[i][j]->Ruler == NULL) {
+						this->Factions[i][j]->RulerSuccession();
 					}
 				}
 			} else { //end of valid factions
@@ -3272,7 +3277,11 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 {
 	if (hero_full_name.empty()) {
-		this->RulerSuccession();
+		if (this->IsAlive()) {
+			this->RulerSuccession();
+		} else {
+			this->Ruler = NULL;
+		}
 		return;
 	}
 	
@@ -3299,7 +3308,7 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 
 void CGrandStrategyFaction::RulerSuccession()
 {
-	if (this->GovernmentType == GovernmentTypeMonarchy) { //if is a monarchy, put the next in line on the throne
+	if (this->Ruler != NULL && this->GovernmentType == GovernmentTypeMonarchy) { //if is a monarchy, put the next in line on the throne
 		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) {
 			if (this->Ruler->Children[i]->State != 0) {
 				this->SetRuler(this->Ruler->Children[i]->GetFullName());
@@ -6186,6 +6195,19 @@ std::string GetGrandStrategyHeroUnitType(std::string hero_full_name)
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 	}
 	return "";
+}
+
+bool GrandStrategyHeroIsAlive(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		if (hero->State != 0) {
+			return true;
+		}
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	return false;
 }
 
 void SetCommodityPrice(std::string resource_name, int price)
