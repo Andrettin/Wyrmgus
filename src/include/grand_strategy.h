@@ -254,6 +254,7 @@ public:
 	void CheckFormableFactions(int civilization);
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction);
+	void SetRuler(std::string hero_full_name);
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
 	bool CanFormFaction(int civilization, int faction);

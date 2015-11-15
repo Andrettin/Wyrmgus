@@ -3261,6 +3261,34 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 	}
 }
 
+void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
+{
+	if (hero_full_name.empty()) {
+		this->Ruler = NULL;
+		return;
+	}
+	
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		if (hero->State == 0) {
+			hero->Create();
+		}
+		this->Ruler = const_cast<CGrandStrategyHero *>(&(*hero));
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	
+	if (this == GrandStrategyGame.PlayerFaction) {
+		char buf[256];
+		snprintf(
+			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
+			("Ruler " + this->GetFullName()).c_str(),
+			("A new ruler has come to power in our realm, " + this->GetFullName() + "!").c_str()
+		);
+		CclCommand(buf);	
+	}
+}
+
 bool CGrandStrategyFaction::IsAlive()
 {
 	return this->ProvinceCount > 0;
@@ -3350,7 +3378,10 @@ void CGrandStrategyHero::Create()
 	int province_of_origin_id = GetProvinceId(this->ProvinceOfOrigin);
 	//show message that the hero has appeared
 	if (
-		province_of_origin_id != -1 && GrandStrategyGame.Provinces[province_of_origin_id]->Owner != NULL && GrandStrategyGame.Provinces[province_of_origin_id]->Owner == GrandStrategyGame.PlayerFaction
+		province_of_origin_id != -1
+		&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner != NULL
+		&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner == GrandStrategyGame.PlayerFaction
+		&& this->Type->BoolFlag[HERO_INDEX].value
 	) {
 		char buf[256];
 		snprintf(
@@ -6023,21 +6054,7 @@ void SetFactionRuler(std::string civilization_name, std::string faction_name, st
 		return;
 	}
 	
-	if (hero_full_name.empty()) {
-		GrandStrategyGame.Factions[civilization][faction]->Ruler = NULL;
-		return;
-	}
-	
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		if (hero->Province != NULL && hero->Province->Owner != NULL) {
-			if (hero->Province->Owner->Civilization == civilization && hero->Province->Owner->Faction == faction) {
-				GrandStrategyGame.Factions[civilization][faction]->Ruler = const_cast<CGrandStrategyHero *>(&(*hero));
-			}
-		}
-	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
-	}
+	GrandStrategyGame.Factions[civilization][faction]->SetRuler(hero_full_name);
 }
 
 std::string GetFactionRuler(std::string civilization_name, std::string faction_name)
