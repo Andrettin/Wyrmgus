@@ -199,6 +199,9 @@ static const char ISALIVE_KEY[] = "IsAlive";
 static const char PLAYER_KEY[] = "Player";
 static const char PRIORITY_KEY[] = "Priority";
 //Wyrmgus start
+static const char STRENGTH_KEY[] = "Strength";
+static const char DEXTERITY_KEY[] = "Dexterity";
+static const char INTELLIGENCE_KEY[] = "Intelligence";
 static const char ACCURACY_KEY[] = "Accuracy";
 static const char EVASION_KEY[] = "Evasion";
 static const char LEVELUP_KEY[] = "LevelUp";
@@ -278,6 +281,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 //Wyrmgus
 //							   PRIORITY_KEY
 							   PRIORITY_KEY,
+							   STRENGTH_KEY, DEXTERITY_KEY, INTELLIGENCE_KEY,
 							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, XPREQUIRED_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
 							   BACKSTAB_KEY, BONUSAGAINSTMOUNTED_KEY, BONUSAGAINSTBUILDINGS_KEY, BONUSAGAINSTAIR_KEY, BONUSAGAINSTGIANTS_KEY,
 							   DAYSIGHTRANGEBONUS_KEY, NIGHTSIGHTRANGEBONUS_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY
@@ -3008,6 +3012,7 @@ void UpdateUnitVariables(CUnit &unit)
 			//Wyrmgus
 //			|| i == ISALIVE_INDEX || i == PLAYER_INDEX) {
 			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == PRIORITY_INDEX || i == SIGHTRANGE_INDEX || i == ATTACKRANGE_INDEX
+			|| i == STRENGTH_INDEX || i == DEXTERITY_INDEX || i == INTELLIGENCE_INDEX
 			|| i == ACCURACY_INDEX || i == EVASION_INDEX
 			|| i == LEVELUP_INDEX || i == XPREQUIRED_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
 			|| i == BACKSTAB_INDEX || i == BONUSAGAINSTMOUNTED_INDEX || i == BONUSAGAINSTBUILDINGS_INDEX || i == BONUSAGAINSTAIR_INDEX || i == BONUSAGAINSTGIANTS_INDEX

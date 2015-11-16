@@ -308,7 +308,9 @@ public:
 	
 	void Create();
 	void Die();
+	int GetAdministrativeEfficiencyModifier();
 	std::string GetFullName();
+	std::string GetRulerEffectsString();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province
 	int Year;			/// Year in which the hero historically starts being active

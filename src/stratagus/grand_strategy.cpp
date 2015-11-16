@@ -518,6 +518,10 @@ void CGrandStrategyGame::DrawInterface()
 				std::string ruler_class_string = "Class: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Type->Name;
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_class_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_class_string);
 				item_y += 1;
+				
+				std::string ruler_effects_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->GetRulerEffectsString();
+				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_effects_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_effects_string);
+				item_y += 1;
 			}
 		}
 		
@@ -2180,6 +2184,11 @@ int CProvince::GetAdministrativeEfficiencyModifier()
 		modifier += this->Civilization == this->Owner->Civilization ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to its administrative efficiency modifier
 	}
 	
+	
+	if (this->Owner != NULL && this->Owner->Ruler != NULL) {
+		modifier += this->Owner->Ruler->GetAdministrativeEfficiencyModifier();
+	}
+	
 	return modifier;
 }
 
@@ -3282,33 +3291,37 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 		} else {
 			this->Ruler = NULL;
 		}
-		return;
-	}
-	
-	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
-	if (hero) {
-		if (hero->State == 0) {
-			hero->Create();
-		}
-		this->Ruler = const_cast<CGrandStrategyHero *>(&(*hero));
 	} else {
-		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+		if (hero) {
+			if (hero->State == 0) {
+				hero->Create();
+			}
+			this->Ruler = const_cast<CGrandStrategyHero *>(&(*hero));
+		} else {
+			fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		}
+		
+		if (this == GrandStrategyGame.PlayerFaction) {
+			char buf[256];
+			snprintf(
+				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
+				("Ruler " + this->Ruler->GetFullName()).c_str(),
+				("A new ruler has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
+			);
+			CclCommand(buf);	
+		}
 	}
 	
-	if (this == GrandStrategyGame.PlayerFaction) {
-		char buf[256];
-		snprintf(
-			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-			("Ruler " + this->Ruler->GetFullName()).c_str(),
-			("A new ruler has come to power in our realm, " + this->Ruler->GetFullName() + "!").c_str()
-		);
-		CclCommand(buf);	
-	}
+	this->CalculateIncomes(); //recalculate incomes, as administrative efficiency may have changed
 }
 
 void CGrandStrategyFaction::RulerSuccession()
 {
-	if (this->Ruler != NULL && this->GovernmentType == GovernmentTypeMonarchy) { //if is a monarchy, put the next in line on the throne
+	if (
+		this->Ruler != NULL
+		&& (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType == GovernmentTypeMonarchy)
+	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) {
 			if (this->Ruler->Children[i]->State != 0) {
 				this->SetRuler(this->Ruler->Children[i]->GetFullName());
@@ -3436,7 +3449,7 @@ void CGrandStrategyHero::Create()
 		snprintf(
 			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 			(this->Type->Name + " " + this->GetFullName()).c_str(),
-			("My lord, the hero " + this->GetFullName() + " has come to renown in " + GrandStrategyGame.Provinces[province_of_origin_id]->GetCulturalName() + " and has entered our services.").c_str()
+			("My lord, the hero " + this->GetFullName() + " has come to renown in " + GrandStrategyGame.Provinces[province_of_origin_id]->GetCulturalName() + " and has entered our service.").c_str()
 		);
 		CclCommand(buf);	
 	}
@@ -3503,6 +3516,17 @@ void CGrandStrategyHero::Die()
 	}
 }
 
+int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
+{
+	int modifier = 0;
+	
+	if (this->Type != NULL) {
+		modifier += (this->Type->DefaultStat.Variables[INTELLIGENCE_INDEX].Value - 10) * 25 / 10; //+2.5% administrative efficiency for every intelligence point above 10, and -2.5% for every point below 10
+	}
+	
+	return modifier;
+}
+
 std::string CGrandStrategyHero::GetFullName()
 {
 	if (!this->Dynasty.empty()) {
@@ -3510,6 +3534,21 @@ std::string CGrandStrategyHero::GetFullName()
 	} else {
 		return this->Name;
 	}
+}
+
+std::string CGrandStrategyHero::GetRulerEffectsString()
+{
+	std::string ruler_effects_string;
+	
+	int administrative_modifier = this->GetAdministrativeEfficiencyModifier();
+	if (administrative_modifier != 0) {
+		if (administrative_modifier > 0) {
+			ruler_effects_string += "+";
+		}
+		ruler_effects_string += std::to_string((long long) administrative_modifier) + "% Administrative Efficiency";
+	}
+	
+	return ruler_effects_string;
 }
 
 /**
