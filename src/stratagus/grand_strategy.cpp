@@ -3341,12 +3341,28 @@ void CGrandStrategyFaction::RulerSuccession()
 		int province_of_origin_id = GetProvinceId(GrandStrategyGame.Heroes[i]->ProvinceOfOrigin);
 		if (
 			GrandStrategyGame.Heroes[i]->State != 0
+			 && this->Ruler->Children[i]->Gender == MaleGender
 			&& (
 				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
 				|| (GrandStrategyGame.Heroes[i]->Province == NULL && province_of_origin_id != -1 && GrandStrategyGame.Provinces[province_of_origin_id]->Owner == this)
 			)
 		) {
 			ruler_candidates.push_back(GrandStrategyGame.Heroes[i]);
+		}
+	}
+	if (ruler_candidates.size() == 0) {
+		//if the list of male ruler candidates is empty, see if there are heroes available without taking gender in regard
+		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+			int province_of_origin_id = GetProvinceId(GrandStrategyGame.Heroes[i]->ProvinceOfOrigin);
+			if (
+				GrandStrategyGame.Heroes[i]->State != 0
+				&& (
+					(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
+					|| (GrandStrategyGame.Heroes[i]->Province == NULL && province_of_origin_id != -1 && GrandStrategyGame.Provinces[province_of_origin_id]->Owner == this)
+				)
+			) {
+				ruler_candidates.push_back(GrandStrategyGame.Heroes[i]);
+			}
 		}
 	}
 	if (ruler_candidates.size() > 0) {
