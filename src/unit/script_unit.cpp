@@ -1678,7 +1678,13 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 		} else if (!strcmp(value, "Dynasty")) {
 			hero->Dynasty = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultType")) {
-			hero->DefaultType = const_cast<CUnitType *>(&(*UnitTypes[UnitTypeIdByIdent(LuaToString(l, -1))]));
+			std::string unit_type_ident = LuaToString(l, -1);
+			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+			if (unit_type_id != -1) {
+				hero->DefaultType = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+			} else {
+				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
+			}
 		} else if (!strcmp(value, "Year")) {
 			hero->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DeathYear")) {

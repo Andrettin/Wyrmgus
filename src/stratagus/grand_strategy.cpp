@@ -3341,7 +3341,7 @@ void CGrandStrategyFaction::RulerSuccession()
 		int province_of_origin_id = GetProvinceId(GrandStrategyGame.Heroes[i]->ProvinceOfOrigin);
 		if (
 			GrandStrategyGame.Heroes[i]->State != 0
-			 && this->Ruler->Children[i]->Gender == MaleGender
+			 && GrandStrategyGame.Heroes[i]->Gender == MaleGender
 			&& (
 				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
 				|| (GrandStrategyGame.Heroes[i]->Province == NULL && province_of_origin_id != -1 && GrandStrategyGame.Provinces[province_of_origin_id]->Owner == this)
