@@ -2174,6 +2174,32 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 	
 	return "";
 }
+
+std::string GetGovernmentTypeNameById(int government_type)
+{
+	if (government_type == GovernmentTypeMonarchy) {
+		return "monarchy";
+	} else if (government_type == GovernmentTypeRepublic) {
+		return "republic";
+	} else if (government_type == GovernmentTypeTheocracy) {
+		return "theocracy";
+	}
+
+	return "";
+}
+
+int GetGovernmentTypeIdByName(std::string government_type)
+{
+	if (government_type == "monarchy") {
+		return GovernmentTypeMonarchy;
+	} else if (government_type == "republic") {
+		return GovernmentTypeRepublic;
+	} else if (government_type == "theocracy") {
+		return GovernmentTypeTheocracy;
+	}
+
+	return -1;
+}
 //Wyrmgus end
 
 //@}

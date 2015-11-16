@@ -360,7 +360,7 @@ static bool Breed(CUnit &unit)
 		return false;
 	}
 	
-	if (unit.Variable[GENDER_INDEX].Value == 1 || unit.Variable[GENDER_INDEX].Value == 2) { //if is male or female, check if has a potential mate nearby
+	if (unit.Variable[GENDER_INDEX].Value == MaleGender || unit.Variable[GENDER_INDEX].Value == FemaleGender) { //if is male or female, check if has a potential mate nearby
 		// look for an adjacent unit of the same type
 		std::vector<CUnit *> table;
 		SelectAroundUnit(unit, 1, table, HasSamePlayerAndTypeAs(unit));
@@ -379,7 +379,7 @@ static bool Breed(CUnit &unit)
 				return true;
 			}
 		}
-	} else if (unit.Variable[GENDER_INDEX].Value == 3 && (SyncRand() % 5) < 1) { //if is asexual (like slimes), reproduce endogenously (with a lower chance than normal reproduction
+	} else if (unit.Variable[GENDER_INDEX].Value == AsexualGender && (SyncRand() % 5) < 1) { //if is asexual (like slimes), reproduce endogenously (with a lower chance than normal reproduction
 		CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
 		DropOutOnSide(*newUnit, LookingW, &unit);
 		newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;

@@ -772,6 +772,8 @@ extern void SetCivilizationStringToIndex(std::string civilization_name, int civi
 extern void SetFactionStringToIndex(int civilization, std::string faction_name, int faction_id);
 extern void NetworkSetFaction(int player, std::string faction_name);
 extern std::string GetFactionEffectsString(std::string civilization_name, std::string faction_name);
+extern std::string GetGovernmentTypeNameById(int government_type);
+extern int GetGovernmentTypeIdByName(std::string government_type);
 //Wyrmgus end
 
 //@}

@@ -3323,6 +3323,12 @@ void CGrandStrategyFaction::RulerSuccession()
 		&& (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType == GovernmentTypeMonarchy)
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) {
+			if (this->Ruler->Children[i]->State != 0 && this->Ruler->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
+				this->SetRuler(this->Ruler->Children[i]->GetFullName());
+				return;
+			}
+		}
+		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) { //check again, but now allow for inheritance regardless of gender
 			if (this->Ruler->Children[i]->State != 0) {
 				this->SetRuler(this->Ruler->Children[i]->GetFullName());
 				return;

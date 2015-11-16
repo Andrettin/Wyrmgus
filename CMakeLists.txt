@@ -733,7 +733,10 @@ option(ENABLE_METASERVER "Build Stratagus metaserver (requires Sqlite3)" OFF)
 option(ENABLE_TOUCHSCREEN "Use touchscreen input" OFF)
 
 option(WITH_BZIP2 "Compile Stratagus with BZip2 compression support" OFF)
-option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" ON)
+#Wyrmgus start
+#option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" ON)
+option(WITH_FLUIDSYNTH "Compile Stratagus with FluidSynth sound library" OFF)
+#Wyrmgus end
 option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
 option(WITH_MNG "Compile Stratagus with MNG image library" OFF)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)

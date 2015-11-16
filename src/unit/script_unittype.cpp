@@ -2003,6 +2003,10 @@ static int CclDefineUnitType(lua_State *l)
 			type->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			type->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Gender")) {
+			type->DefaultStat.Variables[GENDER_INDEX].Enable = 1;
+			type->DefaultStat.Variables[GENDER_INDEX].Value = GetGenderIdByName(LuaToString(l, -1));
+			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "DefaultName")) {
@@ -3047,10 +3051,9 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[XPREQUIRED_INDEX].Enable = 1;
 	}
 	
-	unit.Variable[GENDER_INDEX].Enable = 1;
-	unit.Variable[GENDER_INDEX].Max = 10;
-	if (unit.Variable[GENDER_INDEX].Value == 0 && unit.Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
+	if (unit.Variable[GENDER_INDEX].Value == NoGender && unit.Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
 		unit.Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
+		unit.Variable[GENDER_INDEX].Max = MaxGenders;
 		unit.Variable[GENDER_INDEX].Enable = 1;
 	}
 	

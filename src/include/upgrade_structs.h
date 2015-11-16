@@ -178,8 +178,6 @@ extern std::string GetResourceNameById(int resource_id);
 //Wyrmgus end
 
 //Wyrmgus start
-extern std::string GetGovernmentTypeNameById(int government_type);
-extern int GetGovernmentTypeIdByName(std::string government_type);
 extern int GetItemTypeIdByName(std::string item_type);
 //Wyrmgus end
 

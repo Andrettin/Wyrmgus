@@ -1691,8 +1691,12 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			std::string father_name = TransliterateText(LuaToString(l, -1));
 			CGrandStrategyHero *father = GrandStrategyGame.GetHero(father_name);
 			if (father) {
-				hero->Father = const_cast<CGrandStrategyHero *>(&(*father));
-				father->Children.push_back(hero);
+				if (father->Gender == MaleGender) {
+					hero->Father = const_cast<CGrandStrategyHero *>(&(*father));
+					father->Children.push_back(hero);
+				} else {
+					LuaError(l, "Hero \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_name.c_str() _C_ hero_full_name.c_str());
+				}
 			} else {
 				LuaError(l, "Hero \"%s\" doesn't exist." _C_ father_name.c_str());
 			}
@@ -1700,13 +1704,25 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			std::string mother_name = TransliterateText(LuaToString(l, -1));
 			CGrandStrategyHero *mother = GrandStrategyGame.GetHero(mother_name);
 			if (mother) {
-				hero->Mother = const_cast<CGrandStrategyHero *>(&(*mother));
-				mother->Children.push_back(hero);
+				if (mother->Gender == FemaleGender) {
+					hero->Mother = const_cast<CGrandStrategyHero *>(&(*mother));
+					mother->Children.push_back(hero);
+				} else {
+					LuaError(l, "Hero \"%s\" set to be the biological mother of \"%s\", but isn't female." _C_ mother_name.c_str() _C_ hero_full_name.c_str());
+				}
 			} else {
 				LuaError(l, "Hero \"%s\" doesn't exist." _C_ mother_name.c_str());
 			}
+		} else if (!strcmp(value, "Gender")) {
+			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	if (hero->Gender == NoGender) { //if no gender was set, have the hero be the same gender as the unit type (if the unit type has it predefined)
+		if (hero->DefaultType != NULL && hero->DefaultType->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+			hero->Gender = hero->DefaultType->DefaultStat.Variables[GENDER_INDEX].Value;
 		}
 	}
 	

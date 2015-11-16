@@ -641,32 +641,6 @@ std::string GetResourceNameById(int resource_id)
 	}
 }
 
-std::string GetGovernmentTypeNameById(int government_type)
-{
-	if (government_type == GovernmentTypeMonarchy) {
-		return "monarchy";
-	} else if (government_type == GovernmentTypeRepublic) {
-		return "republic";
-	} else if (government_type == GovernmentTypeTheocracy) {
-		return "theocracy";
-	}
-
-	return "";
-}
-
-int GetGovernmentTypeIdByName(std::string government_type)
-{
-	if (government_type == "monarchy") {
-		return GovernmentTypeMonarchy;
-	} else if (government_type == "republic") {
-		return GovernmentTypeRepublic;
-	} else if (government_type == "theocracy") {
-		return GovernmentTypeTheocracy;
-	}
-
-	return -1;
-}
-
 int GetItemTypeIdByName(std::string item_type)
 {
 	if (item_type == "Sword") {
@@ -697,6 +671,32 @@ int GetItemTypeIdByName(std::string item_type)
 		return RingItemType;
 	} else if (item_type == "Potion") {
 		return PotionItemType;
+	}
+
+	return -1;
+}
+
+std::string GetGenderNameById(int gender)
+{
+	if (gender == MaleGender) {
+		return "male";
+	} else if (gender == FemaleGender) {
+		return "female";
+	} else if (gender == AsexualGender) {
+		return "asexual";
+	}
+
+	return "";
+}
+
+int GetGenderIdByName(std::string gender)
+{
+	if (gender == "male") {
+		return MaleGender;
+	} else if (gender == "female") {
+		return FemaleGender;
+	} else if (gender == "asexual") {
+		return AsexualGender;
 	}
 
 	return -1;
