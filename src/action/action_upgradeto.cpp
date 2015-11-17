@@ -228,7 +228,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		if (!new_personal_name.empty()) {
 			unit.Name = new_personal_name;
 		} else {
-			unit.GeneratePersonalName();
+			unit.Name = GeneratePersonalName(PlayerRaces.GetRaceIndexByName(unit.Type->Civilization.c_str()), unit.Type->Slot);
 		}
 	}
 	//Wyrmgus end

@@ -165,10 +165,6 @@ public:
 	void AssignWorkerToMine(CUnit &mine);
 	void DeAssignWorkerFromMine(CUnit &mine);
 
-	//Wyrmgus start
-	void GeneratePersonalName();
-	//Wyrmgus end
-
 	/// Release a unit
 	void Release(bool final = false);
 	

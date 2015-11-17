@@ -256,6 +256,7 @@ public:
 	void AcquireFactionTechnologies(int civilization, int faction);
 	void SetRuler(std::string hero_full_name);
 	void RulerSuccession();
+	void GenerateRuler();
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
 	bool CanFormFaction(int civilization, int faction);
@@ -302,7 +303,7 @@ public:
 	CGrandStrategyHero() :
 		State(0), Year(0), DeathYear(0), Civilization(-1), Gender(0),
 		Generated(false),
-		Name(""), Dynasty(""), ProvinceOfOrigin(""),
+		Name(""), ExtraName(""), Dynasty(""), ProvinceOfOrigin(""),
 		DefaultType(NULL), Type(NULL), Province(NULL),
 		Father(NULL), Mother(NULL)
 	{
@@ -321,6 +322,7 @@ public:
 	int Gender;			/// Hero's gender
 	bool Generated;		/// Whether the hero has been generated during gameplay or is a preset hero
 	std::string Name;	/// Given name of the hero
+	std::string ExtraName;	/// Extra given names of the hero (used if necessary to differentiate from existing heroes)
 	std::string Dynasty;	/// Name of the hero's dynasty
 	std::string ProvinceOfOrigin;	/// Province from which the hero originates
 	CUnitType *DefaultType;

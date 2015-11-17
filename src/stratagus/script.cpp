@@ -2807,6 +2807,45 @@ void SaveGrandStrategyGame(const std::string &filename)
 			}
 		}
 		
+		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) { //save the generated heroes
+			if (GrandStrategyGame.Heroes[i]->Generated) {
+				fprintf(fd, "DefineGrandStrategyHero(\"%s\", {\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str());
+				fprintf(fd, "\tName = \"%s\",\n", GrandStrategyGame.Heroes[i]->Name.c_str());
+				if (!GrandStrategyGame.Heroes[i]->ExtraName.empty()) {
+					fprintf(fd, "\tExtraName = \"%s\",\n", GrandStrategyGame.Heroes[i]->ExtraName.c_str());
+				}
+				if (!GrandStrategyGame.Heroes[i]->Dynasty.empty()) {
+					fprintf(fd, "\tExtraName = \"%s\",\n", GrandStrategyGame.Heroes[i]->Dynasty.c_str());
+				}
+				if (GrandStrategyGame.Heroes[i]->Gender != NoGender) {
+					fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(GrandStrategyGame.Heroes[i]->Gender).c_str());
+				}
+				if (GrandStrategyGame.Heroes[i]->DefaultType != NULL) {
+					fprintf(fd, "\tDefaultType = \"%s\",\n", GrandStrategyGame.Heroes[i]->DefaultType->Ident.c_str());
+				}
+				if (GrandStrategyGame.Heroes[i]->Civilization != -1) {
+					fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[GrandStrategyGame.Heroes[i]->Civilization].c_str());
+				}
+				if (!GrandStrategyGame.Heroes[i]->ProvinceOfOrigin.empty()) {
+					fprintf(fd, "\tProvinceOfOrigin = \"%s\",\n", GrandStrategyGame.Heroes[i]->ProvinceOfOrigin.c_str());
+				}
+				if (GrandStrategyGame.Heroes[i]->Year != 0) {
+					fprintf(fd, "\tYear = %d,\n", GrandStrategyGame.Heroes[i]->Year);
+				}
+				if (GrandStrategyGame.Heroes[i]->DeathYear != 0) {
+					fprintf(fd, "\tDeathYear = %d,\n", GrandStrategyGame.Heroes[i]->DeathYear);
+				}
+				if (GrandStrategyGame.Heroes[i]->Father != NULL) {
+					fprintf(fd, "\tFather = \"%s\",\n", GrandStrategyGame.Heroes[i]->Father->GetFullName().c_str());
+				}
+				if (GrandStrategyGame.Heroes[i]->Mother != NULL) {
+					fprintf(fd, "\tMother = \"%s\",\n", GrandStrategyGame.Heroes[i]->Mother->GetFullName().c_str());
+				}
+				fprintf(fd, "\tGenerated = \"true\"\n");
+				fprintf(fd, "})\n");
+			}
+		}
+		
 		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 			if (GrandStrategyGame.Heroes[i]->State != 0) {
 				fprintf(fd, "CreateGrandStrategyHero(\"%s\")\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str()); //save existing heroes

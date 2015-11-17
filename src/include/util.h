@@ -154,6 +154,7 @@ extern std::string TransliterateText(std::string text);				/// Convert special c
 extern std::string CapitalizeString(std::string text);				/// Make the string become capitalized
 extern std::string DecapitalizeString(std::string text);			/// Make the string lose capitalization
 extern std::string SeparateCapitalizedStringElements(std::string text);	/// Make the string's capitalized elements become separated
+extern std::string GeneratePersonalName(int civilization, int unit_type_id);	/// Generates a personal name
 //Wyrmgus end
 
 #endif /* __UTIL_H__ */

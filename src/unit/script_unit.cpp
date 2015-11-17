@@ -1675,6 +1675,8 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			hero->Name = TransliterateText(LuaToString(l, -1));
+		} else if (!strcmp(value, "ExtraName")) {
+			hero->ExtraName = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "Dynasty")) {
 			hero->Dynasty = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultType")) {
@@ -1721,6 +1723,8 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			}
 		} else if (!strcmp(value, "Gender")) {
 			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "Generated")) {
+			hero->Generated = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

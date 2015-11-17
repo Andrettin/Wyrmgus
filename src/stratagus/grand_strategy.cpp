@@ -3386,7 +3386,74 @@ void CGrandStrategyFaction::RulerSuccession()
 		return;
 	}
 		
+	this->GenerateRuler(); //if all else failed, try to generate a ruler for the faction
+}
+
+void CGrandStrategyFaction::GenerateRuler()
+{
 	this->Ruler = NULL;
+	std::vector<int> potential_ruler_unit_types;
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType != GovernmentTypeTheocracy) { //exclude priests from ruling non-theocracies
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("heroic-infantry")));
+		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-infantry")));
+		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("infantry")));
+		}
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")));
+		}
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("cavalry")));
+		}
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("flying-rider")));
+		}
+	} else { //only allow priests to rule theocracies
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("priest")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("priest")));
+		}
+	}
+	
+	int unit_type_id;
+	if (potential_ruler_unit_types.size() > 0) {
+		unit_type_id = potential_ruler_unit_types[SyncRand(potential_ruler_unit_types.size())];
+	} else {
+		return;
+	}
+	
+	int civilization = PlayerRaces.GetRaceIndexByName(UnitTypes[unit_type_id]->Civilization.c_str()); //use unit type's civilization, so that names can be generated even for civilizations for which we don't have personal name language data defined
+	std::string hero_name = GeneratePersonalName(civilization, unit_type_id);
+	
+	if (hero_name.empty()) { //if civilization can't generate personal names, return
+		return;
+	}
+	
+	std::string hero_extra_name;
+	if (GrandStrategyGame.GetHero(hero_name) != NULL) { // generate extra given names if this name is already used by an existing hero
+		hero_extra_name = GeneratePersonalName(civilization, unit_type_id);
+		while (GrandStrategyGame.GetHero(hero_name + " " + hero_extra_name) != NULL) {
+			hero_extra_name += " " + GeneratePersonalName(civilization, unit_type_id);
+		}
+	}
+	CGrandStrategyHero *hero = new CGrandStrategyHero;
+	GrandStrategyGame.Heroes.push_back(hero);
+	hero->Name = hero_name;
+	hero->ExtraName = hero_extra_name;
+	hero->State = 2;
+	hero->Generated = true;
+	hero->DefaultType = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+	hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+	hero->Year = GrandStrategyYear;
+	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
+	hero->Civilization = this->Civilization;
+	if (this->ProvinceCount == 0) {
+		fprintf(stderr, "Faction \"%s\" is generating a ruler, but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Name.c_str());
+	}
+	hero->ProvinceOfOrigin = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->Name;
+	hero->Gender = MaleGender;
+	this->SetRuler(hero->GetFullName());
 }
 
 bool CGrandStrategyFaction::IsAlive()
@@ -3645,7 +3712,7 @@ void CGrandStrategyHero::Die()
 	this->Province = NULL;
 	
 	this->State = 0;
-	
+
 	//check if the hero is the ruler of a faction, and if so, remove it from that position
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
@@ -3673,11 +3740,14 @@ int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
 
 std::string CGrandStrategyHero::GetFullName()
 {
-	if (!this->Dynasty.empty()) {
-		return (this->Name + " " + this->Dynasty);
-	} else {
-		return this->Name;
+	std::string full_name = this->Name;
+	if (!this->ExtraName.empty()) {
+		full_name += " " + this->ExtraName;
 	}
+	if (!this->Dynasty.empty()) {
+		full_name += " " + this->Dynasty;
+	}
+	return full_name;
 }
 
 std::string CGrandStrategyHero::GetRulerEffectsString()
@@ -5091,9 +5161,11 @@ void CleanGrandStrategyGame()
 		GrandStrategyGame.Heroes[i]->State = 0;
 		GrandStrategyGame.Heroes[i]->Province = NULL;
 		GrandStrategyGame.Heroes[i]->Type = NULL;
-		for (size_t j = 0; j < GrandStrategyGame.Heroes[i]->Children.size(); ++j) {
+		for (size_t j = 0; j < GrandStrategyGame.Heroes[i]->Children.size();) {
 			if (GrandStrategyGame.Heroes[i]->Children[j]->Generated) { //remove children generated during gameplay
 				GrandStrategyGame.Heroes[i]->Children.erase(GrandStrategyGame.Heroes[i]->Children.begin() + j);
+			} else {
+				++j;
 			}
 		}
 		if (GrandStrategyGame.Heroes[i]->Father && GrandStrategyGame.Heroes[i]->Father->Generated) {
@@ -5103,7 +5175,7 @@ void CleanGrandStrategyGame()
 			GrandStrategyGame.Heroes[i]->Mother = NULL;
 		}
 	}
-			
+
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size();) {
 		if (GrandStrategyGame.Heroes[i]->Generated) { //if hero was generated during the game, delete it
 			delete GrandStrategyGame.Heroes[i];
