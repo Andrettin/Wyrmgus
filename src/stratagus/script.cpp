@@ -2841,7 +2841,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Heroes[i]->Mother != NULL) {
 					fprintf(fd, "\tMother = \"%s\",\n", GrandStrategyGame.Heroes[i]->Mother->GetFullName().c_str());
 				}
-				fprintf(fd, "\tGenerated = \"true\"\n");
+				fprintf(fd, "\tGenerated = true\n");
 				fprintf(fd, "})\n");
 			}
 		}

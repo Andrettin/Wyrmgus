@@ -1736,6 +1736,10 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 		}
 	}
 	
+	if (hero->Generated) { //if the hero was generated, initialize it (since this is loaded during a save game, after the other heroes have already been initialized)
+		hero->Initialize();
+	}
+	
 	return 0;
 }
 //Wyrmgus end

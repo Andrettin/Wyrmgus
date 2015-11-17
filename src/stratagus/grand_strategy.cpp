@@ -3644,6 +3644,13 @@ std::string CGrandStrategyFaction::GetRulerTitle()
 	return "";
 }
 
+void CGrandStrategyHero::Initialize()
+{
+	this->Type = const_cast<CUnitType *>(&(*this->DefaultType));
+	int province_of_origin_id = GetProvinceId(this->ProvinceOfOriginName);
+	this->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_of_origin_id]));
+}
+
 void CGrandStrategyHero::Create()
 {
 	//show message that the hero has appeared
@@ -3729,7 +3736,11 @@ int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
 	int modifier = 0;
 	
 	if (this->Type != NULL) {
-		modifier += (this->Type->DefaultStat.Variables[INTELLIGENCE_INDEX].Value - 10) * 25 / 10; //+2.5% administrative efficiency for every intelligence point above 10, and -2.5% for every point below 10
+		int intelligence = this->Type->DefaultStat.Variables[INTELLIGENCE_INDEX].Value;
+		if (intelligence == 10) {
+			intelligence += 1; //grant +1 intelligence to heroes with 10 intelligence, to prevent them from having no bonus
+		}
+		modifier += (intelligence - 10) * 5; //+2.5% administrative efficiency for every intelligence point above 10, and -2.5% for every point below 10; changed that to 5 for now since heroes don't get intelligence scores which are particularly high
 	}
 	
 	return modifier;
@@ -5514,9 +5525,7 @@ void InitializeGrandStrategyGame()
 	
 	//set hero unit types to their default type
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		GrandStrategyGame.Heroes[i]->Type = const_cast<CUnitType *>(&(*GrandStrategyGame.Heroes[i]->DefaultType));
-		int province_of_origin_id = GetProvinceId(GrandStrategyGame.Heroes[i]->ProvinceOfOriginName);
-		GrandStrategyGame.Heroes[i]->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_of_origin_id]));
+		GrandStrategyGame.Heroes[i]->Initialize();
 	}
 }
 

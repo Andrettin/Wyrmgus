@@ -309,6 +309,7 @@ public:
 	{
 	}
 	
+	void Initialize();
 	void Create();
 	void Die();
 	int GetAdministrativeEfficiencyModifier();
