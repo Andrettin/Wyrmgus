@@ -559,6 +559,7 @@ extern std::string GetFactionCurrentResearch(std::string civilization_name, std:
 extern std::string GetFactionFullName(std::string civilization_name, std::string faction_name);
 extern void AcquireFactionTechnologies(std::string civilization_from_name, std::string faction_from_name, std::string civilization_to_name, std::string faction_to_name);
 extern void SetPlayerFaction(std::string civilization_name, std::string faction_name);
+extern std::string GetPlayerFactionName();
 extern void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
 extern void ChangeFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
 extern int GetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name);

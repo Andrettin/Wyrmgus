@@ -758,6 +758,10 @@ void CGrandStrategyGame::DoTurn()
 					if (this->Factions[i][j]->Ruler == NULL) {
 						this->Factions[i][j]->RulerSuccession();
 					}
+				} else {
+					if (this->Factions[i][j]->Ruler != NULL) {
+						this->Factions[i][j]->SetRuler(""); //"dead" factions should have no ruler
+					}
 				}
 			} else { //end of valid factions
 				break;
@@ -3180,6 +3184,12 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 	
 	GrandStrategyGame.Factions[new_civilization][new_faction]->AcquireFactionTechnologies(old_civilization, old_faction);
 	
+	//set the ruler from the old faction
+	if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ruler != NULL) {
+		GrandStrategyGame.Factions[new_civilization][new_faction]->SetRuler(GrandStrategyGame.Factions[old_civilization][old_faction]->Ruler->GetFullName());
+	}
+
+	
 	if (this->ProvinceCount > 0) {
 		for (int i = (this->ProvinceCount - 1); i >= 0; --i) {
 			int province_id = this->OwnedProvinces[i];
@@ -3273,6 +3283,10 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 			dialog_tooltip.c_str()
 		);
 		CclCommand(buf_2);
+	}
+	
+	if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ruler != NULL) {
+		GrandStrategyGame.Factions[old_civilization][old_faction]->SetRuler(""); //do this after changing the PlayerFaction to prevent ruler death/rise to power messages, since the ruler is the same
 	}
 }
 
@@ -5822,6 +5836,15 @@ void SetPlayerFaction(std::string civilization_name, std::string faction_name)
 	}
 	
 	GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization][faction]));
+}
+
+std::string GetPlayerFactionName()
+{
+	if (GrandStrategyGame.PlayerFaction != NULL) {
+		return PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Name;
+	} else {
+		return "";
+	}
 }
 
 void SetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity)
