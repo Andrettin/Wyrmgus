@@ -6288,16 +6288,45 @@ bool FactionHasHero(std::string civilization_name, std::string faction_name, std
 	}
 	
 	if (faction == -1) {
-		return 0;
+		return false;
 	}
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 	if (hero) {
-		if (hero->Province != NULL && hero->Province->Owner != NULL) {
-			if (hero->Province->Owner->Civilization == civilization && hero->Province->Owner->Faction == faction) {
+		if (hero->State == 0) {
+			return false;
+		}
+		if (hero->Province != NULL) {
+			if (hero->State != 3 && hero->Province->Owner != NULL && hero->Province->Owner->Civilization == civilization && hero->Province->Owner->Faction == faction) {
 				return true;
-			} else {
-				return false;
+			} else if (hero->State == 3 && hero->Province->AttackedBy != NULL && hero->Province->AttackedBy->Civilization == civilization && hero->Province->AttackedBy->Faction == faction) {
+				return true;
 			}
+		}
+		//check if the hero is the ruler of a faction
+		for (int i = 0; i < MAX_RACES; ++i) {
+			for (int j = 0; j < FactionMax; ++j) {
+				if (GrandStrategyGame.Factions[i][j]) {
+					if (GrandStrategyGame.Factions[i][j]->Ruler == hero) {
+						if (civilization == i && faction == j) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+				} else {
+					break;
+				}
+			}
+		}
+		int province_of_origin_id = GetProvinceId(hero->ProvinceOfOrigin);
+		if (
+			hero->Province == NULL
+			&& province_of_origin_id != -1
+			&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner != NULL
+			&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner->Civilization == civilization
+			&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner->Faction == faction
+		) {
+			return true;
 		}
 	}
 	return false;
