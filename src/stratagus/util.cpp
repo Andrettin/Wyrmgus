@@ -623,6 +623,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceStringEnding(text, "gr", "g");
 	text = FindAndReplaceStringEnding(text, "kr", "k");
 	text = FindAndReplaceStringEnding(text, "nr", "n");
+	text = FindAndReplaceStringEnding(text, "rr", "r");
+	text = FindAndReplaceStringEnding(text, "tr", "t");
 	
 	//Greek characters
 	text = FindAndReplaceString(text, "Α", "A");
