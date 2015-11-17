@@ -2826,8 +2826,8 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Heroes[i]->Civilization != -1) {
 					fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[GrandStrategyGame.Heroes[i]->Civilization].c_str());
 				}
-				if (!GrandStrategyGame.Heroes[i]->ProvinceOfOrigin.empty()) {
-					fprintf(fd, "\tProvinceOfOrigin = \"%s\",\n", GrandStrategyGame.Heroes[i]->ProvinceOfOrigin.c_str());
+				if (!GrandStrategyGame.Heroes[i]->ProvinceOfOriginName.empty()) {
+					fprintf(fd, "\tProvinceOfOrigin = \"%s\",\n", GrandStrategyGame.Heroes[i]->ProvinceOfOriginName.c_str());
 				}
 				if (GrandStrategyGame.Heroes[i]->Year != 0) {
 					fprintf(fd, "\tYear = %d,\n", GrandStrategyGame.Heroes[i]->Year);

@@ -1694,7 +1694,7 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			hero->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "ProvinceOfOrigin")) {
-			hero->ProvinceOfOrigin = LuaToString(l, -1);
+			hero->ProvinceOfOriginName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Father")) {
 			std::string father_name = TransliterateText(LuaToString(l, -1));
 			CGrandStrategyHero *father = GrandStrategyGame.GetHero(father_name);

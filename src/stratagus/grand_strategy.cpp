@@ -892,14 +892,13 @@ void CGrandStrategyGame::DoTurn()
 	
 	//check if any heroes should begin activity this year
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
-		int province_of_origin_id = GetProvinceId(this->Heroes[i]->ProvinceOfOrigin);
 		if (
 			// for historical personages to appear, they require three things: the year of their historical rise to prominence, ownership of the province in which they were born or raised, and that that province be of the correct culture for them, if they belonged to the cultural majority
 			this->Heroes[i]->Year == GrandStrategyYear
 			&& this->Heroes[i]->State == 0
-			&& province_of_origin_id != -1
-			&& this->Provinces[province_of_origin_id]->Owner != NULL
-			&& this->Provinces[province_of_origin_id]->Civilization == this->Heroes[i]->Civilization
+			&& this->Heroes[i]->ProvinceOfOrigin != NULL
+			&& this->Heroes[i]->ProvinceOfOrigin->Owner != NULL
+			&& this->Heroes[i]->ProvinceOfOrigin->Civilization == this->Heroes[i]->Civilization
 		) {
 			//make heroes appear in their start year
 			this->Heroes[i]->Create();
@@ -3354,13 +3353,12 @@ void CGrandStrategyFaction::RulerSuccession()
 	
 	std::vector<CGrandStrategyHero *> ruler_candidates;
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		int province_of_origin_id = GetProvinceId(GrandStrategyGame.Heroes[i]->ProvinceOfOrigin);
 		if (
 			GrandStrategyGame.Heroes[i]->State != 0
 			 && GrandStrategyGame.Heroes[i]->Gender == MaleGender
 			&& (
 				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
-				|| (GrandStrategyGame.Heroes[i]->Province == NULL && province_of_origin_id != -1 && GrandStrategyGame.Provinces[province_of_origin_id]->Owner == this)
+				|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
 			)
 		) {
 			ruler_candidates.push_back(GrandStrategyGame.Heroes[i]);
@@ -3369,12 +3367,11 @@ void CGrandStrategyFaction::RulerSuccession()
 	if (ruler_candidates.size() == 0) {
 		//if the list of male ruler candidates is empty, see if there are heroes available without taking gender in regard
 		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-			int province_of_origin_id = GetProvinceId(GrandStrategyGame.Heroes[i]->ProvinceOfOrigin);
 			if (
 				GrandStrategyGame.Heroes[i]->State != 0
 				&& (
 					(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
-					|| (GrandStrategyGame.Heroes[i]->Province == NULL && province_of_origin_id != -1 && GrandStrategyGame.Provinces[province_of_origin_id]->Owner == this)
+					|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
 				)
 			) {
 				ruler_candidates.push_back(GrandStrategyGame.Heroes[i]);
@@ -3451,7 +3448,8 @@ void CGrandStrategyFaction::GenerateRuler()
 	if (this->ProvinceCount == 0) {
 		fprintf(stderr, "Faction \"%s\" is generating a ruler, but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Name.c_str());
 	}
-	hero->ProvinceOfOrigin = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->Name;
+	hero->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]));
+	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
 	hero->Gender = MaleGender;
 	this->SetRuler(hero->GetFullName());
 }
@@ -3648,27 +3646,26 @@ std::string CGrandStrategyFaction::GetRulerTitle()
 
 void CGrandStrategyHero::Create()
 {
-	int province_of_origin_id = GetProvinceId(this->ProvinceOfOrigin);
 	//show message that the hero has appeared
 	if (
-		province_of_origin_id != -1
-		&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner != NULL
-		&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner == GrandStrategyGame.PlayerFaction
+		this->ProvinceOfOrigin != NULL
+		&& this->ProvinceOfOrigin->Owner != NULL
+		&& this->ProvinceOfOrigin->Owner == GrandStrategyGame.PlayerFaction
 		&& this->Type->BoolFlag[HERO_INDEX].value
 	) {
 		char buf[256];
 		snprintf(
 			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 			(this->Type->Name + " " + this->GetFullName()).c_str(),
-			("My lord, the hero " + this->GetFullName() + " has come to renown in " + GrandStrategyGame.Provinces[province_of_origin_id]->GetCulturalName() + " and has entered our service.").c_str()
+			("My lord, the hero " + this->GetFullName() + " has come to renown in " + this->ProvinceOfOrigin->GetCulturalName() + " and has entered our service.").c_str()
 		);
 		CclCommand(buf);	
 	}
 	
 	this->State = 2;
 	
-	if (province_of_origin_id != -1 && this->Type->BoolFlag[HERO_INDEX].value) { //if the hero has its own unit type, add it to its province of origin
-		GrandStrategyGame.Provinces[province_of_origin_id]->SetHero(this->GetFullName(), this->Type->Slot, 2);
+	if (this->ProvinceOfOrigin != NULL && this->Type->BoolFlag[HERO_INDEX].value) { //if the hero has its own unit type, add it to its province of origin
+		this->ProvinceOfOrigin->SetHero(this->GetFullName(), this->Type->Slot, 2);
 	}
 }
 
@@ -5161,6 +5158,7 @@ void CleanGrandStrategyGame()
 		GrandStrategyGame.Heroes[i]->State = 0;
 		GrandStrategyGame.Heroes[i]->Province = NULL;
 		GrandStrategyGame.Heroes[i]->Type = NULL;
+		GrandStrategyGame.Heroes[i]->ProvinceOfOrigin = NULL;
 		for (size_t j = 0; j < GrandStrategyGame.Heroes[i]->Children.size();) {
 			if (GrandStrategyGame.Heroes[i]->Children[j]->Generated) { //remove children generated during gameplay
 				GrandStrategyGame.Heroes[i]->Children.erase(GrandStrategyGame.Heroes[i]->Children.begin() + j);
@@ -5517,6 +5515,8 @@ void InitializeGrandStrategyGame()
 	//set hero unit types to their default type
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		GrandStrategyGame.Heroes[i]->Type = const_cast<CUnitType *>(&(*GrandStrategyGame.Heroes[i]->DefaultType));
+		int province_of_origin_id = GetProvinceId(GrandStrategyGame.Heroes[i]->ProvinceOfOriginName);
+		GrandStrategyGame.Heroes[i]->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_of_origin_id]));
 	}
 }
 
@@ -6390,13 +6390,12 @@ bool FactionHasHero(std::string civilization_name, std::string faction_name, std
 				}
 			}
 		}
-		int province_of_origin_id = GetProvinceId(hero->ProvinceOfOrigin);
 		if (
 			hero->Province == NULL
-			&& province_of_origin_id != -1
-			&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner != NULL
-			&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner->Civilization == civilization
-			&& GrandStrategyGame.Provinces[province_of_origin_id]->Owner->Faction == faction
+			&& hero->ProvinceOfOrigin != NULL
+			&& hero->ProvinceOfOrigin->Owner != NULL
+			&& hero->ProvinceOfOrigin->Owner->Civilization == civilization
+			&& hero->ProvinceOfOrigin->Owner->Faction == faction
 		) {
 			return true;
 		}

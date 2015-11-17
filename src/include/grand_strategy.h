@@ -303,8 +303,8 @@ public:
 	CGrandStrategyHero() :
 		State(0), Year(0), DeathYear(0), Civilization(-1), Gender(0),
 		Generated(false),
-		Name(""), ExtraName(""), Dynasty(""), ProvinceOfOrigin(""),
-		DefaultType(NULL), Type(NULL), Province(NULL),
+		Name(""), ExtraName(""), Dynasty(""), ProvinceOfOriginName(""),
+		DefaultType(NULL), Type(NULL), Province(NULL), ProvinceOfOrigin(NULL),
 		Father(NULL), Mother(NULL)
 	{
 	}
@@ -324,10 +324,11 @@ public:
 	std::string Name;	/// Given name of the hero
 	std::string ExtraName;	/// Extra given names of the hero (used if necessary to differentiate from existing heroes)
 	std::string Dynasty;	/// Name of the hero's dynasty
-	std::string ProvinceOfOrigin;	/// Province from which the hero originates
+	std::string ProvinceOfOriginName;	/// Name of the province from which the hero originates
 	CUnitType *DefaultType;
 	CUnitType *Type;
 	CProvince *Province;
+	CProvince *ProvinceOfOrigin;	/// Province from which the hero originates
 	CGrandStrategyHero *Father;					/// Hero's father
 	CGrandStrategyHero *Mother;					/// Hero's mother
 	std::vector<CGrandStrategyHero *> Children;	/// Children of the hero
