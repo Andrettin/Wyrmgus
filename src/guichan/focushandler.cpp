@@ -322,7 +322,10 @@ namespace gcn
         {
             int hotKey = mWidgets[i]->getHotKey();
 
-            if (hotKey == 0)
+			//Wyrmgus start
+//            if (hotKey == 0)
+            if (hotKey == 0 || !mWidgets[i]->isEnabled())
+			//Wyrmgus end
             {
                 continue;
             }
