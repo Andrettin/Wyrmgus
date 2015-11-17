@@ -489,8 +489,8 @@ void CGrandStrategyGame::DrawInterface()
 			UI.Resources[FoodCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), food_string);
 			
-			//draw show ruler button to return to the province interface
-			if (UI.GrandStrategyShowRulerButton.X != -1) {
+			//draw show ruler button
+			if (UI.GrandStrategyShowRulerButton.X != -1 && GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ruler != NULL) {
 				DrawUIButton(
 					UI.GrandStrategyShowRulerButton.Style,
 					(UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
@@ -511,6 +511,8 @@ void CGrandStrategyGame::DrawInterface()
 			interface_state_name = GrandStrategyInterfaceState;
 			
 			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler != NULL) {
+				interface_state_name = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->GetRulerTitle();
+			
 				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->GetFullName();
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
 				item_y += 1;
@@ -3306,8 +3308,8 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				("Ruler " + this->Ruler->GetFullName()).c_str(),
-				("A new ruler has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
+				(this->GetRulerTitle() + " " + this->Ruler->GetFullName()).c_str(),
+				("A new " + DecapitalizeString(this->GetRulerTitle()) + " has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
 			);
 			CclCommand(buf);	
 		}
@@ -3427,7 +3429,17 @@ std::string CGrandStrategyFaction::GetFullName()
 	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
 		return PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
 	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
-		std::string faction_title;
+		return this->GetTitle() + " of " + PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
+	}
+	
+	return "";
+}
+
+std::string CGrandStrategyFaction::GetTitle()
+{
+	std::string faction_title;
+	
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
 		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType][this->FactionTier].empty()) {
 			faction_title = PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType][this->FactionTier];
 		} else {
@@ -3451,7 +3463,103 @@ std::string CGrandStrategyFaction::GetFullName()
 				faction_title = "Theocracy";
 			}
 		}
-		return faction_title + " of " + PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
+	}
+	
+	return faction_title;
+}
+
+std::string CGrandStrategyFaction::GetRulerTitle()
+{
+	if (this->Ruler == NULL) {
+		return "";
+	}
+	
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+		if (this->Ruler->Gender != FemaleGender) {
+			return "Chieftain";
+		} else {
+			return "Chieftess";
+		}
+	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
+		std::string faction_title = this->GetTitle();
+		
+		if (faction_title == "Barony") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "Baron";
+			} else {
+				return "Baroness";
+			}
+		} else if (faction_title == "Lordship") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "Lord";
+			} else {
+				return "Lady";
+			}
+		} else if (faction_title == "County") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "Count";
+			} else {
+				return "Countess";
+			}
+		} else if (faction_title == "City-State") {
+			return "Archon";
+		} else if (faction_title == "Duchy") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "Duke";
+			} else {
+				return "Duchess";
+			}
+		} else if (faction_title == "Principality") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "Prince";
+			} else {
+				return "Princess";
+			}
+		} else if (faction_title == "Margraviate") {
+			return "Margrave";
+		} else if (faction_title == "Landgraviate") {
+			return "Landgrave";
+		} else if (faction_title == "Grand Duchy") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "Grand Duke";
+			} else {
+				return "Grand Duchess";
+			}
+		} else if (faction_title == "Archduchy") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "Archduke";
+			} else {
+				return "Archduchess";
+			}
+		} else if (faction_title == "Kingdom") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "King";
+			} else {
+				return "Queen";
+			}
+		} else if (faction_title == "Khanate") {
+			return "Khan";
+		} else if (faction_title == "Empire") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "Emperor";
+			} else {
+				return "Empress";
+			}
+		} else if (faction_title == "Republic") {
+			return "Consul";
+		} else if (faction_title == "Confederation") {
+			return "Chancellor";
+		} else if (faction_title == "Theocracy") {
+			if (this->Ruler->Gender != FemaleGender) {
+				return "High Priest";
+			} else {
+				return "High Priestess";
+			}
+		} else if (faction_title == "Bishopric") {
+			return "Bishop";
+		} else if (faction_title == "Archbishopric") {
+			return "Archbishop";
+		}
 	}
 	
 	return "";
@@ -3490,8 +3598,8 @@ void CGrandStrategyHero::Die()
 		char buf[256];
 		snprintf(
 			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-			("Ruler " + this->GetFullName() + " Dies").c_str(),
-			("Tragic news spread throughout our realm. Our ruler, " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
+			(GrandStrategyGame.PlayerFaction->GetRulerTitle() + " " + this->GetFullName() + " Dies").c_str(),
+			("Tragic news spread throughout our realm. Our " + DecapitalizeString(GrandStrategyGame.PlayerFaction->GetRulerTitle()) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
 		);
 		CclCommand(buf);	
 	} else if (

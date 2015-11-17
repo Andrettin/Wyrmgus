@@ -260,6 +260,8 @@ public:
 	bool HasTechnologyClass(std::string technology_class_name);
 	bool CanFormFaction(int civilization, int faction);
 	std::string GetFullName();
+	std::string GetTitle();
+	std::string GetRulerTitle();
 	
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).
