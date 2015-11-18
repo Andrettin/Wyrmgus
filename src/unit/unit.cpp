@@ -2279,6 +2279,14 @@ int DirectionToHeading(const PixelDiff &delta)
 */
 void UnitUpdateHeading(CUnit &unit)
 {
+	//Wyrmgus start
+	//fix direction if it does not correspond to one of the defined directions
+	int num_dir = std::max<int>(8, unit.Type->NumDirections);
+	if (unit.Direction % (256 / num_dir) != 0) {
+		unit.Direction = unit.Direction - (unit.Direction % (256 / num_dir));
+	}
+	//Wyrmgus end
+	
 	int dir;
 	int nextdir;
 	bool neg;

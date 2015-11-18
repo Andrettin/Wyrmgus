@@ -145,7 +145,7 @@ class VariationInfo
 public:
 	VariationInfo() : VariationId(""),
 		FrameWidth(0), FrameHeight(0),
-		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL), WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL), WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL), BackpackSprite(NULL)
 	{
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));	
@@ -169,6 +169,7 @@ public:
 	std::string WeaponFile;			/// Variation's weapon graphics.
 	std::string ShieldFile;			/// Variation's shield graphics.
 	std::string HelmetFile;			/// Variation's helmet graphics.
+	std::string BackpackFile;		/// Variation's backpack graphics.
 	std::string Tileset;			/// Variation's tileset.
 	int FrameWidth;
 	int FrameHeight;
@@ -186,6 +187,7 @@ public:
 	CPlayerColorGraphic *WeaponSprite;	/// The graphic corresponding to WeaponFile.
 	CPlayerColorGraphic *ShieldSprite;	/// The graphic corresponding to ShieldFile.
 	CPlayerColorGraphic *HelmetSprite;	/// The graphic corresponding to HelmetFile.
+	CPlayerColorGraphic *BackpackSprite;	/// The graphic corresponding to BackpackFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
 	OverlayAnimation *ShieldAnimation[AnimationFrameMax];	/// shield animation data	
@@ -702,6 +704,7 @@ public:
 	std::string WeaponFile;			/// Weapon file
 	std::string ShieldFile;			/// Shield file
 	std::string HelmetFile;			/// Helmet file
+	std::string BackpackFile;		/// Backpack file
 	//Wyrmgus end
 
 	int Width;                                            /// Sprite width
@@ -915,6 +918,7 @@ public:
 	CPlayerColorGraphic *WeaponSprite;			/// Weapon sprite image
 	CPlayerColorGraphic *ShieldSprite;			/// Shield sprite image
 	CPlayerColorGraphic *HelmetSprite;			/// Helmet sprite image
+	CPlayerColorGraphic *BackpackSprite;		/// Backpack sprite image
 	//Wyrmgus end
 };
 

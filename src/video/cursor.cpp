@@ -202,6 +202,12 @@ void DrawBuildingCursor()
 	}
 	//Wyrmgus end
 	//Wyrmgus start
+	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->BackpackSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->BackpackSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else if (CursorBuilding->BackpackSprite) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->BackpackSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
+
 //	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 //				 CursorBuilding->StillFrame, screenPos);
 	// get the first variation which has the proper upgrades for this player (to have the proper appearance of buildings drawn in the cursor, according to the upgrades)

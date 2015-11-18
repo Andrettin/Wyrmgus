@@ -749,7 +749,7 @@ CUnitType::CUnitType() :
 //	Sprite(NULL), ShadowSprite(NULL)
 	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL),
 	ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL),
-	WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL)
+	WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL), BackpackSprite(NULL)
 	//Wyrmgus end
 {
 #ifdef USE_MNG
@@ -840,6 +840,7 @@ CUnitType::~CUnitType()
 	CGraphic::Free(WeaponSprite);
 	CGraphic::Free(ShieldSprite);
 	CGraphic::Free(HelmetSprite);
+	CGraphic::Free(BackpackSprite);
 	//Wyrmgus end
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
@@ -1634,6 +1635,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 			type.HelmetSprite->Flip();
 		}
 	}
+	if (!type.BackpackFile.empty()) {
+		type.BackpackSprite = CPlayerColorGraphic::New(type.BackpackFile, type.Width, type.Height);
+		type.BackpackSprite->Load();
+		if (type.Flip) {
+			type.BackpackSprite->Flip();
+		}
+	}
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -1741,6 +1749,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 			varinfo->HelmetSprite->Load();
 			if (type.Flip) {
 				varinfo->HelmetSprite->Flip();
+			}
+		}
+		if (!varinfo->BackpackFile.empty()) {
+			varinfo->BackpackSprite = CPlayerColorGraphic::New(varinfo->BackpackFile, frame_width, frame_height);
+			varinfo->BackpackSprite->Load();
+			if (type.Flip) {
+				varinfo->BackpackSprite->Flip();
 			}
 		}
 		for (int j = 0; j < MaxCosts; ++j) {
@@ -1899,6 +1914,9 @@ VariationInfo::~VariationInfo()
 	}
 	if (this->HelmetSprite) {
 		CGraphic::Free(this->HelmetSprite);
+	}
+	if (this->BackpackSprite) {
+		CGraphic::Free(this->BackpackSprite);
 	}
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (this->SpriteWhenLoaded[res]) {

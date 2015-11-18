@@ -633,6 +633,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->WeaponFile = parent_type->WeaponFile;
 			type->ShieldFile = parent_type->ShieldFile;
 			type->HelmetFile = parent_type->HelmetFile;
+			type->BackpackFile = parent_type->BackpackFile;
 			type->TileWidth = parent_type->TileWidth;
 			type->TileHeight = parent_type->TileHeight;
 			type->BoxWidth = parent_type->BoxWidth;
@@ -754,6 +755,7 @@ static int CclDefineUnitType(lua_State *l)
 					var->WeaponFile = parent_type->VarInfo[var_n]->WeaponFile;
 					var->ShieldFile = parent_type->VarInfo[var_n]->ShieldFile;
 					var->HelmetFile = parent_type->VarInfo[var_n]->HelmetFile;
+					var->BackpackFile = parent_type->VarInfo[var_n]->BackpackFile;
 					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
 					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
 					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
@@ -859,6 +861,8 @@ static int CclDefineUnitType(lua_State *l)
 						var->ShieldFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "helmet-file")) {
 						var->HelmetFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "backpack-file")) {
+						var->BackpackFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
 						lua_rawgeti(l, -1, k + 1);
 						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
@@ -1249,6 +1253,25 @@ static int CclDefineUnitType(lua_State *l)
 			if (redefine && type->HelmetSprite) {
 				CGraphic::Free(type->HelmetSprite);
 				type->HelmetSprite = NULL;
+			}
+		} else if (!strcmp(value, "BackpackImage")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, -1, k + 1);
+				++k;
+
+				if (!strcmp(value, "file")) {
+					type->BackpackFile = LuaToString(l, -1, k + 1);
+				} else {
+					LuaError(l, "Unsupported backpack tag: %s" _C_ value);
+				}
+			}
+			if (redefine && type->BackpackSprite) {
+				CGraphic::Free(type->BackpackSprite);
+				type->BackpackSprite = NULL;
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "Offset")) {

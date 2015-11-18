@@ -1281,6 +1281,20 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 	}
 	
+	CPlayerColorGraphic *backpack_sprite = type->BackpackSprite;
+	if (varinfo) {
+		if (varinfo->BackpackSprite) {
+			backpack_sprite = varinfo->BackpackSprite;
+		}
+	}
+	
+	//draw the backpack before everything but the shadow if facing south (or the still frame, since that also faces south), southeast or southwest
+	if (this->Direction == LookingS || frame == type->StillFrame || this->Direction == LookingSE || this->Direction == LookingSW) {
+		if (backpack_sprite) {
+			DrawPlayerColorOverlay(*type, backpack_sprite, player, frame, screenPos);
+		}
+	}
+	
 	//draw the left arm before the body if not facing south (or the still frame, since that also faces south)
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
 		//draw the shield before the left arm if not facing south
@@ -1388,6 +1402,13 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawPlayerColorOverlay(*type, clothing_sprite, player, frame, screenPos);
 	}
 
+	//draw the backpack after the clothing if facing east or west, if isn't dying (dying animations for east and west use northeast frames)
+	if ((this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() != UnitActionDie) {
+		if (backpack_sprite) {
+			DrawPlayerColorOverlay(*type, backpack_sprite, player, frame, screenPos);
+		}
+	}
+	
 	CPlayerColorGraphic *hair_sprite = type->HairSprite;
 	if (varinfo) {
 		if (varinfo->HairSprite) {
@@ -1429,6 +1450,20 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 		if (clothing_right_arm_sprite) {
 			DrawPlayerColorOverlay(*type, clothing_right_arm_sprite, player, frame, screenPos);
+		}
+	}
+
+	//draw the backpack after everything if facing north, northeast or northwest, or if facing east or west and is dying (dying animations for east and west use northeast frames)
+	if (
+		this->Direction == LookingN
+		|| this->Direction == LookingNE
+		|| this->Direction == LookingNW
+		|| (
+			(this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() == UnitActionDie
+		)
+	) {
+		if (backpack_sprite) {
+			DrawPlayerColorOverlay(*type, backpack_sprite, player, frame, screenPos);
 		}
 	}
 
