@@ -292,6 +292,25 @@ public:
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 };
 
+class CDeity
+{
+public:
+	CDeity() :
+		Civilization(-1), Gender(0),
+		Major(false),
+		Name(""), UpgradeIdent(""), Portfolio(""), ParentDeity("")
+	{
+	}
+	
+	int Civilization;	/// Culture to which the deity belongs
+	int Gender;			/// Deity's gender
+	bool Major;			/// Whether the deity is a major one or not
+	std::string Name;	/// Name of the deity
+	std::string UpgradeIdent;	/// Ident of the upgrade applied by the deity
+	std::string Portfolio; ///Portfolio of the deity
+	std::string ParentDeity;	/// Parent deity of this deity (deity on which it is based on); example: Wodanaz (Germanic) is the parent deity of Odin (Norse) and Woden (teuton)
+};
+
 class LanguageNoun
 {
 public:
@@ -593,6 +612,7 @@ public:
 	int GetRaceIndexByName(const char *raceName) const;
 	//Wyrmgus start
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
+	int GetDeityIndexByName(const int civilization, std::string deity_name) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
 	int GetFactionClassUnitType(int civilization, int faction, int class_id);
@@ -616,6 +636,7 @@ public:
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
 	CFaction *Factions[MAX_RACES][FactionMax];    						/// factions
+	std::vector<CDeity *> Deities[MAX_RACES];							/// deities
 	std::string PersonalNames[MAX_RACES][PersonalNameMax];				/// personal names
 	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];		/// personal name prefixes
 	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];		/// personal name suffixes

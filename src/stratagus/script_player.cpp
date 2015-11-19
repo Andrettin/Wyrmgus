@@ -2327,6 +2327,63 @@ static int CclDefineFaction(lua_State *l)
 }
 
 /**
+**  Define a deity.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineDeity(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string deity_name = LuaToString(l, 1);
+	CDeity *deity = NULL;
+	int deity_id = -1;
+	for (int i = 0; i < MAX_RACES; ++i) {
+		deity_id = PlayerRaces.GetDeityIndexByName(i, deity_name);
+		if (deity_id != -1) {
+			deity = const_cast<CDeity *>(&(*PlayerRaces.Deities[i][deity_id]));
+			break;
+		}
+	}
+	if (deity_id == -1) {
+		deity = new CDeity;
+	}
+	
+	deity->Name = deity_name;
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Civilization")) {
+			if (deity->Civilization != -1) { //if already has a civilization defined, remove the deity from that civilization
+				PlayerRaces.Deities[deity->Civilization].erase(std::remove(PlayerRaces.Deities[deity->Civilization].begin(), PlayerRaces.Deities[deity->Civilization].end(), deity), PlayerRaces.Deities[deity->Civilization].end());
+			}
+			deity->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			PlayerRaces.Deities[deity->Civilization].push_back(deity);
+		} else if (!strcmp(value, "Portfolio")) {
+			deity->Portfolio = LuaToString(l, -1);
+		} else if (!strcmp(value, "ParentDeity")) {
+			deity->ParentDeity = LuaToString(l, -1);
+		} else if (!strcmp(value, "Upgrade")) {
+			deity->UpgradeIdent = LuaToString(l, -1);
+		} else if (!strcmp(value, "Gender")) {
+			deity->Gender = GetGenderIdByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "Major")) {
+			deity->Major = LuaToBoolean(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+//Wyrmgus end
+
+/**
 **  Get the civilizations.
 **
 **  @param l  Lua state.
@@ -2910,6 +2967,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetFactionClassUnitType", CclGetFactionClassUnitType);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
+	lua_register(Lua, "DefineDeity", CclDefineDeity);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);

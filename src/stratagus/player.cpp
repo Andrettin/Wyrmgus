@@ -393,6 +393,11 @@ void PlayerRace::Clean()
 				this->NameTranslations[i][j][k].clear();
 			}
 		}
+		//clear deities
+		for (size_t j = 0; j < this->Deities[i].size(); ++j) {
+			delete this->Deities[i][j];
+		}
+		this->Deities[i].clear();
 		for (int j = 0; j < LanguageWordMax; ++j) {
 			if (this->LanguageNouns[i][j]) {
 				delete this->LanguageNouns[i][j];
@@ -454,6 +459,16 @@ int PlayerRace::GetFactionIndexByName(const int civilization, const std::string 
 	} else {
 		return -1;
 	}		
+}
+
+int PlayerRace::GetDeityIndexByName(const int civilization, std::string deity_name) const
+{
+	for (size_t i = 0; i < this->Deities[civilization].size(); ++i) {
+		if (deity_name == this->Deities[civilization][i]->Name) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
