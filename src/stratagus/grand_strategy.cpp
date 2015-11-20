@@ -1933,10 +1933,6 @@ void CProvince::SetHero(std::string hero_full_name, int unit_type_id, int value)
 		
 void CProvince::AllocateLabor()
 {
-	if (!GrandStrategyGameInitialized) { //don't allocate labor until the grand strategy game has been initialized
-		return;
-	}
-	
 	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //no production if no town hall is in place, or if the province has no owner
 		return;
 	}
