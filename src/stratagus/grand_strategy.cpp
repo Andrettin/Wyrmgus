@@ -1990,6 +1990,9 @@ void CProvince::AllocateLaborToResource(int resource)
 				GrandStrategyGame.WorldMapTiles[x][y]->Worked = true;
 				new_worked_tiles -= 1;
 			}
+			if (new_worked_tiles <= 0) {
+				break;
+			}
 		}	
 	}
 	
