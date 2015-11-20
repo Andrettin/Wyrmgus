@@ -768,10 +768,6 @@ std::string SeparateCapitalizedStringElements(std::string text)
 */
 std::string GeneratePersonalName(int civilization, int unit_type_id)
 {
-	if (civilization == -1) {
-		return "";
-	}
-	
 	const CUnitType &type = *UnitTypes[unit_type_id];
 	std::string personal_name;
 
@@ -807,7 +803,7 @@ std::string GeneratePersonalName(int civilization, int unit_type_id)
 		}
 	} else if (
 		type.BoolFlag[ORGANIC_INDEX].value
-		&& !type.Civilization.empty()
+		&& civilization != -1
 		&& (
 			!PlayerRaces.PersonalNames[civilization][0].empty()
 			|| !PlayerRaces.PersonalNamePrefixes[civilization][0].empty()
