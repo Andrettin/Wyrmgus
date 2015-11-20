@@ -1,6 +1,7 @@
 
 extern bool GrandStrategy;
 extern bool GrandStrategyGamePaused;
+extern bool GrandStrategyGameInitialized;
 extern int GrandStrategyYear;
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
@@ -69,6 +70,7 @@ extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
 extern void InitializeGrandStrategyMinimap();
+extern void InitializeGrandStrategyFactions();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
 extern void DoProspection();

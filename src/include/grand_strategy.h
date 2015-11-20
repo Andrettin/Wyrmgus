@@ -166,6 +166,7 @@ public:
 	void SetHero(std::string hero_full_name, int unit_type_id, int value);
 	void AllocateLabor();
 	void AllocateLaborToResource(int resource);
+	void DeallocateLabor();
 	void ReallocateLabor();
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
@@ -449,7 +450,8 @@ public:
 };
 
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
-extern bool GrandStrategyGamePaused;					/// if grand strategy game is paused
+extern bool GrandStrategyGamePaused;					/// if the grand strategy game is paused
+extern bool GrandStrategyGameInitialized;				/// if the grand strategy game has been initialized
 extern int GrandStrategyYear;
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
@@ -524,6 +526,7 @@ extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame();
 extern void InitializeGrandStrategyMinimap();
+extern void InitializeGrandStrategyFactions();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
 extern void DoProspection();

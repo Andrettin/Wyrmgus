@@ -61,6 +61,7 @@
 
 bool GrandStrategy = false;				///if the game is in grand strategy mode
 bool GrandStrategyGamePaused = false;
+bool GrandStrategyGameInitialized = false;
 int GrandStrategyYear = 0;
 std::string GrandStrategyWorld;
 int WorldMapOffsetX;
@@ -1553,6 +1554,7 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 		this->Owner->ProvinceCount -= 1;
 		
 		//also remove its resource incomes from the owner's incomes, and reset the province's income so it won't be deduced from the new owner's income when recalculating it
+		this->DeallocateLabor();
 		for (int i = 0; i < MaxCosts; ++i) {
 			if (this->Income[i] != 0) {
 				this->Owner->Income[i] -= this->Income[i];
@@ -1844,13 +1846,15 @@ void CProvince::SetUnitQuantity(int unit_type_id, int quantity)
 			this->MilitaryScore += change * ((UnitTypes[militia_unit_type]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
 		}
 		
-		int labor_change = change * 100;
-		if (labor_change >= 0) {
-			this->Labor += labor_change;
-			this->AllocateLabor();
-		} else { //if workers are being removed from the province, reallocate labor
-			this->ReallocateLabor();
-		}		
+		if (GrandStrategyGameInitialized) {
+			int labor_change = change * 100;
+			if (labor_change >= 0) {
+				this->Labor += labor_change;
+				this->AllocateLabor();
+			} else { //if workers are being removed from the province, reallocate labor
+				this->ReallocateLabor();
+			}		
+		}
 	}
 	
 	this->Units[unit_type_id] = quantity;
@@ -1929,6 +1933,10 @@ void CProvince::SetHero(std::string hero_full_name, int unit_type_id, int value)
 		
 void CProvince::AllocateLabor()
 {
+	if (!GrandStrategyGameInitialized) { //don't allocate labor until the grand strategy game has been initialized
+		return;
+	}
+	
 	if (this->Owner == NULL || !this->HasBuildingClass("town-hall")) { //no production if no town hall is in place, or if the province has no owner
 		return;
 	}
@@ -1992,7 +2000,7 @@ void CProvince::AllocateLaborToResource(int resource)
 	FoodConsumption -= (this->ProductionCapacityFulfilled[FishCost] * DefaultResourceLaborInputs[FishCost]);
 }
 
-void CProvince::ReallocateLabor()
+void CProvince::DeallocateLabor()
 {
 	for (int i = 0; i < MaxCosts; ++i) {
 		this->ProductionCapacityFulfilled[i] = 0;
@@ -2006,6 +2014,11 @@ void CProvince::ReallocateLabor()
 		}	
 	}
 	this->Labor = this->TotalWorkers * 100;
+}
+
+void CProvince::ReallocateLabor()
+{
+	this->DeallocateLabor();
 	this->AllocateLabor();
 }
 
@@ -3301,7 +3314,7 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 {
 	if (hero_full_name.empty()) {
-		if (this->IsAlive()) {
+		if (this->IsAlive() && GrandStrategyGameInitialized) {
 			this->RulerSuccession();
 		} else {
 			this->Ruler = NULL;
@@ -5589,6 +5602,37 @@ void InitializeGrandStrategyMinimap()
 			GrandStrategyGame.MinimapOffsetY = (UI.Minimap.H - ((GetWorldMapHeight() / std::max(1000 / GrandStrategyGame.MinimapTileHeight, 1)) * std::max(GrandStrategyGame.MinimapTileHeight / 1000, 1))) / 2;
 		} else {
 			GrandStrategyGame.MinimapOffsetX = (UI.Minimap.H - ((GetWorldMapWidth() / std::max(1000 / GrandStrategyGame.MinimapTileWidth, 1)) * std::max(GrandStrategyGame.MinimapTileWidth / 1000, 1))) / 2;
+		}
+	}
+}
+
+void InitializeGrandStrategyFactions()
+{
+	// allocate labor for provinces
+	for (int i = 0; i < GrandStrategyGame.ProvinceCount; ++i) {
+		if (GrandStrategyGame.Provinces[i] && !GrandStrategyGame.Provinces[i]->Name.empty()) { //if this is a valid province
+			if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL) { // if this province has a culture and an owner
+				GrandStrategyGame.Provinces[i]->ReallocateLabor();
+			}
+		} else { //if a somehow invalid province is reached
+			break;
+		}
+	}
+
+	// calculate income and set initial ruler (if none is preset) for factions
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (GrandStrategyGame.Factions[i][j]) {
+				if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
+					// try to perform ruler succession for existent factions without rulers
+					if (GrandStrategyGame.Factions[i][j]->Ruler == NULL) {
+						GrandStrategyGame.Factions[i][j]->RulerSuccession();
+					}
+					GrandStrategyGame.Factions[i][j]->CalculateIncomes();
+				}
+			} else { //end of valid factions
+				break;
+			}
 		}
 	}
 }
