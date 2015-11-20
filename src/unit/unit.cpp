@@ -842,6 +842,13 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		//Wyrmgus end
 	}
 
+	//Wyrmgus start
+	// generate a trait for the unit, if any are available (only if the editor isn't running)
+	if (Editor.Running == EditorNotRunning && unit->Type->Traits.size() > 0) {
+		TraitAcquire(*unit, AllUpgrades[UpgradeIdByIdent(unit->Type->Traits[SyncRand(unit->Type->Traits.size())])]);
+	}
+	//Wyrmgus end
+	
 	if (unit->Type->OnInit) {
 		unit->Type->OnInit->pushPreamble();
 		unit->Type->OnInit->pushInteger(UnitNumber(*unit));

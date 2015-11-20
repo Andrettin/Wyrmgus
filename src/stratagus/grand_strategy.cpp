@@ -3442,6 +3442,15 @@ void CGrandStrategyFaction::GenerateRuler()
 	hero->Generated = true;
 	hero->DefaultType = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
 	hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+	if (hero->Type->Traits.size() > 0) { //generate a trait
+		std::string trait_ident = hero->Type->Traits[SyncRand(hero->Type->Traits.size())];
+		int trait_upgrade_id = UpgradeIdByIdent(trait_ident);
+		if (trait_upgrade_id != -1) {
+			hero->Trait = const_cast<CUpgrade *>(&(*AllUpgrades[trait_upgrade_id]));
+		} else {
+			fprintf(stderr, "Trait upgrade \"%s\" doesn't exist.\n", trait_ident.c_str());
+		}
+	}
 	hero->Year = GrandStrategyYear;
 	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
 	hero->Civilization = this->Civilization;

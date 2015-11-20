@@ -304,7 +304,7 @@ public:
 		State(0), Year(0), DeathYear(0), Civilization(-1), Gender(0),
 		Generated(false),
 		Name(""), ExtraName(""), Dynasty(""), ProvinceOfOriginName(""),
-		DefaultType(NULL), Type(NULL), Province(NULL), ProvinceOfOrigin(NULL),
+		DefaultType(NULL), Type(NULL), Trait(NULL), Province(NULL), ProvinceOfOrigin(NULL),
 		Father(NULL), Mother(NULL)
 	{
 	}
@@ -328,6 +328,7 @@ public:
 	std::string ProvinceOfOriginName;	/// Name of the province from which the hero originates
 	CUnitType *DefaultType;
 	CUnitType *Type;
+	CUpgrade *Trait;
 	CProvince *Province;
 	CProvince *ProvinceOfOrigin;	/// Province from which the hero originates
 	CGrandStrategyHero *Father;					/// Hero's father

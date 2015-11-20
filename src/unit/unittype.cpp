@@ -782,6 +782,10 @@ CUnitType::~CUnitType()
 	delete TeleportEffectIn;
 	delete TeleportEffectOut;
 
+	//Wyrmgus start
+	Traits.clear();
+	//Wyrmgus end
+
 	BoolFlag.clear();
 
 	// Free Building Restrictions if there are any

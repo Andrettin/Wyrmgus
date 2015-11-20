@@ -2823,6 +2823,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Heroes[i]->DefaultType != NULL) {
 					fprintf(fd, "\tDefaultType = \"%s\",\n", GrandStrategyGame.Heroes[i]->DefaultType->Ident.c_str());
 				}
+				if (GrandStrategyGame.Heroes[i]->Trait != NULL) {
+					fprintf(fd, "\tTrait = \"%s\",\n", GrandStrategyGame.Heroes[i]->Trait->Ident.c_str());
+				}
 				if (GrandStrategyGame.Heroes[i]->Civilization != -1) {
 					fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[GrandStrategyGame.Heroes[i]->Civilization].c_str());
 				}

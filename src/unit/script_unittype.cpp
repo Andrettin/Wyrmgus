@@ -730,6 +730,9 @@ static int CclDefineUnitType(lua_State *l)
 			for (unsigned int i = 0; i < UnitTypeMax; ++i) {
 				type->Drops[i] = parent_type->Drops[i];
 			}
+			for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
+				type->Traits.push_back(parent_type->Traits[i]);
+			}
 			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
 				if (parent_type->VarInfo[var_n]) {
 					VariationInfo *var = new VariationInfo;
@@ -2067,6 +2070,12 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "incorrect drop unit-type");
 				}
 			}
+		} else if (!strcmp(value, "Traits")) {
+			type->Traits.clear(); // remove previously defined traits, to allow unit types to not inherit traits from their parent unit types
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				type->Traits.push_back(LuaToString(l, -1, j + 1));
+			}
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
@@ -2681,6 +2690,14 @@ static int CclGetUnitTypeData(lua_State *l)
 					}
 				}
 			}
+		}
+		return 1;
+	} else if (!strcmp(data, "Traits")) {
+		lua_createtable(l, type->Traits.size(), 0);
+		for (size_t i = 1; i <= type->Traits.size(); ++i)
+		{
+			lua_pushstring(l, type->Traits[i-1].c_str());
+			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else {

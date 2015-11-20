@@ -1687,6 +1687,14 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}
+		} else if (!strcmp(value, "Trait")) {
+			std::string trait_ident = LuaToString(l, -1);
+			int upgrade_id = UpgradeIdByIdent(trait_ident);
+			if (upgrade_id != -1) {
+				hero->Trait = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+			} else {
+				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
+			}
 		} else if (!strcmp(value, "Year")) {
 			hero->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DeathYear")) {
@@ -1727,6 +1735,18 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			hero->Generated = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	if (hero->Trait == NULL) { //if no trait was set, have the hero be the same trait as the unit type (if the unit type has it predefined)
+		if (hero->DefaultType != NULL && hero->DefaultType->Traits.size() > 0) {
+			std::string trait_ident = hero->DefaultType->Traits[SyncRand(hero->DefaultType->Traits.size())];
+			int upgrade_id = UpgradeIdByIdent(trait_ident);
+			if (upgrade_id != -1) {
+				hero->Trait = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+			} else {
+				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
+			}
 		}
 	}
 	

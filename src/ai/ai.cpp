@@ -457,6 +457,13 @@ void AiInit(CPlayer &player)
 	DebugPrint("%d - looking for class %s\n" _C_ player.Index _C_ player.AiName.c_str());
 	//MAPTODO print the player name (player->Name) instead of the pointer
 
+	//Wyrmgus start
+	//if doesn't have a faction, set a random one for the AI
+	if (player.Faction == -1 && !GrandStrategy) {
+		player.SetRandomFaction();
+	}
+	//Wyrmgus end
+	
 	//  Search correct AI type.
 	if (AiTypes.empty()) {
 		DebugPrint("AI: Got no scripts at all! You need at least one dummy fallback script.\n");
