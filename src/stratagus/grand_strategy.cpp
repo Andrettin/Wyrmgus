@@ -3329,7 +3329,7 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 		}
 		
-		if (this == GrandStrategyGame.PlayerFaction) {
+		if (this == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized) {
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
