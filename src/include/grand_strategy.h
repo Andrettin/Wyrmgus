@@ -314,6 +314,9 @@ public:
 	void Create();
 	void Die();
 	int GetAdministrativeEfficiencyModifier();
+	bool IsParentOf(std::string child_full_name);
+	bool IsChildOf(std::string parent_full_name);
+	bool IsSiblingOf(std::string sibling_full_name);
 	std::string GetFullName();
 	std::string GetRulerEffectsString();
 	
@@ -335,6 +338,7 @@ public:
 	CGrandStrategyHero *Father;					/// Hero's father
 	CGrandStrategyHero *Mother;					/// Hero's mother
 	std::vector<CGrandStrategyHero *> Children;	/// Children of the hero
+	std::vector<CGrandStrategyHero *> Siblings;	/// Siblings of the hero
 };
 
 /**

@@ -3355,12 +3355,24 @@ void CGrandStrategyFaction::RulerSuccession()
 				return;
 			}
 		}
-		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) { //check again, but now allow for inheritance regardless of gender
+		for (size_t i = 0; i < this->Ruler->Siblings.size(); ++i) { // now check for male siblings of the current ruler
+			if (this->Ruler->Siblings[i]->State != 0 && this->Ruler->Siblings[i]->Gender == MaleGender) {
+				this->SetRuler(this->Ruler->Siblings[i]->GetFullName());
+				return;
+			}
+		}		
+		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) { //check again for children, but now allow for inheritance regardless of gender
 			if (this->Ruler->Children[i]->State != 0) {
 				this->SetRuler(this->Ruler->Children[i]->GetFullName());
 				return;
 			}
 		}
+		for (size_t i = 0; i < this->Ruler->Siblings.size(); ++i) { //check again for siblings, but now allow for inheritance regardless of gender
+			if (this->Ruler->Siblings[i]->State != 0) {
+				this->SetRuler(this->Ruler->Siblings[i]->GetFullName());
+				return;
+			}
+		}		
 	}
 	
 	std::vector<CGrandStrategyHero *> ruler_candidates;
@@ -3765,6 +3777,34 @@ int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
 	}
 	
 	return modifier;
+}
+
+bool CGrandStrategyHero::IsParentOf(std::string child_full_name)
+{
+	for (size_t i = 0; i < this->Children.size(); ++i) {
+		if (this->Children[i]->GetFullName() == child_full_name) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CGrandStrategyHero::IsChildOf(std::string parent_full_name)
+{
+	if ((this->Father != NULL && this->Father->GetFullName() == parent_full_name) || (this->Mother != NULL && this->Mother->GetFullName() == parent_full_name)) {
+		return true;
+	}
+	return false;
+}
+
+bool CGrandStrategyHero::IsSiblingOf(std::string sibling_full_name)
+{
+	for (size_t i = 0; i < this->Siblings.size(); ++i) {
+		if (this->Siblings[i]->GetFullName() == sibling_full_name) {
+			return true;
+		}
+	}
+	return false;
 }
 
 std::string CGrandStrategyHero::GetFullName()
@@ -5198,6 +5238,13 @@ void CleanGrandStrategyGame()
 				++j;
 			}
 		}
+		for (size_t j = 0; j < GrandStrategyGame.Heroes[i]->Siblings.size();) {
+			if (GrandStrategyGame.Heroes[i]->Siblings[j]->Generated) { //remove siblings generated during gameplay
+				GrandStrategyGame.Heroes[i]->Siblings.erase(GrandStrategyGame.Heroes[i]->Siblings.begin() + j);
+			} else {
+				++j;
+			}
+		}
 		if (GrandStrategyGame.Heroes[i]->Father && GrandStrategyGame.Heroes[i]->Father->Generated) {
 			GrandStrategyGame.Heroes[i]->Father = NULL;
 		}
@@ -5543,11 +5590,6 @@ void InitializeGrandStrategyGame()
 	for (int i = 0; i < MaxCosts; ++i) {
 		GrandStrategyGame.CommodityPrices[i] = DefaultResourcePrices[i];
 	}
-	
-	//set hero unit types to their default type
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-		GrandStrategyGame.Heroes[i]->Initialize();
-	}
 }
 
 void InitializeGrandStrategyMinimap()
@@ -5607,6 +5649,11 @@ void InitializeGrandStrategyMinimap()
 
 void InitializeGrandStrategyFactions()
 {
+	//set hero unit types to their default type
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		GrandStrategyGame.Heroes[i]->Initialize();
+	}
+	
 	// allocate labor for provinces
 	for (int i = 0; i < GrandStrategyGame.ProvinceCount; ++i) {
 		if (GrandStrategyGame.Provinces[i] && !GrandStrategyGame.Provinces[i]->Name.empty()) { //if this is a valid province

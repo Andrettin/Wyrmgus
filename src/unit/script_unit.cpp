@@ -1709,7 +1709,20 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			if (father) {
 				if (father->Gender == MaleGender) {
 					hero->Father = const_cast<CGrandStrategyHero *>(&(*father));
-					father->Children.push_back(hero);
+					if (!father->IsParentOf(hero_full_name)) { //check whether the hero has already been set as a child of the father
+						father->Children.push_back(hero);
+					}
+					// see if the father's other children aren't already included in the hero's siblings, and if they aren't, add them (and add the hero to the siblings' sibling list, of course)
+					for (size_t i = 0; i < father->Children.size(); ++i) {
+						if (father->Children[i]->GetFullName() != hero_full_name) {
+							if (!hero->IsSiblingOf(father->Children[i]->GetFullName())) {
+								hero->Siblings.push_back(father->Children[i]);
+							}
+							if (!father->Children[i]->IsSiblingOf(hero_full_name)) {
+								father->Children[i]->Siblings.push_back(hero);
+							}
+						}
+					}
 				} else {
 					LuaError(l, "Hero \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_name.c_str() _C_ hero_full_name.c_str());
 				}
@@ -1722,7 +1735,20 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			if (mother) {
 				if (mother->Gender == FemaleGender) {
 					hero->Mother = const_cast<CGrandStrategyHero *>(&(*mother));
-					mother->Children.push_back(hero);
+					if (!mother->IsParentOf(hero_full_name)) { //check whether the hero has already been set as a child of the mother
+						mother->Children.push_back(hero);
+					}
+					// see if the mother's other children aren't already included in the hero's siblings, and if they aren't, add them (and add the hero to the siblings' sibling list, of course)
+					for (size_t i = 0; i < mother->Children.size(); ++i) {
+						if (mother->Children[i]->GetFullName() != hero_full_name) {
+							if (!hero->IsSiblingOf(mother->Children[i]->GetFullName())) {
+								hero->Siblings.push_back(mother->Children[i]);
+							}
+							if (!mother->Children[i]->IsSiblingOf(hero_full_name)) {
+								mother->Children[i]->Siblings.push_back(hero);
+							}
+						}
+					}
 				} else {
 					LuaError(l, "Hero \"%s\" set to be the biological mother of \"%s\", but isn't female." _C_ mother_name.c_str() _C_ hero_full_name.c_str());
 				}
