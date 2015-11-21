@@ -1150,8 +1150,8 @@ std::string EvalString(const StringDesc *s)
 			}
 		case EString_UnitTrait : // name of the unit's trait
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && !unit->Trait.empty()) {
-				return CUpgrade::Get(unit->Trait)->Name;
+			if (unit != NULL && unit->Trait != NULL) {
+				return unit->Trait->Name;
 			} else {
 				return std::string("");
 			}

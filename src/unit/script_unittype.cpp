@@ -2074,7 +2074,13 @@ static int CclDefineUnitType(lua_State *l)
 			type->Traits.clear(); // remove previously defined traits, to allow unit types to not inherit traits from their parent unit types
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				type->Traits.push_back(LuaToString(l, -1, j + 1));
+				std::string trait_ident = LuaToString(l, -1, j + 1);
+				int trait_id = UpgradeIdByIdent(trait_ident);
+				if (trait_id != -1) {
+					type->Traits.push_back(AllUpgrades[trait_id]);
+				} else {
+					type->Traits.push_back(CUpgrade::New(trait_ident)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+				}
 			}
 		//Wyrmgus end
 		} else {
@@ -2696,7 +2702,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->Traits.size(), 0);
 		for (size_t i = 1; i <= type->Traits.size(); ++i)
 		{
-			lua_pushstring(l, type->Traits[i-1].c_str());
+			lua_pushstring(l, type->Traits[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

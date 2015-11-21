@@ -365,7 +365,7 @@ public:
 	CUnitColors *Colors;    /// Player colors
 	//Wyrmgus start
 	std::string Name;	/// Unit's personal name (if any)
-	std::string Trait;	/// Unit's trait
+	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
 	int Formation;      /// Which formation this unit has
 	bool LearnedAbilities[UpgradeMax];      /// individual upgrades which the unit has

@@ -1416,7 +1416,7 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Name")) {
 		lua_pushstring(l, unit->Name.c_str());
 	} else if (!strcmp(value, "Trait")) {
-		lua_pushstring(l, unit->Trait.c_str());
+		lua_pushstring(l, unit->Trait->Ident.c_str());
 	} else if (!strcmp(value, "Icon")) {
 		VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
 		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
@@ -1766,13 +1766,7 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 	
 	if (hero->Trait == NULL) { //if no trait was set, have the hero be the same trait as the unit type (if the unit type has it predefined)
 		if (hero->DefaultType != NULL && hero->DefaultType->Traits.size() > 0) {
-			std::string trait_ident = hero->DefaultType->Traits[SyncRand(hero->DefaultType->Traits.size())];
-			int upgrade_id = UpgradeIdByIdent(trait_ident);
-			if (upgrade_id != -1) {
-				hero->Trait = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
-			} else {
-				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
-			}
+			hero->Trait = const_cast<CUpgrade *>(&(*hero->DefaultType->Traits[SyncRand(hero->DefaultType->Traits.size())]));
 		}
 	}
 	

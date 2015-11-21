@@ -687,7 +687,7 @@ public:
 	std::string PersonalNamePrefixes[PersonalNameMax];	/// personal name prefixes
 	std::string PersonalNameSuffixes[PersonalNameMax];	/// personal name suffixes
 	bool Drops[UnitTypeMax];		/// Units spawned upon death (i.e. items).
-	std::vector<std::string> Traits;	/// Which traits this unit type can have
+	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files

@@ -436,6 +436,9 @@ void CUnit::Init()
 	Type = NULL;
 	Player = NULL;
 	Stats = NULL;
+	//Wyrmgus start
+	Trait = NULL;
+	//Wyrmgus end
 	CurrentSightRange = 0;
 
 	pathFinderData = new PathFinderData;
@@ -543,6 +546,9 @@ void CUnit::Release(bool final)
 	//
 
 	Type = NULL;
+	//Wyrmgus start
+	Trait = NULL;
+	//Wyrmgus end
 
 	delete pathFinderData;
 	delete[] AutoCastSpell;
@@ -845,7 +851,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	//Wyrmgus start
 	// generate a trait for the unit, if any are available (only if the editor isn't running)
 	if (Editor.Running == EditorNotRunning && unit->Type->Traits.size() > 0) {
-		TraitAcquire(*unit, AllUpgrades[UpgradeIdByIdent(unit->Type->Traits[SyncRand(unit->Type->Traits.size())])]);
+		TraitAcquire(*unit, unit->Type->Traits[SyncRand(unit->Type->Traits.size())]);
 	}
 	//Wyrmgus end
 	
