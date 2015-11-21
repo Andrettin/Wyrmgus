@@ -236,6 +236,20 @@ static void AnimateActionTrain(CUnit &unit)
 	//Wyrmgus end
 	const CUnitType &nType = *this->Type;
 	const int cost = nType.Stats[player.Index].Costs[TimeCost];
+	
+	//Wyrmgus start
+	// Check if enough supply available.
+	const int food = player.CheckLimits(nType);
+	if (food < 0) {
+		if (food == -3 && player.AiEnabled) {
+			AiNeedMoreSupply(player);
+		}
+		this->Ticks = 0;
+		unit.Wait = CYCLES_PER_SECOND / 6;
+		return ;
+	}
+	//Wyrmgus end
+	
 	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
 
 	if (this->Ticks < cost) {
@@ -244,6 +258,9 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	this->Ticks = std::min(this->Ticks, cost);
 
+	//Wyrmgus start
+	// food check should be before changing the ticks
+	/*
 	// Check if enough supply available.
 	const int food = player.CheckLimits(nType);
 	if (food < 0) {
@@ -253,6 +270,8 @@ static void AnimateActionTrain(CUnit &unit)
 		unit.Wait = CYCLES_PER_SECOND / 6;
 		return ;
 	}
+	*/
+	//Wyrmgus end
 
 	//Wyrmgus start
 	int owner_player = this->Player;
