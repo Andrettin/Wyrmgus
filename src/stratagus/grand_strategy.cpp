@@ -894,12 +894,12 @@ void CGrandStrategyGame::DoTurn()
 	//check if any heroes should begin activity this year
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		if (
-			// for historical personages to appear, they require three things: the year of their historical rise to prominence, ownership of the province in which they were born or raised, and that that province be of the correct culture for them, if they belonged to the cultural majority
+			// for historical personages to appear, they require three things: the year of their historical rise to prominence, ownership of the province in which they were born or raised, and that that province be of the correct culture for them, if they belonged to the cultural majority (or if the civilization of the province's owner is the same as the hero, as undoubtedly administrators and the like would exist from the faction's culture in any of its provinces)
 			this->Heroes[i]->Year == GrandStrategyYear
 			&& this->Heroes[i]->State == 0
 			&& this->Heroes[i]->ProvinceOfOrigin != NULL
 			&& this->Heroes[i]->ProvinceOfOrigin->Owner != NULL
-			&& this->Heroes[i]->ProvinceOfOrigin->Civilization == this->Heroes[i]->Civilization
+			&& (this->Heroes[i]->ProvinceOfOrigin->Civilization == this->Heroes[i]->Civilization || this->Heroes[i]->ProvinceOfOrigin->Owner->Civilization == this->Heroes[i]->Civilization)
 		) {
 			//make heroes appear in their start year
 			this->Heroes[i]->Create();
