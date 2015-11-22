@@ -3463,8 +3463,6 @@ void CGrandStrategyFaction::GenerateRuler()
 	hero->Name = hero_name;
 	hero->ExtraName = hero_extra_name;
 	hero->State = 2;
-	hero->Generated = true;
-	hero->DefaultType = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
 	hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
 	if (hero->Type->Traits.size() > 0) { //generate a trait
 		hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
@@ -3673,7 +3671,11 @@ std::string CGrandStrategyFaction::GetRulerTitle()
 
 void CGrandStrategyHero::Initialize()
 {
-	this->Type = const_cast<CUnitType *>(&(*this->DefaultType));
+	if (this->Trait == NULL) { //if no trait was set, have the hero be the same trait as the unit type (if the unit type has it predefined)
+		if (this->Type != NULL && this->Type->Traits.size() > 0) {
+			this->Trait = const_cast<CUpgrade *>(&(*this->Type->Traits[SyncRand(this->Type->Traits.size())]));
+		}
+	}
 	int province_of_origin_id = GetProvinceId(this->ProvinceOfOriginName);
 	this->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_of_origin_id]));
 }
@@ -3773,35 +3775,7 @@ int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
 	return modifier;
 }
 
-bool CGrandStrategyHero::IsParentOf(std::string child_full_name)
-{
-	for (size_t i = 0; i < this->Children.size(); ++i) {
-		if (this->Children[i]->GetFullName() == child_full_name) {
-			return true;
-		}
-	}
-	return false;
-}
-
-bool CGrandStrategyHero::IsChildOf(std::string parent_full_name)
-{
-	if ((this->Father != NULL && this->Father->GetFullName() == parent_full_name) || (this->Mother != NULL && this->Mother->GetFullName() == parent_full_name)) {
-		return true;
-	}
-	return false;
-}
-
-bool CGrandStrategyHero::IsSiblingOf(std::string sibling_full_name)
-{
-	for (size_t i = 0; i < this->Siblings.size(); ++i) {
-		if (this->Siblings[i]->GetFullName() == sibling_full_name) {
-			return true;
-		}
-	}
-	return false;
-}
-
-std::string CGrandStrategyHero::GetFullName()
+std::string CCharacter::GetFullName()
 {
 	std::string full_name = this->Name;
 	if (!this->ExtraName.empty()) {
@@ -5225,36 +5199,16 @@ void CleanGrandStrategyGame()
 		GrandStrategyGame.Heroes[i]->Province = NULL;
 		GrandStrategyGame.Heroes[i]->Type = NULL;
 		GrandStrategyGame.Heroes[i]->ProvinceOfOrigin = NULL;
-		for (size_t j = 0; j < GrandStrategyGame.Heroes[i]->Children.size();) {
-			if (GrandStrategyGame.Heroes[i]->Children[j]->Generated) { //remove children generated during gameplay
-				GrandStrategyGame.Heroes[i]->Children.erase(GrandStrategyGame.Heroes[i]->Children.begin() + j);
-			} else {
-				++j;
-			}
-		}
-		for (size_t j = 0; j < GrandStrategyGame.Heroes[i]->Siblings.size();) {
-			if (GrandStrategyGame.Heroes[i]->Siblings[j]->Generated) { //remove siblings generated during gameplay
-				GrandStrategyGame.Heroes[i]->Siblings.erase(GrandStrategyGame.Heroes[i]->Siblings.begin() + j);
-			} else {
-				++j;
-			}
-		}
-		if (GrandStrategyGame.Heroes[i]->Father && GrandStrategyGame.Heroes[i]->Father->Generated) {
-			GrandStrategyGame.Heroes[i]->Father = NULL;
-		}
-		if (GrandStrategyGame.Heroes[i]->Mother && GrandStrategyGame.Heroes[i]->Mother->Generated) {
-			GrandStrategyGame.Heroes[i]->Mother = NULL;
-		}
+		GrandStrategyGame.Heroes[i]->Children.clear();
+		GrandStrategyGame.Heroes[i]->Siblings.clear();
+		GrandStrategyGame.Heroes[i]->Father = NULL;
+		GrandStrategyGame.Heroes[i]->Mother = NULL;
 	}
 
-	for (size_t i = 0; i < GrandStrategyGame.Heroes.size();) {
-		if (GrandStrategyGame.Heroes[i]->Generated) { //if hero was generated during the game, delete it
-			delete GrandStrategyGame.Heroes[i];
-			GrandStrategyGame.Heroes.erase(GrandStrategyGame.Heroes.begin() + i);
-		} else {
-			++i;
-		}
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		delete GrandStrategyGame.Heroes[i];
 	}
+	GrandStrategyGame.Heroes.clear();
 	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
@@ -5584,6 +5538,43 @@ void InitializeGrandStrategyGame()
 	for (int i = 0; i < MaxCosts; ++i) {
 		GrandStrategyGame.CommodityPrices[i] = DefaultResourcePrices[i];
 	}
+	
+	//initialize heroes
+	for (size_t i = 0; i < Characters.size(); ++i) {
+		CGrandStrategyHero *hero = new CGrandStrategyHero;
+		GrandStrategyGame.Heroes.push_back(hero);
+		hero->Name = Characters[i]->Name;
+		hero->ExtraName = Characters[i]->ExtraName;
+		hero->Dynasty = Characters[i]->Dynasty;
+		if (Characters[i]->Type != NULL) {
+			hero->Type = const_cast<CUnitType *>(&(*Characters[i]->Type));
+		}
+		if (Characters[i]->Trait != NULL) {
+			hero->Trait = const_cast<CUpgrade *>(&(*Characters[i]->Trait));
+		} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
+			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
+		}
+		hero->Year = Characters[i]->Year;
+		hero->DeathYear = Characters[i]->DeathYear;
+		hero->Civilization = Characters[i]->Civilization;
+		hero->ProvinceOfOriginName = Characters[i]->ProvinceOfOriginName;
+		hero->Gender = Characters[i]->Gender;
+		if (Characters[i]->Father != NULL) {
+			hero->Father = const_cast<CGrandStrategyHero *>(&(*GrandStrategyGame.GetHero(Characters[i]->Father->GetFullName())));
+			hero->Father->Children.push_back(hero);
+		}
+		if (Characters[i]->Mother != NULL) {
+			hero->Mother = const_cast<CGrandStrategyHero *>(&(*GrandStrategyGame.GetHero(Characters[i]->Mother->GetFullName())));
+			hero->Mother->Children.push_back(hero);
+		}
+		for (size_t j = 0; j < Characters[i]->Siblings.size(); ++j) { // now check for male siblings of the current ruler
+			CGrandStrategyHero *sibling = GrandStrategyGame.GetHero(Characters[i]->Siblings[j]->GetFullName());
+			if (sibling != NULL) {
+				hero->Siblings.push_back(sibling);
+				sibling->Siblings.push_back(hero); //when the sibling was defined, the hero wasn't, since by virtue of not being NULL, the sibling was necessarily defined before the hero
+			}
+		}
+	}
 }
 
 void InitializeGrandStrategyMinimap()
@@ -5643,7 +5634,7 @@ void InitializeGrandStrategyMinimap()
 
 void InitializeGrandStrategyFactions()
 {
-	//set hero unit types to their default type
+	//initialize heroes
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		GrandStrategyGame.Heroes[i]->Initialize();
 	}

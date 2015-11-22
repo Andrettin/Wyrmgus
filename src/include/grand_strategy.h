@@ -39,6 +39,7 @@
 #include "vec2i.h"
 #include "video.h"
 #include "player.h"
+#include "unit.h"
 #include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
@@ -298,14 +299,12 @@ public:
 	std::string CulturalNames[MAX_RACES];								/// Names for the river for each different culture/civilization
 };
 
-class CGrandStrategyHero
+class CGrandStrategyHero : public CCharacter
 {
 public:
-	CGrandStrategyHero() :
-		State(0), Year(0), DeathYear(0), Civilization(-1), Gender(0),
-		Generated(false),
-		Name(""), ExtraName(""), Dynasty(""), ProvinceOfOriginName(""),
-		DefaultType(NULL), Type(NULL), Trait(NULL), Province(NULL), ProvinceOfOrigin(NULL),
+	CGrandStrategyHero() : CCharacter(),
+		State(0),
+		Province(NULL), ProvinceOfOrigin(NULL),
 		Father(NULL), Mother(NULL)
 	{
 	}
@@ -314,31 +313,15 @@ public:
 	void Create();
 	void Die();
 	int GetAdministrativeEfficiencyModifier();
-	bool IsParentOf(std::string child_full_name);
-	bool IsChildOf(std::string parent_full_name);
-	bool IsSiblingOf(std::string sibling_full_name);
-	std::string GetFullName();
 	std::string GetRulerEffectsString();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province
-	int Year;			/// Year in which the hero historically starts being active
-	int DeathYear;		/// Year in which the hero dies of natural causes
-	int Civilization;	/// Culture to which the hero belongs
-	int Gender;			/// Hero's gender
-	bool Generated;		/// Whether the hero has been generated during gameplay or is a preset hero
-	std::string Name;	/// Given name of the hero
-	std::string ExtraName;	/// Extra given names of the hero (used if necessary to differentiate from existing heroes)
-	std::string Dynasty;	/// Name of the hero's dynasty
-	std::string ProvinceOfOriginName;	/// Name of the province from which the hero originates
-	CUnitType *DefaultType;
-	CUnitType *Type;
-	CUpgrade *Trait;
 	CProvince *Province;
 	CProvince *ProvinceOfOrigin;	/// Province from which the hero originates
-	CGrandStrategyHero *Father;					/// Hero's father
-	CGrandStrategyHero *Mother;					/// Hero's mother
-	std::vector<CGrandStrategyHero *> Children;	/// Children of the hero
-	std::vector<CGrandStrategyHero *> Siblings;	/// Siblings of the hero
+	CGrandStrategyHero *Father;			/// Character's father
+	CGrandStrategyHero *Mother;					/// Character's mother
+	std::vector<CGrandStrategyHero *> Children;	/// Children of the character
+	std::vector<CGrandStrategyHero *> Siblings;	/// Siblings of the character
 };
 
 /**

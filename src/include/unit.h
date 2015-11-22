@@ -507,6 +507,40 @@ public:
 
 extern CPreference Preference;
 
+//Wyrmgus start
+class CCharacter
+{
+public:
+	CCharacter() :
+		Year(0), DeathYear(0), Civilization(-1), Gender(0),
+		Name(""), ExtraName(""), Dynasty(""), ProvinceOfOriginName(""),
+		Type(NULL), Trait(NULL),
+		Father(NULL), Mother(NULL)
+	{
+	}
+	
+	bool IsParentOf(std::string child_full_name);
+	bool IsChildOf(std::string parent_full_name);
+	bool IsSiblingOf(std::string sibling_full_name);
+	std::string GetFullName();
+	
+	int Year;			/// Year in which the hero historically starts being active
+	int DeathYear;		/// Year in which the hero dies of natural causes
+	int Civilization;	/// Culture to which the hero belongs
+	int Gender;			/// Hero's gender
+	std::string Name;	/// Given name of the hero
+	std::string ExtraName;	/// Extra given names of the hero (used if necessary to differentiate from existing heroes)
+	std::string Dynasty;	/// Name of the hero's dynasty
+	std::string ProvinceOfOriginName;	/// Name of the province from which the hero originates
+	CUnitType *Type;
+	CUpgrade *Trait;
+	CCharacter *Father;					/// Character's father
+	CCharacter *Mother;					/// Character's mother
+	std::vector<CCharacter *> Children;	/// Children of the character
+	std::vector<CCharacter *> Siblings;	/// Siblings of the character
+};
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
@@ -526,6 +560,10 @@ extern void (*DrawSelection)(IntColor, int, int, int, int);
 
 extern unsigned int MaxSelectable;    /// How many units could be selected
 extern std::vector<CUnit *> Selected; /// currently selected units
+//Wyrmgus start
+extern CCharacter *GetCharacter(std::string character_full_name);
+extern std::vector<CCharacter *> Characters;
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 -- Functions

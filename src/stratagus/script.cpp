@@ -2808,7 +2808,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 		}
 		
 		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) { //save the generated heroes
-			if (GrandStrategyGame.Heroes[i]->Generated) {
+			if (GetCharacter(GrandStrategyGame.Heroes[i]->GetFullName()) == NULL) { // if hero has no character equivalent, then it was generated during grand strategy gameplay, and needs to be defined in the save game
 				fprintf(fd, "DefineGrandStrategyHero(\"%s\", {\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str());
 				fprintf(fd, "\tName = \"%s\",\n", GrandStrategyGame.Heroes[i]->Name.c_str());
 				if (!GrandStrategyGame.Heroes[i]->ExtraName.empty()) {
@@ -2820,8 +2820,8 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Heroes[i]->Gender != NoGender) {
 					fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(GrandStrategyGame.Heroes[i]->Gender).c_str());
 				}
-				if (GrandStrategyGame.Heroes[i]->DefaultType != NULL) {
-					fprintf(fd, "\tDefaultType = \"%s\",\n", GrandStrategyGame.Heroes[i]->DefaultType->Ident.c_str());
+				if (GrandStrategyGame.Heroes[i]->Type != NULL) {
+					fprintf(fd, "\tType = \"%s\",\n", GrandStrategyGame.Heroes[i]->Type->Ident.c_str());
 				}
 				if (GrandStrategyGame.Heroes[i]->Trait != NULL) {
 					fprintf(fd, "\tTrait = \"%s\",\n", GrandStrategyGame.Heroes[i]->Trait->Ident.c_str());
@@ -2844,7 +2844,6 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Heroes[i]->Mother != NULL) {
 					fprintf(fd, "\tMother = \"%s\",\n", GrandStrategyGame.Heroes[i]->Mother->GetFullName().c_str());
 				}
-				fprintf(fd, "\tGenerated = true\n");
 				fprintf(fd, "})\n");
 			}
 		}
