@@ -5544,6 +5544,9 @@ void InitializeGrandStrategyGame()
 	
 	//initialize heroes
 	for (size_t i = 0; i < Characters.size(); ++i) {
+		if (Characters[i]->Civilization == -1 || Characters[i]->Year == 0 || Characters[i]->DeathYear == 0 || Characters[i]->ProvinceOfOriginName.empty()) {
+			continue;
+		}
 		CGrandStrategyHero *hero = new CGrandStrategyHero;
 		GrandStrategyGame.Heroes.push_back(hero);
 		hero->Name = Characters[i]->Name;
