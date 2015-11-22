@@ -3688,6 +3688,7 @@ void CGrandStrategyHero::Create()
 		&& this->ProvinceOfOrigin->Owner != NULL
 		&& this->ProvinceOfOrigin->Owner == GrandStrategyGame.PlayerFaction
 		&& this->Type->BoolFlag[HERO_INDEX].value
+		&& GrandStrategyGameInitialized
 	) {
 		char buf[256];
 		snprintf(
@@ -3708,28 +3709,30 @@ void CGrandStrategyHero::Create()
 void CGrandStrategyHero::Die()
 {
 	//show message that the hero has died
-	if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ruler == this) {
-		char buf[256];
-		snprintf(
-			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-			(GrandStrategyGame.PlayerFaction->GetRulerTitle() + " " + this->GetFullName() + " Dies").c_str(),
-			("Tragic news spread throughout our realm. Our " + DecapitalizeString(GrandStrategyGame.PlayerFaction->GetRulerTitle()) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
-		);
-		CclCommand(buf);	
-	} else if (
-		this->Province != NULL
-		&& (
-			((this->State == 1 || this->State == 2) && this->Province->Owner == GrandStrategyGame.PlayerFaction)
-			|| (this->State == 3 && this->Province->AttackedBy == GrandStrategyGame.PlayerFaction)
-		)
-	) {
-		char buf[256];
-		snprintf(
-			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-			(this->GetFullName() + " Dies").c_str(),
-			("My lord, the hero " + this->GetFullName() + " has died!").c_str()
-		);
-		CclCommand(buf);	
+	if (GrandStrategyGameInitialized) {
+		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ruler == this) {
+			char buf[256];
+			snprintf(
+				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
+				(GrandStrategyGame.PlayerFaction->GetRulerTitle() + " " + this->GetFullName() + " Dies").c_str(),
+				("Tragic news spread throughout our realm. Our " + DecapitalizeString(GrandStrategyGame.PlayerFaction->GetRulerTitle()) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
+			);
+			CclCommand(buf);	
+		} else if (
+			this->Province != NULL
+			&& (
+				((this->State == 1 || this->State == 2) && this->Province->Owner == GrandStrategyGame.PlayerFaction)
+				|| (this->State == 3 && this->Province->AttackedBy == GrandStrategyGame.PlayerFaction)
+			)
+		) {
+			char buf[256];
+			snprintf(
+				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
+				(this->GetFullName() + " Dies").c_str(),
+				("My lord, the hero " + this->GetFullName() + " has died!").c_str()
+			);
+			CclCommand(buf);	
+		}
 	}
 	
 	if (this->Province != NULL) {
@@ -5637,6 +5640,12 @@ void InitializeGrandStrategyFactions()
 	//initialize heroes
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		GrandStrategyGame.Heroes[i]->Initialize();
+		
+		if (GrandStrategyGame.Heroes[i]->State == 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year && GrandStrategyYear < GrandStrategyGame.Heroes[i]->DeathYear) {
+			GrandStrategyGame.Heroes[i]->Create();
+		} else if (GrandStrategyGame.Heroes[i]->State != 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->DeathYear) {
+			GrandStrategyGame.Heroes[i]->Die();
+		}
 	}
 	
 	// allocate labor for provinces
