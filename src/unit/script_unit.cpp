@@ -1775,6 +1775,10 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 	
+	if (character->GetFullName() != character_full_name) { // if the character's full name (built from its defined elements) is different from the name used to initialize the character, something went wrong
+		LuaError(l, "Character name \"%s\" doesn't match the defined name \"%s\"." _C_ character->GetFullName().c_str() _C_ character_full_name.c_str());
+	}
+	
 	return 0;
 }
 
