@@ -1828,26 +1828,8 @@ void NetworkGamePrepareGameSettings()
 			case 0: {
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
 				int v = ServerSetupState.Race[num[i]];
-				//Wyrmgus start
-//				if (v != 0) {
 				if (v != -1) { //fix civilization selection for multiplayer
-				//Wyrmgus end
-					//Wyrmgus start
-					/*
-					int x = 0;
-
-					for (unsigned int n = 0; n < PlayerRaces.Count; ++n) {
-						if (PlayerRaces.Visible[n]) {
-							if (x + 1 == v) {
-								break;
-							}
-							++x;
-						}
-					}
-					GameSettings.Presets[num[i]].Race = x;
-					*/
 					GameSettings.Presets[num[i]].Race = v;
-					//Wyrmgus end
 				} else {
 					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
 				}

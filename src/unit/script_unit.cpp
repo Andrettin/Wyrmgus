@@ -1666,6 +1666,8 @@ static int CclDefineCharacter(lua_State *l)
 	if (!character) {
 		character = new CCharacter;
 		Characters.push_back(character);
+	} else {
+		LuaError(l, "Character \"%s\" is being redefined." _C_ character_full_name.c_str());
 	}
 	
 	//  Parse the list:
