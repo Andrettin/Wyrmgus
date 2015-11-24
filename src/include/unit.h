@@ -121,7 +121,7 @@ class CUnit
 public:
 	//Wyrmgus start
 //	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
-	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), FormationGoalPos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
 	//Wyrmgus end
 
 	void Init();
@@ -353,7 +353,6 @@ public:
 	Vec2i tilePos; /// Map position X
 	//Wyrmgus start
 	Vec2i RallyPointPos;	/// used for storing the rally point position (where units trained by this unit will be sent to)
-	Vec2i FormationGoalPos; /// used for storing formation position
 	//Wyrmgus end
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)
@@ -373,7 +372,6 @@ public:
 	std::string Name;	/// Unit's personal name (if any)
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
-	int Formation;      /// Which formation this unit has
 	bool LearnedAbilities[UpgradeMax];      /// individual upgrades which the unit has
 	//Wyrmgus end
 
