@@ -314,8 +314,8 @@ public:
 	PixelPos GetMapPixelPosCenter() const;
 	
 	//Wyrmgus start
-	CAnimations *GetAnimations();
-	CConstruction *GetConstruction();
+	CAnimations *GetAnimations() const;
+	CConstruction *GetConstruction() const;
 	//Wyrmgus end
 
 public:
@@ -373,8 +373,8 @@ public:
 	std::string Name;	/// Unit's personal name (if any)
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
-	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 	//Wyrmgus end
+	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 
 	signed char IX;         /// X image displacement to map position
 	signed char IY;         /// Y image displacement to map position

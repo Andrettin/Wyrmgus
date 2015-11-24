@@ -2626,23 +2626,23 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 }
 
 //Wyrmgus start
-CAnimations *CUnit::GetAnimations()
+CAnimations *CUnit::GetAnimations() const
 {
-	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+	VariationInfo *varinfo = Type->VarInfo[Variation];
 	if (varinfo && varinfo->Animations) {
 		return varinfo->Animations;
 	} else {
-		return this->Type->Animations;
+		return Type->Animations;
 	}
 }
 
-CConstruction *CUnit::GetConstruction()
+CConstruction *CUnit::GetConstruction() const
 {
-	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+	VariationInfo *varinfo = Type->VarInfo[Variation];
 	if (varinfo && varinfo->Construction) {
 		return varinfo->Construction;
 	} else {
-		return this->Type->Construction;
+		return Type->Construction;
 	}
 }
 //Wyrmgus end

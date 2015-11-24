@@ -98,7 +98,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged)
 	UnitShowAnimation(unit, unit.Type->Animations->Attack);
 	*/
 	if (ranged && unit.GetAnimations() && unit.GetAnimations()->RangedAttack) {
-		UnitShowAnimation(unit, unit.GetAnimations());
+		UnitShowAnimation(unit, unit.GetAnimations()->RangedAttack);
 	} else {
 		if (!unit.GetAnimations() || !unit.GetAnimations()->Attack) {
 			order.OnAnimationAttack(unit);
