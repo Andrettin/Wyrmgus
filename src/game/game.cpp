@@ -641,10 +641,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (unit.Type->GivesResource) {
 				f->printf("SetResourcesHeld(unit, %d)\n", unit.ResourcesHeld);
 			}
-			//Wyrmgus start
 			if (!unit.Active) { //Active is true by default
-				f->printf("SetUnitActive(unit, false)\n");
+				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 			}
+			//Wyrmgus start
 			if (unit.Name != unit.Type->DefaultName) {
 				f->printf("SetUnitName(unit, \"%s\")\n", unit.Name.c_str());
 			}

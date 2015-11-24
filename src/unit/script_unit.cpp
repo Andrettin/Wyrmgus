@@ -552,11 +552,9 @@ static int CclUnit(lua_State *l)
 				DebugPrint("HACK: the building is not ready yet\n");
 				// HACK: the building is not ready yet
 				unit->Player->UnitTypesCount[type->Slot]--;
-				//Wyrmgus start
 				if (unit->Active) {
 					unit->Player->UnitTypesAiActiveCount[type->Slot]--;
 				}
-				//Wyrmgus end
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_rawgeti(l, 2, j + 1);
@@ -1435,6 +1433,9 @@ static int CclGetUnitVariable(lua_State *l)
 			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 		}
 		return 1;
+	} else if (!strcmp(value, "Active")) {
+		lua_pushboolean(l, unit->Active);
+		return 1;
 	} else if (!strcmp(value, "Idle")) {
 		lua_pushboolean(l, unit->IsIdle());
 		return 1;
@@ -1498,6 +1499,19 @@ static int CclSetUnitVariable(lua_State *l)
 		} else {
 			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 		}
+	} else if (!strcmp(name, "Active")) {
+		bool ai_active = LuaToBoolean(l, 3);
+		if (ai_active != unit->Active) {
+			if (ai_active) {
+				unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]++;
+			} else {
+				unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]--;
+				if (unit->Player->UnitTypesAiActiveCount[unit->Type->Slot] < 0) { // if unit AI active count is negative, something wrong happened
+					fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->Index, unit->Type->Ident.c_str(), unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]);
+				}
+			}
+		}
+		unit->Active = ai_active;
 	//Wyrmgus start
 	} else if (!strcmp(name, "Variation")) {
 		value = LuaToNumber(l, 3);
@@ -1587,38 +1601,6 @@ static int CclSetUnitName(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	unit->Name = LuaToString(l, 2);
-
-	return 0;
-}
-
-/**
-**  Set whether the unit is active for the AI or not.
-**
-**  @param l  Lua state.
-*/
-static int CclSetUnitActive(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-
-	if (lua_isnil(l, 1)) {
-		return 0;
-	}
-	
-	lua_pushvalue(l, 1);
-	CUnit *unit = CclGetUnit(l);
-	lua_pop(l, 1);
-	bool ai_active = LuaToBoolean(l, 2);
-	if (ai_active != unit->Active) {
-		if (ai_active) {
-			unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]++;
-		} else {
-			unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]--;
-			if (unit->Player->UnitTypesAiActiveCount[unit->Type->Slot] < 0) { // if unit AI active count is negative, something wrong happened
-				fprintf(stderr, "Player %d has a negative %s AI active count of %d.\n", unit->Player->Index, unit->Type->Ident.c_str(), unit->Player->UnitTypesAiActiveCount[unit->Type->Slot]);
-			}
-		}
-	}
-	unit->Active = ai_active;
 
 	return 0;
 }
@@ -1919,7 +1901,6 @@ void UnitCclRegister()
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
 	//Wyrmgus start
 	lua_register(Lua, "SetUnitName", CclSetUnitName);
-	lua_register(Lua, "SetUnitActive", CclSetUnitActive);
 	lua_register(Lua, "DefineCharacter", CclDefineCharacter);
 	lua_register(Lua, "DefineGrandStrategyHero", CclDefineGrandStrategyHero);
 	//Wyrmgus end

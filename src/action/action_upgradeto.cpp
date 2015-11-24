@@ -112,12 +112,10 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	CPlayer &player = *unit.Player;
 	player.UnitTypesCount[oldtype.Slot]--;
 	player.UnitTypesCount[newtype.Slot]++;
-	//Wyrmgus start
 	if (unit.Active) {
 		player.UnitTypesAiActiveCount[oldtype.Slot]--;
 		player.UnitTypesAiActiveCount[newtype.Slot]++;
 	}
-	//Wyrmgus end
 
 	//Wyrmgus start
 //	player.Demand += newtype.Demand - oldtype.Demand;

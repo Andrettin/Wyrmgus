@@ -764,10 +764,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			}
 		}
 		player.UnitTypesCount[type.Slot]++;
-		//Wyrmgus start
 		if (Active) {
 			player.UnitTypesAiActiveCount[type.Slot]++;
 		}
+		//Wyrmgus start
 //		player.Demand += type.Demand; // food needed
 		player.Demand += type.Stats[player.Index].Variables[DEMAND_INDEX].Value; // food needed
 		//Wyrmgus end
@@ -1480,11 +1480,9 @@ void UnitLost(CUnit &unit)
 		}
 		if (unit.CurrentAction() != UnitActionBuilt) {
 			player.UnitTypesCount[type.Slot]--;
-			//Wyrmgus start
 			if (unit.Active) {
 				player.UnitTypesAiActiveCount[type.Slot]--;
 			}
-			//Wyrmgus end
 		}
 	}
 
@@ -2061,11 +2059,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 		newplayer.NumBuildings++;
 	}
 	newplayer.UnitTypesCount[Type->Slot]++;
-	//Wyrmgus start
 	if (Active) {
 		newplayer.UnitTypesAiActiveCount[Type->Slot]++;
 	}
-	//Wyrmgus end
 
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {

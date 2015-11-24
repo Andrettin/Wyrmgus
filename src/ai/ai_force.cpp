@@ -579,10 +579,7 @@ bool AiForceManager::Assign(CUnit &unit, int force)
 void AiForceManager::CheckUnits(int *counter)
 {
 	int attacking[UnitTypeMax];
-	//Wyrmgus start
-//	const int *unit_types_count = AiPlayer->Player->UnitTypesCount;
 	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
-	//Wyrmgus end
 
 	memset(attacking, 0, sizeof(attacking));
 
