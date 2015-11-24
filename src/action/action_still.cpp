@@ -356,7 +356,7 @@ static bool Breed(CUnit &unit)
 		return false;
 	}
 
-	if (unit.LearnedAbilities[CUpgrade::Get(unit.Type->ChildUpgrade)->ID]) { //children can't reproduce
+	if (unit.IndividualUpgrades[CUpgrade::Get(unit.Type->ChildUpgrade)->ID]) { //children can't reproduce
 		return false;
 	}
 	

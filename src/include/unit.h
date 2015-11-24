@@ -372,7 +372,7 @@ public:
 	std::string Name;	/// Unit's personal name (if any)
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
-	bool LearnedAbilities[UpgradeMax];      /// individual upgrades which the unit has
+	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 	//Wyrmgus end
 
 	signed char IX;         /// X image displacement to map position

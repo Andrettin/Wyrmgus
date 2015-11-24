@@ -426,8 +426,8 @@ extern bool ButtonCheckFalse(const CUnit &unit, const ButtonAction &button);
 /// Check if allowed upgrade is ready
 extern bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button);
 //Wyrmgus start
-/// Check if allowed ability is ready
-extern bool ButtonCheckAbility(const CUnit &unit, const ButtonAction &button);
+/// Check if unit has an individual upgrade
+extern bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button);
 //Wyrmgus end
 /// Check if unit's variables pass the condition check
 extern bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button);

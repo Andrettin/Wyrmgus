@@ -97,16 +97,16 @@ bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 
 //Wyrmgus start
 /**
-**  Check for button enabled, if upgrade is ready.
+**  Check for button enabled, if unit has an individual upgrade.
 **
 **  @param unit    Pointer to unit for button.
 **  @param button  Pointer to button to check/enable.
 **
 **  @return        True if enabled.
 */
-bool ButtonCheckAbility(const CUnit &unit, const ButtonAction &button)
+bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button)
 {
-	return unit.LearnedAbilities[UpgradeIdByIdent(button.AllowStr)];
+	return unit.IndividualUpgrades[UpgradeIdByIdent(button.AllowStr)];
 }
 //Wyrmgus end
 

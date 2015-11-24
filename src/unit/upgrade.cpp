@@ -966,11 +966,11 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								}
 								bool UpgradesCheck = true;
 								for (int u = 0; u < VariationMax; ++u) {
-									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
 										UpgradesCheck = false;
 										break;
 									}
-									if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+									if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
 										UpgradesCheck = false;
 										break;
 									}
@@ -1227,11 +1227,11 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								}
 								bool UpgradesCheck = true;
 								for (int u = 0; u < VariationMax; ++u) {
-									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
 										UpgradesCheck = false;
 										break;
 									}
-									if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+									if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
 										UpgradesCheck = false;
 										break;
 									}
@@ -1332,11 +1332,11 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 				}
 				bool UpgradesCheck = true;
 				for (int u = 0; u < VariationMax; ++u) {
-					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
 						UpgradesCheck = false;
 						break;
 					}
-					if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+					if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
 						UpgradesCheck = false;
 						break;
 					}
@@ -1423,11 +1423,11 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 				}
 				bool UpgradesCheck = true;
 				for (int u = 0; u < VariationMax; ++u) {
-					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
 						UpgradesCheck = false;
 						break;
 					}
-					if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+					if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
 						UpgradesCheck = false;
 						break;
 					}
@@ -1541,23 +1541,8 @@ void ApplyUpgrades()
 */
 void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
-	int id = upgrade->ID;
-	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
-	unit.LearnedAbilities[id] = true;	// learning done
-
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (UpgradeModifiers[z]->UpgradeId == id) {
-			ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
-		}
-	}
-
-	//
-	//  Upgrades could change the buttons displayed.
-	//
-	if (unit.Player == ThisPlayer) {
-		SelectedUnitChanged();
-	}
+	IndividualUpgradeAcquire(unit, upgrade);
 }
 
 void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
@@ -1586,7 +1571,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
 	int id = upgrade->ID;
 	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
-	unit.LearnedAbilities[id] = true;	// learning done
+	unit.IndividualUpgrades[id] = true;	// learning done
 
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
@@ -1606,7 +1591,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 {
 	int id = upgrade->ID;
 	unit.Player->UpgradeTimers.Upgrades[id] = 0;
-	unit.LearnedAbilities[id] = false;	// learning undone
+	unit.IndividualUpgrades[id] = false;	// learning undone
 
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {

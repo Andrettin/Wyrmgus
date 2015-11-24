@@ -449,7 +449,7 @@ void CUnit::Init()
 	//Wyrmgus start
 	Name = "";
 	Variation = 0;
-	memset(LearnedAbilities, 0, sizeof(LearnedAbilities));
+	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 	//Wyrmgus end
 	IX = 0;
 	IY = 0;
@@ -641,9 +641,7 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	//Wyrmgus start
-	for (int i = 0; i < UpgradeMax; ++i) { //initialize individual upgrades (setting all of them to false)
-		LearnedAbilities[i] = false;
-	}
+	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 
 	//set the unit's personal name, if applicable
 	Name = GeneratePersonalName(PlayerRaces.GetRaceIndexByName(Type->Civilization.c_str()), Type->Slot);

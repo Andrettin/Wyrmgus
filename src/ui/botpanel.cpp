@@ -1121,7 +1121,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonLearnAbility:
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && !unit.LearnedAbilities[buttonaction.Value] && unit.Variable[LEVELUP_INDEX].Value >= 1;
+				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && !unit.IndividualUpgrades[buttonaction.Value] && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			}
 			break;
 		//Wyrmgus end

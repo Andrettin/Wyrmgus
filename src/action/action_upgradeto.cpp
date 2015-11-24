@@ -189,11 +189,11 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		}
 		bool UpgradesCheck = true;
 		for (int u = 0; u < VariationMax; ++u) {
-			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
 				UpgradesCheck = false;
 				break;
 			}
-			if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.LearnedAbilities[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+			if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
 				UpgradesCheck = false;
 				break;
 			}

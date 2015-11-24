@@ -1423,9 +1423,23 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushstring(l, unit->Type->Icon.Name.c_str());
 		}
 		return 1;
+	} else if (!strcmp(value, "IndividualUpgrade")) {
+		LuaCheckArgs(l, 3);
+		std::string upgrade_ident = LuaToString(l, 3);
+		if (CUpgrade::Get(upgrade_ident)) {
+			lua_pushboolean(l, unit->IndividualUpgrades[CUpgrade::Get(upgrade_ident)->ID]);
+		} else {
+			LuaError(l, "Individual upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		}
+		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(value, "PlayerType")) {
 		lua_pushinteger(l, unit->Player->Type);
+	//Wyrmgus start
+	} else if (!strcmp(value, "Idle")) {
+		lua_pushboolean(l, unit->IsIdle());
+		return 1;
+	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {
@@ -1600,48 +1614,6 @@ static int CclSetUnitActive(lua_State *l)
 	unit->Active = ai_active;
 
 	return 0;
-}
-
-/**
-**
-**  Get whether the unit is idle or not.
-**
-**  @param l  Lua state.
-**
-**  @return   Whether the unit is idle or not.
-*/
-static int CclIsUnitIdle(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-
-	lua_pushvalue(l, 1);
-	const CUnit *unit = CclGetUnit(l);
-	lua_pop(l, 1);
-
-	lua_pushboolean(l, unit->IsIdle());
-	return 1;
-}
-
-/**
-**
-**  Get whether the unit is idle or not.
-**
-**  @param l  Lua state.
-**
-**  @return   Whether the unit is idle or not.
-*/
-static int CclUnitHasAbility(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-
-	lua_pushvalue(l, 1);
-	const CUnit *unit = CclGetUnit(l);
-	lua_pop(l, 1);
-
-	const char *ident = LuaToString(l, 2);	
-	
-	lua_pushboolean(l, unit->LearnedAbilities[CUpgrade::Get(ident)->ID]);
-	return 1;
 }
 
 /**
@@ -1941,8 +1913,6 @@ void UnitCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "SetUnitName", CclSetUnitName);
 	lua_register(Lua, "SetUnitActive", CclSetUnitActive);
-	lua_register(Lua, "IsUnitIdle", CclIsUnitIdle);
-	lua_register(Lua, "UnitHasAbility", CclUnitHasAbility);
 	lua_register(Lua, "DefineCharacter", CclDefineCharacter);
 	lua_register(Lua, "DefineGrandStrategyHero", CclDefineGrandStrategyHero);
 	//Wyrmgus end
