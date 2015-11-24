@@ -10,7 +10,8 @@
 //
 /**@name button_checks.cpp - The button checks. */
 //
-//      (c) Copyright 1999-2006 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//      (c) Copyright 1999-2015 by Lutz Sammer, Vladi Belperchinov-Shabanski
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -95,7 +96,6 @@ bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 	return UpgradeIdentAllowed(*unit.Player, button.AllowStr) == 'R';
 }
 
-//Wyrmgus start
 /**
 **  Check for button enabled, if unit has an individual upgrade.
 **
@@ -108,7 +108,6 @@ bool ButtonCheckIndividualUpgrade(const CUnit &unit, const ButtonAction &button)
 {
 	return unit.IndividualUpgrades[UpgradeIdByIdent(button.AllowStr)];
 }
-//Wyrmgus end
 
 /**
 **  Check for button enabled, if unit's variables pass the condition check.

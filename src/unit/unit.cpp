@@ -10,7 +10,7 @@
 //
 /**@name unit.cpp - The units. */
 //
-//      (c) Copyright 1998-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -449,7 +449,6 @@ void CUnit::Init()
 	//Wyrmgus start
 	Name = "";
 	Variation = 0;
-	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 	//Wyrmgus end
 	IX = 0;
 	IY = 0;
@@ -496,6 +495,7 @@ void CUnit::Init()
 	SpellCoolDownTimers = NULL;
 	AutoRepair = 0;
 	Goal = NULL;
+	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 }
 
 /**
@@ -640,9 +640,9 @@ void CUnit::Init(const CUnitType &type)
 		Variable = NULL;
 	}
 
-	//Wyrmgus start
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
 
+	//Wyrmgus start
 	//set the unit's personal name, if applicable
 	Name = GeneratePersonalName(PlayerRaces.GetRaceIndexByName(Type->Civilization.c_str()), Type->Slot);
 	//Wyrmgus end
@@ -2069,14 +2069,12 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	}
 	//Wyrmgus end
 
-	//Wyrmgus start
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (oldplayer->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] != 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade, and the upgrade is applicable to the unit
 			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 		}
 	}
-	//Wyrmgus end
 
 	UpdateForNewUnit(*this, 1);
 }

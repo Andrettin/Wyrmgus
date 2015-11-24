@@ -10,7 +10,8 @@
 //
 /**@name upgrade.cpp - The upgrade/allow functions. */
 //
-//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski, Jimmy Salmon
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -557,24 +558,6 @@ static int CclAcquireTrait(lua_State *l)
 	}
 	return 0;
 }
-
-/**
-** Add an individual upgrade to the unit
-*/
-static int CclAcquireIndividualUpgrade(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-	lua_pushvalue(l, 1);
-	CUnit *unit = &UnitManager.GetSlotUnit(LuaToNumber(l, -1));
-	lua_pop(l, 1);
-	const char *ident = LuaToString(l, 2);
-	if (!strncmp(ident, "upgrade-", 8)) {
-		IndividualUpgradeAcquire(*unit, CUpgrade::Get(ident));
-	} else {
-		DebugPrint(" wrong ident %s\n" _C_ ident);
-	}
-	return 0;
-}
 //Wyrmgus end
 
 /**
@@ -588,7 +571,6 @@ void UpgradesCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "AcquireAbility", CclAcquireAbility);
 	lua_register(Lua, "AcquireTrait", CclAcquireTrait);
-	lua_register(Lua, "AcquireIndividualUpgrade", CclAcquireIndividualUpgrade);
 	//Wyrmgus end
 }
 
@@ -1262,15 +1244,11 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	}
 }
 
-//Wyrmgus start
 /**
-**  Apply the modifiers of an ability.
+**  Apply the modifiers of an individual upgrade.
 **
-**  This function will mark upgrade done and do all required modifications
-**  to unit types and will modify allow/forbid maps
-**
-**  @param player  Player that get all the upgrades.
-**  @param um      Upgrade modifier that do the effects
+**  @param unit    Unit that will get the modifier applied
+**  @param um      Upgrade modifier that does the effects
 */
 void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 {
@@ -1281,9 +1259,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			MapUnmarkUnitSight(unit);
 			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value +
 									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
-			//Wyrmgus start
 			UpdateUnitSightRange(unit);
-			//Wyrmgus end
 			MapMarkUnitSight(unit);
 		}
 	}
@@ -1309,6 +1285,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		//Wyrmgus end
 	}
 	
+	//Wyrmgus start
 	//change variation if current one becomes forbidden
 	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
 	if (current_varinfo) {
@@ -1357,6 +1334,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			}
 		}
 	}
+	//Wyrmgus end
 	
 	if (um->ConvertTo) {
 		CommandTransformIntoType(unit, *um->ConvertTo);
@@ -1372,9 +1350,7 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 			MapUnmarkUnitSight(unit);
 			unit.CurrentSightRange = unit.Variable[SIGHTRANGE_INDEX].Value -
 									 um->Modifier.Variables[SIGHTRANGE_INDEX].Value;
-			//Wyrmgus start
 			UpdateUnitSightRange(unit);
-			//Wyrmgus end
 			MapMarkUnitSight(unit);
 		}
 	}
@@ -1400,6 +1376,7 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 		//Wyrmgus end
 	}
 	
+	//Wyrmgus start
 	//change variation if current one becomes forbidden
 	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
 	if (current_varinfo) {
@@ -1448,8 +1425,8 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 			}
 		}
 	}
+	//Wyrmgus end
 }
-//Wyrmgus end
 
 /**
 **  Handle that an upgrade was acquired.
@@ -1566,12 +1543,13 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 		SelectedUnitChanged();
 	}
 }
+//Wyrmgus end
 
 void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
 	int id = upgrade->ID;
 	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
-	unit.IndividualUpgrades[id] = true;	// learning done
+	unit.IndividualUpgrades[id] = true;
 
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
@@ -1591,7 +1569,7 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 {
 	int id = upgrade->ID;
 	unit.Player->UpgradeTimers.Upgrades[id] = 0;
-	unit.IndividualUpgrades[id] = false;	// learning undone
+	unit.IndividualUpgrades[id] = false;
 
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
@@ -1606,7 +1584,6 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 		SelectedUnitChanged();
 	}
 }
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Allow(s)

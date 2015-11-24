@@ -10,7 +10,8 @@
 //
 /**@name upgrade.h - The upgrades headerfile. */
 //
-//      (c) Copyright 1999-2006 by Vladi Belperchinov-Shabanski and Jimmy Salmon
+//      (c) Copyright 1999-2015 by Vladi Belperchinov-Shabanski, Jimmy Salmon
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -92,13 +93,13 @@ extern void UpgradeLost(CPlayer &player, int id);
 /// Apply researched upgrades when map is loading
 extern void ApplyUpgrades();
 
+extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um); /// Apply upgrade modifier of an individual upgrade
 //Wyrmgus start
-extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um);
 extern void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade);
 extern void TraitAcquire(CUnit &unit, const CUpgrade *upgrade);
-extern void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade);
-extern void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade);
 //Wyrmgus end
+extern void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade); /// Make a unit acquire in individual upgrade
+extern void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade); /// Make a unit lose in individual upgrade
 
 /*----------------------------------------------------------------------------
 --  Allow(s)
