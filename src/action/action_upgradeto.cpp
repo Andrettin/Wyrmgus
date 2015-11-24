@@ -357,16 +357,9 @@ static void AnimateActionUpgradeTo(CUnit &unit)
 {
 	//Wyrmgus start
 //	CAnimations &animations = *unit.Type->Animations;
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations) {
-		UnitShowAnimation(unit, varinfo->Animations->Upgrade ? varinfo->Animations->Upgrade : varinfo->Animations->Still);
-	} else {
-		UnitShowAnimation(unit, unit.Type->Animations->Upgrade ? unit.Type->Animations->Upgrade : unit.Type->Animations->Still);
-	}
-	//Wyrmgus end
-
-	//Wyrmgus start
 //	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
+	CAnimations &animations = *unit.GetAnimations();
+	UnitShowAnimation(unit, animations.Upgrade ? animations.Upgrade : animations.Still);
 	//Wyrmgus end
 }
 

@@ -120,14 +120,9 @@
 	const CUnitType &type = *unit.Type;
 
 
-		//Wyrmgus start
+	//Wyrmgus start
 //	UnitShowAnimation(unit, type.Animations->Research ? type.Animations->Research : type.Animations->Still);
-	VariationInfo *varinfo = type.VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations) {
-		UnitShowAnimation(unit, varinfo->Animations->Research ? varinfo->Animations->Research : varinfo->Animations->Still);
-	} else {
-		UnitShowAnimation(unit, type.Animations->Research ? type.Animations->Research : type.Animations->Still);
-	}
+	UnitShowAnimation(unit, unit.GetAnimations()->Research ? unit.GetAnimations()->Research : unit.GetAnimations()->Still);
 	//Wyrmgus end
 	if (unit.Wait) {
 		unit.Wait--;

@@ -210,15 +210,10 @@ static void AnimateActionTrain(CUnit &unit)
 		UnitShowAnimation(unit, unit.Type->Animations->Still);
 	}
 	*/
-	CAnimations *animations = unit.Type->Animations;
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations) {
-		animations = varinfo->Animations;
-	}
-	if (animations->Train) {
-		UnitShowAnimation(unit, animations->Train);
+	if (unit.GetAnimations()->Train) {
+		UnitShowAnimation(unit, unit.GetAnimations()->Train);
 	} else {
-		UnitShowAnimation(unit, animations->Still);
+		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 	}
 	//Wyrmgus end
 }

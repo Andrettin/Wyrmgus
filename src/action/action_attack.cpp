@@ -97,28 +97,14 @@ void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged)
 	}
 	UnitShowAnimation(unit, unit.Type->Animations->Attack);
 	*/
-	if (ranged && ((unit.Type->Animations && unit.Type->Animations->RangedAttack) || (unit.Type->VarInfo[unit.Variation] && unit.Type->VarInfo[unit.Variation]->Animations && unit.Type->VarInfo[unit.Variation]->Animations->RangedAttack))) {
-		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-		if (varinfo && varinfo->Animations && varinfo->Animations->RangedAttack) {
-			UnitShowAnimation(unit, varinfo->Animations->RangedAttack);
-		} else {
-			if (!unit.Type->Animations || !unit.Type->Animations->RangedAttack) {
-				order.OnAnimationAttack(unit);
-				return;
-			}
-			UnitShowAnimation(unit, unit.Type->Animations->RangedAttack);
-		}
+	if (ranged && unit.GetAnimations() && unit.GetAnimations()->RangedAttack) {
+		UnitShowAnimation(unit, unit.GetAnimations());
 	} else {
-		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-		if (varinfo && varinfo->Animations && varinfo->Animations->Attack) {
-			UnitShowAnimation(unit, varinfo->Animations->Attack);
-		} else {
-			if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
-				order.OnAnimationAttack(unit);
-				return;
-			}
-			UnitShowAnimation(unit, unit.Type->Animations->Attack);
+		if (!unit.GetAnimations() || !unit.GetAnimations()->Attack) {
+			order.OnAnimationAttack(unit);
+			return;
 		}
+		UnitShowAnimation(unit, unit.GetAnimations()->Attack);
 	}
 	//Wyrmgus end
 }
@@ -763,12 +749,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		}
 		//Wyrmgus start
 //		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
-			UnitShowAnimation(unit, varinfo->Animations->Still);
-		} else {
-			UnitShowAnimation(unit, unit.Type->Animations->Still);
-		}
+		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;
 		return;

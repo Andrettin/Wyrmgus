@@ -225,11 +225,7 @@ static void AnimateActionSpellCast(CUnit &unit, COrder_SpellCast &order)
 {
 	//Wyrmgus start
 //	const CAnimations *animations = unit.Type->Animations;
-	CAnimations *animations = unit.Type->Animations;
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations) {
-		animations = varinfo->Animations;
-	}
+	const CAnimations *animations = unit.GetAnimations();
 	//Wyrmgus end
 
 	if (!animations || (!animations->Attack && !animations->SpellCast)) {
@@ -346,12 +342,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		}
 		//Wyrmgus start
 //		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
-			UnitShowAnimation(unit, varinfo->Animations->Still);
-		} else {
-			UnitShowAnimation(unit, unit.Type->Animations->Still);
-		}
+		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;
 		return;

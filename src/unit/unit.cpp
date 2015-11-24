@@ -2635,6 +2635,16 @@ CAnimations *CUnit::GetAnimations()
 		return this->Type->Animations;
 	}
 }
+
+CConstruction *CUnit::GetConstruction()
+{
+	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+	if (varinfo && varinfo->Construction) {
+		return varinfo->Construction;
+	} else {
+		return this->Type->Construction;
+	}
+}
 //Wyrmgus end
 
 /**
@@ -2781,13 +2791,8 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// If we have a corpse, or a death animation, we are put back on the map
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
 	//Wyrmgus start
-	CAnimations *animations = type->Animations;
-	VariationInfo *varinfo = type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations) {
-		animations = varinfo->Animations;
-	}
 //	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
-	if (type->CorpseType || (animations && animations->Death)) {
+	if (type->CorpseType || (unit.GetAnimations() && unit.GetAnimations()->Death)) {
 	//Wyrmgus end
 		unit.Removed = 0;
 		Map.Insert(unit);

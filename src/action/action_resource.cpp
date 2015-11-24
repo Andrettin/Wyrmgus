@@ -676,14 +676,8 @@ static void AnimateActionHarvest(CUnit &unit)
 	//Wyrmgus start
 //	Assert(unit.Type->Animations->Harvest[unit.CurrentResource]);
 //	UnitShowAnimation(unit, unit.Type->Animations->Harvest[unit.CurrentResource]);
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations && varinfo->Animations->Harvest[unit.CurrentResource]) {
-		Assert(varinfo->Animations->Harvest[unit.CurrentResource]);
-		UnitShowAnimation(unit, varinfo->Animations->Harvest[unit.CurrentResource]);
-	} else {
-		Assert(unit.Type->Animations->Harvest[unit.CurrentResource]);
-		UnitShowAnimation(unit, unit.Type->Animations->Harvest[unit.CurrentResource]);
-	}
+	Assert(unit.GetAnimations()->Harvest[unit.CurrentResource]);
+	UnitShowAnimation(unit, unit.GetAnimations()->Harvest[unit.CurrentResource]);
 	//Wyrmgus end
 }
 
@@ -1463,12 +1457,7 @@ void COrder_Resource::Execute(CUnit &unit)
 		}
 		//Wyrmgus start
 //		UnitShowAnimation(unit, unit.Type->Animations->Still);
-		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-		if (varinfo && varinfo->Animations && varinfo->Animations->Still) {
-			UnitShowAnimation(unit, varinfo->Animations->Still);
-		} else {
-			UnitShowAnimation(unit, unit.Type->Animations->Still);
-		}
+		UnitShowAnimation(unit, unit.GetAnimations()->Still);
 		//Wyrmgus end
 		unit.Wait--;
 		return;

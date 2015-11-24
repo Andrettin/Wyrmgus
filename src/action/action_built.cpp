@@ -84,13 +84,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	}
 	//Wyrmgus start
 //	CConstructionFrame *cframe = unit.Type->Construction->Frames;
-	CConstructionFrame *cframe;
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Construction) {
-		cframe = varinfo->Construction->Frames;
-	} else {
-		cframe = unit.Type->Construction->Frames;
-	}
+	CConstructionFrame *cframe = unit.GetConstruction()->Frames;
 	//Wyrmgus end
 	int frame = 0;
 	while (cframe != this->Frame) {
@@ -124,13 +118,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 		int frame = LuaToNumber(l, -1, j + 1);
 		//Wyrmgus start
 //		CConstructionFrame *cframe = unit.Type->Construction->Frames;
-		CConstructionFrame *cframe;
-		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-		if (varinfo && varinfo->Construction) {
-			cframe = varinfo->Construction->Frames;
-		} else {
-			cframe = unit.Type->Construction->Frames;
-		}
+		CConstructionFrame *cframe = unit.GetConstruction()->Frames;
 		//Wyrmgus end
 		while (frame-- && cframe->Next != NULL) {
 			cframe = cframe->Next;
@@ -431,8 +419,9 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 	const CUnitType &type = *unit.Type;
 	const int percent = this->ProgressCounter / (type.Stats[unit.Player->Index].Costs[TimeCost] * 6);
 	//Wyrmgus start
-	/*
-	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
+//	const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
+	const CConstructionFrame *cframe = FindCFramePercent(*unit.GetConstruction()->Frames, percent);
+	//Wyrmgus end
 
 	Assert(cframe != NULL);
 
@@ -444,36 +433,6 @@ void COrder_Built::UpdateConstructionFrame(CUnit &unit)
 			unit.Frame = cframe->Frame;
 		}
 	}
-	*/
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Construction) {
-		const CConstructionFrame *cframe = FindCFramePercent(*varinfo->Construction->Frames, percent);
-
-		Assert(cframe != NULL);
-
-		if (cframe != this->Frame) {
-			this->Frame = cframe;
-			if (unit.Frame < 0) {
-				unit.Frame = -cframe->Frame - 1;
-			} else {
-				unit.Frame = cframe->Frame;
-			}
-		}
-	} else {
-		const CConstructionFrame *cframe = FindCFramePercent(*type.Construction->Frames, percent);
-
-		Assert(cframe != NULL);
-
-		if (cframe != this->Frame) {
-			this->Frame = cframe;
-			if (unit.Frame < 0) {
-				unit.Frame = -cframe->Frame - 1;
-			} else {
-				unit.Frame = cframe->Frame;
-			}
-		}
-	}
-	//Wyrmgus end
 }
 
 

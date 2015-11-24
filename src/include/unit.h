@@ -315,6 +315,7 @@ public:
 	
 	//Wyrmgus start
 	CAnimations *GetAnimations();
+	CConstruction *GetConstruction();
 	//Wyrmgus end
 
 public:
