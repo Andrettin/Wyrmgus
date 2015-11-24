@@ -66,13 +66,11 @@
 #include "unit_manager.h"
 #include "unitsound.h"
 #include "unittype.h"
+#include "upgrade.h"
 //Wyrmgus start
 #include "util.h"
 //Wyrmgus end
 #include "video.h"
-//Wyrmgus start
-#include "upgrade.h"
-//Wyrmgus end
 
 #include <math.h>
 

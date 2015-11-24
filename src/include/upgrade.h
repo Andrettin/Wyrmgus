@@ -40,22 +40,19 @@
 class CFile;
 class CPlayer;
 class CUpgrade;
-//Wyrmgus start
 class CUnit;
 class CUpgradeModifier;
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-//Wyrmgus start
+/// How many upgrades modifiers supported
 #define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
 
 extern CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 
 extern int NumUpgradeModifiers;
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Functions

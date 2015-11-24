@@ -87,18 +87,10 @@
 
 std::vector<CUpgrade *> AllUpgrades;           /// The main user useable upgrades
 
-/// How many upgrades modifiers supported
-//Wyrmgus start
-//#define UPGRADE_MODIFIERS_MAX (UpgradeMax * 4)
 /// Upgrades modifiers
-//static CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
 CUpgradeModifier *UpgradeModifiers[UPGRADE_MODIFIERS_MAX];
-//Wyrmgus end
 /// Number of upgrades modifiers used
-//Wyrmgus start
-//static int NumUpgradeModifiers;
 int NumUpgradeModifiers;
-//Wyrmgus end
 
 std::map<std::string, CUpgrade *> Upgrades;
 
@@ -293,15 +285,11 @@ static int CclDefineModifier(lua_State *l)
 	um->ModifyPercent = new int[UnitTypeVar.GetNumberVariable()];
 	memset(um->ModifyPercent, 0, UnitTypeVar.GetNumberVariable() * sizeof(int));
 
-	//Wyrmgus start
-//	um->UpgradeId = UpgradeIdByIdent(LuaToString(l, 1));
-	std::string upgrade_name = LuaToString(l, 1);
-	um->UpgradeId = UpgradeIdByIdent(upgrade_name);
-	
+	std::string upgrade_ident = LuaToString(l, 1);
+	um->UpgradeId = UpgradeIdByIdent(upgrade_ident);
 	if (um->UpgradeId == -1) {
-		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_name.c_str());
+		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 	}
-	//Wyrmgus end
 
 	for (int j = 1; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
