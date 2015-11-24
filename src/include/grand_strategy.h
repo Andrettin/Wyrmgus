@@ -449,6 +449,7 @@ extern int BattalionMultiplier;
 extern int PopulationGrowthThreshold;					/// How much population growth progress must be accumulated before a new worker unit is created in the province
 extern std::string GrandStrategyInterfaceState;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
+extern std::map<std::string, int> GrandStrategyHeroStringToIndex;
 
 extern std::string GetDiplomacyStateNameById(int diplomacy_state);
 extern int GetDiplomacyStateIdByName(std::string diplomacy_state);

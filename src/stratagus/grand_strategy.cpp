@@ -72,6 +72,7 @@ int BattalionMultiplier;
 int PopulationGrowthThreshold = 1000;
 std::string GrandStrategyInterfaceState;
 CGrandStrategyGame GrandStrategyGame;
+std::map<std::string, int> GrandStrategyHeroStringToIndex;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -1214,12 +1215,11 @@ Vec2i CGrandStrategyGame::GetTileUnderCursor()
 
 CGrandStrategyHero *CGrandStrategyGame::GetHero(std::string hero_full_name)
 {
-	for (size_t i = 0; i < this->Heroes.size(); ++i) {
-		if (hero_full_name == this->Heroes[i]->GetFullName()) {
-			return this->Heroes[i];
-		}
+	if (!hero_full_name.empty() && GrandStrategyHeroStringToIndex.find(hero_full_name) != GrandStrategyHeroStringToIndex.end()) {
+		return this->Heroes[GrandStrategyHeroStringToIndex[hero_full_name]];
+	} else {
+		return NULL;
 	}
-	return NULL;
 }
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -3476,6 +3476,7 @@ void CGrandStrategyFaction::GenerateRuler()
 	hero->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]));
 	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
 	hero->Gender = MaleGender;
+	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	this->SetRuler(hero->GetFullName());
 }
 
@@ -5212,6 +5213,7 @@ void CleanGrandStrategyGame()
 		delete GrandStrategyGame.Heroes[i];
 	}
 	GrandStrategyGame.Heroes.clear();
+	GrandStrategyHeroStringToIndex.clear();
 	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
@@ -5580,6 +5582,7 @@ void InitializeGrandStrategyGame()
 				sibling->Siblings.push_back(hero); //when the sibling was defined, the hero wasn't, since by virtue of not being NULL, the sibling was necessarily defined before the hero
 			}
 		}
+		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	}
 }
 

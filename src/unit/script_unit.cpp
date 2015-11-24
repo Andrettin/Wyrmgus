@@ -1799,6 +1799,7 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 	if (!hero) {
 		hero = new CGrandStrategyHero;
 		GrandStrategyGame.Heroes.push_back(hero);
+		GrandStrategyHeroStringToIndex[hero_full_name] = GrandStrategyGame.Heroes.size() - 1;
 	}
 	
 	//  Parse the list:
