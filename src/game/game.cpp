@@ -646,7 +646,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			}
 			//Wyrmgus start
 			if (unit.Name != unit.Type->DefaultName) {
-				f->printf("SetUnitName(unit, \"%s\")\n", unit.Name.c_str());
+				f->printf("SetUnitVariable(unit, \"Name\", \"%s\")\n", unit.Name.c_str());
 			}
 			if (unit.Trait != NULL) {
 				f->printf("AcquireTrait(unit, \"%s\")\n", unit.Trait->Ident.c_str());

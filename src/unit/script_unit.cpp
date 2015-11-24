@@ -1395,9 +1395,10 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushnumber(l, unit->Type->GivesResource);
 	} else if (!strcmp(value, "CurrentResource")) {
 		lua_pushnumber(l, unit->CurrentResource);
+	} else if (!strcmp(value, "Name")) {
 	//Wyrmgus start
-//	} else if (!strcmp(value, "Name")) {
 //		lua_pushstring(l, unit->Type->Name.c_str());
+		lua_pushstring(l, unit->Name.c_str());
 	} else if (!strcmp(value, "GiveResourceTypeName")) {
 		lua_pushstring(l, DefaultResourceNames[unit->Type->GivesResource].c_str());
 	} else if (!strcmp(value, "CurrentResourceName")) {
@@ -1409,8 +1410,6 @@ static int CclGetUnitVariable(lua_State *l)
 		} else {
 			lua_pushstring(l, unit->Type->Name.c_str());
 		}
-	} else if (!strcmp(value, "Name")) {
-		lua_pushstring(l, unit->Name.c_str());
 	} else if (!strcmp(value, "Trait")) {
 		lua_pushstring(l, unit->Trait->Ident.c_str());
 	} else if (!strcmp(value, "Icon")) {
@@ -1476,6 +1475,12 @@ static int CclSetUnitVariable(lua_State *l)
 	const int nargs = lua_gettop(l);
 	Assert(nargs >= 3 && nargs <= 5);
 
+	//Wyrmgus start
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+	//Wyrmgus end
+	
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
@@ -1483,6 +1488,10 @@ static int CclSetUnitVariable(lua_State *l)
 	int value;
 	if (!strcmp(name, "Player")) {
 		unit->AssignToPlayer(Players[LuaToNumber(l, 3)]);
+	//Wyrmgus start
+	} else if (!strcmp(name, "Name")) {
+		unit->Name = LuaToString(l, 3);
+	//Wyrmgus end
 	} else if (!strcmp(name, "RegenerationRate")) {
 		value = LuaToNumber(l, 3);
 		unit->Variable[HP_INDEX].Increase = std::min(unit->Variable[HP_INDEX].Max, value);
@@ -1584,27 +1593,6 @@ static int CclSlotUsage(lua_State *l)
 }
 
 //Wyrmgus start
-/**
-**  Set the name of the unit structure.
-**
-**  @param l  Lua state.
-*/
-static int CclSetUnitName(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-
-	if (lua_isnil(l, 1)) {
-		return 0;
-	}
-	
-	lua_pushvalue(l, 1);
-	CUnit *unit = CclGetUnit(l);
-	lua_pop(l, 1);
-	unit->Name = LuaToString(l, 2);
-
-	return 0;
-}
-
 /**
 **  Define a character.
 **
@@ -1900,7 +1888,6 @@ void UnitCclRegister()
 
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
 	//Wyrmgus start
-	lua_register(Lua, "SetUnitName", CclSetUnitName);
 	lua_register(Lua, "DefineCharacter", CclDefineCharacter);
 	lua_register(Lua, "DefineGrandStrategyHero", CclDefineGrandStrategyHero);
 	//Wyrmgus end
