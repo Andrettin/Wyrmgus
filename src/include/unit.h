@@ -168,6 +168,8 @@ public:
 	/// Release a unit
 	void Release(bool final = false);
 	
+	void SetVariation(int new_variation);
+	
 	bool RestoreOrder();
 	bool CanStoreOrder(COrder *order);
 
@@ -310,6 +312,10 @@ public:
 
 	PixelPos GetMapPixelPosTopLeft() const;
 	PixelPos GetMapPixelPosCenter() const;
+	
+	//Wyrmgus start
+	CAnimations *GetAnimations();
+	//Wyrmgus end
 
 public:
 	class CUnitManagerData

@@ -202,7 +202,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			continue;
 		}
 		if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if the old variation's ident is included in that of a viable one of the new unit type, chose the latter automatically
-			unit.Variation = i;
+			unit.SetVariation(i);
 			TypeVariationCount = 0;
 			break;
 		}
@@ -210,7 +210,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		TypeVariationCount += 1;
 	}
 	if (TypeVariationCount > 0) {
-		unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+		unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
 	}
 	//Wyrmgus end
 	

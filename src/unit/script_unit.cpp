@@ -1482,7 +1482,7 @@ static int CclSetUnitVariable(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(name, "Variation")) {
 		value = LuaToNumber(l, 3);
-		unit->Variation = value;
+		unit->SetVariation(value);
 		unit->Variable[VARIATION_INDEX].Value = unit->Variation;
 	} else if (!strcmp(name, "Formation")) {
 		value = LuaToNumber(l, 3);

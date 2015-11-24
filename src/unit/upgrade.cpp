@@ -979,7 +979,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 									continue;
 								}
 								if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
-									unit.Variation = i;
+									unit.SetVariation(i);
 									TypeVariationCount = 0;
 									break;
 								}
@@ -987,7 +987,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								TypeVariationCount += 1;
 							}
 							if (TypeVariationCount > 0) {
-								unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+								unit.Frame = unit.Type->StillFrame;
+								unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
 							}
 						}
 					}
@@ -1239,7 +1240,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 									continue;
 								}
 								if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
-									unit.Variation = i;
+									unit.SetVariation(i);
 									TypeVariationCount = 0;
 									break;
 								}
@@ -1247,7 +1248,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 								TypeVariationCount += 1;
 							}
 							if (TypeVariationCount > 0) {
-								unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+								unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
 							}
 						}
 					}
@@ -1344,7 +1345,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 					continue;
 				}
 				if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
-					unit.Variation = i;
+					unit.SetVariation(i);
 					TypeVariationCount = 0;
 					break;
 				}
@@ -1352,7 +1353,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 				TypeVariationCount += 1;
 			}
 			if (TypeVariationCount > 0) {
-				unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+				unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
 			}
 		}
 	}
@@ -1435,7 +1436,7 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 					continue;
 				}
 				if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
-					unit.Variation = i;
+					unit.SetVariation(i);
 					TypeVariationCount = 0;
 					break;
 				}
@@ -1443,7 +1444,7 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 				TypeVariationCount += 1;
 			}
 			if (TypeVariationCount > 0) {
-				unit.Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
+				unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
 			}
 		}
 	}

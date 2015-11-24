@@ -80,11 +80,7 @@ static bool AnimateActionDie(CUnit &unit)
 {
 	//Wyrmgus start
 //	const CAnimations *animations = unit.Type->Animations;
-	CAnimations *animations = unit.Type->Animations;
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations) {
-		animations = varinfo->Animations;
-	}
+	const CAnimations *animations = unit.GetAnimations();
 	//Wyrmgus end
 
 	if (animations == NULL) {

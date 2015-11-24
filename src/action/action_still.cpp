@@ -573,18 +573,11 @@ bool AutoAttack(CUnit &unit)
 	}
 	this->Finished = false;
 
-	//Wyrmgus start
-	CAnimations *animations = unit.Type->Animations;
-	VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-	if (varinfo && varinfo->Animations) {
-		animations = varinfo->Animations;
-	}
-	//Wyrmgus end
 	switch (this->State) {
 		case SUB_STILL_STANDBY:
 			//Wyrmgus start
 //			UnitShowAnimation(unit, unit.Type->Animations->Still);
-			UnitShowAnimation(unit, animations->Still);
+			UnitShowAnimation(unit, unit.GetAnimations()->Still);
 			if (SyncRand(1000) == 0) {
 				PlayUnitSound(unit, VoiceIdle);
 			}

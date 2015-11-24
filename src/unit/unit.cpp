@@ -566,6 +566,19 @@ void CUnit::Release(bool final)
 	UnitManager.ReleaseUnit(this);
 }
 
+//Wyrmgus start
+void CUnit::SetVariation(int new_variation)
+{
+	if (
+		(this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->Animations)
+		|| this->Type->VarInfo[new_variation]->Animations
+	) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
+		this->Frame = this->Type->StillFrame;
+	}
+	this->Variation = new_variation;
+}
+//Wyrmgus end
+
 unsigned int CUnit::CurrentAction() const
 {
 	return (CurrentOrder()->Action);
@@ -2618,6 +2631,18 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 {
 	return GetMapPixelPosTopLeft() + Type->GetPixelSize() / 2;
 }
+
+//Wyrmgus start
+CAnimations *CUnit::GetAnimations()
+{
+	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+	if (varinfo && varinfo->Animations) {
+		return varinfo->Animations;
+	} else {
+		return this->Type->Animations;
+	}
+}
+//Wyrmgus end
 
 /**
 **  Let an unit die.

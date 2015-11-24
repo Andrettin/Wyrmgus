@@ -999,7 +999,6 @@ CPlayerColorGraphic *CPlayerColorGraphic::ForceNew(const std::string &file, int 
 	return g;
 }
 
-//Wyrmgus start
 /**
 **  Get a graphic object.
 **
@@ -1037,7 +1036,6 @@ CPlayerColorGraphic *CPlayerColorGraphic::Get(const std::string &filename)
 
 	return g;
 }
-//Wyrmgus end
 
 void CGraphic::GenFramesMap()
 {
