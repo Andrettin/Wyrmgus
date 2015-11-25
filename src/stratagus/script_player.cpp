@@ -2783,7 +2783,12 @@ static int CclSetPlayerData(lua_State *l)
 		}
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
-		p->SetFaction(LuaToString(l, 3));
+		std::string faction_name = LuaToString(l, 3);
+		if (faction_name == "Random") {
+			p->SetRandomFaction();
+		} else {
+			p->SetFaction(faction_name);
+		}
 	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
 		LuaCheckArgs(l, 4);
