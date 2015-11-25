@@ -608,10 +608,13 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 	}
 
 	// No missile hits immediately!
-	//Wyrmgus start
-//	if (unit.Type->Missile.Missile->Class == MissileClassNone) {
-	if (unit.Type->Missile.Missile->Class == MissileClassNone || (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && ((goal && goal->IsAliveOnMap() && unit.MapDistanceTo(*goal) <= 1) || (!goal && unit.MapDistanceTo(goalPos) <= 1)) && !unit.Container)) { // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
-	//Wyrmgus end
+	if (
+		unit.Type->Missile.Missile->Class == MissileClassNone
+		//Wyrmgus start
+//		|| (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
+		|| (unit.GetAnimations() && unit.GetAnimations()->Attack && unit.GetAnimations()->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
+		//Wyrmgus end
+	) {
 		//Wyrmgus start
 		int damage = 0;
 		//Wyrmgus end

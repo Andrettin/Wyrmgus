@@ -81,23 +81,24 @@
 **
 **  @todo manage correctly unit with no animation attack.
 */
-//Wyrmgus start
-//void AnimateActionAttack(CUnit &unit, COrder &order)
-void AnimateActionAttack(CUnit &unit, COrder &order, bool ranged)
-//Wyrmgus end
+void AnimateActionAttack(CUnit &unit, COrder &order)
 {
 	//  No animation.
 	//  So direct fire missile.
 	//  FIXME : wait a little.
 	//Wyrmgus start
 	/*
-	if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
-		order.OnAnimationAttack(unit);
-		return;
+	if (unit.Type->Animations && unit.Type->Animations->RangedAttack && unit.IsAttackRanged(order.GetGoal(), order.GetGoalPos())) {
+		UnitShowAnimation(unit, unit.Type->Animations->RangedAttack);
+	} else {
+		if (!unit.Type->Animations || !unit.Type->Animations->Attack) {
+			order.OnAnimationAttack(unit);
+			return;
+		}
+		UnitShowAnimation(unit, unit.Type->Animations->Attack);
 	}
-	UnitShowAnimation(unit, unit.Type->Animations->Attack);
 	*/
-	if (ranged && unit.GetAnimations() && unit.GetAnimations()->RangedAttack) {
+	if (unit.GetAnimations() && unit.GetAnimations()->RangedAttack && unit.IsAttackRanged(order.GetGoal(), order.GetGoalPos())) {
 		UnitShowAnimation(unit, unit.GetAnimations()->RangedAttack);
 	} else {
 		if (!unit.GetAnimations() || !unit.GetAnimations()->Attack) {
@@ -597,21 +598,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 {
 	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
 
-	//Wyrmgus start
-//	AnimateActionAttack(unit, *this);
-	bool ranged = false;
-	if (
-		(
-			(this->GetGoal() && (unit.MapDistanceTo(*this->GetGoal()) > 1 || (unit.Type->UnitType != UnitTypeFly && this->GetGoal()->Type->UnitType == UnitTypeFly) || (unit.Type->UnitType == UnitTypeFly && this->GetGoal()->Type->UnitType != UnitTypeFly)))
-			|| (!this->HasGoal() && Map.Info.IsPointOnMap(this->goalPos) && unit.MapDistanceTo(this->goalPos) > 1)
-			|| unit.Container
-		)
-		&& unit.Variable[ATTACKRANGE_INDEX].Value > 1
-	) {
-		ranged = true;
-	}
-	AnimateActionAttack(unit, *this, ranged);
-	//Wyrmgus end
+	AnimateActionAttack(unit, *this);
 	if (unit.Anim.Unbreakable) {
 		return;
 	}

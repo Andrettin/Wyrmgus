@@ -584,20 +584,7 @@ bool AutoAttack(CUnit &unit)
 			//Wyrmgus end
 			break;
 		case SUB_STILL_ATTACK: // attacking unit in attack range.
-			//Wyrmgus start
-//			AnimateActionAttack(unit, *this);
-			bool ranged = false;
-			if (
-				(
-					(this->GetGoal() && (unit.MapDistanceTo(*this->GetGoal()) > 1 || (unit.Type->UnitType != UnitTypeFly && this->GetGoal()->Type->UnitType == UnitTypeFly) || (unit.Type->UnitType == UnitTypeFly && this->GetGoal()->Type->UnitType != UnitTypeFly)))
-					|| unit.Container
-				)
-				&& unit.Variable[ATTACKRANGE_INDEX].Value > 1
-			) {
-				ranged = true;
-			}
-			AnimateActionAttack(unit, *this, ranged);
-			//Wyrmgus end
+			AnimateActionAttack(unit, *this);
 			break;
 	}
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here

@@ -120,9 +120,7 @@ static void MapAnimSounds(CUnitType &type)
 	MapAnimSounds2(type.Animations->Still);
 	MapAnimSounds2(type.Animations->Move);
 	MapAnimSounds2(type.Animations->Attack);
-	//Wyrmgus start
 	MapAnimSounds2(type.Animations->RangedAttack);
-	//Wyrmgus end
 	MapAnimSounds2(type.Animations->SpellCast);
 	for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 		MapAnimSounds2(type.Animations->Death[i]);
@@ -148,9 +146,7 @@ static void MapAnimSounds(CUnitType &type)
 		MapAnimSounds2(varinfo->Animations->Still);
 		MapAnimSounds2(varinfo->Animations->Move);
 		MapAnimSounds2(varinfo->Animations->Attack);
-		//Wyrmgus start
 		MapAnimSounds2(varinfo->Animations->RangedAttack);
-		//Wyrmgus end
 		MapAnimSounds2(varinfo->Animations->SpellCast);
 		for (int i = 0; i <= ANIMATIONS_DEATHTYPES; ++i) {
 			MapAnimSounds2(varinfo->Animations->Death[i]);
