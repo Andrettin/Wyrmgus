@@ -1814,8 +1814,36 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 	
 	if (UnitTypes[building_id]->Class == "stronghold") { //increase the military score of the province, if this building is a stronghold
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
-	} else if (UnitTypes[building_id]->Class == "dock") { //place a port in the province's settlement location, if the building is a dock
+	} else if (UnitTypes[building_id]->Class == "dock") {
+		//place a port in the province's settlement location, if the building is a dock
 		GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port = has_settlement_building;
+		
+		//allow the province to fish if it has a dock
+		this->ProductionCapacity[FishCost] = 0;
+		if (has_settlement_building) {
+			for (int sub_x = -1; sub_x <= 1; ++sub_x) { //add 1 capacity in fish production for every water tile adjacent to the settlement location
+				if ((this->SettlementLocation.x + sub_x) < 0 || (this->SettlementLocation.x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
+					continue;
+				}
+				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+					if ((this->SettlementLocation.y + sub_y) < 0 || (this->SettlementLocation.y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
+						continue;
+					}
+					if (!(sub_x == 0 && sub_y == 0)) {
+						if (GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x + sub_x][this->SettlementLocation.y + sub_y]->IsWater()) {
+							this->ProductionCapacity[FishCost] += 1;
+						}
+					}
+				}
+			}
+				
+			for (int i = 0; i < MaxDirections; ++i) { //if the settlement location has a river, add one fish production capacity
+				if (GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->River[i] != -1) {
+					this->ProductionCapacity[FishCost] += 1;
+					break;
+				}
+			}
+		}
 	}
 
 	// allocate labor (in case building a town hall or another building may have allowed a new sort of production)
@@ -4752,30 +4780,6 @@ void SetProvinceSettlementLocation(std::string province_name, int x, int y)
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		GrandStrategyGame.Provinces[province_id]->SettlementLocation.x = x;
 		GrandStrategyGame.Provinces[province_id]->SettlementLocation.y = y;
-		
-		GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost] = 0;
-		for (int sub_x = -1; sub_x <= 1; ++sub_x) { //add 1 capacity in fish production for every water tile adjacent to the settlement location
-			if ((x + sub_x) < 0 || (x + sub_x) >= GrandStrategyGame.WorldMapWidth) {
-				continue;
-			}
-			for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-				if ((y + sub_y) < 0 || (y + sub_y) >= GrandStrategyGame.WorldMapHeight) {
-					continue;
-				}
-				if (!(sub_x == 0 && sub_y == 0)) {
-					if (GrandStrategyGame.WorldMapTiles[x + sub_x][y + sub_y]->IsWater()) {
-						GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost] += 1;
-					}
-				}
-			}
-		}
-		
-		for (int i = 0; i < MaxDirections; ++i) { //if the settlement location has a river, add one fish production capacity
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
-				GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost] += 1;
-				break;
-			}
-		}
 	}
 }
 
