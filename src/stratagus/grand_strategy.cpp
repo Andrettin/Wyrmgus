@@ -698,12 +698,14 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 			}
 		}
 	}
-	
-	if (GrandStrategyGame.WorldMapTiles[x][y]->Port) {
+
+	/*
+	if (GrandStrategyGame.WorldMapTiles[x][y]->Port) { //deactivated for now, since there aren't proper port graphics yet
 		tile_tooltip += " (";
 		tile_tooltip += "Port";
 		tile_tooltip += ")";
 	}
+	*/
 	
 	if (province_id != -1) {
 		tile_tooltip += ",\n";
@@ -4297,8 +4299,6 @@ void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::strin
 void SetWorldMapTilePort(int x, int y, bool has_port)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	return; //deactivate this for now, while there aren't proper graphics for the ports
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->SetPort(has_port);
 }
