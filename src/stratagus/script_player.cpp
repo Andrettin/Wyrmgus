@@ -2015,69 +2015,44 @@ static int CclDefineLanguageNumeral(lua_State *l)
 }
 
 /**
-**  Get whether a civilization is playable or not.
+**  Get a civilization's data.
 **
 **  @param l  Lua state.
 */
-static int CclIsCivilizationPlayable(lua_State *l)
+static int CclGetCivilizationData(lua_State *l)
 {
-	LuaCheckArgs(l, 1);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
-	lua_pop(l, 1);
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string civilization_name = LuaToString(l, 1);
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	if (civilization == -1) {
+		LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
+	}
+	const char *data = LuaToString(l, 2);
 
-	lua_pushboolean(l, PlayerRaces.Playable[civilization]);
-	return 1;
-}
-
-/**
-**  Get a civilization's species.
-**
-**  @param l  Lua state.
-*/
-static int CclGetCivilizationSpecies(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
-	lua_pop(l, 1);
-
-	lua_pushstring(l, PlayerRaces.Species[civilization].c_str());
-	return 1;
-}
-
-/**
-**  Get a civilization's parent civilization.
-**
-**  @param l  Lua state.
-*/
-static int CclGetParentCivilization(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
-	lua_pop(l, 1);
-	
-	std::string parent_civilization_name;
-	int parent_civilization = PlayerRaces.ParentCivilization[civilization];
-	if (parent_civilization != -1) {
-		parent_civilization_name = PlayerRaces.Name[parent_civilization];
+	if (!strcmp(data, "Playable")) {
+		lua_pushboolean(l, PlayerRaces.Playable[civilization]);
+		return 1;
+	} else if (!strcmp(data, "Species")) {
+		lua_pushstring(l, PlayerRaces.Species[civilization].c_str());
+		return 1;
+	} else if (!strcmp(data, "ParentCivilization")) {
+		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
+		if (parent_civilization != -1) {
+			lua_pushstring(l, PlayerRaces.Name[parent_civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "DefaultColor")) {
+		lua_pushstring(l, PlayerRaces.DefaultColor[civilization].c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
 	}
 
-	lua_pushstring(l, parent_civilization_name.c_str());
-	return 1;
-}
-
-/**
-**  Get a civilization's default color.
-**
-**  @param l  Lua state.
-*/
-static int CclGetCivilizationDefaultColor(lua_State *l)
-{
-	LuaCheckArgs(l, 1);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
-	lua_pop(l, 1);
-
-	lua_pushstring(l, PlayerRaces.DefaultColor[civilization].c_str());
-	return 1;
+	return 0;
 }
 
 /**
@@ -3158,10 +3133,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineLanguageAdjective", CclDefineLanguageAdjective);
 	lua_register(Lua, "DefineLanguageAdverb", CclDefineLanguageAdverb);
 	lua_register(Lua, "DefineLanguageNumeral", CclDefineLanguageNumeral);
-	lua_register(Lua, "IsCivilizationPlayable", CclIsCivilizationPlayable);
-	lua_register(Lua, "GetCivilizationSpecies", CclGetCivilizationSpecies);
-	lua_register(Lua, "GetParentCivilization", CclGetParentCivilization);
-	lua_register(Lua, "GetCivilizationDefaultColor", CclGetCivilizationDefaultColor);
+	lua_register(Lua, "GetCivilizationData", CclGetCivilizationData);
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
 	lua_register(Lua, "GetFactionClassUnitType", CclGetFactionClassUnitType);
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
