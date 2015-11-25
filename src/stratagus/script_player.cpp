@@ -2944,12 +2944,20 @@ static int CclDefineQuest(lua_State *l)
 			quest->RequiredQuest = LuaToString(l, -1);
 		} else if (!strcmp(value, "RequiredTechnology")) {
 			quest->RequiredTechnology = LuaToString(l, -1);
+		} else if (!strcmp(value, "Area")) {
+			quest->Area = LuaToString(l, -1);
 		} else if (!strcmp(value, "Briefing")) {
 			quest->Briefing = LuaToString(l, -1);
 		} else if (!strcmp(value, "BriefingBackground")) {
 			quest->BriefingBackground = LuaToString(l, -1);
 		} else if (!strcmp(value, "BriefingMusic")) {
 			quest->BriefingMusic = LuaToString(l, -1);
+		} else if (!strcmp(value, "StartSpeech")) {
+			quest->StartSpeech = LuaToString(l, -1);
+		} else if (!strcmp(value, "InProgressSpeech")) {
+			quest->InProgressSpeech = LuaToString(l, -1);
+		} else if (!strcmp(value, "CompletionSpeech")) {
+			quest->CompletionSpeech = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			quest->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "TechnologyPoints")) {
@@ -2972,6 +2980,14 @@ static int CclDefineQuest(lua_State *l)
 			quest->Icon.Name = LuaToString(l, -1);
 			quest->Icon.Icon = NULL;
 			quest->Icon.Load();
+		} else if (!strcmp(value, "QuestGiver")) {
+			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
+			CCharacter *quest_giver = GetCharacter(quest_giver_name);
+			if (quest_giver) {
+				quest->QuestGiver = const_cast<CCharacter *>(&(*quest_giver));
+			} else {
+				LuaError(l, "Character \"%s\" doesn't exist." _C_ quest_giver_name.c_str());
+			}
 		} else if (!strcmp(value, "Objectives")) {
 			quest->Objectives.clear();
 			const int args = lua_rawlen(l, -1);
@@ -3038,6 +3054,9 @@ static int CclGetQuestData(lua_State *l)
 	} else if (!strcmp(data, "RequiredTechnology")) {
 		lua_pushstring(l, quest->RequiredTechnology.c_str());
 		return 1;
+	} else if (!strcmp(data, "Area")) {
+		lua_pushstring(l, quest->Area.c_str());
+		return 1;
 	} else if (!strcmp(data, "Briefing")) {
 		lua_pushstring(l, quest->Briefing.c_str());
 		return 1;
@@ -3046,6 +3065,15 @@ static int CclGetQuestData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "BriefingMusic")) {
 		lua_pushstring(l, quest->BriefingMusic.c_str());
+		return 1;
+	} else if (!strcmp(data, "StartSpeech")) {
+		lua_pushstring(l, quest->StartSpeech.c_str());
+		return 1;
+	} else if (!strcmp(data, "InProgressSpeech")) {
+		lua_pushstring(l, quest->InProgressSpeech.c_str());
+		return 1;
+	} else if (!strcmp(data, "CompletionSpeech")) {
+		lua_pushstring(l, quest->CompletionSpeech.c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (quest->Civilization != -1) {
@@ -3081,6 +3109,9 @@ static int CclGetQuestData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, quest->Icon.Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "QuestGiver")) {
+		lua_pushstring(l, quest->QuestGiver->GetFullName().c_str());
 		return 1;
 	} else if (!strcmp(data, "Objectives")) {
 		lua_createtable(l, quest->Objectives.size(), 0);
