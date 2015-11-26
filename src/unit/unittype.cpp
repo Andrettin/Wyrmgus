@@ -10,7 +10,7 @@
 //
 /**@name unittype.cpp - The unit types. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -364,10 +364,6 @@
 **  CUnitType::GroundAttack
 **
 **    Can do command ground attack
-**
-**  CUnitType::ShoreBuilding
-**
-**    Building must be build on coast
 **
 **  CUnitType::CanCastSpell
 **
@@ -731,7 +727,7 @@ CUnitType::CUnitType() :
 	ExplodeWhenKilled(0), Building(0),
 //	PermanentCloak(0), DetectCloak(0),
 //	Coward(0), AttackFromTransporter(0),
-//	Vanishes(0), GroundAttack(0), ShoreBuilding(0), CanAttack(0),
+//	Vanishes(0), GroundAttack(0), CanAttack(0),
 	CanAttack(0),
 	//Wyrmgus end
 	//Wyrmgus start
@@ -1094,15 +1090,9 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.MovementMask = 0;
 			break;
 	}
-	//Wyrmgus start
-//	if (type.Building || type.ShoreBuilding) {
 	if (type.Building || type.BoolFlag[SHOREBUILDING_INDEX].value) {
-	//Wyrmgus end
 		// Shore building is something special.
-		//Wyrmgus start
-//		if (type.ShoreBuilding) {
 		if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
-		//Wyrmgus end
 			type.MovementMask =
 				MapFieldLandUnit |
 				MapFieldSeaUnit |

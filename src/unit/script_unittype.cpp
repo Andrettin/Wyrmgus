@@ -10,7 +10,7 @@
 //
 /**@name script_unittype.cpp - The unit-type ccl functions. */
 //
-//      (c) Copyright 1999-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -550,7 +550,6 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 //	type.BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value = type.AttackFromTransporter;
 //	type.BoolFlag[VANISHES_INDEX].value              = type.Vanishes;
 //	type.BoolFlag[GROUNDATTACK_INDEX].value          = type.GroundAttack;
-//	type.BoolFlag[SHOREBUILDING_INDEX].value         = type.ShoreBuilding;
 	//Wyrmgus end
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
 	//Wyrmgus start
@@ -1644,8 +1643,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->AutoBuildRate = LuaToNumber(l, -1);
 		//Wyrmgus start
 		/*
-		} else if (!strcmp(value, "ShoreBuilding")) {
-			type->ShoreBuilding = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "LandUnit")) {
 			type->LandUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "AirUnit")) {

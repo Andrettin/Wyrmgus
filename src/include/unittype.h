@@ -10,7 +10,7 @@
 //
 /**@name unittype.h - The unit-types headerfile. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -245,7 +245,7 @@ enum {
 	ATTACKFROMTRANSPORTER_INDEX,
 	VANISHES_INDEX,
 	GROUNDATTACK_INDEX,
-	SHOREBUILDING_INDEX,
+	SHOREBUILDING_INDEX,			/// Building must be built on coast.
 	CANATTACK_INDEX,
 	//Wyrmgus start
 	CANDOCK_INDEX,
@@ -826,7 +826,6 @@ public:
 //	unsigned AttackFromTransporter : 1;  /// Can attack from transporter
 //	unsigned Vanishes : 1;          /// Corpes & destroyed places.
 //	unsigned GroundAttack : 1;      /// Can do command ground attack.
-//	unsigned ShoreBuilding : 1;     /// Building must be build on coast.
 	//Wyrmgus end
 	unsigned CanAttack : 1;         /// Unit can attack.
 	//Wyrmgus start
