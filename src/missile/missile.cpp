@@ -41,9 +41,7 @@
 
 #include "action/action_spellcast.h"
 #include "actions.h"
-//Wyrmgus start
 #include "animation.h"
-//Wyrmgus end
 #include "font.h"
 #include "iolib.h"
 #include "luacallback.h"

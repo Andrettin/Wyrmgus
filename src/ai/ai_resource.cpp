@@ -446,10 +446,7 @@ public:
 	explicit IsAWorker() {}
 	bool operator()(const CUnit *const unit) const
 	{
-		//Wyrmgus start
-//		return (unit->Type->Harvester && unit->Type->ResInfo && !unit->Removed);
 		return (unit->Type->BoolFlag[HARVESTER_INDEX].value && unit->Type->ResInfo && !unit->Removed);
-		//Wyrmgus end
 	}
 };
 
@@ -1197,10 +1194,7 @@ static void AiCollectResources()
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		//Wyrmgus start
-//		if (!unit.Type->Harvester) {
 		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
-		//Wyrmgus end
 			continue;
 		}
 

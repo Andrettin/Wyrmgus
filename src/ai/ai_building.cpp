@@ -132,10 +132,7 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 		++obstacleCount;
 	}
 
-	//Wyrmgus start
-//	if (!type.ShoreBuilding) {
 	if (!type.BoolFlag[SHOREBUILDING_INDEX].value) {
-	//Wyrmgus end
 		backupok = obstacleCount < 5;
 	} else {
 		// Shore building have at least 2 obstacles : sea->ground & ground->sea
@@ -150,10 +147,7 @@ public:
 	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
-			//Wyrmgus start
-//			& ~((type.ShoreBuilding ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
-			//Wyrmgus end
 			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		checkSurround(checkSurround),
 		resultPos(resultPos)
@@ -231,10 +225,7 @@ public:
 	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask
-			//Wyrmgus start
-//			& ~((type.ShoreBuilding ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
 			& ~((type.BoolFlag[SHOREBUILDING_INDEX].value ? (MapFieldCoastAllowed | MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit) 
-			//Wyrmgus end
 			:  (MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)))),
 		resource(resource),
 		resultPos(resultPos)
@@ -389,10 +380,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 		}
 	}
 	if (CanMoveToMask(pos, movemask)
-		//Wyrmgus start
-//		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BuilderOutside)) { // reachable, or unit can build from outside and anywhere
 		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BoolFlag[BUILDEROUTSIDE_INDEX].value)) { // reachable, or unit can build from outside and anywhere
-		//Wyrmgus end
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;

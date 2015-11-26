@@ -627,7 +627,7 @@ void GameMainLoop()
 
 	GameCycle = 0;//????
 	//Wyrmgus start
-	GameTimeOfDay = 0;//????
+	GameTimeOfDay = 0;
 	//Wyrmgus end
 	CParticleManager::exit();
 	FlagRevealMap = 0;
