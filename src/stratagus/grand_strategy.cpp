@@ -5658,11 +5658,13 @@ void InitializeGrandStrategyFactions()
 		}
 	}
 	
-	// allocate labor for provinces
 	for (int i = 0; i < GrandStrategyGame.ProvinceCount; ++i) {
 		if (GrandStrategyGame.Provinces[i] && !GrandStrategyGame.Provinces[i]->Name.empty()) { //if this is a valid province
 			if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL) { // if this province has a culture and an owner
-				GrandStrategyGame.Provinces[i]->ReallocateLabor();
+				GrandStrategyGame.Provinces[i]->ReallocateLabor(); // allocate labor for provinces
+			}
+			if (GrandStrategyGame.Provinces[i]->Coastal && GrandStrategyGame.Provinces[i]->Tiles.size() == 1) { //if the province is a 1-tile island, it has to start with a port in its capital to feed itself
+				GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->SettlementLocation.x][GrandStrategyGame.Provinces[i]->SettlementLocation.y]->SetPort(true);
 			}
 		} else { //if a somehow invalid province is reached
 			break;

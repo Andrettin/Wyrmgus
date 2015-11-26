@@ -834,8 +834,6 @@ public:
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
 	//Wyrmgus start
-//	unsigned SelectableByRectangle : 1; /// Selectable with mouse rectangle.
-//	unsigned IsNotSelectable : 1;       /// Unit should not be selected during game.
 //	unsigned Decoration : 1;            /// Unit is a decoration (act as tile).
 //	unsigned Indestructible : 1;        /// Unit is indestructible (take no damage).
 //	unsigned Teleporter : 1;            /// Can teleport other units.

@@ -712,7 +712,7 @@ CUnitType::CUnitType() :
 //	BuilderLost(0),
 	//Wyrmgus end
 	//Wyrmgus start
-//	Neutral(0), IsNotSelectable(0), Decoration(0),
+//	Neutral(0), Decoration(0),
 	Neutral(0),
 //	Indestructible(0), Teleporter(0), SaveCargo(0),
 //	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
@@ -855,10 +855,7 @@ bool CUnitType::CanMove() const
 
 bool CUnitType::CanSelect(GroupSelectionMode mode) const
 {
-	//Wyrmgus start
-//	if (!IsNotSelectable) {
 	if (!BoolFlag[ISNOTSELECTABLE_INDEX].value) {
-	//Wyrmgus end
 		switch (mode) {
 			case SELECTABLE_BY_RECTANGLE_ONLY:
 				return BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
