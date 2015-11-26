@@ -10,7 +10,7 @@
 //
 /**@name unit_draw.cpp - The draw routines for units. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Jimmy Salmon, Nehal Mistry
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -1322,10 +1322,7 @@ void CUnit::Draw(const CViewport &vp) const
 	// Adjust sprite for Harvesters.
 	//
 	CPlayerColorGraphic *sprite = type->Sprite;
-	//Wyrmgus start
-//	if (type->Harvester && this->CurrentResource) {
 	if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
-	//Wyrmgus end
 		ResourceInfo *resinfo = type->ResInfo[this->CurrentResource];
 		if (this->ResourcesHeld) {
 			if (resinfo->SpriteWhenLoaded) {
@@ -1343,10 +1340,7 @@ void CUnit::Draw(const CViewport &vp) const
 		if (varinfo->Sprite) {
 			sprite = varinfo->Sprite;
 		}
-		//Wyrmgus start
-//		if (type->Harvester && this->CurrentResource) {
 		if (type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource) {
-		//Wyrmgus end
 			if (this->ResourcesHeld) {
 				if (varinfo->SpriteWhenLoaded[this->CurrentResource]) {
 					sprite = varinfo->SpriteWhenLoaded[this->CurrentResource];

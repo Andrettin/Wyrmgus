@@ -10,8 +10,7 @@
 //
 /**@name action_build.cpp - The build building action. */
 //
-//      (c) Copyright 1998-2012 by Lutz Sammer, Jimmy Salmon, and
-//                                 Russell Smith
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -68,7 +67,7 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 
 	//Wyrmgus start
 	//workers building from outside shouldn't be treated differently in this instance
-//	if (unit.Type->BuilderOutside == false) {
+//	if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
 		order->Worker = &builder;
 //	}
 	//Wyrmgus end
@@ -323,10 +322,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	const CUnitType &type = *unit.Type;
 
 	int amount;
-	//Wyrmgus start
-//	if (type.BuilderOutside) {
 	if (type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
-	//Wyrmgus end
 		amount = type.AutoBuildRate;
 	} else {
 		// FIXME: implement this below:

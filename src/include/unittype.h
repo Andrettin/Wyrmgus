@@ -250,10 +250,10 @@ enum {
 	//Wyrmgus start
 	CANDOCK_INDEX,
 	//Wyrmgus end
-	BUILDEROUTSIDE_INDEX,
+	BUILDEROUTSIDE_INDEX,			/// The builder stays outside during the construction.
 	BUILDERLOST_INDEX,
-	CANHARVEST_INDEX,
-	HARVESTER_INDEX,
+	CANHARVEST_INDEX,				/// Resource can be harvested.
+	HARVESTER_INDEX,				/// Unit is a resource harvester.
 	SELECTABLEBYRECTANGLE_INDEX,
 	ISNOTSELECTABLE_INDEX,
 	DECORATION_INDEX,
@@ -829,10 +829,7 @@ public:
 	//Wyrmgus end
 	unsigned CanAttack : 1;         /// Unit can attack.
 	//Wyrmgus start
-//	unsigned BuilderOutside : 1;    /// The builder stays outside during the build.
 //	unsigned BuilderLost : 1;       /// The builder is lost after the build.
-//	unsigned CanHarvest : 1;        /// Resource can be harvested.
-//	unsigned Harvester : 1;         /// unit is a resource harvester.
 	//Wyrmgus end
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 

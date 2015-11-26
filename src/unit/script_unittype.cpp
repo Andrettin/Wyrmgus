@@ -553,10 +553,7 @@ static void UpdateDefaultBoolFlags(CUnitType &type)
 	//Wyrmgus end
 	type.BoolFlag[CANATTACK_INDEX].value             = type.CanAttack;
 	//Wyrmgus start
-//	type.BoolFlag[BUILDEROUTSIDE_INDEX].value        = type.BuilderOutside;
 //	type.BoolFlag[BUILDERLOST_INDEX].value           = type.BuilderLost;
-//	type.BoolFlag[CANHARVEST_INDEX].value            = type.CanHarvest;
-//	type.BoolFlag[HARVESTER_INDEX].value             = type.Harvester;
 //	type.BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value = type.SelectableByRectangle;
 //	type.BoolFlag[ISNOTSELECTABLE_INDEX].value       = type.IsNotSelectable;
 //	type.BoolFlag[DECORATION_INDEX].value            = type.Decoration;
@@ -1633,8 +1630,6 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus start
 		/*
-		} else if (!strcmp(value, "BuilderOutside")) {
-			type->BuilderOutside = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "BuilderLost")) {
 			type->BuilderLost = LuaToBoolean(l, -1);
 		*/
@@ -1786,20 +1781,11 @@ static int CclDefineUnitType(lua_State *l)
 				Assert(res->ResourceId);
 				lua_pop(l, 1);
 			}
-			//Wyrmgus start
-//			type->Harvester = 1;
 			type->BoolFlag[HARVESTER_INDEX].value = 1;
-			//Wyrmgus end
 		} else if (!strcmp(value, "GivesResource")) {
 			lua_pushvalue(l, -1);
 			type->GivesResource = CclGetResourceByName(l);
 			lua_pop(l, 1);
-		//Wyrmgus start
-		/*
-		} else if (!strcmp(value, "CanHarvest")) {
-			type->CanHarvest = LuaToBoolean(l, -1);
-		*/
-		//Wyrmgus end
 		} else if (!strcmp(value, "CanStore")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -3129,10 +3115,7 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[GIVERESOURCE_INDEX].Enable = 1;
 		//Wyrmgus end
 	}
-	//Wyrmgus start
-//	if (unit.Type->Harvester && unit.CurrentResource) {
 	if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.CurrentResource) {
-	//Wyrmgus end
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
 		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
 	}

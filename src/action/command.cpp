@@ -10,7 +10,7 @@
 //
 /**@name command.cpp - Give units a command. */
 //
-//      (c) Copyright 1998-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -629,10 +629,7 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 	//Wyrmgus end
 	COrderPtr *order;
 
-	//Wyrmgus start
-//	if (unit.Type->Building && !what.BuilderOutside && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
 	if (unit.Type->Building && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
-	//Wyrmgus end
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -674,10 +671,7 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	//Wyrmgus start
-//	if (!unit.Type->Building && !unit.Type->Harvester) {
 	if (!unit.Type->Building && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
-	//Wyrmgus end
 		ClearSavedAction(unit);
 		return ;
 	}
@@ -723,10 +717,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 	if (dest.Destroyed) {
 		return ;
 	}
-	//Wyrmgus start
-//	if (!unit.Type->Building && !unit.Type->Harvester) {
 	if (!unit.Type->Building && !unit.Type->BoolFlag[HARVESTER_INDEX].value) {
-	//Wyrmgus end
 		ClearSavedAction(unit);
 		return ;
 	}
@@ -769,12 +760,8 @@ void CommandReturnGoods(CUnit &unit, CUnit *depot, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
-	//Wyrmgus start
-//	if ((unit.Type->Harvester && unit.ResourcesHeld == 0)
-//		|| (!unit.Type->Building && !unit.Type->Harvester)) {
 	if ((unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.ResourcesHeld == 0)
 		|| (!unit.Type->Building && !unit.Type->BoolFlag[HARVESTER_INDEX].value)) {
-	//Wyrmgus end
 		ClearSavedAction(unit);
 		return ;
 	}

@@ -10,8 +10,7 @@
 //
 /**@name selection.cpp - The units' selection. */
 //
-//      (c) Copyright 1999-2005 by Patrice Fortier, Lutz Sammer, and
-//                                 Jimmy Salmon
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -872,10 +871,7 @@ int SelectArmy()
 		if (unit.Type->Building) { //this selection mode is not for buildings
 			continue;
 		}
-		//Wyrmgus start
-//		if (unit.Type->Harvester && unit.Type->ResInfo) { //this selection mode is not for workers
 		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.Type->ResInfo) { //this selection mode is not for workers
-		//Wyrmgus end
 			continue;
 		}
 		table[n++] = &unit;
