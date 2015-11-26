@@ -254,7 +254,7 @@ enum {
 	BUILDERLOST_INDEX,
 	CANHARVEST_INDEX,				/// Resource can be harvested.
 	HARVESTER_INDEX,				/// Unit is a resource harvester.
-	SELECTABLEBYRECTANGLE_INDEX,
+	SELECTABLEBYRECTANGLE_INDEX,	/// Selectable with mouse rectangle.
 	ISNOTSELECTABLE_INDEX,
 	DECORATION_INDEX,
 	INDESTRUCTIBLE_INDEX,

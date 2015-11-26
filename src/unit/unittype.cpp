@@ -377,10 +377,6 @@
 **    Only valid for buildings without the BuilderOutside flag.
 **    The worker is lost when the building is completed.
 **
-**  CUnitType::SelectableByRectangle
-**
-**    Selectable with mouse rectangle
-**
 **    CUnitType::Teleporter
 **
 **    Can teleport other units.
@@ -716,7 +712,7 @@ CUnitType::CUnitType() :
 //	BuilderLost(0),
 	//Wyrmgus end
 	//Wyrmgus start
-//	Neutral(0), SelectableByRectangle(0), IsNotSelectable(0), Decoration(0),
+//	Neutral(0), IsNotSelectable(0), Decoration(0),
 	Neutral(0),
 //	Indestructible(0), Teleporter(0), SaveCargo(0),
 //	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
@@ -865,15 +861,9 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 	//Wyrmgus end
 		switch (mode) {
 			case SELECTABLE_BY_RECTANGLE_ONLY:
-				//Wyrmgus start
-//				return SelectableByRectangle;
 				return BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
-				//Wyrmgus end
 			case NON_SELECTABLE_BY_RECTANGLE_ONLY:
-				//Wyrmgus start
-//				return !SelectableByRectangle;
 				return !BoolFlag[SELECTABLEBYRECTANGLE_INDEX].value;
-				//Wyrmgus end
 			default:
 				return true;
 		}
