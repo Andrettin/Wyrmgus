@@ -168,8 +168,6 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 				return goal->Resource.Active;
 			} else if (!strcmp(cur, "_Distance")) {
 				return unit.MapDistanceTo(*goal);
-			} else if (!strcmp(cur, "Direction")) {
-				return goal->Direction;
 			}
 			fprintf(stderr, "Bad variable name '%s'\n", cur);
 			ExitFatal(1);

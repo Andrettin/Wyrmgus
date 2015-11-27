@@ -40,9 +40,7 @@
 #include "actions.h"
 #include "animation.h"
 #include "construct.h"
-//Wyrmgus start
 #include "editor.h"
-//Wyrmgus end
 #include "font.h"
 #include "luacallback.h"
 #include "map.h"
@@ -2392,9 +2390,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		} else if (type->UnitType == UnitTypeFly) {
 			lua_pushstring(l, "fly");
 			return 1;
+		//Wyrmgus start
 		} else if (type->UnitType == UnitTypeFlyLow) {
 			lua_pushstring(l, "fly-low");
 			return 1;
+		//Wyrmgus end
 		} else if (type->UnitType == UnitTypeNaval) {
 			lua_pushstring(l, "naval");
 			return 1;
