@@ -337,22 +337,9 @@
 **    If units have a repair range, they can repair, and this is the
 **    distance.
 **
-**  CUnitType::BuilderLost
-**
-**    Only valid for buildings without the BuilderOutside flag.
-**    The worker is lost when the building is completed.
-**
-**    CUnitType::Teleporter
-**
-**    Can teleport other units.
-**
 **    CUnitType::ShieldPiercing
 **
 **    Can directly damage shield-protected units, without shield damaging.
-**
-**    CUnitType::SaveCargo
-**
-**    Unit unloads his passengers after death.
 **
 **  CUnitType::Sound
 **
@@ -658,15 +645,7 @@ CUnitType::CUnitType() :
 	Flip(0), LandUnit(0), AirUnit(0), SeaUnit(0),
 	ExplodeWhenKilled(0), Building(0),
 	CanAttack(0),
-	//Wyrmgus start
-//	BuilderLost(0),
-	//Wyrmgus end
-	//Wyrmgus start
-//	Neutral(0), Decoration(0),
 	Neutral(0),
-//	Indestructible(0), Teleporter(0), SaveCargo(0),
-//	NonSolid(0), Wall(0), NoRandomPlacing(0),
-	//Wyrmgus end
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
 //	Sprite(NULL), ShadowSprite(NULL)
@@ -866,10 +845,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 	}
 
 	// Non-solid units can always be entered and they don't block anything
-	//Wyrmgus start
-//	if (type.NonSolid) {
 	if (type.BoolFlag[NONSOLID_INDEX].value) {
-	//Wyrmgus end
 		if (type.Building) {
 			type.MovementMask = MapFieldLandUnit |
 								MapFieldSeaUnit |

@@ -888,10 +888,7 @@ static int CclSetTeleportDestination(lua_State *l)
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
-	//Wyrmgus start
-//	if (unit->Type->Teleporter == false) {
 	if (unit->Type->BoolFlag[TELEPORTER_INDEX].value == false) {
-	//Wyrmgus end
 		LuaError(l, "Unit not a teleporter");
 	}
 	lua_pushvalue(l, 2);

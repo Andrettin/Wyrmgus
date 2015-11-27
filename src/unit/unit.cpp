@@ -648,10 +648,7 @@ void CUnit::Init(const CUnitType &type)
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
-	//Wyrmgus start
-//	if (type.NumDirections > 1 && type.NoRandomPlacing == false && type.Sprite && !type.Building) {
 	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false && type.Sprite && !type.Building) {
-	//Wyrmgus end
 		Direction = (MyRand() >> 8) & 0xFF; // random heading
 		UnitUpdateHeading(*this);
 	}
@@ -750,10 +747,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			// don't count again
 			if (type.Building) {
 				// FIXME: support more races
-				//Wyrmgus start
-//				if (!type.Wall && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
 				if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
-				//Wyrmgus end
 					player.TotalBuildings++;
 				}
 			} else {
@@ -770,10 +764,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	// Don't Add the building if it's dying, used to load a save game
 	if (type.Building && CurrentAction() != UnitActionDie) {
 		// FIXME: support more races
-		//Wyrmgus start
-//		if (!type.Wall && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
 		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
-		//Wyrmgus end
 			player.NumBuildings++;
 		}
 	}
@@ -866,10 +857,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 	//  fancy buildings: mirror buildings (but shadows not correct)
 	if (type.Building && FancyBuildings
-		//Wyrmgus start
-//		&& unit->Type->NoRandomPlacing == false && (MyRand() & 1) != 0) {
 		&& unit->Type->BoolFlag[NORANDOMPLACING_INDEX].value == false && (MyRand() & 1) != 0) {
-		//Wyrmgus end
 		unit->Frame = -unit->Frame - 1;
 	}
 	
@@ -1279,10 +1267,7 @@ void CUnit::Place(const Vec2i &pos)
 	MapMarkUnitSight(*this);
 
 	// Correct directions for wall units
-	//Wyrmgus start
-//	if (this->Type->Wall && this->CurrentAction() != UnitActionBuilt) {
 	if (this->Type->BoolFlag[WALL_INDEX].value && this->CurrentAction() != UnitActionBuilt) {
-	//Wyrmgus end
 		CorrectWallDirections(*this);
 		UnitUpdateHeading(*this);
 		CorrectWallNeighBours(*this);
@@ -1397,10 +1382,7 @@ void CUnit::Remove(CUnit *host)
 	Removed = 1;
 
 	// Correct surrounding walls directions
-	//Wyrmgus start
-//	if (this->Type->Wall) {
 	if (this->Type->BoolFlag[WALL_INDEX].value) {
-	//Wyrmgus end
 		CorrectWallNeighBours(*this);
 	}
 
@@ -1456,10 +1438,7 @@ void UnitLost(CUnit &unit)
 
 		if (type.Building) {
 			// FIXME: support more races
-			//Wyrmgus start
-//			if (!type.Wall && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
 			if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
-			//Wyrmgus end
 				player.NumBuildings--;
 			}
 		}
@@ -1625,10 +1604,7 @@ enum {
 */
 void CorrectWallDirections(CUnit &unit)
 {
-	//Wyrmgus start
-//	Assert(unit.Type->Wall);
 	Assert(unit.Type->BoolFlag[WALL_INDEX].value);
-	//Wyrmgus end
 	Assert(unit.Type->NumDirections == 16);
 	Assert(!unit.Type->Flip);
 
@@ -1668,10 +1644,7 @@ void CorrectWallDirections(CUnit &unit)
 */
 void CorrectWallNeighBours(CUnit &unit)
 {
-	//Wyrmgus start
-//	Assert(unit.Type->Wall);
 	Assert(unit.Type->BoolFlag[WALL_INDEX].value);
-	//Wyrmgus end
 
 	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
 
@@ -1981,10 +1954,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	//  Now the new side!
 
 	if (Type->Building) {
-		//Wyrmgus start
-//		if (!Type->Wall) {
 		if (!Type->BoolFlag[WALL_INDEX].value) {
-		//Wyrmgus end
 			newplayer.TotalBuildings++;
 		}
 	} else {
@@ -2009,10 +1979,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 			newplayer.MaxResources[i] += Type->Stats[newplayer.Index].Storing[i];
 		}
 	}
-	//Wyrmgus start
-//	if (Type->Building && !Type->Wall) {
 	if (Type->Building && !Type->BoolFlag[WALL_INDEX].value) {
-	//Wyrmgus end
 		newplayer.NumBuildings++;
 	}
 	newplayer.UnitTypesCount[Type->Slot]++;
@@ -2652,10 +2619,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		MakeMissile(*type->Missile.Missile, pixelPos, pixelPos);
 	}
 	// Handle Teleporter Destination Removal
-	//Wyrmgus start
-//	if (type->Teleporter && unit.Goal) {
 	if (type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
-	//Wyrmgus end
 		unit.Goal->Remove(NULL);
 		UnitLost(*unit.Goal);
 		UnitClearOrders(*unit.Goal);
@@ -2664,10 +2628,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	}
 
 	// Transporters lose or save their units and building their workers
-	//Wyrmgus start
-//	if (unit.UnitInside && unit.Type->SaveCargo) {
 	if (unit.UnitInside && unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
-	//Wyrmgus end
 		DropOutAll(unit);
 	} else if (unit.UnitInside) {
 		DestroyAllInside(unit);
@@ -2791,10 +2752,7 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 
 	// Buildings, non-aggressive and invincible units have the lowest priority
 	if (dest.IsAgressive() == false || dest.Variable[UNHOLYARMOR_INDEX].Value > 0
-		//Wyrmgus start
-//		|| dest.Type->Indestructible) {
 		|| dest.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
-		//Wyrmgus end
 		if (dest.Type->CanMove() == false) {
 			return INT_MAX;
 		} else {
@@ -2842,10 +2800,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 	const unsigned long lastattack = target.Attacked;
 
 	target.Attacked = GameCycle ? GameCycle : 1;
-	//Wyrmgus start
-//	if (target.Type->Wall || (lastattack && GameCycle <= lastattack + 2 * CYCLES_PER_SECOND)) {
 	if (target.Type->BoolFlag[WALL_INDEX].value || (lastattack && GameCycle <= lastattack + 2 * CYCLES_PER_SECOND)) {
-	//Wyrmgus end
 		return;
 	}
 	// NOTE: perhaps this should also be moved into the notify?
@@ -3166,10 +3121,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		return;
 	}
 
-	//Wyrmgus start
-//	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.Type->Indestructible) {
 	if (target.Variable[UNHOLYARMOR_INDEX].Value > 0 || target.Type->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
-	//Wyrmgus end
 		// vladi: units with active UnholyArmour are invulnerable
 		return;
 	}
@@ -3195,7 +3147,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	}
 
 	//Wyrmgus start
-//	if (attacker && !target.Type->Wall && target.Player->AiEnabled) {
+//	if (attacker && !target.Type->BoolFlag[WALL_INDEX].value && target.Player->AiEnabled) {
 	if (
 		attacker
 		&& !target.Type->BoolFlag[WALL_INDEX].value

@@ -10,8 +10,7 @@
 //
 /**@name game.cpp - The game set-up and creation. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Andreas Arens, and
-//                                 Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -655,10 +654,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 				f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit.Variable[HP_INDEX].Value);
 			}
 			//Wyrmgus end
-			//Wyrmgus start
-//			if (unit.Type->Teleporter && unit.Goal) {
 			if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {
-			//Wyrmgus end
 				teleporters.push_back(*it);
 			}
 		}

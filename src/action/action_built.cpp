@@ -191,10 +191,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	CUnit *worker = order.GetWorkerPtr();
 
 	if (worker != NULL) {
-		//Wyrmgus start
-//		if (type.BuilderLost) {
 		if (type.BoolFlag[BUILDERLOST_INDEX].value) {
-		//Wyrmgus end
 			// Bye bye worker.
 			LetUnitDie(*worker);
 			worker = NULL;
@@ -288,14 +285,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	UpdateForNewUnit(unit, 0);
 
 	// Set the direction of the building if it supports them
-	//Wyrmgus start
-//	if (type.NumDirections > 1 && type.NoRandomPlacing == false) {
 	if (type.NumDirections > 1 && type.BoolFlag[NORANDOMPLACING_INDEX].value == false) {
-	//Wyrmgus end
-		//Wyrmgus start
-//		if (type.Wall) { // Special logic for walls
 		if (type.BoolFlag[WALL_INDEX].value) { // Special logic for walls
-		//Wyrmgus end
 			CorrectWallDirections(unit);
 			CorrectWallNeighBours(unit);
 		} else {
