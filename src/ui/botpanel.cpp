@@ -1075,10 +1075,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = ButtonCheckAttack(unit, buttonaction);
 			break;
 		case ButtonAttackGround:
-			//Wyrmgus start
-//			if (unit.Type->GroundAttack) {
 			if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
-			//Wyrmgus end
 				res = true;
 			}
 			break;

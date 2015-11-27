@@ -10,7 +10,7 @@
 //
 /**@name unit.h - The unit headerfile. */
 //
-//      (c) Copyright 1998-2012 by Lutz Sammer, Jimmy Salmon and Joris Dauphin
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -204,10 +204,7 @@ public:
 	bool operator()(const CUnit *const unit) const
 	{
 		const CUnitType &type = *unit->Type;
-		//Wyrmgus start
-//		if (type.Vanishes || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
 		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
-		//Wyrmgus end
 			return false;
 		}
 		return true;

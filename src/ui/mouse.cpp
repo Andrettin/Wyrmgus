@@ -583,10 +583,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	
 	//  Control + alt click - ground attack
 	if ((KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
-		//Wyrmgus start
-//		if (unit.Type->GroundAttack) {
 		if (unit.Type->BoolFlag[GROUNDATTACK_INDEX].value) {
-		//Wyrmgus end
 			if (!acknowledged) {
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;

@@ -10,7 +10,7 @@
 //
 /**@name script_unit.cpp - The unit ccl functions. */
 //
-//      (c) Copyright 2001-2005 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2001-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -353,10 +353,7 @@ static int CclUnit(lua_State *l)
 			h = LuaToNumber(l, -1, 4);
 			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
 			// Detectcloak works in container
-			//Wyrmgus start
-//			if (unit->Type->DetectCloak) {
 			if (unit->Type->BoolFlag[DETECTCLOAK_INDEX].value) {
-			//Wyrmgus end
 				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
 			}
 			// Radar(Jammer) not.
@@ -622,10 +619,7 @@ static int CclUnit(lua_State *l)
 	}
 
 	//  Revealers are units that can see while removed
-	//Wyrmgus start
-//	if (unit->Removed && unit->Type->Revealer) {
 	if (unit->Removed && unit->Type->BoolFlag[REVEALER_INDEX].value) {
-	//Wyrmgus end
 		MapMarkUnitSight(*unit);
 	}
 

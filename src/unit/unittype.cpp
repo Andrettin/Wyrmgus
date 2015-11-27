@@ -257,12 +257,6 @@
 **
 **    Which units can it attack
 **
-**  Unit::Revealer
-**
-**    A special unit used to reveal the map for a time. This unit
-**    has active sight even when Removed. It's used for Reveal map
-**    type of spells.
-**
 **  CUnitType::LandUnit
 **
 **    Land animated
@@ -293,30 +287,9 @@
 **
 **    Unit is a Building
 **
-**  CUnitType::VisibleUnderFog
-**
-**    Unit is visible under fog of war.
-**
-**  CUnitType::PermanentCloak
-**
-**    Unit is permanently cloaked.
-**
-**  CUnitType::DetectCloak
-**
-**    These units can detect Cloaked units.
-**
-**  CUnitType::Coward
-**
-**    Unit is a coward, and acts defensively. it will not attack
-**    at will and auto-casters will not buff it(bloodlust).
-**
 **  CUnitType::Transporter
 **
 **    Can transport units
-**
-**  CUnitType::AttackFromTransporter
-**
-**    Units inside this transporter can attack with missiles.
 **
 **  CUnitType::MaxOnBoard
 **
@@ -346,14 +319,6 @@
 **  CUnitType::CanStore[::MaxCosts]
 **
 **    What resource types we can store here.
-**
-**  CUnitType::Vanishes
-**
-**    Corpes & destroyed places
-**
-**  CUnitType::GroundAttack
-**
-**    Can do command ground attack
 **
 **  CUnitType::CanCastSpell
 **
@@ -690,16 +655,9 @@ CUnitType::CUnitType() :
 	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),
-	//Wyrmgus start
-//	Flip(0), Revealer(0), LandUnit(0), AirUnit(0), SeaUnit(0),
 	Flip(0), LandUnit(0), AirUnit(0), SeaUnit(0),
-//	ExplodeWhenKilled(0), Building(0), VisibleUnderFog(0),
 	ExplodeWhenKilled(0), Building(0),
-//	PermanentCloak(0), DetectCloak(0),
-//	Coward(0), AttackFromTransporter(0),
-//	Vanishes(0), GroundAttack(0), CanAttack(0),
 	CanAttack(0),
-	//Wyrmgus end
 	//Wyrmgus start
 //	BuilderLost(0),
 	//Wyrmgus end
@@ -707,7 +665,7 @@ CUnitType::CUnitType() :
 //	Neutral(0), Decoration(0),
 	Neutral(0),
 //	Indestructible(0), Teleporter(0), SaveCargo(0),
-//	NonSolid(0), Wall(0), NoRandomPlacing(0), Organic(0),
+//	NonSolid(0), Wall(0), NoRandomPlacing(0),
 	//Wyrmgus end
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start

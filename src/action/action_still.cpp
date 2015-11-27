@@ -10,7 +10,7 @@
 //
 /**@name action_still.cpp - The stand still action. */
 //
-//      (c) Copyright 1998-2006 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -566,7 +566,7 @@ bool AutoAttack(CUnit &unit)
 	// If unit is not bunkered and removed, wait
 	if (unit.Removed
 		//Wyrmgus start
-//		&& (unit.Container == NULL || unit.Container->Type->AttackFromTransporter == false)) {
+//		&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
 		&& (unit.Container == NULL || !unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
 		//Wyrmgus end
 		return ;
