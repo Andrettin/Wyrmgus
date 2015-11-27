@@ -850,10 +850,6 @@ public:
 	// --- FILLED UP ---
 
 	//Wyrmgus start
-//	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
-	//Wyrmgus end
-
-	//Wyrmgus start
 //	unsigned FieldFlags;            /// Unit map field flags
 //	unsigned MovementMask;          /// Unit check this map flags for move
 	unsigned long FieldFlags;            /// Unit map field flags

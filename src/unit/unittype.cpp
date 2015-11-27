@@ -351,10 +351,6 @@
 **
 **  @todo temporary solution
 **
-**  CUnitType::ImproveIncomes[::MaxCosts]
-**
-**    Gives the player an improved income.
-**
 **  CUnitType::FieldFlags
 **
 **    Flags that are set, if a unit enters a map field or cleared, if
@@ -666,7 +662,6 @@ CUnitType::CUnitType() :
 	//Wyrmgus start
 	memset(VarInfo, 0, sizeof(VarInfo));
 	memset(Drops, 0, sizeof(Drops));
-//	memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
 	//Wyrmgus end
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 	//Wyrmgus start
@@ -1111,7 +1106,6 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.Storing[i]);
 	}
-	//Wyrmgus start
 	file.printf("},\n\"improve-production\", {");
 	for (unsigned int i = 0; i < MaxCosts; ++i) {
 		if (i) {
@@ -1119,7 +1113,6 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ImproveIncomes[i]);
 	}
-	//Wyrmgus end
 	file.printf("}})\n");
 	return true;
 }

@@ -10,8 +10,7 @@
 //
 /**@name upgrade_structs.h - The upgrade/allow headerfile. */
 //
-//      (c) Copyright 1999-2007 by Vladi Belperchinov-Shabanski and
-//                                 Jimmy Salmon
+//      (c) Copyright 1999-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -191,9 +190,7 @@ public:
 	{
 		memset(Costs, 0, sizeof(Costs));
 		memset(Storing, 0, sizeof(Storing));
-		//Wyrmgus start
 		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
-		//Wyrmgus end
 	}
 	~CUnitStats();
 
@@ -205,9 +202,7 @@ public:
 	CVariable *Variables;           /// user defined variable.
 	int Costs[MaxCosts];            /// current costs of the unit
 	int Storing[MaxCosts];          /// storage increasing
-	//Wyrmgus start
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
-	//Wyrmgus end
 };
 
 /**
@@ -277,9 +272,7 @@ public:
 	CUnitStats Modifier;                /// modifier of unit stats.
 	int *ModifyPercent;					/// use for percent modifiers
 	int SpeedResearch;					/// speed factor for researching
-	//Wyrmgus start
-	int  ImproveIncomes[MaxCosts];      /// improve incomes
-	//Wyrmgus end
+	int ImproveIncomes[MaxCosts];		/// improve incomes
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow

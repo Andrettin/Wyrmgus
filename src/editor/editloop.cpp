@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2008 by Lutz Sammer and Jimmy Salmon
+//      (c) Copyright 2002-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -310,10 +310,6 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	}
 	if (unit != NULL) {
 		if (type.GivesResource) {
-			//Wyrmgus start
-//			unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
-//			unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
-//			unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
 			if (type.StartingResources != 0) {
 				unit->ResourcesHeld = type.StartingResources;
 				unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
@@ -323,7 +319,6 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 				unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
 				unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
 			}
-			//Wyrmgus end
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
 	} else {
@@ -1096,10 +1091,7 @@ static void DrawStartLocations()
 				if (type) {
 					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
 				} else { // Draw a cross
-					//Wyrmgus start
-//					DrawCross(startScreenPos, PixelTileSize, PlayerColors[i][0]);
 					DrawCross(startScreenPos, PixelTileSize, Players[i].Color);
-					//Wyrmgus end
 				}
 			}
 		}
@@ -1435,20 +1427,12 @@ static void EditorCallbackButtonDown(unsigned button)
 	// Click on unit area
 	if (Editor.State == EditorEditUnit) {
 		// Cursor on unit icons
-		//Wyrmgus start
-		/*
 		if (Editor.CursorUnitIndex != -1) {
-			Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
-			CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
-			return;
-		}
-		*/
-		if (Editor.CursorUnitIndex != -1) {
-			if ((MouseButtons & LeftButton)) {
+			if (MouseButtons & LeftButton) {
 				Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
 				CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
 				return;
-			} else if ((MouseButtons & RightButton)) {
+			} else if (MouseButtons & RightButton) {
 				char buf[256];
 				snprintf(buf, sizeof(buf), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
 				Editor.CursorUnitIndex = -1;
@@ -1456,7 +1440,6 @@ static void EditorCallbackButtonDown(unsigned button)
 				return;
 			}
 		}
-		//Wyrmgus end
 	}
 
 	// Right click on a resource
@@ -1502,10 +1485,7 @@ static void EditorCallbackButtonDown(unsigned button)
 						UnitPlacedThisPress = true;
 						UI.StatusLine.Clear();
 					} else {
-						//Wyrmgus start
-//						UI.StatusLine.Set(_("Unit can't be placed here."));
 						UI.StatusLine.Set(_("Unit cannot be placed here."));
-						//Wyrmgus end
 						PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound,
 									  MaxSampleVolume);
 					}
@@ -1983,10 +1963,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = SelectButton;
 		CursorOn = CursorOnButton;
-		//Wyrmgus start
-//		UI.StatusLine.Set(_("Select mode"));
 		UI.StatusLine.Set(_("Select Mode"));
-		//Wyrmgus end
 		return;
 	}
 	//Wyrmgus start
@@ -2002,10 +1979,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = UnitButton;
 		CursorOn = CursorOnButton;
-		//Wyrmgus start
-//		UI.StatusLine.Set(_("Unit mode"));
 		UI.StatusLine.Set(_("Unit Mode"));
-		//Wyrmgus end
 		return;
 	}
 	if (Editor.TerrainEditable) {
@@ -2020,10 +1994,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			ButtonAreaUnderCursor = -1;
 			ButtonUnderCursor = TileButton;
 			CursorOn = CursorOnButton;
-			//Wyrmgus start
-//			UI.StatusLine.Set(_("Tile mode"));
 			UI.StatusLine.Set(_("Tile Mode"));
-			//Wyrmgus end
 			return;
 		}
 	}
@@ -2045,10 +2016,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		ButtonAreaUnderCursor = -1;
 		ButtonUnderCursor = StartButton;
 		CursorOn = CursorOnButton;
-		//Wyrmgus start
-//		UI.StatusLine.Set(_("Set start location mode"));
 		UI.StatusLine.Set(_("Set Start Location"));
-		//Wyrmgus end
 		return;
 	}
 	if (UI.MenuButton.X != -1 && UI.MenuButton.Contains(screenPos)) {
