@@ -636,8 +636,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->BoxOffsetY = parent_type->BoxOffsetY;
 			type->Construction = parent_type->Construction;
 			type->UnitType = parent_type->UnitType;
-//			type->Demand = parent_type->Demand;
-//			type->Supply = parent_type->Supply;
 			type->Missile.Name = parent_type->Missile.Name;
 			type->Missile.Missile = NULL;
 			type->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
@@ -1412,12 +1410,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->AiAdjacentRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DecayRate")) {
 			type->DecayRate = LuaToNumber(l, -1);
-		//Wyrmgus start
-//		} else if (!strcmp(value, "Demand")) {
-//			type->Demand = LuaToNumber(l, -1);
-//		} else if (!strcmp(value, "Supply")) {
-//			type->Supply = LuaToNumber(l, -1);
-		//Wyrmgus end
 		} else if (!strcmp(value, "Corpse")) {
 			type->CorpseName = LuaToString(l, -1);
 			type->CorpseType = NULL;
@@ -1702,7 +1694,10 @@ static int CclDefineUnitType(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				ResourceInfo *res = new ResourceInfo;
+				//Wyrmgus start
+//				ResourceInfo *res = new ResourceInfo;
+				ResourceInfo *res;
+				//Wyrmgus end
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument");
 				}
@@ -1712,17 +1707,19 @@ static int CclDefineUnitType(lua_State *l)
 					++k;
 					if (!strcmp(value, "resource-id")) {
 						lua_rawgeti(l, -1, k + 1);
-						res->ResourceId = CclGetResourceByName(l);
-						lua_pop(l, 1);
 						//Wyrmgus start
+//						res->ResourceId = CclGetResourceByName(l);
 //						type->ResInfo[res->ResourceId] = res;
+						int resource_id = CclGetResourceByName(l);
 						//allow redefinition
-						if (type->ResInfo[res->ResourceId]) {
-							res = type->ResInfo[res->ResourceId];
-						} else {
-							type->ResInfo[res->ResourceId] = res;
+						res = type->ResInfo[resource_id];
+						if (!res) {
+							res = new ResourceInfo;
+							type->ResInfo[resource_id] = res;
 						}
+						res->ResourceId = resource_id;
 						//Wyrmgus end
+						lua_pop(l, 1);
 					} else if (!strcmp(value, "resource-step")) {
 						res->ResourceStep = LuaToNumber(l, -1, k + 1);
 					} else if (!strcmp(value, "final-resource")) {
@@ -2472,20 +2469,6 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_pushnumber(l, type->MapDefaultStat.Variables[PRIORITY_INDEX].Value);
 		}
 		return 1;
-	} else if (!strcmp(data, "Demand")) {
-		if (!GameRunning && Editor.Running != EditorEditing) {
-			lua_pushnumber(l, type->DefaultStat.Variables[DEMAND_INDEX].Value);
-		} else {
-			lua_pushnumber(l, type->MapDefaultStat.Variables[DEMAND_INDEX].Value);
-		}
-		return 1;
-	} else if (!strcmp(data, "Supply")) {
-		if (!GameRunning && Editor.Running != EditorEditing) {
-			lua_pushnumber(l, type->DefaultStat.Variables[SUPPLY_INDEX].Value);
-		} else {
-			lua_pushnumber(l, type->MapDefaultStat.Variables[SUPPLY_INDEX].Value);
-		}
-		return 1;
 	} else if (!strcmp(data, "Type")) {
 		if (type->UnitType == UnitTypeLand) {
 			lua_pushstring(l, "land");
@@ -3113,23 +3096,6 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[CARRYRESOURCE_INDEX].Value = unit.ResourcesHeld;
 		unit.Variable[CARRYRESOURCE_INDEX].Max = unit.Type->ResInfo[unit.CurrentResource]->ResourceCapacity;
 	}
-
-	//Wyrmgus start
-	/*
-	// Supply
-	unit.Variable[SUPPLY_INDEX].Value = unit.Type->Supply;
-	unit.Variable[SUPPLY_INDEX].Max = unit.Player->Supply;
-	if (unit.Player->Supply < unit.Type->Supply) { // Come with 1st supply building.
-		unit.Variable[SUPPLY_INDEX].Value = unit.Variable[SUPPLY_INDEX].Max;
-	}
-	unit.Variable[SUPPLY_INDEX].Enable = unit.Type->Supply > 0;
-
-	// Demand
-	unit.Variable[DEMAND_INDEX].Value = unit.Type->Demand;
-	unit.Variable[DEMAND_INDEX].Max = unit.Player->Demand;
-	unit.Variable[DEMAND_INDEX].Enable = unit.Type->Demand > 0;
-	*/
-	//Wyrmgus end
 
 	//Wyrmgus start
 	/*

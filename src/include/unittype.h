@@ -313,8 +313,8 @@ enum {
 	CARRYRESOURCE_INDEX,
 	XP_INDEX,
 	KILL_INDEX,
-	SUPPLY_INDEX,
-	DEMAND_INDEX,
+	SUPPLY_INDEX,					/// Food supply
+	DEMAND_INDEX,					/// Food demand
 	ARMOR_INDEX,
 	SIGHTRANGE_INDEX,
 	ATTACKRANGE_INDEX,
@@ -873,11 +873,6 @@ public:
 	CUnitSound Sound;				/// Sounds for events
 	//Wyrmgus start
 	CUnitSound MapSound;			/// Sounds for events, map-specific
-	//Wyrmgus end
-
-	//Wyrmgus start
-//	int Supply;                     /// Food supply
-//	int Demand;                     /// Food demand
 	//Wyrmgus end
 
 	int PoisonDrain;                /// How much health is drained every second when poisoned

@@ -1494,7 +1494,7 @@ int CPlayer::CheckLimits(const CUnitType &type) const
 		return -2;
 	}
 	//Wyrmgus start
-//	if (this->Demand + type.Demand > this->Supply && type.Demand) {
+//	if (this->Demand + type.Stats[this->Index].Variables[DEMAND_INDEX].Value > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
 	if (this->Demand + (type.Stats[this->Index].Variables[DEMAND_INDEX].Value * (type.TrainQuantity ? type.TrainQuantity : 1)) > this->Supply && type.Stats[this->Index].Variables[DEMAND_INDEX].Value) {
 	//Wyrmgus end
 		Notify("%s", _("Insufficient Supply, increase Supply."));

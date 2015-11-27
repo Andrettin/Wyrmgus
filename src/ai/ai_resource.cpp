@@ -10,7 +10,7 @@
 //
 /**@name ai_resource.cpp - AI resource manager. */
 //
-//      (c) Copyright 2000-2005 by Lutz Sammer and Antonis Chaniotis.
+//      (c) Copyright 2000-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -130,22 +130,13 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 	int remaining = 0;
 	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
 		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
-		//Wyrmgus start
-//		if (queue.Type->Supply) {
 		if (queue.Type->Stats[pai.Player->Index].Variables[SUPPLY_INDEX].Value) {
-		//Wyrmgus end
-			//Wyrmgus start
-//			remaining += queue.Made * queue.Type->Supply;
 			remaining += queue.Made * queue.Type->Stats[pai.Player->Index].Variables[SUPPLY_INDEX].Value;
-			//Wyrmgus end
 		}
 	}
 
 	// We are already out of food.
-	//Wyrmgus start
-//	remaining += pai.Player->Supply - pai.Player->Demand - type.Demand;
 	remaining += pai.Player->Supply - pai.Player->Demand - type.Stats[pai.Player->Index].Variables[DEMAND_INDEX].Value;
-	//Wyrmgus end
 	if (remaining < 0) {
 		return 0;
 	}
@@ -153,10 +144,7 @@ static int AiCheckSupply(const PlayerAi &pai, const CUnitType &type)
 	for (unsigned int i = 0; i < pai.UnitTypeBuilt.size(); ++i) {
 		const AiBuildQueue &queue = pai.UnitTypeBuilt[i];
 
-		//Wyrmgus start
-//		remaining -= queue.Made * queue.Type->Demand;
 		remaining -= queue.Made * queue.Type->Stats[pai.Player->Index].Variables[DEMAND_INDEX].Value;
-		//Wyrmgus end
 		if (remaining < 0) {
 			return 0;
 		}
@@ -565,12 +553,8 @@ static bool AiRequestSupply()
 		for (int c = 1; c < MaxCosts; ++c) {
 			cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Costs[c];
 		}
-		//Wyrmgus start
-//		cache[j].unit_cost += type.Supply - 1;
-//		cache[j].unit_cost /= type.Supply;
 		cache[j].unit_cost += type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value - 1;
 		cache[j].unit_cost /= type.Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value;
-		//Wyrmgus end
 		cache[j++].type = &type;
 		Assert(j < 16);
 	}
@@ -875,10 +859,7 @@ static void AiCheckingWork()
 {
 	// Supply has the highest priority
 	if (AiPlayer->NeedSupply) {
-		//Wyrmgus start
-//		if (AiPlayer->UnitTypeBuilt.empty() || AiPlayer->UnitTypeBuilt[0].Type->Supply == 0) {
 		if (AiPlayer->UnitTypeBuilt.empty() || AiPlayer->UnitTypeBuilt[0].Type->Stats[AiPlayer->Player->Index].Variables[SUPPLY_INDEX].Value == 0) {
-		//Wyrmgus end
 			AiPlayer->NeedSupply = false;
 			AiRequestSupply();
 		}
@@ -893,10 +874,7 @@ static void AiCheckingWork()
 		// Buildings can be destroyed.
 
 		// Check if we have enough food.
-		//Wyrmgus start
-//		if (type.Demand && !AiCheckSupply(*AiPlayer, type)) {
 		if (type.Stats[AiPlayer->Player->Index].Variables[DEMAND_INDEX].Value && !AiCheckSupply(*AiPlayer, type)) {
-		//Wyrmgus end
 			AiPlayer->NeedSupply = true;
 			AiRequestSupply();
 			// AiRequestSupply can change UnitTypeBuilt so recalculate queuep
