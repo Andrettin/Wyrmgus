@@ -10,8 +10,7 @@
 //
 /**@name sound.cpp - The sound. */
 //
-//      (c) Copyright 1998-2007 by Lutz Sammer, Fabrice Rossi,
-//                                 and Jimmy Salmon
+//      (c) Copyright 1998-2015 by the Stratagus Team
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -165,25 +164,13 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 	//Wyrmgus end
 	switch (voice) {
 		case VoiceAcknowledging:
-			//Wyrmgus start
-//			return unit.Type->Sound.Acknowledgement.Sound;
 			return unit.Type->MapSound.Acknowledgement.Sound;
-			//Wyrmgus end
 		case VoiceAttack:
-			//Wyrmgus start
-			/*
-			if (unit.Type->Sound.Attack.Sound) {
-				return unit.Type->Sound.Attack.Sound;
-			} else {
-				return unit.Type->Sound.Acknowledgement.Sound;
-			}
-			*/
 			if (unit.Type->MapSound.Attack.Sound) {
 				return unit.Type->MapSound.Attack.Sound;
 			} else {
 				return unit.Type->MapSound.Acknowledgement.Sound;
 			}
-			//Wyrmgus end
 		//Wyrmgus start
 		case VoiceIdle:
 			return unit.Type->MapSound.Idle.Sound;
@@ -213,40 +200,19 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 			return unit.Type->MapSound.Used.Sound;
 		//Wyrmgus end
 		case VoiceBuild:
-			//Wyrmgus start
-//			return unit.Type->Sound.Build.Sound;
 			return unit.Type->MapSound.Build.Sound;
-			//Wyrmgus end
 		case VoiceReady:
-			//Wyrmgus start
-//			return unit.Type->Sound.Ready.Sound;
 			return unit.Type->MapSound.Ready.Sound;
-			//Wyrmgus end
 		case VoiceSelected:
-			//Wyrmgus start
-//			return unit.Type->Sound.Selected.Sound;
 			return unit.Type->MapSound.Selected.Sound;
-			//Wyrmgus end
 		case VoiceHelpMe:
-			//Wyrmgus start
-//			return unit.Type->Sound.Help.Sound;
 			return unit.Type->MapSound.Help.Sound;
-			//Wyrmgus end
 		case VoiceDying:
-			//Wyrmgus start
-			/*
-			if (unit.Type->Sound.Dead[unit.DamagedType].Sound) {
-				return unit.Type->Sound.Dead[unit.DamagedType].Sound;
-			} else {
-				return unit.Type->Sound.Dead[ANIMATIONS_DEATHTYPES].Sound;
-			}
-			*/
 			if (unit.Type->MapSound.Dead[unit.DamagedType].Sound) {
 				return unit.Type->MapSound.Dead[unit.DamagedType].Sound;
 			} else {
 				return unit.Type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Sound;
 			}
-			//Wyrmgus end
 		case VoiceWorkCompleted:
 			return GameSounds.WorkComplete[ThisPlayer->Race].Sound;
 		case VoiceBuilding:
@@ -254,38 +220,20 @@ static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 		case VoiceDocking:
 			return GameSounds.Docking.Sound;
 		case VoiceRepairing:
-			//Wyrmgus start
-			/*
-			if (unit.Type->Sound.Repair.Sound) {
-				return unit.Type->Sound.Repair.Sound;
-			} else {
-				return unit.Type->Sound.Acknowledgement.Sound;
-			}
-			*/
 			if (unit.Type->MapSound.Repair.Sound) {
 				return unit.Type->MapSound.Repair.Sound;
 			} else {
 				return unit.Type->MapSound.Acknowledgement.Sound;
 			}
-			//Wyrmgus end
 		case VoiceHarvesting:
 			for (size_t i = 0; i != unit.Orders.size(); ++i) {
 				if (unit.Orders[i]->Action == UnitActionResource) {
 					COrder_Resource &order = dynamic_cast<COrder_Resource &>(*unit.Orders[i]);
-					//Wyrmgus start
-					/*
-					if (unit.Type->Sound.Harvest[order.GetCurrentResource()].Sound) {
-						return unit.Type->Sound.Harvest[order.GetCurrentResource()].Sound;
-					} else {
-						return unit.Type->Sound.Acknowledgement.Sound;
-					}
-					*/
 					if (unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound) {
 						return unit.Type->MapSound.Harvest[order.GetCurrentResource()].Sound;
 					} else {
 						return unit.Type->MapSound.Acknowledgement.Sound;
 					}
-					//Wyrmgus end
 				}
 			}
 	}

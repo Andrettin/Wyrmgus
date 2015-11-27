@@ -246,7 +246,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (&player == ThisPlayer) {
 		//Wyrmgus start
 		/*
-		if (type.Sound.Ready.Sound) {
+		if (type.MapSound.Ready.Sound) {
 			PlayUnitSound(unit, VoiceReady);
 		} else if (worker) {
 			PlayUnitSound(*worker, VoiceWorkCompleted);

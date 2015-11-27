@@ -537,7 +537,6 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			}
 		}
 
-		//Wyrmgus start
 		f->printf("\n-- set map default stat and map sound for unit types\n");
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 			const CUnitType &type = *UnitTypes[i];
@@ -569,6 +568,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (type.MapSound.Attack.Name != type.Sound.Attack.Name) {
 				f->printf("SetMapSound(\"%s\", \"%s\", \"attack\")\n", type.Ident.c_str(), type.MapSound.Attack.Name.c_str());
 			}
+			//Wyrmgus start
 			if (type.MapSound.Idle.Name != type.Sound.Idle.Name) {
 				f->printf("SetMapSound(\"%s\", \"%s\", \"idle\")\n", type.Ident.c_str(), type.MapSound.Idle.Name.c_str());
 			}
@@ -596,6 +596,10 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (type.MapSound.StepStone.Name != type.Sound.StepStone.Name) {
 				f->printf("SetMapSound(\"%s\", \"%s\", \"step-stone\")\n", type.Ident.c_str(), type.MapSound.StepStone.Name.c_str());
 			}
+			if (type.MapSound.Used.Name != type.Sound.Used.Name) {
+				f->printf("SetMapSound(\"%s\", \"%s\", \"used\")\n", type.Ident.c_str(), type.MapSound.Used.Name.c_str());
+			}
+			//Wyrmgus end
 			if (type.MapSound.Build.Name != type.Sound.Build.Name) {
 				f->printf("SetMapSound(\"%s\", \"%s\", \"build\")\n", type.Ident.c_str(), type.MapSound.Build.Name.c_str());
 			}
@@ -623,12 +627,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 				}
 			}
 		}
-		//Wyrmgus end
 		
-		//Wyrmgus start
-//		f->printf("-- place units\n");
 		f->printf("\n-- place units\n");
-		//Wyrmgus end
 		f->printf("if (MapUnitsInit ~= nil) then MapUnitsInit() end\n");
 		std::vector<CUnit *> teleporters;
 		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {

@@ -830,18 +830,11 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player) const
 void UpdateUnitStats(CUnitType &type, int reset)
 {
 	if (reset) {
-		//Wyrmgus start
-		/*
-		for (int player = 0; player < PlayerMax; ++player) {
-			type.Stats[player] = type.DefaultStat;
-		}
-		*/
 		type.MapDefaultStat = type.DefaultStat;
 		for (int player = 0; player < PlayerMax; ++player) {
 			type.Stats[player] = type.MapDefaultStat;
 		}
 		type.MapSound = type.Sound;
-		//Wyrmgus end
 	}
 
 	// Non-solid units can always be entered and they don't block anything
@@ -1001,10 +994,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 		// A little chaos, buildings without HP can be entered.
 		// The oil-patch is a very special case.
 		//
-		//Wyrmgus start
-//		if (type.DefaultStat.Variables[HP_INDEX].Max) {
 		if (type.MapDefaultStat.Variables[HP_INDEX].Max) {
-		//Wyrmgus end
 			type.FieldFlags = MapFieldBuilding;
 		} else {
 			type.FieldFlags = MapFieldNoBuilding;

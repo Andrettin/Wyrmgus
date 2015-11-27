@@ -2270,9 +2270,6 @@ static int CclSetUnitTypeName(lua_State *l)
 	return 1;
 }
 
-//Wyrmgus start
-// ----------------------------------------------------------------------------
-
 /**
 **  Get unit type data.
 **
@@ -2291,6 +2288,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, type->Name.c_str());
 		return 1;
+	//Wyrmgus start
 	} else if (!strcmp(data, "DefaultName")) {
 		lua_pushstring(l, type->DefaultName.c_str());
 		return 1;
@@ -2315,6 +2313,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, type->Background.c_str());
 		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, type->Icon.Name.c_str());
 		return 1;
@@ -2338,6 +2337,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_pushnumber(l, type->MapDefaultStat.ImproveIncomes[resId]);
 		}
 		return 1;
+	//Wyrmgus start
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, type->ChildUpgrade.c_str());
 		return 1;
@@ -2350,6 +2350,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "TrainQuantity")) {
 		lua_pushnumber(l, type->TrainQuantity);
 		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "DrawLevel")) {
 		lua_pushnumber(l, type->DrawLevel);
 		return 1;
@@ -2359,6 +2360,7 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "TileHeight")) {
 		lua_pushnumber(l, type->TileHeight);
 		return 1;
+	//Wyrmgus start
 	/*
 	} else if (!strcmp(data, "ComputerReactionRange")) {
 		lua_pushnumber(l, type->ReactRangeComputer);
@@ -2367,6 +2369,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->ReactRangePerson);
 		return 1;
 	*/
+	//Wyrmgus end
 	} else if (!strcmp(data, "Missile")) {
 		lua_pushstring(l, type->Missile.Name.c_str());
 		return 1;
@@ -2410,12 +2413,14 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Building")) {
 		lua_pushboolean(l, type->Building);
 		return 1;
+	//Wyrmgus start
 	} else if (!strcmp(data, "Item")) {
 		lua_pushboolean(l, type->BoolFlag[ITEM_INDEX].value);
 		return 1;
 	} else if (!strcmp(data, "Mercenary")) {
 		lua_pushboolean(l, type->BoolFlag[MERCENARY_INDEX].value);
 		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "LandUnit")) {
 		lua_pushboolean(l, type->LandUnit);
 		return 1;
@@ -2448,6 +2453,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			} else {
 				lua_pushstring(l, type->MapSound.Attack.Name.c_str());
 			}
+		//Wyrmgus start
 		} else if (sound_type == "idle") {
 			if (!GameRunning && Editor.Running != EditorEditing) {
 				lua_pushstring(l, type->Sound.Idle.Name.c_str());
@@ -2508,6 +2514,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			} else {
 				lua_pushstring(l, type->MapSound.Used.Name.c_str());
 			}
+		//Wyrmgus end
 		} else if (sound_type == "build") {
 			if (!GameRunning && Editor.Running != EditorEditing) {
 				lua_pushstring(l, type->Sound.Build.Name.c_str());
@@ -2573,6 +2580,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			}
 		}
 		return 1;
+	//Wyrmgus start
 	} else if (!strcmp(data, "Traits")) {
 		lua_createtable(l, type->Traits.size(), 0);
 		for (size_t i = 1; i <= type->Traits.size(); ++i)
@@ -2581,6 +2589,7 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
 		if (index != -1) { // valid index
@@ -2590,7 +2599,6 @@ static int CclGetUnitTypeData(lua_State *l)
 				lua_pushnumber(l, type->MapDefaultStat.Variables[index].Value);
 			}
 			return 1;
-//			continue;
 		}
 
 		index = UnitTypeVar.BoolFlagNameLookup[data];
@@ -2604,7 +2612,6 @@ static int CclGetUnitTypeData(lua_State *l)
 
 	return 0;
 }
-//Wyrmgus end
 
 // ----------------------------------------------------------------------------
 
@@ -3015,23 +3022,19 @@ void UpdateUnitVariables(CUnit &unit)
 	//Wyrmgus start
 	/*
 	// SightRange
-	unit.Variable[SIGHTRANGE_INDEX].Value = type->DefaultStat.Variables[SIGHTRANGE_INDEX].Value;
+	unit.Variable[SIGHTRANGE_INDEX].Value = type->MapDefaultStat.Variables[SIGHTRANGE_INDEX].Value;
 	unit.Variable[SIGHTRANGE_INDEX].Max = unit.Stats->Variables[SIGHTRANGE_INDEX].Max;
 	*/
 	//Wyrmgus end
 
 	// AttackRange
 	//Wyrmgus start
-//	unit.Variable[ATTACKRANGE_INDEX].Value = type->DefaultStat.Variables[ATTACKRANGE_INDEX].Max;
 //	unit.Variable[ATTACKRANGE_INDEX].Value = type->MapDefaultStat.Variables[ATTACKRANGE_INDEX].Max;
 //	unit.Variable[ATTACKRANGE_INDEX].Max = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	//Wyrmgus end
 
 	// Priority
-	//Wyrmgus start
-//	unit.Variable[PRIORITY_INDEX].Value = type->DefaultStat.Variables[PRIORITY_INDEX].Max;
 	unit.Variable[PRIORITY_INDEX].Value = type->MapDefaultStat.Variables[PRIORITY_INDEX].Max;
-	//Wyrmgus end
 	unit.Variable[PRIORITY_INDEX].Max = unit.Stats->Variables[PRIORITY_INDEX].Max;
 
 	// Position
@@ -3079,7 +3082,6 @@ void UpdateUnitVariables(CUnit &unit)
 	}
 }
 
-//Wyrmgus start
 /**
 **  Set the map default stat for a unit type
 **
@@ -3158,6 +3160,7 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 		type->MapSound.Acknowledgement.Name = sound;
 	} else if (sound_type == "attack") {
 		type->MapSound.Attack.Name = sound;
+	//Wyrmgus start
 	} else if (sound_type == "idle") {
 		type->MapSound.Idle.Name = sound;
 	} else if (sound_type == "hit") {
@@ -3178,6 +3181,7 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 		type->MapSound.StepStone.Name = sound;
 	} else if (sound_type == "used") {
 		type->MapSound.Used.Name = sound;
+	//Wyrmgus end
 	} else if (sound_type == "build") {
 		type->MapSound.Build.Name = sound;
 	} else if (sound_type == "ready") {
@@ -3204,7 +3208,6 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 		}
 	}
 }
-//Wyrmgus end
 
 /**
 **  Register CCL features for unit-type.
@@ -3227,9 +3230,7 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "GetUnitTypeIdent", CclGetUnitTypeIdent);
 	lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
 	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
-	//Wyrmgus start
 	lua_register(Lua, "GetUnitTypeData", CclGetUnitTypeData);
-	//Wyrmgus end
 }
 
 //@}

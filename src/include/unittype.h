@@ -819,9 +819,7 @@ public:
 	unsigned Neutral : 1;           /// Unit is neutral, used by the editor
 
 	CUnitStats DefaultStat;
-	//Wyrmgus start
 	CUnitStats MapDefaultStat;
-	//Wyrmgus end
 	struct BoolFlags {
 		bool value;             /// User defined flag. Used for (dis)allow target.
 		char CanTransport;      /// Can transport units with this flag.
@@ -845,9 +843,7 @@ public:
 	CColor NeutralMinimapColorRGB;   /// Minimap Color for Neutral Units.
 
 	CUnitSound Sound;				/// Sounds for events
-	//Wyrmgus start
 	CUnitSound MapSound;			/// Sounds for events, map-specific
-	//Wyrmgus end
 
 	int PoisonDrain;                /// How much health is drained every second when poisoned
 
@@ -1059,9 +1055,10 @@ extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
 /// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(CUnit &unit);
 
-//Wyrmgus start
 extern void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type);
 extern void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
+
+//Wyrmgus start
 extern std::string GetGenderNameById(int gender);
 extern int GetGenderIdByName(std::string gender);
 //Wyrmgus end
