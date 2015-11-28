@@ -346,10 +346,6 @@ std::map<std::string, int> CivilizationStringToIndex;
 std::map<std::string, int> FactionStringToIndex[MAX_RACES];
 //Wyrmgus end
 
-//Wyrmgus start
-std::vector<CQuest *> Quests;
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -2211,16 +2207,6 @@ int GetGovernmentTypeIdByName(std::string government_type)
 	}
 
 	return -1;
-}
-
-CQuest *GetQuest(std::string quest_name)
-{
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (quest_name == Quests[i]->Name) {
-			return Quests[i];
-		}
-	}
-	return NULL;
 }
 //Wyrmgus end
 

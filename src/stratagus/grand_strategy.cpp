@@ -37,6 +37,7 @@
 
 #include "grand_strategy.h"
 
+#include "character.h"
 #include "font.h"	// for grand strategy mode tooltip drawing
 #include "interface.h"
 #include "iolib.h"

@@ -729,44 +729,6 @@ enum NotifyType {
 	NotifyGreen    /// Green alarm
 };
 
-//Wyrmgus start
-class CQuest
-{
-public:
-	CQuest() :
-		Civilization(-1), TechnologyPoints(0), X(-1), Y(-1), PlayerColor(0),
-		Hidden(false),
-		QuestGiver(NULL)
-	{
-	}
-	
-	std::string Name;				/// Name of the quest
-	std::string Description;		/// Description of the quest
-	std::string World;				/// Which world the quest belongs to
-	std::string Map;				/// What map the quest is played on
-	std::string Scenario;			/// Which scenario file is to be loaded for the quest
-	std::string RequiredQuest;		/// Quest required before this quest becomes available
-	std::string RequiredTechnology;	/// Technology required before this quest becomes available
-	std::string Area;				/// The area where the quest is set
-	std::string Briefing;			/// Briefing text of the quest
-	std::string BriefingBackground;	/// Image file for the briefing's background
-	std::string BriefingMusic;		/// Music file image to play during the briefing
-	std::string StartSpeech;		/// Speech given by the quest giver when offering the quest
-	std::string InProgressSpeech;	/// Speech given by the quest giver while the quest is in progress
-	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed
-	int Civilization;				/// Which civilization the quest belongs to
-	int TechnologyPoints;			/// How many technology points the quest gives as a reward
-	int X;							/// X position of the quest in its world's quest screen
-	int Y;							/// Y position of the quest in its world's quest screen
-	int PlayerColor;				/// Player color used for the quest's icon
-	bool Hidden;					/// Whether the quest is hidden
-	IconConfig Icon;				/// Quest's icon
-	CCharacter *QuestGiver;			/// Quest giver
-	std::vector<std::string> Objectives;	/// The objectives of this quest (used for the briefing only)
-	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
-};
-//Wyrmgus end
-
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -791,11 +753,6 @@ extern PlayerRace PlayerRaces;  /// Player races
 */
 extern int PlayerColorIndexStart;
 extern int PlayerColorIndexCount;
-
-//Wyrmgus start
-extern CQuest *GetQuest(std::string quest_name);
-extern std::vector<CQuest *> Quests;
-//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Functions

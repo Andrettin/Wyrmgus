@@ -43,6 +43,9 @@
 #include "actions.h"
 #include "ai.h"
 #include "animation.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "commands.h"
 #include "construct.h"
 #include "depend.h"
@@ -59,6 +62,9 @@
 #include "parameters.h"
 #include "pathfinder.h"
 #include "player.h"
+//Wyrmgus start
+#include "quest.h"
+//Wyrmgus end
 #include "replay.h"
 #include "results.h"
 #include "settings.h"
@@ -1708,6 +1714,9 @@ void LuaRegisterModules()
 
 	AiCclRegister();
 	AnimationCclRegister();
+	//Wyrmgus start
+	CharacterCclRegister();
+	//Wyrmgus end
 	ConstructionCclRegister();
 	DecorationCclRegister();
 	DependenciesCclRegister();
@@ -1718,6 +1727,9 @@ void LuaRegisterModules()
 	NetworkCclRegister();
 	PathfinderCclRegister();
 	PlayerCclRegister();
+	//Wyrmgus start
+	QuestCclRegister();
+	//Wyrmgus end
 	ReplayCclRegister();
 	ScriptRegister();
 	SelectionCclRegister();

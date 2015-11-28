@@ -288,6 +288,9 @@ set(spell_SRCS
 source_group(spell FILES ${spell_SRCS})
 
 set(stratagusmain_SRCS
+	#Wyrmgus start
+	src/stratagus/character.cpp
+	#Wyrmgus end
 	src/stratagus/construct.cpp
 	#Wyrmgus start
 	src/stratagus/grand_strategy.cpp
@@ -299,8 +302,15 @@ set(stratagusmain_SRCS
 	src/stratagus/mainloop.cpp
 	src/stratagus/parameters.cpp
 	src/stratagus/player.cpp
+	#Wyrmgus start
+	src/stratagus/quest.cpp
+	#Wyrmgus end
 	src/stratagus/script.cpp
 	src/stratagus/script_player.cpp
+	#Wyrmgus start
+	src/stratagus/script_character.cpp
+	src/stratagus/script_quest.cpp
+	#Wyrmgus end
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
 	src/stratagus/title.cpp
@@ -544,6 +554,9 @@ set(stratagus_generic_HDRS
 	src/include/actions.h
 	src/include/ai.h
 	src/include/animation.h
+	#Wyrmgus start
+	src/include/character.h
+	#Wyrmgus end
 	src/include/color.h
 	src/include/commands.h
 	src/include/construct.h
@@ -578,6 +591,9 @@ set(stratagus_generic_HDRS
 	src/include/particle.h
 	src/include/pathfinder.h
 	src/include/player.h
+	#Wyrmgus start
+	src/include/quest.h
+	#Wyrmgus end
 	src/include/replay.h
 	src/include/results.h
 	src/include/script.h

@@ -36,10 +36,12 @@
 --  Includes
 ----------------------------------------------------------------------------*/
 
+#include <vector>
+
+#include "character.h"
 #include "vec2i.h"
 #include "video.h"
 #include "player.h"
-#include "unit.h"
 #include "upgrade_structs.h"
 
 /*----------------------------------------------------------------------------
@@ -436,6 +438,10 @@ public:
 	SDL_Surface *MinimapSurface;
 };
 
+/*----------------------------------------------------------------------------
+-- Variables
+----------------------------------------------------------------------------*/
+
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
 extern bool GrandStrategyGamePaused;					/// if the grand strategy game is paused
 extern bool GrandStrategyGameInitialized;				/// if the grand strategy game has been initialized
@@ -450,6 +456,10 @@ extern int PopulationGrowthThreshold;					/// How much population growth progres
 extern std::string GrandStrategyInterfaceState;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 extern std::map<std::string, int> GrandStrategyHeroStringToIndex;
+
+/*----------------------------------------------------------------------------
+-- Functions
+----------------------------------------------------------------------------*/
 
 extern std::string GetDiplomacyStateNameById(int diplomacy_state);
 extern int GetDiplomacyStateIdByName(std::string diplomacy_state);

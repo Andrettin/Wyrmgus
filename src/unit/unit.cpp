@@ -366,10 +366,6 @@ int ResourcesMultiBuildersMultiplier = 0; /// Config: spend resources for buildi
 static unsigned long HelpMeLastCycle;     /// Last cycle HelpMe sound played
 static int HelpMeLastX;                   /// Last X coordinate HelpMe sound played
 static int HelpMeLastY;                   /// Last Y coordinate HelpMe sound played
-//Wyrmgus start
-std::vector<CCharacter *> Characters;
-//Wyrmgus end
-
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -3635,45 +3631,5 @@ void CleanUnits()
 	FancyBuildings = false;
 	HelpMeLastCycle = 0;
 }
-
-//Wyrmgus start
-CCharacter *GetCharacter(std::string character_full_name)
-{
-	for (size_t i = 0; i < Characters.size(); ++i) {
-		if (character_full_name == Characters[i]->GetFullName()) {
-			return Characters[i];
-		}
-	}
-	return NULL;
-}
-
-bool CCharacter::IsParentOf(std::string child_full_name)
-{
-	for (size_t i = 0; i < this->Children.size(); ++i) {
-		if (this->Children[i]->GetFullName() == child_full_name) {
-			return true;
-		}
-	}
-	return false;
-}
-
-bool CCharacter::IsChildOf(std::string parent_full_name)
-{
-	if ((this->Father != NULL && this->Father->GetFullName() == parent_full_name) || (this->Mother != NULL && this->Mother->GetFullName() == parent_full_name)) {
-		return true;
-	}
-	return false;
-}
-
-bool CCharacter::IsSiblingOf(std::string sibling_full_name)
-{
-	for (size_t i = 0; i < this->Siblings.size(); ++i) {
-		if (this->Siblings[i]->GetFullName() == sibling_full_name) {
-			return true;
-		}
-	}
-	return false;
-}
-//Wyrmgus end
 
 //@}
