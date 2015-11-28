@@ -49,6 +49,18 @@
 class CUnitType;
 class CUpgrade;
 
+/**
+**  Indexes into item type array.
+*/
+enum Genders {
+	NoGender,
+	MaleGender,
+	FemaleGender,
+	AsexualGender, //i.e. slimes reproduce asexually
+
+	MaxGenders
+};
+
 class CCharacter
 {
 public:
@@ -102,6 +114,9 @@ extern std::vector<CCharacter *> CustomHeroes;
 extern void CleanCharacters();
 extern CCharacter *GetCharacter(std::string character_full_name);
 extern CCharacter *GetCustomHero(std::string hero_full_name);
+extern void SaveHeroes();
+extern std::string GetGenderNameById(int gender);
+extern int GetGenderIdByName(std::string gender);
 extern void CharacterCclRegister();
 
 //@}

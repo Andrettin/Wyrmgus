@@ -589,32 +589,6 @@ int GetItemTypeIdByName(std::string item_type)
 
 	return -1;
 }
-
-std::string GetGenderNameById(int gender)
-{
-	if (gender == MaleGender) {
-		return "male";
-	} else if (gender == FemaleGender) {
-		return "female";
-	} else if (gender == AsexualGender) {
-		return "asexual";
-	}
-
-	return "";
-}
-
-int GetGenderIdByName(std::string gender)
-{
-	if (gender == "male") {
-		return MaleGender;
-	} else if (gender == "female") {
-		return FemaleGender;
-	} else if (gender == "asexual") {
-		return AsexualGender;
-	}
-
-	return -1;
-}
 //Wyrmgus end
 
 CUnitType::CUnitType() :

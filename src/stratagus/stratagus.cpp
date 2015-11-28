@@ -180,6 +180,9 @@ extern void beos_init(int argc, char **argv);
 #include "stratagus.h"
 
 #include "ai.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "editor.h"
 #include "game.h"
 #include "guichan.h"
@@ -407,6 +410,10 @@ void Exit(int err)
 		StopGame(GameExit);
 		return;
 	}
+	
+	//Wyrmgus start
+	SaveHeroes(); //save persistent heroes before exiting
+	//Wyrmgus end
 
 	StopMusic();
 	QuitSound();

@@ -38,6 +38,9 @@
 #include "action/action_still.h"
 
 #include "animation.h"
+//Wyrmgus start
+#include "character.h" //for the gender identifiers
+//Wyrmgus end
 #include "commands.h"
 #include "iolib.h"
 #include "map.h"

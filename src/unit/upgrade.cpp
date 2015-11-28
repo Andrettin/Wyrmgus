@@ -58,6 +58,9 @@
 #include "interface.h"
 #include "iolib.h"
 #include "map.h"
+//Wyrmgus start
+#include "network.h"
+//Wyrmgus end
 #include "player.h"
 #include "script.h"
 //Wyrmgus start
@@ -1490,9 +1493,15 @@ void ApplyUpgrades()
 **  @param unit     Unit learning the upgrade.
 **  @param upgrade  Upgrade ready researched.
 */
-void AbilityAcquire(CUnit &unit, const CUpgrade *upgrade)
+void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
+	if (!IsNetworkGame() && unit.Character != NULL && unit.Character->Persistent && unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
+		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) == unit.Character->Abilities.end()) {
+			unit.Character->Abilities.push_back(upgrade);
+			SaveHeroes();
+		}
+	}
 	IndividualUpgradeAcquire(unit, upgrade);
 }
 

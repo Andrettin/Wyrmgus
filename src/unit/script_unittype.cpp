@@ -39,11 +39,17 @@
 
 #include "actions.h"
 #include "animation.h"
+//Wyrmgus start
+#include "character.h" //for updating levels
+//Wyrmgus end
 #include "construct.h"
 #include "editor.h"
 #include "font.h"
 #include "luacallback.h"
 #include "map.h"
+//Wyrmgus start
+#include "network.h" //for updating levels
+//Wyrmgus end
 #include "player.h"
 #include "script.h"
 #include "sound.h"
@@ -2978,6 +2984,13 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 
 	unit.Variable[LEVEL_INDEX].Max = 100000;
+	if (!IsNetworkGame() && unit.Character != NULL && unit.Character->Persistent && unit.Player->AiEnabled == false) {
+		if (unit.Variable[LEVEL_INDEX].Value > unit.Character->Level) { //save level, if unit has a persistent character
+			unit.Character->Level = unit.Variable[LEVEL_INDEX].Value;
+			SaveHeroes();
+		}
+	}
+	
 	unit.Variable[LEVELUP_INDEX].Max = 255;
 
 	if (unit.Type->BoolFlag[ORGANIC_INDEX].value) {

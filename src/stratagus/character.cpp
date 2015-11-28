@@ -42,6 +42,11 @@
 #include <string>
 #include <map>
 
+#include "game.h"
+#include "parameters.h"
+#include "player.h"
+#include "unit.h"
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -112,6 +117,118 @@ CCharacter *GetCustomHero(std::string hero_full_name)
 		}
 	}
 	return NULL;
+}
+
+/**
+**  Save heroes
+*/
+void SaveHeroes()
+{
+	std::string path = Parameters::Instance.GetUserDirectory();
+
+	if (!GameName.empty()) {
+		path += "/";
+		path += GameName;
+	}
+	path += "/";
+	path += "heroes";
+	path += ".lua";
+
+	FILE *fd = fopen(path.c_str(), "w");
+	if (!fd) {
+		DebugPrint("Cannot open file %s for writing\n" _C_ path.c_str());
+		return;
+	}
+
+	for (size_t i = 0; i < Characters.size(); ++i) { //save persistent characters
+		if (Characters[i]->Persistent) {
+			fprintf(fd, "DefineCharacter(\"%s\", {\n", Characters[i]->GetFullName().c_str());
+			if (Characters[i]->Type != NULL) {
+				fprintf(fd, "\tType = \"%s\",\n", Characters[i]->Type->Ident.c_str());
+			}
+			if (Characters[i]->Level != 0) {
+				fprintf(fd, "\tLevel = %d,\n", Characters[i]->Level);
+			}
+			if (Characters[i]->Abilities.size() > 0) {
+				fprintf(fd, "\tAbilities = {");
+				for (size_t j = 0; j < Characters[i]->Abilities.size(); ++j) {
+					fprintf(fd, "\"%s\"", Characters[i]->Abilities[j]->Ident.c_str());
+					if (j < (Characters[i]->Abilities.size() - 1)) {
+						fprintf(fd, ", ");
+					}
+				}
+				fprintf(fd, "}\n");
+			}
+			fprintf(fd, "})\n\n");
+		}
+	}
+		
+	for (size_t i = 0; i < CustomHeroes.size(); ++i) { //save custom heroes
+		if (CustomHeroes[i]->Persistent) {
+			fprintf(fd, "DefineCustomHero(\"%s\", {\n", CustomHeroes[i]->GetFullName().c_str());
+			fprintf(fd, "\tName = \"%s\",\n", CustomHeroes[i]->Name.c_str());
+			if (!CustomHeroes[i]->ExtraName.empty()) {
+				fprintf(fd, "\tExtraName = \"%s\",\n", CustomHeroes[i]->ExtraName.c_str());
+			}
+			if (!CustomHeroes[i]->Dynasty.empty()) {
+				fprintf(fd, "\tDynasty = \"%s\",\n", CustomHeroes[i]->Dynasty.c_str());
+			}
+			if (CustomHeroes[i]->Gender != NoGender) {
+				fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(CustomHeroes[i]->Gender).c_str());
+			}
+			if (CustomHeroes[i]->Type != NULL) {
+				fprintf(fd, "\tType = \"%s\",\n", CustomHeroes[i]->Type->Ident.c_str());
+			}
+			if (CustomHeroes[i]->Trait != NULL) {
+				fprintf(fd, "\tTrait = \"%s\",\n", CustomHeroes[i]->Trait->Ident.c_str());
+			}
+			if (CustomHeroes[i]->Civilization != -1) {
+				fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[CustomHeroes[i]->Civilization].c_str());
+			}
+			if (CustomHeroes[i]->Level != 0) {
+				fprintf(fd, "\tLevel = %d,\n", CustomHeroes[i]->Level);
+			}
+			if (CustomHeroes[i]->Abilities.size() > 0) {
+				fprintf(fd, "\tAbilities = {");
+				for (size_t j = 0; j < CustomHeroes[i]->Abilities.size(); ++j) {
+					fprintf(fd, "\"%s\"", CustomHeroes[i]->Abilities[j]->Ident.c_str());
+					if (j < (CustomHeroes[i]->Abilities.size() - 1)) {
+						fprintf(fd, ", ");
+					}
+				}
+				fprintf(fd, "}\n");
+			}
+			fprintf(fd, "})\n\n");
+		}
+	}
+		
+	fclose(fd);
+}
+
+std::string GetGenderNameById(int gender)
+{
+	if (gender == MaleGender) {
+		return "male";
+	} else if (gender == FemaleGender) {
+		return "female";
+	} else if (gender == AsexualGender) {
+		return "asexual";
+	}
+
+	return "";
+}
+
+int GetGenderIdByName(std::string gender)
+{
+	if (gender == "male") {
+		return MaleGender;
+	} else if (gender == "female") {
+		return FemaleGender;
+	} else if (gender == "asexual") {
+		return AsexualGender;
+	}
+
+	return -1;
 }
 
 //@}

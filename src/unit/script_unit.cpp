@@ -1390,6 +1390,18 @@ static int CclGetUnitVariable(lua_State *l)
 	//Wyrmgus start
 //		lua_pushstring(l, unit->Type->Name.c_str());
 		lua_pushstring(l, unit->Name.c_str());
+	} else if (!strcmp(value, "Character")) {
+		if (unit->Character != NULL) {
+			lua_pushstring(l, unit->Character->GetFullName().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+	} else if (!strcmp(value, "CustomCharacter")) {
+		if (unit->Character != NULL && unit->Character->Custom) {
+			lua_pushboolean(l, true);
+		} else {
+			lua_pushboolean(l, false);
+		}
 	} else if (!strcmp(value, "GiveResourceTypeName")) {
 		lua_pushstring(l, DefaultResourceNames[unit->Type->GivesResource].c_str());
 	} else if (!strcmp(value, "CurrentResourceName")) {

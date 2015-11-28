@@ -90,20 +90,6 @@ enum GroupSelectionMode {
 	SELECT_ALL
 };
 
-//Wyrmgus start
-/**
-**  Indexes into item type array.
-*/
-enum Genders {
-	NoGender,
-	MaleGender,
-	FemaleGender,
-	AsexualGender, //i.e. slimes reproduce asexually
-
-	MaxGenders
-};
-//Wyrmgus end
-
 class ResourceInfo
 {
 public:
@@ -1054,11 +1040,6 @@ extern void UpdateUnitVariables(CUnit &unit);
 
 extern void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type);
 extern void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
-
-//Wyrmgus start
-extern std::string GetGenderNameById(int gender);
-extern int GetGenderIdByName(std::string gender);
-//Wyrmgus end
 
 //@}
 

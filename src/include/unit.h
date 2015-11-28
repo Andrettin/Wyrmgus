@@ -173,7 +173,7 @@ public:
 	
 	//Wyrmgus start
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
-	void SetVariation(int new_variation);
+	void SetVariation(int new_variation, const CUnitType *new_type = NULL);
 	//Wyrmgus end
 	
 	bool RestoreOrder();

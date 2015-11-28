@@ -91,4 +91,8 @@ private:
 	int Ticks;       /// Ticks to complete
 };
 
+//Wyrmgus start
+extern int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype);
+//Wyrmgus end
+
 #endif // !__ACTIONS_H__

@@ -69,7 +69,7 @@ static int CclDefineCharacter(lua_State *l)
 		character = new CCharacter;
 		Characters.push_back(character);
 	} else {
-		LuaError(l, "Character \"%s\" is being redefined." _C_ character_full_name.c_str());
+		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_full_name.c_str());
 	}
 	
 	//  Parse the list:
@@ -171,6 +171,18 @@ static int CclDefineCharacter(lua_State *l)
 			character->Persistent = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Level")) {
 			character->Level = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Abilities")) {
+			character->Abilities.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string ability_ident = LuaToString(l, -1, j + 1);
+				int ability_id = UpgradeIdByIdent(ability_ident);
+				if (ability_id != -1) {
+					character->Abilities.push_back(AllUpgrades[ability_id]);
+				} else {
+					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident);
+				}
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -213,7 +225,7 @@ static int CclDefineCustomHero(lua_State *l)
 		hero = new CCharacter;
 		CustomHeroes.push_back(hero);
 	} else {
-		LuaError(l, "Custom hero \"%s\" is being redefined." _C_ hero_full_name.c_str());
+		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_full_name.c_str());
 	}
 	hero->Custom = true;
 	hero->Persistent = true;
@@ -253,6 +265,18 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
 			hero->Level = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Abilities")) {
+			hero->Abilities.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string ability_ident = LuaToString(l, -1, j + 1);
+				int ability_id = UpgradeIdByIdent(ability_ident);
+				if (ability_id != -1) {
+					hero->Abilities.push_back(AllUpgrades[ability_id]);
+				} else {
+					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident);
+				}
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -389,6 +413,158 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 	return 0;
 }
 
+/**
+**  Get character data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetCharacterData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string character_name = LuaToString(l, 1);
+	CCharacter *character = GetCharacter(character_name);
+	if (!character) {
+		LuaError(l, "Character \"%s\" doesn't exist." _C_ character_name.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, character->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Dynasty")) {
+		lua_pushstring(l, character->Dynasty.c_str());
+		return 1;
+	} else if (!strcmp(data, "FullName")) {
+		lua_pushstring(l, character->GetFullName().c_str());
+		return 1;
+	} else if (!strcmp(data, "ProvinceOfOrigin")) {
+		lua_pushstring(l, character->ProvinceOfOriginName.c_str());
+		return 1;
+	} else if (!strcmp(data, "Civilization")) {
+		if (character->Civilization != -1) {
+			lua_pushstring(l, PlayerRaces.Name[character->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Year")) {
+		lua_pushnumber(l, character->Year);
+		return 1;
+	} else if (!strcmp(data, "DeathYear")) {
+		lua_pushnumber(l, character->DeathYear);
+		return 1;
+	} else if (!strcmp(data, "Gender")) {
+		lua_pushstring(l, GetGenderNameById(character->Gender).c_str());
+		return 1;
+	} else if (!strcmp(data, "Level")) {
+		lua_pushnumber(l, character->Level);
+		return 1;
+	} else if (!strcmp(data, "Type")) {
+		if (character->Type != NULL) {
+			lua_pushstring(l, character->Type->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Trait")) {
+		if (character->Trait != NULL) {
+			lua_pushstring(l, character->Trait->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Father")) {
+		if (character->Father != NULL) {
+			lua_pushstring(l, character->Father->GetFullName().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Mother")) {
+		if (character->Mother != NULL) {
+			lua_pushstring(l, character->Mother->GetFullName().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Persistent")) {
+		lua_pushboolean(l, character->Persistent);
+		return 1;
+	} else if (!strcmp(data, "Icon")) {
+		lua_pushstring(l, character->Icon.Name.c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
+**  Get custom hero data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetCustomHeroData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string character_name = LuaToString(l, 1);
+	CCharacter *character = GetCharacter(character_name);
+	if (!character) {
+		LuaError(l, "Custom hero \"%s\" doesn't exist." _C_ character_name.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, character->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Dynasty")) {
+		lua_pushstring(l, character->Dynasty.c_str());
+		return 1;
+	} else if (!strcmp(data, "FullName")) {
+		lua_pushstring(l, character->GetFullName().c_str());
+		return 1;
+	} else if (!strcmp(data, "Civilization")) {
+		if (character->Civilization != -1) {
+			lua_pushstring(l, PlayerRaces.Name[character->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Gender")) {
+		lua_pushstring(l, GetGenderNameById(character->Gender).c_str());
+		return 1;
+	} else if (!strcmp(data, "Level")) {
+		lua_pushnumber(l, character->Level);
+		return 1;
+	} else if (!strcmp(data, "Type")) {
+		if (character->Type != NULL) {
+			lua_pushstring(l, character->Type->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Trait")) {
+		if (character->Trait != NULL) {
+			lua_pushstring(l, character->Trait->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Icon")) {
+		lua_pushstring(l, character->Icon.Name.c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -399,6 +575,8 @@ void CharacterCclRegister()
 	lua_register(Lua, "DefineCharacter", CclDefineCharacter);
 	lua_register(Lua, "DefineCustomHero", CclDefineCustomHero);
 	lua_register(Lua, "DefineGrandStrategyHero", CclDefineGrandStrategyHero);
+	lua_register(Lua, "GetCharacterData", CclGetCharacterData);
+	lua_register(Lua, "GetCustomHeroData", CclGetCustomHeroData);
 }
 
 //@}

@@ -88,7 +88,10 @@
 **
 **  @return 0 on error, 1 if nothing happens, 2 else.
 */
-static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
+//Wyrmgus start
+//static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
+int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
+//Wyrmgus end
 {
 	const CUnitType &oldtype = *unit.Type;
 	if (&oldtype == &newtype) { // nothing to do
@@ -195,8 +198,8 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		if (UpgradesCheck == false) {
 			continue;
 		}
-		if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if the old variation's ident is included in that of a viable one of the new unit type, chose the latter automatically
-			unit.SetVariation(i);
+		if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if the old variation's ident is included in that of a viable one of the new unit type, choose the latter automatically
+			unit.SetVariation(i, &newtype);
 			TypeVariationCount = 0;
 			break;
 		}
@@ -204,7 +207,7 @@ static int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		TypeVariationCount += 1;
 	}
 	if (TypeVariationCount > 0) {
-		unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
+		unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)], &newtype);
 	}
 	//Wyrmgus end
 	

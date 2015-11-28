@@ -167,7 +167,7 @@
 		if (!upgrade.Ability) {
 			UpgradeAcquire(player, &upgrade);
 		} else {
-			AbilityAcquire(unit, &upgrade);
+			AbilityAcquire(unit, AllUpgrades[upgrade.ID]);
 		}
 		//Wyrmgus end
 		this->Finished = true;

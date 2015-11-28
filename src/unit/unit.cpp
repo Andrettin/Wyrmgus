@@ -38,6 +38,9 @@
 #include "unit.h"
 
 #include "action/action_attack.h"
+//Wyrmgus start
+#include "action/action_upgradeto.h"
+//Wyrmgus end
 
 #include "actions.h"
 #include "ai.h"
@@ -584,16 +587,33 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	}
 	
 	this->Name = this->Character->GetFullName();
-	if (this->Character->Trait != NULL) {
+	
+	if (this->Character->Type != NULL && this->Character->Type != this->Type) { //set type to that of the character
+		TransformUnitIntoType(*this, *this->Character->Type);
+	}
+	
+	if (this->Character->Trait != NULL) { //set trait
 		TraitAcquire(*this, this->Character->Trait);
+	}
+	
+	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
+		char buf[256];
+		snprintf(buf, sizeof(buf), "IncreaseUnitLevel(%d, %d);", UnitNumber(*this), this->Character->Level - this->Variable[LEVEL_INDEX].Value);
+		CclCommand(buf);
+	}
+			
+	//load learned abilities
+	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
+		AbilityAcquire(*this, this->Character->Abilities[i]);
 	}
 }
 
-void CUnit::SetVariation(int new_variation)
+void CUnit::SetVariation(int new_variation, const CUnitType *new_type)
 {
 	if (
 		(this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->Animations)
-		|| this->Type->VarInfo[new_variation]->Animations
+		|| (new_type == NULL && this->Type->VarInfo[new_variation]->Animations)
+		|| (new_type != NULL && new_type->VarInfo[new_variation]->Animations)
 	) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
 		this->Frame = this->Type->StillFrame;
 	}

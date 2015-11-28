@@ -243,7 +243,7 @@ static int CclSavePreferences(lua_State *l)
 
 //Wyrmgus start
 /**
-**  Save extra preferences
+**  Save grand strategy game
 **
 **  @param l  Lua state.
 */
@@ -2560,7 +2560,7 @@ void SavePreferences()
 
 //Wyrmgus start
 /**
-**  Save extra user preferences
+**  Save grand strategy game
 */
 void SaveGrandStrategyGame(const std::string &filename)
 {
@@ -2815,7 +2815,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 					fprintf(fd, "\tExtraName = \"%s\",\n", GrandStrategyGame.Heroes[i]->ExtraName.c_str());
 				}
 				if (!GrandStrategyGame.Heroes[i]->Dynasty.empty()) {
-					fprintf(fd, "\tExtraName = \"%s\",\n", GrandStrategyGame.Heroes[i]->Dynasty.c_str());
+					fprintf(fd, "\tDynasty = \"%s\",\n", GrandStrategyGame.Heroes[i]->Dynasty.c_str());
 				}
 				if (GrandStrategyGame.Heroes[i]->Gender != NoGender) {
 					fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(GrandStrategyGame.Heroes[i]->Gender).c_str());
