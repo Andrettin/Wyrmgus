@@ -1594,6 +1594,36 @@ static int CclSlotUsage(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+**  Return whether the unit is at a certain location
+*/
+static int CclUnitIsAt(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+	
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	
+	Vec2i minPos;
+	Vec2i maxPos;
+	CclGetPos(l, &minPos.x, &minPos.y, 2);
+	CclGetPos(l, &maxPos.x, &maxPos.y, 3);
+
+	if (unit->tilePos.x >= minPos.x && unit->tilePos.x <= maxPos.x && unit->tilePos.y >= minPos.y && unit->tilePos.y <= maxPos.y) {
+		lua_pushboolean(l, true);
+	} else {
+		lua_pushboolean(l, false);
+	}
+	return 1;
+}
+//Wyrmgus end
+
 /**
 **  Register CCL features for unit.
 */
@@ -1636,6 +1666,10 @@ void UnitCclRegister()
 	lua_register(Lua, "SetUnitVariable", CclSetUnitVariable);
 
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
+	
+	//Wyrmgus start
+	lua_register(Lua, "UnitIsAt", CclUnitIsAt);
+	//Wyrmgus end
 }
 
 //@}
