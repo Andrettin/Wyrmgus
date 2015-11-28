@@ -57,6 +57,9 @@ class CBuildRestrictionOnTop;
 class CConstructionFrame;
 class CFile;
 class Missile;
+//Wyrmgus start
+class CCharacter;
+//Wyrmgus end
 class CMapField;
 class COrder;
 class CPlayer;
@@ -168,7 +171,10 @@ public:
 	/// Release a unit
 	void Release(bool final = false);
 	
+	//Wyrmgus start
+	void SetCharacter(std::string character_full_name, bool custom_hero = false);
 	void SetVariation(int new_variation);
+	//Wyrmgus end
 	
 	bool RestoreOrder();
 	bool CanStoreOrder(COrder *order);
@@ -361,6 +367,7 @@ public:
 	CUnitColors *Colors;    /// Player colors
 	//Wyrmgus start
 	std::string Name;	/// Unit's personal name (if any)
+	CCharacter  *Character;	/// Pointer to the character represented by this unit
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
 	//Wyrmgus end

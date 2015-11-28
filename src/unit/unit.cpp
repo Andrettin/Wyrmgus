@@ -42,6 +42,9 @@
 #include "actions.h"
 #include "ai.h"
 #include "animation.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "commands.h"
 #include "construct.h"
 #include "game.h"
@@ -432,6 +435,7 @@ void CUnit::Init()
 	Player = NULL;
 	Stats = NULL;
 	//Wyrmgus start
+	Character = NULL;
 	Trait = NULL;
 	//Wyrmgus end
 	CurrentSightRange = 0;
@@ -541,6 +545,7 @@ void CUnit::Release(bool final)
 
 	Type = NULL;
 	//Wyrmgus start
+	Character = NULL;
 	Trait = NULL;
 	//Wyrmgus end
 
@@ -558,6 +563,32 @@ void CUnit::Release(bool final)
 }
 
 //Wyrmgus start
+void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
+{
+	if (!custom_hero) {
+		CCharacter *character = GetCharacter(character_full_name);
+		if (character) {
+			this->Character = const_cast<CCharacter *>(&(*character));
+		} else {
+			fprintf(stderr, "Character \"%s\" doesn't exist.\n", character_full_name.c_str());
+			return;
+		}
+	} else {
+		CCharacter *character = GetCustomHero(character_full_name);
+		if (character) {
+			this->Character = const_cast<CCharacter *>(&(*character));
+		} else {
+			fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", character_full_name.c_str());
+			return;
+		}
+	}
+	
+	this->Name = this->Character->GetFullName();
+	if (this->Character->Trait != NULL) {
+		TraitAcquire(*this, this->Character->Trait);
+	}
+}
+
 void CUnit::SetVariation(int new_variation)
 {
 	if (

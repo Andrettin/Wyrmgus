@@ -47,20 +47,11 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CCharacter *> Characters;
+std::vector<CCharacter *> CustomHeroes;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
-
-CCharacter *GetCharacter(std::string character_full_name)
-{
-	for (size_t i = 0; i < Characters.size(); ++i) {
-		if (character_full_name == Characters[i]->GetFullName()) {
-			return Characters[i];
-		}
-	}
-	return NULL;
-}
 
 bool CCharacter::IsParentOf(std::string child_full_name)
 {
@@ -88,6 +79,39 @@ bool CCharacter::IsSiblingOf(std::string sibling_full_name)
 		}
 	}
 	return false;
+}
+
+void CleanCharacters()
+{
+	for (size_t i = 0; i < Characters.size(); ++i) {
+		delete Characters[i];
+	}
+	Characters.clear();
+	
+	for (size_t i = 0; i < CustomHeroes.size(); ++i) {
+		delete CustomHeroes[i];
+	}
+	CustomHeroes.clear();
+}
+
+CCharacter *GetCharacter(std::string character_full_name)
+{
+	for (size_t i = 0; i < Characters.size(); ++i) {
+		if (character_full_name == Characters[i]->GetFullName()) {
+			return Characters[i];
+		}
+	}
+	return NULL;
+}
+
+CCharacter *GetCustomHero(std::string hero_full_name)
+{
+	for (size_t i = 0; i < CustomHeroes.size(); ++i) {
+		if (hero_full_name == CustomHeroes[i]->GetFullName()) {
+			return CustomHeroes[i];
+		}
+	}
+	return NULL;
 }
 
 //@}

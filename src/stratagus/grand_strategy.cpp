@@ -5587,6 +5587,11 @@ void InitializeGrandStrategyGame()
 				sibling->Siblings.push_back(hero); //when the sibling was defined, the hero wasn't, since by virtue of not being NULL, the sibling was necessarily defined before the hero
 			}
 		}
+		if (!Characters[i]->Icon.Name.empty()) {
+			hero->Icon.Name = Characters[i]->Icon.Name;
+			hero->Icon.Icon = NULL;
+			hero->Icon.Load();
+		}
 		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	}
 }

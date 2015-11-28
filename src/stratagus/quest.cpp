@@ -52,6 +52,14 @@ std::vector<CQuest *> Quests;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+void CleanQuests()
+{
+	for (size_t i = 0; i < Quests.size(); ++i) {
+		delete Quests[i];
+	}
+	Quests.clear();
+}
+
 CQuest *GetQuest(std::string quest_name)
 {
 	for (size_t i = 0; i < Quests.size(); ++i) {

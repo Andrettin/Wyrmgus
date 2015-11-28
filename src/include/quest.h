@@ -94,6 +94,7 @@ extern std::vector<CQuest *> Quests;
 -- Functions
 ----------------------------------------------------------------------------*/
 
+extern void CleanQuests();
 extern CQuest *GetQuest(std::string quest_name);
 extern void QuestCclRegister();
 

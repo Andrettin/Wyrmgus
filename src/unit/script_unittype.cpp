@@ -199,6 +199,7 @@ static const char DEXTERITY_KEY[] = "Dexterity";
 static const char INTELLIGENCE_KEY[] = "Intelligence";
 static const char ACCURACY_KEY[] = "Accuracy";
 static const char EVASION_KEY[] = "Evasion";
+static const char LEVEL_KEY[] = "Level";
 static const char LEVELUP_KEY[] = "LevelUp";
 static const char XPREQUIRED_KEY[] = "XpRequired";
 static const char VARIATION_KEY[] = "Variation";
@@ -277,7 +278,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 //							   PRIORITY_KEY
 							   PRIORITY_KEY,
 							   STRENGTH_KEY, DEXTERITY_KEY, INTELLIGENCE_KEY,
-							   ACCURACY_KEY, EVASION_KEY, LEVELUP_KEY, XPREQUIRED_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
+							   ACCURACY_KEY, EVASION_KEY, LEVEL_KEY, LEVELUP_KEY, XPREQUIRED_KEY, VARIATION_KEY, HITPOINTHEALING_KEY, CRITICALSTRIKECHANCE_KEY,
 							   BACKSTAB_KEY, BONUSAGAINSTMOUNTED_KEY, BONUSAGAINSTBUILDINGS_KEY, BONUSAGAINSTAIR_KEY, BONUSAGAINSTGIANTS_KEY,
 							   DAYSIGHTRANGEBONUS_KEY, NIGHTSIGHTRANGEBONUS_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY
 //Wyrmgus end
@@ -2040,6 +2041,15 @@ static int CclDefineUnitType(lua_State *l)
 	} else if (type->NumDirections == 0) {
 		type->NumDirections = 8;
 	}
+	
+	//Wyrmgus start
+	//unit type's level must be at least 1
+	if (type->DefaultStat.Variables[LEVEL_INDEX].Value == 0) {
+		type->DefaultStat.Variables[LEVEL_INDEX].Enable = 1;
+		type->DefaultStat.Variables[LEVEL_INDEX].Value = 1;
+		type->DefaultStat.Variables[LEVEL_INDEX].Max = 1;
+	}
+	//Wyrmgus end
 
 	// FIXME: try to simplify/combine the flags instead
 	if (type->MouseAction == MouseActionAttack && !type->CanAttack) {
@@ -2941,7 +2951,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == ISALIVE_INDEX || i == PLAYER_INDEX || i == PRIORITY_INDEX || i == SIGHTRANGE_INDEX || i == ATTACKRANGE_INDEX
 			|| i == STRENGTH_INDEX || i == DEXTERITY_INDEX || i == INTELLIGENCE_INDEX
 			|| i == ACCURACY_INDEX || i == EVASION_INDEX
-			|| i == LEVELUP_INDEX || i == XPREQUIRED_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
+			|| i == LEVEL_INDEX || i == LEVELUP_INDEX || i == XPREQUIRED_INDEX || i == VARIATION_INDEX || i == HITPOINTHEALING_INDEX || i == CRITICALSTRIKECHANCE_INDEX
 			|| i == BACKSTAB_INDEX || i == BONUSAGAINSTMOUNTED_INDEX || i == BONUSAGAINSTBUILDINGS_INDEX || i == BONUSAGAINSTAIR_INDEX || i == BONUSAGAINSTGIANTS_INDEX
 			|| i == DAYSIGHTRANGEBONUS_INDEX || i == NIGHTSIGHTRANGEBONUS_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX) {
 			//Wyrmgus end
@@ -2967,6 +2977,7 @@ void UpdateUnitVariables(CUnit &unit)
 
 	unit.Variable[TRANSPARENCY_INDEX].Max = 100;
 
+	unit.Variable[LEVEL_INDEX].Max = 100000;
 	unit.Variable[LEVELUP_INDEX].Max = 255;
 
 	if (unit.Type->BoolFlag[ORGANIC_INDEX].value) {

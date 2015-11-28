@@ -37,6 +37,9 @@
 
 #include "actions.h"
 #include "ai.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "commands.h"
 #include "construct.h"
 #include "depend.h"
@@ -49,6 +52,9 @@
 #include "missile.h"
 #include "particle.h"
 #include "pathfinder.h"
+//Wyrmgus start
+#include "quest.h"
+//Wyrmgus end
 #include "replay.h"
 #include "script.h"
 #include "sound.h"
@@ -92,10 +98,14 @@ void CleanModules()
 	PlayerRaces.Clean();
 	//Wyrmgus start
 	GrandStrategyGame.Clean();
+	CleanCharacters();
 	//Wyrmgus end
 	CleanConstructions();
 	CleanDecorations();
 	CleanMissiles();
+	//Wyrmgus start
+	CleanQuests();
+	//Wyrmgus end
 	CleanUnits();
 	CleanUnitTypes();
 	CleanPlayers();

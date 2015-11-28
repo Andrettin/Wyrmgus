@@ -38,6 +38,10 @@
 
 #include <vector>
 
+#ifndef __ICONS_H__
+#include "icons.h"
+#endif
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -49,7 +53,8 @@ class CCharacter
 {
 public:
 	CCharacter() :
-		Year(0), DeathYear(0), Civilization(-1), Gender(0),
+		Year(0), DeathYear(0), Civilization(-1), Gender(0), Level(0),
+		Persistent(false), Custom(false),
 		Name(""), ExtraName(""), Dynasty(""), ProvinceOfOriginName(""),
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL)
@@ -61,20 +66,26 @@ public:
 	bool IsSiblingOf(std::string sibling_full_name);
 	std::string GetFullName();
 	
-	int Year;			/// Year in which the hero historically starts being active
-	int DeathYear;		/// Year in which the hero dies of natural causes
-	int Civilization;	/// Culture to which the hero belongs
-	int Gender;			/// Hero's gender
-	std::string Name;	/// Given name of the hero
-	std::string ExtraName;	/// Extra given names of the hero (used if necessary to differentiate from existing heroes)
-	std::string Dynasty;	/// Name of the hero's dynasty
-	std::string ProvinceOfOriginName;	/// Name of the province from which the hero originates
+	int Year;			/// Year in which the character historically starts being active
+	int DeathYear;		/// Year in which the character dies of natural causes
+	int Civilization;	/// Culture to which the character belongs
+	int Gender;			/// Character's gender
+	int Level;			/// Character's level
+	bool Persistent;	/// Whether this character's levels and abilities are persistent
+	bool Custom;		/// Whether this character is a custom hero
+	std::string Name;	/// Given name of the character
+	std::string ExtraName;	/// Extra given names of the character (used if necessary to differentiate from existing heroes)
+	std::string Dynasty;	/// Name of the character's dynasty
+	std::string ProvinceOfOriginName;	/// Name of the province from which the character originates
+	IconConfig Icon;					/// Character's icon
 	CUnitType *Type;
 	CUpgrade *Trait;
 	CCharacter *Father;					/// Character's father
 	CCharacter *Mother;					/// Character's mother
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
+	std::vector<CUpgrade *> Abilities;
+//	std::vector<CItem *> Items;
 };
 
 /*----------------------------------------------------------------------------
@@ -82,12 +93,15 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern std::vector<CCharacter *> Characters;
+extern std::vector<CCharacter *> CustomHeroes;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
+extern void CleanCharacters();
 extern CCharacter *GetCharacter(std::string character_full_name);
+extern CCharacter *GetCustomHero(std::string hero_full_name);
 extern void CharacterCclRegister();
 
 //@}

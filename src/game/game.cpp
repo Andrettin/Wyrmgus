@@ -651,6 +651,13 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 				f->printf("SetUnitVariable(unit, \"Active\", false)\n");
 			}
 			//Wyrmgus start
+			if (unit.Character != NULL) {
+				if (!unit.Character->Custom) {
+					f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit.Character->GetFullName().c_str());
+				} else {
+					f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit.Character->GetFullName().c_str());
+				}
+			}
 			if (unit.Name != unit.Type->DefaultName) {
 				f->printf("SetUnitVariable(unit, \"Name\", \"%s\")\n", unit.Name.c_str());
 			}

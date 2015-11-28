@@ -1513,6 +1513,10 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 		unit->Active = ai_active;
 	//Wyrmgus start
+	} else if (!strcmp(name, "Character")) {
+		unit->SetCharacter(LuaToString(l, 3));
+	} else if (!strcmp(name, "CustomHero")) {
+		unit->SetCharacter(LuaToString(l, 3), true);
 	} else if (!strcmp(name, "Variation")) {
 		value = LuaToNumber(l, 3);
 		unit->SetVariation(value);
