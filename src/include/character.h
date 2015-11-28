@@ -67,7 +67,6 @@ public:
 	CCharacter() :
 		Year(0), DeathYear(0), Civilization(-1), Gender(0), Level(0),
 		Persistent(false), Custom(false),
-		Name(""), ExtraName(""), Dynasty(""), ProvinceOfOriginName(""),
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL)
 	{
@@ -78,16 +77,20 @@ public:
 	bool IsSiblingOf(std::string sibling_full_name);
 	std::string GetFullName();
 	
-	int Year;			/// Year in which the character historically starts being active
-	int DeathYear;		/// Year in which the character dies of natural causes
-	int Civilization;	/// Culture to which the character belongs
-	int Gender;			/// Character's gender
-	int Level;			/// Character's level
-	bool Persistent;	/// Whether this character's levels and abilities are persistent
-	bool Custom;		/// Whether this character is a custom hero
-	std::string Name;	/// Given name of the character
-	std::string ExtraName;	/// Extra given names of the character (used if necessary to differentiate from existing heroes)
-	std::string Dynasty;	/// Name of the character's dynasty
+	int Year;					/// Year in which the character historically starts being active
+	int DeathYear;				/// Year in which the character dies of natural causes
+	int Civilization;			/// Culture to which the character belongs
+	int Gender;					/// Character's gender
+	int Level;					/// Character's level
+	bool Persistent;			/// Whether this character's levels and abilities are persistent
+	bool Custom;				/// Whether this character is a custom hero
+	std::string Name;			/// Given name of the character
+	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
+	std::string Dynasty;		/// Name of the character's dynasty
+	std::string Description;	/// Description of the character from an in-game universe perspective
+	std::string Background;		/// Description of the character from a perspective outside of the game's universe
+	std::string Quote;			/// A quote relating to the character
+	std::string Variation;		/// Name of the character's variation
 	std::string ProvinceOfOriginName;	/// Name of the province from which the character originates
 	IconConfig Icon;					/// Character's icon
 	CUnitType *Type;

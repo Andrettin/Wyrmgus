@@ -312,6 +312,7 @@ public:
 	//Wyrmgus start
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
+	IconConfig GetIcon() const;
 	//Wyrmgus end
 
 public:

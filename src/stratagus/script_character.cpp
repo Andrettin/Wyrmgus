@@ -82,6 +82,14 @@ static int CclDefineCharacter(lua_State *l)
 			character->ExtraName = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "Dynasty")) {
 			character->Dynasty = TransliterateText(LuaToString(l, -1));
+		} else if (!strcmp(value, "Description")) {
+			character->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			character->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			character->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Variation")) {
+			character->Variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
@@ -235,11 +243,15 @@ static int CclDefineCustomHero(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			hero->Name = TransliterateText(LuaToString(l, -1));
+			hero->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ExtraName")) {
-			hero->ExtraName = TransliterateText(LuaToString(l, -1));
+			hero->ExtraName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Dynasty")) {
-			hero->Dynasty = TransliterateText(LuaToString(l, -1));
+			hero->Dynasty = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			hero->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Variation")) {
+			hero->Variation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);

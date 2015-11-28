@@ -3710,6 +3710,10 @@ void CGrandStrategyHero::Initialize()
 	}
 	int province_of_origin_id = GetProvinceId(this->ProvinceOfOriginName);
 	this->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_of_origin_id]));
+	
+	if (!this->Icon.Name.empty()) {
+		this->Icon.Load();
+	}
 }
 
 void CGrandStrategyHero::Create()
@@ -5590,7 +5594,6 @@ void InitializeGrandStrategyGame()
 		if (!Characters[i]->Icon.Name.empty()) {
 			hero->Icon.Name = Characters[i]->Icon.Name;
 			hero->Icon.Icon = NULL;
-			hero->Icon.Load();
 		}
 		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	}

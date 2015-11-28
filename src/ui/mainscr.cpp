@@ -506,12 +506,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 
 		//Wyrmgus start
 //		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-		VariationInfo *varinfo = type.VarInfo[unit.Variation];
-		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
-			varinfo->Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-		} else {
-			type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-		}
+		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
 		//Wyrmgus end
 	}
 }
@@ -596,12 +591,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
-		VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
-		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
-			varinfo->Icon.Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
-		} else {
-			icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
-		}
+		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
 		//Wyrmgus end
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		//Wyrmgus start
@@ -1448,25 +1438,13 @@ static void InfoPanel_draw_multiple_selection()
 		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 		//Wyrmgus start
-		/*
-		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
+//		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
+		Selected[i]->GetIcon().Icon->DrawUnitIcon(*UI.SelectedButtons[i].Style,
+		//Wyrmgus end
 						  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
 						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
-		*/
-		VariationInfo *varinfo = Selected[i]->Type->VarInfo[Selected[i]->Variation];
-		if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
-			varinfo->Icon.Icon->DrawUnitIcon(*UI.SelectedButtons[i].Style,
-							  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
-							  (IconActive | (MouseButtons & LeftButton)) : 0,
-							  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
-		} else {
-			icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,
-							  (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int)i) ?
-							  (IconActive | (MouseButtons & LeftButton)) : 0,
-							  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
-		}
-		//Wyrmgus end
+
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {

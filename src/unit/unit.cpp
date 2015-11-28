@@ -2598,6 +2598,17 @@ CConstruction *CUnit::GetConstruction() const
 		return Type->Construction;
 	}
 }
+
+IconConfig CUnit::GetIcon() const
+{
+	if (this->Character != NULL && this->Character->Icon.Icon) {
+		return this->Character->Icon;
+	} else if (Type->VarInfo[Variation] && Type->VarInfo[Variation]->Icon.Icon) {
+		return Type->VarInfo[Variation]->Icon;
+	} else {
+		return Type->Icon;
+	}
+}
 //Wyrmgus end
 
 /**
