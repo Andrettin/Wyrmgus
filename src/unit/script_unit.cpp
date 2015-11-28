@@ -1029,6 +1029,8 @@ static int CclKillUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 
+	//Wyrmgus start
+	/*
 	lua_pushvalue(l, 1);
 	const CUnitType *unittype = TriggerGetUnitType(l);
 	lua_pop(l, 1);
@@ -1051,6 +1053,22 @@ static int CclKillUnit(lua_State *l)
 			return 1;
 		}
 	}
+	*/
+	
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+	
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);	
+	
+	if (unit) {
+		LetUnitDie(*unit);
+		lua_pushboolean(l, 1);
+		return 1;
+	}
+	//Wyrmgus end
 	lua_pushboolean(l, 0);
 	return 1;
 }
