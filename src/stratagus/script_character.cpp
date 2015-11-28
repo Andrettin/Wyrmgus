@@ -175,6 +175,10 @@ static int CclDefineCharacter(lua_State *l)
 			character->Icon.Name = LuaToString(l, -1);
 			character->Icon.Icon = NULL;
 			character->Icon.Load();
+		} else if (!strcmp(value, "HeroicIcon")) {
+			character->HeroicIcon.Name = LuaToString(l, -1);
+			character->HeroicIcon.Icon = NULL;
+			character->HeroicIcon.Load();
 		} else if (!strcmp(value, "Persistent")) {
 			character->Persistent = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Level")) {
@@ -506,6 +510,9 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, character->Icon.Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "HeroicIcon")) {
+		lua_pushstring(l, character->HeroicIcon.Name.c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

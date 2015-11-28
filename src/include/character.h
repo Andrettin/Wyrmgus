@@ -93,6 +93,7 @@ public:
 	std::string Variation;		/// Name of the character's variation
 	std::string ProvinceOfOriginName;	/// Name of the province from which the character originates
 	IconConfig Icon;					/// Character's icon
+	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
 	CUnitType *Type;
 	CUpgrade *Trait;
 	CCharacter *Father;					/// Character's father

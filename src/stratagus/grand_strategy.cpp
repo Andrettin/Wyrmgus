@@ -3714,6 +3714,10 @@ void CGrandStrategyHero::Initialize()
 	if (!this->Icon.Name.empty()) {
 		this->Icon.Load();
 	}
+	
+	if (!this->HeroicIcon.Name.empty()) {
+		this->HeroicIcon.Load();
+	}
 }
 
 void CGrandStrategyHero::Create()
@@ -5594,6 +5598,10 @@ void InitializeGrandStrategyGame()
 		if (!Characters[i]->Icon.Name.empty()) {
 			hero->Icon.Name = Characters[i]->Icon.Name;
 			hero->Icon.Icon = NULL;
+		}
+		if (!Characters[i]->HeroicIcon.Name.empty()) {
+			hero->HeroicIcon.Name = Characters[i]->HeroicIcon.Name;
+			hero->HeroicIcon.Icon = NULL;
 		}
 		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	}

@@ -2601,7 +2601,9 @@ CConstruction *CUnit::GetConstruction() const
 
 IconConfig CUnit::GetIcon() const
 {
-	if (this->Character != NULL && this->Character->Icon.Icon) {
+	if (this->Character != NULL && this->Character->Level >= 3 && this->Character->HeroicIcon.Icon) {
+		return this->Character->HeroicIcon;
+	} else if (this->Character != NULL && this->Character->Icon.Icon) {
 		return this->Character->Icon;
 	} else if (Type->VarInfo[Variation] && Type->VarInfo[Variation]->Icon.Icon) {
 		return Type->VarInfo[Variation]->Icon;
