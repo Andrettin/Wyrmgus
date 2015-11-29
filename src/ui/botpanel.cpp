@@ -48,10 +48,16 @@
 #include "commands.h"
 #include "depend.h"
 #include "font.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
 #include "interface.h"
 #include "map.h"
+//Wyrmgus start
+#include "network.h"
+//Wyrmgus end
 #include "player.h"
 #include "sound.h"
 #include "spells.h"
@@ -1582,6 +1588,18 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->CheckLimits(type) != -6) { //ugly way to make the checklimits message only appear when it should
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
+				if (!IsNetworkGame() && Selected[i]->Character != NULL && Selected[i]->Character->Persistent && Selected[i]->Player->AiEnabled == false) {	//save the unit-type experience upgrade for persistent characters
+					if (Selected[i]->Character->Type->Slot != type.Slot) {
+						Selected[i]->Character->Type = const_cast<CUnitType *>(&(*UnitTypes[CurrentButtons[button].Value]));
+						if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
+							CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Selected[i]->Character->GetFullName());
+							if (hero) {
+								hero->SetType(CurrentButtons[button].Value);
+							}
+						}
+						SaveHeroes();
+					}
+				}
 				SendCommandTransformInto(*Selected[i], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();

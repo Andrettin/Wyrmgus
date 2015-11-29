@@ -2852,7 +2852,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 			if (GrandStrategyGame.Heroes[i]->State != 0) {
 				fprintf(fd, "CreateGrandStrategyHero(\"%s\")\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str()); //save existing heroes
 				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
-					fprintf(fd, "SetProvinceHero(\"%s\", \"%s\", \"%s\", %d)\n", GrandStrategyGame.Heroes[i]->Province->Name.c_str(), GrandStrategyGame.Heroes[i]->GetFullName().c_str(), GrandStrategyGame.Heroes[i]->Type->Ident.c_str(), GrandStrategyGame.Heroes[i]->State); //save province heroes
+					fprintf(fd, "SetProvinceHero(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Heroes[i]->Province->Name.c_str(), GrandStrategyGame.Heroes[i]->GetFullName().c_str(), GrandStrategyGame.Heroes[i]->State); //save province heroes
 				}
 			}
 		}

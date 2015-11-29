@@ -166,7 +166,7 @@ public:
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
 	void SetAttackingUnitQuantity(int unit_type_id, int quantity);
 	void ChangeAttackingUnitQuantity(int unit_type_id, int quantity);
-	void SetHero(std::string hero_full_name, int unit_type_id, int value);
+	void SetHero(std::string hero_full_name, int value);
 	void AllocateLabor();
 	void AllocateLaborToResource(int resource);
 	void DeallocateLabor();
@@ -314,6 +314,7 @@ public:
 	void Initialize();
 	void Create();
 	void Die();
+	void SetType(int unit_type_id);
 	int GetAdministrativeEfficiencyModifier();
 	std::string GetRulerEffectsString();
 	
@@ -513,7 +514,7 @@ extern void ChangeProvinceUnitQuantity(std::string province_name, std::string un
 extern void SetProvinceUnderConstructionUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
 extern void SetProvinceAttackingUnitQuantity(std::string province_name, std::string unit_type_ident, int quantity);
-extern void SetProvinceHero(std::string province_name, std::string hero_full_name, std::string hero_ident, int value);
+extern void SetProvinceHero(std::string province_name, std::string hero_full_name, int value);
 extern void SetProvinceFood(std::string province_name, int quantity);
 extern void ChangeProvinceFood(std::string province_name, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);

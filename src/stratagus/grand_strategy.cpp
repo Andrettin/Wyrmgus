@@ -1914,7 +1914,7 @@ void CProvince::ChangeAttackingUnitQuantity(int unit_type_id, int quantity)
 	this->SetAttackingUnitQuantity(unit_type_id, this->AttackingUnits[unit_type_id] + quantity);
 }
 
-void CProvince::SetHero(std::string hero_full_name, int unit_type_id, int value)
+void CProvince::SetHero(std::string hero_full_name, int value)
 {
 	if (value == 1) {
 		this->Movement = true;
@@ -1928,17 +1928,12 @@ void CProvince::SetHero(std::string hero_full_name, int unit_type_id, int value)
 		}
 		if (hero->Province != NULL) {
 			if (hero->State == 2) {
-				hero->Province->MilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (hero->Province->Owner != NULL ? hero->Province->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+				hero->Province->MilitaryScore -= (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (hero->Province->Owner != NULL ? hero->Province->Owner->MilitaryScoreBonus[hero->Type->Slot] : 0));
 			} else if (hero->State == 3) {
-				hero->Province->AttackingMilitaryScore -= (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (hero->Province->AttackedBy != NULL ? hero->Province->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
+				hero->Province->AttackingMilitaryScore -= (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (hero->Province->AttackedBy != NULL ? hero->Province->AttackedBy->MilitaryScoreBonus[hero->Type->Slot] : 0));
 			}
 		}
 		hero->State = value;
-			
-		//if the hero's unit type changed
-		if (unit_type_id != hero->Type->Slot) {
-			hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-		}
 			
 		if (this != hero->Province || value == 0) { //if the new province is different from the hero's current province
 			if (hero->Province != NULL) {
@@ -1956,9 +1951,9 @@ void CProvince::SetHero(std::string hero_full_name, int unit_type_id, int value)
 	
 	
 	if (value == 2) {
-		this->MilitaryScore += (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[unit_type_id] : 0));
+		this->MilitaryScore += (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[hero->Type->Slot] : 0));
 	} else if (value == 3) {
-		this->AttackingMilitaryScore += (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->AttackedBy != NULL ? this->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
+		this->AttackingMilitaryScore += (hero->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->AttackedBy != NULL ? this->AttackedBy->MilitaryScoreBonus[hero->Type->Slot] : 0));
 	}
 }
 		
@@ -3742,7 +3737,7 @@ void CGrandStrategyHero::Create()
 	this->State = 2;
 	
 	if (this->ProvinceOfOrigin != NULL && !this->Icon.Name.empty()) { //if the hero has its own icon
-		this->ProvinceOfOrigin->SetHero(this->GetFullName(), this->Type->Slot, 2);
+		this->ProvinceOfOrigin->SetHero(this->GetFullName(), 2);
 	}
 }
 
@@ -3799,6 +3794,30 @@ void CGrandStrategyHero::Die()
 			} else {
 				break;
 			}
+		}
+	}
+}
+
+void CGrandStrategyHero::SetType(int unit_type_id)
+{
+	if (this->Province != NULL) {
+		if (this->State == 2) {
+			this->Province->MilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->Owner != NULL ? this->Province->Owner->MilitaryScoreBonus[this->Type->Slot] : 0));
+		} else if (this->State == 3) {
+			this->Province->AttackingMilitaryScore -= (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->AttackedBy != NULL ? this->Province->AttackedBy->MilitaryScoreBonus[this->Type->Slot] : 0));
+		}
+	}
+	
+	//if the hero's unit type changed
+	if (unit_type_id != this->Type->Slot) {
+		this->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+	}	
+	
+	if (this->Province != NULL) {
+		if (this->State == 2) {
+			this->Province->MilitaryScore += (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->Owner != NULL ? this->Province->Owner->MilitaryScoreBonus[this->Type->Slot] : 0));
+		} else if (this->State == 3) {
+			this->Province->AttackingMilitaryScore += (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->AttackedBy != NULL ? this->Province->AttackedBy->MilitaryScoreBonus[this->Type->Slot] : 0));
 		}
 	}
 }
@@ -4958,13 +4977,12 @@ void SetProvinceAttackingUnitQuantity(std::string province_name, std::string uni
 	}
 }
 
-void SetProvinceHero(std::string province_name, std::string hero_full_name, std::string hero_ident, int value)
+void SetProvinceHero(std::string province_name, std::string hero_full_name, int value)
 {
 	int province_id = GetProvinceId(province_name);
-	int unit_type_id = UnitTypeIdByIdent(hero_ident);
 	
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type_id != -1) {
-		GrandStrategyGame.Provinces[province_id]->SetHero(hero_full_name, unit_type_id, value);
+	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
+		GrandStrategyGame.Provinces[province_id]->SetHero(hero_full_name, value);
 	}
 }
 
@@ -6594,13 +6612,7 @@ void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_t
 	if (hero) {
 		int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 		if (unit_type_id != -1) {
-			if (hero->Province != NULL) {
-				hero->Province->SetHero(hero_full_name, unit_type_id, hero->State);
-			} else {
-				if (hero->Type == NULL || hero->Type->Slot != unit_type_id) {
-					hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-				}
-			}
+			hero->SetType(unit_type_id);
 		}
 	} else {
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
