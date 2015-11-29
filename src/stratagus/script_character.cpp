@@ -68,7 +68,7 @@ static int CclDefineCharacter(lua_State *l)
 	if (!character) {
 		character = new CCharacter;
 		Characters.push_back(character);
-	} else {
+	} else if (!character->Persistent) {
 		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_full_name.c_str());
 	}
 	
@@ -193,6 +193,18 @@ static int CclDefineCharacter(lua_State *l)
 					character->Abilities.push_back(AllUpgrades[ability_id]);
 				} else {
 					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident);
+				}
+			}
+		} else if (!strcmp(value, "ForbiddenUpgrades")) {
+			memset(character->ForbiddenUpgrades, 0, sizeof(character->ForbiddenUpgrades));
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string unit_type_ident = LuaToString(l, -1, j + 1);
+				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+				if (unit_type_id != -1) {
+					character->ForbiddenUpgrades[unit_type_id] = true;
+				} else {
+					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident);
 				}
 			}
 		} else {

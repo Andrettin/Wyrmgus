@@ -70,6 +70,7 @@ public:
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL)
 	{
+		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}
 	
 	bool IsParentOf(std::string child_full_name);
@@ -102,6 +103,7 @@ public:
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CUpgrade *> Abilities;
 //	std::vector<CItem *> Items;
+	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
 };
 
 /*----------------------------------------------------------------------------

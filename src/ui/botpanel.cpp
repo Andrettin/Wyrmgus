@@ -43,6 +43,7 @@
 #include "action/action_research.h"
 #include "action/action_train.h"
 #include "action/action_upgradeto.h"
+#include "character.h"
 //Wyrmgus end
 #include "commands.h"
 #include "depend.h"
@@ -1099,6 +1100,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, true);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			}
+			if (res && unit.Character != NULL) {
+				res = !unit.Character->ForbiddenUpgrades[buttonaction.Value];
 			}
 			break;
 		case ButtonLearnAbility:
