@@ -254,6 +254,23 @@ void UpdateDisplay()
 				}
 			}
 		}
+		
+		//draw icon if there are units with available level up upgrades
+		if (UI.LevelUpUnitButton && !ThisPlayer->LevelUpUnits.empty()) {
+			const PixelPos pos(UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
+			const int flag = (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
+								 
+			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index);
+				
+			if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
+				std::string level_up_unit_tooltip = "Find Unit with Available Level Up";
+				if (!Preference.NoStatusLineTooltips) {
+					CLabel label(GetGameFont());
+					label.Draw(2 + 16, Video.Height + 2 - 16, level_up_unit_tooltip);
+				}
+				DrawGenericPopup(level_up_unit_tooltip, UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
+			}
+		}
 		//Wyrmgus end
 	//Wyrmgus start
 	} else if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { //grand strategy mode

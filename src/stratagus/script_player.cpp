@@ -104,6 +104,9 @@ void CPlayer::Load(lua_State *l)
 
 	this->Units.resize(0);
 	this->FreeWorkers.resize(0);
+	//Wyrmgus start
+	this->LevelUpUnits.resize(0);
+	//Wyrmgus end
 
 	// j = 0 represent player Index.
 	for (int j = 1; j < args; ++j) {

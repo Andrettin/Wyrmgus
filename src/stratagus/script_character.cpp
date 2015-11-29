@@ -39,6 +39,7 @@
 
 #include "grand_strategy.h"
 #include "player.h"
+#include "quest.h"
 #include "script.h"
 #include "unittype.h"
 #include "upgrade.h"
@@ -305,6 +306,28 @@ static int CclDefineCustomHero(lua_State *l)
 					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident);
 				}
 			}
+		} else if (!strcmp(value, "QuestsInProgress")) {
+			hero->QuestsInProgress.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string quest_name = LuaToString(l, -1, j + 1);
+				if (GetQuest(quest_name) != NULL) {
+					hero->QuestsInProgress.push_back(GetQuest(quest_name));
+				} else {
+					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name);
+				}
+			}
+		} else if (!strcmp(value, "QuestsCompleted")) {
+			hero->QuestsCompleted.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string quest_name = LuaToString(l, -1, j + 1);
+				if (GetQuest(quest_name) != NULL) {
+					hero->QuestsCompleted.push_back(GetQuest(quest_name));
+				} else {
+					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name);
+				}
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -554,7 +577,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string character_name = LuaToString(l, 1);
-	CCharacter *character = GetCharacter(character_name);
+	CCharacter *character = GetCustomHero(character_name);
 	if (!character) {
 		LuaError(l, "Custom hero \"%s\" doesn't exist." _C_ character_name.c_str());
 	}

@@ -150,6 +150,9 @@ public:
 	CUnitColors UnitColors; /// Unit colors for new units
 
 	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
+	//Wyrmgus start
+	std::vector<CUnit *> LevelUpUnits;	/// Container for units with available level up upgrades
+	//Wyrmgus end
 
 	// Upgrades/Allows:
 	CAllow Allow;                 /// Allowed for player
@@ -178,6 +181,9 @@ public:
 	void AddUnit(CUnit &unit);
 	void RemoveUnit(CUnit &unit);
 	void UpdateFreeWorkers();
+	//Wyrmgus start
+	void UpdateLevelUpUnits();
+	//Wyrmgus end
 
 	/// Get a resource of the player
 	int GetResource(const int resource, const int type);

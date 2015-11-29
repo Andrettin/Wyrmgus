@@ -946,6 +946,9 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 {
 	std::vector<CUnit *>().swap(this->Units);
 	std::vector<CUnit *>().swap(this->FreeWorkers);
+	//Wyrmgus start
+	std::vector<CUnit *>().swap(this->LevelUpUnits);
+	//Wyrmgus end
 
 	//  Take first slot for person on this computer,
 	//  fill other with computer players.
@@ -1267,6 +1270,9 @@ void CPlayer::Clear()
 	Ai = 0;
 	this->Units.resize(0);
 	this->FreeWorkers.resize(0);
+	//Wyrmgus start
+	this->LevelUpUnits.resize(0);
+	//Wyrmgus end
 	NumBuildings = 0;
 	Supply = 0;
 	Demand = 0;
@@ -1339,6 +1345,26 @@ void CPlayer::UpdateFreeWorkers()
 	}
 }
 
+//Wyrmgus start
+void CPlayer::UpdateLevelUpUnits()
+{
+	LevelUpUnits.clear();
+	if (LevelUpUnits.capacity() != 0) {
+		// Just calling LevelUpUnits.clear() is not always appropriate.
+		// Certain paths may leave LevelUpUnits in an invalid state, so
+		// it's safer to re-initialize.
+		std::vector<CUnit*>().swap(LevelUpUnits);
+	}
+	const int nunits = this->GetUnitCount();
+
+	for (int i = 0; i < nunits; ++i) {
+		CUnit &unit = this->GetUnit(i);
+		if (unit.IsAlive() && unit.Variable[LEVELUP_INDEX].Value >= 1 && !unit.Removed) {
+			LevelUpUnits.push_back(&unit);
+		}
+	}
+}
+//Wyrmgus end
 
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const
 {

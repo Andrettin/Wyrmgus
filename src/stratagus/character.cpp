@@ -45,6 +45,7 @@
 #include "game.h"
 #include "parameters.h"
 #include "player.h"
+#include "quest.h"
 #include "unit.h"
 
 /*----------------------------------------------------------------------------
@@ -196,6 +197,26 @@ void SaveHeroes()
 						fprintf(fd, ", ");
 					}
 				}
+				fprintf(fd, "},\n");
+			}
+			if (CustomHeroes[i]->QuestsInProgress.size() > 0) {
+				fprintf(fd, "\tQuestsInProgress = {");
+				for (size_t j = 0; j < CustomHeroes[i]->QuestsInProgress.size(); ++j) {
+					fprintf(fd, "\"%s\"", CustomHeroes[i]->QuestsInProgress[j]->Name.c_str());
+					if (j < (CustomHeroes[i]->QuestsInProgress.size() - 1)) {
+						fprintf(fd, ", ");
+					}
+				}
+				fprintf(fd, "},\n");
+			}
+			if (CustomHeroes[i]->QuestsCompleted.size() > 0) {
+				fprintf(fd, "\tQuestsCompleted = {");
+				for (size_t j = 0; j < CustomHeroes[i]->QuestsCompleted.size(); ++j) {
+					fprintf(fd, "\"%s\"", CustomHeroes[i]->QuestsCompleted[j]->Name.c_str());
+					if (j < (CustomHeroes[i]->QuestsCompleted.size() - 1)) {
+						fprintf(fd, ", ");
+					}
+				}
 				fprintf(fd, "}\n");
 			}
 			fprintf(fd, "})\n\n");
@@ -203,6 +224,37 @@ void SaveHeroes()
 	}
 		
 	fclose(fd);
+}
+
+void HeroAddQuest(std::string hero_full_name, std::string quest_name)
+{
+	CCharacter *hero = GetCustomHero(hero_full_name);
+	if (!hero) {
+		fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	
+	CQuest *quest = GetQuest(quest_name);
+	if (!quest) {
+		fprintf(stderr, "Quest \"%s\" doesn't exist.\n", quest_name.c_str());
+	}
+	
+	hero->QuestsInProgress.push_back(quest);
+}
+
+void HeroCompleteQuest(std::string hero_full_name, std::string quest_name)
+{
+	CCharacter *hero = GetCustomHero(hero_full_name);
+	if (!hero) {
+		fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	
+	CQuest *quest = GetQuest(quest_name);
+	if (!quest) {
+		fprintf(stderr, "Quest \"%s\" doesn't exist.\n", quest_name.c_str());
+	}
+	
+	hero->QuestsInProgress.erase(std::remove(hero->QuestsInProgress.begin(), hero->QuestsInProgress.end(), quest), hero->QuestsInProgress.end());
+	hero->QuestsCompleted.push_back(quest);
 }
 
 std::string GetGenderNameById(int gender)

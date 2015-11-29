@@ -91,6 +91,9 @@ enum _iface_state_ InterfaceState;   /// Current interface state
 bool GodMode;                        /// Invincibility cheat
 enum _key_state_ KeyState;           /// current key state
 CUnit *LastIdleWorker;               /// Last called idle worker
+//Wyrmgus start
+CUnit *LastLevelUpUnit;				 /// Last called level up unit
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -476,6 +479,41 @@ void UiFindIdleWorker()
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
 }
+
+//Wyrmgus start
+/**
+**  Find the next level up unit, select it, and center on it
+*/
+void UiFindLevelUpUnit()
+{
+	if (ThisPlayer->LevelUpUnits.empty()) {
+		return;
+	}
+	CUnit *unit = ThisPlayer->LevelUpUnits[0];
+	if (LastLevelUpUnit) {
+		const std::vector<CUnit *> &levelUpUnits = ThisPlayer->LevelUpUnits;
+		std::vector<CUnit *>::const_iterator it = std::find(levelUpUnits.begin(),
+															levelUpUnits.end(),
+															LastLevelUpUnit);
+		if (it != ThisPlayer->LevelUpUnits.end()) {
+			if (*it != ThisPlayer->LevelUpUnits.back()) {
+				unit = *(++it);
+			}
+		}
+	}
+
+	if (unit != NULL) {
+		LastLevelUpUnit = unit;
+		SelectSingleUnit(*unit);
+		UI.StatusLine.Clear();
+		UI.StatusLine.ClearCosts();
+		CurrentButtonLevel = 0;
+		PlayUnitSound(*Selected[0], VoiceSelected);
+		SelectionChanged();
+		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
+	}
+}
+//Wyrmgus end
 
 /**
 **  Toggle grab mouse on/off.

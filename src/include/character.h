@@ -46,6 +46,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CQuest;
 class CUnitType;
 class CUpgrade;
 
@@ -102,6 +103,8 @@ public:
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CUpgrade *> Abilities;
+	std::vector<CQuest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters
+	std::vector<CQuest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
 //	std::vector<CItem *> Items;
 	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
 };
@@ -121,6 +124,8 @@ extern void CleanCharacters();
 extern CCharacter *GetCharacter(std::string character_full_name);
 extern CCharacter *GetCustomHero(std::string hero_full_name);
 extern void SaveHeroes();
+extern void HeroAddQuest(std::string hero_full_name, std::string quest_name);
+extern void HeroCompleteQuest(std::string hero_full_name, std::string quest_name);
 extern std::string GetGenderNameById(int gender);
 extern int GetGenderIdByName(std::string gender);
 extern void CharacterCclRegister();

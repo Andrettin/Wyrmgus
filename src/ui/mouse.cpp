@@ -898,6 +898,13 @@ static void HandleMouseOn(const PixelPos screenPos)
 		CursorOn = CursorOnButton;
 		return;
 	}
+	
+	if (UI.LevelUpUnitButton && UI.LevelUpUnitButton->Contains(screenPos) && !ThisPlayer->LevelUpUnits.empty()) {
+		ButtonAreaUnderCursor = ButtonAreaLevelUpUnit;
+		ButtonUnderCursor = 0;
+		CursorOn = CursorOnButton;
+		return;
+	}
 	//Wyrmgus end
 	
 	//  Minimap
@@ -2106,6 +2113,11 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			if (ButtonUnderCursor == 0) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				UiFindIdleWorker();
+			}
+		} else if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit) {
+			if (ButtonUnderCursor == 0) {
+				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+				UiFindLevelUpUnit();
 			}
 		//Wyrmgus end
 		}

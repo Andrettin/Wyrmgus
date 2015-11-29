@@ -1603,6 +1603,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 				SendCommandTransformInto(*Selected[i], type, !(KeyModifiers & ModifierShift));
 				UI.StatusLine.Clear();
 				UI.StatusLine.ClearCosts();
+				Selected[i]->Player->UpdateLevelUpUnits();
 			}
 		} else {
 			break;

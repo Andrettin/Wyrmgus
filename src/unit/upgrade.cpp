@@ -1366,6 +1366,7 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 		}
 	}
 	IndividualUpgradeAcquire(unit, upgrade);
+	unit.Player->UpdateLevelUpUnits();
 }
 
 void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)

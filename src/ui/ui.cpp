@@ -127,7 +127,7 @@ CUserInterface::CUserInterface() :
 	SingleTrainingFont(NULL), SingleTrainingTextX(0), SingleTrainingTextY(0),
 	TrainingFont(NULL), TrainingTextX(0), TrainingTextY(0),
 	//Wyrmgus start
-	IdleWorkerButton(NULL),
+	IdleWorkerButton(NULL), LevelUpUnitButton(NULL),
 	//Wyrmgus end
 	CompletedBarColor(0), CompletedBarShadow(0),
 	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
@@ -383,6 +383,7 @@ void CleanUserInterface()
 	UI.TransportingButtons.clear();
 	//Wyrmgus start
 	delete UI.IdleWorkerButton;
+	delete UI.LevelUpUnitButton;
 	//Wyrmgus end
 	UI.UserButtons.clear();
 

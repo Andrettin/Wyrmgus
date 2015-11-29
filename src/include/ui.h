@@ -442,6 +442,7 @@ public:
 
 	//Wyrmgus start
 	CUIButton *IdleWorkerButton;		/// Button for the idle worker notification
+	CUIButton *LevelUpUnitButton;		/// Button for the level up unit notification
 	//Wyrmgus end
 	
 	// Completed bar

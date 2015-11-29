@@ -126,6 +126,7 @@ enum _button_area_ {
 	ButtonAreaMenu,          /// Menu button
 	//Wyrmgus start
 	ButtonAreaIdleWorker,	 /// Idle worker button
+	ButtonAreaLevelUpUnit,	 /// Level up unit button
 	//Wyrmgus end
 	ButtonAreaUser           /// User buttons
 };
@@ -351,6 +352,10 @@ extern void UiToggleBigMap();
 extern void UiToggleTerrain();
 /// Find the next idle worker
 extern void UiFindIdleWorker();
+//Wyrmgus start
+/// Find the next level up unit
+extern void UiFindLevelUpUnit();
+//Wyrmgus end
 /// Track unit, the viewport follows the unit.
 extern void UiTrackUnit();
 
