@@ -34,6 +34,9 @@
 #include "action/action_built.h"
 
 #include "ai.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "commands.h"
 #include "construct.h"
 #include "iolib.h"
@@ -183,6 +186,13 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (unit.Active) {
 		player.UnitTypesAiActiveCount[type.Slot]++;
 	}
+	//Wyrmgus start
+	if (unit.Character == NULL) {
+		player.UnitTypesNonHeroCount[type.Slot]++;
+	} else {
+		player.Heroes.push_back(unit.Character->GetFullName());
+	}
+	//Wyrmgus end
 	unit.Constructed = 0;
 	if (unit.Frame < 0) {
 		unit.Frame = -1;

@@ -122,6 +122,10 @@ public:
 	// FIXME: shouldn't use the constant
 	int UnitTypesCount[UnitTypeMax];  /// total units of unit-type
 	int UnitTypesAiActiveCount[UnitTypeMax];  /// total units of unit-type that have their AI set to active
+	//Wyrmgus start
+	int UnitTypesNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character
+	std::vector<std::string> Heroes;			/// characters owned by this player
+	//Wyrmgus end
 
 	bool AiEnabled;        /// handle AI on local computer
 	PlayerAi *Ai;          /// Ai structure pointer

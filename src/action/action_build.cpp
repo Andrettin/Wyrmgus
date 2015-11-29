@@ -42,6 +42,7 @@
 #include "ai.h"
 #include "animation.h"
 //Wyrmgus start
+#include "character.h"
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
@@ -455,6 +456,13 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	if (build->Active) {
 		build->Player->UnitTypesAiActiveCount[type.Slot]--;
 	}
+	//Wyrmgus start
+	if (build->Character == NULL) {
+		build->Player->UnitTypesNonHeroCount[type.Slot]--;
+	} else {
+		build->Player->Heroes.erase(std::remove(build->Player->Heroes.begin(), build->Player->Heroes.end(), build->Character->GetFullName()), build->Player->Heroes.end());
+	}
+	//Wyrmgus end
 
 	// We need somebody to work on it.
 	if (!type.BoolFlag[BUILDEROUTSIDE_INDEX].value) {

@@ -2627,6 +2627,22 @@ static int CclGetPlayerData(lua_State *l)
 		Assert(type);
 		lua_pushnumber(l, p->UnitTypesAiActiveCount[type->Slot]);
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "UnitTypesNonHeroCount")) {
+		LuaCheckArgs(l, 3);
+		CUnitType *type = CclGetUnitType(l);
+		Assert(type);
+		lua_pushnumber(l, p->UnitTypesNonHeroCount[type->Slot]);
+		return 1;
+	} else if (!strcmp(data, "Heroes")) {
+		lua_createtable(l, p->Heroes.size(), 0);
+		for (size_t i = 1; i <= p->Heroes.size(); ++i)
+		{
+			lua_pushstring(l, p->Heroes[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "AiEnabled")) {
 		lua_pushboolean(l, p->AiEnabled);
 		return 1;

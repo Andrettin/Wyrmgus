@@ -1072,6 +1072,10 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 
 	memset(this->UnitTypesCount, 0, sizeof(this->UnitTypesCount));
 	memset(this->UnitTypesAiActiveCount, 0, sizeof(this->UnitTypesAiActiveCount));
+	//Wyrmgus start
+	memset(this->UnitTypesNonHeroCount, 0, sizeof(this->UnitTypesNonHeroCount));
+	this->Heroes.clear();
+	//Wyrmgus end
 
 	this->Supply = 0;
 	this->Demand = 0;
@@ -1255,6 +1259,10 @@ void CPlayer::Clear()
 	memset(Revenue, 0, sizeof(Revenue));
 	memset(UnitTypesCount, 0, sizeof(UnitTypesCount));
 	memset(UnitTypesAiActiveCount, 0, sizeof(UnitTypesAiActiveCount));
+	//Wyrmgus start
+	memset(UnitTypesNonHeroCount, 0, sizeof(UnitTypesNonHeroCount));
+	this->Heroes.clear();
+	//Wyrmgus end
 	AiEnabled = false;
 	Ai = 0;
 	this->Units.resize(0);

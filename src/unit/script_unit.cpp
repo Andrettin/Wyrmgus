@@ -552,6 +552,13 @@ static int CclUnit(lua_State *l)
 				if (unit->Active) {
 					unit->Player->UnitTypesAiActiveCount[type->Slot]--;
 				}
+				//Wyrmgus start
+				if (unit->Character == NULL) {
+					unit->Player->UnitTypesNonHeroCount[type->Slot]--;
+				} else {
+					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit->Character->GetFullName()), unit->Player->Heroes.end());
+				}
+				//Wyrmgus end
 			}
 		} else if (!strcmp(value, "critical-order")) {
 			lua_rawgeti(l, 2, j + 1);

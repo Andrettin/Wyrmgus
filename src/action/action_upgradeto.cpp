@@ -119,6 +119,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		player.UnitTypesAiActiveCount[oldtype.Slot]--;
 		player.UnitTypesAiActiveCount[newtype.Slot]++;
 	}
+	//Wyrmgus start
+	if (unit.Character == NULL) {
+		player.UnitTypesNonHeroCount[oldtype.Slot]--;
+		player.UnitTypesNonHeroCount[newtype.Slot]++;
+	}
+	//Wyrmgus end
 
 	player.Demand += newtype.Stats[player.Index].Variables[DEMAND_INDEX].Value - oldtype.Stats[player.Index].Variables[DEMAND_INDEX].Value;
 	player.Supply += newtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value - oldtype.Stats[player.Index].Variables[SUPPLY_INDEX].Value;

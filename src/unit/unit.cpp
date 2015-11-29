@@ -568,6 +568,11 @@ void CUnit::Release(bool final)
 //Wyrmgus start
 void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 {
+	if (this->Character == NULL) {
+		this->Player->UnitTypesNonHeroCount[this->Type->Slot]--;
+	} else {
+		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this->Character->GetFullName()), this->Player->Heroes.end());
+	}
 	if (!custom_hero) {
 		CCharacter *character = GetCharacter(character_full_name);
 		if (character) {
@@ -605,6 +610,12 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	//load learned abilities
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
 		AbilityAcquire(*this, this->Character->Abilities[i]);
+	}
+	
+	if (this->Character == NULL) {
+		this->Player->UnitTypesNonHeroCount[this->Type->Slot]++;
+	} else {
+		this->Player->Heroes.push_back(this->Character->GetFullName());
 	}
 }
 
@@ -802,6 +813,13 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		if (Active) {
 			player.UnitTypesAiActiveCount[type.Slot]++;
 		}
+		//Wyrmgus start
+		if (this->Character == NULL) {
+			player.UnitTypesNonHeroCount[type.Slot]++;
+		} else {
+			player.Heroes.push_back(this->Character->GetFullName());
+		}
+		//Wyrmgus end
 		player.Demand += type.Stats[player.Index].Variables[DEMAND_INDEX].Value; // food needed
 	}
 
@@ -1491,6 +1509,13 @@ void UnitLost(CUnit &unit)
 			if (unit.Active) {
 				player.UnitTypesAiActiveCount[type.Slot]--;
 			}
+			//Wyrmgus start
+			if (unit.Character == NULL) {
+				player.UnitTypesNonHeroCount[type.Slot]--;
+			} else {
+				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), unit.Character->GetFullName()), player.Heroes.end());
+			}
+			//Wyrmgus end
 		}
 	}
 
@@ -2021,6 +2046,13 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	if (Active) {
 		newplayer.UnitTypesAiActiveCount[Type->Slot]++;
 	}
+	//Wyrmgus start
+	if (this->Character == NULL) {
+		newplayer.UnitTypesNonHeroCount[Type->Slot]++;
+	} else {
+		newplayer.Heroes.push_back(this->Character->GetFullName());
+	}
+	//Wyrmgus end
 
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
