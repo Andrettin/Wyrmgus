@@ -160,6 +160,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			unit.Variable[i].Enable = newstats.Variables[i].Enable;
 		}
 		*/
+		if (i == LEVEL_INDEX) { //if the unit's level changed in accordance to the difference between the levels of the two unit types, then its level change would be duplicated when leveling up, so let's skip the level variable here
+			continue;
+		}
+		
 		if (unit.Variable[i].Max && unit.Variable[i].Value) {
 			unit.Variable[i].Value += newstats.Variables[i].Max - oldstats.Variables[i].Max;
 		} else {
