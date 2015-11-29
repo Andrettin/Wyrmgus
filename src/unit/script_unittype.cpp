@@ -1924,8 +1924,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
-		} else if (!strcmp(value, "DefaultName")) {
-			type->DefaultName = LuaToString(l, -1);
 		} else if (!strcmp(value, "PersonalNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -2297,9 +2295,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->Name.c_str());
 		return 1;
 	//Wyrmgus start
-	} else if (!strcmp(data, "DefaultName")) {
-		lua_pushstring(l, type->DefaultName.c_str());
-		return 1;
 	} else if (!strcmp(data, "Parent")) {
 		lua_pushstring(l, type->Parent.c_str());
 		return 1;

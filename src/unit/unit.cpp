@@ -2903,9 +2903,9 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				//attacked messages now only appear if the "help" sound would be played too
 				VariationInfo *varinfo = target.Type->VarInfo[target.Variation];
 				if (varinfo && !varinfo->TypeName.empty()) {
-					target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->DefaultName.empty() ? varinfo->TypeName.c_str() : target.Type->DefaultName.c_str());
+					target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), varinfo->TypeName.c_str());
 				} else {
-					target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->DefaultName.empty() ? target.Type->Name.c_str() : target.Type->DefaultName.c_str());
+					target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
 				}
 				//Wyrmgus end
 			}

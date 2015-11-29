@@ -666,7 +666,6 @@ public:
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
-	std::string DefaultName;		/// Default personal name of the unit type (used by heroes)
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	std::string Excrement;			/// Excrement unit for this unit type
 	std::string PersonalNames[PersonalNameMax];	/// personal names

@@ -1192,10 +1192,8 @@ static void ShowUnitInfo(const CUnit &unit)
 	//Wyrmgus end
 					//Wyrmgus start
 //					unit.Type->Name.c_str(), unit.Player->Index,
-					(unit.Type->DefaultName.empty() ?
 					((unit.Type->VarInfo[unit.Variation] && !unit.Type->VarInfo[unit.Variation]->TypeName.empty()) ?
-					unit.Type->VarInfo[unit.Variation]->TypeName.c_str() : unit.Type->Name.c_str()) :
-					unit.Type->DefaultName.c_str()),
+					unit.Type->VarInfo[unit.Variation]->TypeName.c_str() : unit.Type->Name.c_str()),
 					unit.Player->Index,
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
@@ -1745,10 +1743,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			char buf[256];
 			snprintf(buf, sizeof(buf), "%s \"%s\"",
 					 Editor.ShownUnitTypes[i]->Ident.c_str(),
-					 //Wyrmgus start
-//					 Editor.ShownUnitTypes[i]->Name.c_str());
-					 Editor.ShownUnitTypes[i]->DefaultName.empty() ? Editor.ShownUnitTypes[i]->Name.c_str() : Editor.ShownUnitTypes[i]->DefaultName.c_str());
-					 //Wyrmgus end
+					 Editor.ShownUnitTypes[i]->Name.c_str());
 			UI.StatusLine.Set(buf);
 			Editor.CursorUnitIndex = i;
 			return true;

@@ -771,8 +771,8 @@ std::string GeneratePersonalName(int civilization, int unit_type_id)
 	const CUnitType &type = *UnitTypes[unit_type_id];
 	std::string personal_name;
 
-	if (!type.DefaultName.empty() || Editor.Running == EditorEditing) { // always set the personal name to the default name if in the editor
-		personal_name = type.DefaultName;
+	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
+		personal_name = "";
 	} else if (!type.PersonalNames[0].empty() || !type.PersonalNamePrefixes[0].empty()) {
 		int PersonalNameCount = 0;
 		int PersonalNamePrefixCount = 0;
