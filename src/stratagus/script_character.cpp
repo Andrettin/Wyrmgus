@@ -458,6 +458,15 @@ static int CclGetCharacterData(lua_State *l)
 	} else if (!strcmp(data, "ProvinceOfOrigin")) {
 		lua_pushstring(l, character->ProvinceOfOriginName.c_str());
 		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, character->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, character->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, character->Quote.c_str());
+		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (character->Civilization != -1) {
 			lua_pushstring(l, PlayerRaces.Name[character->Civilization].c_str());
