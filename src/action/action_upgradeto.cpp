@@ -179,42 +179,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 
 	//Wyrmgus start
 	//change variation if upgrading (new unit type may have different variations)
-	VariationInfo *current_varinfo = oldtype.VarInfo[unit.Variation];
-	int TypeVariationCount = 0;
-	int LocalTypeVariations[VariationMax];
-	for (int i = 0; i < VariationMax; ++i) {
-		VariationInfo *varinfo = newtype.VarInfo[i];
-		if (!varinfo) {
-			continue;
-		}
-		if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
-			continue;
-		}
-		bool UpgradesCheck = true;
-		for (int u = 0; u < VariationMax; ++u) {
-			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
-				UpgradesCheck = false;
-				break;
-			}
-			if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
-				UpgradesCheck = false;
-				break;
-			}
-		}
-		if (UpgradesCheck == false) {
-			continue;
-		}
-		if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if the old variation's ident is included in that of a viable one of the new unit type, choose the latter automatically
-			unit.SetVariation(i, &newtype);
-			TypeVariationCount = 0;
-			break;
-		}
-		LocalTypeVariations[TypeVariationCount] = i;
-		TypeVariationCount += 1;
-	}
-	if (TypeVariationCount > 0) {
-		unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)], &newtype);
-	}
+	unit.ChooseVariation(&newtype);
 	//Wyrmgus end
 	
 	unit.Type = const_cast<CUnitType *>(&newtype);

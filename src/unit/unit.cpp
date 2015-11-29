@@ -617,6 +617,52 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	} else {
 		this->Player->Heroes.push_back(this->Character->GetFullName());
 	}
+	
+	this->ChooseVariation(); //choose a new variation now
+}
+
+void CUnit::ChooseVariation(const CUnitType *new_type)
+{
+	std::string priority_variation;
+	if (this->Character != NULL && !this->Character->Variation.empty()) {
+		priority_variation = this->Character->Variation;
+	} else if (this->Type->VarInfo[this->Variation]) {
+		priority_variation = this->Type->VarInfo[this->Variation]->VariationId;
+	}
+	
+	std::vector<int> type_variations;
+	for (int i = 0; i < VariationMax; ++i) {
+		VariationInfo *varinfo = new_type != NULL ? new_type->VarInfo[i] : this->Type->VarInfo[i];
+		if (!varinfo) {
+			continue;
+		}
+		if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
+			continue;
+		}
+		bool upgrades_check = true;
+		for (int u = 0; u < VariationMax; ++u) {
+			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*this->Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+				upgrades_check = false;
+				break;
+			}
+			if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
+				upgrades_check = false;
+				break;
+			}
+		}
+		if (upgrades_check == false) {
+			continue;
+		}
+		if (!priority_variation.empty() && varinfo->VariationId.find(priority_variation) != std::string::npos) { // if the priority variation's ident is included in that of a new viable, choose the latter automatically
+			this->SetVariation(i, new_type);
+			type_variations.clear();
+			break;
+		}
+		type_variations.push_back(i);
+	}
+	if (type_variations.size() > 0) {
+		this->SetVariation(type_variations[SyncRand(type_variations.size())], new_type);
+	}
 }
 
 void CUnit::SetVariation(int new_variation, const CUnitType *new_type)
@@ -862,45 +908,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		unit->AssignToPlayer(*player);
 
 		//Wyrmgus start
-		int TypeVariationCount = 0;
-		int LocalTypeVariations[VariationMax];
-		for (int i = 0; i < VariationMax; ++i) {
-			VariationInfo *varinfo = type.VarInfo[i];
-			if (!varinfo) {
-				continue;
-			}
-			if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
-				continue;
-			}
-			bool UpgradesCheck = true;
-			if (GameCycle != 0) {
-				for (int u = 0; u < VariationMax; ++u) {
-					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*player, varinfo->UpgradesRequired[u].c_str()) != 'R') {
-						UpgradesCheck = false;
-						break;
-					}
-					if (!varinfo->UpgradesForbidden[u].empty() && UpgradeIdentAllowed(*player, varinfo->UpgradesForbidden[u].c_str()) == 'R') {
-						UpgradesCheck = false;
-						break;
-					}
-				}
-			} else {
-				for (int u = 0; u < VariationMax; ++u) {
-					if (!varinfo->UpgradesRequired[u].empty()) {
-						UpgradesCheck = false;
-						break;
-					}
-				}
-			}
-			if (UpgradesCheck == false) {
-				continue;
-			}
-			LocalTypeVariations[TypeVariationCount] = i;
-			TypeVariationCount += 1;
-		}
-		if (TypeVariationCount > 0) {
-			unit->Variation = LocalTypeVariations[SyncRand(TypeVariationCount)];
-		}
+		unit->ChooseVariation();
 		//Wyrmgus end
 	}
 

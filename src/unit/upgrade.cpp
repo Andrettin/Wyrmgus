@@ -909,50 +909,15 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					//change variation if current one becomes forbidden
 					VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
 					if (current_varinfo) {
-						bool ForbiddenUpgrade = false;
+						bool forbidden_upgrade = false;
 						for (int u = 0; u < VariationMax; ++u) {
 							if (!current_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesForbidden[u])->ID) {
-								ForbiddenUpgrade = true;
+								forbidden_upgrade = true;
 								break;
 							}
 						}
-						if (ForbiddenUpgrade == true) {
-							int TypeVariationCount = 0;
-							int LocalTypeVariations[VariationMax];
-							for (int i = 0; i < VariationMax; ++i) {
-								VariationInfo *varinfo = UnitTypes[z]->VarInfo[i];
-								if (!varinfo) {
-									continue;
-								}
-								if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
-									continue;
-								}
-								bool UpgradesCheck = true;
-								for (int u = 0; u < VariationMax; ++u) {
-									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
-										UpgradesCheck = false;
-										break;
-									}
-									if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
-										UpgradesCheck = false;
-										break;
-									}
-								}
-								if (UpgradesCheck == false) {
-									continue;
-								}
-								if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
-									unit.SetVariation(i);
-									TypeVariationCount = 0;
-									break;
-								}
-								LocalTypeVariations[TypeVariationCount] = i;
-								TypeVariationCount += 1;
-							}
-							if (TypeVariationCount > 0) {
-								unit.Frame = unit.Type->StillFrame;
-								unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
-							}
+						if (forbidden_upgrade == true) {
+							unit.ChooseVariation();
 						}
 					}
 					//Wyrmgus end
@@ -1166,49 +1131,15 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					//change variation if current one becomes forbidden
 					VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
 					if (current_varinfo) {
-						bool RequiredUpgrade = false;
+						bool required_upgrade = false;
 						for (int u = 0; u < VariationMax; ++u) {
 							if (!current_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesRequired[u])->ID) {
-								RequiredUpgrade = true;
+								required_upgrade = true;
 								break;
 							}
 						}
-						if (RequiredUpgrade == true) {
-							int TypeVariationCount = 0;
-							int LocalTypeVariations[VariationMax];
-							for (int i = 0; i < VariationMax; ++i) {
-								VariationInfo *varinfo = UnitTypes[z]->VarInfo[i];
-								if (!varinfo) {
-									continue;
-								}
-								if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
-									continue;
-								}
-								bool UpgradesCheck = true;
-								for (int u = 0; u < VariationMax; ++u) {
-									if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
-										UpgradesCheck = false;
-										break;
-									}
-									if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
-										UpgradesCheck = false;
-										break;
-									}
-								}
-								if (UpgradesCheck == false) {
-									continue;
-								}
-								if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
-									unit.SetVariation(i);
-									TypeVariationCount = 0;
-									break;
-								}
-								LocalTypeVariations[TypeVariationCount] = i;
-								TypeVariationCount += 1;
-							}
-							if (TypeVariationCount > 0) {
-								unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
-							}
+						if (required_upgrade == true) {
+							unit.ChooseVariation();
 						}
 					}
 					//Wyrmgus end
@@ -1266,49 +1197,15 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	//change variation if current one becomes forbidden
 	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
 	if (current_varinfo) {
-		bool ForbiddenUpgrade = false;
+		bool forbidden_upgrade = false;
 		for (int u = 0; u < VariationMax; ++u) {
 			if (!current_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesForbidden[u])->ID) {
-				ForbiddenUpgrade = true;
+				forbidden_upgrade = true;
 				break;
 			}
 		}
-		if (ForbiddenUpgrade == true) {
-			int TypeVariationCount = 0;
-			int LocalTypeVariations[VariationMax];
-			for (int i = 0; i < VariationMax; ++i) {
-				VariationInfo *varinfo = unit.Type->VarInfo[i];
-				if (!varinfo) {
-					continue;
-				}
-				if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
-					continue;
-				}
-				bool UpgradesCheck = true;
-				for (int u = 0; u < VariationMax; ++u) {
-					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
-						UpgradesCheck = false;
-						break;
-					}
-					if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
-						UpgradesCheck = false;
-						break;
-					}
-				}
-				if (UpgradesCheck == false) {
-					continue;
-				}
-				if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
-					unit.SetVariation(i);
-					TypeVariationCount = 0;
-					break;
-				}
-				LocalTypeVariations[TypeVariationCount] = i;
-				TypeVariationCount += 1;
-			}
-			if (TypeVariationCount > 0) {
-				unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
-			}
+		if (forbidden_upgrade == true) {
+			unit.ChooseVariation();
 		}
 	}
 	//Wyrmgus end
@@ -1357,49 +1254,15 @@ static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier 
 	//change variation if current one becomes forbidden
 	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
 	if (current_varinfo) {
-		bool ForbiddenUpgrade = false;
+		bool required_upgrade = false;
 		for (int u = 0; u < VariationMax; ++u) {
 			if (!current_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesRequired[u])->ID) {
-				ForbiddenUpgrade = true;
+				required_upgrade = true;
 				break;
 			}
 		}
-		if (ForbiddenUpgrade == true) {
-			int TypeVariationCount = 0;
-			int LocalTypeVariations[VariationMax];
-			for (int i = 0; i < VariationMax; ++i) {
-				VariationInfo *varinfo = unit.Type->VarInfo[i];
-				if (!varinfo) {
-					continue;
-				}
-				if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
-					continue;
-				}
-				bool UpgradesCheck = true;
-				for (int u = 0; u < VariationMax; ++u) {
-					if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
-						UpgradesCheck = false;
-						break;
-					}
-					if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*unit.Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || unit.IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
-						UpgradesCheck = false;
-						break;
-					}
-				}
-				if (UpgradesCheck == false) {
-					continue;
-				}
-				if (current_varinfo && varinfo->VariationId.find(current_varinfo->VariationId) != std::string::npos) { // if this variation includes the ident of the one incompatible with this upgrade, choose it automatically
-					unit.SetVariation(i);
-					TypeVariationCount = 0;
-					break;
-				}
-				LocalTypeVariations[TypeVariationCount] = i;
-				TypeVariationCount += 1;
-			}
-			if (TypeVariationCount > 0) {
-				unit.SetVariation(LocalTypeVariations[SyncRand(TypeVariationCount)]);
-			}
+		if (required_upgrade == true) {
+			unit.ChooseVariation();
 		}
 	}
 	//Wyrmgus end
