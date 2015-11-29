@@ -3727,7 +3727,7 @@ void CGrandStrategyHero::Create()
 		this->ProvinceOfOrigin != NULL
 		&& this->ProvinceOfOrigin->Owner != NULL
 		&& this->ProvinceOfOrigin->Owner == GrandStrategyGame.PlayerFaction
-		&& this->Type->BoolFlag[HERO_INDEX].value
+		&& !this->Icon.Name.empty()
 		&& GrandStrategyGameInitialized
 	) {
 		char buf[256];
@@ -3741,7 +3741,7 @@ void CGrandStrategyHero::Create()
 	
 	this->State = 2;
 	
-	if (this->ProvinceOfOrigin != NULL && this->Type->BoolFlag[HERO_INDEX].value) { //if the hero has its own unit type, add it to its province of origin
+	if (this->ProvinceOfOrigin != NULL && !this->Icon.Name.empty()) { //if the hero has its own icon
 		this->ProvinceOfOrigin->SetHero(this->GetFullName(), this->Type->Slot, 2);
 	}
 }
@@ -6346,7 +6346,7 @@ void AcquireFactionTechnologies(std::string civilization_from_name, std::string 
 
 bool IsGrandStrategyUnit(const CUnitType &type)
 {
-	if (!type.BoolFlag[BUILDING_INDEX].value && !type.BoolFlag[HERO_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.Class != "caravan") {
+	if (!type.BoolFlag[BUILDING_INDEX].value && type.DefaultStat.Variables[DEMAND_INDEX].Value > 0 && type.Class != "caravan") {
 		return true;
 	}
 	return false;

@@ -509,10 +509,11 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushboolean(l, character->Persistent);
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, character->Icon.Name.c_str());
-		return 1;
-	} else if (!strcmp(data, "HeroicIcon")) {
-		lua_pushstring(l, character->HeroicIcon.Name.c_str());
+		if (character->Level >= 3 && character->HeroicIcon.Icon) {
+			lua_pushstring(l, character->HeroicIcon.Name.c_str());
+		} else {
+			lua_pushstring(l, character->Icon.Name.c_str());
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -584,6 +585,39 @@ static int CclGetCustomHeroData(lua_State *l)
 	return 0;
 }
 
+static int CclGetCharacters(lua_State *l)
+{
+	lua_createtable(l, Characters.size(), 0);
+	for (size_t i = 1; i <= Characters.size(); ++i)
+	{
+		lua_pushstring(l, Characters[i-1]->GetFullName().c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+static int CclGetCustomHeroes(lua_State *l)
+{
+	lua_createtable(l, CustomHeroes.size(), 0);
+	for (size_t i = 1; i <= CustomHeroes.size(); ++i)
+	{
+		lua_pushstring(l, CustomHeroes[i-1]->GetFullName().c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+static int CclGetGrandStrategyHeroes(lua_State *l)
+{
+	lua_createtable(l, GrandStrategyGame.Heroes.size(), 0);
+	for (size_t i = 1; i <= GrandStrategyGame.Heroes.size(); ++i)
+	{
+		lua_pushstring(l, GrandStrategyGame.Heroes[i-1]->GetFullName().c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -596,6 +630,9 @@ void CharacterCclRegister()
 	lua_register(Lua, "DefineGrandStrategyHero", CclDefineGrandStrategyHero);
 	lua_register(Lua, "GetCharacterData", CclGetCharacterData);
 	lua_register(Lua, "GetCustomHeroData", CclGetCustomHeroData);
+	lua_register(Lua, "GetCharacters", CclGetCharacters);
+	lua_register(Lua, "GetCustomHeroes", CclGetCustomHeroes);
+	lua_register(Lua, "GetGrandStrategyHeroes", CclGetGrandStrategyHeroes);
 }
 
 //@}

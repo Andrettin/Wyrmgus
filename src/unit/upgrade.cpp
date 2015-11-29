@@ -533,7 +533,7 @@ static int CclAcquireTrait(lua_State *l)
 		TraitAcquire(*unit, CUpgrade::Get(ident));
 	} else if (strlen(ident) == 0) {
 		if (unit->Trait != NULL) { //remove previous trait, if any
-			if (!GameSettings.NoRandomness || unit->Type->BoolFlag[HERO_INDEX].value) { // if in no randomness setting, only change trait modifiers if the unit is a hero
+			if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
 				IndividualUpgradeLost(*unit, unit->Trait);
 			}
 		}
@@ -1508,14 +1508,14 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
 	if (unit.Trait != NULL) { //remove previous trait, if any
-		if (!GameSettings.NoRandomness || unit.Type->BoolFlag[HERO_INDEX].value) { // if in no randomness setting, only change trait modifiers if the unit is a hero
+		if (!GameSettings.NoRandomness) { // if in no randomness setting, don't change trait modifiers
 			IndividualUpgradeLost(unit, unit.Trait);
 		}
 	}
 
 	unit.Trait = CUpgrade::Get(upgrade->Ident);
 
-	if (!GameSettings.NoRandomness || unit.Type->BoolFlag[HERO_INDEX].value) { // if in no randomness setting, only apply trait modifiers if the unit is a hero
+	if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
 		IndividualUpgradeAcquire(unit, upgrade);
 	}
 

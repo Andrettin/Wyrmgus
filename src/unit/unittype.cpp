@@ -1339,12 +1339,11 @@ void LoadUnitTypeSprite(CUnitType &type)
 		if (type.Flip) {
 			type.ShadowSprite->Flip();
 		}
-		//Wyrmgus start
-//		type.ShadowSprite->MakeShadow();
 		if (type.ShadowSprite->Surface->format->BytesPerPixel == 1) {
+			//Wyrmgus start
 //			type.ShadowSprite->MakeShadow();
+			//Wyrmgus end
 		}
-		//Wyrmgus end
 	}
 
 	if (type.BoolFlag[HARVESTER_INDEX].value) {
