@@ -111,11 +111,16 @@ static int CclDefineQuest(lua_State *l)
 			quest->Y = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
+			bool found_color = false;
 			for (int c = 0; c < PlayerColorMax; ++c) {
 				if (PlayerColorNames[c] == color_name) {
 					quest->PlayerColor = c;
+					found_color = true;
 					break;
 				}
+			}
+			if (!found_color) {
+				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
 			}
 		} else if (!strcmp(value, "Hidden")) {
 			quest->Hidden = LuaToBoolean(l, -1);
@@ -235,17 +240,7 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushnumber(l, quest->Y);
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
-		bool found_color = false;
-		for (int i = 0; i < PlayerColorMax; ++i) {
-			if (PlayerColors[i][0] == quest->PlayerColor) {
-				lua_pushstring(l, PlayerColorNames[i].c_str());
-				found_color = true;
-				break;
-			}		
-		}
-		if (!found_color) {
-			LuaError(l, "Quest \"%s\" has no player color." _C_ quest->Name.c_str());
-		}
+		lua_pushstring(l, PlayerColorNames[quest->PlayerColor].c_str());
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
 		lua_pushboolean(l, quest->Hidden);
