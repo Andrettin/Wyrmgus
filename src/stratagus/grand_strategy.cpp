@@ -1523,7 +1523,7 @@ void WorldMapTile::SetPort(bool has_port)
 		if (civilization != -1) {
 			int building_type = GrandStrategyGame.Provinces[this->Province]->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
 			if (building_type != -1) {
-//				GrandStrategyGame.Provinces[this->Province]->SetSettlementBuilding(building_type, has_port);
+				GrandStrategyGame.Provinces[this->Province]->SetSettlementBuilding(building_type, has_port);
 			}
 		}
 	}
@@ -1674,7 +1674,7 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 			if (GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
 				int dock_building_type = this->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
 				if (dock_building_type != -1) {
-//					this->SetSettlementBuilding(dock_building_type, true);
+					this->SetSettlementBuilding(dock_building_type, true);
 				}
 			}
 		}
@@ -1873,7 +1873,7 @@ void CProvince::SetSettlementBuilding(int building_id, bool has_settlement_build
 	
 	if (UnitTypes[building_id]->Class == "stronghold") { //increase the military score of the province, if this building is a stronghold
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
-	} else if (UnitTypes[building_id]->Class == "town-hall") {
+	} else if (UnitTypes[building_id]->Class == "dock") {
 		//place a port in the province's settlement location, if the building is a dock
 		GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port = has_settlement_building;
 		
