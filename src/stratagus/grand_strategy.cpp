@@ -2261,6 +2261,24 @@ int CProvince::GetClassUnitType(int class_id)
 	}
 }
 
+int CProvince::GetFoodCapacity(bool subtract_non_food)
+{
+	int food_capacity = 0;
+	food_capacity += this->ProductionCapacity[GrainCost];
+	food_capacity += this->ProductionCapacity[MushroomCost];
+	food_capacity += this->ProductionCapacity[FishCost];
+	
+	if (subtract_non_food) {
+		food_capacity -= this->ProductionCapacity[GoldCost];
+		food_capacity -= this->ProductionCapacity[SilverCost];
+		food_capacity -= this->ProductionCapacity[CopperCost];
+		food_capacity -= this->ProductionCapacity[WoodCost];
+		food_capacity -= this->ProductionCapacity[StoneCost];
+	}
+	
+	return food_capacity;
+}
+
 /**
 **  Get the province's cultural name.
 */
@@ -6028,20 +6046,7 @@ int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food)
 		return false;
 	}
 	
-	int food_capacity = 0;
-	food_capacity += GrandStrategyGame.Provinces[province_id]->ProductionCapacity[GrainCost];
-	food_capacity += GrandStrategyGame.Provinces[province_id]->ProductionCapacity[MushroomCost];
-	food_capacity += GrandStrategyGame.Provinces[province_id]->ProductionCapacity[FishCost];
-	
-	if (subtract_non_food) {
-		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[GoldCost];
-		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[SilverCost];
-		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[CopperCost];
-		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[WoodCost];
-		food_capacity -= GrandStrategyGame.Provinces[province_id]->ProductionCapacity[StoneCost];
-	}
-	
-	return food_capacity;
+	return GrandStrategyGame.Provinces[province_id]->GetFoodCapacity(subtract_non_food);
 }
 
 void SetPlayerFaction(std::string civilization_name, std::string faction_name)

@@ -185,6 +185,7 @@ public:
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRisk();
 	int GetClassUnitType(int class_id);
+	int GetFoodCapacity(bool subtract_non_food);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);
