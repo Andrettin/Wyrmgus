@@ -236,7 +236,8 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), ProvinceCount(0), Ruler(NULL)
+		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), ProvinceCount(0), Upkeep(0),
+		Ruler(NULL)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(OwnedProvinces, -1, sizeof(OwnedProvinces));
@@ -256,6 +257,7 @@ public:
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
+	void CalculateUpkeep();
 	void CheckFormableFactions(int civilization);
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction);
@@ -275,6 +277,7 @@ public:
 	int FactionTier;													/// What is the tier of this faction (barony, etc.).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
 	int ProvinceCount;													/// Quantity of provinces owned by this faction.
+	int Upkeep;															/// How much gold this faction has to pay per turn
 	CGrandStrategyHero *Ruler;											/// Ruler of the faction
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
 	int OwnedProvinces[ProvinceMax];									/// Provinces owned by this faction
@@ -572,7 +575,9 @@ extern void SetFactionResource(std::string civilization_name, std::string factio
 extern void ChangeFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
 extern int GetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern void CalculateFactionIncomes(std::string civilization_name, std::string faction_name);
+extern void CalculateFactionUpkeeps();
 extern int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
+extern int GetFactionUpkeep(std::string civilization_name, std::string faction_name);
 extern bool IsGrandStrategyUnit(const CUnitType &type);
 extern bool IsMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);

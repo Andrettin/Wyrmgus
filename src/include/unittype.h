@@ -705,6 +705,7 @@ public:
 	//Wyrmgus start
 	int TechnologyPointCost;								/// Technology point cost
 	int TrainQuantity;										/// Quantity to be trained
+	int Upkeep;												/// Gold upkeep (for grand strategy mode)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 

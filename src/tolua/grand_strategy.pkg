@@ -115,7 +115,9 @@ extern void SetFactionResource(std::string civilization_name, std::string factio
 extern void ChangeFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name, int resource_quantity);
 extern int GetFactionResource(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern void CalculateFactionIncomes(std::string civilization_name, std::string faction_name);
+extern void CalculateFactionUpkeeps();
 extern int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name);
+extern int GetFactionUpkeep(std::string civilization_name, std::string faction_name);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
 extern void FormFaction(std::string old_civilization_name, std::string old_faction_name, std::string new_civilization_name, std::string new_faction_name);
 extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);

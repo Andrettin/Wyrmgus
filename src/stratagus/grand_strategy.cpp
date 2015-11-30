@@ -449,6 +449,62 @@ void CGrandStrategyGame::DrawMinimap()
 
 void CGrandStrategyGame::DrawInterface()
 {
+	if (this->PlayerFaction != NULL && this->PlayerFaction->ProvinceCount > 0) { //draw resource bar
+		std::vector<int> stored_resources;
+		stored_resources.push_back(GoldCost);
+		stored_resources.push_back(WoodCost);
+		stored_resources.push_back(StoneCost);
+		stored_resources.push_back(ResearchCost);
+		stored_resources.push_back(PrestigeCost);
+
+		Vec2i hovered_research_icon(-1, -1);
+		Vec2i hovered_prestige_icon(-1, -1);
+		for (size_t i = 0; i < stored_resources.size(); ++i) {
+			int x = 154 + (100 * i);
+			int y = 0;
+			UI.Resources[stored_resources[i]].G->DrawFrameClip(0, x, y, true);
+			
+			int quantity_stored = this->PlayerFaction->Resources[stored_resources[i]];
+			int income = 0;
+			if (stored_resources[i] == GoldCost) {
+				income = this->PlayerFaction->Income[stored_resources[i]] - this->PlayerFaction->Upkeep;
+			} else if (stored_resources[i] == ResearchCost) {
+				income = this->PlayerFaction->Income[stored_resources[i]] / this->PlayerFaction->ProvinceCount;
+			} else {
+				income = this->PlayerFaction->Income[stored_resources[i]];
+			}
+			std::string income_string;
+			if (income != 0) {
+				if (income > 0) {
+					income_string += "+";
+				}
+				income_string += std::to_string((long long) income);
+			}
+			std::string resource_stored_string = std::to_string((long long) quantity_stored) + income_string;
+			
+			if (resource_stored_string.size() <= 9) {
+				CLabel(GetGameFont()).Draw(x + 18, y + 1, resource_stored_string);
+			} else {
+				CLabel(GetSmallFont()).Draw(x + 18, y + 1 + 2, resource_stored_string);
+			}
+			
+			if (CursorScreenPos.x >= x && CursorScreenPos.x <= (x + UI.Resources[stored_resources[i]].G->getGraphicWidth()) && CursorScreenPos.y >= y && CursorScreenPos.y <= (y + UI.Resources[stored_resources[i]].G->getGraphicHeight())) {
+				if (stored_resources[i] == ResearchCost) {
+					hovered_research_icon.x = x;
+					hovered_research_icon.y = y;
+				} else if (stored_resources[i] == PrestigeCost) {
+					hovered_prestige_icon.x = x;
+					hovered_prestige_icon.y = y;
+				}
+			}
+		}
+		if (hovered_research_icon.x != -1 && hovered_research_icon.y != -1) {
+			DrawGenericPopup("Gain Research by building town halls, lumber mills and smithies", hovered_research_icon.x, hovered_research_icon.y);
+		} else if (hovered_prestige_icon.x != -1 && hovered_prestige_icon.y != -1) {
+			DrawGenericPopup("Prestige influences trade priority between nations, among other things", hovered_prestige_icon.x, hovered_prestige_icon.y);
+		}
+	}
+	
 	int item_y = 0;
 	
 	if (this->SelectedProvince != -1) {
@@ -3215,6 +3271,24 @@ void CGrandStrategyFaction::CalculateIncomes()
 	}
 }
 
+void CGrandStrategyFaction::CalculateUpkeep()
+{
+	this->Upkeep = 0;
+	
+	if (this->ProvinceCount == 0) {
+		return;
+	}
+	
+	for (int i = 0; i < this->ProvinceCount; ++i) {
+		int province_id = this->OwnedProvinces[i];
+		for (size_t j = 0; j < UnitTypes.size(); ++j) {
+			if (GrandStrategyGame.Provinces[province_id]->Units[j] > 0 && UnitTypes[j]->Upkeep > 0) {
+				this->Upkeep += GrandStrategyGame.Provinces[province_id]->Units[j] * UnitTypes[j]->Upkeep;
+			}
+		}
+	}
+}
+
 void CGrandStrategyFaction::CheckFormableFactions(int civilization)
 {
 	for (size_t i = 0; i < PlayerRaces.Factions[this->Civilization][this->Faction]->DevelopsTo.size(); ++i) {
@@ -5195,6 +5269,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
 				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
+				GrandStrategyGame.Factions[i][j]->Upkeep = 0;
 				GrandStrategyGame.Factions[i][j]->Ruler = NULL;
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
@@ -5724,7 +5799,7 @@ void InitializeGrandStrategyFactions()
 		}
 	}
 
-	// calculate income and set initial ruler (if none is preset) for factions
+	// calculate income and upkeep, and set initial ruler (if none is preset) for factions
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (int j = 0; j < FactionMax; ++j) {
 			if (GrandStrategyGame.Factions[i][j]) {
@@ -5734,6 +5809,7 @@ void InitializeGrandStrategyFactions()
 						GrandStrategyGame.Factions[i][j]->RulerSuccession();
 					}
 					GrandStrategyGame.Factions[i][j]->CalculateIncomes();
+					GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
 				}
 			} else { //end of valid factions
 				break;
@@ -6139,6 +6215,19 @@ void CalculateFactionIncomes(std::string civilization_name, std::string faction_
 	GrandStrategyGame.Factions[civilization][faction]->CalculateIncomes();
 }
 
+void CalculateFactionUpkeeps()
+{
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (GrandStrategyGame.Factions[i][j]) {
+				GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
+			} else { //end of valid factions
+				break;
+			}
+		}
+	}
+}
+
 int GetFactionIncome(std::string civilization_name, std::string faction_name, std::string resource_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -6154,6 +6243,21 @@ int GetFactionIncome(std::string civilization_name, std::string faction_name, st
 	}
 	
 	return GrandStrategyGame.Factions[civilization][faction]->Income[resource];
+}
+
+int GetFactionUpkeep(std::string civilization_name, std::string faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	
+	if (faction == -1) {
+		return 0;
+	}
+	
+	return GrandStrategyGame.Factions[civilization][faction]->Upkeep;
 }
 
 void SetFactionTechnology(std::string civilization_name, std::string faction_name, std::string upgrade_ident, bool has_technology)

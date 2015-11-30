@@ -212,9 +212,15 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 		//if pressed the hotkey of the "OK" button in the province interface
 		} else if (GrandStrategyGame.SelectedProvince != -1 && GrandStrategyInterfaceState != "Province" && GrandStrategyInterfaceState != "Diplomacy" && key == 'o') {
 			UI.GrandStrategyOKButton.HotkeyPressed = true;
+		} else if (key == SDLK_F5) {
+			CclCommand("if (RunEncyclopediaMenu ~= nil) then RunEncyclopediaMenu() end;");
 		//if pressed the hotkey of the menu button
 		} else if (key == SDLK_F10) {
 			UI.MenuButton.HotkeyPressed = true;
+		} else if (key == SDLK_F11) {
+			CclCommand("if (RunGrandStrategySaveMenu ~= nil) then RunGrandStrategySaveMenu() end;");
+		} else if (key == SDLK_F12) {
+			CclCommand("if (RunGrandStrategyLoadGameMenu ~= nil) then RunGrandStrategyLoadGameMenu() end;");
 		} else if (key == 'e') {
 			UI.GrandStrategyEndTurnButton.HotkeyPressed = true;
 		} else if (GrandStrategyGame.SelectedProvince != -1 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyInterfaceState == "Province" && key == 'h') {

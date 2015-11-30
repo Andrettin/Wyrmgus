@@ -595,7 +595,7 @@ CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
-	TechnologyPointCost(0), TrainQuantity(0),
+	TechnologyPointCost(0), Upkeep(0), TrainQuantity(0),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),

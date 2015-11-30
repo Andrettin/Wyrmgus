@@ -629,6 +629,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
 			type->TechnologyPointCost = parent_type->TechnologyPointCost;
 			type->TrainQuantity = parent_type->TrainQuantity;
+			type->Upkeep = parent_type->Upkeep;
 			type->MaxOnBoard = parent_type->MaxOnBoard;
 			type->RepairRange = parent_type->RepairRange;
 			type->RepairHP = parent_type->RepairHP;
@@ -1943,6 +1944,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
 			type->TrainQuantity = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Upkeep")) {
+			type->Upkeep = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			type->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "Excrement")) {
@@ -2352,6 +2355,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "TrainQuantity")) {
 		lua_pushnumber(l, type->TrainQuantity);
+		return 1;
+	} else if (!strcmp(data, "Upkeep")) {
+		lua_pushnumber(l, type->Upkeep);
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "DrawLevel")) {
