@@ -193,7 +193,7 @@ static int CclDefineCharacter(lua_State *l)
 				if (ability_id != -1) {
 					character->Abilities.push_back(AllUpgrades[ability_id]);
 				} else {
-					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident);
+					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident.c_str());
 				}
 			}
 		} else if (!strcmp(value, "ForbiddenUpgrades")) {
@@ -205,7 +205,7 @@ static int CclDefineCharacter(lua_State *l)
 				if (unit_type_id != -1) {
 					character->ForbiddenUpgrades[unit_type_id] = true;
 				} else {
-					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident);
+					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
 			}
 		} else {
@@ -303,7 +303,7 @@ static int CclDefineCustomHero(lua_State *l)
 				if (ability_id != -1) {
 					hero->Abilities.push_back(AllUpgrades[ability_id]);
 				} else {
-					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident);
+					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident.c_str());
 				}
 			}
 		} else if (!strcmp(value, "QuestsInProgress")) {
@@ -314,7 +314,7 @@ static int CclDefineCustomHero(lua_State *l)
 				if (GetQuest(quest_name) != NULL) {
 					hero->QuestsInProgress.push_back(GetQuest(quest_name));
 				} else {
-					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name);
+					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name.c_str());
 				}
 			}
 		} else if (!strcmp(value, "QuestsCompleted")) {
@@ -325,7 +325,7 @@ static int CclDefineCustomHero(lua_State *l)
 				if (GetQuest(quest_name) != NULL) {
 					hero->QuestsCompleted.push_back(GetQuest(quest_name));
 				} else {
-					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name);
+					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name.c_str());
 				}
 			}
 		} else {
