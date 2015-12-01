@@ -487,6 +487,10 @@ static void Usage()
 		"\t-v mode\t\tVideo mode resolution in format <xres>x<yres>\n"
 		"\t-W\t\tWindowed video mode\n"
 #if defined(USE_OPENGL) || defined(USE_GLES)
+		"\t-x\t\tControls fullscreen scaling if your graphics card supports shaders.\n"\
+		"\t  \t\tPass 1 for nearest-neigubour, 2 for EPX/AdvMame, 3 for HQx, 4 for SAL, 5 for SuperEagle\n"\
+		"\t  \t\tYou can also use Ctrl+Alt+/ to cycle between these scaling algorithms at runtime.\n"
+		"\t  \t\tPass -1 to force old-school nearest neighbour scaling without shaders\n"\
 		"\t-Z\t\tUse OpenGL to scale the screen to the viewport (retro-style). Implies -O.\n"
 #endif
 		"map is relative to StratagusLibPath=datapath, use ./map for relative to cwd\n",
@@ -539,7 +543,7 @@ static void RedirectOutput()
 void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 {
 	for (;;) {
-		switch (getopt(argc, argv, "ac:d:D:eE:FhiI:lN:oOP:ps:S:u:v:WZ?")) {
+		switch (getopt(argc, argv, "ac:d:D:eE:FhiI:lN:oOP:ps:S:u:v:Wx:Z?")) {
 			case 'a':
 				EnableAssert = true;
 				continue;
@@ -639,6 +643,12 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				Video.FullScreen = 0;
 				continue;
 #if defined(USE_OPENGL) || defined(USE_GLES)
+			case 'x':
+				ShaderIndex = atoi(optarg) % MAX_SHADERS;
+				if (atoi(optarg) == -1) {
+					GLShaderPipelineSupported = false;
+				}
+				continue;
 			case 'Z':
 				ForceUseOpenGL = 1;
 				UseOpenGL = 1;

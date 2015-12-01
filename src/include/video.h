@@ -40,7 +40,11 @@
 #endif
 
 #ifdef USE_OPENGL
+#ifdef __APPLE__
+#define GL_GLEXT_PROTOTYPES 1
+#endif
 #include "SDL_opengl.h"
+#include "shaders.h"
 #endif
 
 #include "guichan.h"
@@ -54,6 +58,7 @@ class CFont;
 extern char ForceUseOpenGL;
 extern bool UseOpenGL;
 extern bool ZoomNoResize;
+extern bool GLShaderPipelineSupported;
 #endif
 
 class CGraphic : public gcn::Image
@@ -594,7 +599,7 @@ extern void FreeGraphics();
 
 
 // ARB_texture_compression
-#ifdef USE_OPENGL
+#if defined(USE_OPENGL) && !defined(__APPLE__)
 extern PFNGLCOMPRESSEDTEXIMAGE3DARBPROC    glCompressedTexImage3DARB;
 extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC    glCompressedTexImage2DARB;
 extern PFNGLCOMPRESSEDTEXIMAGE1DARBPROC    glCompressedTexImage1DARB;

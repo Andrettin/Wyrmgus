@@ -1623,6 +1623,18 @@ static int CclSlotUsage(lua_State *l)
 	return 0;
 }
 
+static int CclSelectSingleUnit(lua_State *l)
+{
+	const int nargs = lua_gettop(l);
+	Assert(nargs == 1);
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	SelectSingleUnit(*unit);
+	SelectionChanged();
+	return 0;
+}
+
 //Wyrmgus start
 /**
 **  Return whether the unit is at a certain location
@@ -1695,6 +1707,8 @@ void UnitCclRegister()
 	lua_register(Lua, "SetUnitVariable", CclSetUnitVariable);
 
 	lua_register(Lua, "SlotUsage", CclSlotUsage);
+	
+	lua_register(Lua, "SelectSingleUnit", CclSelectSingleUnit);
 	
 	//Wyrmgus start
 	lua_register(Lua, "UnitIsAt", CclUnitIsAt);

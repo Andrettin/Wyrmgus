@@ -103,6 +103,14 @@
  * Path to stratagus executable binary
  **/
 
+/**
+ * \def TITLE_PNG
+ * OPTIONAL: Path to title screen (for testing if data was extracted)
+ **/
+#ifndef TITLE_PNG
+#define TITLE_PNG "%s\\graphics\\ui\\title.png"
+#endif
+
 /* Fake definitions for Doxygen */
 #ifdef DOXYGEN
 #define GAME_NAME
@@ -155,10 +163,16 @@
 #define stat _stat
 #endif
 
+#ifdef _MSC_VER
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+#endif
+
 #ifndef WIN32
 #include <unistd.h>
 #include <X11/Xlib.h>
+#ifndef NOGTK
 #include <gtk/gtk.h>
+#endif
 #endif
 
 #ifdef MAEMO
@@ -188,6 +202,9 @@ static void error(char * title, char * text) {
 #ifdef WIN32
 	MessageBox(NULL, text, title, MB_OK | MB_ICONERROR);
 #else
+#ifdef NOGTK
+	{
+#else
 	if ( ! ConsoleMode ) {
 		GtkWidget * window = NULL;
 		GtkWidget * dialog = NULL;
@@ -210,6 +227,7 @@ static void error(char * title, char * text) {
 		gtk_widget_destroy(window);
 #endif
 	} else {
+#endif
 		fprintf(stderr, "%s -- Error: %s\n", title, text);
 	}
 #endif
@@ -231,9 +249,11 @@ int main(int argc, char * argv[]) {
 		}
 #endif
 	} else {
+#ifndef NOGTK
 		gtk_init(&argc, &argv);
 #ifdef MAEMO
 		hildon_init();
+#endif
 #endif
 	}
 #endif
@@ -300,9 +320,8 @@ int main(int argc, char * argv[]) {
 	if ( stat(data_path, &st) != 0 ) {
 		error(TITLE, DATA_NOT_EXTRACTED);
 	}
+	sprintf(title_path, TITLE_PNG, data_path);
 #ifdef WIN32
-	sprintf(title_path, "%s\\graphics\\ui\\title.png", data_path);
-
 	int data_path_len = strlen(data_path);
 
 	for (int i = data_path_len - 1; i >= 0; --i) {
@@ -311,8 +330,6 @@ int main(int argc, char * argv[]) {
 	data_path[0] = '"';
 	data_path[data_path_len + 1] = '"';
 	data_path[data_path_len + 2] = 0;
-#else
-	sprintf(title_path, "%s/graphics/ui/title.png", data_path);
 #endif
 
 	if ( stat(title_path, &st) != 0 ) {
