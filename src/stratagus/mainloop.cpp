@@ -238,7 +238,7 @@ void UpdateDisplay()
 				const int flag = (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
 				VariationInfo *varinfo = type.GetDefaultVariation(*ThisPlayer);
-				if (varinfo && varinfo->Icon.Icon) { // check if the unit's variation is valid, and if it is, then make the unit use its variation's icon
+				if (varinfo && varinfo->Icon.Icon) { // check if the default variation is valid, and if it is, then make the button use the variation's icon
 					varinfo->Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index);
 				} else {
 					type.Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index);
