@@ -73,6 +73,8 @@ static int CclDefineCharacter(lua_State *l)
 		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_full_name.c_str());
 	}
 	
+	std::string faction_name;
+	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
@@ -116,6 +118,8 @@ static int CclDefineCharacter(lua_State *l)
 			character->DeathYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			character->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "Faction")) {
+			faction_name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ProvinceOfOrigin")) {
 			character->ProvinceOfOriginName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Father")) {
@@ -211,6 +215,10 @@ static int CclDefineCharacter(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
+	}
+	
+	if (character->Civilization != -1 && !faction_name.empty()) { //we have to set the faction here, because Lua tables are in an arbitrary order, and the character needs its civilization to have been set before it can find its faction
+		character->Faction = PlayerRaces.GetFactionIndexByName(character->Civilization, faction_name);
 	}
 	
 	if (character->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
@@ -505,6 +513,13 @@ static int CclGetCharacterData(lua_State *l)
 	} else if (!strcmp(data, "Civilization")) {
 		if (character->Civilization != -1) {
 			lua_pushstring(l, PlayerRaces.Name[character->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Faction")) {
+		if (character->Faction != -1) {
+			lua_pushstring(l, PlayerRaces.Factions[character->Civilization][character->Faction]->Name.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

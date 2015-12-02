@@ -66,7 +66,7 @@ class CCharacter
 {
 public:
 	CCharacter() :
-		Year(0), DeathYear(0), Civilization(-1), Gender(0), Level(0),
+		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0),
 		Persistent(false), Custom(false),
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL)
@@ -82,6 +82,7 @@ public:
 	int Year;					/// Year in which the character historically starts being active
 	int DeathYear;				/// Year in which the character dies of natural causes
 	int Civilization;			/// Culture to which the character belongs
+	int Faction;				/// Faction to which the character belongs
 	int Gender;					/// Character's gender
 	int Level;					/// Character's level
 	bool Persistent;			/// Whether this character's levels and abilities are persistent
