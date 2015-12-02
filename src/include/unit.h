@@ -314,6 +314,7 @@ public:
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
+	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
 	//Wyrmgus end
 
 public:

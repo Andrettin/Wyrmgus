@@ -1185,68 +1185,6 @@ void CUnit::Draw(const CViewport &vp) const
 	//Wyrmgus start
 	int base_frame = frame >= 0 ? frame : abs(frame) - 1;
 	
-	CPlayerColorGraphic *left_arm_sprite = type->LeftArmSprite;
-	if (varinfo) {
-		if (varinfo->LeftArmSprite) {
-			left_arm_sprite = varinfo->LeftArmSprite;
-		}
-	}
-	
-	CPlayerColorGraphic *right_arm_sprite = type->RightArmSprite;
-	if (varinfo) {
-		if (varinfo->RightArmSprite) {
-			right_arm_sprite = varinfo->RightArmSprite;
-		}
-	}
-
-	CPlayerColorGraphic *pants_sprite = type->PantsSprite;
-	if (varinfo) {
-		if (varinfo->PantsSprite) {
-			pants_sprite = varinfo->PantsSprite;
-		}
-	}
-	
-	CPlayerColorGraphic *clothing_sprite = type->ClothingSprite;
-	if (varinfo) {
-		if (varinfo->ClothingSprite) {
-			clothing_sprite = varinfo->ClothingSprite;
-		}
-	}
-	
-	CPlayerColorGraphic *clothing_left_arm_sprite = type->ClothingLeftArmSprite;
-	if (varinfo) {
-		if (varinfo->ClothingLeftArmSprite) {
-			clothing_left_arm_sprite = varinfo->ClothingLeftArmSprite;
-		}
-	}
-	
-	CPlayerColorGraphic *clothing_right_arm_sprite = type->ClothingRightArmSprite;
-	if (varinfo) {
-		if (varinfo->ClothingRightArmSprite) {
-			clothing_right_arm_sprite = varinfo->ClothingRightArmSprite;
-		}
-	}
-	
-	CPlayerColorGraphic *shoes_sprite = type->ShoesSprite;
-	if (varinfo) {
-		if (varinfo->ShoesSprite) {
-			shoes_sprite = varinfo->ShoesSprite;
-		}
-	}
-	
-	CPlayerColorGraphic *weapon_sprite = type->WeaponSprite;
-	if (varinfo) {
-		if (varinfo->WeaponSprite) {
-			weapon_sprite = varinfo->WeaponSprite;
-		}
-	}
-
-	CPlayerColorGraphic *shield_sprite = type->ShieldSprite;
-	if (varinfo) {
-		if (varinfo->ShieldSprite) {
-			shield_sprite = varinfo->ShieldSprite;
-		}
-	}
 	int shield_frame = frame;
 	PixelPos shield_offset(0, 0);
 	if (varinfo && varinfo->ShieldAnimation[base_frame]) {
@@ -1269,47 +1207,23 @@ void CUnit::Draw(const CViewport &vp) const
 		}
 	}
 	
-	CPlayerColorGraphic *helmet_sprite = type->HelmetSprite;
-	if (varinfo) {
-		if (varinfo->HelmetSprite) {
-			helmet_sprite = varinfo->HelmetSprite;
-		}
-	}
-	
-	CPlayerColorGraphic *backpack_sprite = type->BackpackSprite;
-	if (varinfo) {
-		if (varinfo->BackpackSprite) {
-			backpack_sprite = varinfo->BackpackSprite;
-		}
-	}
-	
 	//draw the backpack before everything but the shadow if facing south (or the still frame, since that also faces south), southeast or southwest
 	if (this->Direction == LookingS || frame == type->StillFrame || this->Direction == LookingSE || this->Direction == LookingSW) {
-		if (backpack_sprite) {
-			DrawPlayerColorOverlay(*type, backpack_sprite, player, frame, screenPos);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
 	}
 	
 	//draw the left arm before the body if not facing south (or the still frame, since that also faces south)
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
 		//draw the shield before the left arm if not facing south
-		if (shield_sprite) {
-			DrawPlayerColorOverlay(*type, shield_sprite, player, shield_frame, screenPos + shield_offset);
-		}
-		
-		if (left_arm_sprite) {
-			DrawPlayerColorOverlay(*type, left_arm_sprite, player, frame, screenPos);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, shield_frame, screenPos + shield_offset);
+
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
 	}
 		
 	//draw the right arm before the body if facing north
 	if (this->Direction == LookingN && this->CurrentAction() != UnitActionDie) {
-		if (weapon_sprite) {
-			DrawPlayerColorOverlay(*type, weapon_sprite, player, frame, screenPos);
-		}
-		if (right_arm_sprite) {
-			DrawPlayerColorOverlay(*type, right_arm_sprite, player, frame, screenPos);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
 	}
 	//Wyrmgus end
 
@@ -1373,73 +1287,36 @@ void CUnit::Draw(const CViewport &vp) const
 	//Wyrmgus start
 	//draw the left arm and right arm clothing after the body, even if the arms were drawn before
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
-		if (clothing_left_arm_sprite) {
-			DrawPlayerColorOverlay(*type, clothing_left_arm_sprite, player, frame, screenPos);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
 	}
 	if (this->Direction == LookingN && this->CurrentAction() != UnitActionDie) {
-		if (clothing_right_arm_sprite) {
-			DrawPlayerColorOverlay(*type, clothing_right_arm_sprite, player, frame, screenPos);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
 	}
 
-	if (pants_sprite) {
-		DrawPlayerColorOverlay(*type, pants_sprite, player, frame, screenPos);
-	}
-
-	if (clothing_sprite) {
-		DrawPlayerColorOverlay(*type, clothing_sprite, player, frame, screenPos);
-	}
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(PantsImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player, frame, screenPos);
 
 	//draw the backpack after the clothing if facing east or west, if isn't dying (dying animations for east and west use northeast frames)
 	if ((this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() != UnitActionDie) {
-		if (backpack_sprite) {
-			DrawPlayerColorOverlay(*type, backpack_sprite, player, frame, screenPos);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
 	}
 	
-	CPlayerColorGraphic *hair_sprite = type->HairSprite;
-	if (varinfo) {
-		if (varinfo->HairSprite) {
-			hair_sprite = varinfo->HairSprite;
-		}
-	}
-	if (hair_sprite) {
-		DrawPlayerColorOverlay(*type, hair_sprite, player, frame, screenPos);
-	}
-	
-	if (helmet_sprite) {
-		DrawPlayerColorOverlay(*type, helmet_sprite, player, frame, screenPos);
-	}
-
-	if (shoes_sprite) {
-		DrawPlayerColorOverlay(*type, shoes_sprite, player, frame, screenPos);
-	}
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShoesImageLayer), player, frame, screenPos);
 	
 	//draw the left arm just after the body if facing south
 	if ((this->Direction == LookingS && this->CurrentAction() != UnitActionDie) || frame == type->StillFrame) {
-		if (left_arm_sprite) {
-			DrawPlayerColorOverlay(*type, left_arm_sprite, player, frame, screenPos);
-		}		
-		if (clothing_left_arm_sprite) {
-			DrawPlayerColorOverlay(*type, clothing_left_arm_sprite, player, frame, screenPos);
-		}
-		if (shield_sprite) {
-			DrawPlayerColorOverlay(*type, shield_sprite, player, shield_frame, screenPos + shield_offset);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, shield_frame, screenPos + shield_offset);
 	}
 
 	//draw the right arm just after the body if not facing north
 	if (this->Direction != LookingN || this->CurrentAction() == UnitActionDie) {
-		if (weapon_sprite) {
-			DrawPlayerColorOverlay(*type, weapon_sprite, player, frame, screenPos);
-		}
-		if (right_arm_sprite) {
-			DrawPlayerColorOverlay(*type, right_arm_sprite, player, frame, screenPos);
-		}
-		if (clothing_right_arm_sprite) {
-			DrawPlayerColorOverlay(*type, clothing_right_arm_sprite, player, frame, screenPos);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
 	}
 
 	//draw the backpack after everything if facing north, northeast or northwest, or if facing east or west and is dying (dying animations for east and west use northeast frames)
@@ -1451,15 +1328,10 @@ void CUnit::Draw(const CViewport &vp) const
 			(this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() == UnitActionDie
 		)
 	) {
-		if (backpack_sprite) {
-			DrawPlayerColorOverlay(*type, backpack_sprite, player, frame, screenPos);
-		}
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
 	}
 
-	CGraphic *light_sprite = type->LightSprite;
-	if (light_sprite) {
-		DrawOverlay(*type, light_sprite, player, frame, screenPos);
-	}
+	DrawOverlay(*type, type->LightSprite, player, frame, screenPos);
 	//Wyrmgus end
 	
 	// Unit's extras not fully supported.. need to be decorations themselves.

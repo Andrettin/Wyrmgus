@@ -619,9 +619,7 @@ CUnitType::CUnitType() :
 	GivesResource(0), PoisonDrain(0), FieldFlags(0), MovementMask(0),
 	//Wyrmgus start
 //	Sprite(NULL), ShadowSprite(NULL)
-	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL),
-	ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL),
-	WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL), BackpackSprite(NULL)
+	Sprite(NULL), ShadowSprite(NULL), LightSprite(NULL)
 	//Wyrmgus end
 {
 #ifdef USE_MNG
@@ -639,6 +637,7 @@ CUnitType::CUnitType() :
 	//Wyrmgus end
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 	//Wyrmgus start
+	memset(LayerSprites, 0, sizeof(LayerSprites));
 	memset(ShieldAnimation, 0, sizeof(ShieldAnimation));
 	//Wyrmgus end
 }
@@ -704,18 +703,9 @@ CUnitType::~CUnitType()
 	CGraphic::Free(ShadowSprite);
 	//Wyrmgus start
 	CGraphic::Free(LightSprite);
-	CGraphic::Free(LeftArmSprite);
-	CGraphic::Free(RightArmSprite);
-	CGraphic::Free(HairSprite);
-	CGraphic::Free(ClothingSprite);
-	CGraphic::Free(ClothingLeftArmSprite);
-	CGraphic::Free(ClothingRightArmSprite);
-	CGraphic::Free(PantsSprite);
-	CGraphic::Free(ShoesSprite);
-	CGraphic::Free(WeaponSprite);
-	CGraphic::Free(ShieldSprite);
-	CGraphic::Free(HelmetSprite);
-	CGraphic::Free(BackpackSprite);
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		CGraphic::Free(LayerSprites[i]);
+	}
 	//Wyrmgus end
 #ifdef USE_MNG
 	if (this->Portrait.Num) {
@@ -792,7 +782,19 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player) const
 		}
 		return varinfo;
 	}
-	return this->VarInfo[VariationMax - 1];
+	return NULL;
+}
+
+CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(CPlayer &player, int image_layer) const
+{
+	VariationInfo *varinfo = this->GetDefaultVariation(player);
+	if (varinfo && varinfo->LayerSprites[image_layer]) {
+		return varinfo->LayerSprites[image_layer];
+	} else if (this->LayerSprites[image_layer])  {
+		return this->LayerSprites[image_layer];
+	} else {
+		return NULL;
+	}
 }
 //Wyrmgus end
 
@@ -1399,88 +1401,13 @@ void LoadUnitTypeSprite(CUnitType &type)
 			type.LightSprite->Flip();
 		}
 	}
-	if (!type.LeftArmFile.empty()) {
-		type.LeftArmSprite = CPlayerColorGraphic::New(type.LeftArmFile, type.Width, type.Height);
-		type.LeftArmSprite->Load();
-		if (type.Flip) {
-			type.LeftArmSprite->Flip();
-		}
-	}
-	if (!type.RightArmFile.empty()) {
-		type.RightArmSprite = CPlayerColorGraphic::New(type.RightArmFile, type.Width, type.Height);
-		type.RightArmSprite->Load();
-		if (type.Flip) {
-			type.RightArmSprite->Flip();
-		}
-	}
-	if (!type.HairFile.empty()) {
-		type.HairSprite = CPlayerColorGraphic::New(type.HairFile, type.Width, type.Height);
-		type.HairSprite->Load();
-		if (type.Flip) {
-			type.HairSprite->Flip();
-		}
-	}
-	if (!type.ClothingFile.empty()) {
-		type.ClothingSprite = CPlayerColorGraphic::New(type.ClothingFile, type.Width, type.Height);
-		type.ClothingSprite->Load();
-		if (type.Flip) {
-			type.ClothingSprite->Flip();
-		}
-	}
-	if (!type.ClothingLeftArmFile.empty()) {
-		type.ClothingLeftArmSprite = CPlayerColorGraphic::New(type.ClothingLeftArmFile, type.Width, type.Height);
-		type.ClothingLeftArmSprite->Load();
-		if (type.Flip) {
-			type.ClothingLeftArmSprite->Flip();
-		}
-	}
-	if (!type.ClothingRightArmFile.empty()) {
-		type.ClothingRightArmSprite = CPlayerColorGraphic::New(type.ClothingRightArmFile, type.Width, type.Height);
-		type.ClothingRightArmSprite->Load();
-		if (type.Flip) {
-			type.ClothingRightArmSprite->Flip();
-		}
-	}
-	if (!type.PantsFile.empty()) {
-		type.PantsSprite = CPlayerColorGraphic::New(type.PantsFile, type.Width, type.Height);
-		type.PantsSprite->Load();
-		if (type.Flip) {
-			type.PantsSprite->Flip();
-		}
-	}
-	if (!type.ShoesFile.empty()) {
-		type.ShoesSprite = CPlayerColorGraphic::New(type.ShoesFile, type.Width, type.Height);
-		type.ShoesSprite->Load();
-		if (type.Flip) {
-			type.ShoesSprite->Flip();
-		}
-	}
-	if (!type.WeaponFile.empty()) {
-		type.WeaponSprite = CPlayerColorGraphic::New(type.WeaponFile, type.Width, type.Height);
-		type.WeaponSprite->Load();
-		if (type.Flip) {
-			type.WeaponSprite->Flip();
-		}
-	}
-	if (!type.ShieldFile.empty()) {
-		type.ShieldSprite = CPlayerColorGraphic::New(type.ShieldFile, type.Width, type.Height);
-		type.ShieldSprite->Load();
-		if (type.Flip) {
-			type.ShieldSprite->Flip();
-		}
-	}
-	if (!type.HelmetFile.empty()) {
-		type.HelmetSprite = CPlayerColorGraphic::New(type.HelmetFile, type.Width, type.Height);
-		type.HelmetSprite->Load();
-		if (type.Flip) {
-			type.HelmetSprite->Flip();
-		}
-	}
-	if (!type.BackpackFile.empty()) {
-		type.BackpackSprite = CPlayerColorGraphic::New(type.BackpackFile, type.Width, type.Height);
-		type.BackpackSprite->Load();
-		if (type.Flip) {
-			type.BackpackSprite->Flip();
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		if (!type.LayerFiles[i].empty()) {
+			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.Width, type.Height);
+			type.LayerSprites[i]->Load();
+			if (type.Flip) {
+				type.LayerSprites[i]->Flip();
+			}
 		}
 	}
 	//Wyrmgus end
@@ -1515,90 +1442,16 @@ void LoadUnitTypeSprite(CUnitType &type)
 //				varinfo->ShadowSprite->MakeShadow();
 			}
 		}
-		if (!varinfo->LeftArmFile.empty()) {
-			varinfo->LeftArmSprite = CPlayerColorGraphic::New(varinfo->LeftArmFile, frame_width, frame_height);
-			varinfo->LeftArmSprite->Load();
-			if (type.Flip) {
-				varinfo->LeftArmSprite->Flip();
+		for (int j = 0; j < MaxImageLayers; ++j) {
+			if (!varinfo->LayerFiles[j].empty()) {
+				varinfo->LayerSprites[j] = CPlayerColorGraphic::New(varinfo->LayerFiles[j], frame_width, frame_height);
+				varinfo->LayerSprites[j]->Load();
+				if (type.Flip) {
+					varinfo->LayerSprites[j]->Flip();
+				}
 			}
 		}
-		if (!varinfo->RightArmFile.empty()) {
-			varinfo->RightArmSprite = CPlayerColorGraphic::New(varinfo->RightArmFile, frame_width, frame_height);
-			varinfo->RightArmSprite->Load();
-			if (type.Flip) {
-				varinfo->RightArmSprite->Flip();
-			}
-		}
-		if (!varinfo->HairFile.empty()) {
-			varinfo->HairSprite = CPlayerColorGraphic::New(varinfo->HairFile, frame_width, frame_height);
-			varinfo->HairSprite->Load();
-			if (type.Flip) {
-				varinfo->HairSprite->Flip();
-			}
-		}
-		if (!varinfo->ClothingFile.empty()) {
-			varinfo->ClothingSprite = CPlayerColorGraphic::New(varinfo->ClothingFile, frame_width, frame_height);
-			varinfo->ClothingSprite->Load();
-			if (type.Flip) {
-				varinfo->ClothingSprite->Flip();
-			}
-		}
-		if (!varinfo->ClothingLeftArmFile.empty()) {
-			varinfo->ClothingLeftArmSprite = CPlayerColorGraphic::New(varinfo->ClothingLeftArmFile, frame_width, frame_height);
-			varinfo->ClothingLeftArmSprite->Load();
-			if (type.Flip) {
-				varinfo->ClothingLeftArmSprite->Flip();
-			}
-		}
-		if (!varinfo->ClothingRightArmFile.empty()) {
-			varinfo->ClothingRightArmSprite = CPlayerColorGraphic::New(varinfo->ClothingRightArmFile, frame_width, frame_height);
-			varinfo->ClothingRightArmSprite->Load();
-			if (type.Flip) {
-				varinfo->ClothingRightArmSprite->Flip();
-			}
-		}
-		if (!varinfo->PantsFile.empty()) {
-			varinfo->PantsSprite = CPlayerColorGraphic::New(varinfo->PantsFile, frame_width, frame_height);
-			varinfo->PantsSprite->Load();
-			if (type.Flip) {
-				varinfo->PantsSprite->Flip();
-			}
-		}
-		if (!varinfo->ShoesFile.empty()) {
-			varinfo->ShoesSprite = CPlayerColorGraphic::New(varinfo->ShoesFile, frame_width, frame_height);
-			varinfo->ShoesSprite->Load();
-			if (type.Flip) {
-				varinfo->ShoesSprite->Flip();
-			}
-		}
-		if (!varinfo->WeaponFile.empty()) {
-			varinfo->WeaponSprite = CPlayerColorGraphic::New(varinfo->WeaponFile, frame_width, frame_height);
-			varinfo->WeaponSprite->Load();
-			if (type.Flip) {
-				varinfo->WeaponSprite->Flip();
-			}
-		}
-		if (!varinfo->ShieldFile.empty()) {
-			varinfo->ShieldSprite = CPlayerColorGraphic::New(varinfo->ShieldFile, frame_width, frame_height);
-			varinfo->ShieldSprite->Load();
-			if (type.Flip) {
-				varinfo->ShieldSprite->Flip();
-			}
-		}
-		if (!varinfo->HelmetFile.empty()) {
-			varinfo->HelmetSprite = CPlayerColorGraphic::New(varinfo->HelmetFile, frame_width, frame_height);
-			varinfo->HelmetSprite->Load();
-			if (type.Flip) {
-				varinfo->HelmetSprite->Flip();
-			}
-		}
-		if (!varinfo->BackpackFile.empty()) {
-			varinfo->BackpackSprite = CPlayerColorGraphic::New(varinfo->BackpackFile, frame_width, frame_height);
-			varinfo->BackpackSprite->Load();
-			if (type.Flip) {
-				varinfo->BackpackSprite->Flip();
-			}
-		}
+	
 		for (int j = 0; j < MaxCosts; ++j) {
 			if (!varinfo->FileWhenLoaded[j].empty()) {
 				varinfo->SpriteWhenLoaded[j] = CPlayerColorGraphic::New(varinfo->FileWhenLoaded[j],
@@ -1723,41 +1576,10 @@ VariationInfo::~VariationInfo()
 	if (this->ShadowSprite) {
 		CGraphic::Free(this->ShadowSprite);
 	}
-	if (this->LeftArmSprite) {
-		CGraphic::Free(this->LeftArmSprite);
-	}
-	if (this->RightArmSprite) {
-		CGraphic::Free(this->RightArmSprite);
-	}
-	if (this->HairSprite) {
-		CGraphic::Free(this->HairSprite);
-	}
-	if (this->ClothingSprite) {
-		CGraphic::Free(this->ClothingSprite);
-	}
-	if (this->ClothingLeftArmSprite) {
-		CGraphic::Free(this->ClothingLeftArmSprite);
-	}
-	if (this->ClothingRightArmSprite) {
-		CGraphic::Free(this->ClothingRightArmSprite);
-	}
-	if (this->PantsSprite) {
-		CGraphic::Free(this->PantsSprite);
-	}
-	if (this->ShoesSprite) {
-		CGraphic::Free(this->ShoesSprite);
-	}
-	if (this->WeaponSprite) {
-		CGraphic::Free(this->WeaponSprite);
-	}
-	if (this->ShieldSprite) {
-		CGraphic::Free(this->ShieldSprite);
-	}
-	if (this->HelmetSprite) {
-		CGraphic::Free(this->HelmetSprite);
-	}
-	if (this->BackpackSprite) {
-		CGraphic::Free(this->BackpackSprite);
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		if (this->LayerSprites[i]) {
+			CGraphic::Free(this->LayerSprites[i]);
+		}
 	}
 	for (int res = 0; res < MaxCosts; ++res) {
 		if (this->SpriteWhenLoaded[res]) {
@@ -1772,6 +1594,68 @@ VariationInfo::~VariationInfo()
 			delete this->ShieldAnimation[i];
 		}
 	}
+}
+
+std::string GetImageLayerNameById(int image_layer)
+{
+	if (image_layer == LeftArmImageLayer) {
+		return "left-arm";
+	} else if (image_layer == RightArmImageLayer) {
+		return "right-arm";
+	} else if (image_layer == HairImageLayer) {
+		return "hair";
+	} else if (image_layer == ClothingImageLayer) {
+		return "clothing";
+	} else if (image_layer == ClothingLeftArmImageLayer) {
+		return "clothing-left-arm";
+	} else if (image_layer == ClothingRightArmImageLayer) {
+		return "clothing-right-arm";
+	} else if (image_layer == PantsImageLayer) {
+		return "pants";
+	} else if (image_layer == ShoesImageLayer) {
+		return "shoes";
+	} else if (image_layer == WeaponImageLayer) {
+		return "weapon";
+	} else if (image_layer == ShieldImageLayer) {
+		return "shield";
+	} else if (image_layer == HelmetImageLayer) {
+		return "helmet";
+	} else if (image_layer == BackpackImageLayer) {
+		return "backpack";
+	}
+
+	return "";
+}
+
+int GetImageLayerIdByName(std::string image_layer)
+{
+	if (image_layer == "left-arm") {
+		return LeftArmImageLayer;
+	} else if (image_layer == "right-arm") {
+		return RightArmImageLayer;
+	} else if (image_layer == "hair") {
+		return HairImageLayer;
+	} else if (image_layer == "clothing") {
+		return ClothingImageLayer;
+	} else if (image_layer == "clothing-left-arm") {
+		return ClothingLeftArmImageLayer;
+	} else if (image_layer == "clothing-right-arm") {
+		return ClothingRightArmImageLayer;
+	} else if (image_layer == "pants") {
+		return PantsImageLayer;
+	} else if (image_layer == "shoes") {
+		return ShoesImageLayer;
+	} else if (image_layer == "weapon") {
+		return WeaponImageLayer;
+	} else if (image_layer == "shield") {
+		return ShieldImageLayer;
+	} else if (image_layer == "helmet") {
+		return HelmetImageLayer;
+	} else if (image_layer == "backpack") {
+		return BackpackImageLayer;
+	}
+
+	return -1;
 }
 //Wyrmgus end
 

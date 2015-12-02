@@ -592,18 +592,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->ShadowOffsetX = parent_type->ShadowOffsetX;
 			type->ShadowOffsetY = parent_type->ShadowOffsetY;
 			type->LightFile = parent_type->LightFile;
-			type->LeftArmFile = parent_type->LeftArmFile;
-			type->RightArmFile = parent_type->RightArmFile;
-			type->HairFile = parent_type->HairFile;
-			type->ClothingFile = parent_type->ClothingFile;
-			type->ClothingLeftArmFile = parent_type->ClothingLeftArmFile;
-			type->ClothingRightArmFile = parent_type->ClothingRightArmFile;
-			type->PantsFile = parent_type->PantsFile;
-			type->ShoesFile = parent_type->ShoesFile;
-			type->WeaponFile = parent_type->WeaponFile;
-			type->ShieldFile = parent_type->ShieldFile;
-			type->HelmetFile = parent_type->HelmetFile;
-			type->BackpackFile = parent_type->BackpackFile;
 			type->TileWidth = parent_type->TileWidth;
 			type->TileHeight = parent_type->TileHeight;
 			type->BoxWidth = parent_type->BoxWidth;
@@ -716,18 +704,6 @@ static int CclDefineUnitType(lua_State *l)
 						var->FileWhenEmpty[i] = parent_type->VarInfo[var_n]->FileWhenEmpty[i];
 					}
 					var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
-					var->LeftArmFile = parent_type->VarInfo[var_n]->LeftArmFile;
-					var->RightArmFile = parent_type->VarInfo[var_n]->RightArmFile;
-					var->HairFile = parent_type->VarInfo[var_n]->HairFile;
-					var->ClothingFile = parent_type->VarInfo[var_n]->ClothingFile;
-					var->ClothingLeftArmFile = parent_type->VarInfo[var_n]->ClothingLeftArmFile;
-					var->ClothingRightArmFile = parent_type->VarInfo[var_n]->ClothingRightArmFile;
-					var->PantsFile = parent_type->VarInfo[var_n]->PantsFile;
-					var->ShoesFile = parent_type->VarInfo[var_n]->ShoesFile;
-					var->WeaponFile = parent_type->VarInfo[var_n]->WeaponFile;
-					var->ShieldFile = parent_type->VarInfo[var_n]->ShieldFile;
-					var->HelmetFile = parent_type->VarInfo[var_n]->HelmetFile;
-					var->BackpackFile = parent_type->VarInfo[var_n]->BackpackFile;
 					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
 					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
 					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
@@ -742,6 +718,10 @@ static int CclDefineUnitType(lua_State *l)
 					}
 					var->Tileset = parent_type->VarInfo[var_n]->Tileset;
 					
+					for (int i = 0; i < MaxImageLayers; ++i) {
+						var->LayerFiles[i] = parent_type->VarInfo[var_n]->LayerFiles[i];
+					}
+			
 					for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
 						if (parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]) {
 							OverlayAnimation *shield_anim = new OverlayAnimation;
@@ -757,6 +737,9 @@ static int CclDefineUnitType(lua_State *l)
 				} else {
 					break;
 				}
+			}
+			for (int i = 0; i < MaxImageLayers; ++i) {
+				type->LayerFiles[i] = parent_type->LayerFiles[i];
 			}
 			for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
 				if (parent_type->ShieldAnimation[anim_n]) {
@@ -811,30 +794,10 @@ static int CclDefineUnitType(lua_State *l)
 						var->FileWhenEmpty[res] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "shadow-file")) {
 						var->ShadowFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "left-arm-file")) {
-						var->LeftArmFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "right-arm-file")) {
-						var->RightArmFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "hair-file")) {
-						var->HairFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "clothing-file")) {
-						var->ClothingFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "clothing-left-arm-file")) {
-						var->ClothingLeftArmFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "clothing-right-arm-file")) {
-						var->ClothingRightArmFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "pants-file")) {
-						var->PantsFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "shoes-file")) {
-						var->ShoesFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "weapon-file")) {
-						var->WeaponFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "shield-file")) {
-						var->ShieldFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "helmet-file")) {
-						var->HelmetFile = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "backpack-file")) {
-						var->BackpackFile = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "layer-file")) {
+						int image_layer = GetImageLayerIdByName(LuaToString(l, -1, k + 1));
+						++k;
+						var->LayerFiles[image_layer] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
 						lua_rawgeti(l, -1, k + 1);
 						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
@@ -1017,233 +980,32 @@ static int CclDefineUnitType(lua_State *l)
 				CGraphic::Free(type->LightSprite);
 				type->LightSprite = NULL;
 			}
-		} else if (!strcmp(value, "LeftArmImage")) {
+		} else if (!strcmp(value, "LayerImages")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				const int subargs = lua_rawlen(l, -1);
+				int image_layer = 0;
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
 
-				if (!strcmp(value, "file")) {
-					type->LeftArmFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported left arm tag: %s" _C_ value);
+					if (!strcmp(value, "layer")) {
+						image_layer = GetImageLayerIdByName(LuaToString(l, -1, k + 1));
+					} else if (!strcmp(value, "file")) {
+						type->LayerFiles[image_layer] = LuaToString(l, -1, k + 1);
+					} else {
+						LuaError(l, "Unsupported layer image tag: %s" _C_ value);
+					}
 				}
-			}
-			if (redefine && type->LeftArmSprite) {
-				CGraphic::Free(type->LeftArmSprite);
-				type->LeftArmSprite = NULL;
-			}
-		} else if (!strcmp(value, "RightArmImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->RightArmFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported right arm tag: %s" _C_ value);
+				if (redefine && type->LayerSprites[image_layer]) {
+					CGraphic::Free(type->LayerSprites[image_layer]);
+					type->LayerSprites[image_layer] = NULL;
 				}
-			}
-			if (redefine && type->RightArmSprite) {
-				CGraphic::Free(type->RightArmSprite);
-				type->RightArmSprite = NULL;
-			}
-		} else if (!strcmp(value, "HairImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->HairFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported hair tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->HairSprite) {
-				CGraphic::Free(type->HairSprite);
-				type->HairSprite = NULL;
-			}
-		} else if (!strcmp(value, "ClothingImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->ClothingFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported clothing tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->ClothingSprite) {
-				CGraphic::Free(type->ClothingSprite);
-				type->ClothingSprite = NULL;
-			}
-		} else if (!strcmp(value, "ClothingLeftArmImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->ClothingLeftArmFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported clothing left arm tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->ClothingLeftArmSprite) {
-				CGraphic::Free(type->ClothingLeftArmSprite);
-				type->ClothingLeftArmSprite = NULL;
-			}
-		} else if (!strcmp(value, "ClothingRightArmImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->ClothingRightArmFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported clothing right arm tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->ClothingRightArmSprite) {
-				CGraphic::Free(type->ClothingRightArmSprite);
-				type->ClothingRightArmSprite = NULL;
-			}
-		} else if (!strcmp(value, "PantsImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->PantsFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported pants tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->PantsSprite) {
-				CGraphic::Free(type->PantsSprite);
-				type->PantsSprite = NULL;
-			}
-		} else if (!strcmp(value, "ShoesImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->ShoesFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported shoes tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->ShoesSprite) {
-				CGraphic::Free(type->ShoesSprite);
-				type->ShoesSprite = NULL;
-			}
-		} else if (!strcmp(value, "WeaponImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->WeaponFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported weapon tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->WeaponSprite) {
-				CGraphic::Free(type->WeaponSprite);
-				type->WeaponSprite = NULL;
-			}
-		} else if (!strcmp(value, "ShieldImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->ShieldFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported shield tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->ShieldSprite) {
-				CGraphic::Free(type->ShieldSprite);
-				type->ShieldSprite = NULL;
-			}
-		} else if (!strcmp(value, "HelmetImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->HelmetFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported helmet tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->HelmetSprite) {
-				CGraphic::Free(type->HelmetSprite);
-				type->HelmetSprite = NULL;
-			}
-		} else if (!strcmp(value, "BackpackImage")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, -1, k + 1);
-				++k;
-
-				if (!strcmp(value, "file")) {
-					type->BackpackFile = LuaToString(l, -1, k + 1);
-				} else {
-					LuaError(l, "Unsupported backpack tag: %s" _C_ value);
-				}
-			}
-			if (redefine && type->BackpackSprite) {
-				CGraphic::Free(type->BackpackSprite);
-				type->BackpackSprite = NULL;
+				lua_pop(l, 1);
 			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "Offset")) {

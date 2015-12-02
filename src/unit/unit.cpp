@@ -2651,6 +2651,18 @@ IconConfig CUnit::GetIcon() const
 		return Type->Icon;
 	}
 }
+
+CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
+{
+	VariationInfo *varinfo = Type->VarInfo[Variation];
+	if (varinfo && varinfo->LayerSprites[image_layer]) {
+		return varinfo->LayerSprites[image_layer];
+	} else if (Type->LayerSprites[image_layer])  {
+		return Type->LayerSprites[image_layer];
+	} else {
+		return NULL;
+	}
+}
 //Wyrmgus end
 
 /**

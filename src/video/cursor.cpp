@@ -202,11 +202,7 @@ void DrawBuildingCursor()
 	}
 	//Wyrmgus end
 	//Wyrmgus start
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->BackpackSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->BackpackSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->BackpackSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->BackpackSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, BackpackImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 //	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 //				 CursorBuilding->StillFrame, screenPos);
@@ -221,75 +217,29 @@ void DrawBuildingCursor()
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->HairSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->HairSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->HairSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->HairSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, HairImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->PantsSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->PantsSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->PantsSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->PantsSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, PantsImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->ClothingSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ClothingSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->HelmetSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->HelmetSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->HelmetSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->HelmetSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, HelmetImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShoesSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShoesSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->ShoesSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ShoesSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ShoesImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->LeftArmSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->LeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->LeftArmSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->LeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, LeftArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingLeftArmSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingLeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->ClothingLeftArmSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ClothingLeftArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingLeftArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->ShieldSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ShieldSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ShieldImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->RightArmSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->RightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->RightArmSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->RightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingRightArmSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->ClothingRightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->ClothingRightArmSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->ClothingRightArmSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingRightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->GetDefaultVariation(*ThisPlayer) && CursorBuilding->GetDefaultVariation(*ThisPlayer)->WeaponSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultVariation(*ThisPlayer)->WeaponSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	} else if (CursorBuilding->WeaponSprite) {
-		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->WeaponSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, WeaponImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	if (CursorBuilding->LightSprite) {
-		DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
-	}
+	DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	//Wyrmgus end
 	
 	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {

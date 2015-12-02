@@ -90,6 +90,25 @@ enum GroupSelectionMode {
 	SELECT_ALL
 };
 
+//Wyrmgus start
+enum ImageLayers {
+	LeftArmImageLayer,
+	RightArmImageLayer,
+	HairImageLayer,
+	ClothingImageLayer,
+	ClothingLeftArmImageLayer,
+	ClothingRightArmImageLayer,
+	PantsImageLayer,
+	ShoesImageLayer,
+	WeaponImageLayer,
+	ShieldImageLayer,
+	HelmetImageLayer,
+	BackpackImageLayer,
+	
+	MaxImageLayers
+};
+//Wyrmgus end
+
 class ResourceInfo
 {
 public:
@@ -131,8 +150,9 @@ class VariationInfo
 public:
 	VariationInfo() : VariationId(""),
 		FrameWidth(0), FrameHeight(0),
-		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL), LeftArmSprite(NULL), RightArmSprite(NULL), HairSprite(NULL), ClothingSprite(NULL), ClothingLeftArmSprite(NULL), ClothingRightArmSprite(NULL), PantsSprite(NULL), ShoesSprite(NULL), WeaponSprite(NULL), ShieldSprite(NULL), HelmetSprite(NULL), BackpackSprite(NULL)
+		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL)
 	{
+		memset(LayerSprites, 0, sizeof(LayerSprites));
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));	
 		memset(ShieldAnimation, 0, sizeof(ShieldAnimation));
@@ -144,36 +164,12 @@ public:
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
 	std::string ShadowFile;			/// Variation's shadow graphics.
-	std::string LeftArmFile;		/// Variation's left arm graphics.
-	std::string RightArmFile;		/// Variation's right arm graphics.
-	std::string HairFile;			/// Variation's hair graphics.
-	std::string ClothingFile;		/// Variation's clothing graphics.
-	std::string ClothingLeftArmFile;	/// Variation's clothing left arm graphics.
-	std::string ClothingRightArmFile;	/// Variation's clothing right arm graphics.
-	std::string PantsFile;			/// Variation's pants graphics.
-	std::string ShoesFile;			/// Variation's shoes graphics.
-	std::string WeaponFile;			/// Variation's weapon graphics.
-	std::string ShieldFile;			/// Variation's shield graphics.
-	std::string HelmetFile;			/// Variation's helmet graphics.
-	std::string BackpackFile;		/// Variation's backpack graphics.
 	std::string Tileset;			/// Variation's tileset.
 	int FrameWidth;
 	int FrameHeight;
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
 	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
-	CPlayerColorGraphic *LeftArmSprite;	/// The graphic corresponding to LeftArmFile.
-	CPlayerColorGraphic *RightArmSprite;	/// The graphic corresponding to RightArmFile.
-	CPlayerColorGraphic *HairSprite;	/// The graphic corresponding to HairFile.
-	CPlayerColorGraphic *ClothingSprite;	/// The graphic corresponding to ClothingFile.
-	CPlayerColorGraphic *ClothingLeftArmSprite;	/// The graphic corresponding to ClothingLeftArmFile.
-	CPlayerColorGraphic *ClothingRightArmSprite;	/// The graphic corresponding to ClothingRightArmFile.
-	CPlayerColorGraphic *PantsSprite;	/// The graphic corresponding to PantsFile.
-	CPlayerColorGraphic *ShoesSprite;	/// The graphic corresponding to ShoesFile.
-	CPlayerColorGraphic *WeaponSprite;	/// The graphic corresponding to WeaponFile.
-	CPlayerColorGraphic *ShieldSprite;	/// The graphic corresponding to ShieldFile.
-	CPlayerColorGraphic *HelmetSprite;	/// The graphic corresponding to HelmetFile.
-	CPlayerColorGraphic *BackpackSprite;	/// The graphic corresponding to BackpackFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
 	OverlayAnimation *ShieldAnimation[AnimationFrameMax];	/// shield animation data	
@@ -181,8 +177,10 @@ public:
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
 
+	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
 	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
 	std::string FileWhenEmpty[MaxCosts];      /// Change the graphic when the unit is empty.
+	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// The graphics corresponding to LayerFiles.
 	CPlayerColorGraphic *SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
 };
@@ -653,6 +651,7 @@ public:
 	
 	//Wyrmgus start
 	VariationInfo *GetDefaultVariation(CPlayer &player) const;
+	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
 	//Wyrmgus end
 
 public:
@@ -679,18 +678,7 @@ public:
 	std::string ShadowFile;         /// Shadow file
 	//Wyrmgus start
 	std::string LightFile;			/// Light file
-	std::string LeftArmFile;		/// Left arm file
-	std::string RightArmFile;		/// Right arm file
-	std::string HairFile;			/// Hair file
-	std::string ClothingFile;		/// Clothing file
-	std::string ClothingLeftArmFile;	/// Clothing left arm file
-	std::string ClothingRightArmFile;	/// Clothing right arm file
-	std::string PantsFile;			/// Pants file
-	std::string ShoesFile;			/// Shoes file
-	std::string WeaponFile;			/// Weapon file
-	std::string ShieldFile;			/// Shield file
-	std::string HelmetFile;			/// Helmet file
-	std::string BackpackFile;		/// Backpack file
+	std::string LayerFiles[MaxImageLayers];	/// Layer files
 	//Wyrmgus end
 
 	int Width;                                            /// Sprite width
@@ -849,18 +837,7 @@ public:
 	CGraphic *ShadowSprite;          /// Shadow sprite image
 	//Wyrmgus start
 	CGraphic *LightSprite;						/// Light sprite image
-	CPlayerColorGraphic *LeftArmSprite;			/// Left arm sprite image
-	CPlayerColorGraphic *RightArmSprite;		/// Right arm sprite image
-	CPlayerColorGraphic *HairSprite;			/// Hair sprite image
-	CPlayerColorGraphic *ClothingSprite;		/// Clothing sprite image
-	CPlayerColorGraphic *ClothingLeftArmSprite;		/// Clothing left arm sprite image
-	CPlayerColorGraphic *ClothingRightArmSprite;	/// Clothing right arm sprite image
-	CPlayerColorGraphic *PantsSprite;			/// Pants sprite image
-	CPlayerColorGraphic *ShoesSprite;			/// Shoes sprite image
-	CPlayerColorGraphic *WeaponSprite;			/// Weapon sprite image
-	CPlayerColorGraphic *ShieldSprite;			/// Shield sprite image
-	CPlayerColorGraphic *HelmetSprite;			/// Helmet sprite image
-	CPlayerColorGraphic *BackpackSprite;		/// Backpack sprite image
+	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// Layer sprite images
 	//Wyrmgus end
 };
 
@@ -1039,6 +1016,11 @@ extern void UpdateUnitVariables(CUnit &unit);
 
 extern void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type);
 extern void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
+
+//Wyrmgus start
+extern std::string GetImageLayerNameById(int image_layer);
+extern int GetImageLayerIdByName(std::string image_layer);
+//Wyrmgus end
 
 //@}
 
