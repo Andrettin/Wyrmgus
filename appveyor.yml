@@ -1,5 +1,3 @@
-environment:
-  VisualStudioVersion: 12.0
 shallow_clone: true
 configuration:
   - Release
