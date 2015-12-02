@@ -785,6 +785,16 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player) const
 	return NULL;
 }
 
+std::string CUnitType::GetDefaultName(CPlayer &player) const
+{
+	VariationInfo *varinfo = this->GetDefaultVariation(player);
+	if (varinfo && !varinfo->TypeName.empty()) {
+		return varinfo->TypeName;
+	} else {
+		return this->Name;
+	}
+}
+
 CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(CPlayer &player, int image_layer) const
 {
 	VariationInfo *varinfo = this->GetDefaultVariation(player);

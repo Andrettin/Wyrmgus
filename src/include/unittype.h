@@ -651,6 +651,7 @@ public:
 	
 	//Wyrmgus start
 	VariationInfo *GetDefaultVariation(CPlayer &player) const;
+	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
 	//Wyrmgus end
 

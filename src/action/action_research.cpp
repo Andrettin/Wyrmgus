@@ -139,12 +139,7 @@
 		if (upgrade.Name.empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
-			VariationInfo *varinfo = type.GetDefaultVariation(player);
-			if (varinfo && !varinfo->TypeName.empty()) {
-				player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), varinfo->TypeName.c_str());
-			} else {
-				player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
-			}
+			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.GetDefaultName(player).c_str());
 			//Wyrmgus end
 		//Wyrmgus start
 //		} else {

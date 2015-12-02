@@ -122,12 +122,7 @@ public:
 	if (cansummon) {
 		//Wyrmgus start
 //		DebugPrint("Summoning a %s\n" _C_ unittype.Name.c_str());
-		VariationInfo *varinfo = unittype.GetDefaultVariation(*caster.Player);
-		if (varinfo && !varinfo->TypeName.empty()) {
-			DebugPrint("Summoning a %s\n" _C_ varinfo->TypeName.c_str());
-		} else {
-			DebugPrint("Summoning a %s\n" _C_ unittype.Name.c_str());
-		}
+		DebugPrint("Summoning a %s\n" _C_ unittype.GetDefaultName(*caster.Player).c_str());
 		//Wyrmgus end
 
 		//
