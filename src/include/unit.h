@@ -173,7 +173,7 @@ public:
 	
 	//Wyrmgus start
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
-	void ChooseVariation(const CUnitType *new_type = NULL);
+	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false);
 	void SetVariation(int new_variation, const CUnitType *new_type = NULL);
 	//Wyrmgus end
 	

@@ -621,7 +621,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	this->ChooseVariation(); //choose a new variation now
 }
 
-void CUnit::ChooseVariation(const CUnitType *new_type)
+void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation)
 {
 	std::string priority_variation;
 	if (this->Character != NULL && !this->Character->Variation.empty()) {
@@ -653,7 +653,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type)
 		if (upgrades_check == false) {
 			continue;
 		}
-		if (!priority_variation.empty() && varinfo->VariationId.find(priority_variation) != std::string::npos) { // if the priority variation's ident is included in that of a new viable, choose the latter automatically
+		if (!ignore_old_variation && !priority_variation.empty() && varinfo->VariationId.find(priority_variation) != std::string::npos) { // if the priority variation's ident is included in that of a new viable, choose the latter automatically
 			this->SetVariation(i, new_type);
 			type_variations.clear();
 			break;
@@ -669,7 +669,7 @@ void CUnit::SetVariation(int new_variation, const CUnitType *new_type)
 {
 	if (
 		(this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->Animations)
-		|| (new_type == NULL && this->Type->VarInfo[new_variation]->Animations)
+		|| (new_type == NULL && this->Type->VarInfo[new_variation] && this->Type->VarInfo[new_variation]->Animations)
 		|| (new_type != NULL && new_type->VarInfo[new_variation]->Animations)
 	) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
 		this->Frame = this->Type->StillFrame;
@@ -908,7 +908,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		unit->AssignToPlayer(*player);
 
 		//Wyrmgus start
-		unit->ChooseVariation();
+		unit->ChooseVariation(NULL, true);
 		//Wyrmgus end
 	}
 

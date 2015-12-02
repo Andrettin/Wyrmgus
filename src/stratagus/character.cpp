@@ -54,6 +54,7 @@
 
 std::vector<CCharacter *> Characters;
 std::vector<CCharacter *> CustomHeroes;
+CCharacter *CurrentCustomHero = NULL;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -269,6 +270,20 @@ void DeleteCustomHero(std::string hero_full_name)
 	
 	CustomHeroes.erase(std::remove(CustomHeroes.begin(), CustomHeroes.end(), hero), CustomHeroes.end());
 	delete hero;
+}
+
+void SetCurrentCustomHero(std::string hero_full_name)
+{
+	if (!hero_full_name.empty()) {
+		CCharacter *hero = GetCustomHero(hero_full_name);
+		if (!hero) {
+			fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		}
+		
+		CurrentCustomHero = const_cast<CCharacter *>(&(*hero));
+	} else {
+		CurrentCustomHero = NULL;
+	}
 }
 
 std::string GetGenderNameById(int gender)

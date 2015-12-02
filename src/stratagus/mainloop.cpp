@@ -36,6 +36,9 @@
 #include "stratagus.h"
 
 #include "actions.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "editor.h"
 //Wyrmgus start
 #include "font.h"
@@ -621,6 +624,11 @@ void GameMainLoop()
 		char buf[256];
 		snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", ThisPlayer->Race != -1 ? PlayerRaces.Name[ThisPlayer->Race].c_str() : "", "");
 		CclCommand(buf);
+	}
+	
+	if (!GrandStrategy && !IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL && CurrentCustomHero->Civilization == ThisPlayer->Race) {
+		CUnit *custom_hero = MakeUnitAndPlace(ThisPlayer->StartPos, *CurrentCustomHero->Type, ThisPlayer);
+		custom_hero->SetCharacter(CurrentCustomHero->GetFullName(), true);		
 	}
 	//Wyrmgus end
 
