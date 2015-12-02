@@ -57,7 +57,7 @@
 #endif
 
 #define snprintf _snprintf
-#if !(_MSC_VER >= 1500 && _MSC_VER < 1600)
+#if !(_MSC_VER >= 1500 && _MSC_VER < 1900)
 #define vsnprintf _vsnprintf
 #endif
 #define unlink _unlink
