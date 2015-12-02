@@ -1439,7 +1439,11 @@ static int CclGetUnitVariable(lua_State *l)
 			lua_pushstring(l, unit->Type->Name.c_str());
 		}
 	} else if (!strcmp(value, "Trait")) {
-		lua_pushstring(l, unit->Trait->Ident.c_str());
+		if (unit->Trait != NULL) {
+			lua_pushstring(l, unit->Trait->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 	} else if (!strcmp(value, "Icon")) {
 		lua_pushstring(l, unit->GetIcon().Name.c_str());
 		return 1;
@@ -1508,7 +1512,10 @@ static int CclSetUnitVariable(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	const char *const name = LuaToString(l, 2);
-	int value;
+	//Wyrmgus start
+//	int value;
+	int value = 0;
+	//Wyrmgus end
 	if (!strcmp(name, "Player")) {
 		value = LuaToNumber(l, 3);
 		unit->AssignToPlayer(Players[value]);

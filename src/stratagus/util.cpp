@@ -525,6 +525,7 @@ void PrintOnStdOut(const char *format, ...)
 #include "editor.h" //for personal name generation
 #include "player.h" //for personal name generation
 #include "unittype.h" //for personal name generation
+#include "upgrade.h" //for personal name generation
 
 std::string FindAndReplaceString(std::string text, const std::string& find, const std::string& replace) {
     size_t pos = 0;
@@ -998,5 +999,12 @@ std::string GeneratePersonalName(int civilization, int unit_type_id)
 	personal_name = TransliterateText(personal_name);
 	
 	return personal_name;
+}
+
+std::string GeneratePersonalName(std::string civilization_name, std::string unit_type_ident)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+	return GeneratePersonalName(civilization, unit_type_id);
 }
 //Wyrmgus end

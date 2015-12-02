@@ -177,14 +177,17 @@ void SaveHeroes()
 			if (CustomHeroes[i]->Gender != NoGender) {
 				fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(CustomHeroes[i]->Gender).c_str());
 			}
+			if (CustomHeroes[i]->Civilization != -1) {
+				fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[CustomHeroes[i]->Civilization].c_str());
+			}
 			if (CustomHeroes[i]->Type != NULL) {
 				fprintf(fd, "\tType = \"%s\",\n", CustomHeroes[i]->Type->Ident.c_str());
 			}
 			if (CustomHeroes[i]->Trait != NULL) {
 				fprintf(fd, "\tTrait = \"%s\",\n", CustomHeroes[i]->Trait->Ident.c_str());
 			}
-			if (CustomHeroes[i]->Civilization != -1) {
-				fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[CustomHeroes[i]->Civilization].c_str());
+			if (!CustomHeroes[i]->Variation.empty()) {
+				fprintf(fd, "\tVariation = \"%s\",\n", CustomHeroes[i]->Variation.c_str());
 			}
 			if (CustomHeroes[i]->Level != 0) {
 				fprintf(fd, "\tLevel = %d,\n", CustomHeroes[i]->Level);

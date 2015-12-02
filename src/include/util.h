@@ -155,6 +155,7 @@ extern std::string CapitalizeString(std::string text);				/// Make the string be
 extern std::string DecapitalizeString(std::string text);			/// Make the string lose capitalization
 extern std::string SeparateCapitalizedStringElements(std::string text);	/// Make the string's capitalized elements become separated
 extern std::string GeneratePersonalName(int civilization, int unit_type_id);	/// Generates a personal name
+extern std::string GeneratePersonalName(std::string civilization_name, std::string unit_type_ident);
 //Wyrmgus end
 
 #endif /* __UTIL_H__ */
