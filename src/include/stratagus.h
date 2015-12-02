@@ -48,6 +48,11 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOUSER
 
+#if _MSC_VER >= 1800
+// From VS2013 onwards, std::min/max are only defined if algorithm is included
+#include <algorithm>
+#endif
+
 #pragma warning(disable:4244)               /// Conversion from double to uchar
 #pragma warning(disable:4761)               /// Integral size mismatch
 #pragma warning(disable:4786)               /// Truncated to 255 chars
@@ -57,7 +62,7 @@
 #endif
 
 #define snprintf _snprintf
-#if defined(_MSC_VER) && !(_MSC_VER >= 1500 && _MSC_VER < 1900)
+#if !(_MSC_VER >= 1500 && _MSC_VER < 1600)
 #define vsnprintf _vsnprintf
 #endif
 #define unlink _unlink
