@@ -286,6 +286,15 @@ void SetCurrentCustomHero(std::string hero_full_name)
 	}
 }
 
+std::string GetCurrentCustomHero()
+{
+	if (CurrentCustomHero != NULL) {
+		return CurrentCustomHero->GetFullName();
+	} else {
+		return "";
+	}
+}
+
 std::string GetGenderNameById(int gender)
 {
 	if (gender == MaleGender) {

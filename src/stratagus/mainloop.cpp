@@ -627,8 +627,10 @@ void GameMainLoop()
 	}
 	
 	if (!GrandStrategy && !IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL && CurrentCustomHero->Civilization == ThisPlayer->Race) {
-		CUnit *custom_hero = MakeUnitAndPlace(ThisPlayer->StartPos, *CurrentCustomHero->Type, ThisPlayer);
-		custom_hero->SetCharacter(CurrentCustomHero->GetFullName(), true);		
+		Vec2i resPos;
+		FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW);
+		CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer);
+		custom_hero->SetCharacter(CurrentCustomHero->GetFullName(), true);	
 	}
 	//Wyrmgus end
 
