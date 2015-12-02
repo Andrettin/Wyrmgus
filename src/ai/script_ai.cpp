@@ -1088,7 +1088,7 @@ static int CclAiSetBuildDepots(lua_State *l)
 }
 
 /**
-**  Dump some AI debug informations.
+**  Dump some AI debug information.
 **
 **  @param l  Lua state.
 */

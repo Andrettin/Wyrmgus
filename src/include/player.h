@@ -792,7 +792,7 @@ extern void PlayersEachSecond(int player);
 extern void GraphicPlayerPixels(int player, const CGraphic &sprite);
 //Wyrmgus end
 
-/// Output debug informations for players
+/// Output debug information for players
 extern void DebugPlayers();
 
 #ifdef DEBUG
