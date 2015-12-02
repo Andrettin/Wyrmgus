@@ -16,9 +16,6 @@
 #ifndef XBRZ_HEADER_3847894708239054
 #define XBRZ_HEADER_3847894708239054
 
-//Wyrmgus start
-#define NOMINMAX // do not use min, max as macro
-//Wyrmgus end
 #include <cstddef> //size_t
 #include <cstdint> //uint32_t
 #include <limits>

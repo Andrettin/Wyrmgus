@@ -47,7 +47,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOUSER
-#define NOMINMAX // do not use min, max as macro
 
 #pragma warning(disable:4244)               /// Conversion from double to uchar
 #pragma warning(disable:4761)               /// Integral size mismatch
