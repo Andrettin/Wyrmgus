@@ -1533,4 +1533,74 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 	return '-';
 }
 
+//Wyrmgus start
+std::string GetUpgradeEffectsString(std::string upgrade_ident)
+{
+	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+
+	if (upgrade) {
+		std::string upgrade_effects_string;
+		
+		bool first_element = true;
+		//check if the upgrade makes modifications to any units
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (UpgradeModifiers[z]->UpgradeId == upgrade->ID) {
+				if (!first_element) {
+					upgrade_effects_string += ", ";
+				} else {
+					first_element = false;
+				}
+				
+				bool first_var = true;
+				for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+					if (var == PRIORITY_INDEX || var == POINTS_INDEX) {
+						continue;
+					}
+						
+					if (UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
+						if (!first_var) {
+							upgrade_effects_string += ", ";
+						} else {
+							first_var = false;
+						}
+											
+						if (UpgradeModifiers[z]->Modifier.Variables[var].Value > 0) {
+							upgrade_effects_string += "+";
+						}
+						upgrade_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[var].Value);
+						upgrade_effects_string += " ";
+											
+						std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+						variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+						variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
+						variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
+						variable_name = SeparateCapitalizedStringElements(variable_name);
+						upgrade_effects_string += variable_name;
+						
+						bool first_unit_type = true;
+						for (size_t i = 0; i < UnitTypes.size(); ++i) {
+							if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+								if (!first_unit_type) {
+									upgrade_effects_string += ", ";
+								} else {
+									upgrade_effects_string += " for ";
+									first_unit_type = false;
+								}
+									
+								upgrade_effects_string += UnitTypes[i]->Name;
+								upgrade_effects_string += "s";
+							}
+						}
+					}
+				}
+			}
+		}
+			
+		return upgrade_effects_string;
+	}
+	
+	return "";
+}
+//Wyrmgus end
+
 //@}

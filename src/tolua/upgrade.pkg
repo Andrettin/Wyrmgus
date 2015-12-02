@@ -25,4 +25,5 @@ class CUpgrade
 //Wyrmgus start
 extern int GetResourceIdByName(const char *resourceName);
 extern std::string GetResourceNameById(int resource_id);
+extern std::string GetUpgradeEffectsString(std::string upgrade_ident);
 //Wyrmgus end

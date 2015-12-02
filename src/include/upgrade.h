@@ -114,6 +114,10 @@ extern void AllowUpgradeId(CPlayer &player, int id, char af);
 extern char UpgradeIdAllowed(const CPlayer &player, int id);
 extern char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident);
 
+//Wyrmgus start
+extern std::string GetUpgradeEffectsString(std::string upgrade_ident);
+//Wyrmgus end
+
 //@}
 
 #endif  // !__UPGRADE_H__

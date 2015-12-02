@@ -21,6 +21,9 @@ $#include "ui.h"
 $#include "unit.h"
 $#include "unit_manager.h"
 $#include "unittype.h"
+//Wyrmgus start
+$#include "upgrade.h"
+//Wyrmgus end
 $#include "video.h"
 $#include "widgets.h"
 
@@ -116,5 +119,6 @@ extern std::string StratagusLibPath;
 //Wyrmgus start
 extern void HeroAddQuest(std::string hero_full_name, std::string quest_name);
 extern void HeroCompleteQuest(std::string hero_full_name, std::string quest_name);
+extern void DeleteCustomHero(std::string hero_full_name);
 extern std::string GeneratePersonalName(std::string civilization_name, std::string unit_type_ident);
 //Wyrmgus end
