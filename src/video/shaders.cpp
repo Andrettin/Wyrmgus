@@ -392,7 +392,10 @@ void printProgramInfoLog(GLuint obj, const char* prefix)
 	}
 }
 
-unsigned ShaderIndex = 0;
+//Wyrmgus start
+//unsigned ShaderIndex = 0;
+unsigned ShaderIndex = -1 % MAX_SHADERS;
+//Wyrmgus end
 
 extern void LoadShaders() {
 	GLuint vs, fs;

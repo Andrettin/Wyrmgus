@@ -170,7 +170,10 @@ CVideo Video;
 char ForceUseOpenGL;
 bool UseOpenGL;                      /// Use OpenGL
 bool ZoomNoResize;
-bool GLShaderPipelineSupported = true;
+//Wyrmgus start
+//bool GLShaderPipelineSupported = true;
+bool GLShaderPipelineSupported = false;
+//Wyrmgus end
 #endif
 
 char VideoForceFullScreen;           /// fullscreen set from commandline
