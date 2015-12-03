@@ -268,6 +268,9 @@ void DeleteCustomHero(std::string hero_full_name)
 		fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 	}
 	
+	if (CurrentCustomHero == hero) {
+		CurrentCustomHero = NULL;
+	}
 	CustomHeroes.erase(std::remove(CustomHeroes.begin(), CustomHeroes.end(), hero), CustomHeroes.end());
 	delete hero;
 }
