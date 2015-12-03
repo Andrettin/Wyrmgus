@@ -336,6 +336,18 @@ static int CclDefineCustomHero(lua_State *l)
 					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name.c_str());
 				}
 			}
+		} else if (!strcmp(value, "ForbiddenUpgrades")) {
+			memset(hero->ForbiddenUpgrades, 0, sizeof(hero->ForbiddenUpgrades));
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string unit_type_ident = LuaToString(l, -1, j + 1);
+				int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+				if (unit_type_id != -1) {
+					hero->ForbiddenUpgrades[unit_type_id] = true;
+				} else {
+					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
+				}
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

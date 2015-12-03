@@ -221,8 +221,17 @@ void SaveHeroes()
 						fprintf(fd, ", ");
 					}
 				}
-				fprintf(fd, "}\n");
+				fprintf(fd, "},\n");
 			}
+			
+			fprintf(fd, "\tForbiddenUpgrades = {");
+			for (int j = 0; j < UnitTypeMax; ++j) {
+				if (CustomHeroes[i]->ForbiddenUpgrades[j]) {
+					fprintf(fd, "\"%s\", ", UnitTypes[j]->Ident.c_str());
+				}
+			}
+			fprintf(fd, "},\n");
+			
 			fprintf(fd, "})\n\n");
 		}
 	}
