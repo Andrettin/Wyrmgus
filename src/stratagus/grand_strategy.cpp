@@ -114,6 +114,28 @@ void CGrandStrategyGame::Clean()
 		}
 	}
 	
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (int j = 0; j < FactionMax; ++j) {
+			if (this->Factions[i][j]) {
+				delete this->Factions[i][j];
+			} else { //end of valid factions for this civilization
+				break;
+			}
+		}
+	}
+	
+	for (int i = 0; i < RiverMax; ++i) {
+		if (this->Rivers[i]) {
+			delete this->Rivers[i];
+		}
+	}
+	
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		delete GrandStrategyGame.Heroes[i];
+	}
+	GrandStrategyGame.Heroes.clear();
+	GrandStrategyHeroStringToIndex.clear();
+	
 	//destroy minimap surface
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -824,7 +846,7 @@ void CGrandStrategyGame::DoTurn()
 						this->Factions[i][j]->SetRuler(""); //"dead" factions should have no ruler
 					}
 				}
-			} else { //end of valid factions
+			} else { //end of valid factions for this civilization
 				break;
 			}
 		}
@@ -945,7 +967,7 @@ void CGrandStrategyGame::DoTurn()
 					//see if this faction can form a faction
 					this->Factions[i][j]->CheckFormableFactions(i);
 				}
-			} else { //end of valid factions
+			} else { //end of valid factions for this civilization
 				break;
 			}
 		}
@@ -1015,7 +1037,7 @@ void CGrandStrategyGame::DoTrade()
 						}
 					}
 				}
-			} else { //end of valid factions
+			} else { //end of valid factions for this civilization
 				break;
 			}
 		}
@@ -1030,7 +1052,7 @@ void CGrandStrategyGame::DoTrade()
 					factions_by_prestige[factions_by_prestige_count] = const_cast<CGrandStrategyFaction *>(&(*this->Factions[i][j]));
 					factions_by_prestige_count += 1;
 				}
-			} else { //end of valid factions
+			} else { //end of valid factions for this civilization
 				break;
 			}
 		}
@@ -5811,7 +5833,7 @@ void InitializeGrandStrategyFactions()
 					GrandStrategyGame.Factions[i][j]->CalculateIncomes();
 					GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
 				}
-			} else { //end of valid factions
+			} else { //end of valid factions for this civilization
 				break;
 			}
 		}
@@ -6221,7 +6243,7 @@ void CalculateFactionUpkeeps()
 		for (int j = 0; j < FactionMax; ++j) {
 			if (GrandStrategyGame.Factions[i][j]) {
 				GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
-			} else { //end of valid factions
+			} else { //end of valid factions for this civilization
 				break;
 			}
 		}
