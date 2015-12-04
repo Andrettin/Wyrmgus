@@ -68,7 +68,7 @@ enum {
 
 extern lua_State *Lua;
 
-extern int LuaLoadFile(const std::string &file);
+extern int LuaLoadFile(const std::string &file, const std::string &strArg = "");
 extern int LuaCall(int narg, int clear, bool exitOnError = true);
 
 #define LuaError(l, args) \
@@ -324,7 +324,7 @@ extern bool LuaToBoolean(lua_State *l, int index, int subIndex);
 
 extern void LuaGarbageCollect();  /// Perform garbage collection
 extern void InitLua();                /// Initialise Lua
-extern void LoadCcl(const std::string &filename);  /// Load ccl config file
+extern void LoadCcl(const std::string &filename, const std::string &luaArgStr = "");  /// Load ccl config file
 extern void SavePreferences();        /// Save user preferences
 //Wyrmgus start
 extern void SaveGrandStrategyGame(const std::string &filename);        /// Save extra user preferences

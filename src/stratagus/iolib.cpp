@@ -614,8 +614,18 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
+	
+	// Support for scripts in default scripts dir.
+	sprintf(buffer, "scripts/%s", file);
+	if (FindFileWithExtension(buffer)) {
+		return;
+	}
+	sprintf(buffer, "%s/scripts/%s", StratagusLibPath.c_str(), file);
+	if (FindFileWithExtension(buffer)) {
+		return;
+	}
 
-	DebugPrint("File `%s' not found\n" _C_ file);
+	DebugPrint("File '%s' not found\n" _C_ file);
 	strcpy_s(buffer, PATH_MAX, file);
 }
 

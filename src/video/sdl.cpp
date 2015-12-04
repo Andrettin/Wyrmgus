@@ -56,10 +56,6 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 
-#ifdef USE_GLES_MAEMO
-#include "SDL_gles.h"
-#endif
-
 #ifdef USE_GLES_EGL
 #include "EGL/egl.h"
 #endif
@@ -79,10 +75,6 @@
 
 #ifdef USE_WIN32
 #include <shellapi.h>
-#endif
-
-#ifdef USE_MAEMO
-#include "maemo.h"
 #endif
 
 #include "editor.h"
@@ -497,10 +489,6 @@ void InitVideoSdl()
 		// Clean up on exit
 		atexit(SDL_Quit);
 
-#ifdef USE_MAEMO
-		maemo_init();
-#endif
-
 		// If debug is enabled, Stratagus disable SDL Parachute.
 		// So we need gracefully handle segfaults and aborts.
 #if defined(DEBUG) && !defined(USE_WIN32)
@@ -516,7 +504,7 @@ void InitVideoSdl()
 			SDL_WM_SetCaption("Stratagus", "Stratagus");
 		}
 
-#if ! defined(USE_WIN32) && ! defined(USE_MAEMO)
+#if ! defined(USE_WIN32)
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		// Make sure, that we not create OpenGL textures (and do not call OpenGL functions), when creating icon surface
@@ -599,13 +587,6 @@ void InitVideoSdl()
 
 	// Initialize the display
 
-#ifdef USE_MAEMO
-	// TODO: Support window mode and portrait mode resolution on Maemo - Nokia N900
-	Video.FullScreen = 1;
-	Video.Width = 800;
-	Video.Height = 480;
-#endif
-
 #if !defined(USE_OPENGL) && !defined(USE_GLES)
 	flags = SDL_HWSURFACE | SDL_HWPALETTE;
 #endif
@@ -620,17 +601,6 @@ void InitVideoSdl()
 	if (UseOpenGL) {
 #ifdef USE_GLES_NATIVE
 		flags |= SDL_OPENGLES;
-#endif
-#ifdef USE_GLES_MAEMO
-		if (SDL_GLES_Init(SDL_GLES_VERSION_1_1) < 0) {
-			fprintf(stderr, "Couldn't initialize SDL_GLES: %s\n", SDL_GetError());
-			exit(1);
-		}
-
-		// Clean up GLES on exit
-		atexit(SDL_GLES_Quit);
-
-		flags |= SDL_SWSURFACE;
 #endif
 #ifdef USE_OPENGL
 		flags |= SDL_OPENGL | SDL_GL_DOUBLEBUFFER;
@@ -691,18 +661,6 @@ void InitVideoSdl()
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-#ifdef USE_GLES_MAEMO
-		SDL_GLES_Context *context = SDL_GLES_CreateContext();
-		if (!context) {
-			fprintf(stderr, "Couldn't initialize SDL_GLES_CreateContext: %s\n", SDL_GetError());
-			exit(1);
-		}
-		if (SDL_GLES_MakeCurrent(context) < 0) {
-			fprintf(stderr, "Couldn't initialize SDL_GLES_MakeCurrent: %s\n", SDL_GetError());
-			exit(1);
-		}
-		// atexit(GLES_DeleteContext(context));
-#endif
 #ifdef USE_GLES_EGL
 		// Get the SDL window handle
 		SDL_SysWMinfo sysInfo; //Will hold our Window information
@@ -782,11 +740,6 @@ void InitVideoSdl()
 */
 int VideoValidResolution(int w, int h)
 {
-#ifdef USE_MAEMO
-	if (w != 800 || h != 480) {
-		return 0;
-	}
-#endif
 	return SDL_VideoModeOK(w, h, TheScreen->format->BitsPerPixel, TheScreen->flags);
 }
 
@@ -1019,9 +972,6 @@ void RealizeVideoMemory()
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
-#ifdef USE_GLES_MAEMO
-		SDL_GLES_SwapBuffers();
-#endif
 #ifdef USE_GLES_EGL
 		eglSwapBuffers(eglDisplay, eglSurface);
 #endif
@@ -1133,10 +1083,6 @@ void ToggleGrabMouse(int mode)
 */
 void ToggleFullScreen()
 {
-#ifdef USE_MAEMO
-	// On Maemo is only supported fullscreen mode
-	return;
-#endif
 #ifdef USE_WIN32
 	long framesize;
 	SDL_Rect clip;
