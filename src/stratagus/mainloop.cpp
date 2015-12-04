@@ -489,12 +489,18 @@ static void GameLogicLoop()
 				}
 			}
 		}
-		
-		if (!IsNetworkGame() && !GrandStrategy && Preference.Autosave && GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * 60 * 5) == 0) { // autosave every five minutes, if the option is enabled
-			UI.StatusLine.Set(_("Autosave"));
-			CclCommand("if (RunSaveGame ~= nil) then RunSaveGame(\"autosave.sav\") end;");
-		}
 		//Wyrmgus end
+		
+		//Wyrmgus start
+//		if (Preference.AutosaveMinutes != 0 && !IsNetworkGame() && GameCycle > 0 && (GameCycle % (CYCLES_PER_SECOND * 60 * Preference.AutosaveMinutes)) == 0) { // autosave every X minutes, if the option is enabled
+		if (Preference.AutosaveMinutes != 0 && !IsNetworkGame() && !GrandStrategy && GameCycle > 0 && (GameCycle % (CYCLES_PER_SECOND * 60 * Preference.AutosaveMinutes)) == 0) { // autosave every X minutes, if the option is enabled
+		//Wyrmgus end
+			UI.StatusLine.Set(_("Autosave"));
+			//Wyrmgus start
+//			SaveGame("autosave.sav");
+			CclCommand("if (RunSaveGame ~= nil) then RunSaveGame(\"autosave.sav\") end;");
+			//Wyrmgus end
+		}
 	}
 
 	UpdateMessages();     // update messages

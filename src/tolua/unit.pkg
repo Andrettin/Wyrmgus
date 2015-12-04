@@ -32,14 +32,14 @@ class CPreference
 	bool DeselectInMine;
 	bool NoStatusLineTooltips;
 	//Wyrmgus start
-	bool Autosave;
 	bool PlayerColorCircle;
 	bool ShowPathlines;
 	//Wyrmgus end
 
 	unsigned int ShowOrders;
-	unsigned int  ShowNameDelay;
-	unsigned int  ShowNameTime;
+	unsigned int ShowNameDelay;
+	unsigned int ShowNameTime;
+	unsigned int AutosaveMinutes;
 	
 	std::string SF2Soundfont;
 	

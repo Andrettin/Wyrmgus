@@ -1,14 +1,15 @@
-stratagus (2.3.9-1) unstable; urgency=low
+stratagus (2.4.0-1) unstable; urgency=low
 
   * Introduced OpenGL shaders for pixel scaling
-  * Add support for semi-transparent building shadows
+  * Added support for semi-transparent building shadows
   * Many cleanups ported from Wyrmgus
-  * Support individual unit upgrades
-  * Fix multiplayer out-of-sync issue
-  * Fix multiplayer race selection
-  * Fix unit sight not being symmetrical
-  * Fix build restriction on top not being symmetrical
+  * Added support individual unit upgrades
+  * Fixed multiplayer out-of-sync issue
+  * Fixed multiplayer race selection
+  * Fixed unit sight not being symmetrical
+  * Fixed build restriction on top not being symmetrical
   * Added support for map-specific unit stats and changing them through the map editor
+  * Added support for autosaves
   
  -- Tim Felgentreff <timfelgentreff@gmail.com>  Wed, 2 Dec 2015 12:41:01 +0100
 
