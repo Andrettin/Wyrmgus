@@ -719,7 +719,9 @@ void CleanPlayers()
 	NoRescueCheck = false;
 }
 
-#ifdef DEBUG
+//Wyrmgus start
+//#ifdef DEBUG
+//Wyrmgus end
 void FreePlayerColors()
 {
 	for (int i = 0; i < PlayerMax; ++i) {
@@ -736,7 +738,9 @@ void FreePlayerColors()
 	}
 	//Wyrmgus end
 }
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 
 /**
 **  Save state of players to file.

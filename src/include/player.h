@@ -795,9 +795,13 @@ extern void GraphicPlayerPixels(int player, const CGraphic &sprite);
 /// Output debug information for players
 extern void DebugPlayers();
 
-#ifdef DEBUG
+//Wyrmgus start
+//#ifdef DEBUG
+//Wyrmgus end
 void FreePlayerColors();
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 
 /// register ccl features
 extern void PlayerCclRegister();

@@ -630,9 +630,13 @@ extern void InitMissiles();
 /// Clean missiles
 extern void CleanMissiles();
 
-#ifdef DEBUG
+//Wyrmgus start
+//#ifdef DEBUG
+//Wyrmgus end
 extern void FreeBurningBuildingFrames();
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 
 //@}
 

@@ -561,9 +561,13 @@ extern void InitUserInterface();
 extern void SaveUserInterface(CFile &file);
 /// Clean up the ui module
 extern void CleanUserInterface();
-#ifdef DEBUG
+//Wyrmgus start
+//#ifdef DEBUG
+//Wyrmgus end
 extern void FreeButtonStyles();
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 /// Register ccl features
 extern void UserInterfaceCclRegister();
 

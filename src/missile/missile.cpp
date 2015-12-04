@@ -1768,7 +1768,9 @@ void CleanMissiles()
 	LocalMissiles.clear();
 }
 
-#ifdef DEBUG
+//Wyrmgus start
+//#ifdef DEBUG
+//Wyrmgus end
 void FreeBurningBuildingFrames()
 {
 	for (std::vector<BurningBuildingFrame *>::iterator i = BurningBuildingFrames.begin();
@@ -1777,6 +1779,8 @@ void FreeBurningBuildingFrames()
 	}
 	BurningBuildingFrames.clear();
 }
-#endif
+//Wyrmgus start
+//#endif
+//Wyrmgus end
 
 //@}
