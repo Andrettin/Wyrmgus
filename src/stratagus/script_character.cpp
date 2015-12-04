@@ -348,6 +348,14 @@ static int CclDefineCustomHero(lua_State *l)
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "Icon")) {
+			hero->Icon.Name = LuaToString(l, -1);
+			hero->Icon.Icon = NULL;
+			hero->Icon.Load();
+		} else if (!strcmp(value, "HeroicIcon")) {
+			hero->HeroicIcon.Name = LuaToString(l, -1);
+			hero->HeroicIcon.Icon = NULL;
+			hero->HeroicIcon.Load();
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -647,7 +655,11 @@ static int CclGetCustomHeroData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		lua_pushstring(l, character->Icon.Name.c_str());
+		if (character->Level >= 3 && character->HeroicIcon.Icon) {
+			lua_pushstring(l, character->HeroicIcon.Name.c_str());
+		} else {
+			lua_pushstring(l, character->Icon.Name.c_str());
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
