@@ -45,6 +45,9 @@
 //Wyrmgus end
 
 #include "color.h"
+//Wyrmgus start
+#include "item.h"
+//Wyrmgus end
 #include "upgrade_structs.h"
 
 #include "vec2i.h"
@@ -376,28 +379,28 @@ public:
 	bool SettlementName;			/// Whether the noun can be used as a settlement name
 	bool ProvinceName;				/// Whether the noun can be used as a province name
 	bool TerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a name of particular terrain features
-	bool ItemName[MaxItemTypes];	/// Whether the noun can be used as an item name
+	bool ItemName[MaxItemClasses];	/// Whether the noun can be used as an item name
 	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
 	bool PrefixPlural;				/// Whether the noun's plural form can be used as a prefix
 	bool PrefixPersonalName;		/// Whether the noun can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the noun can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the noun can be used as a prefix for province names
 	bool PrefixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a prefix for names of particular terrain features
-	bool PrefixItemName[MaxItemTypes];	/// Whether the noun can be used as a prefix for item names
+	bool PrefixItemName[MaxItemClasses];	/// Whether the noun can be used as a prefix for item names
 	bool SuffixSingular;			/// Whether the noun's singular form can be used as a suffix
 	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
 	bool SuffixPersonalName;		/// Whether the noun can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the noun can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the noun can be used as a suffix for province names
 	bool SuffixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as a suffix for names of particular terrain features
-	bool SuffixItemName[MaxItemTypes];	/// Whether the noun can be used as a suffix for item names
+	bool SuffixItemName[MaxItemClasses];	/// Whether the noun can be used as a suffix for item names
 	bool InfixSingular;				/// Whether the noun's singular form can be used as an infix
 	bool InfixPlural;				/// Whether the noun's plural form can be used as an infix
 	bool InfixPersonalName;			/// Whether the noun can be used as an infix for personal names
 	bool InfixSettlementName;		/// Whether the noun can be used as an infix for settlement names
 	bool InfixProvinceName;			/// Whether the noun can be used as an infix for province names
 	bool InfixTerrainName[WorldMapTerrainTypeMax];	/// Whether the noun can be used as an infix for names of particular terrain features
-	bool InfixItemName[MaxItemTypes];	/// Whether the noun can be used as an infix item name
+	bool InfixItemName[MaxItemClasses];	/// Whether the noun can be used as an infix item name
 };
 
 class LanguageVerb
@@ -456,17 +459,17 @@ public:
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
 	bool PrefixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a prefix for names of particular terrain features
-	bool PrefixItemName[MaxItemTypes];	/// Whether the word can be used as a prefix for item names
+	bool PrefixItemName[MaxItemClasses];	/// Whether the word can be used as a prefix for item names
 	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
 	bool SuffixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a suffix for names of particular terrain features
-	bool SuffixItemName[MaxItemTypes];	/// Whether the word can be used as a suffix for item names
+	bool SuffixItemName[MaxItemClasses];	/// Whether the word can be used as a suffix for item names
 	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
 	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
 	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
 	bool InfixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a infix for names of particular terrain features
-	bool InfixItemName[MaxItemTypes];	/// Whether the word can be used as an infix for item names
+	bool InfixItemName[MaxItemClasses];	/// Whether the word can be used as an infix for item names
 };
 
 class LanguageAdjective
@@ -499,23 +502,23 @@ public:
 	bool PersonalName;				/// Whether the word can be used as a personal name
 	bool SettlementName;			/// Whether the word can be used as a settlement name
 	bool ProvinceName;				/// Whether the word can be used as a province name
-	bool TerrainName[MaxItemTypes];	/// Whether the word can be used as an item name
-	bool ItemName[MaxItemTypes];	/// Whether the word can be used as an item name
+	bool TerrainName[MaxItemClasses];	/// Whether the word can be used as an item name
+	bool ItemName[MaxItemClasses];	/// Whether the word can be used as an item name
 	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
 	bool PrefixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a prefix for names of particular terrain features
-	bool PrefixItemName[MaxItemTypes];	/// Whether the word can be used as a prefix for item names
+	bool PrefixItemName[MaxItemClasses];	/// Whether the word can be used as a prefix for item names
 	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
 	bool SuffixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a suffix for names of particular terrain features
-	bool SuffixItemName[MaxItemTypes];	/// Whether the word can be used as a suffix for item names
+	bool SuffixItemName[MaxItemClasses];	/// Whether the word can be used as a suffix for item names
 	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
 	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
 	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
 	bool InfixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a infix for names of particular terrain features
-	bool InfixItemName[MaxItemTypes];	/// Whether the word can be used as an infix for item names
+	bool InfixItemName[MaxItemClasses];	/// Whether the word can be used as an infix for item names
 };
 
 class LanguagePronoun
@@ -583,17 +586,17 @@ public:
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
 	bool PrefixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a prefix for names of particular terrain features
-	bool PrefixItemName[MaxItemTypes];	/// Whether the word can be used as a prefix for item names
+	bool PrefixItemName[MaxItemClasses];	/// Whether the word can be used as a prefix for item names
 	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
 	bool SuffixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a suffix for names of particular terrain features
-	bool SuffixItemName[MaxItemTypes];	/// Whether the word can be used as a suffix for item names
+	bool SuffixItemName[MaxItemClasses];	/// Whether the word can be used as a suffix for item names
 	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
 	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
 	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
 	bool InfixTerrainName[WorldMapTerrainTypeMax];	/// Whether the word can be used as a infix for names of particular terrain features
-	bool InfixItemName[MaxItemTypes];	/// Whether the word can be used as an infix for item names
+	bool InfixItemName[MaxItemClasses];	/// Whether the word can be used as an infix for item names
 };
 //Wyrmgus end
 

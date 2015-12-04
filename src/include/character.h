@@ -46,6 +46,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CItem;
 class CQuest;
 class CUnitType;
 class CUpgrade;
@@ -106,7 +107,7 @@ public:
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CQuest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters
 	std::vector<CQuest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
-//	std::vector<CItem *> Items;
+	std::vector<CItem *> Items;
 	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
 };
 

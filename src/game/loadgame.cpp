@@ -102,6 +102,10 @@ void CleanModules()
 	//Wyrmgus end
 	CleanConstructions();
 	CleanDecorations();
+	//Wyrmgus start
+	CleanItemTypes();
+	CleanItems();
+	//Wyrmgus end
 	CleanMissiles();
 	//Wyrmgus start
 	CleanQuests();
@@ -223,6 +227,7 @@ void LoadGame(const std::string &filename)
 {
 	//Wyrmgus start
 	CleanPlayers(); //clean players, as they may not have been cleansed after a scenario
+	CleanItems();
 	//Wyrmgus end
 	
 	// log will be enabled if found in the save game

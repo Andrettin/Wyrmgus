@@ -293,6 +293,9 @@ set(stratagusmain_SRCS
 	src/stratagus/groups.cpp
 	src/stratagus/iolib.cpp
 	src/stratagus/luacallback.cpp
+	#Wyrmgus start
+	src/stratagus/item.cpp
+	#Wyrmgus end
 	src/stratagus/main.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/parameters.cpp
@@ -304,6 +307,7 @@ set(stratagusmain_SRCS
 	src/stratagus/script_player.cpp
 	#Wyrmgus start
 	src/stratagus/script_character.cpp
+	src/stratagus/script_item.cpp
 	src/stratagus/script_quest.cpp
 	#Wyrmgus end
 	src/stratagus/selection.cpp
@@ -568,6 +572,9 @@ set(stratagus_generic_HDRS
 	src/include/interface.h
 	src/include/iocompat.h
 	src/include/iolib.h
+	#Wyrmgus start
+	src/include/item.h
+	#Wyrmgus end
 	src/include/luacallback.h
 	src/include/map.h
 	src/include/master.h

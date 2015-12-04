@@ -704,7 +704,7 @@ static int CclGetGrandStrategyHeroes(lua_State *l)
 // ----------------------------------------------------------------------------
 
 /**
-**  Register CCL features for quests.
+**  Register CCL features for characters.
 */
 void CharacterCclRegister()
 {

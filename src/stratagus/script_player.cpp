@@ -43,6 +43,7 @@
 //Wyrmgus start
 #include "font.h"
 #include "grand_strategy.h"
+#include "item.h"
 //Wyrmgus end
 #include "map.h"
 #include "script.h"
@@ -843,7 +844,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						noun->TerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						noun->ItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-singular")) {
@@ -868,7 +869,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						noun->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						noun->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-singular")) {
@@ -893,7 +894,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						noun->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						noun->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-singular")) {
@@ -918,7 +919,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						noun->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						noun->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
@@ -1035,7 +1036,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						verb->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						verb->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
@@ -1054,7 +1055,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						verb->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						verb->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
@@ -1073,7 +1074,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						verb->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						verb->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
@@ -1130,7 +1131,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						adjective->TerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						adjective->ItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-personal-name")) {
@@ -1149,7 +1150,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						adjective->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						adjective->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
@@ -1168,7 +1169,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						adjective->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						adjective->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
@@ -1187,7 +1188,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						adjective->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						adjective->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
@@ -1325,7 +1326,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						numeral->PrefixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						numeral->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
@@ -1344,7 +1345,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						numeral->SuffixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						numeral->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
@@ -1363,7 +1364,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 						numeral->InfixTerrainName[terrain_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-item-name")) {
 						++n;
-						int item_type = GetItemTypeIdByName(LuaToString(l, -1, n + 1));
+						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
 						++n;
 						numeral->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
@@ -1455,7 +1456,7 @@ static int CclDefineLanguageNoun(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				noun->ItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1485,7 +1486,7 @@ static int CclDefineLanguageNoun(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				noun->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1515,7 +1516,7 @@ static int CclDefineLanguageNoun(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				noun->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1545,7 +1546,7 @@ static int CclDefineLanguageNoun(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				noun->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1653,7 +1654,7 @@ static int CclDefineLanguageVerb(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				verb->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1679,7 +1680,7 @@ static int CclDefineLanguageVerb(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				verb->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1705,7 +1706,7 @@ static int CclDefineLanguageVerb(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				verb->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1773,7 +1774,7 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				adjective->ItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1799,7 +1800,7 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				adjective->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1825,7 +1826,7 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				adjective->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1851,7 +1852,7 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				adjective->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1953,7 +1954,7 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				numeral->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -1979,7 +1980,7 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				numeral->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
@@ -2005,7 +2006,7 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemTypeIdByName(LuaToString(l, -1, k + 1));
+				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				numeral->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
 			}
