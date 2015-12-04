@@ -95,7 +95,7 @@ CSound *SoundForName(const std::string &name)
 	if (sound) {
 		return sound;
 	}
-	DebugPrint("Can't find sound `%s' in sound table\n" _C_ name.c_str());
+	DebugPrint("Can't find sound '%s' in sound table\n" _C_ name.c_str());
 	return NULL;
 }
 
@@ -116,7 +116,7 @@ CSound *MakeSound(const std::string &name, const std::vector<std::string> &files
 	CSound *sound = FindSound(name);
 
 	if (sound) {
-		DebugPrint("re-register sound `%s'\n" _C_ name.c_str());
+		DebugPrint("re-register sound '%s'\n" _C_ name.c_str());
 		return sound;
 	}
 
@@ -145,7 +145,7 @@ CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second)
 	CSound *sound = FindSound(name);
 
 	if (sound) {
-		DebugPrint("re-register sound `%s'\n" _C_ name.c_str());
+		DebugPrint("re-register sound '%s'\n" _C_ name.c_str());
 		return sound;
 	}
 

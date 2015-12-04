@@ -58,9 +58,7 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"
-//Wyrmgus start
 #include "translate.h"
-//Wyrmgus end
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"

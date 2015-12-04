@@ -138,7 +138,7 @@ CCursor *CursorByIdent(const std::string &ident)
 			return &cursor;
 		}
 	}
-	DebugPrint("Cursor `%s' not found, please check your code.\n" _C_ ident.c_str());
+	DebugPrint("Cursor '%s' not found, please check your code.\n" _C_ ident.c_str());
 	return NULL;
 }
 
