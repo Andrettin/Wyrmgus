@@ -311,6 +311,7 @@ public:
 	PixelPos GetMapPixelPosCenter() const;
 	
 	//Wyrmgus start
+	int GetModifiedVariable(int index) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;

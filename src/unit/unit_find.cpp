@@ -745,7 +745,10 @@ private:
 		const CPlayer &player = *attacker->Player;
 		const CUnitType &type = *attacker->Type;
 		const CUnitType &dtype = *dest->Type;
-		const int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+		//Wyrmgus start
+//		const int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+		const int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
+		//Wyrmgus end
 
 		//Wyrmgus start
 //		if (!player.IsEnemy(*dest) // a friend or neutral
@@ -968,7 +971,10 @@ public:
 					d = attacker->MapDistanceTo(*dest);
 				}
 
-				int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+				//Wyrmgus start
+//				int attackrange = attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+				int attackrange = attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
+				//Wyrmgus end
 				if (d <= attackrange ||
 					(d <= range && UnitReachable(*attacker, *dest, attackrange))) {
 					++enemy_count;
@@ -1234,7 +1240,10 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred)
 {
 	Assert(unit.Type->CanAttack);
-	return AttackUnitsInDistance(unit, unit.Stats->Variables[ATTACKRANGE_INDEX].Max, pred);
+	//Wyrmgus start
+//	return AttackUnitsInDistance(unit, unit.Stats->Variables[ATTACKRANGE_INDEX].Max, pred);
+	return AttackUnitsInDistance(unit, unit.GetModifiedVariable(ATTACKRANGE_INDEX), pred);
+	//Wyrmgus end
 }
 
 CUnit *AttackUnitsInRange(const CUnit &unit)

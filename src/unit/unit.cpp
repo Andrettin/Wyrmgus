@@ -1246,16 +1246,16 @@ static void RemoveUnitFromContainer(CUnit &unit)
 //Wyrmgus start
 void CUnit::UpdateContainerAttackRange()
 {
-	//reset attack range, if this unit is a container from which units can attack, but which doesn't have a native attack range
-	if (this->Stats->Variables[ATTACKRANGE_INDEX].Max == 0 && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->CanAttack) {
+	//reset attack range, if this unit is a container from which units can attack
+	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->CanAttack) {
 		this->Variable[ATTACKRANGE_INDEX].Max = 0;
 		this->Variable[ATTACKRANGE_INDEX].Value = 0;
 		if (this->BoardCount > 0) {
 			CUnit *boarded_unit = this->UnitInside;
 			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
-				if (boarded_unit->Variable[ATTACKRANGE_INDEX].Value > this->Variable[ATTACKRANGE_INDEX].Value && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if container has no range by itself, but the unit has range, and the unit can attack from a transporter, change the container's range to the unit's
-					this->Variable[ATTACKRANGE_INDEX].Max = boarded_unit->Variable[ATTACKRANGE_INDEX].Max;
-					this->Variable[ATTACKRANGE_INDEX].Value = boarded_unit->Variable[ATTACKRANGE_INDEX].Value;
+				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > this->Variable[ATTACKRANGE_INDEX].Value && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if container has no range by itself, but the unit has range, and the unit can attack from a transporter, change the container's range to the unit's
+					this->Variable[ATTACKRANGE_INDEX].Max = boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX);
+					this->Variable[ATTACKRANGE_INDEX].Value = boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX);
 				}
 			}
 		}
@@ -2619,6 +2619,17 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 }
 
 //Wyrmgus start
+int CUnit::GetModifiedVariable(int index) const
+{
+	int value = Variable[index].Value;
+	
+	if (index == ATTACKRANGE_INDEX && Container) {
+		value += Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
+	}
+	
+	return value;
+}
+
 CAnimations *CUnit::GetAnimations() const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];
@@ -2867,7 +2878,10 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 
 	const int d = unit.MapDistanceTo(dest);
 
-	if (d <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max && d >= type.MinAttackRange) {
+	//Wyrmgus start
+//	if (d <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max && d >= type.MinAttackRange) {
+	if (d <= unit.GetModifiedVariable(ATTACKRANGE_INDEX) && d >= type.MinAttackRange) {
+	//Wyrmgus end
 		cost += d * INRANGE_FACTOR;
 		cost -= INRANGE_BONUS;
 	} else {

@@ -889,7 +889,11 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 				}
 			}
 			if (Preference.ShowAttackRange) {
-				const int value = stats.Variables[ATTACKRANGE_INDEX].Max;
+				//Wyrmgus start
+//				const int value = stats.Variables[ATTACKRANGE_INDEX].Max;
+				const int value = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
+				
+				//Wyrmgus end
 				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
 
 				if (value) {

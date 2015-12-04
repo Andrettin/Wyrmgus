@@ -242,7 +242,10 @@ void DrawBuildingCursor()
 	DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	//Wyrmgus end
 	
-	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
+	//Wyrmgus start
+//	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0) {
+	if (CursorBuilding->CanAttack && CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Value > 0 && !CursorBuilding->CanTransport()) {
+	//Wyrmgus end
 		const PixelPos center(screenPos + CursorBuilding->GetPixelSize() / 2);
 		const int radius = (CursorBuilding->Stats->Variables[ATTACKRANGE_INDEX].Max + (CursorBuilding->TileWidth - 1)) * PixelTileSize.x + 1;
 		Video.DrawCircleClip(ColorRed, center.x, center.y, radius);

@@ -119,7 +119,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->SetGoal(&target);
 	//Wyrmgus start
 //	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
-	order->Range = attacker.Variable[ATTACKRANGE_INDEX].Value;
+	order->Range = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 	//Wyrmgus end
 	order->MinRange = attacker.Type->MinAttackRange;
 
@@ -144,7 +144,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		order->goalPos = dest;
 		//Wyrmgus start
 //		order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
-		order->Range = attacker.Variable[ATTACKRANGE_INDEX].Value;
+		order->Range = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 		//Wyrmgus end
 		order->MinRange = attacker.Type->MinAttackRange;
 	} else {
@@ -160,7 +160,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	order->goalPos = dest;
 	//Wyrmgus start
 //	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
-	order->Range = attacker.Variable[ATTACKRANGE_INDEX].Value;
+	order->Range = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 	//Wyrmgus end
 	order->MinRange = attacker.Type->MinAttackRange;
 
@@ -308,7 +308,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		}
 		//Wyrmgus start
 //		if (goal->CurrentAction() == UnitActionAttack) {
-		if (goal->CurrentAction() == UnitActionAttack && unit.MapDistanceTo(*goal) <= unit.Variable[ATTACKRANGE_INDEX].Value) {
+		if (goal->CurrentAction() == UnitActionAttack && unit.MapDistanceTo(*goal) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 		//Wyrmgus end
 			const COrder_Attack &order = *static_cast<COrder_Attack *>(goal->CurrentOrder());
 			if (order.GetGoal() == &unit) {
@@ -395,7 +395,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			this->MinRange = unit.Type->MinAttackRange;
 			//Wyrmgus start
 //			this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-			this->Range = unit.Variable[ATTACKRANGE_INDEX].Value;
+			this->Range = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 			//Wyrmgus end
 			this->goalPos = goal->tilePos;
 			this->State |= WEAK_TARGET; // weak target
@@ -442,7 +442,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->CurrentAction() == UnitActionMove) {
-					if ((this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) <= unit.Variable[ATTACKRANGE_INDEX].Value) || (!this->HasGoal() && unit.MapDistanceTo(this->goalPos) <= unit.Variable[ATTACKRANGE_INDEX].Value)) {
+					if ((this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) || (!this->HasGoal() && unit.MapDistanceTo(this->goalPos) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
 						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
 							CommandStopUnit(*table[i]);
 						}
@@ -464,7 +464,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		// Check if we're in range when attacking a location and we are waiting
 		//Wyrmgus start
 //		if (unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-		if (unit.MapDistanceTo(this->goalPos) <= unit.Variable[ATTACKRANGE_INDEX].Value) {
+		if (unit.MapDistanceTo(this->goalPos) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
@@ -485,7 +485,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		// Have reached target? FIXME: could use the new return code?
 		//Wyrmgus start
 //		if (goal && unit.MapDistanceTo(*goal) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-		if (goal && unit.MapDistanceTo(*goal) <= unit.Variable[ATTACKRANGE_INDEX].Value) {
+		if (goal && unit.MapDistanceTo(*goal) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
@@ -520,7 +520,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			//Wyrmgus end
 			//Wyrmgus start
 //			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			&& unit.MapDistanceTo(this->goalPos) <= unit.Variable[ATTACKRANGE_INDEX].Value) {
+			&& unit.MapDistanceTo(this->goalPos) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 			//Wyrmgus end
 			//Wyrmgus start
 //			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
@@ -632,7 +632,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		this->MinRange = unit.Type->MinAttackRange;
 		//Wyrmgus start
 //		this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
-		this->Range = unit.Variable[ATTACKRANGE_INDEX].Value;
+		this->Range = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 		//Wyrmgus end
 		this->State |= WEAK_TARGET;
 
@@ -658,7 +658,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	const int dist = unit.MapDistanceTo(*goal);
 	//Wyrmgus start
 //	if (dist > unit.Stats->Variables[ATTACKRANGE_INDEX].Max
-	if (dist > unit.Variable[ATTACKRANGE_INDEX].Value
+	if (dist > unit.GetModifiedVariable(ATTACKRANGE_INDEX)
 	//Wyrmgus end
 		//Wyrmgus start
 //		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
@@ -751,7 +751,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				if (unit.Type->MinAttackRange < dist &&
 					//Wyrmgus start
 //					dist <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-					dist <= unit.Variable[ATTACKRANGE_INDEX].Value) {
+					dist <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 					//Wyrmgus end
 					//Wyrmgus start
 //					if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
@@ -782,7 +782,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			// add instance for attack ground without moving
 			//Wyrmgus start
 //			} else if (this->Action == UnitActionAttackGround && unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
-			} else if (this->Action == UnitActionAttackGround && unit.MapDistanceTo(this->goalPos) <= unit.Variable[ATTACKRANGE_INDEX].Value) {
+			} else if (this->Action == UnitActionAttackGround && unit.MapDistanceTo(this->goalPos) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 			//Wyrmgus end
 				if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
 					// Reached wall or ground, now attacking it

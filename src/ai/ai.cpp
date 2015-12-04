@@ -717,7 +717,10 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 					const CUnit *oldGoal = orderAttack.GetGoal();
 
 					if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
-											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+											//Wyrmgus start
+//											&& aiunit.MapDistanceTo(defender) <= aiunit.Stats->Variables[ATTACKRANGE_INDEX].Max)) {
+											&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
+											//Wyrmgus end
 						shouldAttack = true;
 					}
 				}

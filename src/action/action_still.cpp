@@ -144,7 +144,10 @@ private:
 	bool IsDistanceCorrect(int distance) const
 	{
 		return attacker->Type->MinAttackRange < distance
-			   && distance <= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+			   //Wyrmgus start
+//			   && distance <= attacker->Stats->Variables[ATTACKRANGE_INDEX].Max;
+			   && distance <= attacker->GetModifiedVariable(ATTACKRANGE_INDEX);
+			   //Wyrmgus end
 	}
 private:
 	const CUnit *attacker;
@@ -500,7 +503,10 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	}
 	// If unit is removed, use container's x and y
 	const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
-	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+	//Wyrmgus start
+//	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
+	if (firstContainer->MapDistanceTo(*autoAttackUnit) > unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
+	//Wyrmgus end
 		return false;
 	}
 	//Wyrmgus start
