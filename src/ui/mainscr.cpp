@@ -56,6 +56,9 @@
 #include "unit.h"
 #include "unitsound.h"
 #include "unittype.h"
+//Wyrmgus start
+#include "util.h"
+//Wyrmgus end
 #include "upgrade.h"
 #include "video.h"
 
@@ -643,7 +646,17 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			if (!Preference.NoStatusLineTooltips) {
 				UI.StatusLine.Set(uins->GetTypeName());
 			}
-			DrawGenericPopup(uins->GetTypeName(), UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
+			//hackish way to make the popup appear correctly for the inventory item
+			ButtonAction *ba = new ButtonAction;
+			ba->Hint = uins->GetTypeName();
+			ba->Pos = j;
+			ba->Level = unit.Type->ButtonLevelForInventory;
+			ba->Action = ButtonButton;
+			ba->Value = uins->Type->Slot;
+			ba->Popup = "popup-item-inventory";
+			DrawPopup(*ba, UI.InventoryButtons[j], UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
+			delete ba;
+			LastDrawnButtonPopup = NULL;
 			//Wyrmgus end
 		}
 		++j;

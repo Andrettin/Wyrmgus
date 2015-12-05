@@ -858,6 +858,11 @@ void DrawGenericPopup(std::string popup_text, int x, int y)
 						 ? std::min(MaxWidth, popupWidth - 2 * MARGIN_X)
 						 : 0;
 	while ((sub = GetLineFont(++i, popup_text, width, &font)).length()) {
+		if (sub.find("LINE", 0) != std::string::npos) {
+			Video.FillRectangle(BorderColor, x - MARGIN_X + 1 - MARGIN_X,
+								y_off, popupWidth - 2, 1);
+			sub = sub.substr(sub.find("LINE", 0) + 4, sub.length());
+		}
 		int cost_symbol_pos = sub.find("COST_", 0);
 		if (cost_symbol_pos != std::string::npos) {
 			int x_offset = 0;

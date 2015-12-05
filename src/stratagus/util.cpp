@@ -753,6 +753,27 @@ std::string DecapitalizeString(std::string text)
 	return text;
 }
 
+std::string FullyCapitalizeString(std::string text)
+{
+	text = CapitalizeString(text);
+	
+    size_t pos = 0;
+    while ((pos = text.find(" ", pos)) != std::string::npos) {
+		text.substr(pos + 1, pos + 2) = CapitalizeString(text.substr(pos + 1, pos + 2));
+        pos += 1;
+    }
+	
+	return text;
+}
+
+std::string IdentToName(std::string text)
+{
+	text = FindAndReplaceString(text, "-", " ");
+	text = FullyCapitalizeString(text);
+	
+	return text;
+}
+
 std::string SeparateCapitalizedStringElements(std::string text)
 {
 	for (size_t pos = 1; pos < text.length(); ++pos) {
