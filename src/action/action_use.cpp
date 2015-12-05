@@ -196,7 +196,13 @@ enum {
 
 		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value)) {
 			std::string unit_name = unit.Name + " (" + unit.GetTypeName() + ")";
-			if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
+			if (unit.Type->BoolFlag[INVENTORY_INDEX].value && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass != -1 && goal->Type->ItemClass != PotionItemClass) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)
+				if (!unit.IsItemEquipped(goal)) {
+					unit.EquipItem(*goal);
+				} else {
+					unit.DeequipItem(*goal);
+				}
+			} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
 				if (unit.Player == ThisPlayer) {
 					unit.Player->Notify(NotifyGreen, unit.tilePos, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
 				}
@@ -223,13 +229,15 @@ enum {
 				return;
 			}
 			PlayUnitSound(*goal, VoiceUsed);
-			if (goal->Container == NULL) {
-				goal->Remove(NULL);
-				LetUnitDie(*goal);
-			} else {
-				UnitLost(*goal);
-				UnitClearOrders(*goal);
-				goal->Release();
+			if (goal->Type->BoolFlag[POWERUP_INDEX].value || goal->Type->ItemClass == PotionItemClass) { //only destroy item if it is consumable
+				if (goal->Container == NULL) {
+					goal->Remove(NULL);
+					LetUnitDie(*goal);
+				} else {
+					UnitLost(*goal);
+					UnitClearOrders(*goal);
+					goal->Release();
+				}
 			}
 		}
 		

@@ -884,6 +884,16 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					if (unit.Player->Index != player.Index) {
 						continue;
 					}
+					
+					//Wyrmgus start
+					if (
+						(AllUpgrades[um->UpgradeId]->Weapon && unit.Weapon != NULL)
+						|| (AllUpgrades[um->UpgradeId]->Shield && unit.Shield != NULL)
+					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
+						continue;
+					}
+					//Wyrmgus end
+					
 					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 						unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 						if (um->ModifyPercent[j]) {
@@ -1107,6 +1117,16 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					if (unit.Player->Index != player.Index) {
 						continue;
 					}
+					
+					//Wyrmgus start
+					if (
+						(AllUpgrades[um->UpgradeId]->Weapon && unit.Weapon != NULL)
+						|| (AllUpgrades[um->UpgradeId]->Shield && unit.Shield != NULL)
+					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
+						continue;
+					}
+					//Wyrmgus end
+					
 					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 						unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 						if (um->ModifyPercent[j]) {
@@ -1215,7 +1235,10 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	}
 }
 
-static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
+//Wyrmgus start
+//static void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
+void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
+//Wyrmgus end
 {
 	Assert(um);
 

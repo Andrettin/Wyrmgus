@@ -175,6 +175,8 @@ public:
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
 	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false);
 	void SetVariation(int new_variation, const CUnitType *new_type = NULL);
+	void EquipItem(CUnit &item);
+	void DeequipItem(CUnit &item);
 	//Wyrmgus end
 	
 	bool RestoreOrder();
@@ -312,6 +314,7 @@ public:
 	
 	//Wyrmgus start
 	int GetModifiedVariable(int index) const;
+	bool IsItemEquipped(CUnit *item) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
@@ -352,6 +355,11 @@ public:
 		int Active; /// how many units are harvesting from the resource.
 	} Resource; /// Resource still
 
+	//Wyrmgus start
+	CUnit *Weapon;		/// Pointer to unit's weapon item
+	CUnit *Shield;		/// Pointer to unit's shield item
+	//Wyrmgus end
+	
 	Vec2i tilePos; /// Map position X
 	//Wyrmgus start
 	Vec2i RallyPointPos;	/// used for storing the rally point position (where units trained by this unit will be sent to)

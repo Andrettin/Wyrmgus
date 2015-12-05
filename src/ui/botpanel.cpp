@@ -964,9 +964,27 @@ void CButtonPanel::Draw()
 				}
 				//Wyrmgus end
 			}
+			//Wyrmgus start
+			/*
 			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
 											   pos, buf, player);
+			*/
+			// if there is a single unit selected, show the icon of its weapon/shield equipped for the appropriate buttons
+			if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->Weapon != NULL) {
+				Selected[0]->Weapon->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+												   GetButtonStatus(buttons[i], ButtonUnderCursor),
+												   pos, buf, player);
+			} else if (Selected.size() == 1 && buttons[i].Action == ButtonStop && Selected[0]->Shield != NULL) {
+				Selected[0]->Shield->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+												   GetButtonStatus(buttons[i], ButtonUnderCursor),
+												   pos, buf, player);
+			} else {
+				buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+												   GetButtonStatus(buttons[i], ButtonUnderCursor),
+												   pos, buf, player);
+			}
+			//Wyrmgus end
 		}
 	}
 	//

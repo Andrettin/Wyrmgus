@@ -429,6 +429,11 @@ void CUnit::Init()
 	Resource.Workers = NULL;
 	Resource.Assigned = 0;
 	Resource.Active = 0;
+	
+	//Wyrmgus start
+	Weapon = NULL;
+	Shield = NULL;
+	//Wyrmgus end
 
 	tilePos.x = 0;
 	tilePos.y = 0;
@@ -553,6 +558,8 @@ void CUnit::Release(bool final)
 	//Wyrmgus start
 	Character = NULL;
 	Trait = NULL;
+	Weapon = NULL;
+	Shield = NULL;
 	//Wyrmgus end
 
 	delete pathFinderData;
@@ -678,6 +685,68 @@ void CUnit::SetVariation(int new_variation, const CUnitType *new_type)
 		this->Frame = this->Type->StillFrame;
 	}
 	this->Variation = new_variation;
+}
+
+void CUnit::EquipItem(CUnit &item)
+{
+	int item_class = item.Type->ItemClass;
+	if (GetItemClassSlot(item_class) == WeaponItemSlot) {
+		if (Weapon != NULL) {
+			DeequipItem(*Weapon);
+		}
+		// remove the upgrade modifiers from weapon technologies
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
+				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
+		}
+		Weapon = &item;
+	} else if (GetItemClassSlot(item_class) == ShieldItemSlot) {
+		if (Shield != NULL) {
+			DeequipItem(*Shield);
+		}
+		// remove the upgrade modifiers from shield technologies
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
+				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
+		}
+		Shield = &item;
+	}
+	
+	//add item bonuses
+	Variable[BASICDAMAGE_INDEX].Value += item.Variable[BASICDAMAGE_INDEX].Value;
+	Variable[BASICDAMAGE_INDEX].Max += item.Variable[BASICDAMAGE_INDEX].Max;
+	Variable[ARMOR_INDEX].Value += item.Variable[ARMOR_INDEX].Value;
+	Variable[ARMOR_INDEX].Max += item.Variable[ARMOR_INDEX].Max;
+}
+
+void CUnit::DeequipItem(CUnit &item)
+{
+	//remove item bonuses
+	Variable[BASICDAMAGE_INDEX].Value -= item.Variable[BASICDAMAGE_INDEX].Value;
+	Variable[BASICDAMAGE_INDEX].Max -= item.Variable[BASICDAMAGE_INDEX].Max;
+	Variable[ARMOR_INDEX].Value -= item.Variable[ARMOR_INDEX].Value;
+	Variable[ARMOR_INDEX].Max -= item.Variable[ARMOR_INDEX].Max;
+	
+	int item_class = item.Type->ItemClass;
+	if (GetItemClassSlot(item_class) == WeaponItemSlot) {
+		Weapon = NULL;
+		// restore the upgrade modifiers from weapon technologies
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
+				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
+		}
+	} else if (GetItemClassSlot(item_class) == ShieldItemSlot) {
+		Shield = NULL;
+		// restore the upgrade modifiers from shield technologies
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
+				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
+		}
+	}
 }
 //Wyrmgus end
 
@@ -2068,7 +2137,15 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	//apply upgrades of the new player, if the old one doesn't have that upgrade
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (oldplayer->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] != 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') { //if the old player doesn't have the modifier's upgrade, and the upgrade is applicable to the unit
-			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			//Wyrmgus start
+//			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			if ( // don't apply equipment-related upgrades if the unit has an item of that equipment type equipped
+				(!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon || Weapon == NULL)
+				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield || Shield == NULL)
+			) {
+				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
+			//Wyrmgus end
 		}
 	}
 
@@ -2631,6 +2708,15 @@ int CUnit::GetModifiedVariable(int index) const
 	}
 	
 	return value;
+}
+
+bool CUnit::IsItemEquipped(CUnit *item) const
+{
+	if (Weapon == item || Shield == item) {
+		return true;
+	}
+	
+	return false;
 }
 
 CAnimations *CUnit::GetAnimations() const

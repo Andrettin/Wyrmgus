@@ -627,12 +627,15 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 		CIcon &icon = *uins->Type->Icon.Icon;
 		int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   IconActive : 0;
-		if ((MouseButtons & LeftButton) || (MouseButtons & RightButton)) {
+		if (flag && ((MouseButtons & LeftButton) || (MouseButtons & RightButton))) {
 			flag |= IconClicked;
 		}
 		flag |= IconCommandButton;
+		if (unit.IsItemEquipped(uins)) {
+			flag |= IconSelected;
+		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
+		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->Index);
 		if (ButtonAreaUnderCursor == ButtonAreaInventory
 			&& static_cast<size_t>(ButtonUnderCursor) == j) {
 			//Wyrmgus start
