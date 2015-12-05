@@ -604,17 +604,60 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 			&& static_cast<size_t>(ButtonUnderCursor) == j) {
 			//Wyrmgus start
 //			UI.StatusLine.Set(uins->Type->Name);
+			std::string tooltip;
 			VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
 			if (varinfo && !varinfo->TypeName.empty()) {
-				UI.StatusLine.Set(varinfo->TypeName);
+				tooltip = varinfo->TypeName;
 			} else {
-				UI.StatusLine.Set(uins->Type->Name);
+				tooltip = uins->Type->Name;
 			}
+			if (!Preference.NoStatusLineTooltips) {
+				UI.StatusLine.Set(tooltip);
+			}
+			DrawGenericPopup(tooltip, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 			//Wyrmgus end
 		}
 		++j;
 	}
 }
+
+//Wyrmgus start
+static void DrawUnitInfo_inventory(CUnit &unit)
+{
+	CUnit *uins = unit.UnitInside;
+	size_t j = 0;
+
+	for (int i = 0; i < unit.InsideCount; ++i, uins = uins->NextContained) {
+		if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
+			continue;
+		}
+		CIcon &icon = *uins->Type->Icon.Icon;
+		int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
+				   (IconActive | (MouseButtons & LeftButton)) : 0;
+		flag |= IconCommandButton;
+		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
+		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
+		if (ButtonAreaUnderCursor == ButtonAreaInventory
+			&& static_cast<size_t>(ButtonUnderCursor) == j) {
+			//Wyrmgus start
+//			UI.StatusLine.Set(uins->Type->Name);
+			std::string tooltip;
+			VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
+			if (varinfo && !varinfo->TypeName.empty()) {
+				tooltip = varinfo->TypeName;
+			} else {
+				tooltip = uins->Type->Name;
+			}
+			if (!Preference.NoStatusLineTooltips) {
+				UI.StatusLine.Set(tooltip);
+			}
+			DrawGenericPopup(tooltip, UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
+			//Wyrmgus end
+		}
+		++j;
+	}
+}
+//Wyrmgus end
 
 /**
 **  Draw the unit info into top-panel.
@@ -661,6 +704,13 @@ static void DrawUnitInfo(CUnit &unit)
 		DrawUnitInfo_transporter(unit);
 		return;
 	}
+	
+	//Wyrmgus start
+	if (type.BoolFlag[INVENTORY_INDEX].value && unit.InsideCount && CurrentButtonLevel == unit.Type->ButtonLevelForInventory) {
+		DrawUnitInfo_inventory(unit);
+		return;
+	}
+	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------

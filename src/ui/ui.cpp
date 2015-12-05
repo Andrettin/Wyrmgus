@@ -384,6 +384,7 @@ void CleanUserInterface()
 	//Wyrmgus start
 	delete UI.IdleWorkerButton;
 	delete UI.LevelUpUnitButton;
+	UI.InventoryButtons.clear();
 	//Wyrmgus end
 	UI.UserButtons.clear();
 

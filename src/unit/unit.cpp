@@ -1246,7 +1246,7 @@ static void RemoveUnitFromContainer(CUnit &unit)
 //Wyrmgus start
 void CUnit::UpdateContainerAttackRange()
 {
-	//reset attack range, if this unit is a container from which units can attack
+	//reset attack range, if this unit is a transporter (or garrisonable building) from which units can attack
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->CanAttack) {
 		this->Variable[ATTACKRANGE_INDEX].Max = 0;
 		this->Variable[ATTACKRANGE_INDEX].Value = 0;

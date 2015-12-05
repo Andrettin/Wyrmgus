@@ -211,9 +211,18 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 	if (!FindUnloadPosition(transporter, unit, transporter.tilePos, maxRange, &pos)) {
 		return false;
 	}
+	//Wyrmgus start
+	/*
 	unit.Boarded = 0;
 	unit.Place(pos);
 	transporter.BoardCount -= unit.Type->BoardSize;
+	*/
+	if (unit.Boarded) {
+		unit.Boarded = 0;
+		transporter.BoardCount -= unit.Type->BoardSize;
+	}
+	unit.Place(pos);
+	//Wyrmgus end
 	//Wyrmgus start
 	//if transporter has a rally point (useful for towers), send the unloaded unit there
 	if (transporter.RallyPointPos.x != -1 && transporter.RallyPointPos.y != -1 && unit.CanMove()) {

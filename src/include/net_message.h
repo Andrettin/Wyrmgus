@@ -294,6 +294,9 @@ enum _message_type_ {
 	MessageCommandDefend,          /// Unit command defend
 	MessageCommandFollow,          /// Unit command follow
 	MessageCommandMove,            /// Unit command move
+	//Wyrmgus start
+	MessageCommandPickUp,		   /// Unit command pick up
+	//Wyrmgus end
 	MessageCommandRepair,          /// Unit command repair
 	MessageCommandAutoRepair,      /// Unit command autorepair
 	MessageCommandAttack,          /// Unit command attack

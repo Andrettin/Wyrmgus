@@ -56,6 +56,9 @@ enum UnitAction {
 	UnitActionMove,         /// unit moves to position/unit
 	UnitActionAttack,       /// unit attacks position/unit
 	UnitActionAttackGround, /// unit attacks ground
+	//Wyrmgus start
+	UnitActionPickUp,		/// unit picks up an item
+	//Wyrmgus end
 	UnitActionDie,          /// unit dies
 
 	UnitActionSpellCast,    /// unit casts spell
@@ -63,7 +66,7 @@ enum UnitAction {
 	UnitActionTrain,        /// building is training
 	UnitActionUpgradeTo,    /// building is upgrading itself
 	UnitActionResearch,     /// building is researching spell
-	UnitActionBuilt,      /// building is under construction
+	UnitActionBuilt,		/// building is under construction
 
 	// Compound actions
 	UnitActionBoard,        /// unit entering transporter
@@ -136,6 +139,9 @@ public:
 	static COrder *NewActionFollow(CUnit &dest);
 	static COrder *NewActionMove(const Vec2i &pos);
 	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+	//Wyrmgus start
+	static COrder *NewActionPickUp(CUnit &dest);
+	//Wyrmgus end
 	static COrder *NewActionRepair(CUnit &unit, CUnit &target);
 	static COrder *NewActionRepair(const Vec2i &pos);
 	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade);

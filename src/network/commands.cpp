@@ -151,6 +151,23 @@ void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos)
 		NetworkSendCommand(MessageCommandMove, unit, pos.x, pos.y, NoUnitP, 0, 0);
 	}
 }
+
+/**
+** Send command: Pick up item.
+**
+** @param unit    pointer to unit.
+** @param dest    pick up this item.
+** @param flush   Flag flush all pending commands.
+*/
+void SendCommandPickUp(CUnit &unit, CUnit &dest, int flush)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("pick-up", &unit, flush, -1, -1, &dest, NULL, -1);
+		CommandPickUp(unit, dest, flush);
+	} else {
+		NetworkSendCommand(MessageCommandPickUp, unit, 0, 0, &dest, 0, flush);
+	}
+}
 //Wyrmgus end
 
 /**
@@ -694,6 +711,17 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			}
 			//Wyrmgus end
 			break;
+		//Wyrmgus start
+		case MessageCommandPickUp: {
+			if (dstnr != (unsigned short)0xFFFF) {
+				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				Assert(dest.Type);
+				CommandLog("pick-up", &unit, status, -1, -1, &dest, NULL, -1);
+				CommandPickUp(unit, dest, status);
+			}
+			break;
+		}
+		//Wyrmgus end
 		case MessageCommandRepair: {
 			CUnit *dest = NoUnitP;
 			if (dstnr != (unsigned short)0xFFFF) {

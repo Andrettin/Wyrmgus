@@ -298,6 +298,9 @@ static int GetButtonStatus(const ButtonAction &button, int UnderCursor)
 				if (saction != UnitActionMove &&
 					saction != UnitActionBuild &&
 					saction != UnitActionFollow &&
+					//Wyrmgus start
+					saction != UnitActionPickUp &&
+					//Wyrmgus end
 					saction != UnitActionDefend) {
 					break;
 				}

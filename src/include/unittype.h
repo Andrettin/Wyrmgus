@@ -764,6 +764,9 @@ public:
 	int MaxOnBoard;                 /// Number of Transporter slots.
 	int BoardSize;                  /// How much "cells" unit occupies inside transporter
 	int ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
+	//Wyrmgus start
+	int ButtonLevelForInventory;	/// On which button level the game will show items inside inventory
+	//Wyrmgus end
 	int StartingResources;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
 	UnitTypeType UnitType;          /// Land / fly / naval

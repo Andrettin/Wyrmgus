@@ -332,6 +332,19 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			}
 		}
 	}
+	//Wyrmgus start
+	// Pick up an item
+	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
+		&& unit.Type->BoolFlag[INVENTORY_INDEX].value && dest->Type->BoolFlag[ITEM_INDEX].value) {
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandPickUp(unit, *dest, flush);
+		return true;
+	}
+	//Wyrmgus end
 	// Follow another unit
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
 		//Wyrmgus start
@@ -408,6 +421,18 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 		}
 		return true;
 	}
+	//Wyrmgus start
+	// Pick up an item
+	if (&dest != &unit && unit.Type->BoolFlag[INVENTORY_INDEX].value && dest.Type->BoolFlag[ITEM_INDEX].value) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandPickUp(unit, dest, flush);
+		return true;
+	}
+	//Wyrmgus end
 	if ((dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) && &dest != &unit) {
 		dest.Blink = 4;
 		if (!acknowledged) {
@@ -485,6 +510,18 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 
 static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
 {
+	//Wyrmgus start
+	// Pick up an item
+	if (unit.Type->BoolFlag[INVENTORY_INDEX].value && dest.Type->BoolFlag[ITEM_INDEX].value) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandPickUp(unit, dest, flush);
+		return true;
+	}
+	//Wyrmgus end
 	if (dest.Player == unit.Player || unit.IsAllied(dest) || dest.Player->Index == PlayerNumNeutral) {
 		dest.Blink = 4;
 		if (!acknowledged) {
@@ -830,6 +867,21 @@ static void HandleMouseOn(const PixelPos screenPos)
 				}
 			}
 		}
+		//Wyrmgus start
+		if (Selected.size() == 1 && Selected[0]->Type->BoolFlag[INVENTORY_INDEX].value) {
+			const size_t size = UI.InventoryButtons.size();
+
+			for (size_t i = std::min<size_t>(Selected[0]->InsideCount, size); i != 0;) {
+				--i;
+				if (UI.InventoryButtons[i].Contains(screenPos)) {
+					ButtonAreaUnderCursor = ButtonAreaInventory;
+					ButtonUnderCursor = i;
+					CursorOn = CursorOnButton;
+					return;
+				}
+			}
+		}
+		//Wyrmgus end
 		if (Selected.size() == 1) {
 			if (Selected[0]->CurrentAction() == UnitActionTrain) {
 				if (Selected[0]->Orders.size() == 1) {
@@ -2101,6 +2153,31 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					}
 				}
 			}
+		//Wyrmgus start
+		} else if (ButtonAreaUnderCursor == ButtonAreaInventory) {
+			//  for inventory unit
+			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
+				if (Selected[0]->InsideCount >= ButtonUnderCursor) {
+					CUnit *uins = Selected[0]->UnitInside;
+					size_t j = 0;
+
+					for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+						if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
+							continue;
+						}
+						if (ButtonAreaUnderCursor == ButtonAreaInventory
+							&& static_cast<size_t>(ButtonUnderCursor) == j) {
+								Assert(uins->Type->BoolFlag[ITEM_INDEX].value);
+								const int flush = !(KeyModifiers & ModifierShift);
+								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
+									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+								}
+						}
+						++j;
+					}
+				}
+			}
+		//Wyrmgus end
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {

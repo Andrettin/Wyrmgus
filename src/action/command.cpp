@@ -346,6 +346,45 @@ void CommandRallyPoint(CUnit &unit, const Vec2i &pos)
 	}
 	unit.RallyPointPos = pos;
 }
+
+/**
+**  Pick up item
+**
+**  @param unit   pointer to unit.
+**  @param dest   item to be picked up
+**  @param flush  if true, flush command queue.
+*/
+void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	//Wyrmgus start
+	CMapField &mf = *Map.Field(unit.tilePos);
+	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
+		std::vector<CUnit *> table;
+		Select(unit.tilePos, unit.tilePos, table);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
+				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
+			}
+		}
+	}
+	//Wyrmgus end
+	COrderPtr *order;
+
+	if (!unit.CanMove()) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
+	}
+	*order = COrder::NewActionPickUp(dest);
+	ClearSavedAction(unit);
+}
 //Wyrmgus end
 
 /**

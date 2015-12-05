@@ -70,6 +70,9 @@ set(action_SRCS
 	src/action/action_die.cpp
 	src/action/action_follow.cpp
 	src/action/action_move.cpp
+	#Wyrmgus start
+	src/action/action_pickup.cpp
+	#Wyrmgus end
 	src/action/action_patrol.cpp
 	src/action/action_repair.cpp
 	src/action/action_research.cpp
@@ -491,6 +494,9 @@ set(stratagus_action_HDRS
 	src/include/action/action_follow.h
 	src/include/action/action_move.h
 	src/include/action/action_patrol.h
+	#Wyrmgus start
+	src/include/action/action_pickup.h
+	#Wyrmgus end
 	src/include/action/action_repair.h
 	src/include/action/action_research.h
 	src/include/action/action_resource.h

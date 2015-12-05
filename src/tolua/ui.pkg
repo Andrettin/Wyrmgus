@@ -178,6 +178,7 @@ class CUserInterface
 	//Wyrmgus start
 	CUIButton *IdleWorkerButton;
 	CUIButton *LevelUpUnitButton;
+	vector<CUIButton> InventoryButtons;
 	//Wyrmgus end
 
 	CColor CompletedBarColorRGB;

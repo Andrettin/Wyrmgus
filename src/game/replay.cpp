@@ -895,6 +895,10 @@ static void DoNextReplay()
 		SendCommandFollow(*unit, *dunit, flags);
 	} else if (!strcmp(action, "move")) {
 		SendCommandMove(*unit, pos, flags);
+	//Wyrmgus start
+	} else if (!strcmp(action, "pick-up")) {
+		SendCommandPickUp(*unit, *dunit, flags);
+	//Wyrmgus end
 	} else if (!strcmp(action, "repair")) {
 		SendCommandRepair(*unit, pos, dunit, flags);
 	} else if (!strcmp(action, "auto-repair")) {

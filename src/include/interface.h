@@ -129,6 +129,7 @@ enum _button_area_ {
 	//Wyrmgus start
 	ButtonAreaIdleWorker,	 /// Idle worker button
 	ButtonAreaLevelUpUnit,	 /// Level up unit button
+	ButtonAreaInventory,  /// Transporting button
 	//Wyrmgus end
 	ButtonAreaUser           /// User buttons
 };

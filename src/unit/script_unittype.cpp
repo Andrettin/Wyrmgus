@@ -637,6 +637,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->Building = parent_type->Building;
 			type->BoardSize = parent_type->BoardSize;
 			type->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
+			type->ButtonLevelForInventory = parent_type->ButtonLevelForInventory;
 			type->StartingResources = parent_type->StartingResources;
 			type->BurnPercent = parent_type->BurnPercent;
 			type->BurnDamageRate = parent_type->BurnDamageRate;
@@ -1093,6 +1094,10 @@ static int CclDefineUnitType(lua_State *l)
 			type->BoardSize = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ButtonLevelForTransporter")) {
 			type->ButtonLevelForTransporter = LuaToNumber(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "ButtonLevelForInventory")) {
+			type->ButtonLevelForInventory = LuaToNumber(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "StartingResources")) {
 			type->StartingResources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "RegenerationRate")) {

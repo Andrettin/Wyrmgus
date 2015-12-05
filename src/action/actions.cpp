@@ -49,6 +49,9 @@
 #include "action/action_follow.h"
 #include "action/action_move.h"
 #include "action/action_patrol.h"
+//Wyrmgus start
+#include "action/action_pickup.h"
+//Wyrmgus end
 #include "action/action_repair.h"
 #include "action/action_research.h"
 #include "action/action_resource.h"
@@ -206,6 +209,10 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 		*orderPtr = new COrder_Move;
 	} else if (!strcmp(actiontype, "action-patrol")) {
 		*orderPtr = new COrder_Patrol;
+	//Wyrmgus start
+	} else if (!strcmp(actiontype, "action-pickup")) {
+		*orderPtr = new COrder_PickUp;
+	//Wyrmgus end
 	} else if (!strcmp(actiontype, "action-repair")) {
 		*orderPtr = new COrder_Repair;
 	} else if (!strcmp(actiontype, "action-research")) {

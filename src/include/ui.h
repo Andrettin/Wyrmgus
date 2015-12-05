@@ -444,6 +444,7 @@ public:
 	//Wyrmgus start
 	CUIButton *IdleWorkerButton;		/// Button for the idle worker notification
 	CUIButton *LevelUpUnitButton;		/// Button for the level up unit notification
+	std::vector<CUIButton> InventoryButtons;	/// Button info for inventory items
 	//Wyrmgus end
 	
 	// Completed bar
