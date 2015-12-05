@@ -316,6 +316,7 @@ public:
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
+	std::string GetTypeName() const;
 	//Wyrmgus end
 
 public:

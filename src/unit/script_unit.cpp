@@ -1373,12 +1373,7 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "CurrentResourceName")) {
 		lua_pushstring(l, DefaultResourceNames[unit->CurrentResource].c_str());
 	} else if (!strcmp(value, "TypeName")) {
-		VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
-		if (varinfo && !varinfo->TypeName.empty()) {
-			lua_pushstring(l, varinfo->TypeName.c_str());
-		} else {
-			lua_pushstring(l, unit->Type->Name.c_str());
-		}
+		lua_pushstring(l, unit->GetTypeName().c_str());
 	} else if (!strcmp(value, "Trait")) {
 		if (unit->Trait != NULL) {
 			lua_pushstring(l, unit->Trait->Ident.c_str());

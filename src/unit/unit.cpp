@@ -2677,6 +2677,16 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 		return NULL;
 	}
 }
+
+std::string CUnit::GetTypeName() const
+{
+	VariationInfo *varinfo = Type->VarInfo[Variation];
+	if (varinfo && !varinfo->TypeName.empty()) {
+		return varinfo->TypeName;
+	} else {
+		return Type->Name;
+	}
+}
 //Wyrmgus end
 
 /**
@@ -2938,12 +2948,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				PlayUnitSound(target, VoiceHelpMe);
 				//Wyrmgus start
 				//attacked messages now only appear if the "help" sound would be played too
-				VariationInfo *varinfo = target.Type->VarInfo[target.Variation];
-				if (varinfo && !varinfo->TypeName.empty()) {
-					target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), varinfo->TypeName.c_str());
-				} else {
-					target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.Type->Name.c_str());
-				}
+				target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.GetTypeName().c_str());
 				//Wyrmgus end
 			}
 		}

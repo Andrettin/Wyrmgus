@@ -1132,12 +1132,7 @@ std::string EvalString(const StringDesc *s)
 				if (!unit->Name.empty()) {
 					return unit->Name;
 				} else {
-					VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
-					if (varinfo && !varinfo->TypeName.empty()) {
-						return varinfo->TypeName;
-					} else {
-						return unit->Type->Name;
-					}
+					return unit->GetTypeName();
 				}
 				//Wyrmgus end
 			} else { // ERROR.
@@ -1147,12 +1142,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitTypeName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL && !unit->Name.empty()) {
-				VariationInfo *varinfo = unit->Type->VarInfo[unit->Variation];
-				if (varinfo && !varinfo->TypeName.empty()) {
-					return varinfo->TypeName;
-				} else {
-					return unit->Type->Name;
-				}
+				return unit->GetTypeName();
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string("");
 			}

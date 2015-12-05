@@ -332,12 +332,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (this->IsCancelled || this->ProgressCounter < 0) {
 		//Wyrmgus start
 //		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
-		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-		if (varinfo && !varinfo->TypeName.empty()) {
-			DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ varinfo->TypeName.c_str());
-		} else {
-			DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.Type->Name.c_str());
-		}
+		DebugPrint("%d: %s canceled.\n" _C_ unit.Player->Index _C_ unit.GetTypeName().c_str());
 		//Wyrmgus end
 
 		CancelBuilt(*this, unit);

@@ -604,17 +604,10 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 			&& static_cast<size_t>(ButtonUnderCursor) == j) {
 			//Wyrmgus start
 //			UI.StatusLine.Set(uins->Type->Name);
-			std::string tooltip;
-			VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
-			if (varinfo && !varinfo->TypeName.empty()) {
-				tooltip = varinfo->TypeName;
-			} else {
-				tooltip = uins->Type->Name;
-			}
 			if (!Preference.NoStatusLineTooltips) {
-				UI.StatusLine.Set(tooltip);
+				UI.StatusLine.Set(uins->GetTypeName());
 			}
-			DrawGenericPopup(tooltip, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+			DrawGenericPopup(uins->GetTypeName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 			//Wyrmgus end
 		}
 		++j;
@@ -644,17 +637,10 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			&& static_cast<size_t>(ButtonUnderCursor) == j) {
 			//Wyrmgus start
 //			UI.StatusLine.Set(uins->Type->Name);
-			std::string tooltip;
-			VariationInfo *varinfo = uins->Type->VarInfo[uins->Variation];
-			if (varinfo && !varinfo->TypeName.empty()) {
-				tooltip = varinfo->TypeName;
-			} else {
-				tooltip = uins->Type->Name;
-			}
 			if (!Preference.NoStatusLineTooltips) {
-				UI.StatusLine.Set(tooltip);
+				UI.StatusLine.Set(uins->GetTypeName());
 			}
-			DrawGenericPopup(tooltip, UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
+			DrawGenericPopup(uins->GetTypeName(), UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
 			//Wyrmgus end
 		}
 		++j;
@@ -1473,12 +1459,10 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 		//Wyrmgus start
 //		UI.StatusLine.Set(unit.Type->Name);
-		VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
-		if (varinfo && !varinfo->TypeName.empty()) {
-			UI.StatusLine.Set(varinfo->TypeName);
-		} else {
-			UI.StatusLine.Set(unit.Type->Name);
+		if (!Preference.NoStatusLineTooltips) {
+			UI.StatusLine.Set(unit.GetTypeName());
 		}
+		DrawGenericPopup(unit.GetTypeName(), UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		//Wyrmgus end
 	}
 }
@@ -1503,12 +1487,10 @@ static void InfoPanel_draw_multiple_selection()
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
 			//Wyrmgus start
 //			UI.StatusLine.Set(Selected[i]->Type->Name);
-			VariationInfo *varinfo = Selected[i]->Type->VarInfo[Selected[i]->Variation];
-			if (varinfo && !varinfo->TypeName.empty()) {
-				UI.StatusLine.Set(varinfo->TypeName);
-			} else {
-				UI.StatusLine.Set(Selected[i]->Type->Name);
+			if (!Preference.NoStatusLineTooltips) {
+				UI.StatusLine.Set(Selected[i]->GetTypeName());
 			}
+			DrawGenericPopup(Selected[i]->GetTypeName(), UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 			//Wyrmgus end
 		}
 	}

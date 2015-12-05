@@ -1192,9 +1192,7 @@ static void ShowUnitInfo(const CUnit &unit)
 	//Wyrmgus end
 					//Wyrmgus start
 //					unit.Type->Name.c_str(), unit.Player->Index,
-					((unit.Type->VarInfo[unit.Variation] && !unit.Type->VarInfo[unit.Variation]->TypeName.empty()) ?
-					unit.Type->VarInfo[unit.Variation]->TypeName.c_str() : unit.Type->Name.c_str()),
-					unit.Player->Index,
+					unit.GetTypeName().c_str(), unit.Player->Index,
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
