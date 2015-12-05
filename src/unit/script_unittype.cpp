@@ -565,7 +565,12 @@ static int CclDefineUnitType(lua_State *l)
 		redefine = 0;
 	}
 
-	type->NumDirections = 0;
+	//Wyrmgus start
+//	type->NumDirections = 0;
+	if (!redefine) {
+		type->NumDirections = 0;
+	}
+	//Wyrmgus end
 	type->Flip = 1;
 
 	//  Parse the list: (still everything could be changed!)
@@ -639,6 +644,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->AutoBuildRate = parent_type->AutoBuildRate;
 			type->Animations = parent_type->Animations;
 			type->Sound = parent_type->Sound;
+			type->NumDirections = parent_type->NumDirections;
+			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
 			if (parent_type->CanCastSpell) {
 				type->CanCastSpell = new char[SpellTypeTable.size()];
 				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));

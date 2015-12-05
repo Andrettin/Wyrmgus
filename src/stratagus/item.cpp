@@ -57,33 +57,33 @@
 
 int GetItemClassIdByName(std::string item_class)
 {
-	if (item_class == "Sword") {
+	if (item_class == "sword") {
 		return SwordItemClass;
-	} else if (item_class == "Axe") {
+	} else if (item_class == "axe") {
 		return AxeItemClass;
-	} else if (item_class == "Mace") {
+	} else if (item_class == "mace") {
 		return MaceItemClass;
-	} else if (item_class == "Spear") {
+	} else if (item_class == "spear") {
 		return SpearItemClass;
-	} else if (item_class == "Bow") {
+	} else if (item_class == "bow") {
 		return BowItemClass;
-	} else if (item_class == "Throwing Axe") {
+	} else if (item_class == "throwing-axe") {
 		return ThrowingAxeItemClass;
-	} else if (item_class == "Javelin") {
+	} else if (item_class == "javelin") {
 		return JavelinItemClass;
-	} else if (item_class == "Shield") {
+	} else if (item_class == "shield") {
 		return ShieldItemClass;
-	} else if (item_class == "Helmet") {
+	} else if (item_class == "helmet") {
 		return HelmetItemClass;
-	} else if (item_class == "Armor") {
+	} else if (item_class == "armor") {
 		return ArmorItemClass;
-	} else if (item_class == "Shoes") {
+	} else if (item_class == "shoes") {
 		return ShoesItemClass;
-	} else if (item_class == "Amulet") {
+	} else if (item_class == "amulet") {
 		return AmuletItemClass;
-	} else if (item_class == "Ring") {
+	} else if (item_class == "ring") {
 		return RingItemClass;
-	} else if (item_class == "Potion") {
+	} else if (item_class == "potion") {
 		return PotionItemClass;
 	}
 
@@ -93,33 +93,33 @@ int GetItemClassIdByName(std::string item_class)
 std::string GetItemClassNameById(int item_class)
 {
 	if (item_class == SwordItemClass) {
-		return "Sword";
+		return "sword";
 	} else if (item_class == AxeItemClass) {
-		return "Axe";
+		return "axe";
 	} else if (item_class == MaceItemClass) {
-		return "Mace";
+		return "mace";
 	} else if (item_class == SpearItemClass) {
-		return "Spear";
+		return "spear";
 	} else if (item_class == BowItemClass) {
-		return "Bow";
+		return "bow";
 	} else if (item_class == ThrowingAxeItemClass) {
-		return "Throwing Axe";
+		return "throwing-axe";
 	} else if (item_class == JavelinItemClass) {
-		return "Javelin";
+		return "javelin";
 	} else if (item_class == ShieldItemClass) {
-		return "Shield";
+		return "shield";
 	} else if (item_class == HelmetItemClass) {
-		return "Helmet";
+		return "helmet";
 	} else if (item_class == ArmorItemClass) {
-		return "Armor";
+		return "armor";
 	} else if (item_class == ShoesItemClass) {
-		return "Shoes";
+		return "shoes";
 	} else if (item_class == AmuletItemClass) {
-		return "Amulet";
+		return "amulet";
 	} else if (item_class == RingItemClass) {
-		return "Ring";
+		return "ring";
 	} else if (item_class == PotionItemClass) {
-		return "Potion";
+		return "potion";
 	}
 
 	return "";

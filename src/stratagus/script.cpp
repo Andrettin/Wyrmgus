@@ -47,6 +47,9 @@
 //Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
+//Wyrmgus start
+#include "item.h"
+//Wyrmgus end
 #include "map.h"
 #include "parameters.h"
 #include "translate.h"
@@ -1163,7 +1166,12 @@ std::string EvalString(const StringDesc *s)
 		case EString_TypeClass : // name of the unit type's class
 			type = s->D.Type;
 			if (type != NULL) {
-				std::string str = (**type).Class.c_str();
+				std::string str;
+				if (!(**type).BoolFlag[ITEM_INDEX].value) {
+					str = (**type).Class.c_str();
+				} else {
+					str = GetItemClassNameById((**type).ItemClass).c_str();
+				}
 				str[0] = toupper(str[0]);
 				size_t loc = str.find("-");
 				if (loc != std::string::npos) {
