@@ -301,6 +301,9 @@ enum _message_type_ {
 	MessageCommandAutoRepair,      /// Unit command autorepair
 	MessageCommandAttack,          /// Unit command attack
 	MessageCommandGround,          /// Unit command attack ground
+	//Wyrmgus start
+	MessageCommandUse,			   /// Unit command use
+	//Wyrmgus end
 	MessageCommandPatrol,          /// Unit command patrol
 	MessageCommandBoard,           /// Unit command board
 	MessageCommandUnload,          /// Unit command unload

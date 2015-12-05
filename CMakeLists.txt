@@ -82,6 +82,9 @@ set(action_SRCS
 	src/action/action_train.cpp
 	src/action/action_unload.cpp
 	src/action/action_upgradeto.cpp
+	#Wyrmgus start
+	src/action/action_use.cpp
+	#Wyrmgus end
 	src/action/actions.cpp
 	src/action/command.cpp
 )
@@ -505,6 +508,9 @@ set(stratagus_action_HDRS
 	src/include/action/action_train.h
 	src/include/action/action_unload.h
 	src/include/action/action_upgradeto.h
+	#Wyrmgus start
+	src/include/action/action_use.h
+	#Wyrmgus end
 )
 
 set(stratagus_animation_HDRS

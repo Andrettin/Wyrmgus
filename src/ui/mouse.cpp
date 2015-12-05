@@ -335,7 +335,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	//Wyrmgus start
 	// Pick up an item
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
-		&& unit.Type->BoolFlag[INVENTORY_INDEX].value && dest->Type->BoolFlag[ITEM_INDEX].value) {
+		&& CanPickUp(unit, *dest)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -423,7 +423,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 	}
 	//Wyrmgus start
 	// Pick up an item
-	if (&dest != &unit && unit.Type->BoolFlag[INVENTORY_INDEX].value && dest.Type->BoolFlag[ITEM_INDEX].value) {
+	if (&dest != &unit && CanPickUp(unit, dest)) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -512,7 +512,7 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 {
 	//Wyrmgus start
 	// Pick up an item
-	if (unit.Type->BoolFlag[INVENTORY_INDEX].value && dest.Type->BoolFlag[ITEM_INDEX].value) {
+	if (CanPickUp(unit, dest)) {
 		dest.Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -2170,7 +2170,11 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 								Assert(uins->Type->BoolFlag[ITEM_INDEX].value);
 								const int flush = !(KeyModifiers & ModifierShift);
 								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
-									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+									if ((1 << button) == LeftButton) {
+										SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+									} else if ((1 << button) == RightButton) {
+										SendCommandUse(*Selected[0], *uins, flush);
+									}
 								}
 						}
 						++j;
@@ -2310,7 +2314,10 @@ void UIHandleButtonUp(unsigned button)
 		}
 	}
 
-	if ((1 << button) == LeftButton) {
+	//Wyrmgus start
+//	if ((1 << button) == LeftButton) {
+	if ((1 << button) == LeftButton || ((1 << button) == RightButton && ButtonAreaUnderCursor == ButtonAreaInventory)) {
+	//Wyrmgus end
 		//
 		//  Menu (F10) button
 		//

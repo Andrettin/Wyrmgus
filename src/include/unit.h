@@ -629,6 +629,10 @@ extern int ViewPointDistanceToUnit(const CUnit &dest);
 extern int CanTarget(const CUnitType &type, const CUnitType &dest);
 /// Can transporter transport the other unit
 extern int CanTransport(const CUnit &transporter, const CUnit &unit);
+//Wyrmgus start
+/// Can the unit pick up the other unit
+extern bool CanPickUp(const CUnit &picker, const CUnit &unit);
+//Wyrmgus end
 
 /// Generate a unit reference, a printable unique string for unit
 extern std::string UnitReference(const CUnit &unit);

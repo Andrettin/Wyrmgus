@@ -58,6 +58,7 @@ enum UnitAction {
 	UnitActionAttackGround, /// unit attacks ground
 	//Wyrmgus start
 	UnitActionPickUp,		/// unit picks up an item
+	UnitActionUse,			/// unit uses another unit (i.e. an item)
 	//Wyrmgus end
 	UnitActionDie,          /// unit dies
 
@@ -158,6 +159,9 @@ public:
 	static COrder *NewActionTransformInto(CUnitType &type);
 	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
 	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
+	//Wyrmgus start
+	static COrder *NewActionUse(CUnit &dest);
+	//Wyrmgus end
 
 protected:
 	void UpdatePathFinderData_NotCalled(PathFinderInput &input);

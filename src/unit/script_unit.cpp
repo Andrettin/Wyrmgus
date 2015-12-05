@@ -1178,65 +1178,6 @@ static int CclConvertUnit(lua_State *l)
 
 	return 0;
 }
-
-/**
-**  Unit acquires an item
-**
-**  @param l  Lua state.
-*/
-static int CclAcquireItem(lua_State *l)
-{
-	LuaCheckArgs(l, 2);
-
-	if (lua_isnil(l, 1)) {
-		return 0;
-	}
-
-	lua_pushvalue(l, 1);
-	CUnit *unit = CclGetUnit(l);
-	lua_pop(l, 1);
-	
-	if (lua_isnil(l, 2)) {
-		return 0;
-	}
-
-	lua_pushvalue(l, 2);
-	CUnit *item = CclGetUnit(l);
-	lua_pop(l, 2);
-	
-	if (item->Type->BoolFlag[ITEM_INDEX].value && unit->Type->BoolFlag[ORGANIC_INDEX].value) {
-		if (item->Type->GivesResource && item->ResourcesHeld > 0) {
-			if (unit->Player == ThisPlayer) {
-				unit->Player->Notify(NotifyGreen, unit->tilePos, _("Gained %d %s"), item->ResourcesHeld, DefaultResourceNames[item->Type->GivesResource].c_str());
-			}
-			unit->Player->ChangeResource(item->Type->GivesResource, (item->ResourcesHeld, true));
-			unit->Player->TotalResources[item->Type->GivesResource] += (item->ResourcesHeld * unit->Player->Incomes[item->Type->GivesResource]) / 100;
-		} else if (item->Variable[HITPOINTHEALING_INDEX].Value > 0 && unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max) {
-			int hp_healed = std::min(item->Variable[HITPOINTHEALING_INDEX].Value, (unit->Variable[HP_INDEX].Max - unit->Variable[HP_INDEX].Value));
-			if (unit->Player == ThisPlayer) {
-				unit->Player->Notify(NotifyGreen, unit->tilePos, _("%s healed for %d HP"), unit->Name.c_str(), hp_healed);
-			}
-			unit->Variable[HP_INDEX].Value += hp_healed;
-		} else if (item->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow) {
-			if (unit->Player == ThisPlayer) {
-				unit->Player->Notify(NotifyRed, unit->tilePos, _("%s suffered a %d HP loss"), unit->Name.c_str(), (item->Variable[HITPOINTHEALING_INDEX].Value * -1));
-			}
-			HitUnit(item, *unit, item->Variable[HITPOINTHEALING_INDEX].Value);
-		} else if (item->Type->BoolFlag[SLOWS_INDEX].value && unit->Type->UnitType != UnitTypeFly && unit->Type->UnitType != UnitTypeFlyLow) {
-			unit->Variable[SLOW_INDEX].Value = 1000;
-			if (unit->Player == ThisPlayer) {
-				unit->Player->Notify(NotifyRed, unit->tilePos, _("%s has been slowed"), unit->Name.c_str());
-			}
-		} else {
-			return 0;
-		}
-		PlayUnitSound(*item, VoiceUsed);
-		item->Remove(NULL);
-		LetUnitDie(*item);
-	}
-	
-	return 0;
-}
 //Wyrmgus end
 
 /**
@@ -1698,7 +1639,6 @@ void UnitCclRegister()
 	lua_register(Lua, "CreateUnitInTransporter", CclCreateUnitInTransporter);
 	lua_register(Lua, "ChangeUnitOwner", CclChangeUnitOwner);
 	lua_register(Lua, "ConvertUnit", CclConvertUnit);
-	lua_register(Lua, "AcquireItem", CclAcquireItem);
 	//Wyrmgus end
 
 	lua_register(Lua, "GetUnits", CclGetUnits);

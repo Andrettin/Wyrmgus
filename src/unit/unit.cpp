@@ -53,6 +53,9 @@
 #include "game.h"
 #include "editor.h"
 #include "interface.h"
+//Wyrmgus start
+#include "item.h"
+//Wyrmgus end
 #include "luacallback.h"
 #include "map.h"
 #include "missile.h"
@@ -3566,6 +3569,40 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	}
 	return 1;
 }
+
+//Wyrmgus start
+/**
+**  Can the unit pick up the other unit.
+**
+**  @param picker		Unit which is the picker.
+**  @param unit         Unit which wants to be picked.
+**
+**  @return             true if picker can pick up unit, false else.
+*/
+bool CanPickUp(const CUnit &picker, const CUnit &unit)
+{
+	if (!picker.Type->BoolFlag[ORGANIC_INDEX].value) { //only organic units can pick up power-ups and items
+		return false;
+	}
+	if (!unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Type->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
+		return false;
+	}
+	if (!picker.Type->BoolFlag[INVENTORY_INDEX].value && unit.Type->ItemClass != PotionItemClass) { //only potion items can be picked up as if they were power-ups for units with no inventory
+		return false;
+	}
+	if (picker.CurrentAction() == UnitActionBuilt) { // Under construction
+		return false;
+	}
+	if (&picker == &unit) { // Cannot pick up itself.
+		return false;
+	}
+	if (picker.Type->BoolFlag[INVENTORY_INDEX].value && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= UI.InventoryButtons.size()) { // full
+		return false;
+	}
+
+	return true;
+}
+//Wyrmgus end
 
 /**
 **  Check if the player is an enemy

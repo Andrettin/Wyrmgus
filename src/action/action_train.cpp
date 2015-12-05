@@ -267,7 +267,7 @@ static void AnimateActionTrain(CUnit &unit)
 
 	//Wyrmgus start
 	int owner_player = this->Player;
-	if (this->Type->BoolFlag[ITEM_INDEX].value) { //items should always be owned by the neutral player
+	if (this->Type->BoolFlag[ITEM_INDEX].value || this->Type->BoolFlag[POWERUP_INDEX].value) { //items and power-ups should always be owned by the neutral player
 		owner_player = PlayerNumNeutral;
 	}
 

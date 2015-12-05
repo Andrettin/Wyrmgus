@@ -907,6 +907,10 @@ static void DoNextReplay()
 		SendCommandAttack(*unit, pos, dunit, flags);
 	} else if (!strcmp(action, "attack-ground")) {
 		SendCommandAttackGround(*unit, pos, flags);
+	//Wyrmgus start
+	} else if (!strcmp(action, "use")) {
+		SendCommandUse(*unit, *dunit, flags);
+	//Wyrmgus end
 	} else if (!strcmp(action, "patrol")) {
 		SendCommandPatrol(*unit, pos, flags);
 	} else if (!strcmp(action, "board")) {

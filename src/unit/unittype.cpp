@@ -949,7 +949,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 			type.FieldFlags = MapFieldNoBuilding;
 		}
 	//Wyrmgus start
-	} else if (type.BoolFlag[ITEM_INDEX].value || type.BoolFlag[TRAP_INDEX].value) {
+	} else if (type.BoolFlag[ITEM_INDEX].value || type.BoolFlag[POWERUP_INDEX].value || type.BoolFlag[TRAP_INDEX].value) {
 		type.MovementMask = MapFieldLandUnit |
 							MapFieldSeaUnit |
 							MapFieldBuilding |

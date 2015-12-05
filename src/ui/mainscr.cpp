@@ -633,7 +633,10 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 		}
 		CIcon &icon = *uins->Type->Icon.Icon;
 		int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
-				   (IconActive | (MouseButtons & LeftButton)) : 0;
+				   IconActive : 0;
+		if ((MouseButtons & LeftButton) || (MouseButtons & RightButton)) {
+			flag |= IconClicked;
+		}
 		flag |= IconCommandButton;
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
 		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);

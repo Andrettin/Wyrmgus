@@ -239,6 +239,25 @@ void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 	}
 }
 
+//Wyrmgus start
+/**
+** Send command: Use a unit.
+**
+** @param unit    pointer to unit.
+** @param dest    use this unit.
+** @param flush   Flag flush all pending commands.
+*/
+void SendCommandUse(CUnit &unit, CUnit &dest, int flush)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("use", &unit, flush, -1, -1, &dest, NULL, -1);
+		CommandUse(unit, dest, flush);
+	} else {
+		NetworkSendCommand(MessageCommandUse, unit, 0, 0, &dest, 0, flush);
+	}
+}
+//Wyrmgus end
+
 /**
 ** Send command: Unit patrol between current and position.
 **
@@ -750,6 +769,17 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandLog("attack-ground", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
 			CommandAttackGround(unit, pos, status);
 			break;
+		//Wyrmgus start
+		case MessageCommandUse: {
+			if (dstnr != (unsigned short)0xFFFF) {
+				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				Assert(dest.Type);
+				CommandLog("use", &unit, status, -1, -1, &dest, NULL, -1);
+				CommandUse(unit, dest, status);
+			}
+			break;
+		}
+		//Wyrmgus end
 		case MessageCommandPatrol:
 			CommandLog("patrol", &unit, status, pos.x, pos.y, NoUnitP, NULL, -1);
 			CommandPatrolUnit(unit, pos, status);

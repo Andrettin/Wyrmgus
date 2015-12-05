@@ -60,6 +60,9 @@
 #include "action/action_train.h"
 #include "action/action_unload.h"
 #include "action/action_upgradeto.h"
+//Wyrmgus start
+#include "action/action_use.h"
+//Wyrmgus end
 
 #include "animation/animation_die.h"
 #include "commands.h"
@@ -210,7 +213,7 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 	} else if (!strcmp(actiontype, "action-patrol")) {
 		*orderPtr = new COrder_Patrol;
 	//Wyrmgus start
-	} else if (!strcmp(actiontype, "action-pickup")) {
+	} else if (!strcmp(actiontype, "action-pick-up")) {
 		*orderPtr = new COrder_PickUp;
 	//Wyrmgus end
 	} else if (!strcmp(actiontype, "action-repair")) {
@@ -233,6 +236,10 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 		*orderPtr = new COrder_UpgradeTo;
 	} else if (!strcmp(actiontype, "action-unload")) {
 		*orderPtr = new COrder_Unload;
+	//Wyrmgus start
+	} else if (!strcmp(actiontype, "action-use")) {
+		*orderPtr = new COrder_Use;
+	//Wyrmgus end
 	} else {
 		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);
 	}
