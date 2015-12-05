@@ -107,6 +107,7 @@ static const char ORGANIC_KEY[] = "organic";
 static const char SIDEATTACK_KEY[] = "SideAttack";
 //Wyrmgus start
 static const char ITEM_KEY[] = "Item";
+static const char INVENTORY_KEY[] = "Inventory";
 static const char TRAP_KEY[] = "Trap";
 static const char BRIDGE_KEY[] = "Bridge";
 static const char MERCENARY_KEY[] = "Mercenary";
@@ -242,7 +243,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   ISNOTSELECTABLE_KEY, DECORATION_KEY, INDESTRUCTIBLE_KEY, TELEPORTER_KEY, SHIELDPIERCE_KEY,
 							   //Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
-							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, ITEM_KEY, TRAP_KEY, BRIDGE_KEY,
+							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, ITEM_KEY, INVENTORY_KEY, TRAP_KEY, BRIDGE_KEY,
 							   MERCENARY_KEY,
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY, GIANT_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
@@ -618,6 +619,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->TechnologyPointCost = parent_type->TechnologyPointCost;
 			type->TrainQuantity = parent_type->TrainQuantity;
 			type->Upkeep = parent_type->Upkeep;
+			type->ItemClass = parent_type->ItemClass;
 			type->MaxOnBoard = parent_type->MaxOnBoard;
 			type->RepairRange = parent_type->RepairRange;
 			type->RepairHP = parent_type->RepairHP;
@@ -1734,6 +1736,8 @@ static int CclDefineUnitType(lua_State *l)
 					type->Traits.push_back(CUpgrade::New(trait_ident)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 				}
 			}
+		} else if (!strcmp(value, "ItemClass")) {
+			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
@@ -2140,6 +2144,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->ReactRangePerson);
 		return 1;
 	*/
+	} else if (!strcmp(data, "ItemClass")) {
+		lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Missile")) {
 		lua_pushstring(l, type->Missile.Name.c_str());

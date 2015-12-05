@@ -91,11 +91,19 @@ bool CCharacter::IsSiblingOf(std::string sibling_full_name)
 void CleanCharacters()
 {
 	for (size_t i = 0; i < Characters.size(); ++i) {
+		for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
+			delete Characters[i]->Items[j];
+		}
+		Characters[i]->Items.clear();
 		delete Characters[i];
 	}
 	Characters.clear();
 	
 	for (size_t i = 0; i < CustomHeroes.size(); ++i) {
+		for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
+			delete CustomHeroes[i]->Items[j];
+		}
+		CustomHeroes[i]->Items.clear();
 		delete CustomHeroes[i];
 	}
 	CustomHeroes.clear();

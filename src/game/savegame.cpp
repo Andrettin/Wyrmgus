@@ -210,9 +210,6 @@ void StartSavedGame(const std::string &filename)
 
 	SaveGameLoading = true;
 	CleanPlayers();
-	//Wyrmgus start
-	CleanItems();
-	//Wyrmgus end
 	ExpandPath(path, filename);
 	LoadGame(path);
 

@@ -1105,9 +1105,6 @@ void StartReplay(const std::string &filename, bool reveal)
 	std::string replay;
 
 	CleanPlayers();
-	//Wyrmgus start
-	CleanItems();
-	//Wyrmgus end
 	ExpandPath(replay, filename);
 	LoadReplay(replay);
 

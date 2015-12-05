@@ -252,6 +252,7 @@ enum {
 	SIDEATTACK_INDEX,
 	//Wyrmgus start
 	ITEM_INDEX,
+	INVENTORY_INDEX,
 	TRAP_INDEX,
 	BRIDGE_INDEX,
 	MERCENARY_INDEX,
@@ -695,6 +696,7 @@ public:
 	int TechnologyPointCost;								/// Technology point cost
 	int TrainQuantity;										/// Quantity to be trained
 	int Upkeep;												/// Gold upkeep (for grand strategy mode)
+	int ItemClass;											/// Item class (if the unit type is an item)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 

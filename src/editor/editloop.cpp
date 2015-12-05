@@ -2364,7 +2364,6 @@ void StartEditor(const char *filename)
 	
 	//Wyrmgus start
 	CleanPlayers(); //clean players, as they could not have been cleansed after a scenario
-	CleanItems();
 	//Wyrmgus end
 	
 	// Run the editor.
@@ -2379,9 +2378,6 @@ void StartEditor(const char *filename)
 	Editor.ShownTileTypes.clear();
 	CleanGame();
 	CleanPlayers();
-	//Wyrmgus start
-	CleanItems();
-	//Wyrmgus end
 
 	SetDefaultTextColors(nc, rc);
 }

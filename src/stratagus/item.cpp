@@ -51,9 +51,6 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CItemType *> ItemTypes;
-std::vector<CItem *> Items;
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -128,30 +125,33 @@ std::string GetItemClassNameById(int item_class)
 	return "";
 }
 
-CItemType *GetItemType(std::string item_type_name)
+int GetItemClassSlot(int item_class)
 {
-	for (size_t i = 0; i < ItemTypes.size(); ++i) {
-		if (item_type_name == ItemTypes[i]->Name) {
-			return ItemTypes[i];
-		}
+	if (
+		item_class == SwordItemClass
+		|| item_class == AxeItemClass
+		|| item_class == MaceItemClass
+		|| item_class == SpearItemClass
+		|| item_class == BowItemClass
+		|| item_class == ThrowingAxeItemClass
+		|| item_class == JavelinItemClass
+	) {
+		return WeaponItemSlot;
+	} else if (item_class == ShieldItemClass) {
+		return ShieldItemSlot;
+	} else if (item_class == HelmetItemClass) {
+		return HelmetItemSlot;
+	} else if (item_class == ArmorItemClass) {
+		return ArmorItemSlot;
+	} else if (item_class == ShoesItemClass) {
+		return ShoesItemSlot;
+	} else if (item_class == AmuletItemClass) {
+		return AmuletItemSlot;
+	} else if (item_class == RingItemClass) {
+		return RingItemSlot;
 	}
-	return NULL;
-}
 
-void CleanItemTypes()
-{
-	for (size_t i = 0; i < ItemTypes.size(); ++i) {
-		delete ItemTypes[i];
-	}
-	ItemTypes.clear();
-}
-
-void CleanItems()
-{
-	for (size_t i = 0; i < Items.size(); ++i) {
-		delete Items[i];
-	}
-	Items.clear();
+	return -1;
 }
 
 //@}

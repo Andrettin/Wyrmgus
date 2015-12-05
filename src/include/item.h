@@ -50,7 +50,22 @@ class CUnitType;
 class CUpgrade;
 
 /**
-**  Indexes into item type array.
+**  Indexes into item class array.
+*/
+enum ItemSlots {
+	WeaponItemSlot,
+	ShieldItemSlot,
+	HelmetItemSlot,
+	ArmorItemSlot,
+	ShoesItemSlot,
+	AmuletItemSlot,
+	RingItemSlot,
+	
+	MaxItemSlots
+};
+
+/**
+**  Indexes into item class array.
 */
 enum ItemClasses {
 	SwordItemClass,
@@ -75,38 +90,23 @@ enum ItemClasses {
 	MaxItemClasses
 };
 
-class CItemType
-{
-public:
-	CItemType() :
-		Class(-1),
-		UnitType(NULL)
-	{
-	}
-	
-	int Class;					/// Item type's class
-	std::string Name;			/// Name of the item type
-	IconConfig Icon;			/// Item's icon
-	CUnitType *UnitType;		/// Unit type used by the item when it is on the ground
-};
-
 class CItem
 {
 public:
 	CItem() :
-		ItemType(NULL)
+		Unique(false),
+		Type(NULL)
 	{
 	}
 	
-	CItemType *ItemType;		/// Item type of the item
+	std::string Name;			/// Name of the item
+	bool Unique;				/// Whether this is a unique item
+	CUnitType *Type;			/// Item type of the item
 };
 
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
-
-extern std::vector<CItemType *> ItemTypes;
-extern std::vector<CItem *> Items;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -114,9 +114,7 @@ extern std::vector<CItem *> Items;
 
 extern int GetItemClassIdByName(std::string item_class);
 extern std::string GetItemClassNameById(int item_class);
-extern CItemType *GetItemType(std::string item_type_name);
-extern void CleanItemTypes();
-extern void CleanItems();
+extern int GetItemClassSlot(int item_class);
 extern void ItemCclRegister();
 
 //@}

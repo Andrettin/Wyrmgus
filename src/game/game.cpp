@@ -158,9 +158,6 @@ void StartMap(const std::string &filename, bool clean)
 	DebugPrint("Creating game with map: %s\n" _C_ filename.c_str());
 	if (clean) {
 		CleanPlayers();
-		//Wyrmgus start
-		CleanItems();
-		//Wyrmgus end
 	}
 	GetDefaultTextColors(nc, rc);
 
