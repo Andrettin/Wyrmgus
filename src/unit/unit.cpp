@@ -732,19 +732,37 @@ void CUnit::EquipItem(CUnit &item)
 	}
 	
 	//add item bonuses
-	Variable[BASICDAMAGE_INDEX].Value += item.Variable[BASICDAMAGE_INDEX].Value;
-	Variable[BASICDAMAGE_INDEX].Max += item.Variable[BASICDAMAGE_INDEX].Max;
-	Variable[ARMOR_INDEX].Value += item.Variable[ARMOR_INDEX].Value;
-	Variable[ARMOR_INDEX].Max += item.Variable[ARMOR_INDEX].Max;
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
+		if (
+			i == BASICDAMAGE_INDEX || i == PIERCINGDAMAGE_INDEX || i == THORNSDAMAGE_INDEX
+			|| i == FIREDAMAGE_INDEX || i == COLDDAMAGE_INDEX || i == ARCANEDAMAGE_INDEX || i == LIGHTNINGDAMAGE_INDEX
+			|| i == AIRDAMAGE_INDEX || i == EARTHDAMAGE_INDEX || i == WATERDAMAGE_INDEX
+			|| i == ARMOR_INDEX || i == FIRERESISTANCE_INDEX || i == COLDRESISTANCE_INDEX || i == ARCANERESISTANCE_INDEX || i == LIGHTNINGRESISTANCE_INDEX
+			|| i == AIRRESISTANCE_INDEX || i == EARTHRESISTANCE_INDEX || i == WATERRESISTANCE_INDEX
+			|| i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
+		) {
+			Variable[i].Value += item.Variable[i].Value;
+			Variable[i].Max += item.Variable[i].Max;
+		}
+	}
 }
 
 void CUnit::DeequipItem(CUnit &item)
 {
 	//remove item bonuses
-	Variable[BASICDAMAGE_INDEX].Value -= item.Variable[BASICDAMAGE_INDEX].Value;
-	Variable[BASICDAMAGE_INDEX].Max -= item.Variable[BASICDAMAGE_INDEX].Max;
-	Variable[ARMOR_INDEX].Value -= item.Variable[ARMOR_INDEX].Value;
-	Variable[ARMOR_INDEX].Max -= item.Variable[ARMOR_INDEX].Max;
+	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
+		if (
+			i == BASICDAMAGE_INDEX || i == PIERCINGDAMAGE_INDEX || i == THORNSDAMAGE_INDEX
+			|| i == FIREDAMAGE_INDEX || i == COLDDAMAGE_INDEX || i == ARCANEDAMAGE_INDEX || i == LIGHTNINGDAMAGE_INDEX
+			|| i == AIRDAMAGE_INDEX || i == EARTHDAMAGE_INDEX || i == WATERDAMAGE_INDEX
+			|| i == ARMOR_INDEX || i == FIRERESISTANCE_INDEX || i == COLDRESISTANCE_INDEX || i == ARCANERESISTANCE_INDEX || i == LIGHTNINGRESISTANCE_INDEX
+			|| i == AIRRESISTANCE_INDEX || i == EARTHRESISTANCE_INDEX || i == WATERRESISTANCE_INDEX
+			|| i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
+		) {
+			Variable[i].Value -= item.Variable[i].Value;
+			Variable[i].Max -= item.Variable[i].Max;
+		}
+	}
 	
 	int item_class = item.Type->ItemClass;
 	if (GetItemClassSlot(item_class) == WeaponItemSlot) {
