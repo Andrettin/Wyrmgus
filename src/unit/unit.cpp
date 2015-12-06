@@ -3792,6 +3792,10 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 		return false;
 	}
 	if (picker.Type->BoolFlag[INVENTORY_INDEX].value && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= UI.InventoryButtons.size()) { // full
+		if (picker.Player == ThisPlayer) {
+			std::string picker_name = picker.Name + "'s (" + picker.GetTypeName() + ")";
+			picker.Player->Notify(NotifyRed, picker.tilePos, _("%s inventory is full."), picker_name.c_str());
+		}
 		return false;
 	}
 
