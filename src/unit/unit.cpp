@@ -2803,6 +2803,10 @@ bool CUnit::CanEquipItem(CUnit *item) const
 		return false;
 	}
 	
+	if (GetItemClassSlot(item->Type->ItemClass) == ShieldItemSlot && !Type->BoolFlag[CANUSESHIELD_INDEX].value) { //if the item is a shield and this unit's type can't use shields, return false
+		return false;
+	}
+	
 	if (item->Type->ItemClass == PotionItemClass) {
 		return false;
 	}
