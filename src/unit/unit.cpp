@@ -3021,7 +3021,11 @@ void LetUnitDie(CUnit &unit, bool suicide)
 				droppedUnit->SetPrefix(ItemPrefixes[droppedUnit->Type->ItemClass][SyncRand(ItemPrefixes[droppedUnit->Type->ItemClass].size())]);
 			}
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1 && ItemSuffixes[droppedUnit->Type->ItemClass].size() > 0) { //10% of a dropped item having a suffix
-				droppedUnit->SetSuffix(ItemSuffixes[droppedUnit->Type->ItemClass][SyncRand(ItemSuffixes[droppedUnit->Type->ItemClass].size())]);
+				CUpgrade *chosen_suffix = ItemSuffixes[droppedUnit->Type->ItemClass][SyncRand(ItemSuffixes[droppedUnit->Type->ItemClass].size())];
+				while (droppedUnit->Prefix != NULL && chosen_suffix->IncompatibleAffixes[droppedUnit->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+					chosen_suffix = ItemSuffixes[droppedUnit->Type->ItemClass][SyncRand(ItemSuffixes[droppedUnit->Type->ItemClass].size())];
+				}
+				droppedUnit->SetSuffix(chosen_suffix);
 			}
 		}
 	}

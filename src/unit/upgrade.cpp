@@ -160,6 +160,7 @@ CUpgrade::CUpgrade(const std::string &ident) :
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
 	memset(this->ItemPrefix, 0, sizeof(this->ItemPrefix));
 	memset(this->ItemSuffix, 0, sizeof(this->ItemSuffix));
+	memset(this->IncompatibleAffixes, 0, sizeof(this->IncompatibleAffixes));
 	//Wyrmgus end
 }
 
@@ -442,6 +443,12 @@ static int CclDefineModifier(lua_State *l)
 		}
 		if (AllUpgrades[um->UpgradeId]->ItemSuffix[i]) {
 			ItemSuffixes[i].push_back(AllUpgrades[um->UpgradeId]);
+		}
+	}
+	
+	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add this to the incompatible affix's counterpart list
+		if (AllUpgrades[um->UpgradeId]->IncompatibleAffixes[i]) {
+			AllUpgrades[i]->IncompatibleAffixes[um->UpgradeId] = true;
 		}
 	}
 	//Wyrmgus end

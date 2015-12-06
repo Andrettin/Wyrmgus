@@ -16,6 +16,8 @@ class CUpgrade
 	bool Shield;
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
+	bool IncompatibleAffixes[UpgradeMax];
+	int ID;
 	//Wyrmgus end
 	int Costs[MaxCosts];
 	//Wyrmgus start

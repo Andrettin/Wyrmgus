@@ -205,6 +205,7 @@ public:
 	bool Shield;
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
+	bool IncompatibleAffixes[UpgradeMax];
 	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
