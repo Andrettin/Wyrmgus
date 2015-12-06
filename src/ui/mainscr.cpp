@@ -279,6 +279,13 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 	if (condition->BoolFlags && !unit.Type->CheckUserBoolFlags(condition->BoolFlags)) {
 		return false;
 	}
+	//Wyrmgus start
+	if (condition->Affixed != CONDITION_TRUE) {
+		if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != NULL || unit.Suffix != NULL)) {
+			return false;
+		}
+	}
+	//Wyrmgus end
 	if (condition->Variables) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
@@ -648,7 +655,11 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			}
 			//hackish way to make the popup appear correctly for the inventory item
 			ButtonAction *ba = new ButtonAction;
-			ba->Hint = uins->GetTypeName();
+			if (!uins->Name.empty()) {
+				ba->Hint = uins->Name;
+			} else {
+				ba->Hint = uins->GetTypeName();
+			}
 			ba->Pos = j;
 			ba->Level = unit.Type->ButtonLevelForInventory;
 			ba->Action = ButtonUnit;

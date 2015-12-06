@@ -199,10 +199,16 @@ enum {
 
 		if (unit.Type->BoolFlag[INVENTORY_INDEX].value && goal && goal->Type->BoolFlag[ITEM_INDEX].value) {
 			goal->Remove(&unit);
-			if (unit.Character) { //if the unit has a character, store the item for it
+			if (unit.Character && unit.Character->Persistent) { //if the unit has a persistent character, store the item for it
 				CItem *item = new CItem;
 				unit.Character->Items.push_back(item);
 				item->Type = const_cast<CUnitType *>(&(*goal->Type));
+				if (goal->Prefix != NULL) {
+					item->Prefix = const_cast<CUpgrade *>(&(*goal->Prefix));
+				}
+				if (goal->Suffix != NULL) {
+					item->Suffix = const_cast<CUpgrade *>(&(*goal->Suffix));
+				}
 			}
 		} else if (goal && (goal->Type->BoolFlag[POWERUP_INDEX].value || (!unit.Type->BoolFlag[INVENTORY_INDEX].value && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass == PotionItemClass))) {
 			CommandUse(unit, *goal, FlushCommands);

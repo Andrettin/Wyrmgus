@@ -213,6 +213,10 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		return false;
 	}
 	//Wyrmgus start
+	if (unit.Type->BoolFlag[ITEM_INDEX].value && transporter.Type->BoolFlag[INVENTORY_INDEX].value && transporter.IsItemEquipped(&unit)) { //if the unit is an equipped item in the transporter's inventory, deequip it
+		transporter.DeequipItem(unit);
+	}
+	
 	/*
 	unit.Boarded = 0;
 	unit.Place(pos);
@@ -224,7 +228,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 	}
 	unit.Place(pos);
 	
-	if (transporter.Character && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
+	if (transporter.Character && transporter.Character->Persistent && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
 		CItem *item = transporter.Character->GetItem(unit);
 		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
 		delete item;

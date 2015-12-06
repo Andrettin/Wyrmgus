@@ -77,7 +77,10 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	Assert(&font);
 	Assert(this->Index == -1 || ((unsigned int) this->Index < UnitTypeVar.GetNumberVariable()));
 
-	CLabel label(font);
+	//Wyrmgus start
+//	CLabel label(font);
+	CLabel label(font, this->TextColor, this->HighlightColor);
+	//Wyrmgus end
 
 	if (this->Text) {
 		text = EvalString(this->Text);
@@ -149,7 +152,10 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 	CFont &font = this->Font ? *this->Font : *defaultfont;
 	Assert(&font);
 
-	CLabel label(font);
+	//Wyrmgus start
+//	CLabel label(font);
+	CLabel label(font, this->TextColor, this->HighlightColor);
+	//Wyrmgus end
 
 	Assert((unsigned int) this->Index < UnitTypeVar.GetNumberVariable());
 	usi1 = GetComponent(unit, this->Index, this->Component, 0);
@@ -187,7 +193,10 @@ extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e);
 
 	CFont &font = this->Font ? *this->Font : *defaultfont;
 	Assert(&font);
-	CLabel label(font);
+	//Wyrmgus start
+//	CLabel label(font);
+	CLabel label(font, this->TextColor, this->HighlightColor);
+	//Wyrmgus end
 
 	usi1 = GetComponent(unit, this->Index1, this->Component1, 0);
 	usi2 = GetComponent(unit, this->Index2, this->Component2, 0);

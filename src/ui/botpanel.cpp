@@ -430,6 +430,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 					return false;
 				}
 			}
+			if (condition->Affixed != CONDITION_TRUE) {
+				if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != NULL || unit.Suffix != NULL)) {
+					return false;
+				}
+			}
 			if (condition->ItemClass != -1) {
 				if (condition->ItemClass != unit.Type->ItemClass) {
 					return false;

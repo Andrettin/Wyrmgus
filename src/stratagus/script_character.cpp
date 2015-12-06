@@ -203,15 +203,46 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Items")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				std::string item_ident = LuaToString(l, -1, j + 1);
-				int item_type_id = UnitTypeIdByIdent(item_ident);
-				if (item_type_id != -1) {
-					CItem *item = new CItem;
-					character->Items.push_back(item);
-					item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
-				} else {
-					LuaError(l, "Item type \"%s\" doesn't exist." _C_ item_ident.c_str());
+				lua_rawgeti(l, -1, j + 1);
+				CItem *item = new CItem;
+				character->Items.push_back(item);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table for items)");
 				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "type")) {
+						std::string item_ident = LuaToString(l, -1, k + 1);
+						int item_type_id = UnitTypeIdByIdent(item_ident);
+						if (item_type_id != -1) {
+							item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
+						} else {
+							LuaError(l, "Item type \"%s\" doesn't exist." _C_ item_ident.c_str());
+						}
+					} else if (!strcmp(value, "prefix")) {
+						std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+						if (upgrade_id != -1) {
+							item->Prefix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						} else {
+							LuaError(l, "Item prefix \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+						}
+					} else if (!strcmp(value, "suffix")) {
+						std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+						if (upgrade_id != -1) {
+							item->Suffix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						} else {
+							LuaError(l, "Item suffix \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+						}
+					} else {
+						printf("\n%s\n", character->GetFullName().c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "ForbiddenUpgrades")) {
 			memset(character->ForbiddenUpgrades, 0, sizeof(character->ForbiddenUpgrades));
@@ -330,15 +361,46 @@ static int CclDefineCustomHero(lua_State *l)
 		} else if (!strcmp(value, "Items")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				std::string item_ident = LuaToString(l, -1, j + 1);
-				int item_type_id = UnitTypeIdByIdent(item_ident);
-				if (item_type_id != -1) {
-					CItem *item = new CItem;
-					hero->Items.push_back(item);
-					item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
-				} else {
-					LuaError(l, "Item type \"%s\" doesn't exist." _C_ item_ident.c_str());
+				lua_rawgeti(l, -1, j + 1);
+				CItem *item = new CItem;
+				hero->Items.push_back(item);
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table for items)");
 				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "type")) {
+						std::string item_ident = LuaToString(l, -1, k + 1);
+						int item_type_id = UnitTypeIdByIdent(item_ident);
+						if (item_type_id != -1) {
+							item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
+						} else {
+							LuaError(l, "Item type \"%s\" doesn't exist." _C_ item_ident.c_str());
+						}
+					} else if (!strcmp(value, "prefix")) {
+						std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+						if (upgrade_id != -1) {
+							item->Prefix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						} else {
+							LuaError(l, "Item prefix \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+						}
+					} else if (!strcmp(value, "suffix")) {
+						std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+						if (upgrade_id != -1) {
+							item->Suffix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						} else {
+							LuaError(l, "Item suffix \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+						}
+					} else {
+						printf("\n%s\n", hero->GetFullName().c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				lua_pop(l, 1);
 			}
 		} else if (!strcmp(value, "QuestsInProgress")) {
 			hero->QuestsInProgress.clear();

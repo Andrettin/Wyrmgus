@@ -57,6 +57,10 @@ public:
 public:
 	PixelPos Pos;             /// Coordinate where to display.
 	ConditionPanel *Condition; /// Condition to show the content; if NULL, no condition.
+//Wyrmgus start
+	std::string TextColor;      /// Color used for plain text in content.
+	std::string HighlightColor; /// Color used for highlighted letters.
+//Wyrmgus end
 };
 
 /**

@@ -1497,6 +1497,22 @@ static int CclSetUnitVariable(lua_State *l)
 		value = LuaToNumber(l, 3);
 		unit->SetVariation(value);
 		unit->Variable[VARIATION_INDEX].Value = unit->Variation;
+	} else if (!strcmp(name, "Prefix")) { //add an item prefix to the unit
+		LuaCheckArgs(l, 3);
+		std::string upgrade_ident = LuaToString(l, 3);
+		if (CUpgrade::Get(upgrade_ident)) {
+			unit->SetPrefix(CUpgrade::Get(upgrade_ident));
+		} else {
+			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		}
+	} else if (!strcmp(name, "Suffix")) { //add an item suffix to the unit
+		LuaCheckArgs(l, 3);
+		std::string upgrade_ident = LuaToString(l, 3);
+		if (CUpgrade::Get(upgrade_ident)) {
+			unit->SetSuffix(CUpgrade::Get(upgrade_ident));
+		} else {
+			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		}
 	//Wyrmgus end
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables

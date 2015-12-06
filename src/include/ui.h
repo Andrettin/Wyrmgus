@@ -188,6 +188,9 @@ class ConditionPanel
 public:
 	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
 		HideAllied(false), ShowOpponent(false), BoolFlags(NULL),
+		//Wyrmgus start
+		Affixed(0),
+		//Wyrmgus end
 		Variables(NULL) {}
 	~ConditionPanel()
 	{
@@ -201,6 +204,9 @@ public:
 	bool HideAllied;            /// if true, don't show for allied unit. (but show own units)
 	bool ShowOpponent;          /// if true, show for opponent unit.
 
+	//Wyrmgus start
+	char Affixed;				/// check if the button's unit has an affix
+	//Wyrmgus end
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)
 };

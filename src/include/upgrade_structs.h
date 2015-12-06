@@ -200,6 +200,8 @@ public:
 	bool Ability;
 	bool Weapon;
 	bool Shield;
+	bool ItemPrefix;
+	bool ItemSuffix;
 	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade

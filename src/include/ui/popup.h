@@ -54,7 +54,7 @@ class PopupConditionPanel
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
 		//Wyrmgus start
-		Equipped(0), Equippable(0),
+		Equipped(0), Equippable(0), Affixed(0),
 //		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
 		ButtonAction(-1), ItemClass(-1), BoolFlags(NULL), Variables(NULL) {}
 		//Wyrmgus end
@@ -76,6 +76,7 @@ public:
 	//Wyrmgus start
 	char Equipped;				/// check if button's item is equipped.
 	char Equippable;			/// check if button's item is equippable by its owner.
+	char Affixed;				/// check if button's item has an affix
 	//Wyrmgus end
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)

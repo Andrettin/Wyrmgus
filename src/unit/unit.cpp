@@ -448,6 +448,8 @@ void CUnit::Init()
 	//Wyrmgus start
 	Character = NULL;
 	Trait = NULL;
+	Prefix = NULL;
+	Suffix = NULL;
 	//Wyrmgus end
 	CurrentSightRange = 0;
 
@@ -560,6 +562,8 @@ void CUnit::Release(bool final)
 	Trait = NULL;
 	Weapon = NULL;
 	Shield = NULL;
+	Prefix = NULL;
+	Suffix = NULL;
 	//Wyrmgus end
 
 	delete pathFinderData;
@@ -625,6 +629,12 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	//load items
 	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
 		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, &Players[PlayerNumNeutral]);
+		if (this->Character->Items[i]->Prefix != NULL) {
+			item->SetPrefix(this->Character->Items[i]->Prefix);
+		}
+		if (this->Character->Items[i]->Suffix != NULL) {
+			item->SetSuffix(this->Character->Items[i]->Suffix);
+		}
 		item->Remove(this);
 	}
 	
@@ -752,6 +762,64 @@ void CUnit::DeequipItem(CUnit &item)
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
+	}
+}
+
+void CUnit::SetPrefix(CUpgrade *prefix)
+{
+	if (Prefix != NULL) {
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (UpgradeModifiers[z]->UpgradeId == Prefix->ID) {
+				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
+		}
+	}
+	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->GetItem(*this)->Prefix = const_cast<CUpgrade *>(&(*prefix));
+	}
+	Prefix = const_cast<CUpgrade *>(&(*prefix));
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == Prefix->ID) {
+			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+		}
+	}
+	
+	Name = "";
+	if (Prefix != NULL) {
+		Name += Prefix->Name + " ";
+	}
+	Name += GetTypeName();
+	if (Suffix != NULL) {
+		Name += " " + Suffix->Name;
+	}
+}
+
+void CUnit::SetSuffix(CUpgrade *suffix)
+{
+	if (Suffix != NULL) {
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (UpgradeModifiers[z]->UpgradeId == Suffix->ID) {
+				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
+		}
+	}
+	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->GetItem(*this)->Suffix = const_cast<CUpgrade *>(&(*suffix));
+	}
+	Suffix = const_cast<CUpgrade *>(&(*suffix));
+	for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		if (UpgradeModifiers[z]->UpgradeId == Suffix->ID) {
+			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+		}
+	}
+	
+	Name = "";
+	if (Prefix != NULL) {
+		Name += Prefix->Name + " ";
+	}
+	Name += GetTypeName();
+	if (Suffix != NULL) {
+		Name += " " + Suffix->Name;
 	}
 }
 //Wyrmgus end

@@ -458,6 +458,10 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 			condition->HideAllied = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "ShowOpponent")) {
 			condition->ShowOpponent = LuaToBoolean(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(key, "Affixed")) {
+			condition->Affixed = Ccl2Condition(l, LuaToString(l, -1));
+		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {
@@ -492,11 +496,21 @@ static CContentType *CclParseContent(lua_State *l)
 	CContentType *content = NULL;
 	ConditionPanel *condition = NULL;
 	PixelPos pos(0, 0);
+	//Wyrmgus start
+	std::string textColor("white");
+	std::string highColor("red");
+	//Wyrmgus end
 
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Pos")) {
 			CclGetPos(l, &pos.x, &pos.y);
+		//Wyrmgus start
+		} else if (!strcmp(key, "TextColor")) {
+			textColor = LuaToString(l, -1);
+		} else if (!strcmp(key, "HighlightColor")) {
+			highColor = LuaToString(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(key, "More")) {
 			Assert(lua_istable(l, -1));
 			lua_rawgeti(l, -1, 1); // Method name
@@ -527,6 +541,10 @@ static CContentType *CclParseContent(lua_State *l)
 	}
 	content->Pos = pos;
 	content->Condition = condition;
+	//Wyrmgus start
+	content->TextColor = textColor;
+	content->HighlightColor = highColor;
+	//Wyrmgus end
 	return content;
 }
 

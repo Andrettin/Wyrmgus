@@ -177,6 +177,8 @@ public:
 	void SetVariation(int new_variation, const CUnitType *new_type = NULL);
 	void EquipItem(CUnit &item);
 	void DeequipItem(CUnit &item);
+	void SetPrefix(CUpgrade *prefix);
+	void SetSuffix(CUpgrade *suffix);
 	//Wyrmgus end
 	
 	bool RestoreOrder();
@@ -381,9 +383,11 @@ public:
 	CUnitColors *Colors;    /// Player colors
 	//Wyrmgus start
 	std::string Name;	/// Unit's personal name (if any)
-	CCharacter  *Character;	/// Pointer to the character represented by this unit
+	CCharacter *Character;	/// Pointer to the character represented by this unit
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
+	CUpgrade *Prefix;	/// Unit's item prefix
+	CUpgrade *Suffix;	/// Unit's item suffix
 	//Wyrmgus end
 	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 

@@ -92,7 +92,7 @@ bool CCharacter::IsSiblingOf(std::string sibling_full_name)
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type) {
+		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix) {
 			return this->Items[i];
 		}
 	}
@@ -183,12 +183,20 @@ void SaveHeroes()
 			if (Characters[i]->Items.size() > 0) {
 				fprintf(fd, "\tItems = {");
 				for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
-					fprintf(fd, "\"%s\"", Characters[i]->Items[j]->Type->Ident.c_str());
+					fprintf(fd, "\n\t\t{");
+					fprintf(fd, "\n\t\t\t\"type\", \"%s\",", Characters[i]->Items[j]->Type->Ident.c_str());
+					if (Characters[i]->Items[j]->Prefix != NULL) {
+						fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", Characters[i]->Items[j]->Prefix->Ident.c_str());
+					}
+					if (Characters[i]->Items[j]->Suffix != NULL) {
+						fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", Characters[i]->Items[j]->Suffix->Ident.c_str());
+					}
+					fprintf(fd, "\n\t\t}");
 					if (j < (Characters[i]->Items.size() - 1)) {
-						fprintf(fd, ", ");
+						fprintf(fd, ",");
 					}
 				}
-				fprintf(fd, "}\n");
+				fprintf(fd, "\n\t},\n");
 			}
 			fprintf(fd, "})\n\n");
 		}
@@ -235,12 +243,20 @@ void SaveHeroes()
 			if (CustomHeroes[i]->Items.size() > 0) {
 				fprintf(fd, "\tItems = {");
 				for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
-					fprintf(fd, "\"%s\"", CustomHeroes[i]->Items[j]->Type->Ident.c_str());
+					fprintf(fd, "\n\t\t{");
+					fprintf(fd, "\n\t\t\t\"type\", \"%s\",", CustomHeroes[i]->Items[j]->Type->Ident.c_str());
+					if (CustomHeroes[i]->Items[j]->Prefix != NULL) {
+						fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", CustomHeroes[i]->Items[j]->Prefix->Ident.c_str());
+					}
+					if (CustomHeroes[i]->Items[j]->Suffix != NULL) {
+						fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", CustomHeroes[i]->Items[j]->Suffix->Ident.c_str());
+					}
+					fprintf(fd, "\n\t\t}");
 					if (j < (CustomHeroes[i]->Items.size() - 1)) {
-						fprintf(fd, ", ");
+						fprintf(fd, ",");
 					}
 				}
-				fprintf(fd, "},\n");
+				fprintf(fd, "\n\t},\n");
 			}
 			if (CustomHeroes[i]->QuestsInProgress.size() > 0) {
 				fprintf(fd, "\tQuestsInProgress = {");

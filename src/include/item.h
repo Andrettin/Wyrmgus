@@ -48,6 +48,7 @@
 
 class CUnitType;
 class CUpgrade;
+class CVariable;
 
 /**
 **  Indexes into item class array.
@@ -96,12 +97,13 @@ class CItem
 {
 public:
 	CItem() :
-		Type(NULL)
+		Type(NULL), Prefix(NULL), Suffix(NULL)
 	{
 	}
 	
-	std::string Name;			/// Name of the item
 	CUnitType *Type;			/// Item type of the item
+	CUpgrade *Prefix;
+	CUpgrade *Suffix;
 };
 
 /*----------------------------------------------------------------------------
