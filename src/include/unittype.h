@@ -254,7 +254,6 @@ enum {
 	ITEM_INDEX,
 	POWERUP_INDEX,
 	INVENTORY_INDEX,
-	CANUSESHIELD_INDEX,				/// Whether the unit type can use a shield
 	TRAP_INDEX,
 	BRIDGE_INDEX,
 	MERCENARY_INDEX,

@@ -2803,7 +2803,16 @@ bool CUnit::CanEquipItem(CUnit *item) const
 		return false;
 	}
 	
-	if (GetItemClassSlot(item->Type->ItemClass) == ShieldItemSlot && !Type->BoolFlag[CANUSESHIELD_INDEX].value) { //if the item is a shield and this unit's type can't use shields, return false
+	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
+		GetItemClassSlot(item->Type->ItemClass) == ShieldItemSlot
+		 && (
+			Type->WeaponClass == DaggerItemClass
+			|| Type->WeaponClass == BowItemClass
+			|| Type->WeaponClass == ThrowingAxeItemClass
+			|| Type->WeaponClass == JavelinItemClass
+			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
+		)
+	) {
 		return false;
 	}
 	
