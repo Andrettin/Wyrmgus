@@ -65,6 +65,9 @@
 #include "trigger.h"
 #include "ui/popup.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_manager.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "upgrade.h"
 #include "video.h"
@@ -390,7 +393,10 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 
-	if (condition->Variables && type) {
+	//Wyrmgus start
+//	if (condition->Variables && type) {
+	if (condition->Variables && type && button.Action != ButtonUnit) {
+	//Wyrmgus end
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 				if ((condition->Variables[i] == CONDITION_ONLY) ^ type->Stats[ThisPlayer->Index].Variables[i].Enable) {
@@ -398,7 +404,19 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 		}
+	//Wyrmgus start
+	} else if (condition->Variables && button.Action == ButtonUnit) {
+		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+			if (condition->Variables[i] != CONDITION_TRUE) {
+				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
+					return false;
+				}
+			}
+		}
+	//Wyrmgus end
 	}
+	
+	
 	return true;
 }
 
@@ -417,7 +435,13 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 		 ++it) {
 		CPopupContentType &content = **it;
 
-		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
+		//Wyrmgus start
+//		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
+		if (
+			(button.Action != ButtonUnit && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
+			|| (button.Action == ButtonUnit && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
+		) {
+		//Wyrmgus end
 			// Automatically write the calculated coordinates.
 			content.pos.x = contentWidth + content.MarginX;
 			content.pos.y = popupHeight + content.MarginY;
@@ -637,7 +661,13 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		 it != popup->Contents.end(); ++it) {
 		const CPopupContentType &content = **it;
 
-		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
+		//Wyrmgus start
+//		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
+		if (
+			(button.Action != ButtonUnit && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
+			|| (button.Action == ButtonUnit && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
+		) {
+		//Wyrmgus end
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
 		}
 	}

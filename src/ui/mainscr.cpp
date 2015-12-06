@@ -651,8 +651,8 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			ba->Hint = uins->GetTypeName();
 			ba->Pos = j;
 			ba->Level = unit.Type->ButtonLevelForInventory;
-			ba->Action = ButtonButton;
-			ba->Value = uins->Type->Slot;
+			ba->Action = ButtonUnit;
+			ba->Value = UnitNumber(*uins);
 			ba->Popup = "popup-item-inventory";
 			DrawPopup(*ba, UI.InventoryButtons[j], UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
 			delete ba;

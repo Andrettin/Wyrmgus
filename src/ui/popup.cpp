@@ -43,6 +43,10 @@
 #include "spells.h"
 #include "trigger.h"
 #include "ui.h"
+//Wyrmgus start
+#include "unit.h"
+#include "unit_manager.h"
+//Wyrmgus end
 #include "unittype.h"
 #include "video.h"
 
@@ -380,7 +384,14 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 /* virtual */ int CPopupContentTypeVariable::GetWidth(const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
-	TriggerData.Type = UnitTypes[button.Value];
+	//Wyrmgus start
+//	TriggerData.Type = UnitTypes[button.Value];
+	if (button.Action != ButtonUnit) {
+		TriggerData.Type = UnitTypes[button.Value];
+	} else {
+		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
+	}
+	//Wyrmgus end
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	return font.getWidth(text);
@@ -402,7 +413,14 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	CLabel label(font, this->TextColor, this->HighlightColor);
 
 	if (this->Text) {
-		TriggerData.Type = UnitTypes[button.Value];
+		//Wyrmgus start
+//		TriggerData.Type = UnitTypes[button.Value];
+		if (button.Action != ButtonUnit) {
+			TriggerData.Type = UnitTypes[button.Value];
+		} else {
+			TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
+		}
+		//Wyrmgus end
 		text = EvalString(this->Text);
 		TriggerData.Type = NULL;
 		if (this->Centered) {
@@ -413,9 +431,9 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	}
 
 	if (this->Index != -1) {
-		CUnitType &type = *UnitTypes[button.Value];
 		//Wyrmgus start
 		/*
+		CUnitType &type = *UnitTypes[button.Value];
 		int value = type.DefaultStat.Variables[this->Index].Value;
 		int diff = type.Stats[ThisPlayer->Index].Variables[this->Index].Value - value;
 
@@ -427,7 +445,12 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			label.Draw(x, y, buf);
 		}
 		*/
-		int value = type.Stats[ThisPlayer->Index].Variables[this->Index].Value;
+		int value;
+		if (button.Action != ButtonUnit) {
+			value = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[this->Index].Value;
+		} else {
+			value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
+		}
 		label.Draw(x, y, value);
 		//Wyrmgus end
 	}
