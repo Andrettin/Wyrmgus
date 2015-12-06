@@ -2725,6 +2725,19 @@ bool CUnit::IsItemEquipped(CUnit *item) const
 	return false;
 }
 
+bool CUnit::CanEquipItem(CUnit *item) const
+{
+	if (item->Container != this) {
+		return false;
+	}
+	
+	if (item->Type->ItemClass == PotionItemClass) {
+		return false;
+	}
+	
+	return true;
+}
+
 CAnimations *CUnit::GetAnimations() const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];

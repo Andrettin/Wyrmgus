@@ -53,7 +53,11 @@ class PopupConditionPanel
 {
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
-		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
+		//Wyrmgus start
+		Equipped(0), Equippable(0),
+//		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
+		ButtonAction(-1), ItemClass(-1), BoolFlags(NULL), Variables(NULL) {}
+		//Wyrmgus end
 	~PopupConditionPanel()
 	{
 		delete[] BoolFlags;
@@ -64,8 +68,15 @@ public:
 	bool HasDescription;        /// check if button has description.
 	bool HasDependencies;       /// check if button has dependencies or restrictions.
 	int ButtonAction;           /// action type of button
+	//Wyrmgus start
+	int ItemClass;				/// item class of the button's item
+	//Wyrmgus end
 	std::string ButtonValue;    /// value used in ValueStr field of button
 
+	//Wyrmgus start
+	char Equipped;				/// check if button's item is equipped.
+	char Equippable;			/// check if button's item is equippable by its owner.
+	//Wyrmgus end
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)
 };

@@ -315,6 +315,7 @@ public:
 	//Wyrmgus start
 	int GetModifiedVariable(int index) const;
 	bool IsItemEquipped(CUnit *item) const;
+	bool CanEquipItem(CUnit *item) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;

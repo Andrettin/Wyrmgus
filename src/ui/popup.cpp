@@ -562,6 +562,14 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value);
 			}
+		//Wyrmgus start
+		} else if (!strcmp(key, "Equipped")) {
+			condition->Equipped = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Equippable")) {
+			condition->Equippable = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "ItemClass")) {
+			condition->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
 			if (index != -1) {

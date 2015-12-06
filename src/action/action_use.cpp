@@ -196,7 +196,7 @@ enum {
 
 		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value)) {
 			std::string unit_name = unit.Name + " (" + unit.GetTypeName() + ")";
-			if (unit.Type->BoolFlag[INVENTORY_INDEX].value && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass != -1 && goal->Type->ItemClass != PotionItemClass) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)
+			if (unit.Type->BoolFlag[INVENTORY_INDEX].value && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass != -1 && goal->Type->ItemClass != PotionItemClass && unit.CanEquipItem(goal)) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)
 				if (!unit.IsItemEquipped(goal)) {
 					unit.EquipItem(*goal);
 				} else {
@@ -225,6 +225,9 @@ enum {
 					unit.Player->Notify(NotifyRed, unit.tilePos, _("%s has been slowed"), unit_name.c_str());
 				}
 			} else { //cannot use
+				if (unit.Player == ThisPlayer) {
+					unit.Player->Notify(NotifyRed, unit.tilePos, _("%s can't use that."), unit_name.c_str());
+				}
 				this->Finished = true;
 				return;
 			}
