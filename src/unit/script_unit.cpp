@@ -1560,6 +1560,9 @@ static int CclSetUnitVariable(lua_State *l)
 		if (index == LEVELUP_INDEX) {
 			unit->Player->UpdateLevelUpUnits();
 		}
+		if (index == LEVEL_INDEX || index == POINTS_INDEX) {
+			unit->UpdateXPRequired();
+		}
 		//Wyrmgus end
 	}
 	lua_pushnumber(l, value);

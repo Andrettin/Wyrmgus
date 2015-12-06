@@ -171,8 +171,6 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		}
 		if (i == KILL_INDEX || i == XP_INDEX) {
 			unit.Variable[i].Value = unit.Variable[i].Max;
-		} else if (i == POINTS_INDEX) {
-			unit.Variable[i].Value += newstats.Variables[i].Value - oldstats.Variables[i].Value;
 		} else {
 			unit.Variable[i].Max += newstats.Variables[i].Max - oldstats.Variables[i].Max;
 			unit.Variable[i].Increase += newstats.Variables[i].Increase - oldstats.Variables[i].Increase;
@@ -225,6 +223,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		container->UpdateContainerAttackRange();
 		//Wyrmgus end
 	}
+	//Wyrmgus start
+	//update the unit's XP required, as its level or points may have changed
+	unit.UpdateXPRequired();
+	//Wyrmgus end
 	//
 	// Update possible changed buttons.
 	//

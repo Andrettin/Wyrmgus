@@ -210,6 +210,8 @@ static void PlaceUnits()
 		if (unit.BoardCount > 0 && unit.InsideCount > 0) {
 			unit.UpdateContainerAttackRange();
 		}
+		
+		unit.UpdateXPRequired();
 		//Wyrmgus end
 	}
 }

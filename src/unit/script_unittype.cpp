@@ -208,7 +208,7 @@ static const char ACCURACY_KEY[] = "Accuracy";
 static const char EVASION_KEY[] = "Evasion";
 static const char LEVEL_KEY[] = "Level";
 static const char LEVELUP_KEY[] = "LevelUp";
-static const char XPREQUIRED_KEY[] = "XpRequired";
+static const char XPREQUIRED_KEY[] = "XPRequired";
 static const char VARIATION_KEY[] = "Variation";
 static const char HITPOINTHEALING_KEY[] = "HitPointHealing";
 static const char CRITICALSTRIKECHANCE_KEY[] = "CriticalStrikeChance";
@@ -2797,11 +2797,6 @@ void UpdateUnitVariables(CUnit &unit)
 	
 	unit.Variable[LEVELUP_INDEX].Max = 255;
 
-	if (unit.Type->BoolFlag[ORGANIC_INDEX].value) {
-		unit.Variable[XPREQUIRED_INDEX].Max = 43500;
-		unit.Variable[XPREQUIRED_INDEX].Enable = 1;
-	}
-	
 	if (unit.Variable[GENDER_INDEX].Value == NoGender && unit.Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
 		unit.Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
 		unit.Variable[GENDER_INDEX].Max = MaxGenders;
