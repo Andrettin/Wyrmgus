@@ -698,6 +698,7 @@ public:
 	int TrainQuantity;										/// Quantity to be trained
 	int Upkeep;												/// Gold upkeep (for grand strategy mode)
 	int ItemClass;											/// Item class (if the unit type is an item)
+	int WeaponClass;										/// Weapon class (if the unit type uses a weapon)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 

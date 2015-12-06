@@ -57,8 +57,12 @@
 
 int GetItemClassIdByName(std::string item_class)
 {
-	if (item_class == "sword") {
+	if (item_class == "dagger") {
+		return DaggerItemClass;
+	} else if (item_class == "sword") {
 		return SwordItemClass;
+	} else if (item_class == "rapier") {
+		return RapierItemClass;
 	} else if (item_class == "axe") {
 		return AxeItemClass;
 	} else if (item_class == "mace") {
@@ -92,8 +96,12 @@ int GetItemClassIdByName(std::string item_class)
 
 std::string GetItemClassNameById(int item_class)
 {
-	if (item_class == SwordItemClass) {
+	if (item_class == DaggerItemClass) {
+		return "dagger";
+	} else if (item_class == SwordItemClass) {
 		return "sword";
+	} else if (item_class == RapierItemClass) {
+		return "rapier";
 	} else if (item_class == AxeItemClass) {
 		return "axe";
 	} else if (item_class == MaceItemClass) {
@@ -128,7 +136,9 @@ std::string GetItemClassNameById(int item_class)
 int GetItemClassSlot(int item_class)
 {
 	if (
-		item_class == SwordItemClass
+		item_class == DaggerItemClass
+		|| item_class == SwordItemClass
+		|| item_class == RapierItemClass
 		|| item_class == AxeItemClass
 		|| item_class == MaceItemClass
 		|| item_class == SpearItemClass

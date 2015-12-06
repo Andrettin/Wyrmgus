@@ -68,7 +68,9 @@ enum ItemSlots {
 **  Indexes into item class array.
 */
 enum ItemClasses {
+	DaggerItemClass,
 	SwordItemClass,
+	RapierItemClass,
 	AxeItemClass,
 	MaceItemClass,
 	SpearItemClass,

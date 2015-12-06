@@ -626,6 +626,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->TrainQuantity = parent_type->TrainQuantity;
 			type->Upkeep = parent_type->Upkeep;
 			type->ItemClass = parent_type->ItemClass;
+			type->WeaponClass = parent_type->WeaponClass;
 			type->MaxOnBoard = parent_type->MaxOnBoard;
 			type->RepairRange = parent_type->RepairRange;
 			type->RepairHP = parent_type->RepairHP;
@@ -1751,6 +1752,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "ItemClass")) {
 			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "WeaponClass")) {
+			type->WeaponClass = GetItemClassIdByName(LuaToString(l, -1));
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
@@ -2159,6 +2162,9 @@ static int CclGetUnitTypeData(lua_State *l)
 	*/
 	} else if (!strcmp(data, "ItemClass")) {
 		lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		return 1;
+	} else if (!strcmp(data, "WeaponClass")) {
+		lua_pushstring(l, GetItemClassNameById(type->WeaponClass).c_str());
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Missile")) {

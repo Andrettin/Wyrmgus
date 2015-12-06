@@ -2731,6 +2731,10 @@ bool CUnit::CanEquipItem(CUnit *item) const
 		return false;
 	}
 	
+	if (GetItemClassSlot(item->Type->ItemClass) == WeaponItemSlot && Type->WeaponClass != item->Type->ItemClass) { //if the item is a weapon and its item class doesn't match the weapon class used by this unit's type, return false
+		return false;
+	}
+	
 	if (item->Type->ItemClass == PotionItemClass) {
 		return false;
 	}
