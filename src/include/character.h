@@ -49,6 +49,7 @@
 class CItem;
 class CQuest;
 class CUnitType;
+class CUnit;
 class CUpgrade;
 
 /**
@@ -70,7 +71,8 @@ public:
 		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0),
 		Persistent(false), Custom(false),
 		Type(NULL), Trait(NULL),
-		Father(NULL), Mother(NULL)
+		Father(NULL), Mother(NULL),
+		Weapon(NULL), Shield(NULL)
 	{
 		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}
@@ -79,7 +81,8 @@ public:
 	bool IsChildOf(std::string parent_full_name);
 	bool IsSiblingOf(std::string sibling_full_name);
 	std::string GetFullName();
-	
+	CItem *GetItem(CUnit &item);
+
 	int Year;					/// Year in which the character historically starts being active
 	int DeathYear;				/// Year in which the character dies of natural causes
 	int Civilization;			/// Culture to which the character belongs
@@ -102,6 +105,8 @@ public:
 	CUpgrade *Trait;
 	CCharacter *Father;					/// Character's father
 	CCharacter *Mother;					/// Character's mother
+	CItem *Weapon;						/// The weapon the character has equipped
+	CItem *Shield;						/// The shield the character has equipped
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CUpgrade *> Abilities;

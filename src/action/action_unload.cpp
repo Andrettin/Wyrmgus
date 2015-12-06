@@ -39,6 +39,7 @@
 
 #include "animation.h"
 //Wyrmgus start
+#include "character.h"
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
@@ -222,6 +223,12 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		transporter.BoardCount -= unit.Type->BoardSize;
 	}
 	unit.Place(pos);
+	
+	if (transporter.Character && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
+		CItem *item = transporter.Character->GetItem(unit);
+		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
+		delete item;
+	}
 	//Wyrmgus end
 	//Wyrmgus start
 	//if transporter has a rally point (useful for towers), send the unloaded unit there

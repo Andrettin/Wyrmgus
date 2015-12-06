@@ -622,6 +622,12 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		AbilityAcquire(*this, this->Character->Abilities[i]);
 	}
 	
+	//load items
+	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
+		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, &Players[PlayerNumNeutral]);
+		item->Remove(this);
+	}
+	
 	if (this->Character == NULL) {
 		this->Player->UnitTypesNonHeroCount[this->Type->Slot]++;
 	} else {

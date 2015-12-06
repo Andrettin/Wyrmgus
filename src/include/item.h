@@ -94,13 +94,11 @@ class CItem
 {
 public:
 	CItem() :
-		Unique(false),
 		Type(NULL)
 	{
 	}
 	
 	std::string Name;			/// Name of the item
-	bool Unique;				/// Whether this is a unique item
 	CUnitType *Type;			/// Item type of the item
 };
 

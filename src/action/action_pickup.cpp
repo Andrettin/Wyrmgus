@@ -39,6 +39,7 @@
 
 #include "animation.h"
 //Wyrmgus start
+#include "character.h"
 #include "commands.h"
 //Wyrmgus end
 #include "iolib.h"
@@ -198,6 +199,11 @@ enum {
 
 		if (unit.Type->BoolFlag[INVENTORY_INDEX].value && goal && goal->Type->BoolFlag[ITEM_INDEX].value) {
 			goal->Remove(&unit);
+			if (unit.Character) { //if the unit has a character, store the item for it
+				CItem *item = new CItem;
+				unit.Character->Items.push_back(item);
+				item->Type = const_cast<CUnitType *>(&(*goal->Type));
+			}
 		} else if (goal && (goal->Type->BoolFlag[POWERUP_INDEX].value || (!unit.Type->BoolFlag[INVENTORY_INDEX].value && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass == PotionItemClass))) {
 			CommandUse(unit, *goal, FlushCommands);
 		}

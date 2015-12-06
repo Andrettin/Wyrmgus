@@ -43,6 +43,7 @@
 #include <map>
 
 #include "game.h"
+#include "item.h"
 #include "parameters.h"
 #include "player.h"
 #include "quest.h"
@@ -86,6 +87,16 @@ bool CCharacter::IsSiblingOf(std::string sibling_full_name)
 		}
 	}
 	return false;
+}
+
+CItem *CCharacter::GetItem(CUnit &item)
+{
+	for (size_t i = 0; i < this->Items.size(); ++i) {
+		if (this->Items[i]->Type == item.Type) {
+			return this->Items[i];
+		}
+	}
+	return NULL;
 }
 
 void CleanCharacters()
@@ -167,6 +178,16 @@ void SaveHeroes()
 						fprintf(fd, ", ");
 					}
 				}
+				fprintf(fd, "},\n");
+			}
+			if (Characters[i]->Items.size() > 0) {
+				fprintf(fd, "\tItems = {");
+				for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
+					fprintf(fd, "\"%s\"", Characters[i]->Items[j]->Type->Ident.c_str());
+					if (j < (Characters[i]->Items.size() - 1)) {
+						fprintf(fd, ", ");
+					}
+				}
 				fprintf(fd, "}\n");
 			}
 			fprintf(fd, "})\n\n");
@@ -206,6 +227,16 @@ void SaveHeroes()
 				for (size_t j = 0; j < CustomHeroes[i]->Abilities.size(); ++j) {
 					fprintf(fd, "\"%s\"", CustomHeroes[i]->Abilities[j]->Ident.c_str());
 					if (j < (CustomHeroes[i]->Abilities.size() - 1)) {
+						fprintf(fd, ", ");
+					}
+				}
+				fprintf(fd, "},\n");
+			}
+			if (CustomHeroes[i]->Items.size() > 0) {
+				fprintf(fd, "\tItems = {");
+				for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
+					fprintf(fd, "\"%s\"", CustomHeroes[i]->Items[j]->Type->Ident.c_str());
+					if (j < (CustomHeroes[i]->Items.size() - 1)) {
 						fprintf(fd, ", ");
 					}
 				}

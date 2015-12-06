@@ -200,6 +200,19 @@ static int CclDefineCharacter(lua_State *l)
 					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "Items")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string item_ident = LuaToString(l, -1, j + 1);
+				int item_type_id = UnitTypeIdByIdent(item_ident);
+				if (item_type_id != -1) {
+					CItem *item = new CItem;
+					character->Items.push_back(item);
+					item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
+				} else {
+					LuaError(l, "Item type \"%s\" doesn't exist." _C_ item_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "ForbiddenUpgrades")) {
 			memset(character->ForbiddenUpgrades, 0, sizeof(character->ForbiddenUpgrades));
 			const int args = lua_rawlen(l, -1);
@@ -312,6 +325,19 @@ static int CclDefineCustomHero(lua_State *l)
 					hero->Abilities.push_back(AllUpgrades[ability_id]);
 				} else {
 					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident.c_str());
+				}
+			}
+		} else if (!strcmp(value, "Items")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string item_ident = LuaToString(l, -1, j + 1);
+				int item_type_id = UnitTypeIdByIdent(item_ident);
+				if (item_type_id != -1) {
+					CItem *item = new CItem;
+					hero->Items.push_back(item);
+					item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
+				} else {
+					LuaError(l, "Item type \"%s\" doesn't exist." _C_ item_ident.c_str());
 				}
 			}
 		} else if (!strcmp(value, "QuestsInProgress")) {
