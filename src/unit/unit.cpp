@@ -2975,18 +2975,23 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		Vec2i drop_pos = unit.tilePos;
 		drop_pos.x += SyncRand(unit.Type->TileWidth);
 		drop_pos.y += SyncRand(unit.Type->TileHeight);
-		int DropCount = 0;
-		int LocalDrops[UnitTypeMax];
-		for (int i = 0; i < UnitTypeMax; ++i) {
-			if (unit.Type->Drops[i]) {
-				LocalDrops[DropCount] = i;
-				DropCount += 1;
+		CUnit *droppedUnit = NULL;
+		if (unit.Player->AiEnabled && unit.Type->AiDrops.size() > 0) {
+			int chosen_drop = unit.Type->AiDrops[SyncRand(unit.Type->AiDrops.size())];
+			droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+		} else if (unit.Type->Drops.size() > 0) {
+			int chosen_drop = unit.Type->Drops[SyncRand(unit.Type->Drops.size())];
+			droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+		}
+		
+		if (droppedUnit != NULL) {
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1 && ItemPrefixes[droppedUnit->Type->ItemClass].size() > 0) { //10% of a dropped item having a prefix
+				droppedUnit->SetPrefix(ItemPrefixes[droppedUnit->Type->ItemClass][SyncRand(ItemPrefixes[droppedUnit->Type->ItemClass].size())]);
+			}
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1 && ItemSuffixes[droppedUnit->Type->ItemClass].size() > 0) { //10% of a dropped item having a suffix
+				droppedUnit->SetSuffix(ItemSuffixes[droppedUnit->Type->ItemClass][SyncRand(ItemSuffixes[droppedUnit->Type->ItemClass].size())]);
 			}
 		}
-		if (DropCount > 0) {
-			int ChosenDrop = LocalDrops[SyncRand(DropCount)];
-			CUnit *droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[ChosenDrop], &Players[PlayerNumNeutral]);
-		}		
 	}
 	//Wyrmgus end
 

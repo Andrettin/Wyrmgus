@@ -57,6 +57,9 @@
 //Wyrmgus end
 #include "interface.h"
 #include "iolib.h"
+//Wyrmgus start
+#include "item.h"
+//Wyrmgus end
 #include "map.h"
 //Wyrmgus start
 #include "network.h"
@@ -155,6 +158,8 @@ CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 	memset(this->GrandStrategyCosts, 0, sizeof(this->GrandStrategyCosts));
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
+	memset(this->ItemPrefix, 0, sizeof(this->ItemPrefix));
+	memset(this->ItemSuffix, 0, sizeof(this->ItemSuffix));
 	//Wyrmgus end
 }
 
@@ -217,6 +222,13 @@ void CleanUpgrades()
 	}
 	Upgrades.clear();
 
+	//Wyrmgus start
+	for (unsigned int i = 0; i < MaxItemClasses; ++i) {
+		ItemPrefixes[i].clear();
+		ItemSuffixes[i].clear();
+	}
+	//Wyrmgus end
+	
 	//
 	//  Free the upgrade modifiers.
 	//
@@ -420,6 +432,16 @@ static int CclDefineModifier(lua_State *l)
 					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = um->UpgradeId;
 				}
 			}
+		}
+	}
+	
+	//add the upgrade to the prefix and suffix vectors (if applicable), for lack of a better place
+	for (unsigned int i = 0; i < MaxItemClasses; ++i) {
+		if (AllUpgrades[um->UpgradeId]->ItemPrefix[i]) {
+			ItemPrefixes[i].push_back(AllUpgrades[um->UpgradeId]);
+		}
+		if (AllUpgrades[um->UpgradeId]->ItemSuffix[i]) {
+			ItemSuffixes[i].push_back(AllUpgrades[um->UpgradeId]);
 		}
 	}
 	//Wyrmgus end

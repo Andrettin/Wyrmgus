@@ -110,6 +110,9 @@ public:
 -- Variables
 ----------------------------------------------------------------------------*/
 
+extern std::vector<CUpgrade *> ItemPrefixes[MaxItemClasses];
+extern std::vector<CUpgrade *> ItemSuffixes[MaxItemClasses];
+
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/

@@ -10,6 +10,9 @@ $#include "game.h"
 $#include "grand_strategy.h"
 //Wyrmgus end
 $#include "iolib.h"
+//Wyrmgus start
+$#include "item.h"
+//Wyrmgus end
 $#include "map.h"
 $#include "minimap.h"
 $#include "movie.h"
@@ -58,7 +61,7 @@ $]
 
 //Wyrmgus start
 //#define MaxCosts 7
-#define MaxCosts 12
+#define MaxCosts 16
 //Wyrmgus end
 #define FoodCost MaxCosts
 #define ScoreCost MaxCosts + 1
@@ -75,6 +78,10 @@ $]
 #define RightButton 8
 #define UpButton 16
 #define DownButton 32
+
+//Wyrmgus start
+#define MaxItemClasses 16
+//Wyrmgus end
 
 $using std::string;
 $using std::vector;
@@ -123,4 +130,5 @@ extern void DeleteCustomHero(std::string hero_full_name);
 extern void SetCurrentCustomHero(std::string hero_full_name);
 extern std::string GetCurrentCustomHero();
 extern std::string GeneratePersonalName(std::string civilization_name, std::string unit_type_ident);
+extern int GetItemClassIdByName(std::string item_class);
 //Wyrmgus end

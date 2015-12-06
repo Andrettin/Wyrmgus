@@ -14,8 +14,8 @@ class CUpgrade
 	bool Ability;
 	bool Weapon;
 	bool Shield;
-	bool ItemPrefix;
-	bool ItemSuffix;
+	bool ItemPrefix[MaxItemClasses];
+	bool ItemSuffix[MaxItemClasses];
 	//Wyrmgus end
 	int Costs[MaxCosts];
 	//Wyrmgus start

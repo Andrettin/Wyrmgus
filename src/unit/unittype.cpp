@@ -601,7 +601,6 @@ CUnitType::CUnitType() :
 	memset(ResInfo, 0, sizeof(ResInfo));
 	//Wyrmgus start
 	memset(VarInfo, 0, sizeof(VarInfo));
-	memset(Drops, 0, sizeof(Drops));
 	//Wyrmgus end
 	memset(MissileOffsets, 0, sizeof(MissileOffsets));
 	//Wyrmgus start

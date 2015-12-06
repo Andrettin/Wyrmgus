@@ -697,8 +697,11 @@ static int CclDefineUnitType(lua_State *l)
 				type->BoolFlag[i].value = parent_type->BoolFlag[i].value;
 				type->BoolFlag[i].CanTransport = parent_type->BoolFlag[i].CanTransport;
 			}
-			for (unsigned int i = 0; i < UnitTypeMax; ++i) {
-				type->Drops[i] = parent_type->Drops[i];
+			for (size_t i = 0; i < parent_type->Drops.size(); ++i) {
+				type->Drops.push_back(parent_type->Drops[i]);
+			}
+			for (size_t i = 0; i < parent_type->AiDrops.size(); ++i) {
+				type->AiDrops.push_back(parent_type->AiDrops[i]);
 			}
 			for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
 				type->Traits.push_back(parent_type->Traits[i]);
@@ -1730,11 +1733,23 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Excrement")) {
 			type->Excrement = LuaToString(l, -1);
 		} else if (!strcmp(value, "Drops")) {
+			type->Drops.clear(); // remove previously defined drops
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				CUnitType *drop_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (drop_type) {
-					type->Drops[drop_type->Slot] = true;
+				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
+				if (drop_type_id != -1) {
+					type->Drops.push_back(drop_type_id);
+				} else { // Error
+					LuaError(l, "incorrect drop unit-type");
+				}
+			}
+		} else if (!strcmp(value, "AiDrops")) {
+			type->AiDrops.clear(); // remove previously defined AI drops
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
+				if (drop_type_id != -1) {
+					type->AiDrops.push_back(drop_type_id);
 				} else { // Error
 					LuaError(l, "incorrect drop unit-type");
 				}

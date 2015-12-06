@@ -673,7 +673,8 @@ public:
 	std::string PersonalNames[PersonalNameMax];	/// personal names
 	std::string PersonalNamePrefixes[PersonalNameMax];	/// personal name prefixes
 	std::string PersonalNameSuffixes[PersonalNameMax];	/// personal name suffixes
-	bool Drops[UnitTypeMax];		/// Units spawned upon death (i.e. items).
+	std::vector<int> Drops;			/// Units which can spawn upon death (i.e. items).
+	std::vector<int> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
 	//Wyrmgus end
 	int Slot;                       /// Type as number

@@ -38,6 +38,9 @@
 ----------------------------------------------------------------------------*/
 
 #include <vector>
+//Wyrmgus start
+#include "item.h"
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Defines
@@ -200,15 +203,15 @@ public:
 	bool Ability;
 	bool Weapon;
 	bool Shield;
-	bool ItemPrefix;
-	bool ItemSuffix;
+	bool ItemPrefix[MaxItemClasses];
+	bool ItemSuffix[MaxItemClasses];
 	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
 	//Wyrmgus start
-	int   GrandStrategyCosts[MaxCosts];	/// costs for the upgrade for grand strategy mode
-	int   GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode
-	int   TechnologyPointCost;		/// technology point cost
+	int GrandStrategyCosts[MaxCosts];	/// costs for the upgrade for grand strategy mode
+	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode
+	int TechnologyPointCost;		/// technology point cost
 	//Wyrmgus end
 	// TODO: not used by buttons
 	CIcon *Icon;                      /// icon to display to the user
