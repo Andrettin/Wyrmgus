@@ -819,7 +819,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 /**
 **  Draw popup
 */
-void DrawGenericPopup(std::string popup_text, int x, int y)
+void DrawGenericPopup(std::string popup_text, int x, int y, std::string text_color, std::string highlight_color)
 {
 	const CFont &font = GetGameFont();
 	
@@ -904,10 +904,17 @@ void DrawGenericPopup(std::string popup_text, int x, int y)
 	}
 	Video.DrawRectangle(BorderColor, x, y, popupWidth, popupHeight);
 
+	if (text_color.empty()) {
+		text_color = "white";
+	}
+	if (highlight_color.empty()) {
+		highlight_color = "yellow";
+	}
+	
 	// Contents
 	x += pos.x;
 	y += pos.y;
-	CLabel label(font, "white", "yellow");
+	CLabel label(font, text_color, highlight_color);
 	std::string sub;
 	i = 0;
 	int y_off = y;

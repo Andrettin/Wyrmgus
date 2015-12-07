@@ -464,15 +464,38 @@ void CViewport::Draw() const
 	//
 	// Draw unit's name popup
 	//
-	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
+	//Wyrmgus start
+//	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
+	if (CursorOn == CursorOnMap && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
+	//Wyrmgus end
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
 
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
 			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
-			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-		} else if (!isMapFieldVisile) {
-			ShowUnitName(*this, CursorScreenPos, NULL, true);
+			//Wyrmgus start
+//			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
+			std::string unit_name;
+			if (!UnitUnderCursor->Name.empty()) {
+				unit_name = UnitUnderCursor->Name;
+				if (!UnitUnderCursor->Type->BoolFlag[ITEM_INDEX].value) {
+					unit_name += " (" + UnitUnderCursor->GetTypeName() + ")";
+				}
+			} else {
+				unit_name = UnitUnderCursor->GetTypeName();
+			}
+			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
+			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
+			std::string text_color;
+			if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
+				text_color = "blue";
+			}
+			DrawGenericPopup(unit_name, unit_center_pos.x, unit_center_pos.y, text_color);
+			//Wyrmgus end
+		//Wyrmgus start
+//		} else if (!isMapFieldVisile) {
+//			ShowUnitName(*this, CursorScreenPos, NULL, true);
+		//Wyrmgus end
 		}
 	}
 
