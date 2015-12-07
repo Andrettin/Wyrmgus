@@ -378,6 +378,28 @@ std::string GetCurrentCustomHero()
 	}
 }
 
+void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_dynasty_name)
+{
+	if (!hero_full_name.empty()) {
+		CCharacter *hero = GetCustomHero(hero_full_name);
+		if (!hero) {
+			fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		}
+		
+		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		if (civilization != -1) {
+			hero->Civilization = civilization;
+			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization, GetUnitTypeClassIndexByName(hero->Type->Class));
+			if (new_unit_type_id != -1) {
+				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
+				hero->Name = new_hero_name;
+				hero->Dynasty = new_hero_dynasty_name;
+				SaveHeroes();
+			}
+		}
+	}
+}
+
 std::string GetGenderNameById(int gender)
 {
 	if (gender == MaleGender) {
