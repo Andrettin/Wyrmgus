@@ -790,6 +790,7 @@ void CUnit::EquipItem(CUnit &item)
 			|| i == ARMOR_INDEX || i == FIRERESISTANCE_INDEX || i == COLDRESISTANCE_INDEX || i == ARCANERESISTANCE_INDEX || i == LIGHTNINGRESISTANCE_INDEX
 			|| i == AIRRESISTANCE_INDEX || i == EARTHRESISTANCE_INDEX || i == WATERRESISTANCE_INDEX
 			|| i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
+			|| i == ACCURACY_INDEX || i == EVASION_INDEX || i == BACKSTAB_INDEX
 		) {
 			Variable[i].Value += item.Variable[i].Value;
 			Variable[i].Max += item.Variable[i].Max;
@@ -808,6 +809,7 @@ void CUnit::DeequipItem(CUnit &item)
 			|| i == ARMOR_INDEX || i == FIRERESISTANCE_INDEX || i == COLDRESISTANCE_INDEX || i == ARCANERESISTANCE_INDEX || i == LIGHTNINGRESISTANCE_INDEX
 			|| i == AIRRESISTANCE_INDEX || i == EARTHRESISTANCE_INDEX || i == WATERRESISTANCE_INDEX
 			|| i == HACKRESISTANCE_INDEX || i == PIERCERESISTANCE_INDEX || i == BLUNTRESISTANCE_INDEX
+			|| i == ACCURACY_INDEX || i == EVASION_INDEX || i == BACKSTAB_INDEX
 		) {
 			Variable[i].Value -= item.Variable[i].Value;
 			Variable[i].Max -= item.Variable[i].Max;
