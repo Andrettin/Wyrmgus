@@ -38,6 +38,7 @@
 #include "action/action_use.h"
 
 #include "animation.h"
+#include "character.h"
 #include "commands.h"
 #include "iolib.h"
 #include "luacallback.h"
@@ -241,6 +242,11 @@ enum {
 					goal->Remove(NULL);
 					LetUnitDie(*goal);
 				} else {
+					if (goal->Container->Character && goal->Container->Character->Persistent && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
+						CItem *item = goal->Container->Character->GetItem(*goal);
+						goal->Container->Character->Items.erase(std::remove(goal->Container->Character->Items.begin(), goal->Container->Character->Items.end(), item), goal->Container->Character->Items.end());
+						delete item;
+					}
 					UnitLost(*goal);
 					UnitClearOrders(*goal);
 					goal->Release();
