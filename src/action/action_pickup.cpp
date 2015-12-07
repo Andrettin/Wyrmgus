@@ -197,7 +197,7 @@ enum {
 			return ;
 		}
 
-		if (unit.Type->BoolFlag[INVENTORY_INDEX].value && goal && goal->Type->BoolFlag[ITEM_INDEX].value) {
+		if (unit.HasInventory() && goal && goal->Type->BoolFlag[ITEM_INDEX].value) {
 			goal->Remove(&unit);
 			if (unit.Character && unit.Character->Persistent) { //if the unit has a persistent character, store the item for it
 				CItem *item = new CItem;
@@ -214,7 +214,7 @@ enum {
 					item->Unique = goal->Unique;
 				}
 			}
-		} else if (goal && (goal->Type->BoolFlag[POWERUP_INDEX].value || (!unit.Type->BoolFlag[INVENTORY_INDEX].value && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass == PotionItemClass))) {
+		} else if (goal && (goal->Type->BoolFlag[POWERUP_INDEX].value || (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass == PotionItemClass))) {
 			CommandUse(unit, *goal, FlushCommands);
 		}
 		

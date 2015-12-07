@@ -419,7 +419,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	//Wyrmgus start
 	if (button.Action == ButtonUnit) {
 		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
-		if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->Type->BoolFlag[INVENTORY_INDEX].value) {
+		if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
 			if (condition->Equipped != CONDITION_TRUE) {
 				if ((condition->Equipped == CONDITION_ONLY) ^ unit.Container->IsItemEquipped(&unit)) {
 					return false;

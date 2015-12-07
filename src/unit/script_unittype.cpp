@@ -2418,6 +2418,21 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "Variations")) {
+		std::vector<std::string> variation_idents;
+		for (int var_n = 0; var_n < VariationMax; ++var_n) {
+			if (type->VarInfo[var_n] && std::find(variation_idents.begin(), variation_idents.end(), type->VarInfo[var_n]->VariationId) == variation_idents.end()) {
+				variation_idents.push_back(type->VarInfo[var_n]->VariationId);
+			}
+		}
+		
+		lua_createtable(l, variation_idents.size(), 0);
+		for (size_t i = 1; i <= variation_idents.size(); ++i)
+		{
+			lua_pushstring(l, variation_idents[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];

@@ -213,7 +213,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		return false;
 	}
 	//Wyrmgus start
-	if (unit.Type->BoolFlag[ITEM_INDEX].value && transporter.Type->BoolFlag[INVENTORY_INDEX].value && transporter.IsItemEquipped(&unit)) { //if the unit is an equipped item in the transporter's inventory, deequip it
+	if (unit.Type->BoolFlag[ITEM_INDEX].value && transporter.HasInventory() && transporter.IsItemEquipped(&unit)) { //if the unit is an equipped item in the transporter's inventory, deequip it
 		transporter.DeequipItem(unit);
 	}
 	

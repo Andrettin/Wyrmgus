@@ -727,7 +727,7 @@ static void DrawUnitInfo(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	if (type.BoolFlag[INVENTORY_INDEX].value && unit.InsideCount && CurrentButtonLevel == unit.Type->ButtonLevelForInventory) {
+	if (unit.HasInventory() && unit.InsideCount && CurrentButtonLevel == unit.Type->ButtonLevelForInventory) {
 		DrawUnitInfo_inventory(unit);
 		return;
 	}

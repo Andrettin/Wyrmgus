@@ -2914,6 +2914,19 @@ bool CUnit::CanEquipItem(CUnit *item) const
 	return true;
 }
 
+bool CUnit::HasInventory() const
+{
+	if (Type->BoolFlag[INVENTORY_INDEX].value) {
+		return true;
+	}
+	
+	if (Character != NULL && Character->Persistent) {
+		return true;
+	}
+	
+	return false;
+}
+
 CAnimations *CUnit::GetAnimations() const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];
@@ -3886,7 +3899,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (!unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Type->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
 		return false;
 	}
-	if (!picker.Type->BoolFlag[INVENTORY_INDEX].value && unit.Type->ItemClass != PotionItemClass) { //only potion items can be picked up as if they were power-ups for units with no inventory
+	if (!picker.HasInventory() && unit.Type->ItemClass != PotionItemClass) { //only potion items can be picked up as if they were power-ups for units with no inventory
 		return false;
 	}
 	if (picker.CurrentAction() == UnitActionBuilt) { // Under construction
@@ -3895,7 +3908,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (&picker == &unit) { // Cannot pick up itself.
 		return false;
 	}
-	if (picker.Type->BoolFlag[INVENTORY_INDEX].value && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= UI.InventoryButtons.size()) { // full
+	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= UI.InventoryButtons.size()) { // full
 		if (picker.Player == ThisPlayer) {
 			std::string picker_name = picker.Name + "'s (" + picker.GetTypeName() + ")";
 			picker.Player->Notify(NotifyRed, picker.tilePos, _("%s inventory is full."), picker_name.c_str());

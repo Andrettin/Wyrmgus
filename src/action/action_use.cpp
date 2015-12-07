@@ -200,7 +200,7 @@ enum {
 			if (!goal->Unique) {
 				goal_name = "the " + goal_name;
 			}
-			if (unit.Type->BoolFlag[INVENTORY_INDEX].value && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass != -1 && goal->Type->ItemClass != PotionItemClass && unit.CanEquipItem(goal)) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)
+			if (unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass != -1 && goal->Type->ItemClass != PotionItemClass && unit.CanEquipItem(goal)) { //if the item is an equipment, equip it (only for units with inventories), or deequip it (if it is already equipped)
 				if (!unit.IsItemEquipped(goal)) {
 					unit.EquipItem(*goal);
 				} else {
