@@ -460,6 +460,10 @@ static CUnit **Str2UnitRef(lua_State *l, const char *s)
 		res = &TriggerData.Defender;
 	} else if (!strcmp(s, "Active")) {
 		res = &TriggerData.Active;
+	//Wyrmgus start
+	} else if (!strcmp(s, "Unit")) {
+		res = &TriggerData.Unit;
+	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid unit reference '%s'\n" _C_ s);
 	}
@@ -1608,6 +1612,23 @@ static int CclActiveTypeVar(lua_State *l)
 	return AliasTypeVar(l, "Type");
 }
 
+//Wyrmgus start
+/**
+**  Return equivalent lua table for .
+**  {"Unit", {Unit = "Unit", Variable = arg1, Component = "Value" or arg2}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitVar(lua_State *l)
+{
+	if (lua_gettop(l) == 0 || lua_gettop(l) > 3) {
+		LuaError(l, "Bad number of arg for ActiveUnitVar()\n");
+	}
+	return AliasUnitVar(l, "Unit");
+}
+//Wyrmgus end
 
 /**
 **  Make alias for some function.
@@ -2105,6 +2126,9 @@ static void AliasRegister()
 	lua_register(Lua, "AttackerVar", CclUnitAttackerVar);
 	lua_register(Lua, "DefenderVar", CclUnitDefenderVar);
 	lua_register(Lua, "ActiveUnitVar", CclActiveUnitVar);
+	//Wyrmgus start
+	lua_register(Lua, "UnitVar", CclUnitVar);
+	//Wyrmgus end
 
 	// Type
 	lua_register(Lua, "TypeVar", CclActiveTypeVar);

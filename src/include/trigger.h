@@ -78,6 +78,9 @@ struct TriggerDataType {
 	CUnit *Attacker;  /// Unit which send the missile.
 	CUnit *Defender;  /// Unit which is hit by missile.
 	CUnit *Active;    /// Unit which is selected or else under cursor unit.
+	//Wyrmgus start
+	CUnit *Unit;	  /// Unit used in trigger
+	//Wyrmgus end
 	CUnitType *Type;  /// Type used in trigger;
 };
 

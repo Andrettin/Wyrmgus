@@ -390,10 +390,14 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		TriggerData.Type = UnitTypes[button.Value];
 	} else {
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
+		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
 	}
 	//Wyrmgus end
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
+	//Wyrmgus start
+	TriggerData.Unit = NULL;
+	//Wyrmgus end
 	return font.getWidth(text);
 }
 
@@ -419,10 +423,14 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			TriggerData.Type = UnitTypes[button.Value];
 		} else {
 			TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
+			TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
 		}
 		//Wyrmgus end
 		text = EvalString(this->Text);
 		TriggerData.Type = NULL;
+		//Wyrmgus start
+		TriggerData.Unit = NULL;
+		//Wyrmgus end
 		if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
 		} else {
