@@ -676,8 +676,8 @@ public:
 	std::string PersonalNameSuffixes[PersonalNameMax];	/// personal name suffixes
 	std::vector<int> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<int> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
+	std::vector<CUpgrade *> DropAffixes;	/// Affixes which can be applied to dropped items
 	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
-	std::vector<CUniqueItem *> Uniques;	/// Unique versions of this item type
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files

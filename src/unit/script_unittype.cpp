@@ -703,6 +703,9 @@ static int CclDefineUnitType(lua_State *l)
 			for (size_t i = 0; i < parent_type->AiDrops.size(); ++i) {
 				type->AiDrops.push_back(parent_type->AiDrops[i]);
 			}
+			for (size_t i = 0; i < parent_type->DropAffixes.size(); ++i) {
+				type->DropAffixes.push_back(parent_type->DropAffixes[i]);
+			}
 			for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
 				type->Traits.push_back(parent_type->Traits[i]);
 			}
@@ -1752,6 +1755,17 @@ static int CclDefineUnitType(lua_State *l)
 					type->AiDrops.push_back(drop_type_id);
 				} else { // Error
 					LuaError(l, "incorrect drop unit-type");
+				}
+			}
+		} else if (!strcmp(value, "DropAffixes")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string affix_ident = LuaToString(l, -1, j + 1);
+				int affix_id = UpgradeIdByIdent(affix_ident);
+				if (affix_id != -1) {
+					type->DropAffixes.push_back(AllUpgrades[affix_id]);
+				} else {
+					type->DropAffixes.push_back(CUpgrade::New(affix_ident)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 				}
 			}
 		} else if (!strcmp(value, "Traits")) {

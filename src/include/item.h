@@ -101,6 +101,8 @@ public:
 	{
 	}
 	
+	bool CanDrop();				/// Check whether this unique item can drop
+	
 	std::string Name;
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
@@ -127,8 +129,6 @@ public:
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CUpgrade *> ItemPrefixes[MaxItemClasses];
-extern std::vector<CUpgrade *> ItemSuffixes[MaxItemClasses];
 extern std::vector<CUniqueItem *> UniqueItems;
 
 /*----------------------------------------------------------------------------

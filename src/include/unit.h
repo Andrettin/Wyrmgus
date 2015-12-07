@@ -180,6 +180,9 @@ public:
 	void DeequipItem(CUnit &item);
 	void SetPrefix(CUpgrade *prefix);
 	void SetSuffix(CUpgrade *suffix);
+	void GeneratePrefix(CUnit &dropper);
+	void GenerateSuffix(CUnit &dropper);
+	void GenerateUnique(CUnit &dropper);
 	//Wyrmgus end
 	
 	bool RestoreOrder();

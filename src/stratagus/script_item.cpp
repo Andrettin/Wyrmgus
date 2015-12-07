@@ -79,7 +79,6 @@ static int CclDefineUniqueItem(lua_State *l)
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
 				item->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-				UnitTypes[unit_type_id]->Uniques.push_back(item);
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}

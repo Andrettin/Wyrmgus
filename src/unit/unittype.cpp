@@ -620,8 +620,10 @@ CUnitType::~CUnitType()
 	delete TeleportEffectOut;
 
 	//Wyrmgus start
+	Drops.clear();
+	AiDrops.clear();
+	DropAffixes.clear();
 	Traits.clear();
-	Uniques.clear();
 	//Wyrmgus end
 
 	BoolFlag.clear();

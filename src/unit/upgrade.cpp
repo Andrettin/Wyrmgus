@@ -223,13 +223,6 @@ void CleanUpgrades()
 	}
 	Upgrades.clear();
 
-	//Wyrmgus start
-	for (unsigned int i = 0; i < MaxItemClasses; ++i) {
-		ItemPrefixes[i].clear();
-		ItemSuffixes[i].clear();
-	}
-	//Wyrmgus end
-	
 	//
 	//  Free the upgrade modifiers.
 	//
@@ -436,17 +429,7 @@ static int CclDefineModifier(lua_State *l)
 		}
 	}
 	
-	//add the upgrade to the prefix and suffix vectors (if applicable), for lack of a better place
-	for (unsigned int i = 0; i < MaxItemClasses; ++i) {
-		if (AllUpgrades[um->UpgradeId]->ItemPrefix[i]) {
-			ItemPrefixes[i].push_back(AllUpgrades[um->UpgradeId]);
-		}
-		if (AllUpgrades[um->UpgradeId]->ItemSuffix[i]) {
-			ItemSuffixes[i].push_back(AllUpgrades[um->UpgradeId]);
-		}
-	}
-	
-	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add this to the incompatible affix's counterpart list
+	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add the upgrade to the incompatible affix's counterpart list here, for lack of a better place
 		if (AllUpgrades[um->UpgradeId]->IncompatibleAffixes[i]) {
 			AllUpgrades[i]->IncompatibleAffixes[um->UpgradeId] = true;
 		}

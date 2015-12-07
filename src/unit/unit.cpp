@@ -847,6 +847,59 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		Name += " " + Suffix->Name;
 	}
 }
+
+void CUnit::GeneratePrefix(CUnit &dropper)
+{
+	std::vector<CUpgrade *> potential_prefixes;
+	for (size_t i = 0; i < dropper.Type->DropAffixes.size(); ++i) {
+		if (dropper.Type->DropAffixes[i]->ItemPrefix[Type->ItemClass]) {
+			potential_prefixes.push_back(dropper.Type->DropAffixes[i]);
+		}
+	}
+	
+	if (potential_prefixes.size() > 0) {
+		SetPrefix(potential_prefixes[SyncRand(potential_prefixes.size())]);
+	}
+}
+
+void CUnit::GenerateSuffix(CUnit &dropper)
+{
+	std::vector<CUpgrade *> potential_suffixes;
+	for (size_t i = 0; i < dropper.Type->DropAffixes.size(); ++i) {
+		if (dropper.Type->DropAffixes[i]->ItemSuffix[Type->ItemClass]) {
+			if (Prefix == NULL || !dropper.Type->DropAffixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+				potential_suffixes.push_back(dropper.Type->DropAffixes[i]);
+			}
+		}
+	}
+	
+	if (potential_suffixes.size() > 0) {
+		SetSuffix(potential_suffixes[SyncRand(potential_suffixes.size())]);
+	}
+}
+
+void CUnit::GenerateUnique(CUnit &dropper)
+{
+	std::vector<CUniqueItem *> potential_uniques;
+	for (size_t i = 0; i < UniqueItems.size(); ++i) {
+		if (
+			Type == UniqueItems[i]->Type
+			&& (UniqueItems[i]->Prefix == NULL || std::find(dropper.Type->DropAffixes.begin(), dropper.Type->DropAffixes.end(), UniqueItems[i]->Prefix) != dropper.Type->DropAffixes.end()) //the dropper unit must be capable of generating this unique item's prefix to drop the item
+			&& (UniqueItems[i]->Suffix == NULL || std::find(dropper.Type->DropAffixes.begin(), dropper.Type->DropAffixes.end(), UniqueItems[i]->Suffix) != dropper.Type->DropAffixes.end()) //the dropper unit must be capable of generating this unique item's suffix to drop the item
+			&& UniqueItems[i]->CanDrop()
+		) {
+			potential_uniques.push_back(UniqueItems[i]);
+		}
+	}
+	
+	if (potential_uniques.size() > 0) {
+		CUniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
+		SetPrefix(chosen_unique->Prefix);
+		SetSuffix(chosen_unique->Suffix);
+		Name = chosen_unique->Name;
+		Unique = true;
+	}
+}
 //Wyrmgus end
 
 unsigned int CUnit::CurrentAction() const
@@ -3023,22 +3076,14 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		}
 		
 		if (droppedUnit != NULL) {
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1 && ItemPrefixes[droppedUnit->Type->ItemClass].size() > 0) { //10% of a dropped item having a prefix
-				droppedUnit->SetPrefix(ItemPrefixes[droppedUnit->Type->ItemClass][SyncRand(ItemPrefixes[droppedUnit->Type->ItemClass].size())]);
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1) { //10% of a dropped item having a prefix
+				droppedUnit->GeneratePrefix(unit);
 			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1 && ItemSuffixes[droppedUnit->Type->ItemClass].size() > 0) { //10% of a dropped item having a suffix
-				CUpgrade *chosen_suffix = ItemSuffixes[droppedUnit->Type->ItemClass][SyncRand(ItemSuffixes[droppedUnit->Type->ItemClass].size())];
-				while (droppedUnit->Prefix != NULL && chosen_suffix->IncompatibleAffixes[droppedUnit->Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-					chosen_suffix = ItemSuffixes[droppedUnit->Type->ItemClass][SyncRand(ItemSuffixes[droppedUnit->Type->ItemClass].size())];
-				}
-				droppedUnit->SetSuffix(chosen_suffix);
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1) { //10% of a dropped item having a suffix
+				droppedUnit->GenerateSuffix(unit);
 			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= 999 && droppedUnit->Type->ItemClass != -1 && droppedUnit->Type->Uniques.size() > 0) { //0.1% of a dropped item being unique
-				CUniqueItem *chosen_unique = droppedUnit->Type->Uniques[SyncRand(droppedUnit->Type->Uniques.size())];
-				droppedUnit->SetPrefix(chosen_unique->Prefix);
-				droppedUnit->SetSuffix(chosen_unique->Suffix);
-				droppedUnit->Name = chosen_unique->Name;
-				droppedUnit->Unique = true;
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= 999 && droppedUnit->Type->ItemClass != -1) { //0.1% of a dropped item being unique
+				droppedUnit->GenerateUnique(unit);
 			}
 		}
 	}

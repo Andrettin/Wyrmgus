@@ -42,17 +42,18 @@
 #include <string>
 #include <map>
 
+#include "character.h"
 #include "game.h"
 #include "parameters.h"
 #include "player.h"
+#include "unit.h"
+#include "unit_manager.h"
 #include "unittype.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CUpgrade *> ItemPrefixes[MaxItemClasses];
-std::vector<CUpgrade *> ItemSuffixes[MaxItemClasses];
 std::vector<CUniqueItem *> UniqueItems;
 
 /*----------------------------------------------------------------------------
@@ -166,6 +167,35 @@ int GetItemClassSlot(int item_class)
 	}
 
 	return -1;
+}
+
+bool CUniqueItem::CanDrop()
+{
+	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario
+	for (size_t i = 0; i < Characters.size(); ++i) {
+		for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
+			if (Characters[i]->Items[j]->Unique && Characters[i]->Items[j]->Name == this->Name) {
+				return false;
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < CustomHeroes.size(); ++i) {
+		for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
+			if (CustomHeroes[i]->Items[j]->Unique && CustomHeroes[i]->Items[j]->Name == this->Name) {
+				return false;
+			}
+		}
+	}
+	
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (unit.Unique && unit.Name == this->Name) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void CleanUniqueItems()
