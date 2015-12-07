@@ -1059,6 +1059,10 @@ static int CclDefineButton(lua_State *l)
 				ba.Allowed = ButtonCheckResearch;
 			} else if (!strcmp(value, "check-single-research")) {
 				ba.Allowed = ButtonCheckSingleResearch;
+			//Wyrmgus start
+			} else if (!strcmp(value, "check-has-inventory")) {
+				ba.Allowed = ButtonCheckHasInventory;
+			//Wyrmgus end
 			} else {
 				LuaError(l, "Unsupported action: %s" _C_ value);
 			}

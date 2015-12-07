@@ -375,4 +375,19 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button)
 	return false;
 }
 
+//Wyrmgus start
+/**
+**  Check for button enabled, if the unit has an inventory.
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
+*/
+bool ButtonCheckHasInventory(const CUnit &unit, const ButtonAction &button)
+{
+	return unit.HasInventory();
+}
+//Wyrmgus end
+
 //@}

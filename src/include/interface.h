@@ -460,6 +460,10 @@ extern bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button);
 extern bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button);
 /// Check if all requirements for a single research are meet
 extern bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button);
+//Wyrmgus start
+/// Check if the unit has an inventory
+extern bool ButtonCheckHasInventory(const CUnit &unit, const ButtonAction &button);
+//Wyrmgus end
 
 //
 // in ccl_ui.c
