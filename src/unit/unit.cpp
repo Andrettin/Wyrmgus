@@ -450,6 +450,7 @@ void CUnit::Init()
 	Trait = NULL;
 	Prefix = NULL;
 	Suffix = NULL;
+	Unique = false;
 	//Wyrmgus end
 	CurrentSightRange = 0;
 
@@ -564,6 +565,7 @@ void CUnit::Release(bool final)
 	Shield = NULL;
 	Prefix = NULL;
 	Suffix = NULL;
+	Unique = false;
 	//Wyrmgus end
 
 	delete pathFinderData;
@@ -634,6 +636,10 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 		if (this->Character->Items[i]->Suffix != NULL) {
 			item->SetSuffix(this->Character->Items[i]->Suffix);
+		}
+		item->Unique = this->Character->Items[i]->Unique;
+		if (!this->Character->Items[i]->Name.empty()) {
+			item->Name = this->Character->Items[i]->Name;
 		}
 		item->Remove(this);
 	}
@@ -3026,6 +3032,13 @@ void LetUnitDie(CUnit &unit, bool suicide)
 					chosen_suffix = ItemSuffixes[droppedUnit->Type->ItemClass][SyncRand(ItemSuffixes[droppedUnit->Type->ItemClass].size())];
 				}
 				droppedUnit->SetSuffix(chosen_suffix);
+			}
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= 999 && droppedUnit->Type->ItemClass != -1 && droppedUnit->Type->Uniques.size() > 0) { //0.1% of a dropped item being unique
+				CUniqueItem *chosen_unique = droppedUnit->Type->Uniques[SyncRand(droppedUnit->Type->Uniques.size())];
+				droppedUnit->SetPrefix(chosen_unique->Prefix);
+				droppedUnit->SetSuffix(chosen_unique->Suffix);
+				droppedUnit->Name = chosen_unique->Name;
+				droppedUnit->Unique = true;
 			}
 		}
 	}

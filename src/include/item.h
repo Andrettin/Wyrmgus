@@ -93,14 +93,31 @@ enum ItemClasses {
 	MaxItemClasses
 };
 
-class CItem
+class CUniqueItem
 {
 public:
-	CItem() :
+	CUniqueItem() :
 		Type(NULL), Prefix(NULL), Suffix(NULL)
 	{
 	}
 	
+	std::string Name;
+	CUnitType *Type;			/// Item type of the item
+	CUpgrade *Prefix;
+	CUpgrade *Suffix;
+};
+
+class CItem
+{
+public:
+	CItem() :
+		Unique(false),
+		Type(NULL), Prefix(NULL), Suffix(NULL)
+	{
+	}
+	
+	std::string Name;
+	bool Unique;
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
@@ -112,6 +129,7 @@ public:
 
 extern std::vector<CUpgrade *> ItemPrefixes[MaxItemClasses];
 extern std::vector<CUpgrade *> ItemSuffixes[MaxItemClasses];
+extern std::vector<CUniqueItem *> UniqueItems;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -120,6 +138,8 @@ extern std::vector<CUpgrade *> ItemSuffixes[MaxItemClasses];
 extern int GetItemClassIdByName(std::string item_class);
 extern std::string GetItemClassNameById(int item_class);
 extern int GetItemClassSlot(int item_class);
+extern void CleanUniqueItems();
+extern CUniqueItem *GetUniqueItem(std::string item_name);
 extern void ItemCclRegister();
 
 //@}

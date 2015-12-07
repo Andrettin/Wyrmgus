@@ -857,6 +857,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitTrait")) {
 			res->e = EString_UnitTrait;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "TypeName")) {
+			res->e = EString_TypeName;
+			res->D.Type = CclParseTypeDesc(l);
 		} else if (!strcmp(key, "TypeClass")) {
 			res->e = EString_TypeClass;
 			res->D.Type = CclParseTypeDesc(l);
@@ -1141,7 +1144,7 @@ std::string EvalString(const StringDesc *s)
 		//Wyrmgus start
 		case EString_UnitTypeName : // name of the UnitType
 			unit = EvalUnit(s->D.Unit);
-			if (unit != NULL && !unit->Name.empty() && !unit->Type->BoolFlag[ITEM_INDEX].value) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
+			if (unit != NULL && !unit->Name.empty() && (!unit->Type->BoolFlag[ITEM_INDEX].value || unit->Unique)) { //items with affixes use their type name in their given name, so there's no need to repeat their type name
 				return unit->GetTypeName();
 			} else { // only return a unit type name if the unit has a personal name (otherwise the unit type name would be returned as the unit name)
 				return std::string("");
@@ -1151,6 +1154,13 @@ std::string EvalString(const StringDesc *s)
 			if (unit != NULL && unit->Trait != NULL) {
 				return unit->Trait->Name;
 			} else {
+				return std::string("");
+			}
+		case EString_TypeName : // name of the unit type
+			type = s->D.Type;
+			if (type != NULL) {
+				return (**type).Name;
+			} else { // ERROR.
 				return std::string("");
 			}
 		case EString_TypeClass : // name of the unit type's class
@@ -1369,6 +1379,9 @@ void FreeStringDesc(StringDesc *s)
 		case EString_UnitTrait : // Trait of the unit
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
+			break;
+		case EString_TypeName : // Name of the unit type
+			delete *s->D.Type;
 			break;
 		case EString_TypeClass : // Class of the unit type
 			delete *s->D.Type;
@@ -1885,6 +1898,19 @@ static int CclUnitTrait(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for TypeName.
+**  {"TypeName", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclTypeName(lua_State *l)
+{
+	return Alias(l, "TypeName");
+}
+
+/**
 **  Return equivalent lua table for TypeClass.
 **  {"TypeClass", {}}
 **
@@ -2091,6 +2117,7 @@ static void AliasRegister()
 	//Wyrmgus start
 	lua_register(Lua, "UnitTypeName", CclUnitTypeName);
 	lua_register(Lua, "UnitTrait", CclUnitTrait);
+	lua_register(Lua, "TypeName", CclTypeName);
 	lua_register(Lua, "TypeClass", CclTypeClass);
 	lua_register(Lua, "TypeTrainQuantity", CclTypeTrainQuantity);
 	//Wyrmgus end

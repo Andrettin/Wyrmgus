@@ -461,6 +461,8 @@ static ConditionPanel *ParseConditionPanel(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(key, "Affixed")) {
 			condition->Affixed = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Unique")) {
+			condition->Unique = Ccl2Condition(l, LuaToString(l, -1));
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];

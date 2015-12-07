@@ -487,7 +487,9 @@ void CViewport::Draw() const
 			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string text_color;
-			if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
+			if (UnitUnderCursor->Unique) {
+				text_color = "orange";
+			} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
 				text_color = "blue";
 			}
 			DrawGenericPopup(unit_name, unit_center_pos.x, unit_center_pos.y, text_color);

@@ -50,6 +50,63 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/**
+**  Define a unique item.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineUniqueItem(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string item_name = LuaToString(l, 1);
+	CUniqueItem *item = GetUniqueItem(item_name);
+	if (!item) {
+		item = new CUniqueItem;
+		UniqueItems.push_back(item);
+		item->Name = item_name;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Type")) {
+			std::string unit_type_ident = LuaToString(l, -1);
+			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+			if (unit_type_id != -1) {
+				item->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+				UnitTypes[unit_type_id]->Uniques.push_back(item);
+			} else {
+				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
+			}
+		} else if (!strcmp(value, "Prefix")) {
+			std::string affix_ident = LuaToString(l, -1);
+			int upgrade_id = UpgradeIdByIdent(affix_ident);
+			if (upgrade_id != -1) {
+				item->Prefix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+			} else {
+				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
+			}
+		} else if (!strcmp(value, "Suffix")) {
+			std::string affix_ident = LuaToString(l, -1);
+			int upgrade_id = UpgradeIdByIdent(affix_ident);
+			if (upgrade_id != -1) {
+				item->Suffix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+			} else {
+				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -57,6 +114,7 @@
 */
 void ItemCclRegister()
 {
+	lua_register(Lua, "DefineUniqueItem", CclDefineUniqueItem);
 }
 
 //@}

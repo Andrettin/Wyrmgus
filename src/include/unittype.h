@@ -71,6 +71,7 @@ class CConstruction;
 class MissileType;
 class CFile;
 //Wyrmgus start
+class CUniqueItem;
 class OverlayAnimation;
 //Wyrmgus end
 struct lua_State;
@@ -676,6 +677,7 @@ public:
 	std::vector<int> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<int> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
+	std::vector<CUniqueItem *> Uniques;	/// Unique versions of this item type
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files

@@ -46,6 +46,7 @@
 #include "font.h"
 //Wyrmgus start
 #include "grand_strategy.h"
+#include "item.h"
 //Wyrmgus end
 #include "map.h"
 #include "minimap.h"
@@ -105,6 +106,7 @@ void CleanModules()
 	CleanMissiles();
 	//Wyrmgus start
 	CleanQuests();
+	CleanUniqueItems();
 	//Wyrmgus end
 	CleanUnits();
 	CleanUnitTypes();

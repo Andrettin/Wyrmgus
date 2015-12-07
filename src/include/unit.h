@@ -389,6 +389,7 @@ public:
 	int Variation;      /// Which of the variations of its unit type this unit has
 	CUpgrade *Prefix;	/// Unit's item prefix
 	CUpgrade *Suffix;	/// Unit's item suffix
+	bool Unique;		/// Whether the item is unique
 	//Wyrmgus end
 	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 

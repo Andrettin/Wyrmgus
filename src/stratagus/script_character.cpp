@@ -237,6 +237,22 @@ static int CclDefineCharacter(lua_State *l)
 						} else {
 							LuaError(l, "Item suffix \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 						}
+					} else if (!strcmp(value, "name")) {
+						item->Name = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "unique")) {
+						item->Name = LuaToString(l, -1, k + 1);
+						item->Unique = true;
+						CUniqueItem *unique_item = GetUniqueItem(item->Name);
+						if (unique_item == NULL) {
+							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item->Name.c_str());
+						}
+						item->Type = const_cast<CUnitType *>(&(*unique_item->Type));
+						if (unique_item->Prefix != NULL) {
+							item->Prefix = const_cast<CUpgrade *>(&(*unique_item->Prefix));
+						}
+						if (unique_item->Suffix != NULL) {
+							item->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
+						}
 					} else {
 						printf("\n%s\n", character->GetFullName().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -394,6 +410,22 @@ static int CclDefineCustomHero(lua_State *l)
 							item->Suffix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
 						} else {
 							LuaError(l, "Item suffix \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+						}
+					} else if (!strcmp(value, "name")) {
+						item->Name = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "unique")) {
+						item->Name = LuaToString(l, -1, k + 1);
+						item->Unique = true;
+						CUniqueItem *unique_item = GetUniqueItem(item->Name);
+						if (unique_item == NULL) {
+							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item->Name.c_str());
+						}
+						item->Type = const_cast<CUnitType *>(&(*unique_item->Type));
+						if (unique_item->Prefix != NULL) {
+							item->Prefix = const_cast<CUpgrade *>(&(*unique_item->Prefix));
+						}
+						if (unique_item->Suffix != NULL) {
+							item->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
 						}
 					} else {
 						printf("\n%s\n", hero->GetFullName().c_str());

@@ -209,6 +209,10 @@ enum {
 				if (goal->Suffix != NULL) {
 					item->Suffix = const_cast<CUpgrade *>(&(*goal->Suffix));
 				}
+				if (goal->Unique) {
+					item->Name = goal->Name;
+					item->Unique = goal->Unique;
+				}
 			}
 		} else if (goal && (goal->Type->BoolFlag[POWERUP_INDEX].value || (!unit.Type->BoolFlag[INVENTORY_INDEX].value && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass == PotionItemClass))) {
 			CommandUse(unit, *goal, FlushCommands);

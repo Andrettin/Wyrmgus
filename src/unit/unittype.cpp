@@ -621,6 +621,7 @@ CUnitType::~CUnitType()
 
 	//Wyrmgus start
 	Traits.clear();
+	Uniques.clear();
 	//Wyrmgus end
 
 	BoolFlag.clear();

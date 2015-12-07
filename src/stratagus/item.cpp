@@ -53,6 +53,7 @@
 
 std::vector<CUpgrade *> ItemPrefixes[MaxItemClasses];
 std::vector<CUpgrade *> ItemSuffixes[MaxItemClasses];
+std::vector<CUniqueItem *> UniqueItems;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -165,6 +166,24 @@ int GetItemClassSlot(int item_class)
 	}
 
 	return -1;
+}
+
+void CleanUniqueItems()
+{
+	for (size_t i = 0; i < UniqueItems.size(); ++i) {
+		delete UniqueItems[i];
+	}
+	UniqueItems.clear();
+}
+
+CUniqueItem *GetUniqueItem(std::string item_name)
+{
+	for (size_t i = 0; i < UniqueItems.size(); ++i) {
+		if (item_name == UniqueItems[i]->Name) {
+			return UniqueItems[i];
+		}
+	}
+	return NULL;
 }
 
 //@}

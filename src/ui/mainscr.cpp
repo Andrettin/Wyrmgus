@@ -285,6 +285,11 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 			return false;
 		}
 	}
+	if (condition->Unique != CONDITION_TRUE) {
+		if ((condition->Unique == CONDITION_ONLY) ^ unit.Unique) {
+			return false;
+		}
+	}
 	//Wyrmgus end
 	if (condition->Variables) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {

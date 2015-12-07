@@ -92,8 +92,10 @@ bool CCharacter::IsSiblingOf(std::string sibling_full_name)
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix) {
-			return this->Items[i];
+		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Unique == item.Unique) {
+			if (this->Items[i]->Name.empty() || this->Items[i]->Name == item.Name) {
+				return this->Items[i];
+			}
 		}
 	}
 	return NULL;
@@ -184,12 +186,19 @@ void SaveHeroes()
 				fprintf(fd, "\tItems = {");
 				for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
 					fprintf(fd, "\n\t\t{");
-					fprintf(fd, "\n\t\t\t\"type\", \"%s\",", Characters[i]->Items[j]->Type->Ident.c_str());
-					if (Characters[i]->Items[j]->Prefix != NULL) {
-						fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", Characters[i]->Items[j]->Prefix->Ident.c_str());
-					}
-					if (Characters[i]->Items[j]->Suffix != NULL) {
-						fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", Characters[i]->Items[j]->Suffix->Ident.c_str());
+					if (Characters[i]->Items[j]->Unique) {
+						fprintf(fd, "\n\t\t\t\"unique\", \"%s\"", Characters[i]->Items[j]->Name.c_str());
+					} else {
+						fprintf(fd, "\n\t\t\t\"type\", \"%s\",", Characters[i]->Items[j]->Type->Ident.c_str());
+						if (Characters[i]->Items[j]->Prefix != NULL) {
+							fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", Characters[i]->Items[j]->Prefix->Ident.c_str());
+						}
+						if (Characters[i]->Items[j]->Suffix != NULL) {
+							fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", Characters[i]->Items[j]->Suffix->Ident.c_str());
+						}
+						if (!Characters[i]->Items[j]->Name.empty()) {
+							fprintf(fd, "\n\t\t\t\"name\", \"%s\",", Characters[i]->Items[j]->Name.c_str());
+						}
 					}
 					fprintf(fd, "\n\t\t}");
 					if (j < (Characters[i]->Items.size() - 1)) {
@@ -244,12 +253,19 @@ void SaveHeroes()
 				fprintf(fd, "\tItems = {");
 				for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
 					fprintf(fd, "\n\t\t{");
-					fprintf(fd, "\n\t\t\t\"type\", \"%s\",", CustomHeroes[i]->Items[j]->Type->Ident.c_str());
-					if (CustomHeroes[i]->Items[j]->Prefix != NULL) {
-						fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", CustomHeroes[i]->Items[j]->Prefix->Ident.c_str());
-					}
-					if (CustomHeroes[i]->Items[j]->Suffix != NULL) {
-						fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", CustomHeroes[i]->Items[j]->Suffix->Ident.c_str());
+					if (CustomHeroes[i]->Items[j]->Unique) {
+						fprintf(fd, "\n\t\t\t\"unique\", \"%s\"", CustomHeroes[i]->Items[j]->Name.c_str());
+					} else {
+						fprintf(fd, "\n\t\t\t\"type\", \"%s\",", CustomHeroes[i]->Items[j]->Type->Ident.c_str());
+						if (CustomHeroes[i]->Items[j]->Prefix != NULL) {
+							fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", CustomHeroes[i]->Items[j]->Prefix->Ident.c_str());
+						}
+						if (CustomHeroes[i]->Items[j]->Suffix != NULL) {
+							fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", CustomHeroes[i]->Items[j]->Suffix->Ident.c_str());
+						}
+						if (!CustomHeroes[i]->Items[j]->Name.empty()) {
+							fprintf(fd, "\n\t\t\t\"name\", \"%s\",", CustomHeroes[i]->Items[j]->Name.c_str());
+						}
 					}
 					fprintf(fd, "\n\t\t}");
 					if (j < (CustomHeroes[i]->Items.size() - 1)) {
