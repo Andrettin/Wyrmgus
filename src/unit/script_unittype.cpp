@@ -733,7 +733,13 @@ static int CclDefineUnitType(lua_State *l)
 					var->Construction = parent_type->VarInfo[var_n]->Construction;
 					for (int u = 0; u < VariationMax; ++u) {
 						var->UpgradesRequired[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
-						var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
+						var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesForbidden[u];
+					}
+					for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemsEquipped.size(); ++i) {
+						var->ItemsEquipped.push_back(parent_type->VarInfo[var_n]->ItemsEquipped[i]);
+					}
+					for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemsNotEquipped.size(); ++i) {
+						var->ItemsNotEquipped.push_back(parent_type->VarInfo[var_n]->ItemsNotEquipped[i]);
 					}
 					var->Tileset = parent_type->VarInfo[var_n]->Tileset;
 					
@@ -844,6 +850,22 @@ static int CclDefineUnitType(lua_State *l)
 								var->UpgradesForbidden[u] = LuaToString(l, -1, k + 1);
 								break;
 							}
+						}
+					} else if (!strcmp(value, "item-equipped")) {
+						std::string type_ident = LuaToString(l, -1, k + 1);
+						CUnitType *type = UnitTypeByIdent(type_ident);
+						if (type) {
+							var->ItemsEquipped.push_back(type);
+						} else {
+							LuaError(l, "Unit type %s not defined" _C_ type_ident.c_str());
+						}
+					} else if (!strcmp(value, "item-not-equipped")) {
+						std::string type_ident = LuaToString(l, -1, k + 1);
+						CUnitType *type = UnitTypeByIdent(type_ident);
+						if (type) {
+							var->ItemsNotEquipped.push_back(type);
+						} else {
+							LuaError(l, "Unit type %s not defined" _C_ type_ident.c_str());
 						}
 					} else if (!strcmp(value, "tileset")) {
 						var->Tileset = LuaToString(l, -1, k + 1);

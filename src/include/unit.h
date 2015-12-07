@@ -321,6 +321,7 @@ public:
 	//Wyrmgus start
 	int GetModifiedVariable(int index) const;
 	bool IsItemEquipped(CUnit *item) const;
+	bool IsItemTypeEquipped(CUnitType *item_type) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool HasInventory() const;
 	CAnimations *GetAnimations() const;

@@ -152,7 +152,10 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 }
 
 CUpgrade::CUpgrade(const std::string &ident) :
-	Ident(ident), ID(0)
+	//Wyrmgus start
+//	Ident(ident), ID(0)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false)
+	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start

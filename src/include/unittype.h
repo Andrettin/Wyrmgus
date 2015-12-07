@@ -177,6 +177,8 @@ public:
 
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
+	std::vector<CUnitType *> ItemsEquipped;
+	std::vector<CUnitType *> ItemsNotEquipped;
 
 	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
 	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.

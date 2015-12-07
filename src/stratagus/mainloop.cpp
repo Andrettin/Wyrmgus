@@ -622,7 +622,19 @@ void GameMainLoop()
 		CclCommand(buf);
 	}
 	
-	if (!GrandStrategy && !IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL && CurrentCustomHero->Civilization == ThisPlayer->Race) {
+	if (!GrandStrategy && !IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL
+		&& (CurrentCustomHero->Civilization == ThisPlayer->Race || PlayerRaces.ParentCivilization[CurrentCustomHero->Civilization] == ThisPlayer->Race || PlayerRaces.ParentCivilization[ThisPlayer->Race] == CurrentCustomHero->Civilization)
+	) {
+		/*
+		if (PlayerRaces.ParentCivilization[ThisPlayer->Race] == CurrentCustomHero->Civilization) { //if the parent of the player's civilization is the hero's civilization, update the hero for the new civilization
+			CurrentCustomHero->Civilization = ThisPlayer->Race;
+			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(CurrentCustomHero->Civilization, GetUnitTypeClassIndexByName(CurrentCustomHero->Type->Class));
+			if (new_unit_type_id != -1) {
+				CurrentCustomHero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
+				SaveHeroes();
+			}
+		}
+		*/
 		Vec2i resPos;
 		FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW);
 		CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer);

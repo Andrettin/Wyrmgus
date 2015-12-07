@@ -673,17 +673,55 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			continue;
 		}
 		bool upgrades_check = true;
+		bool requires_weapon = false;
+		bool found_weapon = false;
+		bool requires_shield = false;
+		bool found_shield = false;
 		for (int u = 0; u < VariationMax; ++u) {
-			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(*this->Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
-				upgrades_check = false;
-				break;
+			if (!varinfo->UpgradesRequired[u].empty()) {
+				if (CUpgrade::Get(varinfo->UpgradesRequired[u])->Weapon) {
+					requires_weapon = true;
+					if (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesRequired[u].c_str()) == 'R' || this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID]) {
+						found_weapon = true;
+					}
+				} else if (CUpgrade::Get(varinfo->UpgradesRequired[u])->Shield) {
+					requires_shield = true;
+					if (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesRequired[u].c_str()) == 'R' || this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID]) {
+						found_shield = true;
+					}
+				} else if (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesRequired[u].c_str()) != 'R' && this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesRequired[u])->ID] == false) {
+					upgrades_check = false;
+					break;
+				}
 			}
 			if (!varinfo->UpgradesForbidden[u].empty() && (UpgradeIdentAllowed(*this->Player, varinfo->UpgradesForbidden[u].c_str()) == 'R' || this->IndividualUpgrades[CUpgrade::Get(varinfo->UpgradesForbidden[u])->ID] == true)) {
 				upgrades_check = false;
 				break;
 			}
 		}
+		for (size_t j = 0; j < varinfo->ItemsNotEquipped.size(); ++j) {
+			if (IsItemTypeEquipped(varinfo->ItemsNotEquipped[j])) {
+				upgrades_check = false;
+				break;
+			}
+		}
 		if (upgrades_check == false) {
+			continue;
+		}
+		for (size_t j = 0; j < varinfo->ItemsEquipped.size(); ++j) {
+			if (GetItemClassSlot(varinfo->ItemsEquipped[j]->ItemClass) == WeaponItemSlot) {
+				requires_weapon = true;
+				if (IsItemTypeEquipped(varinfo->ItemsEquipped[j])) {
+					found_weapon = true;
+				}
+			} else if (GetItemClassSlot(varinfo->ItemsEquipped[j]->ItemClass) == ShieldItemSlot) {
+				requires_shield = true;
+				if (IsItemTypeEquipped(varinfo->ItemsEquipped[j])) {
+					found_shield = true;
+				}
+			}
+		}
+		if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
 			continue;
 		}
 		if (!ignore_old_variation && !priority_variation.empty() && varinfo->VariationId.find(priority_variation) != std::string::npos) { // if the priority variation's ident is included in that of a new viable, choose the latter automatically
@@ -737,6 +775,12 @@ void CUnit::EquipItem(CUnit &item)
 		Shield = &item;
 	}
 	
+	//change variation, if the current one has become forbidden
+	VariationInfo *varinfo = Type->VarInfo[Variation];
+	if (varinfo && std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end()) {
+		ChooseVariation(); //choose a new variation now
+	}
+	
 	//add item bonuses
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (
@@ -787,6 +831,12 @@ void CUnit::DeequipItem(CUnit &item)
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
+	}
+	
+	//change variation, if the current one has become forbidden
+	VariationInfo *varinfo = Type->VarInfo[Variation];
+	if (varinfo && std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end()) {
+		ChooseVariation(); //choose a new variation now
 	}
 }
 
@@ -2878,6 +2928,15 @@ int CUnit::GetModifiedVariable(int index) const
 bool CUnit::IsItemEquipped(CUnit *item) const
 {
 	if (Weapon == item || Shield == item) {
+		return true;
+	}
+	
+	return false;
+}
+
+bool CUnit::IsItemTypeEquipped(CUnitType *item_type) const
+{
+	if ((Weapon != NULL && Weapon->Type == item_type) || (Shield != NULL && Shield->Type == item_type)) {
 		return true;
 	}
 	
