@@ -888,6 +888,7 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				// Johns: MapFieldUnpassable only for land units?
 			*/
 			if (type.BoolFlag[CANDOCK_INDEX].value) {
+				type.MovementMask =
 					MapFieldLandUnit |
 					MapFieldSeaUnit |
 					MapFieldBuilding | // already occuppied
