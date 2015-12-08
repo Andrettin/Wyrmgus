@@ -72,7 +72,7 @@ public:
 		Persistent(false), Custom(false),
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL),
-		Weapon(NULL), Shield(NULL)
+		Weapon(NULL), Shield(NULL), Boots(NULL), Arrows(NULL)
 	{
 		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}
@@ -107,6 +107,8 @@ public:
 	CCharacter *Mother;					/// Character's mother
 	CItem *Weapon;						/// The weapon the character has equipped
 	CItem *Shield;						/// The shield the character has equipped
+	CItem *Boots;						/// The boots the character has equipped
+	CItem *Arrows;						/// The arrows the character has equipped
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CUpgrade *> Abilities;

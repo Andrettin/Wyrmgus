@@ -1592,8 +1592,8 @@ std::string GetImageLayerNameById(int image_layer)
 		return "clothing-right-arm";
 	} else if (image_layer == PantsImageLayer) {
 		return "pants";
-	} else if (image_layer == ShoesImageLayer) {
-		return "shoes";
+	} else if (image_layer == BootsImageLayer) {
+		return "boots";
 	} else if (image_layer == WeaponImageLayer) {
 		return "weapon";
 	} else if (image_layer == ShieldImageLayer) {
@@ -1623,8 +1623,8 @@ int GetImageLayerIdByName(std::string image_layer)
 		return ClothingRightArmImageLayer;
 	} else if (image_layer == "pants") {
 		return PantsImageLayer;
-	} else if (image_layer == "shoes") {
-		return ShoesImageLayer;
+	} else if (image_layer == "boots") {
+		return BootsImageLayer;
 	} else if (image_layer == "weapon") {
 		return WeaponImageLayer;
 	} else if (image_layer == "shield") {

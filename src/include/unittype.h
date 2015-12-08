@@ -100,7 +100,7 @@ enum ImageLayers {
 	ClothingLeftArmImageLayer,
 	ClothingRightArmImageLayer,
 	PantsImageLayer,
-	ShoesImageLayer,
+	BootsImageLayer,
 	WeaponImageLayer,
 	ShieldImageLayer,
 	HelmetImageLayer,

@@ -330,6 +330,14 @@ static int CclUnit(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "personal-name")) {
 			unit->Name = LuaToString(l, 2, j + 1);
+		} else if (!strcmp(value, "trait")) {
+			unit->Trait = CUpgrade::Get(LuaToString(l, 2, j + 1));
+		} else if (!strcmp(value, "prefix")) {
+			unit->Prefix = CUpgrade::Get(LuaToString(l, 2, j + 1));
+		} else if (!strcmp(value, "suffix")) {
+			unit->Suffix = CUpgrade::Get(LuaToString(l, 2, j + 1));
+		} else if (!strcmp(value, "unique")) {
+			unit->Unique = LuaToBoolean(l, 2, j + 1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, 2, j + 1);
@@ -601,6 +609,10 @@ static int CclUnit(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "variation")) {
 			unit->Variation = LuaToNumber(l, 2, j + 1);
+		} else if (!strcmp(value, "character")) {
+			unit->SetCharacter(LuaToString(l, 2, j + 1), false);
+		} else if (!strcmp(value, "custom-hero")) {
+			unit->SetCharacter(LuaToString(l, 2, j + 1), true);
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables

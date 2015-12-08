@@ -1307,7 +1307,7 @@ void CUnit::Draw(const CViewport &vp) const
 	
 	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos);
 	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, frame, screenPos);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShoesImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, frame, screenPos);
 	
 	//draw the left arm just after the body if facing south
 	if ((this->Direction == LookingS && this->CurrentAction() != UnitActionDie) || frame == type->StillFrame) {

@@ -58,9 +58,10 @@ enum ItemSlots {
 	ShieldItemSlot,
 	HelmetItemSlot,
 	ArmorItemSlot,
-	ShoesItemSlot,
+	BootsItemSlot,
 	AmuletItemSlot,
 	RingItemSlot,
+	ArrowsItemSlot,
 	
 	MaxItemSlots
 };
@@ -83,11 +84,13 @@ enum ItemClasses {
 
 	HelmetItemClass,
 	ArmorItemClass,
-	ShoesItemClass,
+	BootsItemClass,
 
 	AmuletItemClass,
 	RingItemClass,
 	
+	ArrowsItemClass,
+
 	PotionItemClass,
 
 	MaxItemClasses

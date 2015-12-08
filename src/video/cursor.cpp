@@ -225,7 +225,7 @@ void DrawBuildingCursor()
 
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, HelmetImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ShoesImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, BootsImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, LeftArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 

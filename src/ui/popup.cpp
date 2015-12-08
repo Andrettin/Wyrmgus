@@ -458,6 +458,13 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			value = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[this->Index].Value;
 		} else {
 			value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
+			if (UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value) {
+				if (value >= 0) {
+					x += label.Draw(x, y, "+");
+				} else {
+					x += label.Draw(x, y, "-");
+				}
+			}
 		}
 		label.Draw(x, y, value);
 		//Wyrmgus end

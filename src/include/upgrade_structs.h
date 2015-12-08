@@ -203,6 +203,8 @@ public:
 	bool Ability;
 	bool Weapon;
 	bool Shield;
+	bool Boots;
+	bool Arrows;
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];

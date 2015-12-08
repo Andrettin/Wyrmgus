@@ -367,6 +367,8 @@ public:
 	//Wyrmgus start
 	CUnit *Weapon;		/// Pointer to unit's weapon item
 	CUnit *Shield;		/// Pointer to unit's shield item
+	CUnit *Boots;		/// Pointer to unit's boots item
+	CUnit *Arrows;		/// Pointer to unit's arrows item
 	//Wyrmgus end
 	
 	Vec2i tilePos; /// Map position X

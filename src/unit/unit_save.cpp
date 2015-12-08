@@ -166,6 +166,18 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"attacked\", %lu,\n ", unit.Attacked);
 	//Wyrmgus start
 	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
+	if (unit.Trait != NULL) {
+		file.printf("\"trait\", \"%s\", ", unit.Trait->Ident.c_str());
+	}
+	if (unit.Prefix != NULL) {
+		file.printf("\"prefix\", \"%s\", ", unit.Prefix->Ident.c_str());
+	}
+	if (unit.Suffix != NULL) {
+		file.printf("\"suffix\", \"%s\", ", unit.Suffix->Ident.c_str());
+	}
+	if (unit.Unique) {
+		file.printf("\"unique\", true");
+	}
 	//Wyrmgus end
 	file.printf(" \"current-sight-range\", %d,", unit.CurrentSightRange);
 	if (unit.Burning) {
@@ -334,6 +346,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	//Wyrmgus start
 	file.printf(",\n  \"variation\", %d,", unit.Variation);
+	if (unit.Character != NULL) {
+		if (!unit.Character->Custom) {
+			file.printf(",\n  \"character\", %d,", unit.Character->GetFullName());
+		} else {
+			file.printf(",\n  \"custom-hero\", %d,", unit.Character->GetFullName());
+		}
+	}
 	//Wyrmgus end
 
 	file.printf("})\n");

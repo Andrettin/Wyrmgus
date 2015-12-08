@@ -86,12 +86,14 @@ int GetItemClassIdByName(std::string item_class)
 		return HelmetItemClass;
 	} else if (item_class == "armor") {
 		return ArmorItemClass;
-	} else if (item_class == "shoes") {
-		return ShoesItemClass;
+	} else if (item_class == "boots") {
+		return BootsItemClass;
 	} else if (item_class == "amulet") {
 		return AmuletItemClass;
 	} else if (item_class == "ring") {
 		return RingItemClass;
+	} else if (item_class == "arrows") {
+		return ArrowsItemClass;
 	} else if (item_class == "potion") {
 		return PotionItemClass;
 	}
@@ -125,12 +127,14 @@ std::string GetItemClassNameById(int item_class)
 		return "helmet";
 	} else if (item_class == ArmorItemClass) {
 		return "armor";
-	} else if (item_class == ShoesItemClass) {
-		return "shoes";
+	} else if (item_class == BootsItemClass) {
+		return "boots";
 	} else if (item_class == AmuletItemClass) {
 		return "amulet";
 	} else if (item_class == RingItemClass) {
 		return "ring";
+	} else if (item_class == ArrowsItemClass) {
+		return "arrows";
 	} else if (item_class == PotionItemClass) {
 		return "potion";
 	}
@@ -158,12 +162,14 @@ int GetItemClassSlot(int item_class)
 		return HelmetItemSlot;
 	} else if (item_class == ArmorItemClass) {
 		return ArmorItemSlot;
-	} else if (item_class == ShoesItemClass) {
-		return ShoesItemSlot;
+	} else if (item_class == BootsItemClass) {
+		return BootsItemSlot;
 	} else if (item_class == AmuletItemClass) {
 		return AmuletItemSlot;
 	} else if (item_class == RingItemClass) {
 		return RingItemSlot;
+	} else if (item_class == ArrowsItemClass) {
+		return ArrowsItemSlot;
 	}
 
 	return -1;

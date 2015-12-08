@@ -154,7 +154,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -907,6 +907,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					if (
 						(AllUpgrades[um->UpgradeId]->Weapon && unit.Weapon != NULL)
 						|| (AllUpgrades[um->UpgradeId]->Shield && unit.Shield != NULL)
+						|| (AllUpgrades[um->UpgradeId]->Boots && unit.Boots != NULL)
+						|| (AllUpgrades[um->UpgradeId]->Arrows && unit.Arrows != NULL)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
 						continue;
 					}
@@ -1143,6 +1145,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					if (
 						(AllUpgrades[um->UpgradeId]->Weapon && unit.Weapon != NULL)
 						|| (AllUpgrades[um->UpgradeId]->Shield && unit.Shield != NULL)
+						|| (AllUpgrades[um->UpgradeId]->Boots && unit.Boots != NULL)
+						|| (AllUpgrades[um->UpgradeId]->Arrows && unit.Arrows != NULL)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't remove the modifier from it (it already doesn't have it)
 						continue;
 					}
