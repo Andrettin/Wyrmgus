@@ -3150,13 +3150,13 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		}
 		
 		if (droppedUnit != NULL) {
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1) { //10% of a dropped item having a prefix
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1) { //10% chance of a dropped item having a prefix
 				droppedUnit->GeneratePrefix(unit);
 			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1) { //10% of a dropped item having a suffix
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1) { //10% chance of a dropped item having a suffix
 				droppedUnit->GenerateSuffix(unit);
 			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= 999 && droppedUnit->Type->ItemClass != -1) { //0.1% of a dropped item being unique
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= 995 && droppedUnit->Type->ItemClass != -1) { //0.5% chance of a dropped item being unique
 				droppedUnit->GenerateUnique(unit);
 			}
 		}
