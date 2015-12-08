@@ -461,8 +461,6 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			if (UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value) {
 				if (value >= 0) {
 					x += label.Draw(x, y, "+");
-				} else {
-					x += label.Draw(x, y, "-");
 				}
 			}
 		}

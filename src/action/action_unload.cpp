@@ -232,6 +232,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		CItem *item = transporter.Character->GetItem(unit);
 		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
 		delete item;
+		SaveHeroes();
 	}
 	//Wyrmgus end
 	//Wyrmgus start

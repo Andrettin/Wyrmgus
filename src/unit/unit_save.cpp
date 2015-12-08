@@ -42,6 +42,9 @@
 
 #include "actions.h"
 #include "animation.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "construct.h"
 #include "iolib.h"
 #include "pathfinder.h"

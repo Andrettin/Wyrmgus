@@ -895,6 +895,7 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 	}
 	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Prefix = const_cast<CUpgrade *>(&(*prefix));
+		SaveHeroes();
 	}
 	Prefix = const_cast<CUpgrade *>(&(*prefix));
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
@@ -924,6 +925,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	}
 	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Suffix = const_cast<CUpgrade *>(&(*suffix));
+		SaveHeroes();
 	}
 	Suffix = const_cast<CUpgrade *>(&(*suffix));
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
