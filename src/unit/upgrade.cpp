@@ -671,7 +671,10 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 		CUnit &unit = player.GetUnit(i);
 
 		//  Convert already existing units to this type.
-		if (unit.Type == &src) {
+		//Wyrmgus start
+//		if (unit.Type == &src) {
+		if (unit.Type == &src && (!unit.Character || !unit.Character->Persistent)) { //don't do this for persistent characters
+		//Wyrmgus end
 			CommandTransformIntoType(unit, dst);
 			//  Convert trained units to this type.
 			//  FIXME: what about buildings?
@@ -1255,7 +1258,12 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	//Wyrmgus end
 	
 	if (um->ConvertTo) {
-		CommandTransformIntoType(unit, *um->ConvertTo);
+		//Wyrmgus start
+		//CommandTransformIntoType(unit, *um->ConvertTo);
+		if (!unit.Character || !unit.Character->Persistent) { //don't do this for persistent characters
+			CommandTransformIntoType(unit, *um->ConvertTo);
+		}
+		//Wyrmgus end
 	}
 }
 
