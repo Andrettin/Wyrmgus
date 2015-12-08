@@ -441,6 +441,26 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 					return false;
 				}
 			}
+			if (condition->Weapon != CONDITION_TRUE) {
+				if ((condition->Weapon == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == WeaponItemSlot)) {
+					return false;
+				}
+			}
+			if (condition->Shield != CONDITION_TRUE) {
+				if ((condition->Shield == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == ShieldItemSlot)) {
+					return false;
+				}
+			}
+			if (condition->Boots != CONDITION_TRUE) {
+				if ((condition->Boots == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == BootsItemSlot)) {
+					return false;
+				}
+			}
+			if (condition->Arrows != CONDITION_TRUE) {
+				if ((condition->Arrows == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == ArrowsItemSlot)) {
+					return false;
+				}
+			}
 			if (condition->ItemClass != -1) {
 				if (condition->ItemClass != unit.Type->ItemClass) {
 					return false;

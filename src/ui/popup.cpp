@@ -586,6 +586,14 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Unique = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {
 			condition->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+		} else if (!strcmp(key, "Weapon")) {
+			condition->Weapon = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Shield")) {
+			condition->Shield = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Boots")) {
+			condition->Boots = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Arrows")) {
+			condition->Arrows = Ccl2Condition(l, LuaToString(l, -1));
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];
