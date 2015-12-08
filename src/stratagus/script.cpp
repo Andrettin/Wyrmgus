@@ -867,6 +867,12 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "TypeClass")) {
 			res->e = EString_TypeClass;
 			res->D.Type = CclParseTypeDesc(l);
+		} else if (!strcmp(key, "TypeDescription")) {
+			res->e = EString_TypeDescription;
+			res->D.Type = CclParseTypeDesc(l);
+		} else if (!strcmp(key, "TypeQuote")) {
+			res->e = EString_TypeQuote;
+			res->D.Type = CclParseTypeDesc(l);
 		//Wyrmgus end
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
@@ -1186,6 +1192,20 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_TypeDescription : // name of the unit type's description
+			type = s->D.Type;
+			if (type != NULL) {
+				return (**type).Description;
+			} else { // ERROR.
+				return std::string("");
+			}
+		case EString_TypeQuote : // name of the unit type's quote
+			type = s->D.Type;
+			if (type != NULL) {
+				return (**type).Quote;
+			} else { // ERROR.
+				return std::string("");
+			}
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;
 			if (EvalNumber(s->D.If.Cond)) {
@@ -1388,6 +1408,12 @@ void FreeStringDesc(StringDesc *s)
 			delete *s->D.Type;
 			break;
 		case EString_TypeClass : // Class of the unit type
+			delete *s->D.Type;
+			break;
+		case EString_TypeDescription : // Description of the unit type
+			delete *s->D.Type;
+			break;
+		case EString_TypeQuote : // Quote of the unit type
 			delete *s->D.Type;
 			break;
 		//Wyrmgus end
@@ -1944,6 +1970,32 @@ static int CclTypeClass(lua_State *l)
 	return Alias(l, "TypeClass");
 }
 
+/**
+**  Return equivalent lua table for TypeDescription.
+**  {"TypeDescription", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclTypeDescription(lua_State *l)
+{
+	return Alias(l, "TypeDescription");
+}
+
+/**
+**  Return equivalent lua table for TypeQuote.
+**  {"TypeQuote", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclTypeQuote(lua_State *l)
+{
+	return Alias(l, "TypeQuote");
+}
+
 static int CclTypeTrainQuantity(lua_State *l)
 {
 	return Alias(l, "TypeTrainQuantity");
@@ -2143,6 +2195,8 @@ static void AliasRegister()
 	lua_register(Lua, "UnitTrait", CclUnitTrait);
 	lua_register(Lua, "TypeName", CclTypeName);
 	lua_register(Lua, "TypeClass", CclTypeClass);
+	lua_register(Lua, "TypeDescription", CclTypeDescription);
+	lua_register(Lua, "TypeQuote", CclTypeQuote);
 	lua_register(Lua, "TypeTrainQuantity", CclTypeTrainQuantity);
 	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);

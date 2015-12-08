@@ -380,6 +380,16 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->HasDependencies && PrintDependencies(*ThisPlayer, button).empty()) {
 		return false;
 	}
+	
+	//Wyrmgus start
+	if (condition->Description && type && type->Description.empty()) {
+		return false;
+	}
+	
+	if (condition->Quote && type && type->Quote.empty()) {
+		return false;
+	}
+	//Wyrmgus end
 
 	if (condition->ButtonAction != -1 && button.Action != condition->ButtonAction) {
 		return false;

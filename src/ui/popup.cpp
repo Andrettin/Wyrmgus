@@ -164,14 +164,31 @@
 /* virtual */ int CPopupContentTypeText::GetWidth(const ButtonAction &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
-
+	//Wyrmgus start
+	if (button.Action != ButtonUnit) {
+		TriggerData.Type = UnitTypes[button.Value];
+	} else {
+		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
+		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
+	}
+	std::string text = EvalString(this->Text);
+	TriggerData.Type = NULL;
+	TriggerData.Unit = NULL;
+	//Wyrmgus end
+	
 	if (this->MaxWidth) {
-		return std::min((unsigned int)font.getWidth(this->Text), this->MaxWidth);
+		//Wyrmgus start
+//		return std::min((unsigned int)font.getWidth(this->Text), this->MaxWidth);
+		return std::min((unsigned int)font.getWidth(text), this->MaxWidth);
+		//Wyrmgus end
 	}
 	int width = 0;
 	std::string sub;
 	int i = 1;
-	while (!(sub = GetLineFont(i++, this->Text, 0, &font)).empty()) {
+	//Wyrmgus start
+//	while (!(sub = GetLineFont(i++, this->Text, 0, &font)).empty()) {
+	while (!(sub = GetLineFont(i++, text, 0, &font)).empty()) {
+	//Wyrmgus end
 		width = std::max(width, font.getWidth(sub));
 	}
 	return width;
@@ -180,9 +197,23 @@
 /* virtual */ int CPopupContentTypeText::GetHeight(const ButtonAction &button, int *) const
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
+	//Wyrmgus start
+	if (button.Action != ButtonUnit) {
+		TriggerData.Type = UnitTypes[button.Value];
+	} else {
+		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
+		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
+	}
+	std::string text = EvalString(this->Text);
+	TriggerData.Type = NULL;
+	TriggerData.Unit = NULL;
+	//Wyrmgus end
 	int height = 0;
 	int i = 1;
-	while ((GetLineFont(i++, this->Text, this->MaxWidth, &font)).length()) {
+	//Wyrmgus start
+//	while ((GetLineFont(i++, this->Text, this->MaxWidth, &font)).length()) {
+	while ((GetLineFont(i++, text, this->MaxWidth, &font)).length()) {
+	//Wyrmgus end
 		height += font.Height() + 2;
 	}
 	return height;
@@ -191,6 +222,17 @@
 /* virtual */ void CPopupContentTypeText::Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *) const
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
+	//Wyrmgus start
+	if (button.Action != ButtonUnit) {
+		TriggerData.Type = UnitTypes[button.Value];
+	} else {
+		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
+		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
+	}
+	std::string text = EvalString(this->Text);
+	TriggerData.Type = NULL;
+	TriggerData.Unit = NULL;
+	//Wyrmgus end
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string sub;
 	int i = 0;
@@ -198,7 +240,10 @@
 	unsigned int width = this->MaxWidth
 						 ? std::min(this->MaxWidth, popupWidth - 2 * popup.MarginX)
 						 : 0;
-	while ((sub = GetLineFont(++i, this->Text, width, &font)).length()) {
+	//Wyrmgus start
+//	while ((sub = GetLineFont(++i, this->Text, width, &font)).length()) {
+	while ((sub = GetLineFont(++i, text, width, &font)).length()) {
+	//Wyrmgus end
 		label.Draw(x, y_off, sub);
 		y_off += font.Height() + 2;
 	}
@@ -211,7 +256,11 @@
 	for (lua_pushnil(l); lua_next(l, -2); lua_pop(l, 1)) {
 		const char *key = LuaToString(l, -2);
 		if (!strcmp(key, "Text")) {
-			this->Text = LuaToString(l, -1);
+			//Wyrmgus start
+//			this->Text = LuaToString(l, -1);
+			this->Text = CclParseStringDesc(l);
+			lua_pushnil(l); // ParseStringDesc eat token
+			//Wyrmgus end
 		} else if (!strcmp(key, "MaxWidth")) {
 			this->MaxWidth = LuaToNumber(l, -1);
 		} else if (!strcmp(key, "Font")) {
@@ -518,6 +567,12 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->HasDescription = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "HasDependencies")) {
 			condition->HasDependencies = LuaToBoolean(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(key, "Description")) {
+			condition->Description = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "Quote")) {
+			condition->Quote = LuaToBoolean(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(key, "ButtonValue")) {
 			condition->ButtonValue = LuaToString(l, -1);
 		} else if (!strcmp(key, "ButtonAction")) {

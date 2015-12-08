@@ -54,6 +54,7 @@ class PopupConditionPanel
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
 		//Wyrmgus start
+		Description(false), Quote(false),
 		Equipped(0), Equippable(0), Affixed(0), Unique(0), Weapon(0), Shield(0), Boots(0), Arrows(0),
 //		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
 		ButtonAction(-1), ItemClass(-1), BoolFlags(NULL), Variables(NULL) {}
@@ -67,6 +68,10 @@ public:
 	bool HasHint;               /// check if button has hint.
 	bool HasDescription;        /// check if button has description.
 	bool HasDependencies;       /// check if button has dependencies or restrictions.
+	//Wyrmgus start
+	bool Description;			/// check if the button's unit type has a description.
+	bool Quote;					/// check if the button's unit type has a quote.
+	//Wyrmgus end
 	int ButtonAction;           /// action type of button
 	//Wyrmgus start
 	int ItemClass;				/// item class of the button's item
@@ -148,8 +153,17 @@ private:
 class CPopupContentTypeText : public CPopupContentType
 {
 public:
-	CPopupContentTypeText() : MaxWidth(0), Font(NULL) {}
-	virtual ~CPopupContentTypeText() {}
+	//Wyrmgus start
+//	CPopupContentTypeText() : MaxWidth(0), Font(NULL) {}
+	CPopupContentTypeText() : Text(NULL), MaxWidth(0), Font(NULL) {}
+	//Wyrmgus end
+	//Wyrmgus start
+//	virtual ~CPopupContentTypeText() {}
+	virtual ~CPopupContentTypeText() {
+		FreeStringDesc(Text);
+		delete Text;
+	}
+	//Wyrmgus end
 
 	virtual void Draw(int x, int y, const CPopup &popup, const unsigned int popupWidth, const ButtonAction &button, int *Costs) const;
 
@@ -159,7 +173,10 @@ public:
 	virtual void Parse(lua_State *l);
 
 private:
-	std::string Text;            /// Text to display
+	//Wyrmgus start
+//	std::string Text;            /// Text to display
+	StringDesc *Text;            /// Text to display.
+	//Wyrmgus end
 	unsigned int MaxWidth;       /// Maximum width of multilined text.
 	CFont *Font;                 /// Font to use.
 };
