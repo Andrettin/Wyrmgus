@@ -3165,7 +3165,16 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	}
 
 	// Transporters lose or save their units and building their workers
-	if (unit.UnitInside && unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
+	//Wyrmgus start
+//	if (unit.UnitInside && unit.Type->BoolFlag[SAVECARGO_INDEX].value) {
+	if (
+		unit.UnitInside
+		&& (
+			unit.Type->BoolFlag[SAVECARGO_INDEX].value
+			|| (unit.HasInventory() && (unit.Character == NULL || !unit.Character->Persistent))
+		)
+	) {
+	//Wyrmgus end
 		DropOutAll(unit);
 	} else if (unit.UnitInside) {
 		DestroyAllInside(unit);

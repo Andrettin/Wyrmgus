@@ -458,7 +458,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			value = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[this->Index].Value;
 		} else {
 			value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
-			if (UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value) {
+			if (UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && this->Index != HITPOINTHEALING_INDEX) {
 				if (value >= 0) {
 					x += label.Draw(x, y, "+");
 				}
