@@ -541,6 +541,10 @@ void FreeAi()
 	AiHelpers.Equiv.clear();
 	AiHelpers.Refinery.clear();
 	AiHelpers.Depots.clear();
+	//Wyrmgus start
+	AiHelpers.ExperienceUpgrades.clear();
+	AiHelpers.LearnableAbilities.clear();
+	//Wyrmgus end
 
 	AiResetUnitTypeEquiv();
 }

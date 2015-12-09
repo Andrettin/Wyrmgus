@@ -173,6 +173,7 @@ public:
 	void Release(bool final = false);
 	
 	//Wyrmgus start
+	void IncreaseLevel(int level_quantity);
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
 	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false);
 	void SetVariation(int new_variation, const CUnitType *new_type = NULL);
@@ -319,6 +320,7 @@ public:
 	PixelPos GetMapPixelPosCenter() const;
 	
 	//Wyrmgus start
+	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
 	int GetModifiedVariable(int index) const;
 	bool IsItemEquipped(CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;

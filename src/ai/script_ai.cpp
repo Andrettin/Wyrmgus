@@ -69,6 +69,29 @@ static void AiHelperInsert(std::vector<std::vector<CUnitType *> > &table,
 	table[n].push_back(&base);
 }
 
+//Wyrmgus start
+/**
+**  Insert new unit-type element.
+**
+**  @param table  Table with elements.
+**  @param n      Index to insert new into table
+**  @param base   Base type to insert into table.
+*/
+static void AiHelperInsert(std::vector<std::vector<CUpgrade *> > &table,
+						   unsigned int n, CUpgrade &base)
+{
+	if (n >= table.size()) {
+		table.resize(n + 1);
+	}
+	// Look if already known
+	std::vector<CUpgrade *>::const_iterator it = std::find(table[n].begin(), table[n].end(), &base);
+	if (it != table[n].end()) {
+		return;
+	}
+	table[n].push_back(&base);
+}
+//Wyrmgus end
+
 /**
 **  Transform list of unit separed with coma to a true list.
 */
@@ -289,6 +312,24 @@ static void InitAiHelper(AiHelper &aiHelper)
 				}
 				break;
 			}
+			//Wyrmgus start
+			case ButtonExperienceUpgradeTo : {
+				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.ExperienceUpgrades, (**j).Slot, *upgradeToType);
+				}
+				break;
+			}
+			case ButtonLearnAbility : {
+				CUpgrade *ability = CUpgrade::Get(button.ValueStr);
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.LearnableAbilities, (**j).Slot, *ability);
+				}
+				break;
+			}
+			//Wyrmgus end
 			default:
 				break;
 		}
@@ -318,7 +359,13 @@ static int CclDefineAiHelper(lua_State *l)
 			|| !strcmp(value, "upgrade")
 			|| !strcmp(value, "research")
 			|| !strcmp(value, "unit-limit")
-			|| !strcmp(value, "repair")) {
+			//Wyrmgus start
+//			|| !strcmp(value, "repair")) {
+			|| !strcmp(value, "repair")
+			|| !strcmp(value, "experience-upgrade")
+			|| !strcmp(value, "learnable-ability")
+		) {
+			//Wyrmgus end
 #ifdef DEBUG
 			fprintf(stderr, "DefineAiHelper: Relation is computed from buttons, you may remove safely the block beginning with '\"%s\"'\n", value);
 #endif

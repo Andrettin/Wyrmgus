@@ -375,6 +375,20 @@ public:
 	** units/buildings/mines which can store this resource.
 	*/
 	std::vector<std::vector<CUnitType *> > Depots;
+	
+	//Wyrmgus start
+	/**
+	** The index is the unit that should acquire an experience upgrade, giving a table of all
+	** possible upgrades for it.
+	*/
+	std::vector<std::vector<CUnitType *> > ExperienceUpgrades;
+	
+	/**
+	** The index is the unit that should acquire a learnable ability, giving a table of all
+	** abilities that it can learn.
+	*/
+	std::vector<std::vector<CUpgrade *> > LearnableAbilities;
+	//Wyrmgus end
 };
 
 /*----------------------------------------------------------------------------

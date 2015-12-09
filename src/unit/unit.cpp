@@ -44,12 +44,18 @@
 
 #include "actions.h"
 #include "ai.h"
+//Wyrmgus start
+#include "../ai/ai_local.h" //for using AiHelpers
+//Wyrmgus end
 #include "animation.h"
 //Wyrmgus start
 #include "character.h"
 //Wyrmgus end
 #include "commands.h"
 #include "construct.h"
+//Wyrmgus start
+#include "depend.h"	//for using dependency checks
+//Wyrmgus end
 #include "game.h"
 #include "editor.h"
 #include "interface.h"
@@ -586,6 +592,61 @@ void CUnit::Release(bool final)
 }
 
 //Wyrmgus start
+void CUnit::IncreaseLevel(int level_quantity)
+{
+	while (level_quantity > 0) {
+		this->Variable[LEVEL_INDEX].Value += 1;
+		if (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value < this->Variable[LEVEL_INDEX].Value) {
+			if (GetAvailableLevelUpUpgrades(true) == 0 || (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) > 1) {
+				this->Variable[POINTS_INDEX].Max += 5 * (this->Variable[LEVEL_INDEX].Value + 1);
+				this->Variable[POINTS_INDEX].Value += 5 * (this->Variable[LEVEL_INDEX].Value + 1);
+			}
+			
+			this->Variable[LEVELUP_INDEX].Value += 1;
+			// if there are no level-up upgrades available for the unit, increase its HP instead
+			if (this->GetAvailableLevelUpUpgrades() < this->Variable[LEVELUP_INDEX].Value) {
+				this->Variable[HP_INDEX].Max += 15;
+				this->Variable[LEVELUP_INDEX].Value -= 1;
+			}
+		}
+		this->Variable[HP_INDEX].Value = this->Variable[HP_INDEX].Max;
+		level_quantity -= 1;
+	}
+	
+	UpdateXPRequired();
+	
+	if (Player->AiEnabled) {
+		while (this->Variable[LEVELUP_INDEX].Value > 0) {
+			std::vector<CUnitType *> potential_upgrades;
+			for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
+				if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
+					if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
+						potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
+					}
+				}
+			}
+			if (potential_upgrades.size() > 0) {
+				this->Variable[LEVELUP_INDEX].Value -= 1;
+				TransformUnitIntoType(*this, *potential_upgrades[SyncRand(potential_upgrades.size())]);
+			}
+			
+			if (this->Variable[LEVELUP_INDEX].Value) {
+				std::vector<CUpgrade *> potential_abilities;
+				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
+					if (!IndividualUpgrades[AiHelpers.LearnableAbilities[Type->Slot][i]->ID] && CheckDependByIdent(*Player, AiHelpers.LearnableAbilities[Type->Slot][i]->Ident) && UpgradeIdAllowed(*Player, AiHelpers.LearnableAbilities[Type->Slot][i]->ID) == 'A') {
+						potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
+					}
+				}
+				if (potential_abilities.size() > 0) {
+					AbilityAcquire(*this, potential_abilities[SyncRand(potential_abilities.size())]);
+				}
+			}
+		}
+	}
+	
+	Player->UpdateLevelUpUnits();
+}
+
 void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 {
 	if (this->Character == NULL) {
@@ -622,9 +683,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	}
 	
 	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
-		char buf[256];
-		snprintf(buf, sizeof(buf), "IncreaseUnitLevel(%d, %d);", UnitNumber(*this), this->Character->Level - this->Variable[LEVEL_INDEX].Value);
-		CclCommand(buf);
+		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value);
 	}
 			
 	//load learned abilities
@@ -2962,6 +3021,29 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 }
 
 //Wyrmgus start
+int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
+{
+	int value = 0;
+	
+	for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
+		if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
+			if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
+				value += 1;
+			}
+		}
+	}
+	
+	if (!only_units) {
+		for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
+			if (!IndividualUpgrades[AiHelpers.LearnableAbilities[Type->Slot][i]->ID] && CheckDependByIdent(*Player, AiHelpers.LearnableAbilities[Type->Slot][i]->Ident) && UpgradeIdAllowed(*Player, AiHelpers.LearnableAbilities[Type->Slot][i]->ID) == 'A') {
+				value += 1;
+			}
+		}
+	}
+	
+	return value;
+}
+
 int CUnit::GetModifiedVariable(int index) const
 {
 	int value = Variable[index].Value;
@@ -3292,7 +3374,6 @@ void DestroyAllInside(CUnit &source)
 		unit->Release();
 	}
 }
-
 
 /*----------------------------------------------------------------------------
   -- Unit AI
