@@ -3519,11 +3519,12 @@ void CGrandStrategyFaction::RulerSuccession()
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		if (
 			GrandStrategyGame.Heroes[i]->State != 0
-			 && GrandStrategyGame.Heroes[i]->Gender == MaleGender
+			&& GrandStrategyGame.Heroes[i]->Gender == MaleGender
 			&& (
 				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
 				|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
 			)
+			&& !GrandStrategyGame.Heroes[i]->Custom
 		) {
 			ruler_candidates.push_back(GrandStrategyGame.Heroes[i]);
 		}
@@ -3537,6 +3538,7 @@ void CGrandStrategyFaction::RulerSuccession()
 					(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
 					|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
 				)
+				&& !GrandStrategyGame.Heroes[i]->Custom
 			) {
 				ruler_candidates.push_back(GrandStrategyGame.Heroes[i]);
 			}
@@ -3856,7 +3858,7 @@ void CGrandStrategyHero::Create()
 	
 	this->State = 2;
 	
-	if (this->ProvinceOfOrigin != NULL && !this->Icon.Name.empty()) { //if the hero has its own icon
+	if (this->ProvinceOfOrigin != NULL && (!this->Icon.Name.empty() || this->Custom)) { //if the hero has its own icon or is a custom hero
 		this->ProvinceOfOrigin->SetHero(this->GetFullName(), 2);
 	}
 }
