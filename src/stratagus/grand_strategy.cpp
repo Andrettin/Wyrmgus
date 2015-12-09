@@ -900,10 +900,10 @@ void CGrandStrategyGame::DoTurn()
 							int militia_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("militia"));
 							int infantry_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"));
 							
-							if (militia_id != -1) {
-								this->Provinces[i]->SetAttackingUnitQuantity(militia_id, SyncRand(this->Provinces[i]->TotalWorkers) + 1);
-							} else if (infantry_id != -1 && this->Provinces[i]->TotalWorkers >= 2) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
-								this->Provinces[i]->SetAttackingUnitQuantity(infantry_id, (SyncRand(this->Provinces[i]->TotalWorkers / 2) + 1));
+							if (militia_id != -1 && this->Provinces[i]->TotalWorkers >= 2) {
+								this->Provinces[i]->SetAttackingUnitQuantity(militia_id, (this->Provinces[i]->TotalWorkers / 2) + (SyncRand(this->Provinces[i]->TotalWorkers / 2)));
+							} else if (infantry_id != -1 && this->Provinces[i]->TotalWorkers >= 4) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
+								this->Provinces[i]->SetAttackingUnitQuantity(infantry_id, (this->Provinces[i]->TotalWorkers / 4) + (SyncRand(this->Provinces[i]->TotalWorkers * 3 / 4)));
 							}
 						}
 					}
@@ -2319,11 +2319,11 @@ int CProvince::GetRevoltRisk()
 	
 	if (this->Civilization != -1 && this->Owner != NULL) {
 		if (this->Civilization != this->Owner->Civilization) {
-			revolt_risk += 3; //if the province is of a different culture than its owner, it gets plus 3% revolt risk
+			revolt_risk += 2; //if the province is of a different culture than its owner, it gets plus 2% revolt risk
 		}
 		
 		if (!this->HasFactionClaim(this->Owner->Civilization, this->Owner->Faction)) {
-			revolt_risk += 2; //if the owner does not have a claim to the province, it gets plus 2% revolt risk
+			revolt_risk += 1; //if the owner does not have a claim to the province, it gets plus 1% revolt risk
 		}
 	}
 	
