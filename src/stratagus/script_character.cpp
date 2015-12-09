@@ -777,8 +777,10 @@ static int CclGetCustomHeroData(lua_State *l)
 	} else if (!strcmp(data, "Icon")) {
 		if (character->Level >= 3 && character->HeroicIcon.Icon) {
 			lua_pushstring(l, character->HeroicIcon.Name.c_str());
-		} else {
+		} else if (character->Icon.Icon) {
 			lua_pushstring(l, character->Icon.Name.c_str());
+		} else {
+			lua_pushstring(l, character->Type->Icon.Name.c_str());
 		}
 		return 1;
 	} else {

@@ -622,9 +622,7 @@ void GameMainLoop()
 		CclCommand(buf);
 	}
 	
-	if (!GrandStrategy && !IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL
-		&& (CurrentCustomHero->Civilization == ThisPlayer->Race || PlayerRaces.ParentCivilization[CurrentCustomHero->Civilization] == ThisPlayer->Race || PlayerRaces.ParentCivilization[ThisPlayer->Race] == CurrentCustomHero->Civilization)
-	) {
+	if (!IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL) {
 		Vec2i resPos;
 		FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW);
 		CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer);

@@ -164,9 +164,10 @@
 	//Wyrmgus start
 	if (index == ATTACKRANGE_INDEX && goal->Container) {
 		goal->Container->UpdateContainerAttackRange();
-	}
-	if (index == LEVEL_INDEX || index == POINTS_INDEX) {
+	} else if (index == LEVEL_INDEX || index == POINTS_INDEX) {
 		goal->UpdateXPRequired();
+	} else if (index == XP_INDEX) {
+		goal->XPChanged();
 	}
 	//Wyrmgus end
 }

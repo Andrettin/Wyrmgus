@@ -89,6 +89,18 @@ bool CCharacter::IsSiblingOf(std::string sibling_full_name)
 	return false;
 }
 
+std::string CCharacter::GetFullName()
+{
+	std::string full_name = this->Name;
+	if (!this->ExtraName.empty()) {
+		full_name += " " + this->ExtraName;
+	}
+	if (!this->Dynasty.empty()) {
+		full_name += " " + this->Dynasty;
+	}
+	return full_name;
+}
+
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {

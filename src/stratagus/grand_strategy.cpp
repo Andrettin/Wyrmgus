@@ -3817,7 +3817,13 @@ void CGrandStrategyHero::Initialize()
 			this->Trait = const_cast<CUpgrade *>(&(*this->Type->Traits[SyncRand(this->Type->Traits.size())]));
 		}
 	}
-	int province_of_origin_id = GetProvinceId(this->ProvinceOfOriginName);
+	int province_of_origin_id;
+	if (!this->Custom) {
+		province_of_origin_id = GetProvinceId(this->ProvinceOfOriginName);
+	} else {
+		province_of_origin_id = GrandStrategyGame.PlayerFaction->OwnedProvinces[0];
+	}
+	
 	this->ProvinceOfOrigin = const_cast<CProvince *>(&(*GrandStrategyGame.Provinces[province_of_origin_id]));
 	
 	if (!this->Icon.Name.empty()) {
@@ -3949,18 +3955,6 @@ int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
 	}
 	
 	return modifier;
-}
-
-std::string CCharacter::GetFullName()
-{
-	std::string full_name = this->Name;
-	if (!this->ExtraName.empty()) {
-		full_name += " " + this->ExtraName;
-	}
-	if (!this->Dynasty.empty()) {
-		full_name += " " + this->Dynasty;
-	}
-	return full_name;
 }
 
 std::string CGrandStrategyHero::GetRulerEffectsString()
@@ -5738,6 +5732,26 @@ void InitializeGrandStrategyGame()
 		}
 		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	}
+	
+	if (CurrentCustomHero != NULL) { //if a custom hero has been selected, create the hero as a grand strategy hero
+		CGrandStrategyHero *hero = new CGrandStrategyHero;
+		GrandStrategyGame.Heroes.push_back(hero);
+		hero->Name = CurrentCustomHero->Name;
+		hero->ExtraName = CurrentCustomHero->ExtraName;
+		hero->Dynasty = CurrentCustomHero->Dynasty;
+		if (CurrentCustomHero->Type != NULL) {
+			hero->Type = const_cast<CUnitType *>(&(*CurrentCustomHero->Type));
+		}
+		if (CurrentCustomHero->Trait != NULL) {
+			hero->Trait = const_cast<CUpgrade *>(&(*CurrentCustomHero->Trait));
+		} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
+			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
+		}
+		hero->Civilization = CurrentCustomHero->Civilization;
+		hero->Gender = CurrentCustomHero->Gender;
+		hero->Custom = CurrentCustomHero->Custom;
+		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
+	}
 }
 
 void InitializeGrandStrategyMinimap()
@@ -5801,7 +5815,10 @@ void InitializeGrandStrategyFactions()
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		GrandStrategyGame.Heroes[i]->Initialize();
 		
-		if (GrandStrategyGame.Heroes[i]->State == 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year && GrandStrategyYear < GrandStrategyGame.Heroes[i]->DeathYear) {
+		if (
+			(GrandStrategyGame.Heroes[i]->State == 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year && GrandStrategyYear < GrandStrategyGame.Heroes[i]->DeathYear)
+			|| GrandStrategyGame.Heroes[i]->Custom //create custom hero regardless of date
+		) {
 			GrandStrategyGame.Heroes[i]->Create();
 		} else if (GrandStrategyGame.Heroes[i]->State != 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->DeathYear) {
 			GrandStrategyGame.Heroes[i]->Die();
@@ -6770,6 +6787,18 @@ bool GrandStrategyHeroIsAlive(std::string hero_full_name)
 		if (hero->State != 0) {
 			return true;
 		}
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	return false;
+}
+
+
+bool GrandStrategyHeroIsCustom(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		return hero->Custom;
 	} else {
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 	}

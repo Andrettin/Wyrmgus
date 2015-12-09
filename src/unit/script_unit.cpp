@@ -1591,12 +1591,12 @@ static int CclSetUnitVariable(lua_State *l)
 		//Wyrmgus start
 		if (index == ATTACKRANGE_INDEX && unit->Container) {
 			unit->Container->UpdateContainerAttackRange();
-		}
-		if (index == LEVELUP_INDEX) {
+		} else if (index == LEVELUP_INDEX) {
 			unit->Player->UpdateLevelUpUnits();
-		}
-		if (index == LEVEL_INDEX || index == POINTS_INDEX) {
+		} else if (index == LEVEL_INDEX || index == POINTS_INDEX) {
 			unit->UpdateXPRequired();
+		} else if (index == XP_INDEX) {
+			unit->XPChanged();
 		}
 		//Wyrmgus end
 	}

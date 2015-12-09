@@ -617,28 +617,32 @@ void CUnit::IncreaseLevel(int level_quantity)
 	
 	if (Player->AiEnabled) {
 		while (this->Variable[LEVELUP_INDEX].Value > 0) {
-			std::vector<CUnitType *> potential_upgrades;
-			for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-				if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
-					if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
-						potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
+			if (AiHelpers.ExperienceUpgrades.size() > Type->Slot) {
+				std::vector<CUnitType *> potential_upgrades;
+				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
+					if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
+						if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
+							potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
+						}
 					}
 				}
-			}
-			if (potential_upgrades.size() > 0) {
-				this->Variable[LEVELUP_INDEX].Value -= 1;
-				TransformUnitIntoType(*this, *potential_upgrades[SyncRand(potential_upgrades.size())]);
+				if (potential_upgrades.size() > 0) {
+					this->Variable[LEVELUP_INDEX].Value -= 1;
+					TransformUnitIntoType(*this, *potential_upgrades[SyncRand(potential_upgrades.size())]);
+				}
 			}
 			
 			if (this->Variable[LEVELUP_INDEX].Value) {
-				std::vector<CUpgrade *> potential_abilities;
-				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-					if (!CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
-						potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
+				if (AiHelpers.LearnableAbilities.size() > Type->Slot) {
+					std::vector<CUpgrade *> potential_abilities;
+					for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
+						if (!CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
+							potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
+						}
 					}
-				}
-				if (potential_abilities.size() > 0) {
-					AbilityAcquire(*this, potential_abilities[SyncRand(potential_abilities.size())]);
+					if (potential_abilities.size() > 0) {
+						AbilityAcquire(*this, potential_abilities[SyncRand(potential_abilities.size())]);
+					}
 				}
 			}
 		}
@@ -1652,6 +1656,27 @@ void CUnit::UpdateXPRequired()
 	this->Variable[XPREQUIRED_INDEX].Max = this->Variable[XPREQUIRED_INDEX].Value;
 	this->Variable[XPREQUIRED_INDEX].Enable = 1;
 	this->Variable[XP_INDEX].Enable = 1;
+}
+
+void CUnit::XPChanged()
+{
+	if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Type->BoolFlag[BUILDING_INDEX].value || this->Type->BoolFlag[FAUNA_INDEX].value) {
+		return;
+	}
+	
+	if (this->Variable[XPREQUIRED_INDEX].Value == 0) {
+		return;
+	}
+	
+	while (this->Variable[XP_INDEX].Value >= this->Variable[XPREQUIRED_INDEX].Value) {
+		this->Variable[XP_INDEX].Max -= this->Variable[XPREQUIRED_INDEX].Max;
+		this->Variable[XP_INDEX].Value -= this->Variable[XPREQUIRED_INDEX].Value;
+		if (this->Player == ThisPlayer) {
+			std::string unit_name = this->Name + " (" + GetTypeName() + ")";
+			this->Player->Notify(NotifyGreen, this->tilePos, _("%s has leveled up!"), unit_name.c_str());
+		}
+		this->IncreaseLevel(1);
+	}
 }
 //Wyrmgus end
 
@@ -3025,15 +3050,17 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 {
 	int value = 0;
 	
-	for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-		if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
-			if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
-				value += 1;
+	if (AiHelpers.ExperienceUpgrades.size() > Type->Slot) {
+		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
+			if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
+				if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
+					value += 1;
+				}
 			}
 		}
 	}
 	
-	if (!only_units) {
+	if (!only_units && AiHelpers.LearnableAbilities.size() > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
 			if (CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
 				value += 1;
@@ -3554,6 +3581,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 			attacker.Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value / (table.size() + 1);
 		}
 		attacker.Variable[XP_INDEX].Value = attacker.Variable[XP_INDEX].Max;
+		attacker.XPChanged();
 
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (UseHPForXp) {
@@ -3562,6 +3590,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 				table[i]->Variable[XP_INDEX].Max += target.Variable[POINTS_INDEX].Value / (table.size() + 1);
 			}
 			table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
+			table[i]->XPChanged();
 		}
 	}
 	//Wyrmgus end
@@ -3603,10 +3632,12 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 
 		attacker->Variable[XP_INDEX].Value += damage / (table.size() + 1);
 		attacker->Variable[XP_INDEX].Max += damage / (table.size() + 1);
+		attacker->XPChanged();
 
 		for (size_t i = 0; i != table.size(); ++i) {
 			table[i]->Variable[XP_INDEX].Value += damage / (table.size() + 1);
 			table[i]->Variable[XP_INDEX].Max += damage / (table.size() + 1);
+			table[i]->XPChanged();
 		}
 	}
 	//Wyrmgus end
@@ -3671,9 +3702,10 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 	//Wyrmgus start
 	if (var == ATTACKRANGE_INDEX && target.Container) {
 		target.Container->UpdateContainerAttackRange();
-	}
-	if (var == LEVEL_INDEX || var == POINTS_INDEX) {
+	} else if (var == LEVEL_INDEX || var == POINTS_INDEX) {
 		target.UpdateXPRequired();
+	} else if (var == XP_INDEX) {
+		target.XPChanged();
 	}
 	//Wyrmgus end
 }

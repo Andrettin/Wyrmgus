@@ -120,6 +120,7 @@
 				caster.Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value / (table.size() + 1);
 			}
 			caster.Variable[XP_INDEX].Value = caster.Variable[XP_INDEX].Max;
+			caster.XPChanged();
 
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (UseHPForXp) {
@@ -128,6 +129,7 @@
 					table[i]->Variable[XP_INDEX].Max += target->Variable[POINTS_INDEX].Value / (table.size() + 1);
 				}
 				table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
+				table[i]->XPChanged();
 			}
 		}
 		//Wyrmgus end
