@@ -169,6 +169,9 @@ CUpgrade::CUpgrade(const std::string &ident) :
 
 CUpgrade::~CUpgrade()
 {
+	//Wyrmgus start
+	RequiredAbilities.clear();
+	//Wyrmgus end
 }
 
 /**
@@ -1596,6 +1599,13 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 }
 
 //Wyrmgus start
+void AddUpgradeRequiredAbility(std::string upgrade_ident, std::string required_ability_ident)
+{
+	CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+	CUpgrade *required_ability = CUpgrade::Get(required_ability_ident);
+	upgrade->RequiredAbilities.push_back(required_ability);
+}
+
 std::string GetUpgradeEffectsString(std::string upgrade_ident)
 {
 	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);

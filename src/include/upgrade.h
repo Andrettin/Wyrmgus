@@ -116,6 +116,7 @@ extern char UpgradeIdAllowed(const CPlayer &player, int id);
 extern char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident);
 
 //Wyrmgus start
+extern void AddUpgradeRequiredAbility(std::string upgrade_ident, std::string required_ability_ident);
 extern std::string GetUpgradeEffectsString(std::string upgrade_ident);
 //Wyrmgus end
 

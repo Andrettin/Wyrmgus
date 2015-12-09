@@ -633,7 +633,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 			if (this->Variable[LEVELUP_INDEX].Value) {
 				std::vector<CUpgrade *> potential_abilities;
 				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-					if (!IndividualUpgrades[AiHelpers.LearnableAbilities[Type->Slot][i]->ID] && CheckDependByIdent(*Player, AiHelpers.LearnableAbilities[Type->Slot][i]->Ident) && UpgradeIdAllowed(*Player, AiHelpers.LearnableAbilities[Type->Slot][i]->ID) == 'A') {
+					if (!CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
 						potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
 					}
 				}
@@ -3035,7 +3035,7 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	
 	if (!only_units) {
 		for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-			if (!IndividualUpgrades[AiHelpers.LearnableAbilities[Type->Slot][i]->ID] && CheckDependByIdent(*Player, AiHelpers.LearnableAbilities[Type->Slot][i]->Ident) && UpgradeIdAllowed(*Player, AiHelpers.LearnableAbilities[Type->Slot][i]->ID) == 'A') {
+			if (CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
 				value += 1;
 			}
 		}
@@ -3126,6 +3126,29 @@ bool CUnit::HasInventory() const
 	}
 	
 	return false;
+}
+
+bool CUnit::CanLearnAbility(CUpgrade *ability) const
+{
+	if (IndividualUpgrades[ability->ID]) { // already learned
+		return false;
+	}
+	
+	if (!CheckDependByIdent(*Player, ability->Ident)) {
+		return false;
+	}
+	
+	if (UpgradeIdAllowed(*Player, ability->ID) != 'A') {
+		return false;
+	}
+	
+	for (size_t i = 0; i < ability->RequiredAbilities.size(); ++i) {
+		if (!IndividualUpgrades[ability->RequiredAbilities[i]->ID]) {
+			return false;
+		}
+	}
+				
+	return true;
 }
 
 CAnimations *CUnit::GetAnimations() const

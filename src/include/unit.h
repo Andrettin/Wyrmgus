@@ -326,6 +326,7 @@ public:
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool HasInventory() const;
+	bool CanLearnAbility(CUpgrade *ability) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
