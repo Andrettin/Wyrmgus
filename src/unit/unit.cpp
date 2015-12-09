@@ -3308,7 +3308,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	//Wyrmgus start
 	//drop items upon death
-	if (unit.CurrentAction() != UnitActionBuilt && SyncRand(100) >= 66) { //66% chance nothing will be dropped
+	if (unit.CurrentAction() != UnitActionBuilt && (unit.Character || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit has a character, in which it case it will always drop an item
 		Vec2i drop_pos = unit.tilePos;
 		drop_pos.x += SyncRand(unit.Type->TileWidth);
 		drop_pos.y += SyncRand(unit.Type->TileHeight);
@@ -3322,13 +3322,22 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		}
 		
 		if (droppedUnit != NULL) {
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1) { //10% chance of a dropped item having a prefix
+			int magic_affix_chance = 10; //10% chance of a dropped item having a magic prefix or suffix
+			int unique_chance = 5; //0.5% chance of a dropped item being unique
+			if (unit.Character) { //if the dropper has a character, double the chances of the item being magical or unique
+				magic_affix_chance *= 2;
+				unique_chance *= 2;
+			}
+			
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
 				droppedUnit->GeneratePrefix(unit);
 			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= 90 && droppedUnit->Type->ItemClass != -1) { //10% chance of a dropped item having a suffix
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
 				droppedUnit->GenerateSuffix(unit);
 			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= 995 && droppedUnit->Type->ItemClass != -1) { //0.5% chance of a dropped item being unique
+			
+			
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= (1000 - unique_chance) && droppedUnit->Type->ItemClass != -1) {
 				droppedUnit->GenerateUnique(unit);
 			}
 		}
