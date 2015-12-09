@@ -127,6 +127,7 @@ extern bool FactionHasHero(std::string civilization_name, std::string faction_na
 extern void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_full_name);
 extern std::string GetFactionRuler(std::string civilization_name, std::string faction_name);
 extern void CreateGrandStrategyHero(std::string hero_full_name);
+extern void CreateGrandStrategyCustomHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);
 extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
 extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);

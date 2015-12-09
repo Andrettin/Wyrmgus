@@ -6746,6 +6746,31 @@ void CreateGrandStrategyHero(std::string hero_full_name)
 	}
 }
 
+void CreateGrandStrategyCustomHero(std::string hero_full_name)
+{
+	CCharacter *custom_hero = GetCustomHero(hero_full_name);
+	CGrandStrategyHero *hero = new CGrandStrategyHero;
+	GrandStrategyGame.Heroes.push_back(hero);
+	hero->Name = custom_hero->Name;
+	hero->ExtraName = custom_hero->ExtraName;
+	hero->Dynasty = custom_hero->Dynasty;
+	if (custom_hero->Type != NULL) {
+		hero->Type = const_cast<CUnitType *>(&(*custom_hero->Type));
+	}
+	if (custom_hero->Trait != NULL) {
+		hero->Trait = const_cast<CUpgrade *>(&(*custom_hero->Trait));
+	} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
+		hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
+	}
+	hero->Civilization = custom_hero->Civilization;
+	hero->Gender = custom_hero->Gender;
+	hero->Custom = custom_hero->Custom;
+	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
+
+	hero->Initialize();
+	hero->Create();
+}
+
 void KillGrandStrategyHero(std::string hero_full_name)
 {
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
