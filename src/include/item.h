@@ -107,6 +107,9 @@ public:
 	bool CanDrop();				/// Check whether this unique item can drop
 	
 	std::string Name;
+	std::string Description;
+	std::string Background;
+	std::string Quote;
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;

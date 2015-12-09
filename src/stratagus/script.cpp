@@ -861,6 +861,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitTrait")) {
 			res->e = EString_UnitTrait;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitQuote")) {
+			res->e = EString_UnitQuote;
+			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "TypeName")) {
 			res->e = EString_TypeName;
 			res->D.Type = CclParseTypeDesc(l);
@@ -1166,6 +1169,17 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				return std::string("");
 			}
+		case EString_UnitQuote : // name of the unit's trait
+			unit = EvalUnit(s->D.Unit);
+			if (unit != NULL) {
+				if (!unit->Unique) {
+					return unit->Type->Quote;
+				} else {
+					return GetUniqueItem(unit->Name)->Quote;
+				}
+			} else {
+				return std::string("");
+			}
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != NULL) {
@@ -1401,6 +1415,10 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Unit;
 			break;
 		case EString_UnitTrait : // Trait of the unit
+			FreeUnitDesc(s->D.Unit);
+			delete s->D.Unit;
+			break;
+		case EString_UnitQuote : // Quote of the unit
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
 			break;
@@ -1945,6 +1963,20 @@ static int CclUnitTrait(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for UnitQuote.
+**  {"UnitQuote", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitQuote(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitQuote");
+}
+
+/**
 **  Return equivalent lua table for TypeName.
 **  {"TypeName", {}}
 **
@@ -2193,6 +2225,7 @@ static void AliasRegister()
 	//Wyrmgus start
 	lua_register(Lua, "UnitTypeName", CclUnitTypeName);
 	lua_register(Lua, "UnitTrait", CclUnitTrait);
+	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "TypeName", CclTypeName);
 	lua_register(Lua, "TypeClass", CclTypeClass);
 	lua_register(Lua, "TypeDescription", CclTypeDescription);

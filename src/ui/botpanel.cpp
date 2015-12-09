@@ -386,7 +386,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->Quote.empty()) {
+	if (condition->Quote && type && type->Quote.empty() && !(button.Action == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Unique && !GetUniqueItem(UnitManager.GetSlotUnit(button.Value).Name)->Quote.empty())) {
 		return false;
 	}
 	//Wyrmgus end

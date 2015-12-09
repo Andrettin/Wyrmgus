@@ -146,6 +146,7 @@ enum EString {
 	//Wyrmgus start
 	EString_UnitTypeName,		/// UnitType Name, if EString_UnitName is occupied by the unit's personal name.
 	EString_UnitTrait,			/// Unit Trait
+	EString_UnitQuote,			/// Unit quote
 	EString_TypeName,			/// Unit type's name
 	EString_TypeClass,			/// Unit type's class
 	EString_TypeDescription,	/// Unit type's description

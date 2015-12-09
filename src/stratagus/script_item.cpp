@@ -98,6 +98,12 @@ static int CclDefineUniqueItem(lua_State *l)
 			} else {
 				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
 			}
+		} else if (!strcmp(value, "Description")) {
+			item->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			item->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			item->Quote = LuaToString(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
