@@ -3356,15 +3356,22 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		drop_pos.x += SyncRand(unit.Type->TileWidth);
 		drop_pos.y += SyncRand(unit.Type->TileHeight);
 		CUnit *droppedUnit = NULL;
+		int chosen_drop = -1;
 		if (unit.Player->AiEnabled && unit.Type->AiDrops.size() > 0) {
-			int chosen_drop = unit.Type->AiDrops[SyncRand(unit.Type->AiDrops.size())];
-			droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+			chosen_drop = unit.Type->AiDrops[SyncRand(unit.Type->AiDrops.size())];
 		} else if (unit.Type->Drops.size() > 0) {
-			int chosen_drop = unit.Type->Drops[SyncRand(unit.Type->Drops.size())];
-			droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+			chosen_drop = unit.Type->Drops[SyncRand(unit.Type->Drops.size())];
 		}
 		
-		if (droppedUnit != NULL) {
+		if (chosen_drop != -1) {
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
+				Vec2i resPos;
+				FindNearestDrop(*droppedUnit->Type, drop_pos, resPos, LookingW);
+				droppedUnit = MakeUnitAndPlace(resPos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+			} else {
+				droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+			}
+			
 			int magic_affix_chance = 10; //10% chance of a dropped item having a magic prefix or suffix
 			int unique_chance = 5; //0.5% chance of a dropped item being unique
 			if (unit.Character) { //if the dropper has a character, double the chances of the item being magical or unique
@@ -3378,8 +3385,6 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
 				droppedUnit->GenerateSuffix(unit);
 			}
-			
-			
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= (1000 - unique_chance) && droppedUnit->Type->ItemClass != -1) {
 				droppedUnit->GenerateUnique(unit);
 			}
