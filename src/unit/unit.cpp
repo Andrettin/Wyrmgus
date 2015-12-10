@@ -3364,29 +3364,31 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		}
 		
 		if (chosen_drop != -1) {
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
+			if ((UnitTypes[chosen_drop]->BoolFlag[ITEM_INDEX].value || UnitTypes[chosen_drop]->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
 				Vec2i resPos;
-				FindNearestDrop(*droppedUnit->Type, drop_pos, resPos, LookingW);
+				FindNearestDrop(*UnitTypes[chosen_drop], drop_pos, resPos, LookingW);
 				droppedUnit = MakeUnitAndPlace(resPos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
 			} else {
 				droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
 			}
 			
-			int magic_affix_chance = 10; //10% chance of a dropped item having a magic prefix or suffix
-			int unique_chance = 5; //0.5% chance of a dropped item being unique
-			if (unit.Character) { //if the dropper has a character, double the chances of the item being magical or unique
-				magic_affix_chance *= 2;
-				unique_chance *= 2;
-			}
-			
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
-				droppedUnit->GeneratePrefix(unit);
-			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
-				droppedUnit->GenerateSuffix(unit);
-			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= (1000 - unique_chance) && droppedUnit->Type->ItemClass != -1) {
-				droppedUnit->GenerateUnique(unit);
+			if (droppedUnit != NULL) {
+				int magic_affix_chance = 10; //10% chance of a dropped item having a magic prefix or suffix
+				int unique_chance = 5; //0.5% chance of a dropped item being unique
+				if (unit.Character) { //if the dropper has a character, double the chances of the item being magical or unique
+					magic_affix_chance *= 2;
+					unique_chance *= 2;
+				}
+				
+				if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
+					droppedUnit->GeneratePrefix(unit);
+				}
+				if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
+					droppedUnit->GenerateSuffix(unit);
+				}
+				if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= (1000 - unique_chance) && droppedUnit->Type->ItemClass != -1) {
+					droppedUnit->GenerateUnique(unit);
+				}
 			}
 		}
 	}
