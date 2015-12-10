@@ -329,6 +329,9 @@ public:
 	std::string UpgradeIdent;	/// Ident of the upgrade applied by the deity
 	std::string Portfolio; ///Portfolio of the deity
 	std::string ParentDeity;	/// Parent deity of this deity (deity on which it is based on); example: Wodanaz (Germanic) is the parent deity of Odin (Norse) and Woden (teuton)
+	std::string Description;
+	std::string Background;
+	std::string Quote;
 };
 
 class LanguageNoun

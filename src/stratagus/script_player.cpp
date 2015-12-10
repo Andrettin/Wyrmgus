@@ -2353,6 +2353,12 @@ static int CclDefineDeity(lua_State *l)
 			deity->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Major")) {
 			deity->Major = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			deity->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			deity->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			deity->Quote = LuaToString(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
