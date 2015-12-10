@@ -1046,7 +1046,10 @@ private:
 */
 static int CclKillUnit(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	//Wyrmgus start
+//	LuaCheckArgs(l, 2);
+	LuaCheckArgs(l, 1);
+	//Wyrmgus end
 
 	//Wyrmgus start
 	/*
@@ -1082,7 +1085,7 @@ static int CclKillUnit(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);	
 	
-	if (unit) {
+	if (unit && unit->IsAlive()) {
 		LetUnitDie(*unit);
 		lua_pushboolean(l, 1);
 		return 1;
