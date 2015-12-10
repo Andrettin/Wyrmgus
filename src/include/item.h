@@ -72,7 +72,7 @@ enum ItemSlots {
 enum ItemClasses {
 	DaggerItemClass,
 	SwordItemClass,
-	RapierItemClass,
+	ThrustingSwordItemClass,
 	AxeItemClass,
 	MaceItemClass,
 	SpearItemClass,

@@ -1758,7 +1758,6 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Excrement")) {
 			type->Excrement = LuaToString(l, -1);
 		} else if (!strcmp(value, "Drops")) {
-			type->Drops.clear(); // remove previously defined drops
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
@@ -1769,7 +1768,6 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "AiDrops")) {
-			type->AiDrops.clear(); // remove previously defined AI drops
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
