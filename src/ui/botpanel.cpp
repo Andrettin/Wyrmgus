@@ -451,6 +451,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 					return false;
 				}
 			}
+			if (condition->Bound != CONDITION_TRUE) {
+				if ((condition->Bound == CONDITION_ONLY) ^ unit.Bound) {
+					return false;
+				}
+			}
 			if (condition->Weapon != CONDITION_TRUE) {
 				if ((condition->Weapon == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == WeaponItemSlot)) {
 					return false;

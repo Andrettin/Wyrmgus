@@ -338,6 +338,8 @@ static int CclUnit(lua_State *l)
 			unit->Suffix = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
 			unit->Unique = LuaToBoolean(l, 2, j + 1);
+		} else if (!strcmp(value, "bound")) {
+			unit->Bound = LuaToBoolean(l, 2, j + 1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "current-sight-range")) {
 			unit->CurrentSightRange = LuaToNumber(l, 2, j + 1);

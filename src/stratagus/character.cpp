@@ -104,7 +104,7 @@ std::string CCharacter::GetFullName()
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Unique == item.Unique) {
+		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound) {
 			if (this->Items[i]->Name.empty() || this->Items[i]->Name == item.Name) {
 				return this->Items[i];
 			}
@@ -199,7 +199,7 @@ void SaveHeroes()
 				for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
 					fprintf(fd, "\n\t\t{");
 					if (Characters[i]->Items[j]->Unique) {
-						fprintf(fd, "\n\t\t\t\"unique\", \"%s\"", Characters[i]->Items[j]->Name.c_str());
+						fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", Characters[i]->Items[j]->Name.c_str());
 					} else {
 						fprintf(fd, "\n\t\t\t\"type\", \"%s\",", Characters[i]->Items[j]->Type->Ident.c_str());
 						if (Characters[i]->Items[j]->Prefix != NULL) {
@@ -211,6 +211,9 @@ void SaveHeroes()
 						if (!Characters[i]->Items[j]->Name.empty()) {
 							fprintf(fd, "\n\t\t\t\"name\", \"%s\",", Characters[i]->Items[j]->Name.c_str());
 						}
+					}
+					if (Characters[i]->Items[j]->Bound) {
+						fprintf(fd, "\n\t\t\t\"bound\", true");
 					}
 					fprintf(fd, "\n\t\t}");
 					if (j < (Characters[i]->Items.size() - 1)) {
@@ -266,7 +269,7 @@ void SaveHeroes()
 				for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
 					fprintf(fd, "\n\t\t{");
 					if (CustomHeroes[i]->Items[j]->Unique) {
-						fprintf(fd, "\n\t\t\t\"unique\", \"%s\"", CustomHeroes[i]->Items[j]->Name.c_str());
+						fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", CustomHeroes[i]->Items[j]->Name.c_str());
 					} else {
 						fprintf(fd, "\n\t\t\t\"type\", \"%s\",", CustomHeroes[i]->Items[j]->Type->Ident.c_str());
 						if (CustomHeroes[i]->Items[j]->Prefix != NULL) {
@@ -278,6 +281,9 @@ void SaveHeroes()
 						if (!CustomHeroes[i]->Items[j]->Name.empty()) {
 							fprintf(fd, "\n\t\t\t\"name\", \"%s\",", CustomHeroes[i]->Items[j]->Name.c_str());
 						}
+					}
+					if (CustomHeroes[i]->Items[j]->Bound) {
+						fprintf(fd, "\n\t\t\t\"bound\", true");
 					}
 					fprintf(fd, "\n\t\t}");
 					if (j < (CustomHeroes[i]->Items.size() - 1)) {

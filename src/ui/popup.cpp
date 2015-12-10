@@ -639,6 +639,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Affixed = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Unique")) {
 			condition->Unique = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Bound")) {
+			condition->Bound = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ItemClass")) {
 			condition->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
 		} else if (!strcmp(key, "Weapon")) {

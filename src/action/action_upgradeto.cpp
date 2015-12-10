@@ -188,6 +188,22 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	unit.Stats = &unit.Type->Stats[player.Index];
 	
 	//Wyrmgus start
+	//deequip the current equipment if they are incompatible with the new unit type
+	if (unit.Weapon != NULL && !unit.CanEquipItemClass(unit.Weapon->Type->ItemClass)) {
+		unit.DeequipItem(*unit.Weapon);
+	}
+	if (unit.Shield != NULL && !unit.CanEquipItemClass(unit.Shield->Type->ItemClass)) {
+		unit.DeequipItem(*unit.Shield);
+	}
+	if (unit.Boots != NULL && !unit.CanEquipItemClass(unit.Boots->Type->ItemClass)) {
+		unit.DeequipItem(*unit.Boots);
+	}
+	if (unit.Arrows != NULL && !unit.CanEquipItemClass(unit.Arrows->Type->ItemClass)) {
+		unit.DeequipItem(*unit.Arrows);
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
 	//change personal name if new unit type's civilization is different from old unit type's civilization
 	if (
 		(!oldtype.Civilization.empty() && !newtype.Civilization.empty() && oldtype.Civilization != newtype.Civilization)

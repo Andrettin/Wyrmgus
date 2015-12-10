@@ -459,6 +459,7 @@ void CUnit::Init()
 	Prefix = NULL;
 	Suffix = NULL;
 	Unique = false;
+	Bound = false;
 	//Wyrmgus end
 	CurrentSightRange = 0;
 
@@ -576,6 +577,7 @@ void CUnit::Release(bool final)
 	Prefix = NULL;
 	Suffix = NULL;
 	Unique = false;
+	Bound = false;
 	//Wyrmgus end
 
 	delete pathFinderData;
@@ -708,6 +710,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		if (!this->Character->Items[i]->Name.empty()) {
 			item->Name = this->Character->Items[i]->Name;
 		}
+		item->Bound = this->Character->Items[i]->Bound;
 		item->Remove(this);
 	}
 	
@@ -3111,12 +3114,25 @@ bool CUnit::CanEquipItem(CUnit *item) const
 		return false;
 	}
 	
-	if (GetItemClassSlot(item->Type->ItemClass) == WeaponItemSlot && Type->WeaponClass != item->Type->ItemClass) { //if the item is a weapon and its item class doesn't match the weapon class used by this unit's type, return false
+	if (!CanEquipItemClass(item->Type->ItemClass)) {
+		return false;
+	}
+	
+	return true;
+}
+
+bool CUnit::CanEquipItemClass(int item_class) const
+{
+	if (item_class == -1) {
+		return false;
+	}
+	
+	if (GetItemClassSlot(item_class) == WeaponItemSlot && Type->WeaponClass != item_class) { //if the item is a weapon and its item class doesn't match the weapon class used by this unit's type, return false
 		return false;
 	}
 	
 	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
-		GetItemClassSlot(item->Type->ItemClass) == ShieldItemSlot
+		GetItemClassSlot(item_class) == ShieldItemSlot
 		 && (
 			Type->WeaponClass == DaggerItemClass
 			|| Type->WeaponClass == BowItemClass
@@ -3129,13 +3145,13 @@ bool CUnit::CanEquipItem(CUnit *item) const
 	}
 	
 	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
-		GetItemClassSlot(item->Type->ItemClass) == ArrowsItemSlot
+		GetItemClassSlot(item_class) == ArrowsItemSlot
 		&& Type->WeaponClass != BowItemClass
 	) {
 		return false;
 	}
 	
-	if (item->Type->ItemClass == PotionItemClass) {
+	if (item_class == PotionItemClass) {
 		return false;
 	}
 	

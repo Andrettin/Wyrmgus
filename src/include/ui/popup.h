@@ -55,7 +55,7 @@ public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
 		//Wyrmgus start
 		Description(false), Quote(false),
-		Equipped(0), Equippable(0), Affixed(0), Unique(0), Weapon(0), Shield(0), Boots(0), Arrows(0),
+		Equipped(0), Equippable(0), Affixed(0), Unique(0), Bound(0), Weapon(0), Shield(0), Boots(0), Arrows(0),
 //		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
 		ButtonAction(-1), ItemClass(-1), BoolFlags(NULL), Variables(NULL) {}
 		//Wyrmgus end
@@ -83,6 +83,7 @@ public:
 	char Equippable;			/// check if button's item is equippable by its owner.
 	char Affixed;				/// check if button's item has an affix
 	char Unique;				/// check if button's item is unique
+	char Bound;					/// check if button's item is bound to its owner
 	char Weapon;				/// check if button's item is a weapon
 	char Shield;				/// check if button's item is a shield
 	char Boots;					/// check if button's item are boots

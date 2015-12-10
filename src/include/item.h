@@ -119,13 +119,14 @@ class CItem
 {
 public:
 	CItem() :
-		Unique(false),
+		Unique(false), Bound(false),
 		Type(NULL), Prefix(NULL), Suffix(NULL)
 	{
 	}
 	
 	std::string Name;
 	bool Unique;
+	bool Bound;					/// Whether the item is bound to its owner and can't be dropped
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;

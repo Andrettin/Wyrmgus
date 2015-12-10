@@ -179,7 +179,10 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"suffix\", \"%s\", ", unit.Suffix->Ident.c_str());
 	}
 	if (unit.Unique) {
-		file.printf("\"unique\", true");
+		file.printf("\"unique\", true, ");
+	}
+	if (unit.Bound) {
+		file.printf("\"bound\", true, ");
 	}
 	//Wyrmgus end
 	file.printf(" \"current-sight-range\", %d,", unit.CurrentSightRange);

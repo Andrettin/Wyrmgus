@@ -2171,7 +2171,18 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 								const int flush = !(KeyModifiers & ModifierShift);
 								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
 									if ((1 << button) == LeftButton) {
-										SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+										if  (!uins->Bound) {
+											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+										} else {
+											if (Selected[0]->Player == ThisPlayer) {
+												std::string unit_name = Selected[0]->Name + " (" + Selected[0]->GetTypeName() + ")";
+												std::string item_name = uins->Name.empty() ? uins->GetTypeName() : uins->Name;
+												if (!uins->Unique) {
+													item_name = "the " + item_name;
+												}
+												Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, _("%s cannot drop %s."), unit_name.c_str(), item_name.c_str());
+											}
+										}
 									} else if ((1 << button) == RightButton) {
 										SendCommandUse(*Selected[0], *uins, flush);
 									}

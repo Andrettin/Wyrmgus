@@ -326,6 +326,7 @@ public:
 	bool IsItemEquipped(CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
 	bool CanEquipItem(CUnit *item) const;
+	bool CanEquipItemClass(int item_class) const;
 	bool HasInventory() const;
 	bool CanLearnAbility(CUpgrade *ability) const;
 	CAnimations *GetAnimations() const;
@@ -401,6 +402,7 @@ public:
 	CUpgrade *Prefix;	/// Unit's item prefix
 	CUpgrade *Suffix;	/// Unit's item suffix
 	bool Unique;		/// Whether the item is unique
+	bool Bound;			/// Whether the item is bound to its owner
 	//Wyrmgus end
 	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 

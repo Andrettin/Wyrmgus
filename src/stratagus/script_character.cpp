@@ -201,6 +201,7 @@ static int CclDefineCharacter(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "Items")) {
+			character->Items.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
@@ -253,6 +254,8 @@ static int CclDefineCharacter(lua_State *l)
 						if (unique_item->Suffix != NULL) {
 							item->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
 						}
+					} else if (!strcmp(value, "bound")) {
+						item->Bound = LuaToBoolean(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", character->GetFullName().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -427,6 +430,8 @@ static int CclDefineCustomHero(lua_State *l)
 						if (unique_item->Suffix != NULL) {
 							item->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
 						}
+					} else if (!strcmp(value, "bound")) {
+						item->Bound = LuaToBoolean(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", hero->GetFullName().c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
