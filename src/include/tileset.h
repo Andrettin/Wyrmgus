@@ -179,6 +179,8 @@ public:
 	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
 	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
 	unsigned getMidOneTreeTile() const { return midOneTreeTile; }
+	
+	unsigned getWallDirection(int tileIndex, bool human) const;
 
 	unsigned getHumanWallTileIndex(int dirFlag) const;
 	unsigned getOrcWallTileIndex(int dirFlag) const;
