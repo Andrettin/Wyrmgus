@@ -458,6 +458,7 @@ void CUnit::Init()
 	Trait = NULL;
 	Prefix = NULL;
 	Suffix = NULL;
+	Spell = NULL;
 	Unique = false;
 	Bound = false;
 	//Wyrmgus end
@@ -576,6 +577,7 @@ void CUnit::Release(bool final)
 	Arrows = NULL;
 	Prefix = NULL;
 	Suffix = NULL;
+	Spell = NULL;
 	Unique = false;
 	Bound = false;
 	//Wyrmgus end
@@ -653,6 +655,21 @@ void CUnit::IncreaseLevel(int level_quantity)
 	Player->UpdateLevelUpUnits();
 }
 
+void CUnit::Retrain()
+{
+	//lose all abilities (the AbilityLost function also returns the level-ups to the unit)
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+		if (this->IndividualUpgrades[AllUpgrades[i]->ID] && AllUpgrades[i]->Ability) {
+			AbilityLost(*this, AllUpgrades[i]);
+		}
+	}
+	
+	if (this->Player == ThisPlayer) {
+		std::string unit_name = this->Name + " (" + GetTypeName() + ")";
+		this->Player->Notify(NotifyGreen, this->tilePos, _("%s has retrained."), unit_name.c_str());
+	}
+}
+
 void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 {
 	if (this->Character == NULL) {
@@ -705,6 +722,9 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 		if (this->Character->Items[i]->Suffix != NULL) {
 			item->SetSuffix(this->Character->Items[i]->Suffix);
+		}
+		if (this->Character->Items[i]->Spell != NULL) {
+			item->SetSpell(this->Character->Items[i]->Spell);
 		}
 		item->Unique = this->Character->Items[i]->Unique;
 		if (!this->Character->Items[i]->Name.empty()) {
@@ -977,6 +997,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 	Name += GetTypeName();
 	if (Suffix != NULL) {
 		Name += " " + Suffix->Name;
+	} else if (Spell != NULL) {
+		Name += " of " + Spell->Name;
 	}
 }
 
@@ -1007,6 +1029,28 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	Name += GetTypeName();
 	if (Suffix != NULL) {
 		Name += " " + Suffix->Name;
+	} else if (Spell != NULL) {
+		Name += " of " + Spell->Name;
+	}
+}
+
+void CUnit::SetSpell(SpellType *spell)
+{
+	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->GetItem(*this)->Spell = const_cast<SpellType *>(&(*spell));
+		SaveHeroes();
+	}
+	Spell = const_cast<SpellType *>(&(*spell));
+	
+	Name = "";
+	if (Prefix != NULL) {
+		Name += Prefix->Name + " ";
+	}
+	Name += GetTypeName();
+	if (Suffix != NULL) {
+		Name += " " + Suffix->Name;
+	} else if (Spell != NULL) {
+		Name += " of " + Spell->Name;
 	}
 }
 
@@ -1058,6 +1102,7 @@ void CUnit::GenerateUnique(CUnit &dropper)
 		CUniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
 		SetPrefix(chosen_unique->Prefix);
 		SetSuffix(chosen_unique->Suffix);
+		SetSpell(chosen_unique->Spell);
 		Name = chosen_unique->Name;
 		Unique = true;
 	}
@@ -3055,17 +3100,15 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	
 	if (AiHelpers.ExperienceUpgrades.size() > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
-			if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
-				if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
-					value += 1;
-				}
+			if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
+				value += 1;
 			}
 		}
 	}
 	
 	if (!only_units && AiHelpers.LearnableAbilities.size() > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-			if (CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
+			if (!IndividualUpgrades[AiHelpers.LearnableAbilities[Type->Slot][i]->ID]) {
 				value += 1;
 			}
 		}
@@ -3190,7 +3233,7 @@ bool CUnit::CanLearnAbility(CUpgrade *ability) const
 			return false;
 		}
 	}
-				
+
 	return true;
 }
 

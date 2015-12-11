@@ -46,6 +46,7 @@
 #include "pathfinder.h"
 #include "script.h"
 #include "sound.h"
+#include "spells.h"
 #include "tileset.h"
 #include "translate.h"
 #include "ui.h"
@@ -207,6 +208,8 @@ enum {
 				} else {
 					unit.DeequipItem(*goal);
 				}
+			} else if (goal->Spell != NULL) {
+				CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands);
 			} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
 				if (unit.Player == ThisPlayer) {
 					unit.Player->Notify(NotifyGreen, unit.tilePos, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());

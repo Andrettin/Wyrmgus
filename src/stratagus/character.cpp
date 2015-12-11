@@ -47,6 +47,7 @@
 #include "parameters.h"
 #include "player.h"
 #include "quest.h"
+#include "spells.h"
 #include "unit.h"
 
 /*----------------------------------------------------------------------------
@@ -104,7 +105,7 @@ std::string CCharacter::GetFullName()
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound) {
+		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound) {
 			if (this->Items[i]->Name.empty() || this->Items[i]->Name == item.Name) {
 				return this->Items[i];
 			}
@@ -208,6 +209,9 @@ void SaveHeroes()
 						if (Characters[i]->Items[j]->Suffix != NULL) {
 							fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", Characters[i]->Items[j]->Suffix->Ident.c_str());
 						}
+						if (Characters[i]->Items[j]->Spell != NULL) {
+							fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", Characters[i]->Items[j]->Spell->Ident.c_str());
+						}
 						if (!Characters[i]->Items[j]->Name.empty()) {
 							fprintf(fd, "\n\t\t\t\"name\", \"%s\",", Characters[i]->Items[j]->Name.c_str());
 						}
@@ -277,6 +281,9 @@ void SaveHeroes()
 						}
 						if (CustomHeroes[i]->Items[j]->Suffix != NULL) {
 							fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", CustomHeroes[i]->Items[j]->Suffix->Ident.c_str());
+						}
+						if (CustomHeroes[i]->Items[j]->Spell != NULL) {
+							fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", CustomHeroes[i]->Items[j]->Spell->Ident.c_str());
 						}
 						if (!CustomHeroes[i]->Items[j]->Name.empty()) {
 							fprintf(fd, "\n\t\t\t\"name\", \"%s\",", CustomHeroes[i]->Items[j]->Name.c_str());

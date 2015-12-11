@@ -39,6 +39,7 @@
 
 #include "player.h"
 #include "script.h"
+#include "spells.h"
 #include "unittype.h"
 #include "upgrade.h"
 
@@ -97,6 +98,14 @@ static int CclDefineUniqueItem(lua_State *l)
 				item->Suffix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
 			} else {
 				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
+			}
+		} else if (!strcmp(value, "Spell")) {
+			std::string spell_ident = LuaToString(l, -1);
+			SpellType *spell = SpellTypeByIdent(spell_ident);
+			if (spell != NULL) {
+				item->Spell = const_cast<SpellType *>(&(*spell));
+			} else {
+				LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
 			}
 		} else if (!strcmp(value, "Description")) {
 			item->Description = LuaToString(l, -1);

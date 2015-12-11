@@ -635,8 +635,12 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Equipped = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Equippable")) {
 			condition->Equippable = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Consumable")) {
+			condition->Consumable = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Affixed")) {
 			condition->Affixed = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Spell")) {
+			condition->Spell = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Unique")) {
 			condition->Unique = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Bound")) {

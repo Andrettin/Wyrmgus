@@ -441,8 +441,18 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 					return false;
 				}
 			}
+			if (condition->Consumable != CONDITION_TRUE) {
+				if ((condition->Consumable == CONDITION_ONLY) ^ (unit.Type->ItemClass == PotionItemClass || unit.Type->ItemClass == ScrollItemClass)) {
+					return false;
+				}
+			}
 			if (condition->Affixed != CONDITION_TRUE) {
 				if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != NULL || unit.Suffix != NULL)) {
+					return false;
+				}
+			}
+			if (condition->Spell != CONDITION_TRUE) {
+				if ((condition->Spell == CONDITION_ONLY) ^ unit.Spell != NULL) {
 					return false;
 				}
 			}

@@ -336,6 +336,8 @@ static int CclUnit(lua_State *l)
 			unit->Prefix = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "suffix")) {
 			unit->Suffix = CUpgrade::Get(LuaToString(l, 2, j + 1));
+		} else if (!strcmp(value, "spell")) {
+			unit->Spell = SpellTypeByIdent(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
 			unit->Unique = LuaToBoolean(l, 2, j + 1);
 		} else if (!strcmp(value, "bound")) {
@@ -1552,6 +1554,14 @@ static int CclSetUnitVariable(lua_State *l)
 			unit->SetSuffix(CUpgrade::Get(upgrade_ident));
 		} else {
 			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		}
+	} else if (!strcmp(name, "Spell")) { //add a spell to the item unit
+		LuaCheckArgs(l, 3);
+		std::string spell_ident = LuaToString(l, 3);
+		if (SpellTypeByIdent(spell_ident)) {
+			unit->SetSpell(SpellTypeByIdent(spell_ident));
+		} else {
+			LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
 		}
 	//Wyrmgus end
 	} else {

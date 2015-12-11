@@ -178,6 +178,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Suffix != NULL) {
 		file.printf("\"suffix\", \"%s\", ", unit.Suffix->Ident.c_str());
 	}
+	if (unit.Spell != NULL) {
+		file.printf("\"spell\", \"%s\", ", unit.Spell->Ident.c_str());
+	}
 	if (unit.Unique) {
 		file.printf("\"unique\", true, ");
 	}

@@ -48,6 +48,7 @@
 
 class CUnitType;
 class CUpgrade;
+class SpellType;
 class CVariable;
 
 /**
@@ -101,7 +102,7 @@ class CUniqueItem
 {
 public:
 	CUniqueItem() :
-		Type(NULL), Prefix(NULL), Suffix(NULL)
+		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL)
 	{
 	}
 	
@@ -114,6 +115,7 @@ public:
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
+	SpellType *Spell;
 };
 
 class CItem
@@ -121,7 +123,7 @@ class CItem
 public:
 	CItem() :
 		Unique(false), Bound(false),
-		Type(NULL), Prefix(NULL), Suffix(NULL)
+		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL)
 	{
 	}
 	
@@ -131,6 +133,7 @@ public:
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
+	SpellType *Spell;
 };
 
 /*----------------------------------------------------------------------------

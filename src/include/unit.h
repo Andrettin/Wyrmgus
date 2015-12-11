@@ -175,6 +175,7 @@ public:
 	
 	//Wyrmgus start
 	void IncreaseLevel(int level_quantity);
+	void Retrain();
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
 	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false);
 	void SetVariation(int new_variation, const CUnitType *new_type = NULL);
@@ -182,6 +183,7 @@ public:
 	void DeequipItem(CUnit &item);
 	void SetPrefix(CUpgrade *prefix);
 	void SetSuffix(CUpgrade *suffix);
+	void SetSpell(SpellType *spell);
 	void GeneratePrefix(CUnit &dropper);
 	void GenerateSuffix(CUnit &dropper);
 	void GenerateUnique(CUnit &dropper);
@@ -399,8 +401,9 @@ public:
 	CCharacter *Character;	/// Pointer to the character represented by this unit
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
-	CUpgrade *Prefix;	/// Unit's item prefix
-	CUpgrade *Suffix;	/// Unit's item suffix
+	CUpgrade *Prefix;	/// Item unit's prefix
+	CUpgrade *Suffix;	/// Item unit's suffix
+	SpellType *Spell;	/// Item unit's spell
 	bool Unique;		/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	//Wyrmgus end

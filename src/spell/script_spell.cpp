@@ -44,6 +44,9 @@
 #include "spell/spell_demolish.h"
 #include "spell/spell_luacallback.h"
 #include "spell/spell_polymorph.h"
+//Wyrmgus start
+#include "spell/spell_retrain.h"
+//Wyrmgus end
 #include "spell/spell_spawnmissile.h"
 #include "spell/spell_spawnportal.h"
 #include "spell/spell_summon.h"
@@ -90,6 +93,10 @@ static SpellActionType *CclSpellAction(lua_State *l)
 		spellaction = new Spell_LuaCallback;
 	} else if (!strcmp(value, "polymorph")) {
 		spellaction = new Spell_Polymorph;
+	//Wyrmgus start
+	} else if (!strcmp(value, "retrain")) {
+		spellaction = new Spell_Retrain;
+	//Wyrmgus end
 	} else if (!strcmp(value, "spawn-missile")) {
 		spellaction = new Spell_SpawnMissile;
 	} else if (!strcmp(value, "spawn-portal")) {

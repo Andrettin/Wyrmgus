@@ -94,6 +94,7 @@ extern void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *
 //Wyrmgus start
 extern void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um);
 extern void AbilityAcquire(CUnit &unit, CUpgrade *upgrade);
+extern void AbilityLost(CUnit &unit, CUpgrade *upgrade);
 extern void TraitAcquire(CUnit &unit, const CUpgrade *upgrade);
 //Wyrmgus end
 extern void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade); /// Make a unit acquire in individual upgrade

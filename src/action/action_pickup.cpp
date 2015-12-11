@@ -209,6 +209,9 @@ enum {
 				if (goal->Suffix != NULL) {
 					item->Suffix = const_cast<CUpgrade *>(&(*goal->Suffix));
 				}
+				if (goal->Spell != NULL) {
+					item->Spell = const_cast<SpellType *>(&(*goal->Spell));
+				}
 				if (goal->Unique) {
 					item->Name = goal->Name;
 					item->Unique = goal->Unique;

@@ -41,6 +41,7 @@
 #include "player.h"
 #include "quest.h"
 #include "script.h"
+#include "spells.h"
 #include "unittype.h"
 #include "upgrade.h"
 
@@ -238,6 +239,14 @@ static int CclDefineCharacter(lua_State *l)
 						} else {
 							LuaError(l, "Item suffix \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 						}
+					} else if (!strcmp(value, "spell")) {
+						std::string spell_ident = LuaToString(l, -1, k + 1);
+						SpellType *spell = SpellTypeByIdent(spell_ident);
+						if (spell != NULL) {
+							item->Spell = const_cast<SpellType *>(&(*spell));
+						} else {
+							LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
+						}
 					} else if (!strcmp(value, "name")) {
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
@@ -253,6 +262,9 @@ static int CclDefineCharacter(lua_State *l)
 						}
 						if (unique_item->Suffix != NULL) {
 							item->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
+						}
+						if (unique_item->Spell != NULL) {
+							item->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
 						}
 					} else if (!strcmp(value, "bound")) {
 						item->Bound = LuaToBoolean(l, -1, k + 1);
@@ -414,6 +426,14 @@ static int CclDefineCustomHero(lua_State *l)
 						} else {
 							LuaError(l, "Item suffix \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 						}
+					} else if (!strcmp(value, "spell")) {
+						std::string spell_ident = LuaToString(l, -1, k + 1);
+						SpellType *spell = SpellTypeByIdent(spell_ident);
+						if (spell != NULL) {
+							item->Spell = const_cast<SpellType *>(&(*spell));
+						} else {
+							LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
+						}
 					} else if (!strcmp(value, "name")) {
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
@@ -429,6 +449,9 @@ static int CclDefineCustomHero(lua_State *l)
 						}
 						if (unique_item->Suffix != NULL) {
 							item->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
+						}
+						if (unique_item->Spell != NULL) {
+							item->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
 						}
 					} else if (!strcmp(value, "bound")) {
 						item->Bound = LuaToBoolean(l, -1, k + 1);

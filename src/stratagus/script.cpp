@@ -52,6 +52,9 @@
 //Wyrmgus end
 #include "map.h"
 #include "parameters.h"
+//Wyrmgus start
+#include "spells.h"
+//Wyrmgus end
 #include "translate.h"
 #include "trigger.h"
 #include "ui.h"
@@ -861,6 +864,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitTrait")) {
 			res->e = EString_UnitTrait;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitSpell")) {
+			res->e = EString_UnitSpell;
+			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "UnitQuote")) {
 			res->e = EString_UnitQuote;
 			res->D.Unit = CclParseUnitDesc(l);
@@ -1169,7 +1175,14 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				return std::string("");
 			}
-		case EString_UnitQuote : // name of the unit's trait
+		case EString_UnitSpell : // name of the unit's spell
+			unit = EvalUnit(s->D.Unit);
+			if (unit != NULL && unit->Spell != NULL) {
+				return unit->Spell->Name;
+			} else {
+				return std::string("");
+			}
+		case EString_UnitQuote : // unit's quote
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
 				if (!unit->Unique) {
@@ -1415,6 +1428,10 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Unit;
 			break;
 		case EString_UnitTrait : // Trait of the unit
+			FreeUnitDesc(s->D.Unit);
+			delete s->D.Unit;
+			break;
+		case EString_UnitSpell : // Spell of the unit
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
 			break;
@@ -1963,6 +1980,20 @@ static int CclUnitTrait(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for UnitSpell.
+**  {"UnitSpell", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitSpell(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitSpell");
+}
+
+/**
 **  Return equivalent lua table for UnitQuote.
 **  {"UnitQuote", {arg1}}
 **
@@ -2225,6 +2256,7 @@ static void AliasRegister()
 	//Wyrmgus start
 	lua_register(Lua, "UnitTypeName", CclUnitTypeName);
 	lua_register(Lua, "UnitTrait", CclUnitTrait);
+	lua_register(Lua, "UnitSpell", CclUnitSpell);
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "TypeName", CclTypeName);
 	lua_register(Lua, "TypeClass", CclTypeClass);
