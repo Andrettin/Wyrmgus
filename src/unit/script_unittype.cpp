@@ -2430,6 +2430,30 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	//Wyrmgus start
+	} else if (!strcmp(data, "Drops")) {
+		lua_createtable(l, type->Drops.size(), 0);
+		for (size_t i = 1; i <= type->Drops.size(); ++i)
+		{
+			lua_pushstring(l, UnitTypes[type->Drops[i-1]]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "AiDrops")) {
+		lua_createtable(l, type->AiDrops.size(), 0);
+		for (size_t i = 1; i <= type->AiDrops.size(); ++i)
+		{
+			lua_pushstring(l, UnitTypes[type->AiDrops[i-1]]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "DropAffixes")) {
+		lua_createtable(l, type->DropAffixes.size(), 0);
+		for (size_t i = 1; i <= type->DropAffixes.size(); ++i)
+		{
+			lua_pushstring(l, type->DropAffixes[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else if (!strcmp(data, "Traits")) {
 		lua_createtable(l, type->Traits.size(), 0);
 		for (size_t i = 1; i <= type->Traits.size(); ++i)
