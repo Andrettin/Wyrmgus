@@ -1054,6 +1054,56 @@ void CUnit::SetSpell(SpellType *spell)
 	}
 }
 
+void CUnit::GenerateDrop()
+{
+	Vec2i drop_pos = this->tilePos;
+	drop_pos.x += SyncRand(this->Type->TileWidth);
+	drop_pos.y += SyncRand(this->Type->TileHeight);
+	CUnit *droppedUnit = NULL;
+	int chosen_drop = -1;
+	std::vector<int> potential_drops;
+	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
+		potential_drops.push_back(this->Type->Drops[i]);
+	}
+	if (this->Player->AiEnabled) {
+		for (size_t i = 0; i < this->Type->AiDrops.size(); ++i) {
+			potential_drops.push_back(this->Type->AiDrops[i]);
+		}
+	}
+	if (potential_drops.size() > 0) {
+		chosen_drop = potential_drops[SyncRand(potential_drops.size())];
+	}
+		
+	if (chosen_drop != -1) {
+		if ((UnitTypes[chosen_drop]->BoolFlag[ITEM_INDEX].value || UnitTypes[chosen_drop]->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
+			Vec2i resPos;
+			FindNearestDrop(*UnitTypes[chosen_drop], drop_pos, resPos, LookingW);
+			droppedUnit = MakeUnitAndPlace(resPos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+		} else {
+			droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+		}
+			
+		if (droppedUnit != NULL) {
+			int magic_affix_chance = 10; //10% chance of a dropped item having a magic prefix or suffix
+			int unique_chance = 5; //0.5% chance of a dropped item being unique
+			if (this->Character) { //if the dropper has a character, double the chances of the item being magical or unique
+				magic_affix_chance *= 2;
+				unique_chance *= 2;
+			}
+				
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
+				droppedUnit->GeneratePrefix(*this);
+			}
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
+				droppedUnit->GenerateSuffix(*this);
+			}
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= (1000 - unique_chance) && droppedUnit->Type->ItemClass != -1) {
+				droppedUnit->GenerateUnique(*this);
+			}
+		}
+	}
+}
+
 void CUnit::GeneratePrefix(CUnit &dropper)
 {
 	std::vector<CUpgrade *> potential_prefixes;
@@ -3395,45 +3445,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	//Wyrmgus start
 	//drop items upon death
 	if (unit.CurrentAction() != UnitActionBuilt && (unit.Character || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit has a character, in which it case it will always drop an item
-		Vec2i drop_pos = unit.tilePos;
-		drop_pos.x += SyncRand(unit.Type->TileWidth);
-		drop_pos.y += SyncRand(unit.Type->TileHeight);
-		CUnit *droppedUnit = NULL;
-		int chosen_drop = -1;
-		if (unit.Player->AiEnabled && unit.Type->AiDrops.size() > 0) {
-			chosen_drop = unit.Type->AiDrops[SyncRand(unit.Type->AiDrops.size())];
-		} else if (unit.Type->Drops.size() > 0) {
-			chosen_drop = unit.Type->Drops[SyncRand(unit.Type->Drops.size())];
-		}
-		
-		if (chosen_drop != -1) {
-			if ((UnitTypes[chosen_drop]->BoolFlag[ITEM_INDEX].value || UnitTypes[chosen_drop]->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
-				Vec2i resPos;
-				FindNearestDrop(*UnitTypes[chosen_drop], drop_pos, resPos, LookingW);
-				droppedUnit = MakeUnitAndPlace(resPos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
-			} else {
-				droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
-			}
-			
-			if (droppedUnit != NULL) {
-				int magic_affix_chance = 10; //10% chance of a dropped item having a magic prefix or suffix
-				int unique_chance = 5; //0.5% chance of a dropped item being unique
-				if (unit.Character) { //if the dropper has a character, double the chances of the item being magical or unique
-					magic_affix_chance *= 2;
-					unique_chance *= 2;
-				}
-				
-				if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
-					droppedUnit->GeneratePrefix(unit);
-				}
-				if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
-					droppedUnit->GenerateSuffix(unit);
-				}
-				if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= (1000 - unique_chance) && droppedUnit->Type->ItemClass != -1) {
-					droppedUnit->GenerateUnique(unit);
-				}
-			}
-		}
+		unit.GenerateDrop();
 	}
 	//Wyrmgus end
 
