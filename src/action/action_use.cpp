@@ -237,7 +237,7 @@ enum {
 				return;
 			}
 			PlayUnitSound(*goal, VoiceUsed);
-			if (goal->Type->BoolFlag[POWERUP_INDEX].value || goal->Type->ItemClass == PotionItemClass) { //only destroy item if it is consumable
+			if (goal->Type->BoolFlag[POWERUP_INDEX].value || goal->Type->ItemClass == PotionItemClass || goal->Type->ItemClass == ScrollItemClass) { //only destroy item if it is consumable
 				if (goal->Container == NULL) {
 					goal->Remove(NULL);
 					LetUnitDie(*goal);

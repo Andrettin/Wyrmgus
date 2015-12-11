@@ -96,6 +96,8 @@ int GetItemClassIdByName(std::string item_class)
 		return ArrowsItemClass;
 	} else if (item_class == "potion") {
 		return PotionItemClass;
+	} else if (item_class == "scroll") {
+		return ScrollItemClass;
 	}
 
 	return -1;
@@ -137,6 +139,8 @@ std::string GetItemClassNameById(int item_class)
 		return "arrows";
 	} else if (item_class == PotionItemClass) {
 		return "potion";
+	} else if (item_class == ScrollItemClass) {
+		return "scroll";
 	}
 
 	return "";

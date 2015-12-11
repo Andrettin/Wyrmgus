@@ -92,6 +92,7 @@ enum ItemClasses {
 	ArrowsItemClass,
 
 	PotionItemClass,
+	ScrollItemClass,
 
 	MaxItemClasses
 };

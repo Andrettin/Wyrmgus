@@ -3127,6 +3127,10 @@ bool CUnit::CanEquipItemClass(int item_class) const
 		return false;
 	}
 	
+	if (GetItemClassSlot(item_class) == -1) { //can't equip items that don't correspond to an equippable slot
+		return false;
+	}
+	
 	if (GetItemClassSlot(item_class) == WeaponItemSlot && Type->WeaponClass != item_class) { //if the item is a weapon and its item class doesn't match the weapon class used by this unit's type, return false
 		return false;
 	}
@@ -3148,10 +3152,6 @@ bool CUnit::CanEquipItemClass(int item_class) const
 		GetItemClassSlot(item_class) == ArrowsItemSlot
 		&& Type->WeaponClass != BowItemClass
 	) {
-		return false;
-	}
-	
-	if (item_class == PotionItemClass) {
 		return false;
 	}
 	
