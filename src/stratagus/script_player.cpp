@@ -1865,7 +1865,53 @@ static int CclDefineLanguageAdjective(lua_State *l)
 }
 
 /**
-**  Define an adverb for a particular civilization's language.
+**  Define a pronoun for a civilization's language.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineLanguagePronoun(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	LanguagePronoun *pronoun = new LanguagePronoun;
+	pronoun->Word = LuaToString(l, 1);
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Civilization")) {
+			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			
+			for (int i = 0; i < LanguageWordMax; ++i) {
+				if (!PlayerRaces.LanguagePronouns[civilization][i] || PlayerRaces.LanguagePronouns[civilization][i]->Word.empty()) {
+					PlayerRaces.LanguagePronouns[civilization][i] = pronoun;
+					break;
+				}
+			}
+		} else if (!strcmp(value, "Meaning")) {
+			pronoun->Meaning = LuaToString(l, -1);
+		} else if (!strcmp(value, "Nominative")) {
+			pronoun->Nominative = LuaToString(l, -1);
+		} else if (!strcmp(value, "Accusative")) {
+			pronoun->Accusative = LuaToString(l, -1);
+		} else if (!strcmp(value, "Dative")) {
+			pronoun->Dative = LuaToString(l, -1);
+		} else if (!strcmp(value, "Genitive")) {
+			pronoun->Genitive = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
+**  Define an adverb for a civilization's language.
 **
 **  @param l  Lua state.
 */
@@ -1903,7 +1949,45 @@ static int CclDefineLanguageAdverb(lua_State *l)
 }
 
 /**
-**  Define a numeral for a particular civilization's language.
+**  Define an conjunction for a civilization's language.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineLanguageConjunction(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	LanguageConjunction *conjunction = new LanguageConjunction;
+	conjunction->Word = LuaToString(l, 1);
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Civilization")) {
+			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			
+			for (int i = 0; i < LanguageWordMax; ++i) {
+				if (!PlayerRaces.LanguageConjunctions[civilization][i] || PlayerRaces.LanguageConjunctions[civilization][i]->Word.empty()) {
+					PlayerRaces.LanguageConjunctions[civilization][i] = conjunction;
+					break;
+				}
+			}
+		} else if (!strcmp(value, "Meaning")) {
+			conjunction->Meaning = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
+**  Define a numeral for a civilization's language.
 **
 **  @param l  Lua state.
 */
@@ -2961,7 +3045,9 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineLanguageNoun", CclDefineLanguageNoun);
 	lua_register(Lua, "DefineLanguageVerb", CclDefineLanguageVerb);
 	lua_register(Lua, "DefineLanguageAdjective", CclDefineLanguageAdjective);
+	lua_register(Lua, "DefineLanguagePronoun", CclDefineLanguagePronoun);
 	lua_register(Lua, "DefineLanguageAdverb", CclDefineLanguageAdverb);
+	lua_register(Lua, "DefineLanguageConjunction", CclDefineLanguageConjunction);
 	lua_register(Lua, "DefineLanguageNumeral", CclDefineLanguageNumeral);
 	lua_register(Lua, "GetCivilizationData", CclGetCivilizationData);
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
