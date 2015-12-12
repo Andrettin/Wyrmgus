@@ -2134,7 +2134,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->Parent.c_str());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
-		lua_pushstring(l, type->Class.c_str());
+		if (type->ItemClass == -1) {
+			lua_pushstring(l, type->Class.c_str());
+		} else {
+			lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		lua_pushstring(l, type->Civilization.c_str());
@@ -2451,6 +2455,26 @@ static int CclGetUnitTypeData(lua_State *l)
 		for (size_t i = 1; i <= type->DropAffixes.size(); ++i)
 		{
 			lua_pushstring(l, type->DropAffixes[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
+		std::vector<CUnitType *> droppers;
+		for (int i = 0; i < UnitTypes.size(); ++i) {
+			if (std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), type->Slot) != UnitTypes[i]->Drops.end()) {
+				droppers.push_back(UnitTypes[i]);
+			}
+		}
+		for (int i = 0; i < UnitTypes.size(); ++i) {
+			if (std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), type->Slot) != UnitTypes[i]->AiDrops.end()) {
+				droppers.push_back(UnitTypes[i]);
+			}
+		}
+		
+		lua_createtable(l, droppers.size(), 0);
+		for (size_t i = 1; i <= droppers.size(); ++i)
+		{
+			lua_pushstring(l, droppers[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

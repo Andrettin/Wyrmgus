@@ -151,6 +151,7 @@ extern std::string GetItemClassNameById(int item_class);
 extern int GetItemClassSlot(int item_class);
 extern void CleanUniqueItems();
 extern CUniqueItem *GetUniqueItem(std::string item_name);
+extern std::string GetItemEffectsString(std::string item_ident);
 extern void ItemCclRegister();
 
 //@}

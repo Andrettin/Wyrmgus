@@ -132,4 +132,5 @@ extern std::string GetCurrentCustomHero();
 extern void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_dynasty_name);
 extern std::string GeneratePersonalName(std::string civilization_name, std::string unit_type_ident);
 extern int GetItemClassIdByName(std::string item_class);
+extern std::string GetItemEffectsString(std::string item_ident);
 //Wyrmgus end

@@ -226,4 +226,66 @@ CUniqueItem *GetUniqueItem(std::string item_name)
 	return NULL;
 }
 
+std::string GetItemEffectsString(std::string item_ident)
+{
+	const CUnitType *item = UnitTypeByIdent(item_ident);;
+
+	if (item) {
+		std::string item_effects_string;
+		
+		bool first_element = true;
+		//check if the item makes any modifications to units
+		if (!first_element) {
+			item_effects_string += ", ";
+		} else {
+			first_element = false;
+		}
+				
+		bool first_var = true;
+		for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+			if (
+				!(var == BASICDAMAGE_INDEX || var == PIERCINGDAMAGE_INDEX || var == THORNSDAMAGE_INDEX
+				|| var == FIREDAMAGE_INDEX || var == COLDDAMAGE_INDEX || var == ARCANEDAMAGE_INDEX || var == LIGHTNINGDAMAGE_INDEX
+				|| var == AIRDAMAGE_INDEX || var == EARTHDAMAGE_INDEX || var == WATERDAMAGE_INDEX
+				|| var == ARMOR_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX
+				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
+				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
+				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
+				|| var == HITPOINTHEALING_INDEX)
+			) {
+				continue;
+			}
+						
+			if (item->DefaultStat.Variables[var].Enable) {
+				if (!first_var) {
+					item_effects_string += ", ";
+				} else {
+					first_var = false;
+				}
+											
+				if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+					item_effects_string += "+";
+				}
+				item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Value);
+				if (var == BACKSTAB_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX || var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX) {
+					item_effects_string += "%";
+				}
+				item_effects_string += " ";
+											
+				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+				variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+				variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
+				variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
+				variable_name = SeparateCapitalizedStringElements(variable_name);
+				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
+				item_effects_string += variable_name;
+			}
+		}
+			
+		return item_effects_string;
+	}
+	
+	return "";
+}
+
 //@}
