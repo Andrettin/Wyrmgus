@@ -1086,7 +1086,7 @@ void CUnit::GenerateDrop()
 		if (droppedUnit != NULL) {
 			int magic_affix_chance = 10; //10% chance of a dropped item having a magic prefix or suffix
 			int unique_chance = 5; //0.5% chance of a dropped item being unique
-			if (this->Character) { //if the dropper has a character, double the chances of the item being magical or unique
+			if (this->Character || this->Type->BoolFlag[BUILDING_INDEX].value) { //if the dropper has a character or is a building, double the chances of the item being magical or unique
 				magic_affix_chance *= 2;
 				unique_chance *= 2;
 			}
@@ -3444,7 +3444,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 
 	//Wyrmgus start
 	//drop items upon death
-	if (unit.CurrentAction() != UnitActionBuilt && (unit.Character || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit has a character, in which it case it will always drop an item
+	if (unit.CurrentAction() != UnitActionBuilt && (unit.Character || unit.Type->BoolFlag[BUILDING_INDEX].value || SyncRand(100) >= 66)) { //66% chance nothing will be dropped, unless the unit is a character or building, in which it case it will always drop an item
 		unit.GenerateDrop();
 	}
 	//Wyrmgus end
