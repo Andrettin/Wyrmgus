@@ -204,6 +204,29 @@ static int CclGetUniqueItemData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
+		std::vector<CUnitType *> droppers;
+		for (int i = 0; i < UnitTypes.size(); ++i) {
+			if (
+				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), item->Type->Slot) != UnitTypes[i]->Drops.end()
+				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), item->Type->Slot) != UnitTypes[i]->AiDrops.end()
+			) {
+				if (
+					(item->Prefix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Prefix) != UnitTypes[i]->DropAffixes.end())
+					&& (item->Suffix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Suffix) != UnitTypes[i]->DropAffixes.end())
+				) {
+					droppers.push_back(UnitTypes[i]);
+				}
+			}
+		}
+		
+		lua_createtable(l, droppers.size(), 0);
+		for (size_t i = 1; i <= droppers.size(); ++i)
+		{
+			lua_pushstring(l, droppers[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

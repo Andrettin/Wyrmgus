@@ -452,7 +452,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Spell != CONDITION_TRUE) {
-				if ((condition->Spell == CONDITION_ONLY) ^ unit.Spell != NULL) {
+				if ((condition->Spell == CONDITION_ONLY) ^ (unit.Spell != NULL)) {
 					return false;
 				}
 			}

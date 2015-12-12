@@ -2461,12 +2461,10 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
 		std::vector<CUnitType *> droppers;
 		for (int i = 0; i < UnitTypes.size(); ++i) {
-			if (std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), type->Slot) != UnitTypes[i]->Drops.end()) {
-				droppers.push_back(UnitTypes[i]);
-			}
-		}
-		for (int i = 0; i < UnitTypes.size(); ++i) {
-			if (std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), type->Slot) != UnitTypes[i]->AiDrops.end()) {
+			if (
+				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), type->Slot) != UnitTypes[i]->Drops.end()
+				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), type->Slot) != UnitTypes[i]->AiDrops.end()
+			) {
 				droppers.push_back(UnitTypes[i]);
 			}
 		}
