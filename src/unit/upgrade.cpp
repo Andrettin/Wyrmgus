@@ -561,6 +561,180 @@ static int CclAcquireTrait(lua_State *l)
 	}
 	return 0;
 }
+
+static int CclGetUpgrades(lua_State *l)
+{
+	lua_createtable(l, AllUpgrades.size(), 0);
+	for (size_t i = 1; i <= AllUpgrades.size(); ++i)
+	{
+		lua_pushstring(l, AllUpgrades[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+static int CclGetItemPrefixes(lua_State *l)
+{
+	std::vector<CUpgrade *> item_prefixes;
+	for (int i = 0; i < AllUpgrades.size(); ++i) {
+		for (int j = 0; j < MaxItemClasses; ++j) {
+			if (AllUpgrades[i]->ItemPrefix[j]) {
+				item_prefixes.push_back(AllUpgrades[i]);
+				break;
+			}
+		}
+	}
+		
+	lua_createtable(l, item_prefixes.size(), 0);
+	for (size_t i = 1; i <= item_prefixes.size(); ++i)
+	{
+		lua_pushstring(l, item_prefixes[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+static int CclGetItemSuffixes(lua_State *l)
+{
+	std::vector<CUpgrade *> item_suffixes;
+	for (int i = 0; i < AllUpgrades.size(); ++i) {
+		for (int j = 0; j < MaxItemClasses; ++j) {
+			if (AllUpgrades[i]->ItemSuffix[j]) {
+				item_suffixes.push_back(AllUpgrades[i]);
+				break;
+			}
+		}
+	}
+		
+	lua_createtable(l, item_suffixes.size(), 0);
+	for (size_t i = 1; i <= item_suffixes.size(); ++i)
+	{
+		lua_pushstring(l, item_suffixes[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+/**
+**  Get upgrade data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetUpgradeData(lua_State *l)
+{
+	const int nargs = lua_gettop(l);
+	if (nargs < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string upgrade_ident = LuaToString(l, 1);
+	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+	if (!upgrade) {
+		LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, upgrade->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Class")) {
+		lua_pushstring(l, upgrade->Class.c_str());
+		return 1;
+	} else if (!strcmp(data, "Civilization")) {
+		lua_pushstring(l, upgrade->Civilization.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, upgrade->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, upgrade->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, upgrade->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "ItemPrefix")) {
+		if (nargs == 2) { //check if the item is a prefix for any item type
+			for (int i = 0; i < MaxItemClasses; ++i) {
+				if (upgrade->ItemPrefix[i]) {
+					lua_pushboolean(l, true);
+					return 1;
+				}
+			}
+			lua_pushboolean(l, false);
+			return 1;
+		} else {
+			LuaCheckArgs(l, 3);
+			std::string item_class_name = LuaToString(l, 3);
+			int item_class = GetItemClassIdByName(item_class_name);
+			if (item_class == -1) {
+				LuaError(l, "Item class \"%s\" doesn't exist." _C_ item_class_name.c_str());
+			}
+			lua_pushboolean(l, upgrade->ItemPrefix[item_class]);
+			return 1;
+		}
+	} else if (!strcmp(data, "ItemSuffix")) {
+		if (nargs == 2) { //check if the item is a suffix for any item type
+			for (int i = 0; i < MaxItemClasses; ++i) {
+				if (upgrade->ItemSuffix[i]) {
+					lua_pushboolean(l, true);
+					return 1;
+				}
+			}
+			lua_pushboolean(l, false);
+			return 1;
+		} else {
+			LuaCheckArgs(l, 3);
+			std::string item_class_name = LuaToString(l, 3);
+			int item_class = GetItemClassIdByName(item_class_name);
+			if (item_class == -1) {
+				LuaError(l, "Item class \"%s\" doesn't exist." _C_ item_class_name.c_str());
+			}
+			lua_pushboolean(l, upgrade->ItemSuffix[item_class]);
+			return 1;
+		}
+	} else if (!strcmp(data, "Droppers")) { //the unit types which can drop this affix
+		std::vector<CUnitType *> droppers;
+		for (int i = 0; i < UnitTypes.size(); ++i) {
+			if (std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), upgrade) != UnitTypes[i]->DropAffixes.end()) {
+				droppers.push_back(UnitTypes[i]);
+			}
+		}
+		
+		lua_createtable(l, droppers.size(), 0);
+		for (size_t i = 1; i <= droppers.size(); ++i)
+		{
+			lua_pushstring(l, droppers[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "AppliesTo")) { //to which unit types or item classes this upgrade applies
+		std::vector<std::string> applies_to;
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			for (int i = 0; i < UnitTypes.size(); ++i) {
+				if (UpgradeModifiers[z]->UpgradeId == upgrade->ID && UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+					applies_to.push_back(UnitTypes[i]->Ident);
+				}
+			}
+		}
+		
+		for (int i = 0; i < MaxItemClasses; ++i) {
+			if (upgrade->ItemPrefix[i] || upgrade->ItemSuffix[i]) {
+				applies_to.push_back(GetItemClassNameById(i));
+			}
+		}
+			
+		lua_createtable(l, applies_to.size(), 0);
+		for (size_t i = 1; i <= applies_to.size(); ++i)
+		{
+			lua_pushstring(l, applies_to[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
 //Wyrmgus end
 
 /**
@@ -574,6 +748,10 @@ void UpgradesCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "AcquireAbility", CclAcquireAbility);
 	lua_register(Lua, "AcquireTrait", CclAcquireTrait);
+	lua_register(Lua, "GetUpgrades", CclGetUpgrades);
+	lua_register(Lua, "GetItemPrefixes", CclGetItemPrefixes);
+	lua_register(Lua, "GetItemSuffixes", CclGetItemSuffixes);
+	lua_register(Lua, "GetUpgradeData", CclGetUpgradeData);
 	//Wyrmgus end
 }
 
@@ -1663,6 +1841,9 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 							upgrade_effects_string += "+";
 						}
 						upgrade_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[var].Value);
+						if (var == BACKSTAB_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX || var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX) {
+							upgrade_effects_string += "%";
+						}
 						upgrade_effects_string += " ";
 											
 						std::string variable_name = UnitTypeVar.VariableNameLookup[var];
@@ -1670,6 +1851,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 						variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
 						variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
 						variable_name = SeparateCapitalizedStringElements(variable_name);
+						variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 						upgrade_effects_string += variable_name;
 						
 						bool first_unit_type = true;

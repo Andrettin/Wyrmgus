@@ -121,6 +121,78 @@ static int CclDefineUniqueItem(lua_State *l)
 	return 0;
 }
 
+static int CclGetUniqueItems(lua_State *l)
+{
+	lua_createtable(l, UniqueItems.size(), 0);
+	for (size_t i = 1; i <= UniqueItems.size(); ++i)
+	{
+		lua_pushstring(l, UniqueItems[i-1]->Name.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+/**
+**  Get unique item data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetUniqueItemData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string item_name = LuaToString(l, 1);
+	const CUniqueItem *item = GetUniqueItem(item_name);
+	if (!item) {
+		LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item_name.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Description")) {
+		lua_pushstring(l, item->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, item->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, item->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "Type")) {
+		if (item->Type != NULL) {
+			lua_pushstring(l, item->Type->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Prefix")) {
+		if (item->Prefix != NULL) {
+			lua_pushstring(l, item->Prefix->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Suffix")) {
+		if (item->Suffix != NULL) {
+			lua_pushstring(l, item->Suffix->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Spell")) {
+		if (item->Spell != NULL) {
+			lua_pushstring(l, item->Spell->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -129,6 +201,8 @@ static int CclDefineUniqueItem(lua_State *l)
 void ItemCclRegister()
 {
 	lua_register(Lua, "DefineUniqueItem", CclDefineUniqueItem);
+	lua_register(Lua, "GetUniqueItems", CclGetUniqueItems);
+	lua_register(Lua, "GetUniqueItemData", CclGetUniqueItemData);
 }
 
 //@}
