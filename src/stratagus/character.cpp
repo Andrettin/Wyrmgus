@@ -93,6 +93,11 @@ bool CCharacter::IsSiblingOf(std::string sibling_full_name)
 bool CCharacter::IsItemEquipped(const CItem *item) const
 {
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	
+	if (item_slot == -1) {
+		return false;
+	}
+	
 	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
 		return true;
 	}

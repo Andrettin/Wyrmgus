@@ -845,6 +845,11 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	int item_class = item.Type->ItemClass;
 	int item_slot = GetItemClassSlot(item_class);
 	
+	if (item_slot == -1) {
+		fprintf(stderr, "Trying to equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
+		return;
+	}
+	
 	if (GetItemSlotQuantity(item_slot) > 0 && EquippedItems[item_slot].size() == GetItemSlotQuantity(item_slot)) {
 		DeequipItem(*EquippedItems[item_slot][EquippedItems[item_slot].size() - 1]);
 	}
@@ -958,6 +963,11 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	
 	int item_class = item.Type->ItemClass;
 	int item_slot = GetItemClassSlot(item_class);
+	
+	if (item_slot == -1) {
+		fprintf(stderr, "Trying to de-equip item of type \"%s\", which has no item slot.\n", item.GetTypeName().c_str());
+		return;
+	}
 	
 	if (Character && Character->Persistent && affect_character) {
 		if (Character->GetItem(item) != NULL) {
@@ -3227,10 +3237,10 @@ int CUnit::GetItemSlotQuantity(int item_slot) const
 	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return 0
 		item_slot == ShieldItemSlot
 		&& (
-			Type->WeaponClass == DaggerItemClass
-			|| Type->WeaponClass == BowItemClass
-			|| Type->WeaponClass == ThrowingAxeItemClass
-			|| Type->WeaponClass == JavelinItemClass
+			Type->WeaponClasses[0] == DaggerItemClass
+			|| Type->WeaponClasses[0] == BowItemClass
+			|| Type->WeaponClasses[0] == ThrowingAxeItemClass
+			|| Type->WeaponClasses[0] == JavelinItemClass
 			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
 		)
 	) {
@@ -3239,7 +3249,7 @@ int CUnit::GetItemSlotQuantity(int item_slot) const
 	
 	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
 		item_slot == ArrowsItemSlot
-		&& Type->WeaponClass != BowItemClass
+		&& Type->WeaponClasses[0] != BowItemClass
 	) {
 		return 0;
 	}
@@ -3251,9 +3261,23 @@ int CUnit::GetItemSlotQuantity(int item_slot) const
 	return 1;
 }
 
+int CUnit::GetCurrentWeaponClass() const
+{
+	if (HasInventory() && EquippedItems[WeaponItemSlot].size() > 0) {
+		return EquippedItems[WeaponItemSlot][0]->Type->ItemClass;
+	}
+	
+	return Type->WeaponClasses[0];
+}
+
 bool CUnit::IsItemEquipped(const CUnit *item) const
 {
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	
+	if (item_slot == -1) {
+		return false;
+	}
+	
 	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
 		return true;
 	}
@@ -3264,6 +3288,11 @@ bool CUnit::IsItemEquipped(const CUnit *item) const
 bool CUnit::IsItemTypeEquipped(CUnitType *item_type) const
 {
 	int item_slot = GetItemClassSlot(item_type->ItemClass);
+	
+	if (item_slot == -1) {
+		return false;
+	}
+	
 	for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
 		if (EquippedItems[item_slot][i]->Type == item_type) {
 			return true;
@@ -3296,7 +3325,7 @@ bool CUnit::CanEquipItemClass(int item_class) const
 		return false;
 	}
 	
-	if (GetItemClassSlot(item_class) == WeaponItemSlot && Type->WeaponClass != item_class) { //if the item is a weapon and its item class doesn't match the weapon class used by this unit's type, return false
+	if (GetItemClassSlot(item_class) == WeaponItemSlot && std::find(Type->WeaponClasses.begin(), Type->WeaponClasses.end(), item_class) == Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
 		return false;
 	}
 	
