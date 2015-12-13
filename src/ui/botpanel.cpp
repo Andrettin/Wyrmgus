@@ -491,6 +491,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 					return false;
 				}
 			}
+			if (condition->Regeneration != CONDITION_TRUE) {
+				if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.Variable[HP_INDEX].Increase != 0 || unit.Variable[HITPOINTBONUS_INDEX].Increase != 0)) {
+					return false;
+				}
+			}
 		}
 	}
 	//Wyrmgus end

@@ -274,6 +274,27 @@ std::string GetItemEffectsString(std::string item_ident)
 				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 				item_effects_string += variable_name;
 			}
+			
+			if (item->DefaultStat.Variables[var].Increase != 0) {
+				if (!first_var) {
+					item_effects_string += ", ";
+				} else {
+					first_var = false;
+				}
+											
+				if (item->DefaultStat.Variables[var].Increase > 0) {
+					item_effects_string += "+";
+				}
+				item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Increase);
+				item_effects_string += " ";
+											
+				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+				variable_name += "Increase";
+				variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
+				variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
+				variable_name = SeparateCapitalizedStringElements(variable_name);
+				item_effects_string += variable_name;
+			}
 		}
 			
 		return item_effects_string;
@@ -305,12 +326,14 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 			}
 			
 			int variable_value = item->Type->DefaultStat.Variables[var].Value;
+			int variable_increase = item->Type->DefaultStat.Variables[var].Increase;
 			for (int z = 0; z < NumUpgradeModifiers; ++z) {
 				if (
 					(item->Prefix != NULL && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
 					|| (item->Suffix != NULL && UpgradeModifiers[z]->UpgradeId == item->Suffix->ID)
 				) {
 					variable_value += UpgradeModifiers[z]->Modifier.Variables[var].Value;
+					variable_increase += UpgradeModifiers[z]->Modifier.Variables[var].Increase;
 				}
 			}
 						
@@ -337,6 +360,27 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
 				variable_name = SeparateCapitalizedStringElements(variable_name);
 				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
+				item_effects_string += variable_name;
+			}
+			
+			if (variable_increase != 0) {
+				if (!first_var) {
+					item_effects_string += ", ";
+				} else {
+					first_var = false;
+				}
+											
+				if (variable_increase > 0) {
+					item_effects_string += "+";
+				}
+				item_effects_string += std::to_string((long long) variable_increase);
+				item_effects_string += " ";
+											
+				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+				variable_name += "Increase";
+				variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
+				variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
+				variable_name = SeparateCapitalizedStringElements(variable_name);
 				item_effects_string += variable_name;
 			}
 		}

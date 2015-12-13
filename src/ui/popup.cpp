@@ -655,6 +655,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Boots = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Arrows")) {
 			condition->Arrows = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Regeneration")) {
+			condition->Regeneration = Ccl2Condition(l, LuaToString(l, -1));
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];

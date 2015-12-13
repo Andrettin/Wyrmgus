@@ -381,6 +381,10 @@ static int CclDefineModifier(lua_State *l)
 					const char *value = LuaToString(l, j + 1, 3);
 					if (!strcmp(value, "Percent")) {
 						um->ModifyPercent[index] = LuaToNumber(l, j + 1, 2);
+					//Wyrmgus start
+					} else if (!strcmp(value, "Increase")) {
+						um->Modifier.Variables[index].Increase = LuaToNumber(l, j + 1, 2);
+					//Wyrmgus end
 					}
 				} else {
 					lua_rawgeti(l, j + 1, 2);
@@ -1836,7 +1840,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 						} else {
 							first_var = false;
 						}
-											
+
 						if (UpgradeModifiers[z]->Modifier.Variables[var].Value > 0) {
 							upgrade_effects_string += "+";
 						}
@@ -1869,6 +1873,27 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 								upgrade_effects_string += "s";
 							}
 						}
+					}
+					
+					if (UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
+						if (!first_var) {
+							upgrade_effects_string += ", ";
+						} else {
+							first_var = false;
+						}
+
+						if (UpgradeModifiers[z]->Modifier.Variables[var].Increase > 0) {
+							upgrade_effects_string += "+";
+						}
+						upgrade_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[var].Increase);
+						upgrade_effects_string += " ";
+											
+						std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+						variable_name += "Increase";
+						variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
+						variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
+						variable_name = SeparateCapitalizedStringElements(variable_name);
+						upgrade_effects_string += variable_name;
 					}
 				}
 			}

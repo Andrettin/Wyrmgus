@@ -55,7 +55,7 @@ public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
 		//Wyrmgus start
 		Description(false), Quote(false),
-		Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), Unique(0), Bound(0), Weapon(0), Shield(0), Boots(0), Arrows(0),
+		Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), Unique(0), Bound(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0),
 //		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
 		ButtonAction(-1), ItemClass(-1), BoolFlags(NULL), Variables(NULL) {}
 		//Wyrmgus end
@@ -90,6 +90,7 @@ public:
 	char Shield;				/// check if button's item is a shield
 	char Boots;					/// check if button's item are boots
 	char Arrows;				/// check if button's item are arrows
+	char Regeneration;			/// check if button's item has regeneration
 	//Wyrmgus end
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)
