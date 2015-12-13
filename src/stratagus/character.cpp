@@ -90,6 +90,16 @@ bool CCharacter::IsSiblingOf(std::string sibling_full_name)
 	return false;
 }
 
+bool CCharacter::IsItemEquipped(const CItem *item) const
+{
+	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
+		return true;
+	}
+	
+	return false;
+}
+
 std::string CCharacter::GetFullName()
 {
 	std::string full_name = this->Name;
@@ -105,7 +115,7 @@ std::string CCharacter::GetFullName()
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound) {
+		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
 			if (this->Items[i]->Name.empty() || this->Items[i]->Name == item.Name) {
 				return this->Items[i];
 			}
@@ -219,11 +229,8 @@ void SaveHeroes()
 					if (Characters[i]->Items[j]->Bound) {
 						fprintf(fd, "\n\t\t\t\"bound\", true,");
 					}
-					int item_slot = GetItemClassSlot(Characters[i]->Items[j]->Type->ItemClass);
-					if (item_slot != -1) {
-						if (std::find(Characters[i]->EquippedItems[item_slot].begin(), Characters[i]->EquippedItems[item_slot].end(), Characters[i]->Items[j]) != Characters[i]->EquippedItems[item_slot].end()) {
-							fprintf(fd, "\n\t\t\t\"equipped\", true");
-						}
+					if (Characters[i]->IsItemEquipped(Characters[i]->Items[j])) {
+						fprintf(fd, "\n\t\t\t\"equipped\", true");
 					}
 					fprintf(fd, "\n\t\t}");
 					if (j < (Characters[i]->Items.size() - 1)) {
@@ -298,11 +305,8 @@ void SaveHeroes()
 					if (CustomHeroes[i]->Items[j]->Bound) {
 						fprintf(fd, "\n\t\t\t\"bound\", true,");
 					}
-					int item_slot = GetItemClassSlot(CustomHeroes[i]->Items[j]->Type->ItemClass);
-					if (item_slot != -1) {
-						if (std::find(CustomHeroes[i]->EquippedItems[item_slot].begin(), CustomHeroes[i]->EquippedItems[item_slot].end(), CustomHeroes[i]->Items[j]) != CustomHeroes[i]->EquippedItems[item_slot].end()) {
-							fprintf(fd, "\n\t\t\t\"equipped\", true");
-						}
+					if (CustomHeroes[i]->IsItemEquipped(CustomHeroes[i]->Items[j])) {
+						fprintf(fd, "\n\t\t\t\"equipped\", true");
 					}
 					fprintf(fd, "\n\t\t}");
 					if (j < (CustomHeroes[i]->Items.size() - 1)) {

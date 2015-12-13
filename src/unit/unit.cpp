@@ -731,11 +731,8 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 		item->Bound = this->Character->Items[i]->Bound;
 		item->Remove(this);
-		int item_slot = GetItemClassSlot(this->Character->Items[i]->Type->ItemClass);
-		if (item_slot != -1) {
-			if (std::find(this->Character->EquippedItems[item_slot].begin(), this->Character->EquippedItems[item_slot].end(), this->Character->Items[i]) != this->Character->EquippedItems[item_slot].end()) {
-				EquipItem(*item);
-			}
+		if (this->Character->IsItemEquipped(this->Character->Items[i])) {
+			EquipItem(*item, false);
 		}
 	}
 	
@@ -843,7 +840,7 @@ void CUnit::SetVariation(int new_variation, const CUnitType *new_type)
 	this->Variation = new_variation;
 }
 
-void CUnit::EquipItem(CUnit &item)
+void CUnit::EquipItem(CUnit &item, bool affect_character)
 {
 	int item_class = item.Type->ItemClass;
 	int item_slot = GetItemClassSlot(item_class);
@@ -882,10 +879,19 @@ void CUnit::EquipItem(CUnit &item)
 		}
 	}
 	
-	EquippedItems[item_slot].push_back(&item);
-	if (Character && Character->Persistent) {
-		Character->EquippedItems[item_slot].push_back(Character->GetItem(item));
+	if (Character && Character->Persistent && affect_character) {
+		if (Character->GetItem(item) != NULL) {
+			if (!Character->IsItemEquipped(Character->GetItem(item))) {
+				Character->EquippedItems[item_slot].push_back(Character->GetItem(item));
+				SaveHeroes();
+			} else {
+				fprintf(stderr, "Item is not equipped by character %s's unit, but is equipped by the character itself.\n", Character->GetFullName().c_str());
+			}
+		} else {
+			fprintf(stderr, "Item is present in the inventory of the character %s's unit, but not in the character's inventory itself.\n", Character->GetFullName().c_str());
+		}
 	}
+	EquippedItems[item_slot].push_back(&item);
 	
 	//change variation, if the current one has become forbidden
 	VariationInfo *varinfo = Type->VarInfo[Variation];
@@ -921,7 +927,7 @@ void CUnit::EquipItem(CUnit &item)
 	}
 }
 
-void CUnit::DeequipItem(CUnit &item)
+void CUnit::DeequipItem(CUnit &item, bool affect_character)
 {
 	//remove item bonuses
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
@@ -953,10 +959,19 @@ void CUnit::DeequipItem(CUnit &item)
 	int item_class = item.Type->ItemClass;
 	int item_slot = GetItemClassSlot(item_class);
 	
-	EquippedItems[item_slot].erase(std::remove(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), &item), EquippedItems[item_slot].end());
-	if (Character && Character->Persistent) {
-		Character->EquippedItems[item_slot].erase(std::remove(Character->EquippedItems[item_slot].begin(), Character->EquippedItems[item_slot].end(), Character->GetItem(item)), Character->EquippedItems[item_slot].end());
+	if (Character && Character->Persistent && affect_character) {
+		if (Character->GetItem(item) != NULL) {
+			if (Character->IsItemEquipped(Character->GetItem(item))) {
+				Character->EquippedItems[item_slot].erase(std::remove(Character->EquippedItems[item_slot].begin(), Character->EquippedItems[item_slot].end(), Character->GetItem(item)), Character->EquippedItems[item_slot].end());
+				SaveHeroes();
+			} else {
+				fprintf(stderr, "Item is equipped by character %s's unit, but not by the character itself.\n", Character->GetFullName().c_str());
+			}
+		} else {
+			fprintf(stderr, "Item is present in the inventory of the character %s's unit, but not in the character's inventory itself.\n", Character->GetFullName().c_str());
+		}
 	}
+	EquippedItems[item_slot].erase(std::remove(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), &item), EquippedItems[item_slot].end());
 	
 	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies
@@ -1004,7 +1019,7 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 			}
 		}
 	}
-	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Prefix = const_cast<CUpgrade *>(&(*prefix));
 		SaveHeroes();
 	}
@@ -1036,7 +1051,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 			}
 		}
 	}
-	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Suffix = const_cast<CUpgrade *>(&(*suffix));
 		SaveHeroes();
 	}
@@ -1061,7 +1076,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 
 void CUnit::SetSpell(SpellType *spell)
 {
-	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Spell = const_cast<SpellType *>(&(*spell));
 		SaveHeroes();
 	}

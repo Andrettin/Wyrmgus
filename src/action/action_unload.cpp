@@ -217,6 +217,13 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		transporter.DeequipItem(unit);
 	}
 	
+	if (transporter.Character && transporter.Character->Persistent && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
+		CItem *item = transporter.Character->GetItem(unit);
+		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
+		delete item;
+		SaveHeroes();
+	}
+	
 	/*
 	unit.Boarded = 0;
 	unit.Place(pos);
@@ -227,13 +234,6 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		transporter.BoardCount -= unit.Type->BoardSize;
 	}
 	unit.Place(pos);
-	
-	if (transporter.Character && transporter.Character->Persistent && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
-		CItem *item = transporter.Character->GetItem(unit);
-		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
-		delete item;
-		SaveHeroes();
-	}
 	//Wyrmgus end
 	//Wyrmgus start
 	//if transporter has a rally point (useful for towers), send the unloaded unit there

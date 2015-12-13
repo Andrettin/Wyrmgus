@@ -83,6 +83,7 @@ public:
 	bool IsParentOf(std::string child_full_name);
 	bool IsChildOf(std::string parent_full_name);
 	bool IsSiblingOf(std::string sibling_full_name);
+	bool IsItemEquipped(const CItem *item) const;
 	std::string GetFullName();
 	CItem *GetItem(CUnit &item);
 
