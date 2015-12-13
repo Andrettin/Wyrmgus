@@ -244,7 +244,7 @@ std::string GetItemEffectsString(std::string item_ident)
 				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
 				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX)
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX)
 			) {
 				continue;
 			}
@@ -269,6 +269,7 @@ std::string GetItemEffectsString(std::string item_ident)
 				variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
 				variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
 				variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
+				variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
 				variable_name = SeparateCapitalizedStringElements(variable_name);
 				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 				item_effects_string += variable_name;
@@ -298,7 +299,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
 				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX)
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX)
 			) {
 				continue;
 			}
@@ -333,6 +334,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
 				variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
 				variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
+				variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
 				variable_name = SeparateCapitalizedStringElements(variable_name);
 				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 				item_effects_string += variable_name;

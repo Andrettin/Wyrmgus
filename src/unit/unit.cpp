@@ -897,6 +897,9 @@ void CUnit::EquipItem(CUnit &item)
 		) {
 			Variable[i].Value += item.Variable[i].Value;
 			Variable[i].Max += item.Variable[i].Max;
+		} else if (i == HITPOINTBONUS_INDEX) {
+			Variable[HP_INDEX].Value += item.Variable[i].Value;
+			Variable[HP_INDEX].Max += item.Variable[i].Max;
 		}
 	}
 }
@@ -916,6 +919,9 @@ void CUnit::DeequipItem(CUnit &item)
 		) {
 			Variable[i].Value -= item.Variable[i].Value;
 			Variable[i].Max -= item.Variable[i].Max;
+		} else if (i == HITPOINTBONUS_INDEX) {
+			Variable[HP_INDEX].Value -= item.Variable[i].Value;
+			Variable[HP_INDEX].Max -= item.Variable[i].Max;
 		}
 	}
 	

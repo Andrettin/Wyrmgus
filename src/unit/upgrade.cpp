@@ -1850,6 +1850,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 						variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
 						variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
 						variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
+						variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
 						variable_name = SeparateCapitalizedStringElements(variable_name);
 						variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 						upgrade_effects_string += variable_name;
