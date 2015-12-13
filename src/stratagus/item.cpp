@@ -244,7 +244,7 @@ std::string GetItemEffectsString(std::string item_ident)
 				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
 				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX)
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX)
 			) {
 				continue;
 			}
@@ -320,7 +320,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
 				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX)
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX)
 			) {
 				continue;
 			}

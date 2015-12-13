@@ -910,6 +910,13 @@ void CUnit::EquipItem(CUnit &item)
 			Variable[HP_INDEX].Value += item.Variable[i].Value;
 			Variable[HP_INDEX].Max += item.Variable[i].Max;
 			Variable[HP_INDEX].Increase += item.Variable[i].Increase;
+		} else if (i == SIGHTRANGE_INDEX) {
+			MapUnmarkUnitSight(*this);
+			Variable[i].Value += item.Variable[i].Value;
+			Variable[i].Max += item.Variable[i].Max;
+			CurrentSightRange = Variable[i].Value;
+			UpdateUnitSightRange(*this);
+			MapMarkUnitSight(*this);
 		}
 	}
 }
@@ -933,6 +940,13 @@ void CUnit::DeequipItem(CUnit &item)
 			Variable[HP_INDEX].Value -= item.Variable[i].Value;
 			Variable[HP_INDEX].Max -= item.Variable[i].Max;
 			Variable[HP_INDEX].Increase -= item.Variable[i].Increase;
+		} else if (i == SIGHTRANGE_INDEX) {
+			MapUnmarkUnitSight(*this);
+			Variable[i].Value -= item.Variable[i].Value;
+			Variable[i].Max -= item.Variable[i].Max;
+			CurrentSightRange = Variable[i].Value;
+			UpdateUnitSightRange(*this);
+			MapMarkUnitSight(*this);
 		}
 	}
 	
