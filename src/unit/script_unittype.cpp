@@ -2903,7 +2903,7 @@ void UpdateUnitVariables(CUnit &unit)
 	if (!IsNetworkGame() && unit.Character != NULL && unit.Character->Persistent && unit.Player->AiEnabled == false) {
 		if (unit.Variable[LEVEL_INDEX].Value > unit.Character->Level) { //save level, if unit has a persistent character
 			unit.Character->Level = unit.Variable[LEVEL_INDEX].Value;
-			SaveHeroes();
+			SaveHero(unit.Character);
 		}
 	}
 	

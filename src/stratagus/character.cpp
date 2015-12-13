@@ -43,6 +43,8 @@
 #include <map>
 
 #include "game.h"
+#include "iocompat.h"
+#include "iolib.h"
 #include "item.h"
 #include "parameters.h"
 #include "player.h"
@@ -175,6 +177,19 @@ CCharacter *GetCustomHero(std::string hero_full_name)
 */
 void SaveHeroes()
 {
+	for (size_t i = 0; i < Characters.size(); ++i) { //save persistent characters
+		if (Characters[i]->Persistent) {
+			SaveHero(Characters[i]);
+		}
+	}
+		
+	for (size_t i = 0; i < CustomHeroes.size(); ++i) { //save custom heroes
+		if (CustomHeroes[i]->Persistent) {
+			SaveHero(CustomHeroes[i]);
+		}
+	}
+
+	//see if the old heroes.lua save file is present, and if so, delete it
 	std::string path = Parameters::Instance.GetUserDirectory();
 
 	if (!GameName.empty()) {
@@ -182,176 +197,142 @@ void SaveHeroes()
 		path += GameName;
 	}
 	path += "/";
-	path += "heroes";
+	path += "heroes.lua";
+
+	if (CanAccessFile(path.c_str())) {
+		unlink(path.c_str());
+	}
+}
+
+void SaveHero(CCharacter *hero)
+{
+	struct stat tmp;
+	std::string path = Parameters::Instance.GetUserDirectory();
+
+	if (!GameName.empty()) {
+		path += "/";
+		path += GameName;
+	}
+	path += "/";
+	path += "heroes/";
+	if (hero->Custom) {
+		path += "custom/";
+	}
+	if (stat(path.c_str(), &tmp) < 0) {
+		makedir(path.c_str(), 0777);
+	}
+	std::string hero_file_name = hero->GetFullName();
+	hero_file_name = FullyDecapitalizeString(hero_file_name);
+	hero_file_name = FindAndReplaceString(hero_file_name, " ", "_");
+	path += hero_file_name;
 	path += ".lua";
 
 	FILE *fd = fopen(path.c_str(), "w");
 	if (!fd) {
-		DebugPrint("Cannot open file %s for writing\n" _C_ path.c_str());
+		fprintf(stderr, "Cannot open file %s for writing.\n", path.c_str());
 		return;
 	}
 
-	for (size_t i = 0; i < Characters.size(); ++i) { //save persistent characters
-		if (Characters[i]->Persistent) {
-			fprintf(fd, "DefineCharacter(\"%s\", {\n", Characters[i]->GetFullName().c_str());
-			if (Characters[i]->Type != NULL) {
-				fprintf(fd, "\tType = \"%s\",\n", Characters[i]->Type->Ident.c_str());
-			}
-			if (Characters[i]->Level != 0) {
-				fprintf(fd, "\tLevel = %d,\n", Characters[i]->Level);
-			}
-			if (Characters[i]->Abilities.size() > 0) {
-				fprintf(fd, "\tAbilities = {");
-				for (size_t j = 0; j < Characters[i]->Abilities.size(); ++j) {
-					fprintf(fd, "\"%s\"", Characters[i]->Abilities[j]->Ident.c_str());
-					if (j < (Characters[i]->Abilities.size() - 1)) {
-						fprintf(fd, ", ");
-					}
-				}
-				fprintf(fd, "},\n");
-			}
-			if (Characters[i]->Items.size() > 0) {
-				fprintf(fd, "\tItems = {");
-				for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
-					fprintf(fd, "\n\t\t{");
-					if (Characters[i]->Items[j]->Unique) {
-						fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", Characters[i]->Items[j]->Name.c_str());
-					} else {
-						fprintf(fd, "\n\t\t\t\"type\", \"%s\",", Characters[i]->Items[j]->Type->Ident.c_str());
-						if (Characters[i]->Items[j]->Prefix != NULL) {
-							fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", Characters[i]->Items[j]->Prefix->Ident.c_str());
-						}
-						if (Characters[i]->Items[j]->Suffix != NULL) {
-							fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", Characters[i]->Items[j]->Suffix->Ident.c_str());
-						}
-						if (Characters[i]->Items[j]->Spell != NULL) {
-							fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", Characters[i]->Items[j]->Spell->Ident.c_str());
-						}
-						if (!Characters[i]->Items[j]->Name.empty()) {
-							fprintf(fd, "\n\t\t\t\"name\", \"%s\",", Characters[i]->Items[j]->Name.c_str());
-						}
-					}
-					if (Characters[i]->Items[j]->Bound) {
-						fprintf(fd, "\n\t\t\t\"bound\", true,");
-					}
-					if (Characters[i]->IsItemEquipped(Characters[i]->Items[j])) {
-						fprintf(fd, "\n\t\t\t\"equipped\", true");
-					}
-					fprintf(fd, "\n\t\t}");
-					if (j < (Characters[i]->Items.size() - 1)) {
-						fprintf(fd, ",");
-					}
-				}
-				fprintf(fd, "\n\t},\n");
-			}
-			fprintf(fd, "})\n\n");
+	if (!hero->Custom) {
+		fprintf(fd, "DefineCharacter(\"%s\", {\n", hero->GetFullName().c_str());
+	} else {
+		fprintf(fd, "DefineCustomHero(\"%s\", {\n", hero->GetFullName().c_str());
+		fprintf(fd, "\tName = \"%s\",\n", hero->Name.c_str());
+		if (!hero->ExtraName.empty()) {
+			fprintf(fd, "\tExtraName = \"%s\",\n", hero->ExtraName.c_str());
+		}
+		if (!hero->Dynasty.empty()) {
+			fprintf(fd, "\tDynasty = \"%s\",\n", hero->Dynasty.c_str());
+		}
+		if (hero->Gender != NoGender) {
+			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
+		}
+		if (hero->Civilization != -1) {
+			fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[hero->Civilization].c_str());
 		}
 	}
-		
-	for (size_t i = 0; i < CustomHeroes.size(); ++i) { //save custom heroes
-		if (CustomHeroes[i]->Persistent) {
-			fprintf(fd, "DefineCustomHero(\"%s\", {\n", CustomHeroes[i]->GetFullName().c_str());
-			fprintf(fd, "\tName = \"%s\",\n", CustomHeroes[i]->Name.c_str());
-			if (!CustomHeroes[i]->ExtraName.empty()) {
-				fprintf(fd, "\tExtraName = \"%s\",\n", CustomHeroes[i]->ExtraName.c_str());
+	if (hero->Type != NULL) {
+		fprintf(fd, "\tType = \"%s\",\n", hero->Type->Ident.c_str());
+	}
+	if (hero->Custom) {
+		if (hero->Trait != NULL) {
+			fprintf(fd, "\tTrait = \"%s\",\n", hero->Trait->Ident.c_str());
+		}
+		if (!hero->Variation.empty()) {
+			fprintf(fd, "\tVariation = \"%s\",\n", hero->Variation.c_str());
+		}
+	}
+	if (hero->Level != 0) {
+		fprintf(fd, "\tLevel = %d,\n", hero->Level);
+	}
+	if (hero->Abilities.size() > 0) {
+		fprintf(fd, "\tAbilities = {");
+		for (size_t j = 0; j < hero->Abilities.size(); ++j) {
+			fprintf(fd, "\"%s\"", hero->Abilities[j]->Ident.c_str());
+			if (j < (hero->Abilities.size() - 1)) {
+				fprintf(fd, ", ");
 			}
-			if (!CustomHeroes[i]->Dynasty.empty()) {
-				fprintf(fd, "\tDynasty = \"%s\",\n", CustomHeroes[i]->Dynasty.c_str());
-			}
-			if (CustomHeroes[i]->Gender != NoGender) {
-				fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(CustomHeroes[i]->Gender).c_str());
-			}
-			if (CustomHeroes[i]->Civilization != -1) {
-				fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[CustomHeroes[i]->Civilization].c_str());
-			}
-			if (CustomHeroes[i]->Type != NULL) {
-				fprintf(fd, "\tType = \"%s\",\n", CustomHeroes[i]->Type->Ident.c_str());
-			}
-			if (CustomHeroes[i]->Trait != NULL) {
-				fprintf(fd, "\tTrait = \"%s\",\n", CustomHeroes[i]->Trait->Ident.c_str());
-			}
-			if (!CustomHeroes[i]->Variation.empty()) {
-				fprintf(fd, "\tVariation = \"%s\",\n", CustomHeroes[i]->Variation.c_str());
-			}
-			if (CustomHeroes[i]->Level != 0) {
-				fprintf(fd, "\tLevel = %d,\n", CustomHeroes[i]->Level);
-			}
-			if (CustomHeroes[i]->Abilities.size() > 0) {
-				fprintf(fd, "\tAbilities = {");
-				for (size_t j = 0; j < CustomHeroes[i]->Abilities.size(); ++j) {
-					fprintf(fd, "\"%s\"", CustomHeroes[i]->Abilities[j]->Ident.c_str());
-					if (j < (CustomHeroes[i]->Abilities.size() - 1)) {
-						fprintf(fd, ", ");
-					}
+		}
+		fprintf(fd, "},\n");
+	}
+	if (hero->Items.size() > 0) {
+		fprintf(fd, "\tItems = {");
+		for (size_t j = 0; j < hero->Items.size(); ++j) {
+			fprintf(fd, "\n\t\t{");
+			if (hero->Items[j]->Unique) {
+				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", hero->Items[j]->Name.c_str());
+			} else {
+				fprintf(fd, "\n\t\t\t\"type\", \"%s\",", hero->Items[j]->Type->Ident.c_str());
+				if (hero->Items[j]->Prefix != NULL) {
+					fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", hero->Items[j]->Prefix->Ident.c_str());
 				}
-				fprintf(fd, "},\n");
-			}
-			if (CustomHeroes[i]->Items.size() > 0) {
-				fprintf(fd, "\tItems = {");
-				for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
-					fprintf(fd, "\n\t\t{");
-					if (CustomHeroes[i]->Items[j]->Unique) {
-						fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", CustomHeroes[i]->Items[j]->Name.c_str());
-					} else {
-						fprintf(fd, "\n\t\t\t\"type\", \"%s\",", CustomHeroes[i]->Items[j]->Type->Ident.c_str());
-						if (CustomHeroes[i]->Items[j]->Prefix != NULL) {
-							fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", CustomHeroes[i]->Items[j]->Prefix->Ident.c_str());
-						}
-						if (CustomHeroes[i]->Items[j]->Suffix != NULL) {
-							fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", CustomHeroes[i]->Items[j]->Suffix->Ident.c_str());
-						}
-						if (CustomHeroes[i]->Items[j]->Spell != NULL) {
-							fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", CustomHeroes[i]->Items[j]->Spell->Ident.c_str());
-						}
-						if (!CustomHeroes[i]->Items[j]->Name.empty()) {
-							fprintf(fd, "\n\t\t\t\"name\", \"%s\",", CustomHeroes[i]->Items[j]->Name.c_str());
-						}
-					}
-					if (CustomHeroes[i]->Items[j]->Bound) {
-						fprintf(fd, "\n\t\t\t\"bound\", true,");
-					}
-					if (CustomHeroes[i]->IsItemEquipped(CustomHeroes[i]->Items[j])) {
-						fprintf(fd, "\n\t\t\t\"equipped\", true");
-					}
-					fprintf(fd, "\n\t\t}");
-					if (j < (CustomHeroes[i]->Items.size() - 1)) {
-						fprintf(fd, ",");
-					}
+				if (hero->Items[j]->Suffix != NULL) {
+					fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", hero->Items[j]->Suffix->Ident.c_str());
 				}
-				fprintf(fd, "\n\t},\n");
-			}
-			if (CustomHeroes[i]->QuestsInProgress.size() > 0) {
-				fprintf(fd, "\tQuestsInProgress = {");
-				for (size_t j = 0; j < CustomHeroes[i]->QuestsInProgress.size(); ++j) {
-					fprintf(fd, "\"%s\"", CustomHeroes[i]->QuestsInProgress[j]->Name.c_str());
-					if (j < (CustomHeroes[i]->QuestsInProgress.size() - 1)) {
-						fprintf(fd, ", ");
-					}
+				if (hero->Items[j]->Spell != NULL) {
+					fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", hero->Items[j]->Spell->Ident.c_str());
 				}
-				fprintf(fd, "},\n");
-			}
-			if (CustomHeroes[i]->QuestsCompleted.size() > 0) {
-				fprintf(fd, "\tQuestsCompleted = {");
-				for (size_t j = 0; j < CustomHeroes[i]->QuestsCompleted.size(); ++j) {
-					fprintf(fd, "\"%s\"", CustomHeroes[i]->QuestsCompleted[j]->Name.c_str());
-					if (j < (CustomHeroes[i]->QuestsCompleted.size() - 1)) {
-						fprintf(fd, ", ");
-					}
+				if (!hero->Items[j]->Name.empty()) {
+					fprintf(fd, "\n\t\t\t\"name\", \"%s\",", hero->Items[j]->Name.c_str());
 				}
-				fprintf(fd, "},\n");
 			}
-			
-			fprintf(fd, "\tForbiddenUpgrades = {");
-			for (int j = 0; j < UnitTypeMax; ++j) {
-				if (CustomHeroes[i]->ForbiddenUpgrades[j]) {
-					fprintf(fd, "\"%s\", ", UnitTypes[j]->Ident.c_str());
+			if (hero->Items[j]->Bound) {
+				fprintf(fd, "\n\t\t\t\"bound\", true,");
+			}
+			if (hero->IsItemEquipped(hero->Items[j])) {
+				fprintf(fd, "\n\t\t\t\"equipped\", true");
+			}
+			fprintf(fd, "\n\t\t}");
+			if (j < (hero->Items.size() - 1)) {
+				fprintf(fd, ",");
+			}
+		}
+		fprintf(fd, "\n\t},\n");
+	}
+	
+	if (hero->Custom) {
+		if (hero->QuestsInProgress.size() > 0) {
+			fprintf(fd, "\tQuestsInProgress = {");
+			for (size_t j = 0; j < hero->QuestsInProgress.size(); ++j) {
+				fprintf(fd, "\"%s\"", hero->QuestsInProgress[j]->Name.c_str());
+				if (j < (hero->QuestsInProgress.size() - 1)) {
+					fprintf(fd, ", ");
 				}
 			}
 			fprintf(fd, "},\n");
-			
-			fprintf(fd, "})\n\n");
+		}
+		if (hero->QuestsCompleted.size() > 0) {
+			fprintf(fd, "\tQuestsCompleted = {");
+			for (size_t j = 0; j < hero->QuestsCompleted.size(); ++j) {
+				fprintf(fd, "\"%s\"", hero->QuestsCompleted[j]->Name.c_str());
+				if (j < (hero->QuestsCompleted.size() - 1)) {
+					fprintf(fd, ", ");
+				}
+			}
+			fprintf(fd, "},\n");
 		}
 	}
+	fprintf(fd, "})\n\n");
 		
 	fclose(fd);
 }
@@ -440,7 +421,7 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
 				hero->Name = new_hero_name;
 				hero->Dynasty = new_hero_dynasty_name;
-				SaveHeroes();
+				SaveHero(hero);
 			}
 		}
 	}

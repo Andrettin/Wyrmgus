@@ -153,7 +153,8 @@ extern std::string FindAndReplaceStringBeginning(std::string text, const std::st
 extern std::string TransliterateText(std::string text);				/// Convert special characters into ones more legible for English-speakers
 extern std::string CapitalizeString(std::string text);				/// Make the string become capitalized
 extern std::string DecapitalizeString(std::string text);			/// Make the string lose capitalization
-extern std::string FullyCapitalizeString(std::string text);			/// Make the every part of the string after a space become capitalized
+extern std::string FullyCapitalizeString(std::string text);			/// Make every part of the string after a space become capitalized
+extern std::string FullyDecapitalizeString(std::string text);		/// Make every part of the string lose capitalization
 extern std::string IdentToName(std::string text);					/// Make the ident string become a display name
 extern std::string SeparateCapitalizedStringElements(std::string text);	/// Make the string's capitalized elements become separated
 extern std::string GeneratePersonalName(int civilization, int unit_type_id);	/// Generates a personal name

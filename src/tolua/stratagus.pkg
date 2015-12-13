@@ -134,4 +134,5 @@ extern std::string GeneratePersonalName(std::string civilization_name, std::stri
 extern int GetItemClassIdByName(std::string item_class);
 extern std::string GetItemEffectsString(std::string item_ident);
 extern std::string GetUniqueItemEffectsString(std::string item_name);
+extern void SaveHeroes();
 //Wyrmgus end

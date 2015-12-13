@@ -249,7 +249,7 @@ enum {
 						CItem *item = goal->Container->Character->GetItem(*goal);
 						goal->Container->Character->Items.erase(std::remove(goal->Container->Character->Items.begin(), goal->Container->Character->Items.end(), item), goal->Container->Character->Items.end());
 						delete item;
-						SaveHeroes();
+						SaveHero(goal->Container->Character);
 					}
 					UnitLost(*goal);
 					UnitClearOrders(*goal);

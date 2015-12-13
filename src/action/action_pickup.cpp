@@ -217,7 +217,7 @@ enum {
 					item->Unique = goal->Unique;
 				}
 				item->Bound = goal->Bound;
-				SaveHeroes();
+				SaveHero(unit.Character);
 			}
 		} else if (goal && (goal->Type->BoolFlag[POWERUP_INDEX].value || (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass == PotionItemClass))) {
 			CommandUse(unit, *goal, FlushCommands);

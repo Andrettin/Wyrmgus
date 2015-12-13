@@ -134,6 +134,7 @@ extern CCharacter *CurrentCustomHero;
 extern void CleanCharacters();
 extern CCharacter *GetCharacter(std::string character_full_name);
 extern CCharacter *GetCustomHero(std::string hero_full_name);
+extern void SaveHero(CCharacter *hero);
 extern void SaveHeroes();
 extern void HeroAddQuest(std::string hero_full_name, std::string quest_name);
 extern void HeroCompleteQuest(std::string hero_full_name, std::string quest_name);

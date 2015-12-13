@@ -766,6 +766,19 @@ std::string FullyCapitalizeString(std::string text)
 	return text;
 }
 
+std::string FullyDecapitalizeString(std::string text)
+{
+	text = DecapitalizeString(text);
+	
+    size_t pos = 0;
+    while ((pos = text.find(" ", pos)) != std::string::npos) {
+		text.substr(pos + 1, pos + 2) = DecapitalizeString(text.substr(pos + 1, pos + 2));
+        pos += 1;
+    }
+	
+	return text;
+}
+
 std::string IdentToName(std::string text)
 {
 	text = FindAndReplaceString(text, "-", " ");

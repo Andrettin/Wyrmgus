@@ -1750,7 +1750,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 								hero->SetType(CurrentButtons[button].Value);
 							}
 						}
-						SaveHeroes();
+						SaveHero(Selected[i]->Character);
 					}
 				}
 				SendCommandTransformInto(*Selected[i], type, !(KeyModifiers & ModifierShift));

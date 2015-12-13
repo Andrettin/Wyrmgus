@@ -888,7 +888,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		if (Character->GetItem(item) != NULL) {
 			if (!Character->IsItemEquipped(Character->GetItem(item))) {
 				Character->EquippedItems[item_slot].push_back(Character->GetItem(item));
-				SaveHeroes();
+				SaveHero(Character);
 			} else {
 				fprintf(stderr, "Item is not equipped by character %s's unit, but is equipped by the character itself.\n", Character->GetFullName().c_str());
 			}
@@ -973,7 +973,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		if (Character->GetItem(item) != NULL) {
 			if (Character->IsItemEquipped(Character->GetItem(item))) {
 				Character->EquippedItems[item_slot].erase(std::remove(Character->EquippedItems[item_slot].begin(), Character->EquippedItems[item_slot].end(), Character->GetItem(item)), Character->EquippedItems[item_slot].end());
-				SaveHeroes();
+				SaveHero(Character);
 			} else {
 				fprintf(stderr, "Item is equipped by character %s's unit, but not by the character itself.\n", Character->GetFullName().c_str());
 			}
@@ -1031,7 +1031,7 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 	}
 	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Prefix = const_cast<CUpgrade *>(&(*prefix));
-		SaveHeroes();
+		SaveHero(Container->Character);
 	}
 	Prefix = const_cast<CUpgrade *>(&(*prefix));
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
@@ -1063,7 +1063,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 	}
 	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Suffix = const_cast<CUpgrade *>(&(*suffix));
-		SaveHeroes();
+		SaveHero(Container->Character);
 	}
 	Suffix = const_cast<CUpgrade *>(&(*suffix));
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
@@ -1088,7 +1088,7 @@ void CUnit::SetSpell(SpellType *spell)
 {
 	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Spell = const_cast<SpellType *>(&(*spell));
-		SaveHeroes();
+		SaveHero(Container->Character);
 	}
 	Spell = const_cast<SpellType *>(&(*spell));
 	

@@ -1613,7 +1613,7 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 	if (!IsNetworkGame() && unit.Character != NULL && unit.Character->Persistent && unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) == unit.Character->Abilities.end()) {
 			unit.Character->Abilities.push_back(upgrade);
-			SaveHeroes();
+			SaveHero(unit.Character);
 		}
 	}
 	IndividualUpgradeAcquire(unit, upgrade);
@@ -1632,7 +1632,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade)
 	if (!IsNetworkGame() && unit.Character != NULL && unit.Character->Persistent && unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
 			unit.Character->Abilities.erase(std::remove(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade), unit.Character->Abilities.end());
-			SaveHeroes();
+			SaveHero(unit.Character);
 		}
 	}
 	IndividualUpgradeLost(unit, upgrade);

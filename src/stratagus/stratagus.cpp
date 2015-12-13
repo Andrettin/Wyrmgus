@@ -412,10 +412,6 @@ void Exit(int err)
 		return;
 	}
 	
-	//Wyrmgus start
-	SaveHeroes(); //save persistent heroes before exiting
-	//Wyrmgus end
-
 	StopMusic();
 	QuitSound();
 	NetworkQuitGame();
