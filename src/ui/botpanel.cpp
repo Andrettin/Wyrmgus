@@ -1091,20 +1091,20 @@ void CButtonPanel::Draw()
 											   pos, buf, player);
 			*/
 			// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
-			if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->Arrows != NULL) {
-				Selected[0]->Arrows->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+			if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->GetItemSlotQuantity(ArrowsItemSlot) > 0 && Selected[0]->EquippedItems[ArrowsItemSlot].size() > 0) {
+				Selected[0]->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player);
-			} else if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->Weapon != NULL) {
-				Selected[0]->Weapon->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+			} else if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->GetItemSlotQuantity(ArrowsItemSlot) == 0 && Selected[0]->EquippedItems[WeaponItemSlot].size() > 0) {
+				Selected[0]->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player);
-			} else if (Selected.size() == 1 && buttons[i].Action == ButtonStop && Selected[0]->Shield != NULL) {
-				Selected[0]->Shield->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+			} else if (Selected.size() == 1 && buttons[i].Action == ButtonStop && Selected[0]->EquippedItems[ShieldItemSlot].size() > 0) {
+				Selected[0]->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player);
-			} else if (Selected.size() == 1 && buttons[i].Action == ButtonMove && Selected[0]->Boots != NULL) {
-				Selected[0]->Boots->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+			} else if (Selected.size() == 1 && buttons[i].Action == ButtonMove && Selected[0]->EquippedItems[BootsItemSlot].size() > 0) {
+				Selected[0]->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player);
 			} else {

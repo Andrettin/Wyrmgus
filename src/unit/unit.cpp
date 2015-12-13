@@ -437,10 +437,9 @@ void CUnit::Init()
 	Resource.Active = 0;
 	
 	//Wyrmgus start
-	Weapon = NULL;
-	Shield = NULL;
-	Boots = NULL;
-	Arrows = NULL;
+	for (int i = 0; i < MaxItemSlots; ++i) {
+		EquippedItems[i].clear();
+	}
 	//Wyrmgus end
 
 	tilePos.x = 0;
@@ -571,15 +570,15 @@ void CUnit::Release(bool final)
 	//Wyrmgus start
 	Character = NULL;
 	Trait = NULL;
-	Weapon = NULL;
-	Shield = NULL;
-	Boots = NULL;
-	Arrows = NULL;
 	Prefix = NULL;
 	Suffix = NULL;
 	Spell = NULL;
 	Unique = false;
 	Bound = false;
+	
+	for (int i = 0; i < MaxItemSlots; ++i) {
+		EquippedItems[i].clear();
+	}
 	//Wyrmgus end
 
 	delete pathFinderData;
@@ -841,51 +840,43 @@ void CUnit::SetVariation(int new_variation, const CUnitType *new_type)
 void CUnit::EquipItem(CUnit &item)
 {
 	int item_class = item.Type->ItemClass;
-	if (GetItemClassSlot(item_class) == WeaponItemSlot) {
-		if (Weapon != NULL) {
-			DeequipItem(*Weapon);
-		}
+	int item_slot = GetItemClassSlot(item_class);
+	
+	if (GetItemSlotQuantity(item_slot) > 0 && EquippedItems[item_slot].size() == GetItemSlotQuantity(item_slot)) {
+		DeequipItem(*EquippedItems[item_slot][EquippedItems[item_slot].size() - 1]);
+	}
+	
+	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from weapon technologies
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
 				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
-		Weapon = &item;
-	} else if (GetItemClassSlot(item_class) == ShieldItemSlot) {
-		if (Shield != NULL) {
-			DeequipItem(*Shield);
-		}
+	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from shield technologies
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
 				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
-		Shield = &item;
-	} else if (GetItemClassSlot(item_class) == BootsItemSlot) {
-		if (Boots != NULL) {
-			DeequipItem(*Boots);
-		}
+	} else if (item_slot == BootsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from boots technologies
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Boots && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
 				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
-		Boots = &item;
-	} else if (GetItemClassSlot(item_class) == ArrowsItemSlot) {
-		if (Arrows != NULL) {
-			DeequipItem(*Arrows);
-		}
+	} else if (item_slot == ArrowsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// remove the upgrade modifiers from arrows technologies
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Arrows && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
 				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
-		Arrows = &item;
 	}
+	
+	EquippedItems[item_slot].push_back(&item);
 	
 	//change variation, if the current one has become forbidden
 	VariationInfo *varinfo = Type->VarInfo[Variation];
@@ -929,32 +920,32 @@ void CUnit::DeequipItem(CUnit &item)
 	}
 	
 	int item_class = item.Type->ItemClass;
-	if (GetItemClassSlot(item_class) == WeaponItemSlot) {
-		Weapon = NULL;
+	int item_slot = GetItemClassSlot(item_class);
+	
+	EquippedItems[item_slot].erase(std::remove(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), &item), EquippedItems[item_slot].end());
+	
+	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
-	} else if (GetItemClassSlot(item_class) == ShieldItemSlot) {
-		Shield = NULL;
+	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from shield technologies
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
-	} else if (GetItemClassSlot(item_class) == BootsItemSlot) {
-		Boots = NULL;
+	} else if (item_slot == BootsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from boots technologies
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Boots && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
-	} else if (GetItemClassSlot(item_class) == ArrowsItemSlot) {
-		Arrows = NULL;
+	} else if (item_slot == ArrowsItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from arrows technologies
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Arrows && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
@@ -2583,10 +2574,10 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 			//Wyrmgus start
 //			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			if ( // don't apply equipment-related upgrades if the unit has an item of that equipment type equipped
-				(!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon || Weapon == NULL)
-				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield || Shield == NULL)
-				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Boots || Boots == NULL)
-				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Arrows || Arrows == NULL)
+				(!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon || EquippedItems[WeaponItemSlot].size() == 0)
+				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield || EquippedItems[ShieldItemSlot].size() == 0)
+				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Boots || EquippedItems[BootsItemSlot].size() == 0)
+				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Arrows || EquippedItems[ArrowsItemSlot].size() == 0)
 			) {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
@@ -3178,9 +3169,43 @@ int CUnit::GetModifiedVariable(int index) const
 	return value;
 }
 
+int CUnit::GetItemSlotQuantity(int item_slot) const
+{
+	if (!HasInventory()) {
+		return 0;
+	}
+	
+	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return 0
+		item_slot == ShieldItemSlot
+		&& (
+			Type->WeaponClass == DaggerItemClass
+			|| Type->WeaponClass == BowItemClass
+			|| Type->WeaponClass == ThrowingAxeItemClass
+			|| Type->WeaponClass == JavelinItemClass
+			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
+		)
+	) {
+		return 0;
+	}
+	
+	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
+		item_slot == ArrowsItemSlot
+		&& Type->WeaponClass != BowItemClass
+	) {
+		return 0;
+	}
+	
+	if (item_slot == RingItemSlot) {
+		return 2;
+	}
+	
+	return 1;
+}
+
 bool CUnit::IsItemEquipped(CUnit *item) const
 {
-	if (Weapon == item || Shield == item || Boots == item || Arrows == item) {
+	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
 		return true;
 	}
 	
@@ -3189,13 +3214,11 @@ bool CUnit::IsItemEquipped(CUnit *item) const
 
 bool CUnit::IsItemTypeEquipped(CUnitType *item_type) const
 {
-	if (
-		(Weapon != NULL && Weapon->Type == item_type)
-		|| (Shield != NULL && Shield->Type == item_type)
-		|| (Boots != NULL && Boots->Type == item_type)
-		|| (Arrows != NULL && Arrows->Type == item_type)
-	) {
-		return true;
+	int item_slot = GetItemClassSlot(item_type->ItemClass);
+	for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
+		if (EquippedItems[item_slot][i]->Type == item_type) {
+			return true;
+		}
 	}
 	
 	return false;
@@ -3228,23 +3251,7 @@ bool CUnit::CanEquipItemClass(int item_class) const
 		return false;
 	}
 	
-	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
-		GetItemClassSlot(item_class) == ShieldItemSlot
-		 && (
-			Type->WeaponClass == DaggerItemClass
-			|| Type->WeaponClass == BowItemClass
-			|| Type->WeaponClass == ThrowingAxeItemClass
-			|| Type->WeaponClass == JavelinItemClass
-			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
-		)
-	) {
-		return false;
-	}
-	
-	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
-		GetItemClassSlot(item_class) == ArrowsItemSlot
-		&& Type->WeaponClass != BowItemClass
-	) {
+	if (this->GetItemSlotQuantity(GetItemClassSlot(item_class)) == 0) {
 		return false;
 	}
 	

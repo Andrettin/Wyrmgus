@@ -326,6 +326,7 @@ public:
 	//Wyrmgus start
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
 	int GetModifiedVariable(int index) const;
+	int GetItemSlotQuantity(int item_slot) const;
 	bool IsItemEquipped(CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
 	bool CanEquipItem(CUnit *item) const;
@@ -373,10 +374,7 @@ public:
 	} Resource; /// Resource still
 
 	//Wyrmgus start
-	CUnit *Weapon;		/// Pointer to unit's weapon item
-	CUnit *Shield;		/// Pointer to unit's shield item
-	CUnit *Boots;		/// Pointer to unit's boots item
-	CUnit *Arrows;		/// Pointer to unit's arrows item
+	std::vector<CUnit *> EquippedItems[MaxItemSlots];	/// Pointer to unit's equipped items, per slot
 	//Wyrmgus end
 	
 	Vec2i tilePos; /// Map position X

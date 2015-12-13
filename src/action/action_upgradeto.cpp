@@ -189,17 +189,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	
 	//Wyrmgus start
 	//deequip the current equipment if they are incompatible with the new unit type
-	if (unit.Weapon != NULL && !unit.CanEquipItemClass(unit.Weapon->Type->ItemClass)) {
-		unit.DeequipItem(*unit.Weapon);
-	}
-	if (unit.Shield != NULL && !unit.CanEquipItemClass(unit.Shield->Type->ItemClass)) {
-		unit.DeequipItem(*unit.Shield);
-	}
-	if (unit.Boots != NULL && !unit.CanEquipItemClass(unit.Boots->Type->ItemClass)) {
-		unit.DeequipItem(*unit.Boots);
-	}
-	if (unit.Arrows != NULL && !unit.CanEquipItemClass(unit.Arrows->Type->ItemClass)) {
-		unit.DeequipItem(*unit.Arrows);
+	for (int i = 0; i < MaxItemSlots; ++i) {
+		for (size_t j = 0; j < unit.EquippedItems[i].size(); ++j) {
+			if (!unit.CanEquipItemClass(unit.EquippedItems[i][j]->Type->ItemClass)) {
+				unit.DeequipItem(*unit.EquippedItems[i][j]);
+			}
+		}
 	}
 	//Wyrmgus end
 	

@@ -124,7 +124,7 @@ static int CclDefineUniqueItem(lua_State *l)
 static int CclGetItems(lua_State *l)
 {
 	std::vector<CUnitType *> items;
-	for (int i = 0; i < UnitTypes.size(); ++i) {
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		if (UnitTypes[i]->BoolFlag[ITEM_INDEX].value) {
 			items.push_back(UnitTypes[i]);
 		}
@@ -206,7 +206,7 @@ static int CclGetUniqueItemData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
 		std::vector<CUnitType *> droppers;
-		for (int i = 0; i < UnitTypes.size(); ++i) {
+		for (size_t i = 0; i < UnitTypes.size(); ++i) {
 			if (
 				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), item->Type->Slot) != UnitTypes[i]->Drops.end()
 				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), item->Type->Slot) != UnitTypes[i]->AiDrops.end()
