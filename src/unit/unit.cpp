@@ -731,6 +731,12 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 		item->Bound = this->Character->Items[i]->Bound;
 		item->Remove(this);
+		int item_slot = GetItemClassSlot(this->Character->Items[i]->Type->ItemClass);
+		if (item_slot != -1) {
+			if (std::find(this->Character->EquippedItems[item_slot].begin(), this->Character->EquippedItems[item_slot].end(), this->Character->Items[i]) != this->Character->EquippedItems[item_slot].end()) {
+				EquipItem(*item);
+			}
+		}
 	}
 	
 	if (this->Character == NULL) {
@@ -877,6 +883,9 @@ void CUnit::EquipItem(CUnit &item)
 	}
 	
 	EquippedItems[item_slot].push_back(&item);
+	if (Character && Character->Persistent) {
+		Character->EquippedItems[item_slot].push_back(Character->GetItem(item));
+	}
 	
 	//change variation, if the current one has become forbidden
 	VariationInfo *varinfo = Type->VarInfo[Variation];
@@ -931,6 +940,9 @@ void CUnit::DeequipItem(CUnit &item)
 	int item_slot = GetItemClassSlot(item_class);
 	
 	EquippedItems[item_slot].erase(std::remove(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), &item), EquippedItems[item_slot].end());
+	if (Character && Character->Persistent) {
+		Character->EquippedItems[item_slot].erase(std::remove(Character->EquippedItems[item_slot].begin(), Character->EquippedItems[item_slot].end(), Character->GetItem(item)), Character->EquippedItems[item_slot].end());
+	}
 	
 	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
 		// restore the upgrade modifiers from weapon technologies
@@ -3210,7 +3222,7 @@ int CUnit::GetItemSlotQuantity(int item_slot) const
 	return 1;
 }
 
-bool CUnit::IsItemEquipped(CUnit *item) const
+bool CUnit::IsItemEquipped(const CUnit *item) const
 {
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);
 	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {

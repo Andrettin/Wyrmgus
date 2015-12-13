@@ -187,6 +187,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Bound) {
 		file.printf("\"bound\", true, ");
 	}
+	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->IsItemEquipped(&unit)) {
+		file.printf("\"equipped\", true, ");
+	}
 	//Wyrmgus end
 	file.printf(" \"current-sight-range\", %d,", unit.CurrentSightRange);
 	if (unit.Burning) {

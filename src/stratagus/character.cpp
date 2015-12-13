@@ -217,7 +217,13 @@ void SaveHeroes()
 						}
 					}
 					if (Characters[i]->Items[j]->Bound) {
-						fprintf(fd, "\n\t\t\t\"bound\", true");
+						fprintf(fd, "\n\t\t\t\"bound\", true,");
+					}
+					int item_slot = GetItemClassSlot(Characters[i]->Items[j]->Type->ItemClass);
+					if (item_slot != -1) {
+						if (std::find(Characters[i]->EquippedItems[item_slot].begin(), Characters[i]->EquippedItems[item_slot].end(), Characters[i]->Items[j]) != Characters[i]->EquippedItems[item_slot].end()) {
+							fprintf(fd, "\n\t\t\t\"equipped\", true");
+						}
 					}
 					fprintf(fd, "\n\t\t}");
 					if (j < (Characters[i]->Items.size() - 1)) {
@@ -290,7 +296,13 @@ void SaveHeroes()
 						}
 					}
 					if (CustomHeroes[i]->Items[j]->Bound) {
-						fprintf(fd, "\n\t\t\t\"bound\", true");
+						fprintf(fd, "\n\t\t\t\"bound\", true,");
+					}
+					int item_slot = GetItemClassSlot(CustomHeroes[i]->Items[j]->Type->ItemClass);
+					if (item_slot != -1) {
+						if (std::find(CustomHeroes[i]->EquippedItems[item_slot].begin(), CustomHeroes[i]->EquippedItems[item_slot].end(), CustomHeroes[i]->Items[j]) != CustomHeroes[i]->EquippedItems[item_slot].end()) {
+							fprintf(fd, "\n\t\t\t\"equipped\", true");
+						}
 					}
 					fprintf(fd, "\n\t\t}");
 					if (j < (CustomHeroes[i]->Items.size() - 1)) {

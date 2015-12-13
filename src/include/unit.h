@@ -327,7 +327,7 @@ public:
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
 	int GetModifiedVariable(int index) const;
 	int GetItemSlotQuantity(int item_slot) const;
-	bool IsItemEquipped(CUnit *item) const;
+	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool CanEquipItemClass(int item_class) const;
