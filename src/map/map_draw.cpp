@@ -475,15 +475,6 @@ void CViewport::Draw() const
 			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
 			//Wyrmgus start
 //			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-			std::string unit_name;
-			if (!UnitUnderCursor->Name.empty()) {
-				unit_name = UnitUnderCursor->Name;
-				if (!UnitUnderCursor->Type->BoolFlag[ITEM_INDEX].value) {
-					unit_name += " (" + UnitUnderCursor->GetTypeName() + ")";
-				}
-			} else {
-				unit_name = UnitUnderCursor->GetTypeName();
-			}
 			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string text_color;
@@ -492,7 +483,7 @@ void CViewport::Draw() const
 			} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
 				text_color = "blue";
 			}
-			DrawGenericPopup(unit_name, unit_center_pos.x, unit_center_pos.y, text_color);
+			DrawGenericPopup(UnitUnderCursor->GetMessageName(), unit_center_pos.x, unit_center_pos.y, text_color);
 			//Wyrmgus end
 		//Wyrmgus start
 //		} else if (!isMapFieldVisile) {

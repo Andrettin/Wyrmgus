@@ -664,8 +664,7 @@ void CUnit::Retrain()
 	}
 	
 	if (this->Player == ThisPlayer) {
-		std::string unit_name = this->Name + " (" + GetTypeName() + ")";
-		this->Player->Notify(NotifyGreen, this->tilePos, _("%s has retrained."), unit_name.c_str());
+		this->Player->Notify(NotifyGreen, this->tilePos, _("%s has retrained."), GetMessageName().c_str());
 	}
 }
 
@@ -1824,8 +1823,7 @@ void CUnit::XPChanged()
 		this->Variable[XP_INDEX].Max -= this->Variable[XPREQUIRED_INDEX].Max;
 		this->Variable[XP_INDEX].Value -= this->Variable[XPREQUIRED_INDEX].Value;
 		if (this->Player == ThisPlayer) {
-			std::string unit_name = this->Name + " (" + GetTypeName() + ")";
-			this->Player->Notify(NotifyGreen, this->tilePos, _("%s has leveled up!"), unit_name.c_str());
+			this->Player->Notify(NotifyGreen, this->tilePos, _("%s has leveled up!"), GetMessageName().c_str());
 		}
 		this->IncreaseLevel(1);
 	}
@@ -3436,6 +3434,19 @@ std::string CUnit::GetTypeName() const
 		return Type->Name;
 	}
 }
+
+std::string CUnit::GetMessageName() const
+{
+	if (Name.empty()) {
+		return GetTypeName();
+	}
+	
+	if (Type->BoolFlag[ITEM_INDEX].value) {
+		return Name;
+	}
+	
+	return Name + " (" + GetTypeName() + ")";
+}
 //Wyrmgus end
 
 /**
@@ -3691,7 +3702,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				PlayUnitSound(target, VoiceHelpMe);
 				//Wyrmgus start
 				//attacked messages now only appear if the "help" sound would be played too
-				target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.GetTypeName().c_str());
+				target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.GetMessageName().c_str());
 				//Wyrmgus end
 			}
 		}

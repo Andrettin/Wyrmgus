@@ -619,16 +619,10 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 			&& static_cast<size_t>(ButtonUnderCursor) == j) {
 			//Wyrmgus start
 //			UI.StatusLine.Set(uins->Type->Name);
-			std::string unit_name;
-			if (!uins->Name.empty()) {
-				unit_name = uins->Name + " (" + uins->GetTypeName() + ")";
-			} else {
-				unit_name = uins->GetTypeName();
-			}
 			if (!Preference.NoStatusLineTooltips) {
-				UI.StatusLine.Set(unit_name);
+				UI.StatusLine.Set(uins->GetMessageName());
 			}
-			DrawGenericPopup(unit_name, UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+			DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 			//Wyrmgus end
 		}
 		++j;
@@ -1497,16 +1491,10 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 		//Wyrmgus start
 //		UI.StatusLine.Set(unit.Type->Name);
-		std::string unit_name;
-		if (!unit.Name.empty()) {
-			unit_name = unit.Name + " (" + unit.GetTypeName() + ")";
-		} else {
-			unit_name = unit.GetTypeName();
-		}
 		if (!Preference.NoStatusLineTooltips) {
-			UI.StatusLine.Set(unit_name);
+			UI.StatusLine.Set(unit.GetMessageName());
 		}
-		DrawGenericPopup(unit_name, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
+		DrawGenericPopup(unit.GetMessageName(), UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
 		//Wyrmgus end
 	}
 }
@@ -1531,16 +1519,10 @@ static void InfoPanel_draw_multiple_selection()
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
 			//Wyrmgus start
 //			UI.StatusLine.Set(Selected[i]->Type->Name);
-			std::string unit_name;
-			if (!Selected[i]->Name.empty()) {
-				unit_name = Selected[i]->Name + " (" + Selected[i]->GetTypeName() + ")";
-			} else {
-				unit_name = Selected[i]->GetTypeName();
-			}
 			if (!Preference.NoStatusLineTooltips) {
-				UI.StatusLine.Set(unit_name);
+				UI.StatusLine.Set(Selected[i]->GetMessageName());
 			}
-			DrawGenericPopup(unit_name, UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
+			DrawGenericPopup(Selected[i]->GetMessageName(), UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 			//Wyrmgus end
 		}
 	}
