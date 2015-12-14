@@ -221,10 +221,7 @@ void SaveHero(CCharacter *hero)
 	if (stat(path.c_str(), &tmp) < 0) {
 		makedir(path.c_str(), 0777);
 	}
-	std::string hero_file_name = hero->GetFullName();
-	hero_file_name = FullyDecapitalizeString(hero_file_name);
-	hero_file_name = FindAndReplaceString(hero_file_name, " ", "_");
-	path += hero_file_name;
+	path += hero->GetFullName();
 	path += ".lua";
 
 	FILE *fd = fopen(path.c_str(), "w");
@@ -400,10 +397,7 @@ void DeleteCustomHero(std::string hero_full_name)
 	if (hero->Custom) {
 		path += "custom/";
 	}
-	std::string hero_file_name = hero->GetFullName();
-	hero_file_name = FullyDecapitalizeString(hero_file_name);
-	hero_file_name = FindAndReplaceString(hero_file_name, " ", "_");
-	path += hero_file_name;
+	path += hero->GetFullName();
 	path += ".lua";	
 	if (CanAccessFile(path.c_str())) {
 		unlink(path.c_str());
@@ -457,10 +451,7 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 			if (hero->Custom) {
 				path += "custom/";
 			}
-			std::string hero_file_name = hero->GetFullName();
-			hero_file_name = FullyDecapitalizeString(hero_file_name);
-			hero_file_name = FindAndReplaceString(hero_file_name, " ", "_");
-			path += hero_file_name;
+			path += hero->GetFullName();
 			path += ".lua";	
 			if (CanAccessFile(path.c_str())) {
 				unlink(path.c_str());
