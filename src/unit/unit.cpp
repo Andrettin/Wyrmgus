@@ -1150,6 +1150,10 @@ void CUnit::GenerateDrop()
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= (1000 - unique_chance) && droppedUnit->Type->ItemClass != -1) {
 				droppedUnit->GenerateUnique(*this);
 			}
+			
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && droppedUnit->Prefix == NULL && droppedUnit->Suffix == NULL && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
+				droppedUnit->TTL = GameCycle + (5 * 60 * CYCLES_PER_SECOND);
+			}
 		}
 	}
 }
@@ -3105,6 +3109,12 @@ void DropOutAll(const CUnit &source)
 	for (int i = source.InsideCount; i; --i, unit = unit->NextContained) {
 		DropOutOnSide(*unit, LookingW, &source);
 	}
+	
+	//Wyrmgus start
+	if (unit->Type->BoolFlag[ITEM_INDEX].value && unit->Prefix == NULL && unit->Suffix == NULL && !unit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
+		unit->TTL = GameCycle + (5 * 60 * CYCLES_PER_SECOND);
+	}
+	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------

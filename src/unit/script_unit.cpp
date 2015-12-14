@@ -340,6 +340,23 @@ static int CclUnit(lua_State *l)
 			unit->Spell = SpellTypeByIdent(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
 			unit->Unique = LuaToBoolean(l, 2, j + 1);
+			if (unit->Unique) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
+				CUniqueItem *unique_item = GetUniqueItem(unit->Name);
+				if (unique_item == NULL) {
+					LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unit->Name.c_str());
+				}
+				unit->Type = const_cast<CUnitType *>(&(*unique_item->Type));
+				CUnitType *type = const_cast<CUnitType *>(&(*unique_item->Type));
+				if (unique_item->Prefix != NULL) {
+					unit->Prefix = const_cast<CUpgrade *>(&(*unique_item->Prefix));
+				}
+				if (unique_item->Suffix != NULL) {
+					unit->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
+				}
+				if (unique_item->Spell != NULL) {
+					unit->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
+				}
+			}
 		} else if (!strcmp(value, "bound")) {
 			unit->Bound = LuaToBoolean(l, 2, j + 1);
 		} else if (!strcmp(value, "equipped")) {

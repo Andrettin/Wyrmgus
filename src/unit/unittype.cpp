@@ -942,6 +942,9 @@ void UpdateUnitStats(CUnitType &type, int reset)
 				MapFieldLandAllowed; // can't build on this
 		}
 		type.MovementMask |= MapFieldNoBuilding;
+		//Wyrmgus start
+		type.MovementMask |= MapFieldItem;
+		//Wyrmgus end
 		//
 		// A little chaos, buildings without HP can be entered.
 		// The oil-patch is a very special case.

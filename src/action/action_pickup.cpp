@@ -198,6 +198,8 @@ enum {
 		}
 
 		if (unit.HasInventory() && goal && goal->Type->BoolFlag[ITEM_INDEX].value) {
+			goal->TTL = 0; //remove item destruction timer when picked up
+			
 			goal->Remove(&unit);
 			if (unit.Character && unit.Character->Persistent) { //if the unit has a persistent character, store the item for it
 				CItem *item = new CItem;
