@@ -138,6 +138,7 @@ extern void SaveHero(CCharacter *hero);
 extern void SaveHeroes();
 extern void HeroAddQuest(std::string hero_full_name, std::string quest_name);
 extern void HeroCompleteQuest(std::string hero_full_name, std::string quest_name);
+extern void SaveCustomHero(std::string hero_full_name);
 extern void DeleteCustomHero(std::string hero_full_name);
 extern void SetCurrentCustomHero(std::string hero_full_name);
 extern std::string GetCurrentCustomHero();

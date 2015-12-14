@@ -368,6 +368,16 @@ void HeroCompleteQuest(std::string hero_full_name, std::string quest_name)
 	hero->QuestsCompleted.push_back(quest);
 }
 
+void SaveCustomHero(std::string hero_full_name)
+{
+	CCharacter *hero = GetCustomHero(hero_full_name);
+	if (!hero) {
+		fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	
+	SaveHero(hero);
+}
+
 void DeleteCustomHero(std::string hero_full_name)
 {
 	CCharacter *hero = GetCustomHero(hero_full_name);
@@ -378,6 +388,27 @@ void DeleteCustomHero(std::string hero_full_name)
 	if (CurrentCustomHero == hero) {
 		CurrentCustomHero = NULL;
 	}
+	
+	//delete hero save file
+	std::string path = Parameters::Instance.GetUserDirectory();
+	if (!GameName.empty()) {
+		path += "/";
+		path += GameName;
+	}
+	path += "/";
+	path += "heroes/";
+	if (hero->Custom) {
+		path += "custom/";
+	}
+	std::string hero_file_name = hero->GetFullName();
+	hero_file_name = FullyDecapitalizeString(hero_file_name);
+	hero_file_name = FindAndReplaceString(hero_file_name, " ", "_");
+	path += hero_file_name;
+	path += ".lua";	
+	if (CanAccessFile(path.c_str())) {
+		unlink(path.c_str());
+	}
+	
 	CustomHeroes.erase(std::remove(CustomHeroes.begin(), CustomHeroes.end(), hero), CustomHeroes.end());
 	delete hero;
 }
@@ -415,6 +446,27 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 		
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		if (civilization != -1) {
+			//delete old hero save file
+			std::string path = Parameters::Instance.GetUserDirectory();
+			if (!GameName.empty()) {
+				path += "/";
+				path += GameName;
+			}
+			path += "/";
+			path += "heroes/";
+			if (hero->Custom) {
+				path += "custom/";
+			}
+			std::string hero_file_name = hero->GetFullName();
+			hero_file_name = FullyDecapitalizeString(hero_file_name);
+			hero_file_name = FindAndReplaceString(hero_file_name, " ", "_");
+			path += hero_file_name;
+			path += ".lua";	
+			if (CanAccessFile(path.c_str())) {
+				unlink(path.c_str());
+			}
+			
+			//now, update the hero
 			hero->Civilization = civilization;
 			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization, GetUnitTypeClassIndexByName(hero->Type->Class));
 			if (new_unit_type_id != -1) {
