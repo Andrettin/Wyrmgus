@@ -357,12 +357,12 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("}");
 	}
 	//Wyrmgus start
-	file.printf(",\n  \"variation\", %d,", unit.Variation);
+	file.printf(",\n  \"variation\", %d", unit.Variation);
 	if (unit.Character != NULL) {
 		if (!unit.Character->Custom) {
-			file.printf(",\n  \"character\", %d,", unit.Character->GetFullName().c_str());
+			file.printf(",\n  \"character\", %s", unit.Character->GetFullName().c_str());
 		} else {
-			file.printf(",\n  \"custom-hero\", %d,", unit.Character->GetFullName().c_str());
+			file.printf(",\n  \"custom-hero\", %s", unit.Character->GetFullName().c_str());
 		}
 	}
 	//Wyrmgus end
