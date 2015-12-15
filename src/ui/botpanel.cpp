@@ -419,8 +419,14 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 //				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
-				if ((condition->Variables[i] == CONDITION_ONLY) ^ (UnitManager.GetSlotUnit(button.Value).Variable[i].Value != 0)) { //the former for some reason wasn't working with negative values
-					return false;
+				if (i != BASICDAMAGE_INDEX) {
+					if ((condition->Variables[i] == CONDITION_ONLY) ^ (UnitManager.GetSlotUnit(button.Value).Variable[i].Value != 0)) { //the former for some reason wasn't working with negative values
+						return false;
+					}
+				} else {
+					if ((condition->Variables[i] == CONDITION_ONLY) ^ (UnitManager.GetSlotUnit(button.Value).Variable[i].Value != 0 || UnitManager.GetSlotUnit(button.Value).Variable[PIERCINGDAMAGE_INDEX].Value != 0)) {
+						return false;
+					}
 				}
 			}
 		}

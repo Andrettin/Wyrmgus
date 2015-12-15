@@ -235,7 +235,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 	}
 	unit.Place(pos);
 
-	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Prefix == NULL && unit.Suffix == NULL && !unit.Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
+	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Prefix == NULL && unit.Suffix == NULL && !unit.Unique) { //destroy items if they have been on the ground for too long
 		unit.TTL = GameCycle + (5 * 60 * CYCLES_PER_SECOND);
 	}
 	//Wyrmgus end
