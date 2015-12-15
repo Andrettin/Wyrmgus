@@ -409,16 +409,7 @@ public:
 class LanguageVerb
 {
 public:
-	LanguageVerb() : Word(""),
-		Meaning(""), Noun(""), Adjective(""),
-		Infinitive(""),
-		SingularFirstPersonPresent(""), SingularSecondPersonPresent(""), SingularThirdPersonPresent(""),
-		PluralFirstPersonPresent(""), PluralSecondPersonPresent(""), PluralThirdPersonPresent(""),
-		SingularFirstPersonPast(""), SingularSecondPersonPast(""), SingularThirdPersonPast(""),
-		PluralFirstPersonPast(""), PluralSecondPersonPast(""), PluralThirdPersonPast(""),
-		SingularFirstPersonFuture(""), SingularSecondPersonFuture(""), SingularThirdPersonFuture(""),
-		PluralFirstPersonFuture(""), PluralSecondPersonFuture(""), PluralThirdPersonFuture(""),
-		ParticiplePresent(""), ParticiplePast(""),
+	LanguageVerb() : 
 		PersonalName(false), 
 		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
@@ -443,6 +434,12 @@ public:
 	std::string PluralFirstPersonPresent;
 	std::string PluralSecondPersonPresent;
 	std::string PluralThirdPersonPresent;
+	std::string SingularFirstPersonPresentSubjunctive;
+	std::string SingularSecondPersonPresentSubjunctive;
+	std::string SingularThirdPersonPresentSubjunctive;
+	std::string PluralFirstPersonPresentSubjunctive;
+	std::string PluralSecondPersonPresentSubjunctive;
+	std::string PluralThirdPersonPresentSubjunctive;
 	std::string SingularFirstPersonPast;
 	std::string SingularSecondPersonPast;
 	std::string SingularThirdPersonPast;

@@ -1402,10 +1402,12 @@ static int CclDefineLanguageNoun(lua_State *l)
 		if (!strcmp(value, "Civilization")) {
 			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 			
-			for (int i = 0; i < LanguageWordMax; ++i) {
-				if (!PlayerRaces.LanguageNouns[civilization][i] || PlayerRaces.LanguageNouns[civilization][i]->Word.empty()) {
-					PlayerRaces.LanguageNouns[civilization][i] = noun;
-					break;
+			if (civilization != -1) {
+				for (int i = 0; i < LanguageWordMax; ++i) {
+					if (!PlayerRaces.LanguageNouns[civilization][i] || PlayerRaces.LanguageNouns[civilization][i]->Word.empty()) {
+						PlayerRaces.LanguageNouns[civilization][i] = noun;
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "Meaning")) {
@@ -1580,10 +1582,12 @@ static int CclDefineLanguageVerb(lua_State *l)
 		if (!strcmp(value, "Civilization")) {
 			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 			
-			for (int i = 0; i < LanguageWordMax; ++i) {
-				if (!PlayerRaces.LanguageVerbs[civilization][i] || PlayerRaces.LanguageVerbs[civilization][i]->Word.empty()) {
-					PlayerRaces.LanguageVerbs[civilization][i] = verb;
-					break;
+			if (civilization != -1) {
+				for (int i = 0; i < LanguageWordMax; ++i) {
+					if (!PlayerRaces.LanguageVerbs[civilization][i] || PlayerRaces.LanguageVerbs[civilization][i]->Word.empty()) {
+						PlayerRaces.LanguageVerbs[civilization][i] = verb;
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "Meaning")) {
@@ -1602,6 +1606,18 @@ static int CclDefineLanguageVerb(lua_State *l)
 			verb->PluralSecondPersonPresent = LuaToString(l, -1);
 		} else if (!strcmp(value, "PluralThirdPersonPresent")) {
 			verb->PluralThirdPersonPresent = LuaToString(l, -1);
+		} else if (!strcmp(value, "SingularFirstPersonPresentSubjunctive")) {
+			verb->SingularFirstPersonPresentSubjunctive = LuaToString(l, -1);
+		} else if (!strcmp(value, "SingularSecondPersonPresentSubjunctive")) {
+			verb->SingularSecondPersonPresentSubjunctive = LuaToString(l, -1);
+		} else if (!strcmp(value, "SingularThirdPersonPresentSubjunctive")) {
+			verb->SingularThirdPersonPresentSubjunctive = LuaToString(l, -1);
+		} else if (!strcmp(value, "PluralFirstPersonPresentSubjunctive")) {
+			verb->PluralFirstPersonPresentSubjunctive = LuaToString(l, -1);
+		} else if (!strcmp(value, "PluralSecondPersonPresentSubjunctive")) {
+			verb->PluralSecondPersonPresentSubjunctive = LuaToString(l, -1);
+		} else if (!strcmp(value, "PluralThirdPersonPresentSubjunctive")) {
+			verb->PluralThirdPersonPresentSubjunctive = LuaToString(l, -1);
 		} else if (!strcmp(value, "SingularFirstPersonPast")) {
 			verb->SingularFirstPersonPast = LuaToString(l, -1);
 		} else if (!strcmp(value, "SingularSecondPersonPast")) {
@@ -1740,10 +1756,12 @@ static int CclDefineLanguageAdjective(lua_State *l)
 		if (!strcmp(value, "Civilization")) {
 			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 			
-			for (int i = 0; i < LanguageWordMax; ++i) {
-				if (!PlayerRaces.LanguageAdjectives[civilization][i] || PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
-					PlayerRaces.LanguageAdjectives[civilization][i] = adjective;
-					break;
+			if (civilization != -1) {
+				for (int i = 0; i < LanguageWordMax; ++i) {
+					if (!PlayerRaces.LanguageAdjectives[civilization][i] || PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
+						PlayerRaces.LanguageAdjectives[civilization][i] = adjective;
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "Meaning")) {
@@ -1886,10 +1904,12 @@ static int CclDefineLanguagePronoun(lua_State *l)
 		if (!strcmp(value, "Civilization")) {
 			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 			
-			for (int i = 0; i < LanguageWordMax; ++i) {
-				if (!PlayerRaces.LanguagePronouns[civilization][i] || PlayerRaces.LanguagePronouns[civilization][i]->Word.empty()) {
-					PlayerRaces.LanguagePronouns[civilization][i] = pronoun;
-					break;
+			if (civilization != -1) {
+				for (int i = 0; i < LanguageWordMax; ++i) {
+					if (!PlayerRaces.LanguagePronouns[civilization][i] || PlayerRaces.LanguagePronouns[civilization][i]->Word.empty()) {
+						PlayerRaces.LanguagePronouns[civilization][i] = pronoun;
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "Meaning")) {
@@ -1932,10 +1952,12 @@ static int CclDefineLanguageAdverb(lua_State *l)
 		if (!strcmp(value, "Civilization")) {
 			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 			
-			for (int i = 0; i < LanguageWordMax; ++i) {
-				if (!PlayerRaces.LanguageAdverbs[civilization][i] || PlayerRaces.LanguageAdverbs[civilization][i]->Word.empty()) {
-					PlayerRaces.LanguageAdverbs[civilization][i] = adverb;
-					break;
+			if (civilization != -1) {
+				for (int i = 0; i < LanguageWordMax; ++i) {
+					if (!PlayerRaces.LanguageAdverbs[civilization][i] || PlayerRaces.LanguageAdverbs[civilization][i]->Word.empty()) {
+						PlayerRaces.LanguageAdverbs[civilization][i] = adverb;
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "Meaning")) {
@@ -1970,10 +1992,12 @@ static int CclDefineLanguageConjunction(lua_State *l)
 		if (!strcmp(value, "Civilization")) {
 			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 			
-			for (int i = 0; i < LanguageWordMax; ++i) {
-				if (!PlayerRaces.LanguageConjunctions[civilization][i] || PlayerRaces.LanguageConjunctions[civilization][i]->Word.empty()) {
-					PlayerRaces.LanguageConjunctions[civilization][i] = conjunction;
-					break;
+			if (civilization != -1) {
+				for (int i = 0; i < LanguageWordMax; ++i) {
+					if (!PlayerRaces.LanguageConjunctions[civilization][i] || PlayerRaces.LanguageConjunctions[civilization][i]->Word.empty()) {
+						PlayerRaces.LanguageConjunctions[civilization][i] = conjunction;
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "Meaning")) {
@@ -2008,10 +2032,12 @@ static int CclDefineLanguageNumeral(lua_State *l)
 		if (!strcmp(value, "Civilization")) {
 			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 			
-			for (int i = 0; i < LanguageWordMax; ++i) {
-				if (!PlayerRaces.LanguageNumerals[civilization][i] || PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
-					PlayerRaces.LanguageNumerals[civilization][i] = numeral;
-					break;
+			if (civilization != -1) {
+				for (int i = 0; i < LanguageWordMax; ++i) {
+					if (!PlayerRaces.LanguageNumerals[civilization][i] || PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
+						PlayerRaces.LanguageNumerals[civilization][i] = numeral;
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "Number")) {
