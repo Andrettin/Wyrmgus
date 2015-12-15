@@ -104,6 +104,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
 		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
+			this->Flags |= MapFieldUnpassable;
 			this->Flags |= MapFieldAirUnpassable;
 		}
 	}
