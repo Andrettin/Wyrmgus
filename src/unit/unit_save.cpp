@@ -360,9 +360,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf(",\n  \"variation\", %d", unit.Variation);
 	if (unit.Character != NULL) {
 		if (!unit.Character->Custom) {
-			file.printf(",\n  \"character\", %s", unit.Character->GetFullName().c_str());
+			file.printf(",\n  \"character\", \"%s\"", unit.Character->GetFullName().c_str());
 		} else {
-			file.printf(",\n  \"custom-hero\", %s", unit.Character->GetFullName().c_str());
+			file.printf(",\n  \"custom-hero\", \"%s\"", unit.Character->GetFullName().c_str());
 		}
 	}
 	//Wyrmgus end

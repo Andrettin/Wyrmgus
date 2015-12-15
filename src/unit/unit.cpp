@@ -921,12 +921,16 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 			Variable[HP_INDEX].Max += item.Variable[i].Max;
 			Variable[HP_INDEX].Increase += item.Variable[i].Increase;
 		} else if (i == SIGHTRANGE_INDEX) {
-			MapUnmarkUnitSight(*this);
+			if (!SaveGameLoading) {
+				MapUnmarkUnitSight(*this);
+			}
 			Variable[i].Value += item.Variable[i].Value;
 			Variable[i].Max += item.Variable[i].Max;
-			CurrentSightRange = Variable[i].Value;
-			UpdateUnitSightRange(*this);
-			MapMarkUnitSight(*this);
+			if (!SaveGameLoading) {
+				CurrentSightRange = Variable[i].Value;
+				UpdateUnitSightRange(*this);
+				MapMarkUnitSight(*this);
+			}
 		}
 	}
 }
