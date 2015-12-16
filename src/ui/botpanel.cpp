@@ -448,7 +448,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Consumable != CONDITION_TRUE) {
-				if ((condition->Consumable == CONDITION_ONLY) ^ (unit.Type->ItemClass == PotionItemClass || unit.Type->ItemClass == ScrollItemClass)) {
+				if ((condition->Consumable == CONDITION_ONLY) ^ IsItemClassConsumable(unit.Type->ItemClass)) {
 					return false;
 				}
 			}

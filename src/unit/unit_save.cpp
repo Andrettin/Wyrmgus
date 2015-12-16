@@ -304,7 +304,10 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	file.printf(" \"units-boarded-count\", %d,", unit.BoardCount);
 
-	if (unit.UnitInside) {
+	//Wyrmgus start
+//	if (unit.UnitInside) {
+	if (unit.UnitInside && !(unit.Character && unit.Character->Persistent && unit.HasInventory())) { // don't save items for persistent heroes
+	//Wyrmgus end
 		file.printf("\n  \"units-contained\", {");
 		CUnit *uins = unit.UnitInside->PrevContained;
 		for (int i = unit.InsideCount; i; --i, uins = uins->PrevContained) {

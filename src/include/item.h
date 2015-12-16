@@ -92,6 +92,7 @@ enum ItemClasses {
 	
 	ArrowsItemClass,
 
+	FoodItemClass,
 	PotionItemClass,
 	ScrollItemClass,
 
@@ -149,6 +150,7 @@ extern std::vector<CUniqueItem *> UniqueItems;
 extern int GetItemClassIdByName(std::string item_class);
 extern std::string GetItemClassNameById(int item_class);
 extern int GetItemClassSlot(int item_class);
+extern bool IsItemClassConsumable(int item_class);
 extern void CleanUniqueItems();
 extern CUniqueItem *GetUniqueItem(std::string item_name);
 extern std::string GetItemEffectsString(std::string item_ident);

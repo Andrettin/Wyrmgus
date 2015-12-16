@@ -681,7 +681,7 @@ void CUnit::HealingItemAutoUse()
 			continue;
 		}
 		
-		if (uins->Type->ItemClass != PotionItemClass && uins->Type->ItemClass != ScrollItemClass) {
+		if (!IsItemClassConsumable(uins->Type->ItemClass)) {
 			continue;
 		}
 		
@@ -4393,7 +4393,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (!unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Type->BoolFlag[POWERUP_INDEX].value) { //only item and powerup units can be picked up
 		return false;
 	}
-	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && unit.Type->ItemClass != PotionItemClass) { //only potion items can be picked up as if they were power-ups for units with no inventory
+	if (!unit.Type->BoolFlag[POWERUP_INDEX].value && !picker.HasInventory() && !IsItemClassConsumable(unit.Type->ItemClass)) { //only consumable items can be picked up as if they were power-ups for units with no inventory
 		return false;
 	}
 	if (picker.CurrentAction() == UnitActionBuilt) { // Under construction

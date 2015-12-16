@@ -221,7 +221,13 @@ enum {
 				item->Bound = goal->Bound;
 				SaveHero(unit.Character);
 			}
-		} else if (goal && (goal->Type->BoolFlag[POWERUP_INDEX].value || (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Type->ItemClass == PotionItemClass))) {
+		} else if (
+			goal
+				&& (
+					goal->Type->BoolFlag[POWERUP_INDEX].value
+					|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && IsItemClassConsumable(goal->Type->ItemClass))
+				)
+			) {
 			CommandUse(unit, *goal, FlushCommands);
 		}
 		

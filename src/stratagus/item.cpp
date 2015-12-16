@@ -95,6 +95,8 @@ int GetItemClassIdByName(std::string item_class)
 		return RingItemClass;
 	} else if (item_class == "arrows") {
 		return ArrowsItemClass;
+	} else if (item_class == "food") {
+		return FoodItemClass;
 	} else if (item_class == "potion") {
 		return PotionItemClass;
 	} else if (item_class == "scroll") {
@@ -138,6 +140,8 @@ std::string GetItemClassNameById(int item_class)
 		return "ring";
 	} else if (item_class == ArrowsItemClass) {
 		return "arrows";
+	} else if (item_class == FoodItemClass) {
+		return "food";
 	} else if (item_class == PotionItemClass) {
 		return "potion";
 	} else if (item_class == ScrollItemClass) {
@@ -178,6 +182,15 @@ int GetItemClassSlot(int item_class)
 	}
 
 	return -1;
+}
+
+bool IsItemClassConsumable(int item_class)
+{
+	if (item_class == FoodItemClass || item_class == PotionItemClass || item_class == ScrollItemClass) {
+		return true;
+	}
+	
+	return false;
 }
 
 bool CUniqueItem::CanDrop()
