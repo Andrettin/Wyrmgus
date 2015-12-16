@@ -221,6 +221,10 @@ enum {
 					unit.Player->Notify(NotifyGreen, unit.tilePos, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
 				}
 				unit.Variable[HP_INDEX].Value += hp_healed;
+				
+				if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) { //if unit is still damaged, see if there are further healing items for it to use
+					unit.HealingItemAutoUse();
+				}
 			} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
 				if (unit.Player == ThisPlayer) {
 					unit.Player->Notify(NotifyRed, unit.tilePos, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));

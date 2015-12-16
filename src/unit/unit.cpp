@@ -668,6 +668,32 @@ void CUnit::Retrain()
 	}
 }
 
+void CUnit::HealingItemAutoUse()
+{
+	if (!HasInventory()) {
+		return;
+	}
+	
+	CUnit *uins = this->UnitInside;
+	
+	for (int i = 0; i < this->InsideCount; ++i, uins = uins->NextContained) {
+		if (!uins->Type->BoolFlag[ITEM_INDEX].value) {
+			continue;
+		}
+		
+		if (uins->Type->ItemClass != PotionItemClass && uins->Type->ItemClass != ScrollItemClass) {
+			continue;
+		}
+		
+		if (uins->Variable[HITPOINTHEALING_INDEX].Value > 0) {
+			if (uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->Variable[HP_INDEX].Max - this->Variable[HP_INDEX].Value)) {
+				CommandUse(*this, *uins, FlushCommands);
+				break;
+			}
+		}
+	}
+}
+
 void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 {
 	if (this->Character == NULL) {
@@ -3827,6 +3853,13 @@ static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
 			table[i]->Variable[XP_INDEX].Max += damage / (table.size() + 1);
 			table[i]->XPChanged();
 		}
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	//use a healing item if any are available
+	if (target.HasInventory()) {
+		target.HealingItemAutoUse();
 	}
 	//Wyrmgus end
 }

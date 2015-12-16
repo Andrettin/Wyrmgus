@@ -269,6 +269,12 @@ static inline void IncreaseVariable(CUnit &unit, int index)
 {
 	unit.Variable[index].Value += unit.Variable[index].Increase;
 	clamp(&unit.Variable[index].Value, 0, unit.Variable[index].Max);
+	
+	//Wyrmgus start
+	if (index == HP_INDEX && unit.Variable[index].Increase < 0 && unit.HasInventory()) {
+		unit.HealingItemAutoUse();
+	}
+	//Wyrmgus end
 
 	//if variable is HP and increase is negative, unit dies if HP reached 0
 	if (index == HP_INDEX && unit.Variable[HP_INDEX].Value <= 0) {
