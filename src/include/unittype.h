@@ -656,6 +656,7 @@ public:
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
 	//Wyrmgus start
+	int GetAvailableLevelUpUpgrades() const;
 	VariationInfo *GetDefaultVariation(CPlayer &player) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;

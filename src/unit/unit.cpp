@@ -58,6 +58,9 @@
 //Wyrmgus end
 #include "game.h"
 #include "editor.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "interface.h"
 //Wyrmgus start
 #include "item.h"
@@ -663,8 +666,43 @@ void CUnit::Retrain()
 		}
 	}
 	
+	std::string unit_name = GetMessageName();
+	
+	//now, revert the unit's type to the level 1 one
+	while (this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value > 1) {
+		bool found_previous_unit_type = false;
+		for (size_t i = 0; i != UnitTypes.size(); ++i) {
+			if (Character != NULL && Character->ForbiddenUpgrades[i]) {
+				continue;
+			}
+			for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[i].size(); ++j) {
+				if (AiHelpers.ExperienceUpgrades[i][j] == this->Type) {
+					this->Variable[LEVELUP_INDEX].Value += 1;
+					TransformUnitIntoType(*this, *UnitTypes[i]);
+					if (!IsNetworkGame() && Character != NULL && Character->Persistent && Player->AiEnabled == false) {	//save the unit-type experience upgrade for persistent characters
+						if (Character->Type->Slot != i) {
+							Character->Type = const_cast<CUnitType *>(&(*UnitTypes[i]));
+							if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
+								CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Character->GetFullName());
+								if (hero) {
+									hero->SetType(i);
+								}
+							}
+							SaveHero(Character);
+						}
+					}
+					found_previous_unit_type = true;
+					break;
+				}
+			}
+			if (found_previous_unit_type) {
+				break;
+			}
+		}
+	}
+	
 	if (this->Player == ThisPlayer) {
-		this->Player->Notify(NotifyGreen, this->tilePos, _("%s has retrained."), GetMessageName().c_str());
+		this->Player->Notify(NotifyGreen, this->tilePos, _("%s's level-up choices have been reset."), unit_name.c_str());
 	}
 }
 
@@ -3235,14 +3273,25 @@ PixelPos CUnit::GetMapPixelPosCenter() const
 int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 {
 	int value = 0;
+	int upgrade_value = 0;
 	
 	if (AiHelpers.ExperienceUpgrades.size() > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 			if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
-				value += 1;
+				int local_upgrade_value = 1;
+				
+				if (!only_units) {
+					local_upgrade_value += AiHelpers.ExperienceUpgrades[Type->Slot][i]->GetAvailableLevelUpUpgrades();
+				}
+				
+				if (local_upgrade_value > upgrade_value) {
+					upgrade_value = local_upgrade_value;
+				}
 			}
 		}
 	}
+	
+	value += upgrade_value;
 	
 	if (!only_units && AiHelpers.LearnableAbilities.size() > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {

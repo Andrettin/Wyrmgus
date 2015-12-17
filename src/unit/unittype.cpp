@@ -37,6 +37,9 @@
 
 #include "unittype.h"
 
+//Wyrmgus start
+#include "../ai/ai_local.h" //for using AiHelpers
+//Wyrmgus end
 #include "animation.h"
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
@@ -726,6 +729,34 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 }
 
 //Wyrmgus start
+int CUnitType::GetAvailableLevelUpUpgrades() const
+{
+	int value = 0;
+	int upgrade_value = 0;
+	
+	if (AiHelpers.ExperienceUpgrades.size() > this->Slot) {
+		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Slot].size(); ++i) {
+			int local_upgrade_value = 1;
+			
+			local_upgrade_value += AiHelpers.ExperienceUpgrades[this->Slot][i]->GetAvailableLevelUpUpgrades();
+			
+			if (local_upgrade_value > upgrade_value) {
+				upgrade_value = local_upgrade_value;
+			}
+		}
+	}
+	
+	value += upgrade_value;
+	
+	if (AiHelpers.LearnableAbilities.size() > this->Slot) {
+		for (size_t i = 0; i != AiHelpers.LearnableAbilities[this->Slot].size(); ++i) {
+			value += 1;
+		}
+	}
+	
+	return value;
+}
+
 VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player) const
 {
 	for (int i = 0; i < VariationMax; ++i) {
