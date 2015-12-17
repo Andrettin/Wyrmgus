@@ -178,6 +178,15 @@ void CUnitManager::Save(CFile &file) const
 		const CUnit &unit = **it;
 		file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(unit), unit.ReleaseCycle);
 	}
+	//Wyrmgus start
+	//add items owned by persistent heroes here, as if they were released
+	for (std::vector<CUnit *>::const_iterator it = units.begin(); it != units.end(); ++it) {
+		const CUnit &unit = **it;
+		if (unit.Container && unit.Container->Character && unit.Container->Character->Persistent && unit.Container->HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value) { // don't save items for persistent heroes
+			file.printf("{Slot = %d, FreeCycle = %u}, ", UnitNumber(unit), GameCycle);
+		}
+	}
+	//Wyrmgus end
 	file.printf("})\n");
 
 	for (std::vector<CUnit *>::const_iterator it = units.begin(); it != units.end(); ++it) {
