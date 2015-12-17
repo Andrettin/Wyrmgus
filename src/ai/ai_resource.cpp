@@ -959,117 +959,79 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 */
 static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
 {
+	//Wyrmgus start
+	/*
 	// Try to find the nearest depot first.
 	CUnit *depot = FindDeposit(unit, 1000, resource);
 	// Find a resource to harvest from.
-	//Wyrmgus start
-//	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 32, resource, true); //search nearby first
-	//Wyrmgus end
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
 
 	if (mine) {
 		CommandResource(unit, *mine, FlushCommands);
 		return 1;
 	}
+	*/
 	
-	//Wyrmgus start
+	// Try to find the nearest depot first.
+	CUnit *depot = FindDeposit(unit, 1000, resource);
 	
-	//didn't find anything? see if there are resources which convert to this one nearby
-	for (int c = 0; c < MaxCosts; ++c) {
-		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
-			mine = UnitFindResource(unit, depot ? *depot : unit, 32, c, true);
-
-			if (mine) {
-				CommandResource(unit, *mine, FlushCommands);
-				return 1;
-			}
+	int resource_range = 0;
+	for (int i = 0; i < 3; ++i) { //search for resources first in a 16 tile radius, then in a 32 tile radius, and then in the whole map
+		resource_range += 16;
+		if (i == 2) {
+			resource_range = 1000;
 		}
-	}
-	
-	CUnit *deposit = UnitFindResource(unit, depot ? *depot : unit, 32, resource, true, NULL, false);
-	
-	if (deposit) {
-		const int n = AiHelpers.Refinery[resource - 1].size();
-
-		for (int i = 0; i < n; ++i) {
-			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
-
-			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
-				return 1;
-			}
+		
+		// Find a resource to harvest from.
+		CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true); //search nearby first
+		if (mine) {
+			CommandResource(unit, *mine, FlushCommands);
+			return 1;
 		}
-	}
-	
-	//didn't find anything? see if there are resource deposits which convert to this one nearby
-	for (int c = 0; c < MaxCosts; ++c) {
-		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
-			deposit = UnitFindResource(unit, depot ? *depot : unit, 32, c, true, NULL, false);
-			
-			if (deposit) {
-				const int n = AiHelpers.Refinery[c - 1].size();
+		
+		//didn't find anything? see if there are resources which convert to this one
+		for (int c = 0; c < MaxCosts; ++c) {
+			if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
+				mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, c, true);
 
-				for (int i = 0; i < n; ++i) {
-					CUnitType &type = *AiHelpers.Refinery[c - 1][i];
-
-					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
-						return 1;
-					}
+				if (mine) {
+					CommandResource(unit, *mine, FlushCommands);
+					return 1;
 				}
 			}
 		}
-	}
-	
-	//if didn't find anything nearby, search with unlimited range 
-	mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
+		
+		//if no readily-harvestable resources are available, search for deposits instead
+		CUnit *deposit = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, NULL, false);
+		
+		if (deposit) {
+			const int n = AiHelpers.Refinery[resource - 1].size();
 
-	if (mine) {
-		CommandResource(unit, *mine, FlushCommands);
-		return 1;
-	}
-	
-	//search for equivalent resources at infinite range
-	for (int c = 0; c < MaxCosts; ++c) {
-		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
-			mine = UnitFindResource(unit, depot ? *depot : unit, 1000, c, true);
+			for (int i = 0; i < n; ++i) {
+				CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
 
-			if (mine) {
-				CommandResource(unit, *mine, FlushCommands);
-				return 1;
+				if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
+					CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+					return 1;
+				}
 			}
 		}
-	}
-	
-	deposit = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true, NULL, false);
-	
-	if (deposit) {
-		const int n = AiHelpers.Refinery[resource - 1].size();
+		
+		//didn't find anything? see if there are resource deposits which convert to this one
+		for (int c = 0; c < MaxCosts; ++c) {
+			if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
+				deposit = UnitFindResource(unit, depot ? *depot : unit, resource_range, c, true, NULL, false);
+				
+				if (deposit) {
+					const int n = AiHelpers.Refinery[c - 1].size();
 
-		for (int i = 0; i < n; ++i) {
-			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
+					for (int i = 0; i < n; ++i) {
+						CUnitType &type = *AiHelpers.Refinery[c - 1][i];
 
-			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
-				return 1;
-			}
-		}
-	}
-	
-	//search for equivalent resource deposits at infinite range
-	for (int c = 0; c < MaxCosts; ++c) {
-		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
-			deposit = UnitFindResource(unit, depot ? *depot : unit, 1000, c, true, NULL, false);
-			
-			if (deposit) {
-				const int n = AiHelpers.Refinery[c - 1].size();
-
-				for (int i = 0; i < n; ++i) {
-					CUnitType &type = *AiHelpers.Refinery[c - 1][i];
-
-					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
-						return 1;
+						if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
+							CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+							return 1;
+						}
 					}
 				}
 			}
