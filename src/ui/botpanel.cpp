@@ -419,12 +419,21 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 //				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
-				if (i != BASICDAMAGE_INDEX) {
-					if ((condition->Variables[i] == CONDITION_ONLY) ^ (UnitManager.GetSlotUnit(button.Value).Variable[i].Value != 0)) { //the former for some reason wasn't working with negative values
+				CUnit &unit = UnitManager.GetSlotUnit(button.Value);
+				if (i == BASICDAMAGE_INDEX) {
+					if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0 || unit.Variable[PIERCINGDAMAGE_INDEX].Value != 0 || GetItemClassSlot(unit.Type->ItemClass) == WeaponItemSlot)) {
+						return false;
+					}
+				} else if (i == ARMOR_INDEX) {
+					if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0 || GetItemClassSlot(unit.Type->ItemClass) == ShieldItemSlot || GetItemClassSlot(unit.Type->ItemClass) == ArmorItemSlot || GetItemClassSlot(unit.Type->ItemClass) == HelmetItemSlot)) {
+						return false;
+					}
+				} else if (i == SPEED_INDEX) {
+					if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0 || GetItemClassSlot(unit.Type->ItemClass) == BootsItemSlot)) {
 						return false;
 					}
 				} else {
-					if ((condition->Variables[i] == CONDITION_ONLY) ^ (UnitManager.GetSlotUnit(button.Value).Variable[i].Value != 0 || UnitManager.GetSlotUnit(button.Value).Variable[PIERCINGDAMAGE_INDEX].Value != 0)) {
+					if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0)) { //the former for some reason wasn't working with negative values
 						return false;
 					}
 				}
