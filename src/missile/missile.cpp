@@ -587,7 +587,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 	Vec2i newgoalPos = goalPos;
 	// Goal dead?
 	if (goal) {
-		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
+		//Wyrmgus start
+//		Assert(!unit.Type->Missile.Missile->AlwaysFire || unit.Type->Missile.Missile->Range);
+		Assert(!unit.GetMissile().Missile->AlwaysFire || unit.GetMissile().Missile->Range);
+		//Wyrmgus end
 		if (goal->Destroyed) {
 			DebugPrint("destroyed unit\n");
 			return;
@@ -596,7 +599,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			return;
 		}
 		if (goal->CurrentAction() == UnitActionDie) {
-			if (unit.Type->Missile.Missile->AlwaysFire) {
+			//Wyrmgus start
+//			if (unit.Type->Missile.Missile->AlwaysFire) {
+			if (unit.GetMissile().Missile->AlwaysFire) {
+			//Wyrmgus end
 				newgoalPos = goal->tilePos;
 				goal = NULL;
 			} else {
@@ -607,8 +613,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 
 	// No missile hits immediately!
 	if (
-		unit.Type->Missile.Missile->Class == MissileClassNone
 		//Wyrmgus start
+//		unit.Type->Missile.Missile->Class == MissileClassNone
+		unit.GetMissile().Missile->Class == MissileClassNone
 //		|| (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
 		|| (unit.GetAnimations() && unit.GetAnimations()->Attack && unit.GetAnimations()->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
 		//Wyrmgus end
@@ -710,7 +717,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 	}
 
 	PixelPos destPixelPos = Map.TilePosToMapPixelPos_Center(dpos);
-	Missile *missile = MakeMissile(*unit.Type->Missile.Missile, startPixelPos, destPixelPos);
+	//Wyrmgus start
+//	Missile *missile = MakeMissile(*unit.Type->Missile.Missile, startPixelPos, destPixelPos);
+	Missile *missile = MakeMissile(*unit.GetMissile().Missile, startPixelPos, destPixelPos);
+	//Wyrmgus end
 	//
 	// Damage of missile
 	//

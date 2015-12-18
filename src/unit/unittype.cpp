@@ -1522,6 +1522,9 @@ void LoadUnitTypes()
 
 		// Lookup missiles.
 		type.Missile.MapMissile();
+		//Wyrmgus start
+		type.FireMissile.MapMissile();
+		//Wyrmgus end
 		type.Explosion.MapMissile();
 
 		// Lookup impacts

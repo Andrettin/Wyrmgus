@@ -611,6 +611,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->UnitType = parent_type->UnitType;
 			type->Missile.Name = parent_type->Missile.Name;
 			type->Missile.Missile = NULL;
+			type->FireMissile.Name = parent_type->FireMissile.Name;
+			type->FireMissile.Missile = NULL;
 			type->ExplodeWhenKilled = parent_type->ExplodeWhenKilled;
 			type->Explosion.Name = parent_type->Explosion.Name;
 			type->Explosion.Missile = NULL;
@@ -1170,6 +1172,11 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Missile")) {
 			type->Missile.Name = LuaToString(l, -1);
 			type->Missile.Missile = NULL;
+		//Wyrmgus start
+		} else if (!strcmp(value, "FireMissile")) {
+			type->FireMissile.Name = LuaToString(l, -1);
+			type->FireMissile.Missile = NULL;
+		//Wyrmgus end
 		} else if (!strcmp(value, "MinAttackRange")) {
 			type->MinAttackRange = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxAttackRange")) {
@@ -2240,6 +2247,9 @@ static int CclGetUnitTypeData(lua_State *l)
 	//Wyrmgus end
 	} else if (!strcmp(data, "Missile")) {
 		lua_pushstring(l, type->Missile.Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "FireMissile")) {
+		lua_pushstring(l, type->FireMissile.Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "MinAttackRange")) {
 		lua_pushnumber(l, type->MinAttackRange);

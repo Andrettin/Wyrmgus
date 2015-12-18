@@ -3492,6 +3492,15 @@ IconConfig CUnit::GetIcon() const
 	}
 }
 
+MissileConfig CUnit::GetMissile() const
+{
+	if (this->Variable[FIREDAMAGE_INDEX].Value > 0 && this->Type->FireMissile.Missile) {
+		return this->Type->FireMissile;
+	} else {
+		return this->Type->Missile;
+	}
+}
+
 CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];
@@ -3579,7 +3588,10 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	if (suicide) {
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
 		
-		MakeMissile(*type->Missile.Missile, pixelPos, pixelPos);
+		//Wyrmgus start
+//		MakeMissile(*type->Missile.Missile, pixelPos, pixelPos);
+		MakeMissile(*unit.GetMissile().Missile, pixelPos, pixelPos);
+		//Wyrmgus end
 	}
 	// Handle Teleporter Destination Removal
 	if (type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {

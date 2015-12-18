@@ -987,7 +987,10 @@ public:
 				}
 			}
 
-			const int missile_range = type.Missile.Missile->Range + range - 1;
+			//Wyrmgus start
+//			const int missile_range = type.Missile.Missile->Range + range - 1;
+			const int missile_range = attacker->GetMissile().Missile->Range + range - 1;
+			//Wyrmgus end
 			const int x = dest->tilePos.x - attacker->tilePos.x + missile_range + 1;
 			const int y = dest->tilePos.y - attacker->tilePos.y + missile_range + 1;
 
@@ -1049,7 +1052,10 @@ private:
 		}
 		const CUnitType &type = *attacker->Type;
 		const CUnitType &dtype = *dest->Type;
-		const int missile_range = type.Missile.Missile->Range + range - 1;
+		//Wyrmgus start
+//		const int missile_range = type.Missile.Missile->Range + range - 1;
+		const int missile_range = attacker->GetMissile().Missile->Range + range - 1;
+		//Wyrmgus end
 		int x = attacker->tilePos.x;
 		int y = attacker->tilePos.y;
 
@@ -1065,12 +1071,24 @@ private:
 
 		int sbad = 0;
 		int sgood = 0;
-		int yy = -(type.Missile.Missile->Range - 1);
+		//Wyrmgus start
+//		int yy = -(type.Missile.Missile->Range - 1);
+		int yy = -(attacker->GetMissile().Missile->Range - 1);
+		//Wyrmgus end
 		int yy_offset = x + yy * 32;
-		for (; yy <= type.Missile.Missile->Range - 1; ++yy) {
+		//Wyrmgus start
+//		for (; yy <= type.Missile.Missile->Range - 1; ++yy) {
+		for (; yy <= attacker->GetMissile().Missile->Range - 1; ++yy) {
+		//Wyrmgus end
 			if ((y + yy >= 0) && ((y + yy) < 2 * missile_range + 1)) {
-				for (int xx = -(type.Missile.Missile->Range - 1);
-					 xx <= type.Missile.Missile->Range - 1; ++xx) {
+				//Wyrmgus start
+//				for (int xx = -(type.Missile.Missile->Range - 1);
+				for (int xx = -(attacker->GetMissile().Missile->Range - 1);
+				//Wyrmgus end
+					//Wyrmgus start
+//					 xx <= type.Missile.Missile->Range - 1; ++xx) {
+					 xx <= attacker->GetMissile().Missile->Range - 1; ++xx) {
+					//Wyrmgus end
 					if ((x + xx >= 0) && ((x + xx) < 2 * missile_range + 1)) {
 						sbad += bad[yy_offset + xx];
 						sgood += good[yy_offset + xx];
@@ -1182,12 +1200,19 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 {
 	// if necessary, take possible damage on allied units into account...
-	if (unit.Type->Missile.Missile->Range > 1
-		&& (range + unit.Type->Missile.Missile->Range < 15)) {
+	//Wyrmgus start
+//	if (unit.Type->Missile.Missile->Range > 1
+//		&& (range + unit.Type->Missile.Missile->Range < 15)) {
+	if (unit.GetMissile().Missile->Range > 1
+		&& (range + unit.GetMissile().Missile->Range < 15)) {
+	//Wyrmgus end
 		//  If catapult, count units near the target...
 		//   FIXME : make it configurable
 
-		int missile_range = unit.Type->Missile.Missile->Range + range - 1;
+		//Wyrmgus start
+//		int missile_range = unit.Type->Missile.Missile->Range + range - 1;
+		int missile_range = unit.GetMissile().Missile->Range + range - 1;
+		//Wyrmgus end
 
 		Assert(2 * missile_range + 1 < 32);
 

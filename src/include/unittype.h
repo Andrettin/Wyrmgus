@@ -723,6 +723,9 @@ public:
 	} Portrait;
 #endif
 	MissileConfig Missile;                           /// Missile weapon
+	//Wyrmgus start
+	MissileConfig FireMissile;						 /// Missile weapon if the unit has fire damage
+	//Wyrmgus end
 	MissileConfig Explosion;                         /// Missile for unit explosion
 	MissileConfig Impact[ANIMATIONS_DEATHTYPES + 2]; /// Missiles spawned if unit is hit(+shield)
 

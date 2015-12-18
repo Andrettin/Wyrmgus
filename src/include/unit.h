@@ -338,6 +338,7 @@ public:
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
+	MissileConfig GetMissile() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
