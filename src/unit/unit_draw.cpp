@@ -1187,47 +1187,23 @@ void CUnit::Draw(const CViewport &vp) const
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	int base_frame = frame >= 0 ? frame : abs(frame) - 1;
-	
-	int shield_frame = frame;
-	PixelPos shield_offset(0, 0);
-	if (varinfo && varinfo->ShieldAnimation[base_frame]) {
-		shield_frame = varinfo->ShieldAnimation[base_frame]->OverlayFrame;
-		shield_offset.x = varinfo->ShieldAnimation[base_frame]->XOffset;
-		shield_offset.y = varinfo->ShieldAnimation[base_frame]->YOffset;
-		if (frame < 0) {
-			shield_frame *= -1;
-			shield_frame -= 1;
-			shield_offset.x *= -1;
-		}
-	} else if (type->ShieldAnimation[base_frame]) {
-		shield_frame = type->ShieldAnimation[base_frame]->OverlayFrame;
-		shield_offset.x = type->ShieldAnimation[base_frame]->XOffset;
-		shield_offset.y = type->ShieldAnimation[base_frame]->YOffset;
-		if (frame < 0) {
-			shield_frame *= -1;
-			shield_frame -= 1;
-			shield_offset.x *= -1;
-		}
-	}
-	
 	//draw the backpack before everything but the shadow if facing south (or the still frame, since that also faces south), southeast or southwest
 	if (this->Direction == LookingS || frame == type->StillFrame || this->Direction == LookingSE || this->Direction == LookingSW) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, this->GetLayerFrame(BackpackImageLayer, frame), screenPos + this->GetLayerOffset(BackpackImageLayer, frame));
 	}
 	
 	//draw the left arm before the body if not facing south (or the still frame, since that also faces south)
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
 		//draw the shield before the left arm if not facing south
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, shield_frame, screenPos + shield_offset);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, this->GetLayerFrame(ShieldImageLayer, frame), screenPos + this->GetLayerOffset(ShieldImageLayer, frame));
 
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, this->GetLayerFrame(LeftArmImageLayer, frame), screenPos + this->GetLayerOffset(LeftArmImageLayer, frame));
 	}
 		
 	//draw the right arm before the body if facing north
 	if (this->Direction == LookingN && this->CurrentAction() != UnitActionDie) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, this->GetLayerFrame(WeaponImageLayer, frame), screenPos + this->GetLayerOffset(WeaponImageLayer, frame));
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, this->GetLayerFrame(RightArmImageLayer, frame), screenPos + this->GetLayerOffset(RightArmImageLayer, frame));
 	}
 	//Wyrmgus end
 
@@ -1291,36 +1267,36 @@ void CUnit::Draw(const CViewport &vp) const
 	//Wyrmgus start
 	//draw the left arm and right arm clothing after the body, even if the arms were drawn before
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, this->GetLayerFrame(ClothingLeftArmImageLayer, frame), screenPos + this->GetLayerOffset(ClothingLeftArmImageLayer, frame));
 	}
 	if (this->Direction == LookingN && this->CurrentAction() != UnitActionDie) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, this->GetLayerFrame(ClothingRightArmImageLayer, frame), screenPos + this->GetLayerOffset(ClothingRightArmImageLayer, frame));
 	}
 
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(PantsImageLayer), player, frame, screenPos);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(PantsImageLayer), player, this->GetLayerFrame(PantsImageLayer, frame), screenPos + this->GetLayerOffset(PantsImageLayer, frame));
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player, this->GetLayerFrame(ClothingImageLayer, frame), screenPos + this->GetLayerOffset(ClothingImageLayer, frame));
 
 	//draw the backpack after the clothing if facing east or west, if isn't dying (dying animations for east and west use northeast frames)
 	if ((this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() != UnitActionDie) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, this->GetLayerFrame(BackpackImageLayer, frame), screenPos + this->GetLayerOffset(BackpackImageLayer, frame));
 	}
 	
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, frame, screenPos);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, this->GetLayerFrame(HairImageLayer, frame), screenPos + this->GetLayerOffset(HairImageLayer, frame));
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, this->GetLayerFrame(HelmetImageLayer, frame), screenPos + this->GetLayerOffset(HelmetImageLayer, frame));
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, this->GetLayerFrame(BootsImageLayer, frame), screenPos + this->GetLayerOffset(BootsImageLayer, frame));
 	
 	//draw the left arm just after the body if facing south
 	if ((this->Direction == LookingS && this->CurrentAction() != UnitActionDie) || frame == type->StillFrame) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, shield_frame, screenPos + shield_offset);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, this->GetLayerFrame(LeftArmImageLayer, frame), screenPos + this->GetLayerOffset(LeftArmImageLayer, frame));
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, this->GetLayerFrame(ClothingLeftArmImageLayer, frame), screenPos + this->GetLayerOffset(ClothingLeftArmImageLayer, frame));
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, this->GetLayerFrame(ShieldImageLayer, frame), screenPos + this->GetLayerOffset(ShieldImageLayer, frame));
 	}
 
 	//draw the right arm just after the body if not facing north
 	if (this->Direction != LookingN || this->CurrentAction() == UnitActionDie) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, this->GetLayerFrame(WeaponImageLayer, frame), screenPos + this->GetLayerOffset(WeaponImageLayer, frame));
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, this->GetLayerFrame(RightArmImageLayer, frame), screenPos + this->GetLayerOffset(RightArmImageLayer, frame));
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, this->GetLayerFrame(ClothingRightArmImageLayer, frame), screenPos + this->GetLayerOffset(ClothingRightArmImageLayer, frame));
 	}
 
 	//draw the backpack after everything if facing north, northeast or northwest, or if facing east or west and is dying (dying animations for east and west use northeast frames)
@@ -1332,7 +1308,7 @@ void CUnit::Draw(const CViewport &vp) const
 			(this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() == UnitActionDie
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, this->GetLayerFrame(BackpackImageLayer, frame), screenPos + this->GetLayerOffset(BackpackImageLayer, frame));
 	}
 
 	DrawOverlay(*type, type->LightSprite, player, frame, screenPos);

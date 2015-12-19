@@ -92,8 +92,10 @@ static int CclDefineCharacter(lua_State *l)
 			character->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			character->Quote = LuaToString(l, -1);
-		} else if (!strcmp(value, "Variation")) {
-			character->Variation = LuaToString(l, -1);
+		} else if (!strcmp(value, "Variation")) { //to keep backwards compatibility
+			character->HairVariation = LuaToString(l, -1);
+		} else if (!strcmp(value, "HairVariation")) {
+			character->HairVariation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
@@ -360,8 +362,10 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->Dynasty = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			hero->Description = LuaToString(l, -1);
-		} else if (!strcmp(value, "Variation")) {
-			hero->Variation = LuaToString(l, -1);
+		} else if (!strcmp(value, "Variation")) { //to keep backwards compatibility
+			hero->HairVariation = LuaToString(l, -1);
+		} else if (!strcmp(value, "HairVariation")) {
+			hero->HairVariation = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);

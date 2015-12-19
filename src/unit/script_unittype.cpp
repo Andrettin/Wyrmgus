@@ -751,25 +751,46 @@ static int CclDefineUnitType(lua_State *l)
 					for (int i = 0; i < MaxImageLayers; ++i) {
 						var->LayerFiles[i] = parent_type->VarInfo[var_n]->LayerFiles[i];
 					}
-			
-					for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
-						if (parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]) {
-							OverlayAnimation *shield_anim = new OverlayAnimation;
-							
-							var->ShieldAnimation[anim_n] = shield_anim;
-							
-							shield_anim->Frame = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->Frame;
-							shield_anim->OverlayFrame = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->OverlayFrame;
-							shield_anim->XOffset = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->XOffset;
-							shield_anim->YOffset = parent_type->VarInfo[var_n]->ShieldAnimation[anim_n]->YOffset;
-						}
-					}
 				} else {
 					break;
 				}
 			}
 			for (int i = 0; i < MaxImageLayers; ++i) {
 				type->LayerFiles[i] = parent_type->LayerFiles[i];
+				
+				//inherit layer variations
+				for (size_t j = 0; j < parent_type->LayerVarInfo[i].size(); ++j) {
+					VariationInfo *var = new VariationInfo;
+						
+					type->LayerVarInfo[i].push_back(var);
+						
+					var->VariationId = parent_type->LayerVarInfo[i][j]->VariationId;
+					var->File = parent_type->LayerVarInfo[i][j]->File;
+					for (int u = 0; u < VariationMax; ++u) {
+						var->UpgradesRequired[u] = parent_type->LayerVarInfo[i][j]->UpgradesRequired[u];
+						var->UpgradesForbidden[u] = parent_type->LayerVarInfo[i][j]->UpgradesForbidden[u];
+					}
+					for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemsEquipped.size(); ++u) {
+						var->ItemsEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsEquipped[u]);
+					}
+					for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemsNotEquipped.size(); ++u) {
+						var->ItemsNotEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsNotEquipped[u]);
+					}
+					var->Tileset = parent_type->LayerVarInfo[i][j]->Tileset;
+						
+					for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
+						if (parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]) {
+							OverlayAnimation *layer_anim = new OverlayAnimation;
+								
+							var->LayerAnimation[anim_n] = layer_anim;
+								
+							layer_anim->Frame = parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]->Frame;
+							layer_anim->OverlayFrame = parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]->OverlayFrame;
+							layer_anim->XOffset = parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]->XOffset;
+							layer_anim->YOffset = parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]->YOffset;
+						}
+					}
+				}
 			}
 			for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
 				if (parent_type->ShieldAnimation[anim_n]) {
@@ -796,6 +817,14 @@ static int CclDefineUnitType(lua_State *l)
 					type->VarInfo[var_n] = NULL;
 				}
 			}
+			//remove previously defined layer variations, if any
+			for (int i = 0; i < MaxImageLayers; ++i) {
+				for (int j = 0; j < type->LayerVarInfo[i].size(); ++j) {
+					delete type->LayerVarInfo[i][j];
+				}
+				type->LayerVarInfo[i].clear();
+			}
+			int variation_count = 0;
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
@@ -803,13 +832,25 @@ static int CclDefineUnitType(lua_State *l)
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for variations)");
 				}
+				int image_layer = -1;
 				const int subargs = lua_rawlen(l, -1);
 				for (int k = 0; k < subargs; ++k) {
 					value = LuaToString(l, -1, k + 1);
 					++k;
-					if (!strcmp(value, "variation-id")) {
+					if (!strcmp(value, "layer")) {
+						std::string image_layer_name = LuaToString(l, -1, k + 1);
+						image_layer = GetImageLayerIdByName(image_layer_name);
+						if (image_layer != -1) {
+							type->LayerVarInfo[image_layer].push_back(var);
+						} else {
+							LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
+						}
+					} else if (!strcmp(value, "variation-id")) {
 						var->VariationId = LuaToString(l, -1, k + 1);
-						type->VarInfo[j] = var;
+						if (image_layer == -1) {
+							type->VarInfo[variation_count] = var;
+							variation_count += 1;
+						}
 					} else if (!strcmp(value, "type-name")) {
 						var->TypeName = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "file")) {
@@ -874,37 +915,40 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "tileset")) {
 						var->Tileset = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "shield-animation")) {
+					} else if (!strcmp(value, "layer-animation")) {
+						if (image_layer == -1) {
+							LuaError(l, "Defining layer animations for a non-layer variation.");
+						}
 						lua_rawgeti(l, -1, k + 1);
 						if (!lua_istable(l, -1)) {
-							LuaError(l, "incorrect argument (expected table for shield animations)");
+							LuaError(l, "incorrect argument (expected table for layer animations)");
 						}
 						const int subsubargs = lua_rawlen(l, -1);
 						for (int n = 0; n < subsubargs; ++n) {
 							lua_rawgeti(l, -1, n + 1);
 							if (!lua_istable(l, -1)) {
-								LuaError(l, "incorrect argument (expected table for shield animation frames)");
+								LuaError(l, "incorrect argument (expected table for layer animation frames)");
 							}
-							OverlayAnimation *shield_anim = new OverlayAnimation;
+							OverlayAnimation *layer_anim = new OverlayAnimation;
 							const int subsubsubargs = lua_rawlen(l, -1);
 							for (int o = 0; o < subsubsubargs; ++o) {
 								value = LuaToString(l, -1, o + 1);
 								++o;
 								if (!strcmp(value, "frame")) {
-									shield_anim->Frame = LuaToNumber(l, -1, o + 1);
-									if (shield_anim->Frame < 0) {
-										LuaError(l, "ShieldAnimation Frame cannot be negative");
+									layer_anim->Frame = LuaToNumber(l, -1, o + 1);
+									if (layer_anim->Frame < 0) {
+										LuaError(l, "LayerAnimation Frame cannot be negative");
 									}
-									var->ShieldAnimation[shield_anim->Frame] = shield_anim;
+									var->LayerAnimation[layer_anim->Frame] = layer_anim;
 								} else if (!strcmp(value, "overlay-frame")) {
-									shield_anim->OverlayFrame = LuaToNumber(l, -1, o + 1);
-									if (shield_anim->OverlayFrame < 0) {
-										LuaError(l, "ShieldAnimation OverlayFrame cannot be negative");
+									layer_anim->OverlayFrame = LuaToNumber(l, -1, o + 1);
+									if (layer_anim->OverlayFrame < 0) {
+										LuaError(l, "LayerAnimation OverlayFrame cannot be negative");
 									}
 								} else if (!strcmp(value, "x-offset")) {
-									shield_anim->XOffset = LuaToNumber(l, -1, o + 1);
+									layer_anim->XOffset = LuaToNumber(l, -1, o + 1);
 								} else if (!strcmp(value, "y-offset")) {
-									shield_anim->YOffset = LuaToNumber(l, -1, o + 1);
+									layer_anim->YOffset = LuaToNumber(l, -1, o + 1);
 								} else {
 									printf("\n%s\n", type->Name.c_str());
 									LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2516,6 +2560,25 @@ static int CclGetUnitTypeData(lua_State *l)
 		for (int var_n = 0; var_n < VariationMax; ++var_n) {
 			if (type->VarInfo[var_n] && std::find(variation_idents.begin(), variation_idents.end(), type->VarInfo[var_n]->VariationId) == variation_idents.end()) {
 				variation_idents.push_back(type->VarInfo[var_n]->VariationId);
+			}
+		}
+		
+		lua_createtable(l, variation_idents.size(), 0);
+		for (size_t i = 1; i <= variation_idents.size(); ++i)
+		{
+			lua_pushstring(l, variation_idents[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "LayerVariations")) {
+		LuaCheckArgs(l, 3);
+		const std::string image_layer_name = LuaToString(l, 3);
+		const int image_layer = GetImageLayerIdByName(image_layer_name);
+		
+		std::vector<std::string> variation_idents;
+		for (int var_n = 0; var_n < type->LayerVarInfo[image_layer].size(); ++var_n) {
+			if (type->LayerVarInfo[image_layer][var_n] && std::find(variation_idents.begin(), variation_idents.end(), type->LayerVarInfo[image_layer][var_n]->VariationId) == variation_idents.end()) {
+				variation_idents.push_back(type->LayerVarInfo[image_layer][var_n]->VariationId);
 			}
 		}
 		

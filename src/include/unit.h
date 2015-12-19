@@ -178,8 +178,8 @@ public:
 	void Retrain();
 	void HealingItemAutoUse();
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
-	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false);
-	void SetVariation(int new_variation, const CUnitType *new_type = NULL);
+	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false, int image_layer = -1);
+	void SetVariation(int new_variation, const CUnitType *new_type = NULL, int image_layer = -1);
 	void EquipItem(CUnit &item, bool affect_character = true);
 	void DeequipItem(CUnit &item, bool affect_character = true);
 	void SetPrefix(CUpgrade *prefix);
@@ -340,6 +340,8 @@ public:
 	IconConfig GetIcon() const;
 	MissileConfig GetMissile() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
+	int GetLayerFrame(int image_layer, int frame) const;
+	PixelPos GetLayerOffset(int image_layer, int frame) const;
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
 	//Wyrmgus end
@@ -404,6 +406,7 @@ public:
 	CCharacter *Character;	/// Pointer to the character represented by this unit
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
+	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
 	CUpgrade *Prefix;	/// Item unit's prefix
 	CUpgrade *Suffix;	/// Item unit's suffix
 	SpellType *Spell;	/// Item unit's spell

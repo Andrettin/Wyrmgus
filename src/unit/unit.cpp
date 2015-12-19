@@ -473,6 +473,7 @@ void CUnit::Init()
 	//Wyrmgus start
 	Name = "";
 	Variation = 0;
+	memset(LayerVariation, -1, sizeof(LayerVariation));
 	//Wyrmgus end
 	IX = 0;
 	IY = 0;
@@ -806,21 +807,33 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	}
 	
 	this->ChooseVariation(); //choose a new variation now
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		ChooseVariation(NULL, false, i);
+	}
 	this->UpdateXPRequired();
 }
 
-void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation)
+void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation, int image_layer)
 {
 	std::string priority_variation;
-	if (this->Character != NULL && !this->Character->Variation.empty()) {
-		priority_variation = this->Character->Variation;
-	} else if (this->Type->VarInfo[this->Variation]) {
-		priority_variation = this->Type->VarInfo[this->Variation]->VariationId;
+	if (image_layer == -1) {
+		if (this->Character != NULL && !this->Character->HairVariation.empty()) {
+			priority_variation = this->Character->HairVariation;
+		} else if (this->Type->VarInfo[this->Variation]) {
+			priority_variation = this->Type->VarInfo[this->Variation]->VariationId;
+		}
+	} else {
+		if (image_layer == HairImageLayer && this->Character != NULL && !this->Character->HairVariation.empty()) {
+			priority_variation = this->Character->HairVariation;
+		} else if (this->LayerVariation[image_layer] != -1) {
+			priority_variation = this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->VariationId;
+		}
 	}
 	
 	std::vector<int> type_variations;
-	for (int i = 0; i < VariationMax; ++i) {
-		VariationInfo *varinfo = new_type != NULL ? new_type->VarInfo[i] : this->Type->VarInfo[i];
+	int variation_max = image_layer == -1 ? VariationMax : (new_type != NULL ? new_type->LayerVarInfo[image_layer].size() : this->Type->LayerVarInfo[image_layer].size());
+	for (int i = 0; i < variation_max; ++i) {
+		VariationInfo *varinfo = image_layer == -1 ? new_type != NULL ? new_type->VarInfo[i] : this->Type->VarInfo[i] : (new_type != NULL ? new_type->LayerVarInfo[image_layer][i] : this->Type->LayerVarInfo[image_layer][i]);
 		if (!varinfo) {
 			continue;
 		}
@@ -880,27 +893,31 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			continue;
 		}
 		if (!ignore_old_variation && !priority_variation.empty() && varinfo->VariationId.find(priority_variation) != std::string::npos) { // if the priority variation's ident is included in that of a new viable, choose the latter automatically
-			this->SetVariation(i, new_type);
+			this->SetVariation(i, new_type, image_layer);
 			type_variations.clear();
 			break;
 		}
 		type_variations.push_back(i);
 	}
 	if (type_variations.size() > 0) {
-		this->SetVariation(type_variations[SyncRand(type_variations.size())], new_type);
+		this->SetVariation(type_variations[SyncRand(type_variations.size())], new_type, image_layer);
 	}
 }
 
-void CUnit::SetVariation(int new_variation, const CUnitType *new_type)
+void CUnit::SetVariation(int new_variation, const CUnitType *new_type, int image_layer)
 {
-	if (
-		(this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->Animations)
-		|| (new_type == NULL && this->Type->VarInfo[new_variation] && this->Type->VarInfo[new_variation]->Animations)
-		|| (new_type != NULL && new_type->VarInfo[new_variation]->Animations)
-	) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
-		this->Frame = this->Type->StillFrame;
+	if (image_layer == -1) {
+		if (
+			(this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->Animations)
+			|| (new_type == NULL && this->Type->VarInfo[new_variation] && this->Type->VarInfo[new_variation]->Animations)
+			|| (new_type != NULL && new_type->VarInfo[new_variation]->Animations)
+		) { //if the old (if any) or the new variation has specific animations, set the unit's frame to its type's still frame
+			this->Frame = this->Type->StillFrame;
+		}
+		this->Variation = new_variation;
+	} else {
+		this->LayerVariation[image_layer] = new_variation;
 	}
-	this->Variation = new_variation;
 }
 
 void CUnit::EquipItem(CUnit &item, bool affect_character)
@@ -966,6 +983,16 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	if (varinfo && std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end()) {
 		ChooseVariation(); //choose a new variation now
 	}
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		if (this->LayerVariation[i] == -1) {
+			continue;
+		}
+		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
+		if (std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end()) {
+			ChooseVariation(NULL, false, i);
+		}
+	}
+	
 	
 	//add item bonuses
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
@@ -1084,6 +1111,15 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	VariationInfo *varinfo = Type->VarInfo[Variation];
 	if (varinfo && std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end()) {
 		ChooseVariation(); //choose a new variation now
+	}
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		if (this->LayerVariation[i] == -1) {
+			continue;
+		}
+		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
+		if (std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end()) {
+			ChooseVariation(NULL, false, i);
+		}
 	}
 }
 
@@ -1511,6 +1547,9 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 
 		//Wyrmgus start
 		unit->ChooseVariation(NULL, true);
+		for (int i = 0; i < MaxImageLayers; ++i) {
+			unit->ChooseVariation(NULL, true, i);
+		}
 		unit->UpdateXPRequired();
 		//Wyrmgus end
 	}
@@ -3504,13 +3543,61 @@ MissileConfig CUnit::GetMissile() const
 CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && varinfo->LayerSprites[image_layer]) {
+	if (this->LayerVariation[image_layer] != -1 && this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite) {
+		return this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite;
+	} else if (varinfo && varinfo->LayerSprites[image_layer]) {
 		return varinfo->LayerSprites[image_layer];
 	} else if (Type->LayerSprites[image_layer])  {
 		return Type->LayerSprites[image_layer];
 	} else {
 		return NULL;
 	}
+}
+
+int CUnit::GetLayerFrame(int image_layer, int frame) const
+{
+	int base_frame = frame >= 0 ? frame : abs(frame) - 1;
+	int layer_frame = frame;
+	
+	int layer_variation = this->LayerVariation[image_layer];
+	if (layer_variation != -1 && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
+		layer_frame = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->OverlayFrame;
+		if (frame < 0) {
+			layer_frame *= -1;
+			layer_frame -= 1;
+		}
+	} else if (image_layer == ShieldImageLayer && this->Type->ShieldAnimation[base_frame]) {
+		layer_frame = this->Type->ShieldAnimation[base_frame]->OverlayFrame;
+		if (frame < 0) {
+			layer_frame *= -1;
+			layer_frame -= 1;
+		}
+	}
+	
+	return layer_frame;
+}
+
+PixelPos CUnit::GetLayerOffset(int image_layer, int frame) const
+{
+	int base_frame = frame >= 0 ? frame : abs(frame) - 1;
+	PixelPos layer_offset(0, 0);
+	
+	int layer_variation = this->LayerVariation[image_layer];
+	if (layer_variation != -1 && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
+		layer_offset.x = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->XOffset;
+		layer_offset.y = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->YOffset;
+		if (frame < 0) {
+			layer_offset.x *= -1;
+		}
+	} else if (image_layer == ShieldImageLayer && this->Type->ShieldAnimation[base_frame]) {
+		layer_offset.x = this->Type->ShieldAnimation[base_frame]->XOffset;
+		layer_offset.y = this->Type->ShieldAnimation[base_frame]->YOffset;
+		if (frame < 0) {
+			layer_offset.x *= -1;
+		}
+	}
+	
+	return layer_offset;
 }
 
 std::string CUnit::GetTypeName() const

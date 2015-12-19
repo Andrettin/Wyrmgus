@@ -1139,6 +1139,21 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.ChooseVariation();
 						}
 					}
+					for (int i = 0; i < MaxImageLayers; ++i) {
+						if (unit.LayerVariation[i] != -1) {
+							VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
+							bool forbidden_upgrade = false;
+							for (int u = 0; u < VariationMax; ++u) {
+								if (!current_layer_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesForbidden[u])->ID) {
+									forbidden_upgrade = true;
+									break;
+								}
+							}
+							if (forbidden_upgrade == true) {
+								unit.ChooseVariation(NULL, false, i);
+							}
+						}
+					}
 					//Wyrmgus end
 				}
 			}
@@ -1377,6 +1392,21 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.ChooseVariation();
 						}
 					}
+					for (int i = 0; i < MaxImageLayers; ++i) {
+						if (unit.LayerVariation[i] != -1) {
+							VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
+							bool required_upgrade = false;
+							for (int u = 0; u < VariationMax; ++u) {
+								if (!current_layer_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesRequired[u])->ID) {
+									required_upgrade = true;
+									break;
+								}
+							}
+							if (required_upgrade == true) {
+								unit.ChooseVariation(NULL, false, i);
+							}
+						}
+					}
 					//Wyrmgus end
 				}
 			}
@@ -1447,6 +1477,21 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.ChooseVariation();
 		}
 	}
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		if (unit.LayerVariation[i] != -1) {
+			VariationInfo *current_layer_varinfo = unit.Type->LayerVarInfo[i][unit.LayerVariation[i]];
+			bool forbidden_upgrade = false;
+			for (int u = 0; u < VariationMax; ++u) {
+				if (!current_layer_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesForbidden[u])->ID) {
+					forbidden_upgrade = true;
+					break;
+				}
+			}
+			if (forbidden_upgrade == true) {
+				unit.ChooseVariation(NULL, false, i);
+			}
+		}
+	}
 	//Wyrmgus end
 	
 	if (um->ConvertTo) {
@@ -1514,6 +1559,21 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 		if (required_upgrade == true) {
 			unit.ChooseVariation();
+		}
+	}
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		if (unit.LayerVariation[i] != -1) {
+			VariationInfo *current_layer_varinfo = unit.Type->LayerVarInfo[i][unit.LayerVariation[i]];
+			bool required_upgrade = false;
+			for (int u = 0; u < VariationMax; ++u) {
+				if (!current_layer_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesRequired[u])->ID) {
+					required_upgrade = true;
+					break;
+				}
+			}
+			if (required_upgrade == true) {
+				unit.ChooseVariation(NULL, false, i);
+			}
 		}
 	}
 	//Wyrmgus end

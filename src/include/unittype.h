@@ -154,9 +154,9 @@ public:
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL)
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
-		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));		
-		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));	
-		memset(ShieldAnimation, 0, sizeof(ShieldAnimation));
+		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
+		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));
+		memset(LayerAnimation, 0, sizeof(LayerAnimation));
 	}
 	
 	~VariationInfo();
@@ -173,7 +173,7 @@ public:
 	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
-	OverlayAnimation *ShieldAnimation[AnimationFrameMax];	/// shield animation data	
+	OverlayAnimation *LayerAnimation[AnimationFrameMax];	/// layer animation data
 
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
@@ -657,7 +657,7 @@ public:
 	
 	//Wyrmgus start
 	int GetAvailableLevelUpUpgrades() const;
-	VariationInfo *GetDefaultVariation(CPlayer &player) const;
+	VariationInfo *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
 	//Wyrmgus end
@@ -827,8 +827,9 @@ public:
 	//Wyrmgus end
 	ResourceInfo *ResInfo[MaxCosts];    /// Resource information.
 	//Wyrmgus start
-	VariationInfo *VarInfo[VariationMax];			/// Variation information.
-	OverlayAnimation *ShieldAnimation[AnimationFrameMax];	/// shield animation data
+	VariationInfo *VarInfo[VariationMax];						/// Variation information.
+	std::vector<VariationInfo *> LayerVarInfo[MaxImageLayers];	/// Layer variation information.
+	OverlayAnimation *ShieldAnimation[AnimationFrameMax];		/// shield animation data
 	//Wyrmgus end
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.

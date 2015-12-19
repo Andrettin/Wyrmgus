@@ -182,6 +182,9 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus start
 	//change variation if upgrading (new unit type may have different variations)
 	unit.ChooseVariation(&newtype);
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		unit.ChooseVariation(&newtype, false, i);
+	}
 	//Wyrmgus end
 	
 	unit.Type = const_cast<CUnitType *>(&newtype);

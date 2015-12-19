@@ -255,8 +255,8 @@ void SaveHero(CCharacter *hero)
 		if (hero->Trait != NULL) {
 			fprintf(fd, "\tTrait = \"%s\",\n", hero->Trait->Ident.c_str());
 		}
-		if (!hero->Variation.empty()) {
-			fprintf(fd, "\tVariation = \"%s\",\n", hero->Variation.c_str());
+		if (!hero->HairVariation.empty()) {
+			fprintf(fd, "\tHairVariation = \"%s\",\n", hero->HairVariation.c_str());
 		}
 	}
 	if (hero->Level != 0) {

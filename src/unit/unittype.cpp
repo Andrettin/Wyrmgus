@@ -665,6 +665,13 @@ CUnitType::~CUnitType()
 		}
 	}
 	
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		for (size_t var = 0; var < LayerVarInfo[i].size(); ++var) {
+			delete this->LayerVarInfo[i][var];
+		}
+		LayerVarInfo[i].clear();
+	}
+	
 	for (int i = 0; i < AnimationFrameMax; ++i) {
 		if (this->ShieldAnimation[i]) {
 			delete this->ShieldAnimation[i];
@@ -757,10 +764,11 @@ int CUnitType::GetAvailableLevelUpUpgrades() const
 	return value;
 }
 
-VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player) const
+VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) const
 {
-	for (int i = 0; i < VariationMax; ++i) {
-		VariationInfo *varinfo = this->VarInfo[i];
+	int variation_max = image_layer == -1 ? VariationMax : this->LayerVarInfo[image_layer].size();
+	for (int i = 0; i < variation_max; ++i) {
+		VariationInfo *varinfo = image_layer == -1 ? this->VarInfo[i] : this->LayerVarInfo[image_layer][i];
 		if (!varinfo) {
 			break;
 		}
@@ -799,7 +807,9 @@ std::string CUnitType::GetDefaultName(CPlayer &player) const
 CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(CPlayer &player, int image_layer) const
 {
 	VariationInfo *varinfo = this->GetDefaultVariation(player);
-	if (varinfo && varinfo->LayerSprites[image_layer]) {
+	if (this->LayerVarInfo[image_layer].size() > 0) {
+		return this->GetDefaultVariation(player, image_layer)->Sprite;
+	} else if (varinfo && varinfo->LayerSprites[image_layer]) {
 		return varinfo->LayerSprites[image_layer];
 	} else if (this->LayerSprites[image_layer])  {
 		return this->LayerSprites[image_layer];
@@ -1489,6 +1499,19 @@ void LoadUnitTypeSprite(CUnitType &type)
 			}
 		}
 	}
+	
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		for (int j = 0; j < type.LayerVarInfo[i].size(); ++j) {
+			VariationInfo *varinfo = type.LayerVarInfo[i][j];
+			if (!varinfo->File.empty()) {
+				varinfo->Sprite = CPlayerColorGraphic::New(varinfo->File, type.Width, type.Height);
+				varinfo->Sprite->Load();
+				if (type.Flip) {
+					varinfo->Sprite->Flip();
+				}
+			}
+		}
+	}
 	//Wyrmgus end
 }
 
@@ -1611,8 +1634,8 @@ VariationInfo::~VariationInfo()
 		}
 	}
 	for (int i = 0; i < AnimationFrameMax; ++i) {
-		if (this->ShieldAnimation[i]) {
-			delete this->ShieldAnimation[i];
+		if (this->LayerAnimation[i]) {
+			delete this->LayerAnimation[i];
 		}
 	}
 }

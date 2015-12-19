@@ -635,6 +635,15 @@ static int CclUnit(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "variation")) {
 			unit->Variation = LuaToNumber(l, 2, j + 1);
+		} else if (!strcmp(value, "layer-variation")) {
+			std::string image_layer_name = LuaToString(l, 2, j + 1);
+			int image_layer = GetImageLayerIdByName(image_layer_name);
+			if (image_layer != -1) {
+				++j;
+				unit->LayerVariation[image_layer] = LuaToNumber(l, 2, j + 1);
+			} else {
+				LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
+			}
 		} else if (!strcmp(value, "character")) {
 			unit->SetCharacter(LuaToString(l, 2, j + 1), false);
 		} else if (!strcmp(value, "custom-hero")) {
@@ -1561,6 +1570,15 @@ static int CclSetUnitVariable(lua_State *l)
 		value = LuaToNumber(l, 3);
 		unit->SetVariation(value);
 		unit->Variable[VARIATION_INDEX].Value = unit->Variation;
+	} else if (!strcmp(name, "LayerVariation")) {
+		LuaCheckArgs(l, 4);
+		std::string image_layer_name = LuaToString(l, 3);
+		int image_layer = GetImageLayerIdByName(image_layer_name);
+		if (image_layer != -1) {
+			unit->SetVariation(LuaToNumber(l, 4), NULL, image_layer);
+		} else {
+			LuaError(l, "Image layer \"%s\" doesn't exist." _C_ image_layer_name.c_str());
+		}
 	} else if (!strcmp(name, "Prefix")) { //add an item prefix to the unit
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
