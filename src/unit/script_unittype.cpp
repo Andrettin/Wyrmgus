@@ -819,7 +819,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			//remove previously defined layer variations, if any
 			for (int i = 0; i < MaxImageLayers; ++i) {
-				for (int j = 0; j < type->LayerVarInfo[i].size(); ++j) {
+				for (size_t j = 0; j < type->LayerVarInfo[i].size(); ++j) {
 					delete type->LayerVarInfo[i][j];
 				}
 				type->LayerVarInfo[i].clear();
@@ -2576,7 +2576,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		const int image_layer = GetImageLayerIdByName(image_layer_name);
 		
 		std::vector<std::string> variation_idents;
-		for (int var_n = 0; var_n < type->LayerVarInfo[image_layer].size(); ++var_n) {
+		for (size_t var_n = 0; var_n < type->LayerVarInfo[image_layer].size(); ++var_n) {
 			if (type->LayerVarInfo[image_layer][var_n] && std::find(variation_idents.begin(), variation_idents.end(), type->LayerVarInfo[image_layer][var_n]->VariationId) == variation_idents.end()) {
 				variation_idents.push_back(type->LayerVarInfo[image_layer][var_n]->VariationId);
 			}
@@ -2980,7 +2980,7 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 	
-	unit.Variable[LEVELUP_INDEX].Max = 255;
+	unit.Variable[LEVELUP_INDEX].Max = 100000;
 
 	if (unit.Variable[GENDER_INDEX].Value == NoGender && unit.Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
 		unit.Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
