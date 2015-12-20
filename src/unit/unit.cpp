@@ -825,7 +825,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	} else {
 		if (image_layer == HairImageLayer && this->Character != NULL && !this->Character->HairVariation.empty()) {
 			priority_variation = this->Character->HairVariation;
-		} else if (this->LayerVariation[image_layer] != -1) {
+		} else if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < this->Type->LayerVarInfo[image_layer].size()) {
 			priority_variation = this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->VariationId;
 		}
 	}
@@ -984,7 +984,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerVariation[i] == -1) {
+		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= this->Type->LayerVarInfo[i].size()) {
 			continue;
 		}
 		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
@@ -1113,7 +1113,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerVariation[i] == -1) {
+		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= this->Type->LayerVarInfo[i].size()) {
 			continue;
 		}
 		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
@@ -3543,7 +3543,7 @@ MissileConfig CUnit::GetMissile() const
 CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (this->LayerVariation[image_layer] != -1 && this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite) {
+	if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < this->Type->LayerVarInfo[image_layer].size() && this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite) {
 		return this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite;
 	} else if (varinfo && varinfo->LayerSprites[image_layer]) {
 		return varinfo->LayerSprites[image_layer];
@@ -3560,7 +3560,7 @@ int CUnit::GetLayerFrame(int image_layer, int frame) const
 	int layer_frame = frame;
 	
 	int layer_variation = this->LayerVariation[image_layer];
-	if (layer_variation != -1 && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
+	if (layer_variation != -1 && layer_variation < this->Type->LayerVarInfo[image_layer].size() && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
 		layer_frame = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->OverlayFrame;
 		if (frame < 0) {
 			layer_frame *= -1;
@@ -3583,7 +3583,7 @@ PixelPos CUnit::GetLayerOffset(int image_layer, int frame) const
 	PixelPos layer_offset(0, 0);
 	
 	int layer_variation = this->LayerVariation[image_layer];
-	if (layer_variation != -1 && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
+	if (layer_variation != -1 && layer_variation < this->Type->LayerVarInfo[image_layer].size() && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
 		layer_offset.x = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->XOffset;
 		layer_offset.y = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->YOffset;
 		if (frame < 0) {

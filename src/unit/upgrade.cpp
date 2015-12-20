@@ -1140,7 +1140,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 					}
 					for (int i = 0; i < MaxImageLayers; ++i) {
-						if (unit.LayerVariation[i] != -1) {
+						if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < unit.Type->LayerVarInfo[i].size()) {
 							VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
 							bool forbidden_upgrade = false;
 							for (int u = 0; u < VariationMax; ++u) {
@@ -1393,7 +1393,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 					}
 					for (int i = 0; i < MaxImageLayers; ++i) {
-						if (unit.LayerVariation[i] != -1) {
+						if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < unit.Type->LayerVarInfo[i].size()) {
 							VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
 							bool required_upgrade = false;
 							for (int u = 0; u < VariationMax; ++u) {
@@ -1478,7 +1478,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (unit.LayerVariation[i] != -1) {
+		if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < unit.Type->LayerVarInfo[i].size()) {
 			VariationInfo *current_layer_varinfo = unit.Type->LayerVarInfo[i][unit.LayerVariation[i]];
 			bool forbidden_upgrade = false;
 			for (int u = 0; u < VariationMax; ++u) {
@@ -1562,7 +1562,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (unit.LayerVariation[i] != -1) {
+		if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < unit.Type->LayerVarInfo[i].size()) {
 			VariationInfo *current_layer_varinfo = unit.Type->LayerVarInfo[i][unit.LayerVariation[i]];
 			bool required_upgrade = false;
 			for (int u = 0; u < VariationMax; ++u) {
