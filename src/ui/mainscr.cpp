@@ -622,7 +622,6 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 			if (!Preference.NoStatusLineTooltips) {
 				UI.StatusLine.Set(uins->GetMessageName());
 			}
-			DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 			//Wyrmgus end
 		}
 		++j;

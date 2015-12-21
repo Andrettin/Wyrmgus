@@ -1148,6 +1148,23 @@ void CButtonPanel::Draw()
 					UI.ButtonPanel.Buttons[i].Y);
 		}
 	}
+	
+	//Wyrmgus start
+	if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
+		CUnit *uins = Selected[0]->UnitInside;
+		size_t j = 0;
+
+		for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+			if (!uins->Boarded || j >= UI.TransportingButtons.size() || (Selected[0]->Player != ThisPlayer && uins->Player != ThisPlayer)) {
+				continue;
+			}
+			if (static_cast<size_t>(ButtonUnderCursor) == j) {
+				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+			}
+			++j;
+		}
+	}
+	//Wyrmgus end
 }
 
 /**
