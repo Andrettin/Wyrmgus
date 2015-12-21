@@ -1192,16 +1192,29 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, this->GetLayerFrame(BackpackImageLayer, frame), screenPos + this->GetLayerOffset(BackpackImageLayer, frame));
 	}
 	
-	//draw the left arm before the body if not facing south (or the still frame, since that also faces south)
-	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
+	//draw the left arm before the body if not facing south (or the still frame, since that also faces south); if the position of the arms in the southeast frame is inverted, don't draw the left arm yet either
+	if (
+		(this->Direction != LookingS || this->CurrentAction() == UnitActionDie)
+		&& frame != type->StillFrame
+		&& !(
+			type->InvertedSoutheastArms
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+		)
+	) {
 		//draw the shield before the left arm if not facing south
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, this->GetLayerFrame(ShieldImageLayer, frame), screenPos + this->GetLayerOffset(ShieldImageLayer, frame));
 
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, this->GetLayerFrame(LeftArmImageLayer, frame), screenPos + this->GetLayerOffset(LeftArmImageLayer, frame));
 	}
 		
-	//draw the right arm before the body if facing north
-	if (this->Direction == LookingN && this->CurrentAction() != UnitActionDie) {
+	//draw the right arm before the body if facing north, or if facing southeast/southwest and the arms are inverted for that direction
+	if (
+		(this->Direction == LookingN && this->CurrentAction() != UnitActionDie)
+		|| (
+			type->InvertedSoutheastArms
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+		)
+	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, this->GetLayerFrame(WeaponImageLayer, frame), screenPos + this->GetLayerOffset(WeaponImageLayer, frame));
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, this->GetLayerFrame(RightArmImageLayer, frame), screenPos + this->GetLayerOffset(RightArmImageLayer, frame));
 	}
@@ -1286,14 +1299,27 @@ void CUnit::Draw(const CViewport &vp) const
 	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, this->GetLayerFrame(BootsImageLayer, frame), screenPos + this->GetLayerOffset(BootsImageLayer, frame));
 	
 	//draw the left arm just after the body if facing south
-	if ((this->Direction == LookingS && this->CurrentAction() != UnitActionDie) || frame == type->StillFrame) {
+	if (
+		(this->Direction == LookingS && this->CurrentAction() != UnitActionDie)
+		|| frame == type->StillFrame
+		|| (
+			type->InvertedSoutheastArms
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+		)
+	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, this->GetLayerFrame(LeftArmImageLayer, frame), screenPos + this->GetLayerOffset(LeftArmImageLayer, frame));
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, this->GetLayerFrame(ClothingLeftArmImageLayer, frame), screenPos + this->GetLayerOffset(ClothingLeftArmImageLayer, frame));
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, this->GetLayerFrame(ShieldImageLayer, frame), screenPos + this->GetLayerOffset(ShieldImageLayer, frame));
 	}
 
 	//draw the right arm just after the body if not facing north
-	if (this->Direction != LookingN || this->CurrentAction() == UnitActionDie) {
+	if (
+		(this->Direction != LookingN || this->CurrentAction() == UnitActionDie)
+		&& !(
+			type->InvertedSoutheastArms
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+		)
+	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, this->GetLayerFrame(WeaponImageLayer, frame), screenPos + this->GetLayerOffset(WeaponImageLayer, frame));
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, this->GetLayerFrame(RightArmImageLayer, frame), screenPos + this->GetLayerOffset(RightArmImageLayer, frame));
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, this->GetLayerFrame(ClothingRightArmImageLayer, frame), screenPos + this->GetLayerOffset(ClothingRightArmImageLayer, frame));

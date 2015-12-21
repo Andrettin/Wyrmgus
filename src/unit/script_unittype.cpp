@@ -652,6 +652,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->Sound = parent_type->Sound;
 			type->NumDirections = parent_type->NumDirections;
 			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
+			type->InvertedSoutheastArms = parent_type->InvertedSoutheastArms;
 			if (parent_type->CanCastSpell) {
 				type->CanCastSpell = new char[SpellTypeTable.size()];
 				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
@@ -1867,6 +1868,8 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "incorrect weapon class");
 				}
 			}
+		} else if (!strcmp(value, "InvertedSoutheastArms")) {
+			type->InvertedSoutheastArms = LuaToBoolean(l, -1);
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];

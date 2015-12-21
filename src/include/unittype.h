@@ -706,6 +706,7 @@ public:
 	int Upkeep;												/// Gold upkeep (for grand strategy mode)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
+	bool InvertedSoutheastArms;								/// Whether the arms are inverted for the southeast/southwest graphics
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
