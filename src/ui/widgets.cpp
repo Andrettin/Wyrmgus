@@ -2905,9 +2905,13 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 	shadowColor.a = alpha;
 
 
-	img->Resize(getWidth(), h);
+	//Wyrmgus start
+//	img->Resize(getWidth(), h);
+	//Wyrmgus end
 	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), h);
-	img->SetOriginalSize();
+	//Wyrmgus start
+//	img->SetOriginalSize();
+	//Wyrmgus end
 	
 	graphics->setFont(getFont());
 
@@ -2983,9 +2987,13 @@ void ImageDropDownWidget::drawButton(gcn::Graphics *graphics)
 	} else {
 		img = this->DownNormalImage;
 	}
-	img->Resize(h, h);
+	//Wyrmgus start
+//	img->Resize(h, h);
+	//Wyrmgus end
 	graphics->drawImage(img, 0, 0, x, y, h, h);
-	img->SetOriginalSize();
+	//Wyrmgus start
+//	img->SetOriginalSize();
+	//Wyrmgus end
 }
 
 int ImageDropDownWidget::getSelected()
