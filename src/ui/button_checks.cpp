@@ -328,7 +328,10 @@ bool ButtonCheckUpgradeTo(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckAttack(const CUnit &unit, const ButtonAction &)
 {
-	return unit.Type->CanAttack;
+	//Wyrmgus start
+//	return unit.Type->CanAttack;
+	return unit.CanAttack();
+	//Wyrmgus end
 }
 
 /**

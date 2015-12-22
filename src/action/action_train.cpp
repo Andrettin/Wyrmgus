@@ -188,7 +188,10 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 		}
 		return true;
 	}
-	if (order->Action == UnitActionAttack && !unit.Type->CanAttack) {
+	//Wyrmgus start
+//	if (order->Action == UnitActionAttack && !unit.Type->CanAttack) {
+	if (order->Action == UnitActionAttack && !unit.CanAttack()) {
+	//Wyrmgus end
 		return false;
 	}
 	if (order->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand) {

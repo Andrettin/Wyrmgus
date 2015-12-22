@@ -197,7 +197,10 @@ public:
 	// Cowards and invisible units don't attack unless ordered.
 	bool IsAgressive() const
 	{
-		return (Type->BoolFlag[CANATTACK_INDEX].value && !Type->BoolFlag[COWARD_INDEX].value
+		//Wyrmgus start
+//		return (Type->BoolFlag[CANATTACK_INDEX].value && !Type->BoolFlag[COWARD_INDEX].value
+		return (CanAttack() && !Type->BoolFlag[COWARD_INDEX].value
+		//Wyrmgus end
 				&& Variable[INVISIBLE_INDEX].Value == 0);
 	}
 
@@ -329,6 +332,7 @@ public:
 	int GetModifiedVariable(int index) const;
 	int GetItemSlotQuantity(int item_slot) const;
 	int GetCurrentWeaponClass() const;
+	bool CanAttack() const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
 	bool CanEquipItem(CUnit *item) const;

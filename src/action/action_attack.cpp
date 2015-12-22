@@ -287,7 +287,10 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 /* virtual */ void COrder_Attack::OnAnimationAttack(CUnit &unit)
 {
-	Assert(unit.Type->CanAttack);
+	//Wyrmgus start
+//	Assert(unit.Type->CanAttack);
+	Assert(unit.CanAttack());
+	//Wyrmgus end
 
 	FireMissile(unit, this->GetGoal(), this->goalPos);
 	UnHideUnit(unit); // unit is invisible until attacks

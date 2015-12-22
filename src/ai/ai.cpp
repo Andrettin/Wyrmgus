@@ -686,7 +686,10 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			   defender.Type->Ident.c_str() _C_ defender.tilePos.x _C_ defender.tilePos.y);
 
 	//  Don't send help to scouts (zeppelin,eye of vision).
-	if (!defender.Type->CanAttack && defender.Type->UnitType == UnitTypeFly) {
+	//Wyrmgus start
+//	if (!defender.Type->CanAttack && defender.Type->UnitType == UnitTypeFly) {
+	if (!defender.CanAttack() && defender.Type->UnitType == UnitTypeFly) {
+	//Wyrmgus end
 		return;
 	}
 	// Summoned unit, don't help

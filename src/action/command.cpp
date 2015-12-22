@@ -475,7 +475,10 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 
 	COrderPtr *order;
 
-	if (!unit.Type->CanAttack) {
+	//Wyrmgus start
+//	if (!unit.Type->CanAttack) {
+	if (!unit.CanAttack()) {
+	//Wyrmgus end
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -520,7 +523,10 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 	//Wyrmgus end
 	COrderPtr *order;
 
-	if (!unit.Type->CanAttack) {
+	//Wyrmgus start
+//	if (!unit.Type->CanAttack) {
+	if (!unit.CanAttack()) {
+	//Wyrmgus end
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {

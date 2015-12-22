@@ -2884,7 +2884,10 @@ void RescueUnits()
 				SelectAroundUnit(unit, 1, around);
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
-					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i])) {
+					//Wyrmgus start
+//					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i])) {
+					if (around[i]->CanAttack() && unit.IsAllied(*around[i])) {
+					//Wyrmgus end
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!
@@ -3394,6 +3397,23 @@ int CUnit::GetCurrentWeaponClass() const
 	}
 	
 	return Type->WeaponClasses[0];
+}
+
+bool CUnit::CanAttack() const
+{
+	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters can only attack through a unit within them
+		if (this->BoardCount > 0) {
+			CUnit *boarded_unit = this->UnitInside;
+			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
+				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	return this->Type->BoolFlag[CANATTACK_INDEX].value;
 }
 
 bool CUnit::IsItemEquipped(const CUnit *item) const
@@ -4328,7 +4348,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 //	if (target.Threshold == 0 && target.IsAgressive() && target.CanMove() && !target.ReCast) {
 	if (
 		target.Threshold == 0
-		&& (target.IsAgressive() || (target.Type->CanAttack && target.Type->BoolFlag[COWARD_INDEX].value && (attacker->Type->BoolFlag[COWARD_INDEX].value || attacker->Variable[HP_INDEX].Value <= 3))) // attacks back if isn't coward, or if attacker is also coward, or if attacker has 3 HP or less 
+		&& (target.IsAgressive() || (target.CanAttack() && target.Type->BoolFlag[COWARD_INDEX].value && (attacker->Type->BoolFlag[COWARD_INDEX].value || attacker->Variable[HP_INDEX].Value <= 3))) // attacks back if isn't coward, or if attacker is also coward, or if attacker has 3 HP or less 
 		&& target.CanMove()
 		&& !target.ReCast
 		&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back

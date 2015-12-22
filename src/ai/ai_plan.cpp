@@ -205,7 +205,10 @@ int AiFindWall(AiForce *force)
 		force->State = AiForceAttackingState_Waiting;
 		for (unsigned int i = 0; i < force->Units.size(); ++i) {
 			CUnit &aiunit = *force->Units[i];
-			if (aiunit.Type->CanAttack) {
+			//Wyrmgus start
+//			if (aiunit.Type->CanAttack) {
+			if (aiunit.CanAttack()) {
+			//Wyrmgus end
 				CommandAttack(aiunit, wallPos, NULL, FlushCommands);
 			} else {
 				CommandMove(aiunit, wallPos, FlushCommands);

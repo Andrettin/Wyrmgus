@@ -287,7 +287,10 @@ enum {
 
 				if (dest.NewOrder == NULL
 					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
-					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
+					//Wyrmgus start
+//					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
+					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack())
+					//Wyrmgus end
 					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
 					this->Finished = true;
 					return ;
@@ -328,7 +331,10 @@ enum {
 	// Attack any enemy in reaction range.
 	// If don't set the goal, the unit can than choose a
 	//  better goal if moving nearer to enemy.
-	if (unit.Type->CanAttack
+	//Wyrmgus start
+//	if (unit.Type->CanAttack
+	if (unit.CanAttack()
+	//Wyrmgus end
 		&& (!goal || goal->CurrentAction() == UnitActionAttack || goal->CurrentAction() == UnitActionStill)) {
 		CUnit *target = AttackUnitsInReactRange(unit);
 		if (target) {

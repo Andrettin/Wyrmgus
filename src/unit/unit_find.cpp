@@ -1264,8 +1264,9 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
 */
 CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred)
 {
-	Assert(unit.Type->CanAttack);
 	//Wyrmgus start
+//	Assert(unit.Type->CanAttack);
+	Assert(unit.CanAttack());
 //	return AttackUnitsInDistance(unit, unit.Stats->Variables[ATTACKRANGE_INDEX].Max, pred);
 	return AttackUnitsInDistance(unit, unit.GetModifiedVariable(ATTACKRANGE_INDEX), pred);
 	//Wyrmgus end
@@ -1285,8 +1286,9 @@ CUnit *AttackUnitsInRange(const CUnit &unit)
 */
 CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred)
 {
-	Assert(unit.Type->CanAttack);
 	//Wyrmgus start
+//	Assert(unit.Type->CanAttack);
+	Assert(unit.CanAttack());
 //	const int range = unit.Player->Type == PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
 	const int range = unit.CurrentSightRange;
 	//Wyrmgus end

@@ -155,7 +155,10 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 */
 /* virtual */ void COrder::OnAnimationAttack(CUnit &unit)
 {
-	if (unit.Type->CanAttack == false) {
+	//Wyrmgus start
+//	if (unit.Type->CanAttack == false) {
+	if (unit.CanAttack() == false) {
+	//Wyrmgus end
 		return;
 	}
 	CUnit *goal = AttackUnitsInRange(unit);

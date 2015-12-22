@@ -79,7 +79,10 @@ public:
 
 	bool operator()(const CUnit *const unit) const
 	{
-		if (unit->Type->CanAttack == false) {
+		//Wyrmgus start
+//		if (unit->Type->CanAttack == false) {
+		if (unit->CanAttack() == false) {
+		//Wyrmgus end
 			return *enemy == NULL;
 		}
 		if (FIND_TYPE == AIATTACK_RANGE) {
@@ -388,7 +391,10 @@ void AiForce::Attack(const Vec2i &pos)
 	bool isNaval = false;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
-		if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
+		//Wyrmgus start
+//		if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
+		if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack()) {
+		//Wyrmgus end
 			isNaval = true;
 			break;
 		}
@@ -396,7 +402,10 @@ void AiForce::Attack(const Vec2i &pos)
 	bool isTransporter = false;
 	for (size_t i = 0; i != this->Units.size(); ++i) {
 		CUnit *const unit = this->Units[i];
-		if (unit->Type->CanTransport() && unit->IsAgressive() == false) {
+		//Wyrmgus start
+//		if (unit->Type->CanTransport() && unit->IsAgressive() == false) {
+		if (unit->Type->CanTransport()) {
+		//Wyrmgus end
 			isTransporter = true;
 			break;
 		}
@@ -861,7 +870,10 @@ void AiForce::Update()
 	for (unsigned int i = 0; i < Size(); ++i) {
 		CUnit *aiunit = Units[i];
 
-		if (aiunit->Type->CanAttack) {
+		//Wyrmgus start
+//		if (aiunit->Type->CanAttack) {
+		if (aiunit->CanAttack()) {
+		//Wyrmgus end
 			Attacking = true;
 			break;
 		}
@@ -1005,7 +1017,10 @@ void AiForce::Update()
 		bool isNaval = false;
 		for (size_t i = 0; i != this->Units.size(); ++i) {
 			CUnit *const unit = this->Units[i];
-			if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
+			//Wyrmgus start
+//			if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
+			if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack()) {
+			//Wyrmgus end
 				isNaval = true;
 				break;
 			}
@@ -1109,7 +1124,10 @@ void AiForceManager::Update()
 							const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
 							unit->Wait = delay;
-							if (unit->Type->CanAttack) {
+							//Wyrmgus start
+//							if (unit->Type->CanAttack) {
+							if (unit->CanAttack()) {
+							//Wyrmgus end
 								CommandAttack(*unit, force.GoalPos, NULL, FlushCommands);
 							} else {
 								CommandMove(*unit, force.GoalPos, FlushCommands);

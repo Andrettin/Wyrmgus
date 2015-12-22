@@ -876,7 +876,10 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 				Video.DrawCircleClip(ColorGreen, center.x, center.y, radius - 1);
 			}
 		}
-		if (type.CanAttack) {
+		//Wyrmgus start
+//		if (type.CanAttack) {
+		if (unit.CanAttack()) {
+		//Wyrmgus end
 			if (Preference.ShowReactionRange) {
 				//Wyrmgus start
 //				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;

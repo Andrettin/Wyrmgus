@@ -1423,7 +1423,10 @@ static int SendAttack(const Vec2i &tilePos)
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
 
-		if (unit.Type->CanAttack) {
+		//Wyrmgus start
+//		if (unit.Type->CanAttack) {
+		if (unit.CanAttack()) {
+		//Wyrmgus end
 			if (!dest || (dest != &unit && CanTarget(*unit.Type, *dest->Type))) {
 				if (dest) {
 					dest->Blink = 4;
@@ -1453,7 +1456,10 @@ static int SendAttackGround(const Vec2i &tilePos)
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
-		if (unit.Type->CanAttack) {
+		//Wyrmgus start
+//		if (unit.Type->CanAttack) {
+		if (unit.CanAttack()) {
+		//Wyrmgus end
 			SendCommandAttackGround(unit, tilePos, flush);
 			ret = 1;
 		} else {

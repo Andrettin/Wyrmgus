@@ -488,7 +488,10 @@ bool AutoRepair(CUnit &unit)
 
 bool COrder_Still::AutoAttackStand(CUnit &unit)
 {
-	if (unit.Type->CanAttack == false) {
+	//Wyrmgus start
+//	if (unit.Type->CanAttack == false) {
+	if (unit.CanAttack() == false) {
+	//Wyrmgus end
 		return false;
 	}
 	// Removed units can only attack in AttackRange, from bunker
@@ -544,7 +547,10 @@ bool COrder_Still::AutoCastStand(CUnit &unit)
 */
 bool AutoAttack(CUnit &unit)
 {
-	if (unit.Type->CanAttack == false) {
+	//Wyrmgus start
+//	if (unit.Type->CanAttack == false) {
+	if (unit.CanAttack() == false) {
+	//Wyrmgus end
 		return false;
 	}
 	// Normal units react in reaction range.
