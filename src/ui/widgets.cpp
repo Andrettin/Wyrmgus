@@ -2148,7 +2148,9 @@ void ImageListBox::draw(gcn::Graphics *graphics)
 	int i, fontHeight;
 	int y = 0;
 	CGraphic *img = itemImage;
-	img->Resize(getWidth(), img->getHeight());
+	//Wyrmgus start
+//	img->Resize(getWidth(), img->getHeight());
+	//Wyrmgus end
 
 	fontHeight = std::max<int>(getFont()->getHeight(), img->getHeight());
 
@@ -2921,10 +2923,14 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 			1, (h - getFont()->getHeight()) / 2);
 	}
 
+	//Wyrmgus start
+	/*
 	if (hasFocus())
 	{
 		graphics->drawRectangle(gcn::Rectangle(0, 0, getWidth() - h, h));
 	}
+	*/
+	//Wyrmgus end
 
 	drawButton(graphics);
 
@@ -2936,10 +2942,14 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 
 		// Draw two lines separating the ListBox with se selected
 		// element view.
+		//Wyrmgus start
+		/*
 		graphics->setColor(highlightColor);
 		graphics->drawLine(0, h, getWidth(), h);
 		graphics->setColor(shadowColor);
 		graphics->drawLine(0, h + 1,getWidth(),h + 1);
+		*/
+		//Wyrmgus end
 	}
 }
 
@@ -2978,7 +2988,10 @@ void ImageDropDownWidget::drawButton(gcn::Graphics *graphics)
 	{
 		h = getHeight();
 	}
-	int x = getWidth() - h;
+	//Wyrmgus start
+//	int x = getWidth() - h;
+	int x = getWidth() - (h - 1);
+	//Wyrmgus end
 	int y = 0;
 
 	CGraphic *img = NULL;
