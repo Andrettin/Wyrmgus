@@ -393,7 +393,7 @@ void AiForce::Attack(const Vec2i &pos)
 		CUnit *const unit = this->Units[i];
 		//Wyrmgus start
 //		if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
-		if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack()) {
+		if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack() && !unit->Type->CanTransport()) {
 		//Wyrmgus end
 			isNaval = true;
 			break;
@@ -1019,7 +1019,7 @@ void AiForce::Update()
 			CUnit *const unit = this->Units[i];
 			//Wyrmgus start
 //			if (unit->Type->UnitType == UnitTypeNaval && unit->Type->CanAttack) {
-			if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack()) {
+			if (unit->Type->UnitType == UnitTypeNaval && unit->CanAttack() && !unit->Type->CanTransport()) {
 			//Wyrmgus end
 				isNaval = true;
 				break;
