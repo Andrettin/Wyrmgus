@@ -243,14 +243,8 @@ extern CSound *SoundForName(const std::string &sound_name);
 extern CSound *MakeSound(const std::string &sound_name, const std::vector<std::string> &files);
 /// Make a sound group bound to identifier
 extern CSound *MakeSoundGroup(const std::string &name, CSound *first, CSound *second);
-//Wyrmgus start
-//#ifdef DEBUG
-//Wyrmgus end
-extern void FreeSounds();
-//Wyrmgus start
-//#endif
-//Wyrmgus end
 
+extern void FreeSounds();
 
 // script_sound.cpp
 

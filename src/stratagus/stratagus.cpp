@@ -207,13 +207,7 @@ extern void beos_init(int argc, char **argv);
 #include "widgets.h"
 #include "util.h"
 
-//Wyrmgus start
-//#ifdef DEBUG
-//Wyrmgus end
 #include "missile.h" //for FreeBurningBuildingFrames
-//Wyrmgus start
-//#endif
-//Wyrmgus end
 
 #ifdef USE_STACKTRACE
 #include <stdexcept>
@@ -417,9 +411,6 @@ void Exit(int err)
 	NetworkQuitGame();
 
 	ExitNetwork1();
-//Wyrmgus start
-//#ifdef DEBUG
-//Wyrmgus end
 	CleanModules();
 	FreeBurningBuildingFrames();
 	FreeSounds();
@@ -434,9 +425,6 @@ void Exit(int err)
 	lua_settop(Lua, 0);
 	lua_close(Lua);
 	DeInitVideo();
-//Wyrmgus start
-//#endif
-//Wyrmgus end
 
 	fprintf(stdout, "%s", _("Thanks for playing Stratagus.\n"));
 	exit(err);

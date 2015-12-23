@@ -1824,21 +1824,18 @@ void NetworkGamePrepareGameSettings()
 		}
 	}
 	for (int i = 0; i < h; i++) {
+		int v = ServerSetupState.Race[num[i]];
+		//Wyrmgus start
+//		if (v != 0) {
+		if (v != -1) {
+		//Wyrmgus end
+			GameSettings.Presets[num[i]].Race = v;
+		} else {
+			GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
+		}
 		switch (ServerSetupState.CompOpt[num[i]]) {
 			case 0: {
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
-				int v = ServerSetupState.Race[num[i]];
-				//Wyrmgus start
-//				if (v != 0) {
-				if (v != -1) { //fix civilization selection for multiplayer
-				//Wyrmgus end
-					//Wyrmgus start
-//					GameSettings.Presets[num[i]].Race = v - 1;
-					GameSettings.Presets[num[i]].Race = v;
-					//Wyrmgus end
-				} else {
-					GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
-				}
 				break;
 			}
 			case 1:

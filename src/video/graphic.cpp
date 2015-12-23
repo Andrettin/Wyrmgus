@@ -2322,9 +2322,6 @@ void CGraphic::MakeShadow()
 	}
 }
 
-//Wyrmgus start
-//#ifdef DEBUG
-//Wyrmgus end
 void FreeGraphics()
 {
 	std::map<std::string, CGraphic *>::iterator i;
@@ -2333,9 +2330,6 @@ void FreeGraphics()
 		CGraphic::Free((*i).second);
 	}
 }
-//Wyrmgus start
-//#endif
-//Wyrmgus end
 
 CFiller::bits_map::~bits_map()
 {
