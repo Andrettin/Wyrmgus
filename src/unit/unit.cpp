@@ -935,10 +935,17 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	}
 	
 	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
-		// remove the upgrade modifiers from weapon technologies
+		// remove the upgrade modifiers from weapon technologies or from abilities which require the base weapon class but aren't compatible with this weapon's class; and apply upgrade modifiers from abilities which require this weapon's class
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
+			if (
+				(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X')
+				|| (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->Type->WeaponClasses[0]) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item_class) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end())
+			) {
 				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			} else if (
+				AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->Type->WeaponClasses[0]) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item_class) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end()
+			) {
+				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
 	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {
@@ -1078,10 +1085,17 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	EquippedItems[item_slot].erase(std::remove(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), &item), EquippedItems[item_slot].end());
 	
 	if (item_slot == WeaponItemSlot && EquippedItems[item_slot].size() == 0) {
-		// restore the upgrade modifiers from weapon technologies
+		// restore the upgrade modifiers from weapon technologies, and apply ability effects that are weapon class-specific accordingly
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			if (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X') {
+			if (
+				(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X')
+				|| (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->Type->WeaponClasses[0]) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item_class) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end())
+			) {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			} else if (
+				AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->Type->WeaponClasses[0]) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item_class) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end()
+			) {
+				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
 	} else if (item_slot == ShieldItemSlot && EquippedItems[item_slot].size() == 0) {

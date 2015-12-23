@@ -171,6 +171,7 @@ CUpgrade::~CUpgrade()
 {
 	//Wyrmgus start
 	RequiredAbilities.clear();
+	WeaponClasses.clear();
 	//Wyrmgus end
 }
 
@@ -1728,11 +1729,22 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	unit.IndividualUpgrades[id] = true;
 
+	//Wyrmgus start
+	/*
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
 			ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
 		}
 	}
+	*/
+	if (!(upgrade->Ability && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (UpgradeModifiers[z]->UpgradeId == id) {
+				ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
+			}
+		}
+	}
+	//Wyrmgus end
 
 	//
 	//  Upgrades could change the buttons displayed.
@@ -1748,11 +1760,17 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 	unit.Player->UpgradeTimers.Upgrades[id] = 0;
 	unit.IndividualUpgrades[id] = false;
 
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (UpgradeModifiers[z]->UpgradeId == id) {
-			RemoveIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
+	//Wyrmgus start
+	/*
+	*/
+	if (!(upgrade->Ability && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (UpgradeModifiers[z]->UpgradeId == id) {
+				RemoveIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
+			}
 		}
 	}
+	//Wyrmgus end
 
 	//
 	//  Upgrades could change the buttons displayed.
@@ -1869,6 +1887,12 @@ void AddUpgradeRequiredAbility(std::string upgrade_ident, std::string required_a
 	CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
 	CUpgrade *required_ability = CUpgrade::Get(required_ability_ident);
 	upgrade->RequiredAbilities.push_back(required_ability);
+}
+
+void AddUpgradeWeaponClass(std::string upgrade_ident, int weapon_class)
+{
+	CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+	upgrade->WeaponClasses.push_back(weapon_class);
 }
 
 std::string GetUpgradeEffectsString(std::string upgrade_ident)
