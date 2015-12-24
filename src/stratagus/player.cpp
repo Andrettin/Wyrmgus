@@ -1777,35 +1777,19 @@ void GraphicPlayerPixels(int player, const CGraphic &sprite)
 	int time_of_day_green = 0;
 	int time_of_day_blue = 0;
 	
-	if (sprite.TimeOfDay == 1) { // dawn
+	if (sprite.TimeOfDay == DawnTimeOfDay) {
 		time_of_day_red = -20;
 		time_of_day_green = -20;
 		time_of_day_blue = 0;
-	} else if (sprite.TimeOfDay == 2) { // morning
+	} else if (sprite.TimeOfDay == MorningTimeOfDay || sprite.TimeOfDay == MiddayTimeOfDay || sprite.TimeOfDay == AfternoonTimeOfDay) {
 		time_of_day_red = 0;
 		time_of_day_green = 0;
 		time_of_day_blue = 0;
-	} else if (sprite.TimeOfDay == 3) { // midday
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (sprite.TimeOfDay == 4) { // afternoon
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (sprite.TimeOfDay == 5) { // dusk
+	} else if (sprite.TimeOfDay == DuskTimeOfDay) {
 		time_of_day_red = 0;
 		time_of_day_green = -20;
 		time_of_day_blue = -20;
-	} else if (sprite.TimeOfDay == 6) { // first watch
-		time_of_day_red = -45;
-		time_of_day_green = -35;
-		time_of_day_blue = -10;
-	} else if (sprite.TimeOfDay == 7) { // midnight
-		time_of_day_red = -45;
-		time_of_day_green = -35;
-		time_of_day_blue = -10;
-	} else if (sprite.TimeOfDay == 8) { // second watch
+	} else if (sprite.TimeOfDay == FirstWatchTimeOfDay || sprite.TimeOfDay == MidnightTimeOfDay || sprite.TimeOfDay == SecondWatchTimeOfDay) {
 		time_of_day_red = -45;
 		time_of_day_green = -35;
 		time_of_day_blue = -10;

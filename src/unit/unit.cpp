@@ -1739,9 +1739,9 @@ void UpdateUnitSightRange(CUnit &unit)
 	// FIXME : these values must be configurable.
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
-	if (GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+	if (GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 		unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
-	} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+	} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 		unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 	}
 	unit_sight_range = std::max<int>(1, unit_sight_range);

@@ -215,6 +215,20 @@ enum Directions {
 	
 	MaxDirections
 };
+
+enum TimesOfDay {
+	NoTimeOfDay,
+	DawnTimeOfDay,
+	MorningTimeOfDay,
+	MiddayTimeOfDay,
+	AfternoonTimeOfDay,
+	DuskTimeOfDay,
+	FirstWatchTimeOfDay,
+	MidnightTimeOfDay,
+	SecondWatchTimeOfDay,
+	
+	MaxTimesOfDay
+};
 //Wyrmgus end
 
 //@}

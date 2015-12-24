@@ -334,19 +334,19 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_d
 	if (UseOpenGL) {
 		//Wyrmgus start
 //		DoDrawFrameClip(Textures, frame, x, y);
-		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 			DoDrawFrameClip(Textures, frame, x, y);
-		} else if (GameTimeOfDay == 1) {
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
 			if (!TexturesDawn) {
 				MakeTexture(this, GameTimeOfDay);
 			}
 			DoDrawFrameClip(TexturesDawn, frame, x, y);
-		} else if (GameTimeOfDay == 5) {
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
 			if (!TexturesDusk) {
 				MakeTexture(this, GameTimeOfDay);
 			}
 			DoDrawFrameClip(TexturesDusk, frame, x, y);
-		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 			if (!TexturesNight) {
 				MakeTexture(this, GameTimeOfDay);
 			}
@@ -444,22 +444,22 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 		}
 		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
 		*/
-		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player);
 			}
 			DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
-		} else if (GameTimeOfDay == 1) {
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
 			DoDrawFrameClip(PlayerColorTexturesDawn[player], frame, x, y);
-		} else if (GameTimeOfDay == 5) {
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
 			DoDrawFrameClip(PlayerColorTexturesDusk[player], frame, x, y);
-		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
@@ -497,19 +497,19 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 			MakePlayerColorTexture(this, player);
 		}
 		*/
-		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player);
 			}
-		} else if (GameTimeOfDay == 1) {
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
-		} else if (GameTimeOfDay == 5) {
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
-		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
@@ -519,13 +519,13 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 		glColor4ub(255, 255, 255, alpha);
 		//Wyrmgus start
 //		DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
-		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 			DoDrawFrameClip(PlayerColorTextures[player], frame, x, y);
-		} else if (GameTimeOfDay == 1) {
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
 			DoDrawFrameClip(PlayerColorTexturesDawn[player], frame, x, y);
-		} else if (GameTimeOfDay == 5) {
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
 			DoDrawFrameClip(PlayerColorTexturesDusk[player], frame, x, y);
-		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 			DoDrawFrameClip(PlayerColorTexturesNight[player], frame, x, y);
 		}
 		//Wyrmgus end
@@ -565,19 +565,19 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 			MakePlayerColorTexture(this, player);
 		}
 		*/
-		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player);
 			}
-		} else if (GameTimeOfDay == 1) {
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
-		} else if (GameTimeOfDay == 5) {
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
-		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
@@ -587,13 +587,13 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 		glColor4ub(255, 255, 255, alpha);
 		//Wyrmgus start
 //		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 			DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		} else if (GameTimeOfDay == 1) {
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
 			DoDrawFrameClipX(PlayerColorTexturesDawn[player], frame, x, y);
-		} else if (GameTimeOfDay == 5) {
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
 			DoDrawFrameClipX(PlayerColorTexturesDusk[player], frame, x, y);
-		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 			DoDrawFrameClipX(PlayerColorTexturesNight[player], frame, x, y);
 		}
 		//Wyrmgus end
@@ -679,19 +679,19 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_
 	if (UseOpenGL) {
 		//Wyrmgus start
 		//DoDrawFrameClipX(Textures, frame, x, y);
-		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 			DoDrawFrameClipX(Textures, frame, x, y);
-		} else if (GameTimeOfDay == 1) {
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
 			if (!TexturesDawn) {
 				MakeTexture(this, GameTimeOfDay);
 			}
 			DoDrawFrameClipX(TexturesDawn, frame, x, y);
-		} else if (GameTimeOfDay == 5) {
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
 			if (!TexturesDusk) {
 				MakeTexture(this, GameTimeOfDay);
 			}
 			DoDrawFrameClipX(TexturesDusk, frame, x, y);
-		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 			if (!TexturesNight) {
 				MakeTexture(this, GameTimeOfDay);
 			}
@@ -811,22 +811,22 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 		}
 		DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
 		*/
-		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == 2 || GameTimeOfDay == 3 || GameTimeOfDay == 4) {
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
 			if (!PlayerColorTextures[player]) {
 				MakePlayerColorTexture(this, player);
 			}
 			DoDrawFrameClipX(PlayerColorTextures[player], frame, x, y);
-		} else if (GameTimeOfDay == 1) {
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
 			if (!PlayerColorTexturesDawn[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
 			DoDrawFrameClipX(PlayerColorTexturesDawn[player], frame, x, y);
-		} else if (GameTimeOfDay == 5) {
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
 			if (!PlayerColorTexturesDusk[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}
 			DoDrawFrameClipX(PlayerColorTexturesDusk[player], frame, x, y);
-		} else if (GameTimeOfDay == 6 || GameTimeOfDay == 7 || GameTimeOfDay == 8) {
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
 			if (!PlayerColorTexturesNight[player]) {
 				MakePlayerColorTexture(this, player, GameTimeOfDay);
 			}

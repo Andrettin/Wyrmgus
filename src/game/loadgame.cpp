@@ -137,7 +137,7 @@ void InitModules()
 	GameCycle = 0;
 	FastForwardCycle = 0;
 	//Wyrmgus start
-	GameTimeOfDay = 0;
+	GameTimeOfDay = NoTimeOfDay;
 	//Wyrmgus end
 	SyncHash = 0;
 
