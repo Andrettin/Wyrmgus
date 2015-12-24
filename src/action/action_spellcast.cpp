@@ -391,7 +391,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										//Wyrmgus start
 //										_("%s: can't cast spell: %s"),
-										_("%s cannot use the %s ability on an invalid target."),
+										_("That is an invalid target for %s to use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
 										unit.GetMessageName().c_str(), spell.Name.c_str());
 										//Wyrmgus end
