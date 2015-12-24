@@ -15,7 +15,7 @@ if(TOLUA++_INCLUDE_DIR AND TOLUA++_LIBRARY AND TOLUA++_APP)
 	set(TOLUA++_FOUND true)
 else()
 	find_path(TOLUA++_INCLUDE_DIR tolua++.h)
-	find_library(TOLUA++_LIBRARY NAMES tolua++ tolua++5.1 toluapp)
+	find_library(TOLUA++_LIBRARY NAMES tolua++ tolua++5.1 libtoluapp-5.1 toluapp)
 	find_program(TOLUA++_APP NAMES tolua++ tolua++5.1 toluapp)
 
 	if(TOLUA++_INCLUDE_DIR AND TOLUA++_LIBRARY AND TOLUA++_APP)
