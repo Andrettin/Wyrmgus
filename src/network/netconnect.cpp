@@ -1824,15 +1824,16 @@ void NetworkGamePrepareGameSettings()
 		}
 	}
 	for (int i = 0; i < h; i++) {
-		int v = ServerSetupState.Race[num[i]];
+		GameSettings.Presets[num[i]].Race = ServerSetupState.Race[num[i]];
 		//Wyrmgus start
-//		if (v != 0) {
+//		GameSettings.Presets[num[i]].Race = ServerSetupState.Race[num[i]];
+		int v = ServerSetupState.Race[num[i]];
 		if (v != -1) {
-		//Wyrmgus end
 			GameSettings.Presets[num[i]].Race = v;
 		} else {
 			GameSettings.Presets[num[i]].Race = SettingsPresetMapDefault;
 		}
+		//Wyrmgus end
 		switch (ServerSetupState.CompOpt[num[i]]) {
 			case 0: {
 				GameSettings.Presets[num[i]].Type = PlayerPerson;
