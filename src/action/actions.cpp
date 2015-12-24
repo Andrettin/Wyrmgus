@@ -317,7 +317,10 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
+	//Wyrmgus start
+//	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX};
+	//Wyrmgus end
 	//  decrease spells effects time.
 	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
 		unit.Variable[SpellEffects[i]].Increase = -1;
@@ -368,7 +371,10 @@ static void HandleBuffsEachSecond(CUnit &unit)
 	// User defined variables
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
+			//Wyrmgus start
+//			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX) {
+			//Wyrmgus end
 			continue;
 		}
 		if (i == HP_INDEX && HandleBurnAndPoison(unit)) {

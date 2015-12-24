@@ -307,7 +307,10 @@ void CServerSetup::Clear()
 	Opponents = 0;
 	memset(CompOpt, 0, sizeof(CompOpt));
 	memset(Ready, 0, sizeof(Ready));
-	memset(Race, 0, sizeof(Race));
+	//Wyrmgus start
+//	memset(Race, 0, sizeof(Race));
+	memset(Race, -1, sizeof(Race));
+	//Wyrmgus end
 }
 
 bool CServerSetup::operator == (const CServerSetup &rhs) const
