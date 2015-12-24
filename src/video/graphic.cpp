@@ -2078,7 +2078,7 @@ void CGraphic::SetOriginalSize()
 */
 void CGraphic::SetTimeOfDay(int time)
 {
-	Assert(Surface); // can't resize before it's been loaded
+	Assert(Surface);
 
 	if (TimeOfDay == time) {
 		return;
