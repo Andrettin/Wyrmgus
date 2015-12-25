@@ -56,7 +56,10 @@
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
-			draw = button.Hint;
+			//Wyrmgus start
+//			draw = button.Hint;
+			draw = button.GetHint();
+			//Wyrmgus end
 			break;
 		case PopupButtonInfo_Description:
 			draw = button.Description;
@@ -86,7 +89,10 @@
 
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
-			draw = button.Hint;
+			//Wyrmgus start
+//			draw = button.Hint;
+			draw = button.GetHint();
+			//Wyrmgus end
 			break;
 		case PopupButtonInfo_Description:
 			draw = button.Description;
@@ -112,7 +118,10 @@
 	std::string draw("");
 	switch (this->InfoType) {
 		case PopupButtonInfo_Hint:
-			draw = button.Hint;
+			//Wyrmgus start
+//			draw = button.Hint;
+			draw = button.GetHint();
+			//Wyrmgus end
 			break;
 		case PopupButtonInfo_Description:
 			draw = button.Description;
@@ -305,7 +314,10 @@
 			popupWidth += font.Width(spell->ManaCost);
 			popupWidth = std::max<int>(popupWidth, font.Width(spell->Name) + 10);
 		} else {
-			popupWidth = font.Width(button.Hint) + 10;
+			//Wyrmgus start
+//			popupWidth = font.Width(button.Hint) + 10;
+			popupWidth = font.Width(button.GetHint()) + 10;
+			//Wyrmgus end
 		}
 		popupWidth = std::max<int>(popupWidth, 100);
 	}

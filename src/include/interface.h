@@ -97,6 +97,11 @@ class ButtonAction
 public:
 	ButtonAction() : Pos(0), Level(0), AlwaysShow(false), Action(ButtonMove), Value(0), Payload(NULL),
 		Allowed(NULL), Key(0) {}
+		
+	//Wyrmgus start
+	int GetKey() const;
+	std::string GetHint() const;
+	//Wyrmgus end
 
 	int Pos;          /// button position in the grid
 	int Level;        /// requires button level

@@ -369,7 +369,10 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return true;
 	}
 
-	if (condition->HasHint && button.Hint.empty()) {
+	//Wyrmgus start
+//	if (condition->HasHint && button.Hint.empty()) {
+	if (condition->HasHint && button.GetHint().empty()) {
+	//Wyrmgus end
 		return false;
 	}
 
@@ -776,7 +779,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			CLabel label(font, "white", "red");
 			int *Costs = AllUpgrades[button->Value]->Costs;
 			popupWidth = GetPopupCostsS(font, Costs);
-			popupWidth = std::max<int>(popupWidth, font->Width(button->Hint) + 10);
+			//Wyrmgus start
+//			popupWidth = std::max<int>(popupWidth, font->Width(button->Hint) + 10);
+			popupWidth = std::max<int>(popupWidth, font->Width(button->GetHint()) + 10);
+			//Wyrmgus end
 
 			popupHeight = 40;
 
@@ -791,7 +797,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			Video.DrawRectangle(ColorWhite, x, y, popupWidth, popupHeight);
 
 			// Name
-			label.Draw(x + 5, y + 5, button->Hint);
+			//Wyrmgus start
+//			label.Draw(x + 5, y + 5, button->Hint);
+			label.Draw(x + 5, y + 5, button->GetHint());
+			//Wyrmgus end
 			Video.DrawHLine(ColorWhite, x, y + 15, popupWidth - 1);
 
 			y += 20;
@@ -820,7 +829,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 				popupWidth += font->Width(spell->ManaCost);
 				popupWidth = std::max<int>(popupWidth, font->Width(spell->Name) + 10);
 			} else {
-				popupWidth = font->Width(button->Hint) + 10;
+				//Wyrmgus start
+//				popupWidth = font->Width(button->Hint) + 10;
+				popupWidth = font->Width(button->GetHint()) + 10;
+				//Wyrmgus end
 				popupHeight = font_height + 10;
 			}
 
@@ -853,7 +865,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 				label.Draw(x, y + y_offset, spell->ManaCost);
 			} else {
 				// Only Hint
-				label.Draw(x + 5, y + (popupHeight - font_height) / 2, button->Hint);
+				//Wyrmgus start
+//				label.Draw(x + 5, y + (popupHeight - font_height) / 2, button->Hint);
+				label.Draw(x + 5, y + (popupHeight - font_height) / 2, button->GetHint());
+				//Wyrmgus end
 			}
 		}
 		break;
@@ -868,7 +883,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 
 
 		default:
-			popupWidth = font->Width(button->Hint) + 10;
+			//Wyrmgus start
+//			popupWidth = font->Width(button->Hint) + 10;
+			popupWidth = font->Width(button->GetHint()) + 10;
+			//Wyrmgus end
 			popupHeight = font_height + 10;//19;
 			x = std::min<int>(uibutton->X, Video.Width - 1 - popupWidth);
 			y = uibutton->Y - popupHeight - 10;
@@ -879,7 +897,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 
 			// Hint
 			CLabel(font, "white", "red").Draw(x + 5,
-											  y + (popupHeight - font_height) / 2, button->Hint);
+											  //Wyrmgus start
+//											  y + (popupHeight - font_height) / 2, button->Hint);
+											  y + (popupHeight - font_height) / 2, button->GetHint());
+											  //Wyrmgus end
 			break;
 
 	}
@@ -1070,13 +1091,19 @@ void CButtonPanel::Draw()
 		//  Tutorial show command key in icons
 		//
 		if (ShowCommandKey) {
-			if (buttons[i].Key == gcn::Key::K_ESCAPE) {
+			//Wyrmgus start
+//			if (buttons[i].Key == gcn::Key::K_ESCAPE) {
+			if (buttons[i].GetKey() == gcn::Key::K_ESCAPE) {
+			//Wyrmgus end
 				//Wyrmgus start
 //				strcpy_s(buf, sizeof(buf), "ESC");
 				strcpy_s(buf, sizeof(buf), "Esc");
 				//Wyrmgus end
 			} else {
-				buf[0] = toupper(buttons[i].Key);
+				//Wyrmgus start
+//				buf[0] = toupper(buttons[i].Key);
+				buf[0] = toupper(buttons[i].GetKey());
+				//Wyrmgus end
 				buf[1] = '\0';
 			}
 		} else {
@@ -1174,7 +1201,10 @@ void CButtonPanel::Draw()
 */
 void UpdateStatusLineForButton(const ButtonAction &button)
 {
-	UI.StatusLine.Set(button.Hint);
+	//Wyrmgus start
+//	UI.StatusLine.Set(button.Hint);
+	UI.StatusLine.Set(button.GetHint());
+	//Wyrmgus end
 	switch (button.Action) {
 		case ButtonBuild:
 		case ButtonTrain:
@@ -1901,7 +1931,10 @@ int CButtonPanel::DoKey(int key)
 		}
 
 		for (int i = 0; i < (int)UI.ButtonPanel.Buttons.size(); ++i) {
-			if (CurrentButtons[i].Pos != -1 && key == CurrentButtons[i].Key) {
+			//Wyrmgus start
+//			if (CurrentButtons[i].Pos != -1 && key == CurrentButtons[i].Key) {
+			if (CurrentButtons[i].Pos != -1 && key == CurrentButtons[i].GetKey()) {
+			//Wyrmgus end
 				UI.ButtonPanel.DoClicked(i);
 				return 1;
 			}

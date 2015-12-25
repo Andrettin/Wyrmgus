@@ -513,7 +513,7 @@ public:
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
 		//Wyrmgus start
-		PlayerColorCircle(false),
+		PlayerColorCircle(false), ButtonHotKeysByPosition(false),
 		ShowPathlines(false),
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5),
@@ -535,6 +535,7 @@ public:
 	bool NoStatusLineTooltips;	/// Don't show messages on status line
 	//Wyrmgus start
 	bool PlayerColorCircle;		/// Show a player color circle below each unit
+	bool ButtonHotKeysByPosition;	/// If active, button hotkeys depend on position (i.e. the first button in the panel always has "Q" as its hotkey
 	bool ShowPathlines;			/// Show order pathlines
 	//Wyrmgus end
 

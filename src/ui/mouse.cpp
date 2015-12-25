@@ -2660,10 +2660,16 @@ void DrawPieMenu()
 			if (UI.ButtonPanel.ShowCommandKey) {
 				const char *text;
 
-				if (buttons[i].Key == 27) {
+				//Wyrmgus start
+//				if (buttons[i].Key == 27) {
+				if (buttons[i].GetKey() == 27) {
+				//Wyrmgus end
 					text = "ESC";
 				} else {
-					buf[0] = toupper(buttons[i].Key);
+					//Wyrmgus start
+//					buf[0] = toupper(buttons[i].Key);
+					buf[0] = toupper(buttons[i].GetKey());
+					//Wyrmgus end
 					text = (const char *)buf;
 				}
 				label.DrawClip(x + 4, y + 4, text);

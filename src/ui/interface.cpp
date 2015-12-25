@@ -99,6 +99,70 @@ CUnit *LastLevelUpUnit;				 /// Last called level up unit
 --  Functions
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+int ButtonAction::GetKey() const
+{
+	if (this->Key == gcn::Key::K_ESCAPE) {
+		return this->Key;
+	}
+	
+	if (Preference.ButtonHotKeysByPosition && this->Key != 0) {
+		if (this->Pos == 1) {
+			return 'q';
+		} else if (this->Pos == 2) {
+			return 'w';
+		} else if (this->Pos == 3) {
+			return 'e';
+		} else if (this->Pos == 4) {
+			return 'r';
+		} else if (this->Pos == 5) {
+			return 't';
+		} else if (this->Pos == 6) {
+			return 'y';
+		} else if (this->Pos == 7) {
+			return 'u';
+		} else if (this->Pos == 8) {
+			return 'i';
+		} else if (this->Pos == 9) {
+			return 'o';
+		} else if (this->Pos == 10) {
+			return 'p';
+		} else if (this->Pos == 11) {
+			return 'a';
+		} else if (this->Pos == 12) {
+			return 's';
+		} else if (this->Pos == 13) {
+			return 'd';
+		} else if (this->Pos == 14) {
+			return 'f';
+		} else if (this->Pos == 15) {
+			return 'g';
+		} else if (this->Pos == 16) {
+			return 'h';
+		}
+	}
+	return this->Key;
+}
+
+std::string ButtonAction::GetHint() const
+{
+	if (this->Key == gcn::Key::K_ESCAPE) {
+		return this->Hint;
+	}
+	
+	if (Preference.ButtonHotKeysByPosition && this->Key != 0 && !this->Hint.empty()) {
+		std::string hint = this->Hint;
+		hint = FindAndReplaceString(hint, "~!", "");
+		hint += " (~!";
+		hint += CapitalizeString(SdlKey2Str(this->GetKey()));
+		hint += ")";
+		return hint;
+	}
+	
+	return this->Hint;
+}
+//Wyrmgus end
+
 /**
 **  Show input.
 */
