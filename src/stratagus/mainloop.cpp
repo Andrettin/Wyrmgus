@@ -113,8 +113,12 @@ void DoScrollArea(int state, bool fast, bool isKeyboard)
 	vp = UI.SelectedViewport;
 
 	if (fast) {
-		stepx = (int)(speed * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND / 4);
-		stepy = (int)(speed * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND / 4);
+		//Wyrmgus start
+//		stepx = (int)(speed * vp->MapWidth / 2 * PixelTileSize.x * FRAMES_PER_SECOND / 4);
+//		stepy = (int)(speed * vp->MapHeight / 2 * PixelTileSize.y * FRAMES_PER_SECOND / 4);
+		stepx = (int)(speed * PixelTileSize.x * FRAMES_PER_SECOND / 4 * 4);
+		stepy = (int)(speed * PixelTileSize.y * FRAMES_PER_SECOND / 4 * 4);
+		//Wyrmgus end
 	} else {// dynamic: let these variables increase up to fast..
 		// FIXME: pixels per second should be configurable
 		stepx = (int)(speed * PixelTileSize.x * FRAMES_PER_SECOND / 4);
