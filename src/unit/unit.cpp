@@ -1347,7 +1347,10 @@ void CUnit::ClearAction()
 
 bool CUnit::IsIdle() const
 {
-	return Orders.size() == 1 && CurrentAction() == UnitActionStill;
+	//Wyrmgus start
+//	return Orders.size() == 1 && CurrentAction() == UnitActionStill;
+	return Orders.size() == 1 && CurrentAction() == UnitActionStill && this->Variable[STUN_INDEX].Value == 0;
+	//Wyrmgus end
 }
 
 bool CUnit::IsAlive() const
@@ -4109,6 +4112,8 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 		target.UpdateXPRequired();
 	} else if (var == XP_INDEX) {
 		target.XPChanged();
+	} else if (var == STUN_INDEX && target.Variable[var].Value > 0) { //if unit has become stunned, stop it
+		CommandStopUnit(target);
 	}
 	//Wyrmgus end
 }

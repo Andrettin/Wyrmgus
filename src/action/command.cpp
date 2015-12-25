@@ -87,7 +87,12 @@ static void ReleaseOrders(CUnit &unit)
 		}
 	}
 	unit.Orders.resize(1);
-	unit.Orders[0]->Finished = true;
+	//Wyrmgus start
+//	unit.Orders[0]->Finished = true;
+	if (unit.Variable[STUN_INDEX].Value == 0 || unit.Orders[0]->Action != UnitActionStill) { //if the unit is stunned, don't end its current "still" order
+		unit.Orders[0]->Finished = true;
+	}
+	//Wyrmgus end
 }
 
 /**

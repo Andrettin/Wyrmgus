@@ -34,6 +34,9 @@
 
 #include "spell/spell_adjustvariable.h"
 
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "script.h"
 #include "unit.h"
 
@@ -158,6 +161,8 @@
 			unit->UpdateXPRequired();
 		} else if (i == XP_INDEX) {
 			unit->XPChanged();
+		} else if (i == STUN_INDEX && unit->Variable[i].Value > 0) { //if target has become stunned, stop it
+			CommandStopUnit(*unit);
 		}
 		//Wyrmgus end
 	}

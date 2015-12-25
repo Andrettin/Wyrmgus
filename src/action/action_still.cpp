@@ -592,7 +592,11 @@ bool AutoAttack(CUnit &unit)
 		case SUB_STILL_STANDBY:
 			//Wyrmgus start
 //			UnitShowAnimation(unit, unit.Type->Animations->Still);
-			UnitShowAnimation(unit, unit.GetAnimations()->Still);
+			//Wyrmgus start
+			if (unit.Variable[STUN_INDEX].Value == 0) { //only show the idle animation when still if the unit is not stunned
+				UnitShowAnimation(unit, unit.GetAnimations()->Still);
+			}
+			//Wyrmgus end
 			if (SyncRand(1000) == 0) {
 				PlayUnitSound(unit, VoiceIdle);
 			}
@@ -605,6 +609,11 @@ bool AutoAttack(CUnit &unit)
 	if (unit.Anim.Unbreakable) { // animation can't be aborted here
 		return;
 	}
+	//Wyrmgus start
+	if (unit.Variable[STUN_INDEX].Value > 0) { //if unit is stunned, remain still
+		return;
+	}
+	//Wyrmgus end
 	this->State = SUB_STILL_STANDBY;
 	this->Finished = (this->Action == UnitActionStill);
 	if (this->Action == UnitActionStandGround || unit.Removed || unit.CanMove() == false) {

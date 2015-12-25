@@ -1652,6 +1652,8 @@ static int CclSetUnitVariable(lua_State *l)
 			unit->UpdateXPRequired();
 		} else if (index == XP_INDEX) {
 			unit->XPChanged();
+		} else if (index == STUN_INDEX && unit->Variable[index].Value > 0) { //if unit has become stunned, stop it
+			CommandStopUnit(*unit);
 		}
 		//Wyrmgus end
 	}

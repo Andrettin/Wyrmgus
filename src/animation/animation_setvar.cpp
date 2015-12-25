@@ -38,6 +38,9 @@
 #include "animation/animation_setvar.h"
 
 #include "actions.h"
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "unit.h"
 #include "unit_manager.h"
 
@@ -168,6 +171,8 @@
 		goal->UpdateXPRequired();
 	} else if (index == XP_INDEX) {
 		goal->XPChanged();
+	} else if (index == STUN_INDEX && goal->Variable[index].Value > 0) { //if unit has become stunned, stop it
+		CommandStopUnit(*goal);
 	}
 	//Wyrmgus end
 }
