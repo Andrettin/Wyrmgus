@@ -428,7 +428,9 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 			if (goal != NULL) {
 				if (goal->Variable[EVASION_INDEX].Value > 0) {
 					damage += attacker.Variable[ACCURACY_INDEX].Value;
-					damage -= goal->Variable[EVASION_INDEX].Value;
+					if (goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
+						damage -= goal->Variable[EVASION_INDEX].Value;
+					}
 					
 					if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) { //flanking
 						if (attacker.Direction == goal->Direction) {
@@ -543,7 +545,7 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 	} else {
 		int evasion = 0;
 		if (goal != NULL) {
-			if (goal->Variable[EVASION_INDEX].Value) {
+			if (goal->Variable[EVASION_INDEX].Value && goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
 				evasion = goal->Variable[EVASION_INDEX].Value;
 			}
 			if (goal->Type->BoolFlag[ORGANIC_INDEX].value && !goal->Type->Building && goal->Type->NumDirections == 8) { //flanking
