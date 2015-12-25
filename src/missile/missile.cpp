@@ -1151,6 +1151,10 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 	}
 	
 	//Wyrmgus start
+	if (goal.Type->BoolFlag[ITEM_INDEX].value && splash != 1) { //don't damage items with splash damage
+		return;
+	}
+	
 	if (!missile.Type->AlwaysHits && CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
 		if (splash == 1 && missile.Type->Range <= 1) {
 			return;

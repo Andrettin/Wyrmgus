@@ -1600,7 +1600,10 @@ void AiResourceManager()
 	AiCheckingWork();
 
 	// Look if we can build a farm in advance.
-	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
+	//Wyrmgus start
+//	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply == AiPlayer->Player->Demand) {
+	if (!AiPlayer->NeedSupply && AiPlayer->Player->Supply <= AiPlayer->Player->Demand) {
+	//Wyrmgus end
 		AiRequestSupply();
 	}
 
