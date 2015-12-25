@@ -541,6 +541,14 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 				PlayGameSound(spell.SoundWhenCast.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), spell.SoundWhenCast.Sound->Range) * spell.SoundWhenCast.Sound->VolumePercent / 100);
 				//Wyrmgus end
 			}
+		//Wyrmgus start
+		} else if (caster.Type->MapSound.Hit.Sound) { //if the spell has no sound-when-cast designated, use the unit's hit sound instead (if any)
+			if (spell.Target == TargetSelf) {
+				PlayUnitSound(caster, caster.Type->MapSound.Hit.Sound);
+			} else {
+				PlayGameSound(caster.Type->MapSound.Hit.Sound, CalculateVolume(false, ViewPointDistance(target ? target->tilePos : goalPos), caster.Type->MapSound.Hit.Sound->Range) * caster.Type->MapSound.Hit.Sound->VolumePercent / 100);
+			}
+		//Wyrmgus end
 		}
 		for (std::vector<SpellActionType *>::const_iterator act = spell.Action.begin();
 			 act != spell.Action.end(); ++act) {

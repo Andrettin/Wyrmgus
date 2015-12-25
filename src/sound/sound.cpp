@@ -313,6 +313,13 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 		return;
 	}
 	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (unit.Variable[STUN_INDEX].Value > 0 && voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep && voice != VoiceDying) { //don't speak if stunned
+		return;
+	}
+	//Wyrmgus end
+	
 	CSound *sound = ChooseUnitVoiceSound(unit, voice);
 	if (!sound) {
 		return;

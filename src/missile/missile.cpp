@@ -1149,7 +1149,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 	}
 	
 	//Wyrmgus start
-	if (CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
+	if (!missile.Type->AlwaysHits && CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
 		if (splash == 1 && missile.Type->Range <= 1) {
 			return;
 		} else if (splash == 1 && missile.Type->Range > 1) {
@@ -1226,7 +1226,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 	}
 
 	//Wyrmgus start
-	if (CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
+	if (!missile.Type->AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
 		if (splash == 1 && missile.Type->Range <= 1) {
 			return;
 		} else if (splash == 1 && missile.Type->Range > 1) {
@@ -1709,6 +1709,9 @@ MissileType::MissileType(const std::string &ident) :
 	CorrectSphashDamage(false), Flip(false), CanHitOwner(false), FriendlyFire(true),
 	//Wyrmgus end
 	AlwaysFire(false), Pierce(false), PierceOnce(false), IgnoreWalls(true), KillFirstUnit(false),
+	//Wyrmgus start
+	AlwaysHits(false),
+	//Wyrmgus end
 	Class(), NumBounces(0),	ParabolCoefficient(2048), StartDelay(0),
 	//Wyrmgus start
 //	Sleep(0), Speed(0), BlizzardSpeed(0), TTL(-1), ReduceFactor(100), SmokePrecision(0),

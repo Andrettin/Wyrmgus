@@ -379,6 +379,9 @@ public:
 	bool PierceOnce;           /// pierce every target only once
 	bool IgnoreWalls;          /// missile ignores Wall units on it's way
 	bool KillFirstUnit;        /// missile kills first unit blocking it's way
+	//Wyrmgus start
+	bool AlwaysHits;		   /// missile never misses
+	//Wyrmgus end
 
 	int Class;                 /// missile class
 	int NumBounces;            /// number of bounces

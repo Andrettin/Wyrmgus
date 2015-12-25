@@ -198,6 +198,10 @@ void MissileType::Load(lua_State *l)
 			this->KillFirstUnit = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "FriendlyFire")) {
 			this->FriendlyFire = LuaToBoolean(l, -1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "AlwaysHits")) {
+			this->AlwaysHits = LuaToBoolean(l, -1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "SplashFactor")) {
 			this->SplashFactor = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "CorrectSphashDamage")) {
