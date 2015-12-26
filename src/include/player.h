@@ -131,6 +131,9 @@ public:
 	//Wyrmgus end
 
 	bool AiEnabled;        /// handle AI on local computer
+	//Wyrmgus start
+	bool Revealed;			/// Whether the player has been revealed (i.e. after losing the last town hall)
+	//Wyrmgus end
 	PlayerAi *Ai;          /// Ai structure pointer
 
 	int    NumBuildings;   /// # buildings
@@ -148,6 +151,10 @@ public:
 	int    TotalRazings;
 	int    TotalKills;      /// How many unit killed
 
+	//Wyrmgus start
+	int LostTownHallTimer;	/// The timer for when the player lost the last town hall (to make the player's units be revealed)
+	//Wyrmgus end
+	
 	IntColor Color;           /// color of units on minimap
 
 	CUnitColors UnitColors; /// Unit colors for new units

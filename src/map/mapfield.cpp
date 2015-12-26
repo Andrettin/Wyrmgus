@@ -374,7 +374,15 @@ unsigned char CMapFieldPlayerInfo::TeamVisibilityState(const CPlayer &player) co
 		maxVision = 1;
 	}
 	for (int i = 0; i != PlayerMax ; ++i) {
-		if (player.IsBothSharedVision(Players[i])) {
+		//Wyrmgus start
+//		if (player.IsBothSharedVision(Players[i])) {
+		if (player.IsBothSharedVision(Players[i]) || Players[i].Revealed) {
+		//Wyrmgus end
+			//Wyrmgus start
+			if (Players[i].Revealed && !player.IsBothSharedVision(Players[i]) && Visible[i] < 2) { //don't show a revealed player's explored tiles, only the currently visible ones
+				continue;
+			}
+			//Wyrmgus end
 			maxVision = std::max<unsigned char>(maxVision, Visible[i]);
 			if (maxVision >= 2) {
 				return 2;

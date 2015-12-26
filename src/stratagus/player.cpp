@@ -857,7 +857,13 @@ void CPlayer::Save(CFile &file) const
 	// Units done by load units.
 	// TotalNumUnits done by load units.
 	// NumBuildings done by load units.
-
+	
+	//Wyrmgus start
+	if (p.Revealed) {
+		file.printf(" \"revealed\",");
+	}
+	//Wyrmgus end
+	
 	file.printf(" \"supply\", %d,", p.Supply);
 	file.printf(" \"unit-limit\", %d,", p.UnitLimit);
 	file.printf(" \"building-limit\", %d,", p.BuildingLimit);
@@ -876,6 +882,11 @@ void CPlayer::Save(CFile &file) const
 	file.printf("},");
 	file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
 	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
+	//Wyrmgus start
+	if (p.LostTownHallTimer != 0) {
+		file.printf("\n  \"lost-town-hall-timer\", %d,", p.LostTownHallTimer);
+	}
+	//Wyrmgus end
 
 	file.printf("\n  \"speed-resource-harvest\", {");
 	for (int j = 0; j < MaxCosts; ++j) {
@@ -1082,6 +1093,9 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Demand = 0;
 	this->NumBuildings = 0;
 	this->Score = 0;
+	//Wyrmgus start
+	this->LostTownHallTimer = 0;
+	//Wyrmgus end
 
 	this->Color = PlayerColors[NumPlayers][0];
 
@@ -1090,6 +1104,9 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	} else {
 		this->AiEnabled = false;
 	}
+	//Wyrmgus start
+	this->Revealed = false;
+	//Wyrmgus end
 	++NumPlayers;
 }
 
@@ -1265,6 +1282,9 @@ void CPlayer::Clear()
 	this->Heroes.clear();
 	//Wyrmgus end
 	AiEnabled = false;
+	//Wyrmgus start
+	Revealed = false;
+	//Wyrmgus end
 	Ai = 0;
 	this->Units.resize(0);
 	this->FreeWorkers.resize(0);
@@ -1284,6 +1304,9 @@ void CPlayer::Clear()
 	memset(TotalResources, 0, sizeof(TotalResources));
 	TotalRazings = 0;
 	TotalKills = 0;
+	//Wyrmgus start
+	LostTownHallTimer = 0;
+	//Wyrmgus end
 	Color = 0;
 	UpgradeTimers.Clear();
 	for (int i = 0; i < MaxCosts; ++i) {
@@ -1722,6 +1745,19 @@ void PlayersEachCycle()
 {
 	for (int player = 0; player < NumPlayers; ++player) {
 		CPlayer &p = Players[player];
+		
+		//Wyrmgus start
+		if (p.LostTownHallTimer && !p.Revealed && p.LostTownHallTimer < GameCycle) {
+			p.Revealed = true;
+			for (int j = 0; j < NumPlayers; ++j) {
+				if (player != j && Players[j].Type != PlayerNobody) {
+					Players[j].Notify(_("%s's units have been revealed!"), p.Name.c_str());
+				} else {
+					Players[j].Notify(_("Your units have been revealed!"));
+				}
+			}
+		}
+		//Wyrmgus end
 
 		if (p.AiEnabled) {
 			AiEachCycle(p);

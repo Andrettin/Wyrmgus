@@ -2246,6 +2246,27 @@ void UnitLost(CUnit &unit)
 				player.Incomes[i] = m;
 			}
 		}
+		
+		//Wyrmgus start
+		if (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress") {
+			bool lost_town_hall = true;
+			for (int j = 0; j < player.GetUnitCount(); ++j) {
+				if (player.GetUnit(j).Type->Class == "town-hall" || player.GetUnit(j).Type->Class == "stronghold" || player.GetUnit(j).Type->Class == "fortress") {
+					lost_town_hall = false;
+				}
+			}
+			if (lost_town_hall) {
+				player.LostTownHallTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
+				for (int j = 0; j < NumPlayers; ++j) {
+					if (player.Index != j && Players[j].Type != PlayerNobody) {
+						Players[j].Notify(_("%s has lost their last town hall, and will be revealed in thirty seconds!"), player.Name.c_str());
+					} else {
+						Players[j].Notify(_("You have lost your last town hall, and will be revealed in thirty seconds!"));
+					}
+				}
+			}
+		}
+		//Wyrmgus end
 	}
 
 	//  Handle order cancels.
@@ -2310,6 +2331,20 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	for (int u = 1; u < MaxCosts; ++u) {
 		player.Incomes[u] = std::max(player.Incomes[u], type.Stats[player.Index].ImproveIncomes[u]);
 	}
+	
+	//Wyrmgus start
+	if (player.LostTownHallTimer != 0 && (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress")) {
+		player.LostTownHallTimer = 0;
+		player.Revealed = false;
+		for (int j = 0; j < NumPlayers; ++j) {
+			if (player.Index != j && Players[j].Type != PlayerNobody) {
+				Players[j].Notify(_("%s has rebuilt a town hall, and will no longer be revealed!"), player.Name.c_str());
+			} else {
+				Players[j].Notify(_("You have rebuilt a town hall, and will no longer be revealed!"));
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 /**
@@ -2573,7 +2608,10 @@ bool CUnit::IsVisible(const CPlayer &player) const
 		return true;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
-		if (p != player.Index && player.IsBothSharedVision(Players[p])) {
+		//Wyrmgus start
+//		if (p != player.Index && player.IsBothSharedVision(Players[p])) {
+		if (p != player.Index && (player.IsBothSharedVision(Players[p]) || Players[p].Revealed)) {
+		//Wyrmgus end
 			if (VisCount[p]) {
 				return true;
 			}

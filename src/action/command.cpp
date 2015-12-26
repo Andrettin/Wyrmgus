@@ -1179,13 +1179,19 @@ void CommandSharedVision(int player, bool state, int opponent)
 			CMapField &mf = *Map.Field(i);
 			CMapFieldPlayerInfo &mfp = mf.playerInfo;
 
-			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
+			//Wyrmgus start
+//			if (mfp.Visible[player] && !mfp.Visible[opponent]) {
+			if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
+			//Wyrmgus end
 				mfp.Visible[opponent] = 1;
 				if (opponent == ThisPlayer->Index) {
 					Map.MarkSeenTile(mf);
 				}
 			}
-			if (mfp.Visible[opponent] && !mfp.Visible[player]) {
+			//Wyrmgus start
+//			if (mfp.Visible[opponent] && !mfp.Visible[player]) {
+			if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
+			//Wyrmgus end
 				mfp.Visible[player] = 1;
 				if (player == ThisPlayer->Index) {
 					Map.MarkSeenTile(mf);

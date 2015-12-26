@@ -255,6 +255,11 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "ai-disabled")) {
 			this->AiEnabled = false;
 			--j;
+		//Wyrmgus start
+		} else if (!strcmp(value, "revealed")) {
+			this->Revealed = true;
+			--j;
+		//Wyrmgus end
 		} else if (!strcmp(value, "supply")) {
 			this->Supply = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "demand")) {
@@ -275,6 +280,10 @@ void CPlayer::Load(lua_State *l)
 			this->TotalRazings = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "total-kills")) {
 			this->TotalKills = LuaToNumber(l, j + 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "lost-town-hall-timer")) {
+			this->LostTownHallTimer = LuaToNumber(l, j + 1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "total-resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
