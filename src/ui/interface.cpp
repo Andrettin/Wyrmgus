@@ -116,29 +116,29 @@ int ButtonAction::GetKey() const
 		} else if (this->Pos == 4) {
 			return 'r';
 		} else if (this->Pos == 5) {
-			return 't';
-		} else if (this->Pos == 6) {
-			return 'y';
-		} else if (this->Pos == 7) {
-			return 'u';
-		} else if (this->Pos == 8) {
-			return 'i';
-		} else if (this->Pos == 9) {
-			return 'o';
-		} else if (this->Pos == 10) {
-			return 'p';
-		} else if (this->Pos == 11) {
 			return 'a';
-		} else if (this->Pos == 12) {
+		} else if (this->Pos == 6) {
 			return 's';
-		} else if (this->Pos == 13) {
+		} else if (this->Pos == 7) {
 			return 'd';
-		} else if (this->Pos == 14) {
+		} else if (this->Pos == 8) {
 			return 'f';
-		} else if (this->Pos == 15) {
+		} else if (this->Pos == 9) {
+			return 'z';
+		} else if (this->Pos == 10) {
+			return 'x';
+		} else if (this->Pos == 11) {
+			return 'c';
+		} else if (this->Pos == 12) {
+			return 'v';
+		} else if (this->Pos == 13) {
+			return 't';
+		} else if (this->Pos == 14) {
 			return 'g';
+		} else if (this->Pos == 15) {
+			return 'b';
 		} else if (this->Pos == 16) {
-			return 'h';
+			return 'y';
 		}
 	}
 	return this->Key;
@@ -757,6 +757,11 @@ static bool CommandKey(int key)
 			break;
 
 		case 'c': // ALT+C, CTRL+C C center on units
+			//Wyrmgus start
+			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+				break;
+			}
+			//Wyrmgus end
 			UiCenterOnSelected();
 			break;
 
@@ -819,8 +824,8 @@ static bool CommandKey(int key)
 			break;
 
 		//Wyrmgus start
-		case 'q': // select all army units
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+		case 'q': // Shift+Q: select all army units
+			if (!(KeyModifiers & ModifierControl) && (KeyModifiers & (ModifierAlt))) {
 				if (GameObserve || GamePaused || GameEstablishing) {
 					break;
 				}
@@ -871,8 +876,8 @@ static bool CommandKey(int key)
 			break;
 
 		//Wyrmgus start
-		case 'w': // select all units of the same type as the first currently selected one (FIXME: still need to add functionality)
-			if (!(KeyModifiers & (ModifierAlt | ModifierControl))) {
+		case 'w': // Alt+W: select all units of the same type as the first currently selected one
+			if (!(KeyModifiers & ModifierControl) && (KeyModifiers & ModifierAlt)) {
 				if (GameObserve || GamePaused || GameEstablishing) {
 					break;
 				}
