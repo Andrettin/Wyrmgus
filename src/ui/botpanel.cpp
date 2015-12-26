@@ -1167,7 +1167,11 @@ void CButtonPanel::Draw()
 	//
 	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
-			ButtonUnderCursor == i && KeyState != KeyStateInput) {
+			//Wyrmgus start
+//			ButtonUnderCursor == i && KeyState != KeyStateInput) {
+			ButtonUnderCursor == i && KeyState != KeyStateInput
+			&& buttons[i].Level == CurrentButtonLevel) {
+			//Wyrmgus end
 				if (!Preference.NoStatusLineTooltips) {
 					UpdateStatusLineForButton(buttons[i]);
 				}
