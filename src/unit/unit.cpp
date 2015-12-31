@@ -2335,6 +2335,21 @@ void UnitLost(CUnit &unit)
 				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
 				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
 				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
+				//Wyrmgus start
+				if (unit.Prefix != NULL) {
+					temp->SetPrefix(unit.Prefix);
+				}
+				if (unit.Suffix != NULL) {
+					temp->SetSuffix(unit.Suffix);
+				}
+				if (unit.Spell != NULL) {
+					temp->SetSpell(unit.Spell);
+				}
+				if (unit.Unique) {
+					temp->Unique = true;
+					temp->Name = unit.Name;
+				}
+				//Wyrmgus end
 			}
 		}
 	}

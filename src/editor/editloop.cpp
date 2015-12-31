@@ -303,6 +303,21 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 			unit->Variable[GIVERESOURCE_INDEX].Value = replacedUnit.Variable[GIVERESOURCE_INDEX].Value;
 			unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
 			unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
+			//Wyrmgus start
+			if (replacedUnit.Prefix != NULL) {
+				unit->SetPrefix(replacedUnit.Prefix);
+			}
+			if (replacedUnit.Suffix != NULL) {
+				unit->SetSuffix(replacedUnit.Suffix);
+			}
+			if (replacedUnit.Spell != NULL) {
+				unit->SetSpell(replacedUnit.Spell);
+			}
+			if (replacedUnit.Unique) {
+				unit->Unique = true;
+				unit->Name = replacedUnit.Name;
+			}
+			//Wyrmgus end
 			replacedUnit.Remove(NULL); // Destroy building beneath
 			UnitLost(replacedUnit);
 			UnitClearOrders(replacedUnit);

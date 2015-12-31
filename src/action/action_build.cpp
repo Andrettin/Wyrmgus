@@ -394,6 +394,21 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 			build->Variable[GIVERESOURCE_INDEX].Value = ontop.Variable[GIVERESOURCE_INDEX].Value;
 			build->Variable[GIVERESOURCE_INDEX].Max = ontop.Variable[GIVERESOURCE_INDEX].Max;
 			build->Variable[GIVERESOURCE_INDEX].Enable = ontop.Variable[GIVERESOURCE_INDEX].Enable;
+			//Wyrmgus start
+			if (ontop.Prefix != NULL) {
+				build->SetPrefix(ontop.Prefix);
+			}
+			if (ontop.Suffix != NULL) {
+				build->SetSuffix(ontop.Suffix);
+			}
+			if (ontop.Spell != NULL) {
+				build->SetSpell(ontop.Spell);
+			}
+			if (ontop.Unique) {
+				build->Unique = true;
+				build->Name = ontop.Name;
+			}
+			//Wyrmgus end
 			ontop.Remove(NULL); // Destroy building beneath
 			UnitLost(ontop);
 			UnitClearOrders(ontop);
