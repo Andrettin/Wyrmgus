@@ -320,6 +320,10 @@ static void MixIntoBuffer(void *buffer, int samples)
 static void FillAudio(void *, Uint8 *stream, int len)
 {
 	Assert(len != Audio.Format.size);
+
+	if (Audio.Running == false)
+		return;
+
 	SDL_memset(stream, 0, len);
 
 	SDL_LockMutex(Audio.Lock);
@@ -889,7 +893,7 @@ int InitSound()
 void QuitSound()
 {
 	Audio.Running = false;
-	SDL_KillThread(Audio.Thread);
+	SDL_WaitThread(Audio.Thread, NULL);
 
 	SDL_DestroyCond(Audio.Cond);
 	SDL_DestroyMutex(Audio.Lock);
