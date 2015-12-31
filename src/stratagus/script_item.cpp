@@ -212,8 +212,8 @@ static int CclGetUniqueItemData(lua_State *l)
 				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), item->Type->Slot) != UnitTypes[i]->AiDrops.end()
 			) {
 				if (
-					(item->Prefix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Prefix) != UnitTypes[i]->DropAffixes.end())
-					&& (item->Suffix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Suffix) != UnitTypes[i]->DropAffixes.end())
+					(item->Prefix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Prefix) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Prefix) != item->Type->Affixes.end())
+					&& (item->Suffix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Suffix) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Suffix) != item->Type->Affixes.end())
 				) {
 					droppers.push_back(UnitTypes[i]);
 				}

@@ -626,6 +626,7 @@ CUnitType::~CUnitType()
 	Drops.clear();
 	AiDrops.clear();
 	DropAffixes.clear();
+	Affixes.clear();
 	Traits.clear();
 	//Wyrmgus end
 

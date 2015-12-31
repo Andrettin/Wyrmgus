@@ -205,6 +205,8 @@ public:
 	bool Shield;
 	bool Boots;
 	bool Arrows;
+	bool MagicPrefix;
+	bool MagicSuffix;
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];

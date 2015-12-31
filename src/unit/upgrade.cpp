@@ -154,7 +154,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -582,11 +582,9 @@ static int CclGetItemPrefixes(lua_State *l)
 {
 	std::vector<CUpgrade *> item_prefixes;
 	for (int i = 0; i < AllUpgrades.size(); ++i) {
-		for (int j = 0; j < MaxItemClasses; ++j) {
-			if (AllUpgrades[i]->ItemPrefix[j]) {
-				item_prefixes.push_back(AllUpgrades[i]);
-				break;
-			}
+		if (AllUpgrades[i]->MagicPrefix) {
+			item_prefixes.push_back(AllUpgrades[i]);
+			break;
 		}
 	}
 		
@@ -603,11 +601,9 @@ static int CclGetItemSuffixes(lua_State *l)
 {
 	std::vector<CUpgrade *> item_suffixes;
 	for (int i = 0; i < AllUpgrades.size(); ++i) {
-		for (int j = 0; j < MaxItemClasses; ++j) {
-			if (AllUpgrades[i]->ItemSuffix[j]) {
-				item_suffixes.push_back(AllUpgrades[i]);
-				break;
-			}
+		if (AllUpgrades[i]->MagicSuffix) {
+			item_suffixes.push_back(AllUpgrades[i]);
+			break;
 		}
 	}
 		
@@ -657,15 +653,14 @@ static int CclGetUpgradeData(lua_State *l)
 		lua_pushstring(l, upgrade->Quote.c_str());
 		return 1;
 	} else if (!strcmp(data, "ItemPrefix")) {
-		if (nargs == 2) { //check if the item is a prefix for any item type
-			for (int i = 0; i < MaxItemClasses; ++i) {
-				if (upgrade->ItemPrefix[i]) {
-					lua_pushboolean(l, true);
-					return 1;
-				}
+		if (nargs == 2) { //check if the upgrade is a prefix for any item type
+			if (upgrade->MagicPrefix) {
+				lua_pushboolean(l, true);
+				return 1;
+			} else {
+				lua_pushboolean(l, false);
+				return 1;
 			}
-			lua_pushboolean(l, false);
-			return 1;
 		} else {
 			LuaCheckArgs(l, 3);
 			std::string item_class_name = LuaToString(l, 3);
@@ -678,14 +673,13 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 	} else if (!strcmp(data, "ItemSuffix")) {
 		if (nargs == 2) { //check if the item is a suffix for any item type
-			for (int i = 0; i < MaxItemClasses; ++i) {
-				if (upgrade->ItemSuffix[i]) {
-					lua_pushboolean(l, true);
-					return 1;
-				}
+			if (upgrade->MagicSuffix) {
+				lua_pushboolean(l, true);
+				return 1;
+			} else {
+				lua_pushboolean(l, false);
+				return 1;
 			}
-			lua_pushboolean(l, false);
-			return 1;
 		} else {
 			LuaCheckArgs(l, 3);
 			std::string item_class_name = LuaToString(l, 3);

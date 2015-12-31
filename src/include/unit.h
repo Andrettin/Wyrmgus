@@ -186,9 +186,10 @@ public:
 	void SetSuffix(CUpgrade *suffix);
 	void SetSpell(SpellType *spell);
 	void GenerateDrop();
-	void GeneratePrefix(CUnit &dropper);
-	void GenerateSuffix(CUnit &dropper);
-	void GenerateUnique(CUnit &dropper);
+	void GenerateSpecialProperties(CUnit *dropper = NULL);
+	void GeneratePrefix(CUnit *dropper);
+	void GenerateSuffix(CUnit *dropper);
+	void GenerateUnique(CUnit *dropper);
 	//Wyrmgus end
 	
 	bool RestoreOrder();

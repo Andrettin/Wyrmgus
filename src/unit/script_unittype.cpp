@@ -714,6 +714,9 @@ static int CclDefineUnitType(lua_State *l)
 			for (size_t i = 0; i < parent_type->DropAffixes.size(); ++i) {
 				type->DropAffixes.push_back(parent_type->DropAffixes[i]);
 			}
+			for (size_t i = 0; i < parent_type->Affixes.size(); ++i) {
+				type->Affixes.push_back(parent_type->Affixes[i]);
+			}
 			for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
 				type->Traits.push_back(parent_type->Traits[i]);
 			}
@@ -1845,6 +1848,17 @@ static int CclDefineUnitType(lua_State *l)
 					type->DropAffixes.push_back(CUpgrade::New(affix_ident)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 				}
 			}
+		} else if (!strcmp(value, "Affixes")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string affix_ident = LuaToString(l, -1, j + 1);
+				int affix_id = UpgradeIdByIdent(affix_ident);
+				if (affix_id != -1) {
+					type->Affixes.push_back(AllUpgrades[affix_id]);
+				} else {
+					type->Affixes.push_back(CUpgrade::New(affix_ident)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+				}
+			}
 		} else if (!strcmp(value, "Traits")) {
 			type->Traits.clear(); // remove previously defined traits, to allow unit types to not inherit traits from their parent unit types
 			const int args = lua_rawlen(l, -1);
@@ -2531,6 +2545,14 @@ static int CclGetUnitTypeData(lua_State *l)
 		for (size_t i = 1; i <= type->DropAffixes.size(); ++i)
 		{
 			lua_pushstring(l, type->DropAffixes[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Affixes")) {
+		lua_createtable(l, type->Affixes.size(), 0);
+		for (size_t i = 1; i <= type->Affixes.size(); ++i)
+		{
+			lua_pushstring(l, type->Affixes[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

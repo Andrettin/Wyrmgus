@@ -1223,6 +1223,10 @@ void CUnit::SetSpell(SpellType *spell)
 
 void CUnit::GenerateDrop()
 {
+	if (this->Type->BoolFlag[ORGANIC_INDEX].value && !this->Character && !this->Type->BoolFlag[FAUNA_INDEX].value) { //if the unit is organic and isn't a character (and isn't fauna), don't generate a drop
+		return;
+	}
+	
 	Vec2i drop_pos = this->tilePos;
 	drop_pos.x += SyncRand(this->Type->TileWidth);
 	drop_pos.y += SyncRand(this->Type->TileHeight);
@@ -1251,22 +1255,7 @@ void CUnit::GenerateDrop()
 		}
 			
 		if (droppedUnit != NULL) {
-			int magic_affix_chance = 10; //10% chance of a dropped item having a magic prefix or suffix
-			int unique_chance = 5; //0.5% chance of a dropped item being unique
-			if (this->Character || this->Type->BoolFlag[BUILDING_INDEX].value) { //if the dropper has a character or is a building, double the chances of the item being magical or unique
-				magic_affix_chance *= 2;
-				unique_chance *= 2;
-			}
-				
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
-				droppedUnit->GeneratePrefix(*this);
-			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(100) >= (100 - magic_affix_chance) && droppedUnit->Type->ItemClass != -1) {
-				droppedUnit->GenerateSuffix(*this);
-			}
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && SyncRand(1000) >= (1000 - unique_chance) && droppedUnit->Type->ItemClass != -1) {
-				droppedUnit->GenerateUnique(*this);
-			}
+			droppedUnit->GenerateSpecialProperties(this);
 			
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && droppedUnit->Prefix == NULL && droppedUnit->Suffix == NULL && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 				droppedUnit->TTL = GameCycle + (5 * 60 * CYCLES_PER_SECOND);
@@ -1275,12 +1264,55 @@ void CUnit::GenerateDrop()
 	}
 }
 
-void CUnit::GeneratePrefix(CUnit &dropper)
+void CUnit::GenerateSpecialProperties(CUnit *dropper)
+{
+	int magic_affix_chance = 10; //10% chance of the unit having a magic prefix or suffix
+	int unique_chance = 5; //0.5% chance of the unit being unique
+	if (dropper != NULL) {
+		if (dropper->Character) { //if the dropper is a character, multiply the chances of the item being magic or unique by the character's level
+			magic_affix_chance *= dropper->Character->Level;
+			unique_chance *= dropper->Character->Level;
+		} else if (dropper->Type->BoolFlag[BUILDING_INDEX].value) { //if the dropper is a building, multiply the chances of the drop being magic or unique by a factor according to whether the building itself is magic/unique
+			int chance_multiplier = 2;
+			if (dropper->Unique) {
+				chance_multiplier += 8;
+			} else {
+				if (dropper->Prefix != NULL) {
+					chance_multiplier += 1;
+				}
+				if (dropper->Suffix != NULL) {
+					chance_multiplier += 1;
+				}
+			}
+			magic_affix_chance *= chance_multiplier;
+			unique_chance *= chance_multiplier;
+		}
+	}
+
+	if (SyncRand(100) >= (100 - magic_affix_chance)) {
+		this->GeneratePrefix(dropper);
+	}
+	if (SyncRand(100) >= (100 - magic_affix_chance)) {
+		this->GenerateSuffix(dropper);
+	}
+	if (SyncRand(1000) >= (1000 - unique_chance)) {
+		this->GenerateUnique(dropper);
+	}
+}
+			
+void CUnit::GeneratePrefix(CUnit *dropper)
 {
 	std::vector<CUpgrade *> potential_prefixes;
-	for (size_t i = 0; i < dropper.Type->DropAffixes.size(); ++i) {
-		if (dropper.Type->DropAffixes[i]->ItemPrefix[Type->ItemClass]) {
-			potential_prefixes.push_back(dropper.Type->DropAffixes[i]);
+	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
+		if ((this->Type->ItemClass == -1 && this->Type->Affixes[i]->MagicPrefix) || (this->Type->ItemClass != -1 && this->Type->Affixes[i]->ItemPrefix[Type->ItemClass])) {
+			potential_prefixes.push_back(this->Type->Affixes[i]);
+		}
+	}
+	if (dropper != NULL) {
+		for (size_t i = 0; i < dropper->Type->DropAffixes.size(); ++i) {
+			if ((this->Type->ItemClass == -1 && dropper->Type->DropAffixes[i]->MagicPrefix) || (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->ItemPrefix[Type->ItemClass])) {
+				potential_prefixes.push_back(dropper->Type->DropAffixes[i]);
+			}
 		}
 	}
 	
@@ -1289,13 +1321,22 @@ void CUnit::GeneratePrefix(CUnit &dropper)
 	}
 }
 
-void CUnit::GenerateSuffix(CUnit &dropper)
+void CUnit::GenerateSuffix(CUnit *dropper)
 {
 	std::vector<CUpgrade *> potential_suffixes;
-	for (size_t i = 0; i < dropper.Type->DropAffixes.size(); ++i) {
-		if (dropper.Type->DropAffixes[i]->ItemSuffix[Type->ItemClass]) {
-			if (Prefix == NULL || !dropper.Type->DropAffixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-				potential_suffixes.push_back(dropper.Type->DropAffixes[i]);
+	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
+		if ((this->Type->ItemClass == -1 && this->Type->Affixes[i]->MagicSuffix) || (this->Type->ItemClass != -1 && this->Type->Affixes[i]->ItemSuffix[Type->ItemClass])) {
+			if (Prefix == NULL || !this->Type->Affixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+				potential_suffixes.push_back(this->Type->Affixes[i]);
+			}
+		}
+	}
+	if (dropper != NULL) {
+		for (size_t i = 0; i < dropper->Type->DropAffixes.size(); ++i) {
+			if ((this->Type->ItemClass == -1 && dropper->Type->DropAffixes[i]->MagicSuffix) || (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->ItemSuffix[Type->ItemClass])) {
+				if (Prefix == NULL || !dropper->Type->DropAffixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+					potential_suffixes.push_back(dropper->Type->DropAffixes[i]);
+				}
 			}
 		}
 	}
@@ -1305,14 +1346,22 @@ void CUnit::GenerateSuffix(CUnit &dropper)
 	}
 }
 
-void CUnit::GenerateUnique(CUnit &dropper)
+void CUnit::GenerateUnique(CUnit *dropper)
 {
 	std::vector<CUniqueItem *> potential_uniques;
 	for (size_t i = 0; i < UniqueItems.size(); ++i) {
 		if (
 			Type == UniqueItems[i]->Type
-			&& (UniqueItems[i]->Prefix == NULL || std::find(dropper.Type->DropAffixes.begin(), dropper.Type->DropAffixes.end(), UniqueItems[i]->Prefix) != dropper.Type->DropAffixes.end()) //the dropper unit must be capable of generating this unique item's prefix to drop the item
-			&& (UniqueItems[i]->Suffix == NULL || std::find(dropper.Type->DropAffixes.begin(), dropper.Type->DropAffixes.end(), UniqueItems[i]->Suffix) != dropper.Type->DropAffixes.end()) //the dropper unit must be capable of generating this unique item's suffix to drop the item
+			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
+				UniqueItems[i]->Prefix == NULL
+				|| (dropper != NULL && std::find(dropper->Type->DropAffixes.begin(), dropper->Type->DropAffixes.end(), UniqueItems[i]->Prefix) != dropper->Type->DropAffixes.end())
+				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
+			)
+			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
+				UniqueItems[i]->Suffix == NULL
+				|| (dropper != NULL && std::find(dropper->Type->DropAffixes.begin(), dropper->Type->DropAffixes.end(), UniqueItems[i]->Suffix) != dropper->Type->DropAffixes.end())
+				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
+			)
 			&& UniqueItems[i]->CanDrop()
 		) {
 			potential_uniques.push_back(UniqueItems[i]);
@@ -3691,7 +3740,7 @@ std::string CUnit::GetMessageName() const
 		return GetTypeName();
 	}
 	
-	if (Type->BoolFlag[ITEM_INDEX].value) {
+	if (!this->Unique && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {
 		return Name;
 	}
 	

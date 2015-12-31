@@ -1603,6 +1603,8 @@ static int CclSetUnitVariable(lua_State *l)
 		} else {
 			LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
 		}
+	} else if (!strcmp(name, "GenerateSpecialProperties")) {
+		unit->GenerateSpecialProperties();
 	//Wyrmgus end
 	} else {
 		const int index = UnitTypeVar.VariableNameLookup[name];// User variables
