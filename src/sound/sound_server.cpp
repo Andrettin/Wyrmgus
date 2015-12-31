@@ -319,7 +319,7 @@ static void MixIntoBuffer(void *buffer, int samples)
 */
 static void FillAudio(void *, Uint8 *stream, int len)
 {
-	Assert(len != Audio.Format.size);
+	Assert((len/2) != Audio.Format.size);
 
 	if (Audio.Running == false)
 		return;
@@ -340,12 +340,9 @@ static void FillAudio(void *, Uint8 *stream, int len)
 static int FillThread(void *)
 {
 	while (Audio.Running == true) {
-		SDL_LockMutex(Audio.Lock);
-		int ret = SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 100);
-		if (ret == 0) {
-			SDL_LockAudio();
+		int status = SDL_LockMutex(Audio.Lock);
+		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 100) == 0) {
 			MixIntoBuffer(Audio.Buffer, Audio.Format.samples * Audio.Format.channels);
-			SDL_UnlockAudio();
 		}
 		SDL_UnlockMutex(Audio.Lock);
 	}
