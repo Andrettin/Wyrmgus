@@ -584,7 +584,6 @@ static int CclGetItemPrefixes(lua_State *l)
 	for (int i = 0; i < AllUpgrades.size(); ++i) {
 		if (AllUpgrades[i]->MagicPrefix) {
 			item_prefixes.push_back(AllUpgrades[i]);
-			break;
 		}
 	}
 		
@@ -603,7 +602,6 @@ static int CclGetItemSuffixes(lua_State *l)
 	for (int i = 0; i < AllUpgrades.size(); ++i) {
 		if (AllUpgrades[i]->MagicSuffix) {
 			item_suffixes.push_back(AllUpgrades[i]);
-			break;
 		}
 	}
 		
@@ -693,6 +691,10 @@ static int CclGetUpgradeData(lua_State *l)
 	} else if (!strcmp(data, "Droppers")) { //the unit types which can drop this affix
 		std::vector<CUnitType *> droppers;
 		for (int i = 0; i < UnitTypes.size(); ++i) {
+			if (UnitTypes[i]->Ident.find("template") != std::string::npos) { //if is a template, continue
+				continue;
+			}
+
 			if (std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), upgrade) != UnitTypes[i]->DropAffixes.end()) {
 				droppers.push_back(UnitTypes[i]);
 			}
@@ -707,20 +709,24 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "AppliesTo")) { //to which unit types or item classes this upgrade applies
 		std::vector<std::string> applies_to;
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			for (int i = 0; i < UnitTypes.size(); ++i) {
-				if (UpgradeModifiers[z]->UpgradeId == upgrade->ID && UpgradeModifiers[z]->ApplyTo[i] == 'X') {
-					applies_to.push_back(UnitTypes[i]->Ident);
-				}
-			}
-		}
-		
 		for (int i = 0; i < MaxItemClasses; ++i) {
 			if (upgrade->ItemPrefix[i] || upgrade->ItemSuffix[i]) {
 				applies_to.push_back(GetItemClassNameById(i));
 			}
 		}
 			
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			for (int i = 0; i < UnitTypes.size(); ++i) {
+				if (UnitTypes[i]->Ident.find("template") != std::string::npos) { //if is a template, continue
+					continue;
+				}
+				
+				if (UpgradeModifiers[z]->UpgradeId == upgrade->ID && (UpgradeModifiers[z]->ApplyTo[i] == 'X' || std::find(UnitTypes[i]->Affixes.begin(), UnitTypes[i]->Affixes.end(), upgrade) != UnitTypes[i]->Affixes.end())) {
+					applies_to.push_back(UnitTypes[i]->Ident);
+				}
+			}
+		}
+		
 		lua_createtable(l, applies_to.size(), 0);
 		for (size_t i = 1; i <= applies_to.size(); ++i)
 		{
@@ -1970,6 +1976,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 						variable_name += "Increase";
 						variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
 						variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
+						variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
 						variable_name = SeparateCapitalizedStringElements(variable_name);
 						upgrade_effects_string += variable_name;
 					}

@@ -1221,6 +1221,21 @@ void CUnit::SetSpell(SpellType *spell)
 	}
 }
 
+void CUnit::SetUnique(CUniqueItem *unique)
+{
+	SetPrefix(unique->Prefix);
+	SetSuffix(unique->Suffix);
+	SetSpell(unique->Spell);
+	if (unique->ResourcesHeld != 0) {
+		this->ResourcesHeld = unique->ResourcesHeld;
+		this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
+		this->Variable[GIVERESOURCE_INDEX].Max = unique->ResourcesHeld;
+		this->Variable[GIVERESOURCE_INDEX].Enable = 1;
+	}
+	Name = unique->Name;
+	Unique = true;
+}
+
 void CUnit::GenerateDrop()
 {
 	if (this->Type->BoolFlag[ORGANIC_INDEX].value && !this->Character && !this->Type->BoolFlag[FAUNA_INDEX].value) { //if the unit is organic and isn't a character (and isn't fauna), don't generate a drop
@@ -1370,11 +1385,7 @@ void CUnit::GenerateUnique(CUnit *dropper)
 	
 	if (potential_uniques.size() > 0) {
 		CUniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
-		SetPrefix(chosen_unique->Prefix);
-		SetSuffix(chosen_unique->Suffix);
-		SetSpell(chosen_unique->Spell);
-		Name = chosen_unique->Name;
-		Unique = true;
+		SetUnique(chosen_unique);
 	}
 }
 //Wyrmgus end
@@ -2336,18 +2347,18 @@ void UnitLost(CUnit &unit)
 				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
 				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
 				//Wyrmgus start
-				if (unit.Prefix != NULL) {
-					temp->SetPrefix(unit.Prefix);
-				}
-				if (unit.Suffix != NULL) {
-					temp->SetSuffix(unit.Suffix);
-				}
-				if (unit.Spell != NULL) {
-					temp->SetSpell(unit.Spell);
-				}
-				if (unit.Unique) {
-					temp->Unique = true;
-					temp->Name = unit.Name;
+				if (unit.Unique && GetUniqueItem(unit.Name) != NULL) {
+					temp->SetUnique(GetUniqueItem(unit.Name));
+				} else {
+					if (unit.Prefix != NULL) {
+						temp->SetPrefix(unit.Prefix);
+					}
+					if (unit.Suffix != NULL) {
+						temp->SetSuffix(unit.Suffix);
+					}
+					if (unit.Spell != NULL) {
+						temp->SetSpell(unit.Spell);
+					}
 				}
 				//Wyrmgus end
 			}

@@ -1603,6 +1603,14 @@ static int CclSetUnitVariable(lua_State *l)
 		} else {
 			LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
 		}
+	} else if (!strcmp(name, "Unique")) { //set the unit to a particular unique unit
+		LuaCheckArgs(l, 3);
+		std::string unique_name = LuaToString(l, 3);
+		if (GetUniqueItem(unique_name) != NULL) {
+			unit->SetUnique(GetUniqueItem(unique_name));
+		} else {
+			LuaError(l, "Unique \"%s\" doesn't exist." _C_ unique_name.c_str());
+		}
 	} else if (!strcmp(name, "GenerateSpecialProperties")) {
 		unit->GenerateSpecialProperties();
 	//Wyrmgus end

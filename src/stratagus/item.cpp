@@ -305,6 +305,7 @@ std::string GetItemEffectsString(std::string item_ident)
 				variable_name += "Increase";
 				variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
 				variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
+				variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
 				variable_name = SeparateCapitalizedStringElements(variable_name);
 				item_effects_string += variable_name;
 			}
@@ -333,13 +334,18 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				|| var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX
 				|| var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX
 				|| var == ACCURACY_INDEX || var == EVASION_INDEX || var == SPEED_INDEX || var == BACKSTAB_INDEX
-				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX)
+				|| var == HITPOINTHEALING_INDEX || var == HITPOINTBONUS_INDEX || var == SIGHTRANGE_INDEX || var == GIVERESOURCE_INDEX)
 			) {
 				continue;
 			}
 			
-			int variable_value = item->Type->DefaultStat.Variables[var].Value;
-			int variable_increase = item->Type->DefaultStat.Variables[var].Increase;
+			int variable_value = 0;
+			int variable_increase = 0;
+			if (item->Type->BoolFlag[ITEM_INDEX].value) {
+				variable_value = item->Type->DefaultStat.Variables[var].Value;
+				variable_increase = item->Type->DefaultStat.Variables[var].Increase;
+			}
+			
 			for (int z = 0; z < NumUpgradeModifiers; ++z) {
 				if (
 					(item->Prefix != NULL && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
@@ -350,7 +356,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				}
 			}
 						
-			if (item->Type->DefaultStat.Variables[var].Enable || variable_value != 0) {
+			if ((item->Type->BoolFlag[ITEM_INDEX].value && item->Type->DefaultStat.Variables[var].Enable) || variable_value != 0) {
 				if (!first_var) {
 					item_effects_string += ", ";
 				} else {
@@ -393,6 +399,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				variable_name += "Increase";
 				variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
 				variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
+				variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
 				variable_name = SeparateCapitalizedStringElements(variable_name);
 				item_effects_string += variable_name;
 			}

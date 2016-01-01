@@ -113,6 +113,8 @@ static int CclDefineUniqueItem(lua_State *l)
 			item->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			item->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "ResourcesHeld")) {
+			item->ResourcesHeld = LuaToNumber(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

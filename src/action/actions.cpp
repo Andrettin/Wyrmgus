@@ -276,6 +276,9 @@ static inline void IncreaseVariable(CUnit &unit, int index)
 	//Wyrmgus start
 	if (index == HP_INDEX && unit.Variable[index].Increase < 0 && unit.HasInventory()) {
 		unit.HealingItemAutoUse();
+	} else if (index == GIVERESOURCE_INDEX) {
+		unit.ResourcesHeld += unit.Variable[index].Increase;
+		clamp(&unit.ResourcesHeld, 0, unit.Variable[index].Max);
 	}
 	//Wyrmgus end
 

@@ -185,6 +185,7 @@ public:
 	void SetPrefix(CUpgrade *prefix);
 	void SetSuffix(CUpgrade *suffix);
 	void SetSpell(SpellType *spell);
+	void SetUnique(CUniqueItem *unique);
 	void GenerateDrop();
 	void GenerateSpecialProperties(CUnit *dropper = NULL);
 	void GeneratePrefix(CUnit *dropper);

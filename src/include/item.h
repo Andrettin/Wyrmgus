@@ -103,12 +103,13 @@ class CUniqueItem
 {
 public:
 	CUniqueItem() :
-		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL)
+		ResourcesHeld(0), Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL)
 	{
 	}
 	
 	bool CanDrop();				/// Check whether this unique item can drop
-	
+
+	int ResourcesHeld;
 	std::string Name;
 	std::string Description;
 	std::string Background;
