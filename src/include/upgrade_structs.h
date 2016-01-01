@@ -207,6 +207,7 @@ public:
 	bool Arrows;
 	bool MagicPrefix;
 	bool MagicSuffix;
+	bool RunicAffix;
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];

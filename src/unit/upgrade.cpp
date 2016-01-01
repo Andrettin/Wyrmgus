@@ -154,7 +154,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -600,7 +600,25 @@ static int CclGetItemSuffixes(lua_State *l)
 {
 	std::vector<CUpgrade *> item_suffixes;
 	for (int i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->MagicSuffix) {
+		if (AllUpgrades[i]->MagicSuffix && !AllUpgrades[i]->RunicAffix) {
+			item_suffixes.push_back(AllUpgrades[i]);
+		}
+	}
+		
+	lua_createtable(l, item_suffixes.size(), 0);
+	for (size_t i = 1; i <= item_suffixes.size(); ++i)
+	{
+		lua_pushstring(l, item_suffixes[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+static int CclGetRunicSuffixes(lua_State *l)
+{
+	std::vector<CUpgrade *> item_suffixes;
+	for (int i = 0; i < AllUpgrades.size(); ++i) {
+		if (AllUpgrades[i]->MagicSuffix && AllUpgrades[i]->RunicAffix) {
 			item_suffixes.push_back(AllUpgrades[i]);
 		}
 	}
@@ -756,6 +774,7 @@ void UpgradesCclRegister()
 	lua_register(Lua, "GetUpgrades", CclGetUpgrades);
 	lua_register(Lua, "GetItemPrefixes", CclGetItemPrefixes);
 	lua_register(Lua, "GetItemSuffixes", CclGetItemSuffixes);
+	lua_register(Lua, "GetRunicSuffixes", CclGetRunicSuffixes);
 	lua_register(Lua, "GetUpgradeData", CclGetUpgradeData);
 	//Wyrmgus end
 }
