@@ -478,10 +478,10 @@ void CViewport::Draw() const
 			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string text_color;
-			if (UnitUnderCursor->Unique) {
-				text_color = "orange";
+			if (UnitUnderCursor->Unique || UnitUnderCursor->Character != NULL) {
+				text_color = "fire";
 			} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
-				text_color = "blue";
+				text_color = "light-blue";
 			}
 			DrawGenericPopup(UnitUnderCursor->GetMessageName(), unit_center_pos.x, unit_center_pos.y, text_color);
 			//Wyrmgus end
