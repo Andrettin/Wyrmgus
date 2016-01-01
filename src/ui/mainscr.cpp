@@ -290,6 +290,11 @@ static bool CanShowContent(const ConditionPanel *condition, const CUnit &unit)
 			return false;
 		}
 	}
+	if (condition->Replenishment != CONDITION_TRUE) {
+		if ((condition->Replenishment == CONDITION_ONLY) ^ (unit.Variable[GIVERESOURCE_INDEX].Increase != 0)) {
+			return false;
+		}
+	}
 	//Wyrmgus end
 	if (condition->Variables) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {

@@ -189,7 +189,7 @@ public:
 	ConditionPanel() : ShowOnlySelected(false), HideNeutral(false),
 		HideAllied(false), ShowOpponent(false), BoolFlags(NULL),
 		//Wyrmgus start
-		Affixed(0), Unique(0),
+		Affixed(0), Unique(0), Replenishment(0),
 		//Wyrmgus end
 		Variables(NULL) {}
 	~ConditionPanel()
@@ -207,6 +207,7 @@ public:
 	//Wyrmgus start
 	char Affixed;				/// check if the button's unit has an affix
 	char Unique;				/// check if the button's unit is unique
+	char Replenishment;			/// check if the button's unit has resource replenishment
 	//Wyrmgus end
 	char *BoolFlags;            /// array of condition about user flags.
 	char *Variables;            /// array of variable to verify (enable and max > 0)
