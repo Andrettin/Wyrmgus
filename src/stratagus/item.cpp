@@ -346,6 +346,10 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				variable_increase = item->Type->DefaultStat.Variables[var].Increase;
 			}
 			
+			if (var == GIVERESOURCE_INDEX && item->ResourcesHeld != 0) {
+				variable_value = item->ResourcesHeld;
+			}
+			
 			for (int z = 0; z < NumUpgradeModifiers; ++z) {
 				if (
 					(item->Prefix != NULL && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
@@ -363,7 +367,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 					first_var = false;
 				}
 											
-				if (variable_value >= 0 && var != HITPOINTHEALING_INDEX) {
+				if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != GIVERESOURCE_INDEX) {
 					item_effects_string += "+";
 				}
 				item_effects_string += std::to_string((long long) variable_value);
@@ -377,6 +381,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
 				variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
 				variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
+				variable_name = FindAndReplaceString(variable_name, "GiveResource", "ResourcesHeld");
 				variable_name = SeparateCapitalizedStringElements(variable_name);
 				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 				item_effects_string += variable_name;

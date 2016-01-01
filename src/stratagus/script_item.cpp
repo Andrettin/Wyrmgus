@@ -178,6 +178,9 @@ static int CclGetUniqueItemData(lua_State *l)
 	} else if (!strcmp(data, "Quote")) {
 		lua_pushstring(l, item->Quote.c_str());
 		return 1;
+	} else if (!strcmp(data, "ResourcesHeld")) {
+		lua_pushnumber(l, item->ResourcesHeld);
+		return 1;
 	} else if (!strcmp(data, "Type")) {
 		if (item->Type != NULL) {
 			lua_pushstring(l, item->Type->Ident.c_str());
