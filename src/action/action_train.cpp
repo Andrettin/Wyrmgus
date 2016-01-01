@@ -245,7 +245,10 @@ static void AnimateActionTrain(CUnit &unit)
 	}
 	//Wyrmgus end
 	
-	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
+	//Wyrmgus start
+//	this->Ticks += std::max(1, player.SpeedTrain / SPEEDUP_FACTOR);
+	this->Ticks += std::max(1, (player.SpeedTrain + unit.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+	//Wyrmgus end
 
 	if (this->Ticks < cost) {
 		unit.Wait = CYCLES_PER_SECOND / 6;

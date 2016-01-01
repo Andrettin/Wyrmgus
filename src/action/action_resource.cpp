@@ -657,7 +657,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 			wait_at_resource = resinfo.WaitAtResource * 100 / resinfo.ResourceStep;
 		}
-		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
 		//Wyrmgus end
 	} else {
 		this->TimeToHarvest = 1;
@@ -823,10 +823,14 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			// Wyrmgus start
 //			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 			int wait_at_resource = resinfo.WaitAtResource;
+			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo.ResourceId];
 			if (!Map.Info.IsPointOnMap(this->goalPos) && !harvest_from_outside) {
 				wait_at_resource = resinfo.WaitAtResource * 100 / resinfo.ResourceStep;
 			}
-			this->TimeToHarvest += std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+			if (this->GetGoal()) {
+				resource_harvest_speed += this->GetGoal()->Variable[TIMEEFFICIENCYBONUS_INDEX].Value;
+			}
+			this->TimeToHarvest += std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / resource_harvest_speed);
 			//Wyrmgus end
 		} else {
 			this->TimeToHarvest += 1;
@@ -1216,7 +1220,10 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	unit.CurrentResource = 0;
 
 	if (unit.Wait) {
-		unit.Wait /= std::max(1, unit.Player->SpeedResourcesReturn[resinfo.ResourceId] / SPEEDUP_FACTOR);
+		//Wyrmgus start
+//		unit.Wait /= std::max(1, unit.Player->SpeedResourcesReturn[resinfo.ResourceId] / SPEEDUP_FACTOR);
+		unit.Wait /= std::max(1, (unit.Player->SpeedResourcesReturn[resinfo.ResourceId] + goal.Variable[TIMEEFFICIENCYBONUS_INDEX].Value) / SPEEDUP_FACTOR);
+		//Wyrmgus end
 		if (unit.Wait) {
 			unit.Wait--;
 		}
