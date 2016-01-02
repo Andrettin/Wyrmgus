@@ -105,6 +105,8 @@ void ShowLoadProgress(const char *fmt, ...)
 	} else {
 		DebugPrint("!!!!%s\n" _C_ temp);
 	}
+
+	PollEvents();
 }
 
 CUnitInfoPanel::~CUnitInfoPanel()
