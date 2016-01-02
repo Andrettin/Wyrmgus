@@ -125,7 +125,7 @@ static std::map<std::string, int> Str2Key;
 
 double FrameTicks;     /// Frame length in ms
 
-const EventCallback *Callbacks;
+const EventCallback *Callbacks = NULL;
 
 static bool RegenerateScreen = false;
 bool IsSDLWindowVisible = true;
@@ -902,6 +902,24 @@ const EventCallback *GetCallbacks()
 	return Callbacks;
 }
 
+int PollEvent()
+{
+	SDL_Event event;
+	if (SDL_PollEvent(&event)) { // Handle SDL event
+		SdlDoEvent(*GetCallbacks(), event);
+		return 1;
+	}
+
+	return 0;
+}
+
+void PollEvents()
+{
+	if (Callbacks == NULL) return;
+
+	while (PollEvent()) { }
+}
+
 /**
 **  Wait for interactive input event for one frame.
 **
@@ -939,11 +957,7 @@ void WaitEventsOneFrame()
 			NextFrameTicks += FrameTicks;
 		}
 
-		SDL_Event event[1];
-		const int i = SDL_PollEvent(event);
-		if (i) { // Handle SDL event
-			SdlDoEvent(*GetCallbacks(), *event);
-		}
+		int i = PollEvent();
 
 		// Network
 		int s = 0;

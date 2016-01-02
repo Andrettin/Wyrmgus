@@ -156,6 +156,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern void LoadIcons();   /// Load icons
+extern int  GetIconsCount();
 extern void CleanIcons();  /// Cleanup icons
 
 //@}

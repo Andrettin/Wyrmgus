@@ -1516,6 +1516,28 @@ void LoadUnitTypeSprite(CUnitType &type)
 	//Wyrmgus end
 }
 
+
+/**
+** Return the amount of unit-types.
+*/
+int GetUnitTypesCount()
+{
+	int count = 0;
+	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+		CUnitType &type = *UnitTypes[i];
+
+		if (type.Missile.IsEmpty() == false) count++;
+		if (type.FireMissile.IsEmpty() == false) count++;
+		if (type.Explosion.IsEmpty() == false) count++;
+
+
+		if (!type.Sprite) {
+			count++;
+		}
+	}
+	return count;
+}
+
 /**
 ** Load the graphics for the unit-types.
 */
@@ -1564,6 +1586,8 @@ void LoadUnitTypes()
 		if (!type.Sprite) {
 			ShowLoadProgress(_("Unit \"%s\""), type.Name.c_str());
 			LoadUnitTypeSprite(type);
+
+			IncItemsLoaded();
 		}
 #endif
 		// FIXME: should i copy the animations of same graphics?

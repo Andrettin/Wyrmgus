@@ -99,6 +99,7 @@ void CConstruction::Load()
 		this->Sprite = CPlayerColorGraphic::New(file, this->Width, this->Height);
 		this->Sprite->Load();
 		this->Sprite->Flip();
+		IncItemsLoaded();
 	}
 	file = this->ShadowFile.File;
 	this->ShadowWidth = this->ShadowFile.Width;
@@ -109,6 +110,7 @@ void CConstruction::Load()
 		this->ShadowSprite->Load();
 		this->ShadowSprite->Flip();
 		this->ShadowSprite->MakeShadow();
+		IncItemsLoaded();
 	}
 }
 
@@ -118,6 +120,31 @@ void CConstruction::Load()
 */
 void InitConstructions()
 {
+}
+
+
+/**
+**  Return the amount of constructions.
+*/
+int GetConstructionsCount()
+{
+	int count = 0;
+	for (std::vector<CConstruction *>::iterator it = Constructions.begin();
+		 it != Constructions.end();
+		 ++it) {
+		 CConstruction *c = *it;
+		if (c->Ident.empty()) {
+			continue;
+		}
+
+		std::string file = c->File.File;
+		if (!file.empty()) count++;
+
+		file = c->ShadowFile.File;
+		if (!file.empty()) count++;
+
+	}
+	return count;
 }
 
 /**

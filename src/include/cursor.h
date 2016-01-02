@@ -179,6 +179,9 @@ extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
 --  Functions
 ----------------------------------------------------------------------------*/
 
+/// Get amount of cursors to load
+extern int GetCursorsCount(const std::string &racename);
+
 /// Load all cursors
 extern void LoadCursors(const std::string &racename);
 

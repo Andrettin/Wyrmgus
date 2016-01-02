@@ -709,6 +709,8 @@ extern void DrawSelectionCorners(IntColor, int, int, int, int);
 
 /// Register CCL decorations features
 extern void DecorationCclRegister();
+/// Get the amount of decorations
+extern int GetDecorationsCount();
 /// Load the decorations (health,mana) of units
 extern void LoadDecorations();
 /// Clean the decorations (health,mana) of units

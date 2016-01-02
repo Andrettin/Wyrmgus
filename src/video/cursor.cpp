@@ -89,6 +89,28 @@ static SDL_Surface *HiddenSurface;
 ----------------------------------------------------------------------------*/
 
 /**
+**  Get the amount of cursors sprites to load
+*/
+int GetCursorsCount(const std::string &race)
+{
+	int count = 0;
+	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
+		CCursor &cursor = **i;
+
+		//  Only load cursors of this race or universal cursors.
+		if (!cursor.Race.empty() && cursor.Race != race) {
+			continue;
+		}
+
+		if (cursor.G && !cursor.G->IsLoaded()) {
+			count++;
+		}
+	}
+
+	return count;
+}
+
+/**
 **  Load all cursor sprites.
 **
 **  @param race  Cursor graphics of this race to load.
@@ -107,6 +129,8 @@ void LoadCursors(const std::string &race)
 			ShowLoadProgress(_("Cursor %s"), cursor.G->File.c_str());
 			cursor.G->Load();
 			cursor.G->UseDisplayFormat();
+
+			IncItemsLoaded();
 		}
 	}
 }

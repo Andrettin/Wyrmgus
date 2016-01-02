@@ -295,13 +295,21 @@ bool IconConfig::LoadNoLog()
 */
 bool IconConfig::Load()
 {
-	if (LoadNoLog() == true) {
+	bool res = LoadNoLog();
+	if (res == true) {
 		ShowLoadProgress(_("Icon %s"), this->Name.c_str());
-		return true;
 	} else {
 		fprintf(stderr, _("Can't find icon %s\n"), this->Name.c_str());
-		return false;
 	}
+	return res;
+}
+
+/**
+**  Get the numbers of icons.
+*/
+int GetIconsCount()
+{
+	return Icons.size();
 }
 
 /**
@@ -314,6 +322,8 @@ void LoadIcons()
 
 		ShowLoadProgress(_("Icons %s"), icon.G->File.c_str());
 		icon.Load();
+
+		IncItemsLoaded();
 	}
 }
 

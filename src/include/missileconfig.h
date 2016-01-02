@@ -48,6 +48,7 @@ public:
 
 	bool MapMissileNoLog();
 	bool MapMissile();
+	bool IsEmpty() { return Name.empty(); }
 
 public:
 	std::string Name;        /// Config missile name

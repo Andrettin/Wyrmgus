@@ -1026,6 +1026,7 @@ extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 extern void LoadUnitTypeSprite(CUnitType &unittype); /// Load the sprite for a unittype
+extern int GetUnitTypesCount();                     /// Get the amount of unit-types
 extern void LoadUnitTypes();                     /// Load the unit-type data
 extern void CleanUnitTypes();                    /// Cleanup unit-type module
 

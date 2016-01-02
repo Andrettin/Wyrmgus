@@ -39,25 +39,27 @@
 
 bool MissileConfig::MapMissileNoLog()
 {
-	if (this->Name.empty()) {
-		this->Missile = NULL;
+	if (Name.empty()) {
+		Missile = NULL;
 		return true;
 	}
-	this->Missile = MissileTypeByIdent(this->Name);
-	return this->Missile != NULL;
+	Missile = MissileTypeByIdent(Name);
+	return Missile != NULL;
 }
 
 bool MissileConfig::MapMissile()
 {
-	if (MapMissileNoLog() == true) {
-		if (this->Name.empty() == false) {
-			ShowLoadProgress(_("Missile %s"), this->Name.c_str());
+	bool res = MapMissileNoLog();
+	if (res == true) {
+		if (Name.empty() == false) {
+			ShowLoadProgress(_("Missile %s"), Name.c_str());
+			IncItemsLoaded();
 		}
-		return true;
 	} else {
-		fprintf(stderr, _("Can't find missile %s\n"), this->Name.c_str());
-		return false;
+		fprintf(stderr, _("Can't find missile %s\n"), Name.c_str());
 	}
+
+	return res;
 }
 
 //@}
