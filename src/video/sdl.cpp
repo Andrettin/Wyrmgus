@@ -1097,7 +1097,7 @@ void ToggleGrabMouse(int mode)
 */
 void ToggleFullScreen()
 {
-#ifdef USE_WIN32
+#if defined(USE_WIN32) || defined(__APPLE__)
 	long framesize;
 	SDL_Rect clip;
 	Uint32 flags;
