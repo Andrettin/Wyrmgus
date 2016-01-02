@@ -1363,9 +1363,13 @@ static bool IsReadyToRepair(const CUnit &unit)
 	} else if (unit.Orders.size() == 1 && unit.CurrentAction() == UnitActionResource) {
 		COrder_Resource &order = *static_cast<COrder_Resource *>(unit.CurrentOrder());
 
-		if (order.IsGatheringStarted() == false) {
+		//Wyrmgus start
+//		if (order.IsGatheringStarted() == false) {
+		//Wyrmgus end
 			return true;
-		}
+		//Wyrmgus start
+//		}
+		//Wyrmgus end
 	}
 	return false;
 }
