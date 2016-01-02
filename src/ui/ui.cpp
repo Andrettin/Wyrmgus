@@ -101,6 +101,8 @@ void ShowLoadProgress(const char *fmt, ...)
 //		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
 		InvalidateArea(0, Video.Height - 18, Video.Width, 18);
 		//Wyrmgus end
+
+		UpdateLoadingBar();
 		RealizeVideoMemory();
 	} else {
 		DebugPrint("!!!!%s\n" _C_ temp);

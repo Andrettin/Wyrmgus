@@ -973,6 +973,54 @@ static void GameTypeManTeamVsMachine()
 --  Game creation
 ----------------------------------------------------------------------------*/
 
+static int itemsToLoad;
+static int itemsLoaded;
+static CGraphic *loadingEmpty = NULL;
+static CGraphic *loadingFull = NULL;
+
+void CalculateItemsToLoad()
+{
+	itemsLoaded = 0;
+	itemsToLoad = 0;
+
+	if (CanAccessFile("ui/loadingEmpty.png") == false || CanAccessFile("ui/loadingFull.png") == false) {
+		return;
+	}
+
+	itemsToLoad+= GetIconsCount();
+	itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
+	itemsToLoad+= GetUnitTypesCount();
+	itemsToLoad+= GetDecorationsCount();
+	itemsToLoad+= GetConstructionsCount();
+	itemsToLoad+= GetMissileSpritesCount();
+
+	loadingEmpty = CGraphic::New("ui/loadingEmpty.png");
+	loadingEmpty->Load();
+	loadingFull = CGraphic::New("ui/loadingFull.png");
+	loadingFull->Load();
+}
+
+void UpdateLoadingBar()
+{
+	if (itemsToLoad == 0)
+		return;
+
+	int x = Video.Width/2 - loadingEmpty->Width/2;
+	int y = Video.Height/2 - loadingEmpty->Height/2;
+	int pct = (itemsLoaded * 100) / itemsToLoad;
+
+	loadingEmpty->DrawClip(x, y);
+	loadingFull->DrawSub(0, 0, (loadingFull->Width * pct) / 100, loadingFull->Height, x, y);
+}
+
+void IncItemsLoaded()
+{
+	if (itemsToLoad == 0 || itemsLoaded >= itemsToLoad)
+		return;
+
+	itemsLoaded++;
+}
+
 /**
 **  CreateGame.
 **
@@ -1123,6 +1171,8 @@ void CreateGame(const std::string &filename, CMap *map)
 	//
 	// Graphic part
 	//
+	CalculateItemsToLoad();
+
 	SetPlayersPalette();
 	LoadIcons();
 

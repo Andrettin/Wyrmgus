@@ -414,6 +414,14 @@ void DecorationCclRegister()
 }
 
 /**
+**  Return the amount of decorations.
+*/
+int GetDecorationsCount()
+{
+	return DecoSprite.SpriteArray.size();
+}
+
+/**
 **  Load decoration.
 */
 void LoadDecorations()

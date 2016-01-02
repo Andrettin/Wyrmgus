@@ -597,6 +597,8 @@ extern void MissileCclRegister();
 
 /// load all missile sprites
 extern void LoadMissileSprites();
+/// count missile sprites
+extern int GetMissileSpritesCount();
 /// allocate an empty missile-type slot
 extern MissileType *NewMissileTypeSlot(const std::string &ident);
 /// Get missile-type by ident

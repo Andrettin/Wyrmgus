@@ -172,6 +172,8 @@ public:
 extern void InitConstructions();
 /// Load the graphics for constructions
 extern void LoadConstructions();
+/// Count the amount of constructions to load
+extern int GetConstructionsCount();
 /// Clean up the constructions module
 extern void CleanConstructions();
 /// Get construction by identifier

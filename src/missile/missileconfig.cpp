@@ -49,14 +49,16 @@ bool MissileConfig::MapMissileNoLog()
 
 bool MissileConfig::MapMissile()
 {
-	bool res = MapMissileNoLog() ;
+	bool res = MapMissileNoLog();
 	if (res == true) {
 		if (Name.empty() == false) {
 			ShowLoadProgress(_("Missile %s"), Name.c_str());
+			IncItemsLoaded();
 		}
 	} else {
 		fprintf(stderr, _("Can't find missile %s\n"), Name.c_str());
 	}
+
 	return res;
 }
 

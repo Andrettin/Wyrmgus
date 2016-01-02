@@ -305,6 +305,14 @@ bool IconConfig::Load()
 }
 
 /**
+**  Get the numbers of icons.
+*/
+int GetIconsCount()
+{
+	return Icons.size();
+}
+
+/**
 **  Load the graphics for the icons.
 */
 void LoadIcons()
@@ -314,6 +322,8 @@ void LoadIcons()
 
 		ShowLoadProgress(_("Icons %s"), icon.G->File.c_str());
 		icon.Load();
+
+		IncItemsLoaded();
 	}
 }
 

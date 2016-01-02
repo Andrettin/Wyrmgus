@@ -99,6 +99,15 @@ void MissileType::LoadMissileSprite()
 	}
 }
 
+int GetMissileSpritesCount()
+{
+#ifndef DYNAMIC_LOAD
+	return MissileTypes.size();
+#else
+	return 0;
+#endif
+}
+
 /**
 **  Load the graphics for all missiles types
 */
