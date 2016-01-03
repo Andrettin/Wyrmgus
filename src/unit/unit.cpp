@@ -892,7 +892,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		if ((requires_weapon && !found_weapon) || (requires_shield && !found_shield)) {
 			continue;
 		}
-		if (!ignore_old_variation && !priority_variation.empty() && varinfo->VariationId.find(priority_variation) != std::string::npos) { // if the priority variation's ident is included in that of a new viable, choose the latter automatically
+		if (!ignore_old_variation && !priority_variation.empty() && (varinfo->VariationId.find(priority_variation) != std::string::npos || priority_variation.find(varinfo->VariationId) != std::string::npos)) { // if the priority variation's ident is included in that of a new viable variation (or vice-versa), choose the latter automatically
 			this->SetVariation(i, new_type, image_layer);
 			type_variations.clear();
 			break;
