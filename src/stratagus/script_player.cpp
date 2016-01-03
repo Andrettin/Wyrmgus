@@ -2284,22 +2284,20 @@ static int CclDefineCivilizationFactions(lua_State *l)
 				} else if (!strcmp(value, "type")) {
 					++k;
 					PlayerRaces.Factions[civilization][(j - 1) / 2]->Type = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "color")) {
+				} else if (!strcmp(value, "colors")) {
 					++k;
-					std::string color_name = LuaToString(l, j + 1, k + 1);
-					for (int c = 0; c < PlayerColorMax; ++c) {
-						if (PlayerColorNames[c] == color_name) {
-							PlayerRaces.Factions[civilization][(j - 1) / 2]->Color = c;
-							break;
-						}
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument (expected table)");
 					}
-				} else if (!strcmp(value, "secondary_color")) {
-					++k;
-					std::string color_name = LuaToString(l, j + 1, k + 1);
-					for (int c = 0; c < PlayerColorMax; ++c) {
-						if (PlayerColorNames[c] == color_name) {
-							PlayerRaces.Factions[civilization][(j - 1) / 2]->SecondaryColor = c;
-							break;
+					int subsubargs = lua_rawlen(l, -1);
+					for (int n = 0; n < subsubargs; ++n) {
+						std::string color_name = LuaToString(l, -1, n + 1);
+						for (int c = 0; c < PlayerColorMax; ++c) {
+							if (PlayerColorNames[c] == color_name) {
+								PlayerRaces.Factions[civilization][(j - 1) / 2]->Colors.push_back(c);
+								break;
+							}
 						}
 					}
 				} else if (!strcmp(value, "playable")) {
@@ -2360,20 +2358,18 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "Type")) {
 			faction->Type = LuaToString(l, -1);
-		} else if (!strcmp(value, "Color")) {
-			std::string color_name = LuaToString(l, -1);
-			for (int c = 0; c < PlayerColorMax; ++c) {
-				if (PlayerColorNames[c] == color_name) {
-					faction->Color = c;
-					break;
-				}
+		} else if (!strcmp(value, "Colors")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
 			}
-		} else if (!strcmp(value, "SecondaryColor")) {
-			std::string color_name = LuaToString(l, -1);
-			for (int c = 0; c < PlayerColorMax; ++c) {
-				if (PlayerColorNames[c] == color_name) {
-					faction->SecondaryColor = c;
-					break;
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				std::string color_name = LuaToString(l, -1, k + 1);
+				for (int c = 0; c < PlayerColorMax; ++c) {
+					if (PlayerColorNames[c] == color_name) {
+						faction->Colors.push_back(c);
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "DefaultTier")) {
@@ -2564,10 +2560,11 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, PlayerRaces.Factions[civilization][civilization_faction]->Type.c_str());
 		return 1;
 	} else if (!strcmp(data, "Color")) {
-		lua_pushstring(l, PlayerColorNames[PlayerRaces.Factions[civilization][civilization_faction]->Color].c_str());
-		return 1;
-	} else if (!strcmp(data, "SecondaryColor")) {
-		lua_pushstring(l, PlayerColorNames[PlayerRaces.Factions[civilization][civilization_faction]->SecondaryColor].c_str());
+		if (PlayerRaces.Factions[civilization][civilization_faction]->Colors.size() > 0) {
+			lua_pushstring(l, PlayerColorNames[PlayerRaces.Factions[civilization][civilization_faction]->Colors[0]].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Factions[civilization][civilization_faction]->Playable);

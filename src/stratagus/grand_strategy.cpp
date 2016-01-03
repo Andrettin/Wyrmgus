@@ -273,7 +273,7 @@ void CGrandStrategyGame::DrawMap()
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (this->WorldMapTiles[x][y]->Terrain != -1) {
-				int player_color = this->WorldMapTiles[x][y]->Province != -1 && this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner != NULL ? PlayerRaces.Factions[this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner->Civilization][this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner->Faction]->Color : 15;
+				int player_color = this->WorldMapTiles[x][y]->Province != -1 && this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner != NULL ? PlayerRaces.Factions[this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner->Civilization][this->Provinces[this->WorldMapTiles[x][y]->Province]->Owner->Faction]->Colors[0] : 15;
 				
 				int province_id = this->WorldMapTiles[x][y]->Province;
 				
@@ -372,7 +372,7 @@ void CGrandStrategyGame::DrawMap()
 						} else {
 							int player_color;
 							if (this->Provinces[province_id]->Owner != NULL) {
-								player_color = PlayerRaces.Factions[this->Provinces[province_id]->Owner->Civilization][this->Provinces[province_id]->Owner->Faction]->Color;
+								player_color = PlayerRaces.Factions[this->Provinces[province_id]->Owner->Civilization][this->Provinces[province_id]->Owner->Faction]->Colors[0];
 							} else {
 								player_color = 15;
 							}
@@ -1360,7 +1360,7 @@ void CGrandStrategyGame::UpdateMinimap()
 				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != -1) {
 					int province_id = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
 					if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
-						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Colors[0];
 						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
 						*(Uint32 *)&(this->MinimapSurfaceGL[(mx + my * this->MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
@@ -1377,7 +1377,7 @@ void CGrandStrategyGame::UpdateMinimap()
 				if (GrandStrategyGame.WorldMapTiles[tile_x][tile_y] && GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province != -1) {
 					int province_id = GrandStrategyGame.WorldMapTiles[tile_x][tile_y]->Province;
 					if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
-						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Colors[0];
 						if (bpp == 2) {
 							*(Uint16 *)&((Uint8 *)this->MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 						} else {
@@ -1455,7 +1455,7 @@ void WorldMapTile::UpdateMinimap()
 				if (this->Province != -1) {
 					int province_id = this->Province;
 					if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
-						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Colors[0];
 						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 					} else if (GrandStrategyGame.Provinces[province_id]->Water) {
 						*(Uint32 *)&(GrandStrategyGame.MinimapSurfaceGL[(mx + my * GrandStrategyGame.MinimapTextureWidth) * 4]) = Video.MapRGB(TheScreen->format, 171, 198, 217);
@@ -1472,7 +1472,7 @@ void WorldMapTile::UpdateMinimap()
 				if (this->Province != -1) {
 					int province_id = this->Province;
 					if (GrandStrategyGame.Provinces[province_id]->Owner != NULL) {
-						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Color;
+						int player_color = PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Colors[0];
 						if (bpp == 2) {
 							*(Uint16 *)&((Uint8 *)GrandStrategyGame.MinimapSurface->pixels)[index] = Video.MapRGB(TheScreen->format, PlayerColorsRGB[player_color][0]);
 						} else {

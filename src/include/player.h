@@ -174,6 +174,7 @@ public:
 	//Wyrmgus start
 	void SetFaction(const std::string faction_name);
 	void SetRandomFaction();
+	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(std::string upgrade_class_name);
 	//Wyrmgus end
 
@@ -302,7 +303,7 @@ class CFaction
 public:
 	CFaction() : 
 		Name(""), Type(""), FactionUpgrade(""),
-		Color(-1), SecondaryColor(-1), DefaultTier(FactionTierBarony), ParentFaction(-1),
+		DefaultTier(FactionTierBarony), ParentFaction(-1),
 		Playable(true) //factions are playable by default
 	{
 	}
@@ -310,11 +311,10 @@ public:
 	std::string Name;													/// faction name
 	std::string Type;													/// faction type (tribe or polity)
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
-	int Color;															/// faction color
-	int SecondaryColor;													/// faction secondary color
 	int DefaultTier;													/// default faction tier
 	int ParentFaction;													/// parent faction of this faction
 	bool Playable;														/// faction playability
+	std::vector<int> Colors;											/// faction colors
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 };

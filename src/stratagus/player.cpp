@@ -1146,20 +1146,25 @@ void CPlayer::SetFaction(const std::string faction_name)
 	}
 	this->Faction = faction;
 	if (this->Faction != -1) {
-		int PrimaryColor = PlayerRaces.Factions[this->Race][faction]->Color;
-		int SecondaryColor = PlayerRaces.Factions[this->Race][faction]->SecondaryColor;
-		bool color_used = false;
-		for (int i = 0; i < PlayerMax; ++i) {
-			if (this->Index != i && Players[i].Faction != -1 && Players[i].Type != PlayerNobody && Players[i].Color == PlayerColors[PrimaryColor][0]) {
-				color_used = true;
-			}		
+		int color = -1;
+		for (size_t i = 0; i < PlayerRaces.Factions[this->Race][faction]->Colors.size(); ++i) {
+			if (!IsPlayerColorUsed(PlayerRaces.Factions[this->Race][faction]->Colors[i])) {
+				color = PlayerRaces.Factions[this->Race][faction]->Colors[i];
+				break;
+			}
 		}
-		if (!color_used) {
-			this->Color = PlayerColors[PrimaryColor][0];
-			this->UnitColors.Colors = PlayerColorsRGB[PrimaryColor];
-		} else {
-			this->Color = PlayerColors[SecondaryColor][0];
-			this->UnitColors.Colors = PlayerColorsRGB[SecondaryColor];
+		if (color == -1) { //if all of the faction's colors are used, get a unused player color
+			for (int i = 0; i < PlayerColorMax; ++i) {
+				if (!IsPlayerColorUsed(i)) {
+					color = i;
+					break;
+				}
+			}
+		}
+		
+		if (color != -1) {
+			this->Color = PlayerColors[color][0];
+			this->UnitColors.Colors = PlayerColorsRGB[color];
 		}
 	
 		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {
@@ -1229,6 +1234,17 @@ void CPlayer::SetRandomFaction()
 		int chosen_faction = local_factions[SyncRand(faction_count)];
 		this->SetFaction(PlayerRaces.Factions[this->Race][chosen_faction]->Name);
 	}
+}
+
+bool CPlayer::IsPlayerColorUsed(int color)
+{
+	bool color_used = false;
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (this->Index != i && Players[i].Faction != -1 && Players[i].Type != PlayerNobody && Players[i].Color == PlayerColors[color][0]) {
+			color_used = true;
+		}		
+	}
+	return color_used;
 }
 
 bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
