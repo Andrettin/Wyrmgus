@@ -38,9 +38,6 @@
 
 #include "ui.h"
 
-//Wyrmgus start
-#include "editor.h"
-//Wyrmgus end
 #include "font.h"
 #include "interface.h"
 #include "iolib.h"
@@ -111,13 +108,7 @@ void ShowLoadProgress(const char *fmt, ...)
 		DebugPrint("!!!!%s\n" _C_ temp);
 	}
 
-	//Wyrmgus start
-//	PollEvents();
-	//quick fix to the map editor PollEvents load crash
-	if (Editor.Running == EditorNotRunning) {
-		PollEvents();
-	}
-	//Wyrmgus end
+	PollEvents();
 }
 
 CUnitInfoPanel::~CUnitInfoPanel()

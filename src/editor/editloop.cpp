@@ -2191,6 +2191,7 @@ void CEditor::Init()
 	EditorCallbacks.KeyReleased = EditorCallbackKeyUp;
 	EditorCallbacks.KeyRepeated = EditorCallbackKeyRepeated;
 	EditorCallbacks.NetworkEvent = NetworkEvent;
+	SetCallbacks(&EditorCallbacks);
 }
 
 /**
@@ -2229,7 +2230,6 @@ void EditorMainLoop()
 	bool first_init = true;
 
 	CommandLogDisabled = true;
-	SetCallbacks(&EditorCallbacks);
 
 	gcn::Widget *oldTop = Gui->getTop();
 

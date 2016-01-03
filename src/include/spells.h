@@ -266,7 +266,10 @@ extern void InitSpells();
 extern void CleanSpells();
 
 /// return 1 if spell is available, 0 if not (must upgrade)
-extern bool SpellIsAvailable(const CPlayer &player, int SpellId);
+//Wyrmgus start
+//extern bool SpellIsAvailable(const CPlayer &player, int SpellId);
+extern bool SpellIsAvailable(const CUnit &unit, int SpellId);
+//Wyrmgus end
 
 /// returns true if spell can be casted (enough mana, valid target)
 extern bool CanCastSpell(const CUnit &caster, const SpellType &spell,

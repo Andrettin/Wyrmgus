@@ -65,7 +65,10 @@ void AiCheckMagic()
 			}
 			for (unsigned int j = 0; j < SpellTypeTable.size(); ++j) {
 				// Check if we can cast this spell. SpellIsAvailable checks for upgrades.
-				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j)
+				//Wyrmgus start
+//				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(player, j)
+				if (unit.Type->CanCastSpell[j] && SpellIsAvailable(unit, j)
+				//Wyrmgus end
 					&& SpellTypeTable[j]->AICast) {
 					if (AutoCastSpell(unit, *SpellTypeTable[j])) {
 						break;

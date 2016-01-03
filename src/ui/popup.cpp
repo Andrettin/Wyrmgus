@@ -643,6 +643,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				LuaError(l, "Unsupported button action: %s" _C_ value);
 			}
 		//Wyrmgus start
+		} else if (!strcmp(key, "AutoCast")) {
+			condition->AutoCast = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Equipped")) {
 			condition->Equipped = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Equippable")) {

@@ -446,6 +446,14 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
+	if (button.Action == ButtonSpellCast) {
+		if (condition->AutoCast != CONDITION_TRUE) {
+			if ((condition->AutoCast == CONDITION_ONLY) ^ (SpellTypeTable[button.Value]->AutoCast != NULL)) {
+				return false;
+			}
+		}
+	}
+		
 	if (button.Action == ButtonUnit) {
 		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
 		if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
@@ -1338,7 +1346,10 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		//Wyrmgus end
 		case ButtonSpellCast:
-			res = SpellIsAvailable(*unit.Player, buttonaction.Value);
+			//Wyrmgus start
+//			res = SpellIsAvailable(*unit.Player, buttonaction.Value);
+			res = SpellIsAvailable(unit, buttonaction.Value);
+			//Wyrmgus end
 			break;
 		case ButtonUnload:
 			res = (Selected[0]->Type->CanTransport() && Selected[0]->BoardCount);

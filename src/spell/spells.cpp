@@ -437,11 +437,17 @@ SpellType *SpellTypeByIdent(const std::string &ident)
 **
 **  @return          0 if spell is not available, else no null.
 */
-bool SpellIsAvailable(const CPlayer &player, int spellid)
+//Wyrmgus start
+//bool SpellIsAvailable(const CPlayer &player, int spellid)
+bool SpellIsAvailable(const CUnit &unit, int spellid)
+//Wyrmgus end
 {
 	const int dependencyId = SpellTypeTable[spellid]->DependencyId;
 
-	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
+	//Wyrmgus start
+//	return dependencyId == -1 || UpgradeIdAllowed(player, dependencyId) == 'R';
+	return dependencyId == -1 || unit.IndividualUpgrades[dependencyId] || UpgradeIdAllowed(*unit.Player, dependencyId) == 'R';
+	//Wyrmgus end
 }
 
 /**
@@ -475,7 +481,10 @@ bool CanCastSpell(const CUnit &caster, const SpellType &spell,
 int AutoCastSpell(CUnit &caster, const SpellType &spell)
 {
 	//  Check for mana and cooldown time, trivial optimization.
-	if (!SpellIsAvailable(*caster.Player, spell.Slot)
+	//Wyrmgus start
+//	if (!SpellIsAvailable(*caster.Player, spell.Slot)
+	if (!SpellIsAvailable(caster, spell.Slot)
+	//Wyrmgus end
 		|| caster.Variable[MANA_INDEX].Value < spell.ManaCost
 		|| caster.SpellCoolDownTimers[spell.Slot]) {
 		return 0;
