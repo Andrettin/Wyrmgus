@@ -920,7 +920,10 @@ static void AiCheckingWork()
 **
 **  @return          1 if the worker was assigned, 0 otherwise.
 */
-static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
+//Wyrmgus start
+//static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
+static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_range)
+//Wyrmgus end
 {
 	// TODO : hardcoded forest
 	Vec2i forestPos;
@@ -931,19 +934,24 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 	// Code for terrain harvesters. Search for piece of terrain to mine.
 	//Wyrmgus start
 //	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
-	if (resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
+	if (resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, resource_range, *unit.Player, unit.tilePos, &forestPos)) {
 	//Wyrmgus end
 		CommandResourceLoc(unit, forestPos, FlushCommands);
 		return 1;
 	}
 	//Wyrmgus start
-	if (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, 1000, *unit.Player, unit.tilePos, &rockPos)) {
+	if (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, resource_range, *unit.Player, unit.tilePos, &rockPos)) {
 		CommandResourceLoc(unit, rockPos, FlushCommands);
 		return 1;
 	}
 	//Wyrmgus end
 	// Ask the AI to explore...
-	AiExplore(unit.tilePos, MapFieldLandUnit);
+	//Wyrmgus start
+//	AiExplore(unit.tilePos, MapFieldLandUnit);
+	if (resource_range == 1000) { //only explore if searching the whole map for the resource
+		AiExplore(unit.tilePos, MapFieldLandUnit);
+	}
+	//Wyrmgus end
 
 	// Failed.
 	return 0;
@@ -957,85 +965,76 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource)
 **
 **  @return          1 if the worker was assigned, 0 otherwise.
 */
-static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
+//Wyrmgus start
+//static int AiAssignHarvesterFromUnit(CUnit &unit, int resource)
+static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_range)
+//Wyrmgus end
 {
-	//Wyrmgus start
-	/*
 	// Try to find the nearest depot first.
 	CUnit *depot = FindDeposit(unit, 1000, resource);
+	
 	// Find a resource to harvest from.
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
+	//Wyrmgus start
+//	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true);
+	//Wyrmgus end
 
 	if (mine) {
 		CommandResource(unit, *mine, FlushCommands);
 		return 1;
 	}
-	*/
 	
-	// Try to find the nearest depot first.
-	CUnit *depot = FindDeposit(unit, 1000, resource);
-	
-	int resource_range = 0;
-	for (int i = 0; i < 3; ++i) { //search for resources first in a 16 tile radius, then in a 32 tile radius, and then in the whole map
-		resource_range += 16;
-		if (i == 2) {
-			resource_range = 1000;
-		}
-		
-		// Find a resource to harvest from.
-		CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true); //search nearby first
-		if (mine) {
-			CommandResource(unit, *mine, FlushCommands);
-			return 1;
-		}
-		
-		//didn't find anything? see if there are resources which convert to this one
-		for (int c = 0; c < MaxCosts; ++c) {
-			if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
-				mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, c, true);
+	//Wyrmgus start
+	//didn't find anything? see if there are resources which convert to this one
+	for (int c = 0; c < MaxCosts; ++c) {
+		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
+			mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, c, true);
 
-				if (mine) {
-					CommandResource(unit, *mine, FlushCommands);
-					return 1;
-				}
+			if (mine) {
+				CommandResource(unit, *mine, FlushCommands);
+				return 1;
 			}
 		}
+	}
 		
-		//if no readily-harvestable resources are available, search for deposits instead
-		CUnit *deposit = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, NULL, false);
+	//if no readily-harvestable resources are available, search for deposits instead
+	CUnit *deposit = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, NULL, false);
 		
-		if (deposit) {
-			const int n = AiHelpers.Refinery[resource - 1].size();
+	if (deposit) {
+		const int n = AiHelpers.Refinery[resource - 1].size();
 
-			for (int i = 0; i < n; ++i) {
-				CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
+		for (int i = 0; i < n; ++i) {
+			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
 
-				if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-					CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
-					return 1;
-				}
+			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
+				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+				return 1;
 			}
 		}
+	}
 		
-		//didn't find anything? see if there are resource deposits which convert to this one
-		for (int c = 0; c < MaxCosts; ++c) {
-			if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
-				deposit = UnitFindResource(unit, depot ? *depot : unit, resource_range, c, true, NULL, false);
+	//didn't find anything? see if there are resource deposits which convert to this one
+	for (int c = 0; c < MaxCosts; ++c) {
+		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
+			deposit = UnitFindResource(unit, depot ? *depot : unit, resource_range, c, true, NULL, false);
 				
-				if (deposit) {
-					const int n = AiHelpers.Refinery[c - 1].size();
+			if (deposit) {
+				const int n = AiHelpers.Refinery[c - 1].size();
 
-					for (int i = 0; i < n; ++i) {
-						CUnitType &type = *AiHelpers.Refinery[c - 1][i];
+				for (int i = 0; i < n; ++i) {
+					CUnitType &type = *AiHelpers.Refinery[c - 1][i];
 
-						if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-							CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
-							return 1;
-						}
+					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
+						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+						return 1;
 					}
 				}
 			}
 		}
+	}
+	
+	if (resource_range != 1000) { //only explore if searching the whole map for the resource
+		return 0;
 	}
 	//Wyrmgus end
 
@@ -1092,15 +1091,29 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 	Assert(&resinfo);
 
 	//Wyrmgus start
-//	if (resinfo.TerrainHarvester) {
-	Vec2i forestPos;
-	Vec2i rockPos;
-	if ((resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) || (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, 1000, *unit.Player, unit.tilePos, &rockPos))) {
-	//Wyrmgus end
+	/*
+	if (resinfo.TerrainHarvester) {
 		return AiAssignHarvesterFromTerrain(unit, resource);
 	} else {
 		return AiAssignHarvesterFromUnit(unit, resource);
 	}
+	*/
+	int resource_range = 0;
+	for (int i = 0; i < 3; ++i) { //search for resources first in a 16 tile radius, then in a 32 tile radius, and then in the whole map
+		resource_range += 16;
+		if (i == 2) {
+			resource_range = 1000;
+		}
+		
+		Vec2i forestPos;
+		Vec2i rockPos;
+		if ((resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, resource_range, *unit.Player, unit.tilePos, &forestPos)) || (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, resource_range, *unit.Player, unit.tilePos, &rockPos))) {
+			return AiAssignHarvesterFromTerrain(unit, resource, resource_range);
+		} else {
+			return AiAssignHarvesterFromUnit(unit, resource, resource_range);
+		}
+	}
+	//Wyrmgus end
 }
 
 static bool CmpWorkers(const CUnit *lhs, const CUnit *rhs)
