@@ -2583,6 +2583,52 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "Prefixes")) {
+		std::vector<CUpgrade *> prefixes;
+		for (size_t i = 0; i < type->Affixes.size(); ++i)
+		{
+			if (type->Affixes[i]->MagicPrefix) {
+				prefixes.push_back(type->Affixes[i]);
+			}
+		}
+		if (type->ItemClass != -1) {
+			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+				if (AllUpgrades[i]->MagicPrefix && AllUpgrades[i]->ItemPrefix[type->ItemClass]) {
+					prefixes.push_back(AllUpgrades[i]);
+				}
+			}
+		}
+		
+		lua_createtable(l, prefixes.size(), 0);
+		for (size_t i = 1; i <= prefixes.size(); ++i)
+		{
+			lua_pushstring(l, prefixes[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Suffixes")) {
+		std::vector<CUpgrade *> suffixes;
+		for (size_t i = 0; i < type->Affixes.size(); ++i)
+		{
+			if (type->Affixes[i]->MagicSuffix) {
+				suffixes.push_back(type->Affixes[i]);
+			}
+		}
+		if (type->ItemClass != -1) {
+			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+				if (AllUpgrades[i]->MagicSuffix && AllUpgrades[i]->ItemSuffix[type->ItemClass]) {
+					suffixes.push_back(AllUpgrades[i]);
+				}
+			}
+		}
+		
+		lua_createtable(l, suffixes.size(), 0);
+		for (size_t i = 1; i <= suffixes.size(); ++i)
+		{
+			lua_pushstring(l, suffixes[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else if (!strcmp(data, "Variations")) {
 		std::vector<std::string> variation_idents;
 		for (int var_n = 0; var_n < VariationMax; ++var_n) {

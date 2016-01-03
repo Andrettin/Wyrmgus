@@ -286,6 +286,13 @@ static inline void IncreaseVariable(CUnit &unit, int index)
 	if (index == HP_INDEX && unit.Variable[HP_INDEX].Value <= 0) {
 		LetUnitDie(unit);
 	}
+	
+	//Wyrmgus start
+	//if variable is resources held and increase is negative, unit dies if resources held reached 0 (only for units which cannot be harvested, as the ones that can be harvested need more complex code for dying)
+	if (index == GIVERESOURCE_INDEX && unit.Variable[GIVERESOURCE_INDEX].Increase < 0 && unit.Variable[GIVERESOURCE_INDEX].Value <= 0 && unit.Type->GivesResource && !unit.Type->BoolFlag[CANHARVEST_INDEX].value) {
+		LetUnitDie(unit);
+	}
+	//Wyrmgus end
 }
 
 /**

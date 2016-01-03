@@ -665,6 +665,12 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 			if (unit.Trait != NULL) {
 				f->printf("AcquireTrait(unit, \"%s\")\n", unit.Trait->Ident.c_str());
 			}
+			if (unit.Prefix != NULL) {
+				f->printf("SetUnitVariable(unit, \"Prefix\", \"%s\")\n", unit.Prefix->Ident.c_str());
+			}
+			if (unit.Suffix != NULL) {
+				f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit.Suffix->Ident.c_str());
+			}
 			if (unit.Variable[HP_INDEX].Value != unit.Variable[HP_INDEX].Max) {
 				f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit.Variable[HP_INDEX].Value);
 			}

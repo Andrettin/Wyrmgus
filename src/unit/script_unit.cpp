@@ -1453,6 +1453,18 @@ static int CclGetUnitVariable(lua_State *l)
 		} else {
 			lua_pushstring(l, "");
 		}
+	} else if (!strcmp(value, "Prefix")) {
+		if (unit->Prefix != NULL) {
+			lua_pushstring(l, unit->Prefix->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+	} else if (!strcmp(value, "Suffix")) {
+		if (unit->Suffix != NULL) {
+			lua_pushstring(l, unit->Suffix->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 	} else if (!strcmp(value, "Icon")) {
 		lua_pushstring(l, unit->GetIcon().Name.c_str());
 		return 1;
