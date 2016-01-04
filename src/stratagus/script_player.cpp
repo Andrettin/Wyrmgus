@@ -41,6 +41,7 @@
 #include "ai.h"
 #include "commands.h"
 //Wyrmgus start
+#include "editor.h"
 #include "font.h"
 #include "grand_strategy.h"
 #include "item.h"
@@ -2887,7 +2888,7 @@ static int CclSetPlayerData(lua_State *l)
 	
 	//Wyrmgus start
 	//if player is unused, return
-	if (p->Type == PlayerNobody) {
+	if (p->Type == PlayerNobody && Editor.Running == EditorNotRunning) {
 		return 0;
 	}
 	//Wyrmgus end

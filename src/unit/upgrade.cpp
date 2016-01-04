@@ -53,6 +53,7 @@
 #include "commands.h"
 #include "depend.h"
 //Wyrmgus start
+#include "editor.h"
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "interface.h"
@@ -961,7 +962,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set new faction from new civilization
-		if (!GrandStrategy) {
+		if (!GrandStrategy && Editor.Running == EditorNotRunning) {
 			if (ThisPlayer && ThisPlayer->Index == player.Index) {
 				if (GameCycle != 0) {
 					char buf[256];
@@ -1218,7 +1219,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		}
 		
 		// set faction from the old civilization
-		if (!GrandStrategy) {
+		if (!GrandStrategy && Editor.Running == EditorNotRunning) {
 			if (ThisPlayer && ThisPlayer->Index == player.Index) {
 				if (GameCycle != 0) {
 					char buf[256];
@@ -1835,7 +1836,7 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 	//Wyrmgus start
 	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
 	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == "tribe")) {
-		if (!GrandStrategy) {
+		if (!GrandStrategy && Editor.Running == EditorNotRunning) {
 			int old_faction = player.Faction;
 			if (ThisPlayer && ThisPlayer->Index == player.Index) {
 				if (GameCycle != 0) {
