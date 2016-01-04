@@ -771,6 +771,10 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
 		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value);
 	}
+	
+	this->Variable[XP_INDEX].Enable = 1;
+	this->Variable[XP_INDEX].Value = (this->Variable[XPREQUIRED_INDEX].Value * this->Character->ExperiencePercent) / 100;
+	this->Variable[XP_INDEX].Max = this->Variable[XP_INDEX].Value;
 			
 	//load learned abilities
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
@@ -971,7 +975,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
-	if (Character && Character->Persistent && affect_character) {
+	if (!IsNetworkGame() && Character && Character->Persistent && this->Player->AiEnabled == false && affect_character) {
 		if (Character->GetItem(item) != NULL) {
 			if (!Character->IsItemEquipped(Character->GetItem(item))) {
 				Character->EquippedItems[item_slot].push_back(Character->GetItem(item));
@@ -1070,7 +1074,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		return;
 	}
 	
-	if (Character && Character->Persistent && affect_character) {
+	if (!IsNetworkGame() && Character && Character->Persistent && this->Player->AiEnabled == false && affect_character) {
 		if (Character->GetItem(item) != NULL) {
 			if (Character->IsItemEquipped(Character->GetItem(item))) {
 				Character->EquippedItems[item_slot].erase(std::remove(Character->EquippedItems[item_slot].begin(), Character->EquippedItems[item_slot].end(), Character->GetItem(item)), Character->EquippedItems[item_slot].end());
@@ -1146,7 +1150,7 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 			}
 		}
 	}
-	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Prefix = const_cast<CUpgrade *>(&(*prefix));
 		SaveHero(Container->Character);
 	}
@@ -1178,7 +1182,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 			}
 		}
 	}
-	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Suffix = const_cast<CUpgrade *>(&(*suffix));
 		SaveHero(Container->Character);
 	}
@@ -1203,7 +1207,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 
 void CUnit::SetSpell(SpellType *spell)
 {
-	if (Container && Container->Character && Container->Character->Persistent && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
+	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Spell = const_cast<SpellType *>(&(*spell));
 		SaveHero(Container->Character);
 	}
@@ -2010,6 +2014,11 @@ void CUnit::XPChanged()
 			this->Player->Notify(NotifyGreen, this->tilePos, _("%s has leveled up!"), GetMessageName().c_str());
 		}
 		this->IncreaseLevel(1);
+	}
+	
+	if (!IsNetworkGame() && this->Character != NULL && this->Character->Persistent && this->Player->AiEnabled == false) {
+		this->Character->ExperiencePercent = (this->Variable[XP_INDEX].Value * 100) / this->Variable[XPREQUIRED_INDEX].Value;
+		SaveHero(this->Character);
 	}
 }
 //Wyrmgus end

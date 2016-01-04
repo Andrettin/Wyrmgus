@@ -43,6 +43,7 @@
 #include "iolib.h"
 #include "luacallback.h"
 #include "missile.h"
+#include "network.h"
 #include "pathfinder.h"
 #include "script.h"
 #include "sound.h"
@@ -248,7 +249,7 @@ enum {
 					goal->Remove(NULL);
 					LetUnitDie(*goal);
 				} else {
-					if (goal->Container->Character && goal->Container->Character->Persistent && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
+					if (!IsNetworkGame() && goal->Container->Character && goal->Container->Character->Persistent && goal->Container->Player->AiEnabled == false && goal->Type->BoolFlag[ITEM_INDEX].value && goal->Container->HasInventory()) {
 						CItem *item = goal->Container->Character->GetItem(*goal);
 						goal->Container->Character->Items.erase(std::remove(goal->Container->Character->Items.begin(), goal->Container->Character->Items.end(), item), goal->Container->Character->Items.end());
 						delete item;

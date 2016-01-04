@@ -72,7 +72,7 @@ class CCharacter
 {
 public:
 	CCharacter() :
-		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0),
+		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
 		Persistent(false), Custom(false),
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL)
@@ -93,6 +93,7 @@ public:
 	int Faction;				/// Faction to which the character belongs
 	int Gender;					/// Character's gender
 	int Level;					/// Character's level
+	int ExperiencePercent;		/// Character's experience, as a percentage of the experience required to level up
 	bool Persistent;			/// Whether this character's levels and abilities are persistent
 	bool Custom;				/// Whether this character is a custom hero
 	std::string Name;			/// Given name of the character

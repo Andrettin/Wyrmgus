@@ -191,6 +191,8 @@ static int CclDefineCharacter(lua_State *l)
 			character->Persistent = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Level")) {
 			character->Level = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ExperiencePercent")) {
+			character->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Abilities")) {
 			character->Abilities.clear();
 			const int args = lua_rawlen(l, -1);

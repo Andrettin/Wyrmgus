@@ -262,6 +262,9 @@ void SaveHero(CCharacter *hero)
 	if (hero->Level != 0) {
 		fprintf(fd, "\tLevel = %d,\n", hero->Level);
 	}
+	if (hero->ExperiencePercent != 0) {
+		fprintf(fd, "\tExperiencePercent = %d,\n", hero->ExperiencePercent);
+	}
 	if (hero->Abilities.size() > 0) {
 		fprintf(fd, "\tAbilities = {");
 		for (size_t j = 0; j < hero->Abilities.size(); ++j) {

@@ -1140,8 +1140,6 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.Container->UpdateContainerAttackRange();
 						} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 							unit.UpdateXPRequired();
-						} else if (j == XP_INDEX) {
-							unit.XPChanged();
 						}
 						//Wyrmgus end
 					}
@@ -1393,8 +1391,6 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.Container->UpdateContainerAttackRange();
 						} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 							unit.UpdateXPRequired();
-						} else if (j == XP_INDEX) {
-							unit.XPChanged();
 						}
 						//Wyrmgus end
 					}
@@ -1477,8 +1473,6 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.Container->UpdateContainerAttackRange();
 		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 			unit.UpdateXPRequired();
-		} else if (j == XP_INDEX) {
-			unit.XPChanged();
 		}
 		//Wyrmgus end
 	}
@@ -1561,8 +1555,6 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.Container->UpdateContainerAttackRange();
 		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 			unit.UpdateXPRequired();
-		} else if (j == XP_INDEX) {
-			unit.XPChanged();
 		}
 		//Wyrmgus end
 	}

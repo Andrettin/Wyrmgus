@@ -45,6 +45,7 @@
 #include "iolib.h"
 #include "luacallback.h"
 #include "missile.h"
+#include "network.h"
 #include "pathfinder.h"
 #include "script.h"
 //Wyrmgus start
@@ -201,7 +202,7 @@ enum {
 			goal->TTL = 0; //remove item destruction timer when picked up
 			
 			goal->Remove(&unit);
-			if (unit.Character && unit.Character->Persistent) { //if the unit has a persistent character, store the item for it
+			if (!IsNetworkGame() && unit.Character && unit.Character->Persistent && unit.Player->AiEnabled == false) { //if the unit has a persistent character, store the item for it
 				CItem *item = new CItem;
 				unit.Character->Items.push_back(item);
 				item->Type = const_cast<CUnitType *>(&(*goal->Type));
