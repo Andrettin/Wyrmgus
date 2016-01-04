@@ -875,7 +875,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		if (Preference.ShowSightRange) {
 			//Wyrmgus start
 //			const int value = stats.Variables[SIGHTRANGE_INDEX].Max;
-			const int value = unit.Variable[SIGHTRANGE_INDEX].Max;
+			const int value = unit.CurrentSightRange;
 			//Wyrmgus end
 			const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
 
@@ -891,7 +891,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 			if (Preference.ShowReactionRange) {
 				//Wyrmgus start
 //				const int value = (unit.Player->Type == PlayerPerson) ? type.ReactRangePerson : type.ReactRangeComputer;
-				const int value = unit.CurrentSightRange;
+				const int value = (unit.Player->Type == PlayerPerson) ? unit.CurrentSightRange : unit.CurrentSightRange + 2;
 				//Wyrmgus end
 				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
 
