@@ -769,6 +769,48 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			aiForce.Attack(pos);
 		}
 	}
+	
+	//Wyrmgus start
+	//now, check if there are any nearby units with active AI that aren't part of any force, and send them to defend
+	const int ai_unit_count = AiPlayer->Player->GetUnitCount();
+	for (int i = 0; i < ai_unit_count; ++i) {
+		CUnit &aiunit = AiPlayer->Player->GetUnit(i);
+
+		if (&defender == &aiunit) {
+			continue;
+		}
+
+		// if brother is idle or attack no-agressive target and
+		// can attack our attacker then ask for help
+		// FIXME ad support for help from Coward type units
+		if (aiunit.Active && aiunit.GroupId == 0 && aiunit.IsAgressive() && CanTarget(*aiunit.Type, *attacker->Type)
+			&& aiunit.CurrentOrder()->GetGoal() != attacker) {
+			bool shouldAttack = aiunit.IsIdle() && aiunit.Threshold == 0;
+
+			if (aiunit.CurrentAction() == UnitActionAttack) {
+				const COrder_Attack &orderAttack = *static_cast<COrder_Attack *>(aiunit.CurrentOrder());
+				const CUnit *oldGoal = orderAttack.GetGoal();
+
+				if (oldGoal == NULL || (ThreatCalculate(defender, *attacker) < ThreatCalculate(defender, *oldGoal)
+										&& aiunit.MapDistanceTo(defender) <= aiunit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
+					shouldAttack = true;
+				}
+			}
+
+			if (shouldAttack) {
+				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
+				COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
+
+				if (aiunit.CanStoreOrder(savedOrder) == false) {
+					delete savedOrder;
+					savedOrder = NULL;
+				} else {
+					aiunit.SavedOrder = savedOrder;
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 /**
