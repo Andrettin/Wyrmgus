@@ -2738,6 +2738,7 @@ void SavePreferences()
 void SaveGrandStrategyGame(const std::string &filename)
 {
 	std::vector<std::string> blockTableNames;
+	struct stat tmp;
 
 	if (!GameName.empty()) {
 		lua_getglobal(Lua, GameName.c_str());
@@ -2759,7 +2760,10 @@ void SaveGrandStrategyGame(const std::string &filename)
 			path += "/";
 			path += GameName;
 		}
-		path += "/";
+		path += "/save/grand_strategy/";
+		if (stat(path.c_str(), &tmp) < 0) {
+			makedir(path.c_str(), 0777);
+		}
 		path += filename.c_str();
 		path += ".lua";
 
