@@ -173,7 +173,12 @@ enum EnumVariable {
 	VariableIncrease,   /// Increase value of the variable.
 	VariableDiff,       /// (Max - Value)
 	VariablePercent,    /// (100 * Value / Max)
-	VariableName        /// Name of the variable.
+	//Wyrmgus start
+//	VariableName        /// Name of the variable.
+	VariableName,		/// Name of the variable.
+	VariableChange,		/// Change of the variable.
+	VariableIncreaseChange,	/// Change of the variable's increase.
+	//Wyrmgus end
 };
 
 /**

@@ -423,21 +423,25 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			if (condition->Variables[i] != CONDITION_TRUE) {
 //				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
 				CUnit &unit = UnitManager.GetSlotUnit(button.Value);
-				if (i == BASICDAMAGE_INDEX) {
-					if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0 || unit.Variable[PIERCINGDAMAGE_INDEX].Value != 0 || GetItemClassSlot(unit.Type->ItemClass) == WeaponItemSlot)) {
-						return false;
-					}
-				} else if (i == ARMOR_INDEX) {
-					if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0 || GetItemClassSlot(unit.Type->ItemClass) == ShieldItemSlot || GetItemClassSlot(unit.Type->ItemClass) == ArmorItemSlot || GetItemClassSlot(unit.Type->ItemClass) == HelmetItemSlot)) {
-						return false;
-					}
-				} else if (i == SPEED_INDEX) {
-					if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0 || GetItemClassSlot(unit.Type->ItemClass) == BootsItemSlot)) {
-						return false;
+				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
+					if (i == BASICDAMAGE_INDEX) {
+						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetEquipmentVariableChange(&unit, i) != 0 || unit.Container->GetEquipmentVariableChange(&unit, PIERCINGDAMAGE_INDEX) != 0)) {
+							return false;
+						}
+					} else {
+						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetEquipmentVariableChange(&unit, i) != 0)) { //the former for some reason wasn't working with negative values
+							return false;
+						}
 					}
 				} else {
-					if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0)) { //the former for some reason wasn't working with negative values
-						return false;
+					if (i == BASICDAMAGE_INDEX) {
+						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0 || unit.Variable[PIERCINGDAMAGE_INDEX].Value != 0)) {
+							return false;
+						}
+					} else {
+						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Variable[i].Value != 0)) { //the former for some reason wasn't working with negative values
+							return false;
+						}
 					}
 				}
 			}
@@ -518,8 +522,14 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Regeneration != CONDITION_TRUE) {
-				if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.Variable[HP_INDEX].Increase != 0 || unit.Variable[HITPOINTBONUS_INDEX].Increase != 0)) {
-					return false;
+				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
+					if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.Container->GetEquipmentVariableChange(&unit, HITPOINTBONUS_INDEX, true) != 0)) {
+						return false;
+					}
+				} else {
+					if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.Variable[HP_INDEX].Increase != 0 || unit.Variable[HITPOINTBONUS_INDEX].Increase != 0)) {
+						return false;
+					}
 				}
 			}
 		}

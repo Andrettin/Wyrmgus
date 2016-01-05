@@ -425,6 +425,10 @@ EnumVariable Str2EnumVariable(lua_State *l, const char *s)
 		{"Diff", VariableDiff},
 		{"Percent", VariablePercent},
 		{"Name", VariableName},
+		//Wyrmgus start
+		{"Change", VariableChange},
+		{"IncreaseChange", VariableIncreaseChange},
+		//Wyrmgus end
 		{0, VariableValue}
 	}; // List of possible values.
 

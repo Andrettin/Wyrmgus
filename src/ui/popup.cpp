@@ -518,11 +518,13 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		if (button.Action != ButtonUnit) {
 			value = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[this->Index].Value;
 		} else {
-			value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
-			if (UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && this->Index != HITPOINTHEALING_INDEX) {
+			if (UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value && this->Index != HITPOINTHEALING_INDEX && UnitManager.GetSlotUnit(button.Value).Container && UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value))) {
+				value = UnitManager.GetSlotUnit(button.Value).Container->GetEquipmentVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
 				if (value >= 0) {
 					x += label.Draw(x, y, "+");
 				}
+			} else {
+				value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
 			}
 		}
 		label.Draw(x, y, value);

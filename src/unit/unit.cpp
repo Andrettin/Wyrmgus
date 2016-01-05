@@ -3538,6 +3538,60 @@ int CUnit::GetCurrentWeaponClass() const
 	return Type->WeaponClasses[0];
 }
 
+int CUnit::GetEquipmentVariableChange(const CUnit *item, int variable_index, bool increase) const
+{
+	int item_slot = GetItemClassSlot(item->Type->ItemClass);
+	if (item->Type->ItemClass == -1 || item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0) {
+		return 0;
+	}
+	
+	int value = 0;
+	if (!increase) {
+		value = item->Variable[variable_index].Value;
+	} else {
+		value = item->Variable[variable_index].Increase;
+	}
+	
+	if (EquippedItems[item_slot].size() == this->GetItemSlotQuantity(item_slot)) {
+		if (!increase) {
+			value -= EquippedItems[item_slot][EquippedItems[item_slot].size() - 1]->Variable[variable_index].Value;
+		} else {
+			value -= EquippedItems[item_slot][EquippedItems[item_slot].size() - 1]->Variable[variable_index].Increase;
+		}
+	} else if (EquippedItems[item_slot].size() == 0 && (item_slot == WeaponItemSlot || item_slot == ShieldItemSlot || item_slot == BootsItemSlot || item_slot == ArrowsItemSlot)) {
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (
+				(
+					(
+						(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Weapon && item_slot == WeaponItemSlot)
+						|| (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield && item_slot == ShieldItemSlot)
+						|| (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Boots && item_slot == BootsItemSlot)
+						|| (AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Arrows && item_slot == ArrowsItemSlot)
+					)
+					&& Player->Allow.Upgrades[UpgradeModifiers[z]->UpgradeId] == 'R' && UpgradeModifiers[z]->ApplyTo[Type->Slot] == 'X'
+				)
+				|| (item_slot == WeaponItemSlot && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->GetCurrentWeaponClass()) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item->Type->ItemClass) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end())
+			) {
+				if (!increase) {
+					value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+				} else {
+					value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+				}
+			} else if (
+				AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ability && this->IndividualUpgrades[UpgradeModifiers[z]->UpgradeId] && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.size() > 0 && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), this->GetCurrentWeaponClass()) == AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end() && std::find(AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.begin(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end(), item->Type->ItemClass) != AllUpgrades[UpgradeModifiers[z]->UpgradeId]->WeaponClasses.end()
+			) {
+				if (!increase) {
+					value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+				} else {
+					value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+				}
+			}
+		}
+	}
+	
+	return value;
+}
+
 bool CUnit::CanAttack() const
 {
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters can only attack through a unit within them
