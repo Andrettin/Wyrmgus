@@ -988,14 +988,35 @@ static void GameTypeManTeamVsMachine()
 	}
 }
 
-/*----------------------------------------------------------------------------
---  Game creation
-----------------------------------------------------------------------------*/
+//
+// LoadingBar
+// TODO: move this to a new class
 
 static int itemsToLoad;
 static int itemsLoaded;
 static CGraphic *loadingEmpty = NULL;
 static CGraphic *loadingFull = NULL;
+static CFont *loadingFont = NULL;
+static std::vector<std::string> loadingTips;
+static std::string loadingTip;
+
+static int CclLoadingBarSetTips(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	const int len = lua_objlen(l, -1);
+	for (int i = 1; i <= len; i++) {
+		lua_pushinteger(l, i);
+		lua_gettable(l, -2);
+		loadingTips.push_back(lua_tostring(l, -1));
+		lua_pop(l, 1);
+	 }
+
+	return 0;
+}
 
 void CalculateItemsToLoad()
 {
@@ -1017,6 +1038,8 @@ void CalculateItemsToLoad()
 	loadingEmpty->Load();
 	loadingFull = CGraphic::New("ui/loadingFull.png");
 	loadingFull->Load();
+
+	loadingTip = "TIP: " + loadingTips[rand()%loadingTips.size()];
 }
 
 void UpdateLoadingBar()
@@ -1030,6 +1053,12 @@ void UpdateLoadingBar()
 
 	loadingEmpty->DrawClip(x, y);
 	loadingFull->DrawSub(0, 0, (loadingFull->Width * pct) / 100, loadingFull->Height, x, y);
+
+	loadingFont = CFont::Get("game");
+	if (loadingFont) {
+		CLabel label(*loadingFont);
+		label.DrawCentered(Video.Width/2, Video.Height/2 + loadingFull->Height/2 + 10, loadingTip);
+	}
 }
 
 void IncItemsLoaded()
@@ -1039,6 +1068,12 @@ void IncItemsLoaded()
 
 	itemsLoaded++;
 }
+
+
+/*----------------------------------------------------------------------------
+--  Game creation
+----------------------------------------------------------------------------*/
+
 
 /**
 **  CreateGame.
@@ -1788,6 +1823,8 @@ void LuaRegisterModules()
 	lua_register(Lua, "GetStratagusHomepage", CclGetStratagusHomepage);
 
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
+
+	lua_register(Lua, "LoadingBarSetTips", CclLoadingBarSetTips);
 
 	AiCclRegister();
 	AnimationCclRegister();
