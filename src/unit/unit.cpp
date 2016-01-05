@@ -4954,7 +4954,10 @@ void CleanUnits()
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
 		CUnit &unit = **it;
 
-		if (&unit == NULL) {
+		//Wyrmgus start
+//		if (&unit == NULL) {
+		if (&unit == NULL || unit.Type == NULL) {
+		//Wyrmgus end
 			continue;
 		}
 		if (!unit.Destroyed) {

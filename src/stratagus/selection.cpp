@@ -37,6 +37,9 @@
 #include "stratagus.h"
 
 #include "commands.h"
+//Wyrmgus start
+#include "game.h"
+//Wyrmgus end
 #include "interface.h"
 #include "iolib.h"
 #include "map.h"
@@ -291,7 +294,10 @@ void UnSelectUnit(CUnit &unit)
 			}
 		}
 	}
-	if (!unit.Selected) {
+	//Wyrmgus start
+//	if (!unit.Selected) {
+	if (!unit.Selected || SaveGameLoading) { //loaded characters are unselected if their unit type is different than that of the unit, but the Selected vector hasn't been loaded yet
+	//Wyrmgus end
 		return;
 	}
 	std::vector<CUnit *>::iterator it = std::find(Selected.begin(), Selected.end(), &unit);

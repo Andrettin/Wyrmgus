@@ -127,6 +127,12 @@ public:
 
 	void operator()(CUnit *const unit) const
 	{
+		//Wyrmgus start
+		if (unit->Type == NULL) {
+			fprintf(stderr, "Unit has no type: \"%s\" (%d, %d)\n", unit->Name.c_str(), unit->tilePos.x, unit->tilePos.y);
+			return;
+		}
+		//Wyrmgus end
 		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
 			return ;
 		}
