@@ -412,6 +412,10 @@ static bool PickUpItem(CUnit &unit)
 	) {
 		return false;
 	}
+	
+	if (unit.Variable[HP_INDEX].Value == unit.Variable[HP_INDEX].Max && !unit.HasInventory()) { //only look for items to pick up if the unit is damaged or has an inventory
+		return false;
+	}
 
 	// look for nearby items to pick up
 	std::vector<CUnit *> table;

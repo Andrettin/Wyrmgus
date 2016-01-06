@@ -545,6 +545,10 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 		return true;
 	}
 	
+	if (GodMode && attacker.Player == ThisPlayer && (!goal || goal->Player != ThisPlayer)) {
+		return true; //always hit if in god mode
+	}
+	
 	int accuracy = 0;
 	if (attacker.Variable[ACCURACY_INDEX].Value) {
 		accuracy = attacker.Variable[ACCURACY_INDEX].Value;

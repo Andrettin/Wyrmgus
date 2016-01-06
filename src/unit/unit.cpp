@@ -1329,7 +1329,7 @@ void CUnit::GeneratePrefix(CUnit *dropper)
 	}
 	if (dropper != NULL) {
 		for (size_t i = 0; i < dropper->Type->DropAffixes.size(); ++i) {
-			if ((this->Type->ItemClass == -1 && dropper->Type->DropAffixes[i]->MagicPrefix) || (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->ItemPrefix[Type->ItemClass])) {
+			if (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->ItemPrefix[Type->ItemClass]) {
 				potential_prefixes.push_back(dropper->Type->DropAffixes[i]);
 			}
 		}
@@ -1352,7 +1352,7 @@ void CUnit::GenerateSuffix(CUnit *dropper)
 	}
 	if (dropper != NULL) {
 		for (size_t i = 0; i < dropper->Type->DropAffixes.size(); ++i) {
-			if ((this->Type->ItemClass == -1 && dropper->Type->DropAffixes[i]->MagicSuffix) || (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->ItemSuffix[Type->ItemClass])) {
+			if (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->ItemSuffix[Type->ItemClass]) {
 				if (Prefix == NULL || !dropper->Type->DropAffixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
 					potential_suffixes.push_back(dropper->Type->DropAffixes[i]);
 				}
