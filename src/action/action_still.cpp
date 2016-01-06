@@ -250,7 +250,7 @@ static bool MoveRandomly(CUnit &unit)
 /**
 **  Feed
 **
-**  @return  true if the unit breeds, false otherwise
+**  @return  true if the unit feeds, false otherwise
 */
 static bool Feed(CUnit &unit)
 {
@@ -395,6 +395,37 @@ static bool Breed(CUnit &unit)
 		IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
 		unit.Variable[HUNGER_INDEX].Value += 100;
 		return true;
+	}
+	return false;
+}
+
+/**
+**  PickUpItem
+**
+**  @return  true if the unit picks up an item, false otherwise
+*/
+static bool PickUpItem(CUnit &unit)
+{
+	if (
+		!unit.Type->BoolFlag[ORGANIC_INDEX].value
+		|| !unit.Player->AiEnabled
+	) {
+		return false;
+	}
+
+	// look for nearby items to pick up
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, unit.CurrentSightRange + 2, table);
+
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
+			if (CanPickUp(unit, *table[i])) {
+				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.Variable[HP_INDEX].Max - unit.Variable[HP_INDEX].Value) >= table[i]->Variable[HITPOINTHEALING_INDEX].Value) {
+					CommandPickUp(unit, *table[i], FlushCommands);
+					return true;
+				}
+			}
+		}
 	}
 	return false;
 }
@@ -628,7 +659,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| Feed(unit) || MoveRandomly(unit) || Excrete(unit) || Breed(unit)) {
+			|| Feed(unit) || MoveRandomly(unit) || Excrete(unit) || Breed(unit) || PickUpItem(unit)) {
 			//Wyrmgus end
 		}
 	}

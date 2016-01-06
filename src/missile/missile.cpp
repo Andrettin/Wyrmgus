@@ -1159,24 +1159,24 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		return;
 	}
 	
-	//Wyrmgus start
-	if (goal.Type->BoolFlag[ITEM_INDEX].value && splash != 1) { //don't damage items with splash damage
-		return;
-	}
-	
-	if (!missile.Type->AlwaysHits && CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
-		if (splash == 1 && missile.Type->Range <= 1) {
+	if (goal.CurrentAction() != UnitActionDie) {
+		//Wyrmgus start
+		if (goal.Type->BoolFlag[ITEM_INDEX].value && splash != 1) { //don't damage items with splash damage
 			return;
-		} else if (splash == 1 && missile.Type->Range > 1) {
-			splash = missile.Type->SplashFactor; // if missile has splash but missed, apply splash damage
-			if (missile.Type->SplashFactor == 0) {
-				splash = 1;
+		}
+		
+		if (!missile.Type->AlwaysHits && CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
+			if (splash == 1 && missile.Type->Range <= 1) {
+				return;
+			} else if (splash == 1 && missile.Type->Range > 1) {
+				splash = missile.Type->SplashFactor; // if missile has splash but missed, apply splash damage
+				if (missile.Type->SplashFactor == 0) {
+					splash = 1;
+				}
 			}
 		}
-	}
-	//Wyrmgus end
+		//Wyrmgus end
 
-	if (goal.CurrentAction() != UnitActionDie) {
 		int damage;
 
 		if (missile.Type->Damage) {   // custom formula
