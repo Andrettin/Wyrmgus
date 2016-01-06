@@ -624,7 +624,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 	
 	if (Player->AiEnabled) {
 		while (this->Variable[LEVELUP_INDEX].Value > 0) {
-			if (AiHelpers.ExperienceUpgrades.size() > Type->Slot) {
+			if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
 				std::vector<CUnitType *> potential_upgrades;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
@@ -640,7 +640,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 			}
 			
 			if (this->Variable[LEVELUP_INDEX].Value) {
-				if (AiHelpers.LearnableAbilities.size() > Type->Slot) {
+				if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
 					std::vector<CUpgrade *> potential_abilities;
 					for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
 						if (!CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
@@ -829,7 +829,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	} else {
 		if (image_layer == HairImageLayer && this->Character != NULL && !this->Character->HairVariation.empty()) {
 			priority_variation = this->Character->HairVariation;
-		} else if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < this->Type->LayerVarInfo[image_layer].size()) {
+		} else if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < ((int) this->Type->LayerVarInfo[image_layer].size())) {
 			priority_variation = this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->VariationId;
 		}
 	}
@@ -995,7 +995,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= this->Type->LayerVarInfo[i].size()) {
+		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= ((int) this->Type->LayerVarInfo[i].size())) {
 			continue;
 		}
 		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
@@ -1131,7 +1131,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= this->Type->LayerVarInfo[i].size()) {
+		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= ((int) this->Type->LayerVarInfo[i].size())) {
 			continue;
 		}
 		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
@@ -3457,7 +3457,7 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	int value = 0;
 	int upgrade_value = 0;
 	
-	if (AiHelpers.ExperienceUpgrades.size() > Type->Slot) {
+	if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 			if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
 				int local_upgrade_value = 1;
@@ -3475,7 +3475,7 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	
 	value += upgrade_value;
 	
-	if (!only_units && AiHelpers.LearnableAbilities.size() > Type->Slot) {
+	if (!only_units && ((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
 		for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
 			if (!IndividualUpgrades[AiHelpers.LearnableAbilities[Type->Slot][i]->ID]) {
 				value += 1;
@@ -3757,7 +3757,7 @@ MissileConfig CUnit::GetMissile() const
 CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < this->Type->LayerVarInfo[image_layer].size() && this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite) {
+	if (this->LayerVariation[image_layer] != -1 && this->LayerVariation[image_layer] < ((int) this->Type->LayerVarInfo[image_layer].size()) && this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite) {
 		return this->Type->LayerVarInfo[image_layer][this->LayerVariation[image_layer]]->Sprite;
 	} else if (varinfo && varinfo->LayerSprites[image_layer]) {
 		return varinfo->LayerSprites[image_layer];
@@ -3774,7 +3774,7 @@ int CUnit::GetLayerFrame(int image_layer, int frame) const
 	int layer_frame = frame;
 	
 	int layer_variation = this->LayerVariation[image_layer];
-	if (layer_variation != -1 && layer_variation < this->Type->LayerVarInfo[image_layer].size() && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
+	if (layer_variation != -1 && layer_variation < ((int) this->Type->LayerVarInfo[image_layer].size()) && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
 		layer_frame = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->OverlayFrame;
 		if (frame < 0) {
 			layer_frame *= -1;
@@ -3797,7 +3797,7 @@ PixelPos CUnit::GetLayerOffset(int image_layer, int frame) const
 	PixelPos layer_offset(0, 0);
 	
 	int layer_variation = this->LayerVariation[image_layer];
-	if (layer_variation != -1 && layer_variation < this->Type->LayerVarInfo[image_layer].size() && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
+	if (layer_variation != -1 && layer_variation < ((int) this->Type->LayerVarInfo[image_layer].size()) && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
 		layer_offset.x = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->XOffset;
 		layer_offset.y = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->YOffset;
 		if (frame < 0) {
@@ -4766,7 +4766,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (&picker == &unit) { // Cannot pick up itself.
 		return false;
 	}
-	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= UI.InventoryButtons.size()) { // full
+	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= ((int) UI.InventoryButtons.size())) { // full
 		if (picker.Player == ThisPlayer) {
 			std::string picker_name = picker.Name + "'s (" + picker.GetTypeName() + ")";
 			picker.Player->Notify(NotifyRed, picker.tilePos, _("%s inventory is full."), picker_name.c_str());

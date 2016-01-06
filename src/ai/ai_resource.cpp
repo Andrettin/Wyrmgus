@@ -1113,6 +1113,8 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 			return AiAssignHarvesterFromUnit(unit, resource, resource_range);
 		}
 	}
+
+	return 0;
 	//Wyrmgus end
 }
 

@@ -1763,7 +1763,7 @@ void PlayersEachCycle()
 		CPlayer &p = Players[player];
 		
 		//Wyrmgus start
-		if (p.LostTownHallTimer && !p.Revealed && p.LostTownHallTimer < GameCycle) {
+		if (p.LostTownHallTimer && !p.Revealed && ((int) p.LostTownHallTimer) < GameCycle) {
 			p.Revealed = true;
 			for (int j = 0; j < NumPlayers; ++j) {
 				if (player != j && Players[j].Type != PlayerNobody) {

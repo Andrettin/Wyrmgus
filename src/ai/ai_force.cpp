@@ -945,7 +945,10 @@ void AiForce::Update()
 		}
 	}
 
-	const int thresholdDist = 5; // Hard coded value
+	//Wyrmgus start
+//	const int thresholdDist = 5; // Hard coded value
+	const int thresholdDist = std::max(5, (int) Units.size() / 8);
+	//Wyrmgus end
 	Assert(Map.Info.IsPointOnMap(GoalPos));
 	if (State == AiForceAttackingState_GoingToRallyPoint) {
 		// Check if we are near the goalpos

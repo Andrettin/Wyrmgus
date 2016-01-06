@@ -582,7 +582,7 @@ static int CclGetUpgrades(lua_State *l)
 static int CclGetItemPrefixes(lua_State *l)
 {
 	std::vector<CUpgrade *> item_prefixes;
-	for (int i = 0; i < AllUpgrades.size(); ++i) {
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (AllUpgrades[i]->MagicPrefix) {
 			item_prefixes.push_back(AllUpgrades[i]);
 		}
@@ -600,7 +600,7 @@ static int CclGetItemPrefixes(lua_State *l)
 static int CclGetItemSuffixes(lua_State *l)
 {
 	std::vector<CUpgrade *> item_suffixes;
-	for (int i = 0; i < AllUpgrades.size(); ++i) {
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (AllUpgrades[i]->MagicSuffix && !AllUpgrades[i]->RunicAffix) {
 			item_suffixes.push_back(AllUpgrades[i]);
 		}
@@ -618,7 +618,7 @@ static int CclGetItemSuffixes(lua_State *l)
 static int CclGetRunicSuffixes(lua_State *l)
 {
 	std::vector<CUpgrade *> item_suffixes;
-	for (int i = 0; i < AllUpgrades.size(); ++i) {
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (AllUpgrades[i]->MagicSuffix && AllUpgrades[i]->RunicAffix) {
 			item_suffixes.push_back(AllUpgrades[i]);
 		}
@@ -709,7 +709,7 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 	} else if (!strcmp(data, "Droppers")) { //the unit types which can drop this affix
 		std::vector<CUnitType *> droppers;
-		for (int i = 0; i < UnitTypes.size(); ++i) {
+		for (size_t i = 0; i < UnitTypes.size(); ++i) {
 			if (UnitTypes[i]->Ident.find("template") != std::string::npos) { //if is a template, continue
 				continue;
 			}
@@ -735,7 +735,7 @@ static int CclGetUpgradeData(lua_State *l)
 		}
 			
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			for (int i = 0; i < UnitTypes.size(); ++i) {
+			for (size_t i = 0; i < UnitTypes.size(); ++i) {
 				if (UnitTypes[i]->Ident.find("template") != std::string::npos) { //if is a template, continue
 					continue;
 				}
@@ -1159,7 +1159,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 					}
 					for (int i = 0; i < MaxImageLayers; ++i) {
-						if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < unit.Type->LayerVarInfo[i].size()) {
+						if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
 							VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
 							bool forbidden_upgrade = false;
 							for (int u = 0; u < VariationMax; ++u) {
@@ -1410,7 +1410,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 					}
 					for (int i = 0; i < MaxImageLayers; ++i) {
-						if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < unit.Type->LayerVarInfo[i].size()) {
+						if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
 							VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
 							bool required_upgrade = false;
 							for (int u = 0; u < VariationMax; ++u) {
@@ -1493,7 +1493,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < unit.Type->LayerVarInfo[i].size()) {
+		if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
 			VariationInfo *current_layer_varinfo = unit.Type->LayerVarInfo[i][unit.LayerVariation[i]];
 			bool forbidden_upgrade = false;
 			for (int u = 0; u < VariationMax; ++u) {
@@ -1575,7 +1575,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < unit.Type->LayerVarInfo[i].size()) {
+		if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
 			VariationInfo *current_layer_varinfo = unit.Type->LayerVarInfo[i][unit.LayerVariation[i]];
 			bool required_upgrade = false;
 			for (int u = 0; u < VariationMax; ++u) {

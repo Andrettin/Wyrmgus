@@ -742,7 +742,7 @@ int CUnitType::GetAvailableLevelUpUpgrades() const
 	int value = 0;
 	int upgrade_value = 0;
 	
-	if (AiHelpers.ExperienceUpgrades.size() > this->Slot) {
+	if (((int) AiHelpers.ExperienceUpgrades.size()) > this->Slot) {
 		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Slot].size(); ++i) {
 			int local_upgrade_value = 1;
 			
@@ -756,7 +756,7 @@ int CUnitType::GetAvailableLevelUpUpgrades() const
 	
 	value += upgrade_value;
 	
-	if (AiHelpers.LearnableAbilities.size() > this->Slot) {
+	if (((int) AiHelpers.LearnableAbilities.size()) > this->Slot) {
 		for (size_t i = 0; i != AiHelpers.LearnableAbilities[this->Slot].size(); ++i) {
 			value += 1;
 		}
@@ -1502,7 +1502,7 @@ void LoadUnitTypeSprite(CUnitType &type)
 	}
 	
 	for (int i = 0; i < MaxImageLayers; ++i) {
-		for (int j = 0; j < type.LayerVarInfo[i].size(); ++j) {
+		for (size_t j = 0; j < type.LayerVarInfo[i].size(); ++j) {
 			VariationInfo *varinfo = type.LayerVarInfo[i][j];
 			if (!varinfo->File.empty()) {
 				varinfo->Sprite = CPlayerColorGraphic::New(varinfo->File, type.Width, type.Height);
