@@ -2885,6 +2885,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield || EquippedItems[ShieldItemSlot].size() == 0)
 				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Boots || EquippedItems[BootsItemSlot].size() == 0)
 				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Arrows || EquippedItems[ArrowsItemSlot].size() == 0)
+				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ident == PlayerRaces.Factions[newplayer.Race][newplayer.Faction]->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
@@ -3024,8 +3025,8 @@ void RescueUnits()
 				//  Look if ally near the unit.
 				for (size_t i = 0; i != around.size(); ++i) {
 					//Wyrmgus start
-//					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i])) {
-					if (around[i]->CanAttack() && unit.IsAllied(*around[i])) {
+//					if (around[i]->Type->CanAttack && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerRescuePassive && around[i]->Player->Type != PlayerRescueActive) {
+					if (around[i]->CanAttack() && unit.IsAllied(*around[i]) && around[i]->Player->Type != PlayerRescuePassive && around[i]->Player->Type != PlayerRescueActive) {
 					//Wyrmgus end
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
