@@ -1512,7 +1512,10 @@ static void AiCheckRepair()
 			//Wyrmgus end
 			&& unit.CurrentAction() != UnitActionUpgradeTo
 			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
-			&& unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
+			//Wyrmgus start
+//			&& unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
+			) {
+			//Wyrmgus end
 			//
 			// FIXME: Repair only units under control
 			//
