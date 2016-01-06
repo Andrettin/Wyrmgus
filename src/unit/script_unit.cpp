@@ -657,7 +657,10 @@ static int CclUnit(lua_State *l)
 				lua_pop(l, 1);
 				continue;
 			}
-			LuaError(l, "Unit: Unsupported tag: %s" _C_ value);
+			//Wyrmgus start
+//			LuaError(l, "Unit: Unsupported tag: %s" _C_ value);
+			fprintf(stderr, "Unit: Unsupported tag: %s\n", value);
+			//Wyrmgus end
 		}
 	}
 

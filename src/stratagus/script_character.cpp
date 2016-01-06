@@ -393,6 +393,8 @@ static int CclDefineCustomHero(lua_State *l)
 			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Level")) {
 			hero->Level = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ExperiencePercent")) {
+			hero->ExperiencePercent = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Abilities")) {
 			hero->Abilities.clear();
 			const int args = lua_rawlen(l, -1);
