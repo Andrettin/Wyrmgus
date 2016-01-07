@@ -3428,7 +3428,7 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		dialog_text += GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName() + "!";
 		char buf_2[256];
 		snprintf(
-			buf_2, sizeof(buf_2), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
+			buf_2, sizeof(buf_2), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\", \"%s\") end;",
 			("The " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName()).c_str(),
 			dialog_text.c_str(),
 			dialog_tooltip.c_str()
