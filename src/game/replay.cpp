@@ -331,7 +331,7 @@ static void PrintLogCommand(const LogEntry &log, CFile &file)
 	file.printf("Log( { ");
 	file.printf("GameCycle = %lu, ", log.GameCycle);
 	//Wyrmgus start
-	file.printf("GameTimeOfDay = %lu, ", log.GameTimeOfDay);
+	file.printf("GameTimeOfDay = %lu, ", (unsigned long) log.GameTimeOfDay);
 	//Wyrmgus end
 	if (log.UnitNumber != -1) {
 		file.printf("UnitNumber = %d, ", log.UnitNumber);

@@ -963,7 +963,7 @@ void Convert0ADMap(const std::string &mapname)
 	int tile_heights_xy[MaxMapWidth][MaxMapHeight];
 
 	if (!CanAccessFile(pmp_filename.c_str())) {
-		fprintf(stderr, ("File \"" + pmp_filename + "\" not found.").c_str());
+		fprintf(stderr, "File \"%s\" not found.\n", pmp_filename.c_str());
 	}
 	
 	std::ifstream is_pmp(pmp_filename, std::ifstream::binary);
@@ -977,7 +977,7 @@ void Convert0ADMap(const std::string &mapname)
 		is_pmp.read(buffer,length);
 
 		if (!is_pmp) {
-			fprintf(stderr, ("Error loading file \"" + pmp_filename + "\".").c_str());
+			fprintf(stderr, "Error loading file \"%s\".\n", pmp_filename.c_str());
 		}
 		
 		int current_byte = 0;
@@ -1084,7 +1084,7 @@ void Convert0ADMap(const std::string &mapname)
 	std::string player_factions[PlayerMax];
 	
 	if (!CanAccessFile(xml_filename.c_str())) {
-		fprintf(stderr, ("File \"" + xml_filename + "\" not found.").c_str());
+		fprintf(stderr, "File \"%s\" not found.\n", xml_filename.c_str());
 	}
 	
 	std::ifstream is_xml(xml_filename);
@@ -1273,7 +1273,7 @@ void Convert0ADMap(const std::string &mapname)
 		f_smp->printf("PresentMap(\"%s\", %d, %d, %d, %d)\n",
 				  map_title.c_str(), player_quantity, map_size * 16, map_size * 16, 1);
 	} catch (const FileException &) {
-		fprintf(stderr, "Couldn't write the map presentation: '%s'\n", smp_filename.c_str());
+		fprintf(stderr, "Couldn't write the map presentation: \"%s\"\n", smp_filename.c_str());
 		delete f_smp;
 		return;
 	}
@@ -1339,7 +1339,7 @@ void Convert0ADMap(const std::string &mapname)
 
 		f->printf("\n");
 	} catch (const FileException &) {
-		fprintf(stderr, "Couldn't write the map setup: '%s'\n", sms_filename.c_str());
+		fprintf(stderr, "Couldn't write the map setup: \"%s\"\n", sms_filename.c_str());
 		delete f;
 		return;
 	}
@@ -1445,7 +1445,7 @@ std::string Convert0ADTextureToTileType(const std::string zero_ad_texture)
 	} else if (zero_ad_texture == "farmland_a") {
 		return "Land";
 	} else {
-		fprintf(stderr, ("0 AD terrain texture \"" + zero_ad_texture + "\" not recognized.\n").c_str());
+		fprintf(stderr, "0 AD terrain texture \"%s\" not recognized.\n", zero_ad_texture.c_str());
 		return "";
 	}
 }
@@ -1462,7 +1462,7 @@ std::string Convert0ADTemplateToUnitTypeIdent(const std::string zero_ad_template
 	if (ZeroADTemplateUnitTypeEquivalency.find(zero_ad_template) != ZeroADTemplateUnitTypeEquivalency.end()) {
 		return ZeroADTemplateUnitTypeEquivalency[zero_ad_template];
 	} else {
-		fprintf(stderr, ("0 AD template \"" + zero_ad_template + "\" not recognized.\n").c_str());
+		fprintf(stderr, "0 AD template \"%s\" not recognized.\n", zero_ad_template.c_str());
 		return "";
 	}
 }
@@ -1479,7 +1479,7 @@ std::string Convert0ADCivilizationToCivilization(const std::string zero_ad_civil
 	if (ZeroADCivilizationEquivalency.find(zero_ad_civilization) != ZeroADCivilizationEquivalency.end()) {
 		return ZeroADCivilizationEquivalency[zero_ad_civilization];
 	} else {
-		fprintf(stderr, ("0 AD civilization \"" + zero_ad_civilization + "\" not recognized.\n").c_str());
+		fprintf(stderr, "0 AD civilization \"%s\" not recognized.\n", zero_ad_civilization.c_str());
 		return "";
 	}
 }
@@ -1496,7 +1496,7 @@ std::string Convert0ADCivilizationToFaction(const std::string zero_ad_civilizati
 	if (ZeroADCivilizationFactionEquivalency.find(zero_ad_civilization) != ZeroADCivilizationFactionEquivalency.end()) {
 		return ZeroADCivilizationFactionEquivalency[zero_ad_civilization];
 	} else {
-		fprintf(stderr, ("0 AD civilization \"" + zero_ad_civilization + "\" not recognized.\n").c_str());
+		fprintf(stderr, "0 AD civilization \"%s\" not recognized.\n", zero_ad_civilization.c_str());
 		return "";
 	}
 }
