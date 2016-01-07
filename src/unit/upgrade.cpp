@@ -953,10 +953,22 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		
 		player.SetFaction("");
 		
+		if (ThisPlayer && ThisPlayer->Index == player.Index) {
+			//load proper UI
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[um->ChangeCivilizationTo].c_str());
+			CclCommand(buf);
+		}
+
 		player.Race = um->ChangeCivilizationTo;
 		
 		//if the civilization of the person player changed, update the UI
 		if (ThisPlayer && ThisPlayer->Index == player.Index) {
+			//load proper UI
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[player.Race].c_str());
+			CclCommand(buf);
+		
 			LoadCursors(PlayerRaces.Name[player.Race]);
 			UI.Load();
 		}
@@ -1207,7 +1219,14 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		int old_faction = player.Faction;
 		
 		player.SetFaction("");
-		
+
+		if (ThisPlayer && ThisPlayer->Index == player.Index) {
+			//load proper UI
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", AllUpgrades[um->UpgradeId]->Civilization.c_str());
+			CclCommand(buf);
+		}
+
 		player.Race = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str()); // restore old civilization
 		
 		//if the civilization of the person player changed, update the UI

@@ -410,6 +410,15 @@ static int CclSetThisPlayer(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	int plynr = LuaToNumber(l, 1);
+
+	//Wyrmgus start
+	ThisPlayer = &Players[PlayerNumNeutral]; //ugly hack to make sure the music is stopped
+	//load proper UI
+	char buf[256];
+	snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[Players[plynr].Race].c_str());
+	CclCommand(buf);
+	//Wyrmgus end
+	
 	ThisPlayer = &Players[plynr];
 
 	lua_pushnumber(l, plynr);
