@@ -2334,7 +2334,7 @@ void UnitLost(CUnit &unit)
 					if (player.Index != j && Players[j].Type != PlayerNobody) {
 						Players[j].Notify(_("%s has lost their last town hall, and will be revealed in thirty seconds!"), player.Name.c_str());
 					} else {
-						Players[j].Notify(_("You have lost your last town hall, and will be revealed in thirty seconds!"));
+						Players[j].Notify("%s", _("You have lost your last town hall, and will be revealed in thirty seconds!"));
 					}
 				}
 			}
@@ -2428,7 +2428,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 			if (player.Index != j && Players[j].Type != PlayerNobody) {
 				Players[j].Notify(_("%s has rebuilt a town hall, and will no longer be revealed!"), player.Name.c_str());
 			} else {
-				Players[j].Notify(_("You have rebuilt a town hall, and will no longer be revealed!"));
+				Players[j].Notify("%s", _("You have rebuilt a town hall, and will no longer be revealed!"));
 			}
 		}
 	}

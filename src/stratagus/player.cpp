@@ -1769,7 +1769,7 @@ void PlayersEachCycle()
 				if (player != j && Players[j].Type != PlayerNobody) {
 					Players[j].Notify(_("%s's units have been revealed!"), p.Name.c_str());
 				} else {
-					Players[j].Notify(_("Your units have been revealed!"));
+					Players[j].Notify("%s", _("Your units have been revealed!"));
 				}
 			}
 		}
