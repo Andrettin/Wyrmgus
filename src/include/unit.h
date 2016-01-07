@@ -516,10 +516,10 @@ public:
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
 		//Wyrmgus start
-		PlayerColorCircle(false), ButtonHotKeysByPosition(false),
+		PlayerColorCircle(false),
 		ShowPathlines(false),
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
-		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5),
+		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5), HotkeySetup(0),
 		IconFrameG(NULL), PressedIconFrameG(NULL), CommandButtonFrameG(NULL), BarFrameG(NULL), InfoPanelFrameG(NULL), ProgressBarG(NULL) {};
 		//Wyrmgus end
 
@@ -538,7 +538,6 @@ public:
 	bool NoStatusLineTooltips;	/// Don't show messages on status line
 	//Wyrmgus start
 	bool PlayerColorCircle;		/// Show a player color circle below each unit
-	bool ButtonHotKeysByPosition;	/// If active, button hotkeys depend on position (i.e. the first button in the panel always has "Q" as its hotkey
 	bool ShowPathlines;			/// Show order pathlines
 	//Wyrmgus end
 
@@ -546,6 +545,9 @@ public:
 	int ShowNameDelay;		/// How many cycles need to wait until unit's name popup will appear.
 	int ShowNameTime;		/// How many cycles need to show unit's name popup.
 	int AutosaveMinutes;	/// Autosave the game every X minutes; autosave is disabled if the value is 0
+	//Wyrmgus start
+	int HotkeySetup;			/// Hotkey layout (0 = default, 1 = position-based, 2 = position-based (except commands))
+	//Wyrmgus end
 	std::string SF2Soundfont;/// Path to SF2 soundfont
 	//Wyrmgus start
 	CGraphic *IconFrameG;

@@ -106,7 +106,7 @@ int ButtonAction::GetKey() const
 		return this->Key;
 	}
 	
-	if (Preference.ButtonHotKeysByPosition && this->Key != 0) {
+	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint))) && this->Key != 0) {
 		if (this->Pos == 1) {
 			return 'q';
 		} else if (this->Pos == 2) {
@@ -150,7 +150,7 @@ std::string ButtonAction::GetHint() const
 		return this->Hint;
 	}
 	
-	if (Preference.ButtonHotKeysByPosition && this->Key != 0 && !this->Hint.empty()) {
+	if ((Preference.HotkeySetup == 1 || (Preference.HotkeySetup == 2 && (this->Action == ButtonBuild || this->Action == ButtonTrain || this->Action == ButtonResearch || this->Action == ButtonLearnAbility || this->Action == ButtonExperienceUpgradeTo || this->Action == ButtonUpgradeTo || this->Action == ButtonRallyPoint))) && this->Key != 0 && !this->Hint.empty()) {
 		std::string hint = this->Hint;
 		hint = FindAndReplaceString(hint, "~!", "");
 		hint += " (~!";
