@@ -998,7 +998,7 @@ static CGraphic *loadingEmpty = NULL;
 static CGraphic *loadingFull = NULL;
 static CFont *loadingFont = NULL;
 static std::vector<std::string> loadingTips;
-static std::string loadingTip;
+static std::vector<std::string> loadingTip;
 
 static int CclLoadingBarSetTips(lua_State *l)
 {
@@ -1024,8 +1024,7 @@ static int CclLoadingBarSetTips(lua_State *l)
 
 void CalculateItemsToLoad()
 {
-	itemsLoaded = 0;
-	itemsToLoad = 0;
+	ResetItemsToLoad();
 
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		itemsToLoad+= GetIconsCount();
@@ -1041,7 +1040,29 @@ void CalculateItemsToLoad()
 		loadingFull->Load();
 	}
 
-	loadingTip = "TIP: " + loadingTips[rand()%loadingTips.size()];
+	std::string base_loadingTip = loadingTips[rand()%loadingTips.size()];
+	
+	int str_width_per_total_width = 1;
+	str_width_per_total_width += GetGameFont().Width(base_loadingTip) / Video.Width;
+	
+//	int line_length = Video.Width / GetGameFont().Width(1);
+	int line_length = base_loadingTip.size() / str_width_per_total_width;
+	
+	int begin = 0;
+	for (size_t i = 0; i < str_width_per_total_width; ++i) {
+		int end = base_loadingTip.size();
+		
+		if (i != (str_width_per_total_width - 1)) {
+			end = (i + 1) * line_length;
+			while (base_loadingTip.substr(end - 1, 1) != " ") {
+				end -= 1;
+			}
+		}
+		
+		loadingTip.push_back(base_loadingTip.substr(begin, end - begin));
+		
+		begin = end;
+	}
 }
 
 void UpdateLoadingBar()
@@ -1063,7 +1084,9 @@ void UpdateLoadingBar()
 
 	if (loadingFont != NULL) {
 		CLabel label(*loadingFont);
-		label.DrawCentered(Video.Width/2, y + 10, loadingTip);
+		for (size_t i = 0; i < loadingTip.size(); ++i) {
+			label.DrawCentered(Video.Width/2, y + 10 + (GetGameFont().Height() * i), loadingTip[i]);
+		}
 	}
 }
 
@@ -1075,6 +1098,12 @@ void IncItemsLoaded()
 	itemsLoaded++;
 }
 
+void ResetItemsToLoad()
+{
+	itemsLoaded = 0;
+	itemsToLoad = 0;
+	loadingTip.clear();
+}
 
 /*----------------------------------------------------------------------------
 --  Game creation
@@ -1327,6 +1356,10 @@ void CreateGame(const std::string &filename, CMap *map)
 
 	CommandLog(NULL, NoUnitP, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 	Video.ClearScreen();
+	
+	//Wyrmgus start
+	ResetItemsToLoad();
+	//Wyrmgus end
 }
 
 /**

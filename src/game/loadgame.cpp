@@ -173,6 +173,9 @@ void InitModules()
 */
 void LoadModules()
 {
+	//Wyrmgus start
+	CalculateItemsToLoad();
+	//Wyrmgus end
 	LoadFonts();
 	LoadIcons();
 	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
@@ -196,6 +199,10 @@ void LoadModules()
 	UI.Minimap.Create();
 
 	SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
+	
+	//Wyrmgus start
+	ResetItemsToLoad();
+	//Wyrmgus end
 }
 
 static void PlaceUnits()
