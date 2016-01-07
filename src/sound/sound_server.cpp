@@ -895,7 +895,7 @@ void QuitSound()
 	SDL_DestroyCond(Audio.Cond);
 	SDL_DestroyMutex(Audio.Lock);
 
-	SDL_CloseAudio();
+	// Mustn't call SDL_CloseAudio here, it'll be called again from SDL_Quit
 	SoundInitialized = false;
 	delete[] Audio.MixerBuffer;
 	Audio.MixerBuffer = NULL;
