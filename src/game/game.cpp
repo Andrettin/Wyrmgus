@@ -1007,13 +1007,17 @@ static int CclLoadingBarSetTips(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	const int len = lua_objlen(l, -1);
-	for (int i = 1; i <= len; i++) {
-		lua_pushinteger(l, i);
+	const char *str;
+	int i = 1;
+	do {
+		lua_pushinteger(l, i++);
 		lua_gettable(l, -2);
-		loadingTips.push_back(lua_tostring(l, -1));
+		str = lua_tostring(l, -1);
+		if (str) {
+			loadingTips.push_back(str);
+		}
 		lua_pop(l, 1);
-	 }
+	} while (str != NULL);
 
 	return 0;
 }
@@ -1023,41 +1027,43 @@ void CalculateItemsToLoad()
 	itemsLoaded = 0;
 	itemsToLoad = 0;
 
-	if (CanAccessFile("ui/loadingEmpty.png") == false || CanAccessFile("ui/loadingFull.png") == false) {
-		return;
+	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
+		itemsToLoad+= GetIconsCount();
+		itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
+		itemsToLoad+= GetUnitTypesCount();
+		itemsToLoad+= GetDecorationsCount();
+		itemsToLoad+= GetConstructionsCount();
+		itemsToLoad+= GetMissileSpritesCount();
+
+		loadingEmpty = CGraphic::New("ui/loadingEmpty.png");
+		loadingEmpty->Load();
+		loadingFull = CGraphic::New("ui/loadingFull.png");
+		loadingFull->Load();
 	}
-
-	itemsToLoad+= GetIconsCount();
-	itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
-	itemsToLoad+= GetUnitTypesCount();
-	itemsToLoad+= GetDecorationsCount();
-	itemsToLoad+= GetConstructionsCount();
-	itemsToLoad+= GetMissileSpritesCount();
-
-	loadingEmpty = CGraphic::New("ui/loadingEmpty.png");
-	loadingEmpty->Load();
-	loadingFull = CGraphic::New("ui/loadingFull.png");
-	loadingFull->Load();
 
 	loadingTip = "TIP: " + loadingTips[rand()%loadingTips.size()];
 }
 
 void UpdateLoadingBar()
 {
-	if (itemsToLoad == 0)
-		return;
+	int y = Video.Height/2;
 
-	int x = Video.Width/2 - loadingEmpty->Width/2;
-	int y = Video.Height/2 - loadingEmpty->Height/2;
-	int pct = (itemsLoaded * 100) / itemsToLoad;
+	if (itemsToLoad > 0) {
+		int x = Video.Width/2 - loadingEmpty->Width/2;
+		int pct = (itemsLoaded * 100) / itemsToLoad;
 
-	loadingEmpty->DrawClip(x, y);
-	loadingFull->DrawSub(0, 0, (loadingFull->Width * pct) / 100, loadingFull->Height, x, y);
+		loadingEmpty->DrawClip(x, y - loadingEmpty->Height/2);
+		loadingFull->DrawSub(0, 0, (loadingFull->Width * pct) / 100, loadingFull->Height, x, y - loadingEmpty->Height/2);
+		y+= loadingEmpty->Height/2;
+	}
 
-	loadingFont = CFont::Get("game");
-	if (loadingFont) {
+	if (loadingFont == NULL) {
+		loadingFont = CFont::Get("game");
+	}
+
+	if (loadingFont != NULL) {
 		CLabel label(*loadingFont);
-		label.DrawCentered(Video.Width/2, Video.Height/2 + loadingFull->Height/2 + 10, loadingTip);
+		label.DrawCentered(Video.Width/2, y + 10, loadingTip);
 	}
 }
 
