@@ -735,6 +735,10 @@ void CUnit::HealingItemAutoUse()
 
 void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 {
+	if (this->CurrentAction() == UnitActionDie) {
+		return;
+	}
+	
 	if (this->Character == NULL) {
 		this->Player->UnitTypesNonHeroCount[this->Type->Slot]--;
 	} else {
@@ -4955,10 +4959,7 @@ void CleanUnits()
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
 		CUnit &unit = **it;
 
-		//Wyrmgus start
-//		if (&unit == NULL) {
-		if (&unit == NULL || unit.Type == NULL) {
-		//Wyrmgus end
+		if (&unit == NULL) {
 			continue;
 		}
 		if (!unit.Destroyed) {

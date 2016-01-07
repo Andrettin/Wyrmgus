@@ -39,6 +39,9 @@
 
 #include "ai.h"
 #include "animation.h"
+//Wyrmgus start
+#include "game.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "player.h"
@@ -100,6 +103,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	const Vec2i pos = unit.tilePos + oldtype.GetHalfTileSize() - newtype.GetHalfTileSize();
 	CUnit *container = unit.Container;
 
+	//Wyrmgus start
+	/*
 	if (container) {
 		MapUnmarkUnitSight(unit);
 	} else {
@@ -112,6 +117,22 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			return 0;
 		}
 	}
+	*/
+	if (!SaveGameLoading) {
+		if (container) {
+			MapUnmarkUnitSight(unit);
+		} else {
+			SaveSelection();
+			unit.Remove(NULL);
+			if (!UnitTypeCanBeAt(newtype, pos)) {
+				unit.Place(unit.tilePos);
+				RestoreSelection();
+				// FIXME unit is not modified, try later ?
+				return 0;
+			}
+		}
+	}
+	//Wyrmgus end
 	CPlayer &player = *unit.Player;
 	player.UnitTypesCount[oldtype.Slot]--;
 	player.UnitTypesCount[newtype.Slot]++;
@@ -225,6 +246,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 
 	UpdateForNewUnit(unit, 1);
+	//Wyrmgus start
+	/*
 	//  Update Possible sight range change
 	UpdateUnitSightRange(unit);
 	if (!container) {
@@ -232,15 +255,30 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		RestoreSelection();
 	} else {
 		MapMarkUnitSight(unit);
-		//Wyrmgus start
-		//if unit has a container, update the container's attack range, as the unit's range may have been changed with the upgrade
-		container->UpdateContainerAttackRange();
-		//Wyrmgus end
 	}
+	*/
+	if (!SaveGameLoading) {
+		//  Update Possible sight range change
+		UpdateUnitSightRange(unit);
+		if (!container) {
+			unit.Place(pos);
+			RestoreSelection();
+		} else {
+			MapMarkUnitSight(unit);
+			//Wyrmgus start
+			//if unit has a container, update the container's attack range, as the unit's range may have been changed with the upgrade
+			container->UpdateContainerAttackRange();
+			//Wyrmgus end
+		}
+	}
+	//Wyrmgus end
 	//Wyrmgus start
 	//update the unit's XP required, as its level or points may have changed
 	unit.UpdateXPRequired();
 	//Wyrmgus end
+	
+	//Wyrmgus start
+	/*
 	//
 	// Update possible changed buttons.
 	//
@@ -248,6 +286,17 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		// could affect the buttons of any selected unit
 		SelectedUnitChanged();
 	}
+	*/
+	if (!SaveGameLoading) {
+		//
+		// Update possible changed buttons.
+		//
+		if (IsOnlySelected(unit) || &player == ThisPlayer) {
+			// could affect the buttons of any selected unit
+			SelectedUnitChanged();
+		}
+	}
+	//Wyrmgus end
 	return 1;
 }
 

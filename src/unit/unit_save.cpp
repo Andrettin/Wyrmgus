@@ -366,7 +366,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);
 		}
 	}
-	if (unit.Character != NULL) {
+	if (unit.Character != NULL && unit.CurrentAction() != UnitActionDie) {
 		if (!unit.Character->Custom) {
 			file.printf(",\n  \"character\", \"%s\"", unit.Character->GetFullName().c_str());
 		} else {
