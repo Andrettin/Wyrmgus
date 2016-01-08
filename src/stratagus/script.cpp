@@ -3072,7 +3072,7 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 	//  Load and evaluate configuration file
 	CclInConfigFile = 1;
 	const std::string name = LibraryFileName(filename.c_str());
-	if (access(name.c_str(), R_OK)) {
+	if (CanAccessFile(name.c_str()) == 0) {
 		fprintf(stderr, "Maybe you need to specify another gamepath with '-d /path/to/datadir'?\n");
 		ExitFatal(-1);
 	}
