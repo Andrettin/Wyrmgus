@@ -2086,7 +2086,7 @@ void CEditor::Init()
 {
 	// Load and evaluate the editor configuration file
 	const std::string filename = LibraryFileName(Parameters::Instance.luaEditorStartFilename.c_str());
-	if (access(filename.c_str(), R_OK)) {
+	if (CanAccessFile(filename.c_str())) {
 		fprintf(stderr, "Editor configuration file '%s' was not found\n"
 				"Specify another with '-E file.lua'\n",
 				Parameters::Instance.luaEditorStartFilename.c_str());
