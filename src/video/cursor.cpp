@@ -126,7 +126,7 @@ void LoadCursors(const std::string &race)
 		}
 
 		if (cursor.G && !cursor.G->IsLoaded()) {
-			ShowLoadProgress(_("Cursor %s"), cursor.G->File.c_str());
+			ShowLoadProgress(_("Loading Cursor \"%s\""), cursor.G->File.c_str());
 			cursor.G->Load();
 			cursor.G->UseDisplayFormat();
 

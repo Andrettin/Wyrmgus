@@ -883,7 +883,7 @@ void CFont::Load()
 	}
 
 	if (this->G) {
-		//ShowLoadProgress("Fonts %s", this->G->File.c_str());
+		//ShowLoadProgress("Loading Font \"%s\"", this->G->File.c_str());
 		this->G->Load();
 		this->MeasureWidths();
 

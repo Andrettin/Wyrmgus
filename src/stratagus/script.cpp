@@ -3081,7 +3081,7 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress(_("Script %s\n"), name.c_str());
+	ShowLoadProgress(_("Loading Script \"%s\"\n"), name.c_str());
 	LuaLoadFile(name, luaArgStr);
 	CclInConfigFile = 0;
 	LuaGarbageCollect();

@@ -2093,7 +2093,7 @@ void CEditor::Init()
 		ExitFatal(-1);
 	}
 
-	ShowLoadProgress(_("Script %s"), filename.c_str());
+	ShowLoadProgress(_("Loading Script \"%s\""), filename.c_str());
 	LuaLoadFile(filename);
 	LuaGarbageCollect();
 

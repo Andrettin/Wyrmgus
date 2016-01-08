@@ -428,7 +428,7 @@ void LoadDecorations()
 {
 	std::vector<Decoration>::iterator i;
 	for (i = DecoSprite.SpriteArray.begin(); i != DecoSprite.SpriteArray.end(); ++i) {
-		ShowLoadProgress(_("Decorations '%s'"), (*i).File.c_str());
+		ShowLoadProgress(_("Loading Decorations \"%s\""), (*i).File.c_str());
 		(*i).Sprite = CGraphic::New((*i).File, (*i).Width, (*i).Height);
 		(*i).Sprite->Load();
 	}

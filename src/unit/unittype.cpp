@@ -1584,7 +1584,7 @@ void LoadUnitTypes()
 #ifndef DYNAMIC_LOAD
 		// Load Sprite
 		if (!type.Sprite) {
-			ShowLoadProgress(_("Unit \"%s\""), type.Name.c_str());
+			ShowLoadProgress(_("Loading Unit \"%s\""), type.Name.c_str());
 			LoadUnitTypeSprite(type);
 
 			IncItemsLoaded();

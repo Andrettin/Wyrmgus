@@ -297,7 +297,7 @@ bool IconConfig::Load()
 {
 	bool res = LoadNoLog();
 	if (res == true) {
-		ShowLoadProgress(_("Icon %s"), this->Name.c_str());
+		ShowLoadProgress(_("Loading Icon \"%s\""), this->Name.c_str());
 	} else {
 		fprintf(stderr, _("Can't find icon %s\n"), this->Name.c_str());
 	}
@@ -320,7 +320,7 @@ void LoadIcons()
 	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
 		CIcon &icon = *(*it).second;
 
-		ShowLoadProgress(_("Icons %s"), icon.G->File.c_str());
+		ShowLoadProgress(_("Loading Icon \"%s\""), icon.G->File.c_str());
 		icon.Load();
 
 		IncItemsLoaded();
