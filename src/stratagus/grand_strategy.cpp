@@ -38,6 +38,7 @@
 #include "grand_strategy.h"
 
 #include "character.h"
+#include "game.h"	// for loading screen elements
 #include "font.h"	// for grand strategy mode tooltip drawing
 #include "interface.h"
 #include "iolib.h"
@@ -5394,8 +5395,13 @@ void CleanGrandStrategyGame()
 	GrandStrategyMapHeightIndent = 0;
 }
 
-void InitializeGrandStrategyGame()
+void InitializeGrandStrategyGame(bool show_loading)
 {
+	if (show_loading) {
+		CalculateItemsToLoad(true);
+		UpdateLoadingBar();
+	}
+	
 	//do the same for the fog tile now
 	std::string fog_graphic_tile = "tilesets/world/terrain/fog.png";
 	if (CGraphic::Get(fog_graphic_tile) == NULL) {

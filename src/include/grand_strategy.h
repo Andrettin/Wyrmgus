@@ -527,7 +527,7 @@ extern void AddProvinceClaim(std::string province_name, std::string civilization
 extern void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
-extern void InitializeGrandStrategyGame();
+extern void InitializeGrandStrategyGame(bool show_loading = true);
 extern void InitializeGrandStrategyMinimap();
 extern void InitializeGrandStrategyFactions();
 extern void SetGrandStrategyWorld(std::string world);

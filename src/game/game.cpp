@@ -1050,7 +1050,7 @@ static int CclLoadingBarSetBackgrounds(lua_State *l)
 	return 0;
 }
 
-void CalculateItemsToLoad()
+void CalculateItemsToLoad(bool grand_strategy)
 {
 	ResetItemsToLoad();
 
@@ -1064,12 +1064,14 @@ void CalculateItemsToLoad()
 	}
 	
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
-		itemsToLoad+= GetIconsCount();
-		itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
-		itemsToLoad+= GetUnitTypesCount();
-		itemsToLoad+= GetDecorationsCount();
-		itemsToLoad+= GetConstructionsCount();
-		itemsToLoad+= GetMissileSpritesCount();
+		if (!grand_strategy) {
+			itemsToLoad+= GetIconsCount();
+			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
+			itemsToLoad+= GetUnitTypesCount();
+			itemsToLoad+= GetDecorationsCount();
+			itemsToLoad+= GetConstructionsCount();
+			itemsToLoad+= GetMissileSpritesCount();
+		}
 		
 		loadingEmpty = CGraphic::New("ui/loadingEmpty.png");
 		loadingEmpty->Load();
