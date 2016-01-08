@@ -1055,9 +1055,7 @@ void CalculateItemsToLoad(bool grand_strategy)
 	ResetItemsToLoad();
 
 	if (loadingBackgrounds.size() > 0) {
-		int i = rand()%loadingBackgrounds.size();
-		printf("%d %d\n", i, loadingBackgrounds.size());
-		std::string loading_background_string = loadingBackgrounds[i];
+		std::string loading_background_string = loadingBackgrounds[rand()%loadingBackgrounds.size()];
 		if (CanAccessFile(loading_background_string.c_str())) {
 			loadingBackground = CGraphic::New(loading_background_string);
 			loadingBackground->Load();
