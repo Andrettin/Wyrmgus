@@ -32,6 +32,9 @@
 #include <string>
 
 class CFile;
+//Wyrmgus start
+class CGraphic;
+//Wyrmgus end
 
 extern void LoadGame(const std::string &filename); /// Load saved game
 extern int SaveGame(const std::string &filename); /// Save game
@@ -51,6 +54,10 @@ extern std::string GameName;                /// Name of the game
 extern std::string FullGameName;            /// Full Name of the game
 
 extern bool UseHPForXp;                     /// true if gain XP by dealing damage, false if by killing.
+
+//Wyrmgus start
+extern CGraphic *loadingBackground;
+//Wyrmgus end
 
 #endif // GAME_H
 

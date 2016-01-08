@@ -173,9 +173,6 @@ void InitModules()
 */
 void LoadModules()
 {
-	//Wyrmgus start
-	CalculateItemsToLoad();
-	//Wyrmgus end
 	LoadFonts();
 	LoadIcons();
 	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
@@ -253,6 +250,9 @@ void LoadGame(const std::string &filename)
 
 	LuaGarbageCollect();
 	InitUnitTypes(1);
+	//Wyrmgus start
+	CalculateItemsToLoad();
+	//Wyrmgus end
 	LuaLoadFile(filename);
 	LuaGarbageCollect();
 

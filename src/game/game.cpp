@@ -996,12 +996,16 @@ static int itemsToLoad;
 static int itemsLoaded;
 static CGraphic *loadingEmpty = NULL;
 static CGraphic *loadingFull = NULL;
+static std::vector<std::string> loadingBackgrounds;
+CGraphic *loadingBackground = NULL;
 static CFont *loadingFont = NULL;
 static std::vector<std::string> loadingTips;
 static std::vector<std::string> loadingTip;
 
 static int CclLoadingBarSetTips(lua_State *l)
 {
+	loadingTips.clear();
+	
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument (expected table)");
@@ -1022,10 +1026,43 @@ static int CclLoadingBarSetTips(lua_State *l)
 	return 0;
 }
 
+static int CclLoadingBarSetBackgrounds(lua_State *l)
+{
+	loadingBackgrounds.clear();
+	
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	const char *str;
+	int i = 1;
+	do {
+		lua_pushinteger(l, i++);
+		lua_gettable(l, -2);
+		str = lua_tostring(l, -1);
+		if (str) {
+			loadingBackgrounds.push_back(str);
+		}
+		lua_pop(l, 1);
+	} while (str != NULL);
+
+	return 0;
+}
+
 void CalculateItemsToLoad()
 {
 	ResetItemsToLoad();
 
+	if (loadingBackgrounds.size() > 0) {
+		std::string loading_background_string = loadingBackgrounds[rand()%loadingBackgrounds.size()];
+		if (CanAccessFile(loading_background_string.c_str())) {
+			loadingBackground = CGraphic::New(loading_background_string);
+			loadingBackground->Load();
+			loadingBackground->Resize(Video.Width, Video.Height);
+		}
+	}
+	
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		itemsToLoad+= GetIconsCount();
 		itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
@@ -1040,34 +1077,40 @@ void CalculateItemsToLoad()
 		loadingFull->Load();
 	}
 
-	std::string base_loadingTip = loadingTips[rand()%loadingTips.size()];
-	
-	int str_width_per_total_width = 1;
-	str_width_per_total_width += GetGameFont().Width(base_loadingTip) / Video.Width;
-	
-//	int line_length = Video.Width / GetGameFont().Width(1);
-	int line_length = base_loadingTip.size() / str_width_per_total_width;
-	
-	int begin = 0;
-	for (size_t i = 0; i < str_width_per_total_width; ++i) {
-		int end = base_loadingTip.size();
+	if (loadingTips.size() > 0) {
+		std::string base_loadingTip = loadingTips[rand()%loadingTips.size()];
 		
-		if (i != (str_width_per_total_width - 1)) {
-			end = (i + 1) * line_length;
-			while (base_loadingTip.substr(end - 1, 1) != " ") {
-				end -= 1;
+		int str_width_per_total_width = 1;
+		str_width_per_total_width += GetGameFont().Width(base_loadingTip) / Video.Width;
+		
+	//	int line_length = Video.Width / GetGameFont().Width(1);
+		int line_length = base_loadingTip.size() / str_width_per_total_width;
+		
+		int begin = 0;
+		for (size_t i = 0; i < str_width_per_total_width; ++i) {
+			int end = base_loadingTip.size();
+			
+			if (i != (str_width_per_total_width - 1)) {
+				end = (i + 1) * line_length;
+				while (base_loadingTip.substr(end - 1, 1) != " ") {
+					end -= 1;
+				}
 			}
+			
+			loadingTip.push_back(base_loadingTip.substr(begin, end - begin));
+			
+			begin = end;
 		}
-		
-		loadingTip.push_back(base_loadingTip.substr(begin, end - begin));
-		
-		begin = end;
 	}
 }
 
 void UpdateLoadingBar()
 {
 	int y = Video.Height/2;
+	
+	if (loadingBackground != NULL) {
+		loadingBackground->DrawClip(0, 0);
+	}
 	
 	if (itemsToLoad > 0) {
 		int x = Video.Width/2 - loadingEmpty->Width/2;
@@ -1103,6 +1146,7 @@ void ResetItemsToLoad()
 	itemsLoaded = 0;
 	itemsToLoad = 0;
 	loadingTip.clear();
+	loadingBackground = NULL;
 }
 
 /*----------------------------------------------------------------------------
@@ -1154,6 +1198,10 @@ void CreateGame(const std::string &filename, CMap *map)
 		}
 		CreatePlayer(playertype);
 	}
+	
+	//Wyrmgus start
+	CalculateItemsToLoad();
+	//Wyrmgus end
 
 	if (!filename.empty()) {
 		if (CurrentMapPath != filename) {
@@ -1260,8 +1308,6 @@ void CreateGame(const std::string &filename, CMap *map)
 	//
 	// Graphic part
 	//
-	CalculateItemsToLoad();
-
 	SetPlayersPalette();
 	LoadIcons();
 
@@ -1863,7 +1909,10 @@ void LuaRegisterModules()
 
 	lua_register(Lua, "SavedGameInfo", CclSavedGameInfo);
 
+	//Wyrmgus start
 	lua_register(Lua, "LoadingBarSetTips", CclLoadingBarSetTips);
+	lua_register(Lua, "LoadingBarSetBackgrounds", CclLoadingBarSetBackgrounds);
+	//Wyrmgus end
 
 	AiCclRegister();
 	AnimationCclRegister();

@@ -39,6 +39,9 @@
 #include "ui.h"
 
 #include "font.h"
+//Wyrmgus start
+#include "game.h"
+//Wyrmgus end
 #include "interface.h"
 #include "iolib.h"
 #include "map.h"
@@ -86,6 +89,10 @@ void ShowLoadProgress(const char *fmt, ...)
 	va_end(va);
 
 	if (Video.Depth && IsGameFontReady() && GetGameFont().IsLoaded()) {
+		//Wyrmgus start
+		UpdateLoadingBar();
+		//Wyrmgus end
+		
 		// Remove non printable chars
 		for (unsigned char *s = (unsigned char *)temp; *s; ++s) {
 			if (*s < 32) {
@@ -94,7 +101,9 @@ void ShowLoadProgress(const char *fmt, ...)
 		}
 		//Wyrmgus start
 //		Video.FillRectangle(ColorBlack, 5, Video.Height - 18, Video.Width - 10, 18);
-		Video.FillRectangle(ColorBlack, 0, Video.Height - 18, Video.Width, 18);
+		if (loadingBackground == NULL) {
+			Video.FillRectangle(ColorBlack, 0, Video.Height - 18, Video.Width, 18);
+		}
 		//Wyrmgus end
 		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
 		//Wyrmgus start
@@ -102,7 +111,6 @@ void ShowLoadProgress(const char *fmt, ...)
 		InvalidateArea(0, Video.Height - 18, Video.Width, 18);
 		//Wyrmgus end
 
-		UpdateLoadingBar();
 		RealizeVideoMemory();
 	} else {
 		DebugPrint("!!!!%s\n" _C_ temp);
