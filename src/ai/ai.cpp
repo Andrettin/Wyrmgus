@@ -931,6 +931,10 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			continue;
 		}
 		//Wyrmgus start
+		if (!blocker.Player->AiEnabled) {
+			continue;
+		}
+		
 		int blocker_force = blocker.Player->Ai->Force.GetForce(blocker);
 		if (blocker_force != -1 && blocker.Player->Ai->Force[blocker_force].Attacking) { //don't try to move the blocker if it is part of a force that is attacking
 			continue;
