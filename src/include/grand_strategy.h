@@ -190,7 +190,6 @@ public:
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization);
 	std::string GenerateSettlementName(int civilization);
-	std::string GenerateTileName(int civilization, int terrain);
 	
 	std::string Name;
 	std::string SettlementName;

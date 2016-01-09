@@ -2276,6 +2276,26 @@ int GetGovernmentTypeIdByName(std::string government_type)
 
 	return -1;
 }
+
+bool LanguageWord::HasTypeName(std::string type)
+{
+	return std::find(this->TypeName.begin(), this->TypeName.end(), type) != this->TypeName.end();
+}
+
+bool LanguageWord::HasPrefixTypeName(std::string type)
+{
+	return std::find(this->PrefixTypeName.begin(), this->PrefixTypeName.end(), type) != this->PrefixTypeName.end();
+}
+
+bool LanguageWord::HasSuffixTypeName(std::string type)
+{
+	return std::find(this->SuffixTypeName.begin(), this->SuffixTypeName.end(), type) != this->SuffixTypeName.end();
+}
+
+bool LanguageWord::HasInfixTypeName(std::string type)
+{
+	return std::find(this->InfixTypeName.begin(), this->InfixTypeName.end(), type) != this->InfixTypeName.end();
+}
 //Wyrmgus end
 
 //@}

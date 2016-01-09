@@ -653,6 +653,10 @@ void ParseCommandLine(int argc, char **argv, Parameters &parameters)
 				ShaderIndex = atoi(optarg) % MAX_SHADERS;
 				if (atoi(optarg) == -1) {
 					GLShaderPipelineSupported = false;
+				//Wyrmgus start
+				} else {
+					GLShaderPipelineSupported = true;
+				//Wyrmgus end
 				}
 				continue;
 			case 'Z':
