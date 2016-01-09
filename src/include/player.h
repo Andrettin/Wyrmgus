@@ -386,10 +386,6 @@ public:
 		InfixSingular(false), InfixPlural(false),
 		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
 	{
-		memset(ItemName, 0, sizeof(ItemName));
-		memset(PrefixItemName, 0, sizeof(PrefixItemName));
-		memset(SuffixItemName, 0, sizeof(SuffixItemName));
-		memset(InfixItemName, 0, sizeof(InfixItemName));
 	}
 
 	std::string Meaning;			/// Meaning of the word in English.
@@ -410,25 +406,21 @@ public:
 	bool PersonalName;				/// Whether the noun can be used as a personal name
 	bool SettlementName;			/// Whether the noun can be used as a settlement name
 	bool ProvinceName;				/// Whether the noun can be used as a province name
-	bool ItemName[MaxItemClasses];	/// Whether the noun can be used as an item name
 	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
 	bool PrefixPlural;				/// Whether the noun's plural form can be used as a prefix
 	bool PrefixPersonalName;		/// Whether the noun can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the noun can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the noun can be used as a prefix for province names
-	bool PrefixItemName[MaxItemClasses];	/// Whether the noun can be used as a prefix for item names
 	bool SuffixSingular;			/// Whether the noun's singular form can be used as a suffix
 	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
 	bool SuffixPersonalName;		/// Whether the noun can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the noun can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the noun can be used as a suffix for province names
-	bool SuffixItemName[MaxItemClasses];	/// Whether the noun can be used as a suffix for item names
 	bool InfixSingular;				/// Whether the noun's singular form can be used as an infix
 	bool InfixPlural;				/// Whether the noun's plural form can be used as an infix
 	bool InfixPersonalName;			/// Whether the noun can be used as an infix for personal names
 	bool InfixSettlementName;		/// Whether the noun can be used as an infix for settlement names
 	bool InfixProvinceName;			/// Whether the noun can be used as an infix for province names
-	bool InfixItemName[MaxItemClasses];	/// Whether the noun can be used as an infix item name
 };
 
 class LanguageVerb : public LanguageWord
@@ -440,9 +432,6 @@ public:
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
 		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
 	{
-		memset(PrefixItemName, 0, sizeof(PrefixItemName));
-		memset(SuffixItemName, 0, sizeof(SuffixItemName));
-		memset(InfixItemName, 0, sizeof(InfixItemName));
 	}
 
 	std::string Meaning;							/// Meaning of the word in English.
@@ -479,15 +468,12 @@ public:
 	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
-	bool PrefixItemName[MaxItemClasses];	/// Whether the word can be used as a prefix for item names
 	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
-	bool SuffixItemName[MaxItemClasses];	/// Whether the word can be used as a suffix for item names
 	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
 	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
 	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
-	bool InfixItemName[MaxItemClasses];	/// Whether the word can be used as an infix for item names
 };
 
 class LanguageAdjective : public LanguageWord
@@ -499,10 +485,6 @@ public:
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
 		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
 	{
-		memset(ItemName, 0, sizeof(ItemName));
-		memset(PrefixItemName, 0, sizeof(PrefixItemName));
-		memset(SuffixItemName, 0, sizeof(SuffixItemName));
-		memset(InfixItemName, 0, sizeof(InfixItemName));
 	}
 
 	std::string Meaning;			/// Meaning of the word in English.
@@ -513,19 +495,15 @@ public:
 	bool PersonalName;				/// Whether the word can be used as a personal name
 	bool SettlementName;			/// Whether the word can be used as a settlement name
 	bool ProvinceName;				/// Whether the word can be used as a province name
-	bool ItemName[MaxItemClasses];	/// Whether the word can be used as an item name
 	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
-	bool PrefixItemName[MaxItemClasses];	/// Whether the word can be used as a prefix for item names
 	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
-	bool SuffixItemName[MaxItemClasses];	/// Whether the word can be used as a suffix for item names
 	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
 	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
 	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
-	bool InfixItemName[MaxItemClasses];	/// Whether the word can be used as an infix for item names
 };
 
 class LanguagePronoun : public LanguageWord
@@ -572,24 +550,18 @@ public:
 		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
 		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
 	{
-		memset(PrefixItemName, 0, sizeof(PrefixItemName));
-		memset(SuffixItemName, 0, sizeof(SuffixItemName));
-		memset(InfixItemName, 0, sizeof(InfixItemName));
 	}
 
 	int Number;
 	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
 	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
 	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
-	bool PrefixItemName[MaxItemClasses];	/// Whether the word can be used as a prefix for item names
 	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
 	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
 	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
-	bool SuffixItemName[MaxItemClasses];	/// Whether the word can be used as a suffix for item names
 	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
 	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
 	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
-	bool InfixItemName[MaxItemClasses];	/// Whether the word can be used as an infix for item names
 };
 //Wyrmgus end
 

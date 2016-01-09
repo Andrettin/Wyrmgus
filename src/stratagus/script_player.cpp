@@ -856,11 +856,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "province-name")) {
 						++n;
 						noun->ProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						noun->ItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-singular")) {
 						++n;
 						noun->PrefixSingular = LuaToBoolean(l, -1, n + 1);
@@ -876,11 +871,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "prefix-province-name")) {
 						++n;
 						noun->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						noun->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-singular")) {
 						++n;
 						noun->SuffixSingular = LuaToBoolean(l, -1, n + 1);
@@ -896,11 +886,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "suffix-province-name")) {
 						++n;
 						noun->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						noun->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-singular")) {
 						++n;
 						noun->InfixSingular = LuaToBoolean(l, -1, n + 1);
@@ -916,11 +901,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "infix-province-name")) {
 						++n;
 						noun->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						noun->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1028,11 +1008,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "prefix-province-name")) {
 						++n;
 						verb->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						verb->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
 						++n;
 						verb->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1042,11 +1017,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "suffix-province-name")) {
 						++n;
 						verb->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						verb->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
 						++n;
 						verb->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1056,11 +1026,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "infix-province-name")) {
 						++n;
 						verb->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						verb->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1108,11 +1073,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "province-name")) {
 						++n;
 						adjective->ProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						adjective->ItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-personal-name")) {
 						++n;
 						adjective->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1122,11 +1082,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "prefix-province-name")) {
 						++n;
 						adjective->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						adjective->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
 						++n;
 						adjective->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1136,11 +1091,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "suffix-province-name")) {
 						++n;
 						adjective->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						adjective->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
 						++n;
 						adjective->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1150,11 +1100,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "infix-province-name")) {
 						++n;
 						adjective->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						adjective->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1283,11 +1228,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "prefix-province-name")) {
 						++n;
 						numeral->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						numeral->PrefixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-personal-name")) {
 						++n;
 						numeral->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1297,11 +1237,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "suffix-province-name")) {
 						++n;
 						numeral->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						numeral->SuffixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-personal-name")) {
 						++n;
 						numeral->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
@@ -1311,11 +1246,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "infix-province-name")) {
 						++n;
 						numeral->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-item-name")) {
-						++n;
-						int item_type = GetItemClassIdByName(LuaToString(l, -1, n + 1));
-						++n;
-						numeral->InfixItemName[item_type] = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1391,16 +1321,6 @@ static int CclDefineLanguageNoun(lua_State *l)
 			noun->SettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "ProvinceName")) {
 			noun->ProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "ItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				noun->ItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "TypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1419,16 +1339,6 @@ static int CclDefineLanguageNoun(lua_State *l)
 			noun->PrefixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixProvinceName")) {
 			noun->PrefixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				noun->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "PrefixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1447,16 +1357,6 @@ static int CclDefineLanguageNoun(lua_State *l)
 			noun->SuffixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixProvinceName")) {
 			noun->SuffixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				noun->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1475,16 +1375,6 @@ static int CclDefineLanguageNoun(lua_State *l)
 			noun->InfixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixProvinceName")) {
 			noun->InfixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				noun->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1603,16 +1493,6 @@ static int CclDefineLanguageVerb(lua_State *l)
 			verb->PrefixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixProvinceName")) {
 			verb->PrefixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				verb->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "PrefixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1635,32 +1515,12 @@ static int CclDefineLanguageVerb(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				verb->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "SuffixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				verb->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "InfixPersonalName")) {
 			verb->InfixPersonalName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixSettlementName")) {
 			verb->InfixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixProvinceName")) {
 			verb->InfixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				verb->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1719,16 +1579,6 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			adjective->SettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "ProvinceName")) {
 			adjective->ProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "ItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				adjective->ItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "TypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1743,16 +1593,6 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			adjective->PrefixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixProvinceName")) {
 			adjective->PrefixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				adjective->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "PrefixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1767,16 +1607,6 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			adjective->SuffixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixProvinceName")) {
 			adjective->SuffixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				adjective->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1791,16 +1621,6 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			adjective->InfixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixProvinceName")) {
 			adjective->InfixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				adjective->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1991,32 +1811,12 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				numeral->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "PrefixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				numeral->PrefixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "SuffixPersonalName")) {
 			numeral->SuffixPersonalName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixSettlementName")) {
 			numeral->SuffixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixProvinceName")) {
 			numeral->SuffixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				numeral->SuffixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2031,16 +1831,6 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			numeral->InfixSettlementName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixProvinceName")) {
 			numeral->InfixProvinceName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixItemName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				int item_type = GetItemClassIdByName(LuaToString(l, -1, k + 1));
-				++k;
-				numeral->InfixItemName[item_type] = LuaToBoolean(l, -1, k + 1);
-			}
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
