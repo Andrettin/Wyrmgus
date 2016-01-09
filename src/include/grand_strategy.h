@@ -139,7 +139,6 @@ class CProvince
 {
 public:
 	CProvince() :
-		Name(""), SettlementName(""),
 		ID(-1), Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),

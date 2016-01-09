@@ -378,13 +378,9 @@ public:
 	LanguageNoun() : LanguageWord(),
 		Uncountable(false),
 		NameSingular(false), NamePlural(false),
-		PersonalName(false), SettlementName(false), ProvinceName(false), 
 		PrefixSingular(false), PrefixPlural(false),
-		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
 		SuffixSingular(false), SuffixPlural(false),
-		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
-		InfixSingular(false), InfixPlural(false),
-		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
+		InfixSingular(false), InfixPlural(false)
 	{
 	}
 
@@ -403,34 +399,18 @@ public:
 	bool Uncountable;				/// Whether the noun is uncountable or not.
 	bool NameSingular;				/// Whether the noun's singular form can be used as a name
 	bool NamePlural;				/// Whether the noun's plural form can be used as a name
-	bool PersonalName;				/// Whether the noun can be used as a personal name
-	bool SettlementName;			/// Whether the noun can be used as a settlement name
-	bool ProvinceName;				/// Whether the noun can be used as a province name
 	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
 	bool PrefixPlural;				/// Whether the noun's plural form can be used as a prefix
-	bool PrefixPersonalName;		/// Whether the noun can be used as a prefix for personal names
-	bool PrefixSettlementName;		/// Whether the noun can be used as a prefix for settlement names
-	bool PrefixProvinceName;		/// Whether the noun can be used as a prefix for province names
 	bool SuffixSingular;			/// Whether the noun's singular form can be used as a suffix
 	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
-	bool SuffixPersonalName;		/// Whether the noun can be used as a suffix for personal names
-	bool SuffixSettlementName;		/// Whether the noun can be used as a suffix for settlement names
-	bool SuffixProvinceName;		/// Whether the noun can be used as a suffix for province names
 	bool InfixSingular;				/// Whether the noun's singular form can be used as an infix
 	bool InfixPlural;				/// Whether the noun's plural form can be used as an infix
-	bool InfixPersonalName;			/// Whether the noun can be used as an infix for personal names
-	bool InfixSettlementName;		/// Whether the noun can be used as an infix for settlement names
-	bool InfixProvinceName;			/// Whether the noun can be used as an infix for province names
 };
 
 class LanguageVerb : public LanguageWord
 {
 public:
-	LanguageVerb() : LanguageWord(),
-		PersonalName(false), 
-		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
-		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
-		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
+	LanguageVerb() : LanguageWord()
 	{
 	}
 
@@ -464,26 +444,12 @@ public:
 	std::string PluralThirdPersonFuture;
 	std::string ParticiplePresent;
 	std::string ParticiplePast;
-	bool PersonalName;				/// Whether the word can be used as a personal name
-	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
-	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
-	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
-	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
-	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
-	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
-	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
-	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
-	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
 };
 
 class LanguageAdjective : public LanguageWord
 {
 public:
-	LanguageAdjective() : LanguageWord(),
-		PersonalName(false), SettlementName(false), ProvinceName(false), 
-		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
-		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
-		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
+	LanguageAdjective() : LanguageWord()
 	{
 	}
 
@@ -492,18 +458,6 @@ public:
 	std::string Verb;				/// Equivalent verb, if any.
 	std::string Comparative;		/// Comparative form of the adjective.
 	std::string Superlative;		/// Superlative form of the adjective.
-	bool PersonalName;				/// Whether the word can be used as a personal name
-	bool SettlementName;			/// Whether the word can be used as a settlement name
-	bool ProvinceName;				/// Whether the word can be used as a province name
-	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
-	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
-	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
-	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
-	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
-	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
-	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
-	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
-	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
 };
 
 class LanguagePronoun : public LanguageWord
@@ -545,23 +499,11 @@ class LanguageNumeral : public LanguageWord
 {
 public:
 	LanguageNumeral() : LanguageWord(),
-		Number(-1),
-		PrefixPersonalName(false), PrefixSettlementName(false), PrefixProvinceName(false),
-		SuffixPersonalName(false), SuffixSettlementName(false), SuffixProvinceName(false),
-		InfixPersonalName(false), InfixSettlementName(false), InfixProvinceName(false)
+		Number(-1)
 	{
 	}
 
 	int Number;
-	bool PrefixPersonalName;		/// Whether the word can be used as a prefix for personal names
-	bool PrefixSettlementName;		/// Whether the word can be used as a prefix for settlement names
-	bool PrefixProvinceName;		/// Whether the word can be used as a prefix for province names
-	bool SuffixPersonalName;		/// Whether the word can be used as a suffix for personal names
-	bool SuffixSettlementName;		/// Whether the word can be used as a suffix for settlement names
-	bool SuffixProvinceName;		/// Whether the word can be used as a suffix for province names
-	bool InfixPersonalName;			/// Whether the word can be used as a infix for personal names
-	bool InfixSettlementName;		/// Whether the word can be used as a infix for settlement names
-	bool InfixProvinceName;			/// Whether the word can be used as a infix for province names
 };
 //Wyrmgus end
 

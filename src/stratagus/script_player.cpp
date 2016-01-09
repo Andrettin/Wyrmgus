@@ -847,60 +847,24 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "name-plural")) {
 						++n;
 						noun->NamePlural = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "personal-name")) {
-						++n;
-						noun->PersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "settlement-name")) {
-						++n;
-						noun->SettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "province-name")) {
-						++n;
-						noun->ProvinceName = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-singular")) {
 						++n;
 						noun->PrefixSingular = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-plural")) {
 						++n;
 						noun->PrefixPlural = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-personal-name")) {
-						++n;
-						noun->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-settlement-name")) {
-						++n;
-						noun->PrefixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-province-name")) {
-						++n;
-						noun->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-singular")) {
 						++n;
 						noun->SuffixSingular = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-plural")) {
 						++n;
 						noun->SuffixPlural = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-personal-name")) {
-						++n;
-						noun->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-settlement-name")) {
-						++n;
-						noun->SuffixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-province-name")) {
-						++n;
-						noun->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-singular")) {
 						++n;
 						noun->InfixSingular = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-plural")) {
 						++n;
 						noun->InfixPlural = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-personal-name")) {
-						++n;
-						noun->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-settlement-name")) {
-						++n;
-						noun->InfixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-province-name")) {
-						++n;
-						noun->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -996,36 +960,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "participle-past")) {
 						++n;
 						verb->ParticiplePast = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "personal-name")) {
-						++n;
-						verb->PersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-personal-name")) {
-						++n;
-						verb->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-settlement-name")) {
-						++n;
-						verb->PrefixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-province-name")) {
-						++n;
-						verb->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-personal-name")) {
-						++n;
-						verb->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-settlement-name")) {
-						++n;
-						verb->SuffixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-province-name")) {
-						++n;
-						verb->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-personal-name")) {
-						++n;
-						verb->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-settlement-name")) {
-						++n;
-						verb->InfixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-province-name")) {
-						++n;
-						verb->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1064,42 +998,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					} else if (!strcmp(value, "superlative")) {
 						++n;
 						adjective->Superlative = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "personal-name")) {
-						++n;
-						adjective->PersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "settlement-name")) {
-						++n;
-						adjective->SettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "province-name")) {
-						++n;
-						adjective->ProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-personal-name")) {
-						++n;
-						adjective->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-settlement-name")) {
-						++n;
-						adjective->PrefixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-province-name")) {
-						++n;
-						adjective->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-personal-name")) {
-						++n;
-						adjective->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-settlement-name")) {
-						++n;
-						adjective->SuffixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-province-name")) {
-						++n;
-						adjective->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-personal-name")) {
-						++n;
-						adjective->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-settlement-name")) {
-						++n;
-						adjective->InfixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-province-name")) {
-						++n;
-						adjective->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1219,33 +1117,6 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					if (!strcmp(value, "number")) {
 						++n;
 						numeral->Number = LuaToNumber(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-personal-name")) {
-						++n;
-						numeral->PrefixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-settlement-name")) {
-						++n;
-						numeral->PrefixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "prefix-province-name")) {
-						++n;
-						numeral->PrefixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-personal-name")) {
-						++n;
-						numeral->SuffixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-settlement-name")) {
-						++n;
-						numeral->SuffixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "suffix-province-name")) {
-						++n;
-						numeral->SuffixProvinceName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-personal-name")) {
-						++n;
-						numeral->InfixPersonalName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-settlement-name")) {
-						++n;
-						numeral->InfixSettlementName = LuaToBoolean(l, -1, n + 1);
-					} else if (!strcmp(value, "infix-province-name")) {
-						++n;
-						numeral->InfixProvinceName = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1315,12 +1186,6 @@ static int CclDefineLanguageNoun(lua_State *l)
 			noun->NameSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NamePlural")) {
 			noun->NamePlural = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PersonalName")) {
-			noun->PersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SettlementName")) {
-			noun->SettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "ProvinceName")) {
-			noun->ProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "TypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1333,12 +1198,6 @@ static int CclDefineLanguageNoun(lua_State *l)
 			noun->PrefixSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixPlural")) {
 			noun->PrefixPlural = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixPersonalName")) {
-			noun->PrefixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixSettlementName")) {
-			noun->PrefixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixProvinceName")) {
-			noun->PrefixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1351,12 +1210,6 @@ static int CclDefineLanguageNoun(lua_State *l)
 			noun->SuffixSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixPlural")) {
 			noun->SuffixPlural = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixPersonalName")) {
-			noun->SuffixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixSettlementName")) {
-			noun->SuffixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixProvinceName")) {
-			noun->SuffixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1369,12 +1222,6 @@ static int CclDefineLanguageNoun(lua_State *l)
 			noun->InfixSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixPlural")) {
 			noun->InfixPlural = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixPersonalName")) {
-			noun->InfixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixSettlementName")) {
-			noun->InfixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixProvinceName")) {
-			noun->InfixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1477,8 +1324,6 @@ static int CclDefineLanguageVerb(lua_State *l)
 			verb->ParticiplePresent = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParticiplePast")) {
 			verb->ParticiplePast = LuaToString(l, -1);
-		} else if (!strcmp(value, "PersonalName")) {
-			verb->PersonalName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "TypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1487,12 +1332,6 @@ static int CclDefineLanguageVerb(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				verb->TypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "PrefixPersonalName")) {
-			verb->PrefixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixSettlementName")) {
-			verb->PrefixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixProvinceName")) {
-			verb->PrefixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1501,12 +1340,6 @@ static int CclDefineLanguageVerb(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				verb->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "SuffixPersonalName")) {
-			verb->SuffixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixSettlementName")) {
-			verb->SuffixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixProvinceName")) {
-			verb->SuffixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1515,12 +1348,6 @@ static int CclDefineLanguageVerb(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				verb->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "InfixPersonalName")) {
-			verb->InfixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixSettlementName")) {
-			verb->InfixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixProvinceName")) {
-			verb->InfixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1573,12 +1400,6 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			adjective->Comparative = LuaToString(l, -1);
 		} else if (!strcmp(value, "Superlative")) {
 			adjective->Superlative = LuaToString(l, -1);
-		} else if (!strcmp(value, "PersonalName")) {
-			adjective->PersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SettlementName")) {
-			adjective->SettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "ProvinceName")) {
-			adjective->ProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "TypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1587,12 +1408,6 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				adjective->TypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "PrefixPersonalName")) {
-			adjective->PrefixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixSettlementName")) {
-			adjective->PrefixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixProvinceName")) {
-			adjective->PrefixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1601,12 +1416,6 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				adjective->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "SuffixPersonalName")) {
-			adjective->SuffixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixSettlementName")) {
-			adjective->SuffixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixProvinceName")) {
-			adjective->SuffixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1615,12 +1424,6 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				adjective->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "InfixPersonalName")) {
-			adjective->InfixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixSettlementName")) {
-			adjective->InfixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixProvinceName")) {
-			adjective->InfixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1797,12 +1600,6 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			}
 		} else if (!strcmp(value, "Number")) {
 			numeral->Number = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "PrefixPersonalName")) {
-			numeral->PrefixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixSettlementName")) {
-			numeral->PrefixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixProvinceName")) {
-			numeral->PrefixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1811,12 +1608,6 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				numeral->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "SuffixPersonalName")) {
-			numeral->SuffixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixSettlementName")) {
-			numeral->SuffixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixProvinceName")) {
-			numeral->SuffixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1825,12 +1616,6 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				numeral->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "InfixPersonalName")) {
-			numeral->InfixPersonalName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixSettlementName")) {
-			numeral->InfixSettlementName = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixProvinceName")) {
-			numeral->InfixProvinceName = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

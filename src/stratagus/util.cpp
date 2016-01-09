@@ -845,8 +845,7 @@ std::string GeneratePersonalName(int civilization, int unit_type_id)
 			}
 		}
 	} else if (
-		type.BoolFlag[ORGANIC_INDEX].value
-		&& civilization != -1
+		civilization != -1
 		&& (
 			!PlayerRaces.PersonalNames[civilization][0].empty()
 			|| !PlayerRaces.PersonalNamePrefixes[civilization][0].empty()
@@ -855,186 +854,10 @@ std::string GeneratePersonalName(int civilization, int unit_type_id)
 			|| PlayerRaces.LanguageAdjectives[civilization][0]
 		)
 	) {
-		int PersonalNameCount = 0;
-		std::string PersonalNames[PersonalNameMax];
-		int PersonalNamePrefixCount = 0;
-		std::string PersonalNamePrefixes[PersonalNameMax];
-		int PersonalNameSuffixCount = 0;
-		std::string PersonalNameSuffixes[PersonalNameMax];
-		int PersonalNameInfixCount = 0;
-		std::string PersonalNameInfixes[PersonalNameMax];
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (PlayerRaces.PersonalNames[civilization][i].empty()) {
-				break;
-			}
-			PersonalNames[PersonalNameCount] = PlayerRaces.PersonalNames[civilization][i];
-			PersonalNameCount += 1;
-		}
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (PlayerRaces.PersonalNamePrefixes[civilization][i].empty()) {
-				break;
-			}
-			PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.PersonalNamePrefixes[civilization][i];
-			PersonalNamePrefixCount += 1;
-		}
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (PlayerRaces.PersonalNameSuffixes[civilization][i].empty()) {
-				break;
-			}
-			PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.PersonalNameSuffixes[civilization][i];
-			PersonalNameSuffixCount += 1;
-		}
-		
-		for (int i = 0; i < LanguageWordMax; ++i) {
-			if (!PlayerRaces.LanguageNouns[civilization][i]) {
-				break;
-			}
-			if (PlayerRaces.LanguageNouns[civilization][i]->PersonalName) { // nouns which can be used as personal names without compounding
-				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NameSingular) {
-					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
-					PersonalNameCount += 1;
-				}
-				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->NamePlural) {
-					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
-					PersonalNameCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageNouns[civilization][i]->PrefixPersonalName) {
-				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixSingular) {
-					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative; //using the nominative, is it always the best choice?
-					PersonalNamePrefixCount += 1;
-				}
-				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->PrefixPlural) {
-					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
-					PersonalNamePrefixCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageNouns[civilization][i]->SuffixPersonalName) {
-				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixSingular) {
-					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
-					PersonalNameSuffixCount += 1;
-				}
-				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->SuffixPlural) {
-					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
-					PersonalNameSuffixCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageNouns[civilization][i]->InfixPersonalName) {
-				if (!PlayerRaces.LanguageNouns[civilization][i]->SingularNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->InfixSingular) {
-					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageNouns[civilization][i]->SingularNominative;
-					PersonalNameInfixCount += 1;
-				}
-				if (!PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty() && PlayerRaces.LanguageNouns[civilization][i]->InfixPlural) {
-					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
-					PersonalNameInfixCount += 1;
-				}
-			}
-		}
-		
-		for (int i = 0; i < LanguageWordMax; ++i) {
-			if (!PlayerRaces.LanguageVerbs[civilization][i]) {
-				break;
-			}
-			if (PlayerRaces.LanguageVerbs[civilization][i]->PersonalName) { // only using verb participles for now; maybe should add more possibilities?
-				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
-					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
-					PersonalNameCount += 1;
-				}
-				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
-					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
-					PersonalNameCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageVerbs[civilization][i]->PrefixPersonalName) { // only using verb participles for now; maybe should add more possibilities?
-				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
-					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
-					PersonalNamePrefixCount += 1;
-				}
-				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
-					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
-					PersonalNamePrefixCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageVerbs[civilization][i]->SuffixPersonalName) {
-				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
-					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
-					PersonalNameSuffixCount += 1;
-				}
-				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
-					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
-					PersonalNameSuffixCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageVerbs[civilization][i]->InfixPersonalName) {
-				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent.empty()) {
-					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePresent;
-					PersonalNameInfixCount += 1;
-				}
-				if (!PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast.empty()) {
-					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageVerbs[civilization][i]->ParticiplePast;
-					PersonalNameInfixCount += 1;
-				}
-			}
-		}
-		
-		for (int i = 0; i < LanguageWordMax; ++i) {
-			if (!PlayerRaces.LanguageAdjectives[civilization][i]) {
-				break;
-			}
-			if (PlayerRaces.LanguageAdjectives[civilization][i]->PersonalName) {
-				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
-					PersonalNames[PersonalNameCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
-					PersonalNameCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageAdjectives[civilization][i]->PrefixPersonalName) {
-				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
-					PersonalNamePrefixes[PersonalNamePrefixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
-					PersonalNamePrefixCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageAdjectives[civilization][i]->SuffixPersonalName) {
-				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
-					PersonalNameSuffixes[PersonalNameSuffixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
-					PersonalNameSuffixCount += 1;
-				}
-			}
-			if (PlayerRaces.LanguageAdjectives[civilization][i]->InfixPersonalName) {
-				if (!PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
-					PersonalNameInfixes[PersonalNameInfixCount] = PlayerRaces.LanguageAdjectives[civilization][i]->Word;
-					PersonalNameInfixCount += 1;
-				}
-			}
-		}
-		
-		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0 || PersonalNameSuffixCount > 0) {
-			int random_number = SyncRand(PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (((PersonalNamePrefixCount + PersonalNameSuffixCount) / 2) * PersonalNameInfixCount));
-			if (random_number < PersonalNameCount) { //entire name
-				personal_name = PersonalNames[SyncRand(PersonalNameCount)];
-			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount)) { //prefix + suffix
-				personal_name = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
-				std::string suffix = PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
-				suffix = DecapitalizeString(suffix);
-				personal_name += suffix;
-			} else if (random_number < PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount) + (((PersonalNamePrefixCount + PersonalNameSuffixCount) / 2) * PersonalNameInfixCount)) { //prefix + infix + suffix
-				std::string prefix = PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
-				std::string infix = PersonalNameInfixes[SyncRand(PersonalNameInfixCount)];
-				infix = DecapitalizeString(infix);
-				std::string suffix = PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
-				suffix = DecapitalizeString(suffix);
-				if (prefix.substr(prefix.size() - 1, 1) == "d" && infix.substr(0, 1) == "d") { //if the prefix ends with "d" and the infix begins with "d", eliminate one instance of "d"
-					prefix = FindAndReplaceStringEnding(prefix, "d", "");
-				}
-				if (infix.substr(infix.size() - 2, 2) == "th" && suffix.substr(0, 2) == "th") { //if the last two characters of the infix are "th", and the suffix begins with "th", then eliminate the infix's "th", to make this be just one instance of "th"
-					infix = FindAndReplaceStringEnding(infix, "th", "");
-				}
-				if (infix.substr(infix.size() - 1, 1) == "d" && suffix.substr(0, 1) == "d") { //if the infix ends with "d" and the suffix begins with "d", eliminate one instance of "d"
-					infix = FindAndReplaceStringEnding(infix, "d", "");
-				}
-				personal_name = prefix;
-				personal_name += infix;
-				personal_name += suffix;
-			}
+		if (type.BoolFlag[ORGANIC_INDEX].value) {
+			personal_name = GenerateName(civilization, "person");
+		} else {
+			personal_name = GenerateName(civilization, type.Ident);
 		}
 	}
 	
@@ -1291,7 +1114,7 @@ std::string GenerateName(int civilization, std::string type)
 			int total_prefix_count = noun_prefix_count + verb_prefix_count + adjective_prefix_count + numeral_prefix_count;
 			int total_suffix_count = noun_suffix_count + verb_suffix_count + adjective_suffix_count + numeral_suffix_count;
 			int total_infix_count = noun_infix_count + verb_infix_count + adjective_infix_count + numeral_infix_count;
-			int random_number = SyncRand(noun_name_count + adjective_name_count + (total_prefix_count * total_suffix_count) + ((total_prefix_count * total_suffix_count) / 2) * total_infix_count);
+			int random_number = SyncRand(noun_name_count + adjective_name_count + (total_prefix_count * total_suffix_count) + ((total_prefix_count + total_suffix_count) / 2) * total_infix_count);
 			if (random_number < noun_name_count + adjective_name_count) { //entire name
 				random_number = SyncRand(noun_name_count + adjective_name_count);
 				if (random_number < noun_name_count) {
@@ -1361,7 +1184,7 @@ std::string GenerateName(int civilization, std::string type)
 				}
 				name = prefix;
 				name += suffix;
-			} else if (random_number < (noun_name_count + (total_prefix_count * total_suffix_count) + ((total_prefix_count * total_suffix_count) / 2) * total_infix_count)) { //prefix + infix + suffix
+			} else if (random_number < (noun_name_count + (total_prefix_count * total_suffix_count) + ((total_prefix_count + total_suffix_count) / 2) * total_infix_count)) { //prefix + infix + suffix
 				std::string prefix;
 				std::string infix;
 				std::string suffix;
@@ -1437,8 +1260,11 @@ std::string GenerateName(int civilization, std::string type)
 					suffix = PlayerRaces.LanguageNouns[civilization][noun_suffix_ids[suffix_id]]->PluralNominative;
 				}
 					
-				infix = DecapitalizeString(suffix);
+				infix = DecapitalizeString(infix);
 				suffix = DecapitalizeString(suffix);
+				if (prefix.substr(prefix.size() - 1, 1) == "d" && infix.substr(0, 1) == "d") { //if the prefix ends with "d" and the infix begins with "d", eliminate one instance of "d"
+					prefix = FindAndReplaceStringEnding(prefix, "d", "");
+				}
 				if (prefix.substr(prefix.size() - 2, 2) == "gs" && infix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the infix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 					prefix = FindAndReplaceStringEnding(prefix, "gs", "g");
 				}
@@ -1450,6 +1276,12 @@ std::string GenerateName(int civilization, std::string type)
 				}
 				if (infix.substr(infix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the infix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the infix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
 					infix = FindAndReplaceStringEnding(infix, "s", "");
+				}
+				if (infix.substr(infix.size() - 2, 2) == "th" && suffix.substr(0, 2) == "th") { //if the last two characters of the infix are "th", and the suffix begins with "th", then eliminate the infix's "th", to make this be just one instance of "th"
+					infix = FindAndReplaceStringEnding(infix, "th", "");
+				}
+				if (infix.substr(infix.size() - 1, 1) == "d" && suffix.substr(0, 1) == "d") { //if the infix ends with "d" and the suffix begins with "d", eliminate one instance of "d"
+					infix = FindAndReplaceStringEnding(infix, "d", "");
 				}
 				name = prefix;
 				name += infix;
