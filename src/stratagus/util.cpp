@@ -1182,6 +1182,9 @@ std::string GenerateName(int civilization, std::string type)
 				if (prefix.substr(prefix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
 					prefix = FindAndReplaceStringEnding(prefix, "s", "");
 				}
+				if (prefix.substr(prefix.size() - 1, 1) == "ß" && suffix.substr(0, 1) == "s") { //prevent triple "s"s in names
+					suffix = FindAndReplaceStringBeginning(suffix, "s", "");
+				}
 				name = prefix;
 				name += suffix;
 			} else if (random_number < (noun_name_count + (total_prefix_count * total_suffix_count) + ((total_prefix_count + total_suffix_count) / 2) * total_infix_count)) { //prefix + infix + suffix
