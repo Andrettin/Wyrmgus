@@ -596,10 +596,6 @@ static int CclUnit(lua_State *l)
 				} else {
 					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit->Character->GetFullName()), unit->Player->Heroes.end());
 				}
-				
-				if (unit->Player->AiEnabled && std::find(unit->Player->Ai->Scouts.begin(), unit->Player->Ai->Scouts.end(), unit) != unit->Player->Ai->Scouts.end()) {
-					unit->Player->Ai->Scouts.erase(std::remove(unit->Player->Ai->Scouts.begin(), unit->Player->Ai->Scouts.end(), unit), unit->Player->Ai->Scouts.end());
-				}
 				//Wyrmgus end
 			}
 		} else if (!strcmp(value, "critical-order")) {

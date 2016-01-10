@@ -402,9 +402,6 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	file.printf("},\n");
 
 	//Wyrmgus start
-//	file.printf("  \"repair-building\", %u\n", ai.LastRepairBuilding);
-	file.printf("  \"repair-building\", %u,\n", ai.LastRepairBuilding);
-	
 	if (!ai.Scouts.empty()) {
 		file.printf("  \"scouts\", {");
 		for (size_t i = 0; i != ai.Scouts.size(); ++i) {
@@ -414,6 +411,8 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		file.printf("},\n");
 	}
 	//Wyrmgus end
+	
+	file.printf("  \"repair-building\", %u\n", ai.LastRepairBuilding);
 
 	file.printf(")\n\n");
 }
@@ -792,6 +791,10 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 		CUnit &aiunit = AiPlayer->Player->GetUnit(i);
 
 		if (&defender == &aiunit) {
+			continue;
+		}
+		
+		if (!aiunit.IsAliveOnMap()) {
 			continue;
 		}
 

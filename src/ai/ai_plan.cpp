@@ -594,18 +594,16 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 //Wyrmgus start
 static CUnit *GetBestScout(int unit_type)
 {
-	const Vec2i &center = AiPlayer->Player->StartPos;
-
 	CUnit *bestunit = NULL;
 
 	bool flyeronly = (unit_type == UnitTypeFly);
 	bool idle_only = false;
 	
-	int bestSquareDistance = -1;
+	int best_score = 0;
 	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
 
-		if (Map.Info.IsPointOnMap(unit.tilePos) == false) {
+		if (!unit.IsAliveOnMap()) {
 			continue;
 		}
 		if (unit.CanMove() == false) {
@@ -652,15 +650,16 @@ static CUnit *GetBestScout(int unit_type)
 			flyeronly = true;
 		}
 
-		const int sqDistance = SquareDistance(unit.tilePos, center);
+		int score = unit.Variable[SIGHTRANGE_INDEX].Value - 4;
+		score += unit.Variable[SPEED_INDEX].Value - 10;
+		
 		if (
-			bestSquareDistance == -1
-			|| sqDistance < bestSquareDistance
-			|| (sqDistance == bestSquareDistance && unit.Variable[SIGHTRANGE_INDEX].Value > bestunit->Variable[SIGHTRANGE_INDEX].Value)
+			bestunit == NULL
+			|| score > best_score
 			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)
 			|| (!bestunit->IsIdle() && unit.IsIdle())
 		) {
-			bestSquareDistance = sqDistance;
+			best_score = score;
 			bestunit = &unit;
 		}
 	}
