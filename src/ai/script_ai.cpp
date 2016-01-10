@@ -1488,6 +1488,18 @@ static int CclDefineAiPlayer(lua_State *l)
 			CclParseBuildQueue(l, ai, j + 1);
 		} else if (!strcmp(value, "repair-building")) {
 			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "scouts")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				const int num = LuaToNumber(l, j + 1, k + 1);
+				++k;
+				ai->Scouts.push_back(&UnitManager.GetSlotUnit(num));
+			}
+		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

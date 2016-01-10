@@ -463,10 +463,15 @@ int AiForce::PlanAttack()
 	return 0;
 }
 
-static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
+//Wyrmgus start
+//static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
+static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos, int ray)
+//Wyrmgus end
 {
 	Assert(pos != NULL);
 
+	//Wyrmgus start
+	/*
 	int ray = 3;
 	const int maxTryCount = 8;
 	for (int i = 0; i != maxTryCount; ++i) {
@@ -479,6 +484,52 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 		}
 		ray = 3 * ray / 2;
 	}
+	*/
+	std::vector<Vec2i> pos_candidates;
+	bool found_unexplored = false;
+	bool found_fogged = false;
+	for (int off_x = -ray; off_x <= ray; ++off_x) {
+		for (int off_y = -ray; off_y <= ray; ++off_y) {
+			Vec2i current_pos(center.x + off_x, center.y + off_y);
+			
+			if (!Map.Info.IsPointOnMap(current_pos)) {
+				continue;
+			}
+			
+			if (Map.Field(current_pos)->playerInfo.IsVisible(*AiPlayer->Player)) {
+				if (found_fogged) {
+					continue;
+				}
+			} else {
+				if (!found_fogged) {
+					pos_candidates.clear();
+					found_fogged = true;
+				}
+				pos_candidates.push_back(current_pos);
+			}
+			
+			if (Map.Field(current_pos)->playerInfo.IsExplored(*AiPlayer->Player)) {
+				if (found_unexplored) {
+					continue;
+				}
+			} else {
+				if (!found_unexplored) {
+					pos_candidates.clear();
+					found_unexplored = true;
+					found_fogged = true;
+				}
+				pos_candidates.push_back(current_pos);
+			}
+		}
+	}
+	
+	if (pos_candidates.size() > 0) {
+		Vec2i chosen_pos = pos_candidates[SyncRand(pos_candidates.size())];
+		pos->x = chosen_pos.x;
+		pos->y = chosen_pos.y;
+		return true;
+	}
+	//Wyrmgus end
 	return false;
 }
 
@@ -486,7 +537,10 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 {
 	// Choose a target, "near"
 	const Vec2i &center = request.pos;
-	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
+	//Wyrmgus start
+//	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
+	if (ChooseRandomUnexploredPositionNear(center, pos, 3) == false) {
+	//Wyrmgus end
 		return NULL;
 	}
 	// We have an unexplored tile in sight (pos)
@@ -507,6 +561,11 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 		if (unit.CanMove() == false) {
 			continue;
 		}
+		//Wyrmgus start
+		if (!unit.Active) {
+			continue; //only explore with AI active units
+		}
+		//Wyrmgus end
 		const CUnitType &type = *unit.Type;
 
 		if (type.UnitType != UnitTypeFly) {
@@ -539,12 +598,87 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 	return bestunit;
 }
 
+//Wyrmgus start
+static CUnit *GetBestScout(int unit_type)
+{
+	const Vec2i &center = AiPlayer->Player->StartPos;
+
+	CUnit *bestunit = NULL;
+
+	bool flyeronly = (unit_type == UnitTypeFly);
+	bool idle_only = false;
+	
+	int bestSquareDistance = -1;
+	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
+
+		if (Map.Info.IsPointOnMap(unit.tilePos) == false) {
+			continue;
+		}
+		if (unit.CanMove() == false) {
+			continue;
+		}
+		if (!unit.Active) {
+			continue; //only scout with AI active units
+		}
+		if (unit.GroupId != 0) { //don't scout with units that are parts of forces
+			continue;
+		}
+		if (unit.Variable[SIGHTRANGE_INDEX].Value < 1) {
+			continue; //don't scout with units who have too low a sight range
+		}
+		
+		const CUnitType &type = *unit.Type;
+		
+		if (type.BoolFlag[HARVESTER_INDEX].value) { //don't scout with harvesters
+			continue;
+		}
+		
+		if (!unit.IsIdle()) { //only choose a non-idle unit if no idle ones are available
+			if (idle_only) {
+				continue;
+			}
+		} else {
+			idle_only = true;
+		}
+
+		if (type.UnitType != UnitTypeFly) {
+			if (flyeronly) {
+				continue;
+			}
+			if (unit_type == UnitTypeLand && type.UnitType != UnitTypeLand && type.UnitType != UnitTypeFlyLow) {
+				continue;
+			}
+			if (unit_type == UnitTypeNaval && type.UnitType != UnitTypeNaval && type.UnitType != UnitTypeFlyLow) {
+				continue;
+			}
+		} else {
+			flyeronly = true;
+		}
+
+		const int sqDistance = SquareDistance(unit.tilePos, center);
+		if (
+			bestSquareDistance == -1
+			|| sqDistance < bestSquareDistance
+			|| (sqDistance == bestSquareDistance && unit.Variable[SIGHTRANGE_INDEX].Value > bestunit->Variable[SIGHTRANGE_INDEX].Value)
+			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)
+			|| (!bestunit->IsIdle() && unit.IsIdle())
+		) {
+			bestSquareDistance = sqDistance;
+			bestunit = &unit;
+		}
+	}
+	return bestunit;
+}
+//Wyrmgus end
 
 /**
 **  Respond to ExplorationRequests
 */
 void AiSendExplorers()
 {
+	//Wyrmgus start
+	/*
 	// Count requests...
 	const int requestcount = AiPlayer->FirstExplorationRequest.size();
 
@@ -568,6 +702,72 @@ void AiSendExplorers()
 	}
 	// Remove all requests
 	AiPlayer->FirstExplorationRequest.clear();
+	*/
+	
+	//instead of exploring that way, make a scout randomly walk to explore
+	bool land_scout = false;
+	bool naval_scout = false;
+	bool air_scout = false;
+	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
+		if (AiPlayer->Scouts[i] == NULL) {
+			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->Index, i);
+			return;
+		}
+		if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeFly) {
+			land_scout = true;
+			naval_scout = true;
+			air_scout = true;
+			break;
+		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeFlyLow) {
+			land_scout = true;
+			naval_scout = true;
+		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeLand) {
+			land_scout = true;
+		} else if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeNaval) {
+			naval_scout = true;
+		}
+	}
+		
+	//if no scouts are already present for a particular type, then choose a suitable unit to scout
+	if (!air_scout) { 
+		CUnit *bestunit = GetBestScout(UnitTypeFly);
+		if (bestunit != NULL) {
+			AiPlayer->Scouts.push_back(bestunit);
+			CommandStopUnit(*bestunit);
+			land_scout = true;
+			naval_scout = true;
+		}
+	}
+	if (!land_scout) { 
+		CUnit *bestunit = GetBestScout(UnitTypeLand);
+		if (bestunit != NULL) {
+			AiPlayer->Scouts.push_back(bestunit);
+			CommandStopUnit(*bestunit);
+			if (bestunit->Type->UnitType == UnitTypeFlyLow) {
+				naval_scout = true;
+			}
+		}
+	}
+	if (!naval_scout) { 
+		CUnit *bestunit = GetBestScout(UnitTypeNaval);
+		if (bestunit != NULL) {
+			AiPlayer->Scouts.push_back(bestunit);
+			CommandStopUnit(*bestunit);
+		}
+	}
+	
+	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
+		// move AI scouts
+		if (AiPlayer->Scouts[i]->IsIdle()) {
+			int sight_range = std::max(1, AiPlayer->Scouts[i]->CurrentSightRange);
+			Vec2i target_pos;
+			ChooseRandomUnexploredPositionNear(AiPlayer->Scouts[i]->tilePos, &target_pos, sight_range);
+			if (Map.Info.IsPointOnMap(target_pos)) {
+				CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands);
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 //@}

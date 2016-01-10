@@ -1588,6 +1588,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		} else {
 			player.Heroes.push_back(this->Character->GetFullName());
 		}
+		
+		if (player.AiEnabled && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(this->tilePos) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+			player.Ai->Scouts.push_back(this);
+		}
 		//Wyrmgus end
 		player.Demand += type.Stats[player.Index].Variables[DEMAND_INDEX].Value; // food needed
 	}
@@ -2287,6 +2291,10 @@ void UnitLost(CUnit &unit)
 			} else {
 				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), unit.Character->GetFullName()), player.Heroes.end());
 			}
+			
+			if (player.AiEnabled && std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
+				player.Ai->Scouts.erase(std::remove(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit), player.Ai->Scouts.end());
+			}
 			//Wyrmgus end
 		}
 	}
@@ -2876,6 +2884,10 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 		newplayer.UnitTypesNonHeroCount[Type->Slot]++;
 	} else {
 		newplayer.Heroes.push_back(this->Character->GetFullName());
+	}
+	
+	if (newplayer.AiEnabled && this->Type->BoolFlag[COWARD_INDEX].value && !this->Type->BoolFlag[HARVESTER_INDEX].value && !this->Type->CanTransport() && !this->Type->CanCastSpell && Map.Info.IsPointOnMap(this->tilePos) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+		newplayer.Ai->Scouts.push_back(this);
 	}
 	//Wyrmgus end
 

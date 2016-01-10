@@ -316,6 +316,9 @@ public:
 	std::vector<CUpgrade *> ResearchRequests;     /// Upgrades requested and priority list
 	std::vector<AiBuildQueue> UnitTypeBuilt;      /// What the resource manager should build
 	int LastRepairBuilding;                       /// Last building checked for repair in this turn
+	//Wyrmgus start
+	std::vector<CUnit *> Scouts;				/// AI scouting units
+	//Wyrmgus end
 };
 
 /**

@@ -51,6 +51,10 @@
 //Wyrmgus end
 #include "unittype.h"
 
+//Wyrmgus start
+#include "../ai/ai_local.h"
+//Wyrmgus end
+
 /// How many resources the player gets back if canceling building
 #define CancelBuildingCostsFactor  75
 
@@ -186,6 +190,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		player.UnitTypesNonHeroCount[type.Slot]++;
 	} else {
 		player.Heroes.push_back(unit.Character->GetFullName());
+	}
+	
+	if (player.AiEnabled && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(unit.tilePos) && unit.CanMove() && unit.Active && unit.GroupId != 0 && unit.Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+		player.Ai->Scouts.push_back(&unit);
 	}
 	//Wyrmgus end
 	unit.Constructed = 0;

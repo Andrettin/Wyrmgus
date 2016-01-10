@@ -424,17 +424,21 @@ void AiForce::Attack(const Vec2i &pos)
 			goalPos = enemy->tilePos;
 		//Wyrmgus start
 		} else {
-			if (isTransporter || isNaval) {
-				AiExplore(this->Units[0]->tilePos, MapFieldSeaUnit);
-			} else {
-				AiExplore(this->Units[0]->tilePos, MapFieldLandUnit);
-			}
 			return;
 		//Wyrmgus end
 		}
 	} else {
 		isDefenceForce = true;
 	}
+	//Wyrmgus start
+	//if one of the force's units is being used as a scout, stop its function as a scout when the force is used to attack
+	for (size_t i = 0; i != this->Units.size(); ++i) {
+		CUnit *unit = this->Units[i];
+		if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit) != AiPlayer->Scouts.end()) {
+			AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit), AiPlayer->Scouts.end());
+		}
+	}
+	//Wyrmgus end
 	if (Map.Info.IsPointOnMap(goalPos) == false || isTransporter) {
 		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 		if (State == AiForceAttackingState_Waiting && !PlanAttack()) {
@@ -997,7 +1001,6 @@ void AiForce::Update()
 					Attacking = false;
 					State = AiForceAttackingState_Waiting;
 					*/
-					AiExplore(this->Units[0]->tilePos, MapFieldLandUnit);
 					//Wyrmgus end
 					return;
 				}
@@ -1065,11 +1068,6 @@ void AiForce::Update()
 			Attacking = false;
 			State = AiForceAttackingState_Waiting;
 			*/
-			if (isNaval) {
-				AiExplore(this->Units[0]->tilePos, MapFieldSeaUnit);
-			} else {
-				AiExplore(this->Units[0]->tilePos, MapFieldLandUnit);
-			}
 			//Wyrmgus end
 			return;
 		} else {

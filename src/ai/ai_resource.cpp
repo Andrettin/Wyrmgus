@@ -309,11 +309,6 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 		}
 	}
 	
-	//Wyrmgus Start
-	//explore if no building place has been found
-	AiExplore(unit.tilePos, MapFieldLandUnit);
-	//Wyrmgus End
-	
 	return 0;
 }
 
@@ -954,9 +949,6 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_
 	// Ask the AI to explore...
 	//Wyrmgus start
 //	AiExplore(unit.tilePos, MapFieldLandUnit);
-	if (resource_range == 1000) { //only explore if searching the whole map for the resource
-		AiExplore(unit.tilePos, MapFieldLandUnit);
-	}
 	//Wyrmgus end
 
 	// Failed.
@@ -1038,12 +1030,10 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 			}
 		}
 	}
-	
-	if (resource_range != 1000) { //only explore if searching the whole map for the resource
-		return 0;
-	}
 	//Wyrmgus end
 
+	//Wyrmgus start
+	/*
 	int exploremask = 0;
 
 	for (size_t i = 0; i != UnitTypes.size(); ++i) {
@@ -1072,6 +1062,8 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 	}
 	// Ask the AI to explore
 	AiExplore(unit.tilePos, exploremask);
+	*/
+	//Wyrmgus end
 	// Failed.
 	return 0;
 }

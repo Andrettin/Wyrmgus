@@ -401,7 +401,19 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 	}
 	file.printf("},\n");
 
-	file.printf("  \"repair-building\", %u\n", ai.LastRepairBuilding);
+	//Wyrmgus start
+//	file.printf("  \"repair-building\", %u\n", ai.LastRepairBuilding);
+	file.printf("  \"repair-building\", %u,\n", ai.LastRepairBuilding);
+	
+	if (!ai.Scouts.empty()) {
+		file.printf("  \"scouts\", {");
+		for (size_t i = 0; i != ai.Scouts.size(); ++i) {
+			const CUnit &aiunit = *ai.Scouts[i];
+			file.printf(" %d, \"%s\",", UnitNumber(aiunit), aiunit.Type->Ident.c_str());
+		}
+		file.printf("},\n");
+	}
+	//Wyrmgus end
 
 	file.printf(")\n\n");
 }
