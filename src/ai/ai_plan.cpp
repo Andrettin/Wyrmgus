@@ -621,8 +621,11 @@ static CUnit *GetBestScout(int unit_type)
 		if (!unit.Active) {
 			continue; //only scout with AI active units
 		}
-		if (unit.GroupId != 0) { //don't scout with units that are parts of forces
-			continue;
+		if (unit.GroupId != 0) { //don't scout with units that are parts of forces that have a goal
+			int force = AiPlayer->Force.GetForce(unit);
+			if (force != -1 && Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos)) {
+				continue;
+			}
 		}
 		if (unit.Variable[SIGHTRANGE_INDEX].Value < 1) {
 			continue; //don't scout with units who have too low a sight range

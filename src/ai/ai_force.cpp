@@ -1001,6 +1001,8 @@ void AiForce::Update()
 					Attacking = false;
 					State = AiForceAttackingState_Waiting;
 					*/
+					GoalPos.x = -1;
+					GoalPos.y = -1;
 					//Wyrmgus end
 					return;
 				}
@@ -1068,6 +1070,8 @@ void AiForce::Update()
 			Attacking = false;
 			State = AiForceAttackingState_Waiting;
 			*/
+			GoalPos.x = -1;
+			GoalPos.y = -1;
 			//Wyrmgus end
 			return;
 		} else {
