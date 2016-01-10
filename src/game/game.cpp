@@ -1089,7 +1089,7 @@ void CalculateItemsToLoad(bool grand_strategy)
 		int line_length = base_loadingTip.size() / str_width_per_total_width;
 		
 		int begin = 0;
-		for (size_t i = 0; i < str_width_per_total_width; ++i) {
+		for (int i = 0; i < str_width_per_total_width; ++i) {
 			int end = base_loadingTip.size();
 			
 			if (i != (str_width_per_total_width - 1)) {

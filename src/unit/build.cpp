@@ -514,7 +514,10 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 
 	CPlayer *player = NULL;
 
-	if (unit && unit->Player->Type == PlayerPerson) {
+	//Wyrmgus start
+//	if (unit && unit->Player->Type == PlayerPerson) {
+	if (unit) {
+	//Wyrmgus end
 		player = unit->Player;
 	}
 	int testmask;

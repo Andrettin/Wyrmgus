@@ -202,7 +202,10 @@ public:
 	/// Regenerate the forest.
 	void RegenerateForest();
 	/// Reveal the complete map, make everything known.
-	void Reveal();
+	//Wyrmgus start
+//	void Reveal();
+	void Reveal(bool only_person_players = false);
+	//Wyrmgus end
 	/// Save the map.
 	void Save(CFile &file) const;
 

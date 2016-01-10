@@ -422,6 +422,15 @@ void AiForce::Attack(const Vec2i &pos)
 		}
 		if (enemy) {
 			goalPos = enemy->tilePos;
+		//Wyrmgus start
+		} else {
+			if (isTransporter || isNaval) {
+				AiExplore(this->Units[0]->tilePos, MapFieldSeaUnit);
+			} else {
+				AiExplore(this->Units[0]->tilePos, MapFieldLandUnit);
+			}
+			return;
+		//Wyrmgus end
 		}
 	} else {
 		isDefenceForce = true;
@@ -866,6 +875,14 @@ void AiForce::Update()
 		}
 		return;
 	}
+	//Wyrmgus start
+	//if force still has no goal, run its Attack function again to get a target
+	if (Map.Info.IsPointOnMap(GoalPos) == false) {
+		const Vec2i invalidPos(-1, -1);
+		Attack(invalidPos);
+		return;
+	}
+	//Wyrmgus end
 	Attacking = false;
 	for (unsigned int i = 0; i < Size(); ++i) {
 		CUnit *aiunit = Units[i];
@@ -971,12 +988,17 @@ void AiForce::Update()
 			if (!unit) {
 				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
 				if (!unit) {
+					//Wyrmgus start
+					/*
 					// No enemy found, give up
 					// FIXME: should the force go home or keep trying to attack?
 					DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
 							   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 					Attacking = false;
 					State = AiForceAttackingState_Waiting;
+					*/
+					AiExplore(this->Units[0]->tilePos, MapFieldLandUnit);
+					//Wyrmgus end
 					return;
 				}
 			}
@@ -1034,12 +1056,21 @@ void AiForce::Update()
 			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
 		}
 		if (!unit) {
+			//Wyrmgus start
+			/*
 			// No enemy found, give up
 			// FIXME: should the force go home or keep trying to attack?
 			DebugPrint("%d: Attack force #%lu can't find a target, giving up\n"
 					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this - & (AiPlayer->Force[0])));
 			Attacking = false;
 			State = AiForceAttackingState_Waiting;
+			*/
+			if (isNaval) {
+				AiExplore(this->Units[0]->tilePos, MapFieldSeaUnit);
+			} else {
+				AiExplore(this->Units[0]->tilePos, MapFieldLandUnit);
+			}
+			//Wyrmgus end
 			return;
 		} else {
 			Vec2i resultPos;

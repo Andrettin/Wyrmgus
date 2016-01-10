@@ -149,14 +149,22 @@ void CMap::MarkSeenTile(CMapField &mf)
 /**
 **  Reveal the entire map.
 */
-void CMap::Reveal()
+//Wyrmgus start
+//void CMap::Reveal()
+void CMap::Reveal(bool only_person_players)
+//Wyrmgus end
 {
 	//  Mark every explored tile as visible. 1 turns into 2.
 	for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
 		CMapField &mf = *this->Field(i);
 		CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
 		for (int p = 0; p < PlayerMax; ++p) {
-			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+			//Wyrmgus start
+//			playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+			if (Players[p].Type == PlayerPerson || !only_person_players) {
+				playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+			}
+			//Wyrmgus end
 		}
 		MarkSeenTile(mf);
 	}
@@ -166,7 +174,10 @@ void CMap::Reveal()
 		//  Reveal neutral buildings. Gold mines:)
 		if (unit.Player->Type == PlayerNeutral) {
 			for (int p = 0; p < PlayerMax; ++p) {
-				if (Players[p].Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
+				//Wyrmgus start
+//				if (Players[p].Type != PlayerNobody && (!(unit.Seen.ByPlayer & (1 << p)))) {
+				if (Players[p].Type != PlayerNobody && (Players[p].Type == PlayerPerson || !only_person_players) && (!(unit.Seen.ByPlayer & (1 << p)))) {
+				//Wyrmgus end
 					UnitGoesOutOfFog(unit, Players[p]);
 					UnitGoesUnderFog(unit, Players[p]);
 				}

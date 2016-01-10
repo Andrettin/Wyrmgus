@@ -121,14 +121,18 @@ class WallFinder
 {
 public:
 	WallFinder(const CUnit &unit, int maxDist, Vec2i *resultPos) :
-		//unit(unit),
+		//Wyrmgus start
+		unit(unit),
+		//Wyrmgus end
 		maxDist(maxDist),
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
 		resultPos(resultPos)
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
-	//const CUnit &unit;
+	//Wyrmgus start
+	const CUnit &unit;
+	//Wyrmgus end
 	int maxDist;
 	int movemask;
 	Vec2i *resultPos;
@@ -136,11 +140,18 @@ private:
 
 VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	//Wyrmgus start
+	/*
 #if 0
 	if (!unit.Player->AiEnabled && !Map.IsFieldExplored(*unit.Player, pos)) {
 		return VisitResult_DeadEnd;
 	}
 #endif
+	*/
+	if (!Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
 	// Look if found what was required.
 	if (Map.WallOnMap(pos)) {
 		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
@@ -223,20 +234,33 @@ class ReachableTerrainMarker
 {
 public:
 	ReachableTerrainMarker(const CUnit &unit) :
+		//Wyrmgus start
+		unit(unit),
+		//Wyrmgus end
 		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit))
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
+	//Wyrmgus start
+	const CUnit &unit;
+	//Wyrmgus end
 	int movemask;
 };
 
 VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	//Wyrmgus start
+	/*
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
 		return VisitResult_DeadEnd;
 	}
 #endif
+	*/
+	if (!Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
 	if (CanMoveToMask(pos, movemask)) { // reachable
 		return VisitResult_Ok;
 	} else { // unreachable
@@ -279,11 +303,18 @@ bool EnemyFinderWithTransporter::IsAccessibleForTransporter(const Vec2i &pos) co
 
 VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	//Wyrmgus start
+	/*
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
 		return VisitResult_DeadEnd;
 	}
 #endif
+	*/
+	if (!Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
 	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
 		DebugPrint("Target found %d,%d\n" _C_ pos.x _C_ pos.y);
 		*resultPos = pos;

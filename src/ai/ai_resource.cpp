@@ -308,6 +308,12 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 			}
 		}
 	}
+	
+	//Wyrmgus Start
+	//explore if no building place has been found
+	AiExplore(unit.tilePos, MapFieldLandUnit);
+	//Wyrmgus End
+	
 	return 0;
 }
 

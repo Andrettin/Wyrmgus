@@ -166,11 +166,18 @@ private:
 
 VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	//Wyrmgus start
+	/*
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
 		return VisitResult_DeadEnd;
 	}
 #endif
+	*/
+	if (!Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
 	if (CanBuildUnitType(&worker, type, pos, 1)
 		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8)) {
 		bool backupok;
@@ -279,11 +286,18 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 
 VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	//Wyrmgus start
+	/*
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
 		return VisitResult_DeadEnd;
 	}
 #endif
+	*/
+	if (!Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
 	CUnit *mine = ResourceOnMap(pos, resource);
 	if (mine && IsAUsableMine(*mine)) {
 		if (AiFindBuildingPlace2(worker, type, pos, mine, true, resultPos)) {
@@ -369,11 +383,18 @@ private:
 
 VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	//Wyrmgus start
+	/*
 #if 0
 	if (!player.AiEnabled && !Map.IsFieldExplored(player, pos)) {
 		return VisitResult_DeadEnd;
 	}
 #endif
+	*/
+	if (!Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
 	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
 		if (AiFindBuildingPlace2(worker, type, from, NULL, true, resultPos)) {
 			return VisitResult_Finished;

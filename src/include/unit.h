@@ -251,8 +251,14 @@ public:
 		if (this->Type->BoolFlag[REVEALER_INDEX].value) {
 			return false;
 		}
-		if ((player.Type == PlayerComputer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
-			|| IsVisible(player) || IsVisibleOnRadar(player)) {
+		//Wyrmgus start
+//		if ((player.Type == PlayerComputer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
+		if (
+		//Wyrmgus end
+			//Wyrmgus start
+//			|| IsVisible(player) || IsVisibleOnRadar(player)) {
+			IsVisible(player) || IsVisibleOnRadar(player)) {
+			//Wyrmgus end
 			return IsAliveOnMap();
 		} else {
 			return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value

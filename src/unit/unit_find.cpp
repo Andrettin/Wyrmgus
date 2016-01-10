@@ -85,7 +85,10 @@ CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 
 VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
+	//Wyrmgus start
+//	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
+	if (!Map.Field(pos)->playerInfo.IsExplored(player)) {
+	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
@@ -121,7 +124,10 @@ private:
 
 VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
+	//Wyrmgus start
+//	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
+	if (!Map.Field(pos)->playerInfo.IsExplored(player)) {
+	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
@@ -403,7 +409,10 @@ void ResourceUnitFinder::ResourceUnitFinder_Cost::SetFrom(const CUnit &mine, con
 
 VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
-	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
+	//Wyrmgus start
+//	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
+	if (!Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
+	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 

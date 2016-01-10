@@ -135,11 +135,21 @@ static int CclStratagusMap(lua_State *l)
 */
 static int CclRevealMap(lua_State *l)
 {
-	LuaCheckArgs(l, 0);
+	//Wyrmgus start
+//	LuaCheckArgs(l, 0);
+	//Wyrmgus end
 	if (CclInConfigFile || !Map.Fields) {
 		FlagRevealMap = 1;
 	} else {
-		Map.Reveal();
+		//Wyrmgus start
+//		Map.Reveal();
+		bool only_person_players = false;
+		const int nargs = lua_gettop(l);
+		if (nargs == 1) {
+			only_person_players = LuaToBoolean(l, 1);
+		}
+		Map.Reveal(only_person_players);
+		//Wyrmgus end
 	}
 	return 0;
 }
