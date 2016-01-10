@@ -419,10 +419,10 @@ static bool PickUpItem(CUnit &unit)
 
 	// look for nearby items to pick up
 	std::vector<CUnit *> table;
-	SelectAroundUnit(unit, unit.CurrentSightRange + 2, table);
+	SelectAroundUnit(unit, unit.GetReactionRange(), table);
 
 	for (size_t i = 0; i != table.size(); ++i) {
-		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
+		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.GetReactionRange())) {
 			if (CanPickUp(unit, *table[i])) {
 				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.Variable[HP_INDEX].Max - unit.Variable[HP_INDEX].Value) >= table[i]->Variable[HITPOINTHEALING_INDEX].Value) {
 					CommandPickUp(unit, *table[i], FlushCommands);

@@ -3513,6 +3513,17 @@ int CUnit::GetModifiedVariable(int index) const
 	return value;
 }
 
+int CUnit::GetReactionRange() const
+{
+	int reaction_range = this->CurrentSightRange;
+
+	if (this->Player->Type != PlayerPerson) {
+		reaction_range += 2;
+	}
+	
+	return reaction_range;
+}
+
 int CUnit::GetItemSlotQuantity(int item_slot) const
 {
 	if (!HasInventory()) {

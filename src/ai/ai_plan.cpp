@@ -463,15 +463,10 @@ int AiForce::PlanAttack()
 	return 0;
 }
 
-//Wyrmgus start
-//static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
-static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos, int ray)
-//Wyrmgus end
+static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 {
 	Assert(pos != NULL);
 
-	//Wyrmgus start
-	/*
 	int ray = 3;
 	const int maxTryCount = 8;
 	for (int i = 0; i != maxTryCount; ++i) {
@@ -484,15 +479,19 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos, 
 		}
 		ray = 3 * ray / 2;
 	}
-	*/
+	return false;
+}
+
+static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int ray)
+{
 	std::vector<Vec2i> pos_candidates;
 	bool found_unexplored = false;
 	bool found_fogged = false;
 	for (int off_x = -ray; off_x <= ray; ++off_x) {
 		for (int off_y = -ray; off_y <= ray; ++off_y) {
-			Vec2i current_pos(center.x + off_x, center.y + off_y);
+			Vec2i current_pos(unit.tilePos.x + off_x, unit.tilePos.y + off_y);
 			
-			if (!Map.Info.IsPointOnMap(current_pos)) {
+			if (!Map.Info.IsPointOnMap(current_pos) || !CanMoveToMask(current_pos, unit.Type->MovementMask)) {
 				continue;
 			}
 			
@@ -505,7 +504,6 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos, 
 					pos_candidates.clear();
 					found_fogged = true;
 				}
-				pos_candidates.push_back(current_pos);
 			}
 			
 			if (Map.Field(current_pos)->playerInfo.IsExplored(*AiPlayer->Player)) {
@@ -518,8 +516,9 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos, 
 					found_unexplored = true;
 					found_fogged = true;
 				}
-				pos_candidates.push_back(current_pos);
 			}
+			
+			pos_candidates.push_back(current_pos);
 		}
 	}
 	
@@ -527,20 +526,14 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos, 
 		Vec2i chosen_pos = pos_candidates[SyncRand(pos_candidates.size())];
 		pos->x = chosen_pos.x;
 		pos->y = chosen_pos.y;
-		return true;
 	}
-	//Wyrmgus end
-	return false;
 }
 
 static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 {
 	// Choose a target, "near"
 	const Vec2i &center = request.pos;
-	//Wyrmgus start
-//	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
-	if (ChooseRandomUnexploredPositionNear(center, pos, 3) == false) {
-	//Wyrmgus end
+	if (ChooseRandomUnexploredPositionNear(center, pos) == false) {
 		return NULL;
 	}
 	// We have an unexplored tile in sight (pos)
@@ -762,9 +755,9 @@ void AiSendExplorers()
 	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
 		// move AI scouts
 		if (AiPlayer->Scouts[i]->IsIdle()) {
-			int sight_range = std::max(1, AiPlayer->Scouts[i]->CurrentSightRange);
-			Vec2i target_pos;
-			ChooseRandomUnexploredPositionNear(AiPlayer->Scouts[i]->tilePos, &target_pos, sight_range);
+			int scout_range = std::max(1, AiPlayer->Scouts[i]->CurrentSightRange * 2);
+			Vec2i target_pos(-1, -1);
+			ChooseRandomPositionForScouting(*AiPlayer->Scouts[i], &target_pos, scout_range);
 			if (Map.Info.IsPointOnMap(target_pos)) {
 				CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands);
 			}

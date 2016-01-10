@@ -338,6 +338,7 @@ public:
 	//Wyrmgus start
 	int GetAvailableLevelUpUpgrades(bool only_units = false) const;
 	int GetModifiedVariable(int index) const;
+	int GetReactionRange() const;
 	int GetItemSlotQuantity(int item_slot) const;
 	int GetCurrentWeaponClass() const;
 	int GetEquipmentVariableChange(const CUnit *item, int variable_index, bool increase = false) const;

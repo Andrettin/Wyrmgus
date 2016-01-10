@@ -346,7 +346,7 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				if (autocast->Attacker == CONDITION_ONLY) {
 					//Wyrmgus start
 //					const int range = table[i]->Player->Type == PlayerPerson ? table[i]->Type->ReactRangePerson : table[i]->Type->ReactRangeComputer;
-					const int range = table[i]->Player->Type == PlayerPerson ? table[i]->CurrentSightRange : table[i]->CurrentSightRange + 2;
+					const int range = table[i]->GetReactionRange();
 					//Wyrmgus end
 					if ((table[i]->CurrentAction() != UnitActionAttack
 						 && table[i]->CurrentAction() != UnitActionAttackGround

@@ -1299,7 +1299,7 @@ CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred)
 //	Assert(unit.Type->CanAttack);
 	Assert(unit.CanAttack());
 //	const int range = unit.Player->Type == PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
-	const int range = unit.Player->Type == PlayerPerson ? unit.CurrentSightRange : unit.CurrentSightRange + 2;
+	const int range = unit.GetReactionRange();
 	//Wyrmgus end
 	return AttackUnitsInDistance(unit, range, pred);
 }
