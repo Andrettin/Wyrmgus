@@ -440,7 +440,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		build->Player->Heroes.erase(std::remove(build->Player->Heroes.begin(), build->Player->Heroes.end(), build->Character->GetFullName()), build->Player->Heroes.end());
 	}
 	
-	if (build->Player->AiEnabled && std::find(build->Player->Ai->Scouts.begin(), build->Player->Ai->Scouts.end(), build) != build->Player->Ai->Scouts.end()) {
+	if (build->Player->AiEnabled && build->Player->Ai && std::find(build->Player->Ai->Scouts.begin(), build->Player->Ai->Scouts.end(), build) != build->Player->Ai->Scouts.end()) {
 		build->Player->Ai->Scouts.erase(std::remove(build->Player->Ai->Scouts.begin(), build->Player->Ai->Scouts.end(), build), build->Player->Ai->Scouts.end());
 	}
 	//Wyrmgus end

@@ -45,6 +45,8 @@
 #include "unittype.h"
 #include "upgrade.h"
 
+#include "../ai/ai_local.h" //for using AiHelpers
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -326,6 +328,16 @@ static int CclDefineCharacter(lua_State *l)
 		LuaError(l, "Character name \"%s\" doesn't match the defined name \"%s\"." _C_ character->GetFullName().c_str() _C_ character_full_name.c_str());
 	}
 	
+	//check if the abilities are correct for this character's unit type
+	if (character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
+		int ability_count = (int) character->Abilities.size();
+		for (int i = (ability_count - 1); i >= 0; --i) {
+			if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
+				character->Abilities.erase(std::remove(character->Abilities.begin(), character->Abilities.end(), character->Abilities[i]), character->Abilities.end());
+			}
+		}
+	}
+	
 	return 0;
 }
 
@@ -545,6 +557,16 @@ static int CclDefineCustomHero(lua_State *l)
 	
 	if (hero->GetFullName() != hero_full_name) { // if the hero's full name (built from its defined elements) is different from the name used to initialize the hero, something went wrong
 		LuaError(l, "Custom hero name \"%s\" doesn't match the defined name \"%s\"." _C_ hero->GetFullName().c_str() _C_ hero_full_name.c_str());
+	}
+	
+	//check if the abilities are correct for this hero's unit type
+	if (hero->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > hero->Type->Slot) {
+		int ability_count = (int) hero->Abilities.size();
+		for (int i = (ability_count - 1); i >= 0; --i) {
+			if (std::find(AiHelpers.LearnableAbilities[hero->Type->Slot].begin(), AiHelpers.LearnableAbilities[hero->Type->Slot].end(), hero->Abilities[i]) == AiHelpers.LearnableAbilities[hero->Type->Slot].end()) {
+				hero->Abilities.erase(std::remove(hero->Abilities.begin(), hero->Abilities.end(), hero->Abilities[i]), hero->Abilities.end());
+			}
+		}
 	}
 	
 	return 0;
