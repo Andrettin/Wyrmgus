@@ -2000,7 +2000,10 @@ void CUnit::UpdateXPRequired()
 	}
 	
 	this->Variable[XPREQUIRED_INDEX].Value = this->Type->Stats[this->Player->Index].Variables[POINTS_INDEX].Value * 4 * this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value;
-	this->Variable[XPREQUIRED_INDEX].Value += 50 * 4 * (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value);
+	int extra_levels = this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value;
+	for (int i = 1; i <= extra_levels; ++i) {
+		this->Variable[XPREQUIRED_INDEX].Value += 50 * 4 * i;
+	}
 	this->Variable[XPREQUIRED_INDEX].Max = this->Variable[XPREQUIRED_INDEX].Value;
 	this->Variable[XPREQUIRED_INDEX].Enable = 1;
 	this->Variable[XP_INDEX].Enable = 1;
