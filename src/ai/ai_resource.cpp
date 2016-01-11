@@ -1084,6 +1084,10 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 	//Wyrmgus end
 		return 0;
 	}
+	
+	if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &unit) != AiPlayer->Scouts.end()) { //if a scouting unit was assigned to harvest, remove it from the scouts vector
+		AiPlayer->Scouts.erase(std::remove(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), &unit), AiPlayer->Scouts.end());
+	}
 
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[resource];
 	Assert(&resinfo);
@@ -1096,6 +1100,7 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 		return AiAssignHarvesterFromUnit(unit, resource);
 	}
 	*/
+	int ret = 0;
 	int resource_range = 0;
 	for (int i = 0; i < 3; ++i) { //search for resources first in a 16 tile radius, then in a 32 tile radius, and then in the whole map
 		resource_range += 16;
@@ -1106,13 +1111,18 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 		Vec2i forestPos;
 		Vec2i rockPos;
 		if ((resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, resource_range, *unit.Player, unit.tilePos, &forestPos)) || (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, resource_range, *unit.Player, unit.tilePos, &rockPos))) {
-			return AiAssignHarvesterFromTerrain(unit, resource, resource_range);
+			ret = AiAssignHarvesterFromTerrain(unit, resource, resource_range);
 		} else {
-			return AiAssignHarvesterFromUnit(unit, resource, resource_range);
+			ret = AiAssignHarvesterFromUnit(unit, resource, resource_range);
 		}
 	}
-
-	return 0;
+	
+	if (ret == 0 && (resource == GoldCost || resource == WoodCost)) { //if didn't find a basic resource, tell the worker to explore
+		AiPlayer->Scouts.push_back(&unit);
+		CommandStopUnit(unit);
+	}
+	
+	return ret;
 	//Wyrmgus end
 }
 
@@ -1245,7 +1255,16 @@ static void AiCollectResources()
 			// If there is a free worker for c, take it.
 			if (num_units_unassigned[c]) {
 				// Take the unit.
-				while (0 < num_units_unassigned[c] && !AiAssignHarvester(*units_unassigned[c][0], c)) {
+				//Wyrmgus start
+//				while (0 < num_units_unassigned[c] && !AiAssignHarvester(*units_unassigned[c][0], c)) {
+				while (
+					0 < num_units_unassigned[c]
+					&& (
+						(std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), units_unassigned[c][0]) != AiPlayer->Scouts.end() && num_units_assigned[c] != 0 && (num_units_assigned[GoldCost] == 0 || num_units_assigned[WoodCost] == 0)) //only assign a scout to harvest if there are no units harvesting this resource, or if there are workers harvesting both gold and lumber already
+						|| !AiAssignHarvester(*units_unassigned[c][0], c)
+					)
+				) {
+				//Wyrmgus end
 					// can't assign to c => remove from units_unassigned !
 					units_unassigned[c][0] = units_unassigned[c][--num_units_unassigned[c]];
 					units_unassigned[c].pop_back();
@@ -1281,8 +1300,8 @@ static void AiCollectResources()
 					const int src_c = priority_resource[j];
 
 					//Wyrmgus start
-					// don't reassign if the src_c resource already has less workers than desired, or if has no workers, or if the new resource has 0 "wanted"
-					if (num_units_assigned[src_c] == 0 || num_units_assigned[src_c] <= wanted[src_c] || !wanted[c]) {
+					// don't reassign if the src_c resource has no workers, or if the new resource has 0 "wanted"
+					if (num_units_assigned[src_c] == 0 || !wanted[c]) {
 						continue;
 					}
 					//Wyrmgus end
@@ -1294,10 +1313,28 @@ static void AiCollectResources()
 						|| (wanted[src_c] == wanted[c]
 							&& num_units_assigned[src_c] <= num_units_assigned[c] + 1)) {
 					*/
-					if (wanted[src_c] && ((num_units_assigned[src_c] + 1) * 100 / wanted[src_c]) >= (num_units_assigned[c] * 100 / wanted[c])) { // what matters is the percent of "wanted" fulfilled, not the absolute quantity of needed workers for that resource; add one worker to num_units_assigned[src_c] so that you won't get one worker being shuffled back and forth
+					bool reassign_only_one = false;
+					if (wanted[src_c] && ((num_units_assigned[src_c] + 1) * 100 / wanted[src_c]) <= (num_units_assigned[c] * 100 / wanted[c])) { // what matters is the percent of "wanted" fulfilled, not the absolute quantity of needed workers for that resource; add one worker to num_units_assigned[src_c] so that you won't get one worker being shuffled back and forth
 					//Wyrmgus end
-						continue;
+						//Wyrmgus start
+//						continue;
+						if (num_units_assigned[c] == 0 && num_units_assigned[src_c] > 1) { // if there are no workers for that resource, allow reshuffling regardless of proportion calculation, so that if the game starts with few workers (like two), the AI isn't stuck gathering only the first resource it finds
+							reassign_only_one = true;
+						} else {
+							continue;
+						}
+						//Wyrmgus end
 					}
+					
+					//Wyrmgus start
+					if (num_units_assigned[src_c] <= wanted[src_c]) { // don't reassign if the src_c resource already has less workers than desired
+						if (num_units_assigned[c] == 0 && num_units_assigned[src_c] > 1) {
+							reassign_only_one = true;
+						} else {
+							continue;
+						}
+					}
+					//Wyrmgus end
 					
 					//Wyrmgus start
 //					for (int k = num_units_assigned[src_c] - 1; k >= 0 && !unit; --k) {
@@ -1328,17 +1365,22 @@ static void AiCollectResources()
 						// unit can't harvest : next one
 						if (!unit->Type->ResInfo[c] || !AiAssignHarvester(*unit, c)) {
 							//Wyrmgus start
-							for (int l = num_units_assigned[src_c] - 1; l >= 0; --l) {
-								if (!units_assigned[src_c][l]) {
-									continue;
+//							unit = NULL;
+//							continue;
+							if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), unit) == AiPlayer->Scouts.end()) { //if AiAssignHarvester told the unit to scout
+								for (int l = num_units_assigned[src_c] - 1; l >= 0; --l) {
+									if (!units_assigned[src_c][l]) {
+										continue;
+									}
+									if (units_assigned[src_c][l]->Type == unit->Type) { // no need to recalculate for units of the same type
+										units_assigned[src_c][l] = NULL;
+									}
 								}
-								if (units_assigned[src_c][l]->Type == unit->Type) { // no need to recalculate for units of the same type
-									units_assigned[src_c][l] = NULL;
-								}
+								
+								unit = NULL;
+								continue;
 							}
 							//Wyrmgus end
-							unit = NULL;
-							continue;
 						}
 
 						// Remove from src_c
@@ -1347,6 +1389,12 @@ static void AiCollectResources()
 
 						// j need one more
 						priority_needed[j]++;
+						
+						//Wyrmgus start
+						if (reassign_only_one) {
+							break;
+						}
+						//Wyrmgus end
 					}
 				}
 			}

@@ -482,16 +482,20 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 	return false;
 }
 
-static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int ray)
+static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int scout_range)
 {
 	std::vector<Vec2i> pos_candidates;
 	bool found_unexplored = false;
 	bool found_fogged = false;
-	for (int off_x = -ray; off_x <= ray; ++off_x) {
-		for (int off_y = -ray; off_y <= ray; ++off_y) {
+	for (int off_x = -scout_range; off_x <= scout_range; ++off_x) {
+		for (int off_y = -scout_range; off_y <= scout_range; ++off_y) {
 			Vec2i current_pos(unit.tilePos.x + off_x, unit.tilePos.y + off_y);
 			
 			if (!Map.Info.IsPointOnMap(current_pos) || !CanMoveToMask(current_pos, unit.Type->MovementMask)) {
+				continue;
+			}
+			int place_reachable = PlaceReachable(unit, current_pos, 1, 1, 0, 1); //PlaceReachable returns 0 if can't reach, or the distance of the path otherwise
+			if (!place_reachable || place_reachable > scout_range) {
 				continue;
 			}
 			
@@ -597,7 +601,6 @@ static CUnit *GetBestScout(int unit_type)
 	CUnit *bestunit = NULL;
 
 	bool flyeronly = (unit_type == UnitTypeFly);
-	bool idle_only = false;
 	
 	int best_score = 0;
 	for (int i = 0; i != AiPlayer->Player->GetUnitCount(); ++i) {
@@ -621,19 +624,14 @@ static CUnit *GetBestScout(int unit_type)
 		if (unit.Variable[SIGHTRANGE_INDEX].Value < 1) {
 			continue; //don't scout with units who have too low a sight range
 		}
-		
-		const CUnitType &type = *unit.Type;
-		
-		if (type.BoolFlag[HARVESTER_INDEX].value) { //don't scout with harvesters
+		if (!unit.IsIdle()) { //don't choose units that aren't idle as scouts
 			continue;
 		}
 		
-		if (!unit.IsIdle()) { //only choose a non-idle unit if no idle ones are available
-			if (idle_only) {
-				continue;
-			}
-		} else {
-			idle_only = true;
+		const CUnitType &type = *unit.Type;
+		
+		if (type.BoolFlag[HARVESTER_INDEX].value) { //don't choose harvesters as scouts (they are already told to explore when they can't find a basic resource)
+			continue;
 		}
 
 		if (type.UnitType != UnitTypeFly) {
@@ -657,7 +655,6 @@ static CUnit *GetBestScout(int unit_type)
 			bestunit == NULL
 			|| score > best_score
 			|| (bestunit->Type->UnitType != UnitTypeFly && type.UnitType == UnitTypeFly)
-			|| (!bestunit->IsIdle() && unit.IsIdle())
 		) {
 			best_score = score;
 			bestunit = &unit;
