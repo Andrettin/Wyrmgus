@@ -494,10 +494,12 @@ static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int s
 			if (!Map.Info.IsPointOnMap(current_pos) || !CanMoveToMask(current_pos, unit.Type->MovementMask)) {
 				continue;
 			}
-			if (!PlaceReachable(unit, current_pos, 1, 1, 0, 1, scout_range * 8)) {
+			if (!PlaceReachable(unit, current_pos, 1, 1, 0, 1, scout_range * 4)) {
 				continue;
 			}
-			
+
+			// don't give preference to fogged tiles, as that prevents scouts from passing through
+			/*
 			if (Map.Field(current_pos)->playerInfo.IsVisible(*AiPlayer->Player)) {
 				if (found_fogged) {
 					continue;
@@ -508,6 +510,7 @@ static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int s
 					found_fogged = true;
 				}
 			}
+			*/
 			
 			if (Map.Field(current_pos)->playerInfo.IsExplored(*AiPlayer->Player)) {
 				if (found_unexplored) {

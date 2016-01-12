@@ -1262,7 +1262,7 @@ static void AiCollectResources()
 				while (
 					0 < num_units_unassigned[c]
 					&& (
-						(std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), units_unassigned[c][0]) != AiPlayer->Scouts.end() && num_units_assigned[c] != 0 && (num_units_assigned[GoldCost] == 0 || num_units_assigned[WoodCost] == 0)) //only assign a scout to harvest if there are no units harvesting this resource, or if there are workers harvesting both gold and lumber already
+						(std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), units_unassigned[c][0]) != AiPlayer->Scouts.end() && (num_units_assigned[c] != 0 || (c != GoldCost && c != WoodCost)) && (num_units_assigned[GoldCost] == 0 || num_units_assigned[WoodCost] == 0)) //only assign a scout to harvest if there are no units harvesting this (basic) resource, or if there are workers harvesting both gold and lumber already
 						|| !AiAssignHarvester(*units_unassigned[c][0], c)
 					)
 				) {
@@ -1320,9 +1320,7 @@ static void AiCollectResources()
 					//Wyrmgus end
 						//Wyrmgus start
 //						continue;
-						if (num_units_assigned[c] == 0 && num_units_assigned[src_c] > 1) { // if there are no workers for that resource, allow reshuffling regardless of proportion calculation, so that if the game starts with few workers (like two), the AI isn't stuck gathering only the first resource it finds
-							reassign_only_one = true;
-						} else {
+						if (num_units_assigned[c] != 0) { // if there are no workers for that resource, allow reshuffling regardless of proportion calculation, so that if the game starts with few workers (like two), the AI isn't stuck gathering only the first resource it finds
 							continue;
 						}
 						//Wyrmgus end
@@ -1330,9 +1328,7 @@ static void AiCollectResources()
 					
 					//Wyrmgus start
 					if (num_units_assigned[src_c] <= wanted[src_c]) { // don't reassign if the src_c resource already has less workers than desired
-						if (num_units_assigned[c] == 0 && num_units_assigned[src_c] > 1) {
-							reassign_only_one = true;
-						} else {
+						if (num_units_assigned[c] != 0) {
 							continue;
 						}
 					}
@@ -1393,9 +1389,7 @@ static void AiCollectResources()
 						priority_needed[j]++;
 						
 						//Wyrmgus start
-						if (reassign_only_one) {
-							break;
-						}
+						break; //only reassign one worker per time
 						//Wyrmgus end
 					}
 				}
