@@ -494,8 +494,7 @@ static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int s
 			if (!Map.Info.IsPointOnMap(current_pos) || !CanMoveToMask(current_pos, unit.Type->MovementMask)) {
 				continue;
 			}
-			int place_reachable = PlaceReachable(unit, current_pos, 1, 1, 0, 1, true); //PlaceReachable returns 0 if can't reach, or the distance of the path otherwise
-			if (!place_reachable || place_reachable > scout_range) {
+			if (!PlaceReachable(unit, current_pos, 1, 1, 0, 1, scout_range * 8)) {
 				continue;
 			}
 			

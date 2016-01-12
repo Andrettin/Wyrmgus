@@ -55,13 +55,10 @@ extern void FreeAStar();
 /// Find and a* path for a unit
 extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 						 int tilesizex, int tilesizey, int minrange,
-						 int maxrange, char *path, int pathlen, const CUnit &unit);
-						 
-//Wyrmgus start
-extern int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
-						 int, int, int minrange,
-						 int maxrange, char *path, const CUnit &unit, bool check_only = false);
-//Wyrmgus end
+						 //Wyrmgus start
+//						 int maxrange, char *path, int pathlen, const CUnit &unit);
+						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length);
+						 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -191,26 +188,15 @@ void FreePathfinder()
 */
 //Wyrmgus start
 //int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
-int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, bool simple_path)
+int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, int max_length)
 //Wyrmgus end
 {
-	//Wyrmgus start
-	/*
 	int i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->TileWidth, src.Type->TileHeight,
-						  minrange, range, NULL, 0, src);
-	*/
-	int i = 0;
-	if (simple_path) {
-		i = AStarFindSimplePath(src.tilePos, goalPos, w, h,
-							  src.Type->TileWidth, src.Type->TileHeight,
-							  minrange, range, NULL, src, true);
-	} else {
-		i = AStarFindPath(src.tilePos, goalPos, w, h,
-							  src.Type->TileWidth, src.Type->TileHeight,
-							  minrange, range, NULL, 0, src);
-	}
-	//Wyrmgus end
+						  //Wyrmgus start
+//						  minrange, range, NULL, 0, src);
+						  minrange, range, NULL, 0, src, max_length);
+						  //Wyrmgus end
 
 	switch (i) {
 		case PF_FAILED:
@@ -359,7 +345,10 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 						  input.GetUnitSize().x, input.GetUnitSize().y,
 						  input.GetMinRange(), input.GetMaxRange(),
 						  path, PathFinderOutput::MAX_PATH_LENGTH,
-						  *input.GetUnit());
+						  //Wyrmgus start
+//						  *input.GetUnit());
+						  *input.GetUnit(), 0);
+						  //Wyrmgus end
 	input.PathRacalculated();
 	if (i == PF_FAILED) {
 		i = PF_UNREACHABLE;

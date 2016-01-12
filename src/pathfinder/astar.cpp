@@ -874,15 +874,9 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 **  Optimization to find a simple path
 **  Check if we're at the goal or if it's 1 tile away
 */
-//Wyrmgus start
-//static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
-int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
-//Wyrmgus end
+static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
 							   int, int, int minrange, int maxrange,
-							   //Wyrmgus start
-//							   char *path, const CUnit &unit)
-							   char *path, const CUnit &unit, bool check_only)
-							   //Wyrmgus end
+							   char *path, const CUnit &unit)
 {
 	ProfileBegin("AStarFindSimplePath");
 	// At exact destination point already
@@ -918,17 +912,6 @@ int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh
 		}
 		ProfileEnd("AStarFindSimplePath");
 		return 1;
-	//Wyrmgus start
-	} else if (check_only) {
-		int move_cost = CostMoveTo(GetIndex(goal.x, goal.y), unit);
-		if (move_cost == -1) {
-			ProfileEnd("AStarFindSimplePath");
-			return PF_UNREACHABLE;
-		} else if (move_cost <= distance) {
-			ProfileEnd("AStarFindSimplePath");
-			return 1;
-		}
-	//Wyrmgus end
 	}
 
 	ProfileEnd("AStarFindSimplePath");
@@ -940,7 +923,10 @@ int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh
 */
 int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				  int tilesizex, int tilesizey, int minrange, int maxrange,
-				  char *path, int pathlen, const CUnit &unit)
+				  //Wyrmgus start
+//				  char *path, int pathlen, const CUnit &unit)
+				  char *path, int pathlen, const CUnit &unit, int max_length)
+				  //Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(startPos));
 
@@ -951,10 +937,7 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 	//  Check for simple cases first
 	int ret = AStarFindSimplePath(startPos, goalPos, gw, gh, tilesizex, tilesizey,
-								  //Wyrmgus start
-//								  minrange, maxrange, path, unit);
-								  minrange, maxrange, path, unit, false);
-								  //Wyrmgus end
+								  minrange, maxrange, path, unit);
 	if (ret != PF_FAILED) {
 		ProfileEnd("AStarFindPath");
 		return ret;
@@ -996,9 +979,21 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 		return ret;
 	}
 	Vec2i endPos;
+	
+	//Wyrmgus start
+	int length = 0;
+	//Wyrmgus end
 
 	//  Begin search
 	while (1) {
+		//Wyrmgus start
+		if (max_length != 0 && length > max_length) {
+			ret = PF_FAILED;
+			ProfileEnd("AStarFindPath");
+			return ret;
+		}
+		//Wyrmgus end
+		
 		// Find the best node of from the open set
 		const int shortest = AStarFindMinimum();
 		const int x = OpenSet[shortest].pos.x;
@@ -1105,6 +1100,10 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 			ProfileEnd("AStarFindPath");
 			return ret;
 		}
+		
+		//Wyrmgus start
+		length += 1;
+		//Wyrmgus end
 	}
 
 	const int path_length = AStarSavePath(startPos, endPos, path, pathlen);

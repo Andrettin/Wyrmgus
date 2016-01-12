@@ -223,8 +223,7 @@ extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
 /// Can the unit 'src' reach the place x,y
 extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
 						  //Wyrmgus start
-//						  int minrange, int maxrange);
-						  int minrange, int maxrange, bool simple_path = false);
+						  int minrange, int maxrange, int max_length = 0);
 						  //Wyrmgus end
 
 //
