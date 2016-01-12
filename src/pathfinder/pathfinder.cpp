@@ -56,6 +56,12 @@ extern void FreeAStar();
 extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 						 int tilesizex, int tilesizey, int minrange,
 						 int maxrange, char *path, int pathlen, const CUnit &unit);
+						 
+//Wyrmgus start
+extern int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
+						 int, int, int minrange,
+						 int maxrange, char *path, const CUnit &unit, bool check_only = false);
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -183,11 +189,28 @@ void FreePathfinder()
 **
 **  @return          Distance to place.
 */
-int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
+//Wyrmgus start
+//int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
+int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, bool simple_path)
+//Wyrmgus end
 {
+	//Wyrmgus start
+	/*
 	int i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->TileWidth, src.Type->TileHeight,
 						  minrange, range, NULL, 0, src);
+	*/
+	int i = 0;
+	if (simple_path) {
+		i = AStarFindSimplePath(src.tilePos, goalPos, w, h,
+							  src.Type->TileWidth, src.Type->TileHeight,
+							  minrange, range, NULL, src, true);
+	} else {
+		i = AStarFindPath(src.tilePos, goalPos, w, h,
+							  src.Type->TileWidth, src.Type->TileHeight,
+							  minrange, range, NULL, 0, src);
+	}
+	//Wyrmgus end
 
 	switch (i) {
 		case PF_FAILED:

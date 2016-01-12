@@ -1108,12 +1108,14 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 			resource_range = 1000;
 		}
 		
-		Vec2i forestPos;
-		Vec2i rockPos;
-		if ((resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, resource_range, *unit.Player, unit.tilePos, &forestPos)) || (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, resource_range, *unit.Player, unit.tilePos, &rockPos))) {
+		ret = AiAssignHarvesterFromUnit(unit, resource, resource_range);
+		
+		if (ret == 0) {
 			ret = AiAssignHarvesterFromTerrain(unit, resource, resource_range);
-		} else {
-			ret = AiAssignHarvesterFromUnit(unit, resource, resource_range);
+		}
+		
+		if (ret != 0) {
+			return ret;
 		}
 	}
 	

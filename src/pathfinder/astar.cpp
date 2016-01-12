@@ -874,9 +874,15 @@ static int AStarSavePath(const Vec2i &startPos, const Vec2i &endPos, char *path,
 **  Optimization to find a simple path
 **  Check if we're at the goal or if it's 1 tile away
 */
-static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
+//Wyrmgus start
+//static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
+int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw, int gh,
+//Wyrmgus end
 							   int, int, int minrange, int maxrange,
-							   char *path, const CUnit &unit)
+							   //Wyrmgus start
+//							   char *path, const CUnit &unit)
+							   char *path, const CUnit &unit, bool check_only)
+							   //Wyrmgus end
 {
 	ProfileBegin("AStarFindSimplePath");
 	// At exact destination point already
@@ -912,6 +918,17 @@ static int AStarFindSimplePath(const Vec2i &startPos, const Vec2i &goal, int gw,
 		}
 		ProfileEnd("AStarFindSimplePath");
 		return 1;
+	//Wyrmgus start
+	} else if (check_only) {
+		int move_cost = CostMoveTo(GetIndex(goal.x, goal.y), unit);
+		if (move_cost == -1) {
+			ProfileEnd("AStarFindSimplePath");
+			return PF_UNREACHABLE;
+		} else if (move_cost <= distance) {
+			ProfileEnd("AStarFindSimplePath");
+			return 1;
+		}
+	//Wyrmgus end
 	}
 
 	ProfileEnd("AStarFindSimplePath");
@@ -934,7 +951,10 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 	//  Check for simple cases first
 	int ret = AStarFindSimplePath(startPos, goalPos, gw, gh, tilesizex, tilesizey,
-								  minrange, maxrange, path, unit);
+								  //Wyrmgus start
+//								  minrange, maxrange, path, unit);
+								  minrange, maxrange, path, unit, false);
+								  //Wyrmgus end
 	if (ret != PF_FAILED) {
 		ProfileEnd("AStarFindPath");
 		return ret;

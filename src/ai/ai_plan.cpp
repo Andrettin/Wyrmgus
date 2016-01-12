@@ -494,7 +494,7 @@ static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int s
 			if (!Map.Info.IsPointOnMap(current_pos) || !CanMoveToMask(current_pos, unit.Type->MovementMask)) {
 				continue;
 			}
-			int place_reachable = PlaceReachable(unit, current_pos, 1, 1, 0, 1); //PlaceReachable returns 0 if can't reach, or the distance of the path otherwise
+			int place_reachable = PlaceReachable(unit, current_pos, 1, 1, 0, 1, true); //PlaceReachable returns 0 if can't reach, or the distance of the path otherwise
 			if (!place_reachable || place_reachable > scout_range) {
 				continue;
 			}
@@ -751,7 +751,7 @@ void AiSendExplorers()
 	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
 		// move AI scouts
 		if (AiPlayer->Scouts[i]->IsIdle()) {
-			int scout_range = std::max(1, AiPlayer->Scouts[i]->CurrentSightRange * 2);
+			int scout_range = std::max(16, AiPlayer->Scouts[i]->CurrentSightRange * 2);
 			Vec2i target_pos(-1, -1);
 			ChooseRandomPositionForScouting(*AiPlayer->Scouts[i], &target_pos, scout_range);
 			if (Map.Info.IsPointOnMap(target_pos)) {
