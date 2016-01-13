@@ -542,6 +542,7 @@ private:
 	gcn::Widget *oldtop;
 	LuaActionListener *logiclistener;
 	bool drawUnder;
+	bool running;
 };
 
 //Wyrmgus start
