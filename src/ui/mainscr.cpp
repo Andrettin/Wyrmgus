@@ -628,7 +628,10 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 //		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
 		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Enable && uins->Variable[MANA_INDEX].Max) {
 		//Wyrmgus end
-			UiDrawManaBar(*uins, pos.x, pos.y);
+			//Wyrmgus start
+//			UiDrawManaBar(*uins, pos.x, pos.y);
+			// don't draw the mana bar when within transporters, as there's not enough space for it
+			//Wyrmgus end
 		}
 		if (ButtonAreaUnderCursor == ButtonAreaTransporting
 			&& static_cast<size_t>(ButtonUnderCursor) == j) {
