@@ -205,6 +205,12 @@ public:
 	bool operator()(const CUnit *const unit) const
 	{
 		const CUnitType &type = *unit->Type;
+		//Wyrmgus start
+		if (!&type) {
+			fprintf(stderr, "CUnitTypeFinder Error: Unit's type is NULL.\n");
+			return false;
+		}
+		//Wyrmgus end
 		if (type.BoolFlag[VANISHES_INDEX].value || (unitTypeType != static_cast<UnitTypeType>(-1) && type.UnitType != unitTypeType)) {
 			return false;
 		}

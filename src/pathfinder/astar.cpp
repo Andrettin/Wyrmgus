@@ -592,6 +592,12 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 */
 static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 {
+	//Wyrmgus start
+	if (!&unit) {
+		fprintf(stderr, "Error in CostMoveTo(unsigned int index, const CUnit &unit): Unit is NULL.\n");
+		return -1;
+	}
+	//Wyrmgus end
 	int *c = &CostMoveToCache[index];
 	if (*c != CacheNotSet) {
 		return *c;
@@ -1040,7 +1046,11 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 
 			// Outside the map or can't be entered.
 			if (endPos.x < 0 || endPos.x + tilesizex - 1 >= AStarMapWidth
-				|| endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight) {
+				//Wyrmgus start
+//				|| endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight) {
+				|| endPos.y < 0 || endPos.y + tilesizey - 1 >= AStarMapHeight
+				|| !Map.Info.IsPointOnMap(endPos)) {
+				//Wyrmgus end
 				continue;
 			}
 
