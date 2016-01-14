@@ -1035,6 +1035,14 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
+	
+	//Wyrmgus start
+	if (what.Ability) {
+		AbilityAcquire(unit, &what);
+		return;
+	}
+	//Wyrmgus end
+	
 	// Check if enough resources remains? (NETWORK!)
 	if (unit.Player->CheckCosts(what.Costs)) {
 		return;

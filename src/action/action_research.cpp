@@ -144,10 +144,7 @@
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
 			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.GetDefaultName(player).c_str());
 			//Wyrmgus end
-		//Wyrmgus start
-//		} else {
-		} else if (!upgrade.Ability) { //don't show this message when abilities get learned
-		//Wyrmgus end
+		} else {
 			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), upgrade.Name.c_str());
 		}
 		if (&player == ThisPlayer) {
@@ -160,14 +157,7 @@
 		if (player.AiEnabled) {
 			AiResearchComplete(unit, &upgrade);
 		}
-		//Wyrmgus start
-//		UpgradeAcquire(player, &upgrade);
-		if (!upgrade.Ability) {
-			UpgradeAcquire(player, &upgrade);
-		} else {
-			AbilityAcquire(unit, AllUpgrades[upgrade.ID]);
-		}
-		//Wyrmgus end
+		UpgradeAcquire(player, &upgrade);
 		this->Finished = true;
 		return ;
 	}

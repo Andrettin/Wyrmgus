@@ -476,7 +476,7 @@ void SendCommandCancelUpgradeTo(CUnit &unit)
 
 //Wyrmgus start
 /**
-** Send command: Building starts upgrading to.
+** Send command: Unit starts upgrading to.
 **
 ** @param unit     pointer to unit.
 ** @param what     pointer to unit-type of the unit upgrade.

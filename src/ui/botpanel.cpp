@@ -1849,6 +1849,12 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 			break;
 		}
 	}
+	
+	if (Selected[0]->Variable[LEVELUP_INDEX].Value == 0) {
+		CurrentButtonLevel = 0;
+		LastDrawnButtonPopup = NULL;
+		UI.ButtonPanel.Update();
+	}
 }
 //Wyrmgus end
 
@@ -1862,6 +1868,25 @@ void CButtonPanel::DoClicked_Research(int button)
 		UI.StatusLine.ClearCosts();
 	}
 }
+
+//Wyrmgus start
+void CButtonPanel::DoClicked_LearnAbility(int button)
+{
+	const int index = CurrentButtons[button].Value;
+	if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
+		//PlayerSubCosts(player,Upgrades[i].Costs);
+		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
+		UI.StatusLine.Clear();
+		UI.StatusLine.ClearCosts();
+	}
+	
+	if (Selected[0]->Variable[LEVELUP_INDEX].Value == 0) {
+		CurrentButtonLevel = 0;
+		LastDrawnButtonPopup = NULL;
+		UI.ButtonPanel.Update();
+	}
+}
+//Wyrmgus end
 
 void CButtonPanel::DoClicked_CallbackAction(int button)
 {
@@ -1928,7 +1953,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonResearch: { DoClicked_Research(button); break; }
 		case ButtonCallbackAction: { DoClicked_CallbackAction(button); break; }
 		//Wyrmgus start
-		case ButtonLearnAbility: { DoClicked_Research(button); break; }
+		case ButtonLearnAbility: { DoClicked_LearnAbility(button); break; }
 		case ButtonExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
 		//Wyrmgus end
 	}
