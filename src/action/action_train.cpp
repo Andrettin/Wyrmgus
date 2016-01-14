@@ -441,6 +441,12 @@ static void AnimateActionTrain(CUnit &unit)
 				CommandMove(*newUnit, unit.RallyPointPos, FlushCommands);
 			}
 		}
+		
+		//Wyrmgus start
+		if (unit.Type->Stats[unit.Player->Index].UnitStock[nType.Slot] != 0) {
+			unit.UnitStock[nType.Slot] -= 1;
+		}
+		//Wyrmgus end
 	}
 	//Wyrmgus end
 	this->Finished = true;

@@ -693,6 +693,9 @@ static int CclDefineUnitType(lua_State *l)
 					res->FileWhenLoaded = parent_type->ResInfo[i]->FileWhenLoaded;
 				}
 			}
+			for (size_t i = 0; i < UnitTypes.size(); ++i) {
+				type->DefaultStat.UnitStock[i] = parent_type->DefaultStat.UnitStock[i];
+			}
 			for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 				type->DefaultStat.Variables[i].Enable = parent_type->DefaultStat.Variables[i].Enable;
 				type->DefaultStat.Variables[i].Value = parent_type->DefaultStat.Variables[i].Value;
@@ -1167,6 +1170,18 @@ static int CclDefineUnitType(lua_State *l)
 				++k;
 				type->DefaultStat.ImproveIncomes[res] = DefaultIncomes[res] + LuaToNumber(l, -1, k + 1);
 			}
+		//Wyrmgus start
+		} else if (!strcmp(value, "UnitStock")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				const int unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, k + 1));
+				++k;
+				type->DefaultStat.UnitStock[unit_type_id] = LuaToNumber(l, -1, k + 1);
+			}
+		//Wyrmgus end
 		} else if (!strcmp(value, "Construction")) {
 			// FIXME: What if constructions aren't yet loaded?
 			type->Construction = ConstructionByIdent(LuaToString(l, -1));
@@ -2052,6 +2067,22 @@ static int CclDefineUnitStats(lua_State *l)
 				stats->ImproveIncomes[resId] = LuaToNumber(l, -1, k + 1);
 				lua_pop(l, 1);
 			}
+		//Wyrmgus start
+		} else if (!strcmp(value, "unit-stock")) {
+			lua_rawgeti(l, 3, j + 1);
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+
+			for (int k = 0; k < subargs; ++k) {
+				lua_rawgeti(l, 3, j + 1);
+				const int unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, k + 1));
+				++k;
+				stats->UnitStock[unit_type_id] = LuaToNumber(l, -1, k + 1);
+				lua_pop(l, 1);
+			}
+		//Wyrmgus end
 		} else {
 			int i = UnitTypeVar.VariableNameLookup[value];// User variables
 			if (i != -1) { // valid index
@@ -2263,6 +2294,15 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	//Wyrmgus start
+	} else if (!strcmp(data, "UnitStock")) {
+		LuaCheckArgs(l, 3);
+		const int unit_type_id = UnitTypeIdByIdent(LuaToString(l, 3));
+		if (!GameRunning && Editor.Running != EditorEditing) {
+			lua_pushnumber(l, type->DefaultStat.UnitStock[unit_type_id]);
+		} else {
+			lua_pushnumber(l, type->MapDefaultStat.UnitStock[unit_type_id]);
+		}
+		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, type->ChildUpgrade.c_str());
 		return 1;
@@ -3182,6 +3222,12 @@ void SetMapStat(std::string ident, std::string variable_key, int value, std::str
 		type->MapDefaultStat.ImproveIncomes[resId] = value;
 		for (int player = 0; player < PlayerMax; ++player) {
 			type->Stats[player].ImproveIncomes[resId] = type->MapDefaultStat.ImproveIncomes[resId];
+		}
+	} else if (variable_key == "UnitStock") {
+		const int unit_type_id = UnitTypeIdByIdent(variable_type);
+		type->MapDefaultStat.UnitStock[unit_type_id] = value;
+		for (int player = 0; player < PlayerMax; ++player) {
+			type->Stats[player].UnitStock[unit_type_id] = type->MapDefaultStat.UnitStock[unit_type_id];
 		}
 	} else {
 		int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];

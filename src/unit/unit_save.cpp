@@ -366,6 +366,14 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);
 		}
 	}
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (unit.UnitStock[i] != 0) {
+			file.printf(",\n  \"unit-stock\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.UnitStock[i]);
+		}
+		if (unit.UnitStockReplenishmentTimers[i] != 0) {
+			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.UnitStockReplenishmentTimers[i]);
+		}
+	}
 	if (unit.Character != NULL && unit.CurrentAction() != UnitActionDie) {
 		if (!unit.Character->Custom) {
 			file.printf(",\n  \"character\", \"%s\"", unit.Character->GetFullName().c_str());

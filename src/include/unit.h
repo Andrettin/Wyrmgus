@@ -434,6 +434,10 @@ public:
 	unsigned char Direction; //: 8; /// angle (0-255) unit looking
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
+	//Wyrmgus start
+	int UnitStock[UnitTypeMax]; /// How many of each unit type this unit has stocked
+	int UnitStockReplenishmentTimers[UnitTypeMax]; /// Replenishment timer for each unit type stock
+	//Wyrmgus end
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit
 	unsigned long Attacked;      /// gamecycle unit was last attacked

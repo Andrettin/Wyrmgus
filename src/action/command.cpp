@@ -896,6 +896,14 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 	//Wyrmgus end
 		return;
 	}
+	//Wyrmgus start
+	if (unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0 && unit.UnitStock[type.Slot] == 0) {
+		if (player == ThisPlayer->Index) {
+			ThisPlayer->Notify(NotifyYellow, unit.tilePos, "%s", _("The stock is empty, wait until it is replenished."));
+		}
+		return;
+	}
+	//Wyrmgus end
 	// Not already training?
 	if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
 		DebugPrint("Unit queue disabled!\n");

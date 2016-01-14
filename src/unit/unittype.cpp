@@ -1118,6 +1118,18 @@ static bool SaveUnitStats(const CUnitStats &stats, const CUnitType &type, int pl
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[i].c_str(), stats.ImproveIncomes[i]);
 	}
+	//Wyrmgus start
+	file.printf("},\n\"unit-stock\", {");
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (stats.UnitStock[i] == type.DefaultStat.UnitStock[i]) {
+			continue;
+		}
+		if (i) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\", %d,", UnitTypes[i]->Ident.c_str(), stats.UnitStock[i]);
+	}
+	//Wyrmgus end
 	file.printf("}})\n");
 	return true;
 }

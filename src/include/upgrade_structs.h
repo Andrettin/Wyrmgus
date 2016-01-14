@@ -163,6 +163,9 @@ public:
 		memset(Costs, 0, sizeof(Costs));
 		memset(Storing, 0, sizeof(Storing));
 		memset(ImproveIncomes, 0, sizeof(ImproveIncomes));
+		//Wyrmgus start
+		memset(UnitStock, 0, sizeof(UnitStock));
+		//Wyrmgus end
 	}
 	~CUnitStats();
 
@@ -175,6 +178,9 @@ public:
 	int Costs[MaxCosts];            /// current costs of the unit
 	int Storing[MaxCosts];          /// storage increasing
 	int ImproveIncomes[MaxCosts];   /// Gives player an improved income
+	//Wyrmgus start
+	int UnitStock[UnitTypeMax];		/// Units in stock
+	//Wyrmgus end
 };
 
 /**
@@ -257,6 +263,9 @@ public:
 	int *ModifyPercent;					/// use for percent modifiers
 	int SpeedResearch;					/// speed factor for researching
 	int ImproveIncomes[MaxCosts];		/// improve incomes
+	//Wyrmgus start
+	int UnitStock[UnitTypeMax];			/// unit stock
+	//Wyrmgus end
 
 	// allow/forbid bitmaps -- used as chars for example:
 	// `?' -- leave as is, `F' -- forbid, `A' -- allow

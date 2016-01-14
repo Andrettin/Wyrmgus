@@ -328,6 +328,22 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	}
 
 	//Wyrmgus start
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (unit.UnitStockReplenishmentTimers[i] > 0) {
+			--unit.UnitStockReplenishmentTimers[i];
+			if (unit.UnitStockReplenishmentTimers[i] == 0 && unit.UnitStock[i] < unit.Type->Stats[unit.Player->Index].UnitStock[i]) { //if timer reached 0, replenish 1 of the stock
+				unit.UnitStock[i] += 1;
+			}
+		}
+			
+		//if the unit still has less stock than its max, re-init the unit stock timer
+		if (unit.UnitStockReplenishmentTimers[i] == 0 && unit.UnitStock[i] < unit.Type->Stats[unit.Player->Index].UnitStock[i]) {
+			unit.UnitStockReplenishmentTimers[i] = 1000;
+		}
+	}
+	//Wyrmgus end
+		
+	//Wyrmgus start
 //	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
 	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX};
 	//Wyrmgus end

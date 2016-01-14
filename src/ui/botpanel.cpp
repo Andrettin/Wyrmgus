@@ -1177,6 +1177,17 @@ void CButtonPanel::Draw()
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player);
 			}
+			
+			//draw the quantity in stock for unit "training" cases which have it
+			if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) {
+				std::string stock_string = std::to_string((long long) Selected[0]->UnitStock[buttons[i].Value]) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value]);
+				std::string oldnc;
+				std::string oldrc;
+				GetDefaultTextColors(oldnc, oldrc);
+				CLabel label(GetGameFont(), oldnc, oldrc);
+
+				label.Draw(pos.x + 46 - GetGameFont().Width(stock_string), pos.y + 0, stock_string);
+			}
 			//Wyrmgus end
 		}
 	}

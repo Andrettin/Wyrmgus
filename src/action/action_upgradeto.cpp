@@ -201,6 +201,15 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 
 	//Wyrmgus start
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (newstats.UnitStock[i] != oldstats.UnitStock[i]) {
+			unit.UnitStock[i] += newstats.UnitStock[i] - oldstats.UnitStock[i];
+			unit.UnitStock[i] = std::max(unit.UnitStock[i], 0);
+		}
+	}
+	//Wyrmgus end
+					
+	//Wyrmgus start
 	//change variation if upgrading (new unit type may have different variations)
 	unit.ChooseVariation(&newtype);
 	for (int i = 0; i < MaxImageLayers; ++i) {

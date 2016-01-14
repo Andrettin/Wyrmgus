@@ -118,6 +118,11 @@ const CUnitStats &CUnitStats::operator = (const CUnitStats &rhs)
 		this->Storing[i] = rhs.Storing[i];
 		this->ImproveIncomes[i] = rhs.ImproveIncomes[i];
 	}
+	//Wyrmgus start
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		this->UnitStock[i] = rhs.UnitStock[i];
+	}
+	//Wyrmgus end
 	delete [] this->Variables;
 	const unsigned int size = UnitTypeVar.GetNumberVariable();
 	this->Variables = new CVariable[size];
@@ -139,6 +144,13 @@ bool CUnitStats::operator == (const CUnitStats &rhs) const
 			return false;
 		}
 	}
+	//Wyrmgus start
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (this->UnitStock[i] != rhs.UnitStock[i]) {
+			return false;
+		}
+	}
+	//Wyrmgus end
 	for (unsigned int i = 0; i != UnitTypeVar.GetNumberVariable(); ++i) {
 		if (this->Variables[i] != rhs.Variables[i]) {
 			return false;
@@ -344,6 +356,12 @@ static int CclDefineModifier(lua_State *l)
 			const char *value = LuaToString(l, j + 1, 2);
 			const int resId = GetResourceIdByName(l, value);
 			um->Modifier.ImproveIncomes[resId] = LuaToNumber(l, j + 1, 3);
+		//Wyrmgus start
+		} else if (!strcmp(key, "unit-stock")) {
+			std::string value = LuaToString(l, j + 1, 2);
+			const int unit_type_id = UnitTypeIdByIdent(value);
+			um->Modifier.UnitStock[unit_type_id] = LuaToNumber(l, j + 1, 3);
+		//Wyrmgus end
 		} else if (!strcmp(key, "allow-unit")) {
 			const char *value = LuaToString(l, j + 1, 2);
 
@@ -1087,6 +1105,14 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					}
 				}
 			}
+			
+			//Wyrmgus start
+			for (size_t j = 0; j < UnitTypes.size(); ++j) {
+				if (um->Modifier.UnitStock[j]) {
+					stat.UnitStock[j] += um->Modifier.UnitStock[j];
+				}
+			}
+			//Wyrmgus end
 
 			int varModified = 0;
 			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
@@ -1155,6 +1181,16 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 						//Wyrmgus end
 					}
+					
+					//Wyrmgus start
+					for (size_t j = 0; j < UnitTypes.size(); ++j) {
+						if (um->Modifier.UnitStock[j]) {
+							unit.UnitStock[j] += um->Modifier.UnitStock[j];
+							unit.UnitStock[j] = std::max(unit.UnitStock[j], 0);
+						}
+					}
+					//Wyrmgus end
+
 					//Wyrmgus start
 					//change variation if current one becomes forbidden
 					VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
@@ -1347,6 +1383,14 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 			}
 
+			//Wyrmgus start
+			for (size_t j = 0; j < UnitTypes.size(); ++j) {
+				if (um->Modifier.UnitStock[j]) {
+					stat.UnitStock[j] -= um->Modifier.UnitStock[j];
+				}
+			}
+			//Wyrmgus end
+
 			int varModified = 0;
 			for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 				varModified |= um->Modifier.Variables[j].Value
@@ -1413,6 +1457,16 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 						//Wyrmgus end
 					}
+					
+					//Wyrmgus start
+					for (size_t j = 0; j < UnitTypes.size(); ++j) {
+						if (um->Modifier.UnitStock[j]) {
+							unit.UnitStock[j] -= um->Modifier.UnitStock[j];
+							unit.UnitStock[j] = std::max(unit.UnitStock[j], 0);
+						}
+					}
+					//Wyrmgus end
+					
 					//Wyrmgus start
 					//change variation if current one becomes forbidden
 					VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
@@ -1497,6 +1551,15 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	}
 	
 	//Wyrmgus start
+	for (size_t j = 0; j < UnitTypes.size(); ++j) {
+		if (um->Modifier.UnitStock[j]) {
+			unit.UnitStock[j] += um->Modifier.UnitStock[j];
+			unit.UnitStock[j] = std::max(unit.UnitStock[j], 0);
+		}
+	}
+	//Wyrmgus end					
+	
+	//Wyrmgus start
 	//change variation if current one becomes forbidden
 	VariationInfo *current_varinfo = unit.Type->VarInfo[unit.Variation];
 	if (current_varinfo) {
@@ -1577,6 +1640,15 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 		//Wyrmgus end
 	}
+	
+	//Wyrmgus start
+	for (size_t j = 0; j < UnitTypes.size(); ++j) {
+		if (um->Modifier.UnitStock[j]) {
+			unit.UnitStock[j] -= um->Modifier.UnitStock[j];
+			unit.UnitStock[j] = std::max(unit.UnitStock[j], 0);
+		}
+	}
+	//Wyrmgus end					
 	
 	//Wyrmgus start
 	//change variation if current one becomes forbidden

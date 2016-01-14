@@ -570,6 +570,11 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 					f->printf("SetMapStat(\"%s\", \"ImproveProduction\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.ImproveIncomes[j], DefaultResourceNames[j].c_str());
 				}
 			}
+			for (size_t j = 0; j < UnitTypes.size(); ++j) {
+				if (type.MapDefaultStat.UnitStock[j] != type.DefaultStat.UnitStock[j]) {
+					f->printf("SetMapStat(\"%s\", \"UnitStock\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.UnitStock[j], UnitTypes[i]->Ident.c_str());
+				}
+			}
 			for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
 				if (type.MapDefaultStat.Variables[j] != type.DefaultStat.Variables[j]) {
 					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Value\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Value);

@@ -521,6 +521,10 @@ void CUnit::Init()
 	AutoRepair = 0;
 	Goal = NULL;
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
+	//Wyrmgus start
+	memset(UnitStock, 0, sizeof(UnitStock));
+	memset(UnitStockReplenishmentTimers, 0, sizeof(UnitStockReplenishmentTimers));
+	//Wyrmgus end
 }
 
 /**
@@ -1463,6 +1467,9 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
+	//Wyrmgus start
+	memset(UnitStockReplenishmentTimers, 0, sizeof(UnitStockReplenishmentTimers));
+	//Wyrmgus end
 
 	//Wyrmgus start
 	//set the unit's personal name, if applicable
@@ -1612,6 +1619,11 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			Assert(Stats->Variables);
 			memcpy(Variable, Stats->Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
 		}
+		//Wyrmgus start
+		for (size_t i = 0; i < UnitTypes.size(); ++i) {
+			UnitStock[i] = Stats->UnitStock[i];
+		}
+		//Wyrmgus end
 	}
 }
 
