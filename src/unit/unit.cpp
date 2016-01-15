@@ -3968,7 +3968,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
+			if (table[i]->IsAliveOnMap() && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
 				table[i]->Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);
 				table[i]->Moving = 0;
 				table[i]->TTL = 0;
