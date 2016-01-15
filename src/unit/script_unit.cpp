@@ -1536,7 +1536,10 @@ static int CclGetUnitVariable(lua_State *l)
 static int CclSetUnitVariable(lua_State *l)
 {
 	const int nargs = lua_gettop(l);
-	Assert(nargs >= 3 && nargs <= 5);
+	//Wyrmgus start
+//	Assert(nargs >= 3 && nargs <= 5);
+	Assert(nargs >= 2 && nargs <= 5);
+	//Wyrmgus end
 
 	//Wyrmgus start
 	if (lua_isnil(l, 1)) {
