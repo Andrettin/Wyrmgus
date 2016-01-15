@@ -91,7 +91,10 @@ public:
 			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 		} else if (FIND_TYPE == AIATTACK_BUILDING) {
 			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
-			Assert(!*enemy);
+			//Wyrmgus start
+//			Assert(!*enemy);
+			Assert(!*enemy || (*enemy)->Type->Building);
+			//Wyrmgus end
 			if (*enemy == NULL || !(*enemy)->Type->Building) {
 				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 			}
