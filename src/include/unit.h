@@ -354,8 +354,6 @@ public:
 	IconConfig GetIcon() const;
 	MissileConfig GetMissile() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
-	int GetLayerFrame(int image_layer, int frame) const;
-	PixelPos GetLayerOffset(int image_layer, int frame) const;
 	std::string GetTypeName() const;
 	std::string GetMessageName() const;
 	//Wyrmgus end

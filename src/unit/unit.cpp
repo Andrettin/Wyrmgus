@@ -3811,52 +3811,6 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 	}
 }
 
-int CUnit::GetLayerFrame(int image_layer, int frame) const
-{
-	int base_frame = frame >= 0 ? frame : abs(frame) - 1;
-	int layer_frame = frame;
-	
-	int layer_variation = this->LayerVariation[image_layer];
-	if (layer_variation != -1 && layer_variation < ((int) this->Type->LayerVarInfo[image_layer].size()) && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
-		layer_frame = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->OverlayFrame;
-		if (frame < 0) {
-			layer_frame *= -1;
-			layer_frame -= 1;
-		}
-	} else if (image_layer == ShieldImageLayer && this->Type->ShieldAnimation[base_frame]) {
-		layer_frame = this->Type->ShieldAnimation[base_frame]->OverlayFrame;
-		if (frame < 0) {
-			layer_frame *= -1;
-			layer_frame -= 1;
-		}
-	}
-	
-	return layer_frame;
-}
-
-PixelPos CUnit::GetLayerOffset(int image_layer, int frame) const
-{
-	int base_frame = frame >= 0 ? frame : abs(frame) - 1;
-	PixelPos layer_offset(0, 0);
-	
-	int layer_variation = this->LayerVariation[image_layer];
-	if (layer_variation != -1 && layer_variation < ((int) this->Type->LayerVarInfo[image_layer].size()) && this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]) {
-		layer_offset.x = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->XOffset;
-		layer_offset.y = this->Type->LayerVarInfo[image_layer][layer_variation]->LayerAnimation[base_frame]->YOffset;
-		if (frame < 0) {
-			layer_offset.x *= -1;
-		}
-	} else if (image_layer == ShieldImageLayer && this->Type->ShieldAnimation[base_frame]) {
-		layer_offset.x = this->Type->ShieldAnimation[base_frame]->XOffset;
-		layer_offset.y = this->Type->ShieldAnimation[base_frame]->YOffset;
-		if (frame < 0) {
-			layer_offset.x *= -1;
-		}
-	}
-	
-	return layer_offset;
-}
-
 std::string CUnit::GetTypeName() const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];

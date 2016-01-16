@@ -156,22 +156,6 @@ public:
 	CAnimation *Upgrade;
 };
 
-//Wyrmgus start
-class OverlayAnimation
-{
-public:
-	OverlayAnimation() : Frame(0), OverlayFrame(0), XOffset(0), YOffset(0)
-	{
-	}
-
-	int Frame;						/// Frame of the main animation.
-	int OverlayFrame;				/// Frame within the overlay's spritesheet.
-	int XOffset;					/// X offset for the overlay's drawing coordinates for that frame.
-	int YOffset;					/// Y offset for the overlay's drawing coordinates for that frame.
-};
-//Wyrmgus end
-
-
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
