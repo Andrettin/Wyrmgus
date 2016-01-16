@@ -704,7 +704,7 @@ bool CanAccessFile(const char *filename)
 **
 **  @return the number of entries added to FileList.
 */
-int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl)
+int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl, int sortmode)
 {
 	struct stat st;
 	char buffer[PATH_MAX];
@@ -751,6 +751,8 @@ int ReadDataDirectory(const char *dirname, std::vector<FileList> &fl)
 						nfl.name = np;
 						nfl.type = 1;
 					}
+					nfl.mtime = st.st_mtime;
+					nfl.sortmode = sortmode;
 					// sorted instertion
 					fl.insert(std::lower_bound(fl.begin(), fl.end(), nfl), nfl);
 				}
