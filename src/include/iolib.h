@@ -78,18 +78,23 @@ FileWriter *CreateFileWriter(const std::string &filename);
 class FileList
 {
 public:
-	FileList() : type(0) {}
+	FileList() : type(0), sortmode(0) {}
 
 	bool operator < (const FileList &rhs) const
 	{
 		if (type != rhs.type) {
 			return type < rhs.type;
 		}
+		if (sortmode == 1) {
+			return mtime > rhs.mtime;
+		}
 		return name < rhs.name;
 	}
 public:
 	std::string name;  /// Name of the file
 	int type;          /// Type of the file
+	int sortmode;      /// Sort by name if 0 or sort by modified time if 1
+	time_t mtime;      /// Modified time
 };
 
 
@@ -143,7 +148,7 @@ extern std::string LibraryFileName(const char *file);
 extern bool CanAccessFile(const char *filename);
 
 /// Read the contents of a directory
-extern int ReadDataDirectory(const char *dirname, std::vector<FileList> &flp);
+extern int ReadDataDirectory(const char *dirname, std::vector<FileList> &flp, int sortmode = 0);
 
 //@}
 
