@@ -2909,10 +2909,9 @@ void ImageDropDownWidget::draw(gcn::Graphics *graphics)
 
 	//Wyrmgus start
 //	img->Resize(getWidth(), h);
-	//Wyrmgus end
-	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
-	//Wyrmgus start
+//	graphics->drawImage(img, 0, 0, 0, 0, getWidth(), h);
 //	img->SetOriginalSize();
+	graphics->drawImage(img, 0, 0, 0, 0, img->getWidth(), img->getHeight());
 	//Wyrmgus end
 	
 	graphics->setFont(getFont());
@@ -3204,7 +3203,7 @@ int StatBoxWidget::getPercent() const
 **  MenuScreen constructor
 */
 MenuScreen::MenuScreen() :
-	Container(), runLoop(true), logiclistener(0), drawUnder(false)
+	Container(), runLoop(true), logiclistener(0), drawUnder(false), running(false)
 {
 	setDimension(gcn::Rectangle(0, 0, Video.Width, Video.Height));
 	setOpaque(false);
@@ -3220,8 +3219,9 @@ MenuScreen::MenuScreen() :
 */
 int MenuScreen::run(bool loop)
 {
-	this->loopResult = 0;
-	this->runLoop = loop;
+	loopResult = 0;
+	runLoop = loop;
+	running = true;
 
 	CursorState = CursorStatePoint;
 	GameCursor = UI.Point.Cursor;
@@ -3253,6 +3253,9 @@ int MenuScreen::run(bool loop)
 */
 void MenuScreen::stop(int result, bool stopAll)
 {
+	if (running == false)
+		return;
+
 	if (!this->runLoop) {
 		Gui->setTop(this->oldtop);
 		Assert(MenuStack.top() == this);
@@ -3277,8 +3280,9 @@ void MenuScreen::stop(int result, bool stopAll)
 		}
 	}
 
-	this->runLoop = false;
-	this->loopResult = result;
+	runLoop = false;
+	loopResult = result;
+	running = false;
 }
 
 void MenuScreen::addLogicCallback(LuaActionListener *listener)
