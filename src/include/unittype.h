@@ -72,7 +72,6 @@ class MissileType;
 class CFile;
 //Wyrmgus start
 class CUniqueItem;
-class OverlayAnimation;
 //Wyrmgus end
 struct lua_State;
 #ifdef USE_MNG
@@ -156,7 +155,6 @@ public:
 		memset(LayerSprites, 0, sizeof(LayerSprites));
 		memset(SpriteWhenLoaded, 0, sizeof(SpriteWhenLoaded));
 		memset(SpriteWhenEmpty, 0, sizeof(SpriteWhenEmpty));
-		memset(LayerAnimation, 0, sizeof(LayerAnimation));
 	}
 	
 	~VariationInfo();
@@ -173,7 +171,6 @@ public:
 	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
 	CAnimations *Animations;        /// Animation scripts
 	CConstruction *Construction;    /// What is shown in construction phase
-	OverlayAnimation *LayerAnimation[AnimationFrameMax];	/// layer animation data
 
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
@@ -710,6 +707,7 @@ public:
 	int Upkeep;												/// Gold upkeep (for grand strategy mode)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
+	bool InvertedEastArms;									/// Whether the arms are inverted for the east/west graphics
 	bool InvertedSoutheastArms;								/// Whether the arms are inverted for the southeast/southwest graphics
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
@@ -834,7 +832,6 @@ public:
 	//Wyrmgus start
 	VariationInfo *VarInfo[VariationMax];						/// Variation information.
 	std::vector<VariationInfo *> LayerVarInfo[MaxImageLayers];	/// Layer variation information.
-	OverlayAnimation *ShieldAnimation[AnimationFrameMax];		/// shield animation data
 	//Wyrmgus end
 	std::vector<CBuildRestriction *> BuildingRules;   /// Rules list for building a building.
 	std::vector<CBuildRestriction *> AiBuildingRules; /// Rules list for for AI to build a building.

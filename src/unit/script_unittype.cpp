@@ -656,6 +656,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->Sound = parent_type->Sound;
 			type->NumDirections = parent_type->NumDirections;
 			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
+			type->InvertedEastArms = parent_type->InvertedEastArms;
 			type->InvertedSoutheastArms = parent_type->InvertedSoutheastArms;
 			if (parent_type->CanCastSpell) {
 				type->CanCastSpell = new char[SpellTypeTable.size()];
@@ -788,31 +789,6 @@ static int CclDefineUnitType(lua_State *l)
 						var->ItemsNotEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsNotEquipped[u]);
 					}
 					var->Tileset = parent_type->LayerVarInfo[i][j]->Tileset;
-						
-					for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
-						if (parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]) {
-							OverlayAnimation *layer_anim = new OverlayAnimation;
-								
-							var->LayerAnimation[anim_n] = layer_anim;
-								
-							layer_anim->Frame = parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]->Frame;
-							layer_anim->OverlayFrame = parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]->OverlayFrame;
-							layer_anim->XOffset = parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]->XOffset;
-							layer_anim->YOffset = parent_type->LayerVarInfo[i][j]->LayerAnimation[anim_n]->YOffset;
-						}
-					}
-				}
-			}
-			for (int anim_n = 0; anim_n < AnimationFrameMax; ++anim_n) {
-				if (parent_type->ShieldAnimation[anim_n]) {
-					OverlayAnimation *shield_anim = new OverlayAnimation;
-					
-					type->ShieldAnimation[anim_n] = shield_anim;
-					
-					shield_anim->Frame = parent_type->ShieldAnimation[anim_n]->Frame;
-					shield_anim->OverlayFrame = parent_type->ShieldAnimation[anim_n]->OverlayFrame;
-					shield_anim->XOffset = parent_type->ShieldAnimation[anim_n]->XOffset;
-					shield_anim->YOffset = parent_type->ShieldAnimation[anim_n]->YOffset;
 				}
 			}
 			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
@@ -926,88 +902,12 @@ static int CclDefineUnitType(lua_State *l)
 						}
 					} else if (!strcmp(value, "tileset")) {
 						var->Tileset = LuaToString(l, -1, k + 1);
-					} else if (!strcmp(value, "layer-animation")) {
-						if (image_layer == -1) {
-							LuaError(l, "Defining layer animations for a non-layer variation.");
-						}
-						lua_rawgeti(l, -1, k + 1);
-						if (!lua_istable(l, -1)) {
-							LuaError(l, "incorrect argument (expected table for layer animations)");
-						}
-						const int subsubargs = lua_rawlen(l, -1);
-						for (int n = 0; n < subsubargs; ++n) {
-							lua_rawgeti(l, -1, n + 1);
-							if (!lua_istable(l, -1)) {
-								LuaError(l, "incorrect argument (expected table for layer animation frames)");
-							}
-							OverlayAnimation *layer_anim = new OverlayAnimation;
-							const int subsubsubargs = lua_rawlen(l, -1);
-							for (int o = 0; o < subsubsubargs; ++o) {
-								value = LuaToString(l, -1, o + 1);
-								++o;
-								if (!strcmp(value, "frame")) {
-									layer_anim->Frame = LuaToNumber(l, -1, o + 1);
-									if (layer_anim->Frame < 0) {
-										LuaError(l, "LayerAnimation Frame cannot be negative");
-									}
-									var->LayerAnimation[layer_anim->Frame] = layer_anim;
-								} else if (!strcmp(value, "overlay-frame")) {
-									layer_anim->OverlayFrame = LuaToNumber(l, -1, o + 1);
-									if (layer_anim->OverlayFrame < 0) {
-										LuaError(l, "LayerAnimation OverlayFrame cannot be negative");
-									}
-								} else if (!strcmp(value, "x-offset")) {
-									layer_anim->XOffset = LuaToNumber(l, -1, o + 1);
-								} else if (!strcmp(value, "y-offset")) {
-									layer_anim->YOffset = LuaToNumber(l, -1, o + 1);
-								} else {
-									printf("\n%s\n", type->Name.c_str());
-									LuaError(l, "Unsupported tag: %s" _C_ value);
-								}
-							}
-							lua_pop(l, 1);
-						}
-						lua_pop(l, 1);
 					} else {
 						printf("\n%s\n", type->Name.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
 				// Assert(var->VariationId);
-				lua_pop(l, 1);
-			}
-		} else if (!strcmp(value, "ShieldAnimation")) {
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				lua_rawgeti(l, -1, j + 1);
-				OverlayAnimation *shield_anim = new OverlayAnimation;
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument");
-				}
-				const int subargs = lua_rawlen(l, -1);
-				for (int k = 0; k < subargs; ++k) {
-					value = LuaToString(l, -1, k + 1);
-					++k;
-					if (!strcmp(value, "frame")) {
-						shield_anim->Frame = LuaToNumber(l, -1, k + 1);
-						if (shield_anim->Frame < 0) {
-							LuaError(l, "ShieldAnimation Frame cannot be negative");
-						}
-						type->ShieldAnimation[shield_anim->Frame] = shield_anim;
-					} else if (!strcmp(value, "overlay-frame")) {
-						shield_anim->OverlayFrame = LuaToNumber(l, -1, k + 1);
-						if (shield_anim->OverlayFrame < 0) {
-							LuaError(l, "ShieldAnimation OverlayFrame cannot be negative");
-						}
-					} else if (!strcmp(value, "x-offset")) {
-						shield_anim->XOffset = LuaToNumber(l, -1, k + 1);
-					} else if (!strcmp(value, "y-offset")) {
-						shield_anim->YOffset = LuaToNumber(l, -1, k + 1);
-					} else {
-						printf("\n%s\n", type->Name.c_str());
-						LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-				}
 				lua_pop(l, 1);
 			}
 		//Wyrmgus end
@@ -1901,6 +1801,8 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "incorrect weapon class");
 				}
 			}
+		} else if (!strcmp(value, "InvertedEastArms")) {
+			type->InvertedEastArms = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InvertedSoutheastArms")) {
 			type->InvertedSoutheastArms = LuaToBoolean(l, -1);
 		//Wyrmgus end
