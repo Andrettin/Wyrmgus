@@ -2294,7 +2294,7 @@ static int CclStratagusLibraryPath(lua_State *l)
 /**
 **  Return a table with the filtered items found in the subdirectory.
 */
-static int CclFilteredListDirectory(lua_State *l, int type, int mask)
+static int CclFilteredListDirectory(lua_State *l, int type, int mask, int sortmode = 0)
 {
 	const int args = lua_gettop(l);
 	if (args < 1 || args > 2) {
@@ -2337,7 +2337,7 @@ static int CclFilteredListDirectory(lua_State *l, int type, int mask)
 	lua_pop(l, 1);
 	lua_newtable(l);
 	std::vector<FileList> flp;
-	n = ReadDataDirectory(directory, flp);
+	n = ReadDataDirectory(directory, flp, sortmode);
 	int j = 0;
 	for (int i = 0; i < n; ++i) {
 		if ((flp[i].type & mask) == type) {
@@ -2364,6 +2364,14 @@ static int CclListDirectory(lua_State *l)
 static int CclListFilesInDirectory(lua_State *l)
 {
 	return CclFilteredListDirectory(l, 0x1, 0x1);
+}
+
+/**
+**  Return a table with the files found in the subdirectory, ordered by modified time.
+*/
+static int CclListFilesInDirectorySortByTime(lua_State *l)
+{
+	return CclFilteredListDirectory(l, 0x1, 0x1, 1);
 }
 
 /**
@@ -3147,6 +3155,7 @@ void ScriptRegister()
 	lua_register(Lua, "LibraryPath", CclStratagusLibraryPath);
 	lua_register(Lua, "ListDirectory", CclListDirectory);
 	lua_register(Lua, "ListFilesInDirectory", CclListFilesInDirectory);
+	lua_register(Lua, "ListFilesInDirectorySortByTime", CclListFilesInDirectorySortByTime);
 	lua_register(Lua, "ListDirsInDirectory", CclListDirsInDirectory);
 
 	lua_register(Lua, "SetDamageFormula", CclSetDamageFormula);
