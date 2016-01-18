@@ -1184,7 +1184,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					for (size_t j = 0; j < UnitTypes.size(); ++j) {
-						if (um->Modifier.UnitStock[j]) {
+						if (um->Modifier.UnitStock[j] < 0) {
 							unit.UnitStock[j] += um->Modifier.UnitStock[j];
 							unit.UnitStock[j] = std::max(unit.UnitStock[j], 0);
 						}
@@ -1460,7 +1460,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					
 					//Wyrmgus start
 					for (size_t j = 0; j < UnitTypes.size(); ++j) {
-						if (um->Modifier.UnitStock[j]) {
+						if (um->Modifier.UnitStock[j] > 0) {
 							unit.UnitStock[j] -= um->Modifier.UnitStock[j];
 							unit.UnitStock[j] = std::max(unit.UnitStock[j], 0);
 						}
@@ -1552,7 +1552,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	
 	//Wyrmgus start
 	for (size_t j = 0; j < UnitTypes.size(); ++j) {
-		if (um->Modifier.UnitStock[j]) {
+		if (um->Modifier.UnitStock[j] < 0) {
 			unit.UnitStock[j] += um->Modifier.UnitStock[j];
 			unit.UnitStock[j] = std::max(unit.UnitStock[j], 0);
 		}
@@ -1643,7 +1643,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	
 	//Wyrmgus start
 	for (size_t j = 0; j < UnitTypes.size(); ++j) {
-		if (um->Modifier.UnitStock[j]) {
+		if (um->Modifier.UnitStock[j] > 0) {
 			unit.UnitStock[j] -= um->Modifier.UnitStock[j];
 			unit.UnitStock[j] = std::max(unit.UnitStock[j], 0);
 		}

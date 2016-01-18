@@ -1620,9 +1620,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			memcpy(Variable, Stats->Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
 		}
 		//Wyrmgus start
-		for (size_t i = 0; i < UnitTypes.size(); ++i) {
-			UnitStock[i] = Stats->UnitStock[i];
-		}
+		memset(UnitStock, 0, sizeof(UnitStock));
 		//Wyrmgus end
 	}
 }
