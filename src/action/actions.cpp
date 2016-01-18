@@ -345,7 +345,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		
 	//Wyrmgus start
 //	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX};
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX};
 	//Wyrmgus end
 	//  decrease spells effects time.
 	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
@@ -381,9 +381,18 @@ static bool HandleBurnAndPoison(CUnit &unit)
 		return true;
 	}
 	if (unit.Variable[POISON_INDEX].Value && unit.Type->PoisonDrain) {
-		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
+		//Wyrmgus start
+//		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain);
+		HitUnit(NoUnitP, unit, unit.Type->PoisonDrain, NULL, false); //a bit too repetitive to show damage every single time the poison effect is applied
+		//Wyrmgus end
 		return true;
 	}
+	//Wyrmgus start
+	if (unit.Variable[BLEEDING_INDEX].Value) {
+		HitUnit(NoUnitP, unit, 1, NULL, false);
+		//don't return true since we don't want to stop regeneration (positive or negative) from happening
+	}
+	//Wyrmgus end
 	return false;
 }
 
@@ -399,7 +408,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			//Wyrmgus start
 //			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX) {
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
