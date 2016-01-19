@@ -614,10 +614,12 @@ void CUnit::IncreaseLevel(int level_quantity)
 			}
 			
 			this->Variable[LEVELUP_INDEX].Value += 1;
+			this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 			// if there are no level-up upgrades available for the unit, increase its HP instead
 			if (this->GetAvailableLevelUpUpgrades() < this->Variable[LEVELUP_INDEX].Value) {
 				this->Variable[HP_INDEX].Max += 15;
 				this->Variable[LEVELUP_INDEX].Value -= 1;
+				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 			}
 		}
 		this->Variable[HP_INDEX].Value = this->Variable[HP_INDEX].Max;
@@ -639,6 +641,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 				}
 				if (potential_upgrades.size() > 0) {
 					this->Variable[LEVELUP_INDEX].Value -= 1;
+					this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 					TransformUnitIntoType(*this, *potential_upgrades[SyncRand(potential_upgrades.size())]);
 				}
 			}
@@ -683,6 +686,7 @@ void CUnit::Retrain()
 			for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[i].size(); ++j) {
 				if (AiHelpers.ExperienceUpgrades[i][j] == this->Type) {
 					this->Variable[LEVELUP_INDEX].Value += 1;
+					this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 					TransformUnitIntoType(*this, *UnitTypes[i]);
 					if (!IsNetworkGame() && Character != NULL && Character->Persistent && Player->AiEnabled == false) {	//save the unit-type experience upgrade for persistent characters
 						if (Character->Type->Slot != i) {
@@ -776,6 +780,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		TraitAcquire(*this, this->Character->Trait);
 	}
 	
+	this->Variable[LEVEL_INDEX].Value = this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value;
 	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
 		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value);
 	}

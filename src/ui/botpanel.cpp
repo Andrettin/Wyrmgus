@@ -1839,6 +1839,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 		if (Selected[0]->Player->GetUnitTotalCount(type) < Selected[0]->Player->Allow.Units[type.Slot] || Selected[0]->Player->CheckLimits(type) != -6) { //ugly way to make the checklimits message only appear when it should
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
+				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
 				if (!IsNetworkGame() && Selected[i]->Character != NULL && Selected[i]->Character->Persistent && Selected[i]->Player->AiEnabled == false) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->Character->Type->Slot != type.Slot) {
 						Selected[i]->Character->Type = const_cast<CUnitType *>(&(*UnitTypes[CurrentButtons[button].Value]));

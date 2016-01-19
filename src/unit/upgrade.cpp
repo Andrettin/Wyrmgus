@@ -1774,6 +1774,7 @@ void ApplyUpgrades()
 void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 {
 	unit.Variable[LEVELUP_INDEX].Value -= 1;
+	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	if (!IsNetworkGame() && unit.Character != NULL && unit.Character->Persistent && unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) == unit.Character->Abilities.end()) {
 			unit.Character->Abilities.push_back(upgrade);
@@ -1793,6 +1794,7 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 void AbilityLost(CUnit &unit, CUpgrade *upgrade)
 {
 	unit.Variable[LEVELUP_INDEX].Value += 1;
+	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	if (!IsNetworkGame() && unit.Character != NULL && unit.Character->Persistent && unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
 			unit.Character->Abilities.erase(std::remove(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade), unit.Character->Abilities.end());

@@ -2998,8 +2998,6 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 	
-	unit.Variable[LEVELUP_INDEX].Max = 100000;
-
 	if (unit.Variable[GENDER_INDEX].Value == NoGender && unit.Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
 		unit.Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
 		unit.Variable[GENDER_INDEX].Max = MaxGenders;
