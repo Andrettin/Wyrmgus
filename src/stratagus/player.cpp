@@ -883,6 +883,12 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"total-razings\", %d,", p.TotalRazings);
 	file.printf("\n  \"total-kills\", %d,", p.TotalKills);
 	//Wyrmgus start
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (p.UnitTypeKills[i] != 0) {
+			file.printf("\n  \"unit-type-kills\", \"%s\", %d,", UnitTypes[i]->Ident.c_str(), p.UnitTypeKills[i]);
+		}
+	}
+	//Wyrmgus end
 	if (p.LostTownHallTimer != 0) {
 		file.printf("\n  \"lost-town-hall-timer\", %d,", p.LostTownHallTimer);
 	}
@@ -1321,6 +1327,7 @@ void CPlayer::Clear()
 	TotalRazings = 0;
 	TotalKills = 0;
 	//Wyrmgus start
+	memset(UnitTypeKills, 0, sizeof(UnitTypeKills));
 	LostTownHallTimer = 0;
 	//Wyrmgus end
 	Color = 0;

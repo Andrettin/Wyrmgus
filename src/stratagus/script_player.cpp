@@ -282,6 +282,10 @@ void CPlayer::Load(lua_State *l)
 		} else if (!strcmp(value, "total-kills")) {
 			this->TotalKills = LuaToNumber(l, j + 1);
 		//Wyrmgus start
+		} else if (!strcmp(value, "unit-type-kills")) {
+			int unit_type_id = UnitTypeIdByIdent(LuaToString(l, j + 1));
+			++j;
+			this->UnitTypeKills[unit_type_id] = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "lost-town-hall-timer")) {
 			this->LostTownHallTimer = LuaToNumber(l, j + 1);
 		//Wyrmgus end
@@ -2310,6 +2314,14 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "TotalKills")) {
 		lua_pushnumber(l, p->TotalKills);
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "UnitTypeKills")) {
+		LuaCheckArgs(l, 3);
+		CUnitType *type = CclGetUnitType(l);
+		Assert(type);
+		lua_pushnumber(l, p->UnitTypeKills[type->Slot]);
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "SpeedResourcesHarvest")) {
 		LuaCheckArgs(l, 3);
 

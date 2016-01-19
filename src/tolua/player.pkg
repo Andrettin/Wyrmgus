@@ -46,6 +46,9 @@ class CPlayer
 	int TotalResources[MaxCosts];
 	int TotalRazings;
 	int TotalKills;
+	//Wyrmgus start
+	int UnitTypeKills[UnitTypeMax];
+	//Wyrmgus end
 
 	int SpeedResourcesHarvest[MaxCosts];
 	int SpeedResourcesReturn[MaxCosts];

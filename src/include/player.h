@@ -150,6 +150,9 @@ public:
 	int    TotalResources[MaxCosts];
 	int    TotalRazings;
 	int    TotalKills;      /// How many unit killed
+	//Wyrmgus start
+	int UnitTypeKills[UnitTypeMax];  /// total killed units of unit-type
+	//Wyrmgus end
 
 	//Wyrmgus start
 	int LostTownHallTimer;	/// The timer for when the player lost the last town hall (to make the player's units be revealed)

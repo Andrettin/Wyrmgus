@@ -100,6 +100,7 @@
 			caster.Player->TotalKills++;
 		}
 		//Wyrmgus start
+		caster.Player->UnitTypeKills[target->Type->Slot]++;
 		/*
 		if (UseHPForXp) {
 			caster.Variable[XP_INDEX].Max += target->Variable[HP_INDEX].Value;

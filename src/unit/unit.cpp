@@ -4132,6 +4132,7 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 		attacker.Player->TotalKills++;
 	}
 	//Wyrmgus start
+	attacker.Player->UnitTypeKills[target.Type->Slot]++;
 	/*
 	if (UseHPForXp) {
 		attacker.Variable[XP_INDEX].Max += target.Variable[HP_INDEX].Value;
