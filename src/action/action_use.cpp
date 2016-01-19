@@ -230,7 +230,7 @@ enum {
 				if (unit.Player == ThisPlayer) {
 					unit.Player->Notify(NotifyRed, unit.tilePos, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
 				}
-				HitUnit(goal, unit, goal->Variable[HITPOINTHEALING_INDEX].Value);
+				HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
 			} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
 				unit.Variable[SLOW_INDEX].Value = 1000;
 				if (unit.Player == ThisPlayer) {
