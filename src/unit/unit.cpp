@@ -3981,6 +3981,13 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		// Recalculate the seen count.
 		//UnitCountSeen(unit);
 	}
+	
+	//Wyrmgus start
+	if (unit.Variable[LEVELUP_INDEX].Value > 0) {
+		unit.Player->UpdateLevelUpUnits(); //recalculate level-up units, since this unit no longer should be in that vector
+	}
+	//Wyrmgus end
+	
 	MapMarkUnitSight(unit);
 }
 
