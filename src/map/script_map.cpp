@@ -63,7 +63,10 @@ static int CclStratagusMap(lua_State *l)
 		++j;
 
 		if (!strcmp(value, "version")) {
-			char buf[32];
+			//Wyrmgus start
+//			char buf[32];
+			char buf[64];
+			//Wyrmgus end
 
 			const char *version = LuaToString(l, j + 1);
 			strncpy(buf, VERSION, sizeof(buf));
