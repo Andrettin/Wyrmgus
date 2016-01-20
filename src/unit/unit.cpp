@@ -1289,8 +1289,12 @@ void CUnit::GenerateDrop()
 		if (droppedUnit != NULL) {
 			droppedUnit->GenerateSpecialProperties(this);
 			
-			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && droppedUnit->Prefix == NULL && droppedUnit->Suffix == NULL && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
-				droppedUnit->TTL = GameCycle + (5 * 60 * CYCLES_PER_SECOND);
+			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
+				int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
+				if (droppedUnit->Prefix != NULL || droppedUnit->Suffix != NULL) {
+					ttl_cycles *= 4;
+				}
+				droppedUnit->TTL = GameCycle + ttl_cycles;
 			}
 		}
 	}
@@ -3394,8 +3398,12 @@ void DropOutAll(const CUnit &source)
 	}
 	
 	//Wyrmgus start
-	if (unit->Type->BoolFlag[ITEM_INDEX].value && unit->Prefix == NULL && unit->Suffix == NULL && !unit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
-		unit->TTL = GameCycle + (5 * 60 * CYCLES_PER_SECOND);
+	if (unit->Type->BoolFlag[ITEM_INDEX].value && !unit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
+		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
+		if (unit->Prefix != NULL || unit->Suffix != NULL) {
+			ttl_cycles *= 4;
+		}
+		unit->TTL = GameCycle + ttl_cycles;
 	}
 	//Wyrmgus end
 }

@@ -238,8 +238,12 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 	}
 	unit.Place(pos);
 
-	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Prefix == NULL && unit.Suffix == NULL && !unit.Unique) { //destroy items if they have been on the ground for too long
-		unit.TTL = GameCycle + (5 * 60 * CYCLES_PER_SECOND);
+	if (unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Unique) { //destroy items if they have been on the ground for too long
+		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
+		if (unit.Prefix != NULL || unit.Suffix != NULL) {
+			ttl_cycles *= 4;
+		}
+		unit.TTL = GameCycle + ttl_cycles;
 	}
 	//Wyrmgus end
 	//Wyrmgus start
