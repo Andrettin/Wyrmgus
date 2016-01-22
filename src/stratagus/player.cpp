@@ -2182,6 +2182,9 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 								faction_effects_string += "+";
 							}
 							faction_effects_string += std::to_string((long long) variable_difference);
+							if (j == BACKSTAB_INDEX || j == FIRERESISTANCE_INDEX || j == COLDRESISTANCE_INDEX || j == ARCANERESISTANCE_INDEX || j == LIGHTNINGRESISTANCE_INDEX || j == AIRRESISTANCE_INDEX || j == EARTHRESISTANCE_INDEX || j == WATERRESISTANCE_INDEX || j == HACKRESISTANCE_INDEX || j == PIERCERESISTANCE_INDEX || j == BLUNTRESISTANCE_INDEX || j == TIMEEFFICIENCYBONUS_INDEX) {
+								faction_effects_string += "%";
+							}
 							faction_effects_string += " ";
 							
 							std::string variable_name = UnitTypeVar.VariableNameLookup[j];
@@ -2233,6 +2236,9 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 											faction_effects_string += "+";
 										}
 										faction_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[j].Value);
+										if (j == BACKSTAB_INDEX || j == FIRERESISTANCE_INDEX || j == COLDRESISTANCE_INDEX || j == ARCANERESISTANCE_INDEX || j == LIGHTNINGRESISTANCE_INDEX || j == AIRRESISTANCE_INDEX || j == EARTHRESISTANCE_INDEX || j == WATERRESISTANCE_INDEX || j == HACKRESISTANCE_INDEX || j == PIERCERESISTANCE_INDEX || j == BLUNTRESISTANCE_INDEX || j == TIMEEFFICIENCYBONUS_INDEX) {
+											faction_effects_string += "%";
+										}
 										faction_effects_string += " ";
 											
 										std::string variable_name = UnitTypeVar.VariableNameLookup[j];
