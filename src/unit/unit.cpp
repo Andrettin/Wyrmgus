@@ -629,7 +629,9 @@ void CUnit::IncreaseLevel(int level_quantity)
 	UpdateXPRequired();
 	
 	if (Player->AiEnabled) {
-		while (this->Variable[LEVELUP_INDEX].Value > 0) {
+		bool upgrade_found = true;
+		while (this->Variable[LEVELUP_INDEX].Value > 0 && upgrade_found) {
+			upgrade_found = false;
 			if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
 				std::vector<CUnitType *> potential_upgrades;
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
@@ -643,6 +645,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 					this->Variable[LEVELUP_INDEX].Value -= 1;
 					this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 					TransformUnitIntoType(*this, *potential_upgrades[SyncRand(potential_upgrades.size())]);
+					upgrade_found = true;
 				}
 			}
 			
@@ -650,12 +653,13 @@ void CUnit::IncreaseLevel(int level_quantity)
 				if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
 					std::vector<CUpgrade *> potential_abilities;
 					for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-						if (!CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
+						if (CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
 							potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
 						}
 					}
 					if (potential_abilities.size() > 0) {
 						AbilityAcquire(*this, potential_abilities[SyncRand(potential_abilities.size())]);
+						upgrade_found = true;
 					}
 				}
 			}
