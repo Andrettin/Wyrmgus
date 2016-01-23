@@ -233,6 +233,10 @@ public:
 
 	// Graphics and sounds. Add something else here?
 	SoundConfig SoundWhenCast;  /// Sound played if cast
+	
+	//Wyrmgus start
+	bool ItemSpell[MaxItemClasses];
+	//Wyrmgus end
 
 	bool IsCasterOnly() const
 	{

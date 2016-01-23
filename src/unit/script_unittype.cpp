@@ -721,6 +721,9 @@ static int CclDefineUnitType(lua_State *l)
 			for (size_t i = 0; i < parent_type->DropAffixes.size(); ++i) {
 				type->DropAffixes.push_back(parent_type->DropAffixes[i]);
 			}
+			for (size_t i = 0; i < parent_type->DropSpells.size(); ++i) {
+				type->DropSpells.push_back(parent_type->DropSpells[i]);
+			}
 			for (size_t i = 0; i < parent_type->Affixes.size(); ++i) {
 				type->Affixes.push_back(parent_type->Affixes[i]);
 			}
@@ -1764,6 +1767,17 @@ static int CclDefineUnitType(lua_State *l)
 					type->DropAffixes.push_back(AllUpgrades[affix_id]);
 				} else {
 					type->DropAffixes.push_back(CUpgrade::New(affix_ident)); //if this affix doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
+				}
+			}
+		} else if (!strcmp(value, "DropSpells")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				value = LuaToString(l, -1, j + 1);
+				SpellType *spell = SpellTypeByIdent(value);
+				if (spell != NULL) {
+					type->DropSpells.push_back(spell);
+				} else {
+					LuaError(l, "Spell \"%s\" doesn't exist." _C_ value);
 				}
 			}
 		} else if (!strcmp(value, "Affixes")) {

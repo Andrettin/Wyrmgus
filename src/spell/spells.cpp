@@ -599,6 +599,9 @@ SpellType::SpellType(int slot, const std::string &ident) :
 	AutoCast(NULL), AICast(NULL), ForceUseAnimation(false)
 {
 	memset(Costs, 0, sizeof(Costs));
+	//Wyrmgus start
+	memset(ItemSpell, 0, sizeof(ItemSpell));
+	//Wyrmgus end
 }
 
 /**

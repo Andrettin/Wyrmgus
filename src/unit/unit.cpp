@@ -1295,7 +1295,7 @@ void CUnit::GenerateDrop()
 			
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 				int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-				if (droppedUnit->Prefix != NULL || droppedUnit->Suffix != NULL) {
+				if (droppedUnit->Prefix != NULL || droppedUnit->Suffix != NULL || droppedUnit->Spell != NULL) {
 					ttl_cycles *= 4;
 				}
 				droppedUnit->TTL = GameCycle + ttl_cycles;
@@ -1335,8 +1335,18 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GenerateSuffix(dropper);
 	}
+	if (this->Prefix == NULL && this->Suffix == NULL && SyncRand(100) >= (100 - magic_affix_chance)) {
+		this->GenerateSpell(dropper);
+	}
 	if (SyncRand(1000) >= (1000 - unique_chance)) {
 		this->GenerateUnique(dropper);
+	}
+	
+	if (
+		this->Prefix == NULL && this->Suffix == NULL && this->Spell == NULL
+		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass)
+	) { //scrolls and jewelry must always have a property
+		this->GenerateSpecialProperties(dropper);
 	}
 }
 			
@@ -1386,6 +1396,22 @@ void CUnit::GenerateSuffix(CUnit *dropper)
 	}
 }
 
+void CUnit::GenerateSpell(CUnit *dropper)
+{
+	std::vector<SpellType *> potential_spells;
+	if (dropper != NULL) {
+		for (size_t i = 0; i < dropper->Type->DropSpells.size(); ++i) {
+			if (this->Type->ItemClass != -1 && dropper->Type->DropSpells[i]->ItemSpell[Type->ItemClass]) {
+				potential_spells.push_back(dropper->Type->DropSpells[i]);
+			}
+		}
+	}
+	
+	if (potential_spells.size() > 0) {
+		SetSpell(potential_spells[SyncRand(potential_spells.size())]);
+	}
+}
+
 void CUnit::GenerateUnique(CUnit *dropper)
 {
 	std::vector<CUniqueItem *> potential_uniques;
@@ -1401,6 +1427,10 @@ void CUnit::GenerateUnique(CUnit *dropper)
 				UniqueItems[i]->Suffix == NULL
 				|| (dropper != NULL && std::find(dropper->Type->DropAffixes.begin(), dropper->Type->DropAffixes.end(), UniqueItems[i]->Suffix) != dropper->Type->DropAffixes.end())
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
+			)
+			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
+				UniqueItems[i]->Spell == NULL
+				|| (dropper != NULL && std::find(dropper->Type->DropSpells.begin(), dropper->Type->DropSpells.end(), UniqueItems[i]->Spell) != dropper->Type->DropSpells.end())
 			)
 			&& UniqueItems[i]->CanDrop()
 		) {
@@ -3404,7 +3434,7 @@ void DropOutAll(const CUnit &source)
 	//Wyrmgus start
 	if (unit->Type->BoolFlag[ITEM_INDEX].value && !unit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-		if (unit->Prefix != NULL || unit->Suffix != NULL) {
+		if (unit->Prefix != NULL || unit->Suffix != NULL || unit->Spell != NULL) {
 			ttl_cycles *= 4;
 		}
 		unit->TTL = GameCycle + ttl_cycles;

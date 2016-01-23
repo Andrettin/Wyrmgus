@@ -219,6 +219,7 @@ static int CclGetUniqueItemData(lua_State *l)
 				if (
 					(item->Prefix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Prefix) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Prefix) != item->Type->Affixes.end())
 					&& (item->Suffix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Suffix) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Suffix) != item->Type->Affixes.end())
+					&& (item->Spell == NULL || std::find(UnitTypes[i]->DropSpells.begin(), UnitTypes[i]->DropSpells.end(), item->Spell) != UnitTypes[i]->DropSpells.end())
 				) {
 					droppers.push_back(UnitTypes[i]);
 				}

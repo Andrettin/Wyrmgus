@@ -190,6 +190,7 @@ public:
 	void GenerateSpecialProperties(CUnit *dropper = NULL);
 	void GeneratePrefix(CUnit *dropper);
 	void GenerateSuffix(CUnit *dropper);
+	void GenerateSpell(CUnit *dropper);
 	void GenerateUnique(CUnit *dropper);
 	//Wyrmgus end
 	

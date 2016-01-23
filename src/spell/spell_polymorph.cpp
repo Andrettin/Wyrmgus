@@ -34,8 +34,15 @@
 
 #include "spell/spell_polymorph.h"
 
+//Wyrmgus start
+#include "action/action_upgradeto.h"
+#include "character.h"
+//Wyrmgus end
 #include "game.h"
 #include "map.h"
+//Wyrmgus start
+#include "network.h"
+//Wyrmgus end
 #include "script.h"
 #include "unit.h"
 //Wyrmgus start
@@ -61,12 +68,32 @@
 		} else if (!strcmp(value, "player-caster")) {
 			this->PlayerNeutral = 2;
 			--j;
+		//Wyrmgus start
+		} else if (!strcmp(value, "civilization")) {
+			value = LuaToString(l, -1, j + 1);
+			this->Civilization = PlayerRaces.GetRaceIndexByName(value);
+			if (this->Civilization == -1) {
+				fprintf(stderr, "Civilization %s doesn't exist.\n", value);
+			}
+		} else if (!strcmp(value, "faction")) {
+			value = LuaToString(l, -1, j + 1);
+			this->Faction = PlayerRaces.GetFactionIndexByName(this->Civilization, value);
+			if (this->Faction == -1) {
+				fprintf(stderr, "Faction %s doesn't exist.\n", value);
+			}
+		} else if (!strcmp(value, "detachment")) {
+			this->Detachment = true;
+			--j;
+		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported polymorph tag: %s" _C_ value);
 		}
 	}
 	// Now, checking value.
-	if (this->NewForm == NULL) {
+	//Wyrmgus start
+//	if (this->NewForm == NULL) {
+	if (this->NewForm == NULL && this->Civilization == -1 && this->Faction == -1 && !this->Detachment) {
+	//Wyrmgus end
 		LuaError(l, "Use a unittype for polymorph (with new-form)");
 	}
 }
@@ -86,11 +113,33 @@
 	if (!target) {
 		return 0;
 	}
-	CUnitType &type = *this->NewForm;
-	const Vec2i pos(goalPos - type.GetHalfTileSize());
+	CUnitType *type = this->NewForm;
+	//Wyrmgus start
+	if (this->NewForm == NULL) {
+		int new_unit_type = -1;
+		if (this->Civilization != -1 && this->Faction != -1 && PlayerRaces.Name[this->Civilization] == target->Type->Civilization) { //get faction equivalent, if is of the same civilization
+			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName(target->Type->Class));
+		}
+		if (this->Detachment && !target->Type->Civilization.empty() && !target->Type->Faction.empty()) {
+			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(PlayerRaces.GetRaceIndexByName(target->Type->Civilization.c_str()), GetUnitTypeClassIndexByName(target->Type->Class));
+		}
+		if (new_unit_type != -1) {
+			type = UnitTypes[new_unit_type];
+		}
+	}
+	if (type == NULL) {
+		return 0;
+	}
+//	const Vec2i pos(goalPos - type.GetHalfTileSize());
+	//Wyrmgus end
 
-	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
+	//Wyrmgus start
+//	caster.Player->Score += target->Variable[POINTS_INDEX].Value;
+	//Wyrmgus end
 	if (caster.IsEnemy(*target)) {
+		//Wyrmgus start
+		caster.Player->Score += target->Variable[POINTS_INDEX].Value;
+		//Wyrmgus end
 		if (target->Type->Building) {
 			caster.Player->TotalRazings++;
 		} else {
@@ -137,21 +186,45 @@
 	}
 
 	// as said somewhere else -- no corpses :)
-	target->Remove(NULL);
-	Vec2i offset;
+	//Wyrmgus start
+//	target->Remove(NULL);
+//	Vec2i offset;
+	//Wyrmgus end
 	caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
-	Vec2i resPos;
-	FindNearestDrop(type, pos, resPos, LookingW);
+	//Wyrmgus start
+//	Vec2i resPos;
+//	FindNearestDrop(type, pos, resPos, LookingW);
+	TransformUnitIntoType(*target, *type);
+	//Wyrmgus end
 	if (this->PlayerNeutral == 1) {
-		MakeUnitAndPlace(resPos, type, Players + PlayerNumNeutral);
+		//Wyrmgus start
+//		MakeUnitAndPlace(resPos, type, Players + PlayerNumNeutral);
+		target->ChangeOwner(Players[PlayerNumNeutral]);
+		//Wyrmgus end
 	} else if (this->PlayerNeutral == 2) {
-		MakeUnitAndPlace(resPos, type, caster.Player);
+		//Wyrmgus start
+//		MakeUnitAndPlace(resPos, type, caster.Player);
+		target->ChangeOwner(*caster.Player);
+		//Wyrmgus end
 	} else {
-		MakeUnitAndPlace(resPos, type, target->Player);
+		//Wyrmgus start
+//		MakeUnitAndPlace(resPos, type, target->Player);
+		//Wyrmgus end
 	}
-	UnitLost(*target);
-	UnitClearOrders(*target);
-	target->Release();
+	//Wyrmgus start
+	if (target->Character && (this->PlayerNeutral == 1 || this->PlayerNeutral == 2)) {
+		target->Player->Heroes.erase(std::remove(target->Player->Heroes.begin(), target->Player->Heroes.end(), target->Character->GetFullName()), target->Player->Heroes.end());
+		target->Character = NULL;
+		target->Player->UnitTypesNonHeroCount[target->Type->Slot]++;
+	}
+//	UnitLost(*target);
+//	UnitClearOrders(*target);
+//	target->Release();
+	if (!IsNetworkGame() && target->Character != NULL && target->Character->Persistent && target->Player->AiEnabled == false && &caster == target) { //save persistent data
+		target->Character->Type = const_cast<CUnitType *>(&(*type));
+		SaveHero(target->Character);
+	}
+	//Wyrmgus end
 	return 1;
 }
 

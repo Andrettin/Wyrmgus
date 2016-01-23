@@ -450,8 +450,18 @@ int PlayerRace::GetRaceIndexByName(const char *raceName) const
 //Wyrmgus start
 int PlayerRace::GetFactionIndexByName(const int civilization, const std::string faction_name) const
 {
-	if (civilization == -1 || faction_name.empty()) {
+	if (faction_name.empty()) {
 		return -1;
+	}
+	
+	if (civilization == -1) { //if the civilization is -1, then search all civilizations for this faction
+		for (int i = 0; i < MAX_RACES; ++i) {
+			int civilization_faction_index = PlayerRaces.GetFactionIndexByName(i, faction_name);
+			if (civilization_faction_index != -1) {
+				return civilization_faction_index;
+			}
+		}
+		return -1; //return -1 if found nothing
 	}
 	
 	if (FactionStringToIndex[civilization].find(faction_name) != FactionStringToIndex[civilization].end()) {
