@@ -305,8 +305,7 @@ class CFaction
 {
 public:
 	CFaction() : 
-		Name(""), Type(""), FactionUpgrade(""),
-		DefaultTier(FactionTierBarony), ParentFaction(-1),
+		ID(-1), Civilization(-1), DefaultTier(FactionTierBarony), ParentFaction(-1),
 		Playable(true) //factions are playable by default
 	{
 	}
@@ -314,6 +313,8 @@ public:
 	std::string Name;													/// faction name
 	std::string Type;													/// faction type (tribe or polity)
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
+	int ID;																/// faction ID
+	int Civilization;													/// faction civilization
 	int DefaultTier;													/// default faction tier
 	int ParentFaction;													/// parent faction of this faction
 	bool Playable;														/// faction playability

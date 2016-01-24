@@ -1852,6 +1852,8 @@ static int CclDefineFaction(lua_State *l)
 				if (!PlayerRaces.Factions[civilization][i] || PlayerRaces.Factions[civilization][i]->Name.empty()) {
 					PlayerRaces.Factions[civilization][i] = faction;
 					SetFactionStringToIndex(civilization, PlayerRaces.Factions[civilization][i]->Name, i);
+					faction->Civilization = civilization;
+					faction->ID = i;
 					break;
 				}
 			}
