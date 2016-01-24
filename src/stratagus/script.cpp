@@ -1186,7 +1186,11 @@ std::string EvalString(const StringDesc *s)
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL) {
 				if (!unit->Unique) {
-					return unit->Type->Quote;
+					if (unit->Work != NULL) {
+						return unit->Work->Quote;
+					} else {
+						return unit->Type->Quote;
+					}
 				} else {
 					return GetUniqueItem(unit->Name)->Quote;
 				}
