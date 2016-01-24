@@ -54,6 +54,7 @@
 #include "unit.h"
 #include "unit_find.h"
 #include "unittype.h"
+#include "upgrade.h"
 #include "video.h"
 
 enum {
@@ -208,10 +209,13 @@ enum {
 				} else {
 					unit.DeequipItem(*goal);
 				}
-			} else if (goal->Spell != NULL && CanCastSpell(unit, *goal->Spell, &unit, unit.tilePos)) {
+			} else if (unit.HasInventory() && goal->Spell != NULL && CanCastSpell(unit, *goal->Spell, &unit, unit.tilePos)) {
 				CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands);
-			} else if (goal->Work != NULL && unit.IndividualUpgrades[goal->Work->ID] == false) {
+			} else if (unit.HasInventory() && goal->Work != NULL && unit.IndividualUpgrades[goal->Work->ID] == false) {
 				unit.ReadWork(goal->Work);
+				if (unit.Player == ThisPlayer) {
+					unit.Player->Notify(NotifyGreen, unit.tilePos, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->Ident).c_str());
+				}
 			} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
 				if (unit.Player == ThisPlayer) {
 					unit.Player->Notify(NotifyGreen, unit.tilePos, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
@@ -240,7 +244,7 @@ enum {
 				}
 			} else { //cannot use
 				if (unit.Player == ThisPlayer) {
-					unit.Player->Notify(NotifyRed, unit.tilePos, _("%s cannot use %s."), unit.GetMessageName().c_str(), goal_name.c_str());
+					unit.Player->Notify(NotifyRed, unit.tilePos, _("%s cannot use %s"), unit.GetMessageName().c_str(), goal_name.c_str());
 				}
 				this->Finished = true;
 				return;
