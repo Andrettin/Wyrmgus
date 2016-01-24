@@ -80,7 +80,7 @@ $]
 #define DownButton 32
 
 //Wyrmgus start
-#define MaxItemClasses 16
+#define MaxItemClasses 19
 //Wyrmgus end
 
 $using std::string;

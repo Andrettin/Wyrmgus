@@ -137,6 +137,9 @@ class ConditionInfo
 {
 public:
 	ConditionInfo() : Alliance(0), Opponent(0), TargetSelf(0),
+		//Wyrmgus start
+		ThrustingWeapon(0),
+		//Wyrmgus end
 		BoolFlag(NULL), Variable(NULL), CheckFunc(NULL) {};
 	~ConditionInfo()
 	{
@@ -153,6 +156,9 @@ public:
 	char Alliance;          /// Target is allied. (neutral is neither allied, nor opponent)
 	char Opponent;          /// Target is opponent. (neutral is neither allied, nor opponent)
 	char TargetSelf;        /// Target is the same as the caster.
+	//Wyrmgus start
+	char ThrustingWeapon;	/// Caster has a thrusting weapon as the current weapon.
+	//Wyrmgus end
 
 	char *BoolFlag;         /// User defined boolean flag.
 

@@ -210,6 +210,13 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 			return false;
 		}
 	}
+	//Wyrmgus start
+	if (condition->ThrustingWeapon != CONDITION_TRUE) {
+		if ((condition->ThrustingWeapon == CONDITION_ONLY) ^ (caster.GetCurrentWeaponClass() == DaggerItemClass || caster.GetCurrentWeaponClass() == SwordItemClass || caster.GetCurrentWeaponClass() == ThrustingSwordItemClass || caster.GetCurrentWeaponClass() == SpearItemClass)) {
+			return false;
+		}
+	}
+	//Wyrmgus end
 	return true;
 }
 

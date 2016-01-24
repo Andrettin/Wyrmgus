@@ -182,6 +182,10 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			lua_rawgeti(l, -1, j + 1);
 			condition->CheckFunc = new LuaCallback(l, -1);
 			lua_pop(l, 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "thrusting-weapon")) {
+			condition->ThrustingWeapon = Ccl2Condition(l, LuaToString(l, -1, j + 1));
+		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[value];
 			if (index != -1) {
