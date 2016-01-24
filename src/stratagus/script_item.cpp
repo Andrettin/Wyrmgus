@@ -107,6 +107,14 @@ static int CclDefineUniqueItem(lua_State *l)
 			} else {
 				LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
 			}
+		} else if (!strcmp(value, "Work")) {
+			std::string affix_ident = LuaToString(l, -1);
+			int upgrade_id = UpgradeIdByIdent(affix_ident);
+			if (upgrade_id != -1) {
+				item->Work = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+			} else {
+				LuaError(l, "Literary work upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
+			}
 		} else if (!strcmp(value, "Description")) {
 			item->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
@@ -209,6 +217,13 @@ static int CclGetUniqueItemData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "Work")) {
+		if (item->Work != NULL) {
+			lua_pushstring(l, item->Work->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
 	} else if (!strcmp(data, "Droppers")) { // unit types which can drop this one
 		std::vector<CUnitType *> droppers;
 		for (size_t i = 0; i < UnitTypes.size(); ++i) {
@@ -220,6 +235,7 @@ static int CclGetUniqueItemData(lua_State *l)
 					(item->Prefix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Prefix) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Prefix) != item->Type->Affixes.end())
 					&& (item->Suffix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Suffix) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Suffix) != item->Type->Affixes.end())
 					&& (item->Spell == NULL || std::find(UnitTypes[i]->DropSpells.begin(), UnitTypes[i]->DropSpells.end(), item->Spell) != UnitTypes[i]->DropSpells.end())
+					&& (item->Work == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Work) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Work) != item->Type->Affixes.end())
 				) {
 					droppers.push_back(UnitTypes[i]);
 				}

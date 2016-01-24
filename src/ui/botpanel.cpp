@@ -425,11 +425,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				CUnit &unit = UnitManager.GetSlotUnit(button.Value);
 				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
 					if (i == BASICDAMAGE_INDEX) {
-						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetEquipmentVariableChange(&unit, i) != 0 || unit.Container->GetEquipmentVariableChange(&unit, PIERCINGDAMAGE_INDEX) != 0)) {
+						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetItemVariableChange(&unit, i) != 0 || unit.Container->GetItemVariableChange(&unit, PIERCINGDAMAGE_INDEX) != 0)) {
 							return false;
 						}
 					} else {
-						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetEquipmentVariableChange(&unit, i) != 0)) { //the former for some reason wasn't working with negative values
+						if ((condition->Variables[i] == CONDITION_ONLY) ^ (unit.Container->GetItemVariableChange(&unit, i) != 0)) { //the former for some reason wasn't working with negative values
 							return false;
 						}
 					}
@@ -486,6 +486,16 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 					return false;
 				}
 			}
+			if (condition->Work != CONDITION_TRUE) {
+				if ((condition->Work == CONDITION_ONLY) ^ (unit.Work != NULL)) {
+					return false;
+				}
+			}
+			if (condition->ReadWork != CONDITION_TRUE) {
+				if ((condition->ReadWork == CONDITION_ONLY) ^ (unit.Work != NULL && unit.Container->IndividualUpgrades[unit.Work->ID])) {
+					return false;
+				}
+			}
 			if (condition->Unique != CONDITION_TRUE) {
 				if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != NULL)) {
 					return false;
@@ -523,7 +533,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 			if (condition->Regeneration != CONDITION_TRUE) {
 				if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
-					if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.Container->GetEquipmentVariableChange(&unit, HITPOINTBONUS_INDEX, true) != 0)) {
+					if ((condition->Regeneration == CONDITION_ONLY) ^ (unit.Container->GetItemVariableChange(&unit, HITPOINTBONUS_INDEX, true) != 0)) {
 						return false;
 					}
 				} else {

@@ -103,7 +103,7 @@ class CUniqueItem
 {
 public:
 	CUniqueItem() :
-		ResourcesHeld(0), Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL)
+		ResourcesHeld(0), Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL)
 	{
 	}
 	
@@ -118,6 +118,7 @@ public:
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
 	SpellType *Spell;
+	CUpgrade *Work;
 };
 
 class CItem
@@ -125,7 +126,7 @@ class CItem
 public:
 	CItem() :
 		Unique(false), Bound(false),
-		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL)
+		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL)
 	{
 	}
 	
@@ -136,6 +137,7 @@ public:
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;
 	SpellType *Spell;
+	CUpgrade *Work;
 };
 
 /*----------------------------------------------------------------------------

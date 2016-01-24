@@ -354,6 +354,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				if (
 					(item->Prefix != NULL && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
 					|| (item->Suffix != NULL && UpgradeModifiers[z]->UpgradeId == item->Suffix->ID)
+					|| (item->Work != NULL && UpgradeModifiers[z]->UpgradeId == item->Work->ID)
 				) {
 					variable_value += UpgradeModifiers[z]->Modifier.Variables[var].Value;
 					variable_increase += UpgradeModifiers[z]->Modifier.Variables[var].Increase;

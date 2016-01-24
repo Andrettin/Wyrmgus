@@ -181,6 +181,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Spell != NULL) {
 		file.printf("\"spell\", \"%s\", ", unit.Spell->Ident.c_str());
 	}
+	if (unit.Work != NULL) {
+		file.printf("\"work\", \"%s\", ", unit.Work->Ident.c_str());
+	}
 	if (unit.Unique) {
 		file.printf("\"unique\", true, ");
 	}

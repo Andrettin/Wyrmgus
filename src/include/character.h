@@ -114,6 +114,7 @@ public:
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CUpgrade *> Abilities;
+	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CQuest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters
 	std::vector<CQuest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
 	std::vector<CItem *> Items;

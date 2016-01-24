@@ -389,11 +389,11 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 		//Wyrmgus start
 		case VariableChange:
 			val.type = USTRINT_INT;
-			val.i = unit.Container->GetEquipmentVariableChange(&unit, index);
+			val.i = unit.Container->GetItemVariableChange(&unit, index);
 			break;
 		case VariableIncreaseChange:
 			val.type = USTRINT_INT;
-			val.i = unit.Container->GetEquipmentVariableChange(&unit, index, true);
+			val.i = unit.Container->GetItemVariableChange(&unit, index, true);
 			break;
 		//Wyrmgus end
 	}

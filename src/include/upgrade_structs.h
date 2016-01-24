@@ -226,6 +226,7 @@ public:
 	int GrandStrategyCosts[MaxCosts];	/// costs for the upgrade for grand strategy mode
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode
 	int TechnologyPointCost;		/// technology point cost
+	int Work;
 	//Wyrmgus end
 	// TODO: not used by buttons
 	CIcon *Icon;                      /// icon to display to the user

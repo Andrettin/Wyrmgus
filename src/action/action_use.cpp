@@ -208,8 +208,10 @@ enum {
 				} else {
 					unit.DeequipItem(*goal);
 				}
-			} else if (goal->Spell != NULL) {
+			} else if (goal->Spell != NULL && CanCastSpell(unit, *goal->Spell, &unit, unit.tilePos)) {
 				CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands);
+			} else if (goal->Work != NULL && unit.IndividualUpgrades[goal->Work->ID] == false) {
+				unit.ReadWork(goal->Work);
 			} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
 				if (unit.Player == ThisPlayer) {
 					unit.Player->Notify(NotifyGreen, unit.tilePos, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());

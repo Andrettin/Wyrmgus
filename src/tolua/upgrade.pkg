@@ -29,6 +29,7 @@ class CUpgrade
 	int GrandStrategyCosts[MaxCosts];
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];
 	int TechnologyPointCost;
+	int Work;
 	//Wyrmgus end
 	CIcon *Icon;
 };

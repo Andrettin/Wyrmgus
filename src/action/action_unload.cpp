@@ -240,7 +240,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 
 	if (unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Unique) { //destroy items if they have been on the ground for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-		if (unit.Prefix != NULL || unit.Suffix != NULL || unit.Spell != NULL) {
+		if (unit.Prefix != NULL || unit.Suffix != NULL || unit.Spell != NULL || unit.Work != NULL) {
 			ttl_cycles *= 4;
 		}
 		unit.TTL = GameCycle + ttl_cycles;

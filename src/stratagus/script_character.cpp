@@ -207,6 +207,18 @@ static int CclDefineCharacter(lua_State *l)
 					fprintf(stderr, "Ability \"%s\" doesn't exist.", ability_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "ReadWorks")) {
+			character->ReadWorks.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string work_ident = LuaToString(l, -1, j + 1);
+				int work_id = UpgradeIdByIdent(work_ident);
+				if (work_id != -1) {
+					character->ReadWorks.push_back(AllUpgrades[work_id]);
+				} else {
+					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Items")) {
 			character->Items.clear();
 			const int args = lua_rawlen(l, -1);
@@ -253,6 +265,14 @@ static int CclDefineCharacter(lua_State *l)
 						} else {
 							fprintf(stderr, "Spell \"%s\" doesn't exist.", spell_ident.c_str());
 						}
+					} else if (!strcmp(value, "work")) {
+						std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+						if (upgrade_id != -1) {
+							item->Work = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						} else {
+							fprintf(stderr, "Literary work \"%s\" doesn't exist.", upgrade_ident.c_str());
+						}
 					} else if (!strcmp(value, "name")) {
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
@@ -273,6 +293,9 @@ static int CclDefineCharacter(lua_State *l)
 							}
 							if (unique_item->Spell != NULL) {
 								item->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
+							}
+							if (unique_item->Work != NULL) {
+								item->Work = const_cast<CUpgrade *>(&(*unique_item->Work));
 							}
 						} else {
 							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item->Name.c_str());
@@ -419,6 +442,18 @@ static int CclDefineCustomHero(lua_State *l)
 					fprintf(stderr, "Ability \"%s\" doesn't exist.", ability_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "ReadWorks")) {
+			hero->ReadWorks.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string work_ident = LuaToString(l, -1, j + 1);
+				int work_id = UpgradeIdByIdent(work_ident);
+				if (work_id != -1) {
+					hero->ReadWorks.push_back(AllUpgrades[work_id]);
+				} else {
+					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Items")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -464,6 +499,14 @@ static int CclDefineCustomHero(lua_State *l)
 						} else {
 							fprintf(stderr, "Spell \"%s\" doesn't exist.", spell_ident.c_str());
 						}
+					} else if (!strcmp(value, "work")) {
+						std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+						if (upgrade_id != -1) {
+							item->Work = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						} else {
+							fprintf(stderr, "Literary work \"%s\" doesn't exist.", upgrade_ident.c_str());
+						}
 					} else if (!strcmp(value, "name")) {
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
@@ -484,6 +527,9 @@ static int CclDefineCustomHero(lua_State *l)
 							}
 							if (unique_item->Spell != NULL) {
 								item->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
+							}
+							if (unique_item->Work != NULL) {
+								item->Work = const_cast<CUpgrade *>(&(*unique_item->Work));
 							}
 						} else {
 							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item->Name.c_str());

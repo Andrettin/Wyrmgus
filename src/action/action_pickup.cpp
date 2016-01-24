@@ -215,6 +215,9 @@ enum {
 				if (goal->Spell != NULL) {
 					item->Spell = const_cast<SpellType *>(&(*goal->Spell));
 				}
+				if (goal->Work != NULL) {
+					item->Work = const_cast<CUpgrade *>(&(*goal->Work));
+				}
 				if (goal->Unique) {
 					item->Name = goal->Name;
 					item->Unique = goal->Unique;

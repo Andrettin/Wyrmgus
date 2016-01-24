@@ -342,6 +342,8 @@ static int CclUnit(lua_State *l)
 			unit->Suffix = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "spell")) {
 			unit->Spell = SpellTypeByIdent(LuaToString(l, 2, j + 1));
+		} else if (!strcmp(value, "work")) {
+			unit->Work = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
 			unit->Unique = LuaToBoolean(l, 2, j + 1);
 			if (unit->Unique) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
@@ -359,6 +361,9 @@ static int CclUnit(lua_State *l)
 				}
 				if (unique_item->Spell != NULL) {
 					unit->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
+				}
+				if (unique_item->Work != NULL) {
+					unit->Work = const_cast<CUpgrade *>(&(*unique_item->Work));
 				}
 			}
 		} else if (!strcmp(value, "bound")) {
@@ -1480,6 +1485,12 @@ static int CclGetUnitVariable(lua_State *l)
 		} else {
 			lua_pushstring(l, "");
 		}
+	} else if (!strcmp(value, "Work")) {
+		if (unit->Work != NULL) {
+			lua_pushstring(l, unit->Work->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 	} else if (!strcmp(value, "Icon")) {
 		lua_pushstring(l, unit->GetIcon().Name.c_str());
 		return 1;
@@ -1632,6 +1643,14 @@ static int CclSetUnitVariable(lua_State *l)
 			unit->SetSpell(SpellTypeByIdent(spell_ident));
 		} else {
 			LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
+		}
+	} else if (!strcmp(name, "Work")) { //add a literary work property to the unit
+		LuaCheckArgs(l, 3);
+		std::string upgrade_ident = LuaToString(l, 3);
+		if (CUpgrade::Get(upgrade_ident)) {
+			unit->SetWork(CUpgrade::Get(upgrade_ident));
+		} else {
+			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 		}
 	} else if (!strcmp(name, "Unique")) { //set the unit to a particular unique unit
 		LuaCheckArgs(l, 3);
