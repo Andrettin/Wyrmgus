@@ -224,7 +224,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	const CUnitType &type = *unit.Type;
 	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
-			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			//Wyrmgus start
+//			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			//Wyrmgus end
 				dest.Blink = 4;
 				SendCommandResource(unit, dest, flush);
 				if (!acknowledged) {
@@ -241,6 +244,9 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 						acknowledged = 1;
 					}
 					SendCommandReturnGoods(unit, depot, flush);
+					//Wyrmgus start
+					SendCommandResource(unit, dest, 0);
+					//Wyrmgus end
 					return true;
 				}
 			}
@@ -248,7 +254,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	// make unit build harvesting building on top if right-clicked
 	} else if (res && type.ResInfo[res] && !dest.Type->BoolFlag[CANHARVEST_INDEX].value
 		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
-			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			//Wyrmgus start
+//			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+			//Wyrmgus end
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
 					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1)) {
 						dest.Blink = 4;
@@ -269,6 +278,13 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 						acknowledged = 1;
 					}
 					SendCommandReturnGoods(unit, depot, flush);
+					//Wyrmgus start
+					for (size_t z = 0; z < UnitTypes.size(); ++z) {
+						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1)) {
+							SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0);
+						}
+					}
+					//Wyrmgus end
 					return true;
 				}
 			}
@@ -290,13 +306,37 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 //			&& type.ResInfo[res]->TerrainHarvester
 			//Wyrmgus end
 			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
-			&& ((unit.CurrentResource != res)
-				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
+			//Wyrmgus start
+//			&& ((unit.CurrentResource != res)
+//				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
+			) {
+			//Wyrmgus end
+			//Wyrmgus start
+			/*
 			SendCommandResourceLoc(unit, pos, flush);
 			if (!acknowledged) {
 				PlayUnitSound(unit, VoiceHarvesting);
 				acknowledged = 1;
 			}
+			*/
+			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
+				SendCommandResourceLoc(unit, pos, flush);
+				if (!acknowledged) {
+					PlayUnitSound(unit, VoiceHarvesting);
+					acknowledged = 1;
+				}
+			} else {
+				CUnit *depot = FindDeposit(unit, 1000, unit.CurrentResource);
+				if (depot) {
+					if (!acknowledged) {
+						PlayUnitSound(unit, VoiceAcknowledging);
+						acknowledged = 1;
+					}
+					SendCommandReturnGoods(unit, depot, flush);
+					SendCommandResourceLoc(unit, pos, 0);
+				}
+			}
+			//Wyrmgus end
 			return true;
 		}
 	}
