@@ -795,9 +795,9 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 			}
 			int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
-				LanguageNoun *noun = new LanguageNoun;
-				noun->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.LanguageNouns[civilization][k / 2] = noun;
+				LanguageWord *word = new LanguageWord;
+				word->Word = LuaToString(l, j + 1, k + 1);
+				PlayerRaces.LanguageWords[civilization][k / 2] = word;
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -808,67 +808,61 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					const char *value = LuaToString(l, -1, n + 1);
 					if (!strcmp(value, "meaning")) {
 						++n;
-						noun->Meaning = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "verb")) {
-						++n;
-						noun->Verb = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "adjective")) {
-						++n;
-						noun->Adjective = LuaToString(l, -1, n + 1);
+						word->Meaning = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "singular-nominative")) {
 						++n;
-						noun->SingularNominative = LuaToString(l, -1, n + 1);
+						word->SingularNominative = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "singular-accusative")) {
 						++n;
-						noun->SingularAccusative = LuaToString(l, -1, n + 1);
+						word->SingularAccusative = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "singular-dative")) {
 						++n;
-						noun->SingularDative = LuaToString(l, -1, n + 1);
+						word->SingularDative = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "singular-genitive")) {
 						++n;
-						noun->SingularGenitive = LuaToString(l, -1, n + 1);
+						word->SingularGenitive = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "plural-nominative")) {
 						++n;
-						noun->PluralNominative = LuaToString(l, -1, n + 1);
+						word->PluralNominative = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "plural-accusative")) {
 						++n;
-						noun->PluralAccusative = LuaToString(l, -1, n + 1);
+						word->PluralAccusative = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "plural-dative")) {
 						++n;
-						noun->PluralDative = LuaToString(l, -1, n + 1);
+						word->PluralDative = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "plural-genitive")) {
 						++n;
-						noun->PluralGenitive = LuaToString(l, -1, n + 1);
+						word->PluralGenitive = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "gender")) {
 						++n;
-						noun->Gender = LuaToString(l, -1, n + 1);
+						word->Gender = LuaToString(l, -1, n + 1);
 					} else if (!strcmp(value, "uncountable")) {
 						++n;
-						noun->Uncountable = LuaToBoolean(l, -1, n + 1);
+						word->Uncountable = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "name-singular")) {
 						++n;
-						noun->NameSingular = LuaToBoolean(l, -1, n + 1);
+						word->NameSingular = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "name-plural")) {
 						++n;
-						noun->NamePlural = LuaToBoolean(l, -1, n + 1);
+						word->NamePlural = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-singular")) {
 						++n;
-						noun->PrefixSingular = LuaToBoolean(l, -1, n + 1);
+						word->PrefixSingular = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "prefix-plural")) {
 						++n;
-						noun->PrefixPlural = LuaToBoolean(l, -1, n + 1);
+						word->PrefixPlural = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-singular")) {
 						++n;
-						noun->SuffixSingular = LuaToBoolean(l, -1, n + 1);
+						word->SuffixSingular = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "suffix-plural")) {
 						++n;
-						noun->SuffixPlural = LuaToBoolean(l, -1, n + 1);
+						word->SuffixPlural = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-singular")) {
 						++n;
-						noun->InfixSingular = LuaToBoolean(l, -1, n + 1);
+						word->InfixSingular = LuaToBoolean(l, -1, n + 1);
 					} else if (!strcmp(value, "infix-plural")) {
 						++n;
-						noun->InfixPlural = LuaToBoolean(l, -1, n + 1);
+						word->InfixPlural = LuaToBoolean(l, -1, n + 1);
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -1139,15 +1133,15 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 **
 **  @param l  Lua state.
 */
-static int CclDefineLanguageNoun(lua_State *l)
+static int CclDefineLanguageWord(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
 	if (!lua_istable(l, 2)) {
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	LanguageNoun *noun = new LanguageNoun;
-	noun->Word = LuaToString(l, 1);
+	LanguageWord *word = new LanguageWord;
+	word->Word = LuaToString(l, 1);
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1158,81 +1152,81 @@ static int CclDefineLanguageNoun(lua_State *l)
 			
 			if (civilization != -1) {
 				for (int i = 0; i < LanguageWordMax; ++i) {
-					if (!PlayerRaces.LanguageNouns[civilization][i] || PlayerRaces.LanguageNouns[civilization][i]->Word.empty()) {
-						PlayerRaces.LanguageNouns[civilization][i] = noun;
+					if (!PlayerRaces.LanguageWords[civilization][i] || PlayerRaces.LanguageWords[civilization][i]->Word.empty()) {
+						PlayerRaces.LanguageWords[civilization][i] = word;
 						break;
 					}
 				}
 			}
 		} else if (!strcmp(value, "Meaning")) {
-			noun->Meaning = LuaToString(l, -1);
+			word->Meaning = LuaToString(l, -1);
 		} else if (!strcmp(value, "SingularNominative")) {
-			noun->SingularNominative = LuaToString(l, -1);
+			word->SingularNominative = LuaToString(l, -1);
 		} else if (!strcmp(value, "SingularAccusative")) {
-			noun->SingularAccusative = LuaToString(l, -1);
+			word->SingularAccusative = LuaToString(l, -1);
 		} else if (!strcmp(value, "SingularDative")) {
-			noun->SingularDative = LuaToString(l, -1);
+			word->SingularDative = LuaToString(l, -1);
 		} else if (!strcmp(value, "SingularGenitive")) {
-			noun->SingularGenitive = LuaToString(l, -1);
+			word->SingularGenitive = LuaToString(l, -1);
 		} else if (!strcmp(value, "PluralNominative")) {
-			noun->PluralNominative = LuaToString(l, -1);
+			word->PluralNominative = LuaToString(l, -1);
 		} else if (!strcmp(value, "PluralAccusative")) {
-			noun->PluralAccusative = LuaToString(l, -1);
+			word->PluralAccusative = LuaToString(l, -1);
 		} else if (!strcmp(value, "PluralDative")) {
-			noun->PluralDative = LuaToString(l, -1);
+			word->PluralDative = LuaToString(l, -1);
 		} else if (!strcmp(value, "PluralGenitive")) {
-			noun->PluralGenitive = LuaToString(l, -1);
+			word->PluralGenitive = LuaToString(l, -1);
 		} else if (!strcmp(value, "Gender")) {
-			noun->Gender = LuaToString(l, -1);
+			word->Gender = LuaToString(l, -1);
 		} else if (!strcmp(value, "Uncountable")) {
-			noun->Uncountable = LuaToBoolean(l, -1);
+			word->Uncountable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NameSingular")) {
-			noun->NameSingular = LuaToBoolean(l, -1);
+			word->NameSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NamePlural")) {
-			noun->NamePlural = LuaToBoolean(l, -1);
+			word->NamePlural = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "TypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				noun->TypeName.push_back(LuaToString(l, -1, k + 1));
+				word->TypeName.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else if (!strcmp(value, "PrefixSingular")) {
-			noun->PrefixSingular = LuaToBoolean(l, -1);
+			word->PrefixSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixPlural")) {
-			noun->PrefixPlural = LuaToBoolean(l, -1);
+			word->PrefixPlural = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "PrefixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				noun->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
+				word->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else if (!strcmp(value, "SuffixSingular")) {
-			noun->SuffixSingular = LuaToBoolean(l, -1);
+			word->SuffixSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixPlural")) {
-			noun->SuffixPlural = LuaToBoolean(l, -1);
+			word->SuffixPlural = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				noun->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
+				word->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else if (!strcmp(value, "InfixSingular")) {
-			noun->InfixSingular = LuaToBoolean(l, -1);
+			word->InfixSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixPlural")) {
-			noun->InfixPlural = LuaToBoolean(l, -1);
+			word->InfixPlural = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				noun->InfixTypeName.push_back(LuaToString(l, -1, k + 1));
+				word->InfixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2583,7 +2577,7 @@ void PlayerCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "DefineCivilization", CclDefineCivilization);
 	lua_register(Lua, "DefineCivilizationLanguage", CclDefineCivilizationLanguage);
-	lua_register(Lua, "DefineLanguageNoun", CclDefineLanguageNoun);
+	lua_register(Lua, "DefineLanguageWord", CclDefineLanguageWord);
 	lua_register(Lua, "DefineLanguageVerb", CclDefineLanguageVerb);
 	lua_register(Lua, "DefineLanguageAdjective", CclDefineLanguageAdjective);
 	lua_register(Lua, "DefineLanguagePronoun", CclDefineLanguagePronoun);
