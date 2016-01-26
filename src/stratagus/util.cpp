@@ -879,7 +879,7 @@ std::string GenerateName(int language, std::string type)
 		PlayerRaces.Languages[language]->LanguageNouns.size() > 0
 		|| PlayerRaces.Languages[language]->LanguageVerbs.size() > 0
 		|| PlayerRaces.Languages[language]->LanguageAdjectives.size() > 0
-		|| PlayerRaces.Languages[language]->LanguageAdjectives.size() > 0
+		|| PlayerRaces.Languages[language]->LanguageNumerals.size() > 0
 	) {
 		int noun_name_count = 0;
 		std::string noun_names[PersonalNameMax];

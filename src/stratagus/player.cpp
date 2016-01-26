@@ -355,6 +355,47 @@ std::map<std::string, int> FactionStringToIndex[MAX_RACES];
 */
 void PlayerRace::Clean()
 {
+	//Wyrmgus start
+	if (this->Count > 0) { //don't clean the languages if first defining the civilizations
+		for (size_t i = 0; i < this->Languages.size(); ++i) {
+			for (size_t j = 0; j < this->Languages[i]->LanguageNouns.size(); ++j) {
+				delete this->Languages[i]->LanguageNouns[j];
+			}
+			this->Languages[i]->LanguageNouns.clear();
+			
+			for (size_t j = 0; j < this->Languages[i]->LanguageVerbs.size(); ++j) {
+				delete this->Languages[i]->LanguageVerbs[j];
+			}
+			this->Languages[i]->LanguageVerbs.clear();
+			
+			for (size_t j = 0; j < this->Languages[i]->LanguageAdjectives.size(); ++j) {
+				delete this->Languages[i]->LanguageAdjectives[j];
+			}
+			this->Languages[i]->LanguageAdjectives.clear();
+			
+			for (size_t j = 0; j < this->Languages[i]->LanguagePronouns.size(); ++j) {
+				delete this->Languages[i]->LanguagePronouns[j];
+			}
+			this->Languages[i]->LanguagePronouns.clear();
+			
+			for (size_t j = 0; j < this->Languages[i]->LanguageAdverbs.size(); ++j) {
+				delete this->Languages[i]->LanguageAdverbs[j];
+			}
+			this->Languages[i]->LanguageAdverbs.clear();
+			
+			for (size_t j = 0; j < this->Languages[i]->LanguageConjunctions.size(); ++j) {
+				delete this->Languages[i]->LanguageConjunctions[j];
+			}
+			this->Languages[i]->LanguageConjunctions.clear();
+			
+			for (size_t j = 0; j < this->Languages[i]->LanguageNumerals.size(); ++j) {
+				delete this->Languages[i]->LanguageNumerals[j];
+			}
+			this->Languages[i]->LanguageNumerals.clear();
+			
+		}
+	}
+	//Wyrmgus end
 	for (unsigned int i = 0; i != this->Count; ++i) {
 		this->Name[i].clear();
 		this->Display[i].clear();
@@ -402,45 +443,6 @@ void PlayerRace::Clean()
 		//Wyrmgus end
 	}
 	this->Count = 0;
-	//Wyrmgus start
-	for (size_t i = 0; i < this->Languages.size(); ++i) {
-		for (size_t j = 0; j < this->Languages[i]->LanguageNouns.size(); ++j) {
-			delete this->Languages[i]->LanguageNouns[j];
-		}
-		this->Languages[i]->LanguageNouns.clear();
-		
-		for (size_t j = 0; j < this->Languages[i]->LanguageVerbs.size(); ++j) {
-			delete this->Languages[i]->LanguageVerbs[j];
-		}
-		this->Languages[i]->LanguageVerbs.clear();
-		
-		for (size_t j = 0; j < this->Languages[i]->LanguageAdjectives.size(); ++j) {
-			delete this->Languages[i]->LanguageAdjectives[j];
-		}
-		this->Languages[i]->LanguageAdjectives.clear();
-		
-		for (size_t j = 0; j < this->Languages[i]->LanguagePronouns.size(); ++j) {
-			delete this->Languages[i]->LanguagePronouns[j];
-		}
-		this->Languages[i]->LanguagePronouns.clear();
-		
-		for (size_t j = 0; j < this->Languages[i]->LanguageAdverbs.size(); ++j) {
-			delete this->Languages[i]->LanguageAdverbs[j];
-		}
-		this->Languages[i]->LanguageAdverbs.clear();
-		
-		for (size_t j = 0; j < this->Languages[i]->LanguageConjunctions.size(); ++j) {
-			delete this->Languages[i]->LanguageConjunctions[j];
-		}
-		this->Languages[i]->LanguageConjunctions.clear();
-		
-		for (size_t j = 0; j < this->Languages[i]->LanguageNumerals.size(); ++j) {
-			delete this->Languages[i]->LanguageNumerals[j];
-		}
-		this->Languages[i]->LanguageNumerals.clear();
-		
-	}
-	//Wyrmgus end
 }
 
 int PlayerRace::GetRaceIndexByName(const char *raceName) const
