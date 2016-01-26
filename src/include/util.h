@@ -158,9 +158,9 @@ extern std::string FullyDecapitalizeString(std::string text);		/// Make every pa
 extern std::string IdentToName(std::string text);					/// Make the ident string become a display name
 extern std::string NameToIdent(std::string text);					/// Make the name be formatted like an ident string
 extern std::string SeparateCapitalizedStringElements(std::string text);	/// Make the string's capitalized elements become separated
-extern std::string GeneratePersonalName(int civilization, int unit_type_id);	/// Generates a personal name
-extern std::string GeneratePersonalName(std::string civilization_name, std::string unit_type_ident);
-extern std::string GenerateName(int civilization, std::string type);	/// Generates a name
+extern std::string GeneratePersonalName(int language, int unit_type_id);	/// Generates a personal name
+extern std::string GeneratePersonalName(std::string language_ident, std::string unit_type_ident);
+extern std::string GenerateName(int language, std::string type);	/// Generates a name
 //Wyrmgus end
 
 #endif /* __UTIL_H__ */

@@ -374,6 +374,7 @@ void PlayerRace::Clean()
 		this->Species[i].clear();
 		this->DefaultColor[i].clear();
 		this->ParentCivilization[i] = -1;
+		this->CivilizationLanguage[i] = -1;
 		for (unsigned int j = 0; j < FactionMax; ++j) {
 			if (this->Factions[i][j]) {
 				delete this->Factions[i][j];
@@ -398,32 +399,48 @@ void PlayerRace::Clean()
 			delete this->Deities[i][j];
 		}
 		this->Deities[i].clear();
-		for (int j = 0; j < LanguageWordMax; ++j) {
-			if (this->LanguageNouns[i][j]) {
-				delete this->LanguageNouns[i][j];
-			}
-			if (this->LanguageVerbs[i][j]) {
-				delete this->LanguageVerbs[i][j];
-			}
-			if (this->LanguageAdjectives[i][j]) {
-				delete this->LanguageAdjectives[i][j];
-			}
-			if (this->LanguagePronouns[i][j]) {
-				delete this->LanguagePronouns[i][j];
-			}
-			if (this->LanguageAdverbs[i][j]) {
-				delete this->LanguageAdverbs[i][j];
-			}
-			if (this->LanguageConjunctions[i][j]) {
-				delete this->LanguageConjunctions[i][j];
-			}
-			if (this->LanguageNumerals[i][j]) {
-				delete this->LanguageNumerals[i][j];
-			}
-		}
 		//Wyrmgus end
 	}
 	this->Count = 0;
+	//Wyrmgus start
+	for (size_t i = 0; i < this->Languages.size(); ++i) {
+		for (size_t j = 0; j < this->Languages[i]->LanguageNouns.size(); ++j) {
+			delete this->Languages[i]->LanguageNouns[j];
+		}
+		this->Languages[i]->LanguageNouns.clear();
+		
+		for (size_t j = 0; j < this->Languages[i]->LanguageVerbs.size(); ++j) {
+			delete this->Languages[i]->LanguageVerbs[j];
+		}
+		this->Languages[i]->LanguageVerbs.clear();
+		
+		for (size_t j = 0; j < this->Languages[i]->LanguageAdjectives.size(); ++j) {
+			delete this->Languages[i]->LanguageAdjectives[j];
+		}
+		this->Languages[i]->LanguageAdjectives.clear();
+		
+		for (size_t j = 0; j < this->Languages[i]->LanguagePronouns.size(); ++j) {
+			delete this->Languages[i]->LanguagePronouns[j];
+		}
+		this->Languages[i]->LanguagePronouns.clear();
+		
+		for (size_t j = 0; j < this->Languages[i]->LanguageAdverbs.size(); ++j) {
+			delete this->Languages[i]->LanguageAdverbs[j];
+		}
+		this->Languages[i]->LanguageAdverbs.clear();
+		
+		for (size_t j = 0; j < this->Languages[i]->LanguageConjunctions.size(); ++j) {
+			delete this->Languages[i]->LanguageConjunctions[j];
+		}
+		this->Languages[i]->LanguageConjunctions.clear();
+		
+		for (size_t j = 0; j < this->Languages[i]->LanguageNumerals.size(); ++j) {
+			delete this->Languages[i]->LanguageNumerals[j];
+		}
+		this->Languages[i]->LanguageNumerals.clear();
+		
+	}
+	//Wyrmgus end
 }
 
 int PlayerRace::GetRaceIndexByName(const char *raceName) const
@@ -481,6 +498,16 @@ int PlayerRace::GetDeityIndexByName(const int civilization, std::string deity_na
 	return -1;
 }
 
+int PlayerRace::GetLanguageIndexByIdent(std::string language_ident) const
+{
+	for (size_t i = 0; i < this->Languages.size(); ++i) {
+		if (language_ident == this->Languages[i]->Ident) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
 {
 	if (civilization == -1 || class_id == -1) {
@@ -492,10 +519,7 @@ int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
 	}
 	
 	if (PlayerRaces.ParentCivilization[civilization] != -1) {
-		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
-		if (parent_civilization != -1) {
-			return GetCivilizationClassUnitType(parent_civilization, class_id);
-		}
+		return GetCivilizationClassUnitType(PlayerRaces.ParentCivilization[civilization], class_id);
 	}
 	
 	return -1;
@@ -512,10 +536,7 @@ int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
 	}
 	
 	if (PlayerRaces.ParentCivilization[civilization] != -1) {
-		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
-		if (parent_civilization != -1) {
-			return GetCivilizationClassUpgrade(parent_civilization, class_id);
-		}
+		return GetCivilizationClassUpgrade(PlayerRaces.ParentCivilization[civilization], class_id);
 	}
 	
 	return -1;
@@ -559,21 +580,40 @@ int PlayerRace::GetFactionClassUpgrade(int civilization, int faction, int class_
 	return GetCivilizationClassUpgrade(civilization, class_id);
 }
 
-bool PlayerRace::RequiresPlural(std::string word, int civilization) const
+int PlayerRace::GetCivilizationLanguage(int civilization)
 {
-	for (int i = 0; i < LanguageWordMax; ++i) {
-		if (!PlayerRaces.LanguageNumerals[civilization][i]) { //we only need to check numerals, as other sorts of words don't require plural
-			break;
+	if (civilization == -1) {
+		return -1;
+	}
+	
+	if (CivilizationLanguage[civilization] != -1) {
+		return CivilizationLanguage[civilization];
+	}
+	
+	if (PlayerRaces.ParentCivilization[civilization] != -1) {
+		return GetCivilizationLanguage(PlayerRaces.ParentCivilization[civilization]);
+	}
+	
+	return -1;
+}
+
+int PlayerRace::GetFactionLanguage(int civilization, int faction)
+{
+	if (civilization == -1) {
+		return -1;
+	}
+	
+	if (faction != -1) {
+		if (Factions[civilization][faction]->Language != -1) {
+			return Factions[civilization][faction]->Language;
 		}
-		if (!PlayerRaces.LanguageNumerals[civilization][i]->Word.empty() && PlayerRaces.LanguageNumerals[civilization][i]->Word == word) {
-			if (PlayerRaces.LanguageNumerals[civilization][i]->Number > 1) {
-				return true;
-			} else {
-				return false;
-			}
+		
+		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
+			return GetFactionLanguage(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction);
 		}
 	}
-	return false;
+	
+	return GetCivilizationLanguage(civilization);
 }
 
 /**

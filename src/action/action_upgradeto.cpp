@@ -242,7 +242,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		if (!new_personal_name.empty()) {
 			unit.Name = new_personal_name;
 		} else {
-			unit.Name = GeneratePersonalName(PlayerRaces.GetRaceIndexByName(unit.Type->Civilization.c_str()), unit.Type->Slot);
+			int civilization = PlayerRaces.GetRaceIndexByName(unit.Type->Civilization.c_str());
+			int language = PlayerRaces.GetCivilizationLanguage(civilization);
+			if (civilization != -1 && !unit.Type->Faction.empty()) {
+				language = PlayerRaces.GetFactionLanguage(civilization, PlayerRaces.GetFactionIndexByName(civilization, unit.Type->Faction));
+			}
+			unit.Name = GeneratePersonalName(language, unit.Type->Slot);
 		}
 	}
 	//Wyrmgus end

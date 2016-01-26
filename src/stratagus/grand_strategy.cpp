@@ -1761,7 +1761,7 @@ void CProvince::SetCivilization(int civilization)
 					}
 				}
 				if (new_tile_name == "") { // if trying to translate all cultural names failed, generate a new name
-					new_tile_name = GenerateName(civilization, "terrain-" + NameToIdent(GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name));
+					new_tile_name = GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "terrain-" + NameToIdent(GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name));
 				}
 				if (new_tile_name != "") {
 					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = new_tile_name;
@@ -2412,7 +2412,7 @@ std::string CProvince::GenerateProvinceName(int civilization)
 		return this->CulturalSettlementNames[civilization];
 	}
 	
-	return GenerateName(civilization, "province");
+	return GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "province");
 }
 
 /**
@@ -2429,7 +2429,7 @@ std::string CProvince::GenerateSettlementName(int civilization)
 		return GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization];
 	}
 	
-	return GenerateName(civilization, "settlement");
+	return GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "settlement");
 }
 
 void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting)
@@ -2796,7 +2796,11 @@ void CGrandStrategyFaction::GenerateRuler()
 	}
 	
 	int civilization = PlayerRaces.GetRaceIndexByName(UnitTypes[unit_type_id]->Civilization.c_str()); //use unit type's civilization, so that names can be generated even for civilizations for which we don't have personal name language data defined
-	std::string hero_name = GeneratePersonalName(civilization, unit_type_id);
+	int language = PlayerRaces.GetCivilizationLanguage(civilization);
+	if (civilization != -1 && this->Civilization == civilization && this->Faction != -1) {
+		language = PlayerRaces.GetFactionLanguage(civilization, this->Faction);
+	}
+	std::string hero_name = GeneratePersonalName(language, unit_type_id);
 	
 	if (hero_name.empty()) { //if civilization can't generate personal names, return
 		return;
@@ -2804,9 +2808,9 @@ void CGrandStrategyFaction::GenerateRuler()
 	
 	std::string hero_extra_name;
 	if (GrandStrategyGame.GetHero(hero_name) != NULL) { // generate extra given names if this name is already used by an existing hero
-		hero_extra_name = GeneratePersonalName(civilization, unit_type_id);
+		hero_extra_name = GeneratePersonalName(language, unit_type_id);
 		while (GrandStrategyGame.GetHero(hero_name + " " + hero_extra_name) != NULL) {
-			hero_extra_name += " " + GeneratePersonalName(civilization, unit_type_id);
+			hero_extra_name += " " + GeneratePersonalName(language, unit_type_id);
 		}
 	}
 	CGrandStrategyHero *hero = new CGrandStrategyHero;

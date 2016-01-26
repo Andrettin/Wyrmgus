@@ -305,7 +305,7 @@ class CFaction
 {
 public:
 	CFaction() : 
-		ID(-1), Civilization(-1), DefaultTier(FactionTierBarony), ParentFaction(-1),
+		ID(-1), Civilization(-1), DefaultTier(FactionTierBarony), ParentFaction(-1), Language(-1),
 		Playable(true) //factions are playable by default
 	{
 	}
@@ -317,6 +317,7 @@ public:
 	int Civilization;													/// faction civilization
 	int DefaultTier;													/// default faction tier
 	int ParentFaction;													/// parent faction of this faction
+	int Language;
 	bool Playable;														/// faction playability
 	std::vector<int> Colors;											/// faction colors
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
@@ -498,6 +499,25 @@ public:
 
 	int Number;
 };
+
+class CLanguage
+{
+public:
+	CLanguage() :
+		Ident(""), Name("")
+	{
+	}
+	
+	std::string Ident;	/// Ident of the language
+	std::string Name;	/// Name of the language
+	std::vector<LanguageNoun *> LanguageNouns;								/// nouns of the language
+	std::vector<LanguageVerb *> LanguageVerbs;								/// verbs of the language
+	std::vector<LanguageAdjective *> LanguageAdjectives;					/// adjectives of the language
+	std::vector<LanguagePronoun *> LanguagePronouns;						/// pronouns of the language
+	std::vector<LanguageAdverb *> LanguageAdverbs;							/// adverbs of the language
+	std::vector<LanguageConjunction *> LanguageConjunctions;				/// conjunctions of the language
+	std::vector<LanguageNumeral *> LanguageNumerals;						/// numerals of the language
+};
 //Wyrmgus end
 
 /**
@@ -525,6 +545,7 @@ public:
 			}
 		}
 		memset(Playable, 0, sizeof(Playable));
+		memset(CivilizationLanguage, -1, sizeof(CivilizationLanguage));
 		//Wyrmgus end
 	}
 
@@ -533,11 +554,13 @@ public:
 	//Wyrmgus start
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
 	int GetDeityIndexByName(const int civilization, std::string deity_name) const;
+	int GetLanguageIndexByIdent(std::string language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
 	int GetFactionClassUnitType(int civilization, int faction, int class_id);
 	int GetFactionClassUpgrade(int civilization, int faction, int class_id);
-	bool RequiresPlural(std::string word, int civilization) const;
+	int GetCivilizationLanguage(int civilization);
+	int GetFactionLanguage(int civilization, int faction);
 	std::string TranslateName(std::string name, int civilization);
 	//Wyrmgus end
 
@@ -566,13 +589,8 @@ public:
 	std::string SettlementNamePrefixes[MAX_RACES][PersonalNameMax];		/// settlement name prefixes
 	std::string SettlementNameSuffixes[MAX_RACES][PersonalNameMax];		/// settlement name suffixes
 	std::string NameTranslations[MAX_RACES][PersonalNameMax][2];		/// name translations (2 values: one for the name to be translated, and another for the translation)
-	LanguageNoun *LanguageNouns[MAX_RACES][LanguageWordMax];				/// nouns of the civilization's language
-	LanguageVerb *LanguageVerbs[MAX_RACES][LanguageWordMax];				/// verbs of the civilization's language
-	LanguageAdjective *LanguageAdjectives[MAX_RACES][LanguageWordMax];		/// adjectives of the civilization's language
-	LanguagePronoun *LanguagePronouns[MAX_RACES][LanguageWordMax];			/// pronouns of the civilization's language
-	LanguageAdverb *LanguageAdverbs[MAX_RACES][LanguageWordMax];			/// adverbs of the civilization's language
-	LanguageConjunction *LanguageConjunctions[MAX_RACES][LanguageWordMax];	/// conjunctions of the civilization's language
-	LanguageNumeral *LanguageNumerals[MAX_RACES][LanguageWordMax];			/// numerals of the civilization's language
+	int CivilizationLanguage[MAX_RACES];
+	std::vector<CLanguage *> Languages;									/// languages
 	//Wyrmgus end
 	unsigned int Count;             /// number of races
 };

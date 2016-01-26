@@ -606,6 +606,9 @@ static int CclDefineRaceNames(lua_State *l)
 				} else if (!strcmp(value, "parent-civilization")) {
 					++k;
 					PlayerRaces.ParentCivilization[i] = PlayerRaces.GetRaceIndexByName(LuaToString(l, j + 1, k + 1));
+				} else if (!strcmp(value, "language")) {
+					++k;
+					PlayerRaces.CivilizationLanguage[i] = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, j + 1, k + 1));
 				} else if (!strcmp(value, "personal-names")) {
 					++k;
 					lua_rawgeti(l, j + 1, k + 1);
@@ -752,6 +755,8 @@ static int CclDefineCivilization(lua_State *l)
 			PlayerRaces.Species[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentCivilization")) {
 			PlayerRaces.ParentCivilization[civilization] = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "Language")) {
+			PlayerRaces.CivilizationLanguage[civilization] = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "DefaultColor")) {
 			PlayerRaces.DefaultColor[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "NameTranslations")) {
@@ -780,9 +785,9 @@ static int CclDefineCivilization(lua_State *l)
 static int CclDefineCivilizationLanguage(lua_State *l)
 {
 	int args = lua_gettop(l);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, 1));
 	
-	if (civilization == -1) { //if the civilization is invalid, don't define the language
+	if (language == -1) { //if the language is invalid, don't define its words
 		return 0;
 	}
 	
@@ -797,7 +802,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				LanguageVerb *verb = new LanguageVerb;
 				verb->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.LanguageVerbs[civilization][k / 2] = verb;
+				PlayerRaces.Languages[language]->LanguageVerbs.push_back(verb);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -892,7 +897,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				LanguageAdjective *adjective = new LanguageAdjective;
 				adjective->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.LanguageAdjectives[civilization][k / 2] = adjective;
+				PlayerRaces.Languages[language]->LanguageAdjectives.push_back(adjective);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -930,7 +935,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				LanguagePronoun *pronoun = new LanguagePronoun;
 				pronoun->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.LanguagePronouns[civilization][k / 2] = pronoun;
+				PlayerRaces.Languages[language]->LanguagePronouns.push_back(pronoun);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -968,7 +973,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				LanguageAdverb *adverb = new LanguageAdverb;
 				adverb->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.LanguageAdverbs[civilization][k / 2] = adverb;
+				PlayerRaces.Languages[language]->LanguageAdverbs.push_back(adverb);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -997,7 +1002,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				LanguageConjunction *conjunction = new LanguageConjunction;
 				conjunction->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.LanguageConjunctions[civilization][k / 2] = conjunction;
+				PlayerRaces.Languages[language]->LanguageConjunctions.push_back(conjunction);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -1023,7 +1028,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				LanguageNumeral *numeral = new LanguageNumeral;
 				numeral->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.LanguageNumerals[civilization][k / 2] = numeral;
+				PlayerRaces.Languages[language]->LanguageNumerals.push_back(numeral);
 				++k;
 				lua_rawgeti(l, j + 1, k + 1);
 				if (!lua_istable(l, -1)) {
@@ -1067,16 +1072,11 @@ static int CclDefineLanguageNoun(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Civilization")) {
-			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			
-			if (civilization != -1) {
-				for (int i = 0; i < LanguageWordMax; ++i) {
-					if (!PlayerRaces.LanguageNouns[civilization][i] || PlayerRaces.LanguageNouns[civilization][i]->Word.empty()) {
-						PlayerRaces.LanguageNouns[civilization][i] = noun;
-						break;
-					}
-				}
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguageNouns.push_back(noun);
 			}
 		} else if (!strcmp(value, "Meaning")) {
 			noun->Meaning = LuaToString(l, -1);
@@ -1175,16 +1175,11 @@ static int CclDefineLanguageVerb(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Civilization")) {
-			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			
-			if (civilization != -1) {
-				for (int i = 0; i < LanguageWordMax; ++i) {
-					if (!PlayerRaces.LanguageVerbs[civilization][i] || PlayerRaces.LanguageVerbs[civilization][i]->Word.empty()) {
-						PlayerRaces.LanguageVerbs[civilization][i] = verb;
-						break;
-					}
-				}
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguageVerbs.push_back(verb);
 			}
 		} else if (!strcmp(value, "Meaning")) {
 			verb->Meaning = LuaToString(l, -1);
@@ -1301,16 +1296,11 @@ static int CclDefineLanguageAdjective(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Civilization")) {
-			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
-			
-			if (civilization != -1) {
-				for (int i = 0; i < LanguageWordMax; ++i) {
-					if (!PlayerRaces.LanguageAdjectives[civilization][i] || PlayerRaces.LanguageAdjectives[civilization][i]->Word.empty()) {
-						PlayerRaces.LanguageAdjectives[civilization][i] = adjective;
-						break;
-					}
-				}
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
+
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguageAdjectives.push_back(adjective);
 			}
 		} else if (!strcmp(value, "Meaning")) {
 			adjective->Meaning = LuaToString(l, -1);
@@ -1377,16 +1367,11 @@ static int CclDefineLanguagePronoun(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Civilization")) {
-			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			
-			if (civilization != -1) {
-				for (int i = 0; i < LanguageWordMax; ++i) {
-					if (!PlayerRaces.LanguagePronouns[civilization][i] || PlayerRaces.LanguagePronouns[civilization][i]->Word.empty()) {
-						PlayerRaces.LanguagePronouns[civilization][i] = pronoun;
-						break;
-					}
-				}
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguagePronouns.push_back(pronoun);
 			}
 		} else if (!strcmp(value, "Meaning")) {
 			pronoun->Meaning = LuaToString(l, -1);
@@ -1425,16 +1410,11 @@ static int CclDefineLanguageAdverb(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Civilization")) {
-			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			
-			if (civilization != -1) {
-				for (int i = 0; i < LanguageWordMax; ++i) {
-					if (!PlayerRaces.LanguageAdverbs[civilization][i] || PlayerRaces.LanguageAdverbs[civilization][i]->Word.empty()) {
-						PlayerRaces.LanguageAdverbs[civilization][i] = adverb;
-						break;
-					}
-				}
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguageAdverbs.push_back(adverb);
 			}
 		} else if (!strcmp(value, "Meaning")) {
 			adverb->Meaning = LuaToString(l, -1);
@@ -1465,16 +1445,11 @@ static int CclDefineLanguageConjunction(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Civilization")) {
-			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			
-			if (civilization != -1) {
-				for (int i = 0; i < LanguageWordMax; ++i) {
-					if (!PlayerRaces.LanguageConjunctions[civilization][i] || PlayerRaces.LanguageConjunctions[civilization][i]->Word.empty()) {
-						PlayerRaces.LanguageConjunctions[civilization][i] = conjunction;
-						break;
-					}
-				}
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguageConjunctions.push_back(conjunction);
 			}
 		} else if (!strcmp(value, "Meaning")) {
 			conjunction->Meaning = LuaToString(l, -1);
@@ -1505,16 +1480,11 @@ static int CclDefineLanguageNumeral(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Civilization")) {
-			int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			
-			if (civilization != -1) {
-				for (int i = 0; i < LanguageWordMax; ++i) {
-					if (!PlayerRaces.LanguageNumerals[civilization][i] || PlayerRaces.LanguageNumerals[civilization][i]->Word.empty()) {
-						PlayerRaces.LanguageNumerals[civilization][i] = numeral;
-						break;
-					}
-				}
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguageNumerals.push_back(numeral);
 			}
 		} else if (!strcmp(value, "Number")) {
 			numeral->Number = LuaToNumber(l, -1);
@@ -1577,6 +1547,14 @@ static int CclGetCivilizationData(lua_State *l)
 		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
 		if (parent_civilization != -1) {
 			lua_pushstring(l, PlayerRaces.Name[parent_civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Language")) {
+		int language = PlayerRaces.GetCivilizationLanguage(civilization);
+		if (language != -1) {
+			lua_pushstring(l, PlayerRaces.Languages[language]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -1791,6 +1769,8 @@ static int CclDefineFaction(lua_State *l)
 			faction->DefaultTier = GetFactionTierIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "ParentFaction")) {
 			parent_faction = LuaToString(l, -1);
+		} else if (!strcmp(value, "Language")) {
+			faction->Language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DevelopsTo")) {
@@ -1896,6 +1876,43 @@ static int CclDefineDeity(lua_State *l)
 	
 	return 0;
 }
+
+/**
+**  Define a language.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineLanguage(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string language_ident = LuaToString(l, 1);
+	CLanguage *language = NULL;
+	int language_id = PlayerRaces.GetLanguageIndexByIdent(language_ident);
+	if (language_id == -1) {
+		language = new CLanguage;
+	} else {
+		language = const_cast<CLanguage *>(&(*PlayerRaces.Languages[language_id]));
+	}
+	
+	language->Ident = language_ident;
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			language->Name = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
 //Wyrmgus end
 
 /**
@@ -1983,6 +2000,14 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Factions[civilization][civilization_faction]->Playable);
+		return 1;
+	} else if (!strcmp(data, "Language")) {
+		int language = PlayerRaces.GetFactionLanguage(civilization, civilization_faction);
+		if (language != -1) {
+			lua_pushstring(l, PlayerRaces.Languages[language]->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -2510,6 +2535,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
 	lua_register(Lua, "DefineDeity", CclDefineDeity);
+	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);

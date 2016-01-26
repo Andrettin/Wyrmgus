@@ -1604,7 +1604,12 @@ void CUnit::Init(const CUnitType &type)
 
 	//Wyrmgus start
 	//set the unit's personal name, if applicable
-	Name = GeneratePersonalName(PlayerRaces.GetRaceIndexByName(Type->Civilization.c_str()), Type->Slot);
+	int civilization = PlayerRaces.GetRaceIndexByName(Type->Civilization.c_str());
+	int language = PlayerRaces.GetCivilizationLanguage(civilization);
+	if (civilization != -1 && !Type->Faction.empty()) {
+		language = PlayerRaces.GetFactionLanguage(civilization, PlayerRaces.GetFactionIndexByName(civilization, Type->Faction));
+	}
+	Name = GeneratePersonalName(language, Type->Slot);
 	//Wyrmgus end
 
 	// Set a heading for the unit if it Handles Directions
