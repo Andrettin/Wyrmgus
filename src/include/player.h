@@ -349,7 +349,6 @@ class LanguageWord
 {
 public:
 	LanguageWord() : 
-		Uncountable(false),
 		NameSingular(false), NamePlural(false),
 		PrefixSingular(false), PrefixPlural(false),
 		SuffixSingular(false), SuffixPlural(false),
@@ -363,17 +362,6 @@ public:
 	bool HasInfixTypeName(std::string type);
 
 	std::string Word;				/// Word name / ID.
-	std::string Meaning;			/// Meaning of the word in English.
-	std::string SingularNominative;
-	std::string SingularAccusative;
-	std::string SingularDative;
-	std::string SingularGenitive;
-	std::string PluralNominative;
-	std::string PluralAccusative;
-	std::string PluralDative;
-	std::string PluralGenitive;
-	std::string Gender;				/// What is the grammatical gender of the word, if a noun (Male, Female or Neutral)
-	bool Uncountable;				/// Whether the word (if a noun) is uncountable or not.
 	bool NameSingular;				/// Whether the noun's singular form can be used as a name
 	bool NamePlural;				/// Whether the noun's plural form can be used as a name
 	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
@@ -386,6 +374,41 @@ public:
 	std::vector<std::string> PrefixTypeName;
 	std::vector<std::string> SuffixTypeName;
 	std::vector<std::string> InfixTypeName;
+};
+
+class LanguageNoun : public LanguageWord
+{
+public:
+	LanguageNoun() : LanguageWord(),
+		Uncountable(false),
+		NameSingular(false), NamePlural(false),
+		PrefixSingular(false), PrefixPlural(false),
+		SuffixSingular(false), SuffixPlural(false),
+		InfixSingular(false), InfixPlural(false)
+	{
+	}
+
+	std::string Meaning;			/// Meaning of the word in English.
+	std::string Verb;				/// Equivalent verb, if any.
+	std::string Adjective;			/// Equivalent adjective, if any.
+	std::string SingularNominative;
+	std::string SingularAccusative;
+	std::string SingularDative;
+	std::string SingularGenitive;
+	std::string PluralNominative;
+	std::string PluralAccusative;
+	std::string PluralDative;
+	std::string PluralGenitive;
+	std::string Gender;				/// What is the gender of the noun (Male, Female or Neutral)
+	bool Uncountable;				/// Whether the noun is uncountable or not.
+	bool NameSingular;				/// Whether the noun's singular form can be used as a name
+	bool NamePlural;				/// Whether the noun's plural form can be used as a name
+	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
+	bool PrefixPlural;				/// Whether the noun's plural form can be used as a prefix
+	bool SuffixSingular;			/// Whether the noun's singular form can be used as a suffix
+	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
+	bool InfixSingular;				/// Whether the noun's singular form can be used as an infix
+	bool InfixPlural;				/// Whether the noun's plural form can be used as an infix
 };
 
 class LanguageVerb : public LanguageWord
@@ -555,7 +578,7 @@ public:
 	std::string SettlementNamePrefixes[MAX_RACES][PersonalNameMax];		/// settlement name prefixes
 	std::string SettlementNameSuffixes[MAX_RACES][PersonalNameMax];		/// settlement name suffixes
 	std::string NameTranslations[MAX_RACES][PersonalNameMax][2];		/// name translations (2 values: one for the name to be translated, and another for the translation)
-	LanguageWord *LanguageWords[MAX_RACES][LanguageWordMax];				/// nouns of the civilization's language
+	LanguageNoun *LanguageNouns[MAX_RACES][LanguageWordMax];				/// nouns of the civilization's language
 	LanguageVerb *LanguageVerbs[MAX_RACES][LanguageWordMax];				/// verbs of the civilization's language
 	LanguageAdjective *LanguageAdjectives[MAX_RACES][LanguageWordMax];		/// adjectives of the civilization's language
 	LanguagePronoun *LanguagePronouns[MAX_RACES][LanguageWordMax];			/// pronouns of the civilization's language

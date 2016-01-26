@@ -399,8 +399,8 @@ void PlayerRace::Clean()
 		}
 		this->Deities[i].clear();
 		for (int j = 0; j < LanguageWordMax; ++j) {
-			if (this->LanguageWords[i][j]) {
-				delete this->LanguageWords[i][j];
+			if (this->LanguageNouns[i][j]) {
+				delete this->LanguageNouns[i][j];
 			}
 			if (this->LanguageVerbs[i][j]) {
 				delete this->LanguageVerbs[i][j];
@@ -584,25 +584,25 @@ std::string PlayerRace::GetPluralForm(std::string word, int civilization) const
 	}
 	
 	for (int i = 0; i < LanguageWordMax; ++i) {
-		if (!PlayerRaces.LanguageWords[civilization][i]) {
+		if (!PlayerRaces.LanguageNouns[civilization][i]) {
 			break;
 		}
-		if (PlayerRaces.LanguageWords[civilization][i]->SingularNominative == word && !PlayerRaces.LanguageWords[civilization][i]->PluralNominative.empty()) {
-			return PlayerRaces.LanguageWords[civilization][i]->PluralNominative;
-		} else if (PlayerRaces.LanguageWords[civilization][i]->SingularAccusative == word && !PlayerRaces.LanguageWords[civilization][i]->PluralAccusative.empty()) {
-			return PlayerRaces.LanguageWords[civilization][i]->PluralAccusative;
-		} else if (PlayerRaces.LanguageWords[civilization][i]->SingularDative == word && !PlayerRaces.LanguageWords[civilization][i]->PluralDative.empty()) {
-			return PlayerRaces.LanguageWords[civilization][i]->PluralDative;
-		} else if (PlayerRaces.LanguageWords[civilization][i]->SingularGenitive == word && !PlayerRaces.LanguageWords[civilization][i]->PluralGenitive.empty()) {
-			return PlayerRaces.LanguageWords[civilization][i]->PluralGenitive;
+		if (PlayerRaces.LanguageNouns[civilization][i]->SingularNominative == word && !PlayerRaces.LanguageNouns[civilization][i]->PluralNominative.empty()) {
+			return PlayerRaces.LanguageNouns[civilization][i]->PluralNominative;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->SingularAccusative == word && !PlayerRaces.LanguageNouns[civilization][i]->PluralAccusative.empty()) {
+			return PlayerRaces.LanguageNouns[civilization][i]->PluralAccusative;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->SingularDative == word && !PlayerRaces.LanguageNouns[civilization][i]->PluralDative.empty()) {
+			return PlayerRaces.LanguageNouns[civilization][i]->PluralDative;
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->SingularGenitive == word && !PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive.empty()) {
+			return PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive;
 		// check if the word isn't already a plural one, and if so, just return it back
-		} else if (PlayerRaces.LanguageWords[civilization][i]->PluralNominative == word) {
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->PluralNominative == word) {
 			return word;
-		} else if (PlayerRaces.LanguageWords[civilization][i]->PluralAccusative == word) {
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->PluralAccusative == word) {
 			return word;
-		} else if (PlayerRaces.LanguageWords[civilization][i]->PluralDative == word) {
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->PluralDative == word) {
 			return word;
-		} else if (PlayerRaces.LanguageWords[civilization][i]->PluralGenitive == word) {
+		} else if (PlayerRaces.LanguageNouns[civilization][i]->PluralGenitive == word) {
 			return word;
 		}
 	}
