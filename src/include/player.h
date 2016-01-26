@@ -549,7 +549,6 @@ public:
 	int GetFactionClassUnitType(int civilization, int faction, int class_id);
 	int GetFactionClassUpgrade(int civilization, int faction, int class_id);
 	bool RequiresPlural(std::string word, int civilization) const;
-	std::string GetPluralForm(std::string word, int civilization) const;
 	std::string TranslateName(std::string name, int civilization);
 	//Wyrmgus end
 
