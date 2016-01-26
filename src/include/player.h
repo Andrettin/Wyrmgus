@@ -349,10 +349,7 @@ class LanguageWord
 {
 public:
 	LanguageWord() : 
-		NameSingular(false), NamePlural(false),
-		PrefixSingular(false), PrefixPlural(false),
-		SuffixSingular(false), SuffixPlural(false),
-		InfixSingular(false), InfixPlural(false)
+		Word("")
 	{
 	}
 	
@@ -362,14 +359,6 @@ public:
 	bool HasInfixTypeName(std::string type);
 
 	std::string Word;				/// Word name / ID.
-	bool NameSingular;				/// Whether the noun's singular form can be used as a name
-	bool NamePlural;				/// Whether the noun's plural form can be used as a name
-	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
-	bool PrefixPlural;				/// Whether the noun's plural form can be used as a prefix
-	bool SuffixSingular;			/// Whether the noun's singular form can be used as a suffix
-	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
-	bool InfixSingular;				/// Whether the noun's singular form can be used as an infix
-	bool InfixPlural;				/// Whether the noun's plural form can be used as an infix
 	std::vector<std::string> TypeName;
 	std::vector<std::string> PrefixTypeName;
 	std::vector<std::string> SuffixTypeName;
