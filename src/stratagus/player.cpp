@@ -1163,6 +1163,8 @@ void CPlayer::SetFaction(const std::string faction_name)
 		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {
 			UpgradeAcquire(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade));
 		}
+	} else {
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction_name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
 	}
 }
 
