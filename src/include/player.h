@@ -450,8 +450,12 @@ public:
 	std::string Meaning;			/// Meaning of the word in English.
 	std::string Noun;				/// Equivalent noun, if any.
 	std::string Verb;				/// Equivalent verb, if any.
+	std::string Positive;			/// Positive form of the adjective.
 	std::string Comparative;		/// Comparative form of the adjective.
 	std::string Superlative;		/// Superlative form of the adjective.
+	std::string PositivePlural;		/// Positive plural form of the adjective.
+	std::string ComparativePlural;	/// Comparative plural form of the adjective.
+	std::string SuperlativePlural;	/// Superlative plural form of the adjective.
 };
 
 class LanguagePronoun : public LanguageWord

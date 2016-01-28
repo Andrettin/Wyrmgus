@@ -803,140 +803,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 	
 	for (int j = 1; j < args; ++j) {
 		const char *value = LuaToString(l, j + 1);
-		if (!strcmp(value, "verbs")) {
-			++j;
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				LanguageVerb *verb = new LanguageVerb;
-				verb->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.Languages[language]->LanguageVerbs.push_back(verb);
-				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument (expected table)");
-				}
-				int subsubargs = lua_rawlen(l, -1);
-				for (int n = 0; n < subsubargs; ++n) {
-					const char *value = LuaToString(l, -1, n + 1);
-					if (!strcmp(value, "meaning")) {
-						++n;
-						verb->Meaning = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "noun")) {
-						++n;
-						verb->Noun = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "adjective")) {
-						++n;
-						verb->Adjective = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "infinitive")) {
-						++n;
-						verb->Infinitive = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-first-person-present")) {
-						++n;
-						verb->SingularFirstPersonPresent = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-second-person-present")) {
-						++n;
-						verb->SingularSecondPersonPresent = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-third-person-present")) {
-						++n;
-						verb->SingularThirdPersonPresent = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-first-person-present")) {
-						++n;
-						verb->PluralFirstPersonPresent = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-second-person-present")) {
-						++n;
-						verb->PluralSecondPersonPresent = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-third-person-present")) {
-						++n;
-						verb->PluralThirdPersonPresent = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-first-person-past")) {
-						++n;
-						verb->SingularFirstPersonPast = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-second-person-past")) {
-						++n;
-						verb->SingularSecondPersonPast = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-third-person-past")) {
-						++n;
-						verb->SingularThirdPersonPast = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-first-person-past")) {
-						++n;
-						verb->PluralFirstPersonPast = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-second-person-past")) {
-						++n;
-						verb->PluralSecondPersonPast = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-third-person-past")) {
-						++n;
-						verb->PluralThirdPersonPast = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-first-person-future")) {
-						++n;
-						verb->SingularFirstPersonFuture = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-second-person-future")) {
-						++n;
-						verb->SingularSecondPersonFuture = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "singular-third-person-future")) {
-						++n;
-						verb->SingularThirdPersonFuture = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-first-person-future")) {
-						++n;
-						verb->PluralFirstPersonFuture = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-second-person-future")) {
-						++n;
-						verb->PluralSecondPersonFuture = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "plural-third-person-future")) {
-						++n;
-						verb->PluralThirdPersonFuture = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "participle-present")) {
-						++n;
-						verb->ParticiplePresent = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "participle-past")) {
-						++n;
-						verb->ParticiplePast = LuaToString(l, -1, n + 1);
-					} else {
-						LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-				}
-			}
-		} else if (!strcmp(value, "adjectives")) {
-			++j;
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				LanguageAdjective *adjective = new LanguageAdjective;
-				adjective->Word = LuaToString(l, j + 1, k + 1);
-				PlayerRaces.Languages[language]->LanguageAdjectives.push_back(adjective);
-				++k;
-				lua_rawgeti(l, j + 1, k + 1);
-				if (!lua_istable(l, -1)) {
-					LuaError(l, "incorrect argument (expected table)");
-				}
-				int subsubargs = lua_rawlen(l, -1);
-				for (int n = 0; n < subsubargs; ++n) {
-					const char *value = LuaToString(l, -1, n + 1);
-					if (!strcmp(value, "meaning")) {
-						++n;
-						adjective->Meaning = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "noun")) {
-						++n;
-						adjective->Noun = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "verb")) {
-						++n;
-						adjective->Verb = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "comparative")) {
-						++n;
-						adjective->Comparative = LuaToString(l, -1, n + 1);
-					} else if (!strcmp(value, "superlative")) {
-						++n;
-						adjective->Superlative = LuaToString(l, -1, n + 1);
-					} else {
-						LuaError(l, "Unsupported tag: %s" _C_ value);
-					}
-				}
-			}
-		} else if (!strcmp(value, "pronouns")) {
+		if (!strcmp(value, "pronouns")) {
 			++j;
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
@@ -1320,10 +1187,18 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			}
 		} else if (!strcmp(value, "Meaning")) {
 			adjective->Meaning = LuaToString(l, -1);
+		} else if (!strcmp(value, "Positive")) {
+			adjective->Positive = LuaToString(l, -1);
 		} else if (!strcmp(value, "Comparative")) {
 			adjective->Comparative = LuaToString(l, -1);
 		} else if (!strcmp(value, "Superlative")) {
 			adjective->Superlative = LuaToString(l, -1);
+		} else if (!strcmp(value, "PositivePlural")) {
+			adjective->PositivePlural = LuaToString(l, -1);
+		} else if (!strcmp(value, "ComparativePlural")) {
+			adjective->ComparativePlural = LuaToString(l, -1);
+		} else if (!strcmp(value, "SuperlativePlural")) {
+			adjective->SuperlativePlural = LuaToString(l, -1);
 		} else if (!strcmp(value, "TypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
