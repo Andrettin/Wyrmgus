@@ -767,6 +767,9 @@ static int strchrlen(const std::string &s, char c, unsigned int maxlen, const CF
 		if (res == -1) {
 			// Line too long.
 			// FIXME.
+			//Wyrmgus start
+			return maxlen / font->Width(1);
+			//Wyrmgus end
 		} else {
 			return res;
 		}
@@ -796,7 +799,14 @@ std::string GetLineFont(unsigned int line, const std::string &s, unsigned int ma
 		if (!res || res >= s1.size()) {
 			return "";
 		}
-		s1 = s1.substr(res + 1);
+		//Wyrmgus start
+//		s1 = s1.substr(res + 1);
+		if (s1.substr(res, 1) == " " || s1.substr(res, 2) == "\n") {
+			s1 = s1.substr(res + 1);
+		} else {
+			s1 = s1.substr(res);
+		}
+		//Wyrmgus end
 	}
 	res = strchrlen(s1, '\n', maxlen, font);
 	return s1.substr(0, res);
