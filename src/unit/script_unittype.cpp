@@ -662,6 +662,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
 			type->InvertedEastArms = parent_type->InvertedEastArms;
 			type->InvertedSoutheastArms = parent_type->InvertedSoutheastArms;
+			type->Icon.Name = parent_type->Icon.Name;
+			type->Icon.Icon = NULL;
 			if (parent_type->CanCastSpell) {
 				type->CanCastSpell = new char[SpellTypeTable.size()];
 				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
