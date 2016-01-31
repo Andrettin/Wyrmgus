@@ -388,6 +388,11 @@ void PlayerRace::Clean()
 			}
 			this->Languages[i]->LanguageConjunctions.clear();
 			
+			for (size_t j = 0; j < this->Languages[i]->LanguageAdpositions.size(); ++j) {
+				delete this->Languages[i]->LanguageAdpositions[j];
+			}
+			this->Languages[i]->LanguageAdpositions.clear();
+			
 			for (size_t j = 0; j < this->Languages[i]->LanguageNumerals.size(); ++j) {
 				delete this->Languages[i]->LanguageNumerals[j];
 			}

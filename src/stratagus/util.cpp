@@ -574,6 +574,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ð", "d");
 	text = FindAndReplaceString(text, "Ḍ", "D");
 	text = FindAndReplaceString(text, "ḍ", "d");
+	text = FindAndReplaceString(text, "Đ", "d");
+	text = FindAndReplaceString(text, "đ", "d");
 	text = FindAndReplaceString(text, "Ē", "E");
 	text = FindAndReplaceString(text, "ē", "e");
 	text = FindAndReplaceString(text, "Ê", "E");

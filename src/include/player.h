@@ -360,6 +360,7 @@ public:
 	bool HasInfixTypeName(std::string type);
 
 	std::string Word;				/// Word name / ID.
+	std::vector<std::string> Meanings;			/// Meanings of the word in English.
 	std::vector<std::string> TypeName;
 	std::vector<std::string> PrefixTypeName;
 	std::vector<std::string> SuffixTypeName;
@@ -378,7 +379,6 @@ public:
 	{
 	}
 
-	std::string Meaning;			/// Meaning of the word in English.
 	std::string Verb;				/// Equivalent verb, if any.
 	std::string Adjective;			/// Equivalent adjective, if any.
 	std::string SingularNominative;
@@ -408,7 +408,6 @@ public:
 	{
 	}
 
-	std::string Meaning;							/// Meaning of the word in English.
 	std::string Noun;								/// Equivalent noun, if any.
 	std::string Adjective;							/// Equivalent adjective, if any.
 	std::string Infinitive;
@@ -447,7 +446,6 @@ public:
 	{
 	}
 
-	std::string Meaning;			/// Meaning of the word in English.
 	std::string Noun;				/// Equivalent noun, if any.
 	std::string Verb;				/// Equivalent verb, if any.
 	std::string Positive;			/// Positive form of the adjective.
@@ -465,7 +463,6 @@ public:
 	{
 	}
 
-	std::string Meaning;			/// Meaning of the word in English.
 	std::string Nominative;			/// Nominative case for the pronoun (if any)
 	std::string Accusative;			/// Accusative case for the pronoun (if any)
 	std::string Dative;				/// Dative case for the pronoun (if any)
@@ -479,7 +476,6 @@ public:
 	{
 	}
 
-	std::string Meaning;			/// Meaning of the word in English.
 	std::string Adjective;			/// Equivalent adjective, if any (i.e. "beautifully"'s equivalent adjective would be "beautiful".
 };
 
@@ -490,7 +486,15 @@ public:
 	{
 	}
 
-	std::string Meaning;			/// Meaning of the word in English.
+};
+
+class LanguageAdposition : public LanguageWord
+{
+public:
+	LanguageAdposition() : LanguageWord()
+	{
+	}
+
 };
 
 class LanguageNumeral : public LanguageWord
@@ -520,6 +524,7 @@ public:
 	std::vector<LanguagePronoun *> LanguagePronouns;						/// pronouns of the language
 	std::vector<LanguageAdverb *> LanguageAdverbs;							/// adverbs of the language
 	std::vector<LanguageConjunction *> LanguageConjunctions;				/// conjunctions of the language
+	std::vector<LanguageAdposition *> LanguageAdpositions;					/// adpositions of the language
 	std::vector<LanguageNumeral *> LanguageNumerals;						/// numerals of the language
 };
 //Wyrmgus end

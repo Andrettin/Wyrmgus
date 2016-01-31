@@ -823,7 +823,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					const char *value = LuaToString(l, -1, n + 1);
 					if (!strcmp(value, "meaning")) {
 						++n;
-						pronoun->Meaning = LuaToString(l, -1, n + 1);
+						pronoun->Meanings.push_back(LuaToString(l, -1, n + 1));
 					} else if (!strcmp(value, "nominative")) {
 						++n;
 						pronoun->Nominative = LuaToString(l, -1, n + 1);
@@ -861,7 +861,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					const char *value = LuaToString(l, -1, n + 1);
 					if (!strcmp(value, "meaning")) {
 						++n;
-						adverb->Meaning = LuaToString(l, -1, n + 1);
+						adverb->Meanings.push_back(LuaToString(l, -1, n + 1));
 					} else if (!strcmp(value, "adjective")) {
 						++n;
 						adverb->Adjective = LuaToString(l, -1, n + 1);
@@ -890,7 +890,7 @@ static int CclDefineCivilizationLanguage(lua_State *l)
 					const char *value = LuaToString(l, -1, n + 1);
 					if (!strcmp(value, "meaning")) {
 						++n;
-						conjunction->Meaning = LuaToString(l, -1, n + 1);
+						conjunction->Meanings.push_back(LuaToString(l, -1, n + 1));
 					} else {
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
@@ -957,8 +957,14 @@ static int CclDefineLanguageNoun(lua_State *l)
 			} else {
 				LuaError(l, "Language not found.");
 			}
-		} else if (!strcmp(value, "Meaning")) {
-			noun->Meaning = LuaToString(l, -1);
+		} else if (!strcmp(value, "Meanings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				noun->Meanings.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "SingularNominative")) {
 			noun->SingularNominative = LuaToString(l, -1);
 		} else if (!strcmp(value, "SingularAccusative")) {
@@ -1062,8 +1068,14 @@ static int CclDefineLanguageVerb(lua_State *l)
 			} else {
 				LuaError(l, "Language not found.");
 			}
-		} else if (!strcmp(value, "Meaning")) {
-			verb->Meaning = LuaToString(l, -1);
+		} else if (!strcmp(value, "Meanings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				verb->Meanings.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "Infinitive")) {
 			verb->Infinitive = LuaToString(l, -1);
 		} else if (!strcmp(value, "SingularFirstPersonPresent")) {
@@ -1185,8 +1197,14 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			} else {
 				LuaError(l, "Language not found.");
 			}
-		} else if (!strcmp(value, "Meaning")) {
-			adjective->Meaning = LuaToString(l, -1);
+		} else if (!strcmp(value, "Meanings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				adjective->Meanings.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "Positive")) {
 			adjective->Positive = LuaToString(l, -1);
 		} else if (!strcmp(value, "Comparative")) {
@@ -1266,8 +1284,14 @@ static int CclDefineLanguagePronoun(lua_State *l)
 			} else {
 				LuaError(l, "Language not found.");
 			}
-		} else if (!strcmp(value, "Meaning")) {
-			pronoun->Meaning = LuaToString(l, -1);
+		} else if (!strcmp(value, "Meanings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				pronoun->Meanings.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "Nominative")) {
 			pronoun->Nominative = LuaToString(l, -1);
 		} else if (!strcmp(value, "Accusative")) {
@@ -1311,8 +1335,14 @@ static int CclDefineLanguageAdverb(lua_State *l)
 			} else {
 				LuaError(l, "Language not found.");
 			}
-		} else if (!strcmp(value, "Meaning")) {
-			adverb->Meaning = LuaToString(l, -1);
+		} else if (!strcmp(value, "Meanings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				adverb->Meanings.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1348,8 +1378,57 @@ static int CclDefineLanguageConjunction(lua_State *l)
 			} else {
 				LuaError(l, "Language not found.");
 			}
-		} else if (!strcmp(value, "Meaning")) {
-			conjunction->Meaning = LuaToString(l, -1);
+		} else if (!strcmp(value, "Meanings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				conjunction->Meanings.push_back(LuaToString(l, -1, k + 1));
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
+**  Define an adposition for a language.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineLanguageAdposition(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	LanguageAdposition *adposition = new LanguageAdposition;
+	adposition->Word = LuaToString(l, 1);
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
+			
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguageAdpositions.push_back(adposition);
+			} else {
+				LuaError(l, "Language not found.");
+			}
+		} else if (!strcmp(value, "Meanings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				adposition->Meanings.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -2434,6 +2513,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineLanguagePronoun", CclDefineLanguagePronoun);
 	lua_register(Lua, "DefineLanguageAdverb", CclDefineLanguageAdverb);
 	lua_register(Lua, "DefineLanguageConjunction", CclDefineLanguageConjunction);
+	lua_register(Lua, "DefineLanguageAdposition", CclDefineLanguageAdposition);
 	lua_register(Lua, "DefineLanguageNumeral", CclDefineLanguageNumeral);
 	lua_register(Lua, "GetCivilizationData", CclGetCivilizationData);
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
