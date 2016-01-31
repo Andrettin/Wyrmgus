@@ -187,8 +187,8 @@ public:
 	int GetFoodCapacity(bool subtract_non_food);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
-	std::string GenerateProvinceName(int civilization);
-	std::string GenerateSettlementName(int civilization);
+	std::string GenerateProvinceName(int civilization, int faction = -1);
+	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
 	std::string Name;
 	std::string SettlementName;

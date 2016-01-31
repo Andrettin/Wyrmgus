@@ -398,6 +398,11 @@ void PlayerRace::Clean()
 			}
 			this->Languages[i]->LanguageNumerals.clear();
 			
+			for (unsigned int j = 0; j < PersonalNameMax; ++j) {
+				for (unsigned int k = 0; k < 2; ++k) {
+					this->Languages[i]->NameTranslations[j][k].clear();
+				}
+			}
 		}
 	}
 	//Wyrmgus end
@@ -436,9 +441,6 @@ void PlayerRace::Clean()
 			this->SettlementNames[i][j].clear();
 			this->SettlementNamePrefixes[i][j].clear();
 			this->SettlementNameSuffixes[i][j].clear();
-			for (unsigned int k = 0; k < 2; ++k) {
-				this->NameTranslations[i][j][k].clear();
-			}
 		}
 		//clear deities
 		for (size_t j = 0; j < this->Deities[i].size(); ++j) {
@@ -626,16 +628,16 @@ int PlayerRace::GetFactionLanguage(int civilization, int faction)
 /**
 **  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
 */
-std::string PlayerRace::TranslateName(std::string name, int civilization)
+std::string PlayerRace::TranslateName(std::string name, int language)
 {
 	std::string new_name;
 
 	// try to translate the entire name, as a particular translation for it may exist
-	if (!PlayerRaces.NameTranslations[civilization][0][0].empty()) {
+	if (!PlayerRaces.Languages[language]->NameTranslations[0][0].empty()) {
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			std::string name_to_be_translated = TransliterateText(PlayerRaces.NameTranslations[civilization][i][0]);
-			if (!PlayerRaces.NameTranslations[civilization][i][0].empty() && name_to_be_translated == name) {
-				std::string name_translation = TransliterateText(PlayerRaces.NameTranslations[civilization][i][1]);
+			std::string name_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[i][0]);
+			if (!PlayerRaces.Languages[language]->NameTranslations[i][0].empty() && name_to_be_translated == name) {
+				std::string name_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[i][1]);
 				new_name = name_translation;
 				return new_name;
 			}
@@ -643,16 +645,16 @@ std::string PlayerRace::TranslateName(std::string name, int civilization)
 	}
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
-	if (!PlayerRaces.NameTranslations[civilization][0][0].empty()) {
+	if (!PlayerRaces.Languages[language]->NameTranslations[0][0].empty()) {
 		for (int i = 0; i < PersonalNameMax; ++i) {
-			std::string prefix_to_be_translated = TransliterateText(PlayerRaces.NameTranslations[civilization][i][0]);
+			std::string prefix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[i][0]);
 			if (!prefix_to_be_translated.empty() && prefix_to_be_translated == name.substr(0, prefix_to_be_translated.size())) {
 				for (int j = 0; j < PersonalNameMax; ++j) {
-					std::string suffix_to_be_translated = TransliterateText(PlayerRaces.NameTranslations[civilization][j][0]);
+					std::string suffix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[j][0]);
 					suffix_to_be_translated[0] = tolower(suffix_to_be_translated[0]);
 					if (!suffix_to_be_translated.empty() && suffix_to_be_translated == name.substr(prefix_to_be_translated.size(), suffix_to_be_translated.size())) {
-						std::string prefix_translation = TransliterateText(PlayerRaces.NameTranslations[civilization][i][1]);
-						std::string suffix_translation = TransliterateText(PlayerRaces.NameTranslations[civilization][j][1]);
+						std::string prefix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[i][1]);
+						std::string suffix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[j][1]);
 						suffix_translation[0] = tolower(suffix_translation[0]);
 						if (prefix_translation.substr(prefix_translation.size() - 2, 2) == "gs" && suffix_translation.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 							prefix_translation = FindAndReplaceStringEnding(prefix_translation, "gs", "g");

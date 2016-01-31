@@ -1721,6 +1721,33 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 				}
 			}
 		}
+		
+		// if the province's new owner is a faction that has a language different from that of its civilization, generate a faction-specific name for the province
+		if (PlayerRaces.Factions[civilization_id][faction_id]->Language != -1 && PlayerRaces.Factions[civilization_id][faction_id]->Language != PlayerRaces.CivilizationLanguage[civilization_id]) {
+			if (this->FactionCulturalNames[civilization_id][faction_id].empty()) {
+				std::string new_province_name = "";
+				// first see if can translate the cultural name of the province's current civilization
+				if (this->Civilization != -1 && !this->CulturalNames[this->Civilization].empty()) {
+					new_province_name = PlayerRaces.TranslateName(this->CulturalNames[this->Civilization], PlayerRaces.Factions[civilization_id][faction_id]->Language); //need to change this function to be for languages instead of civilizations
+				}
+				if (new_province_name == "") { // try to translate any cultural name
+					for (int i = 0; i < MAX_RACES; ++i) {
+						if (!this->CulturalNames[i].empty()) {
+							new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.Factions[civilization_id][faction_id]->Language); //need to change this function to be for languages instead of civilizations
+							if (!new_province_name.empty()) {
+								break;
+							}
+						}
+					}
+				}
+				if (new_province_name == "") { // if trying to translate all cultural names failed, generate a new name
+					new_province_name = this->GenerateProvinceName(civilization_id, faction_id);
+				}
+				if (new_province_name != "") {
+					this->FactionCulturalNames[civilization_id][faction_id] = new_province_name;
+				}
+			}
+		}
 	} else {
 		this->Owner = NULL;
 		this->SetCivilization(-1); //if there is no owner, change the civilization to none
@@ -1748,12 +1775,12 @@ void CProvince::SetCivilization(int civilization)
 				std::string new_tile_name = "";
 				// first see if can translate the cultural name of the old civilization
 				if (old_civilization != -1 && !GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization].empty()) {
-					new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], civilization);
+					new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], PlayerRaces.GetCivilizationLanguage(civilization));
 				}
 				if (new_tile_name == "") { // try to translate any cultural name
 					for (int j = 0; j < MAX_RACES; ++j) {
 						if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[j].empty()) {
-							new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[j], civilization);
+							new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[j], PlayerRaces.GetCivilizationLanguage(civilization));
 							if (!new_tile_name.empty()) {
 								break;
 							}
@@ -1774,12 +1801,12 @@ void CProvince::SetCivilization(int civilization)
 			std::string new_settlement_name = "";
 			// first see if can translate the cultural name of the old civilization
 			if (old_civilization != -1 && !this->CulturalSettlementNames[old_civilization].empty()) {
-				new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[old_civilization], civilization);
+				new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[old_civilization], PlayerRaces.GetCivilizationLanguage(civilization));
 			}
 			if (new_settlement_name == "") { // try to translate any cultural name
 				for (int i = 0; i < MAX_RACES; ++i) {
 					if (!this->CulturalSettlementNames[i].empty()) {
-						new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[i], civilization);
+						new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[i], PlayerRaces.GetCivilizationLanguage(civilization));
 						if (!new_settlement_name.empty()) {
 							break;
 						}
@@ -1799,12 +1826,12 @@ void CProvince::SetCivilization(int civilization)
 			std::string new_province_name = "";
 			// first see if can translate the cultural name of the old civilization
 			if (old_civilization != -1 && !this->CulturalNames[old_civilization].empty()) {
-				new_province_name = PlayerRaces.TranslateName(this->CulturalNames[old_civilization], civilization);
+				new_province_name = PlayerRaces.TranslateName(this->CulturalNames[old_civilization], PlayerRaces.GetCivilizationLanguage(civilization));
 			}
 			if (new_province_name == "") { // try to translate any cultural name
 				for (int i = 0; i < MAX_RACES; ++i) {
 					if (!this->CulturalNames[i].empty()) {
-						new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], civilization);
+						new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.GetCivilizationLanguage(civilization));
 						if (!new_province_name.empty()) {
 							break;
 						}
@@ -2403,16 +2430,22 @@ std::string CProvince::GetCulturalSettlementName()
 /**
 **  Generate a province name for the civilization.
 */
-std::string CProvince::GenerateProvinceName(int civilization)
+std::string CProvince::GenerateProvinceName(int civilization, int faction)
 {
 	std::string province_name;
 
 	//10% chance that the province will be named after its settlement
-	if (civilization != -1 && !this->CulturalSettlementNames[civilization].empty() && SyncRand(100) < 10) {
+	if (civilization != -1 && faction != -1 && !this->FactionCulturalSettlementNames[civilization][faction].empty() && SyncRand(100) < 10) {
+		return this->FactionCulturalSettlementNames[civilization][faction];
+	} else if (civilization != -1 && faction == -1 && !this->CulturalSettlementNames[civilization].empty() && SyncRand(100) < 10) {
 		return this->CulturalSettlementNames[civilization];
 	}
 	
-	return GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "province");
+	if (faction != -1) {
+		return GenerateName(PlayerRaces.GetFactionLanguage(civilization, faction), "province");
+	} else {
+		return GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "province");
+	}
 }
 
 /**
@@ -2420,7 +2453,7 @@ std::string CProvince::GenerateProvinceName(int civilization)
 **
 **  @param l  Lua state.
 */
-std::string CProvince::GenerateSettlementName(int civilization)
+std::string CProvince::GenerateSettlementName(int civilization, int faction)
 {
 	std::string settlement_name;
 	

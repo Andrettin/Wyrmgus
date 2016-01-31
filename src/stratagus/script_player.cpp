@@ -704,18 +704,6 @@ static int CclDefineRaceNames(lua_State *l)
 					for (int n = 0; n < subsubargs; ++n) {
 						PlayerRaces.SettlementNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
 					}
-				} else if (!strcmp(value, "name-translations")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.NameTranslations[i][n / 2][0] = LuaToString(l, -1, n + 1); //name to be translated
-						++n;
-						PlayerRaces.NameTranslations[i][(n - 1) / 2][1] = LuaToString(l, -1, n + 1); //name translation
-					}
 				//Wyrmgus end
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -769,16 +757,6 @@ static int CclDefineCivilization(lua_State *l)
 			}
 		} else if (!strcmp(value, "DefaultColor")) {
 			PlayerRaces.DefaultColor[civilization] = LuaToString(l, -1);
-		} else if (!strcmp(value, "NameTranslations")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				PlayerRaces.NameTranslations[civilization][k / 2][0] = LuaToString(l, -1, k + 1); //name to be translated
-				++k;
-				PlayerRaces.NameTranslations[civilization][(k - 1) / 2][1] = LuaToString(l, -1, k + 1); //name translation
-			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1891,6 +1869,16 @@ static int CclDefineLanguage(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			language->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "NameTranslations")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				language->NameTranslations[k / 2][0] = LuaToString(l, -1, k + 1); //name to be translated
+				++k;
+				language->NameTranslations[(k - 1) / 2][1] = LuaToString(l, -1, k + 1); //name translation
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

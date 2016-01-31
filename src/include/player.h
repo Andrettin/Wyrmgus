@@ -526,6 +526,7 @@ public:
 	std::vector<LanguageConjunction *> LanguageConjunctions;				/// conjunctions of the language
 	std::vector<LanguageAdposition *> LanguageAdpositions;					/// adpositions of the language
 	std::vector<LanguageNumeral *> LanguageNumerals;						/// numerals of the language
+	std::string NameTranslations[PersonalNameMax][2];		/// name translations (2 values: one for the name to be translated, and another for the translation)
 };
 //Wyrmgus end
 
@@ -570,7 +571,7 @@ public:
 	int GetFactionClassUpgrade(int civilization, int faction, int class_id);
 	int GetCivilizationLanguage(int civilization);
 	int GetFactionLanguage(int civilization, int faction);
-	std::string TranslateName(std::string name, int civilization);
+	std::string TranslateName(std::string name, int language);
 	//Wyrmgus end
 
 public:
@@ -597,7 +598,6 @@ public:
 	std::string SettlementNames[MAX_RACES][PersonalNameMax];			/// settlement names
 	std::string SettlementNamePrefixes[MAX_RACES][PersonalNameMax];		/// settlement name prefixes
 	std::string SettlementNameSuffixes[MAX_RACES][PersonalNameMax];		/// settlement name suffixes
-	std::string NameTranslations[MAX_RACES][PersonalNameMax][2];		/// name translations (2 values: one for the name to be translated, and another for the translation)
 	int CivilizationLanguage[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	//Wyrmgus end
