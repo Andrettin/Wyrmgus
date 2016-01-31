@@ -564,6 +564,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ā", "a");
 	text = FindAndReplaceString(text, "Â", "A");
 	text = FindAndReplaceString(text, "â", "a");
+	text = FindAndReplaceString(text, "Ā́", "A");
+	text = FindAndReplaceString(text, "ā́", "a");
 	text = FindAndReplaceString(text, "Æ", "Ae");
 	text = FindAndReplaceString(text, "æ", "ae");
 	text = FindAndReplaceString(text, "Ǣ", "Ae");
@@ -582,6 +584,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ê", "e");
 	text = FindAndReplaceString(text, "Ě", "E");
 	text = FindAndReplaceString(text, "ě", "e");
+	text = FindAndReplaceString(text, "Ḗ", "E");
+	text = FindAndReplaceString(text, "ḗ", "e");
+	text = FindAndReplaceString(text, "Ə", "E");
+	text = FindAndReplaceString(text, "ə", "e");
 	text = FindAndReplaceString(text, "Í", "I");
 	text = FindAndReplaceString(text, "í", "i");
 	text = FindAndReplaceString(text, "Ī", "I");
@@ -604,6 +610,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "Ṓ", "O");
+	text = FindAndReplaceString(text, "ṓ", "o");
+	text = FindAndReplaceString(text, "Φ", "Ph");
+	text = FindAndReplaceString(text, "φ", "ph");
 	text = FindAndReplaceString(text, "Ș", "S");
 	text = FindAndReplaceString(text, "ș", "s");
 	text = FindAndReplaceString(text, "ß", "ss"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
@@ -619,6 +629,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "û", "u");
 	text = FindAndReplaceString(text, "Ŭ", "U");
 	text = FindAndReplaceString(text, "ŭ", "u");
+	text = FindAndReplaceString(text, "Ū́", "U");
+	text = FindAndReplaceString(text, "ū́", "u");
 	text = FindAndReplaceString(text, "Ȳ", "Y");
 	text = FindAndReplaceString(text, "ȳ", "y");
 	text = FindAndReplaceString(text, "Ž", "Z");
