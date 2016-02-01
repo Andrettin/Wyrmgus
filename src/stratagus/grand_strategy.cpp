@@ -1723,17 +1723,17 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 		}
 		
 		// if the province's new owner is a faction that has a language different from that of its civilization, generate a faction-specific name for the province
-		if (PlayerRaces.Factions[civilization_id][faction_id]->Language != -1 && PlayerRaces.Factions[civilization_id][faction_id]->Language != PlayerRaces.CivilizationLanguage[civilization_id]) {
+		if (PlayerRaces.GetFactionLanguage(civilization_id, faction_id) != -1 && PlayerRaces.GetFactionLanguage(civilization_id, faction_id) != PlayerRaces.GetCivilizationLanguage(civilization_id)) {
 			if (this->FactionCulturalNames[civilization_id][faction_id].empty()) {
 				std::string new_province_name = "";
 				// first see if can translate the cultural name of the province's current civilization
 				if (this->Civilization != -1 && !this->CulturalNames[this->Civilization].empty()) {
-					new_province_name = PlayerRaces.TranslateName(this->CulturalNames[this->Civilization], PlayerRaces.Factions[civilization_id][faction_id]->Language); //need to change this function to be for languages instead of civilizations
+					new_province_name = PlayerRaces.TranslateName(this->CulturalNames[this->Civilization], PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
 				}
 				if (new_province_name == "") { // try to translate any cultural name
 					for (int i = 0; i < MAX_RACES; ++i) {
 						if (!this->CulturalNames[i].empty()) {
-							new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.Factions[civilization_id][faction_id]->Language); //need to change this function to be for languages instead of civilizations
+							new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.GetFactionLanguage(civilization_id, faction_id)); 
 							if (!new_province_name.empty()) {
 								break;
 							}
@@ -1743,8 +1743,32 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 				if (new_province_name == "") { // if trying to translate all cultural names failed, generate a new name
 					new_province_name = this->GenerateProvinceName(civilization_id, faction_id);
 				}
-				if (new_province_name != "") {
+				if (!new_province_name.empty()) {
 					this->FactionCulturalNames[civilization_id][faction_id] = new_province_name;
+				}
+			}
+			
+			if (this->FactionCulturalSettlementNames[civilization_id][faction_id].empty()) {
+				std::string new_settlement_name = "";
+				// first see if can translate the cultural name of the province's current civilization
+				if (this->Civilization != -1 && !this->CulturalSettlementNames[this->Civilization].empty()) {
+					new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[this->Civilization], PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
+				}
+				if (new_settlement_name == "") { // try to translate any cultural name
+					for (int i = 0; i < MAX_RACES; ++i) {
+						if (!this->CulturalSettlementNames[i].empty()) {
+							new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[i], PlayerRaces.GetFactionLanguage(civilization_id, faction_id)); 
+							if (!new_settlement_name.empty()) {
+								break;
+							}
+						}
+					}
+				}
+				if (new_settlement_name == "") { // if trying to translate all cultural names failed, generate a new name
+					new_settlement_name = this->GenerateProvinceName(civilization_id, faction_id);
+				}
+				if (!new_settlement_name.empty()) {
+					this->FactionCulturalSettlementNames[civilization_id][faction_id] = new_settlement_name;
 				}
 			}
 		}
@@ -2432,8 +2456,6 @@ std::string CProvince::GetCulturalSettlementName()
 */
 std::string CProvince::GenerateProvinceName(int civilization, int faction)
 {
-	std::string province_name;
-
 	//10% chance that the province will be named after its settlement
 	if (civilization != -1 && faction != -1 && !this->FactionCulturalSettlementNames[civilization][faction].empty() && SyncRand(100) < 10) {
 		return this->FactionCulturalSettlementNames[civilization][faction];
@@ -2455,14 +2477,16 @@ std::string CProvince::GenerateProvinceName(int civilization, int faction)
 */
 std::string CProvince::GenerateSettlementName(int civilization, int faction)
 {
-	std::string settlement_name;
-	
 	//10% chance that the settlement will be named after a named terrain feature in its tile, if there is any
-	if (civilization != -1 && this->SettlementLocation.x != -1 && this->SettlementLocation.y != -1 && !GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization].empty() && SyncRand(100) < 10) {
+	if (civilization != -1 && faction == -1 && this->SettlementLocation.x != -1 && this->SettlementLocation.y != -1 && !GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization].empty() && SyncRand(100) < 10) {
 		return GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization];
 	}
 	
-	return GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "settlement");
+	if (faction != -1) {
+		return GenerateName(PlayerRaces.GetFactionLanguage(civilization, faction), "settlement");
+	} else {
+		return GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "settlement");
+	}
 }
 
 void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting)
