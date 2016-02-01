@@ -1602,16 +1602,6 @@ void CUnit::Init(const CUnitType &type)
 	memset(UnitStockReplenishmentTimers, 0, sizeof(UnitStockReplenishmentTimers));
 	//Wyrmgus end
 
-	//Wyrmgus start
-	//set the unit's personal name, if applicable
-	int civilization = PlayerRaces.GetRaceIndexByName(Type->Civilization.c_str());
-	int language = PlayerRaces.GetCivilizationLanguage(civilization);
-	if (civilization != -1 && !Type->Faction.empty()) {
-		language = PlayerRaces.GetFactionLanguage(civilization, PlayerRaces.GetFactionIndexByName(civilization, Type->Faction));
-	}
-	Name = GeneratePersonalName(language, Type->Slot);
-	//Wyrmgus end
-
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
 	//   is allowed.
@@ -1759,6 +1749,14 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		memset(UnitStock, 0, sizeof(UnitStock));
 		//Wyrmgus end
 	}
+	
+	//Wyrmgus start
+	//generate a personal name for the unit, if applicable
+	if (this->Character == NULL) {
+		this->UpdatePersonalName();
+	}
+	//Wyrmgus end
+
 }
 
 /**
@@ -2153,6 +2151,29 @@ void CUnit::UpdateXPRequired()
 	this->Variable[XPREQUIRED_INDEX].Max = this->Variable[XPREQUIRED_INDEX].Value;
 	this->Variable[XPREQUIRED_INDEX].Enable = 1;
 	this->Variable[XP_INDEX].Enable = 1;
+}
+
+void CUnit::UpdatePersonalName()
+{
+	if (this->Character != NULL) {
+		return;
+	}
+	
+	int civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+	int language = PlayerRaces.GetCivilizationLanguage(civilization);
+	if (civilization != -1 && !this->Type->Faction.empty()) {
+		language = PlayerRaces.GetFactionLanguage(civilization, PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction));
+	} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
+		language = PlayerRaces.GetFactionLanguage(civilization, this->Player->Faction);
+	}
+
+	// first see if can translate the current personal name
+	std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
+	if (!new_personal_name.empty()) {
+		this->Name = new_personal_name;
+	} else {
+		this->Name = GeneratePersonalName(language, this->Type->Slot);
+	}
 }
 
 void CUnit::XPChanged()

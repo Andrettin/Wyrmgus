@@ -631,6 +631,10 @@ int PlayerRace::GetFactionLanguage(int civilization, int faction)
 std::string PlayerRace::TranslateName(std::string name, int language)
 {
 	std::string new_name;
+	
+	if (language == -1) {
+		return new_name;
+	}
 
 	// try to translate the entire name, as a particular translation for it may exist
 	if (!PlayerRaces.Languages[language]->NameTranslations[0][0].empty()) {
@@ -1140,6 +1144,8 @@ void CPlayer::SetFaction(const std::string faction_name)
 	}
 	
 	int faction = PlayerRaces.GetFactionIndexByName(this->Race, faction_name);
+	int old_language = PlayerRaces.GetFactionLanguage(this->Race, this->Faction);
+	int new_language = PlayerRaces.GetFactionLanguage(this->Race, faction);
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
 		this->SetName(faction_name);
@@ -1172,6 +1178,15 @@ void CPlayer::SetFaction(const std::string faction_name)
 		}
 	} else {
 		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction_name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
+	}
+	
+	if (new_language != old_language) { //if the language changed, update the names of this player's units
+		for (int i = 0; i < this->GetUnitCount(); ++i) {
+			CUnit &unit = this->GetUnit(i);
+			if (!unit.Character) {
+				unit.UpdatePersonalName();
+			}
+		}
 	}
 }
 

@@ -159,6 +159,7 @@ public:
 	//Wyrmgus start
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();
+	void UpdatePersonalName();
 	void XPChanged();
 	//Wyrmgus end
 	/// Change owner of unit
