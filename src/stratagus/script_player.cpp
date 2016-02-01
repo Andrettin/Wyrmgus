@@ -987,6 +987,14 @@ static int CclDefineLanguageNoun(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				noun->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SeparatePrefixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				noun->SeparatePrefixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "SuffixSingular")) {
 			noun->SuffixSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SuffixPlural")) {
@@ -999,6 +1007,14 @@ static int CclDefineLanguageNoun(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				noun->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SeparateSuffixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				noun->SeparateSuffixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "InfixSingular")) {
 			noun->InfixSingular = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InfixPlural")) {
@@ -1010,6 +1026,14 @@ static int CclDefineLanguageNoun(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				noun->InfixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
+		} else if (!strcmp(value, "SeparateInfixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				noun->SeparateInfixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1124,6 +1148,14 @@ static int CclDefineLanguageVerb(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				verb->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SeparatePrefixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				verb->SeparatePrefixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1132,6 +1164,14 @@ static int CclDefineLanguageVerb(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				verb->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SeparateSuffixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				verb->SeparateSuffixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1139,6 +1179,14 @@ static int CclDefineLanguageVerb(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				verb->InfixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
+		} else if (!strcmp(value, "SeparateInfixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				verb->SeparateInfixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1211,6 +1259,14 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				adjective->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SeparatePrefixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				adjective->SeparatePrefixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1219,6 +1275,14 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				adjective->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SeparateSuffixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				adjective->SeparateSuffixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1226,6 +1290,14 @@ static int CclDefineLanguageAdjective(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				adjective->InfixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
+		} else if (!strcmp(value, "SeparateInfixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				adjective->SeparateInfixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1416,6 +1488,61 @@ static int CclDefineLanguageAdposition(lua_State *l)
 }
 
 /**
+**  Define an article for a language.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineLanguageArticle(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	LanguageArticle *article = new LanguageArticle;
+	article->Word = LuaToString(l, 1);
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Language")) {
+			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
+			
+			if (language != -1) {
+				PlayerRaces.Languages[language]->LanguageArticles.push_back(article);
+			} else {
+				LuaError(l, "Language not found.");
+			}
+		} else if (!strcmp(value, "Meanings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				article->Meanings.push_back(LuaToString(l, -1, k + 1));
+			}
+		} else if (!strcmp(value, "Nominative")) {
+			article->Nominative = LuaToString(l, -1);
+		} else if (!strcmp(value, "Accusative")) {
+			article->Accusative = LuaToString(l, -1);
+		} else if (!strcmp(value, "Dative")) {
+			article->Dative = LuaToString(l, -1);
+		} else if (!strcmp(value, "Genitive")) {
+			article->Genitive = LuaToString(l, -1);
+		} else if (!strcmp(value, "Gender")) {
+			article->Gender = LuaToString(l, -1);
+		} else if (!strcmp(value, "Definite")) {
+			article->Definite = LuaToBoolean(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a numeral for a civilization's language.
 **
 **  @param l  Lua state.
@@ -1452,6 +1579,14 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				numeral->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SeparatePrefixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				numeral->SeparatePrefixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "SuffixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1460,6 +1595,14 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				numeral->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SeparateSuffixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				numeral->SeparateSuffixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "InfixTypeName")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1467,6 +1610,14 @@ static int CclDefineLanguageNumeral(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				numeral->InfixTypeName.push_back(LuaToString(l, -1, k + 1));
+			}
+		} else if (!strcmp(value, "SeparateInfixTypeName")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				numeral->SeparateInfixTypeName.push_back(LuaToString(l, -1, k + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2502,6 +2653,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineLanguageAdverb", CclDefineLanguageAdverb);
 	lua_register(Lua, "DefineLanguageConjunction", CclDefineLanguageConjunction);
 	lua_register(Lua, "DefineLanguageAdposition", CclDefineLanguageAdposition);
+	lua_register(Lua, "DefineLanguageArticle", CclDefineLanguageArticle);
 	lua_register(Lua, "DefineLanguageNumeral", CclDefineLanguageNumeral);
 	lua_register(Lua, "GetCivilizationData", CclGetCivilizationData);
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);

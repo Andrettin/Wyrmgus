@@ -393,6 +393,11 @@ void PlayerRace::Clean()
 			}
 			this->Languages[i]->LanguageAdpositions.clear();
 			
+			for (size_t j = 0; j < this->Languages[i]->LanguageArticles.size(); ++j) {
+				delete this->Languages[i]->LanguageArticles[j];
+			}
+			this->Languages[i]->LanguageArticles.clear();
+			
 			for (size_t j = 0; j < this->Languages[i]->LanguageNumerals.size(); ++j) {
 				delete this->Languages[i]->LanguageNumerals[j];
 			}
@@ -2301,6 +2306,28 @@ int GetGovernmentTypeIdByName(std::string government_type)
 	return -1;
 }
 
+std::string CLanguage::GetArticle(std::string gender, std::string grammatical_case, bool definite)
+{
+	for (size_t i = 0; i < this->LanguageArticles.size(); ++i) {
+		if (this->LanguageArticles[i]->Definite != definite) {
+			continue;
+		}
+		
+		if (gender.empty() || this->LanguageArticles[i]->Gender.empty() || gender == this->LanguageArticles[i]->Gender) {
+			if (grammatical_case == "nominative" && !this->LanguageArticles[i]->Nominative.empty()) {
+				return this->LanguageArticles[i]->Nominative;
+			} else if (grammatical_case == "accusative" && !this->LanguageArticles[i]->Accusative.empty()) {
+				return this->LanguageArticles[i]->Accusative;
+			} else if (grammatical_case == "dative" && !this->LanguageArticles[i]->Dative.empty()) {
+				return this->LanguageArticles[i]->Dative;
+			} else if (grammatical_case == "genitive" && !this->LanguageArticles[i]->Genitive.empty()) {
+				return this->LanguageArticles[i]->Genitive;
+			}
+		}
+	}
+	return "";
+}
+
 bool LanguageWord::HasTypeName(std::string type)
 {
 	return std::find(this->TypeName.begin(), this->TypeName.end(), type) != this->TypeName.end();
@@ -2319,6 +2346,26 @@ bool LanguageWord::HasSuffixTypeName(std::string type)
 bool LanguageWord::HasInfixTypeName(std::string type)
 {
 	return std::find(this->InfixTypeName.begin(), this->InfixTypeName.end(), type) != this->InfixTypeName.end();
+}
+
+bool LanguageWord::HasSeparatePrefixTypeName(std::string type)
+{
+	return std::find(this->SeparatePrefixTypeName.begin(), this->SeparatePrefixTypeName.end(), type) != this->SeparatePrefixTypeName.end();
+}
+
+bool LanguageWord::HasSeparateSuffixTypeName(std::string type)
+{
+	return std::find(this->SeparateSuffixTypeName.begin(), this->SeparateSuffixTypeName.end(), type) != this->SeparateSuffixTypeName.end();
+}
+
+bool LanguageWord::HasSeparateInfixTypeName(std::string type)
+{
+	return std::find(this->SeparateInfixTypeName.begin(), this->SeparateInfixTypeName.end(), type) != this->SeparateInfixTypeName.end();
+}
+
+bool LanguageWord::HasMeaning(std::string meaning)
+{
+	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
 }
 //Wyrmgus end
 

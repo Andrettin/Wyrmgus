@@ -358,6 +358,10 @@ public:
 	bool HasPrefixTypeName(std::string type);
 	bool HasSuffixTypeName(std::string type);
 	bool HasInfixTypeName(std::string type);
+	bool HasSeparatePrefixTypeName(std::string type);
+	bool HasSeparateSuffixTypeName(std::string type);
+	bool HasSeparateInfixTypeName(std::string type);
+	bool HasMeaning(std::string meaning);
 
 	std::string Word;				/// Word name / ID.
 	std::vector<std::string> Meanings;			/// Meanings of the word in English.
@@ -365,6 +369,9 @@ public:
 	std::vector<std::string> PrefixTypeName;
 	std::vector<std::string> SuffixTypeName;
 	std::vector<std::string> InfixTypeName;
+	std::vector<std::string> SeparatePrefixTypeName;
+	std::vector<std::string> SeparateSuffixTypeName;
+	std::vector<std::string> SeparateInfixTypeName;
 };
 
 class LanguageNoun : public LanguageWord
@@ -497,6 +504,22 @@ public:
 
 };
 
+class LanguageArticle : public LanguageWord
+{
+public:
+	LanguageArticle() : LanguageWord(),
+		Definite(false)
+	{
+	}
+
+	std::string Nominative;			/// Nominative case for the article
+	std::string Accusative;			/// Accusative case for the article
+	std::string Dative;				/// Dative case for the article
+	std::string Genitive;			/// Genitive case for the article
+	std::string Gender;				/// Gender of the article
+	bool Definite;					/// Whether the article is definite
+};
+
 class LanguageNumeral : public LanguageWord
 {
 public:
@@ -516,6 +539,8 @@ public:
 	{
 	}
 	
+	std::string GetArticle(std::string gender, std::string grammatical_case, bool definite);
+	
 	std::string Ident;	/// Ident of the language
 	std::string Name;	/// Name of the language
 	std::vector<LanguageNoun *> LanguageNouns;								/// nouns of the language
@@ -525,6 +550,7 @@ public:
 	std::vector<LanguageAdverb *> LanguageAdverbs;							/// adverbs of the language
 	std::vector<LanguageConjunction *> LanguageConjunctions;				/// conjunctions of the language
 	std::vector<LanguageAdposition *> LanguageAdpositions;					/// adpositions of the language
+	std::vector<LanguageArticle *> LanguageArticles;						/// articles of the language
 	std::vector<LanguageNumeral *> LanguageNumerals;						/// numerals of the language
 	std::string NameTranslations[PersonalNameMax][2];		/// name translations (2 values: one for the name to be translated, and another for the translation)
 };
