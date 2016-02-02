@@ -1263,6 +1263,14 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 				DropOutNearest(unit, pos, depot);
 			}
 			this->goalPos = pos;
+			//Wyrmgus start
+			if (this->CurrentResource == WoodCost) { //tree tiles can regrow, so we need to check if any have regrown closer to the worker
+				Vec2i forestPos;
+				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, std::max<int>(abs(unit.tilePos.x - this->goalPos.x), abs(unit.tilePos.y - this->goalPos.y)), *unit.Player, unit.tilePos, &forestPos)) {
+					this->goalPos = forestPos;
+				}
+			}
+			//Wyrmgus end
 		} else {
 			if (depot) {
 				DropOutOnSide(unit, LookingW, depot);
