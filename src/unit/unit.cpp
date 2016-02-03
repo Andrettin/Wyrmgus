@@ -3773,10 +3773,16 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 		}
 		
 		if (EquippedItems[item_slot].size() == this->GetItemSlotQuantity(item_slot)) {
+			int item_slot_used = EquippedItems[item_slot].size() - 1;
+			for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
+				if (EquippedItems[item_slot][i] == item) {
+					item_slot_used = i;
+				}
+			}
 			if (!increase) {
-				value -= EquippedItems[item_slot][EquippedItems[item_slot].size() - 1]->Variable[variable_index].Value;
+				value -= EquippedItems[item_slot][item_slot_used]->Variable[variable_index].Value;
 			} else {
-				value -= EquippedItems[item_slot][EquippedItems[item_slot].size() - 1]->Variable[variable_index].Increase;
+				value -= EquippedItems[item_slot][item_slot_used]->Variable[variable_index].Increase;
 			}
 		} else if (EquippedItems[item_slot].size() == 0 && (item_slot == WeaponItemSlot || item_slot == ShieldItemSlot || item_slot == BootsItemSlot || item_slot == ArrowsItemSlot)) {
 			for (int z = 0; z < NumUpgradeModifiers; ++z) {
