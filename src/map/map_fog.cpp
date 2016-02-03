@@ -146,7 +146,7 @@ public:
 					if ((pi == p /*player->Index*/)
 						//Wyrmgus start
 //						|| player->IsBothSharedVision(Players[pi])) {
-						|| player->IsBothSharedVision(Players[pi]) || Players[pi].Revealed) {
+						|| player->IsBothSharedVision(Players[pi]) || player->Revealed) {
 						//Wyrmgus end
 						if (!unit->IsVisible(Players[pi])) {
 							UnitGoesOutOfFog(*unit, Players[pi]);
@@ -176,7 +176,7 @@ public:
 					if (pi == p/*player->Index*/ ||
 						//Wyrmgus start
 //						player->IsBothSharedVision(Players[pi])) {
-						player->IsBothSharedVision(Players[pi]) || Players[pi].Revealed) {
+						player->IsBothSharedVision(Players[pi]) || player->Revealed) {
 						//Wyrmgus end
 						if (!unit->IsVisible(Players[pi])) {
 							UnitGoesUnderFog(*unit, Players[pi]);
