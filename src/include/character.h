@@ -145,6 +145,7 @@ extern void DeleteCustomHero(std::string hero_full_name);
 extern void SetCurrentCustomHero(std::string hero_full_name);
 extern std::string GetCurrentCustomHero();
 extern void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_dynasty_name);
+extern bool IsNameValidForCustomHero(std::string hero_full_name);
 extern std::string GetGenderNameById(int gender);
 extern int GetGenderIdByName(std::string gender);
 extern void CharacterCclRegister();

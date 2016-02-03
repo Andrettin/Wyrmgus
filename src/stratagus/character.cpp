@@ -486,6 +486,43 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 	}
 }
 
+bool IsNameValidForCustomHero(std::string hero_full_name)
+{
+	if (GetCustomHero(hero_full_name) != NULL) {
+		return false; //name already used
+	}
+	
+	if (hero_full_name.empty()) {
+		return false;
+	}
+	
+	if (
+		hero_full_name.find('\n') != -1
+		|| hero_full_name.find('\\') != -1
+		|| hero_full_name.find('/') != -1
+		|| hero_full_name.find('.') != -1
+		|| hero_full_name.find('*') != -1
+		|| hero_full_name.find('[') != -1
+		|| hero_full_name.find(']') != -1
+		|| hero_full_name.find(':') != -1
+		|| hero_full_name.find(';') != -1
+		|| hero_full_name.find('=') != -1
+		|| hero_full_name.find(',') != -1
+		|| hero_full_name.find('<') != -1
+		|| hero_full_name.find('>') != -1
+		|| hero_full_name.find('?') != -1
+		|| hero_full_name.find('|') != -1
+	) {
+		return false;
+	}
+	
+	if (hero_full_name.find_first_not_of(' ') == std::string::npos) {
+		return false; //name contains only spaces
+	}
+	
+	return true;
+}
+
 std::string GetGenderNameById(int gender)
 {
 	if (gender == MaleGender) {
