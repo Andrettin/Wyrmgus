@@ -1765,7 +1765,7 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 					}
 				}
 				if (new_settlement_name == "") { // if trying to translate all cultural names failed, generate a new name
-					new_settlement_name = this->GenerateProvinceName(civilization_id, faction_id);
+					new_settlement_name = this->GenerateSettlementName(civilization_id, faction_id);
 				}
 				if (!new_settlement_name.empty()) {
 					this->FactionCulturalSettlementNames[civilization_id][faction_id] = new_settlement_name;
