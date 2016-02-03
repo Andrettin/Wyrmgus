@@ -209,38 +209,40 @@ enum {
 				} else {
 					unit.DeequipItem(*goal);
 				}
-			} else if (unit.HasInventory() && goal->Spell != NULL && CanCastSpell(unit, *goal->Spell, &unit, unit.tilePos)) {
-				CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands);
-			} else if (unit.HasInventory() && goal->Work != NULL && unit.IndividualUpgrades[goal->Work->ID] == false) {
-				unit.ReadWork(goal->Work);
-				if (unit.Player == ThisPlayer) {
-					unit.Player->Notify(NotifyGreen, unit.tilePos, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->Ident).c_str());
-				}
-			} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
-				if (unit.Player == ThisPlayer) {
-					unit.Player->Notify(NotifyGreen, unit.tilePos, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
-				}
-				unit.Player->ChangeResource(goal->Type->GivesResource, (goal->ResourcesHeld, true));
-				unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
-			} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0 && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) {
-				int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.Variable[HP_INDEX].Max - unit.Variable[HP_INDEX].Value));
-				if (unit.Player == ThisPlayer) {
-					unit.Player->Notify(NotifyGreen, unit.tilePos, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
-				}
-				unit.Variable[HP_INDEX].Value += hp_healed;
-				
-				if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) { //if unit is still damaged, see if there are further healing items for it to use
-					unit.HealingItemAutoUse();
-				}
-			} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
-				if (unit.Player == ThisPlayer) {
-					unit.Player->Notify(NotifyRed, unit.tilePos, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
-				}
-				HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
-			} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
-				unit.Variable[SLOW_INDEX].Value = 1000;
-				if (unit.Player == ThisPlayer) {
-					unit.Player->Notify(NotifyRed, unit.tilePos, _("%s has been slowed"), unit.GetMessageName().c_str());
+			} else if (unit.CanUseItem(goal)) {
+				if (goal->Spell != NULL) {
+					CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands);
+				} else if (goal->Work != NULL) {
+					unit.ReadWork(goal->Work);
+					if (unit.Player == ThisPlayer) {
+						unit.Player->Notify(NotifyGreen, unit.tilePos, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->Ident).c_str());
+					}
+				} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
+					if (unit.Player == ThisPlayer) {
+						unit.Player->Notify(NotifyGreen, unit.tilePos, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
+					}
+					unit.Player->ChangeResource(goal->Type->GivesResource, (goal->ResourcesHeld, true));
+					unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
+				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
+					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.Variable[HP_INDEX].Max - unit.Variable[HP_INDEX].Value));
+					if (unit.Player == ThisPlayer) {
+						unit.Player->Notify(NotifyGreen, unit.tilePos, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
+					}
+					unit.Variable[HP_INDEX].Value += hp_healed;
+					
+					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) { //if unit is still damaged, see if there are further healing items for it to use
+						unit.HealingItemAutoUse();
+					}
+				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
+					if (unit.Player == ThisPlayer) {
+						unit.Player->Notify(NotifyRed, unit.tilePos, _("%s suffered a %d HP loss"), unit.GetMessageName().c_str(), (goal->Variable[HITPOINTHEALING_INDEX].Value * -1));
+					}
+					HitUnit(NoUnitP, unit, goal->Variable[HITPOINTHEALING_INDEX].Value * -1);
+				} else if (goal->Type->BoolFlag[SLOWS_INDEX].value && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {
+					unit.Variable[SLOW_INDEX].Value = 1000;
+					if (unit.Player == ThisPlayer) {
+						unit.Player->Notify(NotifyRed, unit.tilePos, _("%s has been slowed"), unit.GetMessageName().c_str());
+					}
 				}
 			} else { //cannot use
 				if (unit.Player == ThisPlayer) {

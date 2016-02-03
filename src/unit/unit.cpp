@@ -3896,6 +3896,31 @@ bool CUnit::CanEquipItemClass(int item_class) const
 	return true;
 }
 
+bool CUnit::CanUseItem(CUnit *item) const
+{
+	if (item->Container != this) {
+		return false;
+	}
+	
+	if (item->Spell != NULL) {
+		if (!this->HasInventory() || !CanCastSpell(*this, *item->Spell, this, this->tilePos)) {
+			return false;
+		}
+	}
+	
+	if (item->Work != NULL) {
+		if (!this->HasInventory() || this->IndividualUpgrades[item->Work->ID]) {
+			return false;
+		}
+	}
+	
+	if (item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->Variable[HP_INDEX].Max) {
+		return false;
+	}
+	
+	return true;
+}
+
 bool CUnit::HasInventory() const
 {
 	if (Type->BoolFlag[INVENTORY_INDEX].value) {

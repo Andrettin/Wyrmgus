@@ -662,6 +662,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Affixed = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Spell")) {
 			condition->Spell = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "CanUse")) {
+			condition->CanUse = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Work")) {
 			condition->Work = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ReadWork")) {

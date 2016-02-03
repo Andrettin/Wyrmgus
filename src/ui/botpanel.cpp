@@ -496,6 +496,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 					return false;
 				}
 			}
+			if (condition->CanUse != CONDITION_TRUE) {
+				if ((condition->CanUse == CONDITION_ONLY) ^ (unit.Container->CanUseItem(&unit))) {
+					return false;
+				}
+			}
 			if (condition->Unique != CONDITION_TRUE) {
 				if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != NULL)) {
 					return false;
