@@ -486,13 +486,19 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 	}
 }
 
-bool IsNameValidForCustomHero(std::string hero_full_name)
+bool IsNameValidForCustomHero(std::string hero_name, std::string hero_dynasty_name)
 {
+	std::string hero_full_name = hero_name;
+	if (!hero_dynasty_name.empty()) {
+		hero_full_name += " ";
+		hero_full_name += hero_dynasty_name;
+	}
+	
 	if (GetCustomHero(hero_full_name) != NULL) {
 		return false; //name already used
 	}
 	
-	if (hero_full_name.empty()) {
+	if (hero_name.empty()) {
 		return false;
 	}
 	
@@ -516,8 +522,12 @@ bool IsNameValidForCustomHero(std::string hero_full_name)
 		return false;
 	}
 	
-	if (hero_full_name.find_first_not_of(' ') == std::string::npos) {
+	if (hero_name.find_first_not_of(' ') == std::string::npos) {
 		return false; //name contains only spaces
+	}
+	
+	if (!hero_dynasty_name.empty() && hero_dynasty_name.find_first_not_of(' ') == std::string::npos) {
+		return false; //dynasty name contains only spaces
 	}
 	
 	return true;
