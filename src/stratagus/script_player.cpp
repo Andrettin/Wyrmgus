@@ -730,10 +730,16 @@ static int CclDefineCivilization(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	int civilization = PlayerRaces.Count++;
-	PlayerRaces.Name[civilization] = LuaToString(l, 1);
-	PlayerRaces.Playable[civilization] = true; //civilizations are playable by default
-	SetCivilizationStringToIndex(PlayerRaces.Name[civilization], civilization);
+	std::string civilization_name = LuaToString(l, 1);
+	int civilization;
+	if (PlayerRaces.GetRaceIndexByName(civilization_name.c_str()) != -1) { // redefinition
+		civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	} else {
+		civilization = PlayerRaces.Count++;
+		PlayerRaces.Name[civilization] = civilization_name;
+		PlayerRaces.Playable[civilization] = true; //civilizations are playable by default
+		SetCivilizationStringToIndex(PlayerRaces.Name[civilization], civilization);
+	}	
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -1835,25 +1841,45 @@ static int CclDefineFaction(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	CFaction *faction = new CFaction;
-	faction->Name = LuaToString(l, 1);
+	std::string faction_name = LuaToString(l, 1);
+	CFaction *faction = NULL;
 	int civilization = -1;
 	std::string parent_faction;
+	
+	int faction_id = -1;
+	for (int i = 0; i < MAX_RACES; ++i) {
+		faction_id = PlayerRaces.GetFactionIndexByName(i, faction_name);
+		if (faction_id != -1) { // redefinition
+			faction = const_cast<CFaction *>(&(*PlayerRaces.Factions[i][faction_id]));
+			civilization = faction->Civilization;
+			if (faction->ParentFaction != -1) {
+				parent_faction = PlayerRaces.Factions[i][faction->ParentFaction]->Name;
+			}
+			break;
+		}
+	}
+	
+	if (faction_id == -1) {
+		faction = new CFaction;
+		faction->Name = faction_name;
+	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Civilization")) {
-			civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
-			
-			for (int i = 0; i < FactionMax; ++i) {
-				if (!PlayerRaces.Factions[civilization][i] || PlayerRaces.Factions[civilization][i]->Name.empty()) {
-					PlayerRaces.Factions[civilization][i] = faction;
-					SetFactionStringToIndex(civilization, PlayerRaces.Factions[civilization][i]->Name, i);
-					faction->Civilization = civilization;
-					faction->ID = i;
-					break;
+			if (civilization == -1) { //don't change the civilization in redefinitions
+				civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+				
+				for (int i = 0; i < FactionMax; ++i) {
+					if (!PlayerRaces.Factions[civilization][i] || PlayerRaces.Factions[civilization][i]->Name.empty()) {
+						PlayerRaces.Factions[civilization][i] = faction;
+						SetFactionStringToIndex(civilization, PlayerRaces.Factions[civilization][i]->Name, i);
+						faction->Civilization = civilization;
+						faction->ID = i;
+						break;
+					}
 				}
 			}
 		} else if (!strcmp(value, "Type")) {
