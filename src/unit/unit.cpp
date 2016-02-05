@@ -3904,7 +3904,7 @@ bool CUnit::CanEquipItemClass(int item_class) const
 
 bool CUnit::CanUseItem(CUnit *item) const
 {
-	if (item->Container != this) {
+	if (!item->Type->BoolFlag[ITEM_INDEX].value && !item->Type->BoolFlag[POWERUP_INDEX].value) {
 		return false;
 	}
 	

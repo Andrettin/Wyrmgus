@@ -1761,75 +1761,6 @@ static int CclGetFactionClassUnitType(lua_State *l)
 }
 
 /**
-**  Define a civilization's factions
-**
-**  @param l  Lua state.
-*/
-static int CclDefineCivilizationFactions(lua_State *l)
-{
-	int args = lua_gettop(l);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
-	for (int j = 1; j < args; ++j) {
-		const char *value = LuaToString(l, j + 1);
-		if (!strcmp(value, "faction")) {
-			++j;
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			CFaction *faction = new CFaction;
-			PlayerRaces.Factions[civilization][(j - 1) / 2] = faction;
-			int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, j + 1, k + 1);
-				if (!strcmp(value, "name")) {
-					++k;
-					PlayerRaces.Factions[civilization][(j - 1) / 2]->Name = LuaToString(l, j + 1, k + 1);
-					SetFactionStringToIndex(civilization, PlayerRaces.Factions[civilization][(j - 1) / 2]->Name, (j - 1) / 2);
-				} else if (!strcmp(value, "type")) {
-					++k;
-					PlayerRaces.Factions[civilization][(j - 1) / 2]->Type = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "colors")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						std::string color_name = LuaToString(l, -1, n + 1);
-						for (int c = 0; c < PlayerColorMax; ++c) {
-							if (PlayerColorNames[c] == color_name) {
-								PlayerRaces.Factions[civilization][(j - 1) / 2]->Colors.push_back(c);
-								break;
-							}
-						}
-					}
-				} else if (!strcmp(value, "playable")) {
-					++k;
-					PlayerRaces.Factions[civilization][(j - 1) / 2]->Playable = LuaToBoolean(l, j + 1, k + 1);
-				} else if (!strcmp(value, "develops-to")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.Factions[civilization][(j - 1) / 2]->DevelopsTo.push_back(LuaToString(l, -1, n + 1));
-					}
-				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-
-	return 0;
-}
-
-/**
 **  Define a faction.
 **
 **  @param l  Lua state.
@@ -1888,6 +1819,7 @@ static int CclDefineFaction(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
+			faction->Colors.clear(); //remove previously defined colors
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				std::string color_name = LuaToString(l, -1, k + 1);
@@ -2684,7 +2616,6 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetCivilizationData", CclGetCivilizationData);
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
 	lua_register(Lua, "GetFactionClassUnitType", CclGetFactionClassUnitType);
-	lua_register(Lua, "DefineCivilizationFactions", CclDefineCivilizationFactions);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
 	lua_register(Lua, "DefineDeity", CclDefineDeity);
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
