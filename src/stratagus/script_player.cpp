@@ -795,6 +795,7 @@ static int CclDefineLanguageWord(lua_State *l)
 			
 			if (language != -1) {
 				PlayerRaces.Languages[language]->LanguageWords.push_back(word);
+				word->Language = language;
 			} else {
 				LuaError(l, "Language not found.");
 			}
@@ -814,6 +815,8 @@ static int CclDefineLanguageWord(lua_State *l)
 			} else {
 				LuaError(l, "Word type \"%s\" doesn't exist." _C_ word_type_name.c_str());
 			}
+		} else if (!strcmp(value, "DerivesFrom")) {
+			word->DerivesFrom = const_cast<LanguageWord *>(&(*PlayerRaces.GetLanguageWord(LuaToString(l, -1))));;
 		} else if (!strcmp(value, "Gender")) {
 			word->Gender = LuaToString(l, -1);
 		//noun-specific variables
@@ -996,8 +999,20 @@ static int CclDefineLanguageWord(lua_State *l)
 		}
 	}
 	
+	if (word->Language == -1) {
+		LuaError(l, "Word \"%s\" has not been assigned to any language" _C_ word->Word.c_str());
+	}
+	
 	if (word->Type == -1) {
 		LuaError(l, "Word \"%s\" has no type" _C_ word->Word.c_str());
+	}
+	
+	if (word->DerivesFrom != NULL) { //if the word is derived from another, add name translations for them going both ways
+		PlayerRaces.Languages[word->Language]->NameTranslations[0].push_back(word->DerivesFrom->Word);
+		PlayerRaces.Languages[word->Language]->NameTranslations[1].push_back(word->Word);
+		
+		PlayerRaces.Languages[word->DerivesFrom->Language]->NameTranslations[0].push_back(word->Word);
+		PlayerRaces.Languages[word->DerivesFrom->Language]->NameTranslations[1].push_back(word->DerivesFrom->Word);
 	}
 	
 	return 0;
@@ -1360,9 +1375,9 @@ static int CclDefineLanguage(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				language->NameTranslations[k / 2][0] = LuaToString(l, -1, k + 1); //name to be translated
+				language->NameTranslations[0].push_back(LuaToString(l, -1, k + 1)); //name to be translated
 				++k;
-				language->NameTranslations[(k - 1) / 2][1] = LuaToString(l, -1, k + 1); //name translation
+				language->NameTranslations[1].push_back(LuaToString(l, -1, k + 1)); //name translation
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

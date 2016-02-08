@@ -363,10 +363,8 @@ void PlayerRace::Clean()
 			}
 			this->Languages[i]->LanguageWords.clear();
 			
-			for (unsigned int j = 0; j < PersonalNameMax; ++j) {
-				for (unsigned int k = 0; k < 2; ++k) {
-					this->Languages[i]->NameTranslations[j][k].clear();
-				}
+			for (size_t j = 0; j < 2; ++j) {
+				this->Languages[i]->NameTranslations[j].clear();
 			}
 		}
 	}
@@ -602,11 +600,11 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	}
 
 	// try to translate the entire name, as a particular translation for it may exist
-	if (!PlayerRaces.Languages[language]->NameTranslations[0][0].empty()) {
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			std::string name_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[i][0]);
-			if (!PlayerRaces.Languages[language]->NameTranslations[i][0].empty() && name_to_be_translated == name) {
-				std::string name_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[i][1]);
+	if (PlayerRaces.Languages[language]->NameTranslations[0].size() > 0) {
+		for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++i) {
+			std::string name_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][i]);
+			if (name_to_be_translated == name) {
+				std::string name_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
 				new_name = name_translation;
 				return new_name;
 			}
@@ -614,16 +612,16 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	}
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
-	if (!PlayerRaces.Languages[language]->NameTranslations[0][0].empty()) {
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			std::string prefix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[i][0]);
-			if (!prefix_to_be_translated.empty() && prefix_to_be_translated == name.substr(0, prefix_to_be_translated.size())) {
-				for (int j = 0; j < PersonalNameMax; ++j) {
-					std::string suffix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[j][0]);
+	if (PlayerRaces.Languages[language]->NameTranslations[0].size() > 0) {
+		for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++i) {
+			std::string prefix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][i]);
+			if (prefix_to_be_translated == name.substr(0, prefix_to_be_translated.size())) {
+				for (size_t j = 0; j < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++j) {
+					std::string suffix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][j]);
 					suffix_to_be_translated[0] = tolower(suffix_to_be_translated[0]);
-					if (!suffix_to_be_translated.empty() && suffix_to_be_translated == name.substr(prefix_to_be_translated.size(), suffix_to_be_translated.size())) {
-						std::string prefix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[i][1]);
-						std::string suffix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[j][1]);
+					if (suffix_to_be_translated == name.substr(prefix_to_be_translated.size(), suffix_to_be_translated.size())) {
+						std::string prefix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
+						std::string suffix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][j]);
 						suffix_translation[0] = tolower(suffix_translation[0]);
 						if (prefix_translation.substr(prefix_translation.size() - 2, 2) == "gs" && suffix_translation.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 							prefix_translation = FindAndReplaceStringEnding(prefix_translation, "gs", "g");
@@ -641,6 +639,19 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	}
 	
 	return new_name;
+}
+
+LanguageWord *PlayerRace::GetLanguageWord(const std::string word) const
+{
+	for (size_t i = 0; i < this->Languages.size(); ++i) {
+		for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
+			if (this->Languages[i]->LanguageWords[j]->Word == word) {
+				return this->Languages[i]->LanguageWords[j];
+			}
+		}
+	}
+
+	return NULL;
 }
 //Wyrmgus end
 

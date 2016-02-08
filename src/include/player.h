@@ -364,7 +364,8 @@ class LanguageWord
 {
 public:
 	LanguageWord() : 
-		Type(-1),
+		Language(-1), Type(-1),
+		DerivesFrom(NULL),
 		Uncountable(false),
 		NameSingular(false), NamePlural(false),
 		PrefixSingular(false), PrefixPlural(false),
@@ -385,8 +386,10 @@ public:
 	bool HasMeaning(std::string meaning);
 
 	std::string Word;									/// Word name / ID.
+	int Language;
 	int Type;											/// Word type
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
+	LanguageWord *DerivesFrom;    						/// From which word does this word derive
 	std::vector<std::string> TypeName;
 	std::vector<std::string> PrefixTypeName;
 	std::vector<std::string> SuffixTypeName;
@@ -479,7 +482,7 @@ public:
 	std::string Ident;	/// Ident of the language
 	std::string Name;	/// Name of the language
 	std::vector<LanguageWord *> LanguageWords;								/// words of the language
-	std::string NameTranslations[PersonalNameMax][2];		/// name translations (2 values: one for the name to be translated, and another for the translation)
+	std::vector<std::string> NameTranslations[2];							/// name translations (2 values: one for the name to be translated, and another for the translation)
 };
 //Wyrmgus end
 
@@ -525,6 +528,7 @@ public:
 	int GetCivilizationLanguage(int civilization);
 	int GetFactionLanguage(int civilization, int faction);
 	std::string TranslateName(std::string name, int language);
+	LanguageWord *GetLanguageWord(const std::string word) const;
 	//Wyrmgus end
 
 public:
