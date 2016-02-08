@@ -390,6 +390,7 @@ public:
 	int Type;											/// Word type
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
 	LanguageWord *DerivesFrom;    						/// From which word does this word derive
+	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
 	std::vector<std::string> TypeName;
 	std::vector<std::string> PrefixTypeName;
 	std::vector<std::string> SuffixTypeName;
@@ -528,7 +529,7 @@ public:
 	int GetCivilizationLanguage(int civilization);
 	int GetFactionLanguage(int civilization, int faction);
 	std::string TranslateName(std::string name, int language);
-	LanguageWord *GetLanguageWord(const std::string word) const;
+	LanguageWord *GetLanguageWord(const std::string word, int language, int word_type) const;
 	//Wyrmgus end
 
 public:

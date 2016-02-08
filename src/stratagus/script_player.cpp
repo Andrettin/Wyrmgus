@@ -816,7 +816,26 @@ static int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "Word type \"%s\" doesn't exist." _C_ word_type_name.c_str());
 			}
 		} else if (!strcmp(value, "DerivesFrom")) {
-			word->DerivesFrom = const_cast<LanguageWord *>(&(*PlayerRaces.GetLanguageWord(LuaToString(l, -1))));;
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int k = 0;
+			int derives_from_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, k + 1));
+			++k;
+			int derives_from_word_type = GetWordTypeIdByName(LuaToString(l, -1, k + 1));
+			++k;
+			if (derives_from_language != -1 && derives_from_word_type != -1) {
+				std::string derives_from_word = LuaToString(l, -1, k + 1);
+				word->DerivesFrom = const_cast<LanguageWord *>(&(*PlayerRaces.GetLanguageWord(derives_from_word, derives_from_language, derives_from_word_type)));
+				
+				if (word->DerivesFrom != NULL) {
+					word->DerivesFrom->DerivesTo.push_back(word);
+				} else {
+					LuaError(l, "Word \"%s\" is set to derive from \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ derives_from_word.c_str() _C_ PlayerRaces.Languages[derives_from_language]->Name.c_str() _C_ GetWordTypeNameById(derives_from_word_type).c_str());
+				}
+			} else {
+				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Word.c_str());
+			}
 		} else if (!strcmp(value, "Gender")) {
 			word->Gender = LuaToString(l, -1);
 		//noun-specific variables

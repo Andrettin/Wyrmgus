@@ -641,13 +641,11 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	return new_name;
 }
 
-LanguageWord *PlayerRace::GetLanguageWord(const std::string word) const
+LanguageWord *PlayerRace::GetLanguageWord(const std::string word, int language, int word_type) const
 {
-	for (size_t i = 0; i < this->Languages.size(); ++i) {
-		for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
-			if (this->Languages[i]->LanguageWords[j]->Word == word) {
-				return this->Languages[i]->LanguageWords[j];
-			}
+	for (size_t i = 0; i < this->Languages[language]->LanguageWords.size(); ++i) {
+		if (this->Languages[language]->LanguageWords[i]->Word == word && this->Languages[language]->LanguageWords[i]->Type == word_type) {
+			return this->Languages[language]->LanguageWords[i];
 		}
 	}
 
