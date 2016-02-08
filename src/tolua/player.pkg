@@ -78,4 +78,5 @@ extern CPlayer *ThisPlayer;
 //Wyrmgus start
 extern void NetworkSetFaction(int player, std::string faction_name);
 extern std::string GetFactionEffectsString(std::string civilization_name, std::string faction_name);
+extern void GenerateMissingLanguageData();
 //Wyrmgus end

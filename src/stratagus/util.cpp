@@ -869,8 +869,8 @@ std::string GeneratePersonalName(int language, int unit_type_id)
 	) {
 		if (type.BoolFlag[ORGANIC_INDEX].value) {
 			personal_name = GenerateName(language, "person");
-		} else {
-			personal_name = GenerateName(language, type.Ident);
+		} else if (!type.Class.empty()) {
+			personal_name = GenerateName(language, "unit-class-" + type.Class);
 		}
 	}
 	

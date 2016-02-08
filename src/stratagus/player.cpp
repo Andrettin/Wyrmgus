@@ -2390,6 +2390,153 @@ bool LanguageWord::HasMeaning(std::string meaning)
 {
 	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
 }
+
+void GenerateMissingLanguageData()
+{
+	std::vector<std::string> types;
+	
+	// first build a vector with all the types
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->TypeName.size(); ++k) {
+				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->TypeName[k]) == types.end()) {
+					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->TypeName[k]);
+				}
+			}
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->PrefixTypeName.size(); ++k) {
+				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->PrefixTypeName[k]) == types.end()) {
+					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->PrefixTypeName[k]);
+				}
+			}
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->SuffixTypeName.size(); ++k) {
+				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->SuffixTypeName[k]) == types.end()) {
+					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->SuffixTypeName[k]);
+				}
+			}
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->InfixTypeName.size(); ++k) {
+				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->InfixTypeName[k]) == types.end()) {
+					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->InfixTypeName[k]);
+				}
+			}
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->SeparatePrefixTypeName.size(); ++k) {
+				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->SeparatePrefixTypeName[k]) == types.end()) {
+					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->SeparatePrefixTypeName[k]);
+				}
+			}
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->SeparateSuffixTypeName.size(); ++k) {
+				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->SeparateSuffixTypeName[k]) == types.end()) {
+					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->SeparateSuffixTypeName[k]);
+				}
+			}
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->SeparateInfixTypeName.size(); ++k) {
+				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->SeparateInfixTypeName[k]) == types.end()) {
+					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->SeparateInfixTypeName[k]);
+				}
+			}
+		}
+	}
+	
+	// now, try to generate a name for language for each type; when failing in one of them, try to assign type name settings based on those of words derived from and to the words in the failing language
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		for (size_t j = 0; j < types.size(); ++j) {
+			std::string name = GenerateName(i, types[j]);
+			
+			bool deeper_related_word_level_exists = true;
+			int relationship_depth_level = 1;
+			while (name.empty() && deeper_related_word_level_exists) {
+				deeper_related_word_level_exists = false;
+				
+				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
+					std::vector<LanguageWord *> related_words;
+					
+					// fill the vector with all the related words for the desired relationship depth level
+					if (PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom != NULL) {
+						related_words.push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom);
+					}
+					for (size_t n = 0; n < PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo.size(); ++n) {
+						related_words.push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo[n]);
+					}
+					
+					for (int n = 0; n < relationship_depth_level; ++n) {
+						for (size_t o = 0; o < related_words.size(); ++o) {
+							if (related_words[o]->DerivesFrom != NULL && related_words[o]->DerivesFrom != PlayerRaces.Languages[i]->LanguageWords[k] && std::find(related_words.begin(), related_words.end(), related_words[o]->DerivesFrom) == related_words.end()) {
+								if (n < (relationship_depth_level - 1)) {
+									related_words.push_back(related_words[o]->DerivesFrom);
+								} else {
+									deeper_related_word_level_exists = true;
+								}
+							}
+							for (size_t p = 0; p < related_words[o]->DerivesTo.size(); ++p) {
+								if (related_words[o]->DerivesTo[p] != PlayerRaces.Languages[i]->LanguageWords[k] && std::find(related_words.begin(), related_words.end(), related_words[o]->DerivesTo[p]) == related_words.end()) {
+									if (n < (relationship_depth_level - 1)) {
+										related_words.push_back(related_words[o]->DerivesTo[p]);
+									} else {
+										deeper_related_word_level_exists = true;
+									}
+								}
+							}
+						}
+					}
+					
+					//now attach the new type name to the word from its related words, if it is found in them
+					for (size_t n = 0; n < related_words.size(); ++n) {
+						if (std::find(related_words[n]->TypeName.begin(), related_words[n]->TypeName.end(), types[j]) != related_words[n]->TypeName.end()) {
+							PlayerRaces.Languages[i]->LanguageWords[k]->TypeName.push_back(types[j]);
+						}
+						if (std::find(related_words[n]->PrefixTypeName.begin(), related_words[n]->PrefixTypeName.end(), types[j]) != related_words[n]->PrefixTypeName.end()) {
+							PlayerRaces.Languages[i]->LanguageWords[k]->PrefixTypeName.push_back(types[j]);
+						}
+						if (std::find(related_words[n]->SuffixTypeName.begin(), related_words[n]->SuffixTypeName.end(), types[j]) != related_words[n]->SuffixTypeName.end()) {
+							PlayerRaces.Languages[i]->LanguageWords[k]->SuffixTypeName.push_back(types[j]);
+						}
+						if (std::find(related_words[n]->InfixTypeName.begin(), related_words[n]->InfixTypeName.end(), types[j]) != related_words[n]->InfixTypeName.end()) {
+							PlayerRaces.Languages[i]->LanguageWords[k]->InfixTypeName.push_back(types[j]);
+						}
+						if (std::find(related_words[n]->SeparatePrefixTypeName.begin(), related_words[n]->SeparatePrefixTypeName.end(), types[j]) != related_words[n]->SeparatePrefixTypeName.end()) {
+							PlayerRaces.Languages[i]->LanguageWords[k]->SeparatePrefixTypeName.push_back(types[j]);
+						}
+						if (std::find(related_words[n]->SeparateSuffixTypeName.begin(), related_words[n]->SeparateSuffixTypeName.end(), types[j]) != related_words[n]->SeparateSuffixTypeName.end()) {
+							PlayerRaces.Languages[i]->LanguageWords[k]->SeparateSuffixTypeName.push_back(types[j]);
+						}
+						if (std::find(related_words[n]->SeparateInfixTypeName.begin(), related_words[n]->SeparateInfixTypeName.end(), types[j]) != related_words[n]->SeparateInfixTypeName.end()) {
+							PlayerRaces.Languages[i]->LanguageWords[k]->SeparateInfixTypeName.push_back(types[j]);
+						}
+						
+						if (PlayerRaces.Languages[i]->LanguageWords[k]->Type == WordTypeNoun) {
+							if (related_words[n]->NameSingular) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->NameSingular = true;
+							}
+							if (related_words[n]->NamePlural) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->NamePlural = true;
+							}
+							if (related_words[n]->PrefixSingular) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->PrefixSingular = true;
+							}
+							if (related_words[n]->PrefixPlural) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->PrefixPlural = true;
+							}
+							if (related_words[n]->SuffixSingular) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->SuffixSingular = true;
+							}
+							if (related_words[n]->SuffixPlural) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->SuffixPlural = true;
+							}
+							if (related_words[n]->InfixSingular) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->InfixSingular = true;
+							}
+							if (related_words[n]->InfixPlural) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->InfixPlural = true;
+							}
+						}
+					}
+				}
+				
+				name = GenerateName(i, types[j]);
+				relationship_depth_level += 1;
+			}
+		}
+	}
+}
 //Wyrmgus end
 
 //@}

@@ -699,6 +699,7 @@ extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(std::string government_type);
 extern std::string GetWordTypeNameById(int word_type);
 extern int GetWordTypeIdByName(std::string word_type);
+extern void GenerateMissingLanguageData();
 //Wyrmgus end
 
 //@}
