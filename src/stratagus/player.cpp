@@ -358,50 +358,10 @@ void PlayerRace::Clean()
 	//Wyrmgus start
 	if (this->Count > 0) { //don't clean the languages if first defining the civilizations
 		for (size_t i = 0; i < this->Languages.size(); ++i) {
-			for (size_t j = 0; j < this->Languages[i]->LanguageNouns.size(); ++j) {
-				delete this->Languages[i]->LanguageNouns[j];
+			for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
+				delete this->Languages[i]->LanguageWords[j];
 			}
-			this->Languages[i]->LanguageNouns.clear();
-			
-			for (size_t j = 0; j < this->Languages[i]->LanguageVerbs.size(); ++j) {
-				delete this->Languages[i]->LanguageVerbs[j];
-			}
-			this->Languages[i]->LanguageVerbs.clear();
-			
-			for (size_t j = 0; j < this->Languages[i]->LanguageAdjectives.size(); ++j) {
-				delete this->Languages[i]->LanguageAdjectives[j];
-			}
-			this->Languages[i]->LanguageAdjectives.clear();
-			
-			for (size_t j = 0; j < this->Languages[i]->LanguagePronouns.size(); ++j) {
-				delete this->Languages[i]->LanguagePronouns[j];
-			}
-			this->Languages[i]->LanguagePronouns.clear();
-			
-			for (size_t j = 0; j < this->Languages[i]->LanguageAdverbs.size(); ++j) {
-				delete this->Languages[i]->LanguageAdverbs[j];
-			}
-			this->Languages[i]->LanguageAdverbs.clear();
-			
-			for (size_t j = 0; j < this->Languages[i]->LanguageConjunctions.size(); ++j) {
-				delete this->Languages[i]->LanguageConjunctions[j];
-			}
-			this->Languages[i]->LanguageConjunctions.clear();
-			
-			for (size_t j = 0; j < this->Languages[i]->LanguageAdpositions.size(); ++j) {
-				delete this->Languages[i]->LanguageAdpositions[j];
-			}
-			this->Languages[i]->LanguageAdpositions.clear();
-			
-			for (size_t j = 0; j < this->Languages[i]->LanguageArticles.size(); ++j) {
-				delete this->Languages[i]->LanguageArticles[j];
-			}
-			this->Languages[i]->LanguageArticles.clear();
-			
-			for (size_t j = 0; j < this->Languages[i]->LanguageNumerals.size(); ++j) {
-				delete this->Languages[i]->LanguageNumerals[j];
-			}
-			this->Languages[i]->LanguageNumerals.clear();
+			this->Languages[i]->LanguageWords.clear();
 			
 			for (unsigned int j = 0; j < PersonalNameMax; ++j) {
 				for (unsigned int k = 0; k < 2; ++k) {
@@ -2306,22 +2266,76 @@ int GetGovernmentTypeIdByName(std::string government_type)
 	return -1;
 }
 
+std::string GetWordTypeNameById(int word_type)
+{
+	if (word_type == WordTypeNoun) {
+		return "noun";
+	} else if (word_type == WordTypeVerb) {
+		return "verb";
+	} else if (word_type == WordTypeAdjective) {
+		return "adjective";
+	} else if (word_type == WordTypePronoun) {
+		return "pronoun";
+	} else if (word_type == WordTypeAdverb) {
+		return "adverb";
+	} else if (word_type == WordTypeConjunction) {
+		return "conjunction";
+	} else if (word_type == WordTypeAdposition) {
+		return "adposition";
+	} else if (word_type == WordTypeArticle) {
+		return "article";
+	} else if (word_type == WordTypeNumeral) {
+		return "numeral";
+	}
+
+	return "";
+}
+
+int GetWordTypeIdByName(std::string word_type)
+{
+	if (word_type == "noun") {
+		return WordTypeNoun;
+	} else if (word_type == "verb") {
+		return WordTypeVerb;
+	} else if (word_type == "adjective") {
+		return WordTypeAdjective;
+	} else if (word_type == "pronoun") {
+		return WordTypePronoun;
+	} else if (word_type == "adverb") {
+		return WordTypeAdverb;
+	} else if (word_type == "conjunction") {
+		return WordTypeConjunction;
+	} else if (word_type == "adposition") {
+		return WordTypeAdposition;
+	} else if (word_type == "article") {
+		return WordTypeArticle;
+	} else if (word_type == "numeral") {
+		return WordTypeNumeral;
+	}
+
+	return -1;
+}
+
 std::string CLanguage::GetArticle(std::string gender, std::string grammatical_case, bool definite)
 {
-	for (size_t i = 0; i < this->LanguageArticles.size(); ++i) {
-		if (this->LanguageArticles[i]->Definite != definite) {
+	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
+		if (this->LanguageWords[i]->Type != WordTypeArticle) {
 			continue;
 		}
 		
-		if (gender.empty() || this->LanguageArticles[i]->Gender.empty() || gender == this->LanguageArticles[i]->Gender) {
-			if (grammatical_case == "nominative" && !this->LanguageArticles[i]->Nominative.empty()) {
-				return this->LanguageArticles[i]->Nominative;
-			} else if (grammatical_case == "accusative" && !this->LanguageArticles[i]->Accusative.empty()) {
-				return this->LanguageArticles[i]->Accusative;
-			} else if (grammatical_case == "dative" && !this->LanguageArticles[i]->Dative.empty()) {
-				return this->LanguageArticles[i]->Dative;
-			} else if (grammatical_case == "genitive" && !this->LanguageArticles[i]->Genitive.empty()) {
-				return this->LanguageArticles[i]->Genitive;
+		if (this->LanguageWords[i]->Definite != definite) {
+			continue;
+		}
+		
+		if (gender.empty() || this->LanguageWords[i]->Gender.empty() || gender == this->LanguageWords[i]->Gender) {
+			if (grammatical_case == "nominative" && !this->LanguageWords[i]->Nominative.empty()) {
+				return this->LanguageWords[i]->Nominative;
+			} else if (grammatical_case == "accusative" && !this->LanguageWords[i]->Accusative.empty()) {
+				return this->LanguageWords[i]->Accusative;
+			} else if (grammatical_case == "dative" && !this->LanguageWords[i]->Dative.empty()) {
+				return this->LanguageWords[i]->Dative;
+			} else if (grammatical_case == "genitive" && !this->LanguageWords[i]->Genitive.empty()) {
+				return this->LanguageWords[i]->Genitive;
 			}
 		}
 	}

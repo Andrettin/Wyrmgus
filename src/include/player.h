@@ -301,6 +301,20 @@ enum FactionTiers {
 	MaxFactionTiers
 };
 
+enum WordTypes {
+	WordTypeNoun,
+	WordTypeVerb,
+	WordTypeAdjective,
+	WordTypePronoun,
+	WordTypeAdverb,
+	WordTypeConjunction,
+	WordTypeAdposition,
+	WordTypeArticle,
+	WordTypeNumeral,
+	
+	MaxWordTypes
+};
+
 class CFaction
 {
 public:
@@ -350,7 +364,14 @@ class LanguageWord
 {
 public:
 	LanguageWord() : 
-		Word("")
+		Type(-1),
+		Uncountable(false),
+		NameSingular(false), NamePlural(false),
+		PrefixSingular(false), PrefixPlural(false),
+		SuffixSingular(false), SuffixPlural(false),
+		InfixSingular(false), InfixPlural(false),
+		Definite(false),
+		Number(-1)
 	{
 	}
 	
@@ -363,8 +384,9 @@ public:
 	bool HasSeparateInfixTypeName(std::string type);
 	bool HasMeaning(std::string meaning);
 
-	std::string Word;				/// Word name / ID.
-	std::vector<std::string> Meanings;			/// Meanings of the word in English.
+	std::string Word;									/// Word name / ID.
+	int Type;											/// Word type
+	std::vector<std::string> Meanings;					/// Meanings of the word in English.
 	std::vector<std::string> TypeName;
 	std::vector<std::string> PrefixTypeName;
 	std::vector<std::string> SuffixTypeName;
@@ -372,22 +394,10 @@ public:
 	std::vector<std::string> SeparatePrefixTypeName;
 	std::vector<std::string> SeparateSuffixTypeName;
 	std::vector<std::string> SeparateInfixTypeName;
-};
+	
+	std::string Gender;				/// What is the gender of the noun or article (Male, Female or Neuter)
 
-class LanguageNoun : public LanguageWord
-{
-public:
-	LanguageNoun() : LanguageWord(),
-		Uncountable(false),
-		NameSingular(false), NamePlural(false),
-		PrefixSingular(false), PrefixPlural(false),
-		SuffixSingular(false), SuffixPlural(false),
-		InfixSingular(false), InfixPlural(false)
-	{
-	}
-
-	std::string Verb;				/// Equivalent verb, if any.
-	std::string Adjective;			/// Equivalent adjective, if any.
+	// noun-specific variables
 	std::string SingularNominative;
 	std::string SingularAccusative;
 	std::string SingularDative;
@@ -396,7 +406,6 @@ public:
 	std::string PluralAccusative;
 	std::string PluralDative;
 	std::string PluralGenitive;
-	std::string Gender;				/// What is the gender of the noun (Male, Female or Neutral)
 	bool Uncountable;				/// Whether the noun is uncountable or not.
 	bool NameSingular;				/// Whether the noun's singular form can be used as a name
 	bool NamePlural;				/// Whether the noun's plural form can be used as a name
@@ -406,17 +415,8 @@ public:
 	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
 	bool InfixSingular;				/// Whether the noun's singular form can be used as an infix
 	bool InfixPlural;				/// Whether the noun's plural form can be used as an infix
-};
-
-class LanguageVerb : public LanguageWord
-{
-public:
-	LanguageVerb() : LanguageWord()
-	{
-	}
-
-	std::string Noun;								/// Equivalent noun, if any.
-	std::string Adjective;							/// Equivalent adjective, if any.
+	
+	//verb-specific variables
 	std::string Infinitive;
 	std::string SingularFirstPersonPresent;
 	std::string SingularSecondPersonPresent;
@@ -444,90 +444,25 @@ public:
 	std::string PluralThirdPersonFuture;
 	std::string ParticiplePresent;
 	std::string ParticiplePast;
-};
-
-class LanguageAdjective : public LanguageWord
-{
-public:
-	LanguageAdjective() : LanguageWord()
-	{
-	}
-
-	std::string Noun;				/// Equivalent noun, if any.
-	std::string Verb;				/// Equivalent verb, if any.
+	
+	//adjective-specific variables
 	std::string Positive;			/// Positive form of the adjective.
 	std::string Comparative;		/// Comparative form of the adjective.
 	std::string Superlative;		/// Superlative form of the adjective.
 	std::string PositivePlural;		/// Positive plural form of the adjective.
 	std::string ComparativePlural;	/// Comparative plural form of the adjective.
 	std::string SuperlativePlural;	/// Superlative plural form of the adjective.
-};
-
-class LanguagePronoun : public LanguageWord
-{
-public:
-	LanguagePronoun() : LanguageWord()
-	{
-	}
-
+	
+	//pronoun and article-specific variables
 	std::string Nominative;			/// Nominative case for the pronoun (if any)
 	std::string Accusative;			/// Accusative case for the pronoun (if any)
 	std::string Dative;				/// Dative case for the pronoun (if any)
 	std::string Genitive;			/// Genitive case for the pronoun (if any)
-};
-
-class LanguageAdverb : public LanguageWord
-{
-public:
-	LanguageAdverb() : LanguageWord()
-	{
-	}
-
-	std::string Adjective;			/// Equivalent adjective, if any (i.e. "beautifully"'s equivalent adjective would be "beautiful".
-};
-
-class LanguageConjunction : public LanguageWord
-{
-public:
-	LanguageConjunction() : LanguageWord()
-	{
-	}
-
-};
-
-class LanguageAdposition : public LanguageWord
-{
-public:
-	LanguageAdposition() : LanguageWord()
-	{
-	}
-
-};
-
-class LanguageArticle : public LanguageWord
-{
-public:
-	LanguageArticle() : LanguageWord(),
-		Definite(false)
-	{
-	}
-
-	std::string Nominative;			/// Nominative case for the article
-	std::string Accusative;			/// Accusative case for the article
-	std::string Dative;				/// Dative case for the article
-	std::string Genitive;			/// Genitive case for the article
-	std::string Gender;				/// Gender of the article
+	
+	//article-specific variables
 	bool Definite;					/// Whether the article is definite
-};
-
-class LanguageNumeral : public LanguageWord
-{
-public:
-	LanguageNumeral() : LanguageWord(),
-		Number(-1)
-	{
-	}
-
+	
+	//numeral-specific variables
 	int Number;
 };
 
@@ -543,15 +478,7 @@ public:
 	
 	std::string Ident;	/// Ident of the language
 	std::string Name;	/// Name of the language
-	std::vector<LanguageNoun *> LanguageNouns;								/// nouns of the language
-	std::vector<LanguageVerb *> LanguageVerbs;								/// verbs of the language
-	std::vector<LanguageAdjective *> LanguageAdjectives;					/// adjectives of the language
-	std::vector<LanguagePronoun *> LanguagePronouns;						/// pronouns of the language
-	std::vector<LanguageAdverb *> LanguageAdverbs;							/// adverbs of the language
-	std::vector<LanguageConjunction *> LanguageConjunctions;				/// conjunctions of the language
-	std::vector<LanguageAdposition *> LanguageAdpositions;					/// adpositions of the language
-	std::vector<LanguageArticle *> LanguageArticles;						/// articles of the language
-	std::vector<LanguageNumeral *> LanguageNumerals;						/// numerals of the language
+	std::vector<LanguageWord *> LanguageWords;								/// words of the language
 	std::string NameTranslations[PersonalNameMax][2];		/// name translations (2 values: one for the name to be translated, and another for the translation)
 };
 //Wyrmgus end
@@ -765,6 +692,8 @@ extern void NetworkSetFaction(int player, std::string faction_name);
 extern std::string GetFactionEffectsString(std::string civilization_name, std::string faction_name);
 extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(std::string government_type);
+extern std::string GetWordTypeNameById(int word_type);
+extern int GetWordTypeIdByName(std::string word_type);
 //Wyrmgus end
 
 //@}
