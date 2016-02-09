@@ -1013,12 +1013,10 @@ public:
 				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
 					int pos = (y + yy) * (size / 2) + (x + xx);
 					if (pos >= good->size()) {
-						DebugPrint(
-							"BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
-							"size: %d, pos: %d, "\
+						printf("BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
+							"size: %d, pos: %d, " \
 							"x: %d, xx: %d, y: %d, yy: %d",
-							size, pos, x, xx, y, yy
-						);
+							size, pos, x, xx, y, yy);
 						break;
 					}
 					if (cost < 0) {
@@ -1103,12 +1101,10 @@ private:
 				int pos = (y + yy) * (size / 2) + (x + xx);
 				int localFactor = (!xx && !yy) ? 1 : splashFactor;
 				if (pos >= good->size()) {
-					DebugPrint(
-						"BUG: RangeTargetFinder.Compute out of range. "\
-						"size: %d, pos: %d, "\
+					printf("BUG: RangeTargetFinder.Compute out of range. " \
+						"size: %d, pos: %d, "	\
 						"x: %d, xx: %d, y: %d, yy: %d",
-						size, pos, x, xx, y, yy
-					);
+						size, pos, x, xx, y, yy);
 					break;
 				}
 				sbad += bad->at(pos) / localFactor;
