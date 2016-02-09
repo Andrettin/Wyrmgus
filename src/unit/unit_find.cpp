@@ -422,7 +422,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
 
 		cost.SetFrom(*mine, deposit, check_usage);
-		if (cost < bestCost) {
+		if (cost < bestCost && UnitReachable(worker, *mine, 1)) {
 			*resultMine = mine;
 
 			if (cost.IsMin()) {

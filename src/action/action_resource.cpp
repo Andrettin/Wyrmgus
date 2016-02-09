@@ -1266,8 +1266,11 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 			//Wyrmgus start
 			if (this->CurrentResource == WoodCost) { //tree tiles can regrow, so we need to check if any have regrown closer to the worker
 				Vec2i forestPos;
-				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, std::max<int>(abs(unit.tilePos.x - this->goalPos.x), abs(unit.tilePos.y - this->goalPos.y)), *unit.Player, unit.tilePos, &forestPos)) {
-					this->goalPos = forestPos;
+				int max_forest_range = std::max<int>(abs(unit.tilePos.x - this->goalPos.x), abs(unit.tilePos.y - this->goalPos.y));
+				if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, max_forest_range, *unit.Player, unit.tilePos, &forestPos)) {
+					if (PlaceReachable(unit, forestPos, 1, 1, 0, 1, max_forest_range * 4)) {
+						this->goalPos = forestPos;
+					}
 				}
 			}
 			//Wyrmgus end
