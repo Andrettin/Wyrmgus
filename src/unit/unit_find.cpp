@@ -838,7 +838,6 @@ private:
 **
 **
 **  @note This could be improved, for better performance / better trade.
-**  @note   Limited to attack range smaller than 16.
 **  @note Will be moved to unit_ai.c soon.
 */
 class BestRangeTargetFinder
@@ -850,17 +849,26 @@ public:
 	**
 	*/
 	BestRangeTargetFinder(const CUnit &a, const int r) : attacker(&a), range(r),
-		best_unit(0), best_cost(INT_MIN)
+		//Wyrmgus start
+//		best_unit(0), best_cost(INT_MIN), size((a.Type->Missile.Missile->Range + r) * 2)
+		best_unit(0), best_cost(INT_MIN), size((a.GetMissile().Missile->Range + r) * 2)
+		//Wyrmgus end
 	{
-		memset(good, 0 , sizeof(int) * 32 * 32);
-		memset(bad, 0 , sizeof(int) * 32 * 32);
+		good = new std::vector<int>(size * size, 0);
+		bad = new std::vector<int>(size * size, 0);
+	};
+	
+	~BestRangeTargetFinder()
+	{
+		delete good;
+		delete bad;
 	};
 
 	class FillBadGood
 	{
 	public:
-		FillBadGood(const CUnit &a, int r, int *g, int *b):
-			attacker(&a), range(r),
+		FillBadGood(const CUnit &a, int r, std::vector<int> *g, std::vector<int> *b, int s):
+			attacker(&a), range(r), size(s),
 			enemy_count(0), good(g), bad(b)
 		{
 		}
@@ -996,28 +1004,29 @@ public:
 				}
 			}
 
-			//Wyrmgus start
-//			const int missile_range = type.Missile.Missile->Range + range - 1;
-			const int missile_range = attacker->GetMissile().Missile->Range + range - 1;
-			//Wyrmgus end
-			const int x = dest->tilePos.x - attacker->tilePos.x + missile_range + 1;
-			const int y = dest->tilePos.y - attacker->tilePos.y + missile_range + 1;
+			const int x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
+			const int y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
+			Assert(x >= 0 && y >= 0);
 
 			// Mark the good/bad array...
-			int yy_offset = x + y * 32;
 			for (int yy = 0; yy < dtype.TileHeight; ++yy) {
-				if ((y + yy >= 0) && (y + yy < 2 * missile_range + 1)) {
-					for (int xx = 0; xx < dtype.TileWidth; ++xx) {
-						if ((x + xx >= 0) && (x + xx < 2 * missile_range + 1)) {
-							if (cost < 0) {
-								good[yy_offset + xx] -= cost;
-							} else {
-								bad[yy_offset + xx] += cost;
-							}
-						}
+				for (int xx = 0; xx < dtype.TileWidth; ++xx) {
+					int pos = (y + yy) * (size / 2) + (x + xx);
+					if (pos >= good->size()) {
+						DebugPrint(
+							"BUG: RangeTargetFinder::FillBadGood.Compute out of range. "\
+							"size: %d, pos: %d, "\
+							"x: %d, xx: %d, y: %d, yy: %d",
+							size, pos, x, xx, y, yy
+						);
+						break;
+					}
+					if (cost < 0) {
+						good->at(pos) -= cost;
+					} else {
+						bad->at(pos) += cost;
 					}
 				}
-				yy_offset += 32;
 			}
 		}
 
@@ -1026,20 +1035,21 @@ public:
 		const CUnit *attacker;
 		const int range;
 		int enemy_count;
-		int *good;
-		int *bad;
+		std::vector<int> *good;
+		std::vector<int> *bad;
+		const int size;
 	};
 
 	CUnit *Find(std::vector<CUnit *> &table)
 	{
-		FillBadGood(*attacker, range, good, bad).Fill(table.begin(), table.end());
+		FillBadGood(*attacker, range, good, bad, size).Fill(table.begin(), table.end());
 		return Find(table.begin(), table.end());
 
 	}
 
 	CUnit *Find(CUnitCache &cache)
 	{
-		FillBadGood(*attacker, range, good, bad).Fill(cache);
+		FillBadGood(*attacker, range, good, bad, size).Fill(cache);
 		return Find(cache.begin(), cache.end());
 	}
 
@@ -1073,51 +1083,45 @@ private:
 		clamp<int>(&x, dest->tilePos.x, dest->tilePos.x + dtype.TileWidth - 1);
 		clamp<int>(&y, dest->tilePos.y, dest->tilePos.y + dtype.TileHeight - 1);
 
-		// Make x,y relative to u->x...
-
-		x = x - attacker->tilePos.x + missile_range + 1;
-		y = y - attacker->tilePos.x + missile_range + 1;
-
 		int sbad = 0;
 		int sgood = 0;
-		//Wyrmgus start
-//		int yy = -(type.Missile.Missile->Range - 1);
-		int yy = -(attacker->GetMissile().Missile->Range - 1);
-		//Wyrmgus end
-		int yy_offset = x + yy * 32;
-		//Wyrmgus start
-//		for (; yy <= type.Missile.Missile->Range - 1; ++yy) {
-		for (; yy <= attacker->GetMissile().Missile->Range - 1; ++yy) {
-		//Wyrmgus end
-			if ((y + yy >= 0) && ((y + yy) < 2 * missile_range + 1)) {
-				//Wyrmgus start
-//				for (int xx = -(type.Missile.Missile->Range - 1);
-				for (int xx = -(attacker->GetMissile().Missile->Range - 1);
-				//Wyrmgus end
-					//Wyrmgus start
-//					 xx <= type.Missile.Missile->Range - 1; ++xx) {
-					 xx <= attacker->GetMissile().Missile->Range - 1; ++xx) {
-					//Wyrmgus end
-					if ((x + xx >= 0) && ((x + xx) < 2 * missile_range + 1)) {
-						sbad += bad[yy_offset + xx];
-						sgood += good[yy_offset + xx];
-						if (!yy && !xx) {
-							sbad += bad[yy_offset + xx];
-							sgood += good[yy_offset + xx];
-						}
-					}
-				}
-			}
-			yy_offset += 32;
-		}
 		
+		// cost map is relative to attacker position
+		x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
+		y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
+		Assert(x >= 0 && y >= 0);
+		
+		// calculate the costs:
+		// costs are the full costs at the target and the splash-factor
+		// adjusted costs of the tiles immediately around the target
+		//Wyrmgus start
+//		int splashFactor = type.Missile.Missile->SplashFactor;
+		int splashFactor = attacker->GetMissile().Missile->SplashFactor;
+		//Wyrmgus end
+		for (int yy = -1; yy <= 1; ++yy) {
+			for (int xx = -1; xx <= 1; ++xx) {
+				int pos = (y + yy) * (size / 2) + (x + xx);
+				int localFactor = (!xx && !yy) ? 1 : splashFactor;
+				if (pos >= good->size()) {
+					DebugPrint(
+						"BUG: RangeTargetFinder.Compute out of range. "\
+						"size: %d, pos: %d, "\
+						"x: %d, xx: %d, y: %d, yy: %d",
+						size, pos, x, xx, y, yy
+					);
+					break;
+				}
+				sbad += bad->at(pos) / localFactor;
+				sgood += good->at(pos) / localFactor;
+			}
+		}
+
 		if (sgood > 0 && attacker->Type->BoolFlag[NOFRIENDLYFIRE_INDEX].value) {
 			return;
 		}
-
-		// don't consider small damages...
+		
+		// don't consider small friendly-fire damages...
 		sgood = std::max(sgood, 20);
-
 		int cost = sbad / sgood;
 		if (cost > best_cost) {
 			best_cost = cost;
@@ -1130,8 +1134,9 @@ private:
 	const int range;
 	CUnit *best_unit;
 	int best_cost;
-	int good[32 * 32];
-	int bad[32 * 32];
+	std::vector<int> *good;
+	std::vector<int> *bad;
+	const int size;
 };
 
 struct CompareUnitDistance {
