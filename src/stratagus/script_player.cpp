@@ -1388,6 +1388,8 @@ static int CclDefineLanguage(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			language->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "NominativeAdjectiveEndingAfterDefiniteArticle")) {
+			language->NominativeAdjectiveEndingAfterDefiniteArticle = LuaToString(l, -1);
 		} else if (!strcmp(value, "NameTranslations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

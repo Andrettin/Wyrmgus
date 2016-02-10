@@ -2391,6 +2391,58 @@ bool LanguageWord::HasMeaning(std::string meaning)
 	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
 }
 
+void LanguageWord::AddTypeNameGenerationFromWord(LanguageWord *word, std::string type)
+{
+	if (word->HasTypeName(type)) {
+		this->TypeName.push_back(type);
+	}
+	if (word->HasPrefixTypeName(type)) {
+		this->PrefixTypeName.push_back(type);
+	}
+	if (word->HasSuffixTypeName(type)) {
+		this->SuffixTypeName.push_back(type);
+	}
+	if (word->HasInfixTypeName(type)) {
+		this->InfixTypeName.push_back(type);
+	}
+	if (word->HasSeparatePrefixTypeName(type)) {
+		this->SeparatePrefixTypeName.push_back(type);
+	}
+	if (word->HasSeparateSuffixTypeName(type)) {
+		this->SeparateSuffixTypeName.push_back(type);
+	}
+	if (word->HasSeparateInfixTypeName(type)) {
+		this->SeparateInfixTypeName.push_back(type);
+	}
+			
+	if (this->Type == WordTypeNoun) {
+		if (word->NameSingular) {
+			this->NameSingular = true;
+		}
+		if (word->NamePlural) {
+			this->NamePlural = true;
+		}
+		if (word->PrefixSingular) {
+			this->PrefixSingular = true;
+		}
+		if (word->PrefixPlural) {
+			this->PrefixPlural = true;
+		}
+		if (word->SuffixSingular) {
+			this->SuffixSingular = true;
+		}
+		if (word->SuffixPlural) {
+			this->SuffixPlural = true;
+		}
+		if (word->InfixSingular) {
+			this->InfixSingular = true;
+		}
+		if (word->InfixPlural) {
+			this->InfixPlural = true;
+		}
+	}
+}
+
 void GenerateMissingLanguageData()
 {
 	std::vector<std::string> types;
@@ -2436,6 +2488,8 @@ void GenerateMissingLanguageData()
 		}
 	}
 	
+	int default_language = PlayerRaces.GetLanguageIndexByIdent("english");
+	
 	// now, try to generate a name for language for each type; when failing in one of them, try to assign type name settings based on those of words derived from and to the words in the failing language
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (size_t j = 0; j < types.size(); ++j) {
@@ -2480,59 +2534,25 @@ void GenerateMissingLanguageData()
 					
 					//now attach the new type name to the word from its related words, if it is found in them
 					for (size_t n = 0; n < related_words.size(); ++n) {
-						if (std::find(related_words[n]->TypeName.begin(), related_words[n]->TypeName.end(), types[j]) != related_words[n]->TypeName.end()) {
-							PlayerRaces.Languages[i]->LanguageWords[k]->TypeName.push_back(types[j]);
-						}
-						if (std::find(related_words[n]->PrefixTypeName.begin(), related_words[n]->PrefixTypeName.end(), types[j]) != related_words[n]->PrefixTypeName.end()) {
-							PlayerRaces.Languages[i]->LanguageWords[k]->PrefixTypeName.push_back(types[j]);
-						}
-						if (std::find(related_words[n]->SuffixTypeName.begin(), related_words[n]->SuffixTypeName.end(), types[j]) != related_words[n]->SuffixTypeName.end()) {
-							PlayerRaces.Languages[i]->LanguageWords[k]->SuffixTypeName.push_back(types[j]);
-						}
-						if (std::find(related_words[n]->InfixTypeName.begin(), related_words[n]->InfixTypeName.end(), types[j]) != related_words[n]->InfixTypeName.end()) {
-							PlayerRaces.Languages[i]->LanguageWords[k]->InfixTypeName.push_back(types[j]);
-						}
-						if (std::find(related_words[n]->SeparatePrefixTypeName.begin(), related_words[n]->SeparatePrefixTypeName.end(), types[j]) != related_words[n]->SeparatePrefixTypeName.end()) {
-							PlayerRaces.Languages[i]->LanguageWords[k]->SeparatePrefixTypeName.push_back(types[j]);
-						}
-						if (std::find(related_words[n]->SeparateSuffixTypeName.begin(), related_words[n]->SeparateSuffixTypeName.end(), types[j]) != related_words[n]->SeparateSuffixTypeName.end()) {
-							PlayerRaces.Languages[i]->LanguageWords[k]->SeparateSuffixTypeName.push_back(types[j]);
-						}
-						if (std::find(related_words[n]->SeparateInfixTypeName.begin(), related_words[n]->SeparateInfixTypeName.end(), types[j]) != related_words[n]->SeparateInfixTypeName.end()) {
-							PlayerRaces.Languages[i]->LanguageWords[k]->SeparateInfixTypeName.push_back(types[j]);
-						}
-						
-						if (PlayerRaces.Languages[i]->LanguageWords[k]->Type == WordTypeNoun) {
-							if (related_words[n]->NameSingular) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->NameSingular = true;
-							}
-							if (related_words[n]->NamePlural) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->NamePlural = true;
-							}
-							if (related_words[n]->PrefixSingular) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->PrefixSingular = true;
-							}
-							if (related_words[n]->PrefixPlural) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->PrefixPlural = true;
-							}
-							if (related_words[n]->SuffixSingular) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->SuffixSingular = true;
-							}
-							if (related_words[n]->SuffixPlural) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->SuffixPlural = true;
-							}
-							if (related_words[n]->InfixSingular) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->InfixSingular = true;
-							}
-							if (related_words[n]->InfixPlural) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->InfixPlural = true;
-							}
-						}
+						PlayerRaces.Languages[i]->LanguageWords[k]->AddTypeNameGenerationFromWord(related_words[n], types[j]);
 					}
 				}
 				
 				name = GenerateName(i, types[j]);
 				relationship_depth_level += 1;
+			}
+			
+			if (name.empty() && default_language != -1) { //if the name is still empty, try to add name generation of this type for this language based on the default language, for words which share a meaning
+				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
+					for (size_t n = 0; n < PlayerRaces.Languages[default_language]->LanguageWords.size(); ++n) {
+						for (size_t o = 0; o < PlayerRaces.Languages[i]->LanguageWords[k]->Meanings.size(); ++o) {
+							if (PlayerRaces.Languages[default_language]->LanguageWords[n]->HasMeaning(PlayerRaces.Languages[i]->LanguageWords[k]->Meanings[o])) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->AddTypeNameGenerationFromWord(PlayerRaces.Languages[default_language]->LanguageWords[n], types[j]);
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 	}

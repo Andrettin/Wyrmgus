@@ -591,7 +591,6 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ḗ", "e");
 	text = FindAndReplaceString(text, "Ė́", "E");
 	text = FindAndReplaceString(text, "ė́", "e");
-	
 	text = FindAndReplaceString(text, "Ə", "E");
 	text = FindAndReplaceString(text, "ə", "e");
 	text = FindAndReplaceString(text, "Í", "I");
@@ -1347,14 +1346,17 @@ std::string GenerateName(int language, std::string type)
 					suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->PluralNominative;
 				}
 				
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement") { //if type is neither a province nor a settlement, add an article at the beginning
+				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, "nominative", true).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
 					name += PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, "nominative", true);
 					name += " ";
 				}
 					
-				name += prefix;
+				name += TransliterateText(prefix);
+				if (PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->NominativeAdjectiveEndingAfterDefiniteArticle.empty() && PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement") {
+					name += PlayerRaces.Languages[language]->NominativeAdjectiveEndingAfterDefiniteArticle;
+				}
 				name += " ";
-				name += suffix;
+				name += TransliterateText(suffix);
 			} else if (random_number < (name_count + (prefix_count * suffix_count) + ((prefix_count + suffix_count) / 2) * infix_count + (separate_prefix_count * separate_suffix_count) + ((separate_prefix_count + separate_suffix_count) / 2) * separate_infix_count)) { //separate prefix + separate infix + separate suffix
 				std::string prefix;
 				std::string infix;
@@ -1383,16 +1385,16 @@ std::string GenerateName(int language, std::string type)
 					suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->PluralNominative;
 				}
 					
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement") { //if type is neither a province nor a settlement, add an article at the beginning
+				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, "nominative", true).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
 					name += PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, "nominative", true);
 					name += " ";
 				}
 					
-				name += prefix;
+				name += TransliterateText(prefix);
 				name += " ";
-				name += infix;
+				name += TransliterateText(infix);
 				name += " ";
-				name += suffix;
+				name += TransliterateText(suffix);
 			}
 		}
 	}

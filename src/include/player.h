@@ -384,6 +384,7 @@ public:
 	bool HasSeparateSuffixTypeName(std::string type);
 	bool HasSeparateInfixTypeName(std::string type);
 	bool HasMeaning(std::string meaning);
+	void AddTypeNameGenerationFromWord(LanguageWord *word, std::string type);
 
 	std::string Word;									/// Word name / ID.
 	int Language;
@@ -482,6 +483,7 @@ public:
 	
 	std::string Ident;	/// Ident of the language
 	std::string Name;	/// Name of the language
+	std::string NominativeAdjectiveEndingAfterDefiniteArticle;
 	std::vector<LanguageWord *> LanguageWords;								/// words of the language
 	std::vector<std::string> NameTranslations[2];							/// name translations (2 values: one for the name to be translated, and another for the translation)
 };

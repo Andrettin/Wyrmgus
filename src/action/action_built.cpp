@@ -304,7 +304,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			CorrectWallDirections(unit);
 			CorrectWallNeighBours(unit);
 		} else {
-			unit.Direction = (MyRand() >> 8) & 0xFF; // random heading
+			//Wyrmgus start
+//			unit.Direction = (MyRand() >> 8) & 0xFF; // random heading
+			unit.Direction = (SyncRand() >> 8) & 0xFF; // random heading
+			//Wyrmgus end
 		}
 		UnitUpdateHeading(unit);
 	}
