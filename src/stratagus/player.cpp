@@ -2545,10 +2545,12 @@ void GenerateMissingLanguageData()
 			if (name.empty() && default_language != -1) { //if the name is still empty, try to add name generation of this type for this language based on the default language, for words which share a meaning
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
 					for (size_t n = 0; n < PlayerRaces.Languages[default_language]->LanguageWords.size(); ++n) {
-						for (size_t o = 0; o < PlayerRaces.Languages[i]->LanguageWords[k]->Meanings.size(); ++o) {
-							if (PlayerRaces.Languages[default_language]->LanguageWords[n]->HasMeaning(PlayerRaces.Languages[i]->LanguageWords[k]->Meanings[o])) {
-								PlayerRaces.Languages[i]->LanguageWords[k]->AddTypeNameGenerationFromWord(PlayerRaces.Languages[default_language]->LanguageWords[n], types[j]);
-								break;
+						if (PlayerRaces.Languages[default_language]->LanguageWords[n]->Type == PlayerRaces.Languages[i]->LanguageWords[k]->Type) {
+							for (size_t o = 0; o < PlayerRaces.Languages[i]->LanguageWords[k]->Meanings.size(); ++o) {
+								if (PlayerRaces.Languages[default_language]->LanguageWords[n]->HasMeaning(PlayerRaces.Languages[i]->LanguageWords[k]->Meanings[o])) {
+									PlayerRaces.Languages[i]->LanguageWords[k]->AddTypeNameGenerationFromWord(PlayerRaces.Languages[default_language]->LanguageWords[n], types[j]);
+									break;
+								}
 							}
 						}
 					}
