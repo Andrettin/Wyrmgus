@@ -331,6 +331,29 @@ enum GrammaticalNumbers {
 	MaxGrammaticalNumbers
 };
 
+enum GrammaticalPersons {
+	GrammaticalPersonFirstPerson,
+	GrammaticalPersonSecondPerson,
+	GrammaticalPersonThirdPerson,
+	
+	MaxGrammaticalPersons
+};
+
+enum GrammaticalTenses {
+	GrammaticalTensePresent,
+	GrammaticalTensePast,
+	GrammaticalTenseFuture,
+	
+	MaxGrammaticalTenses
+};
+
+enum GrammaticalMoods {
+	GrammaticalMoodIndicative,
+	GrammaticalMoodSubjunctive,
+	
+	MaxGrammaticalMoods
+};
+
 enum ComparisonDegrees {
 	ComparisonDegreePositive,
 	ComparisonDegreeComparative,
@@ -409,14 +432,18 @@ public:
 	bool HasSeparateInfixTypeName(std::string type);
 	bool HasMeaning(std::string meaning);
 	std::string GetNumberCaseInflection(int grammatical_number, int grammatical_case);
+	std::string GetNumberPersonTenseMoodInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
 	std::string GetComparisonDegreeInflection(int comparison_degree);
+	std::string GetParticiple(int grammatical_tense);
 	void AddTypeNameGenerationFromWord(LanguageWord *word, std::string type);
 
 	std::string Word;									/// Word name / ID.
 	int Language;
 	int Type;											/// Word type
 	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
+	std::string NumberPersonTenseMoodInflections[MaxGrammaticalNumbers][MaxGrammaticalPersons][MaxGrammaticalTenses][MaxGrammaticalMoods];	/// For verbs
 	std::string ComparisonDegreeInflections[MaxComparisonDegrees];	/// For adjectives
+	std::string Participles[MaxGrammaticalTenses];		/// For verbs
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
 	LanguageWord *DerivesFrom;    						/// From which word does this word derive
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
@@ -440,35 +467,6 @@ public:
 	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
 	bool InfixSingular;				/// Whether the noun's singular form can be used as an infix
 	bool InfixPlural;				/// Whether the noun's plural form can be used as an infix
-	
-	//verb-specific variables
-	std::string Infinitive;
-	std::string SingularFirstPersonPresent;
-	std::string SingularSecondPersonPresent;
-	std::string SingularThirdPersonPresent;
-	std::string PluralFirstPersonPresent;
-	std::string PluralSecondPersonPresent;
-	std::string PluralThirdPersonPresent;
-	std::string SingularFirstPersonPresentSubjunctive;
-	std::string SingularSecondPersonPresentSubjunctive;
-	std::string SingularThirdPersonPresentSubjunctive;
-	std::string PluralFirstPersonPresentSubjunctive;
-	std::string PluralSecondPersonPresentSubjunctive;
-	std::string PluralThirdPersonPresentSubjunctive;
-	std::string SingularFirstPersonPast;
-	std::string SingularSecondPersonPast;
-	std::string SingularThirdPersonPast;
-	std::string PluralFirstPersonPast;
-	std::string PluralSecondPersonPast;
-	std::string PluralThirdPersonPast;
-	std::string SingularFirstPersonFuture;
-	std::string SingularSecondPersonFuture;
-	std::string SingularThirdPersonFuture;
-	std::string PluralFirstPersonFuture;
-	std::string PluralSecondPersonFuture;
-	std::string PluralThirdPersonFuture;
-	std::string ParticiplePresent;
-	std::string ParticiplePast;
 	
 	//pronoun and article-specific variables
 	std::string Nominative;			/// Nominative case for the pronoun (if any)
@@ -717,6 +715,12 @@ extern std::string GetGrammaticalCaseNameById(int grammatical_case);
 extern int GetGrammaticalCaseIdByName(std::string grammatical_case);
 extern std::string GetGrammaticalNumberNameById(int grammatical_number);
 extern int GetGrammaticalNumberIdByName(std::string grammatical_number);
+extern std::string GetGrammaticalPersonNameById(int grammatical_person);
+extern int GetGrammaticalPersonIdByName(std::string grammatical_person);
+extern std::string GetGrammaticalTenseNameById(int grammatical_tense);
+extern int GetGrammaticalTenseIdByName(std::string grammatical_tense);
+extern std::string GetGrammaticalMoodNameById(int grammatical_mood);
+extern int GetGrammaticalMoodIdByName(std::string grammatical_mood);
 extern std::string GetComparisonDegreeNameById(int comparison_degree);
 extern int GetComparisonDegreeIdByName(std::string comparison_degree);
 extern void GenerateMissingLanguageData();

@@ -2377,6 +2377,80 @@ int GetGrammaticalNumberIdByName(std::string grammatical_number)
 	return -1;
 }
 
+std::string GetGrammaticalPersonNameById(int grammatical_person)
+{
+	if (grammatical_person == GrammaticalPersonFirstPerson) {
+		return "first-person";
+	} else if (grammatical_person == GrammaticalPersonSecondPerson) {
+		return "second-person";
+	} else if (grammatical_person == GrammaticalPersonThirdPerson) {
+		return "third-person";
+	}
+
+	return "";
+}
+
+int GetGrammaticalPersonIdByName(std::string grammatical_person)
+{
+	if (grammatical_person == "first-person") {
+		return GrammaticalPersonFirstPerson;
+	} else if (grammatical_person == "second-person") {
+		return GrammaticalPersonSecondPerson;
+	} else if (grammatical_person == "third-person") {
+		return GrammaticalPersonThirdPerson;
+	}
+
+	return -1;
+}
+
+std::string GetGrammaticalTenseNameById(int grammatical_tense)
+{
+	if (grammatical_tense == GrammaticalTensePresent) {
+		return "present";
+	} else if (grammatical_tense == GrammaticalTensePast) {
+		return "past";
+	} else if (grammatical_tense == GrammaticalTenseFuture) {
+		return "future";
+	}
+
+	return "";
+}
+
+int GetGrammaticalTenseIdByName(std::string grammatical_tense)
+{
+	if (grammatical_tense == "present") {
+		return GrammaticalTensePresent;
+	} else if (grammatical_tense == "past") {
+		return GrammaticalTensePast;
+	} else if (grammatical_tense == "future") {
+		return GrammaticalTenseFuture;
+	}
+
+	return -1;
+}
+
+std::string GetGrammaticalMoodNameById(int grammatical_mood)
+{
+	if (grammatical_mood == GrammaticalMoodIndicative) {
+		return "indicative";
+	} else if (grammatical_mood == GrammaticalMoodSubjunctive) {
+		return "subjunctive";
+	}
+
+	return "";
+}
+
+int GetGrammaticalMoodIdByName(std::string grammatical_mood)
+{
+	if (grammatical_mood == "indicative") {
+		return GrammaticalMoodIndicative;
+	} else if (grammatical_mood == "subjunctive") {
+		return GrammaticalMoodSubjunctive;
+	}
+
+	return -1;
+}
+
 std::string GetComparisonDegreeNameById(int comparison_degree)
 {
 	if (comparison_degree == ComparisonDegreePositive) {
@@ -2478,10 +2552,28 @@ std::string LanguageWord::GetNumberCaseInflection(int grammatical_number, int gr
 	return this->Word;
 }
 
+std::string LanguageWord::GetNumberPersonTenseMoodInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
+{
+	if (!this->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood].empty()) {
+		return this->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood];
+	}
+	
+	return this->Word;
+}
+
 std::string LanguageWord::GetComparisonDegreeInflection(int comparison_degree)
 {
 	if (!this->ComparisonDegreeInflections[comparison_degree].empty()) {
 		return this->ComparisonDegreeInflections[comparison_degree];
+	}
+	
+	return this->Word;
+}
+
+std::string LanguageWord::GetParticiple(int grammatical_tense)
+{
+	if (!this->Participles[grammatical_tense].empty()) {
+		return this->Participles[grammatical_tense];
 	}
 	
 	return this->Word;

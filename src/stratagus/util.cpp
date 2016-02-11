@@ -1072,77 +1072,59 @@ std::string GenerateName(int language, std::string type)
 				}
 			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeVerb) {
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasPrefixTypeName(type)) { // only using verb participles for now; maybe should add more possibilities?
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent.empty()) {
-						prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent;
-						prefix_ids[prefix_count] = i;
-						prefix_count += 1;
+					if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
+						prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent);
+					} else {
+						prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePast);
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast.empty()) {
-						prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast;
-						prefix_ids[prefix_count] = i;
-						prefix_count += 1;
-					}
+					prefix_ids[prefix_count] = i;
+					prefix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSuffixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent.empty()) {
-						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent;
-						suffix_ids[suffix_count] = i;
-						suffix_count += 1;
+					if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
+						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent);
+					} else {
+						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePast);
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast.empty()) {
-						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast;
-						suffix_ids[suffix_count] = i;
-						suffix_count += 1;
-					}
+					suffix_ids[suffix_count] = i;
+					suffix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasInfixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent.empty()) {
-						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent;
-						infix_ids[infix_count] = i;
-						infix_count += 1;
+					if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
+						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent);
+					} else {
+						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePast);
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast.empty()) {
-						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast;
-						infix_ids[infix_count] = i;
-						infix_count += 1;
-					}
+					infix_ids[infix_count] = i;
+					infix_count += 1;
 				}
 				
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparatePrefixTypeName(type)) { // only using verb participles for now; maybe should add more possibilities?
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent.empty()) {
-						separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent;
-						separate_prefix_ids[separate_prefix_count] = i;
-						separate_prefix_count += 1;
+					if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
+						separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent);
+					} else {
+						separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePast);
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast.empty()) {
-						separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast;
-						separate_prefix_ids[separate_prefix_count] = i;
-						separate_prefix_count += 1;
-					}
+					separate_prefix_ids[separate_prefix_count] = i;
+					separate_prefix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparateSuffixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent.empty()) {
-						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent;
-						separate_suffix_ids[separate_suffix_count] = i;
-						separate_suffix_count += 1;
+					if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
+						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent);
+					} else {
+						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePast);
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast.empty()) {
-						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast;
-						separate_suffix_ids[separate_suffix_count] = i;
-						separate_suffix_count += 1;
-					}
+					separate_suffix_ids[separate_suffix_count] = i;
+					separate_suffix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparateInfixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent.empty()) {
-						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePresent;
-						separate_infix_ids[separate_infix_count] = i;
-						separate_infix_count += 1;
+					if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
+						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent);
+					} else {
+						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePast);
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast.empty()) {
-						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->ParticiplePast;
-						separate_infix_ids[separate_infix_count] = i;
-						separate_infix_count += 1;
-					}
+					separate_infix_ids[separate_infix_count] = i;
+					separate_infix_count += 1;
 				}
 			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeAdjective) {
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasTypeName(type)) {
