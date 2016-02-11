@@ -483,6 +483,7 @@ public:
 	}
 	
 	std::string GetArticle(std::string gender, std::string grammatical_case, bool definite);
+	int GetPotentialNameQuantityForType(std::string type);
 	
 	std::string Ident;	/// Ident of the language
 	std::string Name;	/// Name of the language

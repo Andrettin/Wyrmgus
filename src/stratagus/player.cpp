@@ -619,7 +619,7 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 				for (size_t j = 0; j < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++j) {
 					std::string suffix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][j]);
 					suffix_to_be_translated[0] = tolower(suffix_to_be_translated[0]);
-					if (suffix_to_be_translated == name.substr(prefix_to_be_translated.size(), suffix_to_be_translated.size())) {
+					if (suffix_to_be_translated == name.substr(prefix_to_be_translated.size(), name.size() - prefix_to_be_translated.size())) {
 						std::string prefix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
 						std::string suffix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][j]);
 						suffix_translation[0] = tolower(suffix_translation[0]);
@@ -2551,6 +2551,40 @@ std::string CLanguage::GetArticle(std::string gender, std::string grammatical_ca
 	return "";
 }
 
+int CLanguage::GetPotentialNameQuantityForType(std::string type)
+{
+	int name_count = 0;
+	int affix_count[MaxWordJunctionTypes][MaxAffixTypes];
+	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
+		for (int j = 0; j < MaxAffixTypes; ++j) {
+			affix_count[i][j] = 0;
+		}
+	}
+
+	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
+		if (this->LanguageWords[i]->HasNameType(type)) {
+			name_count += 1;
+		}
+		
+		for (int j = 0; j < MaxWordJunctionTypes; ++j) {
+			for (int k = 0; k < MaxAffixTypes; ++k) {
+				for (int n = 0; n < MaxGrammaticalNumbers; ++n) {
+					if (this->LanguageWords[i]->HasAffixNameType(type, j, k, n)) {
+						affix_count[j][k] += 1;
+					}
+				}
+			}
+		}
+	}
+	
+	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
+		name_count += affix_count[i][AffixTypePrefix] * affix_count[i][AffixTypeSuffix];
+		name_count += affix_count[i][AffixTypePrefix] * affix_count[i][AffixTypeInfix] * affix_count[i][AffixTypeSuffix];
+	}
+	
+	return name_count;
+}
+
 bool LanguageWord::HasNameType(std::string type)
 {
 	return std::find(this->NameTypes.begin(), this->NameTypes.end(), type) != this->NameTypes.end();
@@ -2622,6 +2656,7 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 void GenerateMissingLanguageData()
 {
 	std::vector<std::string> types;
+	int minimum_desired_names = 25;
 	
 	// first build a vector with all the types
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
@@ -2647,14 +2682,12 @@ void GenerateMissingLanguageData()
 	
 	int default_language = PlayerRaces.GetLanguageIndexByIdent("english");
 	
-	// now, try to generate a name for language for each type; when failing in one of them, try to assign type name settings based on those of words derived from and to the words in the failing language
+	// now, try to get a minimum quantity of names per language for each type; when failing in one of them, try to assign type name settings based on those of words derived from and to the words in the failing language
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (size_t j = 0; j < types.size(); ++j) {
-			std::string name = GenerateName(i, types[j]);
-			
 			bool deeper_related_word_level_exists = true;
 			int relationship_depth_level = 1;
-			while (name.empty() && deeper_related_word_level_exists) {
+			while (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names && deeper_related_word_level_exists) {
 				deeper_related_word_level_exists = false;
 				
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
@@ -2695,11 +2728,10 @@ void GenerateMissingLanguageData()
 					}
 				}
 				
-				name = GenerateName(i, types[j]);
 				relationship_depth_level += 1;
 			}
 			
-			if (name.empty() && default_language != -1) { //if the name is still empty, try to add name generation of this type for this language based on the default language, for words which share a meaning
+			if (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names && default_language != -1) { //if the quantity of names is still too low, try to add name generation of this type for this language based on the default language, for words which share a meaning
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
 					for (size_t n = 0; n < PlayerRaces.Languages[default_language]->LanguageWords.size(); ++n) {
 						if (PlayerRaces.Languages[default_language]->LanguageWords[n]->Type == PlayerRaces.Languages[i]->LanguageWords[k]->Type) {
