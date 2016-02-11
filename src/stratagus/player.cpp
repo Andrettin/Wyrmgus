@@ -2377,6 +2377,32 @@ int GetGrammaticalNumberIdByName(std::string grammatical_number)
 	return -1;
 }
 
+std::string GetComparisonDegreeNameById(int comparison_degree)
+{
+	if (comparison_degree == ComparisonDegreePositive) {
+		return "positive";
+	} else if (comparison_degree == ComparisonDegreeComparative) {
+		return "comparative";
+	} else if (comparison_degree == ComparisonDegreeSuperlative) {
+		return "superlative";
+	}
+
+	return "";
+}
+
+int GetComparisonDegreeIdByName(std::string comparison_degree)
+{
+	if (comparison_degree == "positive") {
+		return ComparisonDegreePositive;
+	} else if (comparison_degree == "comparative") {
+		return ComparisonDegreeComparative;
+	} else if (comparison_degree == "superlative") {
+		return ComparisonDegreeSuperlative;
+	}
+
+	return -1;
+}
+
 std::string CLanguage::GetArticle(std::string gender, std::string grammatical_case, bool definite)
 {
 	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
@@ -2447,6 +2473,15 @@ std::string LanguageWord::GetNumberCaseInflection(int grammatical_number, int gr
 {
 	if (!this->NumberCaseInflections[grammatical_number][grammatical_case].empty()) {
 		return this->NumberCaseInflections[grammatical_number][grammatical_case];
+	}
+	
+	return this->Word;
+}
+
+std::string LanguageWord::GetComparisonDegreeInflection(int comparison_degree)
+{
+	if (!this->ComparisonDegreeInflections[comparison_degree].empty()) {
+		return this->ComparisonDegreeInflections[comparison_degree];
 	}
 	
 	return this->Word;

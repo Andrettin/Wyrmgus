@@ -860,6 +860,21 @@ static int CclDefineLanguageWord(lua_State *l)
 
 				word->NumberCaseInflections[grammatical_number][grammatical_case] = LuaToString(l, -1, k + 1);
 			}
+		} else if (!strcmp(value, "ComparisonDegreeInflections")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				std::string comparison_degree_name = LuaToString(l, -1, k + 1);
+				int comparison_degree = GetComparisonDegreeIdByName(comparison_degree_name);
+				if (comparison_degree == -1) {
+					LuaError(l, "Comparison degree \"%s\" doesn't exist." _C_ comparison_degree_name.c_str());
+				}
+				++k;
+				
+				word->ComparisonDegreeInflections[comparison_degree] = LuaToString(l, -1, k + 1);
+			}
 		//noun-specific variables
 		} else if (!strcmp(value, "Uncountable")) {
 			word->Uncountable = LuaToBoolean(l, -1);
@@ -922,19 +937,6 @@ static int CclDefineLanguageWord(lua_State *l)
 			word->ParticiplePresent = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParticiplePast")) {
 			word->ParticiplePast = LuaToString(l, -1);
-		//adjective-specific variables
-		} else if (!strcmp(value, "Positive")) {
-			word->Positive = LuaToString(l, -1);
-		} else if (!strcmp(value, "Comparative")) {
-			word->Comparative = LuaToString(l, -1);
-		} else if (!strcmp(value, "Superlative")) {
-			word->Superlative = LuaToString(l, -1);
-		} else if (!strcmp(value, "PositivePlural")) {
-			word->PositivePlural = LuaToString(l, -1);
-		} else if (!strcmp(value, "ComparativePlural")) {
-			word->ComparativePlural = LuaToString(l, -1);
-		} else if (!strcmp(value, "SuperlativePlural")) {
-			word->SuperlativePlural = LuaToString(l, -1);
 		//pronoun and article-specific variables
 		} else if (!strcmp(value, "Nominative")) {
 			word->Nominative = LuaToString(l, -1);

@@ -331,6 +331,14 @@ enum GrammaticalNumbers {
 	MaxGrammaticalNumbers
 };
 
+enum ComparisonDegrees {
+	ComparisonDegreePositive,
+	ComparisonDegreeComparative,
+	ComparisonDegreeSuperlative,
+	
+	MaxComparisonDegrees
+};
+
 class CFaction
 {
 public:
@@ -401,12 +409,14 @@ public:
 	bool HasSeparateInfixTypeName(std::string type);
 	bool HasMeaning(std::string meaning);
 	std::string GetNumberCaseInflection(int grammatical_number, int grammatical_case);
+	std::string GetComparisonDegreeInflection(int comparison_degree);
 	void AddTypeNameGenerationFromWord(LanguageWord *word, std::string type);
 
 	std::string Word;									/// Word name / ID.
 	int Language;
 	int Type;											/// Word type
 	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
+	std::string ComparisonDegreeInflections[MaxComparisonDegrees];	/// For adjectives
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
 	LanguageWord *DerivesFrom;    						/// From which word does this word derive
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
@@ -459,14 +469,6 @@ public:
 	std::string PluralThirdPersonFuture;
 	std::string ParticiplePresent;
 	std::string ParticiplePast;
-	
-	//adjective-specific variables
-	std::string Positive;			/// Positive form of the adjective.
-	std::string Comparative;		/// Comparative form of the adjective.
-	std::string Superlative;		/// Superlative form of the adjective.
-	std::string PositivePlural;		/// Positive plural form of the adjective.
-	std::string ComparativePlural;	/// Comparative plural form of the adjective.
-	std::string SuperlativePlural;	/// Superlative plural form of the adjective.
 	
 	//pronoun and article-specific variables
 	std::string Nominative;			/// Nominative case for the pronoun (if any)
@@ -715,6 +717,8 @@ extern std::string GetGrammaticalCaseNameById(int grammatical_case);
 extern int GetGrammaticalCaseIdByName(std::string grammatical_case);
 extern std::string GetGrammaticalNumberNameById(int grammatical_number);
 extern int GetGrammaticalNumberIdByName(std::string grammatical_number);
+extern std::string GetComparisonDegreeNameById(int comparison_degree);
+extern int GetComparisonDegreeIdByName(std::string comparison_degree);
 extern void GenerateMissingLanguageData();
 //Wyrmgus end
 

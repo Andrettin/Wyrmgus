@@ -1146,98 +1146,72 @@ std::string GenerateName(int language, std::string type)
 				}
 			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeAdjective) {
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						names[name_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						name_ids[name_count] = i;
-						name_count += 1;
-					}
+					names[name_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive);
+					name_ids[name_count] = i;
+					name_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasPrefixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						prefix_ids[prefix_count] = i;
-						prefix_count += 1;
-					}
+					prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive);
+					prefix_ids[prefix_count] = i;
+					prefix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSuffixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						suffix_ids[suffix_count] = i;
-						suffix_count += 1;
-					}
+					suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive);
+					suffix_ids[suffix_count] = i;
+					suffix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasInfixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						infix_ids[infix_count] = i;
-						infix_count += 1;
-					}
+					infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive);
+					infix_ids[infix_count] = i;
+					infix_count += 1;
 				}
 				
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparatePrefixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						separate_prefix_ids[separate_prefix_count] = i;
-						separate_prefix_count += 1;
-					}
+					separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive);
+					separate_prefix_ids[separate_prefix_count] = i;
+					separate_prefix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparateSuffixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						separate_suffix_ids[separate_suffix_count] = i;
-						separate_suffix_count += 1;
-					}
+					separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive);
+					separate_suffix_ids[separate_suffix_count] = i;
+					separate_suffix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparateInfixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						separate_infix_ids[separate_infix_count] = i;
-						separate_infix_count += 1;
-					}
+					separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive);
+					separate_infix_ids[separate_infix_count] = i;
+					separate_infix_count += 1;
 				}
 			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeNumeral) {
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasPrefixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						prefix_ids[prefix_count] = i;
-						prefix_count += 1;
-					}
+					prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
+					prefix_ids[prefix_count] = i;
+					prefix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSuffixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						suffix_ids[suffix_count] = i;
-						suffix_count += 1;
-					}
+					suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
+					suffix_ids[suffix_count] = i;
+					suffix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasInfixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						infix_ids[infix_count] = i;
-						infix_count += 1;
-					}
+					infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
+					infix_ids[infix_count] = i;
+					infix_count += 1;
 				}
 				
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparatePrefixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						separate_prefix_ids[separate_prefix_count] = i;
-						separate_prefix_count += 1;
-					}
+					separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
+					separate_prefix_ids[separate_prefix_count] = i;
+					separate_prefix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparateSuffixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						separate_suffix_ids[separate_suffix_count] = i;
-						separate_suffix_count += 1;
-					}
+					separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
+					separate_suffix_ids[separate_suffix_count] = i;
+					separate_suffix_count += 1;
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparateInfixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->Word.empty()) {
-						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
-						separate_infix_ids[separate_infix_count] = i;
-						separate_infix_count += 1;
-					}
+					separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->Word;
+					separate_infix_ids[separate_infix_count] = i;
+					separate_infix_count += 1;
 				}
 			}
 		}
