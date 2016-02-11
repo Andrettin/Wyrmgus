@@ -838,23 +838,29 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 		} else if (!strcmp(value, "Gender")) {
 			word->Gender = LuaToString(l, -1);
+		} else if (!strcmp(value, "NumberCaseInflections")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				std::string grammatical_number_name = LuaToString(l, -1, k + 1);
+				int grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+				if (grammatical_number == -1) {
+					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+				}
+				++k;
+				
+				std::string grammatical_case_name = LuaToString(l, -1, k + 1);
+				int grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
+				if (grammatical_case == -1) {
+					LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
+				}
+				++k;
+
+				word->NumberCaseInflections[grammatical_number][grammatical_case] = LuaToString(l, -1, k + 1);
+			}
 		//noun-specific variables
-		} else if (!strcmp(value, "SingularNominative")) {
-			word->SingularNominative = LuaToString(l, -1);
-		} else if (!strcmp(value, "SingularAccusative")) {
-			word->SingularAccusative = LuaToString(l, -1);
-		} else if (!strcmp(value, "SingularDative")) {
-			word->SingularDative = LuaToString(l, -1);
-		} else if (!strcmp(value, "SingularGenitive")) {
-			word->SingularGenitive = LuaToString(l, -1);
-		} else if (!strcmp(value, "PluralNominative")) {
-			word->PluralNominative = LuaToString(l, -1);
-		} else if (!strcmp(value, "PluralAccusative")) {
-			word->PluralAccusative = LuaToString(l, -1);
-		} else if (!strcmp(value, "PluralDative")) {
-			word->PluralDative = LuaToString(l, -1);
-		} else if (!strcmp(value, "PluralGenitive")) {
-			word->PluralGenitive = LuaToString(l, -1);
 		} else if (!strcmp(value, "Uncountable")) {
 			word->Uncountable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NameSingular")) {

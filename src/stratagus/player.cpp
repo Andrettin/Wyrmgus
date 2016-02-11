@@ -2325,6 +2325,58 @@ int GetWordTypeIdByName(std::string word_type)
 	return -1;
 }
 
+std::string GetGrammaticalCaseNameById(int grammatical_case)
+{
+	if (grammatical_case == GrammaticalCaseNominative) {
+		return "nominative";
+	} else if (grammatical_case == GrammaticalCaseAccusative) {
+		return "accusative";
+	} else if (grammatical_case == GrammaticalCaseDative) {
+		return "dative";
+	} else if (grammatical_case == GrammaticalCaseGenitive) {
+		return "genitive";
+	}
+
+	return "";
+}
+
+int GetGrammaticalCaseIdByName(std::string grammatical_case)
+{
+	if (grammatical_case == "nominative") {
+		return GrammaticalCaseNominative;
+	} else if (grammatical_case == "accusative") {
+		return GrammaticalCaseAccusative;
+	} else if (grammatical_case == "dative") {
+		return GrammaticalCaseDative;
+	} else if (grammatical_case == "genitive") {
+		return GrammaticalCaseGenitive;
+	}
+
+	return -1;
+}
+
+std::string GetGrammaticalNumberNameById(int grammatical_number)
+{
+	if (grammatical_number == GrammaticalNumberSingular) {
+		return "singular";
+	} else if (grammatical_number == GrammaticalNumberPlural) {
+		return "plural";
+	}
+
+	return "";
+}
+
+int GetGrammaticalNumberIdByName(std::string grammatical_number)
+{
+	if (grammatical_number == "singular") {
+		return GrammaticalNumberSingular;
+	} else if (grammatical_number == "plural") {
+		return GrammaticalNumberPlural;
+	}
+
+	return -1;
+}
+
 std::string CLanguage::GetArticle(std::string gender, std::string grammatical_case, bool definite)
 {
 	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
@@ -2389,6 +2441,15 @@ bool LanguageWord::HasSeparateInfixTypeName(std::string type)
 bool LanguageWord::HasMeaning(std::string meaning)
 {
 	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
+}
+
+std::string LanguageWord::GetNumberCaseInflection(int grammatical_number, int grammatical_case)
+{
+	if (!this->NumberCaseInflections[grammatical_number][grammatical_case].empty()) {
+		return this->NumberCaseInflections[grammatical_number][grammatical_case];
+	}
+	
+	return this->Word;
 }
 
 void LanguageWord::AddTypeNameGenerationFromWord(LanguageWord *word, std::string type)

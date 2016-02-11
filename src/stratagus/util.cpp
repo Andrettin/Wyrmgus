@@ -566,6 +566,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "â", "a");
 	text = FindAndReplaceString(text, "Ā́", "A");
 	text = FindAndReplaceString(text, "ā́", "a");
+	text = FindAndReplaceString(text, "Ấ", "A");
+	text = FindAndReplaceString(text, "ấ", "a");
 	text = FindAndReplaceString(text, "Ą", "A");
 	text = FindAndReplaceString(text, "ą", "a");
 	text = FindAndReplaceString(text, "ᶏ", "a");
@@ -581,6 +583,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ḍ", "d");
 	text = FindAndReplaceString(text, "Đ", "d");
 	text = FindAndReplaceString(text, "đ", "d");
+	text = FindAndReplaceString(text, "É", "E");
+	text = FindAndReplaceString(text, "é", "e");
+	text = FindAndReplaceString(text, "È", "E");
+	text = FindAndReplaceString(text, "è", "e");
 	text = FindAndReplaceString(text, "Ē", "E");
 	text = FindAndReplaceString(text, "ē", "e");
 	text = FindAndReplaceString(text, "Ê", "E");
@@ -595,6 +601,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ə", "e");
 	text = FindAndReplaceString(text, "Í", "I");
 	text = FindAndReplaceString(text, "í", "i");
+	text = FindAndReplaceString(text, "Ì", "I");
+	text = FindAndReplaceString(text, "ì", "i");
 	text = FindAndReplaceString(text, "Ī", "I");
 	text = FindAndReplaceString(text, "ī", "i");
 	text = FindAndReplaceString(text, "Î", "I");
@@ -611,6 +619,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ö", "o");
 	text = FindAndReplaceString(text, "Ó", "O");
 	text = FindAndReplaceString(text, "ó", "o");
+	text = FindAndReplaceString(text, "Ò", "O");
+	text = FindAndReplaceString(text, "ò", "o");
 	text = FindAndReplaceString(text, "Ō", "O");
 	text = FindAndReplaceString(text, "ō", "o");
 	text = FindAndReplaceString(text, "Ô", "O");
@@ -632,6 +642,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "þ", "th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ü", "U");
 	text = FindAndReplaceString(text, "ü", "u");
+	text = FindAndReplaceString(text, "Ú", "U");
+	text = FindAndReplaceString(text, "ú", "u");
+	text = FindAndReplaceString(text, "Ù", "U");
+	text = FindAndReplaceString(text, "ù", "u");
 	text = FindAndReplaceString(text, "Ū", "U");
 	text = FindAndReplaceString(text, "ū", "u");
 	text = FindAndReplaceString(text, "Û", "U");
@@ -929,13 +943,13 @@ std::string GenerateName(int language, std::string type)
 		for (size_t i = 0; i < PlayerRaces.Languages[language]->LanguageWords.size(); ++i) {
 			if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeNoun) {
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasTypeName(type)) { // nouns which can be used as names for this type without compounding
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->NameSingular) {
-						names[name_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->NameSingular) {
+						names[name_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 						name_ids[name_count] = i;
 						name_count += 1;
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->NamePlural) {
-						names[name_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->NamePlural) {
+						names[name_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 						name_ids[name_count] = i;
 						name_count += 1;
 					}
@@ -943,60 +957,56 @@ std::string GenerateName(int language, std::string type)
 				
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasPrefixTypeName(type)) {
 					if (PlayerRaces.Languages[language]->LanguageWords[i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive
-						if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->PrefixSingular) {
-							prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
+						if (PlayerRaces.Languages[language]->LanguageWords[i]->PrefixSingular) {
+							prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 							prefix_ids[prefix_count] = i;
 							prefix_count += 1;
 						}
-						if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->PrefixPlural) {
-							prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
+						if (PlayerRaces.Languages[language]->LanguageWords[i]->PrefixPlural) {
+							prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 							prefix_count += 1;
 						}
 					} else {
 						if (PlayerRaces.Languages[language]->LanguageWords[i]->PrefixSingular) {
-							if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularGenitive.empty()) {
-								prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularGenitive;
-								prefix_ids[prefix_count] = i;
-								prefix_count += 1;
-							} else if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty()) { //if no genitive is present, use the nominative instead
-								prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
-								prefix_ids[prefix_count] = i;
-								prefix_count += 1;
+							if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
+								prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseGenitive);
+							} else { //if no genitive is present, use the nominative instead
+								prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 							}
+							prefix_ids[prefix_count] = i;
+							prefix_count += 1;
 						}
 						if (PlayerRaces.Languages[language]->LanguageWords[i]->PrefixPlural) {
-							if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralGenitive.empty()) {
-								prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralGenitive;
-								prefix_ids[prefix_count] = i;
-								prefix_count += 1;
-							} else if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty()) { //if no genitive is present, use the nominative instead
-								prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
-								prefix_ids[prefix_count] = i;
-								prefix_count += 1;
+							if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
+								prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseGenitive);
+							} else  {
+								prefixes[prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 							}
+							prefix_ids[prefix_count] = i;
+							prefix_count += 1;
 						}
 					}
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSuffixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->SuffixSingular) {
-						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->SuffixSingular) {
+						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 						suffix_ids[suffix_count] = i;
 						suffix_count += 1;
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->SuffixPlural) {
-						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->SuffixPlural) {
+						suffixes[suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 						suffix_ids[suffix_count] = i;
 						suffix_count += 1;
 					}
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasInfixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->InfixSingular) {
-						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->InfixSingular) {
+						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 						infix_ids[infix_count] = i;
 						infix_count += 1;
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->InfixPlural) {
-						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->InfixPlural) {
+						infixes[infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 						infix_ids[infix_count] = i;
 						infix_count += 1;
 					}
@@ -1004,34 +1014,32 @@ std::string GenerateName(int language, std::string type)
 				
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparatePrefixTypeName(type)) {
 					if (PlayerRaces.Languages[language]->LanguageWords[i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive
-						if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->PrefixSingular) {
-							separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
+						if (PlayerRaces.Languages[language]->LanguageWords[i]->PrefixSingular) {
+							separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 							separate_prefix_ids[separate_prefix_count] = i;
 							separate_prefix_count += 1;
 						}
-						if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->PrefixPlural) {
-							separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
+						if (PlayerRaces.Languages[language]->LanguageWords[i]->PrefixPlural) {
+							separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 							separate_prefix_count += 1;
 						}
 					} else {
 						if (PlayerRaces.Languages[language]->LanguageWords[i]->PrefixSingular) {
-							if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularGenitive.empty()) {
-								separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularGenitive;
-								separate_prefix_ids[separate_prefix_count] = i;
-								separate_prefix_count += 1;
-							} else if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty()) { //if no genitive is present, use the nominative instead
-								separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
-								separate_prefix_ids[separate_prefix_count] = i;
-								separate_prefix_count += 1;
+							if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
+								separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseGenitive);
+							} else {
+								separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 							}
+							separate_prefix_ids[separate_prefix_count] = i;
+							separate_prefix_count += 1;
 						}
 						if (PlayerRaces.Languages[language]->LanguageWords[i]->PrefixPlural) {
-							if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralGenitive.empty()) {
-								separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralGenitive;
+							if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
+								separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseGenitive);
 								separate_prefix_ids[separate_prefix_count] = i;
 								separate_prefix_count += 1;
-							} else if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty()) { //if no genitive is present, use the nominative instead
-								separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
+							} else {
+								separate_prefixes[separate_prefix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 								separate_prefix_ids[separate_prefix_count] = i;
 								separate_prefix_count += 1;
 							}
@@ -1039,25 +1047,25 @@ std::string GenerateName(int language, std::string type)
 					}
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparateSuffixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->SuffixSingular) {
-						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->SuffixSingular) {
+						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 						separate_suffix_ids[separate_suffix_count] = i;
 						separate_suffix_count += 1;
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->SuffixPlural) {
-						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->SuffixPlural) {
+						separate_suffixes[separate_suffix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 						separate_suffix_ids[separate_suffix_count] = i;
 						separate_suffix_count += 1;
 					}
 				}
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasSeparateInfixTypeName(type)) {
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->InfixSingular) {
-						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->SingularNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->InfixSingular) {
+						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative);
 						separate_infix_ids[separate_infix_count] = i;
 						separate_infix_count += 1;
 					}
-					if (!PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative.empty() && PlayerRaces.Languages[language]->LanguageWords[i]->InfixPlural) {
-						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->PluralNominative;
+					if (PlayerRaces.Languages[language]->LanguageWords[i]->InfixPlural) {
+						separate_infixes[separate_infix_count] = PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 						separate_infix_ids[separate_infix_count] = i;
 						separate_infix_count += 1;
 					}
@@ -1256,7 +1264,7 @@ std::string GenerateName(int language, std::string type)
 
 				if (PlayerRaces.Languages[language]->LanguageWords[prefix_ids[prefix_id]]->Type == WordTypeNumeral && PlayerRaces.Languages[language]->LanguageWords[prefix_ids[prefix_id]]->Number > 1 && PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]]->Type == WordTypeNoun) { // if requires plural (by being a numeral greater than one) and suffix is a noun
 					//then replace the suffix with its plural form
-					suffix = PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]]->PluralNominative;
+					suffix = PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 				}
 					
 				suffix = DecapitalizeString(suffix);
@@ -1296,7 +1304,7 @@ std::string GenerateName(int language, std::string type)
 
 				if (PlayerRaces.Languages[language]->LanguageWords[prefix_ids[prefix_id]]->Type == WordTypeNumeral && PlayerRaces.Languages[language]->LanguageWords[prefix_ids[prefix_id]]->Number > 1 && PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]]->Type == WordTypeNoun) { // if requires plural (by being a numeral greater than one) and suffix is a noun
 					//then replace the suffix with its plural form
-					suffix = PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]]->PluralNominative;
+					suffix = PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 				}
 					
 				infix = DecapitalizeString(infix);
@@ -1343,7 +1351,7 @@ std::string GenerateName(int language, std::string type)
 
 				if (PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->Type == WordTypeNumeral && PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->Number > 1 && PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun) { // if requires plural (by being a numeral greater than one) and suffix is a noun
 					//then replace the suffix with its plural form
-					suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->PluralNominative;
+					suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 				}
 				
 				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, "nominative", true).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
@@ -1382,7 +1390,7 @@ std::string GenerateName(int language, std::string type)
 
 				if (PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->Type == WordTypeNumeral && PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->Number > 1 && PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun) { // if requires plural (by being a numeral greater than one) and suffix is a noun
 					//then replace the suffix with its plural form
-					suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->PluralNominative;
+					suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 				}
 					
 				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, "nominative", true).empty()) { //if type is neither a province nor a settlement, add an article at the beginning

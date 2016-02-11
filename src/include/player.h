@@ -315,6 +315,22 @@ enum WordTypes {
 	MaxWordTypes
 };
 
+enum GrammaticalCases {
+	GrammaticalCaseNominative,
+	GrammaticalCaseAccusative,
+	GrammaticalCaseDative,
+	GrammaticalCaseGenitive,
+	
+	MaxGrammaticalCases
+};
+
+enum GrammaticalNumbers {
+	GrammaticalNumberSingular,
+	GrammaticalNumberPlural,
+	
+	MaxGrammaticalNumbers
+};
+
 class CFaction
 {
 public:
@@ -384,11 +400,13 @@ public:
 	bool HasSeparateSuffixTypeName(std::string type);
 	bool HasSeparateInfixTypeName(std::string type);
 	bool HasMeaning(std::string meaning);
+	std::string GetNumberCaseInflection(int grammatical_number, int grammatical_case);
 	void AddTypeNameGenerationFromWord(LanguageWord *word, std::string type);
 
 	std::string Word;									/// Word name / ID.
 	int Language;
 	int Type;											/// Word type
+	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
 	LanguageWord *DerivesFrom;    						/// From which word does this word derive
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
@@ -403,14 +421,6 @@ public:
 	std::string Gender;				/// What is the gender of the noun or article (Male, Female or Neuter)
 
 	// noun-specific variables
-	std::string SingularNominative;
-	std::string SingularAccusative;
-	std::string SingularDative;
-	std::string SingularGenitive;
-	std::string PluralNominative;
-	std::string PluralAccusative;
-	std::string PluralDative;
-	std::string PluralGenitive;
 	bool Uncountable;				/// Whether the noun is uncountable or not.
 	bool NameSingular;				/// Whether the noun's singular form can be used as a name
 	bool NamePlural;				/// Whether the noun's plural form can be used as a name
@@ -701,6 +711,10 @@ extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(std::string government_type);
 extern std::string GetWordTypeNameById(int word_type);
 extern int GetWordTypeIdByName(std::string word_type);
+extern std::string GetGrammaticalCaseNameById(int grammatical_case);
+extern int GetGrammaticalCaseIdByName(std::string grammatical_case);
+extern std::string GetGrammaticalNumberNameById(int grammatical_number);
+extern int GetGrammaticalNumberIdByName(std::string grammatical_number);
 extern void GenerateMissingLanguageData();
 //Wyrmgus end
 
