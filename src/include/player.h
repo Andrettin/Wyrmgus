@@ -362,6 +362,21 @@ enum ComparisonDegrees {
 	MaxComparisonDegrees
 };
 
+enum AffixTypes {
+	AffixTypePrefix,
+	AffixTypeSuffix,
+	AffixTypeInfix,
+	
+	MaxAffixTypes
+};
+
+enum WordJunctionTypes {
+	WordJunctionTypeCompound,
+	WordJunctionTypeSeparate,
+	
+	MaxWordJunctionTypes
+};
+
 class CFaction
 {
 public:
@@ -414,28 +429,19 @@ public:
 		Language(-1), Type(-1),
 		DerivesFrom(NULL),
 		Uncountable(false),
-		NameSingular(false), NamePlural(false),
-		PrefixSingular(false), PrefixPlural(false),
-		SuffixSingular(false), SuffixPlural(false),
-		InfixSingular(false), InfixPlural(false),
 		Definite(false),
 		Number(-1)
 	{
 	}
 	
-	bool HasTypeName(std::string type);
-	bool HasPrefixTypeName(std::string type);
-	bool HasSuffixTypeName(std::string type);
-	bool HasInfixTypeName(std::string type);
-	bool HasSeparatePrefixTypeName(std::string type);
-	bool HasSeparateSuffixTypeName(std::string type);
-	bool HasSeparateInfixTypeName(std::string type);
+	bool HasNameType(std::string type);
+	bool HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number);
 	bool HasMeaning(std::string meaning);
 	std::string GetNumberCaseInflection(int grammatical_number, int grammatical_case);
 	std::string GetNumberPersonTenseMoodInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
 	std::string GetComparisonDegreeInflection(int comparison_degree);
 	std::string GetParticiple(int grammatical_tense);
-	void AddTypeNameGenerationFromWord(LanguageWord *word, std::string type);
+	void AddNameTypeGenerationFromWord(LanguageWord *word, std::string type);
 
 	std::string Word;									/// Word name / ID.
 	int Language;
@@ -447,26 +453,13 @@ public:
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
 	LanguageWord *DerivesFrom;    						/// From which word does this word derive
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
-	std::vector<std::string> TypeName;
-	std::vector<std::string> PrefixTypeName;
-	std::vector<std::string> SuffixTypeName;
-	std::vector<std::string> InfixTypeName;
-	std::vector<std::string> SeparatePrefixTypeName;
-	std::vector<std::string> SeparateSuffixTypeName;
-	std::vector<std::string> SeparateInfixTypeName;
+	std::vector<std::string> NameTypes;
+	std::vector<std::string> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers];
 	
 	std::string Gender;				/// What is the gender of the noun or article (Male, Female or Neuter)
 
 	// noun-specific variables
 	bool Uncountable;				/// Whether the noun is uncountable or not.
-	bool NameSingular;				/// Whether the noun's singular form can be used as a name
-	bool NamePlural;				/// Whether the noun's plural form can be used as a name
-	bool PrefixSingular;			/// Whether the noun's singular form can be used as a prefix
-	bool PrefixPlural;				/// Whether the noun's plural form can be used as a prefix
-	bool SuffixSingular;			/// Whether the noun's singular form can be used as a suffix
-	bool SuffixPlural;				/// Whether the noun's plural form can be used as a suffix
-	bool InfixSingular;				/// Whether the noun's singular form can be used as an infix
-	bool InfixPlural;				/// Whether the noun's plural form can be used as an infix
 	
 	//pronoun and article-specific variables
 	std::string Nominative;			/// Nominative case for the pronoun (if any)
@@ -723,6 +716,10 @@ extern std::string GetGrammaticalMoodNameById(int grammatical_mood);
 extern int GetGrammaticalMoodIdByName(std::string grammatical_mood);
 extern std::string GetComparisonDegreeNameById(int comparison_degree);
 extern int GetComparisonDegreeIdByName(std::string comparison_degree);
+extern std::string GetAffixTypeNameById(int affix_type);
+extern int GetAffixTypeIdByName(std::string affix_type);
+extern std::string GetWordJunctionTypeNameById(int word_junction_type);
+extern int GetWordJunctionTypeIdByName(std::string word_junction_type);
 extern void GenerateMissingLanguageData();
 //Wyrmgus end
 

@@ -2477,6 +2477,54 @@ int GetComparisonDegreeIdByName(std::string comparison_degree)
 	return -1;
 }
 
+std::string GetAffixTypeNameById(int affix_type)
+{
+	if (affix_type == AffixTypePrefix) {
+		return "prefix";
+	} else if (affix_type == AffixTypeSuffix) {
+		return "suffix";
+	} else if (affix_type == AffixTypeInfix) {
+		return "infix";
+	}
+
+	return "";
+}
+
+int GetAffixTypeIdByName(std::string affix_type)
+{
+	if (affix_type == "prefix") {
+		return AffixTypePrefix;
+	} else if (affix_type == "suffix") {
+		return AffixTypeSuffix;
+	} else if (affix_type == "infix") {
+		return AffixTypeInfix;
+	}
+
+	return -1;
+}
+
+std::string GetWordJunctionTypeNameById(int word_junction_type)
+{
+	if (word_junction_type == WordJunctionTypeCompound) {
+		return "compound";
+	} else if (word_junction_type == WordJunctionTypeSeparate) {
+		return "separate";
+	}
+
+	return "";
+}
+
+int GetWordJunctionTypeIdByName(std::string word_junction_type)
+{
+	if (word_junction_type == "compound") {
+		return WordJunctionTypeCompound;
+	} else if (word_junction_type == "separate") {
+		return WordJunctionTypeSeparate;
+	}
+
+	return -1;
+}
+
 std::string CLanguage::GetArticle(std::string gender, std::string grammatical_case, bool definite)
 {
 	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
@@ -2503,39 +2551,14 @@ std::string CLanguage::GetArticle(std::string gender, std::string grammatical_ca
 	return "";
 }
 
-bool LanguageWord::HasTypeName(std::string type)
+bool LanguageWord::HasNameType(std::string type)
 {
-	return std::find(this->TypeName.begin(), this->TypeName.end(), type) != this->TypeName.end();
+	return std::find(this->NameTypes.begin(), this->NameTypes.end(), type) != this->NameTypes.end();
 }
 
-bool LanguageWord::HasPrefixTypeName(std::string type)
+bool LanguageWord::HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number)
 {
-	return std::find(this->PrefixTypeName.begin(), this->PrefixTypeName.end(), type) != this->PrefixTypeName.end();
-}
-
-bool LanguageWord::HasSuffixTypeName(std::string type)
-{
-	return std::find(this->SuffixTypeName.begin(), this->SuffixTypeName.end(), type) != this->SuffixTypeName.end();
-}
-
-bool LanguageWord::HasInfixTypeName(std::string type)
-{
-	return std::find(this->InfixTypeName.begin(), this->InfixTypeName.end(), type) != this->InfixTypeName.end();
-}
-
-bool LanguageWord::HasSeparatePrefixTypeName(std::string type)
-{
-	return std::find(this->SeparatePrefixTypeName.begin(), this->SeparatePrefixTypeName.end(), type) != this->SeparatePrefixTypeName.end();
-}
-
-bool LanguageWord::HasSeparateSuffixTypeName(std::string type)
-{
-	return std::find(this->SeparateSuffixTypeName.begin(), this->SeparateSuffixTypeName.end(), type) != this->SeparateSuffixTypeName.end();
-}
-
-bool LanguageWord::HasSeparateInfixTypeName(std::string type)
-{
-	return std::find(this->SeparateInfixTypeName.begin(), this->SeparateInfixTypeName.end(), type) != this->SeparateInfixTypeName.end();
+	return std::find(this->AffixNameTypes[word_junction_type][affix_type][grammatical_number].begin(), this->AffixNameTypes[word_junction_type][affix_type][grammatical_number].end(), type) != this->AffixNameTypes[word_junction_type][affix_type][grammatical_number].end();
 }
 
 bool LanguageWord::HasMeaning(std::string meaning)
@@ -2579,54 +2602,19 @@ std::string LanguageWord::GetParticiple(int grammatical_tense)
 	return this->Word;
 }
 
-void LanguageWord::AddTypeNameGenerationFromWord(LanguageWord *word, std::string type)
+void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string type)
 {
-	if (word->HasTypeName(type)) {
-		this->TypeName.push_back(type);
+	if (word->HasNameType(type)) {
+		this->NameTypes.push_back(type);
 	}
-	if (word->HasPrefixTypeName(type)) {
-		this->PrefixTypeName.push_back(type);
-	}
-	if (word->HasSuffixTypeName(type)) {
-		this->SuffixTypeName.push_back(type);
-	}
-	if (word->HasInfixTypeName(type)) {
-		this->InfixTypeName.push_back(type);
-	}
-	if (word->HasSeparatePrefixTypeName(type)) {
-		this->SeparatePrefixTypeName.push_back(type);
-	}
-	if (word->HasSeparateSuffixTypeName(type)) {
-		this->SeparateSuffixTypeName.push_back(type);
-	}
-	if (word->HasSeparateInfixTypeName(type)) {
-		this->SeparateInfixTypeName.push_back(type);
-	}
-			
-	if (this->Type == WordTypeNoun) {
-		if (word->NameSingular) {
-			this->NameSingular = true;
-		}
-		if (word->NamePlural) {
-			this->NamePlural = true;
-		}
-		if (word->PrefixSingular) {
-			this->PrefixSingular = true;
-		}
-		if (word->PrefixPlural) {
-			this->PrefixPlural = true;
-		}
-		if (word->SuffixSingular) {
-			this->SuffixSingular = true;
-		}
-		if (word->SuffixPlural) {
-			this->SuffixPlural = true;
-		}
-		if (word->InfixSingular) {
-			this->InfixSingular = true;
-		}
-		if (word->InfixPlural) {
-			this->InfixPlural = true;
+	
+	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
+		for (int j = 0; j < MaxAffixTypes; ++j) {
+			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
+				if (word->HasAffixNameType(type, i, j, k)) {
+					this->AffixNameTypes[i][j][k].push_back(type);
+				}
+			}
 		}
 	}
 }
@@ -2638,39 +2626,20 @@ void GenerateMissingLanguageData()
 	// first build a vector with all the types
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
-			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->TypeName.size(); ++k) {
-				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->TypeName[k]) == types.end()) {
-					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->TypeName[k]);
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->NameTypes.size(); ++k) {
+				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->NameTypes[k]) == types.end()) {
+					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->NameTypes[k]);
 				}
 			}
-			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->PrefixTypeName.size(); ++k) {
-				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->PrefixTypeName[k]) == types.end()) {
-					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->PrefixTypeName[k]);
-				}
-			}
-			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->SuffixTypeName.size(); ++k) {
-				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->SuffixTypeName[k]) == types.end()) {
-					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->SuffixTypeName[k]);
-				}
-			}
-			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->InfixTypeName.size(); ++k) {
-				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->InfixTypeName[k]) == types.end()) {
-					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->InfixTypeName[k]);
-				}
-			}
-			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->SeparatePrefixTypeName.size(); ++k) {
-				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->SeparatePrefixTypeName[k]) == types.end()) {
-					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->SeparatePrefixTypeName[k]);
-				}
-			}
-			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->SeparateSuffixTypeName.size(); ++k) {
-				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->SeparateSuffixTypeName[k]) == types.end()) {
-					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->SeparateSuffixTypeName[k]);
-				}
-			}
-			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords[j]->SeparateInfixTypeName.size(); ++k) {
-				if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->SeparateInfixTypeName[k]) == types.end()) {
-					types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->SeparateInfixTypeName[k]);
+			for (int k = 0; k < MaxWordJunctionTypes; ++k) {
+				for (int n = 0; n < MaxAffixTypes; ++n) {
+					for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
+						for (size_t p = 0; p < PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o].size(); ++p) {
+							if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p]) == types.end()) {
+								types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p]);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -2722,7 +2691,7 @@ void GenerateMissingLanguageData()
 					
 					//now attach the new type name to the word from its related words, if it is found in them
 					for (size_t n = 0; n < related_words.size(); ++n) {
-						PlayerRaces.Languages[i]->LanguageWords[k]->AddTypeNameGenerationFromWord(related_words[n], types[j]);
+						PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(related_words[n], types[j]);
 					}
 				}
 				
@@ -2736,7 +2705,7 @@ void GenerateMissingLanguageData()
 						if (PlayerRaces.Languages[default_language]->LanguageWords[n]->Type == PlayerRaces.Languages[i]->LanguageWords[k]->Type) {
 							for (size_t o = 0; o < PlayerRaces.Languages[i]->LanguageWords[k]->Meanings.size(); ++o) {
 								if (PlayerRaces.Languages[default_language]->LanguageWords[n]->HasMeaning(PlayerRaces.Languages[i]->LanguageWords[k]->Meanings[o])) {
-									PlayerRaces.Languages[i]->LanguageWords[k]->AddTypeNameGenerationFromWord(PlayerRaces.Languages[default_language]->LanguageWords[n], types[j]);
+									PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(PlayerRaces.Languages[default_language]->LanguageWords[n], types[j]);
 									break;
 								}
 							}

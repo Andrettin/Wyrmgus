@@ -929,10 +929,6 @@ static int CclDefineLanguageWord(lua_State *l)
 		//noun-specific variables
 		} else if (!strcmp(value, "Uncountable")) {
 			word->Uncountable = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "NameSingular")) {
-			word->NameSingular = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "NamePlural")) {
-			word->NamePlural = LuaToBoolean(l, -1);
 		//pronoun and article-specific variables
 		} else if (!strcmp(value, "Nominative")) {
 			word->Nominative = LuaToString(l, -1);
@@ -949,73 +945,42 @@ static int CclDefineLanguageWord(lua_State *l)
 		} else if (!strcmp(value, "Number")) {
 			word->Number = LuaToNumber(l, -1);
 		//type name variables
-		} else if (!strcmp(value, "TypeName")) {
+		} else if (!strcmp(value, "NameTypes")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				word->TypeName.push_back(LuaToString(l, -1, k + 1));
+				word->NameTypes.push_back(LuaToString(l, -1, k + 1));
 			}
-		} else if (!strcmp(value, "PrefixSingular")) {
-			word->PrefixSingular = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixPlural")) {
-			word->PrefixPlural = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PrefixTypeName")) {
+		} else if (!strcmp(value, "AffixNameTypes")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				word->PrefixTypeName.push_back(LuaToString(l, -1, k + 1));
-			}
-		} else if (!strcmp(value, "SeparatePrefixTypeName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				word->SeparatePrefixTypeName.push_back(LuaToString(l, -1, k + 1));
-			}
-		} else if (!strcmp(value, "SuffixSingular")) {
-			word->SuffixSingular = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixPlural")) {
-			word->SuffixPlural = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SuffixTypeName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				word->SuffixTypeName.push_back(LuaToString(l, -1, k + 1));
-			}
-		} else if (!strcmp(value, "SeparateSuffixTypeName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				word->SeparateSuffixTypeName.push_back(LuaToString(l, -1, k + 1));
-			}
-		} else if (!strcmp(value, "InfixSingular")) {
-			word->InfixSingular = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixPlural")) {
-			word->InfixPlural = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InfixTypeName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				word->InfixTypeName.push_back(LuaToString(l, -1, k + 1));
-			}
-		} else if (!strcmp(value, "SeparateInfixTypeName")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				word->SeparateInfixTypeName.push_back(LuaToString(l, -1, k + 1));
+				std::string word_junction_type_name = LuaToString(l, -1, k + 1);
+				int word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
+				if (word_junction_type == -1) {
+					LuaError(l, "Word junction type \"%s\" doesn't exist." _C_ word_junction_type_name.c_str());
+				}
+				++k;
+				
+				std::string affix_type_name = LuaToString(l, -1, k + 1);
+				int affix_type = GetAffixTypeIdByName(affix_type_name);
+				if (affix_type == -1) {
+					LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
+				}
+				++k;
+				
+				std::string grammatical_number_name = LuaToString(l, -1, k + 1);
+				int grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+				if (grammatical_number == -1) {
+					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+				}
+				++k;
+				
+				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number].push_back(LuaToString(l, -1, k + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
