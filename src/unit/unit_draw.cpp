@@ -1303,7 +1303,18 @@ void CUnit::Draw(const CViewport &vp) const
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitActionDie) && frame != type->StillFrame) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
 	}
-	if (this->Direction == LookingN && this->CurrentAction() != UnitActionDie) {
+	if (
+		(this->Direction == LookingN && this->CurrentAction() != UnitActionDie)
+		|| (
+			type->InvertedEastArms
+			&& (this->Direction == LookingE || this->Direction == LookingW)
+			&& this->CurrentAction() != UnitActionDie
+		)
+		|| (
+			type->InvertedSoutheastArms
+			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
+		)
+	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
 	}
 
