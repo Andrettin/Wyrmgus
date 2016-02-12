@@ -577,6 +577,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ǣ", "ae");
 	text = FindAndReplaceString(text, "Ǽ", "Ae");
 	text = FindAndReplaceString(text, "ǽ", "ae");
+	text = FindAndReplaceString(text, "Č", "C");
+	text = FindAndReplaceString(text, "č", "c");
 	text = FindAndReplaceString(text, "Ð", "D");
 	text = FindAndReplaceString(text, "ð", "d");
 	text = FindAndReplaceString(text, "Ḍ", "D");
@@ -613,6 +615,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ī̆", "i");
 	text = FindAndReplaceString(text, "Ḱ", "K");
 	text = FindAndReplaceString(text, "ḱ", "k");
+	text = FindAndReplaceString(text, "Ň", "N");
+	text = FindAndReplaceString(text, "ň", "n");
 	text = FindAndReplaceString(text, "Ṅ", "N");
 	text = FindAndReplaceString(text, "ṅ", "n");
 	text = FindAndReplaceString(text, "Ö", "O");
@@ -633,6 +637,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ṓ", "o");
 	text = FindAndReplaceString(text, "Φ", "Ph");
 	text = FindAndReplaceString(text, "φ", "ph");
+	text = FindAndReplaceString(text, "Ř", "R");
+	text = FindAndReplaceString(text, "ř", "r");
+	text = FindAndReplaceString(text, "Š", "S");
+	text = FindAndReplaceString(text, "š", "s");
 	text = FindAndReplaceString(text, "Ș", "S");
 	text = FindAndReplaceString(text, "ș", "s");
 	text = FindAndReplaceString(text, "ß", "ss"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
@@ -652,6 +660,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "û", "u");
 	text = FindAndReplaceString(text, "Ŭ", "U");
 	text = FindAndReplaceString(text, "ŭ", "u");
+	text = FindAndReplaceString(text, "Ů", "U");
+	text = FindAndReplaceString(text, "ů", "u");
 	text = FindAndReplaceString(text, "Ū́", "U");
 	text = FindAndReplaceString(text, "ū́", "u");
 	text = FindAndReplaceString(text, "ʷ", "w");
@@ -686,6 +696,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ο", "o");
 	text = FindAndReplaceString(text, "Ό", "O");
 	text = FindAndReplaceString(text, "ό", "o");
+	text = FindAndReplaceString(text, "Ὀ", "O");
+	text = FindAndReplaceString(text, "ὀ", "o");
+	text = FindAndReplaceString(text, "Ρ", "R");
+	text = FindAndReplaceString(text, "ρ", "r");
 	text = FindAndReplaceString(text, "Σ", "S");
 	text = FindAndReplaceString(text, "σ", "s");
 	text = FindAndReplaceString(text, "ς", "s");
