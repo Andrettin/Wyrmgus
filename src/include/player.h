@@ -339,6 +339,14 @@ enum GrammaticalPersons {
 	MaxGrammaticalPersons
 };
 
+enum GrammaticalGenders {
+	GrammaticalGenderMasculine,
+	GrammaticalGenderFeminine,
+	GrammaticalGenderNeuter,
+	
+	MaxGrammaticalGenders
+};
+
 enum GrammaticalTenses {
 	GrammaticalTensePresent,
 	GrammaticalTensePast,
@@ -426,7 +434,7 @@ class LanguageWord
 {
 public:
 	LanguageWord() : 
-		Language(-1), Type(-1),
+		Language(-1), Type(-1), Gender(-1),
 		DerivesFrom(NULL),
 		Uncountable(false),
 		Definite(false),
@@ -446,6 +454,7 @@ public:
 	std::string Word;									/// Word name / ID.
 	int Language;
 	int Type;											/// Word type
+	int Gender;											/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
 	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
 	std::string NumberPersonTenseMoodInflections[MaxGrammaticalNumbers][MaxGrammaticalPersons][MaxGrammaticalTenses][MaxGrammaticalMoods];	/// For verbs
 	std::string ComparisonDegreeInflections[MaxComparisonDegrees];	/// For adjectives
@@ -456,8 +465,6 @@ public:
 	std::vector<std::string> NameTypes;
 	std::vector<std::string> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers];
 	
-	std::string Gender;				/// What is the gender of the noun or article (Male, Female or Neuter)
-
 	// noun-specific variables
 	bool Uncountable;				/// Whether the noun is uncountable or not.
 	
@@ -482,7 +489,7 @@ public:
 	{
 	}
 	
-	std::string GetArticle(std::string gender, std::string grammatical_case, bool definite);
+	std::string GetArticle(int gender, int grammatical_case, bool definite);
 	int GetPotentialNameQuantityForType(std::string type);
 	
 	std::string Ident;	/// Ident of the language
@@ -711,6 +718,8 @@ extern std::string GetGrammaticalNumberNameById(int grammatical_number);
 extern int GetGrammaticalNumberIdByName(std::string grammatical_number);
 extern std::string GetGrammaticalPersonNameById(int grammatical_person);
 extern int GetGrammaticalPersonIdByName(std::string grammatical_person);
+extern std::string GetGrammaticalGenderNameById(int grammatical_gender);
+extern int GetGrammaticalGenderIdByName(std::string grammatical_gender);
 extern std::string GetGrammaticalTenseNameById(int grammatical_tense);
 extern int GetGrammaticalTenseIdByName(std::string grammatical_tense);
 extern std::string GetGrammaticalMoodNameById(int grammatical_mood);

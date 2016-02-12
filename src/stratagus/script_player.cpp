@@ -837,7 +837,13 @@ static int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Word.c_str());
 			}
 		} else if (!strcmp(value, "Gender")) {
-			word->Gender = LuaToString(l, -1);
+			std::string grammatical_gender_name = LuaToString(l, -1);
+			int grammatical_gender = GetGrammaticalGenderIdByName(grammatical_gender_name);
+			if (grammatical_gender != -1) {
+				word->Gender = grammatical_gender;
+			} else {
+				LuaError(l, "Grammatical gender \"%s\" doesn't exist." _C_ grammatical_gender_name.c_str());
+			}
 		} else if (!strcmp(value, "NumberCaseInflections")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

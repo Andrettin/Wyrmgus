@@ -2403,6 +2403,32 @@ int GetGrammaticalPersonIdByName(std::string grammatical_person)
 	return -1;
 }
 
+std::string GetGrammaticalGenderNameById(int grammatical_gender)
+{
+	if (grammatical_gender == GrammaticalGenderMasculine) {
+		return "masculine";
+	} else if (grammatical_gender == GrammaticalGenderFeminine) {
+		return "feminine";
+	} else if (grammatical_gender == GrammaticalGenderNeuter) {
+		return "neuter";
+	}
+
+	return "";
+}
+
+int GetGrammaticalGenderIdByName(std::string grammatical_gender)
+{
+	if (grammatical_gender == "masculine") {
+		return GrammaticalGenderMasculine;
+	} else if (grammatical_gender == "feminine") {
+		return GrammaticalGenderFeminine;
+	} else if (grammatical_gender == "neuter") {
+		return GrammaticalGenderNeuter;
+	}
+
+	return -1;
+}
+
 std::string GetGrammaticalTenseNameById(int grammatical_tense)
 {
 	if (grammatical_tense == GrammaticalTensePresent) {
@@ -2525,7 +2551,7 @@ int GetWordJunctionTypeIdByName(std::string word_junction_type)
 	return -1;
 }
 
-std::string CLanguage::GetArticle(std::string gender, std::string grammatical_case, bool definite)
+std::string CLanguage::GetArticle(int gender, int grammatical_case, bool definite)
 {
 	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
 		if (this->LanguageWords[i]->Type != WordTypeArticle) {
@@ -2536,14 +2562,14 @@ std::string CLanguage::GetArticle(std::string gender, std::string grammatical_ca
 			continue;
 		}
 		
-		if (gender.empty() || this->LanguageWords[i]->Gender.empty() || gender == this->LanguageWords[i]->Gender) {
-			if (grammatical_case == "nominative" && !this->LanguageWords[i]->Nominative.empty()) {
+		if (gender == -1 || this->LanguageWords[i]->Gender == -1 || gender == this->LanguageWords[i]->Gender) {
+			if (grammatical_case == GrammaticalCaseNominative && !this->LanguageWords[i]->Nominative.empty()) {
 				return this->LanguageWords[i]->Nominative;
-			} else if (grammatical_case == "accusative" && !this->LanguageWords[i]->Accusative.empty()) {
+			} else if (grammatical_case == GrammaticalCaseAccusative && !this->LanguageWords[i]->Accusative.empty()) {
 				return this->LanguageWords[i]->Accusative;
-			} else if (grammatical_case == "dative" && !this->LanguageWords[i]->Dative.empty()) {
+			} else if (grammatical_case == GrammaticalCaseDative && !this->LanguageWords[i]->Dative.empty()) {
 				return this->LanguageWords[i]->Dative;
-			} else if (grammatical_case == "genitive" && !this->LanguageWords[i]->Genitive.empty()) {
+			} else if (grammatical_case == GrammaticalCaseGenitive && !this->LanguageWords[i]->Genitive.empty()) {
 				return this->LanguageWords[i]->Genitive;
 			}
 		}
