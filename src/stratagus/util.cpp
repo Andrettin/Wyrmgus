@@ -558,6 +558,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "á", "a");
 	text = FindAndReplaceString(text, "À", "A");
 	text = FindAndReplaceString(text, "à", "a");
+	text = FindAndReplaceString(text, "Ã", "A");
+	text = FindAndReplaceString(text, "ã", "a");
 	text = FindAndReplaceString(text, "Ä", "A");
 	text = FindAndReplaceString(text, "ä", "a");
 	text = FindAndReplaceString(text, "Ā", "A");
@@ -686,12 +688,18 @@ std::string TransliterateText(std::string text) //convert special characters int
 	//Greek characters
 	text = FindAndReplaceString(text, "Α", "A");
 	text = FindAndReplaceString(text, "α", "a");
+	text = FindAndReplaceString(text, "Ά", "A");
+	text = FindAndReplaceString(text, "ά", "a");
 	text = FindAndReplaceString(text, "Χ", "Ch");
 	text = FindAndReplaceString(text, "χ", "ch");
 	text = FindAndReplaceString(text, "Ε", "E");
 	text = FindAndReplaceString(text, "ε", "e");
 	text = FindAndReplaceString(text, "Έ", "E");
 	text = FindAndReplaceString(text, "έ", "e");
+	text = FindAndReplaceString(text, "Ἑ", "E");
+	text = FindAndReplaceString(text, "ἑ", "e");
+	text = FindAndReplaceString(text, "Ἔ", "E");
+	text = FindAndReplaceString(text, "ἔ", "e");
 	text = FindAndReplaceString(text, "Ι", "I");
 	text = FindAndReplaceString(text, "ι", "i");
 	text = FindAndReplaceString(text, "Η", "I");
@@ -1142,7 +1150,7 @@ std::string GenerateName(int language, std::string type)
 					separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive));
 					separate_infix_ids.push_back(i);
 				}
-			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeNumeral) {
+			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeNumeral || PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeAdverb) {
 				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, GrammaticalNumberSingular)) {
 					prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->Word);
 					prefix_ids.push_back(i);
