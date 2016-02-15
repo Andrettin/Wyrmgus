@@ -899,12 +899,17 @@ void CGrandStrategyGame::DoTurn()
 							this->Provinces[i]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[this->Provinces[i]->Civilization][revolter_faction]));
 							
 							int militia_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("militia"));
+							int spearman_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("spearman"));
 							int infantry_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"));
 							
 							if (militia_id != -1 && this->Provinces[i]->TotalWorkers >= 2) {
 								this->Provinces[i]->SetAttackingUnitQuantity(militia_id, (this->Provinces[i]->TotalWorkers / 2) + (SyncRand(this->Provinces[i]->TotalWorkers / 2)));
-							} else if (infantry_id != -1 && this->Provinces[i]->TotalWorkers >= 4) { //if the province's civilization doesn't have militia units, use infantry instead (but with half the quantity)
-								this->Provinces[i]->SetAttackingUnitQuantity(infantry_id, (this->Provinces[i]->TotalWorkers / 4) + (SyncRand(this->Provinces[i]->TotalWorkers * 3 / 4)));
+							} else if (spearman_id != -1 && this->Provinces[i]->TotalWorkers >= 4) { //if the province's civilization doesn't have militia units, use spearmen instead (but with 2/3rds the quantity)
+								this->Provinces[i]->SetAttackingUnitQuantity(infantry_id, (this->Provinces[i]->TotalWorkers / 3) + (SyncRand(this->Provinces[i]->TotalWorkers / 3)));
+							} else if (infantry_id != -1 && this->Provinces[i]->TotalWorkers >= 4) { //if the province's civilization doesn't have militia or spearman units, use infantry instead (but with half the quantity)
+								this->Provinces[i]->SetAttackingUnitQuantity(infantry_id, (this->Provinces[i]->TotalWorkers / 4) + (SyncRand(this->Provinces[i]->TotalWorkers / 4)));
+							} else {
+								this->Provinces[i]->AttackedBy = NULL; //no rebels, cancel attack
 							}
 						}
 					}
