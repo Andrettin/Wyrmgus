@@ -650,6 +650,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "Ș", "S");
 	text = FindAndReplaceString(text, "ș", "s");
 	text = FindAndReplaceString(text, "ß", "ss"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "Ṭ", "T");
+	text = FindAndReplaceString(text, "ṭ", "t");
 	text = FindAndReplaceString(text, "Ț", "T");
 	text = FindAndReplaceString(text, "ț", "t");
 	text = FindAndReplaceString(text, "Þ", "Th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
