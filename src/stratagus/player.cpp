@@ -2746,13 +2746,15 @@ void GenerateMissingLanguageData()
 					std::string new_word = "^";
 					int word_type = PlayerRaces.Languages[default_language]->LanguageWords[j]->Type;
 					
-					while (new_word.size() < (maximum_word_length + 1)) {
+					while ((new_word.size() - 1) < maximum_word_length) {
 						std::string next_element;
 						
-						if (markov_elements_per_type[word_type].size() > 0) {
+						if (markov_elements_per_type[word_type].size() > 0 && markov_elements_per_type[word_type][previous_element].size() > 0) {
 							next_element = markov_elements_per_type[word_type][previous_element][SyncRand(markov_elements_per_type[word_type][previous_element].size())];
-						} else {
+						} else if (markov_elements[previous_element].size() > 0) {
 							next_element = markov_elements[previous_element][SyncRand(markov_elements[previous_element].size())];
+						} else {
+							fprintf(stderr, "Markov element \"%s\" has no elements it leads to.\n", previous_element.c_str());
 						}
 						
 						if (next_element == "") {
@@ -2762,8 +2764,32 @@ void GenerateMissingLanguageData()
 						new_word += next_element;
 						previous_element = new_word.substr(new_word.size() - markov_chain_size, markov_chain_size);
 
-						if (word_type == WordTypeArticle && new_word.size() >= 3) { //articles can only have up to three letters
+						if (word_type == WordTypeArticle && (new_word.size() - 1) >= 3) { //articles can only have up to three letters
 							break;
+						}
+					}
+					
+					if ((new_word.size() - 1) >= maximum_word_length || (word_type == WordTypeArticle && (new_word.size() - 1) >= 3)) { // if the word stopped being generated because it hit the character limit, take away characters until the last component of the name has an end of string as its next element
+						std::string fixed_new_word = new_word;
+						while (!fixed_new_word.empty()) {
+							previous_element = fixed_new_word.substr(fixed_new_word.size() - std::min(markov_chain_size, fixed_new_word.size()), std::min(markov_chain_size, fixed_new_word.size()));
+							bool has_string_ending = false;
+							if (markov_elements_per_type[word_type].size() > 0 && markov_elements_per_type[word_type][previous_element].size()) {
+								has_string_ending = std::find(markov_elements_per_type[word_type][previous_element].begin(), markov_elements_per_type[word_type][previous_element].end(), "") != markov_elements_per_type[word_type][previous_element].end();
+							} else if (markov_elements[previous_element].size() > 0) {
+								has_string_ending = std::find(markov_elements[previous_element].begin(), markov_elements[previous_element].end(), "") != markov_elements[previous_element].end();
+							} else {
+								fprintf(stderr, "Markov element \"%s\" has no elements it leads to.\n", previous_element.c_str());
+							}
+							
+							if (has_string_ending) {
+								break;
+							} else {
+								fixed_new_word = fixed_new_word.substr(0, fixed_new_word.size() - 1);
+							}
+						}
+						if (!fixed_new_word.empty()) {
+							new_word = fixed_new_word;
 						}
 					}
 					
