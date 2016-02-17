@@ -1221,6 +1221,9 @@ std::string GenerateName(int language, std::string type)
 				if (prefix.substr(prefix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
 					prefix = FindAndReplaceStringEnding(prefix, "s", "");
 				}
+				if (prefix.substr(prefix.size() - 1, 1) == "h" && suffix.substr(0, 1) == "h") { //if the prefix ends in "h" and the suffix begins in "h" as well, then remove the final "h" from the prefix (as in "Richard", rather than "Rich-hard")
+					prefix = FindAndReplaceStringEnding(prefix, "h", "");
+				}
 				if (prefix.substr(prefix.size() - 1, 1) == "ß" && suffix.substr(0, 1) == "s") { //prevent triple "s"s in names
 					suffix = FindAndReplaceStringBeginning(suffix, "s", "");
 				}
@@ -1265,11 +1268,17 @@ std::string GenerateName(int language, std::string type)
 				if (prefix.substr(prefix.size() - 1, 1) == "s" && infix.substr(0, 1) == "s") { //if the prefix ends in "s" and the infix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
 					prefix = FindAndReplaceStringEnding(prefix, "s", "");
 				}
+				if (prefix.substr(prefix.size() - 1, 1) == "h" && infix.substr(0, 1) == "h") { //if the prefix ends in "h" and the infix begins in "h" as well, then remove the final "h" from the prefix (as in "Richard", rather than "Rich-hard")
+					prefix = FindAndReplaceStringEnding(prefix, "h", "");
+				}
 				if (infix.substr(infix.size() - 2, 2) == "gs" && suffix.substr(0, 1) == "g") { //if the last two characters of the infix are "gs", and the first character of the suffix is "g", then remove the final "s" from the infix (as in "Königgrätz")
 					infix = FindAndReplaceStringEnding(infix, "gs", "g");
 				}
 				if (infix.substr(infix.size() - 1, 1) == "s" && suffix.substr(0, 1) == "s") { //if the infix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the infix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
 					infix = FindAndReplaceStringEnding(infix, "s", "");
+				}
+				if (infix.substr(infix.size() - 1, 1) == "h" && suffix.substr(0, 1) == "h") { //if the infix ends in "h" and the suffix begins in "h" as well, then remove the final "h" from the infix (as in "Richard", rather than "Rich-hard")
+					infix = FindAndReplaceStringEnding(infix, "h", "");
 				}
 				if (infix.substr(infix.size() - 2, 2) == "th" && suffix.substr(0, 2) == "th") { //if the last two characters of the infix are "th", and the suffix begins with "th", then eliminate the infix's "th", to make this be just one instance of "th"
 					infix = FindAndReplaceStringEnding(infix, "th", "");
