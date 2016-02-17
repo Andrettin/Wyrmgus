@@ -844,6 +844,8 @@ static int CclDefineLanguageWord(lua_State *l)
 			} else {
 				LuaError(l, "Grammatical gender \"%s\" doesn't exist." _C_ grammatical_gender_name.c_str());
 			}
+		} else if (!strcmp(value, "Archaic")) {
+			word->Archaic = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NumberCaseInflections")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1363,6 +1365,8 @@ static int CclDefineLanguage(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			language->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "GenerateMissingWords")) {
+			language->GenerateMissingWords = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NominativeAdjectiveEndingAfterDefiniteArticle")) {
 			language->NominativeAdjectiveEndingAfterDefiniteArticle = LuaToString(l, -1);
 		} else if (!strcmp(value, "NameTranslations")) {

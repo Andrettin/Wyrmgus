@@ -2684,6 +2684,113 @@ void GenerateMissingLanguageData()
 	std::vector<std::string> types;
 	int minimum_desired_names = 25;
 	
+	int default_language = PlayerRaces.GetLanguageIndexByIdent("english");
+	unsigned int markov_chain_size = 2;
+	
+	// generate "missing" words (missing equivalent words for English words) for languages which have that enabled, with a Markov chain process
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		if (default_language == -1) {
+			break;
+		}
+		
+		if (PlayerRaces.Languages[i]->GenerateMissingWords) {
+			// produce a list with the Markov chain elements
+			unsigned int maximum_word_length = 0;
+			std::map<std::string, std::vector<std::string>> markov_elements;
+			std::map<std::string, std::vector<std::string>> markov_elements_per_type[MaxWordTypes];
+			for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
+				std::string word = DecapitalizeString(PlayerRaces.Languages[i]->LanguageWords[j]->Word);
+				if (word.size() > maximum_word_length) {
+					maximum_word_length = word.size();
+				}
+				
+				for(size_t k = 0; k < word.size(); ++k) {
+					std::string element = word.substr(k, markov_chain_size);
+					
+					const std::string following_letter = k < (word.size() - 1) ? word.substr(k + markov_chain_size, 1) : ""; // an empty string indicates ending the name
+					markov_elements[element].push_back(following_letter);
+					markov_elements_per_type[PlayerRaces.Languages[i]->LanguageWords[j]->Type][element].push_back(following_letter);
+
+					if (k == 0) {
+						markov_elements["^"].push_back(element); // "^" indicates beginning the name
+						markov_elements_per_type[PlayerRaces.Languages[i]->LanguageWords[j]->Type]["^"].push_back(element);
+					
+						const std::string starting_following_letter = k < (word.size() - 1) ? word.substr(k + markov_chain_size - 1, 1) : "";
+						std::string starting_element = "^" + word.substr(k, markov_chain_size - 1);
+						markov_elements[starting_element].push_back(starting_following_letter);
+						markov_elements_per_type[PlayerRaces.Languages[i]->LanguageWords[j]->Type][starting_element].push_back(starting_following_letter);
+					}
+				}
+			}
+			
+			for (size_t j = 0; j < PlayerRaces.Languages[default_language]->LanguageWords.size(); ++j) {
+				if (!PlayerRaces.Languages[default_language]->LanguageWords[j]->Archaic && PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings.size() > 0) {
+					bool language_has_equivalent = false;
+					for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
+						for (size_t n = 0; n < PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings.size(); ++n) {
+							if (PlayerRaces.Languages[i]->LanguageWords[k]->HasMeaning(PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings[n])) {
+								language_has_equivalent = true;
+								break;
+							}
+						}
+						if (language_has_equivalent) {
+							break;
+						}
+					}
+					if (language_has_equivalent) {
+						continue;
+					}
+					
+					//generate the word from the markov elements
+					std::string previous_element = "^";
+					std::string new_word = "^";
+					int word_type = PlayerRaces.Languages[default_language]->LanguageWords[j]->Type;
+					
+					while (new_word.size() < (maximum_word_length + 1)) {
+						std::string next_element;
+						
+						if (markov_elements_per_type[word_type].size() > 0) {
+							next_element = markov_elements_per_type[word_type][previous_element][SyncRand(markov_elements_per_type[word_type][previous_element].size())];
+						} else {
+							next_element = markov_elements[previous_element][SyncRand(markov_elements[previous_element].size())];
+						}
+						
+						if (next_element == "") {
+							break;
+						}
+						
+						new_word += next_element;
+						previous_element = new_word.substr(new_word.size() - markov_chain_size, markov_chain_size);
+
+						if (word_type == WordTypeArticle && new_word.size() >= 3) { //articles can only have up to three letters
+							break;
+						}
+					}
+					
+					new_word = FindAndReplaceStringBeginning(new_word, "^", "");
+					new_word = CapitalizeString(new_word);
+					
+					LanguageWord *word = new LanguageWord;
+					word->Word = new_word;
+					word->Language = i;
+					PlayerRaces.Languages[i]->LanguageWords.push_back(word);
+					word->Type = word_type;
+					word->Gender = PlayerRaces.Languages[default_language]->LanguageWords[j]->Gender;
+					word->Uncountable = PlayerRaces.Languages[default_language]->LanguageWords[j]->Uncountable;
+					word->Definite = PlayerRaces.Languages[default_language]->LanguageWords[j]->Definite;
+					word->Number = PlayerRaces.Languages[default_language]->LanguageWords[j]->Number;
+					word->Nominative = word->Word;
+					for (size_t k = 0; k < PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings.size(); ++k) {
+						word->Meanings.push_back(PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings[k]);
+					}
+					
+					fprintf(stdout, "Generated word: \"%s\" (\"%s\"), %s, %s language.\n", new_word.c_str(), PlayerRaces.Languages[default_language]->LanguageWords[j]->Word.c_str(), GetWordTypeNameById(word_type).c_str(), PlayerRaces.Languages[i]->Name.c_str());					
+				}
+			}
+		}
+	}
+
+	// now, moving on to dealing with word type names
 	// first build a vector with all the types
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
@@ -2705,8 +2812,6 @@ void GenerateMissingLanguageData()
 			}
 		}
 	}
-	
-	int default_language = PlayerRaces.GetLanguageIndexByIdent("english");
 	
 	// now, try to get a minimum quantity of names per language for each type; when failing in one of them, try to assign type name settings based on those of words derived from and to the words in the failing language
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {

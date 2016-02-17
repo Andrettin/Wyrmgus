@@ -436,6 +436,7 @@ public:
 	LanguageWord() : 
 		Language(-1), Type(-1), Gender(-1),
 		DerivesFrom(NULL),
+		Archaic(false),
 		Uncountable(false),
 		Definite(false),
 		Number(-1)
@@ -455,6 +456,7 @@ public:
 	int Language;
 	int Type;											/// Word type
 	int Gender;											/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
+	bool Archaic;										/// Whether the archaic (whether it is used in current speech)
 	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
 	std::string NumberPersonTenseMoodInflections[MaxGrammaticalNumbers][MaxGrammaticalPersons][MaxGrammaticalTenses][MaxGrammaticalMoods];	/// For verbs
 	std::string ComparisonDegreeInflections[MaxComparisonDegrees];	/// For adjectives
@@ -485,18 +487,19 @@ class CLanguage
 {
 public:
 	CLanguage() :
-		Ident(""), Name("")
+		GenerateMissingWords(false)
 	{
 	}
 	
 	std::string GetArticle(int gender, int grammatical_case, bool definite);
 	int GetPotentialNameQuantityForType(std::string type);
 	
-	std::string Ident;	/// Ident of the language
-	std::string Name;	/// Name of the language
+	std::string Ident;											/// Ident of the language
+	std::string Name;											/// Name of the language
 	std::string NominativeAdjectiveEndingAfterDefiniteArticle;
-	std::vector<LanguageWord *> LanguageWords;								/// words of the language
-	std::vector<std::string> NameTranslations[2];							/// name translations (2 values: one for the name to be translated, and another for the translation)
+	bool GenerateMissingWords;									/// Whether "missing" words (missing equivalents to English words) should be generated for this language
+	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
+	std::vector<std::string> NameTranslations[2];				/// Name translations (2 values: one for the name to be translated, and another for the translation)
 };
 //Wyrmgus end
 
