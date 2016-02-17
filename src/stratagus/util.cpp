@@ -1205,6 +1205,14 @@ std::string GenerateName(int language, std::string type)
 				prefix_id = SyncRand(prefixes.size());
 				prefix = prefixes[prefix_id];
 
+				//if the chosen prefix is also present in the suffix vector, remove it
+				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
+					if (prefix_ids[prefix_id] == suffix_ids[i]) {
+						suffixes.erase(suffixes.begin() + i);
+						suffix_ids.erase(suffix_ids.begin() + i);
+					}
+				}
+
 				//choose the word type of the suffix, and the suffix itself
 				suffix_id = SyncRand(suffixes.size());
 				suffix = suffixes[suffix_id];
@@ -1244,9 +1252,31 @@ std::string GenerateName(int language, std::string type)
 				prefix_id = SyncRand(prefixes.size());
 				prefix = prefixes[prefix_id];
 
+				//if the chosen prefix is also present in the infix or suffix vectors, remove it
+				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
+					if (prefix_ids[prefix_id] == suffix_ids[i]) {
+						suffixes.erase(suffixes.begin() + i);
+						suffix_ids.erase(suffix_ids.begin() + i);
+					}
+				}
+				for (int i = (int) infixes.size() - 1; i >= 0; --i) {
+					if (prefix_ids[prefix_id] == infix_ids[i]) {
+						infixes.erase(infixes.begin() + i);
+						infix_ids.erase(infix_ids.begin() + i);
+					}
+				}
+
 				//choose the word type of the infix, and the infix itself
 				infix_id = SyncRand(infixes.size());
 				infix = infixes[infix_id];
+
+				//if the chosen infix is also present in the suffix vector, remove it
+				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
+					if (infix_ids[infix_id] == suffix_ids[i]) {
+						suffixes.erase(suffixes.begin() + i);
+						suffix_ids.erase(suffix_ids.begin() + i);
+					}
+				}
 
 				//choose the word type of the suffix, and the suffix itself
 				suffix_id = SyncRand(suffixes.size());
@@ -1301,6 +1331,14 @@ std::string GenerateName(int language, std::string type)
 				prefix_id = SyncRand(separate_prefixes.size());
 				prefix = separate_prefixes[prefix_id];
 
+				//if the chosen prefix is also present in the suffix vector, remove it
+				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
+					if (separate_prefix_ids[prefix_id] == separate_suffix_ids[i]) {
+						separate_suffixes.erase(separate_suffixes.begin() + i);
+						separate_suffix_ids.erase(separate_suffix_ids.begin() + i);
+					}
+				}
+
 				//choose the word type of the suffix, and the suffix itself
 				suffix_id = SyncRand(separate_suffixes.size());
 				suffix = separate_suffixes[suffix_id];
@@ -1336,9 +1374,31 @@ std::string GenerateName(int language, std::string type)
 				prefix_id = SyncRand(separate_prefixes.size());
 				prefix = separate_prefixes[prefix_id];
 
+				//if the chosen prefix is also present in the infix or suffix vectors, remove it
+				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
+					if (separate_prefix_ids[prefix_id] == separate_suffix_ids[i]) {
+						separate_suffixes.erase(separate_suffixes.begin() + i);
+						separate_suffix_ids.erase(separate_suffix_ids.begin() + i);
+					}
+				}
+				for (int i = (int) separate_infixes.size() - 1; i >= 0; --i) {
+					if (separate_prefix_ids[prefix_id] == separate_infix_ids[i]) {
+						separate_infixes.erase(separate_infixes.begin() + i);
+						separate_infix_ids.erase(separate_infix_ids.begin() + i);
+					}
+				}
+
 				//choose the word type of the infix, and the infix itself
 				infix_id = SyncRand(separate_infixes.size());
 				infix = separate_infixes[infix_id];
+
+				//if the chosen infix is also present in the suffix vector, remove it
+				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
+					if (separate_infix_ids[infix_id] == separate_suffix_ids[i]) {
+						separate_suffixes.erase(separate_suffixes.begin() + i);
+						separate_suffix_ids.erase(separate_suffix_ids.begin() + i);
+					}
+				}
 
 				//choose the word type of the suffix, and the suffix itself
 				suffix_id = SyncRand(separate_suffixes.size());
