@@ -647,8 +647,6 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ṓ", "O");
 	text = FindAndReplaceString(text, "ṓ", "o");
-	text = FindAndReplaceString(text, "Φ", "Ph");
-	text = FindAndReplaceString(text, "φ", "ph");
 	text = FindAndReplaceString(text, "Ř", "R");
 	text = FindAndReplaceString(text, "ř", "r");
 	text = FindAndReplaceString(text, "Ṛ", "R");
@@ -680,6 +678,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ů", "u");
 	text = FindAndReplaceString(text, "Ū́", "U");
 	text = FindAndReplaceString(text, "ū́", "u");
+	text = FindAndReplaceString(text, "Ů̃", "U");
+	text = FindAndReplaceString(text, "ů̃", "u");
 	text = FindAndReplaceString(text, "ʷ", "w");
 	text = FindAndReplaceString(text, "Ȳ", "Y");
 	text = FindAndReplaceString(text, "ȳ", "y");
@@ -700,6 +700,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "α", "a");
 	text = FindAndReplaceString(text, "Ά", "A");
 	text = FindAndReplaceString(text, "ά", "a");
+	text = FindAndReplaceString(text, "Ἄ", "A");
+	text = FindAndReplaceString(text, "ἄ", "a");
 	text = FindAndReplaceString(text, "Χ", "Ch");
 	text = FindAndReplaceString(text, "χ", "ch");
 	text = FindAndReplaceString(text, "Ε", "E");
@@ -732,6 +734,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ώ", "o");
 	text = FindAndReplaceString(text, "Π", "P");
 	text = FindAndReplaceString(text, "π", "p");
+	text = FindAndReplaceString(text, "Φ", "Ph");
+	text = FindAndReplaceString(text, "φ", "ph");
 	text = FindAndReplaceString(text, "Ρ", "R");
 	text = FindAndReplaceString(text, "ρ", "r");
 	text = FindAndReplaceString(text, "Σ", "S");
