@@ -2664,15 +2664,17 @@ std::string LanguageWord::GetParticiple(int grammatical_tense)
 
 void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string type)
 {
-	if (word->HasNameType(type)) {
+	if (word->HasNameType(type) && !this->HasNameType(type)) {
 		this->NameTypes.push_back(type);
 	}
 	
 	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
 		for (int j = 0; j < MaxAffixTypes; ++j) {
 			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
-				if (word->HasAffixNameType(type, i, j, k)) {
-					this->AffixNameTypes[i][j][k].push_back(type);
+				if (word->HasAffixNameType(type, i, j, k) && !this->HasAffixNameType(type, i, j, k)) {
+					if (i != WordJunctionTypeSeparate || word->Type == this->Type) { //only add separate name type generation from the word if both are of the same type
+						this->AffixNameTypes[i][j][k].push_back(type);
+					}
 				}
 			}
 		}
@@ -2685,7 +2687,7 @@ void GenerateMissingLanguageData()
 	int minimum_desired_names = 25;
 	
 	int default_language = PlayerRaces.GetLanguageIndexByIdent("english");
-	unsigned int markov_chain_size = 2;
+	size_t markov_chain_size = 2;
 	
 	// generate "missing" words (missing equivalent words for English words) for languages which have that enabled, with a Markov chain process
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
@@ -2695,7 +2697,7 @@ void GenerateMissingLanguageData()
 		
 		if (PlayerRaces.Languages[i]->GenerateMissingWords) {
 			// produce a list with the Markov chain elements
-			unsigned int maximum_word_length = 0;
+			size_t maximum_word_length = 0;
 			std::map<std::string, std::vector<std::string>> markov_elements;
 			std::map<std::string, std::vector<std::string>> markov_elements_per_type[MaxWordTypes];
 			for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
