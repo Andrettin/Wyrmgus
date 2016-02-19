@@ -554,6 +554,10 @@ std::string FindAndReplaceStringBeginning(std::string text, const std::string& f
 
 std::string TransliterateText(std::string text) //convert special characters into ones more legible for English-speakers
 {
+	text = FindAndReplaceString(text, "Ā́", "A");
+	text = FindAndReplaceString(text, "ā́", "a");
+	text = FindAndReplaceString(text, "Ấ", "A");
+	text = FindAndReplaceString(text, "ấ", "a");
 	text = FindAndReplaceString(text, "Á", "A");
 	text = FindAndReplaceString(text, "á", "a");
 	text = FindAndReplaceString(text, "À", "A");
@@ -566,10 +570,6 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ā", "a");
 	text = FindAndReplaceString(text, "Â", "A");
 	text = FindAndReplaceString(text, "â", "a");
-	text = FindAndReplaceString(text, "Ā́", "A");
-	text = FindAndReplaceString(text, "ā́", "a");
-	text = FindAndReplaceString(text, "Ấ", "A");
-	text = FindAndReplaceString(text, "ấ", "a");
 	text = FindAndReplaceString(text, "Ą", "A");
 	text = FindAndReplaceString(text, "ą", "a");
 	text = FindAndReplaceString(text, "ᶏ", "a");
@@ -589,6 +589,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ḍ", "d");
 	text = FindAndReplaceString(text, "Đ", "D");
 	text = FindAndReplaceString(text, "đ", "d");
+	text = FindAndReplaceString(text, "Ḗ", "E");
+	text = FindAndReplaceString(text, "ḗ", "e");
+	text = FindAndReplaceString(text, "Ė́", "E");
+	text = FindAndReplaceString(text, "ė́", "e");
 	text = FindAndReplaceString(text, "É", "E");
 	text = FindAndReplaceString(text, "é", "e");
 	text = FindAndReplaceString(text, "È", "E");
@@ -601,16 +605,16 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ě", "e");
 	text = FindAndReplaceString(text, "Ė", "E");
 	text = FindAndReplaceString(text, "ė", "e");
-	text = FindAndReplaceString(text, "Ḗ", "E");
-	text = FindAndReplaceString(text, "ḗ", "e");
-	text = FindAndReplaceString(text, "Ė́", "E");
-	text = FindAndReplaceString(text, "ė́", "e");
 	text = FindAndReplaceString(text, "Ę", "E");
 	text = FindAndReplaceString(text, "ę", "e");
 	text = FindAndReplaceString(text, "Ə", "E");
 	text = FindAndReplaceString(text, "ə", "e");
 	text = FindAndReplaceString(text, "Ĝ", "G");
 	text = FindAndReplaceString(text, "ĝ", "g");
+	text = FindAndReplaceString(text, "Ī̆", "I");
+	text = FindAndReplaceString(text, "ī̆", "i");
+	text = FindAndReplaceString(text, "Î́", "I");
+	text = FindAndReplaceString(text, "î́", "i");
 	text = FindAndReplaceString(text, "Í", "I");
 	text = FindAndReplaceString(text, "í", "i");
 	text = FindAndReplaceString(text, "Ì", "I");
@@ -621,16 +625,13 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "î", "i");
 	text = FindAndReplaceString(text, "Ĭ", "I");
 	text = FindAndReplaceString(text, "ĭ", "i");
-	text = FindAndReplaceString(text, "Ī̆", "I");
-	text = FindAndReplaceString(text, "ī̆", "i");
-	text = FindAndReplaceString(text, "Î́", "I");
-	text = FindAndReplaceString(text, "î́", "i");
 	text = FindAndReplaceString(text, "Ḱ", "K");
 	text = FindAndReplaceString(text, "ḱ", "k");
 	text = FindAndReplaceString(text, "Ň", "N");
 	text = FindAndReplaceString(text, "ň", "n");
 	text = FindAndReplaceString(text, "Ṅ", "N");
 	text = FindAndReplaceString(text, "ṅ", "n");
+	text = FindAndReplaceString(text, "Ṓ", "O");
 	text = FindAndReplaceString(text, "Ö", "O");
 	text = FindAndReplaceString(text, "ö", "o");
 	text = FindAndReplaceString(text, "Ó", "O");
@@ -645,7 +646,6 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "Ṓ", "O");
 	text = FindAndReplaceString(text, "ṓ", "o");
 	text = FindAndReplaceString(text, "Ř", "R");
 	text = FindAndReplaceString(text, "ř", "r");
@@ -662,6 +662,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ț", "t");
 	text = FindAndReplaceString(text, "Þ", "Th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "þ", "th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "Ū́", "U");
+	text = FindAndReplaceString(text, "ū́", "u");
+	text = FindAndReplaceString(text, "Ů̃", "U");
+	text = FindAndReplaceString(text, "ů̃", "u");
 	text = FindAndReplaceString(text, "Ü", "U");
 	text = FindAndReplaceString(text, "ü", "u");
 	text = FindAndReplaceString(text, "Ú", "U");
@@ -676,10 +680,6 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ŭ", "u");
 	text = FindAndReplaceString(text, "Ů", "U");
 	text = FindAndReplaceString(text, "ů", "u");
-	text = FindAndReplaceString(text, "Ū́", "U");
-	text = FindAndReplaceString(text, "ū́", "u");
-	text = FindAndReplaceString(text, "Ů̃", "U");
-	text = FindAndReplaceString(text, "ů̃", "u");
 	text = FindAndReplaceString(text, "ʷ", "w");
 	text = FindAndReplaceString(text, "Ȳ", "Y");
 	text = FindAndReplaceString(text, "ȳ", "y");
@@ -696,22 +696,22 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceStringEnding(text, "tr", "t");
 	
 	//Greek characters
+	text = FindAndReplaceString(text, "Ἄ", "A");
+	text = FindAndReplaceString(text, "ἄ", "a");
 	text = FindAndReplaceString(text, "Α", "A");
 	text = FindAndReplaceString(text, "α", "a");
 	text = FindAndReplaceString(text, "Ά", "A");
 	text = FindAndReplaceString(text, "ά", "a");
-	text = FindAndReplaceString(text, "Ἄ", "A");
-	text = FindAndReplaceString(text, "ἄ", "a");
 	text = FindAndReplaceString(text, "Χ", "Ch");
 	text = FindAndReplaceString(text, "χ", "ch");
-	text = FindAndReplaceString(text, "Ε", "E");
-	text = FindAndReplaceString(text, "ε", "e");
-	text = FindAndReplaceString(text, "Έ", "E");
-	text = FindAndReplaceString(text, "έ", "e");
 	text = FindAndReplaceString(text, "Ἑ", "E");
 	text = FindAndReplaceString(text, "ἑ", "e");
 	text = FindAndReplaceString(text, "Ἔ", "E");
 	text = FindAndReplaceString(text, "ἔ", "e");
+	text = FindAndReplaceString(text, "Ε", "E");
+	text = FindAndReplaceString(text, "ε", "e");
+	text = FindAndReplaceString(text, "Έ", "E");
+	text = FindAndReplaceString(text, "έ", "e");
 	text = FindAndReplaceString(text, "Ι", "I");
 	text = FindAndReplaceString(text, "ι", "i");
 	text = FindAndReplaceString(text, "Η", "I");
@@ -996,7 +996,7 @@ std::string GenerateName(int language, std::string type)
 					name_ids.push_back(i);
 				}
 				
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive
+				if (PlayerRaces.Languages[language]->LanguageWords[i]->Uncountable || type == "person") { // if is uncountable (or if is a person), don't use the genitive
 					if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, GrammaticalNumberSingular)) {
 						prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
 						prefix_ids.push_back(i);
@@ -1040,7 +1040,7 @@ std::string GenerateName(int language, std::string type)
 					infix_ids.push_back(i);
 				}
 				
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->Uncountable) { // if is uncountable, use the nominative instead of the genitive
+				if (PlayerRaces.Languages[language]->LanguageWords[i]->Uncountable || type == "person") { // if is uncountable (or if is a person), don't use the genitive
 					if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix, GrammaticalNumberSingular)) {
 						separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
 						separate_prefix_ids.push_back(i);
