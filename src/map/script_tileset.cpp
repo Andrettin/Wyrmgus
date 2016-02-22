@@ -427,6 +427,12 @@ void CTileset::buildTable(lua_State *l)
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
 			if (tile.flag & MapFieldForest) {
 				mixed = i;
+				//Wyrmgus start
+				//set the default terrain underlays for trees
+				if (this->TreeUnderlayTerrain == 0) {
+					this->TreeUnderlayTerrain = tileinfo.MixTerrain;
+				}
+				//Wyrmgus end
 			}
 			i += 256;
 		} else {
@@ -507,6 +513,12 @@ void CTileset::buildTable(lua_State *l)
 		if (tileinfo.BaseTerrain && tileinfo.MixTerrain) {
 			if (tile.flag & MapFieldRocks) {
 				mixed = i;
+				//Wyrmgus start
+				//set the default terrain underlays for trees
+				if (this->RockUnderlayTerrain == 0) {
+					this->RockUnderlayTerrain = tileinfo.MixTerrain;
+				}
+				//Wyrmgus end
 			}
 			i += 256;
 		} else {
@@ -575,6 +587,15 @@ void CTileset::buildTable(lua_State *l)
 	rockTable[19] = midOneRockTile;
 
 	buildWallReplacementTable();
+	
+	//Wyrmgus start
+	for (size_t i = 0; i != this->solidTerrainTypes.size(); ++i) {
+		int default_tile_index = findTileIndex(i, 0);
+		if (default_tile_index != -1) {
+			this->solidTerrainTypes[i].DefaultTileIndex = default_tile_index;
+		}
+	}
+	//Wyrmgus end
 }
 
 void CTileset::buildWallReplacementTable()

@@ -271,6 +271,24 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			//Wyrmgus start
 //			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
+			int underlay_terrain;
+			if ((tile == Map.Tileset->getRemovedTreeTile() && (mf.getFlag() & MapFieldStumps)) || (mf.getFlag() & MapFieldForest)) { //wood tile, draw grass (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for stump tiles or regrown trees
+				underlay_terrain = Map.Tileset->TreeUnderlayTerrain;
+			} else if ((tile == Map.Tileset->getRemovedRockTile() && (mf.getFlag() & MapFieldGravel)) || (mf.getFlag() & MapFieldForest)) { //rock tile, draw dirt (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for removed tiles
+				underlay_terrain = Map.Tileset->RockUnderlayTerrain;
+			} else {
+				underlay_terrain = Map.Tileset->tiles[mf.getTileIndex()].tileinfo.MixTerrain;
+			}
+			
+			if (underlay_terrain) {
+				//draw the underlay terrain's base tile first (the transition tile itself can have a transparent background)
+				if (!Map.Tileset->solidTerrainTypes[underlay_terrain].ImageFile.empty()) {
+					Map.SolidTileGraphics[underlay_terrain]->DrawFrameClip(Map.Tileset->tiles[Map.Tileset->solidTerrainTypes[underlay_terrain].DefaultTileIndex].tile, dx, dy, false);
+				} else {
+					Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[Map.Tileset->solidTerrainTypes[underlay_terrain].DefaultTileIndex].tile, dx, dy, false);
+				}
+			}
+				
 			if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].ImageFile.empty()) {
 				Map.SolidTileGraphics[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain]->DrawFrameClip(tile, dx, dy, false);
 			} else {

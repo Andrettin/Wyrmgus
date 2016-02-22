@@ -137,6 +137,7 @@ struct SolidTerrainInfo {
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 	//Wyrmgus start
 	std::string ImageFile;		/// File containing image data
+	int DefaultTileIndex;		/// Index for the default tile for this type
 	//Wyrmgus end
 };
 
@@ -231,6 +232,8 @@ public:
 	std::vector<unsigned char> TileTypeTable;  /// For fast lookup of tile type
 	//Wyrmgus start
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
+	int TreeUnderlayTerrain;
+	int RockUnderlayTerrain;
 	//Wyrmgus end
 private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel

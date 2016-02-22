@@ -209,6 +209,10 @@ void CTileset::clear()
 	tiles.clear();
 	TileTypeTable.clear();
 	solidTerrainTypes.clear();
+	//Wyrmgus start
+	TreeUnderlayTerrain = 0;
+	RockUnderlayTerrain = 0;
+	//Wyrmgus end
 	topOneTreeTile = 0;
 	midOneTreeTile = 0;
 	botOneTreeTile = 0;
@@ -244,6 +248,7 @@ unsigned int CTileset::getDefaultWoodTileIndex() const
 			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
 				if (tile.flag & MapFieldForest) {
 					solid = i;
+					break;
 				}
 			}
 			i += 16;
@@ -318,6 +323,9 @@ unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 	// Can't find it, then we add another solid terrain type.
 	SolidTerrainInfo s;
 	s.TerrainName = name;
+	//Wyrmgus start
+	s.DefaultTileIndex = 0;
+	//Wyrmgus end
 	solidTerrainTypes.push_back(s);
 	return solidTerrainTypes.size() - 1;
 }
