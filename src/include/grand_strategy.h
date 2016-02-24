@@ -110,6 +110,8 @@ public:
 	void UpdateMinimap();
 	void SetResourceProspected(int resource_id, bool discovered);
 	void SetPort(bool has_port);
+	void GenerateCulturalName(int old_civilization_id = -1);
+	void GenerateFactionCulturalName();
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	std::string GetCulturalName();										/// Get the tile's cultural name.
@@ -133,6 +135,7 @@ public:
 	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
 	int Pathway[MaxDirections];				/// Whether this tile has a pathway (trail or road) to a particular direction
 	std::string CulturalNames[MAX_RACES];	/// Names for the tile for each different culture/civilization
+	std::map<CFaction *, std::string> FactionCulturalNames;	/// Names for the tile for each different faction
 };
 
 class CProvince
@@ -481,6 +484,7 @@ extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
 extern void SetWorldMapTileName(int x, int y, std::string name);
 extern void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, std::string cultural_name);
+extern void SetWorldMapTileFactionCulturalName(int x, int y, std::string civilization_name, std::string faction_name, std::string cultural_name);
 extern int GetRiverId(std::string river_name);
 extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name);
 extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);

@@ -2805,6 +2805,11 @@ void SaveGrandStrategyGame(const std::string &filename)
 					if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].empty()) {
 						fprintf(fd, "SetWorldMapTileCulturalName(%d, %d, \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[i].c_str(), GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].c_str()); //save tile cultural name
 					}
+					for (int j = 0; j < FactionMax; ++j) {
+						if (GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.find(PlayerRaces.Factions[i][j]) != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.end()) {
+							fprintf(fd, "SetWorldMapTileFactionCulturalName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames[PlayerRaces.Factions[i][j]].c_str()); //save tile faction cultural name
+						}
+					}
 				}
 				for (int i = 0; i < MaxDirections; ++i) {
 					std::string direction_name;

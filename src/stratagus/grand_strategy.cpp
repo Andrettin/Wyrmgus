@@ -1557,6 +1557,91 @@ void WorldMapTile::SetPort(bool has_port)
 	}
 }
 
+void WorldMapTile::GenerateCulturalName(int old_civilization_id)
+{
+	if (this->Province == -1 || GrandStrategyGame.Provinces[this->Province]->Civilization == -1) {
+		return;
+	}
+	
+	int civilization_id = GrandStrategyGame.Provinces[this->Province]->Civilization;
+	
+	if (!this->CulturalNames[civilization_id].empty()) {
+		return;
+	}
+	
+	std::string new_tile_name = "";
+	// first see if can translate the cultural name of the old civilization
+	if (old_civilization_id != -1 && !this->CulturalNames[old_civilization_id].empty()) {
+		new_tile_name = PlayerRaces.TranslateName(this->CulturalNames[old_civilization_id], PlayerRaces.GetCivilizationLanguage(civilization_id));
+	}
+	if (new_tile_name == "") { // try to translate any cultural name
+		for (int j = 0; j < MAX_RACES; ++j) {
+			if (!this->CulturalNames[j].empty()) {
+				new_tile_name = PlayerRaces.TranslateName(this->CulturalNames[j], PlayerRaces.GetCivilizationLanguage(civilization_id));
+				if (!new_tile_name.empty()) {
+					break;
+				}
+			}
+		}
+	}
+	if (new_tile_name == "") { // if trying to translate all cultural names failed, generate a new name
+		new_tile_name = GenerateName(PlayerRaces.GetCivilizationLanguage(civilization_id), "terrain-" + NameToIdent(GrandStrategyGame.TerrainTypes[this->Terrain]->Name));
+	}
+	if (new_tile_name != "") {
+		this->CulturalNames[civilization_id] = new_tile_name;
+	}
+}
+
+void WorldMapTile::GenerateFactionCulturalName()
+{
+	if (this->Province == -1 || GrandStrategyGame.Provinces[this->Province]->Civilization == -1) {
+		return;
+	}
+	
+	if (GrandStrategyGame.Provinces[this->Province]->Owner == NULL) {
+		return;
+	}
+	
+	int civilization_id = GrandStrategyGame.Provinces[this->Province]->Owner->Civilization;
+	int faction_id = GrandStrategyGame.Provinces[this->Province]->Owner->Faction;
+	
+	if (this->FactionCulturalNames.find(PlayerRaces.Factions[civilization_id][faction_id]) != this->FactionCulturalNames.end()) {
+		return;
+	}
+	
+	std::string new_tile_name = "";
+					
+	// if the parent faction of the new owner already has a name for the tile, and shares the same language as the owner, then use that
+	if (
+		PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction != -1
+		&& PlayerRaces.GetFactionLanguage(civilization_id, faction_id) == PlayerRaces.GetFactionLanguage(civilization_id, PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction)
+		&& this->FactionCulturalNames.find(PlayerRaces.Factions[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction]) != this->FactionCulturalNames.end()
+	) {
+		new_tile_name = this->FactionCulturalNames[PlayerRaces.Factions[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction]];
+	}
+				
+	// see if can translate the cultural name of the province's current civilization
+	if (new_tile_name == "" && !this->CulturalNames[GrandStrategyGame.Provinces[this->Province]->Civilization].empty()) {
+		new_tile_name = PlayerRaces.TranslateName(this->CulturalNames[GrandStrategyGame.Provinces[this->Province]->Civilization], PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
+	}
+	if (new_tile_name == "") { // try to translate any cultural name
+		for (int i = 0; i < MAX_RACES; ++i) {
+			if (!this->CulturalNames[i].empty()) {
+				new_tile_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
+				if (!new_tile_name.empty()) {
+					break;
+				}
+			}
+		}
+	}
+	if (new_tile_name == "") { // if trying to translate all cultural names failed, generate a new name
+		new_tile_name = GenerateName(PlayerRaces.GetFactionLanguage(civilization_id, faction_id), "terrain-" + NameToIdent(GrandStrategyGame.TerrainTypes[this->Terrain]->Name));
+	}
+	if (new_tile_name != "") {
+		this->FactionCulturalNames[PlayerRaces.Factions[civilization_id][faction_id]] = new_tile_name;
+	}
+}
+
 bool WorldMapTile::IsWater()
 {
 	if (this->Terrain != -1) {
@@ -1581,7 +1666,9 @@ bool WorldMapTile::HasResource(int resource, bool ignore_prospection)
 */
 std::string WorldMapTile::GetCulturalName()
 {
-	if (this->Province != -1 && !GrandStrategyGame.Provinces[this->Province]->Water && GrandStrategyGame.Provinces[this->Province]->Civilization != -1 && !this->CulturalNames[GrandStrategyGame.Provinces[this->Province]->Civilization].empty()) {
+	if (this->Province != -1 && !GrandStrategyGame.Provinces[this->Province]->Water && GrandStrategyGame.Provinces[this->Province]->Civilization != -1 && GrandStrategyGame.Provinces[this->Province]->Owner != NULL && GrandStrategyGame.Provinces[this->Province]->Civilization == GrandStrategyGame.Provinces[this->Province]->Owner->Civilization && this->FactionCulturalNames.find(PlayerRaces.Factions[GrandStrategyGame.Provinces[this->Province]->Owner->Civilization][GrandStrategyGame.Provinces[this->Province]->Owner->Faction]) != this->FactionCulturalNames.end()) {
+		return this->FactionCulturalNames[PlayerRaces.Factions[GrandStrategyGame.Provinces[this->Province]->Owner->Civilization][GrandStrategyGame.Provinces[this->Province]->Owner->Faction]];
+	} else if (this->Province != -1 && !GrandStrategyGame.Provinces[this->Province]->Water && GrandStrategyGame.Provinces[this->Province]->Civilization != -1 && !this->CulturalNames[GrandStrategyGame.Provinces[this->Province]->Civilization].empty()) {
 		return this->CulturalNames[GrandStrategyGame.Provinces[this->Province]->Civilization];
 	} else if (
 		this->Province != -1
@@ -1729,10 +1816,24 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 		
 		// if the province's new owner is a faction that has a language different from that of its civilization, generate a faction-specific name for the province
 		if (PlayerRaces.GetFactionLanguage(civilization_id, faction_id) != -1 && PlayerRaces.GetFactionLanguage(civilization_id, faction_id) != PlayerRaces.GetCivilizationLanguage(civilization_id)) {
+			// generate names (if they don't exist yet) for each of the province's tiles
+			for (size_t i = 0; i < this->Tiles.size(); ++i) {
+				int x = this->Tiles[i].x;
+				int y = this->Tiles[i].y;
+				if (GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.find(PlayerRaces.Factions[civilization_id][faction_id]) == GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.end()) {
+					GrandStrategyGame.WorldMapTiles[x][y]->GenerateFactionCulturalName();
+				}
+			}
+			
 			if (this->FactionCulturalNames[civilization_id][faction_id].empty()) {
 				std::string new_province_name = "";
-				// first see if can translate the cultural name of the province's current civilization
-				if (this->Civilization != -1 && !this->CulturalNames[this->Civilization].empty()) {
+				// if the parent faction of the new owner already has a name for the province, and shares the same language as the owner, then use that
+				if (PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction != -1 && PlayerRaces.GetFactionLanguage(civilization_id, faction_id) == PlayerRaces.GetFactionLanguage(civilization_id, PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction) && !this->FactionCulturalNames[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction].empty()) {
+					new_province_name = this->FactionCulturalNames[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction];
+				}
+				
+				// see if can translate the cultural name of the province's current civilization
+				if (new_province_name == "" && this->Civilization != -1 && !this->CulturalNames[this->Civilization].empty()) {
 					new_province_name = PlayerRaces.TranslateName(this->CulturalNames[this->Civilization], PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
 				}
 				if (new_province_name == "") { // try to translate any cultural name
@@ -1753,10 +1854,16 @@ void CProvince::SetOwner(int civilization_id, int faction_id)
 				}
 			}
 			
+			// do the same for the settlement's name
 			if (this->FactionCulturalSettlementNames[civilization_id][faction_id].empty()) {
 				std::string new_settlement_name = "";
-				// first see if can translate the cultural name of the province's current civilization
-				if (this->Civilization != -1 && !this->CulturalSettlementNames[this->Civilization].empty()) {
+				// if the parent faction of the new owner already has a name for the province, and shares the same language as the owner, then use that
+				if (PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction != -1 && PlayerRaces.GetFactionLanguage(civilization_id, faction_id) == PlayerRaces.GetFactionLanguage(civilization_id, PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction) && !this->FactionCulturalSettlementNames[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction].empty()) {
+					new_settlement_name = this->FactionCulturalSettlementNames[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction];
+				}
+				
+				// see if can translate the cultural name of the province's current civilization
+				if (new_settlement_name == "" && this->Civilization != -1 && !this->CulturalSettlementNames[this->Civilization].empty()) {
 					new_settlement_name = PlayerRaces.TranslateName(this->CulturalSettlementNames[this->Civilization], PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
 				}
 				if (new_settlement_name == "") { // try to translate any cultural name
@@ -1801,27 +1908,7 @@ void CProvince::SetCivilization(int civilization)
 			int x = this->Tiles[i].x;
 			int y = this->Tiles[i].y;
 			if (GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization].empty()) {
-				std::string new_tile_name = "";
-				// first see if can translate the cultural name of the old civilization
-				if (old_civilization != -1 && !GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization].empty()) {
-					new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[old_civilization], PlayerRaces.GetCivilizationLanguage(civilization));
-				}
-				if (new_tile_name == "") { // try to translate any cultural name
-					for (int j = 0; j < MAX_RACES; ++j) {
-						if (!GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[j].empty()) {
-							new_tile_name = PlayerRaces.TranslateName(GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[j], PlayerRaces.GetCivilizationLanguage(civilization));
-							if (!new_tile_name.empty()) {
-								break;
-							}
-						}
-					}
-				}
-				if (new_tile_name == "") { // if trying to translate all cultural names failed, generate a new name
-					new_tile_name = GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "terrain-" + NameToIdent(GrandStrategyGame.TerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name));
-				}
-				if (new_tile_name != "") {
-					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = new_tile_name;
-				}
+				GrandStrategyGame.WorldMapTiles[x][y]->GenerateCulturalName(old_civilization);
 			}
 		}
 			
@@ -2485,6 +2572,8 @@ std::string CProvince::GenerateSettlementName(int civilization, int faction)
 	//10% chance that the settlement will be named after a named terrain feature in its tile, if there is any
 	if (civilization != -1 && faction == -1 && this->SettlementLocation.x != -1 && this->SettlementLocation.y != -1 && !GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization].empty() && SyncRand(100) < 10) {
 		return GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->CulturalNames[civilization];
+	} else if (civilization != -1 && faction != -1 && this->SettlementLocation.x != -1 && this->SettlementLocation.y != -1 && GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->FactionCulturalNames.find(PlayerRaces.Factions[civilization][faction]) != GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->FactionCulturalNames.end() && SyncRand(100) < 10) {
+		return GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]];
 	}
 	
 	if (faction != -1) {
@@ -3414,6 +3503,12 @@ void SetWorldMapTileTerrain(int x, int y, int terrain)
 	}
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->Terrain = terrain;
+	for (int i = 0; i < MAX_RACES; ++i) {
+		GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i] = "";
+	}
+	GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.clear();
+	GrandStrategyGame.WorldMapTiles[x][y]->GenerateCulturalName();
+	GrandStrategyGame.WorldMapTiles[x][y]->GenerateFactionCulturalName();
 	
 	if (terrain != -1 && GrandStrategyGame.TerrainTypes[terrain]) {
 		//randomly select a variation for the world map tile
@@ -3495,6 +3590,21 @@ void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, st
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	if (civilization != -1) {
 		GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[civilization] = TransliterateText(cultural_name);
+	}
+}
+
+void SetWorldMapTileFactionCulturalName(int x, int y, std::string civilization_name, std::string faction_name, std::string cultural_name)
+{
+	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
+	
+	if (GrandStrategyGame.WorldMapTiles[x][y]) {
+		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		if (civilization != -1) {
+			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			if (faction != -1) {
+				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
+			}
+		}
 	}
 }
 
@@ -4483,6 +4593,7 @@ void CleanGrandStrategyGame()
 				for (int i = 0; i < MAX_RACES; ++i) {
 					GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i] = "";
 				}
+				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.clear();
 				for (int i = 0; i < MaxDirections; ++i) {
 					GrandStrategyGame.WorldMapTiles[x][y]->Borders[i] = false;
 					GrandStrategyGame.WorldMapTiles[x][y]->River[i] = -1;
