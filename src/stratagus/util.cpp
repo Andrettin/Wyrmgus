@@ -621,6 +621,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ī̆", "i");
 	text = FindAndReplaceString(text, "Î́", "I");
 	text = FindAndReplaceString(text, "î́", "i");
+	text = FindAndReplaceString(text, "Ī", "I");
+	text = FindAndReplaceString(text, "ī", "i");
 	text = FindAndReplaceString(text, "Í", "I");
 	text = FindAndReplaceString(text, "í", "i");
 	text = FindAndReplaceString(text, "Ì", "I");
@@ -976,140 +978,38 @@ std::string GenerateName(int language, std::string type)
 	std::string name;
 	
 	if (PlayerRaces.Languages[language]->LanguageWords.size() > 0) {
-		std::vector<std::string> names;
-		std::vector<int> name_ids;
-		
-		std::vector<std::string> prefixes;
-		std::vector<int> prefix_ids;
-
-		std::vector<std::string> infixes;
-		std::vector<int> infix_ids;
-
-		std::vector<std::string> suffixes;
-		std::vector<int> suffix_ids;
-		
-		std::vector<std::string> separate_prefixes;
-		std::vector<int> separate_prefix_ids;
-
-		std::vector<std::string> separate_infixes;
-		std::vector<int> separate_infix_ids;
-
-		std::vector<std::string> separate_suffixes;
-		std::vector<int> separate_suffix_ids;
+		std::vector<LanguageWord *> names;
+		std::vector<LanguageWord *> prefixes;
+		std::vector<LanguageWord *> infixes;
+		std::vector<LanguageWord *> suffixes;
+		std::vector<LanguageWord *> separate_prefixes;
+		std::vector<LanguageWord *> separate_infixes;
+		std::vector<LanguageWord *> separate_suffixes;
 		
 		for (size_t i = 0; i < PlayerRaces.Languages[language]->LanguageWords.size(); ++i) {
-			if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeNoun) {
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasNameType(type)) { // nouns which can be used as names for this type without compounding
-					names.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
-					name_ids.push_back(i);
-				}
+			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasNameType(type)) { // nouns which can be used as names for this type without compounding
+				names.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+			}
 				
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, GrammaticalNumberSingular) || PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, GrammaticalNumberPlural)) {
-					prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
-					prefix_ids.push_back(i);
+			for (int n = 0; n < MaxGrammaticalNumbers; ++n) {
+				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, n)) {
+					prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix, GrammaticalNumberSingular) || PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix, GrammaticalNumberPlural)) {
-					suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
-					suffix_ids.push_back(i);
+				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix, n)) {
+					suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix, GrammaticalNumberSingular) || PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix, GrammaticalNumberPlural)) {
-					infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
-					infix_ids.push_back(i);
+				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix, n)) {
+					infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 				}
-				
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix, GrammaticalNumberSingular) || PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix, GrammaticalNumberPlural)) {
-					separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
-					separate_prefix_ids.push_back(i);
+					
+				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix, n)) {
+					separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix, GrammaticalNumberSingular) || PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix, GrammaticalNumberPlural)) {
-					separate_suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
-					separate_suffix_ids.push_back(i);
+				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix, n)) {
+					separate_suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix, GrammaticalNumberSingular) || PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix, GrammaticalNumberPlural)) {
-					separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetNumberCaseInflection(GrammaticalNumberSingular, GrammaticalCaseNominative));
-					separate_infix_ids.push_back(i);
-				}
-			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeVerb) {
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, GrammaticalNumberSingular)) { // only using verb participles for now; maybe should add more possibilities?
-					prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent));
-					prefix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix, GrammaticalNumberSingular)) {
-					suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent));
-					suffix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix, GrammaticalNumberSingular)) {
-					infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent));
-					infix_ids.push_back(i);
-				}
-				
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix, GrammaticalNumberSingular)) { // only using verb participles for now; maybe should add more possibilities?
-					separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent));
-					separate_prefix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix, GrammaticalNumberSingular)) {
-					separate_suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent));
-					separate_suffix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix, GrammaticalNumberSingular)) {
-					separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetParticiple(GrammaticalTensePresent));
-					separate_infix_ids.push_back(i);
-				}
-			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeAdjective) {
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasNameType(type)) {
-					names.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive));
-					name_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, GrammaticalNumberSingular)) {
-					prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive));
-					prefix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix, GrammaticalNumberSingular)) {
-					suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive));
-					suffix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix, GrammaticalNumberSingular)) {
-					infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive));
-					infix_ids.push_back(i);
-				}
-				
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix, GrammaticalNumberSingular)) {
-					separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive));
-					separate_prefix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix, GrammaticalNumberSingular)) {
-					separate_suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive));
-					separate_suffix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix, GrammaticalNumberSingular)) {
-					separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->GetComparisonDegreeInflection(ComparisonDegreePositive));
-					separate_infix_ids.push_back(i);
-				}
-			} else if (PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeNumeral || PlayerRaces.Languages[language]->LanguageWords[i]->Type == WordTypeAdverb) {
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, GrammaticalNumberSingular)) {
-					prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->Word);
-					prefix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix, GrammaticalNumberSingular)) {
-					suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->Word);
-					suffix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix, GrammaticalNumberSingular)) {
-					infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->Word);
-					infix_ids.push_back(i);
-				}
-				
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix, GrammaticalNumberSingular)) {
-					separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->Word);
-					separate_prefix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix, GrammaticalNumberSingular)) {
-					separate_suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->Word);
-					separate_suffix_ids.push_back(i);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix, GrammaticalNumberSingular)) {
-					separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]->Word);
-					separate_infix_ids.push_back(i);
+				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix, n)) {
+					separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 				}
 			}
 		}
@@ -1117,31 +1017,28 @@ std::string GenerateName(int language, std::string type)
 		if (names.size() > 0 || (prefixes.size() > 0 && suffixes.size() > 0) || (separate_prefixes.size() > 0 && separate_suffixes.size() > 0)) {
 			unsigned int random_number = SyncRand(names.size() + (prefixes.size() * suffixes.size()) + ((prefixes.size() + suffixes.size()) / 2) * infixes.size() + (separate_prefixes.size() * separate_suffixes.size()) + ((separate_prefixes.size() + separate_suffixes.size()) / 2) * separate_infixes.size());
 			if (random_number < names.size()) { //entire name
-				name = names[SyncRand(names.size())];
+				name = names[SyncRand(names.size())]->Word;
 			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()))) { //prefix + suffix
 				std::string prefix;
 				std::string suffix;
-				int prefix_id;
-				int suffix_id;
-				std::string prefix_word_type;
-				std::string suffix_word_type;
+				LanguageWord *prefix_word;
+				LanguageWord *suffix_word;
 				
 				//choose the word type of the prefix, and the prefix itself
-				prefix_id = SyncRand(prefixes.size());
+				prefix_word = prefixes[SyncRand(prefixes.size())];
 
 				//if the chosen prefix is also present in the suffix vector, remove it
 				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
-					if (prefix_ids[prefix_id] == suffix_ids[i]) {
-						suffixes.erase(suffixes.begin() + i);
-						suffix_ids.erase(suffix_ids.begin() + i);
+					if (prefix_word == suffixes[i] && suffixes.size() > 1) {
+						suffixes.erase(std::remove(suffixes.begin(), suffixes.end(), suffixes[i]), suffixes.end());
 					}
 				}
 
 				//choose the word type of the suffix, and the suffix itself
-				suffix_id = SyncRand(suffixes.size());
+				suffix_word = suffixes[SyncRand(suffixes.size())];
 
-				prefix = PlayerRaces.Languages[language]->LanguageWords[prefix_ids[prefix_id]]->GetAffixForm(NULL, PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]], type, WordJunctionTypeCompound, AffixTypePrefix);
-				suffix = PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]]->GetAffixForm(PlayerRaces.Languages[language]->LanguageWords[prefix_ids[prefix_id]], NULL, type, WordJunctionTypeCompound, AffixTypeSuffix);
+				prefix = prefix_word->GetAffixForm(NULL, suffix_word, type, WordJunctionTypeCompound, AffixTypePrefix);
+				suffix = suffix_word->GetAffixForm(prefix_word, NULL, type, WordJunctionTypeCompound, AffixTypeSuffix);
 
 				prefix = TransliterateText(prefix);
 				suffix = DecapitalizeString(TransliterateText(suffix));
@@ -1163,47 +1060,41 @@ std::string GenerateName(int language, std::string type)
 				std::string prefix;
 				std::string infix;
 				std::string suffix;
-				int prefix_id;
-				int infix_id;
-				int suffix_id;
-				std::string prefix_word_type;
-				std::string infix_word_type;
-				std::string suffix_word_type;
+				LanguageWord *prefix_word;
+				LanguageWord *infix_word;
+				LanguageWord *suffix_word;
 				
 				//choose the word type of the prefix, and the prefix itself
-				prefix_id = SyncRand(prefixes.size());
+				prefix_word = prefixes[SyncRand(prefixes.size())];
 
 				//if the chosen prefix is also present in the infix or suffix vectors, remove it
 				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
-					if (prefix_ids[prefix_id] == suffix_ids[i]) {
-						suffixes.erase(suffixes.begin() + i);
-						suffix_ids.erase(suffix_ids.begin() + i);
+					if (prefix_word == suffixes[i] && suffixes.size() > 1) {
+						suffixes.erase(std::remove(suffixes.begin(), suffixes.end(), suffixes[i]), suffixes.end());
 					}
 				}
 				for (int i = (int) infixes.size() - 1; i >= 0; --i) {
-					if (prefix_ids[prefix_id] == infix_ids[i]) {
-						infixes.erase(infixes.begin() + i);
-						infix_ids.erase(infix_ids.begin() + i);
+					if (prefix_word == infixes[i] && infixes.size() > 1) {
+						infixes.erase(std::remove(infixes.begin(), infixes.end(), infixes[i]), infixes.end());
 					}
 				}
 
 				//choose the word type of the infix, and the infix itself
-				infix_id = SyncRand(infixes.size());
+				infix_word = infixes[SyncRand(infixes.size())];
 
 				//if the chosen infix is also present in the suffix vector, remove it
 				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
-					if (infix_ids[infix_id] == suffix_ids[i]) {
-						suffixes.erase(suffixes.begin() + i);
-						suffix_ids.erase(suffix_ids.begin() + i);
+					if (infix_word == suffixes[i] && suffixes.size() > 1) {
+						suffixes.erase(std::remove(suffixes.begin(), suffixes.end(), suffixes[i]), suffixes.end());
 					}
 				}
 
 				//choose the word type of the suffix, and the suffix itself
-				suffix_id = SyncRand(suffixes.size());
+				suffix_word = suffixes[SyncRand(suffixes.size())];
 
-				prefix = PlayerRaces.Languages[language]->LanguageWords[prefix_ids[prefix_id]]->GetAffixForm(NULL, PlayerRaces.Languages[language]->LanguageWords[infix_ids[infix_id]], type, WordJunctionTypeCompound, AffixTypePrefix);
-				infix = PlayerRaces.Languages[language]->LanguageWords[infix_ids[infix_id]]->GetAffixForm(PlayerRaces.Languages[language]->LanguageWords[prefix_ids[prefix_id]], PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]], type, WordJunctionTypeCompound, AffixTypeInfix);
-				suffix = PlayerRaces.Languages[language]->LanguageWords[suffix_ids[suffix_id]]->GetAffixForm(PlayerRaces.Languages[language]->LanguageWords[infix_ids[infix_id]], NULL, type, WordJunctionTypeCompound, AffixTypeSuffix);
+				prefix = prefix_word->GetAffixForm(NULL, infix_word, type, WordJunctionTypeCompound, AffixTypePrefix);
+				infix = infix_word->GetAffixForm(prefix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypeInfix);
+				suffix = suffix_word->GetAffixForm(infix_word, NULL, type, WordJunctionTypeCompound, AffixTypeSuffix);
 
 				prefix = TransliterateText(prefix);
 				infix = DecapitalizeString(TransliterateText(infix));
@@ -1241,36 +1132,33 @@ std::string GenerateName(int language, std::string type)
 			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + ((prefixes.size() + suffixes.size()) / 2) * infixes.size() + (separate_prefixes.size() * separate_suffixes.size()))) { //separate prefix + separate suffix
 				std::string prefix;
 				std::string suffix;
-				int prefix_id;
-				int suffix_id;
-				std::string prefix_word_type;
-				std::string suffix_word_type;
+				LanguageWord *prefix_word;
+				LanguageWord *suffix_word;
 				
 				//choose the word type of the prefix, and the prefix itself
-				prefix_id = SyncRand(separate_prefixes.size());
+				prefix_word = separate_prefixes[SyncRand(separate_prefixes.size())];
 
 				//if the chosen prefix is also present in the suffix vector, remove it
 				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
-					if (separate_prefix_ids[prefix_id] == separate_suffix_ids[i]) {
-						separate_suffixes.erase(separate_suffixes.begin() + i);
-						separate_suffix_ids.erase(separate_suffix_ids.begin() + i);
+					if (prefix_word == separate_suffixes[i] && separate_suffixes.size() > 1) {
+						separate_suffixes.erase(std::remove(separate_suffixes.begin(), separate_suffixes.end(), separate_suffixes[i]), separate_suffixes.end());
 					}
 				}
 
 				//choose the word type of the suffix, and the suffix itself
-				suffix_id = SyncRand(separate_suffixes.size());
+				suffix_word = separate_suffixes[SyncRand(separate_suffixes.size())];
 
-				prefix = PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->GetAffixForm(NULL, PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]], type, WordJunctionTypeSeparate, AffixTypePrefix);
-				suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->GetAffixForm(PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]], NULL, type, WordJunctionTypeSeparate, AffixTypeSuffix);
+				prefix = prefix_word->GetAffixForm(NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix);
+				suffix = suffix_word->GetAffixForm(prefix_word, NULL, type, WordJunctionTypeSeparate, AffixTypeSuffix);
 				
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
-					name += PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular);
+				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular);
 					name += " ";
 				}
 					
 				name += TransliterateText(prefix);
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender).empty() && PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement") {
-					name += PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender);
+				if (prefix_word->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, suffix_word->Gender).empty() && suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement") {
+					name += PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, suffix_word->Gender);
 				}
 				name += " ";
 				name += TransliterateText(suffix);
@@ -1278,50 +1166,44 @@ std::string GenerateName(int language, std::string type)
 				std::string prefix;
 				std::string infix;
 				std::string suffix;
-				int prefix_id;
-				int infix_id;
-				int suffix_id;
-				std::string prefix_word_type;
-				std::string infix_word_type;
-				std::string suffix_word_type;
+				LanguageWord *prefix_word;
+				LanguageWord *infix_word;
+				LanguageWord *suffix_word;
 				
 				//choose the word type of the prefix, and the prefix itself
-				prefix_id = SyncRand(separate_prefixes.size());
+				prefix_word = separate_prefixes[SyncRand(separate_prefixes.size())];
 
 				//if the chosen prefix is also present in the infix or suffix vectors, remove it
 				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
-					if (separate_prefix_ids[prefix_id] == separate_suffix_ids[i]) {
-						separate_suffixes.erase(separate_suffixes.begin() + i);
-						separate_suffix_ids.erase(separate_suffix_ids.begin() + i);
+					if (prefix_word == separate_suffixes[i] && separate_suffixes.size() > 1) {
+						separate_suffixes.erase(std::remove(separate_suffixes.begin(), separate_suffixes.end(), separate_suffixes[i]), separate_suffixes.end());
 					}
 				}
 				for (int i = (int) separate_infixes.size() - 1; i >= 0; --i) {
-					if (separate_prefix_ids[prefix_id] == separate_infix_ids[i]) {
-						separate_infixes.erase(separate_infixes.begin() + i);
-						separate_infix_ids.erase(separate_infix_ids.begin() + i);
+					if (prefix_word == separate_infixes[i] && separate_infixes.size() > 1) {
+						separate_infixes.erase(std::remove(separate_infixes.begin(), separate_infixes.end(), separate_infixes[i]), separate_infixes.end());
 					}
 				}
 
 				//choose the word type of the infix, and the infix itself
-				infix_id = SyncRand(separate_infixes.size());
+				infix_word = separate_infixes[SyncRand(separate_infixes.size())];
 
 				//if the chosen infix is also present in the suffix vector, remove it
 				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
-					if (separate_infix_ids[infix_id] == separate_suffix_ids[i]) {
-						separate_suffixes.erase(separate_suffixes.begin() + i);
-						separate_suffix_ids.erase(separate_suffix_ids.begin() + i);
+					if (infix_word == separate_suffixes[i] && separate_suffixes.size() > 1) {
+						separate_suffixes.erase(std::remove(separate_suffixes.begin(), separate_suffixes.end(), separate_suffixes[i]), separate_suffixes.end());
 					}
 				}
 
 				//choose the word type of the suffix, and the suffix itself
-				suffix_id = SyncRand(separate_suffixes.size());
+				suffix_word = separate_suffixes[SyncRand(separate_suffixes.size())];
 
-				prefix = PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->GetAffixForm(NULL, PlayerRaces.Languages[language]->LanguageWords[infix_ids[infix_id]], type, WordJunctionTypeSeparate, AffixTypePrefix);
-				infix = PlayerRaces.Languages[language]->LanguageWords[separate_infix_ids[infix_id]]->GetAffixForm(PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]], PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]], type, WordJunctionTypeSeparate, AffixTypeInfix);
-				suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->GetAffixForm(PlayerRaces.Languages[language]->LanguageWords[separate_infix_ids[infix_id]], NULL, type, WordJunctionTypeSeparate, AffixTypeSuffix);
+				prefix = prefix_word->GetAffixForm(NULL, infix_word, type, WordJunctionTypeSeparate, AffixTypePrefix);
+				infix = infix_word->GetAffixForm(prefix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeInfix);
+				suffix = suffix_word->GetAffixForm(infix_word, NULL, type, WordJunctionTypeSeparate, AffixTypeSuffix);
 
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
-					name += PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular);
+				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular);
 					name += " ";
 				}
 					
@@ -1329,8 +1211,8 @@ std::string GenerateName(int language, std::string type)
 				name += " ";
 				name += TransliterateText(infix);
 				name += " ";
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_infix_ids[infix_id]]->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender).empty() && PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement") {
-					name += PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender);
+				if (infix_word->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, suffix_word->Gender).empty() && suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement") {
+					name += PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, suffix_word->Gender);
 				}
 				name += TransliterateText(suffix);
 			}

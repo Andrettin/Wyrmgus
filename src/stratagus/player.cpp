@@ -2994,6 +2994,14 @@ void GenerateMissingLanguageData()
 					}
 				}
 			}
+			
+			// now, as a test, generate 10 names for each name type for each language
+			for (int k = 0; k < 10; ++k) {
+				std::string generated_name = GenerateName(i, types[j]);
+				if (!generated_name.empty()) {
+					fprintf(stdout, "Generated name: \"%s\" (\"%s\", %s language).\n", generated_name.c_str(), types[j].c_str(), PlayerRaces.Languages[i]->Name.c_str());
+				}
+			}
 		}
 	}
 }
