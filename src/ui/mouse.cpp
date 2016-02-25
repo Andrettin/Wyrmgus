@@ -223,7 +223,10 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 	const int res = dest.Type->GivesResource;
 	const CUnitType &type = *unit.Type;
 	if (res && type.ResInfo[res] && dest.Type->BoolFlag[CANHARVEST_INDEX].value
-		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
+		//Wyrmgus start
+//		&& (dest.Player == unit.Player || dest.Player->Index == PlayerNumNeutral)) {
+		&& (dest.Player == unit.Player || (dest.Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest.Player)) || dest.Player->Index == PlayerNumNeutral)) {
+		//Wyrmgus end
 			//Wyrmgus start
 //			if (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
@@ -615,7 +618,10 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 {
 	// Go and harvest from a unit
 	if (dest != NULL && dest->Type->GivesResource && dest->Type->BoolFlag[CANHARVEST_INDEX].value
-		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
+		//Wyrmgus start
+//		&& (dest->Player == unit.Player || dest->Player->Index == PlayerNumNeutral)) {
+		&& (dest->Player == unit.Player || (dest->Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest->Player)) || dest->Player->Index == PlayerNumNeutral)) {
+		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAcknowledging);
@@ -1317,7 +1323,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				GameCursor = UI.RedHair.Cursor;
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer &&
-				((UnitUnderCursor->Type->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->Type->GivesResource] && (UnitUnderCursor->Player == ThisPlayer || UnitUnderCursor->Player->Index == PlayerNumNeutral)))
+				((UnitUnderCursor->Type->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->Type->GivesResource] && (UnitUnderCursor->Player == ThisPlayer || (UnitUnderCursor->Player->IsAllied(*ThisPlayer) && ThisPlayer->IsAllied(*UnitUnderCursor->Player)) || UnitUnderCursor->Player->Index == PlayerNumNeutral)))
 			) {
 				GameCursor = UI.YellowHair.Cursor;
 			} else {
@@ -1553,7 +1559,10 @@ static int SendResource(const Vec2i &pos)
 				&& unit.Type->ResInfo[res]
 				&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 				&& dest->Type->BoolFlag[CANHARVEST_INDEX].value
-				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
+				//Wyrmgus start
+//				&& (dest->Player == unit.Player || dest->Player->Index == PlayerMax - 1)) {
+				&& (dest->Player == unit.Player || (dest->Player->IsAllied(*unit.Player) && unit.Player->IsAllied(*dest->Player)) || dest->Player->Index == PlayerMax - 1)) {
+				//Wyrmgus end
 				dest->Blink = 4;
 				SendCommandResource(unit, *dest, flush);
 				ret = 1;
