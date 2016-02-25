@@ -2325,6 +2325,32 @@ int GetWordTypeIdByName(std::string word_type)
 	return -1;
 }
 
+std::string GetArticleTypeNameById(int article_type)
+{
+	if (article_type == ArticleTypeNoArticle) {
+		return "no-article";
+	} else if (article_type == ArticleTypeDefinite) {
+		return "definite";
+	} else if (article_type == ArticleTypeIndefinite) {
+		return "indefinite";
+	}
+
+	return "";
+}
+
+int GetArticleTypeIdByName(std::string article_type)
+{
+	if (article_type == "no-article") {
+		return ArticleTypeNoArticle;
+	} else if (article_type == "definite") {
+		return ArticleTypeDefinite;
+	} else if (article_type == "indefinite") {
+		return ArticleTypeIndefinite;
+	}
+
+	return -1;
+}
+
 std::string GetGrammaticalCaseNameById(int grammatical_case)
 {
 	if (grammatical_case == GrammaticalCaseNominative) {
@@ -2357,7 +2383,9 @@ int GetGrammaticalCaseIdByName(std::string grammatical_case)
 
 std::string GetGrammaticalNumberNameById(int grammatical_number)
 {
-	if (grammatical_number == GrammaticalNumberSingular) {
+	if (grammatical_number == GrammaticalNumberNoNumber) {
+		return "no-number";
+	} else if (grammatical_number == GrammaticalNumberSingular) {
 		return "singular";
 	} else if (grammatical_number == GrammaticalNumberPlural) {
 		return "plural";
@@ -2368,7 +2396,9 @@ std::string GetGrammaticalNumberNameById(int grammatical_number)
 
 int GetGrammaticalNumberIdByName(std::string grammatical_number)
 {
-	if (grammatical_number == "singular") {
+	if (grammatical_number == "no-number") {
+		return GrammaticalNumberNoNumber;
+	} else if (grammatical_number == "singular") {
 		return GrammaticalNumberSingular;
 	} else if (grammatical_number == "plural") {
 		return GrammaticalNumberPlural;
@@ -2405,7 +2435,9 @@ int GetGrammaticalPersonIdByName(std::string grammatical_person)
 
 std::string GetGrammaticalGenderNameById(int grammatical_gender)
 {
-	if (grammatical_gender == GrammaticalGenderMasculine) {
+	if (grammatical_gender == GrammaticalGenderNoGender) {
+		return "no-gender";
+	} else if (grammatical_gender == GrammaticalGenderMasculine) {
 		return "masculine";
 	} else if (grammatical_gender == GrammaticalGenderFeminine) {
 		return "feminine";
@@ -2418,7 +2450,9 @@ std::string GetGrammaticalGenderNameById(int grammatical_gender)
 
 int GetGrammaticalGenderIdByName(std::string grammatical_gender)
 {
-	if (grammatical_gender == "masculine") {
+	if (grammatical_gender == "no-gender") {
+		return GrammaticalGenderNoGender;
+	} else if (grammatical_gender == "masculine") {
 		return GrammaticalGenderMasculine;
 	} else if (grammatical_gender == "feminine") {
 		return GrammaticalGenderFeminine;
@@ -2551,14 +2585,14 @@ int GetWordJunctionTypeIdByName(std::string word_junction_type)
 	return -1;
 }
 
-std::string CLanguage::GetArticle(int gender, int grammatical_case, bool definite)
+std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_type)
 {
 	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
 		if (this->LanguageWords[i]->Type != WordTypeArticle) {
 			continue;
 		}
 		
-		if (this->LanguageWords[i]->Definite != definite) {
+		if (this->LanguageWords[i]->ArticleType != article_type) {
 			continue;
 		}
 		
@@ -2574,6 +2608,19 @@ std::string CLanguage::GetArticle(int gender, int grammatical_case, bool definit
 			}
 		}
 	}
+	return "";
+}
+
+std::string CLanguage::GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
+{
+	if (!this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender].empty()) {
+		return this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender];
+	} else if (!this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender].empty()) {
+		return this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender];
+	} else if (!this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender].empty()) {
+		return this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender];
+	}
+	
 	return "";
 }
 
@@ -2805,7 +2852,7 @@ void GenerateMissingLanguageData()
 					word->Type = word_type;
 					word->Gender = PlayerRaces.Languages[default_language]->LanguageWords[j]->Gender;
 					word->Uncountable = PlayerRaces.Languages[default_language]->LanguageWords[j]->Uncountable;
-					word->Definite = PlayerRaces.Languages[default_language]->LanguageWords[j]->Definite;
+					word->ArticleType = PlayerRaces.Languages[default_language]->LanguageWords[j]->ArticleType;
 					word->Number = PlayerRaces.Languages[default_language]->LanguageWords[j]->Number;
 					word->Nominative = word->Word;
 					for (size_t k = 0; k < PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings.size(); ++k) {

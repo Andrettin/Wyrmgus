@@ -315,6 +315,14 @@ enum WordTypes {
 	MaxWordTypes
 };
 
+enum ArticleTypes {
+	ArticleTypeNoArticle,
+	ArticleTypeDefinite,
+	ArticleTypeIndefinite,
+	
+	MaxArticleTypes
+};
+
 enum GrammaticalCases {
 	GrammaticalCaseNominative,
 	GrammaticalCaseAccusative,
@@ -325,6 +333,7 @@ enum GrammaticalCases {
 };
 
 enum GrammaticalNumbers {
+	GrammaticalNumberNoNumber,
 	GrammaticalNumberSingular,
 	GrammaticalNumberPlural,
 	
@@ -340,6 +349,7 @@ enum GrammaticalPersons {
 };
 
 enum GrammaticalGenders {
+	GrammaticalGenderNoGender,
 	GrammaticalGenderMasculine,
 	GrammaticalGenderFeminine,
 	GrammaticalGenderNeuter,
@@ -438,7 +448,7 @@ public:
 		DerivesFrom(NULL),
 		Archaic(false),
 		Uncountable(false),
-		Definite(false),
+		ArticleType(-1),
 		Number(-1)
 	{
 	}
@@ -477,7 +487,7 @@ public:
 	std::string Genitive;			/// Genitive case for the pronoun (if any)
 	
 	//article-specific variables
-	bool Definite;					/// Whether the article is definite
+	int ArticleType;				/// Which article type this article belongs to
 	
 	//numeral-specific variables
 	int Number;
@@ -491,12 +501,13 @@ public:
 	{
 	}
 	
-	std::string GetArticle(int gender, int grammatical_case, bool definite);
+	std::string GetArticle(int gender, int grammatical_case, int article_type);
+	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
 	int GetPotentialNameQuantityForType(std::string type);
 	
 	std::string Ident;											/// Ident of the language
 	std::string Name;											/// Name of the language
-	std::string NominativeAdjectiveEndingAfterDefiniteArticle;
+	std::string ArticleCaseNumberGenderAdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
 	bool GenerateMissingWords;									/// Whether "missing" words (missing equivalents to English words) should be generated for this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
 	std::vector<std::string> NameTranslations[2];				/// Name translations (2 values: one for the name to be translated, and another for the translation)
@@ -715,6 +726,8 @@ extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(std::string government_type);
 extern std::string GetWordTypeNameById(int word_type);
 extern int GetWordTypeIdByName(std::string word_type);
+extern std::string GetArticleTypeNameById(int article_type);
+extern int GetArticleTypeIdByName(std::string article_type);
 extern std::string GetGrammaticalCaseNameById(int grammatical_case);
 extern int GetGrammaticalCaseIdByName(std::string grammatical_case);
 extern std::string GetGrammaticalNumberNameById(int grammatical_number);

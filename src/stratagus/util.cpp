@@ -593,6 +593,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ḍ", "d");
 	text = FindAndReplaceString(text, "Đ", "D");
 	text = FindAndReplaceString(text, "đ", "d");
+	text = FindAndReplaceString(text, "Δ", "D");
+	text = FindAndReplaceString(text, "δ", "d");
 	text = FindAndReplaceString(text, "Ḗ", "E");
 	text = FindAndReplaceString(text, "ḗ", "e");
 	text = FindAndReplaceString(text, "Ė́", "E");
@@ -1358,14 +1360,14 @@ std::string GenerateName(int language, std::string type)
 					suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 				}
 				
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, true).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
-					name += PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, true);
+				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, ArticleTypeDefinite).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+					name += PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, ArticleTypeDefinite);
 					name += " ";
 				}
 					
 				name += TransliterateText(prefix);
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->NominativeAdjectiveEndingAfterDefiniteArticle.empty() && PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement") {
-					name += PlayerRaces.Languages[language]->NominativeAdjectiveEndingAfterDefiniteArticle;
+				if (PlayerRaces.Languages[language]->LanguageWords[separate_prefix_ids[prefix_id]]->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender).empty() && PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement") {
+					name += PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender);
 				}
 				name += " ";
 				name += TransliterateText(suffix);
@@ -1419,8 +1421,8 @@ std::string GenerateName(int language, std::string type)
 					suffix = PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->GetNumberCaseInflection(GrammaticalNumberPlural, GrammaticalCaseNominative);
 				}
 					
-				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, true).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
-					name += PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, true);
+				if (PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, ArticleTypeDefinite).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+					name += PlayerRaces.Languages[language]->GetArticle(PlayerRaces.Languages[language]->LanguageWords[separate_suffix_ids[suffix_id]]->Gender, GrammaticalCaseNominative, ArticleTypeDefinite);
 					name += " ";
 				}
 					
