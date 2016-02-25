@@ -2715,7 +2715,7 @@ std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *suffi
 	int grammatical_case = GrammaticalCaseNominative;
 	int grammatical_tense = GrammaticalTensePresent;
 	if (this->Type == WordTypeNoun) {
-		if (suffix != NULL && suffix->Type == WordTypeNoun && !this->Uncountable && type == "person") { //if both this word and the element coming after it are nouns, and this isn't a personal name, and the word isn't uncountable, give a chance that the genitive be used
+		if (suffix != NULL && suffix->Type == WordTypeNoun && !this->Uncountable && type != "person") { //if both this word and the element coming after it are nouns, and this isn't a personal name, and the word isn't uncountable, give a chance that the genitive be used
 			if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
 				grammatical_case = GrammaticalCaseGenitive;
 			} else {
