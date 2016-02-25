@@ -2585,14 +2585,14 @@ int GetWordJunctionTypeIdByName(std::string word_junction_type)
 	return -1;
 }
 
-std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_type)
+std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number)
 {
 	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
-		if (this->LanguageWords[i]->Type != WordTypeArticle) {
+		if (this->LanguageWords[i]->Type != WordTypeArticle || this->LanguageWords[i]->ArticleType != article_type) {
 			continue;
 		}
 		
-		if (this->LanguageWords[i]->ArticleType != article_type) {
+		if (grammatical_number != -1 && this->LanguageWords[i]->GrammaticalNumber != -1 && this->LanguageWords[i]->GrammaticalNumber != grammatical_number) {
 			continue;
 		}
 		
@@ -2704,6 +2704,48 @@ std::string LanguageWord::GetParticiple(int grammatical_tense)
 {
 	if (!this->Participles[grammatical_tense].empty()) {
 		return this->Participles[grammatical_tense];
+	}
+	
+	return this->Word;
+}
+
+std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type)
+{
+	int grammatical_number = GrammaticalNumberSingular;
+	int grammatical_case = GrammaticalCaseNominative;
+	int grammatical_tense = GrammaticalTensePresent;
+	if (this->Type == WordTypeNoun) {
+		if (suffix != NULL && suffix->Type == WordTypeNoun && !this->Uncountable && type == "person") { //if both this word and the element coming after it are nouns, and this isn't a personal name, and the word isn't uncountable, give a chance that the genitive be used
+			if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
+				grammatical_case = GrammaticalCaseGenitive;
+			} else {
+				grammatical_case = GrammaticalCaseNominative;
+			}
+		}
+		
+		if (prefix != NULL && prefix->Type == WordTypeNumeral && prefix->Number > 1) { //if prefix is a numeral that is greater than one, the grammatical number of this word must be plural
+			grammatical_number = GrammaticalNumberPlural;
+		} else if (this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberSingular) && this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberPlural)) {
+			if (SyncRand(2) == 0) { //50% chance the plural will be used, 50% chance the singular will be used instead
+				grammatical_number = GrammaticalNumberPlural;
+			} else {
+				grammatical_number = GrammaticalNumberSingular;
+			}
+		} else if (this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberSingular)) {
+			grammatical_number = GrammaticalNumberSingular;
+		} else if (this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberPlural)) {
+			grammatical_number = GrammaticalNumberPlural;
+		}
+		
+		return this->GetNumberCaseInflection(grammatical_number, grammatical_case);
+	} else if (this->Type == WordTypeVerb) {
+		// only using verb participles for now; maybe should add more possibilities?
+		if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
+			grammatical_tense = GrammaticalTensePresent;
+		} else {
+			grammatical_tense = GrammaticalTensePast;
+		}
+		return this->GetParticiple(grammatical_tense);
 	}
 	
 	return this->Word;
@@ -2851,6 +2893,7 @@ void GenerateMissingLanguageData()
 					PlayerRaces.Languages[i]->LanguageWords.push_back(word);
 					word->Type = word_type;
 					word->Gender = PlayerRaces.Languages[default_language]->LanguageWords[j]->Gender;
+					word->GrammaticalNumber = PlayerRaces.Languages[default_language]->LanguageWords[j]->GrammaticalNumber;
 					word->Uncountable = PlayerRaces.Languages[default_language]->LanguageWords[j]->Uncountable;
 					word->ArticleType = PlayerRaces.Languages[default_language]->LanguageWords[j]->ArticleType;
 					word->Number = PlayerRaces.Languages[default_language]->LanguageWords[j]->Number;

@@ -444,7 +444,7 @@ class LanguageWord
 {
 public:
 	LanguageWord() : 
-		Language(-1), Type(-1), Gender(-1),
+		Language(-1), Type(-1), Gender(-1), GrammaticalNumber(-1),
 		DerivesFrom(NULL),
 		Archaic(false),
 		Uncountable(false),
@@ -460,12 +460,14 @@ public:
 	std::string GetNumberPersonTenseMoodInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
 	std::string GetComparisonDegreeInflection(int comparison_degree);
 	std::string GetParticiple(int grammatical_tense);
+	std::string GetAffixForm(LanguageWord *prefix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type);
 	void AddNameTypeGenerationFromWord(LanguageWord *word, std::string type);
 
 	std::string Word;									/// Word name / ID.
 	int Language;
 	int Type;											/// Word type
 	int Gender;											/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
+	int GrammaticalNumber;								/// Grammatical number (i.e. whether the word is necessarily plural or not)
 	bool Archaic;										/// Whether the archaic (whether it is used in current speech)
 	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
 	std::string NumberPersonTenseMoodInflections[MaxGrammaticalNumbers][MaxGrammaticalPersons][MaxGrammaticalTenses][MaxGrammaticalMoods];	/// For verbs
@@ -501,7 +503,7 @@ public:
 	{
 	}
 	
-	std::string GetArticle(int gender, int grammatical_case, int article_type);
+	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
 	int GetPotentialNameQuantityForType(std::string type);
 	

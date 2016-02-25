@@ -844,6 +844,14 @@ static int CclDefineLanguageWord(lua_State *l)
 			} else {
 				LuaError(l, "Grammatical gender \"%s\" doesn't exist." _C_ grammatical_gender_name.c_str());
 			}
+		} else if (!strcmp(value, "GrammaticalNumber")) {
+			std::string grammatical_number_name = LuaToString(l, -1);
+			int grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+			if (grammatical_number != -1) {
+				word->GrammaticalNumber = grammatical_number;
+			} else {
+				LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+			}
 		} else if (!strcmp(value, "Archaic")) {
 			word->Archaic = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NumberCaseInflections")) {
