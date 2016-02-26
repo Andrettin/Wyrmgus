@@ -2709,21 +2709,11 @@ std::string LanguageWord::GetParticiple(int grammatical_tense)
 	return this->Word;
 }
 
-std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type)
+int LanguageWord::GetAffixGrammaticalNumber(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type)
 {
-	int grammatical_number = GrammaticalNumberSingular;
-	int grammatical_case = GrammaticalCaseNominative;
-	int grammatical_tense = GrammaticalTensePresent;
+	int grammatical_number = GrammaticalNumberNoNumber;
 	if (this->Type == WordTypeNoun) {
-		if (suffix != NULL && suffix->Type == WordTypeNoun && !this->Uncountable && type != "person") { //if both this word and the element coming after it are nouns, and this isn't a personal name, and the word isn't uncountable, give a chance that the genitive be used
-			if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
-				grammatical_case = GrammaticalCaseGenitive;
-			} else {
-				grammatical_case = GrammaticalCaseNominative;
-			}
-		}
-		
-		if (prefix != NULL && prefix->Type == WordTypeNumeral && prefix->Number > 1) { //if prefix is a numeral that is greater than one, the grammatical number of this word must be plural
+		if (this != prefix && this != infix && prefix != NULL && prefix->Type == WordTypeNumeral && prefix->Number > 1) { //if prefix is a numeral that is greater than one, the grammatical number of this word must be plural
 			grammatical_number = GrammaticalNumberPlural;
 		} else if (this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberSingular) && this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberPlural)) {
 			if (SyncRand(2) == 0) { //50% chance the plural will be used, 50% chance the singular will be used instead
@@ -2736,8 +2726,27 @@ std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *suffi
 		} else if (this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberPlural)) {
 			grammatical_number = GrammaticalNumberPlural;
 		}
+	}
+	
+	return grammatical_number;
+}
+
+std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type, int affix_grammatical_numbers[MaxAffixTypes])
+{
+	int grammatical_number = affix_grammatical_numbers[affix_type];
+	int grammatical_case = GrammaticalCaseNominative;
+	int grammatical_tense = GrammaticalTensePresent;
+	std::string affix_form;
+	if (this->Type == WordTypeNoun) {
+		if (this != suffix && suffix != NULL && suffix->Type == WordTypeNoun && !this->Uncountable && type != "person") { //if both this word and the element coming after it are nouns, and this isn't a personal name, and the word isn't uncountable, give a chance that the genitive be used
+			if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
+				grammatical_case = GrammaticalCaseGenitive;
+			} else {
+				grammatical_case = GrammaticalCaseNominative;
+			}
+		}
 		
-		return this->GetNumberCaseInflection(grammatical_number, grammatical_case);
+		affix_form = this->GetNumberCaseInflection(grammatical_number, grammatical_case);
 	} else if (this->Type == WordTypeVerb) {
 		// only using verb participles for now; maybe should add more possibilities?
 		if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
@@ -2745,10 +2754,27 @@ std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *suffi
 		} else {
 			grammatical_tense = GrammaticalTensePast;
 		}
-		return this->GetParticiple(grammatical_tense);
+		affix_form = this->GetParticiple(grammatical_tense);
+	} else if (this->Type == WordTypeAdjective) {
+		affix_form = this->GetComparisonDegreeInflection(ComparisonDegreePositive);
+		if (((this == prefix && infix == NULL) || this == infix) && suffix != NULL && suffix->Type == WordTypeNoun) {
+			if (type == "province" || type == "settlement" || type.find("terrain-") != std::string::npos) {
+				if (SyncRand(2) == 0) { //50% chance the dative (or should it be the genitive? this is for cases such as Schwarzenberg or Heiligenstadt) will be used, 50% chance the nominative will be used instead
+					grammatical_case = GrammaticalCaseDative;
+				} else {
+					grammatical_case = GrammaticalCaseNominative;
+				}
+			}
+			if (word_junction_type == WordJunctionTypeSeparate || grammatical_case != GrammaticalCaseNominative) {
+				grammatical_number = affix_grammatical_numbers[AffixTypeSuffix];
+				affix_form += PlayerRaces.Languages[this->Language]->GetAdjectiveEnding(ArticleTypeDefinite, grammatical_case, grammatical_number, suffix->Gender);
+			}
+		}
+	} else {
+		affix_form = this->Word;
 	}
 	
-	return this->Word;
+	return affix_form;
 }
 
 void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string type)
@@ -2815,7 +2841,7 @@ void GenerateMissingLanguageData()
 			}
 			
 			for (size_t j = 0; j < PlayerRaces.Languages[default_language]->LanguageWords.size(); ++j) {
-				if (!PlayerRaces.Languages[default_language]->LanguageWords[j]->Archaic && PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings.size() > 0) {
+				if (!PlayerRaces.Languages[default_language]->LanguageWords[j]->Archaic && (PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings.size() > 0 || PlayerRaces.Languages[default_language]->LanguageWords[j]->Number != -1)) {
 					bool language_has_equivalent = false;
 					for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
 						for (size_t n = 0; n < PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings.size(); ++n) {
@@ -2984,6 +3010,10 @@ void GenerateMissingLanguageData()
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
 					for (size_t n = 0; n < PlayerRaces.Languages[default_language]->LanguageWords.size(); ++n) {
 						if (PlayerRaces.Languages[default_language]->LanguageWords[n]->Type == PlayerRaces.Languages[i]->LanguageWords[k]->Type) {
+							if (PlayerRaces.Languages[default_language]->LanguageWords[n]->Number != -1 && PlayerRaces.Languages[i]->LanguageWords[k]->Number != -1 && PlayerRaces.Languages[default_language]->LanguageWords[n]->Number == PlayerRaces.Languages[i]->LanguageWords[k]->Number) {
+								PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(PlayerRaces.Languages[default_language]->LanguageWords[n], types[j]);
+								continue;
+							}
 							for (size_t o = 0; o < PlayerRaces.Languages[i]->LanguageWords[k]->Meanings.size(); ++o) {
 								if (PlayerRaces.Languages[default_language]->LanguageWords[n]->HasMeaning(PlayerRaces.Languages[i]->LanguageWords[k]->Meanings[o])) {
 									PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(PlayerRaces.Languages[default_language]->LanguageWords[n], types[j]);

@@ -1016,6 +1016,10 @@ std::string GenerateName(int language, std::string type)
 		
 		if (names.size() > 0 || (prefixes.size() > 0 && suffixes.size() > 0) || (separate_prefixes.size() > 0 && separate_suffixes.size() > 0)) {
 			unsigned int random_number = SyncRand(names.size() + (prefixes.size() * suffixes.size()) + ((prefixes.size() + suffixes.size()) / 2) * infixes.size() + (separate_prefixes.size() * separate_suffixes.size()) + ((separate_prefixes.size() + separate_suffixes.size()) / 2) * separate_infixes.size());
+			
+			int affix_grammatical_numbers[MaxAffixTypes];
+			memset(affix_grammatical_numbers, GrammaticalNumberNoNumber, sizeof(affix_grammatical_numbers));
+				
 			if (random_number < names.size()) { //entire name
 				name = names[SyncRand(names.size())]->Word;
 			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()))) { //prefix + suffix
@@ -1037,8 +1041,11 @@ std::string GenerateName(int language, std::string type)
 				//choose the word type of the suffix, and the suffix itself
 				suffix_word = suffixes[SyncRand(suffixes.size())];
 
-				prefix = prefix_word->GetAffixForm(NULL, suffix_word, type, WordJunctionTypeCompound, AffixTypePrefix);
-				suffix = suffix_word->GetAffixForm(prefix_word, NULL, type, WordJunctionTypeCompound, AffixTypeSuffix);
+				affix_grammatical_numbers[AffixTypePrefix] = prefix_word->GetAffixGrammaticalNumber(prefix_word, NULL, suffix_word, type, WordJunctionTypeCompound, AffixTypePrefix);
+				affix_grammatical_numbers[AffixTypeSuffix] = suffix_word->GetAffixGrammaticalNumber(prefix_word, NULL, suffix_word, type, WordJunctionTypeCompound, AffixTypeSuffix);
+				
+				prefix = prefix_word->GetAffixForm(prefix_word, NULL, suffix_word, type, WordJunctionTypeCompound, AffixTypePrefix, affix_grammatical_numbers);
+				suffix = suffix_word->GetAffixForm(prefix_word, NULL, suffix_word, type, WordJunctionTypeCompound, AffixTypeSuffix, affix_grammatical_numbers);
 
 				prefix = TransliterateText(prefix);
 				suffix = DecapitalizeString(TransliterateText(suffix));
@@ -1092,9 +1099,13 @@ std::string GenerateName(int language, std::string type)
 				//choose the word type of the suffix, and the suffix itself
 				suffix_word = suffixes[SyncRand(suffixes.size())];
 
-				prefix = prefix_word->GetAffixForm(NULL, infix_word, type, WordJunctionTypeCompound, AffixTypePrefix);
-				infix = infix_word->GetAffixForm(prefix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypeInfix);
-				suffix = suffix_word->GetAffixForm(infix_word, NULL, type, WordJunctionTypeCompound, AffixTypeSuffix);
+				affix_grammatical_numbers[AffixTypePrefix] = prefix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypePrefix);
+				affix_grammatical_numbers[AffixTypeInfix] = infix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypeInfix);
+				affix_grammatical_numbers[AffixTypeSuffix] = suffix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypeSuffix);
+				
+				prefix = prefix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypePrefix, affix_grammatical_numbers);
+				infix = infix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypeInfix, affix_grammatical_numbers);
+				suffix = suffix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypeSuffix, affix_grammatical_numbers);
 
 				prefix = TransliterateText(prefix);
 				infix = DecapitalizeString(TransliterateText(infix));
@@ -1148,18 +1159,18 @@ std::string GenerateName(int language, std::string type)
 				//choose the word type of the suffix, and the suffix itself
 				suffix_word = separate_suffixes[SyncRand(separate_suffixes.size())];
 
-				prefix = prefix_word->GetAffixForm(NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix);
-				suffix = suffix_word->GetAffixForm(prefix_word, NULL, type, WordJunctionTypeSeparate, AffixTypeSuffix);
+				affix_grammatical_numbers[AffixTypePrefix] = prefix_word->GetAffixGrammaticalNumber(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix);
+				affix_grammatical_numbers[AffixTypeSuffix] = suffix_word->GetAffixGrammaticalNumber(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix);
 				
-				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
-					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular);
+				prefix = prefix_word->GetAffixForm(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix, affix_grammatical_numbers);
+				suffix = suffix_word->GetAffixForm(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix, affix_grammatical_numbers);
+				
+				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]);
 					name += " ";
 				}
 					
 				name += TransliterateText(prefix);
-				if (prefix_word->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, suffix_word->Gender).empty() && suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement") {
-					name += PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, suffix_word->Gender);
-				}
 				name += " ";
 				name += TransliterateText(suffix);
 			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + ((prefixes.size() + suffixes.size()) / 2) * infixes.size() + (separate_prefixes.size() * separate_suffixes.size()) + ((separate_prefixes.size() + separate_suffixes.size()) / 2) * separate_infixes.size())) { //separate prefix + separate infix + separate suffix
@@ -1198,12 +1209,16 @@ std::string GenerateName(int language, std::string type)
 				//choose the word type of the suffix, and the suffix itself
 				suffix_word = separate_suffixes[SyncRand(separate_suffixes.size())];
 
-				prefix = prefix_word->GetAffixForm(NULL, infix_word, type, WordJunctionTypeSeparate, AffixTypePrefix);
-				infix = infix_word->GetAffixForm(prefix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeInfix);
-				suffix = suffix_word->GetAffixForm(infix_word, NULL, type, WordJunctionTypeSeparate, AffixTypeSuffix);
+				affix_grammatical_numbers[AffixTypePrefix] = prefix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix);
+				affix_grammatical_numbers[AffixTypeInfix] = infix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeInfix);
+				affix_grammatical_numbers[AffixTypeSuffix] = suffix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix);
+				
+				prefix = prefix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix, affix_grammatical_numbers);
+				infix = infix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeInfix, affix_grammatical_numbers);
+				suffix = suffix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix, affix_grammatical_numbers);
 
-				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
-					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, GrammaticalNumberSingular);
+				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]);
 					name += " ";
 				}
 					
@@ -1211,9 +1226,6 @@ std::string GenerateName(int language, std::string type)
 				name += " ";
 				name += TransliterateText(infix);
 				name += " ";
-				if (infix_word->Type == WordTypeAdjective && !PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, suffix_word->Gender).empty() && suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement") {
-					name += PlayerRaces.Languages[language]->GetAdjectiveEnding(ArticleTypeDefinite, GrammaticalCaseNominative, GrammaticalNumberSingular, suffix_word->Gender);
-				}
 				name += TransliterateText(suffix);
 			}
 		}
