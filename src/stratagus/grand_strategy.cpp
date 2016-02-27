@@ -1559,7 +1559,7 @@ void WorldMapTile::SetPort(bool has_port)
 
 void WorldMapTile::GenerateCulturalName(int old_civilization_id)
 {
-	if (this->Province == -1 || GrandStrategyGame.Provinces[this->Province]->Civilization == -1) {
+	if (this->Province == -1 || GrandStrategyGame.Provinces[this->Province]->Civilization == -1 || this->Terrain == -1) {
 		return;
 	}
 	
@@ -1594,7 +1594,7 @@ void WorldMapTile::GenerateCulturalName(int old_civilization_id)
 
 void WorldMapTile::GenerateFactionCulturalName()
 {
-	if (this->Province == -1 || GrandStrategyGame.Provinces[this->Province]->Civilization == -1) {
+	if (this->Province == -1 || GrandStrategyGame.Provinces[this->Province]->Civilization == -1 || this->Terrain == -1) {
 		return;
 	}
 	
