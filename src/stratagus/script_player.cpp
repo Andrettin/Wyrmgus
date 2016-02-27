@@ -995,14 +995,27 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				++k;
 				
-				std::string grammatical_number_name = LuaToString(l, -1, k + 1);
-				int grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
-				if (grammatical_number == -1) {
-					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+				int grammatical_number = GrammaticalNumberSingular;
+				if (GetGrammaticalNumberIdByName(LuaToString(l, -1, k + 1)) != -1) {
+					std::string grammatical_number_name = LuaToString(l, -1, k + 1);
+					grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+					if (grammatical_number == -1) {
+						LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+					}
+					++k;
 				}
-				++k;
 				
-				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number].push_back(LuaToString(l, -1, k + 1));
+				int grammatical_case = GrammaticalCaseNominative;
+				if (GetGrammaticalCaseIdByName(LuaToString(l, -1, k + 1)) != -1) {
+					std::string grammatical_case_name = LuaToString(l, -1, k + 1);
+					grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
+					if (grammatical_case == -1) {
+						LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
+					}
+					++k;
+				}
+				
+				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].push_back(LuaToString(l, -1, k + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

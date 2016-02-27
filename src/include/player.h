@@ -454,7 +454,7 @@ public:
 	}
 	
 	bool HasNameType(std::string type);
-	bool HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number);
+	bool HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number = -1, int grammatical_case = -1);
 	bool HasMeaning(std::string meaning);
 	std::string GetNumberCaseInflection(int grammatical_number, int grammatical_case);
 	std::string GetNumberPersonTenseMoodInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
@@ -478,7 +478,7 @@ public:
 	LanguageWord *DerivesFrom;    						/// From which word does this word derive
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
 	std::vector<std::string> NameTypes;
-	std::vector<std::string> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers];
+	std::vector<std::string> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers][MaxGrammaticalCases];
 	
 	// noun-specific variables
 	bool Uncountable;				/// Whether the noun is uncountable or not.

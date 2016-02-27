@@ -2642,8 +2642,10 @@ int CLanguage::GetPotentialNameQuantityForType(std::string type)
 		for (int j = 0; j < MaxWordJunctionTypes; ++j) {
 			for (int k = 0; k < MaxAffixTypes; ++k) {
 				for (int n = 0; n < MaxGrammaticalNumbers; ++n) {
-					if (this->LanguageWords[i]->HasAffixNameType(type, j, k, n)) {
-						affix_count[j][k] += 1;
+					for (int o = 0; o < MaxGrammaticalCases; ++o) {
+						if (this->LanguageWords[i]->HasAffixNameType(type, j, k, n, o)) {
+							affix_count[j][k] += 1;
+						}
 					}
 				}
 			}
@@ -2663,9 +2665,33 @@ bool LanguageWord::HasNameType(std::string type)
 	return std::find(this->NameTypes.begin(), this->NameTypes.end(), type) != this->NameTypes.end();
 }
 
-bool LanguageWord::HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number)
+bool LanguageWord::HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number, int grammatical_case)
 {
-	return std::find(this->AffixNameTypes[word_junction_type][affix_type][grammatical_number].begin(), this->AffixNameTypes[word_junction_type][affix_type][grammatical_number].end(), type) != this->AffixNameTypes[word_junction_type][affix_type][grammatical_number].end();
+	if (grammatical_number == -1 && grammatical_case == -1) {
+		for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
+			for (int j = 0; j < MaxGrammaticalCases; ++j) {
+				if (std::find(this->AffixNameTypes[word_junction_type][affix_type][i][j].begin(), this->AffixNameTypes[word_junction_type][affix_type][i][j].end(), type) != this->AffixNameTypes[word_junction_type][affix_type][i][j].end()) {
+					return true;
+				}
+			}
+		}
+	} else if (grammatical_number == -1) {
+		for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
+			if (std::find(this->AffixNameTypes[word_junction_type][affix_type][i][grammatical_case].begin(), this->AffixNameTypes[word_junction_type][affix_type][i][grammatical_case].end(), type) != this->AffixNameTypes[word_junction_type][affix_type][i][grammatical_case].end()) {
+				return true;
+			}
+		}
+	} else if (grammatical_case == -1) {
+		for (int i = 0; i < MaxGrammaticalCases; ++i) {
+			if (std::find(this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][i].begin(), this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][i].end(), type) != this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][i].end()) {
+				return true;
+			}
+		}
+	} else {
+		return std::find(this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].begin(), this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].end(), type) != this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].end();
+	}
+	
+	return false;
 }
 
 bool LanguageWord::HasMeaning(std::string meaning)
@@ -2711,20 +2737,24 @@ std::string LanguageWord::GetParticiple(int grammatical_tense)
 
 int LanguageWord::GetAffixGrammaticalNumber(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type)
 {
-	int grammatical_number = GrammaticalNumberNoNumber;
+	int grammatical_number = GrammaticalNumberSingular;
 	if (this->Type == WordTypeNoun) {
-		if (this != prefix && this != infix && prefix != NULL && prefix->Type == WordTypeNumeral && prefix->Number > 1) { //if prefix is a numeral that is greater than one, the grammatical number of this word must be plural
-			grammatical_number = GrammaticalNumberPlural;
-		} else if (this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberSingular) && this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberPlural)) {
-			if (SyncRand(2) == 0) { //50% chance the plural will be used, 50% chance the singular will be used instead
-				grammatical_number = GrammaticalNumberPlural;
-			} else {
-				grammatical_number = GrammaticalNumberSingular;
+		std::vector<int> potential_grammatical_numbers;
+		
+		for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
+			if (this->HasAffixNameType(type, word_junction_type, affix_type, i, -1)) {
+				potential_grammatical_numbers.push_back(i);
 			}
-		} else if (this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberSingular)) {
-			grammatical_number = GrammaticalNumberSingular;
-		} else if (this->HasAffixNameType(type, word_junction_type, affix_type, GrammaticalNumberPlural)) {
-			grammatical_number = GrammaticalNumberPlural;
+		}
+		
+		if (potential_grammatical_numbers.size() > 0) {
+			grammatical_number = potential_grammatical_numbers[SyncRand(potential_grammatical_numbers.size())];
+		}
+		
+		if (this != prefix && this != infix && prefix != NULL && prefix->Type == WordTypeNumeral && prefix->Number > 1) { //if prefix is a numeral that is greater than one, the grammatical number of this word must be plural
+			if (grammatical_number == GrammaticalNumberSingular) {
+				grammatical_number = GrammaticalNumberPlural;
+			}
 		}
 	}
 	
@@ -2739,10 +2769,16 @@ std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *infix
 	std::string affix_form;
 	if (this->Type == WordTypeNoun) {
 		if (this != suffix && suffix != NULL && suffix->Type == WordTypeNoun && !this->Uncountable && type != "person") { //if both this word and the element coming after it are nouns, and this isn't a personal name, and the word isn't uncountable, give a chance that the genitive be used
-			if (SyncRand(2) == 0) { //50% chance the genitive will be used, 50% chance the nominative will be used instead
-				grammatical_case = GrammaticalCaseGenitive;
-			} else {
-				grammatical_case = GrammaticalCaseNominative;
+			std::vector<int> potential_grammatical_cases;
+			
+			for (int i = 0; i < MaxGrammaticalCases; ++i) {
+				if (this->HasAffixNameType(type, word_junction_type, affix_type, grammatical_number, i)) {
+					potential_grammatical_cases.push_back(i);
+				}
+			}
+			
+			if (potential_grammatical_cases.size() > 0) {
+				grammatical_case = potential_grammatical_cases[SyncRand(potential_grammatical_cases.size())];
 			}
 		}
 		
@@ -2758,13 +2794,18 @@ std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *infix
 	} else if (this->Type == WordTypeAdjective) {
 		affix_form = this->GetComparisonDegreeInflection(ComparisonDegreePositive);
 		if (((this == prefix && infix == NULL) || this == infix) && suffix != NULL && suffix->Type == WordTypeNoun) {
-			if (type == "province" || type == "settlement" || type.find("terrain-") != std::string::npos) {
-				if (SyncRand(2) == 0) { //50% chance the dative (or should it be the genitive? this is for cases such as Schwarzenberg or Heiligenstadt) will be used, 50% chance the nominative will be used instead
-					grammatical_case = GrammaticalCaseDative;
-				} else {
-					grammatical_case = GrammaticalCaseNominative;
+			std::vector<int> potential_grammatical_cases;
+			
+			for (int i = 0; i < MaxGrammaticalCases; ++i) {
+				if (this->HasAffixNameType(type, word_junction_type, affix_type, grammatical_number, i)) {
+					potential_grammatical_cases.push_back(i);
 				}
 			}
+			
+			if (potential_grammatical_cases.size() > 0) {
+				grammatical_case = potential_grammatical_cases[SyncRand(potential_grammatical_cases.size())];
+			}
+			
 			if (word_junction_type == WordJunctionTypeSeparate || grammatical_case != GrammaticalCaseNominative) {
 				grammatical_number = affix_grammatical_numbers[AffixTypeSuffix];
 				affix_form += PlayerRaces.Languages[this->Language]->GetAdjectiveEnding(ArticleTypeDefinite, grammatical_case, grammatical_number, suffix->Gender);
@@ -2786,9 +2827,11 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
 		for (int j = 0; j < MaxAffixTypes; ++j) {
 			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
-				if (word->HasAffixNameType(type, i, j, k) && !this->HasAffixNameType(type, i, j, k)) {
-					if (i != WordJunctionTypeSeparate || word->Type == this->Type) { //only add separate name type generation from the word if both are of the same type
-						this->AffixNameTypes[i][j][k].push_back(type);
+				for (int n = 0; n < MaxGrammaticalCases; ++n) {
+					if (word->HasAffixNameType(type, i, j, k, n) && !this->HasAffixNameType(type, i, j, k, n)) {
+						if (i != WordJunctionTypeSeparate || word->Type == this->Type) { //only add separate name type generation from the word if both are of the same type
+							this->AffixNameTypes[i][j][k][n].push_back(type);
+						}
 					}
 				}
 			}
@@ -2946,9 +2989,11 @@ void GenerateMissingLanguageData()
 			for (int k = 0; k < MaxWordJunctionTypes; ++k) {
 				for (int n = 0; n < MaxAffixTypes; ++n) {
 					for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
-						for (size_t p = 0; p < PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o].size(); ++p) {
-							if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p]) == types.end()) {
-								types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p]);
+						for (int p = 0; p < MaxGrammaticalCases; ++p) {
+							for (size_t q = 0; q < PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p].size(); ++q) {
+								if (std::find(types.begin(), types.end(), PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p][q]) == types.end()) {
+									types.push_back(PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p][q]);
+								}
 							}
 						}
 					}
@@ -3026,7 +3071,7 @@ void GenerateMissingLanguageData()
 			}
 			
 			// now, as a test, generate 10 names for each name type for each language
-			for (int k = 0; k < 10; ++k) {
+			for (int k = 0; k < 25; ++k) {
 				std::string generated_name = GenerateName(i, types[j]);
 				if (!generated_name.empty()) {
 					fprintf(stdout, "Generated name: \"%s\" (\"%s\", %s language).\n", generated_name.c_str(), types[j].c_str(), PlayerRaces.Languages[i]->Name.c_str());

@@ -995,26 +995,24 @@ std::string GenerateName(int language, std::string type)
 				names.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 			}
 				
-			for (int n = 0; n < MaxGrammaticalNumbers; ++n) {
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix, n)) {
-					prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix, n)) {
-					suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix, n)) {
-					infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-				}
+			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix)) {
+				prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+			}
+			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix)) {
+				suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+			}
+			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix)) {
+				infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+			}
 					
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix, n)) {
-					separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix, n)) {
-					separate_suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-				}
-				if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix, n)) {
-					separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-				}
+			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix)) {
+				separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+			}
+			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix)) {
+				separate_suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+			}
+			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix)) {
+				separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 			}
 		}
 		
