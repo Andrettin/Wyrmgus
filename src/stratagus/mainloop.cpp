@@ -558,7 +558,7 @@ static void DisplayLoop()
 
 	//Wyrmgus start
 	//do tile animation
-	if (FrameCounter % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
+	if (!GamePaused && GameCycle != 0 && GameCycle && GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			CMapField &mf = Map.Fields[i];
 			if (Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].AnimationFrames > 0) {
