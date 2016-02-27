@@ -389,6 +389,7 @@ enum AffixTypes {
 };
 
 enum WordJunctionTypes {
+	WordJunctionTypeNoWordJunction,
 	WordJunctionTypeCompound,
 	WordJunctionTypeSeparate,
 	
@@ -456,8 +457,8 @@ public:
 	bool HasNameType(std::string type);
 	bool HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number = -1, int grammatical_case = -1);
 	bool HasMeaning(std::string meaning);
-	std::string GetNumberCaseInflection(int grammatical_number, int grammatical_case);
-	std::string GetNumberPersonTenseMoodInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
+	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
+	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
 	std::string GetAdjectiveInflection(int comparison_degree, int article_type = -1, int grammatical_case = -1, int grammatical_number = -1, int grammatical_gender = -1);
 	std::string GetParticiple(int grammatical_tense);
 	int GetAffixGrammaticalNumber(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type);
@@ -505,11 +506,13 @@ public:
 	}
 	
 	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
+	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
 	int GetPotentialNameQuantityForType(std::string type);
 	
 	std::string Ident;											/// Ident of the language
 	std::string Name;											/// Name of the language
+	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
 	bool GenerateMissingWords;									/// Whether "missing" words (missing equivalents to English words) should be generated for this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language

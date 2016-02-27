@@ -1394,6 +1394,38 @@ static int CclDefineLanguage(lua_State *l)
 			language->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "GenerateMissingWords")) {
 			language->GenerateMissingWords = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "NounEndings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				std::string grammatical_number_name = LuaToString(l, -1, k + 1);
+				int grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+				if (grammatical_number == -1) {
+					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+				}
+				++k;
+				
+				std::string grammatical_case_name = LuaToString(l, -1, k + 1);
+				int grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
+				if (grammatical_case == -1) {
+					LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
+				}
+				++k;
+				
+				int word_junction_type = WordJunctionTypeNoWordJunction;
+				if (GetWordJunctionTypeIdByName(LuaToString(l, -1, k + 1)) != -1) {
+					std::string word_junction_type_name = LuaToString(l, -1, k + 1);
+					int word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
+					if (word_junction_type == -1) {
+						LuaError(l, "Word junction type \"%s\" doesn't exist." _C_ word_junction_type_name.c_str());
+					}
+					++k;
+				}
+
+				language->NounEndings[grammatical_number][grammatical_case][word_junction_type] = LuaToString(l, -1, k + 1);
+			}
 		} else if (!strcmp(value, "AdjectiveEndings")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

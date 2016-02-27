@@ -2565,7 +2565,9 @@ int GetAffixTypeIdByName(std::string affix_type)
 
 std::string GetWordJunctionTypeNameById(int word_junction_type)
 {
-	if (word_junction_type == WordJunctionTypeCompound) {
+	if (word_junction_type == WordJunctionTypeNoWordJunction) {
+		return "no-word-junction";
+	} else if (word_junction_type == WordJunctionTypeCompound) {
 		return "compound";
 	} else if (word_junction_type == WordJunctionTypeSeparate) {
 		return "separate";
@@ -2576,7 +2578,9 @@ std::string GetWordJunctionTypeNameById(int word_junction_type)
 
 int GetWordJunctionTypeIdByName(std::string word_junction_type)
 {
-	if (word_junction_type == "compound") {
+	if (word_junction_type == "no-word-junction") {
+		return WordJunctionTypeNoWordJunction;
+	} else if (word_junction_type == "compound") {
 		return WordJunctionTypeCompound;
 	} else if (word_junction_type == "separate") {
 		return WordJunctionTypeSeparate;
@@ -2608,6 +2612,21 @@ std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_
 			}
 		}
 	}
+	return "";
+}
+
+std::string CLanguage::GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type)
+{
+	if (word_junction_type == -1) {
+		word_junction_type = WordJunctionTypeNoWordJunction;
+	}
+	
+	if (!this->NounEndings[grammatical_number][grammatical_case][word_junction_type].empty()) {
+		return this->NounEndings[grammatical_number][grammatical_case][word_junction_type];
+	} else if (!this->NounEndings[grammatical_number][grammatical_case][WordJunctionTypeNoWordJunction].empty()) {
+		return this->NounEndings[grammatical_number][grammatical_case][WordJunctionTypeNoWordJunction];
+	}
+	
 	return "";
 }
 
@@ -2707,16 +2726,16 @@ bool LanguageWord::HasMeaning(std::string meaning)
 	return std::find(this->Meanings.begin(), this->Meanings.end(), meaning) != this->Meanings.end();
 }
 
-std::string LanguageWord::GetNumberCaseInflection(int grammatical_number, int grammatical_case)
+std::string LanguageWord::GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type)
 {
 	if (!this->NumberCaseInflections[grammatical_number][grammatical_case].empty()) {
 		return this->NumberCaseInflections[grammatical_number][grammatical_case];
 	}
 	
-	return this->Word;
+	return this->Word + PlayerRaces.Languages[this->Language]->GetNounEnding(grammatical_number, grammatical_case, word_junction_type);
 }
 
-std::string LanguageWord::GetNumberPersonTenseMoodInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
+std::string LanguageWord::GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
 {
 	if (!this->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood].empty()) {
 		return this->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood];
@@ -2798,7 +2817,7 @@ std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *infix
 			}
 		}
 		
-		affix_form = this->GetNumberCaseInflection(grammatical_number, grammatical_case);
+		affix_form = this->GetNounInflection(grammatical_number, grammatical_case, word_junction_type);
 	} else if (this->Type == WordTypeVerb) {
 		// only using verb participles for now; maybe should add more possibilities?
 		if (SyncRand(2) == 0) { //50% chance the present participle will be used, 50% chance the past participle will be used instead
