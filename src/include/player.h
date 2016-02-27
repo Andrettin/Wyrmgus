@@ -458,7 +458,7 @@ public:
 	bool HasMeaning(std::string meaning);
 	std::string GetNumberCaseInflection(int grammatical_number, int grammatical_case);
 	std::string GetNumberPersonTenseMoodInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
-	std::string GetComparisonDegreeInflection(int comparison_degree);
+	std::string GetAdjectiveInflection(int comparison_degree, int article_type = -1, int grammatical_case = -1, int grammatical_number = -1, int grammatical_gender = -1);
 	std::string GetParticiple(int grammatical_tense);
 	int GetAffixGrammaticalNumber(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type);
 	std::string GetAffixForm(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type, int affix_grammatical_numbers[MaxAffixTypes]);
@@ -510,7 +510,7 @@ public:
 	
 	std::string Ident;											/// Ident of the language
 	std::string Name;											/// Name of the language
-	std::string ArticleCaseNumberGenderAdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
+	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
 	bool GenerateMissingWords;									/// Whether "missing" words (missing equivalents to English words) should be generated for this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
 	std::vector<std::string> NameTranslations[2];				/// Name translations (2 values: one for the name to be translated, and another for the translation)

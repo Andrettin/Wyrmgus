@@ -2613,12 +2613,20 @@ std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_
 
 std::string CLanguage::GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
 {
-	if (!this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender].empty()) {
-		return this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender];
-	} else if (!this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender].empty()) {
-		return this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender];
-	} else if (!this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender].empty()) {
-		return this->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender];
+	if (grammatical_number == -1) {
+		grammatical_number = GrammaticalNumberNoNumber;
+	}
+	
+	if (grammatical_gender == -1) {
+		grammatical_gender = GrammaticalGenderNoGender;
+	}
+	
+	if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender].empty()) {
+		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender];
+	} else if (!this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender].empty()) {
+		return this->AdjectiveEndings[article_type][grammatical_case][grammatical_number][GrammaticalGenderNoGender];
+	} else if (!this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender].empty()) {
+		return this->AdjectiveEndings[article_type][grammatical_case][GrammaticalNumberNoNumber][GrammaticalGenderNoGender];
 	}
 	
 	return "";
@@ -2717,13 +2725,21 @@ std::string LanguageWord::GetNumberPersonTenseMoodInflection(int grammatical_num
 	return this->Word;
 }
 
-std::string LanguageWord::GetComparisonDegreeInflection(int comparison_degree)
+std::string LanguageWord::GetAdjectiveInflection(int comparison_degree, int article_type, int grammatical_case, int grammatical_number, int grammatical_gender)
 {
+	std::string inflected_word;
+	
 	if (!this->ComparisonDegreeInflections[comparison_degree].empty()) {
-		return this->ComparisonDegreeInflections[comparison_degree];
+		inflected_word = this->ComparisonDegreeInflections[comparison_degree];
+	} else {
+		inflected_word = this->Word;
 	}
 	
-	return this->Word;
+	if (article_type != -1 && grammatical_case != -1) {
+		inflected_word += PlayerRaces.Languages[this->Language]->GetAdjectiveEnding(article_type, grammatical_case, grammatical_number, grammatical_gender);
+	}
+	
+	return inflected_word;
 }
 
 std::string LanguageWord::GetParticiple(int grammatical_tense)
@@ -2792,7 +2808,7 @@ std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *infix
 		}
 		affix_form = this->GetParticiple(grammatical_tense);
 	} else if (this->Type == WordTypeAdjective) {
-		affix_form = this->GetComparisonDegreeInflection(ComparisonDegreePositive);
+		affix_form = this->GetAdjectiveInflection(ComparisonDegreePositive);
 		if (((this == prefix && infix == NULL) || this == infix) && suffix != NULL && suffix->Type == WordTypeNoun) {
 			std::vector<int> potential_grammatical_cases;
 			
@@ -2808,7 +2824,7 @@ std::string LanguageWord::GetAffixForm(LanguageWord *prefix, LanguageWord *infix
 			
 			if (word_junction_type == WordJunctionTypeSeparate || grammatical_case != GrammaticalCaseNominative) {
 				grammatical_number = affix_grammatical_numbers[AffixTypeSuffix];
-				affix_form += PlayerRaces.Languages[this->Language]->GetAdjectiveEnding(ArticleTypeDefinite, grammatical_case, grammatical_number, suffix->Gender);
+				affix_form = this->GetAdjectiveInflection(ComparisonDegreePositive, ArticleTypeDefinite, grammatical_case, grammatical_number, suffix->Gender);
 			}
 		}
 	} else {

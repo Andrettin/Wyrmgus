@@ -1394,7 +1394,7 @@ static int CclDefineLanguage(lua_State *l)
 			language->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "GenerateMissingWords")) {
 			language->GenerateMissingWords = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "ArticleCaseNumberGenderAdjectiveEndings")) {
+		} else if (!strcmp(value, "AdjectiveEndings")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -1428,7 +1428,7 @@ static int CclDefineLanguage(lua_State *l)
 				}
 				++k;
 				
-				language->ArticleCaseNumberGenderAdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender] = LuaToString(l, -1, k + 1);
+				language->AdjectiveEndings[article_type][grammatical_case][grammatical_number][grammatical_gender] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "NameTranslations")) {
 			if (!lua_istable(l, -1)) {
