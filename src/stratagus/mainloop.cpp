@@ -58,6 +58,9 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"
+//Wyrmgus start
+#include "tileset.h" // for tile animation
+//Wyrmgus end
 #include "translate.h"
 #include "trigger.h"
 #include "ui.h"
@@ -553,6 +556,21 @@ static void DisplayLoop()
 
 	ColorCycle();
 
+	//Wyrmgus start
+	//do tile animation
+	if (FrameCounter % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
+		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+			CMapField &mf = Map.Fields[i];
+			if (Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].AnimationFrames > 0) {
+				mf.AnimationFrame += 1;
+				if (mf.AnimationFrame >= Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].AnimationFrames) {
+					mf.AnimationFrame = 0;
+				}
+			}
+		}
+	}
+	//Wyrmgus end
+		
 #ifdef REALVIDEO
 	if (FastForwardCycle > GameCycle && RealVideoSyncSpeed != VideoSyncSpeed) {
 		RealVideoSyncSpeed = VideoSyncSpeed;

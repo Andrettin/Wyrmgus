@@ -324,6 +324,7 @@ unsigned int CTileset::getOrAddSolidTileIndexByName(const std::string &name)
 	SolidTerrainInfo s;
 	s.TerrainName = name;
 	//Wyrmgus start
+	s.AnimationFrames = 0;
 	s.DefaultTileIndex = 0;
 	//Wyrmgus end
 	solidTerrainTypes.push_back(s);

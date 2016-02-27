@@ -288,11 +288,11 @@ void CViewport::DrawMapBackgroundInViewport() const
 					Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[Map.Tileset->solidTerrainTypes[underlay_terrain].DefaultTileIndex].tile, dx, dy, false);
 				}
 			}
-				
+
 			if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].ImageFile.empty()) {
-				Map.SolidTileGraphics[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain]->DrawFrameClip(tile, dx, dy, false);
+				Map.SolidTileGraphics[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain]->DrawFrameClip(tile + mf.AnimationFrame, dx, dy, false);
 			} else {
-				Map.TileGraphic->DrawFrameClip(tile, dx, dy, false);
+				Map.TileGraphic->DrawFrameClip(tile + mf.AnimationFrame, dx, dy, false);
 			}
 			//Wyrmgus end
 			++sx;

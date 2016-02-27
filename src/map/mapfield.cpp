@@ -55,6 +55,9 @@ CMapField::CMapField() :
 	Flags(0),
 	cost(0),
 	Value(0),
+	//Wyrmgus start
+	AnimationFrame(0),
+	//Wyrmgus end
 	UnitCache()
 {}
 
@@ -115,6 +118,12 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 //#ifdef DEBUG
 	this->tilesetTile = tileIndex;
 //#endif
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames > 0 && !tileset.tiles[this->tilesetTile].tileinfo.MixTerrain) {
+		this->AnimationFrame = SyncRand(tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames);
+	}
 	//Wyrmgus end
 }
 

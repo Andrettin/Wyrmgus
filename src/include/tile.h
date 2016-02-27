@@ -236,6 +236,7 @@ public:
 	//Wyrmgus start
 //	unsigned short Flags;      /// field flags
 	unsigned long Flags;      /// field flags
+	int AnimationFrame;		/// current frame of the tile's animation
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile
