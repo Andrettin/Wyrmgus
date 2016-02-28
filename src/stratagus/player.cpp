@@ -2864,9 +2864,7 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
 				for (int n = 0; n < MaxGrammaticalCases; ++n) {
 					if (word->HasAffixNameType(type, i, j, k, n) && !this->HasAffixNameType(type, i, j, k, n)) {
-						if (i != WordJunctionTypeSeparate || word->Type == this->Type) { //only add separate name type generation from the word if both are of the same type
-							this->AffixNameTypes[i][j][k][n].push_back(type);
-						}
+						this->AffixNameTypes[i][j][k][n].push_back(type);
 					}
 				}
 			}
@@ -3041,8 +3039,9 @@ void GenerateMissingLanguageData()
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (size_t j = 0; j < types.size(); ++j) {
 			bool deeper_related_word_level_exists = true;
+			bool try_different_word_types = false;
 			int relationship_depth_level = 1;
-			while (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names && deeper_related_word_level_exists) {
+			while (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names) {
 				deeper_related_word_level_exists = false;
 				
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
@@ -3079,11 +3078,22 @@ void GenerateMissingLanguageData()
 					
 					//now attach the new type name to the word from its related words, if it is found in them
 					for (size_t n = 0; n < related_words.size(); ++n) {
-						PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(related_words[n], types[j]);
+						if (PlayerRaces.Languages[i]->LanguageWords[k]->Type == related_words[n]->Type || try_different_word_types) { //only accept words of another type if tried to get suitable name generation from all relationship levels and failed
+							PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(related_words[n], types[j]);
+						}
 					}
 				}
 				
 				relationship_depth_level += 1;
+				
+				if (try_different_word_types) { //if tried different word types for this pass, stop (that was the last resort)
+					break;
+				}
+
+				if (!deeper_related_word_level_exists) { //if relationship levels have been exhausted, try different word types for the next pass
+					try_different_word_types = true;
+				}
+				
 			}
 			
 			if (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names && default_language != -1) { //if the quantity of names is still too low, try to add name generation of this type for this language based on the default language, for words which share a meaning
