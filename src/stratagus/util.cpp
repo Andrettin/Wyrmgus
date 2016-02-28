@@ -633,6 +633,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "î", "i");
 	text = FindAndReplaceString(text, "Ĭ", "I");
 	text = FindAndReplaceString(text, "ĭ", "i");
+	text = FindAndReplaceString(text, "Ĩ", "I");
+	text = FindAndReplaceString(text, "ĩ", "i");
 	text = FindAndReplaceString(text, "Ḱ", "K");
 	text = FindAndReplaceString(text, "ḱ", "k");
 	text = FindAndReplaceString(text, "Ň", "N");
@@ -692,10 +694,14 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ŭ", "u");
 	text = FindAndReplaceString(text, "Ů", "U");
 	text = FindAndReplaceString(text, "ů", "u");
+	text = FindAndReplaceString(text, "Ũ", "U");
+	text = FindAndReplaceString(text, "ũ", "u");
 	text = FindAndReplaceString(text, "ʷ", "w");
 	text = FindAndReplaceString(text, "Ȳ", "Y");
 	text = FindAndReplaceString(text, "ȳ", "y");
 	text = FindAndReplaceString(text, "Ž", "Z");
+	text = FindAndReplaceString(text, "Z̨", "Z");
+	text = FindAndReplaceString(text, "z̨", "z");
 	text = FindAndReplaceString(text, "ž", "z");
 	text = FindAndReplaceString(text, "Ż", "Z");
 	text = FindAndReplaceString(text, "ż", "z");
