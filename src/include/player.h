@@ -464,6 +464,7 @@ public:
 	int GetAffixGrammaticalNumber(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type);
 	std::string GetAffixForm(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type, int affix_grammatical_numbers[MaxAffixTypes]);
 	void AddNameTypeGenerationFromWord(LanguageWord *word, std::string type);
+	void StripNameTypeGeneration(std::string type);
 
 	std::string Word;									/// Word name / ID.
 	int Language;

@@ -2668,12 +2668,9 @@ int CLanguage::GetPotentialNameQuantityForType(std::string type)
 		
 		for (int j = 0; j < MaxWordJunctionTypes; ++j) {
 			for (int k = 0; k < MaxAffixTypes; ++k) {
-				for (int n = 0; n < MaxGrammaticalNumbers; ++n) {
-					for (int o = 0; o < MaxGrammaticalCases; ++o) {
-						if (this->LanguageWords[i]->HasAffixNameType(type, j, k, n, o)) {
-							affix_count[j][k] += 1;
-						}
-					}
+				if (this->LanguageWords[i]->HasAffixNameType(type, j, k)) {
+					affix_count[j][k] += 1;
+					break; //don't count the same element for every type of affix (to not make it seem that name diversity is higher than it really is)
 				}
 			}
 		}
@@ -2865,6 +2862,25 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 				for (int n = 0; n < MaxGrammaticalCases; ++n) {
 					if (word->HasAffixNameType(type, i, j, k, n) && !this->HasAffixNameType(type, i, j, k, n)) {
 						this->AffixNameTypes[i][j][k][n].push_back(type);
+					}
+				}
+			}
+		}
+	}
+}
+
+void LanguageWord::StripNameTypeGeneration(std::string type)
+{
+	if (this->HasNameType(type)) {
+		this->NameTypes.erase(std::remove(this->NameTypes.begin(), this->NameTypes.end(), type), this->NameTypes.end());
+	}
+	
+	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
+		for (int j = 0; j < MaxAffixTypes; ++j) {
+			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
+				for (int n = 0; n < MaxGrammaticalCases; ++n) {
+					if (this->HasAffixNameType(type, i, j, k, n)) {
+						this->AffixNameTypes[i][j][k][n].erase(std::remove(this->AffixNameTypes[i][j][k][n].begin(), this->AffixNameTypes[i][j][k][n].end(), type), this->AffixNameTypes[i][j][k][n].end());
 					}
 				}
 			}
@@ -3115,12 +3131,25 @@ void GenerateMissingLanguageData()
 				}
 			}
 			
-			// now, as a test, generate 10 names for each name type for each language
+			// now, as a test, generate 25 names for each name type for the language
 			for (int k = 0; k < 25; ++k) {
 				std::string generated_name = GenerateName(i, types[j]);
 				if (!generated_name.empty()) {
 					fprintf(stdout, "Generated name: \"%s\" (\"%s\", %s language).\n", generated_name.c_str(), types[j].c_str(), PlayerRaces.Languages[i]->Name.c_str());
 				}
+			}
+		}
+	}
+
+	int minimum_names = 5;
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		for (size_t j = 0; j < types.size(); ++j) {
+			int final_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]);
+			if (final_name_quantity > 0 && final_name_quantity < minimum_names) { //if the name quantity is still too low, then don't generate that sort of name for the language
+				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
+					PlayerRaces.Languages[i]->LanguageWords[k]->StripNameTypeGeneration(types[j]);
+				}
+				fprintf(stdout, "%s language could only generate %d names out of %d for type \"%s\", stripped name generation of that type for the language.\n", PlayerRaces.Languages[i]->Name.c_str(), final_name_quantity, minimum_names, types[j].c_str());
 			}
 		}
 	}
