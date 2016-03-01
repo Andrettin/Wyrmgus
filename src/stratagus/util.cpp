@@ -1038,7 +1038,9 @@ std::string GenerateName(int language, std::string type)
 		}
 		
 		if (names.size() > 0 || (prefixes.size() > 0 && suffixes.size() > 0) || (separate_prefixes.size() > 0 && separate_suffixes.size() > 0)) {
-			unsigned int random_number = SyncRand(names.size() + (prefixes.size() * suffixes.size()) + ((prefixes.size() + suffixes.size()) / 2) * infixes.size() + (separate_prefixes.size() * separate_suffixes.size()) + ((separate_prefixes.size() + separate_suffixes.size()) / 2) * separate_infixes.size());
+			int compound_name_with_infix_count = ((prefixes.size() + suffixes.size()) / 2 * ((prefixes.size() > 0 && suffixes.size() > 0) ? 1 : 0)) * infixes.size();
+			int separate_name_with_infix_count = ((separate_prefixes.size() + separate_suffixes.size()) / 2 * ((separate_prefixes.size() > 0 && separate_suffixes.size() > 0) ? 1 : 0)) * separate_infixes.size();
+			unsigned int random_number = SyncRand(names.size() + (prefixes.size() * suffixes.size()) + compound_name_with_infix_count + (separate_prefixes.size() * separate_suffixes.size()) + separate_name_with_infix_count);
 			
 			int affix_grammatical_numbers[MaxAffixTypes];
 			memset(affix_grammatical_numbers, GrammaticalNumberNoNumber, sizeof(affix_grammatical_numbers));
@@ -1086,7 +1088,7 @@ std::string GenerateName(int language, std::string type)
 				}
 				name = prefix;
 				name += suffix;
-			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + ((prefixes.size() + suffixes.size()) / 2) * infixes.size())) { //prefix + infix + suffix
+			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + compound_name_with_infix_count)) { //prefix + infix + suffix
 				std::string prefix;
 				std::string infix;
 				std::string suffix;
@@ -1163,7 +1165,7 @@ std::string GenerateName(int language, std::string type)
 				name = prefix;
 				name += infix;
 				name += suffix;
-			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + ((prefixes.size() + suffixes.size()) / 2) * infixes.size() + (separate_prefixes.size() * separate_suffixes.size()))) { //separate prefix + separate suffix
+			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + compound_name_with_infix_count + (separate_prefixes.size() * separate_suffixes.size()))) { //separate prefix + separate suffix
 				std::string prefix;
 				std::string suffix;
 				LanguageWord *prefix_word;
@@ -1188,7 +1190,7 @@ std::string GenerateName(int language, std::string type)
 				prefix = prefix_word->GetAffixForm(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix, affix_grammatical_numbers);
 				suffix = suffix_word->GetAffixForm(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix, affix_grammatical_numbers);
 				
-				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && type.find("terrain-") == std::string::npos && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
 					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]);
 					name += " ";
 				}
@@ -1196,7 +1198,7 @@ std::string GenerateName(int language, std::string type)
 				name += TransliterateText(prefix);
 				name += " ";
 				name += TransliterateText(suffix);
-			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + ((prefixes.size() + suffixes.size()) / 2) * infixes.size() + (separate_prefixes.size() * separate_suffixes.size()) + ((separate_prefixes.size() + separate_suffixes.size()) / 2) * separate_infixes.size())) { //separate prefix + separate infix + separate suffix
+			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + compound_name_with_infix_count + (separate_prefixes.size() * separate_suffixes.size()) + separate_name_with_infix_count)) { //separate prefix + separate infix + separate suffix
 				std::string prefix;
 				std::string infix;
 				std::string suffix;
@@ -1240,7 +1242,7 @@ std::string GenerateName(int language, std::string type)
 				infix = infix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeInfix, affix_grammatical_numbers);
 				suffix = suffix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix, affix_grammatical_numbers);
 
-				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && type.find("terrain-") == std::string::npos && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
 					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]);
 					name += " ";
 				}

@@ -2891,7 +2891,7 @@ void LanguageWord::StripNameTypeGeneration(std::string type)
 void GenerateMissingLanguageData()
 {
 	std::vector<std::string> types;
-	int minimum_desired_names = 25;
+	int minimum_desired_names = 10;
 	
 	int default_language = PlayerRaces.GetLanguageIndexByIdent("english");
 	size_t markov_chain_size = 2;
@@ -3109,9 +3109,12 @@ void GenerateMissingLanguageData()
 				if (!deeper_related_word_level_exists) { //if relationship levels have been exhausted, try different word types for the next pass
 					try_different_word_types = true;
 				}
-				
 			}
+		}
+	}
 			
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		for (size_t j = 0; j < types.size(); ++j) {
 			if (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names && default_language != -1) { //if the quantity of names is still too low, try to add name generation of this type for this language based on the default language, for words which share a meaning
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
 					for (size_t n = 0; n < PlayerRaces.Languages[default_language]->LanguageWords.size(); ++n) {
@@ -3131,8 +3134,8 @@ void GenerateMissingLanguageData()
 				}
 			}
 			
-			// now, as a test, generate 25 names for each name type for the language
-			for (int k = 0; k < 25; ++k) {
+			// now, as a test, generate 10 names for each name type for the language
+			for (int k = 0; k < 10; ++k) {
 				std::string generated_name = GenerateName(i, types[j]);
 				if (!generated_name.empty()) {
 					fprintf(stdout, "Generated name: \"%s\" (\"%s\", %s language).\n", generated_name.c_str(), types[j].c_str(), PlayerRaces.Languages[i]->Name.c_str());
@@ -3142,14 +3145,19 @@ void GenerateMissingLanguageData()
 	}
 
 	int minimum_names = 5;
+	int desired_names = 25;
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (size_t j = 0; j < types.size(); ++j) {
 			int final_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]);
-			if (final_name_quantity > 0 && final_name_quantity < minimum_names) { //if the name quantity is still too low, then don't generate that sort of name for the language
+			if (final_name_quantity > 0 && final_name_quantity < minimum_names) { //if the name quantity is very low, then don't generate that sort of name for the language
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
 					PlayerRaces.Languages[i]->LanguageWords[k]->StripNameTypeGeneration(types[j]);
 				}
 				fprintf(stdout, "%s language could only generate %d names out of %d for type \"%s\", stripped name generation of that type for the language.\n", PlayerRaces.Languages[i]->Name.c_str(), final_name_quantity, minimum_names, types[j].c_str());
+			} else if (final_name_quantity > 0 && final_name_quantity < minimum_desired_names) { //if the name quantity is below the minimum desired amount, note that in the output
+				fprintf(stdout, "%s language can only generate %d names out of %d for type \"%s\", below the minimum desired amount.\n", PlayerRaces.Languages[i]->Name.c_str(), final_name_quantity, minimum_desired_names, types[j].c_str());
+			} else if (final_name_quantity > 0 && final_name_quantity < desired_names) { //if the name quantity is below the minimum desired amount, note that in the output
+				fprintf(stdout, "%s language can only generate %d names out of %d for type \"%s\", below the desired amount.\n", PlayerRaces.Languages[i]->Name.c_str(), final_name_quantity, desired_names, types[j].c_str());
 			}
 		}
 	}

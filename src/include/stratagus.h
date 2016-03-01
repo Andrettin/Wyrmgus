@@ -165,7 +165,6 @@ extern const char NameLine[];
 #define PlayerColorMax 32			/// How many player colors are supported
 #define VariationMax 32				/// Maximum number of variations a unit can have
 #define PersonalNameMax 1024		/// Maximum number of personal names a civilization can have
-#define LanguageWordMax 1024		/// Maximum number of words a civilization's language can have
 
 #define WorldMapWidthMax 1024		/// Maximum width the grand strategy world map can have
 #define WorldMapHeightMax 1024		/// Maximum height the grand strategy world map can have
