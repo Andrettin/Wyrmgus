@@ -67,8 +67,6 @@ static int CclDefineQuest(lua_State *l)
 		quest = new CQuest;
 		Quests.push_back(quest);
 		quest->Name = quest_name;
-	} else {
-		LuaError(l, "Quest \"%s\" is being redefined." _C_ quest_name.c_str());
 	}
 	
 	//  Parse the list:

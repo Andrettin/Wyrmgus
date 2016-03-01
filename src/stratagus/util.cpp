@@ -945,33 +945,13 @@ std::string GeneratePersonalName(int language, int unit_type_id)
 
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		personal_name = "";
-	} else if (!type.PersonalNames[0].empty() || !type.PersonalNamePrefixes[0].empty()) {
-		int PersonalNameCount = 0;
-		int PersonalNamePrefixCount = 0;
-		int PersonalNameSuffixCount = 0;
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!type.PersonalNames[i].empty()) {
-				PersonalNameCount += 1;
-			}
-		}
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!type.PersonalNamePrefixes[i].empty()) {
-				PersonalNamePrefixCount += 1;
-			}
-		}
-		for (int i = 0; i < PersonalNameMax; ++i) {
-			if (!type.PersonalNameSuffixes[i].empty()) {
-				PersonalNameSuffixCount += 1;
-			}
-		}
-		if (PersonalNameCount > 0 || PersonalNamePrefixCount > 0) {
-			int PersonalNameProbability = PersonalNameCount * 10000 / (PersonalNameCount + (PersonalNamePrefixCount * PersonalNameSuffixCount));
-			if (SyncRand(10000) < PersonalNameProbability) {
-				personal_name = type.PersonalNames[SyncRand(PersonalNameCount)];
-			} else {
-				personal_name = type.PersonalNamePrefixes[SyncRand(PersonalNamePrefixCount)];
-				personal_name += type.PersonalNameSuffixes[SyncRand(PersonalNameSuffixCount)];
-			}
+	} else if (type.PersonalNames.size() > 0 || (type.PersonalNamePrefixes.size() > 0 && type.PersonalNameSuffixes.size() > 0)) {
+		int PersonalNameProbability = type.PersonalNames.size() * 10000 / (type.PersonalNames.size() + (type.PersonalNamePrefixes.size() * type.PersonalNameSuffixes.size()));
+		if (SyncRand(10000) < PersonalNameProbability) {
+			personal_name = type.PersonalNames[SyncRand(type.PersonalNames.size())];
+		} else {
+			personal_name = type.PersonalNamePrefixes[SyncRand(type.PersonalNamePrefixes.size())];
+			personal_name += type.PersonalNameSuffixes[SyncRand(type.PersonalNameSuffixes.size())];
 		}
 	} else if (
 		language != -1

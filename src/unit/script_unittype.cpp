@@ -596,6 +596,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!parent_type) {
 				LuaError(l, "Unit type %s not defined" _C_ type->Parent.c_str());
 			}
+			type->Name = parent_type->Name;
 			type->Class = parent_type->Class;
 			type->DrawLevel = parent_type->DrawLevel;
 			type->File = parent_type->File;
@@ -734,6 +735,15 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
 				type->Traits.push_back(parent_type->Traits[i]);
+			}
+			for (size_t i = 0; i < parent_type->PersonalNames.size(); ++i) {
+				type->PersonalNames.push_back(parent_type->PersonalNames[i]);
+			}
+			for (size_t i = 0; i < parent_type->PersonalNamePrefixes.size(); ++i) {
+				type->PersonalNamePrefixes.push_back(parent_type->PersonalNamePrefixes[i]);
+			}
+			for (size_t i = 0; i < parent_type->PersonalNameSuffixes.size(); ++i) {
+				type->PersonalNameSuffixes.push_back(parent_type->PersonalNameSuffixes[i]);
 			}
 			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
 				if (parent_type->VarInfo[var_n]) {
@@ -1719,19 +1729,22 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "PersonalNames")) {
+			type->PersonalNames.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				type->PersonalNames[j] = LuaToString(l, -1, j + 1);
+				type->PersonalNames.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "PersonalNamePrefixes")) {
+			type->PersonalNamePrefixes.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				type->PersonalNamePrefixes[j] = LuaToString(l, -1, j + 1);
+				type->PersonalNamePrefixes.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "PersonalNameSuffixes")) {
+			type->PersonalNameSuffixes.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
-				type->PersonalNameSuffixes[j] = LuaToString(l, -1, j + 1);
+				type->PersonalNameSuffixes.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "TechnologyPointCost")) {
 			type->TechnologyPointCost = LuaToNumber(l, -1);

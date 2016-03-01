@@ -1909,7 +1909,7 @@ static int CclSetPlayerData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		p->SetName(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
-		if (ThisPlayer) { //a way to check if this is in-game or not
+		if (GameRunning) {
 			p->SetFaction("");
 		}
 

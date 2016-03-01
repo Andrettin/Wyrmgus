@@ -894,6 +894,10 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 	for (int i = 0; i < player.GetUnitCount(); ++i) {
 		CUnit &unit = player.GetUnit(i);
 
+		if (!&unit) {
+			fprintf(stderr, "Unit %d of player %d is invalid.\n", i, player.Index);
+		}
+
 		//  Convert already existing units to this type.
 		//Wyrmgus start
 //		if (unit.Type == &src) {

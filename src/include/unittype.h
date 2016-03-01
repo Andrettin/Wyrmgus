@@ -678,9 +678,9 @@ public:
 	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	std::string Excrement;			/// Excrement unit for this unit type
-	std::string PersonalNames[PersonalNameMax];	/// personal names
-	std::string PersonalNamePrefixes[PersonalNameMax];	/// personal name prefixes
-	std::string PersonalNameSuffixes[PersonalNameMax];	/// personal name suffixes
+	std::vector<std::string> PersonalNames;	/// personal names
+	std::vector<std::string> PersonalNamePrefixes;	/// personal name prefixes
+	std::vector<std::string> PersonalNameSuffixes;	/// personal name suffixes
 	std::vector<int> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<int> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<CUpgrade *> DropAffixes;	/// Affixes which can be applied to dropped items
