@@ -3072,7 +3072,7 @@ void GenerateMissingLanguageData()
 					}
 					
 					for (int n = 0; n < relationship_depth_level; ++n) {
-						for (size_t o = 0; o < related_words.size(); ++o) {
+						for (int o = (int) related_words.size() - 1; o >= 0; --o) {
 							if (related_words[o]->DerivesFrom != NULL && related_words[o]->DerivesFrom != PlayerRaces.Languages[i]->LanguageWords[k] && std::find(related_words.begin(), related_words.end(), related_words[o]->DerivesFrom) == related_words.end()) {
 								if (n < (relationship_depth_level - 1)) {
 									related_words.push_back(related_words[o]->DerivesFrom);
