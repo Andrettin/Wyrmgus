@@ -505,7 +505,8 @@ public:
 		GenerateMissingWords(false)
 	{
 	}
-	
+
+	LanguageWord *GetWord(const std::string word, int word_type, std::vector<std::string>& word_meanings) const;
 	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
@@ -563,7 +564,6 @@ public:
 	int GetCivilizationLanguage(int civilization);
 	int GetFactionLanguage(int civilization, int faction);
 	std::string TranslateName(std::string name, int language);
-	LanguageWord *GetLanguageWord(const std::string word, int language, int word_type) const;
 	//Wyrmgus end
 
 public:

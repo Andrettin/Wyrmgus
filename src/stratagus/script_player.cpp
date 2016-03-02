@@ -804,8 +804,8 @@ static int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				word->Meanings.push_back(LuaToString(l, -1, k + 1));
+			for (int j = 0; j < subargs; ++j) {
+				word->Meanings.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "Type")) {
 			std::string word_type_name = LuaToString(l, -1);
@@ -819,14 +819,27 @@ static int CclDefineLanguageWord(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			int k = 0;
-			int derives_from_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, k + 1));
-			++k;
-			int derives_from_word_type = GetWordTypeIdByName(LuaToString(l, -1, k + 1));
-			++k;
+			int j = 0;
+			int derives_from_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
+			++j;
+			int derives_from_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+			++j;
+			
+			std::vector<std::string> word_meanings;
+			lua_rawgeti(l, -1, j + 1);
+			if (lua_istable(l, -1)) {
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					word_meanings.push_back(LuaToString(l, -1, k + 1));
+				}
+				
+				++j;
+			}
+			lua_pop(l, 1);
+			
 			if (derives_from_language != -1 && derives_from_word_type != -1) {
-				std::string derives_from_word = LuaToString(l, -1, k + 1);
-				word->DerivesFrom = const_cast<LanguageWord *>(&(*PlayerRaces.GetLanguageWord(derives_from_word, derives_from_language, derives_from_word_type)));
+				std::string derives_from_word = LuaToString(l, -1, j + 1);
+				word->DerivesFrom = const_cast<LanguageWord *>(&(*PlayerRaces.Languages[derives_from_language]->GetWord(derives_from_word, derives_from_word_type, word_meanings)));
 				
 				if (word->DerivesFrom != NULL) {
 					word->DerivesFrom->DerivesTo.push_back(word);
@@ -859,88 +872,88 @@ static int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				std::string grammatical_number_name = LuaToString(l, -1, k + 1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string grammatical_number_name = LuaToString(l, -1, j + 1);
 				int grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
 				if (grammatical_number == -1) {
 					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
 				}
-				++k;
+				++j;
 				
-				std::string grammatical_case_name = LuaToString(l, -1, k + 1);
+				std::string grammatical_case_name = LuaToString(l, -1, j + 1);
 				int grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
 				if (grammatical_case == -1) {
 					LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
 				}
-				++k;
+				++j;
 
-				word->NumberCaseInflections[grammatical_number][grammatical_case] = LuaToString(l, -1, k + 1);
+				word->NumberCaseInflections[grammatical_number][grammatical_case] = LuaToString(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "NumberPersonTenseMoodInflections")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				std::string grammatical_number_name = LuaToString(l, -1, k + 1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string grammatical_number_name = LuaToString(l, -1, j + 1);
 				int grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
 				if (grammatical_number == -1) {
 					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
 				}
-				++k;
+				++j;
 				
-				std::string grammatical_person_name = LuaToString(l, -1, k + 1);
+				std::string grammatical_person_name = LuaToString(l, -1, j + 1);
 				int grammatical_person = GetGrammaticalPersonIdByName(grammatical_person_name);
 				if (grammatical_person == -1) {
 					LuaError(l, "Grammatical person \"%s\" doesn't exist." _C_ grammatical_person_name.c_str());
 				}
-				++k;
+				++j;
 				
-				std::string grammatical_tense_name = LuaToString(l, -1, k + 1);
+				std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
 				int grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
 				if (grammatical_tense == -1) {
 					LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
 				}
-				++k;
+				++j;
 				
-				std::string grammatical_mood_name = LuaToString(l, -1, k + 1);
+				std::string grammatical_mood_name = LuaToString(l, -1, j + 1);
 				int grammatical_mood = GetGrammaticalMoodIdByName(grammatical_mood_name);
 				if (grammatical_mood == -1) {
 					LuaError(l, "Grammatical mood \"%s\" doesn't exist." _C_ grammatical_mood_name.c_str());
 				}
-				++k;
+				++j;
 
-				word->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood] = LuaToString(l, -1, k + 1);
+				word->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood] = LuaToString(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "ComparisonDegreeInflections")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				std::string comparison_degree_name = LuaToString(l, -1, k + 1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string comparison_degree_name = LuaToString(l, -1, j + 1);
 				int comparison_degree = GetComparisonDegreeIdByName(comparison_degree_name);
 				if (comparison_degree == -1) {
 					LuaError(l, "Comparison degree \"%s\" doesn't exist." _C_ comparison_degree_name.c_str());
 				}
-				++k;
+				++j;
 				
-				word->ComparisonDegreeInflections[comparison_degree] = LuaToString(l, -1, k + 1);
+				word->ComparisonDegreeInflections[comparison_degree] = LuaToString(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "Participles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				std::string grammatical_tense_name = LuaToString(l, -1, k + 1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
 				int grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
 				if (grammatical_tense == -1) {
 					LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
 				}
-				++k;
+				++j;
 				
-				word->Participles[grammatical_tense] = LuaToString(l, -1, k + 1);
+				word->Participles[grammatical_tense] = LuaToString(l, -1, j + 1);
 			}
 		//noun-specific variables
 		} else if (!strcmp(value, "Uncountable")) {
@@ -972,50 +985,50 @@ static int CclDefineLanguageWord(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				word->NameTypes.push_back(LuaToString(l, -1, k + 1));
+			for (int j = 0; j < subargs; ++j) {
+				word->NameTypes.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "AffixNameTypes")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
-			for (int k = 0; k < subargs; ++k) {
-				std::string word_junction_type_name = LuaToString(l, -1, k + 1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string word_junction_type_name = LuaToString(l, -1, j + 1);
 				int word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
 				if (word_junction_type == -1) {
 					LuaError(l, "Word junction type \"%s\" doesn't exist." _C_ word_junction_type_name.c_str());
 				}
-				++k;
+				++j;
 				
-				std::string affix_type_name = LuaToString(l, -1, k + 1);
+				std::string affix_type_name = LuaToString(l, -1, j + 1);
 				int affix_type = GetAffixTypeIdByName(affix_type_name);
 				if (affix_type == -1) {
 					LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
 				}
-				++k;
+				++j;
 				
 				int grammatical_number = GrammaticalNumberSingular;
-				if (GetGrammaticalNumberIdByName(LuaToString(l, -1, k + 1)) != -1) {
-					std::string grammatical_number_name = LuaToString(l, -1, k + 1);
+				if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_number_name = LuaToString(l, -1, j + 1);
 					grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
 					if (grammatical_number == -1) {
 						LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
 					}
-					++k;
+					++j;
 				}
 				
 				int grammatical_case = GrammaticalCaseNominative;
-				if (GetGrammaticalCaseIdByName(LuaToString(l, -1, k + 1)) != -1) {
-					std::string grammatical_case_name = LuaToString(l, -1, k + 1);
+				if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_case_name = LuaToString(l, -1, j + 1);
 					grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
 					if (grammatical_case == -1) {
 						LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
 					}
-					++k;
+					++j;
 				}
 				
-				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].push_back(LuaToString(l, -1, k + 1));
+				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

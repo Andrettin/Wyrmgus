@@ -640,17 +640,6 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	
 	return new_name;
 }
-
-LanguageWord *PlayerRace::GetLanguageWord(const std::string word, int language, int word_type) const
-{
-	for (size_t i = 0; i < this->Languages[language]->LanguageWords.size(); ++i) {
-		if (this->Languages[language]->LanguageWords[i]->Word == word && this->Languages[language]->LanguageWords[i]->Type == word_type) {
-			return this->Languages[language]->LanguageWords[i];
-		}
-	}
-
-	return NULL;
-}
 //Wyrmgus end
 
 /**
@@ -2587,6 +2576,17 @@ int GetWordJunctionTypeIdByName(std::string word_junction_type)
 	}
 
 	return -1;
+}
+
+LanguageWord *CLanguage::GetWord(const std::string word, int word_type, std::vector<std::string>& word_meanings) const
+{
+	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
+		if (this->LanguageWords[i]->Word == word && this->LanguageWords[i]->Type == word_type && (word_meanings.size() == 0 || this->LanguageWords[i]->Meanings == word_meanings)) {
+			return this->LanguageWords[i];
+		}
+	}
+
+	return NULL;
 }
 
 std::string CLanguage::GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number)
