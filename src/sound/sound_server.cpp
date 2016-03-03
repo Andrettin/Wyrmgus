@@ -49,6 +49,10 @@
 
 #include "SDL.h"
 
+#ifdef USE_OAML
+#include <oaml.h>
+#endif
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -101,6 +105,14 @@ static struct {
 	bool Running;
 } Audio;
 
+#ifdef USE_OAML
+#ifndef SDL_AUDIO_BITSIZE
+#define SDL_AUDIO_BITSIZE(x) (x&0xFF)
+#endif
+
+extern oamlApi *oaml;
+extern bool enableOAML;
+#endif
 
 /*----------------------------------------------------------------------------
 --  Mixers
@@ -306,6 +318,13 @@ static void MixIntoBuffer(void *buffer, int samples)
 		MixMusicToStereo32(Audio.MixerBuffer, samples);
 	}
 	ClipMixToStereo16(Audio.MixerBuffer, samples, (short *)buffer);
+
+#ifdef USE_OAML
+	if (enableOAML && oaml) {
+		oaml->SetAudioFormat(Audio.Format.freq, Audio.Format.channels, SDL_AUDIO_BITSIZE(Audio.Format.format) / 8);
+		oaml->MixToBuffer(buffer, samples);
+	}
+#endif
 }
 
 /**
@@ -349,6 +368,11 @@ static int FillThread(void *)
 			MixIntoBuffer(Audio.Buffer, Audio.Format.samples * Audio.Format.channels);
 		}
 		SDL_UnlockMutex(Audio.Lock);
+
+#ifdef USE_OAML
+		if (enableOAML && oaml)
+			oaml->Update();
+#endif
 	}
 
 	return 0;
@@ -740,11 +764,38 @@ int PlayMusic(const std::string &file)
 	}
 }
 
+void PlayMusicName(const std::string &name) {
+#ifdef USE_OAML
+	if (enableOAML && oaml)
+		oaml->PlayTrack(name.c_str());
+#endif
+}
+
+void PlayMusicWithStringRandom(const std::string &name) {
+#ifdef USE_OAML
+	if (enableOAML && oaml)
+		oaml->PlayTrackWithStringRandom(name.c_str());
+#endif
+}
+
+void SetMusicCondition(int id, int value) {
+#ifdef USE_OAML
+	if (enableOAML && oaml)
+		oaml->SetCondition(id, value);
+#endif
+}
+
 /**
 **  Stop the current playing music.
 */
 void StopMusic()
 {
+#ifdef USE_OAML
+	if (enableOAML && oaml) {
+		oaml->StopPlaying();
+	}
+#endif
+
 	if (MusicPlaying) {
 		MusicPlaying = false;
 		if (MusicChannel.Sample) {
@@ -765,6 +816,11 @@ void SetMusicVolume(int volume)
 {
 	clamp(&volume, 0, MaxVolume);
 	MusicVolume = volume;
+
+#ifdef USE_OAML
+	if (enableOAML && oaml)
+		oaml->SetVolume(MusicVolume / 100.f);
+#endif
 }
 
 /**
@@ -801,8 +857,26 @@ bool IsMusicEnabled()
 */
 bool IsMusicPlaying()
 {
+#ifdef USE_OAML
+	if (enableOAML && oaml) {
+		if (oaml->IsPlaying())
+			return true;
+	}
+#endif
 	return MusicPlaying;
 }
+
+/**
+**  Add tension to music
+*/
+void AddMusicTension(int value)
+{
+#ifdef USE_OAML
+	if (enableOAML && oaml)
+		oaml->AddTension(value);
+#endif
+}
+
 
 /*----------------------------------------------------------------------------
 --  Init
@@ -893,6 +967,14 @@ int InitSound()
 */
 void QuitSound()
 {
+#ifdef USE_OAML
+	if (oaml) {
+		oaml->Shutdown();
+		delete oaml;
+		oaml = NULL;
+	}
+#endif
+
 	Audio.Running = false;
 	SDL_WaitThread(Audio.Thread, NULL);
 

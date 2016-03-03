@@ -142,6 +142,14 @@ void SetMusicFinishedCallback(void (*callback)());
 extern int PlayMusic(CSample *sample);
 /// Play a music file
 extern int PlayMusic(const std::string &file);
+/// Play a music track
+extern void PlayMusicName(const std::string &name);
+/// Play a music track
+extern void PlayMusicWithStringRandom(const std::string &name);
+/// Set a condition for music
+extern void SetMusicCondition(int id, int value);
+/// Increase tension value for the music
+extern void AddMusicTension(int value);
 /// Stop music playing
 extern void StopMusic();
 /// Set music volume

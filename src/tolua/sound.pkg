@@ -16,8 +16,13 @@ end
 $]
 
 extern int PlayMusic(const std::string name);
+extern void PlayMusicName(const std::string name);
+extern void PlayMusicWithStringRandom(const std::string name);
+extern void SetMusicCondition(int id, int value);
 extern void StopMusic(void);
 extern bool IsMusicPlaying();
+extern void InitMusicOAML();
+extern void ShutdownMusicOAML();
 
 extern int SetChannelVolume(int channel, int volume);
 extern int SetChannelStereo(int channel, int stereo);

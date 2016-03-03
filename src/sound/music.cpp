@@ -40,6 +40,7 @@
 
 #include "sound_server.h"
 #include "script.h"
+#include "iolib.h"
 
 /*----------------------------------------------------------------------------
 -- Declaration
@@ -55,6 +56,13 @@ static SDL_mutex *MusicFinishedMutex;     /// Mutex for MusicFinished
 static bool MusicFinished;                /// Music ended and we need a new file
 
 bool CallbackMusic;                       /// flag true callback ccl if stops
+
+#ifdef USE_OAML
+#include <oaml.h>
+
+oamlApi *oaml;
+bool enableOAML = false;
+#endif
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -106,5 +114,79 @@ void InitMusic()
 	InitFluidSynth();
 #endif
 }
+
+#ifdef USE_OAML
+static void* oamlOpen(const char *filename) {
+	CFile *f = new CFile;
+	const std::string name = LibraryFileName(filename);
+	if (f->open(name.c_str(), CL_OPEN_READ) == -1) {
+		delete f;
+		return NULL;
+	}
+	return (void*)f;
+}
+
+static size_t oamlRead(void *ptr, size_t size, size_t nitems, void *fd) {
+	CFile *f = (CFile*)fd;
+	return f->read(ptr, size*nitems);
+}
+
+static int oamlSeek(void *fd, long offset, int whence) {
+	CFile *f = (CFile*)fd;
+	return f->seek(offset, whence);
+}
+
+static long oamlTell(void *fd) {
+	CFile *f = (CFile*)fd;
+	return f->tell();
+}
+
+static int oamlClose(void *fd) {
+	CFile *f = (CFile*)fd;
+	int ret = f->close();
+	delete f;
+	return ret;
+}
+
+
+static oamlFileCallbacks fileCbs = {
+	&oamlOpen,
+	&oamlRead,
+	&oamlSeek,
+	&oamlTell,
+	&oamlClose
+};
+
+void InitMusicOAML()
+{
+	const std::string filename = LibraryFileName("oaml.defs");
+	oaml = new oamlApi();
+	oaml->SetFileCallbacks(&fileCbs);
+	oaml->Init(filename.c_str());
+
+	enableOAML = true;
+	SetMusicVolume(GetMusicVolume());
+}
+
+void ShutdownMusicOAML()
+{
+	if (oaml) {
+		oaml->Shutdown();
+		delete oaml;
+		oaml = NULL;
+	}
+	enableOAML = false;
+}
+#else
+
+void InitMusicOAML()
+{
+}
+
+void ShutdownMusicOAML()
+{
+}
+
+#endif
 
 //@}
