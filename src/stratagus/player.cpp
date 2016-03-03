@@ -2867,6 +2867,15 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 			}
 		}
 	}
+	
+	//if the word being inherited from is used as part of a compound word, inherit relevant type name generation (i.e. if the related word is "Alf", and it is set as the prefix in the compound "Alfred", and "Alfred" as NameType generation for persons, then add PrefixNameType generation for the word inheriting type name generation from "Alf")
+	for (int i = 0; i < MaxAffixTypes; ++i) {
+		for (size_t j = 0; j < word->CompoundElementOf[i].size(); ++j) {
+			if (word->CompoundElementOf[i][j]->HasNameType(type)) {
+				this->AffixNameTypes[WordJunctionTypeCompound][i][GrammaticalNumberSingular][GrammaticalCaseNominative].push_back(type);
+			}
+		}
+	}
 }
 
 void LanguageWord::StripNameTypeGeneration(std::string type)

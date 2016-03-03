@@ -849,6 +849,49 @@ static int CclDefineLanguageWord(lua_State *l)
 			} else {
 				LuaError(l, "Word \"%s\"'s derives from is incorrectly set, as either the language or the word type set for the original word given is incorrect" _C_ word->Word.c_str());
 			}
+		} else if (!strcmp(value, "CompoundElements")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string affix_type_name = LuaToString(l, -1, j + 1);
+				int affix_type = GetAffixTypeIdByName(affix_type_name);
+				if (affix_type == -1) {
+					LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
+				}
+				++j;
+				
+				int affix_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1)); // should be the same language as that of the word, but needs to be specified since the word's language may not have been set yet
+				++j;
+				int affix_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+				++j;
+				
+				std::vector<std::string> word_meanings;
+				lua_rawgeti(l, -1, j + 1);
+				if (lua_istable(l, -1)) {
+					const int subargs = lua_rawlen(l, -1);
+					for (int k = 0; k < subargs; ++k) {
+						word_meanings.push_back(LuaToString(l, -1, k + 1));
+					}
+					
+					++j;
+				}
+				lua_pop(l, 1);
+
+				if (affix_language != -1 && affix_word_type != -1) {
+					std::string affix_word = LuaToString(l, -1, j + 1);
+					word->CompoundElements[affix_type] = const_cast<LanguageWord *>(&(*PlayerRaces.Languages[affix_language]->GetWord(affix_word, affix_word_type, word_meanings)));
+					
+					if (word->CompoundElements[affix_type] != NULL) {
+						word->CompoundElements[affix_type]->CompoundElementOf[affix_type].push_back(word);
+					} else {
+						LuaError(l, "Word \"%s\" is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ word->Word.c_str() _C_ affix_word.c_str() _C_ PlayerRaces.Languages[affix_language]->Name.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
+					}
+				} else {
+					LuaError(l, "Word \"%s\"'s compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ word->Word.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Gender")) {
 			std::string grammatical_gender_name = LuaToString(l, -1);
 			int grammatical_gender = GetGrammaticalGenderIdByName(grammatical_gender_name);

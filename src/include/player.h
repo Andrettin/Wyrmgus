@@ -471,7 +471,7 @@ public:
 	int Type;											/// Word type
 	int Gender;											/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
 	int GrammaticalNumber;								/// Grammatical number (i.e. whether the word is necessarily plural or not)
-	bool Archaic;										/// Whether the archaic (whether it is used in current speech)
+	bool Archaic;										/// Whether the word is archaic (whether it is used in current speech)
 	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
 	std::string NumberPersonTenseMoodInflections[MaxGrammaticalNumbers][MaxGrammaticalPersons][MaxGrammaticalTenses][MaxGrammaticalMoods];	/// For verbs
 	std::string ComparisonDegreeInflections[MaxComparisonDegrees];	/// For adjectives
@@ -479,6 +479,8 @@ public:
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
 	LanguageWord *DerivesFrom;    						/// From which word does this word derive
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
+	LanguageWord *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
+	std::vector<LanguageWord *> CompoundElementOf[MaxAffixTypes];	/// Which words are formed from this word as a compound element
 	std::vector<std::string> NameTypes;
 	std::vector<std::string> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers][MaxGrammaticalCases];
 	
