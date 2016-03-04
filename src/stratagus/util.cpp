@@ -994,67 +994,56 @@ std::string GenerateName(int language, std::string type)
 	
 	if (PlayerRaces.Languages[language]->LanguageWords.size() > 0) {
 		std::vector<LanguageWord *> names;
-		std::vector<LanguageWord *> prefixes;
-		std::vector<LanguageWord *> infixes;
-		std::vector<LanguageWord *> suffixes;
-		std::vector<LanguageWord *> separate_prefixes;
-		std::vector<LanguageWord *> separate_infixes;
-		std::vector<LanguageWord *> separate_suffixes;
+		std::vector<LanguageWord *> affixes[MaxWordJunctionTypes][MaxAffixTypes];
 		
 		for (size_t i = 0; i < PlayerRaces.Languages[language]->LanguageWords.size(); ++i) {
-			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasNameType(type)) { // nouns which can be used as names for this type without compounding
+			int has_name_type = PlayerRaces.Languages[language]->LanguageWords[i]->HasNameType(type);
+			for (int j = 0; j < has_name_type; ++j) {
 				names.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
 			}
 				
-			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypePrefix)) {
-				prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-			}
-			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeSuffix)) {
-				suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-			}
-			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeCompound, AffixTypeInfix)) {
-				infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-			}
-					
-			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypePrefix)) {
-				separate_prefixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-			}
-			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeSuffix)) {
-				separate_suffixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
-			}
-			if (PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, WordJunctionTypeSeparate, AffixTypeInfix)) {
-				separate_infixes.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+			for (int j = 0; j < MaxWordJunctionTypes; ++j) {
+				for (int k = 0; k < MaxAffixTypes; ++k) {
+					int has_affix_name_type = PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, j, k);
+					for (int n = 0; n < has_affix_name_type; ++n) {
+						affixes[j][k].push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+					}
+				}
 			}
 		}
 		
-		if (names.size() > 0 || (prefixes.size() > 0 && suffixes.size() > 0) || (separate_prefixes.size() > 0 && separate_suffixes.size() > 0)) {
-			int compound_name_with_infix_count = ((prefixes.size() + suffixes.size()) / 2 * ((prefixes.size() > 0 && suffixes.size() > 0) ? 1 : 0)) * infixes.size();
-			int separate_name_with_infix_count = ((separate_prefixes.size() + separate_suffixes.size()) / 2 * ((separate_prefixes.size() > 0 && separate_suffixes.size() > 0) ? 1 : 0)) * separate_infixes.size();
-			unsigned int random_number = SyncRand(names.size() + (prefixes.size() * suffixes.size()) + compound_name_with_infix_count + (separate_prefixes.size() * separate_suffixes.size()) + separate_name_with_infix_count);
+		if (names.size() > 0 || (affixes[WordJunctionTypeCompound][AffixTypePrefix].size() > 0 && affixes[WordJunctionTypeCompound][AffixTypeSuffix].size() > 0) || (affixes[WordJunctionTypeSeparate][AffixTypePrefix].size() > 0 && affixes[WordJunctionTypeSeparate][AffixTypeSuffix].size() > 0)) {
+			int compound_name_with_infix_count = ((affixes[WordJunctionTypeCompound][AffixTypePrefix].size() + affixes[WordJunctionTypeCompound][AffixTypeSuffix].size()) / 2 * ((affixes[WordJunctionTypeCompound][AffixTypePrefix].size() > 0 && affixes[WordJunctionTypeCompound][AffixTypeSuffix].size() > 0) ? 1 : 0)) * affixes[WordJunctionTypeCompound][AffixTypeInfix].size();
+			int separate_name_with_infix_count = ((affixes[WordJunctionTypeSeparate][AffixTypePrefix].size() + affixes[WordJunctionTypeSeparate][AffixTypeSuffix].size()) / 2 * ((affixes[WordJunctionTypeSeparate][AffixTypePrefix].size() > 0 && affixes[WordJunctionTypeSeparate][AffixTypeSuffix].size() > 0) ? 1 : 0)) * affixes[WordJunctionTypeSeparate][AffixTypeInfix].size();
+			unsigned int random_number = SyncRand(names.size() + (affixes[WordJunctionTypeCompound][AffixTypePrefix].size() * affixes[WordJunctionTypeCompound][AffixTypeSuffix].size()) + compound_name_with_infix_count + (affixes[WordJunctionTypeSeparate][AffixTypePrefix].size() * affixes[WordJunctionTypeSeparate][AffixTypeSuffix].size()) + separate_name_with_infix_count);
 			
 			int affix_grammatical_numbers[MaxAffixTypes];
 			memset(affix_grammatical_numbers, GrammaticalNumberNoNumber, sizeof(affix_grammatical_numbers));
 				
 			if (random_number < names.size()) { //entire name
+//				fprintf(stderr, "Generating entire name.\n");
 				name = names[SyncRand(names.size())]->GetAffixForm(NULL, NULL, NULL, type, WordJunctionTypeNoWordJunction, -1, affix_grammatical_numbers);
-			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()))) { //prefix + suffix
+			} else if (random_number < (names.size() + (affixes[WordJunctionTypeCompound][AffixTypePrefix].size() * affixes[WordJunctionTypeCompound][AffixTypeSuffix].size()))) { //prefix + suffix
+//				fprintf(stderr, "Generating compound name (\"%s\" type, %s language), prefix + suffix.\n", type.c_str(), PlayerRaces.Languages[language]->Name.c_str());
 				std::string prefix;
 				std::string suffix;
 				LanguageWord *prefix_word;
 				LanguageWord *suffix_word;
 				
+//				fprintf(stderr, "Prefix quantity: %d.\n", affixes[WordJunctionTypeCompound][AffixTypePrefix].size());
+
 				//choose the word type of the prefix, and the prefix itself
-				prefix_word = prefixes[SyncRand(prefixes.size())];
+				prefix_word = affixes[WordJunctionTypeCompound][AffixTypePrefix][SyncRand(affixes[WordJunctionTypeCompound][AffixTypePrefix].size())];
+
+//				fprintf(stderr, "Suffix quantity: %d.\n", affixes[WordJunctionTypeCompound][AffixTypeSuffix].size());
 
 				//if the chosen prefix is also present in the suffix vector, remove it
-				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
-					if (prefix_word == suffixes[i] && suffixes.size() > 1) {
-						suffixes.erase(std::remove(suffixes.begin(), suffixes.end(), suffixes[i]), suffixes.end());
-					}
-				}
+				prefix_word->RemoveFromVector(affixes[WordJunctionTypeCompound][AffixTypeSuffix]);
+
+//				fprintf(stderr, "Suffix quantity: %d.\n", affixes[WordJunctionTypeCompound][AffixTypeSuffix].size());
 
 				//choose the word type of the suffix, and the suffix itself
-				suffix_word = suffixes[SyncRand(suffixes.size())];
+				suffix_word = affixes[WordJunctionTypeCompound][AffixTypeSuffix][SyncRand(affixes[WordJunctionTypeCompound][AffixTypeSuffix].size())];
 
 				affix_grammatical_numbers[AffixTypePrefix] = prefix_word->GetAffixGrammaticalNumber(prefix_word, NULL, suffix_word, type, WordJunctionTypeCompound, AffixTypePrefix);
 				affix_grammatical_numbers[AffixTypeSuffix] = suffix_word->GetAffixGrammaticalNumber(prefix_word, NULL, suffix_word, type, WordJunctionTypeCompound, AffixTypeSuffix);
@@ -1078,7 +1067,8 @@ std::string GenerateName(int language, std::string type)
 				}
 				name = prefix;
 				name += suffix;
-			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + compound_name_with_infix_count)) { //prefix + infix + suffix
+			} else if (random_number < (names.size() + (affixes[WordJunctionTypeCompound][AffixTypePrefix].size() * affixes[WordJunctionTypeCompound][AffixTypeSuffix].size()) + compound_name_with_infix_count)) { //prefix + infix + suffix
+//				fprintf(stderr, "Generating compound name, prefix + infix + suffix.\n");
 				std::string prefix;
 				std::string infix;
 				std::string suffix;
@@ -1087,32 +1077,20 @@ std::string GenerateName(int language, std::string type)
 				LanguageWord *suffix_word;
 				
 				//choose the word type of the prefix, and the prefix itself
-				prefix_word = prefixes[SyncRand(prefixes.size())];
+				prefix_word = affixes[WordJunctionTypeCompound][AffixTypePrefix][SyncRand(affixes[WordJunctionTypeCompound][AffixTypePrefix].size())];
 
 				//if the chosen prefix is also present in the infix or suffix vectors, remove it
-				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
-					if (prefix_word == suffixes[i] && suffixes.size() > 1) {
-						suffixes.erase(std::remove(suffixes.begin(), suffixes.end(), suffixes[i]), suffixes.end());
-					}
-				}
-				for (int i = (int) infixes.size() - 1; i >= 0; --i) {
-					if (prefix_word == infixes[i] && infixes.size() > 1) {
-						infixes.erase(std::remove(infixes.begin(), infixes.end(), infixes[i]), infixes.end());
-					}
-				}
+				prefix_word->RemoveFromVector(affixes[WordJunctionTypeCompound][AffixTypeInfix]);
+				prefix_word->RemoveFromVector(affixes[WordJunctionTypeCompound][AffixTypeSuffix]);
 
 				//choose the word type of the infix, and the infix itself
-				infix_word = infixes[SyncRand(infixes.size())];
+				infix_word = affixes[WordJunctionTypeCompound][AffixTypeInfix][SyncRand(affixes[WordJunctionTypeCompound][AffixTypeInfix].size())];
 
 				//if the chosen infix is also present in the suffix vector, remove it
-				for (int i = (int) suffixes.size() - 1; i >= 0; --i) {
-					if (infix_word == suffixes[i] && suffixes.size() > 1) {
-						suffixes.erase(std::remove(suffixes.begin(), suffixes.end(), suffixes[i]), suffixes.end());
-					}
-				}
+				infix_word->RemoveFromVector(affixes[WordJunctionTypeCompound][AffixTypeSuffix]);
 
 				//choose the word type of the suffix, and the suffix itself
-				suffix_word = suffixes[SyncRand(suffixes.size())];
+				suffix_word = affixes[WordJunctionTypeCompound][AffixTypeSuffix][SyncRand(affixes[WordJunctionTypeCompound][AffixTypeSuffix].size())];
 
 				affix_grammatical_numbers[AffixTypePrefix] = prefix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypePrefix);
 				affix_grammatical_numbers[AffixTypeInfix] = infix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeCompound, AffixTypeInfix);
@@ -1155,24 +1133,21 @@ std::string GenerateName(int language, std::string type)
 				name = prefix;
 				name += infix;
 				name += suffix;
-			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + compound_name_with_infix_count + (separate_prefixes.size() * separate_suffixes.size()))) { //separate prefix + separate suffix
+			} else if (random_number < (names.size() + (affixes[WordJunctionTypeCompound][AffixTypePrefix].size() * affixes[WordJunctionTypeCompound][AffixTypeSuffix].size()) + compound_name_with_infix_count + (affixes[WordJunctionTypeSeparate][AffixTypePrefix].size() * affixes[WordJunctionTypeSeparate][AffixTypeSuffix].size()))) { //separate prefix + separate suffix
+//				fprintf(stderr, "Generating separated name, prefix + suffix.\n");
 				std::string prefix;
 				std::string suffix;
 				LanguageWord *prefix_word;
 				LanguageWord *suffix_word;
 				
 				//choose the word type of the prefix, and the prefix itself
-				prefix_word = separate_prefixes[SyncRand(separate_prefixes.size())];
+				prefix_word = affixes[WordJunctionTypeSeparate][AffixTypePrefix][SyncRand(affixes[WordJunctionTypeSeparate][AffixTypePrefix].size())];
 
 				//if the chosen prefix is also present in the suffix vector, remove it
-				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
-					if (prefix_word == separate_suffixes[i] && separate_suffixes.size() > 1) {
-						separate_suffixes.erase(std::remove(separate_suffixes.begin(), separate_suffixes.end(), separate_suffixes[i]), separate_suffixes.end());
-					}
-				}
+				prefix_word->RemoveFromVector(affixes[WordJunctionTypeSeparate][AffixTypeSuffix]);
 
 				//choose the word type of the suffix, and the suffix itself
-				suffix_word = separate_suffixes[SyncRand(separate_suffixes.size())];
+				suffix_word = affixes[WordJunctionTypeSeparate][AffixTypeSuffix][SyncRand(affixes[WordJunctionTypeSeparate][AffixTypeSuffix].size())];
 
 				affix_grammatical_numbers[AffixTypePrefix] = prefix_word->GetAffixGrammaticalNumber(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix);
 				affix_grammatical_numbers[AffixTypeSuffix] = suffix_word->GetAffixGrammaticalNumber(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix);
@@ -1188,7 +1163,8 @@ std::string GenerateName(int language, std::string type)
 				name += TransliterateText(prefix);
 				name += " ";
 				name += TransliterateText(suffix);
-			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()) + compound_name_with_infix_count + (separate_prefixes.size() * separate_suffixes.size()) + separate_name_with_infix_count)) { //separate prefix + separate infix + separate suffix
+			} else if (random_number < (names.size() + (affixes[WordJunctionTypeCompound][AffixTypePrefix].size() * affixes[WordJunctionTypeCompound][AffixTypeSuffix].size()) + compound_name_with_infix_count + (affixes[WordJunctionTypeSeparate][AffixTypePrefix].size() * affixes[WordJunctionTypeSeparate][AffixTypeSuffix].size()) + separate_name_with_infix_count)) { //separate prefix + separate infix + separate suffix
+//				fprintf(stderr, "Generating separated name (\"%s\" type, %s language), prefix + infix + suffix.\n", type.c_str(), PlayerRaces.Languages[language]->Name.c_str());
 				std::string prefix;
 				std::string infix;
 				std::string suffix;
@@ -1197,32 +1173,20 @@ std::string GenerateName(int language, std::string type)
 				LanguageWord *suffix_word;
 				
 				//choose the word type of the prefix, and the prefix itself
-				prefix_word = separate_prefixes[SyncRand(separate_prefixes.size())];
+				prefix_word = affixes[WordJunctionTypeSeparate][AffixTypePrefix][SyncRand(affixes[WordJunctionTypeSeparate][AffixTypePrefix].size())];
 
 				//if the chosen prefix is also present in the infix or suffix vectors, remove it
-				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
-					if (prefix_word == separate_suffixes[i] && separate_suffixes.size() > 1) {
-						separate_suffixes.erase(std::remove(separate_suffixes.begin(), separate_suffixes.end(), separate_suffixes[i]), separate_suffixes.end());
-					}
-				}
-				for (int i = (int) separate_infixes.size() - 1; i >= 0; --i) {
-					if (prefix_word == separate_infixes[i] && separate_infixes.size() > 1) {
-						separate_infixes.erase(std::remove(separate_infixes.begin(), separate_infixes.end(), separate_infixes[i]), separate_infixes.end());
-					}
-				}
+				prefix_word->RemoveFromVector(affixes[WordJunctionTypeSeparate][AffixTypeInfix]);
+				prefix_word->RemoveFromVector(affixes[WordJunctionTypeSeparate][AffixTypeSuffix]);
 
 				//choose the word type of the infix, and the infix itself
-				infix_word = separate_infixes[SyncRand(separate_infixes.size())];
+				infix_word = affixes[WordJunctionTypeSeparate][AffixTypeInfix][SyncRand(affixes[WordJunctionTypeSeparate][AffixTypeInfix].size())];
 
 				//if the chosen infix is also present in the suffix vector, remove it
-				for (int i = (int) separate_suffixes.size() - 1; i >= 0; --i) {
-					if (infix_word == separate_suffixes[i] && separate_suffixes.size() > 1) {
-						separate_suffixes.erase(std::remove(separate_suffixes.begin(), separate_suffixes.end(), separate_suffixes[i]), separate_suffixes.end());
-					}
-				}
+				infix_word->RemoveFromVector(affixes[WordJunctionTypeSeparate][AffixTypeSuffix]);
 
 				//choose the word type of the suffix, and the suffix itself
-				suffix_word = separate_suffixes[SyncRand(separate_suffixes.size())];
+				suffix_word = affixes[WordJunctionTypeSeparate][AffixTypeSuffix][SyncRand(affixes[WordJunctionTypeSeparate][AffixTypeSuffix].size())];
 
 				affix_grammatical_numbers[AffixTypePrefix] = prefix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix);
 				affix_grammatical_numbers[AffixTypeInfix] = infix_word->GetAffixGrammaticalNumber(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeInfix);

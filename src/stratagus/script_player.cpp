@@ -1039,7 +1039,11 @@ static int CclDefineLanguageWord(lua_State *l)
 					++j;
 				}
 				
-				word->NameTypes[grammatical_number].push_back(LuaToString(l, -1, j + 1));
+				std::string type = LuaToString(l, -1, j + 1);
+				if (word->NameTypes[grammatical_number].find(type) == word->NameTypes[grammatical_number].end()) {
+					word->NameTypes[grammatical_number][type] = 0;
+				}
+				word->NameTypes[grammatical_number][type] += 1;
 			}
 		} else if (!strcmp(value, "AffixNameTypes")) {
 			if (!lua_istable(l, -1)) {
@@ -1081,7 +1085,11 @@ static int CclDefineLanguageWord(lua_State *l)
 					++j;
 				}
 				
-				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].push_back(LuaToString(l, -1, j + 1));
+				std::string type = LuaToString(l, -1, j + 1);
+				if (word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].find(type) == word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].end()) {
+					word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][type] = 0;
+				}
+				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][type] += 1;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

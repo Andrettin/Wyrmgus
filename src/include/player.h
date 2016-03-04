@@ -39,6 +39,8 @@
 #include <string>
 
 //Wyrmgus start
+#include <map>
+
 #ifndef __ICONS_H__
 #include "icons.h"
 #endif
@@ -454,8 +456,8 @@ public:
 	{
 	}
 	
-	bool HasNameType(std::string type, int grammatical_number = -1);
-	bool HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number = -1, int grammatical_case = -1);
+	int HasNameType(std::string type, int grammatical_number = -1); /// returns the quantity of times a certain type name been assigned to the word
+	int HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number = -1, int grammatical_case = -1); /// returns the quantity of times a certain type name been assigned to the word (for using the word as an affix in name type generation)
 	bool HasMeaning(std::string meaning);
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
@@ -465,6 +467,7 @@ public:
 	std::string GetAffixForm(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type, int affix_grammatical_numbers[MaxAffixTypes]);
 	void AddNameTypeGenerationFromWord(LanguageWord *word, std::string type);
 	void StripNameTypeGeneration(std::string type);
+	void RemoveFromVector(std::vector<LanguageWord *>& word_vector);
 
 	std::string Word;									/// Word name / ID.
 	int Language;
@@ -481,8 +484,8 @@ public:
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
 	LanguageWord *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
 	std::vector<LanguageWord *> CompoundElementOf[MaxAffixTypes];	/// Which words are formed from this word as a compound element
-	std::vector<std::string> NameTypes[MaxGrammaticalNumbers];
-	std::vector<std::string> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers][MaxGrammaticalCases];
+	std::map<std::string, int> NameTypes[MaxGrammaticalNumbers];
+	std::map<std::string, int> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers][MaxGrammaticalCases];
 	
 	// noun-specific variables
 	bool Uncountable;				/// Whether the noun is uncountable or not.
