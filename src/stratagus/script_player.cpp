@@ -1029,7 +1029,17 @@ static int CclDefineLanguageWord(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
-				word->NameTypes.push_back(LuaToString(l, -1, j + 1));
+				int grammatical_number = GrammaticalNumberSingular;
+				if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_number_name = LuaToString(l, -1, j + 1);
+					grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+					if (grammatical_number == -1) {
+						LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+					}
+					++j;
+				}
+				
+				word->NameTypes[grammatical_number].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "AffixNameTypes")) {
 			if (!lua_istable(l, -1)) {

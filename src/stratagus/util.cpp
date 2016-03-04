@@ -1036,7 +1036,7 @@ std::string GenerateName(int language, std::string type)
 			memset(affix_grammatical_numbers, GrammaticalNumberNoNumber, sizeof(affix_grammatical_numbers));
 				
 			if (random_number < names.size()) { //entire name
-				name = names[SyncRand(names.size())]->Word;
+				name = names[SyncRand(names.size())]->GetAffixForm(NULL, NULL, NULL, type, WordJunctionTypeNoWordJunction, -1, affix_grammatical_numbers);
 			} else if (random_number < (names.size() + (prefixes.size() * suffixes.size()))) { //prefix + suffix
 				std::string prefix;
 				std::string suffix;

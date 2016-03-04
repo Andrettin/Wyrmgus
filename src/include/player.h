@@ -454,7 +454,7 @@ public:
 	{
 	}
 	
-	bool HasNameType(std::string type);
+	bool HasNameType(std::string type, int grammatical_number = -1);
 	bool HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number = -1, int grammatical_case = -1);
 	bool HasMeaning(std::string meaning);
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
@@ -481,7 +481,7 @@ public:
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
 	LanguageWord *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
 	std::vector<LanguageWord *> CompoundElementOf[MaxAffixTypes];	/// Which words are formed from this word as a compound element
-	std::vector<std::string> NameTypes;
+	std::vector<std::string> NameTypes[MaxGrammaticalNumbers];
 	std::vector<std::string> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers][MaxGrammaticalCases];
 	
 	// noun-specific variables
