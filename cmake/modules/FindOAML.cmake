@@ -1,45 +1,38 @@
-# Locate OAML
-# This module defines
-# OAML_LIBRARIES
-# OAML_FOUND, if false, do not try to link to OAML
-# OAML_INCLUDE_DIRS, where to find the headers
+#.rst:
+# FindOAML
+# -------
 #
-# Created by Marcelo Fernandez. Based on FindVorbisFile.cmake module.
-# TODO Add hints for linux and Mac
+# Find the native OAML includes and library
+#
+# It defines the following variables
+#
+# ``OAML_INCLUDE_DIRS``
+#   where to find oaml.h
+# ``OAML_LIBRARIES_SHARED``
+#   the libraries to link against to use OAML.
+# ``OAML_LIBRARIES_STATIC``
+#   the libraries to link against to use OAML.
+# ``OAML_FOUND``
+#   If false, do not try to use OAML.
+#
 
-FIND_PATH(OAML_INCLUDE_DIRS
-	oaml.h
-	HINTS
-	PATH_SUFFIXES include
-	PATHS
-	~/Library/Frameworks
-	/Library/Frameworks
-	/usr/local
-	/usr
-	/sw # Fink
-	/opt/local # DarwinPorts
-	/opt/csw # Blastwave
-	/opt
-)
+set(OAML_FOUND "NO")
 
-FIND_LIBRARY(OAML_LIBRARIES
-	NAMES oaml
-	HINTS
-	PATHS
-	~/Library/Frameworks
-	/Library/Frameworks
-	/usr/local
-	/usr
-	/sw
-	/opt/local
-	/opt/csw
-	/opt
-)
+find_package(OggVorbis)
+find_package(VorbisFile)
 
-SET(OAML_FOUND "NO")
-IF(OAML_LIBRARIES AND OAML_INCLUDE_DIRS)
-	SET(OAML_FOUND "YES")
-	MARK_AS_ADVANCED(OAML_LIBRARIES OAML_INCLUDE_DIRS)
-ELSEIF(OAML_FIND_REQUIRED)
-	MESSAGE(FATAL_ERROR "Required library OAML not found! Install the library (including dev packages) and try again. If the library is already installed, set the missing variables manually in cmake.")
-ENDIF()
+if(OGGVORBIS_FOUND AND VORBISFILE_FOUND)
+	find_path(OAML_INCLUDE_DIRS oaml.h)
+	find_library(OAML_LIBRARY_STATIC oaml)
+	find_library(OAML_LIBRARY_SHARED oaml_shared)
+
+	if (OAML_LIBRARY_SHARED AND OAML_INCLUDE_DIRS)
+		set(OAML_FOUND "YES")
+		set(OAML_LIBRARIES_SHARED ${OAML_LIBRARY_SHARED} ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${VORBISFILE_LIBRARIES})
+	endif()
+
+	if (OAML_LIBRARY_STATIC AND OAML_INCLUDE_DIRS)
+		set(OAML_FOUND "YES")
+		set(OAML_LIBRARIES_STATIC ${OAML_LIBRARY_STATIC} ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${VORBISFILE_LIBRARIES})
+	endif()
+endif()

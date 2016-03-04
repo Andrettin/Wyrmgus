@@ -771,10 +771,10 @@ void PlayMusicName(const std::string &name) {
 #endif
 }
 
-void PlayMusicWithStringRandom(const std::string &name) {
+void PlayMusicByGroupRandom(const std::string &group) {
 #ifdef USE_OAML
 	if (enableOAML && oaml)
-		oaml->PlayTrackWithStringRandom(name.c_str());
+		oaml->PlayTrackByGroupRandom(group.c_str());
 #endif
 }
 
