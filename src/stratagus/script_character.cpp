@@ -88,6 +88,119 @@ static int CclDefineCharacter(lua_State *l)
 			character->ExtraName = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "Dynasty")) {
 			character->Dynasty = TransliterateText(LuaToString(l, -1));
+		} else if (!strcmp(value, "NameWord")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			int j = 0;
+			int name_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
+			++j;
+			int name_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+			++j;
+			
+			std::vector<std::string> word_meanings;
+			lua_rawgeti(l, -1, j + 1);
+			if (lua_istable(l, -1)) {
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					word_meanings.push_back(LuaToString(l, -1, k + 1));
+				}
+				
+				++j;
+			}
+			lua_pop(l, 1);
+			
+			int grammatical_number = GrammaticalNumberSingular;
+			if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
+				std::string grammatical_number_name = LuaToString(l, -1, j + 1);
+				grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+				if (grammatical_number == -1) {
+					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+				}
+				++j;
+			}
+				
+			if (name_language != -1 && name_word_type != -1) {
+				std::string name_word = LuaToString(l, -1, j + 1);
+				LanguageWord *name_element = PlayerRaces.Languages[name_language]->GetWord(name_word, name_word_type, word_meanings);
+				
+				if (name_element != NULL) {
+					if (name_element->NameTypes[grammatical_number].find("person") == name_element->NameTypes[grammatical_number].end()) {
+						name_element->NameTypes[grammatical_number]["person"] = 0;
+					}
+					name_element->NameTypes[grammatical_number]["person"] += 1;
+				} else {
+					LuaError(l, "The name of character %s is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ character_full_name.c_str() _C_ name_word.c_str() _C_ PlayerRaces.Languages[name_language]->Name.c_str() _C_ GetWordTypeNameById(name_word_type).c_str());
+				}
+			} else {
+				LuaError(l, "The name of character %s's compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ character_full_name.c_str());
+			}
+		} else if (!strcmp(value, "NameCompoundElements")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string affix_type_name = LuaToString(l, -1, j + 1);
+				int affix_type = GetAffixTypeIdByName(affix_type_name);
+				if (affix_type == -1) {
+					LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
+				}
+				++j;
+				
+				int affix_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
+				++j;
+				int affix_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+				++j;
+				
+				std::vector<std::string> word_meanings;
+				lua_rawgeti(l, -1, j + 1);
+				if (lua_istable(l, -1)) {
+					const int subargs = lua_rawlen(l, -1);
+					for (int k = 0; k < subargs; ++k) {
+						word_meanings.push_back(LuaToString(l, -1, k + 1));
+					}
+					
+					++j;
+				}
+				lua_pop(l, 1);
+
+				int grammatical_number = GrammaticalNumberSingular;
+				if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_number_name = LuaToString(l, -1, j + 1);
+					grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+					if (grammatical_number == -1) {
+						LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+					}
+					++j;
+				}
+				
+				int grammatical_case = GrammaticalCaseNominative;
+				if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_case_name = LuaToString(l, -1, j + 1);
+					grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
+					if (grammatical_case == -1) {
+						LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
+					}
+					++j;
+				}
+
+				if (affix_language != -1 && affix_word_type != -1) {
+					std::string affix_word = LuaToString(l, -1, j + 1);
+					LanguageWord *compound_element = PlayerRaces.Languages[affix_language]->GetWord(affix_word, affix_word_type, word_meanings);
+					
+					if (compound_element != NULL) {
+						if (compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case].find("person") == compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case].end()) {
+							compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case]["person"] = 0;
+						}
+						compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case]["person"] += 1;
+					} else {
+						LuaError(l, "The name of character %s is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ character_full_name.c_str() _C_ affix_word.c_str() _C_ PlayerRaces.Languages[affix_language]->Name.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
+					}
+				} else {
+					LuaError(l, "The name of character %s's compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ character_full_name.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Description")) {
 			character->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
