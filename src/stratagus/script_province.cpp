@@ -109,7 +109,14 @@ static int CclDefineProvince(lua_State *l)
 				}
 				
 				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-compound-elements") {
+				if (next_element == "name-word") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameWord(l, "province");
+					}
+					lua_pop(l, 1);
+				} else if (next_element == "name-compound-elements") {
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
@@ -148,7 +155,14 @@ static int CclDefineProvince(lua_State *l)
 				}
 				
 				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-compound-elements") {
+				if (next_element == "name-word") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameWord(l, "province");
+					}
+					lua_pop(l, 1);
+				} else if (next_element == "name-compound-elements") {
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
@@ -181,7 +195,14 @@ static int CclDefineProvince(lua_State *l)
 				}
 				
 				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-compound-elements") {
+				if (next_element == "name-word") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameWord(l, "province");
+					}
+					lua_pop(l, 1);
+				} else if (next_element == "name-compound-elements") {
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
@@ -220,7 +241,14 @@ static int CclDefineProvince(lua_State *l)
 				}
 				
 				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-compound-elements") {
+				if (next_element == "name-word") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameWord(l, "province");
+					}
+					lua_pop(l, 1);
+				} else if (next_element == "name-compound-elements") {
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {

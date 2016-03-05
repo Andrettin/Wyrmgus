@@ -3081,10 +3081,90 @@ void SaveGrandStrategyGame(const std::string &filename)
 }
 
 /**
+**  Parse name word
+**
+**  @param l      Lua state.
+**  @param type   Name type
+*/
+void ParseNameWord(lua_State *l, std::string type)
+{
+	if (!lua_istable(l, -1)) {
+		LuaError(l, "incorrect argument");
+	}
+	int j = 0;
+	int name_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
+	++j;
+	int name_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+	++j;
+			
+	std::vector<std::string> word_meanings;
+	lua_rawgeti(l, -1, j + 1);
+	if (lua_istable(l, -1)) {
+		const int subargs = lua_rawlen(l, -1);
+		for (int k = 0; k < subargs; ++k) {
+			word_meanings.push_back(LuaToString(l, -1, k + 1));
+		}
+				
+		++j;
+	}
+	lua_pop(l, 1);
+			
+	int grammatical_number = GrammaticalNumberSingular;
+	if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
+		std::string grammatical_number_name = LuaToString(l, -1, j + 1);
+		grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
+		if (grammatical_number == -1) {
+			LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
+		}
+		++j;
+	}
+				
+	int grammatical_case = GrammaticalCaseNominative;
+	if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+		std::string grammatical_case_name = LuaToString(l, -1, j + 1);
+		grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
+		if (grammatical_case == -1) {
+			LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
+		}
+		++j;
+	}
+					
+	int grammatical_tense = GrammaticalTenseNoTense;
+	if (GetGrammaticalTenseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+		std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
+		grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
+		if (grammatical_tense == -1) {
+			LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
+		}
+		++j;
+	}
+
+	if (name_language != -1 && name_word_type != -1) {
+		std::string name_word = LuaToString(l, -1, j + 1);
+		LanguageWord *name_element = PlayerRaces.Languages[name_language]->GetWord(name_word, name_word_type, word_meanings);
+				
+		if (name_element != NULL) {
+			if (name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].find(type) == name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].end()) {
+				name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] = 0;
+			}
+			name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] += 1;
+					
+			if (std::find(PlayerRaces.Languages[name_element->Language]->NameTypeWords[type].begin(), PlayerRaces.Languages[name_element->Language]->NameTypeWords[type].end(), name_element) == PlayerRaces.Languages[name_element->Language]->NameTypeWords[type].end()) {
+				PlayerRaces.Languages[name_element->Language]->NameTypeWords[type].push_back(name_element);
+			}
+		} else {
+			LuaError(l, "The \"%s\" name is set to be formed by the word \"%s\" (%s, %s), but the latter doesn't exist" _C_ type.c_str() _C_ name_word.c_str() _C_ PlayerRaces.Languages[name_language]->Name.c_str() _C_ GetWordTypeNameById(name_word_type).c_str());
+		}
+	} else {
+		LuaError(l, "The \"%s\" name word is incorrectly set, as either the language or the word type set for the word is incorrect" _C_ type.c_str());
+	}
+}
+
+/**
 **  Parse name compound elements
 **
 **  @param l      Lua state.
-**  @param blist  BuildingRestriction to fill in
+**  @param type   Name type
 */
 void ParseNameCompoundElements(lua_State *l, std::string type)
 {

@@ -83,6 +83,26 @@ static int CclDefineUniqueItem(lua_State *l)
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}
+		} else if (!strcmp(value, "NameWord")) {
+			if (item->Type != NULL) {
+				if (item->Type->ItemClass != -1) {
+					ParseNameWord(l, "item-" + GetItemClassNameById(item->Type->ItemClass));
+				} else {
+					ParseNameWord(l, "unit-class-" + item->Type->Class);
+				}
+			} else {
+				LuaError(l, "Unique item has no type.");
+			}
+		} else if (!strcmp(value, "NameCompoundElements")) {
+			if (item->Type != NULL) {
+				if (item->Type->ItemClass != -1) {
+					ParseNameCompoundElements(l, "item-" + GetItemClassNameById(item->Type->ItemClass));
+				} else {
+					ParseNameCompoundElements(l, "unit-class-" + item->Type->Class);
+				}
+			} else {
+				LuaError(l, "Unique item has no type.");
+			}
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(affix_ident);
