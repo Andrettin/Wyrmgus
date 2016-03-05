@@ -2534,7 +2534,7 @@ std::string CGrandStrategyProvince::GetCulturalSettlementName()
 std::string CGrandStrategyProvince::GenerateProvinceName(int civilization, int faction)
 {
 	//10% chance that the province will be named after its settlement
-	if (civilization != -1 && faction != -1 && !this->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]].empty() && SyncRand(100) < 10) {
+	if (civilization != -1 && faction != -1 && this->FactionCulturalSettlementNames.find(PlayerRaces.Factions[civilization][faction]) != this->FactionCulturalSettlementNames.end() && SyncRand(100) < 10) {
 		return this->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]];
 	} else if (civilization != -1 && faction == -1 && !this->CulturalSettlementNames[civilization].empty() && SyncRand(100) < 10) {
 		return this->CulturalSettlementNames[civilization];

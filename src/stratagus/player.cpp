@@ -2658,10 +2658,10 @@ std::string CLanguage::GetAdjectiveEnding(int article_type, int grammatical_case
 int CLanguage::GetPotentialNameQuantityForType(std::string type)
 {
 	int name_count = this->NameTypeWords[type].size();
-
+	
 	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
-		name_count += this->NameTypeAffixes[i][AffixTypePrefix].size() * this->NameTypeAffixes[i][AffixTypeSuffix].size();
-		name_count += this->NameTypeAffixes[i][AffixTypePrefix].size() * this->NameTypeAffixes[i][AffixTypeInfix].size() * this->NameTypeAffixes[i][AffixTypeSuffix].size();
+		name_count += this->NameTypeAffixes[i][AffixTypePrefix][type].size() * this->NameTypeAffixes[i][AffixTypeSuffix][type].size();
+		name_count += this->NameTypeAffixes[i][AffixTypePrefix][type].size() * this->NameTypeAffixes[i][AffixTypeInfix][type].size() * this->NameTypeAffixes[i][AffixTypeSuffix][type].size();
 	}
 	
 	return name_count;
@@ -3171,11 +3171,13 @@ void GenerateMissingLanguageData()
 				
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
 					// fill the vector with all the related words for the desired relationship depth level
-					if (PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom != NULL) {
+					if (PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom != NULL && std::find(related_words[PlayerRaces.Languages[i]->LanguageWords[k]].begin(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end(), PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom) == related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end()) {
 						related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom);
 					}
 					for (size_t n = 0; n < PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo.size(); ++n) {
-						related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo[n]);
+						if (std::find(related_words[PlayerRaces.Languages[i]->LanguageWords[k]].begin(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end(), PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo[n]) == related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end()) {
+							related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo[n]);
+						}
 					}
 					
 					for (int n = 0; n < relationship_depth_level; ++n) {
