@@ -338,6 +338,7 @@ extern void LoadCcl(const std::string &filename, const std::string &luaArgStr = 
 extern void SavePreferences();        /// Save user preferences
 //Wyrmgus start
 extern void SaveGrandStrategyGame(const std::string &filename);        /// Save extra user preferences
+extern void ParseNameCompoundElements(lua_State *l, std::string type);
 //Wyrmgus end
 extern int CclCommand(const std::string &command, bool exitOnError = true);
 
