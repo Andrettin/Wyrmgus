@@ -3175,6 +3175,10 @@ void CGrandStrategyHero::Initialize()
 		province_of_origin_id = GrandStrategyGame.PlayerFaction->OwnedProvinces[0];
 	}
 	
+	if (province_of_origin_id == -1) {
+		fprintf(stderr, "Hero \"%s\"'s province of origin \"%s\" doesn't exist.\n", this->GetFullName().c_str(), this->ProvinceOfOriginName.c_str());
+	}
+	
 	this->ProvinceOfOrigin = const_cast<CGrandStrategyProvince *>(&(*GrandStrategyGame.Provinces[province_of_origin_id]));
 	
 	if (!this->Icon.Name.empty()) {
@@ -4984,6 +4988,14 @@ void InitializeGrandStrategyGame(bool show_loading)
 		if (Characters[i]->Civilization == -1 || Characters[i]->Year == 0 || Characters[i]->DeathYear == 0 || Characters[i]->ProvinceOfOriginName.empty()) {
 			continue;
 		}
+		
+		CProvince *province_of_origin = GetProvince(Characters[i]->ProvinceOfOriginName);
+		if (province_of_origin == NULL) {
+			fprintf(stderr, "Hero \"%s\"'s province of origin \"%s\" doesn't exist.\n", Characters[i]->GetFullName().c_str(), Characters[i]->ProvinceOfOriginName.c_str());
+		} else if (province_of_origin->World != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+			continue;
+		}
+		
 		CGrandStrategyHero *hero = new CGrandStrategyHero;
 		GrandStrategyGame.Heroes.push_back(hero);
 		hero->Name = Characters[i]->Name;
@@ -5123,8 +5135,12 @@ void InitializeGrandStrategyProvinces()
 			province->CulturalSettlementNames[j] = Provinces[i]->CulturalSettlementNames[j];
 			
 			for (int k = 0; k < FactionMax; ++k) {
-				province->FactionCulturalNames[PlayerRaces.Factions[j][k]] = Provinces[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]];
-				province->FactionCulturalSettlementNames[PlayerRaces.Factions[j][k]] = Provinces[i]->FactionCulturalSettlementNames[PlayerRaces.Factions[j][k]];
+				if (Provinces[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != Provinces[i]->FactionCulturalNames.end()) {
+					province->FactionCulturalNames[PlayerRaces.Factions[j][k]] = Provinces[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]];
+				}
+				if (Provinces[i]->FactionCulturalSettlementNames.find(PlayerRaces.Factions[j][k]) != Provinces[i]->FactionCulturalSettlementNames.end()) {
+					province->FactionCulturalSettlementNames[PlayerRaces.Factions[j][k]] = Provinces[i]->FactionCulturalSettlementNames[PlayerRaces.Factions[j][k]];
+				}
 			}
 		}
 		for (size_t j = 0; j < Provinces[i]->Tiles.size(); ++j) {
@@ -6034,7 +6050,7 @@ void SetFactionRuler(std::string civilization_name, std::string faction_name, st
 		return;
 	}
 	
-	GrandStrategyGame.Factions[civilization][faction]->SetRuler(hero_full_name);
+	GrandStrategyGame.Factions[civilization][faction]->SetRuler(TransliterateText(hero_full_name));
 }
 
 std::string GetFactionRuler(std::string civilization_name, std::string faction_name)
