@@ -1039,11 +1039,31 @@ static int CclDefineLanguageWord(lua_State *l)
 					++j;
 				}
 				
-				std::string type = LuaToString(l, -1, j + 1);
-				if (word->NameTypes[grammatical_number].find(type) == word->NameTypes[grammatical_number].end()) {
-					word->NameTypes[grammatical_number][type] = 0;
+				int grammatical_case = GrammaticalCaseNominative;
+				if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_case_name = LuaToString(l, -1, j + 1);
+					grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
+					if (grammatical_case == -1) {
+						LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
+					}
+					++j;
 				}
-				word->NameTypes[grammatical_number][type] += 1;
+				
+				int grammatical_tense = GrammaticalTenseNoTense;
+				if (GetGrammaticalTenseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
+					grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
+					if (grammatical_tense == -1) {
+						LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
+					}
+					++j;
+				}
+				
+				std::string type = LuaToString(l, -1, j + 1);
+				if (word->NameTypes[grammatical_number][grammatical_case][grammatical_tense].find(type) == word->NameTypes[grammatical_number][grammatical_case][grammatical_tense].end()) {
+					word->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] = 0;
+				}
+				word->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] += 1;
 			}
 		} else if (!strcmp(value, "AffixNameTypes")) {
 			if (!lua_istable(l, -1)) {
@@ -1085,11 +1105,21 @@ static int CclDefineLanguageWord(lua_State *l)
 					++j;
 				}
 				
-				std::string type = LuaToString(l, -1, j + 1);
-				if (word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].find(type) == word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case].end()) {
-					word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][type] = 0;
+				int grammatical_tense = GrammaticalTenseNoTense;
+				if (GetGrammaticalTenseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
+					grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
+					if (grammatical_tense == -1) {
+						LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
+					}
+					++j;
 				}
-				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][type] += 1;
+				
+				std::string type = LuaToString(l, -1, j + 1);
+				if (word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].find(type) == word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].end()) {
+					word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] = 0;
+				}
+				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

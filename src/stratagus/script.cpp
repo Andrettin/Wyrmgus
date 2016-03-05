@@ -3136,16 +3136,26 @@ void ParseNameCompoundElements(lua_State *l, std::string type)
 			}
 			++j;
 		}
+				
+		int grammatical_tense = GrammaticalTenseNoTense;
+		if (GetGrammaticalTenseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+			std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
+			grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
+			if (grammatical_tense == -1) {
+				LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
+			}
+			++j;
+		}
 
 		if (affix_language != -1 && affix_word_type != -1) {
 			std::string affix_word = LuaToString(l, -1, j + 1);
 			LanguageWord *compound_element = PlayerRaces.Languages[affix_language]->GetWord(affix_word, affix_word_type, word_meanings);
 					
 			if (compound_element != NULL) {
-				if (compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case].find(type) == compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case].end()) {
-					compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][type] = 0;
+				if (compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense].find(type) == compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense].end()) {
+					compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] = 0;
 				}
-				compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][type] += 1;
+				compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
 			} else {
 				LuaError(l, "The \"%s\" name is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist." _C_ type.c_str() _C_ affix_word.c_str() _C_ PlayerRaces.Languages[affix_language]->Name.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
 			}

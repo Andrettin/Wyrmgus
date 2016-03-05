@@ -1021,7 +1021,8 @@ std::string GenerateName(int language, std::string type)
 			memset(affix_grammatical_numbers, GrammaticalNumberNoNumber, sizeof(affix_grammatical_numbers));
 				
 			if (random_number < names.size()) { //entire name
-//				fprintf(stderr, "Generating entire name.\n");
+//				fprintf(stderr, "Generating entire name (\"%s\" type, %s language).\n", type.c_str(), PlayerRaces.Languages[language]->Name.c_str());
+//				fprintf(stderr, "Name quantity: %d.\n", names.size());
 				name = names[SyncRand(names.size())]->GetAffixForm(NULL, NULL, NULL, type, WordJunctionTypeNoWordJunction, -1, affix_grammatical_numbers);
 			} else if (random_number < (names.size() + (affixes[WordJunctionTypeCompound][AffixTypePrefix].size() * affixes[WordJunctionTypeCompound][AffixTypeSuffix].size()))) { //prefix + suffix
 //				fprintf(stderr, "Generating compound name (\"%s\" type, %s language), prefix + suffix.\n", type.c_str(), PlayerRaces.Languages[language]->Name.c_str());

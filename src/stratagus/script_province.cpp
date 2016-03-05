@@ -73,54 +73,7 @@ static int CclDefineProvince(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "NameWord")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			int j = 0;
-			int name_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
-			++j;
-			int name_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
-			++j;
-			
-			std::vector<std::string> word_meanings;
-			lua_rawgeti(l, -1, j + 1);
-			if (lua_istable(l, -1)) {
-				const int subargs = lua_rawlen(l, -1);
-				for (int k = 0; k < subargs; ++k) {
-					word_meanings.push_back(LuaToString(l, -1, k + 1));
-				}
-				
-				++j;
-			}
-			lua_pop(l, 1);
-			
-			int grammatical_number = GrammaticalNumberSingular;
-			if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
-				std::string grammatical_number_name = LuaToString(l, -1, j + 1);
-				grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
-				if (grammatical_number == -1) {
-					LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
-				}
-				++j;
-			}
-				
-			if (name_language != -1 && name_word_type != -1) {
-				std::string name_word = LuaToString(l, -1, j + 1);
-				LanguageWord *name_element = PlayerRaces.Languages[name_language]->GetWord(name_word, name_word_type, word_meanings);
-				
-				if (name_element != NULL) {
-					if (name_element->NameTypes[grammatical_number].find("province") == name_element->NameTypes[grammatical_number].end()) {
-						name_element->NameTypes[grammatical_number]["province"] = 0;
-					}
-					name_element->NameTypes[grammatical_number]["province"] += 1;
-				} else {
-					LuaError(l, "The name of the province %s is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ province_name.c_str() _C_ name_word.c_str() _C_ PlayerRaces.Languages[name_language]->Name.c_str() _C_ GetWordTypeNameById(name_word_type).c_str());
-				}
-			} else {
-				LuaError(l, "The name of the province %s's compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect" _C_ province_name.c_str());
-			}
-		} else if (!strcmp(value, "SettlementName")) {
+		if (!strcmp(value, "SettlementName")) {
 			province->SettlementName = LuaToString(l, -1);
 		} else if (!strcmp(value, "World")) {
 			province->World = LuaToString(l, -1);

@@ -120,15 +120,35 @@ static int CclDefineCharacter(lua_State *l)
 				++j;
 			}
 				
+			int grammatical_case = GrammaticalCaseNominative;
+			if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+				std::string grammatical_case_name = LuaToString(l, -1, j + 1);
+				grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
+				if (grammatical_case == -1) {
+					LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
+				}
+				++j;
+			}
+					
+			int grammatical_tense = GrammaticalTenseNoTense;
+			if (GetGrammaticalTenseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+				std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
+				grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
+				if (grammatical_tense == -1) {
+					LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
+				}
+				++j;
+			}
+
 			if (name_language != -1 && name_word_type != -1) {
 				std::string name_word = LuaToString(l, -1, j + 1);
 				LanguageWord *name_element = PlayerRaces.Languages[name_language]->GetWord(name_word, name_word_type, word_meanings);
 				
 				if (name_element != NULL) {
-					if (name_element->NameTypes[grammatical_number].find("person") == name_element->NameTypes[grammatical_number].end()) {
-						name_element->NameTypes[grammatical_number]["person"] = 0;
+					if (name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].find("person") == name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].end()) {
+						name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense]["person"] = 0;
 					}
-					name_element->NameTypes[grammatical_number]["person"] += 1;
+					name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense]["person"] += 1;
 				} else {
 					LuaError(l, "The name of character %s is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ character_full_name.c_str() _C_ name_word.c_str() _C_ PlayerRaces.Languages[name_language]->Name.c_str() _C_ GetWordTypeNameById(name_word_type).c_str());
 				}
