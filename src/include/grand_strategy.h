@@ -10,7 +10,7 @@
 //
 /**@name grand_strategy.h - The grand strategy headerfile. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2016 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 
 #include <vector>
 
+#include "province.h"
 #include "character.h"
 #include "vec2i.h"
 #include "video.h"
@@ -134,18 +135,18 @@ public:
 	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
 	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
 	int Pathway[MaxDirections];				/// Whether this tile has a pathway (trail or road) to a particular direction
-	std::string CulturalNames[MAX_RACES];	/// Names for the tile for each different culture/civilization
+	std::map<int, std::string> CulturalNames;	/// Names for the tile for each different culture/civilization
 	std::map<CFaction *, std::string> FactionCulturalNames;	/// Names for the tile for each different faction
 };
 
-class CProvince
+class CGrandStrategyProvince : public CProvince
 {
 public:
-	CProvince() :
-		ID(-1), Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
+	CGrandStrategyProvince() : CProvince(),
+		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
-		Water(false), Coastal(false), Movement(false), SettlementLocation(-1, -1),
+		Movement(false),
 		Owner(NULL), AttackedBy(NULL)
 	{
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
@@ -195,7 +196,6 @@ public:
 	
 	std::string Name;
 	std::string SettlementName;
-	int ID;																/// ID of this province
 	int Civilization;													/// Civilization of the province (-1 = no one).
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	int CurrentConstruction;											/// Building currently under construction (unit type index).
@@ -207,10 +207,7 @@ public:
 	int MilitaryScore;													/// Military score of the forces in the province (including fortifications and militia)
 	int OffensiveMilitaryScore;											/// Military score of the forces in the province which can attack other provinces
 	int AttackingMilitaryScore;											/// Military score of the forces attacking the province
-	bool Water;															/// Whether the province is a water province or not
-	bool Coastal;														/// Whether the province is a coastal province or not
 	bool Movement;														/// Whether a unit or hero is currently moving to the province
-	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
 	CGrandStrategyFaction *Owner;										/// Owner of the province
 	CGrandStrategyFaction *AttackedBy;									/// Which faction the province is being attacked by.
 	bool SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
@@ -224,12 +221,7 @@ public:
 	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
 	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
-	std::vector<CGrandStrategyFaction *> Claims;						/// Factions which claim this province
-	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
-	std::string FactionCulturalNames[MAX_RACES][FactionMax];			/// Names for the province for each different faction
-	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
-	std::string FactionCulturalSettlementNames[MAX_RACES][FactionMax];	/// Names for the province's settlement for each different faction
-	std::vector<Vec2i> Tiles;
+	std::vector<CGrandStrategyFaction *> Claims;						/// Factions which have a claim to this province
 	std::vector<Vec2i> ResourceTiles[MaxCosts];							///resources tiles in the province
 };
 
@@ -289,7 +281,7 @@ public:
 	int MilitaryScoreBonus[UnitTypeMax];
 	int DiplomacyState[MAX_RACES][FactionMax];							/// Diplomacy state between this faction and each other faction
 	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
-	std::vector<CProvince *> Claims;									/// Provinces which this faction claims
+	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
 };
 
 class CRiver
@@ -324,8 +316,8 @@ public:
 	std::string GetRulerEffectsString();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province
-	CProvince *Province;
-	CProvince *ProvinceOfOrigin;	/// Province from which the hero originates
+	CGrandStrategyProvince *Province;
+	CGrandStrategyProvince *ProvinceOfOrigin;	/// Province from which the hero originates
 	CGrandStrategyHero *Father;			/// Character's father
 	CGrandStrategyHero *Mother;					/// Character's mother
 	std::vector<CGrandStrategyHero *> Children;	/// Children of the character
@@ -340,7 +332,7 @@ class CGrandStrategyGame
 {
 public:
 	CGrandStrategyGame() : 
-		WorldMapWidth(0), WorldMapHeight(0), ProvinceCount(0), SelectedProvince(-1),
+		WorldMapWidth(0), WorldMapHeight(0), SelectedProvince(-1),
 		FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
 		PlayerFaction(NULL)
 	{
@@ -377,7 +369,6 @@ public:
 		memset(SettlementMasonryGraphics, 0, sizeof(SettlementMasonryGraphics));
 		memset(NationalBorderGraphics, 0, sizeof(NationalBorderGraphics));
 		memset(TerrainTypes, 0, sizeof(TerrainTypes));
-		memset(Provinces, 0, sizeof(Provinces));
 		memset(Rivers, 0, sizeof(Rivers));
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
@@ -403,7 +394,6 @@ public:
 public:
 	int WorldMapWidth;
 	int WorldMapHeight;
-	int ProvinceCount;
 	int SelectedProvince;
 	CGraphic *FogTile;
 	CGraphic *SymbolMove;										///symbol that units are moving to the province (drawn at the settlement location)
@@ -421,7 +411,7 @@ public:
 	CPlayerColorGraphic *NationalBorderGraphics[MaxDirections];	///one for each direction
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
-	CProvince *Provinces[ProvinceMax];
+	std::vector<CGrandStrategyProvince *> Provinces;
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
 	std::vector<CGrandStrategyHero *> Heroes;
@@ -531,6 +521,7 @@ extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame(bool show_loading = true);
 extern void InitializeGrandStrategyMinimap();
+extern void InitializeGrandStrategyProvinces();
 extern void InitializeGrandStrategyFactions();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();

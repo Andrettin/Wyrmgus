@@ -63,6 +63,7 @@
 #include "pathfinder.h"
 #include "player.h"
 //Wyrmgus start
+#include "province.h"
 #include "quest.h"
 //Wyrmgus end
 #include "replay.h"
@@ -1940,6 +1941,7 @@ void LuaRegisterModules()
 	PathfinderCclRegister();
 	PlayerCclRegister();
 	//Wyrmgus start
+	ProvinceCclRegister();
 	QuestCclRegister();
 	//Wyrmgus end
 	ReplayCclRegister();

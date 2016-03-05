@@ -310,6 +310,7 @@ set(stratagusmain_SRCS
 	src/stratagus/parameters.cpp
 	src/stratagus/player.cpp
 	#Wyrmgus start
+	src/stratagus/province.cpp
 	src/stratagus/quest.cpp
 	#Wyrmgus end
 	src/stratagus/script.cpp
@@ -317,6 +318,7 @@ set(stratagusmain_SRCS
 	#Wyrmgus start
 	src/stratagus/script_character.cpp
 	src/stratagus/script_item.cpp
+	src/stratagus/script_province.cpp
 	src/stratagus/script_quest.cpp
 	#Wyrmgus end
 	src/stratagus/selection.cpp
@@ -612,6 +614,7 @@ set(stratagus_generic_HDRS
 	src/include/pathfinder.h
 	src/include/player.h
 	#Wyrmgus start
+	src/include/province.h
 	src/include/quest.h
 	#Wyrmgus end
 	src/include/replay.h
