@@ -149,6 +149,10 @@ static int CclDefineCharacter(lua_State *l)
 						name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense]["person"] = 0;
 					}
 					name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense]["person"] += 1;
+					
+					if (std::find(PlayerRaces.Languages[name_element->Language]->NameTypeWords["person"].begin(), PlayerRaces.Languages[name_element->Language]->NameTypeWords["person"].end(), name_element) == PlayerRaces.Languages[name_element->Language]->NameTypeWords["person"].end()) {
+						PlayerRaces.Languages[name_element->Language]->NameTypeWords["person"].push_back(name_element);
+					}
 				} else {
 					LuaError(l, "The name of character %s is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist" _C_ character_full_name.c_str() _C_ name_word.c_str() _C_ PlayerRaces.Languages[name_language]->Name.c_str() _C_ GetWordTypeNameById(name_word_type).c_str());
 				}

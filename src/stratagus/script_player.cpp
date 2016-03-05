@@ -1142,6 +1142,34 @@ static int CclDefineLanguageWord(lua_State *l)
 		PlayerRaces.Languages[word->DerivesFrom->Language]->NameTranslations[1].push_back(word->DerivesFrom->Word);
 	}
 	
+	for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
+		for (int j = 0; j < MaxGrammaticalCases; ++j) {
+			for (int k = 0; k < MaxGrammaticalTenses; ++k) {
+				for (std::map<std::string, int>::iterator iterator = word->NameTypes[i][j][k].begin(); iterator != word->NameTypes[i][j][k].end(); ++iterator) {
+					if (iterator->second > 0 && std::find(PlayerRaces.Languages[word->Language]->NameTypeWords[iterator->first].begin(), PlayerRaces.Languages[word->Language]->NameTypeWords[iterator->first].end(), word) == PlayerRaces.Languages[word->Language]->NameTypeWords[iterator->first].end()) {
+						PlayerRaces.Languages[word->Language]->NameTypeWords[iterator->first].push_back(word);
+					}
+				}
+			}
+		}
+	}
+						
+	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
+		for (int j = 0; j < MaxAffixTypes; ++j) {
+			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
+				for (int n = 0; n < MaxGrammaticalCases; ++n) {
+					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
+						for (std::map<std::string, int>::iterator iterator = word->AffixNameTypes[i][j][k][n][o].begin(); iterator != word->AffixNameTypes[i][j][k][n][o].end(); ++iterator) {
+							if (iterator->second > 0 && std::find(PlayerRaces.Languages[word->Language]->NameTypeAffixes[i][j][iterator->first].begin(), PlayerRaces.Languages[word->Language]->NameTypeAffixes[i][j][iterator->first].end(), word) == PlayerRaces.Languages[word->Language]->NameTypeAffixes[i][j][iterator->first].end()) {
+								PlayerRaces.Languages[word->Language]->NameTypeAffixes[i][j][iterator->first].push_back(word);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	return 0;
 }
 

@@ -2657,54 +2657,11 @@ std::string CLanguage::GetAdjectiveEnding(int article_type, int grammatical_case
 
 int CLanguage::GetPotentialNameQuantityForType(std::string type)
 {
-	int name_count = 0;
-	int affix_count[MaxWordJunctionTypes][MaxAffixTypes];
-	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
-		for (int j = 0; j < MaxAffixTypes; ++j) {
-			affix_count[i][j] = 0;
-		}
-	}
+	int name_count = this->NameTypeWords[type].size();
 
-	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
-		if (this->LanguageWords[i]->HasNameType(type)) {
-			name_count += 1;
-		}
-		
-		for (int j = 0; j < MaxWordJunctionTypes; ++j) {
-			for (int k = 0; k < MaxAffixTypes; ++k) {
-				if (this->LanguageWords[i]->HasAffixNameType(type, j, k)) {
-					affix_count[j][k] += 1;
-					break; //don't count the same element for every type of affix (to not make it seem that name diversity is higher than it really is)
-				}
-			}
-		}
-	}
-	
 	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
-		bool has_repeated_suffix = false;
-		
-		if (affix_count[i][AffixTypePrefix] > 0 && affix_count[i][AffixTypeSuffix] == 0) { //if suffix count is 0, check to see if there isn't a repeated suffix which could be used
-			for (size_t j = 0; j < this->LanguageWords.size(); ++j) {
-				for (int k = 0; k < MaxAffixTypes; ++k) {
-					if (this->LanguageWords[j]->HasAffixNameType(type, i, k)) {
-						has_repeated_suffix = true;
-						break;
-					}
-				}
-				if (has_repeated_suffix) {
-					break;
-				}
-			}
-		}
-		
-		if (has_repeated_suffix) {
-			affix_count[i][AffixTypeSuffix] = 1;
-		}
-	}
-	
-	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
-		name_count += affix_count[i][AffixTypePrefix] * affix_count[i][AffixTypeSuffix];
-		name_count += affix_count[i][AffixTypePrefix] * affix_count[i][AffixTypeInfix] * affix_count[i][AffixTypeSuffix];
+		name_count += this->NameTypeAffixes[i][AffixTypePrefix].size() * this->NameTypeAffixes[i][AffixTypeSuffix].size();
+		name_count += this->NameTypeAffixes[i][AffixTypePrefix].size() * this->NameTypeAffixes[i][AffixTypeInfix].size() * this->NameTypeAffixes[i][AffixTypeSuffix].size();
 	}
 	
 	return name_count;
@@ -2939,6 +2896,10 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 			for (int k = 0; k < MaxGrammaticalTenses; ++k) {
 				if (word->HasNameType(type, i, j, k) && !this->HasNameType(type, i, j, k)) {
 					this->NameTypes[i][j][k][type] = word->HasNameType(type, i, j, k);
+					
+					if (std::find(PlayerRaces.Languages[this->Language]->NameTypeWords[type].begin(), PlayerRaces.Languages[this->Language]->NameTypeWords[type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeWords[type].end()) {
+						PlayerRaces.Languages[this->Language]->NameTypeWords[type].push_back(this);
+					}
 				}
 			}
 		}
@@ -2951,6 +2912,10 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
 						if (word->HasAffixNameType(type, i, j, k, n, o) && !this->HasAffixNameType(type, i, j, k, n, o)) {
 							this->AffixNameTypes[i][j][k][n][o][type] = word->HasAffixNameType(type, i, j, k, n, o);
+							
+							if (std::find(PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].begin(), PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].end()) {
+								PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].push_back(this);
+							}
 						}
 					}
 				}
@@ -2968,6 +2933,10 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 						for (size_t k = 0; k < word->CompoundElementOf[i].size(); ++k) {
 							if (word->CompoundElementOf[i][k]->HasNameType(type, j, k, n)) {
 								this->AffixNameTypes[WordJunctionTypeCompound][i][j][k][n][type] += word->CompoundElementOf[i][k]->HasNameType(type, j, k, n);
+								
+								if (std::find(PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].begin(), PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].end()) {
+									PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].push_back(this);
+								}
 							}
 						}
 					}
@@ -3044,7 +3013,7 @@ void GenerateMissingLanguageData()
 				
 				for(size_t k = 0; k < word.size(); ++k) {
 					std::string element = word.substr(k, markov_chain_size);
-					
+
 					const std::string following_letter = k < (word.size() - 1) ? word.substr(k + markov_chain_size, 1) : ""; // an empty string indicates ending the name
 					markov_elements[element].push_back(following_letter);
 					markov_elements_per_type[PlayerRaces.Languages[i]->LanguageWords[j]->Type][element].push_back(following_letter);
@@ -3194,33 +3163,41 @@ void GenerateMissingLanguageData()
 			bool deeper_related_word_level_exists = true;
 			bool try_different_word_types = false;
 			int relationship_depth_level = 1;
+
+			std::map<LanguageWord *, std::vector<LanguageWord *>> related_words;
+			
 			while (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names) {
 				deeper_related_word_level_exists = false;
 				
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
-					std::vector<LanguageWord *> related_words;
-					
 					// fill the vector with all the related words for the desired relationship depth level
 					if (PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom != NULL) {
-						related_words.push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom);
+						related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom);
 					}
 					for (size_t n = 0; n < PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo.size(); ++n) {
-						related_words.push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo[n]);
+						related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo[n]);
 					}
 					
 					for (int n = 0; n < relationship_depth_level; ++n) {
-						for (int o = (int) related_words.size() - 1; o >= 0; --o) {
-							if (related_words[o]->DerivesFrom != NULL && related_words[o]->DerivesFrom != PlayerRaces.Languages[i]->LanguageWords[k] && std::find(related_words.begin(), related_words.end(), related_words[o]->DerivesFrom) == related_words.end()) {
+						for (int o = (int) related_words[PlayerRaces.Languages[i]->LanguageWords[k]].size() - 1; o >= 0; --o) {
+							if (
+								related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesFrom != NULL
+								&& related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesFrom != PlayerRaces.Languages[i]->LanguageWords[k]
+								&& std::find(related_words[PlayerRaces.Languages[i]->LanguageWords[k]].begin(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesFrom) == related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end()
+							) {
 								if (n < (relationship_depth_level - 1)) {
-									related_words.push_back(related_words[o]->DerivesFrom);
+									related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesFrom);
 								} else {
 									deeper_related_word_level_exists = true;
 								}
 							}
-							for (size_t p = 0; p < related_words[o]->DerivesTo.size(); ++p) {
-								if (related_words[o]->DerivesTo[p] != PlayerRaces.Languages[i]->LanguageWords[k] && std::find(related_words.begin(), related_words.end(), related_words[o]->DerivesTo[p]) == related_words.end()) {
+							for (size_t p = 0; p < related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesTo.size(); ++p) {
+								if (
+									related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesTo[p] != PlayerRaces.Languages[i]->LanguageWords[k] 
+									&& std::find(related_words[PlayerRaces.Languages[i]->LanguageWords[k]].begin(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesTo[p]) == related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end()
+								) {
 									if (n < (relationship_depth_level - 1)) {
-										related_words.push_back(related_words[o]->DerivesTo[p]);
+										related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesTo[p]);
 									} else {
 										deeper_related_word_level_exists = true;
 									}
@@ -3230,9 +3207,9 @@ void GenerateMissingLanguageData()
 					}
 					
 					//now attach the new type name to the word from its related words, if it is found in them
-					for (size_t n = 0; n < related_words.size(); ++n) {
-						if (PlayerRaces.Languages[i]->LanguageWords[k]->Type == related_words[n]->Type || try_different_word_types) { //only accept words of another type if tried to get suitable name generation from all relationship levels and failed
-							PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(related_words[n], types[j]);
+					for (size_t n = 0; n < related_words[PlayerRaces.Languages[i]->LanguageWords[k]].size(); ++n) {
+						if (PlayerRaces.Languages[i]->LanguageWords[k]->Type == related_words[PlayerRaces.Languages[i]->LanguageWords[k]][n]->Type || try_different_word_types) { //only accept words of another type if tried to get suitable name generation from all relationship levels and failed
+							PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(related_words[PlayerRaces.Languages[i]->LanguageWords[k]][n], types[j]);
 						}
 					}
 				}

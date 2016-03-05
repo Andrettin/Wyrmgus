@@ -996,17 +996,19 @@ std::string GenerateName(int language, std::string type)
 		std::vector<LanguageWord *> names;
 		std::vector<LanguageWord *> affixes[MaxWordJunctionTypes][MaxAffixTypes];
 		
-		for (size_t i = 0; i < PlayerRaces.Languages[language]->LanguageWords.size(); ++i) {
-			int has_name_type = PlayerRaces.Languages[language]->LanguageWords[i]->HasNameType(type);
+		for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTypeWords[type].size(); ++i) {
+			int has_name_type = PlayerRaces.Languages[language]->NameTypeWords[type][i]->HasNameType(type);
 			for (int j = 0; j < has_name_type; ++j) {
-				names.push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+				names.push_back(PlayerRaces.Languages[language]->NameTypeWords[type][i]);
 			}
+		}
 				
-			for (int j = 0; j < MaxWordJunctionTypes; ++j) {
-				for (int k = 0; k < MaxAffixTypes; ++k) {
-					int has_affix_name_type = PlayerRaces.Languages[language]->LanguageWords[i]->HasAffixNameType(type, j, k);
+		for (int i = 0; i < MaxWordJunctionTypes; ++i) {
+			for (int j = 0; j < MaxAffixTypes; ++j) {
+				for (size_t k = 0; k < PlayerRaces.Languages[language]->NameTypeAffixes[i][j][type].size(); ++k) {
+					int has_affix_name_type = PlayerRaces.Languages[language]->NameTypeAffixes[i][j][type][k]->HasAffixNameType(type, i, j);
 					for (int n = 0; n < has_affix_name_type; ++n) {
-						affixes[j][k].push_back(PlayerRaces.Languages[language]->LanguageWords[i]);
+						affixes[i][j].push_back(PlayerRaces.Languages[language]->NameTypeAffixes[i][j][type][k]);
 					}
 				}
 			}
