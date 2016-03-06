@@ -3149,9 +3149,7 @@ void ParseNameWord(lua_State *l, std::string type)
 			}
 			name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] += 1;
 					
-			if (std::find(PlayerRaces.Languages[name_element->Language]->NameTypeWords[type].begin(), PlayerRaces.Languages[name_element->Language]->NameTypeWords[type].end(), name_element) == PlayerRaces.Languages[name_element->Language]->NameTypeWords[type].end()) {
-				PlayerRaces.Languages[name_element->Language]->NameTypeWords[type].push_back(name_element);
-			}
+			name_element->AddToLanguageNameTypes(type);
 		} else {
 			LuaError(l, "The \"%s\" name is set to be formed by the word \"%s\" (%s, %s), but the latter doesn't exist" _C_ type.c_str() _C_ name_word.c_str() _C_ PlayerRaces.Languages[name_language]->Name.c_str() _C_ GetWordTypeNameById(name_word_type).c_str());
 		}
@@ -3237,9 +3235,7 @@ void ParseNameCompoundElements(lua_State *l, std::string type)
 				}
 				compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
 				
-				if (std::find(PlayerRaces.Languages[compound_element->Language]->NameTypeAffixes[WordJunctionTypeCompound][affix_type][type].begin(), PlayerRaces.Languages[compound_element->Language]->NameTypeAffixes[WordJunctionTypeCompound][affix_type][type].end(), compound_element) == PlayerRaces.Languages[compound_element->Language]->NameTypeAffixes[WordJunctionTypeCompound][affix_type][type].end()) {
-					PlayerRaces.Languages[compound_element->Language]->NameTypeAffixes[WordJunctionTypeCompound][affix_type][type].push_back(compound_element);
-				}
+				compound_element->AddToLanguageAffixNameTypes(type, WordJunctionTypeCompound, affix_type);
 			} else {
 				LuaError(l, "The \"%s\" name is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist." _C_ type.c_str() _C_ affix_word.c_str() _C_ PlayerRaces.Languages[affix_language]->Name.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
 			}

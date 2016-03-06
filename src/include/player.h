@@ -467,6 +467,8 @@ public:
 	int GetAffixGrammaticalNumber(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type);
 	std::string GetAffixForm(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type, int affix_grammatical_numbers[MaxAffixTypes]);
 	void AddNameTypeGenerationFromWord(LanguageWord *word, std::string type);
+	void AddToLanguageNameTypes(std::string type);
+	void AddToLanguageAffixNameTypes(std::string type, int word_junction_type, int affix_type);
 	void StripNameTypeGeneration(std::string type);
 	void RemoveFromVector(std::vector<LanguageWord *>& word_vector);
 
@@ -508,7 +510,8 @@ class CLanguage
 {
 public:
 	CLanguage() :
-		GenerateMissingWords(false), UsedByCivilizationOrFaction(false), SkipNameTypeInheritance(false)
+		GenerateMissingWords(false), UsedByCivilizationOrFaction(false), SkipNameTypeInheritance(false),
+		DialectOf(NULL)
 	{
 	}
 
@@ -517,6 +520,7 @@ public:
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
 	int GetPotentialNameQuantityForType(std::string type);
+	void RemoveWord(LanguageWord *word);
 	
 	std::string Ident;											/// Ident of the language
 	std::string Name;											/// Name of the language
@@ -525,6 +529,8 @@ public:
 	bool GenerateMissingWords;									/// Whether "missing" words (missing equivalents to English words) should be generated for this language
 	bool UsedByCivilizationOrFaction;
 	bool SkipNameTypeInheritance;
+	CLanguage *DialectOf;										/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
+	std::vector<CLanguage *> Dialects;							/// Dialects of this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
 	std::vector<std::string> NameTranslations[2];				/// Name translations (2 values: one for the name to be translated, and another for the translation)
 	std::map<std::string, std::vector<LanguageWord *>> NameTypeWords;	/// Words which can be used as names for particular name types

@@ -359,7 +359,9 @@ void PlayerRace::Clean()
 	if (this->Count > 0) { //don't clean the languages if first defining the civilizations
 		for (size_t i = 0; i < this->Languages.size(); ++i) {
 			for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
-				delete this->Languages[i]->LanguageWords[j];
+				if (this->Languages[i]->LanguageWords[j]) {
+					delete this->Languages[i]->LanguageWords[j];
+				}
 			}
 			this->Languages[i]->LanguageWords.clear();
 			
@@ -2667,6 +2669,29 @@ int CLanguage::GetPotentialNameQuantityForType(std::string type)
 	return name_count;
 }
 
+void CLanguage::RemoveWord(LanguageWord *word)
+{
+	if (std::find(this->LanguageWords.begin(), this->LanguageWords.end(), word) != this->LanguageWords.end()) {
+		this->LanguageWords.erase(std::remove(this->LanguageWords.begin(), this->LanguageWords.end(), word), this->LanguageWords.end());
+	}
+
+	for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = this->NameTypeWords.begin(); iterator != this->NameTypeWords.end(); ++iterator) {
+		if (std::find(this->NameTypeWords[iterator->first].begin(), this->NameTypeWords[iterator->first].end(), word) != this->NameTypeWords[iterator->first].end()) {
+			this->NameTypeWords[iterator->first].erase(std::remove(this->NameTypeWords[iterator->first].begin(), this->NameTypeWords[iterator->first].end(), word), this->NameTypeWords[iterator->first].end());
+		}
+	}
+
+	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
+		for (int j = 0; j < MaxAffixTypes; ++j) {
+			for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = this->NameTypeAffixes[i][j].begin(); iterator != this->NameTypeAffixes[i][j].end(); ++iterator) {
+				if (std::find(this->NameTypeAffixes[i][j][iterator->first].begin(), this->NameTypeAffixes[i][j][iterator->first].end(), word) != this->NameTypeAffixes[i][j][iterator->first].end()) {
+					this->NameTypeAffixes[i][j][iterator->first].erase(std::remove(this->NameTypeAffixes[i][j][iterator->first].begin(), this->NameTypeAffixes[i][j][iterator->first].end(), word), this->NameTypeAffixes[i][j][iterator->first].end());
+				}
+			}
+		}
+	}
+}
+
 int LanguageWord::HasNameType(std::string type, int grammatical_number, int grammatical_case, int grammatical_tense)
 {
 	int name_type_count = 0;
@@ -2896,10 +2921,7 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 			for (int k = 0; k < MaxGrammaticalTenses; ++k) {
 				if (word->HasNameType(type, i, j, k) && !this->HasNameType(type, i, j, k)) {
 					this->NameTypes[i][j][k][type] = word->HasNameType(type, i, j, k);
-					
-					if (std::find(PlayerRaces.Languages[this->Language]->NameTypeWords[type].begin(), PlayerRaces.Languages[this->Language]->NameTypeWords[type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeWords[type].end()) {
-						PlayerRaces.Languages[this->Language]->NameTypeWords[type].push_back(this);
-					}
+					this->AddToLanguageNameTypes(type);
 				}
 			}
 		}
@@ -2912,10 +2934,7 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
 						if ((this->Type == word->Type || i != WordJunctionTypeSeparate) && word->HasAffixNameType(type, i, j, k, n, o) && !this->HasAffixNameType(type, i, j, k, n, o)) {
 							this->AffixNameTypes[i][j][k][n][o][type] = word->HasAffixNameType(type, i, j, k, n, o);
-							
-							if (std::find(PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].begin(), PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].end()) {
-								PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].push_back(this);
-							}
+							this->AddToLanguageAffixNameTypes(type, i, j);
 						}
 					}
 				}
@@ -2933,15 +2952,36 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 						for (size_t o = 0; o < word->CompoundElementOf[i].size(); ++o) {
 							if (word->CompoundElementOf[i][o]->HasNameType(type, j, k, n)) {
 								this->AffixNameTypes[WordJunctionTypeCompound][i][j][k][n][type] += word->CompoundElementOf[i][o]->HasNameType(type, j, k, n);
-								
-								if (std::find(PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].begin(), PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].end()) {
-									PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].push_back(this);
-								}
+								this->AddToLanguageAffixNameTypes(type, WordJunctionTypeCompound, i);
 							}
 						}
 					}
 				}
 			}
+		}
+	}
+}
+
+void LanguageWord::AddToLanguageNameTypes(std::string type)
+{
+	if (std::find(PlayerRaces.Languages[this->Language]->NameTypeWords[type].begin(), PlayerRaces.Languages[this->Language]->NameTypeWords[type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeWords[type].end()) {
+		PlayerRaces.Languages[this->Language]->NameTypeWords[type].push_back(this);
+	}
+	for (size_t i = 0; i < PlayerRaces.Languages[this->Language]->Dialects.size(); ++i) { //do the same for the dialects
+		if (std::find(PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeWords[type].begin(), PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeWords[type].end(), this) == PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeWords[type].end()) {
+			PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeWords[type].push_back(this);
+		}
+	}
+}
+
+void LanguageWord::AddToLanguageAffixNameTypes(std::string type, int word_junction_type, int affix_type)
+{
+	if (std::find(PlayerRaces.Languages[this->Language]->NameTypeAffixes[word_junction_type][affix_type][type].begin(), PlayerRaces.Languages[this->Language]->NameTypeAffixes[word_junction_type][affix_type][type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeAffixes[word_junction_type][affix_type][type].end()) {
+		PlayerRaces.Languages[this->Language]->NameTypeAffixes[word_junction_type][affix_type][type].push_back(this);
+	}
+	for (size_t i = 0; i < PlayerRaces.Languages[this->Language]->Dialects.size(); ++i) { //do the same for the dialects
+		if (std::find(PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeAffixes[word_junction_type][affix_type][type].begin(), PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeAffixes[word_junction_type][affix_type][type].end(), this) == PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeAffixes[word_junction_type][affix_type][type].end()) {
+			PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeAffixes[word_junction_type][affix_type][type].push_back(this);
 		}
 	}
 }
