@@ -3159,6 +3159,10 @@ void GenerateMissingLanguageData()
 	
 	// now, try to get a minimum quantity of names per language for each type; when failing in one of them, try to assign type name settings based on those of words derived from and to the words in the failing language
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		if (!PlayerRaces.Languages[i]->UsedByCivilizationOrFaction) {
+			continue;
+		}
+		
 		for (size_t j = 0; j < types.size(); ++j) {
 			bool deeper_related_word_level_exists = true;
 			bool try_different_word_types = false;
@@ -3230,6 +3234,10 @@ void GenerateMissingLanguageData()
 	}
 			
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		if (!PlayerRaces.Languages[i]->UsedByCivilizationOrFaction) {
+			continue;
+		}
+
 		for (size_t j = 0; j < types.size(); ++j) {
 			if (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names && default_language != -1) { //if the quantity of names is still too low, try to add name generation of this type for this language based on the default language, for words which share a meaning
 				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
@@ -3263,6 +3271,10 @@ void GenerateMissingLanguageData()
 	int minimum_names = 5;
 	int desired_names = 25;
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		if (!PlayerRaces.Languages[i]->UsedByCivilizationOrFaction) {
+			continue;
+		}
+
 		for (size_t j = 0; j < types.size(); ++j) {
 			int final_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]);
 			if (final_name_quantity > 0 && final_name_quantity < minimum_names) { //if the name quantity is very low, then don't generate that sort of name for the language

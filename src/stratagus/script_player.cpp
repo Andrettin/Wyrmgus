@@ -611,6 +611,7 @@ static int CclDefineRaceNames(lua_State *l)
 					int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, j + 1, k + 1));
 					if (language != -1) {
 						PlayerRaces.CivilizationLanguage[i] = language;
+						PlayerRaces.Languages[language]->UsedByCivilizationOrFaction = true;
 					} else {
 						LuaError(l, "Language not found.");
 					}
@@ -758,6 +759,7 @@ static int CclDefineCivilization(lua_State *l)
 			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			if (language != -1) {
 				PlayerRaces.CivilizationLanguage[civilization] = language;
+				PlayerRaces.Languages[language]->UsedByCivilizationOrFaction = true;
 			} else {
 				LuaError(l, "Language not found.");
 			}
@@ -1385,6 +1387,7 @@ static int CclDefineFaction(lua_State *l)
 			
 			if (language != -1) {
 				faction->Language = language;
+				PlayerRaces.Languages[language]->UsedByCivilizationOrFaction = true;
 			} else {
 				LuaError(l, "Language not found.");
 			}
