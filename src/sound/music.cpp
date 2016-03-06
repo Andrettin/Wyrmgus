@@ -60,7 +60,7 @@ bool CallbackMusic;                       /// flag true callback ccl if stops
 #ifdef USE_OAML
 #include <oaml.h>
 
-oamlApi *oaml;
+oamlApi *oaml = NULL;
 bool enableOAML = false;
 #endif
 
