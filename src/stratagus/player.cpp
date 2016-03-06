@@ -359,9 +359,11 @@ void PlayerRace::Clean()
 	if (this->Count > 0) { //don't clean the languages if first defining the civilizations
 		for (size_t i = 0; i < this->Languages.size(); ++i) {
 			for (size_t j = 0; j < this->Languages[i]->LanguageWords.size(); ++j) {
-				if (this->Languages[i]->LanguageWords[j]) {
-					delete this->Languages[i]->LanguageWords[j];
+				for (size_t k = 0; k < this->Languages[i]->Dialects.size(); ++k) { //remove word from dialects, so that they don't try to delete it too
+					this->Languages[i]->Dialects[k]->RemoveWord(this->Languages[i]->LanguageWords[j]);
 				}
+				
+				delete this->Languages[i]->LanguageWords[j];
 			}
 			this->Languages[i]->LanguageWords.clear();
 			
