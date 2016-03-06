@@ -2930,9 +2930,9 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 				for (int n = 0; n < MaxGrammaticalTenses; ++n) {
 					if (!this->HasAffixNameType(type, WordJunctionTypeCompound, i, j, k, n)) {
 						this->AffixNameTypes[WordJunctionTypeCompound][i][j][k][n][type] = 0;
-						for (size_t k = 0; k < word->CompoundElementOf[i].size(); ++k) {
-							if (word->CompoundElementOf[i][k]->HasNameType(type, j, k, n)) {
-								this->AffixNameTypes[WordJunctionTypeCompound][i][j][k][n][type] += word->CompoundElementOf[i][k]->HasNameType(type, j, k, n);
+						for (size_t o = 0; o < word->CompoundElementOf[i].size(); ++o) {
+							if (word->CompoundElementOf[i][o]->HasNameType(type, j, k, n)) {
+								this->AffixNameTypes[WordJunctionTypeCompound][i][j][k][n][type] += word->CompoundElementOf[i][o]->HasNameType(type, j, k, n);
 								
 								if (std::find(PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].begin(), PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].end()) {
 									PlayerRaces.Languages[this->Language]->NameTypeAffixes[WordJunctionTypeCompound][i][type].push_back(this);
