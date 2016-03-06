@@ -1529,6 +1529,8 @@ static int CclDefineLanguage(lua_State *l)
 			language->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "GenerateMissingWords")) {
 			language->GenerateMissingWords = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SkipNameTypeInheritance")) {
+			language->SkipNameTypeInheritance = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "NounEndings")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

@@ -2910,7 +2910,7 @@ void LanguageWord::AddNameTypeGenerationFromWord(LanguageWord *word, std::string
 			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
 				for (int n = 0; n < MaxGrammaticalCases; ++n) {
 					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
-						if (word->HasAffixNameType(type, i, j, k, n, o) && !this->HasAffixNameType(type, i, j, k, n, o)) {
+						if ((this->Type == word->Type || i != WordJunctionTypeSeparate) && word->HasAffixNameType(type, i, j, k, n, o) && !this->HasAffixNameType(type, i, j, k, n, o)) {
 							this->AffixNameTypes[i][j][k][n][o][type] = word->HasAffixNameType(type, i, j, k, n, o);
 							
 							if (std::find(PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].begin(), PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].end(), this) == PlayerRaces.Languages[this->Language]->NameTypeAffixes[i][j][type].end()) {
@@ -3159,82 +3159,72 @@ void GenerateMissingLanguageData()
 	
 	// now, try to get a minimum quantity of names per language for each type; when failing in one of them, try to assign type name settings based on those of words derived from and to the words in the failing language
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-		if (!PlayerRaces.Languages[i]->UsedByCivilizationOrFaction) {
+		if (!PlayerRaces.Languages[i]->UsedByCivilizationOrFaction || PlayerRaces.Languages[i]->SkipNameTypeInheritance) {
 			continue;
 		}
 		
 		for (size_t j = 0; j < types.size(); ++j) {
-			bool deeper_related_word_level_exists = true;
-			bool try_different_word_types = false;
-			int relationship_depth_level = 1;
 
 			std::map<LanguageWord *, std::vector<LanguageWord *>> related_words;
+			std::map<LanguageWord *, std::vector<LanguageWord *>> new_related_words;
+
+			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
+				LanguageWord *word = PlayerRaces.Languages[i]->LanguageWords[k];
+				if (word->DerivesFrom != NULL || word->DerivesTo.size() > 0) {
+					related_words[word].push_back(word);
+					new_related_words[word].push_back(word);
+				}
+			}
 			
 			while (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names) {
-				deeper_related_word_level_exists = false;
 				
-				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
-					// fill the vector with all the related words for the desired relationship depth level
-					if (PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom != NULL && std::find(related_words[PlayerRaces.Languages[i]->LanguageWords[k]].begin(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end(), PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom) == related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end()) {
-						related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesFrom);
-					}
-					for (size_t n = 0; n < PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo.size(); ++n) {
-						if (std::find(related_words[PlayerRaces.Languages[i]->LanguageWords[k]].begin(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end(), PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo[n]) == related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end()) {
-							related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(PlayerRaces.Languages[i]->LanguageWords[k]->DerivesTo[n]);
-						}
-					}
+				for (std::map<LanguageWord *, std::vector<LanguageWord *>>::reverse_iterator iterator = related_words.rbegin(); iterator != related_words.rend(); ++iterator) {
+					LanguageWord *word = iterator->first;
 					
-					for (int n = 0; n < relationship_depth_level; ++n) {
-						for (int o = (int) related_words[PlayerRaces.Languages[i]->LanguageWords[k]].size() - 1; o >= 0; --o) {
-							if (
-								related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesFrom != NULL
-								&& related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesFrom != PlayerRaces.Languages[i]->LanguageWords[k]
-								&& std::find(related_words[PlayerRaces.Languages[i]->LanguageWords[k]].begin(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesFrom) == related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end()
-							) {
-								if (n < (relationship_depth_level - 1)) {
-									related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesFrom);
-								} else {
-									deeper_related_word_level_exists = true;
-								}
-							}
-							for (size_t p = 0; p < related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesTo.size(); ++p) {
-								if (
-									related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesTo[p] != PlayerRaces.Languages[i]->LanguageWords[k] 
-									&& std::find(related_words[PlayerRaces.Languages[i]->LanguageWords[k]].begin(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end(), related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesTo[p]) == related_words[PlayerRaces.Languages[i]->LanguageWords[k]].end()
-								) {
-									if (n < (relationship_depth_level - 1)) {
-										related_words[PlayerRaces.Languages[i]->LanguageWords[k]].push_back(related_words[PlayerRaces.Languages[i]->LanguageWords[k]][o]->DerivesTo[p]);
-									} else {
-										deeper_related_word_level_exists = true;
-									}
-								}
+					bool deeper_related_word_level_may_exist = false;
+					
+					// fill the vector with all the related words for the current relationship depth level
+					for (int n = (int) new_related_words[word].size() - 1; n >= 0; --n) {
+						if (
+							new_related_words[word][n]->DerivesFrom != NULL
+							&& std::find(related_words[word].begin(), related_words[word].end(), new_related_words[word][n]->DerivesFrom) == related_words[word].end()
+						) {
+							related_words[word].push_back(new_related_words[word][n]->DerivesFrom);
+							new_related_words[word].push_back(new_related_words[word][n]->DerivesFrom);
+							deeper_related_word_level_may_exist = true;
+						}
+						for (size_t o = 0; o < new_related_words[word][n]->DerivesTo.size(); ++o) {
+							if (std::find(related_words[word].begin(), related_words[word].end(), new_related_words[word][n]->DerivesTo[o]) == related_words[word].end()) {
+								related_words[word].push_back(new_related_words[word][n]->DerivesTo[o]);
+								new_related_words[word].push_back(new_related_words[word][n]->DerivesTo[o]);
+								deeper_related_word_level_may_exist = true;
 							}
 						}
+						new_related_words[word].erase(std::remove(new_related_words[word].begin(), new_related_words[word].end(), new_related_words[word][n]), new_related_words[word].end());
 					}
 					
 					//now attach the new type name to the word from its related words, if it is found in them
-					for (size_t n = 0; n < related_words[PlayerRaces.Languages[i]->LanguageWords[k]].size(); ++n) {
-						if (PlayerRaces.Languages[i]->LanguageWords[k]->Type == related_words[PlayerRaces.Languages[i]->LanguageWords[k]][n]->Type || try_different_word_types) { //only accept words of another type if tried to get suitable name generation from all relationship levels and failed
-							PlayerRaces.Languages[i]->LanguageWords[k]->AddNameTypeGenerationFromWord(related_words[PlayerRaces.Languages[i]->LanguageWords[k]][n], types[j]);
+					for (size_t n = 0; n < new_related_words[word].size(); ++n) {
+						if (word != new_related_words[word][n]) {
+							word->AddNameTypeGenerationFromWord(new_related_words[word][n], types[j]);
 						}
+					}
+					
+					if (!deeper_related_word_level_may_exist) { //if relationship levels have been exhausted, don't search this word anymore
+						related_words.erase(word);
+						new_related_words.erase(word);
 					}
 				}
 				
-				relationship_depth_level += 1;
-				
-				if (try_different_word_types) { //if tried different word types for this pass, stop (that was the last resort)
+				if (related_words.size() == 0) {
 					break;
-				}
-
-				if (!deeper_related_word_level_exists) { //if relationship levels have been exhausted, try different word types for the next pass
-					try_different_word_types = true;
 				}
 			}
 		}
 	}
 			
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-		if (!PlayerRaces.Languages[i]->UsedByCivilizationOrFaction) {
+		if (!PlayerRaces.Languages[i]->UsedByCivilizationOrFaction || PlayerRaces.Languages[i]->SkipNameTypeInheritance) {
 			continue;
 		}
 
@@ -3278,10 +3268,7 @@ void GenerateMissingLanguageData()
 		for (size_t j = 0; j < types.size(); ++j) {
 			int final_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]);
 			if (final_name_quantity > 0 && final_name_quantity < minimum_names) { //if the name quantity is very low, then don't generate that sort of name for the language
-				for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
-					PlayerRaces.Languages[i]->LanguageWords[k]->StripNameTypeGeneration(types[j]);
-				}
-				fprintf(stdout, "%s language could only generate %d names out of %d for type \"%s\", stripped name generation of that type for the language.\n", PlayerRaces.Languages[i]->Name.c_str(), final_name_quantity, minimum_names, types[j].c_str());
+				fprintf(stdout, "%s language could only generate %d names out of %d for type \"%s\".\n", PlayerRaces.Languages[i]->Name.c_str(), final_name_quantity, minimum_names, types[j].c_str());
 			} else if (final_name_quantity > 0 && final_name_quantity < minimum_desired_names) { //if the name quantity is below the minimum desired amount, note that in the output
 				fprintf(stdout, "%s language can only generate %d names out of %d for type \"%s\", below the minimum desired amount.\n", PlayerRaces.Languages[i]->Name.c_str(), final_name_quantity, minimum_desired_names, types[j].c_str());
 			} else if (final_name_quantity > 0 && final_name_quantity < desired_names) { //if the name quantity is below the minimum desired amount, note that in the output

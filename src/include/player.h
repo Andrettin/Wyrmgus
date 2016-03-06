@@ -508,7 +508,7 @@ class CLanguage
 {
 public:
 	CLanguage() :
-		GenerateMissingWords(false), UsedByCivilizationOrFaction(false)
+		GenerateMissingWords(false), UsedByCivilizationOrFaction(false), SkipNameTypeInheritance(false)
 	{
 	}
 
@@ -524,6 +524,7 @@ public:
 	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
 	bool GenerateMissingWords;									/// Whether "missing" words (missing equivalents to English words) should be generated for this language
 	bool UsedByCivilizationOrFaction;
+	bool SkipNameTypeInheritance;
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
 	std::vector<std::string> NameTranslations[2];				/// Name translations (2 values: one for the name to be translated, and another for the translation)
 	std::map<std::string, std::vector<LanguageWord *>> NameTypeWords;	/// Words which can be used as names for particular name types
