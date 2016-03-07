@@ -274,7 +274,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			int underlay_terrain;
 			if ((tile == Map.Tileset->getRemovedTreeTile() && (mf.getFlag() & MapFieldStumps)) || (mf.getFlag() & MapFieldForest)) { //wood tile, draw grass (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for stump tiles or regrown trees
 				underlay_terrain = Map.Tileset->TreeUnderlayTerrain;
-			} else if ((tile == Map.Tileset->getRemovedRockTile() && (mf.getFlag() & MapFieldGravel)) || (mf.getFlag() & MapFieldForest)) { //rock tile, draw dirt (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for removed tiles
+			} else if ((tile == Map.Tileset->getRemovedRockTile() && (mf.getFlag() & MapFieldGravel)) || (mf.getFlag() & MapFieldRocks)) { //rock tile, draw dirt (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for removed tiles
 				underlay_terrain = Map.Tileset->RockUnderlayTerrain;
 			} else {
 				underlay_terrain = Map.Tileset->tiles[mf.getTileIndex()].tileinfo.MixTerrain;

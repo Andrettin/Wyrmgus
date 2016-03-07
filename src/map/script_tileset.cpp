@@ -202,30 +202,33 @@ void CTileset::parseSolid(lua_State *l)
 	const int basic_name = getOrAddSolidTileIndexByName(LuaToString(l, -1, j + 1));
 	++j;
 	//Wyrmgus start
-	lua_rawgeti(l, -1, j + 1);
-	if (lua_isstring(l, -1)) {
-		const char *string_value = LuaToString(l, -1);
-		lua_pop(l, 1);
-		if (!strcmp(string_value, "image")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			++j;
-			const char *second_string_value = LuaToString(l, -1);
+	while (true) {
+		lua_rawgeti(l, -1, j + 1);
+		if (lua_isstring(l, -1)) {
+			const char *string_value = LuaToString(l, -1);
 			lua_pop(l, 1);
-			solidTerrainTypes[basic_name].ImageFile = second_string_value;
-		} else if (!strcmp(string_value, "animation-frames")) {
-			++j;
-			lua_rawgeti(l, -1, j + 1);
-			++j;
-			int animation_frames = LuaToNumber(l, -1);
+			if (!strcmp(string_value, "image")) {
+				++j;
+				lua_rawgeti(l, -1, j + 1);
+				++j;
+				const char *second_string_value = LuaToString(l, -1);
+				lua_pop(l, 1);
+				solidTerrainTypes[basic_name].ImageFile = second_string_value;
+			} else if (!strcmp(string_value, "animation-frames")) {
+				++j;
+				lua_rawgeti(l, -1, j + 1);
+				++j;
+				int animation_frames = LuaToNumber(l, -1);
+				lua_pop(l, 1);
+				solidTerrainTypes[basic_name].AnimationFrames = animation_frames;
+			} else {
+				break;
+			}
+		} else {
 			lua_pop(l, 1);
-			solidTerrainTypes[basic_name].AnimationFrames = animation_frames;
+			break;
 		}
-	} else {
-		lua_pop(l, 1);
 	}
-	lua_rawgeti(l, -1, j + 1);
-	lua_pop(l, 1);
 	//Wyrmgus end
 
 	int f = 0;
