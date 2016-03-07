@@ -726,6 +726,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "Ż", "Z");
 	text = FindAndReplaceString(text, "ż", "z");
 	
+	text = FindAndReplaceString(text, "ʔ", "'"); // glottal stop
+
 	//replace endings in -r after consonants (which happens in the nominative for Old Norse); Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceStringEnding(text, "dr", "d");
 	text = FindAndReplaceStringEnding(text, "fr", "f");
