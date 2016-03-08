@@ -788,7 +788,7 @@ static int CclDefineLanguageWord(lua_State *l)
 	LanguageWord *word = new LanguageWord;
 	word->Word = LuaToString(l, 1);
 	
-	LanguageWord *replaces;
+	LanguageWord *replaces = NULL;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {

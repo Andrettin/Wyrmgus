@@ -3220,6 +3220,8 @@ void GenerateMissingLanguageData()
 			
 			while (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names) {
 				
+				std::vector<LanguageWord *> words_to_erase;
+				
 				for (std::map<LanguageWord *, std::vector<LanguageWord *>>::reverse_iterator iterator = related_words.rbegin(); iterator != related_words.rend(); ++iterator) {
 					LanguageWord *word = iterator->first;
 					
@@ -3253,9 +3255,13 @@ void GenerateMissingLanguageData()
 					}
 					
 					if (!deeper_related_word_level_may_exist) { //if relationship levels have been exhausted, don't search this word anymore
-						related_words.erase(word);
-						new_related_words.erase(word);
+						words_to_erase.push_back(word);
 					}
+				}
+				
+				for (size_t i = 0; i < words_to_erase.size(); ++i) {
+					related_words.erase(words_to_erase[i]);
+					new_related_words.erase(words_to_erase[i]);
 				}
 				
 				if (related_words.size() == 0) {
