@@ -48,19 +48,36 @@
 class CUnitType;
 class CUpgrade;
 class CFaction;
+class CProvince;
+
+class CWorld
+{
+public:
+	CWorld() :
+		ID(-1)
+	{
+	}
+	
+	std::string Name;
+	std::string Description;
+	std::string Background;
+	int ID;																/// ID of this world
+	std::vector<CProvince *> Provinces;									/// Provinces in this world
+};
 
 class CProvince
 {
 public:
 	CProvince() :
 		ID(-1),
-		Water(false), Coastal(false), SettlementLocation(-1, -1)
+		Water(false), Coastal(false), SettlementLocation(-1, -1),
+		World(NULL)
 	{
 	}
 	
 	std::string Name;
 	std::string SettlementName;
-	std::string World;
+	CWorld *World;
 	std::string Map;
 	std::string SettlementTerrain;
 	int ID;																/// ID of this province
@@ -75,18 +92,19 @@ public:
 	std::vector<Vec2i> Tiles;
 };
 
-
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
+extern std::vector<CWorld *> Worlds;
 extern std::vector<CProvince *> Provinces;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
-extern void CleanProvinces();
+extern void CleanWorlds();
+extern CWorld *GetWorld(std::string world_name);
 extern CProvince *GetProvince(std::string province_name);
 extern void ProvinceCclRegister();
 

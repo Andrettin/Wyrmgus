@@ -46,18 +46,34 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+std::vector<CWorld *> Worlds;
 std::vector<CProvince *> Provinces;
 
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CleanProvinces()
+void CleanWorlds()
 {
-	for (size_t i = 0; i < Provinces.size(); ++i) {
-		delete Provinces[i];
+	for (size_t i = 0; i < Worlds.size(); ++i) {
+		for (size_t j = 0; j < Worlds[i]->Provinces.size(); ++j) {
+			delete Worlds[i]->Provinces[j];
+		}
+		Worlds[i]->Provinces.clear();
+		
+		delete Worlds[i];
 	}
-	Provinces.clear();
+	Worlds.clear();
+}
+
+CWorld *GetWorld(std::string world_name)
+{
+	for (size_t i = 0; i < Worlds.size(); ++i) {
+		if (world_name == Worlds[i]->Name) {
+			return Worlds[i];
+		}
+	}
+	return NULL;
 }
 
 CProvince *GetProvince(std::string province_name)

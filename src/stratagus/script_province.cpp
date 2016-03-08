@@ -49,6 +49,43 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Define a world.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineWorld(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string world_name = LuaToString(l, 1);
+	CWorld *world = GetWorld(world_name);
+	if (!world) {
+		world = new CWorld;
+		world->Name = world_name;
+		world->ID = Worlds.size();
+		Worlds.push_back(world);
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Description")) {
+			world->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			world->Background = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a province.
 **
 **  @param l  Lua state.
@@ -76,7 +113,13 @@ static int CclDefineProvince(lua_State *l)
 		if (!strcmp(value, "SettlementName")) {
 			province->SettlementName = LuaToString(l, -1);
 		} else if (!strcmp(value, "World")) {
-			province->World = LuaToString(l, -1);
+			CWorld *world = GetWorld(LuaToString(l, -1));
+			if (world != NULL) {
+				province->World = world;
+				world->Provinces.push_back(province);
+			} else {
+				LuaError(l, "World doesn't exist.");
+			}
 		} else if (!strcmp(value, "Water")) {
 			province->Water = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Coastal")) {
@@ -101,7 +144,7 @@ static int CclDefineProvince(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				province->CulturalNames[civilization] = cultural_name;
+				province->CulturalNames[civilization] = TransliterateText(cultural_name);
 				
 				++j;
 				if (j >= subargs) {
@@ -147,7 +190,7 @@ static int CclDefineProvince(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				province->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = cultural_name;
+				province->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
 				
 				++j;
 				if (j >= subargs) {
@@ -187,7 +230,7 @@ static int CclDefineProvince(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				province->CulturalSettlementNames[civilization] = cultural_name;
+				province->CulturalSettlementNames[civilization] = TransliterateText(cultural_name);
 				
 				++j;
 				if (j >= subargs) {
@@ -233,7 +276,7 @@ static int CclDefineProvince(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				province->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]] = cultural_name;
+				province->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
 				
 				++j;
 				if (j >= subargs) {
@@ -295,6 +338,51 @@ static int CclDefineProvince(lua_State *l)
 		}
 	}
 	
+	if (province->World == NULL) {
+		LuaError(l, "Province \"%s\" is not assigned to any world." _C_ province->Name.c_str());
+	}
+	
+	return 0;
+}
+
+/**
+**  Get world data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetWorldData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string world_name = LuaToString(l, 1);
+	CWorld *world = GetWorld(world_name);
+	if (!world) {
+		LuaError(l, "World \"%s\" doesn't exist." _C_ world_name.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, world->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, world->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, world->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Provinces")) {
+		lua_createtable(l, world->Provinces.size(), 0);
+		for (size_t i = 1; i <= world->Provinces.size(); ++i)
+		{
+			lua_pushstring(l, world->Provinces[i-1]->Name.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
 	return 0;
 }
 
@@ -322,7 +410,11 @@ static int CclGetProvinceData(lua_State *l)
 		lua_pushstring(l, province->SettlementName.c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
-		lua_pushstring(l, province->World.c_str());
+		if (province->World != NULL) {
+			lua_pushstring(l, province->World->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Water")) {
 		lua_pushboolean(l, province->Water);
@@ -361,6 +453,17 @@ static int CclGetProvinceData(lua_State *l)
 	return 0;
 }
 
+static int CclGetWorlds(lua_State *l)
+{
+	lua_createtable(l, Worlds.size(), 0);
+	for (size_t i = 1; i <= Worlds.size(); ++i)
+	{
+		lua_pushstring(l, Worlds[i-1]->Name.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
 static int CclGetProvinces(lua_State *l)
 {
 	lua_createtable(l, Provinces.size(), 0);
@@ -379,8 +482,11 @@ static int CclGetProvinces(lua_State *l)
 */
 void ProvinceCclRegister()
 {
+	lua_register(Lua, "DefineWorld", CclDefineWorld);
 	lua_register(Lua, "DefineProvince", CclDefineProvince);
+	lua_register(Lua, "GetWorldData", CclGetWorldData);
 	lua_register(Lua, "GetProvinceData", CclGetProvinceData);
+	lua_register(Lua, "GetWorlds", CclGetWorlds);
 	lua_register(Lua, "GetProvinces", CclGetProvinces);
 }
 

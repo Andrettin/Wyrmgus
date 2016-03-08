@@ -4992,7 +4992,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 		CProvince *province_of_origin = GetProvince(Characters[i]->ProvinceOfOriginName);
 		if (province_of_origin == NULL) {
 			fprintf(stderr, "Hero \"%s\"'s province of origin \"%s\" doesn't exist.\n", Characters[i]->GetFullName().c_str(), Characters[i]->ProvinceOfOriginName.c_str());
-		} else if (province_of_origin->World != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+		} else if (province_of_origin->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
 			continue;
 		}
 		
@@ -5119,7 +5119,7 @@ void InitializeGrandStrategyMinimap()
 void InitializeGrandStrategyProvinces()
 {
 	for (size_t i = 0; i < Provinces.size(); ++i) {
-		if (Provinces[i]->World != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+		if (Provinces[i]->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
 			continue;
 		}
 		CGrandStrategyProvince *province = new CGrandStrategyProvince;

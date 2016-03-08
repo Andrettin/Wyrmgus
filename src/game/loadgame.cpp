@@ -105,12 +105,14 @@ void CleanModules()
 	CleanDecorations();
 	CleanMissiles();
 	//Wyrmgus start
-	CleanProvinces();
 	CleanQuests();
 	CleanUniqueItems();
 	//Wyrmgus end
 	CleanUnits();
 	CleanUnitTypes();
+	//Wyrmgus start
+	CleanWorlds();
+	//Wyrmgus end
 	CleanPlayers();
 	CleanSelections();
 	CleanGroups();
