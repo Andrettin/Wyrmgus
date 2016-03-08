@@ -146,6 +146,8 @@ extern int PlayMusic(const std::string &file);
 extern void PlayMusicName(const std::string &name);
 /// Play a music track
 extern void PlayMusicByGroupRandom(const std::string &group);
+/// Play a music track
+extern void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup);
 /// Set a condition for music
 extern void SetMusicCondition(int id, int value);
 /// Increase tension value for the music

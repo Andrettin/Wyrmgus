@@ -778,6 +778,15 @@ void PlayMusicByGroupRandom(const std::string &group) {
 #endif
 }
 
+void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup) {
+#ifdef USE_OAML
+	if (enableOAML && oaml)
+		if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str()) == -1) {
+			oaml->PlayTrackByGroupRandom(group.c_str());
+		}
+#endif
+}
+
 void SetMusicCondition(int id, int value) {
 #ifdef USE_OAML
 	if (enableOAML && oaml)

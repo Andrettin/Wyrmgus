@@ -18,6 +18,7 @@ $]
 extern int PlayMusic(const std::string name);
 extern void PlayMusicName(const std::string name);
 extern void PlayMusicByGroupRandom(const std::string group);
+extern void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup);
 extern void SetMusicCondition(int id, int value);
 extern void StopMusic(void);
 extern bool IsMusicPlaying();
