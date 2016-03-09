@@ -49,6 +49,7 @@ class CUnitType;
 class CUpgrade;
 class CFaction;
 class CProvince;
+class WorldMapTile;
 
 class CWorld
 {
@@ -63,6 +64,7 @@ public:
 	std::string Background;
 	int ID;																/// ID of this world
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
+	std::map<std::pair<int,int>, WorldMapTile *> Tiles;								/// Tiles in the world
 };
 
 class CProvince
@@ -90,6 +92,21 @@ public:
 	std::map<CFaction *, std::string> FactionCulturalSettlementNames;	/// Names for the province's settlement for each different faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
 	std::vector<Vec2i> Tiles;
+};
+
+class WorldMapTile
+{
+public:
+	WorldMapTile() :
+		Position(-1, -1),
+		World(NULL)
+	{
+	}
+
+	Vec2i Position;								/// Position of the tile
+	CWorld *World;
+	std::map<int, std::string> CulturalNames;	/// Names for the tile for each different culture/civilization
+	std::map<CFaction *, std::string> FactionCulturalNames;	/// Names for the tile for each different faction
 };
 
 /*----------------------------------------------------------------------------

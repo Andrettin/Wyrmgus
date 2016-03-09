@@ -1406,7 +1406,7 @@ void CGrandStrategyGame::UpdateMinimap()
 	}
 }
 
-void WorldMapTile::UpdateMinimap()
+void GrandStrategyWorldMapTile::UpdateMinimap()
 {
 	if (!(
 		(GetWorldMapWidth() <= UI.Minimap.X && GetWorldMapHeight() <= UI.Minimap.Y)
@@ -1501,7 +1501,7 @@ void WorldMapTile::UpdateMinimap()
 	}
 }
 
-void WorldMapTile::SetResourceProspected(int resource_id, bool discovered)
+void GrandStrategyWorldMapTile::SetResourceProspected(int resource_id, bool discovered)
 {
 	if (this->ResourceProspected == discovered) { //no change, return
 		return;
@@ -1522,7 +1522,7 @@ void WorldMapTile::SetResourceProspected(int resource_id, bool discovered)
 	}
 }
 
-void WorldMapTile::SetPort(bool has_port)
+void GrandStrategyWorldMapTile::SetPort(bool has_port)
 {
 	if (this->Port == has_port) {
 		return;
@@ -1542,7 +1542,7 @@ void WorldMapTile::SetPort(bool has_port)
 	}
 }
 
-void WorldMapTile::GenerateCulturalName(int old_civilization_id)
+void GrandStrategyWorldMapTile::GenerateCulturalName(int old_civilization_id)
 {
 	if (this->Province == -1 || GrandStrategyGame.Provinces[this->Province]->Civilization == -1 || this->Terrain == -1) {
 		return;
@@ -1577,7 +1577,7 @@ void WorldMapTile::GenerateCulturalName(int old_civilization_id)
 	}
 }
 
-void WorldMapTile::GenerateFactionCulturalName()
+void GrandStrategyWorldMapTile::GenerateFactionCulturalName()
 {
 	if (this->Province == -1 || GrandStrategyGame.Provinces[this->Province]->Civilization == -1 || this->Terrain == -1) {
 		return;
@@ -1627,7 +1627,7 @@ void WorldMapTile::GenerateFactionCulturalName()
 	}
 }
 
-bool WorldMapTile::IsWater()
+bool GrandStrategyWorldMapTile::IsWater()
 {
 	if (this->Terrain != -1) {
 		return GrandStrategyGame.TerrainTypes[this->Terrain]->Water;
@@ -1638,7 +1638,7 @@ bool WorldMapTile::IsWater()
 /**
 **  Get whether the tile has a resource
 */
-bool WorldMapTile::HasResource(int resource, bool ignore_prospection)
+bool GrandStrategyWorldMapTile::HasResource(int resource, bool ignore_prospection)
 {
 	if (resource == this->Resource && (this->ResourceProspected || ignore_prospection)) {
 		return true;
@@ -1649,7 +1649,7 @@ bool WorldMapTile::HasResource(int resource, bool ignore_prospection)
 /**
 **  Get the tile's cultural name.
 */
-std::string WorldMapTile::GetCulturalName()
+std::string GrandStrategyWorldMapTile::GetCulturalName()
 {
 	if (this->Province != -1 && !GrandStrategyGame.Provinces[this->Province]->Water && GrandStrategyGame.Provinces[this->Province]->Civilization != -1 && GrandStrategyGame.Provinces[this->Province]->Owner != NULL && GrandStrategyGame.Provinces[this->Province]->Civilization == GrandStrategyGame.Provinces[this->Province]->Owner->Civilization && this->FactionCulturalNames.find(PlayerRaces.Factions[GrandStrategyGame.Provinces[this->Province]->Owner->Civilization][GrandStrategyGame.Provinces[this->Province]->Owner->Faction]) != this->FactionCulturalNames.end()) {
 		return this->FactionCulturalNames[PlayerRaces.Factions[GrandStrategyGame.Provinces[this->Province]->Owner->Civilization][GrandStrategyGame.Provinces[this->Province]->Owner->Faction]];
@@ -3461,7 +3461,7 @@ void SetWorldMapSize(int width, int height)
 		for (int x = 0; x < GrandStrategyGame.WorldMapWidth; ++x) {
 			for (int y = 0; y < GrandStrategyGame.WorldMapHeight; ++y) {
 				if (!GrandStrategyGame.WorldMapTiles[x][y]) {
-					WorldMapTile *world_map_tile = new WorldMapTile;
+					GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
 					GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
 					GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
 					GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
@@ -3479,15 +3479,13 @@ void SetWorldMapTileTerrain(int x, int y, int terrain)
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	//if tile doesn't exist, create it now
 	if (!GrandStrategyGame.WorldMapTiles[x][y]) {
-		WorldMapTile *world_map_tile = new WorldMapTile;
+		GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
 		GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
 		GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
 		GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
 	}
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->Terrain = terrain;
-	GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames.clear();
-	GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.clear();
 	GrandStrategyGame.WorldMapTiles[x][y]->GenerateCulturalName();
 	GrandStrategyGame.WorldMapTiles[x][y]->GenerateFactionCulturalName();
 	
@@ -5112,6 +5110,39 @@ void InitializeGrandStrategyMinimap()
 			GrandStrategyGame.MinimapOffsetY = (UI.Minimap.H - ((GetWorldMapHeight() / std::max(1000 / GrandStrategyGame.MinimapTileHeight, 1)) * std::max(GrandStrategyGame.MinimapTileHeight / 1000, 1))) / 2;
 		} else {
 			GrandStrategyGame.MinimapOffsetX = (UI.Minimap.H - ((GetWorldMapWidth() / std::max(1000 / GrandStrategyGame.MinimapTileWidth, 1)) * std::max(GrandStrategyGame.MinimapTileWidth / 1000, 1))) / 2;
+		}
+	}
+}
+
+void InitializeGrandStrategyWorldMap()
+{
+	CWorld *world = GetWorld(GrandStrategyWorld);
+	
+	if (world == NULL) {
+		return;
+	}
+	
+	for (std::map<std::pair<int,int>, WorldMapTile *>::iterator iterator = world->Tiles.begin(); iterator != world->Tiles.end(); ++iterator) {
+		int x = iterator->first.first;
+		int y = iterator->first.second;
+		
+		if (!GrandStrategyGame.WorldMapTiles[x][y]) {
+			GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
+			GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
+			GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
+			GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
+		}
+		
+		for (int i = 0; i < MAX_RACES; ++i) {
+			if (iterator->second->CulturalNames.find(i) != iterator->second->CulturalNames.end()) {
+				GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i] = iterator->second->CulturalNames[i];
+			}
+			
+			for (int j = 0; j < FactionMax; ++j) {
+				if (iterator->second->FactionCulturalNames.find(PlayerRaces.Factions[i][j]) != iterator->second->FactionCulturalNames.end()) {
+					GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames[PlayerRaces.Factions[i][j]] = iterator->second->FactionCulturalNames[PlayerRaces.Factions[i][j]];
+				}
+			}
 		}
 	}
 }

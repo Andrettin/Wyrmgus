@@ -93,13 +93,12 @@ public:
 	int Variations;					/// quantity of variations
 };
 
-class WorldMapTile
+class GrandStrategyWorldMapTile : public WorldMapTile
 {
 public:
-	WorldMapTile() :
+	GrandStrategyWorldMapTile() : WorldMapTile(),
 		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
 		ResourceProspected(false), Port(false), Worked(false),
-		Position(-1, -1),
 		BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
@@ -126,7 +125,6 @@ public:
 	bool Port;								/// Whether the tile has a port
 	bool Worked;							/// Whether the tile is worked by a worker
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
-	Vec2i Position;							/// Position of the tile
 	CGraphic *BaseTile;
 	CGraphic *GraphicTile;					/// The tile image used by this tile
 	CGraphic *ResourceBuildingGraphics;
@@ -135,8 +133,6 @@ public:
 	int River[MaxDirections];				/// Whether this tile has a river to a particular direction (the value for each direction is the ID of the river)
 	int Riverhead[MaxDirections];			/// Whether this tile has a riverhead to a particular direction (the value for each direction is the ID of the river)
 	int Pathway[MaxDirections];				/// Whether this tile has a pathway (trail or road) to a particular direction
-	std::map<int, std::string> CulturalNames;	/// Names for the tile for each different culture/civilization
-	std::map<CFaction *, std::string> FactionCulturalNames;	/// Names for the tile for each different faction
 };
 
 class CGrandStrategyProvince : public CProvince
@@ -410,7 +406,7 @@ public:
 	CPlayerColorGraphic *SettlementMasonryGraphics[MAX_RACES];
 	CPlayerColorGraphic *NationalBorderGraphics[MaxDirections];	///one for each direction
 	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
-	WorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
+	GrandStrategyWorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	std::vector<CGrandStrategyProvince *> Provinces;
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
@@ -521,6 +517,7 @@ extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame(bool show_loading = true);
 extern void InitializeGrandStrategyMinimap();
+extern void InitializeGrandStrategyWorldMap();
 extern void InitializeGrandStrategyProvinces();
 extern void InitializeGrandStrategyFactions();
 extern void SetGrandStrategyWorld(std::string world);

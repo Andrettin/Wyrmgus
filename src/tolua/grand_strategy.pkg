@@ -71,6 +71,7 @@ extern void UpdateProvinceMinimap(std::string province_name);
 extern void CleanGrandStrategyGame();
 extern void InitializeGrandStrategyGame(bool show_loading = true);
 extern void InitializeGrandStrategyMinimap();
+extern void InitializeGrandStrategyWorldMap();
 extern void InitializeGrandStrategyProvinces();
 extern void InitializeGrandStrategyFactions();
 extern void SetGrandStrategyWorld(std::string world);
