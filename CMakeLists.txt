@@ -776,7 +776,7 @@ option(WITH_MIKMOD "Compile Stratagus with Mikmod sound library" ON)
 option(WITH_MNG "Compile Stratagus with MNG image library" OFF)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
-option(WITH_OAML "Compile Stratagus with OAML library" OFF)
+option(WITH_OAML "Compile Stratagus with OAML library" ON)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
