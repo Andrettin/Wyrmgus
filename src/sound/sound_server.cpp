@@ -794,9 +794,13 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 #ifdef USE_OAML
 	if (enableOAML && oaml)
 		if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) == -1) {
-			int civilization = GetRaceIndexByName(civilization_name.c_str());
-			int parent_faction = PlayerRaces.Factions[civilization][GetFactionIndexByName(civilization, faction_name)]->ParentFaction;
-			if (parent_faction == -1 || oaml->PlayMusicByGroupAndFactionRandom(group.c_str(), PlayerRaces.Factions[civilization][parent_faction]->Name.c_str()) == -1) {
+			int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			int parent_faction = -1;
+			if (faction != -1) {
+				parent_faction = PlayerRaces.Factions[civilization][faction]->ParentFaction;
+			}
+			if (parent_faction == -1 || oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[civilization][parent_faction]->Name.c_str()) == -1) {
 				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) == -1) {
 					oaml->PlayTrackByGroupRandom(group.c_str());
 				}
