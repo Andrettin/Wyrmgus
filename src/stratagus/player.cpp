@@ -2132,18 +2132,22 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 				int unit_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, i);
 				int base_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(civilization, i);
 				if (unit_type_id != -1 && unit_type_id != base_unit_type_id) {
+					bool changed_stats = false;
+					std::string effect_element_string;
+					
 					if (!first_element) {
-						faction_effects_string += ", ";
+						effect_element_string += ", ";
 					} else {
 						first_element = false;
 					}
 					
-					faction_effects_string += UnitTypes[unit_type_id]->Name;
-					faction_effects_string += " (";
+					effect_element_string += UnitTypes[unit_type_id]->Name;
+					effect_element_string += " (";
 					
 					if (UnitTypes[unit_type_id]->Name != UnitTypes[base_unit_type_id]->Name) {
-						faction_effects_string += FindAndReplaceString(CapitalizeString(UnitTypes[unit_type_id]->Class), "-", " ");
-						faction_effects_string += ", ";
+						effect_element_string += FindAndReplaceString(CapitalizeString(UnitTypes[unit_type_id]->Class), "-", " ");
+						effect_element_string += ", ";
+						changed_stats = true;
 					}
 					
 					bool first_var = true;
@@ -2154,31 +2158,39 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 						
 						if (UnitTypes[unit_type_id]->DefaultStat.Variables[j].Value != UnitTypes[base_unit_type_id]->DefaultStat.Variables[j].Value) {
 							if (!first_var) {
-								faction_effects_string += ", ";
+								effect_element_string += ", ";
 							} else {
 								first_var = false;
 							}
 							
 							int variable_difference = UnitTypes[unit_type_id]->DefaultStat.Variables[j].Value - UnitTypes[base_unit_type_id]->DefaultStat.Variables[j].Value;
 							if (variable_difference > 0) {
-								faction_effects_string += "+";
+								effect_element_string += "+";
 							}
-							faction_effects_string += std::to_string((long long) variable_difference);
+							effect_element_string += std::to_string((long long) variable_difference);
 							if (j == BACKSTAB_INDEX || j == BONUSAGAINSTMOUNTED_INDEX || j == BONUSAGAINSTBUILDINGS_INDEX || j == BONUSAGAINSTAIR_INDEX || j == BONUSAGAINSTGIANTS_INDEX || j == BONUSAGAINSTDRAGONS_INDEX || j == FIRERESISTANCE_INDEX || j == COLDRESISTANCE_INDEX || j == ARCANERESISTANCE_INDEX || j == LIGHTNINGRESISTANCE_INDEX || j == AIRRESISTANCE_INDEX || j == EARTHRESISTANCE_INDEX || j == WATERRESISTANCE_INDEX || j == HACKRESISTANCE_INDEX || j == PIERCERESISTANCE_INDEX || j == BLUNTRESISTANCE_INDEX || j == TIMEEFFICIENCYBONUS_INDEX) {
-								faction_effects_string += "%";
+								effect_element_string += "%";
 							}
-							faction_effects_string += " ";
+							effect_element_string += " ";
 							
 							std::string variable_name = UnitTypeVar.VariableNameLookup[j];
 							variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
 							variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
 							variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
 							variable_name = SeparateCapitalizedStringElements(variable_name);
-							faction_effects_string += variable_name;
+							effect_element_string += variable_name;
+							changed_stats = true;
 						}
 					}
 					
-					faction_effects_string += ")";
+					effect_element_string += ")";
+					
+					if (changed_stats) {
+						faction_effects_string += effect_element_string;
+						if (first_element) {
+							first_element = false;
+						}
+					}
 				}
 			}
 			
