@@ -3185,30 +3185,22 @@ void GenerateMissingLanguageData()
 	// now, moving on to dealing with word type names
 	// first build a vector with all the types
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-		for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
-			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
-				for (int n = 0; n < MaxGrammaticalCases; ++n) {
-					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
-						for (std::map<std::string, int>::iterator iterator = PlayerRaces.Languages[i]->LanguageWords[j]->NameTypes[k][n][o].begin(); iterator != PlayerRaces.Languages[i]->LanguageWords[j]->NameTypes[k][n][o].end(); ++iterator) {
-							if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {
-								types.push_back(iterator->first);
-							}
-						}
-					}
-				}
+		for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = PlayerRaces.Languages[i]->NameTypeWords.begin(); iterator != PlayerRaces.Languages[i]->NameTypeWords.end(); ++iterator) {
+			if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first.find("item-") != std::string::npos) {
+				continue;
 			}
-			for (int k = 0; k < MaxWordJunctionTypes; ++k) {
-				for (int n = 0; n < MaxAffixTypes; ++n) {
-					for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
-						for (int p = 0; p < MaxGrammaticalCases; ++p) {
-							for (int q = 0; q < MaxGrammaticalTenses; ++q) {
-								for (std::map<std::string, int>::iterator iterator = PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p][q].begin(); iterator != PlayerRaces.Languages[i]->LanguageWords[j]->AffixNameTypes[k][n][o][p][q].end(); ++iterator) {
-									if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {
-										types.push_back(iterator->first);
-									}
-								}
-							}
-						}
+			if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {
+				types.push_back(iterator->first);
+			}
+		}
+		for (int j = 0; j < MaxWordJunctionTypes; ++j) {
+			for (int k = 0; k < MaxAffixTypes; ++k) {
+				for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = PlayerRaces.Languages[i]->NameTypeAffixes[j][k].begin(); iterator != PlayerRaces.Languages[i]->NameTypeAffixes[j][k].end(); ++iterator) {
+					if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first.find("item-") != std::string::npos) {
+						continue;
+					}
+					if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {
+						types.push_back(iterator->first);
 					}
 				}
 			}
