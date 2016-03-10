@@ -787,6 +787,17 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 #endif
 }
 
+void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name) {
+#ifdef USE_OAML
+	if (enableOAML && oaml)
+		if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) == -1) {
+			if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) == -1) {
+				oaml->PlayTrackByGroupRandom(group.c_str());
+			}
+		}
+#endif
+}
+
 void SetMusicCondition(int id, int value) {
 #ifdef USE_OAML
 	if (enableOAML && oaml)

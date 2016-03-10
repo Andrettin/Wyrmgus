@@ -341,7 +341,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalTerrainNames[std::pair<int,int>(terrain, civilization)] = TransliterateText(cultural_name);
+				tile->CulturalTerrainNames[std::pair<int,int>(terrain, civilization)].push_back(TransliterateText(cultural_name));
 				
 				++j;
 				if (j >= subargs) {
@@ -386,7 +386,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalTerrainNames[std::pair<int,CFaction *>(terrain, PlayerRaces.Factions[civilization][faction])] = TransliterateText(cultural_name);
+				tile->FactionCulturalTerrainNames[std::pair<int,CFaction *>(terrain, PlayerRaces.Factions[civilization][faction])].push_back(TransliterateText(cultural_name));
 				
 				++j;
 				if (j >= subargs) {
@@ -425,7 +425,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalResourceNames[std::pair<int,int>(resource, civilization)] = TransliterateText(cultural_name);
+				tile->CulturalResourceNames[std::pair<int,int>(resource, civilization)].push_back(TransliterateText(cultural_name));
 				
 				++j;
 				if (j >= subargs) {
@@ -470,7 +470,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalResourceNames[std::pair<int,CFaction *>(resource, PlayerRaces.Factions[civilization][faction])] = TransliterateText(cultural_name);
+				tile->FactionCulturalResourceNames[std::pair<int,CFaction *>(resource, PlayerRaces.Factions[civilization][faction])].push_back(TransliterateText(cultural_name));
 				
 				++j;
 				if (j >= subargs) {
@@ -503,7 +503,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalSettlementNames[civilization] = TransliterateText(cultural_name);
+				tile->CulturalSettlementNames[civilization].push_back(TransliterateText(cultural_name));
 				
 				++j;
 				if (j >= subargs) {
@@ -542,7 +542,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
+				tile->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]].push_back(TransliterateText(cultural_name));
 				
 				++j;
 				if (j >= subargs) {

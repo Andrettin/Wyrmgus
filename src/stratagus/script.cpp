@@ -2803,23 +2803,23 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (!GrandStrategyGame.WorldMapTiles[x][y]->Name.empty()) {
 					fprintf(fd, "SetWorldMapTileName(%d, %d, \"%s\")\n", x, y, GrandStrategyGame.WorldMapTiles[x][y]->Name.c_str()); //save tile name
 				}
-				for (std::map<int, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileCulturalSettlementName(%d, %d, \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first].c_str(), iterator->second.c_str()); //save tile cultural settlement name
+				for (std::map<int, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileCulturalSettlementName(%d, %d, \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first].c_str(), iterator->second[0].c_str()); //save tile cultural settlement name
 				}
-				for (std::map<CFaction *, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileFactionCulturalSettlementName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first->Civilization].c_str(), iterator->first->Name.c_str(), iterator->second.c_str()); //save tile faction cultural settlement name
+				for (std::map<CFaction *, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileFactionCulturalSettlementName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first->Civilization].c_str(), iterator->first->Name.c_str(), iterator->second[0].c_str()); //save tile faction cultural settlement name
 				}
-				for (std::map<std::pair<int,int>, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second].c_str(), iterator->second.c_str());
+				for (std::map<std::pair<int,int>, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second].c_str(), iterator->second[0].c_str());
 				}
-				for (std::map<std::pair<int,CFaction *>, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileFactionCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second.c_str());
+				for (std::map<std::pair<int,CFaction *>, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileFactionCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second[0].c_str());
 				}
-				for (std::map<std::pair<int,int>, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second].c_str(), iterator->second.c_str());
+				for (std::map<std::pair<int,int>, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second].c_str(), iterator->second[0].c_str());
 				}
-				for (std::map<std::pair<int,CFaction *>, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileFactionCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second.c_str());
+				for (std::map<std::pair<int,CFaction *>, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileFactionCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second[0].c_str());
 				}
 				for (int i = 0; i < MaxDirections; ++i) {
 					std::string direction_name;

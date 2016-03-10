@@ -119,12 +119,12 @@ public:
 
 	Vec2i Position;								/// Position of the tile
 	CWorld *World;
-	std::map<std::pair<int,int>, std::string> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
-	std::map<std::pair<int,CFaction *>, std::string> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
-	std::map<std::pair<int,int>, std::string> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization
-	std::map<std::pair<int,CFaction *>, std::string> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
-	std::map<int, std::string> CulturalSettlementNames;	/// Names for the tile's settlement for each faction
-	std::map<CFaction *, std::string> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
+	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
+	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
+	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization
+	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
+	std::map<int, std::vector<std::string>> CulturalSettlementNames;	/// Names for the tile's settlement for each faction
+	std::map<CFaction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
 };
 
 /*----------------------------------------------------------------------------

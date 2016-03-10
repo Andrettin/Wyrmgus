@@ -148,6 +148,8 @@ extern void PlayMusicName(const std::string &name);
 extern void PlayMusicByGroupRandom(const std::string &group);
 /// Play a music track
 extern void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup);
+/// Play a music track
+extern void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name);
 /// Set a condition for music
 extern void SetMusicCondition(int id, int value);
 /// Increase tension value for the music
