@@ -740,10 +740,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	//Greek characters
 	text = FindAndReplaceString(text, "Ἄ", "A");
 	text = FindAndReplaceString(text, "ἄ", "a");
-	text = FindAndReplaceString(text, "Α", "A");
-	text = FindAndReplaceString(text, "α", "a");
 	text = FindAndReplaceString(text, "Ά", "A");
 	text = FindAndReplaceString(text, "ά", "a");
+	text = FindAndReplaceString(text, "Α", "A");
+	text = FindAndReplaceString(text, "α", "a");
 	text = FindAndReplaceString(text, "Χ", "Ch");
 	text = FindAndReplaceString(text, "χ", "ch");
 	text = FindAndReplaceString(text, "Ἑ", "E");
@@ -756,8 +756,11 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "έ", "e");
 	text = FindAndReplaceString(text, "Γ", "G");
 	text = FindAndReplaceString(text, "γ", "g");
+	text = FindAndReplaceString(text, "Ῑ́", "I");
+	text = FindAndReplaceString(text, "ῑ́", "i");
 	text = FindAndReplaceString(text, "Ί", "I");
 	text = FindAndReplaceString(text, "ί", "i");
+	text = FindAndReplaceString(text, "ῖ", "i");
 	text = FindAndReplaceString(text, "Ι", "I");
 	text = FindAndReplaceString(text, "ι", "i");
 	text = FindAndReplaceString(text, "Η", "I");
