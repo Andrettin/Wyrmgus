@@ -828,7 +828,7 @@ void SetMusicVolume(int volume)
 
 #ifdef USE_OAML
 	if (enableOAML && oaml)
-		oaml->SetVolume(MusicVolume / 100.f);
+		oaml->SetVolume(MusicVolume / 255.f);
 #endif
 }
 
