@@ -18,6 +18,9 @@ $#include "minimap.h"
 $#include "movie.h"
 $#include "netconnect.h"
 $#include "player.h"
+//Wyrmgus start
+$#include "province.h"
+//Wyrmgus end
 $#include "sound.h"
 $#include "sound_server.h"
 $#include "ui.h"
@@ -137,4 +140,6 @@ extern int GetItemClassIdByName(std::string item_class);
 extern std::string GetItemEffectsString(std::string item_ident);
 extern std::string GetUniqueItemEffectsString(std::string item_name);
 extern void SaveHeroes();
+
+extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 //Wyrmgus end

@@ -88,10 +88,8 @@ static int CclDefineCharacter(lua_State *l)
 			character->ExtraName = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "Dynasty")) {
 			character->Dynasty = TransliterateText(LuaToString(l, -1));
-		} else if (!strcmp(value, "NameWord")) {
-			ParseNameWord(l, "person");
-		} else if (!strcmp(value, "NameCompoundElements")) {
-			ParseNameCompoundElements(l, "person");
+		} else if (!strcmp(value, "NameElements")) {
+			ParseNameElements(l, "person");
 		} else if (!strcmp(value, "Description")) {
 			character->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {

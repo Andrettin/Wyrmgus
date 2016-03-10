@@ -51,6 +51,23 @@ class CFaction;
 class CProvince;
 class WorldMapTile;
 
+class WorldMapTerrainType
+{
+public:
+	WorldMapTerrainType() :
+		HasTransitions(false), Water(false), ID(-1), BaseTile(-1), Variations(0)
+	{
+	}
+
+	std::string Name;
+	std::string Tag;				/// used to locate graphic files
+	bool HasTransitions;
+	bool Water;
+	int ID;
+	int BaseTile;
+	int Variations;					/// quantity of variations
+};
+
 class CWorld
 {
 public:
@@ -78,7 +95,6 @@ public:
 	}
 	
 	std::string Name;
-	std::string SettlementName;
 	CWorld *World;
 	std::string Map;
 	std::string SettlementTerrain;
@@ -88,8 +104,6 @@ public:
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
 	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
 	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
-	std::string CulturalSettlementNames[MAX_RACES];						/// Names for the province's settlement for each different culture/civilization
-	std::map<CFaction *, std::string> FactionCulturalSettlementNames;	/// Names for the province's settlement for each different faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
 	std::vector<Vec2i> Tiles;
 };
@@ -105,8 +119,12 @@ public:
 
 	Vec2i Position;								/// Position of the tile
 	CWorld *World;
-	std::map<int, std::string> CulturalNames;	/// Names for the tile for each different culture/civilization
-	std::map<CFaction *, std::string> FactionCulturalNames;	/// Names for the tile for each different faction
+	std::map<std::pair<int,int>, std::string> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
+	std::map<std::pair<int,CFaction *>, std::string> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
+	std::map<std::pair<int,int>, std::string> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization
+	std::map<std::pair<int,CFaction *>, std::string> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
+	std::map<int, std::string> CulturalSettlementNames;	/// Names for the tile's settlement for each faction
+	std::map<CFaction *, std::string> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
 };
 
 /*----------------------------------------------------------------------------
@@ -115,6 +133,8 @@ public:
 
 extern std::vector<CWorld *> Worlds;
 extern std::vector<CProvince *> Provinces;
+extern std::vector<WorldMapTerrainType *>  WorldMapTerrainTypes;
+extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -123,6 +143,7 @@ extern std::vector<CProvince *> Provinces;
 extern void CleanWorlds();
 extern CWorld *GetWorld(std::string world_name);
 extern CProvince *GetProvince(std::string province_name);
+extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern void ProvinceCclRegister();
 
 //@}

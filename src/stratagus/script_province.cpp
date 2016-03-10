@@ -49,6 +49,53 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Define a world map terrain type.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineWorldMapTerrainType(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string terrain_name = LuaToString(l, 1);
+	int terrain_id = GetWorldMapTerrainTypeId(terrain_name);
+	WorldMapTerrainType *terrain_type = NULL;
+	if (terrain_id == -1) {
+		terrain_type = new WorldMapTerrainType;
+		terrain_type->Name = terrain_name;
+		terrain_type->ID = WorldMapTerrainTypes.size();
+		WorldMapTerrainTypes.push_back(terrain_type);
+		WorldMapTerrainTypeStringToIndex[terrain_name] = terrain_type->ID;
+	} else {
+		terrain_type = WorldMapTerrainTypes[terrain_id];
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Tag")) {
+			terrain_type->Tag = LuaToString(l, -1);
+		} else if (!strcmp(value, "HasTransitions")) {
+			terrain_type->HasTransitions = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Water")) {
+			terrain_type->Water = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "BaseTile")) {
+			terrain_type->BaseTile = GetWorldMapTerrainTypeId(LuaToString(l, -1));
+		} else if (!strcmp(value, "Variations")) {
+			terrain_type->Variations = LuaToNumber(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a world.
 **
 **  @param l  Lua state.
@@ -110,9 +157,7 @@ static int CclDefineProvince(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "SettlementName")) {
-			province->SettlementName = LuaToString(l, -1);
-		} else if (!strcmp(value, "World")) {
+		if (!strcmp(value, "World")) {
 			CWorld *world = GetWorld(LuaToString(l, -1));
 			if (world != NULL) {
 				province->World = world;
@@ -152,18 +197,11 @@ static int CclDefineProvince(lua_State *l)
 				}
 				
 				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-word") {
+				if (next_element == "name-elements") {
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameWord(l, "province");
-					}
-					lua_pop(l, 1);
-				} else if (next_element == "name-compound-elements") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameCompoundElements(l, "province");
+						ParseNameElements(l, "province");
 					}
 					lua_pop(l, 1);
 				} else {
@@ -198,104 +236,11 @@ static int CclDefineProvince(lua_State *l)
 				}
 				
 				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-word") {
+				if (next_element == "name-elements") {
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameWord(l, "province");
-					}
-					lua_pop(l, 1);
-				} else if (next_element == "name-compound-elements") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameCompoundElements(l, "province");
-					}
-					lua_pop(l, 1);
-				} else {
-					--j;
-				}
-			}
-		} else if (!strcmp(value, "CulturalSettlementNames")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
-				++j;
-				
-				std::string cultural_name = LuaToString(l, -1, j + 1);
-				
-				province->CulturalSettlementNames[civilization] = TransliterateText(cultural_name);
-				
-				++j;
-				if (j >= subargs) {
-					break;
-				}
-				
-				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-word") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameWord(l, "province");
-					}
-					lua_pop(l, 1);
-				} else if (next_element == "name-compound-elements") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameCompoundElements(l, "settlement");
-					}
-					lua_pop(l, 1);
-				} else {
-					--j;
-				}
-			}
-		} else if (!strcmp(value, "FactionCulturalSettlementNames")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument (expected table)");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
-				if (civilization == -1) {
-					LuaError(l, "Civilization doesn't exist.");
-				}
-				++j;
-				
-				int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, -1, j + 1));
-				if (faction == -1) {
-					LuaError(l, "Faction doesn't exist.");
-				}
-				++j;
-				
-				std::string cultural_name = LuaToString(l, -1, j + 1);
-				
-				province->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
-				
-				++j;
-				if (j >= subargs) {
-					break;
-				}
-				
-				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-word") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameWord(l, "province");
-					}
-					lua_pop(l, 1);
-				} else if (next_element == "name-compound-elements") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameCompoundElements(l, "settlement");
+						ParseNameElements(l, "province");
 					}
 					lua_pop(l, 1);
 				} else {
@@ -376,7 +321,175 @@ static int CclDefineWorldMapTile(lua_State *l)
 			} else {
 				LuaError(l, "World doesn't exist.");
 			}
-		} else if (!strcmp(value, "CulturalNames")) {
+		} else if (!strcmp(value, "CulturalTerrainNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int terrain = GetWorldMapTerrainTypeId(LuaToString(l, -1, j + 1));
+				if (terrain == -1) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				++j;
+				
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				
+				tile->CulturalTerrainNames[std::pair<int,int>(terrain, civilization)] = TransliterateText(cultural_name);
+				
+				++j;
+				if (j >= subargs) {
+					break;
+				}
+				
+				std::string next_element = LuaToString(l, -1, j + 1);
+				if (next_element == "name-elements") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameElements(l, "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name));
+					}
+					lua_pop(l, 1);
+				} else {
+					--j;
+				}
+			}
+		} else if (!strcmp(value, "FactionCulturalTerrainNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int terrain = GetWorldMapTerrainTypeId(LuaToString(l, -1, j + 1));
+				if (terrain == -1) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				++j;
+				
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, -1, j + 1));
+				if (faction == -1) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				
+				tile->FactionCulturalTerrainNames[std::pair<int,CFaction *>(terrain, PlayerRaces.Factions[civilization][faction])] = TransliterateText(cultural_name);
+				
+				++j;
+				if (j >= subargs) {
+					break;
+				}
+				
+				std::string next_element = LuaToString(l, -1, j + 1);
+				if (next_element == "name-elements") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameElements(l, "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name));
+					}
+					lua_pop(l, 1);
+				} else {
+					--j;
+				}
+			}
+		} else if (!strcmp(value, "CulturalResourceNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				
+				tile->CulturalResourceNames[std::pair<int,int>(resource, civilization)] = TransliterateText(cultural_name);
+				
+				++j;
+				if (j >= subargs) {
+					break;
+				}
+				
+				std::string next_element = LuaToString(l, -1, j + 1);
+				if (next_element == "name-elements") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameElements(l, "resource-tile-" + DefaultResourceNames[resource]);
+					}
+					lua_pop(l, 1);
+				} else {
+					--j;
+				}
+			}
+		} else if (!strcmp(value, "FactionCulturalResourceNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, -1, j + 1));
+				if (faction == -1) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				
+				tile->FactionCulturalResourceNames[std::pair<int,CFaction *>(resource, PlayerRaces.Factions[civilization][faction])] = TransliterateText(cultural_name);
+				
+				++j;
+				if (j >= subargs) {
+					break;
+				}
+				
+				std::string next_element = LuaToString(l, -1, j + 1);
+				if (next_element == "name-elements") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameElements(l, "resource-tile-" + DefaultResourceNames[resource]);
+					}
+					lua_pop(l, 1);
+				} else {
+					--j;
+				}
+			}
+		} else if (!strcmp(value, "CulturalSettlementNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
 			}
@@ -390,7 +503,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->CulturalNames[civilization] = TransliterateText(cultural_name);
+				tile->CulturalSettlementNames[civilization] = TransliterateText(cultural_name);
 				
 				++j;
 				if (j >= subargs) {
@@ -398,25 +511,18 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 				
 				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-word") {
+				if (next_element == "name-elements") {
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameWord(l, "terrain-");
-					}
-					lua_pop(l, 1);
-				} else if (next_element == "name-compound-elements") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameCompoundElements(l, "terrain-");
+						ParseNameElements(l, "settlement");
 					}
 					lua_pop(l, 1);
 				} else {
 					--j;
 				}
 			}
-		} else if (!strcmp(value, "FactionCulturalNames")) {
+		} else if (!strcmp(value, "FactionCulturalSettlementNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
 			}
@@ -436,7 +542,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
-				tile->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
+				tile->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
 				
 				++j;
 				if (j >= subargs) {
@@ -444,18 +550,11 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 				
 				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-word") {
+				if (next_element == "name-elements") {
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameWord(l, "terrain-");
-					}
-					lua_pop(l, 1);
-				} else if (next_element == "name-compound-elements") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameCompoundElements(l, "terrain-");
+						ParseNameElements(l, "settlement");
 					}
 					lua_pop(l, 1);
 				} else {
@@ -535,9 +634,6 @@ static int CclGetProvinceData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, province->Name.c_str());
 		return 1;
-	} else if (!strcmp(data, "SettlementName")) {
-		lua_pushstring(l, province->SettlementName.c_str());
-		return 1;
 	} else if (!strcmp(data, "World")) {
 		if (province->World != NULL) {
 			lua_pushstring(l, province->World->Name.c_str());
@@ -611,6 +707,7 @@ static int CclGetProvinces(lua_State *l)
 */
 void ProvinceCclRegister()
 {
+	lua_register(Lua, "DefineWorldMapTerrainType", CclDefineWorldMapTerrainType);
 	lua_register(Lua, "DefineWorld", CclDefineWorld);
 	lua_register(Lua, "DefineProvince", CclDefineProvince);
 	lua_register(Lua, "DefineWorldMapTile", CclDefineWorldMapTile);

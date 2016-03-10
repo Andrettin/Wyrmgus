@@ -436,7 +436,11 @@ int PlayerRace::GetRaceIndexByName(const char *raceName) const
 		return -1;
 	}
 	
-	return CivilizationStringToIndex[civilization_name];
+	if (CivilizationStringToIndex.find(civilization_name) != CivilizationStringToIndex.end()) {
+		return CivilizationStringToIndex[civilization_name];
+	}
+	
+	return -1;
 	//Wyrmgus end
 }
 

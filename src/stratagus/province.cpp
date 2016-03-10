@@ -48,6 +48,8 @@
 
 std::vector<CWorld *> Worlds;
 std::vector<CProvince *> Provinces;
+std::vector<WorldMapTerrainType *>  WorldMapTerrainTypes;
+std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -55,6 +57,11 @@ std::vector<CProvince *> Provinces;
 
 void CleanWorlds()
 {
+	for (size_t i = 0; i < WorldMapTerrainTypes.size(); ++i) {
+		delete WorldMapTerrainTypes[i];
+	}
+	WorldMapTerrainTypes.clear();
+	
 	for (size_t i = 0; i < Worlds.size(); ++i) {
 		for (std::map<std::pair<int,int>, WorldMapTile *>::iterator iterator = Worlds[i]->Tiles.begin(); iterator != Worlds[i]->Tiles.end(); ++iterator) {
 			delete iterator->second;
@@ -88,6 +95,23 @@ CProvince *GetProvince(std::string province_name)
 		}
 	}
 	return NULL;
+}
+
+
+/**
+**  Get the ID of a world map terrain type
+*/
+int GetWorldMapTerrainTypeId(std::string terrain_type_name)
+{
+	if (terrain_type_name.empty()) {
+		return -1;
+	}
+	
+	if (WorldMapTerrainTypeStringToIndex.find(terrain_type_name) != WorldMapTerrainTypeStringToIndex.end()) {
+		return WorldMapTerrainTypeStringToIndex[terrain_type_name];
+	}
+	
+	return -1;
 }
 
 //@}

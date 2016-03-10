@@ -77,22 +77,6 @@ enum DiplomacyStates {
 	MaxDiplomacyStates
 };
 
-class WorldMapTerrainType
-{
-public:
-	WorldMapTerrainType() :
-		Name(""), Tag(""), HasTransitions(false), Water(false), BaseTile(-1), Variations(0)
-	{
-	}
-
-	std::string Name;
-	std::string Tag;				/// used to locate graphic files
-	bool HasTransitions;
-	bool Water;
-	int BaseTile;
-	int Variations;					/// quantity of variations
-};
-
 class GrandStrategyWorldMapTile : public WorldMapTile
 {
 public:
@@ -115,6 +99,7 @@ public:
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	std::string GetCulturalName();										/// Get the tile's cultural name.
+	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
 	int Terrain;							/// Tile terrain (i.e. plains)
 	int Province;							/// Province to which the tile belongs
@@ -186,12 +171,8 @@ public:
 	int GetClassUnitType(int class_id);
 	int GetFoodCapacity(bool subtract_non_food);
 	std::string GetCulturalName();										/// Get the province's cultural name.
-	std::string GetCulturalSettlementName();							/// Get the province's cultural settlement name.
 	std::string GenerateProvinceName(int civilization, int faction = -1);
-	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
-	std::string Name;
-	std::string SettlementName;
 	int Civilization;													/// Civilization of the province (-1 = no one).
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	int CurrentConstruction;											/// Building currently under construction (unit type index).
@@ -364,7 +345,6 @@ public:
 		memset(BarracksGraphics, 0, sizeof(BarracksGraphics));
 		memset(SettlementMasonryGraphics, 0, sizeof(SettlementMasonryGraphics));
 		memset(NationalBorderGraphics, 0, sizeof(NationalBorderGraphics));
-		memset(TerrainTypes, 0, sizeof(TerrainTypes));
 		memset(Rivers, 0, sizeof(Rivers));
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
@@ -405,7 +385,6 @@ public:
 	CPlayerColorGraphic *BarracksGraphics[MAX_RACES];
 	CPlayerColorGraphic *SettlementMasonryGraphics[MAX_RACES];
 	CPlayerColorGraphic *NationalBorderGraphics[MaxDirections];	///one for each direction
-	WorldMapTerrainType *TerrainTypes[WorldMapTerrainTypeMax];
 	GrandStrategyWorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	std::vector<CGrandStrategyProvince *> Provinces;
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
@@ -463,14 +442,17 @@ extern std::string GetWorldMapTileTerrain(int x, int y);
 extern int GetWorldMapTileTerrainVariation(int x, int y);
 extern std::string GetWorldMapTileProvinceName(int x, int y);
 extern bool WorldMapTileHasResource(int x, int y, std::string resource_name, bool ignore_prospection);
-extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern int GetProvinceId(std::string province_name);
 extern void SetWorldMapSize(int width, int height);
 extern void SetWorldMapTileTerrain(int x, int y, int terrain);
 extern void SetWorldMapTileProvince(int x, int y, std::string province_name);
 extern void SetWorldMapTileName(int x, int y, std::string name);
-extern void SetWorldMapTileCulturalName(int x, int y, std::string civilization_name, std::string cultural_name);
-extern void SetWorldMapTileFactionCulturalName(int x, int y, std::string civilization_name, std::string faction_name, std::string cultural_name);
+extern void SetWorldMapTileCulturalTerrainName(int x, int y, std::string terrain_name, std::string civilization_name, std::string cultural_name);
+extern void SetWorldMapTileFactionCulturalTerrainName(int x, int y, std::string terrain_name, std::string civilization_name, std::string faction_name, std::string cultural_name);
+extern void SetWorldMapTileCulturalResourceName(int x, int y, std::string resource_name, std::string civilization_name, std::string cultural_name);
+extern void SetWorldMapTileFactionCulturalResourceName(int x, int y, std::string resource_name, std::string civilization_name, std::string faction_name, std::string cultural_name);
+extern void SetWorldMapTileCulturalSettlementName(int x, int y, std::string civilization_name, std::string cultural_name);
+extern void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civilization_name, std::string faction_name, std::string cultural_name);
 extern int GetRiverId(std::string river_name);
 extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name);
 extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);
@@ -491,12 +473,9 @@ extern void SetProvinceName(std::string old_province_name, std::string new_provi
 extern void SetProvinceWater(std::string province_name, bool water);
 extern void SetProvinceOwner(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void SetProvinceCivilization(std::string province_name, std::string civilization_name);
-extern void SetProvinceSettlementName(std::string province_name, std::string settlement_name);
 extern void SetProvinceSettlementLocation(std::string province_name, int x, int y);
 extern void SetProvinceCulturalName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
 extern void SetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
-extern void SetProvinceCulturalSettlementName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
-extern void SetProvinceFactionCulturalSettlementName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
 extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident);

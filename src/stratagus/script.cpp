@@ -2803,15 +2803,23 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (!GrandStrategyGame.WorldMapTiles[x][y]->Name.empty()) {
 					fprintf(fd, "SetWorldMapTileName(%d, %d, \"%s\")\n", x, y, GrandStrategyGame.WorldMapTiles[x][y]->Name.c_str()); //save tile name
 				}
-				for (int i = 0; i < MAX_RACES; ++i) {
-					if (GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames.find(i) != GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames.end()) {
-						fprintf(fd, "SetWorldMapTileCulturalName(%d, %d, \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[i].c_str(), GrandStrategyGame.WorldMapTiles[x][y]->CulturalNames[i].c_str()); //save tile cultural name
-					}
-					for (int j = 0; j < FactionMax; ++j) {
-						if (GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.find(PlayerRaces.Factions[i][j]) != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames.end()) {
-							fprintf(fd, "SetWorldMapTileFactionCulturalName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalNames[PlayerRaces.Factions[i][j]].c_str()); //save tile faction cultural name
-						}
-					}
+				for (std::map<int, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileCulturalSettlementName(%d, %d, \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first].c_str(), iterator->second.c_str()); //save tile cultural settlement name
+				}
+				for (std::map<CFaction *, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileFactionCulturalSettlementName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first->Civilization].c_str(), iterator->first->Name.c_str(), iterator->second.c_str()); //save tile faction cultural settlement name
+				}
+				for (std::map<std::pair<int,int>, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second].c_str(), iterator->second.c_str());
+				}
+				for (std::map<std::pair<int,CFaction *>, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileFactionCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second.c_str());
+				}
+				for (std::map<std::pair<int,int>, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second].c_str(), iterator->second.c_str());
+				}
+				for (std::map<std::pair<int,CFaction *>, std::string>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.end(); ++iterator) {
+					fprintf(fd, "SetWorldMapTileFactionCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second.c_str());
 				}
 				for (int i = 0; i < MaxDirections; ++i) {
 					std::string direction_name;
@@ -2893,9 +2901,6 @@ void SaveGrandStrategyGame(const std::string &filename)
 		
 		//now save the provinces' data
 		for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) { //save province information
-			if (!GrandStrategyGame.Provinces[i]->SettlementName.empty()) {
-				fprintf(fd, "SetProvinceSettlementName(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->SettlementName.c_str()); //save the province's settlement name
-			}
 			if (GrandStrategyGame.Provinces[i]->Civilization != -1) {
 				fprintf(fd, "SetProvinceCivilization(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Civilization].c_str()); //save the province's civilization
 			}
@@ -2943,15 +2948,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (!GrandStrategyGame.Provinces[i]->CulturalNames[j].empty()) {
 					fprintf(fd, "SetProvinceCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Provinces[i]->CulturalNames[j].c_str());
 				}
-				if (!GrandStrategyGame.Provinces[i]->CulturalSettlementNames[j].empty()) {
-					fprintf(fd, "SetProvinceCulturalSettlementName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Provinces[i]->CulturalSettlementNames[j].c_str());
-				}
 				for (int k = 0; k < FactionMax; ++k) {
 					if (GrandStrategyGame.Provinces[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != GrandStrategyGame.Provinces[i]->FactionCulturalNames.end()) {
 						fprintf(fd, "SetProvinceFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Name.c_str(), GrandStrategyGame.Provinces[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]].c_str());
-					}
-					if (GrandStrategyGame.Provinces[i]->FactionCulturalSettlementNames.find(PlayerRaces.Factions[j][k]) != GrandStrategyGame.Provinces[i]->FactionCulturalSettlementNames.end()) {
-						fprintf(fd, "SetProvinceFactionCulturalSettlementName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Name.c_str(), GrandStrategyGame.Provinces[i]->FactionCulturalSettlementNames[PlayerRaces.Factions[j][k]].c_str());
 					}
 				}
 			}
@@ -3081,106 +3080,45 @@ void SaveGrandStrategyGame(const std::string &filename)
 }
 
 /**
-**  Parse name word
+**  Parse name
 **
 **  @param l      Lua state.
 **  @param type   Name type
 */
-void ParseNameWord(lua_State *l, std::string type)
-{
-	if (!lua_istable(l, -1)) {
-		LuaError(l, "incorrect argument");
-	}
-	int j = 0;
-	int name_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
-	++j;
-	int name_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
-	++j;
-			
-	std::vector<std::string> word_meanings;
-	lua_rawgeti(l, -1, j + 1);
-	if (lua_istable(l, -1)) {
-		const int subargs = lua_rawlen(l, -1);
-		for (int k = 0; k < subargs; ++k) {
-			word_meanings.push_back(LuaToString(l, -1, k + 1));
-		}
-				
-		++j;
-	}
-	lua_pop(l, 1);
-			
-	int grammatical_number = GrammaticalNumberSingular;
-	if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
-		std::string grammatical_number_name = LuaToString(l, -1, j + 1);
-		grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
-		if (grammatical_number == -1) {
-			LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
-		}
-		++j;
-	}
-				
-	int grammatical_case = GrammaticalCaseNominative;
-	if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
-		std::string grammatical_case_name = LuaToString(l, -1, j + 1);
-		grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
-		if (grammatical_case == -1) {
-			LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
-		}
-		++j;
-	}
-					
-	int grammatical_tense = GrammaticalTenseNoTense;
-	if (GetGrammaticalTenseIdByName(LuaToString(l, -1, j + 1)) != -1) {
-		std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
-		grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
-		if (grammatical_tense == -1) {
-			LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
-		}
-		++j;
-	}
-
-	if (name_language != -1 && name_word_type != -1) {
-		std::string name_word = LuaToString(l, -1, j + 1);
-		LanguageWord *name_element = PlayerRaces.Languages[name_language]->GetWord(name_word, name_word_type, word_meanings);
-				
-		if (name_element != NULL) {
-			if (name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].find(type) == name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].end()) {
-				name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] = 0;
-			}
-			name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] += 1;
-					
-			name_element->AddToLanguageNameTypes(type);
-		} else {
-			LuaError(l, "The \"%s\" name is set to be formed by the word \"%s\" (%s, %s), but the latter doesn't exist" _C_ type.c_str() _C_ name_word.c_str() _C_ PlayerRaces.Languages[name_language]->Name.c_str() _C_ GetWordTypeNameById(name_word_type).c_str());
-		}
-	} else {
-		LuaError(l, "The \"%s\" name word is incorrectly set, as either the language or the word type set for the word is incorrect" _C_ type.c_str());
-	}
-}
-
-/**
-**  Parse name compound elements
-**
-**  @param l      Lua state.
-**  @param type   Name type
-*/
-void ParseNameCompoundElements(lua_State *l, std::string type)
+void ParseNameElements(lua_State *l, std::string type)
 {
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
 	const int args = lua_rawlen(l, -1);
 	for (int j = 0; j < args; ++j) {
-		std::string affix_type_name = LuaToString(l, -1, j + 1);
-		int affix_type = GetAffixTypeIdByName(affix_type_name);
-		if (affix_type == -1) {
-			LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
+		std::string word_junction_type_name = LuaToString(l, -1, j + 1);
+		int word_junction_type = WordJunctionTypeCompound;
+		if (GetWordJunctionTypeIdByName(word_junction_type_name) != -1) {
+			word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
+			if (word_junction_type == -1) {
+				LuaError(l, "Word junction type \"%s\" doesn't exist." _C_ word_junction_type_name.c_str());
+			}
+			++j;
+		} else if (word_junction_type_name == "word") {
+			word_junction_type = -1;
+			++j;
+		}				
+		
+		int affix_type = -1;
+		if (word_junction_type != -1) {
+			std::string affix_type_name = LuaToString(l, -1, j + 1);
+			affix_type = GetAffixTypeIdByName(affix_type_name);
+			if (affix_type == -1) {
+				LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
+			}
+			++j;
 		}
-		++j;
 				
-		int affix_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
+		int element_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1, j + 1));
 		++j;
-		int affix_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
+		
+		int element_word_type = GetWordTypeIdByName(LuaToString(l, -1, j + 1));
 		++j;
 				
 		std::vector<std::string> word_meanings;
@@ -3225,19 +3163,28 @@ void ParseNameCompoundElements(lua_State *l, std::string type)
 			++j;
 		}
 
-		if (affix_language != -1 && affix_word_type != -1) {
-			std::string affix_word = LuaToString(l, -1, j + 1);
-			LanguageWord *compound_element = PlayerRaces.Languages[affix_language]->GetWord(affix_word, affix_word_type, word_meanings);
+		if (element_language != -1 && element_word_type != -1) {
+			std::string element_word = LuaToString(l, -1, j + 1);
+			LanguageWord *name_element = PlayerRaces.Languages[element_language]->GetWord(element_word, element_word_type, word_meanings);
 					
-			if (compound_element != NULL) {
-				if (compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense].find(type) == compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense].end()) {
-					compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] = 0;
+			if (name_element != NULL) {
+				if (word_junction_type != -1 && affix_type != -1) {
+					if (name_element->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].find(type) == name_element->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].end()) {
+						name_element->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] = 0;
+					}
+					name_element->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
+					
+					name_element->AddToLanguageAffixNameTypes(type, word_junction_type, affix_type);
+				} else {
+					if (name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].find(type) == name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].end()) {
+						name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] = 0;
+					}
+					name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] += 1;
+							
+					name_element->AddToLanguageNameTypes(type);
 				}
-				compound_element->AffixNameTypes[WordJunctionTypeCompound][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
-				
-				compound_element->AddToLanguageAffixNameTypes(type, WordJunctionTypeCompound, affix_type);
 			} else {
-				LuaError(l, "The \"%s\" name is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist." _C_ type.c_str() _C_ affix_word.c_str() _C_ PlayerRaces.Languages[affix_language]->Name.c_str() _C_ GetWordTypeNameById(affix_word_type).c_str());
+				LuaError(l, "The \"%s\" name is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist." _C_ type.c_str() _C_ element_word.c_str() _C_ PlayerRaces.Languages[element_language]->Name.c_str() _C_ GetWordTypeNameById(element_word_type).c_str());
 			}
 		} else {
 			LuaError(l, "The \"%s\" name compound elements are incorrectly set, as either the language or the word type set for one of the element words given is incorrect." _C_ type.c_str());
@@ -3265,59 +3212,6 @@ void LoadCcl(const std::string &filename, const std::string &luaArgStr)
 	LuaGarbageCollect();
 }
 
-//Wyrmgus start
-//Grand Strategy elements
-
-/**
-**  Define the world map terrain types
-**
-**  @param l  Lua state.
-*/
-static int CclDefineWorldMapTerrainTypes(lua_State *l)
-{
-	int args = lua_gettop(l);
-	for (int j = 0; j < args; ++j) {
-		const char *value = LuaToString(l, j + 1);
-		if (!strcmp(value, "terrain-type")) {
-			WorldMapTerrainType *terrain_type = new WorldMapTerrainType;
-			GrandStrategyGame.TerrainTypes[j / 2] = terrain_type;
-			++j;
-			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
-			}
-			int subargs = lua_rawlen(l, j + 1);
-			for (int k = 0; k < subargs; ++k) {
-				value = LuaToString(l, j + 1, k + 1);
-				if (!strcmp(value, "name")) {
-					++k;
-					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->Name = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "tag")) {
-					++k;
-					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->Tag = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "has-transitions")) {
-					++k;
-					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->HasTransitions = LuaToBoolean(l, j + 1, k + 1);
-				} else if (!strcmp(value, "water")) {
-					++k;
-					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->Water = LuaToBoolean(l, j + 1, k + 1);
-				} else if (!strcmp(value, "base-tile")) {
-					++k;
-					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->BaseTile = GetWorldMapTerrainTypeId(LuaToString(l, j + 1, k + 1));
-				} else if (!strcmp(value, "variations")) {
-					++k;
-					GrandStrategyGame.TerrainTypes[(j - 1) / 2]->Variations = LuaToNumber(l, j + 1, k + 1);
-				} else {
-					LuaError(l, "Unsupported tag: %s" _C_ value);
-				}
-			}
-		} else {
-			LuaError(l, "Unsupported tag: %s" _C_ value);
-		}
-	}
-
-	return 0;
-}
-
 void ScriptRegister()
 {
 	AliasRegister();
@@ -3338,10 +3232,6 @@ void ScriptRegister()
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
-	
-	//Wyrmgus start
-	lua_register(Lua, "DefineWorldMapTerrainTypes", CclDefineWorldMapTerrainTypes);
-	//Wyrmgus end
 }
 
 //@}
