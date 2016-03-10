@@ -45,6 +45,9 @@
 
 #include "iocompat.h"
 #include "iolib.h"
+//Wyrmgus start
+#include "player.h" // for playing faction music
+//Wyrmgus end
 #include "unit.h"
 
 #include "SDL.h"
@@ -791,8 +794,12 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 #ifdef USE_OAML
 	if (enableOAML && oaml)
 		if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) == -1) {
-			if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) == -1) {
-				oaml->PlayTrackByGroupRandom(group.c_str());
+			int civilization = GetRaceIndexByName(civilization_name.c_str());
+			int parent_faction = PlayerRaces.Factions[civilization][GetFactionIndexByName(civilization, faction_name)]->ParentFaction;
+			if (parent_faction == -1 || oaml->PlayMusicByGroupAndFactionRandom(group.c_str(), PlayerRaces.Factions[civilization][parent_faction]->Name.c_str()) == -1) {
+				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) == -1) {
+					oaml->PlayTrackByGroupRandom(group.c_str());
+				}
 			}
 		}
 #endif
