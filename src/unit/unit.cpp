@@ -1751,6 +1751,13 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	}
 	
 	//Wyrmgus start
+	//assign a gender to the unit
+	if (this->Variable[GENDER_INDEX].Value == NoGender && this->Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
+		this->Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
+		this->Variable[GENDER_INDEX].Max = MaxGenders;
+		this->Variable[GENDER_INDEX].Enable = 1;
+	}
+	
 	//generate a personal name for the unit, if applicable
 	if (this->Character == NULL) {
 		this->UpdatePersonalName();
@@ -2172,7 +2179,7 @@ void CUnit::UpdatePersonalName()
 	if (!new_personal_name.empty()) {
 		this->Name = new_personal_name;
 	} else {
-		this->Name = GeneratePersonalName(language, this->Type->Slot);
+		this->Name = GeneratePersonalName(language, this->Type->Slot, this->Variable[GENDER_INDEX].Value);
 	}
 }
 

@@ -72,7 +72,7 @@ static int CclDefineCharacter(lua_State *l)
 	if (!character) {
 		character = new CCharacter;
 		Characters.push_back(character);
-	} else if (!character->Persistent) {
+	} else if (!character->Persistent && character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with the names and gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
 		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_full_name.c_str());
 	}
 	
@@ -89,7 +89,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Dynasty")) {
 			character->Dynasty = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "NameElements")) {
-			ParseNameElements(l, "person");
+			ParseNameElements(l, "person-" + GetGenderNameById(character->Gender));
 		} else if (!strcmp(value, "Description")) {
 			character->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
@@ -354,7 +354,7 @@ static int CclDefineCharacter(lua_State *l)
 	}
 	
 	//check if the abilities are correct for this character's unit type
-	if (character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
+	if (character->Type != NULL && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
 		int ability_count = (int) character->Abilities.size();
 		for (int i = (ability_count - 1); i >= 0; --i) {
 			if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {

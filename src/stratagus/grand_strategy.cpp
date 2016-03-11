@@ -3043,7 +3043,9 @@ void CGrandStrategyFaction::GenerateRuler()
 		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
 			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("infantry")));
 		}
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-shooter")));
+		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
 			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")));
 		}
 		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
@@ -3070,7 +3072,7 @@ void CGrandStrategyFaction::GenerateRuler()
 	if (civilization != -1 && this->Civilization == civilization && this->Faction != -1) {
 		language = PlayerRaces.GetFactionLanguage(civilization, this->Faction);
 	}
-	std::string hero_name = GeneratePersonalName(language, unit_type_id);
+	std::string hero_name = GeneratePersonalName(language, unit_type_id, MaleGender);
 	
 	if (hero_name.empty()) { //if civilization can't generate personal names, return
 		return;
@@ -3078,9 +3080,9 @@ void CGrandStrategyFaction::GenerateRuler()
 	
 	std::string hero_extra_name;
 	if (GrandStrategyGame.GetHero(hero_name) != NULL) { // generate extra given names if this name is already used by an existing hero
-		hero_extra_name = GeneratePersonalName(language, unit_type_id);
+		hero_extra_name = GeneratePersonalName(language, unit_type_id, MaleGender);
 		while (GrandStrategyGame.GetHero(hero_name + " " + hero_extra_name) != NULL) {
-			hero_extra_name += " " + GeneratePersonalName(language, unit_type_id);
+			hero_extra_name += " " + GeneratePersonalName(language, unit_type_id, MaleGender);
 		}
 	}
 	CGrandStrategyHero *hero = new CGrandStrategyHero;

@@ -522,6 +522,7 @@ void PrintOnStdOut(const char *format, ...)
 }
 
 //Wyrmgus start
+#include "character.h" //for personal name generation
 #include "editor.h" //for personal name generation
 #include "player.h" //for personal name generation
 #include "unittype.h" //for personal name generation
@@ -667,8 +668,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "Œ", "O");
-	text = FindAndReplaceString(text, "œ", "o");
+	text = FindAndReplaceString(text, "Œ", "Oe");
+	text = FindAndReplaceString(text, "œ", "oe");
 	text = FindAndReplaceString(text, "Ṛ́", "R");
 	text = FindAndReplaceString(text, "ṛ́", "r");
 	text = FindAndReplaceString(text, "R̄", "R");
@@ -800,6 +801,9 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "β", "v");
 	text = FindAndReplaceString(text, "Ύ", "Y");
 	text = FindAndReplaceString(text, "ύ", "y");
+	
+	//remove large clusters of the same letters
+	text = FindAndReplaceString(text, "nnn", "nn");
 	
 	return text;
 }
@@ -955,7 +959,7 @@ std::string SeparateCapitalizedStringElements(std::string text)
 /**
 **  Generates a personal name.
 */
-std::string GeneratePersonalName(int language, int unit_type_id)
+std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 {
 	const CUnitType &type = *UnitTypes[unit_type_id];
 	std::string personal_name;
@@ -977,7 +981,10 @@ std::string GeneratePersonalName(int language, int unit_type_id)
 		)
 	) {
 		if (type.BoolFlag[ORGANIC_INDEX].value) {
-			personal_name = GenerateName(language, "person");
+			personal_name = GenerateName(language, "person-" + GetGenderNameById(gender));
+			if (personal_name.empty()) {
+				personal_name = GenerateName(language, "person");
+			}
 		} else if (!type.Class.empty()) {
 			personal_name = GenerateName(language, "unit-class-" + type.Class);
 		}
@@ -992,7 +999,7 @@ std::string GeneratePersonalName(std::string language_ident, std::string unit_ty
 {
 	int language = PlayerRaces.GetLanguageIndexByIdent(language_ident);
 	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-	return GeneratePersonalName(language, unit_type_id);
+	return GeneratePersonalName(language, unit_type_id, UnitTypes[unit_type_id]->DefaultStat.Variables[GENDER_INDEX].Value);
 }
 
 std::string GenerateName(int language, std::string type)

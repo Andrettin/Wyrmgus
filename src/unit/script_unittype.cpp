@@ -3022,12 +3022,6 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 	
-	if (unit.Variable[GENDER_INDEX].Value == NoGender && unit.Type->BoolFlag[ORGANIC_INDEX].value) { // Gender: 0 = Not Set, 1 = Male, 2 = Female, 3 = Asexual
-		unit.Variable[GENDER_INDEX].Value = SyncRand(2) + 1;
-		unit.Variable[GENDER_INDEX].Max = MaxGenders;
-		unit.Variable[GENDER_INDEX].Enable = 1;
-	}
-	
 	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && !unit.Type->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
 		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->ChildUpgrade));
