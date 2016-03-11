@@ -71,6 +71,14 @@
 #include "video.h"
 
 #include <guichan.h>
+
+#ifdef USE_OAML
+#include <oaml.h>
+
+extern oamlApi *oaml;
+extern bool enableOAML;
+#endif
+
 void DrawGuichanWidgets();
 
 //----------------------------------------------------------------------------
@@ -417,6 +425,13 @@ static void GameLogicLoop()
 	// FIXME: We need find better place!
 	SaveGameLoading = false;
 
+#ifdef USE_OAML
+	if (enableOAML && oaml) {
+		// Time of day can change our main music loop, if the current playing track is set for this
+		oaml->SetMainLoopCondition(GameTimeOfDay);
+	}
+#endif
+
 	//
 	// Game logic part
 	//
@@ -486,6 +501,14 @@ static void GameLogicLoop()
 				// indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 				GameTimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day"
 			}
+
+#ifdef USE_OAML
+			if (enableOAML && oaml) {
+				// Time of day can change our main music loop, if the current playing track is set for this
+				oaml->SetMainLoopCondition(GameTimeOfDay);
+			}
+#endif
+
 			//update the sight of all units
 			for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 				CUnit &unit = **it;

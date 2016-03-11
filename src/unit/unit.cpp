@@ -4612,6 +4612,7 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile, bool show_damage)
 //Wyrmgus end
 {
+	const CUnitType *type = target.Type;
 	if (!damage) {
 		// Can now happen by splash damage
 		// Multiple places send x/y as damage, which may be zero
@@ -4629,6 +4630,17 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 
 	Assert(damage != 0 && target.CurrentAction() != UnitActionDie && !target.Type->BoolFlag[VANISHES_INDEX].value);
 
+	//Wyrmgus start
+	if ((attacker != NULL && attacker->Player == ThisPlayer) &&
+		target.Player != ThisPlayer &&
+		(type->Building == 1 ||
+		type->CanAttack == 1)
+		) {
+		// If player is hitting or being hit add tension to our music
+		AddMusicTension(1);
+	}
+	//Wyrmgus end
+
 	if (GodMode) {
 		if (attacker && attacker->Player == ThisPlayer) {
 			damage = target.Variable[HP_INDEX].Value;
@@ -4638,7 +4650,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 		}
 	}
 	HitUnit_LastAttack(attacker, target);
-	const CUnitType *type = target.Type;
 	if (attacker) {
 		target.DamagedType = ExtraDeathIndex(attacker->Type->DamageType.c_str());
 	}
