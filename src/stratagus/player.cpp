@@ -2362,7 +2362,9 @@ int GetArticleTypeIdByName(std::string article_type)
 
 std::string GetGrammaticalCaseNameById(int grammatical_case)
 {
-	if (grammatical_case == GrammaticalCaseNominative) {
+	if (grammatical_case == GrammaticalCaseNoCase) {
+		return "no-case";
+	} else if (grammatical_case == GrammaticalCaseNominative) {
 		return "nominative";
 	} else if (grammatical_case == GrammaticalCaseAccusative) {
 		return "accusative";
@@ -2377,7 +2379,9 @@ std::string GetGrammaticalCaseNameById(int grammatical_case)
 
 int GetGrammaticalCaseIdByName(std::string grammatical_case)
 {
-	if (grammatical_case == "nominative") {
+	if (grammatical_case == "no-case") {
+		return GrammaticalCaseNoCase;
+	} else if (grammatical_case == "nominative") {
 		return GrammaticalCaseNominative;
 	} else if (grammatical_case == "accusative") {
 		return GrammaticalCaseAccusative;
@@ -2805,13 +2809,19 @@ std::string LanguageWord::GetAdjectiveInflection(int comparison_degree, int arti
 {
 	std::string inflected_word;
 	
-	if (!this->ComparisonDegreeInflections[comparison_degree].empty()) {
-		inflected_word = this->ComparisonDegreeInflections[comparison_degree];
+	if (grammatical_case == -1) {
+		grammatical_case = GrammaticalCaseNoCase;
+	}
+	
+	if (!this->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case].empty()) {
+		inflected_word = this->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case];
+	} else if (!this->ComparisonDegreeCaseInflections[comparison_degree][GrammaticalCaseNoCase].empty()) {
+		inflected_word = this->ComparisonDegreeCaseInflections[comparison_degree][GrammaticalCaseNoCase];
 	} else {
 		inflected_word = this->Word;
 	}
 	
-	if (article_type != -1 && grammatical_case != -1) {
+	if (article_type != -1 && grammatical_case != GrammaticalCaseNoCase && this->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case].empty()) {
 		inflected_word += PlayerRaces.Languages[this->Language]->GetAdjectiveEnding(article_type, grammatical_case, grammatical_number, grammatical_gender);
 	}
 	

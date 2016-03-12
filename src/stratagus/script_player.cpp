@@ -1008,7 +1008,7 @@ static int CclDefineLanguageWord(lua_State *l)
 
 				word->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood] = LuaToString(l, -1, j + 1);
 			}
-		} else if (!strcmp(value, "ComparisonDegreeInflections")) {
+		} else if (!strcmp(value, "ComparisonDegreeCaseInflections")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -1021,7 +1021,17 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				++j;
 				
-				word->ComparisonDegreeInflections[comparison_degree] = LuaToString(l, -1, j + 1);
+				int grammatical_case = GrammaticalCaseNoCase;
+				if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
+					std::string grammatical_case_name = LuaToString(l, -1, j + 1);
+					grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
+					if (grammatical_case == -1) {
+						LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
+					}
+					++j;
+				}
+				
+				word->ComparisonDegreeCaseInflections[comparison_degree][grammatical_case] = LuaToString(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "Participles")) {
 			if (!lua_istable(l, -1)) {

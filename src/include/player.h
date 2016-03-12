@@ -326,6 +326,7 @@ enum ArticleTypes {
 };
 
 enum GrammaticalCases {
+	GrammaticalCaseNoCase,
 	GrammaticalCaseNominative,
 	GrammaticalCaseAccusative,
 	GrammaticalCaseDative,
@@ -480,7 +481,7 @@ public:
 	bool Archaic;										/// Whether the word is archaic (whether it is used in current speech)
 	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
 	std::string NumberPersonTenseMoodInflections[MaxGrammaticalNumbers][MaxGrammaticalPersons][MaxGrammaticalTenses][MaxGrammaticalMoods];	/// For verbs
-	std::string ComparisonDegreeInflections[MaxComparisonDegrees];	/// For adjectives
+	std::string ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
 	std::string Participles[MaxGrammaticalTenses];		/// For verbs
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
 	LanguageWord *DerivesFrom;    						/// From which word does this word derive
