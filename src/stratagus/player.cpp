@@ -3186,7 +3186,7 @@ void GenerateMissingLanguageData()
 	// first build a vector with all the types
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = PlayerRaces.Languages[i]->NameTypeWords.begin(); iterator != PlayerRaces.Languages[i]->NameTypeWords.end(); ++iterator) {
-			if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first.find("item-") != std::string::npos) {
+			if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first.find("item-") != std::string::npos || iterator->first == "person-female") {
 				continue;
 			}
 			if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {
@@ -3196,7 +3196,7 @@ void GenerateMissingLanguageData()
 		for (int j = 0; j < MaxWordJunctionTypes; ++j) {
 			for (int k = 0; k < MaxAffixTypes; ++k) {
 				for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = PlayerRaces.Languages[i]->NameTypeAffixes[j][k].begin(); iterator != PlayerRaces.Languages[i]->NameTypeAffixes[j][k].end(); ++iterator) {
-					if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first.find("item-") != std::string::npos) {
+					if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first.find("item-") != std::string::npos || iterator->first == "person-female") {
 						continue;
 					}
 					if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {

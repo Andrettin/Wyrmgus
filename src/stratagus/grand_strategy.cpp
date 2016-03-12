@@ -5153,7 +5153,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 		GrandStrategyGame.Heroes.push_back(hero);
 		hero->Name = Characters[i]->Name;
 		hero->ExtraName = Characters[i]->ExtraName;
-		hero->Dynasty = Characters[i]->Dynasty;
+		hero->FamilyName = Characters[i]->FamilyName;
 		if (Characters[i]->Type != NULL) {
 			hero->Type = const_cast<CUnitType *>(&(*Characters[i]->Type));
 		}
@@ -5198,7 +5198,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 		GrandStrategyGame.Heroes.push_back(hero);
 		hero->Name = CurrentCustomHero->Name;
 		hero->ExtraName = CurrentCustomHero->ExtraName;
-		hero->Dynasty = CurrentCustomHero->Dynasty;
+		hero->FamilyName = CurrentCustomHero->FamilyName;
 		if (CurrentCustomHero->Type != NULL) {
 			hero->Type = const_cast<CUnitType *>(&(*CurrentCustomHero->Type));
 		}
@@ -6271,7 +6271,7 @@ void CreateGrandStrategyCustomHero(std::string hero_full_name)
 	GrandStrategyGame.Heroes.push_back(hero);
 	hero->Name = custom_hero->Name;
 	hero->ExtraName = custom_hero->ExtraName;
-	hero->Dynasty = custom_hero->Dynasty;
+	hero->FamilyName = custom_hero->FamilyName;
 	if (custom_hero->Type != NULL) {
 		hero->Type = const_cast<CUnitType *>(&(*custom_hero->Type));
 	}

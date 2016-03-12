@@ -113,8 +113,8 @@ std::string CCharacter::GetFullName()
 	if (!this->ExtraName.empty()) {
 		full_name += " " + this->ExtraName;
 	}
-	if (!this->Dynasty.empty()) {
-		full_name += " " + this->Dynasty;
+	if (!this->FamilyName.empty()) {
+		full_name += " " + this->FamilyName;
 	}
 	return full_name;
 }
@@ -238,8 +238,8 @@ void SaveHero(CCharacter *hero)
 		if (!hero->ExtraName.empty()) {
 			fprintf(fd, "\tExtraName = \"%s\",\n", hero->ExtraName.c_str());
 		}
-		if (!hero->Dynasty.empty()) {
-			fprintf(fd, "\tDynasty = \"%s\",\n", hero->Dynasty.c_str());
+		if (!hero->FamilyName.empty()) {
+			fprintf(fd, "\tFamilyName = \"%s\",\n", hero->FamilyName.c_str());
 		}
 		if (hero->Gender != NoGender) {
 			fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(hero->Gender).c_str());
@@ -446,7 +446,7 @@ std::string GetCurrentCustomHero()
 	}
 }
 
-void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_dynasty_name)
+void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_family_name)
 {
 	if (!hero_full_name.empty()) {
 		CCharacter *hero = GetCustomHero(hero_full_name);
@@ -479,19 +479,19 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 			if (new_unit_type_id != -1) {
 				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
 				hero->Name = new_hero_name;
-				hero->Dynasty = new_hero_dynasty_name;
+				hero->FamilyName = new_hero_family_name;
 				SaveHero(hero);
 			}
 		}
 	}
 }
 
-bool IsNameValidForCustomHero(std::string hero_name, std::string hero_dynasty_name)
+bool IsNameValidForCustomHero(std::string hero_name, std::string hero_family_name)
 {
 	std::string hero_full_name = hero_name;
-	if (!hero_dynasty_name.empty()) {
+	if (!hero_family_name.empty()) {
 		hero_full_name += " ";
-		hero_full_name += hero_dynasty_name;
+		hero_full_name += hero_family_name;
 	}
 	
 	if (GetCustomHero(hero_full_name) != NULL) {
@@ -526,8 +526,8 @@ bool IsNameValidForCustomHero(std::string hero_name, std::string hero_dynasty_na
 		return false; //name contains only spaces
 	}
 	
-	if (!hero_dynasty_name.empty() && hero_dynasty_name.find_first_not_of(' ') == std::string::npos) {
-		return false; //dynasty name contains only spaces
+	if (!hero_family_name.empty() && hero_family_name.find_first_not_of(' ') == std::string::npos) {
+		return false; //family name contains only spaces
 	}
 	
 	return true;

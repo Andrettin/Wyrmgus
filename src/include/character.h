@@ -98,7 +98,7 @@ public:
 	bool Custom;				/// Whether this character is a custom hero
 	std::string Name;			/// Given name of the character
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
-	std::string Dynasty;		/// Name of the character's dynasty
+	std::string FamilyName;		/// Name of the character's family
 	std::string Description;	/// Description of the character from an in-game universe perspective
 	std::string Background;		/// Description of the character from a perspective outside of the game's universe
 	std::string Quote;			/// A quote relating to the character
@@ -144,8 +144,8 @@ extern void SaveCustomHero(std::string hero_full_name);
 extern void DeleteCustomHero(std::string hero_full_name);
 extern void SetCurrentCustomHero(std::string hero_full_name);
 extern std::string GetCurrentCustomHero();
-extern void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_dynasty_name);
-extern bool IsNameValidForCustomHero(std::string hero_name, std::string hero_dynasty_name);
+extern void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civilization_name, std::string new_hero_name, std::string new_hero_family_name);
+extern bool IsNameValidForCustomHero(std::string hero_name, std::string hero_family_name);
 extern std::string GetGenderNameById(int gender);
 extern int GetGenderIdByName(std::string gender);
 extern void CharacterCclRegister();

@@ -3003,8 +3003,8 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (!GrandStrategyGame.Heroes[i]->ExtraName.empty()) {
 					fprintf(fd, "\tExtraName = \"%s\",\n", GrandStrategyGame.Heroes[i]->ExtraName.c_str());
 				}
-				if (!GrandStrategyGame.Heroes[i]->Dynasty.empty()) {
-					fprintf(fd, "\tDynasty = \"%s\",\n", GrandStrategyGame.Heroes[i]->Dynasty.c_str());
+				if (!GrandStrategyGame.Heroes[i]->FamilyName.empty()) {
+					fprintf(fd, "\tFamilyName = \"%s\",\n", GrandStrategyGame.Heroes[i]->FamilyName.c_str());
 				}
 				if (GrandStrategyGame.Heroes[i]->Gender != NoGender) {
 					fprintf(fd, "\tGender = \"%s\",\n", GetGenderNameById(GrandStrategyGame.Heroes[i]->Gender).c_str());
