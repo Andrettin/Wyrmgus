@@ -1165,6 +1165,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 	// This is forbidden for unexplored and not visible space
 	// FIXME: This must done new, moving units, scrolling...
+	if (UI.MouseViewport == NULL) {
+		fprintf(stderr, "Mouse viewport pointer is NULL.\n");
+	}
+	
 	if (CursorOn == CursorOnMap && UI.MouseViewport->IsInsideMapArea(CursorScreenPos)) {
 		const CViewport &vp = *UI.MouseViewport;
 		const Vec2i tilePos = vp.ScreenToTilePos(cursorPos);

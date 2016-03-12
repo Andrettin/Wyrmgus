@@ -169,8 +169,9 @@ CVideo Video;
 #if defined(USE_OPENGL) || defined(USE_GLES)
 char ForceUseOpenGL;
 bool UseOpenGL;                      /// Use OpenGL
-bool ZoomNoResize;
 //Wyrmgus start
+//bool ZoomNoResize;
+bool ZoomNoResize = false;
 //bool GLShaderPipelineSupported = true;
 bool GLShaderPipelineSupported = false;
 //Wyrmgus end
