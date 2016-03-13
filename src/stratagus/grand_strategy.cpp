@@ -2716,11 +2716,7 @@ std::string CGrandStrategyProvince::GenerateProvinceName(int civilization, int f
 		}
 	}
 	
-	if (faction != -1) {
-		return GenerateName(PlayerRaces.GetFactionLanguage(civilization, faction), "province");
-	} else {
-		return GenerateName(PlayerRaces.GetCivilizationLanguage(civilization), "province");
-	}
+	return GenerateName(language, "province");
 }
 
 void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting)
