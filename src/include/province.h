@@ -81,7 +81,7 @@ public:
 	std::string Background;
 	int ID;																/// ID of this world
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
-	std::map<std::pair<int,int>, WorldMapTile *> Tiles;								/// Tiles in the world
+	std::map<std::pair<int,int>, WorldMapTile *> Tiles;					/// Tiles in the world
 };
 
 class CProvince

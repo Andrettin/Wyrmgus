@@ -2684,13 +2684,34 @@ std::string CGrandStrategyProvince::GetCulturalName()
 */
 std::string CGrandStrategyProvince::GenerateProvinceName(int civilization, int faction)
 {
-	//10% chance that the province will be named after its settlement
-	int x = this->SettlementLocation.x;
-	int y = this->SettlementLocation.y;
-	if (x != -1 && y != -1) {
-		if (civilization != -1 && faction != -1 && GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.find(PlayerRaces.Factions[civilization][faction]) != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.end() && SyncRand(100) < 10) {
+	int language = -1;
+	if (faction != -1) {
+		language = PlayerRaces.GetFactionLanguage(civilization, faction);
+	} else {
+		language = PlayerRaces.GetCivilizationLanguage(civilization);
+	}
+	
+	if (language == -1) {
+		return "";
+	}
+	
+	//a chance that the province will be named after its settlement, based on the name patterns of the language	
+	if (this->Tiles.size() > 0 && PlayerRaces.Languages[language]->TypeNameCount.find("province") != PlayerRaces.Languages[language]->TypeNameCount.end()) {
+		Vec2i random_tile = this->Tiles[SyncRand(this->Tiles.size())];
+		int x = random_tile.x;
+		int y = random_tile.y;
+		if (
+			civilization != -1
+			&& faction != -1
+			&& GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.find(PlayerRaces.Factions[civilization][faction]) != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.end()
+			&& SyncRand(PlayerRaces.Languages[language]->TypeNameCount["province"]) < PlayerRaces.Languages[language]->SettlementDerivedProvinceNameCount
+		) {
 			return GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]][0];
-		} else if (civilization != -1 && faction == -1 && GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.find(civilization) != GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.end() && SyncRand(100) < 10) {
+		} else if (
+			civilization != -1 && faction == -1
+			&& GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.find(civilization) != GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.end()
+			&& SyncRand(PlayerRaces.Languages[language]->TypeNameCount["province"]) < PlayerRaces.Languages[language]->SettlementDerivedProvinceNameCount
+		) {
 			return GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames[civilization][0];
 		}
 	}

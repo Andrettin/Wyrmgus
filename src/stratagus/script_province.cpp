@@ -153,6 +153,8 @@ static int CclDefineProvince(lua_State *l)
 		Provinces.push_back(province);
 	}
 	
+	std::string name_type = "province";
+	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
@@ -190,6 +192,15 @@ static int CclDefineProvince(lua_State *l)
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
 				province->CulturalNames[civilization] = TransliterateText(cultural_name);
+
+				int language = PlayerRaces.GetCivilizationLanguage(civilization);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
 				
 				++j;
 				if (j >= subargs) {
@@ -201,9 +212,11 @@ static int CclDefineProvince(lua_State *l)
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameElements(l, "province");
+						ParseNameElements(l, name_type);
 					}
 					lua_pop(l, 1);
+				} else if (next_element == "settlement-derived-name") {
+					PlayerRaces.Languages[language]->SettlementDerivedProvinceNameCount += 1;
 				} else {
 					--j;
 				}
@@ -230,6 +243,15 @@ static int CclDefineProvince(lua_State *l)
 				
 				province->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
 				
+				int language = PlayerRaces.GetFactionLanguage(civilization, faction);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
+				
 				++j;
 				if (j >= subargs) {
 					break;
@@ -240,9 +262,11 @@ static int CclDefineProvince(lua_State *l)
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameElements(l, "province");
+						ParseNameElements(l, name_type);
 					}
 					lua_pop(l, 1);
+				} else if (next_element == "settlement-derived-name") {
+					PlayerRaces.Languages[language]->SettlementDerivedProvinceNameCount += 1;
 				} else {
 					--j;
 				}
@@ -333,6 +357,8 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 				++j;
 				
+				std::string name_type = "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name);
+
 				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
 				if (civilization == -1) {
 					LuaError(l, "Civilization doesn't exist.");
@@ -342,6 +368,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
 				tile->CulturalTerrainNames[std::pair<int,int>(terrain, civilization)].push_back(TransliterateText(cultural_name));
+				
+				int language = PlayerRaces.GetCivilizationLanguage(civilization);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
 				
 				++j;
 				if (j >= subargs) {
@@ -353,7 +388,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameElements(l, "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name));
+						ParseNameElements(l, name_type);
 					}
 					lua_pop(l, 1);
 				} else {
@@ -372,6 +407,8 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 				++j;
 				
+				std::string name_type = "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name);
+
 				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
 				if (civilization == -1) {
 					LuaError(l, "Civilization doesn't exist.");
@@ -388,6 +425,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				tile->FactionCulturalTerrainNames[std::pair<int,CFaction *>(terrain, PlayerRaces.Factions[civilization][faction])].push_back(TransliterateText(cultural_name));
 				
+				int language = PlayerRaces.GetFactionLanguage(civilization, faction);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
+				
 				++j;
 				if (j >= subargs) {
 					break;
@@ -398,7 +444,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameElements(l, "terrain-" + NameToIdent(WorldMapTerrainTypes[terrain]->Name));
+						ParseNameElements(l, name_type);
 					}
 					lua_pop(l, 1);
 				} else {
@@ -417,6 +463,8 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 				++j;
 				
+				std::string name_type = "resource-tile-" + DefaultResourceNames[resource];
+
 				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
 				if (civilization == -1) {
 					LuaError(l, "Civilization doesn't exist.");
@@ -426,6 +474,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
 				tile->CulturalResourceNames[std::pair<int,int>(resource, civilization)].push_back(TransliterateText(cultural_name));
+				
+				int language = PlayerRaces.GetCivilizationLanguage(civilization);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
 				
 				++j;
 				if (j >= subargs) {
@@ -437,7 +494,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameElements(l, "resource-tile-" + DefaultResourceNames[resource]);
+						ParseNameElements(l, name_type);
 					}
 					lua_pop(l, 1);
 				} else {
@@ -456,6 +513,8 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 				++j;
 				
+				std::string name_type = "resource-tile-" + DefaultResourceNames[resource];
+
 				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
 				if (civilization == -1) {
 					LuaError(l, "Civilization doesn't exist.");
@@ -472,6 +531,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				tile->FactionCulturalResourceNames[std::pair<int,CFaction *>(resource, PlayerRaces.Factions[civilization][faction])].push_back(TransliterateText(cultural_name));
 				
+				int language = PlayerRaces.GetFactionLanguage(civilization, faction);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
+				
 				++j;
 				if (j >= subargs) {
 					break;
@@ -482,7 +550,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameElements(l, "resource-tile-" + DefaultResourceNames[resource]);
+						ParseNameElements(l, name_type);
 					}
 					lua_pop(l, 1);
 				} else {
@@ -490,11 +558,14 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "CulturalSettlementNames")) {
+			std::string name_type = "settlement";
+
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
+
 				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
 				if (civilization == -1) {
 					LuaError(l, "Civilization doesn't exist.");
@@ -505,6 +576,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				tile->CulturalSettlementNames[civilization].push_back(TransliterateText(cultural_name));
 				
+				int language = PlayerRaces.GetCivilizationLanguage(civilization);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
+				
 				++j;
 				if (j >= subargs) {
 					break;
@@ -515,7 +595,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameElements(l, "settlement");
+						ParseNameElements(l, name_type);
 					}
 					lua_pop(l, 1);
 				} else {
@@ -523,6 +603,8 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "FactionCulturalSettlementNames")) {
+			std::string name_type = "settlement";
+
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
 			}
@@ -544,6 +626,15 @@ static int CclDefineWorldMapTile(lua_State *l)
 				
 				tile->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]].push_back(TransliterateText(cultural_name));
 				
+				int language = PlayerRaces.GetFactionLanguage(civilization, faction);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
+				
 				++j;
 				if (j >= subargs) {
 					break;
@@ -554,7 +645,7 @@ static int CclDefineWorldMapTile(lua_State *l)
 					++j;
 					lua_rawgeti(l, -1, j + 1);
 					if (lua_istable(l, -1)) {
-						ParseNameElements(l, "settlement");
+						ParseNameElements(l, name_type);
 					}
 					lua_pop(l, 1);
 				} else {
