@@ -93,7 +93,21 @@ bool ButtonCheckFalse(const CUnit &, const ButtonAction &)
 */
 bool ButtonCheckUpgrade(const CUnit &unit, const ButtonAction &button)
 {
-	return UpgradeIdentAllowed(*unit.Player, button.AllowStr) == 'R';
+	//Wyrmgus start
+//	return UpgradeIdentAllowed(*unit.Player, button.AllowStr) == 'R';
+	
+	CPlayer *player = unit.Player;
+	char *buf = new_strdup(button.AllowStr.c_str());
+
+	for (const char *s = strtok(buf, ","); s; s = strtok(NULL, ",")) {
+		if (UpgradeIdentAllowed(*unit.Player, s) != 'R') {
+			delete[] buf;
+			return false;
+		}
+	}
+	delete[] buf;
+	return true;
+	//Wyrmgus end
 }
 
 /**
