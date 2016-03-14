@@ -1072,7 +1072,9 @@ void CalculateItemsToLoad(bool grand_strategy)
 	if (CanAccessFile("ui/loadingEmpty.png") && CanAccessFile("ui/loadingFull.png")) {
 		if (!grand_strategy) {
 			itemsToLoad+= GetIconsCount();
-			itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
+			if (ThisPlayer) {
+				itemsToLoad+= GetCursorsCount(PlayerRaces.Name[ThisPlayer->Race]);
+			}
 			itemsToLoad+= GetUnitTypesCount();
 			itemsToLoad+= GetDecorationsCount();
 			itemsToLoad+= GetConstructionsCount();
