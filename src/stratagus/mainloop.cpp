@@ -58,6 +58,7 @@
 #include "settings.h"
 //Wyrmgus end
 #include "sound.h"
+#include "sound_server.h"
 //Wyrmgus start
 #include "tileset.h" // for tile animation
 //Wyrmgus end
@@ -428,7 +429,7 @@ static void GameLogicLoop()
 #ifdef USE_OAML
 	if (enableOAML && oaml) {
 		// Time of day can change our main music loop, if the current playing track is set for this
-		oaml->SetMainLoopCondition(GameTimeOfDay);
+		SetMusicCondition(OAML_CONDID_MAIN_LOOP, GameTimeOfDay);
 	}
 #endif
 
@@ -505,7 +506,7 @@ static void GameLogicLoop()
 #ifdef USE_OAML
 			if (enableOAML && oaml) {
 				// Time of day can change our main music loop, if the current playing track is set for this
-				oaml->SetMainLoopCondition(GameTimeOfDay);
+				SetMusicCondition(OAML_CONDID_MAIN_LOOP, GameTimeOfDay);
 			}
 #endif
 

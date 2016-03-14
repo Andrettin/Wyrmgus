@@ -769,50 +769,70 @@ int PlayMusic(const std::string &file)
 
 void PlayMusicName(const std::string &name) {
 #ifdef USE_OAML
-	if (enableOAML && oaml)
-		oaml->PlayTrack(name.c_str());
+	if (enableOAML == false || oaml == NULL)
+		return;
+
+	SDL_LockMutex(Audio.Lock);
+	oaml->PlayTrack(name.c_str());
+	SDL_UnlockMutex(Audio.Lock);
 #endif
 }
 
 void PlayMusicByGroupRandom(const std::string &group) {
 #ifdef USE_OAML
-	if (enableOAML && oaml)
-		oaml->PlayTrackByGroupRandom(group.c_str());
+	if (enableOAML == false || oaml == NULL)
+		return;
+
+	SDL_LockMutex(Audio.Lock);
+	oaml->PlayTrackByGroupRandom(group.c_str());
+	SDL_UnlockMutex(Audio.Lock);
 #endif
 }
 
 void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup) {
 #ifdef USE_OAML
-	if (enableOAML && oaml)
-		if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str()) != OAML_OK) {
-			oaml->PlayTrackByGroupRandom(group.c_str());
-		}
+	if (enableOAML == false || oaml == NULL)
+		return;
+
+	SDL_LockMutex(Audio.Lock);
+	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), subgroup.c_str()) != OAML_OK) {
+		oaml->PlayTrackByGroupRandom(group.c_str());
+	}
+	SDL_UnlockMutex(Audio.Lock);
 #endif
 }
 
 void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name) {
 #ifdef USE_OAML
-	if (enableOAML && oaml)
-		if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
-			int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
-			int parent_faction = -1;
-			if (faction != -1) {
-				parent_faction = PlayerRaces.Factions[civilization][faction]->ParentFaction;
-			}
-			if (parent_faction == -1 || oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[civilization][parent_faction]->Name.c_str()) != OAML_OK) {
-				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-					oaml->PlayTrackByGroupRandom(group.c_str());
-				}
+	if (enableOAML == false || oaml == NULL)
+		return;
+
+	SDL_LockMutex(Audio.Lock);
+	if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), faction_name.c_str()) != OAML_OK) {
+		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+		int parent_faction = -1;
+		if (faction != -1) {
+			parent_faction = PlayerRaces.Factions[civilization][faction]->ParentFaction;
+		}
+		if (parent_faction == -1 || oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[civilization][parent_faction]->Name.c_str()) != OAML_OK) {
+			if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
+				oaml->PlayTrackByGroupRandom(group.c_str());
 			}
 		}
+	}
+	SDL_UnlockMutex(Audio.Lock);
 #endif
 }
 
 void SetMusicCondition(int id, int value) {
 #ifdef USE_OAML
-	if (enableOAML && oaml)
-		oaml->SetCondition(id, value);
+	if (enableOAML == false || oaml == NULL)
+		return;
+
+	SDL_LockMutex(Audio.Lock);
+	oaml->SetCondition(id, value);
+	SDL_UnlockMutex(Audio.Lock);
 #endif
 }
 
@@ -823,7 +843,9 @@ void StopMusic()
 {
 #ifdef USE_OAML
 	if (enableOAML && oaml) {
+		SDL_LockMutex(Audio.Lock);
 		oaml->StopPlaying();
+		SDL_UnlockMutex(Audio.Lock);
 	}
 #endif
 
@@ -849,8 +871,11 @@ void SetMusicVolume(int volume)
 	MusicVolume = volume;
 
 #ifdef USE_OAML
-	if (enableOAML && oaml)
+	if (enableOAML && oaml) {
+		SDL_LockMutex(Audio.Lock);
 		oaml->SetVolume(MusicVolume / 255.f);
+		SDL_UnlockMutex(Audio.Lock);
+	}
 #endif
 }
 
@@ -903,8 +928,12 @@ bool IsMusicPlaying()
 void AddMusicTension(int value)
 {
 #ifdef USE_OAML
-	if (enableOAML && oaml)
-		oaml->AddTension(value);
+	if (enableOAML == false || oaml == NULL)
+		return;
+
+	SDL_LockMutex(Audio.Lock);
+	oaml->AddTension(value);
+	SDL_UnlockMutex(Audio.Lock);
 #endif
 }
 
