@@ -604,7 +604,7 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ė́", "e");
 	text = FindAndReplaceString(text, "Ë̃", "E");
 	text = FindAndReplaceString(text, "ë̃", "e");
-	text = FindAndReplaceString(text, "É", "E");
+	text = FindAndReplaceString(text, "É", "E"); 
 	text = FindAndReplaceString(text, "é", "e");
 	text = FindAndReplaceString(text, "È", "E");
 	text = FindAndReplaceString(text, "è", "e");
@@ -616,6 +616,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ě", "e");
 	text = FindAndReplaceString(text, "Ė", "E");
 	text = FindAndReplaceString(text, "ė", "e");
+	text = FindAndReplaceString(text, "Ë", "E");
+	text = FindAndReplaceString(text, "ë", "e");
 	text = FindAndReplaceString(text, "Ę", "E");
 	text = FindAndReplaceString(text, "ę", "e");
 	text = FindAndReplaceString(text, "Ə", "E");
@@ -731,12 +733,19 @@ std::string TransliterateText(std::string text) //convert special characters int
 
 	//replace endings in -r after consonants (which happens in the nominative for Old Norse); Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceStringEnding(text, "dr", "d");
+	text = FindAndReplaceString(text, "dr ", "d ");
 	text = FindAndReplaceStringEnding(text, "fr", "f");
+	text = FindAndReplaceString(text, "fr ", "f ");
 	text = FindAndReplaceStringEnding(text, "gr", "g");
+	text = FindAndReplaceString(text, "gr ", "g ");
 	text = FindAndReplaceStringEnding(text, "kr", "k");
+	text = FindAndReplaceString(text, "kr ", "k ");
 	text = FindAndReplaceStringEnding(text, "nr", "n");
+	text = FindAndReplaceString(text, "nr ", "n ");
 	text = FindAndReplaceStringEnding(text, "rr", "r");
+	text = FindAndReplaceString(text, "rr ", "r ");
 	text = FindAndReplaceStringEnding(text, "tr", "t");
+	text = FindAndReplaceString(text, "tr ", "t ");
 	
 	//Greek characters
 	text = FindAndReplaceString(text, "Ἄ", "A");
