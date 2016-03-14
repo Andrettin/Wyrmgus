@@ -1225,7 +1225,9 @@ add_custom_command(OUTPUT tolua.cpp
 
 add_executable(stratagus WIN32 ${stratagus_SRCS} ${stratagus_HDRS})
 target_link_libraries(stratagus ${stratagus_LIBS})
-target_link_libraries(stratagus optimized ${stratagus_LIBS_RELEASE})
+if(stratagus_LIBS_RELEASE)
+	target_link_libraries(stratagus optimized ${stratagus_LIBS_RELEASE})
+endif()
 if(stratagus_LIBS_DEBUG)
 	target_link_libraries(stratagus debug ${stratagus_LIBS_DEBUG})
 endif()
