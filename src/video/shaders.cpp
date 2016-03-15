@@ -397,27 +397,59 @@ void printProgramInfoLog(GLuint obj, const char* prefix)
 unsigned ShaderIndex = -1 % MAX_SHADERS;
 //Wyrmgus end
 
-extern void LoadShaders() {
+extern bool LoadShaders() {
 	GLuint vs, fs;
+	GLint params;
 	fs = glCreateShader(GL_FRAGMENT_SHADER);
+	if (fs == 0) {
+		return false;
+	}
 	glShaderSource(fs, 1, (const char**)&(fragment_shaders[ShaderIndex]), NULL);
 	glCompileShader(fs);
+	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
+	if (params == GL_FALSE) {
+		glDeleteShader(fs);
+		return false;
+	}
 	//printShaderInfoLog(fs, "Fragment Shader");
 	ShaderIndex = (ShaderIndex + 1) % MAX_SHADERS;
 	vs = glCreateShader(GL_VERTEX_SHADER);
+	if (fs == 0) {
+		glDeleteShader(fs);
+		return false;
+	}
 	glShaderSource(vs, 1, (const char**)&vertex_shader, NULL);
 	glCompileShader(vs);
+	glGetShaderiv(fs, GL_COMPILE_STATUS, &params);
+	if (params == GL_FALSE) {
+		glDeleteShader(fs);
+		glDeleteShader(vs);
+		return false;
+	}
 	//printShaderInfoLog(vs, "Vertex Shader");
 	if (glIsProgram(fullscreenShader)) {
 		glDeleteProgram(fullscreenShader);
 	}
 	fullscreenShader = glCreateProgram();
+	if (fullscreenShader == 0) {
+		glDeleteShader(fs);
+		glDeleteShader(vs);
+		return false;
+	}
 	glAttachShader(fullscreenShader, vs);
 	glAttachShader(fullscreenShader, fs);
 	glLinkProgram(fullscreenShader);
+	glGetProgramiv(fullscreenShader, GL_LINK_STATUS, &params);
+	if (params == GL_FALSE) {
+		glDeleteShader(fs);
+		glDeleteShader(vs);
+		glDeleteProgram(fullscreenShader);
+		return false;
+	}
 	glDeleteShader(fs);
 	glDeleteShader(vs);
 	//printProgramInfoLog(fullscreenShader, "Shader Program");
+	return true;
 }
 
 extern bool LoadShaderExtensions() {
@@ -453,8 +485,7 @@ extern bool LoadShaderExtensions() {
 	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)(uintptr_t)SDL_GL_GetProcAddress("glCheckFramebufferStatus");
 #endif
 	if (glCreateShader && glGenFramebuffers && glGetUniformLocation && glActiveTextureProc) {
-		LoadShaders();
-		return true;
+		return LoadShaders();
 	} else {
 		return false;
 	}
