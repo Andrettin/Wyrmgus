@@ -3058,7 +3058,8 @@ void GenerateMissingLanguageData()
 {
 	std::vector<std::string> types;
 	int minimum_desired_names = 10;
-	
+
+	ShowLoadProgress("Generating missing language data...");
 	int default_language = PlayerRaces.GetLanguageIndexByIdent("english");
 	size_t markov_chain_size = 2;
 	
@@ -3067,7 +3068,8 @@ void GenerateMissingLanguageData()
 		if (default_language == -1) {
 			break;
 		}
-		
+
+		ShowLoadProgress("Generating missing language data... %s language", PlayerRaces.Languages[i]->Name.c_str());
 		if (PlayerRaces.Languages[i]->GenerateMissingWords) {
 			// produce a list with the Markov chain elements
 			size_t maximum_word_length = 0;
@@ -3096,8 +3098,10 @@ void GenerateMissingLanguageData()
 						markov_elements_per_type[PlayerRaces.Languages[i]->LanguageWords[j]->Type][starting_element].push_back(starting_following_letter);
 					}
 				}
+
+				ShowLoadProgress("Generating missing language data... %s", word.c_str());
 			}
-			
+
 			for (size_t j = 0; j < PlayerRaces.Languages[default_language]->LanguageWords.size(); ++j) {
 				if (!PlayerRaces.Languages[default_language]->LanguageWords[j]->Archaic && (PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings.size() > 0 || PlayerRaces.Languages[default_language]->LanguageWords[j]->Number != -1)) {
 					bool language_has_equivalent = false;
@@ -3186,7 +3190,8 @@ void GenerateMissingLanguageData()
 						word->Meanings.push_back(PlayerRaces.Languages[default_language]->LanguageWords[j]->Meanings[k]);
 					}
 					
-					fprintf(stdout, "Generated word: \"%s\" (\"%s\"), %s, %s language.\n", new_word.c_str(), PlayerRaces.Languages[default_language]->LanguageWords[j]->Word.c_str(), GetWordTypeNameById(word_type).c_str(), PlayerRaces.Languages[i]->Name.c_str());					
+//					fprintf(stdout, "Generated word: \"%s\" (\"%s\"), %s, %s language.\n", new_word.c_str(), PlayerRaces.Languages[default_language]->LanguageWords[j]->Word.c_str(), GetWordTypeNameById(word_type).c_str(), PlayerRaces.Languages[i]->Name.c_str());
+					ShowLoadProgress("Generated word: \"%s\" (\"%s\"), %s, %s language.\n", new_word.c_str(), PlayerRaces.Languages[default_language]->LanguageWords[j]->Word.c_str(), GetWordTypeNameById(word_type).c_str(), PlayerRaces.Languages[i]->Name.c_str());
 				}
 			}
 		}
@@ -3318,7 +3323,8 @@ void GenerateMissingLanguageData()
 			for (int k = 0; k < 10; ++k) {
 				std::string generated_name = GenerateName(i, types[j]);
 				if (!generated_name.empty()) {
-					fprintf(stdout, "Generated name: \"%s\" (\"%s\", %s language).\n", generated_name.c_str(), types[j].c_str(), PlayerRaces.Languages[i]->Name.c_str());
+//					fprintf(stdout, "Generated name: \"%s\" (\"%s\", %s language).\n", generated_name.c_str(), types[j].c_str(), PlayerRaces.Languages[i]->Name.c_str());
+					ShowLoadProgress("Generated name: \"%s\" (\"%s\", %s language).\n", generated_name.c_str(), types[j].c_str(), PlayerRaces.Languages[i]->Name.c_str());
 				}
 			}
 		}
