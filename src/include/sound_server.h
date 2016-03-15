@@ -154,6 +154,8 @@ extern void PlayMusicByGroupAndFactionRandom(const std::string &group, const std
 extern void SetMusicCondition(int id, int value);
 /// Increase tension value for the music
 extern void AddMusicTension(int value);
+/// Set gain of a music layer
+extern void SetMusicLayerGain(const std::string &layer, float gain);
 /// Stop music playing
 extern void StopMusic();
 /// Set music volume

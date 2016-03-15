@@ -836,6 +836,17 @@ void SetMusicCondition(int id, int value) {
 #endif
 }
 
+void SetMusicLayerGain(const std::string &layer, float gain) {
+#ifdef USE_OAML
+	if (enableOAML == false || oaml == NULL)
+		return;
+
+	SDL_LockMutex(Audio.Lock);
+	oaml->SetLayerGain(layer.c_str(), gain);
+	SDL_UnlockMutex(Audio.Lock);
+#endif
+}
+
 /**
 **  Stop the current playing music.
 */
