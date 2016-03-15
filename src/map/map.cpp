@@ -498,24 +498,44 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	} else {
 		const CMapField &new_mf = *(&mf - this->Info.MapWidth);
 		ttup = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		//Wyrmgus start
+		if (!(new_mf.getFlag() & type)) {
+			ttup = -2;
+		}
+		//Wyrmgus end
 	}
 	if (pos.x + 1 >= this->Info.MapWidth) {
 		ttright = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf + 1);
 		ttright = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		//Wyrmgus start
+		if (!(new_mf.getFlag() & type)) {
+			ttright = -2;
+		}
+		//Wyrmgus end
 	}
 	if (pos.y + 1 >= this->Info.MapHeight) {
 		ttdown = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf + this->Info.MapWidth);
 		ttdown = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		//Wyrmgus start
+		if (!(new_mf.getFlag() & type)) {
+			ttdown = -2;
+		}
+		//Wyrmgus end
 	}
 	if (pos.x - 1 < 0) {
 		ttleft = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf - 1);
 		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		//Wyrmgus start
+		if (!(new_mf.getFlag() & type)) {
+			ttleft = -2;
+		}
+		//Wyrmgus end
 	}
 	int tile = this->Tileset->getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
 
@@ -677,244 +697,111 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	if ((mf.Flags & occupedFlag) || pos.y == 0) {
 		return;
 	}
-	const Vec2i offset(0, -1);
-	CMapField &topMf = *(&mf - this->Info.MapWidth);
+	
 	//Wyrmgus start
-	const Vec2i topleftOffset(-1, -1);
-	CMapField &topleftMf = *this->Field(pos + topleftOffset);
-	const Vec2i leftOffset(-1, 0);
-	CMapField &leftMf = *this->Field(pos + leftOffset);
-	const Vec2i bottomleftOffset(-1, 1);
-	CMapField &bottomleftMf = *this->Field(pos + bottomleftOffset);
-	const Vec2i toprightOffset(1, -1);
-	CMapField &toprightMf = *this->Field(pos + toprightOffset);
-	const Vec2i rightOffset(1, 0);
-	CMapField &rightMf = *this->Field(pos + rightOffset);
-	const Vec2i bottomrightOffset(1, 1);
-	CMapField &bottomrightMf = *this->Field(pos + bottomrightOffset);
-	const Vec2i bottomOffset(0, 1);
-	CMapField &bottomMf = *this->Field(pos + bottomOffset);
-//	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
-//		&& topMf.Value >= ForestRegeneration
-//		&& !(topMf.Flags & occupedFlag)) {
-	if (((topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (topMf.getFlag() & MapFieldStumps) && topMf.Value >= ForestRegeneration && !(topMf.Flags & occupedFlag)) || (topMf.getFlag() & MapFieldForest))
-		&& this->Info.IsPointOnMap(pos + topleftOffset) && ((topleftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (topleftMf.getFlag() & MapFieldStumps) && topleftMf.Value >= ForestRegeneration && !(topleftMf.Flags & occupedFlag)) || (topleftMf.getFlag() & MapFieldForest))
-		&& this->Info.IsPointOnMap(pos + leftOffset) && ((leftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (leftMf.getFlag() & MapFieldStumps) && leftMf.Value >= ForestRegeneration && !(leftMf.Flags & occupedFlag)) || (leftMf.getFlag() & MapFieldForest))) {
-		//Wyrmgus end
-		DebugPrint("Real place wood\n");
-		//Wyrmgus start
-//		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
-//		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		topMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		//Wyrmgus end
-		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
-		//Wyrmgus start
-//		topMf.Value = 0;
-		topMf.Value = 100;
-//		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
-		//Wyrmgus end
-		UI.Minimap.UpdateSeenXY(pos + offset);
-		UI.Minimap.UpdateXY(pos + offset);
-		
-		//Wyrmgus start
-		topleftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		topleftMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		topleftMf.playerInfo.SeenTile = topleftMf.getGraphicTile();
-		topleftMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + topleftOffset);
-		UI.Minimap.UpdateXY(pos + topleftOffset);
-		
-		leftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		leftMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		leftMf.playerInfo.SeenTile = leftMf.getGraphicTile();
-		leftMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + leftOffset);
-		UI.Minimap.UpdateXY(pos + leftOffset);
-		
-//		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
-//		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		//Wyrmgus end
-		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		//Wyrmgus start
-//		mf.Value = 0;
-		mf.Value = 100;
-//		mf.Flags |= MapFieldForest | MapFieldUnpassable;
-		//Wyrmgus end
-		UI.Minimap.UpdateSeenXY(pos);
-		UI.Minimap.UpdateXY(pos);
-		
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(mf);
-		}
-		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(topMf);
-		}
-		//Wyrmgus start
-		if (Map.Field(pos + topleftOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(topleftMf);
-		}
-		if (Map.Field(pos + leftOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(leftMf);
-		}
+//	const Vec2i offset(0, -1);
+//	CMapField &topMf = *(&mf - this->Info.MapWidth);
 
-		FixNeighbors(MapFieldForest, 0, pos + topleftOffset);
-		FixNeighbors(MapFieldForest, 0, pos + leftOffset);
-		//Wyrmgus end
-		FixNeighbors(MapFieldForest, 0, pos + offset);
-		FixNeighbors(MapFieldForest, 0, pos);
-	//Wyrmgus start
-	} else if (((topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (topMf.getFlag() & MapFieldStumps) && topMf.Value >= ForestRegeneration && !(topMf.Flags & occupedFlag)) || (topMf.getFlag() & MapFieldForest))
-		&& this->Info.IsPointOnMap(pos + toprightOffset) && ((toprightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (toprightMf.getFlag() & MapFieldStumps) && toprightMf.Value >= ForestRegeneration && !(toprightMf.Flags & occupedFlag)) || (toprightMf.getFlag() & MapFieldForest))
-		&& this->Info.IsPointOnMap(pos + rightOffset) && ((rightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (rightMf.getFlag() & MapFieldStumps) && rightMf.Value >= ForestRegeneration && !(rightMf.Flags & occupedFlag)) || (rightMf.getFlag() & MapFieldForest))) {
-		DebugPrint("Real place wood\n");
-		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		topMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
-		topMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + offset);
-		UI.Minimap.UpdateXY(pos + offset);
-		
-		toprightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		toprightMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		toprightMf.playerInfo.SeenTile = toprightMf.getGraphicTile();
-		toprightMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + toprightOffset);
-		UI.Minimap.UpdateXY(pos + toprightOffset);
-		
-		rightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		rightMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		rightMf.playerInfo.SeenTile = rightMf.getGraphicTile();
-		rightMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + rightOffset);
-		UI.Minimap.UpdateXY(pos + rightOffset);
-		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos);
-		UI.Minimap.UpdateXY(pos);
-		
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(mf);
-		}
-		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(topMf);
-		}
-		if (Map.Field(pos + toprightOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(toprightMf);
-		}
-		if (Map.Field(pos + rightOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(rightMf);
-		}
+	for (int x_offset = -1; x_offset <= 1; x_offset+=2) { //increment by 2 to avoid instances where it is 0
+		for (int y_offset = -1; y_offset <= 1; y_offset+=2) {
+			const Vec2i verticalOffset(0, y_offset);
+			CMapField &verticalMf = *this->Field(pos + verticalOffset);
+			const Vec2i horizontalOffset(x_offset, 0);
+			CMapField &horizontalMf = *this->Field(pos + horizontalOffset);
+			const Vec2i diagonalOffset(x_offset, y_offset);
+			CMapField &diagonalMf = *this->Field(pos + diagonalOffset);
+			
+			if (
+				this->Info.IsPointOnMap(pos + verticalOffset)
+				&& ((verticalMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupedFlag)) || (verticalMf.getFlag() & MapFieldForest))
+				&& this->Info.IsPointOnMap(pos + diagonalOffset)
+				&& ((diagonalMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupedFlag)) || (diagonalMf.getFlag() & MapFieldForest))
+				&& this->Info.IsPointOnMap(pos + horizontalOffset)
+				&& ((horizontalMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupedFlag)) || (horizontalMf.getFlag() & MapFieldForest))
+			) {
+				DebugPrint("Real place wood\n");
+				verticalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
+				verticalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
+				verticalMf.playerInfo.SeenTile = verticalMf.getGraphicTile();
+				verticalMf.Value = 100;
+				UI.Minimap.UpdateSeenXY(pos + verticalOffset);
+				UI.Minimap.UpdateXY(pos + verticalOffset);
+				
+				diagonalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
+				diagonalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
+				diagonalMf.playerInfo.SeenTile = diagonalMf.getGraphicTile();
+				diagonalMf.Value = 100;
+				UI.Minimap.UpdateSeenXY(pos + diagonalOffset);
+				UI.Minimap.UpdateXY(pos + diagonalOffset);
+				
+				horizontalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
+				horizontalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
+				horizontalMf.playerInfo.SeenTile = horizontalMf.getGraphicTile();
+				horizontalMf.Value = 100;
+				UI.Minimap.UpdateSeenXY(pos + horizontalOffset);
+				UI.Minimap.UpdateXY(pos + horizontalOffset);
+				
+				mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
+				mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
+				mf.playerInfo.SeenTile = mf.getGraphicTile();
+				mf.Value = 100;
+				UI.Minimap.UpdateSeenXY(pos);
+				UI.Minimap.UpdateXY(pos);
+				
+				if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+					MarkSeenTile(mf);
+				}
+				if (Map.Field(pos + verticalOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+					MarkSeenTile(verticalMf);
+				}
+				if (Map.Field(pos + diagonalOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+					MarkSeenTile(diagonalMf);
+				}
+				if (Map.Field(pos + horizontalOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+					MarkSeenTile(horizontalMf);
+				}
 
-		FixNeighbors(MapFieldForest, 0, pos + toprightOffset);
-		FixNeighbors(MapFieldForest, 0, pos + rightOffset);
-		FixNeighbors(MapFieldForest, 0, pos + offset);
-		FixNeighbors(MapFieldForest, 0, pos);
-	} else if (this->Info.IsPointOnMap(pos + bottomOffset) && ((bottomMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomMf.getFlag() & MapFieldStumps) && bottomMf.Value >= ForestRegeneration && !(bottomMf.Flags & occupedFlag)) || (bottomMf.getFlag() & MapFieldForest))
-		&& this->Info.IsPointOnMap(pos + bottomleftOffset) && ((bottomleftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomleftMf.getFlag() & MapFieldStumps) && bottomleftMf.Value >= ForestRegeneration && !(bottomleftMf.Flags & occupedFlag)) || (bottomleftMf.getFlag() & MapFieldForest))
-		&& this->Info.IsPointOnMap(pos + leftOffset) && ((leftMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (leftMf.getFlag() & MapFieldStumps) && leftMf.Value >= ForestRegeneration && !(leftMf.Flags & occupedFlag)) || (leftMf.getFlag() & MapFieldForest))) {
-		DebugPrint("Real place wood\n");
-		bottomMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		bottomMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		bottomMf.playerInfo.SeenTile = bottomMf.getGraphicTile();
-		bottomMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + offset);
-		UI.Minimap.UpdateXY(pos + offset);
-		
-		bottomleftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		bottomleftMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		bottomleftMf.playerInfo.SeenTile = bottomleftMf.getGraphicTile();
-		bottomleftMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + bottomleftOffset);
-		UI.Minimap.UpdateXY(pos + bottomleftOffset);
-		
-		leftMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		leftMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		leftMf.playerInfo.SeenTile = leftMf.getGraphicTile();
-		leftMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + leftOffset);
-		UI.Minimap.UpdateXY(pos + leftOffset);
-		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos);
-		UI.Minimap.UpdateXY(pos);
-		
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(mf);
+				FixNeighbors(MapFieldForest, 0, pos + diagonalOffset);
+				FixNeighbors(MapFieldForest, 0, pos + horizontalOffset);
+				FixNeighbors(MapFieldForest, 0, pos + verticalOffset);
+				FixNeighbors(MapFieldForest, 0, pos);
+				
+				return;
+			}
 		}
-		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(bottomMf);
-		}
-		if (Map.Field(pos + bottomleftOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(bottomleftMf);
-		}
-		if (Map.Field(pos + leftOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(leftMf);
-		}
-
-		FixNeighbors(MapFieldForest, 0, pos + bottomleftOffset);
-		FixNeighbors(MapFieldForest, 0, pos + leftOffset);
-		FixNeighbors(MapFieldForest, 0, pos + offset);
-		FixNeighbors(MapFieldForest, 0, pos);
-	} else if (this->Info.IsPointOnMap(pos + bottomOffset) && ((bottomMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomMf.getFlag() & MapFieldStumps) && bottomMf.Value >= ForestRegeneration && !(bottomMf.Flags & occupedFlag)) || (bottomMf.getFlag() & MapFieldForest))
-		&& this->Info.IsPointOnMap(pos + bottomrightOffset) && ((bottomrightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (bottomrightMf.getFlag() & MapFieldStumps) && bottomrightMf.Value >= ForestRegeneration && !(bottomrightMf.Flags & occupedFlag)) || (bottomrightMf.getFlag() & MapFieldForest))
-		&& this->Info.IsPointOnMap(pos + rightOffset) && ((rightMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (rightMf.getFlag() & MapFieldStumps) && rightMf.Value >= ForestRegeneration && !(rightMf.Flags & occupedFlag)) || (rightMf.getFlag() & MapFieldForest))) {
-		DebugPrint("Real place wood\n");
-		bottomMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		bottomMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		bottomMf.playerInfo.SeenTile = bottomMf.getGraphicTile();
-		bottomMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + offset);
-		UI.Minimap.UpdateXY(pos + offset);
-		
-		bottomrightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		bottomrightMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		bottomrightMf.playerInfo.SeenTile = bottomrightMf.getGraphicTile();
-		bottomrightMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + bottomrightOffset);
-		UI.Minimap.UpdateXY(pos + bottomrightOffset);
-		
-		rightMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		rightMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		rightMf.playerInfo.SeenTile = rightMf.getGraphicTile();
-		rightMf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos + rightOffset);
-		UI.Minimap.UpdateXY(pos + rightOffset);
-		
-		mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
-		mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-		mf.playerInfo.SeenTile = mf.getGraphicTile();
-		mf.Value = 100;
-		UI.Minimap.UpdateSeenXY(pos);
-		UI.Minimap.UpdateXY(pos);
-		
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(mf);
-		}
-		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(bottomMf);
-		}
-		if (Map.Field(pos + bottomrightOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(bottomrightMf);
-		}
-		if (Map.Field(pos + rightOffset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
-			MarkSeenTile(rightMf);
-		}
-
-		FixNeighbors(MapFieldForest, 0, pos + bottomrightOffset);
-		FixNeighbors(MapFieldForest, 0, pos + rightOffset);
-		FixNeighbors(MapFieldForest, 0, pos + offset);
-		FixNeighbors(MapFieldForest, 0, pos);
-	//Wyrmgus end
 	}
+
+	/*
+	if (topMf.getGraphicTile() == this->Tileset->getRemovedTreeTile()
+		&& topMf.Value >= ForestRegeneration
+		&& !(topMf.Flags & occupedFlag)) {
+		DebugPrint("Real place wood\n");
+		topMf.setTileIndex(*Map.Tileset, Map.Tileset->getTopOneTreeTile(), 0);
+		topMf.setGraphicTile(Map.Tileset->getTopOneTreeTile());
+		topMf.playerInfo.SeenTile = topMf.getGraphicTile();
+		topMf.Value = 0;
+		topMf.Flags |= MapFieldForest | MapFieldUnpassable;
+		UI.Minimap.UpdateSeenXY(pos + offset);
+		UI.Minimap.UpdateXY(pos + offset);
+		
+		mf.setTileIndex(*Map.Tileset, Map.Tileset->getBottomOneTreeTile(), 0);
+		mf.setGraphicTile(Map.Tileset->getBottomOneTreeTile());
+		mf.playerInfo.SeenTile = mf.getGraphicTile();
+		mf.Value = 0;
+		mf.Flags |= MapFieldForest | MapFieldUnpassable;
+		UI.Minimap.UpdateSeenXY(pos);
+		UI.Minimap.UpdateXY(pos);
+		
+		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+			MarkSeenTile(mf);
+		}
+		if (Map.Field(pos + offset)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			MarkSeenTile(topMf);
+		}
+		FixNeighbors(MapFieldForest, 0, pos + offset);
+		FixNeighbors(MapFieldForest, 0, pos);
+	}
+	*/
 }
 
 /**

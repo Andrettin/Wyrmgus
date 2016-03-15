@@ -522,10 +522,18 @@ int CTileset::getTileBySurrounding(unsigned short type,
 								   int ttup, int ttright,
 								   int ttdown, int ttleft) const
 {
+	//Wyrmgus start
+	/*
 	ttup = ttup == -1 ? 15 : mixedLookupTable[ttup];
 	ttright = ttright == -1 ? 15 : mixedLookupTable[ttright];
 	ttdown = ttdown == -1 ? 15 : mixedLookupTable[ttdown];
 	ttleft = ttleft == -1 ? 15 : mixedLookupTable[ttleft];
+	*/
+	ttup = ttup == -1 ? 15 : (ttup == -2 ? 0 : mixedLookupTable[ttup]);
+	ttright = ttright == -1 ? 15 : (ttright == -2 ? 0 : mixedLookupTable[ttright]);
+	ttdown = ttdown == -1 ? 15 : (ttdown == -2 ? 0 : mixedLookupTable[ttdown]);
+	ttleft = ttleft == -1 ? 15 : (ttleft == -2 ? 0 : mixedLookupTable[ttleft]);
+	//Wyrmgus end
 
 	//  Check each of the corners to ensure it has both connecting
 	//  ?**?
