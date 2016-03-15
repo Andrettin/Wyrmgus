@@ -222,6 +222,9 @@ class CIcon
 
 	tolua_readonly tolua_property__s std::string Ident;
 	CPlayerColorGraphic *G;
+	//Wyrmgus start
+	CPlayerColorGraphic *GScale;
+	//Wyrmgus end
 	int Frame;
 };
 

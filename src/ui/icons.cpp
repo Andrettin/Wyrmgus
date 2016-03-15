@@ -61,7 +61,10 @@ static IconMap Icons;   /// Map of ident to icon.
 /**
 **  CIcon constructor
 */
-CIcon::CIcon(const std::string &ident) : G(NULL), GScale(NULL), Frame(0), Ident(ident)
+//Wyrmgus start
+//CIcon::CIcon(const std::string &ident) : G(NULL), GScale(NULL), Frame(0), Ident(ident)
+CIcon::CIcon(const std::string &ident) : G(NULL), GScale(NULL), Frame(0), Ident(ident), Loaded(false)
+//Wyrmgus end
 {
 }
 
@@ -109,6 +112,11 @@ CIcon::~CIcon()
 
 void CIcon::Load()
 {
+	//Wyrmgus start
+	if (this->Loaded) {
+		return;
+	}
+	//Wyrmgus end
 	Assert(G);
 	G->Load();
 	if (Preference.GrayscaleIcons) {
@@ -118,6 +126,9 @@ void CIcon::Load()
 		DebugPrint("Invalid icon frame: %s - %d\n" _C_ Ident.c_str() _C_ Frame);
 		Frame = 0;
 	}
+	//Wyrmgus start
+	this->Loaded = true;
+	//Wyrmgus end
 }
 
 /**

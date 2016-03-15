@@ -532,7 +532,7 @@ public:
 		IconsShift(false), StereoSound(true), MineNotifications(false),
 		DeselectInMine(false), NoStatusLineTooltips(false),
 		//Wyrmgus start
-		PlayerColorCircle(false),
+		PlayerColorCircle(false), SepiaForGrayscale(false),
 		ShowPathlines(false),
 //		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5) {};
 		ShowOrders(0), ShowNameDelay(0), ShowNameTime(0), AutosaveMinutes(5), HotkeySetup(0),
@@ -553,6 +553,7 @@ public:
 	bool DeselectInMine;     /// Deselect peasants in mines
 	bool NoStatusLineTooltips;	/// Don't show messages on status line
 	//Wyrmgus start
+	bool SepiaForGrayscale;		/// Use a sepia filter for grayscale icons
 	bool PlayerColorCircle;		/// Show a player color circle below each unit
 	bool ShowPathlines;			/// Show order pathlines
 	//Wyrmgus end

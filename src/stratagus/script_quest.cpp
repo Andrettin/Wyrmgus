@@ -130,6 +130,7 @@ static int CclDefineQuest(lua_State *l)
 			quest->Icon.Name = LuaToString(l, -1);
 			quest->Icon.Icon = NULL;
 			quest->Icon.Load();
+			quest->Icon.Icon->Load();
 		} else if (!strcmp(value, "QuestGiver")) {
 			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
 			CCharacter *quest_giver = GetCharacter(quest_giver_name);

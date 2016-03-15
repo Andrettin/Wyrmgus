@@ -74,7 +74,7 @@ protected:
 		Width(0), Height(0), NumFrames(1), GraphicWidth(0), GraphicHeight(0),
 		//Wyrmgus start
 //		Refs(1), Resized(false)
-		Refs(1), TimeOfDay(0), Resized(false)
+		Refs(1), TimeOfDay(0), Resized(false), Grayscale(false)
 		//Wyrmgus end
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		//Wyrmgus start
@@ -175,6 +175,9 @@ public:
 	int TimeOfDay;				/// Time of day of this graphic (0 = normal/none, 1 = dawn, 2 = morning, 3 = midday, 4 = afternoon, 5 = dusk, 6 = first watch, 7 = midnight, 8 = second watch)
 	//Wyrmgus end
 	bool Resized;              /// Image has been resized
+	//Wyrmgus start
+	bool Grayscale;
+	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	GLfloat TextureWidth;      /// Width of the texture

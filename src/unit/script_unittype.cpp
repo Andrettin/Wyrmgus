@@ -665,6 +665,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->InvertedSoutheastArms = parent_type->InvertedSoutheastArms;
 			type->Icon.Name = parent_type->Icon.Name;
 			type->Icon.Icon = NULL;
+			if (!type->Icon.Name.empty()) {
+				type->Icon.Load();
+			}
 			if (parent_type->CanCastSpell) {
 				type->CanCastSpell = new char[SpellTypeTable.size()];
 				memset(type->CanCastSpell, 0, SpellTypeTable.size() * sizeof(char));
@@ -763,6 +766,9 @@ static int CclDefineUnitType(lua_State *l)
 					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
 					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
 					var->Icon.Icon = NULL;
+					if (!var->Icon.Name.empty()) {
+						var->Icon.Load();
+					}
 					if (parent_type->VarInfo[var_n]->Animations) {
 						var->Animations = parent_type->VarInfo[var_n]->Animations;
 					}
@@ -882,6 +888,10 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "icon")) {
 						var->Icon.Name = LuaToString(l, -1, k + 1);
 						var->Icon.Icon = NULL;
+						//Wyrmgus start
+						var->Icon.Load();
+						var->Icon.Icon->Load();
+						//Wyrmgus end
 					} else if (!strcmp(value, "animations")) {
 						var->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
 						if (!var->Animations) {
@@ -1040,6 +1050,10 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Icon")) {
 			type->Icon.Name = LuaToString(l, -1);
 			type->Icon.Icon = NULL;
+			//Wyrmgus start
+			type->Icon.Load();
+			type->Icon.Icon->Load();
+			//Wyrmgus end
 #ifdef USE_MNG
 		} else if (!strcmp(value, "Portrait")) {
 			if (!lua_istable(l, -1)) {

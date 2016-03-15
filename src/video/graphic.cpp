@@ -53,6 +53,7 @@
 //Wyrmgus end
 #include "ui.h"
 //Wyrmgus start
+#include "unit.h" //for using CPreference
 #include "xbrz.h"
 //Wyrmgus end
 
@@ -1107,6 +1108,53 @@ static void ApplyGrayScale(SDL_Surface *Surface, int Width, int Height)
 	SDL_UnlockSurface(Surface);
 }
 
+//Wyrmgus start
+static void ApplySepiaScale(SDL_Surface *Surface, int Width, int Height)
+{
+	SDL_LockSurface(Surface);
+	const SDL_PixelFormat *f = Surface->format;
+	const int bpp = Surface->format->BytesPerPixel;
+
+	switch (bpp) {
+		case 1: {
+			SDL_Color colors[256];
+			SDL_Palette &pal = *Surface->format->palette;
+			for (int i = 0; i < 256; ++i) {
+				int input_red = pal.colors[i].r;
+				int input_green = pal.colors[i].g;
+				int input_blue = pal.colors[i].b;
+				
+				colors[i].r = std::min<int>(255, (input_red * .393) + (input_green *.769) + (input_blue * .189));
+				colors[i].g = std::min<int>(255, (input_red * .349) + (input_green *.686) + (input_blue * .168));
+				colors[i].b = std::min<int>(255, (input_red * .272) + (input_green *.534) + (input_blue * .131));
+			}
+			SDL_SetColors(Surface, &colors[0], 0, 256);
+			break;
+		}
+		case 4: {
+			Uint32 *p;
+			for (int i = 0; i < Height; ++i) {
+				for (int j = 0; j < Width; ++j) {
+					p = (Uint32 *)(Surface->pixels) + i * Width + j * bpp;
+					
+					int input_red = (*p);
+					int input_green = *(p + 1);
+					int input_blue = *(p + 2);
+					
+					const Uint32 sepia = ((Uint8)(std::min<int>(255, (input_red * .393) + (input_green *.769) + (input_blue * .189))) >> f->Rshift) +
+										((Uint8)(std::min<int>(255, (input_red * .349) + (input_green *.686) + (input_blue * .168))) >> f->Gshift) +
+										((Uint8)(std::min<int>(255, (input_red * .272) + (input_green *.534) + (input_blue * .131))) >> f->Bshift) +
+										((Uint8)(*(p + 3)) >> f->Ashift);
+					*p = sepia;
+				}
+			}
+			break;
+		}
+	}
+	SDL_UnlockSurface(Surface);
+}
+//Wyrmgus end
+
 /**
 **  Load a graphic
 **
@@ -1148,7 +1196,15 @@ void CGraphic::Load(bool grayscale)
 	NumFrames = GraphicWidth / Width * GraphicHeight / Height;
 
 	if (grayscale) {
-		ApplyGrayScale(Surface, Width, Height);
+		//Wyrmgus start
+		this->Grayscale = true;
+//		ApplyGrayScale(Surface, Width, Height);
+		if (Preference.SepiaForGrayscale) {
+			ApplySepiaScale(Surface, Width, Height);
+		} else {
+			ApplyGrayScale(Surface, Width, Height);
+		}
+		//Wyrmgus end
 	}
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -1595,38 +1651,40 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	int time_of_day_green = 0;
 	int time_of_day_blue = 0;
 	
-	if (time_of_day == 1) { // dawn
-		time_of_day_red = -20;
-		time_of_day_green = -20;
-		time_of_day_blue = 0;
-	} else if (time_of_day == 2) { // morning
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (time_of_day == 3) { // midday
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (time_of_day == 4) { // afternoon
-		time_of_day_red = 0;
-		time_of_day_green = 0;
-		time_of_day_blue = 0;
-	} else if (time_of_day == 5) { // dusk
-		time_of_day_red = 0;
-		time_of_day_green = -20;
-		time_of_day_blue = -20;
-	} else if (time_of_day == 6) { // first watch
-		time_of_day_red = -45;
-		time_of_day_green = -35;
-		time_of_day_blue = -10;
-	} else if (time_of_day == 7) { // midnight
-		time_of_day_red = -45;
-		time_of_day_green = -35;
-		time_of_day_blue = -10;
-	} else if (time_of_day == 8) { // second watch
-		time_of_day_red = -45;
-		time_of_day_green = -35;
-		time_of_day_blue = -10;
+	if (!g->Grayscale) { // don't alter the colors of grayscale graphics
+		if (time_of_day == 1) { // dawn
+			time_of_day_red = -20;
+			time_of_day_green = -20;
+			time_of_day_blue = 0;
+		} else if (time_of_day == 2) { // morning
+			time_of_day_red = 0;
+			time_of_day_green = 0;
+			time_of_day_blue = 0;
+		} else if (time_of_day == 3) { // midday
+			time_of_day_red = 0;
+			time_of_day_green = 0;
+			time_of_day_blue = 0;
+		} else if (time_of_day == 4) { // afternoon
+			time_of_day_red = 0;
+			time_of_day_green = 0;
+			time_of_day_blue = 0;
+		} else if (time_of_day == 5) { // dusk
+			time_of_day_red = 0;
+			time_of_day_green = -20;
+			time_of_day_blue = -20;
+		} else if (time_of_day == 6) { // first watch
+			time_of_day_red = -45;
+			time_of_day_green = -35;
+			time_of_day_blue = -10;
+		} else if (time_of_day == 7) { // midnight
+			time_of_day_red = -45;
+			time_of_day_green = -35;
+			time_of_day_blue = -10;
+		} else if (time_of_day == 8) { // second watch
+			time_of_day_red = -45;
+			time_of_day_green = -35;
+			time_of_day_blue = -10;
+		}
 	}
 	//Wyrmgus end
 
@@ -1652,7 +1710,10 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					//Wyrmgus end
 					tp[3] = alpha;
 				}
-				if (colors) {
+				//Wyrmgus start
+//				if (colors) {
+				if (colors && !g->Grayscale) {
+				//Wyrmgus end
 					for (int z = 0; z < PlayerColorIndexCount; ++z) {
 						if (*sp == PlayerColorIndexStart + z) {
 							SDL_Color p = colors->Colors[z];
@@ -1683,7 +1744,10 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 						  (f->Rmask | f->Gmask | f->Bmask));
 				}
 				*(Uint32 *)tp = c;
-				if (colors) {
+				//Wyrmgus start
+//				if (colors) {
+				if (colors && !g->Grayscale) {
+				//Wyrmgus end
 					b = (c & f->Bmask) >> f->Bshift;
 					if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
 						((c & f->Gmask) >> f->Gshift) == b) {

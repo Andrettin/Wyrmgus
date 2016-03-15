@@ -167,7 +167,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -463,6 +463,11 @@ static int CclDefineModifier(lua_State *l)
 		if (AllUpgrades[um->UpgradeId]->IncompatibleAffixes[i]) {
 			AllUpgrades[i]->IncompatibleAffixes[um->UpgradeId] = true;
 		}
+	}
+	
+	//load icon here for lack of a better place
+	if (AllUpgrades[um->UpgradeId]->Icon != NULL && !AllUpgrades[um->UpgradeId]->Icon->Loaded) {
+		AllUpgrades[um->UpgradeId]->Icon->Load();
 	}
 	//Wyrmgus end
 

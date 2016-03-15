@@ -134,6 +134,9 @@ public:
 	CPlayerColorGraphic *G;              /// Graphic data
 	CPlayerColorGraphic *GScale;         /// Icon when drawn grayscaled
 	int Frame;                /// Frame number in graphic
+	//Wyrmgus start
+	bool Loaded;
+	//Wyrmgus end
 private:
 	std::string Ident;        /// Icon identifier
 };
