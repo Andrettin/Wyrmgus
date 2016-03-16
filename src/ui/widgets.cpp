@@ -1158,6 +1158,10 @@ void PlayerColorImageButton::setPosition(int x, int y)
 */
 void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const CGraphic &sprite)
 {
+	if (sprite.Grayscale) {
+		return;
+	}
+
 	Assert(PlayerColorIndexCount);
 
 	int WidgetPlayerColorIndexFromName = 15;

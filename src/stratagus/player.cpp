@@ -1806,6 +1806,12 @@ void PlayersEachSecond(int playerIdx)
 void GraphicPlayerPixels(int player, const CGraphic &sprite)
 //Wyrmgus end
 {
+	//Wyrmgus start
+	if (sprite.Grayscale) {
+		return;
+	}
+	//Wyrmgus end
+	
 	Assert(PlayerColorIndexCount);
 
 	SDL_LockSurface(sprite.Surface);

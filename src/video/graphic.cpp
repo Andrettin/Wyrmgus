@@ -2144,7 +2144,7 @@ void CGraphic::SetTimeOfDay(int time)
 {
 	Assert(Surface);
 
-	if (TimeOfDay == time) {
+	if (TimeOfDay == time || this->Grayscale) {
 		return;
 	}
 
