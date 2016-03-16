@@ -874,6 +874,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "TypeName")) {
 			res->e = EString_TypeName;
 			res->D.Type = CclParseTypeDesc(l);
+		} else if (!strcmp(key, "TypeIdent")) {
+			res->e = EString_TypeIdent;
+			res->D.Type = CclParseTypeDesc(l);
 		} else if (!strcmp(key, "TypeClass")) {
 			res->e = EString_TypeClass;
 			res->D.Type = CclParseTypeDesc(l);
@@ -1205,6 +1208,13 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_TypeIdent : // name of the unit type
+			type = s->D.Type;
+			if (type != NULL) {
+				return (**type).Ident;
+			} else { // ERROR.
+				return std::string("");
+			}
 		case EString_TypeClass : // name of the unit type's class
 			type = s->D.Type;
 			if (type != NULL) {
@@ -1445,6 +1455,9 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Unit;
 			break;
 		case EString_TypeName : // Name of the unit type
+			delete *s->D.Type;
+			break;
+		case EString_TypeIdent : // Ident of the unit type
 			delete *s->D.Type;
 			break;
 		case EString_TypeClass : // Class of the unit type
@@ -2026,6 +2039,19 @@ static int CclTypeName(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for TypeIdent.
+**  {"TypeIdent", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclTypeIdent(lua_State *l)
+{
+	return Alias(l, "TypeIdent");
+}
+
+/**
 **  Return equivalent lua table for TypeClass.
 **  {"TypeClass", {}}
 **
@@ -2264,6 +2290,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitSpell", CclUnitSpell);
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
 	lua_register(Lua, "TypeName", CclTypeName);
+	lua_register(Lua, "TypeIdent", CclTypeIdent);
 	lua_register(Lua, "TypeClass", CclTypeClass);
 	lua_register(Lua, "TypeDescription", CclTypeDescription);
 	lua_register(Lua, "TypeQuote", CclTypeQuote);

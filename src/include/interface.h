@@ -79,7 +79,8 @@ enum ButtonCmd {
 	ButtonUpgradeTo,      /// order upgrade
 	//Wyrmgus start
 	ButtonRallyPoint,		/// set rally point
-	ButtonUnit,				/// used to display the popups for inventory items and for units in transporters
+	ButtonUnit,				/// used to display popups for inventory items and for units in transporters
+	ButtonEditorUnit,		/// used to display popups for editor unit type buttons
 	//Wyrmgus end
 	ButtonCancel,         /// cancel
 	ButtonCancelUpgrade,  /// cancel upgrade

@@ -659,6 +659,21 @@ static void DrawUnitIcons()
 		}
 		++i;
 	}
+	
+	//Wyrmgus start
+	i = Editor.UnitIndex;
+	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
+		if (i >= (int) Editor.ShownUnitTypes.size()) {
+			return;
+		}
+		
+		if (i == Editor.CursorUnitIndex) {
+			DrawPopup(CurrentButtons[j], UI.ButtonPanel.Buttons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
+		}
+		
+		++i;
+	}
+	//Wyrmgus end
 }
 
 /**
@@ -1701,6 +1716,10 @@ static void EditorCallbackKeyRepeated(unsigned key, unsigned)
 static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 {
 	Assert(Editor.State == EditorEditUnit || Editor.State == EditorSetStartLocation);
+	
+	//Wyrmgus start
+	LastDrawnButtonPopup = NULL;
+	//Wyrmgus end
 
 	// Scrollbar
 	if (UI.ButtonPanel.X + 4 < CursorScreenPos.x
@@ -1751,13 +1770,37 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		if (i >= (int) Editor.ShownUnitTypes.size()) {
 			break;
 		}
+		//Wyrmgus start
+		if (j >= CurrentButtons.size()) {
+			ButtonAction &ba = *(new ButtonAction);
+			CurrentButtons.push_back(ba);
+		}
+		CurrentButtons[j].Hint = Editor.ShownUnitTypes[i]->Name;
+		CurrentButtons[j].Pos = j;
+		CurrentButtons[j].Level = 0;
+		CurrentButtons[j].Action = ButtonEditorUnit;
+		CurrentButtons[j].ValueStr = Editor.ShownUnitTypes[i]->Ident;
+		CurrentButtons[j].Value = Editor.ShownUnitTypes[i]->Slot;
+		CurrentButtons[j].Popup = "popup-unit";
+		//Wyrmgus end
 		if (x < screenPos.x && screenPos.x < x + IconWidth
 			&& y < screenPos.y && screenPos.y < y + IconHeight) {
+			//Wyrmgus start
+			/*
 			char buf[256];
 			snprintf(buf, sizeof(buf), "%s \"%s\"",
 					 Editor.ShownUnitTypes[i]->Ident.c_str(),
 					 Editor.ShownUnitTypes[i]->Name.c_str());
 			UI.StatusLine.Set(buf);
+			*/
+			if (!Preference.NoStatusLineTooltips) {
+				char buf[256];
+				snprintf(buf, sizeof(buf), "%s \"%s\"",
+						 Editor.ShownUnitTypes[i]->Ident.c_str(),
+						 Editor.ShownUnitTypes[i]->Name.c_str());
+				UI.StatusLine.Set(buf);
+			}
+			//Wyrmgus end
 			Editor.CursorUnitIndex = i;
 			return true;
 		}

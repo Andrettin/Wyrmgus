@@ -817,7 +817,13 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		}
 		if (parent_faction == -1 || oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[civilization][parent_faction]->Name.c_str()) != OAML_OK) {
 			if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-				oaml->PlayTrackByGroupRandom(group.c_str());
+				int parent_civilization = -1;
+				if (civilization != -1) {
+					parent_civilization = PlayerRaces.ParentCivilization[civilization];
+				}
+				if (parent_civilization == -1 || oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Name[parent_civilization].c_str()) != OAML_OK) {
+					oaml->PlayTrackByGroupRandom(group.c_str());
+				}
 			}
 		}
 	}

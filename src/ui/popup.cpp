@@ -637,6 +637,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			//Wyrmgus start
 			} else if (!strcmp(value, "rally-point")) {
 				condition->ButtonAction = ButtonRallyPoint;
+			} else if (!strcmp(value, "unit")) {
+				condition->ButtonAction = ButtonUnit;
+			} else if (!strcmp(value, "editor-unit")) {
+				condition->ButtonAction = ButtonEditorUnit;
 			//Wyrmgus end
 			} else if (!strcmp(value, "cancel")) {
 				condition->ButtonAction = ButtonCancel;
