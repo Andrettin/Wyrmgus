@@ -1171,6 +1171,8 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
 			}
+		} else if (!strcmp(value, "MapWord")) {
+			word->MapWord = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1222,6 +1224,12 @@ static int CclDefineLanguageWord(lua_State *l)
 	
 	if (replaces != NULL) {
 		PlayerRaces.Languages[word->Language]->RemoveWord(replaces);
+	}
+	
+	if (word->MapWord) { //put the word in the language's MapWords vector if it is a MapWord
+		if (std::find(PlayerRaces.Languages[word->Language]->MapWords.begin(), PlayerRaces.Languages[word->Language]->MapWords.end(), word) == PlayerRaces.Languages[word->Language]->MapWords.end()) {
+			PlayerRaces.Languages[word->Language]->MapWords.push_back(word);
+		}
 	}
 	
 	return 0;
@@ -2258,6 +2266,102 @@ static int CclSetAiType(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+static int CclGetLanguages(lua_State *l)
+{
+	lua_createtable(l, PlayerRaces.Languages.size(), 0);
+	for (size_t i = 1; i <= PlayerRaces.Languages.size(); ++i)
+	{
+		lua_pushstring(l, PlayerRaces.Languages[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+/**
+**  Get language data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetLanguageData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string language_name = LuaToString(l, 1);
+	int language_id = PlayerRaces.GetLanguageIndexByIdent(language_name);
+	if (language_id == -1) {
+		LuaError(l, "Language \"%s\" doesn't exist." _C_ language_name.c_str());
+	}
+	const CLanguage *language = PlayerRaces.Languages[language_id];
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, language->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Words")) {
+		lua_createtable(l, language->LanguageWords.size(), 0);
+		for (size_t i = 1; i <= language->LanguageWords.size(); ++i)
+		{
+			lua_pushstring(l, language->LanguageWords[i-1]->Word.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "MapWords")) {
+		lua_createtable(l, language->MapWords.size(), 0);
+		for (size_t i = 1; i <= language->MapWords.size(); ++i)
+		{
+			lua_pushstring(l, language->MapWords[i-1]->Word.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
+**  Get language word data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetLanguageWordData(lua_State *l)
+{
+	if (lua_gettop(l) < 3) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string language_name = LuaToString(l, 1);
+	int language_id = PlayerRaces.GetLanguageIndexByIdent(language_name);
+	if (language_id == -1) {
+		LuaError(l, "Language \"%s\" doesn't exist." _C_ language_name.c_str());
+	}
+	
+	std::string word_name = LuaToString(l, 2);
+	std::vector<std::string> word_meanings;
+	const LanguageWord *word = PlayerRaces.Languages[language_id]->GetWord(word_name, -1, word_meanings);
+	if (word == NULL) {
+		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.c_str() _C_ language_name.c_str());
+	}
+	
+	const char *data = LuaToString(l, 3);
+
+	if (!strcmp(data, "Type")) {
+		if (word->Type != -1) {
+			lua_pushstring(l, GetWordTypeNameById(word->Type).c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+//Wyrmgus end
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -2305,6 +2409,11 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
 	lua_register(Lua, "SetPlayerData", CclSetPlayerData);
 	lua_register(Lua, "SetAiType", CclSetAiType);
+	//Wyrmgus start
+	lua_register(Lua, "GetLanguages", CclGetLanguages);
+	lua_register(Lua, "GetLanguageData", CclGetLanguageData);
+	lua_register(Lua, "GetLanguageWordData", CclGetLanguageWordData);
+	//Wyrmgus end
 }
 
 //@}

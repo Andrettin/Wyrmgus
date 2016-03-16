@@ -2615,7 +2615,11 @@ int GetWordJunctionTypeIdByName(std::string word_junction_type)
 LanguageWord *CLanguage::GetWord(const std::string word, int word_type, std::vector<std::string>& word_meanings) const
 {
 	for (size_t i = 0; i < this->LanguageWords.size(); ++i) {
-		if (this->LanguageWords[i]->Word == word && this->LanguageWords[i]->Type == word_type && (word_meanings.size() == 0 || this->LanguageWords[i]->Meanings == word_meanings)) {
+		if (
+			this->LanguageWords[i]->Word == word
+			&& (word_type == -1 || this->LanguageWords[i]->Type == word_type)
+			&& (word_meanings.size() == 0 || this->LanguageWords[i]->Meanings == word_meanings)
+		) {
 			return this->LanguageWords[i];
 		}
 	}
@@ -3357,6 +3361,50 @@ void GenerateMissingLanguageData()
 			}
 		}
 	}
+}
+
+void CleanLanguageMapWords()
+{
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		for (size_t j = 0; j < PlayerRaces.Languages[i]->MapWords.size(); ++j) {
+			PlayerRaces.Languages[i]->RemoveWord(PlayerRaces.Languages[i]->MapWords[j]);
+			delete PlayerRaces.Languages[i]->MapWords[j];
+		}
+		PlayerRaces.Languages[i]->MapWords.clear();
+	}
+}
+
+bool IsNameValidForWord(std::string word_name)
+{
+	if (word_name.empty()) {
+		return false;
+	}
+	
+	if (
+		word_name.find('\n') != -1
+		|| word_name.find('\\') != -1
+		|| word_name.find('/') != -1
+		|| word_name.find('.') != -1
+		|| word_name.find('*') != -1
+		|| word_name.find('[') != -1
+		|| word_name.find(']') != -1
+		|| word_name.find(':') != -1
+		|| word_name.find(';') != -1
+		|| word_name.find('=') != -1
+		|| word_name.find(',') != -1
+		|| word_name.find('<') != -1
+		|| word_name.find('>') != -1
+		|| word_name.find('?') != -1
+		|| word_name.find('|') != -1
+	) {
+		return false;
+	}
+	
+	if (word_name.find_first_not_of(' ') == std::string::npos) {
+		return false; //name contains only spaces
+	}
+	
+	return true;
 }
 //Wyrmgus end
 

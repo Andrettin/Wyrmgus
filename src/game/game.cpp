@@ -1471,6 +1471,9 @@ void CleanGame()
 	CleanMissiles();
 	CleanUnits();
 	CleanSelections();
+	//Wyrmgus start
+	CleanLanguageMapWords();
+	//Wyrmgus end
 	Map.Clean();
 	CleanReplayLog();
 	FreePathfinder();

@@ -454,7 +454,8 @@ public:
 		Archaic(false),
 		Uncountable(false),
 		ArticleType(-1),
-		Number(-1)
+		Number(-1),
+		MapWord(false)
 	{
 	}
 	
@@ -505,6 +506,8 @@ public:
 	
 	//numeral-specific variables
 	int Number;
+	
+	bool MapWord;					/// Whether the word is a custom word which is to be removed after playing a map
 };
 
 class CLanguage
@@ -535,6 +538,7 @@ public:
 	CLanguage *DialectOf;										/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<CLanguage *> Dialects;							/// Dialects of this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
+	std::vector<LanguageWord *> MapWords;						/// Words of the language
 	std::vector<std::string> NameTranslations[2];				/// Name translations (2 values: one for the name to be translated, and another for the translation)
 	std::map<std::string, std::vector<LanguageWord *>> NameTypeWords;	/// Words which can be used as names for particular name types
 	std::map<std::string, std::vector<LanguageWord *>> NameTypeAffixes[MaxWordJunctionTypes][MaxAffixTypes];	/// Affixes which can form particular name types
@@ -774,6 +778,8 @@ extern int GetAffixTypeIdByName(std::string affix_type);
 extern std::string GetWordJunctionTypeNameById(int word_junction_type);
 extern int GetWordJunctionTypeIdByName(std::string word_junction_type);
 extern void GenerateMissingLanguageData();
+extern void CleanLanguageMapWords();
+extern bool IsNameValidForWord(std::string word_name);
 //Wyrmgus end
 
 //@}
