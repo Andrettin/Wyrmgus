@@ -376,20 +376,34 @@ void UpdateDisplay()
 			}
 		}
 		
-		//draw map
-		GrandStrategyGame.DrawMap();
+		bool draw_grand_strategy = true;
 		
-		// Fillers
-		for (size_t i = 0; i != UI.Fillers.size(); ++i) {
-			UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
+#if defined(USE_OPENGL) || defined(USE_GLES)
+		if (UseOpenGL) {
+		} else
+#endif
+		{
+			if (GrandStrategyGamePaused) {
+				draw_grand_strategy = false;
+			}
 		}
 		
-		GrandStrategyGame.DrawMinimap();
-		
-		GrandStrategyGame.DrawInterface();
-		
-		if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y] && !GrandStrategyGamePaused) {
-			GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+		if (draw_grand_strategy) {
+			//draw map
+			GrandStrategyGame.DrawMap();
+			
+			// Fillers
+			for (size_t i = 0; i != UI.Fillers.size(); ++i) {
+				UI.Fillers[i].G->DrawClip(UI.Fillers[i].X, UI.Fillers[i].Y);
+			}
+			
+			GrandStrategyGame.DrawMinimap();
+			
+			GrandStrategyGame.DrawInterface();
+			
+			if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y] && !GrandStrategyGamePaused) {
+				GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+			}
 		}
 	//Wyrmgus end
 	}
