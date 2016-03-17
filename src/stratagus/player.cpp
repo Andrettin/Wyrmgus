@@ -366,6 +366,7 @@ void PlayerRace::Clean()
 				delete this->Languages[i]->LanguageWords[j];
 			}
 			this->Languages[i]->LanguageWords.clear();
+			this->Languages[i]->MapWords.clear();
 			
 			for (size_t j = 0; j < 2; ++j) {
 				this->Languages[i]->NameTranslations[j].clear();

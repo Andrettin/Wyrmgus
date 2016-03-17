@@ -768,6 +768,10 @@ int PlayMusic(const std::string &file)
 }
 
 void PlayMusicName(const std::string &name) {
+	if (!IsMusicEnabled()) {
+		return;
+	}
+	
 #ifdef USE_OAML
 	if (enableOAML == false || oaml == NULL)
 		return;
@@ -779,6 +783,10 @@ void PlayMusicName(const std::string &name) {
 }
 
 void PlayMusicByGroupRandom(const std::string &group) {
+	if (!IsMusicEnabled()) {
+		return;
+	}
+	
 #ifdef USE_OAML
 	if (enableOAML == false || oaml == NULL)
 		return;
@@ -790,6 +798,10 @@ void PlayMusicByGroupRandom(const std::string &group) {
 }
 
 void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::string &subgroup) {
+	if (!IsMusicEnabled()) {
+		return;
+	}
+	
 #ifdef USE_OAML
 	if (enableOAML == false || oaml == NULL)
 		return;
@@ -803,6 +815,10 @@ void PlayMusicByGroupAndSubgroupRandom(const std::string &group, const std::stri
 }
 
 void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::string &civilization_name, const std::string &faction_name) {
+	if (!IsMusicEnabled()) {
+		return;
+	}
+
 #ifdef USE_OAML
 	if (enableOAML == false || oaml == NULL)
 		return;

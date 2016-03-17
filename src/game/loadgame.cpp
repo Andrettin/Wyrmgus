@@ -103,9 +103,6 @@ void CleanModules()
 	//Wyrmgus end
 	CleanConstructions();
 	CleanDecorations();
-	//Wyrmgus start
-	CleanLanguageMapWords();
-	//Wyrmgus end
 	CleanMissiles();
 	//Wyrmgus start
 	CleanQuests();

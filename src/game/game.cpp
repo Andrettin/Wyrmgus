@@ -498,6 +498,62 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain)
 		//Wyrmgus end
 		// MAPTODO Copyright notice in generated file
 		f->printf("-- File licensed under the GNU GPL version 2.\n\n");
+		
+		//Wyrmgus start
+		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+			for (size_t j = 0; j < PlayerRaces.Languages[i]->MapWords.size(); ++j) {
+				f->printf("DefineLanguageWord(\"%s\", {\n", PlayerRaces.Languages[i]->MapWords[j]->Word.c_str());
+				f->printf("\tLanguage = \"%s\",\n", PlayerRaces.Languages[i]->Ident.c_str());
+				if (PlayerRaces.Languages[i]->MapWords[j]->Type != -1) {
+					f->printf("\tType = \"%s\",\n", GetWordTypeNameById(PlayerRaces.Languages[i]->MapWords[j]->Type).c_str());
+				}
+				if (PlayerRaces.Languages[i]->MapWords[j]->Gender != -1) {
+					f->printf("\tGender = \"%s\",\n", GetGrammaticalGenderNameById(PlayerRaces.Languages[i]->MapWords[j]->Gender).c_str());
+				}
+				
+				f->printf("\tMeanings = {");
+				for (size_t k = 0; k < PlayerRaces.Languages[i]->MapWords[j]->Meanings.size(); ++k) {
+					f->printf("\"%s\", ", PlayerRaces.Languages[i]->MapWords[j]->Meanings[k].c_str());
+				}
+				f->printf("},\n");
+				
+				f->printf("\tNameTypes = {");
+				for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
+					for (int n = 0; n < MaxGrammaticalCases; ++n) {
+						for (int o = 0; o < MaxGrammaticalTenses; ++o) {
+							for (std::map<std::string, int>::iterator iterator = PlayerRaces.Languages[i]->MapWords[j]->NameTypes[k][n][o].begin(); iterator != PlayerRaces.Languages[i]->MapWords[j]->NameTypes[k][n][o].end(); ++iterator) {
+								if (iterator->second > 0) {
+									f->printf("\"%s\", ", iterator->first.c_str());
+								}
+							}
+						}
+					}
+				}
+				f->printf("},\n");
+				f->printf("\tAffixNameTypes = {");
+				for (int k = 0; k < MaxWordJunctionTypes; ++k) {
+					for (int n = 0; n < MaxAffixTypes; ++n) {
+						for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
+							for (int p = 0; p < MaxGrammaticalCases; ++p) {
+								for (int q = 0; q < MaxGrammaticalTenses; ++q) {
+									for (std::map<std::string, int>::iterator iterator = PlayerRaces.Languages[i]->MapWords[j]->AffixNameTypes[k][n][o][p][q].begin(); iterator != PlayerRaces.Languages[i]->MapWords[j]->AffixNameTypes[k][n][o][p][q].end(); ++iterator) {
+										if (iterator->second > 0) {
+											f->printf("\"%s\", ", GetWordJunctionTypeNameById(k).c_str());
+											f->printf("\"%s\", ", GetAffixTypeNameById(n).c_str());
+											f->printf("\"%s\", ", iterator->first.c_str());
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				f->printf("},\n");
+				f->printf("\tMapWord = true\n");
+				f->printf("})\n\n");
+			}
+		}
+		//Wyrmgus end
 
 		f->printf("-- player configuration\n");
 		for (int i = 0; i < PlayerMax; ++i) {

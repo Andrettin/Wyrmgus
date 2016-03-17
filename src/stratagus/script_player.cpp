@@ -2269,10 +2269,22 @@ static int CclSetAiType(lua_State *l)
 //Wyrmgus start
 static int CclGetLanguages(lua_State *l)
 {
-	lua_createtable(l, PlayerRaces.Languages.size(), 0);
-	for (size_t i = 1; i <= PlayerRaces.Languages.size(); ++i)
+	bool only_used = false;
+	if (lua_gettop(l) >= 1) {
+		only_used = LuaToBoolean(l, 1);
+	}
+	
+	std::vector<std::string> languages;
+	for (size_t i = 0; i != PlayerRaces.Languages.size(); ++i) {
+		if (!only_used || PlayerRaces.Languages[i]->UsedByCivilizationOrFaction) {
+			languages.push_back(PlayerRaces.Languages[i]->Ident);
+		}
+	}
+		
+	lua_createtable(l, languages.size(), 0);
+	for (size_t i = 1; i <= languages.size(); ++i)
 	{
-		lua_pushstring(l, PlayerRaces.Languages[i-1]->Ident.c_str());
+		lua_pushstring(l, languages[i-1].c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -2340,7 +2352,7 @@ static int CclGetLanguageWordData(lua_State *l)
 	
 	std::string word_name = LuaToString(l, 2);
 	std::vector<std::string> word_meanings;
-	const LanguageWord *word = PlayerRaces.Languages[language_id]->GetWord(word_name, -1, word_meanings);
+	LanguageWord *word = PlayerRaces.Languages[language_id]->GetWord(word_name, -1, word_meanings);
 	if (word == NULL) {
 		LuaError(l, "Word \"%s\" doesn't exist for the \"%s\" language." _C_ word_name.c_str() _C_ language_name.c_str());
 	}
@@ -2352,6 +2364,84 @@ static int CclGetLanguageWordData(lua_State *l)
 			lua_pushstring(l, GetWordTypeNameById(word->Type).c_str());
 		} else {
 			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Meaning")) {
+		for (size_t i = 0; i < word->Meanings.size(); ++i) {
+			lua_pushstring(l, word->Meanings[i].c_str());
+			return 1;
+		}
+		lua_pushstring(l, "");
+		return 1;
+	} else if (!strcmp(data, "Gender")) {
+		if (word->Gender != -1) {
+			lua_pushstring(l, GetGrammaticalGenderNameById(word->Gender).c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "NameTypes")) {
+		std::vector<std::string> name_types;
+		
+		for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
+			for (int j = 0; j < MaxGrammaticalCases; ++j) {
+				for (int k = 0; k < MaxGrammaticalTenses; ++k) {
+					for (std::map<std::string, int>::iterator iterator = word->NameTypes[i][j][k].begin(); iterator != word->NameTypes[i][j][k].end(); ++iterator) {
+						if (iterator->second > 0) {
+							if (std::find(name_types.begin(), name_types.end(), iterator->first) == name_types.end()) {
+								name_types.push_back(iterator->first);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		lua_createtable(l, name_types.size(), 0);
+		for (size_t i = 1; i <= name_types.size(); ++i)
+		{
+			lua_pushstring(l, name_types[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "AffixNameTypes")) {
+		if (lua_gettop(l) < 5) {
+			LuaError(l, "incorrect argument");
+		}
+		
+		std::string word_junction_type_name = LuaToString(l, 4);
+		int word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
+		if (word_junction_type == -1) {
+			LuaError(l, "Word junction type \"%s\" doesn't exist." _C_ word_junction_type_name.c_str());
+		}
+				
+		std::string affix_type_name = LuaToString(l, 5);
+		int affix_type = GetAffixTypeIdByName(affix_type_name);
+		if (affix_type == -1) {
+			LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
+		}
+		
+		std::vector<std::string> name_types;
+		
+		for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
+			for (int j = 0; j < MaxGrammaticalCases; ++j) {
+				for (int k = 0; k < MaxGrammaticalTenses; ++k) {
+					for (std::map<std::string, int>::iterator iterator = word->AffixNameTypes[word_junction_type][affix_type][i][j][k].begin(); iterator != word->AffixNameTypes[word_junction_type][affix_type][i][j][k].end(); ++iterator) {
+						if (iterator->second > 0) {
+							if (std::find(name_types.begin(), name_types.end(), iterator->first) == name_types.end()) {
+								name_types.push_back(iterator->first);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		lua_createtable(l, name_types.size(), 0);
+		for (size_t i = 1; i <= name_types.size(); ++i)
+		{
+			lua_pushstring(l, name_types[i-1].c_str());
+			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else {
