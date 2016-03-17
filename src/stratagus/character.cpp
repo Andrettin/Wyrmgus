@@ -216,6 +216,9 @@ void SaveHero(CCharacter *hero)
 	path += "/";
 	path += "heroes/";
 	if (hero->Custom) {
+		if (stat(path.c_str(), &tmp) < 0) {
+			makedir(path.c_str(), 0777);
+		}
 		path += "custom/";
 	}
 	if (stat(path.c_str(), &tmp) < 0) {
