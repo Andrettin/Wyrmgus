@@ -1521,7 +1521,9 @@ static void InfoPanel_draw_multiple_selection()
 	//  If there are more units selected draw their pictures and a health bar
 	DrawInfoPanelBackground(0);
 	for (size_t i = 0; i != std::min(Selected.size(), UI.SelectedButtons.size()); ++i) {
-		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
+		//Wyrmgus start
+//		const CIcon &icon = *Selected[i]->Type->Icon.Icon;
+		//Wyrmgus end
 		const PixelPos pos(UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.SelectedButtons[i].Style,

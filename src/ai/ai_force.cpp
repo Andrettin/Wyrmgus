@@ -91,13 +91,19 @@ public:
 			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 		} else if (FIND_TYPE == AIATTACK_BUILDING) {
 			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
-			Assert(!*enemy);
+			//Wyrmgus start
+			//why make sure the enemy is NULL?
+//			Assert(!*enemy);
+			//Wyrmgus end
 			if (*enemy == NULL || !(*enemy)->Type->Building) {
 				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 			}
 		} else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
 			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
-			Assert(!*enemy || (*enemy)->IsAgressive());
+			//Wyrmgus start
+			//why ask that the enemy be NULL?
+//			Assert(!*enemy || (*enemy)->IsAgressive());
+			//Wyrmgus end
 			if (*enemy == NULL) {
 				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 			}
