@@ -2913,7 +2913,11 @@ bool CUnit::IsVisibleOnMinimap() const
 	} else {
 		return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value && Seen.State != 3
 			   && (Seen.ByPlayer & (1 << ThisPlayer->Index))
-			   && !(Seen.Destroyed & (1 << ThisPlayer->Index));
+			   //Wyrmgus start
+//			   && !(Seen.Destroyed & (1 << ThisPlayer->Index));
+			   && !(Seen.Destroyed & (1 << ThisPlayer->Index))
+			   && !Destroyed;
+			   //Wyrmgus end
 	}
 }
 
