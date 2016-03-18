@@ -25,6 +25,7 @@ extern void SetMusicLayerGain(const std::string &layer, float gain);
 extern void StopMusic(void);
 extern bool IsMusicPlaying();
 extern void InitMusicOAML();
+extern void LoadOAMLDefinitionsFile(std::string file_path);
 extern void ShutdownMusicOAML();
 
 extern int SetChannelVolume(int channel, int volume);

@@ -228,6 +228,9 @@ extern void InitMusic();
 /// Initialize adaptive music
 extern void InitMusicOAML();
 
+/// Load adaptive music definitions file
+extern void LoadOAMLDefinitionsFile(std::string file_path);
+
 /// Shutdown adaptive music
 extern void ShutdownMusicOAML();
 

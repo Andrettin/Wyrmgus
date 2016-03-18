@@ -168,6 +168,12 @@ void InitMusicOAML()
 	SetMusicVolume(GetMusicVolume());
 }
 
+void LoadOAMLDefinitionsFile(std::string file_path)
+{
+	const std::string filename = LibraryFileName(file_path.c_str());
+	oaml->ReadDefsFile(filename.c_str());
+}
+
 void ShutdownMusicOAML()
 {
 	if (oaml) {
