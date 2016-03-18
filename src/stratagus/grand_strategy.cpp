@@ -2911,6 +2911,9 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		);
 		CclCommand(buf);
 		
+		StopMusic();
+		PlayMusicByGroupAndFactionRandom("map", PlayerRaces.Name[new_civilization], PlayerRaces.Factions[new_civilization][new_faction]->Name);
+			
 		std::string dialog_tooltip = "Our faction becomes the " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName();
 		if (PlayerRaces.Factions[old_civilization][old_faction]->Type == "tribe" && PlayerRaces.Factions[new_civilization][new_faction]->Type == "polity") {
 			dialog_tooltip += ", +10 Prestige";
