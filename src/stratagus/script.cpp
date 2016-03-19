@@ -3218,6 +3218,12 @@ void ParseNameElements(lua_State *l, std::string type)
 		}
 	}
 }
+
+void DisableMod(std::string mod_file)
+{
+	CleanLanguageModWords(mod_file);
+}
+
 //Wyrmgus end
 
 /**

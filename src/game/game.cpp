@@ -68,6 +68,9 @@
 //Wyrmgus end
 #include "replay.h"
 #include "results.h"
+//Wyrmgus start
+#include "script.h"
+//Wyrmgus end
 #include "settings.h"
 #include "sound.h"
 #include "sound_server.h"
@@ -962,6 +965,7 @@ static void LoadMap(const std::string &filename, CMap &map, bool is_mod)
 				map.Create();
 				LoadStratagusMap(filename, map.Info.Filename);
 			} else {
+				DisableMod(LibraryFileName(map.Info.Filename.c_str()));
 				LuaLoadFile(LibraryFileName(map.Info.Filename.c_str()));
 			}
 			//Wyrmgus end
@@ -1651,7 +1655,7 @@ void CleanGame()
 	CleanUnits();
 	CleanSelections();
 	//Wyrmgus start
-	CleanLanguageModWords(Map.Info.Filename);
+	DisableMod(Map.Info.Filename);
 	//Wyrmgus end
 	Map.Clean();
 	CleanReplayLog();
