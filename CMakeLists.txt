@@ -777,7 +777,7 @@ option(WITH_MNG "Compile Stratagus with MNG image library" OFF)
 option(WITH_OGGVORBIS "Compile Stratagus with OGG/Vorbis sound library" ON)
 option(WITH_THEORA "Compile Stratagus with Theroa video library" ON)
 option(WITH_OAML "Compile Stratagus with OAML library" ON)
-option(FORCE_STATIC_OAML "Link the OAML library statically" OFF)
+option(OAML_FORCE_STATIC "Link the OAML library statically" OFF)
 option(WITH_STACKTRACE "Compile Stratagus with StackTrace library" OFF)
 
 option(WITH_X11 "Compile Stratagus with X11 clipboard pasting support" ON)
@@ -873,10 +873,30 @@ if(WITH_THEORA AND THEORA_FOUND)
 	set(stratagus_LIBS ${stratagus_LIBS} ${THEORA_LIBRARY})
 endif()
 
-if(WITH_OAML AND OAML_FOUND)
+if(WITH_OAML)
+	if(NOT OAML_FOUND)
+		# Build embedded copy statically
+		set(OAML_EMBEDDED ON)
+		set(OAML_FORCE_STATIC ON)
+		set(OAML_EMBEDDED_PATH "${CMAKE_SOURCE_DIR}/src/oaml")
+		include(ExternalProject)
+		ExternalProject_Add(oaml
+			SOURCE_DIR ${OAML_EMBEDDED_PATH}
+			PREFIX ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/oaml.dir
+			BUILD_IN_SOURCE 1
+			CMAKE_ARGS -DENABLE_SHARED=OFF
+			CMAKE_ARGS -DENABLE_UNITYPLUGIN=OFF
+			INSTALL_COMMAND ""
+		)
+
+		set(OAML_INCLUDE_DIRS "${OAML_EMBEDDED_PATH}/include")
+		set(OAML_LIBRARIES_STATIC "${OAML_EMBEDDED_PATH}/liboaml.a" ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${VORBISFILE_LIBRARIES})
+		set(OAML_LIBRARIES_STATIC_DEBUG "${OAML_EMBEDDED_PATH}/liboaml_d.a" ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${VORBISFILE_LIBRARIES})
+	endif()
+
 	add_definitions(-DUSE_OAML)
-	include_directories(${OAML_INCLUDE_DIR})
-	if(ENABLE_STATIC OR FORCE_STATIC_OAML)
+	include_directories(${OAML_INCLUDE_DIRS})
+	if(ENABLE_STATIC OR OAML_FORCE_STATIC)
 		set(stratagus_LIBS_RELEASE ${stratagus_LIBS_RELEASE} ${OAML_LIBRARIES_STATIC})
 		set(stratagus_LIBS_DEBUG ${stratagus_LIBS_DEBUG} ${OAML_LIBRARIES_STATIC_DEBUG})
 	else()
@@ -1059,8 +1079,10 @@ macro(log_package PACKAGE_NAME PACKAGE)
 		message("${PACKAGE_NAME}: Disabled (Enable by param -DWITH_${PACKAGE}=ON)")
 	elseif(WITH_${PACKAGE} AND ${PACKAGE}_FOUND)
 		message("${PACKAGE_NAME}: Found and enabled (Disable by param -DWITH_${PACKAGE}=OFF)")
+	elseif(WITH_${PACKAGE} AND ${PACKAGE}_EMBEDDED)
+		message("${PACKAGE_NAME}: Building embedded library (Disable by param -DWITH_${PACKAGE}=OFF, or install system library)")
 	else()
-		message("${PACKAGE_NAME}: Not Found")
+		message("${PACKAGE_NAME}: Not found")
 	endif()
 endmacro()
 
