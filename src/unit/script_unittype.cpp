@@ -3265,7 +3265,7 @@ void SetModStat(std::string mod_file, std::string ident, std::string variable_ke
 **  @param sound_type		Type of the sound
 **  @param sound			The sound to be set for that type
 */
-void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype)
+void SetModSound(std::string mod_file, std::string ident, std::string sound, std::string sound_type, std::string sound_subtype)
 {
 	if (sound.empty()) {
 		return;
@@ -3273,44 +3273,44 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 	CUnitType *type = UnitTypeByIdent(ident.c_str());
 	
 	if (sound_type == "selected") {
-		type->MapSound.Selected.Name = sound;
+		type->ModSounds[mod_file].Selected.Name = sound;
 	} else if (sound_type == "acknowledge") {
-		type->MapSound.Acknowledgement.Name = sound;
+		type->ModSounds[mod_file].Acknowledgement.Name = sound;
 	} else if (sound_type == "attack") {
-		type->MapSound.Attack.Name = sound;
+		type->ModSounds[mod_file].Attack.Name = sound;
 	//Wyrmgus start
 	} else if (sound_type == "idle") {
-		type->MapSound.Idle.Name = sound;
+		type->ModSounds[mod_file].Idle.Name = sound;
 	} else if (sound_type == "hit") {
-		type->MapSound.Hit.Name = sound;
+		type->ModSounds[mod_file].Hit.Name = sound;
 	} else if (sound_type == "miss") {
-		type->MapSound.Miss.Name = sound;
+		type->ModSounds[mod_file].Miss.Name = sound;
 	} else if (sound_type == "step") {
-		type->MapSound.Step.Name = sound;
+		type->ModSounds[mod_file].Step.Name = sound;
 	} else if (sound_type == "step-dirt") {
-		type->MapSound.StepDirt.Name = sound;
+		type->ModSounds[mod_file].StepDirt.Name = sound;
 	} else if (sound_type == "step-grass") {
-		type->MapSound.StepGrass.Name = sound;
+		type->ModSounds[mod_file].StepGrass.Name = sound;
 	} else if (sound_type == "step-gravel") {
-		type->MapSound.StepGravel.Name = sound;
+		type->ModSounds[mod_file].StepGravel.Name = sound;
 	} else if (sound_type == "step-mud") {
-		type->MapSound.StepMud.Name = sound;
+		type->ModSounds[mod_file].StepMud.Name = sound;
 	} else if (sound_type == "step-stone") {
-		type->MapSound.StepStone.Name = sound;
+		type->ModSounds[mod_file].StepStone.Name = sound;
 	} else if (sound_type == "used") {
-		type->MapSound.Used.Name = sound;
+		type->ModSounds[mod_file].Used.Name = sound;
 	//Wyrmgus end
 	} else if (sound_type == "build") {
-		type->MapSound.Build.Name = sound;
+		type->ModSounds[mod_file].Build.Name = sound;
 	} else if (sound_type == "ready") {
-		type->MapSound.Ready.Name = sound;
+		type->ModSounds[mod_file].Ready.Name = sound;
 	} else if (sound_type == "repair") {
-		type->MapSound.Repair.Name = sound;
+		type->ModSounds[mod_file].Repair.Name = sound;
 	} else if (sound_type == "harvest") {
 		const int resId = GetResourceIdByName(sound_subtype.c_str());
-		type->MapSound.Harvest[resId].Name = sound;
+		type->ModSounds[mod_file].Harvest[resId].Name = sound;
 	} else if (sound_type == "help") {
-		type->MapSound.Help.Name = sound;
+		type->ModSounds[mod_file].Help.Name = sound;
 	} else if (sound_type == "dead") {
 		int death;
 
@@ -3320,9 +3320,65 @@ void SetMapSound(std::string ident, std::string sound, std::string sound_type, s
 			}
 		}
 		if (death == ANIMATIONS_DEATHTYPES) {
-			type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name = sound;
+			type->ModSounds[mod_file].Dead[ANIMATIONS_DEATHTYPES].Name = sound;
 		} else {
-			type->MapSound.Dead[death].Name = sound;
+			type->ModSounds[mod_file].Dead[death].Name = sound;
+		}
+	}
+	
+	if (GameRunning || Editor.Running == EditorEditing) {
+		if (sound_type == "selected") {
+			type->MapSound.Selected.Name = sound;
+		} else if (sound_type == "acknowledge") {
+			type->MapSound.Acknowledgement.Name = sound;
+		} else if (sound_type == "attack") {
+			type->MapSound.Attack.Name = sound;
+		//Wyrmgus start
+		} else if (sound_type == "idle") {
+			type->MapSound.Idle.Name = sound;
+		} else if (sound_type == "hit") {
+			type->MapSound.Hit.Name = sound;
+		} else if (sound_type == "miss") {
+			type->MapSound.Miss.Name = sound;
+		} else if (sound_type == "step") {
+			type->MapSound.Step.Name = sound;
+		} else if (sound_type == "step-dirt") {
+			type->MapSound.StepDirt.Name = sound;
+		} else if (sound_type == "step-grass") {
+			type->MapSound.StepGrass.Name = sound;
+		} else if (sound_type == "step-gravel") {
+			type->MapSound.StepGravel.Name = sound;
+		} else if (sound_type == "step-mud") {
+			type->MapSound.StepMud.Name = sound;
+		} else if (sound_type == "step-stone") {
+			type->MapSound.StepStone.Name = sound;
+		} else if (sound_type == "used") {
+			type->MapSound.Used.Name = sound;
+		//Wyrmgus end
+		} else if (sound_type == "build") {
+			type->MapSound.Build.Name = sound;
+		} else if (sound_type == "ready") {
+			type->MapSound.Ready.Name = sound;
+		} else if (sound_type == "repair") {
+			type->MapSound.Repair.Name = sound;
+		} else if (sound_type == "harvest") {
+			const int resId = GetResourceIdByName(sound_subtype.c_str());
+			type->MapSound.Harvest[resId].Name = sound;
+		} else if (sound_type == "help") {
+			type->MapSound.Help.Name = sound;
+		} else if (sound_type == "dead") {
+			int death;
+
+			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+				if (sound_subtype == ExtraDeathTypes[death]) {
+					break;
+				}
+			}
+			if (death == ANIMATIONS_DEATHTYPES) {
+				type->MapSound.Dead[ANIMATIONS_DEATHTYPES].Name = sound;
+			} else {
+				type->MapSound.Dead[death].Name = sound;
+			}
 		}
 	}
 }

@@ -717,73 +717,72 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 					}
 				}
 			}
-
 			
-			if (type.MapSound.Selected.Name != type.Sound.Selected.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"selected\")\n", type.Ident.c_str(), type.MapSound.Selected.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Selected.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"selected\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Selected.Name.c_str());
 			}
-			if (type.MapSound.Acknowledgement.Name != type.Sound.Acknowledgement.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"acknowledge\")\n", type.Ident.c_str(), type.MapSound.Acknowledgement.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Acknowledgement.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"acknowledge\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Acknowledgement.Name.c_str());
 			}
-			if (type.MapSound.Attack.Name != type.Sound.Attack.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"attack\")\n", type.Ident.c_str(), type.MapSound.Attack.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Attack.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"attack\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Attack.Name.c_str());
 			}
 			//Wyrmgus start
-			if (type.MapSound.Idle.Name != type.Sound.Idle.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"idle\")\n", type.Ident.c_str(), type.MapSound.Idle.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Idle.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"idle\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Idle.Name.c_str());
 			}
-			if (type.MapSound.Hit.Name != type.Sound.Hit.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"hit\")\n", type.Ident.c_str(), type.MapSound.Hit.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Hit.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"hit\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Hit.Name.c_str());
 			}
-			if (type.MapSound.Miss.Name != type.Sound.Miss.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"miss\")\n", type.Ident.c_str(), type.MapSound.Miss.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Miss.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"miss\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Miss.Name.c_str());
 			}
-			if (type.MapSound.Step.Name != type.Sound.Step.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"step\")\n", type.Ident.c_str(), type.MapSound.Step.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Step.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Step.Name.c_str());
 			}
-			if (type.MapSound.StepDirt.Name != type.Sound.StepDirt.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"step-dirt\")\n", type.Ident.c_str(), type.MapSound.StepDirt.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].StepDirt.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-dirt\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].StepDirt.Name.c_str());
 			}
-			if (type.MapSound.StepGrass.Name != type.Sound.StepGrass.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"step-grass\")\n", type.Ident.c_str(), type.MapSound.StepGrass.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].StepGrass.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-grass\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].StepGrass.Name.c_str());
 			}
-			if (type.MapSound.StepGravel.Name != type.Sound.StepGravel.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"step-gravel\")\n", type.Ident.c_str(), type.MapSound.StepGravel.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].StepGravel.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-gravel\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].StepGravel.Name.c_str());
 			}
-			if (type.MapSound.StepMud.Name != type.Sound.StepMud.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"step-mud\")\n", type.Ident.c_str(), type.MapSound.StepMud.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].StepMud.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-mud\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].StepMud.Name.c_str());
 			}
-			if (type.MapSound.StepStone.Name != type.Sound.StepStone.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"step-stone\")\n", type.Ident.c_str(), type.MapSound.StepStone.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].StepStone.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"step-stone\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].StepStone.Name.c_str());
 			}
-			if (type.MapSound.Used.Name != type.Sound.Used.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"used\")\n", type.Ident.c_str(), type.MapSound.Used.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Used.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"used\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Used.Name.c_str());
 			}
 			//Wyrmgus end
-			if (type.MapSound.Build.Name != type.Sound.Build.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"build\")\n", type.Ident.c_str(), type.MapSound.Build.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Build.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"build\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Build.Name.c_str());
 			}
-			if (type.MapSound.Ready.Name != type.Sound.Ready.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"ready\")\n", type.Ident.c_str(), type.MapSound.Ready.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Ready.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"ready\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Ready.Name.c_str());
 			}
-			if (type.MapSound.Repair.Name != type.Sound.Repair.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"repair\")\n", type.Ident.c_str(), type.MapSound.Repair.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Repair.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"repair\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Repair.Name.c_str());
 			}
 			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (type.MapSound.Harvest[j].Name != type.Sound.Harvest[j].Name) {
-					f->printf("SetMapSound(\"%s\", \"%s\", \"harvest\", \"%s\")\n", type.Ident.c_str(), type.MapSound.Harvest[j].Name.c_str(), DefaultResourceNames[j].c_str());
+				if (!type.ModSounds[Map.Info.Filename].Harvest[j].Name.empty()) {
+					f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"harvest\", \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Harvest[j].Name.c_str(), DefaultResourceNames[j].c_str());
 				}
 			}
-			if (type.MapSound.Help.Name != type.Sound.Help.Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"help\")\n", type.Ident.c_str(), type.MapSound.Help.Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Help.Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"help\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Help.Name.c_str());
 			}
-			if (type.MapSound.Dead[ANIMATIONS_DEATHTYPES].Name != type.Sound.Dead[ANIMATIONS_DEATHTYPES].Name) {
-				f->printf("SetMapSound(\"%s\", \"%s\", \"dead\")\n", type.Ident.c_str(), type.MapSound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+			if (!type.ModSounds[Map.Info.Filename].Dead[ANIMATIONS_DEATHTYPES].Name.empty()) {
+				f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"dead\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
 			}
 			int death;
 			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
-				if (type.MapSound.Dead[death].Name != type.Sound.Dead[death].Name) {
-					f->printf("SetMapSound(\"%s\", \"%s\", \"dead\", \"%s\")\n", type.Ident.c_str(), type.MapSound.Dead[death].Name.c_str(), ExtraDeathTypes[death].c_str());
+				if (!type.ModSounds[Map.Info.Filename].Dead[death].Name.empty()) {
+					f->printf("SetModSound(\"%s\", \"%s\", \"%s\", \"dead\", \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModSounds[Map.Info.Filename].Dead[death].Name.c_str(), ExtraDeathTypes[death].c_str());
 				}
 			}
 		}

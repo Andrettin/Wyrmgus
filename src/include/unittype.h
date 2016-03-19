@@ -819,7 +819,9 @@ public:
 
 	CUnitStats DefaultStat;
 	CUnitStats MapDefaultStat;
+	//Wyrmgus start
 	std::map<std::string, CUnitStats> ModDefaultStats;
+	//Wyrmgus end
 	struct BoolFlags {
 		bool value;             /// User defined flag. Used for (dis)allow target.
 		char CanTransport;      /// Can transport units with this flag.
@@ -844,6 +846,9 @@ public:
 
 	CUnitSound Sound;				/// Sounds for events
 	CUnitSound MapSound;			/// Sounds for events, map-specific
+	//Wyrmgus start
+	std::map<std::string, CUnitSound> ModSounds;
+	//Wyrmgus end
 
 	int PoisonDrain;                /// How much health is drained every second when poisoned
 
@@ -1042,7 +1047,7 @@ extern void DefineVariableField(lua_State *l, CVariable *var, int lua_index);
 extern void UpdateUnitVariables(CUnit &unit);
 
 extern void SetModStat(std::string mod_file, std::string ident, std::string variable_key, int value, std::string variable_type);
-extern void SetMapSound(std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
+extern void SetModSound(std::string mod_file, std::string ident, std::string sound, std::string sound_type, std::string sound_subtype = "");
 
 //Wyrmgus start
 extern std::string GetImageLayerNameById(int image_layer);
