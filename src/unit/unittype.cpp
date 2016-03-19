@@ -818,6 +818,23 @@ void UpdateUnitStats(CUnitType &type, int reset)
 {
 	if (reset) {
 		type.MapDefaultStat = type.DefaultStat;
+		for (std::map<std::string, CUnitStats>::iterator iterator = type.ModDefaultStats.begin(); iterator != type.ModDefaultStats.end(); ++iterator) {
+			for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+				type.MapDefaultStat.Variables[i].Value += iterator->second.Variables[i].Value;
+				type.MapDefaultStat.Variables[i].Max += iterator->second.Variables[i].Max;
+				type.MapDefaultStat.Variables[i].Increase += iterator->second.Variables[i].Increase;
+				if (iterator->second.Variables[i].Enable != 0) {
+					type.MapDefaultStat.Variables[i].Enable = iterator->second.Variables[i].Enable;
+				}
+			}
+			for (size_t i = 0; i < UnitTypes.size(); ++i) {
+				type.MapDefaultStat.UnitStock[i] += iterator->second.UnitStock[i];
+			}
+			for (int i = 0; i < MaxCosts; ++i) {
+				type.MapDefaultStat.Costs[i] += iterator->second.Costs[i];
+				type.MapDefaultStat.ImproveIncomes[i] += iterator->second.ImproveIncomes[i];
+			}
+		}
 		for (int player = 0; player < PlayerMax; ++player) {
 			type.Stats[player] = type.MapDefaultStat;
 		}

@@ -684,30 +684,40 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			
 		f->printf("\n-- set map default stat and map sound for unit types\n");
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
-			const CUnitType &type = *UnitTypes[i];
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (type.MapDefaultStat.Costs[j] != type.DefaultStat.Costs[j]) {
-					f->printf("SetMapStat(\"%s\", \"Costs\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.Costs[j], DefaultResourceNames[j].c_str());
+			CUnitType &type = *UnitTypes[i];
+
+			if (type.ModDefaultStats.find(Map.Info.Filename) != type.ModDefaultStats.end()) {
+				for (unsigned int j = 0; j < MaxCosts; ++j) {
+					if (type.ModDefaultStats[Map.Info.Filename].Costs[j] != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"Costs\", %d, \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModDefaultStats[Map.Info.Filename].Costs[j], DefaultResourceNames[j].c_str());
+					}
+				}
+				for (unsigned int j = 0; j < MaxCosts; ++j) {
+					if (type.ModDefaultStats[Map.Info.Filename].ImproveIncomes[j] != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"ImproveProduction\", %d, \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModDefaultStats[Map.Info.Filename].ImproveIncomes[j], DefaultResourceNames[j].c_str());
+					}
+				}
+				for (size_t j = 0; j < UnitTypes.size(); ++j) {
+					if (type.ModDefaultStats[Map.Info.Filename].UnitStock[j] != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModDefaultStats[Map.Info.Filename].UnitStock[j], UnitTypes[i]->Ident.c_str());
+					}
+				}
+				for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
+					if (type.ModDefaultStats[Map.Info.Filename].Variables[j].Value != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Value\")\n", mod_file.c_str(), type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.ModDefaultStats[Map.Info.Filename].Variables[j].Value);
+					}
+					if (type.ModDefaultStats[Map.Info.Filename].Variables[j].Max != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Max\")\n", mod_file.c_str(), type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.ModDefaultStats[Map.Info.Filename].Variables[j].Max);
+					}
+					if (type.ModDefaultStats[Map.Info.Filename].Variables[j].Enable != 0 && (type.ModDefaultStats[Map.Info.Filename].Variables[j].Value != 0 || type.ModDefaultStats[Map.Info.Filename].Variables[j].Max != 0 || type.ModDefaultStats[Map.Info.Filename].Variables[j].Increase != 0)) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Enable\")\n", mod_file.c_str(), type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.ModDefaultStats[Map.Info.Filename].Variables[j].Enable);
+					}
+					if (type.ModDefaultStats[Map.Info.Filename].Variables[j].Increase != 0) {
+						f->printf("SetModStat(\"%s\", \"%s\", \"%s\", %d, \"Increase\")\n", mod_file.c_str(), type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.ModDefaultStats[Map.Info.Filename].Variables[j].Increase);
+					}
 				}
 			}
-			for (unsigned int j = 0; j < MaxCosts; ++j) {
-				if (type.MapDefaultStat.ImproveIncomes[j] != type.DefaultStat.ImproveIncomes[j]) {
-					f->printf("SetMapStat(\"%s\", \"ImproveProduction\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.ImproveIncomes[j], DefaultResourceNames[j].c_str());
-				}
-			}
-			for (size_t j = 0; j < UnitTypes.size(); ++j) {
-				if (type.MapDefaultStat.UnitStock[j] != type.DefaultStat.UnitStock[j]) {
-					f->printf("SetMapStat(\"%s\", \"UnitStock\", %d, \"%s\")\n", type.Ident.c_str(), type.MapDefaultStat.UnitStock[j], UnitTypes[i]->Ident.c_str());
-				}
-			}
-			for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
-				if (type.MapDefaultStat.Variables[j] != type.DefaultStat.Variables[j]) {
-					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Value\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Value);
-					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Max\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Max);
-					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Enable\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Enable);
-					f->printf("SetMapStat(\"%s\", \"%s\", %d, \"Increase\")\n", type.Ident.c_str(), UnitTypeVar.VariableNameLookup[j], type.MapDefaultStat.Variables[j].Increase);
-				}
-			}
+
 			
 			if (type.MapSound.Selected.Name != type.Sound.Selected.Name) {
 				f->printf("SetMapSound(\"%s\", \"%s\", \"selected\")\n", type.Ident.c_str(), type.MapSound.Selected.Name.c_str());

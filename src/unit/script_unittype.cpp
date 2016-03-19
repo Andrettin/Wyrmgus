@@ -3141,50 +3141,111 @@ void UpdateUnitVariables(CUnit &unit)
 **  @param value			Value to set to
 **  @param variable_type	Type to be modified (i.e. "Value", "Max", etc.); alternatively, resource type if variable_key equals "Costs"
 */
-void SetMapStat(std::string ident, std::string variable_key, int value, std::string variable_type)
+void SetModStat(std::string mod_file, std::string ident, std::string variable_key, int value, std::string variable_type)
 {
 	CUnitType *type = UnitTypeByIdent(ident.c_str());
 	
+	if (type->ModDefaultStats.find(mod_file) == type->ModDefaultStats.end()) {
+		type->ModDefaultStats[mod_file].Variables = new CVariable[UnitTypeVar.GetNumberVariable()];
+	}
+	
 	if (variable_key == "Costs") {
 		const int resId = GetResourceIdByName(variable_type.c_str());
-		type->MapDefaultStat.Costs[resId] = value;
-		for (int player = 0; player < PlayerMax; ++player) {
-			type->Stats[player].Costs[resId] = type->MapDefaultStat.Costs[resId];
+		if (GameRunning || Editor.Running == EditorEditing) {
+			type->MapDefaultStat.Costs[resId] -= type->ModDefaultStats[mod_file].Costs[resId];
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].Costs[resId] -= type->ModDefaultStats[mod_file].Costs[resId];
+			}
+		}
+		type->ModDefaultStats[mod_file].Costs[resId] = value;
+		if (GameRunning || Editor.Running == EditorEditing) {
+			type->MapDefaultStat.Costs[resId] += type->ModDefaultStats[mod_file].Costs[resId];
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].Costs[resId] += type->ModDefaultStats[mod_file].Costs[resId];
+			}
 		}
 	} else if (variable_key == "ImproveProduction") {
 		const int resId = GetResourceIdByName(variable_type.c_str());
-		type->MapDefaultStat.ImproveIncomes[resId] = value;
-		for (int player = 0; player < PlayerMax; ++player) {
-			type->Stats[player].ImproveIncomes[resId] = type->MapDefaultStat.ImproveIncomes[resId];
+		if (GameRunning || Editor.Running == EditorEditing) {
+			type->MapDefaultStat.ImproveIncomes[resId] -= type->ModDefaultStats[mod_file].ImproveIncomes[resId];
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].ImproveIncomes[resId] -= type->ModDefaultStats[mod_file].ImproveIncomes[resId];
+			}
+		}
+		type->ModDefaultStats[mod_file].ImproveIncomes[resId] = value;
+		if (GameRunning || Editor.Running == EditorEditing) {
+			type->MapDefaultStat.ImproveIncomes[resId] += type->ModDefaultStats[mod_file].ImproveIncomes[resId];
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].ImproveIncomes[resId] += type->ModDefaultStats[mod_file].ImproveIncomes[resId];
+			}
 		}
 	} else if (variable_key == "UnitStock") {
 		const int unit_type_id = UnitTypeIdByIdent(variable_type);
-		type->MapDefaultStat.UnitStock[unit_type_id] = value;
-		for (int player = 0; player < PlayerMax; ++player) {
-			type->Stats[player].UnitStock[unit_type_id] = type->MapDefaultStat.UnitStock[unit_type_id];
+		if (GameRunning || Editor.Running == EditorEditing) {
+			type->MapDefaultStat.UnitStock[unit_type_id] -= type->ModDefaultStats[mod_file].UnitStock[unit_type_id];
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].UnitStock[unit_type_id] -= type->ModDefaultStats[mod_file].UnitStock[unit_type_id];
+			}
+		}
+		type->ModDefaultStats[mod_file].UnitStock[unit_type_id] = value;
+		if (GameRunning || Editor.Running == EditorEditing) {
+			type->MapDefaultStat.UnitStock[unit_type_id] += type->ModDefaultStats[mod_file].UnitStock[unit_type_id];
+			for (int player = 0; player < PlayerMax; ++player) {
+				type->Stats[player].UnitStock[unit_type_id] += type->ModDefaultStats[mod_file].UnitStock[unit_type_id];
+			}
 		}
 	} else {
 		int variable_index = UnitTypeVar.VariableNameLookup[variable_key.c_str()];
 		if (variable_index != -1) { // valid index
 			if (variable_type == "Value") {
-				type->MapDefaultStat.Variables[variable_index].Value = value;
-				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].Value = type->MapDefaultStat.Variables[variable_index].Value;
+				if (GameRunning || Editor.Running == EditorEditing) {
+					type->MapDefaultStat.Variables[variable_index].Value -= type->ModDefaultStats[mod_file].Variables[variable_index].Value;
+					for (int player = 0; player < PlayerMax; ++player) {
+						type->Stats[player].Variables[variable_index].Value -= type->ModDefaultStats[mod_file].Variables[variable_index].Value;
+					}
+				}
+				type->ModDefaultStats[mod_file].Variables[variable_index].Value = value;
+				if (GameRunning || Editor.Running == EditorEditing) {
+					type->MapDefaultStat.Variables[variable_index].Value += type->ModDefaultStats[mod_file].Variables[variable_index].Value;
+					for (int player = 0; player < PlayerMax; ++player) {
+						type->Stats[player].Variables[variable_index].Value += type->ModDefaultStats[mod_file].Variables[variable_index].Value;
+					}
 				}
 			} else if (variable_type == "Max") {
-				type->MapDefaultStat.Variables[variable_index].Max = value;
-				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].Max = type->MapDefaultStat.Variables[variable_index].Max;
+				if (GameRunning || Editor.Running == EditorEditing) {
+					type->MapDefaultStat.Variables[variable_index].Max -= type->ModDefaultStats[mod_file].Variables[variable_index].Max;
+					for (int player = 0; player < PlayerMax; ++player) {
+						type->Stats[player].Variables[variable_index].Max -= type->ModDefaultStats[mod_file].Variables[variable_index].Max;
+					}
+				}
+				type->ModDefaultStats[mod_file].Variables[variable_index].Max = value;
+				if (GameRunning || Editor.Running == EditorEditing) {
+					type->MapDefaultStat.Variables[variable_index].Max += type->ModDefaultStats[mod_file].Variables[variable_index].Max;
+					for (int player = 0; player < PlayerMax; ++player) {
+						type->Stats[player].Variables[variable_index].Max += type->ModDefaultStats[mod_file].Variables[variable_index].Max;
+					}
 				}
 			} else if (variable_type == "Increase") {
-				type->MapDefaultStat.Variables[variable_index].Increase = value;
-				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].Increase = type->MapDefaultStat.Variables[variable_index].Increase;
+				if (GameRunning || Editor.Running == EditorEditing) {
+					type->MapDefaultStat.Variables[variable_index].Increase -= type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
+					for (int player = 0; player < PlayerMax; ++player) {
+						type->Stats[player].Variables[variable_index].Increase -= type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
+					}
+				}
+				type->ModDefaultStats[mod_file].Variables[variable_index].Increase = value;
+				if (GameRunning || Editor.Running == EditorEditing) {
+					type->MapDefaultStat.Variables[variable_index].Increase += type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
+					for (int player = 0; player < PlayerMax; ++player) {
+						type->Stats[player].Variables[variable_index].Increase += type->ModDefaultStats[mod_file].Variables[variable_index].Increase;
+					}
 				}
 			} else if (variable_type == "Enable") {
-				type->MapDefaultStat.Variables[variable_index].Enable = value;
-				for (int player = 0; player < PlayerMax; ++player) {
-					type->Stats[player].Variables[variable_index].Enable = type->MapDefaultStat.Variables[variable_index].Enable;
+				type->ModDefaultStats[mod_file].Variables[variable_index].Enable = value;
+				if (GameRunning || Editor.Running == EditorEditing) {
+					type->MapDefaultStat.Variables[variable_index].Enable = type->ModDefaultStats[mod_file].Variables[variable_index].Enable;
+					for (int player = 0; player < PlayerMax; ++player) {
+						type->Stats[player].Variables[variable_index].Enable = type->ModDefaultStats[mod_file].Variables[variable_index].Enable;
+					}
 				}
 			} else {
 				fprintf(stderr, "Invalid type: %s\n", variable_type.c_str());

@@ -3221,9 +3221,14 @@ void ParseNameElements(lua_State *l, std::string type)
 
 void DisableMod(std::string mod_file)
 {
+	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (UnitTypes[i]->ModDefaultStats.find(mod_file) != UnitTypes[i]->ModDefaultStats.end()) {
+			UnitTypes[i]->ModDefaultStats.erase(mod_file);
+		}
+	}
+	
 	CleanLanguageModWords(mod_file);
 }
-
 //Wyrmgus end
 
 /**
