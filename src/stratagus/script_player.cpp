@@ -1171,8 +1171,10 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
 			}
-		} else if (!strcmp(value, "MapWord")) {
-			word->MapWord = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Mod")) {
+			word->Mod = LuaToString(l, -1);
+		} else if (!strcmp(value, "MapWord")) { //to keep backwards compatibility
+			word->Mod = Map.Info.Filename;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1226,9 +1228,9 @@ static int CclDefineLanguageWord(lua_State *l)
 		PlayerRaces.Languages[word->Language]->RemoveWord(replaces);
 	}
 	
-	if (word->MapWord) { //put the word in the language's MapWords vector if it is a MapWord
-		if (std::find(PlayerRaces.Languages[word->Language]->MapWords.begin(), PlayerRaces.Languages[word->Language]->MapWords.end(), word) == PlayerRaces.Languages[word->Language]->MapWords.end()) {
-			PlayerRaces.Languages[word->Language]->MapWords.push_back(word);
+	if (!word->Mod.empty()) { //put the word in the language's ModWords vector if it is a mod word
+		if (std::find(PlayerRaces.Languages[word->Language]->ModWords.begin(), PlayerRaces.Languages[word->Language]->ModWords.end(), word) == PlayerRaces.Languages[word->Language]->ModWords.end()) {
+			PlayerRaces.Languages[word->Language]->ModWords.push_back(word);
 		}
 	}
 	
@@ -2319,11 +2321,25 @@ static int CclGetLanguageData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
-	} else if (!strcmp(data, "MapWords")) {
-		lua_createtable(l, language->MapWords.size(), 0);
-		for (size_t i = 1; i <= language->MapWords.size(); ++i)
+	} else if (!strcmp(data, "ModWords")) {
+		if (lua_gettop(l) < 3) {
+			LuaError(l, "incorrect argument");
+		}
+		
+		std::string mod_file = LuaToString(l, 3);
+		
+		std::vector<std::string> mod_words;
+		for (size_t i = 0; i < language->ModWords.size(); ++i)
 		{
-			lua_pushstring(l, language->MapWords[i-1]->Word.c_str());
+			if (language->ModWords[i]->Mod == mod_file) {
+				mod_words.push_back(language->ModWords[i]->Word);
+			}
+		}
+		
+		lua_createtable(l, mod_words.size(), 0);
+		for (size_t i = 1; i <= mod_words.size(); ++i)
+		{
+			lua_pushstring(l, mod_words[i-1].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

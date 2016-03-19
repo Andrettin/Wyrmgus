@@ -3,6 +3,9 @@ $#include "tileset.h"
 class CMapInfo
 {
 	string Description;
+	//Wyrmgus start
+	string Filename;
+	//Wyrmgus end
 	int MapWidth;
 	int MapHeight;
 	int PlayerType[PlayerMax];

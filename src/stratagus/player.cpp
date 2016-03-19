@@ -366,7 +366,7 @@ void PlayerRace::Clean()
 				delete this->Languages[i]->LanguageWords[j];
 			}
 			this->Languages[i]->LanguageWords.clear();
-			this->Languages[i]->MapWords.clear();
+			this->Languages[i]->ModWords.clear();
 			
 			for (size_t j = 0; j < 2; ++j) {
 				this->Languages[i]->NameTranslations[j].clear();
@@ -3364,14 +3364,17 @@ void GenerateMissingLanguageData()
 	}
 }
 
-void CleanLanguageMapWords()
+void CleanLanguageModWords(std::string mod_file)
 {
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-		for (size_t j = 0; j < PlayerRaces.Languages[i]->MapWords.size(); ++j) {
-			PlayerRaces.Languages[i]->RemoveWord(PlayerRaces.Languages[i]->MapWords[j]);
-			delete PlayerRaces.Languages[i]->MapWords[j];
+		int mod_words_size = PlayerRaces.Languages[i]->ModWords.size();
+		for (int j = (mod_words_size - 1); j >= 0; --j) {
+			if (mod_file == PlayerRaces.Languages[i]->ModWords[j]->Mod) {
+				PlayerRaces.Languages[i]->RemoveWord(PlayerRaces.Languages[i]->ModWords[j]);
+				delete PlayerRaces.Languages[i]->ModWords[j];
+				PlayerRaces.Languages[i]->ModWords.erase(std::remove(PlayerRaces.Languages[i]->ModWords.begin(), PlayerRaces.Languages[i]->ModWords.end(), PlayerRaces.Languages[i]->ModWords[j]), PlayerRaces.Languages[i]->ModWords.end());
+			}
 		}
-		PlayerRaces.Languages[i]->MapWords.clear();
 	}
 }
 
