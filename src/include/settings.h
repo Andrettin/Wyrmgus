@@ -130,7 +130,10 @@ extern Settings GameSettings;  /// Game settings
 /// Show stats
 extern void ShowStats();
 /// Create a game
-extern void CreateGame(const std::string &filename, CMap *map);
+//Wyrmgus start
+//extern void CreateGame(const std::string &filename, CMap *map);
+extern void CreateGame(const std::string &filename, CMap *map, bool is_mod = false);
+//Wyrmgus end
 /// Init Setting to default values
 extern void InitSettings();
 

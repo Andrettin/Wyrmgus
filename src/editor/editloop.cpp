@@ -96,6 +96,9 @@ static char TileToolDecoration;  /// Tile tool draws with decorations
 static int TileCursorSize;       /// Tile cursor size 1x1 2x2 ... 4x4
 static bool UnitPlacedThisPress = false;  /// Only allow one unit per press
 static bool UpdateMinimap = false;        /// Update units on the minimap
+//Wyrmgus start
+static bool IsMod = false;				  /// Whether the current "map" is a mod
+//Wyrmgus end
 static int MirrorEdit = 0;                /// Mirror editing enabled
 static int VisibleUnitIcons;              /// Number of icons that are visible at a time
 static int VisibleTileIcons;
@@ -2145,7 +2148,10 @@ void CEditor::Init()
 	FlagRevealMap = 1; // editor without fog and all visible
 	Map.NoFogOfWar = true;
 
-	if (!*CurrentMapPath) { // new map!
+	//Wyrmgus start
+//	if (!*CurrentMapPath) { // new map!
+	if (!*CurrentMapPath || IsMod) { // new map or is a mod
+	//Wyrmgus end
 		InitUnitTypes(1);
 		//
 		// Inititialize Map / Players.
@@ -2180,9 +2186,16 @@ void CEditor::Init()
 			//Wyrmgus end
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;
-		CreateGame("", &Map);
+		//Wyrmgus start
+//		CreateGame("", &Map);
+		//Wyrmgus end
+	//Wyrmgus start
+	}
+	if (!*CurrentMapPath) {
+		CreateGame("", &Map, IsMod);
+	//Wyrmgus end
 	} else {
-		CreateGame(CurrentMapPath, &Map);
+		CreateGame(CurrentMapPath, &Map, IsMod);
 	}
 
 	ReplayRevealMap = 1;
@@ -2248,11 +2261,17 @@ void CEditor::Init()
 **         At least two players, one human slot, every player a startpoint
 **         ...
 */
-int EditorSaveMap(const std::string &file)
+//Wyrmgus start
+//int EditorSaveMap(const std::string &file)
+int EditorSaveMap(const std::string &file, bool is_mod)
+//Wyrmgus end
 {
 	std::string fullName;
 	fullName = StratagusLibPath + "/" + file;
-	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable) == -1) {
+	//Wyrmgus start
+//	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable) == -1) {
+	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable && !is_mod, is_mod) == -1) {
+	//Wyrmgus end
 		fprintf(stderr, "Cannot save map\n");
 		return -1;
 	}
@@ -2394,7 +2413,10 @@ void EditorMainLoop()
 **
 **  @param filename  Map to load, NULL to create a new map
 */
-void StartEditor(const char *filename)
+//Wyrmgus start
+//void StartEditor(const char *filename)
+void StartEditor(const char *filename, bool is_mod)
+//Wyrmgus end
 {
 	std::string nc, rc;
 
@@ -2416,6 +2438,8 @@ void StartEditor(const char *filename)
 	if (!TileToolRandom) {
 		TileToolRandom ^= 1;
 	}
+	
+	IsMod = is_mod;
 	//Wyrmgus end
 	
 	//Wyrmgus start
