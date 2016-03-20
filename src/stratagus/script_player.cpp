@@ -1254,7 +1254,10 @@ static int CclGetCivilizationData(lua_State *l)
 	}
 	const char *data = LuaToString(l, 2);
 
-	if (!strcmp(data, "Playable")) {
+	if (!strcmp(data, "Display")) {
+		lua_pushstring(l, PlayerRaces.Display[civilization].c_str());
+		return 1;
+	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization]);
 		return 1;
 	} else if (!strcmp(data, "Species")) {
@@ -1278,6 +1281,33 @@ static int CclGetCivilizationData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "DefaultColor")) {
 		lua_pushstring(l, PlayerRaces.DefaultColor[civilization].c_str());
+		return 1;
+	} else if (!strcmp(data, "Factions")) {
+		bool is_mod = false;
+		if (lua_gettop(l) >= 3) {
+			is_mod = true;
+		}
+		
+		std::string mod_file;
+
+		if (is_mod) {
+			mod_file = LuaToString(l, 3);
+		}
+		
+		std::vector<std::string> factions;
+		for (size_t i = 0; i < PlayerRaces.Factions[civilization].size(); ++i)
+		{
+			if (!is_mod || PlayerRaces.Factions[civilization][i]->Mod == mod_file) {
+				factions.push_back(PlayerRaces.Factions[civilization][i]->Name);
+			}
+		}
+		
+		lua_createtable(l, factions.size(), 0);
+		for (size_t i = 1; i <= factions.size(); ++i)
+		{
+			lua_pushstring(l, factions[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -1472,6 +1502,8 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "FactionUpgrade")) {
 			faction->FactionUpgrade = LuaToString(l, -1);
+		} else if (!strcmp(value, "Mod")) {
+			faction->Mod = LuaToString(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1731,6 +1763,69 @@ static int CclGetCivilizationFactionNames(lua_State *l)
 }
 
 /**
+**  Get the factions.
+**
+**  @param l  Lua state.
+*/
+static int CclGetFactions(lua_State *l)
+{
+	int civilization = -1;
+	if (lua_gettop(l) >= 1) {
+		civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
+	}
+	
+	std::vector<std::string> factions;
+	if (civilization != -1) {
+		for (size_t i = 0; i < PlayerRaces.Factions[civilization].size(); ++i)
+		{
+			factions.push_back(PlayerRaces.Factions[civilization][i]->Name);
+		}
+	} else {
+		for (int i = 0; i < MAX_RACES; ++i)
+		{
+			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j)
+			{
+				factions.push_back(PlayerRaces.Factions[i][j]->Name);
+			}
+		}
+	}
+		
+	lua_createtable(l, factions.size(), 0);
+	for (size_t i = 1; i <= factions.size(); ++i)
+	{
+		lua_pushstring(l, factions[i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	
+	return 1;
+}
+
+/**
+**  Get the player colors.
+**
+**  @param l  Lua state.
+*/
+static int CclGetPlayerColors(lua_State *l)
+{
+	std::vector<std::string> player_colors;
+	for (int i = 0; i < PlayerColorMax; ++i)
+	{
+		if (!PlayerColorNames[i].empty()) {
+			player_colors.push_back(PlayerColorNames[i]);
+		}
+	}
+		
+	lua_createtable(l, player_colors.size(), 0);
+	for (size_t i = 1; i <= player_colors.size(); ++i)
+	{
+		lua_pushstring(l, player_colors[i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	
+	return 1;
+}
+
+/**
 **  Get faction data.
 **
 **  @param l  Lua state.
@@ -1739,36 +1834,40 @@ static int CclGetFactionData(lua_State *l)
 {
 	LuaCheckArgs(l, 3);
 	const int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
-	const char *faction_name = LuaToString(l, 2);
-	int civilization_faction = 0;
-	for (size_t i = 0; i < PlayerRaces.Factions[civilization].size(); ++i) {
-		if (PlayerRaces.Factions[civilization][i] && PlayerRaces.Factions[civilization][i]->Name.compare(faction_name) == 0) {
-			civilization_faction = i;
-			break;
-		}
+	if (civilization == -1) {
+		LuaError(l, "Civilization doesn't exist.");
 	}
+	std::string faction_name = LuaToString(l, 2);
+	int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	if (faction == -1) {
+		LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
+	}
+	
 	const char *data = LuaToString(l, 3);
 
 	if (!strcmp(data, "Type")) {
-		lua_pushstring(l, PlayerRaces.Factions[civilization][civilization_faction]->Type.c_str());
+		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Type.c_str());
 		return 1;
 	} else if (!strcmp(data, "Color")) {
-		if (PlayerRaces.Factions[civilization][civilization_faction]->Colors.size() > 0) {
-			lua_pushstring(l, PlayerColorNames[PlayerRaces.Factions[civilization][civilization_faction]->Colors[0]].c_str());
+		if (PlayerRaces.Factions[civilization][faction]->Colors.size() > 0) {
+			lua_pushstring(l, PlayerColorNames[PlayerRaces.Factions[civilization][faction]->Colors[0]].c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
-		lua_pushboolean(l, PlayerRaces.Factions[civilization][civilization_faction]->Playable);
+		lua_pushboolean(l, PlayerRaces.Factions[civilization][faction]->Playable);
 		return 1;
 	} else if (!strcmp(data, "Language")) {
-		int language = PlayerRaces.GetFactionLanguage(civilization, civilization_faction);
+		int language = PlayerRaces.GetFactionLanguage(civilization, faction);
 		if (language != -1) {
 			lua_pushstring(l, PlayerRaces.Languages[language]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
+		return 1;
+	} else if (!strcmp(data, "FactionUpgrade")) {
+		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->FactionUpgrade.c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -2489,6 +2588,8 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
 	lua_register(Lua, "GetCivilizationFactionNames", CclGetCivilizationFactionNames);
+	lua_register(Lua, "GetFactions", CclGetFactions);
+	lua_register(Lua, "GetPlayerColors", CclGetPlayerColors);
 	lua_register(Lua, "GetFactionData", CclGetFactionData);
 	lua_register(Lua, "GetFactionDevelopsTo", CclGetFactionDevelopsTo);
 	//Wyrmgus end

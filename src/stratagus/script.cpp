@@ -3010,7 +3010,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 					}
 				}
 				for (int k = i; k < MAX_RACES; ++k) { //the function sets the state for both parties, so we only need to do it once for one of them
-					for (int n = j + 1; n < PlayerRaces.Factions[k].size(); ++n) {
+					for (size_t n = j + 1; n < PlayerRaces.Factions[k].size(); ++n) {
 						if (GrandStrategyGame.Factions[k][n] && GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] != DiplomacyStatePeace) {
 							fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Name.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n]).c_str()); //save faction trade data
 						}
@@ -3216,6 +3216,17 @@ void DisableMod(std::string mod_file)
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		if (UnitTypes[i]->ModDefaultStats.find(mod_file) != UnitTypes[i]->ModDefaultStats.end()) {
 			UnitTypes[i]->ModDefaultStats.erase(mod_file);
+		}
+	}
+	
+	for (int i = 0; i < MAX_RACES; ++i) {
+		int factions_size = PlayerRaces.Factions[i].size();
+		for (int j = (factions_size - 1); j >= 0; --j) {
+			if (PlayerRaces.Factions[i][j]->Mod == mod_file) {
+				FactionStringToIndex[i].erase(PlayerRaces.Factions[i][j]->Name);
+				delete PlayerRaces.Factions[i][j];
+				PlayerRaces.Factions[i].erase(std::remove(PlayerRaces.Factions[i].begin(), PlayerRaces.Factions[i].end(), PlayerRaces.Factions[i][j]), PlayerRaces.Factions[i].end());
+			}
 		}
 	}
 	

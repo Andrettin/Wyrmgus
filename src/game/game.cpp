@@ -600,6 +600,35 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("})\n\n");
 			}
 		}
+		
+		for (int i = 0; i < MAX_RACES; ++i) {
+			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+				if (PlayerRaces.Factions[i][j]->Mod != mod_file && PlayerRaces.Factions[i][j]->Mod != Map.Info.Filename) {
+					continue;
+				}
+				
+				f->printf("DefineFaction(\"%s\", {\n", PlayerRaces.Factions[i][j]->Name.c_str());
+				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
+				if (!PlayerRaces.Factions[i][j]->Type.empty()) {
+					f->printf("\tType = \"%s\",\n", PlayerRaces.Factions[i][j]->Type.c_str());
+				}
+				if (PlayerRaces.Factions[i][j]->Language != -1) {
+					f->printf("\tLanguage = \"%s\",\n", PlayerRaces.Languages[PlayerRaces.Factions[i][j]->Language]->Ident.c_str());
+				}
+				if (PlayerRaces.Factions[i][j]->Colors.size() > 0) {
+					f->printf("\tColors = {");
+					for (size_t k = 0; k < PlayerRaces.Factions[i][j]->Colors.size(); ++k) {
+						f->printf("\"%s\", ", PlayerColorNames[PlayerRaces.Factions[i][j]->Colors[k]].c_str());
+					}
+					f->printf("},\n");
+				}
+				if (!PlayerRaces.Factions[i][j]->FactionUpgrade.empty()) {
+					f->printf("\tFactionUpgrade = \"%s\",\n", PlayerRaces.Factions[i][j]->FactionUpgrade.c_str());
+				}
+				f->printf("\tMod = \"%s\"\n", mod_file.c_str());
+				f->printf("})\n\n");
+			}
+		}
 		//Wyrmgus end
 
 		//Wyrmgus start

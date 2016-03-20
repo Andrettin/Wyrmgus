@@ -421,6 +421,8 @@ public:
 	std::vector<int> Colors;											/// faction colors
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
+	
+	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 };
 
 class CDeity
@@ -698,6 +700,8 @@ extern bool NoRescueCheck;          /// Disable rescue check
 extern std::vector<CColor> PlayerColorsRGB[PlayerColorMax]; /// Player colors
 extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
+extern std::map<std::string, int> CivilizationStringToIndex;
+extern std::map<std::string, int> FactionStringToIndex[MAX_RACES];
 //Wyrmgus end
 
 extern PlayerRace PlayerRaces;  /// Player races
