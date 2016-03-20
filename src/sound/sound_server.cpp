@@ -828,18 +828,39 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 		int parent_faction = -1;
+		bool found_music = false;
 		if (faction != -1) {
-			parent_faction = PlayerRaces.Factions[civilization][faction]->ParentFaction;
+			while (true) {
+				parent_faction = PlayerRaces.Factions[civilization][faction]->ParentFaction;
+				if (parent_faction == -1) {
+					break;
+				}
+				faction = parent_faction;
+				
+				if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[civilization][faction]->Name.c_str()) == OAML_OK) {
+					found_music = true;
+					break;
+				}
+			}
 		}
-		if (parent_faction == -1 || oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Factions[civilization][parent_faction]->Name.c_str()) != OAML_OK) {
-			if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
-				int parent_civilization = -1;
-				if (civilization != -1) {
+		if (!found_music && oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), civilization_name.c_str()) != OAML_OK) {
+			int parent_civilization = -1;
+			if (civilization != -1) {
+				while (true) {
 					parent_civilization = PlayerRaces.ParentCivilization[civilization];
+					if (parent_civilization == -1) {
+						break;
+					}
+					civilization = parent_civilization;
+					
+					if (oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Name[civilization].c_str()) == OAML_OK) {
+						found_music = true;
+						break;
+					}
 				}
-				if (parent_civilization == -1 || oaml->PlayTrackByGroupAndSubgroupRandom(group.c_str(), PlayerRaces.Name[parent_civilization].c_str()) != OAML_OK) {
-					oaml->PlayTrackByGroupRandom(group.c_str());
-				}
+			}
+			if (!found_music) {
+				oaml->PlayTrackByGroupRandom(group.c_str());
 			}
 		}
 	}
