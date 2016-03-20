@@ -183,7 +183,10 @@ extern PixelPos CursorStartMapPos; /// the same in screen map coordinate system
 extern int GetCursorsCount(const std::string &racename);
 
 /// Load all cursors
-extern void LoadCursors(const std::string &racename);
+//Wyrmgus start
+//extern void LoadCursors(const std::string &racename);
+extern void LoadCursors(const std::string civilization_name = "");
+//Wyrmgus end
 
 /// Cursor by identifier
 extern CCursor *CursorByIdent(const std::string &ident);

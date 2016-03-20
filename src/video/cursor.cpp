@@ -115,13 +115,19 @@ int GetCursorsCount(const std::string &race)
 **
 **  @param race  Cursor graphics of this race to load.
 */
-void LoadCursors(const std::string &race)
+//Wyrmgus start
+//void LoadCursors(const std::string &race)
+void LoadCursors(const std::string civilization_name)
+//Wyrmgus end
 {
 	for (std::vector<CCursor *>::iterator i = AllCursors.begin(); i != AllCursors.end(); ++i) {
 		CCursor &cursor = **i;
 
 		//  Only load cursors of this race or universal cursors.
-		if (!cursor.Race.empty() && cursor.Race != race) {
+		//Wyrmgus start
+//		if (!cursor.Race.empty() && cursor.Race != race) {
+		if (!civilization_name.empty() && !cursor.Race.empty() && cursor.Race != civilization_name) {
+		//Wyrmgus end
 			continue;
 		}
 

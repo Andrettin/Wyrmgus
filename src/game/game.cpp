@@ -1513,7 +1513,10 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	SetPlayersPalette();
 	LoadIcons();
 
-	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
+	//Wyrmgus start
+//	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
+	LoadCursors();
+	//Wyrmgus end
 	UnitUnderCursor = NoUnitP;
 
 	InitMissileTypes();

@@ -996,7 +996,6 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[player.Race].c_str());
 			CclCommand(buf);
 		
-			LoadCursors(PlayerRaces.Name[player.Race]);
 			UI.Load();
 		}
 		
@@ -1276,7 +1275,6 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		
 		//if the civilization of the person player changed, update the UI
 		if (ThisPlayer && ThisPlayer->Index == player.Index) {
-			LoadCursors(PlayerRaces.Name[player.Race]);
 			UI.Load();
 		}
 		

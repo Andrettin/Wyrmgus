@@ -2131,11 +2131,9 @@ static int CclSetPlayerData(lua_State *l)
 		//if the civilization of the person player changed, update the UI
 		if (ThisPlayer) {
 			if (ThisPlayer->Index == p->Index) {
-				LoadCursors(PlayerRaces.Name[p->Race]);
 				UI.Load();
 			}
 		} else if (p->Index == 0) {
-			LoadCursors(PlayerRaces.Name[p->Race]);
 			UI.Load();
 		}
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);

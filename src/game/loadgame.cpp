@@ -178,7 +178,10 @@ void LoadModules()
 {
 	LoadFonts();
 	LoadIcons();
-	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
+	//Wyrmgus start
+//	LoadCursors(PlayerRaces.Name[ThisPlayer->Race]);
+	LoadCursors();
+	//Wyrmgus end
 	UI.Load();
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
