@@ -602,7 +602,7 @@ public:
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
-	CFaction *Factions[MAX_RACES][FactionMax];    						/// factions
+	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<CDeity *> Deities[MAX_RACES];							/// deities
 	std::string PersonalNames[MAX_RACES][PersonalNameMax];				/// personal names
 	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];		/// personal name prefixes

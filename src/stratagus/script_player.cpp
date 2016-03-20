@@ -1407,15 +1407,10 @@ static int CclDefineFaction(lua_State *l)
 			if (civilization == -1) { //don't change the civilization in redefinitions
 				civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 				
-				for (int i = 0; i < FactionMax; ++i) {
-					if (!PlayerRaces.Factions[civilization][i] || PlayerRaces.Factions[civilization][i]->Name.empty()) {
-						PlayerRaces.Factions[civilization][i] = faction;
-						SetFactionStringToIndex(civilization, PlayerRaces.Factions[civilization][i]->Name, i);
-						faction->Civilization = civilization;
-						faction->ID = i;
-						break;
-					}
-				}
+				faction->ID = PlayerRaces.Factions[civilization].size();
+				PlayerRaces.Factions[civilization].push_back(faction);
+				SetFactionStringToIndex(civilization, faction->Name, faction->ID);
+				faction->Civilization = civilization;
 			}
 		} else if (!strcmp(value, "Type")) {
 			faction->Type = LuaToString(l, -1);
@@ -1725,15 +1720,8 @@ static int CclGetCivilizationFactionNames(lua_State *l)
 	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
 	lua_pop(l, 1);
 
-	int FactionCount = 0;
-	for (int i = 0; i < FactionMax; ++i) {
-		if (PlayerRaces.Factions[civilization][i] && !PlayerRaces.Factions[civilization][i]->Name.empty()) {
-			FactionCount += 1;
-		}
-	}
-
-	lua_createtable(l, FactionCount, 0);
-	for (int i = 1; i <= FactionCount; ++i)
+	lua_createtable(l, PlayerRaces.Factions[civilization].size(), 0);
+	for (int i = 1; i <= PlayerRaces.Factions[civilization].size(); ++i)
 	{
 		lua_pushstring(l, PlayerRaces.Factions[civilization][i-1]->Name.c_str());
 		lua_rawseti(l, -2, i);
@@ -1753,7 +1741,7 @@ static int CclGetFactionData(lua_State *l)
 	const int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 1));
 	const char *faction_name = LuaToString(l, 2);
 	int civilization_faction = 0;
-	for (int i = 0; i < FactionMax; ++i) {
+	for (size_t i = 0; i < PlayerRaces.Factions[civilization].size(); ++i) {
 		if (PlayerRaces.Factions[civilization][i] && PlayerRaces.Factions[civilization][i]->Name.compare(faction_name) == 0) {
 			civilization_faction = i;
 			break;

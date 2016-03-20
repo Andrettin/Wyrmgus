@@ -2975,7 +2975,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (!GrandStrategyGame.Provinces[i]->CulturalNames[j].empty()) {
 					fprintf(fd, "SetProvinceCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Provinces[i]->CulturalNames[j].c_str());
 				}
-				for (int k = 0; k < FactionMax; ++k) {
+				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
 					if (GrandStrategyGame.Provinces[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != GrandStrategyGame.Provinces[i]->FactionCulturalNames.end()) {
 						fprintf(fd, "SetProvinceFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Name.c_str(), GrandStrategyGame.Provinces[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]].c_str());
 					}
@@ -2984,41 +2984,37 @@ void SaveGrandStrategyGame(const std::string &filename)
 		}		
 		
 		for (int i = 0; i < MAX_RACES; ++i) {
-			for (int j = 0; j < FactionMax; ++j) {
-				if (GrandStrategyGame.Factions[i][j]) {
-					if (GrandStrategyGame.Factions[i][j]->GovernmentType != -1) {
-						std::string government_type_name = GetGovernmentTypeNameById(GrandStrategyGame.Factions[i][j]->GovernmentType);
-						fprintf(fd, "SetFactionGovernmentType(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), government_type_name.c_str());
+			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+				if (GrandStrategyGame.Factions[i][j]->GovernmentType != -1) {
+					std::string government_type_name = GetGovernmentTypeNameById(GrandStrategyGame.Factions[i][j]->GovernmentType);
+					fprintf(fd, "SetFactionGovernmentType(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), government_type_name.c_str());
+				}
+				if (GrandStrategyGame.Factions[i][j]->FactionTier != -1) {
+					std::string faction_tier_name = GetFactionTierNameById(GrandStrategyGame.Factions[i][j]->FactionTier);
+					fprintf(fd, "SetFactionTier(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), faction_tier_name.c_str());
+				}
+				if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
+					fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
+				}
+				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
+					if (GrandStrategyGame.Factions[i][j]->Technologies[k] != false) {
+						fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
 					}
-					if (GrandStrategyGame.Factions[i][j]->FactionTier != -1) {
-						std::string faction_tier_name = GetFactionTierNameById(GrandStrategyGame.Factions[i][j]->FactionTier);
-						fprintf(fd, "SetFactionTier(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), faction_tier_name.c_str());
+				}
+				for (int k = 0; k < MaxCosts; ++k) {
+					if (GrandStrategyGame.Factions[i][j]->Resources[k] > 0) {
+						fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
 					}
-					if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
-						fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
+					if (GrandStrategyGame.Factions[i][j]->Trade[k] != 0) {
+						fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
 					}
-					for (size_t k = 0; k < AllUpgrades.size(); ++k) {
-						if (GrandStrategyGame.Factions[i][j]->Technologies[k] != false) {
-							fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
+				}
+				for (int k = i; k < MAX_RACES; ++k) { //the function sets the state for both parties, so we only need to do it once for one of them
+					for (int n = j + 1; n < PlayerRaces.Factions[k].size(); ++n) {
+						if (GrandStrategyGame.Factions[k][n] && GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] != DiplomacyStatePeace) {
+							fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Name.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n]).c_str()); //save faction trade data
 						}
 					}
-					for (int k = 0; k < MaxCosts; ++k) {
-						if (GrandStrategyGame.Factions[i][j]->Resources[k] > 0) {
-							fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
-						}
-						if (GrandStrategyGame.Factions[i][j]->Trade[k] != 0) {
-							fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
-						}
-					}
-					for (int k = i; k < MAX_RACES; ++k) { //the function sets the state for both parties, so we only need to do it once for one of them
-						for (int n = j + 1; n < FactionMax; ++n) {
-							if (GrandStrategyGame.Factions[k][n] && GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] != DiplomacyStatePeace) {
-								fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Name.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n]).c_str()); //save faction trade data
-							}
-						}
-					}
-				} else {
-					break;
 				}
 			}
 		}
@@ -3078,13 +3074,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 		}
 		
 		for (int i = 0; i < MAX_RACES; ++i) {
-			for (int j = 0; j < FactionMax; ++j) {
-				if (GrandStrategyGame.Factions[i][j]) {
-					if (GrandStrategyGame.Factions[i][j]->Ruler != NULL) {
-						fprintf(fd, "SetFactionRuler(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GrandStrategyGame.Factions[i][j]->Ruler->GetFullName().c_str()); //save faction rulers
-					}
-				} else {
-					break;
+			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+				if (GrandStrategyGame.Factions[i][j]->Ruler != NULL) {
+					fprintf(fd, "SetFactionRuler(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GrandStrategyGame.Factions[i][j]->Ruler->GetFullName().c_str()); //save faction rulers
 				}
 			}
 		}

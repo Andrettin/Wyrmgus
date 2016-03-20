@@ -383,7 +383,7 @@ void PlayerRace::Clean()
 			this->CivilizationClassUnitTypes[i][j] = -1;
 			this->CivilizationClassUpgrades[i][j] = -1;
 		}
-		for (int j = 0; j < FactionMax; ++j) {
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			for (int k = 0; k < UnitTypeClassMax; ++k) {
 				FactionClassUnitTypes[i][j][k] = -1;
 				FactionClassUpgrades[i][j][k] = -1;
@@ -394,11 +394,10 @@ void PlayerRace::Clean()
 		this->DefaultColor[i].clear();
 		this->ParentCivilization[i] = -1;
 		this->CivilizationLanguage[i] = -1;
-		for (unsigned int j = 0; j < FactionMax; ++j) {
-			if (this->Factions[i][j]) {
-				delete this->Factions[i][j];
-			}
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			delete this->Factions[i][j];
 		}
+		PlayerRaces.Factions[i].clear();
 		for (unsigned int j = 0; j < PersonalNameMax; ++j) {
 			this->PersonalNames[i][j].clear();
 			this->PersonalNamePrefixes[i][j].clear();
@@ -1197,24 +1196,20 @@ void CPlayer::SetRandomFaction()
 	}
 	
 	if (faction_count == 0) {
-		for (int i = 0; i < FactionMax; ++i) {
-			if (PlayerRaces.Factions[this->Race][i] && !PlayerRaces.Factions[this->Race][i]->Name.empty()) {
-				bool faction_used = false;
-				for (int j = 0; j < PlayerMax; ++j) {
-					if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
-						faction_used = true;
-					}		
-				}
-				if (
-					!faction_used
-					&& ((PlayerRaces.Factions[this->Race][i]->Type == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == "polity" && this->HasUpgradeClass("writing"))))
-					&& PlayerRaces.Factions[this->Race][i]->Playable
-				) {
-					local_factions[faction_count] = i;
-					faction_count += 1;
-				}
-			} else {
-				break;
+		for (size_t i = 0; i < PlayerRaces.Factions[this->Race].size(); ++i) {
+			bool faction_used = false;
+			for (int j = 0; j < PlayerMax; ++j) {
+				if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
+					faction_used = true;
+				}		
+			}
+			if (
+				!faction_used
+				&& ((PlayerRaces.Factions[this->Race][i]->Type == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == "polity" && this->HasUpgradeClass("writing"))))
+				&& PlayerRaces.Factions[this->Race][i]->Playable
+			) {
+				local_factions[faction_count] = i;
+				faction_count += 1;
 			}
 		}
 	}
@@ -3209,7 +3204,7 @@ void GenerateMissingLanguageData()
 	// first build a vector with all the types
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = PlayerRaces.Languages[i]->NameTypeWords.begin(); iterator != PlayerRaces.Languages[i]->NameTypeWords.end(); ++iterator) {
-			if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first.find("item-") != std::string::npos || iterator->first == "person-female") { //don't do this process for name types which aren't actually used by the game yet, to save performance
+			if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first == "unit-class-farm" || iterator->first.find("item-") != std::string::npos || iterator->first == "person-female") { //don't do this process for name types which aren't actually used by the game yet, to save performance
 				continue;
 			}
 			if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {

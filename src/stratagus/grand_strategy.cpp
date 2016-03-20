@@ -109,12 +109,8 @@ void CGrandStrategyGame::Clean()
 	}
 	
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (this->Factions[i][j]) {
-				delete this->Factions[i][j];
-			} else { //end of valid factions for this civilization
-				break;
-			}
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			delete this->Factions[i][j];
 		}
 	}
 	
@@ -813,31 +809,27 @@ void CGrandStrategyGame::DoTurn()
 	}
 	
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (this->Factions[i][j]) {
-				if (this->Factions[i][j]->IsAlive()) {
-					//faction income
-					for (int k = 0; k < MaxCosts; ++k) {
-						if (k == GrainCost || k == MushroomCost || k == FishCost || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
-							continue;
-						} else if (k == ResearchCost) {
-							this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->ProvinceCount;
-						} else {
-							this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
-						}
-					}
-					
-					// try to perform ruler succession for existent factions without rulers
-					if (this->Factions[i][j]->Ruler == NULL) {
-						this->Factions[i][j]->RulerSuccession();
-					}
-				} else {
-					if (this->Factions[i][j]->Ruler != NULL) {
-						this->Factions[i][j]->SetRuler(""); //"dead" factions should have no ruler
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (this->Factions[i][j]->IsAlive()) {
+				//faction income
+				for (int k = 0; k < MaxCosts; ++k) {
+					if (k == GrainCost || k == MushroomCost || k == FishCost || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
+						continue;
+					} else if (k == ResearchCost) {
+						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->ProvinceCount;
+					} else {
+						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
 					}
 				}
-			} else { //end of valid factions for this civilization
-				break;
+					
+				// try to perform ruler succession for existent factions without rulers
+				if (this->Factions[i][j]->Ruler == NULL) {
+					this->Factions[i][j]->RulerSuccession();
+				}
+			} else {
+				if (this->Factions[i][j]->Ruler != NULL) {
+					this->Factions[i][j]->SetRuler(""); //"dead" factions should have no ruler
+				}
 			}
 		}
 	}
@@ -946,19 +938,15 @@ void CGrandStrategyGame::DoTurn()
 	
 	//research technologies
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (this->Factions[i][j]) {
-				if (this->Factions[i][j]->IsAlive()) {
-					if (this->Factions[i][j]->CurrentResearch != -1) {
-						this->Factions[i][j]->SetTechnology(this->Factions[i][j]->CurrentResearch, true);
-						this->Factions[i][j]->CurrentResearch = -1;
-					}
-					
-					//see if this faction can form a faction
-					this->Factions[i][j]->CheckFormableFactions(i);
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (this->Factions[i][j]->IsAlive()) {
+				if (this->Factions[i][j]->CurrentResearch != -1) {
+					this->Factions[i][j]->SetTechnology(this->Factions[i][j]->CurrentResearch, true);
+					this->Factions[i][j]->CurrentResearch = -1;
 				}
-			} else { //end of valid factions for this civilization
-				break;
+					
+				//see if this faction can form a faction
+				this->Factions[i][j]->CheckFormableFactions(i);
 			}
 		}
 	}
@@ -1008,27 +996,23 @@ void CGrandStrategyGame::DoTrade()
 	
 	// first sell to domestic provinces, then to other factions, and only then to foreign provinces
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (this->Factions[i][j]) {
-				if (this->Factions[i][j]->IsAlive()) {
-					for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
-						int province_id = this->Factions[i][j]->OwnedProvinces[k];
-						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
-								continue;
-							}
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (this->Factions[i][j]->IsAlive()) {
+				for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
+					int province_id = this->Factions[i][j]->OwnedProvinces[k];
+					for (int res = 0; res < MaxCosts; ++res) {
+						if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+							continue;
+						}
 							
-							if (province_consumed_commodity[res][province_id] == false && this->Factions[i][j]->Trade[res] >= this->Provinces[province_id]->GetResourceDemand(res) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
-								this->Factions[i][j]->Resources[res] -= this->Provinces[province_id]->GetResourceDemand(res);
-								this->Factions[i][j]->Resources[GoldCost] += this->Provinces[province_id]->GetResourceDemand(res) * this->CommodityPrices[res] / 100;
-								this->Factions[i][j]->Trade[res] -= this->Provinces[province_id]->GetResourceDemand(res);
-								province_consumed_commodity[res][province_id] = true;
-							}
+						if (province_consumed_commodity[res][province_id] == false && this->Factions[i][j]->Trade[res] >= this->Provinces[province_id]->GetResourceDemand(res) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
+							this->Factions[i][j]->Resources[res] -= this->Provinces[province_id]->GetResourceDemand(res);
+							this->Factions[i][j]->Resources[GoldCost] += this->Provinces[province_id]->GetResourceDemand(res) * this->CommodityPrices[res] / 100;
+							this->Factions[i][j]->Trade[res] -= this->Provinces[province_id]->GetResourceDemand(res);
+							province_consumed_commodity[res][province_id] = true;
 						}
 					}
 				}
-			} else { //end of valid factions for this civilization
-				break;
 			}
 		}
 	}
@@ -1036,14 +1020,10 @@ void CGrandStrategyGame::DoTrade()
 	CGrandStrategyFaction *factions_by_prestige[MAX_RACES * FactionMax];
 	int factions_by_prestige_count = 0;
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (this->Factions[i][j]) {
-				if (this->Factions[i][j]->IsAlive()) {
-					factions_by_prestige[factions_by_prestige_count] = const_cast<CGrandStrategyFaction *>(&(*this->Factions[i][j]));
-					factions_by_prestige_count += 1;
-				}
-			} else { //end of valid factions for this civilization
-				break;
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (this->Factions[i][j]->IsAlive()) {
+				factions_by_prestige[factions_by_prestige_count] = const_cast<CGrandStrategyFaction *>(&(*this->Factions[i][j]));
+				factions_by_prestige_count += 1;
 			}
 		}
 	}
@@ -2884,13 +2864,11 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 	}
 
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) {
-				GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyState[i][j] = DiplomacyStatePeace;
-				GrandStrategyGame.Factions[i][j]->DiplomacyState[old_civilization][old_faction] = DiplomacyStatePeace;
-				GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStateProposal[i][j] = -1;
-				GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[old_civilization][old_faction] = -1;
-			}
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyState[i][j] = DiplomacyStatePeace;
+			GrandStrategyGame.Factions[i][j]->DiplomacyState[old_civilization][old_faction] = DiplomacyStatePeace;
+			GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStateProposal[i][j] = -1;
+			GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[old_civilization][old_faction] = -1;
 		}
 	}
 	
@@ -3418,13 +3396,9 @@ void CGrandStrategyHero::Die()
 
 	//check if the hero is the ruler of a faction, and if so, remove it from that position
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) {
-				if (GrandStrategyGame.Factions[i][j]->Ruler == this) {
-					GrandStrategyGame.Factions[i][j]->SetRuler("");
-				}
-			} else {
-				break;
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (GrandStrategyGame.Factions[i][j]->Ruler == this) {
+				GrandStrategyGame.Factions[i][j]->SetRuler("");
 			}
 		}
 	}
@@ -4749,43 +4723,39 @@ void CleanGrandStrategyGame()
 	}
 		
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) {
-				if (PlayerRaces.Factions[i][j]->Type == "tribe") {
-					GrandStrategyGame.Factions[i][j]->GovernmentType = -1;
-				} else if (PlayerRaces.Factions[i][j]->Type == "polity") {
-					GrandStrategyGame.Factions[i][j]->GovernmentType = GovernmentTypeMonarchy; //monarchy is the default government type for polities
-				}
-				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
-				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
-				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
-				GrandStrategyGame.Factions[i][j]->Upkeep = 0;
-				GrandStrategyGame.Factions[i][j]->Ruler = NULL;
-				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
-					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
-				}
-				for (int k = 0; k < MaxCosts; ++k) {
-					GrandStrategyGame.Factions[i][j]->Resources[k] = 0;
-					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
-					GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
-					GrandStrategyGame.Factions[i][j]->Trade[k] = 0;
-				}
-				for (int k = 0; k < ProvinceMax; ++k) {
-					GrandStrategyGame.Factions[i][j]->OwnedProvinces[k] = -1;
-				}
-				for (size_t k = 0; k < UnitTypes.size(); ++k) {
-					GrandStrategyGame.Factions[i][j]->MilitaryScoreBonus[k] = 0;
-				}
-				for (int k = 0; k < MAX_RACES; ++k) {
-					for (int n = 0; n < FactionMax; ++n) {
-						GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] = DiplomacyStatePeace;
-						GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[k][n] = -1;
-					}
-				}
-				GrandStrategyGame.Factions[i][j]->Claims.clear();
-			} else {
-				break;
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (PlayerRaces.Factions[i][j]->Type == "tribe") {
+				GrandStrategyGame.Factions[i][j]->GovernmentType = -1;
+			} else if (PlayerRaces.Factions[i][j]->Type == "polity") {
+				GrandStrategyGame.Factions[i][j]->GovernmentType = GovernmentTypeMonarchy; //monarchy is the default government type for polities
 			}
+			GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
+			GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
+			GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
+			GrandStrategyGame.Factions[i][j]->Upkeep = 0;
+			GrandStrategyGame.Factions[i][j]->Ruler = NULL;
+			for (size_t k = 0; k < AllUpgrades.size(); ++k) {
+				GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
+			}
+			for (int k = 0; k < MaxCosts; ++k) {
+				GrandStrategyGame.Factions[i][j]->Resources[k] = 0;
+				GrandStrategyGame.Factions[i][j]->Income[k] = 0;
+				GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
+				GrandStrategyGame.Factions[i][j]->Trade[k] = 0;
+			}
+			for (int k = 0; k < ProvinceMax; ++k) {
+				GrandStrategyGame.Factions[i][j]->OwnedProvinces[k] = -1;
+			}
+			for (size_t k = 0; k < UnitTypes.size(); ++k) {
+				GrandStrategyGame.Factions[i][j]->MilitaryScoreBonus[k] = 0;
+			}
+			for (int k = 0; k < MAX_RACES; ++k) {
+				for (size_t n = 0; n < PlayerRaces.Factions[k].size(); ++n) {
+					GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] = DiplomacyStatePeace;
+					GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[k][n] = -1;
+				}
+			}
+			GrandStrategyGame.Factions[i][j]->Claims.clear();
 		}
 	}
 	
@@ -5131,7 +5101,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 	
 	//create grand strategy faction instances for all defined factions
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (!GrandStrategyGame.Factions[i][j]) { // no need to create a grand strategy instance for an already-created faction again
 				if (PlayerRaces.Factions[i][j] && !PlayerRaces.Factions[i][j]->Name.empty()) { //if the faction is defined
 					CGrandStrategyFaction *faction = new CGrandStrategyFaction;
@@ -5335,7 +5305,7 @@ void InitializeGrandStrategyProvinces()
 		for (int j = 0; j < MAX_RACES; ++j) {
 			province->CulturalNames[j] = Provinces[i]->CulturalNames[j];
 			
-			for (int k = 0; k < FactionMax; ++k) {
+			for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
 				if (Provinces[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != Provinces[i]->FactionCulturalNames.end()) {
 					province->FactionCulturalNames[PlayerRaces.Factions[j][k]] = Provinces[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]];
 				}
@@ -5383,18 +5353,14 @@ void InitializeGrandStrategyFactions()
 
 	// calculate income and upkeep, and set initial ruler (if none is preset) for factions
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) {
-				if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
-					// try to perform ruler succession for existent factions without rulers
-					if (GrandStrategyGame.Factions[i][j]->Ruler == NULL) {
-						GrandStrategyGame.Factions[i][j]->RulerSuccession();
-					}
-					GrandStrategyGame.Factions[i][j]->CalculateIncomes();
-					GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
+				// try to perform ruler succession for existent factions without rulers
+				if (GrandStrategyGame.Factions[i][j]->Ruler == NULL) {
+					GrandStrategyGame.Factions[i][j]->RulerSuccession();
 				}
-			} else { //end of valid factions for this civilization
-				break;
+				GrandStrategyGame.Factions[i][j]->CalculateIncomes();
+				GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
 			}
 		}
 	}
@@ -5798,12 +5764,8 @@ void CalculateFactionIncomes(std::string civilization_name, std::string faction_
 void CalculateFactionUpkeeps()
 {
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (int j = 0; j < FactionMax; ++j) {
-			if (GrandStrategyGame.Factions[i][j]) {
-				GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
-			} else { //end of valid factions for this civilization
-				break;
-			}
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			GrandStrategyGame.Factions[i][j]->CalculateUpkeep();
 		}
 	}
 }
@@ -6214,17 +6176,13 @@ bool FactionHasHero(std::string civilization_name, std::string faction_name, std
 		}
 		//check if the hero is the ruler of a faction
 		for (int i = 0; i < MAX_RACES; ++i) {
-			for (int j = 0; j < FactionMax; ++j) {
-				if (GrandStrategyGame.Factions[i][j]) {
-					if (GrandStrategyGame.Factions[i][j]->Ruler == hero) {
-						if (civilization == i && faction == j) {
-							return true;
-						} else {
-							return false;
-						}
+			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+				if (GrandStrategyGame.Factions[i][j]->Ruler == hero) {
+					if (civilization == i && faction == j) {
+						return true;
+					} else {
+						return false;
 					}
-				} else {
-					break;
 				}
 			}
 		}

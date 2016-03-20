@@ -217,7 +217,7 @@ public:
 		memset(Trade, 0, sizeof(Trade));
 		memset(MilitaryScoreBonus, 0, sizeof(MilitaryScoreBonus));
 		for (int i = 0; i < MAX_RACES; ++i) {
-			for (int j = 0; j < FactionMax; ++j) {
+			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 				DiplomacyState[i][j] = DiplomacyStatePeace;
 				DiplomacyStateProposal[i][j] = -1;
 			}
@@ -336,7 +336,7 @@ public:
 			}
 		}
 		for (int i = 0; i < MAX_RACES; ++i) {
-			for (int j = 0; j < FactionMax; ++j) {
+			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 				Factions[i][j] = NULL;
 			}
 		}
