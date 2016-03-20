@@ -238,7 +238,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	}
 	//Wyrmgus end
 
-	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
+	//Wyrmgus start
+//	if (newtype.CanCastSpell && !unit.AutoCastSpell) {
+	if (!unit.AutoCastSpell) { //to avoid crashes with spell items for units who cannot ordinarily cast spells
+	//Wyrmgus end
 		unit.AutoCastSpell = new char[SpellTypeTable.size()];
 		unit.SpellCoolDownTimers = new int[SpellTypeTable.size()];
 		memset(unit.AutoCastSpell, 0, SpellTypeTable.size() * sizeof(char));

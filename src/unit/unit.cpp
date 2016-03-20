@@ -1611,7 +1611,10 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	// Create AutoCastSpell and SpellCoolDownTimers arrays for casters
-	if (type.CanCastSpell) {
+	//Wyrmgus start
+//	if (type.CanCastSpell) {
+	//to avoid crashes with spell items for units who cannot ordinarily cast spells
+	//Wyrmgus end
 		AutoCastSpell = new char[SpellTypeTable.size()];
 		SpellCoolDownTimers = new int[SpellTypeTable.size()];
 		memset(SpellCoolDownTimers, 0, SpellTypeTable.size() * sizeof(int));
@@ -1620,7 +1623,9 @@ void CUnit::Init(const CUnitType &type)
 		} else {
 			memset(AutoCastSpell, 0, SpellTypeTable.size());
 		}
-	}
+	//Wyrmgus start
+//	}
+	//Wyrmgus end
 	Active = 1;
 	Removed = 1;
 
