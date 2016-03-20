@@ -1721,7 +1721,7 @@ static int CclGetCivilizationFactionNames(lua_State *l)
 	lua_pop(l, 1);
 
 	lua_createtable(l, PlayerRaces.Factions[civilization].size(), 0);
-	for (int i = 1; i <= PlayerRaces.Factions[civilization].size(); ++i)
+	for (size_t i = 1; i <= PlayerRaces.Factions[civilization].size(); ++i)
 	{
 		lua_pushstring(l, PlayerRaces.Factions[civilization][i-1]->Name.c_str());
 		lua_rawseti(l, -2, i);

@@ -4724,38 +4724,40 @@ void CleanGrandStrategyGame()
 		
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (PlayerRaces.Factions[i][j]->Type == "tribe") {
-				GrandStrategyGame.Factions[i][j]->GovernmentType = -1;
-			} else if (PlayerRaces.Factions[i][j]->Type == "polity") {
-				GrandStrategyGame.Factions[i][j]->GovernmentType = GovernmentTypeMonarchy; //monarchy is the default government type for polities
-			}
-			GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
-			GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
-			GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
-			GrandStrategyGame.Factions[i][j]->Upkeep = 0;
-			GrandStrategyGame.Factions[i][j]->Ruler = NULL;
-			for (size_t k = 0; k < AllUpgrades.size(); ++k) {
-				GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
-			}
-			for (int k = 0; k < MaxCosts; ++k) {
-				GrandStrategyGame.Factions[i][j]->Resources[k] = 0;
-				GrandStrategyGame.Factions[i][j]->Income[k] = 0;
-				GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
-				GrandStrategyGame.Factions[i][j]->Trade[k] = 0;
-			}
-			for (int k = 0; k < ProvinceMax; ++k) {
-				GrandStrategyGame.Factions[i][j]->OwnedProvinces[k] = -1;
-			}
-			for (size_t k = 0; k < UnitTypes.size(); ++k) {
-				GrandStrategyGame.Factions[i][j]->MilitaryScoreBonus[k] = 0;
-			}
-			for (int k = 0; k < MAX_RACES; ++k) {
-				for (size_t n = 0; n < PlayerRaces.Factions[k].size(); ++n) {
-					GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] = DiplomacyStatePeace;
-					GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[k][n] = -1;
+			if (GrandStrategyGame.Factions[i][j]) {
+				if (PlayerRaces.Factions[i][j]->Type == "tribe") {
+					GrandStrategyGame.Factions[i][j]->GovernmentType = -1;
+				} else if (PlayerRaces.Factions[i][j]->Type == "polity") {
+					GrandStrategyGame.Factions[i][j]->GovernmentType = GovernmentTypeMonarchy; //monarchy is the default government type for polities
 				}
+				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
+				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
+				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
+				GrandStrategyGame.Factions[i][j]->Upkeep = 0;
+				GrandStrategyGame.Factions[i][j]->Ruler = NULL;
+				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
+					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
+				}
+				for (int k = 0; k < MaxCosts; ++k) {
+					GrandStrategyGame.Factions[i][j]->Resources[k] = 0;
+					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
+					GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
+					GrandStrategyGame.Factions[i][j]->Trade[k] = 0;
+				}
+				for (int k = 0; k < ProvinceMax; ++k) {
+					GrandStrategyGame.Factions[i][j]->OwnedProvinces[k] = -1;
+				}
+				for (size_t k = 0; k < UnitTypes.size(); ++k) {
+					GrandStrategyGame.Factions[i][j]->MilitaryScoreBonus[k] = 0;
+				}
+				for (int k = 0; k < MAX_RACES; ++k) {
+					for (size_t n = 0; n < PlayerRaces.Factions[k].size(); ++n) {
+						GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] = DiplomacyStatePeace;
+						GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[k][n] = -1;
+					}
+				}
+				GrandStrategyGame.Factions[i][j]->Claims.clear();
 			}
-			GrandStrategyGame.Factions[i][j]->Claims.clear();
 		}
 	}
 	
