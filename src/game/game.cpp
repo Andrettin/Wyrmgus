@@ -545,7 +545,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		
 		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 			for (size_t j = 0; j < PlayerRaces.Languages[i]->ModWords.size(); ++j) {
-				if (PlayerRaces.Languages[i]->ModWords[j]->Mod != mod_file && PlayerRaces.Languages[i]->ModWords[j]->Mod != Map.Info.Filename) {
+				if (PlayerRaces.Languages[i]->ModWords[j]->Mod != Map.Info.Filename) {
 					continue;
 				}
 				
@@ -603,7 +603,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				if (PlayerRaces.Factions[i][j]->Mod != mod_file && PlayerRaces.Factions[i][j]->Mod != Map.Info.Filename) {
+				if (PlayerRaces.Factions[i][j]->Mod != Map.Info.Filename) {
 					continue;
 				}
 				
@@ -611,6 +611,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
 				if (!PlayerRaces.Factions[i][j]->Type.empty()) {
 					f->printf("\tType = \"%s\",\n", PlayerRaces.Factions[i][j]->Type.c_str());
+				}
+				if (PlayerRaces.Factions[i][j]->ParentFaction != -1) {
+					f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[i][PlayerRaces.Factions[i][j]->ParentFaction]->Name.c_str());
 				}
 				if (PlayerRaces.Factions[i][j]->Language != -1) {
 					f->printf("\tLanguage = \"%s\",\n", PlayerRaces.Languages[PlayerRaces.Factions[i][j]->Language]->Ident.c_str());

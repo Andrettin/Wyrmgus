@@ -1470,13 +1470,16 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "ParentFaction")) {
 			parent_faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Language")) {
-			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
+			std::string language_name = LuaToString(l, -1);
+			int language = PlayerRaces.GetLanguageIndexByIdent(language_name);
 			
 			if (language != -1) {
 				faction->Language = language;
 				PlayerRaces.Languages[language]->UsedByCivilizationOrFaction = true;
+			} else if (language_name.empty()) {
+				faction->Language = language; // to allow redefinitions to remove the language setting
 			} else {
-				LuaError(l, "Language not found.");
+				LuaError(l, "Language \"%s\" not found." _C_ language_name.c_str());
 			}
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
@@ -1519,6 +1522,8 @@ static int CclDefineFaction(lua_State *l)
 		if (faction->ParentFaction != -1 && faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
 			faction->FactionUpgrade = PlayerRaces.Factions[civilization][faction->ParentFaction]->FactionUpgrade;
 		}
+	} else if (parent_faction.empty()) {
+		faction->ParentFaction = -1; // to allow redefinitions to remove the parent faction setting
 	}
 	
 	return 0;
@@ -1868,6 +1873,13 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "FactionUpgrade")) {
 		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->FactionUpgrade.c_str());
+		return 1;
+	} else if (!strcmp(data, "ParentFaction")) {
+		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
+			lua_pushstring(l, PlayerRaces.Factions[civilization][PlayerRaces.Factions[civilization][faction]->ParentFaction]->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
