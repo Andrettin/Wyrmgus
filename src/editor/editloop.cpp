@@ -2269,6 +2269,39 @@ int EditorSaveMap(const std::string &file, bool is_mod)
 	std::string fullName;
 	fullName = StratagusLibPath + "/" + file;
 	//Wyrmgus start
+	if (is_mod) { // if is a mod, save the file in a folder of the same name as the file's name
+		std::string file_name;
+		std::string path_name;
+		int name_size = fullName.length();
+		for (int i = (name_size - 1); i >= 0; --i) {
+			if (fullName[i] == '/') {
+				file_name = fullName.substr(i + 1, (name_size - i - 1));
+				path_name = fullName.substr(0, i);
+				break;
+			}
+		}
+		std::string previous_path_name;
+		name_size = path_name.length();
+		for (int i = (name_size - 1); i >= 0; --i) {
+			if (path_name[i] == '/') {
+				previous_path_name = path_name.substr(i + 1, (name_size - i - 1));
+				break;
+			}
+		}
+		std::string file_name_without_ending = FindAndReplaceString(file_name, ".gz", "");
+		file_name_without_ending = FindAndReplaceString(file_name_without_ending, ".smp", "");
+		
+		if (previous_path_name != file_name_without_ending) {
+			struct stat tmp;
+			
+			path_name += "/" + file_name_without_ending + "/";
+			if (stat(path_name.c_str(), &tmp) < 0) {
+				makedir(path_name.c_str(), 0777);
+			}
+			fullName = path_name + file_name;
+		}
+	}
+	
 //	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable) == -1) {
 	if (SaveStratagusMap(fullName, Map, Editor.TerrainEditable && !is_mod, is_mod) == -1) {
 	//Wyrmgus end
