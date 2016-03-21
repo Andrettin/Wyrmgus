@@ -869,6 +869,8 @@ public:
 	//Wyrmgus start
 	CGraphic *LightSprite;						/// Light sprite image
 	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// Layer sprite images
+	
+	std::string Mod;							/// To which mod (or map), if any, this unit type belongs
 	//Wyrmgus end
 };
 
@@ -1033,6 +1035,9 @@ extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
 						 int player, int frame, const PixelPos &screenPos);
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
+//Wyrmgus start
+extern void InitUnitType(CUnitType &type);			/// Init unit-type
+//Wyrmgus end
 extern void LoadUnitTypeSprite(CUnitType &unittype); /// Load the sprite for a unittype
 extern int GetUnitTypesCount();                     /// Get the amount of unit-types
 extern void LoadUnitTypes();                     /// Load the unit-type data

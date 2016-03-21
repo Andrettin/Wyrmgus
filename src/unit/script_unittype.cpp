@@ -1852,6 +1852,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->InvertedEastArms = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "InvertedSoutheastArms")) {
 			type->InvertedSoutheastArms = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Mod")) {
+			type->Mod = LuaToString(l, -1);
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.VariableNameLookup[value];
@@ -1942,7 +1944,16 @@ static int CclDefineUnitType(lua_State *l)
 		LuaError(l, "Unit-type '%s': right-attack is set, but can-attack is not\n" _C_ type->Name.c_str());
 	}
 	UpdateDefaultBoolFlags(*type);
-	if (!CclInConfigFile) {
+	//Wyrmgus start
+	if (GameRunning || Editor.Running == EditorEditing) {
+		InitUnitType(*type);
+		LoadUnitTypeSprite(*type);
+	}
+	//Wyrmgus end
+	//Wyrmgus start
+//	if (!CclInConfigFile) {
+	if (!CclInConfigFile || GameRunning || Editor.Running == EditorEditing) {
+	//Wyrmgus end
 		UpdateUnitStats(*type, 1);
 	}
 	return 0;
@@ -2978,6 +2989,31 @@ static int CclDefineExtraDeathTypes(lua_State *l)
 	}
 	return 0;
 }
+
+//Wyrmgus start
+static int CclGetUnitTypes(lua_State *l)
+{
+	std::string mod_file;
+	if (lua_gettop(l) >= 1) {
+		mod_file = LuaToString(l, 1);
+	}
+	
+	std::vector<std::string> unit_types;
+	for (size_t i = 0; i != UnitTypes.size(); ++i) {
+		if (mod_file.empty() || UnitTypes[i]->Mod == mod_file) {
+			unit_types.push_back(UnitTypes[i]->Ident);
+		}
+	}
+		
+	lua_createtable(l, unit_types.size(), 0);
+	for (size_t i = 1; i <= unit_types.size(); ++i)
+	{
+		lua_pushstring(l, unit_types[i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+//Wyrmgus end
 // ----------------------------------------------------------------------------
 
 /**
@@ -3395,6 +3431,9 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "DefineDecorations", CclDefineDecorations);
 
 	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
+	//Wyrmgus start
+	lua_register(Lua, "GetUnitTypes", CclGetUnitTypes);
+	//Wyrmgus end
 
 	UnitTypeVar.Init();
 

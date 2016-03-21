@@ -3211,6 +3211,20 @@ void ParseNameElements(lua_State *l, std::string type)
 	}
 }
 
+void DeleteModFaction(std::string civilization_name, std::string faction_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	if (faction != -1 && !PlayerRaces.Factions[civilization][faction]->Mod.empty()) {
+		FactionStringToIndex[civilization].erase(PlayerRaces.Factions[civilization][faction]->Name);
+		delete PlayerRaces.Factions[civilization][faction];
+		PlayerRaces.Factions[civilization].erase(std::remove(PlayerRaces.Factions[civilization].begin(), PlayerRaces.Factions[civilization].end(), PlayerRaces.Factions[civilization][faction]), PlayerRaces.Factions[civilization].end());
+	}
+}
+
 void DisableMod(std::string mod_file)
 {
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {

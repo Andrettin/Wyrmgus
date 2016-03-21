@@ -1427,7 +1427,9 @@ void InitUnitTypes(int reset_player_stats)
 		}
 		//  Add idents to hash.
 		UnitTypeMap[type.Ident] = UnitTypes[i];
-
+		
+		//Wyrmgus start
+		/*
 		// Determine still frame
 		type.StillFrame = GetStillFrame(type);
 
@@ -1442,11 +1444,34 @@ void InitUnitTypes(int reset_player_stats)
 			 b < type.AiBuildingRules.end(); ++b) {
 			(*b)->Init();
 		}
+		*/
+		InitUnitType(type);
+		//Wyrmgus end
 	}
 
 	// LUDO : called after game is loaded -> don't reset stats !
 	UpdateStats(reset_player_stats); // Calculate the stats
 }
+
+//Wyrmgus start
+void InitUnitType(CUnitType &type)
+{
+	// Determine still frame
+	type.StillFrame = GetStillFrame(type);
+
+	// Lookup BuildingTypes
+	for (std::vector<CBuildRestriction *>::iterator b = type.BuildingRules.begin();
+		 b < type.BuildingRules.end(); ++b) {
+		(*b)->Init();
+	}
+
+	// Lookup AiBuildingTypes
+	for (std::vector<CBuildRestriction *>::iterator b = type.AiBuildingRules.begin();
+		 b < type.AiBuildingRules.end(); ++b) {
+		(*b)->Init();
+	}
+}
+//Wyrmgus end
 
 /**
 **  Loads the Sprite for a unit type

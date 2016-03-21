@@ -430,8 +430,7 @@ class CDeity
 public:
 	CDeity() :
 		Civilization(-1), Gender(0),
-		Major(false),
-		Name(""), UpgradeIdent(""), Portfolio(""), ParentDeity("")
+		Major(false)
 	{
 	}
 	
@@ -781,6 +780,7 @@ extern int GetAffixTypeIdByName(std::string affix_type);
 extern std::string GetWordJunctionTypeNameById(int word_junction_type);
 extern int GetWordJunctionTypeIdByName(std::string word_junction_type);
 extern void GenerateMissingLanguageData();
+extern void DeleteModWord(std::string language_name, std::string word_name);
 extern void CleanLanguageModWords(std::string mod_file);
 extern bool IsNameValidForWord(std::string word_name);
 //Wyrmgus end

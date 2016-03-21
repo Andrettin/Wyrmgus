@@ -3359,6 +3359,18 @@ void GenerateMissingLanguageData()
 	}
 }
 
+void DeleteModWord(std::string language_name, std::string word_name)
+{
+	int language = PlayerRaces.GetLanguageIndexByIdent(language_name.c_str());
+	std::vector<std::string> meanings;
+	LanguageWord *word = PlayerRaces.Languages[language]->GetWord(word_name, -1, meanings);
+	if (word != NULL && !word->Mod.empty()) {
+		PlayerRaces.Languages[language]->RemoveWord(word);
+		delete word;
+		PlayerRaces.Languages[language]->ModWords.erase(std::remove(PlayerRaces.Languages[language]->ModWords.begin(), PlayerRaces.Languages[language]->ModWords.end(), word), PlayerRaces.Languages[language]->ModWords.end());
+	}
+}
+
 void CleanLanguageModWords(std::string mod_file)
 {
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {

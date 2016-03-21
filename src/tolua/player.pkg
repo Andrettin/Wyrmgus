@@ -79,6 +79,7 @@ extern CPlayer *ThisPlayer;
 extern void NetworkSetFaction(int player, std::string faction_name);
 extern std::string GetFactionEffectsString(std::string civilization_name, std::string faction_name);
 extern void GenerateMissingLanguageData();
+extern void DeleteModWord(std::string language_name, std::string word_name);
 extern void CleanLanguageModWords(std::string mod_file);
 extern bool IsNameValidForWord(std::string word_name);
 //Wyrmgus end
