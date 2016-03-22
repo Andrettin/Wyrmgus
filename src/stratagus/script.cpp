@@ -3241,6 +3241,20 @@ void DisableMod(std::string mod_file)
 				Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), UnitTypes[i]->Ident), Editor.UnitTypes.end());
 				RecalculateShownUnits();
 			}
+			for (int j = 0; j < MAX_RACES; ++j) {
+				for (int k = 0; k < UnitTypeClassMax; ++k) {
+					if (PlayerRaces.CivilizationClassUnitTypes[j][k] == UnitTypes[i]->Slot) {
+						PlayerRaces.CivilizationClassUnitTypes[j][k] = -1;
+					}
+				}
+				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
+					for (int n = 0; n < UnitTypeClassMax; ++n) {
+						if (PlayerRaces.FactionClassUnitTypes[j][k][n] == UnitTypes[i]->Slot) {
+							PlayerRaces.FactionClassUnitTypes[j][k][n] = -1;
+						}
+					}
+				}
+			}
 			UnitTypeMap.erase(UnitTypes[i]->Ident);
 			delete UnitTypes[i];
 			UnitTypes.erase(std::remove(UnitTypes.begin(), UnitTypes.end(), UnitTypes[i]), UnitTypes.end());

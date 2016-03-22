@@ -1368,6 +1368,23 @@ static void EditorCallbackButtonUp(unsigned button)
 	if ((1 << button) == LeftButton) {
 		UnitPlacedThisPress = false;
 	}
+	//Wyrmgus start
+	if (Editor.State == EditorEditUnit) {
+		if (Editor.CursorUnitIndex != -1) {
+			if (Editor.CursorUnitIndex == (int) Editor.ShownUnitTypes.size()) {
+				if ((1 << button) == LeftButton) {
+					Editor.SelectedUnitIndex = -1;
+					Editor.CursorUnitIndex = -1;
+					CursorBuilding = NULL;
+					char buf[256];
+					snprintf(buf, sizeof(buf), "if (EditorCreateUnitType() ~= nil) then EditorCreateUnitType() end;");
+					CclCommand(buf);
+					return;
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 /**
@@ -1491,17 +1508,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				return;
 			}
 			*/
-			if (Editor.CursorUnitIndex == (int) Editor.ShownUnitTypes.size()) {
-				if (MouseButtons & LeftButton) {
-					Editor.SelectedUnitIndex = -1;
-					Editor.CursorUnitIndex = -1;
-					CursorBuilding = NULL;
-					char buf[256];
-					snprintf(buf, sizeof(buf), "if (EditorCreateUnitType() ~= nil) then EditorCreateUnitType() end;");
-					CclCommand(buf);
-					return;
-				}
-			} else {
+			if (Editor.CursorUnitIndex != (int) Editor.ShownUnitTypes.size()) {
 				if (MouseButtons & LeftButton) {
 					Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
 					CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);

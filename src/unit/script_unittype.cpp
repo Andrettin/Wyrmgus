@@ -1935,6 +1935,23 @@ static int CclDefineUnitType(lua_State *l)
 				break;
 			}
 		}
+		
+		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
+		for (int i = 0; i < MAX_RACES; ++i) {
+			for (int j = 0; j < UnitTypeClassMax; ++j) {
+				if (PlayerRaces.CivilizationClassUnitTypes[i][j] == type->Slot) {
+					PlayerRaces.CivilizationClassUnitTypes[i][j] = -1;
+				}
+			}
+			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+				for (int k = 0; k < UnitTypeClassMax; ++k) {
+					if (PlayerRaces.FactionClassUnitTypes[i][j][k] == type->Slot) {
+						PlayerRaces.FactionClassUnitTypes[i][j][k] = -1;
+					}
+				}
+			}
+		}
+		
 		if (!type->Civilization.empty()) {
 			int civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
 			
@@ -2423,6 +2440,15 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Mercenary")) {
 		lua_pushboolean(l, type->BoolFlag[MERCENARY_INDEX].value);
 		return 1;
+	} else if (!strcmp(data, "ButtonPos")) {
+		lua_pushnumber(l, type->ButtonPos);
+		return 1;
+	} else if (!strcmp(data, "ButtonKey")) {
+		lua_pushstring(l, type->ButtonKey.c_str());
+		return 1;
+	} else if (!strcmp(data, "ButtonHint")) {
+		lua_pushstring(l, type->ButtonHint.c_str());
+		return 1;
 	} else if (!strcmp(data, "Mod")) {
 		lua_pushstring(l, type->Mod.c_str());
 		return 1;
@@ -2722,6 +2748,14 @@ static int CclGetUnitTypeData(lua_State *l)
 		for (size_t i = 1; i <= variation_idents.size(); ++i)
 		{
 			lua_pushstring(l, variation_idents[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Trains")) {
+		lua_createtable(l, type->Trains.size(), 0);
+		for (size_t i = 1; i <= type->Trains.size(); ++i)
+		{
+			lua_pushstring(l, type->Trains[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

@@ -636,7 +636,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 			CUnitType &type = *UnitTypes[i];
 			
-			if (type.Mod != Map.Info.Filename) { //units from this mod were already saved previously
+			if (type.Mod != Map.Info.Filename) {
 				continue;
 			}
 			
@@ -693,6 +693,16 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						f->printf("\t%s = %d,\n", UnitTypeVar.VariableNameLookup[j], type.DefaultStat.Variables[j].Value);
 					}
 				}
+			}
+			
+			if (type.ButtonPos != 0 && (parent_type == NULL || type.ButtonPos != parent_type->ButtonPos)) {
+				f->printf("\tButtonPos = %d,\n", type.ButtonPos);
+			}
+			if (!type.ButtonKey.empty() && (parent_type == NULL || type.ButtonKey != parent_type->ButtonKey)) {
+				f->printf("\tButtonKey = \"%s\",\n", type.ButtonKey.c_str());
+			}
+			if (!type.ButtonHint.empty() && (parent_type == NULL || type.ButtonKey != parent_type->ButtonHint)) {
+				f->printf("\tButtonHint = \"%s\",\n", type.ButtonHint.c_str());
 			}
 			
 			f->printf("\tSounds = {\n");
@@ -766,6 +776,26 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			f->printf("\tMod = \"%s\"\n", mod_file.c_str());
 			f->printf("})\n\n");
 		}
+		
+		//save the definition of trained unit types separately, to avoid issues like a trained unit being defined after the unit that trains it
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+			CUnitType &type = *UnitTypes[i];
+			
+			if (type.Mod != Map.Info.Filename) {
+				continue;
+			}
+			
+			f->printf("DefineUnitType(\"%s\", {\n", type.Ident.c_str());
+			if (type.Trains.size() > 0) {
+				f->printf("\tTrains = {");
+				for (size_t j = 0; j < type.Trains.size(); ++j) {
+					f->printf("\"%s\", ", type.Trains[j]->Ident.c_str());
+				}
+				f->printf("}\n");
+			}
+			
+			f->printf("})\n\n");
+		}		
 		//Wyrmgus end
 
 		//Wyrmgus start
