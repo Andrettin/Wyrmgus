@@ -104,7 +104,12 @@ void InitButtons()
 {
 	// Resolve the icon names.
 	for (size_t i = 0; i != UnitButtonTable.size(); ++i) {
-		UnitButtonTable[i]->Icon.Load();
+		//Wyrmgus start
+//		UnitButtonTable[i]->Icon.Load();
+		if (!UnitButtonTable[i]->Icon.Name.empty()) {
+			UnitButtonTable[i]->Icon.Load();
+		}
+		//Wyrmgus end
 	}
 	CurrentButtons.clear();
 }
@@ -1170,28 +1175,26 @@ void CButtonPanel::Draw()
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
 											   pos, buf, player);
 			*/
+			
+			CIcon *button_icon = buttons[i].Icon.Icon;
+			
 			// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
 			if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->GetItemSlotQuantity(ArrowsItemSlot) > 0 && Selected[0]->EquippedItems[ArrowsItemSlot].size() > 0) {
-				Selected[0]->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player);
+				button_icon = Selected[0]->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon;
 			} else if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->GetItemSlotQuantity(ArrowsItemSlot) == 0 && Selected[0]->EquippedItems[WeaponItemSlot].size() > 0) {
-				Selected[0]->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player);
+				button_icon = Selected[0]->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon;
 			} else if (Selected.size() == 1 && buttons[i].Action == ButtonStop && Selected[0]->EquippedItems[ShieldItemSlot].size() > 0) {
-				Selected[0]->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player);
+				button_icon = Selected[0]->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon;
 			} else if (Selected.size() == 1 && buttons[i].Action == ButtonMove && Selected[0]->EquippedItems[BootsItemSlot].size() > 0) {
-				Selected[0]->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player);
-			} else {
-				buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-												   GetButtonStatus(buttons[i], ButtonUnderCursor),
-												   pos, buf, player);
+				button_icon = Selected[0]->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon;
+			} else if (buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
+				button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
+			} else if (buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
+				button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
 			}
+			button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+											   GetButtonStatus(buttons[i], ButtonUnderCursor),
+											   pos, buf, player);
 			
 			//draw the quantity in stock for unit "training" cases which have it
 			if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) {

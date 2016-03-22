@@ -687,6 +687,7 @@ public:
 	std::vector<SpellType *> DropSpells;	/// Spells which can be applied to dropped items
 	std::vector<CUpgrade *> Affixes;	/// Affixes which can be generated for this unit type
 	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
+	std::vector<CUnitType *> Trains;	/// Units trained by this unit
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files
@@ -785,6 +786,11 @@ public:
 	int ButtonLevelForTransporter;  /// On which button level game will show units inside transporter
 	//Wyrmgus start
 	int ButtonLevelForInventory;	/// On which button level the game will show items inside inventory
+	int ButtonPos;					/// Position of this unit as a train/build button
+	int ButtonLevel;				/// Level of this unit's button
+	std::string ButtonPopup;		/// Popup of this unit's button
+	std::string ButtonHint;			/// Hint of this unit's button
+	std::string ButtonKey;			/// Hotkey of this unit's button
 	//Wyrmgus end
 	int StartingResources;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!

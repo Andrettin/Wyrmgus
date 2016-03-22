@@ -237,7 +237,10 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 				return false;
 			}
 
-			unit.Player->Notify(NotifyYellow, unit.tilePos, "%s", _("You cannot reach building place"));
+			//Wyrmgus start
+//			unit.Player->Notify(NotifyYellow, unit.tilePos, "%s", _("You cannot reach building place"));
+			unit.Player->Notify(NotifyYellow, unit.tilePos, _("%s cannot reach building place"), unit.GetMessageName().c_str());
+			//Wyrmgus end
 			if (unit.Player->AiEnabled) {
 				AiCanNotReach(unit, this->GetUnitType());
 			}

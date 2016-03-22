@@ -652,6 +652,11 @@ static int CclDefineUnitType(lua_State *l)
 			type->BoardSize = parent_type->BoardSize;
 			type->ButtonLevelForTransporter = parent_type->ButtonLevelForTransporter;
 			type->ButtonLevelForInventory = parent_type->ButtonLevelForInventory;
+			type->ButtonPos = parent_type->ButtonPos;
+			type->ButtonLevel = parent_type->ButtonLevel;
+			type->ButtonPopup = parent_type->ButtonPopup;
+			type->ButtonHint = parent_type->ButtonHint;
+			type->ButtonKey = parent_type->ButtonKey;
 			type->StartingResources = parent_type->StartingResources;
 			type->BurnPercent = parent_type->BurnPercent;
 			type->BurnDamageRate = parent_type->BurnDamageRate;
@@ -738,6 +743,9 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
 				type->Traits.push_back(parent_type->Traits[i]);
+			}
+			for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
+				type->Trains.push_back(parent_type->Trains[i]);
 			}
 			for (size_t i = 0; i < parent_type->PersonalNames.size(); ++i) {
 				type->PersonalNames.push_back(parent_type->PersonalNames[i]);
@@ -1133,6 +1141,28 @@ static int CclDefineUnitType(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "ButtonLevelForInventory")) {
 			type->ButtonLevelForInventory = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ButtonPos")) {
+			type->ButtonPos = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ButtonLevel")) {
+			type->ButtonLevel = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ButtonPopup")) {
+			type->ButtonPopup = LuaToString(l, -1);
+		} else if (!strcmp(value, "ButtonHint")) {
+			type->ButtonHint = LuaToString(l, -1);
+		} else if (!strcmp(value, "ButtonKey")) {
+			type->ButtonKey = LuaToString(l, -1);
+		} else if (!strcmp(value, "Trains")) {
+			type->Trains.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				value = LuaToString(l, -1, j + 1);
+				CUnitType *trained_unit = UnitTypeByIdent(value);
+				if (trained_unit != NULL) {
+					type->Trains.push_back(trained_unit);
+				} else {
+					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);
+				}
+			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "StartingResources")) {
 			type->StartingResources = LuaToNumber(l, -1);
@@ -1960,6 +1990,28 @@ static int CclDefineUnitType(lua_State *l)
 	if (Editor.Running == EditorEditing && std::find(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), type->Ident) == Editor.UnitTypes.end()) {
 		Editor.UnitTypes.push_back(type->Ident);
 		RecalculateShownUnits();
+	}
+	
+	for (size_t i = 0; i < type->Trains.size(); ++i) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = " + std::to_string((long long) type->Trains[i]->ButtonPos) + ",\n";
+		button_definition += "\tLevel = " + std::to_string((long long) type->Trains[i]->ButtonLevel) + ",\n";
+		button_definition += "\tAction = ";
+		if (type->Trains[i]->BoolFlag[BUILDING_INDEX].value) {
+			button_definition += "\"build\"";
+		} else {
+			button_definition += "\"train-unit\"";
+		}
+		button_definition += ",\n";
+		button_definition += "\tValue = \"" + type->Trains[i]->Ident + "\",\n";
+		if (!type->Trains[i]->ButtonPopup.empty()) {
+			button_definition += "\tPopup = \"" + type->Trains[i]->ButtonPopup + "\",\n";
+		}
+		button_definition += "\tKey = \"" + type->Trains[i]->ButtonKey + "\",\n";
+		button_definition += "\tHint = \"" + type->Trains[i]->ButtonHint + "\",\n";
+		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
 	}
 	//Wyrmgus end
 	return 0;
