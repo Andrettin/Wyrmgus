@@ -1057,6 +1057,8 @@ extern void SetModSound(std::string mod_file, std::string ident, std::string sou
 //Wyrmgus start
 extern std::string GetImageLayerNameById(int image_layer);
 extern int GetImageLayerIdByName(std::string image_layer);
+
+extern std::map<std::string, CUnitType *> UnitTypeMap;
 //Wyrmgus end
 
 //@}

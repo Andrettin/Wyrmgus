@@ -632,6 +632,140 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				f->printf("})\n\n");
 			}
 		}
+		
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+			CUnitType &type = *UnitTypes[i];
+			
+			if (type.Mod != Map.Info.Filename) { //units from this mod were already saved previously
+				continue;
+			}
+			
+			f->printf("DefineUnitType(\"%s\", {\n", type.Ident.c_str());
+			if (!type.Parent.empty()) {
+				f->printf("\tParent = \"%s\",\n", type.Parent.c_str());
+			}
+			CUnitType *parent_type = UnitTypeByIdent(type.Parent);
+			if (!type.Name.empty() && (parent_type == NULL || type.Name != parent_type->Name)) {
+				f->printf("\tName = \"%s\",\n", type.Name.c_str());
+			}
+			if (!type.Civilization.empty()) {
+				f->printf("\tCivilization = \"%s\",\n", type.Civilization.c_str());
+			}
+			if (!type.Faction.empty()) {
+				f->printf("\tFaction = \"%s\",\n", type.Faction.c_str());
+			}
+			
+			f->printf("\tCosts = {");
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (type.DefaultStat.Costs[j] != 0 && (parent_type == NULL || type.DefaultStat.Costs[j] != parent_type->DefaultStat.Costs[j])) {
+					f->printf("\"%s\", ", DefaultResourceNames[j].c_str());
+					f->printf("%d, ", type.DefaultStat.Costs[j]);
+				}
+			}
+			f->printf("},\n");
+			f->printf("\tImproveProduction = {");
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (type.DefaultStat.ImproveIncomes[j] != 0 && (parent_type == NULL || type.DefaultStat.ImproveIncomes[j] != parent_type->DefaultStat.ImproveIncomes[j])) {
+					f->printf("\"%s\", ", DefaultResourceNames[j].c_str());
+					f->printf("%d, ", type.DefaultStat.ImproveIncomes[j]);
+				}
+			}
+			f->printf("},\n");
+			f->printf("\tUnitStock = {");
+			for (size_t j = 0; j < UnitTypes.size(); ++j) {
+				if (type.DefaultStat.UnitStock[j] != 0 && (parent_type == NULL || type.DefaultStat.UnitStock[j] != parent_type->DefaultStat.UnitStock[j])) {
+					f->printf("\"%s\", ", UnitTypes[j]->Ident.c_str());
+					f->printf("%d, ", type.DefaultStat.UnitStock[j]);
+				}
+			}
+			f->printf("},\n");
+			
+			for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
+				if (parent_type == NULL || type.DefaultStat.Variables[j] != parent_type->DefaultStat.Variables[j]) {
+					if (type.DefaultStat.Variables[j].Increase != 0 || type.DefaultStat.Variables[j].Value != type.DefaultStat.Variables[j].Max) {
+						f->printf("\t%s = {", UnitTypeVar.VariableNameLookup[j]);
+						f->printf("Enable = %s, ", type.DefaultStat.Variables[j].Enable ? "true" : "false");
+						f->printf("Max = %d, ", type.DefaultStat.Variables[j].Max);
+						f->printf("Value = %d, ", type.DefaultStat.Variables[j].Value);
+						f->printf("Increase = %d", type.DefaultStat.Variables[j].Increase);
+						f->printf("},\n");
+					} else if (type.DefaultStat.Variables[j].Value != 0) {
+						f->printf("\t%s = %d,\n", UnitTypeVar.VariableNameLookup[j], type.DefaultStat.Variables[j].Value);
+					}
+				}
+			}
+			
+			f->printf("\tSounds = {\n");
+			if (!type.Sound.Selected.Name.empty() && (parent_type == NULL || type.Sound.Selected.Name != parent_type->Sound.Selected.Name)) {
+				f->printf("\t\t\"selected\", \"%s\",\n", type.Sound.Selected.Name.c_str());
+			}
+			if (!type.Sound.Acknowledgement.Name.empty() && (parent_type == NULL || type.Sound.Acknowledgement.Name != parent_type->Sound.Acknowledgement.Name)) {
+				f->printf("\t\t\"acknowledge\", \"%s\",\n", type.Sound.Acknowledgement.Name.c_str());
+			}
+			if (!type.Sound.Attack.Name.empty() && (parent_type == NULL || type.Sound.Attack.Name != parent_type->Sound.Attack.Name)) {
+				f->printf("\t\t\"attack\", \"%s\",\n", type.Sound.Attack.Name.c_str());
+			}
+			if (!type.Sound.Idle.Name.empty() && (parent_type == NULL || type.Sound.Idle.Name != parent_type->Sound.Idle.Name)) {
+				f->printf("\t\t\"idle\", \"%s\",\n", type.Sound.Idle.Name.c_str());
+			}
+			if (!type.Sound.Hit.Name.empty() && (parent_type == NULL || type.Sound.Hit.Name != parent_type->Sound.Hit.Name)) {
+				f->printf("\t\t\"hit\", \"%s\",\n", type.Sound.Hit.Name.c_str());
+			}
+			if (!type.Sound.Miss.Name.empty() && (parent_type == NULL || type.Sound.Miss.Name != parent_type->Sound.Miss.Name)) {
+				f->printf("\t\t\"miss\", \"%s\",\n", type.Sound.Miss.Name.c_str());
+			}
+			if (!type.Sound.Step.Name.empty() && (parent_type == NULL || type.Sound.Step.Name != parent_type->Sound.Step.Name)) {
+				f->printf("\t\t\"step\", \"%s\",\n", type.Sound.Step.Name.c_str());
+			}
+			if (!type.Sound.StepDirt.Name.empty() && (parent_type == NULL || type.Sound.StepDirt.Name != parent_type->Sound.StepDirt.Name)) {
+				f->printf("\t\t\"step-dirt\", \"%s\",\n", type.Sound.StepDirt.Name.c_str());
+			}
+			if (!type.Sound.StepGrass.Name.empty() && (parent_type == NULL || type.Sound.StepGrass.Name != parent_type->Sound.StepGrass.Name)) {
+				f->printf("\t\t\"step-grass\", \"%s\",\n", type.Sound.StepGrass.Name.c_str());
+			}
+			if (!type.Sound.StepGravel.Name.empty() && (parent_type == NULL || type.Sound.StepGravel.Name != parent_type->Sound.StepGravel.Name)) {
+				f->printf("\t\t\"step-gravel\", \"%s\",\n", type.Sound.StepGravel.Name.c_str());
+			}
+			if (!type.Sound.StepMud.Name.empty() && (parent_type == NULL || type.Sound.StepMud.Name != parent_type->Sound.StepMud.Name)) {
+				f->printf("\t\t\"step-mud\", \"%s\",\n", type.Sound.StepMud.Name.c_str());
+			}
+			if (!type.Sound.StepStone.Name.empty() && (parent_type == NULL || type.Sound.StepStone.Name != parent_type->Sound.StepStone.Name)) {
+				f->printf("\t\t\"step-stone\", \"%s\",\n", type.Sound.StepStone.Name.c_str());
+			}
+			if (!type.Sound.Used.Name.empty() && (parent_type == NULL || type.Sound.Used.Name != parent_type->Sound.Used.Name)) {
+				f->printf("\t\t\"used\", \"%s\",\n", type.Sound.Used.Name.c_str());
+			}
+			if (!type.Sound.Build.Name.empty() && (parent_type == NULL || type.Sound.Build.Name != parent_type->Sound.Build.Name)) {
+				f->printf("\t\t\"build\", \"%s\",\n", type.Sound.Build.Name.c_str());
+			}
+			if (!type.Sound.Ready.Name.empty() && (parent_type == NULL || type.Sound.Ready.Name != parent_type->Sound.Ready.Name)) {
+				f->printf("\t\t\"ready\", \"%s\",\n", type.Sound.Ready.Name.c_str());
+			}
+			if (!type.Sound.Repair.Name.empty() && (parent_type == NULL || type.Sound.Repair.Name != parent_type->Sound.Repair.Name)) {
+				f->printf("\t\t\"repair\", \"%s\",\n", type.Sound.Repair.Name.c_str());
+			}
+			for (unsigned int j = 0; j < MaxCosts; ++j) {
+				if (!type.Sound.Harvest[j].Name.empty() && (parent_type == NULL || type.Sound.Harvest[j].Name != parent_type->Sound.Harvest[j].Name)) {
+					f->printf("\t\t\"harvest\", \"%s\", \"%s\",\n", DefaultResourceNames[j].c_str(), type.Sound.Harvest[j].Name.c_str());
+				}
+			}
+			if (!type.Sound.Help.Name.empty() && (parent_type == NULL || type.Sound.Help.Name != parent_type->Sound.Help.Name)) {
+				f->printf("\t\t\"help\", \"%s\",\n", type.Sound.Help.Name.c_str());
+			}
+			if (!type.Sound.Dead[ANIMATIONS_DEATHTYPES].Name.empty() && (parent_type == NULL || type.Sound.Dead[ANIMATIONS_DEATHTYPES].Name != parent_type->Sound.Dead[ANIMATIONS_DEATHTYPES].Name)) {
+				f->printf("\t\t\"dead\", \"%s\",\n", type.Sound.Dead[ANIMATIONS_DEATHTYPES].Name.c_str());
+			}
+			int death;
+			for (death = 0; death < ANIMATIONS_DEATHTYPES; ++death) {
+				if (!type.Sound.Dead[death].Name.empty() && (parent_type == NULL || type.Sound.Dead[death].Name != parent_type->Sound.Dead[death].Name)) {
+					f->printf("\t\t\"dead\", \"%s\", \"%s\",\n", ExtraDeathTypes[death].c_str(), type.Sound.Dead[death].Name.c_str());
+				}
+			}
+			f->printf("\t},\n");
+			
+			f->printf("\tMod = \"%s\"\n", mod_file.c_str());
+			f->printf("})\n\n");
+		}
 		//Wyrmgus end
 
 		//Wyrmgus start
@@ -717,7 +851,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		f->printf("\n-- set map default stat and map sound for unit types\n");
 		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 			CUnitType &type = *UnitTypes[i];
-
+			
 			if (type.ModDefaultStats.find(Map.Info.Filename) != type.ModDefaultStats.end()) {
 				for (unsigned int j = 0; j < MaxCosts; ++j) {
 					if (type.ModDefaultStats[Map.Info.Filename].Costs[j] != 0) {
@@ -731,7 +865,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				}
 				for (size_t j = 0; j < UnitTypes.size(); ++j) {
 					if (type.ModDefaultStats[Map.Info.Filename].UnitStock[j] != 0) {
-						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModDefaultStats[Map.Info.Filename].UnitStock[j], UnitTypes[i]->Ident.c_str());
+						f->printf("SetModStat(\"%s\", \"%s\", \"UnitStock\", %d, \"%s\")\n", mod_file.c_str(), type.Ident.c_str(), type.ModDefaultStats[Map.Info.Filename].UnitStock[j], UnitTypes[j]->Ident.c_str());
 					}
 				}
 				for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {

@@ -140,6 +140,10 @@ extern void EditorTileChanged(const Vec2i &pos);
 
 extern void EditorChangeTile(const Vec2i &pos, int tileIndex, int d);
 
+//Wyrmgus start
+extern void RecalculateShownUnits();
+//Wyrmgus end
+
 //@}
 
 #endif // !__EDITOR_H__

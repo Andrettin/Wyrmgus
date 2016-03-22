@@ -1956,6 +1956,12 @@ static int CclDefineUnitType(lua_State *l)
 	//Wyrmgus end
 		UpdateUnitStats(*type, 1);
 	}
+	//Wyrmgus start
+	if (Editor.Running == EditorEditing && std::find(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), type->Ident) == Editor.UnitTypes.end()) {
+		Editor.UnitTypes.push_back(type->Ident);
+		RecalculateShownUnits();
+	}
+	//Wyrmgus end
 	return 0;
 }
 
@@ -2364,6 +2370,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Mercenary")) {
 		lua_pushboolean(l, type->BoolFlag[MERCENARY_INDEX].value);
+		return 1;
+	} else if (!strcmp(data, "Mod")) {
+		lua_pushstring(l, type->Mod.c_str());
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "LandUnit")) {

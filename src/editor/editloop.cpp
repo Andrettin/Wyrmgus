@@ -140,7 +140,10 @@ public:
 	virtual void action(const std::string &)
 	{
 		const int iconsPerStep = VisibleUnitIcons;
-		const int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
+		//Wyrmgus start
+//		const int steps = (Editor.ShownUnitTypes.size() + iconsPerStep - 1) / iconsPerStep;
+		const int steps = (Editor.ShownUnitTypes.size() + 1 + iconsPerStep - 1) / iconsPerStep; // + 1 because of the button to create a new unit
+		//Wyrmgus end
 		const double value = editorUnitSlider->getValue();
 		for (int i = 1; i <= steps; ++i) {
 			if (value <= (double)i / steps) {
@@ -499,7 +502,10 @@ static void CalculateMaxIconSize()
 /**
 **  Recalculate the shown units.
 */
-static void RecalculateShownUnits()
+//Wyrmgus start
+//static void RecalculateShownUnits()
+void RecalculateShownUnits()
+//Wyrmgus end
 {
 	Editor.ShownUnitTypes.clear();
 
@@ -620,10 +626,19 @@ static void DrawUnitIcons()
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
 		const int x = UI.ButtonPanel.Buttons[j].X;
 		const int y = UI.ButtonPanel.Buttons[j].Y;
-		if (i >= (int) Editor.ShownUnitTypes.size()) {
-			return;
+		//Wyrmgus start
+//		if (i >= (int) Editor.ShownUnitTypes.size()) {
+		if (i >= (int) Editor.ShownUnitTypes.size() + 1) {
+		//Wyrmgus end
+			//Wyrmgus start
+//			return;
+			break;
+			//Wyrmgus emd
 		}
-		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
+		//Wyrmgus start
+//		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
+		CIcon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *CIcon::Get("icon-level-up");
+		//Wyrmgus end
 		const PixelPos pos(x, y);
 
 		unsigned int flag = 0;
@@ -666,12 +681,16 @@ static void DrawUnitIcons()
 	//Wyrmgus start
 	i = Editor.UnitIndex;
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
-		if (i >= (int) Editor.ShownUnitTypes.size()) {
-			return;
+		if (i >= (int) Editor.ShownUnitTypes.size() + 1) {
+			break;
 		}
 		
 		if (i == Editor.CursorUnitIndex) {
-			DrawPopup(CurrentButtons[j], UI.ButtonPanel.Buttons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
+			if (i == (int) Editor.ShownUnitTypes.size()) {
+				DrawGenericPopup("Create Unit Type", UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
+			} else {
+				DrawPopup(CurrentButtons[j], UI.ButtonPanel.Buttons[j], UI.ButtonPanel.Buttons[j].X, UI.ButtonPanel.Buttons[j].Y);
+			}
 		}
 		
 		++i;
@@ -1458,6 +1477,8 @@ static void EditorCallbackButtonDown(unsigned button)
 	if (Editor.State == EditorEditUnit) {
 		// Cursor on unit icons
 		if (Editor.CursorUnitIndex != -1) {
+			//Wyrmgus start
+			/*
 			if (MouseButtons & LeftButton) {
 				Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
 				CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
@@ -1469,6 +1490,31 @@ static void EditorCallbackButtonDown(unsigned button)
 				CclCommand(buf);
 				return;
 			}
+			*/
+			if (Editor.CursorUnitIndex == (int) Editor.ShownUnitTypes.size()) {
+				if (MouseButtons & LeftButton) {
+					Editor.SelectedUnitIndex = -1;
+					Editor.CursorUnitIndex = -1;
+					CursorBuilding = NULL;
+					char buf[256];
+					snprintf(buf, sizeof(buf), "if (EditorCreateUnitType() ~= nil) then EditorCreateUnitType() end;");
+					CclCommand(buf);
+					return;
+				}
+			} else {
+				if (MouseButtons & LeftButton) {
+					Editor.SelectedUnitIndex = Editor.CursorUnitIndex;
+					CursorBuilding = const_cast<CUnitType *>(Editor.ShownUnitTypes[Editor.CursorUnitIndex]);
+					return;
+				} else if (MouseButtons & RightButton) {
+					char buf[256];
+					snprintf(buf, sizeof(buf), "if (EditUnitTypeProperties ~= nil) then EditUnitTypeProperties(\"%s\") end;", Editor.ShownUnitTypes[Editor.CursorUnitIndex]->Ident.c_str());
+					Editor.CursorUnitIndex = -1;
+					CclCommand(buf);
+					return;
+				}
+			}
+			//Wyrmgus end
 		}
 	}
 
@@ -1770,21 +1816,26 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	for (size_t j = 0; j < UI.ButtonPanel.Buttons.size(); ++j) {
 		const int x = UI.ButtonPanel.Buttons[j].X;
 		const int y = UI.ButtonPanel.Buttons[j].Y;
-		if (i >= (int) Editor.ShownUnitTypes.size()) {
+		//Wyrmgus start
+//		if (i >= (int) Editor.ShownUnitTypes.size()) {
+		if (i >= (int) Editor.ShownUnitTypes.size() + 1) {
+		//Wyrmgus end
 			break;
 		}
 		//Wyrmgus start
-		if (j >= CurrentButtons.size()) {
-			ButtonAction &ba = *(new ButtonAction);
-			CurrentButtons.push_back(ba);
+		if (i < (int) Editor.ShownUnitTypes.size()) {
+			if (j >= CurrentButtons.size()) {
+				ButtonAction &ba = *(new ButtonAction);
+				CurrentButtons.push_back(ba);
+			}
+			CurrentButtons[j].Hint = Editor.ShownUnitTypes[i]->Name;
+			CurrentButtons[j].Pos = j;
+			CurrentButtons[j].Level = 0;
+			CurrentButtons[j].Action = ButtonEditorUnit;
+			CurrentButtons[j].ValueStr = Editor.ShownUnitTypes[i]->Ident;
+			CurrentButtons[j].Value = Editor.ShownUnitTypes[i]->Slot;
+			CurrentButtons[j].Popup = "popup-unit";
 		}
-		CurrentButtons[j].Hint = Editor.ShownUnitTypes[i]->Name;
-		CurrentButtons[j].Pos = j;
-		CurrentButtons[j].Level = 0;
-		CurrentButtons[j].Action = ButtonEditorUnit;
-		CurrentButtons[j].ValueStr = Editor.ShownUnitTypes[i]->Ident;
-		CurrentButtons[j].Value = Editor.ShownUnitTypes[i]->Slot;
-		CurrentButtons[j].Popup = "popup-unit";
 		//Wyrmgus end
 		if (x < screenPos.x && screenPos.x < x + IconWidth
 			&& y < screenPos.y && screenPos.y < y + IconHeight) {
@@ -1798,9 +1849,13 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 			*/
 			if (!Preference.NoStatusLineTooltips) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), "%s \"%s\"",
-						 Editor.ShownUnitTypes[i]->Ident.c_str(),
-						 Editor.ShownUnitTypes[i]->Name.c_str());
+				if (i == (int) Editor.ShownUnitTypes.size()) {
+					snprintf(buf, sizeof(buf), "Create Unit Type");
+				} else {
+					snprintf(buf, sizeof(buf), "%s \"%s\"",
+							 Editor.ShownUnitTypes[i]->Ident.c_str(),
+							 Editor.ShownUnitTypes[i]->Name.c_str());
+				}
 				UI.StatusLine.Set(buf);
 			}
 			//Wyrmgus end
@@ -2142,6 +2197,21 @@ void CEditor::Init()
 	ShowLoadProgress(_("Loading Script \"%s\""), filename.c_str());
 	LuaLoadFile(filename);
 	LuaGarbageCollect();
+	
+	//Wyrmgus start
+	if (this->UnitTypes.size() == 0) {
+		//if editor's unit types vector is still empty after loading the editor's lua file, then fill it automatically
+		for (std::vector<CUnitType *>::size_type i = 0; i < ::UnitTypes.size(); ++i) {
+			CUnitType &type = *::UnitTypes[i];
+			
+			if (type.Icon.Name.empty() || type.BoolFlag[VANISHES_INDEX].value) {
+				continue;
+			}
+			
+			this->UnitTypes.push_back(type.Ident);
+		}
+	}
+	//Wyrmgus end
 
 	ThisPlayer = &Players[0];
 

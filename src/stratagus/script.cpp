@@ -40,6 +40,10 @@
 #include "script.h"
 
 #include "animation/animation_setplayervar.h"
+//Wyrmgus start
+//Wyrmgus start
+#include "editor.h"
+//Wyrmgus end
 #include "font.h"
 #include "game.h"
 //Wyrmgus start
@@ -60,6 +64,9 @@
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unittype.h"
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -3227,6 +3234,19 @@ void DeleteModFaction(std::string civilization_name, std::string faction_name)
 
 void DisableMod(std::string mod_file)
 {
+	int unit_types_size = UnitTypes.size();
+	for (int i = (unit_types_size - 1); i >= 0; --i) {
+		if (UnitTypes[i]->Mod == mod_file) {
+			if (Editor.Running == EditorEditing) {
+				Editor.UnitTypes.erase(std::remove(Editor.UnitTypes.begin(), Editor.UnitTypes.end(), UnitTypes[i]->Ident), Editor.UnitTypes.end());
+				RecalculateShownUnits();
+			}
+			UnitTypeMap.erase(UnitTypes[i]->Ident);
+			delete UnitTypes[i];
+			UnitTypes.erase(std::remove(UnitTypes.begin(), UnitTypes.end(), UnitTypes[i]), UnitTypes.end());
+		}
+	}
+		
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		if (UnitTypes[i]->ModDefaultStats.find(mod_file) != UnitTypes[i]->ModDefaultStats.end()) {
 			UnitTypes[i]->ModDefaultStats.erase(mod_file);
