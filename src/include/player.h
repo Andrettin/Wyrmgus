@@ -603,17 +603,13 @@ public:
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
+	IconConfig MoveIcon[MAX_RACES];										/// move icon
+	IconConfig StopIcon[MAX_RACES];										/// stop icon
+	IconConfig AttackIcon[MAX_RACES];									/// attack icon
+	IconConfig PatrolIcon[MAX_RACES];									/// patrol icon
+	IconConfig StandGroundIcon[MAX_RACES];								/// stand ground icon
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<CDeity *> Deities[MAX_RACES];							/// deities
-	std::string PersonalNames[MAX_RACES][PersonalNameMax];				/// personal names
-	std::string PersonalNamePrefixes[MAX_RACES][PersonalNameMax];		/// personal name prefixes
-	std::string PersonalNameSuffixes[MAX_RACES][PersonalNameMax];		/// personal name suffixes
-	std::string ProvinceNames[MAX_RACES][PersonalNameMax];				/// province names
-	std::string ProvinceNamePrefixes[MAX_RACES][PersonalNameMax];		/// province name prefixes
-	std::string ProvinceNameSuffixes[MAX_RACES][PersonalNameMax];		/// province name suffixes
-	std::string SettlementNames[MAX_RACES][PersonalNameMax];			/// settlement names
-	std::string SettlementNamePrefixes[MAX_RACES][PersonalNameMax];		/// settlement name prefixes
-	std::string SettlementNameSuffixes[MAX_RACES][PersonalNameMax];		/// settlement name suffixes
 	int CivilizationLanguage[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	//Wyrmgus end

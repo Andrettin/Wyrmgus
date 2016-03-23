@@ -1183,13 +1183,23 @@ void CButtonPanel::Draw()
 				button_icon = Selected[0]->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon;
 			} else if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->GetItemSlotQuantity(ArrowsItemSlot) == 0 && Selected[0]->EquippedItems[WeaponItemSlot].size() > 0) {
 				button_icon = Selected[0]->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon;
+			} else if (buttons[i].Action == ButtonAttack && buttons[i].Icon.Name.empty() && !PlayerRaces.AttackIcon[ThisPlayer->Race].Name.empty()) {
+				button_icon = PlayerRaces.AttackIcon[ThisPlayer->Race].Icon;
 			} else if (Selected.size() == 1 && buttons[i].Action == ButtonStop && Selected[0]->EquippedItems[ShieldItemSlot].size() > 0) {
 				button_icon = Selected[0]->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon;
+			} else if (buttons[i].Action == ButtonStop && buttons[i].Icon.Name.empty() && !PlayerRaces.StopIcon[ThisPlayer->Race].Name.empty()) {
+				button_icon = PlayerRaces.StopIcon[ThisPlayer->Race].Icon;
 			} else if (Selected.size() == 1 && buttons[i].Action == ButtonMove && Selected[0]->EquippedItems[BootsItemSlot].size() > 0) {
 				button_icon = Selected[0]->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon;
-			} else if (buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
+			} else if (buttons[i].Action == ButtonMove && buttons[i].Icon.Name.empty() && !PlayerRaces.MoveIcon[ThisPlayer->Race].Name.empty()) {
+				button_icon = PlayerRaces.MoveIcon[ThisPlayer->Race].Icon;
+			} else if (buttons[i].Action == ButtonPatrol && buttons[i].Icon.Name.empty() && !PlayerRaces.PatrolIcon[ThisPlayer->Race].Name.empty()) {
+				button_icon = PlayerRaces.PatrolIcon[ThisPlayer->Race].Icon;
+			} else if (buttons[i].Action == ButtonStandGround && buttons[i].Icon.Name.empty() && !PlayerRaces.StandGroundIcon[ThisPlayer->Race].Name.empty()) {
+				button_icon = PlayerRaces.StandGroundIcon[ThisPlayer->Race].Icon;
+			} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
 				button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
-			} else if (buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
+			} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
 				button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
 			}
 			button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,

@@ -3266,7 +3266,8 @@ void DisableMod(std::string mod_file)
 					UnitTypes[j]->AiDrops.erase(std::remove(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]->Slot), UnitTypes[j]->AiDrops.end());
 				}
 			}
-			for (size_t j = 0; j < UnitButtonTable.size(); ++j) {
+			int buttons_size = UnitButtonTable.size();
+			for (int j = (buttons_size - 1); j >= 0; --j) {
 				if (UnitButtonTable[j]->UnitMask.find(UnitTypes[i]->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
 					UnitButtonTable[j]->UnitMask = FindAndReplaceString(UnitButtonTable[j]->UnitMask, UnitTypes[i]->Ident + ",", "");
 				}

@@ -659,6 +659,7 @@ public:
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
 	//Wyrmgus start
+	void RemoveButtons(int button_action = -1);
 	int GetAvailableLevelUpUpgrades() const;
 	VariationInfo *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;

@@ -731,6 +731,23 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 }
 
 //Wyrmgus start
+void CUnitType::RemoveButtons(int button_action)
+{
+	int buttons_size = UnitButtonTable.size();
+	for (int i = (buttons_size - 1); i >= 0; --i) {
+		if (button_action != -1 && UnitButtonTable[i]->Action != button_action) {
+			continue;
+		}
+		
+		if (UnitButtonTable[i]->UnitMask == ("," + this->Ident + ",")) { //delete the appropriate buttons
+			delete UnitButtonTable[i];
+			UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[i]), UnitButtonTable.end());
+		} else if (UnitButtonTable[i]->UnitMask.find(this->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of the appropriate buttons
+			UnitButtonTable[i]->UnitMask = FindAndReplaceString(UnitButtonTable[i]->UnitMask, this->Ident + ",", "");
+		}
+	}
+}
+
 int CUnitType::GetAvailableLevelUpUpgrades() const
 {
 	int value = 0;

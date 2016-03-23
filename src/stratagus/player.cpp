@@ -398,17 +398,6 @@ void PlayerRace::Clean()
 			delete this->Factions[i][j];
 		}
 		PlayerRaces.Factions[i].clear();
-		for (unsigned int j = 0; j < PersonalNameMax; ++j) {
-			this->PersonalNames[i][j].clear();
-			this->PersonalNamePrefixes[i][j].clear();
-			this->PersonalNameSuffixes[i][j].clear();
-			this->ProvinceNames[i][j].clear();
-			this->ProvinceNamePrefixes[i][j].clear();
-			this->ProvinceNameSuffixes[i][j].clear();
-			this->SettlementNames[i][j].clear();
-			this->SettlementNamePrefixes[i][j].clear();
-			this->SettlementNameSuffixes[i][j].clear();
-		}
 		//clear deities
 		for (size_t j = 0; j < this->Deities[i].size(); ++j) {
 			delete this->Deities[i][j];

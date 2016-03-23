@@ -593,119 +593,6 @@ static int CclDefineRaceNames(lua_State *l)
 					PlayerRaces.Display[i] = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "visible")) {
 					PlayerRaces.Visible[i] = 1;
-				//Wyrmgus start
-				} else if (!strcmp(value, "playable")) {
-					++k;
-					PlayerRaces.Playable[i] = LuaToBoolean(l, j + 1, k + 1);
-				} else if (!strcmp(value, "species")) {
-					++k;
-					PlayerRaces.Species[i] = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "default-color")) {
-					++k;
-					PlayerRaces.DefaultColor[i] = LuaToString(l, j + 1, k + 1);
-				} else if (!strcmp(value, "parent-civilization")) {
-					++k;
-					PlayerRaces.ParentCivilization[i] = PlayerRaces.GetRaceIndexByName(LuaToString(l, j + 1, k + 1));
-				} else if (!strcmp(value, "language")) {
-					++k;
-					int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, j + 1, k + 1));
-					if (language != -1) {
-						PlayerRaces.CivilizationLanguage[i] = language;
-						PlayerRaces.Languages[language]->UsedByCivilizationOrFaction = true;
-					} else {
-						LuaError(l, "Language not found.");
-					}
-				} else if (!strcmp(value, "personal-names")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.PersonalNames[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "personal-name-prefixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.PersonalNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "personal-name-suffixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.PersonalNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "province-names")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.ProvinceNames[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "province-name-prefixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.ProvinceNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "province-name-suffixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.ProvinceNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "settlement-names")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.SettlementNames[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "settlement-name-prefixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.SettlementNamePrefixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				} else if (!strcmp(value, "settlement-name-suffixes")) {
-					++k;
-					lua_rawgeti(l, j + 1, k + 1);
-					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument (expected table)");
-					}
-					int subsubargs = lua_rawlen(l, -1);
-					for (int n = 0; n < subsubargs; ++n) {
-						PlayerRaces.SettlementNameSuffixes[i][n] = LuaToString(l, -1, n + 1);
-					}
-				//Wyrmgus end
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -765,9 +652,94 @@ static int CclDefineCivilization(lua_State *l)
 			}
 		} else if (!strcmp(value, "DefaultColor")) {
 			PlayerRaces.DefaultColor[civilization] = LuaToString(l, -1);
+		} else if (!strcmp(value, "MoveIcon")) {
+			PlayerRaces.MoveIcon[civilization].Name = LuaToString(l, -1);
+			PlayerRaces.MoveIcon[civilization].Icon = NULL;
+			PlayerRaces.MoveIcon[civilization].Load();
+		} else if (!strcmp(value, "StopIcon")) {
+			PlayerRaces.StopIcon[civilization].Name = LuaToString(l, -1);
+			PlayerRaces.StopIcon[civilization].Icon = NULL;
+			PlayerRaces.StopIcon[civilization].Load();
+		} else if (!strcmp(value, "AttackIcon")) {
+			PlayerRaces.AttackIcon[civilization].Name = LuaToString(l, -1);
+			PlayerRaces.AttackIcon[civilization].Icon = NULL;
+			PlayerRaces.AttackIcon[civilization].Load();
+		} else if (!strcmp(value, "PatrolIcon")) {
+			PlayerRaces.PatrolIcon[civilization].Name = LuaToString(l, -1);
+			PlayerRaces.PatrolIcon[civilization].Icon = NULL;
+			PlayerRaces.PatrolIcon[civilization].Load();
+		} else if (!strcmp(value, "StandGroundIcon")) {
+			PlayerRaces.StandGroundIcon[civilization].Name = LuaToString(l, -1);
+			PlayerRaces.StandGroundIcon[civilization].Icon = NULL;
+			PlayerRaces.StandGroundIcon[civilization].Load();
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
+	}
+	
+	if (!PlayerRaces.MoveIcon[civilization].Name.empty()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 1,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"move\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"m\",\n";
+		button_definition += "\tHint = _(\"~!Move\"),\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (!PlayerRaces.StopIcon[civilization].Name.empty()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 2,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"stop\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"s\",\n";
+		button_definition += "\tHint = _(\"~!Stop\"),\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (!PlayerRaces.AttackIcon[civilization].Name.empty()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 3,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"attack\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"a\",\n";
+		button_definition += "\tHint = _(\"~!Attack\"),\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (!PlayerRaces.PatrolIcon[civilization].Name.empty()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 4,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"patrol\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"p\",\n";
+		button_definition += "\tHint = _(\"~!Patrol\"),\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (!PlayerRaces.StandGroundIcon[civilization].Name.empty()) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 5,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"stand-ground\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"t\",\n";
+		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
 	}
 	
 	return 0;
