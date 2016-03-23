@@ -3255,6 +3255,26 @@ void DisableMod(std::string mod_file)
 					}
 				}
 			}
+			for (size_t j = 0; j < UnitTypes.size(); ++j) { //remove this unit from the "Trains", "Drops" and "AiDrops" vectors of other unit types
+				if (std::find(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), UnitTypes[i]) != UnitTypes[j]->Trains.end()) {
+					UnitTypes[j]->Trains.erase(std::remove(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), UnitTypes[i]), UnitTypes[j]->Trains.end());
+				}
+				if (std::find(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]->Slot) != UnitTypes[j]->Drops.end()) {
+					UnitTypes[j]->Drops.erase(std::remove(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]->Slot), UnitTypes[j]->Drops.end());
+				}
+				if (std::find(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]->Slot) != UnitTypes[j]->AiDrops.end()) {
+					UnitTypes[j]->AiDrops.erase(std::remove(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]->Slot), UnitTypes[j]->AiDrops.end());
+				}
+			}
+			for (size_t j = 0; j < UnitButtonTable.size(); ++j) {
+				if (UnitButtonTable[j]->UnitMask.find(UnitTypes[i]->Ident) != std::string::npos) { //remove this unit from the "ForUnit" array of buttons
+					UnitButtonTable[j]->UnitMask = FindAndReplaceString(UnitButtonTable[j]->UnitMask, UnitTypes[i]->Ident + ",", "");
+				}
+				if (UnitButtonTable[j]->Value == UnitTypes[i]->Slot && UnitButtonTable[j]->ValueStr == UnitTypes[i]->Ident) {
+					delete UnitButtonTable[j];
+					UnitButtonTable.erase(std::remove(UnitButtonTable.begin(), UnitButtonTable.end(), UnitButtonTable[j]), UnitButtonTable.end());
+				}
+			}
 			UnitTypeMap.erase(UnitTypes[i]->Ident);
 			delete UnitTypes[i];
 			UnitTypes.erase(std::remove(UnitTypes.begin(), UnitTypes.end(), UnitTypes[i]), UnitTypes.end());
