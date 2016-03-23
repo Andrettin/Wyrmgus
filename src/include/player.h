@@ -603,11 +603,7 @@ public:
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
-	IconConfig MoveIcon[MAX_RACES];										/// move icon
-	IconConfig StopIcon[MAX_RACES];										/// stop icon
-	IconConfig AttackIcon[MAX_RACES];									/// attack icon
-	IconConfig PatrolIcon[MAX_RACES];									/// patrol icon
-	IconConfig StandGroundIcon[MAX_RACES];								/// stand ground icon
+	std::map<int, IconConfig> ButtonIcons[MAX_RACES];				/// icons for button actions
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<CDeity *> Deities[MAX_RACES];							/// deities
 	int CivilizationLanguage[MAX_RACES];

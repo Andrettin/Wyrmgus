@@ -1765,4 +1765,120 @@ void SetHoldClickDelay(int delay)
 	HoldClickDelay = delay;
 }
 
+//Wyrmgus start
+std::string GetButtonActionNameById(int button_action)
+{
+	if (button_action == ButtonMove) {
+		return "attack";
+	} else if (button_action == ButtonStop) {
+		return "stop";
+	} else if (button_action == ButtonAttack) {
+		return "attack";
+	} else if (button_action == ButtonRepair) {
+		return "repair";
+	} else if (button_action == ButtonHarvest) {
+		return "harvest";
+	} else if (button_action == ButtonButton) {
+		return "button";
+	} else if (button_action == ButtonBuild) {
+		return "build";
+	} else if (button_action == ButtonTrain) {
+		return "train-unit";
+	} else if (button_action == ButtonPatrol) {
+		return "patrol";
+	} else if (button_action == ButtonStandGround) {
+		return "stand-ground";
+	} else if (button_action == ButtonAttackGround) {
+		return "attack-ground";
+	} else if (button_action == ButtonReturn) {
+		return "return-goods";
+	} else if (button_action == ButtonSpellCast) {
+		return "cast-spell";
+	} else if (button_action == ButtonResearch) {
+		return "research";
+	} else if (button_action == ButtonLearnAbility) {
+		return "learn-ability";
+	} else if (button_action == ButtonExperienceUpgradeTo) {
+		return "experience-upgrade-to";
+	} else if (button_action == ButtonUpgradeTo) {
+		return "upgrade-to";
+	} else if (button_action == ButtonUnload) {
+		return "unload";
+	} else if (button_action == ButtonRallyPoint) {
+		return "rally-point";
+	} else if (button_action == ButtonUnit) {
+		return "unit";
+	} else if (button_action == ButtonEditorUnit) {
+		return "editor-unit";
+	} else if (button_action == ButtonCancel) {
+		return "cancel";
+	} else if (button_action == ButtonCancelUpgrade) {
+		return "cancel-upgrade";
+	} else if (button_action == ButtonCancelTrain) {
+		return "cancel-train-unit";
+	} else if (button_action == ButtonCancelBuild) {
+		return "cancel-build";
+	}
+
+	return "";
+}
+
+int GetButtonActionIdByName(std::string button_action)
+{
+	if (button_action == "move") {
+		return ButtonMove;
+	} else if (button_action == "stop") {
+		return ButtonStop;
+	} else if (button_action == "attack") {
+		return ButtonAttack;
+	} else if (button_action == "repair") {
+		return ButtonRepair;
+	} else if (button_action == "harvest") {
+		return ButtonHarvest;
+	} else if (button_action == "button") {
+		return ButtonButton;
+	} else if (button_action == "build") {
+		return ButtonBuild;
+	} else if (button_action == "train-unit") {
+		return ButtonTrain;
+	} else if (button_action == "patrol") {
+		return ButtonPatrol;
+	} else if (button_action == "stand-ground") {
+		return ButtonStandGround;
+	} else if (button_action == "attack-ground") {
+		return ButtonAttackGround;
+	} else if (button_action == "return-goods") {
+		return ButtonReturn;
+	} else if (button_action == "cast-spell") {
+		return ButtonSpellCast;
+	} else if (button_action == "research") {
+		return ButtonResearch;
+	} else if (button_action == "learn-ability") {
+		return ButtonLearnAbility;
+	} else if (button_action == "experience-upgrade-to") {
+		return ButtonExperienceUpgradeTo;
+	} else if (button_action == "upgrade-to") {
+		return ButtonUpgradeTo;
+	} else if (button_action == "unload") {
+		return ButtonUnload;
+	} else if (button_action == "rally-point") {
+		return ButtonRallyPoint;
+	} else if (button_action == "unit") {
+		return ButtonUnit;
+	} else if (button_action == "editor-unit") {
+		return ButtonEditorUnit;
+	} else if (button_action == "cancel") {
+		return ButtonCancel;
+	} else if (button_action == "cancel-upgrade") {
+		return ButtonCancelUpgrade;
+	} else if (button_action == "cancel-train-unit") {
+		return ButtonCancelTrain;
+	} else if (button_action == "cancel-build") {
+		return ButtonCancelBuild;
+	}
+
+	return -1;
+}
+//Wyrmgus end
+
 //@}

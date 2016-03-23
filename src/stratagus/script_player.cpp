@@ -652,32 +652,38 @@ static int CclDefineCivilization(lua_State *l)
 			}
 		} else if (!strcmp(value, "DefaultColor")) {
 			PlayerRaces.DefaultColor[civilization] = LuaToString(l, -1);
-		} else if (!strcmp(value, "MoveIcon")) {
-			PlayerRaces.MoveIcon[civilization].Name = LuaToString(l, -1);
-			PlayerRaces.MoveIcon[civilization].Icon = NULL;
-			PlayerRaces.MoveIcon[civilization].Load();
-		} else if (!strcmp(value, "StopIcon")) {
-			PlayerRaces.StopIcon[civilization].Name = LuaToString(l, -1);
-			PlayerRaces.StopIcon[civilization].Icon = NULL;
-			PlayerRaces.StopIcon[civilization].Load();
-		} else if (!strcmp(value, "AttackIcon")) {
-			PlayerRaces.AttackIcon[civilization].Name = LuaToString(l, -1);
-			PlayerRaces.AttackIcon[civilization].Icon = NULL;
-			PlayerRaces.AttackIcon[civilization].Load();
-		} else if (!strcmp(value, "PatrolIcon")) {
-			PlayerRaces.PatrolIcon[civilization].Name = LuaToString(l, -1);
-			PlayerRaces.PatrolIcon[civilization].Icon = NULL;
-			PlayerRaces.PatrolIcon[civilization].Load();
-		} else if (!strcmp(value, "StandGroundIcon")) {
-			PlayerRaces.StandGroundIcon[civilization].Name = LuaToString(l, -1);
-			PlayerRaces.StandGroundIcon[civilization].Icon = NULL;
-			PlayerRaces.StandGroundIcon[civilization].Load();
+		} else if (!strcmp(value, "ButtonIcons")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string button_action_name = LuaToString(l, -1, j + 1);
+				int button_action = GetButtonActionIdByName(button_action_name);
+				if (button_action != -1) {
+					++j;
+					PlayerRaces.ButtonIcons[civilization][button_action].Name = LuaToString(l, -1, j + 1);
+					PlayerRaces.ButtonIcons[civilization][button_action].Icon = NULL;
+					PlayerRaces.ButtonIcons[civilization][button_action].Load();
+				} else {
+					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
+				}
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	
-	if (!PlayerRaces.MoveIcon[civilization].Name.empty()) {
+	if (PlayerRaces.ParentCivilization[civilization] != -1) { //inherit button icons from parent civilization, for button actions which none are specified
+		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
+		for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization].end(); ++iterator) {
+			if (PlayerRaces.ButtonIcons[civilization].find(iterator->first) == PlayerRaces.ButtonIcons[civilization].end()) {
+				PlayerRaces.ButtonIcons[civilization][iterator->first] = iterator->second;
+			}
+		}
+	}
+	
+	if (PlayerRaces.ButtonIcons[civilization].find(ButtonMove) != PlayerRaces.ButtonIcons[civilization].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -690,7 +696,7 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (!PlayerRaces.StopIcon[civilization].Name.empty()) {
+	if (PlayerRaces.ButtonIcons[civilization].find(ButtonStop) != PlayerRaces.ButtonIcons[civilization].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 2,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -703,7 +709,7 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (!PlayerRaces.AttackIcon[civilization].Name.empty()) {
+	if (PlayerRaces.ButtonIcons[civilization].find(ButtonAttack) != PlayerRaces.ButtonIcons[civilization].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 3,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -716,7 +722,7 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (!PlayerRaces.PatrolIcon[civilization].Name.empty()) {
+	if (PlayerRaces.ButtonIcons[civilization].find(ButtonPatrol) != PlayerRaces.ButtonIcons[civilization].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -729,7 +735,7 @@ static int CclDefineCivilization(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (!PlayerRaces.StandGroundIcon[civilization].Name.empty()) {
+	if (PlayerRaces.ButtonIcons[civilization].find(ButtonStandGround) != PlayerRaces.ButtonIcons[civilization].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
 		button_definition += "\tLevel = 0,\n";

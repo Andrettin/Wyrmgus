@@ -595,6 +595,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "ButtonValue")) {
 			condition->ButtonValue = LuaToString(l, -1);
 		} else if (!strcmp(key, "ButtonAction")) {
+			//Wyrmgus start
+			/*
 			const char *value = LuaToString(l, -1);
 			if (!strcmp(value, "move")) {
 				condition->ButtonAction = ButtonMove;
@@ -624,24 +626,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 				condition->ButtonAction = ButtonSpellCast;
 			} else if (!strcmp(value, "research")) {
 				condition->ButtonAction = ButtonResearch;
-			//Wyrmgus start
-			} else if (!strcmp(value, "learn-ability")) {
-				condition->ButtonAction = ButtonLearnAbility;
-			} else if (!strcmp(value, "experience-upgrade-to")) {
-				condition->ButtonAction = ButtonExperienceUpgradeTo;
-			//Wyrmgus end
 			} else if (!strcmp(value, "upgrade-to")) {
 				condition->ButtonAction = ButtonUpgradeTo;
 			} else if (!strcmp(value, "unload")) {
 				condition->ButtonAction = ButtonUnload;
-			//Wyrmgus start
-			} else if (!strcmp(value, "rally-point")) {
-				condition->ButtonAction = ButtonRallyPoint;
-			} else if (!strcmp(value, "unit")) {
-				condition->ButtonAction = ButtonUnit;
-			} else if (!strcmp(value, "editor-unit")) {
-				condition->ButtonAction = ButtonEditorUnit;
-			//Wyrmgus end
 			} else if (!strcmp(value, "cancel")) {
 				condition->ButtonAction = ButtonCancel;
 			} else if (!strcmp(value, "cancel-upgrade")) {
@@ -653,6 +641,15 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value);
 			}
+			*/
+			std::string value = LuaToString(l, -1);
+			int button_action_id = GetButtonActionIdByName(value);
+			if (button_action_id != -1) {
+				condition->ButtonAction = button_action_id;
+			} else {
+				LuaError(l, "Unsupported button action: %s" _C_ value.c_str());
+			}
+			//Wyrmgus end
 		//Wyrmgus start
 		} else if (!strcmp(key, "AutoCast")) {
 			condition->AutoCast = Ccl2Condition(l, LuaToString(l, -1));

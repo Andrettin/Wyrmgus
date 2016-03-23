@@ -958,6 +958,8 @@ static int CclDefineButton(lua_State *l)
 			ba.Icon.Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Action")) {
 			value = LuaToString(l, -1);
+			//Wyrmgus start
+			/*
 			if (!strcmp(value, "move")) {
 				ba.Action = ButtonMove;
 			} else if (!strcmp(value, "stop")) {
@@ -986,20 +988,10 @@ static int CclDefineButton(lua_State *l)
 				ba.Action = ButtonSpellCast;
 			} else if (!strcmp(value, "research")) {
 				ba.Action = ButtonResearch;
-			//Wyrmgus start
-			} else if (!strcmp(value, "learn-ability")) {
-				ba.Action = ButtonLearnAbility;
-			} else if (!strcmp(value, "experience-upgrade-to")) {
-				ba.Action = ButtonExperienceUpgradeTo;
-			//Wyrmgus end
 			} else if (!strcmp(value, "upgrade-to")) {
 				ba.Action = ButtonUpgradeTo;
 			} else if (!strcmp(value, "unload")) {
 				ba.Action = ButtonUnload;
-			//Wyrmgus start
-			} else if (!strcmp(value, "rally-point")) {
-				ba.Action = ButtonRallyPoint;
-			//Wyrmgus end
 			} else if (!strcmp(value, "cancel")) {
 				ba.Action = ButtonCancel;
 			} else if (!strcmp(value, "cancel-upgrade")) {
@@ -1013,6 +1005,14 @@ static int CclDefineButton(lua_State *l)
 			} else {
 				LuaError(l, "Unsupported button action: %s" _C_ value);
 			}
+			*/
+			int button_action_id = GetButtonActionIdByName(std::string(value));
+			if (button_action_id != -1) {
+				ba.Action = ButtonCmd(button_action_id);
+			} else {
+				LuaError(l, "Unsupported button action: %s" _C_ value);
+			}
+			//Wyrmgus end
 		} else if (!strcmp(value, "Value")) {
 			if (!lua_isnumber(l, -1) && !lua_isstring(l, -1) && !lua_isfunction(l, -1)) {
 				LuaError(l, "incorrect argument");

@@ -86,7 +86,10 @@ enum ButtonCmd {
 	ButtonCancelUpgrade,  /// cancel upgrade
 	ButtonCancelTrain,    /// cancel training
 	ButtonCancelBuild,    /// cancel building
+	//Wyrmgus start
+//	ButtonCallbackAction
 	ButtonCallbackAction
+	//Wyrmgus end
 };
 
 class ButtonAction;
@@ -490,6 +493,11 @@ extern bool GetGamePaused();
 extern void SetGameSpeed(int speed);
 /// Get the game speed
 extern int GetGameSpeed();
+
+//Wyrmgus start
+extern std::string GetButtonActionNameById(int button_action);
+extern int GetButtonActionIdByName(std::string button_action);
+//Wyrmgus end
 
 //@}
 
