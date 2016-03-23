@@ -2385,6 +2385,15 @@ static int CclGetUnitTypeData(lua_State *l)
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, type->Background.c_str());
 		return 1;
+	} else if (!strcmp(data, "Image")) {
+		lua_pushstring(l, type->File.c_str());
+		return 1;
+	} else if (!strcmp(data, "Width")) {
+		lua_pushnumber(l, type->Width);
+		return 1;
+	} else if (!strcmp(data, "Height")) {
+		lua_pushnumber(l, type->Height);
+		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, type->Icon.Name.c_str());
