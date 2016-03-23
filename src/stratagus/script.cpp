@@ -3283,6 +3283,10 @@ void DisableMod(std::string mod_file)
 	}
 		
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
+		if (UnitTypes[i]->ModTrains.find(mod_file) != UnitTypes[i]->ModTrains.end()) {
+			UnitTypes[i]->ModTrains.erase(mod_file);
+			UnitTypes[i]->RemoveButtons(-1, mod_file);
+		}
 		if (UnitTypes[i]->ModDefaultStats.find(mod_file) != UnitTypes[i]->ModDefaultStats.end()) {
 			UnitTypes[i]->ModDefaultStats.erase(mod_file);
 		}

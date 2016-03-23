@@ -731,11 +731,14 @@ bool CUnitType::CanSelect(GroupSelectionMode mode) const
 }
 
 //Wyrmgus start
-void CUnitType::RemoveButtons(int button_action)
+void CUnitType::RemoveButtons(int button_action, std::string mod_file)
 {
 	int buttons_size = UnitButtonTable.size();
 	for (int i = (buttons_size - 1); i >= 0; --i) {
 		if (button_action != -1 && UnitButtonTable[i]->Action != button_action) {
+			continue;
+		}
+		if (!mod_file.empty() && UnitButtonTable[i]->Mod != mod_file) {
 			continue;
 		}
 		

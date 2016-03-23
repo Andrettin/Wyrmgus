@@ -1116,6 +1116,10 @@ static int CclDefineButton(lua_State *l)
 			if (!strncmp(ba.UnitMask.c_str(), ",*,", 3)) {
 				ba.UnitMask = "*";
 			}
+		//Wyrmgus start
+		} else if (!strcmp(value, "Mod")) {
+			ba.Mod = LuaToString(l, -1);
+		//Wyrmgus end
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1123,7 +1127,10 @@ static int CclDefineButton(lua_State *l)
 	}
 	AddButton(ba.Pos, ba.Level, ba.Icon.Name, ba.Action, ba.ValueStr, ba.Payload,
 			  ba.Allowed, ba.AllowStr, ba.Key, ba.Hint, ba.Description, ba.CommentSound.Name,
-			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow);
+			  //Wyrmgus start
+//			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow);
+			  ba.ButtonCursor, ba.UnitMask, ba.Popup, ba.AlwaysShow, ba.Mod);
+			  //Wyrmgus end
 	return 0;
 }
 

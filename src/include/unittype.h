@@ -659,7 +659,7 @@ public:
 	bool CanSelect(GroupSelectionMode mode = SELECTABLE_BY_RECTANGLE_ONLY) const;
 	
 	//Wyrmgus start
-	void RemoveButtons(int button_action = -1);
+	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	int GetAvailableLevelUpUpgrades() const;
 	VariationInfo *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
@@ -689,6 +689,7 @@ public:
 	std::vector<CUpgrade *> Affixes;	/// Affixes which can be generated for this unit type
 	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
 	std::vector<CUnitType *> Trains;	/// Units trained by this unit
+	std::map<std::string, std::vector<CUnitType *>> ModTrains;	/// Units trained by this unit (as set in a mod)
 	//Wyrmgus end
 	int Slot;                       /// Type as number
 	std::string File;               /// Sprite files

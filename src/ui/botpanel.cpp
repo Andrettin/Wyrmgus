@@ -125,7 +125,10 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 			  ButtonCmd action, const std::string &value, void* actionCb, const ButtonCheckFunc func,
 			  const std::string &allow, const int key, const std::string &hint, const std::string &descr,
 			  const std::string &sound, const std::string &cursor, const std::string &umask,
-			  const std::string &popup, bool alwaysShow)
+			  //Wyrmgus start
+//			  const std::string &popup, bool alwaysShow)
+			  const std::string &popup, bool alwaysShow, const std::string &mod_file)
+			  //Wyrmgus end
 {
 	char buf[2048];
 	ButtonAction *ba = new ButtonAction;
@@ -206,6 +209,9 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 		sprintf(buf, ",%s,", umask.c_str());
 	}
 	ba->UnitMask = buf;
+	//Wyrmgus start
+	ba->Mod = mod_file;
+	//Wyrmgus end
 	UnitButtonTable.push_back(ba);
 	// FIXME: check if already initited
 	//Assert(ba->Icon.Icon != NULL);// just checks, that's why at the end

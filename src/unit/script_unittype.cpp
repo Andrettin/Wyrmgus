@@ -2102,6 +2102,11 @@ static int CclDefineUnitType(lua_State *l)
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
+	
+	// make units allowed by default
+	for (int i = 0; i < PlayerMax; ++i) {
+		AllowUnitId(Players[i], type->Slot, 65536);
+	}
 	//Wyrmgus end
 	return 0;
 }
@@ -2344,7 +2349,10 @@ static int CclGetUnitTypeData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	lua_pushvalue(l, 1);
-	const CUnitType *type = CclGetUnitType(l);
+	//Wyrmgus start
+//	const CUnitType *type = CclGetUnitType(l);
+	CUnitType *type = CclGetUnitType(l);
+	//Wyrmgus end
 	lua_pop(l, 1);
 	const char *data = LuaToString(l, 2);
 
@@ -2824,13 +2832,33 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Trains")) {
-		lua_createtable(l, type->Trains.size(), 0);
-		for (size_t i = 1; i <= type->Trains.size(); ++i)
-		{
-			lua_pushstring(l, type->Trains[i-1]->Ident.c_str());
-			lua_rawseti(l, -2, i);
+		bool is_mod = false;
+		if (lua_gettop(l) >= 3) {
+			is_mod = true;
 		}
-		return 1;
+		
+		std::string mod_file;
+		if (is_mod) {
+			mod_file = LuaToString(l, 3);
+		}
+
+		if (is_mod && type->ModTrains.find(mod_file) != type->ModTrains.end()) {
+			lua_createtable(l, type->ModTrains[mod_file].size(), 0);
+			for (size_t i = 1; i <= type->ModTrains[mod_file].size(); ++i)
+			{
+				lua_pushstring(l, type->ModTrains[mod_file][i-1]->Ident.c_str());
+				lua_rawseti(l, -2, i);
+			}
+			return 1;
+		} else {
+			lua_createtable(l, type->Trains.size(), 0);
+			for (size_t i = 1; i <= type->Trains.size(); ++i)
+			{
+				lua_pushstring(l, type->Trains[i-1]->Ident.c_str());
+				lua_rawseti(l, -2, i);
+			}
+			return 1;
+		}
 	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[data];
@@ -3586,6 +3614,61 @@ void SetModSound(std::string mod_file, std::string ident, std::string sound, std
 	}
 }
 
+//Wyrmgus start
+static int CclSetModTrains(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+	
+	std::string mod_file = LuaToString(l, 1);
+	CUnitType *type = UnitTypeByIdent(LuaToString(l, 2));
+	if (type == NULL) {
+		LuaError(l, "Unit type doesn't exist.");
+	}
+
+	type->ModTrains[mod_file].clear();
+	type->RemoveButtons(-1, mod_file);
+	
+	if (!lua_istable(l, 3)) {
+		LuaError(l, "incorrect argument");
+	}
+	int subargs = lua_rawlen(l, 3);
+	for (int i = 0; i < subargs; ++i) {
+		const char *value = LuaToString(l, 3, i + 1);
+		CUnitType *trained_unit = UnitTypeByIdent(value);
+		if (trained_unit != NULL) {
+			type->ModTrains[mod_file].push_back(trained_unit);
+		} else {
+			LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);
+		}
+	}
+	
+	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = " + std::to_string((long long) type->ModTrains[mod_file][i]->ButtonPos) + ",\n";
+		button_definition += "\tLevel = " + std::to_string((long long) type->ModTrains[mod_file][i]->ButtonLevel) + ",\n";
+		button_definition += "\tAction = ";
+		if (type->ModTrains[mod_file][i]->BoolFlag[BUILDING_INDEX].value) {
+			button_definition += "\"build\"";
+		} else {
+			button_definition += "\"train-unit\"";
+		}
+		button_definition += ",\n";
+		button_definition += "\tValue = \"" + type->ModTrains[mod_file][i]->Ident + "\",\n";
+		if (!type->ModTrains[mod_file][i]->ButtonPopup.empty()) {
+			button_definition += "\tPopup = \"" + type->ModTrains[mod_file][i]->ButtonPopup + "\",\n";
+		}
+		button_definition += "\tKey = \"" + type->ModTrains[mod_file][i]->ButtonKey + "\",\n";
+		button_definition += "\tHint = \"" + type->ModTrains[mod_file][i]->ButtonHint + "\",\n";
+		button_definition += "\tMod = \"" + mod_file + "\",\n";
+		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Register CCL features for unit-type.
 */
@@ -3611,6 +3694,9 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "GetUnitTypeName", CclGetUnitTypeName);
 	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
 	lua_register(Lua, "GetUnitTypeData", CclGetUnitTypeData);
+	//Wyrmgus start
+	lua_register(Lua, "SetModTrains", CclSetModTrains);
+	//Wyrmgus end
 }
 
 //@}

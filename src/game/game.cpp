@@ -785,17 +785,30 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				continue;
 			}
 			
-			f->printf("DefineUnitType(\"%s\", {\n", type.Ident.c_str());
 			if (type.Trains.size() > 0) {
+				f->printf("DefineUnitType(\"%s\", {\n", type.Ident.c_str());
+				
 				f->printf("\tTrains = {");
 				for (size_t j = 0; j < type.Trains.size(); ++j) {
 					f->printf("\"%s\", ", type.Trains[j]->Ident.c_str());
 				}
 				f->printf("}\n");
+				
+				f->printf("})\n\n");
 			}
-			
-			f->printf("})\n\n");
 		}		
+
+		for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
+			CUnitType &type = *UnitTypes[i];
+			
+			if (type.ModTrains.find(Map.Info.Filename) != type.ModTrains.end()) {
+				f->printf("SetModTrains(\"%s\", \"%s\", {", mod_file.c_str(), type.Ident.c_str());
+				for (size_t j = 0; j < type.ModTrains[Map.Info.Filename].size(); ++j) {
+					f->printf("\"%s\", ", type.ModTrains[Map.Info.Filename][j]->Ident.c_str());
+				}
+				f->printf("})\n\n");
+			}
+		}
 		//Wyrmgus end
 
 		//Wyrmgus start
