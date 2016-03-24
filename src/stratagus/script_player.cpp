@@ -1420,6 +1420,8 @@ static int CclDefineFaction(lua_State *l)
 				SetFactionStringToIndex(civilization, faction->Name, faction->ID);
 				faction->Civilization = civilization;
 			}
+		} else if (!strcmp(value, "Description")) {
+			faction->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			faction->Type = LuaToString(l, -1);
 		} else if (!strcmp(value, "Colors")) {
@@ -1828,7 +1830,10 @@ static int CclGetFactionData(lua_State *l)
 	
 	const char *data = LuaToString(l, 3);
 
-	if (!strcmp(data, "Type")) {
+	if (!strcmp(data, "Description")) {
+		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Type")) {
 		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Type.c_str());
 		return 1;
 	} else if (!strcmp(data, "Color")) {

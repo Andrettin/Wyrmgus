@@ -410,6 +410,7 @@ public:
 	}
 
 	std::string Name;													/// faction name
+	std::string Description;											/// faction description
 	std::string Type;													/// faction type (tribe or polity)
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	int ID;																/// faction ID
