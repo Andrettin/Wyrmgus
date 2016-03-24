@@ -146,4 +146,5 @@ extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 
 extern void DeleteModFaction(std::string civilization_name, std::string faction_name);
 extern void DisableMod(std::string mod_file);
+extern void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file);
 //Wyrmgus end

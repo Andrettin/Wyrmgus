@@ -95,6 +95,10 @@ extern UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 /// Get component for unit type variable.
 extern UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t);
 
+//Wyrmgus start
+std::map<std::string, std::string> DLCFileEquivalency;
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -3304,6 +3308,11 @@ void DisableMod(std::string mod_file)
 	}
 	
 	CleanLanguageModWords(mod_file);
+}
+
+void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file)
+{
+	DLCFileEquivalency[dlc_file] = replacement_file;
 }
 //Wyrmgus end
 

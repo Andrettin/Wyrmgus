@@ -42,6 +42,9 @@
 #include "iocompat.h"
 #include "map.h"
 #include "parameters.h"
+//Wyrmgus start
+#include "script.h"
+//Wyrmgus end
 #include "util.h"
 
 #include <stdarg.h>
@@ -665,6 +668,13 @@ static void LibraryFileName(const char *file, char(&buffer)[PATH_MAX])
 	if (FindFileWithExtension(buffer)) {
 		return;
 	}
+	
+	//Wyrmgus start
+	if (DLCFileEquivalency.find(std::string(file)) != DLCFileEquivalency.end()) { //if the file hasn't been found and it has an equivalent file, try to get that instead
+		LibraryFileName(DLCFileEquivalency[std::string(file)].c_str(), buffer);
+		return;
+	}
+	//Wyrmgus end
 
 	DebugPrint("File '%s' not found\n" _C_ file);
 	strcpy_s(buffer, PATH_MAX, file);
