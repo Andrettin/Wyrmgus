@@ -657,6 +657,12 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (!type.File.empty() && (parent_type == NULL || type.File != parent_type->File)) {
 				f->printf("\tImage = {\"file\", \"%s\", \"size\", {%d, %d}},\n", type.File.c_str(), type.Width, type.Height);
 			}
+			if (!type.Icon.Name.empty() && (parent_type == NULL || type.Icon.Name != parent_type->Icon.Name)) {
+				f->printf("\tIcon = \"%s\",\n", type.Icon.Name.c_str());
+			}
+			if (type.Animations != NULL && (parent_type == NULL || type.Animations != parent_type->Animations)) {
+				f->printf("\tAnimations = \"%s\",\n", type.Animations->Ident.c_str());
+			}
 			
 			f->printf("\tCosts = {");
 			for (unsigned int j = 0; j < MaxCosts; ++j) {

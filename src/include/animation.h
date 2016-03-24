@@ -141,6 +141,9 @@ public:
 	static void LoadWaitUnitAnim(lua_State *l, CUnit &unit, int luaIndex);
 
 public:
+	//Wyrmgus start
+	std::string Ident;
+	//Wyrmgus end
 	CAnimation *Attack;
 	CAnimation *RangedAttack;
 	CAnimation *Build;
@@ -177,6 +180,10 @@ extern int ParseAnimFlags(const CUnit &unit, const char *parseflag);
 extern void FindLabelLater(CAnimation **anim, const std::string &name);
 
 extern void FreeAnimations();
+
+//Wyrmgus start
+extern std::map<std::string, CAnimations *> AnimationMap;
+//Wyrmgus end
 
 //@}
 

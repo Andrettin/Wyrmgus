@@ -2003,7 +2003,7 @@ static int CclDefineUnitType(lua_State *l)
 	//Wyrmgus start
 	if (GameRunning || Editor.Running == EditorEditing) {
 		InitUnitType(*type);
-		LoadUnitTypeSprite(*type);
+		LoadUnitType(*type);
 	}
 	//Wyrmgus end
 	//Wyrmgus start
@@ -2393,6 +2393,13 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Height")) {
 		lua_pushnumber(l, type->Height);
+		return 1;
+	} else if (!strcmp(data, "Animations")) {
+		if (type->Animations != NULL) {
+			lua_pushstring(l, type->Animations->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Icon")) {
@@ -3217,6 +3224,24 @@ static int CclGetUnitTypes(lua_State *l)
 	}
 	return 1;
 }
+
+static int CclGetAnimations(lua_State *l)
+{
+	std::vector<std::string> animations;
+
+	std::map<std::string, CAnimations *>::iterator it;
+	for (it = AnimationMap.begin(); it != AnimationMap.end(); ++it) {
+		animations.push_back((*it).first);
+	}
+
+	lua_createtable(l, animations.size(), 0);
+	for (size_t i = 1; i <= animations.size(); ++i)
+	{
+		lua_pushstring(l, animations[i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
 //Wyrmgus end
 // ----------------------------------------------------------------------------
 
@@ -3692,6 +3717,7 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "DefineExtraDeathTypes", CclDefineExtraDeathTypes);
 	//Wyrmgus start
 	lua_register(Lua, "GetUnitTypes", CclGetUnitTypes);
+	lua_register(Lua, "GetAnimations", CclGetAnimations);
 	//Wyrmgus end
 
 	UnitTypeVar.Init();

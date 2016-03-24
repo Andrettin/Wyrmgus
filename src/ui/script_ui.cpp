@@ -39,6 +39,9 @@
 #include "ui.h"
 
 #include "font.h"
+//Wyrmgus start
+#include "icons.h"
+//Wyrmgus end
 #include "interface.h"
 #include "map.h"
 #include "menus.h"
@@ -1282,6 +1285,24 @@ static int CclDefineMapSetup(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+static int CclGetIcons(lua_State *l)
+{
+	std::vector<std::string> icons;
+	for (IconMap::iterator it = Icons.begin(); it != Icons.end(); ++it) {
+		icons.push_back(it->first);
+	}
+		
+	lua_createtable(l, icons.size(), 0);
+	for (size_t i = 1; i <= icons.size(); ++i)
+	{
+		lua_pushstring(l, icons[i-1].c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+//Wyrmgus end
+
 /**
 **  Register CCL features for UI.
 */
@@ -1338,6 +1359,10 @@ void UserInterfaceCclRegister()
 	lua_register(Lua, "SetSelectionStyle", CclSetSelectionStyle);
 
 	lua_register(Lua, "SetGroupKeys", CclSetGroupKeys);
+	
+	//Wyrmgus start
+	lua_register(Lua, "GetIcons", CclGetIcons);
+	//Wyrmgus end
 }
 
 //@}

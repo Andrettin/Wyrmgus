@@ -681,6 +681,9 @@ static int CclDefineAnimations(lua_State *l)
 	if (!anims) {
 		anims = new CAnimations;
 		AnimationMap[name] = anims;
+		//Wyrmgus start
+		anims->Ident = std::string(name);
+		//Wyrmgus end
 	}
 
 	lua_pushnil(l);

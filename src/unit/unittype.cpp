@@ -1415,6 +1415,12 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 */
 static int GetStillFrame(const CUnitType &type)
 {
+	//Wyrmgus start
+	if (type.Animations == NULL) {
+		return 0;
+	}
+	//Wyrmgus end
+	
 	CAnimation *anim = type.Animations->Still;
 
 	while (anim) {
@@ -1682,31 +1688,13 @@ void LoadUnitTypes()
 	for (std::vector<CUnitType *>::size_type i = 0; i < UnitTypes.size(); ++i) {
 		CUnitType &type = *UnitTypes[i];
 
+		//Wyrmgus start
+		/*
 		// Lookup icons.
-		//Wyrmgus start
-//		type.Icon.Load();
-		if (!type.Icon.Name.empty()) {
-			type.Icon.Load();
-		}
-		//Wyrmgus end
-
-		//Wyrmgus start
-		for (int j = 0; j < VariationMax; ++j) {
-			VariationInfo *varinfo = type.VarInfo[j];
-			if (!varinfo) {
-				continue;
-			}
-			if (!varinfo->Icon.Name.empty()) {
-				varinfo->Icon.Load();
-			}
-		}
-		//Wyrmgus end
+		type.Icon.Load();
 
 		// Lookup missiles.
 		type.Missile.MapMissile();
-		//Wyrmgus start
-		type.FireMissile.MapMissile();
-		//Wyrmgus end
 		type.Explosion.MapMissile();
 
 		// Lookup impacts
@@ -1727,8 +1715,57 @@ void LoadUnitTypes()
 		}
 #endif
 		// FIXME: should i copy the animations of same graphics?
+		*/
+		LoadUnitType(type);
+		//Wyrmgus end
 	}
 }
+
+//Wyrmgus start
+void LoadUnitType(CUnitType &type)
+{
+	// Lookup icons.
+	if (!type.Icon.Name.empty()) {
+		type.Icon.Load();
+	}
+
+	for (int j = 0; j < VariationMax; ++j) {
+		VariationInfo *varinfo = type.VarInfo[j];
+		if (!varinfo) {
+			continue;
+		}
+		if (!varinfo->Icon.Name.empty()) {
+			varinfo->Icon.Load();
+		}
+	}
+
+	// Lookup missiles.
+	type.Missile.MapMissile();
+	//Wyrmgus start
+	type.FireMissile.MapMissile();
+	//Wyrmgus end
+	type.Explosion.MapMissile();
+
+	// Lookup impacts
+	for (int i = 0; i < ANIMATIONS_DEATHTYPES + 2; ++i) {
+		type.Impact[i].MapMissile();
+	}
+	// Lookup corpse.
+	if (!type.CorpseName.empty()) {
+		type.CorpseType = UnitTypeByIdent(type.CorpseName);
+	}
+#ifndef DYNAMIC_LOAD
+	// Load Sprite
+	if (!type.Sprite) {
+		ShowLoadProgress(_("Loading Unit \"%s\""), type.Name.c_str());
+		LoadUnitTypeSprite(type);
+
+		IncItemsLoaded();
+	}
+#endif
+	// FIXME: should i copy the animations of same graphics?
+}
+//Wyrmgus end
 
 void CUnitTypeVar::Init()
 {

@@ -34,6 +34,9 @@
 
 #include "vec2i.h"
 #include <string>
+//Wyrmgus start
+#include <map>
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Documentation
@@ -161,6 +164,11 @@ public:
 extern void LoadIcons();   /// Load icons
 extern int  GetIconsCount();
 extern void CleanIcons();  /// Cleanup icons
+
+//Wyrmgus start
+typedef std::map<std::string, CIcon *> IconMap;
+extern IconMap Icons;
+//Wyrmgus end
 
 //@}
 

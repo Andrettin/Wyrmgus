@@ -50,8 +50,11 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-typedef std::map<std::string, CIcon *> IconMap;
-static IconMap Icons;   /// Map of ident to icon.
+//Wyrmgus start
+//typedef std::map<std::string, CIcon *> IconMap;
+//static IconMap Icons;   /// Map of ident to icon.
+IconMap Icons;   /// Map of ident to icon.
+//Wyrmgus end
 
 
 /*----------------------------------------------------------------------------
