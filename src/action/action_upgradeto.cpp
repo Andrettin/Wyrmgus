@@ -216,7 +216,6 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		unit.ChooseVariation(&newtype, false, i);
 	}
-	unit.UpdateButtonIcons();
 	//Wyrmgus end
 	
 	unit.Type = const_cast<CUnitType *>(&newtype);
@@ -280,6 +279,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus start
 	//update the unit's XP required, as its level or points may have changed
 	unit.UpdateXPRequired();
+	
+	unit.UpdateButtonIcons();
 	//Wyrmgus end
 	
 	//Wyrmgus start

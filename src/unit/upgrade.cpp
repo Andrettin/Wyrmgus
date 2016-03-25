@@ -373,7 +373,10 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "allow")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			if (!strncmp(value, "upgrade-", 8)) {
-				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
+				//Wyrmgus start
+//				um->ChangeUpgrades[UpgradeIdByIdent(value)] = LuaToNumber(l, j + 1, 3);
+				um->ChangeUpgrades[UpgradeIdByIdent(value)] = *strdup(LuaToString(l, j + 1, 3));
+				//Wyrmgus end
 			} else {
 				LuaError(l, "upgrade expected");
 			}
@@ -1229,17 +1232,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							}
 						}
 					}
-					if (AllUpgrades[um->UpgradeId]->Weapon || AllUpgrades[um->UpgradeId]->Arrows) {
-						unit.ChooseButtonIcon(ButtonAttack);
-						unit.ChooseButtonIcon(ButtonStandGround);
-					}
-					if (AllUpgrades[um->UpgradeId]->Shield) {
-						unit.ChooseButtonIcon(ButtonStop);
-					}
-					if (AllUpgrades[um->UpgradeId]->Boots) {
-						unit.ChooseButtonIcon(ButtonMove);
-					}
-					unit.ChooseButtonIcon(ButtonPatrol);
+					unit.UpdateButtonIcons();
 					//Wyrmgus end
 				}
 			}
@@ -1515,17 +1508,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							}
 						}
 					}
-					if (AllUpgrades[um->UpgradeId]->Weapon || AllUpgrades[um->UpgradeId]->Arrows) {
-						unit.ChooseButtonIcon(ButtonAttack);
-						unit.ChooseButtonIcon(ButtonStandGround);
-					}
-					if (AllUpgrades[um->UpgradeId]->Shield) {
-						unit.ChooseButtonIcon(ButtonStop);
-					}
-					if (AllUpgrades[um->UpgradeId]->Boots) {
-						unit.ChooseButtonIcon(ButtonMove);
-					}
-					unit.ChooseButtonIcon(ButtonPatrol);
+					unit.UpdateButtonIcons();
 					//Wyrmgus end
 				}
 			}
@@ -1618,17 +1601,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			}
 		}
 	}
-	if (AllUpgrades[um->UpgradeId]->Weapon || AllUpgrades[um->UpgradeId]->Arrows) {
-		unit.ChooseButtonIcon(ButtonAttack);
-		unit.ChooseButtonIcon(ButtonStandGround);
-	}
-	if (AllUpgrades[um->UpgradeId]->Shield) {
-		unit.ChooseButtonIcon(ButtonStop);
-	}
-	if (AllUpgrades[um->UpgradeId]->Boots) {
-		unit.ChooseButtonIcon(ButtonMove);
-	}
-	unit.ChooseButtonIcon(ButtonPatrol);
+	unit.UpdateButtonIcons();
 	//Wyrmgus end
 	
 	if (um->ConvertTo) {
@@ -1720,17 +1693,7 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			}
 		}
 	}
-	if (AllUpgrades[um->UpgradeId]->Weapon || AllUpgrades[um->UpgradeId]->Arrows) {
-		unit.ChooseButtonIcon(ButtonAttack);
-		unit.ChooseButtonIcon(ButtonStandGround);
-	}
-	if (AllUpgrades[um->UpgradeId]->Shield) {
-		unit.ChooseButtonIcon(ButtonStop);
-	}
-	if (AllUpgrades[um->UpgradeId]->Boots) {
-		unit.ChooseButtonIcon(ButtonMove);
-	}
-	unit.ChooseButtonIcon(ButtonPatrol);
+	unit.UpdateButtonIcons();
 	//Wyrmgus end
 }
 
