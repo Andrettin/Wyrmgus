@@ -1185,18 +1185,8 @@ void CButtonPanel::Draw()
 			CIcon *button_icon = buttons[i].Icon.Icon;
 			
 			// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
-			if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->GetItemSlotQuantity(ArrowsItemSlot) > 0 && Selected[0]->EquippedItems[ArrowsItemSlot].size() > 0) {
-				button_icon = Selected[0]->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon;
-			} else if (Selected.size() == 1 && buttons[i].Action == ButtonAttack && Selected[0]->GetItemSlotQuantity(ArrowsItemSlot) == 0 && Selected[0]->EquippedItems[WeaponItemSlot].size() > 0) {
-				button_icon = Selected[0]->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon;
-			} else if (Selected.size() == 1 && buttons[i].Action == ButtonStop && Selected[0]->EquippedItems[ShieldItemSlot].size() > 0) {
-				button_icon = Selected[0]->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon;
-			} else if (Selected.size() == 1 && buttons[i].Action == ButtonMove && Selected[0]->EquippedItems[BootsItemSlot].size() > 0) {
-				button_icon = Selected[0]->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon;
-			} else if (buttons[i].Icon.Name.empty() && !Selected[0]->Type->Civilization.empty() && PlayerRaces.ButtonIcons[PlayerRaces.GetRaceIndexByName(Selected[0]->Type->Civilization.c_str())].find(buttons[i].Action) != PlayerRaces.ButtonIcons[PlayerRaces.GetRaceIndexByName(Selected[0]->Type->Civilization.c_str())].end()) {
-				button_icon = PlayerRaces.ButtonIcons[PlayerRaces.GetRaceIndexByName(Selected[0]->Type->Civilization.c_str())][buttons[i].Action].Icon;
-			} else if (buttons[i].Icon.Name.empty() && PlayerRaces.ButtonIcons[ThisPlayer->Race].find(buttons[i].Action) != PlayerRaces.ButtonIcons[ThisPlayer->Race].end()) {
-				button_icon = PlayerRaces.ButtonIcons[ThisPlayer->Race][buttons[i].Action].Icon;
+			if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != NULL) {
+				button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
 			} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
 				button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
 			} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {

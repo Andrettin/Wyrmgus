@@ -422,6 +422,7 @@ public:
 	std::vector<int> Colors;											/// faction colors
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
+	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 };
@@ -604,7 +605,7 @@ public:
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
-	std::map<int, IconConfig> ButtonIcons[MAX_RACES];				/// icons for button actions
+	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<CDeity *> Deities[MAX_RACES];							/// deities
 	int CivilizationLanguage[MAX_RACES];

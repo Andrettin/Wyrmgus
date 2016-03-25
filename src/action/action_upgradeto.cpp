@@ -41,6 +41,7 @@
 #include "animation.h"
 //Wyrmgus start
 #include "game.h"
+#include "interface.h"
 //Wyrmgus end
 #include "iolib.h"
 #include "map.h"
@@ -215,6 +216,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		unit.ChooseVariation(&newtype, false, i);
 	}
+	unit.UpdateButtonIcons();
 	//Wyrmgus end
 	
 	unit.Type = const_cast<CUnitType *>(&newtype);

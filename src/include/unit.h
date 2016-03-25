@@ -181,6 +181,8 @@ public:
 	void SetCharacter(std::string character_full_name, bool custom_hero = false);
 	void ChooseVariation(const CUnitType *new_type = NULL, bool ignore_old_variation = false, int image_layer = -1);
 	void SetVariation(int new_variation, const CUnitType *new_type = NULL, int image_layer = -1);
+	void UpdateButtonIcons();
+	void ChooseButtonIcon(int button_action);
 	void EquipItem(CUnit &item, bool affect_character = true);
 	void DeequipItem(CUnit &item, bool affect_character = true);
 	void ReadWork(CUpgrade *work, bool affect_character = true);
@@ -358,6 +360,7 @@ public:
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;
+	CIcon *GetButtonIcon(int button_action) const;
 	MissileConfig GetMissile() const;
 	CPlayerColorGraphic *GetLayerSprite(int image_layer) const;
 	std::string GetTypeName() const;
@@ -431,6 +434,7 @@ public:
 	CUpgrade *Work;		/// Item unit's literary work
 	bool Unique;		/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
+	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
 	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
 

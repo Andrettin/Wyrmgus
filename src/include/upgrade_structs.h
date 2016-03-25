@@ -219,6 +219,7 @@ public:
 	bool IncompatibleAffixes[UpgradeMax];
 	std::vector<CUpgrade *> RequiredAbilities;
 	std::vector<int> WeaponClasses;		/// If isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
+	CUnitType *Item;
 	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade

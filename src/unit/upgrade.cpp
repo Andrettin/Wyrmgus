@@ -167,7 +167,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL), Item(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -1229,6 +1229,17 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							}
 						}
 					}
+					if (AllUpgrades[um->UpgradeId]->Weapon || AllUpgrades[um->UpgradeId]->Arrows) {
+						unit.ChooseButtonIcon(ButtonAttack);
+						unit.ChooseButtonIcon(ButtonStandGround);
+					}
+					if (AllUpgrades[um->UpgradeId]->Shield) {
+						unit.ChooseButtonIcon(ButtonStop);
+					}
+					if (AllUpgrades[um->UpgradeId]->Boots) {
+						unit.ChooseButtonIcon(ButtonMove);
+					}
+					unit.ChooseButtonIcon(ButtonPatrol);
 					//Wyrmgus end
 				}
 			}
@@ -1504,6 +1515,17 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							}
 						}
 					}
+					if (AllUpgrades[um->UpgradeId]->Weapon || AllUpgrades[um->UpgradeId]->Arrows) {
+						unit.ChooseButtonIcon(ButtonAttack);
+						unit.ChooseButtonIcon(ButtonStandGround);
+					}
+					if (AllUpgrades[um->UpgradeId]->Shield) {
+						unit.ChooseButtonIcon(ButtonStop);
+					}
+					if (AllUpgrades[um->UpgradeId]->Boots) {
+						unit.ChooseButtonIcon(ButtonMove);
+					}
+					unit.ChooseButtonIcon(ButtonPatrol);
 					//Wyrmgus end
 				}
 			}
@@ -1596,6 +1618,17 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			}
 		}
 	}
+	if (AllUpgrades[um->UpgradeId]->Weapon || AllUpgrades[um->UpgradeId]->Arrows) {
+		unit.ChooseButtonIcon(ButtonAttack);
+		unit.ChooseButtonIcon(ButtonStandGround);
+	}
+	if (AllUpgrades[um->UpgradeId]->Shield) {
+		unit.ChooseButtonIcon(ButtonStop);
+	}
+	if (AllUpgrades[um->UpgradeId]->Boots) {
+		unit.ChooseButtonIcon(ButtonMove);
+	}
+	unit.ChooseButtonIcon(ButtonPatrol);
 	//Wyrmgus end
 	
 	if (um->ConvertTo) {
@@ -1687,6 +1720,17 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			}
 		}
 	}
+	if (AllUpgrades[um->UpgradeId]->Weapon || AllUpgrades[um->UpgradeId]->Arrows) {
+		unit.ChooseButtonIcon(ButtonAttack);
+		unit.ChooseButtonIcon(ButtonStandGround);
+	}
+	if (AllUpgrades[um->UpgradeId]->Shield) {
+		unit.ChooseButtonIcon(ButtonStop);
+	}
+	if (AllUpgrades[um->UpgradeId]->Boots) {
+		unit.ChooseButtonIcon(ButtonMove);
+	}
+	unit.ChooseButtonIcon(ButtonPatrol);
 	//Wyrmgus end
 }
 
@@ -2005,6 +2049,13 @@ void AddUpgradeWeaponClass(std::string upgrade_ident, int weapon_class)
 {
 	CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
 	upgrade->WeaponClasses.push_back(weapon_class);
+}
+
+void SetUpgradeItem(std::string upgrade_ident, std::string item_ident)
+{
+	CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+	CUnitType *item = UnitTypeByIdent(item_ident);
+	upgrade->Item = item;
 }
 
 std::string GetUpgradeEffectsString(std::string upgrade_ident)

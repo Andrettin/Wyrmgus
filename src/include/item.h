@@ -150,6 +150,8 @@ extern std::vector<CUniqueItem *> UniqueItems;
 -- Functions
 ----------------------------------------------------------------------------*/
 
+extern int GetItemSlotIdByName(std::string item_slot);
+extern std::string GetItemSlotNameById(int item_slot);
 extern int GetItemClassIdByName(std::string item_class);
 extern std::string GetItemClassNameById(int item_class);
 extern int GetItemClassSlot(int item_class);

@@ -841,6 +841,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	for (int i = 0; i < MaxImageLayers; ++i) {
 		ChooseVariation(NULL, false, i);
 	}
+	this->UpdateButtonIcons();
 	this->UpdateXPRequired();
 }
 
@@ -951,6 +952,144 @@ void CUnit::SetVariation(int new_variation, const CUnitType *new_type, int image
 	}
 }
 
+void CUnit::UpdateButtonIcons()
+{
+	this->ChooseButtonIcon(ButtonAttack);
+	this->ChooseButtonIcon(ButtonStop);
+	this->ChooseButtonIcon(ButtonMove);
+	this->ChooseButtonIcon(ButtonStandGround);
+	this->ChooseButtonIcon(ButtonPatrol);
+}
+
+void CUnit::ChooseButtonIcon(int button_action)
+{
+	if (button_action == ButtonAttack) {
+		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon != NULL) {
+			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon;
+			return;
+		}
+		
+		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon != NULL) {
+			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon;
+			return;
+		}
+	} else if (button_action == ButtonStop) {
+		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon != NULL) {
+			this->ButtonIcons[button_action] = this->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon;
+			return;
+		}
+	} else if (button_action == ButtonMove) {
+		if (this->EquippedItems[BootsItemSlot].size() > 0 && this->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon != NULL) {
+			this->ButtonIcons[button_action] = this->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon;
+			return;
+		}
+	} else if (button_action == ButtonStandGround) {
+		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->Type->ButtonIcons.find(button_action)->second.Icon;
+			return;
+		}
+
+		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->Type->ButtonIcons.find(button_action) != this->EquippedItems[WeaponItemSlot][0]->Type->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->Type->ButtonIcons.find(button_action)->second.Icon;
+			return;
+		}
+	}
+	
+	if (this->Type->VarInfo[this->Variation] && this->Type->VarInfo[this->Variation]->ButtonIcons.find(button_action) != this->Type->VarInfo[this->Variation]->ButtonIcons.end()) {
+		this->ButtonIcons[button_action] = this->Type->VarInfo[this->Variation]->ButtonIcons[button_action].Icon;
+		return;
+	}
+	for (int i = 0; i < MaxImageLayers; ++i) {
+		if (this->LayerVariation[i] == -1 || this->LayerVariation[i] >= ((int) this->Type->LayerVarInfo[i].size())) {
+			continue;
+		}
+		VariationInfo *varinfo = this->Type->LayerVarInfo[i][this->LayerVariation[i]];
+		if (varinfo && varinfo->ButtonIcons.find(button_action) != varinfo->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = varinfo->ButtonIcons[button_action].Icon;
+			return;
+		}
+	}
+
+	int all_upgrades_size = AllUpgrades.size();
+	
+	for (int i = (NumUpgradeModifiers - 1); i >= 0; --i) {
+		if (this->Player->Allow.Upgrades[UpgradeModifiers[i]->UpgradeId] == 'R' && UpgradeModifiers[i]->ApplyTo[this->Type->Slot] == 'X') {
+			if (
+				(
+					(button_action == ButtonAttack && (AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Weapon || AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Arrows))
+					|| (button_action == ButtonStop && AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Shield)
+					|| (button_action == ButtonMove && AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Boots)
+				)
+				&& AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->Icon.Icon != NULL
+			) {
+				this->ButtonIcons[button_action] = AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->Icon.Icon;
+				return;
+			} else if (button_action == ButtonStandGround && (AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Weapon || AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Arrows) && AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->ButtonIcons.find(button_action) != AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->ButtonIcons.end()) {
+				this->ButtonIcons[button_action] = AllUpgrades[UpgradeModifiers[i]->UpgradeId]->Item->ButtonIcons.find(button_action)->second.Icon;
+				return;
+			}
+		}
+	}
+	
+	if (button_action == ButtonAttack) {
+		if (this->Type->DefaultEquipment.find(ArrowsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon != NULL) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->Icon.Icon;
+			return;
+		}
+		
+		if (this->Type->DefaultEquipment.find(WeaponItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(WeaponItemSlot)->second->Icon.Icon != NULL) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(WeaponItemSlot)->second->Icon.Icon;
+			return;
+		}
+	} else if (button_action == ButtonStop) {
+		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != NULL) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon;
+			return;
+		}
+	} else if (button_action == ButtonMove) {
+		if (this->Type->DefaultEquipment.find(BootsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon != NULL) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(BootsItemSlot)->second->Icon.Icon;
+			return;
+		}
+	} else if (button_action == ButtonStandGround) {
+		if (this->Type->DefaultEquipment.find(ArrowsItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ArrowsItemSlot)->second->ButtonIcons.find(button_action)->second.Icon;
+			return;
+		}
+		
+		if (this->Type->DefaultEquipment.find(WeaponItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(WeaponItemSlot)->second->ButtonIcons.find(button_action) != this->Type->DefaultEquipment.find(WeaponItemSlot)->second->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(WeaponItemSlot)->second->ButtonIcons.find(button_action)->second.Icon;
+			return;
+		}
+	}
+	
+	if (this->Type->ButtonIcons.find(button_action) != this->Type->ButtonIcons.end()) {
+		this->ButtonIcons[button_action] = this->Type->ButtonIcons.find(button_action)->second.Icon;
+		return;
+	}
+	
+	if (!this->Type->Civilization.empty()) {
+		int civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+		int faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
+		
+		if (faction == -1 && this->Player->Race == civilization) {
+			faction = this->Player->Faction;
+		}
+		
+		if (faction != -1 && PlayerRaces.Factions[civilization][faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[civilization][faction]->ButtonIcons.end()) {
+			this->ButtonIcons[button_action] = PlayerRaces.Factions[civilization][faction]->ButtonIcons[button_action].Icon;
+			return;
+		} else if (PlayerRaces.ButtonIcons[civilization].find(button_action) != PlayerRaces.ButtonIcons[civilization].end()) {
+			this->ButtonIcons[button_action] = PlayerRaces.ButtonIcons[civilization][button_action].Icon;
+			return;
+		}
+	}
+	
+	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) { //if no proper button icon found, make sure any old button icon set for this button action isn't used either
+		this->ButtonIcons.erase(button_action);
+	}
+}
+
 void CUnit::EquipItem(CUnit &item, bool affect_character)
 {
 	int item_class = item.Type->ItemClass;
@@ -1031,6 +1170,15 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 		}
 	}
 	
+	if (item_slot == WeaponItemSlot || item_slot == ArrowsItemSlot) {
+		this->ChooseButtonIcon(ButtonAttack);
+		this->ChooseButtonIcon(ButtonStandGround);
+	} else if (item_slot == ShieldItemSlot) {
+		this->ChooseButtonIcon(ButtonStop);
+	} else if (item_slot == BootsItemSlot) {
+		this->ChooseButtonIcon(ButtonMove);
+	}
+	this->ChooseButtonIcon(ButtonPatrol);
 	
 	//add item bonuses
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); i++) {
@@ -1166,6 +1314,16 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 			ChooseVariation(NULL, false, i);
 		}
 	}
+	
+	if (item_slot == WeaponItemSlot || item_slot == ArrowsItemSlot) {
+		this->ChooseButtonIcon(ButtonAttack);
+		this->ChooseButtonIcon(ButtonStandGround);
+	} else if (item_slot == ShieldItemSlot) {
+		this->ChooseButtonIcon(ButtonStop);
+	} else if (item_slot == BootsItemSlot) {
+		this->ChooseButtonIcon(ButtonMove);
+	}
+	this->ChooseButtonIcon(ButtonPatrol);
 }
 
 void CUnit::ReadWork(CUpgrade *work, bool affect_character)
@@ -1795,6 +1953,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 		for (int i = 0; i < MaxImageLayers; ++i) {
 			unit->ChooseVariation(NULL, true, i);
 		}
+		unit->UpdateButtonIcons();
 		unit->UpdateXPRequired();
 		//Wyrmgus end
 	}
@@ -4010,6 +4169,19 @@ IconConfig CUnit::GetIcon() const
 	} else {
 		return Type->Icon;
 	}
+}
+
+CIcon *CUnit::GetButtonIcon(int button_action) const
+{
+	if (this->ButtonIcons.find(button_action) != this->ButtonIcons.end()) {
+		return this->ButtonIcons.find(button_action)->second;
+	} else if (this->Player == ThisPlayer && ThisPlayer->Faction != -1 && PlayerRaces.Factions[ThisPlayer->Race][ThisPlayer->Faction]->ButtonIcons.find(button_action) != PlayerRaces.Factions[ThisPlayer->Race][ThisPlayer->Faction]->ButtonIcons.end()) {
+		return PlayerRaces.Factions[ThisPlayer->Race][ThisPlayer->Faction]->ButtonIcons[button_action].Icon;
+	} else if (this->Player == ThisPlayer && PlayerRaces.ButtonIcons[ThisPlayer->Race].find(button_action) != PlayerRaces.ButtonIcons[ThisPlayer->Race].end()) {
+		return PlayerRaces.ButtonIcons[ThisPlayer->Race][button_action].Icon;
+	}
+	
+	return NULL;
 }
 
 MissileConfig CUnit::GetMissile() const

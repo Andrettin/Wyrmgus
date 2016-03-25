@@ -61,6 +61,52 @@ std::vector<CUniqueItem *> UniqueItems;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+int GetItemSlotIdByName(std::string item_slot)
+{
+	if (item_slot == "weapon") {
+		return WeaponItemSlot;
+	} else if (item_slot == "shield") {
+		return ShieldItemSlot;
+	} else if (item_slot == "helmet") {
+		return HelmetItemSlot;
+	} else if (item_slot == "armor") {
+		return ArmorItemSlot;
+	} else if (item_slot == "boots") {
+		return BootsItemSlot;
+	} else if (item_slot == "amulet") {
+		return AmuletItemSlot;
+	} else if (item_slot == "ring") {
+		return RingItemSlot;
+	} else if (item_slot == "arrows") {
+		return ArrowsItemSlot;
+	}
+
+	return -1;
+}
+
+std::string GetItemSlotNameById(int item_slot)
+{
+	if (item_slot == WeaponItemSlot) {
+		return "weapon";
+	} else if (item_slot == ShieldItemSlot) {
+		return "shield";
+	} else if (item_slot == HelmetItemSlot) {
+		return "helmet";
+	} else if (item_slot == ArmorItemSlot) {
+		return "armor";
+	} else if (item_slot == BootsItemSlot) {
+		return "boots";
+	} else if (item_slot == AmuletItemSlot) {
+		return "amulet";
+	} else if (item_slot == RingItemSlot) {
+		return "ring";
+	} else if (item_slot == ArrowsItemSlot) {
+		return "arrows";
+	}
+
+	return "";
+}
+
 int GetItemClassIdByName(std::string item_class)
 {
 	if (item_class == "dagger") {

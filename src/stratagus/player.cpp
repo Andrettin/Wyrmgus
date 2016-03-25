@@ -1140,13 +1140,14 @@ void CPlayer::SetFaction(const std::string faction_name)
 		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction_name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
 	}
 	
-	if (new_language != old_language) { //if the language changed, update the names of this player's units
-		for (int i = 0; i < this->GetUnitCount(); ++i) {
-			CUnit &unit = this->GetUnit(i);
+	for (int i = 0; i < this->GetUnitCount(); ++i) {
+		CUnit &unit = this->GetUnit(i);
+		if (new_language != old_language) { //if the language changed, update the names of this player's units
 			if (!unit.Character) {
 				unit.UpdatePersonalName();
 			}
 		}
+		unit.UpdateButtonIcons();
 	}
 }
 

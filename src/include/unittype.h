@@ -148,7 +148,7 @@ public:
 class VariationInfo
 {
 public:
-	VariationInfo() : VariationId(""),
+	VariationInfo() : 
 		FrameWidth(0), FrameHeight(0),
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL)
 	{
@@ -183,6 +183,8 @@ public:
 	CPlayerColorGraphic *LayerSprites[MaxImageLayers];	/// The graphics corresponding to LayerFiles.
 	CPlayerColorGraphic *SpriteWhenLoaded[MaxCosts]; /// The graphic corresponding to FileWhenLoaded.
 	CPlayerColorGraphic *SpriteWhenEmpty[MaxCosts];  /// The graphic corresponding to FileWhenEmpty
+	
+	std::map<int, IconConfig> ButtonIcons;				/// icons for button actions
 };
 //Wyrmgus end
 
@@ -697,6 +699,8 @@ public:
 	//Wyrmgus start
 	std::string LightFile;			/// Light file
 	std::string LayerFiles[MaxImageLayers];	/// Layer files
+	std::map<int, IconConfig> ButtonIcons;					/// icons for button actions
+	std::map<int, CUnitType *> DefaultEquipment;			/// default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
 
 	int Width;                                            /// Sprite width

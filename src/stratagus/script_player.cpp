@@ -1485,6 +1485,23 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "FactionUpgrade")) {
 			faction->FactionUpgrade = LuaToString(l, -1);
+		} else if (!strcmp(value, "ButtonIcons")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string button_action_name = LuaToString(l, -1, j + 1);
+				int button_action = GetButtonActionIdByName(button_action_name);
+				if (button_action != -1) {
+					++j;
+					faction->ButtonIcons[button_action].Name = LuaToString(l, -1, j + 1);
+					faction->ButtonIcons[button_action].Icon = NULL;
+					faction->ButtonIcons[button_action].Load();
+				} else {
+					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Mod")) {
 			faction->Mod = LuaToString(l, -1);
 		} else {
@@ -1501,6 +1518,14 @@ static int CclDefineFaction(lua_State *l)
 		
 		if (faction->ParentFaction != -1 && faction->FactionUpgrade.empty()) { //if the faction has no faction upgrade, inherit that of its parent faction
 			faction->FactionUpgrade = PlayerRaces.Factions[civilization][faction->ParentFaction]->FactionUpgrade;
+		}
+		
+		if (faction->ParentFaction != -1) { //inherit button icons from parent civilization, for button actions which none are specified
+			for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->ButtonIcons.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->ButtonIcons.end(); ++iterator) {
+				if (faction->ButtonIcons.find(iterator->first) == faction->ButtonIcons.end()) {
+					faction->ButtonIcons[iterator->first] = iterator->second;
+				}
+			}
 		}
 	} else if (parent_faction.empty()) {
 		faction->ParentFaction = -1; // to allow redefinitions to remove the parent faction setting

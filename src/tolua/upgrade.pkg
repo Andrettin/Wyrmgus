@@ -22,6 +22,7 @@ class CUpgrade
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];
+	CUnitType *Item;
 	int ID;
 	//Wyrmgus end
 	int Costs[MaxCosts];
@@ -39,5 +40,6 @@ extern int GetResourceIdByName(const char *resourceName);
 extern std::string GetResourceNameById(int resource_id);
 extern void AddUpgradeRequiredAbility(std::string upgrade_ident, std::string required_ability_ident);
 extern void AddUpgradeWeaponClass(std::string upgrade_ident, int weapon_class);
+extern void SetUpgradeItem(std::string upgrade_ident, std::string item_ident);
 extern std::string GetUpgradeEffectsString(std::string upgrade_ident);
 //Wyrmgus end

@@ -803,6 +803,12 @@ static int CclDefineUnitType(lua_State *l)
 					for (int i = 0; i < MaxImageLayers; ++i) {
 						var->LayerFiles[i] = parent_type->VarInfo[var_n]->LayerFiles[i];
 					}
+					for (std::map<int, IconConfig>::iterator iterator = parent_type->VarInfo[var_n]->ButtonIcons.begin(); iterator != parent_type->VarInfo[var_n]->ButtonIcons.end(); ++iterator) {
+						var->ButtonIcons[iterator->first].Name = iterator->second.Name;
+						var->ButtonIcons[iterator->first].Icon = NULL;
+						var->ButtonIcons[iterator->first].Load();
+						var->ButtonIcons[iterator->first].Icon->Load();
+					}
 				} else {
 					break;
 				}
@@ -830,6 +836,15 @@ static int CclDefineUnitType(lua_State *l)
 					}
 					var->Tileset = parent_type->LayerVarInfo[i][j]->Tileset;
 				}
+			}
+			for (std::map<int, IconConfig>::iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
+				type->ButtonIcons[iterator->first].Name = iterator->second.Name;
+				type->ButtonIcons[iterator->first].Icon = NULL;
+				type->ButtonIcons[iterator->first].Load();
+				type->ButtonIcons[iterator->first].Icon->Load();
+			}
+			for (std::map<int, CUnitType *>::iterator iterator = parent_type->DefaultEquipment.begin(); iterator != parent_type->DefaultEquipment.end(); ++iterator) {
+				type->DefaultEquipment[iterator->first] = iterator->second;
 			}
 			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value + 1; //increase priority by 1 to make it be chosen by the AI when building over the previous unit
 			type->DefaultStat.Variables[PRIORITY_INDEX].Max = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max + 1;
@@ -903,10 +918,15 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "icon")) {
 						var->Icon.Name = LuaToString(l, -1, k + 1);
 						var->Icon.Icon = NULL;
-						//Wyrmgus start
 						var->Icon.Load();
 						var->Icon.Icon->Load();
-						//Wyrmgus end
+					} else if (!strcmp(value, "button-icon")) {
+						int button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
+						++k;
+						var->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
+						var->ButtonIcons[button_action].Icon = NULL;
+						var->ButtonIcons[button_action].Load();
+						var->ButtonIcons[button_action].Icon->Load();
 					} else if (!strcmp(value, "animations")) {
 						var->Animations = AnimationsByIdent(LuaToString(l, -1, k + 1));
 						if (!var->Animations) {
@@ -1049,6 +1069,46 @@ static int CclDefineUnitType(lua_State *l)
 				if (redefine && type->LayerSprites[image_layer]) {
 					CGraphic::Free(type->LayerSprites[image_layer]);
 					type->LayerSprites[image_layer] = NULL;
+				}
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "ButtonIcons")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				const int subargs = lua_rawlen(l, -1);
+				int image_layer = 0;
+				for (int k = 0; k < subargs; ++k) {
+					int button_action = GetButtonActionIdByName(LuaToString(l, -1, k + 1));
+					++k;
+					type->ButtonIcons[button_action].Name = LuaToString(l, -1, k + 1);
+					type->ButtonIcons[button_action].Icon = NULL;
+					type->ButtonIcons[button_action].Load();
+					type->ButtonIcons[button_action].Icon->Load();
+				}
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "DefaultEquipment")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				const int subargs = lua_rawlen(l, -1);
+				int image_layer = 0;
+				for (int k = 0; k < subargs; ++k) {
+					int item_slot = GetItemSlotIdByName(LuaToString(l, -1, k + 1));
+					++k;
+					CUnitType *default_equipment = UnitTypeByIdent(LuaToString(l, -1, k + 1));
+					if (default_equipment != NULL) {
+						type->DefaultEquipment[item_slot] = default_equipment;
+					} else { // Error
+						LuaError(l, "incorrect default equipment unit-type");
+					}
 				}
 				lua_pop(l, 1);
 			}
