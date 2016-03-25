@@ -2246,9 +2246,11 @@ static int CclSetPlayerData(lua_State *l)
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 		//Wyrmgus end
 		
-		if (GrandStrategy && ThisPlayer) {
+		//Wyrmgus start
+		if (GameRunning && GrandStrategy && ThisPlayer) {
 			p->SetRandomFaction();
 		}
+		//Wyrmgus end
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		std::string faction_name = LuaToString(l, 3);
