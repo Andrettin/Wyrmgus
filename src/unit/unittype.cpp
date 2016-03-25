@@ -1349,6 +1349,12 @@ CUnitType *NewUnitTypeSlot(const std::string &ident)
 */
 void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
 {
+	//Wyrmgus start
+	if (sprite == NULL) {
+		return;
+	}
+	//Wyrmgus end
+	
 	PixelPos pos = screenPos;
 	// FIXME: move this calculation to high level.
 	//Wyrmgus start
