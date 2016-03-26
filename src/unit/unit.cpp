@@ -932,7 +932,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		type_variations.push_back(i);
 	}
 	if (type_variations.size() > 0) {
-		this->SetVariation(type_variations[rand() % type_variations.size()], new_type, image_layer);
+		this->SetVariation(type_variations[SyncRand(type_variations.size())], new_type, image_layer);
 	}
 }
 
