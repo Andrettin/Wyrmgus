@@ -423,6 +423,8 @@ public:
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
+	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
+	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 };
@@ -561,16 +563,6 @@ public:
 		//Wyrmgus start
 		for (int i = 0; i < MAX_RACES; ++i) {
 			ParentCivilization[i] = -1;
-			for (int j = 0; j < UnitTypeClassMax; ++j) {
-				CivilizationClassUnitTypes[i][j] = -1;
-				CivilizationClassUpgrades[i][j] = -1;
-			}
-			for (int j = 0; j < FactionMax; ++j) {
-				for (int k = 0; k < UnitTypeClassMax; ++k) {
-					FactionClassUnitTypes[i][j][k] = -1;
-					FactionClassUpgrades[i][j][k] = -1;
-				}
-			}
 		}
 		memset(Playable, 0, sizeof(Playable));
 		memset(CivilizationLanguage, -1, sizeof(CivilizationLanguage));
@@ -597,14 +589,12 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
-	int CivilizationClassUnitTypes[MAX_RACES][UnitTypeClassMax];		/// the unit type slot of a particular class for a particular civilization
-	int CivilizationClassUpgrades[MAX_RACES][UnitTypeClassMax];			/// the upgrade slot of a particular class for a particular civilization
-	int FactionClassUnitTypes[MAX_RACES][FactionMax][UnitTypeClassMax];	/// the unit type slot of a particular class for a particular faction
-	int FactionClassUpgrades[MAX_RACES][FactionMax][UnitTypeClassMax];	/// the upgrade slot of a particular class for a particular faction
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
+	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
+	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<CDeity *> Deities[MAX_RACES];							/// deities

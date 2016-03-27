@@ -3254,15 +3254,15 @@ void DisableMod(std::string mod_file)
 				RecalculateShownUnits();
 			}
 			for (int j = 0; j < MAX_RACES; ++j) {
-				for (int k = 0; k < UnitTypeClassMax; ++k) {
-					if (PlayerRaces.CivilizationClassUnitTypes[j][k] == UnitTypes[i]->Slot) {
-						PlayerRaces.CivilizationClassUnitTypes[j][k] = -1;
+				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[j].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[j].rend(); ++iterator) {
+					if (iterator->second == UnitTypes[i]->Slot) {
+						PlayerRaces.CivilizationClassUnitTypes[j].erase(iterator->first);
 					}
 				}
 				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
-					for (int n = 0; n < UnitTypeClassMax; ++n) {
-						if (PlayerRaces.FactionClassUnitTypes[j][k][n] == UnitTypes[i]->Slot) {
-							PlayerRaces.FactionClassUnitTypes[j][k][n] = -1;
+					for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[j][k]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[j][k]->ClassUnitTypes.rend(); ++iterator) {
+						if (iterator->second == UnitTypes[i]->Slot) {
+							PlayerRaces.Factions[j][k]->ClassUnitTypes.erase(iterator->first);
 						}
 					}
 				}

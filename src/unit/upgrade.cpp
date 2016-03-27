@@ -433,18 +433,11 @@ static int CclDefineModifier(lua_State *l)
 	//Wyrmgus start
 	//set the upgrade's civilization and class here, for lack of a better place
 	if (!AllUpgrades[um->UpgradeId]->Class.empty()) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = -1;
-		for (unsigned int i = 0; i != UnitTypeClassMax; ++i) {
-			if (UpgradeClasses[i] == AllUpgrades[um->UpgradeId]->Class) {
-				class_id = i;
-				break;
-			}
-			if (UpgradeClasses[i].empty()) { //if reached a blank slot, then the class isn't recorded yet; do so now
-				UpgradeClasses[i] = AllUpgrades[um->UpgradeId]->Class;
-				SetUpgradeClassStringToIndex(AllUpgrades[um->UpgradeId]->Class, i);
-				class_id = i;
-				break;
-			}
+		int class_id = GetUpgradeClassIndexByName(AllUpgrades[um->UpgradeId]->Class);
+		if (class_id == -1) {
+			SetUpgradeClassStringToIndex(AllUpgrades[um->UpgradeId]->Class, UpgradeClasses.size());
+			class_id = UpgradeClasses.size();
+			UpgradeClasses.push_back(AllUpgrades[um->UpgradeId]->Class);
 		}
 		if (!AllUpgrades[um->UpgradeId]->Civilization.empty()) {
 			int civilization_id = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str());
@@ -452,7 +445,7 @@ static int CclDefineModifier(lua_State *l)
 			if (!AllUpgrades[um->UpgradeId]->Faction.empty()) {
 				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, AllUpgrades[um->UpgradeId]->Faction);
 				if (civilization_id != -1 && faction_id != -1 && class_id != -1) {
-					PlayerRaces.FactionClassUpgrades[civilization_id][faction_id][class_id] = um->UpgradeId;
+					PlayerRaces.Factions[civilization_id][faction_id]->ClassUpgrades[class_id] = um->UpgradeId;
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {

@@ -519,9 +519,9 @@ int ResourceGrandStrategyBuildingTerrainSpecificGraphic[MaxCosts][WorldMapTerrai
 std::string ExtraDeathTypes[ANIMATIONS_DEATHTYPES];
 
 //Wyrmgus start
-std::string UnitTypeClasses[UnitTypeClassMax];
+std::vector<std::string> UnitTypeClasses;
 std::map<std::string, int> UnitTypeClassStringToIndex;
-std::string UpgradeClasses[UnitTypeClassMax];
+std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
 //Wyrmgus end
 

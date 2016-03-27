@@ -1991,31 +1991,24 @@ static int CclDefineUnitType(lua_State *l)
 	
 	//Wyrmgus start
 	if (!type->Class.empty()) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
-		int class_id = -1;
-		for (unsigned int i = 0; i != UnitTypeClassMax; ++i) {
-			if (UnitTypeClasses[i] == type->Class) {
-				class_id = i;
-				break;
-			}
-			if (UnitTypeClasses[i].empty()) { //if reached a blank slot, then the class isn't recorded yet; do so now
-				UnitTypeClasses[i] = type->Class;
-				SetUnitTypeClassStringToIndex(type->Class, i);
-				class_id = i;
-				break;
-			}
+		int class_id = GetUnitTypeClassIndexByName(type->Class);
+		if (class_id == -1) {
+			SetUnitTypeClassStringToIndex(type->Class, UnitTypeClasses.size());
+			class_id = UnitTypeClasses.size();
+			UnitTypeClasses.push_back(type->Class);
 		}
 		
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (int i = 0; i < MAX_RACES; ++i) {
-			for (int j = 0; j < UnitTypeClassMax; ++j) {
-				if (PlayerRaces.CivilizationClassUnitTypes[i][j] == type->Slot) {
-					PlayerRaces.CivilizationClassUnitTypes[i][j] = -1;
+			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[i].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[i].rend(); ++iterator) {
+				if (iterator->second == type->Slot) {
+					PlayerRaces.CivilizationClassUnitTypes[i].erase(iterator->first);
 				}
 			}
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				for (int k = 0; k < UnitTypeClassMax; ++k) {
-					if (PlayerRaces.FactionClassUnitTypes[i][j][k] == type->Slot) {
-						PlayerRaces.FactionClassUnitTypes[i][j][k] = -1;
+				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[i][j]->ClassUnitTypes.rend(); ++iterator) {
+					if (iterator->second == type->Slot) {
+						PlayerRaces.Factions[i][j]->ClassUnitTypes.erase(iterator->first);
 					}
 				}
 			}
@@ -2027,7 +2020,7 @@ static int CclDefineUnitType(lua_State *l)
 			if (!type->Faction.empty()) {
 				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, type->Faction);
 				if (civilization_id != -1 && faction_id != -1 && class_id != -1) {
-					PlayerRaces.FactionClassUnitTypes[civilization_id][faction_id][class_id] = type->Slot;
+					PlayerRaces.Factions[civilization_id][faction_id]->ClassUnitTypes[class_id] = type->Slot;
 				}
 			} else {
 				if (civilization_id != -1 && class_id != -1) {

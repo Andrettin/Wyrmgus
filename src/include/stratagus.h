@@ -158,7 +158,6 @@ extern const char NameLine[];
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
 //Wyrmgus start
-#define UnitTypeClassMax  128		/// How many unit type classes are supported
 //#define MAX_RACES 8
 #define MAX_RACES 32
 #define FactionMax 128				/// Maximum number of factions a civilization can have

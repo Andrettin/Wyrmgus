@@ -379,16 +379,8 @@ void PlayerRace::Clean()
 		this->Display[i].clear();
 		this->Visible[i] = false;
 		//Wyrmgus start
-		for (int j = 0; j < UnitTypeClassMax; ++j) {
-			this->CivilizationClassUnitTypes[i][j] = -1;
-			this->CivilizationClassUpgrades[i][j] = -1;
-		}
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			for (int k = 0; k < UnitTypeClassMax; ++k) {
-				FactionClassUnitTypes[i][j][k] = -1;
-				FactionClassUpgrades[i][j][k] = -1;
-			}
-		}
+		this->CivilizationClassUnitTypes[i].clear();
+		this->CivilizationClassUpgrades[i].clear();
 		this->Playable[i] = false;
 		this->Species[i].clear();
 		this->DefaultColor[i].clear();
@@ -483,7 +475,7 @@ int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
 		return -1;
 	}
 	
-	if (CivilizationClassUnitTypes[civilization][class_id] != -1) {
+	if (CivilizationClassUnitTypes[civilization].find(class_id) != CivilizationClassUnitTypes[civilization].end()) {
 		return CivilizationClassUnitTypes[civilization][class_id];
 	}
 	
@@ -500,7 +492,7 @@ int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
 		return -1;
 	}
 	
-	if (CivilizationClassUpgrades[civilization][class_id] != -1) {
+	if (CivilizationClassUpgrades[civilization].find(class_id) != CivilizationClassUpgrades[civilization].end()) {
 		return CivilizationClassUpgrades[civilization][class_id];
 	}
 	
@@ -518,8 +510,8 @@ int PlayerRace::GetFactionClassUnitType(int civilization, int faction, int class
 	}
 	
 	if (faction != -1) {
-		if (FactionClassUnitTypes[civilization][faction][class_id] != -1) {
-			return FactionClassUnitTypes[civilization][faction][class_id];
+		if (PlayerRaces.Factions[civilization][faction]->ClassUnitTypes.find(class_id) != PlayerRaces.Factions[civilization][faction]->ClassUnitTypes.end()) {
+			return PlayerRaces.Factions[civilization][faction]->ClassUnitTypes[class_id];
 		}
 		
 		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
@@ -537,8 +529,8 @@ int PlayerRace::GetFactionClassUpgrade(int civilization, int faction, int class_
 	}
 	
 	if (faction != -1) {
-		if (FactionClassUpgrades[civilization][faction][class_id] != -1) {
-			return FactionClassUpgrades[civilization][faction][class_id];
+		if (PlayerRaces.Factions[civilization][faction]->ClassUpgrades.find(class_id) != PlayerRaces.Factions[civilization][faction]->ClassUpgrades.end()) {
+			return PlayerRaces.Factions[civilization][faction]->ClassUpgrades[class_id];
 		}
 		
 		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
@@ -1098,12 +1090,25 @@ void CPlayer::SetFaction(const std::string faction_name)
 		}
 	}
 	
-	if (faction_name.empty()) {
+	int faction = PlayerRaces.GetFactionIndexByName(this->Race, faction_name);
+	
+	for (size_t i = 0; i < UpgradeClasses.size(); ++i) {
+		if (PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i) != PlayerRaces.GetFactionClassUpgrade(this->Race, faction, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+			if (PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i) != -1 && this->Allow.Upgrades[PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i)] == 'R') {
+				UpgradeLost(*this, PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i));
+
+				if (PlayerRaces.GetFactionClassUpgrade(this->Race, faction, i) != -1) {
+					UpgradeAcquire(*this, AllUpgrades[PlayerRaces.GetFactionClassUpgrade(this->Race, faction, i)]);
+				}
+			}
+		}
+	}
+	
+	if (faction == -1) {
 		this->Faction = -1;
 		return;
 	}
 	
-	int faction = PlayerRaces.GetFactionIndexByName(this->Race, faction_name);
 	int old_language = PlayerRaces.GetFactionLanguage(this->Race, this->Faction);
 	int new_language = PlayerRaces.GetFactionLanguage(this->Race, faction);
 	
@@ -2120,7 +2125,7 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 			
 			//check if the faction has a different unit type from its civilization
 			bool first_element = true;
-			for (int i = 0; i < UnitTypeClassMax; ++i) {
+			for (size_t i = 0; i < UnitTypeClasses.size(); ++i) {
 				int unit_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, i);
 				int base_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(civilization, i);
 				if (unit_type_id != -1 && unit_type_id != base_unit_type_id) {

@@ -1020,8 +1020,8 @@ public:
 extern CUnitTypeVar UnitTypeVar;
 
 //Wyrmgus start
-extern std::string UnitTypeClasses[UnitTypeClassMax]; //list of unit type classes; built with CclDefineUnitType
-extern std::string UpgradeClasses[UnitTypeClassMax]; //list of upgrade classes; built with CclDefineModifier
+extern std::vector<std::string> UnitTypeClasses; //list of unit type classes; built with CclDefineUnitType
+extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
