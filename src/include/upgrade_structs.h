@@ -53,6 +53,9 @@
 class CUnitType;
 class CVariable;
 class CIcon;
+//Wyrmgus start
+class CCharacter;
+//Wyrmgus end
 struct lua_State;
 
 /**
@@ -227,7 +230,10 @@ public:
 	int GrandStrategyCosts[MaxCosts];	/// costs for the upgrade for grand strategy mode
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode
 	int TechnologyPointCost;		/// technology point cost
-	int Work;
+	int Work;						/// form in which was inscribed (i.e. scroll or book), if is a literary work
+	int Year;						/// year of publication, if is a literary work
+	CCharacter *Author;				/// author of this literary work (if it is one)
+	std::vector<CCharacter *> Characters;	/// characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
 	CIcon *Icon;                      /// icon to display to the user

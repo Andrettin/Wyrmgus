@@ -279,7 +279,7 @@ class CGrandStrategyHero : public CCharacter
 {
 public:
 	CGrandStrategyHero() : CCharacter(),
-		State(0),
+		State(0), Existed(false),
 		Province(NULL), ProvinceOfOrigin(NULL),
 		Father(NULL), Mother(NULL)
 	{
@@ -289,10 +289,12 @@ public:
 	void Create();
 	void Die();
 	void SetType(int unit_type_id);
+	bool IsAlive();
 	int GetAdministrativeEfficiencyModifier();
 	std::string GetRulerEffectsString();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province
+	bool Existed;		/// whether the character has existed in this playthrough
 	CGrandStrategyProvince *Province;
 	CGrandStrategyProvince *ProvinceOfOrigin;	/// Province from which the hero originates
 	CGrandStrategyHero *Father;			/// Character's father
@@ -358,6 +360,7 @@ public:
 	void DoTrade();							/// Process trade deals
 	void DoProspection();					/// Process prospection for the turn
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
+	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
 	#if defined(USE_OPENGL) || defined(USE_GLES)
 	void CreateMinimapTexture();
 	#endif
@@ -387,9 +390,11 @@ public:
 	CPlayerColorGraphic *NationalBorderGraphics[MaxDirections];	///one for each direction
 	GrandStrategyWorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	std::vector<CGrandStrategyProvince *> Provinces;
+	std::map<int, std::vector<CGrandStrategyProvince *>> CultureProvinces;	/// provinces belonging to each culture
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
 	std::vector<CGrandStrategyHero *> Heroes;
+	std::vector<CUpgrade *> Works;
 	CGrandStrategyFaction *PlayerFaction;
 	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts];								///price for every 100 of each commodity
@@ -416,6 +421,7 @@ public:
 extern bool GrandStrategy;								/// if the game is in grand strategy mode
 extern bool GrandStrategyGamePaused;					/// if the grand strategy game is paused
 extern bool GrandStrategyGameInitialized;				/// if the grand strategy game has been initialized
+extern bool GrandStrategyGameLoading;
 extern int GrandStrategyYear;
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
@@ -562,8 +568,10 @@ extern void CreateGrandStrategyCustomHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);
 extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
 extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);
+extern void GrandStrategyHeroExisted(std::string hero_full_name);
 extern bool GrandStrategyHeroIsAlive(std::string hero_full_name);
 extern bool GrandStrategyHeroIsCustom(std::string hero_full_name);
+extern void GrandStrategyWorkCreated(std::string work_ident);
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);

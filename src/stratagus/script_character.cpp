@@ -225,6 +225,32 @@ static int CclDefineCharacter(lua_State *l)
 					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "AuthoredWorks")) {
+			character->AuthoredWorks.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string work_ident = LuaToString(l, -1, j + 1);
+				int work_id = UpgradeIdByIdent(work_ident);
+				if (work_id != -1) {
+					character->AuthoredWorks.push_back(AllUpgrades[work_id]);
+					AllUpgrades[work_id]->Author = character;
+				} else {
+					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
+				}
+			}
+		} else if (!strcmp(value, "LiteraryAppearances")) {
+			character->LiteraryAppearances.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string work_ident = LuaToString(l, -1, j + 1);
+				int work_id = UpgradeIdByIdent(work_ident);
+				if (work_id != -1) {
+					character->LiteraryAppearances.push_back(AllUpgrades[work_id]);
+					AllUpgrades[work_id]->Characters.push_back(character);
+				} else {
+					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Items")) {
 			character->Items.clear();
 			const int args = lua_rawlen(l, -1);

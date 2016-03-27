@@ -3081,6 +3081,8 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
 					fprintf(fd, "SetProvinceHero(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Heroes[i]->Province->Name.c_str(), GrandStrategyGame.Heroes[i]->GetFullName().c_str(), GrandStrategyGame.Heroes[i]->State); //save province heroes
 				}
+			} else if (GrandStrategyGame.Heroes[i]->Existed && !GrandStrategyGame.Heroes[i]->Custom) {
+				fprintf(fd, "GrandStrategyHeroExisted(\"%s\")\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str()); // save which characters have existed but died in this playthrough
 			}
 		}
 		
@@ -3091,6 +3093,12 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 			}
 		}
+		
+		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+			if (AllUpgrades[i]->Work != -1 && std::find(GrandStrategyGame.Works.begin(), GrandStrategyGame.Works.end(), AllUpgrades[i]) == GrandStrategyGame.Works.end()) {
+				fprintf(fd, "GrandStrategyWorkCreated(\"%s\")\n", AllUpgrades[i]->Ident.c_str()); // save which works have already been created
+			}
+		}		
 		
 		fprintf(fd, "SetPlayerFaction(\"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.PlayerFaction->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Name.c_str());
 	

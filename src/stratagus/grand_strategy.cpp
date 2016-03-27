@@ -10,7 +10,7 @@
 //
 /**@name grand_strategy.cpp - The grand strategy mode. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2016 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -65,6 +65,7 @@
 bool GrandStrategy = false;				///if the game is in grand strategy mode
 bool GrandStrategyGamePaused = false;
 bool GrandStrategyGameInitialized = false;
+bool GrandStrategyGameLoading = false;
 int GrandStrategyYear = 0;
 std::string GrandStrategyWorld;
 int WorldMapOffsetX;
@@ -970,9 +971,50 @@ void CGrandStrategyGame::DoTurn()
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		if (
 			this->Heroes[i]->DeathYear == GrandStrategyYear
-			&& this->Heroes[i]->State != 0
+			&& this->Heroes[i]->IsAlive()
 		) {
 			this->Heroes[i]->Die();
+		}
+	}
+	
+	// check if any literary works should be published this year
+	int works_size = this->Works.size();
+	for (int i = (works_size - 1); i >= 0; --i) {
+		CGrandStrategyHero *author = NULL;
+		if (this->Works[i]->Author != NULL) {
+			author = this->GetHero(this->Works[i]->Author->GetFullName());
+			if (author != NULL && !author->IsAlive()) {
+				continue;
+			}
+		}
+			
+		if ((author == NULL && SyncRand(200) != 0) || (author != NULL && SyncRand(10) != 0)) { // 0.5% chance per year that a work will be published if no author is preset, and 10% if an author is preset
+			continue;
+		}
+		
+		int civilization = PlayerRaces.GetRaceIndexByName(this->Works[i]->Civilization.c_str());
+		if (
+			(author != NULL && author->ProvinceOfOrigin != NULL)
+			|| (civilization != -1 && this->CultureProvinces.find(civilization) != this->CultureProvinces.end() && this->CultureProvinces[civilization].size() > 0)
+		) {
+			bool characters_existed = true;
+			for (size_t j = 0; j < this->Works[i]->Characters.size(); ++j) {
+				CGrandStrategyHero *hero = this->GetHero(this->Works[i]->Characters[j]->GetFullName());
+				
+				if (hero == NULL || !hero->Existed) {
+					characters_existed = false;
+					break;
+				}
+			}
+			if (!characters_existed) {
+				continue;
+			}
+			
+			if (author != NULL && author->ProvinceOfOrigin != NULL) {
+				this->CreateWork(this->Works[i], author, author->ProvinceOfOrigin);
+			} else {
+				this->CreateWork(this->Works[i], author, this->CultureProvinces[civilization][SyncRand(this->CultureProvinces[civilization].size())]);
+			}
 		}
 	}
 }
@@ -1222,6 +1264,41 @@ void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, C
 		exporter_faction.Trade[resource] += importer_faction.Trade[resource];
 		importer_faction.Trade[resource] = 0;
 	}
+}
+
+void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province)
+{
+	if (!province->Owner->HasTechnologyClass("writing")) { // only factions which have knowledge of writing can produce literary works
+		return;
+	}
+
+	this->Works.erase(std::remove(this->Works.begin(), this->Works.end(), work), this->Works.end()); // remove work from the vector, so that it doesn't get created again
+
+	std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work->Name + "\", \"";
+	if (author != NULL) {
+		work_creation_message += author->GetFullName() + " ";
+	} else {
+		work_creation_message += "A sage ";
+	}
+	work_creation_message += "has written the literary work \\\"" + work->Name + "\\\" in ";
+	if (province->Owner != GrandStrategyGame.PlayerFaction) {
+		work_creation_message += "the foreign lands of ";
+	}
+	work_creation_message += province->GetCulturalName() + "!";
+	if (!work->Description.empty()) {
+		work_creation_message += " " + FindAndReplaceString(work->Description, "\"", "\\\"");
+	}
+	if (!work->Quote.empty()) {
+		work_creation_message += "\\n\\n" + FindAndReplaceString(work->Quote, "\"", "\\\"");
+	}
+	work_creation_message += "\"";
+	if (province->Owner == GrandStrategyGame.PlayerFaction) {
+		work_creation_message += ", \"+1 Prestige\"";
+	}
+	work_creation_message += ") end;";
+	CclCommand(work_creation_message);
+	
+	province->Owner->Resources[PrestigeCost] += 1;
 }
 
 bool CGrandStrategyGame::IsPointOnMap(int x, int y)
@@ -2056,7 +2133,12 @@ void CGrandStrategyProvince::SetCivilization(int civilization)
 {
 	int old_civilization = this->Civilization;
 	
+	if (old_civilization != -1) { // if province had a civilization, remove it from that civilization's culture province vector
+		GrandStrategyGame.CultureProvinces[old_civilization].erase(std::remove(GrandStrategyGame.CultureProvinces[old_civilization].begin(), GrandStrategyGame.CultureProvinces[old_civilization].end(), this), GrandStrategyGame.CultureProvinces[old_civilization].end());
+	}
+	
 	this->Civilization = civilization;
+	GrandStrategyGame.CultureProvinces[civilization].push_back(this);
 	
 	if (civilization != -1) {
 		// create new cultural names for the province's terrain features, if there aren't any
@@ -2968,25 +3050,25 @@ void CGrandStrategyFaction::RulerSuccession()
 		&& (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType == GovernmentTypeMonarchy)
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) {
-			if (this->Ruler->Children[i]->State != 0 && this->Ruler->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
+			if (this->Ruler->Children[i]->IsAlive() && this->Ruler->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
 				this->SetRuler(this->Ruler->Children[i]->GetFullName());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ruler->Siblings.size(); ++i) { // now check for male siblings of the current ruler
-			if (this->Ruler->Siblings[i]->State != 0 && this->Ruler->Siblings[i]->Gender == MaleGender) {
+			if (this->Ruler->Siblings[i]->IsAlive() && this->Ruler->Siblings[i]->Gender == MaleGender) {
 				this->SetRuler(this->Ruler->Siblings[i]->GetFullName());
 				return;
 			}
 		}		
 		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) { //check again for children, but now allow for inheritance regardless of gender
-			if (this->Ruler->Children[i]->State != 0) {
+			if (this->Ruler->Children[i]->IsAlive()) {
 				this->SetRuler(this->Ruler->Children[i]->GetFullName());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ruler->Siblings.size(); ++i) { //check again for siblings, but now allow for inheritance regardless of gender
-			if (this->Ruler->Siblings[i]->State != 0) {
+			if (this->Ruler->Siblings[i]->IsAlive()) {
 				this->SetRuler(this->Ruler->Siblings[i]->GetFullName());
 				return;
 			}
@@ -2996,7 +3078,7 @@ void CGrandStrategyFaction::RulerSuccession()
 	std::vector<CGrandStrategyHero *> ruler_candidates;
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		if (
-			GrandStrategyGame.Heroes[i]->State != 0
+			GrandStrategyGame.Heroes[i]->IsAlive()
 			&& GrandStrategyGame.Heroes[i]->Gender == MaleGender
 			&& (
 				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
@@ -3011,7 +3093,7 @@ void CGrandStrategyFaction::RulerSuccession()
 		//if the list of male ruler candidates is empty, see if there are heroes available without taking gender in regard
 		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 			if (
-				GrandStrategyGame.Heroes[i]->State != 0
+				GrandStrategyGame.Heroes[i]->IsAlive()
 				&& (
 					(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
 					|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
@@ -3345,6 +3427,7 @@ void CGrandStrategyHero::Create()
 	}
 	
 	this->State = 2;
+	this->Existed = true;
 	
 	if (this->ProvinceOfOrigin != NULL && (!this->Icon.Name.empty() || this->Custom)) { //if the hero has its own icon or is a custom hero
 		this->ProvinceOfOrigin->SetHero(this->GetFullName(), 2);
@@ -3426,6 +3509,11 @@ void CGrandStrategyHero::SetType(int unit_type_id)
 			this->Province->AttackingMilitaryScore += (this->Type->DefaultStat.Variables[POINTS_INDEX].Value + (this->Province->AttackedBy != NULL ? this->Province->AttackedBy->MilitaryScoreBonus[this->Type->Slot] : 0));
 		}
 	}
+}
+
+bool CGrandStrategyHero::IsAlive()
+{
+	return this->State != 0;
 }
 
 int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
@@ -4788,12 +4876,15 @@ void CleanGrandStrategyGame()
 		delete GrandStrategyGame.Provinces[i];
 	}
 	GrandStrategyGame.Provinces.clear();
+	GrandStrategyGame.CultureProvinces.clear();
 
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		delete GrandStrategyGame.Heroes[i];
 	}
 	GrandStrategyGame.Heroes.clear();
 	GrandStrategyHeroStringToIndex.clear();
+	
+	GrandStrategyGame.Works.clear();
 	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
@@ -5205,6 +5296,15 @@ void InitializeGrandStrategyGame(bool show_loading)
 		hero->Custom = CurrentCustomHero->Custom;
 		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	}
+	
+	//initialize literary works
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+		if (AllUpgrades[i]->Work == -1) {
+			continue;
+		}
+		
+		GrandStrategyGame.Works.push_back(AllUpgrades[i]);
+	}
 }
 
 void InitializeGrandStrategyMinimap()
@@ -5329,13 +5429,29 @@ void InitializeGrandStrategyFactions()
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		GrandStrategyGame.Heroes[i]->Initialize();
 		
-		if (
-			(GrandStrategyGame.Heroes[i]->State == 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year && GrandStrategyYear < GrandStrategyGame.Heroes[i]->DeathYear)
-			|| GrandStrategyGame.Heroes[i]->Custom //create custom hero regardless of date
-		) {
-			GrandStrategyGame.Heroes[i]->Create();
-		} else if (GrandStrategyGame.Heroes[i]->State != 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->DeathYear) {
-			GrandStrategyGame.Heroes[i]->Die();
+		if (!GrandStrategyGameLoading) {
+			if (GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year) {
+				GrandStrategyGame.Heroes[i]->Existed = true;
+			}
+			
+			if (
+				(GrandStrategyGame.Heroes[i]->State == 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year && GrandStrategyYear < GrandStrategyGame.Heroes[i]->DeathYear)
+				|| GrandStrategyGame.Heroes[i]->Custom //create custom hero regardless of date
+			) {
+				GrandStrategyGame.Heroes[i]->Create();
+			} else if (GrandStrategyGame.Heroes[i]->State != 0 && GrandStrategyYear >= GrandStrategyGame.Heroes[i]->DeathYear) {
+				GrandStrategyGame.Heroes[i]->Die();
+			}
+		}
+	}
+
+	//initialize literary works
+	int works_size = GrandStrategyGame.Works.size();
+	for (int i = (works_size - 1); i >= 0; --i) {
+		if (!GrandStrategyGameLoading) {
+			if (GrandStrategyGame.Works[i]->Year != 0 && GrandStrategyYear >= GrandStrategyGame.Works[i]->Year) { //if the game is starting after the publication date of this literary work, remove it from the work list
+				GrandStrategyGame.Works.erase(std::remove(GrandStrategyGame.Works.begin(), GrandStrategyGame.Works.end(), GrandStrategyGame.Works[i]), GrandStrategyGame.Works.end());
+			}
 		}
 	}
 	
@@ -6306,13 +6422,21 @@ std::string GetGrandStrategyHeroUnitType(std::string hero_full_name)
 	return "";
 }
 
+void GrandStrategyHeroExisted(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		hero->Existed = true;
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+}
+
 bool GrandStrategyHeroIsAlive(std::string hero_full_name)
 {
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 	if (hero) {
-		if (hero->State != 0) {
-			return true;
-		}
+		return hero->IsAlive();
 	} else {
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 	}
@@ -6329,6 +6453,16 @@ bool GrandStrategyHeroIsCustom(std::string hero_full_name)
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 	}
 	return false;
+}
+
+void GrandStrategyWorkCreated(std::string work_ident)
+{
+	CUpgrade *work = CUpgrade::Get(work_ident);
+	if (work) {
+		GrandStrategyGame.Works.erase(std::remove(GrandStrategyGame.Works.begin(), GrandStrategyGame.Works.end(), work), GrandStrategyGame.Works.end()); // remove work from the vector, so that it doesn't get created again
+	} else {
+		fprintf(stderr, "Work \"%s\" doesn't exist.\n", work_ident.c_str());
+	}
 }
 
 void SetCommodityPrice(std::string resource_name, int price)
