@@ -49,7 +49,6 @@
 #include "grand_strategy.h" // for playing faction music
 #include "interface.h" // for playing faction music
 #include "player.h" // for playing faction music
-#include "results.h" // for playing faction music
 //Wyrmgus end
 #include "unit.h"
 
@@ -869,7 +868,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 	}
 	SDL_UnlockMutex(Audio.Lock);
 	
-	if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { // play day music in grand strategy mode
+	if (GrandStrategy && !GameRunning) { // play day music in grand strategy mode
 		SetMusicCondition(OAML_CONDID_MAIN_LOOP, MiddayTimeOfDay);
 	}
 #endif
