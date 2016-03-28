@@ -457,7 +457,7 @@ void DrawGuichanWidgets()
 #else
 		//Wyrmgus start
 //		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running);
-		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running && (!GrandStrategy || GrandStrategyGamePaused);
+		Gui->setUseDirtyDrawing(!GameRunning && !Editor.Running && (!GrandStrategy || GrandStrategyGamePaused));
 		//Wyrmgus end
 #endif
 		Gui->draw();
