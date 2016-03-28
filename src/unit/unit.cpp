@@ -5211,15 +5211,48 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 {
 	//Wyrmgus start
 //	return IsEnemy(*unit.Player);
-	if (this->Player->Type == PlayerNeutral && this->Type->BoolFlag[FAUNA_INDEX].value && this->Type->BoolFlag[ORGANIC_INDEX].value && this->Type->BoolFlag[PREDATOR_INDEX].value && this->Variable[HUNGER_INDEX].Value > 250 && !unit.Type->BoolFlag[PREDATOR_INDEX].value && unit.Type->BoolFlag[FLESH_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && this->Type->Slot != unit.Type->Slot) {
+	if (
+		this->Player->Type == PlayerNeutral
+		&& this->Type->BoolFlag[FAUNA_INDEX].value
+		&& this->Type->BoolFlag[ORGANIC_INDEX].value
+		&& unit.Type->BoolFlag[ORGANIC_INDEX].value
+		&& this->Type->Slot != unit.Type->Slot
+	) {
+		if (
+			this->Variable[HUNGER_INDEX].Value > 250
+			&& !unit.Type->BoolFlag[PREDATOR_INDEX].value
+			&& unit.Type->BoolFlag[FLESH_INDEX].value
+		) {
+			return true;
+		} else if (
+			this->Type->BoolFlag[PEOPLEAVERSION_INDEX].value
+			&& !unit.Type->BoolFlag[FAUNA_INDEX].value
+			&& unit.Player->Type != PlayerNeutral
+			&& this->MapDistanceTo(unit) <= 1
+		) {
+			return true;
+		}
+	} else if (
+		unit.Player->Type == PlayerNeutral
+		&& unit.Type->BoolFlag[FAUNA_INDEX].value
+		&& unit.Type->BoolFlag[ORGANIC_INDEX].value
+		&& unit.Type->BoolFlag[PREDATOR_INDEX].value
+		&& !this->Type->BoolFlag[FAUNA_INDEX].value
+		&& !this->Type->BoolFlag[PREDATOR_INDEX].value
+		&& this->Player->Type != PlayerNeutral
+		&& this->Type->Slot != unit.Type->Slot
+	) {
 		return true;
-	} else if (unit.Player->Type == PlayerNeutral && unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->BoolFlag[PREDATOR_INDEX].value && !this->Type->BoolFlag[FAUNA_INDEX].value && !this->Type->BoolFlag[PREDATOR_INDEX].value && this->Player->Type != PlayerNeutral && this->Type->Slot != unit.Type->Slot) {
+	} else if (
+		this->Player != unit.Player
+		&& unit.CurrentAction() == UnitActionAttack
+		&& unit.CurrentOrder()->HasGoal()
+		&& unit.CurrentOrder()->GetGoal()->Player == this->Player
+	) {
 		return true;
-	} else if (this->Player->Type == PlayerNeutral && this->Type->BoolFlag[FAUNA_INDEX].value && this->Type->BoolFlag[ORGANIC_INDEX].value && this->Type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit.Type->BoolFlag[ORGANIC_INDEX].value && !unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Player->Type != PlayerNeutral && this->Type->Slot != unit.Type->Slot && this->MapDistanceTo(unit) <= 1) {
-		return true;
-	} else {
-		return IsEnemy(*unit.Player);
 	}
+	
+	return IsEnemy(*unit.Player);
 	//Wyrmgus end
 }
 
