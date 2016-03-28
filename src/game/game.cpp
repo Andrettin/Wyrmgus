@@ -190,6 +190,9 @@ void StartMap(const std::string &filename, bool clean)
 	Invalidate();
 
 	CleanGame();
+	//Wyrmgus start
+	CleanPlayers();
+	//Wyrmgus end
 	InterfaceState = IfaceStateMenu;
 	SetDefaultTextColors(nc, rc);
 

@@ -398,7 +398,6 @@ public:
 
 	void Load();
 
-
 	bool MouseScroll;                   /// Enable mouse scrolling
 	bool KeyScroll;                     /// Enable keyboard scrolling
 	/// Key Scroll Speed
@@ -570,6 +569,9 @@ extern void InitUserInterface();
 extern void SaveUserInterface(CFile &file);
 /// Clean up the ui module
 extern void CleanUserInterface();
+//Wyrmgus start
+void CleanUserInterfaceFillers();
+//Wyrmgus end
 
 extern void FreeButtonStyles();
 

@@ -2504,6 +2504,15 @@ void CFiller::Load()
 		map.Init(G);
 		G->UseDisplayFormat();
 	}
+	//Wyrmgus start
+	if (this->X < 0) {
+		this->X = Video.Width + this->X;
+	}
+	
+	if (this->Y < 0) {
+		this->Y = Video.Height + this->Y;
+	}
+	//Wyrmgus end
 }
 
 //@}

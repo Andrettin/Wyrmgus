@@ -139,7 +139,10 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 static void SetPlayerData(const int player, const char *prop, const char *arg, int value)
 {
 	if (!strcmp(prop, "RaceName")) {
-		Players[player].Race = value;
+		//Wyrmgus start
+//		Players[player].Race = value;
+		Players[player].SetCivilization(value);
+		//Wyrmgus end
 	} else if (!strcmp(prop, "Resources")) {
 		const int resId = GetResourceIdByName(arg);
 		if (resId == -1) {

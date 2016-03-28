@@ -45,8 +45,13 @@
 #include "ai.h"
 //Wyrmgus start
 #include "commands.h" //for faction setting
+#include "editor.h"
+#include "font.h"
 //Wyrmgus end
 #include "iolib.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "map.h"
 #include "network.h"
 #include "netconnect.h"
@@ -395,6 +400,7 @@ void PlayerRace::Clean()
 			delete this->Deities[i][j];
 		}
 		this->Deities[i].clear();
+		this->CivilizationUIFillers[i].clear();
 		//Wyrmgus end
 	}
 	this->Count = 0;
@@ -577,6 +583,42 @@ int PlayerRace::GetFactionLanguage(int civilization, int faction)
 	return GetCivilizationLanguage(civilization);
 }
 
+std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
+{
+	if (civilization == -1) {
+		return std::vector<CFiller>();
+	}
+	
+	if (CivilizationUIFillers[civilization].size() > 0) {
+		return CivilizationUIFillers[civilization];
+	}
+	
+	if (PlayerRaces.ParentCivilization[civilization] != -1) {
+		return GetCivilizationUIFillers(PlayerRaces.ParentCivilization[civilization]);
+	}
+	
+	return std::vector<CFiller>();
+}
+
+std::vector<CFiller> PlayerRace::GetFactionUIFillers(int civilization, int faction)
+{
+	if (civilization == -1) {
+		return std::vector<CFiller>();
+	}
+	
+	if (faction != -1) {
+		if (Factions[civilization][faction]->UIFillers.size() > 0) {
+			return Factions[civilization][faction]->UIFillers;
+		}
+		
+		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
+			return GetFactionUIFillers(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction);
+		}
+	}
+	
+	return GetCivilizationUIFillers(civilization);
+}
+
 /**
 **  "Translate" (that is, adapt) a proper name from one culture (civilization) to another.
 */
@@ -628,6 +670,11 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	}
 	
 	return new_name;
+}
+
+CFaction::~CFaction()
+{
+	this->UIFillers.clear();
 }
 //Wyrmgus end
 
@@ -1077,6 +1124,46 @@ void CPlayer::SetName(const std::string &name)
 }
 
 //Wyrmgus start
+void CPlayer::SetCivilization(int civilization)
+{
+	int old_civilization = this->Race;
+	int old_faction = this->Faction;
+
+	if (GameRunning) {
+		this->SetFaction("");
+	}
+
+	this->Race = civilization;
+
+	//if the civilization of the person player changed, update the UI
+	if ((ThisPlayer && ThisPlayer->Index == this->Index) || (!ThisPlayer && this->Index == 0)) {
+		//load proper UI
+		char buf[256];
+		snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[this->Race].c_str());
+		CclCommand(buf);
+		
+		UI.Load();
+		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
+	}
+		
+	// set new faction from new civilization
+	if (GameRunning && !GrandStrategy && Editor.Running == EditorNotRunning) {
+		if (ThisPlayer && ThisPlayer->Index == this->Index) {
+			if (GameCycle != 0) {
+				char buf[256];
+				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
+				CclCommand(buf);
+			}
+		} else if (this->AiEnabled) {
+			this->SetRandomFaction();
+		}
+	}
+		
+	if (GrandStrategy && ThisPlayer) {
+		this->SetRandomFaction();
+	}
+}
+
 /**
 **  Change player faction.
 **
@@ -1104,18 +1191,22 @@ void CPlayer::SetFaction(const std::string faction_name)
 		}
 	}
 	
-	if (faction == -1) {
-		this->Faction = -1;
-		return;
-	}
-	
 	int old_language = PlayerRaces.GetFactionLanguage(this->Race, this->Faction);
 	int new_language = PlayerRaces.GetFactionLanguage(this->Race, faction);
+	
+	this->Faction = faction;
+
+	if (this->Index == ThisPlayer->Index) {
+		UI.Load();
+	}
+	
+	if (this->Faction == -1) {
+		return;
+	}
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
 		this->SetName(faction_name);
 	}
-	this->Faction = faction;
 	if (this->Faction != -1) {
 		int color = -1;
 		for (size_t i = 0; i < PlayerRaces.Factions[this->Race][faction]->Colors.size(); ++i) {
@@ -1212,6 +1303,8 @@ void CPlayer::SetRandomFaction()
 	if (faction_count > 0) {
 		int chosen_faction = local_factions[SyncRand(faction_count)];
 		this->SetFaction(PlayerRaces.Factions[this->Race][chosen_faction]->Name);
+	} else {
+		this->SetFaction("");
 	}
 }
 

@@ -971,42 +971,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		player.SpeedResearch += um->SpeedResearch;
 	}
 	if (um->ChangeCivilizationTo != -1) {
-		int old_civilization = player.Race;
-		int old_faction = player.Faction;
-		
-		player.SetFaction("");
-		
-		if (ThisPlayer && ThisPlayer->Index == player.Index) {
-			//load proper UI
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[um->ChangeCivilizationTo].c_str());
-			CclCommand(buf);
-		}
-
-		player.Race = um->ChangeCivilizationTo;
-		
-		//if the civilization of the person player changed, update the UI
-		if (ThisPlayer && ThisPlayer->Index == player.Index) {
-			//load proper UI
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[player.Race].c_str());
-			CclCommand(buf);
-		
-			UI.Load();
-		}
-		
-		// set new faction from new civilization
-		if (!GrandStrategy && Editor.Running == EditorNotRunning) {
-			if (ThisPlayer && ThisPlayer->Index == player.Index) {
-				if (GameCycle != 0) {
-					char buf[256];
-					snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
-					CclCommand(buf);
-				}
-			} else if (player.AiEnabled) {
-				player.SetRandomFaction();
-			}
-		}
+		player.SetCivilization(um->ChangeCivilizationTo);
 	}
 	//Wyrmgus end
 
@@ -1256,37 +1221,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	}
 	//Wyrmgus start
 	if (um->ChangeCivilizationTo != -1) {
-		int old_civilization = player.Race;
-		int old_faction = player.Faction;
-		
-		player.SetFaction("");
-
-		if (ThisPlayer && ThisPlayer->Index == player.Index) {
-			//load proper UI
-			char buf[256];
-			snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", AllUpgrades[um->UpgradeId]->Civilization.c_str());
-			CclCommand(buf);
-		}
-
-		player.Race = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str()); // restore old civilization
-		
-		//if the civilization of the person player changed, update the UI
-		if (ThisPlayer && ThisPlayer->Index == player.Index) {
-			UI.Load();
-		}
-		
-		// set faction from the old civilization
-		if (!GrandStrategy && Editor.Running == EditorNotRunning) {
-			if (ThisPlayer && ThisPlayer->Index == player.Index) {
-				if (GameCycle != 0) {
-					char buf[256];
-					snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
-					CclCommand(buf);
-				}
-			} else if (player.AiEnabled) {
-				player.SetRandomFaction();
-			}
-		}
+		player.SetCivilization(PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str())); // restore old civilization
 	}
 	//Wyrmgus end
 

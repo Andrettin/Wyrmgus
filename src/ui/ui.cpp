@@ -41,6 +41,7 @@
 #include "font.h"
 //Wyrmgus start
 #include "game.h"
+#include "grand_strategy.h"
 //Wyrmgus end
 #include "interface.h"
 #include "iolib.h"
@@ -230,6 +231,24 @@ void CursorConfig::Load()
 */
 void CUserInterface::Load()
 {
+	//Wyrmgus start
+	// set the correct UI
+	CleanUserInterfaceFillers();
+	std::vector<CFiller> new_ui_fillers;
+	if (ThisPlayer) {
+		new_ui_fillers = PlayerRaces.GetFactionUIFillers(ThisPlayer->Race, ThisPlayer->Faction);
+	} else if (GrandStrategy) {
+		new_ui_fillers = PlayerRaces.GetFactionUIFillers(GrandStrategyGame.PlayerFaction->Civilization, GrandStrategyGame.PlayerFaction->Faction);
+	}
+	for (size_t i = 0; i < new_ui_fillers.size(); ++i) {
+		CFiller filler = CFiller();
+		filler.G = CGraphic::New(new_ui_fillers[i].G->File);
+		filler.X = new_ui_fillers[i].X;
+		filler.Y = new_ui_fillers[i].Y;
+		UI.Fillers.push_back(filler);
+	}
+	//Wyrmgus end
+	
 	//  Load graphics
 	const int size = (int)Fillers.size();
 	for (int i = 0; i < size; ++i) {
@@ -350,10 +369,15 @@ CUserInterface::~CUserInterface()
 void CleanUserInterface()
 {
 	// Filler
+	//Wyrmgus start
+	/*
 	for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
 		CGraphic::Free(UI.Fillers[i].G);
 	}
 	UI.Fillers.clear();
+	*/
+	CleanUserInterfaceFillers();
+	//Wyrmgus end
 
 	// Resource Icons
 	for (int i = 0; i <= FreeWorkersCount; ++i) {
@@ -419,6 +443,16 @@ void CleanUserInterface()
 		TitleScreens = NULL;
 	}
 }
+
+//Wyrmgus start
+void CleanUserInterfaceFillers()
+{
+	for (int i = 0; i < (int)UI.Fillers.size(); ++i) {
+		CGraphic::Free(UI.Fillers[i].G);
+	}
+	UI.Fillers.clear();
+}
+//Wyrmgus end
 
 void FreeButtonStyles()
 {

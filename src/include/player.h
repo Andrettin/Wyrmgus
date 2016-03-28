@@ -49,6 +49,7 @@
 #include "color.h"
 //Wyrmgus start
 #include "item.h"
+#include "ui.h" // for the UI fillers
 //Wyrmgus end
 #include "upgrade_structs.h"
 
@@ -76,6 +77,9 @@ class CUnit;
 class CUnitType;
 class PlayerAi;
 class CFile;
+//Wyrmgus start
+class CFiller;
+//Wyrmgus end
 struct lua_State;
 
 /*----------------------------------------------------------------------------
@@ -177,6 +181,7 @@ public:
 	void SetName(const std::string &name);
 	
 	//Wyrmgus start
+	void SetCivilization(int civilization);
 	void SetFaction(const std::string faction_name);
 	void SetRandomFaction();
 	bool IsPlayerColorUsed(int color);
@@ -408,6 +413,8 @@ public:
 		Playable(true) //factions are playable by default
 	{
 	}
+	
+	~CFaction();
 
 	std::string Name;													/// faction name
 	std::string Description;											/// faction description
@@ -425,6 +432,7 @@ public:
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
+	std::vector<CFiller> UIFillers;
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 };
@@ -581,6 +589,8 @@ public:
 	int GetFactionClassUpgrade(int civilization, int faction, int class_id);
 	int GetCivilizationLanguage(int civilization);
 	int GetFactionLanguage(int civilization, int faction);
+	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
+	std::vector<CFiller> GetFactionUIFillers(int civilization, int faction);
 	std::string TranslateName(std::string name, int language);
 	//Wyrmgus end
 
@@ -599,6 +609,7 @@ public:
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<CDeity *> Deities[MAX_RACES];							/// deities
 	int CivilizationLanguage[MAX_RACES];
+	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
 	//Wyrmgus end
 	unsigned int Count;             /// number of races

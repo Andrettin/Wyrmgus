@@ -5802,6 +5802,7 @@ void SetPlayerFaction(std::string civilization_name, std::string faction_name)
 	}
 	
 	GrandStrategyGame.PlayerFaction = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization][faction]));
+	UI.Load();
 }
 
 std::string GetPlayerFactionName()

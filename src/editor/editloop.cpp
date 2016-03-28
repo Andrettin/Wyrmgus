@@ -2238,7 +2238,11 @@ void CEditor::Init()
 			if (i == PlayerNumNeutral) {
 				CreatePlayer(PlayerNeutral);
 				Map.Info.PlayerType[i] = PlayerNeutral;
-				Map.Info.PlayerSide[i] = Players[i].Race = 0;
+				//Wyrmgus start
+//				Map.Info.PlayerSide[i] = Players[i].Race = 0;
+				Players[i].SetCivilization(0);
+				Map.Info.PlayerSide[i] = Players[i].Race;
+				//Wyrmgus end
 			} else {
 				CreatePlayer(PlayerNobody);
 				Map.Info.PlayerType[i] = PlayerNobody;

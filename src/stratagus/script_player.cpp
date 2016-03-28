@@ -415,15 +415,11 @@ static int CclSetThisPlayer(lua_State *l)
 	LuaCheckArgs(l, 1);
 	int plynr = LuaToNumber(l, 1);
 
-	//Wyrmgus start
-	ThisPlayer = &Players[PlayerNumNeutral]; //ugly hack to make sure the music is stopped
-	//load proper UI
-	char buf[256];
-	snprintf(buf, sizeof(buf), "if (LoadCivilizationUI ~= nil) then LoadCivilizationUI(\"%s\") end;", PlayerRaces.Name[Players[plynr].Race].c_str());
-	CclCommand(buf);
-	//Wyrmgus end
-	
 	ThisPlayer = &Players[plynr];
+	
+	//Wyrmgus start
+	UI.Load();
+	//Wyrmgus end
 
 	lua_pushnumber(l, plynr);
 	return 1;
@@ -668,6 +664,27 @@ static int CclDefineCivilization(lua_State *l)
 				} else {
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}
+			}
+		} else if (!strcmp(value, "UIFillers")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			
+			PlayerRaces.CivilizationUIFillers[civilization].clear();
+			
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CFiller filler = CFiller();
+				std::string filler_file = LuaToString(l, -1, j + 1);
+				if (filler_file.empty()) {
+					LuaError(l, "Filler graphic file is empty.");
+				}				
+				filler.G = CGraphic::New(filler_file);
+				++j;
+				filler.X = LuaToNumber(l, -1, j + 1);
+				++j;
+				filler.Y = LuaToNumber(l, -1, j + 1);
+				PlayerRaces.CivilizationUIFillers[civilization].push_back(filler);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1502,6 +1519,27 @@ static int CclDefineFaction(lua_State *l)
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}
 			}
+		} else if (!strcmp(value, "UIFillers")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			
+			faction->UIFillers.clear();
+			
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CFiller filler = CFiller();
+				std::string filler_file = LuaToString(l, -1, j + 1);
+				if (filler_file.empty()) {
+					LuaError(l, "Filler graphic file is empty.");
+				}
+				filler.G = CGraphic::New(filler_file);
+				++j;
+				filler.X = LuaToNumber(l, -1, j + 1);
+				++j;
+				filler.Y = LuaToNumber(l, -1, j + 1);
+				faction->UIFillers.push_back(filler);
+			}
 		} else if (!strcmp(value, "Mod")) {
 			faction->Mod = LuaToString(l, -1);
 		} else {
@@ -2228,29 +2266,14 @@ static int CclSetPlayerData(lua_State *l)
 		}
 
 		const char *racename = LuaToString(l, 3);
-		p->Race = PlayerRaces.GetRaceIndexByName(racename);
+		//Wyrmgus start
+//		p->Race = PlayerRaces.GetRaceIndexByName(racename);
+		p->SetCivilization(PlayerRaces.GetRaceIndexByName(racename));
+		//Wyrmgus end
 		
 		if (p->Race == -1) {
 			LuaError(l, "invalid race name '%s'" _C_ racename);
 		}
-		
-		//Wyrmgus start
-		//if the civilization of the person player changed, update the UI
-		if (ThisPlayer) {
-			if (ThisPlayer->Index == p->Index) {
-				UI.Load();
-			}
-		} else if (p->Index == 0) {
-			UI.Load();
-		}
-		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
-		//Wyrmgus end
-		
-		//Wyrmgus start
-		if (GameRunning && GrandStrategy && ThisPlayer) {
-			p->SetRandomFaction();
-		}
-		//Wyrmgus end
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		std::string faction_name = LuaToString(l, 3);
