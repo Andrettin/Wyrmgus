@@ -852,6 +852,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 			break;
 
 		case SDL_KEYDOWN:
+#if (defined(USE_OPENGL) || defined(USE_GLES))
 			if (GLShaderPipelineSupported
 				&& event.key.keysym.sym == SDLK_SLASH
 				&& event.key.keysym.mod & KMOD_ALT
@@ -859,6 +860,7 @@ static void SdlDoEvent(const EventCallback &callbacks, SDL_Event &event)
 				LoadShaders();
 				break;
 			}
+#endif
 			InputKeyButtonPress(callbacks, SDL_GetTicks(),
 								event.key.keysym.sym, event.key.keysym.unicode);
 			break;
