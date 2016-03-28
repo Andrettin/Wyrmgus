@@ -23,7 +23,7 @@ cmake \
       -DWITH_STACKTRACE=OFF \
       -DWITH_X11=ON \
       -DWITH_OAML=ON \
-      -DFORCE_STATIC_OAML=ON \
+      -DOAML_FORCE_STATIC=ON \
       $@
 
 # Hack to link lua 5.1 statically
