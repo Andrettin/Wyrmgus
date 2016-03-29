@@ -2295,6 +2295,10 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 
 void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 {
+	if (unit_type_id == -1) {
+		return;
+	}
+	
 	quantity = std::max(0, quantity);
 	
 	int change = quantity - this->Units[unit_type_id];
@@ -5475,6 +5479,14 @@ void InitializeGrandStrategyFactions()
 	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
 		if (GrandStrategyGame.Provinces[i]->Coastal && GrandStrategyGame.Provinces[i]->Tiles.size() == 1) { //if the province is a 1-tile island, it has to start with a port in its capital to feed itself
 			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->SettlementLocation.x][GrandStrategyGame.Provinces[i]->SettlementLocation.y]->SetPort(true);
+		}
+		
+		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL && GrandStrategyGame.Provinces[i]->TotalWorkers < 4) { // make every province that has an owner start with at least four workers
+			GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), 4);
+		}
+		
+		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL && GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")) != -1 && GrandStrategyGame.Provinces[i]->Units[GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"))] < 2) { // make every province that has an owner start with at least two infantry units
+			GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
 		}
 		
 		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL) { // if this province has a culture and an owner
