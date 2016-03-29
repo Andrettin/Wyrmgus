@@ -419,6 +419,7 @@ public:
 	CResourceInfo Resources[MaxResourceInfo];/// Icon+Text of all resources
 
 	CInfoPanel InfoPanel;               /// Info panel
+	CInfoPanel TimePanel;               /// Time panel
 	std::vector<CUnitInfoPanel *> InfoPanelContents;/// Info panel contents
 
 	std::vector<CPopup *> ButtonPopups; /// Popup windows for buttons

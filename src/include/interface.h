@@ -404,6 +404,8 @@ extern void UpdateMessages();
 extern void DrawMessages();
 /// Draw the player resource in resource line
 extern void DrawResources();
+/// Draw the time of day
+extern void DrawDayTime();
 /// Set message to display
 extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 /// Set message to display with event point

@@ -162,6 +162,7 @@ class CUserInterface
 
 	CResourceInfo Resources[MaxResourceInfo];
 	CInfoPanel InfoPanel;
+	CInfoPanel TimePanel;
 	CUIButton *SingleSelectedButton;
 
 	vector<CUIButton> SelectedButtons;
