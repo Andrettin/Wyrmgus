@@ -1688,6 +1688,10 @@ void GrandStrategyWorldMapTile::GenerateFactionCulturalName()
 	int civilization_id = GrandStrategyGame.Provinces[this->Province]->Owner->Civilization;
 	int faction_id = GrandStrategyGame.Provinces[this->Province]->Owner->Faction;
 	
+	if (PlayerRaces.GetFactionLanguage(civilization_id, faction_id) == -1 || PlayerRaces.GetFactionLanguage(civilization_id, faction_id) == PlayerRaces.GetCivilizationLanguage(civilization_id)) { // don't generate a name for the faction if its language is the same as the civilization's language
+		return;
+	}
+	
 	if (this->FactionCulturalTerrainNames.find(std::pair<int,CFaction *>(this->Terrain, PlayerRaces.Factions[civilization_id][faction_id])) == this->FactionCulturalTerrainNames.end()) {
 		std::string new_tile_name = "";
 						
@@ -1771,7 +1775,6 @@ void GrandStrategyWorldMapTile::GenerateFactionCulturalName()
 			}
 		}
 	}
-
 
 	if (this->FactionCulturalSettlementNames.find(PlayerRaces.Factions[civilization_id][faction_id]) == this->FactionCulturalSettlementNames.end()) {
 		std::string new_tile_name = "";
@@ -2454,7 +2457,7 @@ void CGrandStrategyProvince::AllocateLaborToResource(int resource)
 	}
 	
 	//recalculate food consumption (workers employed in producing food don't need to consume food)
-	FoodConsumption = this->TotalWorkers * 100;
+	FoodConsumption = this->TotalWorkers * FoodConsumptionPerWorker;
 	FoodConsumption -= (this->ProductionCapacityFulfilled[GrainCost] * DefaultResourceLaborInputs[GrainCost]);
 	FoodConsumption -= (this->ProductionCapacityFulfilled[MushroomCost] * DefaultResourceLaborInputs[MushroomCost]);
 	FoodConsumption -= (this->ProductionCapacityFulfilled[FishCost] * DefaultResourceLaborInputs[FishCost]);
@@ -2514,16 +2517,12 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 			income += 2;
 		}
 			
-		income *= 100 + this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource] + this->GetAdministrativeEfficiencyModifier();
+		income *= 100 + this->GetProductionEfficiencyModifier(resource);
 		income /= 100;
 	} else {
 		if (this->ProductionCapacityFulfilled[resource] > 0) {
 			income = DefaultResourceOutputs[resource] * this->ProductionCapacityFulfilled[resource];
-			int production_modifier = this->Owner->ProductionEfficiencyModifier[resource] + this->ProductionEfficiencyModifier[resource];
-			if (resource != GrainCost && resource != MushroomCost && resource != FishCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
-				production_modifier += this->GetAdministrativeEfficiencyModifier();
-			}
-			income *= 100 + production_modifier;
+			income *= 100 + this->GetProductionEfficiencyModifier(resource);
 			income /= 100;
 		}
 	}
@@ -2670,6 +2669,23 @@ int CGrandStrategyProvince::GetAdministrativeEfficiencyModifier()
 	return modifier;
 }
 
+int CGrandStrategyProvince::GetProductionEfficiencyModifier(int resource)
+{
+	int modifier = 0;
+	
+	if (this->Owner != NULL) {
+		modifier += this->Owner->ProductionEfficiencyModifier[resource];
+	}
+	
+	modifier += this->ProductionEfficiencyModifier[resource];
+
+	if (resource != GrainCost && resource != MushroomCost && resource != FishCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
+		modifier += this->GetAdministrativeEfficiencyModifier();
+	}
+
+	return modifier;
+}
+
 int CGrandStrategyProvince::GetRevoltRisk()
 {
 	int revolt_risk = 0;
@@ -2699,16 +2715,17 @@ int CGrandStrategyProvince::GetClassUnitType(int class_id)
 int CGrandStrategyProvince::GetFoodCapacity(bool subtract_non_food)
 {
 	int food_capacity = 0;
-	food_capacity += this->ProductionCapacity[GrainCost];
-	food_capacity += this->ProductionCapacity[MushroomCost];
-	food_capacity += this->ProductionCapacity[FishCost];
+	food_capacity += this->ProductionCapacity[GrainCost] * DefaultResourceOutputs[GrainCost] * (100 + this->GetProductionEfficiencyModifier(GrainCost)) / 100;
+	food_capacity += this->ProductionCapacity[MushroomCost] * DefaultResourceOutputs[MushroomCost] * (100 + this->GetProductionEfficiencyModifier(MushroomCost)) / 100;
+	food_capacity += this->ProductionCapacity[FishCost] * DefaultResourceOutputs[FishCost] * (100 + this->GetProductionEfficiencyModifier(FishCost)) / 100;
+	
 	
 	if (subtract_non_food) {
-		food_capacity -= this->ProductionCapacity[GoldCost];
-		food_capacity -= this->ProductionCapacity[SilverCost];
-		food_capacity -= this->ProductionCapacity[CopperCost];
-		food_capacity -= this->ProductionCapacity[WoodCost];
-		food_capacity -= this->ProductionCapacity[StoneCost];
+		food_capacity -= this->ProductionCapacity[GoldCost] * FoodConsumptionPerWorker;
+		food_capacity -= this->ProductionCapacity[SilverCost] * FoodConsumptionPerWorker;
+		food_capacity -= this->ProductionCapacity[CopperCost] * FoodConsumptionPerWorker;
+		food_capacity -= this->ProductionCapacity[WoodCost] * FoodConsumptionPerWorker;
+		food_capacity -= this->ProductionCapacity[StoneCost] * FoodConsumptionPerWorker;
 	}
 	
 	return food_capacity;
@@ -5456,17 +5473,23 @@ void InitializeGrandStrategyFactions()
 	}
 	
 	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
+		if (GrandStrategyGame.Provinces[i]->Coastal && GrandStrategyGame.Provinces[i]->Tiles.size() == 1) { //if the province is a 1-tile island, it has to start with a port in its capital to feed itself
+			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->SettlementLocation.x][GrandStrategyGame.Provinces[i]->SettlementLocation.y]->SetPort(true);
+		}
+		
 		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL) { // if this province has a culture and an owner
 			GrandStrategyGame.Provinces[i]->ReallocateLabor(); // allocate labor for provinces
 		}
-		if (GrandStrategyGame.Provinces[i]->Coastal && GrandStrategyGame.Provinces[i]->Tiles.size() == 1) { //if the province is a 1-tile island, it has to start with a port in its capital to feed itself
-			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->SettlementLocation.x][GrandStrategyGame.Provinces[i]->SettlementLocation.y]->SetPort(true);
+
+		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->FoodConsumption > GrandStrategyGame.Provinces[i]->GetFoodCapacity()) { // remove workers if there are so many the province will starve
+			GrandStrategyGame.Provinces[i]->ChangeUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), ((GrandStrategyGame.Provinces[i]->GetFoodCapacity() - GrandStrategyGame.Provinces[i]->FoodConsumption) / FoodConsumptionPerWorker));
+			GrandStrategyGame.Provinces[i]->ReallocateLabor();
 		}
 		
 		for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) { // generate cultural names for tiles (since this isn't done throughout the history to increase performance)
 			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->GenerateCulturalName();
 			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->GenerateFactionCulturalName();
-		}		
+		}
 	}
 
 	// calculate income and upkeep, and set initial ruler (if none is preset) for factions

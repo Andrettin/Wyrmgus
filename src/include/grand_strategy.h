@@ -50,6 +50,7 @@
 ----------------------------------------------------------------------------*/
 
 #define BasePopulationGrowthPermyriad 12					/// Base population growth per 10,000
+#define FoodConsumptionPerWorker 100
 
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
@@ -167,9 +168,10 @@ public:
 	int GetPopulation();
 	int GetResourceDemand(int resource);
 	int GetAdministrativeEfficiencyModifier();
+	int GetProductionEfficiencyModifier(int resource);
 	int GetRevoltRisk();
 	int GetClassUnitType(int class_id);
-	int GetFoodCapacity(bool subtract_non_food);
+	int GetFoodCapacity(bool subtract_non_food = false);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GenerateProvinceName(int civilization, int faction = -1);
 	
