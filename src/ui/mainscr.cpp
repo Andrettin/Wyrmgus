@@ -821,6 +821,10 @@ void DrawResources()
 **  Draw the day time.
 */
 void DrawDayTime() {
+	if (GameTimeOfDay == NoTimeOfDay || GameTimeOfDay >= MaxTimesOfDay) {
+		return;
+	}
+
 	char timesText[MaxTimesOfDay][16] = {
 		"NoTime",
 		"Dawn",
@@ -828,14 +832,11 @@ void DrawDayTime() {
 		"Midday",
 		"Afternoon",
 		"Dusk",
-		"First Watch",
+		"Early Night",
 		"Midnight",
-		"Second Watch"
+		"Late Night"
 	};
 	CLabel label(GetGameFont());
-
-	if (GameTimeOfDay >= MaxTimesOfDay)
-		return;
 
 	// TODO: Instead of a simple text here we could use an icon per time of day
 	label.Draw(UI.TimePanel.X, UI.TimePanel.Y, timesText[GameTimeOfDay]);
