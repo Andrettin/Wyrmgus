@@ -396,11 +396,19 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	}
 	
 	//Wyrmgus start
+	if (condition->Class && type && type->Class.empty() && !(type->BoolFlag[ITEM_INDEX].value && type->ItemClass != -1)) {
+		return false;
+	}
+	
 	if (condition->Description && type && type->Description.empty()) {
 		return false;
 	}
 	
 	if (condition->Quote && type && type->Quote.empty() && !(button.Action == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Unique && !GetUniqueItem(UnitManager.GetSlotUnit(button.Value).Name)->Quote.empty()) && !(button.Action == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Work != NULL && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty())) {
+		return false;
+	}
+	
+	if (condition->Encyclopedia && type && type->Description.empty() && type->Background.empty() && type->Quote.empty() && (!type->BoolFlag[ITEM_INDEX].value || type->ItemClass == -1)) {
 		return false;
 	}
 	//Wyrmgus end
@@ -487,11 +495,6 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 					return false;
 				}
 			}
-			if (condition->Affixed != CONDITION_TRUE) {
-				if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != NULL || unit.Suffix != NULL)) {
-					return false;
-				}
-			}
 			if (condition->Spell != CONDITION_TRUE) {
 				if ((condition->Spell == CONDITION_ONLY) ^ (unit.Spell != NULL)) {
 					return false;
@@ -509,11 +512,6 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 			if (condition->CanUse != CONDITION_TRUE) {
 				if ((condition->CanUse == CONDITION_ONLY) ^ (unit.Container->CanUseItem(&unit))) {
-					return false;
-				}
-			}
-			if (condition->Unique != CONDITION_TRUE) {
-				if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != NULL)) {
 					return false;
 				}
 			}
@@ -557,6 +555,39 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 						return false;
 					}
 				}
+			}
+		}
+		
+		if (condition->Opponent != CONDITION_TRUE) {
+			if ((condition->Opponent == CONDITION_ONLY) ^ ThisPlayer->IsEnemy(unit)) {
+				return false;
+			}
+		}
+		if (condition->Neutral != CONDITION_TRUE) {
+			if ((condition->Neutral == CONDITION_ONLY) ^ (!ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && ThisPlayer != unit.Player && (unit.Container == NULL || (!ThisPlayer->IsEnemy(*unit.Container) && !ThisPlayer->IsAllied(*unit.Container) && ThisPlayer != unit.Container->Player)))) {
+				return false;
+			}
+		}
+		
+		if (condition->Affixed != CONDITION_TRUE) {
+			if ((condition->Affixed == CONDITION_ONLY) ^ (unit.Prefix != NULL || unit.Suffix != NULL)) {
+				return false;
+			}
+		}
+		if (condition->Unique != CONDITION_TRUE) {
+			if ((condition->Unique == CONDITION_ONLY) ^ (unit.Unique || unit.Character != NULL)) {
+				return false;
+			}
+		}
+	} else { // always return false for "Affixed" and "Unique" for buttons that aren't individual unit buttons
+		if (condition->Affixed != CONDITION_TRUE) {
+			if (condition->Affixed == CONDITION_ONLY) {
+				return false;
+			}
+		}
+		if (condition->Unique != CONDITION_TRUE) {
+			if (condition->Unique == CONDITION_ONLY) {
+				return false;
 			}
 		}
 	}

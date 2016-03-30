@@ -48,6 +48,9 @@
 #include "unit_manager.h"
 //Wyrmgus end
 #include "unittype.h"
+//Wyrmgus start
+#include "upgrade.h"
+//Wyrmgus end
 #include "video.h"
 
 /* virtual */ int CPopupContentTypeButtonInfo::GetWidth(const ButtonAction &button, int *) const
@@ -532,7 +535,10 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				value = UnitManager.GetSlotUnit(button.Value).Variable[this->Index].Value;
 			}
 		}
-		label.Draw(x, y, value);
+		x += label.Draw(x, y, value);
+		if (IsPercentageVariable(this->Index)) {
+			x += label.Draw(x, y, "%");
+		}
 		//Wyrmgus end
 	}
 }
@@ -587,10 +593,14 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 		} else if (!strcmp(key, "HasDependencies")) {
 			condition->HasDependencies = LuaToBoolean(l, -1);
 		//Wyrmgus start
+		} else if (!strcmp(key, "Class")) {
+			condition->Class = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "Description")) {
 			condition->Description = LuaToBoolean(l, -1);
 		} else if (!strcmp(key, "Quote")) {
 			condition->Quote = LuaToBoolean(l, -1);
+		} else if (!strcmp(key, "Encyclopedia")) {
+			condition->Encyclopedia = LuaToBoolean(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(key, "ButtonValue")) {
 			condition->ButtonValue = LuaToString(l, -1);
@@ -651,6 +661,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			}
 			//Wyrmgus end
 		//Wyrmgus start
+		} else if (!strcmp(key, "Opponent")) {
+			condition->Opponent = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Neutral")) {
+			condition->Neutral = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "AutoCast")) {
 			condition->AutoCast = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Equipped")) {

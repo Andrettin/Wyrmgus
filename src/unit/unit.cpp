@@ -4085,6 +4085,10 @@ bool CUnit::CanUseItem(CUnit *item) const
 		return false;
 	}
 	
+	if (item->Type->BoolFlag[ITEM_INDEX].value && item->Type->ItemClass != FoodItemClass && item->Type->ItemClass != PotionItemClass && item->Type->ItemClass != ScrollItemClass) {
+		return false;
+	}
+	
 	if (item->Spell != NULL) {
 		if (!this->HasInventory() || !CanCastSpell(*this, *item->Spell, this, this->tilePos)) {
 			return false;

@@ -121,6 +121,7 @@ extern void AddUpgradeRequiredAbility(std::string upgrade_ident, std::string req
 extern void AddUpgradeWeaponClass(std::string upgrade_ident, int weapon_class);
 extern void SetUpgradeItem(std::string upgrade_ident, std::string item_ident);
 extern std::string GetUpgradeEffectsString(std::string upgrade_ident);
+extern bool IsPercentageVariable(int var);
 //Wyrmgus end
 
 //@}

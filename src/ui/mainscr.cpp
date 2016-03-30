@@ -531,8 +531,16 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 #endif
 	if (UI.SingleSelectedButton) {
 		const PixelPos pos(UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
-		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
-						 (IconActive | (MouseButtons & LeftButton)) : 0;
+		 //Wyrmgus start
+//		const int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
+//						 (IconActive | (MouseButtons & LeftButton)) : 0;
+		int flag = (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) ?
+						 IconActive : 0;
+		
+		if (flag == IconActive && ((MouseButtons & LeftButton) || (MouseButtons & MiddleButton) || (MouseButtons & RightButton))) {
+			flag = IconClicked;
+		}
+		 //Wyrmgus end
 
 		//Wyrmgus start
 //		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
@@ -1540,7 +1548,16 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		if (!Preference.NoStatusLineTooltips) {
 			UI.StatusLine.Set(unit.GetMessageName());
 		}
-		DrawGenericPopup(unit.GetMessageName(), UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
+		
+		//hackish way to make the popup appear correctly for the single selected unit
+		ButtonAction *ba = new ButtonAction;
+		ba->Hint = unit.GetMessageName();
+		ba->Action = ButtonUnit;
+		ba->Value = UnitNumber(unit);
+		ba->Popup = "popup-unit";
+		DrawPopup(*ba, *UI.SingleSelectedButton, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
+		delete ba;
+		LastDrawnButtonPopup = NULL;
 		//Wyrmgus end
 	}
 }

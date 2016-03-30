@@ -46,6 +46,9 @@
 #include "action/action_build.h"
 #include "action/action_train.h"
 #include "actions.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "commands.h"
 #include "cursor.h"
 #include "font.h"
@@ -2132,6 +2135,8 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			}
 		}
 	} else if ((MouseButtons & MiddleButton)) {
+		//Wyrmgus start
+		/*
 		//  clicked on info panel - single unit shown
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
@@ -2141,6 +2146,8 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 				UI.SelectedViewport->Unit = Selected[0];
 			}
 		}
+		*/
+		//Wyrmgus end
 	} else if ((MouseButtons & RightButton)) {
 	}
 }
@@ -2156,7 +2163,27 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			//  clicked on single unit shown
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-				UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
+				if ((1 << button) == LeftButton) {
+					UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
+				} else if ((1 << button) == RightButton) {
+					std::string encyclopedia_ident = Selected[0]->Type->Ident;
+					std::string encyclopedia_state = "units";
+					if (Selected[0]->Character != NULL && Selected[0]->Character->Persistent && !Selected[0]->Character->Custom) {
+						encyclopedia_ident = Selected[0]->Character->GetFullName();
+						encyclopedia_state = "heroes";
+					} else if (Selected[0]->Unique && GetUniqueItem(Selected[0]->Name) != NULL) {
+						encyclopedia_ident = Selected[0]->Name;
+						encyclopedia_state = "unique_items";
+					}
+					CclCommand("if (OpenEncyclopediaUnitEntry ~= nil) then OpenEncyclopediaUnitEntry(\"" + encyclopedia_ident + "\", \"" + encyclopedia_state + "\") end;");
+				} else if ((1 << button) == MiddleButton) {
+					//  clicked on info panel - single unit shown
+					if (UI.SelectedViewport->Unit == Selected[0]) {
+						UI.SelectedViewport->Unit = NULL;
+					} else {
+						UI.SelectedViewport->Unit = Selected[0];
+					}
+				}
 			}
 			//  clicked on training button
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
@@ -2388,7 +2415,17 @@ void UIHandleButtonUp(unsigned button)
 
 	//Wyrmgus start
 //	if ((1 << button) == LeftButton) {
-	if ((1 << button) == LeftButton || ((1 << button) == RightButton && ButtonAreaUnderCursor == ButtonAreaInventory)) {
+	if (
+		(1 << button) == LeftButton
+		|| (
+			(1 << button) == RightButton
+			&& (ButtonAreaUnderCursor == ButtonAreaInventory || (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1))
+		)
+		|| (
+			(1 << button) == MiddleButton
+			&& (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0 && Selected.size() == 1)
+		)
+	) {
 	//Wyrmgus end
 		//
 		//  Menu (F10) button

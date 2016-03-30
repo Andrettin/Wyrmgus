@@ -1983,7 +1983,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 							upgrade_effects_string += "+";
 						}
 						upgrade_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[var].Value);
-						if (var == BACKSTAB_INDEX || var == BONUSAGAINSTMOUNTED_INDEX || var == BONUSAGAINSTBUILDINGS_INDEX || var == BONUSAGAINSTAIR_INDEX || var == BONUSAGAINSTGIANTS_INDEX || var == BONUSAGAINSTDRAGONS_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX || var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX || var == TIMEEFFICIENCYBONUS_INDEX) {
+						if (IsPercentageVariable(var)) {
 							upgrade_effects_string += "%";
 						}
 						upgrade_effects_string += " ";
@@ -2042,6 +2042,11 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 	}
 	
 	return "";
+}
+
+bool IsPercentageVariable(int var)
+{
+	return var == BACKSTAB_INDEX || var == BONUSAGAINSTMOUNTED_INDEX || var == BONUSAGAINSTBUILDINGS_INDEX || var == BONUSAGAINSTAIR_INDEX || var == BONUSAGAINSTGIANTS_INDEX || var == BONUSAGAINSTDRAGONS_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX || var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX || var == TIMEEFFICIENCYBONUS_INDEX;
 }
 //Wyrmgus end
 

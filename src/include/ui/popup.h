@@ -54,8 +54,8 @@ class PopupConditionPanel
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
 		//Wyrmgus start
-		Description(false), Quote(false),
-		AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Unique(0), Bound(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0),
+		Class(false), Description(false), Quote(false), Encyclopedia(false),
+		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Unique(0), Bound(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0),
 //		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
 		ButtonAction(-1), ItemClass(-1), BoolFlags(NULL), Variables(NULL) {}
 		//Wyrmgus end
@@ -69,8 +69,10 @@ public:
 	bool HasDescription;        /// check if button has description.
 	bool HasDependencies;       /// check if button has dependencies or restrictions.
 	//Wyrmgus start
+	bool Class;					/// check if the button's unit type has a class.
 	bool Description;			/// check if the button's unit type has a description.
 	bool Quote;					/// check if the button's unit type has a quote.
+	bool Encyclopedia;			/// check if the button's unit type has an encyclopedia entry.
 	//Wyrmgus end
 	int ButtonAction;           /// action type of button
 	//Wyrmgus start
@@ -79,15 +81,17 @@ public:
 	std::string ButtonValue;    /// value used in ValueStr field of button
 
 	//Wyrmgus start
+	char Opponent;				/// check if button's item is an opponent
+	char Neutral;				/// check if button's item is neutral
 	char AutoCast;				/// check if button's spell can be autocasted
-	char Equipped;				/// check if button's item is equipped.
-	char Equippable;			/// check if button's item is equippable by its owner.
-	char Consumable;			/// check if button's item is consumable.
+	char Equipped;				/// check if button's item is equipped
+	char Equippable;			/// check if button's item is equippable by its owner
+	char Consumable;			/// check if button's item is consumable
 	char Affixed;				/// check if button's item has an affix
 	char Spell;					/// check if button's item has a spell
 	char CanUse;				/// check if button's item's can be used
-	char Work;					/// check if button's item is a work.
-	char ReadWork;				/// check if button's item is a work that has been read.
+	char Work;					/// check if button's item is a work
+	char ReadWork;				/// check if button's item is a work that has been read
 	char Unique;				/// check if button's item is unique
 	char Bound;					/// check if button's item is bound to its owner
 	char Weapon;				/// check if button's item is a weapon

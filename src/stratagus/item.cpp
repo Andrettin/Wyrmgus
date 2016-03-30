@@ -319,7 +319,7 @@ std::string GetItemEffectsString(std::string item_ident)
 					item_effects_string += "+";
 				}
 				item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Value);
-				if (var == BACKSTAB_INDEX || var == BONUSAGAINSTMOUNTED_INDEX || var == BONUSAGAINSTBUILDINGS_INDEX || var == BONUSAGAINSTAIR_INDEX || var == BONUSAGAINSTGIANTS_INDEX || var == BONUSAGAINSTDRAGONS_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX || var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX) {
+				if (IsPercentageVariable(var)) {
 					item_effects_string += "%";
 				}
 				item_effects_string += " ";
@@ -418,7 +418,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 					item_effects_string += "+";
 				}
 				item_effects_string += std::to_string((long long) variable_value);
-				if (var == BACKSTAB_INDEX || var == BONUSAGAINSTMOUNTED_INDEX || var == BONUSAGAINSTBUILDINGS_INDEX || var == BONUSAGAINSTAIR_INDEX || var == BONUSAGAINSTGIANTS_INDEX || var == BONUSAGAINSTDRAGONS_INDEX || var == FIRERESISTANCE_INDEX || var == COLDRESISTANCE_INDEX || var == ARCANERESISTANCE_INDEX || var == LIGHTNINGRESISTANCE_INDEX || var == AIRRESISTANCE_INDEX || var == EARTHRESISTANCE_INDEX || var == WATERRESISTANCE_INDEX || var == HACKRESISTANCE_INDEX || var == PIERCERESISTANCE_INDEX || var == BLUNTRESISTANCE_INDEX || var == TIMEEFFICIENCYBONUS_INDEX) {
+				if (IsPercentageVariable(var)) {
 					item_effects_string += "%";
 				}
 				item_effects_string += " ";
