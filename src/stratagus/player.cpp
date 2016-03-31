@@ -2294,14 +2294,17 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 							Assert(UpgradeModifiers[z]->ApplyTo[i] == '?' || UpgradeModifiers[z]->ApplyTo[i] == 'X');
 
 							if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+								bool changed_stats = false;
+								std::string effect_element_string;
+								
 								if (!first_element) {
-									faction_effects_string += ", ";
+									effect_element_string += ", ";
 								} else {
 									first_element = false;
 								}
 									
-								faction_effects_string += UnitTypes[i]->Name;
-								faction_effects_string += " (";
+								effect_element_string += UnitTypes[i]->Name;
+								effect_element_string += " (";
 
 								bool first_var = true;
 								for (size_t j = 0; j < UnitTypeVar.GetNumberVariable(); ++j) {
@@ -2311,30 +2314,34 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 						
 									if (UpgradeModifiers[z]->Modifier.Variables[j].Value != 0) {
 										if (!first_var) {
-											faction_effects_string += ", ";
+											effect_element_string += ", ";
 										} else {
 											first_var = false;
 										}
 											
 										if (UpgradeModifiers[z]->Modifier.Variables[j].Value > 0) {
-											faction_effects_string += "+";
+											effect_element_string += "+";
 										}
-										faction_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[j].Value);
+										effect_element_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[j].Value);
 										if (IsPercentageVariable(j)) {
-											faction_effects_string += "%";
+											effect_element_string += "%";
 										}
-										faction_effects_string += " ";
+										effect_element_string += " ";
 											
 										std::string variable_name = UnitTypeVar.VariableNameLookup[j];
 										variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
 										variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
 										variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
 										variable_name = SeparateCapitalizedStringElements(variable_name);
-										faction_effects_string += variable_name;
+										effect_element_string += variable_name;
+										changed_stats = true;
 									}
 								}
 						
-								faction_effects_string += ")";
+								effect_element_string += ")";
+								if (changed_stats) {
+									faction_effects_string += effect_element_string;
+								}
 							}
 						}
 					}

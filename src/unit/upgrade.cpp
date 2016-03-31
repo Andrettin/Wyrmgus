@@ -1105,10 +1105,18 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			}
 
 			// And now modify ingame units
-			if (varModified) {
-				std::vector<CUnit *> unitupgrade;
+			//Wyrmgus start
+			std::vector<CUnit *> unitupgrade;
 
-				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+			FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+			//Wyrmgus end
+			
+			if (varModified) {
+				//Wyrmgus start
+//				std::vector<CUnit *> unitupgrade;
+
+//				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+				//Wyrmgus end
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 
@@ -1159,41 +1167,49 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 					}
 					//Wyrmgus end
+				}
+			}
+			
+			//Wyrmgus start
+			for (size_t j = 0; j != unitupgrade.size(); ++j) {
+				CUnit &unit = *unitupgrade[j];
 
-					//Wyrmgus start
-					//change variation if current one becomes forbidden
-					VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
-					if (current_varinfo) {
+				if (unit.Player->Index != player.Index) {
+					continue;
+				}
+				//change variation if current one becomes forbidden
+				VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
+				if (current_varinfo) {
+					bool forbidden_upgrade = false;
+					for (int u = 0; u < VariationMax; ++u) {
+						if (!current_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesForbidden[u])->ID) {
+							forbidden_upgrade = true;
+							break;
+						}
+					}
+					if (forbidden_upgrade == true) {
+						unit.ChooseVariation();
+					}
+				}
+				for (int i = 0; i < MaxImageLayers; ++i) {
+					if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
+						VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
 						bool forbidden_upgrade = false;
 						for (int u = 0; u < VariationMax; ++u) {
-							if (!current_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesForbidden[u])->ID) {
+							if (!current_layer_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesForbidden[u])->ID) {
 								forbidden_upgrade = true;
 								break;
 							}
 						}
 						if (forbidden_upgrade == true) {
-							unit.ChooseVariation();
+							unit.ChooseVariation(NULL, false, i);
 						}
 					}
-					for (int i = 0; i < MaxImageLayers; ++i) {
-						if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
-							VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
-							bool forbidden_upgrade = false;
-							for (int u = 0; u < VariationMax; ++u) {
-								if (!current_layer_varinfo->UpgradesForbidden[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesForbidden[u])->ID) {
-									forbidden_upgrade = true;
-									break;
-								}
-							}
-							if (forbidden_upgrade == true) {
-								unit.ChooseVariation(NULL, false, i);
-							}
-						}
-					}
-					unit.UpdateButtonIcons();
-					//Wyrmgus end
 				}
+				unit.UpdateButtonIcons();
 			}
+			//Wyrmgus end
+			
 			if (um->ConvertTo) {
 				ConvertUnitTypeTo(player, *UnitTypes[z], *um->ConvertTo);
 			}
@@ -1351,11 +1367,21 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
 			}
 
+			//Wyrmgus start
+			std::vector<CUnit *> unitupgrade;
+
+			FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+			//Wyrmgus end
+			
 			// And now modify ingame units
 			if (varModified) {
+				//Wyrmgus start
+				/*
 				std::vector<CUnit *> unitupgrade;
 
 				FindUnitsByType(*UnitTypes[z], unitupgrade, true);
+				*/
+				//Wyrmgus end
 				for (size_t j = 0; j != unitupgrade.size(); ++j) {
 					CUnit &unit = *unitupgrade[j];
 
@@ -1405,41 +1431,50 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						}
 					}
 					//Wyrmgus end
-					
-					//Wyrmgus start
-					//change variation if current one becomes forbidden
-					VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
-					if (current_varinfo) {
+				}
+			}
+			
+			//Wyrmgus start
+			for (size_t j = 0; j != unitupgrade.size(); ++j) {
+				CUnit &unit = *unitupgrade[j];
+
+				if (unit.Player->Index != player.Index) {
+					continue;
+				}
+				
+				//change variation if current one becomes forbidden
+				VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
+				if (current_varinfo) {
+					bool required_upgrade = false;
+					for (int u = 0; u < VariationMax; ++u) {
+						if (!current_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesRequired[u])->ID) {
+							required_upgrade = true;
+							break;
+						}
+					}
+					if (required_upgrade == true) {
+						unit.ChooseVariation();
+					}
+				}
+				for (int i = 0; i < MaxImageLayers; ++i) {
+					if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
+						VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
 						bool required_upgrade = false;
 						for (int u = 0; u < VariationMax; ++u) {
-							if (!current_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_varinfo->UpgradesRequired[u])->ID) {
+							if (!current_layer_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesRequired[u])->ID) {
 								required_upgrade = true;
 								break;
 							}
 						}
 						if (required_upgrade == true) {
-							unit.ChooseVariation();
+							unit.ChooseVariation(NULL, false, i);
 						}
 					}
-					for (int i = 0; i < MaxImageLayers; ++i) {
-						if (unit.LayerVariation[i] != -1 && unit.LayerVariation[i] < ((int) unit.Type->LayerVarInfo[i].size())) {
-							VariationInfo *current_layer_varinfo = UnitTypes[z]->LayerVarInfo[i][unit.LayerVariation[i]];
-							bool required_upgrade = false;
-							for (int u = 0; u < VariationMax; ++u) {
-								if (!current_layer_varinfo->UpgradesRequired[u].empty() && um->UpgradeId == CUpgrade::Get(current_layer_varinfo->UpgradesRequired[u])->ID) {
-									required_upgrade = true;
-									break;
-								}
-							}
-							if (required_upgrade == true) {
-								unit.ChooseVariation(NULL, false, i);
-							}
-						}
-					}
-					unit.UpdateButtonIcons();
-					//Wyrmgus end
 				}
+				unit.UpdateButtonIcons();
 			}
+			//Wyrmgus end
+			
 			if (um->ConvertTo) {
 				ConvertUnitTypeTo(player, *um->ConvertTo, *UnitTypes[z]);
 			}

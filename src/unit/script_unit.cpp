@@ -745,6 +745,11 @@ static int CclMoveUnit(lua_State *l)
 static int CclRemoveUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
+	//Wyrmgus start
+	if (lua_isnil(l, 1)) {
+		return 0;
+	}
+	//Wyrmgus end
 	lua_pushvalue(l, 1);
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
