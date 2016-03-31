@@ -418,6 +418,8 @@ public:
 
 	std::string Name;													/// faction name
 	std::string Description;											/// faction description
+	std::string Quote;													/// faction quote
+	std::string Background;												/// faction background
 	std::string Type;													/// faction type (tribe or polity)
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	int ID;																/// faction ID
@@ -599,6 +601,7 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
+	std::string Adjective[MAX_RACES]; /// adjective pertaining to the civilization
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)

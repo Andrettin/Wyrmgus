@@ -630,6 +630,8 @@ static int CclDefineCivilization(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Display")) {
 			PlayerRaces.Display[civilization] = LuaToString(l, -1);
+		} else if (!strcmp(value, "Adjective")) {
+			PlayerRaces.Adjective[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
 			PlayerRaces.Visible[civilization] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
@@ -1252,6 +1254,13 @@ static int CclGetCivilizationData(lua_State *l)
 	if (!strcmp(data, "Display")) {
 		lua_pushstring(l, PlayerRaces.Display[civilization].c_str());
 		return 1;
+	} else if (!strcmp(data, "Adjective")) {
+		if (!PlayerRaces.Adjective[civilization].empty()) {
+			lua_pushstring(l, PlayerRaces.Adjective[civilization].c_str());
+		} else {
+			lua_pushstring(l, PlayerRaces.Display[civilization].c_str());
+		}
+		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization]);
 		return 1;
@@ -1439,6 +1448,10 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "Description")) {
 			faction->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			faction->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			faction->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
 			faction->Type = LuaToString(l, -1);
 		} else if (!strcmp(value, "Colors")) {
@@ -1895,6 +1908,12 @@ static int CclGetFactionData(lua_State *l)
 
 	if (!strcmp(data, "Description")) {
 		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Background.c_str());
 		return 1;
 	} else if (!strcmp(data, "Type")) {
 		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Type.c_str());

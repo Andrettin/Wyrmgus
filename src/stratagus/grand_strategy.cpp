@@ -536,7 +536,7 @@ void CGrandStrategyGame::DrawInterface()
 			}
 		} else if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
 			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization != -1) {
-				std::string province_culture_string = "Province Culture: " + CapitalizeString(PlayerRaces.Name[GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization]);
+				std::string province_culture_string = "Province Culture: " + PlayerRaces.Adjective[GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization];
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(province_culture_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), province_culture_string);
 				item_y += 1;
 			}
