@@ -1,0 +1,96 @@
+############################################################
+# Building Wyrmsun on Debian 8
+############################################################
+
+by Sam Klein
+
+Originally posted at: http://srukle.github.io/2016-03-31-building-wyrmsun-on-debian/
+
+The most useful tool for you is to use the PPA source (https://launchpad.net/~stratagus/+archive/ubuntu/ppa). You can follow these instructions (https://wiki.debian.org/CreatePackageFromPPA) to install a package from Ubuntu's PPA. If you're running Debian 8, I recommend using Ubuntu 14.04. You can see this list (https://askubuntu.com/questions/445487/which-ubuntu-version-is-equivalent-to-debian-squeeze) to determine the best Ubuntu build for you. 
+
+Installing from PPA will give you a dependency list, which will be useful. **Do not install this.** It'll waste your time. Instead, you can run 'apt-get -t install' instead. I just ran 'apt-get install' and then removed it after I realized I couldn't use the package -- as you will learn. 
+
+The list below is for AMD64 builds, and so you may need more dependencies. This is the most information I could give you without knowing your particular build environment. You may want to install all of these anyways. You can check out the *official* list here (https://raw.githubusercontent.com/Andrettin/Wyrmgus/master/doc/install.html).
+
+First, install all the dependencies for your build. If you're running AMD64 Debian 8, all you would need is posted below. I recommend using your terminal at this point because we'll be working with it quite a bit after this point.
+
+**Dependencies:**
+
+cmake
+doxygen
+imagemagick
+sharutils
+liblua5.1-dev
+liblua5.1-0-dev
+libtolua++5.1-dev
+zlib1g-dev
+libbz2-dev
+libpng12-dev
+libmng-dev
+libmikmod2-dev
+libogg-dev
+libtheora-dev
+libsdl1.2-dev
+libsqlite3-dev
+libgles1-sgx-img-dev
+libglu1-mesa-dev
+libglu-dev
+libgles1-mesa-dev
+libsdl-gles1.2-dev
+libsdl2-dev
+libglu1-mesa-dev
+libglu-dev
+libfluidsynth-dev
+SQLite
+zlib-gst
+libpng
+libpng++-dev
+sdlbasic
+
+Next install 'git-core' if you haven't already.
+
+Make a directory of your choice, go into it with 'cd'.
+
+We're going to download the source code now. This is how we do it. 
+
+First, if you're using root, exit 'su'. Just 'exit'.
+
+This is your engine.
+
+'git clone https://github.com/Andrettin/Wyrmgus.git'
+
+and
+
+This is the game.
+
+'git clone https://github.com/Andrettin/Wyrmsun.git'
+
+First go into Wyrmgus and init OAML module.
+
+'cd Wyrmgus'
+'git submodule update --init'
+
+Now you're ready to build the engine.
+
+'mkdir build'
+'cmake .. && make'
+
+The trick here is to build cmake after it's been built. So if the command above doesn't work just do:
+
+'cmake .' in the directory of the source files -- so in the "Wyrmgus" directory.
+
+Then 'make' wherever the cmake files fall.
+
+At this point, you should have the 'stratagus' command. Test it. If you don't, something went wrong. You may have built the software wrong. Try debugging it. Look for error codes. Shoot an issue notice here (https://github.com/Andrettin/Wyrmgus/issues) if all else fails. Be sure you know how to post your error log.
+
+If your 'stratagus' command works. The output should say this: 'Maybe you need to specify another gamepath with '-d /path/to/datadir'?'
+
+Run this to play the game:
+
+'stratagus -d [direct path of Wyrmsun]'
+
+It's smart to keep Wyrmsun as a Git -- since you can update this source with this code while in the directory:
+
+'git pull'
+
+That's it. You can now play.
