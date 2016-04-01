@@ -2255,14 +2255,22 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 							}
 							
 							int variable_difference = UnitTypes[unit_type_id]->DefaultStat.Variables[j].Value - UnitTypes[base_unit_type_id]->DefaultStat.Variables[j].Value;
-							if (variable_difference > 0) {
-								effect_element_string += "+";
+							
+							if (IsBooleanVariable(j) && variable_difference < 0) {
+								effect_element_string += "Lose ";
 							}
-							effect_element_string += std::to_string((long long) variable_difference);
-							if (IsPercentageVariable(j)) {
-								effect_element_string += "%";
+							
+							if (!IsBooleanVariable(j)) {
+								if (variable_difference > 0) {
+									effect_element_string += "+";
+								}
+
+								effect_element_string += std::to_string((long long) variable_difference);
+								if (IsPercentageVariable(j)) {
+									effect_element_string += "%";
+								}
+								effect_element_string += " ";
 							}
-							effect_element_string += " ";
 							
 							std::string variable_name = UnitTypeVar.VariableNameLookup[j];
 							variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
@@ -2320,14 +2328,20 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 											first_var = false;
 										}
 											
-										if (UpgradeModifiers[z]->Modifier.Variables[j].Value > 0) {
-											effect_element_string += "+";
+										if (IsBooleanVariable(j) && UpgradeModifiers[z]->Modifier.Variables[j].Value < 0) {
+											effect_element_string += "Lose ";
 										}
-										effect_element_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[j].Value);
-										if (IsPercentageVariable(j)) {
-											effect_element_string += "%";
+										
+										if (!IsBooleanVariable(j)) {
+											if (UpgradeModifiers[z]->Modifier.Variables[j].Value > 0) {
+												effect_element_string += "+";
+											}
+											effect_element_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[j].Value);
+											if (IsPercentageVariable(j)) {
+												effect_element_string += "%";
+											}
+											effect_element_string += " ";
 										}
-										effect_element_string += " ";
 											
 										std::string variable_name = UnitTypeVar.VariableNameLookup[j];
 										variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");

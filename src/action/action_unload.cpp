@@ -227,6 +227,15 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		SaveHero(transporter.Character);
 	}
 	
+	//Wyrmgus start
+	//if this is a naval transporter and the unit has a disembarkment bonus, apply it
+	if (transporter.Type->UnitType == UnitTypeNaval && unit.Variable[DISEMBARKMENTBONUS_INDEX].Value > 0 && unit.Variable[INSPIRE_INDEX].Value < 1000) {
+		unit.Variable[INSPIRE_INDEX].Enable = 1;
+		unit.Variable[INSPIRE_INDEX].Value = 1000;
+		unit.Variable[INSPIRE_INDEX].Max = 1000;
+	}
+	//Wyrmgus end
+	
 	/*
 	unit.Boarded = 0;
 	unit.Place(pos);
@@ -246,6 +255,7 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		unit.TTL = GameCycle + ttl_cycles;
 	}
 	//Wyrmgus end
+	
 	//Wyrmgus start
 	//if transporter has a rally point (useful for towers), send the unloaded unit there
 	if (transporter.RallyPointPos.x != -1 && transporter.RallyPointPos.y != -1 && unit.CanMove()) {

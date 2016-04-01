@@ -314,15 +314,21 @@ std::string GetItemEffectsString(std::string item_ident)
 				} else {
 					first_var = false;
 				}
-											
-				if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
-					item_effects_string += "+";
+										
+				if (IsBooleanVariable(var) && item->DefaultStat.Variables[var].Value < 0) {
+					item_effects_string += "Lose ";
 				}
-				item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Value);
-				if (IsPercentageVariable(var)) {
-					item_effects_string += "%";
+				
+				if (!IsBooleanVariable(var)) {
+					if (item->DefaultStat.Variables[var].Value >= 0 && var != HITPOINTHEALING_INDEX) {
+						item_effects_string += "+";
+					}
+					item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Value);
+					if (IsPercentageVariable(var)) {
+						item_effects_string += "%";
+					}
+					item_effects_string += " ";
 				}
-				item_effects_string += " ";
 											
 				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
 				variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
@@ -413,15 +419,21 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				} else {
 					first_var = false;
 				}
-											
-				if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != GIVERESOURCE_INDEX) {
-					item_effects_string += "+";
+
+				if (IsBooleanVariable(var) && variable_value < 0) {
+					item_effects_string += "Lose ";
 				}
-				item_effects_string += std::to_string((long long) variable_value);
-				if (IsPercentageVariable(var)) {
-					item_effects_string += "%";
+				
+				if (!IsBooleanVariable(var)) {
+					if (variable_value >= 0 && var != HITPOINTHEALING_INDEX && var != GIVERESOURCE_INDEX) {
+						item_effects_string += "+";
+					}
+					item_effects_string += std::to_string((long long) variable_value);
+					if (IsPercentageVariable(var)) {
+						item_effects_string += "%";
+					}
+					item_effects_string += " ";
 				}
-				item_effects_string += " ";
 											
 				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
 				variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");

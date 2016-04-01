@@ -122,6 +122,7 @@ extern void AddUpgradeWeaponClass(std::string upgrade_ident, int weapon_class);
 extern void SetUpgradeItem(std::string upgrade_ident, std::string item_ident);
 extern std::string GetUpgradeEffectsString(std::string upgrade_ident);
 extern bool IsPercentageVariable(int var);
+extern bool IsBooleanVariable(int var);
 //Wyrmgus end
 
 //@}
