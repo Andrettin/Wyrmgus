@@ -3047,7 +3047,7 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			}
 			this->Ruler = const_cast<CGrandStrategyHero *>(&(*hero));
 		} else {
-			fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+			fprintf(stderr, "Tried to make \"%s\" the ruler of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), this->GetFullName().c_str());
 		}
 		
 		if (this == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized) {
@@ -4941,6 +4941,8 @@ void CleanGrandStrategyGame()
 	WorldMapOffsetY = 0;
 	GrandStrategyMapWidthIndent = 0;
 	GrandStrategyMapHeightIndent = 0;
+	
+	GrandStrategyGameInitialized = false;
 }
 
 void InitializeGrandStrategyGame(bool show_loading)
@@ -5508,6 +5510,12 @@ void InitializeGrandStrategyFactions()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
+				for (std::map<std::pair<int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalRulers.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalRulers.end(); ++iterator) { //set the appropriate historical rulers
+					if (GrandStrategyYear >= iterator->first.first && GrandStrategyYear < iterator->first.second) {
+						GrandStrategyGame.Factions[i][j]->SetRuler(iterator->second->GetFullName());
+					}
+				}
+				
 				// try to perform ruler succession for existent factions without rulers
 				if (GrandStrategyGame.Factions[i][j]->Ruler == NULL) {
 					GrandStrategyGame.Factions[i][j]->RulerSuccession();

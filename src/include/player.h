@@ -434,6 +434,7 @@ public:
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
+	std::map<std::pair<int, int>, CCharacter *> HistoricalRulers;		/// historical rulers of the faction, mapped to the beginning and end of the rule
 	std::vector<CFiller> UIFillers;
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs

@@ -358,6 +358,26 @@ static int CclDefineCharacter(lua_State *l)
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "HistoricalRulerships")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int start_year = LuaToNumber(l, -1, j + 1);
+				++j;
+				int end_year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string rulership_civilization_name = LuaToString(l, -1, j + 1);
+				int rulership_civilization = PlayerRaces.GetRaceIndexByName(rulership_civilization_name.c_str());
+				++j;
+				std::string rulership_faction_name = LuaToString(l, -1, j + 1);
+				int rulership_faction = PlayerRaces.GetFactionIndexByName(rulership_civilization, rulership_faction_name);
+				if (rulership_faction == -1) {
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ rulership_faction_name.c_str());
+				}
+				PlayerRaces.Factions[rulership_civilization][rulership_faction]->HistoricalRulers[std::pair<int, int>(start_year, end_year)] = character;
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
