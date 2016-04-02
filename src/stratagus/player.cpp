@@ -1132,6 +1132,8 @@ void CPlayer::SetCivilization(int civilization)
 
 	if (GameRunning) {
 		this->SetFaction("");
+	} else {
+		this->Faction = -1;
 	}
 
 	this->Race = civilization;

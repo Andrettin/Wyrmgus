@@ -518,7 +518,22 @@ int CTileset::tileFromQuad(unsigned fixed, unsigned quad) const
 	return base | (table[direction] << 4);
 }
 
+//Wyrmgus start
+int CTileset::getFromMixedLookupTable(int base_terrain, int tile) const
+{
+	if (this->mixedLookupTable.find(std::pair<int, int>(base_terrain, tile)) != this->mixedLookupTable.end()) {
+		return this->mixedLookupTable.find(std::pair<int, int>(base_terrain, tile))->second;
+	} else {
+		return 0;
+	}
+}
+//Wyrmgus end
+
+//Wyrmgus start
+//int CTileset::getTileBySurrounding(unsigned short type,
 int CTileset::getTileBySurrounding(unsigned short type,
+								   int tile_index,
+//Wyrmgus end
 								   int ttup, int ttright,
 								   int ttdown, int ttleft) const
 {
@@ -529,10 +544,11 @@ int CTileset::getTileBySurrounding(unsigned short type,
 	ttdown = ttdown == -1 ? 15 : mixedLookupTable[ttdown];
 	ttleft = ttleft == -1 ? 15 : mixedLookupTable[ttleft];
 	*/
-	ttup = ttup == -1 ? 15 : (ttup == -2 ? 0 : mixedLookupTable[ttup]);
-	ttright = ttright == -1 ? 15 : (ttright == -2 ? 0 : mixedLookupTable[ttright]);
-	ttdown = ttdown == -1 ? 15 : (ttdown == -2 ? 0 : mixedLookupTable[ttdown]);
-	ttleft = ttleft == -1 ? 15 : (ttleft == -2 ? 0 : mixedLookupTable[ttleft]);
+	int base_terrain = tiles[tile_index].tileinfo.BaseTerrain;
+	ttup = ttup == -1 ? 15 : (ttup == -2 ? 0 : this->getFromMixedLookupTable(base_terrain, ttup));
+	ttright = ttright == -1 ? 15 : (ttright == -2 ? 0 : this->getFromMixedLookupTable(base_terrain, ttright));
+	ttdown = ttdown == -1 ? 15 : (ttdown == -2 ? 0 : this->getFromMixedLookupTable(base_terrain, ttdown));
+	ttleft = ttleft == -1 ? 15 : (ttleft == -2 ? 0 : this->getFromMixedLookupTable(base_terrain, ttleft));
 	//Wyrmgus end
 
 	//  Check each of the corners to ensure it has both connecting
@@ -589,12 +605,19 @@ int CTileset::getTileBySurrounding(unsigned short type,
 	return tile;
 }
 
-
-bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
+//Wyrmgus start
+//bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2) const
+bool CTileset::isEquivalentTile(unsigned int tile1, unsigned int tile2, int tile_index) const
+//Wyrmgus end
 {
 	//Assert(type == MapFieldForest || type == MapFieldRocks);
 
-	return mixedLookupTable[tile1] == mixedLookupTable[tile2];
+	//Wyrmgus start
+//	return mixedLookupTable[tile1] == mixedLookupTable[tile2];
+	int base_terrain = tiles[tile_index].tileinfo.BaseTerrain;
+	return this->getFromMixedLookupTable(base_terrain, tile1) == this->getFromMixedLookupTable(base_terrain, tile2);
+	
+	//Wyrmgus end
 }
 
 int CTileset::findTileIndexByTile(unsigned int tile) const

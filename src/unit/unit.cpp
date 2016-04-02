@@ -2119,6 +2119,8 @@ void MapUnmarkUnitSight(CUnit &unit)
 */
 void UpdateUnitSightRange(CUnit &unit)
 {
+//Wyrmgus start
+/*
 #if 0 // which is the better ? caller check ?
 	if (SaveGameLoading) {
 		return ;
@@ -2126,6 +2128,8 @@ void UpdateUnitSightRange(CUnit &unit)
 #else
 	Assert(!SaveGameLoading);
 #endif
+*/
+//Wyrmgus end
 	// FIXME : these values must be configurable.
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
@@ -2572,7 +2576,12 @@ void CUnit::Remove(CUnit *host)
 			CancelBuildingMode();
 		}
 		UnSelectUnit(*this);
-		SelectionChanged();
+		//Wyrmgus start
+//		SelectionChanged();
+		if (GameRunning) { // to avoid a crash when SelectionChanged() calls UI.ButtonPanel.Update()
+			SelectionChanged();
+		}
+		//Wyrmgus end
 	}
 	// Remove unit from team selections
 	if (!Selected && TeamSelected) {
@@ -5409,6 +5418,11 @@ void CleanUnits()
 		if (&unit == NULL) {
 			continue;
 		}
+		//Wyrmgus start
+		if (unit.Type == NULL) {
+			fprintf(stderr, "Unit \"%d\"'s type is NULL.\n", UnitNumber(unit));
+		}
+		//Wyrmgus end
 		if (!unit.Destroyed) {
 			if (!unit.Removed) {
 				unit.Remove(NULL);

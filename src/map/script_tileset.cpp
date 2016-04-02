@@ -382,7 +382,9 @@ void CTileset::buildTable(lua_State *l)
 	const int n = tiles.size();
 
 	mixedLookupTable.clear();
-	mixedLookupTable.resize(n, 0);
+	//Wyrmgus start
+//	mixedLookupTable.resize(n, 0);
+	//Wyrmgus end
 	//  Build the TileTypeTable
 	TileTypeTable.resize(n, 0);
 
@@ -429,6 +431,9 @@ void CTileset::buildTable(lua_State *l)
 	}
 
 	//  Build wood removement table.
+	//Wyrmgus start
+	int wood_terrain_type = 0;
+	//Wyrmgus end
 	int solid = 0;
 	int mixed = 0;
 	for (int i = 0; i < n;) {
@@ -449,6 +454,9 @@ void CTileset::buildTable(lua_State *l)
 			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
 				if (tile.flag & MapFieldForest) {
 					solid = i;
+					//Wyrmgus start
+					wood_terrain_type = tileinfo.BaseTerrain;
+					//Wyrmgus end
 				}
 			}
 			i += 16;
@@ -484,12 +492,17 @@ void CTileset::buildTable(lua_State *l)
 	//16 Bottom Tree Tile
 	//32 Top Tree Tile
 	for (int i = solid; i < solid + 16; ++i) {
-		mixedLookupTable[tiles[i].tile] = 15;
+		//Wyrmgus start
+//		mixedLookupTable[tiles[i].tile] = 15;
+		mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 15;
+		//Wyrmgus end
 	}
 	for (int i = mixed; i < mixed + 256; ++i) {
 		int check = (int)((i - mixed) / 16);
 
 		switch (check) {
+			//Wyrmgus start
+			/*
 			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
 			case 1: mixedLookupTable[tiles[i].tile] = 4; break;
 			case 2: mixedLookupTable[tiles[i].tile] = 8 + 4; break;
@@ -505,16 +518,43 @@ void CTileset::buildTable(lua_State *l)
 			case 12: mixedLookupTable[tiles[i].tile] = 8 + 2 + 1; break;
 			case 13:  mixedLookupTable[tiles[i].tile] = 4 + 2 + 1; break;
 			default: mixedLookupTable[tiles[i].tile] = 0; break;
+			*/
+			case 0: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8; break;
+			case 1: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4; break;
+			case 2: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4; break;
+			case 3: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 1; break;
+			case 4: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 1; break;
+			case 5: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 1; break;
+			case 6: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4 + 1; break;
+			case 7: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 2; break;
+			case 8: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 2; break;
+			case 9: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 2; break;
+			case 10: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4 + 2; break;
+			case 11: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 2 + 1; break;
+			case 12: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 2 + 1; break;
+			case 13: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 2 + 1; break;
+			default: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 0; break;
+			//Wyrmgus end
 		}
 	}
 	//16 Bottom Tree Special
 	//32 Top Tree Special
 	//64 Mid tree special - differentiate with mixed tiles.
+	//Wyrmgus start
+	/*
 	mixedLookupTable[botOneTreeTile] = 12 + 16;
 	mixedLookupTable[topOneTreeTile] = 3 + 32;
 	mixedLookupTable[midOneTreeTile] = 15 + 48;
+	*/
+	mixedLookupTable[std::pair<int, int>(wood_terrain_type, botOneTreeTile)] = 12 + 16;
+	mixedLookupTable[std::pair<int, int>(wood_terrain_type, topOneTreeTile)] = 3 + 32;
+	mixedLookupTable[std::pair<int, int>(wood_terrain_type, midOneTreeTile)] = 15 + 48;
+	//Wyrmgus end
 
 	//  Build rock removement table.
+	//Wyrmgus start
+	int rock_terrain_type = 0;
+	//Wyrmgus end
 	mixed = 0;
 	solid = 0;
 	for (int i = 0; i < n;) {
@@ -535,6 +575,9 @@ void CTileset::buildTable(lua_State *l)
 			if (tileinfo.BaseTerrain != 0 && tileinfo.MixTerrain == 0) {
 				if (tile.flag & MapFieldRocks) {
 					solid = i;
+					//Wyrmgus start
+					rock_terrain_type = tileinfo.BaseTerrain;
+					//Wyrmgus end
 				}
 			}
 			i += 16;
@@ -548,11 +591,16 @@ void CTileset::buildTable(lua_State *l)
 	//4 Top Right
 	//8 Top Left
 	for (int i = solid; i < solid + 16; ++i) {
-		mixedLookupTable[tiles[i].tile] = 15;
+		//Wyrmgus start
+//		mixedLookupTable[tiles[i].tile] = 15;
+		mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 15;
+		//Wyrmgus end
 	}
 	for (int i = mixed; i < mixed + 256; ++i) {
 		int check = (int)((i - mixed) / 16);
 		switch (check) {
+			//Wyrmgus start
+			/*
 			case 0: mixedLookupTable[tiles[i].tile] = 8; break;
 			case 1: mixedLookupTable[tiles[i].tile] = 4; break;
 			case 2: mixedLookupTable[tiles[i].tile] = 8 + 4; break;
@@ -568,12 +616,36 @@ void CTileset::buildTable(lua_State *l)
 			case 12: mixedLookupTable[tiles[i].tile] = 8 + 2 + 1; break;
 			case 13: mixedLookupTable[tiles[i].tile] = 4 + 2 + 1; break;
 			default: mixedLookupTable[tiles[i].tile] = 0; break;
+			*/
+			case 0: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8; break;
+			case 1: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4; break;
+			case 2: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4; break;
+			case 3: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 1; break;
+			case 4: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 1; break;
+			case 5: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 1; break;
+			case 6: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4 + 1; break;
+			case 7: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 2; break;
+			case 8: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 2; break;
+			case 9: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 2; break;
+			case 10: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 4 + 2; break;
+			case 11: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 2 + 1; break;
+			case 12: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 8 + 2 + 1; break;
+			case 13: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 4 + 2 + 1; break;
+			default: mixedLookupTable[std::pair<int, int>(tiles[i].tileinfo.BaseTerrain, tiles[i].tile)] = 0; break;
+			//Wyrmgus end
 		}
 	}
 
+	//Wyrmgus start
+	/*
 	mixedLookupTable[botOneRockTile] = 12 + 16;
 	mixedLookupTable[topOneRockTile] = 3 + 32;
 	mixedLookupTable[midOneRockTile] = 15 + 48;
+	*/
+	mixedLookupTable[std::pair<int, int>(rock_terrain_type, botOneRockTile)] = 12 + 16;
+	mixedLookupTable[std::pair<int, int>(rock_terrain_type, topOneRockTile)] = 3 + 32;
+	mixedLookupTable[std::pair<int, int>(rock_terrain_type, midOneRockTile)] = 15 + 48;
+	//Wyrmgus end
 
 	rockTable[ 0] = -1;
 	rockTable[ 1] = tiles[mixed + 0x30].tile;

@@ -499,7 +499,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		const CMapField &new_mf = *(&mf - this->Info.MapWidth);
 		ttup = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
 		//Wyrmgus start
-		if (!(new_mf.getFlag() & type)) {
+		if (this->Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain != this->Tileset->tiles[new_mf.getTileIndex()].tileinfo.BaseTerrain) {
 			ttup = -2;
 		}
 		//Wyrmgus end
@@ -510,7 +510,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		const CMapField &new_mf = *(&mf + 1);
 		ttright = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
 		//Wyrmgus start
-		if (!(new_mf.getFlag() & type)) {
+		if (this->Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain != this->Tileset->tiles[new_mf.getTileIndex()].tileinfo.BaseTerrain) {
 			ttright = -2;
 		}
 		//Wyrmgus end
@@ -521,7 +521,7 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		const CMapField &new_mf = *(&mf + this->Info.MapWidth);
 		ttdown = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
 		//Wyrmgus start
-		if (!(new_mf.getFlag() & type)) {
+		if (this->Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain != this->Tileset->tiles[new_mf.getTileIndex()].tileinfo.BaseTerrain) {
 			ttdown = -2;
 		}
 		//Wyrmgus end
@@ -532,12 +532,15 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		const CMapField &new_mf = *(&mf - 1);
 		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
 		//Wyrmgus start
-		if (!(new_mf.getFlag() & type)) {
+		if (this->Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain != this->Tileset->tiles[new_mf.getTileIndex()].tileinfo.BaseTerrain) {
 			ttleft = -2;
 		}
 		//Wyrmgus end
 	}
-	int tile = this->Tileset->getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
+	//Wyrmgus start
+//	int tile = this->Tileset->getTileBySurrounding(type, ttup, ttright, ttdown, ttleft);
+	int tile = this->Tileset->getTileBySurrounding(type, mf.getTileIndex(), ttup, ttright, ttdown, ttleft);
+	//Wyrmgus end
 
 	//Update seen tile.
 	if (tile == -1) { // No valid wood remove it.
@@ -558,7 +561,10 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			mf.Value = 0;
 			UI.Minimap.UpdateXY(pos);
 		}
-	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
+	//Wyrmgus start
+//	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
+	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile, mf.getTileIndex())) { //Same Type
+	//Wyrmgus end
 		return;
 	} else {
 		if (seen) {

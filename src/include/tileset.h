@@ -38,6 +38,9 @@
 
 #include "vec2i.h"
 #include <vector>
+//Wyrmgus start
+#include <map>
+//Wyrmgus end
 
 struct lua_State;
 
@@ -203,11 +206,19 @@ public:
 //	unsigned getQuadFromTile(unsigned int tile) const;
 	unsigned getQuadFromTile(unsigned int tileIndex) const;
 	//Wyrmgus end
+	//Wyrmgus start
+	int getFromMixedLookupTable(int base_terrain, int tile) const;
+//	int getTileBySurrounding(unsigned short type
 	int getTileBySurrounding(unsigned short type,
+							 int tile_index,
+	//Wyrmgus end
 							 int up, int right,
 							 int bottom, int left) const;
 	int tileFromQuad(unsigned fixed, unsigned quad) const;
-	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
+	//Wyrmgus start
+//	bool isEquivalentTile(unsigned int tile1, unsigned int tile2) const;
+	bool isEquivalentTile(unsigned int tile1, unsigned int tile2, int tile_index) const;
+	//Wyrmgus end
 
 	void parse(lua_State *l);
 	void buildTable(lua_State *l);
@@ -242,7 +253,10 @@ private:
 //	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
 	//Wyrmgus end
 #if 1
-	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
+	//Wyrmgus start
+//	std::vector<int> mixedLookupTable;  /// Lookup for what part of tile used
+	std::map<std::pair<int,int>, int> mixedLookupTable;  /// Lookup for what part of tile used; mapped to a pair, which has its first element as the tile type and the second element as the graphic tile
+	//Wyrmgus end
 	unsigned topOneTreeTile;   /// Tile for one tree top
 	unsigned midOneTreeTile;   /// Tile for one tree middle
 	unsigned botOneTreeTile;   /// Tile for one tree bottom
