@@ -272,9 +272,9 @@ void CViewport::DrawMapBackgroundInViewport() const
 			//Wyrmgus start
 //			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 			int underlay_terrain;
-			if ((tile == Map.Tileset->getRemovedTreeTile() && (mf.getFlag() & MapFieldStumps)) || (mf.getFlag() & MapFieldForest)) { //wood tile, draw grass (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for stump tiles or regrown trees
+			if ((std::find(Map.Tileset->removedTreeTiles.begin(), Map.Tileset->removedTreeTiles.end(), tile) != Map.Tileset->removedTreeTiles.end() && (mf.getFlag() & MapFieldStumps)) || (mf.getFlag() & MapFieldForest)) { //wood tile, draw grass (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for stump tiles or regrown trees
 				underlay_terrain = Map.Tileset->TreeUnderlayTerrain;
-			} else if ((tile == Map.Tileset->getRemovedRockTile() && (mf.getFlag() & MapFieldGravel)) || (mf.getFlag() & MapFieldRocks)) { //rock tile, draw dirt (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for removed tiles
+			} else if ((std::find(Map.Tileset->removedRockTiles.begin(), Map.Tileset->removedRockTiles.end(), tile) != Map.Tileset->removedRockTiles.end() && (mf.getFlag() & MapFieldGravel)) || (mf.getFlag() & MapFieldRocks)) { //rock tile, draw dirt (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for removed tiles
 				underlay_terrain = Map.Tileset->RockUnderlayTerrain;
 			} else {
 				underlay_terrain = Map.Tileset->tiles[mf.getTileIndex()].tileinfo.MixTerrain;

@@ -216,13 +216,19 @@ void CTileset::clear()
 	topOneTreeTile = 0;
 	midOneTreeTile = 0;
 	botOneTreeTile = 0;
-	removedTreeTile = 0;
+	//Wyrmgus start
+//	removedTreeTile = 0;
+	removedTreeTiles.clear();
+	//Wyrmgus end
 	memset(woodTable, 0, sizeof(woodTable));
 	mixedLookupTable.clear();
 	topOneRockTile = 0;
 	midOneRockTile = 0;
 	botOneRockTile = 0;
-	removedRockTile = 0;
+	//Wyrmgus start
+//	removedRockTile = 0;
+	removedRockTiles.clear();
+	//Wyrmgus end
 	memset(rockTable, 0, sizeof(rockTable));
 	memset(humanWallTable, 0, sizeof(humanWallTable));
 	memset(orcWallTable, 0, sizeof(orcWallTable));

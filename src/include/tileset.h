@@ -179,8 +179,12 @@ public:
 
 	const PixelSize &getPixelTileSize() const { return pixelTileSize; }
 
-	unsigned getRemovedRockTile() const { return removedRockTile; }
-	unsigned getRemovedTreeTile() const { return removedTreeTile; }
+	//Wyrmgus start
+//	unsigned getRemovedRockTile() const { return removedRockTile; }
+//	unsigned getRemovedTreeTile() const { return removedTreeTile; }
+	unsigned getRemovedRockTile() const { return removedRockTiles.size() > 0 ? removedRockTiles[SyncRand(removedRockTiles.size())] : -1; }
+	unsigned getRemovedTreeTile() const { return removedTreeTiles.size() > 0 ? removedTreeTiles[SyncRand(removedTreeTiles.size())] : -1; }
+	//Wyrmgus end
 	unsigned getBottomOneTreeTile() const { return botOneTreeTile; }
 	unsigned getTopOneTreeTile() const { return topOneTreeTile; }
 	unsigned getMidOneTreeTile() const { return midOneTreeTile; }
@@ -246,6 +250,8 @@ public:
 	std::vector<SolidTerrainInfo> solidTerrainTypes; /// Information about solid terrains.
 	int TreeUnderlayTerrain;
 	int RockUnderlayTerrain;
+	std::vector<unsigned> removedTreeTiles;  /// Tiles placed where trees are gone
+	std::vector<unsigned> removedRockTiles;  /// Tiles placed where trees are gone
 	//Wyrmgus end
 private:
 	PixelSize pixelTileSize;    /// Size of a tile in pixel
@@ -260,12 +266,16 @@ private:
 	unsigned topOneTreeTile;   /// Tile for one tree top
 	unsigned midOneTreeTile;   /// Tile for one tree middle
 	unsigned botOneTreeTile;   /// Tile for one tree bottom
-	unsigned removedTreeTile;  /// Tile placed where trees are gone
+	//Wyrmgus start
+//	unsigned removedTreeTile;  /// Tile placed where trees are gone
+	//Wyrmgus end
 	int woodTable[20];     /// Table for tree removable
 	unsigned topOneRockTile;   /// Tile for one rock top
 	unsigned midOneRockTile;   /// Tile for one rock middle
 	unsigned botOneRockTile;   /// Tile for one rock bottom
-	unsigned removedRockTile;  /// Tile placed where rocks are gone
+	//Wyrmgus start
+//	unsigned removedRockTile;  /// Tile placed where rocks are gone
+	//Wyrmgus end
 	int rockTable[20];     /// Removed rock placement table
 	unsigned humanWallTable[16];  /// Human wall placement table
 	unsigned orcWallTable[16];    /// Orc wall placement table

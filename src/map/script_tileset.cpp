@@ -146,6 +146,11 @@ void CTileset::parseSpecial(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	const int args = lua_rawlen(l, -1);
+	
+	//Wyrmgus start
+	removedTreeTiles.clear();
+	removedRockTiles.clear();
+	//Wyrmgus end
 
 	for (int j = 0; j < args; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
@@ -161,7 +166,10 @@ void CTileset::parseSpecial(lua_State *l)
 			botOneTreeTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "removed-tree")) {
 			++j;
-			removedTreeTile = LuaToNumber(l, -1, j + 1);
+			//Wyrmgus start
+//			removedTreeTile = LuaToNumber(l, -1, j + 1);
+			removedTreeTiles.push_back(LuaToNumber(l, -1, j + 1));
+			//Wyrmgus end
 		} else if (!strcmp(value, "growing-tree")) {
 			++j;
 			// keep for retro compatibility.
@@ -177,7 +185,10 @@ void CTileset::parseSpecial(lua_State *l)
 			botOneRockTile = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "removed-rock")) {
 			++j;
-			removedRockTile = LuaToNumber(l, -1, j + 1);
+			//Wyrmgus start
+//			removedRockTile = LuaToNumber(l, -1, j + 1);
+			removedRockTiles.push_back(LuaToNumber(l, -1, j + 1));
+			//Wyrmgus end
 		} else {
 			LuaError(l, "special: unsupported tag: %s" _C_ value);
 		}

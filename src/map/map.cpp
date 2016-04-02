@@ -106,12 +106,12 @@ void CMap::MarkSeenTile(CMapField &mf)
 		//  Handle wood changes. FIXME: check if for growing wood correct?
 		//Wyrmgus start
 //		if (tile == this->Tileset->getRemovedTreeTile()) {
-		if (tile == this->Tileset->getRemovedTreeTile() && mf.getFlag() & MapFieldStumps) {
+		if (std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), tile) != this->Tileset->removedTreeTiles.end() && mf.getFlag() & MapFieldStumps) {
 		//Wyrmgus end
 			FixNeighbors(MapFieldForest, 1, pos);
 		//Wyrmgus start
 //		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
-		} else if (seentile == this->Tileset->getRemovedTreeTile() && ((mf.getFlag() & MapFieldStumps) || (mf.getFlag() & MapFieldForest))) {
+		} else if (std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), seentile) != this->Tileset->removedTreeTiles.end() && ((mf.getFlag() & MapFieldStumps) || (mf.getFlag() & MapFieldForest))) {
 		//Wyrmgus end
 			FixTile(MapFieldForest, 1, pos);
 		} else if (mf.ForestOnMap()) {
@@ -121,12 +121,12 @@ void CMap::MarkSeenTile(CMapField &mf)
 			// Handle rock changes.
 		//Wyrmgus start
 //		} else if (tile == Tileset->getRemovedRockTile()) {
-		} else if (tile == Tileset->getRemovedRockTile() && mf.getFlag() & MapFieldGravel) {
+		} else if (std::find(this->Tileset->removedRockTiles.begin(), this->Tileset->removedRockTiles.end(), tile) != this->Tileset->removedRockTiles.end() && mf.getFlag() & MapFieldGravel) {
 		//Wyrmgus end
 			FixNeighbors(MapFieldRocks, 1, pos);
 		//Wyrmgus start
 //		} else if (seentile == Tileset->getRemovedRockTile()) {
-		} else if (seentile == Tileset->getRemovedRockTile() && ((mf.getFlag() & MapFieldGravel) || (mf.getFlag() & MapFieldRocks))) {
+		} else if (std::find(this->Tileset->removedRockTiles.begin(), this->Tileset->removedRockTiles.end(), seentile) != this->Tileset->removedRockTiles.end() && ((mf.getFlag() & MapFieldGravel) || (mf.getFlag() & MapFieldRocks))) {
 		//Wyrmgus end
 			FixTile(MapFieldRocks, 1, pos);
 		} else if (mf.RockOnMap()) {
@@ -681,7 +681,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 
 	//Wyrmgus start
 //	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {
-	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile() || !(mf.getFlag() & MapFieldStumps)) {
+	if (std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), mf.getGraphicTile()) == this->Tileset->removedTreeTiles.end() || !(mf.getFlag() & MapFieldStumps)) {
 	//Wyrmgus end
 		return;
 	}
@@ -719,11 +719,11 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 			
 			if (
 				this->Info.IsPointOnMap(pos + verticalOffset)
-				&& ((verticalMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupedFlag)) || (verticalMf.getFlag() & MapFieldForest))
+				&& ((std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), verticalMf.getGraphicTile()) != this->Tileset->removedTreeTiles.end() && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupedFlag)) || (verticalMf.getFlag() & MapFieldForest))
 				&& this->Info.IsPointOnMap(pos + diagonalOffset)
-				&& ((diagonalMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupedFlag)) || (diagonalMf.getFlag() & MapFieldForest))
+				&& ((std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), diagonalMf.getGraphicTile()) != this->Tileset->removedTreeTiles.end() && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupedFlag)) || (diagonalMf.getFlag() & MapFieldForest))
 				&& this->Info.IsPointOnMap(pos + horizontalOffset)
-				&& ((horizontalMf.getGraphicTile() == this->Tileset->getRemovedTreeTile() && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupedFlag)) || (horizontalMf.getFlag() & MapFieldForest))
+				&& ((std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), horizontalMf.getGraphicTile()) != this->Tileset->removedTreeTiles.end() && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupedFlag)) || (horizontalMf.getFlag() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
 				verticalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 100);
