@@ -5271,6 +5271,9 @@ void InitializeGrandStrategyGame(bool show_loading)
 		}
 		hero->Year = Characters[i]->Year;
 		hero->DeathYear = Characters[i]->DeathYear;
+		if (Characters[i]->ViolentDeath) { //if the character died a violent death historically, add a random number of years to the hero's natural lifespan
+			hero->DeathYear += SyncRand(15);
+		}
 		hero->Civilization = Characters[i]->Civilization;
 		hero->ProvinceOfOriginName = Characters[i]->ProvinceOfOriginName;
 		hero->Gender = Characters[i]->Gender;
@@ -5446,7 +5449,7 @@ void InitializeGrandStrategyProvinces()
 	}
 }
 
-void InitializeGrandStrategyFactions()
+void FinalizeGrandStrategyInitialization()
 {
 	//initialize heroes
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {

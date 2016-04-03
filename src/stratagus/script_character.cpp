@@ -125,6 +125,8 @@ static int CclDefineCharacter(lua_State *l)
 			character->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "DeathYear")) {
 			character->DeathYear = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "ViolentDeath")) {
+			character->ViolentDeath = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			character->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
@@ -182,6 +184,15 @@ static int CclDefineCharacter(lua_State *l)
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_name.c_str());
+			}
+		} else if (!strcmp(value, "DateReferenceCharacter")) {
+			std::string reference_character_name = TransliterateText(LuaToString(l, -1));
+			CCharacter *reference_character = GetCharacter(reference_character_name);
+			if (reference_character) {
+				character->DateReferenceCharacter = const_cast<CCharacter *>(&(*reference_character));
+				reference_character->DateReferredCharacters.push_back(character);
+			} else {
+				LuaError(l, "Character \"%s\" doesn't exist." _C_ reference_character_name.c_str());
 			}
 		} else if (!strcmp(value, "Gender")) {
 			character->Gender = GetGenderIdByName(LuaToString(l, -1));
@@ -412,6 +423,8 @@ static int CclDefineCharacter(lua_State *l)
 			}
 		}
 	}
+
+	character->GenerateMissingData();
 	
 	return 0;
 }
@@ -852,6 +865,9 @@ static int CclGetCharacterData(lua_State *l)
 	} else if (!strcmp(data, "DeathYear")) {
 		lua_pushnumber(l, character->DeathYear);
 		return 1;
+	} else if (!strcmp(data, "ViolentDeath")) {
+		lua_pushboolean(l, character->ViolentDeath);
+		return 1;
 	} else if (!strcmp(data, "Gender")) {
 		lua_pushstring(l, GetGenderNameById(character->Gender).c_str());
 		return 1;
@@ -899,7 +915,7 @@ static int CclGetCharacterData(lua_State *l)
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
-
+	
 	return 0;
 }
 

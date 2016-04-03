@@ -73,9 +73,9 @@ class CCharacter
 public:
 	CCharacter() :
 		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
-		Persistent(false), Custom(false),
+		ViolentDeath(false), Persistent(false), Custom(false),
 		Type(NULL), Trait(NULL),
-		Father(NULL), Mother(NULL)
+		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL)
 	{
 		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}
@@ -86,6 +86,7 @@ public:
 	bool IsItemEquipped(const CItem *item) const;
 	std::string GetFullName();
 	CItem *GetItem(CUnit &item);
+	void GenerateMissingData();
 
 	int Year;					/// Year in which the character historically starts being active
 	int DeathYear;				/// Year in which the character dies of natural causes
@@ -94,6 +95,7 @@ public:
 	int Gender;					/// Character's gender
 	int Level;					/// Character's level
 	int ExperiencePercent;		/// Character's experience, as a percentage of the experience required to level up
+	bool ViolentDeath;			/// If historical death was violent
 	bool Persistent;			/// Whether this character's levels and abilities are persistent
 	bool Custom;				/// Whether this character is a custom hero
 	std::string Name;			/// Given name of the character
@@ -110,9 +112,11 @@ public:
 	CUpgrade *Trait;
 	CCharacter *Father;					/// Character's father
 	CCharacter *Mother;					/// Character's mother
+	CCharacter *DateReferenceCharacter;	/// Character used as a date reference for this character; i.e. if a dwarf was the contemporary of a human hero in a saga, make the hero a date reference for the dwarf, so that the dwarf will be generated in a similar date in Nidavellir
 	std::vector<CItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
+	std::vector<CCharacter *> DateReferredCharacters;	/// Characters who use this character as a date reference
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author

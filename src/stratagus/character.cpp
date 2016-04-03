@@ -10,7 +10,7 @@
 //
 /**@name character.cpp - The characters. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2016 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -129,6 +129,70 @@ CItem *CCharacter::GetItem(CUnit &item)
 		}
 	}
 	return NULL;
+}
+
+void CCharacter::GenerateMissingData()
+{
+	if (this->Year != 0 && this->DeathYear != 0) {
+		return;
+	}
+	
+	bool year_data_changed = false;
+	
+	if (this->Year == 0) {
+		if (this->Father != NULL && this->Father->DeathYear != 0) { // if the character has no year set, base it on the death year of the father
+			this->Year = this->Father->DeathYear;
+			year_data_changed = true;
+		} else if (this->Mother != NULL && this->Mother->DeathYear != 0) { // if the character has no year set, base it on the death year of the mother
+			this->Year = this->Mother->DeathYear;
+			year_data_changed = true;
+		}
+	}
+	
+	if (this->DeathYear == 0) { // if the character has no death year set, try to base it on the start year of a child
+		for (size_t i = 0; i < this->Children.size(); ++i) {
+			if (this->Children[i]->Year != 0) {
+				this->DeathYear = this->Children[i]->Year;
+				year_data_changed = true;
+				break;
+			}
+		}
+	}
+	
+	if (this->DateReferenceCharacter != NULL) { // if the character has no year or death year set, try to base it on the year and death year of the date reference character
+		if (this->Year == 0 && this->DateReferenceCharacter->Year != 0) {
+			this->Year = this->DateReferenceCharacter->Year;
+			year_data_changed = true;
+		}
+		if (this->DeathYear == 0 && this->DateReferenceCharacter->DeathYear != 0) {
+			this->DeathYear = this->DateReferenceCharacter->DeathYear;
+			year_data_changed = true;
+		}
+	}
+	
+	if (this->Year != 0 && this->DeathYear == 0) { // if the start year is known but the death one isn't, estimate the death year
+		this->DeathYear = this->Year + 30;
+		year_data_changed = true;
+	} else if (this->Year == 0 && this->DeathYear != 0) { // if the start year is not known but the death one is, estimate the start year
+		this->Year = this->DeathYear - 30;
+		year_data_changed = true;
+	}
+	
+	// if any piece of year data was changed, see if more data can be generated for the parents or children
+	if (year_data_changed) {
+		if (this->Father != NULL) {
+			this->Father->GenerateMissingData();
+		}
+		if (this->Mother != NULL) {
+			this->Mother->GenerateMissingData();
+		}
+		for (size_t i = 0; i < this->Children.size(); ++i) {
+			this->Children[i]->GenerateMissingData();
+		}
+		for (size_t i = 0; i < this->DateReferredCharacters.size(); ++i) {
+			this->DateReferredCharacters[i]->GenerateMissingData();
+		}
+	}
 }
 
 void CleanCharacters()

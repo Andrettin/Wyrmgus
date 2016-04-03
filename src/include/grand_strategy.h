@@ -506,7 +506,7 @@ extern void InitializeGrandStrategyGame(bool show_loading = true);
 extern void InitializeGrandStrategyMinimap();
 extern void InitializeGrandStrategyWorldMap();
 extern void InitializeGrandStrategyProvinces();
-extern void InitializeGrandStrategyFactions();
+extern void FinalizeGrandStrategyInitialization();
 extern void SetGrandStrategyWorld(std::string world);
 extern void DoGrandStrategyTurn();
 extern void DoProspection();
