@@ -342,16 +342,34 @@ static void HandleBuffsEachCycle(CUnit &unit)
 		}
 	}
 	//Wyrmgus end
-		
+	
 	//Wyrmgus start
 //	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, INSPIRE_INDEX};
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, INSPIRE_INDEX, REGENERATION_INDEX};
 	//Wyrmgus end
 	//  decrease spells effects time.
 	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
 		unit.Variable[SpellEffects[i]].Increase = -1;
 		IncreaseVariable(unit, SpellEffects[i]);
 	}
+	
+	//Wyrmgus start
+	//apply auras to all appropriate nearby units
+	int aura_range = 4;
+	if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) { // regeneration aura
+		if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) {
+			unit.ApplyAuraEffect(REGENERATIONAURA_INDEX);
+		}
+		
+		std::vector<CUnit *> table;
+		SelectAroundUnit(unit, aura_range, table, MakeAndPredicate(MakeOrPredicate(HasSamePlayerAs(*unit.Player), IsAlliedWith(*unit.Player)), IsOrganicType()));
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (table[i]->Variable[HP_INDEX].Value < table[i]->Variable[HP_INDEX].Max) {
+				table[i]->ApplyAuraEffect(REGENERATIONAURA_INDEX);
+			}
+		}
+	}
+	//Wyrmgus end
 
 	const bool lastStatusIsHidden = unit.Variable[INVISIBLE_INDEX].Value > 0;
 	if (lastStatusIsHidden && unit.Variable[INVISIBLE_INDEX].Value == 0) {
@@ -408,13 +426,19 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			//Wyrmgus start
 //			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == INSPIRE_INDEX) {
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == INSPIRE_INDEX || i == REGENERATION_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
 		if (i == HP_INDEX && HandleBurnAndPoison(unit)) {
 			continue;
 		}
+		//Wyrmgus start
+		if (i == HP_INDEX && unit.Variable[REGENERATION_INDEX].Value > 0) {
+			unit.Variable[i].Value += 1;
+			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
+		}
+		//Wyrmgus end
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {
 			IncreaseVariable(unit, i);
 		}

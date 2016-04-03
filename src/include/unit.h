@@ -186,6 +186,7 @@ public:
 	void EquipItem(CUnit &item, bool affect_character = true);
 	void DeequipItem(CUnit &item, bool affect_character = true);
 	void ReadWork(CUpgrade *work, bool affect_character = true);
+	void ApplyAuraEffect(int aura_index);
 	void SetPrefix(CUpgrade *prefix);
 	void SetSuffix(CUpgrade *suffix);
 	void SetSpell(SpellType *spell);

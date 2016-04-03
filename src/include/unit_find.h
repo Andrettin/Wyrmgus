@@ -196,6 +196,21 @@ private:
 template <typename Pred1, typename Pred2>
 AndPredicate<Pred1, Pred2> MakeAndPredicate(Pred1 pred1, Pred2 pred2) { return AndPredicate<Pred1, Pred2>(pred1, pred2); }
 
+//Wyrmgus start
+template <typename Pred1, typename Pred2>
+class OrPredicate : public CUnitFilter
+{
+public:
+	OrPredicate(Pred1 _pred1, Pred2 _pred2) : pred1(_pred1), pred2(_pred2) {}
+	bool operator()(const CUnit *unit) const { return pred1(unit) || pred2(unit); }
+private:
+	Pred1 pred1;
+	Pred2 pred2;
+};
+
+template <typename Pred1, typename Pred2>
+OrPredicate<Pred1, Pred2> MakeOrPredicate(Pred1 pred1, Pred2 pred2) { return OrPredicate<Pred1, Pred2>(pred1, pred2); }
+//Wyrmgus end
 
 //unit_find
 class CUnitTypeFinder

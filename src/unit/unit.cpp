@@ -1338,6 +1338,22 @@ void CUnit::ReadWork(CUpgrade *work, bool affect_character)
 	}
 }
 
+void CUnit::ApplyAuraEffect(int aura_index)
+{
+	int effect_index = -1;
+	if (aura_index == REGENERATIONAURA_INDEX) {
+		effect_index = REGENERATION_INDEX;
+	}
+	
+	if (effect_index == -1) {
+		return;
+	}
+	
+	this->Variable[effect_index].Enable = 1;
+	this->Variable[effect_index].Max = std::max(1, this->Variable[effect_index].Max);
+	this->Variable[effect_index].Value = std::max(1, this->Variable[effect_index].Value);
+}
+
 void CUnit::SetPrefix(CUpgrade *prefix)
 {
 	if (Prefix != NULL) {
