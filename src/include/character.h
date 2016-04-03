@@ -37,6 +37,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <vector>
+#include <tuple>
 
 #ifndef __ICONS_H__
 #include "icons.h"
@@ -50,6 +51,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CFaction;
 class CItem;
 class CQuest;
 class CUnitType;
@@ -125,6 +127,7 @@ public:
 	std::vector<CQuest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
 	std::vector<CItem *> Items;
 	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
+	std::vector<std::tuple<int, int, CFaction *>> HistoricalRulerships;	/// historical rulerships of the character, the first element is the beginning year of the rule, the second one the end year, and the third the faction ruled over
 };
 
 /*----------------------------------------------------------------------------

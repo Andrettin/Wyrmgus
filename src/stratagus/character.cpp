@@ -178,6 +178,23 @@ void CCharacter::GenerateMissingData()
 		year_data_changed = true;
 	}
 	
+	if (this->Year != 0 && this->DeathYear != 0) { // if any of the character's historical rulerships have blank years, try to fill them in with the character's start or death years
+		for (size_t i = 0; i < this->HistoricalRulerships.size(); ++i) {
+			bool historical_rulership_changed = false;
+			if (std::get<0>(this->HistoricalRulerships[i]) == 0) {
+				std::get<0>(this->HistoricalRulerships[i]) = this->Year;
+				historical_rulership_changed = true;
+			}
+			if (std::get<1>(this->HistoricalRulerships[i]) == 0) {
+				std::get<1>(this->HistoricalRulerships[i]) = this->DeathYear;
+				historical_rulership_changed = true;
+			}
+			if (historical_rulership_changed && std::get<0>(this->HistoricalRulerships[i]) != 0 && std::get<1>(this->HistoricalRulerships[i]) != 0) {
+				std::get<2>(this->HistoricalRulerships[i])->HistoricalRulers[std::pair<int, int>(std::get<0>(this->HistoricalRulerships[i]), std::get<1>(this->HistoricalRulerships[i]))] = this;
+			}
+		}
+	}
+	
 	// if any piece of year data was changed, see if more data can be generated for the parents or children
 	if (year_data_changed) {
 		if (this->Father != NULL) {

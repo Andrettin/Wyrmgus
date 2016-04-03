@@ -387,7 +387,10 @@ static int CclDefineCharacter(lua_State *l)
 				if (rulership_faction == -1) {
 					LuaError(l, "Faction \"%s\" doesn't exist." _C_ rulership_faction_name.c_str());
 				}
-				PlayerRaces.Factions[rulership_civilization][rulership_faction]->HistoricalRulers[std::pair<int, int>(start_year, end_year)] = character;
+				if (start_year != 0 && end_year != 0) { // don't put in the faction's historical data if a blank year was given
+					PlayerRaces.Factions[rulership_civilization][rulership_faction]->HistoricalRulers[std::pair<int, int>(start_year, end_year)] = character;
+				}
+				character->HistoricalRulerships.push_back(std::tuple<int, int, CFaction *>(start_year, end_year, PlayerRaces.Factions[rulership_civilization][rulership_faction]));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -424,7 +427,9 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 
-	character->GenerateMissingData();
+	if (character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with the names and gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
+		character->GenerateMissingData();
+	}
 	
 	return 0;
 }
