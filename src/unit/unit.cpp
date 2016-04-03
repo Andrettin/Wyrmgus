@@ -1350,8 +1350,8 @@ void CUnit::ApplyAuraEffect(int aura_index)
 	}
 	
 	this->Variable[effect_index].Enable = 1;
-	this->Variable[effect_index].Max = std::max(1, this->Variable[effect_index].Max);
-	this->Variable[effect_index].Value = std::max(1, this->Variable[effect_index].Value);
+	this->Variable[effect_index].Max = std::max(2, this->Variable[effect_index].Max);
+	this->Variable[effect_index].Value = std::max(2, this->Variable[effect_index].Value);
 }
 
 void CUnit::SetPrefix(CUpgrade *prefix)
