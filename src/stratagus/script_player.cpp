@@ -1553,6 +1553,35 @@ static int CclDefineFaction(lua_State *l)
 				filler.Y = LuaToNumber(l, -1, j + 1);
 				faction->UIFillers.push_back(filler);
 			}
+		} else if (!strcmp(value, "HistoricalFactionDerivations")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string predecessor_civilization_name = LuaToString(l, -1, j + 1);
+				int predecessor_civilization = PlayerRaces.GetRaceIndexByName(predecessor_civilization_name.c_str());
+				++j;
+				std::string predecessor_faction_name = LuaToString(l, -1, j + 1);
+				int predecessor_faction = PlayerRaces.GetFactionIndexByName(predecessor_civilization, predecessor_faction_name);
+				if (predecessor_faction == -1) {
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ predecessor_faction_name.c_str());
+				}
+				faction->HistoricalFactionDerivations[year] = PlayerRaces.Factions[predecessor_civilization][predecessor_faction];
+			}
+		} else if (!strcmp(value, "HistoricalTechnologies")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string technology_ident = LuaToString(l, -1, j + 1);
+				++j;
+				int year = LuaToNumber(l, -1, j + 1);
+				faction->HistoricalTechnologies[technology_ident] = year;
+			}
 		} else if (!strcmp(value, "Mod")) {
 			faction->Mod = LuaToString(l, -1);
 		} else {

@@ -232,7 +232,7 @@ public:
 	void CalculateUpkeep();
 	void CheckFormableFactions(int civilization);
 	void FormFaction(int civilization, int faction);
-	void AcquireFactionTechnologies(int civilization, int faction);
+	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
 	void SetRuler(std::string hero_full_name);
 	void RulerSuccession();
 	void GenerateRuler();
@@ -261,6 +261,7 @@ public:
 	int DiplomacyState[MAX_RACES][FactionMax];							/// Diplomacy state between this faction and each other faction
 	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
+	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 };
 
 class CRiver

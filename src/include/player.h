@@ -435,6 +435,8 @@ public:
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	std::map<std::pair<int, int>, CCharacter *> HistoricalRulers;		/// historical rulers of the faction, mapped to the beginning and end of the rule
+	std::map<std::string, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
+	std::map<int, CFaction *> HistoricalFactionDerivations;				/// cases of this faction deriving technologies/governmental system from another, mapped to the date in which it happened
 	std::vector<CFiller> UIFillers;
 	
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs

@@ -512,7 +512,7 @@ void CGrandStrategyGame::DrawInterface()
 			}
 		}
 		if (hovered_research_icon.x != -1 && hovered_research_icon.y != -1) {
-			DrawGenericPopup("Gain Research by building town halls, lumber mills and smithies", hovered_research_icon.x, hovered_research_icon.y);
+			DrawGenericPopup("Gain Research by building town halls, lumber mills, smithies and temples", hovered_research_icon.x, hovered_research_icon.y);
 		} else if (hovered_prestige_icon.x != -1 && hovered_prestige_icon.y != -1) {
 			DrawGenericPopup("Prestige influences trade priority between nations, among other things", hovered_prestige_icon.x, hovered_prestige_icon.y);
 		}
@@ -2520,6 +2520,9 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 		if (this->HasBuildingClass("smithy")) {
 			income += 2;
 		}
+		if (this->HasBuildingClass("temple")) { // +2 research if has a temple
+			income += 2;
+		}
 			
 		income *= 100 + this->GetProductionEfficiencyModifier(resource);
 		income /= 100;
@@ -3022,11 +3025,18 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 	}
 }
 
-void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int faction)
+void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int faction, int year)
 {
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (GrandStrategyGame.Factions[civilization][faction]->Technologies[i] && AllUpgrades[i]->Ident != PlayerRaces.Factions[civilization][faction]->FactionUpgrade) { //don't acquire the faction's faction-specific upgrade
+		if (
+			GrandStrategyGame.Factions[civilization][faction]->Technologies[i]
+			&& AllUpgrades[i]->Ident != PlayerRaces.Factions[civilization][faction]->FactionUpgrade //don't acquire the faction's faction-specific upgrade
+			&& (year == 0 || (GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.find(AllUpgrades[i]) != GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.end() && year >= GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.find(AllUpgrades[i])->second)) // if a year is given, only add the technology if it is present in the historical technologies for the faction, and if the date for the technology is less or equal than the year given
+		) {
 			this->SetTechnology(i, true);
+			if (year != 0) {
+				this->HistoricalTechnologies[AllUpgrades[i]] = year;
+			}
 		}
 	}
 }
@@ -4866,6 +4876,7 @@ void CleanGrandStrategyGame()
 					}
 				}
 				GrandStrategyGame.Factions[i][j]->Claims.clear();
+				GrandStrategyGame.Factions[i][j]->HistoricalTechnologies.clear();
 			}
 		}
 	}
@@ -5504,6 +5515,32 @@ void FinalizeGrandStrategyInitialization()
 		if (!GrandStrategyGameLoading) {
 			if (GrandStrategyGame.Works[i]->Year != 0 && GrandStrategyYear >= GrandStrategyGame.Works[i]->Year) { //if the game is starting after the publication date of this literary work, remove it from the work list
 				GrandStrategyGame.Works.erase(std::remove(GrandStrategyGame.Works.begin(), GrandStrategyGame.Works.end(), GrandStrategyGame.Works[i]), GrandStrategyGame.Works.end());
+			}
+		}
+	}
+	
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (!GrandStrategyGameLoading) {
+				// add historical technologies that should have been discovered at the game's start date; do this here instead of together with the other faction initialization finalization elements because it can affect the food productivity used to determine some province settings below
+				for (std::map<std::string, int>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalTechnologies.end(); ++iterator) {
+					if (GrandStrategyYear >= iterator->second) {
+						int upgrade_id = UpgradeIdByIdent(iterator->first);
+						if (upgrade_id != -1) {
+							GrandStrategyGame.Factions[i][j]->SetTechnology(upgrade_id, true);
+							GrandStrategyGame.Factions[i][j]->HistoricalTechnologies[AllUpgrades[upgrade_id]] = iterator->second;
+						} else {
+							fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+						}
+					}
+				}
+				
+				// inherit technologies from other factions, as appropriate (i.e. when tribes split off from their parent tribe)
+				for (std::map<int, CFaction *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalFactionDerivations.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalFactionDerivations.end(); ++iterator) {
+					if (GrandStrategyYear >= iterator->first) {
+						GrandStrategyGame.Factions[i][j]->AcquireFactionTechnologies(iterator->second->Civilization, iterator->second->ID, iterator->first);
+					}
+				}
 			}
 		}
 	}
