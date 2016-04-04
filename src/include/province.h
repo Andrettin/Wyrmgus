@@ -106,6 +106,9 @@ public:
 	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
 	std::vector<Vec2i> Tiles;
+	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the province
+	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the province
+	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province
 };
 
 class WorldMapTile

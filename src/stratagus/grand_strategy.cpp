@@ -2222,7 +2222,7 @@ void CGrandStrategyProvince::SetCivilization(int civilization)
 void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_settlement_building)
 {
 	if (building_id == -1) {
-		fprintf(stderr, "Invalid building type being set for the settlement of \"%s\".\n", this->Name.c_str());
+		fprintf(stderr, "Tried to set invalid building type for the settlement of \"%s\".\n", this->Name.c_str());
 		return;
 	}
 	
@@ -5446,6 +5446,33 @@ void InitializeGrandStrategyProvinces()
 		for (size_t j = 0; j < Provinces[i]->FactionClaims.size(); ++j) {
 			province->AddFactionClaim(Provinces[i]->FactionClaims[j]->Civilization, Provinces[i]->FactionClaims[j]->ID);
 		}
+		if (!GrandStrategyGameLoading) {
+			for (std::map<int, int>::reverse_iterator iterator = Provinces[i]->HistoricalCultures.rbegin(); iterator != Provinces[i]->HistoricalCultures.rend(); ++iterator) {
+				if (GrandStrategyYear >= iterator->first) { // set the owner to the last historical owner that is still after the chosen start date
+					province->SetCivilization(iterator->second);
+					break;
+				}
+			}
+			
+			for (std::map<int, CFaction *>::reverse_iterator iterator = Provinces[i]->HistoricalOwners.rbegin(); iterator != Provinces[i]->HistoricalOwners.rend(); ++iterator) {
+				if (GrandStrategyYear >= iterator->first) { // set the owner to the last historical owner that is still after the chosen start date
+					if (iterator->second != NULL) {
+						province->SetOwner(iterator->second->Civilization, iterator->second->ID);
+					} else {
+						province->SetOwner(-1, -1);
+					}
+					break;
+				}
+			}
+			
+			for (std::map<int, CFaction *>::iterator iterator = Provinces[i]->HistoricalClaims.begin(); iterator != Provinces[i]->HistoricalClaims.end(); ++iterator) {
+				if (GrandStrategyYear >= iterator->first) { // set the owner to the last historical owner that is still after the chosen start date
+					if (iterator->second != NULL) {
+						province->AddFactionClaim(iterator->second->Civilization, iterator->second->ID);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -5486,18 +5513,25 @@ void FinalizeGrandStrategyInitialization()
 			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->SettlementLocation.x][GrandStrategyGame.Provinces[i]->SettlementLocation.y]->SetPort(true);
 		}
 		
-		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL && GrandStrategyGame.Provinces[i]->TotalWorkers < 4) { // make every province that has an owner start with at least four workers
-			GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), 4);
-		}
-		
-		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL && GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")) != -1 && GrandStrategyGame.Provinces[i]->Units[GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"))] < 2) { // make every province that has an owner start with at least two infantry units
-			GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
-		}
-		
-		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL) { // if this province has a culture and an owner
+		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL) {
+			if (!GrandStrategyGameLoading) {
+				if (!GrandStrategyGame.Provinces[i]->HasBuildingClass("town-hall")) { // if the province has an owner but no town hall building, give it one; in the future we may want to have gameplay for provinces without town halls (for instance, for nomadic tribes), but at least until then, keep this in place
+					GrandStrategyGame.Provinces[i]->SetSettlementBuilding(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("town-hall")), true);
+				}
+				
+				if (GrandStrategyGame.Provinces[i]->TotalWorkers < 4) { // make every province that has an owner start with at least four workers
+					GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), 4);
+				}
+
+				if (GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")) != -1 && GrandStrategyGame.Provinces[i]->Units[GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"))] < 2) { // make every province that has an owner start with at least two infantry units
+					GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
+				}
+			}
+			
 			GrandStrategyGame.Provinces[i]->ReallocateLabor(); // allocate labor for provinces
 		}
-
+		
+		
 		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->FoodConsumption > GrandStrategyGame.Provinces[i]->GetFoodCapacity()) { // remove workers if there are so many the province will starve
 			GrandStrategyGame.Provinces[i]->ChangeUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), ((GrandStrategyGame.Provinces[i]->GetFoodCapacity() - GrandStrategyGame.Provinces[i]->FoodConsumption) / FoodConsumptionPerWorker));
 			GrandStrategyGame.Provinces[i]->ReallocateLabor();
@@ -5513,9 +5547,11 @@ void FinalizeGrandStrategyInitialization()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
-				for (std::map<std::pair<int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalRulers.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalRulers.end(); ++iterator) { //set the appropriate historical rulers
-					if (GrandStrategyYear >= iterator->first.first && GrandStrategyYear < iterator->first.second) {
-						GrandStrategyGame.Factions[i][j]->SetRuler(iterator->second->GetFullName());
+				if (!GrandStrategyGameLoading) {
+					for (std::map<std::pair<int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalRulers.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalRulers.end(); ++iterator) { //set the appropriate historical rulers
+						if (GrandStrategyYear >= iterator->first.first && GrandStrategyYear < iterator->first.second) {
+							GrandStrategyGame.Factions[i][j]->SetRuler(iterator->second->GetFullName());
+						}
 					}
 				}
 				

@@ -1553,24 +1553,6 @@ static int CclDefineFaction(lua_State *l)
 				filler.Y = LuaToNumber(l, -1, j + 1);
 				faction->UIFillers.push_back(filler);
 			}
-		} else if (!strcmp(value, "HistoricalRulers")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int start_year = LuaToNumber(l, -1, j + 1);
-				++j;
-				int end_year = LuaToNumber(l, -1, j + 1);
-				++j;
-				std::string ruler_name = TransliterateText(LuaToString(l, -1, j + 1));
-				CCharacter *ruler = GetCharacter(ruler_name);
-				if (ruler == NULL) { //if the character hasn't been defined yet, define it now
-					ruler = new CCharacter;
-					Characters.push_back(ruler);
-				}
-				faction->HistoricalRulers[std::pair<int, int>(start_year, end_year)] = ruler;
-			}
 		} else if (!strcmp(value, "Mod")) {
 			faction->Mod = LuaToString(l, -1);
 		} else {
