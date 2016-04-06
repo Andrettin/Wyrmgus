@@ -1216,7 +1216,9 @@ void CButtonPanel::Draw()
 			CIcon *button_icon = buttons[i].Icon.Icon;
 			
 			// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
-			if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != NULL) {
+			if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->Type->CanAttack && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != NULL && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != NULL) {
+				button_icon = Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action);
+			} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != NULL) {
 				button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
 			} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
 				button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
