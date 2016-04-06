@@ -1481,7 +1481,7 @@ static int SendAttack(const Vec2i &tilePos)
 
 		//Wyrmgus start
 //		if (unit.Type->CanAttack) {
-		if (unit.CanAttack()) {
+		if (unit.CanAttack(true)) {
 		//Wyrmgus end
 			if (!dest || (dest != &unit && CanTarget(*unit.Type, *dest->Type))) {
 				if (dest) {
@@ -1514,7 +1514,7 @@ static int SendAttackGround(const Vec2i &tilePos)
 		CUnit &unit = *Selected[i];
 		//Wyrmgus start
 //		if (unit.Type->CanAttack) {
-		if (unit.CanAttack()) {
+		if (unit.CanAttack(true)) {
 		//Wyrmgus end
 			SendCommandAttackGround(unit, tilePos, flush);
 			ret = 1;

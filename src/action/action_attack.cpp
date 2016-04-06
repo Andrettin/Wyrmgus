@@ -289,7 +289,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 {
 	//Wyrmgus start
 //	Assert(unit.Type->CanAttack);
-	Assert(unit.CanAttack());
+	if (!unit.CanAttack()) {
+		return;
+	}
 	//Wyrmgus end
 
 	FireMissile(unit, this->GetGoal(), this->goalPos);
@@ -378,7 +380,7 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 	if (CheckForDeadGoal(unit)) {
 		return true;
 	}
-
+	
 	// No goal: if meeting enemy attack it.
 	if (!this->HasGoal()
 		&& this->Action != UnitActionAttackGround
@@ -739,6 +741,13 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		unit.Anim = unit.WaitBackup;
 		unit.Waiting = 0;
 	}
+	
+	//Wyrmgus start
+	if (!unit.CanAttack() && !this->HasGoal()) { //if unit is a transporter that can't attack, return false if the original target no longer exists
+		this->Finished = true;
+		return;
+	}
+	//Wyrmgus end
 
 	switch (this->State) {
 		case 0: { // First entry

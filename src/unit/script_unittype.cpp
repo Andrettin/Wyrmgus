@@ -2110,9 +2110,13 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (type->CanMove() || (type->CanAttack && !(type->CanTransport() && type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value))) {
+	if (type->CanMove() || type->CanAttack) {
 		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 2,\n";
+		if (type->CanMove()) {
+			button_definition += "\tPos = 2,\n";
+		} else {
+			button_definition += "\tPos = 1,\n";
+		}
 		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stop\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
@@ -2123,9 +2127,13 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (type->CanAttack && !(type->CanTransport() && type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
+	if (type->CanAttack) {
 		std::string button_definition = "DefineButton({\n";
-		button_definition += "\tPos = 3,\n";
+		if (type->CanMove()) {
+			button_definition += "\tPos = 3,\n";
+		} else {
+			button_definition += "\tPos = 2,\n";
+		}
 		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"attack\",\n";
 		button_definition += "\tPopup = \"popup-commands\",\n";
@@ -2136,7 +2144,7 @@ static int CclDefineUnitType(lua_State *l)
 		CclCommand(button_definition);
 	}
 	
-	if (type->CanMove() && !type->BoolFlag[COWARD_INDEX].value && type->CanAttack && !(type->CanTransport() && type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
+	if (type->CanMove() && !type->BoolFlag[COWARD_INDEX].value && type->CanAttack) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tLevel = 0,\n";

@@ -190,7 +190,7 @@ static bool CanHandleOrder(const CUnit &unit, COrder *order)
 	}
 	//Wyrmgus start
 //	if (order->Action == UnitActionAttack && !unit.Type->CanAttack) {
-	if (order->Action == UnitActionAttack && !unit.CanAttack()) {
+	if (order->Action == UnitActionAttack && !unit.CanAttack(true)) {
 	//Wyrmgus end
 		return false;
 	}

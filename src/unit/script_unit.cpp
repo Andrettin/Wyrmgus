@@ -876,6 +876,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		unit->Remove(transporter);
 		transporter->BoardCount += unit->Type->BoardSize;
 		unit->Boarded = 1;
+		transporter->UpdateContainerAttackRange();
 
 		UpdateForNewUnit(*unit, 0);
 

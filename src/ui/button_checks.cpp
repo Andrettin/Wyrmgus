@@ -344,7 +344,7 @@ bool ButtonCheckAttack(const CUnit &unit, const ButtonAction &)
 {
 	//Wyrmgus start
 //	return unit.Type->CanAttack;
-	return unit.CanAttack();
+	return unit.CanAttack(true);
 	//Wyrmgus end
 }
 

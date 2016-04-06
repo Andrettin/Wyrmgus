@@ -350,7 +350,7 @@ public:
 	int GetItemSlotQuantity(int item_slot) const;
 	int GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
-	bool CanAttack() const;
+	bool CanAttack(bool count_inside = false) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
 	bool CanEquipItem(CUnit *item) const;

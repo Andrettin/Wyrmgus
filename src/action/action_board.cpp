@@ -251,6 +251,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 		unit.Remove(transporter);
 		transporter->BoardCount += unit.Type->BoardSize;
 		unit.Boarded = 1;
+		transporter->UpdateContainerAttackRange();
 		if (!unit.Player->AiEnabled) {
 			// Don't make anything funny after going out of the transporter.
 			CommandStopUnit(unit);

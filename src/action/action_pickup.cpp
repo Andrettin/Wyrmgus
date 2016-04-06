@@ -307,7 +307,7 @@ enum {
 
 				if (dest.NewOrder == NULL
 					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
-					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack())
+					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack(true))
 					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
 					this->Finished = true;
 					return ;

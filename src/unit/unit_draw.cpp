@@ -886,7 +886,7 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 		}
 		//Wyrmgus start
 //		if (type.CanAttack) {
-		if (unit.CanAttack()) {
+		if (unit.CanAttack(true)) {
 		//Wyrmgus end
 			if (Preference.ShowReactionRange) {
 				//Wyrmgus start

@@ -2314,12 +2314,14 @@ void CUnit::UpdateContainerAttackRange()
 {
 	//reset attack range, if this unit is a transporter (or garrisonable building) from which units can attack
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->CanAttack) {
+		this->Variable[ATTACKRANGE_INDEX].Enable = 0;
 		this->Variable[ATTACKRANGE_INDEX].Max = 0;
 		this->Variable[ATTACKRANGE_INDEX].Value = 0;
 		if (this->BoardCount > 0) {
 			CUnit *boarded_unit = this->UnitInside;
 			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
 				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > this->Variable[ATTACKRANGE_INDEX].Value && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) { //if container has no range by itself, but the unit has range, and the unit can attack from a transporter, change the container's range to the unit's
+					this->Variable[ATTACKRANGE_INDEX].Enable = 1;
 					this->Variable[ATTACKRANGE_INDEX].Max = boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX);
 					this->Variable[ATTACKRANGE_INDEX].Value = boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX);
 				}
@@ -4021,10 +4023,10 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	return value;
 }
 
-bool CUnit::CanAttack() const
+bool CUnit::CanAttack(bool count_inside) const
 {
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters can only attack through a unit within them
-		if (this->BoardCount > 0) {
+		if (count_inside && this->BoardCount > 0) {
 			CUnit *boarded_unit = this->UnitInside;
 			for (int i = 0; i < this->InsideCount; ++i, boarded_unit = boarded_unit->NextContained) {
 				if (boarded_unit->GetModifiedVariable(ATTACKRANGE_INDEX) > 1 && boarded_unit->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value) {

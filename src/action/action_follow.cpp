@@ -289,7 +289,7 @@ enum {
 					|| (dest.NewOrder->Action == UnitActionResource && !unit.Type->BoolFlag[HARVESTER_INDEX].value)
 					//Wyrmgus start
 //					|| (dest.NewOrder->Action == UnitActionAttack && !unit.Type->CanAttack)
-					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack())
+					|| (dest.NewOrder->Action == UnitActionAttack && !unit.CanAttack(true))
 					//Wyrmgus end
 					|| (dest.NewOrder->Action == UnitActionBoard && unit.Type->UnitType != UnitTypeLand)) {
 					this->Finished = true;
