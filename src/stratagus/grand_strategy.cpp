@@ -3460,6 +3460,10 @@ void CGrandStrategyHero::Create()
 	this->State = 2;
 	this->Existed = true;
 	
+	if (this->ViolentDeath) { //if the character died a violent death historically, add a random number of years to the hero's natural lifespan
+		this->DeathYear += SyncRand(15);
+	}
+	
 	if (this->ProvinceOfOrigin != NULL && (!this->Icon.Name.empty() || this->Custom)) { //if the hero has its own icon or is a custom hero
 		this->ProvinceOfOrigin->SetHero(this->GetFullName(), 2);
 	}
@@ -5282,9 +5286,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 		}
 		hero->Year = Characters[i]->Year;
 		hero->DeathYear = Characters[i]->DeathYear;
-		if (Characters[i]->ViolentDeath) { //if the character died a violent death historically, add a random number of years to the hero's natural lifespan
-			hero->DeathYear += SyncRand(15);
-		}
+		hero->ViolentDeath = Characters[i]->ViolentDeath;
 		hero->Civilization = Characters[i]->Civilization;
 		hero->ProvinceOfOriginName = Characters[i]->ProvinceOfOriginName;
 		hero->Gender = Characters[i]->Gender;
