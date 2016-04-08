@@ -913,6 +913,20 @@ static void DrawInformations(const CUnit &unit, const CUnitType &type, const Pix
 				}
 			}
 		}
+		
+		//Wyrmgus start
+		if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
+			//show aura range if the unit has an aura
+			if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) {
+				const int value = AuraRange - (unit.Type->TileWidth - 1);
+				const int radius = value * PixelTileSize.x + (type.TileWidth - 1) * PixelTileSize.x / 2;
+
+				if (value) {
+					Video.DrawCircleClip(ColorBlue, center.x, center.y, radius);
+				}
+			}
+		}
+		//Wyrmgus end
 	}
 
 	// FIXME: johns: ugly check here, should be removed!

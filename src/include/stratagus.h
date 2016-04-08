@@ -171,6 +171,8 @@ extern const char NameLine[];
 #define ProvinceMax 256				/// Maximum quantity of provinces in a grand strategy game
 #define RiverMax 256				/// Maximum quantity of rivers in a grand strategy game
 #define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
+
+#define AuraRange 6					/// Range of auras
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)

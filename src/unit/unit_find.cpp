@@ -54,17 +54,26 @@
   -- Finding units
   ----------------------------------------------------------------------------*/
 
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
+//Wyrmgus start
+//void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
+void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, bool circle)
+//Wyrmgus end
 {
 	Select(ltPos, rbPos, units, NoFilter());
 }
 
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
+//Wyrmgus start
+//void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
+void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, bool circle)
+//Wyrmgus end
 {
 	Select(ltPos, rbPos, units, NoFilter());
 }
 
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around)
+//Wyrmgus start
+//void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around)
+void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, bool circle)
+//Wyrmgus end
 {
 	SelectAroundUnit(unit, range, around, NoFilter());
 }

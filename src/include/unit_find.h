@@ -252,19 +252,48 @@ private:
 	CUnit **unitP;
 };
 
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around);
+//Wyrmgus start
+//void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
+//void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units);
+//void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around);
+void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, bool circle = false);
+void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, bool circle = false);
+void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, bool circle = false);
+//Wyrmgus end
 
 template <typename Pred>
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+//Wyrmgus start
+//void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred, bool circle = false)
+//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(ltPos));
 	Assert(Map.Info.IsPointOnMap(rbPos));
 	Assert(units.empty());
+	
+	//Wyrmgus start
+	double middle_x;
+	double middle_y;
+	double radius;
+	if (circle) {
+		middle_x = (rbPos.x + ltPos.x) / 2;
+		middle_y = (rbPos.y + ltPos.y) / 2;
+		radius = ((middle_x - ltPos.x) + (middle_y - ltPos.y)) / 2;
+	}
+	//Wyrmgus end
 
 	for (Vec2i posIt = ltPos; posIt.y != rbPos.y + 1; ++posIt.y) {
 		for (posIt.x = ltPos.x; posIt.x != rbPos.x + 1; ++posIt.x) {
+			//Wyrmgus start
+			if (circle) {
+				double rel_x = posIt.x - middle_x;
+				double rel_y = posIt.y - middle_y;
+				double my = radius * radius - rel_x * rel_x;
+				if ((rel_y * rel_y) > my) {
+					continue;
+				}
+			}
+			//Wyrmgus end
 			const CMapField &mf = *Map.Field(posIt);
 			const CUnitCache &cache = mf.UnitCache;
 
@@ -284,7 +313,10 @@ void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &u
 }
 
 template <typename Pred>
-void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
+//Wyrmgus start
+//void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred)
+void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around, Pred pred, bool circle = false)
+//Wyrmgus end
 {
 	const Vec2i offset(range, range);
 	//Wyrmgus start
@@ -295,17 +327,26 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 
 	Select(unit.tilePos - offset,
 		   unit.tilePos + typeSize + offset, around,
-		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
+		   //Wyrmgus start
+//		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred));
+		   MakeAndPredicate(IsNotTheSameUnitAs(unit), pred), circle);
+		   //Wyrmgus end
 }
 
 template <typename Pred>
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+//Wyrmgus start
+//void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred)
+void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, Pred pred, bool circle = false)
+//Wyrmgus end
 {
 	Vec2i minPos = ltPos;
 	Vec2i maxPos = rbPos;
 
 	Map.FixSelectionArea(minPos, maxPos);
-	SelectFixed(minPos, maxPos, units, pred);
+	//Wyrmgus start
+//	SelectFixed(minPos, maxPos, units, pred);
+	SelectFixed(minPos, maxPos, units, pred, circle);
+	//Wyrmgus end
 }
 
 template <typename Pred>

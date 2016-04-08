@@ -356,14 +356,14 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	//Wyrmgus start
 	//apply auras to all appropriate nearby units
 	if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
-		int aura_range = 4;
+		int aura_range = AuraRange - (unit.Type->TileWidth - 1);
 		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) { // regeneration aura
 			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) {
 				unit.ApplyAuraEffect(REGENERATIONAURA_INDEX);
 			}
 			
 			std::vector<CUnit *> table;
-			SelectAroundUnit(unit, aura_range, table, MakeAndPredicate(MakeOrPredicate(HasSamePlayerAs(*unit.Player), IsAlliedWith(*unit.Player)), IsOrganicType()));
+			SelectAroundUnit(unit, aura_range, table, MakeAndPredicate(MakeOrPredicate(HasSamePlayerAs(*unit.Player), IsAlliedWith(*unit.Player)), IsOrganicType()), true);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (table[i]->Variable[HP_INDEX].Value < table[i]->Variable[HP_INDEX].Max) {
 					table[i]->ApplyAuraEffect(REGENERATIONAURA_INDEX);
