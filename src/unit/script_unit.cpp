@@ -491,6 +491,11 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "active")) {
 			unit->Active = 1;
 			--j;
+		//Wyrmgus start
+		} else if (!strcmp(value, "starting")) {
+			unit->Starting = 1;
+			--j;
+		//Wyrmgus end
 		} else if (!strcmp(value, "ttl")) {
 			// FIXME : unsigned long should be better handled
 			unit->TTL = LuaToNumber(l, 2, j + 1);
@@ -598,6 +603,9 @@ static int CclUnit(lua_State *l)
 				//Wyrmgus start
 				if (unit->Character == NULL) {
 					unit->Player->UnitTypesNonHeroCount[type->Slot]--;
+					if (unit->Starting) {
+						unit->Player->UnitTypesStartingNonHeroCount[type->Slot]--;
+					}
 				} else {
 					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit->Character->GetFullName()), unit->Player->Heroes.end());
 				}
@@ -807,6 +815,14 @@ static int CclCreateUnit(lua_State *l)
 		}
 		UpdateForNewUnit(*unit, 0);
 
+		//Wyrmgus start
+		if (!unit->Starting) {
+			unit->Starting = 1;
+			unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
+			//make sure the unit is always a "Starting" one if created with this function
+		}
+		//Wyrmgus end
+		
 		lua_pushnumber(l, UnitNumber(*unit));
 		return 1;
 	}
@@ -880,6 +896,12 @@ static int CclCreateUnitInTransporter(lua_State *l)
 
 		UpdateForNewUnit(*unit, 0);
 
+		if (!unit->Starting) {
+			unit->Starting = 1;
+			unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
+			//make sure the unit is always a "Starting" one if created with this function
+		}
+		
 		lua_pushnumber(l, UnitNumber(*unit));
 		return 1;
 	}
@@ -1609,6 +1631,16 @@ static int CclSetUnitVariable(lua_State *l)
 		}
 		unit->Active = ai_active;
 	//Wyrmgus start
+	} else if (!strcmp(name, "Starting")) {
+		bool starting = LuaToBoolean(l, 3);
+		if (starting != unit->Starting && unit->Character == NULL) {
+			if (starting) {
+				unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
+			} else {
+				unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]--;
+			}
+		}
+		unit->Starting = starting;
 	} else if (!strcmp(name, "Character")) {
 		unit->SetCharacter(LuaToString(l, 3));
 	} else if (!strcmp(name, "CustomHero")) {

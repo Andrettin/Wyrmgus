@@ -425,6 +425,7 @@ extern bool GrandStrategy;								/// if the game is in grand strategy mode
 extern bool GrandStrategyGamePaused;					/// if the grand strategy game is paused
 extern bool GrandStrategyGameInitialized;				/// if the grand strategy game has been initialized
 extern bool GrandStrategyGameLoading;
+extern bool GrandStrategyBattleBaseBuilding;			/// if grand strategy game has base building in battles
 extern int GrandStrategyYear;
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;

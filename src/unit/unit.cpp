@@ -507,6 +507,9 @@ void CUnit::Init()
 	Summoned = 0;
 	Waiting = 0;
 	MineLow = 0;
+	//Wyrmgus start
+	Starting = 0;
+	//Wyrmgus end
 	memset(&Anim, 0, sizeof(Anim));
 	memset(&WaitBackup, 0, sizeof(WaitBackup));
 	CurrentResource = 0;
@@ -755,6 +758,9 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	if (this->Character == NULL) {
 		this->Player->UnitTypesNonHeroCount[this->Type->Slot]--;
+		if (this->Starting) {
+			this->Player->UnitTypesStartingNonHeroCount[this->Type->Slot]--;
+		}
 	} else {
 		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this->Character->GetFullName()), this->Player->Heroes.end());
 	}
@@ -833,6 +839,9 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	if (this->Character == NULL) {
 		this->Player->UnitTypesNonHeroCount[this->Type->Slot]++;
+		if (this->Starting) {
+			this->Player->UnitTypesStartingNonHeroCount[this->Type->Slot]++;
+		}
 	} else {
 		this->Player->Heroes.push_back(this->Character->GetFullName());
 	}
@@ -1802,6 +1811,11 @@ void CUnit::Init(const CUnitType &type)
 	//Wyrmgus end
 	Active = 1;
 	Removed = 1;
+	//Wyrmgus start
+	if (!GameRunning && !SaveGameLoading) { //if unit was created before the game started, it is a starting unit
+		Starting = 1;
+	}
+	//Wyrmgus end
 
 	// Has StartingResources, Use those
 	this->ResourcesHeld = type.StartingResources;
@@ -1897,6 +1911,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		//Wyrmgus start
 		if (this->Character == NULL) {
 			player.UnitTypesNonHeroCount[type.Slot]++;
+			if (this->Starting) {
+				player.UnitTypesStartingNonHeroCount[type.Slot]++;
+			}
 		} else {
 			player.Heroes.push_back(this->Character->GetFullName());
 		}
@@ -2657,6 +2674,9 @@ void UnitLost(CUnit &unit)
 			//Wyrmgus start
 			if (unit.Character == NULL) {
 				player.UnitTypesNonHeroCount[type.Slot]--;
+				if (unit.Starting) {
+					player.UnitTypesStartingNonHeroCount[type.Slot]--;
+				}
 			} else {
 				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), unit.Character->GetFullName()), player.Heroes.end());
 			}
@@ -3257,6 +3277,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	//Wyrmgus start
 	if (this->Character == NULL) {
 		newplayer.UnitTypesNonHeroCount[Type->Slot]++;
+		if (this->Starting) {
+			newplayer.UnitTypesStartingNonHeroCount[Type->Slot]++;
+		}
 	} else {
 		newplayer.Heroes.push_back(this->Character->GetFullName());
 	}

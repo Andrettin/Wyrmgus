@@ -415,8 +415,12 @@ extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
 extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int *distance = NULL);
 //Wyrmgus end
 /// Find best enemy in numeric range to attack
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred);
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);
+//Wyrmgus start
+//extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred);
+//extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool circle = false);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle = false);
+//Wyrmgus end
 /// Find best enemy in attack range to attack
 extern CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred);
 extern CUnit *AttackUnitsInRange(const CUnit &unit);

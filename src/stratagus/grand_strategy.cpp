@@ -66,6 +66,7 @@ bool GrandStrategy = false;				///if the game is in grand strategy mode
 bool GrandStrategyGamePaused = false;
 bool GrandStrategyGameInitialized = false;
 bool GrandStrategyGameLoading = false;
+bool GrandStrategyBattleBaseBuilding = false;
 int GrandStrategyYear = 0;
 std::string GrandStrategyWorld;
 int WorldMapOffsetX;

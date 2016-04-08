@@ -1220,7 +1220,10 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 **
 **  @return       Unit to be attacked.
 */
-CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
+//Wyrmgus start
+//CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
+CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool circle)
+//Wyrmgus end
 {
 	// if necessary, take possible damage on allied units into account...
 	//Wyrmgus start
@@ -1245,7 +1248,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 		SelectAroundUnit(*firstContainer, missile_range, table,
 			//Wyrmgus start
 //			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
-			pred);
+			pred, circle);
 			//Wyrmgus end
 
 		if (table.empty() == false) {
@@ -1260,7 +1263,7 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 		SelectAroundUnit(*firstContainer, range, table,
 			//Wyrmgus start
 //			MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), pred));
-			pred);
+			pred, circle);
 			//Wyrmgus end
 
 		const int n = static_cast<int>(table.size());
@@ -1273,9 +1276,15 @@ CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred)
 	}
 }
 
-CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
+//Wyrmgus start
+//CUnit *AttackUnitsInDistance(const CUnit &unit, int range)
+CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle)
+//Wyrmgus end
 {
-	return AttackUnitsInDistance(unit, range, NoFilter());
+	//Wyrmgus start
+//	return AttackUnitsInDistance(unit, range, NoFilter());
+	return AttackUnitsInDistance(unit, range, NoFilter(), circle);
+	//Wyrmgus end
 }
 
 /**
@@ -1313,9 +1322,10 @@ CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred)
 //	Assert(unit.Type->CanAttack);
 	Assert(unit.CanAttack());
 //	const int range = unit.Player->Type == PlayerPerson ? unit.Type->ReactRangePerson : unit.Type->ReactRangeComputer;
+//	return AttackUnitsInDistance(unit, range, pred);
 	const int range = unit.GetReactionRange();
+	return AttackUnitsInDistance(unit, range, pred, true);
 	//Wyrmgus end
-	return AttackUnitsInDistance(unit, range, pred);
 }
 
 CUnit *AttackUnitsInReactRange(const CUnit &unit)

@@ -29,6 +29,7 @@ class CPlayer
 	const int UnitTypesAiActiveCount[UnitTypeMax];
 	//Wyrmgus start
 	const int UnitTypesNonHeroCount[UnitTypeMax];
+	const int UnitTypesStartingNonHeroCount[UnitTypeMax];
 	//Wyrmgus end
 	bool AiEnabled;
 

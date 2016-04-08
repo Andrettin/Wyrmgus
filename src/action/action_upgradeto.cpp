@@ -145,6 +145,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	if (unit.Character == NULL) {
 		player.UnitTypesNonHeroCount[oldtype.Slot]--;
 		player.UnitTypesNonHeroCount[newtype.Slot]++;
+		if (unit.Starting) {
+			player.UnitTypesStartingNonHeroCount[oldtype.Slot]--;
+			player.UnitTypesStartingNonHeroCount[newtype.Slot]++;
+		}
 	}
 	//Wyrmgus end
 

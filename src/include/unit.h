@@ -469,6 +469,10 @@ public:
 	unsigned Summoned : 1;       /// Unit is summoned using spells.
 	unsigned Waiting : 1;        /// Unit is waiting and playing its still animation
 	unsigned MineLow : 1;        /// This mine got a notification about its resources being low
+	
+	//Wyrmgus start
+	unsigned Starting : 1;		 /// Whether this is a starting unit
+	//Wyrmgus end
 
 	unsigned TeamSelected;  /// unit is selected by a team member.
 	CPlayer *RescuedFrom;        /// The original owner of a rescued unit.

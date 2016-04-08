@@ -133,6 +133,7 @@ public:
 	int UnitTypesAiActiveCount[UnitTypeMax];  /// total units of unit-type that have their AI set to active
 	//Wyrmgus start
 	int UnitTypesNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character
+	int UnitTypesStartingNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character and which are starting units
 	std::vector<std::string> Heroes;			/// characters owned by this player
 	//Wyrmgus end
 
