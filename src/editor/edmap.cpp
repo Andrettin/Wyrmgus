@@ -126,7 +126,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 //	mf.setTileIndex(*Map.Tileset, tile, 0);
 	int value = 0;
 	if ((Map.Tileset->tiles[tile].flag & MapFieldForest) || (Map.Tileset->tiles[tile].flag & MapFieldRocks)) {
-		value = 100;
+		value = 500;
 	}
 	mf.setTileIndex(*Map.Tileset, tile, value);
 	//Wyrmgus end

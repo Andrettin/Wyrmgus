@@ -242,7 +242,10 @@ private:
 	unsigned char cost;        /// unit cost to move in this tile
 public:
 	// FIXME: Value should be removed, walls and regeneration can be handled differently.
-	unsigned char Value;       /// HP for walls/ Wood Regeneration
+	//Wyrmgus start
+//	unsigned char Value;       /// HP for walls/ Wood Regeneration
+	int Value;       /// HP for walls/ Wood Regeneration
+	//Wyrmgus end
 	CUnitCache UnitCache;      /// A unit on the map field.
 
 	CMapFieldPlayerInfo playerInfo; /// stuff related to player

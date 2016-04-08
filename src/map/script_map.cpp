@@ -362,8 +362,14 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
 		return;
 	}
-	if (value < 0 || value >= 256) {
-		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
+	//Wyrmgus start
+//	if (value < 0 || value >= 256) {
+	if (value < 0) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		fprintf(stderr, "Invalid tile number: %d\n", tileIndex);
+		fprintf(stderr, "Invalid tile value: %d\n", value);
+		//Wyrmgus end
 		return;
 	}
 
