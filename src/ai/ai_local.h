@@ -438,7 +438,10 @@ extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUn
 // Buildings
 //
 /// Find nice building place
-extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
+//Wyrmgus start
+//extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
+extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration = false);
+//Wyrmgus end
 
 //
 // Forces

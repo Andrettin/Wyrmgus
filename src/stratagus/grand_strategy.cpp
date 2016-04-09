@@ -5460,7 +5460,7 @@ void InitializeGrandStrategyProvinces()
 		for (size_t j = 0; j < Provinces[i]->FactionClaims.size(); ++j) {
 			province->AddFactionClaim(Provinces[i]->FactionClaims[j]->Civilization, Provinces[i]->FactionClaims[j]->ID);
 		}
-		if (!GrandStrategyGameLoading) {
+		if (GrandStrategyGameLoading == false) {
 			for (std::map<int, int>::reverse_iterator iterator = Provinces[i]->HistoricalCultures.rbegin(); iterator != Provinces[i]->HistoricalCultures.rend(); ++iterator) {
 				if (GrandStrategyYear >= iterator->first) { // set the owner to the last historical owner that is still after the chosen start date
 					province->SetCivilization(iterator->second);
@@ -5496,7 +5496,7 @@ void FinalizeGrandStrategyInitialization()
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		GrandStrategyGame.Heroes[i]->Initialize();
 		
-		if (!GrandStrategyGameLoading) {
+		if (GrandStrategyGameLoading == false) {
 			if (GrandStrategyYear >= GrandStrategyGame.Heroes[i]->Year) {
 				GrandStrategyGame.Heroes[i]->Existed = true;
 			}
@@ -5515,7 +5515,7 @@ void FinalizeGrandStrategyInitialization()
 	//initialize literary works
 	int works_size = GrandStrategyGame.Works.size();
 	for (int i = (works_size - 1); i >= 0; --i) {
-		if (!GrandStrategyGameLoading) {
+		if (GrandStrategyGameLoading == false) {
 			if (GrandStrategyGame.Works[i]->Year != 0 && GrandStrategyYear >= GrandStrategyGame.Works[i]->Year) { //if the game is starting after the publication date of this literary work, remove it from the work list
 				GrandStrategyGame.Works.erase(std::remove(GrandStrategyGame.Works.begin(), GrandStrategyGame.Works.end(), GrandStrategyGame.Works[i]), GrandStrategyGame.Works.end());
 			}
@@ -5524,7 +5524,7 @@ void FinalizeGrandStrategyInitialization()
 	
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (!GrandStrategyGameLoading) {
+			if (GrandStrategyGameLoading == false) {
 				// add historical technologies that should have been discovered at the game's start date; do this here instead of together with the other faction initialization finalization elements because it can affect the food productivity used to determine some province settings below
 				for (std::map<std::string, int>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalTechnologies.end(); ++iterator) {
 					if (GrandStrategyYear >= iterator->second) {
@@ -5554,7 +5554,7 @@ void FinalizeGrandStrategyInitialization()
 		}
 		
 		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL) {
-			if (!GrandStrategyGameLoading) {
+			if (GrandStrategyGameLoading == false) {
 				if (!GrandStrategyGame.Provinces[i]->HasBuildingClass("town-hall")) { // if the province has an owner but no town hall building, give it one; in the future we may want to have gameplay for provinces without town halls (for instance, for nomadic tribes), but at least until then, keep this in place
 					GrandStrategyGame.Provinces[i]->SetSettlementBuilding(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("town-hall")), true);
 				}
@@ -5587,7 +5587,7 @@ void FinalizeGrandStrategyInitialization()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
-				if (!GrandStrategyGameLoading) {
+				if (GrandStrategyGameLoading == false) {
 					for (std::map<std::pair<int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalRulers.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalRulers.end(); ++iterator) { //set the appropriate historical rulers
 						if (GrandStrategyYear >= iterator->first.first && GrandStrategyYear < iterator->first.second) {
 							GrandStrategyGame.Factions[i][j]->SetRuler(iterator->second->GetFullName());

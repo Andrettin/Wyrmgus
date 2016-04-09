@@ -906,6 +906,79 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		return 1;
 	}
 }
+
+/**
+**  Create a building and place it on a random location map
+**
+**  @param l  Lua state.
+**
+**  @return   Returns the slot number of the made unit.
+*/
+static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
+{
+	LuaCheckArgs(l, 4);
+
+	lua_pushvalue(l, 1);
+	CUnitType *unittype = CclGetUnitType(l);
+	if (unittype == NULL) {
+		LuaError(l, "Bad unittype");
+	}
+	lua_pop(l, 1);
+	Vec2i ipos;
+	CclGetPos(l, &ipos.x, &ipos.y, 3);
+
+	lua_pushvalue(l, 4);
+	CUnit *worker = CclGetUnit(l);
+	lua_pop(l, 1);
+	if (worker == NULL) {
+		LuaError(l, "Worker unit is NULL");
+		return 0;
+	}
+	
+	lua_pushvalue(l, 2);
+	const int playerno = TriggerGetPlayer(l);
+	lua_pop(l, 1);
+	if (playerno == -1) {
+		printf("CreateUnit: You cannot use \"any\" in create-unit, specify a player\n");
+		LuaError(l, "bad player");
+		return 0;
+	}
+	if (Players[playerno].Type == PlayerNobody) {
+		printf("CreateUnit: player %d does not exist\n", playerno);
+		LuaError(l, "bad player");
+		return 0;
+	}
+	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	if (unit == NULL) {
+		DebugPrint("Unable to allocate unit");
+		return 0;
+	} else {
+		Vec2i new_pos;
+		AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true);
+		
+		if (UnitCanBeAt(*unit, new_pos)
+			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0))) {
+			unit->Place(new_pos);
+		} else {
+			const int heading = SyncRand() % 256;
+
+			unit->tilePos = new_pos;
+			DropOutOnSide(*unit, heading, NULL);
+		}
+		UpdateForNewUnit(*unit, 0);
+
+		//Wyrmgus start
+		if (!unit->Starting) {
+			unit->Starting = 1;
+			unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
+			//make sure the unit is always a "Starting" one if created with this function
+		}
+		//Wyrmgus end
+		
+		lua_pushnumber(l, UnitNumber(*unit));
+		return 1;
+	}
+}
 //Wyrmgus end
 
 /**
@@ -1840,6 +1913,7 @@ void UnitCclRegister()
 	lua_register(Lua, "KillUnitAt", CclKillUnitAt);
 	//Wyrmgus start
 	lua_register(Lua, "CreateUnitInTransporter", CclCreateUnitInTransporter);
+	lua_register(Lua, "CreateBuildingAtRandomLocationNear", CclCreateBuildingAtRandomLocationNear);
 	lua_register(Lua, "ChangeUnitOwner", CclChangeUnitOwner);
 	lua_register(Lua, "ConvertUnit", CclConvertUnit);
 	lua_register(Lua, "IncreaseUnitLevel", CclIncreaseUnitLevel);

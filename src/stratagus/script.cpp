@@ -2832,6 +2832,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 		 //the global variables pertaining to the grand strategy game have been saved, now get to the grand strategy variables stored by the engine directly
 		 
 		fprintf(fd, "SetGrandStrategyWorld(\"%s\")\n", GrandStrategyWorld.c_str());
+		fprintf(fd, "InitializeGrandStrategyGame()\n");
 		fprintf(fd, "SetWorldMapSize(%d, %d)\n", GetWorldMapWidth(), GetWorldMapHeight()); //save world map size
 		for (int x = 0; x < GetWorldMapWidth(); ++x) {
 			for (int y = 0; y < GetWorldMapHeight(); ++y) {

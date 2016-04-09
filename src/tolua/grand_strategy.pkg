@@ -2,6 +2,7 @@
 extern bool GrandStrategy;
 extern bool GrandStrategyGamePaused;
 extern bool GrandStrategyGameInitialized;
+extern bool GrandStrategyGameLoading;
 extern bool GrandStrategyBattleBaseBuilding;
 extern int GrandStrategyYear;
 extern std::string GrandStrategyWorld;
