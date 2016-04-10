@@ -956,6 +956,10 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		Vec2i new_pos;
 		AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true);
 		
+		if (!Map.Info.IsPointOnMap(new_pos)) {
+			return 0;
+		}
+
 		if (UnitCanBeAt(*unit, new_pos)
 			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0))) {
 			unit->Place(new_pos);
