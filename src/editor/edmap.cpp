@@ -125,8 +125,10 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 	//Wyrmgus start
 //	mf.setTileIndex(*Map.Tileset, tile, 0);
 	int value = 0;
-	if ((Map.Tileset->tiles[tile].flag & MapFieldForest) || (Map.Tileset->tiles[tile].flag & MapFieldRocks)) {
-		value = 500;
+	if (Map.Tileset->tiles[tile].flag & MapFieldForest) {
+		value = DefaultResourceAmounts[WoodCost];
+	} else if (Map.Tileset->tiles[tile].flag & MapFieldRocks) {
+		value = DefaultResourceAmounts[StoneCost];
 	}
 	mf.setTileIndex(*Map.Tileset, tile, value);
 	//Wyrmgus end

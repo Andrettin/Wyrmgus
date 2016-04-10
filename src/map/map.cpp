@@ -726,31 +726,31 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 				&& ((std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), horizontalMf.getGraphicTile()) != this->Tileset->removedTreeTiles.end() && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupedFlag)) || (horizontalMf.getFlag() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
-				verticalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 500);
+				verticalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), DefaultResourceAmounts[WoodCost]);
 				verticalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 				verticalMf.playerInfo.SeenTile = verticalMf.getGraphicTile();
-				verticalMf.Value = 500;
+				verticalMf.Value = DefaultResourceAmounts[WoodCost];
 				UI.Minimap.UpdateSeenXY(pos + verticalOffset);
 				UI.Minimap.UpdateXY(pos + verticalOffset);
 				
-				diagonalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 500);
+				diagonalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), DefaultResourceAmounts[WoodCost]);
 				diagonalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 				diagonalMf.playerInfo.SeenTile = diagonalMf.getGraphicTile();
-				diagonalMf.Value = 500;
+				diagonalMf.Value = DefaultResourceAmounts[WoodCost];
 				UI.Minimap.UpdateSeenXY(pos + diagonalOffset);
 				UI.Minimap.UpdateXY(pos + diagonalOffset);
 				
-				horizontalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 500);
+				horizontalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), DefaultResourceAmounts[WoodCost]);
 				horizontalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 				horizontalMf.playerInfo.SeenTile = horizontalMf.getGraphicTile();
-				horizontalMf.Value = 500;
+				horizontalMf.Value = DefaultResourceAmounts[WoodCost];
 				UI.Minimap.UpdateSeenXY(pos + horizontalOffset);
 				UI.Minimap.UpdateXY(pos + horizontalOffset);
 				
-				mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), 500);
+				mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), DefaultResourceAmounts[WoodCost]);
 				mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
 				mf.playerInfo.SeenTile = mf.getGraphicTile();
-				mf.Value = 500;
+				mf.Value = DefaultResourceAmounts[WoodCost];
 				UI.Minimap.UpdateSeenXY(pos);
 				UI.Minimap.UpdateXY(pos);
 				

@@ -2260,8 +2260,10 @@ void CEditor::Init()
 			//Wyrmgus start
 //			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
 			int value = 0;
-			if ((tileset.tiles[tileset.getTileNumber(defaultTile, true, false)].flag & MapFieldForest) || (tileset.tiles[tileset.getTileNumber(defaultTile, true, false)].flag & MapFieldRocks)) {
-				value = 100;
+			if (tileset.tiles[tileset.getTileNumber(defaultTile, true, false)].flag & MapFieldForest) {
+				value = DefaultResourceAmounts[WoodCost];
+			} else if (tileset.tiles[tileset.getTileNumber(defaultTile, true, false)].flag & MapFieldRocks) {
+				value = DefaultResourceAmounts[StoneCost];
 			}
 			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), value);
 			//Wyrmgus end

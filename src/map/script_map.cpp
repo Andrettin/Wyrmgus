@@ -290,11 +290,20 @@ static int CclSetForestRegeneration(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	int i = LuaToNumber(l, 1);
+	//Wyrmgus start
+	/*
 	if (i < 0 || i > 255) {
 		PrintFunction();
 		fprintf(stdout, "Regeneration speed should be 0 - 255\n");
 		i = 100;
 	}
+	*/
+	if (i < 0) {
+		PrintFunction();
+		fprintf(stdout, "Regeneration speed should be greater than 0\n");
+		i = 100;
+	}
+	//Wyrmgus end
 	const int old = ForestRegeneration;
 	ForestRegeneration = i;
 
@@ -372,6 +381,15 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 		//Wyrmgus end
 		return;
 	}
+	
+	//Wyrmgus start
+	//wood and rock tiles must always begin with the default value for their respective resource types
+	if (Map.Tileset->tiles[tileIndex].flag & MapFieldForest) {
+		value = DefaultResourceAmounts[WoodCost];
+	} else if (Map.Tileset->tiles[tileIndex].flag & MapFieldRocks) {
+		value = DefaultResourceAmounts[StoneCost];
+	}
+	//Wyrmgus end
 
 	if (Map.Fields) {
 		CMapField &mf = *Map.Field(pos);
