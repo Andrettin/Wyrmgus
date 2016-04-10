@@ -1590,6 +1590,12 @@ static int CclGetUnitVariable(lua_State *l)
 		} else {
 			lua_pushstring(l, "");
 		}
+	} else if (!strcmp(value, "Unique")) {
+		if (unit->Unique) {
+			lua_pushstring(l, unit->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 	} else if (!strcmp(value, "Work")) {
 		if (unit->Work != NULL) {
 			lua_pushstring(l, unit->Work->Ident.c_str());
@@ -1738,7 +1744,9 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "Prefix")) { //add an item prefix to the unit
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
-		if (CUpgrade::Get(upgrade_ident)) {
+		if (upgrade_ident.empty()) {
+			unit->SetPrefix(NULL);
+		} else if (CUpgrade::Get(upgrade_ident)) {
 			unit->SetPrefix(CUpgrade::Get(upgrade_ident));
 		} else {
 			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
@@ -1746,7 +1754,9 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "Suffix")) { //add an item suffix to the unit
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
-		if (CUpgrade::Get(upgrade_ident)) {
+		if (upgrade_ident.empty()) {
+			unit->SetSuffix(NULL);
+		} else if (CUpgrade::Get(upgrade_ident)) {
 			unit->SetSuffix(CUpgrade::Get(upgrade_ident));
 		} else {
 			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
@@ -1754,7 +1764,9 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "Spell")) { //add a spell to the item unit
 		LuaCheckArgs(l, 3);
 		std::string spell_ident = LuaToString(l, 3);
-		if (SpellTypeByIdent(spell_ident)) {
+		if (spell_ident.empty()) {
+			unit->SetSpell(NULL);
+		} else if (SpellTypeByIdent(spell_ident)) {
 			unit->SetSpell(SpellTypeByIdent(spell_ident));
 		} else {
 			LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
@@ -1762,7 +1774,9 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "Work")) { //add a literary work property to the unit
 		LuaCheckArgs(l, 3);
 		std::string upgrade_ident = LuaToString(l, 3);
-		if (CUpgrade::Get(upgrade_ident)) {
+		if (upgrade_ident.empty()) {
+			unit->SetWork(NULL);
+		} else if (CUpgrade::Get(upgrade_ident)) {
 			unit->SetWork(CUpgrade::Get(upgrade_ident));
 		} else {
 			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
@@ -1770,7 +1784,9 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "Unique")) { //set the unit to a particular unique unit
 		LuaCheckArgs(l, 3);
 		std::string unique_name = LuaToString(l, 3);
-		if (GetUniqueItem(unique_name) != NULL) {
+		if (unique_name.empty()) {
+			unit->SetUnique(NULL);
+		} else if (GetUniqueItem(unique_name) != NULL) {
 			unit->SetUnique(GetUniqueItem(unique_name));
 		} else {
 			LuaError(l, "Unique \"%s\" doesn't exist." _C_ unique_name.c_str());

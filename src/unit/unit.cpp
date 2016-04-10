@@ -1377,9 +1377,11 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 		SaveHero(Container->Character);
 	}
 	Prefix = const_cast<CUpgrade *>(&(*prefix));
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (UpgradeModifiers[z]->UpgradeId == Prefix->ID) {
-			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+	if (Prefix != NULL) {
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (UpgradeModifiers[z]->UpgradeId == Prefix->ID) {
+				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
 		}
 	}
 	
@@ -1413,9 +1415,11 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		SaveHero(Container->Character);
 	}
 	Suffix = const_cast<CUpgrade *>(&(*suffix));
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (UpgradeModifiers[z]->UpgradeId == Suffix->ID) {
-			ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+	if (Suffix != NULL) {
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (UpgradeModifiers[z]->UpgradeId == Suffix->ID) {
+				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
+			}
 		}
 	}
 	
@@ -1485,18 +1489,27 @@ void CUnit::SetWork(CUpgrade *work)
 
 void CUnit::SetUnique(CUniqueItem *unique)
 {
-	SetPrefix(unique->Prefix);
-	SetSuffix(unique->Suffix);
-	SetSpell(unique->Spell);
-	SetWork(unique->Work);
-	if (unique->ResourcesHeld != 0) {
-		this->ResourcesHeld = unique->ResourcesHeld;
-		this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
-		this->Variable[GIVERESOURCE_INDEX].Max = unique->ResourcesHeld;
-		this->Variable[GIVERESOURCE_INDEX].Enable = 1;
+	if (unique != NULL) {
+		SetPrefix(unique->Prefix);
+		SetSuffix(unique->Suffix);
+		SetSpell(unique->Spell);
+		SetWork(unique->Work);
+		if (unique->ResourcesHeld != 0) {
+			this->ResourcesHeld = unique->ResourcesHeld;
+			this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
+			this->Variable[GIVERESOURCE_INDEX].Max = unique->ResourcesHeld;
+			this->Variable[GIVERESOURCE_INDEX].Enable = 1;
+		}
+		Name = unique->Name;
+		Unique = true;
+	} else {
+		Name = "";
+		Unique = false;
+		SetPrefix(NULL);
+		SetSuffix(NULL);
+		SetSpell(NULL);
+		SetWork(NULL);
 	}
-	Name = unique->Name;
-	Unique = true;
 }
 
 void CUnit::GenerateDrop()

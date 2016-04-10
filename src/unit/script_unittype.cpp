@@ -2878,6 +2878,22 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "Uniques")) {
+		std::vector<CUniqueItem *> uniques;
+		for (size_t i = 0; i < UniqueItems.size(); ++i)
+		{
+			if (UniqueItems[i]->Type == type) {
+				uniques.push_back(UniqueItems[i]);
+			}
+		}
+		
+		lua_createtable(l, uniques.size(), 0);
+		for (size_t i = 1; i <= uniques.size(); ++i)
+		{
+			lua_pushstring(l, uniques[i-1]->Name.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else if (!strcmp(data, "Variations")) {
 		std::vector<std::string> variation_idents;
 		for (int var_n = 0; var_n < VariationMax; ++var_n) {
