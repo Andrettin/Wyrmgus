@@ -590,8 +590,8 @@ void CGrandStrategyGame::DrawInterface()
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
 				item_y += 1;
 				
-				std::string ruler_class_string = "Class: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Type->Name;
-				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_class_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_class_string);
+				std::string ruler_type_string = "Type: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Type->Name + " Trait: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Trait->Name;
+				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_type_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_type_string);
 				item_y += 1;
 				
 				// draw ruler effects string
