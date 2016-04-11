@@ -2005,15 +2005,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 		}
 		this->Owner->ProvinceCount -= 1;
 		
-		//also remove its resource incomes from the owner's incomes, and reset the province's income so it won't be deduced from the new owner's income when recalculating it
-		this->DeallocateLabor();
-		for (int i = 0; i < MaxCosts; ++i) {
-			if (this->Income[i] != 0) {
-				this->Owner->Income[i] -= this->Income[i];
-				this->Income[i] = 0;
-			}
-		}
-		
 		//set the province's faction-specific units back to the corresponding units of the province's civilization
 		if (this->Owner->Civilization == this->Civilization) {
 			for (size_t i = 0; i < UnitTypes.size(); ++i) { //change the province's military score to be appropriate for the new faction's technologies
@@ -2031,6 +2022,15 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					this->SetUnitQuantity(i, 0);
 					this->UnderConstructionUnits[i] = 0;
 				}
+			}
+		}
+		
+		//also remove its resource incomes from the owner's incomes, and reset the province's income so it won't be deduced from the new owner's income when recalculating it
+		this->DeallocateLabor();
+		for (int i = 0; i < MaxCosts; ++i) {
+			if (this->Income[i] != 0) {
+				this->Owner->Income[i] -= this->Income[i];
+				this->Income[i] = 0;
 			}
 		}
 	}
@@ -2313,8 +2313,8 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	}
 
 	// allocate labor (in case building a town hall or another building may have allowed a new sort of production)
-	if (this->Owner != NULL && this->Labor > 0 && this->HasBuildingClass("town-hall")) {
-		this->AllocateLabor();
+	if (this->Owner != NULL && this->HasBuildingClass("town-hall")) {
+		this->ReallocateLabor();
 	}
 }
 
