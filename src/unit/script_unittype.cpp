@@ -2158,7 +2158,7 @@ static int CclDefineUnitType(lua_State *l)
 	}
 	
 	if (type->CanMove() && !type->BoolFlag[COWARD_INDEX].value && type->CanAttack && !(type->CanTransport() && type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
-		button_definition = "DefineButton({\n";
+		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
 		button_definition += "\tLevel = 0,\n";
 		button_definition += "\tAction = \"stand-ground\",\n";

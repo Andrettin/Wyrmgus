@@ -3156,7 +3156,12 @@ void CGrandStrategyFaction::GenerateRuler()
 		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
 			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("infantry")));
 		}
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("spearman")));
+		}
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("heroic-shooter")));
+		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
 			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-shooter")));
 		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
 			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")));
@@ -3170,6 +3175,11 @@ void CGrandStrategyFaction::GenerateRuler()
 	} else { //only allow priests to rule theocracies
 		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("priest")) != -1) {
 			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("priest")));
+		}
+	}
+	if (this->GovernmentType == GovernmentTypeRepublic) { // allow workers to rule republics
+		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("worker")) != -1) {
+			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("worker")));
 		}
 	}
 	
