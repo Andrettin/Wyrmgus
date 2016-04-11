@@ -174,6 +174,8 @@ public:
 	int GetFoodCapacity(bool subtract_non_food = false);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GenerateProvinceName(int civilization, int faction = -1);
+	CGrandStrategyHero *GenerateHero(std::string type);
+	CGrandStrategyHero *GetRandomAuthor();
 	
 	int Civilization;													/// Civilization of the province (-1 = no one).
 	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
@@ -195,6 +197,7 @@ public:
 	int MovingUnits[UnitTypeMax];										/// Quantity of units of a particular unit type moving to the province
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
+	std::vector<CGrandStrategyHero *> ActiveHeroes;						/// Active (can move, attack and defend) heroes in the province
 	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
 	int Income[MaxCosts];												/// Income for each resource.
 	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
@@ -297,7 +300,7 @@ public:
 	int GetRevoltRiskModifier();
 	std::string GetRulerEffectsString();
 	
-	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province
+	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province, 4 = hero is in the province but not defending it
 	bool Existed;		/// whether the character has existed in this playthrough
 	CGrandStrategyProvince *Province;
 	CGrandStrategyProvince *ProvinceOfOrigin;	/// Province from which the hero originates

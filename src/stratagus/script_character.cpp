@@ -810,6 +810,7 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 	}
 	
 	hero->Initialize();
+	hero->UpdateAttributes();
 	
 	return 0;
 }

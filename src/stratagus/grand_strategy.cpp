@@ -305,7 +305,7 @@ void CGrandStrategyGame::DrawMap()
 						this->SymbolMove->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 					
-					if (this->Provinces[province_id]->Heroes.size() > 0 && this->Provinces[province_id]->Owner != NULL && this->Provinces[province_id]->Owner == this->PlayerFaction && this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
+					if (this->Provinces[province_id]->ActiveHeroes.size() > 0 && this->Provinces[province_id]->Owner != NULL && this->Provinces[province_id]->Owner == this->PlayerFaction && this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
 						this->SymbolHero->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 				}
@@ -526,7 +526,7 @@ void CGrandStrategyGame::DrawInterface()
 		
 		if (GrandStrategyInterfaceState == "Province") {
 			//draw show heroes button
-			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Heroes.size() > 0 && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner == this->PlayerFaction && UI.GrandStrategyShowHeroesButton.X != -1) {
+			if (GrandStrategyGame.Provinces[this->SelectedProvince]->ActiveHeroes.size() > 0 && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner == this->PlayerFaction && UI.GrandStrategyShowHeroesButton.X != -1) {
 				DrawUIButton(
 					UI.GrandStrategyShowHeroesButton.Style,
 					(UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
@@ -1031,8 +1031,8 @@ void CGrandStrategyGame::DoTurn()
 				continue;
 			}
 			
-			if (author != NULL && author->ProvinceOfOrigin != NULL) {
-				this->CreateWork(this->Works[i], author, author->ProvinceOfOrigin);
+			if (author != NULL && author->Province != NULL) {
+				this->CreateWork(this->Works[i], author, author->Province);
 			} else {
 				this->CreateWork(this->Works[i], author, this->CultureProvinces[civilization][SyncRand(this->CultureProvinces[civilization].size())]);
 			}
@@ -1245,7 +1245,7 @@ void CGrandStrategyGame::DoProspection()
 							snprintf(
 								buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 								(CapitalizeString(DefaultResourceNames[i]) + " found in " + GrandStrategyGame.Provinces[province_id]->GetCulturalName()).c_str(),
-								("My lord, " + CapitalizeString(DefaultResourceNames[i]) + " has been found in the " + DecapitalizeString(WorldMapTerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name) + " of " + GrandStrategyGame.Provinces[province_id]->GetCulturalName() + "!").c_str()
+								("My lord, " + CapitalizeString(DefaultResourceNames[i]) + " has been found in the " + FullyDecapitalizeString(WorldMapTerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name) + " of " + GrandStrategyGame.Provinces[province_id]->GetCulturalName() + "!").c_str()
 							);
 							CclCommand(buf);
 							
@@ -1295,9 +1295,13 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 
 	this->Works.erase(std::remove(this->Works.begin(), this->Works.end(), work), this->Works.end()); // remove work from the vector, so that it doesn't get created again
 
+	if (author == NULL) {
+		author = province->GetRandomAuthor();
+	}
+	
 	std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work->Name + "\", \"";
 	if (author != NULL) {
-		work_creation_message += author->GetFullName() + " ";
+		work_creation_message += "The " + FullyDecapitalizeString(author->Type->Name) + " " + author->GetFullName() + " ";
 	} else {
 		work_creation_message += "A sage ";
 	}
@@ -2400,11 +2404,17 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 			
 		if (this != hero->Province || value == 0) { //if the new province is different from the hero's current province
 			if (hero->Province != NULL) {
-				hero->Province->Heroes.erase(std::remove(hero->Province->Heroes.begin(), hero->Province->Heroes.end(), hero), hero->Province->Heroes.end());  //remove the hero from the last province
+				hero->Province->Heroes.erase(std::remove(hero->Province->Heroes.begin(), hero->Province->Heroes.end(), hero), hero->Province->Heroes.end());  //remove the hero from the previous province
+				if (!hero->Icon.Name.empty() || hero->Custom) {
+					hero->Province->ActiveHeroes.erase(std::remove(hero->Province->ActiveHeroes.begin(), hero->Province->ActiveHeroes.end(), hero), hero->Province->ActiveHeroes.end());
+				}
 			}
 			hero->Province = value != 0 ? const_cast<CGrandStrategyProvince *>(&(*this)) : NULL;
 			if (hero->Province != NULL) {
 				hero->Province->Heroes.push_back(hero); //add the hero to the new province
+				if (!hero->Icon.Name.empty() || hero->Custom) {
+					hero->Province->ActiveHeroes.push_back(hero); //add the hero to the new province
+				}
 			}
 		}
 	} else {
@@ -2502,6 +2512,7 @@ void CGrandStrategyProvince::DeallocateLabor()
 		}	
 	}
 	this->Labor = this->TotalWorkers * 100;
+	this->CalculateIncomes();
 }
 
 void CGrandStrategyProvince::ReallocateLabor()
@@ -2732,6 +2743,8 @@ int CGrandStrategyProvince::GetRevoltRisk()
 		}
 	}
 	
+	revolt_risk = std::max(0, revolt_risk);
+	
 	return revolt_risk;
 }
 
@@ -2829,6 +2842,167 @@ std::string CGrandStrategyProvince::GenerateProvinceName(int civilization, int f
 	}
 	
 	return GenerateName(language, "province");
+}
+
+CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type)
+{
+	std::vector<int> potential_hero_unit_types;
+	
+	if (type == "ruler" && this->Owner == NULL) {
+		return NULL;
+	}
+	
+	int civilization;
+	int faction;
+	if (type == "ruler") {
+		civilization = this->Owner->Civilization;
+		faction = this->Owner->Faction;
+	} else {
+		civilization = this->Civilization;
+		if (this->Owner->Civilization == this->Civilization) {
+			faction = this->Owner->Faction;
+		} else {
+			faction = -1;
+		}
+	}
+	
+	if (type == "ruler") {
+		if (PlayerRaces.Factions[civilization][faction]->Type == "tribe" || this->Owner->GovernmentType != GovernmentTypeTheocracy) { //exclude priests from ruling non-theocracies
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")));
+			}
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")));
+			}
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
+			}
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
+			}
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
+			}
+		} else { //only allow priests to rule theocracies
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")));
+			}
+		}
+		if (this->Owner->GovernmentType == GovernmentTypeRepublic) { // allow workers to rule republics
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker")));
+			}
+		}
+	} else if (type == "author") {
+		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")));
+		}
+		
+		if (potential_hero_unit_types.size() == 0) { //if no scholarly unit types are available, then use warriors, since they were likely to form a nobility which could be a contemplative class
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")));
+			}
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")));
+			}
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
+			}
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
+			}
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
+			}
+		}
+	}
+	
+	int unit_type_id;
+	if (potential_hero_unit_types.size() > 0) {
+		unit_type_id = potential_hero_unit_types[SyncRand(potential_hero_unit_types.size())];
+	} else {
+		return NULL;
+	}
+	
+	int type_civilization = PlayerRaces.GetRaceIndexByName(UnitTypes[unit_type_id]->Civilization.c_str()); //use unit type's civilization, so that names can be generated even for civilizations for which we don't have personal name language data defined
+	int language = PlayerRaces.GetCivilizationLanguage(civilization);
+	if (type_civilization != -1 && civilization == type_civilization && faction != -1) {
+		language = PlayerRaces.GetFactionLanguage(type_civilization, faction);
+	}
+	std::string hero_name = GeneratePersonalName(language, unit_type_id, MaleGender);
+	
+	if (hero_name.empty()) { //if civilization can't generate personal names, return
+		return NULL;
+	}
+	
+	std::string hero_extra_name;
+	if (GrandStrategyGame.GetHero(hero_name) != NULL) { // generate extra given names if this name is already used by an existing hero
+		hero_extra_name = GeneratePersonalName(language, unit_type_id, MaleGender);
+		while (GrandStrategyGame.GetHero(hero_name + " " + hero_extra_name) != NULL) {
+			hero_extra_name += " " + GeneratePersonalName(language, unit_type_id, MaleGender);
+		}
+	}
+	CGrandStrategyHero *hero = new CGrandStrategyHero;
+	GrandStrategyGame.Heroes.push_back(hero);
+	hero->Name = hero_name;
+	hero->ExtraName = hero_extra_name;
+	hero->State = 4;
+	hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+	if (hero->Type->Traits.size() > 0) { //generate a trait
+		hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
+	}
+	hero->Year = GrandStrategyYear;
+	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
+	hero->Civilization = civilization;
+	hero->ProvinceOfOrigin = this;
+	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
+	hero->Gender = MaleGender;
+	
+	hero->UpdateAttributes();
+	
+	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
+	hero->ProvinceOfOrigin->SetHero(hero->GetFullName(), hero->State);
+	
+	return hero;
+}
+
+CGrandStrategyHero *CGrandStrategyProvince::GetRandomAuthor()
+{
+	std::vector<CGrandStrategyHero *> potential_authors;
+	
+	for (size_t i = 0; i < this->Heroes.size(); ++i) {
+		if (this->Heroes[i]->Type->Class == "priest") { // first see if there are any heroes in the province from a unit class likely to produce scholarly works
+			potential_authors.push_back(this->Heroes[i]);
+		}
+	}
+	
+	if (potential_authors.size() == 0) { // if the first loop through the province's heroes failed, try to get a hero from any class
+		for (size_t i = 0; i < this->Heroes.size(); ++i) {
+			potential_authors.push_back(this->Heroes[i]);
+		}
+	}
+	
+	if (potential_authors.size() > 0) { // if a hero was found in the province, return it as the result
+		return potential_authors[SyncRand(potential_authors.size())];
+	} else { // if no hero was found, generate one
+		return this->GenerateHero("author");
+	}
 }
 
 void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting)
@@ -3090,7 +3264,7 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 				(this->GetRulerTitle() + " " + this->Ruler->GetFullName()).c_str(),
-				("A new " + DecapitalizeString(this->GetRulerTitle()) + " has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + "Type: " + this->Ruler->Type->Name + "\\n" + "Trait: " + this->Ruler->Trait->Name + "\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
+				("A new " + FullyDecapitalizeString(this->GetRulerTitle()) + " has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + "Type: " + this->Ruler->Type->Name + "\\n" + "Trait: " + this->Ruler->Trait->Name + "\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
 			);
 			CclCommand(buf);	
 		}
@@ -3171,89 +3345,12 @@ void CGrandStrategyFaction::RulerSuccession()
 void CGrandStrategyFaction::GenerateRuler()
 {
 	this->Ruler = NULL;
-	std::vector<int> potential_ruler_unit_types;
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType != GovernmentTypeTheocracy) { //exclude priests from ruling non-theocracies
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("heroic-infantry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-infantry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("infantry")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("spearman")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("heroic-shooter")));
-		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("veteran-shooter")));
-		} else if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("shooter")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("cavalry")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("flying-rider")));
-		}
-	} else { //only allow priests to rule theocracies
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("priest")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("priest")));
-		}
-	}
-	if (this->GovernmentType == GovernmentTypeRepublic) { // allow workers to rule republics
-		if (PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("worker")) != -1) {
-			potential_ruler_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName("worker")));
-		}
-	}
 	
-	int unit_type_id;
-	if (potential_ruler_unit_types.size() > 0) {
-		unit_type_id = potential_ruler_unit_types[SyncRand(potential_ruler_unit_types.size())];
-	} else {
-		return;
-	}
-	
-	int civilization = PlayerRaces.GetRaceIndexByName(UnitTypes[unit_type_id]->Civilization.c_str()); //use unit type's civilization, so that names can be generated even for civilizations for which we don't have personal name language data defined
-	int language = PlayerRaces.GetCivilizationLanguage(civilization);
-	if (civilization != -1 && this->Civilization == civilization && this->Faction != -1) {
-		language = PlayerRaces.GetFactionLanguage(civilization, this->Faction);
-	}
-	std::string hero_name = GeneratePersonalName(language, unit_type_id, MaleGender);
-	
-	if (hero_name.empty()) { //if civilization can't generate personal names, return
-		return;
-	}
-	
-	std::string hero_extra_name;
-	if (GrandStrategyGame.GetHero(hero_name) != NULL) { // generate extra given names if this name is already used by an existing hero
-		hero_extra_name = GeneratePersonalName(language, unit_type_id, MaleGender);
-		while (GrandStrategyGame.GetHero(hero_name + " " + hero_extra_name) != NULL) {
-			hero_extra_name += " " + GeneratePersonalName(language, unit_type_id, MaleGender);
-		}
-	}
-	CGrandStrategyHero *hero = new CGrandStrategyHero;
-	GrandStrategyGame.Heroes.push_back(hero);
-	hero->Name = hero_name;
-	hero->ExtraName = hero_extra_name;
-	hero->State = 2;
-	hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-	if (hero->Type->Traits.size() > 0) { //generate a trait
-		hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
-	}
-	hero->Year = GrandStrategyYear;
-	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
-	hero->Civilization = this->Civilization;
 	if (this->ProvinceCount == 0) {
 		fprintf(stderr, "Faction \"%s\" is generating a ruler, but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Name.c_str());
 	}
-	hero->ProvinceOfOrigin = const_cast<CGrandStrategyProvince *>(&(*GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]));
-	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
-	hero->Gender = MaleGender;
 	
-	hero->UpdateAttributes();
-	
-	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
+	CGrandStrategyHero *hero = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->GenerateHero("ruler");
 	this->SetRuler(hero->GetFullName());
 }
 
@@ -3483,27 +3580,30 @@ void CGrandStrategyHero::Create()
 		this->ProvinceOfOrigin != NULL
 		&& this->ProvinceOfOrigin->Owner != NULL
 		&& this->ProvinceOfOrigin->Owner == GrandStrategyGame.PlayerFaction
-		&& !this->Icon.Name.empty()
 		&& GrandStrategyGameInitialized
 	) {
 		char buf[256];
 		snprintf(
 			buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 			(this->Type->Name + " " + this->GetFullName()).c_str(),
-			("My lord, the hero " + this->GetFullName() + " has come to renown in " + this->ProvinceOfOrigin->GetCulturalName() + " and has entered our service.").c_str()
+			("My lord, the " + FullyDecapitalizeString(this->Type->Name) + " " + this->GetFullName() + " has come to renown in " + this->ProvinceOfOrigin->GetCulturalName() + " and has entered our service.").c_str()
 		);
 		CclCommand(buf);	
 	}
 	
-	this->State = 2;
+	if (!this->Icon.Name.empty() || this->Custom) { //if the hero has its own icon or is a custom hero, make it available for moving around, attacking and defending
+		this->State = 2;
+	} else {
+		this->State = 4;
+	}
 	this->Existed = true;
 	
 	if (this->ViolentDeath) { //if the character died a violent death historically, add a random number of years to the hero's natural lifespan
 		this->DeathYear += SyncRand(15);
 	}
 	
-	if (this->ProvinceOfOrigin != NULL && (!this->Icon.Name.empty() || this->Custom)) { //if the hero has its own icon or is a custom hero
-		this->ProvinceOfOrigin->SetHero(this->GetFullName(), 2);
+	if (this->ProvinceOfOrigin != NULL) {
+		this->ProvinceOfOrigin->SetHero(this->GetFullName(), this->State);
 	}
 }
 
@@ -3516,13 +3616,13 @@ void CGrandStrategyHero::Die()
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 				(GrandStrategyGame.PlayerFaction->GetRulerTitle() + " " + this->GetFullName() + " Dies").c_str(),
-				("Tragic news spread throughout our realm. Our " + DecapitalizeString(GrandStrategyGame.PlayerFaction->GetRulerTitle()) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
+				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetRulerTitle()) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
 			);
 			CclCommand(buf);	
 		} else if (
 			this->Province != NULL
 			&& (
-				((this->State == 1 || this->State == 2) && this->Province->Owner == GrandStrategyGame.PlayerFaction)
+				((this->State == 1 || this->State == 2 || this->State == 4) && this->Province->Owner == GrandStrategyGame.PlayerFaction)
 				|| (this->State == 3 && this->Province->AttackedBy == GrandStrategyGame.PlayerFaction)
 			)
 		) {
@@ -3530,7 +3630,7 @@ void CGrandStrategyHero::Die()
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 				(this->GetFullName() + " Dies").c_str(),
-				("My lord, the hero " + this->GetFullName() + " has died!").c_str()
+				("My lord, the " + FullyDecapitalizeString(this->Type->Name) + " " + this->GetFullName() + " has died!").c_str()
 			);
 			CclCommand(buf);	
 		}
@@ -3544,6 +3644,9 @@ void CGrandStrategyHero::Die()
 		}
 		
 		this->Province->Heroes.erase(std::remove(this->Province->Heroes.begin(), this->Province->Heroes.end(), this), this->Province->Heroes.end());  //remove the hero from its province
+		if (!this->Icon.Name.empty() || this->Custom) {
+			this->Province->ActiveHeroes.erase(std::remove(this->Province->ActiveHeroes.begin(), this->Province->ActiveHeroes.end(), this), this->Province->ActiveHeroes.end());  //remove the hero from its province
+		}
 	}
 	
 	this->Province = NULL;
