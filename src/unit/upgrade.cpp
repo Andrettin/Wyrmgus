@@ -1756,6 +1756,13 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) == unit.Character->Abilities.end()) {
 			unit.Character->Abilities.push_back(upgrade);
 			SaveHero(unit.Character);
+			if (GrandStrategy) { // also save the ability for the character's grand strategy hero version
+				CGrandStrategyHero *hero = GrandStrategyGame.GetHero(unit.Character->GetFullName());
+				if (hero != NULL) {
+					hero->Abilities.push_back(upgrade);
+					hero->UpdateAttributes();
+				}
+			}
 		}
 	}
 	IndividualUpgradeAcquire(unit, upgrade);
@@ -1776,6 +1783,13 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade)
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
 			unit.Character->Abilities.erase(std::remove(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade), unit.Character->Abilities.end());
 			SaveHero(unit.Character);
+			if (GrandStrategy) { // also save the ability for the character's grand strategy hero version
+				CGrandStrategyHero *hero = GrandStrategyGame.GetHero(unit.Character->GetFullName());
+				if (hero != NULL) {
+					hero->Abilities.erase(std::remove(hero->Abilities.begin(), hero->Abilities.end(), upgrade), hero->Abilities.end());
+					hero->UpdateAttributes();
+				}
+			}
 		}
 	}
 	IndividualUpgradeLost(unit, upgrade);
@@ -2007,6 +2021,10 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 						continue;
 					}
 						
+					if (var == STRENGTH_INDEX || var == DEXTERITY_INDEX || var == INTELLIGENCE_INDEX || var == CHARISMA_INDEX) { // don't show attributes for now
+						continue;
+					}
+
 					if (UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
 						if (!first_var) {
 							upgrade_effects_string += ", ";

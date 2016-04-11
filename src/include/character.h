@@ -59,7 +59,7 @@ class CUnit;
 class CUpgrade;
 
 /**
-**  Indexes into item type array.
+**  Indexes into gender array.
 */
 enum Genders {
 	NoGender,
@@ -68,6 +68,15 @@ enum Genders {
 	AsexualGender, //i.e. slimes reproduce asexually
 
 	MaxGenders
+};
+
+enum Attributes {
+	StrengthAttribute,
+	DexterityAttribute,
+	IntelligenceAttribute,
+	CharismaAttribute,
+
+	MaxAttributes
 };
 
 class CCharacter
@@ -79,9 +88,11 @@ public:
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL)
 	{
+		memset(Attributes, 0, sizeof(Attributes));
 		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}
 	
+	int GetAttributeModifier(int attribute);
 	bool IsParentOf(std::string child_full_name);
 	bool IsChildOf(std::string parent_full_name);
 	bool IsSiblingOf(std::string sibling_full_name);
@@ -89,6 +100,7 @@ public:
 	std::string GetFullName();
 	CItem *GetItem(CUnit &item);
 	void GenerateMissingData();
+	void UpdateAttributes();
 
 	int Year;					/// Year in which the character historically starts being active
 	int DeathYear;				/// Year in which the character dies of natural causes
@@ -126,6 +138,7 @@ public:
 	std::vector<CQuest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters
 	std::vector<CQuest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
 	std::vector<CItem *> Items;
+	int Attributes[MaxAttributes];
 	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
 	std::vector<std::tuple<int, int, CFaction *>> HistoricalRulerships;	/// historical rulerships of the character, the first element is the beginning year of the rule, the second one the end year, and the third the faction ruled over
 };
@@ -142,6 +155,7 @@ extern CCharacter *CurrentCustomHero;
 -- Functions
 ----------------------------------------------------------------------------*/
 
+extern int GetAttributeVariableIndex(int attribute);
 extern void CleanCharacters();
 extern CCharacter *GetCharacter(std::string character_full_name);
 extern CCharacter *GetCustomHero(std::string hero_full_name);

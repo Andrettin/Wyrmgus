@@ -3921,8 +3921,11 @@ int CUnit::GetModifiedVariable(int index) const
 {
 	int value = Variable[index].Value;
 	
-	if (index == ATTACKRANGE_INDEX && Container) {
-		value += Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
+	if (index == ATTACKRANGE_INDEX) {
+		if (Container) {
+			value += Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
+		}
+		std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 	}
 	
 	return value;

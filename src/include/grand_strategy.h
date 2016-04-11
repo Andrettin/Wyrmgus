@@ -294,6 +294,7 @@ public:
 	void SetType(int unit_type_id);
 	bool IsAlive();
 	int GetAdministrativeEfficiencyModifier();
+	int GetRevoltRiskModifier();
 	std::string GetRulerEffectsString();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province

@@ -431,6 +431,8 @@ static int CclDefineCharacter(lua_State *l)
 		character->GenerateMissingData();
 	}
 	
+	character->UpdateAttributes();
+	
 	return 0;
 }
 

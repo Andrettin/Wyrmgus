@@ -51,6 +51,7 @@
 #include "quest.h"
 #include "spells.h"
 #include "unit.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -63,6 +64,11 @@ CCharacter *CurrentCustomHero = NULL;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+int CCharacter::GetAttributeModifier(int attribute)
+{
+	return this->Attributes[attribute] - 10;
+}
 
 bool CCharacter::IsParentOf(std::string child_full_name)
 {
@@ -209,6 +215,43 @@ void CCharacter::GenerateMissingData()
 		for (size_t i = 0; i < this->DateReferredCharacters.size(); ++i) {
 			this->DateReferredCharacters[i]->GenerateMissingData();
 		}
+	}
+}
+
+void CCharacter::UpdateAttributes()
+{
+	if (this->Type == NULL) {
+		return;
+	}
+	
+	for (int i = 0; i < MaxAttributes; ++i) {
+		int var = GetAttributeVariableIndex(i);
+		this->Attributes[i] = this->Type->DefaultStat.Variables[var].Value;
+		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (
+				(this->Trait != NULL && UpgradeModifiers[z]->UpgradeId == this->Trait->ID)
+				|| std::find(this->Abilities.begin(), this->Abilities.end(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]) != this->Abilities.end()
+			) {
+				if (UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
+					this->Attributes[i] += UpgradeModifiers[z]->Modifier.Variables[var].Value;
+				}
+			}
+		}
+	}
+}
+
+int GetAttributeVariableIndex(int attribute)
+{
+	if (attribute == StrengthAttribute) {
+		return STRENGTH_INDEX;
+	} else if (attribute == DexterityAttribute) {
+		return DEXTERITY_INDEX;
+	} else if (attribute == IntelligenceAttribute) {
+		return INTELLIGENCE_INDEX;
+	} else if (attribute == CharismaAttribute) {
+		return CHARISMA_INDEX;
+	} else {
+		return -1;
 	}
 }
 

@@ -594,9 +594,29 @@ void CGrandStrategyGame::DrawInterface()
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_class_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_class_string);
 				item_y += 1;
 				
+				// draw ruler effects string
 				std::string ruler_effects_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->GetRulerEffectsString();
-				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_effects_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_effects_string);
-				item_y += 1;
+				
+				int str_width_per_total_width = 1;
+				str_width_per_total_width += GetGameFont().Width(ruler_effects_string) / (218 - 6);
+				
+				int line_length = ruler_effects_string.size() / str_width_per_total_width;
+				
+				int begin = 0;
+				for (int i = 0; i < str_width_per_total_width; ++i) {
+					int end = ruler_effects_string.size();
+					
+					if (i != (str_width_per_total_width - 1)) {
+						end = (i + 1) * line_length;
+						while (ruler_effects_string.substr(end - 1, 1) != " ") {
+							end -= 1;
+						}
+					}
+					
+					CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_effects_string.substr(begin, end - begin)) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23) + i * (GetGameFont().getHeight() + 1), ruler_effects_string.substr(begin, end - begin));
+					
+					begin = end;
+				}
 			}
 		}
 		
@@ -2706,6 +2726,10 @@ int CGrandStrategyProvince::GetRevoltRisk()
 		if (!this->HasFactionClaim(this->Owner->Civilization, this->Owner->Faction)) {
 			revolt_risk += 1; //if the owner does not have a claim to the province, it gets plus 1% revolt risk
 		}
+		
+		if (this->Owner->Ruler != NULL) {
+			revolt_risk += this->Owner->Ruler->GetRevoltRiskModifier();
+		}
 	}
 	
 	return revolt_risk;
@@ -3226,6 +3250,9 @@ void CGrandStrategyFaction::GenerateRuler()
 	hero->ProvinceOfOrigin = const_cast<CGrandStrategyProvince *>(&(*GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]));
 	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
 	hero->Gender = MaleGender;
+	
+	hero->UpdateAttributes();
+	
 	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	this->SetRuler(hero->GetFullName());
 }
@@ -3566,13 +3593,16 @@ int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
 {
 	int modifier = 0;
 	
-	if (this->Type != NULL) {
-		int intelligence = this->Type->DefaultStat.Variables[INTELLIGENCE_INDEX].Value;
-		if (intelligence == 10) {
-			intelligence += 1; //grant +1 intelligence to heroes with 10 intelligence, to prevent them from having no bonus
-		}
-		modifier += (intelligence - 10) * 5; //+2.5% administrative efficiency for every intelligence point above 10, and -2.5% for every point below 10; changed that to 5 for now since heroes don't get intelligence scores which are particularly high
-	}
+	modifier += this->GetAttributeModifier(IntelligenceAttribute) * 5 / 2; //+2.5% administrative efficiency for every intelligence point above 10, and -2.5% for every point below 10
+	
+	return modifier;
+}
+
+int CGrandStrategyHero::GetRevoltRiskModifier()
+{
+	int modifier = 0;
+	
+	modifier += this->GetAttributeModifier(CharismaAttribute) * -1 / 2; //-0.5% revolt risk per charisma modifier
 	
 	return modifier;
 }
@@ -3581,12 +3611,32 @@ std::string CGrandStrategyHero::GetRulerEffectsString()
 {
 	std::string ruler_effects_string;
 	
+	bool first = true;
+	
 	int administrative_modifier = this->GetAdministrativeEfficiencyModifier();
 	if (administrative_modifier != 0) {
+		if (!first) {
+			ruler_effects_string += ", ";
+		} else {
+			first = false;
+		}
 		if (administrative_modifier > 0) {
 			ruler_effects_string += "+";
 		}
 		ruler_effects_string += std::to_string((long long) administrative_modifier) + "% Administrative Efficiency";
+	}
+	
+	int revolt_risk_modifier = this->GetRevoltRiskModifier();
+	if (revolt_risk_modifier != 0) {
+		if (!first) {
+			ruler_effects_string += ", ";
+		} else {
+			first = false;
+		}
+		if (revolt_risk_modifier > 0) {
+			ruler_effects_string += "+";
+		}
+		ruler_effects_string += std::to_string((long long) revolt_risk_modifier) + "% Revolt Risk";
 	}
 	
 	return ruler_effects_string;
@@ -5316,6 +5366,12 @@ void InitializeGrandStrategyGame(bool show_loading)
 				sibling->Siblings.push_back(hero); //when the sibling was defined, the hero wasn't, since by virtue of not being NULL, the sibling was necessarily defined before the hero
 			}
 		}
+		for (size_t j = 0; j < Characters[i]->Abilities.size(); ++j) {
+			hero->Abilities.push_back(Characters[i]->Abilities[j]);
+		}
+		
+		hero->UpdateAttributes();
+
 		if (!Characters[i]->Icon.Name.empty()) {
 			hero->Icon.Name = Characters[i]->Icon.Name;
 			hero->Icon.Icon = NULL;
@@ -5344,6 +5400,13 @@ void InitializeGrandStrategyGame(bool show_loading)
 		hero->Civilization = CurrentCustomHero->Civilization;
 		hero->Gender = CurrentCustomHero->Gender;
 		hero->Custom = CurrentCustomHero->Custom;
+
+		for (size_t j = 0; j < CurrentCustomHero->Abilities.size(); ++j) {
+			hero->Abilities.push_back(CurrentCustomHero->Abilities[j]);
+		}
+		
+		hero->UpdateAttributes();
+		
 		GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 	}
 	
@@ -6513,6 +6576,13 @@ void CreateGrandStrategyCustomHero(std::string hero_full_name)
 	hero->Civilization = custom_hero->Civilization;
 	hero->Gender = custom_hero->Gender;
 	hero->Custom = custom_hero->Custom;
+	
+	for (size_t j = 0; j < custom_hero->Abilities.size(); ++j) {
+		hero->Abilities.push_back(custom_hero->Abilities[j]);
+	}
+		
+	hero->UpdateAttributes();
+	
 	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
 
 	hero->Initialize();
