@@ -3090,7 +3090,7 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 				(this->GetRulerTitle() + " " + this->Ruler->GetFullName()).c_str(),
-				("A new " + DecapitalizeString(this->GetRulerTitle()) + " has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
+				("A new " + DecapitalizeString(this->GetRulerTitle()) + " has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + "Type: " + this->Ruler->Type->Name + "\\n" + "Trait: " + this->Ruler->Trait->Name + "\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
 			);
 			CclCommand(buf);	
 		}
