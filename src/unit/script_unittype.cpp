@@ -2155,7 +2155,9 @@ static int CclDefineUnitType(lua_State *l)
 		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
+	}
 	
+	if (type->CanMove() && !type->BoolFlag[COWARD_INDEX].value && type->CanAttack && !(type->CanTransport() && type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) {
 		button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
 		button_definition += "\tLevel = 0,\n";
