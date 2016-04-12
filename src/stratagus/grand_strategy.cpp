@@ -3290,6 +3290,10 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			);
 			CclCommand(buf);	
 		}
+		
+		if (std::find(this->HistoricalRulers.begin(), this->HistoricalRulers.end(), hero) == this->HistoricalRulers.end()) {
+			this->HistoricalRulers.push_back(hero);
+		}
 	}
 	
 	this->CalculateIncomes(); //recalculate incomes, as administrative efficiency may have changed
@@ -5052,6 +5056,7 @@ void CleanGrandStrategyGame()
 					}
 				}
 				GrandStrategyGame.Factions[i][j]->Claims.clear();
+				GrandStrategyGame.Factions[i][j]->HistoricalRulers.clear();
 				GrandStrategyGame.Factions[i][j]->HistoricalTechnologies.clear();
 			}
 		}

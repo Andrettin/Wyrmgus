@@ -293,6 +293,272 @@ void SaveUpgrades(CFile &file)
 --  Ccl part of upgrades
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+/**
+**  Define an upgrade.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineUpgrade(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string upgrade_ident = LuaToString(l, 1);
+	CUpgrade *upgrade = CUpgrade::New(upgrade_ident);
+	
+	std::string name_type = "upgrade";
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Parent")) {
+			CUpgrade *parent_upgrade = CUpgrade::Get(LuaToString(l, -1));
+			if (parent_upgrade != NULL) {
+				upgrade->Name = parent_upgrade->Name;
+				upgrade->Icon = parent_upgrade->Icon;
+				upgrade->Class = parent_upgrade->Class;
+				upgrade->Civilization = parent_upgrade->Civilization;
+				upgrade->Faction = parent_upgrade->Faction;
+				upgrade->Description = parent_upgrade->Description;
+				upgrade->Quote = parent_upgrade->Quote;
+				upgrade->Background = parent_upgrade->Background;
+				for (int i = 0; i < MaxCosts; ++i) {
+					upgrade->Costs[i] = parent_upgrade->Costs[i];
+					upgrade->GrandStrategyCosts[i] = parent_upgrade->GrandStrategyCosts[i];
+					upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
+				}
+				for (int i = 0; i < MaxItemClasses; ++i) {
+					upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
+					upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
+				}
+				upgrade->TechnologyPointCost = parent_upgrade->TechnologyPointCost;
+				upgrade->Ability = parent_upgrade->Ability;
+				upgrade->Weapon = parent_upgrade->Weapon;
+				upgrade->Shield = parent_upgrade->Shield;
+				upgrade->Boots = parent_upgrade->Boots;
+				upgrade->Arrows = parent_upgrade->Arrows;
+				upgrade->Item = parent_upgrade->Item;
+				upgrade->MagicPrefix = parent_upgrade->MagicPrefix;
+				upgrade->MagicSuffix = parent_upgrade->MagicSuffix;
+				upgrade->RunicAffix = parent_upgrade->RunicAffix;
+				upgrade->Work = parent_upgrade->Work;
+			} else {
+				LuaError(l, "Parent upgrade doesn't exist.");
+			}
+		} else if (!strcmp(value, "Name")) {
+			upgrade->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Icon")) {
+			CIcon *icon = CIcon::Get(LuaToString(l, -1));
+			if (icon != NULL) {
+				upgrade->Icon = icon;
+			} else {
+				LuaError(l, "Icon doesn't exist.");
+			}
+		} else if (!strcmp(value, "Class")) {
+			upgrade->Class = LuaToString(l, -1);
+		} else if (!strcmp(value, "Civilization")) {
+			upgrade->Civilization = LuaToString(l, -1);
+		} else if (!strcmp(value, "Faction")) {
+			upgrade->Faction = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			upgrade->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			upgrade->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			upgrade->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "TechnologyPointCost")) {
+			upgrade->TechnologyPointCost = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Year")) {
+			upgrade->Year = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Ability")) {
+			upgrade->Ability = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Weapon")) {
+			upgrade->Weapon = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Shield")) {
+			upgrade->Shield = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Boots")) {
+			upgrade->Boots = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Arrows")) {
+			upgrade->Arrows = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "MagicPrefix")) {
+			upgrade->MagicPrefix = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "MagicSuffix")) {
+			upgrade->MagicSuffix = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "RunicAffix")) {
+			upgrade->RunicAffix = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Work")) {
+			int work_type = GetItemClassIdByName(LuaToString(l, -1));
+			if (work_type != -1) {
+				upgrade->Work = work_type;
+			} else {
+				LuaError(l, "Work item class doesn't exist.");
+			}
+		} else if (!strcmp(value, "Item")) {
+			CUnitType *item = UnitTypeByIdent(LuaToString(l, -1));
+			if (item != NULL) {
+				upgrade->Item = item;
+			} else {
+				LuaError(l, "Item type doesn't exist.");
+			}
+		} else if (!strcmp(value, "Costs")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				upgrade->Costs[resource] = LuaToNumber(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "GrandStrategyCosts")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				upgrade->GrandStrategyCosts[resource] = LuaToNumber(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "GrandStrategyProductionEfficiencyModifier")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				upgrade->GrandStrategyProductionEfficiencyModifier[resource] = LuaToNumber(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "ItemPrefix")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
+				if (item_class == -1) {
+					LuaError(l, "Item class doesn't exist.");
+				}
+				++j;
+				
+				upgrade->ItemPrefix[item_class] = LuaToBoolean(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "ItemSuffix")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
+				if (item_class == -1) {
+					LuaError(l, "Item class doesn't exist.");
+				}
+				++j;
+
+				upgrade->ItemSuffix[item_class] = LuaToBoolean(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "IncompatibleAffixes")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int affix_id = UpgradeIdByIdent(LuaToString(l, -1, j + 1));
+				if (affix_id == -1) {
+					LuaError(l, "Upgrade doesn't exist.");
+				}
+
+				upgrade->IncompatibleAffixes[affix_id] = true;
+			}
+		} else if (!strcmp(value, "RequiredAbilities")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CUpgrade *required_ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
+				if (required_ability == NULL) {
+					LuaError(l, "Upgrade doesn't exist.");
+				}
+				++j;
+
+				upgrade->RequiredAbilities.push_back(required_ability);
+			}
+		} else if (!strcmp(value, "WeaponClasses")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int item_class = GetItemClassIdByName(LuaToString(l, -1, j + 1));
+				if (item_class == -1) {
+					LuaError(l, "Item class doesn't exist.");
+				}
+				++j;
+
+				upgrade->WeaponClasses.push_back(item_class);
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	//set the upgrade's civilization and class here
+	if (!upgrade->Class.empty()) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		int class_id = GetUpgradeClassIndexByName(upgrade->Class);
+		if (class_id == -1) {
+			SetUpgradeClassStringToIndex(upgrade->Class, UpgradeClasses.size());
+			class_id = UpgradeClasses.size();
+			UpgradeClasses.push_back(upgrade->Class);
+		}
+		if (!upgrade->Civilization.empty()) {
+			int civilization_id = PlayerRaces.GetRaceIndexByName(upgrade->Civilization.c_str());
+			
+			if (!upgrade->Faction.empty()) {
+				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, upgrade->Faction);
+				if (civilization_id != -1 && faction_id != -1 && class_id != -1) {
+					PlayerRaces.Factions[civilization_id][faction_id]->ClassUpgrades[class_id] = upgrade->ID;
+				}
+			} else {
+				if (civilization_id != -1 && class_id != -1) {
+					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = upgrade->ID;
+				}
+			}
+		}
+	}
+	
+	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add the upgrade to the incompatible affix's counterpart list here
+		if (upgrade->IncompatibleAffixes[i]) {
+			AllUpgrades[i]->IncompatibleAffixes[upgrade->ID] = true;
+		}
+	}
+	
+	//load icon here
+	if (upgrade->Icon != NULL && !upgrade->Icon->Loaded) {
+		upgrade->Icon->Load();
+	}
+	
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Define a new upgrade modifier.
 **
@@ -430,43 +696,6 @@ static int CclDefineModifier(lua_State *l)
 
 	UpgradeModifiers[NumUpgradeModifiers++] = um;
 	
-	//Wyrmgus start
-	//set the upgrade's civilization and class here, for lack of a better place
-	if (!AllUpgrades[um->UpgradeId]->Class.empty()) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = GetUpgradeClassIndexByName(AllUpgrades[um->UpgradeId]->Class);
-		if (class_id == -1) {
-			SetUpgradeClassStringToIndex(AllUpgrades[um->UpgradeId]->Class, UpgradeClasses.size());
-			class_id = UpgradeClasses.size();
-			UpgradeClasses.push_back(AllUpgrades[um->UpgradeId]->Class);
-		}
-		if (!AllUpgrades[um->UpgradeId]->Civilization.empty()) {
-			int civilization_id = PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str());
-			
-			if (!AllUpgrades[um->UpgradeId]->Faction.empty()) {
-				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, AllUpgrades[um->UpgradeId]->Faction);
-				if (civilization_id != -1 && faction_id != -1 && class_id != -1) {
-					PlayerRaces.Factions[civilization_id][faction_id]->ClassUpgrades[class_id] = um->UpgradeId;
-				}
-			} else {
-				if (civilization_id != -1 && class_id != -1) {
-					PlayerRaces.CivilizationClassUpgrades[civilization_id][class_id] = um->UpgradeId;
-				}
-			}
-		}
-	}
-	
-	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add the upgrade to the incompatible affix's counterpart list here, for lack of a better place
-		if (AllUpgrades[um->UpgradeId]->IncompatibleAffixes[i]) {
-			AllUpgrades[i]->IncompatibleAffixes[um->UpgradeId] = true;
-		}
-	}
-	
-	//load icon here for lack of a better place
-	if (AllUpgrades[um->UpgradeId]->Icon != NULL && !AllUpgrades[um->UpgradeId]->Icon->Loaded) {
-		AllUpgrades[um->UpgradeId]->Icon->Load();
-	}
-	//Wyrmgus end
-
 	return 0;
 }
 
@@ -785,6 +1014,9 @@ static int CclGetUpgradeData(lua_State *l)
 */
 void UpgradesCclRegister()
 {
+	//Wyrmgus start
+	lua_register(Lua, "DefineUpgrade", CclDefineUpgrade);
+	//Wyrmgus end
 	lua_register(Lua, "DefineModifier", CclDefineModifier);
 	lua_register(Lua, "DefineAllow", CclDefineAllow);
 	lua_register(Lua, "DefineUnitAllow", CclDefineUnitAllow);
@@ -1978,26 +2210,6 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 }
 
 //Wyrmgus start
-void AddUpgradeRequiredAbility(std::string upgrade_ident, std::string required_ability_ident)
-{
-	CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
-	CUpgrade *required_ability = CUpgrade::Get(required_ability_ident);
-	upgrade->RequiredAbilities.push_back(required_ability);
-}
-
-void AddUpgradeWeaponClass(std::string upgrade_ident, int weapon_class)
-{
-	CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
-	upgrade->WeaponClasses.push_back(weapon_class);
-}
-
-void SetUpgradeItem(std::string upgrade_ident, std::string item_ident)
-{
-	CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
-	CUnitType *item = UnitTypeByIdent(item_ident);
-	upgrade->Item = item;
-}
-
 std::string GetUpgradeEffectsString(std::string upgrade_ident)
 {
 	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);

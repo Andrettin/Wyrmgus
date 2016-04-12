@@ -265,6 +265,7 @@ public:
 	int DiplomacyState[MAX_RACES][FactionMax];							/// Diplomacy state between this faction and each other faction
 	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
+	std::vector<CGrandStrategyHero *> HistoricalRulers;					/// All rulers who have reigned over this faction
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 };
 
