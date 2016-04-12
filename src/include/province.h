@@ -108,8 +108,6 @@ public:
 	{
 	}
 	
-	void AddRegion(CRegion *region);
-	
 	std::string Name;
 	CWorld *World;
 	std::string Map;
@@ -127,6 +125,7 @@ public:
 	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
 	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province, mapped to the year
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
+	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings;	/// Historical settlement buildings, mapped to building unit type id and year
 };
 
 class WorldMapTile

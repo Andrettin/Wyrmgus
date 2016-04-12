@@ -39,6 +39,8 @@
 
 #include "player.h"
 #include "script.h"
+#include "unittype.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -356,7 +358,8 @@ static int CclDefineProvince(lua_State *l)
 				if (region == NULL) {
 					LuaError(l, "Region doesn't exist.");
 				}
-				province->AddRegion(region);
+				province->Regions.push_back(region);
+				region->Provinces.push_back(province);
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {
@@ -423,6 +426,22 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				int historical_population = LuaToNumber(l, -1, j + 1);
 				province->HistoricalPopulation[year] = historical_population;
+			}
+		} else if (!strcmp(value, "HistoricalSettlementBuildings")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string building_type_ident = LuaToString(l, -1, j + 1);
+				int building_type = UnitTypeIdByIdent(building_type_ident);
+				if (building_type == -1) {
+					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ building_type_ident.c_str());
+				}
+				++j;
+				province->HistoricalSettlementBuildings[building_type][year] = LuaToBoolean(l, -1, j + 1);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

@@ -56,12 +56,6 @@ std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 --  Functions
 ----------------------------------------------------------------------------*/
 
-void CProvince::AddRegion(CRegion *region)
-{
-	this->Regions.push_back(region);
-	region->Provinces.push_back(this);
-}
-
 void CleanWorlds()
 {
 	for (size_t i = 0; i < WorldMapTerrainTypes.size(); ++i) {

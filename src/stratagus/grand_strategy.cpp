@@ -5687,6 +5687,14 @@ void InitializeGrandStrategyProvinces()
 				}
 			}
 			
+			for (std::map<int, std::map<int, bool>>::iterator iterator = Provinces[i]->HistoricalSettlementBuildings.begin(); iterator != Provinces[i]->HistoricalSettlementBuildings.end(); ++iterator) {
+				for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+					if (GrandStrategyYear >= second_iterator->first) {
+						province->SetSettlementBuilding(iterator->first, second_iterator->second);
+						break;
+					}
+				}
+			}
 		}
 	}
 }
