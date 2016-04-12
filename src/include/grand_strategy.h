@@ -151,6 +151,7 @@ public:
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
 	void SetAttackingUnitQuantity(int unit_type_id, int quantity);
 	void ChangeAttackingUnitQuantity(int unit_type_id, int quantity);
+	void SetPopulation(int quantity);
 	void SetHero(std::string hero_full_name, int value);
 	void AllocateLabor();
 	void AllocateLaborToResource(int resource);

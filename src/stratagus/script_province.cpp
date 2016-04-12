@@ -133,6 +133,50 @@ static int CclDefineWorld(lua_State *l)
 }
 
 /**
+**  Define a region.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineRegion(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string region_name = LuaToString(l, 1);
+	CRegion *region = GetRegion(region_name);
+	if (!region) {
+		region = new CRegion;
+		region->Name = region_name;
+		region->ID = Regions.size();
+		Regions.push_back(region);
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "HistoricalPopulation")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				int historical_population = LuaToNumber(l, -1, j + 1);
+				region->HistoricalPopulation[year] = historical_population;
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a province.
 **
 **  @param l  Lua state.
@@ -302,6 +346,18 @@ static int CclDefineProvince(lua_State *l)
 				
 				province->FactionClaims.push_back(PlayerRaces.Factions[civilization][faction]);
 			}
+		} else if (!strcmp(value, "Regions")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CRegion *region = GetRegion(LuaToString(l, -1, j + 1));
+				if (region == NULL) {
+					LuaError(l, "Region doesn't exist.");
+				}
+				province->AddRegion(region);
+			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -356,6 +412,17 @@ static int CclDefineProvince(lua_State *l)
 					LuaError(l, "Civilization \"%s\" doesn't exist." _C_ historical_civilization_name.c_str());
 				}
 				province->HistoricalCultures[year] = historical_civilization;
+			}
+		} else if (!strcmp(value, "HistoricalPopulation")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				int historical_population = LuaToNumber(l, -1, j + 1);
+				province->HistoricalPopulation[year] = historical_population;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -855,6 +922,7 @@ void ProvinceCclRegister()
 {
 	lua_register(Lua, "DefineWorldMapTerrainType", CclDefineWorldMapTerrainType);
 	lua_register(Lua, "DefineWorld", CclDefineWorld);
+	lua_register(Lua, "DefineRegion", CclDefineRegion);
 	lua_register(Lua, "DefineProvince", CclDefineProvince);
 	lua_register(Lua, "DefineWorldMapTile", CclDefineWorldMapTile);
 	lua_register(Lua, "GetWorldData", CclGetWorldData);

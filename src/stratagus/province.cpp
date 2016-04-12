@@ -47,6 +47,7 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CWorld *> Worlds;
+std::vector<CRegion *> Regions;
 std::vector<CProvince *> Provinces;
 std::vector<WorldMapTerrainType *>  WorldMapTerrainTypes;
 std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
@@ -54,6 +55,12 @@ std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+void CProvince::AddRegion(CRegion *region)
+{
+	this->Regions.push_back(region);
+	region->Provinces.push_back(this);
+}
 
 void CleanWorlds()
 {
@@ -75,6 +82,10 @@ void CleanWorlds()
 		delete Worlds[i];
 	}
 	Worlds.clear();
+	
+	for (size_t j = 0; j < Regions.size(); ++j) {
+		delete Regions[j];
+	}
 }
 
 CWorld *GetWorld(std::string world_name)
@@ -82,6 +93,16 @@ CWorld *GetWorld(std::string world_name)
 	for (size_t i = 0; i < Worlds.size(); ++i) {
 		if (world_name == Worlds[i]->Name) {
 			return Worlds[i];
+		}
+	}
+	return NULL;
+}
+
+CRegion *GetRegion(std::string region_name)
+{
+	for (size_t i = 0; i < Regions.size(); ++i) {
+		if (region_name == Regions[i]->Name) {
+			return Regions[i];
 		}
 	}
 	return NULL;
@@ -96,7 +117,6 @@ CProvince *GetProvince(std::string province_name)
 	}
 	return NULL;
 }
-
 
 /**
 **  Get the ID of a world map terrain type

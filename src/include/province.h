@@ -84,6 +84,20 @@ public:
 	std::map<std::pair<int,int>, WorldMapTile *> Tiles;					/// Tiles in the world
 };
 
+class CRegion
+{
+public:
+	CRegion() :
+		ID(-1)
+	{
+	}
+	
+	std::string Name;
+	int ID;																/// ID of this province
+	std::vector<CProvince *> Provinces;									/// Provinces which belong to this region
+	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
+};
+
 class CProvince
 {
 public:
@@ -93,6 +107,8 @@ public:
 		World(NULL)
 	{
 	}
+	
+	void AddRegion(CRegion *region);
 	
 	std::string Name;
 	CWorld *World;
@@ -106,9 +122,11 @@ public:
 	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
 	std::vector<Vec2i> Tiles;
-	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the province
-	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the province
-	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province
+	std::vector<CRegion *> Regions;										/// Regions to which this province belongs
+	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the province, mapped to the year
+	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the province, mapped to the year
+	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province, mapped to the year
+	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
 };
 
 class WorldMapTile
@@ -135,6 +153,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern std::vector<CWorld *> Worlds;
+extern std::vector<CRegion *> Regions;
 extern std::vector<CProvince *> Provinces;
 extern std::vector<WorldMapTerrainType *>  WorldMapTerrainTypes;
 extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
@@ -145,6 +164,7 @@ extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 extern void CleanWorlds();
 extern CWorld *GetWorld(std::string world_name);
+extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern void ProvinceCclRegister();

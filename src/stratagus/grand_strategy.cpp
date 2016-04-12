@@ -2381,6 +2381,28 @@ void CGrandStrategyProvince::ChangeAttackingUnitQuantity(int unit_type_id, int q
 	this->SetAttackingUnitQuantity(unit_type_id, this->AttackingUnits[unit_type_id] + quantity);
 }
 
+void CGrandStrategyProvince::SetPopulation(int quantity)
+{
+	if (this->Civilization == -1) {
+		return;
+	}
+
+	int worker_unit_type = this->GetClassUnitType(GetUnitTypeClassIndexByName("worker"));
+	
+	if (quantity > 0) {
+		quantity /= 10000; // each population unit represents 10,000 people
+		quantity /= 2; // only (working-age) adults are represented, so around half of the total population
+		quantity = std::max(1, quantity);
+	}
+	
+//	quantity -= this->TotalUnits - this->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
+	// don't take military units in consideration for this population count for now (since they don't cost food anyway)
+	quantity -= this->TotalWorkers - this->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
+	quantity = std::max(0, quantity);
+			
+	this->SetUnitQuantity(worker_unit_type, quantity);
+}
+
 void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 {
 	if (value == 1) {
@@ -3351,7 +3373,9 @@ void CGrandStrategyFaction::GenerateRuler()
 	}
 	
 	CGrandStrategyHero *hero = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->GenerateHero("ruler");
-	this->SetRuler(hero->GetFullName());
+	if (hero != NULL) {
+		this->SetRuler(hero->GetFullName());
+	}
 }
 
 bool CGrandStrategyFaction::IsAlive()
@@ -4800,23 +4824,7 @@ void SetProvincePopulation(std::string province_name, int quantity)
 	int province_id = GetProvinceId(province_name);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		if (GrandStrategyGame.Provinces[province_id]->Civilization == -1) {
-			return;
-		}
-		int worker_unit_type = GrandStrategyGame.Provinces[province_id]->GetClassUnitType(GetUnitTypeClassIndexByName("worker"));
-	
-		if (quantity > 0) {
-			quantity /= 10000; // each population unit represents 10,000 people
-			quantity /= 2; // only (working-age) adults are represented, so around half of the total population
-			quantity = std::max(1, quantity);
-		}
-	
-//		quantity -= GrandStrategyGame.Provinces[province_id]->TotalUnits - GrandStrategyGame.Provinces[province_id]->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
-		// don't take military units in consideration for this population count for now (since they don't cost food anyway)
-		quantity -= GrandStrategyGame.Provinces[province_id]->TotalWorkers - GrandStrategyGame.Provinces[province_id]->Units[worker_unit_type]; // decrease from the quantity to be set the population that isn't composed of workers
-		quantity = std::max(0, quantity);
-			
-		GrandStrategyGame.Provinces[province_id]->SetUnitQuantity(worker_unit_type, quantity);
+		GrandStrategyGame.Provinces[province_id]->SetPopulation(quantity);
 	}
 }
 
@@ -5662,6 +5670,23 @@ void InitializeGrandStrategyProvinces()
 					}
 				}
 			}
+			
+			// add historical population from regions to provinces here, for a lack of a better place (all province's region belongings need to be defined before this takes place, so this can't happen during the province definitions)
+			for (size_t j = 0; j < Provinces[i]->Regions.size(); ++j) {
+				for (std::map<int, int>::iterator iterator = Provinces[i]->Regions[j]->HistoricalPopulation.begin(); iterator != Provinces[i]->Regions[j]->HistoricalPopulation.end(); ++iterator) {
+					if (Provinces[i]->HistoricalPopulation.find(iterator->first) == Provinces[i]->HistoricalPopulation.end()) { // if the province doesn't have historical population information for a given year but the region does, then use the region's population quantity divided by the number of provinces the region has
+						Provinces[i]->HistoricalPopulation[iterator->first] = iterator->second / Provinces[i]->Regions[j]->Provinces.size();
+					}
+				}
+			}
+	
+			for (std::map<int, int>::reverse_iterator iterator = Provinces[i]->HistoricalPopulation.rbegin(); iterator != Provinces[i]->HistoricalPopulation.rend(); ++iterator) {
+				if (GrandStrategyYear >= iterator->first) {
+					province->SetPopulation(iterator->second);
+					break;
+				}
+			}
+			
 		}
 	}
 }
