@@ -109,7 +109,11 @@ void ShowLoadProgress(const char *fmt, ...)
 		CLabel(GetGameFont()).DrawCentered(Video.Width / 2, Video.Height - 16, temp);
 		//Wyrmgus start
 //		InvalidateArea(5, Video.Height - 18, Video.Width - 10, 18);
-		InvalidateArea(0, Video.Height - 18, Video.Width, 18);
+		if (loadingBackground == NULL) {
+			InvalidateArea(0, Video.Height - 18, Video.Width, 18);
+		} else {
+			InvalidateArea(0, 0, Video.Width, Video.Height);
+		}
 		//Wyrmgus end
 
 		RealizeVideoMemory();
