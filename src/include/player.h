@@ -609,6 +609,7 @@ public:
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
+	std::string CivilizationUpgrades[MAX_RACES];
 	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
 	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization

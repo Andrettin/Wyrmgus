@@ -3312,6 +3312,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Shield || EquippedItems[ShieldItemSlot].size() == 0)
 				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Boots || EquippedItems[BootsItemSlot].size() == 0)
 				&& (!AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Arrows || EquippedItems[ArrowsItemSlot].size() == 0)
+				&& !(newplayer.Race != -1 && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ident == PlayerRaces.CivilizationUpgrades[newplayer.Race])
 				&& !(newplayer.Race != -1 && newplayer.Faction != -1 && AllUpgrades[UpgradeModifiers[z]->UpgradeId]->Ident == PlayerRaces.Factions[newplayer.Race][newplayer.Faction]->FactionUpgrade)
 			) {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);

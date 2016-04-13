@@ -385,6 +385,7 @@ void PlayerRace::Clean()
 		this->Visible[i] = false;
 		//Wyrmgus start
 		this->Adjective[i].clear();
+		this->CivilizationUpgrades[i].clear();
 		this->CivilizationClassUnitTypes[i].clear();
 		this->CivilizationClassUpgrades[i].clear();
 		this->Playable[i] = false;
@@ -1128,6 +1129,12 @@ void CPlayer::SetName(const std::string &name)
 //Wyrmgus start
 void CPlayer::SetCivilization(int civilization)
 {
+	if (this->Race != -1 && !GameRunning) {
+		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty()) {
+			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
+		}
+	}
+
 	int old_civilization = this->Race;
 	int old_faction = this->Faction;
 
@@ -1148,6 +1155,12 @@ void CPlayer::SetCivilization(int civilization)
 		
 		UI.Load();
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
+	}
+	
+	if (this->Race != -1 && !GameRunning) {
+		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty()) {
+			UpgradeAcquire(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race]));
+		}
 	}
 		
 	// set new faction from new civilization
@@ -1180,7 +1193,7 @@ void CPlayer::SetFaction(const std::string faction_name)
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade)->ID);
 		}
 	}
-	
+
 	int faction = PlayerRaces.GetFactionIndexByName(this->Race, faction_name);
 	
 	for (size_t i = 0; i < UpgradeClasses.size(); ++i) {

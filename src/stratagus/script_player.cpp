@@ -650,6 +650,8 @@ static int CclDefineCivilization(lua_State *l)
 			}
 		} else if (!strcmp(value, "DefaultColor")) {
 			PlayerRaces.DefaultColor[civilization] = LuaToString(l, -1);
+		} else if (!strcmp(value, "CivilizationUpgrade")) {
+			PlayerRaces.CivilizationUpgrades[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "ButtonIcons")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -693,8 +695,14 @@ static int CclDefineCivilization(lua_State *l)
 		}
 	}
 	
-	if (PlayerRaces.ParentCivilization[civilization] != -1) { //inherit button icons from parent civilization, for button actions which none are specified
+	if (PlayerRaces.ParentCivilization[civilization] != -1) {
 		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
+
+		if (PlayerRaces.CivilizationUpgrades[civilization].empty() && !PlayerRaces.CivilizationUpgrades[parent_civilization].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
+			PlayerRaces.CivilizationUpgrades[civilization] = PlayerRaces.CivilizationUpgrades[parent_civilization];
+		}
+		
+		//inherit button icons from parent civilization, for button actions which none are specified
 		for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization].end(); ++iterator) {
 			if (PlayerRaces.ButtonIcons[civilization].find(iterator->first) == PlayerRaces.ButtonIcons[civilization].end()) {
 				PlayerRaces.ButtonIcons[civilization][iterator->first] = iterator->second;
@@ -1285,6 +1293,9 @@ static int CclGetCivilizationData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "DefaultColor")) {
 		lua_pushstring(l, PlayerRaces.DefaultColor[civilization].c_str());
+		return 1;
+	} else if (!strcmp(data, "CivilizationUpgrade")) {
+		lua_pushstring(l, PlayerRaces.CivilizationUpgrades[civilization].c_str());
 		return 1;
 	} else if (!strcmp(data, "Factions")) {
 		bool is_mod = false;

@@ -1205,7 +1205,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch += um->SpeedResearch;
 	}
-	if (um->ChangeCivilizationTo != -1) {
+	if (um->ChangeCivilizationTo != -1 && GameRunning) {
 		player.SetCivilization(um->ChangeCivilizationTo);
 	}
 	//Wyrmgus end
@@ -1471,7 +1471,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		player.SpeedResearch -= um->SpeedResearch;
 	}
 	//Wyrmgus start
-	if (um->ChangeCivilizationTo != -1) {
+	if (um->ChangeCivilizationTo != -1 && GameRunning) {
 		player.SetCivilization(PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str())); // restore old civilization
 	}
 	//Wyrmgus end
@@ -1567,7 +1567,12 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					int m = DefaultIncomes[j];
 
 					for (int k = 0; k < player.GetUnitCount(); ++k) {
-						m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
+						//Wyrmgus start
+//						m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
+						if (player.GetUnit(k).Type != NULL) {
+							m = std::max(m, player.GetUnit(k).Type->Stats[player.Index].ImproveIncomes[j]);
+						}
+						//Wyrmgus end
 					}
 					player.Incomes[j] = m;
 				}

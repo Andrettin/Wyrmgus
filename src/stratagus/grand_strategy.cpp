@@ -3342,7 +3342,8 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (
 			GrandStrategyGame.Factions[civilization][faction]->Technologies[i]
-			&& AllUpgrades[i]->Ident != PlayerRaces.Factions[civilization][faction]->FactionUpgrade //don't acquire the faction's faction-specific upgrade
+			&& AllUpgrades[i]->Ident != PlayerRaces.CivilizationUpgrades[civilization] //don't acquire civilization upgrades
+			&& AllUpgrades[i]->Ident != PlayerRaces.Factions[civilization][faction]->FactionUpgrade //don't acquire the faction upgrades
 			&& (year == 0 || (GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.find(AllUpgrades[i]) != GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.end() && year >= GrandStrategyGame.Factions[civilization][faction]->HistoricalTechnologies.find(AllUpgrades[i])->second)) // if a year is given, only add the technology if it is present in the historical technologies for the faction, and if the date for the technology is less or equal than the year given
 		) {
 			this->SetTechnology(i, true);
@@ -5521,6 +5522,9 @@ void InitializeGrandStrategyGame(bool show_loading)
 				}
 			}
 			
+			if (!PlayerRaces.CivilizationUpgrades[i].empty()) { //if faction's civilization has a civilization upgrade, apply it
+				GrandStrategyGame.Factions[i][j]->SetTechnology(UpgradeIdByIdent(PlayerRaces.CivilizationUpgrades[i]), true);
+			}
 			if (!PlayerRaces.Factions[i][j]->FactionUpgrade.empty()) { //if faction has a faction upgrade, apply it
 				GrandStrategyGame.Factions[i][j]->SetTechnology(UpgradeIdByIdent(PlayerRaces.Factions[i][j]->FactionUpgrade), true);
 			}
