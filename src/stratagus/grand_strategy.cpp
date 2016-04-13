@@ -954,7 +954,7 @@ void CGrandStrategyGame::DoTurn()
 				}
 				this->Provinces[i]->PopulationGrowthProgress = std::max(0, this->Provinces[i]->PopulationGrowthProgress);
 				
-				if (SyncRand(500) == 0) { // 0.2% chance per year that a (randomly generated) literary work will be done in a province
+				if (SyncRand(10000) == 0) { // 0.01% chance per year that a (randomly generated) literary work will be done in a province
 					this->CreateWork(NULL, NULL, this->Provinces[i]);
 				}
 			}
@@ -2912,7 +2912,12 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 		return "";
 	}
 	
-	work_name += DecapitalizeString(GenerateName(this->GetLanguage(), "literary-work", AffixTypeSuffix));
+	std::string work_name_suffix = DecapitalizeString(GenerateName(this->GetLanguage(), "literary-work", AffixTypeSuffix));
+	if (work_name_suffix.empty()) {
+		return "";
+	}
+	
+	work_name += work_name_suffix;
 	
 	return work_name;
 }
