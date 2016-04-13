@@ -2954,10 +2954,14 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 	int faction;
 	std::vector<int> potential_civilizations;
 	
-	potential_civilizations.push_back(this->Civilization);
+	if (parent == NULL || PlayerRaces.Species[parent->Civilization] == PlayerRaces.Species[this->Civilization]) {
+		potential_civilizations.push_back(this->Civilization);
+	}
 	
 	if (type == "ruler") {
-		potential_civilizations.push_back(this->Owner->Civilization);
+		if (parent == NULL || PlayerRaces.Species[parent->Civilization] == PlayerRaces.Species[this->Owner->Civilization]) {
+			potential_civilizations.push_back(this->Owner->Civilization);
+		}
 	}
 	 
 	if (parent != NULL) { // if a parent is given, there's a chance that the hero will have the same culture as the parent
