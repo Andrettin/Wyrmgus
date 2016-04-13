@@ -954,7 +954,7 @@ void CGrandStrategyGame::DoTurn()
 				}
 				this->Provinces[i]->PopulationGrowthProgress = std::max(0, this->Provinces[i]->PopulationGrowthProgress);
 				
-				if (SyncRand(10000) == 0) { // 0.01% chance per year that a (randomly generated) literary work will be done in a province
+				if (SyncRand(1000) == 0) { // 0.1% chance per year that a (randomly generated) literary work will be created in a province
 					this->CreateWork(NULL, NULL, this->Provinces[i]);
 				}
 			}
@@ -1315,29 +1315,31 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 		author = province->GetRandomAuthor();
 	}
 	
-	std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work_name + "\", \"";
-	if (author != NULL) {
-		work_creation_message += "The " + FullyDecapitalizeString(author->Type->Name) + " " + author->GetFullName() + " ";
-	} else {
-		work_creation_message += "A sage ";
+	if (province->Owner == GrandStrategyGame.PlayerFaction || work != NULL) { // only show foreign works that are predefined
+		std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work_name + "\", \"";
+		if (author != NULL) {
+			work_creation_message += "The " + FullyDecapitalizeString(author->Type->Name) + " " + author->GetFullName() + " ";
+		} else {
+			work_creation_message += "A sage ";
+		}
+		work_creation_message += "has written the literary work \\\"" + work_name + "\\\" in ";
+		if (province->Owner != GrandStrategyGame.PlayerFaction) {
+			work_creation_message += "the foreign lands of ";
+		}
+		work_creation_message += province->GetCulturalName() + "!";
+		if (work != NULL && !work->Description.empty()) {
+			work_creation_message += " " + FindAndReplaceString(work->Description, "\"", "\\\"");
+		}
+		if (work != NULL && !work->Quote.empty()) {
+			work_creation_message += "\\n\\n" + FindAndReplaceString(work->Quote, "\"", "\\\"");
+		}
+		work_creation_message += "\"";
+		if (province->Owner == GrandStrategyGame.PlayerFaction) {
+			work_creation_message += ", \"+1 Prestige\"";
+		}
+		work_creation_message += ") end;";
+		CclCommand(work_creation_message);
 	}
-	work_creation_message += "has written the literary work \\\"" + work_name + "\\\" in ";
-	if (province->Owner != GrandStrategyGame.PlayerFaction) {
-		work_creation_message += "the foreign lands of ";
-	}
-	work_creation_message += province->GetCulturalName() + "!";
-	if (work != NULL && !work->Description.empty()) {
-		work_creation_message += " " + FindAndReplaceString(work->Description, "\"", "\\\"");
-	}
-	if (work != NULL && !work->Quote.empty()) {
-		work_creation_message += "\\n\\n" + FindAndReplaceString(work->Quote, "\"", "\\\"");
-	}
-	work_creation_message += "\"";
-	if (province->Owner == GrandStrategyGame.PlayerFaction) {
-		work_creation_message += ", \"+1 Prestige\"";
-	}
-	work_creation_message += ") end;";
-	CclCommand(work_creation_message);
 	
 	province->Owner->Resources[PrestigeCost] += 1;
 }
@@ -2037,6 +2039,13 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					this->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
 					this->SetUnitQuantity(i, 0);
 					this->UnderConstructionUnits[i] = 0;
+				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && !UnitTypes[i]->Civilization.empty() && !UnitTypes[i]->Faction.empty()) {
+					if (this->SettlementBuildings[i] && PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
+						this->SetSettlementBuilding(i, false); // remove building from other civilization
+						if (PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
+							this->SetSettlementBuilding(PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), true);
+						}
+					}
 				}
 			}
 		}
@@ -2104,6 +2113,13 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					this->UnderConstructionUnits[PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
 					this->SetUnitQuantity(i, 0);
 					this->UnderConstructionUnits[i] = 0;
+				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && !UnitTypes[i]->Civilization.empty() && UnitTypes[i]->Faction.empty()) {
+					if (this->SettlementBuildings[i] && this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
+						this->SetSettlementBuilding(i, false); // remove building from other civilization
+						if (this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
+							this->SetSettlementBuilding(this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)), true);
+						}
+					}
 				}
 			}
 		}
