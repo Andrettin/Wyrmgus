@@ -953,6 +953,10 @@ void CGrandStrategyGame::DoTurn()
 					}
 				}
 				this->Provinces[i]->PopulationGrowthProgress = std::max(0, this->Provinces[i]->PopulationGrowthProgress);
+				
+				if (SyncRand(500) == 0) { // 0.2% chance per year that a (randomly generated) literary work will be done in a province
+					this->CreateWork(NULL, NULL, this->Provinces[i]);
+				}
 			}
 		}
 		this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
@@ -1293,27 +1297,39 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 		return;
 	}
 
-	this->Works.erase(std::remove(this->Works.begin(), this->Works.end(), work), this->Works.end()); // remove work from the vector, so that it doesn't get created again
+	if (work != NULL) {
+		this->Works.erase(std::remove(this->Works.begin(), this->Works.end(), work), this->Works.end()); // remove work from the vector, so that it doesn't get created again
+	}
 
+	std::string work_name;
+	if (work != NULL) {
+		work_name = work->Name;
+	} else {
+		work_name = province->GenerateWorkName();
+		if (work_name.empty()) {
+			return;
+		}
+	}
+	
 	if (author == NULL) {
 		author = province->GetRandomAuthor();
 	}
 	
-	std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work->Name + "\", \"";
+	std::string work_creation_message = "if (GenericDialog ~= nil) then GenericDialog(\"" + work_name + "\", \"";
 	if (author != NULL) {
 		work_creation_message += "The " + FullyDecapitalizeString(author->Type->Name) + " " + author->GetFullName() + " ";
 	} else {
 		work_creation_message += "A sage ";
 	}
-	work_creation_message += "has written the literary work \\\"" + work->Name + "\\\" in ";
+	work_creation_message += "has written the literary work \\\"" + work_name + "\\\" in ";
 	if (province->Owner != GrandStrategyGame.PlayerFaction) {
 		work_creation_message += "the foreign lands of ";
 	}
 	work_creation_message += province->GetCulturalName() + "!";
-	if (!work->Description.empty()) {
+	if (work != NULL && !work->Description.empty()) {
 		work_creation_message += " " + FindAndReplaceString(work->Description, "\"", "\\\"");
 	}
-	if (!work->Quote.empty()) {
+	if (work != NULL && !work->Quote.empty()) {
 		work_creation_message += "\\n\\n" + FindAndReplaceString(work->Quote, "\"", "\\\"");
 	}
 	work_creation_message += "\"";
@@ -2779,6 +2795,15 @@ int CGrandStrategyProvince::GetClassUnitType(int class_id)
 	}
 }
 
+int CGrandStrategyProvince::GetLanguage()
+{
+	if (this->Owner != NULL && this->Civilization == this->Owner->Civilization) {
+		return PlayerRaces.GetFactionLanguage(this->Owner->Civilization, this->Owner->Faction);
+	} else {
+		return PlayerRaces.GetCivilizationLanguage(this->Civilization);
+	}
+}
+
 int CGrandStrategyProvince::GetFoodCapacity(bool subtract_non_food)
 {
 	int food_capacity = 0;
@@ -2864,6 +2889,32 @@ std::string CGrandStrategyProvince::GenerateProvinceName(int civilization, int f
 	}
 	
 	return GenerateName(language, "province");
+}
+
+std::string CGrandStrategyProvince::GenerateWorkName()
+{
+	if (this->Owner == NULL) {
+		return "";
+	}
+	
+	std::string work_name;
+	
+	std::vector<CGrandStrategyHero *> potential_heroes;
+	for (size_t i = 0; i < this->Owner->HistoricalRulers.size(); ++i) {
+		potential_heroes.push_back(this->Owner->HistoricalRulers[i]);
+	}
+	if (potential_heroes.size() > 0) {
+		work_name += potential_heroes[SyncRand(potential_heroes.size())]->Name;
+		if (work_name.substr(work_name.size() - 1, 1) != "s") {
+			work_name += "s";
+		}
+	} else {
+		return "";
+	}
+	
+	work_name += DecapitalizeString(GenerateName(this->GetLanguage(), "literary-work", AffixTypeSuffix));
+	
+	return work_name;
 }
 
 CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type)

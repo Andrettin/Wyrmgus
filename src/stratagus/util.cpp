@@ -920,11 +920,12 @@ std::string FullyCapitalizeString(std::string text)
 {
 	text = CapitalizeString(text);
 	
-    size_t pos = 0;
-    while ((pos = text.find(" ", pos)) != std::string::npos) {
-		text.substr(pos + 1, pos + 2) = CapitalizeString(text.substr(pos + 1, pos + 2));
-        pos += 1;
-    }
+	size_t pos = 0;
+	while ((pos = text.find(" ", pos)) != std::string::npos) {
+		std::string replace = CapitalizeString(text.substr(pos + 1, 1));
+		text.replace(pos + 1, 1, replace);
+		pos += replace.length();
+	}
 	
 	return text;
 }
@@ -933,11 +934,12 @@ std::string FullyDecapitalizeString(std::string text)
 {
 	text = DecapitalizeString(text);
 	
-    size_t pos = 0;
+	size_t pos = 0;
     while ((pos = text.find(" ", pos)) != std::string::npos) {
-		text.substr(pos + 1, pos + 2) = DecapitalizeString(text.substr(pos + 1, pos + 2));
-        pos += 1;
-    }
+		std::string replace = DecapitalizeString(text.substr(pos + 1, 1));
+		text.replace(pos + 1, 1, replace);
+		pos += replace.length();
+	}
 	
 	return text;
 }
@@ -1015,7 +1017,7 @@ std::string GeneratePersonalName(std::string language_ident, std::string unit_ty
 	return GeneratePersonalName(language, unit_type_id, UnitTypes[unit_type_id]->DefaultStat.Variables[GENDER_INDEX].Value);
 }
 
-std::string GenerateName(int language, std::string type)
+std::string GenerateName(int language, std::string type, int affix_type)
 {
 	std::string name;
 	
@@ -1038,6 +1040,23 @@ std::string GenerateName(int language, std::string type)
 						affixes[i][j].push_back(PlayerRaces.Languages[language]->NameTypeAffixes[i][j][type][k]);
 					}
 				}
+			}
+		}
+		
+		if (affix_type != -1) { // if only an affix is wanted
+			if (affixes[WordJunctionTypeCompound][affix_type].size() > 0) {
+				int affix_grammatical_numbers[MaxAffixTypes];
+				memset(affix_grammatical_numbers, GrammaticalNumberNoNumber, sizeof(affix_grammatical_numbers));
+				
+				LanguageWord *affix_word = affixes[WordJunctionTypeCompound][affix_type][SyncRand(affixes[WordJunctionTypeCompound][affix_type].size())];
+				
+				affix_grammatical_numbers[affix_type] = affix_word->GetAffixGrammaticalNumber(affix_type == AffixTypePrefix ? affix_word : NULL, affix_type == AffixTypeInfix ? affix_word : NULL, affix_type == AffixTypeSuffix ? affix_word : NULL, type, WordJunctionTypeCompound, affix_type);
+					
+				std::string affix_string = affix_word->GetAffixForm(affix_type == AffixTypePrefix ? affix_word : NULL, affix_type == AffixTypeInfix ? affix_word : NULL, affix_type == AffixTypeSuffix ? affix_word : NULL, type, WordJunctionTypeCompound, affix_type, affix_grammatical_numbers);
+				
+				return TransliterateText(affix_string);
+			} else {
+				return "";
 			}
 		}
 		

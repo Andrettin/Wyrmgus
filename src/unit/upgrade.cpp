@@ -310,6 +310,9 @@ static int CclDefineUpgrade(lua_State *l)
 	CUpgrade *upgrade = CUpgrade::New(upgrade_ident);
 	
 	std::string name_type = "upgrade";
+	if (upgrade->Work != -1) { // the work is defined before the rest, so this isn't an issue
+		name_type = "literary-work";
+	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -321,8 +324,6 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->Name = parent_upgrade->Name;
 				upgrade->Icon = parent_upgrade->Icon;
 				upgrade->Class = parent_upgrade->Class;
-				upgrade->Civilization = parent_upgrade->Civilization;
-				upgrade->Faction = parent_upgrade->Faction;
 				upgrade->Description = parent_upgrade->Description;
 				upgrade->Quote = parent_upgrade->Quote;
 				upgrade->Background = parent_upgrade->Background;
@@ -351,6 +352,8 @@ static int CclDefineUpgrade(lua_State *l)
 			}
 		} else if (!strcmp(value, "Name")) {
 			upgrade->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "NameElements")) {
+			ParseNameElements(l, name_type);
 		} else if (!strcmp(value, "Icon")) {
 			CIcon *icon = CIcon::Get(LuaToString(l, -1));
 			if (icon != NULL) {

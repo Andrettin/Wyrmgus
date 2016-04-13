@@ -172,9 +172,11 @@ public:
 	int GetProductionEfficiencyModifier(int resource);
 	int GetRevoltRisk();
 	int GetClassUnitType(int class_id);
+	int GetLanguage();
 	int GetFoodCapacity(bool subtract_non_food = false);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GenerateProvinceName(int civilization, int faction = -1);
+	std::string GenerateWorkName();
 	CGrandStrategyHero *GenerateHero(std::string type);
 	CGrandStrategyHero *GetRandomAuthor();
 	
