@@ -177,7 +177,7 @@ public:
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GenerateProvinceName(int civilization, int faction = -1);
 	std::string GenerateWorkName();
-	CGrandStrategyHero *GenerateHero(std::string type);
+	CGrandStrategyHero *GenerateHero(std::string type, CGrandStrategyHero *parent = NULL);
 	CGrandStrategyHero *GetRandomAuthor();
 	
 	int Civilization;													/// Civilization of the province (-1 = no one).
@@ -241,7 +241,7 @@ public:
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
 	void SetRuler(std::string hero_full_name);
 	void RulerSuccession();
-	void GenerateRuler();
+	void GenerateRuler(bool child_of_current_ruler = false);
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
 	bool CanFormFaction(int civilization, int faction);

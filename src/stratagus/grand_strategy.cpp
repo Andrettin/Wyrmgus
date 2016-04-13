@@ -2938,7 +2938,7 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	return work_name;
 }
 
-CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type)
+CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGrandStrategyHero *parent)
 {
 	std::vector<int> potential_hero_unit_types;
 	
@@ -2946,22 +2946,34 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type)
 		return NULL;
 	}
 	
-	int civilization;
-	int faction;
-	if (type == "ruler") {
-		civilization = this->Owner->Civilization;
-		faction = this->Owner->Faction;
-	} else {
-		civilization = this->Civilization;
-		if (this->Owner->Civilization == this->Civilization) {
-			faction = this->Owner->Faction;
-		} else {
-			faction = -1;
-		}
+	if (this->Civilization == -1) {
+		return NULL;
 	}
 	
+	int civilization;
+	int faction;
+	std::vector<int> potential_civilizations;
+	
+	potential_civilizations.push_back(this->Civilization);
+	
 	if (type == "ruler") {
-		if (PlayerRaces.Factions[civilization][faction]->Type == "tribe" || this->Owner->GovernmentType != GovernmentTypeTheocracy) { //exclude priests from ruling non-theocracies
+		potential_civilizations.push_back(this->Owner->Civilization);
+	}
+	 
+	if (parent != NULL) { // if a parent is given, there's a chance that the hero will have the same culture as the parent
+		potential_civilizations.push_back(parent->Civilization);
+	}
+	
+	civilization = potential_civilizations[SyncRand(potential_civilizations.size())];
+	
+	if (this->Owner->Civilization == civilization) {
+		faction = this->Owner->Faction;
+	} else {
+		faction = -1;
+	}
+		
+	if (type == "ruler") {
+		if (PlayerRaces.Factions[this->Owner->Civilization][this->Owner->Faction]->Type == "tribe" || this->Owner->GovernmentType != GovernmentTypeTheocracy) { //exclude priests from ruling non-theocracies
 			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
 				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
 			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
@@ -3056,10 +3068,17 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type)
 	GrandStrategyGame.Heroes.push_back(hero);
 	hero->Name = hero_name;
 	hero->ExtraName = hero_extra_name;
+	if (parent != NULL) {
+		hero->FamilyName = parent->FamilyName;
+	}
 	hero->State = 4;
 	hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-	if (hero->Type->Traits.size() > 0) { //generate a trait
-		hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
+	if (hero->Type->Traits.size() > 0) {
+		if (parent != NULL && std::find(hero->Type->Traits.begin(), hero->Type->Traits.end(), parent->Trait) != hero->Type->Traits.end() && SyncRand(20) == 0) { // 5% chance that the hero will inherit their trait from their parent
+			hero->Trait = parent->Trait;
+		} else {
+			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())])); //generate a trait
+		}
 	}
 	hero->Year = GrandStrategyYear;
 	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
@@ -3400,7 +3419,13 @@ void CGrandStrategyFaction::RulerSuccession()
 				this->SetRuler(this->Ruler->Siblings[i]->GetFullName());
 				return;
 			}
-		}		
+		}
+		
+		// if ruler succession is by inheritance and no suitable successor could be found, there's a 90% chance that a new ruler that is a child of the current one will be generated
+		if (SyncRand(10) != 0) {
+			this->GenerateRuler(true);
+			return;
+		}
 	}
 	
 	std::vector<CGrandStrategyHero *> ruler_candidates;
@@ -3436,19 +3461,20 @@ void CGrandStrategyFaction::RulerSuccession()
 		this->SetRuler(ruler_candidates[SyncRand(ruler_candidates.size())]->GetFullName());
 		return;
 	}
-		
+
 	this->GenerateRuler(); //if all else failed, try to generate a ruler for the faction
 }
 
-void CGrandStrategyFaction::GenerateRuler()
+void CGrandStrategyFaction::GenerateRuler(bool child_of_current_ruler)
 {
-	this->Ruler = NULL;
-	
 	if (this->ProvinceCount == 0) {
 		fprintf(stderr, "Faction \"%s\" is generating a ruler, but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Name.c_str());
 	}
 	
-	CGrandStrategyHero *hero = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->GenerateHero("ruler");
+	CGrandStrategyHero *hero = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->GenerateHero("ruler", child_of_current_ruler ? this->Ruler : NULL);
+	
+	this->Ruler = NULL;
+	
 	if (hero != NULL) {
 		this->SetRuler(hero->GetFullName());
 	}
