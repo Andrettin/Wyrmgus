@@ -139,7 +139,10 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 	COrder_Attack *order = new COrder_Attack(false);
 
-	if (Map.WallOnMap(dest) && Map.Field(dest)->playerInfo.IsExplored(*attacker.Player)) {
+	//Wyrmgus start
+//	if (Map.WallOnMap(dest) && Map.Field(dest)->playerInfo.IsExplored(*attacker.Player)) {
+	if (Map.WallOnMap(dest) && Map.Field(dest)->playerInfo.IsTeamExplored(*attacker.Player)) {
+	//Wyrmgus end
 		// FIXME: look into action_attack.cpp about this ugly problem
 		order->goalPos = dest;
 		//Wyrmgus start

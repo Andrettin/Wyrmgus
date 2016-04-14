@@ -409,6 +409,13 @@ bool CMapFieldPlayerInfo::IsExplored(const CPlayer &player) const
 	return Visible[player.Index] != 0;
 }
 
+//Wyrmgus start
+bool CMapFieldPlayerInfo::IsTeamExplored(const CPlayer &player) const
+{
+	return Visible[player.Index] != 0 || TeamVisibilityState(player) != 0;
+}
+//Wyrmgus end
+
 bool CMapFieldPlayerInfo::IsVisible(const CPlayer &player) const
 {
 	const bool fogOfWar = !Map.NoFogOfWar;

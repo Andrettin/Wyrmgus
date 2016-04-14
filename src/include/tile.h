@@ -160,6 +160,9 @@ public:
 
 	/// Check if a field for the user is explored.
 	bool IsExplored(const CPlayer &player) const;
+	//Wyrmgus start
+	bool IsTeamExplored(const CPlayer &player) const;
+	//Wyrmgus end
 
 	/// @note Manage Map.NoFogOfWar
 	bool IsVisible(const CPlayer &player) const;

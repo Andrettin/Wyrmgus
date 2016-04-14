@@ -95,7 +95,7 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 {
 	//Wyrmgus start
 //	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
-	if (!Map.Field(pos)->playerInfo.IsExplored(player)) {
+	if (!Map.Field(pos)->playerInfo.IsTeamExplored(player)) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}

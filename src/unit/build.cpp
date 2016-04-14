@@ -544,7 +544,10 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 				ontop = NULL;
 				break;
 			}
-			if (player && !mf.playerInfo.IsExplored(*player)) {
+			//Wyrmgus start
+//			if (player && !mf.playerInfo.IsExplored(*player)) {
+			if (player && !mf.playerInfo.IsTeamExplored(*player)) {
+			//Wyrmgus end
 				h = type.TileHeight;
 				ontop = NULL;
 				break;

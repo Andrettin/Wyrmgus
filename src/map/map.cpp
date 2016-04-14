@@ -575,7 +575,10 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	}
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	//Wyrmgus start
+//	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamExplored(*ThisPlayer)) {
+	//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos);
 		if (!seen) {
 			MarkSeenTile(mf);
@@ -617,7 +620,10 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 	FixNeighbors(MapFieldForest, 0, pos);
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	//Wyrmgus start
+//	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamExplored(*ThisPlayer)) {
+	//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}
@@ -650,7 +656,10 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	FixNeighbors(MapFieldRocks, 0, pos);
 
 	//maybe isExplored
-	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	//Wyrmgus start
+//	if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+	if (mf.playerInfo.IsTeamExplored(*ThisPlayer)) {
+	//Wyrmgus end
 		UI.Minimap.UpdateSeenXY(pos);
 		MarkSeenTile(mf);
 	}

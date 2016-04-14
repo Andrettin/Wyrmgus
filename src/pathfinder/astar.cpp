@@ -533,7 +533,10 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 			}
 			const int flag = check_flags & mask;
 			//Wyrmgus end
-			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsExplored(*unit.Player))) {
+			//Wyrmgus start
+//			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsExplored(*unit.Player))) {
+			if (flag && (AStarKnowUnseenTerrain || mf->playerInfo.IsTeamExplored(*unit.Player))) {
+			//Wyrmgus end
 				if (flag & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)) {
 					// we can't cross fixed units and other unpassable things
 					return -1;
@@ -565,7 +568,10 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 				}
 			}
 			// Add cost of crossing unknown tiles if required
-			if (!AStarKnowUnseenTerrain && !mf->playerInfo.IsExplored(*unit.Player)) {
+			//Wyrmgus start
+//			if (!AStarKnowUnseenTerrain && !mf->playerInfo.IsExplored(*unit.Player)) {
+			if (!AStarKnowUnseenTerrain && !mf->playerInfo.IsTeamExplored(*unit.Player)) {
+			//Wyrmgus end
 				// Tend against unknown tiles.
 				cost += AStarUnknownTerrainCost;
 			}
