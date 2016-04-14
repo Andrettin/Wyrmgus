@@ -584,7 +584,7 @@ void CGrandStrategyGame::DrawInterface()
 			interface_state_name = GrandStrategyInterfaceState;
 			
 			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler != NULL) {
-				interface_state_name = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->GetRulerTitle();
+				interface_state_name = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->GetCharacterTitle(CharacterTitleHeadOfState, GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Gender);
 			
 				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->GetFullName();
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
@@ -2916,8 +2916,8 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	std::string work_name;
 	
 	std::vector<CGrandStrategyHero *> potential_heroes;
-	for (size_t i = 0; i < this->Owner->HistoricalRulers.size(); ++i) {
-		potential_heroes.push_back(this->Owner->HistoricalRulers[i]);
+	for (size_t i = 0; i < this->Owner->HistoricalMinisters[CharacterTitleHeadOfState].size(); ++i) {
+		potential_heroes.push_back(this->Owner->HistoricalMinisters[CharacterTitleHeadOfState][i]);
 	}
 	if (potential_heroes.size() > 0) {
 		work_name += potential_heroes[SyncRand(potential_heroes.size())]->Name;
@@ -3381,14 +3381,14 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(this->GetRulerTitle() + " " + this->Ruler->GetFullName()).c_str(),
-				("A new " + FullyDecapitalizeString(this->GetRulerTitle()) + " has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + "Type: " + this->Ruler->Type->Name + "\\n" + "Trait: " + this->Ruler->Trait->Name + "\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
+				(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ruler->Gender) + " " + this->Ruler->GetFullName()).c_str(),
+				("A new " + FullyDecapitalizeString(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ruler->Gender)) + " has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + "Type: " + this->Ruler->Type->Name + "\\n" + "Trait: " + this->Ruler->Trait->Name + "\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
 			);
 			CclCommand(buf);	
 		}
 		
-		if (std::find(this->HistoricalRulers.begin(), this->HistoricalRulers.end(), hero) == this->HistoricalRulers.end()) {
-			this->HistoricalRulers.push_back(hero);
+		if (std::find(this->HistoricalMinisters[CharacterTitleHeadOfState].begin(), this->HistoricalMinisters[CharacterTitleHeadOfState].end(), hero) == this->HistoricalMinisters[CharacterTitleHeadOfState].end()) {
+			this->HistoricalMinisters[CharacterTitleHeadOfState].push_back(hero);
 		}
 	}
 	
@@ -3578,98 +3578,112 @@ std::string CGrandStrategyFaction::GetTitle()
 	return faction_title;
 }
 
-std::string CGrandStrategyFaction::GetRulerTitle()
+std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 {
-	if (this->Ruler == NULL) {
-		return "";
-	}
-	
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
-		if (this->Ruler->Gender != FemaleGender) {
-			return "Chieftain";
-		} else {
-			return "Chieftess";
+	if (title_type == CharacterTitleHeadOfState) {
+		if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+			if (gender != FemaleGender) {
+				return "Chieftain";
+			} else {
+				return "Chieftess";
+			}
+		} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
+			std::string faction_title = this->GetTitle();
+			
+			if (faction_title == "Barony") {
+				if (gender != FemaleGender) {
+					return "Baron";
+				} else {
+					return "Baroness";
+				}
+			} else if (faction_title == "Lordship") {
+				if (gender != FemaleGender) {
+					return "Lord";
+				} else {
+					return "Lady";
+				}
+			} else if (faction_title == "County") {
+				if (gender != FemaleGender) {
+					return "Count";
+				} else {
+					return "Countess";
+				}
+			} else if (faction_title == "City-State") {
+				return "Archon";
+			} else if (faction_title == "Duchy") {
+				if (gender != FemaleGender) {
+					return "Duke";
+				} else {
+					return "Duchess";
+				}
+			} else if (faction_title == "Principality") {
+				if (gender != FemaleGender) {
+					return "Prince";
+				} else {
+					return "Princess";
+				}
+			} else if (faction_title == "Margraviate") {
+				return "Margrave";
+			} else if (faction_title == "Landgraviate") {
+				return "Landgrave";
+			} else if (faction_title == "Grand Duchy") {
+				if (gender != FemaleGender) {
+					return "Grand Duke";
+				} else {
+					return "Grand Duchess";
+				}
+			} else if (faction_title == "Archduchy") {
+				if (gender != FemaleGender) {
+					return "Archduke";
+				} else {
+					return "Archduchess";
+				}
+			} else if (faction_title == "Kingdom") {
+				if (gender != FemaleGender) {
+					return "King";
+				} else {
+					return "Queen";
+				}
+			} else if (faction_title == "Khanate") {
+				return "Khan";
+			} else if (faction_title == "Empire") {
+				if (gender != FemaleGender) {
+					return "Emperor";
+				} else {
+					return "Empress";
+				}
+			} else if (faction_title == "Republic") {
+				return "Consul";
+			} else if (faction_title == "Confederation") {
+				return "Chancellor";
+			} else if (faction_title == "Theocracy") {
+				if (gender != FemaleGender) {
+					return "High Priest";
+				} else {
+					return "High Priestess";
+				}
+			} else if (faction_title == "Bishopric") {
+				return "Bishop";
+			} else if (faction_title == "Archbishopric") {
+				return "Archbishop";
+			}
 		}
-	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
-		std::string faction_title = this->GetTitle();
-		
-		if (faction_title == "Barony") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "Baron";
-			} else {
-				return "Baroness";
-			}
-		} else if (faction_title == "Lordship") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "Lord";
-			} else {
-				return "Lady";
-			}
-		} else if (faction_title == "County") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "Count";
-			} else {
-				return "Countess";
-			}
-		} else if (faction_title == "City-State") {
-			return "Archon";
-		} else if (faction_title == "Duchy") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "Duke";
-			} else {
-				return "Duchess";
-			}
-		} else if (faction_title == "Principality") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "Prince";
-			} else {
-				return "Princess";
-			}
-		} else if (faction_title == "Margraviate") {
-			return "Margrave";
-		} else if (faction_title == "Landgraviate") {
-			return "Landgrave";
-		} else if (faction_title == "Grand Duchy") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "Grand Duke";
-			} else {
-				return "Grand Duchess";
-			}
-		} else if (faction_title == "Archduchy") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "Archduke";
-			} else {
-				return "Archduchess";
-			}
-		} else if (faction_title == "Kingdom") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "King";
-			} else {
-				return "Queen";
-			}
-		} else if (faction_title == "Khanate") {
-			return "Khan";
-		} else if (faction_title == "Empire") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "Emperor";
-			} else {
-				return "Empress";
-			}
-		} else if (faction_title == "Republic") {
-			return "Consul";
-		} else if (faction_title == "Confederation") {
-			return "Chancellor";
-		} else if (faction_title == "Theocracy") {
-			if (this->Ruler->Gender != FemaleGender) {
-				return "High Priest";
-			} else {
-				return "High Priestess";
-			}
-		} else if (faction_title == "Bishopric") {
-			return "Bishop";
-		} else if (faction_title == "Archbishopric") {
-			return "Archbishop";
-		}
+	} else if (title_type == CharacterTitleHeadOfGovernment) {
+		return "Prime Minister";
+	} else if (title_type == CharacterTitleFinanceMinister) {
+		return "Finance Minister";
+	} else if (title_type == CharacterTitleForeignMinister) {
+		return "Foreign Minister";
+	} else if (title_type == CharacterTitleIntelligenceMinister) {
+		return "Intelligence Minister";
+	} else if (title_type == CharacterTitleInteriorMinister) {
+		return "Interior Minister";
+	} else if (title_type == CharacterTitleJusticeMinister) {
+		return "Justice Minister";
+	} else if (title_type == CharacterTitleWarMinister) {
+		return "War Minister";
+	} else if (title_type == CharacterTitleGeneral) {
+		return "General";
 	}
 	
 	return "";
@@ -3746,8 +3760,8 @@ void CGrandStrategyHero::Die()
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(GrandStrategyGame.PlayerFaction->GetRulerTitle() + " " + this->GetFullName() + " Dies").c_str(),
-				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetRulerTitle()) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
+				(GrandStrategyGame.PlayerFaction->GetCharacterTitle(CharacterTitleHeadOfState, this->Gender) + " " + this->GetFullName() + " Dies").c_str(),
+				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetCharacterTitle(CharacterTitleHeadOfState, this->Gender)) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
 			);
 			CclCommand(buf);	
 		} else if (
@@ -5159,7 +5173,7 @@ void CleanGrandStrategyGame()
 					}
 				}
 				GrandStrategyGame.Factions[i][j]->Claims.clear();
-				GrandStrategyGame.Factions[i][j]->HistoricalRulers.clear();
+				GrandStrategyGame.Factions[i][j]->HistoricalMinisters[CharacterTitleHeadOfState].clear();
 				GrandStrategyGame.Factions[i][j]->HistoricalTechnologies.clear();
 			}
 		}
@@ -5908,8 +5922,8 @@ void FinalizeGrandStrategyInitialization()
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
 				if (GrandStrategyGameLoading == false) {
-					for (std::map<std::pair<int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalRulers.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalRulers.end(); ++iterator) { //set the appropriate historical rulers
-						if (GrandStrategyYear >= iterator->first.first && GrandStrategyYear < iterator->first.second) {
+					for (std::map<std::tuple<int,int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
+						if (GrandStrategyYear >= std::get<0>(iterator->first) && GrandStrategyYear < std::get<1>(iterator->first) && std::get<2>(iterator->first) == CharacterTitleHeadOfState) {
 							GrandStrategyGame.Factions[i][j]->SetRuler(iterator->second->GetFullName());
 						}
 					}

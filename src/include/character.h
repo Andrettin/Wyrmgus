@@ -79,6 +79,24 @@ enum Attributes {
 	MaxAttributes
 };
 
+/**
+**  Indexes into character title array.
+*/
+enum CharacterTitles {
+	CharacterTitleHeadOfState, // also used for titulars to aristocratic titles which were formal only; for example: the French duke of Orléans did not rule over Orléans, but here we consider the "head of state" title to also encompass such cases
+	CharacterTitleHeadOfGovernment,
+	CharacterTitleFinanceMinister,
+	CharacterTitleForeignMinister,
+	CharacterTitleIntelligenceMinister,
+	CharacterTitleInteriorMinister,
+	CharacterTitleJusticeMinister,
+	CharacterTitleWarMinister,
+
+	CharacterTitleGeneral, // this is to be used later for characters who can lead armies; maybe restrict movable heroes to generals?
+	
+	MaxCharacterTitles
+};
+
 class CCharacter
 {
 public:
@@ -140,7 +158,7 @@ public:
 	std::vector<CItem *> Items;
 	int Attributes[MaxAttributes];
 	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
-	std::vector<std::tuple<int, int, CFaction *>> HistoricalRulerships;	/// historical rulerships of the character, the first element is the beginning year of the rule, the second one the end year, and the third the faction ruled over
+	std::vector<std::tuple<int, int, CFaction *, int>> HistoricalTitles;	/// historical rulerships of the character, the first element is the beginning year of the rule, the second one the end year, the third the faction it pertains to (if any, if not then it is NULL), and the fourth is the character title itself (from the character title enums)
 };
 
 /*----------------------------------------------------------------------------
@@ -171,6 +189,9 @@ extern void ChangeCustomHeroCivilization(std::string hero_full_name, std::string
 extern bool IsNameValidForCustomHero(std::string hero_name, std::string hero_family_name);
 extern std::string GetGenderNameById(int gender);
 extern int GetGenderIdByName(std::string gender);
+extern std::string GetCharacterTitleNameById(int title);
+extern int GetCharacterTitleIdByName(std::string title);
+extern bool IsMinisterialTitle(int title);
 extern void CharacterCclRegister();
 
 //@}

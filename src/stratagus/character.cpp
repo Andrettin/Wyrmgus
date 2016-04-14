@@ -185,18 +185,18 @@ void CCharacter::GenerateMissingData()
 	}
 	
 	if (this->Year != 0 && this->DeathYear != 0) { // if any of the character's historical rulerships have blank years, try to fill them in with the character's start or death years
-		for (size_t i = 0; i < this->HistoricalRulerships.size(); ++i) {
+		for (size_t i = 0; i < this->HistoricalTitles.size(); ++i) {
 			bool historical_rulership_changed = false;
-			if (std::get<0>(this->HistoricalRulerships[i]) == 0) {
-				std::get<0>(this->HistoricalRulerships[i]) = this->Year;
+			if (std::get<0>(this->HistoricalTitles[i]) == 0) {
+				std::get<0>(this->HistoricalTitles[i]) = this->Year;
 				historical_rulership_changed = true;
 			}
-			if (std::get<1>(this->HistoricalRulerships[i]) == 0) {
-				std::get<1>(this->HistoricalRulerships[i]) = this->DeathYear;
+			if (std::get<1>(this->HistoricalTitles[i]) == 0) {
+				std::get<1>(this->HistoricalTitles[i]) = this->DeathYear;
 				historical_rulership_changed = true;
 			}
-			if (historical_rulership_changed && std::get<0>(this->HistoricalRulerships[i]) != 0 && std::get<1>(this->HistoricalRulerships[i]) != 0) {
-				std::get<2>(this->HistoricalRulerships[i])->HistoricalRulers[std::pair<int, int>(std::get<0>(this->HistoricalRulerships[i]), std::get<1>(this->HistoricalRulerships[i]))] = this;
+			if (historical_rulership_changed && std::get<0>(this->HistoricalTitles[i]) != 0 && std::get<1>(this->HistoricalTitles[i]) != 0) {
+				std::get<2>(this->HistoricalTitles[i])->HistoricalMinisters[std::tuple<int, int, int>(std::get<0>(this->HistoricalTitles[i]), std::get<1>(this->HistoricalTitles[i]), std::get<3>(this->HistoricalTitles[i]))] = this;
 			}
 		}
 	}
@@ -686,4 +686,58 @@ int GetGenderIdByName(std::string gender)
 	return -1;
 }
 
+std::string GetCharacterTitleNameById(int title)
+{
+	if (title == CharacterTitleHeadOfState) {
+		return "head-of-state";
+	} else if (title == CharacterTitleHeadOfGovernment) {
+		return "head-of-government";
+	} else if (title == CharacterTitleFinanceMinister) {
+		return "finance-minister";
+	} else if (title == CharacterTitleForeignMinister) {
+		return "foreign-minister";
+	} else if (title == CharacterTitleIntelligenceMinister) {
+		return "intelligence-minister";
+	} else if (title == CharacterTitleInteriorMinister) {
+		return "interior-minister";
+	} else if (title == CharacterTitleJusticeMinister) {
+		return "justice-minister";
+	} else if (title == CharacterTitleWarMinister) {
+		return "war-minister";
+	} else if (title == CharacterTitleGeneral) {
+		return "general";
+	}
+
+	return "";
+}
+
+int GetCharacterTitleIdByName(std::string title)
+{
+	if (title == "head-of-state") {
+		return CharacterTitleHeadOfState;
+	} else if (title == "head-of-government") {
+		return CharacterTitleHeadOfGovernment;
+	} else if (title == "finance-minister") {
+		return CharacterTitleFinanceMinister;
+	} else if (title == "foreign-minister") {
+		return CharacterTitleForeignMinister;
+	} else if (title == "intelligence-minister") {
+		return CharacterTitleIntelligenceMinister;
+	} else if (title == "interior-minister") {
+		return CharacterTitleInteriorMinister;
+	} else if (title == "justice-minister") {
+		return CharacterTitleJusticeMinister;
+	} else if (title == "war-minister") {
+		return CharacterTitleWarMinister;
+	} else if (title == "general") {
+		return CharacterTitleGeneral;
+	}
+
+	return -1;
+}
+
+bool IsMinisterialTitle(int title)
+{
+	return (title == CharacterTitleHeadOfState || title == CharacterTitleHeadOfGovernment || title == CharacterTitleFinanceMinister || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleInteriorMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleWarMinister);
+}
 //@}

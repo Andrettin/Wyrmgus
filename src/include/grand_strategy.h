@@ -247,7 +247,7 @@ public:
 	bool CanFormFaction(int civilization, int faction);
 	std::string GetFullName();
 	std::string GetTitle();
-	std::string GetRulerTitle();
+	std::string GetCharacterTitle(int title_type, int gender);
 	
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).
@@ -267,7 +267,7 @@ public:
 	int DiplomacyState[MAX_RACES][FactionMax];							/// Diplomacy state between this faction and each other faction
 	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
-	std::vector<CGrandStrategyHero *> HistoricalRulers;					/// All rulers who have reigned over this faction
+	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles];	/// All characters who had a ministerial (or head of state or government) title in this faction
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 };
 

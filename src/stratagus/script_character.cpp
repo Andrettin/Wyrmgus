@@ -369,28 +369,34 @@ static int CclDefineCharacter(lua_State *l)
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 				}
 			}
-		} else if (!strcmp(value, "HistoricalRulerships")) {
+		} else if (!strcmp(value, "HistoricalTitles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
+				int title = GetCharacterTitleIdByName(LuaToString(l, -1, j + 1));
+				if (title == -1) {
+					LuaError(l, "Character title doesn't exist.");
+				}
+				++j;
 				int start_year = LuaToNumber(l, -1, j + 1);
 				++j;
 				int end_year = LuaToNumber(l, -1, j + 1);
 				++j;
-				std::string rulership_civilization_name = LuaToString(l, -1, j + 1);
-				int rulership_civilization = PlayerRaces.GetRaceIndexByName(rulership_civilization_name.c_str());
+				
+				std::string title_civilization_name = LuaToString(l, -1, j + 1);
+				int title_civilization = PlayerRaces.GetRaceIndexByName(title_civilization_name.c_str());
 				++j;
-				std::string rulership_faction_name = LuaToString(l, -1, j + 1);
-				int rulership_faction = PlayerRaces.GetFactionIndexByName(rulership_civilization, rulership_faction_name);
-				if (rulership_faction == -1) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ rulership_faction_name.c_str());
+				std::string title_faction_name = LuaToString(l, -1, j + 1);
+				int title_faction = PlayerRaces.GetFactionIndexByName(title_civilization, title_faction_name);
+				if (title_faction == -1) {
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
 				}
-				if (start_year != 0 && end_year != 0) { // don't put in the faction's historical data if a blank year was given
-					PlayerRaces.Factions[rulership_civilization][rulership_faction]->HistoricalRulers[std::pair<int, int>(start_year, end_year)] = character;
+				if (start_year != 0 && end_year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
+					PlayerRaces.Factions[title_civilization][title_faction]->HistoricalMinisters[std::tuple<int, int, int>(start_year, end_year, title)] = character;
 				}
-				character->HistoricalRulerships.push_back(std::tuple<int, int, CFaction *>(start_year, end_year, PlayerRaces.Factions[rulership_civilization][rulership_faction]));
+				character->HistoricalTitles.push_back(std::tuple<int, int, CFaction *, int>(start_year, end_year, PlayerRaces.Factions[title_civilization][title_faction], title));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
