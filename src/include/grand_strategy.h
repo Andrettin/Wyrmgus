@@ -136,7 +136,6 @@ public:
 		memset(UnderConstructionUnits, 0, sizeof(UnderConstructionUnits));
 		memset(MovingUnits, 0, sizeof(MovingUnits));
 		memset(AttackingUnits, 0, sizeof(AttackingUnits));
-		memset(BorderProvinces, 0, sizeof(BorderProvinces));
 		memset(Income, 0, sizeof(Income));
 		memset(ProductionCapacity, 0, sizeof(ProductionCapacity));
 		memset(ProductionCapacityFulfilled, 0, sizeof(ProductionCapacityFulfilled));
@@ -201,7 +200,7 @@ public:
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
 	std::vector<CGrandStrategyHero *> ActiveHeroes;						/// Active (can move, attack and defend) heroes in the province
-	int BorderProvinces[ProvinceMax];									/// Which provinces this province borders
+	std::vector<int> BorderProvinces;									/// Which provinces this province borders
 	int Income[MaxCosts];												/// Income for each resource.
 	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
 	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled
@@ -214,10 +213,9 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), ProvinceCount(0), Upkeep(0)
+		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), Upkeep(0)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
-		memset(OwnedProvinces, -1, sizeof(OwnedProvinces));
 		memset(Resources, 0, sizeof(Resources));
 		memset(Income, 0, sizeof(Income));
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
@@ -255,10 +253,9 @@ public:
 	int GovernmentType;													/// Government type of the faction (-1 = none).
 	int FactionTier;													/// What is the tier of this faction (barony, etc.).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
-	int ProvinceCount;													/// Quantity of provinces owned by this faction.
 	int Upkeep;															/// How much gold this faction has to pay per turn
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
-	int OwnedProvinces[ProvinceMax];									/// Provinces owned by this faction
+	std::vector<int> OwnedProvinces;									/// Provinces owned by this faction
 	int Resources[MaxCosts];											/// Amount of each resource stored by the faction.
 	int Income[MaxCosts];												/// Income of each resource for the faction.
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.

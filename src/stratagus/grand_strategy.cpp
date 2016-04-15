@@ -463,7 +463,7 @@ void CGrandStrategyGame::DrawMinimap()
 
 void CGrandStrategyGame::DrawInterface()
 {
-	if (this->PlayerFaction != NULL && this->PlayerFaction->ProvinceCount > 0) { //draw resource bar
+	if (this->PlayerFaction != NULL && this->PlayerFaction->OwnedProvinces.size() > 0) { //draw resource bar
 		std::vector<int> stored_resources;
 		stored_resources.push_back(GoldCost);
 		stored_resources.push_back(WoodCost);
@@ -483,7 +483,7 @@ void CGrandStrategyGame::DrawInterface()
 			if (stored_resources[i] == GoldCost) {
 				income = this->PlayerFaction->Income[stored_resources[i]] - this->PlayerFaction->Upkeep;
 			} else if (stored_resources[i] == ResearchCost) {
-				income = this->PlayerFaction->Income[stored_resources[i]] / this->PlayerFaction->ProvinceCount;
+				income = this->PlayerFaction->Income[stored_resources[i]] / this->PlayerFaction->OwnedProvinces.size();
 			} else {
 				income = this->PlayerFaction->Income[stored_resources[i]];
 			}
@@ -838,7 +838,7 @@ void CGrandStrategyGame::DoTurn()
 					if (k == GrainCost || k == MushroomCost || k == FishCost || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
 						continue;
 					} else if (k == ResearchCost) {
-						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->ProvinceCount;
+						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->OwnedProvinces.size();
 					} else {
 						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
 					}
@@ -1058,10 +1058,10 @@ void CGrandStrategyGame::DoTrade()
 		}
 	}
 	
-	bool province_consumed_commodity[MaxCosts][ProvinceMax];
+	std::vector<bool> province_consumed_commodity[MaxCosts];
 	for (int i = 0; i < MaxCosts; ++i) {
 		for (size_t j = 0; j < this->Provinces.size(); ++j) {
-			province_consumed_commodity[i][j] = false;
+			province_consumed_commodity[i].push_back(false);
 		}
 	}
 	
@@ -1069,7 +1069,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (this->Factions[i][j]->IsAlive()) {
-				for (int k = 0; k < this->Factions[i][j]->ProvinceCount; ++k) {
+				for (size_t k = 0; k < this->Factions[i][j]->OwnedProvinces.size(); ++k) {
 					int province_id = this->Factions[i][j]->OwnedProvinces[k];
 					for (int res = 0; res < MaxCosts; ++res) {
 						if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
@@ -1156,7 +1156,7 @@ void CGrandStrategyGame::DoTrade()
 		if (factions_by_prestige[i]) {
 			for (int j = 0; j < factions_by_prestige_count; ++j) {
 				if (j != i && factions_by_prestige[j]) {
-					for (int k = 0; k < factions_by_prestige[j]->ProvinceCount; ++k) {
+					for (size_t k = 0; k < factions_by_prestige[j]->OwnedProvinces.size(); ++k) {
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
@@ -2016,16 +2016,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	}
 	
 	if (this->Owner != NULL) { //if province has a previous owner, remove it from the owner's province list
-		for (int i = 0; i < this->Owner->ProvinceCount; ++i) {
-			if (this->Owner->OwnedProvinces[i] == this->ID) {
-				//if this owned province is the one we are changing the owner of, push every element of the array after it back one step
-				for (int j = i; j < this->Owner->ProvinceCount; ++j) {
-					this->Owner->OwnedProvinces[j] = this->Owner->OwnedProvinces[j + 1];
-				}
-				break;
-			}
-		}
-		this->Owner->ProvinceCount -= 1;
+		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
 		
 		//set the province's faction-specific units back to the corresponding units of the province's civilization
 		if (this->Owner->Civilization == this->Civilization) {
@@ -2086,8 +2077,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 
 	if (civilization_id != -1 && faction_id != -1) {
 		this->Owner = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization_id][faction_id]));
-		this->Owner->OwnedProvinces[this->Owner->ProvinceCount] = this->ID;
-		this->Owner->ProvinceCount += 1;
+		this->Owner->OwnedProvinces.push_back(this->ID);
 		
 		if (this->Civilization == -1) { // if province has no civilization/culture defined, then make its culture that of its owner
 			this->SetCivilization(this->Owner->Civilization);
@@ -2696,13 +2686,9 @@ bool CGrandStrategyProvince::HasResource(int resource, bool ignore_prospection)
 
 bool CGrandStrategyProvince::BordersProvince(int province_id)
 {
-	for (int i = 0; i < ProvinceMax; ++i) {
-		if (this->BorderProvinces[i] != -1) {
-			if (this->BorderProvinces[i] == province_id) {
-				return true;
-			}
-		} else {
-			break;
+	for (size_t i = 0; i < this->BorderProvinces.size(); ++i) {
+		if (this->BorderProvinces[i] == province_id) {
+			return true;
 		}
 	}
 	return false;
@@ -2710,16 +2696,12 @@ bool CGrandStrategyProvince::BordersProvince(int province_id)
 
 bool CGrandStrategyProvince::BordersFaction(int faction_civilization, int faction)
 {
-	for (int i = 0; i < ProvinceMax; ++i) {
-		if (this->BorderProvinces[i] != -1) {
-			if (GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner == NULL) {
-				continue;
-			}
-			if (GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner->Civilization == faction_civilization && GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner->Faction == faction) {
-				return true;
-			}
-		} else {
-			break;
+	for (size_t i = 0; i < this->BorderProvinces.size(); ++i) {
+		if (GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner == NULL) {
+			continue;
+		}
+		if (GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner->Civilization == faction_civilization && GrandStrategyGame.Provinces[this->BorderProvinces[i]]->Owner->Faction == faction) {
+			return true;
 		}
 	}
 	return false;
@@ -3243,12 +3225,12 @@ void CGrandStrategyFaction::CalculateIncome(int resource)
 		return;
 	}
 	
-	if (this->ProvinceCount == 0) {
+	if (!this->IsAlive()) {
 		this->Income[resource] = 0;
 		return;
 	}
 	
-	for (int i = 0; i < this->ProvinceCount; ++i) {
+	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
 		int province_id = this->OwnedProvinces[i];
 		GrandStrategyGame.Provinces[province_id]->CalculateIncome(resource);
 	}
@@ -3265,11 +3247,11 @@ void CGrandStrategyFaction::CalculateUpkeep()
 {
 	this->Upkeep = 0;
 	
-	if (this->ProvinceCount == 0) {
+	if (!this->IsAlive()) {
 		return;
 	}
 	
-	for (int i = 0; i < this->ProvinceCount; ++i) {
+	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
 		int province_id = this->OwnedProvinces[i];
 		for (size_t j = 0; j < UnitTypes.size(); ++j) {
 			if (GrandStrategyGame.Provinces[province_id]->Units[j] > 0 && UnitTypes[j]->Upkeep > 0) {
@@ -3310,9 +3292,9 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		}
 	}
 
-	
-	if (this->ProvinceCount > 0) {
-		for (int i = (this->ProvinceCount - 1); i >= 0; --i) {
+	int province_count = this->OwnedProvinces.size();
+	if (province_count > 0) {
+		for (int i = (province_count - 1); i >= 0; --i) {
 			int province_id = this->OwnedProvinces[i];
 
 			//GrandStrategyGame.Provinces[province_id]->SetOwner(new_civilization, new_faction);
@@ -3477,7 +3459,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 		}
 		
 		if (hero->Province == NULL || hero->Province->Owner != this) { // if the hero's province is not owned by this faction, move him to a random province owned by this faction
-			GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->SetHero(hero->GetFullName(), hero->State);
+			GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->OwnedProvinces.size())]]->SetHero(hero->GetFullName(), hero->State);
 		}
 	}
 	
@@ -3573,7 +3555,7 @@ void CGrandStrategyFaction::GenerateMinister(int title, bool child_of_current_mi
 	if (child_of_current_minister && this->Ministers[title]->Province->Owner == this) {
 		province = this->Ministers[title]->Province;
 	} else {
-		province = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]];
+		province = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->OwnedProvinces.size())]];
 	}
 	
 	CGrandStrategyHero *hero = province->GenerateHero(GetCharacterTitleNameById(title), child_of_current_minister ? this->Ministers[title] : NULL);
@@ -3587,7 +3569,7 @@ void CGrandStrategyFaction::GenerateMinister(int title, bool child_of_current_mi
 
 bool CGrandStrategyFaction::IsAlive()
 {
-	return this->ProvinceCount > 0;
+	return this->OwnedProvinces.size() > 0;
 }
 
 bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name)
@@ -3811,7 +3793,7 @@ void CGrandStrategyHero::Initialize()
 	if (!this->Custom) {
 		province_of_origin_id = GetProvinceId(this->ProvinceOfOriginName);
 	} else {
-		province_of_origin_id = GrandStrategyGame.PlayerFaction->OwnedProvinces[0];
+		province_of_origin_id = GrandStrategyGame.PlayerFaction->OwnedProvinces[SyncRand(GrandStrategyGame.PlayerFaction->OwnedProvinces.size())];
 	}
 	
 	if (province_of_origin_id == -1) {
@@ -5287,7 +5269,6 @@ void CleanGrandStrategyGame()
 				}
 				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
 				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
-				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
 				GrandStrategyGame.Factions[i][j]->Upkeep = 0;
 				memset(GrandStrategyGame.Factions[i][j]->Ministers, 0, sizeof(GrandStrategyGame.Factions[i][j]->Ministers));
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
@@ -5299,9 +5280,7 @@ void CleanGrandStrategyGame()
 					GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
 					GrandStrategyGame.Factions[i][j]->Trade[k] = 0;
 				}
-				for (int k = 0; k < ProvinceMax; ++k) {
-					GrandStrategyGame.Factions[i][j]->OwnedProvinces[k] = -1;
-				}
+				GrandStrategyGame.Factions[i][j]->OwnedProvinces.clear();
 				for (size_t k = 0; k < UnitTypes.size(); ++k) {
 					GrandStrategyGame.Factions[i][j]->MilitaryScoreBonus[k] = 0;
 				}
@@ -6107,15 +6086,9 @@ void CalculateProvinceBorders()
 			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->Province = i; //tell the tile it belongs to this province
 		}
 			
-		for (int j = 0; j < ProvinceMax; ++j) { //clean border provinces
-			if (GrandStrategyGame.Provinces[i]->BorderProvinces[j] == -1) {
-				break;
-			}
-			GrandStrategyGame.Provinces[i]->BorderProvinces[j] = -1;
-		}
+		GrandStrategyGame.Provinces[i]->BorderProvinces.clear(); //clean border provinces
 			
 		//calculate which of the province's tiles are border tiles, and which provinces it borders; also whether the province borders water (is coastal) or not
-		int border_province_count = 0;
 		for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) {
 			int x = GrandStrategyGame.Provinces[i]->Tiles[j].x;
 			int y = GrandStrategyGame.Provinces[i]->Tiles[j].y;
@@ -6142,8 +6115,7 @@ void CalculateProvinceBorders()
 						}
 								
 						if (second_province_id != -1 && !GrandStrategyGame.Provinces[i]->BordersProvince(second_province_id)) { //if isn't added yet to the border provinces, do so now
-							GrandStrategyGame.Provinces[i]->BorderProvinces[border_province_count] = second_province_id;
-							border_province_count += 1;
+							GrandStrategyGame.Provinces[i]->BorderProvinces.push_back(second_province_id);
 						}
 								
 						if (second_province_id != -1 && GrandStrategyGame.Provinces[i]->Water == false && GrandStrategyGame.Provinces[second_province_id]->Water == true) {
@@ -6474,7 +6446,7 @@ void CalculateFactionIncomes(std::string civilization_name, std::string faction_
 		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 	}
 	
-	if (faction == -1 || GrandStrategyGame.Factions[civilization][faction]->ProvinceCount == 0) {
+	if (faction == -1 || !GrandStrategyGame.Factions[civilization][faction]->IsAlive()) {
 		return;
 	}
 	

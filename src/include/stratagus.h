@@ -163,12 +163,10 @@ extern const char NameLine[];
 #define FactionMax 128				/// Maximum number of factions a civilization can have
 #define PlayerColorMax 32			/// How many player colors are supported
 #define VariationMax 32				/// Maximum number of variations a unit can have
-#define PersonalNameMax 1024		/// Maximum number of personal names a civilization can have
 
 #define WorldMapWidthMax 1024		/// Maximum width the grand strategy world map can have
 #define WorldMapHeightMax 1024		/// Maximum height the grand strategy world map can have
 #define WorldMapTerrainTypeMax 32	/// Maximum height the grand strategy world map can have
-#define ProvinceMax 256				/// Maximum quantity of provinces in a grand strategy game
 #define RiverMax 256				/// Maximum quantity of rivers in a grand strategy game
 #define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
 
