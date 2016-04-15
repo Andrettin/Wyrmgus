@@ -240,11 +240,12 @@ public:
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
 	void SetMinister(int title, std::string hero_full_name);
-	void RulerSuccession();
-	void GenerateRuler(bool child_of_current_ruler = false);
+	void MinisterSuccession(int title);
+	void GenerateMinister(int title, bool child_of_current_minister = false);
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
 	bool CanFormFaction(int civilization, int faction);
+	bool HasGovernmentPosition(int title);
 	std::string GetFullName();
 	std::string GetTitle();
 	std::string GetCharacterTitle(int title_type, int gender);
