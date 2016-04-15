@@ -563,7 +563,7 @@ void CGrandStrategyGame::DrawInterface()
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(food_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), food_string);
 			
 			//draw show ruler button
-			if (UI.GrandStrategyShowRulerButton.X != -1 && GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ruler != NULL) {
+			if (UI.GrandStrategyShowRulerButton.X != -1 && GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] != NULL) {
 				DrawUIButton(
 					UI.GrandStrategyShowRulerButton.Style,
 					(UI.GrandStrategyShowRulerButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
@@ -583,19 +583,19 @@ void CGrandStrategyGame::DrawInterface()
 		} else if (GrandStrategyInterfaceState == "Ruler") {
 			interface_state_name = GrandStrategyInterfaceState;
 			
-			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler != NULL) {
-				interface_state_name = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->GetCharacterTitle(CharacterTitleHeadOfState, GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Gender);
+			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
+				interface_state_name = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->GetCharacterTitle(CharacterTitleHeadOfState, GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->Gender);
 			
-				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->GetFullName();
+				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->GetFullName();
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
 				item_y += 1;
 				
-				std::string ruler_type_string = "Type: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Type->Name + " Trait: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->Trait->Name;
+				std::string ruler_type_string = "Type: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->Type->Name + " Trait: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->Trait->Name;
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_type_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_type_string);
 				item_y += 1;
 				
 				// draw ruler effects string
-				std::string ruler_effects_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ruler->GetRulerEffectsString();
+				std::string ruler_effects_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->GetRulerEffectsString();
 				
 				int str_width_per_total_width = 1;
 				str_width_per_total_width += GetGameFont().Width(ruler_effects_string) / (218 - 6);
@@ -845,12 +845,12 @@ void CGrandStrategyGame::DoTurn()
 				}
 					
 				// try to perform ruler succession for existent factions without rulers
-				if (this->Factions[i][j]->Ruler == NULL) {
+				if (this->Factions[i][j]->Ministers[CharacterTitleHeadOfState] == NULL) {
 					this->Factions[i][j]->RulerSuccession();
 				}
 			} else {
-				if (this->Factions[i][j]->Ruler != NULL) {
-					this->Factions[i][j]->SetRuler(""); //"dead" factions should have no ruler
+				if (this->Factions[i][j]->Ministers[CharacterTitleHeadOfState] != NULL) {
+					this->Factions[i][j]->SetMinister(CharacterTitleHeadOfState, ""); //"dead" factions should have no ruler
 				}
 			}
 		}
@@ -2755,8 +2755,8 @@ int CGrandStrategyProvince::GetAdministrativeEfficiencyModifier()
 	}
 	
 	
-	if (this->Owner != NULL && this->Owner->Ruler != NULL) {
-		modifier += this->Owner->Ruler->GetAdministrativeEfficiencyModifier();
+	if (this->Owner != NULL && this->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
+		modifier += this->Owner->Ministers[CharacterTitleHeadOfState]->GetAdministrativeEfficiencyModifier();
 	}
 	
 	return modifier;
@@ -2792,8 +2792,8 @@ int CGrandStrategyProvince::GetRevoltRisk()
 			revolt_risk += 1; //if the owner does not have a claim to the province, it gets plus 1% revolt risk
 		}
 		
-		if (this->Owner->Ruler != NULL) {
-			revolt_risk += this->Owner->Ruler->GetRevoltRiskModifier();
+		if (this->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
+			revolt_risk += this->Owner->Ministers[CharacterTitleHeadOfState]->GetRevoltRiskModifier();
 		}
 	}
 	
@@ -3235,8 +3235,8 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 	GrandStrategyGame.Factions[new_civilization][new_faction]->AcquireFactionTechnologies(old_civilization, old_faction);
 	
 	//set the ruler from the old faction
-	if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ruler != NULL) {
-		GrandStrategyGame.Factions[new_civilization][new_faction]->SetRuler(GrandStrategyGame.Factions[old_civilization][old_faction]->Ruler->GetFullName());
+	if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[CharacterTitleHeadOfState] != NULL) {
+		GrandStrategyGame.Factions[new_civilization][new_faction]->SetMinister(CharacterTitleHeadOfState, GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[CharacterTitleHeadOfState]->GetFullName());
 	}
 
 	
@@ -3336,8 +3336,8 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		CclCommand(buf_2);
 	}
 	
-	if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ruler != NULL) {
-		GrandStrategyGame.Factions[old_civilization][old_faction]->SetRuler(""); //do this after changing the PlayerFaction to prevent ruler death/rise to power messages, since the ruler is the same
+	if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[CharacterTitleHeadOfState] != NULL) {
+		GrandStrategyGame.Factions[old_civilization][old_faction]->SetMinister(CharacterTitleHeadOfState, ""); //do this after changing the PlayerFaction to prevent ruler death/rise to power messages, since the ruler is the same
 	}
 }
 
@@ -3358,13 +3358,13 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 	}
 }
 
-void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
+void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 {
 	if (hero_full_name.empty()) {
 		if (this->IsAlive() && GrandStrategyGameInitialized) {
 			this->RulerSuccession();
 		} else {
-			this->Ruler = NULL;
+			this->Ministers[CharacterTitleHeadOfState] = NULL;
 		}
 	} else {
 		CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
@@ -3372,7 +3372,7 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			if (hero->State == 0) {
 				hero->Create();
 			}
-			this->Ruler = const_cast<CGrandStrategyHero *>(&(*hero));
+			this->Ministers[CharacterTitleHeadOfState] = const_cast<CGrandStrategyHero *>(&(*hero));
 		} else {
 			fprintf(stderr, "Tried to make \"%s\" the ruler of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), this->GetFullName().c_str());
 		}
@@ -3381,8 +3381,8 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ruler->Gender) + " " + this->Ruler->GetFullName()).c_str(),
-				("A new " + FullyDecapitalizeString(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ruler->Gender)) + " has come to power in our realm, " + this->Ruler->GetFullName() + "!\\n\\n" + "Type: " + this->Ruler->Type->Name + "\\n" + "Trait: " + this->Ruler->Trait->Name + "\\n\\n" + this->Ruler->GetRulerEffectsString()).c_str()
+				(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Gender) + " " + this->Ministers[CharacterTitleHeadOfState]->GetFullName()).c_str(),
+				("A new " + FullyDecapitalizeString(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Gender)) + " has come to power in our realm, " + this->Ministers[CharacterTitleHeadOfState]->GetFullName() + "!\\n\\n" + "Type: " + this->Ministers[CharacterTitleHeadOfState]->Type->Name + "\\n" + "Trait: " + this->Ministers[CharacterTitleHeadOfState]->Trait->Name + "\\n\\n" + this->Ministers[CharacterTitleHeadOfState]->GetRulerEffectsString()).c_str()
 			);
 			CclCommand(buf);	
 		}
@@ -3398,30 +3398,30 @@ void CGrandStrategyFaction::SetRuler(std::string hero_full_name)
 void CGrandStrategyFaction::RulerSuccession()
 {
 	if (
-		this->Ruler != NULL
+		this->Ministers[CharacterTitleHeadOfState] != NULL
 		&& (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType == GovernmentTypeMonarchy)
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
-		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) {
-			if (this->Ruler->Children[i]->IsAlive() && this->Ruler->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
-				this->SetRuler(this->Ruler->Children[i]->GetFullName());
+		for (size_t i = 0; i < this->Ministers[CharacterTitleHeadOfState]->Children.size(); ++i) {
+			if (this->Ministers[CharacterTitleHeadOfState]->Children[i]->IsAlive() && this->Ministers[CharacterTitleHeadOfState]->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
+				this->SetMinister(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Children[i]->GetFullName());
 				return;
 			}
 		}
-		for (size_t i = 0; i < this->Ruler->Siblings.size(); ++i) { // now check for male siblings of the current ruler
-			if (this->Ruler->Siblings[i]->IsAlive() && this->Ruler->Siblings[i]->Gender == MaleGender) {
-				this->SetRuler(this->Ruler->Siblings[i]->GetFullName());
+		for (size_t i = 0; i < this->Ministers[CharacterTitleHeadOfState]->Siblings.size(); ++i) { // now check for male siblings of the current ruler
+			if (this->Ministers[CharacterTitleHeadOfState]->Siblings[i]->IsAlive() && this->Ministers[CharacterTitleHeadOfState]->Siblings[i]->Gender == MaleGender) {
+				this->SetMinister(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Siblings[i]->GetFullName());
 				return;
 			}
 		}		
-		for (size_t i = 0; i < this->Ruler->Children.size(); ++i) { //check again for children, but now allow for inheritance regardless of gender
-			if (this->Ruler->Children[i]->IsAlive()) {
-				this->SetRuler(this->Ruler->Children[i]->GetFullName());
+		for (size_t i = 0; i < this->Ministers[CharacterTitleHeadOfState]->Children.size(); ++i) { //check again for children, but now allow for inheritance regardless of gender
+			if (this->Ministers[CharacterTitleHeadOfState]->Children[i]->IsAlive()) {
+				this->SetMinister(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Children[i]->GetFullName());
 				return;
 			}
 		}
-		for (size_t i = 0; i < this->Ruler->Siblings.size(); ++i) { //check again for siblings, but now allow for inheritance regardless of gender
-			if (this->Ruler->Siblings[i]->IsAlive()) {
-				this->SetRuler(this->Ruler->Siblings[i]->GetFullName());
+		for (size_t i = 0; i < this->Ministers[CharacterTitleHeadOfState]->Siblings.size(); ++i) { //check again for siblings, but now allow for inheritance regardless of gender
+			if (this->Ministers[CharacterTitleHeadOfState]->Siblings[i]->IsAlive()) {
+				this->SetMinister(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Siblings[i]->GetFullName());
 				return;
 			}
 		}
@@ -3463,7 +3463,7 @@ void CGrandStrategyFaction::RulerSuccession()
 		}
 	}
 	if (ruler_candidates.size() > 0) {
-		this->SetRuler(ruler_candidates[SyncRand(ruler_candidates.size())]->GetFullName());
+		this->SetMinister(CharacterTitleHeadOfState, ruler_candidates[SyncRand(ruler_candidates.size())]->GetFullName());
 		return;
 	}
 
@@ -3476,12 +3476,12 @@ void CGrandStrategyFaction::GenerateRuler(bool child_of_current_ruler)
 		fprintf(stderr, "Faction \"%s\" is generating a ruler, but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Name.c_str());
 	}
 	
-	CGrandStrategyHero *hero = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->GenerateHero("ruler", child_of_current_ruler ? this->Ruler : NULL);
+	CGrandStrategyHero *hero = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]]->GenerateHero("ruler", child_of_current_ruler ? this->Ministers[CharacterTitleHeadOfState] : NULL);
 	
-	this->Ruler = NULL;
+	this->Ministers[CharacterTitleHeadOfState] = NULL;
 	
 	if (hero != NULL) {
-		this->SetRuler(hero->GetFullName());
+		this->SetMinister(CharacterTitleHeadOfState, hero->GetFullName());
 	}
 }
 
@@ -3756,7 +3756,7 @@ void CGrandStrategyHero::Die()
 {
 	//show message that the hero has died
 	if (GrandStrategyGameInitialized) {
-		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ruler == this) {
+		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this) {
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
@@ -3801,8 +3801,8 @@ void CGrandStrategyHero::Die()
 	//check if the hero is the ruler of a faction, and if so, remove it from that position
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (GrandStrategyGame.Factions[i][j]->Ruler == this) {
-				GrandStrategyGame.Factions[i][j]->SetRuler("");
+			if (GrandStrategyGame.Factions[i][j]->Ministers[CharacterTitleHeadOfState] == this) {
+				GrandStrategyGame.Factions[i][j]->SetMinister(CharacterTitleHeadOfState, "");
 			}
 		}
 	}
@@ -5150,7 +5150,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
 				GrandStrategyGame.Factions[i][j]->ProvinceCount = 0;
 				GrandStrategyGame.Factions[i][j]->Upkeep = 0;
-				GrandStrategyGame.Factions[i][j]->Ruler = NULL;
+				memset(GrandStrategyGame.Factions[i][j]->Ministers, 0, sizeof(GrandStrategyGame.Factions[i][j]->Ministers));
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
 				}
@@ -5924,13 +5924,13 @@ void FinalizeGrandStrategyInitialization()
 				if (GrandStrategyGameLoading == false) {
 					for (std::map<std::tuple<int,int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
 						if (GrandStrategyYear >= std::get<0>(iterator->first) && GrandStrategyYear < std::get<1>(iterator->first) && std::get<2>(iterator->first) == CharacterTitleHeadOfState) {
-							GrandStrategyGame.Factions[i][j]->SetRuler(iterator->second->GetFullName());
+							GrandStrategyGame.Factions[i][j]->SetMinister(CharacterTitleHeadOfState, iterator->second->GetFullName());
 						}
 					}
 				}
 				
 				// try to perform ruler succession for existent factions without rulers
-				if (GrandStrategyGame.Factions[i][j]->Ruler == NULL) {
+				if (GrandStrategyGame.Factions[i][j]->Ministers[CharacterTitleHeadOfState] == NULL) {
 					GrandStrategyGame.Factions[i][j]->RulerSuccession();
 				}
 				GrandStrategyGame.Factions[i][j]->CalculateIncomes();
@@ -6752,7 +6752,7 @@ bool FactionHasHero(std::string civilization_name, std::string faction_name, std
 		//check if the hero is the ruler of a faction
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				if (GrandStrategyGame.Factions[i][j]->Ruler == hero) {
+				if (GrandStrategyGame.Factions[i][j]->Ministers[CharacterTitleHeadOfState] == hero) {
 					if (civilization == i && faction == j) {
 						return true;
 					} else {
@@ -6774,35 +6774,37 @@ bool FactionHasHero(std::string civilization_name, std::string faction_name, std
 	return false;
 }
 
-void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_full_name)
+void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
 		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 	}
+	int title = GetCharacterTitleIdByName(title_name);
 	
-	if (faction == -1) {
+	if (faction == -1 || title == -1) {
 		return;
 	}
 	
-	GrandStrategyGame.Factions[civilization][faction]->SetRuler(TransliterateText(hero_full_name));
+	GrandStrategyGame.Factions[civilization][faction]->SetMinister(title, TransliterateText(hero_full_name));
 }
 
-std::string GetFactionRuler(std::string civilization_name, std::string faction_name)
+std::string GetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name)
 {
 	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
 	int faction = -1;
 	if (civilization != -1) {
 		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 	}
+	int title = GetCharacterTitleIdByName(title_name);
 	
-	if (faction == -1) {
+	if (faction == -1 || title == -1) {
 		return "";
 	}
 	
-	if (GrandStrategyGame.Factions[civilization][faction]->Ruler != NULL) {
-		return GrandStrategyGame.Factions[civilization][faction]->Ruler->GetFullName();
+	if (title == CharacterTitleHeadOfState && GrandStrategyGame.Factions[civilization][faction]->Ministers[CharacterTitleHeadOfState] != NULL) {
+		return GrandStrategyGame.Factions[civilization][faction]->Ministers[CharacterTitleHeadOfState]->GetFullName();
 	} else {
 		return "";
 	}

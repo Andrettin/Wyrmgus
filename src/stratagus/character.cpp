@@ -184,18 +184,18 @@ void CCharacter::GenerateMissingData()
 		year_data_changed = true;
 	}
 	
-	if (this->Year != 0 && this->DeathYear != 0) { // if any of the character's historical rulerships have blank years, try to fill them in with the character's start or death years
+	if (this->Year != 0 && this->DeathYear != 0) { // if any of the character's historical titles have blank years, try to fill them in with the character's start or death years
 		for (size_t i = 0; i < this->HistoricalTitles.size(); ++i) {
-			bool historical_rulership_changed = false;
+			bool historical_title_changed = false;
 			if (std::get<0>(this->HistoricalTitles[i]) == 0) {
 				std::get<0>(this->HistoricalTitles[i]) = this->Year;
-				historical_rulership_changed = true;
+				historical_title_changed = true;
 			}
 			if (std::get<1>(this->HistoricalTitles[i]) == 0) {
 				std::get<1>(this->HistoricalTitles[i]) = this->DeathYear;
-				historical_rulership_changed = true;
+				historical_title_changed = true;
 			}
-			if (historical_rulership_changed && std::get<0>(this->HistoricalTitles[i]) != 0 && std::get<1>(this->HistoricalTitles[i]) != 0) {
+			if (historical_title_changed && std::get<0>(this->HistoricalTitles[i]) != 0 && std::get<1>(this->HistoricalTitles[i]) != 0 && IsMinisterialTitle(std::get<3>(this->HistoricalTitles[i]))) {
 				std::get<2>(this->HistoricalTitles[i])->HistoricalMinisters[std::tuple<int, int, int>(std::get<0>(this->HistoricalTitles[i]), std::get<1>(this->HistoricalTitles[i]), std::get<3>(this->HistoricalTitles[i]))] = this;
 			}
 		}

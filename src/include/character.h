@@ -158,7 +158,7 @@ public:
 	std::vector<CItem *> Items;
 	int Attributes[MaxAttributes];
 	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
-	std::vector<std::tuple<int, int, CFaction *, int>> HistoricalTitles;	/// historical rulerships of the character, the first element is the beginning year of the rule, the second one the end year, the third the faction it pertains to (if any, if not then it is NULL), and the fourth is the character title itself (from the character title enums)
+	std::vector<std::tuple<int, int, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning year of the rule, the second one the end year, the third the faction it pertains to (if any, if not then it is NULL), and the fourth is the character title itself (from the character title enums)
 };
 
 /*----------------------------------------------------------------------------

@@ -3089,8 +3089,10 @@ void SaveGrandStrategyGame(const std::string &filename)
 		
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				if (GrandStrategyGame.Factions[i][j]->Ruler != NULL) {
-					fprintf(fd, "SetFactionRuler(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GrandStrategyGame.Factions[i][j]->Ruler->GetFullName().c_str()); //save faction rulers
+				for (int k = 0; k < MaxCharacterTitles; ++k) {
+					if (GrandStrategyGame.Factions[i][j]->Ministers[k] != NULL) {
+						fprintf(fd, "SetFactionMinister(\"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GetCharacterTitleNameById(k).c_str(), GrandStrategyGame.Factions[i][j]->Ministers[k]->GetFullName().c_str()); //save faction ministers
+					}
 				}
 			}
 		}

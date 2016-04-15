@@ -214,8 +214,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), ProvinceCount(0), Upkeep(0),
-		Ruler(NULL)
+		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), ProvinceCount(0), Upkeep(0)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(OwnedProvinces, -1, sizeof(OwnedProvinces));
@@ -224,6 +223,7 @@ public:
 		memset(ProductionEfficiencyModifier, 0, sizeof(ProductionEfficiencyModifier));
 		memset(Trade, 0, sizeof(Trade));
 		memset(MilitaryScoreBonus, 0, sizeof(MilitaryScoreBonus));
+		memset(Ministers, 0, sizeof(Ministers));
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 				DiplomacyState[i][j] = DiplomacyStatePeace;
@@ -239,7 +239,7 @@ public:
 	void CheckFormableFactions(int civilization);
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
-	void SetRuler(std::string hero_full_name);
+	void SetMinister(int title, std::string hero_full_name);
 	void RulerSuccession();
 	void GenerateRuler(bool child_of_current_ruler = false);
 	bool IsAlive();
@@ -256,7 +256,6 @@ public:
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
 	int ProvinceCount;													/// Quantity of provinces owned by this faction.
 	int Upkeep;															/// How much gold this faction has to pay per turn
-	CGrandStrategyHero *Ruler;											/// Ruler of the faction
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
 	int OwnedProvinces[ProvinceMax];									/// Provinces owned by this faction
 	int Resources[MaxCosts];											/// Amount of each resource stored by the faction.
@@ -266,6 +265,7 @@ public:
 	int MilitaryScoreBonus[UnitTypeMax];
 	int DiplomacyState[MAX_RACES][FactionMax];							/// Diplomacy state between this faction and each other faction
 	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
+	CGrandStrategyHero *Ministers[MaxCharacterTitles];					/// Ministers of the faction
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
 	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles];	/// All characters who had a ministerial (or head of state or government) title in this faction
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
@@ -573,8 +573,8 @@ extern void SetFactionCommodityTrade(std::string civilization_name, std::string 
 extern void ChangeFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
 extern int GetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name);
 extern bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_full_name);
-extern void SetFactionRuler(std::string civilization_name, std::string faction_name, std::string hero_full_name);
-extern std::string GetFactionRuler(std::string civilization_name, std::string faction_name);
+extern void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name);
+extern std::string GetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name);
 extern void CreateGrandStrategyHero(std::string hero_full_name);
 extern void CreateGrandStrategyCustomHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);
