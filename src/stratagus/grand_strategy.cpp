@@ -2459,14 +2459,14 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 		if (this != hero->Province || value == 0) { //if the new province is different from the hero's current province
 			if (hero->Province != NULL) {
 				hero->Province->Heroes.erase(std::remove(hero->Province->Heroes.begin(), hero->Province->Heroes.end(), hero), hero->Province->Heroes.end());  //remove the hero from the previous province
-				if (!hero->Icon.Name.empty() || hero->Custom) {
+				if (hero->IsActive()) {
 					hero->Province->ActiveHeroes.erase(std::remove(hero->Province->ActiveHeroes.begin(), hero->Province->ActiveHeroes.end(), hero), hero->Province->ActiveHeroes.end());
 				}
 			}
 			hero->Province = value != 0 ? const_cast<CGrandStrategyProvince *>(&(*this)) : NULL;
 			if (hero->Province != NULL) {
 				hero->Province->Heroes.push_back(hero); //add the hero to the new province
-				if (!hero->Icon.Name.empty() || hero->Custom) {
+				if (hero->IsActive()) {
 					hero->Province->ActiveHeroes.push_back(hero); //add the hero to the new province
 				}
 			}
@@ -3075,7 +3075,6 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 	if (parent != NULL) {
 		hero->FamilyName = parent->FamilyName;
 	}
-	hero->State = 4;
 	hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
 	if (hero->Type->Traits.size() > 0) {
 		if (parent != NULL && std::find(hero->Type->Traits.begin(), hero->Type->Traits.end(), parent->Trait) != hero->Type->Traits.end() && SyncRand(20) == 0) { // 5% chance that the hero will inherit their trait from their parent
@@ -3084,12 +3083,19 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())])); //generate a trait
 		}
 	}
+	hero->HairVariation = hero->Type->GetRandomVariationIdent();
 	hero->Year = GrandStrategyYear;
 	hero->DeathYear = GrandStrategyYear + (SyncRand(45) + 1); //average + 30 years after initially appearing
 	hero->Civilization = civilization;
 	hero->ProvinceOfOrigin = this;
 	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
 	hero->Gender = MaleGender;
+	
+	if (hero->IsActive()) {
+		hero->State = 2;
+	} else {
+		hero->State = 4;
+	}
 	
 	hero->UpdateAttributes();
 	
@@ -3382,7 +3388,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
 				(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Gender) + " " + this->Ministers[CharacterTitleHeadOfState]->GetFullName()).c_str(),
-				("A new " + FullyDecapitalizeString(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Gender)) + " has come to power in our realm, " + this->Ministers[CharacterTitleHeadOfState]->GetFullName() + "!\\n\\n" + "Type: " + this->Ministers[CharacterTitleHeadOfState]->Type->Name + "\\n" + "Trait: " + this->Ministers[CharacterTitleHeadOfState]->Trait->Name + "\\n\\n" + this->Ministers[CharacterTitleHeadOfState]->GetRulerEffectsString()).c_str()
+				("A new " + FullyDecapitalizeString(this->GetCharacterTitle(CharacterTitleHeadOfState, this->Ministers[CharacterTitleHeadOfState]->Gender)) + " has come to power in our realm, " + this->Ministers[CharacterTitleHeadOfState]->GetFullName() + "!\\n\\n" + "Type: " + this->Ministers[CharacterTitleHeadOfState]->Type->Name + "\\n" + "Trait: " + this->Ministers[CharacterTitleHeadOfState]->Trait->Name + "\\n" + "Province of Origin: " + this->Ministers[CharacterTitleHeadOfState]->ProvinceOfOrigin->GetCulturalName() + "\\n\\n" + this->Ministers[CharacterTitleHeadOfState]->GetRulerEffectsString()).c_str()
 			);
 			CclCommand(buf);	
 		}
@@ -3682,8 +3688,6 @@ std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 		return "Justice Minister";
 	} else if (title_type == CharacterTitleWarMinister) {
 		return "War Minister";
-	} else if (title_type == CharacterTitleGeneral) {
-		return "General";
 	}
 	
 	return "";
@@ -3695,6 +3699,9 @@ void CGrandStrategyHero::Initialize()
 		if (this->Type != NULL && this->Type->Traits.size() > 0) {
 			this->Trait = const_cast<CUpgrade *>(&(*this->Type->Traits[SyncRand(this->Type->Traits.size())]));
 		}
+	}
+	if (this->Type != NULL && this->HairVariation.empty()) {
+		this->HairVariation = this->Type->GetRandomVariationIdent();
 	}
 	int province_of_origin_id;
 	if (!this->Custom) {
@@ -3736,7 +3743,7 @@ void CGrandStrategyHero::Create()
 		CclCommand(buf);	
 	}
 	
-	if (!this->Icon.Name.empty() || this->Custom) { //if the hero has its own icon or is a custom hero, make it available for moving around, attacking and defending
+	if (this->IsActive()) { //if the hero is "active", make it available for moving around, attacking and defending
 		this->State = 2;
 	} else {
 		this->State = 4;
@@ -3789,7 +3796,7 @@ void CGrandStrategyHero::Die()
 		}
 		
 		this->Province->Heroes.erase(std::remove(this->Province->Heroes.begin(), this->Province->Heroes.end(), this), this->Province->Heroes.end());  //remove the hero from its province
-		if (!this->Icon.Name.empty() || this->Custom) {
+		if (this->IsActive()) {
 			this->Province->ActiveHeroes.erase(std::remove(this->Province->ActiveHeroes.begin(), this->Province->ActiveHeroes.end(), this), this->Province->ActiveHeroes.end());  //remove the hero from its province
 		}
 	}
@@ -3835,6 +3842,16 @@ void CGrandStrategyHero::SetType(int unit_type_id)
 bool CGrandStrategyHero::IsAlive()
 {
 	return this->State != 0;
+}
+
+bool CGrandStrategyHero::IsVisible()
+{
+	return this->Type->DefaultStat.Variables[GENDER_INDEX].Value == 0 || this->Gender == this->Type->DefaultStat.Variables[GENDER_INDEX].Value; // hero not visible if their unit type has a set gender which is different from the hero's (this is because of instances where i.e. females have a unit type that only has male portraits)
+}
+
+bool CGrandStrategyHero::IsActive()
+{
+	return this->IsVisible() && IsOffensiveMilitaryUnit(*this->Type);
 }
 
 int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
@@ -5581,6 +5598,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 		} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
 			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
 		}
+		hero->HairVariation = Characters[i]->HairVariation;
 		hero->Year = Characters[i]->Year;
 		hero->DeathYear = Characters[i]->DeathYear;
 		hero->ViolentDeath = Characters[i]->ViolentDeath;
@@ -5633,6 +5651,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 		} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
 			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
 		}
+		hero->HairVariation = CurrentCustomHero->HairVariation;
 		hero->Civilization = CurrentCustomHero->Civilization;
 		hero->Gender = CurrentCustomHero->Gender;
 		hero->Custom = CurrentCustomHero->Custom;
@@ -6604,6 +6623,14 @@ bool IsMilitaryUnit(const CUnitType &type)
 	return false;
 }
 
+bool IsOffensiveMilitaryUnit(const CUnitType &type)
+{
+	if (IsMilitaryUnit(type) && type.Class != "militia") {
+		return true;
+	}
+	return false;
+}
+
 void CreateProvinceUnits(std::string province_name, int player, int divisor, bool attacking_units, bool ignore_militia)
 {
 	int province_id = GetProvinceId(province_name);
@@ -6836,6 +6863,7 @@ void CreateGrandStrategyCustomHero(std::string hero_full_name)
 	} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
 		hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
 	}
+	hero->HairVariation = custom_hero->HairVariation;
 	hero->Civilization = custom_hero->Civilization;
 	hero->Gender = custom_hero->Gender;
 	hero->Custom = custom_hero->Custom;
@@ -6888,6 +6916,19 @@ std::string GetGrandStrategyHeroUnitType(std::string hero_full_name)
 	return "";
 }
 
+std::string GetGrandStrategyHeroIcon(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		if (hero->Type != NULL) {
+			return hero->GetIcon().Name;
+		}
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	return "";
+}
+
 void GrandStrategyHeroExisted(std::string hero_full_name)
 {
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
@@ -6909,6 +6950,27 @@ bool GrandStrategyHeroIsAlive(std::string hero_full_name)
 	return false;
 }
 
+bool GrandStrategyHeroIsVisible(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		return hero->IsVisible();
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	return false;
+}
+
+bool GrandStrategyHeroIsActive(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		return hero->IsActive();
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	return false;
+}
 
 bool GrandStrategyHeroIsCustom(std::string hero_full_name)
 {

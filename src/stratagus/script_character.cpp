@@ -920,11 +920,7 @@ static int CclGetCharacterData(lua_State *l)
 		lua_pushboolean(l, character->Persistent);
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		if (character->Level >= 3 && character->HeroicIcon.Icon) {
-			lua_pushstring(l, character->HeroicIcon.Name.c_str());
-		} else {
-			lua_pushstring(l, character->Icon.Name.c_str());
-		}
+		lua_pushstring(l, character->GetIcon().Name.c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -987,13 +983,7 @@ static int CclGetCustomHeroData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
-		if (character->Level >= 3 && character->HeroicIcon.Icon) {
-			lua_pushstring(l, character->HeroicIcon.Name.c_str());
-		} else if (character->Icon.Icon) {
-			lua_pushstring(l, character->Icon.Name.c_str());
-		} else {
-			lua_pushstring(l, character->Type->Icon.Name.c_str());
-		}
+		lua_pushstring(l, character->GetIcon().Name.c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

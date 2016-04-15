@@ -92,8 +92,6 @@ enum CharacterTitles {
 	CharacterTitleJusticeMinister,
 	CharacterTitleWarMinister,
 
-	CharacterTitleGeneral, // this is to be used later for characters who can lead armies; maybe restrict movable heroes to generals?
-	
 	MaxCharacterTitles
 };
 
@@ -116,6 +114,7 @@ public:
 	bool IsSiblingOf(std::string sibling_full_name);
 	bool IsItemEquipped(const CItem *item) const;
 	std::string GetFullName();
+	IconConfig GetIcon();
 	CItem *GetItem(CUnit &item);
 	void GenerateMissingData();
 	void UpdateAttributes();

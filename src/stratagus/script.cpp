@@ -3050,6 +3050,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 				if (GrandStrategyGame.Heroes[i]->Trait != NULL) {
 					fprintf(fd, "\tTrait = \"%s\",\n", GrandStrategyGame.Heroes[i]->Trait->Ident.c_str());
 				}
+				if (!GrandStrategyGame.Heroes[i]->HairVariation.empty()) {
+					fprintf(fd, "\tHairVariation = \"%s\",\n", GrandStrategyGame.Heroes[i]->HairVariation.c_str());
+				}
 				if (GrandStrategyGame.Heroes[i]->Civilization != -1) {
 					fprintf(fd, "\tCivilization = \"%s\",\n", PlayerRaces.Name[GrandStrategyGame.Heroes[i]->Civilization].c_str());
 				}

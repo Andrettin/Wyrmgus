@@ -300,6 +300,8 @@ public:
 	void Die();
 	void SetType(int unit_type_id);
 	bool IsAlive();
+	bool IsVisible();
+	bool IsActive();							/// whether the hero can be ordered to move around
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRiskModifier();
 	std::string GetRulerEffectsString();
@@ -567,6 +569,7 @@ extern int GetFactionIncome(std::string civilization_name, std::string faction_n
 extern int GetFactionUpkeep(std::string civilization_name, std::string faction_name);
 extern bool IsGrandStrategyUnit(const CUnitType &type);
 extern bool IsMilitaryUnit(const CUnitType &type);
+extern bool IsOffensiveMilitaryUnit(const CUnitType &type);
 extern void CreateProvinceUnits(std::string province_name, int player, int divisor = 1, bool attacking_units = false, bool ignore_militia = false);
 extern void FormFaction(std::string old_civilization_name, std::string old_faction_name, std::string new_civilization_name, std::string new_faction_name);
 extern void SetFactionCommodityTrade(std::string civilization_name, std::string faction_name, std::string resource_name, int quantity);
@@ -580,8 +583,11 @@ extern void CreateGrandStrategyCustomHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);
 extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
 extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);
+extern std::string GetGrandStrategyHeroIcon(std::string hero_full_name);
 extern void GrandStrategyHeroExisted(std::string hero_full_name);
 extern bool GrandStrategyHeroIsAlive(std::string hero_full_name);
+extern bool GrandStrategyHeroIsVisible(std::string hero_full_name);
+extern bool GrandStrategyHeroIsActive(std::string hero_full_name);
 extern bool GrandStrategyHeroIsCustom(std::string hero_full_name);
 extern void GrandStrategyWorkCreated(std::string work_ident);
 extern void SetCommodityPrice(std::string resource_name, int price);

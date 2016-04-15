@@ -125,6 +125,19 @@ std::string CCharacter::GetFullName()
 	return full_name;
 }
 
+IconConfig CCharacter::GetIcon()
+{
+	if (this->Level >= 3 && this->HeroicIcon.Icon) {
+		return this->HeroicIcon;
+	} else if (this->Icon.Icon) {
+		return this->Icon;
+	} else if (!this->HairVariation.empty() && this->Type->GetVariation(this->HairVariation) != NULL && !this->Type->GetVariation(this->HairVariation)->Icon.Name.empty()) {
+		return this->Type->GetVariation(this->HairVariation)->Icon;
+	} else {
+		return this->Type->Icon;
+	}
+}
+
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
@@ -704,8 +717,6 @@ std::string GetCharacterTitleNameById(int title)
 		return "justice-minister";
 	} else if (title == CharacterTitleWarMinister) {
 		return "war-minister";
-	} else if (title == CharacterTitleGeneral) {
-		return "general";
 	}
 
 	return "";
@@ -729,8 +740,6 @@ int GetCharacterTitleIdByName(std::string title)
 		return CharacterTitleJusticeMinister;
 	} else if (title == "war-minister") {
 		return CharacterTitleWarMinister;
-	} else if (title == "general") {
-		return CharacterTitleGeneral;
 	}
 
 	return -1;

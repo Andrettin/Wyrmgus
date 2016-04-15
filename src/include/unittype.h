@@ -669,6 +669,8 @@ public:
 	void RemoveButtons(int button_action = -1, std::string mod_file = "");
 	int GetAvailableLevelUpUpgrades() const;
 	VariationInfo *GetDefaultVariation(CPlayer &player, int image_layer = -1) const;
+	VariationInfo *GetVariation(std::string variation_name, int image_layer = -1) const;
+	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
 	//Wyrmgus end

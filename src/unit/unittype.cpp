@@ -809,6 +809,40 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) 
 	return NULL;
 }
 
+VariationInfo *CUnitType::GetVariation(std::string variation_name, int image_layer) const
+{
+	int variation_max = image_layer == -1 ? VariationMax : this->LayerVarInfo[image_layer].size();
+	for (int i = 0; i < variation_max; ++i) {
+		VariationInfo *varinfo = image_layer == -1 ? this->VarInfo[i] : this->LayerVarInfo[image_layer][i];
+		if (!varinfo) {
+			break;
+		}
+		if (varinfo->VariationId == variation_name) {
+			return varinfo;
+		}
+	}
+	return NULL;
+}
+
+std::string CUnitType::GetRandomVariationIdent(int image_layer) const
+{
+	std::vector<std::string> variation_idents;
+	int variation_max = image_layer == -1 ? VariationMax : this->LayerVarInfo[image_layer].size();
+	for (int i = 0; i < variation_max; ++i) {
+		VariationInfo *varinfo = image_layer == -1 ? this->VarInfo[i] : this->LayerVarInfo[image_layer][i];
+		if (!varinfo) {
+			break;
+		}
+		variation_idents.push_back(varinfo->VariationId);
+	}
+	
+	if (variation_idents.size() > 0) {
+		return variation_idents[SyncRand(variation_idents.size())];
+	}
+	
+	return "";
+}
+
 std::string CUnitType::GetDefaultName(CPlayer &player) const
 {
 	VariationInfo *varinfo = this->GetDefaultVariation(player);
