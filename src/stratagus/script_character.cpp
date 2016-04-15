@@ -810,6 +810,8 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			}
 		} else if (!strcmp(value, "Gender")) {
 			hero->Gender = GetGenderIdByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "HairVariation")) {
+			hero->HairVariation = LuaToString(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

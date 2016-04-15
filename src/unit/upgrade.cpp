@@ -1233,6 +1233,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		CUnitStats &stat = UnitTypes[z]->Stats[pn];
 		// add/remove allowed units
 
+		//Wyrmgus start
+		if (stat.Variables == NULL) { // unit types stats not initialized
+			break;
+		}
+		//Wyrmgus end
+
 		// FIXME: check if modify is allowed
 
 		player.Allow.Units[z] += um->ChangeUnits[z];

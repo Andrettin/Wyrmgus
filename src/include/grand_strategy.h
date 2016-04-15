@@ -303,18 +303,20 @@ public:
 	bool IsAlive();
 	bool IsVisible();
 	bool IsActive();							/// whether the hero can be ordered to move around
+	bool IsEligibleForTitle(int title);
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRiskModifier();
 	std::string GetRulerEffectsString();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province, 4 = hero is in the province but not defending it
-	bool Existed;		/// whether the character has existed in this playthrough
+	bool Existed;								/// whether the character has existed in this playthrough
 	CGrandStrategyProvince *Province;
 	CGrandStrategyProvince *ProvinceOfOrigin;	/// Province from which the hero originates
-	CGrandStrategyHero *Father;			/// Character's father
+	CGrandStrategyHero *Father;					/// Character's father
 	CGrandStrategyHero *Mother;					/// Character's mother
 	std::vector<CGrandStrategyHero *> Children;	/// Children of the character
 	std::vector<CGrandStrategyHero *> Siblings;	/// Siblings of the character
+	std::vector<std::pair<int, CGrandStrategyFaction *>> Titles;	/// Titles of the character (first value is the title type, and the second one is the faction
 };
 
 /**

@@ -851,8 +851,10 @@ void CGrandStrategyGame::DoTurn()
 					}
 				}
 			} else {
-				if (this->Factions[i][j]->Ministers[CharacterTitleHeadOfState] != NULL) {
-					this->Factions[i][j]->SetMinister(CharacterTitleHeadOfState, ""); //"dead" factions should have no ruler
+				for (int k = 0; k < MaxCharacterTitles; ++k) {
+					if (this->Factions[i][j]->Ministers[k] != NULL) {
+						this->Factions[i][j]->SetMinister(k, ""); //"dead" factions should have no ministers
+					}
 				}
 			}
 		}
@@ -3301,9 +3303,11 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 	
 	GrandStrategyGame.Factions[new_civilization][new_faction]->AcquireFactionTechnologies(old_civilization, old_faction);
 	
-	//set the ruler from the old faction
-	if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[CharacterTitleHeadOfState] != NULL) {
-		GrandStrategyGame.Factions[new_civilization][new_faction]->SetMinister(CharacterTitleHeadOfState, GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[CharacterTitleHeadOfState]->GetFullName());
+	//set the ministers from the old faction
+	for (int i = 0; i < MaxCharacterTitles; ++i) {
+		if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i] != NULL && GrandStrategyGame.Factions[new_civilization][new_faction]->HasGovernmentPosition(i)) {
+			GrandStrategyGame.Factions[new_civilization][new_faction]->SetMinister(i, GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i]->GetFullName());
+		}
 	}
 
 	
@@ -3403,8 +3407,10 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		CclCommand(buf_2);
 	}
 	
-	if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[CharacterTitleHeadOfState] != NULL) {
-		GrandStrategyGame.Factions[old_civilization][old_faction]->SetMinister(CharacterTitleHeadOfState, ""); //do this after changing the PlayerFaction to prevent ruler death/rise to power messages, since the ruler is the same
+	for (int i = 0; i < MaxCharacterTitles; ++i) {
+		if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i] != NULL) {
+			GrandStrategyGame.Factions[old_civilization][old_faction]->SetMinister(i, ""); //do this after changing the PlayerFaction to prevent minister death/rise to power messages, since the ministers are the same
+		}
 	}
 }
 
@@ -3427,8 +3433,12 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 
 void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 {
+	if (this->Ministers[title] != NULL && std::find(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::pair<int, CGrandStrategyFaction *>(title, this)) != this->Ministers[title]->Titles.end()) { // remove from the old minister's array
+		this->Ministers[title]->Titles.erase(std::remove(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::pair<int, CGrandStrategyFaction *>(title, this)), this->Ministers[title]->Titles.end());
+	}
+			
 	if (hero_full_name.empty()) {
-		if (GrandStrategyGameInitialized) {
+		if (this->IsAlive() && GrandStrategyGameInitialized) {
 			this->MinisterSuccession(title);
 		} else {
 			this->Ministers[title] = NULL;
@@ -3440,6 +3450,14 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 				hero->Create();
 			}
 			this->Ministers[title] = const_cast<CGrandStrategyHero *>(&(*hero));
+			hero->Titles.push_back(std::pair<int, CGrandStrategyFaction *>(title, this));
+			
+			int titles_size = hero->Titles.size(); // -1 because the last one in the vector is the one we just pushed
+			for (int i = (titles_size - 1); i >= 0; --i) {
+				if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
+					hero->Titles[i].second->SetMinister(title, "");
+				}
+			}
 		} else {
 			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), GetCharacterTitleNameById(title).c_str(), this->GetFullName().c_str());
 		}
@@ -3515,6 +3533,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 				|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
 			)
 			&& !GrandStrategyGame.Heroes[i]->Custom
+			&& GrandStrategyGame.Heroes[i]->IsEligibleForTitle(title)
 		) {
 			minister_candidates.push_back(GrandStrategyGame.Heroes[i]);
 		}
@@ -3529,6 +3548,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 					|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
 				)
 				&& !GrandStrategyGame.Heroes[i]->Custom
+				&& GrandStrategyGame.Heroes[i]->IsEligibleForTitle(title)
 			) {
 				minister_candidates.push_back(GrandStrategyGame.Heroes[i]);
 			}
@@ -3544,13 +3564,13 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 
 void CGrandStrategyFaction::GenerateMinister(int title, bool child_of_current_minister)
 {
-	if (this->ProvinceCount == 0) {
+	if (!this->IsAlive()) {
 		fprintf(stderr, "Faction \"%s\" is generating a \"%s\", but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Name.c_str(), GetCharacterTitleNameById(title).c_str());
 	}
 	
 	CGrandStrategyProvince *province = NULL;
 	
-	if (child_of_current_minister) {
+	if (child_of_current_minister && this->Ministers[title]->Province->Owner == this) {
 		province = this->Ministers[title]->Province;
 	} else {
 		province = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->ProvinceCount)]];
@@ -3616,11 +3636,12 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 
 bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 {
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
+//	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
+	if (title != CharacterTitleHeadOfState) { // deactivate all titles other than head of state for now
 		return false;
-	} else {
-		return true;
 	}
+	
+	return true;
 }
 
 std::string CGrandStrategyFaction::GetFullName()
@@ -3887,11 +3908,13 @@ void CGrandStrategyHero::Die()
 	
 	this->State = 0;
 
-	//check if the hero is the ruler of a faction, and if so, remove it from that position
+	//check if the hero is the minister of a faction, and if so, remove it from that position
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (GrandStrategyGame.Factions[i][j]->Ministers[CharacterTitleHeadOfState] == this) {
-				GrandStrategyGame.Factions[i][j]->SetMinister(CharacterTitleHeadOfState, "");
+			for (int k = 0; k < MaxCharacterTitles; ++k) {
+				if (GrandStrategyGame.Factions[i][j]->Ministers[k] == this) {
+					GrandStrategyGame.Factions[i][j]->SetMinister(k, "");
+				}
 			}
 		}
 	}
@@ -3936,6 +3959,21 @@ bool CGrandStrategyHero::IsVisible()
 bool CGrandStrategyHero::IsActive()
 {
 	return this->IsVisible() && IsOffensiveMilitaryUnit(*this->Type);
+}
+
+bool CGrandStrategyHero::IsEligibleForTitle(int title)
+{
+	for (size_t i = 0; i < this->Titles.size(); ++i) {
+		if (this->Titles[i].first == CharacterTitleHeadOfState && this->Titles[i].second->IsAlive() && title != CharacterTitleHeadOfState) { // if it is not a head of state title, and this character is already the head of state of a living faction, return false
+			return false;
+		} else if (this->Titles[i].first == CharacterTitleHeadOfGovernment && title != CharacterTitleHeadOfState) { // if is already a head of government, don't accept ministerial titles of lower rank (that is, any but the title of head of state)
+			return false;
+		} else if (this->Titles[i].first != CharacterTitleHeadOfState && this->Titles[i].first != CharacterTitleHeadOfGovernment && title != CharacterTitleHeadOfState && title != CharacterTitleHeadOfGovernment) { // if is already a minister, don't accept another ministerial title of equal rank
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 int CGrandStrategyHero::GetAdministrativeEfficiencyModifier()
@@ -5274,7 +5312,9 @@ void CleanGrandStrategyGame()
 					}
 				}
 				GrandStrategyGame.Factions[i][j]->Claims.clear();
-				GrandStrategyGame.Factions[i][j]->HistoricalMinisters[CharacterTitleHeadOfState].clear();
+				for (int k = 0; k < MaxCharacterTitles; ++k) {
+					GrandStrategyGame.Factions[i][j]->HistoricalMinisters[k].clear();
+				}
 				GrandStrategyGame.Factions[i][j]->HistoricalTechnologies.clear();
 			}
 		}
@@ -6026,8 +6066,8 @@ void FinalizeGrandStrategyInitialization()
 			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
 				if (GrandStrategyGameLoading == false) {
 					for (std::map<std::tuple<int,int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
-						if (GrandStrategyYear >= std::get<0>(iterator->first) && GrandStrategyYear < std::get<1>(iterator->first) && std::get<2>(iterator->first) == CharacterTitleHeadOfState) {
-							GrandStrategyGame.Factions[i][j]->SetMinister(CharacterTitleHeadOfState, iterator->second->GetFullName());
+						if (GrandStrategyYear >= std::get<0>(iterator->first) && GrandStrategyYear < std::get<1>(iterator->first)) {
+							GrandStrategyGame.Factions[i][j]->SetMinister(std::get<2>(iterator->first), iterator->second->GetFullName());
 						}
 					}
 				}
@@ -6916,8 +6956,8 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 		return "";
 	}
 	
-	if (title == CharacterTitleHeadOfState && GrandStrategyGame.Factions[civilization][faction]->Ministers[CharacterTitleHeadOfState] != NULL) {
-		return GrandStrategyGame.Factions[civilization][faction]->Ministers[CharacterTitleHeadOfState]->GetFullName();
+	if (GrandStrategyGame.Factions[civilization][faction]->Ministers[title] != NULL) {
+		return GrandStrategyGame.Factions[civilization][faction]->Ministers[title]->GetFullName();
 	} else {
 		return "";
 	}
