@@ -244,6 +244,7 @@ public:
 	bool HasTechnologyClass(std::string technology_class_name);
 	bool CanFormFaction(int civilization, int faction);
 	bool HasGovernmentPosition(int title);
+	bool CanHaveSuccession(int title, bool family_inheritance);
 	std::string GetFullName();
 	std::string GetTitle();
 	std::string GetCharacterTitle(int title_type, int gender);

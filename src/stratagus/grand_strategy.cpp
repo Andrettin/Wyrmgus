@@ -3420,7 +3420,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 	}
 			
 	if (hero_full_name.empty()) {
-		if (this->IsAlive() && GrandStrategyGameInitialized) {
+		if (this->CanHaveSuccession(title, true) && GrandStrategyGameInitialized) {
 			this->MinisterSuccession(title);
 		} else {
 			this->Ministers[title] = NULL;
@@ -3496,6 +3496,12 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
 				return;
 			}
+		}
+		
+		// if no family successor was found, the title becomes extinct if it is only a titular one (an aristocratic title whose corresponding faction does not actually hold territory)
+		if (!this->CanHaveSuccession(title, false)) {
+			this->Ministers[title] = NULL;
+			return;
 		}
 		
 		// if ruler succession is by inheritance and no suitable successor could be found, there's a 90% chance that a new ruler that is a child of the current one will be generated
@@ -3620,6 +3626,15 @@ bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 {
 //	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
 	if (title != CharacterTitleHeadOfState) { // deactivate all titles other than head of state for now
+		return false;
+	}
+	
+	return true;
+}
+
+bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance)
+{
+	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe")) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
