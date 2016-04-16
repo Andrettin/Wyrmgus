@@ -3434,10 +3434,10 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			this->Ministers[title] = const_cast<CGrandStrategyHero *>(&(*hero));
 			hero->Titles.push_back(std::pair<int, CGrandStrategyFaction *>(title, this));
 			
-			int titles_size = hero->Titles.size(); // -1 because the last one in the vector is the one we just pushed
+			int titles_size = hero->Titles.size();
 			for (int i = (titles_size - 1); i >= 0; --i) {
 				if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
-					hero->Titles[i].second->SetMinister(title, "");
+					hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
 				}
 			}
 		} else {
@@ -3543,7 +3543,8 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		}
 	}
 	if (minister_candidates.size() > 0) {
-		this->SetMinister(title, minister_candidates[SyncRand(minister_candidates.size())]->GetFullName());
+		std::string chosen_minister_candidate = minister_candidates[SyncRand(minister_candidates.size())]->GetFullName();
+		this->SetMinister(title, chosen_minister_candidate);
 		return;
 	}
 
@@ -3624,8 +3625,8 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 
 bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 {
-//	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
-	if (title != CharacterTitleHeadOfState) { // deactivate all titles other than head of state for now
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
+//	if (title != CharacterTitleHeadOfState) { // deactivate all titles other than head of state for now
 		return false;
 	}
 	
@@ -3634,7 +3635,7 @@ bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 
 bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe")) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
