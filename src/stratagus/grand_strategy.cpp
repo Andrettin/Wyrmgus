@@ -595,7 +595,7 @@ void CGrandStrategyGame::DrawInterface()
 				item_y += 1;
 				
 				// draw ruler effects string
-				std::string ruler_effects_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->GetRulerEffectsString();
+				std::string ruler_effects_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->GetMinisterEffectsString(CharacterTitleHeadOfState);
 				
 				int str_width_per_total_width = 1;
 				str_width_per_total_width += GetGameFont().Width(ruler_effects_string) / (218 - 6);
@@ -3465,14 +3465,20 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), GetCharacterTitleNameById(title).c_str(), this->GetFullName().c_str());
 		}
 		
-		if (this == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized && title == CharacterTitleHeadOfState) {
-			char buf[256];
-			snprintf(
-				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName()).c_str(),
-				("A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender)) + " has come to power in our realm, " + this->Ministers[title]->GetFullName() + "!\\n\\n" + "Type: " + this->Ministers[title]->Type->Name + "\\n" + "Trait: " + this->Ministers[title]->Trait->Name + "\\n" + "Province of Origin: " + this->Ministers[title]->ProvinceOfOrigin->GetCulturalName() + "\\n\\n" + this->Ministers[title]->GetRulerEffectsString()).c_str()
-			);
-			CclCommand(buf);	
+		if (this == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized) {
+			std::string new_minister_message = "if (GenericDialog ~= nil) then GenericDialog(\"";
+			new_minister_message += this->GetCharacterTitle(title, this->Ministers[title]->Gender) + " " + this->Ministers[title]->GetFullName();
+			new_minister_message += "\", \"";
+			new_minister_message += "A new " + FullyDecapitalizeString(this->GetCharacterTitle(title, this->Ministers[title]->Gender));
+			if (title == CharacterTitleHeadOfState) {
+				new_minister_message += " has come to power in our realm, ";
+			} else {
+				new_minister_message += " has been appointed, ";
+			}
+			new_minister_message += this->Ministers[title]->GetFullName() + "!\\n\\n";
+			new_minister_message += "Type: " + this->Ministers[title]->Type->Name + "\\n" + "Trait: " + this->Ministers[title]->Trait->Name + "\\n" + "Province of Origin: " + this->Ministers[title]->ProvinceOfOrigin->GetCulturalName() + "\\n\\n" + this->Ministers[title]->GetMinisterEffectsString(title);
+			new_minister_message += "\") end;";
+			CclCommand(new_minister_message);	
 		}
 		
 		if (std::find(this->HistoricalMinisters[title].begin(), this->HistoricalMinisters[title].end(), hero) == this->HistoricalMinisters[title].end()) {
@@ -3647,7 +3653,10 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 {
 	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
-//	if (title != CharacterTitleHeadOfState) { // deactivate all titles other than head of state for now
+		return false;
+	}
+	
+	if (title == CharacterTitleHeadOfGovernment || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleJusticeMinister) { // these titles don't serve much of a purpose yet
 		return false;
 	}
 	
@@ -3800,9 +3809,11 @@ std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 	} else if (title_type == CharacterTitleHeadOfGovernment) {
 		return "Prime Minister";
 	} else if (title_type == CharacterTitleFinanceMinister) {
-		return "Finance Minister";
+//		return "Finance Minister"; //finance minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Treasurer";
 	} else if (title_type == CharacterTitleForeignMinister) {
-		return "Foreign Minister";
+//		return "Foreign Minister"; //foreign minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Chancellor";
 	} else if (title_type == CharacterTitleIntelligenceMinister) {
 		return "Intelligence Minister";
 	} else if (title_type == CharacterTitleInteriorMinister) {
@@ -3810,7 +3821,8 @@ std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 	} else if (title_type == CharacterTitleJusticeMinister) {
 		return "Justice Minister";
 	} else if (title_type == CharacterTitleWarMinister) {
-		return "War Minister";
+//		return "War Minister"; //war minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
+		return "Marshal";
 	}
 	
 	return "";
@@ -3895,18 +3907,12 @@ void CGrandStrategyHero::Die()
 				("Tragic news spread throughout our realm. Our " + FullyDecapitalizeString(GrandStrategyGame.PlayerFaction->GetCharacterTitle(CharacterTitleHeadOfState, this->Gender)) + ", " + this->GetFullName() + ", has died! May his soul rest in peace.").c_str()
 			);
 			CclCommand(buf);	
-		} else if (
-			this->Province != NULL
-			&& (
-				((this->State == 1 || this->State == 2 || this->State == 4) && this->Province->Owner == GrandStrategyGame.PlayerFaction)
-				|| (this->State == 3 && this->Province->AttackedBy == GrandStrategyGame.PlayerFaction)
-			)
-		) {
+		} else if (this->GetFaction() == GrandStrategyGame.PlayerFaction) {
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
-				(this->GetFullName() + " Dies").c_str(),
-				("My lord, the " + FullyDecapitalizeString(this->Type->Name) + " " + this->GetFullName() + " has died!").c_str()
+				(this->GetBestDisplayTitle() + " " + this->GetFullName() + " Dies").c_str(),
+				("My lord, the " + FullyDecapitalizeString(this->GetBestDisplayTitle()) + " " + this->GetFullName() + " has died!").c_str()
 			);
 			CclCommand(buf);	
 		}
@@ -3982,6 +3988,12 @@ bool CGrandStrategyHero::IsActive()
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)
 {
+	if (this->GetFaction()->GovernmentType == GovernmentTypeMonarchy && title == CharacterTitleHeadOfState && this->Type->Class == "worker") { // commoners cannot become monarchs
+		return false;
+	} else if (this->GetFaction()->GovernmentType == GovernmentTypeTheocracy && title == CharacterTitleHeadOfState && this->Type->Class != "priest") { // non-priests cannot rule theocracies
+		return false;
+	}
+	
 	for (size_t i = 0; i < this->Titles.size(); ++i) {
 		if (this->Titles[i].first == CharacterTitleHeadOfState && this->Titles[i].second->IsAlive() && title != CharacterTitleHeadOfState) { // if it is not a head of state title, and this character is already the head of state of a living faction, return false
 			return false;
@@ -4022,67 +4034,90 @@ int CGrandStrategyHero::GetLanguage()
 	return language;
 }
 
-std::string CGrandStrategyHero::GetRulerEffectsString()
+std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 {
-	std::string ruler_effects_string;
+	std::string minister_effects_string;
 	
 	bool first = true;
 	
-	int administrative_modifier = this->GetAdministrativeEfficiencyModifier();
-	if (administrative_modifier != 0) {
-		if (!first) {
-			ruler_effects_string += ", ";
-		} else {
-			first = false;
+	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister) {
+		int administrative_modifier = this->GetAdministrativeEfficiencyModifier();
+		if (administrative_modifier != 0) {
+			if (!first) {
+				minister_effects_string += ", ";
+			} else {
+				first = false;
+			}
+			if (administrative_modifier > 0) {
+				minister_effects_string += "+";
+			}
+			minister_effects_string += std::to_string((long long) administrative_modifier) + "% Administrative Efficiency";
 		}
-		if (administrative_modifier > 0) {
-			ruler_effects_string += "+";
-		}
-		ruler_effects_string += std::to_string((long long) administrative_modifier) + "% Administrative Efficiency";
 	}
 	
-	int revolt_risk_modifier = this->GetRevoltRiskModifier();
-	if (revolt_risk_modifier != 0) {
-		if (!first) {
-			ruler_effects_string += ", ";
-		} else {
-			first = false;
+	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister) {
+		int revolt_risk_modifier = this->GetRevoltRiskModifier();
+		if (revolt_risk_modifier != 0) {
+			if (!first) {
+				minister_effects_string += ", ";
+			} else {
+				first = false;
+			}
+			if (revolt_risk_modifier > 0) {
+				minister_effects_string += "+";
+			}
+			minister_effects_string += std::to_string((long long) revolt_risk_modifier) + "% Revolt Risk";
 		}
-		if (revolt_risk_modifier > 0) {
-			ruler_effects_string += "+";
-		}
-		ruler_effects_string += std::to_string((long long) revolt_risk_modifier) + "% Revolt Risk";
 	}
 	
-	return ruler_effects_string;
+	return minister_effects_string;
+}
+
+std::string CGrandStrategyHero::GetBestDisplayTitle()
+{
+	std::string best_title = this->Type->Name;
+	int best_title_type = MaxCharacterTitles;
+	for (size_t i = 0; i < this->Titles.size(); ++i) {
+		if (this->Titles[i].second != this->GetFaction()) {
+			continue;
+		}
+		if (this->Titles[i].first < best_title_type) {
+			best_title = this->GetFaction()->GetCharacterTitle(this->Titles[i].first, this->Gender);
+			best_title_type = this->Titles[i].first;
+		}
+	}
+	return best_title;
 }
 
 std::string CGrandStrategyHero::GenerateNobleFamilyName()
 {
 	int civilization = this->Civilization;
 	int faction = this->GetFaction()->Civilization == this->Civilization ? this->GetFaction()->Faction : -1;
+	int language = this->GetLanguage();
 	
 	std::string family_name;
 	
-	std::string noble_predicate = GenerateName(this->GetLanguage(), "noble-family-predicate");
+	std::string noble_predicate = GenerateName(language, "noble-family-predicate");
 	
 	if (!noble_predicate.empty()) {
 		family_name += DecapitalizeString(noble_predicate) + " ";
 	}
 	
 	std::vector<std::string> potential_place_names;
-	for (size_t i = 0; i < this->ProvinceOfOrigin->Tiles.size(); ++i) {
-		int x = this->ProvinceOfOrigin->Tiles[i].x;
-		int y = this->ProvinceOfOrigin->Tiles[i].y;
-		if (GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName(civilization, faction, true).empty()) {
-			if (faction != -1) {
-				GrandStrategyGame.WorldMapTiles[x][y]->GenerateFactionCulturalName(civilization, faction);
-			} else {
-				GrandStrategyGame.WorldMapTiles[x][y]->GenerateCulturalName(-1, civilization);
+	if (PlayerRaces.Languages[language]->TypeNameCount.find("noble-family") != PlayerRaces.Languages[language]->TypeNameCount.end() && SyncRand(PlayerRaces.Languages[language]->TypeNameCount["noble-family"]) < PlayerRaces.Languages[language]->PlaceNameDerivedNobleFamilyNameCount) {
+		for (size_t i = 0; i < this->ProvinceOfOrigin->Tiles.size(); ++i) {
+			int x = this->ProvinceOfOrigin->Tiles[i].x;
+			int y = this->ProvinceOfOrigin->Tiles[i].y;
+			if (GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName(civilization, faction, true).empty()) {
+				if (faction != -1) {
+					GrandStrategyGame.WorldMapTiles[x][y]->GenerateFactionCulturalName(civilization, faction);
+				} else {
+					GrandStrategyGame.WorldMapTiles[x][y]->GenerateCulturalName(-1, civilization);
+				}
 			}
-		}
-		if (!GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName(civilization, faction, true).empty()) {
-			potential_place_names.push_back(GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName(civilization, faction, true));
+			if (!GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName(civilization, faction, true).empty()) {
+				potential_place_names.push_back(GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName(civilization, faction, true));
+			}
 		}
 	}
 	
@@ -7142,6 +7177,19 @@ std::string GetGrandStrategyHeroIcon(std::string hero_full_name)
 	if (hero) {
 		if (hero->Type != NULL) {
 			return hero->GetIcon().Name;
+		}
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	return "";
+}
+
+std::string GetGrandStrategyHeroBestDisplayTitle(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		if (hero->Type != NULL) {
+			return hero->GetBestDisplayTitle();
 		}
 	} else {
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());

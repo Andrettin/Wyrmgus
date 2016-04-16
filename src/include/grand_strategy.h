@@ -305,7 +305,8 @@ public:
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRiskModifier();
 	int GetLanguage();
-	std::string GetRulerEffectsString();
+	std::string GetMinisterEffectsString(int title);
+	std::string GetBestDisplayTitle();
 	std::string GenerateNobleFamilyName();
 	CGrandStrategyFaction *GetFaction();
 	
@@ -588,6 +589,7 @@ extern void KillGrandStrategyHero(std::string hero_full_name);
 extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
 extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);
 extern std::string GetGrandStrategyHeroIcon(std::string hero_full_name);
+extern std::string GetGrandStrategyHeroBestDisplayTitle(std::string hero_full_name);
 extern void GrandStrategyHeroExisted(std::string hero_full_name);
 extern bool GrandStrategyHeroIsAlive(std::string hero_full_name);
 extern bool GrandStrategyHeroIsVisible(std::string hero_full_name);
