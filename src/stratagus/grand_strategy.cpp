@@ -3455,10 +3455,12 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			this->Ministers[title] = const_cast<CGrandStrategyHero *>(&(*hero));
 			hero->Titles.push_back(std::pair<int, CGrandStrategyFaction *>(title, this));
 			
-			int titles_size = hero->Titles.size();
-			for (int i = (titles_size - 1); i >= 0; --i) {
-				if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
-					hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
+			if (this->IsAlive()) {
+				int titles_size = hero->Titles.size();
+				for (int i = (titles_size - 1); i >= 0; --i) {
+					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
+						hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
+					}
 				}
 			}
 		} else {
@@ -3485,7 +3487,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 			this->HistoricalMinisters[title].push_back(hero);
 		}
 		
-		if (hero->Province == NULL || hero->Province->Owner != this) { // if the hero's province is not owned by this faction, move him to a random province owned by this faction
+		if (this->IsAlive() && (hero->Province == NULL || hero->Province->Owner != this)) { // if the hero's province is not owned by this faction, move him to a random province owned by this faction
 			GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->OwnedProvinces.size())]]->SetHero(hero->GetFullName(), hero->State);
 		}
 	}
@@ -3501,25 +3503,25 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		&& title == CharacterTitleHeadOfState
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
-			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
+			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible() && this->Ministers[title]->Children[i]->Gender == MaleGender) { //historically males have generally been given priority in throne inheritance (if not exclusivity), specially in the cultures currently playable in the game
 				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { // now check for male siblings of the current ruler
-			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->Gender == MaleGender) {
+			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible() && this->Ministers[title]->Siblings[i]->Gender == MaleGender) {
 				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
 				return;
 			}
 		}		
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) { //check again for children, but now allow for inheritance regardless of gender
-			if (this->Ministers[title]->Children[i]->IsAlive()) {
+			if (this->Ministers[title]->Children[i]->IsAlive() && this->Ministers[title]->Children[i]->IsVisible()) {
 				this->SetMinister(title, this->Ministers[title]->Children[i]->GetFullName());
 				return;
 			}
 		}
 		for (size_t i = 0; i < this->Ministers[title]->Siblings.size(); ++i) { //check again for siblings, but now allow for inheritance regardless of gender
-			if (this->Ministers[title]->Siblings[i]->IsAlive()) {
+			if (this->Ministers[title]->Siblings[i]->IsAlive() && this->Ministers[title]->Siblings[i]->IsVisible()) {
 				this->SetMinister(title, this->Ministers[title]->Siblings[i]->GetFullName());
 				return;
 			}
@@ -3542,7 +3544,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		if (
 			GrandStrategyGame.Heroes[i]->IsAlive()
-			&& GrandStrategyGame.Heroes[i]->Gender == MaleGender
+			&& GrandStrategyGame.Heroes[i]->IsVisible()
 			&& (
 				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
 				|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
@@ -3551,22 +3553,6 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 			&& GrandStrategyGame.Heroes[i]->IsEligibleForTitle(title)
 		) {
 			minister_candidates.push_back(GrandStrategyGame.Heroes[i]);
-		}
-	}
-	if (minister_candidates.size() == 0) {
-		//if the list of male minister candidates is empty, see if there are heroes available without taking gender in regard
-		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
-			if (
-				GrandStrategyGame.Heroes[i]->IsAlive()
-				&& (
-					(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this)
-					|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this)
-				)
-				&& !GrandStrategyGame.Heroes[i]->Custom
-				&& GrandStrategyGame.Heroes[i]->IsEligibleForTitle(title)
-			) {
-				minister_candidates.push_back(GrandStrategyGame.Heroes[i]);
-			}
 		}
 	}
 	if (minister_candidates.size() > 0) {
@@ -3899,7 +3885,7 @@ void CGrandStrategyHero::Die()
 {
 	//show message that the hero has died
 	if (GrandStrategyGameInitialized) {
-		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this) {
+		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this && this->IsVisible()) {
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
@@ -6199,15 +6185,21 @@ void FinalizeGrandStrategyInitialization()
 	// calculate income and upkeep, and set initial ruler (if none is preset) for factions
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
-				if (GrandStrategyGameLoading == false) {
-					for (std::map<std::tuple<int,int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
-						if (GrandStrategyYear >= std::get<0>(iterator->first) && GrandStrategyYear < std::get<1>(iterator->first)) {
-							GrandStrategyGame.Factions[i][j]->SetMinister(std::get<2>(iterator->first), iterator->second->GetFullName());
-						}
+			if (GrandStrategyGameLoading == false) {
+				for (std::map<std::tuple<int,int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
+					if (
+						GrandStrategyYear >= std::get<0>(iterator->first)
+						&& GrandStrategyYear < std::get<1>(iterator->first)
+						&& (GrandStrategyGame.Factions[i][j]->IsAlive() || std::get<2>(iterator->first) == CharacterTitleHeadOfState)
+						&& GrandStrategyGame.GetHero(iterator->second->GetFullName()) != NULL
+						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsAlive()
+						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsVisible()
+					) {
+						GrandStrategyGame.Factions[i][j]->SetMinister(std::get<2>(iterator->first), iterator->second->GetFullName());
 					}
 				}
-				
+			}
+			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
 				for (int k = 0; k < MaxCharacterTitles; ++k) {
 					// try to perform government position succession for existent factions missing a character in charge of it
 					if (GrandStrategyGame.Factions[i][j]->Ministers[k] == NULL && GrandStrategyGame.Factions[i][j]->HasGovernmentPosition(k)) {
@@ -7190,6 +7182,35 @@ std::string GetGrandStrategyHeroBestDisplayTitle(std::string hero_full_name)
 	if (hero) {
 		if (hero->Type != NULL) {
 			return hero->GetBestDisplayTitle();
+		}
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
+	return "";
+}
+
+std::string GetGrandStrategyHeroTooltip(std::string hero_full_name)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		if (hero->Type != NULL) {
+			std::string hero_tooltip = hero->GetBestDisplayTitle() + " " + hero->GetFullName();
+			
+			for (size_t i = 0; i < hero->Titles.size(); ++i) {
+				hero_tooltip += "\n" + hero->Titles[i].second->GetCharacterTitle(hero->Titles[i].first, hero->Gender) + " of ";
+				if (PlayerRaces.Factions[hero->Titles[i].second->Civilization][hero->Titles[i].second->Faction]->Type == "tribe") {
+					hero_tooltip += "the ";
+				}
+				hero_tooltip += PlayerRaces.Factions[hero->Titles[i].second->Civilization][hero->Titles[i].second->Faction]->Name;
+			}
+
+			for (size_t i = 0; i < hero->Titles.size(); ++i) {
+				if (hero->GetFaction() == hero->Titles[i].second && !hero->GetMinisterEffectsString(hero->Titles[i].first).empty()) {
+					hero_tooltip += "\n" + FindAndReplaceString(hero->GetMinisterEffectsString(hero->Titles[i].first), ", ", "\n");
+				}
+			}
+			
+			return hero_tooltip;
 		}
 	} else {
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());

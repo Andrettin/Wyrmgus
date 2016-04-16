@@ -157,10 +157,6 @@ CItem *CCharacter::GetItem(CUnit &item)
 
 void CCharacter::GenerateMissingData()
 {
-	if (this->Year != 0 && this->DeathYear != 0) {
-		return;
-	}
-	
 	bool year_data_changed = false;
 	
 	if (this->Year == 0) {
