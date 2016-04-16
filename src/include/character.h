@@ -100,7 +100,7 @@ class CCharacter
 public:
 	CCharacter() :
 		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
-		ViolentDeath(false), Persistent(false), Custom(false),
+		ViolentDeath(false), Noble(false), Persistent(false), Custom(false),
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL)
 	{
@@ -109,6 +109,7 @@ public:
 	}
 	
 	int GetAttributeModifier(int attribute);
+	int GetLanguage();
 	bool IsParentOf(std::string child_full_name);
 	bool IsChildOf(std::string parent_full_name);
 	bool IsSiblingOf(std::string sibling_full_name);
@@ -127,6 +128,7 @@ public:
 	int Level;					/// Character's level
 	int ExperiencePercent;		/// Character's experience, as a percentage of the experience required to level up
 	bool ViolentDeath;			/// If historical death was violent
+	bool Noble;
 	bool Persistent;			/// Whether this character's levels and abilities are persistent
 	bool Custom;				/// Whether this character is a custom hero
 	std::string Name;			/// Given name of the character
@@ -164,8 +166,8 @@ public:
 -- Variables
 ----------------------------------------------------------------------------*/
 
-extern std::vector<CCharacter *> Characters;
-extern std::vector<CCharacter *> CustomHeroes;
+extern std::map<std::string, CCharacter *> Characters;
+extern std::map<std::string, CCharacter *> CustomHeroes;
 extern CCharacter *CurrentCustomHero;
 
 /*----------------------------------------------------------------------------

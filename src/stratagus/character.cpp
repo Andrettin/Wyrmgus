@@ -57,8 +57,8 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::vector<CCharacter *> Characters;
-std::vector<CCharacter *> CustomHeroes;
+std::map<std::string, CCharacter *> Characters;
+std::map<std::string, CCharacter *> CustomHeroes;
 CCharacter *CurrentCustomHero = NULL;
 
 /*----------------------------------------------------------------------------
@@ -68,6 +68,11 @@ CCharacter *CurrentCustomHero = NULL;
 int CCharacter::GetAttributeModifier(int attribute)
 {
 	return this->Attributes[attribute] - 10;
+}
+
+int CCharacter::GetLanguage()
+{
+	return PlayerRaces.GetFactionLanguage(this->Civilization, this->Faction);
 }
 
 bool CCharacter::IsParentOf(std::string child_full_name)
@@ -270,43 +275,41 @@ int GetAttributeVariableIndex(int attribute)
 
 void CleanCharacters()
 {
-	for (size_t i = 0; i < Characters.size(); ++i) {
-		for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
-			delete Characters[i]->Items[j];
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		for (size_t i = 0; i < iterator->second->Items.size(); ++i) {
+			delete iterator->second->Items[i];
 		}
-		Characters[i]->Items.clear();
-		delete Characters[i];
+		iterator->second->Items.clear();
+		delete iterator->second;
 	}
 	Characters.clear();
 	
-	for (size_t i = 0; i < CustomHeroes.size(); ++i) {
-		for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
-			delete CustomHeroes[i]->Items[j];
+	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+		for (size_t i = 0; i < iterator->second->Items.size(); ++i) {
+			delete iterator->second->Items[i];
 		}
-		CustomHeroes[i]->Items.clear();
-		delete CustomHeroes[i];
+		iterator->second->Items.clear();
+		delete iterator->second;
 	}
 	CustomHeroes.clear();
 }
 
 CCharacter *GetCharacter(std::string character_full_name)
 {
-	for (size_t i = 0; i < Characters.size(); ++i) {
-		if (character_full_name == Characters[i]->GetFullName()) {
-			return Characters[i];
-		}
+	if (Characters.find(character_full_name) != Characters.end()) {
+		return Characters[character_full_name];
+	} else {
+		return NULL;
 	}
-	return NULL;
 }
 
 CCharacter *GetCustomHero(std::string hero_full_name)
 {
-	for (size_t i = 0; i < CustomHeroes.size(); ++i) {
-		if (hero_full_name == CustomHeroes[i]->GetFullName()) {
-			return CustomHeroes[i];
-		}
+	if (CustomHeroes.find(hero_full_name) != CustomHeroes.end()) {
+		return CustomHeroes[hero_full_name];
+	} else {
+		return NULL;
 	}
-	return NULL;
 }
 
 /**
@@ -314,18 +317,18 @@ CCharacter *GetCustomHero(std::string hero_full_name)
 */
 void SaveHeroes()
 {
-	for (size_t i = 0; i < Characters.size(); ++i) { //save persistent characters
-		if (Characters[i]->Persistent) {
-			SaveHero(Characters[i]);
-		}
-	}
-		
-	for (size_t i = 0; i < CustomHeroes.size(); ++i) { //save custom heroes
-		if (CustomHeroes[i]->Persistent) {
-			SaveHero(CustomHeroes[i]);
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) { //save persistent characters
+		if (iterator->second->Persistent) {
+			SaveHero(iterator->second);
 		}
 	}
 
+	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { //save custom heroes
+		if (iterator->second->Persistent) {
+			SaveHero(iterator->second);
+		}
+	}
+			
 	//see if the old heroes.lua save file is present, and if so, delete it
 	std::string path = Parameters::Instance.GetUserDirectory();
 
@@ -559,7 +562,7 @@ void DeleteCustomHero(std::string hero_full_name)
 		unlink(path.c_str());
 	}
 	
-	CustomHeroes.erase(std::remove(CustomHeroes.begin(), CustomHeroes.end(), hero), CustomHeroes.end());
+	CustomHeroes.erase(hero_full_name);
 	delete hero;
 }
 

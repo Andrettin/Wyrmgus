@@ -242,17 +242,17 @@ bool IsItemClassConsumable(int item_class)
 bool CUniqueItem::CanDrop()
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
-	for (size_t i = 0; i < Characters.size(); ++i) {
-		for (size_t j = 0; j < Characters[i]->Items.size(); ++j) {
-			if (Characters[i]->Items[j]->Unique && Characters[i]->Items[j]->Name == this->Name && !Characters[i]->Items[j]->Bound) {
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
+			if (iterator->second->Items[j]->Unique && iterator->second->Items[j]->Name == this->Name && !iterator->second->Items[j]->Bound) {
 				return false;
 			}
 		}
 	}
 	
-	for (size_t i = 0; i < CustomHeroes.size(); ++i) {
-		for (size_t j = 0; j < CustomHeroes[i]->Items.size(); ++j) {
-			if (CustomHeroes[i]->Items[j]->Unique && CustomHeroes[i]->Items[j]->Name == this->Name && !CustomHeroes[i]->Items[j]->Bound) {
+	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+		for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
+			if (iterator->second->Items[j]->Unique && iterator->second->Items[j]->Name == this->Name && !iterator->second->Items[j]->Bound) {
 				return false;
 			}
 		}

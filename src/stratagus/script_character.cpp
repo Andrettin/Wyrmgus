@@ -71,12 +71,19 @@ static int CclDefineCharacter(lua_State *l)
 	CCharacter *character = GetCharacter(character_full_name);
 	if (!character) {
 		character = new CCharacter;
-		Characters.push_back(character);
-	} else if (!character->Persistent && character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with the names and gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
+		Characters[character_full_name] = character;
+	} else if (!character->Persistent && character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with some data like gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
 		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_full_name.c_str());
 	}
 	
 	std::string faction_name;
+	
+	std::string family_name_type;
+	if (character->Noble) {
+		family_name_type = "noble-family";
+	} else {
+		family_name_type = "family";
+	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -88,10 +95,19 @@ static int CclDefineCharacter(lua_State *l)
 			character->ExtraName = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "FamilyName")) {
 			character->FamilyName = TransliterateText(LuaToString(l, -1));
+			
+			if (PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount.find(family_name_type) == PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount.end()) {
+				PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount[family_name_type] = 0;
+			}
+			PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount[family_name_type] += 1;
 		} else if (!strcmp(value, "NameElements")) {
 			ParseNameElements(l, "person-" + GetGenderNameById(character->Gender));
 		} else if (!strcmp(value, "FamilyNameElements")) {
-			ParseNameElements(l, "family");
+			ParseNameElements(l, family_name_type);
+		} else if (!strcmp(value, "FamilyNamePredicateElements")) {
+			ParseNameElements(l, "family-predicate");
+		} else if (!strcmp(value, "NobleFamilyNamePredicateElements")) {
+			ParseNameElements(l, "noble-family-predicate");
 		} else if (!strcmp(value, "Description")) {
 			character->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
@@ -127,6 +143,13 @@ static int CclDefineCharacter(lua_State *l)
 			character->DeathYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ViolentDeath")) {
 			character->ViolentDeath = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Noble")) {
+			character->Noble = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "PlaceNameDerivedFamilyName")) {
+			bool place_name_derived_family_name = LuaToBoolean(l, -1);
+			if (character->Noble) {
+				PlayerRaces.Languages[character->GetLanguage()]->PlaceNameDerivedNobleFamilyNameCount += 1;
+			}
 		} else if (!strcmp(value, "Civilization")) {
 			character->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
@@ -180,7 +203,7 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					}
 				} else {
-					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female." _C_ mother_name.c_str() _C_ character_full_name.c_str());
+					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female (gender is \"%s\")." _C_ mother_name.c_str() _C_ character_full_name.c_str() _C_ GetGenderNameById(mother->Gender).c_str());
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_name.c_str());
@@ -404,7 +427,12 @@ static int CclDefineCharacter(lua_State *l)
 	}
 	
 	if (character->Civilization != -1 && !faction_name.empty()) { //we have to set the faction here, because Lua tables are in an arbitrary order, and the character needs its civilization to have been set before it can find its faction
-		character->Faction = PlayerRaces.GetFactionIndexByName(character->Civilization, faction_name);
+		int faction = PlayerRaces.GetFactionIndexByName(character->Civilization, faction_name);
+		if (faction != -1) {
+			character->Faction = faction;
+		} else {
+			LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
+		}
 	}
 	
 	if (character->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
@@ -419,7 +447,7 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 	
-	if (character->GetFullName() != character_full_name) { // if the character's full name (built from its defined elements) is different from the name used to initialize the character, something went wrong
+	if (character->Type != NULL && character->GetFullName() != character_full_name) { // if the character's full name (built from its defined elements) is different from the name used to initialize the character, something went wrong; asks if the type is NULL because every character is defined in the Lua code first only with the some data like gender, and afterwards with everything else
 		LuaError(l, "Character name \"%s\" doesn't match the defined name \"%s\"." _C_ character->GetFullName().c_str() _C_ character_full_name.c_str());
 	}
 	
@@ -433,7 +461,7 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 
-	if (character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with the names and gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
+	if (character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with the some data like gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
 		character->GenerateMissingData();
 	}
 	
@@ -458,7 +486,7 @@ static int CclDefineCustomHero(lua_State *l)
 	CCharacter *hero = GetCustomHero(hero_full_name);
 	if (!hero) {
 		hero = new CCharacter;
-		CustomHeroes.push_back(hero);
+		CustomHeroes[hero_full_name] = hero;
 	} else {
 		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_full_name.c_str());
 	}
@@ -996,10 +1024,15 @@ static int CclGetCustomHeroData(lua_State *l)
 
 static int CclGetCharacters(lua_State *l)
 {
-	lua_createtable(l, Characters.size(), 0);
-	for (size_t i = 1; i <= Characters.size(); ++i)
+	std::vector<std::string> character_names;
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		character_names.push_back(iterator->first);
+	}
+	
+	lua_createtable(l, character_names.size(), 0);
+	for (size_t i = 1; i <= character_names.size(); ++i)
 	{
-		lua_pushstring(l, Characters[i-1]->GetFullName().c_str());
+		lua_pushstring(l, character_names[i-1].c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -1007,10 +1040,15 @@ static int CclGetCharacters(lua_State *l)
 
 static int CclGetCustomHeroes(lua_State *l)
 {
-	lua_createtable(l, CustomHeroes.size(), 0);
-	for (size_t i = 1; i <= CustomHeroes.size(); ++i)
+	std::vector<std::string> character_names;
+	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+		character_names.push_back(iterator->first);
+	}
+	
+	lua_createtable(l, character_names.size(), 0);
+	for (size_t i = 1; i <= character_names.size(); ++i)
 	{
-		lua_pushstring(l, CustomHeroes[i-1]->GetFullName().c_str());
+		lua_pushstring(l, character_names[i-1].c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;

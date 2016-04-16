@@ -95,11 +95,11 @@ public:
 	void UpdateMinimap();
 	void SetResourceProspected(int resource_id, bool discovered);
 	void SetPort(bool has_port);
-	void GenerateCulturalName(int old_civilization_id = -1);
-	void GenerateFactionCulturalName();
+	void GenerateCulturalName(int old_civilization_id = -1, int civilization_id = -1);
+	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
-	std::string GetCulturalName();										/// Get the tile's cultural name.
+	std::string GetCulturalName(int civilization = -1, int faction = -1, bool only_settlement = false);		/// Get the tile's cultural name.
 	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
 	int Terrain;							/// Tile terrain (i.e. plains)
@@ -304,7 +304,10 @@ public:
 	bool IsEligibleForTitle(int title);
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRiskModifier();
+	int GetLanguage();
 	std::string GetRulerEffectsString();
+	std::string GenerateNobleFamilyName();
+	CGrandStrategyFaction *GetFaction();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province, 4 = hero is in the province but not defending it
 	bool Existed;								/// whether the character has existed in this playthrough

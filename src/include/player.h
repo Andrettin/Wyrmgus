@@ -534,7 +534,7 @@ class CLanguage
 public:
 	CLanguage() :
 		GenerateMissingWords(false), UsedByCivilizationOrFaction(false), SkipNameTypeInheritance(false),
-		SettlementDerivedProvinceNameCount(0),
+		SettlementDerivedProvinceNameCount(0), PlaceNameDerivedNobleFamilyNameCount(0),
 		DialectOf(NULL)
 	{
 	}
@@ -554,6 +554,7 @@ public:
 	bool UsedByCivilizationOrFaction;
 	bool SkipNameTypeInheritance;
 	int SettlementDerivedProvinceNameCount;
+	int PlaceNameDerivedNobleFamilyNameCount;
 	CLanguage *DialectOf;										/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<CLanguage *> Dialects;							/// Dialects of this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
