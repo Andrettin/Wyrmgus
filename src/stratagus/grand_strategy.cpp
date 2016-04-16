@@ -3884,8 +3884,8 @@ void CGrandStrategyHero::Create()
 void CGrandStrategyHero::Die()
 {
 	//show message that the hero has died
-	if (GrandStrategyGameInitialized) {
-		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this && this->IsVisible()) {
+	if (GrandStrategyGameInitialized && this->IsVisible()) {
+		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this) {
 			char buf[256];
 			snprintf(
 				buf, sizeof(buf), "if (GenericDialog ~= nil) then GenericDialog(\"%s\", \"%s\") end;",
