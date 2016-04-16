@@ -116,7 +116,7 @@ public:
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located
-	std::string CulturalNames[MAX_RACES];								/// Names for the province for each different culture/civilization
+	std::map<int, std::string> CulturalNames;							/// Names for the province for each different culture/civilization
 	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the province for each different faction
 	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this province
 	std::vector<Vec2i> Tiles;

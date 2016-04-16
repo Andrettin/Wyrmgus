@@ -1987,7 +1987,7 @@ std::string GrandStrategyWorldMapTile::GetCulturalName()
 */
 std::string CRiver::GetCulturalName(int civilization)
 {
-	if (civilization != -1 && !this->CulturalNames[civilization].empty()) {
+	if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
 		return this->CulturalNames[civilization];
 	} else {
 		return this->Name;
@@ -2142,12 +2142,12 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				}
 				
 				// see if can translate the cultural name of the province's current civilization
-				if (new_province_name == "" && this->Civilization != -1 && !this->CulturalNames[this->Civilization].empty()) {
+				if (new_province_name == "" && this->Civilization != -1 && this->CulturalNames.find(this->Civilization) != this->CulturalNames.end()) {
 					new_province_name = PlayerRaces.TranslateName(this->CulturalNames[this->Civilization], PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
 				}
 				if (new_province_name == "") { // try to translate any cultural name
 					for (int i = 0; i < MAX_RACES; ++i) {
-						if (!this->CulturalNames[i].empty()) {
+						if (this->CulturalNames.find(i) != this->CulturalNames.end()) {
 							new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.GetFactionLanguage(civilization_id, faction_id)); 
 							if (!new_province_name.empty()) {
 								break;
@@ -2205,15 +2205,15 @@ void CGrandStrategyProvince::SetCivilization(int civilization)
 		}
 
 		// create a new cultural name for the province, if there isn't any
-		if (this->CulturalNames[civilization].empty()) {
+		if (this->CulturalNames.find(civilization) == this->CulturalNames.end()) {
 			std::string new_province_name = "";
 			// first see if can translate the cultural name of the old civilization
-			if (old_civilization != -1 && !this->CulturalNames[old_civilization].empty()) {
+			if (old_civilization != -1 && this->CulturalNames.find(old_civilization) != this->CulturalNames.end()) {
 				new_province_name = PlayerRaces.TranslateName(this->CulturalNames[old_civilization], PlayerRaces.GetCivilizationLanguage(civilization));
 			}
 			if (new_province_name == "") { // try to translate any cultural name
 				for (int i = 0; i < MAX_RACES; ++i) {
-					if (!this->CulturalNames[i].empty()) {
+					if (this->CulturalNames.find(i) != this->CulturalNames.end()) {
 						new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.GetCivilizationLanguage(civilization));
 						if (!new_province_name.empty()) {
 							break;
@@ -2832,7 +2832,7 @@ std::string CGrandStrategyProvince::GetCulturalName()
 {
 	if (this->Owner != NULL && !this->Water && this->FactionCulturalNames.find(PlayerRaces.Factions[this->Owner->Civilization][this->Owner->Faction]) != this->FactionCulturalNames.end() && this->Civilization == this->Owner->Civilization) {
 		return this->FactionCulturalNames[PlayerRaces.Factions[this->Owner->Civilization][this->Owner->Faction]];
-	} else if (!this->Water && this->Civilization != -1 && !this->CulturalNames[this->Civilization].empty()) {
+	} else if (!this->Water && this->Civilization != -1 && this->CulturalNames.find(this->Civilization) != this->CulturalNames.end()) {
 		return this->CulturalNames[this->Civilization];
 	} else if (
 		this->Water && this->ReferenceProvince != -1
@@ -2845,7 +2845,7 @@ std::string CGrandStrategyProvince::GetCulturalName()
 	} else if (
 		this->Water && this->ReferenceProvince != -1
 		&& GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization != -1
-		&& !this->CulturalNames[GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization].empty()
+		&& this->CulturalNames.find(GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization) != this->CulturalNames.end()
 	) {
 		return this->CulturalNames[GrandStrategyGame.Provinces[this->ReferenceProvince]->Civilization];
 	} else {
@@ -5302,9 +5302,7 @@ void CleanGrandStrategyGame()
 	for (int i = 0; i < RiverMax; ++i) {
 		if (GrandStrategyGame.Rivers[i] && !GrandStrategyGame.Rivers[i]->Name.empty()) {
 			GrandStrategyGame.Rivers[i]->Name = "";
-			for (int j = 0; j < MAX_RACES; ++j) {
-				GrandStrategyGame.Rivers[i]->CulturalNames[j] = "";
-			}
+			GrandStrategyGame.Rivers[i]->CulturalNames.clear();
 		} else {
 			break;
 		}
@@ -5876,7 +5874,9 @@ void InitializeGrandStrategyProvinces()
 		province->Coastal = Provinces[i]->Coastal;
 		province->SettlementLocation = Provinces[i]->SettlementLocation;
 		for (int j = 0; j < MAX_RACES; ++j) {
-			province->CulturalNames[j] = Provinces[i]->CulturalNames[j];
+			if (Provinces[i]->CulturalNames.find(j) != Provinces[i]->CulturalNames.end()) {
+				province->CulturalNames[j] = Provinces[i]->CulturalNames[j];
+			}
 			
 			for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
 				if (Provinces[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != Provinces[i]->FactionCulturalNames.end()) {

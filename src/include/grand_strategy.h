@@ -280,7 +280,7 @@ public:
 	std::string GetCulturalName(int civilization);						/// Get the river's cultural name for a particular civilization.
 	
 	std::string Name;
-	std::string CulturalNames[MAX_RACES];								/// Names for the river for each different culture/civilization
+	std::map<int, std::string> CulturalNames;							/// Names for the river for each different culture/civilization
 };
 
 class CGrandStrategyHero : public CCharacter

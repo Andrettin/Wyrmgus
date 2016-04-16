@@ -2914,7 +2914,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 		for (int i = 0; i < RiverMax; ++i) { //save river information
 			if (GrandStrategyGame.Rivers[i] && !GrandStrategyGame.Rivers[i]->Name.empty()) {
 				for (int j = 0; j < MAX_RACES; ++j) {
-					if (!GrandStrategyGame.Rivers[i]->CulturalNames[j].empty()) {
+					if (GrandStrategyGame.Rivers[i]->CulturalNames.find(j) != GrandStrategyGame.Rivers[i]->CulturalNames.end()) {
 						fprintf(fd, "SetRiverCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Rivers[i]->CulturalNames[j].c_str());
 					}
 				}
@@ -2984,7 +2984,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 			}
 			for (int j = 0; j < MAX_RACES; ++j) {
-				if (!GrandStrategyGame.Provinces[i]->CulturalNames[j].empty()) {
+				if (GrandStrategyGame.Provinces[i]->CulturalNames.find(j) != GrandStrategyGame.Provinces[i]->CulturalNames.end()) {
 					fprintf(fd, "SetProvinceCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Provinces[i]->CulturalNames[j].c_str());
 				}
 				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
