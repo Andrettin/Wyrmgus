@@ -3977,6 +3977,31 @@ void CGrandStrategyHero::Create()
 	
 	if (this->ProvinceOfOrigin != NULL) {
 		this->ProvinceOfOrigin->SetHero(this->GetFullName(), this->State);
+		
+		if (this->ProvinceOfOrigin->Owner != NULL) {
+			// see if the character can occupy a vacant ministry slot, choosing the one that best fits
+			int best_title = -1;
+			int best_title_score = 0;
+			
+			for (int i = 2; i < MaxCharacterTitles; ++i) { // begin at 2 to ignore the head of state and head of government titles
+				if (this->ProvinceOfOrigin->Owner->Ministers[i] == NULL) {
+					int title_score = 0;
+					if (i == CharacterTitleFinanceMinister) {
+						title_score = this->Attributes[IntelligenceAttribute];
+					} else if (i == CharacterTitleWarMinister) {
+						title_score = (this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2;
+					}
+					if (title_score > best_title_score) {
+						best_title = i;
+						best_title_score = title_score;
+					}
+				}
+			}
+			
+			if (best_title != -1) {
+				this->ProvinceOfOrigin->Owner->SetMinister(best_title, this->GetFullName());
+			}
+		}
 	}
 }
 
@@ -7343,6 +7368,9 @@ std::string GetGrandStrategyHeroTooltip(std::string hero_full_name)
 	if (hero) {
 		if (hero->Type != NULL) {
 			std::string hero_tooltip = hero->GetBestDisplayTitle() + " " + hero->GetFullName();
+			
+			hero_tooltip += "\nTrait: " + hero->Trait->Name;
+			hero_tooltip += "\nProvince: " + hero->Province->GetCulturalName();
 			
 			for (size_t i = 0; i < hero->Titles.size(); ++i) {
 				hero_tooltip += "\n" + hero->Titles[i].second->GetCharacterTitle(hero->Titles[i].first, hero->Gender) + " of ";
