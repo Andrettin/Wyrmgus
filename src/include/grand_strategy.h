@@ -248,6 +248,7 @@ public:
 	std::string GetFullName();
 	std::string GetTitle();
 	std::string GetCharacterTitle(int title_type, int gender);
+	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
 	
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).

@@ -86,6 +86,7 @@ enum CostType {
 	MushroomCost,							/// mushroom resource
 	LaborCost,								/// labor resource
 	FishCost,								/// fish resource
+	LeadershipCost,							/// leadership resource
 	//Wyrmgus end
 
 	MaxCosts                                /// how many different costs

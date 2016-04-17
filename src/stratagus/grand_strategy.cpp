@@ -482,7 +482,7 @@ void CGrandStrategyGame::DrawInterface()
 			int income = 0;
 			if (stored_resources[i] == GoldCost) {
 				income = this->PlayerFaction->Income[stored_resources[i]] - this->PlayerFaction->Upkeep;
-			} else if (stored_resources[i] == ResearchCost) {
+			} else if (stored_resources[i] == ResearchCost || stored_resources[i] == LeadershipCost) {
 				income = this->PlayerFaction->Income[stored_resources[i]] / this->PlayerFaction->OwnedProvinces.size();
 			} else {
 				income = this->PlayerFaction->Income[stored_resources[i]];
@@ -837,7 +837,7 @@ void CGrandStrategyGame::DoTurn()
 				for (int k = 0; k < MaxCosts; ++k) {
 					if (k == GrainCost || k == MushroomCost || k == FishCost || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
 						continue;
-					} else if (k == ResearchCost) {
+					} else if (k == ResearchCost || k == LeadershipCost) {
 						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->OwnedProvinces.size();
 					} else {
 						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k];
@@ -985,17 +985,57 @@ void CGrandStrategyGame::DoTurn()
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		if (
 			// for historical personages to appear, they require three things: the year of their historical rise to prominence, ownership of the province in which they were born or raised, and that that province be of the correct culture for them, if they belonged to the cultural majority (or if the civilization of the province's owner is the same as the hero, as undoubtedly administrators and the like would exist from the faction's culture in any of its provinces)
-			this->Heroes[i]->Year == GrandStrategyYear
+			GrandStrategyYear >= this->Heroes[i]->Year
+			&& GrandStrategyYear <= this->Heroes[i]->DeathYear
 			&& this->Heroes[i]->State == 0
+			&& !this->Heroes[i]->Existed
 			&& this->Heroes[i]->ProvinceOfOrigin != NULL
 			&& this->Heroes[i]->ProvinceOfOrigin->Owner != NULL
 			&& (this->Heroes[i]->ProvinceOfOrigin->Civilization == this->Heroes[i]->Civilization || this->Heroes[i]->ProvinceOfOrigin->Owner->Civilization == this->Heroes[i]->Civilization)
 		) {
 			//make heroes appear in their start year
-			this->Heroes[i]->Create();
+			if ( // warrior heroes have the additional requirement of needing leadership to be created, unless they belong to the ruling house, in which case they are free
+				!IsOffensiveMilitaryUnit(*this->Heroes[i]->Type)
+				|| (
+					this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState] != NULL
+					&& (
+						this->Heroes[i]->Father == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]
+						|| this->Heroes[i]->Mother == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]
+						|| this->Heroes[i]->FamilyName == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]->FamilyName
+					)
+				)
+				|| this->Heroes[i]->ProvinceOfOrigin->Owner->Resources[LeadershipCost] >= 2000
+			) {
+				this->Heroes[i]->Create();
+				
+				if (
+					IsOffensiveMilitaryUnit(*this->Heroes[i]->Type)
+					&& !(
+						this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState] != NULL
+						&& (
+							this->Heroes[i]->Father == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]
+							|| this->Heroes[i]->Mother == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]
+							|| this->Heroes[i]->FamilyName == this->Heroes[i]->ProvinceOfOrigin->Owner->Ministers[CharacterTitleHeadOfState]->FamilyName
+						)
+					)
+				) {
+					this->Heroes[i]->ProvinceOfOrigin->Owner->Resources[LeadershipCost] -= 2000;
+				}
+			}
 		}
 	}
 	
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (this->Factions[i][j]->IsAlive()) {
+				if (this->Factions[i][j]->Resources[LeadershipCost] >= 2000) { // if the faction has 2000 leadership or more, produce a warrior character
+					this->Factions[i][j]->GetRandomProvinceWeightedByPopulation()->GenerateHero("warrior");
+					this->Factions[i][j]->Resources[LeadershipCost] -= 2000;
+				}
+			}
+		}
+	}
+
 	//check if any heroes should die this year (this needs to be done as its own loop to allow new rulers to appear in the same year their predecessor dies, and succeede him)
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {
 		if (
@@ -1072,7 +1112,7 @@ void CGrandStrategyGame::DoTrade()
 				for (size_t k = 0; k < this->Factions[i][j]->OwnedProvinces.size(); ++k) {
 					int province_id = this->Factions[i][j]->OwnedProvinces[k];
 					for (int res = 0; res < MaxCosts; ++res) {
-						if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+						if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost || res == LeadershipCost) {
 							continue;
 						}
 							
@@ -1120,7 +1160,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+				if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost || res == LeadershipCost) {
 					continue;
 				}
 				
@@ -1160,7 +1200,7 @@ void CGrandStrategyGame::DoTrade()
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+							if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost || res == LeadershipCost) {
 								continue;
 							}
 							
@@ -1185,7 +1225,7 @@ void CGrandStrategyGame::DoTrade()
 	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost) {
+		if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost || res == LeadershipCost) {
 			continue;
 		}
 		
@@ -1215,7 +1255,7 @@ void CGrandStrategyGame::DoTrade()
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == GoldCost || i == SilverCost || i == CopperCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || i == GrainCost || i == MushroomCost || i == FishCost) {
+			if (i == GoldCost || i == SilverCost || i == CopperCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || i == GrainCost || i == MushroomCost || i == FishCost || i == LeadershipCost) {
 				continue;
 			}
 		
@@ -2309,9 +2349,13 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	if (this->Owner != NULL) {
 		if (UnitTypes[building_id]->Class == "town-hall") {
 			this->CalculateIncomes();
+		} else if (UnitTypes[building_id]->Class == "barracks") {
+			this->CalculateIncome(LeadershipCost);
 		} else if (UnitTypes[building_id]->Class == "lumber-mill") {
 			this->CalculateIncome(ResearchCost);
 		} else if (UnitTypes[building_id]->Class == "smithy") {
+			this->CalculateIncome(ResearchCost);
+		} else if (UnitTypes[building_id]->Class == "temple") {
 			this->CalculateIncome(ResearchCost);
 		}
 	}
@@ -2614,6 +2658,13 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 		}
 		if (this->HasBuildingClass("temple")) { // +2 research if has a temple
 			income += 2;
+		}
+			
+		income *= 100 + this->GetProductionEfficiencyModifier(resource);
+		income /= 100;
+	} else if (resource == LeadershipCost) {
+		if (this->HasBuildingClass("barracks")) {
+			income += 100;
 		}
 			
 		income *= 100 + this->GetProductionEfficiencyModifier(resource);
@@ -3010,6 +3061,30 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker")));
 			}
 		}
+	} else if (type == "warrior") {
+		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
+		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")));
+		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")));
+		}
+		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")));
+		}
+		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")));
+		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")));
+		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
+		}
+		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
+		}
+		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
+		}
 	} else if (type == "author") {
 		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")) != -1) {
 			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")));
@@ -3039,60 +3114,6 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
 				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
 			}
-		}
-	} else if (type == "war-minister") {
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
-		}
-	} else if (type == "head-of-government" || type.find("minister") != std::string::npos) { // allow any unit type for ministers (other than the minister of war)
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("priest")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("infantry")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("spearman")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-shooter")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-shooter")));
-		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
-		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
-			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")));
 		}
 	}
 	
@@ -3156,17 +3177,22 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 	} else if (hero->Type->Class != "worker") {
 		hero->FamilyName = hero->GenerateNobleFamilyName();
 	}
-	
-	if (hero->IsActive()) {
-		hero->State = 2;
-	} else {
-		hero->State = 4;
-	}
-	
+
 	hero->UpdateAttributes();
 	
 	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
-	hero->ProvinceOfOrigin->SetHero(hero->GetFullName(), hero->State);
+	
+	if (type == "head-of-state" || type == "author") {
+		if (hero->IsActive()) {
+			hero->State = 2;
+		} else {
+			hero->State = 4;
+		}
+		hero->Existed = true;
+		hero->ProvinceOfOrigin->SetHero(hero->GetFullName(), hero->State);
+	} else {
+		hero->Create();
+	}
 	
 	return hero;
 }
@@ -3488,7 +3514,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 		}
 		
 		if (this->IsAlive() && (hero->Province == NULL || hero->Province->Owner != this)) { // if the hero's province is not owned by this faction, move him to a random province owned by this faction
-			GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->OwnedProvinces.size())]]->SetHero(hero->GetFullName(), hero->State);
+			this->GetRandomProvinceWeightedByPopulation()->SetHero(hero->GetFullName(), hero->State);
 		}
 	}
 	
@@ -3528,7 +3554,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		}
 		
 		// if no family successor was found, the title becomes extinct if it is only a titular one (an aristocratic title whose corresponding faction does not actually hold territory)
-		if (!this->CanHaveSuccession(title, false)) {
+		if (!this->CanHaveSuccession(title, false) || title != CharacterTitleHeadOfState) {
 			this->Ministers[title] = NULL;
 			return;
 		}
@@ -3561,7 +3587,11 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		return;
 	}
 
-	this->GenerateMinister(title); //if all else failed, try to generate a minister for the faction
+	if (title == CharacterTitleHeadOfState) { // only generate characters for rulers, to not grant too many free heroes to the player
+		this->GenerateMinister(title); //if all else failed, try to generate a minister for the faction
+	} else {
+		this->Ministers[title] = NULL;
+	}
 }
 
 void CGrandStrategyFaction::GenerateMinister(int title, bool child_of_current_minister)
@@ -3575,7 +3605,7 @@ void CGrandStrategyFaction::GenerateMinister(int title, bool child_of_current_mi
 	if (child_of_current_minister && this->Ministers[title]->Province->Owner == this) {
 		province = this->Ministers[title]->Province;
 	} else {
-		province = GrandStrategyGame.Provinces[this->OwnedProvinces[SyncRand(this->OwnedProvinces.size())]];
+		province = this->GetRandomProvinceWeightedByPopulation();
 	}
 	
 	CGrandStrategyHero *hero = province->GenerateHero(GetCharacterTitleNameById(title), child_of_current_minister ? this->Ministers[title] : NULL);
@@ -3814,6 +3844,22 @@ std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 	return "";
 }
 
+CGrandStrategyProvince *CGrandStrategyFaction::GetRandomProvinceWeightedByPopulation()
+{
+	std::vector<int> potential_provinces;
+	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
+		for (int j = 0; j < GrandStrategyGame.Provinces[this->OwnedProvinces[i]]->TotalWorkers; ++j) {
+			potential_provinces.push_back(this->OwnedProvinces[i]);
+		}
+	}
+	
+	if (potential_provinces.size() > 0) {
+		return GrandStrategyGame.Provinces[potential_provinces[SyncRand(potential_provinces.size())]];
+	} else {
+		return NULL;
+	}
+}
+
 void CGrandStrategyHero::Initialize()
 {
 	if (this->Trait == NULL) { //if no trait was set, have the hero be the same trait as the unit type (if the unit type has it predefined)
@@ -3828,7 +3874,7 @@ void CGrandStrategyHero::Initialize()
 	if (!this->Custom) {
 		province_of_origin_id = GetProvinceId(this->ProvinceOfOriginName);
 	} else {
-		province_of_origin_id = GrandStrategyGame.PlayerFaction->OwnedProvinces[SyncRand(GrandStrategyGame.PlayerFaction->OwnedProvinces.size())];
+		province_of_origin_id = GrandStrategyGame.PlayerFaction->GetRandomProvinceWeightedByPopulation()->ID;
 	}
 	
 	if (province_of_origin_id == -1) {
