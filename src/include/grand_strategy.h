@@ -311,6 +311,7 @@ public:
 	int GetRevoltRiskModifier();
 	int GetTroopCostModifier();
 	int GetLanguage();
+	int GetTitleScore(int title);
 	std::string GetMinisterEffectsString(int title);
 	std::string GetBestDisplayTitle();
 	std::string GenerateNobleFamilyName();

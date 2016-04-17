@@ -3563,7 +3563,9 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 		}
 	}
 	
-	std::vector<CGrandStrategyHero *> minister_candidates;
+	CGrandStrategyHero *best_candidate = NULL;
+	int best_score = 0;
+			
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		if (
 			GrandStrategyGame.Heroes[i]->IsAlive()
@@ -3575,12 +3577,15 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 			&& !GrandStrategyGame.Heroes[i]->Custom
 			&& GrandStrategyGame.Heroes[i]->IsEligibleForTitle(title)
 		) {
-			minister_candidates.push_back(GrandStrategyGame.Heroes[i]);
+			int score = GrandStrategyGame.Heroes[i]->GetTitleScore(title);
+			if (score > best_score) {
+				best_candidate = GrandStrategyGame.Heroes[i];
+				best_score = score;
+			}
 		}
 	}
-	if (minister_candidates.size() > 0) {
-		std::string chosen_minister_candidate = minister_candidates[SyncRand(minister_candidates.size())]->GetFullName();
-		this->SetMinister(title, chosen_minister_candidate);
+	if (best_candidate != NULL) {
+		this->SetMinister(title, best_candidate->GetFullName());
 		return;
 	}
 
@@ -3984,13 +3989,8 @@ void CGrandStrategyHero::Create()
 			int best_title_score = 0;
 			
 			for (int i = 2; i < MaxCharacterTitles; ++i) { // begin at 2 to ignore the head of state and head of government titles
-				if (this->ProvinceOfOrigin->Owner->Ministers[i] == NULL) {
-					int title_score = 0;
-					if (i == CharacterTitleFinanceMinister) {
-						title_score = this->Attributes[IntelligenceAttribute];
-					} else if (i == CharacterTitleWarMinister) {
-						title_score = (this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2;
-					}
+				if (this->ProvinceOfOrigin->Owner->Ministers[i] == NULL && this->ProvinceOfOrigin->Owner->HasGovernmentPosition(i)) {
+					int title_score = this->GetTitleScore(i);
 					if (title_score > best_title_score) {
 						best_title = i;
 						best_title_score = title_score;
@@ -4151,6 +4151,27 @@ int CGrandStrategyHero::GetLanguage()
 		language = PlayerRaces.GetFactionLanguage(this->Civilization, this->GetFaction()->Faction);
 	}
 	return language;
+}
+
+int CGrandStrategyHero::GetTitleScore(int title)
+{
+	if (title == CharacterTitleHeadOfState) {
+		return (this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3;
+	} else if (title == CharacterTitleHeadOfGovernment) {
+		return (this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3;
+	} else if (title == CharacterTitleFinanceMinister) {
+		return this->Attributes[IntelligenceAttribute];
+	} else if (title == CharacterTitleWarMinister) {
+		return (this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2;
+	} else if (title == CharacterTitleInteriorMinister) {
+		return this->Attributes[IntelligenceAttribute];
+	} else if (title == CharacterTitleJusticeMinister) {
+		return this->Attributes[IntelligenceAttribute];
+	} else if (title == CharacterTitleForeignMinister) {
+		return (this->Attributes[CharismaAttribute] + this->Attributes[IntelligenceAttribute]) / 2;
+	} else {
+		return 0;
+	}
 }
 
 std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
