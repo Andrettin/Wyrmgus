@@ -2803,9 +2803,8 @@ int CGrandStrategyProvince::GetAdministrativeEfficiencyModifier()
 		modifier += this->Civilization == this->Owner->Civilization ? 0 : -25; //if the province is of a different culture than its owner, it gets a cultural penalty to its administrative efficiency modifier
 	}
 	
-	
-	if (this->Owner != NULL && this->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
-		modifier += this->Owner->Ministers[CharacterTitleHeadOfState]->GetAdministrativeEfficiencyModifier();
+	if (this->Owner != NULL) {
+		modifier += this->Owner->GetAdministrativeEfficiencyModifier();
 	}
 	
 	return modifier;
@@ -2816,7 +2815,7 @@ int CGrandStrategyProvince::GetProductionEfficiencyModifier(int resource)
 	int modifier = 0;
 	
 	if (this->Owner != NULL) {
-		modifier += this->Owner->ProductionEfficiencyModifier[resource];
+		modifier += this->Owner->GetProductionEfficiencyModifier(resource);
 	}
 	
 	modifier += this->ProductionEfficiencyModifier[resource];
@@ -2841,9 +2840,7 @@ int CGrandStrategyProvince::GetRevoltRisk()
 			revolt_risk += 1; //if the owner does not have a claim to the province, it gets plus 1% revolt risk
 		}
 		
-		if (this->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
-			revolt_risk += this->Owner->Ministers[CharacterTitleHeadOfState]->GetRevoltRiskModifier();
-		}
+		revolt_risk += this->Owner->GetRevoltRiskModifier();
 	}
 	
 	revolt_risk = std::max(0, revolt_risk);
@@ -3672,7 +3669,7 @@ bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 		return false;
 	}
 	
-	if (title == CharacterTitleHeadOfGovernment || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleJusticeMinister) { // these titles don't serve much of a purpose yet
+	if (title == CharacterTitleHeadOfGovernment || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleInteriorMinister) { // these titles don't serve much of a purpose yet
 		return false;
 	}
 	
@@ -3686,6 +3683,62 @@ bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance
 	}
 	
 	return true;
+}
+
+int CGrandStrategyFaction::GetAdministrativeEfficiencyModifier()
+{
+	int modifier = 0;
+	
+	if (this->Ministers[CharacterTitleHeadOfState] != NULL) {
+		modifier += this->Ministers[CharacterTitleHeadOfState]->GetAdministrativeEfficiencyModifier();
+	}
+	
+//	if (this->Ministers[CharacterTitleInteriorMinister] != NULL) {
+//		modifier += this->Ministers[CharacterTitleInteriorMinister]->GetAdministrativeEfficiencyModifier();
+//	}
+	
+	if (this->Ministers[CharacterTitleFinanceMinister] != NULL) {
+		modifier += this->Ministers[CharacterTitleFinanceMinister]->GetAdministrativeEfficiencyModifier();
+	}
+	
+	return modifier;
+}
+
+int CGrandStrategyFaction::GetProductionEfficiencyModifier(int resource)
+{
+	int modifier = this->ProductionEfficiencyModifier[resource];
+	
+	return modifier;
+}
+
+int CGrandStrategyFaction::GetRevoltRiskModifier()
+{
+	int modifier = 0;
+	
+	if (this->Ministers[CharacterTitleHeadOfState] != NULL) {
+		modifier += this->Ministers[CharacterTitleHeadOfState]->GetRevoltRiskModifier();
+	}
+	
+	if (this->Ministers[CharacterTitleInteriorMinister] != NULL) {
+		modifier += this->Ministers[CharacterTitleInteriorMinister]->GetRevoltRiskModifier();
+	}
+	
+	return modifier;
+}
+
+int CGrandStrategyFaction::GetTroopCostModifier()
+{
+	int modifier = 0;
+	
+	if (this->Ministers[CharacterTitleHeadOfState] != NULL) {
+		modifier += this->Ministers[CharacterTitleHeadOfState]->GetTroopCostModifier();
+	}
+	
+	if (this->Ministers[CharacterTitleWarMinister] != NULL) {
+		modifier += this->Ministers[CharacterTitleWarMinister]->GetTroopCostModifier();
+	}
+	
+	return modifier;
 }
 
 std::string CGrandStrategyFaction::GetFullName()
@@ -4057,6 +4110,15 @@ int CGrandStrategyHero::GetRevoltRiskModifier()
 	return modifier;
 }
 
+int CGrandStrategyHero::GetTroopCostModifier()
+{
+	int modifier = 0;
+	
+	modifier += (this->GetAttributeModifier(IntelligenceAttribute) + this->GetAttributeModifier(this->GetMartialAttribute())) / 2 * -5 / 2; //-2.5% troop cost modifier per average of the intelligence modifier and the strength/dexterity one (depending on which one the character uses)
+	
+	return modifier;
+}
+
 int CGrandStrategyHero::GetLanguage()
 {
 	int language = PlayerRaces.GetCivilizationLanguage(this->Civilization);
@@ -4072,33 +4134,49 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 	
 	bool first = true;
 	
-	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister) {
-		int administrative_modifier = this->GetAdministrativeEfficiencyModifier();
-		if (administrative_modifier != 0) {
+//	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister) {
+	if (title == CharacterTitleHeadOfState || title == CharacterTitleFinanceMinister) { // make it be affected by the finance minister instead of the interior one for now, since the primary effect of the administrative efficiency modifier at the moment is to improve production
+		int modifier = this->GetAdministrativeEfficiencyModifier();
+		if (modifier != 0) {
 			if (!first) {
 				minister_effects_string += ", ";
 			} else {
 				first = false;
 			}
-			if (administrative_modifier > 0) {
+			if (modifier > 0) {
 				minister_effects_string += "+";
 			}
-			minister_effects_string += std::to_string((long long) administrative_modifier) + "% Administrative Efficiency";
+			minister_effects_string += std::to_string((long long) modifier) + "% Administrative Efficiency";
 		}
 	}
 	
 	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister) {
-		int revolt_risk_modifier = this->GetRevoltRiskModifier();
-		if (revolt_risk_modifier != 0) {
+		int modifier = this->GetRevoltRiskModifier();
+		if (modifier != 0) {
 			if (!first) {
 				minister_effects_string += ", ";
 			} else {
 				first = false;
 			}
-			if (revolt_risk_modifier > 0) {
+			if (modifier > 0) {
 				minister_effects_string += "+";
 			}
-			minister_effects_string += std::to_string((long long) revolt_risk_modifier) + "% Revolt Risk";
+			minister_effects_string += std::to_string((long long) modifier) + "% Revolt Risk";
+		}
+	}
+	
+	if (title == CharacterTitleHeadOfState || title == CharacterTitleWarMinister) {
+		int modifier = this->GetTroopCostModifier();
+		if (modifier != 0) {
+			if (!first) {
+				minister_effects_string += ", ";
+			} else {
+				first = false;
+			}
+			if (modifier > 0) {
+				minister_effects_string += "+";
+			}
+			minister_effects_string += std::to_string((long long) modifier) + "% Troop Cost";
 		}
 	}
 	
@@ -7128,6 +7206,30 @@ std::string GetFactionMinister(std::string civilization_name, std::string factio
 	} else {
 		return "";
 	}
+}
+
+int GetFactionUnitCost(std::string civilization_name, std::string faction_name, std::string unit_type_ident, std::string resource_name)
+{
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	int faction = -1;
+	if (civilization != -1) {
+		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+	}
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (unit_type == -1 || resource == -1) {
+		return 0;
+	}
+	
+	int cost = UnitTypes[unit_type]->DefaultStat.Costs[resource];
+	if (faction != -1) {
+		if (IsMilitaryUnit(*UnitTypes[unit_type])) {
+			cost *= 100 + GrandStrategyGame.Factions[civilization][faction]->GetTroopCostModifier();
+			cost /= 100;
+		}
+	}
+	return cost;
 }
 
 void CreateGrandStrategyHero(std::string hero_full_name)

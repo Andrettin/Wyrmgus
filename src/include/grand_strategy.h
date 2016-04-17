@@ -245,6 +245,10 @@ public:
 	bool CanFormFaction(int civilization, int faction);
 	bool HasGovernmentPosition(int title);
 	bool CanHaveSuccession(int title, bool family_inheritance);
+	int GetAdministrativeEfficiencyModifier();
+	int GetProductionEfficiencyModifier(int resource);
+	int GetRevoltRiskModifier();
+	int GetTroopCostModifier();
 	std::string GetFullName();
 	std::string GetTitle();
 	std::string GetCharacterTitle(int title_type, int gender);
@@ -305,6 +309,7 @@ public:
 	bool IsEligibleForTitle(int title);
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRiskModifier();
+	int GetTroopCostModifier();
 	int GetLanguage();
 	std::string GetMinisterEffectsString(int title);
 	std::string GetBestDisplayTitle();
@@ -584,6 +589,7 @@ extern int GetFactionCommodityTrade(std::string civilization_name, std::string f
 extern bool FactionHasHero(std::string civilization_name, std::string faction_name, std::string hero_full_name);
 extern void SetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name, std::string hero_full_name);
 extern std::string GetFactionMinister(std::string civilization_name, std::string faction_name, std::string title_name);
+extern int GetFactionUnitCost(std::string civilization_name, std::string faction_name, std::string unit_type_ident, std::string resource_name);
 extern void CreateGrandStrategyHero(std::string hero_full_name);
 extern void CreateGrandStrategyCustomHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);

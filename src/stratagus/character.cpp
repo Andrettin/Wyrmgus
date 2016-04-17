@@ -65,6 +65,15 @@ CCharacter *CurrentCustomHero = NULL;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+int CCharacter::GetMartialAttribute()
+{
+	if (this->Type->Class == "thief" || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
+		return DexterityAttribute;
+	} else {
+		return StrengthAttribute;
+	}
+}
+
 int CCharacter::GetAttributeModifier(int attribute)
 {
 	return this->Attributes[attribute] - 10;

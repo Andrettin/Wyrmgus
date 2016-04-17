@@ -108,6 +108,7 @@ public:
 		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}
 	
+	int GetMartialAttribute();
 	int GetAttributeModifier(int attribute);
 	int GetLanguage();
 	bool IsParentOf(std::string child_full_name);
