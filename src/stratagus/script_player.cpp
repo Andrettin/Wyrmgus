@@ -39,6 +39,9 @@
 
 #include "actions.h"
 #include "ai.h"
+//Wyrmgus start
+#include "character.h"
+//Wyrmgus end
 #include "commands.h"
 //Wyrmgus start
 #include "editor.h"
@@ -1523,6 +1526,22 @@ static int CclDefineFaction(lua_State *l)
 				int faction_tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
 				++k;
 				faction->Titles[government_type][faction_tier] = LuaToString(l, -1, k + 1);
+			}
+		} else if (!strcmp(value, "MinisterTitles")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				int title = GetCharacterTitleIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				int gender = GetGenderIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				int government_type = GetGovernmentTypeIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				int faction_tier = GetFactionTierIdByName(LuaToString(l, -1, k + 1));
+				++k;
+				faction->MinisterTitles[title][gender][government_type][faction_tier] = LuaToString(l, -1, k + 1);
 			}
 		} else if (!strcmp(value, "FactionUpgrade")) {
 			faction->FactionUpgrade = LuaToString(l, -1);

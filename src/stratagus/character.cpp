@@ -683,7 +683,9 @@ bool IsNameValidForCustomHero(std::string hero_name, std::string hero_family_nam
 
 std::string GetGenderNameById(int gender)
 {
-	if (gender == MaleGender) {
+	if (gender == NoGender) {
+		return "no-gender";
+	} else if (gender == MaleGender) {
 		return "male";
 	} else if (gender == FemaleGender) {
 		return "female";
@@ -696,7 +698,9 @@ std::string GetGenderNameById(int gender)
 
 int GetGenderIdByName(std::string gender)
 {
-	if (gender == "male") {
+	if (gender == "no-gender") {
+		return NoGender;
+	} else if (gender == "male") {
 		return MaleGender;
 	} else if (gender == "female") {
 		return FemaleGender;
@@ -713,6 +717,8 @@ std::string GetCharacterTitleNameById(int title)
 		return "head-of-state";
 	} else if (title == CharacterTitleHeadOfGovernment) {
 		return "head-of-government";
+	} else if (title == CharacterTitleEducationMinister) {
+		return "education-minister";
 	} else if (title == CharacterTitleFinanceMinister) {
 		return "finance-minister";
 	} else if (title == CharacterTitleForeignMinister) {
@@ -736,6 +742,8 @@ int GetCharacterTitleIdByName(std::string title)
 		return CharacterTitleHeadOfState;
 	} else if (title == "head-of-government") {
 		return CharacterTitleHeadOfGovernment;
+	} else if (title == "education-minister") {
+		return CharacterTitleEducationMinister;
 	} else if (title == "finance-minister") {
 		return CharacterTitleFinanceMinister;
 	} else if (title == "foreign-minister") {
@@ -755,6 +763,6 @@ int GetCharacterTitleIdByName(std::string title)
 
 bool IsMinisterialTitle(int title)
 {
-	return (title == CharacterTitleHeadOfState || title == CharacterTitleHeadOfGovernment || title == CharacterTitleFinanceMinister || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleInteriorMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleWarMinister);
+	return (title == CharacterTitleHeadOfState || title == CharacterTitleHeadOfGovernment || title == CharacterTitleEducationMinister || title == CharacterTitleFinanceMinister || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleInteriorMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleWarMinister);
 }
 //@}

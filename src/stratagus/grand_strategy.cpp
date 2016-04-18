@@ -3674,7 +3674,7 @@ bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 		return false;
 	}
 	
-	if (title == CharacterTitleHeadOfGovernment || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleInteriorMinister) { // these titles don't serve much of a purpose yet
+	if (title == CharacterTitleHeadOfGovernment || title == CharacterTitleEducationMinister || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleInteriorMinister) { // these titles don't serve much of a purpose yet
 		return false;
 	}
 	
@@ -3792,6 +3792,26 @@ std::string CGrandStrategyFaction::GetTitle()
 
 std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 {
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
+		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][this->FactionTier].empty()) {
+			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][this->FactionTier];
+		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][this->FactionTier].empty()) {
+			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][this->FactionTier];
+		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][this->FactionTier].empty()) {
+			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][this->FactionTier];
+		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][this->FactionTier].empty()) {
+			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][this->FactionTier];
+		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][FactionTierNoFactionTier].empty()) {
+			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][FactionTierNoFactionTier];
+		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][FactionTierNoFactionTier].empty()) {
+			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][FactionTierNoFactionTier];
+		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
+			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
+		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier].empty()) {
+			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][GovernmentTypeNoGovernmentType][FactionTierNoFactionTier];
+		}
+	}
+
 	if (title_type == CharacterTitleHeadOfState) {
 		if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
 			if (gender != FemaleGender) {
@@ -3882,6 +3902,8 @@ std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 		}
 	} else if (title_type == CharacterTitleHeadOfGovernment) {
 		return "Prime Minister";
+	} else if (title_type == CharacterTitleEducationMinister) {
+		return "Education Minister";
 	} else if (title_type == CharacterTitleFinanceMinister) {
 //		return "Finance Minister"; //finance minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 		return "Treasurer";
@@ -4159,6 +4181,8 @@ int CGrandStrategyHero::GetTitleScore(int title)
 		return (this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3;
 	} else if (title == CharacterTitleHeadOfGovernment) {
 		return (this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3;
+	} else if (title == CharacterTitleEducationMinister) {
+		return this->Attributes[IntelligenceAttribute];
 	} else if (title == CharacterTitleFinanceMinister) {
 		return this->Attributes[IntelligenceAttribute];
 	} else if (title == CharacterTitleWarMinister) {
@@ -7597,7 +7621,9 @@ int GetDiplomacyStateIdByName(std::string diplomacy_state)
 
 std::string GetFactionTierNameById(int faction_tier)
 {
-	if (faction_tier == FactionTierBarony) {
+	if (faction_tier == FactionTierNoFactionTier) {
+		return "no-faction-tier";
+	} else if (faction_tier == FactionTierBarony) {
 		return "barony";
 	} else if (faction_tier == FactionTierCounty) {
 		return "county";
@@ -7616,7 +7642,9 @@ std::string GetFactionTierNameById(int faction_tier)
 
 int GetFactionTierIdByName(std::string faction_tier)
 {
-	if (faction_tier == "barony") {
+	if (faction_tier == "no-faction-tier") {
+		return FactionTierNoFactionTier;
+	} else if (faction_tier == "barony") {
 		return FactionTierBarony;
 	} else if (faction_tier == "county") {
 		return FactionTierCounty;

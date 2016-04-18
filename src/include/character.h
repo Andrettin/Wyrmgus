@@ -85,6 +85,7 @@ enum Attributes {
 enum CharacterTitles {
 	CharacterTitleHeadOfState, // also used for titulars to aristocratic titles which were formal only; for example: the French duke of Orléans did not rule over Orléans, but here we consider the "head of state" title to also encompass such cases
 	CharacterTitleHeadOfGovernment,
+	CharacterTitleEducationMinister,
 	CharacterTitleFinanceMinister,
 	CharacterTitleForeignMinister,
 	CharacterTitleIntelligenceMinister,

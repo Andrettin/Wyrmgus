@@ -2389,7 +2389,9 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 
 std::string GetGovernmentTypeNameById(int government_type)
 {
-	if (government_type == GovernmentTypeMonarchy) {
+	if (government_type == GovernmentTypeNoGovernmentType) {
+		return "no-government-type";
+	} else if (government_type == GovernmentTypeMonarchy) {
 		return "monarchy";
 	} else if (government_type == GovernmentTypeRepublic) {
 		return "republic";
@@ -2402,7 +2404,9 @@ std::string GetGovernmentTypeNameById(int government_type)
 
 int GetGovernmentTypeIdByName(std::string government_type)
 {
-	if (government_type == "monarchy") {
+	if (government_type == "no-government-type") {
+		return GovernmentTypeNoGovernmentType;
+	} else if (government_type == "monarchy") {
 		return GovernmentTypeMonarchy;
 	} else if (government_type == "republic") {
 		return GovernmentTypeRepublic;
