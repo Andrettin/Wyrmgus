@@ -3032,7 +3032,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 		}
 		
 		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) { //save the generated heroes
-			if (!GrandStrategyGame.Heroes[i]->Custom && GetCharacter(GrandStrategyGame.Heroes[i]->GetFullName()) == NULL) { // if hero has no character equivalent, then it was generated during grand strategy gameplay, and needs to be defined in the save game
+			if (GrandStrategyGame.Heroes[i]->IsGenerated()) { // if hero has no character equivalent, then it was generated during grand strategy gameplay, and needs to be defined in the save game
 				fprintf(fd, "DefineGrandStrategyHero(\"%s\", {\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str());
 				fprintf(fd, "\tName = \"%s\",\n", GrandStrategyGame.Heroes[i]->Name.c_str());
 				if (!GrandStrategyGame.Heroes[i]->ExtraName.empty()) {
@@ -3082,6 +3082,14 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 
 				fprintf(fd, "CreateGrandStrategyHero(\"%s\")\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str()); //save existing heroes
+				if (!GrandStrategyGame.Heroes[i]->IsGenerated() && GrandStrategyGame.Heroes[i]->Type != GetCharacter(GrandStrategyGame.Heroes[i]->GetFullName())->Type) { // save unit type
+					fprintf(fd, "SetGrandStrategyHeroUnitType(\"%s\", \"%s\")\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str(), GrandStrategyGame.Heroes[i]->Type->Ident.c_str());
+				}
+				for (size_t j = 0; j < GrandStrategyGame.Heroes[i]->Abilities.size(); ++j) {
+					if (GrandStrategyGame.Heroes[i]->IsGenerated() || std::find(GetCharacter(GrandStrategyGame.Heroes[i]->GetFullName())->Abilities.begin(), GetCharacter(GrandStrategyGame.Heroes[i]->GetFullName())->Abilities.end(), GrandStrategyGame.Heroes[i]->Abilities[j]) == GetCharacter(GrandStrategyGame.Heroes[i]->GetFullName())->Abilities.end()) { // save unit type
+						fprintf(fd, "AddGrandStrategyHeroAbility(\"%s\", \"%s\")\n", GrandStrategyGame.Heroes[i]->GetFullName().c_str(), GrandStrategyGame.Heroes[i]->Abilities[j]->Ident.c_str());
+					}
+				}
 				if (GrandStrategyGame.Heroes[i]->Province != NULL) {
 					fprintf(fd, "SetProvinceHero(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Heroes[i]->Province->Name.c_str(), GrandStrategyGame.Heroes[i]->GetFullName().c_str(), GrandStrategyGame.Heroes[i]->State); //save province heroes
 				}

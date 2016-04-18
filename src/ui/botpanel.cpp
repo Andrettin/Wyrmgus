@@ -1891,16 +1891,18 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 			if (Selected[i]->CurrentAction() != UnitActionUpgradeTo) {
 				Selected[i]->Variable[LEVELUP_INDEX].Value -= 1;
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
-				if (!IsNetworkGame() && Selected[i]->Character != NULL && Selected[i]->Character->Persistent && Selected[i]->Player->AiEnabled == false) {	//save the unit-type experience upgrade for persistent characters
+				if (!IsNetworkGame() && Selected[i]->Character != NULL) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->Character->Type->Slot != type.Slot) {
-						Selected[i]->Character->Type = const_cast<CUnitType *>(&(*UnitTypes[CurrentButtons[button].Value]));
+						if (Selected[i]->Character->Persistent && Selected[i]->Player->AiEnabled == false) {
+							Selected[i]->Character->Type = UnitTypes[CurrentButtons[button].Value];
+							SaveHero(Selected[i]->Character);
+						}
 						if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
 							CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Selected[i]->Character->GetFullName());
 							if (hero) {
 								hero->SetType(CurrentButtons[button].Value);
 							}
 						}
-						SaveHero(Selected[i]->Character);
 					}
 				}
 				SendCommandTransformInto(*Selected[i], type, !(KeyModifiers & ModifierShift));

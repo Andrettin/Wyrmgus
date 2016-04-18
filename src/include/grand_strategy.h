@@ -306,6 +306,7 @@ public:
 	bool IsAlive();
 	bool IsVisible();
 	bool IsActive();							/// whether the hero can be ordered to move around
+	bool IsGenerated();
 	bool IsEligibleForTitle(int title);
 	int GetAdministrativeEfficiencyModifier();
 	int GetRevoltRiskModifier();
@@ -596,6 +597,7 @@ extern void CreateGrandStrategyCustomHero(std::string hero_full_name);
 extern void KillGrandStrategyHero(std::string hero_full_name);
 extern void SetGrandStrategyHeroUnitType(std::string hero_full_name, std::string unit_type_ident);
 extern std::string GetGrandStrategyHeroUnitType(std::string hero_full_name);
+extern void AddGrandStrategyHeroAbility(std::string hero_full_name, std::string upgrade_ident);
 extern std::string GetGrandStrategyHeroIcon(std::string hero_full_name);
 extern std::string GetGrandStrategyHeroBestDisplayTitle(std::string hero_full_name);
 extern std::string GetGrandStrategyHeroTooltip(std::string hero_full_name);

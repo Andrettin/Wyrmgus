@@ -4091,8 +4091,10 @@ void CGrandStrategyHero::SetType(int unit_type_id)
 	
 	//if the hero's unit type changed
 	if (unit_type_id != this->Type->Slot) {
-		this->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-	}	
+		this->Type = UnitTypes[unit_type_id];
+	}
+	
+	this->UpdateAttributes();
 	
 	if (this->Province != NULL) {
 		if (this->State == 2) {
@@ -4116,6 +4118,11 @@ bool CGrandStrategyHero::IsVisible()
 bool CGrandStrategyHero::IsActive()
 {
 	return this->IsVisible() && IsOffensiveMilitaryUnit(*this->Type);
+}
+
+bool CGrandStrategyHero::IsGenerated()
+{
+	return !this->Custom && GetCharacter(this->GetFullName()) == NULL;
 }
 
 bool CGrandStrategyHero::IsEligibleForTitle(int title)
@@ -7386,6 +7393,20 @@ std::string GetGrandStrategyHeroUnitType(std::string hero_full_name)
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
 	}
 	return "";
+}
+
+void AddGrandStrategyHeroAbility(std::string hero_full_name, std::string upgrade_ident)
+{
+	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+	if (hero) {
+		CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+		if (upgrade != NULL) {
+			hero->Abilities.push_back(upgrade);
+			hero->UpdateAttributes();
+		}
+	} else {
+		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+	}
 }
 
 std::string GetGrandStrategyHeroIcon(std::string hero_full_name)

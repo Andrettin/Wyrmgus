@@ -697,16 +697,18 @@ void CUnit::Retrain()
 					this->Variable[LEVELUP_INDEX].Value += 1;
 					this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 					TransformUnitIntoType(*this, *UnitTypes[i]);
-					if (!IsNetworkGame() && Character != NULL && Character->Persistent && Player->AiEnabled == false) {	//save the unit-type experience upgrade for persistent characters
+					if (!IsNetworkGame() && Character != NULL) {	//save the unit-type experience upgrade for persistent characters
 						if (Character->Type->Slot != i) {
-							Character->Type = const_cast<CUnitType *>(&(*UnitTypes[i]));
+							if (Character->Persistent && Player->AiEnabled == false) {
+								Character->Type = const_cast<CUnitType *>(&(*UnitTypes[i]));
+								SaveHero(Character);
+							}
 							if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
 								CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Character->GetFullName());
 								if (hero) {
 									hero->SetType(i);
 								}
 							}
-							SaveHero(Character);
 						}
 					}
 					found_previous_unit_type = true;
@@ -764,24 +766,24 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	} else {
 		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this->Character->GetFullName()), this->Player->Heroes.end());
 	}
+	
+	CCharacter *character = NULL;
 	if (!custom_hero) {
-		CCharacter *character = GetCharacter(character_full_name);
-		if (character) {
-			this->Character = const_cast<CCharacter *>(&(*character));
-		} else {
-			fprintf(stderr, "Character \"%s\" doesn't exist.\n", character_full_name.c_str());
-			return;
+		character = GetCharacter(character_full_name);
+		if (GrandStrategy && (character == NULL || !character->Persistent || this->Player->AiEnabled)) {
+			character = GrandStrategyGame.GetHero(character_full_name);
 		}
 	} else {
-		CCharacter *character = GetCustomHero(character_full_name);
-		if (character) {
-			this->Character = const_cast<CCharacter *>(&(*character));
-		} else {
-			fprintf(stderr, "Custom hero \"%s\" doesn't exist.\n", character_full_name.c_str());
-			return;
-		}
+		character = GetCustomHero(character_full_name);
 	}
 	
+	if (character) {
+		this->Character = character;
+	} else {
+		fprintf(stderr, "Character \"%s\" doesn't exist.\n", character_full_name.c_str());
+		return;
+	}
+		
 	this->Name = this->Character->GetFullName();
 	
 	if (this->Character->Type != NULL && this->Character->Type != this->Type) { //set type to that of the character
