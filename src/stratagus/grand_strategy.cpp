@@ -386,7 +386,7 @@ void CGrandStrategyGame::DrawMap()
 				if (province_id != -1) {
 					if (this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
 						std::string settlement_string;
-						if (!this->WorldMapTiles[x][y]->GetCulturalName().empty()) {
+						if (this->Provinces[province_id]->Owner != NULL && !this->WorldMapTiles[x][y]->GetCulturalName().empty()) {
 							settlement_string += this->WorldMapTiles[x][y]->GetCulturalName() + ", ";
 						}
 						settlement_string += this->Provinces[province_id]->GetCulturalName();
