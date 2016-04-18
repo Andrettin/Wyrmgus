@@ -6380,6 +6380,13 @@ void FinalizeGrandStrategyInitialization()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGameLoading == false) {
+				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalTiers.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalTiers.rend(); ++iterator) {
+					if (GrandStrategyYear >= iterator->first) {
+						GrandStrategyGame.Factions[i][j]->FactionTier = iterator->second;
+						break;
+					}
+				}
+				
 				for (std::map<std::tuple<int,int,int>, CCharacter *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalMinisters.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalMinisters.end(); ++iterator) { //set the appropriate historical rulers
 					if (
 						GrandStrategyYear >= std::get<0>(iterator->first)

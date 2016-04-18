@@ -1612,6 +1612,21 @@ static int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				faction->HistoricalTechnologies[technology_ident] = year;
 			}
+		} else if (!strcmp(value, "HistoricalTiers")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string faction_tier_name = LuaToString(l, -1, j + 1);
+				int faction_tier = GetFactionTierIdByName(faction_tier_name);
+				if (faction_tier == -1) {
+					LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
+				}
+				faction->HistoricalTiers[year] = faction_tier;
+			}
 		} else if (!strcmp(value, "Mod")) {
 			faction->Mod = LuaToString(l, -1);
 		} else {
