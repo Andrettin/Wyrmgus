@@ -377,6 +377,26 @@ void CGrandStrategyGame::DrawMap()
 		}
 	}
 	
+	//draw settlement names after everything else, so that they appear over the graphics
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
+		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
+			if (this->WorldMapTiles[x][y]->Terrain != -1) {
+				int province_id = this->WorldMapTiles[x][y]->Province;
+				
+				if (province_id != -1) {
+					if (this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
+						std::string settlement_string;
+						if (!this->WorldMapTiles[x][y]->GetCulturalName().empty()) {
+							settlement_string += this->WorldMapTiles[x][y]->GetCulturalName() + ", ";
+						}
+						settlement_string += this->Provinces[province_id]->GetCulturalName();
+						CLabel(GetSmallFont()).Draw(64 * (x - WorldMapOffsetX) + width_indent + (64 / 2) - (GetSmallFont().Width(settlement_string) / 2), 16 + 64 * (y - WorldMapOffsetY) + height_indent + 64, settlement_string);
+					}
+				}
+			}
+		}
+	}
+	
 	//if is clicking on a tile, draw a square on its borders
 	if (!GrandStrategyGamePaused && UI.MapArea.Contains(CursorScreenPos) && this->WorldMapTiles[this->GetTileUnderCursor().x][this->GetTileUnderCursor().y]->Terrain != -1 && (MouseButtons & LeftButton)) {
 		int tile_screen_x = ((this->GetTileUnderCursor().x - WorldMapOffsetX) * 64) + UI.MapArea.X + width_indent;
