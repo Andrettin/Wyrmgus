@@ -385,12 +385,16 @@ void CGrandStrategyGame::DrawMap()
 				
 				if (province_id != -1) {
 					if (this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
-						std::string settlement_string;
+						int item_y = 0;
 						if (this->Provinces[province_id]->Owner != NULL && !this->WorldMapTiles[x][y]->GetCulturalName().empty()) {
-							settlement_string += this->WorldMapTiles[x][y]->GetCulturalName() + ", ";
+							std::string settlement_string = this->WorldMapTiles[x][y]->GetCulturalName();
+							int string_width = GetSmallFont().Width(settlement_string);
+							settlement_string += ",";
+							CLabel(GetSmallFont()).Draw(64 * (x - WorldMapOffsetX) + width_indent + (64 / 2) - (string_width / 2), 16 + 64 * (y - WorldMapOffsetY) + height_indent + (64 - GetSmallFont().getHeight()) + (GetSmallFont().getHeight() + 1) * item_y, settlement_string);
+							item_y += 1;
 						}
-						settlement_string += this->Provinces[province_id]->GetCulturalName();
-						CLabel(GetSmallFont()).Draw(64 * (x - WorldMapOffsetX) + width_indent + (64 / 2) - (GetSmallFont().Width(settlement_string) / 2), 16 + 64 * (y - WorldMapOffsetY) + height_indent + 64, settlement_string);
+						std::string province_string = this->Provinces[province_id]->GetCulturalName();
+						CLabel(GetSmallFont()).Draw(64 * (x - WorldMapOffsetX) + width_indent + (64 / 2) - (GetSmallFont().Width(province_string) / 2), 16 + 64 * (y - WorldMapOffsetY) + height_indent + (64 - GetSmallFont().getHeight()) + (GetSmallFont().getHeight() + 1) * item_y, province_string);
 					}
 				}
 			}
