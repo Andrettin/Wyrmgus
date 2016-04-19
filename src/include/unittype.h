@@ -94,6 +94,7 @@ enum GroupSelectionMode {
 enum ImageLayers {
 	LeftArmImageLayer,
 	RightArmImageLayer,
+	RightHandImageLayer,
 	HairImageLayer,
 	ClothingImageLayer,
 	ClothingLeftArmImageLayer,

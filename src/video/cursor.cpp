@@ -263,11 +263,21 @@ void DrawBuildingCursor()
 
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ShieldImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	if (CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightHandImageLayer) != NULL) {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingRightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingRightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
-	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, WeaponImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, WeaponImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+		
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightHandImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	} else {
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, WeaponImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, RightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+
+		DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, ClothingRightArmImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+	}
 
 	DrawOverlay(*CursorBuilding, CursorBuilding->LightSprite, ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 	//Wyrmgus end

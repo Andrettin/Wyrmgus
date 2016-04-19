@@ -1879,6 +1879,8 @@ std::string GetImageLayerNameById(int image_layer)
 		return "left-arm";
 	} else if (image_layer == RightArmImageLayer) {
 		return "right-arm";
+	} else if (image_layer == RightHandImageLayer) {
+		return "right-hand";
 	} else if (image_layer == HairImageLayer) {
 		return "hair";
 	} else if (image_layer == ClothingImageLayer) {
@@ -1910,6 +1912,8 @@ int GetImageLayerIdByName(std::string image_layer)
 		return LeftArmImageLayer;
 	} else if (image_layer == "right-arm") {
 		return RightArmImageLayer;
+	} else if (image_layer == "right-hand") {
+		return RightHandImageLayer;
 	} else if (image_layer == "hair") {
 		return HairImageLayer;
 	} else if (image_layer == "clothing") {
