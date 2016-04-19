@@ -51,6 +51,9 @@
 #include "depend.h"
 #include "editor.h"
 #include "font.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "interface.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -2349,6 +2352,9 @@ void LuaRegisterModules()
 	DecorationCclRegister();
 	DependenciesCclRegister();
 	EditorCclRegister();
+	//Wyrmgus start
+	GrandStrategyCclRegister();
+	//Wyrmgus end
 	GroupCclRegister();
 	//Wyrmgus start
 	ItemCclRegister();

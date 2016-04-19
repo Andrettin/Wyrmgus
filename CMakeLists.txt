@@ -317,6 +317,7 @@ set(stratagusmain_SRCS
 	src/stratagus/script_player.cpp
 	#Wyrmgus start
 	src/stratagus/script_character.cpp
+	src/stratagus/script_grand_strategy.cpp
 	src/stratagus/script_item.cpp
 	src/stratagus/script_province.cpp
 	src/stratagus/script_quest.cpp

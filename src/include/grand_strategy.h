@@ -146,6 +146,7 @@ public:
 	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
 	void SetCivilization(int civilization);
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
+	void SetModifier(CUpgrade *modifier, bool has_modifier);
 	void SetUnitQuantity(int unit_type_id, int quantity);
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
 	void SetAttackingUnitQuantity(int unit_type_id, int quantity);
@@ -161,6 +162,7 @@ public:
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
 	bool HasBuildingClass(std::string building_class_name);
+	bool HasModifier(CUpgrade *modifier);
 	bool HasFactionClaim(int civilization_id, int faction_id);
 	bool HasResource(int resource, bool ignore_prospection = false);
 	bool BordersProvince(int province_id);
@@ -206,7 +208,8 @@ public:
 	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	std::vector<CGrandStrategyFaction *> Claims;						/// Factions which have a claim to this province
-	std::vector<Vec2i> ResourceTiles[MaxCosts];							///resources tiles in the province
+	std::vector<Vec2i> ResourceTiles[MaxCosts];							/// Resources tiles in the province
+	std::vector<CUpgrade *> Modifiers;									/// Modifiers affecting the province
 };
 
 class CGrandStrategyFaction
@@ -420,7 +423,7 @@ public:
 	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
 	CRiver *Rivers[RiverMax];
 	std::vector<CGrandStrategyHero *> Heroes;
-	std::vector<CUpgrade *> Works;
+	std::vector<CUpgrade *> UnpublishedWorks;
 	CGrandStrategyFaction *PlayerFaction;
 	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts];								///price for every 100 of each commodity
@@ -614,6 +617,7 @@ extern void SetResourceBaseLaborInput(std::string resource_name, int input);
 extern void SetResourceBaseOutput(std::string resource_name, int output);
 extern void SetResourceGrandStrategyBuildingVariations(std::string resource_name, int variation_quantity);
 extern void SetResourceGrandStrategyBuildingTerrainSpecificGraphic(std::string resource_name, std::string terrain_type_name, bool has_terrain_specific_graphic);
+extern void GrandStrategyCclRegister();
 
 //@}
 

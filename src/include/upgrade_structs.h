@@ -210,6 +210,7 @@ public:
 	std::string Description;		/// Description of the upgrade
 	std::string Quote;				/// Quote of the upgrade
 	std::string Background;			/// Encyclopedia entry for the upgrade
+	std::string ModifierGraphicFile;
 	bool Ability;
 	bool Weapon;
 	bool Shield;
@@ -229,7 +230,9 @@ public:
 	int   Costs[MaxCosts];            /// costs for the upgrade
 	//Wyrmgus start
 	int GrandStrategyCosts[MaxCosts];	/// costs for the upgrade for grand strategy mode
+	int GrandStrategyProductionModifier[MaxCosts];	/// production modifier (absolute increase) for a particular resource for grand strategy mode
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode
+	int RevoltRiskModifier;			/// revolt risk modifier (for the grand strategy mode)
 	int TechnologyPointCost;		/// technology point cost
 	int Work;						/// form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year;						/// year of publication, if is a literary work

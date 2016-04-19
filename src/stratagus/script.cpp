@@ -41,7 +41,6 @@
 
 #include "animation/animation_setplayervar.h"
 //Wyrmgus start
-//Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
 #include "font.h"
@@ -2978,10 +2977,11 @@ void SaveGrandStrategyGame(const std::string &filename)
 					fprintf(fd, "SetProvinceAttackingUnitQuantity(\"%s\", \"%s\", %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), UnitTypes[j]->Ident.c_str(), GrandStrategyGame.Provinces[i]->AttackingUnits[j]); //save province attacking units
 				}
 			}
-			if (GrandStrategyGame.Provinces[i]->Claims.size() > 0) {
-				for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Claims.size(); ++j) {
-					fprintf(fd, "AddProvinceClaim(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Name.c_str());
-				}
+			for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Modifiers.size(); ++j) {
+				fprintf(fd, "SetGrandStrategyProvinceData(\"%s\", \"Modifier\", \"%s\", true)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->Modifiers[j]->Ident.c_str());
+			}
+			for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Claims.size(); ++j) {
+				fprintf(fd, "AddProvinceClaim(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Name.c_str());
 			}
 			for (int j = 0; j < MAX_RACES; ++j) {
 				if (GrandStrategyGame.Provinces[i]->CulturalNames.find(j) != GrandStrategyGame.Provinces[i]->CulturalNames.end()) {
@@ -3109,7 +3109,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 		}
 		
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-			if (AllUpgrades[i]->Work != -1 && std::find(GrandStrategyGame.Works.begin(), GrandStrategyGame.Works.end(), AllUpgrades[i]) == GrandStrategyGame.Works.end()) {
+			if (AllUpgrades[i]->Work != -1 && std::find(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), AllUpgrades[i]) == GrandStrategyGame.UnpublishedWorks.end()) {
 				fprintf(fd, "GrandStrategyWorkCreated(\"%s\")\n", AllUpgrades[i]->Ident.c_str()); // save which works have already been created
 			}
 		}		

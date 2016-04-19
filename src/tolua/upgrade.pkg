@@ -11,6 +11,7 @@ class CUpgrade
 	std::string Description;
 	std::string Quote;
 	std::string Background;
+	std::string ModifierGraphicFile;
 	bool Ability;
 	bool Weapon;
 	bool Shield;
@@ -28,7 +29,9 @@ class CUpgrade
 	int Costs[MaxCosts];
 	//Wyrmgus start
 	int GrandStrategyCosts[MaxCosts];
+	int GrandStrategyProductionModifier[MaxCosts];
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];
+	int RevoltRiskModifier;
 	int TechnologyPointCost;
 	int Work;
 	int Year;
@@ -39,5 +42,5 @@ class CUpgrade
 //Wyrmgus start
 extern int GetResourceIdByName(const char *resourceName);
 extern std::string GetResourceNameById(int resource_id);
-extern std::string GetUpgradeEffectsString(std::string upgrade_ident);
+extern std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strategy = false, bool multiline = false);
 //Wyrmgus end

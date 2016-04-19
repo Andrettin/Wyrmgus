@@ -1071,11 +1071,11 @@ void CGrandStrategyGame::DoTurn()
 	}
 	
 	// check if any literary works should be published this year
-	int works_size = this->Works.size();
+	int works_size = this->UnpublishedWorks.size();
 	for (int i = (works_size - 1); i >= 0; --i) {
 		CGrandStrategyHero *author = NULL;
-		if (this->Works[i]->Author != NULL) {
-			author = this->GetHero(this->Works[i]->Author->GetFullName());
+		if (this->UnpublishedWorks[i]->Author != NULL) {
+			author = this->GetHero(this->UnpublishedWorks[i]->Author->GetFullName());
 			if (author != NULL && !author->IsAlive()) {
 				continue;
 			}
@@ -1085,14 +1085,14 @@ void CGrandStrategyGame::DoTurn()
 			continue;
 		}
 		
-		int civilization = PlayerRaces.GetRaceIndexByName(this->Works[i]->Civilization.c_str());
+		int civilization = PlayerRaces.GetRaceIndexByName(this->UnpublishedWorks[i]->Civilization.c_str());
 		if (
 			(author != NULL && author->ProvinceOfOrigin != NULL)
 			|| (civilization != -1 && this->CultureProvinces.find(civilization) != this->CultureProvinces.end() && this->CultureProvinces[civilization].size() > 0)
 		) {
 			bool characters_existed = true;
-			for (size_t j = 0; j < this->Works[i]->Characters.size(); ++j) {
-				CGrandStrategyHero *hero = this->GetHero(this->Works[i]->Characters[j]->GetFullName());
+			for (size_t j = 0; j < this->UnpublishedWorks[i]->Characters.size(); ++j) {
+				CGrandStrategyHero *hero = this->GetHero(this->UnpublishedWorks[i]->Characters[j]->GetFullName());
 				
 				if (hero == NULL || !hero->Existed) {
 					characters_existed = false;
@@ -1104,9 +1104,9 @@ void CGrandStrategyGame::DoTurn()
 			}
 			
 			if (author != NULL && author->Province != NULL) {
-				this->CreateWork(this->Works[i], author, author->Province);
+				this->CreateWork(this->UnpublishedWorks[i], author, author->Province);
 			} else {
-				this->CreateWork(this->Works[i], author, this->CultureProvinces[civilization][SyncRand(this->CultureProvinces[civilization].size())]);
+				this->CreateWork(this->UnpublishedWorks[i], author, this->CultureProvinces[civilization][SyncRand(this->CultureProvinces[civilization].size())]);
 			}
 		}
 	}
@@ -1366,7 +1366,7 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 	}
 
 	if (work != NULL) {
-		this->Works.erase(std::remove(this->Works.begin(), this->Works.end(), work), this->Works.end()); // remove work from the vector, so that it doesn't get created again
+		this->UnpublishedWorks.erase(std::remove(this->UnpublishedWorks.begin(), this->UnpublishedWorks.end(), work), this->UnpublishedWorks.end()); // remove work from the vector, so that it doesn't get created again
 	}
 
 	std::string work_name;
@@ -2424,6 +2424,35 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	}
 }
 
+void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)
+{
+	if (this->HasModifier(modifier) == has_modifier) { // current situation already corresponds to has_modifier setting
+		return;
+	}
+
+	if (has_modifier) {
+		this->Modifiers.push_back(modifier);
+	} else {
+		this->Modifiers.erase(std::remove(this->Modifiers.begin(), this->Modifiers.end(), modifier), this->Modifiers.end());
+	}
+
+	int change = has_modifier ? 1 : -1;
+
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (modifier->GrandStrategyProductionModifier[i] != 0) {
+			if (this->Owner != NULL) {
+				this->CalculateIncome(i);
+			}
+		}
+		if (modifier->GrandStrategyProductionEfficiencyModifier[i] != 0) {
+			this->ProductionEfficiencyModifier[i] += modifier->GrandStrategyProductionEfficiencyModifier[i] * change;
+			if (this->Owner != NULL) {
+				this->CalculateIncome(i);
+			}
+		}
+	}
+}
+
 void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 {
 	if (unit_type_id == -1) {
@@ -2669,6 +2698,12 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 	
 	int income = 0;
 	
+	for (size_t i = 0; i < this->Modifiers.size(); ++i) {
+		if (this->Modifiers[i]->GrandStrategyProductionModifier[resource] != 0) {
+			income += this->Modifiers[i]->GrandStrategyProductionModifier[resource];
+		}
+	}	
+	
 	if (resource == ResearchCost) {
 		// faction's research is 10 if all provinces have town halls, lumber mills and smithies
 		if (this->HasBuildingClass("town-hall")) {
@@ -2695,7 +2730,7 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 		income /= 100;
 	} else {
 		if (this->ProductionCapacityFulfilled[resource] > 0) {
-			income = DefaultResourceOutputs[resource] * this->ProductionCapacityFulfilled[resource];
+			income += DefaultResourceOutputs[resource] * this->ProductionCapacityFulfilled[resource];
 			income *= 100 + this->GetProductionEfficiencyModifier(resource);
 			income /= 100;
 		}
@@ -2747,6 +2782,11 @@ bool CGrandStrategyProvince::HasBuildingClass(std::string building_class_name)
 	}
 
 	return false;
+}
+
+bool CGrandStrategyProvince::HasModifier(CUpgrade *modifier)
+{
+	return std::find(this->Modifiers.begin(), this->Modifiers.end(), modifier) != this->Modifiers.end();
 }
 
 bool CGrandStrategyProvince::HasFactionClaim(int civilization_id, int faction_id)
@@ -2857,14 +2897,20 @@ int CGrandStrategyProvince::GetRevoltRisk()
 	
 	if (this->Civilization != -1 && this->Owner != NULL) {
 		if (this->Civilization != this->Owner->Civilization) {
-			revolt_risk += 2; //if the province is of a different culture than its owner, it gets plus 2% revolt risk
+			revolt_risk += 3; //if the province is of a different culture than its owner, it gets plus 3% revolt risk
 		}
 		
 		if (!this->HasFactionClaim(this->Owner->Civilization, this->Owner->Faction)) {
-			revolt_risk += 1; //if the owner does not have a claim to the province, it gets plus 1% revolt risk
+			revolt_risk += 2; //if the owner does not have a claim to the province, it gets plus 2% revolt risk
 		}
 		
 		revolt_risk += this->Owner->GetRevoltRiskModifier();
+	}
+	
+	for (size_t i = 0; i < this->Modifiers.size(); ++i) {
+		if (this->Modifiers[i]->RevoltRiskModifier != 0) {
+			revolt_risk += this->Modifiers[i]->RevoltRiskModifier;
+		}
 	}
 	
 	revolt_risk = std::max(0, revolt_risk);
@@ -5676,7 +5722,7 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.Heroes.clear();
 	GrandStrategyHeroStringToIndex.clear();
 	
-	GrandStrategyGame.Works.clear();
+	GrandStrategyGame.UnpublishedWorks.clear();
 	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
@@ -6140,7 +6186,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 			continue;
 		}
 		
-		GrandStrategyGame.Works.push_back(AllUpgrades[i]);
+		GrandStrategyGame.UnpublishedWorks.push_back(AllUpgrades[i]);
 	}
 }
 
@@ -6337,11 +6383,11 @@ void FinalizeGrandStrategyInitialization()
 	}
 
 	//initialize literary works
-	int works_size = GrandStrategyGame.Works.size();
+	int works_size = GrandStrategyGame.UnpublishedWorks.size();
 	for (int i = (works_size - 1); i >= 0; --i) {
 		if (GrandStrategyGameLoading == false) {
-			if (GrandStrategyGame.Works[i]->Year != 0 && GrandStrategyYear >= GrandStrategyGame.Works[i]->Year) { //if the game is starting after the publication date of this literary work, remove it from the work list
-				GrandStrategyGame.Works.erase(std::remove(GrandStrategyGame.Works.begin(), GrandStrategyGame.Works.end(), GrandStrategyGame.Works[i]), GrandStrategyGame.Works.end());
+			if (GrandStrategyGame.UnpublishedWorks[i]->Year != 0 && GrandStrategyYear >= GrandStrategyGame.UnpublishedWorks[i]->Year) { //if the game is starting after the publication date of this literary work, remove it from the work list
+				GrandStrategyGame.UnpublishedWorks.erase(std::remove(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), GrandStrategyGame.UnpublishedWorks[i]), GrandStrategyGame.UnpublishedWorks.end());
 			}
 		}
 	}
@@ -7549,7 +7595,7 @@ void GrandStrategyWorkCreated(std::string work_ident)
 {
 	CUpgrade *work = CUpgrade::Get(work_ident);
 	if (work) {
-		GrandStrategyGame.Works.erase(std::remove(GrandStrategyGame.Works.begin(), GrandStrategyGame.Works.end(), work), GrandStrategyGame.Works.end()); // remove work from the vector, so that it doesn't get created again
+		GrandStrategyGame.UnpublishedWorks.erase(std::remove(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), work), GrandStrategyGame.UnpublishedWorks.end()); // remove work from the vector, so that it doesn't get created again
 	} else {
 		fprintf(stderr, "Work \"%s\" doesn't exist.\n", work_ident.c_str());
 	}

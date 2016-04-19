@@ -167,12 +167,13 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL), Item(NULL), Year(0), Author(NULL)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
 	memset(this->GrandStrategyCosts, 0, sizeof(this->GrandStrategyCosts));
+	memset(this->GrandStrategyProductionModifier, 0, sizeof(this->GrandStrategyProductionModifier));
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
 	memset(this->ItemPrefix, 0, sizeof(this->ItemPrefix));
 	memset(this->ItemSuffix, 0, sizeof(this->ItemSuffix));
@@ -327,15 +328,18 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->Description = parent_upgrade->Description;
 				upgrade->Quote = parent_upgrade->Quote;
 				upgrade->Background = parent_upgrade->Background;
+				upgrade->ModifierGraphicFile = parent_upgrade->ModifierGraphicFile;
 				for (int i = 0; i < MaxCosts; ++i) {
 					upgrade->Costs[i] = parent_upgrade->Costs[i];
 					upgrade->GrandStrategyCosts[i] = parent_upgrade->GrandStrategyCosts[i];
+					upgrade->GrandStrategyProductionModifier[i] = parent_upgrade->GrandStrategyProductionModifier[i];
 					upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
 				}
 				for (int i = 0; i < MaxItemClasses; ++i) {
 					upgrade->ItemPrefix[i] = parent_upgrade->ItemPrefix[i];
 					upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
 				}
+				upgrade->RevoltRiskModifier = parent_upgrade->RevoltRiskModifier;
 				upgrade->TechnologyPointCost = parent_upgrade->TechnologyPointCost;
 				upgrade->Ability = parent_upgrade->Ability;
 				upgrade->Weapon = parent_upgrade->Weapon;
@@ -373,6 +377,10 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			upgrade->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "ModifierGraphicFile")) {
+			upgrade->ModifierGraphicFile = LuaToString(l, -1);
+		} else if (!strcmp(value, "RevoltRiskModifier")) {
+			upgrade->RevoltRiskModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TechnologyPointCost")) {
 			upgrade->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Year")) {
@@ -434,6 +442,20 @@ static int CclDefineUpgrade(lua_State *l)
 				++j;
 				
 				upgrade->GrandStrategyCosts[resource] = LuaToNumber(l, -1, j + 1);
+			}
+		} else if (!strcmp(value, "GrandStrategyProductionModifier")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				upgrade->GrandStrategyProductionModifier[resource] = LuaToNumber(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "GrandStrategyProductionEfficiencyModifier")) {
 			if (!lua_istable(l, -1)) {
@@ -2234,7 +2256,7 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 }
 
 //Wyrmgus start
-std::string GetUpgradeEffectsString(std::string upgrade_ident)
+std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strategy, bool multiline)
 {
 	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
 
@@ -2331,6 +2353,55 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident)
 					}
 				}
 			}
+		}
+		
+		if (grand_strategy) {
+			for (int i = 0; i < MaxCosts; ++i) {
+				if (upgrade->GrandStrategyProductionModifier[i] != 0) {
+					if (!first_element) {
+						upgrade_effects_string += ", ";
+					} else {
+						first_element = false;
+					}
+
+					if (upgrade->GrandStrategyProductionModifier[i] > 0) {
+						upgrade_effects_string += "+";
+					}
+					upgrade_effects_string += std::to_string((long long) upgrade->GrandStrategyProductionModifier[i]) + " "; 
+					upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
+				}
+				if (upgrade->GrandStrategyProductionEfficiencyModifier[i] != 0) {
+					if (!first_element) {
+						upgrade_effects_string += ", ";
+					} else {
+						first_element = false;
+					}
+
+					if (upgrade->GrandStrategyProductionEfficiencyModifier[i] > 0) {
+						upgrade_effects_string += "+";
+					}
+					upgrade_effects_string += std::to_string((long long) upgrade->GrandStrategyProductionEfficiencyModifier[i]) + "% "; 
+					upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
+				}
+			}
+			
+			if (upgrade->RevoltRiskModifier != 0) {
+				if (!first_element) {
+					upgrade_effects_string += ", ";
+				} else {
+					first_element = false;
+				}
+
+				if (upgrade->RevoltRiskModifier > 0) {
+					upgrade_effects_string += "+";
+				}
+				upgrade_effects_string += std::to_string((long long) upgrade->RevoltRiskModifier) + "% "; 
+				upgrade_effects_string += "Revolt Risk";
+			}
+		}
+		
+		if (multiline) {
+			upgrade_effects_string = FindAndReplaceString(upgrade_effects_string, ", ", "\n");
 		}
 			
 		return upgrade_effects_string;
