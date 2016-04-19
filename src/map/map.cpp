@@ -384,7 +384,9 @@ void CMap::Clean()
 	//Wyrmgus start
 	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
 		if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
-			CGraphic::Free(this->SolidTileGraphics[i]);
+			if (CGraphic::Get(Map.Tileset->solidTerrainTypes[i].ImageFile) != NULL) {
+				CGraphic::Free(this->SolidTileGraphics[i]);
+			}
 			this->SolidTileGraphics[i] = NULL;
 		}
 	}
