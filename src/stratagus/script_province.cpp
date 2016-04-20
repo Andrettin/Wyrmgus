@@ -443,6 +443,22 @@ static int CclDefineProvince(lua_State *l)
 				++j;
 				province->HistoricalSettlementBuildings[building_type][year] = LuaToBoolean(l, -1, j + 1);
 			}
+		} else if (!strcmp(value, "HistoricalModifiers")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string upgrade_ident = LuaToString(l, -1, j + 1);
+				CUpgrade *modifier = CUpgrade::Get(upgrade_ident);
+				if (modifier == NULL) {
+					LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+				}
+				++j;
+				province->HistoricalModifiers[modifier][year] = LuaToBoolean(l, -1, j + 1);
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

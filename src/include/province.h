@@ -126,6 +126,7 @@ public:
 	std::map<int, int> HistoricalCultures;								/// Historical cultures which were predominant in the province, mapped to the year
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
 	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings;	/// Historical settlement buildings, mapped to building unit type id and year
+	std::map<CUpgrade *, std::map<int, bool>> HistoricalModifiers;		/// Historical province modifiers, mapped to the modifier's upgrade and year
 };
 
 class WorldMapTile

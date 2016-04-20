@@ -6356,6 +6356,15 @@ void InitializeGrandStrategyProvinces()
 					}
 				}
 			}
+			
+			for (std::map<CUpgrade *, std::map<int, bool>>::iterator iterator = Provinces[i]->HistoricalModifiers.begin(); iterator != Provinces[i]->HistoricalModifiers.end(); ++iterator) {
+				for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+					if (GrandStrategyYear >= second_iterator->first) {
+						province->SetModifier(iterator->first, second_iterator->second);
+						break;
+					}
+				}
+			}
 		}
 	}
 }
