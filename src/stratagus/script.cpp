@@ -3108,6 +3108,12 @@ void SaveGrandStrategyGame(const std::string &filename)
 			}
 		}
 		
+		for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) { //save province governors
+			if (GrandStrategyGame.Provinces[i]->Governor != NULL) {
+				fprintf(fd, "SetGrandStrategyProvinceData(\"%s\", \"Governor\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->Governor->GetFullName().c_str());
+			}
+		}
+		
 		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 			if (AllUpgrades[i]->Work != -1 && std::find(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), AllUpgrades[i]) == GrandStrategyGame.UnpublishedWorks.end()) {
 				fprintf(fd, "GrandStrategyWorkCreated(\"%s\")\n", AllUpgrades[i]->Ident.c_str()); // save which works have already been created

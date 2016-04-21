@@ -731,6 +731,8 @@ std::string GetCharacterTitleNameById(int title)
 		return "justice-minister";
 	} else if (title == CharacterTitleWarMinister) {
 		return "war-minister";
+	} else if (title == CharacterTitleGovernor) {
+		return "governor";
 	}
 
 	return "";
@@ -756,6 +758,8 @@ int GetCharacterTitleIdByName(std::string title)
 		return CharacterTitleJusticeMinister;
 	} else if (title == "war-minister") {
 		return CharacterTitleWarMinister;
+	} else if (title == "governor") {
+		return CharacterTitleGovernor;
 	}
 
 	return -1;

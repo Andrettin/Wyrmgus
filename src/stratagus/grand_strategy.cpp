@@ -870,7 +870,7 @@ void CGrandStrategyGame::DoTurn()
 					
 				for (int k = 0; k < MaxCharacterTitles; ++k) {
 					// try to perform government position succession for existent factions missing a character in charge of it
-					if (GrandStrategyGame.Factions[i][j]->Ministers[k] == NULL && GrandStrategyGame.Factions[i][j]->HasGovernmentPosition(k)) {
+					if (IsMinisterialTitle(k) && GrandStrategyGame.Factions[i][j]->Ministers[k] == NULL && GrandStrategyGame.Factions[i][j]->HasGovernmentPosition(k)) {
 						GrandStrategyGame.Factions[i][j]->MinisterSuccession(k);
 					}
 				}
@@ -984,6 +984,10 @@ void CGrandStrategyGame::DoTurn()
 				
 				if (SyncRand(1000) == 0) { // 0.1% chance per year that a (randomly generated) literary work will be created in a province
 					this->CreateWork(NULL, NULL, this->Provinces[i]);
+				}
+				
+				if (this->Provinces[i]->Governor == NULL && this->Provinces[i]->Owner->HasGovernmentPosition(CharacterTitleGovernor)) {
+					this->Provinces[i]->GovernorSuccession();
 				}
 			}
 		}
@@ -2765,6 +2769,98 @@ void CGrandStrategyProvince::RemoveFactionClaim(int civilization_id, int faction
 	GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.erase(std::remove(GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.begin(), GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.end(), this), GrandStrategyGame.Factions[civilization_id][faction_id]->Claims.end());
 }
 
+void CGrandStrategyProvince::SetGovernor(std::string hero_full_name)
+{
+	if (this->Governor != NULL && std::find(this->Governor->ProvinceTitles.begin(), this->Governor->ProvinceTitles.end(), std::pair<int, CGrandStrategyProvince *>(CharacterTitleGovernor, this)) != this->Governor->ProvinceTitles.end()) { // remove from the old governor's array
+		this->Governor->ProvinceTitles.erase(std::remove(this->Governor->ProvinceTitles.begin(), this->Governor->ProvinceTitles.end(), std::pair<int, CGrandStrategyProvince *>(CharacterTitleGovernor, this)), this->Governor->ProvinceTitles.end());
+	}
+			
+	if (hero_full_name.empty()) {
+		if (this->Owner->CanHaveSuccession(CharacterTitleGovernor, true) && GrandStrategyGameInitialized && (this->Governor == NULL || !this->Governor->ViolentDeath)) { //if the governor died a violent death, wait until the next turn to replace him
+			this->GovernorSuccession();
+		} else {
+			this->Governor = NULL;
+		}
+	} else {
+		CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
+		if (hero) {
+			if (hero->State == 0) {
+				hero->Create();
+			}
+			this->Governor = hero;
+			hero->ProvinceTitles.push_back(std::pair<int, CGrandStrategyProvince *>(CharacterTitleGovernor, this));
+			
+			if (this->Owner->IsAlive()) {
+				int titles_size = hero->Titles.size();
+				for (int i = (titles_size - 1); i >= 0; --i) {
+					if (hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
+						hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
+					}
+				}
+				
+				titles_size = hero->ProvinceTitles.size();
+				for (int i = (titles_size - 1); i >= 0; --i) {
+					if (!(hero->ProvinceTitles[i].first == CharacterTitleGovernor && hero->ProvinceTitles[i].second == this)) {
+						hero->ProvinceTitles[i].second->SetGovernor("");
+					}
+				}
+			}
+		} else {
+			fprintf(stderr, "Tried to make \"%s\" the \"%s\" of the \"%s\", but the hero doesn't exist.\n", hero_full_name.c_str(), GetCharacterTitleNameById(CharacterTitleGovernor).c_str(), this->Name.c_str());
+		}
+		
+		if (this->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized) {
+			std::string new_minister_message = "if (GenericDialog ~= nil) then GenericDialog(\"";
+			new_minister_message += this->Owner->GetCharacterTitle(CharacterTitleGovernor, this->Governor->Gender) + " " + this->Governor->GetFullName();
+			new_minister_message += "\", \"";
+			new_minister_message += "A new " + FullyDecapitalizeString(this->Owner->GetCharacterTitle(CharacterTitleGovernor, this->Governor->Gender));
+			new_minister_message += " of " + this->GetCulturalName();
+			new_minister_message += " has been appointed, ";
+			new_minister_message += this->Governor->GetFullName() + "!\\n\\n";
+			new_minister_message += "Type: " + this->Governor->Type->Name + "\\n" + "Trait: " + this->Governor->Trait->Name + "\\n" + "Province of Origin: " + this->Governor->ProvinceOfOrigin->GetCulturalName() + "\\n\\n" + this->Governor->GetMinisterEffectsString(CharacterTitleGovernor);
+			new_minister_message += "\") end;";
+			CclCommand(new_minister_message);	
+		}
+		
+		if (this->Owner->IsAlive() && hero->Province != this) {
+			this->SetHero(hero->GetFullName(), hero->State);
+		}
+	}
+	
+	this->CalculateIncomes(); //recalculate incomes, as administrative efficiency may have changed
+}
+
+void CGrandStrategyProvince::GovernorSuccession()
+{
+	CGrandStrategyHero *best_candidate = NULL;
+	int best_score = 0;
+			
+	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
+		if (
+			GrandStrategyGame.Heroes[i]->IsAlive()
+			&& GrandStrategyGame.Heroes[i]->IsVisible()
+			&& (
+				(GrandStrategyGame.Heroes[i]->Province != NULL && GrandStrategyGame.Heroes[i]->Province->Owner == this->Owner)
+				|| (GrandStrategyGame.Heroes[i]->Province == NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin != NULL && GrandStrategyGame.Heroes[i]->ProvinceOfOrigin->Owner == this->Owner)
+			)
+			&& !GrandStrategyGame.Heroes[i]->Custom
+			&& GrandStrategyGame.Heroes[i]->IsEligibleForTitle(CharacterTitleGovernor)
+		) {
+			int score = GrandStrategyGame.Heroes[i]->GetTitleScore(CharacterTitleGovernor, this);
+			if (score > best_score) {
+				best_candidate = GrandStrategyGame.Heroes[i];
+				best_score = score;
+			}
+		}
+	}
+	if (best_candidate != NULL) {
+		this->SetGovernor(best_candidate->GetFullName());
+		return;
+	}
+
+	this->Governor = NULL;
+}
+
 bool CGrandStrategyProvince::HasBuildingClass(std::string building_class_name)
 {
 	if (this->Civilization == -1 || building_class_name.empty()) {
@@ -2869,6 +2965,10 @@ int CGrandStrategyProvince::GetAdministrativeEfficiencyModifier()
 	
 	if (this->Owner != NULL) {
 		modifier += this->Owner->GetAdministrativeEfficiencyModifier();
+		
+		if (this->Governor != NULL) {
+			modifier += this->Governor->GetAdministrativeEfficiencyModifier();
+		}
 	}
 	
 	return modifier;
@@ -2905,6 +3005,10 @@ int CGrandStrategyProvince::GetRevoltRisk()
 		}
 		
 		revolt_risk += this->Owner->GetRevoltRiskModifier();
+		
+		if (this->Governor != NULL) {
+			revolt_risk += this->Governor->GetRevoltRiskModifier();
+		}
 	}
 	
 	for (size_t i = 0; i < this->Modifiers.size(); ++i) {
@@ -3058,7 +3162,7 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 {
 	std::vector<int> potential_hero_unit_types;
 	
-	if ((type == "head-of-state" || type == "head-of-government" || type.find("minister") != std::string::npos) && this->Owner == NULL) {
+	if (type == "head-of-state" && this->Owner == NULL) {
 		return NULL;
 		
 	}
@@ -3401,7 +3505,7 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 	
 	//set the ministers from the old faction
 	for (int i = 0; i < MaxCharacterTitles; ++i) {
-		if (GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i] != NULL && GrandStrategyGame.Factions[new_civilization][new_faction]->HasGovernmentPosition(i)) {
+		if (IsMinisterialTitle(i) && GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i] != NULL && GrandStrategyGame.Factions[new_civilization][new_faction]->HasGovernmentPosition(i)) {
 			GrandStrategyGame.Factions[new_civilization][new_faction]->SetMinister(i, GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i]->GetFullName());
 		}
 	}
@@ -3554,6 +3658,11 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 					if (!(hero->Titles[i].first == title && hero->Titles[i].second == this) && hero->Titles[i].first != CharacterTitleHeadOfState) { // a character can only have multiple head of state titles, but not others
 						hero->Titles[i].second->SetMinister(hero->Titles[i].first, "");
 					}
+				}
+				
+				titles_size = hero->ProvinceTitles.size();
+				for (int i = (titles_size - 1); i >= 0; --i) {
+					hero->ProvinceTitles[i].second->SetGovernor("");
 				}
 			}
 		} else {
@@ -3740,7 +3849,7 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 
 bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 {
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState && title != CharacterTitleGovernor) {
 		return false;
 	}
 	
@@ -3989,6 +4098,8 @@ std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 	} else if (title_type == CharacterTitleWarMinister) {
 //		return "War Minister"; //war minister sounds too modern, considering the technology tree we have up to now only goes to the medieval era
 		return "Marshal";
+	} else if (title_type == CharacterTitleGovernor) {
+		return "Governor";
 	}
 	
 	return "";
@@ -4082,8 +4193,15 @@ void CGrandStrategyHero::Create()
 			int best_title_score = 0;
 			
 			for (int i = 2; i < MaxCharacterTitles; ++i) { // begin at 2 to ignore the head of state and head of government titles
-				if (this->ProvinceOfOrigin->Owner->Ministers[i] == NULL && this->ProvinceOfOrigin->Owner->HasGovernmentPosition(i)) {
-					int title_score = this->GetTitleScore(i);
+				if (
+					(
+						(IsMinisterialTitle(i) && this->ProvinceOfOrigin->Owner->Ministers[i] == NULL)
+						|| (i == CharacterTitleGovernor && this->ProvinceOfOrigin->Governor == NULL)
+					)
+					&& this->ProvinceOfOrigin->Owner->HasGovernmentPosition(i)
+				) {
+					int title_score = this->GetTitleScore(i, this->ProvinceOfOrigin);
+					
 					if (title_score > best_title_score) {
 						best_title = i;
 						best_title_score = title_score;
@@ -4092,7 +4210,11 @@ void CGrandStrategyHero::Create()
 			}
 			
 			if (best_title != -1) {
-				this->ProvinceOfOrigin->Owner->SetMinister(best_title, this->GetFullName());
+				if (best_title == CharacterTitleGovernor) {
+					this->ProvinceOfOrigin->SetGovernor(this->GetFullName());
+				} else {
+					this->ProvinceOfOrigin->Owner->SetMinister(best_title, this->GetFullName());
+				}
 			}
 		}
 	}
@@ -4100,7 +4222,9 @@ void CGrandStrategyHero::Create()
 
 void CGrandStrategyHero::Die(bool violent_death)
 {
-	this->ViolentDeath = true;
+	if (violent_death) {
+		this->ViolentDeath = true;
+	}
 	
 	//show message that the hero has died
 	if (GrandStrategyGameInitialized && this->IsVisible()) {
@@ -4138,15 +4262,15 @@ void CGrandStrategyHero::Die(bool violent_death)
 	
 	this->State = 0;
 
-	//check if the hero is the minister of a faction, and if so, remove it from that position
-	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			for (int k = 0; k < MaxCharacterTitles; ++k) {
-				if (GrandStrategyGame.Factions[i][j]->Ministers[k] == this) {
-					GrandStrategyGame.Factions[i][j]->SetMinister(k, "");
-				}
-			}
-		}
+	//check if the hero has government positions in a faction, and if so, remove it from that position
+	int titles_size = this->Titles.size();
+	for (int i = (titles_size - 1); i >= 0; --i) {
+		this->Titles[i].second->SetMinister(this->Titles[i].first, "");
+	}
+				
+	titles_size = this->ProvinceTitles.size();
+	for (int i = (titles_size - 1); i >= 0; --i) {
+		this->ProvinceTitles[i].second->SetGovernor("");
 	}
 	
 	this->Province = NULL;
@@ -4216,6 +4340,12 @@ bool CGrandStrategyHero::IsEligibleForTitle(int title)
 		}
 	}
 	
+	for (size_t i = 0; i < this->ProvinceTitles.size(); ++i) {
+		if (this->ProvinceTitles[i].first != CharacterTitleHeadOfState && this->ProvinceTitles[i].first != CharacterTitleHeadOfGovernment && title != CharacterTitleHeadOfState && title != CharacterTitleHeadOfGovernment) { // if already has a government position, don't accept another ministerial title of equal rank
+			return false;
+		}
+	}
+	
 	return true;
 }
 
@@ -4255,27 +4385,32 @@ int CGrandStrategyHero::GetLanguage()
 	return language;
 }
 
-int CGrandStrategyHero::GetTitleScore(int title)
+int CGrandStrategyHero::GetTitleScore(int title, CGrandStrategyProvince *province)
 {
+	int score = 0;
 	if (title == CharacterTitleHeadOfState) {
-		return (this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3;
+		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3) + 1;
 	} else if (title == CharacterTitleHeadOfGovernment) {
-		return (this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3;
+		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3) + 1;
 	} else if (title == CharacterTitleEducationMinister) {
-		return this->Attributes[IntelligenceAttribute];
+		score = this->Attributes[IntelligenceAttribute];
 	} else if (title == CharacterTitleFinanceMinister) {
-		return this->Attributes[IntelligenceAttribute];
+		score = this->Attributes[IntelligenceAttribute];
 	} else if (title == CharacterTitleWarMinister) {
-		return (this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2;
+		score = (this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2;
 	} else if (title == CharacterTitleInteriorMinister) {
-		return this->Attributes[IntelligenceAttribute];
+		score = this->Attributes[IntelligenceAttribute];
 	} else if (title == CharacterTitleJusticeMinister) {
-		return this->Attributes[IntelligenceAttribute];
+		score = this->Attributes[IntelligenceAttribute];
 	} else if (title == CharacterTitleForeignMinister) {
-		return (this->Attributes[CharismaAttribute] + this->Attributes[IntelligenceAttribute]) / 2;
-	} else {
-		return 0;
+		score = (this->Attributes[CharismaAttribute] + this->Attributes[IntelligenceAttribute]) / 2;
+	} else if (title == CharacterTitleGovernor) {
+		score = ((this->Attributes[IntelligenceAttribute] + ((this->Attributes[this->GetMartialAttribute()] + this->Attributes[IntelligenceAttribute]) / 2) + this->Attributes[CharismaAttribute]) / 3);
+		if (province != NULL && (province == this->Province || province == this->ProvinceOfOrigin)) {
+			score += 1;
+		}
 	}
+	return score;
 }
 
 std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
@@ -4285,7 +4420,7 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 	bool first = true;
 	
 //	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister) {
-	if (title == CharacterTitleHeadOfState || title == CharacterTitleFinanceMinister) { // make it be affected by the finance minister instead of the interior one for now, since the primary effect of the administrative efficiency modifier at the moment is to improve production
+	if (title == CharacterTitleHeadOfState || title == CharacterTitleFinanceMinister || title == CharacterTitleGovernor) { // make it be affected by the finance minister instead of the interior one for now, since the primary effect of the administrative efficiency modifier at the moment is to improve production
 		int modifier = this->GetAdministrativeEfficiencyModifier();
 		if (modifier != 0) {
 			if (!first) {
@@ -4300,7 +4435,7 @@ std::string CGrandStrategyHero::GetMinisterEffectsString(int title)
 		}
 	}
 	
-	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister) {
+	if (title == CharacterTitleHeadOfState || title == CharacterTitleInteriorMinister || title == CharacterTitleGovernor) {
 		int modifier = this->GetRevoltRiskModifier();
 		if (modifier != 0) {
 			if (!first) {
@@ -4344,6 +4479,12 @@ std::string CGrandStrategyHero::GetBestDisplayTitle()
 		if (this->Titles[i].first < best_title_type) {
 			best_title = this->GetFaction()->GetCharacterTitle(this->Titles[i].first, this->Gender);
 			best_title_type = this->Titles[i].first;
+		}
+	}
+	for (size_t i = 0; i < this->ProvinceTitles.size(); ++i) {
+		if (this->ProvinceTitles[i].first < best_title_type) {
+			best_title = this->GetFaction()->GetCharacterTitle(this->ProvinceTitles[i].first, this->Gender);
+			best_title_type = this->ProvinceTitles[i].first;
 		}
 	}
 	return best_title;
@@ -6448,6 +6589,11 @@ void FinalizeGrandStrategyInitialization()
 				if (GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")) != -1 && GrandStrategyGame.Provinces[i]->Units[GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"))] < 2) { // make every province that has an owner start with at least two infantry units
 					GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
 				}
+				
+				// try to perform governor succession for provinces missing a governor in charge of them
+				if (GrandStrategyGame.Provinces[i]->Governor == NULL && GrandStrategyGame.Provinces[i]->Owner->HasGovernmentPosition(CharacterTitleGovernor)) {
+					GrandStrategyGame.Provinces[i]->GovernorSuccession();
+				}
 			}
 			
 			GrandStrategyGame.Provinces[i]->ReallocateLabor(); // allocate labor for provinces
@@ -6492,7 +6638,7 @@ void FinalizeGrandStrategyInitialization()
 			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
 				for (int k = 0; k < MaxCharacterTitles; ++k) {
 					// try to perform government position succession for existent factions missing a character in charge of it
-					if (GrandStrategyGame.Factions[i][j]->Ministers[k] == NULL && GrandStrategyGame.Factions[i][j]->HasGovernmentPosition(k)) {
+					if (IsMinisterialTitle(k) && GrandStrategyGame.Factions[i][j]->Ministers[k] == NULL && GrandStrategyGame.Factions[i][j]->HasGovernmentPosition(k)) {
 						GrandStrategyGame.Factions[i][j]->MinisterSuccession(k);
 					}
 				}
@@ -7538,6 +7684,12 @@ std::string GetGrandStrategyHeroTooltip(std::string hero_full_name)
 			for (size_t i = 0; i < hero->Titles.size(); ++i) {
 				if (hero->GetFaction() == hero->Titles[i].second && !hero->GetMinisterEffectsString(hero->Titles[i].first).empty()) {
 					hero_tooltip += "\n" + FindAndReplaceString(hero->GetMinisterEffectsString(hero->Titles[i].first), ", ", "\n");
+				}
+			}
+			
+			for (size_t i = 0; i < hero->ProvinceTitles.size(); ++i) {
+				if (hero->GetFaction() == hero->ProvinceTitles[i].second->Owner && !hero->GetMinisterEffectsString(hero->ProvinceTitles[i].first).empty()) {
+					hero_tooltip += "\n" + FindAndReplaceString(hero->GetMinisterEffectsString(hero->ProvinceTitles[i].first), ", ", "\n");
 				}
 			}
 			

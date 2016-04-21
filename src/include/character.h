@@ -92,6 +92,8 @@ enum CharacterTitles {
 	CharacterTitleInteriorMinister,
 	CharacterTitleJusticeMinister,
 	CharacterTitleWarMinister,
+	
+	CharacterTitleGovernor,
 
 	MaxCharacterTitles
 };

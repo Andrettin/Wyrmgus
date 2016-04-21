@@ -129,7 +129,8 @@ public:
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
 		Movement(false),
-		Owner(NULL), AttackedBy(NULL)
+		Owner(NULL), AttackedBy(NULL),
+		Governor(NULL)
 	{
 		memset(SettlementBuildings, 0, sizeof(SettlementBuildings));
 		memset(Units, 0, sizeof(Units));
@@ -161,6 +162,8 @@ public:
 	void CalculateIncomes();
 	void AddFactionClaim(int civilization_id, int faction_id);
 	void RemoveFactionClaim(int civilization_id, int faction_id);
+	void SetGovernor(std::string hero_full_name);
+	void GovernorSuccession();
 	bool HasBuildingClass(std::string building_class_name);
 	bool HasModifier(CUpgrade *modifier);
 	bool HasFactionClaim(int civilization_id, int faction_id);
@@ -195,6 +198,7 @@ public:
 	bool Movement;														/// Whether a unit or hero is currently moving to the province
 	CGrandStrategyFaction *Owner;										/// Owner of the province
 	CGrandStrategyFaction *AttackedBy;									/// Which faction the province is being attacked by.
+	CGrandStrategyHero *Governor;										/// Governor of this province
 	bool SettlementBuildings[UnitTypeMax];								/// Buildings in the province; 0 = not constructed, 1 = under construction, 2 = constructed
 	int Units[UnitTypeMax];												/// Quantity of units of a particular unit type in the province
 	int UnderConstructionUnits[UnitTypeMax];							/// Quantity of units of a particular unit type being trained/constructed in the province
@@ -315,7 +319,7 @@ public:
 	int GetRevoltRiskModifier();
 	int GetTroopCostModifier();
 	int GetLanguage();
-	int GetTitleScore(int title);
+	int GetTitleScore(int title, CGrandStrategyProvince *province = NULL);
 	std::string GetMinisterEffectsString(int title);
 	std::string GetBestDisplayTitle();
 	std::string GenerateNobleFamilyName();
@@ -330,6 +334,7 @@ public:
 	std::vector<CGrandStrategyHero *> Children;	/// Children of the character
 	std::vector<CGrandStrategyHero *> Siblings;	/// Siblings of the character
 	std::vector<std::pair<int, CGrandStrategyFaction *>> Titles;	/// Titles of the character (first value is the title type, and the second one is the faction
+	std::vector<std::pair<int, CGrandStrategyProvince *>> ProvinceTitles;	/// Provincial titles of the character (first value is the title type, and the second one is the province
 };
 
 /**

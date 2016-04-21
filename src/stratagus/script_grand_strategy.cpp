@@ -75,6 +75,12 @@ static int CclSetGrandStrategyProvinceData(lua_State *l)
 		bool has_modifier = LuaToBoolean(l, 4);
 		
 		province->SetModifier(modifier, has_modifier);
+	} else if (!strcmp(data, "Governor")) {
+		LuaCheckArgs(l, 3);
+		
+		std::string governor_full_name = LuaToString(l, 3);
+		
+		province->SetGovernor(governor_full_name);
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
@@ -116,6 +122,13 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 		{
 			lua_pushstring(l, province->Modifiers[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Governor")) {
+		if (province->Governor != NULL) {
+			lua_pushstring(l, province->Governor->GetFullName().c_str());
+		} else {
+			lua_pushstring(l, "");
 		}
 		return 1;
 	} else {
