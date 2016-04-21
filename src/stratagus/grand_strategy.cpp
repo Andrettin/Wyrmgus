@@ -6590,6 +6590,18 @@ void FinalizeGrandStrategyInitialization()
 					GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
 				}
 				
+				for (std::map<std::tuple<int,int>, CCharacter *>::iterator iterator = GrandStrategyGame.Provinces[i]->HistoricalGovernors.begin(); iterator != GrandStrategyGame.Provinces[i]->HistoricalGovernors.end(); ++iterator) { //set the appropriate historical governors
+					if (
+						GrandStrategyYear >= std::get<0>(iterator->first)
+						&& GrandStrategyYear < std::get<1>(iterator->first)
+						&& GrandStrategyGame.GetHero(iterator->second->GetFullName()) != NULL
+						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsAlive()
+						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsVisible()
+					) {
+						GrandStrategyGame.Provinces[i]->SetGovernor(iterator->second->GetFullName());
+					}
+				}
+				
 				// try to perform governor succession for provinces missing a governor in charge of them
 				if (GrandStrategyGame.Provinces[i]->Governor == NULL && GrandStrategyGame.Provinces[i]->Owner->HasGovernmentPosition(CharacterTitleGovernor)) {
 					GrandStrategyGame.Provinces[i]->GovernorSuccession();

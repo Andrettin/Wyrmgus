@@ -38,6 +38,7 @@
 
 #include <vector>
 #include <map>
+#include <tuple>
 
 #include "vec2i.h"
 
@@ -49,6 +50,7 @@ class CUnitType;
 class CUpgrade;
 class CFaction;
 class CProvince;
+class CCharacter;
 class WorldMapTile;
 
 class WorldMapTerrainType
@@ -127,6 +129,7 @@ public:
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
 	std::map<int, std::map<int, bool>> HistoricalSettlementBuildings;	/// Historical settlement buildings, mapped to building unit type id and year
 	std::map<CUpgrade *, std::map<int, bool>> HistoricalModifiers;		/// Historical province modifiers, mapped to the modifier's upgrade and year
+	std::map<std::tuple<int, int>, CCharacter *> HistoricalGovernors;	/// Historical governors of the province, mapped to the beginning and end of the term
 };
 
 class WorldMapTile

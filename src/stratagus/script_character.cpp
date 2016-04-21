@@ -39,6 +39,7 @@
 
 #include "grand_strategy.h"
 #include "player.h"
+#include "province.h"
 #include "quest.h"
 #include "script.h"
 #include "spells.h"
@@ -408,18 +409,30 @@ static int CclDefineCharacter(lua_State *l)
 				int end_year = LuaToNumber(l, -1, j + 1);
 				++j;
 				
-				std::string title_civilization_name = LuaToString(l, -1, j + 1);
-				int title_civilization = PlayerRaces.GetRaceIndexByName(title_civilization_name.c_str());
-				++j;
-				std::string title_faction_name = LuaToString(l, -1, j + 1);
-				int title_faction = PlayerRaces.GetFactionIndexByName(title_civilization, title_faction_name);
-				if (title_faction == -1) {
-					LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
+				if (title != CharacterTitleGovernor) {
+					std::string title_civilization_name = LuaToString(l, -1, j + 1);
+					int title_civilization = PlayerRaces.GetRaceIndexByName(title_civilization_name.c_str());
+					++j;
+					std::string title_faction_name = LuaToString(l, -1, j + 1);
+					int title_faction = PlayerRaces.GetFactionIndexByName(title_civilization, title_faction_name);
+					if (title_faction == -1) {
+						LuaError(l, "Faction \"%s\" doesn't exist." _C_ title_faction_name.c_str());
+					}
+					if (start_year != 0 && end_year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
+						PlayerRaces.Factions[title_civilization][title_faction]->HistoricalMinisters[std::tuple<int, int, int>(start_year, end_year, title)] = character;
+					}
+					character->HistoricalTitles.push_back(std::tuple<int, int, CFaction *, int>(start_year, end_year, PlayerRaces.Factions[title_civilization][title_faction], title));
+				} else {
+					std::string title_province_name = LuaToString(l, -1, j + 1);
+					CProvince *title_province = GetProvince(title_province_name);
+					if (title_province == NULL) {
+						LuaError(l, "Province \"%s\" doesn't exist." _C_ title_province_name.c_str());
+					}
+					if (start_year != 0 && end_year != 0) { // don't put in the province's historical data if a blank year was given
+						title_province->HistoricalGovernors[std::tuple<int, int>(start_year, end_year)] = character;
+					}
+					character->HistoricalProvinceTitles.push_back(std::tuple<int, int, CProvince *, int>(start_year, end_year, title_province, title));
 				}
-				if (start_year != 0 && end_year != 0 && IsMinisterialTitle(title)) { // don't put in the faction's historical data if a blank year was given
-					PlayerRaces.Factions[title_civilization][title_faction]->HistoricalMinisters[std::tuple<int, int, int>(start_year, end_year, title)] = character;
-				}
-				character->HistoricalTitles.push_back(std::tuple<int, int, CFaction *, int>(start_year, end_year, PlayerRaces.Factions[title_civilization][title_faction], title));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

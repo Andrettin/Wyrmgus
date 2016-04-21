@@ -48,6 +48,7 @@
 #include "item.h"
 #include "parameters.h"
 #include "player.h"
+#include "province.h"
 #include "quest.h"
 #include "spells.h"
 #include "unit.h"
@@ -220,6 +221,20 @@ void CCharacter::GenerateMissingData()
 			}
 			if (historical_title_changed && std::get<0>(this->HistoricalTitles[i]) != 0 && std::get<1>(this->HistoricalTitles[i]) != 0 && IsMinisterialTitle(std::get<3>(this->HistoricalTitles[i]))) {
 				std::get<2>(this->HistoricalTitles[i])->HistoricalMinisters[std::tuple<int, int, int>(std::get<0>(this->HistoricalTitles[i]), std::get<1>(this->HistoricalTitles[i]), std::get<3>(this->HistoricalTitles[i]))] = this;
+			}
+		}
+		for (size_t i = 0; i < this->HistoricalProvinceTitles.size(); ++i) {
+			bool historical_title_changed = false;
+			if (std::get<0>(this->HistoricalProvinceTitles[i]) == 0) {
+				std::get<0>(this->HistoricalProvinceTitles[i]) = this->Year;
+				historical_title_changed = true;
+			}
+			if (std::get<1>(this->HistoricalProvinceTitles[i]) == 0) {
+				std::get<1>(this->HistoricalProvinceTitles[i]) = this->DeathYear;
+				historical_title_changed = true;
+			}
+			if (historical_title_changed && std::get<0>(this->HistoricalProvinceTitles[i]) != 0 && std::get<1>(this->HistoricalProvinceTitles[i]) != 0 && std::get<3>(this->HistoricalProvinceTitles[i]) == CharacterTitleGovernor) {
+				std::get<2>(this->HistoricalProvinceTitles[i])->HistoricalGovernors[std::tuple<int, int>(std::get<0>(this->HistoricalProvinceTitles[i]), std::get<1>(this->HistoricalProvinceTitles[i]))] = this;
 			}
 		}
 	}
