@@ -304,7 +304,7 @@ public:
 	
 	void Initialize();
 	void Create();
-	void Die();
+	void Die(bool violent_death = false);
 	void SetType(int unit_type_id);
 	bool IsAlive();
 	bool IsVisible();

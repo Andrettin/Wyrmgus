@@ -2546,8 +2546,8 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 	if (hero) {
 		//update the hero
-		if (value == 0) {
-			hero->Die();
+		if (value == 0 || value == -1) {
+			hero->Die(value == -1);
 			return;
 		}
 		if (hero->Province != NULL) {
@@ -3534,7 +3534,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 	}
 			
 	if (hero_full_name.empty()) {
-		if (this->CanHaveSuccession(title, true) && GrandStrategyGameInitialized) {
+		if (this->CanHaveSuccession(title, true) && GrandStrategyGameInitialized && (this->Ministers[title] == NULL || !this->Ministers[title]->ViolentDeath)) { //if the minister died a violent death, wait until the next turn to replace him
 			this->MinisterSuccession(title);
 		} else {
 			this->Ministers[title] = NULL;
@@ -4070,6 +4070,7 @@ void CGrandStrategyHero::Create()
 	
 	if (this->ViolentDeath) { //if the character died a violent death historically, add a random number of years to the hero's natural lifespan
 		this->DeathYear += SyncRand(15);
+		this->ViolentDeath = false;
 	}
 	
 	if (this->ProvinceOfOrigin != NULL) {
@@ -4097,8 +4098,10 @@ void CGrandStrategyHero::Create()
 	}
 }
 
-void CGrandStrategyHero::Die()
+void CGrandStrategyHero::Die(bool violent_death)
 {
+	this->ViolentDeath = true;
+	
 	//show message that the hero has died
 	if (GrandStrategyGameInitialized && this->IsVisible()) {
 		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this) {
