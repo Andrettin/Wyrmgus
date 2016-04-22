@@ -386,7 +386,7 @@ void CGrandStrategyGame::DrawMap()
 				if (province_id != -1) {
 					if (this->Provinces[province_id]->SettlementLocation.x == x && this->Provinces[province_id]->SettlementLocation.y == y) {
 						int item_y = 0;
-						if (this->Provinces[province_id]->Owner != NULL && !this->WorldMapTiles[x][y]->GetCulturalName().empty()) {
+						if (this->Provinces[province_id]->Owner != NULL && this->Provinces[province_id]->HasBuildingClass("town-hall") && !this->WorldMapTiles[x][y]->GetCulturalName().empty()) {
 							std::string settlement_string = this->WorldMapTiles[x][y]->GetCulturalName();
 							int string_width = GetSmallFont().Width(settlement_string);
 							settlement_string += ",";
@@ -802,13 +802,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 				if (!already_in_tooltip) {
 					tooltip_pathways[tooltip_pathway_count] = GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i];
 					tooltip_pathway_count += 1;
-					tile_tooltip += " (";
-					if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] == PathwayTrail) {
-						tile_tooltip += "Trail";
-					} else if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] == PathwayRoad) {
-						tile_tooltip += "Road";
-					}
-					tile_tooltip += ")";
+					tile_tooltip += " (" + CapitalizeString(GetPathwayNameById(GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i])) + ")";
 				}
 			}
 		}
@@ -5034,15 +5028,11 @@ void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::strin
 		return;
 	}
 	
-	int pathway_id;
+	int pathway_id = GetPathwayIdByName(pathway_name);
 	
 	if (pathway_name == "none") {
 		pathway_id = -1;
-	} else if (pathway_name == "trail") {
-		pathway_id = PathwayTrail;
-	} else if (pathway_name == "road") {
-		pathway_id = PathwayRoad;
-	} else {
+	} else if (pathway_id == -1) {
 		fprintf(stderr, "Pathway \"%s\" does not exist.\n", pathway_name.c_str());
 		return;
 	}
@@ -6590,7 +6580,8 @@ void FinalizeGrandStrategyInitialization()
 					GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
 				}
 				
-				for (std::map<std::tuple<int,int>, CCharacter *>::iterator iterator = GrandStrategyGame.Provinces[i]->HistoricalGovernors.begin(); iterator != GrandStrategyGame.Provinces[i]->HistoricalGovernors.end(); ++iterator) { //set the appropriate historical governors
+				CProvince *base_province = GetProvince(GrandStrategyGame.Provinces[i]->Name);
+				for (std::map<std::tuple<int,int>, CCharacter *>::iterator iterator = base_province->HistoricalGovernors.begin(); iterator != base_province->HistoricalGovernors.end(); ++iterator) { //set the appropriate historical governors
 					if (
 						GrandStrategyYear >= std::get<0>(iterator->first)
 						&& GrandStrategyYear < std::get<1>(iterator->first)

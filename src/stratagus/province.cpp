@@ -128,4 +128,30 @@ int GetWorldMapTerrainTypeId(std::string terrain_type_name)
 	return -1;
 }
 
+std::string GetPathwayNameById(int pathway)
+{
+	if (pathway == PathwayTrail) {
+		return "trail";
+	} else if (pathway == PathwayRoad) {
+		return "road";
+	} else if (pathway == PathwayRailroad) {
+		return "railroad";
+	}
+
+	return "";
+}
+
+int GetPathwayIdByName(std::string pathway)
+{
+	if (pathway == "trail") {
+		return PathwayTrail;
+	} else if (pathway == "road") {
+		return PathwayRoad;
+	} else if (pathway == "railroad") {
+		return PathwayRailroad;
+	}
+
+	return -1;
+}
+
 //@}

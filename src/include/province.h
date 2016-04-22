@@ -53,6 +53,17 @@ class CProvince;
 class CCharacter;
 class WorldMapTile;
 
+/**
+**  Indexes into pathway array.
+*/
+enum Pathways {
+	PathwayTrail,
+	PathwayRoad,
+	PathwayRailroad,
+	
+	MaxPathways
+};
+
 class WorldMapTerrainType
 {
 public:
@@ -170,6 +181,8 @@ extern CWorld *GetWorld(std::string world_name);
 extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
+extern std::string GetPathwayNameById(int pathway);
+extern int GetPathwayIdByName(std::string pathway);
 extern void ProvinceCclRegister();
 
 //@}

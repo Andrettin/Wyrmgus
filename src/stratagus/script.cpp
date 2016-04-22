@@ -2884,11 +2884,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 						fprintf(fd, "SetWorldMapTileRiver(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->Name.c_str()); //save tile river data
 					}
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] != -1) { //save tile pathway data
-						if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] == PathwayTrail) {
-							fprintf(fd, "SetWorldMapTilePathway(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), "trail");
-						} else if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] == PathwayRoad) {
-							fprintf(fd, "SetWorldMapTilePathway(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), "road");
-						}
+						fprintf(fd, "SetWorldMapTilePathway(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GetPathwayNameById(GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i]).c_str());
 					}
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Port) { //save tile port data
 						fprintf(fd, "SetWorldMapTilePort(%d, %d, true)\n", x, y);

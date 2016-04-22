@@ -56,16 +56,6 @@ class CGrandStrategyFaction;
 class CGrandStrategyHero;
 
 /**
-**  Indexes into pathway array.
-*/
-enum Pathways {
-	PathwayTrail,
-	PathwayRoad,
-	
-	MaxPathways
-};
-
-/**
 **  Indexes into diplomacy state array.
 */
 enum DiplomacyStates {
