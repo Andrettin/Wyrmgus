@@ -703,9 +703,8 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	//    Allow general updates to any tiletype that regrows
 
 	//Wyrmgus start
-//	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding);
-	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding | MapFieldItem); // don't regrow forests under items
-	//Wyrmgus end
+	/*
+	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding);
 	++mf.Value;
 	if (mf.Value < ForestRegeneration) {
 		return;
@@ -714,6 +713,26 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	if ((mf.Flags & occupedFlag) || pos.y == 0) {
 		return;
 	}
+	*/
+	
+	const unsigned int permanent_occupied_flag = (MapFieldWall | MapFieldUnpassable | MapFieldBuilding);
+	const unsigned int occupedFlag = (MapFieldWall | MapFieldUnpassable | MapFieldLandUnit | MapFieldBuilding | MapFieldItem); // don't regrow forests under items
+	
+	if ((mf.Flags & permanent_occupied_flag)) { //if the tree tile is occupied by buildings and the like, reset the regeneration process
+		mf.Value = 0;
+		return;
+	}
+
+	if ((mf.Flags & occupedFlag) || pos.y == 0) {
+		return;
+	}
+	
+	++mf.Value;
+	if (mf.Value < ForestRegeneration) {
+		return;
+	}
+	mf.Value = ForestRegeneration;
+	//Wyrmgus end
 	
 	//Wyrmgus start
 //	const Vec2i offset(0, -1);
