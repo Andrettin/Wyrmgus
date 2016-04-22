@@ -3847,6 +3847,10 @@ bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 		return false;
 	}
 	
+	if (title == CharacterTitleGovernor && this->OwnedProvinces.size() <= 1) { // factions with only 1 province don't need governors
+		return false;
+	}
+	
 	if (title == CharacterTitleHeadOfGovernment || title == CharacterTitleEducationMinister || title == CharacterTitleForeignMinister || title == CharacterTitleIntelligenceMinister || title == CharacterTitleJusticeMinister || title == CharacterTitleInteriorMinister) { // these titles don't serve much of a purpose yet
 		return false;
 	}
