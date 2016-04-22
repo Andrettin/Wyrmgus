@@ -3843,7 +3843,7 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 
 bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 {
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState && title != CharacterTitleGovernor) {
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
 		return false;
 	}
 	
