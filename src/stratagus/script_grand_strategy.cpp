@@ -106,7 +106,13 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 	CGrandStrategyProvince *province = GrandStrategyGame.Provinces[province_id];
 	const char *data = LuaToString(l, 2);
 
-	if (!strcmp(data, "Modifier")) {
+	if (!strcmp(data, "Water")) {
+		lua_pushboolean(l, province->Water);
+		return 1;
+	} else if (!strcmp(data, "Coastal")) {
+		lua_pushboolean(l, province->Coastal);
+		return 1;
+	} else if (!strcmp(data, "Modifier")) {
 		LuaCheckArgs(l, 3);
 
 		CUpgrade *modifier = CUpgrade::Get(LuaToString(l, 3));
@@ -138,6 +144,17 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 	return 0;
 }
 
+static int CclGetGrandStrategyProvinces(lua_State *l)
+{
+	lua_createtable(l, GrandStrategyGame.Provinces.size(), 0);
+	for (size_t i = 1; i <= GrandStrategyGame.Provinces.size(); ++i)
+	{
+		lua_pushstring(l, GrandStrategyGame.Provinces[i-1]->Name.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
 /**
 **  Register CCL features for provinces.
 */
@@ -145,6 +162,7 @@ void GrandStrategyCclRegister()
 {
 	lua_register(Lua, "SetGrandStrategyProvinceData", CclSetGrandStrategyProvinceData);
 	lua_register(Lua, "GetGrandStrategyProvinceData", CclGetGrandStrategyProvinceData);
+	lua_register(Lua, "GetGrandStrategyProvinces", CclGetGrandStrategyProvinces);
 }
 
 //@}

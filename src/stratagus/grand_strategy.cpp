@@ -6932,17 +6932,6 @@ std::string GetProvinceOwner(std::string province_name)
 	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Name;
 }
 
-bool GetProvinceWater(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-	
-	if (province_id == -1) {
-		return false;
-	}
-	
-	return GrandStrategyGame.Provinces[province_id]->Water;
-}
-
 int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food)
 {
 	int province_id = GetProvinceId(province_name);
