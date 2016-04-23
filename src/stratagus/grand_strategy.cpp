@@ -5922,12 +5922,19 @@ void InitializeGrandStrategyGame(bool show_loading)
 		settlement_graphics_file += "_settlement";
 		std::string settlement_masonry_graphics_file = settlement_graphics_file + "_masonry" + ".png";
 		settlement_graphics_file += ".png";
-		if (!CanAccessFile(settlement_graphics_file.c_str()) && PlayerRaces.ParentCivilization[i] != -1) {
-			settlement_graphics_file = FindAndReplaceString(settlement_graphics_file, PlayerRaces.Name[i], PlayerRaces.Name[PlayerRaces.ParentCivilization[i]]);
+		
+		int file_civilization = i;
+		while (!CanAccessFile(settlement_graphics_file.c_str()) && PlayerRaces.ParentCivilization[file_civilization] != -1) {
+			settlement_graphics_file = FindAndReplaceString(settlement_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.ParentCivilization[file_civilization]]);
+			file_civilization = PlayerRaces.ParentCivilization[file_civilization];
 		}
-		if (!CanAccessFile(settlement_masonry_graphics_file.c_str()) && PlayerRaces.ParentCivilization[i] != -1) {
-			settlement_masonry_graphics_file = FindAndReplaceString(settlement_masonry_graphics_file, PlayerRaces.Name[i], PlayerRaces.Name[PlayerRaces.ParentCivilization[i]]);
+		
+		file_civilization = i;
+		while (!CanAccessFile(settlement_masonry_graphics_file.c_str()) && PlayerRaces.ParentCivilization[file_civilization] != -1) {
+			settlement_masonry_graphics_file = FindAndReplaceString(settlement_masonry_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.ParentCivilization[file_civilization]]);
+			file_civilization = PlayerRaces.ParentCivilization[file_civilization];
 		}
+		
 		if (CanAccessFile(settlement_graphics_file.c_str())) {
 			if (CPlayerColorGraphic::Get(settlement_graphics_file) == NULL) {
 				CPlayerColorGraphic *settlement_graphics = CPlayerColorGraphic::New(settlement_graphics_file, 64, 64);
@@ -5946,9 +5953,13 @@ void InitializeGrandStrategyGame(bool show_loading)
 		std::string barracks_graphics_file = "tilesets/world/sites/";
 		barracks_graphics_file += PlayerRaces.Name[i];
 		barracks_graphics_file += "_barracks.png";
-		if (!CanAccessFile(barracks_graphics_file.c_str()) && PlayerRaces.ParentCivilization[i] != -1) {
-			barracks_graphics_file = FindAndReplaceString(barracks_graphics_file, PlayerRaces.Name[i], PlayerRaces.Name[PlayerRaces.ParentCivilization[i]]);
+		
+		file_civilization = i;
+		while (!CanAccessFile(barracks_graphics_file.c_str()) && PlayerRaces.ParentCivilization[file_civilization] != -1) {
+			barracks_graphics_file = FindAndReplaceString(barracks_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.ParentCivilization[file_civilization]]);
+			file_civilization = PlayerRaces.ParentCivilization[file_civilization];
 		}
+		
 		if (CanAccessFile(barracks_graphics_file.c_str())) {
 			if (CPlayerColorGraphic::Get(barracks_graphics_file) == NULL) {
 				CPlayerColorGraphic *barracks_graphics = CPlayerColorGraphic::New(barracks_graphics_file, 64, 64);
