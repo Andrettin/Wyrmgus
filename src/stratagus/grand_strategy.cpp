@@ -3210,7 +3210,9 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
 				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
 			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
 				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
 			}
 			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
@@ -3244,7 +3246,9 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
 			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
 		}
-		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
+		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")) != -1) {
+			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")));
+		} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
 			potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
 		}
 		if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
@@ -3273,7 +3277,9 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")) != -1) {
 				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("shooter")));
 			}
-			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
+			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")) != -1) {
+				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-cavalry")));
+			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")) != -1) {
 				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("cavalry")));
 			}
 			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("flying-rider")) != -1) {
