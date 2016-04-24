@@ -138,6 +138,7 @@ static void MenuHandleButtonUp(unsigned button)
 		//if clicked on a tile, update the grand strategy interface
 		} else if (UI.MapArea.Contains(CursorScreenPos) && !(MouseButtons & LeftButton) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Terrain != -1) {
 			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume, false);
+			GrandStrategyGame.SelectedTile = GrandStrategyGame.GetTileUnderCursor();
 			if (GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province != -1) {
 				char buf[256];
 				snprintf(buf, sizeof(buf), "if (SetSelectedProvinceLua ~= nil) then SetSelectedProvinceLua(GetTileProvince(%d, %d)) end;", GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);

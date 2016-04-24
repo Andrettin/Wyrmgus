@@ -335,7 +335,7 @@ class CGrandStrategyGame
 {
 public:
 	CGrandStrategyGame() : 
-		WorldMapWidth(0), WorldMapHeight(0), SelectedProvince(-1),
+		WorldMapWidth(0), WorldMapHeight(0), SelectedProvince(-1), SelectedTile(-1, -1),
 		FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
 		PlayerFaction(NULL)
 	{
@@ -398,6 +398,7 @@ public:
 	int WorldMapWidth;
 	int WorldMapHeight;
 	int SelectedProvince;
+	Vec2i SelectedTile;
 	CGraphic *FogTile;
 	CGraphic *SymbolMove;										///symbol that units are moving to the province (drawn at the settlement location)
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
@@ -604,6 +605,9 @@ extern bool GrandStrategyHeroIsVisible(std::string hero_full_name);
 extern bool GrandStrategyHeroIsActive(std::string hero_full_name);
 extern bool GrandStrategyHeroIsCustom(std::string hero_full_name);
 extern void GrandStrategyWorkCreated(std::string work_ident);
+extern int GetGrandStrategySelectedTileX();
+extern int GetGrandStrategySelectedTileY();
+extern void SetSelectedTile(int x, int y);
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);

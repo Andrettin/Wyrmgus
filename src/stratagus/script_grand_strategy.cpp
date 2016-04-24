@@ -112,6 +112,12 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 	} else if (!strcmp(data, "Coastal")) {
 		lua_pushboolean(l, province->Coastal);
 		return 1;
+	} else if (!strcmp(data, "SettlementX")) {
+		lua_pushnumber(l, province->SettlementLocation.x);
+		return 1;
+	} else if (!strcmp(data, "SettlementY")) {
+		lua_pushnumber(l, province->SettlementLocation.y);
+		return 1;
 	} else if (!strcmp(data, "Modifier")) {
 		LuaCheckArgs(l, 3);
 

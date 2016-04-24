@@ -5013,8 +5013,8 @@ void SetRiverCulturalName(std::string river_name, std::string civilization_name,
 void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::string pathway_name)
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
-	
-	return; //deactivate this for now, while there aren't proper graphics for the pathways
+
+	return; //deactivate this for now, while there aren't all the proper graphics for the roads and the code for building them isn't in place yet
 	
 	int direction;
 	if (direction_name == "north") {
@@ -5045,6 +5045,10 @@ void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::strin
 	} else if (pathway_id == -1) {
 		fprintf(stderr, "Pathway \"%s\" does not exist.\n", pathway_name.c_str());
 		return;
+	}
+	
+	if (pathway_id == PathwayTrail) {
+		pathway_id = PathwayRoad; //transform trails into roads for now, while there aren't proper graphics for the trails
 	}
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->Pathway[direction] = pathway_id;
@@ -5871,6 +5875,8 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
 	GrandStrategyGame.SelectedProvince = -1;
+	GrandStrategyGame.SelectedTile.x = -1;
+	GrandStrategyGame.SelectedTile.y = -1;
 	GrandStrategyGame.PlayerFaction = NULL;
 	
 	//destroy minimap surface
@@ -7776,6 +7782,22 @@ void GrandStrategyWorkCreated(std::string work_ident)
 	} else {
 		fprintf(stderr, "Work \"%s\" doesn't exist.\n", work_ident.c_str());
 	}
+}
+
+int GetGrandStrategySelectedTileX()
+{
+	return GrandStrategyGame.SelectedTile.x;
+}
+
+int GetGrandStrategySelectedTileY()
+{
+	return GrandStrategyGame.SelectedTile.y;
+}
+
+void SetSelectedTile(int x, int y)
+{
+	GrandStrategyGame.SelectedTile.x = x;
+	GrandStrategyGame.SelectedTile.y = y;
 }
 
 void SetCommodityPrice(std::string resource_name, int price)
