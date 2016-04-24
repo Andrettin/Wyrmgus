@@ -2972,6 +2972,10 @@ bool CGrandStrategyProvince::CanAttackProvince(CGrandStrategyProvince *province)
 	) {
 		return false;
 	}
+	
+	if (this->Owner != GrandStrategyGame.PlayerFaction && !this->Owner->IsConquestDesirable(province)) { // if is AI-controlled, and the conquest isn't desirable, don't attack
+		return false;
+	}
 
 	return true;
 }
@@ -3118,6 +3122,37 @@ int CGrandStrategyProvince::GetFoodCapacity(bool subtract_non_food)
 	}
 	
 	return food_capacity;
+}
+
+int CGrandStrategyProvince::GetDesirabilityRating()
+{
+	int desirability = 0;
+	
+	std::vector<int> food_resources;
+	food_resources.push_back(GrainCost);
+	food_resources.push_back(MushroomCost);
+	food_resources.push_back(FishCost);
+	
+	for (size_t i = 0; i < food_resources.size(); ++i) {
+		desirability += this->ProductionCapacity[food_resources[i]] * DefaultResourceOutputs[food_resources[i]];
+	}
+	
+	std::vector<int> resources;
+	resources.push_back(GoldCost);
+	resources.push_back(SilverCost);
+	resources.push_back(CopperCost);
+	resources.push_back(WoodCost);
+	resources.push_back(StoneCost);
+	
+	for (size_t i = 0; i < resources.size(); ++i) {
+		desirability += this->ProductionCapacity[resources[i]] * DefaultResourceOutputs[resources[i]] * GrandStrategyGame.CommodityPrices[resources[i]] / 100;
+	}
+	
+	if (this->Coastal) {
+		desirability += 250;
+	}
+	
+	return desirability;
 }
 
 /**
@@ -3935,6 +3970,17 @@ bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance
 {
 	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
+	}
+	
+	return true;
+}
+
+bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province)
+{
+	if (this->OwnedProvinces.size() == 1 && province->Owner == NULL) {
+		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
+			return false;
+		}
 	}
 	
 	return true;

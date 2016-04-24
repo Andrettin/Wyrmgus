@@ -172,6 +172,7 @@ public:
 	int GetClassUnitType(int class_id);
 	int GetLanguage();
 	int GetFoodCapacity(bool subtract_non_food = false);
+	int GetDesirabilityRating();
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GenerateProvinceName(int civilization, int faction = -1);
 	std::string GenerateWorkName();
@@ -246,6 +247,7 @@ public:
 	bool CanFormFaction(int civilization, int faction);
 	bool HasGovernmentPosition(int title);
 	bool CanHaveSuccession(int title, bool family_inheritance);
+	bool IsConquestDesirable(CGrandStrategyProvince *province);
 	int GetAdministrativeEfficiencyModifier();
 	int GetProductionEfficiencyModifier(int resource);
 	int GetRevoltRiskModifier();
