@@ -3010,7 +3010,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 					}
 				}
 				for (int k = 0; k < MaxCosts; ++k) {
-					if (GrandStrategyGame.Factions[i][j]->Resources[k] > 0) {
+					if (GrandStrategyGame.Factions[i][j]->Resources[k] != 0) {
 						fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
 					}
 					if (GrandStrategyGame.Factions[i][j]->Trade[k] != 0) {
@@ -3114,7 +3114,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 			if (AllUpgrades[i]->Work != -1 && std::find(GrandStrategyGame.UnpublishedWorks.begin(), GrandStrategyGame.UnpublishedWorks.end(), AllUpgrades[i]) == GrandStrategyGame.UnpublishedWorks.end()) {
 				fprintf(fd, "GrandStrategyWorkCreated(\"%s\")\n", AllUpgrades[i]->Ident.c_str()); // save which works have already been created
 			}
-		}		
+		}
 		
 		fprintf(fd, "SetPlayerFaction(\"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.PlayerFaction->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Name.c_str());
 	

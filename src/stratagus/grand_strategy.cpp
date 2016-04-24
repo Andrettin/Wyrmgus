@@ -2422,6 +2422,22 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	}
 }
 
+void CGrandStrategyProvince::SetCurrentConstruction(int settlement_building)
+{
+	this->CurrentConstruction = settlement_building;
+	
+	if (settlement_building != -1 && UnitTypes[settlement_building]->Class == "town-hall" && this->Owner != NULL && this->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized && GrandStrategyGame.SelectedTile.x != -1 && GrandStrategyGame.SelectedTile.y != -1) { // 
+		this->SetSettlementLocation(GrandStrategyGame.SelectedTile.x, GrandStrategyGame.SelectedTile.y);
+		CclCommand("GetProvinceFromName(\"" + this->Name + "\").SettlementLocation = {" + std::to_string((long long) GrandStrategyGame.SelectedTile.x) + ", " + std::to_string((long long) GrandStrategyGame.SelectedTile.y) + "}");
+	}
+}
+
+void CGrandStrategyProvince::SetSettlementLocation(int x, int y)
+{
+	this->SettlementLocation.x = x;
+	this->SettlementLocation.y = y;
+}
+
 void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)
 {
 	if (this->HasModifier(modifier) == has_modifier) { // current situation already corresponds to has_modifier setting
@@ -2813,7 +2829,7 @@ void CGrandStrategyProvince::SetGovernor(std::string hero_full_name)
 			new_minister_message += this->Governor->GetFullName() + "!\\n\\n";
 			new_minister_message += "Type: " + this->Governor->Type->Name + "\\n" + "Trait: " + this->Governor->Trait->Name + "\\n" + "Province of Origin: " + this->Governor->ProvinceOfOrigin->GetCulturalName() + "\\n\\n" + this->Governor->GetMinisterEffectsString(CharacterTitleGovernor);
 			new_minister_message += "\") end;";
-			CclCommand(new_minister_message);	
+			CclCommand(new_minister_message);
 		}
 		
 		if (this->Owner->IsAlive() && hero->Province != this) {
@@ -5533,8 +5549,7 @@ void SetProvinceSettlementLocation(std::string province_name, int x, int y)
 	int province_id = GetProvinceId(province_name);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.Provinces[province_id]->SettlementLocation.x = x;
-		GrandStrategyGame.Provinces[province_id]->SettlementLocation.y = y;
+		GrandStrategyGame.Provinces[province_id]->SetSettlementLocation(x, y);
 	}
 }
 
@@ -5595,7 +5610,7 @@ void SetProvinceCurrentConstruction(std::string province_name, std::string settl
 		settlement_building = -1;
 	}
 	if (province_id != -1) {
-		GrandStrategyGame.Provinces[province_id]->CurrentConstruction = settlement_building;
+		GrandStrategyGame.Provinces[province_id]->SetCurrentConstruction(settlement_building);
 	}
 }
 

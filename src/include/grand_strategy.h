@@ -137,6 +137,8 @@ public:
 	void SetOwner(int civilization_id, int faction_id);					/// Set a new owner for the province
 	void SetCivilization(int civilization);
 	void SetSettlementBuilding(int building_id, bool has_settlement_building);
+	void SetCurrentConstruction(int settlement_building);
+	void SetSettlementLocation(int x, int y);
 	void SetModifier(CUpgrade *modifier, bool has_modifier);
 	void SetUnitQuantity(int unit_type_id, int quantity);
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
