@@ -404,6 +404,26 @@ void UpdateDisplay()
 			
 			if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y] && !GrandStrategyGamePaused) {
 				GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
+				
+				int province_id = GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province;
+				if (province_id != -1 && province_id != GrandStrategyGame.SelectedProvince) {
+					if (GrandStrategyGame.SelectedUnits.size() > 0 || !SelectedHero.empty()) {
+						std::string tooltip;
+						if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->CanAttackProvince(GrandStrategyGame.Provinces[province_id])) {
+							if (GrandStrategyGame.Provinces[province_id]->Owner == NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->OwnedProvinces.size() == 1) {
+								tooltip += "Migrate to ";
+							} else {
+								tooltip += "Attack ";
+							}
+						} else if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.Provinces[province_id]->Owner) {
+							tooltip += "Move units to ";
+						}
+						if (!tooltip.empty()) {
+							tooltip += GrandStrategyGame.Provinces[province_id]->GetCulturalName();
+							DrawGenericPopup(tooltip, CursorScreenPos.x, CursorScreenPos.y);
+						}
+					}
+				}
 			}
 		}
 	//Wyrmgus end

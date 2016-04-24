@@ -143,6 +143,17 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "CanAttackProvince")) {
+		LuaCheckArgs(l, 3);
+
+		int second_province_id = GetProvinceId(LuaToString(l, 3));
+
+		if (second_province_id == -1) {
+			LuaError(l, "Province doesn't exist.");
+		}
+		
+		lua_pushboolean(l, province->CanAttackProvince(GrandStrategyGame.Provinces[second_province_id]));
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

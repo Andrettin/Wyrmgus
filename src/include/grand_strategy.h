@@ -161,7 +161,9 @@ public:
 	bool HasFactionClaim(int civilization_id, int faction_id);
 	bool HasResource(int resource, bool ignore_prospection = false);
 	bool BordersProvince(int province_id);
+	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
 	bool BordersFaction(int faction_civilization, int faction);
+	bool CanAttackProvince(CGrandStrategyProvince *province);
 	int GetPopulation();
 	int GetResourceDemand(int resource);
 	int GetAdministrativeEfficiencyModifier();
@@ -423,8 +425,9 @@ public:
 	std::vector<CGrandStrategyHero *> Heroes;
 	std::vector<CUpgrade *> UnpublishedWorks;
 	CGrandStrategyFaction *PlayerFaction;
-	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];	///resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
-	int CommodityPrices[MaxCosts];								///price for every 100 of each commodity
+	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];		/// resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
+	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity
+	std::map<int, int> SelectedUnits;							/// quantity of selected units, mapped to unit type
 
 	int MinimapTextureWidth;
 	int MinimapTextureHeight;
@@ -459,6 +462,7 @@ extern int GrandStrategyMapHeightIndent;
 extern int BattalionMultiplier;
 extern int PopulationGrowthThreshold;					/// How much population growth progress must be accumulated before a new worker unit is created in the province
 extern std::string GrandStrategyInterfaceState;
+extern std::string SelectedHero;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 extern std::map<std::string, int> GrandStrategyHeroStringToIndex;
 
@@ -607,9 +611,11 @@ extern bool GrandStrategyHeroIsVisible(std::string hero_full_name);
 extern bool GrandStrategyHeroIsActive(std::string hero_full_name);
 extern bool GrandStrategyHeroIsCustom(std::string hero_full_name);
 extern void GrandStrategyWorkCreated(std::string work_ident);
+extern void SetSelectedTile(int x, int y);
 extern int GetGrandStrategySelectedTileX();
 extern int GetGrandStrategySelectedTileY();
-extern void SetSelectedTile(int x, int y);
+extern void SetGrandStrategySelectedUnits(std::string unit_type_ident, int quantity);
+extern int GetGrandStrategySelectedUnits(std::string unit_type_ident);
 extern void SetCommodityPrice(std::string resource_name, int price);
 extern int GetCommodityPrice(std::string resource_name);
 extern void SetResourceBasePrice(std::string resource_name, int price);

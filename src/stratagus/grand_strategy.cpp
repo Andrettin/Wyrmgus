@@ -76,6 +76,7 @@ int GrandStrategyMapHeightIndent;
 int BattalionMultiplier;
 int PopulationGrowthThreshold = 1000;
 std::string GrandStrategyInterfaceState;
+std::string SelectedHero;
 CGrandStrategyGame GrandStrategyGame;
 std::map<std::string, int> GrandStrategyHeroStringToIndex;
 
@@ -2940,6 +2941,56 @@ bool CGrandStrategyProvince::BordersFaction(int faction_civilization, int factio
 	return false;
 }
 
+bool CGrandStrategyProvince::CanAttackProvince(CGrandStrategyProvince *province)
+{
+	if (
+		this->Owner == province->Owner
+		|| province->Water
+		|| (province->AttackedBy != NULL && province->AttackedBy != this->Owner) // province can only be attacked by one player per turn because of mechanical limitations of the current code
+	) {
+		return false;
+	}
+	
+	// if is at peace or offering peace, can't attack
+	if (
+		province->Owner != NULL
+		&& (
+			this->Owner->DiplomacyState[province->Owner->Civilization][province->Owner->Faction] != DiplomacyStateWar
+			|| this->Owner->DiplomacyStateProposal[province->Owner->Civilization][province->Owner->Faction] == DiplomacyStatePeace
+		)
+	) {
+		return false;
+	}
+	
+	if (
+		this->BordersProvince(province->ID) == false
+		&& (
+			province->Coastal == false
+			|| this->HasBuildingClass("dock") == false
+			|| this->HasSecondaryBorderThroughWaterWith(province) == false
+		)
+	) {
+		return false;
+	}
+
+	return true;
+}
+
+bool CGrandStrategyProvince::HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province)
+{
+	for (size_t i = 0; i < this->BorderProvinces.size(); ++i) {
+		CGrandStrategyProvince *border_province = GrandStrategyGame.Provinces[this->BorderProvinces[i]];
+		if (border_province->Water) {
+			for (size_t j = 0; j < border_province->BorderProvinces.size(); ++j) {
+				if (border_province->BorderProvinces[j] == province->ID) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 int CGrandStrategyProvince::GetPopulation()
 {
 	return (this->TotalWorkers * 10000) * 2;
@@ -3918,6 +3969,10 @@ int CGrandStrategyFaction::GetProductionEfficiencyModifier(int resource)
 int CGrandStrategyFaction::GetRevoltRiskModifier()
 {
 	int modifier = 0;
+	
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+		modifier += this->OwnedProvinces.size() - 1; // tribal factions get +1% revolt risk per province owned beyond the first one
+	}
 	
 	if (this->Ministers[CharacterTitleHeadOfState] != NULL) {
 		modifier += this->Ministers[CharacterTitleHeadOfState]->GetRevoltRiskModifier();
@@ -5893,6 +5948,7 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.SelectedProvince = -1;
 	GrandStrategyGame.SelectedTile.x = -1;
 	GrandStrategyGame.SelectedTile.y = -1;
+	GrandStrategyGame.SelectedUnits.clear();
 	GrandStrategyGame.PlayerFaction = NULL;
 	
 	//destroy minimap surface
@@ -7393,6 +7449,9 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 						DropOutOnSide(*unit, heading, NULL);
 					}
 					UpdateForNewUnit(*unit, 0);
+					
+					unit->Starting = 1;
+					unit->Player->UnitTypesStartingNonHeroCount[unit->Type->Slot]++;
 				}
 			}
 		}
@@ -7816,6 +7875,29 @@ void SetSelectedTile(int x, int y)
 	GrandStrategyGame.SelectedTile.y = y;
 }
 
+void SetGrandStrategySelectedUnits(std::string unit_type_ident, int quantity)
+{
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	if (unit_type != -1) {
+		if (quantity > 0) {
+			GrandStrategyGame.SelectedUnits[unit_type] = quantity;
+		} else {
+			GrandStrategyGame.SelectedUnits.erase(unit_type);
+		}
+	}
+}
+
+int GetGrandStrategySelectedUnits(std::string unit_type_ident)
+{
+	int unit_type = UnitTypeIdByIdent(unit_type_ident);
+	
+	if (unit_type == -1 || GrandStrategyGame.SelectedUnits.find(unit_type) == GrandStrategyGame.SelectedUnits.end()) {
+		return 0;
+	}
+	
+	return GrandStrategyGame.SelectedUnits[unit_type];
+}
 void SetCommodityPrice(std::string resource_name, int price)
 {
 	int resource = GetResourceIdByName(resource_name.c_str());
