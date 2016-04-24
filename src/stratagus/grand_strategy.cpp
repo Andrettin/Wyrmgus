@@ -2428,7 +2428,6 @@ void CGrandStrategyProvince::SetCurrentConstruction(int settlement_building)
 	
 	if (settlement_building != -1 && UnitTypes[settlement_building]->Class == "town-hall" && this->Owner != NULL && this->Owner == GrandStrategyGame.PlayerFaction && GrandStrategyGameInitialized && GrandStrategyGame.SelectedTile.x != -1 && GrandStrategyGame.SelectedTile.y != -1) { // 
 		this->SetSettlementLocation(GrandStrategyGame.SelectedTile.x, GrandStrategyGame.SelectedTile.y);
-		CclCommand("GetProvinceFromName(\"" + this->Name + "\").SettlementLocation = {" + std::to_string((long long) GrandStrategyGame.SelectedTile.x) + ", " + std::to_string((long long) GrandStrategyGame.SelectedTile.y) + "}");
 	}
 }
 
@@ -2436,6 +2435,7 @@ void CGrandStrategyProvince::SetSettlementLocation(int x, int y)
 {
 	this->SettlementLocation.x = x;
 	this->SettlementLocation.y = y;
+	CclCommand("GetProvinceFromName(\"" + this->Name + "\").SettlementLocation = {" + std::to_string((long long) x) + ", " + std::to_string((long long) y) + "}");
 }
 
 void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)
@@ -4129,7 +4129,8 @@ CGrandStrategyProvince *CGrandStrategyFaction::GetRandomProvinceWeightedByPopula
 {
 	std::vector<int> potential_provinces;
 	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
-		for (int j = 0; j < GrandStrategyGame.Provinces[this->OwnedProvinces[i]]->TotalWorkers; ++j) {
+		int weight = std::max(1, GrandStrategyGame.Provinces[this->OwnedProvinces[i]]->TotalWorkers);
+		for (int j = 0; j < weight; ++j) {
 			potential_provinces.push_back(this->OwnedProvinces[i]);
 		}
 	}
