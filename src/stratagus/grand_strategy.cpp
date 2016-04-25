@@ -4016,9 +4016,9 @@ int CGrandStrategyFaction::GetRevoltRiskModifier()
 {
 	int modifier = 0;
 	
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
-		modifier += this->OwnedProvinces.size() - 1; // tribal factions get +1% revolt risk per province owned beyond the first one
-	}
+//	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+//		modifier += this->OwnedProvinces.size() - 1; // tribal factions get +1% revolt risk per province owned beyond the first one
+//	}
 	
 	if (this->Ministers[CharacterTitleHeadOfState] != NULL) {
 		modifier += this->Ministers[CharacterTitleHeadOfState]->GetRevoltRiskModifier();
