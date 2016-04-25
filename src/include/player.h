@@ -437,6 +437,7 @@ public:
 	bool Playable;														/// faction playability
 	std::vector<int> Colors;											/// faction colors
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
+	std::vector<std::string> SplitsTo;									/// which factions can split from this one
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier
 	std::string MinisterTitles[MaxCharacterTitles][MaxGenders][MaxGovernmentTypes][MaxFactionTiers]; /// this faction's minister title for each minister type and government type
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions

@@ -163,7 +163,7 @@ public:
 	bool HasResource(int resource, bool ignore_prospection = false);
 	bool BordersProvince(int province_id);
 	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
-	bool BordersFaction(int faction_civilization, int faction);
+	bool BordersFaction(int faction_civilization, int faction, bool check_through_water = false);
 	bool CanAttackProvince(CGrandStrategyProvince *province);
 	int GetPopulation();
 	int GetResourceDemand(int resource);
@@ -237,7 +237,9 @@ public:
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
 	void CalculateUpkeep();
+	void CheckSplitOffFactions();
 	void CheckFormableFactions(int civilization);
+	void SplitOffFaction(CGrandStrategyFaction *faction);
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
 	void SetMinister(int title, std::string hero_full_name);
@@ -245,6 +247,7 @@ public:
 	void GenerateMinister(int title, bool child_of_current_minister = false);
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
+	bool CanSplitOffFaction(CGrandStrategyFaction *faction);
 	bool CanFormFaction(int civilization, int faction);
 	bool HasGovernmentPosition(int title);
 	bool CanHaveSuccession(int title, bool family_inheritance);

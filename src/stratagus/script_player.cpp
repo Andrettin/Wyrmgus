@@ -1515,6 +1515,14 @@ static int CclDefineFaction(lua_State *l)
 			for (int k = 0; k < subargs; ++k) {
 				faction->DevelopsTo.push_back(LuaToString(l, -1, k + 1));
 			}
+		} else if (!strcmp(value, "SplitsTo")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int k = 0; k < subargs; ++k) {
+				faction->SplitsTo.push_back(LuaToString(l, -1, k + 1));
+			}
 		} else if (!strcmp(value, "Titles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
