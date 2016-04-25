@@ -84,6 +84,7 @@ public:
 
 	void UpdateMinimap();
 	void SetResourceProspected(int resource_id, bool discovered);
+	void SetPathway(int pathway, int direction, bool secondary_setting = false);
 	void SetPort(bool has_port);
 	void GenerateCulturalName(int old_civilization_id = -1, int civilization_id = -1);
 	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
@@ -430,6 +431,7 @@ public:
 	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];		/// resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity
 	std::map<int, int> SelectedUnits;							/// quantity of selected units, mapped to unit type
+	std::map<std::pair<int, int>, std::pair<int, int>> CurrentPathwayConstructions;	/// Tiles constructing a pathway; mapped to tile x and y, first value of std::pair is the pathway type, and the second one is the direction
 
 	int MinimapTextureWidth;
 	int MinimapTextureHeight;

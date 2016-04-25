@@ -2860,24 +2860,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 					fprintf(fd, "SetWorldMapTileFactionCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second[0].c_str());
 				}
 				for (int i = 0; i < MaxDirections; ++i) {
-					std::string direction_name;
-					if (i == North) {
-						direction_name = "north";
-					} else if (i == Northeast) {
-						direction_name = "northeast";
-					} else if (i == East) {
-						direction_name = "east";
-					} else if (i == Southeast) {
-						direction_name = "southeast";
-					} else if (i == South) {
-						direction_name = "south";
-					} else if (i == Southwest) {
-						direction_name = "southwest";
-					} else if (i == West) {
-						direction_name = "west";
-					} else if (i == Northwest) {
-						direction_name = "northwest";
-					}
+					std::string direction_name = GetDirectionNameById(i);
 					if (GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] != -1) {
 						fprintf(fd, "SetWorldMapTileRiverhead(%d, %d, \"%s\", \"%s\")\n", x, y, direction_name.c_str(), GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i]]->Name.c_str()); //save tile riverhead data
 					} else if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {

@@ -842,4 +842,72 @@ int stratagusMain(int argc, char **argv)
 	return 0;
 }
 
+//Wyrmgus start
+int GetReverseDirection(int direction)
+{
+	if (direction == North) {
+		return South;
+	} else if (direction == Northeast) {
+		return Southwest;
+	} else if (direction == East) {
+		return West;
+	} else if (direction == Southeast) {
+		return Northwest;
+	} else if (direction == South) {
+		return North;
+	} else if (direction == Southwest) {
+		return Northeast;
+	} else if (direction == West) {
+		return East;
+	} else if (direction == Northwest) {
+		return Southeast;
+	}
+	return -1;
+}
+
+std::string GetDirectionNameById(int direction)
+{
+	if (direction == North) {
+		return "north";
+	} else if (direction == Northeast) {
+		return "northeast";
+	} else if (direction == East) {
+		return "east";
+	} else if (direction == Southeast) {
+		return "southeast";
+	} else if (direction == South) {
+		return "south";
+	} else if (direction == Southwest) {
+		return "southwest";
+	} else if (direction == West) {
+		return "west";
+	} else if (direction == Northwest) {
+		return "northwest";
+	}
+	return "";
+}
+
+int GetDirectionIdByName(std::string direction)
+{
+	if (direction == "north") {
+		return North;
+	} else if (direction == "northeast") {
+		return Northeast;
+	} else if (direction == "east") {
+		return East;
+	} else if (direction == "southeast") {
+		return Southeast;
+	} else if (direction == "south") {
+		return South;
+	} else if (direction == "southwest") {
+		return Southwest;
+	} else if (direction == "west") {
+		return West;
+	} else if (direction == "northwest") {
+		return Northwest;
+	} else {
+		return -1;
+	}
+}
+//Wyrmgus end
 //@}

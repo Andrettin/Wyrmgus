@@ -226,6 +226,12 @@ enum TimesOfDay {
 	
 	MaxTimesOfDay
 };
+
+extern int GetReverseDirection(int direction);
+
+extern std::string GetDirectionNameById(int direction);
+
+extern int GetDirectionIdByName(std::string direction);
 //Wyrmgus end
 
 //@}

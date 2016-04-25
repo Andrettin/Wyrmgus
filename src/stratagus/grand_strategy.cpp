@@ -989,6 +989,16 @@ void CGrandStrategyGame::DoTurn()
 		this->Provinces[i]->Movement = false; //after processing the turn, always set the movement to false
 	}
 	
+	// build pathways
+	for (std::map<std::pair<int, int>, std::pair<int, int>>::iterator iterator = this->CurrentPathwayConstructions.begin(); iterator != this->CurrentPathwayConstructions.end(); ++iterator) {
+		int x = iterator->first.first;
+		int y = iterator->first.second;
+		int direction = iterator->second.second;
+		
+		this->WorldMapTiles[x][y]->SetPathway(iterator->second.first, direction);
+	}
+	this->CurrentPathwayConstructions.clear();
+	
 	//research technologies
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
@@ -1700,6 +1710,31 @@ void GrandStrategyWorldMapTile::SetPort(bool has_port)
 			if (building_type != -1) {
 				GrandStrategyGame.Provinces[this->Province]->SetSettlementBuilding(building_type, has_port);
 			}
+		}
+	}
+}
+
+void GrandStrategyWorldMapTile::SetPathway(int pathway, int direction, bool secondary_setting)
+{
+	this->Pathway[direction] = pathway;
+		
+	if (!secondary_setting) {
+		int x_offset = 0;
+		int y_offset = 0;
+			
+		if (direction == North || direction == Northwest || direction == Northeast) {
+			y_offset = -1;
+		} else if (direction == South || direction == Southwest || direction == Southeast) {
+			y_offset = 1;
+		}
+		if (direction == West || direction == Northwest || direction == Southwest) {
+			x_offset = -1;
+		} else if (direction == East || direction == Northeast || direction == Southeast) {
+			x_offset = 1;
+		}
+			
+		if (GrandStrategyGame.IsPointOnMap(this->Position.x + x_offset, this->Position.y + y_offset)) {
+			GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->SetPathway(pathway, GetReverseDirection(direction), true);
 		}
 	}
 }
@@ -2436,7 +2471,7 @@ void CGrandStrategyProvince::SetSettlementLocation(int x, int y)
 {
 	this->SettlementLocation.x = x;
 	this->SettlementLocation.y = y;
-	CclCommand("GetProvinceFromName(\"" + this->Name + "\").SettlementLocation = {" + std::to_string((long long) x) + ", " + std::to_string((long long) y) + "}");
+	CclCommand("if (GetProvinceFromName(\"" + this->Name + "\") ~= nil) then GetProvinceFromName(\"" + this->Name + "\").SettlementLocation = {" + std::to_string((long long) x) + ", " + std::to_string((long long) y) + "} end;");
 }
 
 void CGrandStrategyProvince::SetModifier(CUpgrade *modifier, bool has_modifier)
@@ -3977,7 +4012,7 @@ bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance
 
 bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province)
 {
-	if (this->OwnedProvinces.size() == 1 && province->Owner == NULL) {
+	if (this->OwnedProvinces.size() == 1 && province->Owner == NULL && PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
 		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
 			return false;
 		}
@@ -5132,29 +5167,7 @@ void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::strin
 {
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 
-	return; //deactivate this for now, while there aren't all the proper graphics for the roads and the code for building them isn't in place yet
-	
-	int direction;
-	if (direction_name == "north") {
-		direction = North;
-	} else if (direction_name == "northeast") {
-		direction = Northeast;
-	} else if (direction_name == "east") {
-		direction = East;
-	} else if (direction_name == "southeast") {
-		direction = Southeast;
-	} else if (direction_name == "south") {
-		direction = South;
-	} else if (direction_name == "southwest") {
-		direction = Southwest;
-	} else if (direction_name == "west") {
-		direction = West;
-	} else if (direction_name == "northwest") {
-		direction = Northwest;
-	} else {
-		fprintf(stderr, "Wrong direction (\"%s\") set for pathway.\n", direction_name.c_str());
-		return;
-	}
+	int direction = GetDirectionIdByName(direction_name);
 	
 	int pathway_id = GetPathwayIdByName(pathway_name);
 	
@@ -5169,7 +5182,7 @@ void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::strin
 		pathway_id = PathwayRoad; //transform trails into roads for now, while there aren't proper graphics for the trails
 	}
 	
-	GrandStrategyGame.WorldMapTiles[x][y]->Pathway[direction] = pathway_id;
+	GrandStrategyGame.WorldMapTiles[x][y]->SetPathway(pathway_id, direction);
 }
 
 void SetWorldMapTilePort(int x, int y, bool has_port)

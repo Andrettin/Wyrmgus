@@ -410,7 +410,11 @@ void UpdateDisplay()
 					if (GrandStrategyGame.SelectedUnits.size() > 0 || !SelectedHero.empty()) {
 						std::string tooltip;
 						if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->CanAttackProvince(GrandStrategyGame.Provinces[province_id])) {
-							if (GrandStrategyGame.Provinces[province_id]->Owner == NULL && GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->OwnedProvinces.size() == 1) {
+							if (
+								GrandStrategyGame.Provinces[province_id]->Owner == NULL
+								&& GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->OwnedProvinces.size() == 1
+								&& PlayerRaces.Factions[GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->Civilization][GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->Faction]->Type == "tribe"
+							) {
 								tooltip += "Migrate to ";
 							} else {
 								tooltip += "Attack ";
