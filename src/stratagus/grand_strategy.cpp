@@ -3808,6 +3808,11 @@ void CGrandStrategyFaction::AiDoTurn()
 			break;
 		}
 		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[this->OwnedProvinces[i]];
+		
+		if (!province->HasBuildingClass("town-hall")) { // don't build roads in the province if it doesn't even have a settlement yet
+			continue;
+		}
+		
 		for (size_t j = 0; j < province->Tiles.size() && this->CanBuildPathway(PathwayRoad, true); ++j) {
 			if (!this->CanBuildPathway(PathwayRoad, true)) {
 				break;
