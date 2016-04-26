@@ -118,7 +118,7 @@ static int CclGetGrandStrategyTileData(lua_State *l)
 		lua_pushboolean(l, GrandStrategyGame.CurrentPathwayConstructions.find(std::pair<int,int>(tile_pos.x, tile_pos.y)) != GrandStrategyGame.CurrentPathwayConstructions.end());
 		return 1;
 	} else if (!strcmp(data, "CanBuildPathway")) {
-		LuaCheckArgs(l, 4);
+		LuaCheckArgs(l, 5);
 
 		std::string pathway_name = LuaToString(l, 3);
 		int pathway = GetPathwayIdByName(pathway_name);
@@ -132,7 +132,9 @@ static int CclGetGrandStrategyTileData(lua_State *l)
 			LuaError(l, "Direction \"%s\" doesn't exist." _C_ direction_name.c_str());
 		}
 		
-		lua_pushboolean(l, tile->CanBuildPathway(pathway, direction));
+		bool check_costs = LuaToBoolean(l, 5);
+		
+		lua_pushboolean(l, tile->CanBuildPathway(pathway, direction, check_costs));
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

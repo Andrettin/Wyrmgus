@@ -154,4 +154,17 @@ int GetPathwayIdByName(std::string pathway)
 	return -1;
 }
 
+int GetPathwayTransportLevel(int pathway)
+{
+	if (pathway == PathwayTrail) {
+		return 1;
+	} else if (pathway == PathwayRoad) {
+		return 2;
+	} else if (pathway == PathwayRailroad) {
+		return 3;
+	}
+
+	return 0;
+}
+
 //@}

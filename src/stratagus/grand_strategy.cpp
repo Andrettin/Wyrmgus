@@ -1353,10 +1353,24 @@ void CGrandStrategyGame::SetSelectedProvince(CGrandStrategyProvince *province)
 	if (province != this->SelectedProvince) {
 		// if the player has units selected and then selects an attackable province, set those units to attack the province
 		if (this->SelectedProvince != NULL && this->PlayerFaction != NULL && this->SelectedProvince->Owner == this->PlayerFaction && this->SelectedProvince->CanAttackProvince(province)) {
+			int total_attacking_units = 0;
+			for (std::map<int, int>::iterator iterator = province->AttackingUnits.begin(); iterator != province->AttackingUnits.end(); ++iterator) {
+				total_attacking_units += iterator->second;
+			}
 			for (std::map<int, int>::iterator iterator = this->SelectedUnits.begin(); iterator != this->SelectedUnits.end(); ++iterator) {
-				province->AttackedBy = this->PlayerFaction;
-				province->ChangeAttackingUnitQuantity(iterator->first, iterator->second);
-				this->SelectedProvince->ChangeUnitQuantity(iterator->first, - iterator->second);
+				total_attacking_units += iterator->second;
+			}
+			
+//			if (this->SelectedUnits.size() > 0 && this->SelectedProvince->GetConnectionTransportLevel(province) < 2 && total_attacking_units > 8) {
+			if (false) {
+				std::string dialog_text = "My lord, we cannot attack a province with more than 8 regiments if there are no roads connecting to it!";
+				CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Too Many Regiments\", \"" + dialog_text + "\") end;");
+			} else {
+				for (std::map<int, int>::iterator iterator = this->SelectedUnits.begin(); iterator != this->SelectedUnits.end(); ++iterator) {
+					province->AttackedBy = this->PlayerFaction;
+					province->ChangeAttackingUnitQuantity(iterator->first, iterator->second);
+					this->SelectedProvince->ChangeUnitQuantity(iterator->first, - iterator->second);
+				}
 			}
 			
 			if (!SelectedHero.empty()) {
@@ -1368,7 +1382,7 @@ void CGrandStrategyGame::SetSelectedProvince(CGrandStrategyProvince *province)
 				province->ChangeMovingUnitQuantity(iterator->first, iterator->second);
 				this->SelectedProvince->ChangeUnitQuantity(iterator->first, - iterator->second);
 			}
-			
+
 			if (!SelectedHero.empty() && GetProvinceHero(SelectedProvince->Name, SelectedHero) == 2) {
 				province->SetHero(SelectedHero, 1);
 			}
@@ -1779,6 +1793,12 @@ void GrandStrategyWorldMapTile::SetPathway(int pathway, int direction, bool seco
 			
 		if (GrandStrategyGame.IsPointOnMap(this->Position.x + x_offset, this->Position.y + y_offset)) {
 			GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->SetPathway(pathway, GetReverseDirection(direction), true);
+			
+			if (
+				this->Province != GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province
+			) {
+				this->Province->SetBorderProvinceConnectionTransportLevel(GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province, GetPathwayTransportLevel(pathway));
+			}
 		}
 	}
 }
@@ -2071,10 +2091,12 @@ bool GrandStrategyWorldMapTile::HasResource(int resource, bool ignore_prospectio
 	return false;
 }
 
-bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction)
+bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction, bool check_costs)
 {
-	if (pathway == PathwayRoad && (this->Province->Owner->Resources[GoldCost] < 200 || this->Province->Owner->Resources[WoodCost] < 200)) {
-		return false;
+	if (check_costs) {
+		if (pathway == PathwayRoad && (this->Province->Owner->Resources[GoldCost] < 200 || this->Province->Owner->Resources[WoodCost] < 200)) {
+			return false;
+		}
 	}
 	
 	if (this->Pathway[direction] >= pathway) {
@@ -2082,6 +2104,28 @@ bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction)
 	}
 	
 	if (GrandStrategyGame.CurrentPathwayConstructions.find(std::pair<int,int>(this->Position.x, this->Position.y)) != GrandStrategyGame.CurrentPathwayConstructions.end()) {
+		return false;
+	}
+	
+	int x_offset = 0;
+	int y_offset = 0;
+			
+	if (direction == North || direction == Northwest || direction == Northeast) {
+		y_offset = -1;
+	} else if (direction == South || direction == Southwest || direction == Southeast) {
+		y_offset = 1;
+	}
+	if (direction == West || direction == Northwest || direction == Southwest) {
+		x_offset = -1;
+	} else if (direction == East || direction == Northeast || direction == Southeast) {
+		x_offset = 1;
+	}
+			
+	if (
+		!GrandStrategyGame.IsPointOnMap(this->Position.x + x_offset, this->Position.y + y_offset)
+		|| GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Terrain == -1
+		|| GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province->Water
+	) {
 		return false;
 	}
 	
@@ -2630,18 +2674,22 @@ void CGrandStrategyProvince::SetAttackingUnitQuantity(int unit_type_id, int quan
 {
 	quantity = std::max(0, quantity);
 	
-	int change = quantity - this->AttackingUnits[unit_type_id];
+	int change = quantity - this->GetAttackingUnitQuantity(unit_type_id);
 	
 	if (IsMilitaryUnit(*UnitTypes[unit_type_id])) {
 		this->AttackingMilitaryScore += change * (UnitTypes[unit_type_id]->DefaultStat.Variables[POINTS_INDEX].Value + (this->AttackedBy != NULL ? this->AttackedBy->MilitaryScoreBonus[unit_type_id] : 0));
 	}
-		
-	this->AttackingUnits[unit_type_id] = quantity;
+
+	if (quantity > 0) {
+		this->AttackingUnits[unit_type_id] = quantity;
+	} else {
+		this->AttackingUnits.erase(unit_type_id);
+	}
 }
 
 void CGrandStrategyProvince::ChangeAttackingUnitQuantity(int unit_type_id, int quantity)
 {
-	this->SetAttackingUnitQuantity(unit_type_id, this->AttackingUnits[unit_type_id] + quantity);
+	this->SetAttackingUnitQuantity(unit_type_id, this->GetAttackingUnitQuantity(unit_type_id) + quantity);
 }
 
 void CGrandStrategyProvince::SetMovingUnitQuantity(int unit_type_id, int quantity)
@@ -3001,6 +3049,13 @@ void CGrandStrategyProvince::GovernorSuccession()
 	this->Governor = NULL;
 }
 
+void CGrandStrategyProvince::SetBorderProvinceConnectionTransportLevel(CGrandStrategyProvince *province, int transport_level)
+{
+	if (this->BorderProvinceConnectionTransportLevel[province] < transport_level) {
+		this->BorderProvinceConnectionTransportLevel[province] = transport_level;
+	}
+}
+
 bool CGrandStrategyProvince::HasBuildingClass(std::string building_class_name)
 {
 	if (this->Civilization == -1 || building_class_name.empty()) {
@@ -3135,6 +3190,15 @@ bool CGrandStrategyProvince::CanAttackProvince(CGrandStrategyProvince *province)
 	}
 
 	return true;
+}
+
+int CGrandStrategyProvince::GetAttackingUnitQuantity(int unit_type_id)
+{
+	if (this->AttackingUnits.find(unit_type_id) != this->AttackingUnits.end()) {
+		return this->AttackingUnits[unit_type_id];
+	} else {
+		return 0;
+	}
 }
 
 int CGrandStrategyProvince::GetPopulation()
@@ -3295,6 +3359,15 @@ int CGrandStrategyProvince::GetDesirabilityRating()
 	}
 	
 	return desirability;
+}
+
+int CGrandStrategyProvince::GetConnectionTransportLevel(CGrandStrategyProvince *province)
+{
+	if (this->BorderProvinceConnectionTransportLevel.find(province) != this->BorderProvinceConnectionTransportLevel.end()) {
+		return BorderProvinceConnectionTransportLevel[province];
+	}
+	
+	return 0;
 }
 
 /**
@@ -7012,6 +7085,7 @@ void CalculateProvinceBorders()
 								
 						if (second_province != NULL && !GrandStrategyGame.Provinces[i]->BordersProvince(second_province)) { //if isn't added yet to the border provinces, do so now
 							GrandStrategyGame.Provinces[i]->BorderProvinces.push_back(second_province);
+							GrandStrategyGame.Provinces[i]->BorderProvinceConnectionTransportLevel[second_province] = 0;
 						}
 								
 						if (second_province != NULL && GrandStrategyGame.Provinces[i]->Water == false && second_province->Water == true) {
@@ -7162,7 +7236,7 @@ int GetProvinceAttackingUnitQuantity(std::string province_name, std::string unit
 	int province_id = GetProvinceId(province_name);
 	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 	
-	return GrandStrategyGame.Provinces[province_id]->AttackingUnits[unit_type_id];
+	return GrandStrategyGame.Provinces[province_id]->GetAttackingUnitQuantity(unit_type_id);
 }
 
 int GetProvinceHero(std::string province_name, std::string hero_full_name)
@@ -7629,7 +7703,7 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 				units_to_be_created = GrandStrategyGame.Provinces[province_id]->Units[i] / divisor;
 				GrandStrategyGame.Provinces[province_id]->ChangeUnitQuantity(i, - units_to_be_created);
 			} else {
-				units_to_be_created = GrandStrategyGame.Provinces[province_id]->AttackingUnits[i] / divisor;
+				units_to_be_created = GrandStrategyGame.Provinces[province_id]->GetAttackingUnitQuantity(i) / divisor;
 				GrandStrategyGame.Provinces[province_id]->ChangeAttackingUnitQuantity(i, - units_to_be_created);
 			}
 		} else if (!attacking_units && UnitTypes[i]->Class == "worker" && !ignore_militia && !UnitTypes[i]->Civilization.empty()) { // create militia in the province depending on the amount of workers

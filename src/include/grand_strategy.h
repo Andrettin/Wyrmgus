@@ -92,7 +92,7 @@ public:
 	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
-	bool CanBuildPathway(int pathway, int direction);
+	bool CanBuildPathway(int pathway, int direction, bool check_costs);
 	std::string GetCulturalName(int civilization = -1, int faction = -1, bool only_settlement = false);		/// Get the tile's cultural name.
 	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
@@ -130,7 +130,6 @@ public:
 		memset(Units, 0, sizeof(Units));
 		memset(UnderConstructionUnits, 0, sizeof(UnderConstructionUnits));
 		memset(MovingUnits, 0, sizeof(MovingUnits));
-		memset(AttackingUnits, 0, sizeof(AttackingUnits));
 		memset(Income, 0, sizeof(Income));
 		memset(ProductionCapacity, 0, sizeof(ProductionCapacity));
 		memset(ProductionCapacityFulfilled, 0, sizeof(ProductionCapacityFulfilled));
@@ -162,6 +161,7 @@ public:
 	void RemoveFactionClaim(int civilization_id, int faction_id);
 	void SetGovernor(std::string hero_full_name);
 	void GovernorSuccession();
+	void SetBorderProvinceConnectionTransportLevel(CGrandStrategyProvince *province, int transport_level);
 	bool HasBuildingClass(std::string building_class_name);
 	bool HasModifier(CUpgrade *modifier);
 	bool HasFactionClaim(int civilization_id, int faction_id);
@@ -170,6 +170,7 @@ public:
 	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
 	bool BordersFaction(int faction_civilization, int faction, bool check_through_water = false);
 	bool CanAttackProvince(CGrandStrategyProvince *province);
+	int GetAttackingUnitQuantity(int unit_type_id);
 	int GetPopulation();
 	int GetResourceDemand(int resource);
 	int GetAdministrativeEfficiencyModifier();
@@ -179,6 +180,7 @@ public:
 	int GetLanguage();
 	int GetFoodCapacity(bool subtract_non_food = false);
 	int GetDesirabilityRating();
+	int GetConnectionTransportLevel(CGrandStrategyProvince *province);
 	std::string GetCulturalName();										/// Get the province's cultural name.
 	std::string GenerateProvinceName(int civilization, int faction = -1);
 	std::string GenerateWorkName();
@@ -204,10 +206,11 @@ public:
 	int Units[UnitTypeMax];												/// Quantity of units of a particular unit type in the province
 	int UnderConstructionUnits[UnitTypeMax];							/// Quantity of units of a particular unit type being trained/constructed in the province
 	int MovingUnits[UnitTypeMax];										/// Quantity of units of a particular unit type moving to the province
-	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
 	std::vector<CGrandStrategyHero *> ActiveHeroes;						/// Active (can move, attack and defend) heroes in the province
 	std::vector<CGrandStrategyProvince *> BorderProvinces;				/// Which provinces this province borders
+	std::map<int, int> AttackingUnits;									/// Quantity of units of a particular unit type attacking the province
+	std::map<CGrandStrategyProvince *, int> BorderProvinceConnectionTransportLevel;	/// connection transport level of each border province
 	int Income[MaxCosts];												/// Income for each resource.
 	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
 	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled
