@@ -909,5 +909,23 @@ int GetDirectionIdByName(std::string direction)
 		return -1;
 	}
 }
+
+Vec2i GetDirectionOffset(int direction)
+{
+	Vec2i offset(0, 0);
+			
+	if (direction == North || direction == Northwest || direction == Northeast) {
+		offset.y = -1;
+	} else if (direction == South || direction == Southwest || direction == Southeast) {
+		offset.y = 1;
+	}
+	if (direction == West || direction == Northwest || direction == Southwest) {
+		offset.x = -1;
+	} else if (direction == East || direction == Northeast || direction == Southeast) {
+		offset.x = 1;
+	}
+
+	return offset;
+}
 //Wyrmgus end
 //@}

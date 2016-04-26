@@ -853,6 +853,14 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 
 void CGrandStrategyGame::DoTurn()
 {
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (this->Factions[i][j]->IsAlive() && this->Factions[i][j] != this->PlayerFaction) {
+				this->Factions[i][j]->AiDoTurn();
+			}
+		}
+	}
+
 	//allocate labor
 	for (size_t i = 0; i < this->Provinces.size(); ++i) {
 		if (this->Provinces[i]->Civilization != -1 && this->Provinces[i]->Owner != NULL && this->Provinces[i]->Labor > 0) { // if this province has a culture and an owner, and has surplus labor
@@ -1797,30 +1805,18 @@ void GrandStrategyWorldMapTile::SetPathway(int pathway, int direction, bool seco
 {
 	this->Pathway[direction] = pathway;
 	this->SetTransportLevel(GetPathwayTransportLevel(pathway));
-		
-	int x_offset = 0;
-	int y_offset = 0;
-			
-	if (direction == North || direction == Northwest || direction == Northeast) {
-		y_offset = -1;
-	} else if (direction == South || direction == Southwest || direction == Southeast) {
-		y_offset = 1;
-	}
-	if (direction == West || direction == Northwest || direction == Southwest) {
-		x_offset = -1;
-	} else if (direction == East || direction == Northeast || direction == Southeast) {
-		x_offset = 1;
-	}
-			
-	if (GrandStrategyGame.IsPointOnMap(this->Position.x + x_offset, this->Position.y + y_offset)) {
+
+	Vec2i offset = GetDirectionOffset(direction);
+
+	if (GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)) {
 		if (!secondary_setting) {
-			GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->SetPathway(pathway, GetReverseDirection(direction), true);
+			GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->SetPathway(pathway, GetReverseDirection(direction), true);
 		}
 			
 		if (
-			this->Province != GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province
+			this->Province != GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province
 		) {
-			this->Province->SetBorderProvinceConnectionTransportLevel(GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province, GetPathwayTransportLevel(pathway));
+			this->Province->SetBorderProvinceConnectionTransportLevel(GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province, GetPathwayTransportLevel(pathway));
 		}
 	}
 }
@@ -1851,6 +1847,7 @@ void GrandStrategyWorldMapTile::SetTransportLevel(int transport_level)
 		}
 	}
 }
+
 void GrandStrategyWorldMapTile::GenerateCulturalName(int old_civilization_id, int civilization_id)
 {
 	if (this->Province == NULL || this->Province->Civilization == -1 || this->Terrain == -1) {
@@ -2082,6 +2079,50 @@ void GrandStrategyWorldMapTile::GenerateFactionCulturalName(int civilization_id,
 	}
 }
 
+bool GrandStrategyWorldMapTile::AiBuildPathway(int pathway)
+{
+	this->AiProcessing = true;
+
+	for (int i = 0; i < MaxDirections; ++i) {
+		if (this->CanBuildPathway(pathway, i, true)) {
+			this->BuildPathway(pathway, i);
+			this->AiProcessing = false;
+			return true;
+		}
+	}
+	
+	// if couldn't build a pathway in the tile itself, try to build in the adjacent tiles
+	for (int i = 0; i < MaxDirections; ++i) {
+		if (i == Northeast || i == Northwest || i == Southeast || i == Southwest) { // no diagonal roads, at least for now
+			continue;
+		}
+		
+		Vec2i offset = GetDirectionOffset(i);
+		
+		if (!GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)) {
+			continue;
+		}
+		
+		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y];
+		
+		if (
+			tile->Province == NULL
+			|| tile->Province->Owner != this->Province->Owner
+			|| tile->AiProcessing //don't ask the tile to build a pathway if that was already done before
+		) {
+			continue;
+		}
+		
+		if (tile->AiBuildPathway(pathway)) {
+			this->AiProcessing = false;
+			return true;
+		}
+	}
+	
+	this->AiProcessing = false;
+	return false;
+}
+
 /**
 **  Generate a settlement name for the tile.
 **
@@ -2140,10 +2181,12 @@ bool GrandStrategyWorldMapTile::HasResource(int resource, bool ignore_prospectio
 
 bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction, bool check_costs)
 {
-	if (check_costs) {
-		if (pathway == PathwayRoad && (this->Province->Owner->Resources[GoldCost] < 200 || this->Province->Owner->Resources[WoodCost] < 200)) {
-			return false;
-		}
+	if (direction == Northeast || direction == Northwest || direction == Southeast || direction == Southwest) { // no diagonal roads, at least for now
+		return false;
+	}
+		
+	if (!this->Province->Owner->CanBuildPathway(pathway, check_costs)) {
+		return false;
 	}
 	
 	if (this->Pathway[direction] >= pathway) {
@@ -2154,29 +2197,17 @@ bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction, bool
 		return false;
 	}
 	
-	int x_offset = 0;
-	int y_offset = 0;
-			
-	if (direction == North || direction == Northwest || direction == Northeast) {
-		y_offset = -1;
-	} else if (direction == South || direction == Southwest || direction == Southeast) {
-		y_offset = 1;
-	}
-	if (direction == West || direction == Northwest || direction == Southwest) {
-		x_offset = -1;
-	} else if (direction == East || direction == Northeast || direction == Southeast) {
-		x_offset = 1;
-	}
+	Vec2i offset = GetDirectionOffset(direction);
 			
 	if (
-		!GrandStrategyGame.IsPointOnMap(this->Position.x + x_offset, this->Position.y + y_offset)
-		|| GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Terrain == -1
-		|| GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province->Water
+		!GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)
+		|| GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Terrain == -1
+		|| GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province->Water
 	) {
 		return false;
 	}
 	
-	if (this->TransportLevel < GetPathwayTransportLevel(pathway) && GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->TransportLevel < GetPathwayTransportLevel(pathway)) { // can only build pathways if connected to the settlement
+	if (this->TransportLevel < GetPathwayTransportLevel(pathway) && GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->TransportLevel < GetPathwayTransportLevel(pathway)) { // can only build pathways if connected to the settlement
 		return false;
 	}
 	
@@ -3204,9 +3235,8 @@ bool CGrandStrategyProvince::BordersFaction(int faction_civilization, int factio
 						return true;
 					}
 				}
-			} else {
-				continue;
 			}
+			continue;
 		}
 		if (border_province->Owner->Civilization == faction_civilization && border_province->Owner->Faction == faction) {
 			return true;
@@ -3770,6 +3800,32 @@ CGrandStrategyHero *CGrandStrategyProvince::GetRandomAuthor()
 	}
 }
 
+void CGrandStrategyFaction::AiDoTurn()
+{
+	// if this faction has enough resources to build a road, check if any resource tiles lack roads, and if so try to build roads in them
+	for (size_t i = 0; i < this->OwnedProvinces.size() && this->CanBuildPathway(PathwayRoad, true); ++i) {
+		if (!this->CanBuildPathway(PathwayRoad, true)) {
+			break;
+		}
+		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[this->OwnedProvinces[i]];
+		for (size_t j = 0; j < province->Tiles.size() && this->CanBuildPathway(PathwayRoad, true); ++j) {
+			if (!this->CanBuildPathway(PathwayRoad, true)) {
+				break;
+			}
+			int x = province->Tiles[j].x;
+			int y = province->Tiles[j].y;
+			GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[x][y];
+				
+			if (!tile->Worked || tile->TransportLevel >= GetPathwayTransportLevel(PathwayRoad)) {
+				continue;
+			}
+
+			tile->AiBuildPathway(PathwayRoad);
+		}
+	}
+
+}
+
 void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting)
 {
 	if (this->Technologies[upgrade_id] == has_technology) {
@@ -4309,6 +4365,17 @@ bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province
 {
 	if (this->OwnedProvinces.size() == 1 && province->Owner == NULL && PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
 		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+bool CGrandStrategyFaction::CanBuildPathway(int pathway, bool check_costs)
+{
+	if (check_costs) {
+		if (pathway == PathwayRoad && (this->Resources[GoldCost] < 200 || this->Resources[WoodCost] < 200)) {
 			return false;
 		}
 	}
@@ -6190,6 +6257,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Port = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Worked = false;
+				GrandStrategyGame.WorldMapTiles[x][y]->AiProcessing = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
 				GrandStrategyGame.WorldMapTiles[x][y]->BaseTile = NULL;
 				GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = NULL;

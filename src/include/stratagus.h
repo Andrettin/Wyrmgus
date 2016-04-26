@@ -227,11 +227,12 @@ enum TimesOfDay {
 	MaxTimesOfDay
 };
 
+#include <vec2i.h>
+
 extern int GetReverseDirection(int direction);
-
 extern std::string GetDirectionNameById(int direction);
-
 extern int GetDirectionIdByName(std::string direction);
+extern Vec2i GetDirectionOffset(int direction);
 //Wyrmgus end
 
 //@}

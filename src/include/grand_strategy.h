@@ -74,7 +74,7 @@ class GrandStrategyWorldMapTile : public WorldMapTile
 public:
 	GrandStrategyWorldMapTile() : WorldMapTile(),
 		Terrain(-1), BaseTileVariation(-1), Variation(-1), Resource(-1), TransportLevel(1),
-		ResourceProspected(false), Port(false), Worked(false),
+		ResourceProspected(false), Port(false), Worked(false), AiProcessing(false),
 		Province(NULL), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
@@ -92,6 +92,7 @@ public:
 	void GenerateCulturalName(int old_civilization_id = -1, int civilization_id = -1);
 	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
 	int GetResourceIncome(bool ignore_transport_level = false);
+	bool AiBuildPathway(int pathway);									/// Tells the AI to try to build a pathway in the tile, returns true if succeeded, false if didn't
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	bool CanBuildPathway(int pathway, int direction, bool check_costs);
@@ -106,6 +107,7 @@ public:
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	bool Port;								/// Whether the tile has a port
 	bool Worked;							/// Whether the tile is worked by a worker
+	bool AiProcessing;						/// Whether the AI is doing something to this tile at the moment
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	CGrandStrategyProvince *Province;		/// Province to which the tile belongs
 	CGraphic *BaseTile;
@@ -244,6 +246,7 @@ public:
 		}
 	}
 	
+	void AiDoTurn();						/// Process the grand strategy turn for an AI faction
 	void SetTechnology(int upgrade_id, bool has_technology, bool secondary_setting = false);
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
@@ -263,6 +266,7 @@ public:
 	bool HasGovernmentPosition(int title);
 	bool CanHaveSuccession(int title, bool family_inheritance);
 	bool IsConquestDesirable(CGrandStrategyProvince *province);
+	bool CanBuildPathway(int pathway, bool check_costs);
 	int GetAdministrativeEfficiencyModifier();
 	int GetProductionEfficiencyModifier(int resource);
 	int GetRevoltRiskModifier();
