@@ -405,13 +405,13 @@ void UpdateDisplay()
 			if (UI.MapArea.Contains(CursorScreenPos) && GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y] && !GrandStrategyGamePaused) {
 				GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
 				
-				int province_id = GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province;
-				if (province_id != -1 && province_id != GrandStrategyGame.SelectedProvince) {
+				CGrandStrategyProvince *province = GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province;
+				if (province != NULL && province->ID != GrandStrategyGame.SelectedProvince) {
 					if (GrandStrategyGame.SelectedUnits.size() > 0 || !SelectedHero.empty()) {
 						std::string tooltip;
-						if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->CanAttackProvince(GrandStrategyGame.Provinces[province_id])) {
+						if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->CanAttackProvince(province)) {
 							if (
-								GrandStrategyGame.Provinces[province_id]->Owner == NULL
+								province->Owner == NULL
 								&& GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->OwnedProvinces.size() == 1
 								&& PlayerRaces.Factions[GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->Civilization][GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->Faction]->Type == "tribe"
 							) {
@@ -419,11 +419,11 @@ void UpdateDisplay()
 							} else {
 								tooltip += "Attack ";
 							}
-						} else if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == GrandStrategyGame.Provinces[province_id]->Owner) {
+						} else if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == province->Owner) {
 							tooltip += "Move units to ";
 						}
 						if (!tooltip.empty()) {
-							tooltip += GrandStrategyGame.Provinces[province_id]->GetCulturalName();
+							tooltip += province->GetCulturalName();
 							DrawGenericPopup(tooltip, CursorScreenPos.x, CursorScreenPos.y);
 						}
 					}

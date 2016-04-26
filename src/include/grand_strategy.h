@@ -52,6 +52,7 @@
 #define BasePopulationGrowthPermyriad 12					/// Base population growth per 10,000
 #define FoodConsumptionPerWorker 100
 
+class CGrandStrategyProvince;
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
 
@@ -72,9 +73,9 @@ class GrandStrategyWorldMapTile : public WorldMapTile
 {
 public:
 	GrandStrategyWorldMapTile() : WorldMapTile(),
-		Terrain(-1), Province(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
+		Terrain(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
 		ResourceProspected(false), Port(false), Worked(false),
-		BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
+		Province(NULL), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
 		memset(River, -1, sizeof(River));
@@ -85,6 +86,7 @@ public:
 	void UpdateMinimap();
 	void SetResourceProspected(int resource_id, bool discovered);
 	void SetPathway(int pathway, int direction, bool secondary_setting = false);
+	void BuildPathway(int pathway, int direction);
 	void SetPort(bool has_port);
 	void GenerateCulturalName(int old_civilization_id = -1, int civilization_id = -1);
 	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
@@ -94,7 +96,6 @@ public:
 	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
 	int Terrain;							/// Tile terrain (i.e. plains)
-	int Province;							/// Province to which the tile belongs
 	int BaseTileVariation;					/// Base tile variation
 	int Variation;							/// Tile variation
 	int Resource;							/// The tile's resource, if any
@@ -102,6 +103,7 @@ public:
 	bool Port;								/// Whether the tile has a port
 	bool Worked;							/// Whether the tile is worked by a worker
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
+	CGrandStrategyProvince *Province;		/// Province to which the tile belongs
 	CGraphic *BaseTile;
 	CGraphic *GraphicTile;					/// The tile image used by this tile
 	CGraphic *ResourceBuildingGraphics;
@@ -161,7 +163,7 @@ public:
 	bool HasModifier(CUpgrade *modifier);
 	bool HasFactionClaim(int civilization_id, int faction_id);
 	bool HasResource(int resource, bool ignore_prospection = false);
-	bool BordersProvince(int province_id);
+	bool BordersProvince(CGrandStrategyProvince *province);
 	bool HasSecondaryBorderThroughWaterWith(CGrandStrategyProvince *province);
 	bool BordersFaction(int faction_civilization, int faction, bool check_through_water = false);
 	bool CanAttackProvince(CGrandStrategyProvince *province);
@@ -202,7 +204,7 @@ public:
 	int AttackingUnits[UnitTypeMax];									/// Quantity of units of a particular unit type attacking the province
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
 	std::vector<CGrandStrategyHero *> ActiveHeroes;						/// Active (can move, attack and defend) heroes in the province
-	std::vector<int> BorderProvinces;									/// Which provinces this province borders
+	std::vector<CGrandStrategyProvince *> BorderProvinces;				/// Which provinces this province borders
 	int Income[MaxCosts];												/// Income for each resource.
 	int ProductionCapacity[MaxCosts];									/// The province's capacity to produce each resource (1 for each unit of base output)
 	int ProductionCapacityFulfilled[MaxCosts];							/// How much of the province's production capacity for each resource is actually fulfilled

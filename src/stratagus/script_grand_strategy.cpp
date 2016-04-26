@@ -78,11 +78,7 @@ static int CclSetGrandStrategyTileData(lua_State *l)
 			LuaError(l, "Direction \"%s\" doesn't exist." _C_ direction_name.c_str());
 		}
 		
-		if (pathway != -1 && direction != -1) {
-			GrandStrategyGame.CurrentPathwayConstructions[std::pair<int,int>(tile_pos.x, tile_pos.y)] = std::pair<int,int>(pathway, direction);
-		} else {
-			GrandStrategyGame.CurrentPathwayConstructions.erase(std::pair<int,int>(tile_pos.x, tile_pos.y));
-		}
+		tile->BuildPathway(pathway, direction);
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
