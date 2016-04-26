@@ -546,12 +546,12 @@ void CGrandStrategyGame::DrawInterface()
 	
 	int item_y = 0;
 	
-	if (this->SelectedProvince != -1) {
+	if (this->SelectedProvince != NULL) {
 		std::string interface_state_name;
 		
 		if (GrandStrategyInterfaceState == "Province") {
 			//draw show heroes button
-			if (GrandStrategyGame.Provinces[this->SelectedProvince]->ActiveHeroes.size() > 0 && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner == this->PlayerFaction && UI.GrandStrategyShowHeroesButton.X != -1) {
+			if (this->SelectedProvince->ActiveHeroes.size() > 0 && this->SelectedProvince->Owner != NULL && this->SelectedProvince->Owner == this->PlayerFaction && UI.GrandStrategyShowHeroesButton.X != -1) {
 				DrawUIButton(
 					UI.GrandStrategyShowHeroesButton.Style,
 					(UI.GrandStrategyShowHeroesButton.Contains(CursorScreenPos) ? MI_FLAGS_ACTIVE : 0) |
@@ -561,22 +561,22 @@ void CGrandStrategyGame::DrawInterface()
 				);
 			}
 		} else if (GrandStrategyInterfaceState == "town-hall" || GrandStrategyInterfaceState == "stronghold") {
-			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization != -1) {
-				std::string province_culture_string = "Province Culture: " + PlayerRaces.Adjective[GrandStrategyGame.Provinces[this->SelectedProvince]->Civilization];
+			if (this->SelectedProvince->Civilization != -1) {
+				std::string province_culture_string = "Province Culture: " + PlayerRaces.Adjective[this->SelectedProvince->Civilization];
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(province_culture_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), province_culture_string);
 				item_y += 1;
 			}
 			
-			std::string administrative_efficiency_string = "Administrative Efficiency: " + std::to_string((long long) 100 + GrandStrategyGame.Provinces[this->SelectedProvince]->GetAdministrativeEfficiencyModifier()) + "%";
+			std::string administrative_efficiency_string = "Administrative Efficiency: " + std::to_string((long long) 100 + this->SelectedProvince->GetAdministrativeEfficiencyModifier()) + "%";
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(administrative_efficiency_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), administrative_efficiency_string);
 			item_y += 1;
 			
-			std::string population_string = "Population: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetPopulation());
+			std::string population_string = "Population: " + std::to_string((long long) this->SelectedProvince->GetPopulation());
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(population_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), population_string);
 			item_y += 1;
 			
-			std::string food_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->PopulationGrowthProgress) + "/" + std::to_string((long long) PopulationGrowthThreshold);
-			int food_change = GrandStrategyGame.Provinces[this->SelectedProvince]->Income[GrainCost] + GrandStrategyGame.Provinces[this->SelectedProvince]->Income[MushroomCost] + GrandStrategyGame.Provinces[this->SelectedProvince]->Income[FishCost] - GrandStrategyGame.Provinces[this->SelectedProvince]->FoodConsumption;
+			std::string food_string = std::to_string((long long) this->SelectedProvince->PopulationGrowthProgress) + "/" + std::to_string((long long) PopulationGrowthThreshold);
+			int food_change = this->SelectedProvince->Income[GrainCost] + this->SelectedProvince->Income[MushroomCost] + this->SelectedProvince->Income[FishCost] - this->SelectedProvince->FoodConsumption;
 
 			if (food_change > 0) {
 				food_string += "+" + std::to_string((long long) food_change);
@@ -598,29 +598,29 @@ void CGrandStrategyGame::DrawInterface()
 				);
 			}
 		} else if (GrandStrategyInterfaceState == "barracks") {
-			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->GetRevoltRisk()) + "%";
+			std::string revolt_risk_string = "Revolt Risk: " + std::to_string((long long) this->SelectedProvince->GetRevoltRisk()) + "%";
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(revolt_risk_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), revolt_risk_string);
 			item_y += 1;
 		} else if (GrandStrategyInterfaceState == "lumber-mill" || GrandStrategyInterfaceState == "smithy") {
-			std::string labor_string = std::to_string((long long) GrandStrategyGame.Provinces[this->SelectedProvince]->Labor);
+			std::string labor_string = std::to_string((long long) this->SelectedProvince->Labor);
 			UI.Resources[LaborCost].G->DrawFrameClip(0, UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), true);
 			CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - ((GetGameFont().Width(labor_string) + 18) / 2) + 18, UI.InfoPanel.Y + 180 - 94 + (item_y * 23), labor_string);
 		} else if (GrandStrategyInterfaceState == "Ruler") {
 			interface_state_name = GrandStrategyInterfaceState;
 			
-			if (GrandStrategyGame.Provinces[this->SelectedProvince]->Owner != NULL && GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
-				interface_state_name = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->GetCharacterTitle(CharacterTitleHeadOfState, GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->Gender);
+			if (this->SelectedProvince->Owner != NULL && this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState] != NULL) {
+				interface_state_name = this->SelectedProvince->Owner->GetCharacterTitle(CharacterTitleHeadOfState, this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->Gender);
 			
-				std::string ruler_name_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->GetFullName();
+				std::string ruler_name_string = this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->GetFullName();
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_name_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_name_string);
 				item_y += 1;
 				
-				std::string ruler_type_string = "Type: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->Type->Name + " Trait: " + GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->Trait->Name;
+				std::string ruler_type_string = "Type: " + this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->Type->Name + " Trait: " + this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->Trait->Name;
 				CLabel(GetGameFont()).Draw(UI.InfoPanel.X + ((218 - 6) / 2) - (GetGameFont().Width(ruler_type_string) / 2), UI.InfoPanel.Y + 180 - 94 + (item_y * 23), ruler_type_string);
 				item_y += 1;
 				
 				// draw ruler effects string
-				std::string ruler_effects_string = GrandStrategyGame.Provinces[this->SelectedProvince]->Owner->Ministers[CharacterTitleHeadOfState]->GetMinisterEffectsString(CharacterTitleHeadOfState);
+				std::string ruler_effects_string = this->SelectedProvince->Owner->Ministers[CharacterTitleHeadOfState]->GetMinisterEffectsString(CharacterTitleHeadOfState);
 				
 				int str_width_per_total_width = 1;
 				str_width_per_total_width += GetGameFont().Width(ruler_effects_string) / (218 - 6);
@@ -1348,6 +1348,47 @@ void CGrandStrategyGame::DoProspection()
 	}
 }
 
+void CGrandStrategyGame::SetSelectedProvince(CGrandStrategyProvince *province)
+{
+	if (province != this->SelectedProvince) {
+		// if the player has units selected and then selects an attackable province, set those units to attack the province
+		if (this->SelectedProvince != NULL && this->PlayerFaction != NULL && this->SelectedProvince->Owner == this->PlayerFaction && this->SelectedProvince->CanAttackProvince(province)) {
+			for (std::map<int, int>::iterator iterator = this->SelectedUnits.begin(); iterator != this->SelectedUnits.end(); ++iterator) {
+				province->AttackedBy = this->PlayerFaction;
+				province->ChangeAttackingUnitQuantity(iterator->first, iterator->second);
+				this->SelectedProvince->ChangeUnitQuantity(iterator->first, - iterator->second);
+			}
+			
+			if (!SelectedHero.empty()) {
+				province->AttackedBy = this->PlayerFaction;
+				province->SetHero(SelectedHero, 3);
+			}
+		} else if (this->SelectedProvince != NULL && this->PlayerFaction != NULL && this->SelectedProvince->Owner == province->Owner && this->SelectedProvince->Owner == this->PlayerFaction) {
+			for (std::map<int, int>::iterator iterator = this->SelectedUnits.begin(); iterator != this->SelectedUnits.end(); ++iterator) {
+				province->ChangeMovingUnitQuantity(iterator->first, iterator->second);
+				this->SelectedProvince->ChangeUnitQuantity(iterator->first, - iterator->second);
+			}
+			
+			if (!SelectedHero.empty() && GetProvinceHero(SelectedProvince->Name, SelectedHero) == 2) {
+				province->SetHero(SelectedHero, 1);
+			}
+		}
+
+		if (this->PlayerFaction != NULL) {
+			if (province != NULL && province->Owner != NULL && !province->Water && province->Owner != this->PlayerFaction) { // if is owned by a foreign faction, use diplomacy interface, if is a self owned province or an empty one, use the normal province interface
+				GrandStrategyInterfaceState = "Diplomacy";
+			} else {
+				GrandStrategyInterfaceState = "Province";
+			}
+		}
+		CclCommand("SelectedProvince = GetProvinceFromName(\"" + province->Name + "\");");
+		this->SelectedProvince = province;
+		SelectedHero = "";
+		this->SelectedUnits.clear();
+	}
+	CclCommand("DrawGrandStrategyInterface();");
+}
+
 void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource)
 {
 	if (abs(importer_faction.Trade[resource]) > exporter_faction.Trade[resource]) {
@@ -2030,6 +2071,23 @@ bool GrandStrategyWorldMapTile::HasResource(int resource, bool ignore_prospectio
 	return false;
 }
 
+bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction)
+{
+	if (pathway == PathwayRoad && (this->Province->Owner->Resources[GoldCost] < 200 || this->Province->Owner->Resources[WoodCost] < 200)) {
+		return false;
+	}
+	
+	if (this->Pathway[direction] >= pathway) {
+		return false;
+	}
+	
+	if (GrandStrategyGame.CurrentPathwayConstructions.find(std::pair<int,int>(this->Position.x, this->Position.y)) != GrandStrategyGame.CurrentPathwayConstructions.end()) {
+		return false;
+	}
+	
+	return true;
+}
+
 /**
 **  Get the tile's cultural name.
 */
@@ -2584,6 +2642,22 @@ void CGrandStrategyProvince::SetAttackingUnitQuantity(int unit_type_id, int quan
 void CGrandStrategyProvince::ChangeAttackingUnitQuantity(int unit_type_id, int quantity)
 {
 	this->SetAttackingUnitQuantity(unit_type_id, this->AttackingUnits[unit_type_id] + quantity);
+}
+
+void CGrandStrategyProvince::SetMovingUnitQuantity(int unit_type_id, int quantity)
+{
+	quantity = std::max(0, quantity);
+	
+	if (quantity > 0) {
+		this->Movement = true;
+	}
+		
+	this->MovingUnits[unit_type_id] = quantity;
+}
+
+void CGrandStrategyProvince::ChangeMovingUnitQuantity(int unit_type_id, int quantity)
+{
+	this->SetMovingUnitQuantity(unit_type_id, this->MovingUnits[unit_type_id] + quantity);
 }
 
 void CGrandStrategyProvince::SetPopulation(int quantity)
@@ -5862,10 +5936,7 @@ void SetProvinceMovingUnitQuantity(std::string province_name, std::string unit_t
 	int unit_type = UnitTypeIdByIdent(unit_type_ident);
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id] && unit_type != -1) {
-		if (quantity > 0) {
-			GrandStrategyGame.Provinces[province_id]->Movement = true;
-		}
-		GrandStrategyGame.Provinces[province_id]->MovingUnits[unit_type] = std::max(0, quantity);
+		GrandStrategyGame.Provinces[province_id]->SetMovingUnitQuantity(unit_type, quantity);
 	}
 }
 
@@ -5919,15 +5990,6 @@ void SetProvinceAttackedBy(std::string province_name, std::string civilization_n
 		} else {
 			GrandStrategyGame.Provinces[province_id]->AttackedBy = NULL;
 		}
-	}
-}
-
-void SetSelectedProvince(std::string province_name)
-{
-	int province_id = GetProvinceId(province_name);
-
-	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
-		GrandStrategyGame.SelectedProvince = province_id;
 	}
 }
 
@@ -6092,7 +6154,7 @@ void CleanGrandStrategyGame()
 	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
-	GrandStrategyGame.SelectedProvince = -1;
+	GrandStrategyGame.SelectedProvince = NULL;
 	GrandStrategyGame.SelectedTile.x = -1;
 	GrandStrategyGame.SelectedTile.y = -1;
 	GrandStrategyGame.SelectedUnits.clear();

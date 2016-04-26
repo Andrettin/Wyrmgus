@@ -406,20 +406,20 @@ void UpdateDisplay()
 				GrandStrategyGame.DrawTileTooltip(GrandStrategyGame.GetTileUnderCursor().x, GrandStrategyGame.GetTileUnderCursor().y);
 				
 				CGrandStrategyProvince *province = GrandStrategyGame.WorldMapTiles[GrandStrategyGame.GetTileUnderCursor().x][GrandStrategyGame.GetTileUnderCursor().y]->Province;
-				if (province != NULL && province->ID != GrandStrategyGame.SelectedProvince) {
+				if (province != NULL && province != GrandStrategyGame.SelectedProvince) {
 					if (GrandStrategyGame.SelectedUnits.size() > 0 || !SelectedHero.empty()) {
 						std::string tooltip;
-						if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->CanAttackProvince(province)) {
+						if (GrandStrategyGame.SelectedProvince->CanAttackProvince(province)) {
 							if (
 								province->Owner == NULL
-								&& GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->OwnedProvinces.size() == 1
-								&& PlayerRaces.Factions[GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->Civilization][GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner->Faction]->Type == "tribe"
+								&& GrandStrategyGame.SelectedProvince->Owner->OwnedProvinces.size() == 1
+								&& PlayerRaces.Factions[GrandStrategyGame.SelectedProvince->Owner->Civilization][GrandStrategyGame.SelectedProvince->Owner->Faction]->Type == "tribe"
 							) {
 								tooltip += "Migrate to ";
 							} else {
 								tooltip += "Attack ";
 							}
-						} else if (GrandStrategyGame.Provinces[GrandStrategyGame.SelectedProvince]->Owner == province->Owner) {
+						} else if (GrandStrategyGame.SelectedProvince->Owner == province->Owner) {
 							tooltip += "Move units to ";
 						}
 						if (!tooltip.empty()) {

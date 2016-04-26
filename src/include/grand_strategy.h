@@ -92,6 +92,7 @@ public:
 	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
+	bool CanBuildPathway(int pathway, int direction);
 	std::string GetCulturalName(int civilization = -1, int faction = -1, bool only_settlement = false);		/// Get the tile's cultural name.
 	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
@@ -147,6 +148,8 @@ public:
 	void ChangeUnitQuantity(int unit_type_id, int quantity);
 	void SetAttackingUnitQuantity(int unit_type_id, int quantity);
 	void ChangeAttackingUnitQuantity(int unit_type_id, int quantity);
+	void SetMovingUnitQuantity(int unit_type_id, int quantity);
+	void ChangeMovingUnitQuantity(int unit_type_id, int quantity);
 	void SetPopulation(int quantity);
 	void SetHero(std::string hero_full_name, int value);
 	void AllocateLabor();
@@ -347,8 +350,8 @@ class CGrandStrategyGame
 {
 public:
 	CGrandStrategyGame() : 
-		WorldMapWidth(0), WorldMapHeight(0), SelectedProvince(-1), SelectedTile(-1, -1),
-		FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
+		WorldMapWidth(0), WorldMapHeight(0), SelectedTile(-1, -1),
+		SelectedProvince(NULL), FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
 		PlayerFaction(NULL)
 	{
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -395,6 +398,7 @@ public:
 	void DoTurn();							/// Process the grand strategy turn
 	void DoTrade();							/// Process trade deals
 	void DoProspection();					/// Process prospection for the turn
+	void SetSelectedProvince(CGrandStrategyProvince *province);	/// Set selected province
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
 	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
 	#if defined(USE_OPENGL) || defined(USE_GLES)
@@ -409,8 +413,8 @@ public:
 public:
 	int WorldMapWidth;
 	int WorldMapHeight;
-	int SelectedProvince;
 	Vec2i SelectedTile;
+	CGrandStrategyProvince *SelectedProvince;
 	CGraphic *FogTile;
 	CGraphic *SymbolMove;										///symbol that units are moving to the province (drawn at the settlement location)
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
@@ -536,7 +540,6 @@ extern void SetProvinceHero(std::string province_name, std::string hero_full_nam
 extern void SetProvinceFood(std::string province_name, int quantity);
 extern void ChangeProvinceFood(std::string province_name, int quantity);
 extern void SetProvinceAttackedBy(std::string province_name, std::string civilization_name, std::string faction_name);
-extern void SetSelectedProvince(std::string province_name);
 extern void AddProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void RemoveProvinceClaim(std::string province_name, std::string civilization_name, std::string faction_name);
 extern void UpdateProvinceMinimap(std::string province_name);
