@@ -167,4 +167,15 @@ int GetPathwayTransportLevel(int pathway)
 	return 0;
 }
 
+int GetTransportLevelMaximumCapacity(int transport_level)
+{
+	if (transport_level == 1) {
+		return 200;
+	} else if (transport_level == 2) {
+		return 1000;
+	}
+
+	return 0;
+}
+
 //@}

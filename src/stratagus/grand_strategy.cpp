@@ -689,18 +689,20 @@ void CGrandStrategyGame::DrawInterface()
 */
 void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 {
+	GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[x][y];
+	
 	std::string tile_tooltip;
 	
-	CGrandStrategyProvince *province = GrandStrategyGame.WorldMapTiles[x][y]->Province;
-	int res = GrandStrategyGame.WorldMapTiles[x][y]->Resource;
+	CGrandStrategyProvince *province = tile->Province;
+	int res = tile->Resource;
 	if (province != NULL && province->Owner != NULL && province->SettlementLocation.x == x && province->SettlementLocation.y == y && province->HasBuildingClass("town-hall")) {
 		tile_tooltip += "Settlement";
-		if (!GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
+		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
 			tile_tooltip += " of ";
-			tile_tooltip += GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName();
+			tile_tooltip += tile->GetCulturalName();
 		}
 		tile_tooltip += " (";
-		tile_tooltip += WorldMapTerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+		tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
 		tile_tooltip += ")";
 		if (province->ProductionCapacityFulfilled[FishCost] > 0 && province->Owner == GrandStrategyGame.PlayerFaction) {
 			tile_tooltip += " (COST_";
@@ -709,8 +711,8 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 			tile_tooltip += std::to_string((long long) province->Income[FishCost]);
 			tile_tooltip += ")";
 		}
-	} else if (res != -1 && GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected) {
-		if (!GrandStrategyGame.WorldMapTiles[x][y]->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
+	} else if (res != -1 && tile->ResourceProspected) {
+		if (!tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
 			tile_tooltip += "Unused ";
 		}
 		
@@ -730,23 +732,27 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 			tile_tooltip += "Mushroom Farm";
 		}
 		tile_tooltip += " (";
-		tile_tooltip += WorldMapTerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+		tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
 		tile_tooltip += ")";
-		if (GrandStrategyGame.WorldMapTiles[x][y]->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
+		if (tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
 			tile_tooltip += " (COST_";
 			tile_tooltip += std::to_string((long long) res);
 			tile_tooltip += " ";
-			tile_tooltip += std::to_string((long long) province->Income[res] / province->ProductionCapacityFulfilled[res]);
+			tile_tooltip += std::to_string((long long) tile->GetResourceIncome());
+			if (tile->GetResourceIncome() != tile->GetResourceIncome(true)) {
+				tile_tooltip += "/";
+				tile_tooltip += std::to_string((long long) tile->GetResourceIncome(true));
+			}
 			tile_tooltip += ")";
 		}
-	} else if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
-		if (!GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
-			tile_tooltip += GrandStrategyGame.WorldMapTiles[x][y]->GetCulturalName();
+	} else if (tile->Terrain != -1) {
+		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
+			tile_tooltip += tile->GetCulturalName();
 			tile_tooltip += " (";
-			tile_tooltip += WorldMapTerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
 			tile_tooltip += ")";
 		} else {
-			tile_tooltip += WorldMapTerrainTypes[GrandStrategyGame.WorldMapTiles[x][y]->Terrain]->Name;
+			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
 		}
 	} else {
 		tile_tooltip += "Unexplored";
@@ -757,24 +763,24 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		memset(tooltip_rivers, -1, sizeof(tooltip_rivers));
 		int tooltip_river_count = 0;
 		for (int i = 0; i < MaxDirections; ++i) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->River[i] != -1) {
+			if (tile->River[i] != -1) {
 				bool already_in_tooltip = false;
 				for (int j = 0; j < MaxDirections; ++j) {
 					if (tooltip_rivers[j] == -1) { //reached blank spot, no need to continue the loop
 						break;
 					}
 
-					if (tooltip_rivers[j] == GrandStrategyGame.WorldMapTiles[x][y]->River[i]) {
+					if (tooltip_rivers[j] == tile->River[i]) {
 						already_in_tooltip = true;
 						break;
 					}
 				}
 				if (!already_in_tooltip) {
-					tooltip_rivers[tooltip_river_count] = GrandStrategyGame.WorldMapTiles[x][y]->River[i];
+					tooltip_rivers[tooltip_river_count] = tile->River[i];
 					tooltip_river_count += 1;
 					tile_tooltip += " (";
-					if (!GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->GetCulturalName(province->Civilization).empty()) {
-						tile_tooltip += GrandStrategyGame.Rivers[GrandStrategyGame.WorldMapTiles[x][y]->River[i]]->GetCulturalName(province->Civilization) + " ";
+					if (!GrandStrategyGame.Rivers[tile->River[i]]->GetCulturalName(province->Civilization).empty()) {
+						tile_tooltip += GrandStrategyGame.Rivers[tile->River[i]]->GetCulturalName(province->Civilization) + " ";
 					}
 					tile_tooltip += "River";
 					tile_tooltip += ")";
@@ -788,29 +794,29 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		memset(tooltip_pathways, -1, sizeof(tooltip_pathways));
 		int tooltip_pathway_count = 0;
 		for (int i = 0; i < MaxDirections; ++i) {
-			if (GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] != -1) {
+			if (tile->Pathway[i] != -1) {
 				bool already_in_tooltip = false;
 				for (int j = 0; j < MaxDirections; ++j) {
 					if (tooltip_pathways[j] == -1) { //reached blank spot, no need to continue the loop
 						break;
 					}
 
-					if (tooltip_pathways[j] == GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i]) {
+					if (tooltip_pathways[j] == tile->Pathway[i]) {
 						already_in_tooltip = true;
 						break;
 					}
 				}
 				if (!already_in_tooltip) {
-					tooltip_pathways[tooltip_pathway_count] = GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i];
+					tooltip_pathways[tooltip_pathway_count] = tile->Pathway[i];
 					tooltip_pathway_count += 1;
-					tile_tooltip += " (" + CapitalizeString(GetPathwayNameById(GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i])) + ")";
+					tile_tooltip += " (" + CapitalizeString(GetPathwayNameById(tile->Pathway[i])) + ")";
 				}
 			}
 		}
 	}
 
 	/*
-	if (GrandStrategyGame.WorldMapTiles[x][y]->Port) { //deactivated for now, since there aren't proper port graphics yet
+	if (tile->Port) { //deactivated for now, since there aren't proper port graphics yet
 		tile_tooltip += " (";
 		tile_tooltip += "Port";
 		tile_tooltip += ")";
@@ -831,6 +837,11 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	tile_tooltip += ", ";
 	tile_tooltip += std::to_string((long long) y);
 	tile_tooltip += ")";
+	
+	if (province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
+		tile_tooltip += "\nTransport Level: ";
+		tile_tooltip += std::to_string((long long) tile->TransportLevel);
+	}
 
 	if (!Preference.NoStatusLineTooltips) {
 		CLabel(GetGameFont()).Draw(UI.StatusLine.TextX, UI.StatusLine.TextY, tile_tooltip);
@@ -854,7 +865,7 @@ void CGrandStrategyGame::DoTurn()
 			if (this->Factions[i][j]->IsAlive()) {
 				//faction income
 				for (int k = 0; k < MaxCosts; ++k) {
-					if (k == GrainCost || k == MushroomCost || k == FishCost || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
+					if (GrandStrategyGame.IsFoodResource(k) || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
 						continue;
 					} else if (k == ResearchCost || k == LeadershipCost) {
 						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->OwnedProvinces.size();
@@ -1148,7 +1159,7 @@ void CGrandStrategyGame::DoTrade()
 				for (size_t k = 0; k < this->Factions[i][j]->OwnedProvinces.size(); ++k) {
 					int province_id = this->Factions[i][j]->OwnedProvinces[k];
 					for (int res = 0; res < MaxCosts; ++res) {
-						if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost || res == LeadershipCost) {
+						if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 							continue;
 						}
 							
@@ -1196,7 +1207,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost || res == LeadershipCost) {
+				if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 					continue;
 				}
 				
@@ -1236,7 +1247,7 @@ void CGrandStrategyGame::DoTrade()
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost || res == LeadershipCost) {
+							if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 								continue;
 							}
 							
@@ -1261,7 +1272,7 @@ void CGrandStrategyGame::DoTrade()
 	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || res == GrainCost || res == MushroomCost || res == FishCost || res == LeadershipCost) {
+		if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 			continue;
 		}
 		
@@ -1291,7 +1302,7 @@ void CGrandStrategyGame::DoTrade()
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == GoldCost || i == SilverCost || i == CopperCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || i == GrainCost || i == MushroomCost || i == FishCost || i == LeadershipCost) {
+			if (i == GoldCost || i == SilverCost || i == CopperCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || GrandStrategyGame.IsFoodResource(i) || i == LeadershipCost) {
 				continue;
 			}
 		
@@ -1485,6 +1496,16 @@ bool CGrandStrategyGame::IsPointOnMap(int x, int y)
 		return false;
 	}
 	return true;
+}
+
+bool CGrandStrategyGame::IsTileResource(int resource)
+{
+	return resource == GoldCost || resource == SilverCost || resource == CopperCost || resource == WoodCost || resource == StoneCost || resource == GrainCost || resource == MushroomCost;
+}
+
+bool CGrandStrategyGame::IsFoodResource(int resource)
+{
+	return resource == GrainCost || resource == MushroomCost || resource == FishCost;
 }
 
 bool CGrandStrategyGame::TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b)
@@ -1775,30 +1796,31 @@ void GrandStrategyWorldMapTile::SetPort(bool has_port)
 void GrandStrategyWorldMapTile::SetPathway(int pathway, int direction, bool secondary_setting)
 {
 	this->Pathway[direction] = pathway;
+	this->SetTransportLevel(GetPathwayTransportLevel(pathway));
 		
-	if (!secondary_setting) {
-		int x_offset = 0;
-		int y_offset = 0;
+	int x_offset = 0;
+	int y_offset = 0;
 			
-		if (direction == North || direction == Northwest || direction == Northeast) {
-			y_offset = -1;
-		} else if (direction == South || direction == Southwest || direction == Southeast) {
-			y_offset = 1;
-		}
-		if (direction == West || direction == Northwest || direction == Southwest) {
-			x_offset = -1;
-		} else if (direction == East || direction == Northeast || direction == Southeast) {
-			x_offset = 1;
-		}
+	if (direction == North || direction == Northwest || direction == Northeast) {
+		y_offset = -1;
+	} else if (direction == South || direction == Southwest || direction == Southeast) {
+		y_offset = 1;
+	}
+	if (direction == West || direction == Northwest || direction == Southwest) {
+		x_offset = -1;
+	} else if (direction == East || direction == Northeast || direction == Southeast) {
+		x_offset = 1;
+	}
 			
-		if (GrandStrategyGame.IsPointOnMap(this->Position.x + x_offset, this->Position.y + y_offset)) {
+	if (GrandStrategyGame.IsPointOnMap(this->Position.x + x_offset, this->Position.y + y_offset)) {
+		if (!secondary_setting) {
 			GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->SetPathway(pathway, GetReverseDirection(direction), true);
+		}
 			
-			if (
-				this->Province != GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province
-			) {
-				this->Province->SetBorderProvinceConnectionTransportLevel(GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province, GetPathwayTransportLevel(pathway));
-			}
+		if (
+			this->Province != GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province
+		) {
+			this->Province->SetBorderProvinceConnectionTransportLevel(GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province, GetPathwayTransportLevel(pathway));
 		}
 	}
 }
@@ -1820,6 +1842,15 @@ void GrandStrategyWorldMapTile::BuildPathway(int pathway, int direction)
 	}
 }
 
+void GrandStrategyWorldMapTile::SetTransportLevel(int transport_level)
+{
+	if (this->TransportLevel < transport_level) {
+		this->TransportLevel = transport_level;
+		if (this->Resource != -1 && this->ResourceProspected) {
+			this->Province->CalculateIncome(this->Resource);
+		}
+	}
+}
 void GrandStrategyWorldMapTile::GenerateCulturalName(int old_civilization_id, int civilization_id)
 {
 	if (this->Province == NULL || this->Province->Civilization == -1 || this->Terrain == -1) {
@@ -2072,6 +2103,22 @@ std::string GrandStrategyWorldMapTile::GenerateSettlementName(int civilization, 
 	}
 }
 
+int GrandStrategyWorldMapTile::GetResourceIncome(bool ignore_transport_level)
+{
+	int income = 0;
+	
+	if (this->Resource != -1 && this->ResourceProspected && this->Worked) {
+		income += DefaultResourceOutputs[this->Resource];
+		income *= 100 + this->Province->GetProductionEfficiencyModifier(this->Resource);
+		income /= 100;
+		if (!ignore_transport_level && income > GetTransportLevelMaximumCapacity(this->TransportLevel)) {
+			income = GetTransportLevelMaximumCapacity(this->TransportLevel);
+		}
+	}
+	
+	return income;
+}
+
 bool GrandStrategyWorldMapTile::IsWater()
 {
 	if (this->Terrain != -1) {
@@ -2126,6 +2173,10 @@ bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction, bool
 		|| GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Terrain == -1
 		|| GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->Province->Water
 	) {
+		return false;
+	}
+	
+	if (this->TransportLevel < GetPathwayTransportLevel(pathway) && GrandStrategyGame.WorldMapTiles[this->Position.x + x_offset][this->Position.y + y_offset]->TransportLevel < GetPathwayTransportLevel(pathway)) { // can only build pathways if connected to the settlement
 		return false;
 	}
 	
@@ -2528,6 +2579,7 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	//recalculate the faction incomes if a town hall or a building that provides research was constructed
 	if (this->Owner != NULL) {
 		if (UnitTypes[building_id]->Class == "town-hall") {
+			GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->TransportLevel = 2;
 			this->CalculateIncomes();
 		} else if (UnitTypes[building_id]->Class == "barracks") {
 			this->CalculateIncome(LeadershipCost);
@@ -2823,7 +2875,6 @@ void CGrandStrategyProvince::AllocateLaborToResource(int resource)
 		int employment_change = std::min(this->Labor / DefaultResourceLaborInputs[resource], this->ProductionCapacity[resource] - ProductionCapacityFulfilled[resource]);
 		this->Labor -= employment_change * DefaultResourceLaborInputs[resource];
 		ProductionCapacityFulfilled[resource] += employment_change;
-		this->CalculateIncome(resource);
 		
 		//set new worked tiles
 		int new_worked_tiles = employment_change;
@@ -2838,6 +2889,8 @@ void CGrandStrategyProvince::AllocateLaborToResource(int resource)
 				break;
 			}
 		}	
+		
+		this->CalculateIncome(resource);
 	}
 	
 	//recalculate food consumption (workers employed in producing food don't need to consume food)
@@ -2921,10 +2974,19 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 		income *= 100 + this->GetProductionEfficiencyModifier(resource);
 		income /= 100;
 	} else {
-		if (this->ProductionCapacityFulfilled[resource] > 0) {
-			income += DefaultResourceOutputs[resource] * this->ProductionCapacityFulfilled[resource];
-			income *= 100 + this->GetProductionEfficiencyModifier(resource);
-			income /= 100;
+		if (GrandStrategyGame.IsTileResource(resource)) {
+			for (size_t i = 0; i < this->ResourceTiles[resource].size(); ++i) {
+				int x = this->ResourceTiles[resource][i].x;
+				int y = this->ResourceTiles[resource][i].y;
+				
+				income += GrandStrategyGame.WorldMapTiles[x][y]->GetResourceIncome();
+			}
+		} else {
+			if (this->ProductionCapacityFulfilled[resource] > 0) {
+				income += DefaultResourceOutputs[resource] * this->ProductionCapacityFulfilled[resource];
+				income *= 100 + this->GetProductionEfficiencyModifier(resource);
+				income /= 100;
+			}
 		}
 	}
 	
@@ -3255,7 +3317,7 @@ int CGrandStrategyProvince::GetProductionEfficiencyModifier(int resource)
 	
 	modifier += this->ProductionEfficiencyModifier[resource];
 
-	if (resource != GrainCost && resource != MushroomCost && resource != FishCost) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
+	if (!GrandStrategyGame.IsFoodResource(resource)) { //food resources don't lose production efficiency if administrative efficiency is lower than 100%, to prevent provinces from starving when conquered
 		modifier += this->GetAdministrativeEfficiencyModifier();
 	}
 
@@ -6124,6 +6186,7 @@ void CleanGrandStrategyGame()
 				GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
 				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
+				GrandStrategyGame.WorldMapTiles[x][y]->TransportLevel = 1;
 				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Port = false;
 				GrandStrategyGame.WorldMapTiles[x][y]->Worked = false;

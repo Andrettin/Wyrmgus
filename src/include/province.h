@@ -184,6 +184,7 @@ extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern std::string GetPathwayNameById(int pathway);
 extern int GetPathwayIdByName(std::string pathway);
 extern int GetPathwayTransportLevel(int pathway);
+extern int GetTransportLevelMaximumCapacity(int transport_level);
 extern void ProvinceCclRegister();
 
 //@}

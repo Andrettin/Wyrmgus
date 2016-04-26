@@ -73,7 +73,7 @@ class GrandStrategyWorldMapTile : public WorldMapTile
 {
 public:
 	GrandStrategyWorldMapTile() : WorldMapTile(),
-		Terrain(-1), BaseTileVariation(-1), Variation(-1), Resource(-1),
+		Terrain(-1), BaseTileVariation(-1), Variation(-1), Resource(-1), TransportLevel(1),
 		ResourceProspected(false), Port(false), Worked(false),
 		Province(NULL), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
@@ -87,9 +87,11 @@ public:
 	void SetResourceProspected(int resource_id, bool discovered);
 	void SetPathway(int pathway, int direction, bool secondary_setting = false);
 	void BuildPathway(int pathway, int direction);
+	void SetTransportLevel(int transport_level);
 	void SetPort(bool has_port);
 	void GenerateCulturalName(int old_civilization_id = -1, int civilization_id = -1);
 	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
+	int GetResourceIncome(bool ignore_transport_level = false);
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	bool CanBuildPathway(int pathway, int direction, bool check_costs);
@@ -100,6 +102,7 @@ public:
 	int BaseTileVariation;					/// Base tile variation
 	int Variation;							/// Tile variation
 	int Resource;							/// The tile's resource, if any
+	int TransportLevel;						/// Transport level of the tile to the capital settlement of its province
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	bool Port;								/// Whether the tile has a port
 	bool Worked;							/// Whether the tile is worked by a worker
@@ -409,6 +412,8 @@ public:
 	#endif
 	void UpdateMinimap();
 	bool IsPointOnMap(int x, int y);
+	bool IsTileResource(int resource);
+	bool IsFoodResource(int resource);
 	bool TradePriority(CGrandStrategyFaction &faction_a, CGrandStrategyFaction &faction_b);
 	Vec2i GetTileUnderCursor();
 	CGrandStrategyHero *GetHero(std::string hero_full_name);
