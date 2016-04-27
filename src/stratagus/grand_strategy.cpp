@@ -2344,12 +2344,23 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	if (this->Owner != NULL) { //if province has a previous owner, remove it from the owner's province list
 		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
 
-		if (GrandStrategyGameInitialized && this->Owner->Capital == this) { // if this was the old owner's capital province, set a random one of the provinces it still has remaining as the capital if it still has territory, set the capital to NULL otherwise
-			if (this->Owner->OwnedProvinces.size() > 0) {
-				int new_capital_province_id = this->Owner->OwnedProvinces[SyncRand(this->Owner->OwnedProvinces.size())];
-				this->Owner->SetCapital(GrandStrategyGame.Provinces[new_capital_province_id]);
-			} else {
-				this->Owner->SetCapital(NULL);
+		if (GrandStrategyGameInitialized) {
+			if (this->Owner->Capital == this) { // if this was the old owner's capital province, set a random one of the provinces it still has remaining as the capital if it still has territory, set the capital to NULL otherwise
+				if (this->Owner->OwnedProvinces.size() > 0) {
+					this->Owner->SetCapital(this->Owner->GetRandomProvinceWeightedByPopulation());
+				} else {
+					this->Owner->SetCapital(NULL);
+				}
+			}
+			
+			for (int i = 0; i < MaxCharacterTitles; ++i) {
+				if (IsMinisterialTitle(i) && this->Owner->Ministers[i] != NULL && this->Owner->Ministers[i]->Province == this) { // if any ministers of the old owner are in this province, move them to another province they own, or kill them off if none are available
+					if (this->Owner->OwnedProvinces.size() > 0) {
+						this->Owner->GetRandomProvinceWeightedByPopulation()->SetHero(this->Owner->Ministers[i]->GetFullName(), this->Owner->Ministers[i]->State);
+					} else {
+						this->Owner->Ministers[i]->Die();
+					}
+				}
 			}
 		}
 		
@@ -2846,8 +2857,8 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 	CGrandStrategyHero *hero = GrandStrategyGame.GetHero(hero_full_name);
 	if (hero) {
 		//update the hero
-		if (value == 0 || value == -1) {
-			hero->Die(value == -1);
+		if (value == 0) {
+			hero->Die();
 			return;
 		}
 		if (hero->Province != NULL) {
@@ -3082,7 +3093,7 @@ void CGrandStrategyProvince::SetGovernor(std::string hero_full_name)
 	}
 			
 	if (hero_full_name.empty()) {
-		if (this->Owner->CanHaveSuccession(CharacterTitleGovernor, true) && GrandStrategyGameInitialized && (this->Governor == NULL || !this->Governor->ViolentDeath)) { //if the governor died a violent death, wait until the next turn to replace him
+		if (this->Owner->CanHaveSuccession(CharacterTitleGovernor, true) && GrandStrategyGameInitialized) {
 			this->GovernorSuccession();
 		} else {
 			this->Governor = NULL;
@@ -4156,7 +4167,7 @@ void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 	}
 			
 	if (hero_full_name.empty()) {
-		if (this->CanHaveSuccession(title, true) && GrandStrategyGameInitialized && (this->Ministers[title] == NULL || !this->Ministers[title]->ViolentDeath)) { //if the minister died a violent death, wait until the next turn to replace him
+		if (this->CanHaveSuccession(title, true) && GrandStrategyGameInitialized) { //if the minister died a violent death, wait until the next turn to replace him
 			this->MinisterSuccession(title);
 		} else {
 			this->Ministers[title] = NULL;
@@ -4780,10 +4791,6 @@ void CGrandStrategyHero::Create()
 
 void CGrandStrategyHero::Die()
 {
-	if (violent_death) {
-		this->ViolentDeath = true;
-	}
-	
 	//show message that the hero has died
 	if (GrandStrategyGameInitialized && this->IsVisible()) {
 		if (GrandStrategyGame.PlayerFaction != NULL && GrandStrategyGame.PlayerFaction->Ministers[CharacterTitleHeadOfState] == this) {
@@ -7128,8 +7135,7 @@ void FinalizeGrandStrategyInitialization()
 						}
 					}
 					if (GrandStrategyGame.Factions[i][j]->Capital == NULL) { // if has no capital preset, set a random province as the capital
-						int province_id = GrandStrategyGame.Factions[i][j]->OwnedProvinces[SyncRand(GrandStrategyGame.Factions[i][j]->OwnedProvinces.size())];
-						GrandStrategyGame.Factions[i][j]->SetCapital(GrandStrategyGame.Provinces[province_id]);
+						GrandStrategyGame.Factions[i][j]->SetCapital(GrandStrategyGame.Factions[i][j]->GetRandomProvinceWeightedByPopulation());
 					}
 				}
 				
