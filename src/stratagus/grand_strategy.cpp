@@ -2081,6 +2081,10 @@ void GrandStrategyWorldMapTile::GenerateFactionCulturalName(int civilization_id,
 
 bool GrandStrategyWorldMapTile::AiBuildPathway(int pathway)
 {
+	if (GrandStrategyGame.CurrentPathwayConstructions.find(std::pair<int,int>(this->Position.x, this->Position.y)) != GrandStrategyGame.CurrentPathwayConstructions.end()) { // already building a pathway here
+		return true;
+	}	
+	
 	this->AiProcessing = true;
 
 	for (int i = 0; i < MaxDirections; ++i) {
