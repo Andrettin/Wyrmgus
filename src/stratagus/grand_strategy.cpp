@@ -112,9 +112,10 @@ void CGrandStrategyGame::Clean()
 	}
 	
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+		for (size_t j = 0; j < this->Factions[i].size(); ++j) {
 			delete this->Factions[i][j];
 		}
+		this->Factions[i].clear();
 	}
 	
 	for (int i = 0; i < RiverMax; ++i) {
@@ -940,7 +941,7 @@ void CGrandStrategyGame::DoTurn()
 					}
 					if (possible_revolter_count > 0) {
 						int revolter_faction = possible_revolters[SyncRand(possible_revolter_count)];
-						this->Provinces[i]->AttackedBy = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[this->Provinces[i]->Civilization][revolter_faction]));
+						this->Provinces[i]->AttackedBy = GrandStrategyGame.Factions[this->Provinces[i]->Civilization][revolter_faction];
 							
 						int militia_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("militia"));
 						int spearman_id = this->Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("spearman"));
@@ -6261,33 +6262,8 @@ void CleanGrandStrategyGame()
 	for (int x = 0; x < WorldMapWidthMax; ++x) {
 		for (int y = 0; y < WorldMapHeightMax; ++y) {
 			if (GrandStrategyGame.WorldMapTiles[x][y]) {
-				GrandStrategyGame.WorldMapTiles[x][y]->Terrain = -1;
-				GrandStrategyGame.WorldMapTiles[x][y]->Province = NULL;
-				GrandStrategyGame.WorldMapTiles[x][y]->BaseTileVariation = -1;
-				GrandStrategyGame.WorldMapTiles[x][y]->Variation = -1;
-				GrandStrategyGame.WorldMapTiles[x][y]->Resource = -1;
-				GrandStrategyGame.WorldMapTiles[x][y]->TransportLevel = 1;
-				GrandStrategyGame.WorldMapTiles[x][y]->ResourceProspected = false;
-				GrandStrategyGame.WorldMapTiles[x][y]->Port = false;
-				GrandStrategyGame.WorldMapTiles[x][y]->Worked = false;
-				GrandStrategyGame.WorldMapTiles[x][y]->AiProcessing = false;
-				GrandStrategyGame.WorldMapTiles[x][y]->Name = "";
-				GrandStrategyGame.WorldMapTiles[x][y]->BaseTile = NULL;
-				GrandStrategyGame.WorldMapTiles[x][y]->GraphicTile = NULL;
-				GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphics = NULL;
-				GrandStrategyGame.WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor = NULL;
-				GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.clear();
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.clear();
-				GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.clear();
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.clear();
-				GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames.clear();
-				GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.clear();
-				for (int i = 0; i < MaxDirections; ++i) {
-					GrandStrategyGame.WorldMapTiles[x][y]->Borders[i] = false;
-					GrandStrategyGame.WorldMapTiles[x][y]->River[i] = -1;
-					GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[i] = -1;
-					GrandStrategyGame.WorldMapTiles[x][y]->Pathway[i] = -1;
-				}
+				delete GrandStrategyGame.WorldMapTiles[x][y];
+				GrandStrategyGame.WorldMapTiles[x][y] = NULL;
 			} else {
 				break;
 			}
@@ -6295,43 +6271,10 @@ void CleanGrandStrategyGame()
 	}
 		
 	for (int i = 0; i < MAX_RACES; ++i) {
-		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (GrandStrategyGame.Factions[i][j]) {
-				if (PlayerRaces.Factions[i][j]->Type == "tribe") {
-					GrandStrategyGame.Factions[i][j]->GovernmentType = -1;
-				} else if (PlayerRaces.Factions[i][j]->Type == "polity") {
-					GrandStrategyGame.Factions[i][j]->GovernmentType = GovernmentTypeMonarchy; //monarchy is the default government type for polities
-				}
-				GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
-				GrandStrategyGame.Factions[i][j]->CurrentResearch = -1;
-				GrandStrategyGame.Factions[i][j]->Upkeep = 0;
-				memset(GrandStrategyGame.Factions[i][j]->Ministers, 0, sizeof(GrandStrategyGame.Factions[i][j]->Ministers));
-				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
-					GrandStrategyGame.Factions[i][j]->Technologies[k] = false;
-				}
-				for (int k = 0; k < MaxCosts; ++k) {
-					GrandStrategyGame.Factions[i][j]->Resources[k] = 0;
-					GrandStrategyGame.Factions[i][j]->Income[k] = 0;
-					GrandStrategyGame.Factions[i][j]->ProductionEfficiencyModifier[k] = 0;
-					GrandStrategyGame.Factions[i][j]->Trade[k] = 0;
-				}
-				GrandStrategyGame.Factions[i][j]->OwnedProvinces.clear();
-				for (size_t k = 0; k < UnitTypes.size(); ++k) {
-					GrandStrategyGame.Factions[i][j]->MilitaryScoreBonus[k] = 0;
-				}
-				for (int k = 0; k < MAX_RACES; ++k) {
-					for (size_t n = 0; n < PlayerRaces.Factions[k].size(); ++n) {
-						GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] = DiplomacyStatePeace;
-						GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[k][n] = -1;
-					}
-				}
-				GrandStrategyGame.Factions[i][j]->Claims.clear();
-				for (int k = 0; k < MaxCharacterTitles; ++k) {
-					GrandStrategyGame.Factions[i][j]->HistoricalMinisters[k].clear();
-				}
-				GrandStrategyGame.Factions[i][j]->HistoricalTechnologies.clear();
-			}
+		for (size_t j = 0; j < GrandStrategyGame.Factions[i].size(); ++j) {
+			delete GrandStrategyGame.Factions[i][j];
 		}
+		GrandStrategyGame.Factions[i].clear();
 	}
 	
 	for (int i = 0; i < RiverMax; ++i) {
@@ -6694,24 +6637,18 @@ void InitializeGrandStrategyGame(bool show_loading)
 	//create grand strategy faction instances for all defined factions
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			if (!GrandStrategyGame.Factions[i][j]) { // no need to create a grand strategy instance for an already-created faction again
-				if (PlayerRaces.Factions[i][j] && !PlayerRaces.Factions[i][j]->Name.empty()) { //if the faction is defined
-					CGrandStrategyFaction *faction = new CGrandStrategyFaction;
-					GrandStrategyGame.Factions[i][j] = faction;
+			CGrandStrategyFaction *faction = new CGrandStrategyFaction;
+			GrandStrategyGame.Factions[i].push_back(faction);
 					
-					GrandStrategyGame.Factions[i][j]->Civilization = i;
-					GrandStrategyGame.Factions[i][j]->Faction = j;
-					GrandStrategyGame.Factions[i][j]->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
-				} else {
-					break;
-				}
-			}
+			faction->Civilization = i;
+			faction->Faction = j;
+			faction->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
 			
 			if (!PlayerRaces.CivilizationUpgrades[i].empty()) { //if faction's civilization has a civilization upgrade, apply it
-				GrandStrategyGame.Factions[i][j]->SetTechnology(UpgradeIdByIdent(PlayerRaces.CivilizationUpgrades[i]), true);
+				faction->SetTechnology(UpgradeIdByIdent(PlayerRaces.CivilizationUpgrades[i]), true);
 			}
 			if (!PlayerRaces.Factions[i][j]->FactionUpgrade.empty()) { //if faction has a faction upgrade, apply it
-				GrandStrategyGame.Factions[i][j]->SetTechnology(UpgradeIdByIdent(PlayerRaces.Factions[i][j]->FactionUpgrade), true);
+				faction->SetTechnology(UpgradeIdByIdent(PlayerRaces.Factions[i][j]->FactionUpgrade), true);
 			}
 		}
 	}

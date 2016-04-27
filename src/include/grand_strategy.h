@@ -229,7 +229,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), Upkeep(0)
+		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), Upkeep(0), Capital(NULL)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -282,6 +282,7 @@ public:
 	int FactionTier;													/// What is the tier of this faction (barony, etc.).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
 	int Upkeep;															/// How much gold this faction has to pay per turn
+	CGrandStrategyProvince *Capital;									/// Capital province of this faction
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
 	std::vector<int> OwnedProvinces;									/// Provinces owned by this faction
 	int Resources[MaxCosts];											/// Amount of each resource stored by the faction.
@@ -386,11 +387,6 @@ public:
 				WorldMapTiles[x][y] = NULL;
 			}
 		}
-		for (int i = 0; i < MAX_RACES; ++i) {
-			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				Factions[i][j] = NULL;
-			}
-		}
 		memset(BorderGraphics, 0, sizeof(BorderGraphics));
 		memset(SettlementGraphics, 0, sizeof(SettlementGraphics));
 		memset(BarracksGraphics, 0, sizeof(BarracksGraphics));
@@ -444,7 +440,7 @@ public:
 	GrandStrategyWorldMapTile *WorldMapTiles[WorldMapWidthMax][WorldMapHeightMax];
 	std::vector<CGrandStrategyProvince *> Provinces;
 	std::map<int, std::vector<CGrandStrategyProvince *>> CultureProvinces;	/// provinces belonging to each culture
-	CGrandStrategyFaction *Factions[MAX_RACES][FactionMax];
+	std::vector<CGrandStrategyFaction *> Factions[MAX_RACES];
 	CRiver *Rivers[RiverMax];
 	std::vector<CGrandStrategyHero *> Heroes;
 	std::vector<CUpgrade *> UnpublishedWorks;
