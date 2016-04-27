@@ -316,9 +316,14 @@ void CPlayer::Load(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
+			//Wyrmgus start
+//			if (subargs != MaxCosts) {
+//				LuaError(l, "Wrong number of speed-resource-harvest: %d" _C_ subargs);
+//			}
 			if (subargs != MaxCosts) {
-				LuaError(l, "Wrong number of speed-resource-harvest: %d" _C_ subargs);
+				fprintf(stderr, "Wrong number of speed-resource-harvest: %d.\n", subargs);
 			}
+			//Wyrmgus end
 			for (int k = 0; k < subargs; ++k) {
 				this->SpeedResourcesHarvest[k] = LuaToNumber(l, j + 1, k + 1);
 			}
@@ -327,9 +332,14 @@ void CPlayer::Load(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
+			//Wyrmgus start
+//			if (subargs != MaxCosts) {
+//				LuaError(l, "Wrong number of speed-resource-harvest: %d" _C_ subargs);
+//			}
 			if (subargs != MaxCosts) {
-				LuaError(l, "Wrong number of speed-resource-harvest: %d" _C_ subargs);
+				fprintf(stderr, "Wrong number of speed-resource-return: %d.\n", subargs);
 			}
+			//Wyrmgus end
 			for (int k = 0; k < subargs; ++k) {
 				this->SpeedResourcesReturn[k] = LuaToNumber(l, j + 1, k + 1);
 			}

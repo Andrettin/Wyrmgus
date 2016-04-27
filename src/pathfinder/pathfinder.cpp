@@ -113,6 +113,13 @@ void TerrainTraversal::PushNeighboor(const Vec2i &pos)
 void TerrainTraversal::PushUnitPosAndNeighboor(const CUnit &unit)
 {
 	const CUnit *startUnit = GetFirstContainer(unit);
+	//Wyrmgus start
+	if (startUnit == NULL) {
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighboor() error: startUnit is NULL.\n");
+	} else if (startUnit->Type == NULL) {
+		fprintf(stderr, "TerrainTraversal::PushUnitPosAndNeighboor() error: startUnit's \"%s\" (ID %d) (%d, %d) type is NULL.\n", startUnit->Name.c_str(), UnitNumber(*startUnit), startUnit->tilePos.x, startUnit->tilePos.y);
+	}
+	//Wyrmgus end
 	const Vec2i offset(1, 1);
 	const Vec2i extraTileSize(startUnit->Type->TileWidth - 1, startUnit->Type->TileHeight - 1);
 	const Vec2i start = startUnit->tilePos - offset;
