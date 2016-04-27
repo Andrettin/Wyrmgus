@@ -229,7 +229,7 @@ class CGrandStrategyFaction
 {
 public:
 	CGrandStrategyFaction() :
-		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), CurrentResearch(-1), Upkeep(0), Capital(NULL)
+		Faction(-1), Civilization(-1), FactionTier(FactionTierBarony), GovernmentType(GovernmentTypeMonarchy), CurrentResearch(-1), Upkeep(0), Capital(NULL)
 	{
 		memset(Technologies, 0, sizeof(Technologies));
 		memset(Resources, 0, sizeof(Resources));
@@ -256,6 +256,7 @@ public:
 	void SplitOffFaction(CGrandStrategyFaction *faction);
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
+	void SetCapital(CGrandStrategyProvince *province);
 	void SetMinister(int title, std::string hero_full_name);
 	void MinisterSuccession(int title);
 	void GenerateMinister(int title, bool child_of_current_minister = false);
@@ -362,7 +363,7 @@ class CGrandStrategyGame
 public:
 	CGrandStrategyGame() : 
 		WorldMapWidth(0), WorldMapHeight(0), SelectedTile(-1, -1),
-		SelectedProvince(NULL), FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
+		SelectedProvince(NULL), FogTile(NULL), SymbolMove(NULL), SymbolAttack(NULL), SymbolCapital(NULL), SymbolHero(NULL), SymbolResourceNotWorked(NULL),
 		PlayerFaction(NULL)
 	{
 		for (int i = 0; i < MaxCosts; ++i) {
@@ -426,6 +427,7 @@ public:
 	CGraphic *FogTile;
 	CGraphic *SymbolMove;										///symbol that units are moving to the province (drawn at the settlement location)
 	CGraphic *SymbolAttack;										///symbol that a province is being attacked (drawn at the settlement location)
+	CGraphic *SymbolCapital;									///symbol that the province is its owner's capital (drawn at the settlement location)
 	CGraphic *SymbolHero;										///symbol that a hero is present in the province (drawn at the settlement location)
 	CGraphic *SymbolResourceNotWorked;							///symbol that a resource is not being worked
 	CGraphic *BorderGraphics[MaxDirections];					///one for each direction

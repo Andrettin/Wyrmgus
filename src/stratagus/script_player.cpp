@@ -50,6 +50,9 @@
 #include "item.h"
 //Wyrmgus end
 #include "map.h"
+//Wyrmgus start
+#include "province.h"
+//Wyrmgus end
 #include "script.h"
 #include "unittype.h"
 #include "unit.h"
@@ -1634,6 +1637,21 @@ static int CclDefineFaction(lua_State *l)
 					LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
 				}
 				faction->HistoricalTiers[year] = faction_tier;
+			}
+		} else if (!strcmp(value, "HistoricalCapitals")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string province_name = LuaToString(l, -1, j + 1);
+				CProvince *province = GetProvince(province_name);
+				if (province == NULL) {
+					LuaError(l, "Province \"%s\" doesn't exist." _C_ province_name.c_str());
+				}
+				faction->HistoricalCapitals[year] = province;
 			}
 		} else if (!strcmp(value, "Mod")) {
 			faction->Mod = LuaToString(l, -1);

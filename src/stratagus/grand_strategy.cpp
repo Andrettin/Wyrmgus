@@ -307,6 +307,10 @@ void CGrandStrategyGame::DrawMap()
 						this->SymbolMove->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
 					
+					if (province->Owner != NULL && province->Owner->Capital == province && province->SettlementLocation.x == x && province->SettlementLocation.y == y) {
+						this->SymbolCapital->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+					}
+					
 					if (province->ActiveHeroes.size() > 0 && province->Owner != NULL && province->Owner == this->PlayerFaction && province->SettlementLocation.x == x && province->SettlementLocation.y == y) {
 						this->SymbolHero->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					}
@@ -697,6 +701,9 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	CGrandStrategyProvince *province = tile->Province;
 	int res = tile->Resource;
 	if (province != NULL && province->Owner != NULL && province->SettlementLocation.x == x && province->SettlementLocation.y == y && province->HasBuildingClass("town-hall")) {
+		if (province->Owner->Capital == province) {
+			tile_tooltip += "Capital ";
+		}
 		tile_tooltip += "Settlement";
 		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
 			tile_tooltip += " of ";
@@ -2336,6 +2343,15 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	
 	if (this->Owner != NULL) { //if province has a previous owner, remove it from the owner's province list
 		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
+
+		if (GrandStrategyGameInitialized && this->Owner->Capital == this) { // if this was the old owner's capital province, set a random one of the provinces it still has remaining as the capital if it still has territory, set the capital to NULL otherwise
+			if (this->Owner->OwnedProvinces.size() > 0) {
+				int new_capital_province_id = this->Owner->OwnedProvinces[SyncRand(this->Owner->OwnedProvinces.size())];
+				this->Owner->SetCapital(GrandStrategyGame.Provinces[new_capital_province_id]);
+			} else {
+				this->Owner->SetCapital(NULL);
+			}
+		}
 		
 		//set the province's faction-specific units back to the corresponding units of the province's civilization
 		if (this->Owner->Civilization == this->Civilization) {
@@ -2395,8 +2411,12 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	}
 
 	if (civilization_id != -1 && faction_id != -1) {
-		this->Owner = const_cast<CGrandStrategyFaction *>(&(*GrandStrategyGame.Factions[civilization_id][faction_id]));
+		this->Owner = GrandStrategyGame.Factions[civilization_id][faction_id];
 		this->Owner->OwnedProvinces.push_back(this->ID);
+		
+		if (GrandStrategyGameInitialized && this->Owner->Capital == NULL) { //if new owner has no capital, set this province as the capital
+			this->Owner->SetCapital(this);
+		}
 		
 		if (this->Civilization == -1) { // if province has no civilization/culture defined, then make its culture that of its owner
 			this->SetCivilization(this->Owner->Civilization);
@@ -4124,6 +4144,11 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 	}
 }
 
+void CGrandStrategyFaction::SetCapital(CGrandStrategyProvince *province)
+{
+	this->Capital = province;
+}
+
 void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
 {
 	if (this->Ministers[title] != NULL && std::find(this->Ministers[title]->Titles.begin(), this->Ministers[title]->Titles.end(), std::pair<int, CGrandStrategyFaction *>(title, this)) != this->Ministers[title]->Titles.end()) { // remove from the old minister's array
@@ -4753,7 +4778,7 @@ void CGrandStrategyHero::Create()
 	}
 }
 
-void CGrandStrategyHero::Die(bool violent_death)
+void CGrandStrategyHero::Die()
 {
 	if (violent_death) {
 		this->ViolentDeath = true;
@@ -6618,6 +6643,14 @@ void InitializeGrandStrategyGame(bool show_loading)
 	}
 	GrandStrategyGame.SymbolAttack = CGraphic::Get(attack_symbol_filename);
 	
+	//load the capital symbol
+	std::string capital_symbol_filename = "tilesets/world/sites/capital.png";
+	if (CGraphic::Get(capital_symbol_filename) == NULL) {
+		CGraphic *capital_symbol_graphic = CGraphic::New(capital_symbol_filename, 64, 64);
+		capital_symbol_graphic->Load();
+	}
+	GrandStrategyGame.SymbolCapital = CGraphic::Get(capital_symbol_filename);
+	
 	//load the hero symbol
 	std::string hero_symbol_filename = "tilesets/world/sites/hero.png";
 	if (CGraphic::Get(hero_symbol_filename) == NULL) {
@@ -7084,6 +7117,19 @@ void FinalizeGrandStrategyInitialization()
 					if (GrandStrategyYear >= iterator->first) {
 						GrandStrategyGame.Factions[i][j]->FactionTier = iterator->second;
 						break;
+					}
+				}
+				
+				if (GrandStrategyGame.Factions[i][j]->IsAlive()) { // set capital for factions which own territory
+					for (std::map<int, CProvince *>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalCapitals.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalCapitals.rend(); ++iterator) {
+						if (GrandStrategyYear >= iterator->first) {
+							GrandStrategyGame.Factions[i][j]->SetCapital(GrandStrategyGame.Provinces[GetProvinceId(iterator->second->Name)]);
+							break;
+						}
+					}
+					if (GrandStrategyGame.Factions[i][j]->Capital == NULL) { // if has no capital preset, set a random province as the capital
+						int province_id = GrandStrategyGame.Factions[i][j]->OwnedProvinces[SyncRand(GrandStrategyGame.Factions[i][j]->OwnedProvinces.size())];
+						GrandStrategyGame.Factions[i][j]->SetCapital(GrandStrategyGame.Provinces[province_id]);
 					}
 				}
 				
