@@ -74,7 +74,7 @@ class GrandStrategyWorldMapTile : public WorldMapTile
 public:
 	GrandStrategyWorldMapTile() : WorldMapTile(),
 		Terrain(-1), BaseTileVariation(-1), Variation(-1), Resource(-1), TransportLevel(1),
-		ResourceProspected(false), Port(false), Worked(false), AiProcessing(false),
+		ResourceProspected(false), Port(false), Worked(false),
 		Province(NULL), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
 		memset(Borders, 0, sizeof(Borders));
@@ -87,12 +87,13 @@ public:
 	void SetResourceProspected(int resource_id, bool discovered);
 	void SetPathway(int pathway, int direction, bool secondary_setting = false);
 	void BuildPathway(int pathway, int direction);
-	void SetTransportLevel(int transport_level);
 	void SetPort(bool has_port);
+	void SetTransportLevel(int transport_level);
+	void LinkToTransportNetwork(int direction_from = -1);
 	void GenerateCulturalName(int old_civilization_id = -1, int civilization_id = -1);
 	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
 	int GetResourceIncome(bool ignore_transport_level = false);
-	bool AiBuildPathway(int pathway);									/// Tells the AI to try to build a pathway in the tile, returns true if succeeded, false if didn't
+	bool AiBuildPathway(int pathway, bool secondary_setting = false);	/// Tells the AI to try to build a pathway in the tile, returns true if succeeded, false if didn't
 	bool IsWater();
 	bool HasResource(int resource, bool ignore_prospection = false);	/// Get whether the tile has a resource
 	bool CanBuildPathway(int pathway, int direction, bool check_costs);
@@ -107,7 +108,6 @@ public:
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	bool Port;								/// Whether the tile has a port
 	bool Worked;							/// Whether the tile is worked by a worker
-	bool AiProcessing;						/// Whether the AI is doing something to this tile at the moment
 	std::string Name;						/// Name of the tile (used for instance to name particular mountains)
 	CGrandStrategyProvince *Province;		/// Province to which the tile belongs
 	CGraphic *BaseTile;
@@ -251,6 +251,7 @@ public:
 	void CalculateIncome(int resource);
 	void CalculateIncomes();
 	void CalculateUpkeep();
+	void CalculateTileTransportLevels();
 	void CheckSplitOffFactions();
 	void CheckFormableFactions(int civilization);
 	void SplitOffFaction(CGrandStrategyFaction *faction);
@@ -276,6 +277,7 @@ public:
 	std::string GetTitle();
 	std::string GetCharacterTitle(int title_type, int gender);
 	CGrandStrategyProvince *GetRandomProvinceWeightedByPopulation();
+	GrandStrategyWorldMapTile *GetCapitalSettlement();
 	
 	int Faction;														/// The faction's ID (-1 = none).
 	int Civilization;													/// Civilization of the faction (-1 = none).

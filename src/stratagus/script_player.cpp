@@ -300,9 +300,14 @@ void CPlayer::Load(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, j + 1);
+			//Wyrmgus start
+//			if (subargs != MaxCosts) {
+//				LuaError(l, "Wrong number of total-resources: %d" _C_ subargs);
+//			}
 			if (subargs != MaxCosts) {
-				LuaError(l, "Wrong number of total-resources: %d" _C_ subargs);
+				fprintf(stderr, "Wrong number of total-resources: %d.\n", subargs);
 			}
+			//Wyrmgus end
 			for (int k = 0; k < subargs; ++k) {
 				this->TotalResources[k] = LuaToNumber(l, j + 1, k + 1);
 			}

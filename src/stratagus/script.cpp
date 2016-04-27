@@ -2976,6 +2976,9 @@ void SaveGrandStrategyGame(const std::string &filename)
 		
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+				if (GrandStrategyGame.Factions[i][j]->Capital != NULL) {
+					fprintf(fd, "SetGrandStrategyFactionData(\"%s\", \"%s\", \"Capital\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GrandStrategyGame.Factions[i][j]->Capital->Name.c_str());
+				}
 				if (GrandStrategyGame.Factions[i][j]->GovernmentType != -1) {
 					std::string government_type_name = GetGovernmentTypeNameById(GrandStrategyGame.Factions[i][j]->GovernmentType);
 					fprintf(fd, "SetFactionGovernmentType(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), government_type_name.c_str());

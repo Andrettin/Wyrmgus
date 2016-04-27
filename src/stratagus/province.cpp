@@ -172,7 +172,7 @@ int GetTransportLevelMaximumCapacity(int transport_level)
 	if (transport_level == 1) {
 		return 200;
 	} else if (transport_level == 2) {
-		return 1000;
+		return 400;
 	}
 
 	return 0;

@@ -847,8 +847,8 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	tile_tooltip += ")";
 	
 	if (province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
-		tile_tooltip += "\nTransport Level: ";
-		tile_tooltip += std::to_string((long long) tile->TransportLevel);
+		tile_tooltip += "\nTransport Capacity: ";
+		tile_tooltip += std::to_string((long long) GetTransportLevelMaximumCapacity(tile->TransportLevel));
 	}
 
 	if (!Preference.NoStatusLineTooltips) {
@@ -1789,30 +1789,12 @@ void GrandStrategyWorldMapTile::SetResourceProspected(int resource_id, bool disc
 	}
 }
 
-void GrandStrategyWorldMapTile::SetPort(bool has_port)
-{
-	if (this->Port == has_port) {
-		return;
-	}
-	
-	this->Port = has_port;
-	
-	//if the tile is the same as the province's settlement location, create a dock for the province's settlement, if its civilization has one
-	if (this->Province != NULL && this->Province->SettlementLocation == this->Position) {
-		int civilization = this->Province->Civilization;
-		if (civilization != -1) {
-			int building_type = this->Province->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
-			if (building_type != -1) {
-				this->Province->SetSettlementBuilding(building_type, has_port);
-			}
-		}
-	}
-}
-
 void GrandStrategyWorldMapTile::SetPathway(int pathway, int direction, bool secondary_setting)
 {
 	this->Pathway[direction] = pathway;
-	this->SetTransportLevel(GetPathwayTransportLevel(pathway));
+	if (GrandStrategyGameInitialized) {
+		this->LinkToTransportNetwork(direction);
+	}
 
 	Vec2i offset = GetDirectionOffset(direction);
 
@@ -1846,6 +1828,30 @@ void GrandStrategyWorldMapTile::BuildPathway(int pathway, int direction)
 	}
 }
 
+void GrandStrategyWorldMapTile::SetPort(bool has_port)
+{
+	if (this->Port == has_port) {
+		return;
+	}
+	
+	this->Port = has_port;
+	
+	//if the tile is the same as the province's settlement location, create a dock for the province's settlement, if its civilization has one
+	if (this->Province != NULL && this->Province->SettlementLocation == this->Position && this->Province->HasBuildingClass("dock") == false) {
+		int civilization = this->Province->Civilization;
+		if (civilization != -1) {
+			int building_type = this->Province->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
+			if (building_type != -1) {
+				this->Province->SetSettlementBuilding(building_type, has_port);
+			}
+		}
+	}
+	
+	if (this->Port) {
+		this->LinkToTransportNetwork();
+	}
+}
+
 void GrandStrategyWorldMapTile::SetTransportLevel(int transport_level)
 {
 	if (this->TransportLevel < transport_level) {
@@ -1853,6 +1859,48 @@ void GrandStrategyWorldMapTile::SetTransportLevel(int transport_level)
 		if (this->Resource != -1 && this->ResourceProspected) {
 			this->Province->CalculateIncome(this->Resource);
 		}
+	}
+}
+
+void GrandStrategyWorldMapTile::LinkToTransportNetwork(int direction_from)
+{
+	if (this->Province == NULL || this->Province->Owner == NULL) {
+		return;
+	}
+	
+	// first, link the tile itself
+	if (
+		(this->Province == this->Province->Owner->Capital && this->Position == this->Province->SettlementLocation)
+		|| this->Port
+	) {
+		this->SetTransportLevel(2);
+	} else if (direction_from != -1 && this->Pathway[direction_from] != -1) {
+		Vec2i offset = GetDirectionOffset(direction_from);
+		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y];
+			
+		this->SetTransportLevel(std::min(GetPathwayTransportLevel(this->Pathway[direction_from]), tile->TransportLevel));
+	} else {
+		return;
+	}
+	
+	for (int i = 0; i < MaxDirections; ++i) {
+		Vec2i offset = GetDirectionOffset(i);
+		
+		if (!GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)) {
+			continue;
+		}
+		
+		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y];
+		
+		if (
+			tile->Province == NULL
+			|| tile->Province->Owner != this->Province->Owner
+			|| tile->TransportLevel > 1 //don't link the tile to the transport network if it has already been linked
+		) {
+			continue;
+		}
+		
+		tile->LinkToTransportNetwork(GetReverseDirection(i));
 	}
 }
 
@@ -2087,51 +2135,65 @@ void GrandStrategyWorldMapTile::GenerateFactionCulturalName(int civilization_id,
 	}
 }
 
-bool GrandStrategyWorldMapTile::AiBuildPathway(int pathway)
+bool GrandStrategyWorldMapTile::AiBuildPathway(int pathway, bool secondary_setting)
 {
 	if (GrandStrategyGame.CurrentPathwayConstructions.find(std::pair<int,int>(this->Position.x, this->Position.y)) != GrandStrategyGame.CurrentPathwayConstructions.end()) { // already building a pathway here
 		return true;
 	}	
 	
-	this->AiProcessing = true;
-
 	for (int i = 0; i < MaxDirections; ++i) {
 		if (this->CanBuildPathway(pathway, i, true)) {
 			this->BuildPathway(pathway, i);
-			this->AiProcessing = false;
 			return true;
 		}
 	}
 	
-	// if couldn't build a pathway in the tile itself, try to build in the adjacent tiles
-	for (int i = 0; i < MaxDirections; ++i) {
-		if (i == Northeast || i == Northwest || i == Southeast || i == Southwest) { // no diagonal roads, at least for now
-			continue;
-		}
+	// if couldn't build a pathway in the tile itself, try to find the closest connected tile, and build a pathway from there in our direction
+	if (!secondary_setting) {
+		std::vector<GrandStrategyWorldMapTile *> all_checked_tiles;
+		std::vector<GrandStrategyWorldMapTile *> currently_checked_tiles;
+		all_checked_tiles.push_back(this);
+		currently_checked_tiles.push_back(this);
 		
-		Vec2i offset = GetDirectionOffset(i);
-		
-		if (!GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)) {
-			continue;
-		}
-		
-		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y];
-		
-		if (
-			tile->Province == NULL
-			|| tile->Province->Owner != this->Province->Owner
-			|| tile->AiProcessing //don't ask the tile to build a pathway if that was already done before
-		) {
-			continue;
-		}
-		
-		if (tile->AiBuildPathway(pathway)) {
-			this->AiProcessing = false;
-			return true;
+		while (currently_checked_tiles.size() > 0) {
+			int currently_checked_tiles_size = currently_checked_tiles.size();
+			for (int i = (currently_checked_tiles_size - 1); i >= 0; --i) {
+				Vec2i pos = currently_checked_tiles[i]->Position;
+				
+				for (int j = 0; j < MaxDirections; ++j) {
+					if (j == Northeast || j == Northwest || j == Southeast || j == Southwest) { // no diagonal roads, at least for now
+						continue;
+					}
+				
+					Vec2i offset = GetDirectionOffset(j);
+					
+					if (!GrandStrategyGame.IsPointOnMap(pos.x + offset.x, pos.y + offset.y)) {
+						continue;
+					}
+					
+					GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[pos.x + offset.x][pos.y + offset.y];
+					
+					if (
+						tile->Province == NULL
+						|| tile->Province->Owner != this->Province->Owner
+						|| std::find(all_checked_tiles.begin(), all_checked_tiles.end(), tile) != all_checked_tiles.end() //don't ask the tile to build a pathway if that was already done before
+					) {
+						continue;
+					}
+					
+					if (tile->AiBuildPathway(pathway, true)) {
+						return true;
+					} else {
+						all_checked_tiles.push_back(tile);
+						currently_checked_tiles.push_back(tile);
+					}
+					
+				}
+				currently_checked_tiles.erase(std::remove(currently_checked_tiles.begin(), currently_checked_tiles.end(), currently_checked_tiles[i]), currently_checked_tiles.end());
+			}
 		}
 	}
 	
-	this->AiProcessing = false;
 	return false;
 }
 
@@ -2219,7 +2281,7 @@ bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction, bool
 		return false;
 	}
 	
-	if (this->TransportLevel < GetPathwayTransportLevel(pathway) && GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->TransportLevel < GetPathwayTransportLevel(pathway)) { // can only build pathways if connected to the settlement
+	if (this->TransportLevel < GetPathwayTransportLevel(pathway) && GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->TransportLevel < GetPathwayTransportLevel(pathway)) { // can only build pathways if connected to the capital
 		return false;
 	}
 	
@@ -2340,6 +2402,8 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	) {
 		return;
 	}
+	
+	CGrandStrategyFaction *old_owner = this->Owner;
 	
 	if (this->Owner != NULL) { //if province has a previous owner, remove it from the owner's province list
 		this->Owner->OwnedProvinces.erase(std::remove(this->Owner->OwnedProvinces.begin(), this->Owner->OwnedProvinces.end(), this->ID), this->Owner->OwnedProvinces.end());
@@ -2529,8 +2593,16 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 	if (this->Owner != NULL && this->Labor > 0 && this->HasBuildingClass("town-hall")) {
 		this->AllocateLabor();
 	}
-	
-	this->CalculateIncomes();
+
+	if (GrandStrategyGameInitialized) {
+		if (this->Owner != NULL) {
+			this->Owner->CalculateTileTransportLevels();
+		}
+		if (old_owner != NULL && old_owner->IsAlive()) {
+			old_owner->CalculateTileTransportLevels();
+		}
+		this->CalculateIncomes();
+	}
 }
 
 void CGrandStrategyProvince::SetCivilization(int civilization)
@@ -2646,7 +2718,6 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	//recalculate the faction incomes if a town hall or a building that provides research was constructed
 	if (this->Owner != NULL) {
 		if (UnitTypes[building_id]->Class == "town-hall") {
-			GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->TransportLevel = 2;
 			this->CalculateIncomes();
 		} else if (UnitTypes[building_id]->Class == "barracks") {
 			this->CalculateIncome(LeadershipCost);
@@ -2663,7 +2734,9 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 		this->MilitaryScore += (100 * 2) * change; // two guard towers if has a stronghold
 	} else if (UnitTypes[building_id]->Class == "dock") {
 		//place a port in the province's settlement location, if the building is a dock
-		GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port = has_settlement_building;
+		if (!GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
+			GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->SetPort(has_settlement_building);
+		}
 		
 		//allow the province to fish if it has a dock
 		this->ProductionCapacity[FishCost] = 0;
@@ -3849,19 +3922,24 @@ void CGrandStrategyFaction::AiDoTurn()
 			continue;
 		}
 		
-		for (size_t j = 0; j < province->Tiles.size() && this->CanBuildPathway(PathwayRoad, true); ++j) {
-			if (!this->CanBuildPathway(PathwayRoad, true)) {
-				break;
-			}
-			int x = province->Tiles[j].x;
-			int y = province->Tiles[j].y;
-			GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[x][y];
-				
-			if (!tile->Worked || tile->TransportLevel >= GetPathwayTransportLevel(PathwayRoad)) {
-				continue;
-			}
+		GrandStrategyWorldMapTile *settlement_tile = GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y];
+		if (settlement_tile->TransportLevel < GetPathwayTransportLevel(PathwayRoad)) {
+			settlement_tile->AiBuildPathway(PathwayRoad); // first link the province's settlement to the transport network, and only afterwards link the resource tiles in the province
+		} else {
+			for (size_t j = 0; j < province->Tiles.size() && this->CanBuildPathway(PathwayRoad, true); ++j) {
+				if (!this->CanBuildPathway(PathwayRoad, true)) {
+					break;
+				}
+				int x = province->Tiles[j].x;
+				int y = province->Tiles[j].y;
+				GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[x][y];
+					
+				if (!tile->Worked || tile->TransportLevel >= GetPathwayTransportLevel(PathwayRoad)) {
+					continue;
+				}
 
-			tile->AiBuildPathway(PathwayRoad);
+				tile->AiBuildPathway(PathwayRoad);
+			}
 		}
 	}
 
@@ -3951,6 +4029,28 @@ void CGrandStrategyFaction::CalculateUpkeep()
 			if (GrandStrategyGame.Provinces[province_id]->Units[j] > 0 && UnitTypes[j]->Upkeep > 0) {
 				this->Upkeep += GrandStrategyGame.Provinces[province_id]->Units[j] * UnitTypes[j]->Upkeep;
 			}
+		}
+	}
+}
+
+void CGrandStrategyFaction::CalculateTileTransportLevels()
+{
+	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
+		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[this->OwnedProvinces[i]];
+		for (size_t j = 0; j < province->Tiles.size(); ++j) {
+			GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[province->Tiles[j].x][province->Tiles[j].y];
+			tile->TransportLevel = 1;
+		}
+	}
+	
+	this->GetCapitalSettlement()->LinkToTransportNetwork();
+	
+	// link ports to the network
+	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
+		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[this->OwnedProvinces[i]];
+		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y];
+		if (tile->Port) {
+			tile->LinkToTransportNetwork();
 		}
 	}
 }
@@ -4158,6 +4258,10 @@ void CGrandStrategyFaction::AcquireFactionTechnologies(int civilization, int fac
 void CGrandStrategyFaction::SetCapital(CGrandStrategyProvince *province)
 {
 	this->Capital = province;
+
+	if (this->Capital != NULL) {
+		this->CalculateTileTransportLevels();
+	}
 }
 
 void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
@@ -4690,6 +4794,14 @@ CGrandStrategyProvince *CGrandStrategyFaction::GetRandomProvinceWeightedByPopula
 	}
 }
 
+GrandStrategyWorldMapTile *CGrandStrategyFaction::GetCapitalSettlement()
+{
+	if (this->Capital == NULL) {
+		return NULL;
+	}
+	
+	return GrandStrategyGame.WorldMapTiles[this->Capital->SettlementLocation.x][this->Capital->SettlementLocation.y];
+}
 void CGrandStrategyHero::Initialize()
 {
 	if (this->Trait == NULL) { //if no trait was set, have the hero be the same trait as the unit type (if the unit type has it predefined)

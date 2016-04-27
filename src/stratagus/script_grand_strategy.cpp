@@ -271,6 +271,49 @@ static int CclGetGrandStrategyProvinces(lua_State *l)
 }
 
 /**
+**  Set grand strategy faction data.
+**
+**  @param l  Lua state.
+*/
+static int CclSetGrandStrategyFactionData(lua_State *l)
+{
+	if (lua_gettop(l) < 3) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string civilization_name = LuaToString(l, 1);
+	int civilization_id = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	if (civilization_id == -1) {
+		LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
+	}
+	std::string faction_name = LuaToString(l, 2);
+	int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, faction_name);
+	if (faction_id == -1) {
+		LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
+	}
+	
+	CGrandStrategyFaction *faction = GrandStrategyGame.Factions[civilization_id][faction_id];
+	
+	const char *data = LuaToString(l, 2);
+	
+	if (!strcmp(data, "Capital")) {
+		LuaCheckArgs(l, 4);
+		
+		std::string province_name = LuaToString(l, 4);
+		int province_id = GetProvinceId(province_name);
+		if (province_id == -1) {
+			LuaError(l, "Province \"%s\" doesn't exist." _C_ province_name.c_str());
+		}
+		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[province_id];
+		
+		faction->SetCapital(province);
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
 **  Register CCL features for provinces.
 */
 void GrandStrategyCclRegister()
@@ -280,6 +323,7 @@ void GrandStrategyCclRegister()
 	lua_register(Lua, "SetGrandStrategyProvinceData", CclSetGrandStrategyProvinceData);
 	lua_register(Lua, "GetGrandStrategyProvinceData", CclGetGrandStrategyProvinceData);
 	lua_register(Lua, "GetGrandStrategyProvinces", CclGetGrandStrategyProvinces);
+	lua_register(Lua, "SetGrandStrategyFactionData", CclSetGrandStrategyFactionData);
 }
 
 //@}
