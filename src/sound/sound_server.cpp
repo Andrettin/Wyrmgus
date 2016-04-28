@@ -78,7 +78,7 @@ struct SoundChannel {
 	unsigned char Volume;  /// Volume of this channel
 	signed char Stereo;    /// stereo location of sound (-128 left, 0 center, 127 right)
 	//Wyrmgus start
-	UnitVoiceGroup Voice;  /// Voice group of this channel (for identifying voice types)
+	int Voice;  /// Voice group of this channel (for identifying voice types)
 	//Wyrmgus end
 
 	bool Playing;          /// channel is currently playing
@@ -405,9 +405,9 @@ bool UnitSoundIsPlaying(Origin *origin)
 	for (int i = 0; i < MaxChannels; ++i) {
 		if (origin && Channels[i].Unit && origin->Id && Channels[i].Unit->Id
 			//Wyrmgus start
-			&& Channels[i].Voice
 //			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
 			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing
+			&& Channels[i].Voice != -1
 			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceStep) {
 			//Wyrmgus end
 			return true;
@@ -428,6 +428,9 @@ static void ChannelFinished(int channel)
 	delete Channels[channel].Unit;
 	Channels[channel].Unit = NULL;
 	
+	//Wyrmgus start
+	Channels[channel].Voice = -1;
+	//Wyrmgus end
 	Channels[channel].Playing = false;
 	Channels[channel].Point = NextFreeChannel;
 	NextFreeChannel = channel;
@@ -445,6 +448,9 @@ static int FillChannel(CSample *sample, unsigned char volume, char stereo, Origi
 
 	Channels[NextFreeChannel].Volume = volume;
 	Channels[NextFreeChannel].Point = 0;
+	//Wyrmgus start
+	Channels[NextFreeChannel].Voice = -1;
+	//Wyrmgus end
 	Channels[NextFreeChannel].Playing = true;
 	Channels[NextFreeChannel].Sample = sample;
 	Channels[NextFreeChannel].Stereo = stereo;
