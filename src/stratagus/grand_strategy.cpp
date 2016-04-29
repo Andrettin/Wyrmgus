@@ -823,13 +823,11 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 		}
 	}
 
-	/*
-	if (tile->Port) { //deactivated for now, since there aren't proper port graphics yet
+	if (tile->Port && province != NULL && province->SettlementLocation.x == x && province->SettlementLocation.y == y) { // ports only possible on settlement locations, at least for now
 		tile_tooltip += " (";
 		tile_tooltip += "Port";
 		tile_tooltip += ")";
 	}
-	*/
 	
 	if (province != NULL) {
 		tile_tooltip += ",\n";
@@ -1796,17 +1794,15 @@ void GrandStrategyWorldMapTile::SetPathway(int pathway, int direction, bool seco
 		this->LinkToTransportNetwork(direction);
 	}
 
+	if (this->Port && this->Province != NULL && this->Province->Owner != NULL && GrandStrategyGameInitialized) {
+		this->Province->Owner->CalculateProvincesReachableThroughWater(); // to apply the increased transport levels if has a (now-connected) port
+	}
+	
 	Vec2i offset = GetDirectionOffset(direction);
 
 	if (GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)) {
 		if (!secondary_setting) {
 			GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->SetPathway(pathway, GetReverseDirection(direction), true);
-		}
-			
-		if (
-			this->Province != GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province
-		) {
-			this->Province->SetBorderProvinceConnectionTransportLevel(GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province, GetPathwayTransportLevel(pathway));
 		}
 	}
 }
@@ -1847,8 +1843,8 @@ void GrandStrategyWorldMapTile::SetPort(bool has_port)
 		}
 	}
 	
-	if (this->Port) {
-		this->LinkToTransportNetwork();
+	if (this->Port && this->Province != NULL && this->Province->Owner != NULL && GrandStrategyGameInitialized) {
+		this->Province->Owner->CalculateProvincesReachableThroughWater(); // to apply the increased transport levels due to ports
 	}
 }
 
@@ -1869,10 +1865,7 @@ void GrandStrategyWorldMapTile::LinkToTransportNetwork(int direction_from)
 	}
 	
 	// first, link the tile itself
-	if (
-		(this->Province == this->Province->Owner->Capital && this->Position == this->Province->SettlementLocation)
-		|| this->Port
-	) {
+	if ((this->Province == this->Province->Owner->Capital || this->Port) && this->Position == this->Province->SettlementLocation) {
 		this->SetTransportLevel(2);
 	} else if (direction_from != -1 && this->Pathway[direction_from] != -1) {
 		Vec2i offset = GetDirectionOffset(direction_from);
@@ -1892,9 +1885,16 @@ void GrandStrategyWorldMapTile::LinkToTransportNetwork(int direction_from)
 		
 		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y];
 		
+		if (tile->Province == NULL || this->Pathway[i] == -1) {
+			continue;
+		}
+		
+		if (this->Province != tile->Province) {
+			this->Province->SetBorderProvinceConnectionTransportLevel(tile->Province, GetPathwayTransportLevel(this->Pathway[i]));
+		}
+		
 		if (
-			tile->Province == NULL
-			|| tile->Province->Owner != this->Province->Owner
+			tile->Province->Owner != this->Province->Owner
 			|| tile->TransportLevel > 1 //don't link the tile to the transport network if it has already been linked
 		) {
 			continue;
@@ -3253,7 +3253,7 @@ void CGrandStrategyProvince::GovernorSuccession()
 
 void CGrandStrategyProvince::SetBorderProvinceConnectionTransportLevel(CGrandStrategyProvince *province, int transport_level)
 {
-	if (this->BorderProvinceConnectionTransportLevel[province] < transport_level) {
+	if (this->GetConnectionTransportLevel(province) < transport_level) {
 		this->BorderProvinceConnectionTransportLevel[province] = transport_level;
 	}
 }
@@ -4041,13 +4041,42 @@ void CGrandStrategyFaction::CalculateTileTransportLevels()
 			GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[province->Tiles[j].x][province->Tiles[j].y];
 			tile->TransportLevel = 1;
 		}
+		province->BorderProvinceConnectionTransportLevel.clear();
 	}
 	
 	this->GetCapitalSettlement()->LinkToTransportNetwork();
 	
-	// link ports to the network
+	this->CalculateProvincesReachableThroughWater();
+}
+
+void CGrandStrategyFaction::CalculateProvincesReachableThroughWater()
+{
+	this->ProvincesLinkedToCapital.clear();
+	this->ProvincesReachableThroughWater.clear();
+
 	for (size_t i = 0; i < this->OwnedProvinces.size(); ++i) {
 		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[this->OwnedProvinces[i]];
+		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y];
+		if (tile->TransportLevel >= 2) {
+			this->ProvincesLinkedToCapital.push_back(province);
+		}
+	}
+	
+	for (size_t i = 0; i < this->ProvincesLinkedToCapital.size(); ++i) {
+		if (!this->ProvincesLinkedToCapital[i]->HasBuildingClass("dock")) {
+			continue;
+		}
+		
+		for (size_t j = 0; j < this->ProvincesLinkedToCapital[i]->LandProvincesReachableThroughWater.size(); ++j) {
+			if (this->ProvincesLinkedToCapital[i]->LandProvincesReachableThroughWater[j]->Owner == this && std::find(this->ProvincesReachableThroughWater.begin(), this->ProvincesReachableThroughWater.end(), this->ProvincesLinkedToCapital[i]->LandProvincesReachableThroughWater[j]) == this->ProvincesReachableThroughWater.end()) {
+				this->ProvincesReachableThroughWater.push_back(this->ProvincesLinkedToCapital[i]->LandProvincesReachableThroughWater[j]);
+			}
+		}
+	}
+	
+	// link ports to the network
+	for (size_t i = 0; i < this->ProvincesReachableThroughWater.size(); ++i) {
+		CGrandStrategyProvince *province = this->ProvincesReachableThroughWater[i];
 		GrandStrategyWorldMapTile *tile = GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y];
 		if (tile->Port) {
 			tile->LinkToTransportNetwork();
@@ -5550,7 +5579,7 @@ void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string 
 	
 	int river_id = GetRiverId(river_name);
 	
-	return; //deactivate this for now, while there aren't proper graphics for the rivers
+//	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
@@ -5639,7 +5668,7 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 	
 	int river_id = GetRiverId(river_name);
 	
-	return; //deactivate this for now, while there aren't proper graphics for the rivers
+//	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
@@ -7239,11 +7268,23 @@ void FinalizeGrandStrategyInitialization()
 					}
 				}
 				
+				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalGovernmentTypes.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalGovernmentTypes.rend(); ++iterator) {
+					if (GrandStrategyYear >= iterator->first) {
+						GrandStrategyGame.Factions[i][j]->GovernmentType = iterator->second;
+						break;
+					}
+				}
+				
 				if (GrandStrategyGame.Factions[i][j]->IsAlive()) { // set capital for factions which own territory
-					for (std::map<int, CProvince *>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalCapitals.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalCapitals.rend(); ++iterator) {
+					for (std::map<int, std::string>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalCapitals.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalCapitals.rend(); ++iterator) {
 						if (GrandStrategyYear >= iterator->first) {
-							GrandStrategyGame.Factions[i][j]->SetCapital(GrandStrategyGame.Provinces[GetProvinceId(iterator->second->Name)]);
-							break;
+							int province_id = GetProvinceId(iterator->second);
+							if (province_id != -1) {
+								GrandStrategyGame.Factions[i][j]->SetCapital(GrandStrategyGame.Provinces[province_id]);
+								break;
+							} else {
+								fprintf(stderr, "Province \"%s\" doesn't exist.\n", iterator->second.c_str());
+							}
 						}
 					}
 					if (GrandStrategyGame.Factions[i][j]->Capital == NULL) { // if has no capital preset, set a random province as the capital
@@ -7301,6 +7342,8 @@ void CalculateProvinceBorders()
 		}
 			
 		GrandStrategyGame.Provinces[i]->BorderProvinces.clear();
+		GrandStrategyGame.Provinces[i]->ReachableWaterProvinces.clear();
+		GrandStrategyGame.Provinces[i]->LandProvincesReachableThroughWater.clear();
 			
 		//calculate which of the province's tiles are border tiles, and which provinces it borders; also whether the province borders water (is coastal) or not
 		for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) {
@@ -7330,17 +7373,40 @@ void CalculateProvinceBorders()
 								
 						if (second_province != NULL && !GrandStrategyGame.Provinces[i]->BordersProvince(second_province)) { //if isn't added yet to the border provinces, do so now
 							GrandStrategyGame.Provinces[i]->BorderProvinces.push_back(second_province);
-							GrandStrategyGame.Provinces[i]->BorderProvinceConnectionTransportLevel[second_province] = 0;
 						}
 								
 						if (second_province != NULL && GrandStrategyGame.Provinces[i]->Water == false && second_province->Water == true) {
 							GrandStrategyGame.Provinces[i]->Coastal = true;
+							GrandStrategyGame.Provinces[i]->ReachableWaterProvinces.push_back(second_province);
 						}
 					}
 				}
 			}
 		}
-	}				
+	}
+	
+	// now fill the ReachableWaterProvinces and LandProvincesReachableThroughWater vectors
+	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
+		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[i];
+		
+		for (size_t j = 0; j < province->ReachableWaterProvinces.size(); ++j) {
+			CGrandStrategyProvince *second_province = province->ReachableWaterProvinces[j];
+			for (size_t k = 0; k < second_province->BorderProvinces.size(); ++k) {
+				if (second_province->BorderProvinces[k]->Water && std::find(province->ReachableWaterProvinces.begin(), province->ReachableWaterProvinces.end(), second_province->BorderProvinces[k]) == province->ReachableWaterProvinces.end()) {
+					province->ReachableWaterProvinces.push_back(second_province->BorderProvinces[k]);
+				}
+			}
+		}
+		
+		for (size_t j = 0; j < province->ReachableWaterProvinces.size(); ++j) {
+			CGrandStrategyProvince *second_province = province->ReachableWaterProvinces[j];
+			for (size_t k = 0; k < second_province->BorderProvinces.size(); ++k) {
+				if (!second_province->BorderProvinces[k]->Water && std::find(province->LandProvincesReachableThroughWater.begin(), province->LandProvincesReachableThroughWater.end(), second_province->BorderProvinces[k]) == province->LandProvincesReachableThroughWater.end()) {
+					province->LandProvincesReachableThroughWater.push_back(second_province->BorderProvinces[k]);
+				}
+			}
+		}
+	}
 }
 
 void CenterGrandStrategyMapOnTile(int x, int y)

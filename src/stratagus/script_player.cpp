@@ -1653,6 +1653,21 @@ static int CclDefineFaction(lua_State *l)
 				}
 				faction->HistoricalTiers[year] = faction_tier;
 			}
+		} else if (!strcmp(value, "HistoricalGovernmentTypes")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string government_type_name = LuaToString(l, -1, j + 1);
+				int government_type = GetGovernmentTypeIdByName(government_type_name);
+				if (government_type == -1) {
+					LuaError(l, "Government type \"%s\" doesn't exist." _C_ government_type_name.c_str());
+				}
+				faction->HistoricalGovernmentTypes[year] = government_type;
+			}
 		} else if (!strcmp(value, "HistoricalCapitals")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1662,11 +1677,7 @@ static int CclDefineFaction(lua_State *l)
 				int year = LuaToNumber(l, -1, j + 1);
 				++j;
 				std::string province_name = LuaToString(l, -1, j + 1);
-				CProvince *province = GetProvince(province_name);
-				if (province == NULL) {
-					LuaError(l, "Province \"%s\" doesn't exist." _C_ province_name.c_str());
-				}
-				faction->HistoricalCapitals[year] = province;
+				faction->HistoricalCapitals[year] = province_name;
 			}
 		} else if (!strcmp(value, "Mod")) {
 			faction->Mod = LuaToString(l, -1);

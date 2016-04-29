@@ -214,6 +214,8 @@ public:
 	std::vector<CGrandStrategyHero *> Heroes;							/// Heroes in the province
 	std::vector<CGrandStrategyHero *> ActiveHeroes;						/// Active (can move, attack and defend) heroes in the province
 	std::vector<CGrandStrategyProvince *> BorderProvinces;				/// Which provinces this province borders
+	std::vector<CGrandStrategyProvince *> ReachableWaterProvinces;		/// Water provinces which are reachable from this province's coasts
+	std::vector<CGrandStrategyProvince *> LandProvincesReachableThroughWater;	/// Which provinces can be reached through water from this province's coasts
 	std::map<int, int> AttackingUnits;									/// Quantity of units of a particular unit type attacking the province
 	std::map<CGrandStrategyProvince *, int> BorderProvinceConnectionTransportLevel;	/// connection transport level of each border province
 	int Income[MaxCosts];												/// Income for each resource.
@@ -252,6 +254,7 @@ public:
 	void CalculateIncomes();
 	void CalculateUpkeep();
 	void CalculateTileTransportLevels();
+	void CalculateProvincesReachableThroughWater();
 	void CheckSplitOffFactions();
 	void CheckFormableFactions(int civilization);
 	void SplitOffFaction(CGrandStrategyFaction *faction);
@@ -297,6 +300,8 @@ public:
 	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
 	CGrandStrategyHero *Ministers[MaxCharacterTitles];					/// Ministers of the faction
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
+	std::vector<CGrandStrategyProvince *> ProvincesLinkedToCapital;		/// Provinces linked by pathways to this faction's capital
+	std::vector<CGrandStrategyProvince *> ProvincesReachableThroughWater;	/// Provinces (belonging to this faction) reachable through water by provinces linked to this faction's capital
 	std::vector<CGrandStrategyHero *> HistoricalMinisters[MaxCharacterTitles];	/// All characters who had a ministerial (or head of state or government) title in this faction
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 };
