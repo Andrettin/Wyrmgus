@@ -625,13 +625,7 @@ void MyOpenGLGraphics::fillRectangle(const gcn::Rectangle &rectangle)
 
 void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 {
-	int WidgetPlayerColorIndexFromName = -1;
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColorNames[i] == WidgetPlayerColor) {
-			WidgetPlayerColorIndexFromName = i;
-			break;
-		}
-	}
+	int WidgetPlayerColorIndexFromName = GetPlayerColorIndexByName(WidgetPlayerColor);
 	if (WidgetPlayerColorIndexFromName == -1) {
 		fprintf(stderr, "Color %s not defined\n", WidgetPlayerColor.c_str());
 		ExitFatal(1);
@@ -969,13 +963,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		img = normalImage;
 	}
 
-	int WidgetPlayerColorIndexFromName = -1;
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColorNames[i] == ButtonPlayerColor) {
-			WidgetPlayerColorIndexFromName = i;
-			break;
-		}
-	}
+	int WidgetPlayerColorIndexFromName = GetPlayerColorIndexByName(ButtonPlayerColor);
 	if (WidgetPlayerColorIndexFromName == -1) {
 		fprintf(stderr, "Color %s not defined\n", ButtonPlayerColor.c_str());
 		ExitFatal(1);
@@ -1163,12 +1151,9 @@ void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const C
 
 	Assert(PlayerColorIndexCount);
 
-	int WidgetPlayerColorIndexFromName = 15;
-	for (int i = 0; i < PlayerColorMax; ++i) {
-		if (PlayerColorNames[i] == WidgetPlayerColorName) {
-			WidgetPlayerColorIndexFromName = i;
-			break;
-		}
+	int WidgetPlayerColorIndexFromName = GetPlayerColorIndexByName(WidgetPlayerColorName);
+	if (WidgetPlayerColorIndexFromName == -1) {
+		WidgetPlayerColorIndexFromName = 15;
 	}
 
 	SDL_LockSurface(sprite.Surface);

@@ -2387,6 +2387,16 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 	return "";
 }
 
+int GetPlayerColorIndexByName(std::string player_color_name)
+{
+	for (int c = 0; c < PlayerColorMax; ++c) {
+		if (PlayerColorNames[c] == player_color_name) {
+			return c;
+		}
+	}
+	return -1;
+}
+
 std::string GetGovernmentTypeNameById(int government_type)
 {
 	if (government_type == GovernmentTypeNoGovernmentType) {

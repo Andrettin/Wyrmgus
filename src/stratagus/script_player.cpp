@@ -1494,11 +1494,11 @@ static int CclDefineFaction(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
 				std::string color_name = LuaToString(l, -1, k + 1);
-				for (int c = 0; c < PlayerColorMax; ++c) {
-					if (PlayerColorNames[c] == color_name) {
-						faction->Colors.push_back(c);
-						break;
-					}
+				int color = GetPlayerColorIndexByName(color_name);
+				if (color != -1) {
+					faction->Colors.push_back(color);
+				} else {
+					LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
 				}
 			}
 		} else if (!strcmp(value, "DefaultTier")) {

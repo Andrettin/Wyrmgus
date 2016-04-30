@@ -113,15 +113,10 @@ static int CclDefineQuest(lua_State *l)
 			quest->Y = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
-			bool found_color = false;
-			for (int c = 0; c < PlayerColorMax; ++c) {
-				if (PlayerColorNames[c] == color_name) {
-					quest->PlayerColor = c;
-					found_color = true;
-					break;
-				}
-			}
-			if (!found_color) {
+			int color = GetPlayerColorIndexByName(color_name);
+			if (color != -1) {
+				quest->PlayerColor = color;
+			} else {
 				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
 			}
 		} else if (!strcmp(value, "Hidden")) {
