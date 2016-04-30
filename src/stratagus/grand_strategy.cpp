@@ -256,7 +256,7 @@ void CGrandStrategyGame::DrawMap()
 			if (this->WorldMapTiles[x][y]->Terrain != -1) {
 				for (int i = 0; i < MaxDirections; ++i) {
 					if (this->WorldMapTiles[x][y]->Pathway[i] != -1) {
-						this->PathwayGraphics[this->WorldMapTiles[x][y]->Pathway[i]][i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
+						this->PathwayGraphics[this->WorldMapTiles[x][y]->Pathway[i]][i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 8, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 8, true);
 					}
 				}
 			}
@@ -2141,9 +2141,19 @@ bool GrandStrategyWorldMapTile::AiBuildPathway(int pathway, bool secondary_setti
 		return true;
 	}	
 	
-	for (int i = 0; i < MaxDirections; ++i) {
-		if (this->CanBuildPathway(pathway, i, true)) {
-			this->BuildPathway(pathway, i);
+	std::vector<int> directions; // give priority to non-diagonal directions
+	directions.push_back(North);
+	directions.push_back(East);
+	directions.push_back(South);
+	directions.push_back(West);
+	directions.push_back(Northeast);
+	directions.push_back(Southeast);
+	directions.push_back(Southwest);
+	directions.push_back(Northwest);
+		
+	for (size_t i = 0; i < directions.size(); ++i) {
+		if (this->CanBuildPathway(pathway, directions[i], true)) {
+			this->BuildPathway(pathway, directions[i]);
 			return true;
 		}
 	}
@@ -2152,20 +2162,16 @@ bool GrandStrategyWorldMapTile::AiBuildPathway(int pathway, bool secondary_setti
 	if (!secondary_setting) {
 		std::vector<GrandStrategyWorldMapTile *> all_checked_tiles;
 		std::vector<GrandStrategyWorldMapTile *> currently_checked_tiles;
+		std::vector<GrandStrategyWorldMapTile *> new_checked_tiles;
 		all_checked_tiles.push_back(this);
 		currently_checked_tiles.push_back(this);
 		
 		while (currently_checked_tiles.size() > 0) {
-			int currently_checked_tiles_size = currently_checked_tiles.size();
-			for (int i = (currently_checked_tiles_size - 1); i >= 0; --i) {
+			for (size_t i = 0; i < currently_checked_tiles.size(); ++i) {
 				Vec2i pos = currently_checked_tiles[i]->Position;
 				
-				for (int j = 0; j < MaxDirections; ++j) {
-					if (j == Northeast || j == Northwest || j == Southeast || j == Southwest) { // no diagonal roads, at least for now
-						continue;
-					}
-				
-					Vec2i offset = GetDirectionOffset(j);
+				for (size_t j = 0; j < directions.size(); ++j) {
+					Vec2i offset = GetDirectionOffset(directions[j]);
 					
 					if (!GrandStrategyGame.IsPointOnMap(pos.x + offset.x, pos.y + offset.y)) {
 						continue;
@@ -2185,12 +2191,16 @@ bool GrandStrategyWorldMapTile::AiBuildPathway(int pathway, bool secondary_setti
 						return true;
 					} else {
 						all_checked_tiles.push_back(tile);
-						currently_checked_tiles.push_back(tile);
+						new_checked_tiles.push_back(tile);
 					}
 					
 				}
-				currently_checked_tiles.erase(std::remove(currently_checked_tiles.begin(), currently_checked_tiles.end(), currently_checked_tiles[i]), currently_checked_tiles.end());
 			}
+			currently_checked_tiles.clear();
+			for (size_t i = 0; i < new_checked_tiles.size(); ++i) {
+				currently_checked_tiles.push_back(new_checked_tiles[i]);
+			}
+			new_checked_tiles.clear();
 		}
 	}
 	
@@ -2255,10 +2265,6 @@ bool GrandStrategyWorldMapTile::HasResource(int resource, bool ignore_prospectio
 
 bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction, bool check_costs)
 {
-	if (direction == Northeast || direction == Northwest || direction == Southeast || direction == Southwest) { // no diagonal roads, at least for now
-		return false;
-	}
-		
 	if (!this->Province->Owner->CanBuildPathway(pathway, check_costs)) {
 		return false;
 	}
@@ -2277,6 +2283,7 @@ bool GrandStrategyWorldMapTile::CanBuildPathway(int pathway, int direction, bool
 		!GrandStrategyGame.IsPointOnMap(this->Position.x + offset.x, this->Position.y + offset.y)
 		|| GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Terrain == -1
 		|| GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province->Water
+		|| GrandStrategyGame.WorldMapTiles[this->Position.x + offset.x][this->Position.y + offset.y]->Province->Owner != this->Province->Owner
 	) {
 		return false;
 	}
@@ -6763,13 +6770,13 @@ void InitializeGrandStrategyGame(bool show_loading)
 		}
 		
 		if (CGraphic::Get(road_graphics_file) == NULL) { //use road graphics file for trails for now
-			CGraphic *trail_graphics = CGraphic::New(road_graphics_file, 64, 64);
+			CGraphic *trail_graphics = CGraphic::New(road_graphics_file, 80, 80);
 			trail_graphics->Load();
 		}
 		GrandStrategyGame.PathwayGraphics[PathwayTrail][i] = CGraphic::Get(road_graphics_file);
 		
 		if (CGraphic::Get(road_graphics_file) == NULL) {
-			CGraphic *road_graphics = CGraphic::New(road_graphics_file, 64, 64);
+			CGraphic *road_graphics = CGraphic::New(road_graphics_file, 80, 80);
 			road_graphics->Load();
 		}
 		GrandStrategyGame.PathwayGraphics[PathwayRoad][i] = CGraphic::Get(road_graphics_file);
