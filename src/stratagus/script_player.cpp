@@ -1509,6 +1509,14 @@ static int CclDefineFaction(lua_State *l)
 			} else {
 				LuaError(l, "Faction tier \"%s\" doesn't exist." _C_ faction_tier_name.c_str());
 			}
+		} else if (!strcmp(value, "DefaultGovernmentType")) {
+			std::string government_type_name = LuaToString(l, -1);
+			int government_type = GetGovernmentTypeIdByName(government_type_name);
+			if (government_type != -1) {
+				faction->DefaultGovernmentType = government_type;
+			} else {
+				LuaError(l, "Government type \"%s\" doesn't exist." _C_ government_type_name.c_str());
+			}
 		} else if (!strcmp(value, "ParentFaction")) {
 			parent_faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Language")) {

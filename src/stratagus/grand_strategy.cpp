@@ -825,7 +825,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 
 	if (tile->Port && province != NULL && province->SettlementLocation.x == x && province->SettlementLocation.y == y) { // ports only possible on settlement locations, at least for now
 		tile_tooltip += " (";
-		tile_tooltip += "Port";
+		tile_tooltip += "Dock";
 		tile_tooltip += ")";
 	}
 	
@@ -2504,7 +2504,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 			this->SetCivilization(this->Owner->Civilization);
 			
 			//if province's settlement location tile has a port but not the province, create a dock for the province's settlement, if its civilization has one
-			if (GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
+			if (GrandStrategyGame.IsPointOnMap(this->SettlementLocation.x, this->SettlementLocation.y) && GrandStrategyGame.WorldMapTiles[this->SettlementLocation.x][this->SettlementLocation.y]->Port) {
 				int dock_building_type = this->GetClassUnitType(GetUnitTypeClassIndexByName("dock"));
 				if (dock_building_type != -1) {
 					this->SetSettlementBuilding(dock_building_type, true);
@@ -6844,6 +6844,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 			faction->Civilization = i;
 			faction->Faction = j;
 			faction->FactionTier = PlayerRaces.Factions[i][j]->DefaultTier;
+			faction->GovernmentType = PlayerRaces.Factions[i][j]->DefaultGovernmentType;
 			
 			if (!PlayerRaces.CivilizationUpgrades[i].empty()) { //if faction's civilization has a civilization upgrade, apply it
 				faction->SetTechnology(UpgradeIdByIdent(PlayerRaces.CivilizationUpgrades[i]), true);

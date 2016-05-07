@@ -417,7 +417,7 @@ class CFaction
 {
 public:
 	CFaction() : 
-		ID(-1), Civilization(-1), DefaultTier(FactionTierBarony), ParentFaction(-1), Language(-1),
+		ID(-1), Civilization(-1), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1), Language(-1),
 		Playable(true) //factions are playable by default
 	{
 	}
@@ -433,6 +433,7 @@ public:
 	int ID;																/// faction ID
 	int Civilization;													/// faction civilization
 	int DefaultTier;													/// default faction tier
+	int DefaultGovernmentType;											/// default government type
 	int ParentFaction;													/// parent faction of this faction
 	int Language;
 	bool Playable;														/// faction playability
