@@ -224,6 +224,7 @@ public:
 	bool IncompatibleAffixes[UpgradeMax];
 	std::vector<CUpgrade *> RequiredAbilities;
 	std::vector<int> WeaponClasses;		/// If isn't empty, one of these weapon classes will need to be equipped for the upgrade to be applied
+	std::vector<std::string> Epithets;	/// Epithets when a character has a certain trait
 	CUnitType *Item;
 	//Wyrmgus end
 	int   ID;                         /// numerical id

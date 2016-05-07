@@ -134,7 +134,7 @@ static int CclDefineCharacter(lua_State *l)
 			std::string trait_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(trait_ident);
 			if (upgrade_id != -1) {
-				character->Trait = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+				character->Trait = AllUpgrades[upgrade_id];
 			} else {
 				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
 			}
@@ -450,7 +450,7 @@ static int CclDefineCharacter(lua_State *l)
 	
 	if (character->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
 		if (character->Type != NULL && character->Type->Traits.size() == 1) {
-			character->Trait = const_cast<CUpgrade *>(&(*character->Type->Traits[0]));
+			character->Trait = character->Type->Traits[0];
 		}
 	}
 	
@@ -539,7 +539,7 @@ static int CclDefineCustomHero(lua_State *l)
 			std::string trait_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(trait_ident);
 			if (upgrade_id != -1) {
-				hero->Trait = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+				hero->Trait = AllUpgrades[upgrade_id];
 			} else {
 				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
 			}
@@ -785,7 +785,7 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 			std::string trait_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(trait_ident);
 			if (upgrade_id != -1) {
-				hero->Trait = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+				hero->Trait = AllUpgrades[upgrade_id];
 			} else {
 				LuaError(l, "Trait upgrade \"%s\" doesn't exist." _C_ trait_ident.c_str());
 			}

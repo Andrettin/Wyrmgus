@@ -186,6 +186,7 @@ CUpgrade::~CUpgrade()
 	//Wyrmgus start
 	RequiredAbilities.clear();
 	WeaponClasses.clear();
+	Epithets.clear();
 	//Wyrmgus end
 }
 
@@ -522,7 +523,6 @@ static int CclDefineUpgrade(lua_State *l)
 				if (required_ability == NULL) {
 					LuaError(l, "Upgrade doesn't exist.");
 				}
-				++j;
 
 				upgrade->RequiredAbilities.push_back(required_ability);
 			}
@@ -536,9 +536,18 @@ static int CclDefineUpgrade(lua_State *l)
 				if (item_class == -1) {
 					LuaError(l, "Item class doesn't exist.");
 				}
-				++j;
 
 				upgrade->WeaponClasses.push_back(item_class);
+			}
+		} else if (!strcmp(value, "Epithets")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string epithet = LuaToString(l, -1, j + 1);
+
+				upgrade->Epithets.push_back(epithet);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

@@ -3838,23 +3838,23 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 		return NULL; //if civilization can't generate personal names, return
 	}
 	
-	std::string hero_extra_name;
-	if (GrandStrategyGame.GetHero(hero_name) != NULL) { // generate extra given names if this name is already used by an existing hero
-		hero_extra_name = GeneratePersonalName(language, unit_type_id, gender);
-		while (GrandStrategyGame.GetHero(hero_name + " " + hero_extra_name) != NULL) {
-			hero_extra_name += " " + GeneratePersonalName(language, unit_type_id, gender);
-		}
-	}
 	CGrandStrategyHero *hero = new CGrandStrategyHero;
 	GrandStrategyGame.Heroes.push_back(hero);
-	hero->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+	hero->Type = UnitTypes[unit_type_id];
+	
+	std::string hero_epithet;
 	if (hero->Type->Traits.size() > 0) {
 		if (parent != NULL && std::find(hero->Type->Traits.begin(), hero->Type->Traits.end(), parent->Trait) != hero->Type->Traits.end() && SyncRand(20) == 0) { // 5% chance that the hero will inherit their trait from their parent
 			hero->Trait = parent->Trait;
 		} else {
-			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())])); //generate a trait
+			hero->Trait = hero->Type->Traits[SyncRand(hero->Type->Traits.size())]; //generate a trait
+		}
+		
+		if (SyncRand(4) == 0 && hero->Trait->Epithets.size() > 0) { // 25% chance the hero will get an epithet along with the trait
+			hero_epithet = hero->Trait->Epithets[SyncRand(hero->Trait->Epithets.size())];
 		}
 	}
+	
 	if (parent != NULL && SyncRand(2) == 0) { // 50% chance that the hero will inherit their hair color from their parent
 		hero->HairVariation = parent->HairVariation;
 	} else {
@@ -3867,13 +3867,26 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 	hero->ProvinceOfOriginName = hero->ProvinceOfOrigin->Name;
 	hero->Gender = gender;
 	hero->Name = hero_name;
-	hero->ExtraName = hero_extra_name;
 	if (parent != NULL) {
 		hero->FamilyName = parent->FamilyName;
 	} else if (hero->Type->Class != "worker") {
 		hero->FamilyName = hero->GenerateNobleFamilyName();
 	}
+	if (hero->FamilyName.empty()) {
+		hero->ExtraName = hero_epithet;
+	} else {
+		hero->ExtraName = "'" + hero_epithet + "'";
+	}
 
+	while (GrandStrategyGame.GetHero(hero->GetFullName()) != NULL) { // generate extra given names if this name is already used by an existing hero
+		std::string new_personal_name = GeneratePersonalName(language, unit_type_id, gender);
+		if (hero->ExtraName.empty()) {
+			hero->ExtraName = new_personal_name;
+		} else {
+			hero->ExtraName = new_personal_name + " " + hero->ExtraName;
+		}
+	}
+	
 	hero->UpdateAttributes();
 	
 	GrandStrategyHeroStringToIndex[hero->GetFullName()] = GrandStrategyGame.Heroes.size() - 1;
@@ -4842,7 +4855,7 @@ void CGrandStrategyHero::Initialize()
 {
 	if (this->Trait == NULL) { //if no trait was set, have the hero be the same trait as the unit type (if the unit type has it predefined)
 		if (this->Type != NULL && this->Type->Traits.size() > 0) {
-			this->Trait = const_cast<CUpgrade *>(&(*this->Type->Traits[SyncRand(this->Type->Traits.size())]));
+			this->Trait = this->Type->Traits[SyncRand(this->Type->Traits.size())];
 		}
 	}
 	if (this->Type != NULL && this->HairVariation.empty()) {
@@ -6878,9 +6891,9 @@ void InitializeGrandStrategyGame(bool show_loading)
 			hero->Type = const_cast<CUnitType *>(&(*iterator->second->Type));
 		}
 		if (iterator->second->Trait != NULL) {
-			hero->Trait = const_cast<CUpgrade *>(&(*iterator->second->Trait));
+			hero->Trait = iterator->second->Trait;
 		} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
-			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
+			hero->Trait = hero->Type->Traits[SyncRand(hero->Type->Traits.size())];
 		}
 		hero->HairVariation = iterator->second->HairVariation;
 		hero->Year = iterator->second->Year;
@@ -6946,9 +6959,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 			hero->Type = const_cast<CUnitType *>(&(*CurrentCustomHero->Type));
 		}
 		if (CurrentCustomHero->Trait != NULL) {
-			hero->Trait = const_cast<CUpgrade *>(&(*CurrentCustomHero->Trait));
-		} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
-			hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
+			hero->Trait = CurrentCustomHero->Trait;
 		}
 		hero->HairVariation = CurrentCustomHero->HairVariation;
 		hero->Civilization = CurrentCustomHero->Civilization;
@@ -8261,9 +8272,7 @@ void CreateGrandStrategyCustomHero(std::string hero_full_name)
 		hero->Type = const_cast<CUnitType *>(&(*custom_hero->Type));
 	}
 	if (custom_hero->Trait != NULL) {
-		hero->Trait = const_cast<CUpgrade *>(&(*custom_hero->Trait));
-	} else if (hero->Type != NULL && hero->Type->Traits.size() > 0) {
-		hero->Trait = const_cast<CUpgrade *>(&(*hero->Type->Traits[SyncRand(hero->Type->Traits.size())]));
+		hero->Trait = custom_hero->Trait;
 	}
 	hero->HairVariation = custom_hero->HairVariation;
 	hero->Civilization = custom_hero->Civilization;
