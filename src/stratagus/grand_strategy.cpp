@@ -7098,9 +7098,11 @@ void InitializeGrandStrategyProvinces()
 				}
 			}
 		}
-		for (size_t j = 0; j < Provinces[i]->Tiles.size(); ++j) {
-			SetWorldMapTileProvince(Provinces[i]->Tiles[j].x, Provinces[i]->Tiles[j].y, province->Name);
-//			province->Tiles.push_back();
+		if (GrandStrategyWorld != "Random") {
+			for (size_t j = 0; j < Provinces[i]->Tiles.size(); ++j) {
+				SetWorldMapTileProvince(Provinces[i]->Tiles[j].x, Provinces[i]->Tiles[j].y, province->Name);
+	//			province->Tiles.push_back();
+			}
 		}
 		for (size_t j = 0; j < Provinces[i]->FactionClaims.size(); ++j) {
 			province->AddFactionClaim(Provinces[i]->FactionClaims[j]->Civilization, Provinces[i]->FactionClaims[j]->ID);
