@@ -4182,6 +4182,8 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 			GrandStrategyGame.Factions[new_civilization][new_faction]->SetMinister(i, GrandStrategyGame.Factions[old_civilization][old_faction]->Ministers[i]->GetFullName());
 		}
 	}
+	
+	CGrandStrategyProvince *capital = GrandStrategyGame.Factions[old_civilization][old_faction]->Capital;
 
 	int province_count = this->OwnedProvinces.size();
 	if (province_count > 0) {
@@ -4237,6 +4239,8 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 			GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[old_civilization][old_faction] = -1;
 		}
 	}
+	
+	GrandStrategyGame.Factions[new_civilization][new_faction]->SetCapital(capital);
 	
 	GrandStrategyGame.Factions[old_civilization][old_faction]->CalculateIncomes();
 	GrandStrategyGame.Factions[new_civilization][new_faction]->CalculateIncomes();
