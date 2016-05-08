@@ -1773,6 +1773,16 @@ static int CclDefineDeity(lua_State *l)
 			deity->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			deity->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Feasts")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string feast = LuaToString(l, -1, j + 1);
+
+				deity->Feasts.push_back(feast);
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

@@ -475,6 +475,7 @@ public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	std::vector<std::string> Feasts;
 };
 
 class LanguageWord
