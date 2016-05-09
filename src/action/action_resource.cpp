@@ -1224,6 +1224,17 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 //	player.TotalResources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
 	player.ChangeResource(rindex, (unit.ResourcesHeld * resinfo.FinalResourceConversionRate / 100 * player.Incomes[rindex]) / 100, true);
 	player.TotalResources[rindex] += (unit.ResourcesHeld * resinfo.FinalResourceConversionRate / 100 * player.Incomes[rindex]) / 100;
+	
+	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
+	int xp_gained = unit.ResourcesHeld * resinfo.FinalResourceConversionRate / 100;
+	if (rindex != GoldCost) {
+		xp_gained *= DefaultResourcePrices[rindex];
+		xp_gained /= 100;
+	}
+	xp_gained /= 10;
+	unit.Variable[XP_INDEX].Max += xp_gained;
+	unit.Variable[XP_INDEX].Value = unit.Variable[XP_INDEX].Max;
+	unit.XPChanged();
 	//Wyrmgus end
 	unit.ResourcesHeld = 0;
 	unit.CurrentResource = 0;

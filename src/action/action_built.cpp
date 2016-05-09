@@ -229,6 +229,8 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			}
 			
 			//Wyrmgus start
+			int worker_count = 1;
+			
 			//make workers that are helping build the building also harvest/return goods to it, if applicable
 			std::vector<CUnit *> table;
 			SelectAroundUnit(unit, 2, table);
@@ -242,6 +244,23 @@ static void Finish(COrder_Built &order, CUnit &unit)
 					if (table[i]->CurrentResource && table[i]->ResourcesHeld > 0 && type.CanStore[table[i]->CurrentResource]) {
 						CommandReturnGoods(*table[i], &unit, 0);
 					}
+					worker_count += 1;
+				}
+			}
+			
+			//give builders experience for the construction of the structure
+			int xp_gained = type.Stats[unit.Player->Index].Costs[TimeCost] / 5;
+			
+			// give experience to the builder
+			worker->Variable[XP_INDEX].Max += xp_gained / worker_count;
+			worker->Variable[XP_INDEX].Value = worker->Variable[XP_INDEX].Max;
+			worker->XPChanged();
+			
+			for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
+				if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+					table[i]->Variable[XP_INDEX].Max += xp_gained / worker_count;
+					table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
+					table[i]->XPChanged();
 				}
 			}
 			//Wyrmgus end
