@@ -5140,6 +5140,11 @@ int CGrandStrategyHero::GetTitleScore(int title, CGrandStrategyProvince *provinc
 			score += 1;
 		}
 	}
+	
+	if (this->Civilization != this->GetFaction()->Civilization) {
+		score -= 1; //characters of a different culture than the faction they are in have a smaller chance of getting a ministerial or gubernatorial position
+	}
+	
 	return score;
 }
 
