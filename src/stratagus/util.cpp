@@ -658,6 +658,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ṓ", "o");
 	text = FindAndReplaceString(text, "Ŏ", "O");
 	text = FindAndReplaceString(text, "ŏ", "o");
+	text = FindAndReplaceString(text, "Ø", "Ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
+	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ö", "O");
 	text = FindAndReplaceString(text, "ö", "o");
 	text = FindAndReplaceString(text, "Ó", "O");
@@ -668,10 +672,6 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "ō", "o");
 	text = FindAndReplaceString(text, "Ô", "O");
 	text = FindAndReplaceString(text, "ô", "o");
-	text = FindAndReplaceString(text, "Ø", "Ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "ø", "ö"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "Ǫ", "O"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
-	text = FindAndReplaceString(text, "ǫ", "o"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Œ", "Oe");
 	text = FindAndReplaceString(text, "œ", "oe");
 	text = FindAndReplaceString(text, "Ṛ́", "R");
