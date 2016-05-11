@@ -293,7 +293,7 @@ static int CclSetGrandStrategyFactionData(lua_State *l)
 	
 	CGrandStrategyFaction *faction = GrandStrategyGame.Factions[civilization_id][faction_id];
 	
-	const char *data = LuaToString(l, 2);
+	const char *data = LuaToString(l, 3);
 	
 	if (!strcmp(data, "Capital")) {
 		LuaCheckArgs(l, 4);

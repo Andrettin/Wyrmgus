@@ -3872,10 +3872,12 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 	} else if (hero->Type->Class != "worker") {
 		hero->FamilyName = hero->GenerateNobleFamilyName();
 	}
-	if (hero->FamilyName.empty()) {
-		hero->ExtraName = hero_epithet;
-	} else {
-		hero->ExtraName = "'" + hero_epithet + "'";
+	if (!hero_epithet.empty()) {
+		if (hero->FamilyName.empty()) {
+			hero->ExtraName = hero_epithet;
+		} else {
+			hero->ExtraName = "'" + hero_epithet + "'";
+		}
 	}
 
 	while (GrandStrategyGame.GetHero(hero->GetFullName()) != NULL) { // generate extra given names if this name is already used by an existing hero
