@@ -42,6 +42,7 @@
 #include "font.h"	// for grand strategy mode tooltip drawing
 #include "interface.h"
 #include "iolib.h"
+#include "luacallback.h"
 #include "menus.h"
 #include "player.h"
 #include "results.h"
@@ -79,6 +80,8 @@ std::string GrandStrategyInterfaceState;
 std::string SelectedHero;
 CGrandStrategyGame GrandStrategyGame;
 std::map<std::string, int> GrandStrategyHeroStringToIndex;
+std::vector<CGrandStrategyEvent *> GrandStrategyEvents;
+std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPointer;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -1147,6 +1150,8 @@ void CGrandStrategyGame::DoTurn()
 			}
 		}
 	}
+	
+	this->DoEvents();
 }
 
 void CGrandStrategyGame::DoTrade()
@@ -1368,6 +1373,20 @@ void CGrandStrategyGame::DoProspection()
 				}
 			} else {
 				break;
+			}
+		}
+	}
+}
+
+void CGrandStrategyGame::DoEvents()
+{
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			for (size_t k = 0; k < GrandStrategyGame.AvailableEvents.size(); ++k) {
+				CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[i][j]->Name + "\");");
+				if (GrandStrategyGame.AvailableEvents[k]->CanTrigger(GrandStrategyGame.Factions[i][j])) {
+					GrandStrategyGame.AvailableEvents[k]->Trigger(GrandStrategyGame.Factions[i][j]);
+				}
 			}
 		}
 	}
@@ -4857,6 +4876,7 @@ GrandStrategyWorldMapTile *CGrandStrategyFaction::GetCapitalSettlement()
 	
 	return GrandStrategyGame.WorldMapTiles[this->Capital->SettlementLocation.x][this->Capital->SettlementLocation.y];
 }
+
 void CGrandStrategyHero::Initialize()
 {
 	if (this->Trait == NULL) { //if no trait was set, have the hero be the same trait as the unit type (if the unit type has it predefined)
@@ -5280,6 +5300,53 @@ CGrandStrategyFaction *CGrandStrategyHero::GetFaction()
 	}
 	
 	return NULL;
+}
+
+CGrandStrategyEvent::~CGrandStrategyEvent()
+{
+	delete Conditions;
+	
+	for (size_t i = 0; i < this->OptionConditions.size(); ++i) {
+		delete this->OptionConditions[i];
+	}
+	
+	for (size_t i = 0; i < this->OptionEffects.size(); ++i) {
+		delete this->OptionEffects[i];
+	}
+}
+
+void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
+{
+	CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name + "\");");
+	CclCommand("GrandStrategyEvent(EventFaction, \"" + this->Name + "\");");
+	CclCommand("EventFaction = nil;");
+	CclCommand("EventProvince = nil;");
+	CclCommand("SecondEventProvince = nil;");
+	
+	if (!this->Persistent) {
+		GrandStrategyGame.AvailableEvents.erase(std::remove(GrandStrategyGame.AvailableEvents.begin(), GrandStrategyGame.AvailableEvents.end(), this), GrandStrategyGame.AvailableEvents.end());
+	}
+}
+
+bool CGrandStrategyEvent::CanTrigger(CGrandStrategyFaction *faction)
+{
+	if (this->MinYear && GrandStrategyYear < this->MinYear) {
+		return false;
+	}
+	
+	if (this->MaxYear && GrandStrategyYear > this->MaxYear) {
+		return false;
+	}
+	
+	if (this->Conditions) {
+		this->Conditions->pushPreamble();
+		this->Conditions->run(1);
+		if (this->Conditions->popBoolean() == false) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 /**
@@ -6515,6 +6582,7 @@ void CleanGrandStrategyGame()
 	GrandStrategyHeroStringToIndex.clear();
 	
 	GrandStrategyGame.UnpublishedWorks.clear();
+	GrandStrategyGame.AvailableEvents.clear();
 	
 	GrandStrategyGame.WorldMapWidth = 0;
 	GrandStrategyGame.WorldMapHeight = 0;
@@ -6994,6 +7062,16 @@ void InitializeGrandStrategyGame(bool show_loading)
 		}
 		
 		GrandStrategyGame.UnpublishedWorks.push_back(AllUpgrades[i]);
+	}
+	
+	if (GrandStrategyGameLoading == false) {
+		for (size_t i = 0; i < GrandStrategyEvents.size(); ++i) {
+			if (GrandStrategyEvents[i]->World != NULL && GrandStrategyEvents[i]->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+				continue;
+			}
+			
+			GrandStrategyGame.AvailableEvents.push_back(GrandStrategyEvents[i]);
+		}
 	}
 }
 
@@ -8483,6 +8561,16 @@ void GrandStrategyWorkCreated(std::string work_ident)
 	}
 }
 
+void MakeGrandStrategyEventAvailable(std::string event_name)
+{
+	CGrandStrategyEvent *event = GetGrandStrategyEvent(event_name);
+	if (event) {
+		GrandStrategyGame.AvailableEvents.push_back(event);
+	} else {
+		fprintf(stderr, "Grand strategy event \"%s\" doesn't exist.\n", event_name.c_str());
+	}
+}
+
 int GetGrandStrategySelectedTileX()
 {
 	return GrandStrategyGame.SelectedTile.x;
@@ -8597,6 +8685,24 @@ void SetResourceGrandStrategyBuildingTerrainSpecificGraphic(std::string resource
 	}
 	
 	ResourceGrandStrategyBuildingTerrainSpecificGraphic[resource][terrain_type] = has_terrain_specific_graphic;
+}
+
+void CleanGrandStrategyEvents()
+{
+	for (size_t i = 0; i < GrandStrategyEvents.size(); ++i) {
+		delete GrandStrategyEvents[i];
+	}
+	GrandStrategyEvents.clear();
+	GrandStrategyEventStringToPointer.clear();
+}
+
+CGrandStrategyEvent *GetGrandStrategyEvent(std::string event_name)
+{
+	if (GrandStrategyEventStringToPointer.find(event_name) != GrandStrategyEventStringToPointer.end()) {
+		return GrandStrategyEventStringToPointer[event_name];
+	}
+	
+	return NULL;
 }
 
 std::string GetDiplomacyStateNameById(int diplomacy_state)

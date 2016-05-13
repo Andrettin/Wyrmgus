@@ -36,6 +36,7 @@
 #include "stratagus.h"
 
 #include "grand_strategy.h"
+#include "luacallback.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -314,6 +315,177 @@ static int CclSetGrandStrategyFactionData(lua_State *l)
 }
 
 /**
+**  Define a world.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineGrandStrategyEvent(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string event_name = LuaToString(l, 1);
+	CGrandStrategyEvent *event = GetGrandStrategyEvent(event_name);
+	if (!event) {
+		event = new CGrandStrategyEvent;
+		event->Name = event_name;
+		event->ID = GrandStrategyEvents.size();
+		GrandStrategyEvents.push_back(event);
+		GrandStrategyEventStringToPointer[event_name] = event;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Description")) {
+			event->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Persistent")) {
+			event->Persistent = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "MinYear")) {
+			event->MinYear = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MaxYear")) {
+			event->MaxYear = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "World")) {
+			CWorld *world = GetWorld(LuaToString(l, -1));
+			if (world != NULL) {
+				event->World = world;
+			} else {
+				LuaError(l, "World doesn't exist.");
+			}
+		} else if (!strcmp(value, "Conditions")) {
+			event->Conditions = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "Options")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string option_string = LuaToString(l, -1, j + 1);
+				event->Options.push_back(option_string);
+			}
+		} else if (!strcmp(value, "OptionEffects")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				event->OptionEffects.push_back(new LuaCallback(l, -1));
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "OptionConditions")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				event->OptionConditions.push_back(new LuaCallback(l, -1));
+				lua_pop(l, 1);
+			}
+		} else if (!strcmp(value, "OptionTooltips")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string option_tooltip = LuaToString(l, -1, j + 1);
+				event->OptionTooltips.push_back(option_tooltip);
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
+**  Get grand strategy event data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetGrandStrategyEventData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string event_name = LuaToString(l, 1);
+	CGrandStrategyEvent *event = GetGrandStrategyEvent(event_name);
+	if (event == NULL) {
+		LuaError(l, "Event \"%s\" doesn't exist." _C_ event_name.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Description")) {
+		lua_pushstring(l, event->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "World")) {
+		if (event->World != NULL) {
+			lua_pushstring(l, event->World->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Persistent")) {
+		lua_pushboolean(l, event->Persistent);
+		return 1;
+	} else if (!strcmp(data, "MinYear")) {
+		lua_pushnumber(l, event->MinYear);
+		return 1;
+	} else if (!strcmp(data, "MaxYear")) {
+		lua_pushnumber(l, event->MaxYear);
+		return 1;
+	} else if (!strcmp(data, "Options")) {
+		lua_createtable(l, event->Options.size(), 0);
+		for (size_t i = 1; i <= event->Options.size(); ++i)
+		{
+			lua_pushstring(l, event->Options[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "OptionCondition")) {
+		LuaCheckArgs(l, 3);
+
+		int option = LuaToNumber(l, 3) - 1;
+		if (event->OptionConditions.size() > option && event->OptionConditions[option]) {
+			event->OptionConditions[option]->pushPreamble();
+			event->OptionConditions[option]->run(1);
+			if (event->OptionConditions[option]->popBoolean() == false) {
+				lua_pushboolean(l, event->OptionConditions[option]->popBoolean());
+			}
+		} else {
+			lua_pushboolean(l, true);
+		}
+		return 1;
+	} else if (!strcmp(data, "OptionEffect")) {
+		LuaCheckArgs(l, 3);
+
+		int option = LuaToNumber(l, 3) - 1;
+		if (event->OptionEffects.size() > option && event->OptionEffects[option]) {
+			event->OptionEffects[option]->pushPreamble();
+			event->OptionEffects[option]->run();
+		}
+		return 1;
+	} else if (!strcmp(data, "OptionTooltips")) {
+		lua_createtable(l, event->OptionTooltips.size(), 0);
+		for (size_t i = 1; i <= event->OptionTooltips.size(); ++i)
+		{
+			lua_pushstring(l, event->OptionTooltips[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+	
+	return 0;
+}
+
+/**
 **  Register CCL features for provinces.
 */
 void GrandStrategyCclRegister()
@@ -324,6 +496,8 @@ void GrandStrategyCclRegister()
 	lua_register(Lua, "GetGrandStrategyProvinceData", CclGetGrandStrategyProvinceData);
 	lua_register(Lua, "GetGrandStrategyProvinces", CclGetGrandStrategyProvinces);
 	lua_register(Lua, "SetGrandStrategyFactionData", CclSetGrandStrategyFactionData);
+	lua_register(Lua, "DefineGrandStrategyEvent", CclDefineGrandStrategyEvent);
+	lua_register(Lua, "GetGrandStrategyEventData", CclGetGrandStrategyEventData);
 }
 
 //@}

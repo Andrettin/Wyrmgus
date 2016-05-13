@@ -3102,6 +3102,10 @@ void SaveGrandStrategyGame(const std::string &filename)
 			}
 		}
 		
+		for (size_t i = 0; i < GrandStrategyGame.AvailableEvents.size(); ++i) {
+			fprintf(fd, "MakeGrandStrategyEventAvailable(\"%s\")\n", GrandStrategyGame.AvailableEvents[i]->Name.c_str()); // save which grand strategy events are available
+		}
+		
 		fprintf(fd, "SetPlayerFaction(\"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.PlayerFaction->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Name.c_str());
 	
 		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {

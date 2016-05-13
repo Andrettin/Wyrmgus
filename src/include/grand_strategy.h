@@ -55,6 +55,7 @@
 class CGrandStrategyProvince;
 class CGrandStrategyFaction;
 class CGrandStrategyHero;
+class LuaCallback;
 
 /**
 **  Indexes into diplomacy state array.
@@ -361,6 +362,35 @@ public:
 	std::vector<std::pair<int, CGrandStrategyProvince *>> ProvinceTitles;	/// Provincial titles of the character (first value is the title type, and the second one is the province
 };
 
+class CGrandStrategyEvent
+{
+public:
+	CGrandStrategyEvent() :
+		Persistent(false),
+		ID(-1), MinYear(0), MaxYear(0),
+		World(NULL),
+		Conditions(NULL)
+	{
+	}
+	~CGrandStrategyEvent();
+	
+	void Trigger(CGrandStrategyFaction *faction);
+	bool CanTrigger(CGrandStrategyFaction *faction);
+	
+	std::string Name;
+	std::string Description;
+	bool Persistent;
+	int ID;
+	int MinYear;
+	int MaxYear;
+	CWorld *World;
+	LuaCallback *Conditions;
+	std::vector<std::string> Options;
+	std::vector<LuaCallback *> OptionConditions;
+	std::vector<LuaCallback *> OptionEffects;
+	std::vector<std::string> OptionTooltips;
+};
+
 /**
 **  Grand Strategy game instance
 **  Mapped with #GrandStrategy to a symbolic name.
@@ -412,6 +442,7 @@ public:
 	void DoTurn();							/// Process the grand strategy turn
 	void DoTrade();							/// Process trade deals
 	void DoProspection();					/// Process prospection for the turn
+	void DoEvents();
 	void SetSelectedProvince(CGrandStrategyProvince *province);	/// Set selected province
 	void PerformTrade(CGrandStrategyFaction &importer_faction, CGrandStrategyFaction &exporter_faction, int resource);
 	void CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province);
@@ -453,6 +484,7 @@ public:
 	CRiver *Rivers[RiverMax];
 	std::vector<CGrandStrategyHero *> Heroes;
 	std::vector<CUpgrade *> UnpublishedWorks;
+	std::vector<CGrandStrategyEvent *> AvailableEvents;
 	CGrandStrategyFaction *PlayerFaction;
 	Vec2i WorldMapResources[MaxCosts][WorldMapResourceMax];		/// resources on the map; three values: the resource's x position, its y position, and whether it is discovered or not
 	int CommodityPrices[MaxCosts];								/// price for every 100 of each commodity
@@ -495,6 +527,8 @@ extern std::string GrandStrategyInterfaceState;
 extern std::string SelectedHero;
 extern CGrandStrategyGame GrandStrategyGame;			/// Grand strategy game
 extern std::map<std::string, int> GrandStrategyHeroStringToIndex;
+extern std::vector<CGrandStrategyEvent *> GrandStrategyEvents;
+extern std::map<std::string, CGrandStrategyEvent *> GrandStrategyEventStringToPointer;
 
 /*----------------------------------------------------------------------------
 -- Functions
@@ -640,6 +674,7 @@ extern bool GrandStrategyHeroIsVisible(std::string hero_full_name);
 extern bool GrandStrategyHeroIsActive(std::string hero_full_name);
 extern bool GrandStrategyHeroIsCustom(std::string hero_full_name);
 extern void GrandStrategyWorkCreated(std::string work_ident);
+extern void MakeGrandStrategyEventAvailable(std::string event_name);
 extern void SetSelectedTile(int x, int y);
 extern int GetGrandStrategySelectedTileX();
 extern int GetGrandStrategySelectedTileY();
@@ -652,6 +687,8 @@ extern void SetResourceBaseLaborInput(std::string resource_name, int input);
 extern void SetResourceBaseOutput(std::string resource_name, int output);
 extern void SetResourceGrandStrategyBuildingVariations(std::string resource_name, int variation_quantity);
 extern void SetResourceGrandStrategyBuildingTerrainSpecificGraphic(std::string resource_name, std::string terrain_type_name, bool has_terrain_specific_graphic);
+extern void CleanGrandStrategyEvents();
+extern CGrandStrategyEvent *GetGrandStrategyEvent(std::string event_name);
 extern void GrandStrategyCclRegister();
 
 //@}

@@ -146,6 +146,7 @@ extern bool GrandStrategyHeroIsVisible(std::string hero_full_name);
 extern bool GrandStrategyHeroIsActive(std::string hero_full_name);
 extern bool GrandStrategyHeroIsCustom(std::string hero_full_name);
 extern void GrandStrategyWorkCreated(std::string work_ident);
+extern void MakeGrandStrategyEventAvailable(std::string event_name);
 extern void SetSelectedTile(int x, int y);
 extern int GetGrandStrategySelectedTileX();
 extern int GetGrandStrategySelectedTileY();

@@ -103,6 +103,9 @@ void CleanModules()
 	//Wyrmgus end
 	CleanConstructions();
 	CleanDecorations();
+	//Wyrmgus start
+	CleanGrandStrategyEvents();
+	//Wyrmgus end
 	CleanMissiles();
 	//Wyrmgus start
 	CleanQuests();
