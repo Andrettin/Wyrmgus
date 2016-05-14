@@ -234,6 +234,7 @@ public:
 	int GrandStrategyProductionModifier[MaxCosts];	/// production modifier (absolute increase) for a particular resource for grand strategy mode
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode
 	int RevoltRiskModifier;			/// revolt risk modifier (for the grand strategy mode)
+	int AdministrativeEfficiencyModifier;	/// administrative efficiency modifier (for the grand strategy mode)
 	int TechnologyPointCost;		/// technology point cost
 	int Work;						/// form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year;						/// year of publication, if is a literary work

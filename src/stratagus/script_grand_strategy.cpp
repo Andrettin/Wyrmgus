@@ -348,6 +348,8 @@ static int CclDefineGrandStrategyEvent(lua_State *l)
 			event->MinYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MaxYear")) {
 			event->MaxYear = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "HistoricalYear")) {
+			event->HistoricalYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "World")) {
 			CWorld *world = GetWorld(LuaToString(l, -1));
 			if (world != NULL) {
@@ -438,6 +440,9 @@ static int CclGetGrandStrategyEventData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "MaxYear")) {
 		lua_pushnumber(l, event->MaxYear);
+		return 1;
+	} else if (!strcmp(data, "HistoricalYear")) {
+		lua_pushnumber(l, event->HistoricalYear);
 		return 1;
 	} else if (!strcmp(data, "Options")) {
 		lua_createtable(l, event->Options.size(), 0);

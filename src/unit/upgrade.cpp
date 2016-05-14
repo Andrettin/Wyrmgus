@@ -167,7 +167,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -341,6 +341,7 @@ static int CclDefineUpgrade(lua_State *l)
 					upgrade->ItemSuffix[i] = parent_upgrade->ItemSuffix[i];
 				}
 				upgrade->RevoltRiskModifier = parent_upgrade->RevoltRiskModifier;
+				upgrade->AdministrativeEfficiencyModifier = parent_upgrade->AdministrativeEfficiencyModifier;
 				upgrade->TechnologyPointCost = parent_upgrade->TechnologyPointCost;
 				upgrade->Ability = parent_upgrade->Ability;
 				upgrade->Weapon = parent_upgrade->Weapon;
@@ -382,6 +383,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->ModifierGraphicFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "RevoltRiskModifier")) {
 			upgrade->RevoltRiskModifier = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "AdministrativeEfficiencyModifier")) {
+			upgrade->AdministrativeEfficiencyModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TechnologyPointCost")) {
 			upgrade->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Year")) {
@@ -2365,6 +2368,20 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 		}
 		
 		if (grand_strategy) {
+			if (upgrade->AdministrativeEfficiencyModifier != 0) {
+				if (!first_element) {
+					upgrade_effects_string += ", ";
+				} else {
+					first_element = false;
+				}
+
+				if (upgrade->AdministrativeEfficiencyModifier > 0) {
+					upgrade_effects_string += "+";
+				}
+				upgrade_effects_string += std::to_string((long long) upgrade->AdministrativeEfficiencyModifier) + "% "; 
+				upgrade_effects_string += "Administrative Efficiency Modifier";
+			}
+			
 			for (int i = 0; i < MaxCosts; ++i) {
 				if (upgrade->GrandStrategyProductionModifier[i] != 0) {
 					if (!first_element) {

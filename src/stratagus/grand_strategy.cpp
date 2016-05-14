@@ -3469,6 +3469,12 @@ int CGrandStrategyProvince::GetAdministrativeEfficiencyModifier()
 		}
 	}
 	
+	for (size_t i = 0; i < this->Modifiers.size(); ++i) {
+		if (this->Modifiers[i]->AdministrativeEfficiencyModifier != 0) {
+			modifier += this->Modifiers[i]->AdministrativeEfficiencyModifier;
+		}
+	}
+	
 	return modifier;
 }
 
@@ -7067,6 +7073,10 @@ void InitializeGrandStrategyGame(bool show_loading)
 	if (GrandStrategyGameLoading == false) {
 		for (size_t i = 0; i < GrandStrategyEvents.size(); ++i) {
 			if (GrandStrategyEvents[i]->World != NULL && GrandStrategyEvents[i]->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+				continue;
+			}
+			
+			if (GrandStrategyEvents[i]->HistoricalYear && GrandStrategyYear > GrandStrategyEvents[i]->HistoricalYear) {
 				continue;
 			}
 			

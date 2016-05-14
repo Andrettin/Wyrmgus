@@ -367,7 +367,7 @@ class CGrandStrategyEvent
 public:
 	CGrandStrategyEvent() :
 		Persistent(false),
-		ID(-1), MinYear(0), MaxYear(0),
+		ID(-1), MinYear(0), MaxYear(0), HistoricalYear(0),
 		World(NULL),
 		Conditions(NULL)
 	{
@@ -383,6 +383,7 @@ public:
 	int ID;
 	int MinYear;
 	int MaxYear;
+	int HistoricalYear;
 	CWorld *World;
 	LuaCallback *Conditions;
 	std::vector<std::string> Options;
