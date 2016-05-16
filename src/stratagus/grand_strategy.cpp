@@ -3683,21 +3683,22 @@ std::string CGrandStrategyProvince::GenerateWorkName()
 	for (size_t i = 0; i < this->Owner->HistoricalMinisters[CharacterTitleHeadOfState].size(); ++i) {
 		potential_heroes.push_back(this->Owner->HistoricalMinisters[CharacterTitleHeadOfState][i]);
 	}
-	if (potential_heroes.size() > 0) {
+	
+	if (potential_heroes.size() > 0 && SyncRand(10) != 0) { // 9 chances out of 10 that a literary work will use a hero's name as a basis
 		work_name += potential_heroes[SyncRand(potential_heroes.size())]->Name;
 		if (work_name.substr(work_name.size() - 1, 1) != "s") {
 			work_name += "s";
 		}
+		
+		std::string work_name_suffix = DecapitalizeString(GenerateName(this->GetLanguage(), "literary-work", AffixTypeSuffix));
+		if (work_name_suffix.empty()) {
+			return "";
+		}
+		
+		work_name += work_name_suffix;
 	} else {
-		return "";
+		work_name = GenerateName(this->GetLanguage(), "literary-work");
 	}
-	
-	std::string work_name_suffix = DecapitalizeString(GenerateName(this->GetLanguage(), "literary-work", AffixTypeSuffix));
-	if (work_name_suffix.empty()) {
-		return "";
-	}
-	
-	work_name += work_name_suffix;
 	
 	return work_name;
 }
