@@ -8581,6 +8581,17 @@ void MakeGrandStrategyEventAvailable(std::string event_name)
 	}
 }
 
+bool GetGrandStrategyEventTriggered(std::string event_name)
+{
+	CGrandStrategyEvent *event = GetGrandStrategyEvent(event_name);
+	if (event) {
+		return std::find(GrandStrategyGame.AvailableEvents.begin(), GrandStrategyGame.AvailableEvents.end(), event) == GrandStrategyGame.AvailableEvents.end();
+	} else {
+		fprintf(stderr, "Grand strategy event \"%s\" doesn't exist.\n", event_name.c_str());
+		return false;
+	}
+}
+
 int GetGrandStrategySelectedTileX()
 {
 	return GrandStrategyGame.SelectedTile.x;
