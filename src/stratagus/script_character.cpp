@@ -476,6 +476,14 @@ static int CclDefineCharacter(lua_State *l)
 
 	if (character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with the some data like gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
 		character->GenerateMissingData();
+		
+		// command to generate missing data for the parents, since those are defined before this character, and thus if this character has both dates set and nothing to estimate, otherwise the parents' dates wouldn't be affected
+		if (character->Father != NULL) {
+			character->Father->GenerateMissingData();
+		}
+		if (character->Mother != NULL) {
+			character->Mother->GenerateMissingData();
+		}
 	}
 	
 	character->UpdateAttributes();
