@@ -11,20 +11,24 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
+set(TOLUA++_FOUND false)
 if(TOLUA++_INCLUDE_DIR AND TOLUA++_LIBRARY AND TOLUA++_APP)
 	set(TOLUA++_FOUND true)
 else()
 	find_path(TOLUA++_INCLUDE_DIR tolua++.h)
-	find_library(TOLUA++_LIBRARY NAMES tolua++ tolua++5.1 toluapp)
-	find_program(TOLUA++_APP NAMES tolua++ tolua++5.1 toluapp)
+	find_library(TOLUA++_LIBRARY NAMES tolua++ tolua++5.1 tolua++-5.1 toluapp)
+	find_program(TOLUA++_APP NAMES tolua++ tolua++5.1 tolua++-5.1 toluapp)
 
-	if(TOLUA++_INCLUDE_DIR AND TOLUA++_LIBRARY AND TOLUA++_APP)
-		set(TOLUA++_FOUND true)
-		message(STATUS "Found program tolua++: ${TOLUA++_APP}")
+	if(TOLUA++_INCLUDE_DIR AND TOLUA++_LIBRARY)
 		message(STATUS "Found library tolua++: ${TOLUA++_LIBRARY}")
+		if(TOLUA++_APP)
+			set(TOLUA++_FOUND true)
+			message(STATUS "Found program tolua++: ${TOLUA++_APP}")
+		else()
+			message(FATAL_ERROR "Could not find tolua++ program")
+		endif()
 	else()
-		set(TOLUA++_FOUND false)
-		message(FATAL_ERROR "Could not find library or program tolua++")
+		message(FATAL_ERROR "Could not find library or tolua++ include path")
 	endif()
 
 	mark_as_advanced(TOLUA++_INCLUDE_DIR AND TOLUA++_LIBRARY AND TOLUA++_APP)
