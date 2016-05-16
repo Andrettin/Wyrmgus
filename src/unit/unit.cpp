@@ -2010,7 +2010,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	// generate a trait for the unit, if any are available (only if the editor isn't running)
 	if (Editor.Running == EditorNotRunning && unit->Type->Traits.size() > 0) {
 		TraitAcquire(*unit, unit->Type->Traits[SyncRand(unit->Type->Traits.size())]);
-		if (unit->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on the trait
+		if (!unit->Name.empty() && unit->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on the trait
 			unit->Name += " " + unit->Trait->Epithets[SyncRand(unit->Trait->Epithets.size())];
 		}
 	}
@@ -2401,7 +2401,7 @@ void CUnit::UpdatePersonalName()
 		this->Name = new_personal_name;
 	} else {
 		this->Name = GeneratePersonalName(language, this->Type->Slot, this->Variable[GENDER_INDEX].Value);
-		if (this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
+		if (!this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
 			this->Name += " " + this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 		}
 	}
