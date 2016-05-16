@@ -674,6 +674,7 @@ public:
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
+	std::string GetNamePlural() const;
 	//Wyrmgus end
 
 public:

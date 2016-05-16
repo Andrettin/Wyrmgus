@@ -2271,6 +2271,11 @@ char UpgradeIdentAllowed(const CPlayer &player, const std::string &ident)
 std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strategy, bool multiline)
 {
 	const CUpgrade *upgrade = CUpgrade::Get(upgrade_ident);
+	
+	std::string padding_string = ", ";
+	if (multiline) {
+		padding_string = "\n";
+	}
 
 	if (upgrade) {
 		std::string upgrade_effects_string;
@@ -2278,9 +2283,12 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 		bool first_element = true;
 		//check if the upgrade makes modifications to any units
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+			if (grand_strategy) { // don't show modifiers in the grand strategy mode for now
+				continue;
+			}
 			if (UpgradeModifiers[z]->UpgradeId == upgrade->ID) {
 				if (!first_element) {
-					upgrade_effects_string += ", ";
+					upgrade_effects_string += padding_string;
 				} else {
 					first_element = false;
 				}
@@ -2294,10 +2302,18 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 					if (var == STRENGTH_INDEX || var == DEXTERITY_INDEX || var == INTELLIGENCE_INDEX || var == CHARISMA_INDEX) { // don't show attributes for now
 						continue;
 					}
+					
+					if (grand_strategy) {
+						if (
+							var == SUPPLY_INDEX // don't show supply effects in the grand strategy mode
+						) {
+							continue;
+						}
+					}
 
 					if (UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
 						if (!first_var) {
-							upgrade_effects_string += ", ";
+							upgrade_effects_string += padding_string;
 						} else {
 							first_var = false;
 						}
@@ -2336,15 +2352,14 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 									first_unit_type = false;
 								}
 									
-								upgrade_effects_string += UnitTypes[i]->Name;
-								upgrade_effects_string += "s";
+								upgrade_effects_string += UnitTypes[i]->GetNamePlural();
 							}
 						}
 					}
 					
 					if (UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
 						if (!first_var) {
-							upgrade_effects_string += ", ";
+							upgrade_effects_string += padding_string;
 						} else {
 							first_var = false;
 						}
@@ -2370,7 +2385,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 		if (grand_strategy) {
 			if (upgrade->AdministrativeEfficiencyModifier != 0) {
 				if (!first_element) {
-					upgrade_effects_string += ", ";
+					upgrade_effects_string += padding_string;
 				} else {
 					first_element = false;
 				}
@@ -2385,7 +2400,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 			for (int i = 0; i < MaxCosts; ++i) {
 				if (upgrade->GrandStrategyProductionModifier[i] != 0) {
 					if (!first_element) {
-						upgrade_effects_string += ", ";
+						upgrade_effects_string += padding_string;
 					} else {
 						first_element = false;
 					}
@@ -2398,7 +2413,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 				}
 				if (upgrade->GrandStrategyProductionEfficiencyModifier[i] != 0) {
 					if (!first_element) {
-						upgrade_effects_string += ", ";
+						upgrade_effects_string += padding_string;
 					} else {
 						first_element = false;
 					}
@@ -2408,12 +2423,13 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 					}
 					upgrade_effects_string += std::to_string((long long) upgrade->GrandStrategyProductionEfficiencyModifier[i]) + "% "; 
 					upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
+					upgrade_effects_string += " Production Efficiency";
 				}
 			}
 			
 			if (upgrade->RevoltRiskModifier != 0) {
 				if (!first_element) {
-					upgrade_effects_string += ", ";
+					upgrade_effects_string += padding_string;
 				} else {
 					first_element = false;
 				}
@@ -2424,12 +2440,37 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 				upgrade_effects_string += std::to_string((long long) upgrade->RevoltRiskModifier) + "% "; 
 				upgrade_effects_string += "Revolt Risk";
 			}
+			
+			if (upgrade->Class == "writing") {
+				if (!first_element) {
+					upgrade_effects_string += padding_string;
+				} else {
+					first_element = false;
+				}
+				
+				upgrade_effects_string += "Transforms faction from tribe to polity (with Masonry)";
+			} else if (upgrade->Class == "masonry") {
+				if (!first_element) {
+					upgrade_effects_string += padding_string;
+				} else {
+					first_element = false;
+				}
+				
+				upgrade_effects_string += "Transforms faction from tribe to polity (with Writing)";
+				upgrade_effects_string += padding_string;
+				upgrade_effects_string += "Allows building of Roads";
+				
+				int civilization_id = PlayerRaces.GetRaceIndexByName(upgrade->Civilization.c_str());
+				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, upgrade->Faction);
+				int stronghold_id = PlayerRaces.GetFactionClassUnitType(civilization_id, faction_id, GetUnitTypeClassIndexByName("stronghold"));
+				if (stronghold_id != -1) {
+					upgrade_effects_string += padding_string;
+					upgrade_effects_string += "Allows building of ";
+					upgrade_effects_string += UnitTypes[stronghold_id]->GetNamePlural();
+				}
+			}
 		}
 		
-		if (multiline) {
-			upgrade_effects_string = FindAndReplaceString(upgrade_effects_string, ", ", "\n");
-		}
-			
 		return upgrade_effects_string;
 	}
 	

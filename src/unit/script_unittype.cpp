@@ -2428,6 +2428,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->Name.c_str());
 		return 1;
 	//Wyrmgus start
+	} else if (!strcmp(data, "NamePlural")) {
+		lua_pushstring(l, type->GetNamePlural().c_str());
+		return 1;
 	} else if (!strcmp(data, "Parent")) {
 		lua_pushstring(l, type->Parent.c_str());
 		return 1;

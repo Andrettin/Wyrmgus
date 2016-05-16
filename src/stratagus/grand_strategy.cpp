@@ -4604,7 +4604,7 @@ bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province
 
 bool CGrandStrategyFaction::CanBuildPathway(int pathway, bool check_costs)
 {
-	if (pathway == PathwayRoad && PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") { // only polities can build roads
+	if (pathway == PathwayRoad && !this->HasTechnologyClass("masonry")) { // only factions that know Masonry can build roads
 		return false;
 	}
 	
