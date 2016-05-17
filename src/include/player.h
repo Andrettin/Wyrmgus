@@ -450,6 +450,7 @@ public:
 	std::map<int, CFaction *> HistoricalFactionDerivations;				/// cases of this faction deriving technologies/governmental system from another, mapped to the date in which it happened
 	std::map<int, int> HistoricalTiers;									/// dates in which this faction's tier changed; faction tier mapped to year
 	std::map<int, int> HistoricalGovernmentTypes;						/// dates in which this faction's government type changed; government type mapped to year
+	std::map<std::pair<int, CFaction *>, int> HistoricalDiplomacyStates;	/// dates in which this faction's diplomacy state to another faction changed; diplomacy state mapped to year and faction
 	std::map<int, std::string> HistoricalCapitals;						/// dates in which this faction's capital changed; province mapped to year
 	std::vector<CFiller> UIFillers;
 	

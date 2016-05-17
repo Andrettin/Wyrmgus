@@ -3005,8 +3005,8 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 				for (int k = i; k < MAX_RACES; ++k) { //the function sets the state for both parties, so we only need to do it once for one of them
 					for (size_t n = j + 1; n < PlayerRaces.Factions[k].size(); ++n) {
-						if (GrandStrategyGame.Factions[k][n] && GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n] != DiplomacyStatePeace) {
-							fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Name.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->DiplomacyState[k][n]).c_str()); //save faction trade data
+						if (GrandStrategyGame.Factions[k][n] && GrandStrategyGame.Factions[i][j]->GetDiplomacyState(GrandStrategyGame.Factions[k][n]) != DiplomacyStatePeace) {
+							fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Name.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->GetDiplomacyState(GrandStrategyGame.Factions[k][n])).c_str()); //save faction trade data
 						}
 					}
 				}

@@ -1676,6 +1676,32 @@ static int CclDefineFaction(lua_State *l)
 				}
 				faction->HistoricalGovernmentTypes[year] = government_type;
 			}
+		} else if (!strcmp(value, "HistoricalDiplomacyStates")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				
+				std::string diplomacy_state_civilization_name = LuaToString(l, -1, j + 1);
+				int diplomacy_state_civilization = PlayerRaces.GetRaceIndexByName(diplomacy_state_civilization_name.c_str());
+				++j;
+				std::string diplomacy_state_faction_name = LuaToString(l, -1, j + 1);
+				int diplomacy_state_faction = PlayerRaces.GetFactionIndexByName(diplomacy_state_civilization, diplomacy_state_faction_name);
+				if (diplomacy_state_faction == -1) {
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ diplomacy_state_faction_name.c_str());
+				}
+				++j;
+
+				std::string diplomacy_state_name = LuaToString(l, -1, j + 1);
+				int diplomacy_state = GetDiplomacyStateIdByName(diplomacy_state_name);
+				if (diplomacy_state == -1) {
+					LuaError(l, "Diplomacy state \"%s\" doesn't exist." _C_ diplomacy_state_name.c_str());
+				}
+				faction->HistoricalDiplomacyStates[std::pair<int, CFaction *>(year, PlayerRaces.Factions[diplomacy_state_civilization][diplomacy_state_faction])] = diplomacy_state;
+			}
 		} else if (!strcmp(value, "HistoricalCapitals")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

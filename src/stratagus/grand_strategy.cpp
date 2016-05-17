@@ -3394,8 +3394,8 @@ bool CGrandStrategyProvince::CanAttackProvince(CGrandStrategyProvince *province)
 	if (
 		province->Owner != NULL
 		&& (
-			this->Owner->DiplomacyState[province->Owner->Civilization][province->Owner->Faction] != DiplomacyStateWar
-			|| this->Owner->DiplomacyStateProposal[province->Owner->Civilization][province->Owner->Faction] == DiplomacyStatePeace
+			this->Owner->GetDiplomacyState(province->Owner) != DiplomacyStateWar
+			|| this->Owner->GetDiplomacyState(province->Owner) == DiplomacyStatePeace
 		)
 	) {
 		return false;
@@ -4259,12 +4259,16 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		this->Claims[i]->AddFactionClaim(new_civilization, new_faction);
 	}
 
+	GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStates.clear();
+	GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStateProposals.clear();
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyState[i][j] = DiplomacyStatePeace;
-			GrandStrategyGame.Factions[i][j]->DiplomacyState[old_civilization][old_faction] = DiplomacyStatePeace;
-			GrandStrategyGame.Factions[old_civilization][old_faction]->DiplomacyStateProposal[i][j] = -1;
-			GrandStrategyGame.Factions[i][j]->DiplomacyStateProposal[old_civilization][old_faction] = -1;
+			if (GrandStrategyGame.Factions[i][j]->DiplomacyStates.find(GrandStrategyGame.Factions[old_civilization][old_faction]) != GrandStrategyGame.Factions[i][j]->DiplomacyStates.end()) {
+				GrandStrategyGame.Factions[i][j]->DiplomacyStates.erase(GrandStrategyGame.Factions[old_civilization][old_faction]);
+			}
+			if (GrandStrategyGame.Factions[i][j]->DiplomacyStateProposals.find(GrandStrategyGame.Factions[old_civilization][old_faction]) != GrandStrategyGame.Factions[i][j]->DiplomacyStateProposals.end()) {
+				GrandStrategyGame.Factions[i][j]->DiplomacyStateProposals.erase(GrandStrategyGame.Factions[old_civilization][old_faction]);
+			}
 		}
 	}
 	
@@ -4343,6 +4347,21 @@ void CGrandStrategyFaction::SetCapital(CGrandStrategyProvince *province)
 	if (this->Capital != NULL) {
 		this->CalculateTileTransportLevels();
 	}
+}
+
+void CGrandStrategyFaction::SetDiplomacyState(CGrandStrategyFaction *faction, int diplomacy_state_id)
+{
+	int second_diplomacy_state_id; // usually the second diplomacy state is the same as the first, but there are asymmetrical diplomacy states (such as vassal/sovereign relationships)
+	if (diplomacy_state_id == DiplomacyStateVassal) {
+		second_diplomacy_state_id = DiplomacyStateSovereign;
+	} else if (diplomacy_state_id == DiplomacyStateSovereign) {
+		second_diplomacy_state_id = DiplomacyStateVassal;
+	} else {
+		second_diplomacy_state_id = diplomacy_state_id;
+	}
+	
+	this->DiplomacyStates[faction] = diplomacy_state_id;
+	faction->DiplomacyStates[this] = second_diplomacy_state_id;
 }
 
 void CGrandStrategyFaction::SetMinister(int title, std::string hero_full_name)
@@ -4676,6 +4695,24 @@ int CGrandStrategyFaction::GetTroopCostModifier()
 	}
 	
 	return modifier;
+}
+
+int CGrandStrategyFaction::GetDiplomacyState(CGrandStrategyFaction *faction)
+{
+	if (this->DiplomacyStates.find(faction) != this->DiplomacyStates.end()) {
+		return this->DiplomacyStates[faction];
+	} else {
+		return DiplomacyStatePeace;
+	}
+}
+
+int CGrandStrategyFaction::GetDiplomacyStateProposal(CGrandStrategyFaction *faction)
+{
+	if (this->DiplomacyStateProposals.find(faction) != this->DiplomacyStateProposals.end()) {
+		return this->DiplomacyStateProposals[faction];
+	} else {
+		return -1;
+	}
 }
 
 std::string CGrandStrategyFaction::GetFullName()
@@ -7396,6 +7433,16 @@ void FinalizeGrandStrategyInitialization()
 					}
 				}
 				
+				for (std::map<std::pair<int, CFaction *>, int>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalDiplomacyStates.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
+					if (GrandStrategyYear >= iterator->first.first) {
+						int diplomacy_state_civilization = iterator->first.second->Civilization;
+						int diplomacy_state_faction = iterator->first.second->ID;
+						if (GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction]->IsAlive()) {
+							GrandStrategyGame.Factions[i][j]->SetDiplomacyState(GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction], iterator->second);
+						}
+					}
+				}
+				
 				if (GrandStrategyGame.Factions[i][j]->IsAlive()) { // set capital for factions which own territory
 					for (std::map<int, std::string>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->HistoricalCapitals.rbegin(); iterator != PlayerRaces.Factions[i][j]->HistoricalCapitals.rend(); ++iterator) {
 						if (GrandStrategyYear >= iterator->first) {
@@ -7940,21 +7987,11 @@ void SetFactionDiplomacyState(std::string civilization_name, std::string faction
 		return;
 	}
 
-	int second_diplomacy_state_id; // usually the second diplomacy state is the same as the first, but there are asymmetrical diplomacy states (such as vassal/sovereign relationships)
-	if (diplomacy_state_id == DiplomacyStateVassal) {
-		second_diplomacy_state_id = DiplomacyStateSovereign;
-	} else if (diplomacy_state_id == DiplomacyStateSovereign) {
-		second_diplomacy_state_id = DiplomacyStateVassal;
-	} else {
-		second_diplomacy_state_id = diplomacy_state_id;
-	}
-
 	if (civilization != -1 && second_civilization != -1) {
 		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
 		if (faction != -1 && second_faction != -1) {
-			GrandStrategyGame.Factions[civilization][faction]->DiplomacyState[second_civilization][second_faction] = diplomacy_state_id;
-			GrandStrategyGame.Factions[second_civilization][second_faction]->DiplomacyState[civilization][faction] = second_diplomacy_state_id;
+			GrandStrategyGame.Factions[civilization][faction]->SetDiplomacyState(GrandStrategyGame.Factions[second_civilization][second_faction],diplomacy_state_id);
 		}
 	}
 }
@@ -7968,7 +8005,7 @@ std::string GetFactionDiplomacyState(std::string civilization_name, std::string 
 		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
 		if (faction != -1 && second_faction != -1) {
-			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization][faction]->DiplomacyState[second_civilization][second_faction]);
+			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization][faction]->GetDiplomacyState(GrandStrategyGame.Factions[second_civilization][second_faction]));
 		}
 	}
 	
@@ -7986,7 +8023,7 @@ void SetFactionDiplomacyStateProposal(std::string civilization_name, std::string
 		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
 		if (faction != -1 && second_faction != -1) {
-			GrandStrategyGame.Factions[civilization][faction]->DiplomacyStateProposal[second_civilization][second_faction] = diplomacy_state_id;
+			GrandStrategyGame.Factions[civilization][faction]->DiplomacyStateProposals[GrandStrategyGame.Factions[second_civilization][second_faction]] = diplomacy_state_id;
 		}
 	}
 }
@@ -8000,7 +8037,7 @@ std::string GetFactionDiplomacyStateProposal(std::string civilization_name, std:
 		int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 		int second_faction = PlayerRaces.GetFactionIndexByName(second_civilization, second_faction_name);
 		if (faction != -1 && second_faction != -1) {
-			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization][faction]->DiplomacyStateProposal[second_civilization][second_faction]);
+			return GetDiplomacyStateNameById(GrandStrategyGame.Factions[civilization][faction]->GetDiplomacyStateProposal(GrandStrategyGame.Factions[second_civilization][second_faction]));
 		}
 	}
 	

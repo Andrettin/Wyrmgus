@@ -241,12 +241,6 @@ public:
 		memset(Trade, 0, sizeof(Trade));
 		memset(MilitaryScoreBonus, 0, sizeof(MilitaryScoreBonus));
 		memset(Ministers, 0, sizeof(Ministers));
-		for (int i = 0; i < MAX_RACES; ++i) {
-			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-				DiplomacyState[i][j] = DiplomacyStatePeace;
-				DiplomacyStateProposal[i][j] = -1;
-			}
-		}
 	}
 	
 	void AiDoTurn();						/// Process the grand strategy turn for an AI faction
@@ -262,6 +256,7 @@ public:
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
 	void SetCapital(CGrandStrategyProvince *province);
+	void SetDiplomacyState(CGrandStrategyFaction *faction, int diplomacy_state_id);
 	void SetMinister(int title, std::string hero_full_name);
 	void MinisterSuccession(int title);
 	void GenerateMinister(int title, bool child_of_current_minister = false);
@@ -277,6 +272,8 @@ public:
 	int GetProductionEfficiencyModifier(int resource);
 	int GetRevoltRiskModifier();
 	int GetTroopCostModifier();
+	int GetDiplomacyState(CGrandStrategyFaction *faction);
+	int GetDiplomacyStateProposal(CGrandStrategyFaction *faction);
 	std::string GetFullName();
 	std::string GetTitle();
 	std::string GetCharacterTitle(int title_type, int gender);
@@ -297,8 +294,8 @@ public:
 	int ProductionEfficiencyModifier[MaxCosts];							/// Efficiency modifier for each resource.
 	int Trade[MaxCosts];												/// How much of each resource the faction wants to trade; negative values are imports and positive ones exports
 	int MilitaryScoreBonus[UnitTypeMax];
-	int DiplomacyState[MAX_RACES][FactionMax];							/// Diplomacy state between this faction and each other faction
-	int DiplomacyStateProposal[MAX_RACES][FactionMax];					/// Diplomacy state being offered by this faction to each other faction
+	std::map<CGrandStrategyFaction *, int> DiplomacyStates;				/// Diplomacy states between this faction and other factions
+	std::map<CGrandStrategyFaction *, int> DiplomacyStateProposals;		/// Diplomacy state being offered by this faction to other factions
 	CGrandStrategyHero *Ministers[MaxCharacterTitles];					/// Ministers of the faction
 	std::vector<CGrandStrategyProvince *> Claims;						/// Provinces which this faction claims
 	std::vector<CGrandStrategyProvince *> ProvincesLinkedToCapital;		/// Provinces linked by pathways to this faction's capital
