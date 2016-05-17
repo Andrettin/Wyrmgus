@@ -1190,11 +1190,32 @@ void CButtonPanel::Draw()
 		//
 		const PixelPos pos(UI.ButtonPanel.Buttons[i].X, UI.ButtonPanel.Buttons[i].Y);
 
+		//Wyrmgus start
+		CIcon *button_icon = buttons[i].Icon.Icon;
+			
+		// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
+		if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->Type->CanAttack && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != NULL && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != NULL) {
+			button_icon = Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action);
+		} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != NULL) {
+			button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
+		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
+			button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
+		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
+			button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
+		}
+		//Wyrmgus end
+		
 		if (cooldownSpell) {
-			buttons[i].Icon.Icon->DrawCooldownSpellIcon(pos,
+			//Wyrmgus start
+//			buttons[i].Icon.Icon->DrawCooldownSpellIcon(pos,
+			button_icon->DrawCooldownSpellIcon(pos,
+			//Wyrmgus end
 														maxCooldown * 100 / SpellTypeTable[buttons[i].Value]->CoolDown);
 		} else if (gray) {
-			buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
+			//Wyrmgus start
+//			buttons[i].Icon.Icon->DrawGrayscaleIcon(pos);
+			button_icon->DrawGrayscaleIcon(pos);
+			//Wyrmgus end
 		} else {
 			int player = -1;
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
@@ -1213,18 +1234,6 @@ void CButtonPanel::Draw()
 											   pos, buf, player);
 			*/
 			
-			CIcon *button_icon = buttons[i].Icon.Icon;
-			
-			// if there is a single unit selected, show the icon of its weapon/shield/boots/arrows equipped for the appropriate buttons
-			if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonAttack && Selected[0]->Type->CanTransport() && Selected[0]->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && Selected[0]->Type->CanAttack && Selected[0]->BoardCount > 0 && Selected[0]->UnitInside != NULL && Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action) != NULL) {
-				button_icon = Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action);
-			} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != NULL) {
-				button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
-			} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
-				button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
-			} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
-				button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
-			}
 			button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
 											   pos, buf, player);

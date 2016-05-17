@@ -970,6 +970,9 @@ void CUnit::UpdateButtonIcons()
 	this->ChooseButtonIcon(ButtonMove);
 	this->ChooseButtonIcon(ButtonStandGround);
 	this->ChooseButtonIcon(ButtonPatrol);
+	if (this->Type->BoolFlag[HARVESTER_INDEX].value) {
+		this->ChooseButtonIcon(ButtonReturn);
+	}
 }
 
 void CUnit::ChooseButtonIcon(int button_action)

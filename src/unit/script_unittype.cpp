@@ -582,6 +582,7 @@ static int CclDefineUnitType(lua_State *l)
 		type->RemoveButtons(ButtonAttack);
 		type->RemoveButtons(ButtonPatrol);
 		type->RemoveButtons(ButtonStandGround);
+		type->RemoveButtons(ButtonReturn);
 		//Wyrmgus end
 	} else {
 		type = NewUnitTypeSlot(str);
@@ -2166,6 +2167,19 @@ static int CclDefineUnitType(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"t\",\n";
 		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
+		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
+		button_definition += "})";
+		CclCommand(button_definition);
+	}
+	
+	if (type->BoolFlag[HARVESTER_INDEX].value) {
+		std::string button_definition = "DefineButton({\n";
+		button_definition += "\tPos = 5,\n";
+		button_definition += "\tLevel = 0,\n";
+		button_definition += "\tAction = \"return-goods\",\n";
+		button_definition += "\tPopup = \"popup-commands\",\n";
+		button_definition += "\tKey = \"g\",\n";
+		button_definition += "\tHint = _(\"Return with ~!Goods\"),\n";
 		button_definition += "\tForUnit = {\"" + type->Ident + "\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
