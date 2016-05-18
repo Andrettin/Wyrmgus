@@ -696,6 +696,7 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "Ț", "T");
 	text = FindAndReplaceString(text, "ț", "t");
 	text = FindAndReplaceString(text, "ÞÞ", "Þ"); //replace double thorns with a single one
+	text = FindAndReplaceString(text, "þþ", "þ"); //replace double thorns with a single one
 	text = FindAndReplaceString(text, "Þ", "Th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "þ", "th"); //Source: Henry Adams Bellows (transl.), "The Poetic Edda", p. xxviii.
 	text = FindAndReplaceString(text, "Ū́", "U");
