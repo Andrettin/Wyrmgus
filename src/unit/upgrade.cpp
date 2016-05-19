@@ -2379,6 +2379,42 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 						upgrade_effects_string += variable_name;
 					}
 				}
+				
+				if (!grand_strategy) {
+					bool first_res = true;
+					for (int i = 0; i < MaxCosts; ++i) {
+						if (UpgradeModifiers[z]->Modifier.ImproveIncomes[i]) {
+							if (!first_res) {
+								upgrade_effects_string += padding_string;
+							} else {
+								first_res = false;
+							}
+							
+							if (UpgradeModifiers[z]->Modifier.ImproveIncomes[i] > 0) {
+								upgrade_effects_string += "+";
+							}
+							upgrade_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.ImproveIncomes[i]);
+							upgrade_effects_string += "%";
+							upgrade_effects_string += " ";
+							upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
+							upgrade_effects_string += " Processing";
+							
+							bool first_unit_type = true;
+							for (size_t i = 0; i < UnitTypes.size(); ++i) {
+								if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+									if (!first_unit_type) {
+										upgrade_effects_string += ", ";
+									} else {
+										upgrade_effects_string += " for ";
+										first_unit_type = false;
+									}
+										
+									upgrade_effects_string += UnitTypes[i]->GetNamePlural();
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 		

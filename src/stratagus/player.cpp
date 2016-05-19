@@ -2385,6 +2385,26 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 										changed_stats = true;
 									}
 								}
+
+								for (int j = 0; j < MaxCosts; ++j) {
+									if (UpgradeModifiers[z]->Modifier.ImproveIncomes[j]) {
+										if (!first_var) {
+											effect_element_string += ", ";
+										} else {
+											first_var = false;
+										}
+										
+										if (UpgradeModifiers[z]->Modifier.ImproveIncomes[j] > 0) {
+											effect_element_string += "+";
+										}
+										effect_element_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.ImproveIncomes[j]);
+										effect_element_string += "%";
+										effect_element_string += " ";
+										effect_element_string += CapitalizeString(DefaultResourceNames[j]);
+										effect_element_string += " Processing";
+										changed_stats = true;
+									}
+								}
 						
 								effect_element_string += ")";
 								if (changed_stats) {
