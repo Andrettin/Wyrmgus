@@ -456,7 +456,7 @@ static int CclGetGrandStrategyEventData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		int option = LuaToNumber(l, 3) - 1;
-		if (event->OptionConditions.size() > option && event->OptionConditions[option]) {
+		if ((int) event->OptionConditions.size() > option && event->OptionConditions[option]) {
 			event->OptionConditions[option]->pushPreamble();
 			event->OptionConditions[option]->run(1);
 			if (event->OptionConditions[option]->popBoolean() == false) {
@@ -470,7 +470,7 @@ static int CclGetGrandStrategyEventData(lua_State *l)
 		LuaCheckArgs(l, 3);
 
 		int option = LuaToNumber(l, 3) - 1;
-		if (event->OptionEffects.size() > option && event->OptionEffects[option]) {
+		if ((int) event->OptionEffects.size() > option && event->OptionEffects[option]) {
 			event->OptionEffects[option]->pushPreamble();
 			event->OptionEffects[option]->run();
 		}

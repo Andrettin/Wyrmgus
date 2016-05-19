@@ -3372,72 +3372,67 @@ void GenerateMissingLanguageData()
 			continue;
 		}
 		
-		for (size_t j = 0; j < types.size(); ++j) {
+		std::map<LanguageWord *, std::vector<LanguageWord *>> related_words;
+		std::map<LanguageWord *, std::vector<LanguageWord *>> new_related_words;
 
-			std::map<LanguageWord *, std::vector<LanguageWord *>> related_words;
-			std::map<LanguageWord *, std::vector<LanguageWord *>> new_related_words;
-
-			for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
-				LanguageWord *word = PlayerRaces.Languages[i]->LanguageWords[k];
-				if (word->DerivesFrom != NULL || word->DerivesTo.size() > 0) {
-					related_words[word].push_back(word);
-					new_related_words[word].push_back(word);
-				}
+		for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
+			LanguageWord *word = PlayerRaces.Languages[i]->LanguageWords[k];
+			if (word->DerivesFrom != NULL || word->DerivesTo.size() > 0) {
+				related_words[word].push_back(word);
+				new_related_words[word].push_back(word);
 			}
+		}
 			
-			if (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names) {
-				ShowLoadProgress("Deriving \"%s\" name generation patterns from related words for the %s language", types[j].c_str(), PlayerRaces.Languages[i]->Name.c_str());
-			}
-			
-			while (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[j]) < minimum_desired_names) {
+		ShowLoadProgress("Deriving name generation patterns from related words for the %s language", PlayerRaces.Languages[i]->Name.c_str());
+		
+		while (related_words.size() > 0) {
 				
-				std::vector<LanguageWord *> words_to_erase;
+			std::vector<LanguageWord *> words_to_erase;
 				
-				for (std::map<LanguageWord *, std::vector<LanguageWord *>>::reverse_iterator iterator = related_words.rbegin(); iterator != related_words.rend(); ++iterator) {
-					LanguageWord *word = iterator->first;
+			for (std::map<LanguageWord *, std::vector<LanguageWord *>>::reverse_iterator iterator = related_words.rbegin(); iterator != related_words.rend(); ++iterator) {
+				LanguageWord *word = iterator->first;
 					
-					bool deeper_related_word_level_may_exist = false;
+				bool deeper_related_word_level_may_exist = false;
 					
-					// fill the vector with all the related words for the current relationship depth level
-					for (int n = (int) new_related_words[word].size() - 1; n >= 0; --n) {
-						if (
-							new_related_words[word][n]->DerivesFrom != NULL
-							&& std::find(related_words[word].begin(), related_words[word].end(), new_related_words[word][n]->DerivesFrom) == related_words[word].end()
-						) {
-							related_words[word].push_back(new_related_words[word][n]->DerivesFrom);
-							new_related_words[word].push_back(new_related_words[word][n]->DerivesFrom);
+				// fill the vector with all the related words for the current relationship depth level
+				for (int n = (int) new_related_words[word].size() - 1; n >= 0; --n) {
+					if (
+						new_related_words[word][n]->DerivesFrom != NULL
+						&& std::find(related_words[word].begin(), related_words[word].end(), new_related_words[word][n]->DerivesFrom) == related_words[word].end()
+					) {
+						related_words[word].push_back(new_related_words[word][n]->DerivesFrom);
+						new_related_words[word].push_back(new_related_words[word][n]->DerivesFrom);
+						deeper_related_word_level_may_exist = true;
+					}
+					for (size_t o = 0; o < new_related_words[word][n]->DerivesTo.size(); ++o) {
+						if (std::find(related_words[word].begin(), related_words[word].end(), new_related_words[word][n]->DerivesTo[o]) == related_words[word].end()) {
+							related_words[word].push_back(new_related_words[word][n]->DerivesTo[o]);
+							new_related_words[word].push_back(new_related_words[word][n]->DerivesTo[o]);
 							deeper_related_word_level_may_exist = true;
 						}
-						for (size_t o = 0; o < new_related_words[word][n]->DerivesTo.size(); ++o) {
-							if (std::find(related_words[word].begin(), related_words[word].end(), new_related_words[word][n]->DerivesTo[o]) == related_words[word].end()) {
-								related_words[word].push_back(new_related_words[word][n]->DerivesTo[o]);
-								new_related_words[word].push_back(new_related_words[word][n]->DerivesTo[o]);
-								deeper_related_word_level_may_exist = true;
+					}
+					new_related_words[word].erase(std::remove(new_related_words[word].begin(), new_related_words[word].end(), new_related_words[word][n]), new_related_words[word].end());
+				}
+					
+				//now attach the new type name to the word from its related words, if it is found in them
+				for (size_t n = 0; n < types.size(); ++n) {
+					if (PlayerRaces.Languages[i]->GetPotentialNameQuantityForType(types[n]) < minimum_desired_names) {
+						for (size_t o = 0; o < new_related_words[word].size(); ++o) {
+							if (word != new_related_words[word][o]) {
+								word->AddNameTypeGenerationFromWord(new_related_words[word][o], types[n]);
 							}
 						}
-						new_related_words[word].erase(std::remove(new_related_words[word].begin(), new_related_words[word].end(), new_related_words[word][n]), new_related_words[word].end());
 					}
+				}
 					
-					//now attach the new type name to the word from its related words, if it is found in them
-					for (size_t n = 0; n < new_related_words[word].size(); ++n) {
-						if (word != new_related_words[word][n]) {
-							word->AddNameTypeGenerationFromWord(new_related_words[word][n], types[j]);
-						}
-					}
-					
-					if (!deeper_related_word_level_may_exist) { //if relationship levels have been exhausted, don't search this word anymore
-						words_to_erase.push_back(word);
-					}
+				if (!deeper_related_word_level_may_exist) { //if relationship levels have been exhausted, don't search this word anymore
+					words_to_erase.push_back(word);
 				}
+			}
 				
-				for (size_t i = 0; i < words_to_erase.size(); ++i) {
-					related_words.erase(words_to_erase[i]);
-					new_related_words.erase(words_to_erase[i]);
-				}
-				
-				if (related_words.size() == 0) {
-					break;
-				}
+			for (size_t i = 0; i < words_to_erase.size(); ++i) {
+				related_words.erase(words_to_erase[i]);
+				new_related_words.erase(words_to_erase[i]);
 			}
 		}
 	}
