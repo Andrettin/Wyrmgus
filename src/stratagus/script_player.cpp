@@ -1214,14 +1214,6 @@ static int CclDefineLanguageWord(lua_State *l)
 		LuaError(l, "Word \"%s\" has no type" _C_ word->Word.c_str());
 	}
 	
-	if (word->DerivesFrom != NULL) { //if the word is derived from another, add name translations for them going both ways
-		PlayerRaces.Languages[word->Language]->NameTranslations[0].push_back(word->DerivesFrom->Word);
-		PlayerRaces.Languages[word->Language]->NameTranslations[1].push_back(word->Word);
-		
-		PlayerRaces.Languages[word->DerivesFrom->Language]->NameTranslations[0].push_back(word->Word);
-		PlayerRaces.Languages[word->DerivesFrom->Language]->NameTranslations[1].push_back(word->DerivesFrom->Word);
-	}
-	
 	for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
 		for (int j = 0; j < MaxGrammaticalCases; ++j) {
 			for (int k = 0; k < MaxGrammaticalTenses; ++k) {
@@ -1933,9 +1925,10 @@ static int CclDefineLanguage(lua_State *l)
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int k = 0; k < subargs; ++k) {
-				language->NameTranslations[0].push_back(LuaToString(l, -1, k + 1)); //name to be translated
+				std::string translation_from = LuaToString(l, -1, k + 1); //name to be translated
 				++k;
-				language->NameTranslations[1].push_back(LuaToString(l, -1, k + 1)); //name translation
+				std::string translation_to = LuaToString(l, -1, k + 1); //name translation
+				language->AddNameTranslation(translation_from, translation_to);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

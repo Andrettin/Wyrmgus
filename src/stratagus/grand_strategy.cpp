@@ -2581,9 +2581,9 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					new_province_name = this->FactionCulturalNames[PlayerRaces.Factions[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction]];
 				}
 				
-				// see if can translate the cultural name of the province's current civilization
-				if (new_province_name == "" && this->Civilization != -1 && this->CulturalNames.find(this->Civilization) != this->CulturalNames.end()) {
-					new_province_name = PlayerRaces.TranslateName(this->CulturalNames[this->Civilization], PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
+				// see if can translate the province's current cultural name
+				if (new_province_name == "") {
+					new_province_name = PlayerRaces.TranslateName(this->GetCulturalName(), PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
 				}
 				if (new_province_name == "") { // try to translate any cultural name
 					for (int i = 0; i < MAX_RACES; ++i) {
@@ -2592,6 +2592,14 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 							if (!new_province_name.empty()) {
 								break;
 							}
+						}
+					}
+				}
+				if (new_province_name == "") { // try to translate any faction cultural name
+					for (std::map<CFaction *, std::string>::iterator iterator = this->FactionCulturalNames.begin(); iterator != this->FactionCulturalNames.end(); ++iterator) {
+						new_province_name = PlayerRaces.TranslateName(iterator->second, PlayerRaces.GetFactionLanguage(civilization_id, faction_id)); 
+						if (!new_province_name.empty()) {
+							break;
 						}
 					}
 				}
@@ -2655,9 +2663,9 @@ void CGrandStrategyProvince::SetCivilization(int civilization)
 		// create a new cultural name for the province, if there isn't any
 		if (this->CulturalNames.find(civilization) == this->CulturalNames.end()) {
 			std::string new_province_name = "";
-			// first see if can translate the cultural name of the old civilization
-			if (old_civilization != -1 && this->CulturalNames.find(old_civilization) != this->CulturalNames.end()) {
-				new_province_name = PlayerRaces.TranslateName(this->CulturalNames[old_civilization], PlayerRaces.GetCivilizationLanguage(civilization));
+			// first see if can translate the province's current cultural name
+			if (new_province_name == "") {
+				new_province_name = PlayerRaces.TranslateName(this->GetCulturalName(), PlayerRaces.GetCivilizationLanguage(civilization));
 			}
 			if (new_province_name == "") { // try to translate any cultural name
 				for (int i = 0; i < MAX_RACES; ++i) {
@@ -2666,6 +2674,14 @@ void CGrandStrategyProvince::SetCivilization(int civilization)
 						if (!new_province_name.empty()) {
 							break;
 						}
+					}
+				}
+			}
+			if (new_province_name == "") { // try to translate any faction cultural name
+				for (std::map<CFaction *, std::string>::iterator iterator = this->FactionCulturalNames.begin(); iterator != this->FactionCulturalNames.end(); ++iterator) {
+					new_province_name = PlayerRaces.TranslateName(iterator->second, PlayerRaces.GetCivilizationLanguage(civilization)); 
+					if (!new_province_name.empty()) {
+						break;
 					}
 				}
 			}

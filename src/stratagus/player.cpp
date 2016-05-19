@@ -633,39 +633,35 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	}
 
 	// try to translate the entire name, as a particular translation for it may exist
-	if (PlayerRaces.Languages[language]->NameTranslations[0].size() > 0) {
-		for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++i) {
-			std::string name_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][i]);
-			if (name_to_be_translated == name) {
-				std::string name_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
-				new_name = name_translation;
-				return new_name;
-			}
+	for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++i) {
+		std::string name_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][i]);
+		if (name_to_be_translated == name) {
+			std::string name_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
+			new_name = name_translation;
+			return new_name;
 		}
 	}
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
-	if (PlayerRaces.Languages[language]->NameTranslations[0].size() > 0) {
-		for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++i) {
-			std::string prefix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][i]);
-			if (prefix_to_be_translated == name.substr(0, prefix_to_be_translated.size())) {
-				for (size_t j = 0; j < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++j) {
-					std::string suffix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][j]);
-					suffix_to_be_translated[0] = tolower(suffix_to_be_translated[0]);
-					if (suffix_to_be_translated == name.substr(prefix_to_be_translated.size(), name.size() - prefix_to_be_translated.size())) {
-						std::string prefix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
-						std::string suffix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][j]);
-						suffix_translation[0] = tolower(suffix_translation[0]);
-						if (prefix_translation.substr(prefix_translation.size() - 2, 2) == "gs" && suffix_translation.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
-							prefix_translation = FindAndReplaceStringEnding(prefix_translation, "gs", "g");
-						}
-						if (prefix_translation.substr(prefix_translation.size() - 1, 1) == "s" && suffix_translation.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
-							prefix_translation = FindAndReplaceStringEnding(prefix_translation, "s", "");
-						}
-						new_name = prefix_translation;
-						new_name += suffix_translation;
-						return new_name;
+	for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++i) {
+		std::string prefix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][i]);
+		if (prefix_to_be_translated == name.substr(0, prefix_to_be_translated.size())) {
+			for (size_t j = 0; j < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++j) {
+				std::string suffix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][j]);
+				suffix_to_be_translated[0] = tolower(suffix_to_be_translated[0]);
+				if (suffix_to_be_translated == name.substr(prefix_to_be_translated.size(), name.size() - prefix_to_be_translated.size())) {
+					std::string prefix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
+					std::string suffix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][j]);
+					suffix_translation[0] = tolower(suffix_translation[0]);
+					if (prefix_translation.substr(prefix_translation.size() - 2, 2) == "gs" && suffix_translation.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+						prefix_translation = FindAndReplaceStringEnding(prefix_translation, "gs", "g");
 					}
+					if (prefix_translation.substr(prefix_translation.size() - 1, 1) == "s" && suffix_translation.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
+						prefix_translation = FindAndReplaceStringEnding(prefix_translation, "s", "");
+					}
+					new_name = prefix_translation;
+					new_name += suffix_translation;
+					return new_name;
 				}
 			}
 		}
@@ -2861,6 +2857,18 @@ void CLanguage::RemoveWord(LanguageWord *word)
 	}
 }
 
+void CLanguage::AddNameTranslation(std::string translation_from, std::string translation_to)
+{
+	for (size_t i = 0; i < this->NameTranslations[0].size(); ++i) {
+		if (this->NameTranslations[0][i] == translation_from && this->NameTranslations[1][i] == translation_to) { //if translation is already present, return
+			return;
+		}
+	}
+	
+	this->NameTranslations[0].push_back(translation_from);
+	this->NameTranslations[1].push_back(translation_to);
+}
+
 int LanguageWord::HasNameType(std::string type, int grammatical_number, int grammatical_case, int grammatical_tense)
 {
 	int name_type_count = 0;
@@ -3396,6 +3404,82 @@ void GenerateMissingLanguageData()
 					
 				// fill the vector with all the related words for the current relationship depth level
 				for (int n = (int) new_related_words[word].size() - 1; n >= 0; --n) {
+					if (word != new_related_words[word][n]) { // add name translations for related words (this will be done in order of relationship, so more distantly related words will be less likely to be used for name translations
+						PlayerRaces.Languages[i]->AddNameTranslation(new_related_words[word][n]->Word, word->Word);
+						
+						// see if there is any inflected form of the word, and if so, add it to the name translations as well
+						if (new_related_words[word][n]->Type == WordTypeNoun) {
+							for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
+								for (int p = 0; p < MaxGrammaticalCases; ++p) {
+									for (int q = 0; q < MaxWordJunctionTypes; ++q) {
+										if (new_related_words[word][n]->GetNounInflection(o, p, q) != new_related_words[word][n]->Word) {
+											std::string translation_from = new_related_words[word][n]->GetNounInflection(o, p, q);
+											std::string translation_to;
+											if (word->Type == new_related_words[word][n]->Type) {
+												translation_to = word->GetNounInflection(o, p, q);
+											} else {
+												translation_to = word->Word;
+											}
+											PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
+										}
+									}
+								}
+							}
+						} else if (new_related_words[word][n]->Type == WordTypeVerb) {
+							for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
+								for (int p = 0; p < MaxGrammaticalPersons; ++p) {
+									for (int q = 0; q < MaxGrammaticalTenses; ++q) {
+										for (int r = 0; r < MaxGrammaticalMoods; ++r) {
+											if (new_related_words[word][n]->GetVerbInflection(o, p, q, r) != new_related_words[word][n]->Word) {
+												std::string translation_from = new_related_words[word][n]->GetVerbInflection(o, p, q, r);
+												std::string translation_to;
+												if (word->Type == new_related_words[word][n]->Type) {
+													translation_to = word->GetVerbInflection(o, p, q, r);
+												} else {
+													translation_to = word->Word;
+												}
+												PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
+											}
+										}
+									}
+								}
+							}
+							
+							for (int o = 0; o < MaxGrammaticalTenses; ++o) {
+								if (new_related_words[word][n]->GetParticiple(o) != new_related_words[word][n]->Word) {
+									std::string translation_from = new_related_words[word][n]->GetParticiple(o);
+									std::string translation_to;
+									if (word->Type == new_related_words[word][n]->Type) {
+										translation_to = word->GetParticiple(o);
+									} else {
+										translation_to = word->Word;
+									}
+									PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
+								}
+							}
+						} else if (new_related_words[word][n]->Type == WordTypeAdjective) {
+							for (int o = 0; o < MaxComparisonDegrees; ++o) {
+								for (int p = 0; p < MaxArticleTypes; ++p) {
+									for (int q = 0; q < MaxGrammaticalCases; ++q) {
+										for (int r = 0; r < MaxGrammaticalNumbers; ++r) {
+											for (int s = 0; s < MaxGrammaticalGenders; ++s) {
+												if (new_related_words[word][n]->GetAdjectiveInflection(o, p, q, r, s) != new_related_words[word][n]->Word) {
+													std::string translation_from = new_related_words[word][n]->GetAdjectiveInflection(o, p, q, r, s);
+													std::string translation_to;
+													if (word->Type == new_related_words[word][n]->Type) {
+														translation_to = word->GetAdjectiveInflection(o, p, q, r, s);
+													} else {
+														translation_to = word->Word;
+													}
+													PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 					if (
 						new_related_words[word][n]->DerivesFrom != NULL
 						&& std::find(related_words[word].begin(), related_words[word].end(), new_related_words[word][n]->DerivesFrom) == related_words[word].end()
