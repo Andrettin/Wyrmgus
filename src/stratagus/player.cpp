@@ -667,6 +667,26 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 		}
 	}
 	
+	// if the name contains a space, try to translate each of its elements separately
+	if (name.find(" ") != std::string::npos) {
+		size_t previous_pos = 0;
+		new_name = name;
+		for (size_t i = 0; i < name.size(); ++i) {
+			if ((i + 1) == name.size() || name[i + 1] == ' ') {
+				std::string name_element = TranslateName(name.substr(previous_pos, i + 1 - previous_pos), language);
+				
+				if (name_element.empty()) {
+					new_name = "";
+					break;
+				}
+				
+				new_name = FindAndReplaceString(new_name, name.substr(previous_pos, i + 1 - previous_pos), name_element);
+				
+				previous_pos = i + 2;
+			}
+		}
+	}
+	
 	return new_name;
 }
 
