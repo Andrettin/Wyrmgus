@@ -1623,6 +1623,11 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Idle")) {
 		lua_pushboolean(l, unit->IsIdle());
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(value, "Removed")) {
+		lua_pushboolean(l, unit->Removed);
+		return 1;
+	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
 		if (index == -1) {

@@ -644,6 +644,9 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 				hero->Name = new_hero_name;
 				hero->FamilyName = new_hero_family_name;
 				SaveHero(hero);
+				
+				CustomHeroes.erase(hero_full_name);
+				CustomHeroes[hero->GetFullName()] = hero;
 			}
 		}
 	}
