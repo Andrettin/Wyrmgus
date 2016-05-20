@@ -373,9 +373,7 @@ void PlayerRace::Clean()
 			this->Languages[i]->LanguageWords.clear();
 			this->Languages[i]->ModWords.clear();
 			
-			for (size_t j = 0; j < 2; ++j) {
-				this->Languages[i]->NameTranslations[j].clear();
-			}
+			this->Languages[i]->NameTranslations.clear();
 		}
 	}
 	//Wyrmgus end
@@ -633,42 +631,33 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	}
 
 	// try to translate the entire name, as a particular translation for it may exist
-	for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++i) {
-		std::string name_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][i]);
-		if (name_to_be_translated == name) {
-			std::string name_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
-			new_name = name_translation;
-			return new_name;
-		}
+	if (PlayerRaces.Languages[language]->NameTranslations.find(name) != PlayerRaces.Languages[language]->NameTranslations.end()) {
+		return PlayerRaces.Languages[language]->NameTranslations[name][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name].size())];
 	}
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
-	for (size_t i = 0; i < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++i) {
-		std::string prefix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][i]);
-		if (prefix_to_be_translated == name.substr(0, prefix_to_be_translated.size())) {
-			for (size_t j = 0; j < PlayerRaces.Languages[language]->NameTranslations[0].size(); ++j) {
-				std::string suffix_to_be_translated = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[0][j]);
-				suffix_to_be_translated[0] = tolower(suffix_to_be_translated[0]);
-				if (suffix_to_be_translated == name.substr(prefix_to_be_translated.size(), name.size() - prefix_to_be_translated.size())) {
-					std::string prefix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][i]);
-					std::string suffix_translation = TransliterateText(PlayerRaces.Languages[language]->NameTranslations[1][j]);
-					suffix_translation[0] = tolower(suffix_translation[0]);
-					if (prefix_translation.substr(prefix_translation.size() - 2, 2) == "gs" && suffix_translation.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
-						prefix_translation = FindAndReplaceStringEnding(prefix_translation, "gs", "g");
-					}
-					if (prefix_translation.substr(prefix_translation.size() - 1, 1) == "s" && suffix_translation.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
-						prefix_translation = FindAndReplaceStringEnding(prefix_translation, "s", "");
-					}
-					new_name = prefix_translation;
-					new_name += suffix_translation;
-					return new_name;
+	if (name.find(" ") == std::string::npos) {
+		for (size_t i = 0; i < name.size(); ++i) {
+			std::string name_prefix = name.substr(0, i + 1);
+			std::string name_suffix = CapitalizeString(name.substr(i + 1, name.size() - (i + 1)));
+			
+//			fprintf(stdout, "Trying to match prefix \"%s\" and suffix \"%s\" for translating name \"%s\" to the \"%s\" language.\n", name_prefix.c_str(), name_suffix.c_str(), name.c_str(), PlayerRaces.Languages[language]->Name.c_str());
+			
+			if (PlayerRaces.Languages[language]->NameTranslations.find(name_prefix) != PlayerRaces.Languages[language]->NameTranslations.end() && PlayerRaces.Languages[language]->NameTranslations.find(name_suffix) != PlayerRaces.Languages[language]->NameTranslations.end()) { // if both a prefix and suffix have been matched
+				name_prefix = PlayerRaces.Languages[language]->NameTranslations[name_prefix][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name_prefix].size())];
+				name_suffix = PlayerRaces.Languages[language]->NameTranslations[name_suffix][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name_suffix].size())];
+				name_suffix = DecapitalizeString(name_suffix);
+				if (name_prefix.substr(name_prefix.size() - 2, 2) == "gs" && name_suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+					name_prefix = FindAndReplaceStringEnding(name_prefix, "gs", "g");
 				}
+				if (name_prefix.substr(name_prefix.size() - 1, 1) == "s" && name_suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
+					name_prefix = FindAndReplaceStringEnding(name_prefix, "s", "");
+				}
+
+				return name_prefix + name_suffix;
 			}
 		}
-	}
-	
-	// if the name contains a space, try to translate each of its elements separately
-	if (name.find(" ") != std::string::npos) {
+	} else { // if the name contains a space, try to translate each of its elements separately
 		size_t previous_pos = 0;
 		new_name = name;
 		for (size_t i = 0; i < name.size(); ++i) {
@@ -2899,14 +2888,16 @@ void CLanguage::RemoveWord(LanguageWord *word)
 
 void CLanguage::AddNameTranslation(std::string translation_from, std::string translation_to)
 {
-	for (size_t i = 0; i < this->NameTranslations[0].size(); ++i) {
-		if (this->NameTranslations[0][i] == translation_from && this->NameTranslations[1][i] == translation_to) { //if translation is already present, return
-			return;
-		}
+	translation_from = TransliterateText(translation_from);
+	translation_to = TransliterateText(translation_to);
+	
+	if (this->NameTranslations.find(translation_from) != this->NameTranslations.end() && std::find(this->NameTranslations[translation_from].begin(), this->NameTranslations[translation_from].end(), translation_to) != this->NameTranslations[translation_from].end()) { //if translation is already present, return
+		return;
 	}
 	
-	this->NameTranslations[0].push_back(translation_from);
-	this->NameTranslations[1].push_back(translation_to);
+	this->NameTranslations[translation_from].push_back(translation_to);
+	
+//	fprintf(stdout, "Added name translation to the \"%s\" language: \"%s\" to \"%s\".\n", this->Name.c_str(), translation_from.c_str(), translation_to.c_str());
 }
 
 int LanguageWord::HasNameType(std::string type, int grammatical_number, int grammatical_case, int grammatical_tense)
