@@ -7282,40 +7282,6 @@ void InitializeGrandStrategyProvinces()
 					}
 				}
 			}
-			
-			// add historical population from regions to provinces here, for a lack of a better place (all province's region belongings need to be defined before this takes place, so this can't happen during the province definitions)
-			for (size_t j = 0; j < Provinces[i]->Regions.size(); ++j) {
-				for (std::map<int, int>::iterator iterator = Provinces[i]->Regions[j]->HistoricalPopulation.begin(); iterator != Provinces[i]->Regions[j]->HistoricalPopulation.end(); ++iterator) {
-					if (Provinces[i]->HistoricalPopulation.find(iterator->first) == Provinces[i]->HistoricalPopulation.end()) { // if the province doesn't have historical population information for a given year but the region does, then use the region's population quantity divided by the number of provinces the region has
-						Provinces[i]->HistoricalPopulation[iterator->first] = iterator->second / Provinces[i]->Regions[j]->Provinces.size();
-					}
-				}
-			}
-	
-			for (std::map<int, int>::reverse_iterator iterator = Provinces[i]->HistoricalPopulation.rbegin(); iterator != Provinces[i]->HistoricalPopulation.rend(); ++iterator) {
-				if (GrandStrategyYear >= iterator->first) {
-					province->SetPopulation(iterator->second);
-					break;
-				}
-			}
-			
-			for (std::map<int, std::map<int, bool>>::iterator iterator = Provinces[i]->HistoricalSettlementBuildings.begin(); iterator != Provinces[i]->HistoricalSettlementBuildings.end(); ++iterator) {
-				for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
-					if (GrandStrategyYear >= second_iterator->first) {
-						province->SetSettlementBuilding(iterator->first, second_iterator->second);
-						break;
-					}
-				}
-			}
-			
-			for (std::map<CUpgrade *, std::map<int, bool>>::iterator iterator = Provinces[i]->HistoricalModifiers.begin(); iterator != Provinces[i]->HistoricalModifiers.end(); ++iterator) {
-				for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
-					if (GrandStrategyYear >= second_iterator->first) {
-						province->SetModifier(iterator->first, second_iterator->second);
-						break;
-					}
-				}
-			}
 		}
 	}
 }
@@ -7379,25 +7345,61 @@ void FinalizeGrandStrategyInitialization()
 	}
 	
 	for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) {
-		if (GrandStrategyGame.Provinces[i]->Coastal && GrandStrategyGame.Provinces[i]->Tiles.size() == 1) { //if the province is a 1-tile island, it has to start with a port in its capital to feed itself
-			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->SettlementLocation.x][GrandStrategyGame.Provinces[i]->SettlementLocation.y]->SetPort(true);
+		CGrandStrategyProvince *province = GrandStrategyGame.Provinces[i];
+		CProvince *base_province = GetProvince(province->Name);
+		
+		// add historical population from regions to provinces here, for a lack of a better place (all province's region belongings need to be defined before this takes place, so this can't happen during the province definitions)
+		for (size_t j = 0; j < base_province->Regions.size(); ++j) {
+			for (std::map<int, int>::iterator iterator = base_province->Regions[j]->HistoricalPopulation.begin(); iterator != base_province->Regions[j]->HistoricalPopulation.end(); ++iterator) {
+				if (base_province->HistoricalPopulation.find(iterator->first) == base_province->HistoricalPopulation.end()) { // if the province doesn't have historical population information for a given year but the region does, then use the region's population quantity divided by the number of provinces the region has
+					base_province->HistoricalPopulation[iterator->first] = iterator->second / base_province->Regions[j]->Provinces.size();
+				}
+			}
+		}
+	
+		for (std::map<int, int>::reverse_iterator iterator = base_province->HistoricalPopulation.rbegin(); iterator != base_province->HistoricalPopulation.rend(); ++iterator) {
+			if (GrandStrategyYear >= iterator->first) {
+				province->SetPopulation(iterator->second);
+				break;
+			}
+		}
+			
+		for (std::map<int, std::map<int, bool>>::iterator iterator = base_province->HistoricalSettlementBuildings.begin(); iterator != base_province->HistoricalSettlementBuildings.end(); ++iterator) {
+			for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+				if (GrandStrategyYear >= second_iterator->first) {
+					province->SetSettlementBuilding(iterator->first, second_iterator->second);
+					break;
+				}
+			}
+		}
+			
+		for (std::map<CUpgrade *, std::map<int, bool>>::iterator iterator = base_province->HistoricalModifiers.begin(); iterator != base_province->HistoricalModifiers.end(); ++iterator) {
+			for (std::map<int, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+				if (GrandStrategyYear >= second_iterator->first) {
+					province->SetModifier(iterator->first, second_iterator->second);
+					break;
+				}
+			}
 		}
 		
-		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->Owner != NULL) {
+		if (province->Coastal && province->Tiles.size() == 1) { //if the province is a 1-tile island, it has to start with a port in its capital to feed itself
+			GrandStrategyGame.WorldMapTiles[province->SettlementLocation.x][province->SettlementLocation.y]->SetPort(true);
+		}
+		
+		if (province->Civilization != -1 && province->Owner != NULL) {
 			if (GrandStrategyGameLoading == false) {
-				if (!GrandStrategyGame.Provinces[i]->HasBuildingClass("town-hall")) { // if the province has an owner but no town hall building, give it one; in the future we may want to have gameplay for provinces without town halls (for instance, for nomadic tribes), but at least until then, keep this in place
-					GrandStrategyGame.Provinces[i]->SetSettlementBuilding(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("town-hall")), true);
+				if (!province->HasBuildingClass("town-hall")) { // if the province has an owner but no town hall building, give it one; in the future we may want to have gameplay for provinces without town halls (for instance, for nomadic tribes), but at least until then, keep this in place
+					province->SetSettlementBuilding(province->GetClassUnitType(GetUnitTypeClassIndexByName("town-hall")), true);
 				}
 				
-				if (GrandStrategyGame.Provinces[i]->TotalWorkers < 4) { // make every province that has an owner start with at least four workers
-					GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), 4);
+				if (province->TotalWorkers < 4) { // make every province that has an owner start with at least four workers
+					province->SetUnitQuantity(province->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), 4);
 				}
 
-				if (GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")) != -1 && GrandStrategyGame.Provinces[i]->Units[GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"))] < 2) { // make every province that has an owner start with at least two infantry units
-					GrandStrategyGame.Provinces[i]->SetUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
+				if (province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")) != -1 && province->Units[province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry"))] < 2) { // make every province that has an owner start with at least two infantry units
+					province->SetUnitQuantity(province->GetClassUnitType(GetUnitTypeClassIndexByName("infantry")), 2);
 				}
 				
-				CProvince *base_province = GetProvince(GrandStrategyGame.Provinces[i]->Name);
 				for (std::map<std::tuple<int,int>, CCharacter *>::iterator iterator = base_province->HistoricalGovernors.begin(); iterator != base_province->HistoricalGovernors.end(); ++iterator) { //set the appropriate historical governors
 					if (
 						GrandStrategyYear >= std::get<0>(iterator->first)
@@ -7406,28 +7408,28 @@ void FinalizeGrandStrategyInitialization()
 						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsAlive()
 						&& GrandStrategyGame.GetHero(iterator->second->GetFullName())->IsVisible()
 					) {
-						GrandStrategyGame.Provinces[i]->SetGovernor(iterator->second->GetFullName());
+						province->SetGovernor(iterator->second->GetFullName());
 					}
 				}
 				
 				// try to perform governor succession for provinces missing a governor in charge of them
-				if (GrandStrategyGame.Provinces[i]->Governor == NULL && GrandStrategyGame.Provinces[i]->Owner->HasGovernmentPosition(CharacterTitleGovernor)) {
-					GrandStrategyGame.Provinces[i]->GovernorSuccession();
+				if (province->Governor == NULL && province->Owner->HasGovernmentPosition(CharacterTitleGovernor)) {
+					province->GovernorSuccession();
 				}
 			}
 			
-			GrandStrategyGame.Provinces[i]->ReallocateLabor(); // allocate labor for provinces
+			province->ReallocateLabor(); // allocate labor for provinces
 		}
 		
 		
-		if (GrandStrategyGame.Provinces[i]->Civilization != -1 && GrandStrategyGame.Provinces[i]->FoodConsumption > GrandStrategyGame.Provinces[i]->GetFoodCapacity()) { // remove workers if there are so many the province will starve
-			GrandStrategyGame.Provinces[i]->ChangeUnitQuantity(GrandStrategyGame.Provinces[i]->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), ((GrandStrategyGame.Provinces[i]->GetFoodCapacity() - GrandStrategyGame.Provinces[i]->FoodConsumption) / FoodConsumptionPerWorker));
-			GrandStrategyGame.Provinces[i]->ReallocateLabor();
+		if (province->Civilization != -1 && province->FoodConsumption > province->GetFoodCapacity()) { // remove workers if there are so many the province will starve
+			province->ChangeUnitQuantity(province->GetClassUnitType(GetUnitTypeClassIndexByName("worker")), ((province->GetFoodCapacity() - province->FoodConsumption) / FoodConsumptionPerWorker));
+			province->ReallocateLabor();
 		}
 		
-		for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Tiles.size(); ++j) { // generate cultural names for tiles (since this isn't done throughout the history to increase performance)
-			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->GenerateCulturalName();
-			GrandStrategyGame.WorldMapTiles[GrandStrategyGame.Provinces[i]->Tiles[j].x][GrandStrategyGame.Provinces[i]->Tiles[j].y]->GenerateFactionCulturalName();
+		for (size_t j = 0; j < province->Tiles.size(); ++j) { // generate cultural names for tiles (since this isn't done throughout the history to increase performance)
+			GrandStrategyGame.WorldMapTiles[province->Tiles[j].x][province->Tiles[j].y]->GenerateCulturalName();
+			GrandStrategyGame.WorldMapTiles[province->Tiles[j].x][province->Tiles[j].y]->GenerateFactionCulturalName();
 		}
 	}
 
