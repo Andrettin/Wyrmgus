@@ -17,13 +17,23 @@ artifacts:
   - path: build\Stratagus-*.exe
   - path: compiled-binaries.zip
 deploy:
-  release: master-builds
-  description: 'Automatic builds from the master branch'
-  provider: GitHub
-  auth_token:
-    secure:  I+Yd37ipF67x5pbsPtl5DX5+bf9q0bt6NFhrtUUauhkHDqn+IfZwyECkUITT98rw
-  artifact: /.*exe/
-  draft: false
-  prerelease: true
-  on:
-    branch: master
+  - provider: GitHub
+    release: master-builds
+    description: 'Automatic builds from the master branch'
+    auth_token:
+      secure:  I+Yd37ipF67x5pbsPtl5DX5+bf9q0bt6NFhrtUUauhkHDqn+IfZwyECkUITT98rw
+    artifact: /.*(exe|zip)/
+    draft: false
+    prerelease: true
+    on:
+      branch: master
+  - provider: GitHub
+    release: $(APPVEYOR_REPO_TAG_NAME)
+	description: 'Release'
+    auth_token:
+      secure:  I+Yd37ipF67x5pbsPtl5DX5+bf9q0bt6NFhrtUUauhkHDqn+IfZwyECkUITT98rw
+	artifact: /.*(exe|zip)/
+	draft: false
+	prerelease: false
+	on:
+	  appveyor_repo_tag: true
