@@ -37,6 +37,9 @@
 
 #include "tile.h"
 
+//Wyrmgus start
+#include "editor.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "player.h"
@@ -121,7 +124,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames > 0 && !tileset.tiles[this->tilesetTile].tileinfo.MixTerrain) {
+	if (Editor.Running == EditorNotRunning && tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames > 0 && !tileset.tiles[this->tilesetTile].tileinfo.MixTerrain) {
 		this->AnimationFrame = SyncRand(tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames);
 	}
 	//Wyrmgus end
