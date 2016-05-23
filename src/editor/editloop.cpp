@@ -2211,7 +2211,7 @@ void CEditor::Init()
 		for (std::vector<CUnitType *>::size_type i = 0; i < ::UnitTypes.size(); ++i) {
 			CUnitType &type = *::UnitTypes[i];
 			
-			if (type.Icon.Name.empty() || type.BoolFlag[VANISHES_INDEX].value) {
+			if (type.Icon.Name.empty() || type.BoolFlag[VANISHES_INDEX].value || type.BoolFlag[HIDDENINEDITOR_INDEX].value) {
 				continue;
 			}
 			

@@ -138,6 +138,7 @@ static const char GRAVEL_KEY[] = "Gravel";
 static const char HACKDAMAGE_KEY[] = "HackDamage";
 static const char PIERCEDAMAGE_KEY[] = "PierceDamage";
 static const char BLUNTDAMAGE_KEY[] = "BluntDamage";
+static const char HIDDENINEDITOR_KEY[] = "HiddenInEditor";
 //Wyrmgus end
 
 // names of the variable.
@@ -263,7 +264,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
 							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY,
-							   HACKDAMAGE_KEY, PIERCEDAMAGE_KEY, BLUNTDAMAGE_KEY
+							   HACKDAMAGE_KEY, PIERCEDAMAGE_KEY, BLUNTDAMAGE_KEY,
+							   HIDDENINEDITOR_KEY
 							   //Wyrmgus end
 							  };
 
