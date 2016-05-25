@@ -1355,7 +1355,9 @@ void CUnit::ReadWork(CUpgrade *work, bool affect_character)
 void CUnit::ApplyAuraEffect(int aura_index)
 {
 	int effect_index = -1;
-	if (aura_index == REGENERATIONAURA_INDEX) {
+	if (aura_index == LEADERSHIPAURA_INDEX) {
+		effect_index = LEADERSHIP_INDEX;
+	} else if (aura_index == REGENERATIONAURA_INDEX) {
 		effect_index = REGENERATION_INDEX;
 	}
 	
@@ -4796,7 +4798,10 @@ static void HitUnit_Burning(CUnit &target)
 	}
 }
 
-static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
+//Wyrmgus start
+//static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
+void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
+//Wyrmgus end
 {
 	Vec2i pos = target.tilePos - attacker.tilePos;
 	int d = isqrt(pos.x * pos.x + pos.y * pos.y);
@@ -5021,7 +5026,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	if (
 		(!target.IsAgressive() || attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value)
 		&& target.CanMove()
-		&& target.CurrentAction() == UnitActionStill
+		&& (target.CurrentAction() == UnitActionStill || target.Variable[TERROR_INDEX].Value > 0)
 		&& !target.BoardCount
 		&& !target.Type->BoolFlag[BRIDGE_INDEX].value
 	) {

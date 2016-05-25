@@ -335,8 +335,10 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	int damage_modifier = 100;
 	if (attacker.Variable[BLOODLUST_INDEX].Value > 0) {
 		damage_modifier += 100;
-	} else if (attacker.Variable[INSPIRE_INDEX].Value > 0) { // don't stack the effects of Inspire and Bloodlust
+	} else if (attacker.Variable[INSPIRE_INDEX].Value > 0) { // don't stack the effects of Inspire, Bloodlust and Leadership
 		damage_modifier += 50;
+	} else if (attacker.Variable[LEADERSHIP_INDEX].Value > 0) {
+		damage_modifier += 10;
 	}
 	if (attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value > 0) {
 		if (GameSettings.NoRandomness) {

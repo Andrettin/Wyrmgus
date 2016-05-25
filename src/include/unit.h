@@ -209,7 +209,7 @@ public:
 	{
 		//Wyrmgus start
 //		return (Type->BoolFlag[CANATTACK_INDEX].value && !Type->BoolFlag[COWARD_INDEX].value
-		return (CanAttack() && !Type->BoolFlag[COWARD_INDEX].value
+		return (CanAttack() && !Type->BoolFlag[COWARD_INDEX].value && Variable[TERROR_INDEX].Value == 0
 		//Wyrmgus end
 				&& Variable[INVISIBLE_INDEX].Value == 0);
 	}
@@ -692,6 +692,7 @@ extern int ThreatCalculate(const CUnit &unit, const CUnit &dest);
 //Wyrmgus start
 //extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL);
 extern void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile = NULL, bool show_damage = true);
+extern void HitUnit_RunAway(CUnit &target, const CUnit &attacker);
 //Wyrmgus end
 
 /// Calculate the distance from current view point to coordinate

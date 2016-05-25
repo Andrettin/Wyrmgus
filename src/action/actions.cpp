@@ -345,7 +345,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	
 	//Wyrmgus start
 //	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, INSPIRE_INDEX, REGENERATION_INDEX};
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, INSPIRE_INDEX, REGENERATION_INDEX, TERROR_INDEX};
 	//Wyrmgus end
 	//  decrease spells effects time.
 	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
@@ -354,9 +354,20 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	}
 	
 	//Wyrmgus start
-	//apply auras to all appropriate nearby units
 	if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
+		//apply auras to all appropriate nearby units
 		int aura_range = AuraRange - (unit.Type->TileWidth - 1);
+		if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0) { // leadership aura
+			if (unit.Type->BoolFlag[BUILDING_INDEX].value == false) {
+				unit.ApplyAuraEffect(LEADERSHIPAURA_INDEX);
+			}
+			
+			std::vector<CUnit *> table;
+			SelectAroundUnit(unit, aura_range, table, MakeAndPredicate(MakeOrPredicate(HasSamePlayerAs(*unit.Player), IsAlliedWith(*unit.Player)), MakeNotPredicate(IsBuildingType())), true);
+			for (size_t i = 0; i != table.size(); ++i) {
+				table[i]->ApplyAuraEffect(LEADERSHIPAURA_INDEX);
+			}
+		}
 		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) { // regeneration aura
 			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) {
 				unit.ApplyAuraEffect(REGENERATIONAURA_INDEX);
@@ -428,7 +439,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			//Wyrmgus start
 //			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == INSPIRE_INDEX || i == REGENERATION_INDEX) {
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == INSPIRE_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -445,6 +456,19 @@ static void HandleBuffsEachSecond(CUnit &unit)
 			IncreaseVariable(unit, i);
 		}
 	}
+	
+	//Wyrmgus start
+	if (unit.Variable[TERROR_INDEX].Value > 0) { // if unit is terrified, flee at the sight of enemies
+		std::vector<CUnit *> table;
+		SelectAroundUnit(unit, unit.CurrentSightRange, table, IsAggresiveUnit(), true);
+		for (size_t i = 0; i != table.size(); ++i) {
+			if (unit.IsEnemy(*table[i])) {
+				HitUnit_RunAway(unit, *table[i]);
+				break;
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 /**

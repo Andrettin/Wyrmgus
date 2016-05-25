@@ -29,11 +29,11 @@ deploy:
       branch: master
   - provider: GitHub
     release: $(APPVEYOR_REPO_TAG_NAME)
-	description: 'Release'
+    description: 'Release'
     auth_token:
       secure:  I+Yd37ipF67x5pbsPtl5DX5+bf9q0bt6NFhrtUUauhkHDqn+IfZwyECkUITT98rw
-	artifact: /.*(exe|zip)/
-	draft: false
-	prerelease: false
-	on:
-	  appveyor_repo_tag: true
+    artifact: /.*(exe|zip)/
+    draft: false
+    prerelease: false
+    on:
+      appveyor_repo_tag: true
