@@ -606,7 +606,7 @@ std::vector<CFiller> PlayerRace::GetFactionUIFillers(int civilization, int facti
 		return std::vector<CFiller>();
 	}
 	
-	if (faction != -1) {
+	if (faction != -1 && Factions[civilization].size() > 0) {
 		if (Factions[civilization][faction]->UIFillers.size() > 0) {
 			return Factions[civilization][faction]->UIFillers;
 		}
