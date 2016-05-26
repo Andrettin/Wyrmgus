@@ -1382,10 +1382,12 @@ void CGrandStrategyGame::DoEvents()
 {
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
-			for (size_t k = 0; k < GrandStrategyGame.AvailableEvents.size(); ++k) {
-				CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[i][j]->Name + "\");");
-				if (GrandStrategyGame.AvailableEvents[k]->CanTrigger(GrandStrategyGame.Factions[i][j])) {
-					GrandStrategyGame.AvailableEvents[k]->Trigger(GrandStrategyGame.Factions[i][j]);
+			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
+				for (size_t k = 0; k < GrandStrategyGame.AvailableEvents.size(); ++k) {
+					CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[i][j]->Name + "\");");
+					if (GrandStrategyGame.AvailableEvents[k]->CanTrigger(GrandStrategyGame.Factions[i][j])) {
+						GrandStrategyGame.AvailableEvents[k]->Trigger(GrandStrategyGame.Factions[i][j]);
+					}
 				}
 			}
 		}
@@ -3322,6 +3324,30 @@ bool CGrandStrategyProvince::HasBuildingClass(std::string building_class_name)
 bool CGrandStrategyProvince::HasModifier(CUpgrade *modifier)
 {
 	return std::find(this->Modifiers.begin(), this->Modifiers.end(), modifier) != this->Modifiers.end();
+}
+
+bool CGrandStrategyProvince::BordersModifier(CUpgrade *modifier)
+{
+	//see if any provinces bordering this one have the modifier (count provinces reachable through water as well)
+	
+	for (size_t i = 0; i < this->BorderProvinces.size(); ++i) {
+		CGrandStrategyProvince *border_province = this->BorderProvinces[i];
+		if (border_province->HasModifier(modifier)) {
+			return true;
+		}
+	}
+	
+	for (size_t i = 0; i < this->LandProvincesReachableThroughWater.size(); ++i) {
+		CGrandStrategyProvince *border_province = this->LandProvincesReachableThroughWater[i];
+		if (this->HasBuildingClass("dock") == false || border_province->HasBuildingClass("dock") == false) {
+			continue;
+		}
+		if (border_province->HasModifier(modifier)) {
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 bool CGrandStrategyProvince::HasFactionClaim(int civilization_id, int faction_id)
@@ -5377,6 +5403,8 @@ CGrandStrategyEvent::~CGrandStrategyEvent()
 
 void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 {
+//	fprintf(stderr, "Triggering event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name.c_str());	
+	
 	CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name + "\");");
 	CclCommand("GrandStrategyEvent(EventFaction, \"" + this->Name + "\");");
 	CclCommand("EventFaction = nil;");
@@ -5390,6 +5418,8 @@ void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 
 bool CGrandStrategyEvent::CanTrigger(CGrandStrategyFaction *faction)
 {
+//	fprintf(stderr, "Checking for triggers for event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name.c_str());	
+	
 	if (this->MinYear && GrandStrategyYear < this->MinYear) {
 		return false;
 	}
@@ -5737,7 +5767,7 @@ void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string 
 	
 	int river_id = GetRiverId(river_name);
 	
-	return; //deactivate this for now, while there aren't proper graphics for the rivers
+//	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
@@ -5826,7 +5856,7 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 	
 	int river_id = GetRiverId(river_name);
 	
-	return; //deactivate this for now, while there aren't proper graphics for the rivers
+//	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;

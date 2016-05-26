@@ -170,6 +170,7 @@ public:
 	void SetBorderProvinceConnectionTransportLevel(CGrandStrategyProvince *province, int transport_level);
 	bool HasBuildingClass(std::string building_class_name);
 	bool HasModifier(CUpgrade *modifier);
+	bool BordersModifier(CUpgrade *modifier);
 	bool HasFactionClaim(int civilization_id, int faction_id);
 	bool HasResource(int resource, bool ignore_prospection = false);
 	bool BordersProvince(CGrandStrategyProvince *province);

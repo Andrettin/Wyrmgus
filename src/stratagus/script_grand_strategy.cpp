@@ -235,6 +235,16 @@ static int CclGetGrandStrategyProvinceData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "BordersModifier")) {
+		LuaCheckArgs(l, 3);
+
+		CUpgrade *modifier = CUpgrade::Get(LuaToString(l, 3));
+		if (modifier == NULL) {
+			LuaError(l, "Modifier doesn't exist.");
+		}
+		
+		lua_pushboolean(l, province->BordersModifier(modifier));
+		return 1;
 	} else if (!strcmp(data, "Governor")) {
 		if (province->Governor != NULL) {
 			lua_pushstring(l, province->Governor->GetFullName().c_str());
