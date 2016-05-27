@@ -7256,6 +7256,7 @@ void InitializeGrandStrategyProvinces()
 		province->Name = Provinces[i]->Name;
 		province->World = Provinces[i]->World;
 		if (Provinces[i]->ReferenceProvince != -1) {
+//			fprintf(stderr, "Setting the ReferenceProvince of province \"%s\" to \"%s\".\n", province->Name.c_str(), Provinces[Provinces[i]->ReferenceProvince]->Name.c_str());
 			province->ReferenceProvince = GetProvinceId(Provinces[Provinces[i]->ReferenceProvince]->Name);
 		}
 		province->Water = Provinces[i]->Water;

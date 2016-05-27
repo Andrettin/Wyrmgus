@@ -226,7 +226,7 @@ static int CclDefineProvince(lua_State *l)
 		} else if (!strcmp(value, "ReferenceProvince")) {
 			CProvince *reference_province = GetProvince(LuaToString(l, -1));
 			if (reference_province != NULL) {
-				reference_province->ReferenceProvince = reference_province->ID;
+				province->ReferenceProvince = reference_province->ID;
 			} else {
 				LuaError(l, "Reference province doesn't exist.");
 			}
