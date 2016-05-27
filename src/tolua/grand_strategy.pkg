@@ -54,7 +54,6 @@ extern void SetProvinceCivilization(std::string province_name, std::string civil
 extern void SetProvinceSettlementLocation(std::string province_name, int x, int y);
 extern void SetProvinceCulturalName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
 extern void SetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
-extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident);
 extern void SetProvincePopulation(std::string province_name, int quantity);

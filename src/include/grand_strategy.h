@@ -125,7 +125,7 @@ class CGrandStrategyProvince : public CProvince
 {
 public:
 	CGrandStrategyProvince() : CProvince(),
-		Civilization(-1), ReferenceProvince(-1), CurrentConstruction(-1),
+		Civilization(-1), CurrentConstruction(-1),
 		TotalUnits(0), TotalWorkers(0), PopulationGrowthProgress(0), FoodConsumption(0), Labor(0),
 		MilitaryScore(0), OffensiveMilitaryScore(0), AttackingMilitaryScore(0),
 		Movement(false),
@@ -195,7 +195,6 @@ public:
 	CGrandStrategyHero *GetRandomAuthor();
 	
 	int Civilization;													/// Civilization of the province (-1 = no one).
-	int ReferenceProvince;												/// Reference province, if a water province (used for name changing) (-1 = none).
 	int CurrentConstruction;											/// Building currently under construction (unit type index).
 	int TotalUnits;														/// Total quantity of units in the province
 	int TotalWorkers;													/// Total quantity of workers in the province
@@ -577,7 +576,6 @@ extern void SetProvinceCivilization(std::string province_name, std::string civil
 extern void SetProvinceSettlementLocation(std::string province_name, int x, int y);
 extern void SetProvinceCulturalName(std::string province_name, std::string civilization_name, std::string province_cultural_name);
 extern void SetProvinceFactionCulturalName(std::string province_name, std::string civilization_name, std::string faction_name, std::string province_cultural_name);
-extern void SetProvinceReferenceProvince(std::string province_name, std::string reference_province_name);
 extern void SetProvinceSettlementBuilding(std::string province_name, std::string settlement_building_ident, bool has_settlement_building);
 extern void SetProvinceCurrentConstruction(std::string province_name, std::string settlement_building_ident);
 extern void SetProvincePopulation(std::string province_name, int quantity);

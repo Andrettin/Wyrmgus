@@ -223,6 +223,13 @@ static int CclDefineProvince(lua_State *l)
 			province->Map = LuaToString(l, -1);
 		} else if (!strcmp(value, "SettlementTerrain")) {
 			province->SettlementTerrain = LuaToString(l, -1);
+		} else if (!strcmp(value, "ReferenceProvince")) {
+			CProvince *reference_province = GetProvince(LuaToString(l, -1));
+			if (reference_province != NULL) {
+				reference_province->ReferenceProvince = reference_province->ID;
+			} else {
+				LuaError(l, "Reference province doesn't exist.");
+			}
 		} else if (!strcmp(value, "CulturalNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");

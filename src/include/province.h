@@ -115,7 +115,7 @@ class CProvince
 {
 public:
 	CProvince() :
-		ID(-1),
+		ID(-1), ReferenceProvince(-1),
 		Water(false), Coastal(false), SettlementLocation(-1, -1),
 		World(NULL)
 	{
@@ -126,6 +126,7 @@ public:
 	std::string Map;
 	std::string SettlementTerrain;
 	int ID;																/// ID of this province
+	int ReferenceProvince;										/// Used by water provinces to see based on which province should they use which cultural name
 	bool Water;															/// Whether the province is a water province or not
 	bool Coastal;														/// Whether the province is a coastal province or not
 	Vec2i SettlementLocation;											/// In which tile the province's settlement is located

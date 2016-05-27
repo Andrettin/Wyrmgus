@@ -2924,9 +2924,6 @@ void SaveGrandStrategyGame(const std::string &filename)
 			if (GrandStrategyGame.Provinces[i]->Owner != NULL) {
 				fprintf(fd, "SetProvinceOwner(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Owner->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Name.c_str()); //save province owner
 			}
-			if (GrandStrategyGame.Provinces[i]->ReferenceProvince != -1) {
-				fprintf(fd, "SetProvinceReferenceProvince(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[GrandStrategyGame.Provinces[i]->ReferenceProvince]->Name.c_str()); //save the province's reference province (for water provinces' cultural name)
-			}
 			if (GrandStrategyGame.Provinces[i]->AttackedBy != NULL) {
 				fprintf(fd, "SetProvinceAttackedBy(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->AttackedBy->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->AttackedBy->Civilization][GrandStrategyGame.Provinces[i]->AttackedBy->Faction]->Name.c_str()); //save attacked by
 			}
