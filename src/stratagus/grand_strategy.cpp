@@ -2743,6 +2743,13 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 		return;
 	}
 	
+	//if this province has an equivalent building for its civilization/faction, use that instead
+	if (!UnitTypes[building_id]->Civilization.empty()) {
+		if (this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[building_id]->Class)) != building_id && this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[building_id]->Class)) != -1) {
+			building_id = this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[building_id]->Class));
+		}
+	}
+				
 	if (this->SettlementBuildings[building_id] == has_settlement_building) {
 		return;
 	}
