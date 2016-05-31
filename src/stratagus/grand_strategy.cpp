@@ -4302,6 +4302,9 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 	
 	for (int i = 0; i < MaxCosts; ++i) {
 		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[i] = this->Resources[i];
+		GrandStrategyGame.Factions[new_civilization][new_faction]->Trade[i] = this->Trade[i];
+		this->Resources[i] = 0;
+		this->Trade[i] = 0;
 	}
 	
 	GrandStrategyGame.Factions[new_civilization][new_faction]->CurrentResearch = GrandStrategyGame.Factions[old_civilization][old_faction]->CurrentResearch;
