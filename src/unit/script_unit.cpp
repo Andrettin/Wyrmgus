@@ -948,18 +948,19 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		LuaError(l, "bad player");
 		return 0;
 	}
+	Vec2i new_pos;
+	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true);
+	
+	if (!Map.Info.IsPointOnMap(new_pos)) {
+		new_pos = Players[playerno].StartPos;
+	}
+	
 	CUnit *unit = MakeUnit(*unittype, &Players[playerno]);
+	
 	if (unit == NULL) {
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		Vec2i new_pos;
-		AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true);
-		
-		if (!Map.Info.IsPointOnMap(new_pos)) {
-			return 0;
-		}
-
 		if (UnitCanBeAt(*unit, new_pos)
 			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0))) {
 			unit->Place(new_pos);
