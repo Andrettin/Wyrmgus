@@ -5779,7 +5779,7 @@ void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string 
 	
 	int river_id = GetRiverId(river_name);
 	
-//	return; //deactivate this for now, while there aren't proper graphics for the rivers
+	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
@@ -5868,7 +5868,7 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 	
 	int river_id = GetRiverId(river_name);
 	
-//	return; //deactivate this for now, while there aren't proper graphics for the rivers
+	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
