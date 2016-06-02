@@ -496,7 +496,10 @@ bool CanBuildOn(const Vec2i &pos, int mask)
 **  @return      OnTop, parent unit, builder on true, NULL false.
 **
 */
-CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
+//Wyrmgus start
+//CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
+CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration)
+//Wyrmgus end
 {
 	// Terrain Flags don't matter if building on top of a unit.
 	CUnit *ontop = CanBuildHere(unit, type, pos);
@@ -546,7 +549,7 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			}
 			//Wyrmgus start
 //			if (player && !mf.playerInfo.IsExplored(*player)) {
-			if (player && !mf.playerInfo.IsTeamExplored(*player)) {
+			if (player && !ignore_exploration && !mf.playerInfo.IsTeamExplored(*player)) {
 			//Wyrmgus end
 				h = type.TileHeight;
 				ontop = NULL;

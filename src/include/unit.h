@@ -675,7 +675,10 @@ extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i
 /// @todo more docu
 extern bool CanBuildOn(const Vec2i &pos, int mask);
 /// FIXME: more docu
-extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
+//Wyrmgus start
+//extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration = false);
+//Wyrmgus end
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(const char *death);
 

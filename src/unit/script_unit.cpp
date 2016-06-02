@@ -962,7 +962,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, new_pos)
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0))) {
+			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0, true))) {
 			unit->Place(new_pos);
 		} else {
 			const int heading = SyncRand() % 256;
