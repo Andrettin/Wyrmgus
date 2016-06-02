@@ -176,22 +176,18 @@ void CGrandStrategyGame::DrawMap()
 	}
 	
 	// draw rivers (has to be drawn separately so that they appear over the terrain of the adjacent tiles they go over)
+	std::vector<int> directions; // draw non-diagonal directions
+	directions.push_back(North);
+	directions.push_back(East);
+	directions.push_back(South);
+	directions.push_back(West);
+	
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (this->WorldMapTiles[x][y]->Terrain != -1) {
-				for (int i = 0; i < MaxDirections; ++i) {
+				for (size_t d = 0; d < directions.size(); ++d) {
+					int i = directions[d];
 					if (this->WorldMapTiles[x][y]->River[i] != -1) {
-						//only draw diagonal directions if inner
-						if (i == Northeast && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[East] != -1)) {
-							continue;
-						} else if (i == Southeast && (this->WorldMapTiles[x][y]->River[South] != -1 || this->WorldMapTiles[x][y]->River[East] != -1)) {
-							continue;
-						} else if (i == Southwest && (this->WorldMapTiles[x][y]->River[South] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
-							continue;
-						} else if (i == Northwest && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
-							continue;
-						}
-						
 						if (this->WorldMapTiles[x][y]->Province != NULL && this->WorldMapTiles[x][y]->Province->Water) { //water tiles always use rivermouth graphics if they have a river
 							//see from which direction the rivermouth comes
 							bool flipped = false;
@@ -247,6 +243,37 @@ void CGrandStrategyGame::DrawMap()
 						} else {
 							this->RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 						}
+					}
+				}
+			}
+		}
+	}
+	
+	directions.clear();
+	directions.push_back(Northeast);
+	directions.push_back(Southeast);
+	directions.push_back(Southwest);
+	directions.push_back(Northwest);
+	
+	//draw diagonal rivers (draw these after non-diagonal ones so that the connections between the rivers look better
+	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
+		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
+			if (this->WorldMapTiles[x][y]->Terrain != -1) {
+				for (size_t d = 0; d < directions.size(); ++d) {
+					int i = directions[d];
+					if (this->WorldMapTiles[x][y]->River[i] != -1) {
+						//only draw diagonal directions if inner
+						if (i == Northeast && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[East] != -1)) {
+							continue;
+						} else if (i == Southeast && (this->WorldMapTiles[x][y]->River[South] != -1 || this->WorldMapTiles[x][y]->River[East] != -1)) {
+							continue;
+						} else if (i == Southwest && (this->WorldMapTiles[x][y]->River[South] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
+							continue;
+						} else if (i == Northwest && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
+							continue;
+						}
+						
+						this->RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
 					}
 				}
 			}
@@ -5779,7 +5806,7 @@ void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string 
 	
 	int river_id = GetRiverId(river_name);
 	
-	return; //deactivate this for now, while there aren't proper graphics for the rivers
+//	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
@@ -5868,7 +5895,7 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 	
 	int river_id = GetRiverId(river_name);
 	
-	return; //deactivate this for now, while there aren't proper graphics for the rivers
+//	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
 		GrandStrategyGame.WorldMapTiles[x][y]->River[North] = river_id;
