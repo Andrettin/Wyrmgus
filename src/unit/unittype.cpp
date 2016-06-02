@@ -856,7 +856,7 @@ std::string CUnitType::GetDefaultName(CPlayer &player) const
 CPlayerColorGraphic *CUnitType::GetDefaultLayerSprite(CPlayer &player, int image_layer) const
 {
 	VariationInfo *varinfo = this->GetDefaultVariation(player);
-	if (this->LayerVarInfo[image_layer].size() > 0) {
+	if (this->LayerVarInfo[image_layer].size() > 0 && this->GetDefaultVariation(player, image_layer)->Sprite) {
 		return this->GetDefaultVariation(player, image_layer)->Sprite;
 	} else if (varinfo && varinfo->LayerSprites[image_layer]) {
 		return varinfo->LayerSprites[image_layer];
