@@ -272,8 +272,15 @@ void CGrandStrategyGame::DrawMap()
 						} else if (i == Northwest && (this->WorldMapTiles[x][y]->River[North] != -1 || this->WorldMapTiles[x][y]->River[West] != -1)) {
 							continue;
 						}
-						
-						this->RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+							
+						if (this->WorldMapTiles[x][y]->Province != NULL && this->WorldMapTiles[x][y]->Province->Water) { //water tiles always use rivermouth graphics if they have a river
+							//see from which direction the rivermouth comes
+							this->RivermouthGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+						} else if (this->WorldMapTiles[x][y]->Riverhead[i] != -1) {
+							this->RiverheadGraphics[i][0]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+						} else {
+							this->RiverGraphics[i]->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
+						}
 					}
 				}
 			}
