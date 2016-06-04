@@ -321,9 +321,13 @@ set(stratagusmain_SRCS
 	src/stratagus/script_item.cpp
 	src/stratagus/script_province.cpp
 	src/stratagus/script_quest.cpp
+	src/stratagus/script_text.cpp
 	#Wyrmgus end
 	src/stratagus/selection.cpp
 	src/stratagus/stratagus.cpp
+	#Wyrmgus start
+	src/stratagus/text.cpp
+	#Wyrmgus end
 	src/stratagus/title.cpp
 	src/stratagus/translate.cpp
 	src/stratagus/util.cpp
@@ -628,6 +632,9 @@ set(stratagus_generic_HDRS
 	src/include/sound_server.h
 	src/include/spells.h
 	src/include/stratagus.h
+	#Wyrmgus start
+	src/include/text.h
+	#Wyrmgus end
 	src/include/tile.h
 	src/include/tileset.h
 	src/include/title.h

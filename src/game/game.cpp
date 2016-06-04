@@ -78,6 +78,9 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
+//Wyrmgus start
+#include "text.h"
+//Wyrmgus end
 #include "tileset.h"
 #include "translate.h"
 #include "trigger.h"
@@ -2373,6 +2376,9 @@ void LuaRegisterModules()
 	SelectionCclRegister();
 	SoundCclRegister();
 	SpellCclRegister();
+	//Wyrmgus start
+	TextCclRegister();
+	//Wyrmgus end
 	TriggerCclRegister();
 	UnitCclRegister();
 	UnitTypeCclRegister();

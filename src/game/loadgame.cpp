@@ -61,6 +61,9 @@
 #include "sound.h"
 #include "sound_server.h"
 #include "spells.h"
+//Wyrmgus start
+#include "text.h"
+//Wyrmgus end
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -109,6 +112,7 @@ void CleanModules()
 	CleanMissiles();
 	//Wyrmgus start
 	CleanQuests();
+	CleanTexts();
 	CleanUniqueItems();
 	//Wyrmgus end
 	CleanUnits();
