@@ -8906,7 +8906,7 @@ std::string GetFactionTierNameById(int faction_tier)
 	} else if (faction_tier == FactionTierDuchy) {
 		return "duchy";
 	} else if (faction_tier == FactionTierGrandDuchy) {
-		return "grand duchy";
+		return "grand-duchy";
 	} else if (faction_tier == FactionTierKingdom) {
 		return "kingdom";
 	} else if (faction_tier == FactionTierEmpire) {
@@ -8926,7 +8926,7 @@ int GetFactionTierIdByName(std::string faction_tier)
 		return FactionTierCounty;
 	} else if (faction_tier == "duchy") {
 		return FactionTierDuchy;
-	} else if (faction_tier == "grand duchy") {
+	} else if (faction_tier == "grand-duchy") {
 		return FactionTierGrandDuchy;
 	} else if (faction_tier == "kingdom") {
 		return FactionTierKingdom;

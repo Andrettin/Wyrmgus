@@ -149,6 +149,7 @@ void SaveGameSettings(CFile &file)
 	file.printf("GameSettings.Inside = %s\n", GameSettings.Inside ? "true" : "false");
 	//Wyrmgus start
 	file.printf("GameSettings.NoRandomness = %s\n", GameSettings.NoRandomness ? "true" : "false");
+	file.printf("GameSettings.NoTimeOfDay = %s\n", GameSettings.NoTimeOfDay ? "true" : "false");
 	//Wyrmgus end
 	file.printf("\n");
 }
@@ -1646,7 +1647,7 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	GameCycle = 0;
 	FastForwardCycle = 0;
 	//Wyrmgus start
-	if (!GameSettings.Inside && Editor.Running == EditorNotRunning) {
+	if (!GameSettings.Inside && Editor.Running == EditorNotRunning && !GameSettings.NoTimeOfDay) {
 		GameTimeOfDay = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
 	} else {
 		GameTimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?

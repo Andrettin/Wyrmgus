@@ -133,7 +133,7 @@ public:
 		Resource(0), NumUnits(0), Difficulty(0), NoFow(false), Inside(false), RevealMap(0),
 		//Wyrmgus start
 //		MapRichness(0), GameType(0), Opponents(0), Commands(NULL)
-		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), Commands(NULL)
+		MapRichness(0), GameType(0), Opponents(0), NoRandomness(false), NoTimeOfDay(false), Commands(NULL)
 		//Wyrmgus end
 	{
 		memset(Engine, 0, sizeof(Engine));
@@ -166,6 +166,7 @@ public:
 	int Opponents;
 	//Wyrmgus start
 	bool NoRandomness;
+	bool NoTimeOfDay;
 	//Wyrmgus end
 	int Engine[3];
 	int Network[3];
@@ -247,6 +248,7 @@ static FullReplay *StartReplay()
 	replay->Opponents = GameSettings.Opponents;
 	//Wyrmgus start
 	replay->NoRandomness = GameSettings.NoRandomness;
+	replay->NoTimeOfDay = GameSettings.NoTimeOfDay;
 	//Wyrmgus end
 
 	replay->Engine[0] = StratagusMajorVersion;
@@ -302,6 +304,7 @@ static void ApplyReplaySettings()
 	GameSettings.Opponents = CurrentReplay->Opponents;
 	//Wyrmgus start
 	GameSettings.NoRandomness = CurrentReplay->NoRandomness;
+	GameSettings.NoTimeOfDay = CurrentReplay->NoTimeOfDay;
 	//Wyrmgus end
 
 	// FIXME : check engine version
@@ -408,6 +411,7 @@ static void SaveFullLog(CFile &file)
 	file.printf("  MapRichness = %d,\n", CurrentReplay->MapRichness);
 	//Wyrmgus start
 	file.printf("  NoRandomness = %s,\n", CurrentReplay->NoRandomness ? "true" : "false");
+	file.printf("  NoTimeOfDay = %s,\n", CurrentReplay->NoTimeOfDay ? "true" : "false");
 	//Wyrmgus end
 	file.printf("  Engine = { %d, %d, %d },\n",
 				CurrentReplay->Engine[0], CurrentReplay->Engine[1], CurrentReplay->Engine[2]);
@@ -724,6 +728,8 @@ static int CclReplayLog(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "NoRandomness")) {
 			replay->NoRandomness = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "NoTimeOfDay")) {
+			replay->NoTimeOfDay = LuaToBoolean(l, -1);
 		//Wyrmgus end
 		} else if (!strcmp(value, "MapRichness")) {
 			replay->MapRichness = LuaToNumber(l, -1);
