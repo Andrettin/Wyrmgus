@@ -259,9 +259,9 @@ void UpdateDisplay()
 								 
 				VariationInfo *varinfo = type.GetDefaultVariation(*ThisPlayer);
 				if (varinfo && varinfo->Icon.Icon) { // check if the default variation is valid, and if it is, then make the button use the variation's icon
-					varinfo->Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index);
+					varinfo->Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index, type.SkinColor, type.HairColor);
 				} else {
-					type.Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index);
+					type.Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index, type.SkinColor, type.HairColor);
 				}
 				
 				if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
@@ -280,7 +280,7 @@ void UpdateDisplay()
 			const PixelPos pos(UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
-			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index);
+			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->LevelUpUnits[0]->Type->SkinColor, ThisPlayer->LevelUpUnits[0]->Type->HairColor);
 				
 			if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
 				std::string level_up_unit_tooltip = "Find Unit with Available Level Up";

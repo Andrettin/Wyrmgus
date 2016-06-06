@@ -730,15 +730,15 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 			}
 		}
 	} else {
@@ -750,9 +750,9 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 		}
 	}
 }
@@ -1056,18 +1056,18 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
+				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 			}
 		} else {
 			const CConstruction &construction = *type.Construction;
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
+				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 			}
 		}
 		//Wyrmgus end
@@ -1091,9 +1091,9 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		//Wyrmgus start
 //		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		if (varinfo && varinfo->Sprite) {
-			varinfo->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+			varinfo->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 		} else {
-			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 		}
 		//Wyrmgus end
 	}
@@ -1222,12 +1222,12 @@ void CUnit::Draw(const CViewport &vp) const
 		(this->Direction != LookingS || this->CurrentAction() == UnitActionDie)
 		&& frame != type->StillFrame
 		&& !(
-			type->InvertedEastArms
+			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
 			&& this->CurrentAction() != UnitActionDie
 		)
 		&& !(
-			type->InvertedSoutheastArms
+			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
 		)
 	) {
@@ -1241,12 +1241,12 @@ void CUnit::Draw(const CViewport &vp) const
 	if (
 		(this->Direction == LookingN && this->CurrentAction() != UnitActionDie)
 		|| (
-			type->InvertedEastArms
+			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
 			&& this->CurrentAction() != UnitActionDie
 		)
 		|| (
-			type->InvertedSoutheastArms
+			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
 		)
 	) {
@@ -1321,12 +1321,12 @@ void CUnit::Draw(const CViewport &vp) const
 	if (
 		(this->Direction == LookingN && this->CurrentAction() != UnitActionDie)
 		|| (
-			type->InvertedEastArms
+			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
 			&& this->CurrentAction() != UnitActionDie
 		)
 		|| (
-			type->InvertedSoutheastArms
+			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
 		)
 	) {
@@ -1350,12 +1350,12 @@ void CUnit::Draw(const CViewport &vp) const
 		(this->Direction == LookingS && this->CurrentAction() != UnitActionDie)
 		|| frame == type->StillFrame
 		|| (
-			type->InvertedEastArms
+			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
 			&& this->CurrentAction() != UnitActionDie
 		)
 		|| (
-			type->InvertedSoutheastArms
+			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
 		)
 	) {
@@ -1368,12 +1368,12 @@ void CUnit::Draw(const CViewport &vp) const
 	if (
 		(this->Direction != LookingN || this->CurrentAction() == UnitActionDie)
 		&& !(
-			type->InvertedEastArms
+			type->BoolFlag[INVERTEDEASTARMS_INDEX].value
 			&& (this->Direction == LookingE || this->Direction == LookingW)
 			&& this->CurrentAction() != UnitActionDie
 		)
 		&& !(
-			type->InvertedSoutheastArms
+			type->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
 		)
 	) {

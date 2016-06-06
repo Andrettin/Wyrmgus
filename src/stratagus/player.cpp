@@ -336,8 +336,12 @@ bool NoRescueCheck;               /// Disable rescue check
 //std::string PlayerColorNames[PlayerMax];
 std::vector<CColor> PlayerColorsRGB[PlayerColorMax];
 std::vector<IntColor> PlayerColors[PlayerColorMax];
-
 std::string PlayerColorNames[PlayerColorMax];
+
+std::vector<CColor> SkinColorsRGB[SkinColorMax];
+std::string SkinColorNames[SkinColorMax];
+std::vector<CColor> HairColorsRGB[HairColorMax];
+std::string HairColorNames[HairColorMax];
 //Wyrmgus end
 
 /**
@@ -2420,6 +2424,32 @@ int GetPlayerColorIndexByName(std::string player_color_name)
 		}
 	}
 	return -1;
+}
+
+int GetSkinColorIndexByName(std::string skin_color_name)
+{
+	for (int c = 1; c < SkinColorMax; ++c) {
+		if (SkinColorNames[c].empty()) {
+			break;
+		}
+		if (SkinColorNames[c] == skin_color_name) {
+			return c;
+		}
+	}
+	return 0;
+}
+
+int GetHairColorIndexByName(std::string hair_color_name)
+{
+	for (int c = 1; c < HairColorMax; ++c) {
+		if (HairColorNames[c].empty()) {
+			break;
+		}
+		if (HairColorNames[c] == hair_color_name) {
+			return c;
+		}
+	}
+	return 0;
 }
 
 std::string GetGovernmentTypeNameById(int government_type)

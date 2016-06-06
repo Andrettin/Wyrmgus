@@ -58,7 +58,10 @@
 **  @param text   text to print on button
 */
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
-				  const std::string &text, int player)
+				  //Wyrmgus start
+//				  const std::string &text, int player)
+				  const std::string &text, int player, int skin_color, int hair_color)
+				  //Wyrmgus end
 {
 	ButtonStyleProperties *p;
 
@@ -89,7 +92,10 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		CPlayerColorGraphic *colorGraphic = dynamic_cast<CPlayerColorGraphic *>(pimage->Sprite);
 
 		if (colorGraphic && player != -1) {
-			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y);
+			//Wyrmgus start
+//			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y);
+			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y, true, skin_color, hair_color);
+			//Wyrmgus end
 		} else {
 			pimage->Sprite->DrawFrame(pimage->Frame, x, y);
 		}

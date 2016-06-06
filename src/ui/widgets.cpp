@@ -522,7 +522,7 @@ void MyOpenGLGraphics::_endDraw()
 //void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
 //								 int dstX, int dstY, int width, int height)
 void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
-								 int dstX, int dstY, int width, int height, int player)
+								 int dstX, int dstY, int width, int height, int player, int skin_color, int hair_color)
 //Wyrmgus end
 {
 	const gcn::ClipRectangle &r = this->getCurrentClipArea();
@@ -540,7 +540,7 @@ void MyOpenGLGraphics::drawImage(const gcn::Image *image, int srcX, int srcY,
 //									 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
 	if (player != -1) {
 		((CPlayerColorGraphic *)image)->DrawPlayerColorSubClip(player, srcX, srcY, width, height,
-										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
+										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset, skin_color, hair_color);
 	} else {
 		((CGraphic *)image)->DrawSubClip(srcX, srcY, width, height,
 										 dstX + mClipStack.top().xOffset, dstY + mClipStack.top().yOffset);
@@ -631,6 +631,18 @@ void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 		ExitFatal(1);
 	}
 	
+	int SkinColorIndex = GetSkinColorIndexByName(SkinColor);
+	if (!SkinColor.empty() && SkinColorIndex == 0) {
+		fprintf(stderr, "Color %s not defined\n", SkinColor.c_str());
+		ExitFatal(1);
+	}
+	
+	int HairColorIndex = GetHairColorIndexByName(HairColor);
+	if (!HairColor.empty() && HairColorIndex == 0) {
+		fprintf(stderr, "Color %s not defined\n", HairColor.c_str());
+		ExitFatal(1);
+	}
+	
 	// make the widget's image be player-colored
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -640,7 +652,7 @@ void PlayerColorImageWidget::draw(gcn::Graphics* graphics)
 		WidgetGraphicPlayerPixels(WidgetPlayerColor, *((CPlayerColorGraphic *)mImage));
 	}
 	
-	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), WidgetPlayerColorIndexFromName);
+	graphics->drawImage(mImage, ImageOrigin.x, ImageOrigin.y, 0, 0, mImage->getWidth(), mImage->getHeight(), WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex);
 }
 //Wyrmgus end
 
@@ -917,7 +929,7 @@ void ImageButton::setPosition(int x, int y)
 */
 PlayerColorImageButton::PlayerColorImageButton() :
 	Button(), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(""), Transparency(0)
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(""), SkinColor(""), HairColor(""), Transparency(0)
 {
 	setForegroundColor(0xffffff);
 	ImageOrigin.x = 0;
@@ -931,7 +943,7 @@ PlayerColorImageButton::PlayerColorImageButton() :
 */
 PlayerColorImageButton::PlayerColorImageButton(const std::string &caption, const std::string &playercolor) :
 	Button(caption), normalImage(NULL), pressedImage(NULL),
-	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(playercolor), Transparency(0)
+	disabledImage(NULL), frameImage(NULL), pressedframeImage(NULL), ButtonPlayerColor(playercolor), SkinColor(""), HairColor(""), Transparency(0)
 {
 	setForegroundColor(0xffffff);
 	ImageOrigin.x = 0;
@@ -969,6 +981,18 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		ExitFatal(1);
 	}
 		
+	int SkinColorIndex = GetSkinColorIndexByName(SkinColor);
+	if (!SkinColor.empty() && SkinColorIndex == 0) {
+		fprintf(stderr, "Color %s not defined\n", SkinColor.c_str());
+		ExitFatal(1);
+	}
+	
+	int HairColorIndex = GetHairColorIndexByName(HairColor);
+	if (!HairColor.empty() && HairColorIndex == 0) {
+		fprintf(stderr, "Color %s not defined\n", HairColor.c_str());
+		ExitFatal(1);
+	}
+	
 	if (img) {
 		// make the button's image be player-colored
 	#if defined(USE_OPENGL) || defined(USE_GLES)
@@ -1005,7 +1029,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			#endif
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1, WidgetPlayerColorIndexFromName);
+								img->getWidth() - 1, img->getHeight() - 1, WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
@@ -1027,7 +1051,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			#endif
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName);
+								img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
@@ -1046,7 +1070,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		#endif
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
-							img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName);
+							img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex);
 		if (Transparency) {
 		#if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {

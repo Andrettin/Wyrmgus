@@ -2213,6 +2213,94 @@ static int CclDefinePlayerColorIndex(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+**  Define skin colors
+**
+**  @param l  Lua state.
+*/
+static int CclDefineSkinColors(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	bool first = true;
+	int skin_color_count = 0;
+	SkinColorNames[0] = "default";
+	const int args = lua_rawlen(l, 1);
+	for (int i = 0; i < args; ++i) {
+		SkinColorNames[(i / 2) + 1] = LuaToString(l, 1, i + 1);
+		++i;
+		lua_rawgeti(l, 1, i + 1);
+		if (!lua_istable(l, -1)) {
+			LuaError(l, "incorrect argument");
+		}
+		const int numcolors = lua_rawlen(l, -1);
+		if (first) {
+			skin_color_count = numcolors;
+			first = false;
+		}
+		if (numcolors != skin_color_count) {
+			LuaError(l, "You should use the same quantity of colors for all skin colors");
+		}
+		SkinColorsRGB[(i / 2) + 1].clear();
+		SkinColorsRGB[(i / 2) + 1].resize(skin_color_count);
+		for (int j = 0; j < numcolors; ++j) {
+			lua_rawgeti(l, -1, j + 1);
+			SkinColorsRGB[(i / 2) + 1][j].Parse(l);
+			lua_pop(l, 1);
+		}
+	}
+
+	return 0;
+}
+
+/**
+**  Define hair colors
+**
+**  @param l  Lua state.
+*/
+static int CclDefineHairColors(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	if (!lua_istable(l, 1)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	bool first = true;
+	int hair_color_count = 0;
+	HairColorNames[0] = "default";
+	const int args = lua_rawlen(l, 1);
+	for (int i = 0; i < args; ++i) {
+		HairColorNames[(i / 2) + 1] = LuaToString(l, 1, i + 1);
+		++i;
+		lua_rawgeti(l, 1, i + 1);
+		if (!lua_istable(l, -1)) {
+			LuaError(l, "incorrect argument");
+		}
+		const int numcolors = lua_rawlen(l, -1);
+		if (first) {
+			hair_color_count = numcolors;
+			first = false;
+		}
+		if (numcolors != hair_color_count) {
+			LuaError(l, "You should use the same quantity of colors for all hair colors");
+		}
+		HairColorsRGB[(i / 2) + 1].clear();
+		HairColorsRGB[(i / 2) + 1].resize(hair_color_count);
+		for (int j = 0; j < numcolors; ++j) {
+			lua_rawgeti(l, -1, j + 1);
+			HairColorsRGB[(i / 2) + 1][j].Parse(l);
+			lua_pop(l, 1);
+		}
+	}
+
+	return 0;
+}
+//Wyrmgus end
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -2831,6 +2919,11 @@ void PlayerCclRegister()
 
 	lua_register(Lua, "NewColors", CclNewPlayerColors);
 
+	//Wyrmgus start
+	lua_register(Lua, "DefineSkinColors", CclDefineSkinColors);
+	lua_register(Lua, "DefineHairColors", CclDefineHairColors);
+	//Wyrmgus end
+	
 	// player member access functions
 	lua_register(Lua, "GetPlayerData", CclGetPlayerData);
 	lua_register(Lua, "SetPlayerData", CclSetPlayerData);

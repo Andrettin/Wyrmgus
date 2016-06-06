@@ -719,6 +719,10 @@ extern bool NoRescueCheck;          /// Disable rescue check
 extern std::vector<CColor> PlayerColorsRGB[PlayerColorMax]; /// Player colors
 extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
+extern std::string SkinColorNames[SkinColorMax];  /// Skin color names
+extern std::vector<CColor> SkinColorsRGB[SkinColorMax]; /// Skin colors
+extern std::string HairColorNames[HairColorMax];  /// Hair color names
+extern std::vector<CColor> HairColorsRGB[HairColorMax]; /// Hair colors
 extern std::map<std::string, int> CivilizationStringToIndex;
 extern std::map<std::string, int> FactionStringToIndex[MAX_RACES];
 //Wyrmgus end
@@ -776,6 +780,8 @@ extern void SetFactionStringToIndex(int civilization, std::string faction_name, 
 extern void NetworkSetFaction(int player, std::string faction_name);
 extern std::string GetFactionEffectsString(std::string civilization_name, std::string faction_name);
 extern int GetPlayerColorIndexByName(std::string player_color_name);
+extern int GetSkinColorIndexByName(std::string skin_color_name);
+extern int GetHairColorIndexByName(std::string hair_color_name);
 extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(std::string government_type);
 extern std::string GetWordTypeNameById(int word_type);

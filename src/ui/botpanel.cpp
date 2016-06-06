@@ -1218,6 +1218,10 @@ void CButtonPanel::Draw()
 			//Wyrmgus end
 		} else {
 			int player = -1;
+			//Wyrmgus start
+			int skin_color = 0;
+			int hair_color = 0;
+			//Wyrmgus end
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
 				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
 				//Wyrmgus start
@@ -1225,9 +1229,17 @@ void CButtonPanel::Draw()
 				if (Players[player].Type == PlayerNeutral) {
 					player = ThisPlayer->Index;
 				}
+				
+				skin_color = Selected[0]->Type->SkinColor;
+				hair_color = Selected[0]->Type->HairColor;
+				
+				if (buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) {
+					skin_color = UnitTypes[buttons[i].Value]->SkinColor;
+					hair_color = UnitTypes[buttons[i].Value]->HairColor;
+				}
 				//Wyrmgus end
 			}
-			//Wyrmgus start
+			//Wyrmgus start			
 			/*
 			buttons[i].Icon.Icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
@@ -1236,7 +1248,7 @@ void CButtonPanel::Draw()
 			
 			button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 											   GetButtonStatus(buttons[i], ButtonUnderCursor),
-											   pos, buf, player);
+											   pos, buf, player, skin_color, hair_color);
 			
 			//draw the quantity in stock for unit "training" cases which have it
 			if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) {

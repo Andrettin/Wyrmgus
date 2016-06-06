@@ -354,6 +354,8 @@ class PlayerColorImageWidget : public Widget
 	PlayerColorImageWidget(CPlayerColorGraphic *image, const std::string playercolor);
 	
 	void setImageOrigin(int x, int y);
+	void setSkinColor(std::string skin_color_name);
+	void setHairColor(std::string hair_color_name);
 };
 //Wyrmgus end
 
@@ -403,6 +405,8 @@ class PlayerColorImageButton : public Button
 	void setPressedFrameImage(CGraphic *image);
 	void setTransparency(int alpha);
 	void setImageOrigin(int x, int y);
+	void setSkinColor(std::string skin_color_name);
+	void setHairColor(std::string hair_color_name);
 };
 // Wyrmgus end
 

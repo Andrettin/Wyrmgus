@@ -195,7 +195,7 @@ namespace gcn
                                    int dstX, int dstY, int width,
 								   //Wyrmgus start
 //                                   int height)
-                                   int height, int player)
+                                   int height, int player, int skin_color, int hair_color)
 								   //Wyrmgus end
     {
         dstX += mClipStack.top().xOffset;

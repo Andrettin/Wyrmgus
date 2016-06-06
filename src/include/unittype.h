@@ -287,6 +287,8 @@ enum {
 	PIERCEDAMAGE_INDEX,
 	BLUNTDAMAGE_INDEX,
 	HIDDENINEDITOR_INDEX,
+	INVERTEDSOUTHEASTARMS_INDEX,
+	INVERTEDEASTARMS_INDEX,
 	//Wyrmgus end
 	NBARALREADYDEFINED
 };
@@ -729,10 +731,10 @@ public:
 	int TechnologyPointCost;								/// Technology point cost
 	int TrainQuantity;										/// Quantity to be trained
 	int Upkeep;												/// Gold upkeep (for grand strategy mode)
+	int SkinColor;											/// Skin color of the unit type (used for color conversion)
+	int HairColor;											/// Hair color of the unit type (used for color conversion)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
-	bool InvertedEastArms;									/// Whether the arms are inverted for the east/west graphics
-	bool InvertedSoutheastArms;								/// Whether the arms are inverted for the southeast/southwest graphics
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 

@@ -142,7 +142,7 @@ namespace gcn
                                 int srcY, int dstX, int dstY,
 								//Wyrmgus start
 //                                int width, int height)
-                                int width, int height, int player)
+                                int width, int height, int player, int skin_color, int hair_color)
 								//Wyrmgus end
     {
         ClipRectangle top = mClipStack.top();

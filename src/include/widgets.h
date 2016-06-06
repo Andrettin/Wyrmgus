@@ -62,7 +62,7 @@ public:
 	virtual void drawImage(const gcn::Image *image, int srcX, int srcY,
 						   //Wyrmgus start
 //						   int dstX, int dstY, int width, int height);
-						   int dstX, int dstY, int width, int height, int player = -1);
+						   int dstX, int dstY, int width, int height, int player = -1, int skin_color = 0, int hair_color = 0);
 						   //Wyrmgus end
 
 	virtual void drawPoint(int x, int y);
@@ -101,8 +101,12 @@ public:
 
 	virtual void draw(gcn::Graphics *graphics);
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
+	void setSkinColor(std::string skin_color_name) { SkinColor = skin_color_name; }
+	void setHairColor(std::string hair_color_name) { HairColor = hair_color_name; }
 
 	std::string WidgetPlayerColor;
+	std::string SkinColor;
+	std::string HairColor;
 	Vec2i ImageOrigin;
 };
 //Wyrmgus end
@@ -170,13 +174,17 @@ public:
 	virtual void setPosition(int x, int y);
 	void setTransparency(int alpha) { Transparency = alpha; }
 	void setImageOrigin(int x, int y) { ImageOrigin.x = x; ImageOrigin.y = y; }
+	void setSkinColor(std::string skin_color_name) { SkinColor = skin_color_name; }
+	void setHairColor(std::string hair_color_name) { HairColor = hair_color_name; }
 
 	gcn::Image *normalImage;
 	gcn::Image *pressedImage;
 	gcn::Image *disabledImage;
 	gcn::Image *frameImage;	
-	gcn::Image *pressedframeImage;	
+	gcn::Image *pressedframeImage;
 	std::string ButtonPlayerColor;
+	std::string SkinColor;
+	std::string HairColor;
 	int Transparency;
 	Vec2i ImageOrigin;
 };

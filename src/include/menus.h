@@ -47,7 +47,10 @@ class ButtonStyle;
 
 /// Draw menu button
 extern void DrawUIButton(ButtonStyle *style, unsigned flags,
-						 int x, int y, const std::string &text, int player = -1);
+						 //Wyrmgus start
+//						 int x, int y, const std::string &text, int player = -1);
+						 int x, int y, const std::string &text, int player = -1, int skin_color = 0, int hair_color = 0);
+						 //Wyrmgus end
 
 /// Pre menu setup
 extern void PreMenuSetup();

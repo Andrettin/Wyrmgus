@@ -162,6 +162,8 @@ extern const char NameLine[];
 #define MAX_RACES 32
 #define FactionMax 128				/// Maximum number of factions a civilization can have
 #define PlayerColorMax 32			/// How many player colors are supported
+#define SkinColorMax 8				/// How many skin colors are supported
+#define HairColorMax SkinColorMax	/// How many hair colors are supported
 #define VariationMax 32				/// Maximum number of variations a unit can have
 
 #define WorldMapWidthMax 1024		/// Maximum width the grand strategy world map can have

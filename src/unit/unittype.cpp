@@ -563,7 +563,7 @@ CUnitType::CUnitType() :
 	Slot(0), Width(0), Height(0), OffsetX(0), OffsetY(0), DrawLevel(0),
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
-	TechnologyPointCost(0), Upkeep(0), TrainQuantity(0), ItemClass(-1), InvertedEastArms(false), InvertedSoutheastArms(false),
+	TechnologyPointCost(0), Upkeep(0), TrainQuantity(0), ItemClass(-1), SkinColor(0), HairColor(0),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
@@ -1439,15 +1439,15 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false);
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 			}
 		}
 	} else {
@@ -1459,9 +1459,9 @@ void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite, int player
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false);
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false);
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
 		}
 	}
 	//Wyrmgus end

@@ -123,7 +123,7 @@ namespace gcn
                                int dstX, int dstY, int width,
 		//Wyrmgus start
 //                               int height);
-                               int height, int player = -1);
+                               int height, int player = -1, int skin_color = 0, int hair_color = 0);
 		//Wyrmgus end
 
         virtual void drawPoint(int x, int y);

@@ -139,6 +139,8 @@ static const char HACKDAMAGE_KEY[] = "HackDamage";
 static const char PIERCEDAMAGE_KEY[] = "PierceDamage";
 static const char BLUNTDAMAGE_KEY[] = "BluntDamage";
 static const char HIDDENINEDITOR_KEY[] = "HiddenInEditor";
+static const char INVERTEDSOUTHEASTARMS_KEY[] = "InvertedSoutheastArms";
+static const char INVERTEDEASTARMS_KEY[] = "InvertedEastArms";
 //Wyrmgus end
 
 // names of the variable.
@@ -268,7 +270,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
 							   HARVESTFROMOUTSIDE_KEY, OBSTACLE_KEY, AIRUNPASSABLE_KEY, SLOWS_KEY, GRAVEL_KEY,
 							   HACKDAMAGE_KEY, PIERCEDAMAGE_KEY, BLUNTDAMAGE_KEY,
-							   HIDDENINEDITOR_KEY
+							   HIDDENINEDITOR_KEY, INVERTEDSOUTHEASTARMS_KEY, INVERTEDEASTARMS_KEY
 							   //Wyrmgus end
 							  };
 
@@ -657,6 +659,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->TrainQuantity = parent_type->TrainQuantity;
 			type->Upkeep = parent_type->Upkeep;
 			type->ItemClass = parent_type->ItemClass;
+			type->SkinColor = parent_type->SkinColor;
+			type->HairColor = parent_type->HairColor;
 			type->MaxOnBoard = parent_type->MaxOnBoard;
 			type->RepairRange = parent_type->RepairRange;
 			type->RepairHP = parent_type->RepairHP;
@@ -684,8 +688,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->Sound = parent_type->Sound;
 			type->NumDirections = parent_type->NumDirections;
 			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
-			type->InvertedEastArms = parent_type->InvertedEastArms;
-			type->InvertedSoutheastArms = parent_type->InvertedSoutheastArms;
 			type->Icon.Name = parent_type->Icon.Name;
 			type->Icon.Icon = NULL;
 			if (!type->Icon.Name.empty()) {
@@ -1947,6 +1949,10 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		} else if (!strcmp(value, "ItemClass")) {
 			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "SkinColor")) {
+			type->SkinColor = GetSkinColorIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "HairColor")) {
+			type->HairColor = GetHairColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "WeaponClasses")) {
 			type->WeaponClasses.clear();
 			const int args = lua_rawlen(l, -1);
@@ -1958,10 +1964,6 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "incorrect weapon class");
 				}
 			}
-		} else if (!strcmp(value, "InvertedEastArms")) {
-			type->InvertedEastArms = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "InvertedSoutheastArms")) {
-			type->InvertedSoutheastArms = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Mod")) {
 			type->Mod = LuaToString(l, -1);
 		//Wyrmgus end
