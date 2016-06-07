@@ -1150,7 +1150,10 @@ static void DrawStartLocations()
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
 
 				if (type) {
-					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
+					//Wyrmgus start
+//					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
+					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, type->SkinColor, type->HairColor);
+					//Wyrmgus end
 				} else { // Draw a cross
 					DrawCross(startScreenPos, PixelTileSize, Players[i].Color);
 				}

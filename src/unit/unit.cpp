@@ -4076,6 +4076,28 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	return value;
 }
 
+int CUnit::GetSkinColor() const
+{
+	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+	if (varinfo && varinfo->SkinColor) {
+		return varinfo->SkinColor;
+	} else {
+		return this->Type->SkinColor;
+	}
+}
+
+int CUnit::GetHairColor() const
+{
+	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+	if (this->LayerVariation[HairImageLayer] != -1 && this->LayerVariation[HairImageLayer] < ((int) this->Type->LayerVarInfo[HairImageLayer].size()) && this->Type->LayerVarInfo[HairImageLayer][this->LayerVariation[HairImageLayer]]->HairColor != 0) {
+		return this->Type->LayerVarInfo[HairImageLayer][this->LayerVariation[HairImageLayer]]->HairColor;
+	} else if (varinfo && varinfo->HairColor != 0) {
+		return varinfo->HairColor;
+	} else {
+		return this->Type->HairColor;
+	}
+}
+
 bool CUnit::CanAttack(bool count_inside) const
 {
 	if (this->Type->CanTransport() && this->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && this->Type->BoolFlag[CANATTACK_INDEX].value) { //transporters can only attack through a unit within them

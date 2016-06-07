@@ -715,7 +715,7 @@ void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const PixelP
 }
 
 //Wyrmgus start
-void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos)
+void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, int skin_color, int hair_color)
 {
 	if (!sprite) {
 		return;
@@ -730,15 +730,15 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 	if (type.Flip) {
 		if (frame < 0) {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
+				sprite->DrawPlayerColorFrameClipTransX(player, -frame - 1, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, skin_color, hair_color);
 			} else {
-				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+				sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, skin_color, hair_color);
 			}
 		} else {
 			if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
+				sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, skin_color, hair_color);
 			} else {
-				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+				sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, skin_color, hair_color);
 			}
 		}
 	} else {
@@ -750,9 +750,9 @@ void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, 
 			frame = (frame / row) * type.NumDirections + frame % row;
 		}
 		if (type.Stats[player].Variables[TRANSPARENCY_INDEX].Value > 0) {
-			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, type.SkinColor, type.HairColor);
+			sprite->DrawPlayerColorFrameClipTrans(player, frame, pos.x, pos.y, int(256 - 2.56 * type.Stats[player].Variables[TRANSPARENCY_INDEX].Value), false, skin_color, hair_color);
 		} else {
-			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+			sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, skin_color, hair_color);
 		}
 	}
 }
@@ -1034,7 +1034,7 @@ static void DrawConstructionShadow(const CUnit &unit, const CUnitType &type, con
 static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 							//Wyrmgus start
 //							 const CUnitType &type, int frame, const PixelPos &screenPos)
-							 const CUnit &unit, const CUnitType &type, int frame, const PixelPos &screenPos)
+							 const CUnit &unit, const CUnitType &type, int frame, const PixelPos &screenPos, int skin_color = 0, int hair_color = 0)
 							//Wyrmgus end
 {
 	PixelPos pos = screenPos;
@@ -1056,18 +1056,18 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, skin_color, hair_color);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, skin_color, hair_color);
 			}
 		} else {
 			const CConstruction &construction = *type.Construction;
 			pos.x -= construction.Width / 2;
 			pos.y -= construction.Height / 2;
 			if (frame < 0) {
-				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+				construction.Sprite->DrawPlayerColorFrameClipX(player, -frame - 1, pos.x, pos.y, false, skin_color, hair_color);
 			} else {
-				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+				construction.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, skin_color, hair_color);
 			}
 		}
 		//Wyrmgus end
@@ -1091,9 +1091,9 @@ static void DrawConstruction(const int player, const CConstructionFrame *cframe,
 		//Wyrmgus start
 //		type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y);
 		if (varinfo && varinfo->Sprite) {
-			varinfo->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+			varinfo->Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, skin_color, hair_color);
 		} else {
-			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, type.SkinColor, type.HairColor);
+			type.Sprite->DrawPlayerColorFrameClip(player, frame, pos.x, pos.y, false, skin_color, hair_color);
 		}
 		//Wyrmgus end
 	}
@@ -1113,6 +1113,10 @@ void CUnit::Draw(const CViewport &vp) const
 	int constructed;
 	const CConstructionFrame *cframe;
 	const CUnitType *type;
+	//Wyrmgus start
+	int skin_color = this->GetSkinColor();
+	int hair_color = this->GetHairColor();
+	//Wyrmgus end
 
 	if (this->Destroyed || this->Container || this->Type->BoolFlag[REVEALER_INDEX].value) { // Revealers are not drawn
 		return;
@@ -1234,7 +1238,7 @@ void CUnit::Draw(const CViewport &vp) const
 		//draw the shield before the left arm if not facing south
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos);
 
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, skin_color, hair_color);
 	}
 		
 	//draw the right arm before the body if facing north, or if facing southeast/southwest and the arms are inverted for that direction
@@ -1251,8 +1255,8 @@ void CUnit::Draw(const CViewport &vp) const
 		)
 	) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, skin_color, hair_color);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, skin_color, hair_color);
 	}
 	//Wyrmgus end
 
@@ -1301,16 +1305,22 @@ void CUnit::Draw(const CViewport &vp) const
 			const PixelPos pos(screenPos + (type->GetPixelSize()) / 2);
 			//Wyrmgus start
 //			DrawConstruction(player, cframe, *type, frame, pos);
-			DrawConstruction(player, cframe, *this, *type, frame, pos);
+			DrawConstruction(player, cframe, *this, *type, frame, pos, skin_color, hair_color);
 			//Wyrmgus end
 		} else {
-			DrawUnitType(*type, sprite, player, frame, screenPos);
+			//Wyrmgus start
+//			DrawUnitType(*type, sprite, player, frame, screenPos);
+			DrawUnitType(*type, sprite, player, frame, screenPos, skin_color, hair_color);
+			//Wyrmgus end
 		}
 		//
 		// Draw the future unit type, if upgrading to it.
 		//
 	} else {
-		DrawUnitType(*type, sprite, player, frame, screenPos);
+		//Wyrmgus start
+//		DrawUnitType(*type, sprite, player, frame, screenPos);
+		DrawUnitType(*type, sprite, player, frame, screenPos, skin_color, hair_color);
+		//Wyrmgus end
 	}
 	
 	//Wyrmgus start
@@ -1341,7 +1351,7 @@ void CUnit::Draw(const CViewport &vp) const
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
 	}
 	
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player, frame, screenPos, skin_color, hair_color);
 	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player, frame, screenPos);
 	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player, frame, screenPos);
 	
@@ -1359,7 +1369,7 @@ void CUnit::Draw(const CViewport &vp) const
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, skin_color, hair_color);
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player, frame, screenPos);
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player, frame, screenPos);
 	}
@@ -1378,14 +1388,14 @@ void CUnit::Draw(const CViewport &vp) const
 		)
 	) {
 		if (this->Direction == LookingS && this->CurrentAction() != UnitActionDie && this->GetLayerSprite(RightHandImageLayer) != NULL) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, skin_color, hair_color);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, skin_color, hair_color);
 		} else {
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, skin_color, hair_color);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player, frame, screenPos, skin_color, hair_color);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
 		}
 	}

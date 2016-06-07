@@ -1230,12 +1230,12 @@ void CButtonPanel::Draw()
 					player = ThisPlayer->Index;
 				}
 				
-				skin_color = Selected[0]->Type->SkinColor;
-				hair_color = Selected[0]->Type->HairColor;
+				skin_color = Selected[0]->GetSkinColor();
+				hair_color = Selected[0]->GetHairColor();
 				
-				if (buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) {
-					skin_color = UnitTypes[buttons[i].Value]->SkinColor;
-					hair_color = UnitTypes[buttons[i].Value]->HairColor;
+				if (buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild) {
+					skin_color = UnitTypes[buttons[i].Value]->GetDefaultSkinColor(Players[player]);
+					hair_color = UnitTypes[buttons[i].Value]->GetDefaultHairColor(Players[player]);
 				}
 				//Wyrmgus end
 			}

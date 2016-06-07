@@ -150,7 +150,7 @@ class VariationInfo
 {
 public:
 	VariationInfo() : 
-		FrameWidth(0), FrameHeight(0),
+		FrameWidth(0), FrameHeight(0), SkinColor(0), HairColor(0),
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL)
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
@@ -167,6 +167,8 @@ public:
 	std::string Tileset;			/// Variation's tileset.
 	int FrameWidth;
 	int FrameHeight;
+	int SkinColor;
+	int HairColor;
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
 	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
@@ -680,6 +682,8 @@ public:
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
+	int GetDefaultSkinColor(CPlayer &player) const;
+	int GetDefaultHairColor(CPlayer &player) const;
 	std::string GetNamePlural() const;
 	//Wyrmgus end
 
@@ -1059,7 +1063,10 @@ extern void SaveUnitTypes(CFile &file);              /// Save the unit-type tabl
 extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empty unit-type slot
 /// Draw the sprite frame of unit-type
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
-						 int player, int frame, const PixelPos &screenPos);
+						 //Wyrmgus start
+//						 int player, int frame, const PixelPos &screenPos);
+						 int player, int frame, const PixelPos &screenPos, int skin_color = 0, int hair_color = 0);
+						 //Wyrmgus end
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table
 //Wyrmgus start

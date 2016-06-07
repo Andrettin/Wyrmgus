@@ -350,6 +350,8 @@ public:
 	int GetItemSlotQuantity(int item_slot) const;
 	int GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
+	int GetSkinColor() const;
+	int GetHairColor() const;
 	bool CanAttack(bool count_inside = false) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
@@ -756,7 +758,7 @@ extern void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const
 //Wyrmgus end
 //Wyrmgus start
 /// Draw unit's overlay
-extern void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos);
+extern void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, int skin_color = 0, int hair_color = 0);
 extern void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos);
 //Wyrmgus end
 /// Draw all units visible on map in viewport

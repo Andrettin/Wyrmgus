@@ -792,6 +792,8 @@ static int CclDefineUnitType(lua_State *l)
 					var->ShadowFile = parent_type->VarInfo[var_n]->ShadowFile;
 					var->FrameWidth = parent_type->VarInfo[var_n]->FrameWidth;
 					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
+					var->SkinColor = parent_type->VarInfo[var_n]->SkinColor;
+					var->HairColor = parent_type->VarInfo[var_n]->HairColor;
 					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
 					var->Icon.Icon = NULL;
 					if (!var->Icon.Name.empty()) {
@@ -928,6 +930,22 @@ static int CclDefineUnitType(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						CclGetPos(l, &var->FrameWidth, &var->FrameHeight);
 						lua_pop(l, 1);
+					} else if (!strcmp(value, "skin-color")) {
+						std::string skin_color_name = LuaToString(l, -1, k + 1);
+						int skin_color = GetSkinColorIndexByName(skin_color_name);
+						if (skin_color != 0) {
+							var->SkinColor = skin_color;
+						} else {
+							LuaError(l, "Skin color \"%s\" doesn't exist." _C_ skin_color_name.c_str());
+						}
+					} else if (!strcmp(value, "hair-color")) {
+						std::string hair_color_name = LuaToString(l, -1, k + 1);
+						int hair_color = GetHairColorIndexByName(hair_color_name);
+						if (hair_color != 0) {
+							var->HairColor = hair_color;
+						} else {
+							LuaError(l, "Hair color \"%s\" doesn't exist." _C_ hair_color_name.c_str());
+						}
 					} else if (!strcmp(value, "icon")) {
 						var->Icon.Name = LuaToString(l, -1, k + 1);
 						var->Icon.Icon = NULL;
@@ -2485,6 +2503,20 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Height")) {
 		lua_pushnumber(l, type->Height);
+		return 1;
+	} else if (!strcmp(data, "SkinColor")) {
+		if (type->SkinColor != 0) {
+			lua_pushstring(l, SkinColorNames[type->SkinColor].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "HairColor")) {
+		if (type->HairColor != 0) {
+			lua_pushstring(l, HairColorNames[type->HairColor].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Animations")) {
 		if (type->Animations != NULL) {

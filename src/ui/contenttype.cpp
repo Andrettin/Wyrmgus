@@ -275,7 +275,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		unitToDraw->Type->Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, 0, this->Pos, "",
 			//Wyrmgus start
 //			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index);
-			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index, unitToDraw->Type->SkinColor, unitToDraw->Type->HairColor);
+			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index, unitToDraw->GetSkinColor(), unitToDraw->GetHairColor());
 			//Wyrmgus end
 	}
 }
