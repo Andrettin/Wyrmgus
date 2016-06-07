@@ -1770,6 +1770,7 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 							
 							for (size_t z = 0; z < SkinColorsRGB[k].size(); ++z) {
 								if (p.r == SkinColorsRGB[k][z].R && p.g == SkinColorsRGB[k][z].G && p.b == SkinColorsRGB[k][z].B) {
+//									fprintf(stderr, "Skin color tone found in \"%s\", belonging to skin color \"%s\" (RGB %d, %d, %d).\n", g->File.c_str(), SkinColorNames[k].c_str(), p.r, p.g, p.b);
 									red = SkinColorsRGB[skin_color][z].R;
 									green = SkinColorsRGB[skin_color][z].G;
 									blue = SkinColorsRGB[skin_color][z].B;
@@ -1790,6 +1791,7 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 							
 							for (size_t z = 0; z < HairColorsRGB[k].size(); ++z) {
 								if (p.r == HairColorsRGB[k][z].R && p.g == HairColorsRGB[k][z].G && p.b == HairColorsRGB[k][z].B) {
+//									fprintf(stderr, "Hair color tone found in \"%s\", belonging to hair color \"%s\" (RGB %d, %d, %d).\n", g->File.c_str(), HairColorNames[k].c_str(), p.r, p.g, p.b);
 									red = HairColorsRGB[hair_color][z].R;
 									green = HairColorsRGB[hair_color][z].G;
 									blue = HairColorsRGB[hair_color][z].B;

@@ -1230,10 +1230,10 @@ void CButtonPanel::Draw()
 					player = ThisPlayer->Index;
 				}
 				
-				skin_color = Selected[0]->GetSkinColor();
-				hair_color = Selected[0]->GetHairColor();
-				
-				if (buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild) {
+				if (buttons[i].Action == ButtonExperienceUpgradeTo || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonPatrol || buttons[i].Action == ButtonReturn) {
+					skin_color = Selected[0]->GetSkinColor();
+					hair_color = Selected[0]->GetHairColor();
+				} else if (buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild) {
 					skin_color = UnitTypes[buttons[i].Value]->GetDefaultSkinColor(Players[player]);
 					hair_color = UnitTypes[buttons[i].Value]->GetDefaultHairColor(Players[player]);
 				}
