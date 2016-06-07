@@ -640,42 +640,44 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	}
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
-	if (name.find(" ") == std::string::npos) {
-		for (size_t i = 0; i < name.size(); ++i) {
-			std::string name_prefix = name.substr(0, i + 1);
-			std::string name_suffix = CapitalizeString(name.substr(i + 1, name.size() - (i + 1)));
+	if (name.size() > 1) {
+		if (name.find(" ") == std::string::npos) {
+			for (size_t i = 0; i < name.size(); ++i) {
+				std::string name_prefix = name.substr(0, i + 1);
+				std::string name_suffix = CapitalizeString(name.substr(i + 1, name.size() - (i + 1)));
 			
-//			fprintf(stdout, "Trying to match prefix \"%s\" and suffix \"%s\" for translating name \"%s\" to the \"%s\" language.\n", name_prefix.c_str(), name_suffix.c_str(), name.c_str(), PlayerRaces.Languages[language]->Name.c_str());
+	//			fprintf(stdout, "Trying to match prefix \"%s\" and suffix \"%s\" for translating name \"%s\" to the \"%s\" language.\n", name_prefix.c_str(), name_suffix.c_str(), name.c_str(), PlayerRaces.Languages[language]->Name.c_str());
 			
-			if (PlayerRaces.Languages[language]->NameTranslations.find(name_prefix) != PlayerRaces.Languages[language]->NameTranslations.end() && PlayerRaces.Languages[language]->NameTranslations.find(name_suffix) != PlayerRaces.Languages[language]->NameTranslations.end()) { // if both a prefix and suffix have been matched
-				name_prefix = PlayerRaces.Languages[language]->NameTranslations[name_prefix][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name_prefix].size())];
-				name_suffix = PlayerRaces.Languages[language]->NameTranslations[name_suffix][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name_suffix].size())];
-				name_suffix = DecapitalizeString(name_suffix);
-				if (name_prefix.substr(name_prefix.size() - 2, 2) == "gs" && name_suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
-					name_prefix = FindAndReplaceStringEnding(name_prefix, "gs", "g");
-				}
-				if (name_prefix.substr(name_prefix.size() - 1, 1) == "s" && name_suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
-					name_prefix = FindAndReplaceStringEnding(name_prefix, "s", "");
-				}
+				if (PlayerRaces.Languages[language]->NameTranslations.find(name_prefix) != PlayerRaces.Languages[language]->NameTranslations.end() && PlayerRaces.Languages[language]->NameTranslations.find(name_suffix) != PlayerRaces.Languages[language]->NameTranslations.end()) { // if both a prefix and suffix have been matched
+					name_prefix = PlayerRaces.Languages[language]->NameTranslations[name_prefix][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name_prefix].size())];
+					name_suffix = PlayerRaces.Languages[language]->NameTranslations[name_suffix][SyncRand(PlayerRaces.Languages[language]->NameTranslations[name_suffix].size())];
+					name_suffix = DecapitalizeString(name_suffix);
+					if (name_prefix.substr(name_prefix.size() - 2, 2) == "gs" && name_suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
+						name_prefix = FindAndReplaceStringEnding(name_prefix, "gs", "g");
+					}
+					if (name_prefix.substr(name_prefix.size() - 1, 1) == "s" && name_suffix.substr(0, 1) == "s") { //if the prefix ends in "s" and the suffix begins in "s" as well, then remove the final "s" from the prefix (as in "Josefstadt", "Kronstadt" and "Leopoldstadt")
+						name_prefix = FindAndReplaceStringEnding(name_prefix, "s", "");
+					}
 
-				return name_prefix + name_suffix;
-			}
-		}
-	} else { // if the name contains a space, try to translate each of its elements separately
-		size_t previous_pos = 0;
-		new_name = name;
-		for (size_t i = 0; i < name.size(); ++i) {
-			if ((i + 1) == name.size() || name[i + 1] == ' ') {
-				std::string name_element = TranslateName(name.substr(previous_pos, i + 1 - previous_pos), language);
-				
-				if (name_element.empty()) {
-					new_name = "";
-					break;
+					return name_prefix + name_suffix;
 				}
+			}
+		} else { // if the name contains a space, try to translate each of its elements separately
+			size_t previous_pos = 0;
+			new_name = name;
+			for (size_t i = 0; i < name.size(); ++i) {
+				if ((i + 1) == name.size() || name[i + 1] == ' ') {
+					std::string name_element = TranslateName(name.substr(previous_pos, i + 1 - previous_pos), language);
 				
-				new_name = FindAndReplaceString(new_name, name.substr(previous_pos, i + 1 - previous_pos), name_element);
+					if (name_element.empty()) {
+						new_name = "";
+						break;
+					}
 				
-				previous_pos = i + 2;
+					new_name = FindAndReplaceString(new_name, name.substr(previous_pos, i + 1 - previous_pos), name_element);
+				
+					previous_pos = i + 2;
+				}
 			}
 		}
 	}

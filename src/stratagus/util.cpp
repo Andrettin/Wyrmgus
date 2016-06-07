@@ -827,6 +827,10 @@ std::string TransliterateText(std::string text) //convert special characters int
 
 std::string CapitalizeString(std::string text)
 {
+	if (text.empty()) {
+		return text;
+	}
+	
 	text[0] = toupper(text[0]);
 	
 	// replace special characters which may not have been uppered with the previous method
@@ -875,6 +879,10 @@ std::string CapitalizeString(std::string text)
 
 std::string DecapitalizeString(std::string text)
 {
+	if (text.empty()) {
+		return text;
+	}
+
 	text[0] = tolower(text[0]);
 	
 	// replace special characters which may not have been lowered with the previous method
