@@ -95,7 +95,10 @@ void CGraphic::DrawClip(int x, int y) const
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
+//Wyrmgus start
+//void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
+void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface) const
+//Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -105,7 +108,10 @@ void CGraphic::DrawSub(int gx, int gy, int w, int h, int x, int y) const
 	{
 		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+		//Wyrmgus start
+//		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+		SDL_BlitSurface(surface ? surface : Surface, &srect, TheScreen, &drect);
+		//Wyrmgus end
 		//Wyrmgus start
 		//code for drawing a scaled image under xBRZ - use later for implementing zoom mode
 		/*
@@ -182,10 +188,18 @@ void CPlayerColorGraphic::DrawPlayerColorSub(int player, int gx, int gy, int w, 
 	} else
 #endif
 	{
-		GraphicPlayerPixels(player, *this);
+		//Wyrmgus start
+//		GraphicPlayerPixels(player, *this);
+		//Wyrmgus end
 		SDL_Rect srect = {Sint16(gx), Sint16(gy), Uint16(w), Uint16(h)};
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
-		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+		//Wyrmgus start
+//		SDL_BlitSurface(Surface, &srect, TheScreen, &drect);
+		if (!PlayerColorSurfaces[player][skin_color][hair_color]) {
+			MakePlayerColorSurface(player, true, NoTimeOfDay, skin_color, hair_color);
+		}
+		SDL_BlitSurface(PlayerColorSurfaces[player][skin_color][hair_color], &srect, TheScreen, &drect);
+		//Wyrmgus end
 	}
 }
 //Wyrmgus end
@@ -200,12 +214,18 @@ void CPlayerColorGraphic::DrawPlayerColorSub(int player, int gx, int gy, int w, 
 **  @param x   X screen position
 **  @param y   Y screen position
 */
-void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
+//Wyrmgus start
+//void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y) const
+void CGraphic::DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface) const
+//Wyrmgus end
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
+	//Wyrmgus start
+//	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y);
+	DrawSub(gx + x - oldx, gy + y - oldy, w, h, x, y, surface);
+	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -240,7 +260,10 @@ void CPlayerColorGraphic::DrawPlayerColorSubClip(int player, int gx, int gy, int
 **  @param alpha  Alpha
 */
 void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
-							unsigned char alpha) const
+							//Wyrmgus start
+//							unsigned char alpha) const
+							unsigned char alpha, SDL_Surface *surface) const
+							//Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -251,10 +274,22 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 	} else
 #endif
 	{
+		//Wyrmgus start
+		/*
 		int oldalpha = Surface->format->alpha;
 		SDL_SetAlpha(Surface, SDL_SRCALPHA, alpha);
 		DrawSub(gx, gy, w, h, x, y);
 		SDL_SetAlpha(Surface, SDL_SRCALPHA, oldalpha);
+		*/
+		if (!surface) {
+			surface = Surface;
+		}
+		
+		int oldalpha = surface->format->alpha;
+		SDL_SetAlpha(surface, SDL_SRCALPHA, alpha);
+		DrawSub(gx, gy, w, h, x, y, surface);
+		SDL_SetAlpha(surface, SDL_SRCALPHA, oldalpha);
+		//Wyrmgus end
 	}
 }
 
@@ -270,12 +305,18 @@ void CGraphic::DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 **  @param alpha  Alpha
 */
 void CGraphic::DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
-								unsigned char alpha) const
+								//Wyrmgus start
+//								unsigned char alpha) const
+								unsigned char alpha, SDL_Surface *surface) const
+								//Wyrmgus end
 {
 	int oldx = x;
 	int oldy = y;
 	CLIP_RECTANGLE(x, y, w, h);
-	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
+	//Wyrmgus start
+//	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha);
+	DrawSubTrans(gx + x - oldx, gy + y - oldy, w, h, x, y, alpha, surface);
+	//Wyrmgus end
 }
 
 /**
@@ -327,7 +368,7 @@ void CGraphic::DoDrawFrameClip(GLuint *textures,
 */
 //Wyrmgus start
 //void CGraphic::DrawFrameClip(unsigned frame, int x, int y) const
-void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day)
+void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -362,7 +403,10 @@ void CGraphic::DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_d
 		}
 		//Wyrmgus end
 		DrawSubClip(frame_map[frame].x, frame_map[frame].y,
-					Width, Height, x, y);
+					//Wyrmgus start
+//					Width, Height, x, y);
+					Width, Height, x, y, surface);
+					//Wyrmgus end
 	}
 }
 
@@ -384,7 +428,7 @@ void CGraphic::DrawFrameTrans(unsigned frame, int x, int y, int alpha) const
 
 //Wyrmgus start
 //void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const
-void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day)
+void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -405,9 +449,232 @@ void CGraphic::DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool 
 		}
 		//Wyrmgus end
 		DrawSubClipTrans(frame_map[frame].x, frame_map[frame].y,
-						 Width, Height, x, y, alpha);
+						 //Wyrmgus start
+//						 Width, Height, x, y, alpha);
+						 Width, Height, x, y, alpha, surface);
+						 //Wyrmgus end
 	}
 }
+
+//Wyrmgus start
+void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped, int time_of_day, int skin_color, int hair_color)
+{
+#if defined(USE_OPENGL) || defined(USE_GLES)
+	if (UseOpenGL) {
+		return;
+	}
+#endif
+	SDL_Surface *surface = NULL;
+	if (time_of_day == 1) {
+		if (flipped) {
+			surface = PlayerColorSurfacesDawnFlip[player_color][skin_color][hair_color];
+		} else {
+			surface = PlayerColorSurfacesDawn[player_color][skin_color][hair_color];
+		}
+	} else if (time_of_day == 5) {
+		if (flipped) {
+			surface = PlayerColorSurfacesDuskFlip[player_color][skin_color][hair_color];
+		} else {
+			surface = PlayerColorSurfacesDusk[player_color][skin_color][hair_color];
+		}
+	} else if (time_of_day == 6 || time_of_day == 7 || time_of_day == 8) {
+		if (flipped) {
+			surface = PlayerColorSurfacesNightFlip[player_color][skin_color][hair_color];
+		} else {
+			surface = PlayerColorSurfacesNight[player_color][skin_color][hair_color];
+		}
+	} else {
+		if (flipped) {
+			surface = PlayerColorSurfacesFlip[player_color][skin_color][hair_color];
+		} else {
+			surface = PlayerColorSurfaces[player_color][skin_color][hair_color];
+		}
+	}
+
+	if (surface) {
+		return;
+	}
+	
+	SDL_Surface *base_surface = flipped ? SurfaceFlip : Surface;
+	
+	if (time_of_day == 1) {
+		if (flipped) {
+			surface = PlayerColorSurfacesDawnFlip[player_color][skin_color][hair_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		} else {
+			surface = PlayerColorSurfacesDawn[player_color][skin_color][hair_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		}
+	} else if (time_of_day == 5) {
+		if (flipped) {
+			surface = PlayerColorSurfacesDuskFlip[player_color][skin_color][hair_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		} else {
+			surface = PlayerColorSurfacesDusk[player_color][skin_color][hair_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		}
+	} else if (time_of_day == 6 || time_of_day == 7 || time_of_day == 8) {
+		if (flipped) {
+			surface = PlayerColorSurfacesNightFlip[player_color][skin_color][hair_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		} else {
+			surface = PlayerColorSurfacesNight[player_color][skin_color][hair_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		}
+	} else {
+		if (flipped) {
+			surface = PlayerColorSurfacesFlip[player_color][skin_color][hair_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		} else {
+			surface = PlayerColorSurfaces[player_color][skin_color][hair_color] = SDL_ConvertSurface(base_surface, base_surface->format, SDL_SWSURFACE);
+		}
+	}
+
+	if (base_surface->flags & SDL_SRCCOLORKEY) {
+		SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, base_surface->format->colorkey);
+	}
+	if (surface->format->BytesPerPixel == 1) {
+		VideoPaletteListAdd(surface);
+	}
+	
+	int found_player_color = -1;
+	int found_skin_color = -1;
+	int found_hair_color = -1;
+	
+	int time_of_day_red = 0;
+	int time_of_day_green = 0;
+	int time_of_day_blue = 0;
+	
+	if (!this->Grayscale) { // don't alter the colors of grayscale graphics
+		if (time_of_day == 1) { // dawn
+			time_of_day_red = -20;
+			time_of_day_green = -20;
+			time_of_day_blue = 0;
+		} else if (time_of_day == 2) { // morning
+			time_of_day_red = 0;
+			time_of_day_green = 0;
+			time_of_day_blue = 0;
+		} else if (time_of_day == 3) { // midday
+			time_of_day_red = 0;
+			time_of_day_green = 0;
+			time_of_day_blue = 0;
+		} else if (time_of_day == 4) { // afternoon
+			time_of_day_red = 0;
+			time_of_day_green = 0;
+			time_of_day_blue = 0;
+		} else if (time_of_day == 5) { // dusk
+			time_of_day_red = 0;
+			time_of_day_green = -20;
+			time_of_day_blue = -20;
+		} else if (time_of_day == 6) { // first watch
+			time_of_day_red = -45;
+			time_of_day_green = -35;
+			time_of_day_blue = -10;
+		} else if (time_of_day == 7) { // midnight
+			time_of_day_red = -45;
+			time_of_day_green = -35;
+			time_of_day_blue = -10;
+		} else if (time_of_day == 8) { // second watch
+			time_of_day_red = -45;
+			time_of_day_green = -35;
+			time_of_day_blue = -10;
+		}
+	}
+	
+	SDL_LockSurface(surface);
+	
+	switch (surface->format->BytesPerPixel) {
+		case 1: {
+			SDL_Color colors[256];
+			SDL_Palette &pal = *surface->format->palette;
+			for (int i = 0; i < 256; ++i) {
+				int red = pal.colors[i].r;
+				int green = pal.colors[i].g;
+				int blue = pal.colors[i].b;
+				
+				if (skin_color != 0 && !this->Grayscale) {
+					for (int k = 1; k < SkinColorMax; ++k) {
+						if (SkinColorNames[k].empty()) {
+							break;
+						}
+						if (k == skin_color) {
+							continue;
+						}
+							
+						for (size_t z = 0; z < SkinColorsRGB[k].size(); ++z) {
+							if (pal.colors[i].r == SkinColorsRGB[k][z].R && pal.colors[i].g == SkinColorsRGB[k][z].G && pal.colors[i].b == SkinColorsRGB[k][z].B) {
+								red = SkinColorsRGB[skin_color][z].R;
+								green = SkinColorsRGB[skin_color][z].G;
+								blue = SkinColorsRGB[skin_color][z].B;
+								
+								if (found_skin_color == -1) {
+									found_skin_color = k;
+								} else if (found_skin_color != k) {
+									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" skin colors.\n", this->File.c_str(), SkinColorNames[k].c_str(), SkinColorNames[found_skin_color].c_str());
+								}
+							}
+						}
+					}
+				}
+					
+				if (hair_color != 0 && !this->Grayscale) {
+					for (int k = 1; k < HairColorMax; ++k) {
+						if (HairColorNames[k].empty()) {
+							break;
+						}
+						if (k == hair_color) {
+							continue;
+						}
+							
+						for (size_t z = 0; z < HairColorsRGB[k].size(); ++z) {
+							if (pal.colors[i].r == HairColorsRGB[k][z].R && pal.colors[i].g == HairColorsRGB[k][z].G && pal.colors[i].b == HairColorsRGB[k][z].B) {
+								red = HairColorsRGB[hair_color][z].R;
+								green = HairColorsRGB[hair_color][z].G;
+								blue = HairColorsRGB[hair_color][z].B;
+								
+								if (found_hair_color == -1) {
+									found_hair_color = k;
+								} else if (found_hair_color != k) {
+									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" hair colors.\n", this->File.c_str(), HairColorNames[k].c_str(), HairColorNames[found_hair_color].c_str());
+								}
+							}
+						}
+					}
+				}
+				
+				if (player_color != -1 && !this->Grayscale) {
+					for (int k = 0; k < PlayerColorMax; ++k) {
+						if (PlayerColorNames[k].empty()) {
+							break;
+						}
+						if (k == player_color) {
+							continue;
+						}
+							
+						for (size_t z = 0; z < PlayerColorsRGB[k].size(); ++z) {
+							if (pal.colors[i].r == PlayerColorsRGB[k][z].R && pal.colors[i].g == PlayerColorsRGB[k][z].G && pal.colors[i].b == PlayerColorsRGB[k][z].B) {
+								red = PlayerColorsRGB[player_color][z].R;
+								green = PlayerColorsRGB[player_color][z].G;
+								blue = PlayerColorsRGB[player_color][z].B;
+								
+								if (found_player_color == -1) {
+									found_player_color = k;
+								} else if (found_player_color != k) {
+									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", this->File.c_str(), PlayerColorNames[k].c_str(), PlayerColorNames[found_player_color].c_str());
+								}
+							}
+						}
+					}
+				}
+				
+				colors[i].r = std::max<int>(0,std::min<int>(255,int(red) + time_of_day_red));
+				colors[i].g = std::max<int>(0,std::min<int>(255,int(green) + time_of_day_green));
+				colors[i].b = std::max<int>(0,std::min<int>(255,int(blue) + time_of_day_blue));;
+			}
+			SDL_SetColors(surface, &colors[0], 0, 256);
+			break;
+		}
+		case 4: {
+			break;
+		}
+	}
+	
+	SDL_UnlockSurface(surface);
+}
+//Wyrmgus end
 
 /**
 **  Draw graphic object clipped and with player colors.
@@ -470,13 +737,34 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClip(int player, unsigned frame,
 #endif
 	{
 		//Wyrmgus start
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(GameTimeOfDay);
-		}
 //		GraphicPlayerPixels(Players[player], *this);
-		GraphicPlayerPixels(player, *this);
+
+		SDL_Surface *surface = NULL;
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
+			if (!PlayerColorSurfaces[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, false, NoTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfaces[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
+			if (!PlayerColorSurfacesDawn[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, false, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesDawn[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
+			if (!PlayerColorSurfacesDusk[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, false, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesDusk[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
+			if (!PlayerColorSurfacesNight[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, false, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesNight[player][skin_color][hair_color];
+		}
+		
+//		DrawFrameClip(frame, x, y);
+		DrawFrameClip(frame, x, y, true, surface);
 		//Wyrmgus end
-		DrawFrameClip(frame, x, y);
 	}
 }
 
@@ -534,13 +822,34 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTrans(int player, unsigned fra
 #endif
 	{
 		//Wyrmgus start
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(GameTimeOfDay);
-		}
 //		GraphicPlayerPixels(Players[player], *this);
-		GraphicPlayerPixels(player, *this);
+
+		SDL_Surface *surface = NULL;
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
+			if (!PlayerColorSurfaces[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, false, NoTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfaces[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
+			if (!PlayerColorSurfacesDawn[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, false, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesDawn[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
+			if (!PlayerColorSurfacesDusk[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, false, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesDusk[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
+			if (!PlayerColorSurfacesNight[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, false, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesNight[player][skin_color][hair_color];
+		}
+		
+//		DrawFrameClipTrans(frame, x, y, alpha);
+		DrawFrameClipTrans(frame, x, y, alpha, true, surface);
 		//Wyrmgus end
-		DrawFrameClipTrans(frame, x, y, alpha);
 	}
 }
 
@@ -602,13 +911,34 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipTransX(int player, unsigned fr
 #endif
 	{
 		//Wyrmgus start
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(GameTimeOfDay);
-		}
 //		GraphicPlayerPixels(Players[player], *this);
-		GraphicPlayerPixels(player, *this);
+
+		SDL_Surface *surface = NULL;
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
+			if (!PlayerColorSurfacesFlip[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, true, NoTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesFlip[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
+			if (!PlayerColorSurfacesDawnFlip[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, true, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesDawnFlip[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
+			if (!PlayerColorSurfacesDuskFlip[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, true, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesDuskFlip[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
+			if (!PlayerColorSurfacesNightFlip[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, true, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesNightFlip[player][skin_color][hair_color];
+		}
+		
+//		DrawFrameClipTransX(frame, x, y, alpha);
+		DrawFrameClipTransX(frame, x, y, alpha, true, surface);
 		//Wyrmgus end
-		DrawFrameClipTransX(frame, x, y, alpha);
 	}
 }
 //Wyrmgus end
@@ -672,7 +1002,7 @@ void CGraphic::DoDrawFrameClipX(GLuint *textures, unsigned frame,
 */
 //Wyrmgus start
 //void CGraphic::DrawFrameClipX(unsigned frame, int x, int y) const
-void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day)
+void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -716,7 +1046,15 @@ void CGraphic::DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_
 
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
 
-		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+		//Wyrmgus start
+//		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
+		
+		if (!surface) {
+			surface = SurfaceFlip;
+		}
+
+		SDL_BlitSurface(surface, &srect, TheScreen, &drect);
+		//Wyrmgus end
 	}
 }
 
@@ -743,7 +1081,7 @@ void CGraphic::DrawFrameTransX(unsigned frame, int x, int y, int alpha) const
 
 //Wyrmgus start
 //void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const
-void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day)
+void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day, SDL_Surface *surface)
 //Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
@@ -772,11 +1110,25 @@ void CGraphic::DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool
 		srect.y += y - oldy;
 
 		SDL_Rect drect = {Sint16(x), Sint16(y), 0, 0};
+		//Wyrmgus start
+		/*
 		const int oldalpha = SurfaceFlip->format->alpha;
 
 		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, alpha);
 		SDL_BlitSurface(SurfaceFlip, &srect, TheScreen, &drect);
 		SDL_SetAlpha(SurfaceFlip, SDL_SRCALPHA, oldalpha);
+		*/
+		
+		if (!surface) {
+			surface = SurfaceFlip;
+		}
+		
+		const int oldalpha = surface->format->alpha;
+
+		SDL_SetAlpha(surface, SDL_SRCALPHA, alpha);
+		SDL_BlitSurface(surface, &srect, TheScreen, &drect);
+		SDL_SetAlpha(surface, SDL_SRCALPHA, oldalpha);
+		//Wyrmgus end
 	}
 }
 
@@ -837,13 +1189,34 @@ void CPlayerColorGraphic::DrawPlayerColorFrameClipX(int player, unsigned frame,
 #endif
 	{
 		//Wyrmgus start
-		if (!ignore_time_of_day) {
-			SetTimeOfDay(GameTimeOfDay);
-		}
 //		GraphicPlayerPixels(Players[player], *this);
-		GraphicPlayerPixels(player, *this);
+
+		SDL_Surface *surface = NULL;
+		if (ignore_time_of_day || !GameTimeOfDay || GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
+			if (!PlayerColorSurfacesFlip[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, true, NoTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesFlip[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == DawnTimeOfDay) {
+			if (!PlayerColorSurfacesDawnFlip[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, true, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesDawnFlip[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == DuskTimeOfDay) {
+			if (!PlayerColorSurfacesDuskFlip[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, true, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesDuskFlip[player][skin_color][hair_color];
+		} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
+			if (!PlayerColorSurfacesNightFlip[player][skin_color][hair_color]) {
+				MakePlayerColorSurface(player, true, GameTimeOfDay, skin_color, hair_color);
+			}
+			surface = PlayerColorSurfacesNightFlip[player][skin_color][hair_color];
+		}
+		
+//		DrawFrameClipX(frame, x, y);
+		DrawFrameClipX(frame, x, y, true, surface);
 		//Wyrmgus end
-		DrawFrameClipX(frame, x, y);
 	}
 }
 
@@ -1331,6 +1704,48 @@ void CGraphic::Free(CGraphic *g)
 			FreeSurface(&g->SurfaceFlip);
 			delete[] g->frameFlip_map;
 			g->frameFlip_map = NULL;
+			
+			//Wyrmgus start
+			CPlayerColorGraphic *cg = dynamic_cast<CPlayerColorGraphic *>(g);
+			if (cg) {
+				for (int i = 0; i < PlayerColorMax; ++i) {
+					for (int j = 0; j < SkinColorMax; ++j) {
+						if (SkinColorNames[j].empty()) {
+							break;
+						}
+						for (int k = 0; k < HairColorMax; ++k) {
+							if (HairColorNames[k].empty()) {
+								break;
+							}
+							if (cg->PlayerColorSurfaces[i][j][k]) {
+								FreeSurface(&cg->PlayerColorSurfaces[i][j][k]);
+							}
+							if (cg->PlayerColorSurfacesFlip[i][j][k]) {
+								FreeSurface(&cg->PlayerColorSurfacesFlip[i][j][k]);
+							}
+							if (cg->PlayerColorSurfacesDawn[i][j][k]) {
+								FreeSurface(&cg->PlayerColorSurfacesDawn[i][j][k]);
+							}
+							if (cg->PlayerColorSurfacesDawnFlip[i][j][k]) {
+								FreeSurface(&cg->PlayerColorSurfacesDawnFlip[i][j][k]);
+							}
+							if (cg->PlayerColorSurfacesDusk[i][j][k]) {
+								FreeSurface(&cg->PlayerColorSurfacesDusk[i][j][k]);
+							}
+							if (cg->PlayerColorSurfacesDuskFlip[i][j][k]) {
+								FreeSurface(&cg->PlayerColorSurfacesDuskFlip[i][j][k]);
+							}
+							if (cg->PlayerColorSurfacesNight[i][j][k]) {
+								FreeSurface(&cg->PlayerColorSurfacesNight[i][j][k]);
+							}
+							if (cg->PlayerColorSurfacesNightFlip[i][j][k]) {
+								FreeSurface(&cg->PlayerColorSurfacesNightFlip[i][j][k]);
+							}
+						}
+					}
+				}
+			}
+			//Wyrmgus end
 		}
 
 		if (!g->HashFile.empty()) {
@@ -1696,6 +2111,12 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 	Uint32 pc;
 	
 	//Wyrmgus start
+	int found_player_color = -1;
+	int found_skin_color = -1;
+	int found_hair_color = -1;
+	//Wyrmgus end
+	
+	//Wyrmgus start
 	int time_of_day_red = 0;
 	int time_of_day_green = 0;
 	int time_of_day_blue = 0;
@@ -1759,7 +2180,6 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					int blue = p.b;
 					
 					if (skin_color != 0 && !g->Grayscale) {
-						SDL_Color p = f->palette->colors[*sp];
 						for (int k = 1; k < SkinColorMax; ++k) {
 							if (SkinColorNames[k].empty()) {
 								break;
@@ -1770,17 +2190,21 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 							
 							for (size_t z = 0; z < SkinColorsRGB[k].size(); ++z) {
 								if (p.r == SkinColorsRGB[k][z].R && p.g == SkinColorsRGB[k][z].G && p.b == SkinColorsRGB[k][z].B) {
-//									fprintf(stderr, "Skin color tone found in \"%s\", belonging to skin color \"%s\" (RGB %d, %d, %d).\n", g->File.c_str(), SkinColorNames[k].c_str(), p.r, p.g, p.b);
 									red = SkinColorsRGB[skin_color][z].R;
 									green = SkinColorsRGB[skin_color][z].G;
 									blue = SkinColorsRGB[skin_color][z].B;
+									
+									if (found_skin_color == -1) {
+										found_skin_color = k;
+									} else if (found_skin_color != k) {
+										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" skin colors.\n", g->File.c_str(), SkinColorNames[k].c_str(), SkinColorNames[found_skin_color].c_str());
+									}
 								}
 							}
 						}
 					}
 					
 					if (hair_color != 0 && !g->Grayscale) {
-						SDL_Color p = f->palette->colors[*sp];
 						for (int k = 1; k < HairColorMax; ++k) {
 							if (HairColorNames[k].empty()) {
 								break;
@@ -1791,10 +2215,37 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 							
 							for (size_t z = 0; z < HairColorsRGB[k].size(); ++z) {
 								if (p.r == HairColorsRGB[k][z].R && p.g == HairColorsRGB[k][z].G && p.b == HairColorsRGB[k][z].B) {
-//									fprintf(stderr, "Hair color tone found in \"%s\", belonging to hair color \"%s\" (RGB %d, %d, %d).\n", g->File.c_str(), HairColorNames[k].c_str(), p.r, p.g, p.b);
 									red = HairColorsRGB[hair_color][z].R;
 									green = HairColorsRGB[hair_color][z].G;
 									blue = HairColorsRGB[hair_color][z].B;
+									
+									if (found_hair_color == -1) {
+										found_hair_color = k;
+									} else if (found_hair_color != k) {
+										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" hair colors.\n", g->File.c_str(), HairColorNames[k].c_str(), HairColorNames[found_hair_color].c_str());
+									}
+								}
+							}
+						}
+					}
+					
+					if (colors && !g->Grayscale) {
+						for (int k = 0; k < PlayerColorMax; ++k) {
+							if (PlayerColorNames[k].empty()) {
+								break;
+							}
+							
+							for (size_t z = 0; z < PlayerColorsRGB[k].size(); ++z) {
+								if (p.r == PlayerColorsRGB[k][z].R && p.g == PlayerColorsRGB[k][z].G && p.b == PlayerColorsRGB[k][z].B) {
+									red = colors->Colors[z].R;
+									green = colors->Colors[z].G;
+									blue = colors->Colors[z].B;
+									
+									if (found_player_color == -1) {
+										found_player_color = k;
+									} else if (found_player_color != k) {
+										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", g->File.c_str(), PlayerColorNames[k].c_str(), PlayerColorNames[found_player_color].c_str());
+									}
 								}
 							}
 						}
@@ -1807,27 +2258,21 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					tp[3] = alpha;
 				}
 				//Wyrmgus start
-//				if (colors) {
-				if (colors && !g->Grayscale) {
-				//Wyrmgus end
+				/*
+				if (colors) {
 					for (int z = 0; z < PlayerColorIndexCount; ++z) {
 						if (*sp == PlayerColorIndexStart + z) {
 							SDL_Color p = colors->Colors[z];
-							//Wyrmgus start
-							/*
 							tp[0] = p.r;
 							tp[1] = p.g;
 							tp[2] = p.b;
-							*/
-							tp[0] = std::max<int>(0,std::min<int>(255,int(p.r) + time_of_day_red));
-							tp[1] = std::max<int>(0,std::min<int>(255,int(p.g) + time_of_day_green));
-							tp[2] = std::max<int>(0,std::min<int>(255,int(p.b) + time_of_day_blue));;
-							//Wyrmgus end
 							tp[3] = 0xff;
 							break;
 						}
 					}
 				}
+				*/
+				//Wyrmgus end
 				++sp;
 			} else {
 				if (bpp == 4) {

@@ -90,12 +90,22 @@ protected:
 public:
 	// Draw
 	void DrawClip(int x, int y) const;
+	//Wyrmgus start
+	/*
 	void DrawSub(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubClip(int gx, int gy, int w, int h, int x, int y) const;
 	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
 					  unsigned char alpha) const;
 	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
 						  unsigned char alpha) const;
+	*/
+	void DrawSub(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = NULL) const;
+	void DrawSubClip(int gx, int gy, int w, int h, int x, int y, SDL_Surface *surface = NULL) const;
+	void DrawSubTrans(int gx, int gy, int w, int h, int x, int y,
+					  unsigned char alpha, SDL_Surface *surface = NULL) const;
+	void DrawSubClipTrans(int gx, int gy, int w, int h, int x, int y,
+						  unsigned char alpha, SDL_Surface *surface = NULL) const;
+	//Wyrmgus end
 
 	// Draw frame
 	void DrawFrame(unsigned frame, int x, int y) const;
@@ -104,12 +114,12 @@ public:
 #endif
 	//Wyrmgus start
 //	void DrawFrameClip(unsigned frame, int x, int y) const;
-	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true);
+	void DrawFrameClip(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = NULL);
 	//Wyrmgus end
 	void DrawFrameTrans(unsigned frame, int x, int y, int alpha) const;
 	//Wyrmgus start
 //	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true);
+	void DrawFrameClipTrans(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = NULL);
 	//Wyrmgus end
 
 	// Draw frame flipped horizontally
@@ -119,12 +129,12 @@ public:
 #endif
 	//Wyrmgus start
 //	void DrawFrameClipX(unsigned frame, int x, int y) const;
-	void DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day = true);
+	void DrawFrameClipX(unsigned frame, int x, int y, bool ignore_time_of_day = true, SDL_Surface *surface = NULL);
 	//Wyrmgus end
 	void DrawFrameTransX(unsigned frame, int x, int y, int alpha) const;
 	//Wyrmgus start
 //	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha) const;
-	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true);
+	void DrawFrameClipTransX(unsigned frame, int x, int y, int alpha, bool ignore_time_of_day = true, SDL_Surface *surface = NULL);
 	//Wyrmgus end
 
 
@@ -199,6 +209,23 @@ class CPlayerColorGraphic : public CGraphic
 protected:
 	CPlayerColorGraphic()
 	{
+		//Wyrmgus start
+		for (int i = 0; i < PlayerColorMax; ++i) {
+			for (int j = 0; j < SkinColorMax; ++j) {
+				for (int k = 0; k < HairColorMax; ++k) {
+					PlayerColorSurfaces[i][j][k] = NULL;
+					PlayerColorSurfacesFlip[i][j][k] = NULL;
+					PlayerColorSurfacesDawn[i][j][k] = NULL;
+					PlayerColorSurfacesDawnFlip[i][j][k] = NULL;
+					PlayerColorSurfacesDusk[i][j][k] = NULL;
+					PlayerColorSurfacesDuskFlip[i][j][k] = NULL;
+					PlayerColorSurfacesNight[i][j][k] = NULL;
+					PlayerColorSurfacesNightFlip[i][j][k] = NULL;
+				}
+			}
+		}
+		//Wyrmgus end
+		
 #if defined(USE_OPENGL) || defined(USE_GLES)
 		//Wyrmgus start
 //		memset(PlayerColorTextures, 0, sizeof(PlayerColorTextures));
@@ -218,6 +245,9 @@ protected:
 
 public:
 	//Wyrmgus start
+	void MakePlayerColorSurface(int player_color, bool flipped = false, int time_of_day = 0, int skin_color = 0, int hair_color = 0);
+	//Wyrmgus end
+	//Wyrmgus start
 	void DrawPlayerColorSub(int player, int gx, int gy, int w, int h, int x, int y, int skin_color = 0, int hair_color = 0);
 	void DrawPlayerColorSubClip(int player, int gx, int gy, int w, int h, int x, int y, int skin_color = 0, int hair_color = 0);
 //	void DrawPlayerColorFrameClipX(int player, unsigned frame, int x, int y);
@@ -233,6 +263,17 @@ public:
 	static CPlayerColorGraphic *Get(const std::string &file);
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
+	
+	//Wyrmgus start
+	SDL_Surface *PlayerColorSurfaces[PlayerColorMax][SkinColorMax][HairColorMax];      /// Surface
+	SDL_Surface *PlayerColorSurfacesFlip[PlayerColorMax][SkinColorMax][HairColorMax];  /// Flipped surface
+	SDL_Surface *PlayerColorSurfacesDawn[PlayerColorMax][SkinColorMax][HairColorMax];      /// Surface
+	SDL_Surface *PlayerColorSurfacesDawnFlip[PlayerColorMax][SkinColorMax][HairColorMax];  /// Flipped surface
+	SDL_Surface *PlayerColorSurfacesDusk[PlayerColorMax][SkinColorMax][HairColorMax];      /// Surface
+	SDL_Surface *PlayerColorSurfacesDuskFlip[PlayerColorMax][SkinColorMax][HairColorMax];  /// Flipped surface
+	SDL_Surface *PlayerColorSurfacesNight[PlayerColorMax][SkinColorMax][HairColorMax];      /// Surface
+	SDL_Surface *PlayerColorSurfacesNightFlip[PlayerColorMax][SkinColorMax][HairColorMax];  /// Flipped surface
+	//Wyrmgus end
 	
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	//Wyrmgus start
