@@ -121,12 +121,12 @@ namespace gcn
 
 	//Wyrmgus start
 //    void Graphics::drawImage(const Image* image, int dstX, int dstY)
-    void Graphics::drawImage(const Image* image, int dstX, int dstY, int player, int skin_color, int hair_color)
+    void Graphics::drawImage(Image* image, int dstX, int dstY, int player, int skin_color, int hair_color, unsigned int transparency)
 	//Wyrmgus end
     {
 		//Wyrmgus start
 //        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight());
-        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player, skin_color, hair_color);
+        drawImage(image, 0, 0, dstX, dstY, image->getWidth(), image->getHeight(), player, skin_color, hair_color, transparency);
 		//Wyrmgus end
     }
 

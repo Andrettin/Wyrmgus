@@ -122,7 +122,10 @@ namespace gcn
          * @return a void pointer to the Image data.
          * @see SDLImageLoader, AllegroImageLoader
          */
-        virtual void* _getData() const;
+		//Wyrmgus start
+//        virtual void* _getData() const;
+        virtual void* _getData(int player_color = -1, int skin_color = 0, int hair_color = 0);
+		//Wyrmgus end
 
         /**
          * Gets the ImageLoader used for loading Images.

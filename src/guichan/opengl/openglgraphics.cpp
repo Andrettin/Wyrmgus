@@ -191,11 +191,14 @@ namespace gcn
         mHeight = height;
     }
 
-    void OpenGLGraphics::drawImage(const Image* image, int srcX, int srcY,
+	//Wyrmgus start
+//    void OpenGLGraphics::drawImage(const Image* image, int srcX, int srcY,
+    void OpenGLGraphics::drawImage(Image* image, int srcX, int srcY,
+	//Wyrmgus end
                                    int dstX, int dstY, int width,
 								   //Wyrmgus start
 //                                   int height)
-                                   int height, int player, int skin_color, int hair_color)
+                                   int height, int player, int skin_color, int hair_color, unsigned int transparency)
 								   //Wyrmgus end
     {
         dstX += mClipStack.top().xOffset;
@@ -222,7 +225,10 @@ namespace gcn
 
         // Please dont look too closely at the next line, it is not pretty.
         // It uses the image data as a pointer to a GLuint
-        glBindTexture(GL_TEXTURE_2D, *((GLuint *)(image->_getData())));
+		//Wyrmgus start
+//        glBindTexture(GL_TEXTURE_2D, *((GLuint *)(image->_getData())));
+        glBindTexture(GL_TEXTURE_2D, *((GLuint *)(image->_getData(player, skin_color, hair_color))));
+		//Wyrmgus end
 
         glEnable(GL_TEXTURE_2D);
 

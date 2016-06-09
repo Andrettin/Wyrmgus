@@ -59,10 +59,12 @@ public:
 	virtual void _beginDraw();
 	virtual void _endDraw();
 
-	virtual void drawImage(const gcn::Image *image, int srcX, int srcY,
+	//Wyrmgus start
+	virtual void drawImage(gcn::Image *image, int srcX, int srcY,
+	//Wyrmgus end
 						   //Wyrmgus start
 //						   int dstX, int dstY, int width, int height);
-						   int dstX, int dstY, int width, int height, int player = -1, int skin_color = 0, int hair_color = 0);
+						   int dstX, int dstY, int width, int height, int player = -1, int skin_color = 0, int hair_color = 0, unsigned int transparency = 0);
 						   //Wyrmgus end
 
 	virtual void drawPoint(int x, int y);
@@ -558,7 +560,6 @@ private:
 --  Functions
 ----------------------------------------------------------------------------*/
 
-extern void WidgetGraphicPlayerPixels(const std::string &WidgetPlayerColorName, const CGraphic &sprite);
 extern void WidgetGraphicTransparency(int alpha, const CGraphic &sprite);
 //Wyrmgus end
 

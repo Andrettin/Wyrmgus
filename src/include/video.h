@@ -159,7 +159,10 @@ public:
 	inline bool IsLoaded() const { return Surface != NULL; }
 
 	//guichan
-	virtual void *_getData() const { return Surface; }
+	//Wyrmgus start
+//	virtual void *_getData() const { return Surface; }
+	virtual void *_getData(int player_color = -1, int skin_color = 0, int hair_color = 0) { return Surface; }
+	//Wyrmgus end
 	virtual int getWidth() const { return Width; }
 	virtual int getHeight() const { return Height; }
 	//Wyrmgus start
@@ -264,6 +267,19 @@ public:
 
 	CPlayerColorGraphic *Clone(bool grayscale = false) const;
 	
+	//Wyrmgus start
+	virtual void *_getData(int player_color = -1, int skin_color = 0, int hair_color = 0) {
+		if (player_color == -1) {
+			return Surface;
+		}
+		
+		if (!PlayerColorSurfaces[player_color][skin_color][hair_color]) {
+			MakePlayerColorSurface(player_color, false, NoTimeOfDay, skin_color, hair_color);
+		}
+		return PlayerColorSurfaces[player_color][skin_color][hair_color];
+	}
+	//Wyrmgus end
+
 	//Wyrmgus start
 	SDL_Surface *PlayerColorSurfaces[PlayerColorMax][SkinColorMax][HairColorMax];      /// Surface
 	SDL_Surface *PlayerColorSurfacesFlip[PlayerColorMax][SkinColorMax][HairColorMax];  /// Flipped surface

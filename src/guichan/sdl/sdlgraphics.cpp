@@ -138,11 +138,14 @@ namespace gcn
         return mTarget;
     }
 
-    void SDLGraphics::drawImage(const Image* image, int srcX,
+	//Wyrmgus start
+//    void SDLGraphics::drawImage(const Image* image, int srcX,
+    void SDLGraphics::drawImage(Image* image, int srcX,
+	//Wyrmgus end
                                 int srcY, int dstX, int dstY,
 								//Wyrmgus start
 //                                int width, int height)
-                                int width, int height, int player, int skin_color, int hair_color)
+                                int width, int height, int player, int skin_color, int hair_color, unsigned int transparency)
 								//Wyrmgus end
     {
         ClipRectangle top = mClipStack.top();
@@ -155,9 +158,30 @@ namespace gcn
         dst.x = dstX + top.xOffset;
         dst.y = dstY + top.yOffset;
 
-        SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
+		//Wyrmgus start
+//        SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
+        SDL_Surface* srcImage = (SDL_Surface*)image->_getData(player, skin_color, hair_color);
 
+		int old_alpha;
+		
+		if (transparency) {
+			unsigned int alpha = unsigned int(256 - 2.56 * transparency);
+			SDL_LockSurface(srcImage);
+			old_alpha = srcImage->format->alpha;
+			SDL_SetAlpha(srcImage, SDL_SRCALPHA, alpha);
+			SDL_UnlockSurface(srcImage);
+		}
+		//Wyrmgus end
+		
         SDL_BlitSurface(srcImage, &src, mTarget, &dst);
+		
+		//Wyrmgus start
+		if (transparency) {
+			SDL_LockSurface(srcImage);
+			SDL_SetAlpha(srcImage, SDL_SRCALPHA, old_alpha);
+			SDL_UnlockSurface(srcImage);
+		}
+		//Wyrmgus end
     }
 
     void SDLGraphics::fillRectangle(const Rectangle& rectangle)
