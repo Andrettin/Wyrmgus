@@ -636,24 +636,24 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 				}
 				
 				if (player_color != -1 && !this->Grayscale) {
-					for (int k = 0; k < PlayerColorMax; ++k) {
+					for (size_t k = 0; k < ConversiblePlayerColors.size(); ++k) {
 						if (PlayerColorNames[k].empty()) {
 							break;
 						}
-						if (k == player_color) {
+						if (ConversiblePlayerColors[k] == player_color) {
 							continue;
 						}
 							
-						for (size_t z = 0; z < PlayerColorsRGB[k].size(); ++z) {
-							if (pal.colors[i].r == PlayerColorsRGB[k][z].R && pal.colors[i].g == PlayerColorsRGB[k][z].G && pal.colors[i].b == PlayerColorsRGB[k][z].B) {
+						for (size_t z = 0; z < PlayerColorsRGB[ConversiblePlayerColors[k]].size(); ++z) {
+							if (pal.colors[i].r == PlayerColorsRGB[ConversiblePlayerColors[k]][z].R && pal.colors[i].g == PlayerColorsRGB[ConversiblePlayerColors[k]][z].G && pal.colors[i].b == PlayerColorsRGB[ConversiblePlayerColors[k]][z].B) {
 								red = PlayerColorsRGB[player_color][z].R;
 								green = PlayerColorsRGB[player_color][z].G;
 								blue = PlayerColorsRGB[player_color][z].B;
 								
 								if (found_player_color == -1) {
-									found_player_color = k;
-								} else if (found_player_color != k) {
-									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", this->File.c_str(), PlayerColorNames[k].c_str(), PlayerColorNames[found_player_color].c_str());
+									found_player_color = ConversiblePlayerColors[k];
+								} else if (found_player_color != ConversiblePlayerColors[k]) {
+									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", this->File.c_str(), PlayerColorNames[ConversiblePlayerColors[k]].c_str(), PlayerColorNames[found_player_color].c_str());
 								}
 							}
 						}
@@ -2230,21 +2230,21 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					}
 					
 					if (colors && !g->Grayscale) {
-						for (int k = 0; k < PlayerColorMax; ++k) {
-							if (PlayerColorNames[k].empty()) {
+						for (size_t k = 0; k < ConversiblePlayerColors.size(); ++k) {
+							if (PlayerColorNames[ConversiblePlayerColors[k]].empty()) {
 								break;
 							}
 							
-							for (size_t z = 0; z < PlayerColorsRGB[k].size(); ++z) {
-								if (p.r == PlayerColorsRGB[k][z].R && p.g == PlayerColorsRGB[k][z].G && p.b == PlayerColorsRGB[k][z].B) {
+							for (size_t z = 0; z < PlayerColorsRGB[ConversiblePlayerColors[k]].size(); ++z) {
+								if (p.r == PlayerColorsRGB[ConversiblePlayerColors[k]][z].R && p.g == PlayerColorsRGB[ConversiblePlayerColors[k]][z].G && p.b == PlayerColorsRGB[ConversiblePlayerColors[k]][z].B) {
 									red = colors->Colors[z].R;
 									green = colors->Colors[z].G;
 									blue = colors->Colors[z].B;
 									
 									if (found_player_color == -1) {
-										found_player_color = k;
-									} else if (found_player_color != k) {
-										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", g->File.c_str(), PlayerColorNames[k].c_str(), PlayerColorNames[found_player_color].c_str());
+										found_player_color = ConversiblePlayerColors[k];
+									} else if (found_player_color != ConversiblePlayerColors[k]) {
+										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" player colors.\n", g->File.c_str(), PlayerColorNames[ConversiblePlayerColors[k]].c_str(), PlayerColorNames[found_player_color].c_str());
 									}
 								}
 							}

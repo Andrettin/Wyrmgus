@@ -719,10 +719,13 @@ extern bool NoRescueCheck;          /// Disable rescue check
 extern std::vector<CColor> PlayerColorsRGB[PlayerColorMax]; /// Player colors
 extern std::vector<IntColor> PlayerColors[PlayerColorMax]; /// Player colors
 extern std::string PlayerColorNames[PlayerColorMax];  /// Player color names
+extern std::vector<int> ConversiblePlayerColors; 			/// Conversible player colors
+
 extern std::string SkinColorNames[SkinColorMax];  /// Skin color names
 extern std::vector<CColor> SkinColorsRGB[SkinColorMax]; /// Skin colors
 extern std::string HairColorNames[HairColorMax];  /// Hair color names
 extern std::vector<CColor> HairColorsRGB[HairColorMax]; /// Hair colors
+
 extern std::map<std::string, int> CivilizationStringToIndex;
 extern std::map<std::string, int> FactionStringToIndex[MAX_RACES];
 //Wyrmgus end

@@ -337,6 +337,7 @@ bool NoRescueCheck;               /// Disable rescue check
 std::vector<CColor> PlayerColorsRGB[PlayerColorMax];
 std::vector<IntColor> PlayerColors[PlayerColorMax];
 std::string PlayerColorNames[PlayerColorMax];
+std::vector<int> ConversiblePlayerColors;
 
 std::vector<CColor> SkinColorsRGB[SkinColorMax];
 std::string SkinColorNames[SkinColorMax];
