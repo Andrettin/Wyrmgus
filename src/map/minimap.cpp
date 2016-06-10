@@ -228,17 +228,21 @@ static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int
 	int y = (yofs + 6 + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
 	return &pixels[x * bpp + y * Map.TileGraphic->Surface->pitch];
 	*/
+	Uint8 *graphic_pixel = NULL;
+	
 	if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain].ImageFile.empty()) {
 		Uint8 *pixels = (Uint8 *)Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->pixels;
 		int x = (xofs + 7 + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
 		int y = (yofs + 6 + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
-		return &pixels[x * bpp + y * Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->pitch];
+		graphic_pixel = &pixels[x * bpp + y * Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->pitch];
 	} else {
 		Uint8 *pixels = (Uint8 *)Map.TileGraphic->Surface->pixels;
 		int x = (xofs + 7 + ((mx * SCALE_PRECISION) % scalex) / SCALE_PRECISION * 8);
 		int y = (yofs + 6 + ((my * SCALE_PRECISION) % scaley) / SCALE_PRECISION * 8);
-		return &pixels[x * bpp + y * Map.TileGraphic->Surface->pitch];
+		graphic_pixel = &pixels[x * bpp + y * Map.TileGraphic->Surface->pitch];
 	}
+	
+	return graphic_pixel;
 	//Wyrmgus end
 }
 
