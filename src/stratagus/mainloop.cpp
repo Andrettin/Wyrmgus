@@ -52,6 +52,9 @@
 #include "missile.h"
 #include "network.h"
 #include "particle.h"
+//Wyrmgus start
+#include "quest.h"
+//Wyrmgus end
 #include "replay.h"
 #include "results.h"
 //Wyrmgus start
@@ -714,6 +717,10 @@ void GameMainLoop()
 		FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW);
 		CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer);
 		custom_hero->SetCharacter(CurrentCustomHero->GetFullName(), true);	
+	}
+	
+	if (CurrentQuest != NULL && CurrentQuest->IntroductionDialogue != NULL) {
+		CurrentQuest->IntroductionDialogue->Call(ThisPlayer->Index);
 	}
 	//Wyrmgus end
 

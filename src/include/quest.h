@@ -47,6 +47,7 @@
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
+class CDialogue;
 class CDialogueNode;
 class LuaCallback;
 
@@ -56,7 +57,7 @@ public:
 	CQuest() :
 		Civilization(-1), TechnologyPoints(0), X(-1), Y(-1), PlayerColor(0),
 		Hidden(false),
-		QuestGiver(NULL)
+		QuestGiver(NULL), IntroductionDialogue(NULL)
 	{
 	}
 	
@@ -84,6 +85,7 @@ public:
 	bool Hidden;					/// Whether the quest is hidden
 	IconConfig Icon;				/// Quest's icon
 	CCharacter *QuestGiver;			/// Quest giver
+	CDialogue *IntroductionDialogue;
 	std::vector<std::string> Objectives;	/// The objectives of this quest (used for the briefing only)
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 };
@@ -131,6 +133,7 @@ public:
 ----------------------------------------------------------------------------*/
 
 extern std::vector<CQuest *> Quests;
+extern CQuest *CurrentQuest;
 extern std::vector<CDialogue *> Dialogues;
 
 /*----------------------------------------------------------------------------
@@ -141,6 +144,9 @@ extern void CleanQuests();
 extern void CleanDialogues();
 extern CQuest *GetQuest(std::string quest_name);
 extern CDialogue *GetDialogue(std::string dialogue_ident);
+
+extern void SetCurrentQuest(std::string quest_name);
+extern std::string GetCurrentQuest();
 
 extern void CallDialogue(std::string dialogue_ident, int player);
 extern void CallDialogueNode(std::string dialogue_ident, int node, int player);

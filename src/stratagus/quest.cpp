@@ -50,6 +50,7 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CQuest *> Quests;
+CQuest *CurrentQuest = NULL;
 std::vector<CDialogue *> Dialogues;
 
 /*----------------------------------------------------------------------------
@@ -119,6 +120,17 @@ CDialogueNode::~CDialogueNode()
 
 void CDialogueNode::Call(int player)
 {
+	if (this->Conditions) {
+		this->Conditions->pushPreamble();
+		this->Conditions->run(1);
+		if (this->Conditions->popBoolean() == false) {
+			if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
+				this->Dialogue->Nodes[this->ID + 1]->Call(player);
+			}
+			return;
+		}
+	}
+	
 	std::string lua_command = "Event(";
 	
 	if (this->SpeakerType == "character") {
@@ -142,17 +154,7 @@ void CDialogueNode::Call(int player)
 	
 	lua_command += "{function(s) ";
 	lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
-	lua_command += " end}, ";
-	
-	lua_command += "nil, nil";
-	
-	if (this->Conditions) {
-		this->Conditions->pushPreamble();
-		this->Conditions->run(1);
-		if (this->Conditions->popBoolean() == false) {
-			lua_command += ", true";
-		}
-	}
+	lua_command += " end}";
 	
 	lua_command += ")";
 	
@@ -167,6 +169,24 @@ void CDialogueNode::OptionEffect(int option, int player)
 	}
 	if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
 		this->Dialogue->Nodes[this->ID + 1]->Call(player);
+	}
+}
+
+void SetCurrentQuest(std::string quest_name)
+{
+	if (quest_name.empty()) {
+		CurrentQuest = NULL;
+	} else {
+		CurrentQuest = GetQuest(quest_name);
+	}
+}
+
+std::string GetCurrentQuest()
+{
+	if (!CurrentQuest) {
+		return "";
+	} else {
+		return CurrentQuest->Name;
 	}
 }
 

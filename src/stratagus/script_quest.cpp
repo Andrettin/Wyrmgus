@@ -131,9 +131,17 @@ static int CclDefineQuest(lua_State *l)
 			std::string quest_giver_name = TransliterateText(LuaToString(l, -1));
 			CCharacter *quest_giver = GetCharacter(quest_giver_name);
 			if (quest_giver) {
-				quest->QuestGiver = const_cast<CCharacter *>(&(*quest_giver));
+				quest->QuestGiver = quest_giver;
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ quest_giver_name.c_str());
+			}
+		} else if (!strcmp(value, "IntroductionDialogue")) {
+			std::string dialogue_ident = LuaToString(l, -1);
+			CDialogue *dialogue = GetDialogue(dialogue_ident);
+			if (dialogue) {
+				quest->IntroductionDialogue = dialogue;
+			} else {
+				LuaError(l, "Dialogue \"%s\" doesn't exist." _C_ dialogue_ident.c_str());
 			}
 		} else if (!strcmp(value, "Objectives")) {
 			quest->Objectives.clear();
