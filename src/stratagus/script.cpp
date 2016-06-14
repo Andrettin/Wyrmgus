@@ -1165,8 +1165,10 @@ std::string EvalString(const StringDesc *s)
 			if (unit != NULL) {
 				//Wyrmgus
 //				return unit->Type->Name;
-				if (!unit->Name.empty()) {
+				if (!unit->Name.empty() && unit->Identified) {
 					return unit->Name;
+				} else if (!unit->Identified) {
+					return unit->GetTypeName() + " (Unidentified)";
 				} else {
 					return unit->GetTypeName();
 				}

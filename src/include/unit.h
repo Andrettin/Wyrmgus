@@ -192,6 +192,9 @@ public:
 	void SetSpell(SpellType *spell);
 	void SetWork(CUpgrade *work);
 	void SetUnique(CUniqueItem *unique);
+	void Identify();
+	void CheckIdentification();
+	void UpdateItemName();
 	void GenerateDrop();
 	void GenerateSpecialProperties(CUnit *dropper = NULL);
 	void GeneratePrefix(CUnit *dropper);
@@ -437,6 +440,7 @@ public:
 	CUpgrade *Work;		/// Item unit's literary work
 	bool Unique;		/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
+	bool Identified;	/// Whether the item has been identified
 	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
 	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has

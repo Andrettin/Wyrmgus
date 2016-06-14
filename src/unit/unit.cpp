@@ -464,6 +464,7 @@ void CUnit::Init()
 	Work = NULL;
 	Unique = false;
 	Bound = false;
+	Identified = true;
 	//Wyrmgus end
 	CurrentSightRange = 0;
 
@@ -588,6 +589,7 @@ void CUnit::Release(bool final)
 	Work = NULL;
 	Unique = false;
 	Bound = false;
+	Identified = true;
 	
 	for (int i = 0; i < MaxItemSlots; ++i) {
 		EquippedItems[i].clear();
@@ -833,6 +835,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			item->Name = this->Character->Items[i]->Name;
 		}
 		item->Bound = this->Character->Items[i]->Bound;
+		item->Identified = this->Character->Items[i]->Identified;
 		item->Remove(this);
 		if (this->Character->IsItemEquipped(this->Character->Items[i])) {
 			EquipItem(*item, false);
@@ -1380,7 +1383,7 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 		}
 	}
 	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Prefix = const_cast<CUpgrade *>(&(*prefix));
+		Container->Character->GetItem(*this)->Prefix = prefix;
 		SaveHero(Container->Character);
 	}
 	Prefix = const_cast<CUpgrade *>(&(*prefix));
@@ -1392,20 +1395,7 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 		}
 	}
 	
-	Name = "";
-	if (Prefix != NULL) {
-		Name += Prefix->Name + " ";
-	}
-	if (Work != NULL) {
-		Name += Work->Name;
-	} else {
-		Name += GetTypeName();
-	}
-	if (Suffix != NULL) {
-		Name += " " + Suffix->Name;
-	} else if (Spell != NULL) {
-		Name += " of " + Spell->Name;
-	}
+	this->UpdateItemName();
 }
 
 void CUnit::SetSuffix(CUpgrade *suffix)
@@ -1418,7 +1408,7 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		}
 	}
 	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Suffix = const_cast<CUpgrade *>(&(*suffix));
+		Container->Character->GetItem(*this)->Suffix = suffix;
 		SaveHero(Container->Character);
 	}
 	Suffix = const_cast<CUpgrade *>(&(*suffix));
@@ -1430,68 +1420,29 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		}
 	}
 	
-	Name = "";
-	if (Prefix != NULL) {
-		Name += Prefix->Name + " ";
-	}
-	if (Work != NULL) {
-		Name += Work->Name;
-	} else {
-		Name += GetTypeName();
-	}
-	if (Suffix != NULL) {
-		Name += " " + Suffix->Name;
-	} else if (Spell != NULL) {
-		Name += " of " + Spell->Name;
-	}
+	this->UpdateItemName();
 }
 
 void CUnit::SetSpell(SpellType *spell)
 {
 	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Spell != spell) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Spell = const_cast<SpellType *>(&(*spell));
+		Container->Character->GetItem(*this)->Spell = spell;
 		SaveHero(Container->Character);
 	}
-	Spell = const_cast<SpellType *>(&(*spell));
+	Spell = spell;
 	
-	Name = "";
-	if (Prefix != NULL) {
-		Name += Prefix->Name + " ";
-	}
-	if (Work != NULL) {
-		Name += Work->Name;
-	} else {
-		Name += GetTypeName();
-	}
-	if (Suffix != NULL) {
-		Name += " " + Suffix->Name;
-	} else if (Spell != NULL) {
-		Name += " of " + Spell->Name;
-	}
+	this->UpdateItemName();
 }
 
 void CUnit::SetWork(CUpgrade *work)
 {
 	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
-		Container->Character->GetItem(*this)->Work = const_cast<CUpgrade *>(&(*work));
+		Container->Character->GetItem(*this)->Work = work;
 		SaveHero(Container->Character);
 	}
-	Work = const_cast<CUpgrade *>(&(*work));
+	Work = work;
 	
-	Name = "";
-	if (Prefix != NULL) {
-		Name += Prefix->Name + " ";
-	}
-	if (Work != NULL) {
-		Name += Work->Name;
-	} else {
-		Name += GetTypeName();
-	}
-	if (Suffix != NULL) {
-		Name += " " + Suffix->Name;
-	} else if (Spell != NULL) {
-		Name += " of " + Spell->Name;
-	}
+	this->UpdateItemName();
 }
 
 void CUnit::SetUnique(CUniqueItem *unique)
@@ -1516,6 +1467,57 @@ void CUnit::SetUnique(CUniqueItem *unique)
 		SetSuffix(NULL);
 		SetSpell(NULL);
 		SetWork(NULL);
+	}
+}
+
+void CUnit::Identify()
+{
+	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Identified != true) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->GetItem(*this)->Identified = true;
+		SaveHero(Container->Character);
+	}
+	
+	this->Identified = true;
+	
+	if (this->Container != NULL && this->Container->Player == ThisPlayer) {
+		this->Container->Player->Notify(NotifyGreen, this->Container->tilePos, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
+	}
+}
+
+void CUnit::CheckIdentification()
+{
+	if (!HasInventory()) {
+		return;
+	}
+	
+	CUnit *uins = this->UnitInside;
+	
+	for (int i = 0; i < this->InsideCount; ++i, uins = uins->NextContained) {
+		if (!uins->Type->BoolFlag[ITEM_INDEX].value) {
+			continue;
+		}
+		
+		if (!uins->Identified && this->Variable[KNOWLEDGEMAGIC_INDEX].Value >= uins->Variable[MAGICLEVEL_INDEX].Value) {
+			uins->Identify();
+		}
+	}
+}
+
+void CUnit::UpdateItemName()
+{
+	Name = "";
+	if (Prefix != NULL) {
+		Name += Prefix->Name + " ";
+	}
+	if (Work != NULL) {
+		Name += Work->Name;
+	} else {
+		Name += GetTypeName();
+	}
+	if (Suffix != NULL) {
+		Name += " " + Suffix->Name;
+	} else if (Spell != NULL) {
+		Name += " of " + Spell->Name;
 	}
 }
 
@@ -1605,6 +1607,10 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 	}
 	if (SyncRand(1000) >= (1000 - unique_chance)) {
 		this->GenerateUnique(dropper);
+	}
+	
+	if (this->Type->BoolFlag[ITEM_INDEX].value && (this->Prefix != NULL || this->Suffix != NULL || this->Unique)) {
+		this->Identified = false;
 	}
 	
 	if (
@@ -4029,6 +4035,21 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 			value = item->Variable[variable_index].Increase;
 		}
 		
+		if (!item->Identified) { //if the item is unidentified, don't show the effects of its affixes
+			for (int z = 0; z < NumUpgradeModifiers; ++z) {
+				if (
+					(item->Prefix != NULL && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
+					|| (item->Suffix != NULL && UpgradeModifiers[z]->UpgradeId == item->Suffix->ID)
+				) {
+					if (!increase) {
+						value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+					} else {
+						value -= UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+					}
+				}
+			}
+		}
+		
 		if (EquippedItems[item_slot].size() == this->GetItemSlotQuantity(item_slot)) {
 			int item_slot_used = EquippedItems[item_slot].size() - 1;
 			for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
@@ -4150,6 +4171,10 @@ bool CUnit::IsItemTypeEquipped(CUnitType *item_type) const
 bool CUnit::CanEquipItem(CUnit *item) const
 {
 	if (item->Container != this) {
+		return false;
+	}
+	
+	if (!item->Identified) {
 		return false;
 	}
 	
@@ -4329,6 +4354,10 @@ std::string CUnit::GetMessageName() const
 {
 	if (Name.empty()) {
 		return GetTypeName();
+	}
+	
+	if (!this->Identified) {
+		return GetTypeName() + " (Unidentified)";
 	}
 	
 	if (!this->Unique && this->Work == NULL && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {
@@ -4800,6 +4829,8 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 		target.XPChanged();
 	} else if (var == STUN_INDEX && target.Variable[var].Value > 0) { //if unit has become stunned, stop it
 		CommandStopUnit(target);
+	} else if (var == KNOWLEDGEMAGIC_INDEX) {
+		target.CheckIdentification();
 	}
 	//Wyrmgus end
 }

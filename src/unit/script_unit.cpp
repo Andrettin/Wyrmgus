@@ -368,6 +368,8 @@ static int CclUnit(lua_State *l)
 			}
 		} else if (!strcmp(value, "bound")) {
 			unit->Bound = LuaToBoolean(l, 2, j + 1);
+		} else if (!strcmp(value, "identified")) {
+			unit->Identified = LuaToBoolean(l, 2, j + 1);
 		} else if (!strcmp(value, "equipped")) {
 			bool is_equipped = LuaToBoolean(l, 2, j + 1);
 			if (is_equipped && unit->Container != NULL) {
@@ -1850,6 +1852,8 @@ static int CclSetUnitVariable(lua_State *l)
 			unit->XPChanged();
 		} else if (index == STUN_INDEX && unit->Variable[index].Value > 0) { //if unit has become stunned, stop it
 			CommandStopUnit(*unit);
+		} else if (index == KNOWLEDGEMAGIC_INDEX) {
+			unit->CheckIdentification();
 		}
 		//Wyrmgus end
 	}

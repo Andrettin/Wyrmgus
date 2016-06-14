@@ -691,10 +691,13 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 			}
 			//hackish way to make the popup appear correctly for the inventory item
 			ButtonAction *ba = new ButtonAction;
-			if (!uins->Name.empty()) {
+			if (!uins->Name.empty() && uins->Identified) {
 				ba->Hint = uins->Name;
 			} else {
 				ba->Hint = uins->GetTypeName();
+				if (!uins->Identified) {
+					ba->Hint += " (Unidentified)";
+				}
 			}
 			ba->Pos = j;
 			ba->Level = unit.Type->ButtonLevelForInventory;

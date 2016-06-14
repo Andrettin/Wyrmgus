@@ -1430,6 +1430,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.Container->UpdateContainerAttackRange();
 						} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 							unit.UpdateXPRequired();
+						} else if (j == KNOWLEDGEMAGIC_INDEX) {
+							unit.CheckIdentification();
 						}
 						//Wyrmgus end
 					}
@@ -1705,6 +1707,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.Container->UpdateContainerAttackRange();
 						} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 							unit.UpdateXPRequired();
+						} else if (j == KNOWLEDGEMAGIC_INDEX) {
+							unit.CheckIdentification();
 						}
 						//Wyrmgus end
 					}
@@ -1807,6 +1811,8 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.Container->UpdateContainerAttackRange();
 		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 			unit.UpdateXPRequired();
+		} else if (j == KNOWLEDGEMAGIC_INDEX) {
+			unit.CheckIdentification();
 		}
 		//Wyrmgus end
 	}
@@ -1899,6 +1905,8 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.Container->UpdateContainerAttackRange();
 		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 			unit.UpdateXPRequired();
+		} else if (j == KNOWLEDGEMAGIC_INDEX) {
+			unit.CheckIdentification();
 		}
 		//Wyrmgus end
 	}
@@ -2340,6 +2348,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 						variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
 						variable_name = SeparateCapitalizedStringElements(variable_name);
 						variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
+						variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
 						upgrade_effects_string += variable_name;
 						
 						bool first_unit_type = true;

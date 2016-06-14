@@ -190,6 +190,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Bound) {
 		file.printf("\"bound\", true, ");
 	}
+	if (!unit.Identified) {
+		file.printf("\"identified\", false, ");
+	}
 	if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->IsItemEquipped(&unit)) {
 		file.printf("\"equipped\", true, ");
 	}

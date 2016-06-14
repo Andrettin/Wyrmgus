@@ -205,25 +205,30 @@ enum {
 			if (!IsNetworkGame() && unit.Character && unit.Character->Persistent && unit.Player->AiEnabled == false) { //if the unit has a persistent character, store the item for it
 				CItem *item = new CItem;
 				unit.Character->Items.push_back(item);
-				item->Type = const_cast<CUnitType *>(&(*goal->Type));
+				item->Type = const_cast<CUnitType *>(goal->Type);
 				if (goal->Prefix != NULL) {
-					item->Prefix = const_cast<CUpgrade *>(&(*goal->Prefix));
+					item->Prefix = goal->Prefix;
 				}
 				if (goal->Suffix != NULL) {
-					item->Suffix = const_cast<CUpgrade *>(&(*goal->Suffix));
+					item->Suffix = goal->Suffix;
 				}
 				if (goal->Spell != NULL) {
-					item->Spell = const_cast<SpellType *>(&(*goal->Spell));
+					item->Spell = goal->Spell;
 				}
 				if (goal->Work != NULL) {
-					item->Work = const_cast<CUpgrade *>(&(*goal->Work));
+					item->Work = goal->Work;
 				}
 				if (goal->Unique) {
 					item->Name = goal->Name;
 					item->Unique = goal->Unique;
 				}
 				item->Bound = goal->Bound;
+				item->Identified = goal->Identified;
 				SaveHero(unit.Character);
+			}
+			
+			if (!goal->Identified && unit.Variable[KNOWLEDGEMAGIC_INDEX].Value >= goal->Variable[MAGICLEVEL_INDEX].Value) {
+				goal->Identify();
 			}
 		} else if (
 			goal

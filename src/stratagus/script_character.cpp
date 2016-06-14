@@ -369,6 +369,8 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					} else if (!strcmp(value, "bound")) {
 						item->Bound = LuaToBoolean(l, -1, k + 1);
+					} else if (!strcmp(value, "identified")) {
+						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
 						bool is_equipped = LuaToBoolean(l, -1, k + 1);
 						if (is_equipped && GetItemClassSlot(item->Type->ItemClass) != -1) {
@@ -665,6 +667,8 @@ static int CclDefineCustomHero(lua_State *l)
 						}
 					} else if (!strcmp(value, "bound")) {
 						item->Bound = LuaToBoolean(l, -1, k + 1);
+					} else if (!strcmp(value, "identified")) {
+						item->Identified = LuaToBoolean(l, -1, k + 1);
 					} else if (!strcmp(value, "equipped")) {
 						bool is_equipped = LuaToBoolean(l, -1, k + 1);
 						if (is_equipped && GetItemClassSlot(item->Type->ItemClass) != -1) {

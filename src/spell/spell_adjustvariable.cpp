@@ -163,6 +163,8 @@
 			unit->XPChanged();
 		} else if (i == STUN_INDEX && unit->Variable[i].Value > 0) { //if target has become stunned, stop it
 			CommandStopUnit(*unit);
+		} else if (i == KNOWLEDGEMAGIC_INDEX) {
+			unit->CheckIdentification();
 		}
 		//Wyrmgus end
 	}

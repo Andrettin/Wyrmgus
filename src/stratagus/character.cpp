@@ -156,7 +156,7 @@ IconConfig CCharacter::GetIcon()
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
+		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->Items[i]->Identified == item.Identified && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
 			if (this->Items[i]->Name.empty() || this->Items[i]->Name == item.Name) {
 				return this->Items[i];
 			}
@@ -474,6 +474,9 @@ void SaveHero(CCharacter *hero)
 			}
 			if (hero->Items[j]->Bound) {
 				fprintf(fd, "\n\t\t\t\"bound\", true,");
+			}
+			if (!hero->Items[j]->Identified) {
+				fprintf(fd, "\n\t\t\t\"identified\", false,");
 			}
 			if (hero->IsItemEquipped(hero->Items[j])) {
 				fprintf(fd, "\n\t\t\t\"equipped\", true");
