@@ -38,6 +38,7 @@
 #include "quest.h"
 
 #include "character.h"
+#include "luacallback.h"
 #include "player.h"
 #include "script.h"
 
@@ -278,6 +279,79 @@ static int CclGetQuestData(lua_State *l)
 	return 0;
 }
 
+/**
+**  Define a dialogue.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineDialogue(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string dialogue_name = LuaToString(l, 1);
+	CDialogue *dialogue = GetDialogue(dialogue_name);
+	if (!dialogue) {
+		dialogue = new CDialogue;
+		Dialogues.push_back(dialogue);
+		dialogue->Ident = dialogue_name;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Nodes")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				lua_rawgeti(l, -1, j + 1);
+				CDialogueNode *node = new CDialogueNode;
+				node->ID = dialogue->Nodes.size();
+				dialogue->Nodes.push_back(node);
+				node->Dialogue = dialogue;
+				if (!lua_istable(l, -1)) {
+					LuaError(l, "incorrect argument (expected table for dialogue nodes)");
+				}
+				const int subargs = lua_rawlen(l, -1);
+				for (int k = 0; k < subargs; ++k) {
+					value = LuaToString(l, -1, k + 1);
+					++k;
+					if (!strcmp(value, "speaker")) {
+						node->SpeakerType = LuaToString(l, -1, k + 1);
+						++k;
+						node->Speaker = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "text")) {
+						node->Text = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "conditions")) {
+						lua_rawgeti(l, -1, k + 1);
+						node->Conditions = new LuaCallback(l, -1);
+						lua_pop(l, 1);
+					} else if (!strcmp(value, "option-effects")) {
+						lua_rawgeti(l, -1, k + 1);
+						const int subsubargs = lua_rawlen(l, -1);
+						for (int n = 0; n < subsubargs; ++n) {
+							lua_rawgeti(l, -1, n + 1);
+							node->OptionEffects.push_back(new LuaCallback(l, -1));
+							lua_pop(l, 1);
+						}
+						lua_pop(l, 1);
+					} else {
+						printf("\n%s\n", dialogue->Ident.c_str());
+						LuaError(l, "Unsupported tag: %s" _C_ value);
+					}
+				}
+				lua_pop(l, 1);
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -288,6 +362,7 @@ void QuestCclRegister()
 	lua_register(Lua, "DefineQuest", CclDefineQuest);
 	lua_register(Lua, "GetQuests", CclGetQuests);
 	lua_register(Lua, "GetQuestData", CclGetQuestData);
+	lua_register(Lua, "DefineDialogue", CclDefineDialogue);
 }
 
 //@}

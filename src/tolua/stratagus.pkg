@@ -20,6 +20,7 @@ $#include "netconnect.h"
 $#include "player.h"
 //Wyrmgus start
 $#include "province.h"
+$#include "quest.h"
 $#include "script.h"
 //Wyrmgus end
 $#include "sound.h"
@@ -147,4 +148,8 @@ extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern void DeleteModFaction(std::string civilization_name, std::string faction_name);
 extern void DisableMod(std::string mod_file);
 extern void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file);
+
+extern void CallDialogue(std::string dialogue_ident, int player);
+extern void CallDialogueNode(std::string dialogue_ident, int node, int player);
+extern void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, int option, int player);
 //Wyrmgus end

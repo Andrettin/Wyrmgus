@@ -47,6 +47,8 @@
 ----------------------------------------------------------------------------*/
 
 class CCharacter;
+class CDialogueNode;
+class LuaCallback;
 
 class CQuest
 {
@@ -86,18 +88,64 @@ public:
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 };
 
+class CDialogue
+{
+public:
+	CDialogue() :
+		Ident("")
+	{
+	}
+	
+	~CDialogue();
+	
+	void Call(int player);
+	
+	std::string Ident;				/// Ident of the dialogue
+	std::vector<CDialogueNode *> Nodes;	/// The nodes of the dialogue
+};
+
+class CDialogueNode
+{
+public:
+	CDialogueNode() :
+		ID(-1), Dialogue(NULL), Conditions(NULL)
+	{
+	}
+	
+	~CDialogueNode();
+	
+	void Call(int player);
+	void OptionEffect(int option, int player);
+	
+	int ID;
+	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself
+	std::string Speaker;
+	std::string Text;
+	CDialogue *Dialogue;
+	LuaCallback *Conditions;
+	std::vector<LuaCallback *> OptionEffects;
+};
+
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
 
 extern std::vector<CQuest *> Quests;
+extern std::vector<CDialogue *> Dialogues;
 
 /*----------------------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------------------*/
 
 extern void CleanQuests();
+extern void CleanDialogues();
 extern CQuest *GetQuest(std::string quest_name);
+extern CDialogue *GetDialogue(std::string dialogue_ident);
+
+extern void CallDialogue(std::string dialogue_ident, int player);
+extern void CallDialogueNode(std::string dialogue_ident, int node, int player);
+extern void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, int option, int player);
+
 extern void QuestCclRegister();
 
 //@}

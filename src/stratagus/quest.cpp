@@ -37,6 +37,9 @@
 
 #include "quest.h"
 
+#include "luacallback.h"
+#include "script.h"
+
 #include <ctype.h>
 
 #include <string>
@@ -47,6 +50,7 @@
 ----------------------------------------------------------------------------*/
 
 std::vector<CQuest *> Quests;
+std::vector<CDialogue *> Dialogues;
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -60,6 +64,14 @@ void CleanQuests()
 	Quests.clear();
 }
 
+void CleanDialogues()
+{
+	for (size_t i = 0; i < Dialogues.size(); ++i) {
+		delete Dialogues[i];
+	}
+	Dialogues.clear();
+}
+
 CQuest *GetQuest(std::string quest_name)
 {
 	for (size_t i = 0; i < Quests.size(); ++i) {
@@ -68,6 +80,124 @@ CQuest *GetQuest(std::string quest_name)
 		}
 	}
 	return NULL;
+}
+
+CDialogue *GetDialogue(std::string dialogue_ident)
+{
+	for (size_t i = 0; i < Dialogues.size(); ++i) {
+		if (dialogue_ident == Dialogues[i]->Ident) {
+			return Dialogues[i];
+		}
+	}
+	return NULL;
+}
+
+CDialogue::~CDialogue()
+{
+	for (size_t i = 0; i < this->Nodes.size(); ++i) {
+		delete this->Nodes[i];
+	}
+}
+
+void CDialogue::Call(int player)
+{
+	if (this->Nodes.size() == 0) {
+		return;
+	}
+	
+	this->Nodes[0]->Call(player);
+}
+
+CDialogueNode::~CDialogueNode()
+{
+	delete Conditions;
+	
+	for (size_t i = 0; i < this->OptionEffects.size(); ++i) {
+		delete this->OptionEffects[i];
+	}
+}
+
+void CDialogueNode::Call(int player)
+{
+	std::string lua_command = "Event(";
+	
+	if (this->SpeakerType == "character") {
+		lua_command += "FindHero(\"" + this->Speaker + "\"), ";
+	} else if (this->SpeakerType == "unit") {
+		lua_command += "FindUnit(\"" + this->Speaker + "\"), ";
+	} else {
+		lua_command += "\"" + this->Speaker + "\", ";
+	}
+	
+	lua_command += "\"" + this->Text + "\", ";
+	lua_command += std::to_string((long long) player) + ", ";
+	
+	lua_command += "{\"";
+	if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
+		lua_command += "~!Continue";
+	} else {
+		lua_command += "~!OK";
+	}
+	lua_command += "\"}, ";
+	
+	lua_command += "{function(s) ";
+	lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
+	lua_command += " end}, ";
+	
+	lua_command += "nil, nil";
+	
+	if (this->Conditions) {
+		this->Conditions->pushPreamble();
+		this->Conditions->run(1);
+		if (this->Conditions->popBoolean() == false) {
+			lua_command += ", true";
+		}
+	}
+	
+	lua_command += ")";
+	
+	CclCommand(lua_command);
+}
+
+void CDialogueNode::OptionEffect(int option, int player)
+{
+	if ((int) this->OptionEffects.size() > option && this->OptionEffects[option]) {
+		this->OptionEffects[option]->pushPreamble();
+		this->OptionEffects[option]->run();
+	}
+	if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
+		this->Dialogue->Nodes[this->ID + 1]->Call(player);
+	}
+}
+
+void CallDialogue(std::string dialogue_ident, int player)
+{
+	CDialogue *dialogue = GetDialogue(dialogue_ident);
+	if (!dialogue) {
+		return;
+	}
+	
+	dialogue->Call(player);
+}
+
+void CallDialogueNode(std::string dialogue_ident, int node, int player)
+{
+	CDialogue *dialogue = GetDialogue(dialogue_ident);
+	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
+		return;
+	}
+	
+	dialogue->Nodes[node]->Call(player);
+}
+
+void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, int option, int player)
+{
+	CDialogue *dialogue = GetDialogue(dialogue_ident);
+	if (!dialogue || node >= (int) dialogue->Nodes.size()) {
+		return;
+	}
+	
+	dialogue->Nodes[node]->OptionEffect(option, player);
 }
 
 //@}
