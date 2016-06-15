@@ -1381,18 +1381,22 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
+		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->MagicLevel;
 	}
 	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Prefix != prefix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Prefix = prefix;
 		SaveHero(Container->Character);
 	}
-	Prefix = const_cast<CUpgrade *>(&(*prefix));
+	Prefix = prefix;
 	if (Prefix != NULL) {
 		for (int z = 0; z < NumUpgradeModifiers; ++z) {
 			if (UpgradeModifiers[z]->UpgradeId == Prefix->ID) {
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
+		this->Variable[MAGICLEVEL_INDEX].Value += Prefix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max += Prefix->MagicLevel;
 	}
 	
 	this->UpdateItemName();
@@ -1406,6 +1410,8 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
+		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->MagicLevel;
 	}
 	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Suffix != suffix) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Suffix = suffix;
@@ -1418,6 +1424,8 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
 			}
 		}
+		this->Variable[MAGICLEVEL_INDEX].Value += Suffix->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max += Suffix->MagicLevel;
 	}
 	
 	this->UpdateItemName();
@@ -1436,11 +1444,22 @@ void CUnit::SetSpell(SpellType *spell)
 
 void CUnit::SetWork(CUpgrade *work)
 {
+	if (this->Work != NULL) {
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Work->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Work->MagicLevel;
+	}
+	
 	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Work != work) { //update the persistent item, if applicable and if it hasn't been updated yet
 		Container->Character->GetItem(*this)->Work = work;
 		SaveHero(Container->Character);
 	}
+	
 	Work = work;
+	
+	if (this->Work != NULL) {
+		this->Variable[MAGICLEVEL_INDEX].Value += this->Work->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max += this->Work->MagicLevel;
+	}
 	
 	this->UpdateItemName();
 }

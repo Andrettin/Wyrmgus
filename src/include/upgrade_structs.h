@@ -236,6 +236,7 @@ public:
 	int RevoltRiskModifier;			/// revolt risk modifier (for the grand strategy mode)
 	int AdministrativeEfficiencyModifier;	/// administrative efficiency modifier (for the grand strategy mode)
 	int TechnologyPointCost;		/// technology point cost
+	int MagicLevel;					/// magic level of an affix
 	int Work;						/// form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year;						/// year of publication, if is a literary work
 	CCharacter *Author;				/// author of this literary work (if it is one)

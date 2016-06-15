@@ -167,7 +167,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -343,6 +343,7 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->RevoltRiskModifier = parent_upgrade->RevoltRiskModifier;
 				upgrade->AdministrativeEfficiencyModifier = parent_upgrade->AdministrativeEfficiencyModifier;
 				upgrade->TechnologyPointCost = parent_upgrade->TechnologyPointCost;
+				upgrade->MagicLevel = parent_upgrade->MagicLevel;
 				upgrade->Ability = parent_upgrade->Ability;
 				upgrade->Weapon = parent_upgrade->Weapon;
 				upgrade->Shield = parent_upgrade->Shield;
@@ -387,6 +388,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->AdministrativeEfficiencyModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TechnologyPointCost")) {
 			upgrade->TechnologyPointCost = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MagicLevel")) {
+			upgrade->MagicLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Year")) {
 			upgrade->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Ability")) {
