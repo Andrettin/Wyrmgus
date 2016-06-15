@@ -297,7 +297,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 	if (this->Index == XP_INDEX) {
 		max = unit.Variable[XPREQUIRED_INDEX].Value;
 	} else {
-		max = unit.Variable[this->Index].Max;
+		max = unit.GetModifiedVariable(this->Index, VariableMax);
 	}
 //	if (!unit.Variable[this->Index].Max) {
 	if (!max) {
@@ -405,7 +405,10 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 /* virtual */ void CContentTypeCompleteBar::Draw(const CUnit &unit, CFont *) const
 {
 	Assert((unsigned int) this->varIndex < UnitTypeVar.GetNumberVariable());
-	if (!unit.Variable[this->varIndex].Max) {
+	//Wyrmgus start
+//	if (!unit.Variable[this->varIndex].Max) {
+	if (!unit.GetModifiedVariable(this->varIndex, VariableMax)) {
+	//Wyrmgus end
 		return;
 	}
 	int x = this->Pos.x;
@@ -419,7 +422,10 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 							 ColorLightBlue, ColorBlue, ColorDarkGreen, ColorBlack
 							};
 	const Uint32 color = (colorIndex != -1) ? colors[colorIndex] : UI.CompletedBarColor;
-	const int f = (100 * unit.Variable[this->varIndex].Value) / unit.Variable[this->varIndex].Max;
+	//Wyrmgus start
+//	const int f = (100 * unit.Variable[this->varIndex].Value) / unit.Variable[this->varIndex].Max;
+	const int f = (100 * unit.GetModifiedVariable(this->varIndex, VariableValue)) / unit.GetModifiedVariable(this->varIndex, VariableMax);
+	//Wyrmgus end
 
 	if (!this->hasBorder) {
 		//Wyrmgus start

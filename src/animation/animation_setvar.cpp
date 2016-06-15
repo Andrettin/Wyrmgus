@@ -163,7 +163,10 @@
 	} else if (!strcmp(next + 1, "Percent")) {
 		goal->Variable[index].Value = goal->Variable[index].Max * value / 100;
 	}
-	clamp(&goal->Variable[index].Value, 0, goal->Variable[index].Max);
+	//Wyrmgus start
+//	clamp(&goal->Variable[index].Value, 0, goal->Variable[index].Max);
+	clamp(&goal->Variable[index].Value, 0, goal->GetModifiedVariable(index, VariableMax));
+	//Wyrmgus end
 	//Wyrmgus start
 	if (index == ATTACKRANGE_INDEX && goal->Container) {
 		goal->Container->UpdateContainerAttackRange();

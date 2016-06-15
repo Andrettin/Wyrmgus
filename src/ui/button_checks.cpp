@@ -147,15 +147,27 @@ bool ButtonCheckUnitVariable(const CUnit &unit, const ButtonAction &button)
 		}
 		int varValue;
 		if (!strcmp(type, "Value")) {
-			varValue = unit.Variable[index].Value;
+			//Wyrmgus start
+//			varValue = unit.Variable[index].Value;
+			varValue = unit.GetModifiedVariable(index, VariableValue);
+			//Wyrmgus end
 		} else if (!strcmp(type, "Max")) {
-			varValue = unit.Variable[index].Max;
+			//Wyrmgus start
+//			varValue = unit.Variable[index].Max;
+			varValue = unit.GetModifiedVariable(index, VariableMax);
+			//Wyrmgus end
 		} else if (!strcmp(type, "Increase")) {
-			varValue = unit.Variable[index].Increase;
+			//Wyrmgus start
+//			varValue = unit.Variable[index].Increase;
+			varValue = unit.GetModifiedVariable(index, VariableIncrease);
+			//Wyrmgus end
 		} else if (!strcmp(type, "Enable")) {
 			varValue = unit.Variable[index].Enable;
 		} else if (!strcmp(type, "Percent")) {
-			varValue = unit.Variable[index].Value * 100 / unit.Variable[index].Max;
+			//Wyrmgus start
+//			varValue = unit.Variable[index].Value * 100 / unit.Variable[index].Max;
+			varValue = unit.GetModifiedVariable(index, VariableValue) * 100 / unit.GetModifiedVariable(index, VariableMax);
+			//Wyrmgus end
 		} else {
 			fprintf(stderr, "Bad variable type '%s'\n", type);
 			Exit(1);

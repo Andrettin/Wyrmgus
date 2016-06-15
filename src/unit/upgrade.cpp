@@ -1423,7 +1423,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 						unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 						if (unit.Variable[j].Max > 0) {
-							clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+							//Wyrmgus start
+//							clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+							clamp(&unit.Variable[j].Value, 0, unit.GetModifiedVariable(j, VariableMax));
+							//Wyrmgus end
 						}
 						//Wyrmgus start
 						if (j == ATTACKRANGE_INDEX && unit.Container) {
@@ -1701,7 +1704,10 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 						unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
 						unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 
-						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+						//Wyrmgus start
+//						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+						clamp(&unit.Variable[j].Value, 0, unit.GetModifiedVariable(j, VariableMax));
+						//Wyrmgus end
 						//Wyrmgus start
 						if (j == ATTACKRANGE_INDEX && unit.Container) {
 							unit.Container->UpdateContainerAttackRange();
@@ -1804,7 +1810,10 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		unit.Variable[j].Max += um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 		if (unit.Variable[j].Max > 0) {
-			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+			//Wyrmgus start
+//			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+			clamp(&unit.Variable[j].Value, 0, unit.GetModifiedVariable(j, VariableMax));
+			//Wyrmgus end
 		}
 		//Wyrmgus start
 		if (j == ATTACKRANGE_INDEX && unit.Container) {
@@ -1898,7 +1907,10 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		unit.Variable[j].Max -= um->Modifier.Variables[j].Max;
 		unit.Variable[j].Max = std::max(unit.Variable[j].Max, 0);
 		if (unit.Variable[j].Max > 0) {
-			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+			//Wyrmgus start
+//			clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
+			clamp(&unit.Variable[j].Value, 0, unit.GetModifiedVariable(j, VariableMax));
+			//Wyrmgus end
 		}
 		//Wyrmgus start
 		if (j == ATTACKRANGE_INDEX && unit.Container) {

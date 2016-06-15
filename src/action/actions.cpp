@@ -271,14 +271,17 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 static inline void IncreaseVariable(CUnit &unit, int index)
 {
 	unit.Variable[index].Value += unit.Variable[index].Increase;
-	clamp(&unit.Variable[index].Value, 0, unit.Variable[index].Max);
+	//Wyrmgus start
+//	clamp(&unit.Variable[index].Value, 0, unit.Variable[index].Max);
+	clamp(&unit.Variable[index].Value, 0, unit.GetModifiedVariable(index, VariableMax));
+	//Wyrmgus end
 	
 	//Wyrmgus start
 	if (index == HP_INDEX && unit.Variable[index].Increase < 0 && unit.HasInventory()) {
 		unit.HealingItemAutoUse();
 	} else if (index == GIVERESOURCE_INDEX) {
 		unit.ResourcesHeld += unit.Variable[index].Increase;
-		clamp(&unit.ResourcesHeld, 0, unit.Variable[index].Max);
+		clamp(&unit.ResourcesHeld, 0, unit.GetModifiedVariable(index, VariableMax));
 	}
 	//Wyrmgus end
 
@@ -449,7 +452,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		//Wyrmgus start
 		if (i == HP_INDEX && unit.Variable[REGENERATION_INDEX].Value > 0) {
 			unit.Variable[i].Value += 1;
-			clamp(&unit.Variable[i].Value, 0, unit.Variable[i].Max);
+			clamp(&unit.Variable[i].Value, 0, unit.GetModifiedVariable(i, VariableMax));
 		}
 		//Wyrmgus end
 		if (unit.Variable[i].Enable && unit.Variable[i].Increase) {

@@ -249,8 +249,14 @@ static void UiDrawManaBar(const CUnit &unit, int x, int y)
 	y += unit.Type->Icon.Icon->G->Height;
 	Video.FillRectangleClip(ColorBlack, x, y + 3, unit.Type->Icon.Icon->G->Width, 4);
 
-	if (unit.Stats->Variables[MANA_INDEX].Max) {
-		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
+	//Wyrmgus start
+//	if (unit.Stats->Variables[MANA_INDEX].Max) {
+	if (unit.GetModifiedVariable(MANA_INDEX, VariableMax)) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		int f = (100 * unit.Variable[MANA_INDEX].Value) / unit.Variable[MANA_INDEX].Max;
+		int f = (100 * unit.GetModifiedVariable(MANA_INDEX, VariableValue)) / unit.GetModifiedVariable(MANA_INDEX, VariableMax);
+		//Wyrmgus end
 		f = (f * (unit.Type->Icon.Icon->G->Width)) / 100;
 		Video.FillRectangleClip(ColorBlue, x + 1, y + 3 + 1, f, 2);
 	}
@@ -332,6 +338,24 @@ UStrInt GetComponent(const CUnit &unit, int index, EnumVariable e, int t)
 	CVariable *var;
 
 	Assert((unsigned int) index < UnitTypeVar.GetNumberVariable());
+	
+	//Wyrmgus start
+	if (t == 0 && (e == VariableValue || e == VariableMax || e == VariableIncrease || e == VariableDiff || e == VariablePercent)) {
+		val.type = USTRINT_INT;
+		if (e == VariableValue) {
+			val.i = unit.GetModifiedVariable(index, VariableValue);
+		} else if (e == VariableMax) {
+			val.i = unit.GetModifiedVariable(index, VariableMax);
+		} else if (e == VariableIncrease) {
+			val.i = unit.GetModifiedVariable(index, VariableIncrease);
+		} else if (e == VariableDiff) {
+			val.i = unit.GetModifiedVariable(index, VariableMax) - unit.GetModifiedVariable(index, VariableValue);
+		} else if (e == VariablePercent) {
+			val.i = 100 * unit.GetModifiedVariable(index, VariableValue) / unit.GetModifiedVariable(index, VariableMax);
+		}
+		return val;
+	}
+	//Wyrmgus end
 
 	switch (t) {
 		case 0: // Unit:
@@ -640,7 +664,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		//Wyrmgus start
 //		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Max) {
-		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Enable && uins->Variable[MANA_INDEX].Max) {
+		if (uins->Type->CanCastSpell && uins->Variable[MANA_INDEX].Enable && uins->GetModifiedVariable(MANA_INDEX, VariableMax)) {
 		//Wyrmgus end
 			//Wyrmgus start
 //			UiDrawManaBar(*uins, pos.x, pos.y);
@@ -1527,7 +1551,10 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 			|| unit.Orders[0]->Action == UnitActionUpgradeTo
 			|| unit.Orders[0]->Action == UnitActionTrain) {
 			panelIndex = 3;
-		} else if (unit.Stats->Variables[MANA_INDEX].Max) {
+		//Wyrmgus start
+//		} else if (unit.Stats->Variables[MANA_INDEX].Max) {
+		} else if (unit.GetModifiedVariable(MANA_INDEX, VariableMax)) {
+		//Wyrmgus end
 			panelIndex = 2;
 		} else {
 			panelIndex = 1;

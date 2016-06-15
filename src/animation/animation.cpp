@@ -174,15 +174,27 @@ int ParseAnimInt(const CUnit &unit, const char *parseint)
 			ExitFatal(1);
 		}
 		if (!strcmp(next + 1, "Value")) {
-			return goal->Variable[index].Value;
+			//Wyrmgus start
+//			return goal->Variable[index].Value;
+			return goal->GetModifiedVariable(index, VariableValue);
+			//Wyrmgus end
 		} else if (!strcmp(next + 1, "Max")) {
-			return goal->Variable[index].Max;
+			//Wyrmgus start
+//			return goal->Variable[index].Max;
+			return goal->GetModifiedVariable(index, VariableMax);
+			//Wyrmgus end
 		} else if (!strcmp(next + 1, "Increase")) {
-			return goal->Variable[index].Increase;
+			//Wyrmgus start
+//			return goal->Variable[index].Increase;
+			return goal->GetModifiedVariable(index, VariableIncrease);
+			//Wyrmgus end
 		} else if (!strcmp(next + 1, "Enable")) {
 			return goal->Variable[index].Enable;
 		} else if (!strcmp(next + 1, "Percent")) {
-			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
+			//Wyrmgus start
+//			return goal->Variable[index].Value * 100 / goal->Variable[index].Max;
+			return goal->GetModifiedVariable(index, VariableValue) * 100 / goal->GetModifiedVariable(index, VariableMax);
+			//Wyrmgus end
 		}
 		return 0;
 	} else if (s[0] == 'b' || s[0] == 'g') { //unit bool flag detected

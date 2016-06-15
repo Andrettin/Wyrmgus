@@ -1641,11 +1641,20 @@ static int CclGetUnitVariable(lua_State *l)
 		} else {
 			const char *const type = LuaToString(l, 3);
 			if (!strcmp(type, "Value")) {
-				lua_pushnumber(l, unit->Variable[index].Value);
+				//Wyrmgus start
+//				lua_pushnumber(l, unit->Variable[index].Value);
+				lua_pushnumber(l, unit->GetModifiedVariable(index, VariableValue));
+				//Wyrmgus end
 			} else if (!strcmp(type, "Max")) {
-				lua_pushnumber(l, unit->Variable[index].Max);
+				//Wyrmgus start
+//				lua_pushnumber(l, unit->Variable[index].Max);
+				lua_pushnumber(l, unit->GetModifiedVariable(index, VariableMax));
+				//Wyrmgus end
 			} else if (!strcmp(type, "Increase")) {
-				lua_pushnumber(l, unit->Variable[index].Increase);
+				//Wyrmgus start
+//				lua_pushnumber(l, unit->Variable[index].Increase);
+				lua_pushnumber(l, unit->GetModifiedVariable(index, VariableIncrease));
+				//Wyrmgus end
 			} else if (!strcmp(type, "Enable")) {
 				lua_pushnumber(l, unit->Variable[index].Enable);
 			} else {
@@ -1826,11 +1835,17 @@ static int CclSetUnitVariable(lua_State *l)
 				LuaError(l, "Bad variable type '%s'\n" _C_ type);
 			}
 		} else if (nargs == 3) {
-			unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
+			//Wyrmgus start
+//			unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
+			unit->Variable[index].Value = std::min(unit->GetModifiedVariable(index, VariableMax), value);
+			//Wyrmgus end
 		} else {
 			const char *const type = LuaToString(l, 4);
 			if (!strcmp(type, "Value")) {
-				unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
+				//Wyrmgus start
+//				unit->Variable[index].Value = std::min(unit->Variable[index].Max, value);
+				unit->Variable[index].Value = std::min(unit->GetModifiedVariable(index, VariableMax), value);
+				//Wyrmgus end
 			} else if (!strcmp(type, "Max")) {
 				unit->Variable[index].Max = value;
 			} else if (!strcmp(type, "Increase")) {

@@ -152,7 +152,10 @@
 		unit->Variable[i].Value += this->Var[i].AddValue;
 		unit->Variable[i].Value += this->Var[i].IncreaseTime * unit->Variable[i].Increase;
 
-		clamp(&unit->Variable[i].Value, 0, unit->Variable[i].Max);
+		//Wyrmgus start
+//		clamp(&unit->Variable[i].Value, 0, unit->Variable[i].Max);
+		clamp(&unit->Variable[i].Value, 0, unit->GetModifiedVariable(i, VariableMax));
+		//Wyrmgus end
 		
 		//Wyrmgus start
 		if (i == ATTACKRANGE_INDEX && unit->Container) {

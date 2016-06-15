@@ -88,7 +88,11 @@
 		diffHP = target->Variable[HP_INDEX].Value;
 	}
 	if (mana > 0) {
-		diffMana = target->Stats->Variables[MANA_INDEX].Max - target->Variable[MANA_INDEX].Value;
+		//Wyrmgus start
+		
+//		diffMana = target->Stats->Variables[MANA_INDEX].Max - target->Variable[MANA_INDEX].Value;
+		diffMana = target->GetModifiedVariable(MANA_INDEX, VariableMax) - target->GetModifiedVariable(MANA_INDEX, VariableValue);
+		//Wyrmgus end
 	} else {
 		diffMana = target->Variable[MANA_INDEX].Value;
 	}
@@ -135,7 +139,10 @@
 		target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
 	}
 	target->Variable[MANA_INDEX].Value += castcount * mana;
-	clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
+	//Wyrmgus start
+//	clamp(&target->Variable[MANA_INDEX].Value, 0, target->Variable[MANA_INDEX].Max);
+	clamp(&target->Variable[MANA_INDEX].Value, 0, target->GetModifiedVariable(MANA_INDEX, VariableMax));
+	//Wyrmgus end
 	target->Variable[SHIELD_INDEX].Value += castcount * shield;
 	clamp(&target->Variable[SHIELD_INDEX].Value, 0, target->Variable[SHIELD_INDEX].Max);
 

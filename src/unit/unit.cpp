@@ -3937,13 +3937,24 @@ int CUnit::GetAvailableLevelUpUpgrades(bool only_units) const
 	return value;
 }
 
-int CUnit::GetModifiedVariable(int index) const
+int CUnit::GetModifiedVariable(int index, int variable_type) const
 {
-	int value = Variable[index].Value;
+	int value = 0;
+	if (variable_type == VariableValue) {
+		value = this->Variable[index].Value;
+	} else if (variable_type == VariableMax) {
+		value = this->Variable[index].Max;
+	} else if (variable_type == VariableIncrease) {
+		value = this->Variable[index].Increase;
+	}
+	
+	if (index == MANA_INDEX && variable_type == VariableMax) {
+		value += this->Variable[KNOWLEDGEMAGIC_INDEX].Value / 5; // +1 max mana for every 5 levels in Knowledge (Magic)
+	}
 	
 	if (index == ATTACKRANGE_INDEX) {
-		if (Container) {
-			value += Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
+		if (this->Container) {
+			value += this->Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
 		}
 		std::min<int>(this->CurrentSightRange, value); // if the unit's current sight range is smaller than its attack range, use it instead
 	}
@@ -4815,8 +4826,14 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 	if (target.Variable[var].Value > target.Variable[var].Max) {
 		if (missile.Type->ChangeMax) {
 			target.Variable[var].Max = target.Variable[var].Value;
-		} else {
-			target.Variable[var].Value = target.Variable[var].Max;
+		//Wyrmgus start
+//		} else {
+		} else if (target.Variable[var].Value > target.GetModifiedVariable(var, VariableMax)) {
+		//Wyrmgus end
+			//Wyrmgus start
+//			target.Variable[var].Value = target.Variable[var].Max;
+			target.Variable[var].Value = target.GetModifiedVariable(var, VariableMax);
+			//Wyrmgus end
 		}
 	}
 	

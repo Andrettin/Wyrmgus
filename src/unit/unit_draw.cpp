@@ -616,7 +616,10 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 		 i < UnitTypeVar.DecoVar.end(); ++i) {
 		const CDecoVar &var = *(*i);
 		const int value = unit.Variable[var.Index].Value;
-		const int max = unit.Variable[var.Index].Max;
+		//Wyrmgus start
+//		const int max = unit.Variable[var.Index].Max;
+		const int max = unit.GetModifiedVariable(var.Index, VariableMax);
+		//Wyrmgus end
 		Assert(value <= max);
 
 		if (!((value == 0 && !var.ShowWhenNull) || (value == max && !var.ShowWhenMax)
