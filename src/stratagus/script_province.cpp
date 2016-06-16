@@ -98,6 +98,45 @@ static int CclDefineWorldMapTerrainType(lua_State *l)
 }
 
 /**
+**  Define a plane.
+**
+**  @param l  Lua state.
+*/
+static int CclDefinePlane(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string plane_name = LuaToString(l, 1);
+	CPlane *plane = GetPlane(plane_name);
+	if (!plane) {
+		plane = new CPlane;
+		plane->Name = plane_name;
+		plane->ID = Planes.size();
+		Planes.push_back(plane);
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Description")) {
+			plane->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			plane->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			plane->Quote = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a world.
 **
 **  @param l  Lua state.
@@ -126,6 +165,14 @@ static int CclDefineWorld(lua_State *l)
 			world->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			world->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			world->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Plane")) {
+			CPlane *plane = GetPlane(LuaToString(l, -1));
+			if (!plane) {
+				LuaError(l, "Plane doesn't exist.");
+			}
+			world->Plane = plane;
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -829,6 +876,42 @@ static int CclDefineWorldMapTile(lua_State *l)
 }
 
 /**
+**  Get plane data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetPlaneData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string plane_name = LuaToString(l, 1);
+	CPlane *plane = GetPlane(plane_name);
+	if (!plane) {
+		LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_name.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, plane->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, plane->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, plane->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, plane->Quote.c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
 **  Get world data.
 **
 **  @param l  Lua state.
@@ -853,6 +936,16 @@ static int CclGetWorldData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, world->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, world->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "Plane")) {
+		if (world->Plane) {
+			lua_pushstring(l, world->Plane->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Provinces")) {
 		lua_createtable(l, world->Provinces.size(), 0);
@@ -933,6 +1026,17 @@ static int CclGetProvinceData(lua_State *l)
 	return 0;
 }
 
+static int CclGetPlanes(lua_State *l)
+{
+	lua_createtable(l, Planes.size(), 0);
+	for (size_t i = 1; i <= Planes.size(); ++i)
+	{
+		lua_pushstring(l, Planes[i-1]->Name.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
 static int CclGetWorlds(lua_State *l)
 {
 	lua_createtable(l, Worlds.size(), 0);
@@ -963,12 +1067,15 @@ static int CclGetProvinces(lua_State *l)
 void ProvinceCclRegister()
 {
 	lua_register(Lua, "DefineWorldMapTerrainType", CclDefineWorldMapTerrainType);
+	lua_register(Lua, "DefinePlane", CclDefinePlane);
 	lua_register(Lua, "DefineWorld", CclDefineWorld);
 	lua_register(Lua, "DefineRegion", CclDefineRegion);
 	lua_register(Lua, "DefineProvince", CclDefineProvince);
 	lua_register(Lua, "DefineWorldMapTile", CclDefineWorldMapTile);
+	lua_register(Lua, "GetPlaneData", CclGetPlaneData);
 	lua_register(Lua, "GetWorldData", CclGetWorldData);
 	lua_register(Lua, "GetProvinceData", CclGetProvinceData);
+	lua_register(Lua, "GetPlanes", CclGetPlanes);
 	lua_register(Lua, "GetWorlds", CclGetWorlds);
 	lua_register(Lua, "GetProvinces", CclGetProvinces);
 }

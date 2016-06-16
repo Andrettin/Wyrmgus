@@ -46,6 +46,7 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+std::vector<CPlane *> Planes;
 std::vector<CWorld *> Worlds;
 std::vector<CRegion *> Regions;
 std::vector<CProvince *> Provinces;
@@ -63,6 +64,10 @@ void CleanWorlds()
 	}
 	WorldMapTerrainTypes.clear();
 	
+	for (size_t i = 0; i < Planes.size(); ++i) {
+		delete Planes[i];
+	}
+	
 	for (size_t i = 0; i < Worlds.size(); ++i) {
 		for (std::map<std::pair<int,int>, WorldMapTile *>::iterator iterator = Worlds[i]->Tiles.begin(); iterator != Worlds[i]->Tiles.end(); ++iterator) {
 			delete iterator->second;
@@ -75,11 +80,20 @@ void CleanWorlds()
 		
 		delete Worlds[i];
 	}
-	Worlds.clear();
 	
 	for (size_t j = 0; j < Regions.size(); ++j) {
 		delete Regions[j];
 	}
+}
+
+CPlane *GetPlane(std::string plane_name)
+{
+	for (size_t i = 0; i < Planes.size(); ++i) {
+		if (plane_name == Planes[i]->Name) {
+			return Planes[i];
+		}
+	}
+	return NULL;
 }
 
 CWorld *GetWorld(std::string world_name)

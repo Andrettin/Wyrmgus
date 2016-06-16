@@ -1805,6 +1805,8 @@ static int CclDefineDeity(lua_State *l)
 			deity->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Portfolio")) {
 			deity->Portfolio = LuaToString(l, -1);
+		} else if (!strcmp(value, "Pantheon")) {
+			deity->Pantheon = LuaToString(l, -1);
 		} else if (!strcmp(value, "Upgrade")) {
 			deity->UpgradeIdent = LuaToString(l, -1);
 		} else if (!strcmp(value, "Gender")) {
@@ -1817,6 +1819,12 @@ static int CclDefineDeity(lua_State *l)
 			deity->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			deity->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "HomePlane")) {
+			CPlane *plane = GetPlane(LuaToString(l, -1));
+			if (!plane) {
+				LuaError(l, "Plane doesn't exist.");
+			}
+			deity->HomePlane = plane;
 		} else if (!strcmp(value, "Civilizations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -2985,6 +2993,9 @@ static int CclGetDeityData(lua_State *l)
 	} else if (!strcmp(data, "Portfolio")) {
 		lua_pushstring(l, deity->Portfolio.c_str());
 		return 1;
+	} else if (!strcmp(data, "Pantheon")) {
+		lua_pushstring(l, deity->Pantheon.c_str());
+		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, deity->Description.c_str());
 		return 1;
@@ -2993,6 +3004,16 @@ static int CclGetDeityData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
 		lua_pushstring(l, deity->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "Major")) {
+		lua_pushboolean(l, deity->Major);
+		return 1;
+	} else if (!strcmp(data, "HomePlane")) {
+		if (deity->HomePlane) {
+			lua_pushstring(l, deity->HomePlane->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Civilizations")) {
 		lua_createtable(l, deity->Civilizations.size(), 0);

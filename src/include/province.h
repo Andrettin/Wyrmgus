@@ -81,18 +81,35 @@ public:
 	int Variations;					/// quantity of variations
 };
 
-class CWorld
+class CPlane
 {
 public:
-	CWorld() :
+	CPlane() :
 		ID(-1)
 	{
 	}
 	
+	int ID;																/// ID of this plane
 	std::string Name;
 	std::string Description;
 	std::string Background;
+	std::string Quote;
+};
+
+class CWorld
+{
+public:
+	CWorld() :
+		ID(-1), Plane(NULL)
+	{
+	}
+	
 	int ID;																/// ID of this world
+	std::string Name;
+	std::string Description;
+	std::string Background;
+	std::string Quote;
+	CPlane *Plane;
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::map<std::pair<int,int>, WorldMapTile *> Tiles;					/// Tiles in the world
 };
@@ -167,6 +184,7 @@ public:
 -- Variables
 ----------------------------------------------------------------------------*/
 
+extern std::vector<CPlane *> Planes;
 extern std::vector<CWorld *> Worlds;
 extern std::vector<CRegion *> Regions;
 extern std::vector<CProvince *> Provinces;
@@ -178,6 +196,7 @@ extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 ----------------------------------------------------------------------------*/
 
 extern void CleanWorlds();
+extern CPlane *GetPlane(std::string plane_name);
 extern CWorld *GetWorld(std::string world_name);
 extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);

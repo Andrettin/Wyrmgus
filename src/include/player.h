@@ -63,6 +63,7 @@ class CGraphic;
 //Wyrmgus start
 class CCharacter;
 class CProvince;
+class CPlane;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -461,8 +462,7 @@ class CDeity
 {
 public:
 	CDeity() :
-		Gender(0),
-		Major(false)
+		Gender(0), Major(false), HomePlane(NULL)
 	{
 	}
 	
@@ -472,9 +472,11 @@ public:
 	std::string Name;			/// Name of the deity
 	std::string UpgradeIdent;	/// Ident of the upgrade applied by the deity
 	std::string Portfolio;		/// Portfolio of the deity
+	std::string Pantheon;		/// Pantheon to which the deity belongs
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	CPlane *HomePlane;			/// The home plane of the deity
 	std::vector<int> Civilizations;	/// Civilizations which may worship the deity
 	std::vector<std::string> Feasts;
 	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
