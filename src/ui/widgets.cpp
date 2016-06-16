@@ -999,7 +999,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			#endif
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, ((frameImage->getWidth() - img->getWidth()) / 2) + 1, ((frameImage->getHeight() - img->getHeight()) / 2) + 1,
-								img->getWidth() - 1, img->getHeight() - 1, WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex, unsigned int(Transparency));
+								img->getWidth() - 1, img->getHeight() - 1, WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex, Transparency);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
@@ -1021,7 +1021,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 			#endif
 			}
 			graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, (frameImage->getWidth() - img->getWidth()) / 2, (frameImage->getHeight() - img->getHeight()) / 2,
-								img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex, unsigned int(Transparency));
+								img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex, Transparency);
 			if (Transparency) {
 			#if defined(USE_OPENGL) || defined(USE_GLES)
 				if (UseOpenGL) {
@@ -1040,7 +1040,7 @@ void PlayerColorImageButton::draw(gcn::Graphics *graphics)
 		#endif
 		}
 		graphics->drawImage(img, ImageOrigin.x, ImageOrigin.y, 0, 0,
-							img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex, unsigned int(Transparency));
+							img->getWidth(), img->getHeight(), WidgetPlayerColorIndexFromName, SkinColorIndex, HairColorIndex, Transparency);
 		if (Transparency) {
 		#if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {
