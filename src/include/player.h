@@ -623,6 +623,7 @@ public:
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
 	std::string Adjective[MAX_RACES]; /// adjective pertaining to the civilization
+	std::string Description[MAX_RACES]; /// description pertaining to the civilization
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
@@ -633,6 +634,8 @@ public:
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<CDeity *> Deities[MAX_RACES];							/// deities
+	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
+	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
 	int CivilizationLanguage[MAX_RACES];
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages

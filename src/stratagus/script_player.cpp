@@ -653,6 +653,8 @@ static int CclDefineCivilization(lua_State *l)
 			PlayerRaces.Display[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "Adjective")) {
 			PlayerRaces.Adjective[civilization] = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			PlayerRaces.Description[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
 			PlayerRaces.Visible[civilization] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
@@ -673,6 +675,21 @@ static int CclDefineCivilization(lua_State *l)
 			PlayerRaces.DefaultColor[civilization] = LuaToString(l, -1);
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
 			PlayerRaces.CivilizationUpgrades[civilization] = LuaToString(l, -1);
+		} else if (!strcmp(value, "DevelopsFrom")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string originary_civilization_name = LuaToString(l, -1, j + 1);
+				int originary_civilization = PlayerRaces.GetRaceIndexByName(originary_civilization_name.c_str());
+				if (originary_civilization == -1) {
+					LuaError(l, "Civilization \"%s\" doesn't exist." _C_ originary_civilization_name.c_str());
+				}
+				PlayerRaces.DevelopsFrom[civilization].push_back(originary_civilization);
+				PlayerRaces.DevelopsTo[originary_civilization].push_back(civilization);
+			}
 		} else if (!strcmp(value, "ButtonIcons")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1282,6 +1299,9 @@ static int CclGetCivilizationData(lua_State *l)
 			lua_pushstring(l, PlayerRaces.Display[civilization].c_str());
 		}
 		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, PlayerRaces.Description[civilization].c_str());
+		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization]);
 		return 1;
@@ -1309,6 +1329,22 @@ static int CclGetCivilizationData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "CivilizationUpgrade")) {
 		lua_pushstring(l, PlayerRaces.CivilizationUpgrades[civilization].c_str());
+		return 1;
+	} else if (!strcmp(data, "DevelopsFrom")) {
+		lua_createtable(l, PlayerRaces.DevelopsFrom[civilization].size(), 0);
+		for (size_t i = 1; i <= PlayerRaces.DevelopsFrom[civilization].size(); ++i)
+		{
+			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsFrom[civilization][i-1]].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "DevelopsTo")) {
+		lua_createtable(l, PlayerRaces.DevelopsTo[civilization].size(), 0);
+		for (size_t i = 1; i <= PlayerRaces.DevelopsTo[civilization].size(); ++i)
+		{
+			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsTo[civilization][i-1]].c_str());
+			lua_rawseti(l, -2, i);
+		}
 		return 1;
 	} else if (!strcmp(data, "Factions")) {
 		bool is_mod = false;

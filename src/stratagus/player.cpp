@@ -388,6 +388,7 @@ void PlayerRace::Clean()
 		this->Visible[i] = false;
 		//Wyrmgus start
 		this->Adjective[i].clear();
+		this->Description[i].clear();
 		this->CivilizationUpgrades[i].clear();
 		this->CivilizationClassUnitTypes[i].clear();
 		this->CivilizationClassUpgrades[i].clear();
@@ -405,6 +406,8 @@ void PlayerRace::Clean()
 			delete this->Deities[i][j];
 		}
 		this->Deities[i].clear();
+		this->DevelopsFrom[i].clear();
+		this->DevelopsTo[i].clear();
 		this->CivilizationUIFillers[i].clear();
 		//Wyrmgus end
 	}
