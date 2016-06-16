@@ -165,7 +165,7 @@ namespace gcn
 		int old_alpha;
 		
 		if (transparency) {
-			unsigned int alpha = unsigned int(256 - 2.56 * transparency);
+			unsigned int alpha = 256 - 2.56 * transparency;
 			SDL_LockSurface(srcImage);
 			old_alpha = srcImage->format->alpha;
 			SDL_SetAlpha(srcImage, SDL_SRCALPHA, alpha);
