@@ -629,7 +629,7 @@ void CUnit::IncreaseLevel(int level_quantity)
 				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
 			}
 		}
-		this->Variable[HP_INDEX].Value = this->Variable[HP_INDEX].Max;
+		this->Variable[HP_INDEX].Value = this->GetModifiedVariable(HP_INDEX, VariableMax);
 		level_quantity -= 1;
 	}
 	
@@ -746,7 +746,7 @@ void CUnit::HealingItemAutoUse()
 		}
 		
 		if (uins->Variable[HITPOINTHEALING_INDEX].Value > 0) {
-			if (uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->Variable[HP_INDEX].Max - this->Variable[HP_INDEX].Value)) {
+			if (uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableMax) - this->Variable[HP_INDEX].Value)) {
 				CommandUse(*this, *uins, FlushCommands);
 				break;
 			}
@@ -3967,11 +3967,11 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 		value = this->Variable[index].Increase;
 	}
 	
-	if (index == MANA_INDEX && variable_type == VariableMax) {
+	if (index == HP_INDEX && variable_type == VariableMax) {
+		value += this->Variable[KNOWLEDGEWARFARE_INDEX].Value / 5; // +1 max HP for every 5 levels in Knowledge (Warfare)
+	} else if (index == MANA_INDEX && variable_type == VariableMax) {
 		value += this->Variable[KNOWLEDGEMAGIC_INDEX].Value / 5; // +1 max mana for every 5 levels in Knowledge (Magic)
-	}
-	
-	if (index == ATTACKRANGE_INDEX) {
+	} else if (index == ATTACKRANGE_INDEX) {
 		if (this->Container) {
 			value += this->Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
 		}
@@ -4258,7 +4258,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 		}
 	}
 	
-	if (item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->Variable[HP_INDEX].Max) {
+	if (item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableMax)) {
 		return false;
 	}
 	
@@ -4600,7 +4600,10 @@ int ThreatCalculate(const CUnit &unit, const CUnit &dest)
 	// Priority 0-255
 	cost -= dest.Variable[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
 	// Remaining HP (Health) 0-65535
-	cost += dest.Variable[HP_INDEX].Value * 100 / dest.Variable[HP_INDEX].Max * HEALTH_FACTOR;
+	//Wyrmgus start
+//	cost += dest.Variable[HP_INDEX].Value * 100 / dest.Variable[HP_INDEX].Max * HEALTH_FACTOR;
+	cost += dest.Variable[HP_INDEX].Value * 100 / dest.GetModifiedVariable(HP_INDEX, VariableMax) * HEALTH_FACTOR;
+	//Wyrmgus end
 
 	const int d = unit.MapDistanceTo(dest);
 
@@ -4874,7 +4877,10 @@ static void HitUnit_ChangeVariable(CUnit &target, const Missile &missile)
 
 static void HitUnit_Burning(CUnit &target)
 {
-	const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
+	//Wyrmgus start
+//	const int f = (100 * target.Variable[HP_INDEX].Value) / target.Variable[HP_INDEX].Max;
+	const int f = (100 * target.Variable[HP_INDEX].Value) / target.GetModifiedVariable(HP_INDEX, VariableMax);
+	//Wyrmgus end
 	MissileType *fire = MissileBurningBuilding(f);
 
 	if (fire) {

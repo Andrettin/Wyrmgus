@@ -70,7 +70,10 @@ void MissileDeathCoil::Action()
 		HitUnit(&source, *this->TargetUnit, this->Damage);
 		if (source.CurrentAction() != UnitActionDie) {
 			source.Variable[HP_INDEX].Value += this->Damage;
-			source.Variable[HP_INDEX].Value = std::min(source.Variable[HP_INDEX].Max, source.Variable[HP_INDEX].Value);
+			//Wyrmgus start
+//			source.Variable[HP_INDEX].Value = std::min(source.Variable[HP_INDEX].Max, source.Variable[HP_INDEX].Value);
+			source.Variable[HP_INDEX].Value = std::min(source.GetModifiedVariable(HP_INDEX, VariableMax), source.Variable[HP_INDEX].Value);
+			//Wyrmgus end
 		}
 	}
 	this->TTL = 0;

@@ -224,7 +224,10 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 		}
 		return false;
 	}
-	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
+	//Wyrmgus start
+//	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
+	if (goal.Variable[HP_INDEX].Value >= goal.GetModifiedVariable(HP_INDEX, VariableMax)) {
+	//Wyrmgus end
 		return true;
 	}
 
@@ -235,8 +238,14 @@ bool COrder_Repair::RepairUnit(const CUnit &unit, CUnit &goal)
 	}
 
 	goal.Variable[HP_INDEX].Value += goal.Type->RepairHP;
-	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
-		goal.Variable[HP_INDEX].Value = goal.Variable[HP_INDEX].Max;
+	//Wyrmgus start
+//	if (goal.Variable[HP_INDEX].Value >= goal.Variable[HP_INDEX].Max) {
+	if (goal.Variable[HP_INDEX].Value >= goal.GetModifiedVariable(HP_INDEX, VariableMax)) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		goal.Variable[HP_INDEX].Value = goal.Variable[HP_INDEX].Max;
+		goal.Variable[HP_INDEX].Value = goal.GetModifiedVariable(HP_INDEX, VariableMax);
+		//Wyrmgus end
 		return true;
 	}
 	return false;
@@ -286,7 +295,10 @@ static void AnimateActionRepair(CUnit &unit)
 
 				// Have reached target? FIXME: could use return value
 				if (goal && unit.MapDistanceTo(*goal) <= unit.Type->RepairRange
-					&& goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
+					//Wyrmgus start
+//					&& goal->Variable[HP_INDEX].Value < goal->Variable[HP_INDEX].Max) {
+					&& goal->Variable[HP_INDEX].Value < goal->GetModifiedVariable(HP_INDEX, VariableMax)) {
+					//Wyrmgus end
 					this->State = 2;
 					this->RepairCycle = 0;
 					//Wyrmgus start
@@ -350,7 +362,10 @@ static void AnimateActionRepair(CUnit &unit)
 				}
 			}
 			// Target is fine, choose new one.
-			if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
+			//Wyrmgus start
+//			if (!goal || goal->Variable[HP_INDEX].Value >= goal->Variable[HP_INDEX].Max) {
+			if (!goal || goal->Variable[HP_INDEX].Value >= goal->GetModifiedVariable(HP_INDEX, VariableMax)) {
+			//Wyrmgus end
 				this->Finished = true;
 				return ;
 			}

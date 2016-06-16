@@ -83,7 +83,10 @@
 
 	//  Healing and harming
 	if (hp > 0) {
-		diffHP = target->Variable[HP_INDEX].Max - target->Variable[HP_INDEX].Value;
+		//Wyrmgus start
+//		diffHP = target->Variable[HP_INDEX].Max - target->Variable[HP_INDEX].Value;
+		diffHP = target->GetModifiedVariable(HP_INDEX, VariableMax) - target->Variable[HP_INDEX].Value;
+		//Wyrmgus end
 	} else {
 		diffHP = target->Variable[HP_INDEX].Value;
 	}
@@ -136,7 +139,10 @@
 		}
 	} else {
 		target->Variable[HP_INDEX].Value += castcount * hp;
-		target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
+		//Wyrmgus start
+//		target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
+		target->Variable[HP_INDEX].Value = std::min(target->GetModifiedVariable(HP_INDEX, VariableMax), target->Variable[HP_INDEX].Value);
+		//Wyrmgus end
 	}
 	target->Variable[MANA_INDEX].Value += castcount * mana;
 	//Wyrmgus start

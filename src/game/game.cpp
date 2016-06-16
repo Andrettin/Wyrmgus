@@ -1076,7 +1076,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				if (unit.Suffix != NULL) {
 					f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit.Suffix->Ident.c_str());
 				}
-				if (unit.Variable[HP_INDEX].Value != unit.Variable[HP_INDEX].Max) {
+				if (unit.Variable[HP_INDEX].Value != unit.GetModifiedVariable(HP_INDEX, VariableMax)) {
 					f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit.Variable[HP_INDEX].Value);
 				}
 				if (unit.Type->BoolFlag[TELEPORTER_INDEX].value && unit.Goal) {

@@ -372,14 +372,14 @@ static void HandleBuffsEachCycle(CUnit &unit)
 			}
 		}
 		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) { // regeneration aura
-			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) {
+			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)) {
 				unit.ApplyAuraEffect(REGENERATIONAURA_INDEX);
 			}
 			
 			std::vector<CUnit *> table;
 			SelectAroundUnit(unit, aura_range, table, MakeAndPredicate(MakeOrPredicate(HasSamePlayerAs(*unit.Player), IsAlliedWith(*unit.Player)), IsOrganicType()), true);
 			for (size_t i = 0; i != table.size(); ++i) {
-				if (table[i]->Variable[HP_INDEX].Value < table[i]->Variable[HP_INDEX].Max) {
+				if (table[i]->Variable[HP_INDEX].Value < table[i]->GetModifiedVariable(HP_INDEX, VariableMax)) {
 					table[i]->ApplyAuraEffect(REGENERATIONAURA_INDEX);
 				}
 			}
@@ -406,7 +406,10 @@ static bool HandleBurnAndPoison(CUnit &unit)
 		return false;
 	}
 	// Burn & poison
-	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+	//Wyrmgus start
+//	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+	const int hpPercent = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableMax);
+	//Wyrmgus end
 	if (hpPercent <= unit.Type->BurnPercent && unit.Type->BurnDamageRate) {
 		//Wyrmgus start
 //		HitUnit(NoUnitP, unit, unit.Type->BurnDamageRate);

@@ -413,7 +413,7 @@ static bool PickUpItem(CUnit &unit)
 		return false;
 	}
 	
-	if (unit.Variable[HP_INDEX].Value == unit.Variable[HP_INDEX].Max && !unit.HasInventory()) { //only look for items to pick up if the unit is damaged or has an inventory
+	if (unit.Variable[HP_INDEX].Value == unit.GetModifiedVariable(HP_INDEX, VariableMax) && !unit.HasInventory()) { //only look for items to pick up if the unit is damaged or has an inventory
 		return false;
 	}
 
@@ -424,7 +424,7 @@ static bool PickUpItem(CUnit &unit)
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.GetReactionRange())) {
 			if (CanPickUp(unit, *table[i])) {
-				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.Variable[HP_INDEX].Max - unit.Variable[HP_INDEX].Value) >= table[i]->Variable[HITPOINTHEALING_INDEX].Value) {
+				if (table[i]->Variable[HITPOINTHEALING_INDEX].Value > 0 && (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value) >= table[i]->Variable[HITPOINTHEALING_INDEX].Value) {
 					CommandPickUp(unit, *table[i], FlushCommands);
 					return true;
 				}
@@ -462,7 +462,10 @@ public:
 	{
 		return (unit->IsTeamed(*worker)
 				&& unit->Type->RepairHP
-				&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
+				//Wyrmgus start
+//				&& unit->Variable[HP_INDEX].Value < unit->Variable[HP_INDEX].Max
+				&& unit->Variable[HP_INDEX].Value < unit->GetModifiedVariable(HP_INDEX, VariableMax)
+				//Wyrmgus end
 				&& unit->IsVisibleAsGoal(*worker->Player));
 	}
 private:

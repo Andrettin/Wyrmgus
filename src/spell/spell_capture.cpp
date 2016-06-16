@@ -81,7 +81,10 @@
 
 	if (this->DamagePercent) {
 		if ((100 * target->Variable[HP_INDEX].Value) /
-			target->Variable[HP_INDEX].Max > this->DamagePercent &&
+			//Wyrmgus start
+//			target->Variable[HP_INDEX].Max > this->DamagePercent &&
+			target->GetModifiedVariable(HP_INDEX, VariableMax) > this->DamagePercent &&
+			//Wyrmgus end
 			target->Variable[HP_INDEX].Value > this->Damage) {
 			HitUnit(&caster, *target, this->Damage);
 			if (this->SacrificeEnable) {

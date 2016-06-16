@@ -224,13 +224,13 @@ enum {
 					unit.Player->ChangeResource(goal->Type->GivesResource, (goal->ResourcesHeld, true));
 					unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
-					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.Variable[HP_INDEX].Max - unit.Variable[HP_INDEX].Value));
+					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
 					if (unit.Player == ThisPlayer) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, _("%s healed for %d HP"), unit.GetMessageName().c_str(), hp_healed);
 					}
 					unit.Variable[HP_INDEX].Value += hp_healed;
 					
-					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max) { //if unit is still damaged, see if there are further healing items for it to use
+					if (unit.HasInventory() && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)) { //if unit is still damaged, see if there are further healing items for it to use
 						unit.HealingItemAutoUse();
 					}
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value < 0 && unit.Type->UnitType != UnitTypeFly && unit.Type->UnitType != UnitTypeFlyLow) {

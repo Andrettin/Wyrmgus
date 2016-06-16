@@ -806,7 +806,10 @@ private:
 		cost -= dest->Variable[PRIORITY_INDEX].Value * PRIORITY_FACTOR;
 		//Wyrmgus end
 		// Remaining HP (Health) 0-65535
-		cost += dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max * HEALTH_FACTOR;
+		//Wyrmgus start
+//		cost += dest->Variable[HP_INDEX].Value * 100 / dest->Variable[HP_INDEX].Max * HEALTH_FACTOR;
+		cost += dest->Variable[HP_INDEX].Value * 100 / dest->GetModifiedVariable(HP_INDEX, VariableMax) * HEALTH_FACTOR;
+		//Wyrmgus end
 
 		if (d <= attackrange && d >= type.MinAttackRange) {
 			cost += d * INRANGE_FACTOR;

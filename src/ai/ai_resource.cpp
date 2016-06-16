@@ -1553,8 +1553,9 @@ static void AiCheckRepair()
 			&& (unit.CurrentAction() != UnitActionBuilt || unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value)
 			//Wyrmgus end
 			&& unit.CurrentAction() != UnitActionUpgradeTo
-			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
 			//Wyrmgus start
+//			&& unit.Variable[HP_INDEX].Value < unit.Variable[HP_INDEX].Max
+			&& unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)
 //			&& unit.Attacked + 5 * CYCLES_PER_SECOND < GameCycle) {
 			) {
 			//Wyrmgus end

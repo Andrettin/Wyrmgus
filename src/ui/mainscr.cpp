@@ -200,8 +200,9 @@ static void UiDrawLifeBar(const CUnit &unit, int x, int y)
 		Uint32 color;
 		//Wyrmgus start
 		Uint32 lighter_color;
+//		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
+		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.GetModifiedVariable(HP_INDEX, VariableMax);
 		//Wyrmgus end
-		int f = (100 * unit.Variable[HP_INDEX].Value) / unit.Variable[HP_INDEX].Max;
 
 		if (f > 75) {
 			color = ColorDarkGreen;

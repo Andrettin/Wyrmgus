@@ -90,7 +90,10 @@
 			HitUnit(&caster, *target, -hp);
 		} else {
 			target->Variable[HP_INDEX].Value += hp;
-			target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
+			//Wyrmgus start
+//			target->Variable[HP_INDEX].Value = std::min(target->Variable[HP_INDEX].Max, target->Variable[HP_INDEX].Value);
+			target->Variable[HP_INDEX].Value = std::min(target->GetModifiedVariable(HP_INDEX, VariableMax), target->Variable[HP_INDEX].Value);
+			//Wyrmgus end
 		}
 		target->Variable[MANA_INDEX].Value += mana;
 		//Wyrmgus start
