@@ -461,22 +461,23 @@ class CDeity
 {
 public:
 	CDeity() :
-		Civilization(-1), Gender(0),
+		Gender(0),
 		Major(false)
 	{
 	}
 	
-	int Civilization;	/// Culture to which the deity belongs
-	int Gender;			/// Deity's gender
-	bool Major;			/// Whether the deity is a major one or not
-	std::string Name;	/// Name of the deity
+	int Gender;					/// Deity's gender
+	bool Major;					/// Whether the deity is a major one or not
+	std::string Ident;			/// Ident of the deity
+	std::string Name;			/// Name of the deity
 	std::string UpgradeIdent;	/// Ident of the upgrade applied by the deity
-	std::string Portfolio; ///Portfolio of the deity
-	std::string ParentDeity;	/// Parent deity of this deity (deity on which it is based on); example: Wodanaz (Germanic) is the parent deity of Odin (Norse) and Woden (teuton)
+	std::string Portfolio;		/// Portfolio of the deity
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	std::vector<int> Civilizations;	/// Civilizations which may worship the deity
 	std::vector<std::string> Feasts;
+	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };
 
 class LanguageWord
@@ -604,7 +605,7 @@ public:
 	int GetRaceIndexByName(const char *raceName) const;
 	//Wyrmgus start
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
-	int GetDeityIndexByName(const int civilization, std::string deity_name) const;
+	int GetDeityIndexByIdent(std::string deity_name) const;
 	int GetLanguageIndexByIdent(std::string language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
@@ -633,12 +634,12 @@ public:
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
-	std::vector<CDeity *> Deities[MAX_RACES];							/// deities
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops
 	int CivilizationLanguage[MAX_RACES];
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
+	std::vector<CDeity *> Deities;										/// deities
 	//Wyrmgus end
 	unsigned int Count;             /// number of races
 };

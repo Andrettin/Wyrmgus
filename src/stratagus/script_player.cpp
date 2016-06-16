@@ -1785,36 +1785,26 @@ static int CclDefineDeity(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string deity_name = LuaToString(l, 1);
+	std::string deity_ident = LuaToString(l, 1);
 	CDeity *deity = NULL;
-	int deity_id = -1;
-	for (int i = 0; i < MAX_RACES; ++i) {
-		deity_id = PlayerRaces.GetDeityIndexByName(i, deity_name);
-		if (deity_id != -1) {
-			deity = const_cast<CDeity *>(&(*PlayerRaces.Deities[i][deity_id]));
-			break;
-		}
-	}
-	if (deity_id == -1) {
+	int deity_id = PlayerRaces.GetDeityIndexByIdent(deity_ident);
+	if (deity_id != -1) {
+		deity = PlayerRaces.Deities[deity_id];
+	} else {
 		deity = new CDeity;
+		PlayerRaces.Deities.push_back(deity);
 	}
 	
-	deity->Name = deity_name;
+	deity->Ident = deity_ident;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Civilization")) {
-			if (deity->Civilization != -1) { //if already has a civilization defined, remove the deity from that civilization
-				PlayerRaces.Deities[deity->Civilization].erase(std::remove(PlayerRaces.Deities[deity->Civilization].begin(), PlayerRaces.Deities[deity->Civilization].end(), deity), PlayerRaces.Deities[deity->Civilization].end());
-			}
-			deity->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
-			PlayerRaces.Deities[deity->Civilization].push_back(deity);
+		if (!strcmp(value, "Name")) {
+			deity->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Portfolio")) {
 			deity->Portfolio = LuaToString(l, -1);
-		} else if (!strcmp(value, "ParentDeity")) {
-			deity->ParentDeity = LuaToString(l, -1);
 		} else if (!strcmp(value, "Upgrade")) {
 			deity->UpgradeIdent = LuaToString(l, -1);
 		} else if (!strcmp(value, "Gender")) {
@@ -1827,6 +1817,19 @@ static int CclDefineDeity(lua_State *l)
 			deity->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			deity->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Civilizations")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+
+				deity->Civilizations.push_back(civilization);
+			}
 		} else if (!strcmp(value, "Feasts")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -1836,6 +1839,21 @@ static int CclDefineDeity(lua_State *l)
 				std::string feast = LuaToString(l, -1, j + 1);
 
 				deity->Feasts.push_back(feast);
+			}
+		} else if (!strcmp(value, "CulturalNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				deity->CulturalNames[civilization] = TransliterateText(cultural_name);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -2931,6 +2949,82 @@ static int CclGetLanguageWordData(lua_State *l)
 
 	return 0;
 }
+
+static int CclGetDeities(lua_State *l)
+{
+	lua_createtable(l, PlayerRaces.Deities.size(), 0);
+	for (size_t i = 1; i <= PlayerRaces.Deities.size(); ++i)
+	{
+		lua_pushstring(l, PlayerRaces.Deities[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+/**
+**  Get deity data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetDeityData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string deity_name = LuaToString(l, 1);
+	int deity_id = PlayerRaces.GetDeityIndexByIdent(deity_name);
+	if (deity_id == -1) {
+		LuaError(l, "Deity \"%s\" doesn't exist." _C_ deity_name.c_str());
+	}
+	const CDeity *deity = PlayerRaces.Deities[deity_id];
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, deity->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Portfolio")) {
+		lua_pushstring(l, deity->Portfolio.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, deity->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, deity->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, deity->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "Civilizations")) {
+		lua_createtable(l, deity->Civilizations.size(), 0);
+		for (size_t i = 1; i <= deity->Civilizations.size(); ++i)
+		{
+			lua_pushstring(l, PlayerRaces.Name[deity->Civilizations[i-1]].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "CulturalName")) {
+		if (lua_gettop(l) < 3) {
+			LuaError(l, "incorrect argument");
+		}
+		
+		int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 3));
+		if (civilization == -1) {
+			LuaError(l, "Civilization doesn't exist.");
+		}
+		
+		if (deity->CulturalNames.find(civilization) != deity->CulturalNames.end()) {
+			lua_pushstring(l, deity->CulturalNames.find(civilization)->second.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
 //Wyrmgus end
 
 // ----------------------------------------------------------------------------
@@ -2993,6 +3087,9 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetLanguages", CclGetLanguages);
 	lua_register(Lua, "GetLanguageData", CclGetLanguageData);
 	lua_register(Lua, "GetLanguageWordData", CclGetLanguageWordData);
+	
+	lua_register(Lua, "GetDeities", CclGetDeities);
+	lua_register(Lua, "GetDeityData", CclGetDeityData);
 	//Wyrmgus end
 }
 

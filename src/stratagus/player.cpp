@@ -381,6 +381,10 @@ void PlayerRace::Clean()
 			this->Languages[i]->NameTranslations.clear();
 		}
 	}
+	for (size_t i = 0; i < this->Deities.size(); ++i) {
+		delete this->Deities[i];
+	}
+	this->Deities.clear();
 	//Wyrmgus end
 	for (unsigned int i = 0; i != this->Count; ++i) {
 		this->Name[i].clear();
@@ -401,11 +405,6 @@ void PlayerRace::Clean()
 			delete this->Factions[i][j];
 		}
 		PlayerRaces.Factions[i].clear();
-		//clear deities
-		for (size_t j = 0; j < this->Deities[i].size(); ++j) {
-			delete this->Deities[i][j];
-		}
-		this->Deities[i].clear();
 		this->DevelopsFrom[i].clear();
 		this->DevelopsTo[i].clear();
 		this->CivilizationUIFillers[i].clear();
@@ -463,10 +462,10 @@ int PlayerRace::GetFactionIndexByName(const int civilization, const std::string 
 	}		
 }
 
-int PlayerRace::GetDeityIndexByName(const int civilization, std::string deity_name) const
+int PlayerRace::GetDeityIndexByIdent(std::string deity_ident) const
 {
-	for (size_t i = 0; i < this->Deities[civilization].size(); ++i) {
-		if (deity_name == this->Deities[civilization][i]->Name) {
+	for (size_t i = 0; i < this->Deities.size(); ++i) {
+		if (deity_ident == this->Deities[i]->Ident) {
 			return i;
 		}
 	}
