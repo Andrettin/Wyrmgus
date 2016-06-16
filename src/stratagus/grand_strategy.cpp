@@ -6896,7 +6896,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 		} else if (i == Northeast) {
 			river_graphics_file += "northeast_inner";
 			rivermouth_graphics_file += "northeast";
-			riverhead_graphics_file += "northeast";
 			trail_graphics_file += "northeast";
 			road_graphics_file += "northeast";
 		} else if (i == East) {
@@ -6908,7 +6907,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 		} else if (i == Southeast) {
 			river_graphics_file += "southeast_inner";
 			rivermouth_graphics_file += "southeast";
-			riverhead_graphics_file += "southeast";
 			trail_graphics_file += "southeast";
 			road_graphics_file += "southeast";
 		} else if (i == South) {
@@ -6920,7 +6918,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 		} else if (i == Southwest) {
 			river_graphics_file += "southwest_inner";
 			rivermouth_graphics_file += "southwest";
-			riverhead_graphics_file += "southwest";
 			trail_graphics_file += "southwest";
 			road_graphics_file += "southwest";
 		} else if (i == West) {
@@ -6932,7 +6929,6 @@ void InitializeGrandStrategyGame(bool show_loading)
 		} else if (i == Northwest) {
 			river_graphics_file += "northwest_inner";
 			rivermouth_graphics_file += "northwest";
-			riverhead_graphics_file += "northwest";
 			trail_graphics_file += "northwest";
 			road_graphics_file += "northwest";
 		}
@@ -6943,7 +6939,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 		}
 		
 		std::string riverhead_flipped_graphics_file;
-		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get flipped riverhead graphics
+		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get riverhead graphics
 			riverhead_flipped_graphics_file = riverhead_graphics_file + "_flipped" + ".png";
 		}
 		
@@ -6973,18 +6969,20 @@ void InitializeGrandStrategyGame(bool show_loading)
 			GrandStrategyGame.RivermouthGraphics[i][1] = CGraphic::Get(rivermouth_flipped_graphics_file);
 		}
 		
-		if (CGraphic::Get(riverhead_graphics_file) == NULL) {
-			CGraphic *riverhead_graphics = CGraphic::New(riverhead_graphics_file, 84, 84);
-			riverhead_graphics->Load();
-		}
-		GrandStrategyGame.RiverheadGraphics[i][0] = CGraphic::Get(riverhead_graphics_file);
-		
-		if (!riverhead_flipped_graphics_file.empty()) {
-			if (CGraphic::Get(riverhead_flipped_graphics_file) == NULL) {
-				CGraphic *riverhead_flipped_graphics = CGraphic::New(riverhead_flipped_graphics_file, 84, 84);
-				riverhead_flipped_graphics->Load();
+		if (i == North || i == East || i == South || i == West) { //only non-diagonal directions get riverhead graphics
+			if (CGraphic::Get(riverhead_graphics_file) == NULL) {
+				CGraphic *riverhead_graphics = CGraphic::New(riverhead_graphics_file, 84, 84);
+				riverhead_graphics->Load();
 			}
-			GrandStrategyGame.RiverheadGraphics[i][1] = CGraphic::Get(riverhead_flipped_graphics_file);
+			GrandStrategyGame.RiverheadGraphics[i][0] = CGraphic::Get(riverhead_graphics_file);
+			
+			if (!riverhead_flipped_graphics_file.empty()) {
+				if (CGraphic::Get(riverhead_flipped_graphics_file) == NULL) {
+					CGraphic *riverhead_flipped_graphics = CGraphic::New(riverhead_flipped_graphics_file, 84, 84);
+					riverhead_flipped_graphics->Load();
+				}
+				GrandStrategyGame.RiverheadGraphics[i][1] = CGraphic::Get(riverhead_flipped_graphics_file);
+			}
 		}
 		
 		if (CGraphic::Get(road_graphics_file) == NULL) { //use road graphics file for trails for now

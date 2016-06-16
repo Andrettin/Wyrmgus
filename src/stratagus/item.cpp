@@ -338,6 +338,7 @@ std::string GetItemEffectsString(std::string item_ident)
 				variable_name = SeparateCapitalizedStringElements(variable_name);
 				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 				variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
+				variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
 				item_effects_string += variable_name;
 			}
 			
@@ -445,6 +446,7 @@ std::string GetUniqueItemEffectsString(std::string item_name)
 				variable_name = SeparateCapitalizedStringElements(variable_name);
 				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 				variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
+				variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
 				item_effects_string += variable_name;
 			}
 			

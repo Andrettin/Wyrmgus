@@ -2364,6 +2364,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 						variable_name = SeparateCapitalizedStringElements(variable_name);
 						variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
 						variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
+						variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
 						upgrade_effects_string += variable_name;
 						
 						bool first_unit_type = true;
