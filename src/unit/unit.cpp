@@ -1529,13 +1529,13 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 	}
 	
 	if (variable == KNOWLEDGEMAGIC_INDEX) {
-		int mana_change = ((this->Variable[variable].Value - change) / 5) - (this->Variable[variable].Value / 5); // +1 max mana for every 5 levels in Knowledge (Magic)
+		int mana_change = (this->Variable[variable].Value / 5) - ((this->Variable[variable].Value - change) / 5); // +1 max mana for every 5 levels in Knowledge (Magic)
 		this->Variable[MANA_INDEX].Max += mana_change;
 		this->Variable[MANA_INDEX].Value += mana_change;
 		
 		this->CheckIdentification();
 	} else if (variable == KNOWLEDGEWARFARE_INDEX) {
-		int hp_change = ((this->Variable[variable].Value - change) / 5) - (this->Variable[variable].Value / 5); // +1 max HP for every 5 levels in Knowledge (Warfare)
+		int hp_change = (this->Variable[variable].Value / 5) - ((this->Variable[variable].Value - change) / 5); // +1 max HP for every 5 levels in Knowledge (Warfare)
 		this->Variable[HP_INDEX].Max += hp_change;
 		this->Variable[HP_INDEX].Value += hp_change;
 	}
