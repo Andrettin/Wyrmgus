@@ -1436,8 +1436,8 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.Container->UpdateContainerAttackRange();
 						} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 							unit.UpdateXPRequired();
-						} else if (j == KNOWLEDGEMAGIC_INDEX) {
-							unit.CheckIdentification();
+						} else if (IsKnowledgeVariable(j)) {
+							unit.CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
 						}
 						//Wyrmgus end
 					}
@@ -1716,8 +1716,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 							unit.Container->UpdateContainerAttackRange();
 						} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 							unit.UpdateXPRequired();
-						} else if (j == KNOWLEDGEMAGIC_INDEX) {
-							unit.CheckIdentification();
+						} else if (IsKnowledgeVariable(j)) {
+							unit.CheckKnowledgeChange(j, - um->Modifier.Variables[j].Value);
 						}
 						//Wyrmgus end
 					}
@@ -1823,8 +1823,8 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.Container->UpdateContainerAttackRange();
 		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 			unit.UpdateXPRequired();
-		} else if (j == KNOWLEDGEMAGIC_INDEX) {
-			unit.CheckIdentification();
+		} else if (IsKnowledgeVariable(j)) {
+			unit.CheckKnowledgeChange(j, um->Modifier.Variables[j].Value);
 		}
 		//Wyrmgus end
 	}
@@ -1920,8 +1920,8 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			unit.Container->UpdateContainerAttackRange();
 		} else if (j == LEVEL_INDEX || j == POINTS_INDEX) {
 			unit.UpdateXPRequired();
-		} else if (j == KNOWLEDGEMAGIC_INDEX) {
-			unit.CheckIdentification();
+		} else if (IsKnowledgeVariable(j)) {
+			unit.CheckKnowledgeChange(j, - um->Modifier.Variables[j].Value);
 		}
 		//Wyrmgus end
 	}
@@ -2546,6 +2546,11 @@ bool IsPercentageVariable(int var)
 bool IsBooleanVariable(int var)
 {
 	return var == DISEMBARKMENTBONUS_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX;
+}
+
+bool IsKnowledgeVariable(int var)
+{
+	return var == KNOWLEDGEMAGIC_INDEX || var == KNOWLEDGEWARFARE_INDEX;
 }
 //Wyrmgus end
 

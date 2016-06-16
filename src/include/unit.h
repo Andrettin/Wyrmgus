@@ -194,6 +194,7 @@ public:
 	void SetUnique(CUniqueItem *unique);
 	void Identify();
 	void CheckIdentification();
+	void CheckKnowledgeChange(int variable, int change);
 	void UpdateItemName();
 	void GenerateDrop();
 	void GenerateSpecialProperties(CUnit *dropper = NULL);

@@ -1522,6 +1522,25 @@ void CUnit::CheckIdentification()
 	}
 }
 
+void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after the variable has already been changed
+{
+	if (!change) {
+		return;
+	}
+	
+	if (variable == KNOWLEDGEMAGIC_INDEX) {
+		int mana_change = ((this->Variable[variable].Value - change) / 5) - (this->Variable[variable].Value / 5); // +1 max mana for every 5 levels in Knowledge (Magic)
+		this->Variable[MANA_INDEX].Max += mana_change;
+		this->Variable[MANA_INDEX].Value += mana_change;
+		
+		this->CheckIdentification();
+	} else if (variable == KNOWLEDGEWARFARE_INDEX) {
+		int hp_change = ((this->Variable[variable].Value - change) / 5) - (this->Variable[variable].Value / 5); // +1 max HP for every 5 levels in Knowledge (Warfare)
+		this->Variable[HP_INDEX].Max += hp_change;
+		this->Variable[HP_INDEX].Value += hp_change;
+	}
+}
+
 void CUnit::UpdateItemName()
 {
 	Name = "";
@@ -3967,11 +3986,7 @@ int CUnit::GetModifiedVariable(int index, int variable_type) const
 		value = this->Variable[index].Increase;
 	}
 	
-	if (index == HP_INDEX && variable_type == VariableMax) {
-		value += this->Variable[KNOWLEDGEWARFARE_INDEX].Value / 5; // +1 max HP for every 5 levels in Knowledge (Warfare)
-	} else if (index == MANA_INDEX && variable_type == VariableMax) {
-		value += this->Variable[KNOWLEDGEMAGIC_INDEX].Value / 5; // +1 max mana for every 5 levels in Knowledge (Magic)
-	} else if (index == ATTACKRANGE_INDEX) {
+	if (index == ATTACKRANGE_INDEX) {
 		if (this->Container) {
 			value += this->Container->Stats->Variables[index].Value; //treat the container's attack range as a bonus to the unit's attack range
 		}
