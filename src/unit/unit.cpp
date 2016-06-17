@@ -1735,6 +1735,15 @@ void CUnit::GenerateWork(CUnit *dropper)
 				potential_works.push_back(dropper->Type->DropAffixes[i]);
 			}
 		}
+		
+		int dropper_civilization = PlayerRaces.GetRaceIndexByName(dropper->Type->Civilization.c_str());
+		if (dropper_civilization != -1) {
+			for (size_t i = 0; i < PlayerRaces.LiteraryWorks[dropper_civilization].size(); ++i) {
+				if (this->Type->ItemClass != -1 && PlayerRaces.LiteraryWorks[dropper_civilization][i]->Work == this->Type->ItemClass) {
+					potential_works.push_back(PlayerRaces.LiteraryWorks[dropper_civilization][i]);
+				}
+			}
+		}
 	}
 	
 	if (potential_works.size() > 0) {

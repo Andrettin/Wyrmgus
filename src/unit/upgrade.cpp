@@ -584,6 +584,13 @@ static int CclDefineUpgrade(lua_State *l)
 		}
 	}
 	
+	if (upgrade->Work != -1 && !upgrade->Civilization.empty()) {
+		int civilization_id = PlayerRaces.GetRaceIndexByName(upgrade->Civilization.c_str());
+		if (std::find(PlayerRaces.LiteraryWorks[civilization_id].begin(), PlayerRaces.LiteraryWorks[civilization_id].end(), upgrade) == PlayerRaces.LiteraryWorks[civilization_id].end()) {
+			PlayerRaces.LiteraryWorks[civilization_id].push_back(upgrade);
+		}
+	}
+	
 	for (unsigned int i = 0; i < UpgradeMax; ++i) { //add the upgrade to the incompatible affix's counterpart list here
 		if (upgrade->IncompatibleAffixes[i]) {
 			AllUpgrades[i]->IncompatibleAffixes[upgrade->ID] = true;

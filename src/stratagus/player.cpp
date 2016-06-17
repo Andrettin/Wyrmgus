@@ -407,6 +407,7 @@ void PlayerRace::Clean()
 		PlayerRaces.Factions[i].clear();
 		this->DevelopsFrom[i].clear();
 		this->DevelopsTo[i].clear();
+		this->LiteraryWorks[i].clear();
 		this->CivilizationUIFillers[i].clear();
 		//Wyrmgus end
 	}
