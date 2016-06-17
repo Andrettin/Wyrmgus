@@ -2035,8 +2035,8 @@ void UpgradeLost(CPlayer &player, int id)
 		}
 	}
 	*/
-	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-		RemoveUpgradeModifier(player, upgrade->UpgradeModifiers[z]);
+	for (size_t z = 0; z < AllUpgrades[id]->UpgradeModifiers.size(); ++z) {
+		RemoveUpgradeModifier(player, AllUpgrades[id]->UpgradeModifiers[z]);
 	}
 	//Wyrmgus end
 
