@@ -55,6 +55,7 @@ class CVariable;
 class CIcon;
 //Wyrmgus start
 class CCharacter;
+class CUpgradeModifier;
 //Wyrmgus end
 struct lua_State;
 
