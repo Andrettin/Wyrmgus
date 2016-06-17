@@ -628,6 +628,10 @@ static int CclDefineModifier(lua_State *l)
 	if (um->UpgradeId == -1) {
 		LuaError(l, "Error when defining upgrade modifier: upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 	}
+	
+	//Wyrmgus start
+	AllUpgrades[um->UpgradeId]->UpgradeModifiers.push_back(um);
+	//Wyrmgus end
 
 	for (int j = 1; j < args; ++j) {
 		if (!lua_istable(l, j + 1)) {
@@ -1028,14 +1032,14 @@ static int CclGetUpgradeData(lua_State *l)
 				applies_to.push_back(GetItemClassNameById(i));
 			}
 		}
-			
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+
+		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			for (size_t i = 0; i < UnitTypes.size(); ++i) {
 				if (UnitTypes[i]->Ident.find("template") != std::string::npos) { //if is a template, continue
 					continue;
 				}
 				
-				if (UpgradeModifiers[z]->UpgradeId == upgrade->ID && (UpgradeModifiers[z]->ApplyTo[i] == 'X' || std::find(UnitTypes[i]->Affixes.begin(), UnitTypes[i]->Affixes.end(), upgrade) != UnitTypes[i]->Affixes.end())) {
+				if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X' || std::find(UnitTypes[i]->Affixes.begin(), UnitTypes[i]->Affixes.end(), upgrade) != UnitTypes[i]->Affixes.end()) {
 					applies_to.push_back(UnitTypes[i]->Ident);
 				}
 			}
@@ -1988,11 +1992,18 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	player.UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	AllowUpgradeId(player, id, 'R');  // research done
 
+	//Wyrmgus start
+	/*
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
 			ApplyUpgradeModifier(player, UpgradeModifiers[z]);
 		}
 	}
+	*/
+	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+		ApplyUpgradeModifier(player, upgrade->UpgradeModifiers[z]);
+	}
+	//Wyrmgus end
 
 	//
 	//  Upgrades could change the buttons displayed.
@@ -2016,11 +2027,18 @@ void UpgradeLost(CPlayer &player, int id)
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
 	//Wyrmgus end
 	
+	//Wyrmgus start
+	/*
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
 			RemoveUpgradeModifier(player, UpgradeModifiers[z]);
 		}
 	}
+	*/
+	for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+		RemoveUpgradeModifier(player, upgrade->UpgradeModifiers[z]);
+	}
+	//Wyrmgus end
 
 	//
 	//  Upgrades could change the buttons displayed.
@@ -2046,11 +2064,18 @@ void ApplyUpgrades()
 					Players[p].UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 					AllowUpgradeId(Players[p], id, 'R');  // research done
 
+					//Wyrmgus start
+					/*
 					for (int z = 0; z < NumUpgradeModifiers; ++z) {
 						if (UpgradeModifiers[z]->UpgradeId == id) {
 							ApplyUpgradeModifier(Players[p], UpgradeModifiers[z]);
 						}
 					}
+					*/
+					for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+						ApplyUpgradeModifier(Players[p], upgrade->UpgradeModifiers[z]);
+					}
+					//Wyrmgus end
 				}
 			}
 		}
@@ -2154,10 +2179,8 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	}
 	*/
 	if (!(upgrade->Ability && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			if (UpgradeModifiers[z]->UpgradeId == id) {
-				ApplyIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
-			}
+		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+			ApplyIndividualUpgradeModifier(unit, upgrade->UpgradeModifiers[z]);
 		}
 	}
 	//Wyrmgus end
@@ -2180,10 +2203,8 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 	/*
 	*/
 	if (!(upgrade->Ability && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			if (UpgradeModifiers[z]->UpgradeId == id) {
-				RemoveIndividualUpgradeModifier(unit, UpgradeModifiers[z]);
-			}
+		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
+			RemoveIndividualUpgradeModifier(unit, upgrade->UpgradeModifiers[z]);
 		}
 	}
 	//Wyrmgus end
@@ -2312,137 +2333,136 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 		
 		bool first_element = true;
 		//check if the upgrade makes modifications to any units
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
+		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
 			if (grand_strategy) { // don't show modifiers in the grand strategy mode for now
 				continue;
 			}
-			if (UpgradeModifiers[z]->UpgradeId == upgrade->ID) {
-				if (!first_element) {
-					upgrade_effects_string += padding_string;
-				} else {
-					first_element = false;
-				}
+
+			if (!first_element) {
+				upgrade_effects_string += padding_string;
+			} else {
+				first_element = false;
+			}
 				
-				bool first_var = true;
-				for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
-					if (var == PRIORITY_INDEX || var == POINTS_INDEX) {
-						continue;
-					}
+			bool first_var = true;
+			for (size_t var = 0; var < UnitTypeVar.GetNumberVariable(); ++var) {
+				if (var == PRIORITY_INDEX || var == POINTS_INDEX) {
+					continue;
+				}
 						
-					if (var == STRENGTH_INDEX || var == DEXTERITY_INDEX || var == INTELLIGENCE_INDEX || var == CHARISMA_INDEX) { // don't show attributes for now
+				if (var == STRENGTH_INDEX || var == DEXTERITY_INDEX || var == INTELLIGENCE_INDEX || var == CHARISMA_INDEX) { // don't show attributes for now
+					continue;
+				}
+					
+				if (grand_strategy) {
+					if (
+						var == SUPPLY_INDEX // don't show supply effects in the grand strategy mode
+					) {
 						continue;
 					}
-					
-					if (grand_strategy) {
-						if (
-							var == SUPPLY_INDEX // don't show supply effects in the grand strategy mode
-						) {
-							continue;
-						}
+				}
+
+				if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
+					if (!first_var) {
+						upgrade_effects_string += padding_string;
+					} else {
+						first_var = false;
 					}
 
-					if (UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
-						if (!first_var) {
+					if (IsBooleanVariable(var) && upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value < 0) {
+						upgrade_effects_string += "Lose ";
+					}
+										
+					if (!IsBooleanVariable(var)) {
+						if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value > 0) {
+							upgrade_effects_string += "+";
+						}
+						upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Value);
+						if (IsPercentageVariable(var)) {
+							upgrade_effects_string += "%";
+						}
+						upgrade_effects_string += " ";
+					}
+											
+					std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+					variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+					variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
+					variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
+					variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
+					variable_name = SeparateCapitalizedStringElements(variable_name);
+					variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
+					variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
+					variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
+					upgrade_effects_string += variable_name;
+						
+					bool first_unit_type = true;
+					for (size_t i = 0; i < UnitTypes.size(); ++i) {
+						if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+							if (!first_unit_type) {
+								upgrade_effects_string += ", ";
+							} else {
+								upgrade_effects_string += " for ";
+								first_unit_type = false;
+							}
+									
+							upgrade_effects_string += UnitTypes[i]->GetNamePlural();
+						}
+					}
+				}
+					
+				if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
+					if (!first_var) {
+						upgrade_effects_string += padding_string;
+					} else {
+						first_var = false;
+					}
+
+					if (upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Increase > 0) {
+						upgrade_effects_string += "+";
+					}
+					upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
+					upgrade_effects_string += " ";
+											
+					std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+					variable_name += "Increase";
+					variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
+					variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
+					variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
+					variable_name = SeparateCapitalizedStringElements(variable_name);
+					upgrade_effects_string += variable_name;
+				}
+			}
+				
+			if (!grand_strategy) {
+				bool first_res = true;
+				for (int i = 0; i < MaxCosts; ++i) {
+					if (upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i]) {
+						if (!first_res) {
 							upgrade_effects_string += padding_string;
 						} else {
-							first_var = false;
+							first_res = false;
 						}
-
-						if (IsBooleanVariable(var) && UpgradeModifiers[z]->Modifier.Variables[var].Value < 0) {
-							upgrade_effects_string += "Lose ";
+							
+						if (upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i] > 0) {
+							upgrade_effects_string += "+";
 						}
-										
-						if (!IsBooleanVariable(var)) {
-							if (UpgradeModifiers[z]->Modifier.Variables[var].Value > 0) {
-								upgrade_effects_string += "+";
-							}
-							upgrade_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[var].Value);
-							if (IsPercentageVariable(var)) {
-								upgrade_effects_string += "%";
-							}
-							upgrade_effects_string += " ";
-						}
-											
-						std::string variable_name = UnitTypeVar.VariableNameLookup[var];
-						variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
-						variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
-						variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
-						variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
-						variable_name = SeparateCapitalizedStringElements(variable_name);
-						variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
-						variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
-						variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
-						upgrade_effects_string += variable_name;
-						
+						upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.ImproveIncomes[i]);
+						upgrade_effects_string += "%";
+						upgrade_effects_string += " ";
+						upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
+						upgrade_effects_string += " Processing";
+							
 						bool first_unit_type = true;
 						for (size_t i = 0; i < UnitTypes.size(); ++i) {
-							if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+							if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
 								if (!first_unit_type) {
 									upgrade_effects_string += ", ";
 								} else {
 									upgrade_effects_string += " for ";
 									first_unit_type = false;
 								}
-									
-								upgrade_effects_string += UnitTypes[i]->GetNamePlural();
-							}
-						}
-					}
-					
-					if (UpgradeModifiers[z]->Modifier.Variables[var].Increase != 0) {
-						if (!first_var) {
-							upgrade_effects_string += padding_string;
-						} else {
-							first_var = false;
-						}
-
-						if (UpgradeModifiers[z]->Modifier.Variables[var].Increase > 0) {
-							upgrade_effects_string += "+";
-						}
-						upgrade_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[var].Increase);
-						upgrade_effects_string += " ";
-											
-						std::string variable_name = UnitTypeVar.VariableNameLookup[var];
-						variable_name += "Increase";
-						variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
-						variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
-						variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
-						variable_name = SeparateCapitalizedStringElements(variable_name);
-						upgrade_effects_string += variable_name;
-					}
-				}
-				
-				if (!grand_strategy) {
-					bool first_res = true;
-					for (int i = 0; i < MaxCosts; ++i) {
-						if (UpgradeModifiers[z]->Modifier.ImproveIncomes[i]) {
-							if (!first_res) {
-								upgrade_effects_string += padding_string;
-							} else {
-								first_res = false;
-							}
-							
-							if (UpgradeModifiers[z]->Modifier.ImproveIncomes[i] > 0) {
-								upgrade_effects_string += "+";
-							}
-							upgrade_effects_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.ImproveIncomes[i]);
-							upgrade_effects_string += "%";
-							upgrade_effects_string += " ";
-							upgrade_effects_string += CapitalizeString(DefaultResourceNames[i]);
-							upgrade_effects_string += " Processing";
-							
-							bool first_unit_type = true;
-							for (size_t i = 0; i < UnitTypes.size(); ++i) {
-								if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
-									if (!first_unit_type) {
-										upgrade_effects_string += ", ";
-									} else {
-										upgrade_effects_string += " for ";
-										first_unit_type = false;
-									}
 										
-									upgrade_effects_string += UnitTypes[i]->GetNamePlural();
-								}
+								upgrade_effects_string += UnitTypes[i]->GetNamePlural();
 							}
 						}
 					}

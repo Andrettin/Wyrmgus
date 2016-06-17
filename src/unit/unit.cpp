@@ -1376,10 +1376,8 @@ void CUnit::ApplyAuraEffect(int aura_index)
 void CUnit::SetPrefix(CUpgrade *prefix)
 {
 	if (Prefix != NULL) {
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			if (UpgradeModifiers[z]->UpgradeId == Prefix->ID) {
-				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
-			}
+		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
+			RemoveIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->MagicLevel;
@@ -1390,10 +1388,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 	}
 	Prefix = prefix;
 	if (Prefix != NULL) {
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			if (UpgradeModifiers[z]->UpgradeId == Prefix->ID) {
-				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
-			}
+		for (size_t z = 0; z < Prefix->UpgradeModifiers.size(); ++z) {
+			ApplyIndividualUpgradeModifier(*this, Prefix->UpgradeModifiers[z]);
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value += Prefix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max += Prefix->MagicLevel;
@@ -1405,10 +1401,8 @@ void CUnit::SetPrefix(CUpgrade *prefix)
 void CUnit::SetSuffix(CUpgrade *suffix)
 {
 	if (Suffix != NULL) {
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			if (UpgradeModifiers[z]->UpgradeId == Suffix->ID) {
-				RemoveIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
-			}
+		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
+			RemoveIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->MagicLevel;
@@ -1417,12 +1411,10 @@ void CUnit::SetSuffix(CUpgrade *suffix)
 		Container->Character->GetItem(*this)->Suffix = suffix;
 		SaveHero(Container->Character);
 	}
-	Suffix = const_cast<CUpgrade *>(&(*suffix));
+	Suffix = suffix;
 	if (Suffix != NULL) {
-		for (int z = 0; z < NumUpgradeModifiers; ++z) {
-			if (UpgradeModifiers[z]->UpgradeId == Suffix->ID) {
-				ApplyIndividualUpgradeModifier(*this, UpgradeModifiers[z]);
-			}
+		for (size_t z = 0; z < Suffix->UpgradeModifiers.size(); ++z) {
+			ApplyIndividualUpgradeModifier(*this, Suffix->UpgradeModifiers[z]);
 		}
 		this->Variable[MAGICLEVEL_INDEX].Value += Suffix->MagicLevel;
 		this->Variable[MAGICLEVEL_INDEX].Max += Suffix->MagicLevel;
@@ -4072,13 +4064,11 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	int value = 0;
 	if (item->Work != NULL) {
 		if (this->IndividualUpgrades[item->Work->ID] == false) {
-			for (int z = 0; z < NumUpgradeModifiers; ++z) {
-				if (UpgradeModifiers[z]->UpgradeId == item->Work->ID) {
-					if (!increase) {
-						value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
-					} else {
-						value += UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
-					}
+			for (size_t z = 0; z < item->Work->UpgradeModifiers.size(); ++z) {
+				if (!increase) {
+					value += item->Work->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+				} else {
+					value += item->Work->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
 				}
 			}
 		}

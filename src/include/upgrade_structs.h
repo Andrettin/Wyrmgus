@@ -240,6 +240,7 @@ public:
 	int Work;						/// form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year;						/// year of publication, if is a literary work
 	CCharacter *Author;				/// author of this literary work (if it is one)
+	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// upgrade modifiers for this upgrade
 	std::vector<CCharacter *> Characters;	/// characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons

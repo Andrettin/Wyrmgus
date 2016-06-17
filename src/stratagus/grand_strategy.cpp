@@ -4089,16 +4089,14 @@ void CGrandStrategyFaction::SetTechnology(int upgrade_id, bool has_technology, b
 	int change = has_technology ? 1 : -1;
 		
 	//add military score bonuses
-	for (int z = 0; z < NumUpgradeModifiers; ++z) {
-		if (UpgradeModifiers[z]->UpgradeId == upgrade_id) {
-			for (size_t i = 0; i < UnitTypes.size(); ++i) {
+	for (size_t z = 0; z < AllUpgrades[upgrade_id]->UpgradeModifiers.size(); ++z) {
+		for (size_t i = 0; i < UnitTypes.size(); ++i) {
 				
-				Assert(UpgradeModifiers[z]->ApplyTo[i] == '?' || UpgradeModifiers[z]->ApplyTo[i] == 'X');
+			Assert(AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == '?' || AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X');
 
-				if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
-					if (UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
-						this->MilitaryScoreBonus[i] += UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
-					}
+			if (AllUpgrades[upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+				if (AllUpgrades[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value) {
+					this->MilitaryScoreBonus[i] += AllUpgrades[upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[POINTS_INDEX].Value * change;
 				}
 			}
 		}

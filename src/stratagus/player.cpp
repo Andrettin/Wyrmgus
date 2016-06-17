@@ -2329,12 +2329,12 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 			if (!PlayerRaces.Factions[civilization][faction]->FactionUpgrade.empty()) {
 				int faction_upgrade_id = CUpgrade::Get(PlayerRaces.Factions[civilization][faction]->FactionUpgrade)->ID;
 				
-				for (int z = 0; z < NumUpgradeModifiers; ++z) {
-					if (UpgradeModifiers[z]->UpgradeId == faction_upgrade_id && !UpgradeModifiers[z]->ConvertTo) {
+				for (size_t z = 0; z < AllUpgrades[faction_upgrade_id]->UpgradeModifiers.size(); ++z) {
+					if (!AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->ConvertTo) {
 						for (size_t i = 0; i < UnitTypes.size(); ++i) {
-							Assert(UpgradeModifiers[z]->ApplyTo[i] == '?' || UpgradeModifiers[z]->ApplyTo[i] == 'X');
+							Assert(AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == '?' || AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X');
 
-							if (UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+							if (AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
 								bool changed_stats = false;
 								std::string effect_element_string;
 								
@@ -2353,22 +2353,22 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 										continue;
 									}
 						
-									if (UpgradeModifiers[z]->Modifier.Variables[j].Value != 0) {
+									if (AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[j].Value != 0) {
 										if (!first_var) {
 											effect_element_string += ", ";
 										} else {
 											first_var = false;
 										}
 											
-										if (IsBooleanVariable(j) && UpgradeModifiers[z]->Modifier.Variables[j].Value < 0) {
+										if (IsBooleanVariable(j) && AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[j].Value < 0) {
 											effect_element_string += "Lose ";
 										}
 										
 										if (!IsBooleanVariable(j)) {
-											if (UpgradeModifiers[z]->Modifier.Variables[j].Value > 0) {
+											if (AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[j].Value > 0) {
 												effect_element_string += "+";
 											}
-											effect_element_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.Variables[j].Value);
+											effect_element_string += std::to_string((long long) AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[j].Value);
 											if (IsPercentageVariable(j)) {
 												effect_element_string += "%";
 											}
@@ -2386,17 +2386,17 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 								}
 
 								for (int j = 0; j < MaxCosts; ++j) {
-									if (UpgradeModifiers[z]->Modifier.ImproveIncomes[j]) {
+									if (AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.ImproveIncomes[j]) {
 										if (!first_var) {
 											effect_element_string += ", ";
 										} else {
 											first_var = false;
 										}
 										
-										if (UpgradeModifiers[z]->Modifier.ImproveIncomes[j] > 0) {
+										if (AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.ImproveIncomes[j] > 0) {
 											effect_element_string += "+";
 										}
-										effect_element_string += std::to_string((long long) UpgradeModifiers[z]->Modifier.ImproveIncomes[j]);
+										effect_element_string += std::to_string((long long) AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.ImproveIncomes[j]);
 										effect_element_string += "%";
 										effect_element_string += " ";
 										effect_element_string += CapitalizeString(DefaultResourceNames[j]);
