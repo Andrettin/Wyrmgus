@@ -227,6 +227,10 @@ enum {
 				SaveHero(unit.Character);
 			}
 			
+			if (!goal->Identified) {
+				CclCommand("if (GetArrayIncludes(wyr.preferences.TipsShown, \"Item Identification\") == false) then Tip(\"Item Identification\", \"Your unit has acquired an unidentified magic item. To identify the item, it must have a certain level of the Knowledge (Magic) stat - hover over the item in the inventory to see how much. The stat is increased by reading literary works. Once it is high enough, identification will happen automatically, given the item is in the unit's inventory.\"); end;");
+			}
+			
 			if (!goal->Identified && unit.Variable[KNOWLEDGEMAGIC_INDEX].Value >= goal->Variable[MAGICLEVEL_INDEX].Value) {
 				goal->Identify();
 			}
