@@ -343,29 +343,30 @@ static int CclDefineCharacter(lua_State *l)
 					} else if (!strcmp(value, "name")) {
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
-						item->Name = LuaToString(l, -1, k + 1);
-						item->Unique = true;
-						CUniqueItem *unique_item = GetUniqueItem(item->Name);
+						std::string unique_ident = LuaToString(l, -1, k + 1);
+						CUniqueItem *unique_item = GetUniqueItem(unique_ident);
+						item->Unique = unique_item;
 						if (unique_item != NULL) {
+							item->Name = unique_item->Name;
 							if (unique_item->Type != NULL) {
-								item->Type = const_cast<CUnitType *>(&(*unique_item->Type));
+								item->Type = unique_item->Type;
 							} else {
 								LuaError(l, "Unique item \"%s\" has no type." _C_ item->Name.c_str());
 							}
 							if (unique_item->Prefix != NULL) {
-								item->Prefix = const_cast<CUpgrade *>(&(*unique_item->Prefix));
+								item->Prefix = unique_item->Prefix;
 							}
 							if (unique_item->Suffix != NULL) {
-								item->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
+								item->Suffix = unique_item->Suffix;
 							}
 							if (unique_item->Spell != NULL) {
-								item->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
+								item->Spell = unique_item->Spell;
 							}
 							if (unique_item->Work != NULL) {
-								item->Work = const_cast<CUpgrade *>(&(*unique_item->Work));
+								item->Work = unique_item->Work;
 							}
 						} else {
-							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item->Name.c_str());
+							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unique_ident.c_str());
 						}
 					} else if (!strcmp(value, "bound")) {
 						item->Bound = LuaToBoolean(l, -1, k + 1);
@@ -641,29 +642,30 @@ static int CclDefineCustomHero(lua_State *l)
 					} else if (!strcmp(value, "name")) {
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
-						item->Name = LuaToString(l, -1, k + 1);
-						item->Unique = true;
-						CUniqueItem *unique_item = GetUniqueItem(item->Name);
+						std::string unique_ident = LuaToString(l, -1, k + 1);
+						CUniqueItem *unique_item = GetUniqueItem(unique_ident);
+						item->Unique = unique_item;
 						if (unique_item != NULL) {
+							item->Name = unique_item->Name;
 							if (unique_item->Type != NULL) {
-								item->Type = const_cast<CUnitType *>(&(*unique_item->Type));
+								item->Type = unique_item->Type;
 							} else {
 								LuaError(l, "Unique item \"%s\" has no type." _C_ item->Name.c_str());
 							}
 							if (unique_item->Prefix != NULL) {
-								item->Prefix = const_cast<CUpgrade *>(&(*unique_item->Prefix));
+								item->Prefix = unique_item->Prefix;
 							}
 							if (unique_item->Suffix != NULL) {
-								item->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
+								item->Suffix = unique_item->Suffix;
 							}
 							if (unique_item->Spell != NULL) {
-								item->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
+								item->Spell = unique_item->Spell;
 							}
 							if (unique_item->Work != NULL) {
-								item->Work = const_cast<CUpgrade *>(&(*unique_item->Work));
+								item->Work = unique_item->Work;
 							}
 						} else {
-							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item->Name.c_str());
+							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unique_ident.c_str());
 						}
 					} else if (!strcmp(value, "bound")) {
 						item->Bound = LuaToBoolean(l, -1, k + 1);

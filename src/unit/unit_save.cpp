@@ -185,7 +185,7 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		file.printf("\"work\", \"%s\", ", unit.Work->Ident.c_str());
 	}
 	if (unit.Unique) {
-		file.printf("\"unique\", true, ");
+		file.printf("\"unique\", \"%s\", ", unit.Unique->Ident.c_str());
 	}
 	if (unit.Bound) {
 		file.printf("\"bound\", true, ");

@@ -402,8 +402,8 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 			build->Variable[GIVERESOURCE_INDEX].Max = ontop.Variable[GIVERESOURCE_INDEX].Max;
 			build->Variable[GIVERESOURCE_INDEX].Enable = ontop.Variable[GIVERESOURCE_INDEX].Enable;
 			//Wyrmgus start
-			if (ontop.Unique && GetUniqueItem(ontop.Name) != NULL) {
-				build->SetUnique(GetUniqueItem(ontop.Name));
+			if (ontop.Unique != NULL) {
+				build->SetUnique(ontop.Unique);
 			} else {
 				if (ontop.Prefix != NULL) {
 					build->SetPrefix(ontop.Prefix);

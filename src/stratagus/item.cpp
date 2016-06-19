@@ -10,7 +10,7 @@
 //
 /**@name item.cpp - The items. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2016 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -244,7 +244,7 @@ bool CUniqueItem::CanDrop()
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
-			if (iterator->second->Items[j]->Unique && iterator->second->Items[j]->Name == this->Name && !iterator->second->Items[j]->Bound) {
+			if (iterator->second->Items[j]->Unique == this && !iterator->second->Items[j]->Bound) {
 				return false;
 			}
 		}
@@ -252,7 +252,7 @@ bool CUniqueItem::CanDrop()
 	
 	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
 		for (size_t j = 0; j < iterator->second->Items.size(); ++j) {
-			if (iterator->second->Items[j]->Unique && iterator->second->Items[j]->Name == this->Name && !iterator->second->Items[j]->Bound) {
+			if (iterator->second->Items[j]->Unique == this && !iterator->second->Items[j]->Bound) {
 				return false;
 			}
 		}
@@ -260,7 +260,7 @@ bool CUniqueItem::CanDrop()
 	
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
-		if (unit.Unique && unit.Name == this->Name && !unit.Bound) {
+		if (unit.Unique == this && !unit.Bound) {
 			return false;
 		}
 	}
@@ -276,10 +276,15 @@ void CleanUniqueItems()
 	UniqueItems.clear();
 }
 
-CUniqueItem *GetUniqueItem(std::string item_name)
+CUniqueItem *GetUniqueItem(std::string item_ident)
 {
 	for (size_t i = 0; i < UniqueItems.size(); ++i) {
-		if (item_name == UniqueItems[i]->Name) {
+		if (item_ident == UniqueItems[i]->Ident) {
+			return UniqueItems[i];
+		}
+	}
+	for (size_t i = 0; i < UniqueItems.size(); ++i) { // for backwards compatibility, search the name of the unique too
+		if (NameToIdent(item_ident) == UniqueItems[i]->Ident) {
 			return UniqueItems[i];
 		}
 	}
@@ -371,9 +376,9 @@ std::string GetItemEffectsString(std::string item_ident)
 	return "";
 }
 
-std::string GetUniqueItemEffectsString(std::string item_name)
+std::string GetUniqueItemEffectsString(std::string item_ident)
 {
-	const CUniqueItem *item = GetUniqueItem(item_name);
+	const CUniqueItem *item = GetUniqueItem(item_ident);
 
 	if (item) {
 		std::string item_effects_string;

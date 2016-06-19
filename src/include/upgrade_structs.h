@@ -231,18 +231,18 @@ public:
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
 	//Wyrmgus start
-	int GrandStrategyCosts[MaxCosts];	/// costs for the upgrade for grand strategy mode
-	int GrandStrategyProductionModifier[MaxCosts];	/// production modifier (absolute increase) for a particular resource for grand strategy mode
-	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// production modifier for a particular resource for grand strategy mode
-	int RevoltRiskModifier;			/// revolt risk modifier (for the grand strategy mode)
-	int AdministrativeEfficiencyModifier;	/// administrative efficiency modifier (for the grand strategy mode)
-	int TechnologyPointCost;		/// technology point cost
-	int MagicLevel;					/// magic level of an affix
-	int Work;						/// form in which was inscribed (i.e. scroll or book), if is a literary work
-	int Year;						/// year of publication, if is a literary work
-	CCharacter *Author;				/// author of this literary work (if it is one)
-	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// upgrade modifiers for this upgrade
-	std::vector<CCharacter *> Characters;	/// characters who appear in this literary work (if it is one)
+	int GrandStrategyCosts[MaxCosts];	/// Costs for the upgrade for grand strategy mode
+	int GrandStrategyProductionModifier[MaxCosts];	/// Production modifier (absolute increase) for a particular resource for grand strategy mode
+	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
+	int RevoltRiskModifier;			/// Revolt risk modifier (for the grand strategy mode)
+	int AdministrativeEfficiencyModifier;	/// Administrative efficiency modifier (for the grand strategy mode)
+	int TechnologyPointCost;		/// Technology point cost
+	int MagicLevel;					/// Magic level of an affix
+	int Work;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
+	int Year;						/// Year of publication, if is a literary work
+	CCharacter *Author;				/// Author of this literary work (if it is one)
+	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
+	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
 	CIcon *Icon;                      /// icon to display to the user

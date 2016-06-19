@@ -462,7 +462,7 @@ void CUnit::Init()
 	Suffix = NULL;
 	Spell = NULL;
 	Work = NULL;
-	Unique = false;
+	Unique = NULL;
 	Bound = false;
 	Identified = true;
 	//Wyrmgus end
@@ -587,7 +587,7 @@ void CUnit::Release(bool final)
 	Suffix = NULL;
 	Spell = NULL;
 	Work = NULL;
-	Unique = false;
+	Unique = NULL;
 	Bound = false;
 	Identified = true;
 	
@@ -1470,10 +1470,10 @@ void CUnit::SetUnique(CUniqueItem *unique)
 			this->Variable[GIVERESOURCE_INDEX].Enable = 1;
 		}
 		Name = unique->Name;
-		Unique = true;
+		Unique = unique;
 	} else {
 		Name = "";
-		Unique = false;
+		Unique = NULL;
 		SetPrefix(NULL);
 		SetSuffix(NULL);
 		SetSpell(NULL);
@@ -2828,8 +2828,8 @@ void UnitLost(CUnit &unit)
 				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
 				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;
 				//Wyrmgus start
-				if (unit.Unique && GetUniqueItem(unit.Name) != NULL) {
-					temp->SetUnique(GetUniqueItem(unit.Name));
+				if (unit.Unique != NULL) {
+					temp->SetUnique(unit.Unique);
 				} else {
 					if (unit.Prefix != NULL) {
 						temp->SetPrefix(unit.Prefix);

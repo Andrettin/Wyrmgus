@@ -2196,8 +2196,8 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 					if (Selected[0]->Character != NULL && Selected[0]->Character->Persistent && !Selected[0]->Character->Custom) {
 						encyclopedia_ident = Selected[0]->Character->GetFullName();
 						encyclopedia_state = "heroes";
-					} else if (Selected[0]->Unique && GetUniqueItem(Selected[0]->Name) != NULL) {
-						encyclopedia_ident = Selected[0]->Name;
+					} else if (Selected[0]->Unique != NULL) {
+						encyclopedia_ident = Selected[0]->Unique->Ident;
 						encyclopedia_state = "unique_items";
 					}
 					CclCommand("if (OpenEncyclopediaUnitEntry ~= nil) then OpenEncyclopediaUnitEntry(\"" + encyclopedia_ident + "\", \"" + encyclopedia_state + "\") end;");

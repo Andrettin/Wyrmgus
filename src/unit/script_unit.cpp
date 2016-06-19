@@ -345,25 +345,25 @@ static int CclUnit(lua_State *l)
 		} else if (!strcmp(value, "work")) {
 			unit->Work = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
-			unit->Unique = LuaToBoolean(l, 2, j + 1);
+			CUniqueItem *unique_item = GetUniqueItem(LuaToString(l, 2, j + 1));
+			unit->Unique = unique_item;
 			if (unit->Unique) { //apply the unique item's prefix and suffix here, because it may have changed in the database in relation to when the game was last played
-				CUniqueItem *unique_item = GetUniqueItem(unit->Name);
 				if (unique_item == NULL) {
 					LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unit->Name.c_str());
 				}
-				unit->Type = const_cast<CUnitType *>(&(*unique_item->Type));
-				CUnitType *type = const_cast<CUnitType *>(&(*unique_item->Type));
+				unit->Type = unique_item->Type;
+				CUnitType *type = unique_item->Type;
 				if (unique_item->Prefix != NULL) {
-					unit->Prefix = const_cast<CUpgrade *>(&(*unique_item->Prefix));
+					unit->Prefix = unique_item->Prefix;
 				}
 				if (unique_item->Suffix != NULL) {
-					unit->Suffix = const_cast<CUpgrade *>(&(*unique_item->Suffix));
+					unit->Suffix = unique_item->Suffix;
 				}
 				if (unique_item->Spell != NULL) {
-					unit->Spell = const_cast<SpellType *>(&(*unique_item->Spell));
+					unit->Spell = unique_item->Spell;
 				}
 				if (unique_item->Work != NULL) {
-					unit->Work = const_cast<CUpgrade *>(&(*unique_item->Work));
+					unit->Work = unique_item->Work;
 				}
 			}
 		} else if (!strcmp(value, "bound")) {
@@ -1595,7 +1595,7 @@ static int CclGetUnitVariable(lua_State *l)
 		}
 	} else if (!strcmp(value, "Unique")) {
 		if (unit->Unique) {
-			lua_pushstring(l, unit->Name.c_str());
+			lua_pushstring(l, unit->Unique->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

@@ -10,7 +10,7 @@
 //
 /**@name item.h - The item headerfile. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2016 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -110,6 +110,7 @@ public:
 	bool CanDrop();				/// Check whether this unique item can drop
 
 	int ResourcesHeld;
+	std::string Ident;
 	std::string Name;
 	std::string Description;
 	std::string Background;
@@ -125,13 +126,12 @@ class CItem
 {
 public:
 	CItem() :
-		Unique(false), Bound(false), Identified(true),
-		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL)
+		Bound(false), Identified(true),
+		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL), Unique(NULL)
 	{
 	}
 	
 	std::string Name;
-	bool Unique;
 	bool Bound;					/// Whether the item is bound to its owner and can't be dropped
 	bool Identified;			/// Whether the item has been identified
 	CUnitType *Type;			/// Item type of the item
@@ -139,6 +139,7 @@ public:
 	CUpgrade *Suffix;
 	SpellType *Spell;
 	CUpgrade *Work;
+	CUniqueItem *Unique;
 };
 
 /*----------------------------------------------------------------------------
@@ -158,9 +159,9 @@ extern std::string GetItemClassNameById(int item_class);
 extern int GetItemClassSlot(int item_class);
 extern bool IsItemClassConsumable(int item_class);
 extern void CleanUniqueItems();
-extern CUniqueItem *GetUniqueItem(std::string item_name);
+extern CUniqueItem *GetUniqueItem(std::string item_ident);
 extern std::string GetItemEffectsString(std::string item_ident);
-extern std::string GetUniqueItemEffectsString(std::string item_name);
+extern std::string GetUniqueItemEffectsString(std::string item_ident);
 extern void ItemCclRegister();
 
 //@}

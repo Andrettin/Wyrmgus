@@ -2953,7 +2953,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, uniques.size(), 0);
 		for (size_t i = 1; i <= uniques.size(); ++i)
 		{
-			lua_pushstring(l, uniques[i-1]->Name.c_str());
+			lua_pushstring(l, uniques[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

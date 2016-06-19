@@ -63,23 +63,25 @@ static int CclDefineUniqueItem(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string item_name = LuaToString(l, 1);
-	CUniqueItem *item = GetUniqueItem(item_name);
+	std::string item_ident = LuaToString(l, 1);
+	CUniqueItem *item = GetUniqueItem(item_ident);
 	if (!item) {
 		item = new CUniqueItem;
 		UniqueItems.push_back(item);
-		item->Name = item_name;
+		item->Ident = item_ident;
 	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Type")) {
+		if (!strcmp(value, "Name")) {
+			item->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Type")) {
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
-				item->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+				item->Type = UnitTypes[unit_type_id];
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}
@@ -97,7 +99,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			std::string affix_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(affix_ident);
 			if (upgrade_id != -1) {
-				item->Prefix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+				item->Prefix = AllUpgrades[upgrade_id];
 			} else {
 				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
 			}
@@ -105,7 +107,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			std::string affix_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(affix_ident);
 			if (upgrade_id != -1) {
-				item->Suffix = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+				item->Suffix = AllUpgrades[upgrade_id];
 			} else {
 				LuaError(l, "Affix upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
 			}
@@ -113,7 +115,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			std::string spell_ident = LuaToString(l, -1);
 			SpellType *spell = SpellTypeByIdent(spell_ident);
 			if (spell != NULL) {
-				item->Spell = const_cast<SpellType *>(&(*spell));
+				item->Spell = spell;
 			} else {
 				LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
 			}
@@ -121,7 +123,7 @@ static int CclDefineUniqueItem(lua_State *l)
 			std::string affix_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(affix_ident);
 			if (upgrade_id != -1) {
-				item->Work = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+				item->Work = AllUpgrades[upgrade_id];
 			} else {
 				LuaError(l, "Literary work upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
 			}
@@ -164,7 +166,7 @@ static int CclGetUniqueItems(lua_State *l)
 	lua_createtable(l, UniqueItems.size(), 0);
 	for (size_t i = 1; i <= UniqueItems.size(); ++i)
 	{
-		lua_pushstring(l, UniqueItems[i-1]->Name.c_str());
+		lua_pushstring(l, UniqueItems[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -180,14 +182,17 @@ static int CclGetUniqueItemData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string item_name = LuaToString(l, 1);
-	const CUniqueItem *item = GetUniqueItem(item_name);
+	std::string item_ident = LuaToString(l, 1);
+	const CUniqueItem *item = GetUniqueItem(item_ident);
 	if (!item) {
-		LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item_name.c_str());
+		LuaError(l, "Unique item \"%s\" doesn't exist." _C_ item_ident.c_str());
 	}
 	const char *data = LuaToString(l, 2);
 
-	if (!strcmp(data, "Description")) {
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, item->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, item->Description.c_str());
 		return 1;
 	} else if (!strcmp(data, "Background")) {

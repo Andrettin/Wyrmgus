@@ -63,6 +63,9 @@ class CCharacter;
 class CMapField;
 class COrder;
 class CPlayer;
+//Wyrmgus start
+class CUniqueItem;
+//Wyrmgus end
 class CUnit;
 class CUnitColors;
 class CUnitPtr;
@@ -439,7 +442,7 @@ public:
 	CUpgrade *Suffix;	/// Item unit's suffix
 	SpellType *Spell;	/// Item unit's spell
 	CUpgrade *Work;		/// Item unit's literary work
-	bool Unique;		/// Whether the item is unique
+	CUniqueItem *Unique;		/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
 	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions

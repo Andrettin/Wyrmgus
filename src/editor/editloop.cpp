@@ -310,8 +310,8 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 			unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
 			unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
 			//Wyrmgus start
-			if (replacedUnit.Unique && GetUniqueItem(replacedUnit.Name) != NULL) {
-				unit->SetUnique(GetUniqueItem(replacedUnit.Name));
+			if (replacedUnit.Unique != NULL) {
+				unit->SetUnique(replacedUnit.Unique);
 			} else {
 				if (replacedUnit.Prefix != NULL) {
 					unit->SetPrefix(replacedUnit.Prefix);

@@ -453,7 +453,7 @@ void SaveHero(CCharacter *hero)
 		for (size_t j = 0; j < hero->Items.size(); ++j) {
 			fprintf(fd, "\n\t\t{");
 			if (hero->Items[j]->Unique) {
-				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", hero->Items[j]->Name.c_str());
+				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", hero->Items[j]->Unique->Ident.c_str());
 			} else {
 				fprintf(fd, "\n\t\t\t\"type\", \"%s\",", hero->Items[j]->Type->Ident.c_str());
 				if (hero->Items[j]->Prefix != NULL) {

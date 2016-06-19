@@ -1208,7 +1208,7 @@ std::string EvalString(const StringDesc *s)
 						return unit->Type->Quote;
 					}
 				} else {
-					return GetUniqueItem(unit->Name)->Quote;
+					return unit->Unique->Quote;
 				}
 			} else {
 				return std::string("");
