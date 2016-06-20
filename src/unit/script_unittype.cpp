@@ -768,6 +768,9 @@ static int CclDefineUnitType(lua_State *l)
 			for (size_t i = 0; i < parent_type->Traits.size(); ++i) {
 				type->Traits.push_back(parent_type->Traits[i]);
 			}
+			for (size_t i = 0; i < parent_type->StartingAbilities.size(); ++i) {
+				type->StartingAbilities.push_back(parent_type->StartingAbilities[i]);
+			}
 			for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
 				type->Trains.push_back(parent_type->Trains[i]);
 			}
@@ -1969,6 +1972,26 @@ static int CclDefineUnitType(lua_State *l)
 					type->Traits.push_back(CUpgrade::New(trait_ident)); //if this trait doesn't exist, define it now (this is useful if the unit type is defined before the upgrade)
 				}
 			}
+		} else if (!strcmp(value, "StartingAbilities")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string ability_ident = LuaToString(l, -1, j + 1);
+				int ability_id = UpgradeIdByIdent(ability_ident);
+				if (ability_id != -1) {
+					type->StartingAbilities.push_back(AllUpgrades[ability_id]);
+					
+					for (size_t z = 0; z < AllUpgrades[ability_id]->UpgradeModifiers.size(); ++z) {
+						for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+							type->DefaultStat.Variables[i].Enable |= AllUpgrades[ability_id]->UpgradeModifiers[z]->Modifier.Variables[i].Enable;
+							type->DefaultStat.Variables[i].Value += AllUpgrades[ability_id]->UpgradeModifiers[z]->Modifier.Variables[i].Value;
+							type->DefaultStat.Variables[i].Max += AllUpgrades[ability_id]->UpgradeModifiers[z]->Modifier.Variables[i].Max;
+							type->DefaultStat.Variables[i].Increase += AllUpgrades[ability_id]->UpgradeModifiers[z]->Modifier.Variables[i].Increase;
+						}
+					}
+				} else {
+					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "ItemClass")) {
 			type->ItemClass = GetItemClassIdByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "SkinColor")) {
@@ -2892,6 +2915,14 @@ static int CclGetUnitTypeData(lua_State *l)
 		for (size_t i = 1; i <= type->Traits.size(); ++i)
 		{
 			lua_pushstring(l, type->Traits[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "StartingAbilities")) {
+		lua_createtable(l, type->StartingAbilities.size(), 0);
+		for (size_t i = 1; i <= type->StartingAbilities.size(); ++i)
+		{
+			lua_pushstring(l, type->StartingAbilities[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

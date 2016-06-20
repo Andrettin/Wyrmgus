@@ -458,6 +458,18 @@ public:
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 };
 
+class CDeityDomain
+{
+public:
+	CDeityDomain() :
+		Ident("")
+	{
+	}
+	
+	std::string Ident;			/// Ident of the deity
+	std::string Name;			/// Name of the deity
+};
+
 class CDeity
 {
 public:
@@ -471,7 +483,6 @@ public:
 	std::string Ident;			/// Ident of the deity
 	std::string Name;			/// Name of the deity
 	std::string UpgradeIdent;	/// Ident of the upgrade applied by the deity
-	std::string Portfolio;		/// Portfolio of the deity
 	std::string Pantheon;		/// Pantheon to which the deity belongs
 	std::string Description;
 	std::string Background;
@@ -479,6 +490,7 @@ public:
 	CPlane *HomePlane;			/// The home plane of the deity
 	std::vector<int> Civilizations;	/// Civilizations which may worship the deity
 	std::vector<std::string> Feasts;
+	std::vector<CDeityDomain *> Domains;
 	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };
 
@@ -607,7 +619,8 @@ public:
 	int GetRaceIndexByName(const char *raceName) const;
 	//Wyrmgus start
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
-	int GetDeityIndexByIdent(std::string deity_name) const;
+	int GetDeityDomainIndexByIdent(std::string deity_domain_ident) const;
+	int GetDeityIndexByIdent(std::string deity_ident) const;
 	int GetLanguageIndexByIdent(std::string language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);
@@ -642,6 +655,7 @@ public:
 	int CivilizationLanguage[MAX_RACES];
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
+	std::vector<CDeityDomain *> DeityDomains;							/// deity domains
 	std::vector<CDeity *> Deities;										/// deities
 	//Wyrmgus end
 	unsigned int Count;             /// number of races

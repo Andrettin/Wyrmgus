@@ -1774,6 +1774,44 @@ static int CclDefineFaction(lua_State *l)
 }
 
 /**
+**  Define a deity domain.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineDeityDomain(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string deity_domain_ident = LuaToString(l, 1);
+	CDeityDomain *deity_domain = NULL;
+	int deity_domain_id = PlayerRaces.GetDeityDomainIndexByIdent(deity_domain_ident);
+	if (deity_domain_id != -1) {
+		deity_domain = PlayerRaces.DeityDomains[deity_domain_id];
+	} else {
+		deity_domain = new CDeityDomain;
+		PlayerRaces.DeityDomains.push_back(deity_domain);
+	}
+	
+	deity_domain->Ident = deity_domain_ident;
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			deity_domain->Name = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a deity.
 **
 **  @param l  Lua state.
@@ -1803,8 +1841,6 @@ static int CclDefineDeity(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			deity->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Portfolio")) {
-			deity->Portfolio = LuaToString(l, -1);
 		} else if (!strcmp(value, "Pantheon")) {
 			deity->Pantheon = LuaToString(l, -1);
 		} else if (!strcmp(value, "Upgrade")) {
@@ -1838,6 +1874,19 @@ static int CclDefineDeity(lua_State *l)
 
 				deity->Civilizations.push_back(civilization);
 			}
+		} else if (!strcmp(value, "Domains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int domain_id = PlayerRaces.GetDeityDomainIndexByIdent(LuaToString(l, -1, j + 1));
+				if (domain_id == -1) {
+					LuaError(l, "Domain doesn't exist.");
+				}
+
+				deity->Domains.push_back(PlayerRaces.DeityDomains[domain_id]);
+			}
 		} else if (!strcmp(value, "Feasts")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -1866,6 +1915,12 @@ static int CclDefineDeity(lua_State *l)
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
+	}
+	
+	if (deity->Major && deity->Domains.size() > 3) { // major deities can only have up to three domains
+		deity->Domains.resize(3);
+	} else if (!deity->Major && deity->Domains.size() > 1) { // minor deities can only have one domain
+		deity->Domains.resize(1);
 	}
 	
 	return 0;
@@ -2958,6 +3013,17 @@ static int CclGetLanguageWordData(lua_State *l)
 	return 0;
 }
 
+static int CclGetDeityDomains(lua_State *l)
+{
+	lua_createtable(l, PlayerRaces.DeityDomains.size(), 0);
+	for (size_t i = 1; i <= PlayerRaces.DeityDomains.size(); ++i)
+	{
+		lua_pushstring(l, PlayerRaces.DeityDomains[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
 static int CclGetDeities(lua_State *l)
 {
 	lua_createtable(l, PlayerRaces.Deities.size(), 0);
@@ -2970,6 +3036,34 @@ static int CclGetDeities(lua_State *l)
 }
 
 /**
+**  Get deity domain data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetDeityDomainData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string deity_domain_ident = LuaToString(l, 1);
+	int deity_domain_id = PlayerRaces.GetDeityDomainIndexByIdent(deity_domain_ident);
+	if (deity_domain_id == -1) {
+		LuaError(l, "Deity domain \"%s\" doesn't exist." _C_ deity_domain_ident.c_str());
+	}
+	const CDeityDomain *deity_domain = PlayerRaces.DeityDomains[deity_domain_id];
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, deity_domain->Name.c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
 **  Get deity data.
 **
 **  @param l  Lua state.
@@ -2979,19 +3073,16 @@ static int CclGetDeityData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string deity_name = LuaToString(l, 1);
-	int deity_id = PlayerRaces.GetDeityIndexByIdent(deity_name);
+	std::string deity_ident = LuaToString(l, 1);
+	int deity_id = PlayerRaces.GetDeityIndexByIdent(deity_ident);
 	if (deity_id == -1) {
-		LuaError(l, "Deity \"%s\" doesn't exist." _C_ deity_name.c_str());
+		LuaError(l, "Deity \"%s\" doesn't exist." _C_ deity_ident.c_str());
 	}
 	const CDeity *deity = PlayerRaces.Deities[deity_id];
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, deity->Name.c_str());
-		return 1;
-	} else if (!strcmp(data, "Portfolio")) {
-		lua_pushstring(l, deity->Portfolio.c_str());
 		return 1;
 	} else if (!strcmp(data, "Pantheon")) {
 		lua_pushstring(l, deity->Pantheon.c_str());
@@ -3020,6 +3111,14 @@ static int CclGetDeityData(lua_State *l)
 		for (size_t i = 1; i <= deity->Civilizations.size(); ++i)
 		{
 			lua_pushstring(l, PlayerRaces.Name[deity->Civilizations[i-1]].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Domains")) {
+		lua_createtable(l, deity->Domains.size(), 0);
+		for (size_t i = 1; i <= deity->Domains.size(); ++i)
+		{
+			lua_pushstring(l, deity->Domains[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -3079,6 +3178,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
 	lua_register(Lua, "GetFactionClassUnitType", CclGetFactionClassUnitType);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
+	lua_register(Lua, "DefineDeityDomain", CclDefineDeityDomain);
 	lua_register(Lua, "DefineDeity", CclDefineDeity);
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
 	lua_register(Lua, "GetCivilizations", CclGetCivilizations);
@@ -3109,7 +3209,9 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetLanguageData", CclGetLanguageData);
 	lua_register(Lua, "GetLanguageWordData", CclGetLanguageWordData);
 	
+	lua_register(Lua, "GetDeityDomains", CclGetDeityDomains);
 	lua_register(Lua, "GetDeities", CclGetDeities);
+	lua_register(Lua, "GetDeityDomainData", CclGetDeityDomainData);
 	lua_register(Lua, "GetDeityData", CclGetDeityData);
 	//Wyrmgus end
 }

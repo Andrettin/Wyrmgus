@@ -628,6 +628,7 @@ CUnitType::~CUnitType()
 	DropSpells.clear();
 	Affixes.clear();
 	Traits.clear();
+	StartingAbilities.clear();
 	//Wyrmgus end
 
 	BoolFlag.clear();

@@ -2064,6 +2064,10 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 			unit->Name += " " + unit->Trait->Epithets[SyncRand(unit->Trait->Epithets.size())];
 		}
 	}
+	
+	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
+		unit->IndividualUpgrades[unit->Type->StartingAbilities[i]->ID] = true;
+	}
 	//Wyrmgus end
 	
 	if (unit->Type->OnInit) {
