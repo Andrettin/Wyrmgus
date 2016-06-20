@@ -3130,6 +3130,10 @@ void SaveGrandStrategyGame(const std::string &filename)
 */
 void ParseNameElements(lua_State *l, std::string type)
 {
+	if (!LanguageCacheOutdated) {
+		return;
+	}
+	
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}

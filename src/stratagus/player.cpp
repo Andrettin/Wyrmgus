@@ -47,6 +47,8 @@
 #include "commands.h" //for faction setting
 #include "editor.h"
 #include "font.h"
+#include "game.h"
+#include "iocompat.h"
 //Wyrmgus end
 #include "iolib.h"
 //Wyrmgus start
@@ -55,6 +57,9 @@
 #include "map.h"
 #include "network.h"
 #include "netconnect.h"
+//Wyrmgus start
+#include "parameters.h"
+//Wyrmgus end
 #include "sound.h"
 #include "translate.h"
 #include "unitsound.h"
@@ -354,6 +359,8 @@ int PlayerColorIndexCount;
 //Wyrmgus start
 std::map<std::string, int> CivilizationStringToIndex;
 std::map<std::string, int> FactionStringToIndex[MAX_RACES];
+
+bool LanguageCacheOutdated = false;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -3293,7 +3300,7 @@ void LanguageWord::RemoveFromVector(std::vector<LanguageWord *>& word_vector)
 void GenerateMissingLanguageData()
 {
 	std::vector<std::string> types;
-	int minimum_desired_names = 10;
+	int minimum_desired_names = 25;
 
 	int default_language = PlayerRaces.GetLanguageIndexByIdent("english");
 	size_t markov_chain_size = 2;
@@ -3463,8 +3470,8 @@ void GenerateMissingLanguageData()
 		
 		std::map<LanguageWord *, std::vector<LanguageWord *>> related_words;
 
-		for (size_t k = 0; k < PlayerRaces.Languages[i]->LanguageWords.size(); ++k) {
-			LanguageWord *word = PlayerRaces.Languages[i]->LanguageWords[k];
+		for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
+			LanguageWord *word = PlayerRaces.Languages[i]->LanguageWords[j];
 			if (word->DerivesFrom != NULL || word->DerivesTo.size() > 0) {
 				related_words[word].push_back(word);
 			}
@@ -3616,7 +3623,9 @@ void GenerateMissingLanguageData()
 			}
 		}
 	}
-
+	
+	CreateLanguageCache();
+	
 	//this is for debugging purposes
 	int minimum_names = 5;
 	int desired_names = 25;
@@ -3636,6 +3645,233 @@ void GenerateMissingLanguageData()
 			}
 		}
 	}
+}
+
+void CreateLanguageCache()
+{
+	struct stat tmp;
+	std::string path = Parameters::Instance.GetUserDirectory();
+
+	if (!GameName.empty()) {
+		path += "/";
+		path += GameName;
+	}
+	path += "/";
+	path += "cache/";
+	if (stat(path.c_str(), &tmp) < 0) {
+		makedir(path.c_str(), 0777);
+	}
+	path += "languages";
+	path += ".lua";
+
+	FILE *fd = fopen(path.c_str(), "w");
+	if (!fd) {
+		fprintf(stderr, "Cannot open file %s for writing.\n", path.c_str());
+		return;
+	}
+	
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		CLanguage *language = PlayerRaces.Languages[i];
+		fprintf(fd, "DefineLanguage(\"%s\", {\n", language->Ident.c_str());
+		fprintf(fd, "\tName = \"%s\",\n", language->Name.c_str());
+		if (language->DialectOf) {
+			fprintf(fd, "\tDialectOf = \"%s\",\n", language->DialectOf->Ident.c_str());
+		}
+		
+		fprintf(fd, "\tNounEndings = {");
+		for (int j = 0; j < MaxGrammaticalNumbers; ++j) {
+			for (int k = 0; k < MaxGrammaticalCases; ++k) {
+				for (int n = 0; n < MaxWordJunctionTypes; ++n) {
+					if (!language->NounEndings[j][k][n].empty()) {
+						fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(j).c_str());
+						fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(k).c_str());
+						fprintf(fd, "\"%s\", ", GetWordJunctionTypeNameById(n).c_str());
+						fprintf(fd, "\"%s\", ", language->NounEndings[j][k][n].c_str());
+					}
+				}
+			}
+		}
+		fprintf(fd, "},\n");
+		
+		fprintf(fd, "\tAdjectiveEndings = {");
+		for (int j = 0; j < MaxArticleTypes; ++j) {
+			for (int k = 0; k < MaxGrammaticalCases; ++k) {
+				for (int n = 0; n < MaxGrammaticalNumbers; ++n) {
+					for (int o = 0; o < MaxGrammaticalGenders; ++o) {
+						if (!language->AdjectiveEndings[j][k][n][o].empty()) {
+							fprintf(fd, "\"%s\", ", GetArticleTypeNameById(j).c_str());
+							fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(k).c_str());
+							fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(n).c_str());
+							fprintf(fd, "\"%s\", ", GetGrammaticalGenderNameById(n).c_str());
+							fprintf(fd, "\"%s\", ", language->AdjectiveEndings[j][k][n][o].c_str());
+						}
+					}
+				}
+			}
+		}
+		fprintf(fd, "},\n");
+		
+		fprintf(fd, "\tNameTranslations = {");
+		for (std::map<std::string, std::vector<std::string>>::iterator iterator = language->NameTranslations.begin(); iterator != language->NameTranslations.end(); ++iterator) {
+			for (size_t j = 0; j < iterator->second.size(); ++j) {
+				fprintf(fd, "\"%s\", ", iterator->first.c_str());
+				fprintf(fd, "\"%s\", ", iterator->second[j].c_str());
+			}
+		}
+		fprintf(fd, "},\n");
+
+		
+		fprintf(fd, "})\n\n");
+	}
+	
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		ShowLoadProgress("Creating cache for the %s language", PlayerRaces.Languages[i]->Name.c_str());
+		for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
+			LanguageWord *word = PlayerRaces.Languages[i]->LanguageWords[j];
+			
+			if (!word->Mod.empty()) {
+				continue;
+			}
+		
+			fprintf(fd, "DefineLanguageWord(\"%s\", {\n", word->Word.c_str());
+			fprintf(fd, "\tLanguage = \"%s\",\n", PlayerRaces.Languages[i]->Ident.c_str());
+			if (word->Type != -1) {
+				fprintf(fd, "\tType = \"%s\",\n", GetWordTypeNameById(word->Type).c_str());
+			}
+			if (word->Gender != -1) {
+				fprintf(fd, "\tGender = \"%s\",\n", GetGrammaticalGenderNameById(word->Gender).c_str());
+			}
+			if (word->GrammaticalNumber != -1) {
+				fprintf(fd, "\tGrammaticalNumber = \"%s\",\n", GetGrammaticalNumberNameById(word->GrammaticalNumber).c_str());
+			}
+			if (word->Archaic) {
+				fprintf(fd, "\tArchaic = true,\n");
+			}
+
+			fprintf(fd, "\tMeanings = {");
+			for (size_t k = 0; k < word->Meanings.size(); ++k) {
+				fprintf(fd, "\"%s\", ", word->Meanings[k].c_str());
+			}
+			fprintf(fd, "},\n");
+			
+			if (word->Type == WordTypeNoun) {
+				fprintf(fd, "\tNumberCaseInflections = {");
+				for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
+					for (int n = 0; n < MaxGrammaticalCases; ++n) {
+						if (!word->NumberCaseInflections[k][n].empty()) {
+							fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(k).c_str());
+							fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(n).c_str());
+							fprintf(fd, "\"%s\", ", word->NumberCaseInflections[k][n].c_str());
+						}
+					}
+				}
+				fprintf(fd, "},\n");
+			} else if (word->Type == WordTypeVerb) {
+				fprintf(fd, "\tNumberPersonTenseMoodInflections = {");
+				for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
+					for (int n = 0; n < MaxGrammaticalPersons; ++n) {
+						for (int o = 0; o < MaxGrammaticalTenses; ++o) {
+							for (int p = 0; p < MaxGrammaticalMoods; ++p) {
+								if (!word->NumberPersonTenseMoodInflections[k][n][o][p].empty()) {
+									fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(k).c_str());
+									fprintf(fd, "\"%s\", ", GetGrammaticalPersonNameById(n).c_str());
+									fprintf(fd, "\"%s\", ", GetGrammaticalTenseNameById(o).c_str());
+									fprintf(fd, "\"%s\", ", GetGrammaticalMoodNameById(p).c_str());
+									fprintf(fd, "\"%s\", ", word->NumberPersonTenseMoodInflections[k][n][o][p].c_str());
+								}
+							}
+						}
+					}
+				}
+				fprintf(fd, "},\n");
+				
+				fprintf(fd, "\tParticiples = {");
+				for (int k = 0; k < MaxGrammaticalTenses; ++k) {
+					if (!word->Participles[k].empty()) {
+						fprintf(fd, "\"%s\", ", GetGrammaticalTenseNameById(k).c_str());
+						fprintf(fd, "\"%s\", ", word->Participles[k].c_str());
+					}
+				}
+				fprintf(fd, "},\n");
+			} else if (word->Type == WordTypeAdjective) {
+				fprintf(fd, "\tComparisonDegreeCaseInflections = {");
+				for (int k = 0; k < MaxComparisonDegrees; ++k) {
+					for (int n = 0; n < MaxGrammaticalCases; ++n) {
+						if (!word->ComparisonDegreeCaseInflections[k][n].empty()) {
+							fprintf(fd, "\"%s\", ", GetComparisonDegreeNameById(k).c_str());
+							fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(n).c_str());
+							fprintf(fd, "\"%s\", ", word->ComparisonDegreeCaseInflections[k][n].c_str());
+						}
+					}
+				}
+				fprintf(fd, "},\n");
+			}
+			
+			if (word->Uncountable) {
+				fprintf(fd, "\tUncountable = true,\n");
+			}
+			if (!word->Nominative.empty()) {
+				fprintf(fd, "\tNominative = \"%s\",\n", word->Nominative.c_str());
+			}
+			if (!word->Accusative.empty()) {
+				fprintf(fd, "\tAccusative = \"%s\",\n", word->Accusative.c_str());
+			}
+			if (!word->Dative.empty()) {
+				fprintf(fd, "\tDative = \"%s\",\n", word->Dative.c_str());
+			}
+			if (!word->Genitive.empty()) {
+				fprintf(fd, "\tGenitive = \"%s\",\n", word->Genitive.c_str());
+			}
+			if (word->ArticleType != -1) {
+				fprintf(fd, "\tArticleType = \"%s\",\n", GetArticleTypeNameById(word->ArticleType).c_str());
+			}
+			if (word->Number != -1) {
+				fprintf(fd, "\tNumber = %d,\n", word->Number);
+			}
+			
+			fprintf(fd, "\tNameTypes = {");
+			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
+				for (int n = 0; n < MaxGrammaticalCases; ++n) {
+					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
+						for (std::map<std::string, int>::iterator iterator = word->NameTypes[k][n][o].begin(); iterator != word->NameTypes[k][n][o].end(); ++iterator) {
+							for (int p = 0; p < iterator->second; ++p) {
+								fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(k).c_str());
+								fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(n).c_str());
+								fprintf(fd, "\"%s\", ", GetGrammaticalTenseNameById(o).c_str());
+								fprintf(fd, "\"%s\", ", iterator->first.c_str());
+							}
+						}
+					}
+				}
+			}
+			fprintf(fd, "},\n");
+			fprintf(fd, "\tAffixNameTypes = {");
+			for (int k = 0; k < MaxWordJunctionTypes; ++k) {
+				for (int n = 0; n < MaxAffixTypes; ++n) {
+					for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
+						for (int p = 0; p < MaxGrammaticalCases; ++p) {
+							for (int q = 0; q < MaxGrammaticalTenses; ++q) {
+								for (std::map<std::string, int>::iterator iterator = word->AffixNameTypes[k][n][o][p][q].begin(); iterator != word->AffixNameTypes[k][n][o][p][q].end(); ++iterator) {
+									for (int r = 0; r < iterator->second; ++r) {
+										fprintf(fd, "\"%s\", ", GetWordJunctionTypeNameById(k).c_str());
+										fprintf(fd, "\"%s\", ", GetAffixTypeNameById(n).c_str());
+										fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(o).c_str());
+										fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(p).c_str());
+										fprintf(fd, "\"%s\", ", GetGrammaticalTenseNameById(q).c_str());
+										fprintf(fd, "\"%s\", ", iterator->first.c_str());
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			fprintf(fd, "}\n");
+			fprintf(fd, "})\n\n");
+		}
+	}
+	
+	fclose(fd);
 }
 
 void DeleteModWord(std::string language_name, std::string word_name)

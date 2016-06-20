@@ -751,6 +751,8 @@ extern std::vector<CColor> HairColorsRGB[HairColorMax]; /// Hair colors
 
 extern std::map<std::string, int> CivilizationStringToIndex;
 extern std::map<std::string, int> FactionStringToIndex[MAX_RACES];
+
+extern bool LanguageCacheOutdated;
 //Wyrmgus end
 
 extern PlayerRace PlayerRaces;  /// Player races
@@ -833,6 +835,7 @@ extern int GetAffixTypeIdByName(std::string affix_type);
 extern std::string GetWordJunctionTypeNameById(int word_junction_type);
 extern int GetWordJunctionTypeIdByName(std::string word_junction_type);
 extern void GenerateMissingLanguageData();
+extern void CreateLanguageCache();
 extern void DeleteModWord(std::string language_name, std::string word_name);
 extern void CleanLanguageModWords(std::string mod_file);
 extern bool IsNameValidForWord(std::string word_name);

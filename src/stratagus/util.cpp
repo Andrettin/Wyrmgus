@@ -524,6 +524,8 @@ void PrintOnStdOut(const char *format, ...)
 //Wyrmgus start
 #include "character.h" //for personal name generation
 #include "editor.h" //for personal name generation
+#include "iocompat.h" //for getting a file's last modified date
+#include "iolib.h" //for getting a file's last modified date
 #include "player.h" //for personal name generation
 #include "unittype.h" //for personal name generation
 #include "upgrade.h" //for personal name generation
@@ -551,6 +553,19 @@ std::string FindAndReplaceStringBeginning(std::string text, const std::string& f
 		text.replace(pos, find.length(), replace);
 	}
     return text;
+}
+
+int GetFileLastModified(std::string file_name)
+{
+	file_name = LibraryFileName(file_name.c_str());
+	
+	struct stat tmp;
+	
+	stat(file_name.c_str(), &tmp);
+	
+	int date = tmp.st_mtime;	
+	
+	return date;
 }
 
 std::string TransliterateText(std::string text) //convert special characters into ones more legible for English-speakers

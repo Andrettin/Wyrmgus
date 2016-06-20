@@ -77,6 +77,8 @@ extern CPlayer Players[PlayerMax];
 extern CPlayer *ThisPlayer;
 
 //Wyrmgus start
+extern bool LanguageCacheOutdated;
+
 extern void CleanPlayers();
 extern void NetworkSetFaction(int player, std::string faction_name);
 extern std::string GetFactionEffectsString(std::string civilization_name, std::string faction_name);
