@@ -269,7 +269,6 @@ void CCharacter::UpdateAttributes()
 			if (
 				(this->Trait != NULL && UpgradeModifiers[z]->UpgradeId == this->Trait->ID)
 				|| std::find(this->Abilities.begin(), this->Abilities.end(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]) != this->Abilities.end()
-				|| std::find(this->Type->StartingAbilities.begin(), this->Type->StartingAbilities.end(), AllUpgrades[UpgradeModifiers[z]->UpgradeId]) != this->Type->StartingAbilities.end()
 			) {
 				if (UpgradeModifiers[z]->Modifier.Variables[var].Value != 0) {
 					this->Attributes[i] += UpgradeModifiers[z]->Modifier.Variables[var].Value;

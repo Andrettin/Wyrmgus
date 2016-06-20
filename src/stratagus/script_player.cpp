@@ -1803,6 +1803,19 @@ static int CclDefineDeityDomain(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			deity_domain->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Abilities")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CUpgrade *ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
+				if (!ability == -1 || !ability->Ability) {
+					LuaError(l, "Ability doesn't exist.");
+				}
+
+				deity_domain->Abilities.push_back(ability);
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1887,6 +1900,21 @@ static int CclDefineDeity(lua_State *l)
 
 				deity->Domains.push_back(PlayerRaces.DeityDomains[domain_id]);
 			}
+		} else if (!strcmp(value, "Abilities")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CUpgrade *ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
+				if (!ability == -1 || !ability->Ability) {
+					LuaError(l, "Ability doesn't exist.");
+				}
+
+				if (std::find(deity->Abilities.begin(), deity->Abilities.end(), ability) == deity->Abilities.end()) {
+					deity->Abilities.push_back(ability);
+				}
+			}
 		} else if (!strcmp(value, "Feasts")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -1921,6 +1949,14 @@ static int CclDefineDeity(lua_State *l)
 		deity->Domains.resize(3);
 	} else if (!deity->Major && deity->Domains.size() > 1) { // minor deities can only have one domain
 		deity->Domains.resize(1);
+	}
+	
+	for (size_t i = 0; i < deity->Domains.size(); ++i) {
+		for (size_t j = 0; j < deity->Domains[i]->Abilities.size(); ++j) {
+			if (std::find(deity->Abilities.begin(), deity->Abilities.end(), deity->Domains[i]->Abilities[j]) == deity->Abilities.end()) {
+				deity->Abilities.push_back(deity->Domains[i]->Abilities[j]);
+			}
+		}
 	}
 	
 	return 0;
@@ -3056,6 +3092,14 @@ static int CclGetDeityDomainData(lua_State *l)
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, deity_domain->Name.c_str());
 		return 1;
+	} else if (!strcmp(data, "Abilities")) {
+		lua_createtable(l, deity_domain->Abilities.size(), 0);
+		for (size_t i = 1; i <= deity_domain->Abilities.size(); ++i)
+		{
+			lua_pushstring(l, deity_domain->Abilities[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
@@ -3119,6 +3163,14 @@ static int CclGetDeityData(lua_State *l)
 		for (size_t i = 1; i <= deity->Domains.size(); ++i)
 		{
 			lua_pushstring(l, deity->Domains[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Abilities")) {
+		lua_createtable(l, deity->Abilities.size(), 0);
+		for (size_t i = 1; i <= deity->Abilities.size(); ++i)
+		{
+			lua_pushstring(l, deity->Abilities[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

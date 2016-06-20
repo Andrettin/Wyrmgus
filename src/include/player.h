@@ -468,6 +468,7 @@ public:
 	
 	std::string Ident;			/// Ident of the deity
 	std::string Name;			/// Name of the deity
+	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this domain
 };
 
 class CDeity
@@ -491,6 +492,7 @@ public:
 	std::vector<int> Civilizations;	/// Civilizations which may worship the deity
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;
+	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this deity
 	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };
 
