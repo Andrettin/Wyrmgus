@@ -1810,7 +1810,7 @@ static int CclDefineDeityDomain(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CUpgrade *ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
-				if (!ability == -1 || !ability->Ability) {
+				if (!ability || !ability->Ability) {
 					LuaError(l, "Ability doesn't exist.");
 				}
 
@@ -1907,7 +1907,7 @@ static int CclDefineDeity(lua_State *l)
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				CUpgrade *ability = CUpgrade::Get(LuaToString(l, -1, j + 1));
-				if (!ability == -1 || !ability->Ability) {
+				if (!ability || !ability->Ability) {
 					LuaError(l, "Ability doesn't exist.");
 				}
 
