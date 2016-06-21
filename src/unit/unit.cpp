@@ -702,7 +702,7 @@ void CUnit::Retrain()
 					if (!IsNetworkGame() && Character != NULL) {	//save the unit-type experience upgrade for persistent characters
 						if (Character->Type->Slot != i) {
 							if (Character->Persistent && Player->AiEnabled == false) {
-								Character->Type = const_cast<CUnitType *>(&(*UnitTypes[i]));
+								Character->Type = UnitTypes[i];
 								SaveHero(Character);
 							}
 							if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode

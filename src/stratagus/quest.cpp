@@ -37,6 +37,7 @@
 
 #include "quest.h"
 
+#include "character.h"
 #include "game.h"
 #include "iocompat.h"
 #include "iolib.h"
@@ -192,6 +193,19 @@ bool CAchievement::CanObtain()
 	
 	for (size_t i = 0; i < this->RequiredQuests.size(); ++i) {
 		if (!this->RequiredQuests[i]->Completed) {
+			return false;
+		}
+	}
+	
+	if (this->CharacterLevel) {
+		bool found_hero = false;
+		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+			if (iterator->second->Level >= CharacterLevel) {
+				found_hero = true;
+				break;
+			}
+		}
+		if (!found_hero) {
 			return false;
 		}
 	}
