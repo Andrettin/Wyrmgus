@@ -338,6 +338,18 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Icon.Icon = NULL;
 			achievement->Icon.Load();
 			achievement->Icon.Icon->Load();
+		} else if (!strcmp(value, "RequiredQuests")) {
+			achievement->RequiredQuests.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string quest_ident = LuaToString(l, -1, j + 1);
+				CQuest *required_quest = GetQuest(quest_ident);
+				if (required_quest) {
+					achievement->RequiredQuests.push_back(required_quest);
+				} else {
+					LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_ident.c_str());
+				}
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

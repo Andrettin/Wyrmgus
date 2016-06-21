@@ -85,7 +85,6 @@ void CleanDialogues()
 
 void SaveQuestCompletion()
 {
-	struct stat tmp;
 	std::string path = Parameters::Instance.GetUserDirectory();
 
 	if (!GameName.empty()) {
@@ -101,21 +100,34 @@ void SaveQuestCompletion()
 		return;
 	}
 
-	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (Quests[i]->Completed) {
-			fprintf(fd, "SetQuestCompleted(\"%s\")\n", Quests[i]->Ident.c_str());
+	for (size_t i = 0; i < Achievements.size(); ++i) {
+		if (Achievements[i]->Obtained) {
+			fprintf(fd, "SetAchievementObtained(\"%s\", false, false)\n", Achievements[i]->Ident.c_str());
 		}
 	}
 	
 	fprintf(fd, "\n");
 	
-	for (size_t i = 0; i < Achievements.size(); ++i) {
-		if (Achievements[i]->Obtained) {
-			fprintf(fd, "SetAchievementObtained(\"%s\")\n", Achievements[i]->Ident.c_str());
+	for (size_t i = 0; i < Quests.size(); ++i) {
+		if (Quests[i]->Completed) {
+			fprintf(fd, "SetQuestCompleted(\"%s\", false)\n", Quests[i]->Ident.c_str());
 		}
 	}
-		
+	
 	fclose(fd);
+}
+
+void CheckAchievements()
+{
+	for (size_t i = 0; i < Achievements.size(); ++i) {
+		if (Achievements[i]->Obtained) {
+			continue;
+		}
+		
+		if (Achievements[i]->CanObtain()) {
+			Achievements[i]->Obtain();
+		}
+	}
 }
 
 CQuest *GetQuest(std::string quest_ident)
@@ -154,6 +166,37 @@ CDialogue *GetDialogue(std::string dialogue_ident)
 		}
 	}
 	return NULL;
+}
+
+void CAchievement::Obtain(bool save, bool display)
+{
+	if (this->Obtained) {
+		return;
+	}
+	this->Obtained = true;
+	
+	if (save) {
+		SaveQuestCompletion();
+	}
+	
+	if (display) {
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->Name + " achievement.\") end;");
+	}
+}
+
+bool CAchievement::CanObtain()
+{
+	if (this->Obtained) {
+		return false;
+	}
+	
+	for (size_t i = 0; i < this->RequiredQuests.size(); ++i) {
+		if (!this->RequiredQuests[i]->Completed) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 CDialogue::~CDialogue()
@@ -253,7 +296,7 @@ std::string GetCurrentQuest()
 	}
 }
 
-void SetQuestCompleted(std::string quest_ident)
+void SetQuestCompleted(std::string quest_ident, bool save)
 {
 	CQuest *quest = GetQuest(quest_ident);
 	if (!quest || quest->Completed) {
@@ -261,18 +304,20 @@ void SetQuestCompleted(std::string quest_ident)
 	}
 	
 	quest->Completed = true;
-	SaveQuestCompletion();
+	if (save) {
+		SaveQuestCompletion();
+	}
+	CheckAchievements();
 }
 
-void SetAchievementObtained(std::string achievement_ident)
+void SetAchievementObtained(std::string achievement_ident, bool save, bool display)
 {
 	CAchievement *achievement = GetAchievement(achievement_ident);
-	if (!achievement || achievement->Obtained) {
+	if (!achievement) {
 		return;
 	}
 	
-	achievement->Obtained = true;
-	SaveQuestCompletion();
+	achievement->Obtain(save, display);
 }
 
 void CallDialogue(std::string dialogue_ident, int player)
