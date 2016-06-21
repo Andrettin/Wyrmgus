@@ -10,7 +10,7 @@
 //
 /**@name quest.cpp - The quests. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2016 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@
 
 std::vector<CQuest *> Quests;
 CQuest *CurrentQuest = NULL;
+std::vector<CAchievement *> Achievements;
 std::vector<CDialogue *> Dialogues;
 
 /*----------------------------------------------------------------------------
@@ -63,6 +64,11 @@ void CleanQuests()
 		delete Quests[i];
 	}
 	Quests.clear();
+	
+	for (size_t i = 0; i < Achievements.size(); ++i) {
+		delete Achievements[i];
+	}
+	Achievements.clear();
 }
 
 void CleanDialogues()
@@ -78,6 +84,16 @@ CQuest *GetQuest(std::string quest_name)
 	for (size_t i = 0; i < Quests.size(); ++i) {
 		if (quest_name == Quests[i]->Name) {
 			return Quests[i];
+		}
+	}
+	return NULL;
+}
+
+CAchievement *GetAchievement(std::string achievement_ident)
+{
+	for (size_t i = 0; i < Achievements.size(); ++i) {
+		if (achievement_ident == Achievements[i]->Ident) {
+			return Achievements[i];
 		}
 	}
 	return NULL;

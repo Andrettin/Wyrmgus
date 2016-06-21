@@ -288,6 +288,107 @@ static int CclGetQuestData(lua_State *l)
 }
 
 /**
+**  Define an achievement.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineAchievement(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string achievement_ident = LuaToString(l, 1);
+	CAchievement *achievement = GetAchievement(achievement_ident);
+	if (!achievement) {
+		achievement = new CAchievement;
+		Achievements.push_back(achievement);
+		achievement->Ident = achievement_ident;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			achievement->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			achievement->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "PlayerColor")) {
+			std::string color_name = LuaToString(l, -1);
+			int color = GetPlayerColorIndexByName(color_name);
+			if (color != -1) {
+				achievement->PlayerColor = color;
+			} else {
+				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
+			}
+		} else if (!strcmp(value, "Hidden")) {
+			achievement->Hidden = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Icon")) {
+			achievement->Icon.Name = LuaToString(l, -1);
+			achievement->Icon.Icon = NULL;
+			achievement->Icon.Load();
+			achievement->Icon.Icon->Load();
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+static int CclGetAchievements(lua_State *l)
+{
+	lua_createtable(l, Achievements.size(), 0);
+	for (size_t i = 1; i <= Achievements.size(); ++i)
+	{
+		lua_pushstring(l, Achievements[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+/**
+**  Get achievement data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetAchievementData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string achievement_ident = LuaToString(l, 1);
+	const CAchievement *achievement = GetAchievement(achievement_ident);
+	if (!achievement) {
+		LuaError(l, "Achievement \"%s\" doesn't exist." _C_ achievement_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, achievement->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, achievement->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "PlayerColor")) {
+		lua_pushstring(l, PlayerColorNames[achievement->PlayerColor].c_str());
+		return 1;
+	} else if (!strcmp(data, "Hidden")) {
+		lua_pushboolean(l, achievement->Hidden);
+		return 1;
+	} else if (!strcmp(data, "Icon")) {
+		lua_pushstring(l, achievement->Icon.Name.c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
 **  Define a dialogue.
 **
 **  @param l  Lua state.
@@ -370,6 +471,9 @@ void QuestCclRegister()
 	lua_register(Lua, "DefineQuest", CclDefineQuest);
 	lua_register(Lua, "GetQuests", CclGetQuests);
 	lua_register(Lua, "GetQuestData", CclGetQuestData);
+	lua_register(Lua, "DefineAchievement", CclDefineAchievement);
+	lua_register(Lua, "GetAchievements", CclGetAchievements);
+	lua_register(Lua, "GetAchievementData", CclGetAchievementData);
 	lua_register(Lua, "DefineDialogue", CclDefineDialogue);
 }
 

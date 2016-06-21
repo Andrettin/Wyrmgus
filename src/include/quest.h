@@ -10,7 +10,7 @@
 //
 /**@name quest.h - The quest headerfile. */
 //
-//      (c) Copyright 2015 by Andrettin
+//      (c) Copyright 2015-2016 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -90,6 +90,23 @@ public:
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 };
 
+class CAchievement
+{
+public:
+	CAchievement() :
+		PlayerColor(0),
+		Hidden(false)
+	{
+	}
+	
+	std::string Ident;				/// Ident of the achievement
+	std::string Name;				/// Name of the achievement
+	std::string Description;		/// Description of the achievement
+	int PlayerColor;				/// Player color used for the achievement's icon
+	bool Hidden;					/// Whether the achievement is hidden
+	IconConfig Icon;				/// Achievement's icon
+};
+
 class CDialogue
 {
 public:
@@ -134,6 +151,7 @@ public:
 
 extern std::vector<CQuest *> Quests;
 extern CQuest *CurrentQuest;
+extern std::vector<CAchievement *> Achievements;
 extern std::vector<CDialogue *> Dialogues;
 
 /*----------------------------------------------------------------------------
@@ -143,6 +161,7 @@ extern std::vector<CDialogue *> Dialogues;
 extern void CleanQuests();
 extern void CleanDialogues();
 extern CQuest *GetQuest(std::string quest_name);
+extern CAchievement *GetAchievement(std::string achievement_ident);
 extern CDialogue *GetDialogue(std::string dialogue_ident);
 
 extern void SetCurrentQuest(std::string quest_name);
