@@ -56,11 +56,12 @@ class CQuest
 public:
 	CQuest() :
 		Civilization(-1), TechnologyPoints(0), X(-1), Y(-1), PlayerColor(0),
-		Hidden(false),
+		Hidden(false), Completed(false),
 		QuestGiver(NULL), IntroductionDialogue(NULL)
 	{
 	}
 	
+	std::string Ident;				/// Ident of the quest
 	std::string Name;				/// Name of the quest
 	std::string Description;		/// Description of the quest
 	std::string World;				/// Which world the quest belongs to
@@ -83,6 +84,7 @@ public:
 	int Y;							/// Y position of the quest in its world's quest screen
 	int PlayerColor;				/// Player color used for the quest's icon
 	bool Hidden;					/// Whether the quest is hidden
+	bool Completed;					/// Whether the quest has been completed
 	IconConfig Icon;				/// Quest's icon
 	CCharacter *QuestGiver;			/// Quest giver
 	CDialogue *IntroductionDialogue;
@@ -95,7 +97,7 @@ class CAchievement
 public:
 	CAchievement() :
 		PlayerColor(0),
-		Hidden(false)
+		Hidden(false), Obtained(false)
 	{
 	}
 	
@@ -104,6 +106,7 @@ public:
 	std::string Description;		/// Description of the achievement
 	int PlayerColor;				/// Player color used for the achievement's icon
 	bool Hidden;					/// Whether the achievement is hidden
+	bool Obtained;					/// Whether the achievement has been obtained
 	IconConfig Icon;				/// Achievement's icon
 };
 
@@ -160,12 +163,15 @@ extern std::vector<CDialogue *> Dialogues;
 
 extern void CleanQuests();
 extern void CleanDialogues();
-extern CQuest *GetQuest(std::string quest_name);
+extern void SaveQuestCompletion();
+extern CQuest *GetQuest(std::string quest_ident);
 extern CAchievement *GetAchievement(std::string achievement_ident);
 extern CDialogue *GetDialogue(std::string dialogue_ident);
 
 extern void SetCurrentQuest(std::string quest_name);
 extern std::string GetCurrentQuest();
+extern void SetQuestCompleted(std::string quest_ident);
+extern void SetAchievementObtained(std::string achievement_ident);
 
 extern void CallDialogue(std::string dialogue_ident, int player);
 extern void CallDialogueNode(std::string dialogue_ident, int node, int player);

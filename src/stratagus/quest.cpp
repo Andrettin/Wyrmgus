@@ -37,7 +37,11 @@
 
 #include "quest.h"
 
+#include "game.h"
+#include "iocompat.h"
+#include "iolib.h"
 #include "luacallback.h"
+#include "parameters.h"
 #include "script.h"
 
 #include <ctype.h>
@@ -79,13 +83,55 @@ void CleanDialogues()
 	Dialogues.clear();
 }
 
-CQuest *GetQuest(std::string quest_name)
+void SaveQuestCompletion()
+{
+	struct stat tmp;
+	std::string path = Parameters::Instance.GetUserDirectory();
+
+	if (!GameName.empty()) {
+		path += "/";
+		path += GameName;
+	}
+	path += "/";
+	path += "quests.lua";
+
+	FILE *fd = fopen(path.c_str(), "w");
+	if (!fd) {
+		fprintf(stderr, "Cannot open file %s for writing.\n", path.c_str());
+		return;
+	}
+
+	for (size_t i = 0; i < Quests.size(); ++i) {
+		if (Quests[i]->Completed) {
+			fprintf(fd, "SetQuestCompleted(\"%s\")\n", Quests[i]->Ident.c_str());
+		}
+	}
+	
+	fprintf(fd, "\n");
+	
+	for (size_t i = 0; i < Achievements.size(); ++i) {
+		if (Achievements[i]->Obtained) {
+			fprintf(fd, "SetAchievementObtained(\"%s\")\n", Achievements[i]->Ident.c_str());
+		}
+	}
+		
+	fclose(fd);
+}
+
+CQuest *GetQuest(std::string quest_ident)
 {
 	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (quest_name == Quests[i]->Name) {
+		if (quest_ident == Quests[i]->Ident) {
 			return Quests[i];
 		}
 	}
+	
+	for (size_t i = 0; i < Quests.size(); ++i) { // for backwards compatibility
+		if (NameToIdent(quest_ident) == Quests[i]->Ident) {
+			return Quests[i];
+		}
+	}
+	
 	return NULL;
 }
 
@@ -96,6 +142,7 @@ CAchievement *GetAchievement(std::string achievement_ident)
 			return Achievements[i];
 		}
 	}
+	
 	return NULL;
 }
 
@@ -204,6 +251,28 @@ std::string GetCurrentQuest()
 	} else {
 		return CurrentQuest->Name;
 	}
+}
+
+void SetQuestCompleted(std::string quest_ident)
+{
+	CQuest *quest = GetQuest(quest_ident);
+	if (!quest || quest->Completed) {
+		return;
+	}
+	
+	quest->Completed = true;
+	SaveQuestCompletion();
+}
+
+void SetAchievementObtained(std::string achievement_ident)
+{
+	CAchievement *achievement = GetAchievement(achievement_ident);
+	if (!achievement || achievement->Obtained) {
+		return;
+	}
+	
+	achievement->Obtained = true;
+	SaveQuestCompletion();
 }
 
 void CallDialogue(std::string dialogue_ident, int player)

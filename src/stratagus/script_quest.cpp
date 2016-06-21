@@ -62,19 +62,21 @@ static int CclDefineQuest(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string quest_name = LuaToString(l, 1);
-	CQuest *quest = GetQuest(quest_name);
+	std::string quest_ident = LuaToString(l, 1);
+	CQuest *quest = GetQuest(quest_ident);
 	if (!quest) {
 		quest = new CQuest;
 		Quests.push_back(quest);
-		quest->Name = quest_name;
+		quest->Ident = quest_ident;
 	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "Description")) {
+		if (!strcmp(value, "Name")) {
+			quest->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
 			quest->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "World")) {
 			quest->World = LuaToString(l, -1);
@@ -168,7 +170,7 @@ static int CclGetQuests(lua_State *l)
 	lua_createtable(l, Quests.size(), 0);
 	for (size_t i = 1; i <= Quests.size(); ++i)
 	{
-		lua_pushstring(l, Quests[i-1]->Name.c_str());
+		lua_pushstring(l, Quests[i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
@@ -184,14 +186,17 @@ static int CclGetQuestData(lua_State *l)
 	if (lua_gettop(l) < 2) {
 		LuaError(l, "incorrect argument");
 	}
-	std::string quest_name = LuaToString(l, 1);
-	const CQuest *quest = GetQuest(quest_name);
+	std::string quest_ident = LuaToString(l, 1);
+	const CQuest *quest = GetQuest(quest_ident);
 	if (!quest) {
-		LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_name.c_str());
+		LuaError(l, "Quest \"%s\" doesn't exist." _C_ quest_ident.c_str());
 	}
 	const char *data = LuaToString(l, 2);
 
-	if (!strcmp(data, "Description")) {
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, quest->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, quest->Description.c_str());
 		return 1;
 	} else if (!strcmp(data, "World")) {
@@ -257,6 +262,9 @@ static int CclGetQuestData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
 		lua_pushboolean(l, quest->Hidden);
+		return 1;
+	} else if (!strcmp(data, "Completed")) {
+		lua_pushboolean(l, quest->Completed);
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, quest->Icon.Name.c_str());
@@ -377,6 +385,9 @@ static int CclGetAchievementData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
 		lua_pushboolean(l, achievement->Hidden);
+		return 1;
+	} else if (!strcmp(data, "Obtained")) {
+		lua_pushboolean(l, achievement->Obtained);
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, achievement->Icon.Name.c_str());

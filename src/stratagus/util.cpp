@@ -985,6 +985,7 @@ std::string NameToIdent(std::string text)
 {
 	text = FullyDecapitalizeString(text);
 	text = FindAndReplaceString(text, " ", "-");
+	text = FindAndReplaceString(text, "'", "");
 	
 	return text;
 }
