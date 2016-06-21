@@ -186,7 +186,7 @@ void CAchievement::Obtain(bool save, bool display)
 
 bool CAchievement::CanObtain()
 {
-	if (this->Obtained) {
+	if (this->Obtained || this->Unobtainable) {
 		return false;
 	}
 	

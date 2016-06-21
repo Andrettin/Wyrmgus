@@ -97,7 +97,7 @@ class CAchievement
 public:
 	CAchievement() :
 		PlayerColor(0),
-		Hidden(false), Obtained(false)
+		Hidden(false), Obtained(false), Unobtainable(false)
 	{
 	}
 	
@@ -110,6 +110,7 @@ public:
 	int PlayerColor;				/// Player color used for the achievement's icon
 	bool Hidden;					/// Whether the achievement is hidden
 	bool Obtained;					/// Whether the achievement has been obtained
+	bool Unobtainable;				/// Whether this achievement can be obtained by checking for it or not
 	IconConfig Icon;				/// Achievement's icon
 	std::vector<CQuest *> RequiredQuests;	/// Quests required for obtaining this achievement
 };

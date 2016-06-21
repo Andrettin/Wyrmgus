@@ -333,6 +333,8 @@ static int CclDefineAchievement(lua_State *l)
 			}
 		} else if (!strcmp(value, "Hidden")) {
 			achievement->Hidden = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Unobtainable")) {
+			achievement->Unobtainable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			achievement->Icon.Name = LuaToString(l, -1);
 			achievement->Icon.Icon = NULL;
@@ -400,6 +402,9 @@ static int CclGetAchievementData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Obtained")) {
 		lua_pushboolean(l, achievement->Obtained);
+		return 1;
+	} else if (!strcmp(data, "Unobtainable")) {
+		lua_pushboolean(l, achievement->Unobtainable);
 		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, achievement->Icon.Name.c_str());
