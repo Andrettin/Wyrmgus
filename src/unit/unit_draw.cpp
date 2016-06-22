@@ -1399,7 +1399,7 @@ void CUnit::Draw(const CViewport &vp) const
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitActionDie))
 		)
 	) {
-		if (this->Direction == LookingS && this->CurrentAction() != UnitActionDie && this->GetLayerSprite(RightHandImageLayer) != NULL) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
+		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitActionDie && this->GetLayerSprite(RightHandImageLayer) != NULL) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player, frame, screenPos, skin_color, hair_color);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player, frame, screenPos);
 			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player, frame, screenPos);
