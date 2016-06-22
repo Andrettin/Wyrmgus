@@ -689,32 +689,32 @@ $renaming MenuScreen @ CMenuScreen
 
 $[
 function MenuScreen()
-  local menu = CMenuScreen()
+	local menu = CMenuScreen()
 
-  -- Store the widget in the container. This way we keep a reference
-  -- to the widget until the container gets deleted.
-  local guichanadd = Container.add
-  function menu:add(widget, x, y)
-    if not self._addedWidgets then
-       self._addedWidgets = {}
-    end
-    self._addedWidgets[widget] = true
-    guichanadd(self, widget, x, y)
-  end
+	-- Store the widget in the container. This way we keep a reference
+	-- to the widget until the container gets deleted.
+	local guichanadd = Container.add
+	function menu:add(widget, x, y)
+		if not self._addedWidgets then
+			self._addedWidgets = {}
+		end
+		self._addedWidgets[widget] = true
+		guichanadd(self, widget, x, y)
+	end
 
-  -- Wyrmgus start
-  -- allow the removal of menu widgets
-  local guichanremove = Container.remove
-  function menu:remove(widget)
-    if not self._addedWidgets then
-       self._addedWidgets = {}
-    end
-    self._addedWidgets[widget] = false
-    guichanremove(self, widget)
-  end
-  -- Wyrmgus end
+	-- Wyrmgus start
+	-- allow the removal of menu widgets
+	local guichanremove = Container.remove
+	function menu:remove(widget)
+		if not self._addedWidgets then
+			self._addedWidgets = {}
+		end
+		self._addedWidgets[widget] = false
+		guichanremove(self, widget)
+	end
+	-- Wyrmgus end
 
-  return menu
+	return menu
 end
 $]
 

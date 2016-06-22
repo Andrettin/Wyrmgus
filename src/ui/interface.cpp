@@ -75,24 +75,24 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-static Vec2i SavedMapPosition[3];    /// Saved map position
-static char Input[80];               /// line input for messages/long commands
-static int InputIndex;               /// current index into input
-static char InputStatusLine[99];     /// Last input status line
-const char DefaultGroupKeys[] = "0123456789`";/// Default group keys
-std::string UiGroupKeys = DefaultGroupKeys;/// Up to 11 keys, last unselect. Default for qwerty
-bool GameRunning;                    /// Current running state
-bool GamePaused;                     /// Current pause state
-bool GameObserve;                    /// Observe mode
-bool GameEstablishing;               /// Game establishing mode
-char SkipGameCycle;                  /// Skip the next game cycle
-char BigMapMode;                     /// Show only the map
-enum _iface_state_ InterfaceState;   /// Current interface state
-bool GodMode;                        /// Invincibility cheat
-enum _key_state_ KeyState;           /// current key state
-CUnit *LastIdleWorker;               /// Last called idle worker
+static Vec2i SavedMapPosition[3];				/// Saved map position
+static char Input[80];							/// line input for messages/long commands
+static int InputIndex;							/// current index into input
+static char InputStatusLine[99];				/// Last input status line
+const char DefaultGroupKeys[] = "0123456789`";	/// Default group keys
+std::string UiGroupKeys = DefaultGroupKeys;		/// Up to 11 keys, last unselect. Default for qwerty
+bool GameRunning;								/// Current running state
+bool GamePaused;								/// Current pause state
+bool GameObserve;								/// Observe mode
+bool GameEstablishing;							/// Game establishing mode
+char SkipGameCycle;								/// Skip the next game cycle
+char BigMapMode;								/// Show only the map
+enum _iface_state_ InterfaceState;				/// Current interface state
+bool GodMode;									/// Invincibility cheat
+enum _key_state_ KeyState;						/// current key state
+CUnit *LastIdleWorker;							/// Last called idle worker
 //Wyrmgus start
-CUnit *LastLevelUpUnit;				 /// Last called level up unit
+CUnit *LastLevelUpUnit;							/// Last called level up unit
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -1511,22 +1511,22 @@ void HandleButtonUp(unsigned button)
 ----------------------------------------------------------------------------*/
 
 #ifdef USE_TOUCHSCREEN
-int DoubleClickDelay = 1000;      /// Time to detect double clicks.
-int HoldClickDelay = 2000;        /// Time to detect hold clicks.
+int DoubleClickDelay = 1000;	/// Time to detect double clicks.
+int HoldClickDelay = 2000;		/// Time to detect hold clicks.
 #else
-int DoubleClickDelay = 300;       /// Time to detect double clicks.
-int HoldClickDelay = 1000;        /// Time to detect hold clicks.
+int DoubleClickDelay = 300;		/// Time to detect double clicks.
+int HoldClickDelay = 1000;		/// Time to detect hold clicks.
 #endif
 
 static enum {
-	InitialMouseState,            /// start state
-	ClickedMouseState             /// button is clicked
-} MouseState;                     /// Current state of mouse
+	InitialMouseState,			/// start state
+	ClickedMouseState			/// button is clicked
+} MouseState;					/// Current state of mouse
 
-static PixelPos LastMousePos;     /// Last mouse position
-static unsigned LastMouseButton;  /// last mouse button handled
-static unsigned StartMouseTicks;  /// Ticks of first click
-static unsigned LastMouseTicks;   /// Ticks of last mouse event
+static PixelPos LastMousePos;		/// Last mouse position
+static unsigned LastMouseButton;	/// last mouse button handled
+static unsigned StartMouseTicks;	/// Ticks of first click
+static unsigned LastMouseTicks;		/// Ticks of last mouse event
 
 /**
 **  Called if any mouse button is pressed down
@@ -1667,13 +1667,13 @@ void InputMouseTimeout(const EventCallback &callbacks, unsigned ticks)
 }
 
 
-static const int HoldKeyDelay = 250;          /// Time to detect hold key
-static const int HoldKeyAdditionalDelay = 50; /// Time to detect additional hold key
+static const int HoldKeyDelay = 250;			/// Time to detect hold key
+static const int HoldKeyAdditionalDelay = 50;	/// Time to detect additional hold key
 
-static unsigned LastIKey;                    /// last key handled
-static unsigned LastIKeyChar;                /// last keychar handled
-static unsigned LastKeyTicks;                /// Ticks of last key
-static unsigned DoubleKey;                   /// last key pressed
+static unsigned LastIKey;						/// last key handled
+static unsigned LastIKeyChar;					/// last keychar handled
+static unsigned LastKeyTicks;					/// Ticks of last key
+static unsigned DoubleKey;						/// last key pressed
 
 /**
 **  Handle keyboard key press.

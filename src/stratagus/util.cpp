@@ -56,7 +56,7 @@
 --  Random
 ----------------------------------------------------------------------------*/
 
-unsigned SyncRandSeed;               /// sync random seed value.
+unsigned SyncRandSeed;				/// sync random seed value.
 
 /**
 **  Inititalize sync rand seed.
@@ -531,12 +531,12 @@ void PrintOnStdOut(const char *format, ...)
 #include "upgrade.h" //for personal name generation
 
 std::string FindAndReplaceString(std::string text, const std::string& find, const std::string& replace) {
-    size_t pos = 0;
-    while ((pos = text.find(find, pos)) != std::string::npos) {
-         text.replace(pos, find.length(), replace);
-         pos += replace.length();
-    }
-    return text;
+	size_t pos = 0;
+	while ((pos = text.find(find, pos)) != std::string::npos) {
+		text.replace(pos, find.length(), replace);
+		pos += replace.length();
+	}
+	return text;
 }
 
 std::string FindAndReplaceStringEnding(std::string text, const std::string& find, const std::string& replace) {
@@ -544,7 +544,7 @@ std::string FindAndReplaceStringEnding(std::string text, const std::string& find
 	if (pos != std::string::npos) {
 		text.replace(pos, find.length(), replace);
 	}
-    return text;
+	return text;
 }
 
 std::string FindAndReplaceStringBeginning(std::string text, const std::string& find, const std::string& replace) {
@@ -552,7 +552,7 @@ std::string FindAndReplaceStringBeginning(std::string text, const std::string& f
 	if (pos != std::string::npos && pos == 0) {
 		text.replace(pos, find.length(), replace);
 	}
-    return text;
+	return text;
 }
 
 int GetFileLastModified(std::string file_name)
@@ -964,7 +964,7 @@ std::string FullyDecapitalizeString(std::string text)
 	text = DecapitalizeString(text);
 	
 	size_t pos = 0;
-    while ((pos = text.find(" ", pos)) != std::string::npos) {
+	while ((pos = text.find(" ", pos)) != std::string::npos) {
 		std::string replace = DecapitalizeString(text.substr(pos + 1, 1));
 		text.replace(pos + 1, 1, replace);
 		pos += replace.length();
@@ -998,7 +998,7 @@ std::string SeparateCapitalizedStringElements(std::string text)
 			pos += 1;
 		}
 	}
-    return text;
+	return text;
 }
 
 /**

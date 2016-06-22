@@ -60,11 +60,11 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::string ClickMissile;        /// FIXME:docu
-std::string DamageMissile;       /// FIXME:docu
+std::string ClickMissile;		/// FIXME:docu
+std::string DamageMissile;		/// FIXME:docu
 std::map<std::string, ButtonStyle *> ButtonStyleHash;
 
-static int HandleCount = 1;     /// Lua handler count
+static int HandleCount = 1;		/// Lua handler count
 
 CPreference Preference;
 

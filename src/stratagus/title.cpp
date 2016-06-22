@@ -38,8 +38,8 @@
 #include "editor.h"
 
 
-TitleScreen **TitleScreens;          /// Title screens to show at startup
-static bool WaitNoEvent;             /// Flag got an event
+TitleScreen **TitleScreens;			/// Title screens to show at startup
+static bool WaitNoEvent;			/// Flag got an event
 extern std::string CliMapName;
 
 

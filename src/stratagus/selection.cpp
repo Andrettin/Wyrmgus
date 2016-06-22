@@ -55,15 +55,15 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
-unsigned int MaxSelectable;               /// Maximum number of selected units
+unsigned int MaxSelectable;								/// Maximum number of selected units
 
-std::vector<CUnit *> Selected;                 /// All selected units
-static std::vector<CUnit *> TeamSelected[PlayerMax];  /// teams currently selected units
+std::vector<CUnit *> Selected;							/// All selected units
+static std::vector<CUnit *> TeamSelected[PlayerMax];	/// teams currently selected units
 
-static std::vector<CUnit *> _Selected;                 /// save of Selected
-static std::vector<CUnit *> _TeamSelected[PlayerMax];  /// save of TeamSelected
+static std::vector<CUnit *> _Selected;					/// save of Selected
+static std::vector<CUnit *> _TeamSelected[PlayerMax];	/// save of TeamSelected
 
-static unsigned GroupId;         /// Unique group # for automatic groups
+static unsigned GroupId;								/// Unique group # for automatic groups
 
 /*----------------------------------------------------------------------------
 --  Functions

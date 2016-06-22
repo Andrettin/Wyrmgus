@@ -27,19 +27,19 @@ class CServerSetup {
 	unsigned char Difficulty;
 	unsigned char MapRichness;
 	unsigned char Opponents;
-	unsigned short CompOpt[PlayerMax]; // cannot use char since tolua interpret variable as string else.
-	unsigned short Ready[PlayerMax];   // cannot use char since tolua interpret variable as string else.
-	unsigned short Race[PlayerMax];    // cannot use char since tolua interpret variable as string else.
+	unsigned short CompOpt[PlayerMax];	// cannot use char since tolua interpret variable as string else.
+	unsigned short Ready[PlayerMax];	// cannot use char since tolua interpret variable as string else.
+	unsigned short Race[PlayerMax];		// cannot use char since tolua interpret variable as string else.
 };
 extern CServerSetup LocalSetupState;
 extern CServerSetup ServerSetupState;
 extern int NetLocalHostsSlot;
 tolua_readonly int NetPlayerNameSize;
 struct CNetworkHost {
-	unsigned long  Host;         /// Host address
-	unsigned short Port;         /// Port on host
-	unsigned short PlyNr;        /// Player nummer
-	char           PlyName[NetPlayerNameSize];  /// Name of player
+	unsigned long  Host;						/// Host address
+	unsigned short Port;						/// Port on host
+	unsigned short PlyNr;						/// Player nummer
+	char           PlyName[NetPlayerNameSize];	/// Name of player
 };
 extern CNetworkHost Hosts[PlayerMax];
 

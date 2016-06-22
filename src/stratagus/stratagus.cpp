@@ -240,17 +240,17 @@ extern void beos_init(int argc, char **argv);
 --  Variables
 ----------------------------------------------------------------------------*/
 
-std::string StratagusLibPath;        /// Path for data directory
+std::string StratagusLibPath;		/// Path for data directory
 
 /// Name, Version, Copyright
 const char NameLine[] = NAME " v" VERSION ", " COPYRIGHT;
 
-std::string CliMapName;          /// Filename of the map given on the command line
+std::string CliMapName;				/// Filename of the map given on the command line
 std::string MenuRace;
 
-bool EnableDebugPrint;           /// if enabled, print the debug messages
-bool EnableAssert;               /// if enabled, halt on assertion failures
-bool EnableUnitDebug;            /// if enabled, a unit info dump will be created
+bool EnableDebugPrint;				/// if enabled, print the debug messages
+bool EnableAssert;					/// if enabled, halt on assertion failures
+bool EnableUnitDebug;				/// if enabled, a unit info dump will be created
 
 /*============================================================================
 ==  MAIN
@@ -799,8 +799,8 @@ int stratagusMain(int argc, char **argv)
 		InitMusic();
 	}
 
-#ifndef DEBUG           // For debug it's better not to have:
-	srand(time(NULL));  // Random counter = random each start
+#ifndef DEBUG			// For debug it's better not to have:
+	srand(time(NULL));	// Random counter = random each start
 #endif
 
 	//  Show title screens.
@@ -816,8 +816,8 @@ int stratagusMain(int argc, char **argv)
 	// memset(Players, 0, sizeof(Players));
 	NumPlayers = 0;
 
-	UnitManager.Init(); // Units memory management
-	PreMenuSetup();     // Load everything needed for menus
+	UnitManager.Init();	// Units memory management
+	PreMenuSetup();		// Load everything needed for menus
 
 	MenuLoop();
 

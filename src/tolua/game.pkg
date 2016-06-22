@@ -15,12 +15,12 @@ int SaveReplay(const std::string filename);
 $#include "results.h"
 
 enum GameResults {
-    GameNoResult,
-    GameVictory,
-    GameDefeat,
-    GameDraw,
-    GameQuitToMenu,
-    GameRestart,
+	GameNoResult,
+	GameVictory,
+	GameDefeat,
+	GameDraw,
+	GameQuitToMenu,
+	GameRestart,
 };
 
 GameResults GameResult;
