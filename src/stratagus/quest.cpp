@@ -197,13 +197,24 @@ bool CAchievement::CanObtain()
 		}
 	}
 	
-	if (this->CharacterLevel) {
+	if (this->Character) {
+		if (this->CharacterType && this->Character->Type != this->CharacterType) {
+			return false;
+		}
+		if (this->CharacterLevel && this->Character->Level < this->CharacterLevel) {
+			return false;
+		}
+	} else if (this->CharacterType || this->CharacterLevel) {
 		bool found_hero = false;
 		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			if (iterator->second->Level >= CharacterLevel) {
-				found_hero = true;
-				break;
+			if (this->CharacterType && iterator->second->Type != this->CharacterType) {
+				continue;
 			}
+			if (this->CharacterLevel && iterator->second->Level < this->CharacterLevel) {
+				continue;
+			}
+			found_hero = true;
+			break;
 		}
 		if (!found_hero) {
 			return false;

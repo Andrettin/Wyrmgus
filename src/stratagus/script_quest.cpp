@@ -41,6 +41,8 @@
 #include "luacallback.h"
 #include "player.h"
 #include "script.h"
+#include "unittype.h"
+#include "upgrade.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -342,6 +344,22 @@ static int CclDefineAchievement(lua_State *l)
 			achievement->Icon.Icon = NULL;
 			achievement->Icon.Load();
 			achievement->Icon.Icon->Load();
+		} else if (!strcmp(value, "Character")) {
+			std::string character_name = TransliterateText(LuaToString(l, -1));
+			CCharacter *character = GetCharacter(character_name);
+			if (character) {
+				achievement->Character = character;
+			} else {
+				LuaError(l, "Character \"%s\" doesn't exist." _C_ character_name.c_str());
+			}
+		} else if (!strcmp(value, "CharacterType")) {
+			std::string unit_type_ident = LuaToString(l, -1);
+			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
+			if (unit_type_id != -1) {
+				achievement->CharacterType = UnitTypes[unit_type_id];
+			} else {
+				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
+			}
 		} else if (!strcmp(value, "RequiredQuests")) {
 			achievement->RequiredQuests.clear();
 			const int args = lua_rawlen(l, -1);
@@ -398,6 +416,20 @@ static int CclGetAchievementData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
 		lua_pushstring(l, PlayerColorNames[achievement->PlayerColor].c_str());
+		return 1;
+	} else if (!strcmp(data, "Character")) {
+		if (achievement->Character) {
+			lua_pushstring(l, achievement->Character->GetFullName().c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "CharacterType")) {
+		if (achievement->CharacterType) {
+			lua_pushstring(l, achievement->CharacterType->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "CharacterLevel")) {
 		lua_pushnumber(l, achievement->CharacterLevel);

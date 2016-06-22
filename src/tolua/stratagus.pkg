@@ -150,6 +150,7 @@ extern void DeleteModFaction(std::string civilization_name, std::string faction_
 extern void DisableMod(std::string mod_file);
 extern void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file);
 
+extern void SaveQuestCompletion();
 extern void SetCurrentQuest(std::string quest_name);
 extern std::string GetCurrentQuest();
 extern void SetQuestCompleted(std::string quest_ident, bool save = true);

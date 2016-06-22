@@ -71,6 +71,9 @@
 #include "network.h"
 #include "pathfinder.h"
 #include "player.h"
+//Wyrmgus start
+#include "quest.h"
+//Wyrmgus end
 #include "script.h"
 #include "sound.h"
 #include "sound_server.h"
@@ -704,6 +707,7 @@ void CUnit::Retrain()
 							if (Character->Persistent && Player->AiEnabled == false) {
 								Character->Type = UnitTypes[i];
 								SaveHero(Character);
+								CheckAchievements();
 							}
 							if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
 								CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Character->GetFullName());

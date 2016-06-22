@@ -59,6 +59,9 @@
 #include "network.h"
 //Wyrmgus end
 #include "player.h"
+//Wyrmgus start
+#include "quest.h"
+//Wyrmgus end
 #include "sound.h"
 #include "spells.h"
 #include "translate.h"
@@ -1922,6 +1925,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 						if (Selected[i]->Character->Persistent && Selected[i]->Player->AiEnabled == false) {
 							Selected[i]->Character->Type = UnitTypes[CurrentButtons[button].Value];
 							SaveHero(Selected[i]->Character);
+							CheckAchievements();
 						}
 						if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
 							CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Selected[i]->Character->GetFullName());

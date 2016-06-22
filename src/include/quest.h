@@ -49,6 +49,7 @@
 class CCharacter;
 class CDialogue;
 class CDialogueNode;
+class CUnitType;
 class LuaCallback;
 
 class CQuest
@@ -97,7 +98,8 @@ class CAchievement
 public:
 	CAchievement() :
 		PlayerColor(0), CharacterLevel(0),
-		Hidden(false), Obtained(false), Unobtainable(false)
+		Hidden(false), Obtained(false), Unobtainable(false),
+		Character(NULL), CharacterType(NULL)
 	{
 	}
 	
@@ -113,6 +115,8 @@ public:
 	bool Obtained;					/// Whether the achievement has been obtained
 	bool Unobtainable;				/// Whether this achievement can be obtained by checking for it or not
 	IconConfig Icon;				/// Achievement's icon
+	CCharacter *Character;			/// Character related to the achievement's requirements
+	CUnitType *CharacterType;		/// Unit type required for a character to have for the achievement
 	std::vector<CQuest *> RequiredQuests;	/// Quests required for obtaining this achievement
 };
 
