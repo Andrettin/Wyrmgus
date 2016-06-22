@@ -3702,7 +3702,7 @@ void CreateLanguageCache()
 							fprintf(fd, "\"%s\", ", GetArticleTypeNameById(j).c_str());
 							fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(k).c_str());
 							fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(n).c_str());
-							fprintf(fd, "\"%s\", ", GetGrammaticalGenderNameById(n).c_str());
+							fprintf(fd, "\"%s\", ", GetGrammaticalGenderNameById(o).c_str());
 							fprintf(fd, "\"%s\", ", language->AdjectiveEndings[j][k][n][o].c_str());
 						}
 					}
