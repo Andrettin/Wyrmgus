@@ -179,7 +179,7 @@ extern CQuest *GetQuest(std::string quest_ident);
 extern CAchievement *GetAchievement(std::string achievement_ident);
 extern CDialogue *GetDialogue(std::string dialogue_ident);
 
-extern void SetCurrentQuest(std::string quest_name);
+extern void SetCurrentQuest(std::string quest_ident);
 extern std::string GetCurrentQuest();
 extern void SetQuestCompleted(std::string quest_ident, bool save = true);
 extern void SetAchievementObtained(std::string achievement_ident, bool save = true, bool display = true);

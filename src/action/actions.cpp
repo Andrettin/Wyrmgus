@@ -358,31 +358,12 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	
 	//Wyrmgus start
 	if (unit.IsAlive() && unit.CurrentAction() != UnitActionBuilt) {
-		//apply auras to all appropriate nearby units
-		int aura_range = AuraRange - (unit.Type->TileWidth - 1);
-		if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0) { // leadership aura
-			if (unit.Type->BoolFlag[BUILDING_INDEX].value == false) {
-				unit.ApplyAuraEffect(LEADERSHIPAURA_INDEX);
-			}
-			
-			std::vector<CUnit *> table;
-			SelectAroundUnit(unit, aura_range, table, MakeAndPredicate(MakeOrPredicate(HasSamePlayerAs(*unit.Player), IsAlliedWith(*unit.Player)), MakeNotPredicate(IsBuildingType())), true);
-			for (size_t i = 0; i != table.size(); ++i) {
-				table[i]->ApplyAuraEffect(LEADERSHIPAURA_INDEX);
-			}
+		//apply auras
+		if (unit.Variable[LEADERSHIPAURA_INDEX].Value > 0) {
+			unit.ApplyAura(LEADERSHIPAURA_INDEX);
 		}
-		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) { // regeneration aura
-			if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Variable[HP_INDEX].Value < unit.GetModifiedVariable(HP_INDEX, VariableMax)) {
-				unit.ApplyAuraEffect(REGENERATIONAURA_INDEX);
-			}
-			
-			std::vector<CUnit *> table;
-			SelectAroundUnit(unit, aura_range, table, MakeAndPredicate(MakeOrPredicate(HasSamePlayerAs(*unit.Player), IsAlliedWith(*unit.Player)), IsOrganicType()), true);
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (table[i]->Variable[HP_INDEX].Value < table[i]->GetModifiedVariable(HP_INDEX, VariableMax)) {
-					table[i]->ApplyAuraEffect(REGENERATIONAURA_INDEX);
-				}
-			}
+		if (unit.Variable[REGENERATIONAURA_INDEX].Value > 0) {
+			unit.ApplyAura(REGENERATIONAURA_INDEX);
 		}
 	}
 	//Wyrmgus end

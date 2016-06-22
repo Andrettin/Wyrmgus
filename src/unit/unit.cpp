@@ -1359,12 +1359,38 @@ void CUnit::ReadWork(CUpgrade *work, bool affect_character)
 	}
 }
 
+void CUnit::ApplyAura(int aura_index)
+{
+	this->ApplyAuraEffect(aura_index);
+			
+	//apply aura to all appropriate nearby units
+	int aura_range = AuraRange - (this->Type->TileWidth - 1);
+	std::vector<CUnit *> table;
+	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), true);
+	for (size_t i = 0; i != table.size(); ++i) {
+		table[i]->ApplyAuraEffect(aura_index);
+		
+		if (table[i]->UnitInside) {
+			CUnit *uins = table[i]->UnitInside;
+			for (int j = 0; j < table[i]->InsideCount; ++j, uins = uins->NextContained) {
+				uins->ApplyAuraEffect(aura_index);
+			}
+		}
+	}
+}
+
 void CUnit::ApplyAuraEffect(int aura_index)
 {
 	int effect_index = -1;
 	if (aura_index == LEADERSHIPAURA_INDEX) {
+		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
+			return;
+		}
 		effect_index = LEADERSHIP_INDEX;
 	} else if (aura_index == REGENERATIONAURA_INDEX) {
+		if (!this->Type->BoolFlag[ORGANIC_INDEX].value || this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableMax)) {
+			return;
+		}
 		effect_index = REGENERATION_INDEX;
 	}
 	

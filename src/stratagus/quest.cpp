@@ -304,12 +304,12 @@ void CDialogueNode::OptionEffect(int option, int player)
 	}
 }
 
-void SetCurrentQuest(std::string quest_name)
+void SetCurrentQuest(std::string quest_ident)
 {
-	if (quest_name.empty()) {
+	if (quest_ident.empty()) {
 		CurrentQuest = NULL;
 	} else {
-		CurrentQuest = GetQuest(quest_name);
+		CurrentQuest = GetQuest(quest_ident);
 	}
 }
 
@@ -318,7 +318,7 @@ std::string GetCurrentQuest()
 	if (!CurrentQuest) {
 		return "";
 	} else {
-		return CurrentQuest->Name;
+		return CurrentQuest->Ident;
 	}
 }
 
