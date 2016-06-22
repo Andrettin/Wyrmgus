@@ -43,6 +43,7 @@
 #include "iolib.h"
 #include "luacallback.h"
 #include "parameters.h"
+#include "player.h"
 #include "script.h"
 
 #include <ctype.h>
@@ -181,7 +182,7 @@ void CAchievement::Obtain(bool save, bool display)
 	}
 	
 	if (display) {
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->Name + " achievement.\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Achievement Unlocked!\", \"You have unlocked the " + this->Name + " achievement.\", nil, \"" + this->Icon.Name + "\", \"" + PlayerColorNames[this->PlayerColor] + "\") end;");
 	}
 }
 
