@@ -353,6 +353,10 @@ static int CclDefineSpell(lua_State *l)
 		++i;
 		if (!strcmp(value, "showname")) {
 			spell->Name = LuaToString(l, i + 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "description")) {
+			spell->Description = LuaToString(l, i + 1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "manacost")) {
 			spell->ManaCost = LuaToNumber(l, i + 1);
 		} else if (!strcmp(value, "cooldown")) {

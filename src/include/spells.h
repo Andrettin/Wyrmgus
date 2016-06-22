@@ -222,6 +222,9 @@ public:
 	// Identification stuff
 	std::string Ident;    /// Spell unique identifier (spell-holy-vision)
 	std::string Name;     /// Spell name shown by the engine
+	//Wyrmgus start
+	std::string Description;	/// Spell description
+	//Wyrmgus end
 	int Slot;             /// Spell numeric identifier
 
 	// Spell Specifications

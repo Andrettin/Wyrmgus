@@ -1194,7 +1194,9 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitSpell : // name of the unit's spell
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL && unit->Spell != NULL) {
-				return unit->Spell->Name;
+				std::string spell_description = unit->Spell->Description;
+				spell_description[0] = tolower(spell_description[0]);
+				return unit->Spell->Name + " (" + spell_description + ")";
 			} else {
 				return std::string("");
 			}
