@@ -704,7 +704,7 @@ void AiSendExplorers()
 	bool air_scout = false;
 	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
 		if (AiPlayer->Scouts[i] == NULL) {
-			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->Index, i);
+			fprintf(stderr, "AI Player #%d's scout %d is null.\n", AiPlayer->Player->Index, (int) i);
 			return;
 		}
 		if (AiPlayer->Scouts[i]->Type->UnitType == UnitTypeFly) {

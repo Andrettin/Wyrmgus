@@ -309,12 +309,6 @@ static char CalculateStereo(const CUnit &unit)
 void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 {
 	//Wyrmgus start
-	if (!&unit) {
-		return;
-	}
-	//Wyrmgus end
-	
-	//Wyrmgus start
 	if (unit.Variable[STUN_INDEX].Value > 0 && voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep && voice != VoiceDying) { //don't speak if stunned
 		return;
 	}
@@ -329,9 +323,6 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 
 	//Wyrmgus start
-	if (!&source) {
-		return;
-	}
 //	if (UnitSoundIsPlaying(&source)) {
 	if (UnitSoundIsPlaying(&source) && voice != VoiceHit && voice != VoiceMiss && voice != VoiceStep) {
 	//Wyrmgus end

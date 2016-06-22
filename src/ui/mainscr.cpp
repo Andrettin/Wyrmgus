@@ -480,6 +480,13 @@ UStrInt GetComponent(const CUnitType &type, int index, EnumVariable e, int t)
 				val.s = UnitTypeVar.VariableNameLookup[index];
 			}
 			break;
+		//Wyrmgus start
+		case VariableIncreaseChange:
+		case VariableChange:
+			val.type = USTRINT_INT;
+			val.i = 0;
+			break;
+		//Wyrmgus end
 	}
 	return val;
 }

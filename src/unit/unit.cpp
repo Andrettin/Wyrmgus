@@ -4557,7 +4557,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	// This enables us to be tracked.  Possibly for spells (eg raise dead)
 	//Wyrmgus start
 //	if (type->CorpseType || (type->Animations && type->Animations->Death)) {
-	if (type->CorpseType || (unit.GetAnimations() && unit.GetAnimations()->Death)) {
+	if (type->CorpseType || unit.GetAnimations()) {
 	//Wyrmgus end
 		unit.Removed = 0;
 		Map.Insert(unit);
@@ -5604,11 +5604,20 @@ void CleanUnits()
 	std::vector<CUnit *> units(UnitManager.begin(), UnitManager.end());
 
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
+		//Wyrmgus start
+		if (*it == NULL) {
+			continue;
+		}
+		//Wyrmgus end
 		CUnit &unit = **it;
 
+		//Wyrmgus start
+		/*
 		if (&unit == NULL) {
 			continue;
 		}
+		*/
+		//Wyrmgus end
 		//Wyrmgus start
 		if (unit.Type == NULL) {
 			fprintf(stderr, "Unit \"%d\"'s type is NULL.\n", UnitNumber(unit));

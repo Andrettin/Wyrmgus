@@ -10,7 +10,7 @@
 //
 /**@name upgrade.cpp - The upgrade/allow functions. */
 //
-//      (c) Copyright 1999-2015 by Vladi Belperchinov-Shabanski, Jimmy Salmon
+//      (c) Copyright 1999-2016 by Vladi Belperchinov-Shabanski, Jimmy Salmon
 //		and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -1178,9 +1178,13 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 	for (int i = 0; i < player.GetUnitCount(); ++i) {
 		CUnit &unit = player.GetUnit(i);
 
+		//Wyrmgus start
+		/*
 		if (!&unit) {
 			fprintf(stderr, "Unit %d of player %d is invalid.\n", i, player.Index);
 		}
+		*/
+		//Wyrmgus end
 
 		//  Convert already existing units to this type.
 		//Wyrmgus start

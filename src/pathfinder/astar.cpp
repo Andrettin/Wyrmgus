@@ -598,12 +598,6 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 */
 static inline int CostMoveTo(unsigned int index, const CUnit &unit)
 {
-	//Wyrmgus start
-	if (!&unit) {
-		fprintf(stderr, "Error in CostMoveTo(unsigned int index, const CUnit &unit): Unit is NULL.\n");
-		return -1;
-	}
-	//Wyrmgus end
 	int *c = &CostMoveToCache[index];
 	if (*c != CacheNotSet) {
 		return *c;

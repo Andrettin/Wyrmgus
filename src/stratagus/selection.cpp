@@ -848,7 +848,7 @@ int SelectArmy()
 		if (unit.Type->Building) { //this selection mode is not for buildings
 			continue;
 		}
-		if (unit.Type->BoolFlag[HARVESTER_INDEX].value && unit.Type->ResInfo) { //this selection mode is not for workers
+		if (unit.Type->BoolFlag[HARVESTER_INDEX].value) { //this selection mode is not for workers
 			continue;
 		}
 		table[n++] = &unit;

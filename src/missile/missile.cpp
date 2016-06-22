@@ -1211,7 +1211,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		
 		//Wyrmgus start
 		//apply Thorns damage if attacker is at melee range
-		if (&goal && goal.Variable[THORNSDAMAGE_INDEX].Value && missile.SourceUnit->MapDistanceTo(goal) <= 1) {
+		if (goal.Variable[THORNSDAMAGE_INDEX].Value && missile.SourceUnit->MapDistanceTo(goal) <= 1) {
 			int thorns_damage = std::max<int>(goal.Variable[THORNSDAMAGE_INDEX].Value - missile.SourceUnit->Variable[ARMOR_INDEX].Value, 1);
 			if (GameSettings.NoRandomness) {
 				thorns_damage -= ((thorns_damage + 2) / 2) / 2; //if no randomness setting is used, then the damage will always return what would have been the average damage with randomness

@@ -221,7 +221,7 @@ enum {
 					if (unit.Player == ThisPlayer) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());
 					}
-					unit.Player->ChangeResource(goal->Type->GivesResource, (goal->ResourcesHeld, true));
+					unit.Player->ChangeResource(goal->Type->GivesResource, goal->ResourcesHeld);
 					unit.Player->TotalResources[goal->Type->GivesResource] += (goal->ResourcesHeld * unit.Player->Incomes[goal->Type->GivesResource]) / 100;
 				} else if (goal->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 					int hp_healed = std::min(goal->Variable[HITPOINTHEALING_INDEX].Value, (unit.GetModifiedVariable(HP_INDEX, VariableMax) - unit.Variable[HP_INDEX].Value));
