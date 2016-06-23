@@ -98,7 +98,7 @@ class CAchievement
 {
 public:
 	CAchievement() :
-		PlayerColor(0), CharacterLevel(0),
+		PlayerColor(0), CharacterLevel(0), Difficulty(-1),
 		Hidden(false), Obtained(false), Unobtainable(false),
 		Character(NULL), CharacterType(NULL)
 	{
@@ -112,6 +112,7 @@ public:
 	std::string Description;		/// Description of the achievement
 	int PlayerColor;				/// Player color used for the achievement's icon
 	int CharacterLevel;				/// Character level required for the achievement
+	int Difficulty;					/// Which difficulty the achievement's requirements need to be done in
 	bool Hidden;					/// Whether the achievement is hidden
 	bool Obtained;					/// Whether the achievement has been obtained
 	bool Unobtainable;				/// Whether this achievement can be obtained by checking for it or not

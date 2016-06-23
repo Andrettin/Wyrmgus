@@ -338,6 +338,8 @@ static int CclDefineAchievement(lua_State *l)
 			}
 		} else if (!strcmp(value, "CharacterLevel")) {
 			achievement->CharacterLevel = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Difficulty")) {
+			achievement->Difficulty = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Hidden")) {
 			achievement->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unobtainable")) {
@@ -436,6 +438,9 @@ static int CclGetAchievementData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "CharacterLevel")) {
 		lua_pushnumber(l, achievement->CharacterLevel);
+		return 1;
+	} else if (!strcmp(data, "Difficulty")) {
+		lua_pushnumber(l, achievement->Difficulty);
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
 		lua_pushboolean(l, achievement->Hidden);

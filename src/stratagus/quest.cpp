@@ -193,7 +193,7 @@ bool CAchievement::CanObtain()
 	}
 	
 	for (size_t i = 0; i < this->RequiredQuests.size(); ++i) {
-		if (!this->RequiredQuests[i]->Completed) {
+		if (!this->RequiredQuests[i]->Completed || (this->Difficulty != -1 && this->RequiredQuests[i]->HighestCompletedDifficulty < this->Difficulty)) {
 			return false;
 		}
 	}
