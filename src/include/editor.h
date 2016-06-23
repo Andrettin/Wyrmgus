@@ -43,6 +43,9 @@
 ----------------------------------------------------------------------------*/
 
 class CUnitType;
+//Wyrmgus start
+class CUnit;
+//Wyrmgus end
 
 
 enum EditorRunningType {
@@ -125,6 +128,10 @@ extern void StartEditor(const char *filename, bool is_mod = false);
 extern void EditorMainLoop();
 /// Update editor display
 extern void EditorUpdateDisplay();
+
+//Wyrmgus start
+extern void EditorActionRemoveUnit(CUnit &unit, bool display = true);
+//Wyrmgus end
 
 /// Save a map from editor
 //Wyrmgus start

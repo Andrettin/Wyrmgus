@@ -112,7 +112,7 @@ void SaveQuestCompletion()
 	
 	for (size_t i = 0; i < Quests.size(); ++i) {
 		if (Quests[i]->Completed) {
-			fprintf(fd, "SetQuestCompleted(\"%s\", false)\n", Quests[i]->Ident.c_str());
+			fprintf(fd, "SetQuestCompleted(\"%s\", %d, false)\n", Quests[i]->Ident.c_str(), Quests[i]->HighestCompletedDifficulty);
 		}
 	}
 	
@@ -322,18 +322,26 @@ std::string GetCurrentQuest()
 	}
 }
 
-void SetQuestCompleted(std::string quest_ident, bool save)
+void SetQuestCompleted(std::string quest_ident, int difficulty, bool save)
 {
 	CQuest *quest = GetQuest(quest_ident);
-	if (!quest || quest->Completed) {
+	if (!quest) {
 		return;
 	}
 	
 	quest->Completed = true;
+	if (difficulty > quest->HighestCompletedDifficulty) {
+		quest->HighestCompletedDifficulty = difficulty;
+	}
 	if (save) {
 		SaveQuestCompletion();
 	}
 	CheckAchievements();
+}
+
+void SetQuestCompleted(std::string quest_ident, bool save)
+{
+	SetQuestCompleted(quest_ident, 2, save);
 }
 
 void SetAchievementObtained(std::string achievement_ident, bool save, bool display)

@@ -56,7 +56,7 @@ class CQuest
 {
 public:
 	CQuest() :
-		Civilization(-1), TechnologyPoints(0), X(-1), Y(-1), PlayerColor(0),
+		Civilization(-1), TechnologyPoints(0), X(-1), Y(-1), PlayerColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false),
 		QuestGiver(NULL), IntroductionDialogue(NULL)
 	{
@@ -84,6 +84,7 @@ public:
 	int X;							/// X position of the quest in its world's quest screen
 	int Y;							/// Y position of the quest in its world's quest screen
 	int PlayerColor;				/// Player color used for the quest's icon
+	int HighestCompletedDifficulty;
 	bool Hidden;					/// Whether the quest is hidden
 	bool Completed;					/// Whether the quest has been completed
 	IconConfig Icon;				/// Quest's icon
@@ -181,7 +182,8 @@ extern CDialogue *GetDialogue(std::string dialogue_ident);
 
 extern void SetCurrentQuest(std::string quest_ident);
 extern std::string GetCurrentQuest();
-extern void SetQuestCompleted(std::string quest_ident, bool save = true);
+extern void SetQuestCompleted(std::string quest_ident, int difficulty = 2, bool save = true);
+extern void SetQuestCompleted(std::string quest_ident, bool save);
 extern void SetAchievementObtained(std::string achievement_ident, bool save = true, bool display = true);
 
 extern void CallDialogue(std::string dialogue_ident, int player);

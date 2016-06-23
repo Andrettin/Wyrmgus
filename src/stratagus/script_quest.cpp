@@ -268,6 +268,9 @@ static int CclGetQuestData(lua_State *l)
 	} else if (!strcmp(data, "Completed")) {
 		lua_pushboolean(l, quest->Completed);
 		return 1;
+	} else if (!strcmp(data, "HighestCompletedDifficulty")) {
+		lua_pushnumber(l, quest->HighestCompletedDifficulty);
+		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, quest->Icon.Name.c_str());
 		return 1;

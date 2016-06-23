@@ -209,6 +209,23 @@ static void EditTile(const Vec2i &pos, int tile)
 	mf.setTileIndex(tileset, tileIndex, value);
 	//Wyrmgus end
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
+	
+	//Wyrmgus start
+	CUnitCache &unitcache = mf.UnitCache;
+	std::vector<CUnit *> units_to_remove;
+
+	for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
+		CUnit *unit = *it;
+
+		if (!CanBuildUnitType(unit, *unit->Type, pos, 1)) {
+			units_to_remove.push_back(unit);
+		}
+	}
+	
+	for (size_t i = 0; i < units_to_remove.size(); ++i) {
+		EditorActionRemoveUnit(*units_to_remove[i], false);
+	}
+	//Wyrmgus end
 
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
@@ -371,13 +388,18 @@ static void EditorPlaceUnit(const Vec2i &pos, CUnitType &type, CPlayer *player)
 /**
 **  Remove a unit
 */
-static void EditorActionRemoveUnit(CUnit &unit)
+//Wyrmgus start
+//static void EditorActionRemoveUnit(CUnit &unit)
+void EditorActionRemoveUnit(CUnit &unit, bool display)
+//Wyrmgus end
 {
 	unit.Remove(NULL);
 	UnitLost(unit);
 	UnitClearOrders(unit);
 	unit.Release();
-	UI.StatusLine.Set(_("Unit deleted"));
+	if (display) {
+		UI.StatusLine.Set(_("Unit deleted"));
+	}
 	UpdateMinimap = true;
 }
 
