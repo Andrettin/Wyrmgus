@@ -1669,7 +1669,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 		this->GenerateUnique(dropper);
 	}
 	
-	if (this->Type->BoolFlag[ITEM_INDEX].value && (this->Prefix != NULL || this->Suffix != NULL || this->Unique)) {
+	if (this->Type->BoolFlag[ITEM_INDEX].value && (this->Prefix != NULL || this->Suffix != NULL)) {
 		this->Identified = false;
 	}
 	
@@ -1747,13 +1747,13 @@ void CUnit::GenerateWork(CUnit *dropper)
 {
 	std::vector<CUpgrade *> potential_works;
 	for (size_t i = 0; i < this->Type->Affixes.size(); ++i) {
-		if (this->Type->ItemClass != -1 && this->Type->Affixes[i]->Work == this->Type->ItemClass) {
+		if (this->Type->ItemClass != -1 && this->Type->Affixes[i]->Work == this->Type->ItemClass && !this->Type->Affixes[i]->UniqueOnly) {
 			potential_works.push_back(this->Type->Affixes[i]);
 		}
 	}
 	if (dropper != NULL) {
 		for (size_t i = 0; i < dropper->Type->DropAffixes.size(); ++i) {
-			if (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->Work == this->Type->ItemClass) {
+			if (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->Work == this->Type->ItemClass && !dropper->Type->DropAffixes[i]->UniqueOnly) {
 				potential_works.push_back(dropper->Type->DropAffixes[i]);
 			}
 		}
@@ -1761,7 +1761,7 @@ void CUnit::GenerateWork(CUnit *dropper)
 		int dropper_civilization = PlayerRaces.GetRaceIndexByName(dropper->Type->Civilization.c_str());
 		if (dropper_civilization != -1) {
 			for (size_t i = 0; i < PlayerRaces.LiteraryWorks[dropper_civilization].size(); ++i) {
-				if (this->Type->ItemClass != -1 && PlayerRaces.LiteraryWorks[dropper_civilization][i]->Work == this->Type->ItemClass) {
+				if (this->Type->ItemClass != -1 && PlayerRaces.LiteraryWorks[dropper_civilization][i]->Work == this->Type->ItemClass && !PlayerRaces.LiteraryWorks[dropper_civilization][i]->UniqueOnly) {
 					potential_works.push_back(PlayerRaces.LiteraryWorks[dropper_civilization][i]);
 				}
 			}
@@ -1775,6 +1775,8 @@ void CUnit::GenerateWork(CUnit *dropper)
 
 void CUnit::GenerateUnique(CUnit *dropper)
 {
+	int dropper_civilization = dropper != NULL ? PlayerRaces.GetRaceIndexByName(dropper->Type->Civilization.c_str()) : -1;
+	
 	std::vector<CUniqueItem *> potential_uniques;
 	for (size_t i = 0; i < UniqueItems.size(); ++i) {
 		if (
@@ -1797,6 +1799,7 @@ void CUnit::GenerateUnique(CUnit *dropper)
 				UniqueItems[i]->Work == NULL
 				|| (dropper != NULL && std::find(dropper->Type->DropAffixes.begin(), dropper->Type->DropAffixes.end(), UniqueItems[i]->Work) != dropper->Type->DropAffixes.end())
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
+				|| (dropper_civilization != -1 && std::find(PlayerRaces.LiteraryWorks[dropper_civilization].begin(), PlayerRaces.LiteraryWorks[dropper_civilization].end(), UniqueItems[i]->Work) != PlayerRaces.LiteraryWorks[dropper_civilization].end())
 			)
 			&& UniqueItems[i]->CanDrop()
 		) {

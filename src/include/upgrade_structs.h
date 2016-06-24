@@ -220,6 +220,7 @@ public:
 	bool MagicPrefix;
 	bool MagicSuffix;
 	bool RunicAffix;
+	bool UniqueOnly;						/// Whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];

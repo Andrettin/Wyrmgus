@@ -167,7 +167,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -354,6 +354,7 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->MagicSuffix = parent_upgrade->MagicSuffix;
 				upgrade->RunicAffix = parent_upgrade->RunicAffix;
 				upgrade->Work = parent_upgrade->Work;
+				upgrade->UniqueOnly = parent_upgrade->UniqueOnly;
 			} else {
 				LuaError(l, "Parent upgrade doesn't exist.");
 			}
@@ -408,6 +409,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->MagicSuffix = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "RunicAffix")) {
 			upgrade->RunicAffix = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "UniqueOnly")) {
+			upgrade->UniqueOnly = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Work")) {
 			int work_type = GetItemClassIdByName(LuaToString(l, -1));
 			if (work_type != -1) {
