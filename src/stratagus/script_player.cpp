@@ -1774,6 +1774,52 @@ static int CclDefineFaction(lua_State *l)
 }
 
 /**
+**  Define a religion.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineReligion(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string religion_ident = LuaToString(l, 1);
+	CReligion *religion = NULL;
+	int religion_id = PlayerRaces.GetReligionIndexByIdent(religion_ident);
+	if (religion_id != -1) {
+		religion = PlayerRaces.Religions[religion_id];
+	} else {
+		religion = new CReligion;
+		PlayerRaces.Religions.push_back(religion);
+	}
+	
+	religion->Ident = religion_ident;
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			religion->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			religion->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			religion->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			religion->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "CulturalDeities")) {
+			religion->CulturalDeities = LuaToBoolean(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a deity domain.
 **
 **  @param l  Lua state.
@@ -1886,6 +1932,19 @@ static int CclDefineDeity(lua_State *l)
 				}
 
 				deity->Civilizations.push_back(civilization);
+			}
+		} else if (!strcmp(value, "Religions")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int religion_id = PlayerRaces.GetReligionIndexByIdent(LuaToString(l, -1, j + 1));
+				if (religion_id == -1) {
+					LuaError(l, "Religion doesn't exist.");
+				}
+
+				deity->Religions.push_back(PlayerRaces.Religions[religion_id]);
 			}
 		} else if (!strcmp(value, "Domains")) {
 			if (!lua_istable(l, -1)) {
@@ -3049,6 +3108,17 @@ static int CclGetLanguageWordData(lua_State *l)
 	return 0;
 }
 
+static int CclGetReligions(lua_State *l)
+{
+	lua_createtable(l, PlayerRaces.Religions.size(), 0);
+	for (size_t i = 1; i <= PlayerRaces.Religions.size(); ++i)
+	{
+		lua_pushstring(l, PlayerRaces.Religions[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
 static int CclGetDeityDomains(lua_State *l)
 {
 	lua_createtable(l, PlayerRaces.DeityDomains.size(), 0);
@@ -3069,6 +3139,46 @@ static int CclGetDeities(lua_State *l)
 		lua_rawseti(l, -2, i);
 	}
 	return 1;
+}
+
+/**
+**  Get religion data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetReligionData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string religion_ident = LuaToString(l, 1);
+	int religion_id = PlayerRaces.GetReligionIndexByIdent(religion_ident);
+	if (religion_id == -1) {
+		LuaError(l, "Religion \"%s\" doesn't exist." _C_ religion_ident.c_str());
+	}
+	const CReligion *religion = PlayerRaces.Religions[religion_id];
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, religion->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, religion->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, religion->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, religion->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "CulturalDeities")) {
+		lua_pushboolean(l, religion->CulturalDeities);
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
 }
 
 /**
@@ -3158,6 +3268,14 @@ static int CclGetDeityData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "Religions")) {
+		lua_createtable(l, deity->Religions.size(), 0);
+		for (size_t i = 1; i <= deity->Religions.size(); ++i)
+		{
+			lua_pushstring(l, deity->Religions[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else if (!strcmp(data, "Domains")) {
 		lua_createtable(l, deity->Domains.size(), 0);
 		for (size_t i = 1; i <= deity->Domains.size(); ++i)
@@ -3230,6 +3348,7 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetCivilizationClassUnitType", CclGetCivilizationClassUnitType);
 	lua_register(Lua, "GetFactionClassUnitType", CclGetFactionClassUnitType);
 	lua_register(Lua, "DefineFaction", CclDefineFaction);
+	lua_register(Lua, "DefineReligion", CclDefineReligion);
 	lua_register(Lua, "DefineDeityDomain", CclDefineDeityDomain);
 	lua_register(Lua, "DefineDeity", CclDefineDeity);
 	lua_register(Lua, "DefineLanguage", CclDefineLanguage);
@@ -3261,8 +3380,10 @@ void PlayerCclRegister()
 	lua_register(Lua, "GetLanguageData", CclGetLanguageData);
 	lua_register(Lua, "GetLanguageWordData", CclGetLanguageWordData);
 	
+	lua_register(Lua, "GetReligions", CclGetReligions);
 	lua_register(Lua, "GetDeityDomains", CclGetDeityDomains);
 	lua_register(Lua, "GetDeities", CclGetDeities);
+	lua_register(Lua, "GetReligionData", CclGetReligionData);
 	lua_register(Lua, "GetDeityDomainData", CclGetDeityDomainData);
 	lua_register(Lua, "GetDeityData", CclGetDeityData);
 	//Wyrmgus end

@@ -458,6 +458,22 @@ public:
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 };
 
+class CReligion
+{
+public:
+	CReligion() :
+		CulturalDeities(false)
+	{
+	}
+	
+	std::string Ident;			/// Ident of the religion
+	std::string Name;			/// Name of the religion
+	std::string Description;
+	std::string Background;
+	std::string Quote;
+	bool CulturalDeities;		/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
+};
+
 class CDeityDomain
 {
 public:
@@ -466,8 +482,8 @@ public:
 	{
 	}
 	
-	std::string Ident;			/// Ident of the deity
-	std::string Name;			/// Name of the deity
+	std::string Ident;			/// Ident of the domain
+	std::string Name;			/// Name of the domain
 	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this domain
 };
 
@@ -490,6 +506,7 @@ public:
 	std::string Quote;
 	CPlane *HomePlane;			/// The home plane of the deity
 	std::vector<int> Civilizations;	/// Civilizations which may worship the deity
+	std::vector<CReligion *> Religions;	/// Religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;
 	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this deity
@@ -621,6 +638,7 @@ public:
 	int GetRaceIndexByName(const char *raceName) const;
 	//Wyrmgus start
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
+	int GetReligionIndexByIdent(std::string religion_ident) const;
 	int GetDeityDomainIndexByIdent(std::string deity_domain_ident) const;
 	int GetDeityIndexByIdent(std::string deity_ident) const;
 	int GetLanguageIndexByIdent(std::string language_ident) const;
@@ -657,6 +675,7 @@ public:
 	int CivilizationLanguage[MAX_RACES];
 	std::vector<CFiller> CivilizationUIFillers[MAX_RACES];
 	std::vector<CLanguage *> Languages;									/// languages
+	std::vector<CReligion *> Religions;									/// religions
 	std::vector<CDeityDomain *> DeityDomains;							/// deity domains
 	std::vector<CDeity *> Deities;										/// deities
 	//Wyrmgus end

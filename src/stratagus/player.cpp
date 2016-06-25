@@ -388,6 +388,10 @@ void PlayerRace::Clean()
 			this->Languages[i]->NameTranslations.clear();
 		}
 	}
+	for (size_t i = 0; i < this->Religions.size(); ++i) {
+		delete this->Religions[i];
+	}
+	this->Religions.clear();
 	for (size_t i = 0; i < this->DeityDomains.size(); ++i) {
 		delete this->DeityDomains[i];
 	}
@@ -472,6 +476,16 @@ int PlayerRace::GetFactionIndexByName(const int civilization, const std::string 
 	} else {
 		return -1;
 	}		
+}
+
+int PlayerRace::GetReligionIndexByIdent(std::string religion_ident) const
+{
+	for (size_t i = 0; i < this->Religions.size(); ++i) {
+		if (religion_ident == this->Religions[i]->Ident) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 int PlayerRace::GetDeityDomainIndexByIdent(std::string deity_domain_ident) const
