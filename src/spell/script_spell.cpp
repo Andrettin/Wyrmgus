@@ -367,12 +367,24 @@ static int CclDefineSpell(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			const int len = lua_rawlen(l, -1);
+			//Wyrmgus start
+			/*
 			if (len != MaxCosts) {
 				LuaError(l, "resource table size isn't correct");
 			}
 			for (int j = 1; j < len; ++j) { // exclude the time
 				spell->Costs[j] = LuaToNumber(l, -1, j + 1);
 			}
+			*/
+			for (int j = 0; j < len; ++j) { // exclude the time
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				spell->Costs[j] = LuaToNumber(l, -1, j + 1);
+			}
+			//Wyrmgus end
 			lua_pop(l, 1);
 		} else if (!strcmp(value, "range")) {
 			if (!lua_isstring(l, i + 1) && !lua_isnumber(l, i + 1)) {
