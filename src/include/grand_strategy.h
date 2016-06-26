@@ -514,6 +514,7 @@ extern bool GrandStrategyGameInitialized;				/// if the grand strategy game has 
 extern bool GrandStrategyGameLoading;
 extern bool GrandStrategyBattleBaseBuilding;			/// if grand strategy game has base building in battles
 extern int GrandStrategyYear;
+extern int GrandStrategyMonth;
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
 extern int WorldMapOffsetY;

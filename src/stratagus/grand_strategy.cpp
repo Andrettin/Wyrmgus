@@ -69,6 +69,7 @@ bool GrandStrategyGameInitialized = false;
 bool GrandStrategyGameLoading = false;
 bool GrandStrategyBattleBaseBuilding = false;
 int GrandStrategyYear = 0;
+int GrandStrategyMonth = 0;
 std::string GrandStrategyWorld;
 int WorldMapOffsetX;
 int WorldMapOffsetY;

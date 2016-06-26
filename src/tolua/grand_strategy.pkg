@@ -5,6 +5,7 @@ extern bool GrandStrategyGameInitialized;
 extern bool GrandStrategyGameLoading;
 extern bool GrandStrategyBattleBaseBuilding;
 extern int GrandStrategyYear;
+extern int GrandStrategyMonth;
 extern std::string GrandStrategyWorld;
 extern int WorldMapOffsetX;
 extern int WorldMapOffsetY;
