@@ -414,6 +414,21 @@ enum WordJunctionTypes {
 	MaxWordJunctionTypes
 };
 
+class CCivilization
+{
+public:
+	CCivilization() :
+		ID(-1)
+	{
+	}
+	
+	std::string GetMonthName(int month);
+	
+	int ID;
+	std::string Ident;			/// Ident of the civilization
+	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
+};
+
 class CFaction
 {
 public:
@@ -668,6 +683,7 @@ public:
 	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions
+	std::vector<CCivilization *> Civilizations;    						/// civilizations
 	std::vector<CFaction *> Factions[MAX_RACES];    					/// factions
 	std::vector<int> DevelopsFrom[MAX_RACES];							/// from which civilizations this civilization develops
 	std::vector<int> DevelopsTo[MAX_RACES];								/// to which civilizations this civilization develops

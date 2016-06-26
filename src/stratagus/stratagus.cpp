@@ -839,6 +839,67 @@ int stratagusMain(int argc, char **argv)
 }
 
 //Wyrmgus start
+std::string GetMonthNameById(int month)
+{
+	if (month == JanuaryMonth) {
+		return "january";
+	} else if (month == FebruaryMonth) {
+		return "february";
+	} else if (month == MarchMonth) {
+		return "march";
+	} else if (month == AprilMonth) {
+		return "april";
+	} else if (month == MayMonth) {
+		return "may";
+	} else if (month == JuneMonth) {
+		return "june";
+	} else if (month == JulyMonth) {
+		return "july";
+	} else if (month == AugustMonth) {
+		return "august";
+	} else if (month == SeptemberMonth) {
+		return "september";
+	} else if (month == OctoberMonth) {
+		return "october";
+	} else if (month == NovemberMonth) {
+		return "november";
+	} else if (month == DecemberMonth) {
+		return "december";
+	}
+	return "";
+}
+
+int GetMonthIdByName(std::string month)
+{
+	if (month == "january") {
+		return JanuaryMonth;
+	} else if (month == "february") {
+		return FebruaryMonth;
+	} else if (month == "march") {
+		return MarchMonth;
+	} else if (month == "april") {
+		return AprilMonth;
+	} else if (month == "may") {
+		return MayMonth;
+	} else if (month == "june") {
+		return JuneMonth;
+	} else if (month == "july") {
+		return JulyMonth;
+	} else if (month == "august") {
+		return AugustMonth;
+	} else if (month == "september") {
+		return SeptemberMonth;
+	} else if (month == "october") {
+		return OctoberMonth;
+	} else if (month == "november") {
+		return NovemberMonth;
+	} else if (month == "december") {
+		return DecemberMonth;
+	} else {
+		return -1;
+	}
+}
+
 int GetReverseDirection(int direction)
 {
 	if (direction == North) {

@@ -229,8 +229,27 @@ enum TimesOfDay {
 	MaxTimesOfDay
 };
 
+enum Months {
+	JanuaryMonth,
+	FebruaryMonth,
+	MarchMonth,
+	AprilMonth,
+	MayMonth,
+	JuneMonth,
+	JulyMonth,
+	AugustMonth,
+	SeptemberMonth,
+	OctoberMonth,
+	NovemberMonth,
+	DecemberMonth,
+	
+	MaxMonths
+};
+
 #include <vec2i.h>
 
+extern std::string GetMonthNameById(int month);
+extern int GetMonthIdByName(std::string month);
 extern int GetReverseDirection(int direction);
 extern std::string GetDirectionNameById(int direction);
 extern int GetDirectionIdByName(std::string direction);

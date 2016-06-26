@@ -636,45 +636,52 @@ static int CclDefineCivilization(lua_State *l)
 	}
 
 	std::string civilization_name = LuaToString(l, 1);
-	int civilization;
+	int civilization_id;
+	CCivilization *civilization = NULL;
 	if (PlayerRaces.GetRaceIndexByName(civilization_name.c_str()) != -1) { // redefinition
-		civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		civilization_id = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		civilization = PlayerRaces.Civilizations[civilization_id];
 	} else {
-		civilization = PlayerRaces.Count++;
-		PlayerRaces.Name[civilization] = civilization_name;
-		PlayerRaces.Playable[civilization] = true; //civilizations are playable by default
-		SetCivilizationStringToIndex(PlayerRaces.Name[civilization], civilization);
-	}	
+		civilization_id = PlayerRaces.Count++;
+		PlayerRaces.Name[civilization_id] = civilization_name;
+		PlayerRaces.Playable[civilization_id] = true; //civilizations are playable by default
+		SetCivilizationStringToIndex(PlayerRaces.Name[civilization_id], civilization_id);
+		
+		civilization = new CCivilization;
+		civilization->Ident = civilization_name;
+		civilization->ID = PlayerRaces.Civilizations.size();
+		PlayerRaces.Civilizations.push_back(civilization);
+	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Display")) {
-			PlayerRaces.Display[civilization] = LuaToString(l, -1);
+			PlayerRaces.Display[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "Adjective")) {
-			PlayerRaces.Adjective[civilization] = LuaToString(l, -1);
+			PlayerRaces.Adjective[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
-			PlayerRaces.Description[civilization] = LuaToString(l, -1);
+			PlayerRaces.Description[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
-			PlayerRaces.Visible[civilization] = LuaToBoolean(l, -1);
+			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
-			PlayerRaces.Playable[civilization] = LuaToBoolean(l, -1);
+			PlayerRaces.Playable[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Species")) {
-			PlayerRaces.Species[civilization] = LuaToString(l, -1);
+			PlayerRaces.Species[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentCivilization")) {
-			PlayerRaces.ParentCivilization[civilization] = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			PlayerRaces.ParentCivilization[civilization_id] = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
 			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			if (language != -1) {
-				PlayerRaces.CivilizationLanguage[civilization] = language;
+				PlayerRaces.CivilizationLanguage[civilization_id] = language;
 				PlayerRaces.Languages[language]->UsedByCivilizationOrFaction = true;
 			} else {
 				LuaError(l, "Language not found.");
 			}
 		} else if (!strcmp(value, "DefaultColor")) {
-			PlayerRaces.DefaultColor[civilization] = LuaToString(l, -1);
+			PlayerRaces.DefaultColor[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "CivilizationUpgrade")) {
-			PlayerRaces.CivilizationUpgrades[civilization] = LuaToString(l, -1);
+			PlayerRaces.CivilizationUpgrades[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "DevelopsFrom")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -687,8 +694,8 @@ static int CclDefineCivilization(lua_State *l)
 				if (originary_civilization == -1) {
 					LuaError(l, "Civilization \"%s\" doesn't exist." _C_ originary_civilization_name.c_str());
 				}
-				PlayerRaces.DevelopsFrom[civilization].push_back(originary_civilization);
-				PlayerRaces.DevelopsTo[originary_civilization].push_back(civilization);
+				PlayerRaces.DevelopsFrom[civilization_id].push_back(originary_civilization);
+				PlayerRaces.DevelopsTo[originary_civilization].push_back(civilization_id);
 			}
 		} else if (!strcmp(value, "ButtonIcons")) {
 			if (!lua_istable(l, -1)) {
@@ -700,9 +707,9 @@ static int CclDefineCivilization(lua_State *l)
 				int button_action = GetButtonActionIdByName(button_action_name);
 				if (button_action != -1) {
 					++j;
-					PlayerRaces.ButtonIcons[civilization][button_action].Name = LuaToString(l, -1, j + 1);
-					PlayerRaces.ButtonIcons[civilization][button_action].Icon = NULL;
-					PlayerRaces.ButtonIcons[civilization][button_action].Load();
+					PlayerRaces.ButtonIcons[civilization_id][button_action].Name = LuaToString(l, -1, j + 1);
+					PlayerRaces.ButtonIcons[civilization_id][button_action].Icon = NULL;
+					PlayerRaces.ButtonIcons[civilization_id][button_action].Load();
 				} else {
 					LuaError(l, "Button action \"%s\" doesn't exist." _C_ button_action_name.c_str());
 				}
@@ -712,7 +719,7 @@ static int CclDefineCivilization(lua_State *l)
 				LuaError(l, "incorrect argument");
 			}
 			
-			PlayerRaces.CivilizationUIFillers[civilization].clear();
+			PlayerRaces.CivilizationUIFillers[civilization_id].clear();
 			
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
@@ -726,29 +733,44 @@ static int CclDefineCivilization(lua_State *l)
 				filler.X = LuaToNumber(l, -1, j + 1);
 				++j;
 				filler.Y = LuaToNumber(l, -1, j + 1);
-				PlayerRaces.CivilizationUIFillers[civilization].push_back(filler);
+				PlayerRaces.CivilizationUIFillers[civilization_id].push_back(filler);
+			}
+		} else if (!strcmp(value, "Months")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string month_name = LuaToString(l, -1, j + 1);
+				int month = GetMonthIdByName(month_name);
+				if (month != -1) {
+					++j;
+					civilization->Months[month] = LuaToString(l, -1, j + 1);
+				} else {
+					LuaError(l, "Month \"%s\" doesn't exist." _C_ month_name.c_str());
+				}
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	
-	if (PlayerRaces.ParentCivilization[civilization] != -1) {
-		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
+	if (PlayerRaces.ParentCivilization[civilization_id] != -1) {
+		int parent_civilization = PlayerRaces.ParentCivilization[civilization_id];
 
-		if (PlayerRaces.CivilizationUpgrades[civilization].empty() && !PlayerRaces.CivilizationUpgrades[parent_civilization].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
-			PlayerRaces.CivilizationUpgrades[civilization] = PlayerRaces.CivilizationUpgrades[parent_civilization];
+		if (PlayerRaces.CivilizationUpgrades[civilization_id].empty() && !PlayerRaces.CivilizationUpgrades[parent_civilization].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
+			PlayerRaces.CivilizationUpgrades[civilization_id] = PlayerRaces.CivilizationUpgrades[parent_civilization];
 		}
 		
 		//inherit button icons from parent civilization, for button actions which none are specified
 		for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization].end(); ++iterator) {
-			if (PlayerRaces.ButtonIcons[civilization].find(iterator->first) == PlayerRaces.ButtonIcons[civilization].end()) {
-				PlayerRaces.ButtonIcons[civilization][iterator->first] = iterator->second;
+			if (PlayerRaces.ButtonIcons[civilization_id].find(iterator->first) == PlayerRaces.ButtonIcons[civilization_id].end()) {
+				PlayerRaces.ButtonIcons[civilization_id][iterator->first] = iterator->second;
 			}
 		}
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization].find(ButtonMove) != PlayerRaces.ButtonIcons[civilization].end()) {
+	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonMove) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 1,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -756,12 +778,12 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"m\",\n";
 		button_definition += "\tHint = _(\"~!Move\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization].find(ButtonStop) != PlayerRaces.ButtonIcons[civilization].end()) {
+	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonStop) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 2,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -769,12 +791,12 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"s\",\n";
 		button_definition += "\tHint = _(\"~!Stop\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization].find(ButtonAttack) != PlayerRaces.ButtonIcons[civilization].end()) {
+	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonAttack) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 3,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -782,12 +804,12 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"a\",\n";
 		button_definition += "\tHint = _(\"~!Attack\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization].find(ButtonPatrol) != PlayerRaces.ButtonIcons[civilization].end()) {
+	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonPatrol) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 4,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -795,12 +817,12 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"p\",\n";
 		button_definition += "\tHint = _(\"~!Patrol\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
 	
-	if (PlayerRaces.ButtonIcons[civilization].find(ButtonStandGround) != PlayerRaces.ButtonIcons[civilization].end()) {
+	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonStandGround) != PlayerRaces.ButtonIcons[civilization_id].end()) {
 		std::string button_definition = "DefineButton({\n";
 		button_definition += "\tPos = 5,\n";
 		button_definition += "\tLevel = 0,\n";
@@ -808,7 +830,7 @@ static int CclDefineCivilization(lua_State *l)
 		button_definition += "\tPopup = \"popup-commands\",\n";
 		button_definition += "\tKey = \"t\",\n";
 		button_definition += "\tHint = _(\"S~!tand Ground\"),\n";
-		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization] + "-group\"},\n";
+		button_definition += "\tForUnit = {\"" + PlayerRaces.Name[civilization_id] + "-group\"},\n";
 		button_definition += "})";
 		CclCommand(button_definition);
 	}
@@ -1283,33 +1305,35 @@ static int CclGetCivilizationData(lua_State *l)
 		LuaError(l, "incorrect argument");
 	}
 	std::string civilization_name = LuaToString(l, 1);
-	int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-	if (civilization == -1) {
+	int civilization_id = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+	if (civilization_id == -1) {
 		LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
 	}
+	CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
+	
 	const char *data = LuaToString(l, 2);
 
 	if (!strcmp(data, "Display")) {
-		lua_pushstring(l, PlayerRaces.Display[civilization].c_str());
+		lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "Adjective")) {
-		if (!PlayerRaces.Adjective[civilization].empty()) {
-			lua_pushstring(l, PlayerRaces.Adjective[civilization].c_str());
+		if (!PlayerRaces.Adjective[civilization_id].empty()) {
+			lua_pushstring(l, PlayerRaces.Adjective[civilization_id].c_str());
 		} else {
-			lua_pushstring(l, PlayerRaces.Display[civilization].c_str());
+			lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
 		}
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, PlayerRaces.Description[civilization].c_str());
+		lua_pushstring(l, PlayerRaces.Description[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
-		lua_pushboolean(l, PlayerRaces.Playable[civilization]);
+		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);
 		return 1;
 	} else if (!strcmp(data, "Species")) {
-		lua_pushstring(l, PlayerRaces.Species[civilization].c_str());
+		lua_pushstring(l, PlayerRaces.Species[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "ParentCivilization")) {
-		int parent_civilization = PlayerRaces.ParentCivilization[civilization];
+		int parent_civilization = PlayerRaces.ParentCivilization[civilization_id];
 		if (parent_civilization != -1) {
 			lua_pushstring(l, PlayerRaces.Name[parent_civilization].c_str());
 		} else {
@@ -1317,7 +1341,7 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Language")) {
-		int language = PlayerRaces.GetCivilizationLanguage(civilization);
+		int language = PlayerRaces.GetCivilizationLanguage(civilization_id);
 		if (language != -1) {
 			lua_pushstring(l, PlayerRaces.Languages[language]->Ident.c_str());
 		} else {
@@ -1325,24 +1349,34 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "DefaultColor")) {
-		lua_pushstring(l, PlayerRaces.DefaultColor[civilization].c_str());
+		lua_pushstring(l, PlayerRaces.DefaultColor[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "CivilizationUpgrade")) {
-		lua_pushstring(l, PlayerRaces.CivilizationUpgrades[civilization].c_str());
+		lua_pushstring(l, PlayerRaces.CivilizationUpgrades[civilization_id].c_str());
+		return 1;
+	} else if (!strcmp(data, "MonthName")) {
+		LuaCheckArgs(l, 3);		
+		
+		int month = GetMonthIdByName(LuaToString(l, 3));
+		if (month == -1) {
+			LuaError(l, "Month doesn't exist.");
+		}
+		
+		lua_pushstring(l, civilization->GetMonthName(month).c_str());
 		return 1;
 	} else if (!strcmp(data, "DevelopsFrom")) {
-		lua_createtable(l, PlayerRaces.DevelopsFrom[civilization].size(), 0);
-		for (size_t i = 1; i <= PlayerRaces.DevelopsFrom[civilization].size(); ++i)
+		lua_createtable(l, PlayerRaces.DevelopsFrom[civilization_id].size(), 0);
+		for (size_t i = 1; i <= PlayerRaces.DevelopsFrom[civilization_id].size(); ++i)
 		{
-			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsFrom[civilization][i-1]].c_str());
+			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsFrom[civilization_id][i-1]].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "DevelopsTo")) {
-		lua_createtable(l, PlayerRaces.DevelopsTo[civilization].size(), 0);
-		for (size_t i = 1; i <= PlayerRaces.DevelopsTo[civilization].size(); ++i)
+		lua_createtable(l, PlayerRaces.DevelopsTo[civilization_id].size(), 0);
+		for (size_t i = 1; i <= PlayerRaces.DevelopsTo[civilization_id].size(); ++i)
 		{
-			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsTo[civilization][i-1]].c_str());
+			lua_pushstring(l, PlayerRaces.Name[PlayerRaces.DevelopsTo[civilization_id][i-1]].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
@@ -1359,10 +1393,10 @@ static int CclGetCivilizationData(lua_State *l)
 		}
 		
 		std::vector<std::string> factions;
-		for (size_t i = 0; i < PlayerRaces.Factions[civilization].size(); ++i)
+		for (size_t i = 0; i < PlayerRaces.Factions[civilization_id].size(); ++i)
 		{
-			if (!is_mod || PlayerRaces.Factions[civilization][i]->Mod == mod_file) {
-				factions.push_back(PlayerRaces.Factions[civilization][i]->Name);
+			if (!is_mod || PlayerRaces.Factions[civilization_id][i]->Mod == mod_file) {
+				factions.push_back(PlayerRaces.Factions[civilization_id][i]->Name);
 			}
 		}
 		

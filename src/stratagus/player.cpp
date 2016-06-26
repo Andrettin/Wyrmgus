@@ -427,6 +427,12 @@ void PlayerRace::Clean()
 		//Wyrmgus end
 	}
 	this->Count = 0;
+	//Wyrmgus start
+	for (size_t i = 0; i < PlayerRaces.Civilizations.size(); ++i) {
+		delete this->Civilizations[i];
+	}
+	PlayerRaces.Civilizations.clear();
+	//Wyrmgus end
 }
 
 int PlayerRace::GetRaceIndexByName(const char *raceName) const
@@ -722,6 +728,15 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 	}
 	
 	return new_name;
+}
+
+std::string CCivilization::GetMonthName(int month)
+{
+	if (this->Months.find(month) != this->Months.end()) {
+		return this->Months.find(month)->second;
+	}
+	
+	return CapitalizeString(GetMonthNameById(month));
 }
 
 CFaction::~CFaction()
