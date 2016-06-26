@@ -758,28 +758,56 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 			tile_tooltip += ")";
 		}
 	} else if (res != -1 && tile->ResourceProspected) {
-		if (!tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
-			tile_tooltip += "Unused ";
+		if (!tile->GetCulturalName().empty()) { //if the terrain feature has a particular name, use it
+			tile_tooltip += tile->GetCulturalName();
+			tile_tooltip += " (";
+			
+			if (!tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
+				tile_tooltip += "Unused ";
+			}
+			
+			if (res == GoldCost) {
+				tile_tooltip += "Gold Mine";
+			} else if (res == SilverCost) {
+				tile_tooltip += "Silver Mine";
+			} else if (res == CopperCost) {
+				tile_tooltip += "Copper Mine";
+			} else if (res == WoodCost) {
+				tile_tooltip += "Timber Lodge";
+			} else if (res == StoneCost) {
+				tile_tooltip += "Quarry";
+			} else if (res == GrainCost) {
+				tile_tooltip += "Grain Farm";
+			} else if (res == MushroomCost) {
+				tile_tooltip += "Mushroom Farm";
+			}
+			tile_tooltip += ", ";
+			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
+			tile_tooltip += ")";
+		} else {
+			if (!tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
+				tile_tooltip += "Unused ";
+			}
+			
+			if (res == GoldCost) {
+				tile_tooltip += "Gold Mine";
+			} else if (res == SilverCost) {
+				tile_tooltip += "Silver Mine";
+			} else if (res == CopperCost) {
+				tile_tooltip += "Copper Mine";
+			} else if (res == WoodCost) {
+				tile_tooltip += "Timber Lodge";
+			} else if (res == StoneCost) {
+				tile_tooltip += "Quarry";
+			} else if (res == GrainCost) {
+				tile_tooltip += "Grain Farm";
+			} else if (res == MushroomCost) {
+				tile_tooltip += "Mushroom Farm";
+			}
+			tile_tooltip += " (";
+			tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
+			tile_tooltip += ")";
 		}
-		
-		if (res == GoldCost) {
-			tile_tooltip += "Gold Mine";
-		} else if (res == SilverCost) {
-			tile_tooltip += "Silver Mine";
-		} else if (res == CopperCost) {
-			tile_tooltip += "Copper Mine";
-		} else if (res == WoodCost) {
-			tile_tooltip += "Timber Lodge";
-		} else if (res == StoneCost) {
-			tile_tooltip += "Quarry";
-		} else if (res == GrainCost) {
-			tile_tooltip += "Grain Farm";
-		} else if (res == MushroomCost) {
-			tile_tooltip += "Mushroom Farm";
-		}
-		tile_tooltip += " (";
-		tile_tooltip += WorldMapTerrainTypes[tile->Terrain]->Name;
-		tile_tooltip += ")";
 		if (tile->Worked && province != NULL && province->Owner == GrandStrategyGame.PlayerFaction) {
 			tile_tooltip += " (COST_";
 			tile_tooltip += std::to_string((long long) res);
