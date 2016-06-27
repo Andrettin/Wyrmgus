@@ -2837,6 +2837,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 		fprintf(fd, "SetGrandStrategyWorld(\"%s\")\n", GrandStrategyWorld.c_str());
 		fprintf(fd, "InitializeGrandStrategyGame()\n");
 		fprintf(fd, "SetWorldMapSize(%d, %d)\n", GetWorldMapWidth(), GetWorldMapHeight()); //save world map size
+		fprintf(fd, "InitializeGrandStrategyWorldMap()\n");
 		for (int x = 0; x < GetWorldMapWidth(); ++x) {
 			for (int y = 0; y < GetWorldMapHeight(); ++y) {
 				if (GrandStrategyGame.WorldMapTiles[x][y]->Terrain != -1) {
@@ -2893,21 +2894,23 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 			}
 		}
-		for (int i = 0; i < RiverMax; ++i) { //save river information
-			if (GrandStrategyGame.Rivers[i] && !GrandStrategyGame.Rivers[i]->Name.empty()) {
-				for (int j = 0; j < MAX_RACES; ++j) {
-					if (GrandStrategyGame.Rivers[i]->CulturalNames.find(j) != GrandStrategyGame.Rivers[i]->CulturalNames.end()) {
-						fprintf(fd, "SetRiverCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Rivers[i]->CulturalNames[j].c_str());
-					}
-				}
-			} else {
-				break;
-			}
-		}
 		fprintf(fd, "InitializeGrandStrategyProvinces()\n");
 		for (size_t i = 0; i < GrandStrategyGame.Provinces.size(); ++i) { //save province information
 			if (GrandStrategyGame.Provinces[i]->Water) { //provinces are non-water provinces by default
 				fprintf(fd, "SetProvinceWater(\"%s\", %s)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), "true"); //save whether the province is a water province
+			}
+		}
+		
+		for (size_t i = 0; i < GrandStrategyGame.Rivers.size(); ++i) { //save river information
+			for (int j = 0; j < MAX_RACES; ++j) {
+				if (GrandStrategyGame.Rivers[i]->CulturalNames.find(j) != GrandStrategyGame.Rivers[i]->CulturalNames.end()) {
+					fprintf(fd, "SetRiverCulturalName(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), GrandStrategyGame.Rivers[i]->CulturalNames[j].c_str());
+				}
+				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
+					if (GrandStrategyGame.Rivers[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != GrandStrategyGame.Rivers[i]->FactionCulturalNames.end()) {
+						fprintf(fd, "SetRiverFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Name.c_str(), GrandStrategyGame.Rivers[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]].c_str());
+					}
+				}
 			}
 		}
 		

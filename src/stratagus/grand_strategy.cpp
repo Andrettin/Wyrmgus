@@ -122,11 +122,10 @@ void CGrandStrategyGame::Clean()
 		this->Factions[i].clear();
 	}
 	
-	for (int i = 0; i < RiverMax; ++i) {
-		if (this->Rivers[i]) {
-			delete this->Rivers[i];
-		}
+	for (size_t i = 0; i < GrandStrategyGame.Rivers.size(); ++i) {
+		delete GrandStrategyGame.Rivers[i];
 	}
+	GrandStrategyGame.Rivers.clear();
 	
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		delete GrandStrategyGame.Heroes[i];
@@ -738,6 +737,7 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 	
 	CGrandStrategyProvince *province = tile->Province;
 	int res = tile->Resource;
+	int owner_faction = (province != NULL && province->Owner != NULL && province != NULL && province->Owner->Civilization == province->Civilization) ? province->Owner->Faction : -1;
 	if (province != NULL && province->Owner != NULL && province->SettlementLocation.x == x && province->SettlementLocation.y == y && province->HasBuildingClass("town-hall")) {
 		if (province->Owner->Capital == province) {
 			tile_tooltip += "Capital ";
@@ -853,8 +853,8 @@ void CGrandStrategyGame::DrawTileTooltip(int x, int y)
 					tooltip_rivers[tooltip_river_count] = tile->River[i];
 					tooltip_river_count += 1;
 					tile_tooltip += " (";
-					if (!GrandStrategyGame.Rivers[tile->River[i]]->GetCulturalName(province->Civilization).empty()) {
-						tile_tooltip += GrandStrategyGame.Rivers[tile->River[i]]->GetCulturalName(province->Civilization) + " ";
+					if (!GrandStrategyGame.Rivers[tile->River[i]]->GetCulturalName(province->Civilization, owner_faction).empty()) {
+						tile_tooltip += GrandStrategyGame.Rivers[tile->River[i]]->GetCulturalName(province->Civilization, owner_faction) + " ";
 					}
 					tile_tooltip += "River";
 					tile_tooltip += ")";
@@ -2464,9 +2464,11 @@ std::string GrandStrategyWorldMapTile::GetCulturalName(int civilization, int fac
 /**
 **  Get a river's cultural name.
 */
-std::string CRiver::GetCulturalName(int civilization)
+std::string CGrandStrategyRiver::GetCulturalName(int civilization, int faction)
 {
-	if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
+	if (civilization != -1 && faction != -1 && this->FactionCulturalNames.find(PlayerRaces.Factions[civilization][faction]) != this->FactionCulturalNames.end()) {
+		return this->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]];
+	} else if (civilization != -1 && this->CulturalNames.find(civilization) != this->CulturalNames.end()) {
 		return this->CulturalNames[civilization];
 	} else {
 		return this->Name;
@@ -5810,20 +5812,8 @@ void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::string civi
 
 int GetRiverId(std::string river_name)
 {
-	for (int i = 0; i < RiverMax; ++i) {
-		if (!GrandStrategyGame.Rivers[i] || GrandStrategyGame.Rivers[i]->Name.empty()) {
-			if (!river_name.empty()) { //if the name is not empty and reached a blank spot, create a new river and return its ID
-				if (!GrandStrategyGame.Rivers[i]) { //if river doesn't exist, create it now
-					CRiver *river = new CRiver;
-					GrandStrategyGame.Rivers[i] = river;
-				}
-				GrandStrategyGame.Rivers[i]->Name = river_name;
-				return i;
-			}
-			break;
-		}
-		
-		if (!GrandStrategyGame.Rivers[i]->Name.empty() && GrandStrategyGame.Rivers[i]->Name == river_name) {
+	for (size_t i = 0; i < GrandStrategyGame.Rivers.size(); ++i) {
+		if (GrandStrategyGame.Rivers[i]->Name == river_name) {
 			return i;
 		}
 	}
@@ -5839,6 +5829,10 @@ void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string 
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
 	int river_id = GetRiverId(river_name);
+	
+	if (river_id == -1) {
+		fprintf(stderr, "River \"%s\" doesn't exist.\n", river_name.c_str());
+	}
 	
 //	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
@@ -5929,6 +5923,10 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 	
 	int river_id = GetRiverId(river_name);
 	
+	if (river_id == -1) {
+		fprintf(stderr, "River \"%s\" doesn't exist.\n", river_name.c_str());
+	}
+	
 //	return; //deactivate this for now, while there aren't proper graphics for the rivers
 	
 	if (direction_name == "north") {
@@ -5957,18 +5955,6 @@ void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::str
 		GrandStrategyGame.WorldMapTiles[x][y]->Riverhead[Northwest] = river_id;
 	} else {
 		fprintf(stderr, "Error: Wrong direction set for river.\n");
-	}
-}
-
-void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name)
-{
-	int river_id = GetRiverId(river_name);
-	
-	if (river_id != -1 && GrandStrategyGame.Rivers[river_id]) {
-		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
-		if (civilization != -1) {
-			GrandStrategyGame.Rivers[river_id]->CulturalNames[civilization] = TransliterateText(cultural_name);
-		}
 	}
 }
 
@@ -6002,6 +5988,33 @@ void SetWorldMapTilePort(int x, int y, bool has_port)
 	Assert(GrandStrategyGame.WorldMapTiles[x][y]);
 	
 	GrandStrategyGame.WorldMapTiles[x][y]->SetPort(has_port);
+}
+
+void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name)
+{
+	int river_id = GetRiverId(river_name);
+	
+	if (river_id != -1) {
+		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		if (civilization != -1) {
+			GrandStrategyGame.Rivers[river_id]->CulturalNames[civilization] = TransliterateText(cultural_name);
+		}
+	}
+}
+
+void SetRiverFactionCulturalName(std::string river_name, std::string civilization_name, std::string faction_name, std::string cultural_name)
+{
+	int river_id = GetRiverId(river_name);
+	
+	if (river_id != -1) {
+		int civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+		if (civilization != -1) {
+			int faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
+			if (faction != -1) {
+				GrandStrategyGame.Rivers[river_id]->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
+			}
+		}
+	}
 }
 
 /**
@@ -6701,15 +6714,6 @@ void CleanGrandStrategyGame()
 		GrandStrategyGame.Factions[i].clear();
 	}
 	
-	for (int i = 0; i < RiverMax; ++i) {
-		if (GrandStrategyGame.Rivers[i] && !GrandStrategyGame.Rivers[i]->Name.empty()) {
-			GrandStrategyGame.Rivers[i]->Name = "";
-			GrandStrategyGame.Rivers[i]->CulturalNames.clear();
-		} else {
-			break;
-		}
-	}
-	
 	for (int i = 0; i < MaxCosts; ++i) {
 		GrandStrategyGame.CommodityPrices[i] = 0;
 		for (int j = 0; j < WorldMapResourceMax; ++j) {
@@ -6728,6 +6732,11 @@ void CleanGrandStrategyGame()
 	GrandStrategyGame.Provinces.clear();
 	GrandStrategyGame.CultureProvinces.clear();
 
+	for (size_t i = 0; i < GrandStrategyGame.Rivers.size(); ++i) {
+		delete GrandStrategyGame.Rivers[i];
+	}
+	GrandStrategyGame.Rivers.clear();
+	
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		delete GrandStrategyGame.Heroes[i];
 	}
@@ -7293,24 +7302,48 @@ void InitializeGrandStrategyWorldMap()
 		return;
 	}
 	
-	for (std::map<std::pair<int,int>, WorldMapTile *>::iterator iterator = world->Tiles.begin(); iterator != world->Tiles.end(); ++iterator) {
-		int x = iterator->first.first;
-		int y = iterator->first.second;
-		
-		if (!GrandStrategyGame.WorldMapTiles[x][y]) {
-			GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
-			GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
-			GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
-			GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
+	if (GrandStrategyGameLoading == false) {
+		for (std::map<std::pair<int,int>, WorldMapTile *>::iterator iterator = world->Tiles.begin(); iterator != world->Tiles.end(); ++iterator) {
+			int x = iterator->first.first;
+			int y = iterator->first.second;
+			
+			if (!GrandStrategyGame.WorldMapTiles[x][y]) {
+				GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
+				GrandStrategyGame.WorldMapTiles[x][y] = world_map_tile;
+				GrandStrategyGame.WorldMapTiles[x][y]->Position.x = x;
+				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
+			}
+			
+			GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames = iterator->second->CulturalTerrainNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames = iterator->second->FactionCulturalTerrainNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames = iterator->second->CulturalResourceNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames = iterator->second->FactionCulturalResourceNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames = iterator->second->CulturalSettlementNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames = iterator->second->FactionCulturalSettlementNames;
 		}
-		
-		GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames = iterator->second->CulturalTerrainNames;
-		GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames = iterator->second->FactionCulturalTerrainNames;
-		GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames = iterator->second->CulturalResourceNames;
-		GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames = iterator->second->FactionCulturalResourceNames;
-		GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames = iterator->second->CulturalSettlementNames;
-		GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames = iterator->second->FactionCulturalSettlementNames;
 	}
+	
+	for (size_t i = 0; i < Rivers.size(); ++i) {
+		if (Rivers[i]->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
+			continue;
+		}
+		CGrandStrategyRiver *river = new CGrandStrategyRiver;
+		river->ID = GrandStrategyGame.Rivers.size();
+		GrandStrategyGame.Rivers.push_back(river);
+		river->Name = Rivers[i]->Name;
+		river->World = Rivers[i]->World;
+		for (int j = 0; j < MAX_RACES; ++j) {
+			if (Rivers[i]->CulturalNames.find(j) != Rivers[i]->CulturalNames.end()) {
+				river->CulturalNames[j] = Rivers[i]->CulturalNames[j];
+			}
+			
+			for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
+				if (Rivers[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != Rivers[i]->FactionCulturalNames.end()) {
+					river->FactionCulturalNames[PlayerRaces.Factions[j][k]] = Rivers[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]];
+				}
+			}
+		}
+	}	
 }
 
 void InitializeGrandStrategyProvinces()

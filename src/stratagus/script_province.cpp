@@ -876,6 +876,143 @@ static int CclDefineWorldMapTile(lua_State *l)
 }
 
 /**
+**  Define a river.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineRiver(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string river_name = LuaToString(l, 1);
+	CRiver *river = GetRiver(river_name);
+	if (!river) {
+		river = new CRiver;
+		river->Name = river_name;
+		river->ID = Rivers.size();
+		Rivers.push_back(river);
+	}
+	
+	std::string name_type = "river";
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "World")) {
+			CWorld *world = GetWorld(LuaToString(l, -1));
+			if (world != NULL) {
+				river->World = world;
+				world->Rivers.push_back(river);
+			} else {
+				LuaError(l, "World doesn't exist.");
+			}
+		} else if (!strcmp(value, "CulturalNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				
+				river->CulturalNames[civilization] = TransliterateText(cultural_name);
+
+				int language = PlayerRaces.GetCivilizationLanguage(civilization);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
+				
+				++j;
+				if (j >= subargs) {
+					break;
+				}
+				
+				std::string next_element = LuaToString(l, -1, j + 1);
+				if (next_element == "name-elements") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameElements(l, name_type);
+					}
+					lua_pop(l, 1);
+				} else {
+					--j;
+				}
+			}
+		} else if (!strcmp(value, "FactionCulturalNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, -1, j + 1));
+				if (faction == -1) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				
+				river->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = TransliterateText(cultural_name);
+				
+				int language = PlayerRaces.GetFactionLanguage(civilization, faction);
+				if (language == -1) {
+					LuaError(l, "Language doesn't exist.");
+				}
+				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+				}
+				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
+				
+				++j;
+				if (j >= subargs) {
+					break;
+				}
+				
+				std::string next_element = LuaToString(l, -1, j + 1);
+				if (next_element == "name-elements") {
+					++j;
+					lua_rawgeti(l, -1, j + 1);
+					if (lua_istable(l, -1)) {
+						ParseNameElements(l, name_type);
+					}
+					lua_pop(l, 1);
+				} else {
+					--j;
+				}
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	if (river->World == NULL) {
+		LuaError(l, "River \"%s\" is not assigned to any world." _C_ river->Name.c_str());
+	}
+	
+	return 0;
+}
+
+/**
 **  Get plane data.
 **
 **  @param l  Lua state.
@@ -1026,6 +1163,40 @@ static int CclGetProvinceData(lua_State *l)
 	return 0;
 }
 
+/**
+**  Get river data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetRiverData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string river_name = LuaToString(l, 1);
+	CRiver *river = GetRiver(river_name);
+	if (!river) {
+		LuaError(l, "River \"%s\" doesn't exist." _C_ river_name.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, river->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "World")) {
+		if (river->World != NULL) {
+			lua_pushstring(l, river->World->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
 static int CclGetPlanes(lua_State *l)
 {
 	lua_createtable(l, Planes.size(), 0);
@@ -1059,6 +1230,17 @@ static int CclGetProvinces(lua_State *l)
 	return 1;
 }
 
+static int CclGetRivers(lua_State *l)
+{
+	lua_createtable(l, Rivers.size(), 0);
+	for (size_t i = 1; i <= Rivers.size(); ++i)
+	{
+		lua_pushstring(l, Rivers[i-1]->Name.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -1072,12 +1254,15 @@ void ProvinceCclRegister()
 	lua_register(Lua, "DefineRegion", CclDefineRegion);
 	lua_register(Lua, "DefineProvince", CclDefineProvince);
 	lua_register(Lua, "DefineWorldMapTile", CclDefineWorldMapTile);
+	lua_register(Lua, "DefineRiver", CclDefineRiver);
 	lua_register(Lua, "GetPlaneData", CclGetPlaneData);
 	lua_register(Lua, "GetWorldData", CclGetWorldData);
 	lua_register(Lua, "GetProvinceData", CclGetProvinceData);
+	lua_register(Lua, "GetRiverData", CclGetRiverData);
 	lua_register(Lua, "GetPlanes", CclGetPlanes);
 	lua_register(Lua, "GetWorlds", CclGetWorlds);
 	lua_register(Lua, "GetProvinces", CclGetProvinces);
+	lua_register(Lua, "GetRivers", CclGetRivers);
 }
 
 //@}

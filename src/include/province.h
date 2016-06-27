@@ -50,6 +50,7 @@ class CUnitType;
 class CUpgrade;
 class CFaction;
 class CProvince;
+class CRiver;
 class CCharacter;
 class WorldMapTile;
 
@@ -111,6 +112,7 @@ public:
 	std::string Quote;
 	CPlane *Plane;
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
+	std::vector<CRiver *> Rivers;										/// Rivers in this world
 	std::map<std::pair<int,int>, WorldMapTile *> Tiles;					/// Tiles in the world
 };
 
@@ -180,6 +182,21 @@ public:
 	std::map<CFaction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
 };
 
+class CRiver
+{
+public:
+	CRiver() :
+		ID(-1), World(NULL)
+	{
+	}
+	
+	int ID;
+	std::string Name;
+	CWorld *World;
+	std::map<int, std::string> CulturalNames;							/// Names for the river for each different culture/civilization
+	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the river for each different faction
+};
+
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
@@ -188,6 +205,7 @@ extern std::vector<CPlane *> Planes;
 extern std::vector<CWorld *> Worlds;
 extern std::vector<CRegion *> Regions;
 extern std::vector<CProvince *> Provinces;
+extern std::vector<CRiver *> Rivers;
 extern std::vector<WorldMapTerrainType *>  WorldMapTerrainTypes;
 extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
@@ -200,6 +218,7 @@ extern CPlane *GetPlane(std::string plane_name);
 extern CWorld *GetWorld(std::string world_name);
 extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
+extern CRiver *GetRiver(std::string river_name);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern std::string GetPathwayNameById(int pathway);
 extern int GetPathwayIdByName(std::string pathway);

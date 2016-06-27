@@ -304,18 +304,14 @@ public:
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 };
 
-class CRiver
+class CGrandStrategyRiver : public CRiver
 {
 public:
-	CRiver() :
-		Name("")
+	CGrandStrategyRiver() : CRiver()
 	{
 	}
 	
-	std::string GetCulturalName(int civilization);						/// Get the river's cultural name for a particular civilization.
-	
-	std::string Name;
-	std::map<int, std::string> CulturalNames;							/// Names for the river for each different culture/civilization
+	std::string GetCulturalName(int civilization, int faction = -1);		/// Get the river's cultural name for a particular civilization/faction
 };
 
 class CGrandStrategyHero : public CCharacter
@@ -428,7 +424,6 @@ public:
 		memset(BarracksGraphics, 0, sizeof(BarracksGraphics));
 		memset(SettlementMasonryGraphics, 0, sizeof(SettlementMasonryGraphics));
 		memset(NationalBorderGraphics, 0, sizeof(NationalBorderGraphics));
-		memset(Rivers, 0, sizeof(Rivers));
 		memset(CommodityPrices, 0, sizeof(CommodityPrices));
 	}
 
@@ -479,7 +474,7 @@ public:
 	std::vector<CGrandStrategyProvince *> Provinces;
 	std::map<int, std::vector<CGrandStrategyProvince *>> CultureProvinces;	/// provinces belonging to each culture
 	std::vector<CGrandStrategyFaction *> Factions[MAX_RACES];
-	CRiver *Rivers[RiverMax];
+	std::vector<CGrandStrategyRiver *> Rivers;
 	std::vector<CGrandStrategyHero *> Heroes;
 	std::vector<CUpgrade *> UnpublishedWorks;
 	std::vector<CGrandStrategyEvent *> AvailableEvents;
@@ -557,9 +552,10 @@ extern void SetWorldMapTileFactionCulturalSettlementName(int x, int y, std::stri
 extern int GetRiverId(std::string river_name);
 extern void SetWorldMapTileRiver(int x, int y, std::string direction_name, std::string river_name);
 extern void SetWorldMapTileRiverhead(int x, int y, std::string direction_name, std::string river_name);
-extern void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name);
 extern void SetWorldMapTilePathway(int x, int y, std::string direction_name, std::string pathway_name);
 extern void SetWorldMapTilePort(int x, int y, bool has_port);
+extern void SetRiverCulturalName(std::string river_name, std::string civilization_name, std::string cultural_name);
+extern void SetRiverFactionCulturalName(std::string river_name, std::string civilization_name, std::string faction_name, std::string cultural_name);
 extern void CalculateWorldMapTileGraphicTile(int x, int y);
 extern void AddWorldMapResource(std::string resource_name, int x, int y, bool discovered);
 extern void SetWorldMapResourceProspected(std::string resource_name, int x, int y, bool discovered);
