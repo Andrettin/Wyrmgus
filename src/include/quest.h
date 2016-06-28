@@ -56,7 +56,7 @@ class CQuest
 {
 public:
 	CQuest() :
-		Civilization(-1), TechnologyPoints(0), X(-1), Y(-1), PlayerColor(0), HighestCompletedDifficulty(-1),
+		Civilization(-1), TechnologyPoints(0), PlayerColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false),
 		QuestGiver(NULL), IntroductionDialogue(NULL)
 	{
@@ -81,8 +81,6 @@ public:
 	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed
 	int Civilization;				/// Which civilization the quest belongs to
 	int TechnologyPoints;			/// How many technology points the quest gives as a reward
-	int X;							/// X position of the quest in its world's quest screen
-	int Y;							/// Y position of the quest in its world's quest screen
 	int PlayerColor;				/// Player color used for the quest's icon
 	int HighestCompletedDifficulty;
 	bool Hidden;					/// Whether the quest is hidden
