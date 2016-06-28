@@ -2161,6 +2161,8 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 	if (!GameSettings.NoRandomness) { // if in no randomness setting, don't apply trait modifiers
 		IndividualUpgradeAcquire(unit, upgrade);
 	}
+	
+	unit.UpdatePersonalName();
 
 	//
 	//  Upgrades could change the buttons displayed.
