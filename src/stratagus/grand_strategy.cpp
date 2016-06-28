@@ -7112,6 +7112,8 @@ void InitializeGrandStrategyGame(bool show_loading)
 			continue;
 		} else if (iterator->second->ProvinceOfOriginName.empty()) {
 			continue;
+		} else if (CurrentCustomHero != NULL && iterator->second->GetFullName() == CurrentCustomHero->GetFullName()) { // temporary work-around for the custom hero duplication bug
+			continue;
 		}
 		
 		CProvince *province_of_origin = GetProvince(iterator->second->ProvinceOfOriginName);
