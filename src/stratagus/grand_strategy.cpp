@@ -198,19 +198,19 @@ void CGrandStrategyGame::DrawMap()
 							//see from which direction the rivermouth comes
 							bool flipped = false;
 							if (i == North) {
-								if (this->IsPointOnMap(x - 1, y) && this->WorldMapTiles[x - 1][y]->River[North] != -1) {
+								if (this->IsPointOnMap(x - 1, y) && (this->WorldMapTiles[x - 1][y]->River[North] != -1 || this->WorldMapTiles[x - 1][y]->River[Northwest] != -1)) {
 									flipped = true;
 								}
 							} else if (i == East) {
-								if (this->IsPointOnMap(x, y - 1) && this->WorldMapTiles[x][y - 1]->River[East] != -1) {
+								if (this->IsPointOnMap(x, y - 1) && (this->WorldMapTiles[x][y - 1]->River[East] != -1 || this->WorldMapTiles[x][y - 1]->River[Southeast] != -1)) {
 									flipped = true;
 								}
 							} else if (i == South) {
-								if (this->IsPointOnMap(x - 1, y) && this->WorldMapTiles[x - 1][y]->River[South] != -1) {
+								if (this->IsPointOnMap(x - 1, y) && (this->WorldMapTiles[x - 1][y]->River[South] != -1 || this->WorldMapTiles[x - 1][y]->River[Southwest] != -1)) {
 									flipped = true;
 								}
 							} else if (i == West) {
-								if (this->IsPointOnMap(x, y - 1) && this->WorldMapTiles[x][y - 1]->River[West] != -1) {
+								if (this->IsPointOnMap(x, y - 1) && (this->WorldMapTiles[x][y - 1]->River[West] != -1 || this->WorldMapTiles[x][y - 1]->River[Southwest] != -1)) {
 									flipped = true;
 								}
 							}
