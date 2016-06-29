@@ -113,7 +113,7 @@ public:
 	CPlane *Plane;
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CRiver *> Rivers;										/// Rivers in this world
-	std::map<std::pair<int,int>, WorldMapTile *> Tiles;					/// Tiles in the world
+	std::vector<WorldMapTile *> Tiles;									/// Tiles in the world
 };
 
 class CRegion
@@ -167,13 +167,19 @@ class WorldMapTile
 {
 public:
 	WorldMapTile() :
+		Terrain(-1), Resource(-1),
+		Capital(false),
 		Position(-1, -1),
-		World(NULL)
+		World(NULL), Province(NULL)
 	{
 	}
 
+	int Terrain;								/// Tile terrain (i.e. plains)
+	int Resource;								/// The tile's resource, if any
+	bool Capital;								/// Whether the tile is its province's capital
 	Vec2i Position;								/// Position of the tile
 	CWorld *World;
+	CProvince *Province;
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalTerrainNames;			/// Names for the tile (if it has a certain terrain) for each culture/civilization
 	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalTerrainNames;	/// Names for the tile (if it has a certain terrain) for each faction
 	std::map<std::pair<int,int>, std::vector<std::string>> CulturalResourceNames;		/// Names for the tile (if it has a certain resource) for each culture/civilization

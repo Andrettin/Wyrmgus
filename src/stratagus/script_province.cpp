@@ -552,10 +552,36 @@ static int CclDefineWorldMapTile(lua_State *l)
 			CWorld *world = GetWorld(LuaToString(l, -1));
 			if (world != NULL) {
 				tile->World = world;
-				world->Tiles[tile_position] = tile;
+				world->Tiles.push_back(tile);
 			} else {
 				LuaError(l, "World doesn't exist.");
 			}
+		} else if (!strcmp(value, "Province")) {
+			CProvince *province = GetProvince(LuaToString(l, -1));
+			if (province != NULL) {
+				tile->Province = province;
+				if (tile->Position.x != -1 && tile->Position.y != -1) {
+					province->Tiles.push_back(tile->Position);
+				}
+			} else {
+				LuaError(l, "Province doesn't exist.");
+			}
+		} else if (!strcmp(value, "Terrain")) {
+			int terrain = GetWorldMapTerrainTypeId(LuaToString(l, -1));
+			if (terrain != -1) {
+				tile->Terrain = terrain;
+			} else {
+				LuaError(l, "Terrain doesn't exist.");
+			}
+		} else if (!strcmp(value, "Resource")) {
+			int resource = GetResourceIdByName(LuaToString(l, -1));
+			if (resource != -1) {
+				tile->Resource = resource;
+			} else {
+				LuaError(l, "Resource doesn't exist.");
+			}
+		} else if (!strcmp(value, "Capital")) {
+			tile->Capital = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "CulturalTerrainNames")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");

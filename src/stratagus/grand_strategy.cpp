@@ -7319,14 +7319,14 @@ void InitializeGrandStrategyWorldMap()
 {
 	CWorld *world = GetWorld(GrandStrategyWorld);
 	
-	if (world == NULL) {
-		return;
-	}
-	
-	if (GrandStrategyGameLoading == false) {
-		for (std::map<std::pair<int,int>, WorldMapTile *>::iterator iterator = world->Tiles.begin(); iterator != world->Tiles.end(); ++iterator) {
-			int x = iterator->first.first;
-			int y = iterator->first.second;
+	if (GrandStrategyGameLoading == false && world != NULL) {
+		for (size_t i = 0; i < world->Tiles.size(); ++i) {
+			int x = world->Tiles[i]->Position.x;
+			int y = world->Tiles[i]->Position.y;
+			
+			if (x == -1 || y == -1) {
+				continue;
+			}
 			
 			if (!GrandStrategyGame.WorldMapTiles[x][y]) {
 				GrandStrategyWorldMapTile *world_map_tile = new GrandStrategyWorldMapTile;
@@ -7335,12 +7335,14 @@ void InitializeGrandStrategyWorldMap()
 				GrandStrategyGame.WorldMapTiles[x][y]->Position.y = y;
 			}
 			
-			GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames = iterator->second->CulturalTerrainNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames = iterator->second->FactionCulturalTerrainNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames = iterator->second->CulturalResourceNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames = iterator->second->FactionCulturalResourceNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames = iterator->second->CulturalSettlementNames;
-			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames = iterator->second->FactionCulturalSettlementNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->Terrain = world->Tiles[i]->Terrain;
+			GrandStrategyGame.WorldMapTiles[x][y]->Resource = world->Tiles[i]->Resource;
+			GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames = world->Tiles[i]->CulturalTerrainNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames = world->Tiles[i]->FactionCulturalTerrainNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames = world->Tiles[i]->CulturalResourceNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames = world->Tiles[i]->FactionCulturalResourceNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->CulturalSettlementNames = world->Tiles[i]->CulturalSettlementNames;
+			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames = world->Tiles[i]->FactionCulturalSettlementNames;
 		}
 	}
 	
@@ -7437,6 +7439,59 @@ void InitializeGrandStrategyProvinces()
 
 void FinalizeGrandStrategyInitialization()
 {
+	CWorld *world = GetWorld(GrandStrategyWorld);
+	
+	if (world != NULL) { // create tiles which should be randomly placed
+		for (size_t i = 0; i < world->Tiles.size(); ++i) {
+			if (world->Tiles[i]->Position.x != -1 && world->Tiles[i]->Position.y != -1) {
+				continue;
+			}
+			
+			std::vector<GrandStrategyWorldMapTile *> potential_tiles;			
+			
+			if (world->Tiles[i]->Province != NULL && GetProvinceId(world->Tiles[i]->Province->Name) != -1) {
+				CGrandStrategyProvince *province = GrandStrategyGame.Provinces[GetProvinceId(world->Tiles[i]->Province->Name)];
+				for (size_t j = 0; j < province->Tiles.size(); ++j) {
+					GrandStrategyWorldMapTile *province_tile = GrandStrategyGame.WorldMapTiles[province->Tiles[j].x][province->Tiles[j].y];
+					
+					if (
+						(world->Tiles[i]->Terrain == -1 || world->Tiles[i]->Terrain == province_tile->Terrain)
+						&& world->Tiles[i]->Resource == province_tile->Resource
+						&& (world->Tiles[i]->Capital == false || province->SettlementLocation == province_tile->Position)
+					) {
+						potential_tiles.push_back(province_tile);
+					}
+				}
+			} else {
+				for (size_t j = 0; j < GrandStrategyGame.Provinces.size(); ++j) {
+					CGrandStrategyProvince *province = GrandStrategyGame.Provinces[j];
+					for (size_t k = 0; k < province->Tiles.size(); ++k) {
+						GrandStrategyWorldMapTile *province_tile = GrandStrategyGame.WorldMapTiles[province->Tiles[k].x][province->Tiles[k].y];
+						
+						if (
+							(world->Tiles[i]->Terrain == -1 || world->Tiles[i]->Terrain == province_tile->Terrain)
+							&& world->Tiles[i]->Resource == province_tile->Resource
+							&& (world->Tiles[i]->Capital == false || province->SettlementLocation == province_tile->Position)
+						) {
+							potential_tiles.push_back(province_tile);
+						}
+					}
+				}
+			}
+			
+			if (potential_tiles.size() > 0) {
+				GrandStrategyWorldMapTile *tile = potential_tiles[SyncRand(potential_tiles.size())];
+				
+				tile->CulturalTerrainNames = world->Tiles[i]->CulturalTerrainNames;
+				tile->FactionCulturalTerrainNames = world->Tiles[i]->FactionCulturalTerrainNames;
+				tile->CulturalResourceNames = world->Tiles[i]->CulturalResourceNames;
+				tile->FactionCulturalResourceNames = world->Tiles[i]->FactionCulturalResourceNames;
+				tile->CulturalSettlementNames = world->Tiles[i]->CulturalSettlementNames;
+				tile->FactionCulturalSettlementNames = world->Tiles[i]->FactionCulturalSettlementNames;
+			}
+		}
+	}
+	
 	//initialize heroes
 	for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 		GrandStrategyGame.Heroes[i]->Initialize();

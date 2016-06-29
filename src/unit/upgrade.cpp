@@ -2392,17 +2392,8 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 						}
 						upgrade_effects_string += " ";
 					}
-											
-					std::string variable_name = UnitTypeVar.VariableNameLookup[var];
-					variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
-					variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
-					variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
-					variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
-					variable_name = SeparateCapitalizedStringElements(variable_name);
-					variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
-					variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
-					variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
-					upgrade_effects_string += variable_name;
+
+					upgrade_effects_string += GetVariableDisplayName(var);
 						
 					bool first_unit_type = true;
 					for (size_t i = 0; i < UnitTypes.size(); ++i) {
@@ -2432,13 +2423,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 					upgrade_effects_string += std::to_string((long long) upgrade->UpgradeModifiers[z]->Modifier.Variables[var].Increase);
 					upgrade_effects_string += " ";
 											
-					std::string variable_name = UnitTypeVar.VariableNameLookup[var];
-					variable_name += "Increase";
-					variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
-					variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
-					variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
-					variable_name = SeparateCapitalizedStringElements(variable_name);
-					upgrade_effects_string += variable_name;
+					upgrade_effects_string += GetVariableDisplayName(var, true);
 				}
 			}
 				
@@ -2587,6 +2572,32 @@ bool IsBooleanVariable(int var)
 bool IsKnowledgeVariable(int var)
 {
 	return var == KNOWLEDGEMAGIC_INDEX || var == KNOWLEDGEWARFARE_INDEX;
+}
+
+std::string GetVariableDisplayName(int var, bool increase)
+{
+	std::string variable_name = UnitTypeVar.VariableNameLookup[var];
+
+	if (increase) {
+		variable_name += "Increase";
+		variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
+		variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
+		variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
+	}
+	
+	variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
+	variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
+	variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
+	variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
+	variable_name = FindAndReplaceString(variable_name, "DaySightBonus", "Day Sight");
+	variable_name = FindAndReplaceString(variable_name, "NightSightBonus", "Night Sight");
+	variable_name = FindAndReplaceString(variable_name, "GiveResource", "ResourcesHeld");
+	variable_name = SeparateCapitalizedStringElements(variable_name);
+	variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
+	variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
+	variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
+
+	return variable_name;
 }
 //Wyrmgus end
 

@@ -2318,7 +2318,7 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 					effect_element_string += " (";
 					
 					if (UnitTypes[unit_type_id]->Name != UnitTypes[base_unit_type_id]->Name) {
-						effect_element_string += FindAndReplaceString(CapitalizeString(UnitTypes[unit_type_id]->Class), "-", " ");
+						effect_element_string += FullyCapitalizeString(FindAndReplaceString(UnitTypes[unit_type_id]->Class, "-", " "));
 						effect_element_string += ", ";
 						changed_stats = true;
 					}
@@ -2354,12 +2354,7 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 								effect_element_string += " ";
 							}
 							
-							std::string variable_name = UnitTypeVar.VariableNameLookup[j];
-							variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
-							variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
-							variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
-							variable_name = SeparateCapitalizedStringElements(variable_name);
-							effect_element_string += variable_name;
+							effect_element_string += GetVariableDisplayName(j);
 							changed_stats = true;
 						}
 					}
@@ -2425,12 +2420,7 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 											effect_element_string += " ";
 										}
 											
-										std::string variable_name = UnitTypeVar.VariableNameLookup[j];
-										variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
-										variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
-										variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
-										variable_name = SeparateCapitalizedStringElements(variable_name);
-										effect_element_string += variable_name;
+										effect_element_string += GetVariableDisplayName(j);
 										changed_stats = true;
 									}
 								}

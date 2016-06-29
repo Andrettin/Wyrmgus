@@ -70,9 +70,10 @@ void CleanWorlds()
 	}
 	
 	for (size_t i = 0; i < Worlds.size(); ++i) {
-		for (std::map<std::pair<int,int>, WorldMapTile *>::iterator iterator = Worlds[i]->Tiles.begin(); iterator != Worlds[i]->Tiles.end(); ++iterator) {
-			delete iterator->second;
+		for (size_t j = 0; j < Worlds[i]->Tiles.size(); ++j) {
+			delete Worlds[i]->Tiles[j];
 		}
+		Worlds[i]->Tiles.clear();
 		
 		for (size_t j = 0; j < Worlds[i]->Provinces.size(); ++j) {
 			delete Worlds[i]->Provinces[j];

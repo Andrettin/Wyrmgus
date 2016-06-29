@@ -121,6 +121,7 @@ extern std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand
 extern bool IsPercentageVariable(int var);
 extern bool IsBooleanVariable(int var);
 extern bool IsKnowledgeVariable(int var);
+extern std::string GetVariableDisplayName(int var, bool increase = false);
 //Wyrmgus end
 
 //@}

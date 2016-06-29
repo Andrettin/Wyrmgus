@@ -74,7 +74,7 @@ class GrandStrategyWorldMapTile : public WorldMapTile
 {
 public:
 	GrandStrategyWorldMapTile() : WorldMapTile(),
-		Terrain(-1), BaseTileVariation(-1), Variation(-1), Resource(-1), TransportLevel(1),
+		BaseTileVariation(-1), Variation(-1), TransportLevel(1),
 		ResourceProspected(false), Port(false), Worked(false),
 		Province(NULL), BaseTile(NULL), GraphicTile(NULL), ResourceBuildingGraphics(NULL), ResourceBuildingGraphicsPlayerColor(NULL)
 	{
@@ -101,10 +101,8 @@ public:
 	std::string GetCulturalName(int civilization = -1, int faction = -1, bool only_settlement = false);		/// Get the tile's cultural name.
 	std::string GenerateSettlementName(int civilization, int faction = -1);
 	
-	int Terrain;							/// Tile terrain (i.e. plains)
 	int BaseTileVariation;					/// Base tile variation
 	int Variation;							/// Tile variation
-	int Resource;							/// The tile's resource, if any
 	int TransportLevel;						/// Transport level of the tile to the capital settlement of its province
 	bool ResourceProspected;				/// Whether the tile's resource has been discovered
 	bool Port;								/// Whether the tile has a port

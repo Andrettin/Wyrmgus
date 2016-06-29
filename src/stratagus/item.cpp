@@ -335,16 +335,7 @@ std::string GetItemEffectsString(std::string item_ident)
 					item_effects_string += " ";
 				}
 											
-				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
-				variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
-				variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
-				variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
-				variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
-				variable_name = SeparateCapitalizedStringElements(variable_name);
-				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
-				variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
-				variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
-				item_effects_string += variable_name;
+				item_effects_string += GetVariableDisplayName(var);
 			}
 			
 			if (item->DefaultStat.Variables[var].Increase != 0) {
@@ -360,13 +351,7 @@ std::string GetItemEffectsString(std::string item_ident)
 				item_effects_string += std::to_string((long long) item->DefaultStat.Variables[var].Increase);
 				item_effects_string += " ";
 											
-				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
-				variable_name += "Increase";
-				variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
-				variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
-				variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
-				variable_name = SeparateCapitalizedStringElements(variable_name);
-				item_effects_string += variable_name;
+				item_effects_string += GetVariableDisplayName(var, true);
 			}
 		}
 			
@@ -443,17 +428,7 @@ std::string GetUniqueItemEffectsString(std::string item_ident)
 					item_effects_string += " ";
 				}
 											
-				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
-				variable_name = FindAndReplaceString(variable_name, "BasicDamage", "Damage");
-				variable_name = FindAndReplaceString(variable_name, "SightRange", "Sight");
-				variable_name = FindAndReplaceString(variable_name, "AttackRange", "Range");
-				variable_name = FindAndReplaceString(variable_name, "HitPointBonus", "HitPoints");
-				variable_name = FindAndReplaceString(variable_name, "GiveResource", "ResourcesHeld");
-				variable_name = SeparateCapitalizedStringElements(variable_name);
-				variable_name = FindAndReplaceString(variable_name, "Backstab", "Backstab Bonus");
-				variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
-				variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
-				item_effects_string += variable_name;
+				item_effects_string += GetVariableDisplayName(var);
 			}
 			
 			if (variable_increase != 0) {
@@ -469,13 +444,7 @@ std::string GetUniqueItemEffectsString(std::string item_ident)
 				item_effects_string += std::to_string((long long) variable_increase);
 				item_effects_string += " ";
 											
-				std::string variable_name = UnitTypeVar.VariableNameLookup[var];
-				variable_name += "Increase";
-				variable_name = FindAndReplaceString(variable_name, "HitPointsIncrease", "Regeneration");
-				variable_name = FindAndReplaceString(variable_name, "HitPointBonusIncrease", "Regeneration");
-				variable_name = FindAndReplaceString(variable_name, "GiveResourceIncrease", "ResourceReplenishment");
-				variable_name = SeparateCapitalizedStringElements(variable_name);
-				item_effects_string += variable_name;
+				item_effects_string += GetVariableDisplayName(var, true);
 			}
 		}
 			
