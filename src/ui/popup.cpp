@@ -74,13 +74,22 @@
 	int width = 0;
 	std::string sub;
 	if (draw.length()) {
+		//Wyrmgus start
+		/*
 		if (this->MaxWidth) {
 			return std::min((unsigned int)font.getWidth(draw), this->MaxWidth);
 		}
+		*/
+		//Wyrmgus end
 		int i = 1;
 		while (!(sub = GetLineFont(i++, draw, 0, &font)).empty()) {
 			width = std::max(width, font.getWidth(sub));
 		}
+		//Wyrmgus start
+		if (this->MaxWidth) {
+			width = std::min((unsigned int) width, this->MaxWidth);
+		}
+		//Wyrmgus end
 	}
 	return width;
 }
@@ -188,12 +197,16 @@
 	TriggerData.Unit = NULL;
 	//Wyrmgus end
 	
+	//Wyrmgus start
+	/*
 	if (this->MaxWidth) {
 		//Wyrmgus start
 //		return std::min((unsigned int)font.getWidth(this->Text), this->MaxWidth);
 		return std::min((unsigned int)font.getWidth(text), this->MaxWidth);
 		//Wyrmgus end
 	}
+	*/
+	//Wyrmgus end
 	int width = 0;
 	std::string sub;
 	int i = 1;
@@ -203,6 +216,11 @@
 	//Wyrmgus end
 		width = std::max(width, font.getWidth(sub));
 	}
+	//Wyrmgus start
+	if (this->MaxWidth) {
+		width = std::min((unsigned int) width, this->MaxWidth);
+	}
+	//Wyrmgus end
 	return width;
 }
 
