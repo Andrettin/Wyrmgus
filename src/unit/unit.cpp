@@ -2093,9 +2093,6 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	// generate a trait for the unit, if any are available (only if the editor isn't running)
 	if (Editor.Running == EditorNotRunning && unit->Type->Traits.size() > 0) {
 		TraitAcquire(*unit, unit->Type->Traits[SyncRand(unit->Type->Traits.size())]);
-		if (!unit->Name.empty() && unit->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on the trait
-			unit->Name += " " + unit->Trait->Epithets[SyncRand(unit->Trait->Epithets.size())];
-		}
 	}
 	
 	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
