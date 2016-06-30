@@ -355,14 +355,14 @@ static bool Excrete(CUnit &unit)
 static bool Breed(CUnit &unit)
 {
 	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
-		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value //only for fauna
+		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
 		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
 		|| unit.Variable[HUNGER_INDEX].Value > 500 //only breed if not hungry
 		|| ((SyncRand() % 200) >= 1)) {
 		return false;
 	}
 
-	if (unit.IndividualUpgrades[CUpgrade::Get(unit.Type->ChildUpgrade)->ID]) { //children can't reproduce
+	if (unit.IndividualUpgrades[CUpgrade::Get(unit.Type->Species->ChildUpgrade)->ID]) { //children can't reproduce
 		return false;
 	}
 	
@@ -379,7 +379,7 @@ static bool Breed(CUnit &unit)
 				newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
 				newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
 				newUnit->Variable[HUNGER_INDEX].Value = 500; //children start off with 50% hunger
-				IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
+				IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->Species->ChildUpgrade));
 				unit.Variable[HUNGER_INDEX].Value += 100;
 				table[i]->Variable[HUNGER_INDEX].Value += 100;
 				return true;
@@ -392,7 +392,7 @@ static bool Breed(CUnit &unit)
 		newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
 		newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
 		newUnit->Variable[HUNGER_INDEX].Value = 500; //children start off with 50% hunger
-		IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->ChildUpgrade));
+		IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->Species->ChildUpgrade));
 		unit.Variable[HUNGER_INDEX].Value += 100;
 		return true;
 	}

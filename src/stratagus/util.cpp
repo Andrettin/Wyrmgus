@@ -773,6 +773,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "mr ", "m ");
 	text = FindAndReplaceStringEnding(text, "nr", "n");
 	text = FindAndReplaceString(text, "nr ", "n ");
+	text = FindAndReplaceStringEnding(text, "pr", "p");
+	text = FindAndReplaceString(text, "pr ", "p ");
 	text = FindAndReplaceStringEnding(text, "rr", "r");
 	text = FindAndReplaceString(text, "rr ", "r ");
 	text = FindAndReplaceStringEnding(text, "tr", "t");
@@ -1016,6 +1018,10 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 {
 	const CUnitType &type = *UnitTypes[unit_type_id];
 	std::string personal_name;
+	
+	if (language == -1 && type.Species != NULL) {
+		language = type.Species->GetRandomNameLanguage();
+	}
 
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		personal_name = "";
@@ -1027,13 +1033,13 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 			personal_name = type.PersonalNamePrefixes[SyncRand(type.PersonalNamePrefixes.size())];
 			personal_name += type.PersonalNameSuffixes[SyncRand(type.PersonalNameSuffixes.size())];
 		}
-	} else if (
-		language != -1
-		&& (
-			PlayerRaces.Languages[language]->LanguageWords.size() > 0
-		)
-	) {
-		if (type.BoolFlag[ORGANIC_INDEX].value) {
+	} else if (language != -1 && PlayerRaces.Languages[language]->LanguageWords.size() > 0) {
+		if (type.BoolFlag[FAUNA_INDEX].value && type.Species != NULL) {
+			personal_name = GenerateName(language, "species-" + type.Species->Ident);
+			if (personal_name.empty() && !type.Species->Family.empty()) {
+				personal_name = GenerateName(language, "species-family-" + type.Species->Family);
+			}
+		} else if (type.BoolFlag[ORGANIC_INDEX].value) {
 			personal_name = GenerateName(language, "person-" + GetGenderNameById(gender));
 			if (personal_name.empty()) {
 				personal_name = GenerateName(language, "person");

@@ -73,11 +73,18 @@ static int CclDefineCharacter(lua_State *l)
 	if (!character) {
 		character = new CCharacter;
 		Characters[character_full_name] = character;
-	} else if (!character->Persistent && character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with some data like gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
+	} else if (!character->Persistent && character->Defined) { //asks if the type is NULL because every character is defined in the Lua code first only with some data like gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
 		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_full_name.c_str());
 	}
 	
 	std::string faction_name;
+	
+	std::string name_type;
+	if (character->Type != NULL && character->Type->Species != NULL) {
+		name_type = "species-" + character->Type->Species->Ident;
+	} else {
+		name_type = "person-" + GetGenderNameById(character->Gender);
+	}
 	
 	std::string family_name_type;
 	if (character->Noble) {
@@ -102,7 +109,7 @@ static int CclDefineCharacter(lua_State *l)
 			}
 			PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount[family_name_type] += 1;
 		} else if (!strcmp(value, "NameElements")) {
-			ParseNameElements(l, "person-" + GetGenderNameById(character->Gender));
+			ParseNameElements(l, name_type);
 		} else if (!strcmp(value, "FamilyNameElements")) {
 			ParseNameElements(l, family_name_type);
 		} else if (!strcmp(value, "FamilyNamePredicateElements")) {
@@ -437,6 +444,8 @@ static int CclDefineCharacter(lua_State *l)
 					character->HistoricalProvinceTitles.push_back(std::tuple<int, int, CProvince *, int>(start_year, end_year, title_province, title));
 				}
 			}
+		} else if (!strcmp(value, "Defined")) {
+			character->Defined = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -451,35 +460,35 @@ static int CclDefineCharacter(lua_State *l)
 		}
 	}
 	
-	if (character->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
-		if (character->Type != NULL && character->Type->Traits.size() == 1) {
-			character->Trait = character->Type->Traits[0];
-		}
-	}
-	
-	if (character->Gender == NoGender) { //if no gender was set, have the character be the same gender as the unit type (if the unit type has it predefined)
-		if (character->Type != NULL && character->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-			character->Gender = character->Type->DefaultStat.Variables[GENDER_INDEX].Value;
-		}
-	}
-	
-	if (character->Type != NULL && character->GetFullName() != character_full_name) { // if the character's full name (built from its defined elements) is different from the name used to initialize the character, something went wrong; asks if the type is NULL because every character is defined in the Lua code first only with the some data like gender, and afterwards with everything else
-		LuaError(l, "Character name \"%s\" doesn't match the defined name \"%s\"." _C_ character->GetFullName().c_str() _C_ character_full_name.c_str());
-	}
-	
-	//check if the abilities are correct for this character's unit type
-	if (character->Type != NULL && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
-		int ability_count = (int) character->Abilities.size();
-		for (int i = (ability_count - 1); i >= 0; --i) {
-			if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
-				character->Abilities.erase(std::remove(character->Abilities.begin(), character->Abilities.end(), character->Abilities[i]), character->Abilities.end());
+	if (character->Defined) { // only do the finalization of the character if it has been fully defined
+		if (character->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
+			if (character->Type != NULL && character->Type->Traits.size() == 1) {
+				character->Trait = character->Type->Traits[0];
 			}
 		}
-	}
-
-	if (character->Type != NULL) { //asks if the type is NULL because every character is defined in the Lua code first only with the some data like gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
-		character->GenerateMissingData();
 		
+		if (character->Gender == NoGender) { //if no gender was set, have the character be the same gender as the unit type (if the unit type has it predefined)
+			if (character->Type != NULL && character->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+				character->Gender = character->Type->DefaultStat.Variables[GENDER_INDEX].Value;
+			}
+		}
+		
+		if (character->GetFullName() != character_full_name) { // if the character's full name (built from its defined elements) is different from the name used to initialize the character, something went wrong
+			LuaError(l, "Character name \"%s\" doesn't match the defined name \"%s\"." _C_ character->GetFullName().c_str() _C_ character_full_name.c_str());
+		}
+		
+		//check if the abilities are correct for this character's unit type
+		if (character->Type != NULL && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
+			int ability_count = (int) character->Abilities.size();
+			for (int i = (ability_count - 1); i >= 0; --i) {
+				if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
+					character->Abilities.erase(std::remove(character->Abilities.begin(), character->Abilities.end(), character->Abilities[i]), character->Abilities.end());
+				}
+			}
+		}
+
+		character->GenerateMissingData();
+			
 		// command to generate missing data for the parents, since those are defined before this character, and thus if this character has both dates set and nothing to estimate, otherwise the parents' dates wouldn't be affected
 		if (character->Father != NULL) {
 			character->Father->GenerateMissingData();
@@ -487,9 +496,9 @@ static int CclDefineCharacter(lua_State *l)
 		if (character->Mother != NULL) {
 			character->Mother->GenerateMissingData();
 		}
+		
+		character->UpdateAttributes();
 	}
-	
-	character->UpdateAttributes();
 	
 	return 0;
 }

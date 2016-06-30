@@ -654,6 +654,27 @@ public:
 	bool CheckBuilder;
 };
 
+//Wyrmgus start
+class CSpecies
+{
+public:
+	CSpecies() :
+		Ident("")
+	{
+	}
+	
+	int GetRandomNameLanguage();
+	
+	std::string Ident;				/// Ident of the species
+	std::string Name;				/// Name of the species
+	std::string Description;		/// Description of the species
+	std::string Quote;				/// Quote pertaining to the species
+	std::string Background;			/// Background of the species
+	std::string Family;
+	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
+};
+//Wyrmgus end
+
 /// Base structure of unit-type
 /// @todo n0body: AutoBuildRate not implemented.
 class CUnitType
@@ -701,7 +722,6 @@ public:
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
-	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	std::string Excrement;			/// Excrement unit for this unit type
 	std::vector<std::string> PersonalNames;	/// personal names
 	std::vector<std::string> PersonalNamePrefixes;	/// personal name prefixes
@@ -742,6 +762,7 @@ public:
 	int SkinColor;											/// Skin color of the unit type (used for color conversion)
 	int HairColor;											/// Hair color of the unit type (used for color conversion)
 	int ItemClass;											/// Item class (if the unit type is an item)
+	CSpecies *Species;
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
@@ -1045,6 +1066,8 @@ extern CUnitTypeVar UnitTypeVar;
 //Wyrmgus start
 extern std::vector<std::string> UnitTypeClasses; //list of unit type classes; built with CclDefineUnitType
 extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
+
+extern std::vector<CSpecies *> Species;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -1061,6 +1084,8 @@ extern int GetUnitTypeClassIndexByName(const std::string &class_name);
 extern void SetUnitTypeClassStringToIndex(std::string class_name, int class_id);
 extern int GetUpgradeClassIndexByName(const std::string &class_name);
 extern void SetUpgradeClassStringToIndex(std::string class_name, int class_id);
+
+extern CSpecies *GetSpecies(std::string species_ident);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table

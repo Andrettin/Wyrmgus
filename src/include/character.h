@@ -104,7 +104,7 @@ class CCharacter
 public:
 	CCharacter() :
 		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
-		ViolentDeath(false), Noble(false), Persistent(false), Custom(false),
+		ViolentDeath(false), Noble(false), Persistent(false), Custom(false), Defined(false),
 		Type(NULL), Trait(NULL),
 		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL)
 	{
@@ -136,6 +136,7 @@ public:
 	bool Noble;
 	bool Persistent;			/// Whether this character's levels and abilities are persistent
 	bool Custom;				/// Whether this character is a custom hero
+	bool Defined;				/// Whether this character has been fully defined
 	std::string Name;			/// Given name of the character
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 	std::string FamilyName;		/// Name of the character's family

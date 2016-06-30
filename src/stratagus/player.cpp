@@ -675,7 +675,7 @@ std::string PlayerRace::TranslateName(std::string name, int language)
 {
 	std::string new_name;
 	
-	if (language == -1) {
+	if (language == -1 || name.empty()) {
 		return new_name;
 	}
 
@@ -2548,6 +2548,8 @@ std::string GetWordTypeNameById(int word_type)
 		return "article";
 	} else if (word_type == WordTypeNumeral) {
 		return "numeral";
+	} else if (word_type == WordTypeAffix) {
+		return "affix";
 	}
 
 	return "";
@@ -2573,6 +2575,8 @@ int GetWordTypeIdByName(std::string word_type)
 		return WordTypeArticle;
 	} else if (word_type == "numeral") {
 		return WordTypeNumeral;
+	} else if (word_type == "affix") {
+		return WordTypeAffix;
 	}
 
 	return -1;
@@ -3262,6 +3266,15 @@ void LanguageWord::AddToLanguageNameTypes(std::string type)
 			PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeWords[type].push_back(this);
 		}
 	}
+	
+	if (type.find("species-") != std::string::npos && type.find("species-family-") == std::string::npos) {
+		CSpecies *species = GetSpecies(FindAndReplaceStringBeginning(type, "species-", ""));
+		if (species != NULL) {
+			if (!species->Family.empty()) {
+				this->AddToLanguageNameTypes("species-family" + species->Family);
+			}
+		}
+	}
 }
 
 void LanguageWord::AddToLanguageAffixNameTypes(std::string type, int word_junction_type, int affix_type)
@@ -3272,6 +3285,15 @@ void LanguageWord::AddToLanguageAffixNameTypes(std::string type, int word_juncti
 	for (size_t i = 0; i < PlayerRaces.Languages[this->Language]->Dialects.size(); ++i) { //do the same for the dialects
 		if (std::find(PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeAffixes[word_junction_type][affix_type][type].begin(), PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeAffixes[word_junction_type][affix_type][type].end(), this) == PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeAffixes[word_junction_type][affix_type][type].end()) {
 			PlayerRaces.Languages[this->Language]->Dialects[i]->NameTypeAffixes[word_junction_type][affix_type][type].push_back(this);
+		}
+	}
+	
+	if (type.find("species-") != std::string::npos && type.find("species-family-") == std::string::npos) {
+		CSpecies *species = GetSpecies(FindAndReplaceStringBeginning(type, "species-", ""));
+		if (species != NULL) {
+			if (!species->Family.empty()) {
+				this->AddToLanguageAffixNameTypes("species-family" + species->Family, word_junction_type, affix_type);
+			}
 		}
 	}
 }

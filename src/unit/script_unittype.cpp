@@ -1906,8 +1906,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->TrainQuantity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Upkeep")) {
 			type->Upkeep = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "ChildUpgrade")) {
-			type->ChildUpgrade = LuaToString(l, -1);
 		} else if (!strcmp(value, "Excrement")) {
 			type->Excrement = LuaToString(l, -1);
 		} else if (!strcmp(value, "Drops")) {
@@ -2001,6 +1999,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->SkinColor = GetSkinColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "HairColor")) {
 			type->HairColor = GetHairColorIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "Species")) {
+			type->Species = GetSpecies(LuaToString(l, -1));
 		} else if (!strcmp(value, "WeaponClasses")) {
 			type->WeaponClasses.clear();
 			const int args = lua_rawlen(l, -1);
@@ -2589,9 +2589,6 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_pushnumber(l, type->MapDefaultStat.UnitStock[unit_type_id]);
 		}
 		return 1;
-	} else if (!strcmp(data, "ChildUpgrade")) {
-		lua_pushstring(l, type->ChildUpgrade.c_str());
-		return 1;
 	} else if (!strcmp(data, "Excrement")) {
 		lua_pushstring(l, type->Excrement.c_str());
 		return 1;
@@ -2623,6 +2620,13 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushnumber(l, type->ReactRangePerson);
 		return 1;
 	*/
+	} else if (!strcmp(data, "Species")) {
+		if (type->Species != NULL) {
+			lua_pushstring(l, type->Species->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
 	} else if (!strcmp(data, "ItemClass")) {
 		lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
 		return 1;
@@ -3484,9 +3488,9 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 	
-	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && !unit.Type->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
+	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->Species != NULL && !unit.Type->Species->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
-		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->ChildUpgrade));
+		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->Species->ChildUpgrade));
 	}
 
 	if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->BoolFlag[FAUNA_INDEX].value) { // only fauna can have a hunger value
@@ -3589,6 +3593,102 @@ void UpdateUnitVariables(CUnit &unit)
 		}
 	}
 }
+
+//Wyrmgus start
+/**
+**  Define a species.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineSpecies(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string species_ident = LuaToString(l, 1);
+	CSpecies *species = GetSpecies(species_ident);
+	if (!species) {
+		species = new CSpecies;
+		Species.push_back(species);
+		species->Ident = species_ident;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			species->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			species->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			species->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			species->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Family")) {
+			species->Family = LuaToString(l, -1);
+		} else if (!strcmp(value, "ChildUpgrade")) {
+			species->ChildUpgrade = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+static int CclGetSpecies(lua_State *l)
+{
+	lua_createtable(l, Species.size(), 0);
+	for (size_t i = 1; i <= Species.size(); ++i)
+	{
+		lua_pushstring(l, Species[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+/**
+**  Get species data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetSpeciesData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string species_ident = LuaToString(l, 1);
+	const CSpecies *species = GetSpecies(species_ident);
+	if (!species) {
+		LuaError(l, "Species \"%s\" doesn't exist." _C_ species_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, species->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, species->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, species->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, species->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "ChildUpgrade")) {
+		lua_pushstring(l, species->ChildUpgrade.c_str());
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+//Wyrmgus end
 
 /**
 **  Set the map default stat for a unit type
@@ -3922,6 +4022,9 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
 	lua_register(Lua, "GetUnitTypeData", CclGetUnitTypeData);
 	//Wyrmgus start
+	lua_register(Lua, "DefineSpecies", CclDefineSpecies);
+	lua_register(Lua, "GetSpecies", CclGetSpecies);
+	lua_register(Lua, "GetSpeciesData", CclGetSpeciesData);
 	lua_register(Lua, "SetModTrains", CclSetModTrains);
 	//Wyrmgus end
 }

@@ -327,6 +327,7 @@ enum WordTypes {
 	WordTypeAdposition,
 	WordTypeArticle,
 	WordTypeNumeral,
+	WordTypeAffix,
 	
 	MaxWordTypes
 };

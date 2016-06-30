@@ -523,6 +523,8 @@ std::vector<std::string> UnitTypeClasses;
 std::map<std::string, int> UnitTypeClassStringToIndex;
 std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
+
+std::vector<CSpecies *> Species;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -564,6 +566,7 @@ CUnitType::CUnitType() :
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TechnologyPointCost(0), Upkeep(0), TrainQuantity(0), ItemClass(-1), SkinColor(0), HairColor(0),
+	Species(NULL),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
@@ -1891,6 +1894,13 @@ void CleanUnitTypes()
 	// Clean hardcoded unit types.
 	UnitTypeHumanWall = NULL;
 	UnitTypeOrcWall = NULL;
+	
+	//Wyrmgus start
+	for (size_t i = 0; i < Species.size(); ++i) {
+		delete Species[i];
+	}
+	Species.clear();
+	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -1915,6 +1925,44 @@ VariationInfo::~VariationInfo()
 			CGraphic::Free(this->SpriteWhenEmpty[res]);
 		}
 	}
+}
+
+CSpecies *GetSpecies(std::string species_ident)
+{
+	for (size_t i = 0; i < Species.size(); ++i) {
+		if (species_ident == Species[i]->Ident) {
+			return Species[i];
+		}
+	}
+	
+	return NULL;
+}
+
+int CSpecies::GetRandomNameLanguage()
+{
+	std::vector<int> potential_languages;
+	
+	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+		int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-" + this->Ident);
+		for (int j = 0; j < potential_name_quantity; ++j) {
+			potential_languages.push_back(i);
+		}
+	}
+	
+	if (potential_languages.size() == 0 && !this->Family.empty()) { // if no language that can generate a name for this species was found, try to see if any can generate for its family instead
+		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-family-" + this->Family);
+			for (int j = 0; j < potential_name_quantity; ++j) {
+				potential_languages.push_back(i);
+			}
+		}
+	}
+	
+	if (potential_languages.size() > 0) {
+		return potential_languages[SyncRand(potential_languages.size())];
+	}
+
+	return -1;
 }
 
 std::string GetImageLayerNameById(int image_layer)
