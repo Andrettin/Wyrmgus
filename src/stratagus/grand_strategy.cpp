@@ -7121,7 +7121,9 @@ void InitializeGrandStrategyGame(bool show_loading)
 	//initialize heroes
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 		if (iterator->second->Civilization == -1) {
-			fprintf(stderr, "Character \"%s\" has no civilization.\n", iterator->second->GetFullName().c_str());
+			if (!iterator->second->Type->BoolFlag[FAUNA_INDEX].value) {
+				fprintf(stderr, "Character \"%s\" has no civilization.\n", iterator->second->GetFullName().c_str());
+			}
 			continue;
 		} else if (iterator->second->Year == 0) {
 //			fprintf(stderr, "Character \"%s\" has no start year.\n", iterator->second->GetFullName().c_str());
