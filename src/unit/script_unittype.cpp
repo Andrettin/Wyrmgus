@@ -3627,8 +3627,40 @@ static int CclDefineSpecies(lua_State *l)
 			species->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			species->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Kingdom")) {
+			species->Kingdom = LuaToString(l, -1);
+		} else if (!strcmp(value, "Subkingdom")) {
+			species->Subkingdom = LuaToString(l, -1);
+		} else if (!strcmp(value, "Infrakingdom")) {
+			species->Infrakingdom = LuaToString(l, -1);
+		} else if (!strcmp(value, "Phylum")) {
+			species->Phylum = LuaToString(l, -1);
+		} else if (!strcmp(value, "Subphylum")) {
+			species->Subphylum = LuaToString(l, -1);
+		} else if (!strcmp(value, "Infraphylum")) {
+			species->Infraphylum = LuaToString(l, -1);
+		} else if (!strcmp(value, "Superclass")) {
+			species->Superclass = LuaToString(l, -1);
+		} else if (!strcmp(value, "Class")) {
+			species->Class = LuaToString(l, -1);
+		} else if (!strcmp(value, "Subclass")) {
+			species->Subclass = LuaToString(l, -1);
+		} else if (!strcmp(value, "Infraclass")) {
+			species->Infraclass = LuaToString(l, -1);
+		} else if (!strcmp(value, "Order")) {
+			species->Order = LuaToString(l, -1);
+		} else if (!strcmp(value, "Suborder")) {
+			species->Suborder = LuaToString(l, -1);
+		} else if (!strcmp(value, "Superfamily")) {
+			species->Superfamily = LuaToString(l, -1);
 		} else if (!strcmp(value, "Family")) {
 			species->Family = LuaToString(l, -1);
+		} else if (!strcmp(value, "Subfamily")) {
+			species->Subfamily = LuaToString(l, -1);
+		} else if (!strcmp(value, "Genus")) {
+			species->Genus = LuaToString(l, -1);
+		} else if (!strcmp(value, "Species")) {
+			species->Species = LuaToString(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			species->ChildUpgrade = LuaToString(l, -1);
 		} else {

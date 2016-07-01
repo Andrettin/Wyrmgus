@@ -650,6 +650,8 @@ std::string TransliterateText(std::string text) //convert special characters int
 	text = FindAndReplaceString(text, "Ī́", "I");
 	text = FindAndReplaceString(text, "ī́", "i");
 	text = FindAndReplaceString(text, "Ī", "I");
+	text = FindAndReplaceString(text, "I̊", "I");
+	text = FindAndReplaceString(text, "i̊", "i");
 	text = FindAndReplaceString(text, "ī", "i");
 	text = FindAndReplaceString(text, "Í", "I");
 	text = FindAndReplaceString(text, "í", "i");
@@ -1020,7 +1022,7 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 	std::string personal_name;
 	
 	if (language == -1 && type.Species != NULL) {
-		language = type.Species->GetRandomNameLanguage();
+		language = type.Species->GetRandomNameLanguage(gender);
 	}
 
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
@@ -1035,9 +1037,28 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 		}
 	} else if (language != -1 && PlayerRaces.Languages[language]->LanguageWords.size() > 0) {
 		if (type.BoolFlag[FAUNA_INDEX].value && type.Species != NULL) {
-			personal_name = GenerateName(language, "species-" + type.Species->Ident);
+			personal_name = GenerateName(language, "species-" + type.Species->Ident + "-" + GetGenderNameById(gender));
+			if (personal_name.empty()) {
+				personal_name = GenerateName(language, "species-" + type.Species->Ident);
+			}
+			
+			if (personal_name.empty() && !type.Species->Genus.empty()) {
+				personal_name = GenerateName(language, "species-genus-" + type.Species->Genus + "-" + GetGenderNameById(gender));
+				if (personal_name.empty()) {
+					personal_name = GenerateName(language, "species-genus-" + type.Species->Genus);
+				}
+			}
+			if (personal_name.empty() && !type.Species->Subfamily.empty()) {
+				personal_name = GenerateName(language, "species-subfamily-" + type.Species->Subfamily + "-" + GetGenderNameById(gender));
+				if (personal_name.empty()) {
+					personal_name = GenerateName(language, "species-subfamily-" + type.Species->Subfamily);
+				}
+			}
 			if (personal_name.empty() && !type.Species->Family.empty()) {
-				personal_name = GenerateName(language, "species-family-" + type.Species->Family);
+				personal_name = GenerateName(language, "species-family-" + type.Species->Family + "-" + GetGenderNameById(gender));
+				if (personal_name.empty()) {
+					personal_name = GenerateName(language, "species-family-" + type.Species->Family);
+				}
 			}
 		} else if (type.BoolFlag[ORGANIC_INDEX].value) {
 			personal_name = GenerateName(language, "person-" + GetGenderNameById(gender));

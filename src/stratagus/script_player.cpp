@@ -1175,10 +1175,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				
 				std::string type = LuaToString(l, -1, j + 1);
-				if (word->NameTypes[grammatical_number][grammatical_case][grammatical_tense].find(type) == word->NameTypes[grammatical_number][grammatical_case][grammatical_tense].end()) {
-					word->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] = 0;
-				}
-				word->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] += 1;
+				word->IncreaseNameType(type, grammatical_number, grammatical_case, grammatical_tense);
 			}
 		} else if (!strcmp(value, "AffixNameTypes")) {
 			if (!lua_istable(l, -1)) {
@@ -1231,10 +1228,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				
 				std::string type = LuaToString(l, -1, j + 1);
-				if (word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].find(type) == word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].end()) {
-					word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] = 0;
-				}
-				word->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
+				word->IncreaseAffixNameType(type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
 			}
 		} else if (!strcmp(value, "Mod")) {
 			word->Mod = LuaToString(l, -1);

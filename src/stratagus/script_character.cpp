@@ -82,6 +82,9 @@ static int CclDefineCharacter(lua_State *l)
 	std::string name_type;
 	if (character->Type != NULL && character->Type->Species != NULL) {
 		name_type = "species-" + character->Type->Species->Ident;
+		if (character->Gender != NoGender) {
+			name_type += "-" + GetGenderNameById(character->Gender);
+		}
 	} else {
 		name_type = "person-" + GetGenderNameById(character->Gender);
 	}

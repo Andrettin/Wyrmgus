@@ -2933,6 +2933,15 @@ std::string CLanguage::GetAdjectiveEnding(int article_type, int grammatical_case
 
 int CLanguage::GetPotentialNameQuantityForType(std::string type)
 {
+	if (this->PotentialNameQuantityForType.find(type) != this->PotentialNameQuantityForType.end()) {
+		return this->PotentialNameQuantityForType.find(type)->second;
+	}
+	
+	return 0;
+}
+
+void CLanguage::CalculatePotentialNameQuantityForType(std::string type)
+{
 	int name_count = this->NameTypeWords[type].size();
 	
 	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
@@ -2940,7 +2949,7 @@ int CLanguage::GetPotentialNameQuantityForType(std::string type)
 		name_count += this->NameTypeAffixes[i][AffixTypePrefix][type].size() * this->NameTypeAffixes[i][AffixTypeInfix][type].size() * this->NameTypeAffixes[i][AffixTypeSuffix][type].size();
 	}
 	
-	return name_count;
+	this->PotentialNameQuantityForType[type] = name_count;
 }
 
 void CLanguage::RemoveWord(LanguageWord *word)
@@ -3267,14 +3276,7 @@ void LanguageWord::AddToLanguageNameTypes(std::string type)
 		}
 	}
 	
-	if (type.find("species-") != std::string::npos && type.find("species-family-") == std::string::npos) {
-		CSpecies *species = GetSpecies(FindAndReplaceStringBeginning(type, "species-", ""));
-		if (species != NULL) {
-			if (!species->Family.empty()) {
-				this->AddToLanguageNameTypes("species-family" + species->Family);
-			}
-		}
-	}
+	PlayerRaces.Languages[this->Language]->CalculatePotentialNameQuantityForType(type);
 }
 
 void LanguageWord::AddToLanguageAffixNameTypes(std::string type, int word_junction_type, int affix_type)
@@ -3288,14 +3290,23 @@ void LanguageWord::AddToLanguageAffixNameTypes(std::string type, int word_juncti
 		}
 	}
 	
-	if (type.find("species-") != std::string::npos && type.find("species-family-") == std::string::npos) {
-		CSpecies *species = GetSpecies(FindAndReplaceStringBeginning(type, "species-", ""));
-		if (species != NULL) {
-			if (!species->Family.empty()) {
-				this->AddToLanguageAffixNameTypes("species-family" + species->Family, word_junction_type, affix_type);
-			}
-		}
+	PlayerRaces.Languages[this->Language]->CalculatePotentialNameQuantityForType(type);
+}
+
+void LanguageWord::IncreaseNameType(std::string type, int grammatical_number, int grammatical_case, int grammatical_tense)
+{
+	if (this->NameTypes[grammatical_number][grammatical_case][grammatical_tense].find(type) == this->NameTypes[grammatical_number][grammatical_case][grammatical_tense].end()) {
+		this->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] = 0;
 	}
+	this->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] += 1;
+}
+
+void LanguageWord::IncreaseAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number, int grammatical_case, int grammatical_tense)
+{
+	if (this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].find(type) == this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].end()) {
+		this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] = 0;
+	}
+	this->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
 }
 
 void LanguageWord::StripNameTypeGeneration(std::string type)
@@ -3482,7 +3493,7 @@ void GenerateMissingLanguageData()
 	// first build a vector with all the types
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = PlayerRaces.Languages[i]->NameTypeWords.begin(); iterator != PlayerRaces.Languages[i]->NameTypeWords.end(); ++iterator) {
-			if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first == "unit-class-farm" || iterator->first.find("item-") != std::string::npos || iterator->first == "person" || iterator->first == "person-female" || iterator->first == "family" || iterator->first == "noble-family" || iterator->first == "noble-family-predicate") { //don't do this process for name types which aren't actually used by the game yet, to save performance ("person" is actually used by Kobolds, but no language can inherit language data from their language)
+			if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first == "unit-class-farm" || iterator->first.find("item-") != std::string::npos || iterator->first == "person" || iterator->first == "person-female" || iterator->first == "family" || iterator->first == "noble-family" || iterator->first == "noble-family-predicate" || iterator->first.find("species-") != std::string::npos) { //don't do this process for name types which aren't actually used by the game yet, to save performance ("person" is actually used by Kobolds, but no language can inherit language data from their language), and don't do this process for proper names for animals (it's better to have animals with the names of historical or mythological beings in the original language in which they appeared, than have names made from related words)
 				continue;
 			}
 			if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {
@@ -3492,7 +3503,7 @@ void GenerateMissingLanguageData()
 		for (int j = 0; j < MaxWordJunctionTypes; ++j) {
 			for (int k = 0; k < MaxAffixTypes; ++k) {
 				for (std::map<std::string, std::vector<LanguageWord *>>::iterator iterator = PlayerRaces.Languages[i]->NameTypeAffixes[j][k].begin(); iterator != PlayerRaces.Languages[i]->NameTypeAffixes[j][k].end(); ++iterator) {
-					if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first == "unit-class-farm" || iterator->first.find("item-") != std::string::npos || iterator->first == "person" || iterator->first == "person-female" || iterator->first == "family" || iterator->first == "noble-family" || iterator->first == "noble-family-predicate") {
+					if (iterator->first == "river" || iterator->first == "unit-class-castle" || iterator->first == "unit-class-farm" || iterator->first.find("item-") != std::string::npos || iterator->first == "person" || iterator->first == "person-female" || iterator->first == "family" || iterator->first == "noble-family" || iterator->first == "noble-family-predicate" || iterator->first.find("species-") != std::string::npos) {
 						continue;
 					}
 					if (std::find(types.begin(), types.end(), iterator->first) == types.end()) {
@@ -3876,7 +3887,7 @@ void CreateLanguageCache()
 					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
 						for (std::map<std::string, int>::iterator iterator = word->NameTypes[k][n][o].begin(); iterator != word->NameTypes[k][n][o].end(); ++iterator) {
 							for (int p = 0; p < iterator->second; ++p) {
-								fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(k).c_str());
+								fprintf(fd, "\n\t\t\"%s\", ", GetGrammaticalNumberNameById(k).c_str());
 								fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(n).c_str());
 								fprintf(fd, "\"%s\", ", GetGrammaticalTenseNameById(o).c_str());
 								fprintf(fd, "\"%s\", ", iterator->first.c_str());
@@ -3894,7 +3905,7 @@ void CreateLanguageCache()
 							for (int q = 0; q < MaxGrammaticalTenses; ++q) {
 								for (std::map<std::string, int>::iterator iterator = word->AffixNameTypes[k][n][o][p][q].begin(); iterator != word->AffixNameTypes[k][n][o][p][q].end(); ++iterator) {
 									for (int r = 0; r < iterator->second; ++r) {
-										fprintf(fd, "\"%s\", ", GetWordJunctionTypeNameById(k).c_str());
+										fprintf(fd, "\n\t\t\"%s\", ", GetWordJunctionTypeNameById(k).c_str());
 										fprintf(fd, "\"%s\", ", GetAffixTypeNameById(n).c_str());
 										fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(o).c_str());
 										fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(p).c_str());

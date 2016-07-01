@@ -663,14 +663,30 @@ public:
 	{
 	}
 	
-	int GetRandomNameLanguage();
+	int GetRandomNameLanguage(int gender);
 	
 	std::string Ident;				/// Ident of the species
 	std::string Name;				/// Name of the species
 	std::string Description;		/// Description of the species
 	std::string Quote;				/// Quote pertaining to the species
 	std::string Background;			/// Background of the species
+	std::string Kingdom;
+	std::string Subkingdom;
+	std::string Infrakingdom;
+	std::string Phylum;
+	std::string Subphylum;
+	std::string Infraphylum;
+	std::string Superclass;
+	std::string Class;
+	std::string Subclass;
+	std::string Infraclass;
+	std::string Order;
+	std::string Suborder;
+	std::string Superfamily;
 	std::string Family;
+	std::string Subfamily;
+	std::string Genus;
+	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 };
 //Wyrmgus end

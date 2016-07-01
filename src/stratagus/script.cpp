@@ -3221,19 +3221,53 @@ void ParseNameElements(lua_State *l, std::string type)
 					
 			if (name_element != NULL) {
 				if (word_junction_type != -1 && affix_type != -1) {
-					if (name_element->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].find(type) == name_element->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense].end()) {
-						name_element->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] = 0;
-					}
-					name_element->AffixNameTypes[word_junction_type][affix_type][grammatical_number][grammatical_case][grammatical_tense][type] += 1;
-					
+					name_element->IncreaseAffixNameType(type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
 					name_element->AddToLanguageAffixNameTypes(type, word_junction_type, affix_type);
-				} else {
-					if (name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].find(type) == name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense].end()) {
-						name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] = 0;
+					
+					if (type.find("species-") != std::string::npos && type.find("species-family-") == std::string::npos && type.find("species-subfamily-") == std::string::npos && type.find("species-genus-") == std::string::npos) {
+						CSpecies *species = GetSpecies(FindAndReplaceStringEnding(FindAndReplaceStringEnding(FindAndReplaceStringBeginning(type, "species-", ""), "-male", ""), "-female", ""));
+						if (species != NULL) {
+							if (!species->Family.empty()) {
+								std::string family_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-family-" + species->Family);
+								name_element->IncreaseAffixNameType(family_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
+								name_element->AddToLanguageAffixNameTypes(family_type, word_junction_type, affix_type);
+							}
+							if (!species->Subfamily.empty()) {
+								std::string subfamily_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-subfamily-" + species->Subfamily);
+								name_element->IncreaseAffixNameType(subfamily_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
+								name_element->AddToLanguageAffixNameTypes(subfamily_type, word_junction_type, affix_type);
+							}
+							if (!species->Genus.empty()) {
+								std::string genus_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-genus-" + species->Genus);
+								name_element->IncreaseAffixNameType(genus_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
+								name_element->AddToLanguageAffixNameTypes(genus_type, word_junction_type, affix_type);
+							}
+						}
 					}
-					name_element->NameTypes[grammatical_number][grammatical_case][grammatical_tense][type] += 1;
-							
+				} else {
+					name_element->IncreaseNameType(type, grammatical_number, grammatical_case, grammatical_tense);
 					name_element->AddToLanguageNameTypes(type);
+	
+					if (type.find("species-") != std::string::npos && type.find("species-family-") == std::string::npos && type.find("species-subfamily-") == std::string::npos && type.find("species-genus-") == std::string::npos) {
+						CSpecies *species = GetSpecies(FindAndReplaceStringEnding(FindAndReplaceStringEnding(FindAndReplaceStringBeginning(type, "species-", ""), "-male", ""), "-female", ""));
+						if (species != NULL) {
+							if (!species->Family.empty()) {
+								std::string family_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-family-" + species->Family);
+								name_element->IncreaseNameType(family_type, grammatical_number, grammatical_case, grammatical_tense);
+								name_element->AddToLanguageNameTypes(family_type);
+							}
+							if (!species->Subfamily.empty()) {
+								std::string subfamily_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-subfamily-" + species->Subfamily);
+								name_element->IncreaseNameType(subfamily_type, grammatical_number, grammatical_case, grammatical_tense);
+								name_element->AddToLanguageNameTypes(subfamily_type);
+							}
+							if (!species->Genus.empty()) {
+								std::string genus_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-genus-" + species->Genus);
+								name_element->IncreaseNameType(genus_type, grammatical_number, grammatical_case, grammatical_tense);
+								name_element->AddToLanguageNameTypes(genus_type);
+							}
+						}
+					}
 				}
 			} else {
 				LuaError(l, "The \"%s\" name is set to be a compound formed by \"%s\" (%s, %s), but the latter doesn't exist." _C_ type.c_str() _C_ element_word.c_str() _C_ PlayerRaces.Languages[element_language]->Name.c_str() _C_ GetWordTypeNameById(element_word_type).c_str());

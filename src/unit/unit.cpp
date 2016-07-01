@@ -1587,6 +1587,14 @@ void CUnit::GenerateDrop()
 		return;
 	}
 	
+	int dropper_civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+	int dropper_faction = -1;
+	if (dropper_civilization != -1 && !this->Type->Faction.empty()) {
+		dropper_faction = PlayerRaces.GetFactionIndexByName(dropper_civilization, this->Type->Faction);
+	} else if (dropper_civilization != -1 && this->Player->Race == dropper_civilization && this->Player->Faction != -1) {
+		dropper_faction = this->Player->Faction;
+	}
+	
 	Vec2i drop_pos = this->tilePos;
 	drop_pos.x += SyncRand(this->Type->TileWidth);
 	drop_pos.y += SyncRand(this->Type->TileHeight);
@@ -1615,6 +1623,16 @@ void CUnit::GenerateDrop()
 		}
 			
 		if (droppedUnit != NULL) {
+			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
+				droppedUnit->Name = GeneratePersonalName(PlayerRaces.GetFactionLanguage(dropper_civilization, dropper_faction), droppedUnit->Type->Slot, droppedUnit->Variable[GENDER_INDEX].Value);
+				if (droppedUnit->Name.empty()) {
+					droppedUnit->Name = GeneratePersonalName(-1, droppedUnit->Type->Slot, droppedUnit->Variable[GENDER_INDEX].Value);
+				}
+				if (!droppedUnit->Name.empty() && droppedUnit->Trait != NULL && droppedUnit->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
+					droppedUnit->Name += " " + droppedUnit->Trait->Epithets[SyncRand(droppedUnit->Trait->Epithets.size())];
+				}
+			}
+			
 			droppedUnit->GenerateSpecialProperties(this);
 			
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long

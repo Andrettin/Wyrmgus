@@ -554,6 +554,8 @@ public:
 	void AddNameTypeGenerationFromWord(LanguageWord *word, std::string type);
 	void AddToLanguageNameTypes(std::string type);
 	void AddToLanguageAffixNameTypes(std::string type, int word_junction_type, int affix_type);
+	void IncreaseNameType(std::string type, int grammatical_number, int grammatical_case, int grammatical_tense);
+	void IncreaseAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number, int grammatical_case, int grammatical_tense);
 	void StripNameTypeGeneration(std::string type);
 	void RemoveFromVector(std::vector<LanguageWord *>& word_vector);
 
@@ -608,6 +610,7 @@ public:
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
 	int GetPotentialNameQuantityForType(std::string type);
+	void CalculatePotentialNameQuantityForType(std::string type);
 	void RemoveWord(LanguageWord *word);
 	void AddNameTranslation(std::string translation_from, std::string translation_to);
 	
@@ -628,6 +631,7 @@ public:
 	std::map<std::string, std::vector<LanguageWord *>> NameTypeWords;	/// Words which can be used as names for particular name types
 	std::map<std::string, std::vector<LanguageWord *>> NameTypeAffixes[MaxWordJunctionTypes][MaxAffixTypes];	/// Affixes which can form particular name types
 	std::map<std::string, int> TypeNameCount;
+	std::map<std::string, int> PotentialNameQuantityForType;
 };
 //Wyrmgus end
 
