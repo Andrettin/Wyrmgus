@@ -1540,6 +1540,10 @@ void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, C
 
 void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, CGrandStrategyProvince *province)
 {
+	if (!province || !province->Owner) {
+		return;
+	}
+
 	if (!province->Owner->HasTechnologyClass("writing")) { // only factions which have knowledge of writing can produce literary works
 		return;
 	}
@@ -1575,10 +1579,10 @@ void CGrandStrategyGame::CreateWork(CUpgrade *work, CGrandStrategyHero *author, 
 		}
 		work_creation_message += province->GetCulturalName() + "!";
 		if (work != NULL && !work->Description.empty()) {
-			work_creation_message += " " + FindAndReplaceString(work->Description, "\"", "\\\"");
+			work_creation_message += " " + FindAndReplaceString(FindAndReplaceString(work->Description, "\"", "\\\""), "\n", "\\n");
 		}
 		if (work != NULL && !work->Quote.empty()) {
-			work_creation_message += "\\n\\n" + FindAndReplaceString(work->Quote, "\"", "\\\"");
+			work_creation_message += "\\n\\n" + FindAndReplaceString(FindAndReplaceString(work->Quote, "\"", "\\\""), "\n", "\\n");
 		}
 		work_creation_message += "\"";
 		if (province->Owner == GrandStrategyGame.PlayerFaction) {

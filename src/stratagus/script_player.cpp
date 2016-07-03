@@ -658,14 +658,20 @@ static int CclDefineCivilization(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		if (!strcmp(value, "Display")) {
 			PlayerRaces.Display[civilization_id] = LuaToString(l, -1);
-		} else if (!strcmp(value, "Adjective")) {
-			civilization->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			civilization->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			civilization->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			civilization->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Adjective")) {
+			civilization->Adjective = LuaToString(l, -1);
+		} else if (!strcmp(value, "CalendarStartingYear")) {
+			civilization->CalendarStartingYear = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "YearLabel")) {
+			civilization->YearLabel = LuaToString(l, -1);
+		} else if (!strcmp(value, "NegativeYearLabel")) {
+			civilization->NegativeYearLabel = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
 			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
@@ -1314,13 +1320,6 @@ static int CclGetCivilizationData(lua_State *l)
 	if (!strcmp(data, "Display")) {
 		lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
 		return 1;
-	} else if (!strcmp(data, "Adjective")) {
-		if (!civilization->Adjective.empty()) {
-			lua_pushstring(l, civilization->Adjective.c_str());
-		} else {
-			lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
-		}
-		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, civilization->Description.c_str());
 		return 1;
@@ -1329,6 +1328,22 @@ static int CclGetCivilizationData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, civilization->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Adjective")) {
+		if (!civilization->Adjective.empty()) {
+			lua_pushstring(l, civilization->Adjective.c_str());
+		} else {
+			lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
+		}
+		return 1;
+	} else if (!strcmp(data, "CalendarStartingYear")) {
+		lua_pushnumber(l, civilization->CalendarStartingYear);
+		return 1;
+	} else if (!strcmp(data, "YearLabel")) {
+		lua_pushstring(l, civilization->YearLabel.c_str());
+		return 1;
+	} else if (!strcmp(data, "NegativeYearLabel")) {
+		lua_pushstring(l, civilization->NegativeYearLabel.c_str());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);

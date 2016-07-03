@@ -419,18 +419,21 @@ class CCivilization
 {
 public:
 	CCivilization() :
-		ID(-1)
+		ID(-1), CalendarStartingYear(0)
 	{
 	}
 	
 	std::string GetMonthName(int month);
 	
 	int ID;
+	int CalendarStartingYear;
 	std::string Ident;			/// Ident of the civilization
 	std::string Description;	/// civilization description
 	std::string Quote;			/// civilization quote
 	std::string Background;		/// civilization background
 	std::string Adjective;		/// adjective pertaining to the civilization
+	std::string YearLabel;		/// label used for years (i.e. AD)
+	std::string NegativeYearLabel;	/// label used for "negative" years (i.e. BC)
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 };
 
