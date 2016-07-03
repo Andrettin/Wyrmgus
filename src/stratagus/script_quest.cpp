@@ -494,6 +494,8 @@ static int CclDefineDialogue(lua_State *l)
 						node->SpeakerType = LuaToString(l, -1, k + 1);
 						++k;
 						node->Speaker = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "speaker-player")) {
+						node->SpeakerPlayer = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "text")) {
 						node->Text = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "conditions")) {

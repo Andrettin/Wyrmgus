@@ -266,11 +266,19 @@ void CDialogueNode::Call(int player)
 	std::string lua_command = "Event(";
 	
 	if (this->SpeakerType == "character") {
-		lua_command += "FindHero(\"" + this->Speaker + "\"), ";
+		lua_command += "FindHero(\"" + this->Speaker;
 	} else if (this->SpeakerType == "unit") {
-		lua_command += "FindUnit(\"" + this->Speaker + "\"), ";
+		lua_command += "FindUnit(\"" + this->Speaker;
 	} else {
 		lua_command += "\"" + this->Speaker + "\", ";
+	}
+	
+	if (this->SpeakerType == "character" || this->SpeakerType == "unit") {
+		lua_command += "\"";
+		if (!this->SpeakerPlayer.empty()) {
+			lua_command += ", GetFactionPlayer(\"" + this->SpeakerPlayer + "\")";
+		}
+		lua_command += "), ";
 	}
 	
 	lua_command += "\"" + this->Text + "\", ";

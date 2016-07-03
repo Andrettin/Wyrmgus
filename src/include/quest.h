@@ -151,6 +151,7 @@ public:
 	
 	int ID;
 	std::string SpeakerType;			/// "character" if the speaker is a character, "unit" if the speaker belongs to a particular unit type, and empty if the Speaker string will be used as the displayed name of the speaker itself
+	std::string SpeakerPlayer;			/// name of the player to whom the speaker belongs
 	std::string Speaker;
 	std::string Text;
 	CDialogue *Dialogue;
