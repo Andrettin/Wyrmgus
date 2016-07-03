@@ -1060,6 +1060,12 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 					personal_name = GenerateName(language, "species-family-" + type.Species->Family);
 				}
 			}
+			if (personal_name.empty() && !type.Species->Order.empty()) {
+				personal_name = GenerateName(language, "species-order-" + type.Species->Order + "-" + GetGenderNameById(gender));
+				if (personal_name.empty()) {
+					personal_name = GenerateName(language, "species-order-" + type.Species->Order);
+				}
+			}
 		} else if (type.BoolFlag[ORGANIC_INDEX].value) {
 			personal_name = GenerateName(language, "person-" + GetGenderNameById(gender));
 			if (personal_name.empty()) {

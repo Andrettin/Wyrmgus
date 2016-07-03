@@ -1981,6 +1981,15 @@ int CSpecies::GetRandomNameLanguage(int gender)
 		}
 	}
 	
+	if (potential_languages.size() == 0 && !this->Order.empty()) { // if no language that can generate a name for this species was found, try to see if any can generate for its order instead
+		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Order + gender_string);
+			for (int j = 0; j < potential_name_quantity; ++j) {
+				potential_languages.push_back(i);
+			}
+		}
+	}
+	
 	if (potential_languages.size() > 0) {
 		return potential_languages[SyncRand(potential_languages.size())];
 	}

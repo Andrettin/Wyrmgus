@@ -3657,6 +3657,8 @@ static int CclDefineSpecies(lua_State *l)
 			species->Family = LuaToString(l, -1);
 		} else if (!strcmp(value, "Subfamily")) {
 			species->Subfamily = LuaToString(l, -1);
+		} else if (!strcmp(value, "Tribe")) {
+			species->Tribe = LuaToString(l, -1);
 		} else if (!strcmp(value, "Genus")) {
 			species->Genus = LuaToString(l, -1);
 		} else if (!strcmp(value, "Species")) {

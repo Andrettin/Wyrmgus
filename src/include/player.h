@@ -427,6 +427,10 @@ public:
 	
 	int ID;
 	std::string Ident;			/// Ident of the civilization
+	std::string Description;	/// civilization description
+	std::string Quote;			/// civilization quote
+	std::string Background;		/// civilization background
+	std::string Adjective;		/// adjective pertaining to the civilization
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 };
 
@@ -678,8 +682,6 @@ public:
 	std::string Name[MAX_RACES];    /// race names
 	std::string Display[MAX_RACES]; /// text to display in pulldown
 	//Wyrmgus start
-	std::string Adjective[MAX_RACES]; /// adjective pertaining to the civilization
-	std::string Description[MAX_RACES]; /// description pertaining to the civilization
 	bool Playable[MAX_RACES];											/// civilization is playable?
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)

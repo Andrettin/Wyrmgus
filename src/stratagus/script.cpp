@@ -3224,9 +3224,14 @@ void ParseNameElements(lua_State *l, std::string type)
 					name_element->IncreaseAffixNameType(type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
 					name_element->AddToLanguageAffixNameTypes(type, word_junction_type, affix_type);
 					
-					if (type.find("species-") != std::string::npos && type.find("species-family-") == std::string::npos && type.find("species-subfamily-") == std::string::npos && type.find("species-genus-") == std::string::npos) {
+					if (type.find("species-") != std::string::npos && type.find("species-order-") == std::string::npos && type.find("species-family-") == std::string::npos && type.find("species-subfamily-") == std::string::npos && type.find("species-genus-") == std::string::npos) {
 						CSpecies *species = GetSpecies(FindAndReplaceStringEnding(FindAndReplaceStringEnding(FindAndReplaceStringBeginning(type, "species-", ""), "-male", ""), "-female", ""));
 						if (species != NULL) {
+							if (!species->Order.empty()) {
+								std::string order_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-order-" + species->Order);
+								name_element->IncreaseAffixNameType(order_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
+								name_element->AddToLanguageAffixNameTypes(order_type, word_junction_type, affix_type);
+							}
 							if (!species->Family.empty()) {
 								std::string family_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-family-" + species->Family);
 								name_element->IncreaseAffixNameType(family_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
@@ -3248,9 +3253,14 @@ void ParseNameElements(lua_State *l, std::string type)
 					name_element->IncreaseNameType(type, grammatical_number, grammatical_case, grammatical_tense);
 					name_element->AddToLanguageNameTypes(type);
 	
-					if (type.find("species-") != std::string::npos && type.find("species-family-") == std::string::npos && type.find("species-subfamily-") == std::string::npos && type.find("species-genus-") == std::string::npos) {
+					if (type.find("species-") != std::string::npos && type.find("species-order-") == std::string::npos && type.find("species-family-") == std::string::npos && type.find("species-subfamily-") == std::string::npos && type.find("species-genus-") == std::string::npos) {
 						CSpecies *species = GetSpecies(FindAndReplaceStringEnding(FindAndReplaceStringEnding(FindAndReplaceStringBeginning(type, "species-", ""), "-male", ""), "-female", ""));
 						if (species != NULL) {
+							if (!species->Order.empty()) {
+								std::string order_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-order-" + species->Order);
+								name_element->IncreaseNameType(order_type, grammatical_number, grammatical_case, grammatical_tense);
+								name_element->AddToLanguageNameTypes(order_type);
+							}
 							if (!species->Family.empty()) {
 								std::string family_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-family-" + species->Family);
 								name_element->IncreaseNameType(family_type, grammatical_number, grammatical_case, grammatical_tense);

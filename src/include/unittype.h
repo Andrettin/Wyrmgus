@@ -685,6 +685,7 @@ public:
 	std::string Superfamily;
 	std::string Family;
 	std::string Subfamily;
+	std::string Tribe;
 	std::string Genus;
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get

@@ -889,6 +889,65 @@ static int CclDefineWorldMapTile(lua_State *l)
 					--j;
 				}
 			}
+		} else if (!strcmp(value, "Claims")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, -1, j + 1));
+				if (faction == -1) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				
+				tile->FactionClaims.push_back(PlayerRaces.Factions[civilization][faction]);
+			}
+		} else if (!strcmp(value, "HistoricalOwners")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string owner_civilization_name = LuaToString(l, -1, j + 1);
+				++j;
+				std::string owner_faction_name = LuaToString(l, -1, j + 1);
+				if (!owner_civilization_name.empty() && !owner_faction_name.empty()) {
+					int owner_civilization = PlayerRaces.GetRaceIndexByName(owner_civilization_name.c_str());
+					int owner_faction = PlayerRaces.GetFactionIndexByName(owner_civilization, owner_faction_name);
+					if (owner_faction == -1) {
+						LuaError(l, "Faction \"%s\" doesn't exist." _C_ owner_faction_name.c_str());
+					}
+					tile->HistoricalOwners[year] = PlayerRaces.Factions[owner_civilization][owner_faction];
+				} else {
+					tile->HistoricalOwners[year] = NULL;
+				}
+			}
+		} else if (!strcmp(value, "HistoricalClaims")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int year = LuaToNumber(l, -1, j + 1);
+				++j;
+				std::string claimant_civilization_name = LuaToString(l, -1, j + 1);
+				int claimant_civilization = PlayerRaces.GetRaceIndexByName(claimant_civilization_name.c_str());
+				++j;
+				std::string claimant_faction_name = LuaToString(l, -1, j + 1);
+				int claimant_faction = PlayerRaces.GetFactionIndexByName(claimant_civilization, claimant_faction_name);
+				if (claimant_faction == -1) {
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ claimant_faction_name.c_str());
+				}
+				tile->HistoricalClaims[year] = PlayerRaces.Factions[claimant_civilization][claimant_faction];
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

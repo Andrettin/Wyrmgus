@@ -659,9 +659,13 @@ static int CclDefineCivilization(lua_State *l)
 		if (!strcmp(value, "Display")) {
 			PlayerRaces.Display[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "Adjective")) {
-			PlayerRaces.Adjective[civilization_id] = LuaToString(l, -1);
+			civilization->Adjective = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
-			PlayerRaces.Description[civilization_id] = LuaToString(l, -1);
+			civilization->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Quote")) {
+			civilization->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "Background")) {
+			civilization->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Visible")) {
 			PlayerRaces.Visible[civilization_id] = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Playable")) {
@@ -1311,14 +1315,20 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "Adjective")) {
-		if (!PlayerRaces.Adjective[civilization_id].empty()) {
-			lua_pushstring(l, PlayerRaces.Adjective[civilization_id].c_str());
+		if (!civilization->Adjective.empty()) {
+			lua_pushstring(l, civilization->Adjective.c_str());
 		} else {
 			lua_pushstring(l, PlayerRaces.Display[civilization_id].c_str());
 		}
 		return 1;
 	} else if (!strcmp(data, "Description")) {
-		lua_pushstring(l, PlayerRaces.Description[civilization_id].c_str());
+		lua_pushstring(l, civilization->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Quote")) {
+		lua_pushstring(l, civilization->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "Background")) {
+		lua_pushstring(l, civilization->Background.c_str());
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, PlayerRaces.Playable[civilization_id]);

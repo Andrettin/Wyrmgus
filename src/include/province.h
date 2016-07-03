@@ -186,6 +186,9 @@ public:
 	std::map<std::pair<int,CFaction *>, std::vector<std::string>> FactionCulturalResourceNames;	/// Names for the tile (if it has a certain resource) for each faction
 	std::map<int, std::vector<std::string>> CulturalSettlementNames;	/// Names for the tile's settlement for each faction
 	std::map<CFaction *, std::vector<std::string>> FactionCulturalSettlementNames;	/// Names for the tile's settlement for each faction
+	std::vector<CFaction *> FactionClaims;								/// Factions which have a claim to this tile
+	std::map<int, CFaction *> HistoricalOwners;							/// Historical owners of the tile, mapped to the year
+	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the tile, mapped to the year
 };
 
 class CRiver

@@ -406,8 +406,6 @@ void PlayerRace::Clean()
 		this->Display[i].clear();
 		this->Visible[i] = false;
 		//Wyrmgus start
-		this->Adjective[i].clear();
-		this->Description[i].clear();
 		this->CivilizationUpgrades[i].clear();
 		this->CivilizationClassUnitTypes[i].clear();
 		this->CivilizationClassUpgrades[i].clear();
