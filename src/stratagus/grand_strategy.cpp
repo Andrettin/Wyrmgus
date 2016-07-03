@@ -7462,7 +7462,7 @@ void FinalizeGrandStrategyInitialization()
 					
 					if (
 						(world->Tiles[i]->Terrain == -1 || world->Tiles[i]->Terrain == province_tile->Terrain)
-						&& world->Tiles[i]->Resource == province_tile->Resource
+						&& (world->Tiles[i]->Resource == -1 || world->Tiles[i]->Resource == province_tile->Resource)
 						&& (world->Tiles[i]->Capital == false || province->SettlementLocation == province_tile->Position)
 					) {
 						potential_tiles.push_back(province_tile);
@@ -7476,7 +7476,7 @@ void FinalizeGrandStrategyInitialization()
 						
 						if (
 							(world->Tiles[i]->Terrain == -1 || world->Tiles[i]->Terrain == province_tile->Terrain)
-							&& world->Tiles[i]->Resource == province_tile->Resource
+							&& (world->Tiles[i]->Resource == -1 || world->Tiles[i]->Resource == province_tile->Resource)
 							&& (world->Tiles[i]->Capital == false || province->SettlementLocation == province_tile->Position)
 						) {
 							potential_tiles.push_back(province_tile);
