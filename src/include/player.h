@@ -620,6 +620,7 @@ public:
 	
 	std::string Ident;											/// Ident of the language
 	std::string Name;											/// Name of the language
+	std::string Family;											/// Family of the language
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
 	bool GenerateMissingWords;									/// Whether "missing" words (missing equivalents to English words) should be generated for this language

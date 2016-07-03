@@ -2089,6 +2089,8 @@ static int CclDefineLanguage(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			language->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Family")) {
+			language->Family = LuaToString(l, -1);
 		} else if (!strcmp(value, "GenerateMissingWords")) {
 			language->GenerateMissingWords = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "SkipNameTypeInheritance")) {
@@ -2991,6 +2993,9 @@ static int CclGetLanguageData(lua_State *l)
 
 	if (!strcmp(data, "Name")) {
 		lua_pushstring(l, language->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Family")) {
+		lua_pushstring(l, language->Family.c_str());
 		return 1;
 	} else if (!strcmp(data, "Words")) {
 		lua_createtable(l, language->LanguageWords.size(), 0);
