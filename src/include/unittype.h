@@ -655,21 +655,16 @@ public:
 };
 
 //Wyrmgus start
-class CSpecies
+class CSpeciesFamily
 {
 public:
-	CSpecies() :
+	CSpeciesFamily() :
 		Ident("")
 	{
 	}
 	
-	int GetRandomNameLanguage(int gender);
-	
-	std::string Ident;				/// Ident of the species
-	std::string Name;				/// Name of the species
-	std::string Description;		/// Description of the species
-	std::string Quote;				/// Quote pertaining to the species
-	std::string Background;			/// Background of the species
+	std::string Ident;				/// Ident of the species family
+	std::string Name;				/// Name of the species family
 	std::string Kingdom;
 	std::string Subkingdom;
 	std::string Infrakingdom;
@@ -683,7 +678,25 @@ public:
 	std::string Order;
 	std::string Suborder;
 	std::string Superfamily;
-	std::string Family;
+};	
+
+class CSpecies
+{
+public:
+	CSpecies() :
+		Sapient(false)
+	{
+	}
+	
+	int GetRandomNameLanguage(int gender);
+	
+	bool Sapient;					/// Whether the species is sapient
+	std::string Ident;				/// Ident of the species
+	std::string Name;				/// Name of the species
+	std::string Description;		/// Description of the species
+	std::string Quote;				/// Quote pertaining to the species
+	std::string Background;			/// Background of the species
+	CSpeciesFamily *Family;
 	std::string Subfamily;
 	std::string Tribe;
 	std::string Genus;
@@ -1086,6 +1099,7 @@ extern std::vector<std::string> UnitTypeClasses; //list of unit type classes; bu
 extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
 
 extern std::vector<CSpecies *> Species;
+extern std::vector<CSpeciesFamily *> SpeciesFamilies;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -1104,6 +1118,7 @@ extern int GetUpgradeClassIndexByName(const std::string &class_name);
 extern void SetUpgradeClassStringToIndex(std::string class_name, int class_id);
 
 extern CSpecies *GetSpecies(std::string species_ident);
+extern CSpeciesFamily *GetSpeciesFamily(std::string family_ident);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table
