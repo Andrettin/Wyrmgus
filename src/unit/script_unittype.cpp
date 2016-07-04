@@ -3665,6 +3665,18 @@ static int CclDefineSpecies(lua_State *l)
 			species->Species = LuaToString(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			species->ChildUpgrade = LuaToString(l, -1);
+		} else if (!strcmp(value, "EvolvesFrom")) {
+			species->EvolvesFrom.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string evolves_from_ident = LuaToString(l, -1, j + 1);
+				CSpecies *evolves_from = GetSpecies(evolves_from_ident);
+				if (evolves_from) {
+					species->EvolvesFrom.push_back(evolves_from);
+				} else {
+					LuaError(l, "Species \"%s\" doesn't exist." _C_ evolves_from_ident.c_str());
+				}
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -3715,6 +3727,14 @@ static int CclGetSpeciesData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, species->ChildUpgrade.c_str());
+		return 1;
+	} else if (!strcmp(data, "EvolvesFrom")) {
+		lua_createtable(l, species->EvolvesFrom.size(), 0);
+		for (size_t i = 1; i <= species->EvolvesFrom.size(); ++i)
+		{
+			lua_pushstring(l, species->EvolvesFrom[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);

@@ -689,6 +689,7 @@ public:
 	std::string Genus;
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
+	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
 };
 //Wyrmgus end
 
