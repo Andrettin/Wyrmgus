@@ -3645,6 +3645,8 @@ static int CclDefineSpeciesFamily(lua_State *l)
 			family->Order = LuaToString(l, -1);
 		} else if (!strcmp(value, "Suborder")) {
 			family->Suborder = LuaToString(l, -1);
+		} else if (!strcmp(value, "Infraorder")) {
+			family->Infraorder = LuaToString(l, -1);
 		} else if (!strcmp(value, "Superfamily")) {
 			family->Superfamily = LuaToString(l, -1);
 		} else {

@@ -677,6 +677,7 @@ public:
 	std::string Infraclass;
 	std::string Order;
 	std::string Suborder;
+	std::string Infraorder;
 	std::string Superfamily;
 };	
 
