@@ -373,7 +373,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	unit.Player->SubUnitType(type);
 
 	CUnit *build = MakeUnit(const_cast<CUnitType &>(type), unit.Player);
-
+	
 	// If unable to make unit, stop, and report message
 	if (build == NULL) {
 		// FIXME: Should we retry this?
@@ -430,6 +430,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	UpdateUnitSightRange(*build);
 	// Must place after previous for map flags
 	build->Place(this->goalPos);
+
+	//Wyrmgus start
+	build->Player->NumBuildingsUnderConstruction++;
+	//Wyrmgus end
 
 	// HACK: the building is not ready yet
 	build->Player->UnitTypesCount[type.Slot]--;

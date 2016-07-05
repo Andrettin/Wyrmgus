@@ -150,6 +150,9 @@ public:
 	PlayerAi *Ai;          /// Ai structure pointer
 
 	int    NumBuildings;   /// # buildings
+	//Wyrmgus start
+	int    NumBuildingsUnderConstruction; /// # buildings under construction
+	//Wyrmgus end
 	int    Supply;         /// supply available/produced
 	int    Demand;         /// demand of player
 

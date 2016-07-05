@@ -1161,6 +1161,9 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Supply = 0;
 	this->Demand = 0;
 	this->NumBuildings = 0;
+	//Wyrmgus start
+	this->NumBuildingsUnderConstruction = 0;
+	//Wyrmgus end
 	this->Score = 0;
 	//Wyrmgus start
 	this->LostTownHallTimer = 0;
@@ -1461,6 +1464,9 @@ void CPlayer::Clear()
 	this->LevelUpUnits.resize(0);
 	//Wyrmgus end
 	NumBuildings = 0;
+	//Wyrmgus start
+	NumBuildingsUnderConstruction = 0;
+	//Wyrmgus end
 	Supply = 0;
 	Demand = 0;
 	// FIXME: can't clear limits since it's initialized already

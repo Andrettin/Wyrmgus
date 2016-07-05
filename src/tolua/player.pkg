@@ -34,6 +34,9 @@ class CPlayer
 	bool AiEnabled;
 
 	int NumBuildings;
+	//Wyrmgus start
+	int NumBuildingsUnderConstruction;
+	//Wyrmgus end
 	int Supply;
 	int Demand;
 

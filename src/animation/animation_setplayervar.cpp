@@ -99,6 +99,10 @@ int GetPlayerData(const int player, const char *prop, const char *arg)
 		return Players[player].GetUnitCount();
 	} else if (!strcmp(prop, "NumBuildings")) {
 		return Players[player].NumBuildings;
+	//Wyrmgus start
+	} else if (!strcmp(prop, "NumBuildingsUnderConstruction")) {
+		return Players[player].NumBuildingsUnderConstruction;
+	//Wyrmgus end
 	} else if (!strcmp(prop, "Supply")) {
 		return Players[player].Supply;
 	} else if (!strcmp(prop, "Demand")) {

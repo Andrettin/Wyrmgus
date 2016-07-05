@@ -2046,6 +2046,11 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		// FIXME: support more races
 		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
 			player.NumBuildings++;
+			//Wyrmgus start
+			if (CurrentAction() == UnitActionBuilt) {
+				player.NumBuildingsUnderConstruction++;
+			}
+			//Wyrmgus end
 		}
 	}
 	Player = &player;
@@ -2787,6 +2792,11 @@ void UnitLost(CUnit &unit)
 			// FIXME: support more races
 			if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
 				player.NumBuildings--;
+				//Wyrmgus start
+				if (unit.CurrentAction() == UnitActionBuilt) {
+					player.NumBuildingsUnderConstruction--;
+				}
+				//Wyrmgus end
 			}
 		}
 		if (unit.CurrentAction() != UnitActionBuilt) {
@@ -3393,6 +3403,11 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	if (Type->Building && !Type->BoolFlag[WALL_INDEX].value) {
 		newplayer.NumBuildings++;
 	}
+	//Wyrmgus start
+	if (CurrentAction() == UnitActionBuilt) {
+		newplayer.NumBuildingsUnderConstruction++;
+	}
+	//Wyrmgus end
 	newplayer.UnitTypesCount[Type->Slot]++;
 	if (Active) {
 		newplayer.UnitTypesAiActiveCount[Type->Slot]++;

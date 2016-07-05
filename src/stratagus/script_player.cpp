@@ -2699,9 +2699,19 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "TotalNumUnits")) {
 		lua_pushnumber(l, p->GetUnitCount());
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "TotalNumUnitsConstructed")) {
+		lua_pushnumber(l, p->GetUnitCount() - p->NumBuildingsUnderConstruction);
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "NumBuildings")) {
 		lua_pushnumber(l, p->NumBuildings);
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "NumBuildingsUnderConstruction")) {
+		lua_pushnumber(l, p->NumBuildingsUnderConstruction);
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "Supply")) {
 		lua_pushnumber(l, p->Supply);
 		return 1;
