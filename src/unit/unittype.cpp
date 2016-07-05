@@ -1954,10 +1954,13 @@ CSpeciesFamily *GetSpeciesFamily(std::string family_ident)
 	return NULL;
 }
 
-bool CSpecies::CanEvolveToAUnitType()
+bool CSpecies::CanEvolveToAUnitType(bool current_tileset_only)
 {
 	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-		if (this->EvolvesTo[i]->Type != NULL || this->EvolvesTo[i]->CanEvolveToAUnitType()) {
+		if (
+			(this->EvolvesTo[i]->Type != NULL && (!current_tileset_only || std::find(this->EvolvesTo[i]->Environments.begin(), this->EvolvesTo[i]->Environments.end(), Map.Tileset->Ident) != this->EvolvesTo[i]->Environments.end()))
+			|| this->EvolvesTo[i]->CanEvolveToAUnitType(current_tileset_only)
+		) {
 			return true;
 		}
 	}
@@ -2032,7 +2035,10 @@ CSpecies *CSpecies::GetRandomEvolution()
 	std::vector<CSpecies *> potential_evolutions;
 	
 	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
-		if ((this->EvolvesTo[i]->Type != NULL || this->EvolvesTo[i]->CanEvolveToAUnitType()) && std::find(this->EvolvesTo[i]->Environments.begin(), this->EvolvesTo[i]->Environments.end(), Map.Tileset->Ident) != this->EvolvesTo[i]->Environments.end()) { //give preference to evolutions that are native to the current tileset
+		if (
+			(this->EvolvesTo[i]->Type != NULL && std::find(this->EvolvesTo[i]->Environments.begin(), this->EvolvesTo[i]->Environments.end(), Map.Tileset->Ident) != this->EvolvesTo[i]->Environments.end())
+			|| this->EvolvesTo[i]->CanEvolveToAUnitType(true)
+		) { //give preference to evolutions that are native to the current tileset
 			potential_evolutions.push_back(this->EvolvesTo[i]);
 		}
 	}

@@ -692,7 +692,7 @@ public:
 	{
 	}
 	
-	bool CanEvolveToAUnitType();
+	bool CanEvolveToAUnitType(bool current_tileset_only = false);
 	int GetRandomNameLanguage(int gender);
 	CSpecies *GetRandomEvolution();
 	
