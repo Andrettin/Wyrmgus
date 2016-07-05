@@ -41,6 +41,9 @@
 #include "iolib.h"
 #include "map.h"
 #include "player.h"
+//Wyrmgus start
+#include "quest.h" // for saving quests
+//Wyrmgus end
 #include "results.h"
 #include "script.h"
 #include "unit.h"
@@ -628,6 +631,11 @@ void SaveTriggers(CFile &file)
 	file.printf("\n");
 	file.printf("if (Triggers ~= nil) then assert(loadstring(Triggers))() end\n");
 	file.printf("\n");
+	//Wyrmgus start
+	if (CurrentQuest != NULL) {
+		file.printf("SetCurrentQuest(\"%s\")\n", CurrentQuest->Ident.c_str());
+	}
+	//Wyrmgus end
 }
 
 /**
