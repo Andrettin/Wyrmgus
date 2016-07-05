@@ -584,8 +584,8 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	}
 
 	//Wyrmgus start
-	//don't draw decorations on the minimap
-	if (type->BoolFlag[DECORATION_INDEX].value) {
+	//don't draw decorations or diminutive fauna units on the minimap
+	if (type->BoolFlag[DECORATION_INDEX].value || (type->BoolFlag[DIMINUTIVE_INDEX].value && type->BoolFlag[FAUNA_INDEX].value)) {
 		return;
 	}
 	//Wyrmgus end
