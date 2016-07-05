@@ -1954,6 +1954,16 @@ CSpeciesFamily *GetSpeciesFamily(std::string family_ident)
 	return NULL;
 }
 
+bool CSpecies::CanEvolveToAUnitType()
+{
+	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
+		if (this->EvolvesTo[i]->Type != NULL || this->EvolvesTo[i]->CanEvolveToAUnitType()) {
+			return true;
+		}
+	}
+	return false;
+}
+
 int CSpecies::GetRandomNameLanguage(int gender)
 {
 	std::string gender_string;
@@ -2015,6 +2025,31 @@ int CSpecies::GetRandomNameLanguage(int gender)
 	}
 
 	return -1;
+}
+
+CSpecies *CSpecies::GetRandomEvolution()
+{
+	std::vector<CSpecies *> potential_evolutions;
+	
+	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
+		if ((this->EvolvesTo[i]->Type != NULL || this->EvolvesTo[i]->CanEvolveToAUnitType()) && std::find(this->EvolvesTo[i]->Environments.begin(), this->EvolvesTo[i]->Environments.end(), Map.Tileset->Ident) != this->EvolvesTo[i]->Environments.end()) { //give preference to evolutions that are native to the current tileset
+			potential_evolutions.push_back(this->EvolvesTo[i]);
+		}
+	}
+	
+	if (potential_evolutions.size() == 0) {
+		for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
+			if (this->EvolvesTo[i]->Type != NULL || this->EvolvesTo[i]->CanEvolveToAUnitType()) {
+				potential_evolutions.push_back(this->EvolvesTo[i]);
+			}
+		}
+	}
+	
+	if (potential_evolutions.size() > 0) {
+		return potential_evolutions[SyncRand(potential_evolutions.size())];
+	}
+	
+	return NULL;
 }
 
 std::string GetImageLayerNameById(int image_layer)

@@ -238,6 +238,7 @@ static const char TRANSPARENCY_KEY[] = "Transparency";
 static const char GENDER_KEY[] = "Gender";
 static const char BIRTHCYCLE_KEY[] = "BirthCycle";
 static const char HUNGER_KEY[] = "Hunger";
+static const char EVOLUTION_KEY[] = "Evolution";
 static const char STUN_KEY[] = "Stun";
 static const char BLEEDING_KEY[] = "Bleeding";
 static const char LEADERSHIP_KEY[] = "Leadership";
@@ -316,7 +317,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BACKSTAB_KEY, BONUSAGAINSTMOUNTED_KEY, BONUSAGAINSTBUILDINGS_KEY, BONUSAGAINSTAIR_KEY, BONUSAGAINSTGIANTS_KEY,
 							   BONUSAGAINSTDRAGONS_KEY,
 							   DAYSIGHTRANGEBONUS_KEY, NIGHTSIGHTRANGEBONUS_KEY, KNOWLEDGEMAGIC_KEY, KNOWLEDGEWARFARE_KEY,
-							   MAGICLEVEL_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY,
+							   MAGICLEVEL_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY, EVOLUTION_KEY,
 							   STUN_KEY, BLEEDING_KEY, LEADERSHIP_KEY, INSPIRE_KEY, REGENERATION_KEY, TERROR_KEY, TIMEEFFICIENCYBONUS_KEY, DISEMBARKMENTBONUS_KEY, LEADERSHIPAURA_KEY, REGENERATIONAURA_KEY
 //Wyrmgus end
 							  };
@@ -2002,6 +2003,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->HairColor = GetHairColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
 			type->Species = GetSpecies(LuaToString(l, -1));
+			type->Species->Type = type;
 		} else if (!strcmp(value, "WeaponClasses")) {
 			type->WeaponClasses.clear();
 			const int args = lua_rawlen(l, -1);
@@ -3462,7 +3464,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == BACKSTAB_INDEX || i == BONUSAGAINSTMOUNTED_INDEX || i == BONUSAGAINSTBUILDINGS_INDEX || i == BONUSAGAINSTAIR_INDEX || i == BONUSAGAINSTGIANTS_INDEX || i == BONUSAGAINSTDRAGONS_INDEX
 			|| i == DAYSIGHTRANGEBONUS_INDEX || i == NIGHTSIGHTRANGEBONUS_INDEX
 			|| i == KNOWLEDGEMAGIC_INDEX || i == KNOWLEDGEWARFARE_INDEX
-			|| i == MAGICLEVEL_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX
+			|| i == MAGICLEVEL_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX || i == EVOLUTION_INDEX
 			|| i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == INSPIRE_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX || i == TIMEEFFICIENCYBONUS_INDEX
 			|| i == DISEMBARKMENTBONUS_INDEX || i == LEADERSHIPAURA_INDEX || i == REGENERATIONAURA_INDEX) {
 			//Wyrmgus end
@@ -3498,6 +3500,9 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[HUNGER_INDEX].Enable = 1;
 		unit.Variable[HUNGER_INDEX].Max = 1000;
 		unit.Variable[HUNGER_INDEX].Increase = 1;
+		unit.Variable[EVOLUTION_INDEX].Enable = 1;
+		unit.Variable[EVOLUTION_INDEX].Max = 300;
+		unit.Variable[EVOLUTION_INDEX].Increase = 1;
 	}
 	//Wyrmgus end
 
@@ -3732,6 +3737,7 @@ static int CclDefineSpecies(lua_State *l)
 				CSpecies *evolves_from = GetSpecies(evolves_from_ident);
 				if (evolves_from) {
 					species->EvolvesFrom.push_back(evolves_from);
+					evolves_from->EvolvesTo.push_back(species);
 				} else {
 					LuaError(l, "Species \"%s\" doesn't exist." _C_ evolves_from_ident.c_str());
 				}
@@ -3797,6 +3803,13 @@ static int CclGetSpeciesData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "Type")) {
+		if (species->Type != NULL) {
+			lua_pushstring(l, species->Type->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
 	} else if (!strcmp(data, "Environments")) {
 		lua_createtable(l, species->Environments.size(), 0);
 		for (size_t i = 1; i <= species->Environments.size(); ++i)
@@ -3810,6 +3823,14 @@ static int CclGetSpeciesData(lua_State *l)
 		for (size_t i = 1; i <= species->EvolvesFrom.size(); ++i)
 		{
 			lua_pushstring(l, species->EvolvesFrom[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "EvolvesTo")) {
+		lua_createtable(l, species->EvolvesTo.size(), 0);
+		for (size_t i = 1; i <= species->EvolvesTo.size(); ++i)
+		{
+			lua_pushstring(l, species->EvolvesTo[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

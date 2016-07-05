@@ -98,8 +98,10 @@ int main(int argc, char * argv[]) {
 	fprintf(file, "#define StratagusPatchLevel %d\n", new_ver[2]);
 	fprintf(file, "#define StratagusPatchLevel2 %d\n", new_ver[3]);
 
-	if ( new_ver[4] != -1 )
-		fprintf(file, "#define StratagusGitRev %s\n", git_rev);
+	//Wyrmgus start
+//	if ( new_ver[4] != -1 )
+//		fprintf(file, "#define StratagusGitRev %s\n", git_rev); // was causing a compile error
+	//Wyrmgus end
 
 	fclose(file);
 	return 0;

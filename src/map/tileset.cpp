@@ -204,6 +204,9 @@ PixelSize PixelTileSize(32, 32);
 void CTileset::clear()
 {
 	Name.clear();
+	//Wyrmgus start
+	Ident.clear();
+	//Wyrmgus end
 	ImageFile.clear();
 	pixelTileSize.x = pixelTileSize.y = 0;
 	tiles.clear();

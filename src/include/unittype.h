@@ -388,6 +388,7 @@ enum {
 	GENDER_INDEX,
 	BIRTHCYCLE_INDEX,
 	HUNGER_INDEX,
+	EVOLUTION_INDEX,
 	STUN_INDEX,
 	BLEEDING_INDEX,
 	LEADERSHIP_INDEX,
@@ -687,11 +688,13 @@ class CSpecies
 public:
 	CSpecies() :
 		Sapient(false),
-		Family(NULL), Homeworld(NULL)
+		Family(NULL), Homeworld(NULL), Type(NULL)
 	{
 	}
 	
+	bool CanEvolveToAUnitType();
 	int GetRandomNameLanguage(int gender);
+	CSpecies *GetRandomEvolution();
 	
 	bool Sapient;					/// Whether the species is sapient
 	std::string Ident;				/// Ident of the species
@@ -706,8 +709,10 @@ public:
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	CWorld *Homeworld;
+	CUnitType *Type;
 	std::vector<std::string> Environments;	/// in which environments (tilesets) does this species live
 	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
+	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
 };
 //Wyrmgus end
 

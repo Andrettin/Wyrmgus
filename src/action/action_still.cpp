@@ -42,10 +42,16 @@
 #include "character.h" //for the gender identifiers
 //Wyrmgus end
 #include "commands.h"
+//Wyrmgus start
+#include "grand_strategy.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "map.h"
 #include "missile.h"
 #include "player.h"
+//Wyrmgus start
+#include "quest.h"
+//Wyrmgus end
 #include "script.h"
 #include "settings.h"
 //Wyrmgus start
@@ -400,6 +406,43 @@ static bool Breed(CUnit &unit)
 }
 
 /**
+**  Evolve (if possible) to another species
+**
+**  @return  true if the unit evolves, false otherwise
+*/
+static bool Evolve(CUnit &unit)
+{
+	if (
+		!unit.Type->BoolFlag[ORGANIC_INDEX].value
+		|| CurrentQuest != NULL || GrandStrategy //only perform evolution in custom games, not in quests or in grand strategy battles
+		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
+		|| unit.Type->Species->EvolvesTo.size() == 0
+		|| unit.Variable[EVOLUTION_INDEX].Value == 0 || unit.Variable[EVOLUTION_INDEX].Value < unit.Variable[EVOLUTION_INDEX].Max
+		|| SyncRand(1000) == 0 // add a random element to evolution
+	) {
+		return false;
+	}
+
+	if (unit.IndividualUpgrades[CUpgrade::Get(unit.Type->Species->ChildUpgrade)->ID]) { //children can't evolve
+		return false;
+	}
+	
+	if (unit.Type->Species->CanEvolveToAUnitType()) {
+		CSpecies *evolved_species = unit.Type->Species->GetRandomEvolution();
+		
+		while (evolved_species->Type == NULL) {
+			evolved_species = evolved_species->GetRandomEvolution();
+		}
+
+		CommandTransformIntoType(unit, *evolved_species->Type);
+		
+		return true;
+	}
+	
+	return false;
+}
+
+/**
 **  PickUpItem
 **
 **  @return  true if the unit picks up an item, false otherwise
@@ -666,7 +709,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| Feed(unit) || MoveRandomly(unit) || Excrete(unit) || Breed(unit) || PickUpItem(unit)) {
+			|| Feed(unit) || MoveRandomly(unit) || Excrete(unit) || Breed(unit) || Evolve(unit) || PickUpItem(unit)) {
 			//Wyrmgus end
 		}
 	}

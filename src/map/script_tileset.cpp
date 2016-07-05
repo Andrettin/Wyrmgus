@@ -372,6 +372,8 @@ void CTileset::parse(lua_State *l)
 
 		if (!strcmp(value, "name")) {
 			this->Name = LuaToString(l, j);
+		} else if (!strcmp(value, "ident")) {
+			this->Ident = LuaToString(l, j);
 		} else if (!strcmp(value, "image")) {
 			this->ImageFile = LuaToString(l, j);
 		} else if (!strcmp(value, "size")) {

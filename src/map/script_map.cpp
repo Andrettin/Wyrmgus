@@ -521,6 +521,22 @@ static int CclSetTileFlags(lua_State *l)
 	return 0;
 }
 
+//Wyrmgus start
+/**
+**  Get the ident of the current tileset.
+**
+**  @param l  Lua state.
+**
+**  @return   The name of the terrain of the tile.
+*/
+static int CclGetCurrentTileset(lua_State *l)
+{
+	const CTileset &tileset = *Map.Tileset;
+	lua_pushstring(l, tileset.Ident.c_str());
+	return 1;
+}
+//Wyrmgus end
+
 /**
 **  Get the name of the terrain of the tile.
 **
@@ -669,6 +685,9 @@ void MapCclRegister()
 	lua_register(Lua, "SetTileFlags", CclSetTileFlags);
 	lua_register(Lua, "BuildTilesetTables", CclBuildTilesetTables);
 
+	//Wyrmgus start
+	lua_register(Lua, "GetCurrentTileset", CclGetCurrentTileset);
+	//Wyrmgus end
 	lua_register(Lua, "GetTileTerrainName", CclGetTileTerrainName);
 	lua_register(Lua, "GetTileTerrainMixedName", CclGetTileTerrainMixedName);
 	lua_register(Lua, "GetTileTerrainHasFlag", CclGetTileTerrainHasFlag);

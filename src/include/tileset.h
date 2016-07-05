@@ -239,6 +239,9 @@ private:
 	int findTilePath(int base, int goal, int length, std::vector<char> &marks, int *tileIndex) const;
 public:
 	std::string Name;           /// Nice name to display
+	//Wyrmgus start
+	std::string Ident;			/// Ident of the tileset
+	//Wyrmgus end
 	std::string ImageFile;      /// File containing image data
 
 public:
