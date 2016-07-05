@@ -7245,7 +7245,7 @@ void InitializeGrandStrategyGame(bool show_loading)
 	
 	//initialize literary works
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (AllUpgrades[i]->Work == -1) {
+		if (AllUpgrades[i]->Work == -1 || AllUpgrades[i]->UniqueOnly) { // literary works that can only appear in unique items wouldn't be publishable
 			continue;
 		}
 		
