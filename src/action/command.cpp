@@ -903,13 +903,24 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 		}
 		return;
 	}
+
+	if (type.Stats[unit.Player->Index].Costs[TimeCost] == 0) { //if the time cost to train is 0, train this unit before any currently trained ones
+		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTrain) {
+			return;
+		}
+		Assert(unit.CriticalOrder == NULL);
+		
+		unit.CriticalOrder = COrder::NewActionTrain(unit, type, player);
+		return;
+	}
 	//Wyrmgus end
+
 	// Not already training?
 	if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
 		DebugPrint("Unit queue disabled!\n");
 		return;
 	}
-
+	
 	const int noFlushCommands = 0;
 	COrderPtr *order = GetNextOrder(unit, noFlushCommands);
 

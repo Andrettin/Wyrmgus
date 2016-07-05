@@ -220,11 +220,22 @@ static void AnimateActionTrain(CUnit &unit)
 
 /* virtual */ void COrder_Train::Execute(CUnit &unit)
 {
+	//Wyrmgus start
+	/*
 	AnimateActionTrain(unit);
 	if (unit.Wait) {
 		unit.Wait--;
 		return ;
 	}
+	*/
+	if (unit.CriticalOrder != this) {
+		AnimateActionTrain(unit);
+		if (unit.Wait) {
+			unit.Wait--;
+			return ;
+		}
+	}
+	//Wyrmgus end
 	//Wyrmgus start
 //	CPlayer &player = *unit.Player;
 	CPlayer &player = *(&Players[this->Player]);
