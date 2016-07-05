@@ -685,7 +685,8 @@ class CSpecies
 {
 public:
 	CSpecies() :
-		Sapient(false)
+		Sapient(false),
+		Family(NULL)
 	{
 	}
 	
