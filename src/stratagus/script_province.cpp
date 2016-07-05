@@ -167,6 +167,12 @@ static int CclDefineWorld(lua_State *l)
 			world->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
 			world->Quote = LuaToString(l, -1);
+		} else if (!strcmp(value, "BaseTerrain")) {
+			int base_terrain_id = GetWorldMapTerrainTypeId(LuaToString(l, -1));
+			if (base_terrain_id == -1) {
+				LuaError(l, "Terrain doesn't exist.");
+			}
+			world->BaseTerrain = WorldMapTerrainTypes[base_terrain_id];
 		} else if (!strcmp(value, "Plane")) {
 			CPlane *plane = GetPlane(LuaToString(l, -1));
 			if (!plane) {
@@ -1161,6 +1167,13 @@ static int CclGetWorldData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
 		lua_pushstring(l, world->Quote.c_str());
+		return 1;
+	} else if (!strcmp(data, "BaseTerrain")) {
+		if (world->BaseTerrain) {
+			lua_pushstring(l, world->BaseTerrain->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Plane")) {
 		if (world->Plane) {

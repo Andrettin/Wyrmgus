@@ -101,7 +101,7 @@ class CWorld
 {
 public:
 	CWorld() :
-		ID(-1), Plane(NULL)
+		ID(-1), BaseTerrain(NULL), Plane(NULL)
 	{
 	}
 	
@@ -110,6 +110,7 @@ public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	WorldMapTerrainType *BaseTerrain;									/// Base terrain for the world
 	CPlane *Plane;
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CRiver *> Rivers;										/// Rivers in this world
