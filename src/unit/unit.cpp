@@ -683,7 +683,7 @@ void CUnit::Retrain()
 {
 	//lose all abilities (the AbilityLost function also returns the level-ups to the unit)
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (this->IndividualUpgrades[AllUpgrades[i]->ID] && AllUpgrades[i]->Ability) {
+		if (this->IndividualUpgrades[AllUpgrades[i]->ID] && AllUpgrades[i]->Ability && std::find(this->Type->StartingAbilities.begin(), this->Type->StartingAbilities.end(), AllUpgrades[i]) == this->Type->StartingAbilities.end()) {
 			AbilityLost(*this, AllUpgrades[i]);
 		}
 	}
