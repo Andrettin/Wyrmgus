@@ -2195,7 +2195,7 @@ static int CclDefineLanguage(lua_State *l)
 				std::string translation_from = LuaToString(l, -1, k + 1); //name to be translated
 				++k;
 				std::string translation_to = LuaToString(l, -1, k + 1); //name translation
-				language->AddNameTranslation(translation_from, translation_to);
+				language->NameTranslations[TransliterateText(translation_from)].push_back(TransliterateText(translation_to));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

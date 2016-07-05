@@ -168,10 +168,10 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"damage-type\", %d,", unit.DamagedType);
 	file.printf("\"attacked\", %lu,\n ", unit.Attacked);
 	//Wyrmgus start
-	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
 	if (unit.Trait != NULL) {
 		file.printf("\"trait\", \"%s\", ", unit.Trait->Ident.c_str());
 	}
+	file.printf("\"personal-name\", \"%s\", ", unit.Name.c_str());
 	if (unit.Prefix != NULL) {
 		file.printf("\"prefix\", \"%s\", ", unit.Prefix->Ident.c_str());
 	}

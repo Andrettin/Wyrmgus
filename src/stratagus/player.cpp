@@ -3528,9 +3528,7 @@ void GenerateMissingLanguageData()
 
 		for (size_t j = 0; j < PlayerRaces.Languages[i]->LanguageWords.size(); ++j) {
 			LanguageWord *word = PlayerRaces.Languages[i]->LanguageWords[j];
-			if (word->DerivesFrom != NULL || word->DerivesTo.size() > 0) {
-				related_words[word].push_back(word);
-			}
+			related_words[word].push_back(word);
 		}
 			
 		ShowLoadProgress("Deriving name generation patterns from related words for the %s language", PlayerRaces.Languages[i]->Name.c_str());
@@ -3540,19 +3538,37 @@ void GenerateMissingLanguageData()
 
 			// fill the vector with all the related words for the current relationship depth level
 			for (size_t n = 0; n < related_words[word].size(); ++n) {
-				if (word != related_words[word][n]) { // add name translations for related words (this will be done in order of relationship, so more distantly related words will be less likely to be used for name translations
-					PlayerRaces.Languages[i]->AddNameTranslation(related_words[word][n]->Word, word->Word);
+				// add name translations for related words (this will be done in order of relationship, so more distantly related words will be less likely to be used for name translations
+				PlayerRaces.Languages[i]->AddNameTranslation(related_words[word][n]->Word, word->Word);
 						
-					// see if there is any inflected form of the word, and if so, add it to the name translations as well
-					if (related_words[word][n]->Type == WordTypeNoun) {
-						for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
-							for (int p = 0; p < MaxGrammaticalCases; ++p) {
-								for (int q = 0; q < MaxWordJunctionTypes; ++q) {
-									if (related_words[word][n]->GetNounInflection(o, p, q) != related_words[word][n]->Word) {
-										std::string translation_from = related_words[word][n]->GetNounInflection(o, p, q);
+				// see if there is any inflected form of the word, and if so, add it to the name translations as well
+				if (related_words[word][n]->Type == WordTypeNoun) {
+					for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
+						for (int p = 0; p < MaxGrammaticalCases; ++p) {
+							for (int q = 0; q < MaxWordJunctionTypes; ++q) {
+								if (related_words[word][n]->GetNounInflection(o, p, q) != related_words[word][n]->Word) {
+									std::string translation_from = related_words[word][n]->GetNounInflection(o, p, q);
+									std::string translation_to;
+									if (word->Type == related_words[word][n]->Type) {
+										translation_to = word->GetNounInflection(o, p, q);
+									} else {
+										translation_to = word->Word;
+									}
+									PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
+								}
+							}
+						}
+					}
+				} else if (related_words[word][n]->Type == WordTypeVerb) {
+					for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
+						for (int p = 0; p < MaxGrammaticalPersons; ++p) {
+							for (int q = 0; q < MaxGrammaticalTenses; ++q) {
+								for (int r = 0; r < MaxGrammaticalMoods; ++r) {
+									if (related_words[word][n]->GetVerbInflection(o, p, q, r) != related_words[word][n]->Word) {
+										std::string translation_from = related_words[word][n]->GetVerbInflection(o, p, q, r);
 										std::string translation_to;
 										if (word->Type == related_words[word][n]->Type) {
-											translation_to = word->GetNounInflection(o, p, q);
+											translation_to = word->GetVerbInflection(o, p, q, r);
 										} else {
 											translation_to = word->Word;
 										}
@@ -3561,54 +3577,35 @@ void GenerateMissingLanguageData()
 								}
 							}
 						}
-					} else if (related_words[word][n]->Type == WordTypeVerb) {
-						for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
-							for (int p = 0; p < MaxGrammaticalPersons; ++p) {
-								for (int q = 0; q < MaxGrammaticalTenses; ++q) {
-									for (int r = 0; r < MaxGrammaticalMoods; ++r) {
-										if (related_words[word][n]->GetVerbInflection(o, p, q, r) != related_words[word][n]->Word) {
-											std::string translation_from = related_words[word][n]->GetVerbInflection(o, p, q, r);
+					}
+						
+					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
+						if (related_words[word][n]->GetParticiple(o) != related_words[word][n]->Word) {
+							std::string translation_from = related_words[word][n]->GetParticiple(o);
+							std::string translation_to;
+							if (word->Type == related_words[word][n]->Type) {
+								translation_to = word->GetParticiple(o);
+							} else {
+								translation_to = word->Word;
+							}
+							PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
+						}
+					}
+				} else if (related_words[word][n]->Type == WordTypeAdjective) {
+					for (int o = 0; o < MaxComparisonDegrees; ++o) {
+						for (int p = 0; p < MaxArticleTypes; ++p) {
+							for (int q = 0; q < MaxGrammaticalCases; ++q) {
+								for (int r = 0; r < MaxGrammaticalNumbers; ++r) {
+									for (int s = 0; s < MaxGrammaticalGenders; ++s) {
+										if (related_words[word][n]->GetAdjectiveInflection(o, p, q, r, s) != related_words[word][n]->Word) {
+											std::string translation_from = related_words[word][n]->GetAdjectiveInflection(o, p, q, r, s);
 											std::string translation_to;
 											if (word->Type == related_words[word][n]->Type) {
-												translation_to = word->GetVerbInflection(o, p, q, r);
+												translation_to = word->GetAdjectiveInflection(o, p, q, r, s);
 											} else {
 												translation_to = word->Word;
 											}
 											PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
-										}
-									}
-								}
-							}
-						}
-						
-						for (int o = 0; o < MaxGrammaticalTenses; ++o) {
-							if (related_words[word][n]->GetParticiple(o) != related_words[word][n]->Word) {
-								std::string translation_from = related_words[word][n]->GetParticiple(o);
-								std::string translation_to;
-								if (word->Type == related_words[word][n]->Type) {
-									translation_to = word->GetParticiple(o);
-								} else {
-									translation_to = word->Word;
-								}
-								PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
-							}
-						}
-					} else if (related_words[word][n]->Type == WordTypeAdjective) {
-						for (int o = 0; o < MaxComparisonDegrees; ++o) {
-							for (int p = 0; p < MaxArticleTypes; ++p) {
-								for (int q = 0; q < MaxGrammaticalCases; ++q) {
-									for (int r = 0; r < MaxGrammaticalNumbers; ++r) {
-										for (int s = 0; s < MaxGrammaticalGenders; ++s) {
-											if (related_words[word][n]->GetAdjectiveInflection(o, p, q, r, s) != related_words[word][n]->Word) {
-												std::string translation_from = related_words[word][n]->GetAdjectiveInflection(o, p, q, r, s);
-												std::string translation_to;
-												if (word->Type == related_words[word][n]->Type) {
-													translation_to = word->GetAdjectiveInflection(o, p, q, r, s);
-												} else {
-													translation_to = word->Word;
-												}
-												PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
-											}
 										}
 									}
 								}
@@ -3770,11 +3767,11 @@ void CreateLanguageCache()
 		fprintf(fd, "\tNameTranslations = {");
 		for (std::map<std::string, std::vector<std::string>>::iterator iterator = language->NameTranslations.begin(); iterator != language->NameTranslations.end(); ++iterator) {
 			for (size_t j = 0; j < iterator->second.size(); ++j) {
-				fprintf(fd, "\"%s\", ", iterator->first.c_str());
+				fprintf(fd, "\n\t\t\"%s\", ", iterator->first.c_str());
 				fprintf(fd, "\"%s\", ", iterator->second[j].c_str());
 			}
 		}
-		fprintf(fd, "},\n");
+		fprintf(fd, "\n\t},\n");
 
 		
 		fprintf(fd, "})\n\n");
@@ -3900,7 +3897,7 @@ void CreateLanguageCache()
 					}
 				}
 			}
-			fprintf(fd, "},\n");
+			fprintf(fd, "\n\t},\n");
 			fprintf(fd, "\tAffixNameTypes = {");
 			for (int k = 0; k < MaxWordJunctionTypes; ++k) {
 				for (int n = 0; n < MaxAffixTypes; ++n) {
@@ -3922,7 +3919,7 @@ void CreateLanguageCache()
 					}
 				}
 			}
-			fprintf(fd, "}\n");
+			fprintf(fd, "\n\t}\n");
 			fprintf(fd, "})\n\n");
 		}
 	}
