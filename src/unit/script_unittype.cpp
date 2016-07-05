@@ -52,6 +52,7 @@
 //Wyrmgus end
 #include "player.h"
 //Wyrmgus start
+#include "province.h"
 #include "quest.h" //for updating levels
 //Wyrmgus end
 #include "script.h"
@@ -3709,6 +3710,20 @@ static int CclDefineSpecies(lua_State *l)
 			species->Species = LuaToString(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			species->ChildUpgrade = LuaToString(l, -1);
+		} else if (!strcmp(value, "Homeworld")) {
+			std::string world_ident = LuaToString(l, -1);
+			CWorld *world = GetWorld(world_ident);
+			if (world) {
+				species->Homeworld = world;
+			} else {
+				LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
+			}
+		} else if (!strcmp(value, "Environments")) {
+			species->Environments.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				species->Environments.push_back(LuaToString(l, -1, j + 1));
+			}
 		} else if (!strcmp(value, "EvolvesFrom")) {
 			species->EvolvesFrom.clear();
 			const int args = lua_rawlen(l, -1);
@@ -3774,6 +3789,21 @@ static int CclGetSpeciesData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, species->ChildUpgrade.c_str());
+		return 1;
+	} else if (!strcmp(data, "Homeworld")) {
+		if (species->Homeworld != NULL) {
+			lua_pushstring(l, species->Homeworld->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Environments")) {
+		lua_createtable(l, species->Environments.size(), 0);
+		for (size_t i = 1; i <= species->Environments.size(); ++i)
+		{
+			lua_pushstring(l, species->Environments[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
 		return 1;
 	} else if (!strcmp(data, "EvolvesFrom")) {
 		lua_createtable(l, species->EvolvesFrom.size(), 0);
