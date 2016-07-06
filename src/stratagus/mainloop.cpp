@@ -705,22 +705,24 @@ void GameMainLoop()
 	MultiPlayerReplayEachCycle();
 	
 	//Wyrmgus start
-	//if the person player has no faction, bring up the faction choice interface
-	if (!GrandStrategy && ThisPlayer && ThisPlayer->Faction == -1) {
-		char buf[256];
-		snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", ThisPlayer->Race != -1 ? PlayerRaces.Name[ThisPlayer->Race].c_str() : "", "");
-		CclCommand(buf);
-	}
-	
-	if (!IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL) {
-		Vec2i resPos;
-		FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW);
-		CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer);
-		custom_hero->SetCharacter(CurrentCustomHero->GetFullName(), true);	
-	}
-	
-	if (CurrentQuest != NULL && CurrentQuest->IntroductionDialogue != NULL) {
-		CurrentQuest->IntroductionDialogue->Call(ThisPlayer->Index);
+	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
+		//if the person player has no faction, bring up the faction choice interface
+		if (!GrandStrategy && ThisPlayer && ThisPlayer->Faction == -1) {
+			char buf[256];
+			snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", ThisPlayer->Race != -1 ? PlayerRaces.Name[ThisPlayer->Race].c_str() : "", "");
+			CclCommand(buf);
+		}
+		
+		if (!IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL) {
+			Vec2i resPos;
+			FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW);
+			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer);
+			custom_hero->SetCharacter(CurrentCustomHero->GetFullName(), true);	
+		}
+		
+		if (CurrentQuest != NULL && CurrentQuest->IntroductionDialogue != NULL) {
+			CurrentQuest->IntroductionDialogue->Call(ThisPlayer->Index);
+		}
 	}
 	//Wyrmgus end
 
