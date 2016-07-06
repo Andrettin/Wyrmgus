@@ -5422,9 +5422,13 @@ int CanTransport(const CUnit &transporter, const CUnit &unit)
 	if (&transporter == &unit) { // Cannot transporter itself.
 		return 0;
 	}
+	//Wyrmgus start
+	/*
 	if (transporter.BoardCount >= transporter.Type->MaxOnBoard) { // full
 		return 0;
 	}
+	*/
+	//Wyrmgus end
 
 	if (transporter.BoardCount + unit.Type->BoardSize > transporter.Type->MaxOnBoard) { // too big unit
 		return 0;

@@ -10,7 +10,7 @@
 //
 /**@name action_still.cpp - The stand still action. */
 //
-//      (c) Copyright 1998-2015 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2016 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -263,7 +263,7 @@ static bool Feed(CUnit &unit)
 	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value //only for fauna
 		|| unit.Variable[HUNGER_INDEX].Value < 250 //don't feed if not hungry enough
-		) {
+	) {
 		return false;
 	}
 
@@ -361,7 +361,7 @@ static bool Breed(CUnit &unit)
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
 		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
 		|| unit.Variable[HUNGER_INDEX].Value > 500 //only breed if not hungry
-		|| ((SyncRand() % 200) >= 1)) {
+	) {
 		return false;
 	}
 
@@ -370,25 +370,35 @@ static bool Breed(CUnit &unit)
 	}
 	
 	if (unit.Variable[GENDER_INDEX].Value == MaleGender || unit.Variable[GENDER_INDEX].Value == FemaleGender) { //if is male or female, check if has a potential mate nearby
-		// look for an adjacent unit of the same type
 		std::vector<CUnit *> table;
-		SelectAroundUnit(unit, 1, table, HasSamePlayerAndTypeAs(unit));
+		SelectAroundUnit(unit, unit.CurrentSightRange, table, HasSamePlayerAndTypeAs(unit));
 
 		for (size_t i = 0; i != table.size(); ++i) {
-			if (table[i]->Variable[GENDER_INDEX].Value != unit.Variable[GENDER_INDEX].Value) {
-				CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
-				DropOutOnSide(*newUnit, LookingW, &unit);
-				newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
-				newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
-				newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
-				newUnit->Variable[HUNGER_INDEX].Value = 500; //children start off with 50% hunger
-				IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->Species->ChildUpgrade));
-				unit.Variable[HUNGER_INDEX].Value += 100;
-				table[i]->Variable[HUNGER_INDEX].Value += 100;
-				return true;
+			if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
+				if (table[i]->Variable[GENDER_INDEX].Value != unit.Variable[GENDER_INDEX].Value) {
+					int distance = unit.MapDistanceTo(table[i]->tilePos);
+					int reach = 1;
+					if (table[i]->Type->BoolFlag[DIMINUTIVE_INDEX].value || unit.Type->BoolFlag[DIMINUTIVE_INDEX].value) {
+						reach = 0;
+					}
+					if (reach < distance) { // if isn't adjacent to the potential mate, move next to them
+						CommandMove(unit, table[i]->tilePos, FlushCommands);
+					} else {
+						CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
+						DropOutOnSide(*newUnit, LookingW, &unit);
+						newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
+						newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
+						newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
+						newUnit->Variable[HUNGER_INDEX].Value = 500; //children start off with 50% hunger
+						IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->Species->ChildUpgrade));
+						unit.Variable[HUNGER_INDEX].Value += 100;
+						table[i]->Variable[HUNGER_INDEX].Value += 100;
+					}
+					return true;
+				}
 			}
 		}
-	} else if (unit.Variable[GENDER_INDEX].Value == AsexualGender && (SyncRand() % 5) < 1) { //if is asexual (like slimes), reproduce endogenously (with a lower chance than normal reproduction
+	} else if (unit.Variable[GENDER_INDEX].Value == AsexualGender && SyncRand(1000) == 0) { //if is asexual (like slimes), reproduce endogenously (with a lower chance than normal reproduction
 		CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
 		DropOutOnSide(*newUnit, LookingW, &unit);
 		newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
@@ -399,6 +409,68 @@ static bool Breed(CUnit &unit)
 		unit.Variable[HUNGER_INDEX].Value += 100;
 		return true;
 	}
+	return false;
+}
+
+/**
+**  Seek shelter at night or 
+**
+**  @return  true if the unit is now sheltered (or if exited a shelter), false otherwise
+*/
+static bool SeekShelter(CUnit &unit)
+{
+	if (
+		!unit.Type->BoolFlag[ORGANIC_INDEX].value
+		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
+	) {
+		return false;
+	}
+	
+	bool seek_shelter = true;
+	
+	if (unit.Variable[HUNGER_INDEX].Value > 500) { // don't seek shelter if hungry
+		seek_shelter = false;
+	}
+	if (unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value > 0 || unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value < 0) { // if the unit can see better at night than during the day, then it is a nocturnal creature
+		if (GameTimeOfDay != MorningTimeOfDay && GameTimeOfDay != MiddayTimeOfDay && GameTimeOfDay != AfternoonTimeOfDay) { // nocturnal creatures should seek shelter only when daylight is shining
+			seek_shelter = false;
+		}
+	} else { // for diurnal creatures, only seek shelter when the sky is dark
+		if (GameTimeOfDay != FirstWatchTimeOfDay && GameTimeOfDay != MidnightTimeOfDay && GameTimeOfDay != SecondWatchTimeOfDay) {
+			seek_shelter = false;
+		}
+	}
+	
+	if (seek_shelter == (unit.Removed)) {
+		return false; // if unit is seeking shelter it is already sheltered, or if isn't seeking shelter is already outside
+	}
+	
+	if (unit.Removed) { // if the unit is removed and should exit its shelter
+		if (unit.Container != NULL) {
+			CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands);
+			return true;
+		}
+	}
+
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, unit.CurrentSightRange, table, HasSamePlayerAs(*unit.Player));
+
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
+			if (CanTransport(*table[i], unit)) {
+				std::vector<CUnit *> second_table;
+				SelectAroundUnit(*table[i], 3, second_table, HasNotSamePlayerAs(*unit.Player));
+
+				if (second_table.size() > 0) { // don't enter the shelter if there's a person nearby
+					continue;
+				}
+				
+				CommandBoard(unit, *table[i], FlushCommands);
+				return true;
+			}
+		}
+	}
+	
 	return false;
 }
 
@@ -708,7 +780,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| Feed(unit) || MoveRandomly(unit) || Excrete(unit) || Breed(unit) || Evolve(unit) || PickUpItem(unit)) {
+			|| Feed(unit) || Excrete(unit) || Breed(unit) || SeekShelter(unit) || Evolve(unit) || MoveRandomly(unit) || PickUpItem(unit)) {
 			//Wyrmgus end
 		}
 	}
