@@ -1132,6 +1132,14 @@ static int CclGetPlaneData(lua_State *l)
 	} else if (!strcmp(data, "Quote")) {
 		lua_pushstring(l, plane->Quote.c_str());
 		return 1;
+	} else if (!strcmp(data, "Species")) {
+		lua_createtable(l, plane->Species.size(), 0);
+		for (size_t i = 1; i <= plane->Species.size(); ++i)
+		{
+			lua_pushstring(l, plane->Species[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

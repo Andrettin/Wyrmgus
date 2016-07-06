@@ -96,6 +96,7 @@ public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	std::vector<CSpecies *> Species;									/// Species in this plane
 };
 
 class CWorld

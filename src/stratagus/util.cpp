@@ -987,7 +987,15 @@ std::string FullyDecapitalizeString(std::string text)
 
 std::string GetPluralForm(std::string name)
 {
+	if (name == "Einherjar" || name == "Wose") {
+		return name; // no difference
+	}
+	
 	name = FindAndReplaceStringEnding(name, "y", "ie");
+	
+	if (name.substr(name.size() - 2, 2) == "us") {
+		name += "es";
+	}
 	
 	if (name.substr(name.size() - 1, 1) != "s") {
 		name += "s";
@@ -996,10 +1004,8 @@ std::string GetPluralForm(std::string name)
 	name = FindAndReplaceString(name, "Barracks", "Barrackses");
 	name = FindAndReplaceString(name, "Dwarfs", "Dwarves");
 	name = FindAndReplaceString(name, "Elfs", "Elves");
-	name = FindAndReplaceString(name, "Rathaus", "Rathauses");
 	name = FindAndReplaceString(name, "Thiefs", "Thieves");
 	name = FindAndReplaceString(name, "Wolfs", "Wolves");
-	name = FindAndReplaceString(name, "Woses", "Wose");
 	if (name != "Humans") {
 		name = FindAndReplaceStringEnding(name, "mans", "men");
 	}

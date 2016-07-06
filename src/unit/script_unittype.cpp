@@ -3837,6 +3837,15 @@ static int CclDefineSpecies(lua_State *l)
 			species->Species = LuaToString(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
 			species->ChildUpgrade = LuaToString(l, -1);
+		} else if (!strcmp(value, "HomePlane")) {
+			std::string plane_ident = LuaToString(l, -1);
+			CPlane *plane = GetPlane(plane_ident);
+			if (plane) {
+				species->HomePlane = plane;
+				plane->Species.push_back(species);
+			} else {
+				LuaError(l, "Plane \"%s\" doesn't exist." _C_ plane_ident.c_str());
+			}
 		} else if (!strcmp(value, "Homeworld")) {
 			std::string world_ident = LuaToString(l, -1);
 			CWorld *world = GetWorld(world_ident);
@@ -3921,6 +3930,13 @@ static int CclGetSpeciesData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, species->ChildUpgrade.c_str());
+		return 1;
+	} else if (!strcmp(data, "HomePlane")) {
+		if (species->HomePlane != NULL) {
+			lua_pushstring(l, species->HomePlane->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Homeworld")) {
 		if (species->Homeworld != NULL) {

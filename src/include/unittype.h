@@ -72,6 +72,7 @@ class MissileType;
 class CFile;
 //Wyrmgus start
 class CUniqueItem;
+class CPlane;
 class CWorld;
 //Wyrmgus end
 struct lua_State;
@@ -724,7 +725,7 @@ class CSpecies
 public:
 	CSpecies() :
 		Sapient(false), Prehistoric(false),
-		Family(NULL), Homeworld(NULL), Type(NULL)
+		Family(NULL), HomePlane(NULL), Homeworld(NULL), Type(NULL)
 	{
 	}
 	
@@ -745,6 +746,7 @@ public:
 	std::string Genus;
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
+	CPlane *HomePlane;
 	CWorld *Homeworld;
 	CUnitType *Type;
 	std::vector<std::string> Environments;	/// in which environments (tilesets) does this species live
