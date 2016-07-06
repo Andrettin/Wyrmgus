@@ -262,7 +262,7 @@ static bool Feed(CUnit &unit)
 	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value //only for fauna
 		|| unit.Variable[HUNGER_INDEX].Value < 250 //don't feed if not hungry enough
-		|| SyncRand(100) < unit.Type->RandomMovementProbability
+		|| SyncRand(100) > unit.Type->RandomMovementProbability
 	) {
 		return false;
 	}
@@ -283,6 +283,9 @@ static bool Feed(CUnit &unit)
 					reach = 0;
 				}
 				if (reach < distance) {
+					if (reach == 0 && !UnitCanBeAt(unit, table[i]->tilePos)) {
+						continue;
+					}
 					CommandMove(unit, table[i]->tilePos, FlushCommands);
 				} else {
 					if (!table[i]->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value && !unit.Type->BoolFlag[DIMINUTIVE_INDEX].value) { //if food is non-indestructible, and isn't too tiny to consume the food, kill the food object
@@ -361,7 +364,7 @@ static bool Breed(CUnit &unit)
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
 		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
 		|| unit.Variable[HUNGER_INDEX].Value > 500 //only breed if not hungry
-		|| SyncRand(100) < unit.Type->RandomMovementProbability
+		|| SyncRand(100) > unit.Type->RandomMovementProbability
 	) {
 		return false;
 	}
@@ -383,6 +386,9 @@ static bool Breed(CUnit &unit)
 						reach = 0;
 					}
 					if (reach < distance) { // if isn't adjacent to the potential mate, move next to them
+						if (reach == 0 && !UnitCanBeAt(unit, table[i]->tilePos)) {
+							continue;
+						}
 						CommandMove(unit, table[i]->tilePos, FlushCommands);
 					} else {
 						CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
@@ -423,7 +429,7 @@ static bool SeekShelter(CUnit &unit)
 	if (
 		!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
-		|| SyncRand(100) < unit.Type->RandomMovementProbability
+		|| SyncRand(100) > unit.Type->RandomMovementProbability
 	) {
 		return false;
 	}
@@ -489,7 +495,7 @@ static bool Evolve(CUnit &unit)
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
 		|| unit.Type->Species->EvolvesTo.size() == 0
 		|| unit.Variable[EVOLUTION_INDEX].Value == 0 || unit.Variable[EVOLUTION_INDEX].Value < unit.Variable[EVOLUTION_INDEX].Max
-		|| SyncRand(1000) < unit.Type->RandomMovementProbability
+		|| SyncRand(1000) > (unit.Type->RandomMovementProbability * 10)
 	) {
 		return false;
 	}
