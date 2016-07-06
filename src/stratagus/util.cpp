@@ -985,6 +985,27 @@ std::string FullyDecapitalizeString(std::string text)
 	return text;
 }
 
+std::string GetPluralForm(std::string name)
+{
+	name = FindAndReplaceStringEnding(name, "y", "ie");
+	
+	if (name.substr(name.size() - 1, 1) != "s") {
+		name += "s";
+	}
+	
+	name = FindAndReplaceString(name, "Barracks", "Barrackses");
+	name = FindAndReplaceString(name, "Dwarfs", "Dwarves");
+	name = FindAndReplaceString(name, "Elfs", "Elves");
+	name = FindAndReplaceString(name, "Rathaus", "Rathauses");
+	name = FindAndReplaceString(name, "Thiefs", "Thieves");
+	name = FindAndReplaceString(name, "Wolfs", "Wolves");
+	if (name != "Humans") {
+		name = FindAndReplaceStringEnding(name, "mans", "men");
+	}
+	
+	return name;
+}
+
 std::string IdentToName(std::string text)
 {
 	text = FindAndReplaceString(text, "-", " ");

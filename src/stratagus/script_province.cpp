@@ -1190,6 +1190,14 @@ static int CclGetWorldData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "Species")) {
+		lua_createtable(l, world->Species.size(), 0);
+		for (size_t i = 1; i <= world->Species.size(); ++i)
+		{
+			lua_pushstring(l, world->Species[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

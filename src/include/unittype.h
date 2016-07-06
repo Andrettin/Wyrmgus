@@ -723,7 +723,7 @@ class CSpecies
 {
 public:
 	CSpecies() :
-		Sapient(false),
+		Sapient(false), Prehistoric(false),
 		Family(NULL), Homeworld(NULL), Type(NULL)
 	{
 	}
@@ -733,6 +733,7 @@ public:
 	CSpecies *GetRandomEvolution();
 	
 	bool Sapient;					/// Whether the species is sapient
+	bool Prehistoric;				/// Whether the species is prehistoric or not
 	std::string Ident;				/// Ident of the species
 	std::string Name;				/// Name of the species
 	std::string Description;		/// Description of the species

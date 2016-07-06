@@ -31,6 +31,7 @@ $#include "unit_manager.h"
 $#include "unittype.h"
 //Wyrmgus start
 $#include "upgrade.h"
+$#include "util.h"
 //Wyrmgus end
 $#include "video.h"
 $#include "widgets.h"
@@ -129,6 +130,8 @@ extern std::string CliMapName;
 extern std::string StratagusLibPath;
 
 //Wyrmgus start
+extern std::string GetPluralForm(std::string name);
+
 extern std::string GetMonthNameById(int month);
 
 extern void HeroAddQuest(std::string hero_full_name, std::string quest_name);

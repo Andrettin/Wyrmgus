@@ -3817,6 +3817,8 @@ static int CclDefineSpecies(lua_State *l)
 			species->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Sapient")) {
 			species->Sapient = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Prehistoric")) {
+			species->Prehistoric = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Family")) {
 			std::string family_ident = LuaToString(l, -1);
 			CSpeciesFamily *family = GetSpeciesFamily(family_ident);
@@ -3840,6 +3842,7 @@ static int CclDefineSpecies(lua_State *l)
 			CWorld *world = GetWorld(world_ident);
 			if (world) {
 				species->Homeworld = world;
+				world->Species.push_back(species);
 			} else {
 				LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
 			}
@@ -3912,6 +3915,9 @@ static int CclGetSpeciesData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Sapient")) {
 		lua_pushboolean(l, species->Sapient);
+		return 1;
+	} else if (!strcmp(data, "Prehistoric")) {
+		lua_pushboolean(l, species->Prehistoric);
 		return 1;
 	} else if (!strcmp(data, "ChildUpgrade")) {
 		lua_pushstring(l, species->ChildUpgrade.c_str());

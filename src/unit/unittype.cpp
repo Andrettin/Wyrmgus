@@ -900,19 +900,7 @@ int CUnitType::GetDefaultHairColor(CPlayer &player) const
 
 std::string CUnitType::GetNamePlural() const
 {
-	std::string name = this->Name;
-	name = FindAndReplaceStringEnding(name, "y", "ie");
-	
-	if (name.substr(name.size() - 1, 1) != "s") {
-		name += "s";
-	}
-	
-	name = FindAndReplaceString(name, "Rathaus", "Rathauses");
-	name = FindAndReplaceString(name, "Barracks", "Barrackses");
-	name = FindAndReplaceString(name, "Thiefs", "Thieves");
-	name = FindAndReplaceStringEnding(name, "mans", "men");
-	
-	return name;
+	return GetPluralForm(this->Name);
 }
 //Wyrmgus end
 

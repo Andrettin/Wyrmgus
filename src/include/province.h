@@ -52,6 +52,7 @@ class CFaction;
 class CProvince;
 class CRiver;
 class CCharacter;
+class CSpecies;
 class WorldMapTile;
 
 /**
@@ -115,6 +116,7 @@ public:
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CRiver *> Rivers;										/// Rivers in this world
 	std::vector<WorldMapTile *> Tiles;									/// Tiles in the world
+	std::vector<CSpecies *> Species;									/// Species in this world
 };
 
 class CRegion
