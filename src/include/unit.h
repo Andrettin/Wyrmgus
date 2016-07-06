@@ -368,6 +368,7 @@ public:
 	bool CanUseItem(CUnit *item) const;
 	bool HasInventory() const;
 	bool CanLearnAbility(CUpgrade *ability) const;
+	bool CanEat(const CUnit &unit) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;

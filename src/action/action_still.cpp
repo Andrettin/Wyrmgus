@@ -274,11 +274,8 @@ static bool Feed(CUnit &unit)
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
 			if (
-				((table[i]->Type->BoolFlag[DETRITUS_INDEX].value || (table[i]->CurrentAction() == UnitActionDie && table[i]->Type->BoolFlag[FLESH_INDEX].value)) && unit.Type->BoolFlag[DETRITIVORE_INDEX].value)
-				|| (table[i]->Type->BoolFlag[FLESH_INDEX].value && (table[i]->Type->BoolFlag[ITEM_INDEX].value || table[i]->Type->BoolFlag[POWERUP_INDEX].value || table[i]->CurrentAction() == UnitActionDie) && unit.Type->BoolFlag[CARNIVORE_INDEX].value)
-				|| (table[i]->Type->BoolFlag[VEGETABLE_INDEX].value && unit.Type->BoolFlag[HERBIVORE_INDEX].value)
-				|| (table[i]->Type->BoolFlag[INSECT_INDEX].value && unit.Type->BoolFlag[INSECTIVORE_INDEX].value)
-				|| (table[i]->Type->BoolFlag[DAIRY_INDEX].value && (unit.Type->BoolFlag[HERBIVORE_INDEX].value || unit.Type->BoolFlag[CARNIVORE_INDEX].value || unit.Type->BoolFlag[DETRITIVORE_INDEX].value || unit.Type->BoolFlag[INSECTIVORE_INDEX].value) && unit.Variable[HUNGER_INDEX].Value >= 900) //animals only eat cheese when very hungry
+				unit.CanEat(*table[i])
+				&& (table[i]->Type->BoolFlag[DIMINUTIVE_INDEX].value || table[i]->Type->BoolFlag[DECORATION_INDEX].value || table[i]->Type->BoolFlag[ITEM_INDEX].value || table[i]->Type->BoolFlag[POWERUP_INDEX].value || table[i]->CurrentAction() == UnitActionDie)
 			) {
 				int distance = unit.MapDistanceTo(table[i]->tilePos);
 				int reach = 1;

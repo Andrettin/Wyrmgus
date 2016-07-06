@@ -4382,6 +4382,37 @@ bool CUnit::CanLearnAbility(CUpgrade *ability) const
 	return true;
 }
 
+bool CUnit::CanEat(const CUnit &unit) const
+{
+	if (this->Type->BoolFlag[CARNIVORE_INDEX].value && unit.Type->BoolFlag[FLESH_INDEX].value) {
+		return true;
+	}
+	
+	if (this->Type->BoolFlag[INSECTIVORE_INDEX].value && unit.Type->BoolFlag[INSECT_INDEX].value) {
+		return true;
+	}
+	
+	if (this->Type->BoolFlag[HERBIVORE_INDEX].value && unit.Type->BoolFlag[VEGETABLE_INDEX].value) {
+		return true;
+	}
+	
+	if (
+		this->Type->BoolFlag[DETRITIVORE_INDEX].value
+		&& (
+			unit.Type->BoolFlag[DETRITUS_INDEX].value
+			|| (unit.CurrentAction() == UnitActionDie && (unit.Type->BoolFlag[FLESH_INDEX].value || unit.Type->BoolFlag[INSECT_INDEX].value))
+		)
+	) {
+		return true;
+	}
+	
+	if ((this->Type->BoolFlag[CARNIVORE_INDEX].value || this->Type->BoolFlag[HERBIVORE_INDEX].value || this->Type->BoolFlag[INSECTIVORE_INDEX].value || this->Type->BoolFlag[DETRITIVORE_INDEX].value) && unit.Type->BoolFlag[DAIRY_INDEX].value && this->Variable[HUNGER_INDEX].Value >= 900) { //animals will only eat cheese when very hungry
+		return true;
+	}
+		
+	return false;
+}
+
 CAnimations *CUnit::GetAnimations() const
 {
 	VariationInfo *varinfo = Type->VarInfo[Variation];
@@ -5483,8 +5514,9 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 	) {
 		if (
 			this->Variable[HUNGER_INDEX].Value > 250
+			&& this->Type->BoolFlag[PREDATOR_INDEX].value
 			&& !unit.Type->BoolFlag[PREDATOR_INDEX].value
-			&& unit.Type->BoolFlag[FLESH_INDEX].value
+			&& this->CanEat(unit)
 		) {
 			return true;
 		} else if (
