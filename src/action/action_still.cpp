@@ -192,8 +192,7 @@ void UnHideUnit(CUnit &unit)
 */
 static bool MoveRandomly(CUnit &unit)
 {
-	if (unit.Type->RandomMovementProbability == false
-		|| ((SyncRand() % 100) > unit.Type->RandomMovementProbability)) {
+	if (!unit.Type->RandomMovementProbability || SyncRand(100) > unit.Type->RandomMovementProbability) {
 		return false;
 	}
 	// pick random location
@@ -263,6 +262,7 @@ static bool Feed(CUnit &unit)
 	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value //only for fauna
 		|| unit.Variable[HUNGER_INDEX].Value < 250 //don't feed if not hungry enough
+		|| SyncRand(100) < unit.Type->RandomMovementProbability
 	) {
 		return false;
 	}
@@ -361,6 +361,7 @@ static bool Breed(CUnit &unit)
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
 		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
 		|| unit.Variable[HUNGER_INDEX].Value > 500 //only breed if not hungry
+		|| SyncRand(100) < unit.Type->RandomMovementProbability
 	) {
 		return false;
 	}
@@ -422,6 +423,7 @@ static bool SeekShelter(CUnit &unit)
 	if (
 		!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
+		|| SyncRand(100) < unit.Type->RandomMovementProbability
 	) {
 		return false;
 	}
@@ -487,7 +489,7 @@ static bool Evolve(CUnit &unit)
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
 		|| unit.Type->Species->EvolvesTo.size() == 0
 		|| unit.Variable[EVOLUTION_INDEX].Value == 0 || unit.Variable[EVOLUTION_INDEX].Value < unit.Variable[EVOLUTION_INDEX].Max
-		|| SyncRand(1000) == 0 // add a random element to evolution
+		|| SyncRand(1000) < unit.Type->RandomMovementProbability
 	) {
 		return false;
 	}
