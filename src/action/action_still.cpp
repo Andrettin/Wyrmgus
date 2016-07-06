@@ -434,18 +434,18 @@ static bool SeekShelter(CUnit &unit)
 		return false;
 	}
 	
-	bool seek_shelter = true;
+	bool seek_shelter = false;
 	
-	if (unit.Variable[HUNGER_INDEX].Value > 500) { // don't seek shelter if hungry
-		seek_shelter = false;
+	if (unit.Variable[HUNGER_INDEX].Value < 500) { // seek shelter if not hungry
+		seek_shelter = true;
 	}
 	if (unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value > 0 || unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value < 0) { // if the unit can see better at night than during the day, then it is a nocturnal creature
-		if (GameTimeOfDay != MorningTimeOfDay && GameTimeOfDay != MiddayTimeOfDay && GameTimeOfDay != AfternoonTimeOfDay) { // nocturnal creatures should seek shelter only when daylight is shining
-			seek_shelter = false;
+		if (GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) { // nocturnal creatures should seek shelter if daylight is shining
+			seek_shelter = true;
 		}
-	} else { // for diurnal creatures, only seek shelter when the sky is dark
-		if (GameTimeOfDay != FirstWatchTimeOfDay && GameTimeOfDay != MidnightTimeOfDay && GameTimeOfDay != SecondWatchTimeOfDay) {
-			seek_shelter = false;
+	} else { // for diurnal creatures, seek shelter when the sky is dark
+		if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
+			seek_shelter = true;
 		}
 	}
 	
@@ -743,6 +743,9 @@ bool AutoAttack(CUnit &unit)
 		//Wyrmgus start
 //		&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
 		&& (unit.Container == NULL || !unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
+			if (unit.Container != NULL && unit.Type->BoolFlag[FAUNA_INDEX].value) { // if is a fauna unit and is removed, see if should leave shelter
+				SeekShelter(unit);
+			}
 		//Wyrmgus end
 		return ;
 	}
