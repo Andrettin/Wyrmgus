@@ -526,6 +526,9 @@ std::map<std::string, int> UpgradeClassStringToIndex;
 
 std::vector<CSpecies *> Species;
 std::vector<CSpeciesFamily *> SpeciesFamilies;
+std::vector<CSpeciesOrder *> SpeciesOrders;
+std::vector<CSpeciesClass *> SpeciesClasses;
+std::vector<CSpeciesPhylum *> SpeciesPhylums;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -1905,6 +1908,18 @@ void CleanUnitTypes()
 		delete SpeciesFamilies[i];
 	}
 	SpeciesFamilies.clear();
+	for (size_t i = 0; i < SpeciesOrders.size(); ++i) {
+		delete SpeciesOrders[i];
+	}
+	SpeciesOrders.clear();
+	for (size_t i = 0; i < SpeciesClasses.size(); ++i) {
+		delete SpeciesClasses[i];
+	}
+	SpeciesClasses.clear();
+	for (size_t i = 0; i < SpeciesPhylums.size(); ++i) {
+		delete SpeciesPhylums[i];
+	}
+	SpeciesPhylums.clear();
 	//Wyrmgus end
 }
 
@@ -1948,6 +1963,39 @@ CSpeciesFamily *GetSpeciesFamily(std::string family_ident)
 	for (size_t i = 0; i < SpeciesFamilies.size(); ++i) {
 		if (family_ident == SpeciesFamilies[i]->Ident) {
 			return SpeciesFamilies[i];
+		}
+	}
+	
+	return NULL;
+}
+
+CSpeciesOrder *GetSpeciesOrder(std::string order_ident)
+{
+	for (size_t i = 0; i < SpeciesOrders.size(); ++i) {
+		if (order_ident == SpeciesOrders[i]->Ident) {
+			return SpeciesOrders[i];
+		}
+	}
+	
+	return NULL;
+}
+
+CSpeciesClass *GetSpeciesClass(std::string class_ident)
+{
+	for (size_t i = 0; i < SpeciesClasses.size(); ++i) {
+		if (class_ident == SpeciesClasses[i]->Ident) {
+			return SpeciesClasses[i];
+		}
+	}
+	
+	return NULL;
+}
+
+CSpeciesPhylum *GetSpeciesPhylum(std::string phylum_ident)
+{
+	for (size_t i = 0; i < SpeciesPhylums.size(); ++i) {
+		if (phylum_ident == SpeciesPhylums[i]->Ident) {
+			return SpeciesPhylums[i];
 		}
 	}
 	
@@ -2009,11 +2057,20 @@ int CSpecies::GetRandomNameLanguage(int gender)
 			}
 		}
 		
-		if (potential_languages.size() == 0 && !this->Family->Order.empty()) { // if no language that can generate a name for this species was found, try to see if any can generate for its order instead
+		if (potential_languages.size() == 0 && this->Family->Order != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its order instead
 			for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-				int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Family->Order + gender_string);
+				int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Family->Order->Ident + gender_string);
 				for (int j = 0; j < potential_name_quantity; ++j) {
 					potential_languages.push_back(i);
+				}
+			}
+		
+			if (potential_languages.size() == 0 && this->Family->Order->Class != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its class instead
+				for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+					int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-class-" + this->Family->Order->Class->Ident + gender_string);
+					for (int j = 0; j < potential_name_quantity; ++j) {
+						potential_languages.push_back(i);
+					}
 				}
 			}
 		}

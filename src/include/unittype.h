@@ -657,27 +657,63 @@ public:
 };
 
 //Wyrmgus start
+class CSpeciesPhylum
+{
+public:
+	CSpeciesPhylum() :
+		Ident("")
+	{
+	}
+	
+	std::string Ident;				/// Ident of the species phylum
+	std::string Name;				/// Name of the species phylum
+	std::string Kingdom;
+	std::string Subkingdom;
+	std::string Infrakingdom;
+};	
+
+class CSpeciesClass
+{
+public:
+	CSpeciesClass() :
+		Phylum(NULL)
+	{
+	}
+	
+	std::string Ident;				/// Ident of the species class
+	std::string Name;				/// Name of the species class
+	CSpeciesPhylum *Phylum;
+	std::string Subphylum;
+	std::string Infraphylum;
+	std::string Superclass;
+};	
+
+class CSpeciesOrder
+{
+public:
+	CSpeciesOrder() :
+		Class(NULL)
+	{
+	}
+	
+	std::string Ident;				/// Ident of the species order
+	std::string Name;				/// Name of the species order
+	CSpeciesClass *Class;
+	std::string Subclass;
+	std::string Infraclass;
+};	
+
 class CSpeciesFamily
 {
 public:
 	CSpeciesFamily() :
-		Ident("")
+		Order(NULL)
 	{
 	}
 	
 	std::string Ident;				/// Ident of the species family
 	std::string Name;				/// Name of the species family
-	std::string Kingdom;
-	std::string Subkingdom;
-	std::string Infrakingdom;
-	std::string Phylum;
-	std::string Subphylum;
-	std::string Infraphylum;
-	std::string Superclass;
-	std::string Class;
-	std::string Subclass;
-	std::string Infraclass;
-	std::string Order;
+	CSpeciesOrder *Order;
 	std::string Suborder;
 	std::string Infraorder;
 	std::string Superfamily;
@@ -1110,6 +1146,9 @@ extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built
 
 extern std::vector<CSpecies *> Species;
 extern std::vector<CSpeciesFamily *> SpeciesFamilies;
+extern std::vector<CSpeciesOrder *> SpeciesOrders;
+extern std::vector<CSpeciesClass *> SpeciesClasses;
+extern std::vector<CSpeciesPhylum *> SpeciesPhylums;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -1129,6 +1168,9 @@ extern void SetUpgradeClassStringToIndex(std::string class_name, int class_id);
 
 extern CSpecies *GetSpecies(std::string species_ident);
 extern CSpeciesFamily *GetSpeciesFamily(std::string family_ident);
+extern CSpeciesOrder *GetSpeciesOrder(std::string order_ident);
+extern CSpeciesClass *GetSpeciesClass(std::string class_ident);
+extern CSpeciesPhylum *GetSpeciesPhylum(std::string phylum_ident);
 //Wyrmgus end
 
 extern void SaveUnitTypes(CFile &file);              /// Save the unit-type table

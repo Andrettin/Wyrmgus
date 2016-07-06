@@ -3602,6 +3602,140 @@ void UpdateUnitVariables(CUnit &unit)
 
 //Wyrmgus start
 /**
+**  Define a species phylum.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineSpeciesPhylum(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string phylum_ident = LuaToString(l, 1);
+	CSpeciesPhylum *phylum = GetSpeciesPhylum(phylum_ident);
+	if (!phylum) {
+		phylum = new CSpeciesPhylum;
+		SpeciesPhylums.push_back(phylum);
+		phylum->Ident = phylum_ident;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			phylum->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Kingdom")) {
+			phylum->Kingdom = LuaToString(l, -1);
+		} else if (!strcmp(value, "Subkingdom")) {
+			phylum->Subkingdom = LuaToString(l, -1);
+		} else if (!strcmp(value, "Infrakingdom")) {
+			phylum->Infrakingdom = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
+**  Define a species class.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineSpeciesClass(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string class_ident = LuaToString(l, 1);
+	CSpeciesClass *species_class = GetSpeciesClass(class_ident);
+	if (!species_class) {
+		species_class = new CSpeciesClass;
+		SpeciesClasses.push_back(species_class);
+		species_class->Ident = class_ident;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			species_class->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Phylum")) {
+			std::string phylum_ident = LuaToString(l, -1);
+			CSpeciesPhylum *phylum = GetSpeciesPhylum(phylum_ident);
+			if (phylum) {
+				species_class->Phylum = phylum;
+			} else {
+				LuaError(l, "Species phylum \"%s\" doesn't exist." _C_ phylum_ident.c_str());
+			}
+		} else if (!strcmp(value, "Subphylum")) {
+			species_class->Subphylum = LuaToString(l, -1);
+		} else if (!strcmp(value, "Infraphylum")) {
+			species_class->Infraphylum = LuaToString(l, -1);
+		} else if (!strcmp(value, "Superclass")) {
+			species_class->Superclass = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
+**  Define a species order.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineSpeciesOrder(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string order_ident = LuaToString(l, 1);
+	CSpeciesOrder *order = GetSpeciesOrder(order_ident);
+	if (!order) {
+		order = new CSpeciesOrder;
+		SpeciesOrders.push_back(order);
+		order->Ident = order_ident;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			order->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Class")) {
+			std::string class_ident = LuaToString(l, -1);
+			CSpeciesClass *species_class = GetSpeciesClass(class_ident);
+			if (species_class) {
+				order->Class = species_class;
+			} else {
+				LuaError(l, "Species class \"%s\" doesn't exist." _C_ class_ident.c_str());
+			}
+		} else if (!strcmp(value, "Subclass")) {
+			order->Subclass = LuaToString(l, -1);
+		} else if (!strcmp(value, "Infraclass")) {
+			order->Infraclass = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a species family.
 **
 **  @param l  Lua state.
@@ -3627,28 +3761,14 @@ static int CclDefineSpeciesFamily(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			family->Name = LuaToString(l, -1);
-		} else if (!strcmp(value, "Kingdom")) {
-			family->Kingdom = LuaToString(l, -1);
-		} else if (!strcmp(value, "Subkingdom")) {
-			family->Subkingdom = LuaToString(l, -1);
-		} else if (!strcmp(value, "Infrakingdom")) {
-			family->Infrakingdom = LuaToString(l, -1);
-		} else if (!strcmp(value, "Phylum")) {
-			family->Phylum = LuaToString(l, -1);
-		} else if (!strcmp(value, "Subphylum")) {
-			family->Subphylum = LuaToString(l, -1);
-		} else if (!strcmp(value, "Infraphylum")) {
-			family->Infraphylum = LuaToString(l, -1);
-		} else if (!strcmp(value, "Superclass")) {
-			family->Superclass = LuaToString(l, -1);
-		} else if (!strcmp(value, "Class")) {
-			family->Class = LuaToString(l, -1);
-		} else if (!strcmp(value, "Subclass")) {
-			family->Subclass = LuaToString(l, -1);
-		} else if (!strcmp(value, "Infraclass")) {
-			family->Infraclass = LuaToString(l, -1);
 		} else if (!strcmp(value, "Order")) {
-			family->Order = LuaToString(l, -1);
+			std::string order_ident = LuaToString(l, -1);
+			CSpeciesOrder *order = GetSpeciesOrder(order_ident);
+			if (order) {
+				family->Order = order;
+			} else {
+				LuaError(l, "Species order \"%s\" doesn't exist." _C_ order_ident.c_str());
+			}
 		} else if (!strcmp(value, "Suborder")) {
 			family->Suborder = LuaToString(l, -1);
 		} else if (!strcmp(value, "Infraorder")) {
@@ -4174,6 +4294,9 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "SetUnitTypeName", CclSetUnitTypeName);
 	lua_register(Lua, "GetUnitTypeData", CclGetUnitTypeData);
 	//Wyrmgus start
+	lua_register(Lua, "DefineSpeciesPhylum", CclDefineSpeciesPhylum);
+	lua_register(Lua, "DefineSpeciesClass", CclDefineSpeciesClass);
+	lua_register(Lua, "DefineSpeciesOrder", CclDefineSpeciesOrder);
 	lua_register(Lua, "DefineSpeciesFamily", CclDefineSpeciesFamily);
 	lua_register(Lua, "DefineSpecies", CclDefineSpecies);
 	lua_register(Lua, "GetSpecies", CclGetSpecies);

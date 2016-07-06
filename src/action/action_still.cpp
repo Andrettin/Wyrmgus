@@ -436,6 +436,8 @@ static bool Evolve(CUnit &unit)
 
 		CommandTransformIntoType(unit, *evolved_species->Type);
 		
+		unit.Variable[EVOLUTION_INDEX].Value = 0;
+		
 		return true;
 	}
 	
