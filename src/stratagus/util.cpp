@@ -999,6 +999,7 @@ std::string GetPluralForm(std::string name)
 	name = FindAndReplaceString(name, "Rathaus", "Rathauses");
 	name = FindAndReplaceString(name, "Thiefs", "Thieves");
 	name = FindAndReplaceString(name, "Wolfs", "Wolves");
+	name = FindAndReplaceString(name, "Woses", "Wose");
 	if (name != "Humans") {
 		name = FindAndReplaceStringEnding(name, "mans", "men");
 	}
