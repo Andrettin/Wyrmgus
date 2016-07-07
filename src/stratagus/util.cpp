@@ -991,7 +991,9 @@ std::string GetPluralForm(std::string name)
 		return name; // no difference
 	}
 	
-	name = FindAndReplaceStringEnding(name, "y", "ie");
+	if (name != "Monkey") {
+		name = FindAndReplaceStringEnding(name, "y", "ie");
+	}
 	
 	if (name.substr(name.size() - 2, 2) == "us") {
 		name += "es";

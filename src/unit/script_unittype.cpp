@@ -3815,6 +3815,14 @@ static int CclDefineSpecies(lua_State *l)
 			species->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
 			species->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "Era")) {
+			std::string era_ident = LuaToString(l, -1);
+			int era_id = GetEraIdByName(era_ident);
+			if (era_id != -1) {
+				species->Era = era_id;
+			} else {
+				LuaError(l, "Era \"%s\" doesn't exist." _C_ era_ident.c_str());
+			}
 		} else if (!strcmp(value, "Sapient")) {
 			species->Sapient = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Prehistoric")) {
@@ -3879,6 +3887,12 @@ static int CclDefineSpecies(lua_State *l)
 		}
 	}
 	
+	for (size_t i = 0; i < species->EvolvesFrom.size(); ++i) {
+		if (species->Era != -1 && species->EvolvesFrom[i]->Era != -1 && species->Era <= species->EvolvesFrom[i]->Era) {
+			LuaError(l, "Species \"%s\" is set to evolve from \"%s\", but is from the same or an earlier era than the latter." _C_ species->Ident.c_str() _C_ species->EvolvesFrom[i]->Ident.c_str());
+		}
+	}
+	
 	return 0;
 }
 
@@ -3921,6 +3935,9 @@ static int CclGetSpeciesData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, species->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "Era")) {
+		lua_pushnumber(l, species->Era);
 		return 1;
 	} else if (!strcmp(data, "Sapient")) {
 		lua_pushboolean(l, species->Sapient);

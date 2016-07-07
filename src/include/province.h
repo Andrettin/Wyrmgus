@@ -56,6 +56,26 @@ class CSpecies;
 class WorldMapTile;
 
 /**
+**  Indexes into era array.
+*/
+enum Eras {
+	EraCarboniferous,
+	EraPermian,
+	EraTriassic,
+	EraJurassic,
+	EraCretaceous,
+	EraPaleocene,
+	EraEocene,
+	EraOligocene,
+	EraMiocene,
+	EraPliocene,
+	EraPleistocene,
+	EraHolocene,
+	
+	MaxEras
+};
+
+/**
 **  Indexes into pathway array.
 */
 enum Pathways {
@@ -233,6 +253,8 @@ extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
 extern CRiver *GetRiver(std::string river_name);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
+extern std::string GetEraNameById(int era);
+extern int GetEraIdByName(std::string era);
 extern std::string GetPathwayNameById(int pathway);
 extern int GetPathwayIdByName(std::string pathway);
 extern int GetPathwayTransportLevel(int pathway);

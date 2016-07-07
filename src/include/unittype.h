@@ -724,6 +724,7 @@ class CSpecies
 {
 public:
 	CSpecies() :
+		Era(-1),
 		Sapient(false), Prehistoric(false),
 		Family(NULL), HomePlane(NULL), Homeworld(NULL), Type(NULL)
 	{
@@ -733,6 +734,7 @@ public:
 	int GetRandomNameLanguage(int gender);
 	CSpecies *GetRandomEvolution();
 	
+	int Era;						/// Era ID
 	bool Sapient;					/// Whether the species is sapient
 	bool Prehistoric;				/// Whether the species is prehistoric or not
 	std::string Ident;				/// Ident of the species
