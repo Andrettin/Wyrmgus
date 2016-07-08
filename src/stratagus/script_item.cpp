@@ -95,6 +95,11 @@ static int CclDefineUniqueItem(lua_State *l)
 			} else {
 				LuaError(l, "Unique item has no type.");
 			}
+		} else if (!strcmp(value, "Icon")) {
+			item->Icon.Name = LuaToString(l, -1);
+			item->Icon.Icon = NULL;
+			item->Icon.Load();
+			item->Icon.Icon->Load();
 		} else if (!strcmp(value, "Prefix")) {
 			std::string affix_ident = LuaToString(l, -1);
 			int upgrade_id = UpgradeIdByIdent(affix_ident);

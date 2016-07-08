@@ -147,6 +147,8 @@ int GetItemClassIdByName(std::string item_class)
 		return PotionItemClass;
 	} else if (item_class == "scroll") {
 		return ScrollItemClass;
+	} else if (item_class == "book") {
+		return BookItemClass;
 	}
 
 	return -1;
@@ -192,6 +194,8 @@ std::string GetItemClassNameById(int item_class)
 		return "potion";
 	} else if (item_class == ScrollItemClass) {
 		return "scroll";
+	} else if (item_class == BookItemClass) {
+		return "book";
 	}
 
 	return "";
@@ -232,7 +236,7 @@ int GetItemClassSlot(int item_class)
 
 bool IsItemClassConsumable(int item_class)
 {
-	if (item_class == FoodItemClass || item_class == PotionItemClass || item_class == ScrollItemClass) {
+	if (item_class == FoodItemClass || item_class == PotionItemClass || item_class == ScrollItemClass || item_class == BookItemClass) {
 		return true;
 	}
 	

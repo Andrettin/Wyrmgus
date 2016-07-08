@@ -985,23 +985,23 @@ void CUnit::UpdateButtonIcons()
 void CUnit::ChooseButtonIcon(int button_action)
 {
 	if (button_action == ButtonAttack) {
-		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon != NULL) {
-			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->Type->Icon.Icon;
+		if (this->EquippedItems[ArrowsItemSlot].size() > 0 && this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon != NULL) {
+			this->ButtonIcons[button_action] = this->EquippedItems[ArrowsItemSlot][0]->GetIcon().Icon;
 			return;
 		}
 		
-		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon != NULL) {
-			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->Type->Icon.Icon;
+		if (this->EquippedItems[WeaponItemSlot].size() > 0 && this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon != NULL) {
+			this->ButtonIcons[button_action] = this->EquippedItems[WeaponItemSlot][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonStop) {
-		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon != NULL) {
-			this->ButtonIcons[button_action] = this->EquippedItems[ShieldItemSlot][0]->Type->Icon.Icon;
+		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != NULL) {
+			this->ButtonIcons[button_action] = this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonMove) {
-		if (this->EquippedItems[BootsItemSlot].size() > 0 && this->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon != NULL) {
-			this->ButtonIcons[button_action] = this->EquippedItems[BootsItemSlot][0]->Type->Icon.Icon;
+		if (this->EquippedItems[BootsItemSlot].size() > 0 && this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon != NULL) {
+			this->ButtonIcons[button_action] = this->EquippedItems[BootsItemSlot][0]->GetIcon().Icon;
 			return;
 		}
 	} else if (button_action == ButtonStandGround) {
@@ -1693,8 +1693,8 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 	
 	if (
 		this->Prefix == NULL && this->Suffix == NULL && this->Spell == NULL && this->Work == NULL
-		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass)
-	) { //scrolls and jewelry must always have a property
+		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass)
+	) { //scrolls, books and jewelry must always have a property
 		this->GenerateSpecialProperties(dropper);
 	}
 }
@@ -4323,7 +4323,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 		return false;
 	}
 	
-	if (item->Type->BoolFlag[ITEM_INDEX].value && item->Type->ItemClass != FoodItemClass && item->Type->ItemClass != PotionItemClass && item->Type->ItemClass != ScrollItemClass) {
+	if (item->Type->BoolFlag[ITEM_INDEX].value && item->Type->ItemClass != FoodItemClass && item->Type->ItemClass != PotionItemClass && item->Type->ItemClass != ScrollItemClass && item->Type->ItemClass != BookItemClass) {
 		return false;
 	}
 	
@@ -4439,6 +4439,8 @@ IconConfig CUnit::GetIcon() const
 		return this->Character->HeroicIcon;
 	} else if (this->Character != NULL && this->Character->Icon.Icon) {
 		return this->Character->Icon;
+	} else if (this->Unique != NULL && this->Unique->Icon.Icon) {
+		return this->Unique->Icon;
 	} else if (Type->VarInfo[Variation] && Type->VarInfo[Variation]->Icon.Icon) {
 		return Type->VarInfo[Variation]->Icon;
 	} else {

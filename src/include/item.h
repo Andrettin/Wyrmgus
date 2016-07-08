@@ -95,6 +95,7 @@ enum ItemClasses {
 	FoodItemClass,
 	PotionItemClass,
 	ScrollItemClass,
+	BookItemClass,
 
 	MaxItemClasses
 };
@@ -115,6 +116,7 @@ public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
+	IconConfig Icon;			/// Unique item's icon (if it differs from that of its type)
 	CUnitType *Type;			/// Item type of the item
 	CUpgrade *Prefix;
 	CUpgrade *Suffix;

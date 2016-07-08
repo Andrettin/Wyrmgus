@@ -661,7 +661,11 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		//Wyrmgus end
 			continue;
 		}
-		CIcon &icon = *uins->Type->Icon.Icon;
+		//Wyrmgus start
+//		CIcon &icon = *uins->Type->Icon.Icon;
+		CIcon &icon = *uins->GetIcon().Icon;
+		//Wyrmgus end
+		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaTransporting && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   (IconActive | (MouseButtons & LeftButton)) : 0;
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
@@ -702,7 +706,8 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 		if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
 			continue;
 		}
-		CIcon &icon = *uins->Type->Icon.Icon;
+		CIcon &icon = *uins->GetIcon().Icon;
+		
 		int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
 				   IconActive : 0;
 		if (flag && ((MouseButtons & LeftButton) || (MouseButtons & RightButton))) {
