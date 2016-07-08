@@ -2014,6 +2014,9 @@ int CSpecies::GetRandomNameLanguage(int gender)
 	
 	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 		int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-" + this->Ident + gender_string);
+		if (!gender_string.empty() && potential_name_quantity == 0) {
+			potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-" + this->Ident);
+		}
 		for (int j = 0; j < potential_name_quantity; ++j) {
 			potential_languages.push_back(i);
 		}
@@ -2022,6 +2025,9 @@ int CSpecies::GetRandomNameLanguage(int gender)
 	if (potential_languages.size() == 0 && !this->Genus.empty()) { // if no language that can generate a name for this species was found, try to see if any can generate for its genus instead
 		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-genus-" + this->Genus + gender_string);
+			if (!gender_string.empty() && potential_name_quantity == 0) {
+				potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-genus-" + this->Genus);
+			}
 			for (int j = 0; j < potential_name_quantity; ++j) {
 				potential_languages.push_back(i);
 			}
@@ -2031,6 +2037,9 @@ int CSpecies::GetRandomNameLanguage(int gender)
 	if (potential_languages.size() == 0 && !this->Subfamily.empty()) { // if no language that can generate a name for this species was found, try to see if any can generate for its subfamily instead
 		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-subfamily-" + this->Subfamily + gender_string);
+			if (!gender_string.empty() && potential_name_quantity == 0) {
+				potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-subfamily-" + this->Subfamily);
+			}
 			for (int j = 0; j < potential_name_quantity; ++j) {
 				potential_languages.push_back(i);
 			}
@@ -2040,6 +2049,9 @@ int CSpecies::GetRandomNameLanguage(int gender)
 	if (potential_languages.size() == 0 && this->Family != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its family instead
 		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-family-" + this->Family->Ident + gender_string);
+			if (!gender_string.empty() && potential_name_quantity == 0) {
+				potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-family-" + this->Family->Ident);
+			}
 			for (int j = 0; j < potential_name_quantity; ++j) {
 				potential_languages.push_back(i);
 			}
@@ -2048,6 +2060,9 @@ int CSpecies::GetRandomNameLanguage(int gender)
 		if (potential_languages.size() == 0 && this->Family->Order != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its order instead
 			for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 				int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Family->Order->Ident + gender_string);
+				if (!gender_string.empty() && potential_name_quantity == 0) {
+					potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Family->Order->Ident);
+				}
 				for (int j = 0; j < potential_name_quantity; ++j) {
 					potential_languages.push_back(i);
 				}
@@ -2056,6 +2071,9 @@ int CSpecies::GetRandomNameLanguage(int gender)
 			if (potential_languages.size() == 0 && this->Family->Order->Class != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its class instead
 				for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
 					int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-class-" + this->Family->Order->Class->Ident + gender_string);
+					if (!gender_string.empty() && potential_name_quantity == 0) {
+						potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-class-" + this->Family->Order->Class->Ident);
+					}
 					for (int j = 0; j < potential_name_quantity; ++j) {
 						potential_languages.push_back(i);
 					}
@@ -2068,10 +2086,6 @@ int CSpecies::GetRandomNameLanguage(int gender)
 		return potential_languages[SyncRand(potential_languages.size())];
 	}
 	
-	if (gender != NoGender) {
-		return this->GetRandomNameLanguage(NoGender);
-	}
-
 	return -1;
 }
 
