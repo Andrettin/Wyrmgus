@@ -2080,7 +2080,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 		this->UpdatePersonalName();
 	}
 	//Wyrmgus end
-
 }
 
 /**

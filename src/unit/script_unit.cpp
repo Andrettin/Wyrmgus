@@ -1630,6 +1630,13 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Removed")) {
 		lua_pushboolean(l, unit->Removed);
 		return 1;
+	} else if (!strcmp(value, "Container")) {
+		if (unit->Container != NULL) {
+			lua_pushnumber(l, UnitNumber(*unit->Container));
+		} else {
+			lua_pushnumber(l, -1);
+		}
+		return 1;
 	//Wyrmgus end
 	} else {
 		int index = UnitTypeVar.VariableNameLookup[value];// User variables
