@@ -452,25 +452,24 @@ void SaveHero(CCharacter *hero)
 		fprintf(fd, "\tItems = {");
 		for (size_t j = 0; j < hero->Items.size(); ++j) {
 			fprintf(fd, "\n\t\t{");
-			if (hero->Items[j]->Unique) {
+			fprintf(fd, "\n\t\t\t\"type\", \"%s\",", hero->Items[j]->Type->Ident.c_str());
+			if (hero->Items[j]->Prefix != NULL) {
+				fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", hero->Items[j]->Prefix->Ident.c_str());
+			}
+			if (hero->Items[j]->Suffix != NULL) {
+				fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", hero->Items[j]->Suffix->Ident.c_str());
+			}
+			if (hero->Items[j]->Spell != NULL) {
+				fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", hero->Items[j]->Spell->Ident.c_str());
+			}
+			if (hero->Items[j]->Work != NULL) {
+				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", hero->Items[j]->Work->Ident.c_str());
+			}
+			if (!hero->Items[j]->Name.empty()) {
+				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", hero->Items[j]->Name.c_str());
+			}
+			if (hero->Items[j]->Unique) { // affixes, name and etc. will be inherited from the unique item, but we set those previous characteristics for unique items anyway, so that if a unique item no longer exists in the game's code (i.e. if it is from a mod that has been deactivated) the character retains an item with the same affixes, name and etc., even though it will no longer be unique
 				fprintf(fd, "\n\t\t\t\"unique\", \"%s\",", hero->Items[j]->Unique->Ident.c_str());
-			} else {
-				fprintf(fd, "\n\t\t\t\"type\", \"%s\",", hero->Items[j]->Type->Ident.c_str());
-				if (hero->Items[j]->Prefix != NULL) {
-					fprintf(fd, "\n\t\t\t\"prefix\", \"%s\",", hero->Items[j]->Prefix->Ident.c_str());
-				}
-				if (hero->Items[j]->Suffix != NULL) {
-					fprintf(fd, "\n\t\t\t\"suffix\", \"%s\",", hero->Items[j]->Suffix->Ident.c_str());
-				}
-				if (hero->Items[j]->Spell != NULL) {
-					fprintf(fd, "\n\t\t\t\"spell\", \"%s\",", hero->Items[j]->Spell->Ident.c_str());
-				}
-				if (hero->Items[j]->Work != NULL) {
-					fprintf(fd, "\n\t\t\t\"work\", \"%s\",", hero->Items[j]->Work->Ident.c_str());
-				}
-				if (!hero->Items[j]->Name.empty()) {
-					fprintf(fd, "\n\t\t\t\"name\", \"%s\",", hero->Items[j]->Name.c_str());
-				}
 			}
 			if (hero->Items[j]->Bound) {
 				fprintf(fd, "\n\t\t\t\"bound\", true,");

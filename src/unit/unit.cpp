@@ -1599,8 +1599,8 @@ void CUnit::GenerateDrop()
 	drop_pos.x += SyncRand(this->Type->TileWidth);
 	drop_pos.y += SyncRand(this->Type->TileHeight);
 	CUnit *droppedUnit = NULL;
-	int chosen_drop = -1;
-	std::vector<int> potential_drops;
+	CUnitType *chosen_drop = NULL;
+	std::vector<CUnitType *> potential_drops;
 	for (size_t i = 0; i < this->Type->Drops.size(); ++i) {
 		potential_drops.push_back(this->Type->Drops[i]);
 	}
@@ -1608,18 +1608,23 @@ void CUnit::GenerateDrop()
 		for (size_t i = 0; i < this->Type->AiDrops.size(); ++i) {
 			potential_drops.push_back(this->Type->AiDrops[i]);
 		}
+		for (std::map<std::string, std::vector<CUnitType *>>::const_iterator iterator = this->Type->ModAiDrops.begin(); iterator != this->Type->ModAiDrops.end(); ++iterator) {
+			for (size_t i = 0; i < iterator->second.size(); ++i) {
+				potential_drops.push_back(iterator->second[i]);
+			}
+		}
 	}
 	if (potential_drops.size() > 0) {
 		chosen_drop = potential_drops[SyncRand(potential_drops.size())];
 	}
 		
-	if (chosen_drop != -1) {
-		if ((UnitTypes[chosen_drop]->BoolFlag[ITEM_INDEX].value || UnitTypes[chosen_drop]->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
+	if (chosen_drop != NULL) {
+		if ((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
 			Vec2i resPos;
-			FindNearestDrop(*UnitTypes[chosen_drop], drop_pos, resPos, LookingW);
-			droppedUnit = MakeUnitAndPlace(resPos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW);
+			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, &Players[PlayerNumNeutral]);
 		} else {
-			droppedUnit = MakeUnitAndPlace(drop_pos, *UnitTypes[chosen_drop], &Players[PlayerNumNeutral]);
+			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, &Players[PlayerNumNeutral]);
 		}
 			
 		if (droppedUnit != NULL) {

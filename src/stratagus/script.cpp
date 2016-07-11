@@ -3343,11 +3343,11 @@ void DisableMod(std::string mod_file)
 				if (std::find(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), UnitTypes[i]) != UnitTypes[j]->Trains.end()) {
 					UnitTypes[j]->Trains.erase(std::remove(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), UnitTypes[i]), UnitTypes[j]->Trains.end());
 				}
-				if (std::find(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]->Slot) != UnitTypes[j]->Drops.end()) {
-					UnitTypes[j]->Drops.erase(std::remove(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]->Slot), UnitTypes[j]->Drops.end());
+				if (std::find(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]) != UnitTypes[j]->Drops.end()) {
+					UnitTypes[j]->Drops.erase(std::remove(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]), UnitTypes[j]->Drops.end());
 				}
-				if (std::find(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]->Slot) != UnitTypes[j]->AiDrops.end()) {
-					UnitTypes[j]->AiDrops.erase(std::remove(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]->Slot), UnitTypes[j]->AiDrops.end());
+				if (std::find(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]) != UnitTypes[j]->AiDrops.end()) {
+					UnitTypes[j]->AiDrops.erase(std::remove(UnitTypes[j]->AiDrops.begin(), UnitTypes[j]->AiDrops.end(), UnitTypes[i]), UnitTypes[j]->AiDrops.end());
 				}
 			}
 			int buttons_size = UnitButtonTable.size();
@@ -3370,6 +3370,9 @@ void DisableMod(std::string mod_file)
 		if (UnitTypes[i]->ModTrains.find(mod_file) != UnitTypes[i]->ModTrains.end()) {
 			UnitTypes[i]->ModTrains.erase(mod_file);
 			UnitTypes[i]->RemoveButtons(-1, mod_file);
+		}
+		if (UnitTypes[i]->ModAiDrops.find(mod_file) != UnitTypes[i]->ModAiDrops.end()) {
+			UnitTypes[i]->ModAiDrops.erase(mod_file);
 		}
 		if (UnitTypes[i]->ModDefaultStats.find(mod_file) != UnitTypes[i]->ModDefaultStats.end()) {
 			UnitTypes[i]->ModDefaultStats.erase(mod_file);

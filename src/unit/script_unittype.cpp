@@ -1915,7 +1915,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
 				if (drop_type_id != -1) {
-					type->Drops.push_back(drop_type_id);
+					type->Drops.push_back(UnitTypes[drop_type_id]);
 				} else { // Error
 					LuaError(l, "incorrect drop unit-type");
 				}
@@ -1925,7 +1925,7 @@ static int CclDefineUnitType(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				int drop_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
 				if (drop_type_id != -1) {
-					type->AiDrops.push_back(drop_type_id);
+					type->AiDrops.push_back(UnitTypes[drop_type_id]);
 				} else { // Error
 					LuaError(l, "incorrect drop unit-type");
 				}
@@ -2874,18 +2874,38 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_createtable(l, type->Drops.size(), 0);
 		for (size_t i = 1; i <= type->Drops.size(); ++i)
 		{
-			lua_pushstring(l, UnitTypes[type->Drops[i-1]]->Ident.c_str());
+			lua_pushstring(l, type->Drops[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else if (!strcmp(data, "AiDrops")) {
-		lua_createtable(l, type->AiDrops.size(), 0);
-		for (size_t i = 1; i <= type->AiDrops.size(); ++i)
-		{
-			lua_pushstring(l, UnitTypes[type->AiDrops[i-1]]->Ident.c_str());
-			lua_rawseti(l, -2, i);
+		bool is_mod = false;
+		if (lua_gettop(l) >= 3) {
+			is_mod = true;
 		}
-		return 1;
+		
+		std::string mod_file;
+		if (is_mod) {
+			mod_file = LuaToString(l, 3);
+		}
+
+		if (is_mod && type->ModAiDrops.find(mod_file) != type->ModAiDrops.end()) {
+			lua_createtable(l, type->ModAiDrops[mod_file].size(), 0);
+			for (size_t i = 1; i <= type->ModAiDrops[mod_file].size(); ++i)
+			{
+				lua_pushstring(l, type->ModAiDrops[mod_file][i-1]->Ident.c_str());
+				lua_rawseti(l, -2, i);
+			}
+			return 1;
+		} else {
+			lua_createtable(l, type->AiDrops.size(), 0);
+			for (size_t i = 1; i <= type->AiDrops.size(); ++i)
+			{
+				lua_pushstring(l, type->AiDrops[i-1]->Ident.c_str());
+				lua_rawseti(l, -2, i);
+			}
+			return 1;
+		}
 	} else if (!strcmp(data, "DropAffixes")) {
 		lua_createtable(l, type->DropAffixes.size(), 0);
 		for (size_t i = 1; i <= type->DropAffixes.size(); ++i)
@@ -2906,8 +2926,8 @@ static int CclGetUnitTypeData(lua_State *l)
 		std::vector<CUnitType *> droppers;
 		for (size_t i = 0; i < UnitTypes.size(); ++i) {
 			if (
-				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), type->Slot) != UnitTypes[i]->Drops.end()
-				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), type->Slot) != UnitTypes[i]->AiDrops.end()
+				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), type) != UnitTypes[i]->Drops.end()
+				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), type) != UnitTypes[i]->AiDrops.end()
 			) {
 				droppers.push_back(UnitTypes[i]);
 			}
@@ -4304,6 +4324,35 @@ static int CclSetModTrains(lua_State *l)
 	
 	return 0;
 }
+
+static int CclSetModAiDrops(lua_State *l)
+{
+	LuaCheckArgs(l, 3);
+	
+	std::string mod_file = LuaToString(l, 1);
+	CUnitType *type = UnitTypeByIdent(LuaToString(l, 2));
+	if (type == NULL) {
+		LuaError(l, "Unit type doesn't exist.");
+	}
+
+	type->ModAiDrops[mod_file].clear();
+	
+	if (!lua_istable(l, 3)) {
+		LuaError(l, "incorrect argument");
+	}
+	int subargs = lua_rawlen(l, 3);
+	for (int i = 0; i < subargs; ++i) {
+		const char *value = LuaToString(l, 3, i + 1);
+		CUnitType *dropped_unit = UnitTypeByIdent(value);
+		if (dropped_unit != NULL) {
+			type->ModAiDrops[mod_file].push_back(dropped_unit);
+		} else {
+			LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);
+		}
+	}
+	
+	return 0;
+}
 //Wyrmgus end
 
 /**
@@ -4341,6 +4390,7 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "GetSpecies", CclGetSpecies);
 	lua_register(Lua, "GetSpeciesData", CclGetSpeciesData);
 	lua_register(Lua, "SetModTrains", CclSetModTrains);
+	lua_register(Lua, "SetModAiDrops", CclSetModAiDrops);
 	//Wyrmgus end
 }
 

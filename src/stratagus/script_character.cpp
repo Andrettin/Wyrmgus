@@ -316,7 +316,10 @@ static int CclDefineCharacter(lua_State *l)
 						if (item_type_id != -1) {
 							item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
 						} else {
-							LuaError(l, "Item type \"%s\" doesn't exist." _C_ item_ident.c_str());
+							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
+							character->Items.erase(std::remove(character->Items.begin(), character->Items.end(), item), character->Items.end());
+							delete item;
+							break;
 						}
 					} else if (!strcmp(value, "prefix")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
@@ -361,7 +364,7 @@ static int CclDefineCharacter(lua_State *l)
 							if (unique_item->Type != NULL) {
 								item->Type = unique_item->Type;
 							} else {
-								LuaError(l, "Unique item \"%s\" has no type." _C_ item->Name.c_str());
+								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
 							}
 							if (unique_item->Prefix != NULL) {
 								item->Prefix = unique_item->Prefix;
@@ -376,7 +379,7 @@ static int CclDefineCharacter(lua_State *l)
 								item->Work = unique_item->Work;
 							}
 						} else {
-							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unique_ident.c_str());
+							fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", unique_ident.c_str());
 						}
 					} else if (!strcmp(value, "bound")) {
 						item->Bound = LuaToBoolean(l, -1, k + 1);
@@ -617,7 +620,10 @@ static int CclDefineCustomHero(lua_State *l)
 						if (item_type_id != -1) {
 							item->Type = const_cast<CUnitType *>(&(*UnitTypes[item_type_id]));
 						} else {
-							LuaError(l, "Item type \"%s\" doesn't exist." _C_ item_ident.c_str());
+							fprintf(stderr, "Item type \"%s\" doesn't exist.\n", item_ident.c_str());
+							hero->Items.erase(std::remove(hero->Items.begin(), hero->Items.end(), item), hero->Items.end());
+							delete item;
+							break;
 						}
 					} else if (!strcmp(value, "prefix")) {
 						std::string upgrade_ident = LuaToString(l, -1, k + 1);
@@ -662,7 +668,7 @@ static int CclDefineCustomHero(lua_State *l)
 							if (unique_item->Type != NULL) {
 								item->Type = unique_item->Type;
 							} else {
-								LuaError(l, "Unique item \"%s\" has no type." _C_ item->Name.c_str());
+								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
 							}
 							if (unique_item->Prefix != NULL) {
 								item->Prefix = unique_item->Prefix;
@@ -677,7 +683,7 @@ static int CclDefineCustomHero(lua_State *l)
 								item->Work = unique_item->Work;
 							}
 						} else {
-							LuaError(l, "Unique item \"%s\" doesn't exist." _C_ unique_ident.c_str());
+							fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", unique_ident.c_str());
 						}
 					} else if (!strcmp(value, "bound")) {
 						item->Bound = LuaToBoolean(l, -1, k + 1);

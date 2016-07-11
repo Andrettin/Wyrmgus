@@ -248,8 +248,8 @@ static int CclGetUniqueItemData(lua_State *l)
 		std::vector<CUnitType *> droppers;
 		for (size_t i = 0; i < UnitTypes.size(); ++i) {
 			if (
-				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), item->Type->Slot) != UnitTypes[i]->Drops.end()
-				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), item->Type->Slot) != UnitTypes[i]->AiDrops.end()
+				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), item->Type) != UnitTypes[i]->Drops.end()
+				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), item->Type) != UnitTypes[i]->AiDrops.end()
 			) {
 				int dropper_civilization = PlayerRaces.GetRaceIndexByName(UnitTypes[i]->Civilization.c_str());
 				if (

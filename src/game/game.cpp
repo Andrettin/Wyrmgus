@@ -825,6 +825,14 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				}
 				f->printf("})\n\n");
 			}
+			
+			if (type.ModAiDrops.find(Map.Info.Filename) != type.ModAiDrops.end()) {
+				f->printf("SetModAiDrops(\"%s\", \"%s\", {", mod_file.c_str(), type.Ident.c_str());
+				for (size_t j = 0; j < type.ModAiDrops[Map.Info.Filename].size(); ++j) {
+					f->printf("\"%s\", ", type.ModAiDrops[Map.Info.Filename][j]->Ident.c_str());
+				}
+				f->printf("})\n\n");
+			}
 		}
 		//Wyrmgus end
 
