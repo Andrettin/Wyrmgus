@@ -697,33 +697,38 @@ void CUnit::Retrain()
 			if (Character != NULL && Character->ForbiddenUpgrades[i]) {
 				continue;
 			}
-			for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[i].size(); ++j) {
-				if (AiHelpers.ExperienceUpgrades[i][j] == this->Type) {
-					this->Variable[LEVELUP_INDEX].Value += 1;
-					this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
-					TransformUnitIntoType(*this, *UnitTypes[i]);
-					if (!IsNetworkGame() && Character != NULL) {	//save the unit-type experience upgrade for persistent characters
-						if (Character->Type->Slot != i) {
-							if (Character->Persistent && Player->AiEnabled == false) {
-								Character->Type = UnitTypes[i];
-								SaveHero(Character);
-								CheckAchievements();
-							}
-							if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
-								CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Character->GetFullName());
-								if (hero) {
-									hero->SetType(i);
+			if (((int) AiHelpers.ExperienceUpgrades.size()) > i) {
+				for (size_t j = 0; j != AiHelpers.ExperienceUpgrades[i].size(); ++j) {
+					if (AiHelpers.ExperienceUpgrades[i][j] == this->Type) {
+						this->Variable[LEVELUP_INDEX].Value += 1;
+						this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
+						TransformUnitIntoType(*this, *UnitTypes[i]);
+						if (!IsNetworkGame() && Character != NULL) {	//save the unit-type experience upgrade for persistent characters
+							if (Character->Type->Slot != i) {
+								if (Character->Persistent && Player->AiEnabled == false) {
+									Character->Type = UnitTypes[i];
+									SaveHero(Character);
+									CheckAchievements();
+								}
+								if (GrandStrategy) { //also update the corresponding grand strategy hero, if in grand strategy mode
+									CGrandStrategyHero *hero = GrandStrategyGame.GetHero(Character->GetFullName());
+									if (hero) {
+										hero->SetType(i);
+									}
 								}
 							}
 						}
+						found_previous_unit_type = true;
+						break;
 					}
-					found_previous_unit_type = true;
-					break;
 				}
 			}
 			if (found_previous_unit_type) {
 				break;
 			}
+		}
+		if (!found_previous_unit_type) {
+			break;
 		}
 	}
 	
