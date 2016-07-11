@@ -678,6 +678,11 @@ static int CclUnit(lua_State *l)
 			unit->SetCharacter(LuaToString(l, 2, j + 1), false);
 		} else if (!strcmp(value, "custom-hero")) {
 			unit->SetCharacter(LuaToString(l, 2, j + 1), true);
+		} else if (!strcmp(value, "individual-upgrade")) {
+			CUpgrade *individual_upgrade = CUpgrade::Get(LuaToString(l, 2, j + 1));
+			if (individual_upgrade) {
+				unit->IndividualUpgrades[individual_upgrade->ID] = true;
+			}
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables

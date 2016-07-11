@@ -392,6 +392,11 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"custom-hero\", \"%s\"", unit.Character->GetFullName().c_str());
 		}
 	}
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+		if (unit.IndividualUpgrades[i]) {
+			file.printf(",\n  \"individual-upgrade\", \"%s\"", AllUpgrades[i]->Ident.c_str());
+		}
+	}
 	//Wyrmgus end
 
 	file.printf("})\n");
