@@ -603,6 +603,9 @@ static int CclUnit(lua_State *l)
 					unit->Player->UnitTypesAiActiveCount[type->Slot]--;
 				}
 				//Wyrmgus start
+				if (type->Class == "town-hall" || type->Class == "stronghold" || type->Class == "fortress") {
+					unit->Player->NumTownHalls--;
+				}
 				if (unit->Character == NULL) {
 					unit->Player->UnitTypesNonHeroCount[type->Slot]--;
 					if (unit->Starting) {

@@ -1163,6 +1163,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->NumBuildings = 0;
 	//Wyrmgus start
 	this->NumBuildingsUnderConstruction = 0;
+	this->NumTownHalls = 0;
 	//Wyrmgus end
 	this->Score = 0;
 	//Wyrmgus start
@@ -1466,6 +1467,7 @@ void CPlayer::Clear()
 	NumBuildings = 0;
 	//Wyrmgus start
 	NumBuildingsUnderConstruction = 0;
+	NumTownHalls = 0;
 	//Wyrmgus end
 	Supply = 0;
 	Demand = 0;

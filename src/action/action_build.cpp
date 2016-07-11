@@ -441,6 +441,9 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		build->Player->UnitTypesAiActiveCount[type.Slot]--;
 	}
 	//Wyrmgus start
+	if (build->Type->Class == "town-hall" || build->Type->Class == "stronghold" || build->Type->Class == "fortress") {
+		build->Player->NumTownHalls--;
+	}
 	if (build->Character == NULL) {
 		build->Player->UnitTypesNonHeroCount[type.Slot]--;
 	} else {

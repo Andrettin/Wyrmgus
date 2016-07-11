@@ -1583,7 +1583,14 @@ void CUnit::UpdateItemName()
 
 void CUnit::GenerateDrop()
 {
-	if (this->Type->BoolFlag[ORGANIC_INDEX].value && !this->Character && !this->Type->BoolFlag[FAUNA_INDEX].value) { //if the unit is organic and isn't a character (and isn't fauna), don't generate a drop
+	bool base_based_mission = false;
+	for (int p = 0; p < PlayerMax; ++p) {
+		if (Players[p].NumTownHalls > 0 || Players[p].LostTownHallTimer) {
+			base_based_mission = true;
+		}
+	}
+	
+	if (this->Type->BoolFlag[ORGANIC_INDEX].value && !this->Character && !this->Type->BoolFlag[FAUNA_INDEX].value && base_based_mission) { //if the unit is organic and isn't a character (and isn't fauna) and this is a base-based mission, don't generate a drop
 		return;
 	}
 	
@@ -2030,6 +2037,9 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			player.UnitTypesAiActiveCount[type.Slot]++;
 		}
 		//Wyrmgus start
+		if (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress") {
+			player.NumTownHalls++;
+		}
 		if (this->Character == NULL) {
 			player.UnitTypesNonHeroCount[type.Slot]++;
 			if (this->Starting) {
@@ -2809,6 +2819,9 @@ void UnitLost(CUnit &unit)
 				player.UnitTypesAiActiveCount[type.Slot]--;
 			}
 			//Wyrmgus start
+			if (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress") {
+				player.NumTownHalls--;
+			}
 			if (unit.Character == NULL) {
 				player.UnitTypesNonHeroCount[type.Slot]--;
 				if (unit.Starting) {
@@ -3417,6 +3430,9 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 		newplayer.UnitTypesAiActiveCount[Type->Slot]++;
 	}
 	//Wyrmgus start
+	if (Type->Class == "town-hall" || Type->Class == "stronghold" || Type->Class == "fortress") {
+		newplayer.NumTownHalls++;
+	}
 	if (this->Character == NULL) {
 		newplayer.UnitTypesNonHeroCount[Type->Slot]++;
 		if (this->Starting) {

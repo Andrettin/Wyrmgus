@@ -189,6 +189,9 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		player.UnitTypesAiActiveCount[type.Slot]++;
 	}
 	//Wyrmgus start
+	if (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress") {
+		player.NumTownHalls++;
+	}
 	if (unit.Character == NULL) {
 		player.UnitTypesNonHeroCount[type.Slot]++;
 	} else {

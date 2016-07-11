@@ -152,6 +152,7 @@ public:
 	int    NumBuildings;   /// # buildings
 	//Wyrmgus start
 	int    NumBuildingsUnderConstruction; /// # buildings under construction
+	int    NumTownHalls;
 	//Wyrmgus end
 	int    Supply;         /// supply available/produced
 	int    Demand;         /// demand of player
