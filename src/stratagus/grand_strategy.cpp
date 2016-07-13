@@ -311,7 +311,7 @@ void CGrandStrategyGame::DrawMap()
 				
 				CGrandStrategyProvince *province = this->WorldMapTiles[x][y]->Province;
 				
-				if (this->WorldMapTiles[x][y]->Resource != -1 && this->WorldMapTiles[x][y]->ResourceProspected) {
+				if (this->WorldMapTiles[x][y]->Resource != -1 && this->WorldMapTiles[x][y]->ResourceProspected && this->WorldMapTiles[x][y]->ResourceBuildingGraphics != NULL) {
 					this->WorldMapTiles[x][y]->ResourceBuildingGraphics->DrawFrameClip(0, 64 * (x - WorldMapOffsetX) + width_indent, 16 + 64 * (y - WorldMapOffsetY) + height_indent, true);
 					
 					if (this->WorldMapTiles[x][y]->ResourceBuildingGraphicsPlayerColor != NULL) {
@@ -3086,6 +3086,7 @@ void CGrandStrategyProvince::SetHero(std::string hero_full_name, int value)
 	} else {
 		//if the hero hasn't been defined yet, give an error message
 		fprintf(stderr, "Hero \"%s\" doesn't exist.\n", hero_full_name.c_str());
+		return;
 	}
 	
 	
@@ -8636,6 +8637,9 @@ void CreateGrandStrategyHero(std::string hero_full_name)
 void CreateGrandStrategyCustomHero(std::string hero_full_name)
 {
 	CCharacter *custom_hero = GetCustomHero(hero_full_name);
+	if (custom_hero == NULL) {
+		return;
+	}
 	CGrandStrategyHero *hero = new CGrandStrategyHero;
 	GrandStrategyGame.Heroes.push_back(hero);
 	hero->Name = custom_hero->Name;
