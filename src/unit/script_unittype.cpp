@@ -3956,6 +3956,16 @@ static int CclGetSpeciesData(lua_State *l)
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, species->Background.c_str());
 		return 1;
+	} else if (!strcmp(data, "Family")) {
+		if (species->Family != NULL) {
+			lua_pushstring(l, species->Family->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Genus")) {
+		lua_pushstring(l, species->Genus.c_str());
+		return 1;
 	} else if (!strcmp(data, "Era")) {
 		lua_pushnumber(l, species->Era);
 		return 1;
