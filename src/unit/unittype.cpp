@@ -525,6 +525,7 @@ std::vector<std::string> UpgradeClasses;
 std::map<std::string, int> UpgradeClassStringToIndex;
 
 std::vector<CSpecies *> Species;
+std::vector<CSpeciesGenus *> SpeciesGenuses;
 std::vector<CSpeciesFamily *> SpeciesFamilies;
 std::vector<CSpeciesOrder *> SpeciesOrders;
 std::vector<CSpeciesClass *> SpeciesClasses;
@@ -1892,6 +1893,10 @@ void CleanUnitTypes()
 		delete Species[i];
 	}
 	Species.clear();
+	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
+		delete SpeciesGenuses[i];
+	}
+	SpeciesGenuses.clear();
 	for (size_t i = 0; i < SpeciesFamilies.size(); ++i) {
 		delete SpeciesFamilies[i];
 	}
@@ -1940,6 +1945,17 @@ CSpecies *GetSpecies(std::string species_ident)
 	for (size_t i = 0; i < Species.size(); ++i) {
 		if (species_ident == Species[i]->Ident) {
 			return Species[i];
+		}
+	}
+	
+	return NULL;
+}
+
+CSpeciesGenus *GetSpeciesGenus(std::string genus_ident)
+{
+	for (size_t i = 0; i < SpeciesGenuses.size(); ++i) {
+		if (genus_ident == SpeciesGenuses[i]->Ident) {
+			return SpeciesGenuses[i];
 		}
 	}
 	
@@ -2022,65 +2038,66 @@ int CSpecies::GetRandomNameLanguage(int gender)
 		}
 	}
 	
-	if (potential_languages.size() == 0 && !this->Genus.empty()) { // if no language that can generate a name for this species was found, try to see if any can generate for its genus instead
+	if (potential_languages.size() == 0 && this->Genus != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its genus instead
 		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-genus-" + this->Genus + gender_string);
+			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-genus-" + this->Genus->Ident + gender_string);
 			if (!gender_string.empty() && potential_name_quantity == 0) {
-				potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-genus-" + this->Genus);
-			}
-			for (int j = 0; j < potential_name_quantity; ++j) {
-				potential_languages.push_back(i);
-			}
-		}
-	}
-	
-	if (potential_languages.size() == 0 && !this->Subfamily.empty()) { // if no language that can generate a name for this species was found, try to see if any can generate for its subfamily instead
-		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-subfamily-" + this->Subfamily + gender_string);
-			if (!gender_string.empty() && potential_name_quantity == 0) {
-				potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-subfamily-" + this->Subfamily);
-			}
-			for (int j = 0; j < potential_name_quantity; ++j) {
-				potential_languages.push_back(i);
-			}
-		}
-	}
-	
-	if (potential_languages.size() == 0 && this->Family != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its family instead
-		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-			int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-family-" + this->Family->Ident + gender_string);
-			if (!gender_string.empty() && potential_name_quantity == 0) {
-				potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-family-" + this->Family->Ident);
+				potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-genus-" + this->Genus->Ident);
 			}
 			for (int j = 0; j < potential_name_quantity; ++j) {
 				potential_languages.push_back(i);
 			}
 		}
 		
-		if (potential_languages.size() == 0 && this->Family->Order != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its order instead
+		if (potential_languages.size() == 0 && !this->Genus->Subfamily.empty()) { // if no language that can generate a name for this species was found, try to see if any can generate for its subfamily instead
 			for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-				int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Family->Order->Ident + gender_string);
+				int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-subfamily-" + this->Genus->Subfamily + gender_string);
 				if (!gender_string.empty() && potential_name_quantity == 0) {
-					potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Family->Order->Ident);
+					potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-subfamily-" + this->Genus->Subfamily);
 				}
 				for (int j = 0; j < potential_name_quantity; ++j) {
 					potential_languages.push_back(i);
 				}
 			}
+		}
 		
-			if (potential_languages.size() == 0 && this->Family->Order->Class != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its class instead
+		if (potential_languages.size() == 0 && this->Genus->Family != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its family instead
+			for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+				int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-family-" + this->Genus->Family->Ident + gender_string);
+				if (!gender_string.empty() && potential_name_quantity == 0) {
+					potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-family-" + this->Genus->Family->Ident);
+				}
+				for (int j = 0; j < potential_name_quantity; ++j) {
+					potential_languages.push_back(i);
+				}
+			}
+			
+			if (potential_languages.size() == 0 && this->Genus->Family->Order != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its order instead
 				for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-					int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-class-" + this->Family->Order->Class->Ident + gender_string);
+					int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Genus->Family->Order->Ident + gender_string);
 					if (!gender_string.empty() && potential_name_quantity == 0) {
-						potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-class-" + this->Family->Order->Class->Ident);
+						potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-order-" + this->Genus->Family->Order->Ident);
 					}
 					for (int j = 0; j < potential_name_quantity; ++j) {
 						potential_languages.push_back(i);
 					}
 				}
+			
+				if (potential_languages.size() == 0 && this->Genus->Family->Order->Class != NULL) { // if no language that can generate a name for this species was found, try to see if any can generate for its class instead
+					for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
+						int potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-class-" + this->Genus->Family->Order->Class->Ident + gender_string);
+						if (!gender_string.empty() && potential_name_quantity == 0) {
+							potential_name_quantity = PlayerRaces.Languages[i]->GetPotentialNameQuantityForType("species-class-" + this->Genus->Family->Order->Class->Ident);
+						}
+						for (int j = 0; j < potential_name_quantity; ++j) {
+							potential_languages.push_back(i);
+						}
+					}
+				}
 			}
 		}
 	}
+	
 	
 	if (potential_languages.size() > 0) {
 		return potential_languages[SyncRand(potential_languages.size())];

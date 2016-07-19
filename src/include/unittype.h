@@ -720,13 +720,29 @@ public:
 	std::string Superfamily;
 };	
 
+class CSpeciesGenus
+{
+public:
+	CSpeciesGenus() :
+		Family(NULL)
+	{
+	}
+	
+	std::string Ident;				/// Ident of the genus
+	std::string Name;				/// Name of the genus
+	std::string CommonName;			/// Common name of the genus
+	CSpeciesFamily *Family;
+	std::string Subfamily;
+	std::string Tribe;
+};	
+
 class CSpecies
 {
 public:
 	CSpecies() :
 		Era(-1),
 		Sapient(false), Prehistoric(false),
-		Family(NULL), HomePlane(NULL), Homeworld(NULL), Type(NULL)
+		Genus(NULL), HomePlane(NULL), Homeworld(NULL), Type(NULL)
 	{
 	}
 	
@@ -742,10 +758,7 @@ public:
 	std::string Description;		/// Description of the species
 	std::string Quote;				/// Quote pertaining to the species
 	std::string Background;			/// Background of the species
-	CSpeciesFamily *Family;
-	std::string Subfamily;
-	std::string Tribe;
-	std::string Genus;
+	CSpeciesGenus *Genus;
 	std::string Species;
 	std::string ChildUpgrade;		/// Which individual upgrade the children of this species get
 	CPlane *HomePlane;
@@ -1151,6 +1164,7 @@ extern std::vector<std::string> UnitTypeClasses; //list of unit type classes; bu
 extern std::vector<std::string> UpgradeClasses; //list of upgrade classes; built with CclDefineModifier
 
 extern std::vector<CSpecies *> Species;
+extern std::vector<CSpeciesGenus *> SpeciesGenuses;
 extern std::vector<CSpeciesFamily *> SpeciesFamilies;
 extern std::vector<CSpeciesOrder *> SpeciesOrders;
 extern std::vector<CSpeciesClass *> SpeciesClasses;
@@ -1173,6 +1187,7 @@ extern int GetUpgradeClassIndexByName(const std::string &class_name);
 extern void SetUpgradeClassStringToIndex(std::string class_name, int class_id);
 
 extern CSpecies *GetSpecies(std::string species_ident);
+extern CSpeciesGenus *GetSpeciesGenus(std::string genus_ident);
 extern CSpeciesFamily *GetSpeciesFamily(std::string family_ident);
 extern CSpeciesOrder *GetSpeciesOrder(std::string order_ident);
 extern CSpeciesClass *GetSpeciesClass(std::string class_ident);

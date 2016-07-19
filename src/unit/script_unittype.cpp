@@ -3804,6 +3804,54 @@ static int CclDefineSpeciesFamily(lua_State *l)
 }
 
 /**
+**  Define a species genus.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineSpeciesGenus(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string genus_ident = LuaToString(l, 1);
+	CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
+	if (!genus) {
+		genus = new CSpeciesGenus;
+		SpeciesGenuses.push_back(genus);
+		genus->Ident = genus_ident;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			genus->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "CommonName")) {
+			genus->CommonName = LuaToString(l, -1);
+		} else if (!strcmp(value, "Family")) {
+			std::string family_ident = LuaToString(l, -1);
+			CSpeciesFamily *family = GetSpeciesFamily(family_ident);
+			if (family) {
+				genus->Family = family;
+			} else {
+				LuaError(l, "Species family \"%s\" doesn't exist." _C_ family_ident.c_str());
+			}
+		} else if (!strcmp(value, "Subfamily")) {
+			genus->Subfamily = LuaToString(l, -1);
+		} else if (!strcmp(value, "Tribe")) {
+			genus->Tribe = LuaToString(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a species.
 **
 **  @param l  Lua state.
@@ -3847,20 +3895,14 @@ static int CclDefineSpecies(lua_State *l)
 			species->Sapient = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Prehistoric")) {
 			species->Prehistoric = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Family")) {
-			std::string family_ident = LuaToString(l, -1);
-			CSpeciesFamily *family = GetSpeciesFamily(family_ident);
-			if (family) {
-				species->Family = family;
-			} else {
-				LuaError(l, "Species family \"%s\" doesn't exist." _C_ family_ident.c_str());
-			}
-		} else if (!strcmp(value, "Subfamily")) {
-			species->Subfamily = LuaToString(l, -1);
-		} else if (!strcmp(value, "Tribe")) {
-			species->Tribe = LuaToString(l, -1);
 		} else if (!strcmp(value, "Genus")) {
-			species->Genus = LuaToString(l, -1);
+			std::string genus_ident = LuaToString(l, -1);
+			CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
+			if (genus) {
+				species->Genus = genus;
+			} else {
+				LuaError(l, "Species genus \"%s\" doesn't exist." _C_ genus_ident.c_str());
+			}
 		} else if (!strcmp(value, "Species")) {
 			species->Species = LuaToString(l, -1);
 		} else if (!strcmp(value, "ChildUpgrade")) {
@@ -3957,14 +3999,18 @@ static int CclGetSpeciesData(lua_State *l)
 		lua_pushstring(l, species->Background.c_str());
 		return 1;
 	} else if (!strcmp(data, "Family")) {
-		if (species->Family != NULL) {
-			lua_pushstring(l, species->Family->Ident.c_str());
+		if (species->Genus != NULL && species->Genus->Family != NULL) {
+			lua_pushstring(l, species->Genus->Family->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Genus")) {
-		lua_pushstring(l, species->Genus.c_str());
+		if (species->Genus != NULL) {
+			lua_pushstring(l, species->Genus->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Era")) {
 		lua_pushnumber(l, species->Era);
@@ -4022,6 +4068,39 @@ static int CclGetSpeciesData(lua_State *l)
 			lua_pushstring(l, species->EvolvesTo[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
+**  Get species genus data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetSpeciesGenusData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string genus_ident = LuaToString(l, 1);
+	const CSpeciesGenus *genus = GetSpeciesGenus(genus_ident);
+	if (!genus) {
+		LuaError(l, "Species genus \"%s\" doesn't exist." _C_ genus_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, genus->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "CommonName")) {
+		lua_pushstring(l, genus->CommonName.c_str());
+		return 1;
+	} else if (!strcmp(data, "Family")) {
+		lua_pushstring(l, genus->Family->Ident.c_str());
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -4396,9 +4475,11 @@ void UnitTypeCclRegister()
 	lua_register(Lua, "DefineSpeciesClass", CclDefineSpeciesClass);
 	lua_register(Lua, "DefineSpeciesOrder", CclDefineSpeciesOrder);
 	lua_register(Lua, "DefineSpeciesFamily", CclDefineSpeciesFamily);
+	lua_register(Lua, "DefineSpeciesGenus", CclDefineSpeciesGenus);
 	lua_register(Lua, "DefineSpecies", CclDefineSpecies);
 	lua_register(Lua, "GetSpecies", CclGetSpecies);
 	lua_register(Lua, "GetSpeciesData", CclGetSpeciesData);
+	lua_register(Lua, "GetSpeciesGenusData", CclGetSpeciesGenusData);
 	lua_register(Lua, "SetModTrains", CclSetModTrains);
 	lua_register(Lua, "SetModAiDrops", CclSetModAiDrops);
 	//Wyrmgus end

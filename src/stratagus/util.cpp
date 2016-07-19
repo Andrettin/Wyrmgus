@@ -1072,34 +1072,36 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 				personal_name = GenerateName(language, "species-" + type.Species->Ident);
 			}
 			
-			if (personal_name.empty() && !type.Species->Genus.empty()) {
-				personal_name = GenerateName(language, "species-genus-" + type.Species->Genus + "-" + GetGenderNameById(gender));
+			if (personal_name.empty() && type.Species->Genus != NULL) {
+				personal_name = GenerateName(language, "species-genus-" + type.Species->Genus->Ident + "-" + GetGenderNameById(gender));
 				if (personal_name.empty()) {
-					personal_name = GenerateName(language, "species-genus-" + type.Species->Genus);
-				}
-			}
-			if (personal_name.empty() && !type.Species->Subfamily.empty()) {
-				personal_name = GenerateName(language, "species-subfamily-" + type.Species->Subfamily + "-" + GetGenderNameById(gender));
-				if (personal_name.empty()) {
-					personal_name = GenerateName(language, "species-subfamily-" + type.Species->Subfamily);
-				}
-			}
-			if (personal_name.empty() && type.Species->Family != NULL) {
-				personal_name = GenerateName(language, "species-family-" + type.Species->Family->Ident + "-" + GetGenderNameById(gender));
-				if (personal_name.empty()) {
-					personal_name = GenerateName(language, "species-family-" + type.Species->Family->Ident);
+					personal_name = GenerateName(language, "species-genus-" + type.Species->Genus->Ident);
 				}
 				
-				if (personal_name.empty() && type.Species->Family->Order != NULL) {
-					personal_name = GenerateName(language, "species-order-" + type.Species->Family->Order->Ident + "-" + GetGenderNameById(gender));
+				if (personal_name.empty() && !type.Species->Genus->Subfamily.empty()) {
+					personal_name = GenerateName(language, "species-subfamily-" + type.Species->Genus->Subfamily + "-" + GetGenderNameById(gender));
 					if (personal_name.empty()) {
-						personal_name = GenerateName(language, "species-order-" + type.Species->Family->Order->Ident);
+						personal_name = GenerateName(language, "species-subfamily-" + type.Species->Genus->Subfamily);
 					}
+				}
 				
-					if (personal_name.empty() && type.Species->Family->Order->Class != NULL) {
-						personal_name = GenerateName(language, "species-class-" + type.Species->Family->Order->Class->Ident + "-" + GetGenderNameById(gender));
+				if (personal_name.empty() && type.Species->Genus->Family != NULL) {
+					personal_name = GenerateName(language, "species-family-" + type.Species->Genus->Family->Ident + "-" + GetGenderNameById(gender));
+					if (personal_name.empty()) {
+						personal_name = GenerateName(language, "species-family-" + type.Species->Genus->Family->Ident);
+					}
+					
+					if (personal_name.empty() && type.Species->Genus->Family->Order != NULL) {
+						personal_name = GenerateName(language, "species-order-" + type.Species->Genus->Family->Order->Ident + "-" + GetGenderNameById(gender));
 						if (personal_name.empty()) {
-							personal_name = GenerateName(language, "species-class-" + type.Species->Family->Order->Class->Ident);
+							personal_name = GenerateName(language, "species-order-" + type.Species->Genus->Family->Order->Ident);
+						}
+					
+						if (personal_name.empty() && type.Species->Genus->Family->Order->Class != NULL) {
+							personal_name = GenerateName(language, "species-class-" + type.Species->Genus->Family->Order->Class->Ident + "-" + GetGenderNameById(gender));
+							if (personal_name.empty()) {
+								personal_name = GenerateName(language, "species-class-" + type.Species->Genus->Family->Order->Class->Ident);
+							}
 						}
 					}
 				}

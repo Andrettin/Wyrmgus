@@ -3227,30 +3227,32 @@ void ParseNameElements(lua_State *l, std::string type)
 					if (type.find("species-") != std::string::npos) {
 						CSpecies *species = GetSpecies(FindAndReplaceStringEnding(FindAndReplaceStringEnding(FindAndReplaceStringBeginning(type, "species-", ""), "-male", ""), "-female", ""));
 						if (species != NULL) {
-							if (!species->Genus.empty()) {
-								std::string genus_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-genus-" + species->Genus);
+							if (species->Genus != NULL) {
+								std::string genus_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-genus-" + species->Genus->Ident);
 								name_element->IncreaseAffixNameType(genus_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
 								name_element->AddToLanguageAffixNameTypes(genus_type, word_junction_type, affix_type);
-							}
-							if (!species->Subfamily.empty()) {
-								std::string subfamily_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-subfamily-" + species->Subfamily);
-								name_element->IncreaseAffixNameType(subfamily_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
-								name_element->AddToLanguageAffixNameTypes(subfamily_type, word_junction_type, affix_type);
-							}
-							if (species->Family != NULL) {
-								std::string family_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-family-" + species->Family->Ident);
-								name_element->IncreaseAffixNameType(family_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
-								name_element->AddToLanguageAffixNameTypes(family_type, word_junction_type, affix_type);
 								
-								if (species->Family->Order != NULL) {
-									std::string order_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-order-" + species->Family->Order->Ident);
-									name_element->IncreaseAffixNameType(order_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
-									name_element->AddToLanguageAffixNameTypes(order_type, word_junction_type, affix_type);
+								if (!species->Genus->Subfamily.empty()) {
+									std::string subfamily_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-subfamily-" + species->Genus->Subfamily);
+									name_element->IncreaseAffixNameType(subfamily_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
+									name_element->AddToLanguageAffixNameTypes(subfamily_type, word_junction_type, affix_type);
+								}
+								
+								if (species->Genus->Family != NULL) {
+									std::string family_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-family-" + species->Genus->Family->Ident);
+									name_element->IncreaseAffixNameType(family_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
+									name_element->AddToLanguageAffixNameTypes(family_type, word_junction_type, affix_type);
 									
-									if (species->Family->Order->Class != NULL) {
-										std::string class_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-class-" + species->Family->Order->Class->Ident);
-										name_element->IncreaseAffixNameType(class_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
-										name_element->AddToLanguageAffixNameTypes(class_type, word_junction_type, affix_type);
+									if (species->Genus->Family->Order != NULL) {
+										std::string order_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-order-" + species->Genus->Family->Order->Ident);
+										name_element->IncreaseAffixNameType(order_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
+										name_element->AddToLanguageAffixNameTypes(order_type, word_junction_type, affix_type);
+										
+										if (species->Genus->Family->Order->Class != NULL) {
+											std::string class_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-class-" + species->Genus->Family->Order->Class->Ident);
+											name_element->IncreaseAffixNameType(class_type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
+											name_element->AddToLanguageAffixNameTypes(class_type, word_junction_type, affix_type);
+										}
 									}
 								}
 							}
@@ -3263,30 +3265,32 @@ void ParseNameElements(lua_State *l, std::string type)
 					if (type.find("species-") != std::string::npos) {
 						CSpecies *species = GetSpecies(FindAndReplaceStringEnding(FindAndReplaceStringEnding(FindAndReplaceStringBeginning(type, "species-", ""), "-male", ""), "-female", ""));
 						if (species != NULL) {
-							if (!species->Genus.empty()) {
-								std::string genus_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-genus-" + species->Genus);
+							if (species->Genus != NULL) {
+								std::string genus_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-genus-" + species->Genus->Ident);
 								name_element->IncreaseNameType(genus_type, grammatical_number, grammatical_case, grammatical_tense);
 								name_element->AddToLanguageNameTypes(genus_type);
-							}
-							if (!species->Subfamily.empty()) {
-								std::string subfamily_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-subfamily-" + species->Subfamily);
-								name_element->IncreaseNameType(subfamily_type, grammatical_number, grammatical_case, grammatical_tense);
-								name_element->AddToLanguageNameTypes(subfamily_type);
-							}
-							if (species->Family != NULL) {
-								std::string family_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-family-" + species->Family->Ident);
-								name_element->IncreaseNameType(family_type, grammatical_number, grammatical_case, grammatical_tense);
-								name_element->AddToLanguageNameTypes(family_type);
 								
-								if (species->Family->Order != NULL) {
-									std::string order_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-order-" + species->Family->Order->Ident);
-									name_element->IncreaseNameType(order_type, grammatical_number, grammatical_case, grammatical_tense);
-									name_element->AddToLanguageNameTypes(order_type);
+								if (!species->Genus->Subfamily.empty()) {
+									std::string subfamily_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-subfamily-" + species->Genus->Subfamily);
+									name_element->IncreaseNameType(subfamily_type, grammatical_number, grammatical_case, grammatical_tense);
+									name_element->AddToLanguageNameTypes(subfamily_type);
+								}
+								
+								if (species->Genus->Family != NULL) {
+									std::string family_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-family-" + species->Genus->Family->Ident);
+									name_element->IncreaseNameType(family_type, grammatical_number, grammatical_case, grammatical_tense);
+									name_element->AddToLanguageNameTypes(family_type);
 									
-									if (species->Family->Order->Class != NULL) {
-										std::string class_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-class-" + species->Family->Order->Class->Ident);
-										name_element->IncreaseNameType(class_type, grammatical_number, grammatical_case, grammatical_tense);
-										name_element->AddToLanguageNameTypes(class_type);
+									if (species->Genus->Family->Order != NULL) {
+										std::string order_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-order-" + species->Genus->Family->Order->Ident);
+										name_element->IncreaseNameType(order_type, grammatical_number, grammatical_case, grammatical_tense);
+										name_element->AddToLanguageNameTypes(order_type);
+										
+										if (species->Genus->Family->Order->Class != NULL) {
+											std::string class_type = FindAndReplaceStringBeginning(type, "species-" + species->Ident, "species-class-" + species->Genus->Family->Order->Class->Ident);
+											name_element->IncreaseNameType(class_type, grammatical_number, grammatical_case, grammatical_tense);
+											name_element->AddToLanguageNameTypes(class_type);
+										}
 									}
 								}
 							}
