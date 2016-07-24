@@ -161,7 +161,9 @@ int GetWorldMapTerrainTypeId(std::string terrain_type_name)
 
 std::string GetEraNameById(int era)
 {
-	if (era == EraCarboniferous) {
+	if (era == EraDevonian) {
+		return "devonian";
+	} else if (era == EraCarboniferous) {
 		return "carboniferous";
 	} else if (era == EraPermian) {
 		return "permian";
@@ -192,7 +194,9 @@ std::string GetEraNameById(int era)
 
 int GetEraIdByName(std::string era)
 {
-	if (era == "carboniferous") {
+	if (era == "devonian") {
+		return EraDevonian;
+	} else if (era == "carboniferous") {
 		return EraCarboniferous;
 	} else if (era == "permian") {
 		return EraPermian;

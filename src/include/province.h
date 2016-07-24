@@ -59,6 +59,7 @@ class WorldMapTile;
 **  Indexes into era array.
 */
 enum Eras {
+	EraDevonian,
 	EraCarboniferous,
 	EraPermian,
 	EraTriassic,
