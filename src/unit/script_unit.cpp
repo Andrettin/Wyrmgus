@@ -683,6 +683,12 @@ static int CclUnit(lua_State *l)
 			if (individual_upgrade) {
 				unit->IndividualUpgrades[individual_upgrade->ID] = true;
 			}
+		} else if (!strcmp(value, "rally-point")) {
+			int rally_point_x = LuaToNumber(l, 2, j + 1);
+			++j;
+			int rally_point_y = LuaToNumber(l, 2, j + 1);
+			unit->RallyPointPos.x = rally_point_x;
+			unit->RallyPointPos.y = rally_point_y;
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables

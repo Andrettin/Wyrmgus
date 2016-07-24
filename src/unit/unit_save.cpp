@@ -397,6 +397,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"individual-upgrade\", \"%s\"", AllUpgrades[i]->Ident.c_str());
 		}
 	}
+	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1) {
+		file.printf(",\n  \"rally-point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
+	}
 	//Wyrmgus end
 
 	file.printf("})\n");
