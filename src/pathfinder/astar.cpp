@@ -554,15 +554,18 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 					// for non moving unit Always Fail unless goal is unit, or unit can attack the target
 					if (&unit != goal) {
 						//Wyrmgus start
+						/*
 //						if (goal->Player->IsEnemy(unit) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
-						if ((unit.IsEnemy(*goal) || goal->Type->BoolFlag[OBSTACLE_INDEX].value) && unit.IsAgressive() && CanTarget(*unit.Type, *goal->Type)
 						//Wyrmgus end
 							&& goal->Variable[UNHOLYARMOR_INDEX].Value == 0 && goal->IsVisibleAsGoal(*unit.Player)) {
 								cost += 2 * AStarMovingUnitCrossingCost;
 						} else {
+						*/
 						// FIXME: Need support for moving a fixed unit to add cost
 							return -1;
-						}
+						//Wyrmgus start
+//						}
+						//Wyrmgus end
 						//cost += AStarFixedUnitCrossingCost;
 					}
 				}

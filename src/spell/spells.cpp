@@ -341,6 +341,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 							continue;
 						}
 					}
+					//Wyrmgus start
+					if (!UnitReachable(caster, *table[i], spell.Range)) {
+						continue;
+					}
+					//Wyrmgus end
 					if (PassCondition(caster, spell, table[i], pos, spell.Condition)
 						&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
 							table[count++] = table[i];
@@ -401,6 +406,11 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 				//Wyrmgus start
 				//if caster is terrified, don't target enemy units
 				if (caster.Variable[TERROR_INDEX].Value > 0 && caster.IsEnemy(*table[i])) {
+					continue;
+				}
+				//Wyrmgus end
+				//Wyrmgus start
+				if (!UnitReachable(caster, *table[i], spell.Range)) {
 					continue;
 				}
 				//Wyrmgus end
