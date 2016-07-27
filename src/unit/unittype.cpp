@@ -2006,12 +2006,12 @@ CSpeciesPhylum *GetSpeciesPhylum(std::string phylum_ident)
 	return NULL;
 }
 
-bool CSpecies::CanEvolveToAUnitType(bool current_tileset_only)
+bool CSpecies::CanEvolveToAUnitType(bool current_tileset_only, bool sapient_only)
 {
 	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
 		if (
-			(this->EvolvesTo[i]->Type != NULL && (!current_tileset_only || std::find(this->EvolvesTo[i]->Environments.begin(), this->EvolvesTo[i]->Environments.end(), Map.Tileset->Ident) != this->EvolvesTo[i]->Environments.end()))
-			|| this->EvolvesTo[i]->CanEvolveToAUnitType(current_tileset_only)
+			(this->EvolvesTo[i]->Type != NULL && (!current_tileset_only || std::find(this->EvolvesTo[i]->Environments.begin(), this->EvolvesTo[i]->Environments.end(), Map.Tileset->Ident) != this->EvolvesTo[i]->Environments.end()) && (!sapient_only || this->EvolvesTo[i]->Sapient))
+			|| this->EvolvesTo[i]->CanEvolveToAUnitType(current_tileset_only, sapient_only)
 		) {
 			return true;
 		}
