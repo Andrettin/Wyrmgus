@@ -797,15 +797,24 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		
 	this->Name = this->Character->GetFullName();
 	
-	if (this->Character->Type != NULL && this->Character->Type != this->Type) { //set type to that of the character
-		TransformUnitIntoType(*this, *this->Character->Type);
+	if (this->Character->Type != NULL) {
+		if (this->Character->Type != this->Type) { //set type to that of the character
+			TransformUnitIntoType(*this, *this->Character->Type);
+		}
+		
+		memcpy(Variable, this->Character->Type->Stats[this->Player->Index].Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
+	} else {
+		fprintf(stderr, "Character \"%s\" has no unit type.\n", character_full_name.c_str());
+		return;
 	}
+	
+	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades)); //reset the individual upgrades and then apply the character's
 	
 	if (this->Character->Trait != NULL) { //set trait
 		TraitAcquire(*this, this->Character->Trait);
 	}
 	
-	this->Variable[LEVEL_INDEX].Value = this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value;
+	this->Variable[LEVEL_INDEX].Max = 100000; // because the code above sets the max level to the unit type stats' Level variable (which is the same as its value)
 	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
 		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value);
 	}

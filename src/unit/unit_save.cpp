@@ -385,13 +385,6 @@ void SaveUnit(const CUnit &unit, CFile &file)
 			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.UnitStockReplenishmentTimers[i]);
 		}
 	}
-	if (unit.Character != NULL && unit.CurrentAction() != UnitActionDie) {
-		if (!unit.Character->Custom) {
-			file.printf(",\n  \"character\", \"%s\"", unit.Character->GetFullName().c_str());
-		} else {
-			file.printf(",\n  \"custom-hero\", \"%s\"", unit.Character->GetFullName().c_str());
-		}
-	}
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
 		if (unit.IndividualUpgrades[i]) {
 			file.printf(",\n  \"individual-upgrade\", \"%s\"", AllUpgrades[i]->Ident.c_str());
@@ -399,6 +392,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1) {
 		file.printf(",\n  \"rally-point\", %d, %d", unit.RallyPointPos.x, unit.RallyPointPos.y);
+	}
+	if (unit.Character != NULL && unit.CurrentAction() != UnitActionDie) {
+		if (!unit.Character->Custom) {
+			file.printf(",\n  \"character\", \"%s\"", unit.Character->GetFullName().c_str());
+		} else {
+			file.printf(",\n  \"custom-hero\", \"%s\"", unit.Character->GetFullName().c_str());
+		}
 	}
 	//Wyrmgus end
 
