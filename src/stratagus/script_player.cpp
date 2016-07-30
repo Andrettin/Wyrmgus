@@ -52,6 +52,7 @@
 #include "map.h"
 //Wyrmgus start
 #include "province.h"
+#include "quest.h"
 //Wyrmgus end
 #include "script.h"
 #include "unittype.h"
@@ -1423,6 +1424,14 @@ static int CclGetCivilizationData(lua_State *l)
 		for (size_t i = 1; i <= factions.size(); ++i)
 		{
 			lua_pushstring(l, factions[i-1].c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "Quests")) {
+		lua_createtable(l, civilization->Quests.size(), 0);
+		for (size_t i = 1; i <= civilization->Quests.size(); ++i)
+		{
+			lua_pushstring(l, civilization->Quests[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

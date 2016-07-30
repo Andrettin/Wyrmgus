@@ -160,6 +160,10 @@ static int CclDefineQuest(lua_State *l)
 		}
 	}
 	
+	if (!quest->Hidden && quest->Civilization != -1 && std::find(PlayerRaces.Civilizations[quest->Civilization]->Quests.begin(), PlayerRaces.Civilizations[quest->Civilization]->Quests.end(), quest) == PlayerRaces.Civilizations[quest->Civilization]->Quests.end()) {
+		PlayerRaces.Civilizations[quest->Civilization]->Quests.push_back(quest);
+	}
+	
 	return 0;
 }
 

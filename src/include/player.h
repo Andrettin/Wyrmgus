@@ -64,6 +64,7 @@ class CGraphic;
 class CCharacter;
 class CProvince;
 class CPlane;
+class CQuest;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -438,6 +439,7 @@ public:
 	std::string Adjective;		/// adjective pertaining to the civilization
 	std::string YearLabel;		/// label used for years (i.e. AD)
 	std::string NegativeYearLabel;	/// label used for "negative" years (i.e. BC)
+	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 };
 
