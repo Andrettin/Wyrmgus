@@ -125,12 +125,16 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		} else {
 			SaveSelection();
 			unit.Remove(NULL);
+			//Wyrmgus start
+			/*
 			if (!UnitTypeCanBeAt(newtype, pos)) {
 				unit.Place(unit.tilePos);
 				RestoreSelection();
 				// FIXME unit is not modified, try later ?
 				return 0;
 			}
+			*/
+			//Wyrmgus end
 		}
 	}
 	//Wyrmgus end
@@ -269,7 +273,11 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		//  Update Possible sight range change
 		UpdateUnitSightRange(unit);
 		if (!container) {
-			unit.Place(pos);
+			if (!UnitTypeCanBeAt(newtype, pos)) {
+				DropOutNearest(unit, pos, NULL);
+			} else {
+				unit.Place(pos);
+			}
 			RestoreSelection();
 		} else {
 			MapMarkUnitSight(unit);

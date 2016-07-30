@@ -41,6 +41,7 @@
 #include "ui.h"
 #include "player.h"
 //Wyrmgus start
+#include "settings.h"
 #include "unit_find.h"
 //Wyrmgus end
 #include "unittype.h"
@@ -224,6 +225,9 @@ void CMap::RemoveWall(const Vec2i &pos)
 	MapFixWallTile(pos);
 	mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 	//Wyrmgus start
+	if (GameSettings.Inside) {
+		mf.Flags &= ~(MapFieldAirUnpassable);
+	}
 	mf.Flags |= MapFieldGravel;
 	//Wyrmgus end
 	MapFixWallNeighbors(pos);
