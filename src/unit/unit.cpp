@@ -2363,7 +2363,10 @@ void MarkUnitFieldFlags(const CUnit &unit)
 	const int width = unit.Type->TileWidth; // Tile width of the unit.
 	unsigned int index = unit.Offset;
 
-	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
+	//Wyrmgus start
+//	if (unit.Type->BoolFlag[VANISHES_INDEX].value) {
+	if (unit.Type->BoolFlag[VANISHES_INDEX].value || unit.CurrentAction() == UnitActionDie) {
+	//Wyrmgus end
 		return ;
 	}
 	do {
