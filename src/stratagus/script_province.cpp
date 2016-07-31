@@ -51,6 +51,64 @@
 ----------------------------------------------------------------------------*/
 
 /**
+**  Define a terrain type.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineTerrainType(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string terrain_ident = LuaToString(l, 1);
+	CTerrainType *terrain = GetTerrainType(terrain_ident);
+	if (terrain == NULL) {
+		terrain = new CTerrainType;
+		terrain->Ident = terrain_ident;
+		terrain->ID = WorldMapTerrainTypes.size();
+		TerrainTypes.push_back(terrain);
+		TerrainTypeStringToIndex[terrain_ident] = terrain->ID;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			terrain->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Buildable")) {
+			terrain->Buildable = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "BaseTerrain")) {
+			terrain->BaseTerrain = GetTerrainType(LuaToString(l, -1));
+			if (!terrain->BaseTerrain) {
+				LuaError(l, "Terrain doesn't exist.");
+			}
+			terrain->BorderTerrains.push_back(terrain->BaseTerrain);
+			terrain->BaseTerrain->BorderTerrains.push_back(terrain);
+		} else if (!strcmp(value, "BorderTerrains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CTerrainType *border_terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+				if (border_terrain == NULL) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				terrain->BorderTerrains.push_back(border_terrain);
+				border_terrain->BorderTerrains.push_back(terrain);
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define a world map terrain type.
 **
 **  @param l  Lua state.
@@ -64,9 +122,9 @@ static int CclDefineWorldMapTerrainType(lua_State *l)
 
 	std::string terrain_name = LuaToString(l, 1);
 	int terrain_id = GetWorldMapTerrainTypeId(terrain_name);
-	WorldMapTerrainType *terrain_type = NULL;
+	CWorldMapTerrainType *terrain_type = NULL;
 	if (terrain_id == -1) {
-		terrain_type = new WorldMapTerrainType;
+		terrain_type = new CWorldMapTerrainType;
 		terrain_type->Name = terrain_name;
 		terrain_type->ID = WorldMapTerrainTypes.size();
 		WorldMapTerrainTypes.push_back(terrain_type);
@@ -1362,6 +1420,7 @@ static int CclGetRivers(lua_State *l)
 */
 void ProvinceCclRegister()
 {
+	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
 	lua_register(Lua, "DefineWorldMapTerrainType", CclDefineWorldMapTerrainType);
 	lua_register(Lua, "DefinePlane", CclDefinePlane);
 	lua_register(Lua, "DefineWorld", CclDefineWorld);

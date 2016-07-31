@@ -51,7 +51,9 @@ std::vector<CWorld *> Worlds;
 std::vector<CRegion *> Regions;
 std::vector<CProvince *> Provinces;
 std::vector<CRiver *> Rivers;
-std::vector<WorldMapTerrainType *>  WorldMapTerrainTypes;
+std::vector<CTerrainType *> TerrainTypes;
+std::vector<CWorldMapTerrainType *> WorldMapTerrainTypes;
+std::map<std::string, int> TerrainTypeStringToIndex;
 std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 /*----------------------------------------------------------------------------
@@ -60,6 +62,11 @@ std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 void CleanWorlds()
 {
+	for (size_t i = 0; i < TerrainTypes.size(); ++i) {
+		delete TerrainTypes[i];
+	}
+	TerrainTypes.clear();
+	
 	for (size_t i = 0; i < WorldMapTerrainTypes.size(); ++i) {
 		delete WorldMapTerrainTypes[i];
 	}
@@ -140,6 +147,22 @@ CRiver *GetRiver(std::string river_name)
 			return Rivers[i];
 		}
 	}
+	return NULL;
+}
+
+/**
+**  Get a terrain type
+*/
+CTerrainType *GetTerrainType(std::string terrain_ident)
+{
+	if (terrain_ident.empty()) {
+		return NULL;
+	}
+	
+	if (TerrainTypeStringToIndex.find(terrain_ident) != TerrainTypeStringToIndex.end()) {
+		return TerrainTypes[TerrainTypeStringToIndex[terrain_ident]];
+	}
+	
 	return NULL;
 }
 

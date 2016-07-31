@@ -87,10 +87,28 @@ enum Pathways {
 	MaxPathways
 };
 
-class WorldMapTerrainType
+class CTerrainType
 {
 public:
-	WorldMapTerrainType() :
+	CTerrainType() :
+		ID(-1),
+		Buildable(false),
+		BaseTerrain(NULL)
+	{
+	}
+
+	std::string Name;
+	std::string Ident;
+	int ID;
+	bool Buildable;
+	CTerrainType *BaseTerrain;
+	std::vector<CTerrainType *> BorderTerrains;
+};
+
+class CWorldMapTerrainType
+{
+public:
+	CWorldMapTerrainType() :
 		HasTransitions(false), Water(false), ID(-1), BaseTile(-1), Variations(0)
 	{
 	}
@@ -133,7 +151,7 @@ public:
 	std::string Description;
 	std::string Background;
 	std::string Quote;
-	WorldMapTerrainType *BaseTerrain;									/// Base terrain for the world
+	CWorldMapTerrainType *BaseTerrain;									/// Base terrain for the world
 	CPlane *Plane;
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
 	std::vector<CRiver *> Rivers;										/// Rivers in this world
@@ -240,7 +258,9 @@ extern std::vector<CWorld *> Worlds;
 extern std::vector<CRegion *> Regions;
 extern std::vector<CProvince *> Provinces;
 extern std::vector<CRiver *> Rivers;
-extern std::vector<WorldMapTerrainType *>  WorldMapTerrainTypes;
+extern std::vector<CTerrainType *>  TerrainTypes;
+extern std::vector<CWorldMapTerrainType *>  WorldMapTerrainTypes;
+extern std::map<std::string, int> TerrainTypeStringToIndex;
 extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 /*----------------------------------------------------------------------------
@@ -253,6 +273,7 @@ extern CWorld *GetWorld(std::string world_name);
 extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
 extern CRiver *GetRiver(std::string river_name);
+extern CTerrainType *GetTerrainType(std::string terrain_ident);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern std::string GetEraNameById(int era);
 extern int GetEraIdByName(std::string era);

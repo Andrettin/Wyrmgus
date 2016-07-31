@@ -168,7 +168,7 @@ extern const char NameLine[];
 
 #define WorldMapWidthMax 1024		/// Maximum width the grand strategy world map can have
 #define WorldMapHeightMax 1024		/// Maximum height the grand strategy world map can have
-#define WorldMapTerrainTypeMax 32	/// Maximum height the grand strategy world map can have
+#define WorldMapTerrainTypeMax 32	/// Maximum world map terrain types
 #define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
 
 #define AuraRange 6					/// Range of auras
