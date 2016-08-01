@@ -2067,12 +2067,14 @@ static int CclDefineUnitType(lua_State *l)
 			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[i].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[i].rend(); ++iterator) {
 				if (iterator->second == type->Slot) {
 					PlayerRaces.CivilizationClassUnitTypes[i].erase(iterator->first);
+					break;
 				}
 			}
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 				for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.Factions[i][j]->ClassUnitTypes.rbegin(); iterator != PlayerRaces.Factions[i][j]->ClassUnitTypes.rend(); ++iterator) {
 					if (iterator->second == type->Slot) {
 						PlayerRaces.Factions[i][j]->ClassUnitTypes.erase(iterator->first);
+						break;
 					}
 				}
 			}
