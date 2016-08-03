@@ -92,7 +92,7 @@ class CTerrainType
 {
 public:
 	CTerrainType() :
-		ID(-1),
+		ID(-1), Flags(0),
 		Overlay(false), Buildable(false),
 		DefaultBaseTerrain(NULL)
 	{
@@ -101,12 +101,14 @@ public:
 	std::string Name;
 	std::string Ident;
 	int ID;
+	unsigned int Flags;
 	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;
 	CTerrainType *DefaultBaseTerrain;
 	std::vector<CTerrainType *> BorderTerrains;
 	std::vector<CGraphic *> SolidGraphics;
 	std::map<std::tuple<int, int>, std::vector<CGraphic *>> TransitionGraphics;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+	std::map<std::tuple<int, int>, std::vector<CGraphic *>> AdjacentTransitionGraphics;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 };
 
 class CWorldMapTerrainType

@@ -40,6 +40,7 @@
 #include "iolib.h"
 #include "player.h"
 #include "script.h"
+#include "tileset.h"
 #include "unittype.h"
 #include "upgrade.h"
 #include "video.h"
@@ -104,6 +105,47 @@ static int CclDefineTerrainType(lua_State *l)
 				terrain->BorderTerrains.push_back(border_terrain);
 				border_terrain->BorderTerrains.push_back(terrain);
 			}
+		} else if (!strcmp(value, "Flags")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string tile_flag = LuaToString(l, -1, j + 1);
+				if (tile_flag == "land") {
+					terrain->Flags |= MapFieldLandAllowed;
+				} else if (tile_flag == "coast") {
+					terrain->Flags |= MapFieldCoastAllowed;
+				} else if (tile_flag == "water") {
+					terrain->Flags |= MapFieldWaterAllowed;
+				} else if (tile_flag == "no-building") {
+					terrain->Flags |= MapFieldNoBuilding;
+				} else if (tile_flag == "unpassable") {
+					terrain->Flags |= MapFieldUnpassable;
+				} else if (tile_flag == "wall") {
+					terrain->Flags |= MapFieldWall;
+				} else if (tile_flag == "rock") {
+					terrain->Flags |= MapFieldRocks;
+				} else if (tile_flag == "forest") {
+					terrain->Flags |= MapFieldForest;
+				} else if (tile_flag == "air-unpassable") {
+					terrain->Flags |= MapFieldAirUnpassable;
+				} else if (tile_flag == "dirt") {
+					terrain->Flags |= MapFieldDirt;
+				} else if (tile_flag == "grass") {
+					terrain->Flags |= MapFieldGrass;
+				} else if (tile_flag == "gravel") {
+					terrain->Flags |= MapFieldGravel;
+				} else if (tile_flag == "mud") {
+					terrain->Flags |= MapFieldMud;
+				} else if (tile_flag == "stone-floor") {
+					terrain->Flags |= MapFieldStoneFloor;
+				} else if (tile_flag == "stumps") {
+					terrain->Flags |= MapFieldStumps;
+				} else {
+					LuaError(l, "Flag \"%s\" doesn't exist.");
+				}
+			}
 		} else if (!strcmp(value, "SolidGraphics")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -149,6 +191,36 @@ static int CclDefineTerrainType(lua_State *l)
 					transition_graphics->Load();
 				}
 				terrain->TransitionGraphics[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(CGraphic::Get(transition_graphics_file));
+			}
+		} else if (!strcmp(value, "AdjacentTransitionGraphics")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
+				CTerrainType *transition_terrain = GetTerrainType(transition_terrain_name);
+				if (transition_terrain == NULL && transition_terrain_name != "any") {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				int transition_terrain_id = transition_terrain_name == "any" ? -1 : transition_terrain->ID;
+				++j;
+				
+				int transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
+				if (transition_type == -1) {
+					LuaError(l, "Transition type doesn't exist.");
+				}
+				++j;
+				
+				std::string transition_graphics_file = LuaToString(l, -1, j + 1);
+				if (!CanAccessFile(transition_graphics_file.c_str())) {
+					LuaError(l, "File \"%s\" doesn't exist." _C_ transition_graphics_file.c_str());
+				}
+				if (CGraphic::Get(transition_graphics_file) == NULL) {
+					CGraphic *transition_graphics = CGraphic::New(transition_graphics_file, 32, 32);
+					transition_graphics->Load();
+				}
+				terrain->AdjacentTransitionGraphics[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(CGraphic::Get(transition_graphics_file));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
