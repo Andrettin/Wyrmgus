@@ -37,10 +37,12 @@
 
 #include "province.h"
 
+#include "iolib.h"
 #include "player.h"
 #include "script.h"
 #include "unittype.h"
 #include "upgrade.h"
+#include "video.h"
 
 /*----------------------------------------------------------------------------
 --  Variables
@@ -78,15 +80,17 @@ static int CclDefineTerrainType(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			terrain->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Overlay")) {
+			terrain->Overlay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Buildable")) {
 			terrain->Buildable = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "BaseTerrain")) {
-			terrain->BaseTerrain = GetTerrainType(LuaToString(l, -1));
-			if (!terrain->BaseTerrain) {
+		} else if (!strcmp(value, "DefaultBaseTerrain")) {
+			terrain->DefaultBaseTerrain = GetTerrainType(LuaToString(l, -1));
+			if (!terrain->DefaultBaseTerrain) {
 				LuaError(l, "Terrain doesn't exist.");
 			}
-			terrain->BorderTerrains.push_back(terrain->BaseTerrain);
-			terrain->BaseTerrain->BorderTerrains.push_back(terrain);
+			terrain->BorderTerrains.push_back(terrain->DefaultBaseTerrain);
+			terrain->DefaultBaseTerrain->BorderTerrains.push_back(terrain);
 		} else if (!strcmp(value, "BorderTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -99,6 +103,52 @@ static int CclDefineTerrainType(lua_State *l)
 				}
 				terrain->BorderTerrains.push_back(border_terrain);
 				border_terrain->BorderTerrains.push_back(terrain);
+			}
+		} else if (!strcmp(value, "SolidGraphics")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string solid_graphics_file = LuaToString(l, -1, j + 1);
+				if (!CanAccessFile(solid_graphics_file.c_str())) {
+					LuaError(l, "File \"%s\" doesn't exist." _C_ solid_graphics_file.c_str());
+				}
+				if (CGraphic::Get(solid_graphics_file) == NULL) {
+					CGraphic *solid_graphics = CGraphic::New(solid_graphics_file, 32, 32);
+					solid_graphics->Load();
+				}
+				terrain->SolidGraphics.push_back(CGraphic::Get(solid_graphics_file));
+			}
+		} else if (!strcmp(value, "TransitionGraphics")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string transition_terrain_name = LuaToString(l, -1, j + 1);
+				CTerrainType *transition_terrain = GetTerrainType(transition_terrain_name);
+				if (transition_terrain == NULL && transition_terrain_name != "any") {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				int transition_terrain_id = transition_terrain_name == "any" ? -1 : transition_terrain->ID;
+				++j;
+				
+				int transition_type = GetTransitionTypeIdByName(LuaToString(l, -1, j + 1));
+				if (transition_type == -1) {
+					LuaError(l, "Transition type doesn't exist.");
+				}
+				++j;
+				
+				std::string transition_graphics_file = LuaToString(l, -1, j + 1);
+				if (!CanAccessFile(transition_graphics_file.c_str())) {
+					LuaError(l, "File \"%s\" doesn't exist." _C_ transition_graphics_file.c_str());
+				}
+				if (CGraphic::Get(transition_graphics_file) == NULL) {
+					CGraphic *transition_graphics = CGraphic::New(transition_graphics_file, 32, 32);
+					transition_graphics->Load();
+				}
+				terrain->TransitionGraphics[std::tuple<int, int>(transition_terrain_id, transition_type)].push_back(CGraphic::Get(transition_graphics_file));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

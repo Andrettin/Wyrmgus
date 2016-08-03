@@ -228,6 +228,23 @@ enum TimesOfDay {
 	MaxTimesOfDay
 };
 
+enum TransitionTypes {
+	NorthTransitionType,
+	EastTransitionType,
+	SouthTransitionType,
+	WestTransitionType,
+	NortheastOuterTransitionType,
+	SoutheastOuterTransitionType,
+	SouthwestOuterTransitionType,
+	NorthwestOuterTransitionType,
+	NortheastInnerTransitionType,
+	SoutheastInnerTransitionType,
+	SouthwestInnerTransitionType,
+	NorthwestInnerTransitionType,
+	
+	MaxTransitionTypes
+};
+
 enum Months {
 	JanuaryMonth,
 	FebruaryMonth,
@@ -253,6 +270,8 @@ extern int GetReverseDirection(int direction);
 extern std::string GetDirectionNameById(int direction);
 extern int GetDirectionIdByName(std::string direction);
 extern Vec2i GetDirectionOffset(int direction);
+extern std::string GetTransitionTypeNameById(int transition_type);
+extern int GetTransitionTypeIdByName(std::string transition_type);
 //Wyrmgus end
 
 //@}

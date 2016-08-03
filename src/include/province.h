@@ -54,6 +54,7 @@ class CRiver;
 class CCharacter;
 class CSpecies;
 class WorldMapTile;
+class CGraphic;
 
 /**
 **  Indexes into era array.
@@ -92,17 +93,20 @@ class CTerrainType
 public:
 	CTerrainType() :
 		ID(-1),
-		Buildable(false),
-		BaseTerrain(NULL)
+		Overlay(false), Buildable(false),
+		DefaultBaseTerrain(NULL)
 	{
 	}
 
 	std::string Name;
 	std::string Ident;
 	int ID;
+	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;
-	CTerrainType *BaseTerrain;
+	CTerrainType *DefaultBaseTerrain;
 	std::vector<CTerrainType *> BorderTerrains;
+	std::vector<CGraphic *> SolidGraphics;
+	std::map<std::tuple<int, int>, std::vector<CGraphic *>> TransitionGraphics;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 };
 
 class CWorldMapTerrainType
