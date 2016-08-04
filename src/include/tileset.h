@@ -40,9 +40,13 @@
 #include <vector>
 //Wyrmgus start
 #include <map>
+#include <tuple>
 //Wyrmgus end
 
 struct lua_State;
+//Wyrmgus start
+class CGraphic;
+//Wyrmgus end
 
 //Wyrmgus start
 /*
@@ -114,6 +118,47 @@ enum TileType {
 	TileTypeOrcWall,    /// Any orc wall tile
 	TileTypeWater       /// Any water tile
 };
+
+//Wyrmgus start
+enum TransitionTypes {
+	NorthTransitionType,
+	EastTransitionType,
+	SouthTransitionType,
+	WestTransitionType,
+	NortheastOuterTransitionType,
+	SoutheastOuterTransitionType,
+	SouthwestOuterTransitionType,
+	NorthwestOuterTransitionType,
+	NortheastInnerTransitionType,
+	SoutheastInnerTransitionType,
+	SouthwestInnerTransitionType,
+	NorthwestInnerTransitionType,
+	
+	MaxTransitionTypes
+};
+
+class CTerrainType
+{
+public:
+	CTerrainType() :
+		ID(-1), Flags(0),
+		Overlay(false), Buildable(false)
+	{
+	}
+
+	std::string Name;
+	std::string Ident;
+	int ID;
+	unsigned int Flags;
+	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
+	bool Buildable;
+	std::vector<CTerrainType *> BaseTerrains;					/// Possible base terrains for this terrain type (if is an overlay terrain)
+	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border
+	std::vector<CGraphic *> SolidGraphics;
+	std::map<std::tuple<int, int>, std::vector<CGraphic *>> TransitionGraphics;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+	std::map<std::tuple<int, int>, std::vector<CGraphic *>> AdjacentTransitionGraphics;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+};
+//Wyrmgus end
 
 /// Single tile definition
 struct CTileInfo {
@@ -285,11 +330,25 @@ private:
 #endif
 };
 
+//Wyrmgus start
+/*----------------------------------------------------------------------------
+-- Variables
+----------------------------------------------------------------------------*/
+
+extern std::vector<CTerrainType *>  TerrainTypes;
+extern std::map<std::string, int> TerrainTypeStringToIndex;
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
 
 extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
+//Wyrmgus start
+extern std::string GetTransitionTypeNameById(int transition_type);
+extern int GetTransitionTypeIdByName(std::string transition_type);
+extern CTerrainType *GetTerrainType(std::string terrain_ident);
+//Wyrmgus end
 
 //@}
 

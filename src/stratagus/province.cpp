@@ -42,6 +42,8 @@
 #include <string>
 #include <map>
 
+#include "tileset.h" // for the terrain types, which are cleaned here
+
 /*----------------------------------------------------------------------------
 --  Variables
 ----------------------------------------------------------------------------*/
@@ -51,9 +53,7 @@ std::vector<CWorld *> Worlds;
 std::vector<CRegion *> Regions;
 std::vector<CProvince *> Provinces;
 std::vector<CRiver *> Rivers;
-std::vector<CTerrainType *> TerrainTypes;
 std::vector<CWorldMapTerrainType *> WorldMapTerrainTypes;
-std::map<std::string, int> TerrainTypeStringToIndex;
 std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 /*----------------------------------------------------------------------------
@@ -147,22 +147,6 @@ CRiver *GetRiver(std::string river_name)
 			return Rivers[i];
 		}
 	}
-	return NULL;
-}
-
-/**
-**  Get a terrain type
-*/
-CTerrainType *GetTerrainType(std::string terrain_ident)
-{
-	if (terrain_ident.empty()) {
-		return NULL;
-	}
-	
-	if (TerrainTypeStringToIndex.find(terrain_ident) != TerrainTypeStringToIndex.end()) {
-		return TerrainTypes[TerrainTypeStringToIndex[terrain_ident]];
-	}
-	
 	return NULL;
 }
 

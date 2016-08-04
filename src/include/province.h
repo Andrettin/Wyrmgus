@@ -88,29 +88,6 @@ enum Pathways {
 	MaxPathways
 };
 
-class CTerrainType
-{
-public:
-	CTerrainType() :
-		ID(-1), Flags(0),
-		Overlay(false), Buildable(false),
-		DefaultBaseTerrain(NULL)
-	{
-	}
-
-	std::string Name;
-	std::string Ident;
-	int ID;
-	unsigned int Flags;
-	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
-	bool Buildable;
-	CTerrainType *DefaultBaseTerrain;
-	std::vector<CTerrainType *> BorderTerrains;
-	std::vector<CGraphic *> SolidGraphics;
-	std::map<std::tuple<int, int>, std::vector<CGraphic *>> TransitionGraphics;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
-	std::map<std::tuple<int, int>, std::vector<CGraphic *>> AdjacentTransitionGraphics;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
-};
-
 class CWorldMapTerrainType
 {
 public:
@@ -264,9 +241,7 @@ extern std::vector<CWorld *> Worlds;
 extern std::vector<CRegion *> Regions;
 extern std::vector<CProvince *> Provinces;
 extern std::vector<CRiver *> Rivers;
-extern std::vector<CTerrainType *>  TerrainTypes;
 extern std::vector<CWorldMapTerrainType *>  WorldMapTerrainTypes;
-extern std::map<std::string, int> TerrainTypeStringToIndex;
 extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
 /*----------------------------------------------------------------------------
@@ -279,7 +254,6 @@ extern CWorld *GetWorld(std::string world_name);
 extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
 extern CRiver *GetRiver(std::string river_name);
-extern CTerrainType *GetTerrainType(std::string terrain_ident);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern std::string GetEraNameById(int era);
 extern int GetEraIdByName(std::string era);
