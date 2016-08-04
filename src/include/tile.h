@@ -141,6 +141,9 @@
 class CFile;
 class CPlayer;
 class CTileset;
+//Wyrmgus start
+class CTerrainType;
+//Wyrmgus end
 struct lua_State;
 
 /*----------------------------------------------------------------------------
@@ -240,6 +243,8 @@ public:
 //	unsigned short Flags;      /// field flags
 	unsigned long Flags;      /// field flags
 	int AnimationFrame;		/// current frame of the tile's animation
+	CTerrainType *Terrain;
+	CTerrainType *OverlayTerrain;
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile

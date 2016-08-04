@@ -1250,11 +1250,24 @@ static void DrawEditorInfo()
 	const int index = mf.getTileIndex();
 	//Wyrmgus end
 	Assert(index != -1);
+	//Wyrmgus start
+	/*
 	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 	const char *baseTerrainStr = tileset.getTerrainName(baseTerrainIdx).c_str();
 	const int mixTerrainIdx = tileset.tiles[index].tileinfo.MixTerrain;
 	const char *mixTerrainStr = mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "";
 	snprintf(buf, sizeof(buf), "%s %s", baseTerrainStr, mixTerrainStr);
+	*/
+	std::string terrain_name;
+	if (mf.Terrain) {
+		if (mf.OverlayTerrain) {
+			terrain_name = mf.OverlayTerrain->Name + " (" + mf.Terrain->Name + ")";
+		} else {
+			terrain_name = mf.Terrain->Name;
+		}
+	}
+	snprintf(buf, sizeof(buf), "%s", terrain_name.c_str());
+	//Wyrmgus end
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 288, UI.StatusLine.TextY - 12, buf);

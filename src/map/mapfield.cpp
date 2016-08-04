@@ -60,6 +60,8 @@ CMapField::CMapField() :
 	Value(0),
 	//Wyrmgus start
 	AnimationFrame(0),
+	Terrain(NULL),
+	OverlayTerrain(NULL),
 	//Wyrmgus end
 	UnitCache()
 {}
@@ -126,6 +128,18 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	//Wyrmgus start
 	if (Editor.Running == EditorNotRunning && tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames > 0 && !tileset.tiles[this->tilesetTile].tileinfo.MixTerrain) {
 		this->AnimationFrame = SyncRand(tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames);
+	}
+	
+	CTerrainType *terrain = GetTerrainType(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
+	if (terrain && terrain->Overlay) {
+		this->Terrain = terrain->BaseTerrains[0];
+		this->OverlayTerrain = terrain;
+	} else {
+		this->Terrain = terrain;
+	}
+	
+	if (!terrain) {
+		fprintf(stderr, "Terrain type \"%s\" doesn't exist.\n", tileset.getTerrainName(tile.tileinfo.BaseTerrain).c_str());
 	}
 	//Wyrmgus end
 }
