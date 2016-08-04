@@ -63,6 +63,7 @@
 #include "spells.h"
 //Wyrmgus start
 #include "text.h"
+#include "tileset.h"
 //Wyrmgus end
 #include "trigger.h"
 #include "ui.h"
@@ -191,6 +192,9 @@ void LoadModules()
 	LoadCursors();
 	//Wyrmgus end
 	UI.Load();
+	//Wyrmgus start
+	LoadTerrainTypes();
+	//Wyrmgus end
 #ifndef DYNAMIC_LOAD
 	LoadMissileSprites();
 #endif

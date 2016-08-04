@@ -271,6 +271,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			//Wyrmgus start
 //			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
+			/*
 			int underlay_terrain;
 			if ((std::find(Map.Tileset->removedTreeTiles.begin(), Map.Tileset->removedTreeTiles.end(), tile) != Map.Tileset->removedTreeTiles.end() && (mf.getFlag() & MapFieldStumps)) || (mf.getFlag() & MapFieldForest)) { //wood tile, draw grass (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for stump tiles or regrown trees
 				underlay_terrain = Map.Tileset->TreeUnderlayTerrain;
@@ -293,6 +294,14 @@ void CViewport::DrawMapBackgroundInViewport() const
 				Map.SolidTileGraphics[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain]->DrawFrameClip(tile + mf.AnimationFrame, dx, dy, false);
 			} else {
 				Map.TileGraphic->DrawFrameClip(tile + mf.AnimationFrame, dx, dy, false);
+			}
+			*/
+			
+			if (mf.Terrain && mf.Terrain->Graphics) {
+				mf.Terrain->Graphics->DrawFrameClip(mf.SolidTile, dx, dy, false);
+			}
+			if (mf.OverlayTerrain && mf.OverlayTerrain->Graphics) {
+				mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile, dx, dy, false);
 			}
 			//Wyrmgus end
 			++sx;

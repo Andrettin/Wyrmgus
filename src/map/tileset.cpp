@@ -187,6 +187,8 @@
 
 #include <limits.h>
 
+#include "video.h"
+
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
@@ -897,5 +899,16 @@ CTerrainType *GetTerrainType(std::string terrain_ident)
 	}
 	
 	return NULL;
+}
+
+void LoadTerrainTypes()
+{
+	for (std::vector<CTerrainType *>::iterator it = TerrainTypes.begin();
+		 it != TerrainTypes.end();
+		 ++it) {
+		if ((*it)->Graphics) {
+			(*it)->Graphics->Load();
+		}
+	}
 }
 //Wyrmgus end

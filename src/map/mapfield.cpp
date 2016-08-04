@@ -60,8 +60,8 @@ CMapField::CMapField() :
 	Value(0),
 	//Wyrmgus start
 	AnimationFrame(0),
-	Terrain(NULL),
-	OverlayTerrain(NULL),
+	Terrain(NULL), OverlayTerrain(NULL),
+	SolidTile(0), OverlaySolidTile(0),
 	//Wyrmgus end
 	UnitCache()
 {}
@@ -88,6 +88,30 @@ bool CMapField::IsTerrainResourceOnMap() const
 	}
 	return false;
 }
+
+//Wyrmgus start
+void CMapField::SetTerrain(CTerrainType *terrain)
+{
+	if (!terrain) {
+		return;
+	}
+	
+	if (terrain->Overlay) {
+		if (!this->Terrain) {
+			this->SetTerrain(terrain->BaseTerrains[0]);
+		}
+		this->OverlayTerrain = terrain;
+		if (terrain->SolidTiles.size() > 0) {
+			this->OverlaySolidTile = terrain->SolidTiles[SyncRand(terrain->SolidTiles.size())];
+		}
+	} else {
+		this->Terrain = terrain;
+		if (terrain->SolidTiles.size() > 0) {
+			this->SolidTile = terrain->SolidTiles[SyncRand(terrain->SolidTiles.size())];
+		}
+	}
+}
+//Wyrmgus end
 
 void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
 {
@@ -131,13 +155,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	}
 	
 	CTerrainType *terrain = GetTerrainType(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
-	if (terrain && terrain->Overlay) {
-		this->Terrain = terrain->BaseTerrains[0];
-		this->OverlayTerrain = terrain;
-	} else {
-		this->Terrain = terrain;
-	}
-	
+	this->SetTerrain(terrain);
 	if (!terrain) {
 		fprintf(stderr, "Terrain type \"%s\" doesn't exist.\n", tileset.getTerrainName(tile.tileinfo.BaseTerrain).c_str());
 	}
@@ -262,6 +280,7 @@ void CMapField::parse(lua_State *l)
 	this->playerInfo.SeenTile = LuaToNumber(l, -1, 3);
 	this->Value = LuaToNumber(l, -1, 4);
 	this->cost = LuaToNumber(l, -1, 5);
+	this->SetTerrain(GetTerrainType(Map.Tileset->getTerrainName(Map.Tileset->tiles[this->tilesetTile].tileinfo.BaseTerrain)));
 	//Wyrmgus end
 
 	//Wyrmgus start

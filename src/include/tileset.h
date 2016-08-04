@@ -142,7 +142,8 @@ class CTerrainType
 public:
 	CTerrainType() :
 		ID(-1), Flags(0),
-		Overlay(false), Buildable(false)
+		Overlay(false), Buildable(false),
+		Graphics(NULL)
 	{
 	}
 
@@ -152,11 +153,12 @@ public:
 	unsigned int Flags;
 	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;
+	CGraphic *Graphics;
 	std::vector<CTerrainType *> BaseTerrains;					/// Possible base terrains for this terrain type (if is an overlay terrain)
 	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border
-	std::vector<CGraphic *> SolidGraphics;
-	std::map<std::tuple<int, int>, std::vector<CGraphic *>> TransitionGraphics;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
-	std::map<std::tuple<int, int>, std::vector<CGraphic *>> AdjacentTransitionGraphics;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+	std::vector<int> SolidTiles;
+	std::map<std::tuple<int, int>, std::vector<int>> TransitionTiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
+	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 };
 //Wyrmgus end
 
@@ -348,6 +350,7 @@ extern void ParseTilesetTileFlags(lua_State *l, int *back, int *j);
 extern std::string GetTransitionTypeNameById(int transition_type);
 extern int GetTransitionTypeIdByName(std::string transition_type);
 extern CTerrainType *GetTerrainType(std::string terrain_ident);
+extern void LoadTerrainTypes();
 //Wyrmgus end
 
 //@}

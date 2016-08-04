@@ -143,6 +143,7 @@ class CPlayer;
 class CTileset;
 //Wyrmgus start
 class CTerrainType;
+class CGraphic;
 //Wyrmgus end
 struct lua_State;
 
@@ -197,6 +198,9 @@ public:
 	void Save(CFile &file) const;
 	void parse(lua_State *l);
 
+	//Wyrmgus start
+	void SetTerrain(CTerrainType *terrain);
+	//Wyrmgus end
 	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value);
 
 	unsigned int getGraphicTile() const { return tile; }
@@ -245,6 +249,8 @@ public:
 	int AnimationFrame;		/// current frame of the tile's animation
 	CTerrainType *Terrain;
 	CTerrainType *OverlayTerrain;
+	int SolidTile;
+	int OverlaySolidTile;
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile
