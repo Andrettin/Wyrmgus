@@ -148,7 +148,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 			this->Flags |= MapFieldAirUnpassable;
 		}
 	}
-	this->cost = 1 << (this->Flags & MapFieldSpeedMask);
+	this->cost = 8; // default speed
 }
 
 void CMapField::SetOverlayTerrainDestroyed(bool destroyed)

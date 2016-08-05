@@ -740,6 +740,7 @@ static int CclDefineTerrainType(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
+			terrain->Flags = 0;
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
 				std::string tile_flag = LuaToString(l, -1, j + 1);
