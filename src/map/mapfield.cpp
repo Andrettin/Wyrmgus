@@ -123,6 +123,10 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		if (terrain->SolidTiles.size() > 0) {
 			this->SolidTile = terrain->SolidTiles[SyncRand(terrain->SolidTiles.size())];
 		}
+		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrains.begin(), this->OverlayTerrain->BaseTerrains.end(), terrain) == this->OverlayTerrain->BaseTerrains.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
+			this->Flags &= ~(this->OverlayTerrain->Flags);
+			this->OverlayTerrain = NULL;
+		}
 	}
 	
 	if (Editor.Running == EditorNotRunning && terrain->SolidAnimationFrames > 0) {
@@ -144,7 +148,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 			this->Flags |= MapFieldAirUnpassable;
 		}
 	}
-	this->cost = 1 << (terrain->Flags & MapFieldSpeedMask);
+	this->cost = 1 << (this->Flags & MapFieldSpeedMask);
 }
 
 void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
