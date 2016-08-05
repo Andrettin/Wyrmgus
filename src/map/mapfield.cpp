@@ -97,7 +97,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	}
 	
 	if (terrain->Overlay) {
-		if (!this->Terrain) {
+		if (!this->Terrain || std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), this->Terrain) == terrain->BaseTerrains.end()) {
 			this->SetTerrain(terrain->BaseTerrains[0]);
 		}
 		this->OverlayTerrain = terrain;

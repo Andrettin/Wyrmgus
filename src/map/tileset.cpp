@@ -828,28 +828,32 @@ std::string GetTransitionTypeNameById(int transition_type)
 {
 	if (transition_type == NorthTransitionType) {
 		return "north";
-	} else if (transition_type == EastTransitionType) {
-		return "east";
 	} else if (transition_type == SouthTransitionType) {
 		return "south";
 	} else if (transition_type == WestTransitionType) {
 		return "west";
-	} else if (transition_type == NortheastOuterTransitionType) {
-		return "northeast-outer";
-	} else if (transition_type == SoutheastOuterTransitionType) {
-		return "southeast-outer";
-	} else if (transition_type == SouthwestOuterTransitionType) {
-		return "southwest-outer";
+	} else if (transition_type == EastTransitionType) {
+		return "east";
 	} else if (transition_type == NorthwestOuterTransitionType) {
 		return "northwest-outer";
-	} else if (transition_type == NortheastInnerTransitionType) {
-		return "northeast-inner";
-	} else if (transition_type == SoutheastInnerTransitionType) {
-		return "southeast-inner";
-	} else if (transition_type == SouthwestInnerTransitionType) {
-		return "southwest-inner";
+	} else if (transition_type == NortheastOuterTransitionType) {
+		return "northeast-outer";
+	} else if (transition_type == SouthwestOuterTransitionType) {
+		return "southwest-outer";
+	} else if (transition_type == SoutheastOuterTransitionType) {
+		return "southeast-outer";
 	} else if (transition_type == NorthwestInnerTransitionType) {
 		return "northwest-inner";
+	} else if (transition_type == NortheastInnerTransitionType) {
+		return "northeast-inner";
+	} else if (transition_type == SouthwestInnerTransitionType) {
+		return "southwest-inner";
+	} else if (transition_type == SoutheastInnerTransitionType) {
+		return "southeast-inner";
+	} else if (transition_type == NorthwestSoutheastInnerTransitionType) {
+		return "northwest-southeast-inner";
+	} else if (transition_type == NortheastSouthwestInnerTransitionType) {
+		return "northeast-southwest-inner";
 	}
 	return "";
 }
@@ -858,28 +862,32 @@ int GetTransitionTypeIdByName(std::string transition_type)
 {
 	if (transition_type == "north") {
 		return NorthTransitionType;
-	} else if (transition_type == "east") {
-		return EastTransitionType;
 	} else if (transition_type == "south") {
 		return SouthTransitionType;
 	} else if (transition_type == "west") {
 		return WestTransitionType;
-	} else if (transition_type == "northeast-outer") {
-		return NortheastOuterTransitionType;
-	} else if (transition_type == "southeast-outer") {
-		return SoutheastOuterTransitionType;
-	} else if (transition_type == "southwest-outer") {
-		return SouthwestOuterTransitionType;
+	} else if (transition_type == "east") {
+		return EastTransitionType;
 	} else if (transition_type == "northwest-outer") {
 		return NorthwestOuterTransitionType;
-	} else if (transition_type == "northeast-inner") {
-		return NortheastInnerTransitionType;
-	} else if (transition_type == "southeast-inner") {
-		return SoutheastInnerTransitionType;
-	} else if (transition_type == "southwest-inner") {
-		return SouthwestInnerTransitionType;
+	} else if (transition_type == "northeast-outer") {
+		return NortheastOuterTransitionType;
+	} else if (transition_type == "southwest-outer") {
+		return SouthwestOuterTransitionType;
+	} else if (transition_type == "southeast-outer") {
+		return SoutheastOuterTransitionType;
 	} else if (transition_type == "northwest-inner") {
 		return NorthwestInnerTransitionType;
+	} else if (transition_type == "northeast-inner") {
+		return NortheastInnerTransitionType;
+	} else if (transition_type == "southwest-inner") {
+		return SouthwestInnerTransitionType;
+	} else if (transition_type == "southeast-inner") {
+		return SoutheastInnerTransitionType;
+	} else if (transition_type == "northwest-southeast-inner") {
+		return NorthwestSoutheastInnerTransitionType;
+	} else if (transition_type == "northeast-southwest-inner") {
+		return NortheastSouthwestInnerTransitionType;
 	} else {
 		return -1;
 	}

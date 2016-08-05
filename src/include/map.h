@@ -183,6 +183,11 @@ public:
 	void Clean();
 	/// Cleanup memory for fog of war tables
 	void CleanFogOfWar();
+	
+	//Wyrmgus start
+	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
+	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
+	//Wyrmgus end
 
 	/// Remove wood from the map.
 	void ClearWoodTile(const Vec2i &pos);
@@ -195,6 +200,10 @@ public:
 	PixelPos TilePosToMapPixelPos_TopLeft(const Vec2i &tilePos) const;
 	/// convert tilepos coordonates into map pixel pos (take the center of the tile)
 	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
+	
+	//Wyrmgus start
+	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false) const;
+	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
 	void MarkSeenTile(CMapField &mf);

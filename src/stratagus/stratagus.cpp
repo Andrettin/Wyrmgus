@@ -967,6 +967,29 @@ int GetDirectionIdByName(std::string direction)
 	}
 }
 
+int GetDirectionFromOffset(int x, int y)
+{
+	if (x == -1 && y == 0) {
+		return West;
+	} else if (x == 1 && y == 0) {
+		return East;
+	} else if (x == 0 && y == -1) {
+		return North;
+	} else if (x == 0 && y == 1) {
+		return South;
+	} else if (x == -1 && y == -1) {
+		return Northwest;
+	} else if (x == 1 && y == -1) {
+		return Northeast;
+	} else if (x == -1 && y == 1) {
+		return Southwest;
+	} else if (x == 1 && y == 1) {
+		return Southeast;
+	}
+
+	return -1;
+}
+
 Vec2i GetDirectionOffset(int direction)
 {
 	Vec2i offset(0, 0);

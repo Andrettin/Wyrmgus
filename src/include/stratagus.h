@@ -252,6 +252,7 @@ extern int GetMonthIdByName(std::string month);
 extern int GetReverseDirection(int direction);
 extern std::string GetDirectionNameById(int direction);
 extern int GetDirectionIdByName(std::string direction);
+extern int GetDirectionFromOffset(int x, int y);
 extern Vec2i GetDirectionOffset(int direction);
 //Wyrmgus end
 

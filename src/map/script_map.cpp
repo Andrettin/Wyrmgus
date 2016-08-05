@@ -702,7 +702,7 @@ static int CclDefineTerrainType(lua_State *l)
 				}
 				terrain->BaseTerrains.push_back(base_terrain);
 			}
-		} else if (!strcmp(value, "BorderTerrains")) {
+		} else if (!strcmp(value, "InnerBorderTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -712,7 +712,24 @@ static int CclDefineTerrainType(lua_State *l)
 				if (border_terrain == NULL) {
 					LuaError(l, "Terrain doesn't exist.");
 				}
+				terrain->InnerBorderTerrains.push_back(border_terrain);
 				terrain->BorderTerrains.push_back(border_terrain);
+				border_terrain->OuterBorderTerrains.push_back(terrain);
+				border_terrain->BorderTerrains.push_back(terrain);
+			}
+		} else if (!strcmp(value, "OuterBorderTerrains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CTerrainType *border_terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+				if (border_terrain == NULL) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				terrain->OuterBorderTerrains.push_back(border_terrain);
+				terrain->BorderTerrains.push_back(border_terrain);
+				border_terrain->InnerBorderTerrains.push_back(terrain);
 				border_terrain->BorderTerrains.push_back(terrain);
 			}
 		} else if (!strcmp(value, "Flags")) {

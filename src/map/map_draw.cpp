@@ -296,12 +296,21 @@ void CViewport::DrawMapBackgroundInViewport() const
 				Map.TileGraphic->DrawFrameClip(tile + mf.AnimationFrame, dx, dy, false);
 			}
 			*/
-			
 			if (mf.Terrain && mf.Terrain->Graphics) {
 				mf.Terrain->Graphics->DrawFrameClip(mf.SolidTile, dx, dy, false);
 			}
+			for (size_t i = 0; i != mf.TransitionTiles.size(); ++i) {
+				if (mf.TransitionTiles[i].first->Graphics) {
+					mf.TransitionTiles[i].first->Graphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
+				}
+			}
 			if (mf.OverlayTerrain && mf.OverlayTerrain->Graphics) {
 				mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile, dx, dy, false);
+			}
+			for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
+				if (mf.OverlayTransitionTiles[i].first->Graphics) {
+					mf.OverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.OverlayTransitionTiles[i].second, dx, dy, false);
+				}
 			}
 			//Wyrmgus end
 			++sx;

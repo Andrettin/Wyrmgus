@@ -223,6 +223,23 @@ bool CMap::WallOnMap(const Vec2i &pos) const
 	return Field(pos)->isAWall();
 }
 
+//Wyrmgus start
+CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, bool overlay) const
+{
+	if (!Map.Info.IsPointOnMap(pos)) {
+		return NULL;
+	}
+	
+	CMapField &mf = *this->Field(pos);
+	
+	if (overlay) {
+		return mf.OverlayTerrain;
+	} else {
+		return mf.Terrain;
+	}
+}
+//Wyrmgus end
+
 /**
 **  Human wall on map tile.
 **
@@ -312,6 +329,9 @@ void PreprocessMap()
 	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			CMapField &mf = *Map.Field(ix, iy);
+			//Wyrmgus start
+			Map.CalculateTileTransitions(Vec2i(ix, iy));
+			//Wyrmgus end
 			mf.playerInfo.SeenTile = mf.getGraphicTile();
 		}
 	}
@@ -605,6 +625,117 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 		FixTile(type, seen, pos + offset[i]);
 	}
 }
+
+//Wyrmgus start
+void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
+{
+	if (!terrain) {
+		return;
+	}
+	
+	CMapField &mf = *this->Field(pos);
+	
+	mf.SetTerrain(terrain);
+	
+	this->CalculateTileTransitions(pos, terrain->Overlay);
+	
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset != 0 || y_offset != 0) {
+				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					this->CalculateTileTransitions(adjacent_pos, terrain->Overlay);
+				}
+			}
+		}
+	}
+}
+
+void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
+{
+	CMapField &mf = *this->Field(pos);
+	CTerrainType *terrain = NULL;
+	if (overlay) {
+		terrain = mf.OverlayTerrain;
+		mf.OverlayTransitionTiles.clear();
+	} else {
+		terrain = mf.Terrain;
+		mf.TransitionTiles.clear();
+	}
+	
+	if (!terrain) {
+		return;
+	}
+	
+	int terrain_id = terrain->ID;
+	
+	std::map<CTerrainType *, std::vector<int>> adjacent_terrain_directions;
+	std::vector<int> transition_directions;
+	
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset != 0 || y_offset != 0) {
+				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay);
+					if (adjacent_terrain && terrain != adjacent_terrain && std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), adjacent_terrain) != terrain->InnerBorderTerrains.end()) {
+						adjacent_terrain_directions[adjacent_terrain].push_back(GetDirectionFromOffset(x_offset, y_offset));
+					}
+					if (terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+						transition_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
+					}
+				}
+			}
+		}
+	}
+	
+	for (std::map<CTerrainType *, std::vector<int>>::iterator iterator = adjacent_terrain_directions.begin(); iterator != adjacent_terrain_directions.end(); ++iterator) {
+		CTerrainType *adjacent_terrain = iterator->first;
+		int adjacent_terrain_id = adjacent_terrain->ID;
+		int transition_type = -1;
+		
+		if (std::find(iterator->second.begin(), iterator->second.end(), North) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
+			transition_type = NorthTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), South) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
+			transition_type = SouthTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), West) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end()) {
+			transition_type = WestTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), East) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end()) {
+			transition_type = EastTransitionType;
+		} else if ((std::find(iterator->second.begin(), iterator->second.end(), North) != iterator->second.end() || std::find(iterator->second.begin(), iterator->second.end(), West) != iterator->second.end()) && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) == iterator->second.end()) {
+			transition_type = NorthwestOuterTransitionType;
+		} else if ((std::find(iterator->second.begin(), iterator->second.end(), North) != iterator->second.end() || std::find(iterator->second.begin(), iterator->second.end(), East) != iterator->second.end()) && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) == iterator->second.end()) {
+			transition_type = NortheastOuterTransitionType;
+		} else if ((std::find(iterator->second.begin(), iterator->second.end(), South) != iterator->second.end() || std::find(iterator->second.begin(), iterator->second.end(), West) != iterator->second.end()) && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) == iterator->second.end()) {
+			transition_type = SouthwestOuterTransitionType;
+		} else if ((std::find(iterator->second.begin(), iterator->second.end(), South) != iterator->second.end() || std::find(iterator->second.begin(), iterator->second.end(), East) != iterator->second.end()) && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northwest) == iterator->second.end()) {
+			transition_type = SoutheastOuterTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end()) {
+			transition_type = NorthwestSoutheastInnerTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end()) {
+			transition_type = NortheastSouthwestInnerTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end()) {
+			transition_type = NorthwestInnerTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end()) {
+			transition_type = NortheastInnerTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end()) {
+			transition_type = SouthwestInnerTransitionType;
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end()) {
+			transition_type = SoutheastInnerTransitionType;
+		}
+		
+		if (transition_type != -1) {
+			if (terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
+				mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+			} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
+				mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
+			} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
+				mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+			}
+		}
+	}
+}
+//Wyrmgus end
 
 /// Remove wood from the map.
 void CMap::ClearWoodTile(const Vec2i &pos)

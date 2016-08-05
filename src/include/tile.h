@@ -138,6 +138,10 @@
 
 #include <vec2i.h>
 
+//Wyrmgus start
+#include <tuple>
+//Wyrmgus end
+
 class CFile;
 class CPlayer;
 class CTileset;
@@ -251,6 +255,8 @@ public:
 	CTerrainType *OverlayTerrain;
 	int SolidTile;
 	int OverlaySolidTile;
+	std::vector<std::pair<CTerrainType *, int>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<CTerrainType *, int>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile
