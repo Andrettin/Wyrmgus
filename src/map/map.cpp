@@ -713,7 +713,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
 	
 	for (std::map<int, std::vector<int>>::iterator iterator = adjacent_terrain_directions.begin(); iterator != adjacent_terrain_directions.end(); ++iterator) {
 		int adjacent_terrain_id = iterator->first;
-		CTerrainType *adjacent_terrain = TerrainTypes[adjacent_terrain_id];
+		CTerrainType *adjacent_terrain = adjacent_terrain_id < TerrainTypes.size() ? TerrainTypes[adjacent_terrain_id] : NULL;
 		int transition_type = -1;
 		
 		if (terrain->AllowSingle && std::find(iterator->second.begin(), iterator->second.end(), North) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) != iterator->second.end()) {
