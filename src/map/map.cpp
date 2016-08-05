@@ -331,6 +331,7 @@ void PreprocessMap()
 			CMapField &mf = *Map.Field(ix, iy);
 			//Wyrmgus start
 			Map.CalculateTileTransitions(Vec2i(ix, iy));
+			Map.CalculateTileTransitions(Vec2i(ix, iy), true);
 			//Wyrmgus end
 			mf.playerInfo.SeenTile = mf.getGraphicTile();
 		}
@@ -725,12 +726,72 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
 		}
 		
 		if (transition_type != -1) {
-			if (terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
-				mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
-			} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
-				mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
-			} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
-				mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+			if (!overlay) {
+				if (terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
+					mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+				} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
+					mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
+				} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
+					mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+				}
+			} else {
+				if (terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
+					mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+				} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
+					mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
+				} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
+					mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+				}
+			}
+			
+			for (size_t i = 0; i != iterator->second.size(); ++i) {
+				transition_directions.erase(std::remove(transition_directions.begin(), transition_directions.end(), iterator->second[i]), transition_directions.end());
+			}
+		}
+	}
+	
+	// now, if there are still unfulfilled transitions, see if the tile has its own generic transition (i.e. trees ending at a certain point)
+	
+	int transition_type = -1;
+		
+	if (std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southwest) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southeast) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), West) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) == transition_directions.end()) {
+		transition_type = NorthTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), North) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northwest) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northeast) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), West) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) == transition_directions.end()) {
+		transition_type = SouthTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northeast) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southeast) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), North) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) == transition_directions.end()) {
+		transition_type = WestTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), West) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northwest) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southwest) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), North) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) == transition_directions.end()) {
+		transition_type = EastTransitionType;
+	} else if ((std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() || std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end()) && std::find(transition_directions.begin(), transition_directions.end(), South) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southeast) == transition_directions.end()) {
+		transition_type = NorthwestOuterTransitionType;
+	} else if ((std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() || std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end()) && std::find(transition_directions.begin(), transition_directions.end(), South) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), West) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southwest) == transition_directions.end()) {
+		transition_type = NortheastOuterTransitionType;
+	} else if ((std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end() || std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end()) && std::find(transition_directions.begin(), transition_directions.end(), North) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northeast) == transition_directions.end()) {
+		transition_type = SouthwestOuterTransitionType;
+	} else if ((std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end() || std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end()) && std::find(transition_directions.begin(), transition_directions.end(), North) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), West) == transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northwest) == transition_directions.end()) {
+		transition_type = SoutheastOuterTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), Northwest) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southeast) != transition_directions.end()) {
+		transition_type = NorthwestSoutheastInnerTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), Northeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southwest) != transition_directions.end()) {
+		transition_type = NortheastSouthwestInnerTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), Northwest) != transition_directions.end()) {
+		transition_type = NorthwestInnerTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), Northeast) != transition_directions.end()) {
+		transition_type = NortheastInnerTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), Southwest) != transition_directions.end()) {
+		transition_type = SouthwestInnerTransitionType;
+	} else if (std::find(transition_directions.begin(), transition_directions.end(), Southeast) != transition_directions.end()) {
+		transition_type = SoutheastInnerTransitionType;
+	}
+		
+	if (transition_type != -1) {
+		if (!overlay) {
+			if (terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
+				mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+			}
+		} else {
+			if (terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
+				mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
 			}
 		}
 	}

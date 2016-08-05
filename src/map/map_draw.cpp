@@ -304,7 +304,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					mf.TransitionTiles[i].first->Graphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
 				}
 			}
-			if (mf.OverlayTerrain && mf.OverlayTerrain->Graphics) {
+			if (mf.OverlayTerrain && mf.OverlayTerrain->Graphics && mf.OverlayTransitionTiles.size() == 0) {
 				mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile, dx, dy, false);
 			}
 			for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
