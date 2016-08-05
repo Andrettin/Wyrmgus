@@ -223,6 +223,9 @@ void CMap::RemoveWall(const Vec2i &pos)
 	mf.Value = 0;
 
 	MapFixWallTile(pos);
+	//Wyrmgus start
+	mf.SetOverlayTerrainDestroyed(true);
+	//Wyrmgus end
 	mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 	//Wyrmgus start
 	if (GameSettings.Inside) {
@@ -231,6 +234,20 @@ void CMap::RemoveWall(const Vec2i &pos)
 	mf.Flags |= MapFieldGravel;
 	//Wyrmgus end
 	MapFixWallNeighbors(pos);
+	//Wyrmgus start
+	this->CalculateTileTransitions(pos, true);
+	
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset != 0 || y_offset != 0) {
+				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					this->CalculateTileTransitions(adjacent_pos, true);
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 	UI.Minimap.UpdateXY(pos);
 
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {

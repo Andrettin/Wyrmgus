@@ -790,6 +790,14 @@ static int CclDefineTerrainType(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				terrain->SolidTiles.push_back(LuaToNumber(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "DestroyedTiles")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				terrain->DestroyedTiles.push_back(LuaToNumber(l, -1, j + 1));
+			}
 		} else if (!strcmp(value, "TransitionTiles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

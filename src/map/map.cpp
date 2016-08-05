@@ -664,7 +664,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
 		mf.TransitionTiles.clear();
 	}
 	
-	if (!terrain) {
+	if (!terrain || (overlay && mf.OverlayTerrainDestroyed)) {
 		return;
 	}
 	
@@ -679,6 +679,9 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 				if (Map.Info.IsPointOnMap(adjacent_pos)) {
 					CTerrainType *adjacent_terrain = this->GetTileTerrain(adjacent_pos, overlay);
+					if (overlay && adjacent_terrain && this->Field(adjacent_pos)->OverlayTerrainDestroyed) {
+						adjacent_terrain = NULL;
+					}
 					if (adjacent_terrain && terrain != adjacent_terrain && std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), adjacent_terrain) != terrain->InnerBorderTerrains.end()) {
 						adjacent_terrain_directions[adjacent_terrain].push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
@@ -726,26 +729,36 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
 		}
 		
 		if (transition_type != -1) {
+			bool found_transition = false;
+			
 			if (!overlay) {
 				if (terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
 					mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+					found_transition = true;
 				} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
 					mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
+					found_transition = true;
 				} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
 					mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+					found_transition = true;
 				}
 			} else {
 				if (terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size() > 0) {
 					mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(adjacent_terrain_id, transition_type)].size())]));
+					found_transition = true;
 				} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size() > 0) {
 					mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(terrain_id, transition_type)].size())]));
+					found_transition = true;
 				} else if (adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
 					mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
+					found_transition = true;
 				}
 			}
 			
-			for (size_t i = 0; i != iterator->second.size(); ++i) {
-				transition_directions.erase(std::remove(transition_directions.begin(), transition_directions.end(), iterator->second[i]), transition_directions.end());
+			if (found_transition) {
+				for (size_t i = 0; i != iterator->second.size(); ++i) {
+					transition_directions.erase(std::remove(transition_directions.begin(), transition_directions.end(), iterator->second[i]), transition_directions.end());
+				}
 			}
 		}
 	}
@@ -803,6 +816,9 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 {
 	CMapField &mf = *this->Field(pos);
 
+	//Wyrmgus start
+	mf.SetOverlayTerrainDestroyed(true);
+	//Wyrmgus end
 	mf.setGraphicTile(this->Tileset->getRemovedTreeTile());
 	mf.Flags &= ~(MapFieldForest | MapFieldUnpassable);
 	//Wyrmgus start
@@ -812,6 +828,20 @@ void CMap::ClearWoodTile(const Vec2i &pos)
 
 	UI.Minimap.UpdateXY(pos);
 	FixNeighbors(MapFieldForest, 0, pos);
+	//Wyrmgus start
+	this->CalculateTileTransitions(pos, true);
+	
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset != 0 || y_offset != 0) {
+				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					this->CalculateTileTransitions(adjacent_pos, true);
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 
 	//maybe isExplored
 	//Wyrmgus start
@@ -839,15 +869,32 @@ void CMap::ClearRockTile(const Vec2i &pos)
 	CMapField &mf = *this->Field(pos);
 
 	mf.setGraphicTile(this->Tileset->getRemovedRockTile());
+	//Wyrmgus start
+	mf.SetOverlayTerrainDestroyed(true);
+	//Wyrmgus end
 	mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
 	//Wyrmgus start
 	mf.Flags |= MapFieldGravel;
 	mf.Flags |= MapFieldNoBuilding;
 	//Wyrmgus end
 	mf.Value = 0;
-
+	
 	UI.Minimap.UpdateXY(pos);
 	FixNeighbors(MapFieldRocks, 0, pos);
+	//Wyrmgus start
+	this->CalculateTileTransitions(pos, true);
+	
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset != 0 || y_offset != 0) {
+				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					this->CalculateTileTransitions(adjacent_pos, true);
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 
 	//maybe isExplored
 	//Wyrmgus start

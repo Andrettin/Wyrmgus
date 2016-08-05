@@ -204,6 +204,7 @@ public:
 
 	//Wyrmgus start
 	void SetTerrain(CTerrainType *terrain);
+	void SetOverlayTerrainDestroyed(bool destroyed);
 	//Wyrmgus end
 	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value);
 
@@ -255,6 +256,7 @@ public:
 	CTerrainType *OverlayTerrain;
 	int SolidTile;
 	int OverlaySolidTile;
+	bool OverlayTerrainDestroyed;
 	std::vector<std::pair<CTerrainType *, int>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
 	std::vector<std::pair<CTerrainType *, int>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end

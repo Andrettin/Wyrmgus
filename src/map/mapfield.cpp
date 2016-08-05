@@ -62,6 +62,7 @@ CMapField::CMapField() :
 	AnimationFrame(0),
 	Terrain(NULL), OverlayTerrain(NULL),
 	SolidTile(0), OverlaySolidTile(0),
+	OverlayTerrainDestroyed(false),
 	//Wyrmgus end
 	UnitCache()
 {}
@@ -108,6 +109,25 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		this->Terrain = terrain;
 		if (terrain->SolidTiles.size() > 0) {
 			this->SolidTile = terrain->SolidTiles[SyncRand(terrain->SolidTiles.size())];
+		}
+	}
+}
+
+void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
+{
+	if (!this->OverlayTerrain || this->OverlayTerrainDestroyed == destroyed) {
+		return;
+	}
+	
+	this->OverlayTerrainDestroyed = destroyed;
+	
+	if (destroyed) {
+		if (this->OverlayTerrain->DestroyedTiles.size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->DestroyedTiles[SyncRand(this->OverlayTerrain->DestroyedTiles.size())];
+		}
+	} else {
+		if (this->OverlayTerrain->SolidTiles.size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->SolidTiles[SyncRand(this->OverlayTerrain->SolidTiles.size())];
 		}
 	}
 }
