@@ -3004,6 +3004,23 @@ static int CclGetUnitTypeData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "Works")) {
+		std::vector<CUpgrade *> works;
+		if (type->ItemClass != -1) {
+			for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+				if (AllUpgrades[i]->Work == type->ItemClass && !AllUpgrades[i]->UniqueOnly) {
+					works.push_back(AllUpgrades[i]);
+				}
+			}
+		}
+		
+		lua_createtable(l, works.size(), 0);
+		for (size_t i = 1; i <= works.size(); ++i)
+		{
+			lua_pushstring(l, works[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
 	} else if (!strcmp(data, "Uniques")) {
 		std::vector<CUniqueItem *> uniques;
 		for (size_t i = 0; i < UniqueItems.size(); ++i)

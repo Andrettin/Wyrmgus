@@ -1085,6 +1085,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				if (unit.Suffix != NULL) {
 					f->printf("SetUnitVariable(unit, \"Suffix\", \"%s\")\n", unit.Suffix->Ident.c_str());
 				}
+				if (unit.Work != NULL) {
+					f->printf("SetUnitVariable(unit, \"Work\", \"%s\")\n", unit.Work->Ident.c_str());
+				}
 				if (unit.Variable[HP_INDEX].Value != unit.GetModifiedVariable(HP_INDEX, VariableMax)) {
 					f->printf("SetUnitVariable(unit, \"HitPoints\", %d)\n", unit.Variable[HP_INDEX].Value);
 				}
