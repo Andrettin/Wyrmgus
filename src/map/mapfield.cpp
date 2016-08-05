@@ -98,6 +98,18 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		return;
 	}
 	
+	//remove the flags of the old terrain type
+	if (terrain->Overlay) {
+		if (this->Terrain) {
+			this->Flags &= ~(this->Terrain->Flags);
+			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
+		}
+	} else {
+		if (this->OverlayTerrain) {
+			this->Flags &= ~(this->OverlayTerrain->Flags);
+		}
+	}
+	
 	if (terrain->Overlay) {
 		if (!this->Terrain || std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), this->Terrain) == terrain->BaseTerrains.end()) {
 			this->SetTerrain(terrain->BaseTerrains[0]);
@@ -120,6 +132,19 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 			this->AnimationFrame = SyncRand(terrain->SolidAnimationFrames);
 		}
 	}
+	
+	//apply the flags from the new terrain type
+	this->Flags |= terrain->Flags;
+	// restore MapFieldAirUnpassable related to units (i.e. doors)
+	const CUnitCache &cache = this->UnitCache;
+	for (size_t i = 0; i != cache.size(); ++i) {
+		CUnit &unit = *cache[i];
+		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
+			this->Flags |= MapFieldUnpassable;
+			this->Flags |= MapFieldAirUnpassable;
+		}
+	}
+	this->cost = 1 << (terrain->Flags & MapFieldSpeedMask);
 }
 
 void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
@@ -147,6 +172,8 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	const CTile &tile = tileset.tiles[tileIndex];
 	this->tile = tile.tile;
 	this->Value = value;
+	//Wyrmgus start
+	/*
 #if 0
 	this->Flags = tile.flag;
 #else
@@ -159,19 +186,10 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 					 MapFieldGravel | MapFieldMud | MapFieldStoneFloor | MapFieldStumps);
 					 //Wyrmgus end
 	this->Flags |= tile.flag;
-	//Wyrmgus start
-	// restore MapFieldAirUnpassable related to units (i.e. doors)
-	const CUnitCache &cache = this->UnitCache;
-	for (size_t i = 0; i != cache.size(); ++i) {
-		CUnit &unit = *cache[i];
-		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
-			this->Flags |= MapFieldUnpassable;
-			this->Flags |= MapFieldAirUnpassable;
-		}
-	}
-	//Wyrmgus end
 #endif
 	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
+	*/
+	//Wyrmgus end
 	//Wyrmgus start
 //#ifdef DEBUG
 	this->tilesetTile = tileIndex;

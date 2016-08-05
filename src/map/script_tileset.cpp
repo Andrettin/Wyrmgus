@@ -225,13 +225,6 @@ void CTileset::parseSolid(lua_State *l)
 				const char *second_string_value = LuaToString(l, -1);
 				lua_pop(l, 1);
 				solidTerrainTypes[basic_name].ImageFile = second_string_value;
-			} else if (!strcmp(string_value, "animation-frames")) {
-				++j;
-				lua_rawgeti(l, -1, j + 1);
-				++j;
-				int animation_frames = LuaToNumber(l, -1);
-				lua_pop(l, 1);
-				solidTerrainTypes[basic_name].AnimationFrames = animation_frames;
 			} else {
 				break;
 			}

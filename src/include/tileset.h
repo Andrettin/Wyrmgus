@@ -193,7 +193,6 @@ struct SolidTerrainInfo {
 	// TODO: When drawing with the editor add some kind fo probabilities for every tile.
 	//Wyrmgus start
 	std::string ImageFile;		/// File containing image data
-	int AnimationFrames;		/// Frame quantity of the tile type's animation
 	int DefaultTileIndex;		/// Index for the default tile for this type
 	//Wyrmgus end
 };
