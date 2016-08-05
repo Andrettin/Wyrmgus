@@ -572,6 +572,9 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			this->FixNeighbors(type, seen, pos);
 		} else {
 			mf.setGraphicTile(removedtile);
+			//Wyrmgus start
+			mf.SetOverlayTerrainDestroyed(true);
+			//Wyrmgus end
 			mf.Flags &= ~flags;
 			//Wyrmgus start
 			if (type == MapFieldForest) {
@@ -583,6 +586,21 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 			//Wyrmgus end
 			mf.Value = 0;
 			UI.Minimap.UpdateXY(pos);
+			
+			//Wyrmgus start
+			this->CalculateTileTransitions(pos, true);
+			
+			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+					if (x_offset != 0 || y_offset != 0) {
+						Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+						if (Map.Info.IsPointOnMap(adjacent_pos)) {
+							this->CalculateTileTransitions(adjacent_pos, true);
+						}
+					}
+				}
+			}
+			//Wyrmgus end
 		}
 	//Wyrmgus start
 //	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
