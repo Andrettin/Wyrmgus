@@ -60,6 +60,7 @@ CMapField::CMapField() :
 	Value(0),
 	//Wyrmgus start
 	AnimationFrame(0),
+	OverlayAnimationFrame(0),
 	Terrain(NULL), OverlayTerrain(NULL),
 	SolidTile(0), OverlaySolidTile(0),
 	OverlayTerrainDestroyed(false),
@@ -109,6 +110,14 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		this->Terrain = terrain;
 		if (terrain->SolidTiles.size() > 0) {
 			this->SolidTile = terrain->SolidTiles[SyncRand(terrain->SolidTiles.size())];
+		}
+	}
+	
+	if (Editor.Running == EditorNotRunning && terrain->SolidAnimationFrames > 0) {
+		if (terrain->Overlay) {
+			this->OverlayAnimationFrame = SyncRand(terrain->SolidAnimationFrames);
+		} else {
+			this->AnimationFrame = SyncRand(terrain->SolidAnimationFrames);
 		}
 	}
 }
@@ -170,10 +179,6 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	if (Editor.Running == EditorNotRunning && tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames > 0 && !tileset.tiles[this->tilesetTile].tileinfo.MixTerrain) {
-		this->AnimationFrame = SyncRand(tileset.solidTerrainTypes[tileset.tiles[this->tilesetTile].tileinfo.BaseTerrain].AnimationFrames);
-	}
-	
 	CTerrainType *terrain = GetTerrainType(tileset.getTerrainName(tile.tileinfo.BaseTerrain));
 	this->SetTerrain(terrain);
 	if (!terrain) {

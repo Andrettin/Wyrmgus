@@ -297,7 +297,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 			}
 			*/
 			if (mf.Terrain && mf.Terrain->Graphics) {
-				mf.Terrain->Graphics->DrawFrameClip(mf.SolidTile, dx, dy, false);
+				mf.Terrain->Graphics->DrawFrameClip(mf.SolidTile + mf.AnimationFrame, dx, dy, false);
 			}
 			for (size_t i = 0; i != mf.TransitionTiles.size(); ++i) {
 				if (mf.TransitionTiles[i].first->Graphics) {
@@ -305,7 +305,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			}
 			if (mf.OverlayTerrain && mf.OverlayTerrain->Graphics && mf.OverlayTransitionTiles.size() == 0) {
-				mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile, dx, dy, false);
+				mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile + mf.OverlayAnimationFrame, dx, dy, false);
 			}
 			for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
 				if (mf.OverlayTransitionTiles[i].first->Graphics) {

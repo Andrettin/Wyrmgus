@@ -690,6 +690,8 @@ static int CclDefineTerrainType(lua_State *l)
 			terrain->Overlay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Buildable")) {
 			terrain->Buildable = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "SolidAnimationFrames")) {
+			terrain->SolidAnimationFrames = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BaseTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

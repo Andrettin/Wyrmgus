@@ -627,10 +627,16 @@ static void DisplayLoop()
 	if (!GamePaused && GameCycle != 0 && GameCycle && GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			CMapField &mf = Map.Fields[i];
-			if (Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].AnimationFrames > 0 && !Map.Tileset->tiles[mf.getTileIndex()].tileinfo.MixTerrain) {
+			if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
 				mf.AnimationFrame += 1;
-				if (mf.AnimationFrame >= Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].AnimationFrames) {
+				if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
 					mf.AnimationFrame = 0;
+				}
+			}
+			if (mf.OverlayTerrain && mf.Terrain->SolidAnimationFrames > 0) {
+				mf.OverlayAnimationFrame += 1;
+				if (mf.OverlayAnimationFrame >= mf.Terrain->SolidAnimationFrames) {
+					mf.OverlayAnimationFrame = 0;
 				}
 			}
 		}

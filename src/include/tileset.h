@@ -143,7 +143,7 @@ class CTerrainType
 {
 public:
 	CTerrainType() :
-		ID(-1), Flags(0),
+		ID(-1), Flags(0), SolidAnimationFrames(0),
 		Overlay(false), Buildable(false),
 		Graphics(NULL)
 	{
@@ -152,6 +152,7 @@ public:
 	std::string Name;
 	std::string Ident;
 	int ID;
+	int SolidAnimationFrames;
 	unsigned int Flags;
 	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;

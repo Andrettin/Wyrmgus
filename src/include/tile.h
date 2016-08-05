@@ -252,6 +252,7 @@ public:
 //	unsigned short Flags;      /// field flags
 	unsigned long Flags;      /// field flags
 	int AnimationFrame;		/// current frame of the tile's animation
+	int OverlayAnimationFrame;		/// current frame of the overlay tile's animation
 	CTerrainType *Terrain;
 	CTerrainType *OverlayTerrain;
 	int SolidTile;
