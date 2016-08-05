@@ -136,6 +136,19 @@ enum TransitionTypes {
 	NorthwestSoutheastInnerTransitionType,
 	NortheastSouthwestInnerTransitionType,
 	
+	//single tile transition types (enabled for terrain types with the AllowSingle field)
+	SingleTransitionType,
+	NorthSingleTransitionType,
+	SouthSingleTransitionType,
+	WestSingleTransitionType,
+	EastSingleTransitionType,
+	NorthSouthTransitionType,
+	WestEastTransitionType,
+	WestSoutheastInnerTransitionType,
+	EastSouthwestInnerTransitionType,
+	SouthwestOuterNortheastInnerTransitionType,
+	SoutheastOuterNorthwestInnerTransitionType,
+	
 	MaxTransitionTypes
 };
 
@@ -144,7 +157,7 @@ class CTerrainType
 public:
 	CTerrainType() :
 		ID(-1), Flags(0), SolidAnimationFrames(0),
-		Overlay(false), Buildable(false),
+		Overlay(false), Buildable(false), AllowSingle(false),
 		Graphics(NULL)
 	{
 	}
@@ -156,6 +169,7 @@ public:
 	unsigned int Flags;
 	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;
+	bool AllowSingle;											/// Whether this terrain type has transitions for single tiles
 	CGraphic *Graphics;
 	std::vector<CTerrainType *> BaseTerrains;					/// Possible base terrains for this terrain type (if is an overlay terrain)
 	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border

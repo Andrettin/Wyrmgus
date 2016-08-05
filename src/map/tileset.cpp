@@ -853,6 +853,28 @@ std::string GetTransitionTypeNameById(int transition_type)
 		return "northwest-southeast-inner";
 	} else if (transition_type == NortheastSouthwestInnerTransitionType) {
 		return "northeast-southwest-inner";
+	} else if (transition_type == SingleTransitionType) {
+		return "single";
+	} else if (transition_type == NorthSingleTransitionType) {
+		return "north-single";
+	} else if (transition_type == SouthSingleTransitionType) {
+		return "south-single";
+	} else if (transition_type == WestSingleTransitionType) {
+		return "west-single";
+	} else if (transition_type == EastSingleTransitionType) {
+		return "east-single";
+	} else if (transition_type == NorthSouthTransitionType) {
+		return "north-south";
+	} else if (transition_type == WestEastTransitionType) {
+		return "west-east";
+	} else if (transition_type == WestSoutheastInnerTransitionType) {
+		return "west-southeast-inner";
+	} else if (transition_type == EastSouthwestInnerTransitionType) {
+		return "east-southwest-inner";
+	} else if (transition_type == SouthwestOuterNortheastInnerTransitionType) {
+		return "southwest-outer-northeast-inner";
+	} else if (transition_type == SoutheastOuterNorthwestInnerTransitionType) {
+		return "southeast-outer-northwest-inner";
 	}
 	return "";
 }
@@ -887,6 +909,28 @@ int GetTransitionTypeIdByName(std::string transition_type)
 		return NorthwestSoutheastInnerTransitionType;
 	} else if (transition_type == "northeast-southwest-inner") {
 		return NortheastSouthwestInnerTransitionType;
+	} else if (transition_type == "single") {
+		return SingleTransitionType;
+	} else if (transition_type == "north-single") {
+		return NorthSingleTransitionType;
+	} else if (transition_type == "south-single") {
+		return SouthSingleTransitionType;
+	} else if (transition_type == "west-single") {
+		return WestSingleTransitionType;
+	} else if (transition_type == "east-single") {
+		return EastSingleTransitionType;
+	} else if (transition_type == "north-south") {
+		return NorthSouthTransitionType;
+	} else if (transition_type == "west-east") {
+		return WestEastTransitionType;
+	} else if (transition_type == "west-southeast-inner") {
+		return WestSoutheastInnerTransitionType;
+	} else if (transition_type == "east-southwest-inner") {
+		return EastSouthwestInnerTransitionType;
+	} else if (transition_type == "southwest-outer-northeast-inner") {
+		return SouthwestOuterNortheastInnerTransitionType;
+	} else if (transition_type == "southeast-outer-northwest-inner") {
+		return SoutheastOuterNorthwestInnerTransitionType;
 	} else {
 		return -1;
 	}
