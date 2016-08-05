@@ -135,6 +135,23 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 	mf.playerInfo.SeenTile = mf.getGraphicTile();
 	
 	//Wyrmgus start
+	Map.CalculateTileTransitions(pos, false);
+	Map.CalculateTileTransitions(pos, true);
+	
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset != 0 || y_offset != 0) {
+				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					Map.CalculateTileTransitions(adjacent_pos, false);
+					Map.CalculateTileTransitions(adjacent_pos, true);
+				}
+			}
+		}
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
 	CUnitCache &unitcache = mf.UnitCache;
 	std::vector<CUnit *> units_to_remove;
 
