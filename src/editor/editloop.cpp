@@ -297,9 +297,10 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 	for (size_t i = 0; i != changed_tiles.size(); ++i) {
 		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay);
 		
+		bool has_transitions = terrain->Overlay ? (Map.Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (Map.Field(changed_tiles[i])->TransitionTiles.size() > 0);
+		bool solid_tile = true;
+		
 		if (!tile_terrain->AllowSingle) {
-			std::vector<int> transition_directions;
-				
 			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
@@ -311,19 +312,16 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 							if (tile_terrain->Overlay && adjacent_terrain && Map.Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = NULL;
 							}
-							if (tile_terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
-								transition_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
+							if (tile_terrain != adjacent_terrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), adjacent_terrain) == tile_terrain->OuterBorderTerrains.end()) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+								solid_tile = false;
+								break;
 							}
 						}
 					}
 				}
 			}
 				
-			if (
-				(std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end())
-				|| (std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end())
-				|| (std::find(transition_directions.begin(), transition_directions.end(), Northwest) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southwest) != transition_directions.end())
-			) {
+			if (!solid_tile && !has_transitions) {
 				for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 					for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 						if (x_offset != 0 || y_offset != 0) {
@@ -355,10 +353,19 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay)) {
 								continue;
 							}
-							bool changed_terrain = false;
-							if (!adjacent_terrain->AllowSingle) {
-								std::vector<int> transition_directions;
-								
+							bool has_transitions = overlay ? (Map.Field(adjacent_pos)->OverlayTransitionTiles.size() > 0) : (Map.Field(adjacent_pos)->TransitionTiles.size() > 0);
+							bool solid_tile = true;
+							
+							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false)) == adjacent_terrain->BorderTerrains.end()) {
+								for (size_t j = 0; j != adjacent_terrain->BorderTerrains.size(); ++j) {
+									CTerrainType *border_terrain = adjacent_terrain->BorderTerrains[j];
+									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
+										Map.SetTileTerrain(adjacent_pos, border_terrain);
+										changed_tiles.push_back(adjacent_pos);
+										break;
+									}
+								}
+							} else if (!adjacent_terrain->AllowSingle) {
 								for (int sub_x_offset = -1; sub_x_offset <= 1; ++sub_x_offset) {
 									for (int sub_y_offset = -1; sub_y_offset <= 1; ++sub_y_offset) {
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
@@ -368,37 +375,22 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 												if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = NULL;
 												}
-												if (adjacent_terrain != sub_adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
-													transition_directions.push_back(GetDirectionFromOffset(sub_x_offset, sub_y_offset));
+												if (adjacent_terrain != sub_adjacent_terrain && std::find(adjacent_terrain->OuterBorderTerrains.begin(), adjacent_terrain->OuterBorderTerrains.end(), sub_adjacent_terrain) == adjacent_terrain->OuterBorderTerrains.end()) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+													solid_tile = false;
+													break;
 												}
 											}
 										}
 									}
 								}
 									
-								if (
-									(std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end())
-									|| (std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end())
-									|| (std::find(transition_directions.begin(), transition_directions.end(), Northwest) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southwest) != transition_directions.end())
-								) {
+								if (!solid_tile && !has_transitions) {
 									if (overlay) {
 										Map.RemoveTileOverlayTerrain(adjacent_pos);
 									} else {
 										Map.SetTileTerrain(adjacent_pos, Map.GetTileTerrain(changed_tiles[i], false));
 									}
 									changed_tiles.push_back(adjacent_pos);
-									changed_terrain = true;
-								}
-							}
-							
-							if (!changed_terrain && !overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false)) == adjacent_terrain->BorderTerrains.end()) {
-								for (size_t j = 0; j != adjacent_terrain->BorderTerrains.size(); ++j) {
-									CTerrainType *border_terrain = adjacent_terrain->BorderTerrains[j];
-									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
-										Map.SetTileTerrain(adjacent_pos, border_terrain);
-										changed_tiles.push_back(adjacent_pos);
-										break;
-									}
 								}
 							}
 						}

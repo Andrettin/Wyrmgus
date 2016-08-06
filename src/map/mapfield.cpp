@@ -142,6 +142,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrains.begin(), this->OverlayTerrain->BaseTerrains.end(), terrain) == this->OverlayTerrain->BaseTerrains.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->Flags);
 			this->OverlayTerrain = NULL;
+			this->OverlayTransitionTiles.clear();
 		}
 	}
 	

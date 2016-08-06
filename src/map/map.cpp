@@ -666,9 +666,20 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
 	
 	CMapField &mf = *this->Field(pos);
 	
+	if (terrain->Overlay)  {
+		if (mf.OverlayTerrain == terrain) {
+			return;
+		}
+	} else {
+		if (mf.Terrain == terrain) {
+			return;
+		}
+	}
+	
 	mf.SetTerrain(terrain);
 	
-	this->CalculateTileTransitions(pos, terrain->Overlay);
+	this->CalculateTileTransitions(pos, false); //recalculate both, since one may have changed the other
+	this->CalculateTileTransitions(pos, true);
 	
 	UI.Minimap.UpdateXY(pos);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -682,7 +693,8 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
 				if (Map.Info.IsPointOnMap(adjacent_pos)) {
 					CMapField &adjacent_mf = *this->Field(adjacent_pos);
 						
-					this->CalculateTileTransitions(adjacent_pos, terrain->Overlay);
+					this->CalculateTileTransitions(adjacent_pos, false);
+					this->CalculateTileTransitions(adjacent_pos, true);
 					
 					UI.Minimap.UpdateXY(adjacent_pos);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -704,6 +716,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
 	
 	mf.Flags &= ~(mf.OverlayTerrain->Flags);
 	mf.OverlayTerrain = NULL;
+	mf.OverlayTransitionTiles.clear();
 	
 	mf.Flags |= mf.Terrain->Flags;
 	// restore MapFieldAirUnpassable related to units (i.e. doors)
@@ -897,17 +910,17 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
 			transition_type = SouthwestOuterTransitionType;
 		} else if ((std::find(iterator->second.begin(), iterator->second.end(), South) != iterator->second.end() || std::find(iterator->second.begin(), iterator->second.end(), East) != iterator->second.end()) && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northwest) == iterator->second.end()) {
 			transition_type = SoutheastOuterTransitionType;
-		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end()) {
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
 			transition_type = NorthwestSoutheastInnerTransitionType;
-		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end()) {
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
 			transition_type = NortheastSouthwestInnerTransitionType;
-		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end()) {
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
 			transition_type = NorthwestInnerTransitionType;
-		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end()) {
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
 			transition_type = NortheastInnerTransitionType;
-		} else if (std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end()) {
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
 			transition_type = SouthwestInnerTransitionType;
-		} else if (std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end()) {
+		} else if (std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
 			transition_type = SoutheastInnerTransitionType;
 		}
 		
