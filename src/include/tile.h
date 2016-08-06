@@ -158,7 +158,10 @@ struct lua_State;
 class CMapFieldPlayerInfo
 {
 public:
-	CMapFieldPlayerInfo() : SeenTile(0)
+	//Wyrmgus start
+//	CMapFieldPlayerInfo() : SeenTile(0)
+	CMapFieldPlayerInfo() : SeenTerrain(NULL), SeenOverlayTerrain(NULL), SeenSolidTile(0), SeenOverlaySolidTile(0)
+	//Wyrmgus end
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
@@ -186,7 +189,15 @@ public:
 	unsigned char TeamVisibilityState(const CPlayer &player) const;
 
 public:
-	unsigned short SeenTile;              /// last seen tile (FOW)
+	//Wyrmgus start
+//	unsigned short SeenTile;              /// last seen tile (FOW)
+	CTerrainType *SeenTerrain;
+	CTerrainType *SeenOverlayTerrain;
+	int SeenSolidTile;
+	int SeenOverlaySolidTile;
+	std::vector<std::pair<CTerrainType *, int>> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<CTerrainType *, int>> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
+	//Wyrmgus end
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
@@ -207,6 +218,9 @@ public:
 	void SetOverlayTerrainDestroyed(bool destroyed);
 	//Wyrmgus end
 	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value);
+	//Wyrmgus start
+	void UpdateSeenTile();
+	//Wyrmgus end
 
 	unsigned int getGraphicTile() const { return tile; }
 
@@ -236,6 +250,10 @@ public:
 
 	bool IsTerrainResourceOnMap(int resource) const;
 	bool IsTerrainResourceOnMap() const;
+	
+	//Wyrmgus start
+	bool IsSeenTileCorrect() const;
+	//Wyrmgus end
 
 	unsigned char getCost() const { return cost; }
 	unsigned int getFlag() const { return Flags; }

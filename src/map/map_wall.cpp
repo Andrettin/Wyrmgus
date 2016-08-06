@@ -109,9 +109,15 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 			dirFlag |= 1 << i;
 		} else {
 			const CMapField &mf = *Map.Field(newpos);
-			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.getGraphicTile();
+			//Wyrmgus start
+//			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.getGraphicTile();
+			const CTerrainType *overlay_terrain = seen ? mf.playerInfo.SeenOverlayTerrain : mf.OverlayTerrain;
+			//Wyrmgus end
 
-			if (Map.Tileset->isARaceWallTile(tile, human)) {
+			//Wyrmgus start
+//			if (Map.Tileset->isARaceWallTile(tile, human)) {
+			if (overlay_terrain && (overlay_terrain->Flags & MapFieldWall)) { // should check if it is the same wall type instead
+			//Wyrmgus end
 				dirFlag |= 1 << i;
 			}
 		}
@@ -131,6 +137,8 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		return;
 	}
 	CMapField &mf = *Map.Field(pos);
+	//Wyrmgus start
+	/*
 	const CTileset &tileset = *Map.Tileset;
 	const unsigned tile = mf.playerInfo.SeenTile;
 	if (!tileset.isAWallTile(tile)) {
@@ -142,6 +150,14 @@ void MapFixSeenWallTile(const Vec2i &pos)
 
 	if (mf.playerInfo.SeenTile != wallTile) { // Already there!
 		mf.playerInfo.SeenTile = wallTile;
+		// FIXME: can this only happen if seen?
+		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+			UI.Minimap.UpdateSeenXY(pos);
+		}
+	}
+	*/
+	if (!mf.IsSeenTileCorrect()) { // Already there!
+		mf.UpdateSeenTile();
 		// FIXME: can this only happen if seen?
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 			UI.Minimap.UpdateSeenXY(pos);

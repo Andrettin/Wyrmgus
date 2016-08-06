@@ -65,7 +65,10 @@ void ChangeTile(const Vec2i &pos, int tile)
 
 	CMapField &mf = *Map.Field(pos);
 	mf.setGraphicTile(tile);
-	mf.playerInfo.SeenTile = tile;
+	//Wyrmgus start
+//	mf.playerInfo.SeenTile = tile;
+	mf.UpdateSeenTile();
+	//Wyrmgus end
 }
 
 
@@ -131,8 +134,9 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 		value = DefaultResourceAmounts[StoneCost];
 	}
 	mf.setTileIndex(*Map.Tileset, tile, value);
+//	mf.playerInfo.SeenTile = mf.getGraphicTile();
+	mf.UpdateSeenTile();
 	//Wyrmgus end
-	mf.playerInfo.SeenTile = mf.getGraphicTile();
 	
 	//Wyrmgus start
 	Map.CalculateTileTransitions(pos, false);

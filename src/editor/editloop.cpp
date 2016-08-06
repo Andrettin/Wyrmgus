@@ -207,8 +207,9 @@ static void EditTile(const Vec2i &pos, int tile)
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	mf.setTileIndex(tileset, tileIndex, value);
+//	mf.playerInfo.SeenTile = mf.getGraphicTile();
+	mf.UpdateSeenTile();
 	//Wyrmgus end
-	mf.playerInfo.SeenTile = mf.getGraphicTile();
 	
 	//Wyrmgus start
 	Map.CalculateTileTransitions(pos, false);

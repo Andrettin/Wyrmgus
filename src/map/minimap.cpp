@@ -444,6 +444,13 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 		}
 	}
 	//Wyrmgus end
+	//Wyrmgus start
+	for (size_t i = 0; i != TerrainTypes.size(); ++i) {
+		if (TerrainTypes[i]->Graphics) {
+			SDL_LockSurface(TerrainTypes[i]->Graphics->Surface);
+		}
+	}
+	//Wyrmgus end
 
 	const int ty = pos.y * Map.Info.MapWidth;
 	const int tx = pos.x;
@@ -466,18 +473,23 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 				break;
 			}
 
+			//Wyrmgus start
+			/*
 			int tile = Map.Fields[x + y].playerInfo.SeenTile;
 			if (!tile) {
 				tile = Map.Fields[x + y].getGraphicTile();
 			}
+			*/
+			CTerrainType *terrain = Map.Fields[x + y].playerInfo.SeenOverlayTerrain ? Map.Fields[x + y].playerInfo.SeenOverlayTerrain : Map.Fields[x + y].playerInfo.SeenTerrain;
+			int tile = Map.Fields[x + y].playerInfo.SeenOverlayTerrain ? Map.Fields[x + y].playerInfo.SeenOverlaySolidTile : Map.Fields[x + y].playerInfo.SeenSolidTile;
+			if (!terrain) {
+				terrain = Map.Fields[x + y].OverlayTerrain ? Map.Fields[x + y].OverlayTerrain : Map.Fields[x + y].Terrain;
+				tile = Map.Fields[x + y].OverlayTerrain ? Map.Fields[x + y].OverlaySolidTile : Map.Fields[x + y].SolidTile;
+			}
+			//Wyrmgus end
 
 			//Wyrmgus start
-			const int tile_index = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getTileIndex();
-
-			int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
-			if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain].ImageFile.empty()) {
-				tilepitch = Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->w / PixelTileSize.x;
-			}
+			int tilepitch = terrain->Graphics->Surface->w / PixelTileSize.x;
 			//Wyrmgus end
 	
 			const int xofs = PixelTileSize.x * (tile % tilepitch);
@@ -491,19 +503,14 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 					const int colorIndex = *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
 					//Wyrmgus start
 					//const SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[colorIndex];
-					SDL_Color color = Map.TileGraphic->Surface->format->palette->colors[colorIndex];
-					if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain].ImageFile.empty()) {
-						color = Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->format->palette->colors[colorIndex];
-					}
+					const SDL_Color color = terrain->Graphics->Surface->format->palette->colors[colorIndex];
 					//Wyrmgus end
 
 					c = Video.MapRGB(0, color.r, color.g, color.b);
 				} else {
-					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
 					//Wyrmgus start
-					if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain].ImageFile.empty()) {
-						f = Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->format;
-					}
+//					SDL_PixelFormat *f = Map.TileGraphic->Surface->format;
+					SDL_PixelFormat *f = terrain->Graphics->Surface->format;
 					//Wyrmgus end
 
 					c = *(Uint32 *)GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp);
@@ -523,12 +530,8 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 					/*
 					((Uint8 *)MinimapTerrainSurface->pixels)[index] = *s;
 					*/
-					SDL_Color original_color = Map.TileGraphic->Surface->format->palette->colors[
+					SDL_Color original_color = terrain->Graphics->Surface->format->palette->colors[
 										  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
-					if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain].ImageFile.empty()) {
-						original_color = Map.SolidTileGraphics[Map.Tileset->tiles[tile_index].tileinfo.BaseTerrain]->Surface->format->palette->colors[
-											  *GetTileGraphicPixel(xofs, yofs, mx, my, scalex, scaley, bpp)];
-					}
 
 					Uint32 color;
 					color = Video.MapRGB(TheScreen->format, original_color.r, original_color.g, original_color.b);
@@ -560,6 +563,11 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
 		if (!Map.Tileset->solidTerrainTypes[i].ImageFile.empty()) {
 			SDL_UnlockSurface(Map.SolidTileGraphics[i]->Surface);
+		}
+	}
+	for (size_t i = 0; i != TerrainTypes.size(); ++i) {
+		if (TerrainTypes[i]->Graphics) {
+			SDL_UnlockSurface(TerrainTypes[i]->Graphics->Surface);
 		}
 	}
 	//Wyrmgus end

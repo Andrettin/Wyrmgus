@@ -92,6 +92,13 @@ bool CMapField::IsTerrainResourceOnMap() const
 }
 
 //Wyrmgus start
+bool CMapField::IsSeenTileCorrect() const
+{
+	return this->Terrain == this->playerInfo.SeenTerrain && this->OverlayTerrain == this->playerInfo.SeenOverlayTerrain && this->SolidTile == this->playerInfo.SeenSolidTile && this->OverlaySolidTile == this->playerInfo.SeenOverlaySolidTile && this->TransitionTiles == this->playerInfo.SeenTransitionTiles && this->OverlayTransitionTiles == this->playerInfo.SeenOverlayTransitionTiles;
+}
+//Wyrmgus end
+
+//Wyrmgus start
 void CMapField::SetTerrain(CTerrainType *terrain)
 {
 	if (!terrain) {
@@ -209,11 +216,23 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	//Wyrmgus end
 }
 
+//Wyrmgus start
+void CMapField::UpdateSeenTile()
+{
+	this->playerInfo.SeenTerrain = this->Terrain;
+	this->playerInfo.SeenOverlayTerrain = this->OverlayTerrain;
+	this->playerInfo.SeenSolidTile = this->SolidTile;
+	this->playerInfo.SeenOverlaySolidTile = this->OverlaySolidTile;
+	this->playerInfo.SeenTransitionTiles = this->TransitionTiles;
+	this->playerInfo.SeenOverlayTransitionTiles = this->OverlayTransitionTiles;
+}
+//Wyrmgus end
+
 void CMapField::Save(CFile &file) const
 {
 	//Wyrmgus start
 //	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {%3d, %3d, %3d, %2d, %2d", tilesetTile, tile, playerInfo.SeenTile, Value, cost);
+	file.printf("  {\"%s\", \"%s\", %s, \"%s\", \"%s\", %d, %d, %2d, %2d", Terrain ? Terrain->Ident : "", OverlayTerrain ? OverlayTerrain->Ident : "", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident : "", playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost);
 	//Wyrmgus end
 	for (int i = 0; i != PlayerMax; ++i) {
 		if (playerInfo.Visible[i] == 1) {
@@ -310,7 +329,7 @@ void CMapField::parse(lua_State *l)
 	const int len = lua_rawlen(l, -1);
 	//Wyrmgus start
 //	if (len < 4) {
-	if (len < 5) {
+	if (len < 9) {
 	//Wyrmgus end
 		LuaError(l, "incorrect argument");
 	}
@@ -322,17 +341,20 @@ void CMapField::parse(lua_State *l)
 	this->Value = LuaToNumber(l, -1, 3);
 	this->cost = LuaToNumber(l, -1, 4);
 	*/
-	this->tilesetTile = LuaToNumber(l, -1, 1);
-	this->tile = LuaToNumber(l, -1, 2);
-	this->playerInfo.SeenTile = LuaToNumber(l, -1, 3);
-	this->Value = LuaToNumber(l, -1, 4);
-	this->cost = LuaToNumber(l, -1, 5);
-	this->SetTerrain(GetTerrainType(Map.Tileset->getTerrainName(Map.Tileset->tiles[this->tilesetTile].tileinfo.BaseTerrain)));
+	this->SetTerrain(GetTerrainType(LuaToString(l, -1, 1)));
+	this->SetTerrain(GetTerrainType(LuaToString(l, -1, 2)));
+	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 3));
+	this->playerInfo.SeenTerrain = GetTerrainType(LuaToString(l, -1, 4));
+	this->playerInfo.SeenOverlayTerrain = GetTerrainType(LuaToString(l, -1, 5));
+	this->playerInfo.SeenSolidTile = LuaToNumber(l, -1, 6);
+	this->playerInfo.SeenOverlaySolidTile = LuaToNumber(l, -1, 7);
+	this->Value = LuaToNumber(l, -1, 8);
+	this->cost = LuaToNumber(l, -1, 9);
 	//Wyrmgus end
 
 	//Wyrmgus start
 //	for (int j = 4; j < len; ++j) {
-	for (int j = 5; j < len; ++j) {
+	for (int j = 9; j < len; ++j) {
 	//Wyrmgus end
 		const char *value = LuaToString(l, -1, j + 1);
 

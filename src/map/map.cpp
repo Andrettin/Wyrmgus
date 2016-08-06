@@ -78,13 +78,21 @@ char CurrentMapPath[1024];  /// Path of the current map
 void CMap::MarkSeenTile(CMapField &mf)
 {
 	const unsigned int tile = mf.getGraphicTile();
-	const unsigned int seentile = mf.playerInfo.SeenTile;
+	//Wyrmgus start
+//	const unsigned int seentile = mf.playerInfo.SeenTile;
+	//Wyrmgus end
 
 	//  Nothing changed? Seeing already the correct tile.
-	if (tile == seentile) {
+	//Wyrmgus start
+//	if (tile == seentile) {
+	if (mf.IsSeenTileCorrect()) {
+	//Wyrmgus end
 		return;
 	}
-	mf.playerInfo.SeenTile = tile;
+	//Wyrmgus start
+//	mf.playerInfo.SeenTile = tile;
+	mf.UpdateSeenTile();
+	//Wyrmgus end
 
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
@@ -106,12 +114,12 @@ void CMap::MarkSeenTile(CMapField &mf)
 		//  Handle wood changes. FIXME: check if for growing wood correct?
 		//Wyrmgus start
 //		if (tile == this->Tileset->getRemovedTreeTile()) {
-		if (std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), tile) != this->Tileset->removedTreeTiles.end() && mf.getFlag() & MapFieldStumps) {
+		if (mf.OverlayTerrain && std::find(mf.OverlayTerrain->DestroyedTiles.begin(), mf.OverlayTerrain->DestroyedTiles.end(), mf.OverlaySolidTile) != mf.OverlayTerrain->DestroyedTiles.end() && mf.getFlag() & MapFieldStumps) {
 		//Wyrmgus end
 			FixNeighbors(MapFieldForest, 1, pos);
 		//Wyrmgus start
 //		} else if (seentile == this->Tileset->getRemovedTreeTile()) {
-		} else if (std::find(this->Tileset->removedTreeTiles.begin(), this->Tileset->removedTreeTiles.end(), seentile) != this->Tileset->removedTreeTiles.end() && ((mf.getFlag() & MapFieldStumps) || (mf.getFlag() & MapFieldForest))) {
+		} else if (mf.playerInfo.SeenOverlayTerrain && std::find(mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.begin(), mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end(), mf.playerInfo.SeenOverlaySolidTile) != mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end() && ((mf.getFlag() & MapFieldStumps) || (mf.getFlag() & MapFieldForest))) {
 		//Wyrmgus end
 			FixTile(MapFieldForest, 1, pos);
 		} else if (mf.ForestOnMap()) {
@@ -121,12 +129,12 @@ void CMap::MarkSeenTile(CMapField &mf)
 			// Handle rock changes.
 		//Wyrmgus start
 //		} else if (tile == Tileset->getRemovedRockTile()) {
-		} else if (std::find(this->Tileset->removedRockTiles.begin(), this->Tileset->removedRockTiles.end(), tile) != this->Tileset->removedRockTiles.end() && mf.getFlag() & MapFieldGravel) {
+		} else if (mf.OverlayTerrain && std::find(mf.OverlayTerrain->DestroyedTiles.begin(), mf.OverlayTerrain->DestroyedTiles.end(), mf.OverlaySolidTile) != mf.OverlayTerrain->DestroyedTiles.end() && mf.getFlag() & MapFieldGravel) {
 		//Wyrmgus end
 			FixNeighbors(MapFieldRocks, 1, pos);
 		//Wyrmgus start
 //		} else if (seentile == Tileset->getRemovedRockTile()) {
-		} else if (std::find(this->Tileset->removedRockTiles.begin(), this->Tileset->removedRockTiles.end(), seentile) != this->Tileset->removedRockTiles.end() && ((mf.getFlag() & MapFieldGravel) || (mf.getFlag() & MapFieldRocks))) {
+		} else if (mf.playerInfo.SeenOverlayTerrain && std::find(mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.begin(), mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end(), mf.playerInfo.SeenOverlaySolidTile) != mf.playerInfo.SeenOverlayTerrain->DestroyedTiles.end() && ((mf.getFlag() & MapFieldGravel) || (mf.getFlag() & MapFieldRocks))) {
 		//Wyrmgus end
 			FixTile(MapFieldRocks, 1, pos);
 		} else if (mf.RockOnMap()) {
@@ -134,8 +142,13 @@ void CMap::MarkSeenTile(CMapField &mf)
 			FixNeighbors(MapFieldRocks, 1, pos);
 
 			//  Handle Walls changes.
+		//Wyrmgus start
+		/*
 		} else if (this->Tileset->isAWallTile(tile)
 				   || this->Tileset->isAWallTile(seentile)) {
+		*/
+		} else if ((mf.OverlayTerrain && (mf.OverlayTerrain->Flags & MapFieldWall)) || (mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & MapFieldWall))) {
+		//Wyrmgus end
 			MapFixSeenWallTile(pos);
 			MapFixSeenWallNeighbors(pos);
 		}
@@ -332,8 +345,9 @@ void PreprocessMap()
 			//Wyrmgus start
 			Map.CalculateTileTransitions(Vec2i(ix, iy));
 			Map.CalculateTileTransitions(Vec2i(ix, iy), true);
+//			mf.playerInfo.SeenTile = mf.getGraphicTile();
+			mf.UpdateSeenTile();
 			//Wyrmgus end
-			mf.playerInfo.SeenTile = mf.getGraphicTile();
 		}
 	}
 	// it is required for fixing the wood that all tiles are marked as seen!
@@ -489,8 +503,8 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		}
 	}
 	*/
-	if (!((type == MapFieldForest && Tileset->isAWoodTile(mf.playerInfo.SeenTile) && (mf.getFlag() & type))
-		  || (type == MapFieldRocks && Tileset->isARockTile(mf.playerInfo.SeenTile) && (mf.getFlag() & type)))) {
+	if (!((type == MapFieldForest && mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & type) && (mf.getFlag() & type))
+		  || (type == MapFieldRocks && mf.playerInfo.SeenOverlayTerrain && (mf.playerInfo.SeenOverlayTerrain->Flags & type) && (mf.getFlag() & type)))) {
 		if (seen) {
 			return;
 		}
@@ -520,7 +534,10 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		ttup = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf - this->Info.MapWidth);
-		ttup = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		//Wyrmgus start
+//		ttup = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		ttup = new_mf.getGraphicTile();
+		//Wyrmgus end
 		//Wyrmgus start
 		if (this->Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain != this->Tileset->tiles[new_mf.getTileIndex()].tileinfo.BaseTerrain) {
 			ttup = -2;
@@ -531,7 +548,10 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		ttright = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf + 1);
-		ttright = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		//Wyrmgus start
+//		ttright = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		ttright = new_mf.getGraphicTile();
+		//Wyrmgus end
 		//Wyrmgus start
 		if (this->Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain != this->Tileset->tiles[new_mf.getTileIndex()].tileinfo.BaseTerrain) {
 			ttright = -2;
@@ -542,7 +562,10 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		ttdown = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf + this->Info.MapWidth);
-		ttdown = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		//Wyrmgus start
+//		ttdown = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		ttdown = new_mf.getGraphicTile();
+		//Wyrmgus end
 		//Wyrmgus start
 		if (this->Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain != this->Tileset->tiles[new_mf.getTileIndex()].tileinfo.BaseTerrain) {
 			ttdown = -2;
@@ -553,7 +576,10 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		ttleft = -1; //Assign trees in all directions
 	} else {
 		const CMapField &new_mf = *(&mf - 1);
-		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		//Wyrmgus start
+//		ttleft = seen ? new_mf.playerInfo.SeenTile : new_mf.getGraphicTile();
+		ttleft = new_mf.getGraphicTile();
+		//Wyrmgus end
 		//Wyrmgus start
 		if (this->Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain != this->Tileset->tiles[new_mf.getTileIndex()].tileinfo.BaseTerrain) {
 			ttleft = -2;
@@ -568,7 +594,10 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 	//Update seen tile.
 	if (tile == -1) { // No valid wood remove it.
 		if (seen) {
-			mf.playerInfo.SeenTile = removedtile;
+			//Wyrmgus start
+//			mf.playerInfo.SeenTile = removedtile;
+			mf.UpdateSeenTile();
+			//Wyrmgus end
 			this->FixNeighbors(type, seen, pos);
 		} else {
 			mf.setGraphicTile(removedtile);
@@ -604,12 +633,15 @@ void CMap::FixTile(unsigned short type, int seen, const Vec2i &pos)
 		}
 	//Wyrmgus start
 //	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile)) { //Same Type
-	} else if (seen && this->Tileset->isEquivalentTile(tile, mf.playerInfo.SeenTile, mf.getTileIndex())) { //Same Type
+	} else if (seen && mf.Terrain == mf.playerInfo.SeenTerrain && mf.OverlayTerrain == mf.playerInfo.SeenOverlayTerrain) { //Same Type
 	//Wyrmgus end
 		return;
 	} else {
 		if (seen) {
-			mf.playerInfo.SeenTile = tile;
+			//Wyrmgus start
+//			mf.playerInfo.SeenTile = tile;
+			mf.UpdateSeenTile();
+			//Wyrmgus end
 		} else {
 			mf.setGraphicTile(tile);
 		}
@@ -1008,28 +1040,28 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 				DebugPrint("Real place wood\n");
 				verticalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), DefaultResourceAmounts[WoodCost]);
 				verticalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-				verticalMf.playerInfo.SeenTile = verticalMf.getGraphicTile();
+				verticalMf.UpdateSeenTile();
 				verticalMf.Value = DefaultResourceAmounts[WoodCost];
 				UI.Minimap.UpdateSeenXY(pos + verticalOffset);
 				UI.Minimap.UpdateXY(pos + verticalOffset);
 				
 				diagonalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), DefaultResourceAmounts[WoodCost]);
 				diagonalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-				diagonalMf.playerInfo.SeenTile = diagonalMf.getGraphicTile();
+				diagonalMf.UpdateSeenTile();
 				diagonalMf.Value = DefaultResourceAmounts[WoodCost];
 				UI.Minimap.UpdateSeenXY(pos + diagonalOffset);
 				UI.Minimap.UpdateXY(pos + diagonalOffset);
 				
 				horizontalMf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), DefaultResourceAmounts[WoodCost]);
 				horizontalMf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-				horizontalMf.playerInfo.SeenTile = horizontalMf.getGraphicTile();
+				horizontalMf.UpdateSeenTile();
 				horizontalMf.Value = DefaultResourceAmounts[WoodCost];
 				UI.Minimap.UpdateSeenXY(pos + horizontalOffset);
 				UI.Minimap.UpdateXY(pos + horizontalOffset);
 				
 				mf.setTileIndex(*Map.Tileset, Map.Tileset->getDefaultWoodTileIndex(), DefaultResourceAmounts[WoodCost]);
 				mf.setGraphicTile(Map.Tileset->tiles[Map.Tileset->getDefaultWoodTileIndex()].tile);
-				mf.playerInfo.SeenTile = mf.getGraphicTile();
+				mf.UpdateSeenTile();
 				mf.Value = DefaultResourceAmounts[WoodCost];
 				UI.Minimap.UpdateSeenXY(pos);
 				UI.Minimap.UpdateXY(pos);

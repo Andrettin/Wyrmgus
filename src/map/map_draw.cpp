@@ -263,12 +263,16 @@ void CViewport::DrawMapBackgroundInViewport() const
 				continue;
 			}
 			const CMapField &mf = Map.Fields[sx];
+			//Wyrmgus start
+			/*
 			unsigned short int tile;
 			if (ReplayRevealMap) {
 				tile = mf.getGraphicTile();
 			} else {
 				tile = mf.playerInfo.SeenTile;
 			}
+			*/
+			//Wyrmgus end
 			//Wyrmgus start
 //			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
 			/*
@@ -296,20 +300,39 @@ void CViewport::DrawMapBackgroundInViewport() const
 				Map.TileGraphic->DrawFrameClip(tile + mf.AnimationFrame, dx, dy, false);
 			}
 			*/
-			if (mf.Terrain && mf.Terrain->Graphics) {
-				mf.Terrain->Graphics->DrawFrameClip(mf.SolidTile + mf.AnimationFrame, dx, dy, false);
-			}
-			for (size_t i = 0; i != mf.TransitionTiles.size(); ++i) {
-				if (mf.TransitionTiles[i].first->Graphics) {
-					mf.TransitionTiles[i].first->Graphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
+			if (ReplayRevealMap) {
+				if (mf.Terrain && mf.Terrain->Graphics) {
+					mf.Terrain->Graphics->DrawFrameClip(mf.SolidTile + mf.AnimationFrame, dx, dy, false);
 				}
-			}
-			if (mf.OverlayTerrain && mf.OverlayTerrain->Graphics && mf.OverlayTransitionTiles.size() == 0) {
-				mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile + mf.OverlayAnimationFrame, dx, dy, false);
-			}
-			for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
-				if (mf.OverlayTransitionTiles[i].first->Graphics) {
-					mf.OverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.OverlayTransitionTiles[i].second, dx, dy, false);
+				for (size_t i = 0; i != mf.TransitionTiles.size(); ++i) {
+					if (mf.TransitionTiles[i].first->Graphics) {
+						mf.TransitionTiles[i].first->Graphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
+					}
+				}
+				if (mf.OverlayTerrain && mf.OverlayTerrain->Graphics && mf.OverlayTransitionTiles.size() == 0) {
+					mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile + mf.OverlayAnimationFrame, dx, dy, false);
+				}
+				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
+					if (mf.OverlayTransitionTiles[i].first->Graphics) {
+						mf.OverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.OverlayTransitionTiles[i].second, dx, dy, false);
+					}
+				}
+			} else {
+				if (mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->Graphics) {
+					mf.playerInfo.SeenTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenSolidTile + mf.AnimationFrame, dx, dy, false);
+				}
+				for (size_t i = 0; i != mf.playerInfo.SeenTransitionTiles.size(); ++i) {
+					if (mf.playerInfo.SeenTransitionTiles[i].first->Graphics) {
+						mf.playerInfo.SeenTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, false);
+					}
+				}
+				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->Graphics && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
+					mf.playerInfo.SeenOverlayTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + mf.OverlayAnimationFrame, dx, dy, false);
+				}
+				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
+					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics) {
+						mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
+					}
 				}
 			}
 			//Wyrmgus end
