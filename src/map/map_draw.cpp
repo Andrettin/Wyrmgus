@@ -319,7 +319,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 				}
 			} else {
 				if (mf.playerInfo.SeenTerrain && mf.playerInfo.SeenTerrain->Graphics) {
-					mf.playerInfo.SeenTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenSolidTile + mf.AnimationFrame, dx, dy, false);
+					mf.playerInfo.SeenTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenSolidTile + (mf.playerInfo.SeenTerrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, false);
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenTransitionTiles.size(); ++i) {
 					if (mf.playerInfo.SeenTransitionTiles[i].first->Graphics) {
@@ -327,7 +327,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					}
 				}
 				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->Graphics && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
-					mf.playerInfo.SeenOverlayTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + mf.OverlayAnimationFrame, dx, dy, false);
+					mf.playerInfo.SeenOverlayTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.SeenOverlayTerrain : 0), dx, dy, false);
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
 					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics) {
