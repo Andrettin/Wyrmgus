@@ -45,6 +45,7 @@
 class CUnitType;
 //Wyrmgus start
 class CUnit;
+class CTerrainType;
 //Wyrmgus end
 
 
@@ -75,7 +76,10 @@ public:
 
 	std::vector<std::string> UnitTypes;             /// Sorted editor unit-type table.
 	std::vector<const CUnitType *> ShownUnitTypes;  /// Shown editor unit-type table.
-	std::vector<unsigned int> ShownTileTypes;        /// Shown editor tile-type table.
+	//Wyrmgus start
+//	std::vector<unsigned int> ShownTileTypes;        /// Shown editor tile-type table.
+	std::vector<CTerrainType *> ShownTileTypes;        /// Shown editor tile-type table.
+	//Wyrmgus end
 
 	bool TerrainEditable;        /// Is the terrain editable ?
 	IconConfig Select;           /// Editor's select icon.
