@@ -159,7 +159,7 @@ public:
 	CTerrainType() :
 		ID(-1), Flags(0), SolidAnimationFrames(0),
 		Overlay(false), Buildable(false), AllowSingle(false),
-		UnitType(NULL), Graphics(NULL)
+		UnitType(NULL), Graphics(NULL), SemiTransparentGraphics(NULL)
 	{
 	}
 
@@ -173,6 +173,7 @@ public:
 	bool AllowSingle;											/// Whether this terrain type has transitions for single tiles
 	CUnitType *UnitType;
 	CGraphic *Graphics;
+	CGraphic *SemiTransparentGraphics;
 	std::vector<CTerrainType *> BaseTerrains;					/// Possible base terrains for this terrain type (if is an overlay terrain)
 	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border
 	std::vector<CTerrainType *> InnerBorderTerrains;			/// Terrain types which this one can border, and which "enter" this tile type in transitions
