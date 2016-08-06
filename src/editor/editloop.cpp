@@ -189,12 +189,14 @@ static EditorSliderListener *editorSliderListener;
 **  @param pos   map tile coordinate.
 **  @param tile  Tile type to edit.
 */
-static void EditTile(const Vec2i &pos, int tile)
+//Wyrmgus start
+//static void EditTile(const Vec2i &pos, int tile)
+static void EditTile(const Vec2i &pos, CTerrainType *terrain)
+//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 	
 	//Wyrmgus start
-	CTerrainType *terrain = GetTerrainType(Map.Tileset->getTerrainName(Map.Tileset->tiles[tile].tileinfo.BaseTerrain));
 	if (terrain == Map.GetTileTerrain(pos, terrain->Overlay)) {
 		return;
 	}
@@ -203,38 +205,23 @@ static void EditTile(const Vec2i &pos, int tile)
 	const CTileset &tileset = *Map.Tileset;
 	//Wyrmgus start
 //	const int baseTileIndex = tileset.findTileIndexByTile(tile);
-	const int baseTileIndex = tile;
+//	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	//Wyrmgus end
-	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	CMapField &mf = *Map.Field(pos);
 	
+	//Wyrmgus start
 	int value = 0;
-	if ((tileset.tiles[tileIndex].flag & MapFieldForest) || (tileset.tiles[tileIndex].flag & MapFieldRocks)) {
+	if ((terrain->Flags & MapFieldForest) || (terrain->Flags & MapFieldRocks)) {
 		value = 100;
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
-	mf.setTileIndex(tileset, tileIndex, value);
+	Map.SetTileTerrain(pos, terrain);
+	mf.Value = value;
 //	mf.playerInfo.SeenTile = mf.getGraphicTile();
 	mf.UpdateSeenTile();
 	//Wyrmgus end
 	
-	//Wyrmgus start
-	Map.CalculateTileTransitions(pos, false);
-	Map.CalculateTileTransitions(pos, true);
-	
-	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos)) {
-					Map.CalculateTileTransitions(adjacent_pos, false);
-					Map.CalculateTileTransitions(adjacent_pos, true);
-				}
-			}
-		}
-	}
-	//Wyrmgus end
-	
+
 	//Wyrmgus start
 	CUnitCache &unitcache = mf.UnitCache;
 	std::vector<CUnit *> units_to_remove;
@@ -270,7 +257,10 @@ static void EditTile(const Vec2i &pos, int tile)
 **
 **  @bug  This function does not support mirror editing!
 */
-static void EditTilesInternal(const Vec2i &pos, int tile, int size)
+//Wyrmgus start
+//static void EditTilesInternal(const Vec2i &pos, int tile, int size)
+static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
+//Wyrmgus end
 {
 	Vec2i minPos = pos;
 	Vec2i maxPos(pos.x + size - 1, pos.y + size - 1);
@@ -284,8 +274,9 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 	Vec2i itPos;
 	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
 		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
-			EditTile(itPos, tile);
 			//Wyrmgus start
+//			EditTile(itPos, tile);
+			EditTile(itPos, terrain);
 			changed_tiles.push_back(itPos);
 			//Wyrmgus end
 		}
@@ -293,7 +284,6 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 	
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
-	CTerrainType *terrain = GetTerrainType(Map.Tileset->getTerrainName(Map.Tileset->tiles[tile].tileinfo.BaseTerrain));
 	for (size_t i = 0; i != changed_tiles.size(); ++i) {
 		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay);
 		
@@ -326,7 +316,7 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 					for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 						if (x_offset != 0 || y_offset != 0) {
 							if (Map.Info.IsPointOnMap(changed_tiles[i] + Vec2i(x_offset, y_offset))) {
-								EditTile(changed_tiles[i] + Vec2i(x_offset, y_offset), tile);
+								EditTile(changed_tiles[i] + Vec2i(x_offset, y_offset), terrain);
 								changed_tiles.push_back(changed_tiles[i] + Vec2i(x_offset, y_offset));
 							}
 						}
@@ -409,9 +399,15 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 **  @param tile  Tile type to edit.
 **  @param size  Size of rectangle
 */
-static void EditTiles(const Vec2i &pos, int tile, int size)
+//Wyrmgus start
+//static void EditTiles(const Vec2i &pos, int tile, int size)
+static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
+//Wyrmgus end
 {
-	EditTilesInternal(pos, tile, size);
+	//Wyrmgus start
+//	EditTilesInternal(pos, tile, size);
+	EditTilesInternal(pos, terrain, size);
+	//Wyrmgus end
 
 	if (!MirrorEdit) {
 		return;
@@ -420,14 +416,21 @@ static void EditTiles(const Vec2i &pos, int tile, int size)
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
 
-	EditTilesInternal(mirrorv, tile, size);
+	//Wyrmgus start
+//	EditTilesInternal(mirrorv, tile, size);
+	EditTilesInternal(mirrorv, terrain, size);
+	//Wyrmgus end
 	if (MirrorEdit == 1) {
 		return;
 	}
 	const Vec2i mirrorh(pos.x, mirror.y);
 
-	EditTilesInternal(mirrorh, tile, size);
-	EditTilesInternal(mirror, tile, size);
+	//Wyrmgus start
+//	EditTilesInternal(mirrorh, tile, size);
+//	EditTilesInternal(mirror, tile, size);
+	EditTilesInternal(mirrorh, terrain, size);
+	EditTilesInternal(mirror, terrain, size);
+	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------
@@ -1747,7 +1750,10 @@ static void EditorCallbackButtonDown(unsigned button)
 
 			if (Editor.State == EditorEditTile &&
 				Editor.SelectedTileIndex != -1) {
-				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+				//Wyrmgus start
+//				EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+				EditTiles(tilePos, GetTerrainType(Map.Tileset->getTerrainName(Map.Tileset->tiles[Editor.ShownTileTypes[Editor.SelectedTileIndex]].tileinfo.BaseTerrain)), TileCursorSize);
+				//Wyrmgus end
 			} else if (Editor.State == EditorEditUnit) {
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
@@ -2203,7 +2209,10 @@ static void EditorCallbackMouse(const PixelPos &pos)
 		const Vec2i tilePos = UI.SelectedViewport->ScreenToTilePos(CursorScreenPos);
 
 		if (Editor.State == EditorEditTile && Editor.SelectedTileIndex != -1) {
-			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+			//Wyrmgus start
+//			EditTiles(tilePos, Editor.ShownTileTypes[Editor.SelectedTileIndex], TileCursorSize);
+			EditTiles(tilePos, GetTerrainType(Map.Tileset->getTerrainName(Map.Tileset->tiles[Editor.ShownTileTypes[Editor.SelectedTileIndex]].tileinfo.BaseTerrain)), TileCursorSize);
+			//Wyrmgus end
 		} else if (Editor.State == EditorEditUnit && CursorBuilding) {
 			if (!UnitPlacedThisPress) {
 				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
