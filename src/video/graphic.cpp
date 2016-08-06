@@ -2287,20 +2287,20 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 				*(Uint32 *)tp = c;
 				//Wyrmgus start
 //				if (colors) {
-				if (colors && !g->Grayscale) {
+				if (!g->Grayscale) {
 				//Wyrmgus end
 					b = (c & f->Bmask) >> f->Bshift;
-					if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
-						((c & f->Gmask) >> f->Gshift) == b) {
+//					if (b && ((c & f->Rmask) >> f->Rshift) == 0 &&
+//						((c & f->Gmask) >> f->Gshift) == b) {
 						//Wyrmgus start
 						/*
 						pc = ((colors->Colors[0].R * b / 255) << f->Rshift) |
 							 ((colors->Colors[0].G * b / 255) << f->Gshift) |
 							 ((colors->Colors[0].B * b / 255) << f->Bshift);
 						*/
-						pc = ((std::max<int>(0,std::min<int>(255,int(colors->Colors[0].R) + time_of_day_red)) * b / 255) << f->Rshift) |
-							 ((std::max<int>(0,std::min<int>(255,int(colors->Colors[0].G) + time_of_day_green)) * b / 255) << f->Gshift) |
-							 ((std::max<int>(0,std::min<int>(255,int(colors->Colors[0].B) + time_of_day_blue)) * b / 255) << f->Bshift);
+						pc = ((std::max<int>(0,std::min<int>(255, (*tp) + time_of_day_red))) << f->Rshift) |
+							 ((std::max<int>(0,std::min<int>(255, *(tp + 1) + time_of_day_green))) << f->Gshift) |
+							 ((std::max<int>(0,std::min<int>(255, *(tp + 2) + time_of_day_blue))) << f->Bshift);
 						//Wyrmgus end
 						if (bpp == 4) {
 							pc |= (c & f->Amask);
@@ -2308,7 +2308,7 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 							pc |= (0xFFFFFFFF ^ (f->Rmask | f->Gmask | f->Bmask));
 						}
 						*(Uint32 *)tp = pc;
-					}
+//					}
 				}
 				sp += bpp;
 			}

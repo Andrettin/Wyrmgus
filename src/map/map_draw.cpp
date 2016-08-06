@@ -308,24 +308,15 @@ void CViewport::DrawMapBackgroundInViewport() const
 					if (mf.TransitionTiles[i].first->Graphics) {
 						mf.TransitionTiles[i].first->Graphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
 					}
-					if (mf.TransitionTiles[i].first->SemiTransparentGraphics) {
-						mf.TransitionTiles[i].first->SemiTransparentGraphics->DrawFrameClip(mf.TransitionTiles[i].second, dx, dy, false);
-					}
 				}
 				if (mf.OverlayTerrain && mf.OverlayTransitionTiles.size() == 0) {
 					if (mf.OverlayTerrain->Graphics) {
 						mf.OverlayTerrain->Graphics->DrawFrameClip(mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
-					if (mf.OverlayTerrain->SemiTransparentGraphics) {
-						mf.OverlayTerrain->SemiTransparentGraphics->DrawFrameClip(mf.OverlaySolidTile + (mf.OverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
-					}
 				}
 				for (size_t i = 0; i != mf.OverlayTransitionTiles.size(); ++i) {
 					if (mf.OverlayTransitionTiles[i].first->Graphics) {
 						mf.OverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.OverlayTransitionTiles[i].second, dx, dy, false);
-					}
-					if (mf.OverlayTransitionTiles[i].first->SemiTransparentGraphics) {
-						mf.OverlayTransitionTiles[i].first->SemiTransparentGraphics->DrawFrameClip(mf.OverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
 			} else {
@@ -336,24 +327,15 @@ void CViewport::DrawMapBackgroundInViewport() const
 					if (mf.playerInfo.SeenTransitionTiles[i].first->Graphics) {
 						mf.playerInfo.SeenTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, false);
 					}
-					if (mf.playerInfo.SeenTransitionTiles[i].first->SemiTransparentGraphics) {
-						mf.playerInfo.SeenTransitionTiles[i].first->SemiTransparentGraphics->DrawFrameClip(mf.playerInfo.SeenTransitionTiles[i].second, dx, dy, false);
-					}
 				}
 				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
 					if (mf.playerInfo.SeenOverlayTerrain->Graphics) {
 						mf.playerInfo.SeenOverlayTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 					}
-					if (mf.playerInfo.SeenOverlayTerrain->SemiTransparentGraphics) {
-						mf.playerInfo.SeenOverlayTerrain->SemiTransparentGraphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
-					}
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
 					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics) {
 						mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
-					}
-					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->SemiTransparentGraphics) {
-						mf.playerInfo.SeenOverlayTransitionTiles[i].first->SemiTransparentGraphics->DrawFrameClip(mf.playerInfo.SeenOverlayTransitionTiles[i].second, dx, dy, false);
 					}
 				}
 			}

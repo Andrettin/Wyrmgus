@@ -960,9 +960,6 @@ void LoadTerrainTypes()
 		if ((*it)->Graphics) {
 			(*it)->Graphics->Load();
 		}
-		if ((*it)->SemiTransparentGraphics) {
-			(*it)->SemiTransparentGraphics->Load();
-		}
 	}
 }
 //Wyrmgus end

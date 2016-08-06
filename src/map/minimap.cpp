@@ -246,7 +246,9 @@ void CMinimap::UpdateTerrain()
 	if (!scaley) {
 		scaley = 1;
 	}
-	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
+	//Wyrmgus start
+//	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
+	//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (!UseOpenGL)
@@ -306,6 +308,7 @@ void CMinimap::UpdateTerrain()
 			
 			//Wyrmgus start
 			int tilepitch = terrain->Graphics->Surface->w / PixelTileSize.x;
+			const int bpp = terrain->Graphics->Surface->format->BytesPerPixel;
 			//Wyrmgus end
 	
 			const int xofs = PixelTileSize.x * (tile % tilepitch);
@@ -420,8 +423,8 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 
 	//Wyrmgus start
 //	const int tilepitch = Map.TileGraphic->Surface->w / PixelTileSize.x;
+//	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 	//Wyrmgus end
-	const int bpp = Map.TileGraphic->Surface->format->BytesPerPixel;
 
 	//
 	//  Pixel 7,6 7,14, 15,6 15,14 are taken for the minimap picture.
@@ -486,6 +489,7 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 
 			//Wyrmgus start
 			int tilepitch = terrain->Graphics->Surface->w / PixelTileSize.x;
+			const int bpp = terrain->Graphics->Surface->format->BytesPerPixel;
 			//Wyrmgus end
 	
 			const int xofs = PixelTileSize.x * (tile % tilepitch);
