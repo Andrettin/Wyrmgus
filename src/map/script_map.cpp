@@ -398,6 +398,38 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 	}
 }
 
+//Wyrmgus start
+/**
+**  Set a tile
+**
+**  @param tileIndex   Tile number
+**  @param pos    coordinate
+**  @param value  Value of the tile
+*/
+void SetTileTerrain(CTerrainType *terrain, const Vec2i &pos, int value)
+{
+	if (!Map.Info.IsPointOnMap(pos)) {
+		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
+		return;
+	}
+	if (!terrain) {
+		fprintf(stderr, "Invalid terrain\n");
+		return;
+	}
+	if (value < 0) {
+		fprintf(stderr, "Invalid tile value: %d\n", value);
+		return;
+	}
+	
+	if (Map.Fields) {
+		CMapField &mf = *Map.Field(pos);
+
+		mf.SetTerrain(terrain);
+		mf.Value = value;
+	}
+}
+//Wyrmgus end
+
 /**
 **  Define the type of each player available for the map
 **
@@ -551,15 +583,21 @@ static int CclGetTileTerrainName(lua_State *l)
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	const CMapField &mf = *Map.Field(pos);
-	const CTileset &tileset = *Map.Tileset;
 	//Wyrmgus start
-//	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
-	const int index = mf.getTileIndex();
-	//Wyrmgus end
+	/*
+	const CTileset &tileset = *Map.Tileset;
+	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
 	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
+	*/
+	if (mf.OverlayTerrain) {
+		lua_pushstring(l, mf.OverlayTerrain->Ident.c_str());
+	} else {
+		lua_pushstring(l, mf.Terrain->Ident.c_str());
+	}
+	//Wyrmgus end
 	return 1;
 }
 
@@ -570,6 +608,8 @@ static int CclGetTileTerrainName(lua_State *l)
 **
 **  @return   The name of the terrain of the tile.
 */
+//Wyrmgus start
+/*
 static int CclGetTileTerrainMixedName(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
@@ -588,6 +628,8 @@ static int CclGetTileTerrainMixedName(lua_State *l)
 	lua_pushstring(l, mixTerrainIdx ? tileset.getTerrainName(mixTerrainIdx).c_str() : "");
 	return 1;
 }
+*/
+//Wyrmgus end
 
 /**
 **  Check if the tile's terrain has a particular flag.
@@ -795,6 +837,14 @@ static int CclDefineTerrainType(lua_State *l)
 			for (int j = 0; j < subargs; ++j) {
 				terrain->SolidTiles.push_back(LuaToNumber(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "DamagedTiles")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				terrain->DamagedTiles.push_back(LuaToNumber(l, -1, j + 1));
+			}
 		} else if (!strcmp(value, "DestroyedTiles")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -888,7 +938,9 @@ void MapCclRegister()
 	lua_register(Lua, "GetCurrentTileset", CclGetCurrentTileset);
 	//Wyrmgus end
 	lua_register(Lua, "GetTileTerrainName", CclGetTileTerrainName);
-	lua_register(Lua, "GetTileTerrainMixedName", CclGetTileTerrainMixedName);
+	//Wyrmgus start
+//	lua_register(Lua, "GetTileTerrainMixedName", CclGetTileTerrainMixedName);
+	//Wyrmgus end
 	lua_register(Lua, "GetTileTerrainHasFlag", CclGetTileTerrainHasFlag);
 	
 	//Wyrmgus start

@@ -59,17 +59,19 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d);
 **
 **  @note  this is a rather dumb function, doesn't do any tile fixing.
 */
+//Wyrmgus start
+/*
 void ChangeTile(const Vec2i &pos, int tile)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	CMapField &mf = *Map.Field(pos);
 	mf.setGraphicTile(tile);
-	//Wyrmgus start
-//	mf.playerInfo.SeenTile = tile;
+	mf.playerInfo.SeenTile = tile;
 	mf.UpdateSeenTile();
-	//Wyrmgus end
 }
+*/
+//Wyrmgus end
 
 
 /**
@@ -83,15 +85,16 @@ void ChangeTile(const Vec2i &pos, int tile)
 **  ab
 **  cd -> abcd
 */
+//Wyrmgus start
+/*
 static unsigned QuadFromTile(const Vec2i &pos)
 {
 	// find the abstact tile number
-	//Wyrmgus start
-//	const int tile = Map.Field(pos)->getGraphicTile();
-//	return Map.Tileset->getQuadFromTile(tile);
-	return Map.Tileset->getQuadFromTile(Map.Field(pos)->getTileIndex());
-	//Wyrmgus end
+	const int tile = Map.Field(pos)->getGraphicTile();
+	return Map.Tileset->getQuadFromTile(tile);
 }
+*/
+//Wyrmgus end
 
 /**
 **  Editor change tile.
@@ -100,7 +103,10 @@ static unsigned QuadFromTile(const Vec2i &pos)
 **  @param tileIndex  Tile type to edit.
 **  @param d     Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
+//Wyrmgus start
+//void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
+void EditorChangeTile(const Vec2i &pos, int tileIndex)
+//Wyrmgus end
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 
@@ -175,7 +181,10 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	EditorChangeSurrounding(pos, d);
+	//Wyrmgus start
+//	EditorChangeSurrounding(pos, d);
+	EditorChangeSurrounding(pos, tile);
+	//Wyrmgus end
 }
 
 /**
@@ -184,15 +193,62 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex, int d)
 **  @param pos  Map tile position of change.
 **  @param d  Fix direction flag 8 up, 4 down, 2 left, 1 right.
 */
-static void EditorChangeSurrounding(const Vec2i &pos, int d)
+//Wyrmgus start
+//static void EditorChangeSurrounding(const Vec2i &pos, int d)
+static void EditorChangeSurrounding(const Vec2i &pos, int tile)
+//Wyrmgus end
 {
 	// Special case 1) Walls.
 	CMapField &mf = *Map.Field(pos);
+	
+	//Wyrmgus start
+	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
+	CTerrainType *terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
+	bool overlay = mf.OverlayTerrain ? true : false;
+	if (!terrain->AllowSingle) {
+		std::vector<int> transition_directions;
+		
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset != 0 || y_offset != 0) {
+					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+					if (Map.Info.IsPointOnMap(adjacent_pos)) {
+						CMapField &adjacent_mf = *Map.Field(adjacent_pos);
+							
+						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay);
+						if (overlay && adjacent_terrain && Map.Field(adjacent_pos)->OverlayTerrainDestroyed) {
+							adjacent_terrain = NULL;
+						}
+						if (terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+							transition_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
+						}
+					}
+				}
+			}
+		}
+		
+		if (std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end()) {
+			EditorChangeTile(pos + Vec2i(0, -1), tile);
+			EditorChangeTile(pos + Vec2i(0, 1), tile);
+		} else if (std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end()) {
+			EditorChangeTile(pos + Vec2i(-1, 0), tile);
+			EditorChangeTile(pos + Vec2i(1, 0), tile);
+		}
+		
+	}
+	//Wyrmgus end
+
+	//Wyrmgus start
+	/*
 	if (mf.isAWall()) {
 		Map.SetWall(pos, mf.isHuman());
 		return;
 	}
+	*/
+	//Wyrmgus end
 
+	//Wyrmgus start
+	/*
 	const unsigned int quad = QuadFromTile(pos);
 	const unsigned int TH_QUAD_M = 0xFFFF0000; // Top half quad mask
 	const unsigned int BH_QUAD_M = 0x0000FFFF; // Bottom half quad mask
@@ -247,6 +303,8 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 			EditorChangeTile(pos + offset, tile, d & ~DIR_LEFT);
 		}
 	}
+	*/
+	//Wyrmgus end
 }
 
 /**
@@ -254,9 +312,15 @@ static void EditorChangeSurrounding(const Vec2i &pos, int d)
 **
 **  @param pos  Map tile position of change.
 */
-void EditorTileChanged(const Vec2i &pos)
+//Wyrmgus start
+//void EditorTileChanged(const Vec2i &pos)
+void EditorTileChanged(const Vec2i &pos, int tile)
+//Wyrmgus end
 {
-	EditorChangeSurrounding(pos, 0x0F);
+	//Wyrmgus start
+//	EditorChangeSurrounding(pos, 0x0F);
+	EditorChangeSurrounding(pos, tile);
+	//Wyrmgus end
 }
 
 /**
@@ -285,7 +349,10 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {
 		for (itPos.y = ipos.y; itPos.y <= apos.y; ++itPos.y) {
-			EditorChangeTile(itPos, tile, 15);
+			//Wyrmgus start
+//			EditorChangeTile(itPos, tile, 15);
+			EditorChangeTile(itPos, tile);
+			//Wyrmgus end
 		}
 	}
 }

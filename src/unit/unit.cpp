@@ -2039,7 +2039,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			// don't count again
 			if (type.Building) {
 				// FIXME: support more races
-				if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+				//Wyrmgus start
+//				if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+				if (!type.BoolFlag[WALL_INDEX].value) {
+				//Wyrmgus end
 					player.TotalBuildings++;
 				}
 			} else {
@@ -2073,7 +2076,10 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	// Don't Add the building if it's dying, used to load a save game
 	if (type.Building && CurrentAction() != UnitActionDie) {
 		// FIXME: support more races
-		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+		//Wyrmgus start
+//		if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+		if (!type.BoolFlag[WALL_INDEX].value) {
+		//Wyrmgus end
 			player.NumBuildings++;
 			//Wyrmgus start
 			if (CurrentAction() == UnitActionBuilt) {
@@ -2821,7 +2827,10 @@ void UnitLost(CUnit &unit)
 
 		if (type.Building) {
 			// FIXME: support more races
-			if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+			//Wyrmgus start
+//			if (!type.BoolFlag[WALL_INDEX].value && &type != UnitTypeOrcWall && &type != UnitTypeHumanWall) {
+			if (!type.BoolFlag[WALL_INDEX].value) {
+			//Wyrmgus end
 				player.NumBuildings--;
 				//Wyrmgus start
 				if (unit.CurrentAction() == UnitActionBuilt) {

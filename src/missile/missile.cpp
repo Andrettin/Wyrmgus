@@ -52,6 +52,9 @@
 //Wyrmgus end
 #include "sound.h"
 #include "spells.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "trigger.h"
 #include "ui.h"
 #include "unit.h"
@@ -652,32 +655,26 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			if (Map.WallOnMap(goalPos)) {
 				//Wyrmgus start
 //				if (Map.HumanWallOnMap(goalPos)) {
-				if (Map.HumanWallOnMap(goalPos) && CalculateHit(unit, *UnitTypeHumanWall->Stats, NULL) == true) {
+				if (Map.Field(goalPos)->OverlayTerrain->UnitType && CalculateHit(unit, *Map.Field(goalPos)->OverlayTerrain->UnitType->Stats, NULL) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
 					PlayUnitSound(unit, VoiceHit);
-					damage = CalculateDamageStats(unit, *UnitTypeHumanWall->Stats, NULL);
+					damage = CalculateDamageStats(unit, *Map.Field(goalPos)->OverlayTerrain->UnitType->Stats, NULL);
 					//Wyrmgus end
 					Map.HitWall(goalPos,
 								//Wyrmgus start
 //								CalculateDamageStats(*unit.Stats,
-//													 *UnitTypeHumanWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
+//													 *Map.Field(goalPos)->OverlayTerrain->UnitType->Stats, unit.Variable[BLOODLUST_INDEX].Value));
 								damage);
 								//Wyrmgus end
 				//Wyrmgus start
-//				} else {
-				} else if (Map.OrcWallOnMap(goalPos) && CalculateHit(unit, *UnitTypeOrcWall->Stats, NULL) == true) {
-				//Wyrmgus end
-					//Wyrmgus start
-					PlayUnitSound(unit, VoiceHit);
-					damage = CalculateDamageStats(unit, *UnitTypeOrcWall->Stats, NULL);
-					//Wyrmgus end
+				/*
+				} else {
 					Map.HitWall(goalPos,
-								//Wyrmgus start
-//								CalculateDamageStats(*unit.Stats,
-//													 *UnitTypeOrcWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
-								damage);
-								//Wyrmgus end
+								CalculateDamageStats(*unit.Stats,
+													 *UnitTypeOrcWall->Stats, unit.Variable[BLOODLUST_INDEX].Value));
+				*/
+				//Wyrmgus end
 				}
 				return;
 			}
@@ -1246,12 +1243,17 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 	}
 
 	Assert(missile.SourceUnit != NULL);
+	//Wyrmgus start
+	/*
 	if (Map.HumanWallOnMap(tilePos)) {
 		stats = UnitTypeHumanWall->Stats;
 	} else {
 		Assert(Map.OrcWallOnMap(tilePos));
 		stats = UnitTypeOrcWall->Stats;
 	}
+	*/
+	stats = Map.Field(tilePos)->OverlayTerrain->UnitType->Stats;
+	//Wyrmgus end
 
 	//Wyrmgus start
 	if (!missile.Type->AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {

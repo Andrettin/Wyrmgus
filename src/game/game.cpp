@@ -905,13 +905,18 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			for (int i = 0; i < map.Info.MapHeight; ++i) {
 				for (int j = 0; j < map.Info.MapWidth; ++j) {
 					const CMapField &mf = map.Fields[j + i * map.Info.MapWidth];
-					const int tile = mf.getGraphicTile();
 					//Wyrmgus start
+//					const int tile = mf.getGraphicTile();
 //					const int n = map.Tileset->findTileIndexByTile(tile);
-					const int n = mf.getTileIndex();
 					//Wyrmgus end
 					const int value = mf.Value;
-					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
+					//Wyrmgus start
+//					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
+					f->printf("SetTileTerrain(\"%s\", %d, %d, %d)\n", mf.Terrain->Ident, j, i, 0);
+					if (mf.OverlayTerrain) {
+						f->printf("SetTileTerrain(\"%s\", %d, %d, %d)\n", mf.OverlayTerrain->Ident, j, i, value);
+					}
+					//Wyrmgus end
 				}
 			}
 		}

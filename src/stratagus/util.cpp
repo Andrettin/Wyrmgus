@@ -1057,14 +1057,6 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		personal_name = "";
-	} else if (type.PersonalNames.size() > 0 || (type.PersonalNamePrefixes.size() > 0 && type.PersonalNameSuffixes.size() > 0)) {
-		int PersonalNameProbability = type.PersonalNames.size() * 10000 / (type.PersonalNames.size() + (type.PersonalNamePrefixes.size() * type.PersonalNameSuffixes.size()));
-		if (SyncRand(10000) < PersonalNameProbability) {
-			personal_name = type.PersonalNames[SyncRand(type.PersonalNames.size())];
-		} else {
-			personal_name = type.PersonalNamePrefixes[SyncRand(type.PersonalNamePrefixes.size())];
-			personal_name += type.PersonalNameSuffixes[SyncRand(type.PersonalNameSuffixes.size())];
-		}
 	} else if (language != -1 && PlayerRaces.Languages[language]->LanguageWords.size() > 0) {
 		if (type.BoolFlag[FAUNA_INDEX].value && type.Species != NULL) {
 			personal_name = GenerateName(language, "species-" + type.Species->Ident + "-" + GetGenderNameById(gender));

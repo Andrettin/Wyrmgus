@@ -37,6 +37,9 @@
 
 #include "stratagus.h"
 #include "map.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "video.h"
 #include "iolib.h"
 #include "iocompat.h"
@@ -454,15 +457,27 @@ void SaveMapPNG(const char *name)
 		for (int j = 0; j < Map.Info.MapWidth; ++j) {
 			const CMapField &mf = *Map.Field(i, j);
 			SDL_Rect srcRect, dstRect;
+			//Wyrmgus start
+			/*
 			unsigned short int tile = mf.getGraphicTile();
 
 			srcRect.x = Map.TileGraphic->frame_map[tile].x;
 			srcRect.y = Map.TileGraphic->frame_map[tile].y;
+			*/
+			CTerrainType *terrain = mf.OverlayTerrain ? mf.OverlayTerrain : mf.Terrain;
+			unsigned short int tile = mf.OverlayTerrain ? mf.OverlaySolidTile : mf.SolidTile;
+
+			srcRect.x = terrain->Graphics->frame_map[tile].x;
+			srcRect.y = terrain->Graphics->frame_map[tile].y;
+			//Wyrmgus end
 			dstRect.x = i * PixelTileSize.x;
 			dstRect.y = j * PixelTileSize.y;
 			srcRect.w = dstRect.w = PixelTileSize.x;
 			srcRect.h = dstRect.h = PixelTileSize.y;
-			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
+			//Wyrmgus start
+//			SDL_BlitSurface(Map.TileGraphic->Surface, &srcRect, mapImage, &dstRect);
+			SDL_BlitSurface(terrain->Graphics->Surface, &srcRect, mapImage, &dstRect);
+			//Wyrmgus end
 		}
 	}
 

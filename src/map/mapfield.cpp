@@ -49,12 +49,14 @@
 #include "unit_manager.h"
 
 CMapField::CMapField() :
-//Wyrmgus start
-//#ifdef DEBUG
+	//Wyrmgus start
+	/*
+#ifdef DEBUG
 	tilesetTile(0),
-//#endif
-//Wyrmgus end
+#endif
 	tile(0),
+	*/
+	//Wyrmgus end
 	Flags(0),
 	cost(0),
 	Value(0),
@@ -64,6 +66,7 @@ CMapField::CMapField() :
 	Terrain(NULL), OverlayTerrain(NULL),
 	SolidTile(0), OverlaySolidTile(0),
 	OverlayTerrainDestroyed(false),
+	OverlayTerrainDamaged(false),
 	//Wyrmgus end
 	UnitCache()
 {}
@@ -176,12 +179,33 @@ void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
 		}
 	}
 }
+
+void CMapField::SetOverlayTerrainDamaged(bool damaged)
+{
+	if (!this->OverlayTerrain || this->OverlayTerrainDamaged == damaged) {
+		return;
+	}
+	
+	this->OverlayTerrainDamaged = damaged;
+	
+	if (damaged) {
+		if (this->OverlayTerrain->DamagedTiles.size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->DamagedTiles[SyncRand(this->OverlayTerrain->DamagedTiles.size())];
+		}
+	} else {
+		if (this->OverlayTerrain->SolidTiles.size() > 0) {
+			this->OverlaySolidTile = this->OverlayTerrain->SolidTiles[SyncRand(this->OverlayTerrain->SolidTiles.size())];
+		}
+	}
+}
 //Wyrmgus end
 
 void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value)
 {
 	const CTile &tile = tileset.tiles[tileIndex];
-	this->tile = tile.tile;
+	//Wyrmgus start
+//	this->tile = tile.tile;
+	//Wyrmgus end
 	this->Value = value;
 	//Wyrmgus start
 	/*
@@ -199,12 +223,10 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	this->Flags |= tile.flag;
 #endif
 	this->cost = 1 << (tile.flag & MapFieldSpeedMask);
-	*/
-	//Wyrmgus end
-	//Wyrmgus start
-//#ifdef DEBUG
+#ifdef DEBUG
 	this->tilesetTile = tileIndex;
-//#endif
+#endif
+	*/
 	//Wyrmgus end
 	
 	//Wyrmgus start
@@ -465,6 +487,8 @@ bool CMapField::isHuman() const
 	return Flags & MapFieldHuman;
 }
 
+//Wyrmgus start
+/*
 bool CMapField::isAHumanWall() const
 {
 	const unsigned int humanWallFlag = (MapFieldWall | MapFieldHuman);
@@ -475,6 +499,8 @@ bool CMapField::isAOrcWall() const
 	const unsigned int humanWallFlag = (MapFieldWall | MapFieldHuman);
 	return (Flags & humanWallFlag) == MapFieldWall;
 }
+*/
+//Wyrmgus end
 
 //
 //  CMapFieldPlayerInfo

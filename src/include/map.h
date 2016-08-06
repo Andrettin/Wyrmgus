@@ -187,6 +187,7 @@ public:
 	//Wyrmgus start
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed);
+	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
 	//Wyrmgus end
 
@@ -230,16 +231,24 @@ public:
 	/// Wall is hit.
 	void HitWall(const Vec2i &pos, unsigned damage);
 	/// Set wall on field.
+	//Wyrmgus start
+	/*
 	void RemoveWall(const Vec2i &pos);
 	/// Set wall on field.
 	void SetWall(const Vec2i &pos, bool humanwall);
+	*/
+	//Wyrmgus end
 
 	/// Returns true, if wall on the map tile field
 	bool WallOnMap(const Vec2i &pos) const;
+	//Wyrmgus start
+	/*
 	/// Returns true, if human wall on the map tile field
 	bool HumanWallOnMap(const Vec2i &pos) const;
 	/// Returns true, if orc wall on the map tile field
 	bool OrcWallOnMap(const Vec2i &pos) const;
+	*/
+	//Wyrmgus end
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
@@ -367,12 +376,16 @@ extern MapMarkerFunc MapUnmarkTileRadarJammer;
 //
 // in map_wall.c
 //
+//Wyrmgus start
+/*
 /// Correct the seen wall field, depending on the surrounding
 extern void MapFixSeenWallTile(const Vec2i &pos);
 /// Correct the surrounding seen wall fields
 extern void MapFixSeenWallNeighbors(const Vec2i &pos);
 /// Correct the real wall field, depending on the surrounding
 extern void MapFixWallTile(const Vec2i &pos);
+*/
+//Wyrmgus end
 
 //
 // in script_map.cpp
@@ -384,6 +397,15 @@ inline void SetTile(unsigned int tile, int x, int y, int value = 0)
 	const Vec2i pos(x, y);
 	SetTile(tile, pos, value);
 }
+
+//Wyrmgus start
+extern void SetTileTerrain(CTerrainType *terrain, const Vec2i &pos, int value = 0);
+inline void SetTileTerrain(CTerrainType *terrain, int x, int y, int value = 0)
+{
+	const Vec2i pos(x, y);
+	SetTileTerrain(terrain, pos, value);
+}
+//Wyrmgus end
 
 /// register ccl features
 extern void MapCclRegister();

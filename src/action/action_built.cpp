@@ -312,8 +312,14 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	// FIXME: Vladi: this is just a hack to test wall fixing,
 	// FIXME:  also not sure if the right place...
 	// FIXME: Johns: hardcoded unit-type wall / more races!
-	if (&type == UnitTypeOrcWall || &type == UnitTypeHumanWall) {
-		Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
+	//Wyrmgus start
+//	if (&type == UnitTypeOrcWall || &type == UnitTypeHumanWall) {
+	if (type.TerrainType) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
+		Map.SetTileTerrain(unit.tilePos, type.TerrainType);
+		//Wyrmgus end
 		unit.Remove(NULL);
 		UnitLost(unit);
 		UnitClearOrders(unit);

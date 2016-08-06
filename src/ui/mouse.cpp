@@ -61,6 +61,9 @@
 #include "player.h"
 #include "sound.h"
 #include "spells.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "translate.h"
 #include "unit.h"
 #include "unit_find.h"
@@ -515,7 +518,6 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	//Wyrmgus start
-	// don't automatically attack wall tiles
 	/*
 	if (Map.WallOnMap(pos)) {
 		if (unit.Player->Race == PlayerRaceHuman && Map.OrcWallOnMap(pos)) {
@@ -528,6 +530,12 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	*/
+	if (Map.WallOnMap(pos)) {
+		if (!Map.Field(pos)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+			SendCommandAttack(unit, pos, NoUnitP, flush);
+			return;
+		}
+	}
 	//Wyrmgus end
 	// empty space
 	if ((KeyModifiers & ModifierControl)) {

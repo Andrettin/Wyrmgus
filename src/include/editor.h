@@ -143,9 +143,14 @@ extern int EditorSaveMap(const std::string &file, bool is_mod = false);
 extern void EditorCclRegister();
 
 /// Update surroundings for tile changes
-extern void EditorTileChanged(const Vec2i &pos);
+//Wyrmgus start
+//extern void EditorTileChanged(const Vec2i &pos);
+extern void EditorTileChanged(const Vec2i &pos, int tile);
 
-extern void EditorChangeTile(const Vec2i &pos, int tileIndex, int d);
+//extern void EditorChangeTile(const Vec2i &pos, int tileIndex, int d);
+extern void EditorChangeTile(const Vec2i &pos, int tileIndex);
+//Wyrmgus end
+
 
 //Wyrmgus start
 extern void RecalculateShownUnits();

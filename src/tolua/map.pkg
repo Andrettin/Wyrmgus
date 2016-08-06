@@ -26,6 +26,9 @@ class CMap
 extern CMap Map;
 
 void SetTile(int tile, int w, int h, int value = 0);
+//Wyrmgus start
+void SetTileTerrain(CTerrainType *terrain, int w, int h, int value = 0);
+//Wyrmgus end
 
 //Wyrmgus start
 extern void Convert0ADMap(const std::string &mapname);

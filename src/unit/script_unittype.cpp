@@ -58,6 +58,9 @@
 #include "script.h"
 #include "sound.h"
 #include "spells.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "ui.h"
 #include "unit.h"
 #include "unitsound.h"
@@ -778,15 +781,6 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
 				type->Trains.push_back(parent_type->Trains[i]);
-			}
-			for (size_t i = 0; i < parent_type->PersonalNames.size(); ++i) {
-				type->PersonalNames.push_back(parent_type->PersonalNames[i]);
-			}
-			for (size_t i = 0; i < parent_type->PersonalNamePrefixes.size(); ++i) {
-				type->PersonalNamePrefixes.push_back(parent_type->PersonalNamePrefixes[i]);
-			}
-			for (size_t i = 0; i < parent_type->PersonalNameSuffixes.size(); ++i) {
-				type->PersonalNameSuffixes.push_back(parent_type->PersonalNameSuffixes[i]);
 			}
 			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
 				if (parent_type->VarInfo[var_n]) {
@@ -1884,24 +1878,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
-		} else if (!strcmp(value, "PersonalNames")) {
-			type->PersonalNames.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				type->PersonalNames.push_back(LuaToString(l, -1, j + 1));
-			}
-		} else if (!strcmp(value, "PersonalNamePrefixes")) {
-			type->PersonalNamePrefixes.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				type->PersonalNamePrefixes.push_back(LuaToString(l, -1, j + 1));
-			}
-		} else if (!strcmp(value, "PersonalNameSuffixes")) {
-			type->PersonalNameSuffixes.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				type->PersonalNameSuffixes.push_back(LuaToString(l, -1, j + 1));
-			}
 		} else if (!strcmp(value, "TechnologyPointCost")) {
 			type->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
@@ -2003,7 +1979,16 @@ static int CclDefineUnitType(lua_State *l)
 			type->HairColor = GetHairColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Species")) {
 			type->Species = GetSpecies(LuaToString(l, -1));
+			if (!type->Species) {
+				LuaError(l, "Species doesn't exist.");
+			}
 			type->Species->Type = type;
+		} else if (!strcmp(value, "TerrainType")) {
+			type->TerrainType = GetTerrainType(LuaToString(l, -1));
+			if (!type->TerrainType) {
+				LuaError(l, "Terrain type doesn't exist.");
+			}
+			type->TerrainType->UnitType = type;
 		} else if (!strcmp(value, "WeaponClasses")) {
 			type->WeaponClasses.clear();
 			const int args = lua_rawlen(l, -1);

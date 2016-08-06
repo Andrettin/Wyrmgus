@@ -46,6 +46,7 @@
 struct lua_State;
 //Wyrmgus start
 class CGraphic;
+class CUnitType;
 //Wyrmgus end
 
 //Wyrmgus start
@@ -158,7 +159,7 @@ public:
 	CTerrainType() :
 		ID(-1), Flags(0), SolidAnimationFrames(0),
 		Overlay(false), Buildable(false), AllowSingle(false),
-		Graphics(NULL)
+		UnitType(NULL), Graphics(NULL)
 	{
 	}
 
@@ -170,12 +171,14 @@ public:
 	bool Overlay;												/// Whether this terrain type belongs to the overlay layer
 	bool Buildable;
 	bool AllowSingle;											/// Whether this terrain type has transitions for single tiles
+	CUnitType *UnitType;
 	CGraphic *Graphics;
 	std::vector<CTerrainType *> BaseTerrains;					/// Possible base terrains for this terrain type (if is an overlay terrain)
 	std::vector<CTerrainType *> BorderTerrains;					/// Terrain types which this one can border
 	std::vector<CTerrainType *> InnerBorderTerrains;			/// Terrain types which this one can border, and which "enter" this tile type in transitions
 	std::vector<CTerrainType *> OuterBorderTerrains;			/// Terrain types which this one can border, and which are "entered" by this tile type in transitions
 	std::vector<int> SolidTiles;
+	std::vector<int> DamagedTiles;
 	std::vector<int> DestroyedTiles;
 	std::map<std::tuple<int, int>, std::vector<int>> TransitionTiles;	/// Transition graphics, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)
 	std::map<std::tuple<int, int>, std::vector<int>> AdjacentTransitionTiles;	/// Transition graphics for the tiles adjacent to this terrain type, mapped to the tile type (-1 means any tile) and the transition type (i.e. northeast outer)

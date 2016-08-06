@@ -327,7 +327,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 					}
 				}
 				if (mf.playerInfo.SeenOverlayTerrain && mf.playerInfo.SeenOverlayTerrain->Graphics && mf.playerInfo.SeenOverlayTransitionTiles.size() == 0) {
-					mf.playerInfo.SeenOverlayTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.SeenOverlayTerrain : 0), dx, dy, false);
+					mf.playerInfo.SeenOverlayTerrain->Graphics->DrawFrameClip(mf.playerInfo.SeenOverlaySolidTile + (mf.playerInfo.SeenOverlayTerrain == mf.OverlayTerrain ? mf.OverlayAnimationFrame : 0), dx, dy, false);
 				}
 				for (size_t i = 0; i != mf.playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
 					if (mf.playerInfo.SeenOverlayTransitionTiles[i].first->Graphics) {

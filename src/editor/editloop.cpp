@@ -248,7 +248,10 @@ static void EditTile(const Vec2i &pos, int tile)
 	UI.Minimap.UpdateSeenXY(pos);
 	UI.Minimap.UpdateXY(pos);
 
-	EditorTileChanged(pos);
+	//Wyrmgus start
+//	EditorTileChanged(pos);
+	EditorTileChanged(pos, tileIndex);
+	//Wyrmgus end
 	UpdateMinimap = true;
 }
 
@@ -1265,9 +1268,8 @@ static void DrawEditorInfo()
 	const CTileset &tileset = *Map.Tileset;
 	//Wyrmgus start
 //	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
-	const int index = mf.getTileIndex();
+//	Assert(index != -1);
 	//Wyrmgus end
-	Assert(index != -1);
 	//Wyrmgus start
 	/*
 	const int baseTerrainIdx = tileset.tiles[index].tileinfo.BaseTerrain;

@@ -64,6 +64,8 @@
   For the connecting new walls -- all's fine.
 */
 
+//Wyrmgus start
+/*
 static unsigned int getWallTile(const CTileset &tileset, bool humanWall, int dirFlag, int value, unsigned int oldTile = 0)
 {
 	unsigned int tileIndex, newTile;
@@ -109,27 +111,25 @@ static int GetDirectionFromSurrounding(const Vec2i &pos, bool human, bool seen)
 			dirFlag |= 1 << i;
 		} else {
 			const CMapField &mf = *Map.Field(newpos);
-			//Wyrmgus start
-//			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.getGraphicTile();
-			const CTerrainType *overlay_terrain = seen ? mf.playerInfo.SeenOverlayTerrain : mf.OverlayTerrain;
-			//Wyrmgus end
+			const unsigned int tile = seen ? mf.playerInfo.SeenTile : mf.getGraphicTile();
 
-			//Wyrmgus start
-//			if (Map.Tileset->isARaceWallTile(tile, human)) {
-			if (overlay_terrain && (overlay_terrain->Flags & MapFieldWall)) { // should check if it is the same wall type instead
-			//Wyrmgus end
+			if (Map.Tileset->isARaceWallTile(tile, human)) {
 				dirFlag |= 1 << i;
 			}
 		}
 	}
 	return dirFlag;
 }
+*/
+//Wyrmgus end
 
 /**
 ** Correct the seen wall field, depending on the surrounding.
 **
 ** @param pos Map tile-position.
 */
+//Wyrmgus start
+/*
 void MapFixSeenWallTile(const Vec2i &pos)
 {
 	//  Outside of map or no wall.
@@ -137,8 +137,6 @@ void MapFixSeenWallTile(const Vec2i &pos)
 		return;
 	}
 	CMapField &mf = *Map.Field(pos);
-	//Wyrmgus start
-	/*
 	const CTileset &tileset = *Map.Tileset;
 	const unsigned tile = mf.playerInfo.SeenTile;
 	if (!tileset.isAWallTile(tile)) {
@@ -155,21 +153,17 @@ void MapFixSeenWallTile(const Vec2i &pos)
 			UI.Minimap.UpdateSeenXY(pos);
 		}
 	}
-	*/
-	if (!mf.IsSeenTileCorrect()) { // Already there!
-		mf.UpdateSeenTile();
-		// FIXME: can this only happen if seen?
-		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			UI.Minimap.UpdateSeenXY(pos);
-		}
-	}
 }
+*/
+//Wyrmgus end
 
 /**
 ** Correct the surrounding seen wall fields.
 **
 ** @param pos Map tile-position.
 */
+//Wyrmgus start
+/*
 void MapFixSeenWallNeighbors(const Vec2i &pos)
 {
 	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
@@ -178,12 +172,16 @@ void MapFixSeenWallNeighbors(const Vec2i &pos)
 		MapFixSeenWallTile(pos + offset[i]);
 	}
 }
+*/
+//Wyrmgus end
 
 /**
 ** Correct the real wall field, depending on the surrounding.
 **
 ** @param pos Map tile-position.
 */
+//Wyrmgus start
+/*
 void MapFixWallTile(const Vec2i &pos)
 {
 	//  Outside of map or no wall.
@@ -210,12 +208,16 @@ void MapFixWallTile(const Vec2i &pos)
 		}
 	}
 }
+*/
+//Wyrmgus end
 
 /**
 ** Correct the surrounding real wall fields.
 **
 ** @param pos Map tile-position.
 */
+//Wyrmgus start
+/*
 static void MapFixWallNeighbors(const Vec2i &pos)
 {
 	const Vec2i offset[] = {Vec2i(1, 0), Vec2i(-1, 0), Vec2i(0, 1), Vec2i(0, -1)};
@@ -224,6 +226,8 @@ static void MapFixWallNeighbors(const Vec2i &pos)
 		MapFixWallTile(pos + offset[i]);
 	}
 }
+*/
+//Wyrmgus end
 
 /**
 ** Remove wall from the map.
@@ -232,6 +236,8 @@ static void MapFixWallNeighbors(const Vec2i &pos)
 **
 ** FIXME: support more walls of different races.
 */
+//Wyrmgus start
+/*
 void CMap::RemoveWall(const Vec2i &pos)
 {
 	CMapField &mf = *Field(pos);
@@ -239,49 +245,18 @@ void CMap::RemoveWall(const Vec2i &pos)
 	mf.Value = 0;
 
 	MapFixWallTile(pos);
-	//Wyrmgus start
-	mf.SetOverlayTerrainDestroyed(true);
-	//Wyrmgus end
 	mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
-	//Wyrmgus start
-	if (GameSettings.Inside) {
-		mf.Flags &= ~(MapFieldAirUnpassable);
-	}
-	mf.Flags |= MapFieldGravel;
-	//Wyrmgus end
 	MapFixWallNeighbors(pos);
-	//Wyrmgus start
-	this->CalculateTileTransitions(pos, true);
-	
-	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos)) {
-					this->CalculateTileTransitions(adjacent_pos, true);
-				}
-			}
-		}
-	}
-	//Wyrmgus end
+
 	UI.Minimap.UpdateXY(pos);
 
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		UI.Minimap.UpdateSeenXY(pos);
 		this->MarkSeenTile(mf);
 	}
-	
-	//Wyrmgus start
-	//remove decorations if a wall, tree or rock was removed from the tile
-	std::vector<CUnit *> table;
-	Select(pos, pos, table);
-	for (size_t i = 0; i != table.size(); ++i) {
-		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
-			LetUnitDie(*table[i]);			
-		}
-	}
-	//Wyrmgus end
 }
+*/
+//Wyrmgus end
 
 /**
 ** Set wall onto the map.
@@ -291,6 +266,8 @@ void CMap::RemoveWall(const Vec2i &pos)
 **
 ** @todo FIXME: support for more races.
 */
+//Wyrmgus start
+/*
 void CMap::SetWall(const Vec2i &pos, bool humanwall)
 {
 	CMapField &mf = *Field(pos);
@@ -312,6 +289,8 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 		this->MarkSeenTile(mf);
 	}
 }
+*/
+//Wyrmgus end
 
 /**
 ** Wall is hit with damage.
@@ -324,10 +303,18 @@ void CMap::HitWall(const Vec2i &pos, unsigned damage)
 	const unsigned v = this->Field(pos)->Value;
 
 	if (v <= damage) {
-		RemoveWall(pos);
+		//Wyrmgus start
+//		RemoveWall(pos);
+		ClearOverlayTile(pos);
+		//Wyrmgus end
 	} else {
 		this->Field(pos)->Value = v - damage;
-		MapFixWallTile(pos);
+		//Wyrmgus start
+//		MapFixWallTile(pos);
+		if (this->Field(pos)->OverlayTerrain->UnitType && this->Field(pos)->Value <= this->Field(pos)->Terrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
+			this->SetOverlayTerrainDamaged(pos, true);
+		}
+		//Wyrmgus end
 	}
 }
 

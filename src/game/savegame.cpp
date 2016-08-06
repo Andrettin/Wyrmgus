@@ -133,7 +133,10 @@ int SaveGame(const std::string &filename)
 	file.printf("local oldSetTile = SetTile\n");
 	file.printf("function CreateUnit() end\n");
 	file.printf("function SetResourcesHeld() end\n");
-	file.printf("function SetTile() end\n");
+	//Wyrmgus start
+//	file.printf("function SetTile() end\n");
+	file.printf("function SetTileTerrain() end\n");
+	//Wyrmgus end
 	file.printf("Load(\"%s\")\n", Map.Info.Filename.c_str());
 	file.printf("CreateUnit = oldCreateUnit\n");
 	file.printf("SetResourcesHeld = oldSetResourcesHeld\n");

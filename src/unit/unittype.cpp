@@ -477,8 +477,10 @@ std::map<std::string, CUnitType *> UnitTypeMap;
 **
 **  @todo find a way to make it configurable!
 */
-CUnitType *UnitTypeHumanWall;       /// Human wall
-CUnitType *UnitTypeOrcWall;         /// Orc wall
+//Wyrmgus start
+//CUnitType *UnitTypeHumanWall;       /// Human wall
+//CUnitType *UnitTypeOrcWall;         /// Orc wall
+//Wyrmgus end
 
 /**
 **  Default incomes for a new player.
@@ -571,7 +573,7 @@ CUnitType::CUnitType() :
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TechnologyPointCost(0), Upkeep(0), TrainQuantity(0), ItemClass(-1), SkinColor(0), HairColor(0),
-	Species(NULL),
+	Species(NULL), TerrainType(NULL),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
@@ -1885,8 +1887,10 @@ void CleanUnitTypes()
 	UnitTypeVar.Clear();
 
 	// Clean hardcoded unit types.
-	UnitTypeHumanWall = NULL;
-	UnitTypeOrcWall = NULL;
+	//Wyrmgus start
+//	UnitTypeHumanWall = NULL;
+//	UnitTypeOrcWall = NULL;
+	//Wyrmgus end
 	
 	//Wyrmgus start
 	for (size_t i = 0; i < Species.size(); ++i) {

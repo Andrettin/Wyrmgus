@@ -74,6 +74,7 @@ class CFile;
 class CUniqueItem;
 class CPlane;
 class CWorld;
+class CTerrainType;
 //Wyrmgus end
 struct lua_State;
 #ifdef USE_MNG
@@ -818,9 +819,6 @@ public:
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string Excrement;			/// Excrement unit for this unit type
-	std::vector<std::string> PersonalNames;	/// personal names
-	std::vector<std::string> PersonalNamePrefixes;	/// personal name prefixes
-	std::vector<std::string> PersonalNameSuffixes;	/// personal name suffixes
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<CUpgrade *> DropAffixes;	/// Affixes which can be applied to dropped items
@@ -859,6 +857,7 @@ public:
 	int HairColor;											/// Hair color of the unit type (used for color conversion)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	CSpecies *Species;
+	CTerrainType *TerrainType;
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
@@ -1033,8 +1032,10 @@ public:
 extern std::vector<CUnitType *> UnitTypes;   /// All unit-types
 
 /// @todo this hardcoded unit-types must be removed!!
-extern CUnitType *UnitTypeHumanWall;  /// Human wall
-extern CUnitType *UnitTypeOrcWall;    /// Orc wall
+//Wyrmgus start
+//extern CUnitType *UnitTypeHumanWall;  /// Human wall
+//extern CUnitType *UnitTypeOrcWall;    /// Orc wall
+//Wyrmgus end
 
 /**
 **  Variable info for unit and unittype.

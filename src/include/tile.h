@@ -216,16 +216,19 @@ public:
 	//Wyrmgus start
 	void SetTerrain(CTerrainType *terrain);
 	void SetOverlayTerrainDestroyed(bool destroyed);
+	void SetOverlayTerrainDamaged(bool damaged);
 	//Wyrmgus end
 	void setTileIndex(const CTileset &tileset, unsigned int tileIndex, int value);
 	//Wyrmgus start
 	void UpdateSeenTile();
 	//Wyrmgus end
 
+	//Wyrmgus start
+	/*
 	unsigned int getGraphicTile() const { return tile; }
 
-	//Wyrmgus start
 	unsigned int getTileIndex() const { return tilesetTile; }
+	*/
 	//Wyrmgus end
 
 	/// Check if a field flags.
@@ -245,8 +248,10 @@ public:
 
 	bool isAWall() const;
 	bool isHuman() const;
-	bool isAHumanWall() const;
-	bool isAOrcWall() const;
+	//Wyrmgus start
+//	bool isAHumanWall() const;
+//	bool isAOrcWall() const;
+	//Wyrmgus end
 
 	bool IsTerrainResourceOnMap(int resource) const;
 	bool IsTerrainResourceOnMap() const;
@@ -257,14 +262,18 @@ public:
 
 	unsigned char getCost() const { return cost; }
 	unsigned int getFlag() const { return Flags; }
-	void setGraphicTile(unsigned int tile) { this->tile = tile; }
+	//Wyrmgus start
+//	void setGraphicTile(unsigned int tile) { this->tile = tile; }
+	//Wyrmgus end
 private:
 //Wyrmgus start
-//#ifdef DEBUG
+/*
+#ifdef DEBUG
 	unsigned int tilesetTile;  /// tileset tile number
-//#endif
-//Wyrmgus end
+#endif
 	unsigned short tile;       /// graphic tile number
+*/
+//Wyrmgus end
 public:
 	//Wyrmgus start
 //	unsigned short Flags;      /// field flags
@@ -276,6 +285,7 @@ public:
 	int SolidTile;
 	int OverlaySolidTile;
 	bool OverlayTerrainDestroyed;
+	bool OverlayTerrainDamaged;
 	std::vector<std::pair<CTerrainType *, int>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
 	std::vector<std::pair<CTerrainType *, int>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end

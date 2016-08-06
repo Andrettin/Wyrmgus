@@ -142,9 +142,7 @@
 				//Wyrmgus end
 					// Not in circle range
 					continue;
-				} else if (mf.isAWall()) {
-					Map.RemoveWall(ipos);
-				} else if (mf.RockOnMap() || mf.ForestOnMap()) {
+				} else if (mf.RockOnMap() || mf.ForestOnMap() || mf.isAWall()) {
 					Map.ClearOverlayTile(ipos);
 				}
 			}
