@@ -186,6 +186,7 @@ public:
 	
 	//Wyrmgus start
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
+	void RemoveTileOverlayTerrain(const Vec2i &pos);
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);

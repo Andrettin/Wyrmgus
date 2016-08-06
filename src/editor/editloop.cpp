@@ -192,6 +192,13 @@ static EditorSliderListener *editorSliderListener;
 static void EditTile(const Vec2i &pos, int tile)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
+	
+	//Wyrmgus start
+	CTerrainType *terrain = GetTerrainType(Map.Tileset->getTerrainName(Map.Tileset->tiles[tile].tileinfo.BaseTerrain));
+	if (terrain == Map.GetTileTerrain(pos, terrain->Overlay)) {
+		return;
+	}
+	//Wyrmgus end
 
 	const CTileset &tileset = *Map.Tileset;
 	//Wyrmgus start
@@ -200,7 +207,7 @@ static void EditTile(const Vec2i &pos, int tile)
 	//Wyrmgus end
 	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
 	CMapField &mf = *Map.Field(pos);
-	//Wyrmgus start
+	
 	int value = 0;
 	if ((tileset.tiles[tileIndex].flag & MapFieldForest) || (tileset.tiles[tileIndex].flag & MapFieldRocks)) {
 		value = 100;
@@ -250,7 +257,6 @@ static void EditTile(const Vec2i &pos, int tile)
 
 	//Wyrmgus start
 //	EditorTileChanged(pos);
-	EditorTileChanged(pos, tileIndex);
 	//Wyrmgus end
 	UpdateMinimap = true;
 }
@@ -271,12 +277,117 @@ static void EditTilesInternal(const Vec2i &pos, int tile, int size)
 
 	Map.FixSelectionArea(minPos, maxPos);
 
+	//Wyrmgus start
+	std::vector<Vec2i> changed_tiles;
+	//Wyrmgus end
+	
 	Vec2i itPos;
 	for (itPos.y = minPos.y; itPos.y <= maxPos.y; ++itPos.y) {
 		for (itPos.x = minPos.x; itPos.x <= maxPos.x; ++itPos.x) {
 			EditTile(itPos, tile);
+			//Wyrmgus start
+			changed_tiles.push_back(itPos);
+			//Wyrmgus end
 		}
 	}
+	
+	//now, check if the tiles adjacent to the placed ones need correction
+	//Wyrmgus start
+	CTerrainType *terrain = GetTerrainType(Map.Tileset->getTerrainName(Map.Tileset->tiles[tile].tileinfo.BaseTerrain));
+	for (size_t i = 0; i != changed_tiles.size(); ++i) {
+		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay);
+		
+		if (!tile_terrain->AllowSingle) {
+			std::vector<int> transition_directions;
+				
+			for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+					if (x_offset != 0 || y_offset != 0) {
+						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+						if (Map.Info.IsPointOnMap(adjacent_pos)) {
+							CMapField &adjacent_mf = *Map.Field(adjacent_pos);
+									
+							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay);
+							if (tile_terrain->Overlay && adjacent_terrain && Map.Field(adjacent_pos)->OverlayTerrainDestroyed) {
+								adjacent_terrain = NULL;
+							}
+							if (tile_terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+								transition_directions.push_back(GetDirectionFromOffset(x_offset, y_offset));
+							}
+						}
+					}
+				}
+			}
+				
+			if (
+				(std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end())
+				|| (std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end())
+				|| (std::find(transition_directions.begin(), transition_directions.end(), Northwest) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southwest) != transition_directions.end())
+			) {
+				for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+					for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+						if (x_offset != 0 || y_offset != 0) {
+							EditTile(changed_tiles[i] + Vec2i(x_offset, y_offset), tile);
+							changed_tiles.push_back(changed_tiles[i] + Vec2i(x_offset, y_offset));
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	// now check if changing the tiles left any tiles in an incorrect position, and if so, change it accordingly
+	for (size_t i = 0; i != changed_tiles.size(); ++i) {
+		for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+				if (x_offset != 0 || y_offset != 0) {
+					Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
+					if (Map.Info.IsPointOnMap(adjacent_pos)) {
+						for (int overlay = 1; overlay >= 0; --overlay) {
+							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay);
+							if (!adjacent_terrain) {
+								continue;
+							}
+							if (adjacent_terrain->AllowSingle) {
+								continue;
+							}
+							std::vector<int> transition_directions;
+							
+							for (int sub_x_offset = -1; sub_x_offset <= 1; ++sub_x_offset) {
+								for (int sub_y_offset = -1; sub_y_offset <= 1; ++sub_y_offset) {
+									if (sub_x_offset != 0 || sub_y_offset != 0) {
+										Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
+										if (Map.Info.IsPointOnMap(sub_adjacent_pos)) {
+											CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay);
+											if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
+												sub_adjacent_terrain = NULL;
+											}
+											if (adjacent_terrain != sub_adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+												transition_directions.push_back(GetDirectionFromOffset(sub_x_offset, sub_y_offset));
+											}
+										}
+									}
+								}
+							}
+								
+							if (
+								(std::find(transition_directions.begin(), transition_directions.end(), North) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), South) != transition_directions.end())
+								|| (std::find(transition_directions.begin(), transition_directions.end(), West) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), East) != transition_directions.end())
+								|| (std::find(transition_directions.begin(), transition_directions.end(), Northwest) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Northeast) != transition_directions.end() && std::find(transition_directions.begin(), transition_directions.end(), Southwest) != transition_directions.end())
+							) {
+								if (overlay) {
+									Map.RemoveTileOverlayTerrain(adjacent_pos);
+								} else {
+									Map.SetTileTerrain(adjacent_pos, Map.GetTileTerrain(changed_tiles[i], false));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 /**

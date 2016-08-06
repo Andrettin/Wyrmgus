@@ -694,6 +694,54 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
 	}
 }
 
+void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
+{
+	CMapField &mf = *this->Field(pos);
+	
+	if (!mf.OverlayTerrain) {
+		return;
+	}
+	
+	mf.Flags &= ~(mf.OverlayTerrain->Flags);
+	mf.OverlayTerrain = NULL;
+	
+	mf.Flags |= mf.Terrain->Flags;
+	// restore MapFieldAirUnpassable related to units (i.e. doors)
+	const CUnitCache &cache = mf.UnitCache;
+	for (size_t i = 0; i != cache.size(); ++i) {
+		CUnit &unit = *cache[i];
+		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
+			mf.Flags |= MapFieldUnpassable;
+			mf.Flags |= MapFieldAirUnpassable;
+		}
+	}
+	
+	this->CalculateTileTransitions(pos, true);
+	
+	UI.Minimap.UpdateXY(pos);
+	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+		MarkSeenTile(mf);
+	}
+	
+	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
+		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
+			if (x_offset != 0 || y_offset != 0) {
+				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
+				if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					CMapField &adjacent_mf = *this->Field(adjacent_pos);
+						
+					this->CalculateTileTransitions(adjacent_pos, true);
+					
+					UI.Minimap.UpdateXY(adjacent_pos);
+					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+						MarkSeenTile(adjacent_mf);
+					}
+				}
+			}
+		}
+	}
+}
+
 void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed)
 {
 	CMapField &mf = *this->Field(pos);

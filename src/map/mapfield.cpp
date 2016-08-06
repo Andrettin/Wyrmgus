@@ -110,11 +110,17 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	
 	//remove the flags of the old terrain type
 	if (terrain->Overlay) {
+		if (this->OverlayTerrain == terrain) {
+			return;
+		}
 		if (this->Terrain) {
 			this->Flags &= ~(this->Terrain->Flags);
 			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
 	} else {
+		if (this->Terrain == terrain) {
+			return;
+		}
 		if (this->OverlayTerrain) {
 			this->Flags &= ~(this->OverlayTerrain->Flags);
 		}
