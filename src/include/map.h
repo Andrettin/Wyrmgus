@@ -186,13 +186,19 @@ public:
 	
 	//Wyrmgus start
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
+	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
 	//Wyrmgus end
 
+	//Wyrmgus start
+	void ClearOverlayTile(const Vec2i &pos);
+	/*
 	/// Remove wood from the map.
 	void ClearWoodTile(const Vec2i &pos);
 	/// Remove rock from the map.
 	void ClearRockTile(const Vec2i &pos);
+	*/
+	//Wyrmgus end
 
 	/// convert map pixelpos coordonates into tilepos
 	Vec2i MapPixelPosToTilePos(const PixelPos &mapPos) const;
@@ -234,6 +240,10 @@ public:
 	bool HumanWallOnMap(const Vec2i &pos) const;
 	/// Returns true, if orc wall on the map tile field
 	bool OrcWallOnMap(const Vec2i &pos) const;
+	
+	//Wyrmgus start
+	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
+	//Wyrmgus end
 
 	//UnitCache
 
@@ -259,10 +269,14 @@ private:
 	/// Build tables for fog of war
 	void InitFogOfWar();
 
+	//Wyrmgus start
+	/*
 	/// Correct the surrounding seen wood fields
 	void FixNeighbors(unsigned short type, int seen, const Vec2i &pos);
 	/// Correct the seen wood field, depending on the surrounding
 	void FixTile(unsigned short type, int seen, const Vec2i &pos);
+	*/
+	//Wyrmgus end
 
 	/// Regenerate the forest.
 	void RegenerateForestTile(const Vec2i &pos);

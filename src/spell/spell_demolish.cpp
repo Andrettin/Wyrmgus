@@ -144,10 +144,8 @@
 					continue;
 				} else if (mf.isAWall()) {
 					Map.RemoveWall(ipos);
-				} else if (mf.RockOnMap()) {
-					Map.ClearRockTile(ipos);
-				} else if (mf.ForestOnMap()) {
-					Map.ClearWoodTile(ipos);
+				} else if (mf.RockOnMap() || mf.ForestOnMap()) {
+					Map.ClearOverlayTile(ipos);
 				}
 			}
 		}

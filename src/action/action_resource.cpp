@@ -878,11 +878,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			//Wyrmgus end
 				//Wyrmgus start
 //				Map.ClearWoodTile(this->goalPos);
-				if (this->CurrentResource == WoodCost) {
-					Map.ClearWoodTile(this->goalPos);
-				} else if (this->CurrentResource == StoneCost) {
-					Map.ClearRockTile(this->goalPos);
-				}
+				Map.ClearOverlayTile(this->goalPos);
 				//Wyrmgus end
 			}
 		} else {

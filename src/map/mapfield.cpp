@@ -223,7 +223,9 @@ void CMapField::UpdateSeenTile()
 	this->playerInfo.SeenOverlayTerrain = this->OverlayTerrain;
 	this->playerInfo.SeenSolidTile = this->SolidTile;
 	this->playerInfo.SeenOverlaySolidTile = this->OverlaySolidTile;
+	this->playerInfo.SeenTransitionTiles.clear();
 	this->playerInfo.SeenTransitionTiles = this->TransitionTiles;
+	this->playerInfo.SeenOverlayTransitionTiles.clear();
 	this->playerInfo.SeenOverlayTransitionTiles = this->OverlayTransitionTiles;
 }
 //Wyrmgus end
