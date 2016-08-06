@@ -406,12 +406,15 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTileTerrain(CTerrainType *terrain, const Vec2i &pos, int value)
+void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
 {
 	if (!Map.Info.IsPointOnMap(pos)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
+	
+	CTerrainType *terrain = GetTerrainType(terrain_ident);
+	
 	if (!terrain) {
 		fprintf(stderr, "Invalid terrain\n");
 		return;

@@ -400,11 +400,11 @@ inline void SetTile(unsigned int tile, int x, int y, int value = 0)
 }
 
 //Wyrmgus start
-extern void SetTileTerrain(CTerrainType *terrain, const Vec2i &pos, int value = 0);
-inline void SetTileTerrain(CTerrainType *terrain, int x, int y, int value = 0)
+extern void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value = 0);
+inline void SetTileTerrain(std::string terrain_ident, int x, int y, int value = 0)
 {
 	const Vec2i pos(x, y);
-	SetTileTerrain(terrain, pos, value);
+	SetTileTerrain(terrain_ident, pos, value);
 }
 //Wyrmgus end
 
