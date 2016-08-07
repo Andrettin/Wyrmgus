@@ -39,6 +39,9 @@
 
 #include "interface.h"
 #include "iolib.h"
+//Wyrmgus start
+#include "luacallback.h"
+//Wyrmgus end
 #include "map.h"
 #include "player.h"
 //Wyrmgus start
@@ -61,6 +64,11 @@ static bool *ActiveTriggers;
 /// Some data accessible for script during the game.
 TriggerDataType TriggerData;
 
+//Wyrmgus start
+std::vector<CTrigger *> Triggers;
+std::vector<std::string> DeactivatedTriggers;
+std::map<std::string, CTrigger *> TriggerIdentToPointer;
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -430,6 +438,8 @@ void ActionStopTimer()
 */
 static int CclAddTrigger(lua_State *l)
 {
+	//Wyrmgus start
+	/*
 	LuaCheckArgs(l, 2);
 	if (!lua_isfunction(l, 1)
 		|| (!lua_isfunction(l, 2) && !lua_istable(l, 2))) {
@@ -463,6 +473,37 @@ static int CclAddTrigger(lua_State *l)
 		lua_rawseti(l, -2, i + 2);
 	}
 	lua_pop(l, 1);
+	*/
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	LuaCheckArgs(l, 3);
+	
+	if (!lua_isfunction(l, 2) || !lua_isfunction(l, 3)) {
+		LuaError(l, "incorrect argument");
+	}
+
+	std::string trigger_ident = LuaToString(l, 1);
+	
+	if (std::find(DeactivatedTriggers.begin(), DeactivatedTriggers.end(), trigger_ident) != DeactivatedTriggers.end()) {
+		return 0;
+	}
+	
+	CTrigger *trigger = GetTrigger(trigger_ident);
+	if (!trigger) {
+		trigger = new CTrigger;
+		trigger->Ident = trigger_ident;
+		Triggers.push_back(trigger);
+		TriggerIdentToPointer[trigger_ident] = trigger;
+	}
+	
+	trigger->Conditions = new LuaCallback(l, 2);
+	trigger->Effects = new LuaCallback(l, 3);
+	
+	if (trigger->Conditions == NULL || trigger->Effects == NULL) {
+		fprintf(stderr, "Trigger \"%s\" has no conditions or no effects.\n", trigger->Ident.c_str());
+	}
+	//Wyrmgus end
 
 	return 0;
 }
@@ -488,6 +529,21 @@ static int CclSetActiveTriggers(lua_State *l)
 	}
 	return 0;
 }
+
+//Wyrmgus start
+/**
+**  Set the deactivated triggers
+*/
+static int CclSetDeactivatedTriggers(lua_State *l)
+{
+	const int args = lua_gettop(l);
+
+	for (int j = 0; j < args; ++j) {
+		DeactivatedTriggers.push_back(LuaToString(l, j + 1));
+	}
+	return 0;
+}
+//Wyrmgus end
 
 /**
 **  Execute a trigger action
@@ -537,21 +593,30 @@ static void TriggerRemoveTrigger(int trig)
 */
 void TriggersEachCycle()
 {
-	const int base = lua_gettop(Lua);
+	//Wyrmgus start
+//	const int base = lua_gettop(Lua);
+	//Wyrmgus end
 
-	lua_getglobal(Lua, "_triggers_");
-	int triggers = lua_rawlen(Lua, -1);
+	//Wyrmgus start
+//	lua_getglobal(Lua, "_triggers_");
+//	int triggers = lua_rawlen(Lua, -1);
+	int triggers = Triggers.size();
+	//Wyrmgus end
 
 	if (Trigger >= triggers) {
 		Trigger = 0;
 	}
 
 	if (GamePaused) {
-		lua_pop(Lua, 1);
+		//Wyrmgus start
+//		lua_pop(Lua, 1);
+		//Wyrmgus end
 		return;
 	}
 
 	// Skip to the next trigger
+	//Wyrmgus start
+	/*
 	while (Trigger < triggers) {
 		lua_rawgeti(Lua, -1, Trigger + 1);
 		if (!lua_isnumber(Lua, -1)) {
@@ -560,9 +625,17 @@ void TriggersEachCycle()
 		lua_pop(Lua, 1);
 		Trigger += 2;
 	}
+	*/
+	//Wyrmgus end
 	if (Trigger < triggers) {
-		int currentTrigger = Trigger;
-		Trigger += 2;
+		//Wyrmgus start
+//		int currentTrigger = Trigger;
+		CTrigger *current_trigger = Triggers[Trigger];
+//		Trigger += 2;
+		Trigger += 1;
+		//Wyrmgus end
+		//Wyrmgus start
+		/*
 		LuaCall(0, 0);
 		// If condition is true execute action
 		if (lua_gettop(Lua) > base + 1 && lua_toboolean(Lua, -1)) {
@@ -572,9 +645,45 @@ void TriggersEachCycle()
 			}
 		}
 		lua_settop(Lua, base + 1);
+		*/
+		
+		if (current_trigger->Conditions && current_trigger->Effects) {
+			current_trigger->Conditions->pushPreamble();
+			current_trigger->Conditions->run(1);
+			if (current_trigger->Conditions->popBoolean()) {
+				current_trigger->Effects->pushPreamble();
+				current_trigger->Effects->run(1);
+				if (current_trigger->Effects->popBoolean() == false) {
+					DeactivatedTriggers.push_back(current_trigger->Ident);
+					Triggers.erase(std::remove(Triggers.begin(), Triggers.end(), current_trigger), Triggers.end());
+					TriggerIdentToPointer.erase(current_trigger->Ident);
+					delete current_trigger;
+				}
+			}
+		}
+		//Wyrmgus end
 	}
-	lua_pop(Lua, 1);
+	//Wyrmgus start
+//	lua_pop(Lua, 1);
+	//Wyrmgus end
 }
+
+//Wyrmgus start
+CTrigger *GetTrigger(std::string trigger_ident)
+{
+	if (TriggerIdentToPointer.find(trigger_ident) != TriggerIdentToPointer.end()) {
+		return TriggerIdentToPointer[trigger_ident];
+	}
+	
+	return NULL;
+}
+
+CTrigger::~CTrigger()
+{
+	delete Conditions;
+	delete Effects;
+}
+//Wyrmgus end
 
 /**
 **  Register CCL features for triggers.
@@ -583,6 +692,9 @@ void TriggerCclRegister()
 {
 	lua_register(Lua, "AddTrigger", CclAddTrigger);
 	lua_register(Lua, "SetActiveTriggers", CclSetActiveTriggers);
+	//Wyrmgus start
+	lua_register(Lua, "SetDeactivatedTriggers", CclSetDeactivatedTriggers);
+	//Wyrmgus end
 	// Conditions
 	lua_register(Lua, "GetNumUnitsAt", CclGetNumUnitsAt);
 	lua_register(Lua, "IfNearUnit", CclIfNearUnit);
@@ -600,9 +712,13 @@ void SaveTriggers(CFile &file)
 	file.printf("--- MODULE: triggers\n");
 
 	file.printf("\n");
-	lua_getglobal(Lua, "_triggers_");
-	const int triggers = lua_rawlen(Lua, -1);
+	//Wyrmgus start
+//	lua_getglobal(Lua, "_triggers_");
+//	const int triggers = lua_rawlen(Lua, -1);
+	//Wyrmgus end
 
+	//Wyrmgus start
+	/*
 	file.printf("SetActiveTriggers(");
 	for (int i = 0; i < triggers; i += 2) {
 		lua_rawgeti(Lua, -1, i + 1);
@@ -617,6 +733,16 @@ void SaveTriggers(CFile &file)
 		lua_pop(Lua, 1);
 	}
 	file.printf(")\n");
+	*/
+	file.printf("SetDeactivatedTriggers(");
+	for (size_t i = 0; i < DeactivatedTriggers.size(); ++i) {
+		if (i) {
+			file.printf(", ");
+		}
+		file.printf("\"%s\"", DeactivatedTriggers[i].c_str());
+	}
+	file.printf(")\n");
+	//Wyrmgus end
 
 	file.printf("SetTrigger(%d)\n", Trigger);
 
@@ -670,6 +796,14 @@ void CleanTriggers()
 
 	delete[] ActiveTriggers;
 	ActiveTriggers = NULL;
+	
+	//Wyrmgus start
+	for (size_t i = 0; i < Triggers.size(); ++i) {
+		delete Triggers[i];
+	}
+	Triggers.clear();
+	TriggerIdentToPointer.clear();
+	//Wyrmgus end
 
 	GameTimer.Reset();
 }

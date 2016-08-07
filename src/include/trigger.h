@@ -32,6 +32,15 @@
 
 //@{
 
+//Wyrmgus start
+/*----------------------------------------------------------------------------
+--  Includes
+----------------------------------------------------------------------------*/
+
+#include <vector>
+#include <map>
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Declarations
 ----------------------------------------------------------------------------*/
@@ -40,6 +49,9 @@ class CUnit;
 class CUnitType;
 struct lua_State;
 class CFile;
+//Wyrmgus start
+class LuaCallback;
+//Wyrmgus end
 
 /**
 **  Timer structure
@@ -65,6 +77,22 @@ public:
 	long Cycles;                /// current value in game cycles
 	unsigned long LastUpdate;   /// GameCycle of last update
 };
+
+//Wyrmgus start
+class CTrigger
+{
+public:
+	CTrigger() :
+		Conditions(NULL), Effects(NULL)
+	{
+	}
+	~CTrigger();
+	
+	std::string Ident;
+	LuaCallback *Conditions;
+	LuaCallback *Effects;
+};
+//Wyrmgus end
 
 #define ANY_UNIT ((const CUnitType *)0)
 #define ALL_FOODUNITS ((const CUnitType *)-1)
@@ -93,6 +121,12 @@ extern CTimer GameTimer; /// the game timer
 /// Some data accessible for script during the game.
 extern TriggerDataType TriggerData;
 
+//Wyrmgus start
+extern std::vector<CTrigger *> Triggers;
+extern std::vector<std::string> DeactivatedTriggers;
+extern std::map<std::string, CTrigger *> TriggerIdentToPointer;
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
@@ -100,6 +134,10 @@ extern TriggerDataType TriggerData;
 extern int TriggerGetPlayer(lua_State *l);/// get player number.
 extern const CUnitType *TriggerGetUnitType(lua_State *l); /// get the unit-type
 extern void TriggersEachCycle();    /// test triggers
+
+//Wyrmgus start
+extern CTrigger *GetTrigger(std::string trigger_ident);
+//Wyrmgus end
 
 extern void TriggerCclRegister();   /// Register ccl features
 extern void SaveTriggers(CFile &file); /// Save the trigger module
