@@ -10,7 +10,7 @@
 //
 /**@name editloop.cpp - The editor main loop. */
 //
-//      (c) Copyright 2002-2015 by Lutz Sammer, Jimmy Salmon and
+//      (c) Copyright 2002-2016 by Lutz Sammer, Jimmy Salmon and
 //		Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -216,6 +216,9 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	Map.SetTileTerrain(pos, terrain);
+	if (!terrain->Overlay) {
+		Map.RemoveTileOverlayTerrain(pos);
+	}
 	mf.Value = value;
 //	mf.playerInfo.SeenTile = mf.getGraphicTile();
 	mf.UpdateSeenTile();
@@ -284,7 +287,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
-	for (size_t i = 0; i != changed_tiles.size(); ++i) {
+	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
 		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay);
 		
 		bool has_transitions = terrain->Overlay ? (Map.Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (Map.Field(changed_tiles[i])->TransitionTiles.size() > 0);
@@ -647,6 +650,12 @@ static int CalculateVisibleIcons(bool tiles = false)
 	const int count = i * (ButtonPanelWidth - w - 10) / (w + 8);
 	return count;
 #endif
+	//Wyrmgus start
+	if (tiles) {
+		return 12;
+	}
+	//Wyrmgus end
+
 	return UI.ButtonPanel.Buttons.size();
 }
 
@@ -954,7 +963,14 @@ static void DrawTileIcons()
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 11;
 
 	if (CursorOn == CursorOnButton && 300 <= ButtonUnderCursor && ButtonUnderCursor < 306) {
-		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
+		//Wyrmgus start
+//		Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
+		if (ButtonUnderCursor <= 303) {
+			Video.DrawRectangle(ColorGray, x - 42, y - 3 + (ButtonUnderCursor - 300) * 20, 100, 20);
+		} else {
+			Video.DrawRectangle(ColorGray, x - 42 + 100, y - 3 + (ButtonUnderCursor - 304) * 20, 100, 20);
+		}
+		//Wyrmgus end
 	}
 
 	if (TileCursorSize == 1) {
@@ -980,7 +996,11 @@ static void DrawTileIcons()
 	} else {
 		label.DrawCentered(x, y, "4x4");
 	}
-	y += 20;
+	//Wyrmgus start
+//	y += 20;
+	x += 100;
+	y -= 20 * 3;
+	//Wyrmgus end
 	//Wyrmgus start
 	/*
 	if (TileToolRandom) {
@@ -2077,6 +2097,12 @@ static bool EditorCallbackMouse_EditTileArea(const PixelPos &screenPos)
 			return true;
 		}
 		by += 20;
+		//Wyrmgus start
+		if (i == 3) {
+			by = UI.InfoPanel.Y + 4 + IconHeight + 10;
+			bx += 100;
+		}
+		//Wyrmgus end
 	}
 
 	int i = Editor.TileIndex;

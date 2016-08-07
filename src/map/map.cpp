@@ -975,6 +975,37 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
 			}
 		}
 	}
+	
+	//sort the transitions so that they will be displayed in the correct order
+	if (overlay) {
+		bool swapped = true;
+		for (int passes = 0; passes < (int) mf.OverlayTransitionTiles.size() && swapped; ++passes) {
+			swapped = false;
+			for (int i = 0; i < ((int) mf.OverlayTransitionTiles.size()) - 1; ++i) {
+				bool change_order = false;
+				if (std::find(mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.begin(), mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.end(), mf.OverlayTransitionTiles[i].first) != mf.OverlayTransitionTiles[i + 1].first->InnerBorderTerrains.end()) {
+					std::pair<CTerrainType *, int> temp_transition = mf.OverlayTransitionTiles[i];
+					mf.OverlayTransitionTiles[i] = mf.OverlayTransitionTiles[i + 1];
+					mf.OverlayTransitionTiles[i + 1] = temp_transition;
+					swapped = true;
+				}
+			}
+		}
+	} else {
+		bool swapped = true;
+		for (int passes = 0; passes < (int) mf.TransitionTiles.size() && swapped; ++passes) {
+			swapped = false;
+			for (int i = 0; i < ((int) mf.TransitionTiles.size()) - 1; ++i) {
+				bool change_order = false;
+				if (std::find(mf.TransitionTiles[i + 1].first->InnerBorderTerrains.begin(), mf.TransitionTiles[i + 1].first->InnerBorderTerrains.end(), mf.TransitionTiles[i].first) != mf.TransitionTiles[i + 1].first->InnerBorderTerrains.end()) {
+					std::pair<CTerrainType *, int> temp_transition = mf.TransitionTiles[i];
+					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
+					mf.TransitionTiles[i + 1] = temp_transition;
+					swapped = true;
+				}
+			}
+		}
+	}
 }
 //Wyrmgus end
 
