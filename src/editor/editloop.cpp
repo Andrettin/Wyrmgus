@@ -196,12 +196,6 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 {
 	Assert(Map.Info.IsPointOnMap(pos));
 	
-	//Wyrmgus start
-	if (terrain == Map.GetTileTerrain(pos, terrain->Overlay)) {
-		return;
-	}
-	//Wyrmgus end
-
 	const CTileset &tileset = *Map.Tileset;
 	//Wyrmgus start
 //	const int baseTileIndex = tileset.findTileIndexByTile(tile);
