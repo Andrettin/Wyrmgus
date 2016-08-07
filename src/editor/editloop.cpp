@@ -216,7 +216,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	Map.SetTileTerrain(pos, terrain);
-	if (!terrain->Overlay) {
+	if (!terrain->Overlay && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
 		Map.RemoveTileOverlayTerrain(pos);
 	}
 	mf.Value = value;
@@ -1432,7 +1432,7 @@ static void DrawEditorInfo()
 	//Wyrmgus end
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 250, UI.StatusLine.TextY - 16, buf);
-	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 288, UI.StatusLine.TextY - 12, buf);
+	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 298, UI.StatusLine.TextY - 12, buf);
 	//Wyrmgus end
 #endif
 }
