@@ -3929,11 +3929,17 @@ static int CclDefineSpecies(lua_State *l)
 			} else {
 				LuaError(l, "World \"%s\" doesn't exist." _C_ world_ident.c_str());
 			}
-		} else if (!strcmp(value, "Environments")) {
-			species->Environments.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				species->Environments.push_back(LuaToString(l, -1, j + 1));
+		} else if (!strcmp(value, "Terrains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+				if (terrain == NULL) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				species->Terrains.push_back(terrain);
 			}
 		} else if (!strcmp(value, "EvolvesFrom")) {
 			species->EvolvesFrom.clear();
@@ -4049,11 +4055,11 @@ static int CclGetSpeciesData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
-	} else if (!strcmp(data, "Environments")) {
-		lua_createtable(l, species->Environments.size(), 0);
-		for (size_t i = 1; i <= species->Environments.size(); ++i)
+	} else if (!strcmp(data, "Terrains")) {
+		lua_createtable(l, species->Terrains.size(), 0);
+		for (size_t i = 1; i <= species->Terrains.size(); ++i)
 		{
-			lua_pushstring(l, species->Environments[i-1].c_str());
+			lua_pushstring(l, species->Terrains[i-1]->Ident.c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

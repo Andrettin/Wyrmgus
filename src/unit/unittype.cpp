@@ -2010,12 +2010,12 @@ CSpeciesPhylum *GetSpeciesPhylum(std::string phylum_ident)
 	return NULL;
 }
 
-bool CSpecies::CanEvolveToAUnitType(bool current_tileset_only, bool sapient_only)
+bool CSpecies::CanEvolveToAUnitType(CTerrainType *terrain, bool sapient_only)
 {
 	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
 		if (
-			(this->EvolvesTo[i]->Type != NULL && (!current_tileset_only || std::find(this->EvolvesTo[i]->Environments.begin(), this->EvolvesTo[i]->Environments.end(), Map.Tileset->Ident) != this->EvolvesTo[i]->Environments.end()) && (!sapient_only || this->EvolvesTo[i]->Sapient))
-			|| this->EvolvesTo[i]->CanEvolveToAUnitType(current_tileset_only, sapient_only)
+			(this->EvolvesTo[i]->Type != NULL && (!terrain || std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end()) && (!sapient_only || this->EvolvesTo[i]->Sapient))
+			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain, sapient_only)
 		) {
 			return true;
 		}
@@ -2110,14 +2110,14 @@ int CSpecies::GetRandomNameLanguage(int gender)
 	return -1;
 }
 
-CSpecies *CSpecies::GetRandomEvolution()
+CSpecies *CSpecies::GetRandomEvolution(CTerrainType *terrain)
 {
 	std::vector<CSpecies *> potential_evolutions;
 	
 	for (size_t i = 0; i < this->EvolvesTo.size(); ++i) {
 		if (
-			(this->EvolvesTo[i]->Type != NULL && std::find(this->EvolvesTo[i]->Environments.begin(), this->EvolvesTo[i]->Environments.end(), Map.Tileset->Ident) != this->EvolvesTo[i]->Environments.end())
-			|| this->EvolvesTo[i]->CanEvolveToAUnitType(true)
+			(this->EvolvesTo[i]->Type != NULL && std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end())
+			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain)
 		) { //give preference to evolutions that are native to the current tileset
 			potential_evolutions.push_back(this->EvolvesTo[i]);
 		}

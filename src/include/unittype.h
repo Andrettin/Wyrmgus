@@ -747,9 +747,9 @@ public:
 	{
 	}
 	
-	bool CanEvolveToAUnitType(bool current_tileset_only = false, bool sapient_only = false);
+	bool CanEvolveToAUnitType(CTerrainType *terrain = NULL, bool sapient_only = false);
 	int GetRandomNameLanguage(int gender);
-	CSpecies *GetRandomEvolution();
+	CSpecies *GetRandomEvolution(CTerrainType *terrain);
 	
 	int Era;						/// Era ID
 	bool Sapient;					/// Whether the species is sapient
@@ -765,7 +765,7 @@ public:
 	CPlane *HomePlane;
 	CWorld *Homeworld;
 	CUnitType *Type;
-	std::vector<std::string> Environments;	/// in which environments (tilesets) does this species live
+	std::vector<CTerrainType *> Terrains;	/// in which terrains does this species live
 	std::vector<CSpecies *> EvolvesFrom;	/// from which species this one can evolve
 	std::vector<CSpecies *> EvolvesTo;		/// to which species this one can evolve
 };

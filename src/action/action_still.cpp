@@ -496,6 +496,7 @@ static bool Evolve(CUnit &unit)
 		|| unit.Type->Species->EvolvesTo.size() == 0
 		|| unit.Variable[EVOLUTION_INDEX].Value == 0 || unit.Variable[EVOLUTION_INDEX].Value < unit.Variable[EVOLUTION_INDEX].Max
 		|| SyncRand(1000) > (unit.Type->RandomMovementProbability * 10)
+		|| (unit.Removed && !unit.Container)
 	) {
 		return false;
 	}
@@ -504,11 +505,14 @@ static bool Evolve(CUnit &unit)
 		return false;
 	}
 	
+	const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
+	CTerrainType *terrain = Map.Field(firstContainer->tilePos)->OverlayTerrain ? Map.Field(firstContainer->tilePos)->OverlayTerrain : Map.Field(firstContainer->tilePos)->Terrain;
+	
 	if (unit.Type->Species->CanEvolveToAUnitType()) {
-		CSpecies *evolved_species = unit.Type->Species->GetRandomEvolution();
+		CSpecies *evolved_species = unit.Type->Species->GetRandomEvolution(terrain);
 		
 		while (evolved_species->Type == NULL) {
-			evolved_species = evolved_species->GetRandomEvolution();
+			evolved_species = evolved_species->GetRandomEvolution(terrain);
 		}
 
 		CommandTransformIntoType(unit, *evolved_species->Type);
