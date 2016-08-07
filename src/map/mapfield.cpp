@@ -263,7 +263,23 @@ void CMapField::Save(CFile &file) const
 {
 	//Wyrmgus start
 //	file.printf("  {%3d, %3d, %2d, %2d", tile, playerInfo.SeenTile, Value, cost);
-	file.printf("  {\"%s\", \"%s\", %s, \"%s\", \"%s\", %d, %d, %2d, %2d", Terrain ? Terrain->Ident : "", OverlayTerrain ? OverlayTerrain->Ident : "", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident : "", playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost);
+	file.printf("  {\"%s\", \"%s\", %s, %s, \"%s\", \"%s\", %d, %d, %d, %d, %2d, %2d", Terrain ? Terrain->Ident.c_str() : "", OverlayTerrain ? OverlayTerrain->Ident.c_str() : "", OverlayTerrainDamaged ? "true" : "false", OverlayTerrainDestroyed ? "true" : "false", playerInfo.SeenTerrain ? playerInfo.SeenTerrain->Ident.c_str() : "", playerInfo.SeenOverlayTerrain ? playerInfo.SeenOverlayTerrain->Ident.c_str() : "", SolidTile, OverlaySolidTile, playerInfo.SeenSolidTile, playerInfo.SeenOverlaySolidTile, Value, cost);
+	
+	for (size_t i = 0; i != TransitionTiles.size(); ++i) {
+		file.printf(", \"transition-tile\", \"%s\", %d", TransitionTiles[i].first->Ident.c_str(), TransitionTiles[i].second);
+	}
+	
+	for (size_t i = 0; i != OverlayTransitionTiles.size(); ++i) {
+		file.printf(", \"overlay-transition-tile\", \"%s\", %d", OverlayTransitionTiles[i].first->Ident.c_str(), OverlayTransitionTiles[i].second);
+	}
+	
+	for (size_t i = 0; i != playerInfo.SeenTransitionTiles.size(); ++i) {
+		file.printf(", \"seen-transition-tile\", \"%s\", %d", playerInfo.SeenTransitionTiles[i].first->Ident.c_str(), playerInfo.SeenTransitionTiles[i].second);
+	}
+	
+	for (size_t i = 0; i != playerInfo.SeenOverlayTransitionTiles.size(); ++i) {
+		file.printf(", \"seen-overlay-transition-tile\", \"%s\", %d", playerInfo.SeenOverlayTransitionTiles[i].first->Ident.c_str(), playerInfo.SeenOverlayTransitionTiles[i].second);
+	}
 	//Wyrmgus end
 	for (int i = 0; i != PlayerMax; ++i) {
 		if (playerInfo.Visible[i] == 1) {
@@ -360,7 +376,7 @@ void CMapField::parse(lua_State *l)
 	const int len = lua_rawlen(l, -1);
 	//Wyrmgus start
 //	if (len < 4) {
-	if (len < 9) {
+	if (len < 12) {
 	//Wyrmgus end
 		LuaError(l, "incorrect argument");
 	}
@@ -372,24 +388,54 @@ void CMapField::parse(lua_State *l)
 	this->Value = LuaToNumber(l, -1, 3);
 	this->cost = LuaToNumber(l, -1, 4);
 	*/
-	this->SetTerrain(GetTerrainType(LuaToString(l, -1, 1)));
-	this->SetTerrain(GetTerrainType(LuaToString(l, -1, 2)));
-	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 3));
-	this->playerInfo.SeenTerrain = GetTerrainType(LuaToString(l, -1, 4));
-	this->playerInfo.SeenOverlayTerrain = GetTerrainType(LuaToString(l, -1, 5));
-	this->playerInfo.SeenSolidTile = LuaToNumber(l, -1, 6);
-	this->playerInfo.SeenOverlaySolidTile = LuaToNumber(l, -1, 7);
-	this->Value = LuaToNumber(l, -1, 8);
-	this->cost = LuaToNumber(l, -1, 9);
+	this->Terrain = GetTerrainType(LuaToString(l, -1, 1));
+	this->OverlayTerrain = GetTerrainType(LuaToString(l, -1, 2));
+	this->SetOverlayTerrainDamaged(LuaToBoolean(l, -1, 3));
+	this->SetOverlayTerrainDestroyed(LuaToBoolean(l, -1, 4));
+	this->playerInfo.SeenTerrain = GetTerrainType(LuaToString(l, -1, 5));
+	this->playerInfo.SeenOverlayTerrain = GetTerrainType(LuaToString(l, -1, 6));
+	this->SolidTile = LuaToNumber(l, -1, 7);
+	this->OverlaySolidTile = LuaToNumber(l, -1, 8);
+	this->playerInfo.SeenSolidTile = LuaToNumber(l, -1, 9);
+	this->playerInfo.SeenOverlaySolidTile = LuaToNumber(l, -1, 10);
+	this->Value = LuaToNumber(l, -1, 11);
+	this->cost = LuaToNumber(l, -1, 12);
 	//Wyrmgus end
 
 	//Wyrmgus start
 //	for (int j = 4; j < len; ++j) {
-	for (int j = 9; j < len; ++j) {
+	for (int j = 12; j < len; ++j) {
 	//Wyrmgus end
 		const char *value = LuaToString(l, -1, j + 1);
 
-		if (!strcmp(value, "explored")) {
+		//Wyrmgus start
+//		if (!strcmp(value, "explored")) {
+		if (!strcmp(value, "transition-tile")) {
+			++j;
+			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+			++j;
+			int tile_number = LuaToNumber(l, -1, j + 1);
+			this->TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
+		} else if (!strcmp(value, "overlay-transition-tile")) {
+			++j;
+			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+			++j;
+			int tile_number = LuaToNumber(l, -1, j + 1);
+			this->OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
+		} else if (!strcmp(value, "seen-transition-tile")) {
+			++j;
+			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+			++j;
+			int tile_number = LuaToNumber(l, -1, j + 1);
+			this->playerInfo.SeenTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
+		} else if (!strcmp(value, "seen-overlay-transition-tile")) {
+			++j;
+			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+			++j;
+			int tile_number = LuaToNumber(l, -1, j + 1);
+			this->playerInfo.SeenOverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, tile_number));
+		} else if (!strcmp(value, "explored")) {
+		//Wyrmgus end
 			++j;
 			this->playerInfo.Visible[LuaToNumber(l, -1, j + 1)] = 1;
 		} else if (!strcmp(value, "human")) {
