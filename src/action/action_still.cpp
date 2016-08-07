@@ -210,6 +210,13 @@ static bool MoveRandomly(CUnit &unit)
 		if (UnitCanBeAt(unit, pos)) {
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
+			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
+			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.Field(unit.tilePos)->OverlayTerrain ? Map.Field(unit.tilePos)->OverlayTerrain : Map.Field(unit.tilePos)->Terrain) != unit.Type->Species->Terrains.end()) {
+				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.Field(pos)->OverlayTerrain ? Map.Field(pos)->OverlayTerrain : Map.Field(pos)->Terrain) == unit.Type->Species->Terrains.end()) {
+					return false;
+				}
+			}
+			
 			if (unit.Type->BoolFlag[PEOPLEAVERSION_INDEX].value) {
 				std::vector<CUnit *> table;
 				SelectAroundUnit(unit, std::max(6, unit.Type->RandomMovementDistance), table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
