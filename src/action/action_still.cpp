@@ -211,8 +211,8 @@ static bool MoveRandomly(CUnit &unit)
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.Field(unit.tilePos)->OverlayTerrain ? Map.Field(unit.tilePos)->OverlayTerrain : Map.Field(unit.tilePos)->Terrain) != unit.Type->Species->Terrains.end()) {
-				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.Field(pos)->OverlayTerrain ? Map.Field(pos)->OverlayTerrain : Map.Field(pos)->Terrain) == unit.Type->Species->Terrains.end()) {
+			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(unit.tilePos)) != unit.Type->Species->Terrains.end()) {
+				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(pos)) == unit.Type->Species->Terrains.end()) {
 					return false;
 				}
 			}
@@ -513,7 +513,7 @@ static bool Evolve(CUnit &unit)
 	}
 	
 	const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
-	CTerrainType *terrain = Map.Field(firstContainer->tilePos)->OverlayTerrain ? Map.Field(firstContainer->tilePos)->OverlayTerrain : Map.Field(firstContainer->tilePos)->Terrain;
+	CTerrainType *terrain = Map.GetTileTopTerrain(firstContainer->tilePos);
 	
 	if (unit.Type->Species->CanEvolveToAUnitType()) {
 		CSpecies *evolved_species = unit.Type->Species->GetRandomEvolution(terrain);

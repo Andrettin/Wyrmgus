@@ -585,9 +585,9 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
-	const CMapField &mf = *Map.Field(pos);
 	//Wyrmgus start
 	/*
+	const CMapField &mf = *Map.Field(pos);
 	const CTileset &tileset = *Map.Tileset;
 	const int index = tileset.findTileIndexByTile(mf.getGraphicTile());
 	Assert(index != -1);
@@ -595,11 +595,7 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
 	*/
-	if (mf.OverlayTerrain) {
-		lua_pushstring(l, mf.OverlayTerrain->Ident.c_str());
-	} else {
-		lua_pushstring(l, mf.Terrain->Ident.c_str());
-	}
+	lua_pushstring(l, Map.GetTileTopTerrain(pos)->Ident.c_str());
 	//Wyrmgus end
 	return 1;
 }

@@ -229,6 +229,29 @@ CTerrainType *CMap::GetTileTerrain(const Vec2i &pos, bool overlay) const
 		return mf.Terrain;
 	}
 }
+
+CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen) const
+{
+	if (!Map.Info.IsPointOnMap(pos)) {
+		return NULL;
+	}
+	
+	CMapField &mf = *this->Field(pos);
+	
+	if (!seen) {
+		if (mf.OverlayTerrain) {
+			return mf.OverlayTerrain;
+		} else {
+			return mf.Terrain;
+		}
+	} else {
+		if (mf.playerInfo.SeenOverlayTerrain) {
+			return mf.playerInfo.SeenOverlayTerrain;
+		} else {
+			return mf.playerInfo.SeenTerrain;
+		}
+	}
+}
 //Wyrmgus end
 
 /**

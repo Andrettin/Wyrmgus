@@ -211,6 +211,7 @@ public:
 	
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false) const;
+	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen = false) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
