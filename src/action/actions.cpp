@@ -348,7 +348,7 @@ static void HandleBuffsEachCycle(CUnit &unit)
 	
 	//Wyrmgus start
 //	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX};
-	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, INSPIRE_INDEX, REGENERATION_INDEX, TERROR_INDEX};
+	const int SpellEffects[] = {BLOODLUST_INDEX, HASTE_INDEX, SLOW_INDEX, INVISIBLE_INDEX, UNHOLYARMOR_INDEX, POISON_INDEX, STUN_INDEX, BLEEDING_INDEX, LEADERSHIP_INDEX, INSPIRE_INDEX, PRECISION_INDEX, REGENERATION_INDEX, TERROR_INDEX};
 	//Wyrmgus end
 	//  decrease spells effects time.
 	for (unsigned int i = 0; i < sizeof(SpellEffects) / sizeof(int); ++i) {
@@ -426,7 +426,7 @@ static void HandleBuffsEachSecond(CUnit &unit)
 		if (i == BLOODLUST_INDEX || i == HASTE_INDEX || i == SLOW_INDEX
 			//Wyrmgus start
 //			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX) {
-			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == INSPIRE_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX) {
+			|| i == INVISIBLE_INDEX || i == UNHOLYARMOR_INDEX || i == POISON_INDEX || i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == INSPIRE_INDEX || PRECISION_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX) {
 			//Wyrmgus end
 			continue;
 		}

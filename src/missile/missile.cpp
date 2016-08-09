@@ -351,6 +351,11 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 		damage_modifier += 10;
 	}
 	
+	int accuracy_modifier = 100;
+	if (attacker.Variable[PRECISION_INDEX].Value > 0) {
+		accuracy_modifier += 100;
+	}
+	
 	int critical_strike_chance = attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value;
 	if (missile && missile->AlwaysCritical) {
 		critical_strike_chance = 100;
@@ -456,11 +461,18 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	}
 	//Wyrmgus end
 	damage += piercing_damage;
+	
+	//Wyrmgus start
+	int accuracy = attacker.Variable[ACCURACY_INDEX].Value;
+	accuracy *= accuracy_modifier;
+	accuracy /= 100;
+	//Wyrmgus end
+	
 	if (GameSettings.NoRandomness) {
-		if (attacker.Variable[ACCURACY_INDEX].Value > 0) { //if no randomness setting is used, and the attacker's accuracy and is greater than 0, then apply accuracy as a damage bonus and evasion as a damage malus
+		if (accuracy > 0) { //if no randomness setting is used, and the attacker's accuracy and is greater than 0, then apply accuracy as a damage bonus and evasion as a damage malus
 			if (goal != NULL) {
 				if (goal->Variable[EVASION_INDEX].Value > 0) {
-					damage += attacker.Variable[ACCURACY_INDEX].Value;
+					damage += accuracy;
 					if (goal->Variable[STUN_INDEX].Value == 0) { //stunned targets cannot evade
 						damage -= goal->Variable[EVASION_INDEX].Value;
 					}
@@ -479,7 +491,7 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 				}
 			} else {
 				if (goal_stats.Variables[EVASION_INDEX].Value > 0) {
-					damage += attacker.Variable[ACCURACY_INDEX].Value;
+					damage += accuracy;
 					damage -= goal_stats.Variables[EVASION_INDEX].Value;
 				}
 			}
@@ -575,11 +587,16 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 	if (GodMode && attacker.Player == ThisPlayer && (!goal || goal->Player != ThisPlayer)) {
 		return true; //always hit if in god mode
 	}
-	
-	int accuracy = 0;
-	if (attacker.Variable[ACCURACY_INDEX].Value) {
-		accuracy = attacker.Variable[ACCURACY_INDEX].Value;
+
+	int accuracy_modifier = 100;
+	if (attacker.Variable[PRECISION_INDEX].Value > 0) {
+		accuracy_modifier += 100;
 	}
+	
+	int accuracy = attacker.Variable[ACCURACY_INDEX].Value;
+	accuracy *= accuracy_modifier;
+	accuracy /= 100;
+	
 	if (accuracy == 0) {
 		return false;
 	} else {
