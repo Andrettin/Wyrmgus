@@ -461,6 +461,11 @@ public:
 	// Internal use:
 	int CurrentStep;  /// Current step (0 <= x < TotalStep).
 	int TotalStep;    /// Total step.
+	
+	//Wyrmgus start
+	bool AlwaysHits;		/// Missile always hits
+	bool AlwaysCritical;	/// Whether the missile always results in a critical hit
+	//Wyrmgus end
 
 	unsigned  Local: 1;     /// missile is a local missile
 	unsigned int Slot;      /// unique number for draw level.
@@ -609,7 +614,10 @@ extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, 
 extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
 
 /// Calculates damage done to goal by attacker using formula
-extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula);
+//Wyrmgus start
+//extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula);
+extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula, const Missile *missile = NULL);
+//Wyrmgus end
 /// fire a missile
 extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
 

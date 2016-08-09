@@ -164,7 +164,11 @@ Missile::Missile() :
 	Delay(0), SourceUnit(), TargetUnit(), Damage(0),
 	TTL(-1), Hidden(0), DestroyMissile(0),
 	CurrentStep(0), TotalStep(0),
-	Local(0)
+	//Wyrmgus start
+//	Local(0)
+	Local(0),
+	AlwaysHits(false), AlwaysCritical(false)
+	//Wyrmgus end
 {
 	position.x = 0;
 	position.y = 0;
@@ -252,6 +256,9 @@ Missile::Missile() :
 	missile->Wait = mtype.Sleep;
 	missile->Delay = mtype.StartDelay;
 	missile->TTL = mtype.TTL;
+	//Wyrmgus start
+	missile->AlwaysHits = mtype.AlwaysHits;
+	//Wyrmgus end
 	if (mtype.FiredSound.Sound) {
 		PlayMissileSound(*missile, mtype.FiredSound.Sound);
 	}
@@ -311,7 +318,7 @@ Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, co
 //Wyrmgus start
 //static int CalculateDamageStats(const CUnitStats &attacker_stats,
 //								const CUnitStats &goal_stats, int bloodlust)
-static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal)
+static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_stats, const CUnit *goal, const Missile *missile = NULL)
 //Wyrmgus end
 {
 	//Wyrmgus start
@@ -343,11 +350,16 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 	} else if (attacker.Variable[LEADERSHIP_INDEX].Value > 0) {
 		damage_modifier += 10;
 	}
-	if (attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value > 0) {
+	
+	int critical_strike_chance = attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value;
+	if (missile && missile->AlwaysCritical) {
+		critical_strike_chance = 100;
+	}
+	if (critical_strike_chance > 0) {
 		if (GameSettings.NoRandomness) {
-			damage_modifier += attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value;	//if no randomness setting is used, then critical strike chance will be used as a constant damage modifier, instead of being a chance of doubling the damage
+			damage_modifier += critical_strike_chance;	//if no randomness setting is used, then critical strike chance will be used as a constant damage modifier, instead of being a chance of doubling the damage
 		} else {
-			if (SyncRand(100) < attacker.Variable[CRITICALSTRIKECHANCE_INDEX].Value) {
+			if (SyncRand(100) < critical_strike_chance) {
 				damage_modifier += 100;
 			}
 		}
@@ -524,13 +536,16 @@ static int CalculateDamageStats(const CUnit &attacker, const CUnitStats &goal_st
 **
 **  @return          damage produces on goal.
 */
-int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula)
+//Wyrmgus start
+//int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula)
+int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula, const Missile *missile)
+//Wyrmgus end
 {
 	if (!formula) { // Use old method.
 		//Wyrmgus start
 //		return CalculateDamageStats(*attacker.Stats, *goal.Stats,
 //									attacker.Variable[BLOODLUST_INDEX].Value);
-		return CalculateDamageStats(attacker, *goal.Stats, &goal);
+		return CalculateDamageStats(attacker, *goal.Stats, &goal, missile);
 		//Wyrmgus end
 	}
 	Assert(formula);
@@ -1175,7 +1190,7 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 			return;
 		}
 		
-		if (!missile.Type->AlwaysHits && CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
+		if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *goal.Stats, &goal) == false) {
 			if (splash == 1 && missile.Type->Range <= 1) {
 				return;
 			} else if (splash == 1 && missile.Type->Range > 1) {
@@ -1191,12 +1206,18 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 
 		if (missile.Type->Damage) {   // custom formula
 			Assert(missile.SourceUnit != NULL);
-			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
+			//Wyrmgus start
+//			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage) / splash;
+			damage = CalculateDamage(*missile.SourceUnit, goal, missile.Type->Damage, &missile) / splash;
+			//Wyrmgus end
 		} else if (missile.Damage) {  // direct damage, spells mostly
 			damage = missile.Damage / splash;
 		} else {
 			Assert(missile.SourceUnit != NULL);
-			damage = CalculateDamage(*missile.SourceUnit, goal, Damage) / splash;
+			//Wyrmgus start
+//			damage = CalculateDamage(*missile.SourceUnit, goal, Damage) / splash;
+			damage = CalculateDamage(*missile.SourceUnit, goal, Damage, &missile) / splash;
+			//Wyrmgus end
 		}
 		if (missile.Type->Pierce) {  // Handle pierce factor
 			for (size_t i = 0; i < (missile.PiercedUnits.size() - 1); ++i) {
@@ -1256,7 +1277,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 	//Wyrmgus end
 
 	//Wyrmgus start
-	if (!missile.Type->AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
+	if (!missile.AlwaysHits && CalculateHit(*missile.SourceUnit, *stats, NULL) == false) {
 		if (splash == 1 && missile.Type->Range <= 1) {
 			return;
 		} else if (splash == 1 && missile.Type->Range > 1) {
@@ -1270,7 +1291,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 
 	//Wyrmgus start
 //	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit->Stats, *stats, 0) / splash);
-	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, NULL) / splash);
+	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, NULL, &missile) / splash);
 	//Wyrmgus end
 }
 

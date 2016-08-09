@@ -69,6 +69,9 @@ class Spell_SpawnMissile : public SpellActionType
 {
 public:
 	Spell_SpawnMissile() : Damage(0), TTL(-1), Delay(0), UseUnitVar(false),
+	//Wyrmgus start
+	AlwaysHits(false), AlwaysCritical(false),
+	//Wyrmgus end
 		StartPoint(LocBaseCaster), EndPoint(LocBaseTarget), Missile(0) {}
 	virtual int Cast(CUnit &caster, const SpellType &spell,
 					 CUnit *target, const Vec2i &goalPos);
@@ -79,6 +82,10 @@ private:
 	int TTL;                                /// Missile TTL.
 	int Delay;                              /// Missile original delay.
 	bool UseUnitVar;                        /// Use the caster's damage parameters
+	//Wyrmgus start
+	bool AlwaysHits;						/// The missile spawned from the spell always hits
+	bool AlwaysCritical;					/// The damage from the spell is always a critical hit (double damage)
+	//Wyrmgus end
 	SpellActionMissileLocation StartPoint;  /// Start point description.
 	SpellActionMissileLocation EndPoint;    /// Start point description.
 	MissileType *Missile;                   /// Missile fired on cast

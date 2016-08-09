@@ -110,6 +110,14 @@ static void CclSpellMissileLocation(lua_State *l, SpellActionMissileLocation *lo
 		} else if (!strcmp(value, "use-unit-var")) {
 			this->UseUnitVar = true;
 			--j;
+		//Wyrmgus start
+		} else if (!strcmp(value, "always-hits")) {
+			this->AlwaysHits = true;
+			--j;
+		} else if (!strcmp(value, "always-critical")) {
+			this->AlwaysCritical = true;
+			--j;
+		//Wyrmgus end
 		} else if (!strcmp(value, "delay")) {
 			this->Delay = LuaToNumber(l, -1, j + 1);
 		} else if (!strcmp(value, "ttl")) {
@@ -228,7 +236,14 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		EvaluateMissileLocation(this->StartPoint, caster, target, goalPos, &startPos);
 		EvaluateMissileLocation(this->EndPoint, caster, target, goalPos, &endPos);
 
-		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
+		//Wyrmgus start
+//		::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
+		MissileType *mtype = this->Missile;
+		if (mtype->Class == MissileClassNone && this->UseUnitVar) {
+			mtype = caster.GetMissile().Missile;
+		}
+		::Missile *missile = MakeMissile(*mtype, startPos, endPos);
+		//Wyrmgus end
 		missile->TTL = this->TTL;
 		missile->Delay = this->Delay;
 		missile->Damage = this->Damage;
@@ -238,6 +253,12 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		} else if (missile->Damage != 0) {
 			missile->SourceUnit = &caster;
 		}
+		//Wyrmgus start
+		if (this->AlwaysHits) {
+			missile->AlwaysHits = this->AlwaysHits;
+		}
+		missile->AlwaysCritical = this->AlwaysCritical;
+		//Wyrmgus end
 
 		missile->TargetUnit = target;
 	}
