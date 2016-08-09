@@ -809,6 +809,10 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	}
 	
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades)); //reset the individual upgrades and then apply the character's
+
+	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
+		IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
+	}
 	
 	if (this->Character->Trait != NULL) { //set trait
 		TraitAcquire(*this, this->Character->Trait);
@@ -2153,7 +2157,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	}
 	
 	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		unit->IndividualUpgrades[unit->Type->StartingAbilities[i]->ID] = true;
+		IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
 	}
 	//Wyrmgus end
 	

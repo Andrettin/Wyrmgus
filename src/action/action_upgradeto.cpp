@@ -172,6 +172,17 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus start
 	const CUnitStats &oldstats = oldtype.Stats[player.Index];
 	//Wyrmgus end
+	
+	//if old unit type unit had a starting ability that the new one doesn't have, remove it; and apply it if the reverse happens
+	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+		if (AllUpgrades[i]->Ability) {
+			if (unit.IndividualUpgrades[AllUpgrades[i]->ID] && std::find(oldtype.StartingAbilities.begin(), oldtype.StartingAbilities.end(), AllUpgrades[i]) != oldtype.StartingAbilities.end() && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) == newtype.StartingAbilities.end()) {
+				IndividualUpgradeLost(unit, AllUpgrades[i]);
+			} else if (!unit.IndividualUpgrades[AllUpgrades[i]->ID] && std::find(newtype.StartingAbilities.begin(), newtype.StartingAbilities.end(), AllUpgrades[i]) != newtype.StartingAbilities.end()) {
+				IndividualUpgradeAcquire(unit, AllUpgrades[i]);
+			}
+		}
+	}	
 
 	for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 		//Wyrmgus start

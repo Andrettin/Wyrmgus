@@ -1958,15 +1958,6 @@ static int CclDefineUnitType(lua_State *l)
 				int ability_id = UpgradeIdByIdent(ability_ident);
 				if (ability_id != -1) {
 					type->StartingAbilities.push_back(AllUpgrades[ability_id]);
-					
-					for (size_t z = 0; z < AllUpgrades[ability_id]->UpgradeModifiers.size(); ++z) {
-						for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-							type->DefaultStat.Variables[i].Enable |= AllUpgrades[ability_id]->UpgradeModifiers[z]->Modifier.Variables[i].Enable;
-							type->DefaultStat.Variables[i].Value += AllUpgrades[ability_id]->UpgradeModifiers[z]->Modifier.Variables[i].Value;
-							type->DefaultStat.Variables[i].Max += AllUpgrades[ability_id]->UpgradeModifiers[z]->Modifier.Variables[i].Max;
-							type->DefaultStat.Variables[i].Increase += AllUpgrades[ability_id]->UpgradeModifiers[z]->Modifier.Variables[i].Increase;
-						}
-					}
 				} else {
 					LuaError(l, "Ability \"%s\" doesn't exist." _C_ ability_ident.c_str());
 				}
