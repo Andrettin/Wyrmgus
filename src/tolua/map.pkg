@@ -28,6 +28,9 @@ extern CMap Map;
 void SetTile(int tile, int w, int h, int value = 0);
 //Wyrmgus start
 void SetTileTerrain(std::string terrain_ident, int w, int h, int value = 0);
+void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y);
+void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y);
+void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0);
 //Wyrmgus end
 
 //Wyrmgus start

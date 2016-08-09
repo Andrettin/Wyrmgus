@@ -83,6 +83,9 @@
 ----------------------------------------------------------------------------*/
 
 #include <string>
+//Wyrmgus start
+#include <map>
+//Wyrmgus end
 
 #ifndef __MAP_TILE_H__
 #include "tile.h"
@@ -108,6 +111,29 @@ class CUnitType;
 
 #define MaxMapWidth  256  /// max map width supported
 #define MaxMapHeight 256  /// max map height supported
+
+//Wyrmgus start
+class CMapTemplate
+{
+public:
+	CMapTemplate() :
+		Width(0), Height(0)
+	{
+	}
+
+	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
+	void ParseTerrainFile();
+	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false);
+	
+	std::string Name;
+	std::string Ident;
+	std::string TerrainFile;
+	int Width;
+	int Height;
+	std::vector<CTerrainType *> TileTerrains;
+	std::vector<CTerrainType *> TileOverlayTerrains;
+};
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Map info structure
@@ -190,6 +216,8 @@ public:
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
+	void AdjustTileMapIrregularities(bool overlay = false);
+	void AdjustTileMapTransitions();
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -312,6 +340,11 @@ public:
 --  Variables
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+extern std::vector<CMapTemplate *>  MapTemplates;
+extern std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
+//Wyrmgus end
+
 extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
 
@@ -329,6 +362,11 @@ extern int ReplayRevealMap;
 /*----------------------------------------------------------------------------
 --  Functions
 ----------------------------------------------------------------------------*/
+
+//Wyrmgus start
+extern CMapTemplate *GetMapTemplate(std::string map_ident);
+//Wyrmgus end
+
 #define MARKER_ON_INDEX
 //
 // in map_fog.c
@@ -407,6 +445,9 @@ inline void SetTileTerrain(std::string terrain_ident, int x, int y, int value = 
 	const Vec2i pos(x, y);
 	SetTileTerrain(terrain_ident, pos, value);
 }
+extern void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y);
+extern void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y);
+extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0);
 //Wyrmgus end
 
 /// register ccl features

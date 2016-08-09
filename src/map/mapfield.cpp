@@ -113,16 +113,16 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		if (this->OverlayTerrain == terrain) {
 			return;
 		}
-		if (this->Terrain) {
-			this->Flags &= ~(this->Terrain->Flags);
-			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
+		if (this->OverlayTerrain) {
+			this->Flags &= ~(this->OverlayTerrain->Flags);
 		}
 	} else {
 		if (this->Terrain == terrain) {
 			return;
 		}
-		if (this->OverlayTerrain) {
-			this->Flags &= ~(this->OverlayTerrain->Flags);
+		if (this->Terrain) {
+			this->Flags &= ~(this->Terrain->Flags);
+			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
 	}
 	
@@ -151,6 +151,12 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 			this->OverlayAnimationFrame = SyncRand(terrain->SolidAnimationFrames);
 		} else {
 			this->AnimationFrame = SyncRand(terrain->SolidAnimationFrames);
+		}
+	} else {
+		if (terrain->Overlay) {
+			this->OverlayAnimationFrame = 0;
+		} else {
+			this->AnimationFrame = 0;
 		}
 	}
 	

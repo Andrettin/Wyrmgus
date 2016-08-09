@@ -63,11 +63,89 @@
 --  Variables
 ----------------------------------------------------------------------------*/
 
+//Wyrmgus start
+std::vector<CMapTemplate *> MapTemplates;
+std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
+//Wyrmgus end
 CMap Map;                   /// The current map
 int FlagRevealMap;          /// Flag must reveal the map
 int ReplayRevealMap;        /// Reveal Map is replay
 int ForestRegeneration;     /// Forest regeneration
 char CurrentMapPath[1024];  /// Path of the current map
+
+//Wyrmgus start
+/**
+**  Get a map template
+*/
+CMapTemplate *GetMapTemplate(std::string map_ident)
+{
+	if (map_ident.empty()) {
+		return NULL;
+	}
+	
+	if (MapTemplateIdentToPointer.find(map_ident) != MapTemplateIdentToPointer.end()) {
+		return MapTemplateIdentToPointer[map_ident];
+	}
+	
+	return NULL;
+}
+
+void CMapTemplate::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
+{
+	int index = pos.x + pos.y * this->Width;
+	
+	if (terrain->Overlay) {
+		this->TileOverlayTerrains[index] = terrain;
+	} else {
+		this->TileTerrains[index] = terrain;
+	}
+}
+
+void CMapTemplate::ParseTerrainFile()
+{
+	if (this->TerrainFile.empty()) {
+		return;
+	}
+	
+	const std::string terrain_filename = LibraryFileName(this->TerrainFile.c_str());
+		
+	if (!CanAccessFile(terrain_filename.c_str())) {
+		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
+	}
+	
+	std::ifstream is_map(terrain_filename);
+	
+	std::string line_str;
+	int y = 0;
+	while (std::getline(is_map, line_str))
+	{
+		int x = 0;
+		
+		size_t pos = 0;
+		while ((pos = line_str.find(",", pos)) != std::string::npos) {
+			int terrain_id = atoi(line_str.substr(pos - 1, 1).c_str());
+			this->TileTerrains[x + y * this->Width] = TerrainTypes[terrain_id];
+			pos += 1;
+			x += 1;
+		}
+		
+		y += 1;
+	}  
+}
+
+CTerrainType *CMapTemplate::GetTileTerrain(const Vec2i &pos, bool overlay)
+{
+	int index = pos.x + pos.y * this->Width;
+	
+	if (overlay) {
+		return this->TileOverlayTerrains[index];
+	} else {
+		return this->TileTerrains[index];
+	}
+	
+	return NULL;
+}
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Visible and explored handling
@@ -1025,6 +1103,112 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay)
 					mf.TransitionTiles[i] = mf.TransitionTiles[i + 1];
 					mf.TransitionTiles[i + 1] = temp_transition;
 					swapped = true;
+				}
+			}
+		}
+	}
+}
+
+void CMap::AdjustTileMapIrregularities(bool overlay)
+{
+	bool no_irregularities_found = false;
+	while (!no_irregularities_found) {
+		no_irregularities_found = true;
+		for (int x = 0; x < this->Info.MapWidth; ++x) {
+			for (int y = 0; y < this->Info.MapHeight; ++y) {
+				CMapField &mf = *this->Field(x, y);
+				CTerrainType *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
+				if (!terrain || terrain->Ident == "dirt") {
+					continue;
+				}
+				std::vector<CTerrainType *> acceptable_adjacent_tile_types;
+				acceptable_adjacent_tile_types.push_back(terrain);
+				for (size_t i = 0; i < terrain->OuterBorderTerrains.size(); ++i) {
+					acceptable_adjacent_tile_types.push_back(terrain->OuterBorderTerrains[i]);
+				}
+				
+				int horizontal_adjacent_tiles = 0;
+				int vertical_adjacent_tiles = 0;
+				int nw_quadrant_adjacent_tiles = 0; //should be 4 if the wrong tile types are present in X-1,Y; X-1,Y-1; X,Y-1; and X+1,Y+1
+				int ne_quadrant_adjacent_tiles = 0;
+				int sw_quadrant_adjacent_tiles = 0;
+				int se_quadrant_adjacent_tiles = 0;
+				
+				if ((x - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x - 1, y), overlay)) == acceptable_adjacent_tile_types.end()) {
+					horizontal_adjacent_tiles += 1;
+					nw_quadrant_adjacent_tiles += 1;
+					sw_quadrant_adjacent_tiles += 1;
+				}
+				if ((x + 1) < this->Info.MapWidth && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x + 1, y), overlay)) == acceptable_adjacent_tile_types.end()) {
+					horizontal_adjacent_tiles += 1;
+					ne_quadrant_adjacent_tiles += 1;
+					se_quadrant_adjacent_tiles += 1;
+				}
+				
+				if ((y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y - 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+					vertical_adjacent_tiles += 1;
+					nw_quadrant_adjacent_tiles += 1;
+					ne_quadrant_adjacent_tiles += 1;
+				}
+				if ((y + 1) < this->Info.MapHeight && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+					vertical_adjacent_tiles += 1;
+					sw_quadrant_adjacent_tiles += 1;
+					se_quadrant_adjacent_tiles += 1;
+				}
+
+				if ((x - 1) >= 0 && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x - 1, y - 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+					nw_quadrant_adjacent_tiles += 1;
+					se_quadrant_adjacent_tiles += 1;
+				}
+				if ((x - 1) >= 0 && (y + 1) < this->Info.MapHeight && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x - 1, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+					sw_quadrant_adjacent_tiles += 1;
+					ne_quadrant_adjacent_tiles += 1;
+				}
+				if ((x + 1) < this->Info.MapWidth && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y - 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+					ne_quadrant_adjacent_tiles += 1;
+					sw_quadrant_adjacent_tiles += 1;
+				}
+				if ((x + 1) < this->Info.MapWidth && (y + 1) < this->Info.MapHeight && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+					se_quadrant_adjacent_tiles += 1;
+					nw_quadrant_adjacent_tiles += 1;
+				}
+				
+				
+				if (horizontal_adjacent_tiles >= 2 || vertical_adjacent_tiles >= 2 || nw_quadrant_adjacent_tiles >= 4 || ne_quadrant_adjacent_tiles >= 4 || sw_quadrant_adjacent_tiles >= 4 || se_quadrant_adjacent_tiles >= 4) {
+					if (overlay) {
+						mf.OverlayTerrain = NULL;
+					} else {
+						if (terrain->InnerBorderTerrains.size() > 0) {
+							mf.SetTerrain(terrain->InnerBorderTerrains[0]);
+						}
+					}
+					no_irregularities_found = false;
+				}
+			}
+		}
+	}
+}
+
+void CMap::AdjustTileMapTransitions()
+{
+	for (int x = 0; x < this->Info.MapWidth; ++x) {
+		for (int y = 0; y < this->Info.MapHeight; ++y) {
+			CMapField &mf = *this->Field(x, y);
+
+			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+					if ((x + sub_x) < 0 || (x + sub_x) >= this->Info.MapWidth || (y + sub_y) < 0 || (y + sub_y) >= this->Info.MapHeight || (sub_x == 0 && sub_y == 0)) {
+						continue;
+					}
+					if (mf.Terrain != GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false) && std::find(mf.Terrain->BorderTerrains.begin(), mf.Terrain->BorderTerrains.end(), GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false)) == mf.Terrain->BorderTerrains.end()) {
+						for (size_t i = 0; i < mf.Terrain->BorderTerrains.size(); ++i) {
+							CTerrainType *border_terrain = mf.Terrain->BorderTerrains[i];
+							if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), mf.Terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false)) != border_terrain->BorderTerrains.end()) {
+								mf.SetTerrain(border_terrain);
+								break;
+							}
+						}
+					}
 				}
 			}
 		}

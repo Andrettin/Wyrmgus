@@ -416,12 +416,19 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
 	CTerrainType *terrain = GetTerrainType(terrain_ident);
 	
 	if (!terrain) {
-		fprintf(stderr, "Invalid terrain\n");
+		fprintf(stderr, "Terrain \"%s\" doesn't exist.\n", terrain_ident.c_str());
 		return;
 	}
 	if (value < 0) {
 		fprintf(stderr, "Invalid tile value: %d\n", value);
 		return;
+	}
+	
+	//wood and rock tiles must always begin with the default value for their respective resource types
+	if (terrain->Flags & MapFieldForest) {
+		value = DefaultResourceAmounts[WoodCost];
+	} else if (terrain->Flags & MapFieldRocks) {
+		value = DefaultResourceAmounts[StoneCost];
 	}
 	
 	if (Map.Fields) {
@@ -430,6 +437,101 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
 		mf.SetTerrain(terrain);
 		mf.Value = value;
 	}
+}
+
+void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y)
+{
+	CMapTemplate *map = GetMapTemplate(map_ident);
+	
+	if (!map) {
+		fprintf(stderr, "Map template \"%s\" doesn't exist.\n", map_ident.c_str());
+		return;
+	}
+	
+	Vec2i pos(x, y);
+	
+	if (pos.x < 0 || pos.x >= map->Width || pos.y < 0 || pos.y >= map->Height) {
+		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
+		return;
+	}
+	
+	CTerrainType *terrain = GetTerrainType(terrain_ident);
+	
+	if (!terrain) {
+		fprintf(stderr, "Terrain \"%s\" doesn't exist.\n", terrain_ident.c_str());
+		return;
+	}
+	
+	map->SetTileTerrain(pos, terrain);
+}
+
+void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y)
+{
+	CMapTemplate *map = GetMapTemplate(map_ident);
+	
+	if (!map) {
+		fprintf(stderr, "Map template \"%s\" doesn't exist.\n", map_ident.c_str());
+		return;
+	}
+	
+	Vec2i pos(x, y);
+	
+	if (pos.x < 0 || pos.x >= map->Width || pos.y < 0 || pos.y >= map->Height) {
+		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
+		return;
+	}
+	
+	CTerrainType *terrain = TerrainTypes[terrain_id];
+	
+	if (!terrain) {
+		fprintf(stderr, "Terrain doesn't exist.\n");
+		return;
+	}
+
+	map->SetTileTerrain(pos, terrain);
+}
+
+void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
+{
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	
+	if (!map_template) {
+		fprintf(stderr, "Map template \"%s\" doesn't exist.\n", map_template_ident.c_str());
+		return;
+	}
+	
+	Vec2i start_pos(start_x, start_y);
+	
+	if (start_pos.x < 0 || start_pos.x >= map_template->Width || start_pos.y < 0 || start_pos.y >= map_template->Height) {
+		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", start_pos.x, start_pos.y);
+		return;
+	}
+	
+	for (int x = 0; x < Map.Info.MapHeight; ++x) {
+		if ((start_pos.x + x) >= map_template->Width) {
+			break;
+		}
+		for (int y = 0; y < Map.Info.MapHeight; ++y) {
+			if ((start_pos.y + y) >= map_template->Height) {
+				break;
+			}
+			
+			Vec2i pos(start_pos.x + x, start_pos.y + y);
+			Vec2i real_pos(x, y);
+			if (map_template->GetTileTerrain(pos, false)) {
+				SetTileTerrain(map_template->GetTileTerrain(pos, false)->Ident, real_pos);
+			} else {
+				SetTileTerrain(TerrainTypes[0]->Ident, real_pos);
+			}
+			if (map_template->GetTileTerrain(pos, true)) {
+				SetTileTerrain(map_template->GetTileTerrain(pos, true)->Ident, real_pos);
+			}
+		}
+	}
+	
+	Map.AdjustTileMapIrregularities();
+	Map.AdjustTileMapTransitions();
+	Map.AdjustTileMapIrregularities();
 }
 //Wyrmgus end
 
@@ -727,6 +829,12 @@ static int CclDefineTerrainType(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			terrain->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Character")) {
+			terrain->Character = LuaToString(l, -1);
+			if (TerrainTypeCharacterToPointer.find(terrain->Character) != TerrainTypeCharacterToPointer.end()) {
+				LuaError(l, "Character \"%s\" is already used by another terrain type." _C_ terrain->Character.c_str());
+			}
+			TerrainTypeCharacterToPointer[terrain->Character] = terrain;
 		} else if (!strcmp(value, "Overlay")) {
 			terrain->Overlay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Buildable")) {
@@ -903,6 +1011,54 @@ static int CclDefineTerrainType(lua_State *l)
 	
 	return 0;
 }
+
+/**
+**  Define a map template.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineMapTemplate(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string map_ident = LuaToString(l, 1);
+	CMapTemplate *map = GetMapTemplate(map_ident);
+	if (map == NULL) {
+		map = new CMapTemplate;
+		map->Ident = map_ident;
+		MapTemplates.push_back(map);
+		MapTemplateIdentToPointer[map_ident] = map;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			map->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "TerrainFile")) {
+			map->TerrainFile = LuaToString(l, -1);
+		} else if (!strcmp(value, "Width")) {
+			map->Width = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Height")) {
+			map->Height = LuaToNumber(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	for (int i = 0; i < map->Width * map->Height; ++i) {
+		map->TileTerrains.push_back(NULL);
+		map->TileOverlayTerrains.push_back(NULL);
+	}
+	
+	map->ParseTerrainFile();
+	
+	return 0;
+}
 //Wyrmgus end
 
 /**
@@ -944,6 +1100,7 @@ void MapCclRegister()
 	
 	//Wyrmgus start
 	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
+	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
 	//Wyrmgus end
 }
 

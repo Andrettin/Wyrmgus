@@ -1525,6 +1525,55 @@ static void ApplySepiaScale(SDL_Surface *Surface, int Width, int Height)
 	}
 	SDL_UnlockSurface(Surface);
 }
+
+/*
+static int map_terrains[8192][4096];
+
+static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
+{
+	SDL_LockSurface(Surface);
+	const SDL_PixelFormat *f = Surface->format;
+	const int bpp = Surface->format->BytesPerPixel;
+	Uint8 r, g, b;
+
+	for (int j = 0; j < Height; ++j) {
+		for (int i = 0; i < Width; ++i) {
+			Uint32 c = *reinterpret_cast<Uint32 *>(&reinterpret_cast<Uint8 *>(Surface->pixels)[i * 4 + j * Surface->pitch]);
+			Uint8 a;
+
+			Video.GetRGBA(c, Surface->format, &r, &g, &b, &a);
+			if (a >= 128) {
+				map_terrains[i][j] = 0;
+			} else {
+				map_terrains[i][j] = 6;
+			}
+		}
+	}
+	SDL_UnlockSurface(Surface);
+	
+	FileWriter *fw = NULL;
+	std::string map_filename = "scripts/map_templates/earth.map";
+
+	try {
+		fw = CreateFileWriter(map_filename);
+
+		for (int y = 0; y < Height; ++y) {
+			for (int x = 0; x < Width; ++x) {
+				fw->printf("%d,", map_terrains[x][y]);
+			}
+			fw->printf("\n");
+		}
+			
+		fw->printf("\n");
+	} catch (const FileException &) {
+		fprintf(stderr, "Couldn't write the map setup: \"%s\"\n", map_filename.c_str());
+		delete fw;
+		return;
+	}
+	
+	delete fw;
+}
+*/
 //Wyrmgus end
 
 /**
@@ -1578,7 +1627,7 @@ void CGraphic::Load(bool grayscale)
 		}
 		//Wyrmgus end
 	}
-
+	
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
 		MakeTexture(this);

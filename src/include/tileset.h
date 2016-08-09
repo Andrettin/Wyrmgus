@@ -165,6 +165,7 @@ public:
 
 	std::string Name;
 	std::string Ident;
+	std::string Character;
 	int ID;
 	int SolidAnimationFrames;
 	unsigned int Flags;
@@ -361,6 +362,7 @@ private:
 
 extern std::vector<CTerrainType *>  TerrainTypes;
 extern std::map<std::string, int> TerrainTypeStringToIndex;
+extern std::map<std::string, CTerrainType *> TerrainTypeCharacterToPointer;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------

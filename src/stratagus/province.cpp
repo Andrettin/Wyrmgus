@@ -42,6 +42,7 @@
 #include <string>
 #include <map>
 
+#include "map.h" // for the map templates, which are cleaned here
 #include "tileset.h" // for the terrain types, which are cleaned here
 
 /*----------------------------------------------------------------------------
@@ -66,6 +67,11 @@ void CleanWorlds()
 		delete TerrainTypes[i];
 	}
 	TerrainTypes.clear();
+	
+	for (size_t i = 0; i < MapTemplates.size(); ++i) {
+		delete MapTemplates[i];
+	}
+	MapTemplates.clear();
 	
 	for (size_t i = 0; i < WorldMapTerrainTypes.size(); ++i) {
 		delete WorldMapTerrainTypes[i];
