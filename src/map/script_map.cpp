@@ -521,22 +521,22 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		
 		if (degree_level == ExtremelyHighDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 2;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 1024;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 256;
 		} else if (degree_level == VeryHighDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 2048;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 512;
 		} else if (degree_level == HighDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 8;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 4096;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 1024;
 		} else if (degree_level == MediumDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 16;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 8192;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 2048;
 		} else if (degree_level == LowDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 32;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 16384;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 4096;
 		} else if (degree_level == VeryLowDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 64;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 32768;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 8192;
 		}
 		
 		seed_number = std::max(1, seed_number);
