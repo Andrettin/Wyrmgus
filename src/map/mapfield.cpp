@@ -172,6 +172,13 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		}
 	}
 	this->cost = 8; // default speed
+	
+	//wood and rock tiles must always begin with the default value for their respective resource types
+	if (terrain->Flags & MapFieldForest) {
+		this->Value = DefaultResourceAmounts[WoodCost];
+	} else if (terrain->Flags & MapFieldRocks) {
+		this->Value = DefaultResourceAmounts[StoneCost];
+	}
 }
 
 void CMapField::SetOverlayTerrainDestroyed(bool destroyed)

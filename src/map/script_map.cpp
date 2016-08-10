@@ -382,15 +382,6 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 		return;
 	}
 	
-	//Wyrmgus start
-	//wood and rock tiles must always begin with the default value for their respective resource types
-	if (Map.Tileset->tiles[tileIndex].flag & MapFieldForest) {
-		value = DefaultResourceAmounts[WoodCost];
-	} else if (Map.Tileset->tiles[tileIndex].flag & MapFieldRocks) {
-		value = DefaultResourceAmounts[StoneCost];
-	}
-	//Wyrmgus end
-
 	if (Map.Fields) {
 		CMapField &mf = *Map.Field(pos);
 
@@ -422,13 +413,6 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
 	if (value < 0) {
 		fprintf(stderr, "Invalid tile value: %d\n", value);
 		return;
-	}
-	
-	//wood and rock tiles must always begin with the default value for their respective resource types
-	if (terrain->Flags & MapFieldForest) {
-		value = DefaultResourceAmounts[WoodCost];
-	} else if (terrain->Flags & MapFieldRocks) {
-		value = DefaultResourceAmounts[StoneCost];
 	}
 	
 	if (Map.Fields) {
@@ -529,9 +513,34 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		}
 	}
 	
-	Map.AdjustTileMapIrregularities();
+	for (size_t i = 0; i < map_template->GeneratedTerrains.size(); ++i) {
+		int seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 1024;
+		int expansion_number = 0;
+		
+		int degree_level = map_template->GeneratedTerrains[i].second;
+		
+		if (degree_level == ExtremelyHighDegreeLevel) {
+			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 2;
+		} else if (degree_level == VeryHighDegreeLevel) {
+			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 4;
+		} else if (degree_level == HighDegreeLevel) {
+			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 8;
+		} else if (degree_level == MediumDegreeLevel) {
+			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 16;
+		} else if (degree_level == LowDegreeLevel) {
+			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 32;
+		} else if (degree_level == VeryLowDegreeLevel) {
+			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 64;
+		}
+		
+		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, Vec2i(0, 0), Vec2i(Map.Info.MapWidth, Map.Info.MapHeight));
+	}
+	
+	Map.AdjustTileMapIrregularities(false);
+	Map.AdjustTileMapIrregularities(true);
 	Map.AdjustTileMapTransitions();
-	Map.AdjustTileMapIrregularities();
+	Map.AdjustTileMapIrregularities(false);
+	Map.AdjustTileMapIrregularities(true);
 }
 //Wyrmgus end
 
@@ -1045,6 +1054,25 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->Width = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {
 			map->Height = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "GeneratedTerrains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+				if (!terrain) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				++j;
+				
+				int degree_level = GetDegreeLevelIdByName(LuaToString(l, -1, j + 1));
+				if (degree_level == -1) {
+					LuaError(l, "Degree level doesn't exist.");
+				}
+				
+				map->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

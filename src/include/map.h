@@ -113,6 +113,19 @@ class CUnitType;
 #define MaxMapHeight 256  /// max map height supported
 
 //Wyrmgus start
+enum DegreeLevels {
+	ExtremelyHighDegreeLevel,
+	VeryHighDegreeLevel,
+	HighDegreeLevel,
+	MediumDegreeLevel,
+	LowDegreeLevel,
+	VeryLowDegreeLevel,
+	
+	MaxDegreeLevels
+};
+//Wyrmgus end
+
+//Wyrmgus start
 class CMapTemplate
 {
 public:
@@ -130,6 +143,7 @@ public:
 	std::string TerrainFile;
 	int Width;
 	int Height;
+	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
 };
@@ -218,6 +232,7 @@ public:
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
 	void AdjustTileMapIrregularities(bool overlay = false);
 	void AdjustTileMapTransitions();
+	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos);
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -365,6 +380,8 @@ extern int ReplayRevealMap;
 
 //Wyrmgus start
 extern CMapTemplate *GetMapTemplate(std::string map_ident);
+extern std::string GetDegreeLevelNameById(int degree_level);
+extern int GetDegreeLevelIdByName(std::string degree_level);
 //Wyrmgus end
 
 #define MARKER_ON_INDEX

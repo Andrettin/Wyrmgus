@@ -2466,13 +2466,7 @@ void CEditor::Init()
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			//Wyrmgus start
 //			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
-			int value = 0;
-			if (tileset.tiles[tileset.getTileNumber(defaultTile, true, false)].flag & MapFieldForest) {
-				value = DefaultResourceAmounts[WoodCost];
-			} else if (tileset.tiles[tileset.getTileNumber(defaultTile, true, false)].flag & MapFieldRocks) {
-				value = DefaultResourceAmounts[StoneCost];
-			}
-			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), value);
+			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
 			//Wyrmgus end
 		}
 		GameSettings.Resources = SettingsPresetMapDefault;

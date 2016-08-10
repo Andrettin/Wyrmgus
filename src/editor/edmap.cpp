@@ -132,14 +132,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 		tile += i;
 	}
 	//Wyrmgus start
-//	mf.setTileIndex(*Map.Tileset, tile, 0);
-	int value = 0;
-	if (Map.Tileset->tiles[tile].flag & MapFieldForest) {
-		value = DefaultResourceAmounts[WoodCost];
-	} else if (Map.Tileset->tiles[tile].flag & MapFieldRocks) {
-		value = DefaultResourceAmounts[StoneCost];
-	}
-	mf.setTileIndex(*Map.Tileset, tile, value);
+	mf.setTileIndex(*Map.Tileset, tile, 0);
 //	mf.playerInfo.SeenTile = mf.getGraphicTile();
 	mf.UpdateSeenTile();
 	//Wyrmgus end
