@@ -475,6 +475,38 @@ void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x,
 	map->SetTileTerrain(pos, terrain);
 }
 
+static int CclSetMapTemplateHistoricalUnit(lua_State *l)
+{
+	LuaCheckArgs(l, 5);
+	
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template doesn't exist.\n");
+	}
+
+	lua_pushvalue(l, 2);
+	CUnitType *unittype = CclGetUnitType(l);
+	if (unittype == NULL) {
+		LuaError(l, "Bad unittype");
+	}
+	lua_pop(l, 1);
+	Vec2i ipos;
+	CclGetPos(l, &ipos.x, &ipos.y, 4);
+
+	std::string faction_name = LuaToString(l, 3);
+	CFaction *faction = PlayerRaces.GetFaction(-1, faction_name);
+	if (!faction) {
+		LuaError(l, "Faction doesn't exist.\n");
+	}
+
+	int year = LuaToNumber(l, 5);
+	
+	map_template->HistoricalUnits[std::pair<int, int>(ipos.x, ipos.y)][year] = std::pair<CUnitType *, CFaction *>(unittype, faction);
+	
+	return 1;
+}
+
 void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 {
 	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
@@ -518,6 +550,18 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 	Map.AdjustTileMapTransitions();
 	Map.AdjustTileMapIrregularities(false);
 	Map.AdjustTileMapIrregularities(true);
+	
+	for (std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>>::iterator iterator = map_template->HistoricalUnits.begin(); iterator != map_template->HistoricalUnits.end(); ++iterator) {
+		for (std::map<int, std::pair<CUnitType *, CFaction *>>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+//			if (GrandStrategyYear >= second_iterator->first) {
+				int playerno = 0;
+				CUnit *unit = MakeUnit(*second_iterator->second.first, &Players[playerno]);
+				unit->Place(Vec2i(iterator->first.first - start_pos.x, iterator->first.second - start_pos.y));
+				UpdateForNewUnit(*unit, 0);
+				break;
+//			}
+		}
+	}
 	
 	for (size_t i = 0; i < map_template->GeneratedTerrains.size(); ++i) {
 		int seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 1024;
@@ -1137,6 +1181,7 @@ void MapCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
+	lua_register(Lua, "SetMapTemplateHistoricalUnit", CclSetMapTemplateHistoricalUnit);
 	//Wyrmgus end
 }
 

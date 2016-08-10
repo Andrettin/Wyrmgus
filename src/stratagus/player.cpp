@@ -482,6 +482,29 @@ int PlayerRace::GetFactionIndexByName(const int civilization, const std::string 
 	}		
 }
 
+CFaction *PlayerRace::GetFaction(const int civilization, const std::string faction_name) const
+{
+	if (faction_name.empty()) {
+		return NULL;
+	}
+	
+	if (civilization == -1) { //if the civilization is -1, then search all civilizations for this faction
+		for (int i = 0; i < MAX_RACES; ++i) {
+			int civilization_faction_index = PlayerRaces.GetFactionIndexByName(i, faction_name);
+			if (civilization_faction_index != -1) {
+				return PlayerRaces.Factions[civilization][civilization_faction_index];
+			}
+		}
+		return NULL; //return NULL if found nothing
+	}
+	
+	if (FactionStringToIndex[civilization].find(faction_name) != FactionStringToIndex[civilization].end()) {
+		return PlayerRaces.Factions[civilization][FactionStringToIndex[civilization][faction_name]];
+	} else {
+		return NULL;
+	}		
+}
+
 int PlayerRace::GetReligionIndexByIdent(std::string religion_ident) const
 {
 	for (size_t i = 0; i < this->Religions.size(); ++i) {

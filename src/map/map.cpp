@@ -486,6 +486,21 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos)
 		
 	return true;
 }
+
+bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain)
+{
+	CMapField &mf = *Map.Field(pos);
+	
+	const CUnitCache &cache = mf.UnitCache;
+	for (size_t i = 0; i != cache.size(); ++i) {
+		CUnit &unit = *cache[i];
+		if (unit.IsAliveOnMap() && (terrain->Flags & unit.Type->MovementMask) != 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
 //Wyrmgus end
 
 /**
@@ -1335,6 +1350,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 			)
 			&& (!GetTileTopTerrain(random_pos)->Overlay || GetTileTopTerrain(random_pos) == terrain)
 			&& (terrain->Flags & MapFieldWaterAllowed) == (tile_terrain->Flags & MapFieldWaterAllowed) // don't alter coastlines
+			&& !this->TileHasUnitsIncompatibleWithTerrain(random_pos, terrain)
 		) {
 			std::vector<Vec2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
@@ -1362,6 +1378,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						)
 						&& (!GetTileTopTerrain(diagonal_pos)->Overlay || GetTileTopTerrain(diagonal_pos) == terrain) && (!GetTileTopTerrain(vertical_pos)->Overlay || GetTileTopTerrain(vertical_pos) == terrain) && (!GetTileTopTerrain(horizontal_pos)->Overlay || GetTileTopTerrain(horizontal_pos) == terrain)
 						&& (terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed) // don't alter coastlines
+						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
 					}
@@ -1425,6 +1442,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						))
 						&& (!GetTileTopTerrain(diagonal_pos)->Overlay || GetTileTopTerrain(diagonal_pos) == terrain) && (!GetTileTopTerrain(vertical_pos)->Overlay || GetTileTopTerrain(vertical_pos) == terrain) && (!GetTileTopTerrain(horizontal_pos)->Overlay || GetTileTopTerrain(horizontal_pos) == terrain) // don't expand into tiles with overlays
 						&& (terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed) // don't alter coastlines
+						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
 					}

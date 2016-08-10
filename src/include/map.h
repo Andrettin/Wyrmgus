@@ -104,6 +104,9 @@ class CFile;
 class CTileset;
 class CUnit;
 class CUnitType;
+//Wyrmgus start
+class CFaction;
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Map
@@ -146,6 +149,7 @@ public:
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
+	std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>> HistoricalUnits; // Historical units, mapped to the tile position and the year
 };
 //Wyrmgus end
 
@@ -298,6 +302,7 @@ public:
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
 	bool TileBordersOnlySameTerrain(const Vec2i &pos);
+	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain);
 	//Wyrmgus end
 
 	//UnitCache

@@ -673,6 +673,7 @@ public:
 	int GetRaceIndexByName(const char *raceName) const;
 	//Wyrmgus start
 	int GetFactionIndexByName(const int civilization, const std::string faction_name) const;
+	CFaction *GetFaction(const int civilization, const std::string faction_name) const;
 	int GetReligionIndexByIdent(std::string religion_ident) const;
 	int GetDeityDomainIndexByIdent(std::string deity_domain_ident) const;
 	int GetDeityIndexByIdent(std::string deity_ident) const;
