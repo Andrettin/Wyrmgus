@@ -513,6 +513,12 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		}
 	}
 	
+	Map.AdjustTileMapIrregularities(false);
+	Map.AdjustTileMapIrregularities(true);
+	Map.AdjustTileMapTransitions();
+	Map.AdjustTileMapIrregularities(false);
+	Map.AdjustTileMapIrregularities(true);
+	
 	for (size_t i = 0; i < map_template->GeneratedTerrains.size(); ++i) {
 		int seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 1024;
 		int expansion_number = 0;
@@ -543,12 +549,6 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		
 		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, Vec2i(0, 0), Vec2i(Map.Info.MapWidth, Map.Info.MapHeight));
 	}
-	
-	Map.AdjustTileMapIrregularities(false);
-	Map.AdjustTileMapIrregularities(true);
-	Map.AdjustTileMapTransitions();
-	Map.AdjustTileMapIrregularities(false);
-	Map.AdjustTileMapIrregularities(true);
 }
 //Wyrmgus end
 

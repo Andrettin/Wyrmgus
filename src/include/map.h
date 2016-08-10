@@ -297,6 +297,7 @@ public:
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
+	bool TileBordersOnlySameTerrain(const Vec2i &pos);
 	//Wyrmgus end
 
 	//UnitCache
