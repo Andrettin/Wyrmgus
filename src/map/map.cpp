@@ -1352,7 +1352,6 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 		if (
 			this->Info.IsPointOnMap(random_pos)
 			&& GetTileTerrain(random_pos, terrain->Overlay) == terrain
-			&& (!GetTileTopTerrain(random_pos)->Overlay || GetTileTopTerrain(random_pos) == terrain)
 		) {
 			std::vector<Vec2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used

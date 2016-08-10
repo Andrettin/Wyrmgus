@@ -521,17 +521,25 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		
 		if (degree_level == ExtremelyHighDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 2;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 1024;
 		} else if (degree_level == VeryHighDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 4;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 2048;
 		} else if (degree_level == HighDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 8;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 4096;
 		} else if (degree_level == MediumDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 16;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 8192;
 		} else if (degree_level == LowDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 32;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 16384;
 		} else if (degree_level == VeryLowDegreeLevel) {
 			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 64;
+			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 32768;
 		}
+		
+		seed_number = std::max(1, seed_number);
 		
 		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, Vec2i(0, 0), Vec2i(Map.Info.MapWidth, Map.Info.MapHeight));
 	}
