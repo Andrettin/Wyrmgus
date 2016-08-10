@@ -577,6 +577,25 @@ void UiFindLevelUpUnit()
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
 }
+
+/**
+**  Find the next level up unit, select it, and center on it
+*/
+void UiFindCustomHeroUnit()
+{
+	if (!ThisPlayer->CustomHeroUnit) {
+		return;
+	}
+	CUnit *unit = ThisPlayer->CustomHeroUnit;
+
+	SelectSingleUnit(*unit);
+	UI.StatusLine.Clear();
+	UI.StatusLine.ClearCosts();
+	CurrentButtonLevel = 0;
+	PlayUnitSound(*Selected[0], VoiceSelected);
+	SelectionChanged();
+	UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
+}
 //Wyrmgus end
 
 /**

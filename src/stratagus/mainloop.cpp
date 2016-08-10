@@ -294,6 +294,23 @@ void UpdateDisplay()
 				DrawGenericPopup(level_up_unit_tooltip, UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
 			}
 		}
+		
+		//draw icon if the player has a custom hero
+		if (UI.CustomHeroUnitButton && ThisPlayer->CustomHeroUnit) {
+			const PixelPos pos(UI.CustomHeroUnitButton->X, UI.CustomHeroUnitButton->Y);
+			const int flag = (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
+								 
+			ThisPlayer->CustomHeroUnit->GetIcon().Icon->DrawUnitIcon(*UI.CustomHeroUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->CustomHeroUnit->GetSkinColor(), ThisPlayer->CustomHeroUnit->GetHairColor());
+				
+			if (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
+				std::string custom_hero_unit_tooltip = "Find " + ThisPlayer->CustomHeroUnit->GetMessageName();
+				if (!Preference.NoStatusLineTooltips) {
+					CLabel label(GetGameFont());
+					label.Draw(2 + 16, Video.Height + 2 - 16, custom_hero_unit_tooltip);
+				}
+				DrawGenericPopup(custom_hero_unit_tooltip, UI.CustomHeroUnitButton->X, UI.CustomHeroUnitButton->Y);
+			}
+		}
 		//Wyrmgus end
 	//Wyrmgus start
 	} else if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { //grand strategy mode

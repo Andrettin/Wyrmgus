@@ -179,6 +179,7 @@ class CUserInterface
 	//Wyrmgus start
 	CUIButton *IdleWorkerButton;
 	CUIButton *LevelUpUnitButton;
+	CUIButton *CustomHeroUnitButton;
 	vector<CUIButton> InventoryButtons;
 	//Wyrmgus end
 
@@ -723,6 +724,7 @@ void ToggleShowMessages();
 void UiFindIdleWorker();
 //Wyrmgus start
 void UiFindLevelUpUnit();
+void UiFindCustomHeroUnit();
 //Wyrmgus end
 void CycleViewportMode(int step);
 void UiToggleTerrain();

@@ -776,6 +776,10 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 	} else {
 		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this->Character->GetFullName()), this->Player->Heroes.end());
+		
+		if (this == this->Player->CustomHeroUnit) {
+			this->Player->CustomHeroUnit = NULL;
+		}
 	}
 	
 	CCharacter *character = NULL;
@@ -871,6 +875,10 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 	} else {
 		this->Player->Heroes.push_back(this->Character->GetFullName());
+		
+		if (this->Character->Custom) {
+			this->Player->CustomHeroUnit = this;
+		}
 	}
 	
 	this->ChooseVariation(); //choose a new variation now

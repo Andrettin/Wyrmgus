@@ -183,6 +183,7 @@ public:
 	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
 	//Wyrmgus start
 	std::vector<CUnit *> LevelUpUnits;	/// Container for units with available level up upgrades
+	CUnit *CustomHeroUnit;
 	//Wyrmgus end
 
 	// Upgrades/Allows:

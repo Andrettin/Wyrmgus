@@ -1486,6 +1486,9 @@ void CPlayer::Clear()
 	LostTownHallTimer = 0;
 	//Wyrmgus end
 	Color = 0;
+	//Wyrmgus start
+	CustomHeroUnit = NULL;
+	//Wyrmgus end
 	UpgradeTimers.Clear();
 	for (int i = 0; i < MaxCosts; ++i) {
 		SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
