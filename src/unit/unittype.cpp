@@ -2118,7 +2118,7 @@ CSpecies *CSpecies::GetRandomEvolution(CTerrainType *terrain)
 		if (
 			(this->EvolvesTo[i]->Type != NULL && std::find(this->EvolvesTo[i]->Terrains.begin(), this->EvolvesTo[i]->Terrains.end(), terrain) != this->EvolvesTo[i]->Terrains.end())
 			|| this->EvolvesTo[i]->CanEvolveToAUnitType(terrain)
-		) { //give preference to evolutions that are native to the current tileset
+		) { //give preference to evolutions that are native to the current terrain
 			potential_evolutions.push_back(this->EvolvesTo[i]);
 		}
 	}

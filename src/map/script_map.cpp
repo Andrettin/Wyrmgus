@@ -560,10 +560,33 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		for (std::map<int, std::pair<CUnitType *, CFaction *>>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
 //			if (GrandStrategyYear >= second_iterator->first) {
 				int playerno = 0;
-				CUnit *unit = MakeUnit(*second_iterator->second.first, &Players[playerno]);
 				Vec2i unit_offset((second_iterator->second.first->TileWidth - 1) / 2, (second_iterator->second.first->TileHeight - 1) / 2);
-				unit->Place(unit_pos - unit_offset);
-				UpdateForNewUnit(*unit, 0);
+				CUnit *unit = CreateUnit(unit_pos - unit_offset, *second_iterator->second.first, &Players[playerno]);
+				
+				if (unit->Type->CanStore[GoldCost]) { //if can store gold (i.e. is a town hall), create five worker units around it
+					int civilization = PlayerRaces.GetRaceIndexByName(unit->Type->Civilization.c_str());
+					int faction = PlayerRaces.GetFactionIndexByName(civilization, unit->Type->Faction.c_str());
+					int worker_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker"));
+					
+					if (worker_type_id != -1) {
+						Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
+						for (int i = 0; i < 5; ++i) {
+							CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], &Players[playerno]);
+						}
+					}
+				} else if (unit->Type->CanStore[WoodCost] || unit->Type->CanStore[StoneCost]) { //if can store lumber or stone (i.e. is a lumber mill), create two worker units around it
+					int civilization = PlayerRaces.GetRaceIndexByName(unit->Type->Civilization.c_str());
+					int faction = PlayerRaces.GetFactionIndexByName(civilization, unit->Type->Faction.c_str());
+					int worker_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker"));
+					
+					if (worker_type_id != -1) {
+						Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
+						for (int i = 0; i < 2; ++i) {
+							CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], &Players[playerno]);
+						}
+					}
+				}
+				
 				break;
 //			}
 		}

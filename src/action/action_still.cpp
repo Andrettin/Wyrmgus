@@ -369,7 +369,7 @@ static bool Breed(CUnit &unit)
 {
 	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
 		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
-		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 512) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 32 critters of this type in a 128x128 map, if it is to reproduce
+		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 1024) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 16 critters of this type in a 128x128 map, if it is to reproduce
 		|| unit.Variable[HUNGER_INDEX].Value > 500 //only breed if not hungry
 		|| SyncRand(100) > unit.Type->RandomMovementProbability
 	) {
@@ -383,6 +383,10 @@ static bool Breed(CUnit &unit)
 	if (unit.Variable[GENDER_INDEX].Value == MaleGender || unit.Variable[GENDER_INDEX].Value == FemaleGender) { //if is male or female, check if has a potential mate nearby
 		std::vector<CUnit *> table;
 		SelectAroundUnit(unit, unit.CurrentSightRange, table, HasSamePlayerAndTypeAs(unit));
+		
+		if (table.size() > 6) { // don't reproduce if is in an area already crowded with other members of the species
+			return false;
+		}
 
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {

@@ -2689,6 +2689,31 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player
 	return unit;
 }
 
+//Wyrmgus start
+/**
+**  Create a new unit and place it on the map, updating its player accordingly.
+**
+**  @param pos     map tile position.
+**  @param type    Pointer to unit-type.
+**  @param player  Pointer to owning player.
+**
+**  @return        Pointer to created unit.
+*/
+CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
+{
+	CUnit *unit = MakeUnit(type, player);
+
+	if (unit != NULL) {
+		Vec2i res_pos;
+		const int heading = SyncRand() % 256;
+		FindNearestDrop(type, pos, res_pos, heading);
+		unit->Place(res_pos);
+		UpdateForNewUnit(*unit, 0);
+	}
+	return unit;
+}
+//Wyrmgus end
+
 /**
 **  Find the nearest position at which unit can be placed.
 **
