@@ -449,7 +449,8 @@ class CFaction
 public:
 	CFaction() : 
 		ID(-1), Civilization(-1), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1), Language(-1),
-		Playable(true) //factions are playable by default
+		Playable(true), //factions are playable by default
+		StartView(-1, -1)
 	{
 	}
 	
@@ -468,6 +469,7 @@ public:
 	int ParentFaction;													/// parent faction of this faction
 	int Language;
 	bool Playable;														/// faction playability
+	Vec2i StartView;													/// start view for the grand campaign map
 	std::vector<int> Colors;											/// faction colors
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
 	std::vector<std::string> SplitsTo;									/// which factions can split from this one
@@ -831,6 +833,9 @@ extern void SavePlayers(CFile &file);
 /// Create a new player
 extern void CreatePlayer(int type);
 
+//Wyrmgus start
+extern CPlayer *GetOrAddFactionPlayer(CFaction *faction);
+//Wyrmgus end
 
 /// Initialize the computer opponent AI
 extern void PlayersInitAi();

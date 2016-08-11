@@ -492,7 +492,7 @@ CFaction *PlayerRace::GetFaction(const int civilization, const std::string facti
 		for (int i = 0; i < MAX_RACES; ++i) {
 			int civilization_faction_index = PlayerRaces.GetFactionIndexByName(i, faction_name);
 			if (civilization_faction_index != -1) {
-				return PlayerRaces.Factions[civilization][civilization_faction_index];
+				return PlayerRaces.Factions[i][civilization_faction_index];
 			}
 		}
 		return NULL; //return NULL if found nothing
@@ -1041,6 +1041,33 @@ void CreatePlayer(int type)
 
 	player.Init(type);
 }
+
+//Wyrmgus start
+CPlayer *GetOrAddFactionPlayer(CFaction *faction)
+{
+	for (int i = 0; i < NumPlayers; ++i) {
+		if (Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
+			return &Players[i];
+		}
+	}
+	
+	// no player belonging to this faction, so let's make an unused player slot be created for it
+	
+	for (int i = 0; i < NumPlayers; ++i) {
+		if (Players[i].Type == PlayerNobody) {
+			Players[i].Type = PlayerComputer;
+			Players[i].SetCivilization(faction->Civilization);
+			Players[i].SetFaction(faction->Name);
+			Players[i].AiEnabled = true;
+			Players[i].AiName = "land-attack";
+			Players[i].Team = 1;
+			return &Players[i];
+		}
+	}
+	
+	return NULL;
+}
+//Wyrmgus end
 
 void CPlayer::Init(/* PlayerTypes */ int type)
 {
