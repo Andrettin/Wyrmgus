@@ -3516,9 +3516,6 @@ void UpdateUnitVariables(CUnit &unit)
 		unit.Variable[HUNGER_INDEX].Enable = 1;
 		unit.Variable[HUNGER_INDEX].Max = 1000;
 		unit.Variable[HUNGER_INDEX].Increase = 1;
-		unit.Variable[EVOLUTION_INDEX].Enable = 1;
-		unit.Variable[EVOLUTION_INDEX].Max = 300;
-		unit.Variable[EVOLUTION_INDEX].Increase = 1;
 	}
 	//Wyrmgus end
 
