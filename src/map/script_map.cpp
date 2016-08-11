@@ -552,11 +552,17 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 	Map.AdjustTileMapIrregularities(true);
 	
 	for (std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>>::iterator iterator = map_template->HistoricalUnits.begin(); iterator != map_template->HistoricalUnits.end(); ++iterator) {
+		Vec2i unit_pos(iterator->first.first - start_pos.x, iterator->first.second - start_pos.y);
+		if (!Map.Info.IsPointOnMap(unit_pos)) {
+			continue;
+		}
+		
 		for (std::map<int, std::pair<CUnitType *, CFaction *>>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
 //			if (GrandStrategyYear >= second_iterator->first) {
 				int playerno = 0;
 				CUnit *unit = MakeUnit(*second_iterator->second.first, &Players[playerno]);
-				unit->Place(Vec2i(iterator->first.first - start_pos.x, iterator->first.second - start_pos.y));
+				Vec2i unit_offset((second_iterator->second.first->TileWidth - 1) / 2, (second_iterator->second.first->TileHeight - 1) / 2);
+				unit->Place(unit_pos - unit_offset);
 				UpdateForNewUnit(*unit, 0);
 				break;
 //			}
