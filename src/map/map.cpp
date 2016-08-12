@@ -1324,7 +1324,6 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 		return;
 	}
 	
-	int random_number = 0;
 	Vec2i random_pos(0, 0);
 	int count = seed_number;
 	int while_count = 0;
@@ -1456,6 +1455,33 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 				this->Field(Vec2i(adjacent_pos.x, random_pos.y))->SetTerrain(terrain);
 				count -= 1;
 			}
+		}
+		
+		while_count += 1;
+	}
+}
+
+void CMap::GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos)
+{
+	if (SaveGameLoading) {
+		return;
+	}
+	
+	Vec2i random_pos(0, 0);
+	int count = quantity;
+	int while_count = 0;
+	
+	while (count > 0 && while_count < quantity * 100) {
+		random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
+		random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
+		
+		if (!this->Info.IsPointOnMap(random_pos)) {
+			continue;
+		}
+		
+		if (UnitTypeCanBeAt(*unit_type, random_pos) && CanBuildUnitType(NULL, *unit_type, random_pos, 0, true)) {
+			CUnit *unit = CreateResourceUnit(random_pos, *unit_type);
+			count -= 1;
 		}
 		
 		while_count += 1;

@@ -585,31 +585,14 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 			continue;
 		}
 		
-		CPlayer *player = &Players[PlayerNumNeutral];
 		Vec2i unit_offset((iterator->second.first->TileWidth - 1) / 2, (iterator->second.first->TileHeight - 1) / 2);
-		CUnit *unit = CreateUnit(unit_pos - unit_offset, *iterator->second.first, player);
+		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *iterator->second.first);
 		
 		if (iterator->second.second) {
 			unit->ResourcesHeld = iterator->second.second;
 			unit->Variable[GIVERESOURCE_INDEX].Value = iterator->second.second;
 			unit->Variable[GIVERESOURCE_INDEX].Max = iterator->second.second;
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
-		}
-		
-		// create metal rocks near metal resources
-		CUnitType *metal_rock = NULL;
-		if (unit->Type->Ident == "unit-gold-deposit") {
-			metal_rock = UnitTypeByIdent("unit-gold-rock");
-		} else if (unit->Type->Ident == "unit-silver-deposit") {
-			metal_rock = UnitTypeByIdent("unit-silver-rock");
-		} else if (unit->Type->Ident == "unit-copper-deposit") {
-			metal_rock = UnitTypeByIdent("unit-copper-rock");
-		}
-		if (metal_rock) {
-			Vec2i metal_rock_offset((metal_rock->TileWidth - 1) / 2, (metal_rock->TileHeight - 1) / 2);
-			for (int i = 0; i < 9; ++i) {
-				CUnit *metal_rock_unit = CreateUnit(unit_pos - metal_rock_offset, *metal_rock, player);
-			}
 		}
 	}
 	
@@ -689,6 +672,10 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		seed_number = std::max(1, seed_number);
 		
 		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, Vec2i(0, 0), Vec2i(Map.Info.MapWidth, Map.Info.MapHeight));
+	}
+	
+	for (size_t i = 0; i < map_template->GeneratedResources.size(); ++i) {
+		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, Vec2i(0, 0), Vec2i(Map.Info.MapWidth, Map.Info.MapHeight));
 	}
 }
 //Wyrmgus end
@@ -1221,6 +1208,22 @@ static int CclDefineMapTemplate(lua_State *l)
 				}
 				
 				map->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
+			}
+		} else if (!strcmp(value, "GeneratedResources")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+				++j;
+				
+				int quantity = LuaToNumber(l, -1, j + 1);
+				
+				map->GeneratedResources.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

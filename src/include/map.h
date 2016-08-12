@@ -147,6 +147,7 @@ public:
 	int Width;
 	int Height;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
+	std::vector<std::pair<CUnitType *, int>> GeneratedResources; // the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::pair<CUnitType *, int>> Resources; // Resources, mapped to the tile position
@@ -238,6 +239,7 @@ public:
 	void AdjustTileMapIrregularities(bool overlay = false);
 	void AdjustTileMapTransitions();
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos);
+	void GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos);
 	//Wyrmgus end
 
 	//Wyrmgus start

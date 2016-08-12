@@ -2712,6 +2712,30 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
 	}
 	return unit;
 }
+
+CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type)
+{
+	CUnit *unit = CreateUnit(pos, type, &Players[PlayerNumNeutral]);
+	unit->GenerateSpecialProperties();
+			
+	// create metal rocks near metal resources
+	CUnitType *metal_rock_type = NULL;
+	if (type.Ident == "unit-gold-deposit") {
+		metal_rock_type = UnitTypeByIdent("unit-gold-rock");
+	} else if (type.Ident == "unit-silver-deposit") {
+		metal_rock_type = UnitTypeByIdent("unit-silver-rock");
+	} else if (type.Ident == "unit-copper-deposit") {
+		metal_rock_type = UnitTypeByIdent("unit-copper-rock");
+	}
+	if (metal_rock_type) {
+		Vec2i metal_rock_offset((type.TileWidth - 1) / 2, (type.TileHeight - 1) / 2);
+		for (int i = 0; i < 9; ++i) {
+			CUnit *metal_rock_unit = CreateUnit(pos + metal_rock_offset, *metal_rock_type, &Players[PlayerNumNeutral]);
+		}
+	}
+			
+	return unit;
+}
 //Wyrmgus end
 
 /**

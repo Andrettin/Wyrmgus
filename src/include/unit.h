@@ -636,6 +636,7 @@ extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer 
 //Wyrmgus start
 /// Create a new unit and place it on the map, and update its player accordingly
 extern CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player);
+extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type);
 //Wyrmgus end
 /// Find the nearest position at which unit can be placed.
 void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading);
