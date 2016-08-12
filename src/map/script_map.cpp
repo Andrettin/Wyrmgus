@@ -475,6 +475,34 @@ void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x,
 	map->SetTileTerrain(pos, terrain);
 }
 
+static int CclSetMapTemplateResource(lua_State *l)
+{
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template doesn't exist.\n");
+	}
+
+	lua_pushvalue(l, 2);
+	CUnitType *unittype = CclGetUnitType(l);
+	if (unittype == NULL) {
+		LuaError(l, "Bad unittype");
+	}
+	lua_pop(l, 1);
+	Vec2i ipos;
+	CclGetPos(l, &ipos.x, &ipos.y, 3);
+
+	int resources_held = 0;
+	const int nargs = lua_gettop(l);
+	if (nargs == 4) {
+		resources_held = LuaToNumber(l, 4);
+	}
+	
+	map_template->Resources[std::pair<int, int>(ipos.x, ipos.y)] = std::pair<CUnitType *, int>(unittype, resources_held);
+	
+	return 1;
+}
+
 static int CclSetMapTemplateHistoricalUnit(lua_State *l)
 {
 	LuaCheckArgs(l, 5);
@@ -550,6 +578,40 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 	Map.AdjustTileMapTransitions();
 	Map.AdjustTileMapIrregularities(false);
 	Map.AdjustTileMapIrregularities(true);
+	
+	for (std::map<std::pair<int, int>, std::pair<CUnitType *, int>>::iterator iterator = map_template->Resources.begin(); iterator != map_template->Resources.end(); ++iterator) {
+		Vec2i unit_pos(iterator->first.first - start_pos.x, iterator->first.second - start_pos.y);
+		if (!Map.Info.IsPointOnMap(unit_pos)) {
+			continue;
+		}
+		
+		CPlayer *player = &Players[PlayerNumNeutral];
+		Vec2i unit_offset((iterator->second.first->TileWidth - 1) / 2, (iterator->second.first->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *iterator->second.first, player);
+		
+		if (iterator->second.second) {
+			unit->ResourcesHeld = iterator->second.second;
+			unit->Variable[GIVERESOURCE_INDEX].Value = iterator->second.second;
+			unit->Variable[GIVERESOURCE_INDEX].Max = iterator->second.second;
+			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+		}
+		
+		// create metal rocks near metal resources
+		CUnitType *metal_rock = NULL;
+		if (unit->Type->Ident == "unit-gold-deposit") {
+			metal_rock = UnitTypeByIdent("unit-gold-rock");
+		} else if (unit->Type->Ident == "unit-silver-deposit") {
+			metal_rock = UnitTypeByIdent("unit-silver-rock");
+		} else if (unit->Type->Ident == "unit-copper-deposit") {
+			metal_rock = UnitTypeByIdent("unit-copper-rock");
+		}
+		if (metal_rock) {
+			Vec2i metal_rock_offset((metal_rock->TileWidth - 1) / 2, (metal_rock->TileHeight - 1) / 2);
+			for (int i = 0; i < 9; ++i) {
+				CUnit *metal_rock_unit = CreateUnit(unit_pos - metal_rock_offset, *metal_rock, player);
+			}
+		}
+	}
 	
 	for (std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>>::iterator iterator = map_template->HistoricalUnits.begin(); iterator != map_template->HistoricalUnits.end(); ++iterator) {
 		Vec2i unit_pos(iterator->first.first - start_pos.x, iterator->first.second - start_pos.y);
@@ -1216,6 +1278,7 @@ void MapCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
+	lua_register(Lua, "SetMapTemplateResource", CclSetMapTemplateResource);
 	lua_register(Lua, "SetMapTemplateHistoricalUnit", CclSetMapTemplateHistoricalUnit);
 	//Wyrmgus end
 }

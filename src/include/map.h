@@ -149,6 +149,7 @@ public:
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
+	std::map<std::pair<int, int>, std::pair<CUnitType *, int>> Resources; // Resources, mapped to the tile position
 	std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>> HistoricalUnits; // Historical units, mapped to the tile position and the year
 };
 //Wyrmgus end
