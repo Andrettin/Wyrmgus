@@ -578,10 +578,10 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 	
-	for (size_t i = 0; i < map_template->SubTemplates.size(); ++i) {
+	for (size_t i = 0; i < map_template->Subtemplates.size(); ++i) {
 		Vec2i random_pos(0, 0);
 		Vec2i min_pos(0, 0);
-		Vec2i max_pos(Map.Info.MapWidth - map_template->SubTemplates[i]->Width, Map.Info.MapHeight - map_template->SubTemplates[i]->Height);
+		Vec2i max_pos(Map.Info.MapWidth - map_template->Subtemplates[i]->Width, Map.Info.MapHeight - map_template->Subtemplates[i]->Height);
 		int while_count = 0;
 		while (while_count < 100) {
 			random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
@@ -592,7 +592,35 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			}
 			
 			if (true) { // add more conditions here later
-				ApplyMapTemplate(map_template->SubTemplates[i]->Ident, 0, 0, random_pos.x, random_pos.y);
+				ApplyMapTemplate(map_template->Subtemplates[i]->Ident, 0, 0, random_pos.x, random_pos.y);
+				
+				Map.SubtemplateAreas.push_back(std::pair<Vec2i, Vec2i>(random_pos, Vec2i(random_pos.x + map_template->Subtemplates[i]->Width - 1, random_pos.y + map_template->Subtemplates[i]->Height - 1)));
+				
+				for (size_t j = 0; j < map_template->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
+					Vec2i external_start_pos(random_pos.x - (map_template->Subtemplates[i]->Width / 2), random_pos.y - (map_template->Subtemplates[i]->Height / 2));
+					Vec2i external_end(random_pos.x + map_template->Subtemplates[i]->Width + (map_template->Subtemplates[i]->Width / 2), random_pos.y + map_template->Subtemplates[i]->Height + (map_template->Subtemplates[i]->Height / 2));
+					int map_width = (external_end.x - external_start_pos.x);
+					int map_height = (external_end.y - external_start_pos.y);
+					int expansion_number = 0;
+					
+					int degree_level = map_template->Subtemplates[i]->ExternalGeneratedTerrains[j].second;
+					
+					if (degree_level == ExtremelyHighDegreeLevel) {
+						expansion_number = map_width * map_height / 2;
+					} else if (degree_level == VeryHighDegreeLevel) {
+						expansion_number = map_width * map_height / 4;
+					} else if (degree_level == HighDegreeLevel) {
+						expansion_number = map_width * map_height / 8;
+					} else if (degree_level == MediumDegreeLevel) {
+						expansion_number = map_width * map_height / 16;
+					} else if (degree_level == LowDegreeLevel) {
+						expansion_number = map_width * map_height / 32;
+					} else if (degree_level == VeryLowDegreeLevel) {
+						expansion_number = map_width * map_height / 64;
+					}
+					
+					Map.GenerateTerrain(map_template->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end);
+				}
 				break;
 			}
 			
@@ -1227,7 +1255,7 @@ static int CclDefineMapTemplate(lua_State *l)
 				LuaError(l, "Map template doesn't exist.");
 			}
 			map->MainTemplate = main_template;
-			main_template->SubTemplates.push_back(map);
+			main_template->Subtemplates.push_back(map);
 		} else if (!strcmp(value, "BaseTerrain")) {
 			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {
@@ -1252,6 +1280,25 @@ static int CclDefineMapTemplate(lua_State *l)
 				}
 				
 				map->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
+			}
+		} else if (!strcmp(value, "ExternalGeneratedTerrains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+				if (!terrain) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				++j;
+				
+				int degree_level = GetDegreeLevelIdByName(LuaToString(l, -1, j + 1));
+				if (degree_level == -1) {
+					LuaError(l, "Degree level doesn't exist.");
+				}
+				
+				map->ExternalGeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
 			}
 		} else if (!strcmp(value, "GeneratedResources")) {
 			if (!lua_istable(l, -1)) {

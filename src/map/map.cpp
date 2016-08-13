@@ -533,6 +533,19 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *t
 
 	return false;
 }
+
+bool CMap::IsPointInASubtemplateArea(const Vec2i &pos)
+{
+	for (size_t i = 0; i < this->SubtemplateAreas.size(); ++i) {
+		Vec2i min_pos = this->SubtemplateAreas[i].first;
+		Vec2i max_pos = this->SubtemplateAreas[i].second;
+		if (pos.x >= min_pos.x && pos.y >= min_pos.y && pos.x <= max_pos.x && pos.y <= max_pos.y) {
+			return true;
+		}
+	}
+
+	return false;
+}
 //Wyrmgus end
 
 /**
@@ -696,6 +709,10 @@ void CMap::Clean()
 	ReplayRevealMap = 0;
 
 	UI.Minimap.Destroy();
+	
+	//Wyrmgus start
+	SubtemplateAreas.clear();
+	//Wyrmgus end
 }
 
 /**
@@ -1365,7 +1382,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 		random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
 		random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 		
-		if (!this->Info.IsPointOnMap(random_pos)) {
+		if (!this->Info.IsPointOnMap(random_pos) || this->IsPointInASubtemplateArea(random_pos)) {
 			continue;
 		}
 		
@@ -1481,6 +1498,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						&& (!GetTileTopTerrain(diagonal_pos)->Overlay || GetTileTopTerrain(diagonal_pos) == terrain) && (!GetTileTopTerrain(vertical_pos)->Overlay || GetTileTopTerrain(vertical_pos) == terrain) && (!GetTileTopTerrain(horizontal_pos)->Overlay || GetTileTopTerrain(horizontal_pos) == terrain) // don't expand into tiles with overlays
 						&& (terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed) // don't alter coastlines
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
+						&& (!this->IsPointInASubtemplateArea(diagonal_pos) || GetTileTerrain(diagonal_pos, terrain->Overlay) == terrain) && (!this->IsPointInASubtemplateArea(vertical_pos) || GetTileTerrain(vertical_pos, terrain->Overlay) == terrain) && (!this->IsPointInASubtemplateArea(horizontal_pos) || GetTileTerrain(horizontal_pos, terrain->Overlay) == terrain)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
 					}

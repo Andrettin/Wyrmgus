@@ -150,8 +150,9 @@ public:
 	int Height;
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CTerrainType *BaseTerrain;
-	std::vector<CMapTemplate *> SubTemplates;
+	std::vector<CMapTemplate *> Subtemplates;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
+	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;
 	std::vector<std::pair<CUnitType *, int>> GeneratedResources; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
@@ -311,6 +312,7 @@ public:
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, bool overlay = false);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain);
+	bool IsPointInASubtemplateArea(const Vec2i &pos);
 	//Wyrmgus end
 
 	//UnitCache
@@ -359,6 +361,7 @@ public:
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 	//Wyrmgus start
 	CGraphic *SolidTileGraphics[16];   /// separate graphics for solid tiles
+	std::vector<std::pair<Vec2i, Vec2i>> SubtemplateAreas;
 	//Wyrmgus end
 
 	CMapInfo Info;             /// descriptive information
