@@ -418,8 +418,8 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
 	if (Map.Fields) {
 		CMapField &mf = *Map.Field(pos);
 
-		mf.SetTerrain(terrain);
 		mf.Value = value;
+		mf.SetTerrain(terrain);
 	}
 }
 
@@ -569,8 +569,6 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			Vec2i real_pos(map_start_pos.x + x, map_start_pos.y + y);
 			if (map_template->GetTileTerrain(pos, false)) {
 				SetTileTerrain(map_template->GetTileTerrain(pos, false)->Ident, real_pos);
-			} else {
-				SetTileTerrain(TerrainTypes[0]->Ident, real_pos);
 			}
 			if (map_template->GetTileTerrain(pos, true)) {
 				SetTileTerrain(map_template->GetTileTerrain(pos, true)->Ident, real_pos);
@@ -619,7 +617,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 						expansion_number = map_width * map_height / 64;
 					}
 					
-					Map.GenerateTerrain(map_template->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end);
+					Map.GenerateTerrain(map_template->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1));
 				}
 				break;
 			}
@@ -728,11 +726,11 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		
 		seed_number = std::max(1, seed_number);
 		
-		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end);
+		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1));
 	}
 	
 	for (size_t i = 0; i < map_template->GeneratedResources.size(); ++i) {
-		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, map_start_pos, map_end);
+		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, map_start_pos, map_end - Vec2i(1, 1));
 	}
 }
 //Wyrmgus end

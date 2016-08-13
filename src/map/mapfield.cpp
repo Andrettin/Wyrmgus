@@ -181,6 +181,29 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	}
 }
 
+void CMapField::RemoveOverlayTerrain()
+{
+	if (!this->OverlayTerrain) {
+		return;
+	}
+	
+	this->Value = 0;
+	this->Flags &= ~(this->OverlayTerrain->Flags);
+	this->OverlayTerrain = NULL;
+	this->OverlayTransitionTiles.clear();
+	
+	this->Flags |= this->Terrain->Flags;
+	// restore MapFieldAirUnpassable related to units (i.e. doors)
+	const CUnitCache &cache = this->UnitCache;
+	for (size_t i = 0; i != cache.size(); ++i) {
+		CUnit &unit = *cache[i];
+		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
+			this->Flags |= MapFieldUnpassable;
+			this->Flags |= MapFieldAirUnpassable;
+		}
+	}
+}
+
 void CMapField::SetOverlayTerrainDestroyed(bool destroyed)
 {
 	if (!this->OverlayTerrain || this->OverlayTerrainDestroyed == destroyed) {

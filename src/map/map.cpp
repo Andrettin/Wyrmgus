@@ -937,20 +937,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
 		return;
 	}
 	
-	mf.Flags &= ~(mf.OverlayTerrain->Flags);
-	mf.OverlayTerrain = NULL;
-	mf.OverlayTransitionTiles.clear();
-	
-	mf.Flags |= mf.Terrain->Flags;
-	// restore MapFieldAirUnpassable related to units (i.e. doors)
-	const CUnitCache &cache = mf.UnitCache;
-	for (size_t i = 0; i != cache.size(); ++i) {
-		CUnit &unit = *cache[i];
-		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
-			mf.Flags |= MapFieldUnpassable;
-			mf.Flags |= MapFieldAirUnpassable;
-		}
-	}
+	mf.RemoveOverlayTerrain();
 	
 	this->CalculateTileTransitions(pos, true);
 	
@@ -1308,7 +1295,7 @@ void CMap::AdjustTileMapIrregularities(bool overlay)
 				
 				if (horizontal_adjacent_tiles >= 2 || vertical_adjacent_tiles >= 2 || nw_quadrant_adjacent_tiles >= 4 || ne_quadrant_adjacent_tiles >= 4 || sw_quadrant_adjacent_tiles >= 4 || se_quadrant_adjacent_tiles >= 4) {
 					if (overlay) {
-						mf.OverlayTerrain = NULL;
+						mf.RemoveOverlayTerrain();
 					} else {
 						if (terrain->InnerBorderTerrains.size() > 0) {
 							mf.SetTerrain(terrain->InnerBorderTerrains[0]);
@@ -1529,10 +1516,10 @@ void CMap::GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &mi
 	int while_count = 0;
 	
 	while (count > 0 && while_count < quantity * 100) {
-		random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
-		random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
+		random_pos.x = SyncRand(max_pos.x - (unit_type->TileWidth - 1) - min_pos.x + 1) + min_pos.x;
+		random_pos.y = SyncRand(max_pos.y - (unit_type->TileHeight - 1) - min_pos.y + 1) + min_pos.y;
 		
-		if (!this->Info.IsPointOnMap(random_pos)) {
+		if (!this->Info.IsPointOnMap(random_pos) || this->IsPointInASubtemplateArea(random_pos)) {
 			continue;
 		}
 		

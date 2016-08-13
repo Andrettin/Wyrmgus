@@ -215,6 +215,7 @@ public:
 
 	//Wyrmgus start
 	void SetTerrain(CTerrainType *terrain);
+	void RemoveOverlayTerrain();
 	void SetOverlayTerrainDestroyed(bool destroyed);
 	void SetOverlayTerrainDamaged(bool damaged);
 	//Wyrmgus end
