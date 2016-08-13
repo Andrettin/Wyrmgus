@@ -139,12 +139,13 @@ public:
 	}
 
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
-	void ParseTerrainFile();
+	void ParseTerrainFile(bool overlay = false);
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false);
 	
 	std::string Name;
 	std::string Ident;
 	std::string TerrainFile;
+	std::string OverlayTerrainFile;
 	int Width;
 	int Height;
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located

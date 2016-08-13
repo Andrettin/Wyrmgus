@@ -1214,6 +1214,8 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "TerrainFile")) {
 			map->TerrainFile = LuaToString(l, -1);
+		} else if (!strcmp(value, "OverlayTerrainFile")) {
+			map->OverlayTerrainFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "Width")) {
 			map->Width = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {
@@ -1276,7 +1278,8 @@ static int CclDefineMapTemplate(lua_State *l)
 		map->TileOverlayTerrains.push_back(NULL);
 	}
 	
-	map->ParseTerrainFile();
+	map->ParseTerrainFile(false);
+	map->ParseTerrainFile(true);
 	
 	return 0;
 }

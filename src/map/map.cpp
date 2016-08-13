@@ -142,13 +142,20 @@ void CMapTemplate::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
 	}
 }
 
-void CMapTemplate::ParseTerrainFile()
+void CMapTemplate::ParseTerrainFile(bool overlay)
 {
-	if (this->TerrainFile.empty()) {
+	std::string terrain_file;
+	if (overlay) {
+		terrain_file = this->OverlayTerrainFile;
+	} else {
+		terrain_file = this->TerrainFile;
+	}
+	
+	if (terrain_file.empty()) {
 		return;
 	}
 	
-	const std::string terrain_filename = LibraryFileName(this->TerrainFile.c_str());
+	const std::string terrain_filename = LibraryFileName(terrain_file.c_str());
 		
 	if (!CanAccessFile(terrain_filename.c_str())) {
 		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
@@ -163,9 +170,18 @@ void CMapTemplate::ParseTerrainFile()
 		int x = 0;
 		
 		size_t pos = 0;
+		size_t previous_pos = pos;
 		while ((pos = line_str.find(",", pos)) != std::string::npos) {
-			int terrain_id = atoi(line_str.substr(pos - 1, 1).c_str());
-			this->TileTerrains[x + y * this->Width] = TerrainTypes[terrain_id];
+			int terrain_id_length = pos - previous_pos - 1;
+			int terrain_id = atoi(line_str.substr(pos - terrain_id_length, terrain_id_length).c_str());
+			if (terrain_id != -1) {
+				if (overlay) {
+					this->TileOverlayTerrains[x + y * this->Width] = TerrainTypes[terrain_id];
+				} else {
+					this->TileTerrains[x + y * this->Width] = TerrainTypes[terrain_id];
+				}
+			}
+			previous_pos = pos;
 			pos += 1;
 			x += 1;
 		}
