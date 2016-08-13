@@ -566,7 +566,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 				break;
 			}
 			Vec2i pos(template_start_pos.x + x, template_start_pos.y + y);
-			Vec2i real_pos(map_start_pos.x + x, map_start_pos.x + y);
+			Vec2i real_pos(map_start_pos.x + x, map_start_pos.y + y);
 			if (map_template->GetTileTerrain(pos, false)) {
 				SetTileTerrain(map_template->GetTileTerrain(pos, false)->Ident, real_pos);
 			} else {
@@ -585,6 +585,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		int while_count = 0;
 		while (while_count < 100) {
 			random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
+			random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 			
 			if (!Map.Info.IsPointOnMap(random_pos)) {
 				continue;
