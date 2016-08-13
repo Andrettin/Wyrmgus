@@ -535,7 +535,7 @@ static int CclSetMapTemplateHistoricalUnit(lua_State *l)
 	return 1;
 }
 
-void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
+void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y)
 {
 	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
 	
@@ -544,24 +544,29 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		return;
 	}
 	
-	Vec2i start_pos(start_x, start_y);
-	
-	if (start_pos.x < 0 || start_pos.x >= map_template->Width || start_pos.y < 0 || start_pos.y >= map_template->Height) {
-		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", start_pos.x, start_pos.y);
+	Vec2i template_start_pos(template_start_x, template_start_y);
+	if (template_start_pos.x < 0 || template_start_pos.x >= map_template->Width || template_start_pos.y < 0 || template_start_pos.y >= map_template->Height) {
+		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", template_start_pos.x, template_start_pos.y);
+		return;
+	}
+
+	Vec2i map_start_pos(map_start_x, map_start_y);
+	Vec2i map_end(std::min(Map.Info.MapWidth, map_start_x + map_template->Width), std::min(Map.Info.MapHeight, map_start_y + map_template->Height));
+	if (!Map.Info.IsPointOnMap(map_start_pos)) {
+		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", map_start_pos.x, map_start_pos.y);
 		return;
 	}
 	
-	for (int x = 0; x < Map.Info.MapHeight; ++x) {
-		if ((start_pos.x + x) >= map_template->Width) {
+	for (int x = 0; x < Map.Info.MapWidth; ++x) {
+		if ((template_start_pos.x + x) >= map_template->Width) {
 			break;
 		}
 		for (int y = 0; y < Map.Info.MapHeight; ++y) {
-			if ((start_pos.y + y) >= map_template->Height) {
+			if ((template_start_pos.y + y) >= map_template->Height) {
 				break;
 			}
-			
-			Vec2i pos(start_pos.x + x, start_pos.y + y);
-			Vec2i real_pos(x, y);
+			Vec2i pos(template_start_pos.x + x, template_start_pos.y + y);
+			Vec2i real_pos(map_start_pos.x + x, map_start_pos.x + y);
 			if (map_template->GetTileTerrain(pos, false)) {
 				SetTileTerrain(map_template->GetTileTerrain(pos, false)->Ident, real_pos);
 			} else {
@@ -573,6 +578,27 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 		}
 	}
 	
+	for (size_t i = 0; i < map_template->SubTemplates.size(); ++i) {
+		Vec2i random_pos(0, 0);
+		Vec2i min_pos(0, 0);
+		Vec2i max_pos(Map.Info.MapWidth - map_template->SubTemplates[i]->Width, Map.Info.MapHeight - map_template->SubTemplates[i]->Height);
+		int while_count = 0;
+		while (while_count < 100) {
+			random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
+			
+			if (!Map.Info.IsPointOnMap(random_pos)) {
+				continue;
+			}
+			
+			if (true) { // add more conditions here later
+				ApplyMapTemplate(map_template->SubTemplates[i]->Ident, 0, 0, random_pos.x, random_pos.y);
+				break;
+			}
+			
+			while_count += 1;
+		}
+	}
+	
 	Map.AdjustTileMapIrregularities(false);
 	Map.AdjustTileMapIrregularities(true);
 	Map.AdjustTileMapTransitions();
@@ -580,7 +606,7 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 	Map.AdjustTileMapIrregularities(true);
 	
 	for (std::map<std::pair<int, int>, std::pair<CUnitType *, int>>::iterator iterator = map_template->Resources.begin(); iterator != map_template->Resources.end(); ++iterator) {
-		Vec2i unit_pos(iterator->first.first - start_pos.x, iterator->first.second - start_pos.y);
+		Vec2i unit_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
 		if (!Map.Info.IsPointOnMap(unit_pos)) {
 			continue;
 		}
@@ -597,7 +623,7 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 	}
 	
 	for (std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>>::iterator iterator = map_template->HistoricalUnits.begin(); iterator != map_template->HistoricalUnits.end(); ++iterator) {
-		Vec2i unit_pos(iterator->first.first - start_pos.x, iterator->first.second - start_pos.y);
+		Vec2i unit_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
 		if (!Map.Info.IsPointOnMap(unit_pos)) {
 			continue;
 		}
@@ -607,7 +633,7 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 				CPlayer *player = NULL;
 				if (second_iterator->second.second) {
 					player = GetOrAddFactionPlayer(second_iterator->second.second);
-					player->SetStartView(second_iterator->second.second->StartView - start_pos);
+					player->SetStartView(second_iterator->second.second->StartView - template_start_pos);
 				} else {
 					player = &Players[PlayerNumNeutral];
 				}
@@ -644,38 +670,40 @@ void ApplyMapTemplate(std::string map_template_ident, int start_x, int start_y)
 	}
 	
 	for (size_t i = 0; i < map_template->GeneratedTerrains.size(); ++i) {
-		int seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 1024;
+		int map_width = (map_end.x - map_start_pos.x);
+		int map_height = (map_end.y - map_start_pos.y);
+		int seed_number = map_width * map_height / 1024;
 		int expansion_number = 0;
 		
 		int degree_level = map_template->GeneratedTerrains[i].second;
 		
 		if (degree_level == ExtremelyHighDegreeLevel) {
-			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 2;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 256;
+			expansion_number = map_width * map_height / 2;
+			seed_number = map_width * map_height / 256;
 		} else if (degree_level == VeryHighDegreeLevel) {
-			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 4;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 512;
+			expansion_number = map_width * map_height / 4;
+			seed_number = map_width * map_height / 512;
 		} else if (degree_level == HighDegreeLevel) {
-			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 8;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 1024;
+			expansion_number = map_width * map_height / 8;
+			seed_number = map_width * map_height / 1024;
 		} else if (degree_level == MediumDegreeLevel) {
-			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 16;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 2048;
+			expansion_number = map_width * map_height / 16;
+			seed_number = map_width * map_height / 2048;
 		} else if (degree_level == LowDegreeLevel) {
-			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 32;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 4096;
+			expansion_number = map_width * map_height / 32;
+			seed_number = map_width * map_height / 4096;
 		} else if (degree_level == VeryLowDegreeLevel) {
-			expansion_number = Map.Info.MapWidth * Map.Info.MapHeight / 64;
-			seed_number = Map.Info.MapWidth * Map.Info.MapHeight / 8192;
+			expansion_number = map_width * map_height / 64;
+			seed_number = map_width * map_height / 8192;
 		}
 		
 		seed_number = std::max(1, seed_number);
 		
-		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, Vec2i(0, 0), Vec2i(Map.Info.MapWidth, Map.Info.MapHeight));
+		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end);
 	}
 	
 	for (size_t i = 0; i < map_template->GeneratedResources.size(); ++i) {
-		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, Vec2i(0, 0), Vec2i(Map.Info.MapWidth, Map.Info.MapHeight));
+		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, map_start_pos, map_end);
 	}
 }
 //Wyrmgus end
@@ -1190,6 +1218,13 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->Width = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {
 			map->Height = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "MainTemplate")) {
+			CMapTemplate *main_template = GetMapTemplate(LuaToString(l, -1));
+			if (!main_template) {
+				LuaError(l, "Map template doesn't exist.");
+			}
+			map->MainTemplate = main_template;
+			main_template->SubTemplates.push_back(map);
 		} else if (!strcmp(value, "BaseTerrain")) {
 			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {

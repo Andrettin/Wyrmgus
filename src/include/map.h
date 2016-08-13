@@ -134,7 +134,7 @@ class CMapTemplate
 public:
 	CMapTemplate() :
 		Width(0), Height(0),
-		BaseTerrain(NULL)
+		MainTemplate(NULL), BaseTerrain(NULL)
 	{
 	}
 
@@ -147,13 +147,15 @@ public:
 	std::string TerrainFile;
 	int Width;
 	int Height;
+	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CTerrainType *BaseTerrain;
+	std::vector<CMapTemplate *> SubTemplates;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
-	std::vector<std::pair<CUnitType *, int>> GeneratedResources; // the first element of the pair is the resource's unit type, and the second is the quantity
+	std::vector<std::pair<CUnitType *, int>> GeneratedResources; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
-	std::map<std::pair<int, int>, std::pair<CUnitType *, int>> Resources; // Resources, mapped to the tile position
-	std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>> HistoricalUnits; // Historical units, mapped to the tile position and the year
+	std::map<std::pair<int, int>, std::pair<CUnitType *, int>> Resources; /// Resources, mapped to the tile position
+	std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>> HistoricalUnits; /// Historical units, mapped to the tile position and the year
 };
 //Wyrmgus end
 
@@ -475,7 +477,7 @@ inline void SetTileTerrain(std::string terrain_ident, int x, int y, int value = 
 }
 extern void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y);
 extern void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y);
-extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0);
+extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0);
 //Wyrmgus end
 
 /// register ccl features
