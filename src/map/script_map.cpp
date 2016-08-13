@@ -1190,6 +1190,12 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->Width = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {
 			map->Height = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "BaseTerrain")) {
+			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
+			if (!terrain) {
+				LuaError(l, "Terrain doesn't exist.");
+			}
+			map->BaseTerrain = terrain;
 		} else if (!strcmp(value, "GeneratedTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -1231,7 +1237,7 @@ static int CclDefineMapTemplate(lua_State *l)
 	}
 	
 	for (int i = 0; i < map->Width * map->Height; ++i) {
-		map->TileTerrains.push_back(NULL);
+		map->TileTerrains.push_back(map->BaseTerrain);
 		map->TileOverlayTerrains.push_back(NULL);
 	}
 	

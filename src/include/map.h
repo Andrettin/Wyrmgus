@@ -133,7 +133,8 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0)
+		Width(0), Height(0),
+		BaseTerrain(NULL)
 	{
 	}
 
@@ -146,6 +147,7 @@ public:
 	std::string TerrainFile;
 	int Width;
 	int Height;
+	CTerrainType *BaseTerrain;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
 	std::vector<std::pair<CUnitType *, int>> GeneratedResources; // the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<CTerrainType *> TileTerrains;
@@ -304,7 +306,7 @@ public:
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
-	bool TileBordersOnlySameTerrain(const Vec2i &pos);
+	bool TileBordersOnlySameTerrain(const Vec2i &pos, bool overlay = false);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain);
 	//Wyrmgus end
 
