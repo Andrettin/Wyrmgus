@@ -142,6 +142,7 @@ public:
 	int UnitTypesNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character
 	int UnitTypesStartingNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character and which are starting units
 	std::vector<std::string> Heroes;			/// characters owned by this player
+	std::vector<CCharacter *> AvailableHeroes;		/// heroes available to this player
 	std::vector<CQuest *> AvailableQuests;		/// quests available to this player
 	std::vector<CQuest *> CurrentQuests;		/// quests being pursued by this player
 	std::vector<CQuest *> CompletedQuests;		/// quests completed by this player
@@ -220,6 +221,7 @@ public:
 	void UpdateFreeWorkers();
 	//Wyrmgus start
 	void UpdateLevelUpUnits();
+	void UpdateHeroPool();
 	void UpdateQuestPool();
 	void UpdateCurrentQuests();
 	void CompleteQuest(CQuest *quest);

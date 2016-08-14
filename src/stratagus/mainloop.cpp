@@ -554,6 +554,7 @@ static void GameLogicLoop()
 		// every minute, update the quest pool
 		if (GameCycle % CYCLES_PER_MINUTE == 0) {
 			for (int player = 0; player < NumPlayers; ++player) {
+//				Players[player].UpdateHeroPool();
 				Players[player].UpdateQuestPool();
 			}
 		}

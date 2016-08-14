@@ -1526,6 +1526,7 @@ void CPlayer::Clear()
 	memset(UnitTypesNonHeroCount, 0, sizeof(UnitTypesNonHeroCount));
 	memset(UnitTypesStartingNonHeroCount, 0, sizeof(UnitTypesStartingNonHeroCount));
 	this->Heroes.clear();
+	this->AvailableHeroes.clear();
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
@@ -1643,18 +1644,49 @@ void CPlayer::UpdateLevelUpUnits()
 	}
 }
 
+void CPlayer::UpdateHeroPool()
+{
+	this->AvailableHeroes.clear();
+	
+	std::vector<CCharacter *> potential_heroes;
+	
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+		if (iterator->second->Persistent) {
+			potential_heroes.push_back(iterator->second);
+		}
+	}
+	
+	for (int i = 0; i < 1; ++i) { // fill the hero pool with up to one hero
+		if (potential_heroes.size() == 0) {
+			break;
+		}
+		this->AvailableHeroes.push_back(potential_heroes[SyncRand(potential_heroes.size())]);
+		potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), this->AvailableHeroes[this->AvailableHeroes.size() - 1]), potential_heroes.end());
+	}
+}
+
 void CPlayer::UpdateQuestPool()
 {
 	this->AvailableQuests.clear();
 	
+	std::vector<CQuest *> potential_quests;
+	
 	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (!Quests[i]->Hidden && std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), Quests[i]) == this->CurrentQuests.end() && std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), Quests[i]) == this->CompletedQuests.end() && Quests[i]->Conditions) {
+		if (!Quests[i]->Hidden && !Quests[i]->CurrentCompleted && std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), Quests[i]) == this->CurrentQuests.end() && Quests[i]->Conditions) {
 			Quests[i]->Conditions->pushPreamble();
 			Quests[i]->Conditions->run(1);
 			if (Quests[i]->Conditions->popBoolean()) {
-				this->AvailableQuests.push_back(Quests[i]);
+				potential_quests.push_back(Quests[i]);
 			}
 		}
+	}
+	
+	for (int i = 0; i < 3; ++i) { // fill the quest pool with up to three quests
+		if (potential_quests.size() == 0) {
+			break;
+		}
+		this->AvailableQuests.push_back(potential_quests[SyncRand(potential_quests.size())]);
+		potential_quests.erase(std::remove(potential_quests.begin(), potential_quests.end(), this->AvailableQuests[this->AvailableQuests.size() - 1]), potential_quests.end());
 	}
 }
 
