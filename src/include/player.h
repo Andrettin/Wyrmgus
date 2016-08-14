@@ -146,6 +146,7 @@ public:
 	std::vector<CQuest *> AvailableQuests;		/// quests available to this player
 	std::vector<CQuest *> CurrentQuests;		/// quests being pursued by this player
 	std::vector<CQuest *> CompletedQuests;		/// quests completed by this player
+	std::vector<std::tuple<CQuest *, CUnitType *, CFaction *, int>> QuestDestroyUnits;	/// destroy units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is destroyed it is reduced by one
 	//Wyrmgus end
 
 	bool AiEnabled;        /// handle AI on local computer
@@ -224,8 +225,11 @@ public:
 	void UpdateHeroPool();
 	void UpdateQuestPool();
 	void UpdateCurrentQuests();
+	void AcceptQuest(CQuest *quest);
 	void CompleteQuest(CQuest *quest);
 	void FailQuest(CQuest *quest);
+	bool HasCompletedQuest(CQuest *quest);
+	bool HasFailedQuest(CQuest *quest);
 	//Wyrmgus end
 
 	/// Get a resource of the player
@@ -843,6 +847,7 @@ extern void SavePlayers(CFile &file);
 extern void CreatePlayer(int type);
 
 //Wyrmgus start
+extern CPlayer *GetFactionPlayer(CFaction *faction);
 extern CPlayer *GetOrAddFactionPlayer(CFaction *faction);
 //Wyrmgus end
 

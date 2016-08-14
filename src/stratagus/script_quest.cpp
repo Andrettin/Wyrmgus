@@ -145,8 +145,6 @@ static int CclDefineQuest(lua_State *l)
 			}
 		} else if (!strcmp(value, "Conditions")) {
 			quest->Conditions = new LuaCallback(l, -1);
-		} else if (!strcmp(value, "CompletionConditions")) {
-			quest->CompletionConditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CompletionEffects")) {
 			quest->CompletionEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Objectives")) {
@@ -160,6 +158,28 @@ static int CclDefineQuest(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				quest->BriefingSounds.push_back(LuaToString(l, -1, j + 1));
+			}
+		// objective types
+		} else if (!strcmp(value, "DestroyUnits")) {
+			quest->DestroyUnits.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+				++j;
+				
+				std::string faction_ident = LuaToString(l, -1, j + 1);
+				CFaction *faction = PlayerRaces.GetFaction(-1, faction_ident);
+				if (!faction && !faction_ident.empty()) {
+				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
+				}
+				++j;
+				
+				int quantity = LuaToNumber(l, -1, j + 1);
+				
+				quest->DestroyUnits.push_back(std::tuple<CUnitType *, CFaction *, int>(unit_type, faction, quantity));				
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

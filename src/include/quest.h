@@ -37,6 +37,7 @@
 ----------------------------------------------------------------------------*/
 
 #include <vector>
+#include <tuple>
 
 #ifndef __ICONS_H__
 #include "icons.h"
@@ -49,6 +50,7 @@
 class CCharacter;
 class CDialogue;
 class CDialogueNode;
+class CFaction;
 class CUnitType;
 class LuaCallback;
 
@@ -58,7 +60,7 @@ public:
 	CQuest() :
 		Civilization(-1), TechnologyPoints(0), PlayerColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false), CurrentCompleted(false),
-		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionConditions(NULL), CompletionEffects(NULL)
+		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionEffects(NULL)
 	{
 	}
 	~CQuest();
@@ -91,10 +93,10 @@ public:
 	CCharacter *QuestGiver;			/// Quest giver
 	CDialogue *IntroductionDialogue;
 	LuaCallback *Conditions;
-	LuaCallback *CompletionConditions;
 	LuaCallback *CompletionEffects;
 	std::vector<std::string> Objectives;	/// The objectives of this quest (used for the briefing only)
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
+	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 };
 
 class CAchievement

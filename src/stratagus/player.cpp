@@ -1030,6 +1030,22 @@ void CPlayer::Save(CFile &file) const
 		file.printf("\"%s\",", p.CompletedQuests[j]->Ident.c_str());
 	}
 	file.printf("},");
+	
+	file.printf("\n  \"quest-destroy-units\", {");
+	for (size_t j = 0; j < p.QuestDestroyUnits.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestDestroyUnits[j])->Ident.c_str());
+		file.printf("\"%s\",", std::get<1>(p.QuestDestroyUnits[j])->Ident.c_str());
+		if (std::get<2>(p.QuestDestroyUnits[j])) {
+			file.printf("\"%s\",", std::get<2>(p.QuestDestroyUnits[j])->Name.c_str());
+		} else {
+			file.printf("\"%s\",", "");
+		}
+		file.printf("%d,", std::get<3>(p.QuestDestroyUnits[j]));
+	}
+	file.printf("},");
 	//Wyrmgus end
 
 	// UnitColors done by init code.
@@ -1066,12 +1082,22 @@ void CreatePlayer(int type)
 }
 
 //Wyrmgus start
-CPlayer *GetOrAddFactionPlayer(CFaction *faction)
+CPlayer *GetFactionPlayer(CFaction *faction)
 {
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
 			return &Players[i];
 		}
+	}
+	
+	return NULL;
+}
+
+CPlayer *GetOrAddFactionPlayer(CFaction *faction)
+{
+	CPlayer *faction_player = GetFactionPlayer(faction);
+	if (faction_player) {
+		return faction_player;
 	}
 	
 	// no player belonging to this faction, so let's make an unused player slot be created for it
@@ -1530,6 +1556,7 @@ void CPlayer::Clear()
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
+	this->QuestDestroyUnits.clear();
 	//Wyrmgus end
 	AiEnabled = false;
 	//Wyrmgus start
@@ -1694,17 +1721,21 @@ void CPlayer::UpdateQuestPool()
 void CPlayer::UpdateCurrentQuests()
 {
 	for (int i = ((int) this->CurrentQuests.size() - 1); i >= 0; --i) {
-		if (this->CurrentQuests[i]->CurrentCompleted) { // someone else already completed the quest
+		if (this->HasFailedQuest(this->CurrentQuests[i])) {
 			this->FailQuest(this->CurrentQuests[i]);
+		} else if (this->HasCompletedQuest(this->CurrentQuests[i])) {
+			this->CompleteQuest(this->CurrentQuests[i]);
 		}
-		
-		if (this->CurrentQuests[i]->CompletionConditions) {
-			this->CurrentQuests[i]->CompletionConditions->pushPreamble();
-			this->CurrentQuests[i]->CompletionConditions->run(1);
-			if (this->CurrentQuests[i]->CompletionConditions->popBoolean()) {
-				this->CompleteQuest(this->CurrentQuests[i]);
-			}
-		}
+	}
+}
+
+void CPlayer::AcceptQuest(CQuest *quest)
+{
+	this->AvailableQuests.erase(std::remove(this->AvailableQuests.begin(), this->AvailableQuests.end(), quest), this->AvailableQuests.end());
+	this->CurrentQuests.push_back(quest);
+	
+	for (size_t i = 0; i < quest->DestroyUnits.size(); ++i) {
+		this->QuestDestroyUnits.push_back(std::tuple<CQuest *, CUnitType *, CFaction *, int>(quest, std::get<0>(quest->DestroyUnits[i]), std::get<1>(quest->DestroyUnits[i]), std::get<2>(quest->DestroyUnits[i])));
 	}
 }
 
@@ -1729,6 +1760,20 @@ void CPlayer::CompleteQuest(CQuest *quest)
 void CPlayer::FailQuest(CQuest *quest)
 {
 	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
+}
+
+bool CPlayer::HasCompletedQuest(CQuest *quest)
+{
+	return true;
+}
+
+bool CPlayer::HasFailedQuest(CQuest *quest)
+{
+	if (quest->CurrentCompleted) { // quest already completed by someone else
+		return true;
+	}
+
+	return false;
 }
 //Wyrmgus end
 

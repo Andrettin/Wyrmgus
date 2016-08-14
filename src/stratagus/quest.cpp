@@ -173,7 +173,6 @@ CDialogue *GetDialogue(std::string dialogue_ident)
 CQuest::~CQuest()
 {
 	delete Conditions;
-	delete CompletionConditions;
 	delete CompletionEffects;
 }
 
