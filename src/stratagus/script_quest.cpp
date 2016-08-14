@@ -181,6 +181,16 @@ static int CclDefineQuest(lua_State *l)
 				
 				quest->DestroyUnits.push_back(std::tuple<CUnitType *, CFaction *, int>(unit_type, faction, quantity));				
 			}
+		} else if (!strcmp(value, "DestroyUniques")) {
+			quest->DestroyUniques.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, j + 1));
+				if (!unique) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+				quest->DestroyUniques.push_back(unique);
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

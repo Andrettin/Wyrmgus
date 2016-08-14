@@ -405,6 +405,21 @@ void CPlayer::Load(lua_State *l)
 					this->QuestDestroyUnits.push_back(std::tuple<CQuest *, CUnitType *, CFaction *, int>(quest, unit_type, faction, quantity));
 				}
 			}
+		} else if (!strcmp(value, "quest-destroy-uniques")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				++k;
+				CUniqueItem *unique = GetUniqueItem(LuaToString(l, j + 1, k + 1));
+				++k;
+				bool destroyed = LuaToBoolean(l, j + 1, k + 1);
+				if (quest) {
+					this->QuestDestroyUniques.push_back(std::tuple<CQuest *, CUniqueItem *, bool>(quest, unique, destroyed));
+				}
+			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {

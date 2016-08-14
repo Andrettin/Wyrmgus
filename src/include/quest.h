@@ -51,6 +51,7 @@ class CCharacter;
 class CDialogue;
 class CDialogueNode;
 class CFaction;
+class CUniqueItem;
 class CUnitType;
 class LuaCallback;
 
@@ -97,6 +98,7 @@ public:
 	std::vector<std::string> Objectives;	/// The objectives of this quest (used for the briefing only)
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
+	std::vector<CUniqueItem *> DestroyUniques;
 };
 
 class CAchievement

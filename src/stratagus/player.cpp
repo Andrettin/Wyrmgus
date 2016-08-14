@@ -1046,6 +1046,17 @@ void CPlayer::Save(CFile &file) const
 		file.printf("%d,", std::get<3>(p.QuestDestroyUnits[j]));
 	}
 	file.printf("},");
+	
+	file.printf("\n  \"quest-destroy-uniques\", {");
+	for (size_t j = 0; j < p.QuestDestroyUniques.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestDestroyUniques[j])->Ident.c_str());
+		file.printf("\"%s\",", std::get<1>(p.QuestDestroyUniques[j])->Ident.c_str());
+		file.printf("%s,", std::get<2>(p.QuestDestroyUniques[j]) ? "true" : "false");
+	}
+	file.printf("},");
 	//Wyrmgus end
 
 	// UnitColors done by init code.
@@ -1557,6 +1568,7 @@ void CPlayer::Clear()
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
 	this->QuestDestroyUnits.clear();
+	this->QuestDestroyUniques.clear();
 	//Wyrmgus end
 	AiEnabled = false;
 	//Wyrmgus start
@@ -1737,6 +1749,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	for (size_t i = 0; i < quest->DestroyUnits.size(); ++i) {
 		this->QuestDestroyUnits.push_back(std::tuple<CQuest *, CUnitType *, CFaction *, int>(quest, std::get<0>(quest->DestroyUnits[i]), std::get<1>(quest->DestroyUnits[i]), std::get<2>(quest->DestroyUnits[i])));
 	}
+	
+	for (size_t i = 0; i < quest->DestroyUniques.size(); ++i) {
+		this->QuestDestroyUniques.push_back(std::tuple<CQuest *, CUniqueItem *, bool>(quest, quest->DestroyUniques[i], false));
+	}
 }
 
 void CPlayer::CompleteQuest(CQuest *quest)
@@ -1764,6 +1780,18 @@ void CPlayer::FailQuest(CQuest *quest)
 
 bool CPlayer::HasCompletedQuest(CQuest *quest)
 {
+	for (size_t i = 0; i < this->QuestDestroyUnits.size(); ++i) {
+		if (std::get<0>(this->QuestDestroyUnits[i]) == quest && std::get<3>(this->QuestDestroyUnits[i]) > 0) {
+			return false;
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
+		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == false) {
+			return false;
+		}
+	}
+	
 	return true;
 }
 
@@ -1773,6 +1801,12 @@ bool CPlayer::HasFailedQuest(CQuest *quest)
 		return true;
 	}
 
+	for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
+		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == true && std::get<1>(this->QuestDestroyUniques[i])->CanDrop()) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+			return true;
+		}
+	}
+	
 	return false;
 }
 //Wyrmgus end
