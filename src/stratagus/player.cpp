@@ -1669,6 +1669,7 @@ void CPlayer::UpdateQuestPool()
 {
 	this->AvailableQuests.clear();
 	
+	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	std::vector<CQuest *> potential_quests;
 	
 	for (size_t i = 0; i < Quests.size(); ++i) {
