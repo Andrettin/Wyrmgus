@@ -803,6 +803,10 @@ void CleanTriggers()
 	}
 	Triggers.clear();
 	TriggerIdentToPointer.clear();
+	
+	for (size_t i = 0; i < Quests.size(); ++i) {
+		Quests[i]->CurrentCompleted = false;
+	}
 	//Wyrmgus end
 
 	GameTimer.Reset();

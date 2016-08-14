@@ -178,6 +178,9 @@ extern const char NameLine[];
 #define FRAMES_PER_SECOND  30  // 1/30s
 /// Game cycles per second to simulate (original 30-40)
 #define CYCLES_PER_SECOND  30  // 1/30s 0.33ms
+//Wyrmgus start
+#define CYCLES_PER_MINUTE  CYCLES_PER_SECOND * 60
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  stratagus.cpp

@@ -170,6 +170,13 @@ CDialogue *GetDialogue(std::string dialogue_ident)
 	return NULL;
 }
 
+CQuest::~CQuest()
+{
+	delete Conditions;
+	delete CompletionConditions;
+	delete CompletionEffects;
+}
+
 void CAchievement::Obtain(bool save, bool display)
 {
 	if (this->Obtained) {

@@ -551,6 +551,15 @@ static void GameLogicLoop()
 		}
 		
 		//Wyrmgus start
+		// every minute, update the quest pool
+		if (GameCycle % CYCLES_PER_MINUTE == 0) {
+			for (int player = 0; player < NumPlayers; ++player) {
+				Players[player].UpdateQuestPool();
+			}
+		}
+		//Wyrmgus end
+		
+		//Wyrmgus start
 		if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * 10 * 3) == 0) { // every 10 seconds of gameplay = 1 hour for time of day calculations, change time of day every three hours
 			if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) { // only change the time of the day if outdoors
 				GameTimeOfDay += 1;

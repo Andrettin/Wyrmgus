@@ -143,6 +143,12 @@ static int CclDefineQuest(lua_State *l)
 			} else {
 				LuaError(l, "Dialogue \"%s\" doesn't exist." _C_ dialogue_ident.c_str());
 			}
+		} else if (!strcmp(value, "Conditions")) {
+			quest->Conditions = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "CompletionConditions")) {
+			quest->CompletionConditions = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "CompletionEffects")) {
+			quest->CompletionEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Objectives")) {
 			quest->Objectives.clear();
 			const int args = lua_rawlen(l, -1);

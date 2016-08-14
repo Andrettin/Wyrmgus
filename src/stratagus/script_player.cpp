@@ -364,6 +364,31 @@ void CPlayer::Load(lua_State *l)
 			this->Color = Video.MapRGB(TheScreen->format, r, g, b);
 		*/
 		//Wyrmgus end
+		//Wyrmgus start
+		} else if (!strcmp(value, "current-quests")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				if (quest) {
+					this->CurrentQuests.push_back(quest);
+				}
+			}
+		} else if (!strcmp(value, "completed-quests")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				if (quest) {
+					this->CompletedQuests.push_back(quest);
+					quest->CurrentCompleted = true;
+				}
+			}
+		//Wyrmgus end
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

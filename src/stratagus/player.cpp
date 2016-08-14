@@ -53,12 +53,15 @@
 #include "iolib.h"
 //Wyrmgus start
 #include "grand_strategy.h"
+#include "luacallback.h"
 //Wyrmgus end
 #include "map.h"
 #include "network.h"
 #include "netconnect.h"
 //Wyrmgus start
 #include "parameters.h"
+#include "quest.h"
+#include "settings.h"
 //Wyrmgus end
 #include "sound.h"
 #include "translate.h"
@@ -999,7 +1002,7 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\n  \"speed-train\", %d,", p.SpeedTrain);
 	file.printf("\n  \"speed-upgrade\", %d,", p.SpeedUpgrade);
 	file.printf("\n  \"speed-research\", %d,", p.SpeedResearch);
-
+	
 	//Wyrmgus start
 	/*
 	Uint8 r, g, b;
@@ -1007,6 +1010,26 @@ void CPlayer::Save(CFile &file) const
 	SDL_GetRGB(p.Color, TheScreen->format, &r, &g, &b);
 	file.printf("\n  \"color\", { %d, %d, %d },", r, g, b);
 	*/
+	//Wyrmgus end
+
+	//Wyrmgus start
+	file.printf("\n  \"current-quests\", {");
+	for (size_t j = 0; j < p.CurrentQuests.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", p.CurrentQuests[j]->Ident.c_str());
+	}
+	file.printf("},");
+	
+	file.printf("\n  \"completed-quests\", {");
+	for (size_t j = 0; j < p.CompletedQuests.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", p.CompletedQuests[j]->Ident.c_str());
+	}
+	file.printf("},");
 	//Wyrmgus end
 
 	// UnitColors done by init code.
@@ -1503,6 +1526,9 @@ void CPlayer::Clear()
 	memset(UnitTypesNonHeroCount, 0, sizeof(UnitTypesNonHeroCount));
 	memset(UnitTypesStartingNonHeroCount, 0, sizeof(UnitTypesStartingNonHeroCount));
 	this->Heroes.clear();
+	this->AvailableQuests.clear();
+	this->CurrentQuests.clear();
+	this->CompletedQuests.clear();
 	//Wyrmgus end
 	AiEnabled = false;
 	//Wyrmgus start
@@ -1615,6 +1641,61 @@ void CPlayer::UpdateLevelUpUnits()
 			LevelUpUnits.push_back(&unit);
 		}
 	}
+}
+
+void CPlayer::UpdateQuestPool()
+{
+	this->AvailableQuests.clear();
+	
+	for (size_t i = 0; i < Quests.size(); ++i) {
+		if (!Quests[i]->Hidden && std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), Quests[i]) == this->CurrentQuests.end() && std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), Quests[i]) == this->CompletedQuests.end() && Quests[i]->Conditions) {
+			Quests[i]->Conditions->pushPreamble();
+			Quests[i]->Conditions->run(1);
+			if (Quests[i]->Conditions->popBoolean()) {
+				this->AvailableQuests.push_back(Quests[i]);
+			}
+		}
+	}
+}
+
+void CPlayer::UpdateCurrentQuests()
+{
+	for (int i = ((int) this->CurrentQuests.size() - 1); i >= 0; --i) {
+		if (this->CurrentQuests[i]->CurrentCompleted) { // someone else already completed the quest
+			this->FailQuest(this->CurrentQuests[i]);
+		}
+		
+		if (this->CurrentQuests[i]->CompletionConditions) {
+			this->CurrentQuests[i]->CompletionConditions->pushPreamble();
+			this->CurrentQuests[i]->CompletionConditions->run(1);
+			if (this->CurrentQuests[i]->CompletionConditions->popBoolean()) {
+				this->CompleteQuest(this->CurrentQuests[i]);
+			}
+		}
+	}
+}
+
+void CPlayer::CompleteQuest(CQuest *quest)
+{
+	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
+	this->CompletedQuests.push_back(quest);
+	quest->CurrentCompleted = true;
+	
+	if (this == ThisPlayer) {
+		SetQuestCompleted(quest->Ident, GameSettings.Difficulty);
+	}
+
+	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+	
+	if (quest->CompletionEffects) {
+		quest->CompletionEffects->pushPreamble();
+		quest->CompletionEffects->run();
+	}
+}
+
+void CPlayer::FailQuest(CQuest *quest)
+{
+	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
 }
 //Wyrmgus end
 
@@ -2017,6 +2098,9 @@ void PlayersEachSecond(int playerIdx)
 	}
 
 	player.UpdateFreeWorkers();
+	//Wyrmgus start
+	player.UpdateCurrentQuests();
+	//Wyrmgus end
 }
 
 /**

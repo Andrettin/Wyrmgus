@@ -57,10 +57,11 @@ class CQuest
 public:
 	CQuest() :
 		Civilization(-1), TechnologyPoints(0), PlayerColor(0), HighestCompletedDifficulty(-1),
-		Hidden(false), Completed(false),
-		QuestGiver(NULL), IntroductionDialogue(NULL)
+		Hidden(false), Completed(false), CurrentCompleted(false),
+		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionConditions(NULL), CompletionEffects(NULL)
 	{
 	}
+	~CQuest();
 	
 	std::string Ident;				/// Ident of the quest
 	std::string Name;				/// Name of the quest
@@ -85,9 +86,13 @@ public:
 	int HighestCompletedDifficulty;
 	bool Hidden;					/// Whether the quest is hidden
 	bool Completed;					/// Whether the quest has been completed
+	bool CurrentCompleted;			/// Whether the quest has been completed in the current game
 	IconConfig Icon;				/// Quest's icon
 	CCharacter *QuestGiver;			/// Quest giver
 	CDialogue *IntroductionDialogue;
+	LuaCallback *Conditions;
+	LuaCallback *CompletionConditions;
+	LuaCallback *CompletionEffects;
 	std::vector<std::string> Objectives;	/// The objectives of this quest (used for the briefing only)
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 };
