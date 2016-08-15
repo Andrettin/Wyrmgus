@@ -153,6 +153,7 @@ public:
 	CTerrainType *BaseTerrain;
 	std::vector<CMapTemplate *> Subtemplates;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
+	std::vector<std::pair<CTerrainType *, int>> PlayerLocationGeneratedTerrains;
 	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;
 	std::vector<std::pair<CUnitType *, int>> GeneratedResources; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<CTerrainType *> TileTerrains;

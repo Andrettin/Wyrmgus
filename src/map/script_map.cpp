@@ -708,6 +708,44 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 	
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer && Players[i].Type != PlayerRescueActive) {
+			continue;
+		}
+		for (size_t j = 0; j < map_template->PlayerLocationGeneratedTerrains.size(); ++j) {
+			int map_width = 32;
+			int map_height = 32;
+			int seed_number = map_width * map_height / 1024;
+			int expansion_number = 0;
+			
+			int degree_level = map_template->PlayerLocationGeneratedTerrains[j].second;
+			
+			if (degree_level == ExtremelyHighDegreeLevel) {
+				expansion_number = map_width * map_height / 2;
+				seed_number = map_width * map_height / 256;
+			} else if (degree_level == VeryHighDegreeLevel) {
+				expansion_number = map_width * map_height / 4;
+				seed_number = map_width * map_height / 512;
+			} else if (degree_level == HighDegreeLevel) {
+				expansion_number = map_width * map_height / 8;
+				seed_number = map_width * map_height / 1024;
+			} else if (degree_level == MediumDegreeLevel) {
+				expansion_number = map_width * map_height / 16;
+				seed_number = map_width * map_height / 2048;
+			} else if (degree_level == LowDegreeLevel) {
+				expansion_number = map_width * map_height / 32;
+				seed_number = map_width * map_height / 4096;
+			} else if (degree_level == VeryLowDegreeLevel) {
+				expansion_number = map_width * map_height / 64;
+				seed_number = map_width * map_height / 8192;
+			}
+			
+			seed_number = std::max(1, seed_number);
+			
+			Map.GenerateTerrain(map_template->PlayerLocationGeneratedTerrains[j].first, seed_number, expansion_number, Players[i].StartPos - Vec2i(16, 16), Players[i].StartPos + Vec2i(16, 16));
+		}
+	}
+	
 	for (size_t i = 0; i < map_template->GeneratedTerrains.size(); ++i) {
 		int map_width = (map_end.x - map_start_pos.x);
 		int map_height = (map_end.y - map_start_pos.y);
@@ -1290,6 +1328,25 @@ static int CclDefineMapTemplate(lua_State *l)
 				}
 				
 				map->GeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
+			}
+		} else if (!strcmp(value, "PlayerLocationGeneratedTerrains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CTerrainType *terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+				if (!terrain) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				++j;
+				
+				int degree_level = GetDegreeLevelIdByName(LuaToString(l, -1, j + 1));
+				if (degree_level == -1) {
+					LuaError(l, "Degree level doesn't exist.");
+				}
+				
+				map->PlayerLocationGeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
 			}
 		} else if (!strcmp(value, "ExternalGeneratedTerrains")) {
 			if (!lua_istable(l, -1)) {
