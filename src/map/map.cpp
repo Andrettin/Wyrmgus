@@ -394,6 +394,8 @@ Vec2i CMap::GenerateUnitLocation(CUnitType *unit_type, CFaction *faction, const 
 		return Vec2i(-1, -1);
 	}
 	
+	CPlayer *player = GetFactionPlayer(faction);
+	
 	Vec2i random_pos(0, 0);
 
 	int while_count = 0;
@@ -403,6 +405,16 @@ Vec2i CMap::GenerateUnitLocation(CUnitType *unit_type, CFaction *faction, const 
 		random_pos.y = SyncRand(max_pos.y - (unit_type->TileHeight - 1) - min_pos.y + 1) + min_pos.y;
 		
 		if (!this->Info.IsPointOnMap(random_pos) || this->IsPointInASubtemplateArea(random_pos)) {
+			continue;
+		}
+		
+		std::vector<CUnit *> table;
+		if (player != NULL) {
+			Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
+		} else {
+			Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+		}
+		if (table.size() > 0) {
 			continue;
 		}
 		
