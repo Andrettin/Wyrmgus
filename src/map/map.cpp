@@ -387,6 +387,34 @@ CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen) const
 		}
 	}
 }
+
+Vec2i CMap::GenerateUnitLocation(CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos) const
+{
+	if (SaveGameLoading) {
+		return Vec2i(-1, -1);
+	}
+	
+	Vec2i random_pos(0, 0);
+
+	int while_count = 0;
+	
+	while (while_count < 100) {
+		random_pos.x = SyncRand(max_pos.x - (unit_type->TileWidth - 1) - min_pos.x + 1) + min_pos.x;
+		random_pos.y = SyncRand(max_pos.y - (unit_type->TileHeight - 1) - min_pos.y + 1) + min_pos.y;
+		
+		if (!this->Info.IsPointOnMap(random_pos) || this->IsPointInASubtemplateArea(random_pos)) {
+			continue;
+		}
+		
+		if (UnitTypeCanBeAt(*unit_type, random_pos) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(NULL, *unit_type, random_pos, 0, true))) {
+			return random_pos;
+		}
+		
+		while_count += 1;
+	}
+	
+	return Vec2i(-1, -1);
+}
 //Wyrmgus end
 
 /**
@@ -534,7 +562,7 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *t
 	return false;
 }
 
-bool CMap::IsPointInASubtemplateArea(const Vec2i &pos)
+bool CMap::IsPointInASubtemplateArea(const Vec2i &pos) const
 {
 	for (size_t i = 0; i < this->SubtemplateAreas.size(); ++i) {
 		Vec2i min_pos = this->SubtemplateAreas[i].first;

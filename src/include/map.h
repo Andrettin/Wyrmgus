@@ -160,7 +160,7 @@ public:
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources, mapped to the tile position
-	std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>> HistoricalUnits; /// Historical units, mapped to the tile position and the year
+	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, int, int>> Units; /// Units; first value is the tile position, and the last ones are start year and end year
 };
 //Wyrmgus end
 
@@ -271,6 +271,7 @@ public:
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false) const;
 	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen = false) const;
+	Vec2i GenerateUnitLocation(CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
@@ -315,7 +316,7 @@ public:
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, bool overlay = false);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain);
-	bool IsPointInASubtemplateArea(const Vec2i &pos);
+	bool IsPointInASubtemplateArea(const Vec2i &pos) const;
 	//Wyrmgus end
 
 	//UnitCache
