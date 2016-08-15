@@ -672,7 +672,11 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 				CPlayer *player = NULL;
 				if (second_iterator->second.second) {
 					player = GetOrAddFactionPlayer(second_iterator->second.second);
-					player->SetStartView(second_iterator->second.second->StartView - template_start_pos);
+					if (Map.Info.IsPointOnMap(second_iterator->second.second->StartView - template_start_pos)) {
+						player->SetStartView(second_iterator->second.second->StartView - template_start_pos);
+					} else {
+						player->SetStartView(unit_pos);
+					}
 				} else {
 					player = &Players[PlayerNumNeutral];
 				}
@@ -713,6 +717,9 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			continue;
 		}
 		if (Map.IsPointInASubtemplateArea(Players[i].StartPos)) {
+			continue;
+		}
+		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y) {
 			continue;
 		}
 		for (size_t j = 0; j < map_template->PlayerLocationGeneratedResources.size(); ++j) {
