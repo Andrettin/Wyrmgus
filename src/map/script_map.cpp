@@ -493,12 +493,20 @@ static int CclSetMapTemplateResource(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	int resources_held = 0;
+	CUniqueItem *unique = NULL;
+	
 	const int nargs = lua_gettop(l);
-	if (nargs == 4) {
+	if (nargs >= 4) {
 		resources_held = LuaToNumber(l, 4);
 	}
+	if (nargs >= 5) {
+		unique = GetUniqueItem(LuaToString(l, 5));
+		if (!unique) {
+			LuaError(l, "Unique item doesn't exist.\n");
+		}
+	}
 	
-	map_template->Resources[std::pair<int, int>(ipos.x, ipos.y)] = std::pair<CUnitType *, int>(unittype, resources_held);
+	map_template->Resources[std::pair<int, int>(ipos.x, ipos.y)] = std::tuple<CUnitType *, int, CUniqueItem *>(unittype, resources_held, unique);
 	
 	return 1;
 }
@@ -632,20 +640,24 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	Map.AdjustTileMapIrregularities(false);
 	Map.AdjustTileMapIrregularities(true);
 	
-	for (std::map<std::pair<int, int>, std::pair<CUnitType *, int>>::iterator iterator = map_template->Resources.begin(); iterator != map_template->Resources.end(); ++iterator) {
+	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::iterator iterator = map_template->Resources.begin(); iterator != map_template->Resources.end(); ++iterator) {
 		Vec2i unit_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
 		if (!Map.Info.IsPointOnMap(unit_pos)) {
 			continue;
 		}
 		
-		Vec2i unit_offset((iterator->second.first->TileWidth - 1) / 2, (iterator->second.first->TileHeight - 1) / 2);
-		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *iterator->second.first);
+		Vec2i unit_offset((std::get<0>(iterator->second)->TileWidth - 1) / 2, (std::get<0>(iterator->second)->TileHeight - 1) / 2);
+		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *std::get<0>(iterator->second));
 		
-		if (iterator->second.second) {
-			unit->ResourcesHeld = iterator->second.second;
-			unit->Variable[GIVERESOURCE_INDEX].Value = iterator->second.second;
-			unit->Variable[GIVERESOURCE_INDEX].Max = iterator->second.second;
+		if (std::get<1>(iterator->second)) {
+			unit->ResourcesHeld = std::get<1>(iterator->second);
+			unit->Variable[GIVERESOURCE_INDEX].Value = std::get<1>(iterator->second);
+			unit->Variable[GIVERESOURCE_INDEX].Max = std::get<1>(iterator->second);
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+		}
+		
+		if (std::get<2>(iterator->second)) {
+			unit->SetUnique(std::get<2>(iterator->second));
 		}
 	}
 	

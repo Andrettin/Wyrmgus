@@ -106,6 +106,7 @@ class CUnit;
 class CUnitType;
 //Wyrmgus start
 class CFaction;
+class CUniqueItem;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -156,7 +157,7 @@ public:
 	std::vector<std::pair<CUnitType *, int>> GeneratedResources; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
-	std::map<std::pair<int, int>, std::pair<CUnitType *, int>> Resources; /// Resources, mapped to the tile position
+	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources, mapped to the tile position
 	std::map<std::pair<int, int>, std::map<int, std::pair<CUnitType *, CFaction *>>> HistoricalUnits; /// Historical units, mapped to the tile position and the year
 };
 //Wyrmgus end
