@@ -156,6 +156,7 @@ public:
 	std::vector<std::pair<CTerrainType *, int>> PlayerLocationGeneratedTerrains;
 	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;
 	std::vector<std::pair<CUnitType *, int>> GeneratedResources; /// the first element of the pair is the resource's unit type, and the second is the quantity
+	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedResources;
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources, mapped to the tile position

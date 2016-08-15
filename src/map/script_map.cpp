@@ -712,9 +712,12 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer && Players[i].Type != PlayerRescueActive) {
 			continue;
 		}
+		for (size_t j = 0; j < map_template->PlayerLocationGeneratedResources.size(); ++j) {
+			Map.GenerateResources(map_template->PlayerLocationGeneratedResources[j].first, map_template->PlayerLocationGeneratedResources[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8));
+		}
 		for (size_t j = 0; j < map_template->PlayerLocationGeneratedTerrains.size(); ++j) {
-			int map_width = 32;
-			int map_height = 32;
+			int map_width = 16;
+			int map_height = 16;
 			int seed_number = map_width * map_height / 1024;
 			int expansion_number = 0;
 			
@@ -742,7 +745,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			
 			seed_number = std::max(1, seed_number);
 			
-			Map.GenerateTerrain(map_template->PlayerLocationGeneratedTerrains[j].first, seed_number, expansion_number, Players[i].StartPos - Vec2i(16, 16), Players[i].StartPos + Vec2i(16, 16));
+			Map.GenerateTerrain(map_template->PlayerLocationGeneratedTerrains[j].first, seed_number, expansion_number, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8));
 		}
 	}
 	
@@ -1382,6 +1385,22 @@ static int CclDefineMapTemplate(lua_State *l)
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
 				map->GeneratedResources.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+			}
+		} else if (!strcmp(value, "PlayerLocationGeneratedResources")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+				++j;
+				
+				int quantity = LuaToNumber(l, -1, j + 1);
+				
+				map->PlayerLocationGeneratedResources.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
