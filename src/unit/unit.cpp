@@ -4965,6 +4965,22 @@ static void HitUnit_IncreaseScoreForKill(CUnit &attacker, CUnit &target)
 	attacker.Variable[KILL_INDEX].Value++;
 	attacker.Variable[KILL_INDEX].Max++;
 	attacker.Variable[KILL_INDEX].Enable = 1;
+	
+	//Wyrmgus start
+	for (size_t i = 0; i < attacker.Player->QuestDestroyUnits.size(); ++i) {
+		if (std::get<1>(attacker.Player->QuestDestroyUnits[i]) == target.Type && (std::get<2>(attacker.Player->QuestDestroyUnits[i]) == NULL || (std::get<2>(attacker.Player->QuestDestroyUnits[i])->Civilization == target.Player->Race && std::get<2>(attacker.Player->QuestDestroyUnits[i])->ID == target.Player->Faction))) {
+			std::get<3>(attacker.Player->QuestDestroyUnits[i]) -= 1;
+		}
+	}
+	
+	if (target.Unique) {
+		for (size_t i = 0; i < attacker.Player->QuestDestroyUniques.size(); ++i) {
+			if (std::get<1>(attacker.Player->QuestDestroyUniques[i]) == target.Unique) {
+				std::get<2>(attacker.Player->QuestDestroyUniques[i]) = true;
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 static void HitUnit_ApplyDamage(CUnit *attacker, CUnit &target, int damage)
