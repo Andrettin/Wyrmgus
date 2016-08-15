@@ -631,7 +631,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 						expansion_number = map_width * map_height / 64;
 					}
 					
-					Map.GenerateTerrain(map_template->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1));
+					Map.GenerateTerrain(map_template->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !map_template->Subtemplates[i]->TerrainFile.empty());
 				}
 				break;
 			}
@@ -761,7 +761,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			
 			seed_number = std::max(1, seed_number);
 			
-			Map.GenerateTerrain(map_template->PlayerLocationGeneratedTerrains[j].first, seed_number, expansion_number, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8));
+			Map.GenerateTerrain(map_template->PlayerLocationGeneratedTerrains[j].first, seed_number, expansion_number, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), !map_template->TerrainFile.empty());
 		}
 	}
 	
@@ -795,7 +795,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		
 		seed_number = std::max(1, seed_number);
 		
-		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1));
+		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !map_template->TerrainFile.empty());
 	}
 	
 	for (size_t i = 0; i < map_template->GeneratedResources.size(); ++i) {

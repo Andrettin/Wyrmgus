@@ -247,7 +247,7 @@ public:
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
 	void AdjustTileMapIrregularities(bool overlay = false);
 	void AdjustTileMapTransitions();
-	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos);
+	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline = false);
 	void GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos);
 	//Wyrmgus end
 
