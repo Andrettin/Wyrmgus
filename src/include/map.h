@@ -314,7 +314,7 @@ public:
 	
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
-	bool TileBordersOnlySameTerrain(const Vec2i &pos, bool overlay = false);
+	bool TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrain);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain);
 	bool IsPointInASubtemplateArea(const Vec2i &pos) const;
 	//Wyrmgus end

@@ -526,7 +526,7 @@ bool CMap::CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay)
 	return true;
 }
 
-bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, bool overlay)
+bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrain)
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -536,11 +536,12 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, bool overlay)
 			}
 			CTerrainType *top_terrain = GetTileTopTerrain(pos);
 			CTerrainType *adjacent_top_terrain = GetTileTopTerrain(adjacent_pos);
-			if (!overlay) {
+			if (!new_terrain->Overlay) {
 				if (
 					adjacent_top_terrain
 					&& adjacent_top_terrain != top_terrain
-					&& std::find(top_terrain->InnerBorderTerrains.begin(), top_terrain->InnerBorderTerrains.end(), adjacent_top_terrain) == top_terrain->InnerBorderTerrains.end()
+					&& (std::find(top_terrain->InnerBorderTerrains.begin(), top_terrain->InnerBorderTerrains.end(), adjacent_top_terrain) == top_terrain->InnerBorderTerrains.end() || std::find(new_terrain->InnerBorderTerrains.begin(), new_terrain->InnerBorderTerrains.end(), adjacent_top_terrain) == new_terrain->InnerBorderTerrains.end())
+					&& adjacent_top_terrain != new_terrain
 				) {
 					return false;
 				}
@@ -549,6 +550,7 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, bool overlay)
 					adjacent_top_terrain
 					&& adjacent_top_terrain != top_terrain
 					&& std::find(top_terrain->BaseTerrains.begin(), top_terrain->BaseTerrains.end(), adjacent_top_terrain) == top_terrain->BaseTerrains.end() && std::find(adjacent_top_terrain->BaseTerrains.begin(), adjacent_top_terrain->BaseTerrains.end(), top_terrain) == adjacent_top_terrain->BaseTerrains.end()
+					&& adjacent_top_terrain != new_terrain
 				) {
 					return false;
 				}
@@ -1419,9 +1421,9 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 			(
 				(
 					!terrain->Overlay
-					&& (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), tile_terrain) != terrain->InnerBorderTerrains.end() || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(random_pos)))
+					&& std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(random_pos, terrain)
 				)
-				|| (terrain->Overlay && std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(random_pos, true))
+				|| (terrain->Overlay && std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(random_pos, terrain))
 			)
 			&& (!GetTileTopTerrain(random_pos)->Overlay || GetTileTopTerrain(random_pos) == terrain)
 			&& (!preserve_coastline || (terrain->Flags & MapFieldWaterAllowed) == (tile_terrain->Flags & MapFieldWaterAllowed))
@@ -1445,15 +1447,15 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						(
 							(
 								!terrain->Overlay
-								&& (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), diagonal_tile_terrain) != terrain->InnerBorderTerrains.end() || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), diagonal_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos)))
-								&& (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), vertical_tile_terrain) != terrain->InnerBorderTerrains.end() || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), vertical_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos)))
-								&& (std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), horizontal_tile_terrain) != terrain->InnerBorderTerrains.end() || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), horizontal_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos)))
+								&& std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), diagonal_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos, terrain)
+								&& std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), vertical_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos, terrain)
+								&& std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), horizontal_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos, terrain)
 							)
 							|| (
 								terrain->Overlay
-								&& std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), diagonal_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos, true)
-								&& std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), vertical_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos, true)
-								&& std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), horizontal_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos, true)
+								&& std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), diagonal_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos, terrain)
+								&& std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), vertical_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos, terrain)
+								&& std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), horizontal_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos, terrain)
 							)
 						)
 						&& (!GetTileTopTerrain(diagonal_pos)->Overlay || GetTileTopTerrain(diagonal_pos) == terrain) && (!GetTileTopTerrain(vertical_pos)->Overlay || GetTileTopTerrain(vertical_pos) == terrain) && (!GetTileTopTerrain(horizontal_pos)->Overlay || GetTileTopTerrain(horizontal_pos) == terrain)
@@ -1489,7 +1491,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 		if (
 			this->Info.IsPointOnMap(random_pos)
 			&& GetTileTerrain(random_pos, terrain->Overlay) == terrain
-			&& (!terrain->Overlay || this->TileBordersOnlySameTerrain(random_pos, true))
+			&& (!terrain->Overlay || this->TileBordersOnlySameTerrain(random_pos, terrain))
 		) {
 			std::vector<Vec2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
@@ -1509,16 +1511,16 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						(
 							(
 								!terrain->Overlay
-								&& (diagonal_tile_terrain == terrain || std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), diagonal_tile_terrain) != terrain->InnerBorderTerrains.end() || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), diagonal_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos)))
-								&& (vertical_tile_terrain == terrain || std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), vertical_tile_terrain) != terrain->InnerBorderTerrains.end() || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), vertical_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos)))
-								&& (horizontal_tile_terrain == terrain || std::find(terrain->InnerBorderTerrains.begin(), terrain->InnerBorderTerrains.end(), horizontal_tile_terrain) != terrain->InnerBorderTerrains.end() || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), horizontal_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos)))
+								&& (diagonal_tile_terrain == terrain || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), diagonal_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos, terrain)))
+								&& (vertical_tile_terrain == terrain || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), vertical_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos, terrain)))
+								&& (horizontal_tile_terrain == terrain || (std::find(terrain->BorderTerrains.begin(), terrain->BorderTerrains.end(), horizontal_tile_terrain) != terrain->BorderTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos, terrain)))
 								&& (diagonal_tile_terrain != terrain || vertical_tile_terrain != terrain || horizontal_tile_terrain != terrain)
 							)
 							|| (
 								terrain->Overlay
-								&& ((std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), diagonal_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos, true)) || GetTileTerrain(diagonal_pos, terrain->Overlay) == terrain)
-								&& ((std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), vertical_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos, true)) || GetTileTerrain(vertical_pos, terrain->Overlay) == terrain)
-								&& ((std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), horizontal_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos, true)) || GetTileTerrain(horizontal_pos, terrain->Overlay) == terrain)
+								&& ((std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), diagonal_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(diagonal_pos, terrain)) || GetTileTerrain(diagonal_pos, terrain->Overlay) == terrain)
+								&& ((std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), vertical_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(vertical_pos, terrain)) || GetTileTerrain(vertical_pos, terrain->Overlay) == terrain)
+								&& ((std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), horizontal_tile_terrain) != terrain->BaseTerrains.end() && this->TileBordersOnlySameTerrain(horizontal_pos, terrain)) || GetTileTerrain(horizontal_pos, terrain->Overlay) == terrain)
 								&& (GetTileTerrain(diagonal_pos, terrain->Overlay) != terrain || GetTileTerrain(vertical_pos, terrain->Overlay) != terrain || GetTileTerrain(horizontal_pos, terrain->Overlay) != terrain)
 							)
 						)
