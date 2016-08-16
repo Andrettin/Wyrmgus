@@ -498,6 +498,14 @@ static int CclSetThisPlayer(lua_State *l)
 	
 	//Wyrmgus start
 	UI.Load();
+	
+	if (GameRunning) {
+		for (size_t i = 0; i < ThisPlayer->CurrentQuests.size(); ++i) {
+			for (size_t j = 0; j < ThisPlayer->CurrentQuests[i]->Objectives.size(); ++j) {
+				SetObjective(ThisPlayer->CurrentQuests[i]->Objectives[j].c_str());
+			}
+		}
+	}
 	//Wyrmgus end
 
 	lua_pushnumber(l, plynr);

@@ -225,6 +225,7 @@ public:
 	void UpdateLevelUpUnits();
 	void UpdateHeroPool();
 	void UpdateQuestPool();
+	void AvailableQuestsChanged();
 	void UpdateCurrentQuests();
 	void AcceptQuest(CQuest *quest);
 	void CompleteQuest(CQuest *quest);

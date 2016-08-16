@@ -1732,6 +1732,22 @@ void CPlayer::UpdateQuestPool()
 		this->AvailableQuests.push_back(potential_quests[SyncRand(potential_quests.size())]);
 		potential_quests.erase(std::remove(potential_quests.begin(), potential_quests.end(), this->AvailableQuests[this->AvailableQuests.size() - 1]), potential_quests.end());
 	}
+	
+	this->AvailableQuestsChanged();
+}
+
+void CPlayer::AvailableQuestsChanged()
+{
+	if (this == ThisPlayer) {
+		for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
+			if (UnitButtonTable[i]->Action != ButtonQuest || UnitButtonTable[i]->Value >= (int) this->AvailableQuests.size()) {
+				continue;
+			}
+			
+			UnitButtonTable[i]->Hint = "Quest: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Name;
+			UnitButtonTable[i]->Description = this->AvailableQuests[UnitButtonTable[i]->Value]->Description;
+		}
+	}
 }
 
 void CPlayer::UpdateCurrentQuests()
@@ -1763,6 +1779,8 @@ void CPlayer::AcceptQuest(CQuest *quest)
 			SetObjective(quest->Objectives[i].c_str());
 		}
 	}
+	
+	this->AvailableQuestsChanged();
 }
 
 void CPlayer::CompleteQuest(CQuest *quest)
