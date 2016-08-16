@@ -43,6 +43,9 @@
 //Wyrmgus end
 #include "net_message.h"
 #include "network.h"
+//Wyrmgus start
+#include "quest.h"
+//Wyrmgus end
 #include "replay.h"
 #include "spells.h"
 #include "unit.h"
@@ -149,6 +152,22 @@ void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos)
 		CommandRallyPoint(unit, pos);
 	} else {
 		NetworkSendCommand(MessageCommandMove, unit, pos.x, pos.y, NoUnitP, 0, 0);
+	}
+}
+
+/**
+** Send command: Accept new quest for the unit's player.
+**
+** @param unit    pointer to unit.
+** @param pos     map tile position to move to.
+*/
+void SendCommandQuest(CUnit &unit, CQuest *quest)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("quest", &unit, 0, 0, 0, NoUnitP, quest->Ident.c_str(), -1);
+		CommandQuest(unit, quest);
+	} else {
+		NetworkSendCommand(MessageCommandQuest, unit, quest->ID, 0, NoUnitP, NULL, 0);
 	}
 }
 
@@ -881,6 +900,13 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandLog("cancel-research", &unit, FlushCommands, -1, -1, NoUnitP, NULL, -1);
 			CommandCancelResearch(unit);
 			break;
+		//Wyrmgus start
+		case MessageCommandQuest: {
+			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, Quests[arg1]->Ident.c_str(), -1);
+			CommandQuest(unit, Quests[arg1]);
+			break;
+		}
+		//Wyrmgus end
 		default: {
 			int id = (msgnr & 0x7f) - MessageCommandSpellCast;
 			if (arg2 != (unsigned short)0xFFFF) {

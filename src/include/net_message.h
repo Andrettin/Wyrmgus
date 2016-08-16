@@ -318,6 +318,9 @@ enum _message_type_ {
 	MessageCommandCancelUpgrade,   /// Unit command cancel upgrade
 	MessageCommandResearch,        /// Unit command research
 	MessageCommandCancelResearch,  /// Unit command cancel research
+	//Wyrmgus start
+	MessageCommandQuest,           /// Unit command quest
+	//Wyrmgus end
 
 	MessageExtendedCommand,        /// Command is the next byte
 

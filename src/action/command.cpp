@@ -390,6 +390,20 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 	*order = COrder::NewActionPickUp(dest);
 	ClearSavedAction(unit);
 }
+
+/**
+**  Accept new quest for unit's player
+**
+**  @param unit   pointer to unit.
+**  @param quest  quest.
+*/
+void CommandQuest(CUnit &unit, CQuest *quest)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	unit.Player->AcceptQuest(quest);
+}
 //Wyrmgus end
 
 /**

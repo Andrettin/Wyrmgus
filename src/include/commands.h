@@ -47,6 +47,9 @@ class CFile;
 class SpellType;
 class CUnitType;
 class CUpgrade;
+//Wyrmgus start
+class CQuest;
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -77,6 +80,8 @@ extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
 extern void CommandRallyPoint(CUnit &unit, const Vec2i &pos);
 /// Prepare command pick up
 extern void CommandPickUp(CUnit &unit, CUnit &dest, int flush);
+/// Prepare command quest
+extern void CommandQuest(CUnit &unit, CQuest *quest);
 //Wyrmgus end
 /// Prepare command repair
 extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
@@ -156,6 +161,8 @@ extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush);
 //Wyrmgus start
 /// Send rally point command
 extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos);
+/// Send quest command
+extern void SendCommandQuest(CUnit &unit, CQuest *quest);
 /// Send pick up command
 extern void SendCommandPickUp(CUnit &unit, CUnit &dest, int flush);
 //Wyrmgus end

@@ -313,6 +313,7 @@ private:
 	void DoClicked_LearnAbility(int button);
 	void DoClicked_ExperienceUpgradeTo(int button);
 	void DoClicked_RallyPoint(int button);
+	void DoClicked_Quest(int button);
 	//Wyrmgus end
 
 

@@ -1206,6 +1206,8 @@ void CButtonPanel::Draw()
 			button_icon = Selected[0]->UnitInside->GetButtonIcon(buttons[i].Action);
 		} else if (buttons[i].Icon.Name.empty() && Selected[0]->GetButtonIcon(buttons[i].Action) != NULL) {
 			button_icon = Selected[0]->GetButtonIcon(buttons[i].Action);
+		} else if (buttons[i].Icon.Name.empty() && buttons[i].Action == ButtonQuest && buttons[i].Value < (int) Selected[0]->Player->AvailableQuests.size()) {
+			button_icon = Selected[0]->Player->AvailableQuests[buttons[i].Value]->Icon.Icon;
 		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer) != NULL && !UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
 		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
@@ -1478,6 +1480,11 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonCancelBuild:
 			res = unit.CurrentAction() == UnitActionBuilt;
 			break;
+		//Wyrmgus start
+		case ButtonQuest:
+			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size();
+			break;
+		//Wyrmgus end
 	}
 #if 0
 	// there is a additional check function -- call it
@@ -1983,6 +1990,15 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 		UI.ButtonPanel.Update();
 	}
 }
+
+void CButtonPanel::DoClicked_Quest(int button)
+{
+	const int index = CurrentButtons[button].Value;
+	SendCommandQuest(*Selected[0], Selected[0]->Player->AvailableQuests[index]);
+	if (Selected[0]->Player == ThisPlayer) {
+		SelectedUnitChanged();
+	}
+}
 //Wyrmgus end
 
 void CButtonPanel::DoClicked_CallbackAction(int button)
@@ -2054,6 +2070,7 @@ void CButtonPanel::DoClicked(int button)
 		//Wyrmgus start
 		case ButtonLearnAbility: { DoClicked_LearnAbility(button); break; }
 		case ButtonExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
+		case ButtonQuest: { DoClicked_Quest(button); break; }
 		//Wyrmgus end
 	}
 }

@@ -1757,6 +1757,12 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	for (size_t i = 0; i < quest->DestroyUniques.size(); ++i) {
 		this->QuestDestroyUniques.push_back(std::tuple<CQuest *, CUniqueItem *, bool>(quest, quest->DestroyUniques[i], false));
 	}
+	
+	if (this == ThisPlayer) {
+		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
+			SetObjective(quest->Objectives[i].c_str());
+		}
+	}
 }
 
 void CPlayer::CompleteQuest(CQuest *quest)

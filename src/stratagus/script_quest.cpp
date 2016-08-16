@@ -68,6 +68,7 @@ static int CclDefineQuest(lua_State *l)
 	CQuest *quest = GetQuest(quest_ident);
 	if (!quest) {
 		quest = new CQuest;
+		quest->ID = Quests.size();
 		Quests.push_back(quest);
 		quest->Ident = quest_ident;
 	}

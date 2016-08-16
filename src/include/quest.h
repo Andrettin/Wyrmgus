@@ -59,7 +59,7 @@ class CQuest
 {
 public:
 	CQuest() :
-		Civilization(-1), TechnologyPoints(0), PlayerColor(0), HighestCompletedDifficulty(-1),
+		ID(-1), Civilization(-1), TechnologyPoints(0), PlayerColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false), CurrentCompleted(false),
 		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionEffects(NULL)
 	{
@@ -83,6 +83,7 @@ public:
 	std::string StartSpeech;		/// Speech given by the quest giver when offering the quest
 	std::string InProgressSpeech;	/// Speech given by the quest giver while the quest is in progress
 	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed
+	int ID;
 	int Civilization;				/// Which civilization the quest belongs to
 	int TechnologyPoints;			/// How many technology points the quest gives as a reward
 	int PlayerColor;				/// Player color used for the quest's icon
@@ -95,7 +96,7 @@ public:
 	CDialogue *IntroductionDialogue;
 	LuaCallback *Conditions;
 	LuaCallback *CompletionEffects;
-	std::vector<std::string> Objectives;	/// The objectives of this quest (used for the briefing only)
+	std::vector<std::string> Objectives;	/// The objectives of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 	std::vector<CUniqueItem *> DestroyUniques;

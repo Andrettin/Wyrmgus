@@ -47,6 +47,9 @@
 #include "network.h"
 #include "parameters.h"
 #include "player.h"
+//Wyrmgus start
+#include "quest.h"
+//Wyrmgus end
 #include "script.h"
 #include "settings.h"
 #include "sound.h"
@@ -959,6 +962,8 @@ static void DoNextReplay()
 	//Wyrmgus start
 	} else if (!strcmp(action, "rally-point")) {
 		SendCommandRallyPoint(*unit, pos);
+	} else if (!strcmp(action, "quest")) {
+		SendCommandQuest(*unit, GetQuest(val));
 	//Wyrmgus end
 	} else if (!strcmp(action, "diplomacy")) {
 		int state;
