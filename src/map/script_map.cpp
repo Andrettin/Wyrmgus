@@ -729,7 +729,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			continue;
 		}
 		for (size_t j = 0; j < map_template->PlayerLocationGeneratedResources.size(); ++j) {
-			Map.GenerateResources(map_template->PlayerLocationGeneratedResources[j].first, map_template->PlayerLocationGeneratedResources[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8));
+			Map.GenerateResources(map_template->PlayerLocationGeneratedResources[j].first, map_template->PlayerLocationGeneratedResources[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true);
 		}
 		for (size_t j = 0; j < map_template->PlayerLocationGeneratedTerrains.size(); ++j) {
 			int map_width = 16;

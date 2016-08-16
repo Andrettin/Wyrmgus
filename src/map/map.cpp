@@ -561,6 +561,31 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrai
 	return true;
 }
 
+bool CMap::TileBordersBuilding(const Vec2i &pos)
+{
+	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
+			if (!this->Info.IsPointOnMap(adjacent_pos) || (sub_x == 0 && sub_y == 0)) {
+				continue;
+			}
+			CMapField &mf = *Map.Field(adjacent_pos);
+			
+			const CUnitCache &cache = mf.UnitCache;
+			for (size_t i = 0; i != cache.size(); ++i) {
+				CUnit &unit = *cache[i];
+				if (unit.IsAliveOnMap()) {
+					if (unit.Type->BoolFlag[BUILDING_INDEX].value || unit.Type->GivesResource) { // also return true for resource-giving units, so that unpassable terrain isn't generated near them
+						return true;
+					}
+				}
+			}
+		}
+	}
+		
+	return false;
+}
+
 bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain)
 {
 	CMapField &mf = *Map.Field(pos);
@@ -1428,6 +1453,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 			&& (!GetTileTopTerrain(random_pos)->Overlay || GetTileTopTerrain(random_pos) == terrain)
 			&& (!preserve_coastline || (terrain->Flags & MapFieldWaterAllowed) == (tile_terrain->Flags & MapFieldWaterAllowed))
 			&& !this->TileHasUnitsIncompatibleWithTerrain(random_pos, terrain)
+			&& (!(terrain->Flags & MapFieldUnpassable) || !this->TileBordersBuilding(random_pos)) // if the terrain is unpassable, don't expand to spots adjacent to buildings
 		) {
 			std::vector<Vec2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
@@ -1461,6 +1487,8 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						&& (!GetTileTopTerrain(diagonal_pos)->Overlay || GetTileTopTerrain(diagonal_pos) == terrain) && (!GetTileTopTerrain(vertical_pos)->Overlay || GetTileTopTerrain(vertical_pos) == terrain) && (!GetTileTopTerrain(horizontal_pos)->Overlay || GetTileTopTerrain(horizontal_pos) == terrain)
 						&& (!preserve_coastline || ((terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
+						&& (!(terrain->Flags & MapFieldUnpassable) || (!this->TileBordersBuilding(diagonal_pos) && !this->TileBordersBuilding(vertical_pos) && !this->TileBordersBuilding(horizontal_pos))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
+						&& !this->IsPointInASubtemplateArea(diagonal_pos) && !this->IsPointInASubtemplateArea(vertical_pos) && !this->IsPointInASubtemplateArea(horizontal_pos)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
 					}
@@ -1527,6 +1555,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						&& (!GetTileTopTerrain(diagonal_pos)->Overlay || GetTileTopTerrain(diagonal_pos) == terrain) && (!GetTileTopTerrain(vertical_pos)->Overlay || GetTileTopTerrain(vertical_pos) == terrain) && (!GetTileTopTerrain(horizontal_pos)->Overlay || GetTileTopTerrain(horizontal_pos) == terrain) // don't expand into tiles with overlays
 						&& (!preserve_coastline || ((terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
+						&& (!(terrain->Flags & MapFieldUnpassable) || (!this->TileBordersBuilding(diagonal_pos) && !this->TileBordersBuilding(vertical_pos) && !this->TileBordersBuilding(horizontal_pos))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
 						&& (!this->IsPointInASubtemplateArea(diagonal_pos) || GetTileTerrain(diagonal_pos, terrain->Overlay) == terrain) && (!this->IsPointInASubtemplateArea(vertical_pos) || GetTileTerrain(vertical_pos, terrain->Overlay) == terrain) && (!this->IsPointInASubtemplateArea(horizontal_pos) || GetTileTerrain(horizontal_pos, terrain->Overlay) == terrain)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
@@ -1547,7 +1576,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 	}
 }
 
-void CMap::GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos)
+void CMap::GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped)
 {
 	if (SaveGameLoading) {
 		return;
@@ -1566,8 +1595,15 @@ void CMap::GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &mi
 		}
 		
 		if (UnitTypeCanBeAt(*unit_type, random_pos) && CanBuildUnitType(NULL, *unit_type, random_pos, 0, true)) {
-			CUnit *unit = CreateResourceUnit(random_pos, *unit_type);
-			count -= 1;
+			if (grouped) { // if the resources are to be grouped together
+				for (int i = 0; i < quantity; ++i) {
+					CUnit *unit = CreateResourceUnit(random_pos, *unit_type);
+					count -= 1;
+				}
+			} else {
+				CUnit *unit = CreateResourceUnit(random_pos, *unit_type);
+				count -= 1;
+			}
 		}
 		
 		while_count += 1;

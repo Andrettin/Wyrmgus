@@ -1119,11 +1119,6 @@ static int AiAssignHarvester(CUnit &unit, int resource)
 		}
 	}
 	
-	if (ret == 0 && (resource == GoldCost || resource == WoodCost)) { //if didn't find a basic resource, tell the worker to explore
-		AiPlayer->Scouts.push_back(&unit);
-		CommandStopUnit(unit);
-	}
-	
 	return ret;
 	//Wyrmgus end
 }
