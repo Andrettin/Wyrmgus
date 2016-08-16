@@ -411,14 +411,11 @@ Vec2i CMap::GenerateUnitLocation(CUnitType *unit_type, CFaction *faction, const 
 		std::vector<CUnit *> table;
 		if (player != NULL) {
 			Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
-		} else {
+		} else if (!unit_type->GivesResource) {
 			Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 		}
-		if (table.size() > 0) {
-			continue;
-		}
 		
-		if (UnitTypeCanBeAt(*unit_type, random_pos) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(NULL, *unit_type, random_pos, 0, true))) {
+		if (table.size() == 0 && UnitTypeCanBeAt(*unit_type, random_pos) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(NULL, *unit_type, random_pos, 0, true))) {
 			return random_pos;
 		}
 		
@@ -1582,31 +1579,16 @@ void CMap::GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &mi
 		return;
 	}
 	
-	Vec2i random_pos(0, 0);
-	int count = quantity;
-	int while_count = 0;
+	Vec2i resource_pos(-1, -1);
 	
-	while (count > 0 && while_count < quantity * 100) {
-		random_pos.x = SyncRand(max_pos.x - (unit_type->TileWidth - 1) - min_pos.x + 1) + min_pos.x;
-		random_pos.y = SyncRand(max_pos.y - (unit_type->TileHeight - 1) - min_pos.y + 1) + min_pos.y;
-		
-		if (!this->Info.IsPointOnMap(random_pos) || this->IsPointInASubtemplateArea(random_pos)) {
+	for (int i = 0; i < quantity; ++i) {
+		if (i == 0 || !grouped) {
+			resource_pos = GenerateUnitLocation(unit_type, NULL, min_pos, max_pos);
+		}
+		if (!this->Info.IsPointOnMap(resource_pos)) {
 			continue;
 		}
-		
-		if (UnitTypeCanBeAt(*unit_type, random_pos) && CanBuildUnitType(NULL, *unit_type, random_pos, 0, true)) {
-			if (grouped) { // if the resources are to be grouped together
-				for (int i = 0; i < quantity; ++i) {
-					CUnit *unit = CreateResourceUnit(random_pos, *unit_type);
-					count -= 1;
-				}
-			} else {
-				CUnit *unit = CreateResourceUnit(random_pos, *unit_type);
-				count -= 1;
-			}
-		}
-		
-		while_count += 1;
+		CUnit *unit = CreateResourceUnit(resource_pos, *unit_type);
 	}
 }
 //Wyrmgus end

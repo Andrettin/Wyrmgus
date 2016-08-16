@@ -1095,6 +1095,10 @@ void CreatePlayer(int type)
 //Wyrmgus start
 CPlayer *GetFactionPlayer(CFaction *faction)
 {
+	if (!faction) {
+		return NULL;
+	}
+	
 	for (int i = 0; i < NumPlayers; ++i) {
 		if (Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
 			return &Players[i];
