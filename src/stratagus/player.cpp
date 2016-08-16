@@ -1745,7 +1745,7 @@ void CPlayer::AvailableQuestsChanged()
 			}
 			
 			UnitButtonTable[i]->Hint = "Quest: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Name;
-			UnitButtonTable[i]->Description = this->AvailableQuests[UnitButtonTable[i]->Value]->Description;
+			UnitButtonTable[i]->Description = this->AvailableQuests[UnitButtonTable[i]->Value]->Description + "\n \nRewards: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Rewards;
 		}
 	}
 }
@@ -1776,7 +1776,8 @@ void CPlayer::AcceptQuest(CQuest *quest)
 	
 	if (this == ThisPlayer) {
 		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
-			SetObjective(quest->Objectives[i].c_str());
+//			SetObjective(quest->Objectives[i].c_str());
+			CclCommand("AddPlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
 		}
 	}
 	
@@ -1789,21 +1790,37 @@ void CPlayer::CompleteQuest(CQuest *quest)
 	this->CompletedQuests.push_back(quest);
 	quest->CurrentCompleted = true;
 	
-	if (this == ThisPlayer) {
-		SetQuestCompleted(quest->Ident, GameSettings.Difficulty);
-	}
-
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	
 	if (quest->CompletionEffects) {
 		quest->CompletionEffects->pushPreamble();
 		quest->CompletionEffects->run();
 	}
+	
+	if (this == ThisPlayer) {
+		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
+//			SetObjective(quest->Objectives[i].c_str());
+			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
+		}
+	}
+	
+	if (this == ThisPlayer) {
+		SetQuestCompleted(quest->Ident, GameSettings.Difficulty);
+		SaveQuestCompletion();
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\nRewards: " + quest->Rewards + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
+	}
 }
 
 void CPlayer::FailQuest(CQuest *quest)
 {
 	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
+	
+	if (this == ThisPlayer) {
+		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
+//			SetObjective(quest->Objectives[i].c_str());
+			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
+		}
+	}
 }
 
 bool CPlayer::HasCompletedQuest(CQuest *quest)

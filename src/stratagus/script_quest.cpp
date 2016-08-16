@@ -109,6 +109,8 @@ static int CclDefineQuest(lua_State *l)
 			quest->InProgressSpeech = LuaToString(l, -1);
 		} else if (!strcmp(value, "CompletionSpeech")) {
 			quest->CompletionSpeech = LuaToString(l, -1);
+		} else if (!strcmp(value, "Rewards")) {
+			quest->Rewards = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			quest->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "TechnologyPoints")) {
