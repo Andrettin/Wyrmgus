@@ -913,8 +913,25 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		if (!varinfo) {
 			continue;
 		}
-		if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
-			continue;
+		if (varinfo->Terrains.size() > 0) {
+			if (!Map.Info.IsPointOnMap(this->tilePos)) {
+				continue;
+			}
+			bool terrain_check = false;
+			for (int x = 0; x < this->Type->TileWidth; ++x) {
+				for (int y = 0; y < this->Type->TileHeight; ++y) {
+					if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y)) && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y))) != varinfo->Terrains.end()) {
+						terrain_check = true;
+						break;
+					}
+				}
+				if (terrain_check) {
+					break;
+				}
+			}
+			if (!terrain_check) {
+				continue;
+			}
 		}
 		bool upgrades_check = true;
 		bool requires_weapon = false;
@@ -2916,6 +2933,9 @@ void UnitLost(CUnit &unit)
 				}
 			} else {
 				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), unit.Character->GetFullName()), player.Heroes.end());
+				if (&unit == ThisPlayer->CustomHeroUnit) {
+					ThisPlayer->CustomHeroUnit = NULL;
+				}
 			}
 			
 			if (player.AiEnabled && player.Ai && std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {

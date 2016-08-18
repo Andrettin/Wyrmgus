@@ -162,15 +162,21 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	
 	//apply the flags from the new terrain type
 	this->Flags |= terrain->Flags;
-	// restore MapFieldAirUnpassable related to units (i.e. doors)
 	const CUnitCache &cache = this->UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
 		CUnit &unit = *cache[i];
-		if (unit.IsAliveOnMap() && unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) {
-			this->Flags |= MapFieldUnpassable;
-			this->Flags |= MapFieldAirUnpassable;
+		if (unit.IsAliveOnMap()) {
+			if (unit.Type->BoolFlag[AIRUNPASSABLE_INDEX].value) { // restore MapFieldAirUnpassable related to units (i.e. doors)
+				this->Flags |= MapFieldUnpassable;
+				this->Flags |= MapFieldAirUnpassable;
+			}
+			VariationInfo *varinfo = unit.Type->VarInfo[unit.Variation];
+			if (varinfo && varinfo->Terrains.size() > 0 && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), (this->OverlayTerrain ? this->OverlayTerrain : this->Terrain)) == varinfo->Terrains.end()) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation (this isn't perfect though, since the unit may still be allowed to keep the old variation if it has a tile size greater than 1x1)
+				unit.ChooseVariation();
+			}
 		}
 	}
+
 	this->cost = 8; // default speed
 	
 	//wood and rock tiles must always begin with the default value for their respective resource types

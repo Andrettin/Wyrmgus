@@ -167,7 +167,6 @@ public:
 	std::string TypeName;			/// Type name.
 	std::string File;				/// Variation's graphics.
 	std::string ShadowFile;			/// Variation's shadow graphics.
-	std::string Tileset;			/// Variation's tileset.
 	int FrameWidth;
 	int FrameHeight;
 	int SkinColor;
@@ -182,6 +181,7 @@ public:
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
 	std::vector<CUnitType *> ItemsEquipped;
 	std::vector<CUnitType *> ItemsNotEquipped;
+	std::vector<CTerrainType *> Terrains;
 
 	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
 	std::string FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.

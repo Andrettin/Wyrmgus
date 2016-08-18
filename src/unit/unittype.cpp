@@ -798,9 +798,6 @@ VariationInfo *CUnitType::GetDefaultVariation(CPlayer &player, int image_layer) 
 		if (!varinfo) {
 			break;
 		}
-		if (!varinfo->Tileset.empty() && varinfo->Tileset != Map.Tileset->Name) {
-			continue;
-		}
 		bool UpgradesCheck = true;
 		for (int u = 0; u < VariationMax; ++u) {
 			if (!varinfo->UpgradesRequired[u].empty() && UpgradeIdentAllowed(player, varinfo->UpgradesRequired[u].c_str()) != 'R') {

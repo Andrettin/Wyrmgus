@@ -820,7 +820,9 @@ static int CclDefineUnitType(lua_State *l)
 					for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemsNotEquipped.size(); ++i) {
 						var->ItemsNotEquipped.push_back(parent_type->VarInfo[var_n]->ItemsNotEquipped[i]);
 					}
-					var->Tileset = parent_type->VarInfo[var_n]->Tileset;
+					for (size_t i = 0; i < parent_type->VarInfo[var_n]->Terrains.size(); ++i) {
+						var->Terrains.push_back(parent_type->VarInfo[var_n]->Terrains[i]);
+					}
 					
 					for (int i = 0; i < MaxImageLayers; ++i) {
 						var->LayerFiles[i] = parent_type->VarInfo[var_n]->LayerFiles[i];
@@ -856,7 +858,9 @@ static int CclDefineUnitType(lua_State *l)
 					for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemsNotEquipped.size(); ++u) {
 						var->ItemsNotEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsNotEquipped[u]);
 					}
-					var->Tileset = parent_type->LayerVarInfo[i][j]->Tileset;
+					for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->Terrains.size(); ++u) {
+						var->Terrains.push_back(parent_type->LayerVarInfo[i][j]->Terrains[u]);
+					}
 				}
 			}
 			for (std::map<int, IconConfig>::iterator iterator = parent_type->ButtonIcons.begin(); iterator != parent_type->ButtonIcons.end(); ++iterator) {
@@ -1002,8 +1006,14 @@ static int CclDefineUnitType(lua_State *l)
 						} else {
 							LuaError(l, "Unit type %s not defined" _C_ type_ident.c_str());
 						}
-					} else if (!strcmp(value, "tileset")) {
-						var->Tileset = LuaToString(l, -1, k + 1);
+					} else if (!strcmp(value, "terrain")) {
+						std::string terrain_ident = LuaToString(l, -1, k + 1);
+						CTerrainType *terrain = GetTerrainType(terrain_ident);
+						if (terrain) {
+							var->Terrains.push_back(terrain);
+						} else {
+							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
+						}
 					} else {
 						printf("\n%s\n", type->Name.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
