@@ -1260,7 +1260,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch += um->SpeedResearch;
 	}
-	if (um->ChangeCivilizationTo != -1 && GameRunning) {
+	if (um->ChangeCivilizationTo != -1 && GameRunning && um->ChangeCivilizationTo != player.Race) {
 		player.SetCivilization(um->ChangeCivilizationTo);
 	}
 	//Wyrmgus end
@@ -1537,7 +1537,7 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		player.SpeedResearch -= um->SpeedResearch;
 	}
 	//Wyrmgus start
-	if (um->ChangeCivilizationTo != -1 && GameRunning) {
+	if (um->ChangeCivilizationTo != -1 && GameRunning && PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str()) != player.Race) {
 		player.SetCivilization(PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str())); // restore old civilization
 	}
 	//Wyrmgus end

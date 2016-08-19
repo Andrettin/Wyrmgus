@@ -388,7 +388,7 @@ CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen) const
 	}
 }
 
-Vec2i CMap::GenerateUnitLocation(CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos) const
+Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos) const
 {
 	if (SaveGameLoading) {
 		return Vec2i(-1, -1);
@@ -396,7 +396,7 @@ Vec2i CMap::GenerateUnitLocation(CUnitType *unit_type, CFaction *faction, const 
 	
 	CPlayer *player = GetFactionPlayer(faction);
 	
-	Vec2i random_pos(0, 0);
+	Vec2i random_pos(-1, -1);
 
 	int while_count = 0;
 	

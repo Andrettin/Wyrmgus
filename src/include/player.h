@@ -859,6 +859,10 @@ extern void PlayersInitAi();
 extern void PlayersEachCycle();
 /// Called each second for a given player handler (AI)
 extern void PlayersEachSecond(int player);
+//Wyrmgus start
+/// Called each minute for a given player handler (AI)
+extern void PlayersEachMinute(int player);
+//Wyrmgus end
 
 /// Change current color set to new player of the sprite
 //Wyrmgus start

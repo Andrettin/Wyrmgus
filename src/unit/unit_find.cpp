@@ -329,7 +329,7 @@ class ResourceUnitFinder
 public:
 	//Wyrmgus start
 //	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine) :
-	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool mine_on_top) :
+	ResourceUnitFinder(const CUnit &worker, const CUnit *deposit, int resource, int maxRange, bool check_usage, CUnit **resultMine, bool mine_on_top, bool ignore_exploration, bool only_unsettled_area) :
 	//Wyrmgus end
 		worker(worker),
 		resinfo(*worker.Type->ResInfo[resource]),
@@ -339,6 +339,8 @@ public:
 		check_usage(check_usage),
 		//Wyrmgus start
 		mine_on_top(mine_on_top),
+		ignore_exploration(ignore_exploration),
+		only_unsettled_area(only_unsettled_area),
 //		res_finder(resource, 1),
 		res_finder(resource, mine_on_top),
 		//Wyrmgus end
@@ -382,6 +384,8 @@ private:
 	bool check_usage;
 	//Wyrmgus start
 	bool mine_on_top;
+	bool ignore_exploration;
+	bool only_unsettled_area;
 	//Wyrmgus end
 	CResourceFinder res_finder;
 	ResourceUnitFinder_Cost bestCost;
@@ -391,6 +395,14 @@ private:
 bool ResourceUnitFinder::MineIsUsable(const CUnit &mine) const
 {
 	//Wyrmgus start
+	if (only_unsettled_area) {
+		std::vector<CUnit *> table;
+		SelectAroundUnit(mine, 8, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+		if (table.size() > 0) {
+			return false;
+		}
+	}
+	
 //	return mine.Type->BoolFlag[CANHARVEST_INDEX].value && mine.ResourcesHeld
 	return (mine_on_top ? mine.Type->BoolFlag[CANHARVEST_INDEX].value : !mine.Type->BoolFlag[CANHARVEST_INDEX].value) && mine.ResourcesHeld
 	//Wyrmgus end
@@ -420,7 +432,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 {
 	//Wyrmgus start
 //	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
-	if (!Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
@@ -467,7 +479,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						//Wyrmgus start
 //						bool check_usage, const CUnit *deposit)
-						bool check_usage, const CUnit *deposit, bool mine_on_top)
+						bool check_usage, const CUnit *deposit, bool mine_on_top, bool ignore_exploration, bool only_unsettled_area)
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
@@ -485,7 +497,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	//Wyrmgus start
 //	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine);
-	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, mine_on_top);
+	ResourceUnitFinder resourceUnitFinder(unit, deposit, resource, range, check_usage, &resultMine, mine_on_top, ignore_exploration, only_unsettled_area);
 	//Wyrmgus end
 
 	terrainTraversal.Run(resourceUnitFinder);

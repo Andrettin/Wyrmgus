@@ -551,11 +551,11 @@ static void GameLogicLoop()
 		}
 		
 		//Wyrmgus start
-		// every minute, update the quest pool
-		if (GameCycle % CYCLES_PER_MINUTE == 0) {
-			for (int player = 0; player < NumPlayers; ++player) {
-//				Players[player].UpdateHeroPool();
-				Players[player].UpdateQuestPool();
+		if (GameCycle >= CYCLES_PER_MINUTE) {
+			int player = GameCycle % CYCLES_PER_MINUTE;
+			Assert(player >= 0);
+			if (player < NumPlayers) {
+				PlayersEachMinute(player);
 			}
 		}
 		//Wyrmgus end

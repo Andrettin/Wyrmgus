@@ -271,7 +271,7 @@ public:
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false) const;
 	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen = false) const;
-	Vec2i GenerateUnitLocation(CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos) const;
+	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
