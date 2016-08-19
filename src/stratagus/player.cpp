@@ -2275,7 +2275,7 @@ void PlayersEachMinute(int playerIdx)
 	player.UpdateQuestPool(); // every minute, update the quest pool
 	
 	// split off factions
-	if (player.Faction != -1) {
+	if (player.Faction != -1 && CurrentQuest == NULL && !GrandStrategy) {
 		CFaction *faction = PlayerRaces.Factions[player.Race][player.Faction];
 		for (size_t i = 0; i < faction->SplitsTo.size(); ++i) {
 			int splitter_faction_id = PlayerRaces.GetFactionIndexByName(player.Race, faction->SplitsTo[i]);
