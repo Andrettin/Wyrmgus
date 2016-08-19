@@ -113,8 +113,12 @@ class CUniqueItem;
 --  Map
 ----------------------------------------------------------------------------*/
 
-#define MaxMapWidth  256  /// max map width supported
-#define MaxMapHeight 256  /// max map height supported
+//Wyrmgus start
+//#define MaxMapWidth  256  /// max map width supported
+//#define MaxMapHeight 256  /// max map height supported
+#define MaxMapWidth  512  /// max map width supported
+#define MaxMapHeight 512  /// max map height supported
+//Wyrmgus end
 
 //Wyrmgus start
 enum DegreeLevels {

@@ -60,7 +60,10 @@ struct Node {
 struct Open {
 	Vec2i pos;
 	short int Costs; /// complete costs to goal
-	unsigned short int O;     /// Offset into matrix
+	//Wyrmgus start
+//	unsigned short int O;     /// Offset into matrix
+	unsigned int O;     /// Offset into matrix
+	//Wyrmgus end
 };
 
 //for 32 bit signed int
