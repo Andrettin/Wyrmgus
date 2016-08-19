@@ -2356,7 +2356,12 @@ void PlayersEachMinute(int playerIdx)
 					if (UpgradeIdentAllowed(player, AllUpgrades[j]->Ident) == 'R') {
 						UpgradeAcquire(Players[new_player_id], AllUpgrades[j]);
 					}
-				}	
+				}
+				
+				if (&player == ThisPlayer) {
+					std::string dialog_text = "The " + splitter_faction->Name + " has split off from our people, settling in new lands!";
+					CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"The " + splitter_faction->Name + "\", \"" + dialog_text + "\") end;");
+				}
 			}
 		}
 	}
