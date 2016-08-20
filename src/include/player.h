@@ -147,6 +147,7 @@ public:
 	std::vector<CQuest *> CurrentQuests;		/// quests being pursued by this player
 	std::vector<CQuest *> CompletedQuests;		/// quests completed by this player
 	std::vector<std::tuple<CQuest *, CUnitType *, int>> QuestBuildUnits;	/// build units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is built it is reduced by one
+	std::vector<std::tuple<CQuest *, CUpgrade *>> QuestResearchUpgrades;
 	std::vector<std::tuple<CQuest *, CUnitType *, CFaction *, int>> QuestDestroyUnits;	/// destroy units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is destroyed it is reduced by one
 	std::vector<std::tuple<CQuest *, CUniqueItem *, bool>> QuestDestroyUniques;
 	//Wyrmgus end

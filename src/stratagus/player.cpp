@@ -1043,6 +1043,16 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
+	file.printf("\n  \"quest-research-upgrades\", {");
+	for (size_t j = 0; j < p.QuestResearchUpgrades.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestResearchUpgrades[j])->Ident.c_str());
+		file.printf("\"%s\",", std::get<1>(p.QuestResearchUpgrades[j])->Ident.c_str());
+	}
+	file.printf("},");
+	
 	file.printf("\n  \"quest-destroy-units\", {");
 	for (size_t j = 0; j < p.QuestDestroyUnits.size(); ++j) {
 		if (j) {
@@ -1584,6 +1594,7 @@ void CPlayer::Clear()
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
 	this->QuestBuildUnits.clear();
+	this->QuestResearchUpgrades.clear();
 	this->QuestDestroyUnits.clear();
 	this->QuestDestroyUniques.clear();
 	//Wyrmgus end
@@ -1792,6 +1803,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestBuildUnits.push_back(std::tuple<CQuest *, CUnitType *, int>(quest, std::get<0>(quest->BuildUnits[i]), std::get<1>(quest->BuildUnits[i])));
 	}
 	
+	for (size_t i = 0; i < quest->ResearchUpgrades.size(); ++i) {
+		this->QuestResearchUpgrades.push_back(std::tuple<CQuest *, CUpgrade *>(quest, quest->ResearchUpgrades[i]));
+	}
+	
 	for (size_t i = 0; i < quest->DestroyUnits.size(); ++i) {
 		this->QuestDestroyUnits.push_back(std::tuple<CQuest *, CUnitType *, CFaction *, int>(quest, std::get<0>(quest->DestroyUnits[i]), std::get<1>(quest->DestroyUnits[i]), std::get<2>(quest->DestroyUnits[i])));
 	}
@@ -1853,6 +1868,12 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 {
 	for (size_t i = 0; i < this->QuestBuildUnits.size(); ++i) {
 		if (std::get<0>(this->QuestBuildUnits[i]) == quest && std::get<2>(this->QuestBuildUnits[i]) > 0) {
+			return false;
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestResearchUpgrades.size(); ++i) {
+		if (std::get<0>(this->QuestResearchUpgrades[i]) == quest && UpgradeIdentAllowed(*this, std::get<1>(this->QuestResearchUpgrades[i])->Ident) != 'R') {
 			return false;
 		}
 	}

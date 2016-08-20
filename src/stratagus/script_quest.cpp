@@ -179,6 +179,17 @@ static int CclDefineQuest(lua_State *l)
 				
 				quest->BuildUnits.push_back(std::tuple<CUnitType *, int>(unit_type, quantity));
 			}
+		} else if (!strcmp(value, "ResearchUpgrades")) {
+			quest->ResearchUpgrades.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1, j + 1));
+				if (!upgrade) {
+					LuaError(l, "Upgrade doesn't exist.");
+				}
+				
+				quest->ResearchUpgrades.push_back(upgrade);
+			}
 		} else if (!strcmp(value, "DestroyUnits")) {
 			quest->DestroyUnits.clear();
 			const int args = lua_rawlen(l, -1);

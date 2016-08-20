@@ -324,6 +324,12 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			// could affect the buttons of any selected unit
 			SelectedUnitChanged();
 		}
+		
+		for (size_t i = 0; i < player.QuestBuildUnits.size(); ++i) {
+			if (std::get<1>(player.QuestBuildUnits[i]) == &newtype) {
+				std::get<2>(player.QuestBuildUnits[i]) -= 1;
+			}
+		}
 	}
 	//Wyrmgus end
 	return 1;

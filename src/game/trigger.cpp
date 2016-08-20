@@ -803,6 +803,7 @@ void CleanTriggers()
 	}
 	Triggers.clear();
 	TriggerIdentToPointer.clear();
+	DeactivatedTriggers.clear();
 	
 	for (size_t i = 0; i < Quests.size(); ++i) {
 		Quests[i]->CurrentCompleted = false;
