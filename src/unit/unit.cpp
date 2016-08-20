@@ -2692,6 +2692,13 @@ void CUnit::Place(const Vec2i &pos)
 		UnitUpdateHeading(*this);
 		CorrectWallNeighBours(*this);
 	}
+
+	//Wyrmgus start
+	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+	if (varinfo && varinfo->Terrains.size() > 0 && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos)) == varinfo->Terrains.end()) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation (this isn't perfect though, since the unit may still be allowed to keep the old variation if it has a tile size greater than 1x1)
+		this->ChooseVariation();
+	}
+	//Wyrmgus end
 }
 
 /**
