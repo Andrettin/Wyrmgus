@@ -1713,6 +1713,10 @@ void CPlayer::UpdateLevelUpUnits()
 
 void CPlayer::UpdateHeroPool()
 {
+	if (CurrentQuest != NULL || GrandStrategy) { // no hero recruitment while playing scenarios or a grand strategy game
+		return;
+	}
+	
 	this->AvailableHeroes.clear();
 	
 	std::vector<CCharacter *> potential_heroes;
@@ -1734,6 +1738,10 @@ void CPlayer::UpdateHeroPool()
 
 void CPlayer::UpdateQuestPool()
 {
+	if (CurrentQuest != NULL || GrandStrategy) { // no in-game quests while playing scenarios or a grand strategy game
+		return;
+	}
+	
 	this->AvailableQuests.clear();
 	
 	std::vector<CQuest *> potential_quests;
