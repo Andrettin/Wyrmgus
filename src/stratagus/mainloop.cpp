@@ -551,7 +551,7 @@ static void GameLogicLoop()
 		}
 		
 		//Wyrmgus start
-		int player = GameCycle % CYCLES_PER_MINUTE;
+		int player = (GameCycle - 1) % CYCLES_PER_MINUTE;
 		Assert(player >= 0);
 		if (player < NumPlayers) {
 			PlayersEachMinute(player);
