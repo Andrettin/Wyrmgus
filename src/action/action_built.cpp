@@ -201,6 +201,12 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (player.AiEnabled && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(unit.tilePos) && unit.CanMove() && unit.Active && unit.GroupId != 0 && unit.Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		player.Ai->Scouts.push_back(&unit);
 	}
+	
+	for (size_t i = 0; i < player.QuestBuildUnits.size(); ++i) {
+		if (std::get<1>(player.QuestBuildUnits[i]) == &type) {
+			std::get<2>(player.QuestBuildUnits[i]) -= 1;
+		}
+	}
 	//Wyrmgus end
 	unit.Constructed = 0;
 	if (unit.Frame < 0) {

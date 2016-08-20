@@ -388,6 +388,21 @@ void CPlayer::Load(lua_State *l)
 					quest->CurrentCompleted = true;
 				}
 			}
+		} else if (!strcmp(value, "quest-build-units")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				++k;
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, j + 1, k + 1));
+				++k;
+				int quantity = LuaToNumber(l, j + 1, k + 1);
+				if (quest) {
+					this->QuestBuildUnits.push_back(std::tuple<CQuest *, CUnitType *, int>(quest, unit_type, quantity));
+				}
+			}
 		} else if (!strcmp(value, "quest-destroy-units")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

@@ -1032,6 +1032,17 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
+	file.printf("\n  \"quest-build-units\", {");
+	for (size_t j = 0; j < p.QuestBuildUnits.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestBuildUnits[j])->Ident.c_str());
+		file.printf("\"%s\",", std::get<1>(p.QuestBuildUnits[j])->Ident.c_str());
+		file.printf("%d,", std::get<2>(p.QuestBuildUnits[j]));
+	}
+	file.printf("},");
+	
 	file.printf("\n  \"quest-destroy-units\", {");
 	for (size_t j = 0; j < p.QuestDestroyUnits.size(); ++j) {
 		if (j) {
@@ -1572,6 +1583,7 @@ void CPlayer::Clear()
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
+	this->QuestBuildUnits.clear();
 	this->QuestDestroyUnits.clear();
 	this->QuestDestroyUniques.clear();
 	//Wyrmgus end
@@ -1746,7 +1758,16 @@ void CPlayer::AvailableQuestsChanged()
 			}
 			
 			UnitButtonTable[i]->Hint = "Quest: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Name;
-			UnitButtonTable[i]->Description = this->AvailableQuests[UnitButtonTable[i]->Value]->Description + "\n \nRewards: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Rewards;
+			UnitButtonTable[i]->Description = this->AvailableQuests[UnitButtonTable[i]->Value]->Description + "\n \nObjectives:";
+			for (size_t j = 0; j < this->AvailableQuests[UnitButtonTable[i]->Value]->Objectives.size(); ++j) {
+				UnitButtonTable[i]->Description += "\n" + this->AvailableQuests[UnitButtonTable[i]->Value]->Objectives[j];
+			}
+			if (!this->AvailableQuests[UnitButtonTable[i]->Value]->Rewards.empty()) {
+				UnitButtonTable[i]->Description += "\n \nRewards: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Rewards;
+			}
+			if (!this->AvailableQuests[UnitButtonTable[i]->Value]->Hint.empty()) {
+				UnitButtonTable[i]->Description += "\n \nHint: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Hint;
+			}
 		}
 	}
 }
@@ -1766,6 +1787,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 {
 	this->AvailableQuests.erase(std::remove(this->AvailableQuests.begin(), this->AvailableQuests.end(), quest), this->AvailableQuests.end());
 	this->CurrentQuests.push_back(quest);
+	
+	for (size_t i = 0; i < quest->BuildUnits.size(); ++i) {
+		this->QuestBuildUnits.push_back(std::tuple<CQuest *, CUnitType *, int>(quest, std::get<0>(quest->BuildUnits[i]), std::get<1>(quest->BuildUnits[i])));
+	}
 	
 	for (size_t i = 0; i < quest->DestroyUnits.size(); ++i) {
 		this->QuestDestroyUnits.push_back(std::tuple<CQuest *, CUnitType *, CFaction *, int>(quest, std::get<0>(quest->DestroyUnits[i]), std::get<1>(quest->DestroyUnits[i]), std::get<2>(quest->DestroyUnits[i])));
@@ -1826,6 +1851,12 @@ void CPlayer::FailQuest(CQuest *quest)
 
 bool CPlayer::HasCompletedQuest(CQuest *quest)
 {
+	for (size_t i = 0; i < this->QuestBuildUnits.size(); ++i) {
+		if (std::get<0>(this->QuestBuildUnits[i]) == quest && std::get<2>(this->QuestBuildUnits[i]) > 0) {
+			return false;
+		}
+	}
+	
 	for (size_t i = 0; i < this->QuestDestroyUnits.size(); ++i) {
 		if (std::get<0>(this->QuestDestroyUnits[i]) == quest && std::get<3>(this->QuestDestroyUnits[i]) > 0) {
 			return false;
@@ -2275,7 +2306,7 @@ void PlayersEachMinute(int playerIdx)
 	player.UpdateQuestPool(); // every minute, update the quest pool
 	
 	// split off factions
-	if (player.Faction != -1 && CurrentQuest == NULL && !GrandStrategy) {
+	if (GameCycle >= CYCLES_PER_MINUTE && player.Faction != -1 && CurrentQuest == NULL && !GrandStrategy) { // only do this after the first minute has passed
 		CFaction *faction = PlayerRaces.Factions[player.Race][player.Faction];
 		for (size_t i = 0; i < faction->SplitsTo.size(); ++i) {
 			int splitter_faction_id = PlayerRaces.GetFactionIndexByName(player.Race, faction->SplitsTo[i]);

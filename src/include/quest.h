@@ -84,6 +84,7 @@ public:
 	std::string InProgressSpeech;	/// Speech given by the quest giver while the quest is in progress
 	std::string CompletionSpeech;	/// Speech given by the quest giver when the quest is completed
 	std::string Rewards;			/// Description of the quest's rewards
+	std::string Hint;				/// Quest hint
 	int ID;
 	int Civilization;				/// Which civilization the quest belongs to
 	int TechnologyPoints;			/// How many technology points the quest gives as a reward
@@ -99,6 +100,7 @@ public:
 	LuaCallback *CompletionEffects;
 	std::vector<std::string> Objectives;	/// The objectives of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
+	std::vector<std::tuple<CUnitType *, int>> BuildUnits;	/// Build units objective vector, containing unit type and quantity
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 	std::vector<CUniqueItem *> DestroyUniques;
 };

@@ -111,6 +111,8 @@ static int CclDefineQuest(lua_State *l)
 			quest->CompletionSpeech = LuaToString(l, -1);
 		} else if (!strcmp(value, "Rewards")) {
 			quest->Rewards = LuaToString(l, -1);
+		} else if (!strcmp(value, "Hint")) {
+			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			quest->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "TechnologyPoints")) {
@@ -163,6 +165,20 @@ static int CclDefineQuest(lua_State *l)
 				quest->BriefingSounds.push_back(LuaToString(l, -1, j + 1));
 			}
 		// objective types
+		} else if (!strcmp(value, "BuildUnits")) {
+			quest->BuildUnits.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+				++j;
+				
+				int quantity = LuaToNumber(l, -1, j + 1);
+				
+				quest->BuildUnits.push_back(std::tuple<CUnitType *, int>(unit_type, quantity));
+			}
 		} else if (!strcmp(value, "DestroyUnits")) {
 			quest->DestroyUnits.clear();
 			const int args = lua_rawlen(l, -1);
@@ -182,7 +198,7 @@ static int CclDefineQuest(lua_State *l)
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
-				quest->DestroyUnits.push_back(std::tuple<CUnitType *, CFaction *, int>(unit_type, faction, quantity));				
+				quest->DestroyUnits.push_back(std::tuple<CUnitType *, CFaction *, int>(unit_type, faction, quantity));
 			}
 		} else if (!strcmp(value, "DestroyUniques")) {
 			quest->DestroyUniques.clear();

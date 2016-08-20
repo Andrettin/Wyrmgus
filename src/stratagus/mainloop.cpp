@@ -551,12 +551,10 @@ static void GameLogicLoop()
 		}
 		
 		//Wyrmgus start
-		if (GameCycle >= CYCLES_PER_MINUTE) {
-			int player = GameCycle % CYCLES_PER_MINUTE;
-			Assert(player >= 0);
-			if (player < NumPlayers) {
-				PlayersEachMinute(player);
-			}
+		int player = GameCycle % CYCLES_PER_MINUTE;
+		Assert(player >= 0);
+		if (player < NumPlayers) {
+			PlayersEachMinute(player);
 		}
 		//Wyrmgus end
 		
