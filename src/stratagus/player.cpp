@@ -1784,6 +1784,14 @@ void CPlayer::AvailableQuestsChanged()
 			}
 		}
 	}
+	
+	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
+		for (int i = ((int) this->AvailableQuests.size() - 1); i >= 0; --i) {
+			if (this->CanAcceptQuest(this->AvailableQuests[i])) { // something may have changed, so recheck if the player is able to accept the quest
+//				this->AcceptQuest(this->AvailableQuests[i]);
+			}
+		}
+	}
 }
 
 void CPlayer::UpdateCurrentQuests()
@@ -1864,6 +1872,20 @@ void CPlayer::FailQuest(CQuest *quest)
 //			SetObjective(quest->Objectives[i].c_str());
 			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
 		}
+
+		std::string fail_reason;
+		if (quest->CurrentCompleted) { // quest already completed by someone else
+			fail_reason = "Another faction has completed the quest before you.";
+		} else {
+			for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
+				if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == true && std::get<1>(this->QuestDestroyUniques[i])->CanDrop()) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+					fail_reason = "The target no longer exists.";
+					break;
+				}
+			}
+		}
+		
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->Name + " quest! " + fail_reason + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
 	}
 }
 
