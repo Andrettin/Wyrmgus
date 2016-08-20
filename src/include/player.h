@@ -232,6 +232,7 @@ public:
 	void AcceptQuest(CQuest *quest);
 	void CompleteQuest(CQuest *quest);
 	void FailQuest(CQuest *quest);
+	bool CanAcceptQuest(CQuest *quest);
 	bool HasCompletedQuest(CQuest *quest);
 	bool HasFailedQuest(CQuest *quest);
 	//Wyrmgus end

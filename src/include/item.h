@@ -108,7 +108,7 @@ public:
 	{
 	}
 	
-	bool CanDrop();				/// Check whether this unique item can drop
+	bool CanDrop() const;				/// Check whether this unique item can drop
 
 	int ResourcesHeld;
 	std::string Ident;

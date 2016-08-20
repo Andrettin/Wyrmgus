@@ -1480,7 +1480,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		//Wyrmgus start
 		case ButtonQuest:
-			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size();
+			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->CanAcceptQuest(unit.Player->AvailableQuests[buttonaction.Value]);
 			break;
 		//Wyrmgus end
 	}

@@ -275,6 +275,9 @@ static int CclGetUniqueItemData(lua_State *l)
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
+	} else if (!strcmp(data, "CanDrop")) {
+		lua_pushboolean(l, item->CanDrop());
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

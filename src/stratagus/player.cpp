@@ -1736,20 +1736,15 @@ void CPlayer::UpdateQuestPool()
 {
 	this->AvailableQuests.clear();
 	
-	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	std::vector<CQuest *> potential_quests;
-	
 	for (size_t i = 0; i < Quests.size(); ++i) {
-		if (!Quests[i]->Hidden && !Quests[i]->CurrentCompleted && std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), Quests[i]) == this->CurrentQuests.end() && Quests[i]->Conditions) {
-			Quests[i]->Conditions->pushPreamble();
-			Quests[i]->Conditions->run(1);
-			if (Quests[i]->Conditions->popBoolean()) {
-				potential_quests.push_back(Quests[i]);
-			}
+		if (this->CanAcceptQuest(Quests[i])) {
+			potential_quests.push_back(Quests[i]);
 		}
 	}
 	
-	for (int i = 0; i < 3; ++i) { // fill the quest pool with up to three quests
+	int max_quest_pool_size = 3 - ((int) this->CurrentQuests.size());
+	for (int i = 0; i < max_quest_pool_size; ++i) { // fill the quest pool with up to three quests
 		if (potential_quests.size() == 0) {
 			break;
 		}
@@ -1861,6 +1856,30 @@ void CPlayer::FailQuest(CQuest *quest)
 //			SetObjective(quest->Objectives[i].c_str());
 			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
 		}
+	}
+}
+
+bool CPlayer::CanAcceptQuest(CQuest *quest)
+{
+	if (quest->Hidden) {
+		return false;
+	}
+	
+	if (quest->CurrentCompleted) {
+		return false;
+	}
+	
+	if (std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest) != this->CurrentQuests.end()) {
+		return false;
+	}
+	
+	if (quest->Conditions) {
+		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+		quest->Conditions->pushPreamble();
+		quest->Conditions->run(1);
+		return quest->Conditions->popBoolean();
+	} else {
+		return false;
 	}
 }
 

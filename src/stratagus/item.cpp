@@ -243,7 +243,7 @@ bool IsItemClassConsumable(int item_class)
 	return false;
 }
 
-bool CUniqueItem::CanDrop()
+bool CUniqueItem::CanDrop() const
 {
 	// unique items cannot drop if a persistent hero owns them already, or if there's already one of them in the current scenario; unless it's a character-specific bound item, in which case it can still drop
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
@@ -262,10 +262,12 @@ bool CUniqueItem::CanDrop()
 		}
 	}
 	
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (unit.Unique == this && !unit.Bound) {
-			return false;
+	if (GameRunning) {
+		for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+			CUnit &unit = **it;
+			if (unit.Unique == this && !unit.Bound) {
+				return false;
+			}
 		}
 	}
 
