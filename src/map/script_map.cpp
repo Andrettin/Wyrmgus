@@ -1195,7 +1195,7 @@ static int CclDefineTerrainType(lua_State *l)
 				} else if (tile_flag == "stumps") {
 					terrain->Flags |= MapFieldStumps;
 				} else {
-					LuaError(l, "Flag \"%s\" doesn't exist.");
+					LuaError(l, "Flag \"%s\" doesn't exist." _C_ tile_flag.c_str());
 				}
 			}
 		} else if (!strcmp(value, "Graphics")) {

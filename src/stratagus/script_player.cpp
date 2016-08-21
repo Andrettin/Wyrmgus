@@ -530,7 +530,7 @@ static int CclSetThisPlayer(lua_State *l)
 	if (GameRunning) {
 		for (size_t i = 0; i < ThisPlayer->CurrentQuests.size(); ++i) {
 			for (size_t j = 0; j < ThisPlayer->CurrentQuests[i]->Objectives.size(); ++j) {
-				SetObjective(ThisPlayer->CurrentQuests[i]->Objectives[j].c_str());
+				SetObjective("%s", ThisPlayer->CurrentQuests[i]->Objectives[j].c_str());
 			}
 		}
 	}
