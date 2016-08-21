@@ -590,6 +590,15 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 	
+	if (!PlayerFaction.empty()) {
+		CFaction *player_faction = PlayerRaces.GetFaction(-1, PlayerFaction);
+		
+		if (player_faction) {
+			ThisPlayer->SetCivilization(player_faction->Civilization);
+			ThisPlayer->SetFaction(player_faction->Name);
+		}
+	}
+	
 	for (size_t i = 0; i < map_template->Subtemplates.size(); ++i) {
 		Vec2i random_pos(0, 0);
 		Vec2i min_pos(0, 0);

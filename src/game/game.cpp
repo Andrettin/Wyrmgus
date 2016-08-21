@@ -108,6 +108,9 @@ GameResults GameResult;                      /// Outcome of the game
 
 std::string GameName;
 std::string FullGameName;
+//Wyrmgus start
+std::string PlayerFaction;
+//Wyrmgus end
 
 unsigned long GameCycle;             /// Game simulation cycle counter
 unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay

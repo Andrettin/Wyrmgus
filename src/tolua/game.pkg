@@ -38,6 +38,10 @@ extern tolua_property__s int GameSpeed;
 extern bool GameObserve;
 extern bool GameEstablishing;
 
+//Wyrmgus start
+extern std::string PlayerFaction;
+//Wyrmgus end
+
 extern unsigned long GameCycle;
 extern unsigned long FastForwardCycle;
 //Wyrmgus start
