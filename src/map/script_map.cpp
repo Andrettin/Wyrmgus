@@ -37,6 +37,9 @@
 
 #include "map.h"
 
+//Wyrmgus start
+#include "commands.h"
+//Wyrmgus end
 #include "iolib.h"
 #include "script.h"
 #include "tileset.h"
@@ -811,6 +814,14 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	
 	for (size_t i = 0; i < map_template->GeneratedResources.size(); ++i) {
 		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, map_start_pos, map_end - Vec2i(1, 1));
+	}
+	
+	// set players to hostile with each other
+	for (int i = 0; i < PlayerMax - 1; ++i) {
+		for (int j = i + 1; j < PlayerMax - 1; ++j) {
+			CommandDiplomacy(i, DiplomacyEnemy, j);
+			CommandDiplomacy(j, DiplomacyEnemy, i);
+		}
 	}
 }
 //Wyrmgus end
