@@ -261,7 +261,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			}
 			
 			//give builders experience for the construction of the structure
-			int xp_gained = type.Stats[unit.Player->Index].Costs[TimeCost] / 5;
+			int xp_gained = type.Stats[unit.Player->Index].Costs[TimeCost] / 10;
 			
 			// give experience to the builder
 			worker->Variable[XP_INDEX].Max += xp_gained / worker_count;

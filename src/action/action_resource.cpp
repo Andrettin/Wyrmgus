@@ -1227,7 +1227,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 		xp_gained *= DefaultResourcePrices[rindex];
 		xp_gained /= 100;
 	}
-	xp_gained /= 10;
+	xp_gained /= 20;
 	unit.Variable[XP_INDEX].Max += xp_gained;
 	unit.Variable[XP_INDEX].Value = unit.Variable[XP_INDEX].Max;
 	unit.XPChanged();
