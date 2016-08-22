@@ -69,7 +69,12 @@ CMapField::CMapField() :
 	OverlayTerrainDamaged(false),
 	//Wyrmgus end
 	UnitCache()
-{}
+//Wyrmgus start
+//{}
+{
+	memset(Visible, 0, sizeof(Visible));
+}
+//Wyrmgus end
 
 bool CMapField::IsTerrainResourceOnMap(int resource) const
 {

@@ -41,6 +41,9 @@
 #include "actions.h"
 #include "minimap.h"
 #include "player.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "ui.h"
 #include "unit.h"
 #include "unit_manager.h"
@@ -345,8 +348,80 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	if (!range) {
 		return;
 	}
+	
+	//Wyrmgus start
+	/*
+	std::vector<Vec2i> blocked_tiles;
+	for (int offset = 2; offset <= range; ++offset) {
+		for (int change = -1; change <= 1; change += 2) {
+			int x_offset;
+			int y_offset;
+		
+			x_offset = offset * change;
+			if (change > 0) {
+				x_offset += w - 1;
+			}
+			for (y_offset = -offset; y_offset <= (offset + (h - 1)); ++y_offset) {
+				Vec2i mpos(pos.x + x_offset, pos.y + y_offset);
+				if (!Map.Info.IsPointOnMap(mpos)) {
+					continue;
+				}
+				int direction = GetDirectionFromOffset(x_offset, y_offset);
+				Vec2i reverse_offset = GetDirectionOffset(GetReverseDirection(direction));
+				Vec2i previous_mpos(mpos + reverse_offset);
+				Vec2i previous_mpos_horizontal(mpos.x + reverse_offset.x, mpos.y);
+				Vec2i previous_mpos_vertical(mpos.x, mpos.y + reverse_offset.y);
+				if (!Map.Field(mpos)->Visible[GetReverseDirection(direction)] || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_horizontal) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_vertical) != blocked_tiles.end()) {
+					blocked_tiles.push_back(mpos);
+				}
+			}
+			
+			y_offset = offset * change;
+			if (change > 0) {
+				y_offset += h - 1;
+			}
+			for (x_offset = (-offset + 1); x_offset <= (offset - 1 + w - 1); ++x_offset) {
+				Vec2i mpos(pos.x + x_offset, pos.y + y_offset);
+				if (!Map.Info.IsPointOnMap(mpos)) {
+					continue;
+				}
+				int direction = GetDirectionFromOffset(x_offset, y_offset);
+				Vec2i reverse_offset = GetDirectionOffset(GetReverseDirection(direction));
+				Vec2i previous_mpos(mpos + reverse_offset);
+				Vec2i previous_mpos_horizontal(mpos.x + reverse_offset.x, mpos.y);
+				Vec2i previous_mpos_vertical(mpos.x, mpos.y + reverse_offset.y);
+				if (!Map.Field(mpos)->Visible[GetReverseDirection(direction)] || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_horizontal) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_vertical) != blocked_tiles.end()) {
+					blocked_tiles.push_back(mpos);
+				}
+			}
+			
+			//do another pass just for the vertical/horizontal blocked tiles
+			x_offset = offset * change;
+			if (change > 0) {
+				x_offset += w - 1;
+			}
+			for (y_offset = -offset; y_offset <= (offset + (h - 1)); ++y_offset) {
+				Vec2i mpos(pos.x + x_offset, pos.y + y_offset);
+				if (!Map.Info.IsPointOnMap(mpos) || std::find(blocked_tiles.begin(), blocked_tiles.end(), mpos) != blocked_tiles.end()) {
+					continue;
+				}
+				int direction = GetDirectionFromOffset(x_offset, y_offset);
+				Vec2i reverse_offset = GetDirectionOffset(GetReverseDirection(direction));
+				Vec2i previous_mpos(mpos + reverse_offset);
+				Vec2i previous_mpos_horizontal(mpos.x + reverse_offset.x, mpos.y);
+				Vec2i previous_mpos_vertical(mpos.x, mpos.y + reverse_offset.y);
+				if (std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_horizontal) != blocked_tiles.end() || std::find(blocked_tiles.begin(), blocked_tiles.end(), previous_mpos_vertical) != blocked_tiles.end()) {
+					blocked_tiles.push_back(mpos);
+				}
+			}
+		}
+	}
+	*/
+	//Wyrmgus end
+	
 	// Up hemi-cyle
 	const int miny = std::max(-range, 0 - pos.y);
+	
 	for (int offsety = miny; offsety != 0; ++offsety) {
 		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
@@ -357,6 +432,13 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 #endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
+			//Wyrmgus start
+			/*
+			if (std::find(blocked_tiles.begin(), blocked_tiles.end(), mpos) != blocked_tiles.end()) {
+				continue;
+			}
+			*/
+			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
 			marker(player, mpos.x + index);
 #else
@@ -373,6 +455,13 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 #endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
+			//Wyrmgus start
+			/*
+			if (std::find(blocked_tiles.begin(), blocked_tiles.end(), mpos) != blocked_tiles.end()) {
+				continue;
+			}
+			*/
+			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
 			marker(player, mpos.x + index);
 #else
@@ -392,6 +481,13 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 #endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
+			//Wyrmgus start
+			/*
+			if (std::find(blocked_tiles.begin(), blocked_tiles.end(), mpos) != blocked_tiles.end()) {
+				continue;
+			}
+			*/
+			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
 			marker(player, mpos.x + index);
 #else

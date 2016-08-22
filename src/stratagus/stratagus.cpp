@@ -969,21 +969,21 @@ int GetDirectionIdByName(std::string direction)
 
 int GetDirectionFromOffset(int x, int y)
 {
-	if (x == -1 && y == 0) {
+	if (x < 0 && y == 0) {
 		return West;
-	} else if (x == 1 && y == 0) {
+	} else if (x > 0 && y == 0) {
 		return East;
-	} else if (x == 0 && y == -1) {
+	} else if (y < 0 && x == 0) {
 		return North;
-	} else if (x == 0 && y == 1) {
+	} else if (y > 0 && x == 0) {
 		return South;
-	} else if (x == -1 && y == -1) {
+	} else if (x < 0 && y < 0) {
 		return Northwest;
-	} else if (x == 1 && y == -1) {
+	} else if (x > 0 && y < 0) {
 		return Northeast;
-	} else if (x == -1 && y == 1) {
+	} else if (x < 0 && y > 0) {
 		return Southwest;
-	} else if (x == 1 && y == 1) {
+	} else if (x > 0 && y > 0) {
 		return Southeast;
 	}
 

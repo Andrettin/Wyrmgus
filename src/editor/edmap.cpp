@@ -140,6 +140,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	//Wyrmgus start
 	Map.CalculateTileTransitions(pos, false);
 	Map.CalculateTileTransitions(pos, true);
+	Map.CalculateTileVisibility(pos);
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
@@ -148,6 +149,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 				if (Map.Info.IsPointOnMap(adjacent_pos)) {
 					Map.CalculateTileTransitions(adjacent_pos, false);
 					Map.CalculateTileTransitions(adjacent_pos, true);
+					Map.CalculateTileVisibility(adjacent_pos);
 				}
 			}
 		}

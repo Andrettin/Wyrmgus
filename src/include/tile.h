@@ -285,6 +285,7 @@ public:
 	CTerrainType *OverlayTerrain;
 	int SolidTile;
 	int OverlaySolidTile;
+	bool Visible[MaxDirections];			/// whether the tile is visible from a particular direction
 	bool OverlayTerrainDestroyed;
 	bool OverlayTerrainDamaged;
 	std::vector<std::pair<CTerrainType *, int>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index

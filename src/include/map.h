@@ -249,6 +249,7 @@ public:
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
+	void CalculateTileVisibility(const Vec2i &pos);
 	void AdjustTileMapIrregularities(bool overlay = false);
 	void AdjustTileMapTransitions();
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline = false);

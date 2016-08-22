@@ -1672,15 +1672,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	} else {
 		GameTimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 	}
-	//update the sight of all units
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &unit = **it;
-		if (!unit.Destroyed) {
-			MapUnmarkUnitSight(unit);
-			UpdateUnitSightRange(unit);
-			MapMarkUnitSight(unit);
-		}
-	}
 	//Wyrmgus end
 	SyncHash = 0;
 	InitSyncRand();
@@ -1782,6 +1773,18 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 	Map.Init();
 	UI.Minimap.Create();
 	PreprocessMap();
+	
+	//Wyrmgus start
+	//update the sight of all units
+	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+		CUnit &unit = **it;
+		if (!unit.Destroyed) {
+			MapUnmarkUnitSight(unit);
+			UpdateUnitSightRange(unit);
+			MapMarkUnitSight(unit);
+		}
+	}
+	//Wyrmgus end
 
 	//
 	// Sound part
