@@ -1147,6 +1147,12 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 			Players[i].AiEnabled = true;
 			Players[i].AiName = "land-attack";
 			Players[i].Team = 1;
+			for (int j = 0; j < NumPlayers; ++j) {
+				if (Players[j].Type == PlayerComputer || Players[j].Type == PlayerPerson || Players[j].Type == PlayerRescueActive) {
+					CommandDiplomacy(i, DiplomacyEnemy, j);
+					CommandDiplomacy(j, DiplomacyEnemy, i);
+				}
+			}
 			return &Players[i];
 		}
 	}
@@ -2437,6 +2443,12 @@ void PlayersEachMinute(int playerIdx)
 						Players[j].Resources[GoldCost] = 10000; // give the new player enough resources to start up
 						Players[j].Resources[WoodCost] = 10000;
 						Players[j].Resources[StoneCost] = 10000;
+						for (int k = 0; k < NumPlayers; ++k) {
+							if (Players[k].Type == PlayerComputer || Players[k].Type == PlayerPerson || Players[k].Type == PlayerRescueActive) {
+								CommandDiplomacy(j, DiplomacyEnemy, k);
+								CommandDiplomacy(k, DiplomacyEnemy, j);
+							}
+						}
 						AiInit(Players[j]);
 						new_player_id = j;
 						break;
