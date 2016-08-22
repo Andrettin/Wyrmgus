@@ -2440,9 +2440,9 @@ void PlayersEachMinute(int playerIdx)
 						Players[j].AiEnabled = true;
 						Players[j].AiName = "land-attack";
 						Players[j].Team = 1;
-						Players[j].Resources[GoldCost] = 10000; // give the new player enough resources to start up
-						Players[j].Resources[WoodCost] = 10000;
-						Players[j].Resources[StoneCost] = 10000;
+						Players[j].Resources[GoldCost] = 5000; // give the new player enough resources to start up
+						Players[j].Resources[WoodCost] = 5000;
+						Players[j].Resources[StoneCost] = 5000;
 						for (int k = 0; k < NumPlayers; ++k) {
 							if (Players[k].Type == PlayerComputer || Players[k].Type == PlayerPerson || Players[k].Type == PlayerRescueActive) {
 								CommandDiplomacy(j, DiplomacyEnemy, k);
