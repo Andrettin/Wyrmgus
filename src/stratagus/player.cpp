@@ -1794,7 +1794,7 @@ void CPlayer::AvailableQuestsChanged()
 	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
 		for (int i = ((int) this->AvailableQuests.size() - 1); i >= 0; --i) {
 			if (this->CanAcceptQuest(this->AvailableQuests[i])) { // something may have changed, so recheck if the player is able to accept the quest
-//				this->AcceptQuest(this->AvailableQuests[i]);
+				this->AcceptQuest(this->AvailableQuests[i]);
 			}
 		}
 	}
@@ -1846,7 +1846,9 @@ void CPlayer::CompleteQuest(CQuest *quest)
 {
 	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
 	this->CompletedQuests.push_back(quest);
-	quest->CurrentCompleted = true;
+	if (quest->Competitive) {
+		quest->CurrentCompleted = true;
+	}
 	
 	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
 	
@@ -1905,7 +1907,7 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 		return false;
 	}
 	
-	if (std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest) != this->CurrentQuests.end()) {
+	if (std::find(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest) != this->CurrentQuests.end() || std::find(this->CompletedQuests.begin(), this->CompletedQuests.end(), quest) != this->CompletedQuests.end()) {
 		return false;
 	}
 	

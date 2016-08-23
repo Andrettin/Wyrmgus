@@ -127,6 +127,8 @@ static int CclDefineQuest(lua_State *l)
 			}
 		} else if (!strcmp(value, "Hidden")) {
 			quest->Hidden = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Competitive")) {
+			quest->Competitive = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			quest->Icon.Name = LuaToString(l, -1);
 			quest->Icon.Icon = NULL;
@@ -327,6 +329,9 @@ static int CclGetQuestData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Completed")) {
 		lua_pushboolean(l, quest->Completed);
+		return 1;
+	} else if (!strcmp(data, "Competitive")) {
+		lua_pushboolean(l, quest->Competitive);
 		return 1;
 	} else if (!strcmp(data, "HighestCompletedDifficulty")) {
 		lua_pushnumber(l, quest->HighestCompletedDifficulty);

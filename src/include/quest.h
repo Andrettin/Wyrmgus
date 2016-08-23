@@ -61,7 +61,7 @@ class CQuest
 public:
 	CQuest() :
 		ID(-1), Civilization(-1), TechnologyPoints(0), PlayerColor(0), HighestCompletedDifficulty(-1),
-		Hidden(false), Completed(false), CurrentCompleted(false),
+		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false),
 		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionEffects(NULL)
 	{
 	}
@@ -94,6 +94,7 @@ public:
 	bool Hidden;					/// Whether the quest is hidden
 	bool Completed;					/// Whether the quest has been completed
 	bool CurrentCompleted;			/// Whether the quest has been completed in the current game
+	bool Competitive;				/// Whether a player completing the quest causes it to fail for others
 	IconConfig Icon;				/// Quest's icon
 	CCharacter *QuestGiver;			/// Quest giver
 	CDialogue *IntroductionDialogue;

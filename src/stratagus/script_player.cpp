@@ -385,7 +385,9 @@ void CPlayer::Load(lua_State *l)
 				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
 				if (quest) {
 					this->CompletedQuests.push_back(quest);
-					quest->CurrentCompleted = true;
+					if (quest->Competitive) {
+						quest->CurrentCompleted = true;
+					}
 				}
 			}
 		} else if (!strcmp(value, "quest-build-units")) {
