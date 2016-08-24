@@ -1182,11 +1182,10 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 		CUnit &unit = player.GetUnit(i);
 
 		//Wyrmgus start
-		/*
-		if (!&unit) {
-			fprintf(stderr, "Unit %d of player %d is invalid.\n", i, player.Index);
+		if (&unit == NULL) {
+			fprintf(stderr, "Error in ConvertUnitTypeTo: unit %d, of player %d is NULL.\n", i, player.Index);
+			continue;
 		}
-		*/
 		//Wyrmgus end
 
 		//  Convert already existing units to this type.

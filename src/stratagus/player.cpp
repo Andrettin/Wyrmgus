@@ -2092,6 +2092,12 @@ int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 {
 	int count = UnitTypesCount[type.Slot];
 	for (std::vector<CUnit *>::const_iterator it = this->UnitBegin(); it != this->UnitEnd(); ++it) {
+		//Wyrmgus start
+		if (*it == NULL) {
+			fprintf(stderr, "Error in CPlayer::GetUnitTotalCount: unit of player %d is NULL.\n", this->Index);
+			continue;
+		}
+		//Wyrmgus end
 		CUnit &unit = **it;
 
 		if (unit.CurrentAction() == UnitActionUpgradeTo) {

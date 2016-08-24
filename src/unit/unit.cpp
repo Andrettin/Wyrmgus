@@ -5860,6 +5860,7 @@ void CleanUnits()
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
 		//Wyrmgus start
 		if (*it == NULL) {
+			fprintf(stderr, "Error in CleanUnits: unit is NULL.\n");
 			continue;
 		}
 		//Wyrmgus end
