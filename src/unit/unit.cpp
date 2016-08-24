@@ -1608,6 +1608,11 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 
 void CUnit::UpdateItemName()
 {
+	if (this->Unique) {
+		Name = this->Unique->Name;
+		return;
+	}
+	
 	Name = "";
 	if (Prefix != NULL) {
 		Name += Prefix->Name + " ";
@@ -2584,6 +2589,10 @@ void CUnit::UpdatePersonalName()
 		if (!this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
 			this->Name += " " + this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 		}
+	}
+	
+	if (this->Name.empty() && this->Type->BoolFlag[ITEM_INDEX].value) {
+		this->UpdateItemName();
 	}
 }
 
