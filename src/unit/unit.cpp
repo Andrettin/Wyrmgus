@@ -1038,7 +1038,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 			return;
 		}
 	} else if (button_action == ButtonStop) {
-		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != NULL) {
+		if (this->EquippedItems[ShieldItemSlot].size() > 0 && this->EquippedItems[ShieldItemSlot][0]->Type->ItemClass == ShieldItemClass && this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon != NULL) {
 			this->ButtonIcons[button_action] = this->EquippedItems[ShieldItemSlot][0]->GetIcon().Icon;
 			return;
 		}
@@ -1106,7 +1106,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 			return;
 		}
 	} else if (button_action == ButtonStop) {
-		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != NULL) {
+		if (this->Type->DefaultEquipment.find(ShieldItemSlot) != this->Type->DefaultEquipment.end() && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->ItemClass == ShieldItemClass && this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon != NULL) {
 			this->ButtonIcons[button_action] = this->Type->DefaultEquipment.find(ShieldItemSlot)->second->Icon.Icon;
 			return;
 		}
@@ -1753,8 +1753,8 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 	
 	if (
 		this->Prefix == NULL && this->Suffix == NULL && this->Spell == NULL && this->Work == NULL
-		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass)
-	) { //scrolls, books and jewelry must always have a property
+		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass || this->Type->ItemClass == HornItemClass)
+	) { //scrolls, books, jewelry and horns must always have a property
 		this->GenerateSpecialProperties(dropper);
 	}
 }
@@ -4231,19 +4231,6 @@ int CUnit::GetItemSlotQuantity(int item_slot) const
 		return 0;
 	}
 	
-	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return 0
-		item_slot == ShieldItemSlot
-		&& (
-			Type->WeaponClasses[0] == DaggerItemClass
-			|| Type->WeaponClasses[0] == BowItemClass
-			|| Type->WeaponClasses[0] == ThrowingAxeItemClass
-			|| Type->WeaponClasses[0] == JavelinItemClass
-			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
-		)
-	) {
-		return 0;
-	}
-	
 	if ( //if the item are arrows and the weapon of this unit's type is not a bow, return false
 		item_slot == ArrowsItemSlot
 		&& Type->WeaponClasses[0] != BowItemClass
@@ -4457,6 +4444,33 @@ bool CUnit::CanEquipItemClass(int item_class) const
 	}
 	
 	if (GetItemClassSlot(item_class) == WeaponItemSlot && std::find(Type->WeaponClasses.begin(), Type->WeaponClasses.end(), item_class) == Type->WeaponClasses.end()) { //if the item is a weapon and its item class isn't a weapon class used by this unit's type, return false
+		return false;
+	}
+	
+	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
+		item_class == ShieldItemClass
+		&& (
+			Type->WeaponClasses.size() == 0
+			|| Type->WeaponClasses[0] == DaggerItemClass
+			|| Type->WeaponClasses[0] == BowItemClass
+			|| Type->WeaponClasses[0] == ThrowingAxeItemClass
+			|| Type->WeaponClasses[0] == JavelinItemClass
+			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
+		)
+	) {
+		return false;
+	} else if ( // if is a horn, only allow if the weapon is compatible with horns
+		item_class == HornItemClass
+		&& (
+			Type->WeaponClasses.size() == 0
+			|| (
+				Type->WeaponClasses[0] != BowItemClass
+				&& Type->WeaponClasses[0] != ThrowingAxeItemClass
+				&& Type->WeaponClasses[0] != JavelinItemClass
+				&& !Type->BoolFlag[HARVESTER_INDEX].value //workers can use horns
+			)
+		)
+	) {
 		return false;
 	}
 	

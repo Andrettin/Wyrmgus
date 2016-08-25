@@ -82,6 +82,7 @@ enum ItemClasses {
 	JavelinItemClass,
 
 	ShieldItemClass,
+	HornItemClass,
 
 	HelmetItemClass,
 	ArmorItemClass,

@@ -534,7 +534,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 				}
 			}
 			if (condition->Shield != CONDITION_TRUE) {
-				if ((condition->Shield == CONDITION_ONLY) ^ (GetItemClassSlot(unit.Type->ItemClass) == ShieldItemSlot)) {
+				if ((condition->Shield == CONDITION_ONLY) ^ (unit.Type->ItemClass == ShieldItemClass)) {
 					return false;
 				}
 			}
