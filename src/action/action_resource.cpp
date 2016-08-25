@@ -1218,11 +1218,12 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	//Wyrmgus start
 //	player.ChangeResource(rindex, (unit.ResourcesHeld * player.Incomes[rindex]) / 100, true);
 //	player.TotalResources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
-	player.ChangeResource(rindex, (unit.ResourcesHeld * resinfo.FinalResourceConversionRate / 100 * player.Incomes[rindex]) / 100, true);
-	player.TotalResources[rindex] += (unit.ResourcesHeld * resinfo.FinalResourceConversionRate / 100 * player.Incomes[rindex]) / 100;
+	int resource_change = unit.ResourcesHeld * resinfo.FinalResourceConversionRate / 100;
+	player.ChangeResource(rindex, (resource_change * player.Incomes[rindex]) / 100, true);
+	player.TotalResources[rindex] += (resource_change * player.Incomes[rindex]) / 100;
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
-	int xp_gained = unit.ResourcesHeld * resinfo.FinalResourceConversionRate / 100;
+	int xp_gained = resource_change;
 	if (rindex != GoldCost) {
 		xp_gained *= DefaultResourcePrices[rindex];
 		xp_gained /= 100;
@@ -1231,6 +1232,14 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	unit.Variable[XP_INDEX].Max += xp_gained;
 	unit.Variable[XP_INDEX].Value = unit.Variable[XP_INDEX].Max;
 	unit.XPChanged();
+	
+	//update quests
+	for (size_t i = 0; i < player.QuestGatherResources.size(); ++i) { // buildings get subtracted from the BuildUnits array in action_built
+		if (std::get<1>(player.QuestGatherResources[i]) == rindex) {
+			std::get<2>(player.QuestGatherResources[i]) -= resource_change;
+		}
+	}
+	
 	//Wyrmgus end
 	unit.ResourcesHeld = 0;
 	unit.CurrentResource = 0;

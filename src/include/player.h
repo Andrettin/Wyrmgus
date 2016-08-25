@@ -150,6 +150,7 @@ public:
 	std::vector<std::tuple<CQuest *, CUpgrade *>> QuestResearchUpgrades;
 	std::vector<std::tuple<CQuest *, CUnitType *, CFaction *, int>> QuestDestroyUnits;	/// destroy units objectives from quests; int is the quantity, set at start to be the same as the quest's; every time a unit is destroyed it is reduced by one
 	std::vector<std::tuple<CQuest *, CUniqueItem *, bool>> QuestDestroyUniques;
+	std::vector<std::tuple<CQuest *, int, int>> QuestGatherResources;	/// gather resources objectives from quests; the first int is the resource ID, and the second one is the quantity, set at start to be the same as the quest's
 	//Wyrmgus end
 
 	bool AiEnabled;        /// handle AI on local computer

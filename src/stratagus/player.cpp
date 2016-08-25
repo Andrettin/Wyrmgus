@@ -1079,6 +1079,17 @@ void CPlayer::Save(CFile &file) const
 		file.printf("%s,", std::get<2>(p.QuestDestroyUniques[j]) ? "true" : "false");
 	}
 	file.printf("},");
+	
+	file.printf("\n  \"quest-gather-resources\", {");
+	for (size_t j = 0; j < p.QuestGatherResources.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestGatherResources[j])->Ident.c_str());
+		file.printf("\"%s\",", DefaultResourceNames[std::get<1>(p.QuestGatherResources[j])].c_str());
+		file.printf("%d,", std::get<2>(p.QuestGatherResources[j]));
+	}
+	file.printf("},");
 	//Wyrmgus end
 
 	// UnitColors done by init code.
@@ -1603,6 +1614,7 @@ void CPlayer::Clear()
 	this->QuestResearchUpgrades.clear();
 	this->QuestDestroyUnits.clear();
 	this->QuestDestroyUniques.clear();
+	this->QuestGatherResources.clear();
 	//Wyrmgus end
 	AiEnabled = false;
 	//Wyrmgus start
@@ -1832,6 +1844,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestDestroyUniques.push_back(std::tuple<CQuest *, CUniqueItem *, bool>(quest, quest->DestroyUniques[i], false));
 	}
 	
+	for (size_t i = 0; i < quest->GatherResources.size(); ++i) {
+		this->QuestGatherResources.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->GatherResources[i]), std::get<1>(quest->GatherResources[i])));
+	}
+	
 	if (this == ThisPlayer) {
 		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 //			SetObjective(quest->Objectives[i].c_str());
@@ -1943,6 +1959,12 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 	
 	for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
 		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == false) {
+			return false;
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestGatherResources.size(); ++i) {
+		if (std::get<0>(this->QuestGatherResources[i]) == quest && std::get<2>(this->QuestGatherResources[i]) > 0) {
 			return false;
 		}
 	}

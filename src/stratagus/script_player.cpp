@@ -450,6 +450,21 @@ void CPlayer::Load(lua_State *l)
 					this->QuestDestroyUniques.push_back(std::tuple<CQuest *, CUniqueItem *, bool>(quest, unique, destroyed));
 				}
 			}
+		} else if (!strcmp(value, "quest-gather-resources")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				++k;
+				int resource = GetResourceIdByName(LuaToString(l, j + 1, k + 1));
+				++k;
+				int quantity = LuaToNumber(l, j + 1, k + 1);
+				if (quest) {
+					this->QuestGatherResources.push_back(std::tuple<CQuest *, int, int>(quest, resource, quantity));
+				}
+			}
 		//Wyrmgus end
 		} else if (!strcmp(value, "timers")) {
 			if (!lua_istable(l, j + 1)) {

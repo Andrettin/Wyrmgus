@@ -106,6 +106,7 @@ public:
 	std::vector<CUpgrade *> ResearchUpgrades;
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 	std::vector<CUniqueItem *> DestroyUniques;
+	std::vector<std::tuple<int, int>> GatherResources;	/// Gather resources objective vector, containing resource ID and quantity
 };
 
 class CAchievement

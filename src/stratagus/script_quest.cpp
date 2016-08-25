@@ -223,6 +223,20 @@ static int CclDefineQuest(lua_State *l)
 				}
 				quest->DestroyUniques.push_back(unique);
 			}
+		} else if (!strcmp(value, "GatherResources")) {
+			quest->GatherResources.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				int quantity = LuaToNumber(l, -1, j + 1);
+				
+				quest->GatherResources.push_back(std::tuple<int, int>(resource, quantity));
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
