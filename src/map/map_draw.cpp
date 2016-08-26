@@ -378,8 +378,8 @@ void CViewport::DrawMapLabelsInViewport() const
 			}
 			const CMapField &mf = Map.Fields[sx];
 			if (ReplayRevealMap || mf.playerInfo.SeenTerrain) { // if we are in replay mode, or the tile has been seen, draw its label
-				if (!mf.Label.empty()) {
-					CLabel(GetSmallFont()).Draw(dx - (GetSmallFont().Width(mf.Label) / 2), dy + 32 + 2, mf.Label);
+				if (!mf.Label.empty() && !(mf.Flags & MapFieldBuilding)) { // don't draw labels if the tile was built upon
+					CLabel(GetSmallFont()).Draw(dx + (PixelTileSize.x / 2) - (GetSmallFont().Width(mf.Label) / 2), dy + (PixelTileSize.y / 2) - (GetSmallFont().getHeight() / 2), mf.Label);
 				}
 			}
 			++sx;
