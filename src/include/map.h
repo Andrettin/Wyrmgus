@@ -165,6 +165,7 @@ public:
 	std::vector<CTerrainType *> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources, mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, int, int>> Units; /// Units; first value is the tile position, and the last ones are start year and end year
+	std::vector<std::tuple<Vec2i, std::string>> TileLabels; /// labels to appear below certain tiles
 };
 //Wyrmgus end
 

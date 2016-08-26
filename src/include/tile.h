@@ -288,6 +288,7 @@ public:
 	bool Visible[MaxDirections];			/// whether the tile is visible from a particular direction
 	bool OverlayTerrainDestroyed;
 	bool OverlayTerrainDamaged;
+	std::string Label;						/// a label to be drawn below the tile
 	std::vector<std::pair<CTerrainType *, int>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
 	std::vector<std::pair<CTerrainType *, int>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end

@@ -346,7 +346,50 @@ void CViewport::DrawMapBackgroundInViewport() const
 		sy += Map.Info.MapWidth;
 		dy += PixelTileSize.y;
 	}
+	
+	//Wyrmgus start
+	this->DrawMapLabelsInViewport();
+	//Wyrmgus end
 }
+
+//Wyrmgus start
+void CViewport::DrawMapLabelsInViewport() const
+{
+	int ex = this->BottomRightPos.x;
+	int ey = this->BottomRightPos.y;
+	int sy = this->MapPos.y;
+	int dy = this->TopLeftPos.y - this->Offset.y;
+	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
+
+	while (sy  < 0) {
+		sy++;
+		dy += PixelTileSize.y;
+	}
+	sy *=  Map.Info.MapWidth;
+
+	while (dy <= ey && sy  < map_max) {
+		int sx = this->MapPos.x + sy;
+		int dx = this->TopLeftPos.x - this->Offset.x;
+		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
+			if (sx - sy < 0) {
+				++sx;
+				dx += PixelTileSize.x;
+				continue;
+			}
+			const CMapField &mf = Map.Fields[sx];
+			if (ReplayRevealMap || mf.playerInfo.SeenTerrain) { // if we are in replay mode, or the tile has been seen, draw its label
+				if (!mf.Label.empty()) {
+					CLabel(GetSmallFont()).Draw(dx - (GetSmallFont().Width(mf.Label) / 2), dy + 32 + 2, mf.Label);
+				}
+			}
+			++sx;
+			dx += PixelTileSize.x;
+		}
+		sy += Map.Info.MapWidth;
+		dy += PixelTileSize.y;
+	}
+}
+//Wyrmgus end
 
 /**
 **  Show unit's name under cursor or print the message if territory is invisible.

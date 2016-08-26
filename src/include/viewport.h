@@ -106,6 +106,10 @@ private:
 	void Set(const PixelPos &mapPixelPos);
 	/// Draw the map background
 	void DrawMapBackgroundInViewport() const;
+	//Wyrmgus start
+	/// Draw the map labels
+	void DrawMapLabelsInViewport() const;
+	//Wyrmgus end
 	/// Draw the map fog of war
 	void DrawMapFogOfWar() const;
 

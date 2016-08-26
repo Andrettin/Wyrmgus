@@ -475,6 +475,24 @@ void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x,
 	map->SetTileTerrain(pos, terrain);
 }
 
+static int CclSetMapTemplateTileLabel(lua_State *l)
+{
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template doesn't exist.\n");
+	}
+
+	std::string label_string = LuaToString(l, 2);
+	
+	Vec2i ipos;
+	CclGetPos(l, &ipos.x, &ipos.y, 3);
+
+	map_template->TileLabels.push_back(std::tuple<Vec2i, std::string>(ipos, label_string));
+	
+	return 1;
+}
+
 static int CclSetMapTemplateResource(lua_State *l)
 {
 	std::string map_template_ident = LuaToString(l, 1);
@@ -674,6 +692,15 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		if (std::get<2>(iterator->second)) {
 			unit->SetUnique(std::get<2>(iterator->second));
 		}
+	}
+	
+	for (size_t i = 0; i < map_template->TileLabels.size(); ++i) {
+		Vec2i label_pos(map_start_pos + std::get<0>(map_template->TileLabels[i]) - template_start_pos);
+		if (!Map.Info.IsPointOnMap(label_pos)) {
+			continue;
+		}
+		
+		Map.Field(label_pos)->Label = std::get<1>(map_template->TileLabels[i]);
 	}
 	
 	for (size_t i = 0; i < map_template->Units.size(); ++i) {
@@ -1486,6 +1513,7 @@ void MapCclRegister()
 	//Wyrmgus start
 	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
+	lua_register(Lua, "SetMapTemplateTileLabel", CclSetMapTemplateTileLabel);
 	lua_register(Lua, "SetMapTemplateResource", CclSetMapTemplateResource);
 	lua_register(Lua, "SetMapTemplateUnit", CclSetMapTemplateUnit);
 	//Wyrmgus end
