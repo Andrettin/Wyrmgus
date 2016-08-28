@@ -2926,6 +2926,18 @@ static int CclGetPlayerData(lua_State *l)
 			DebugPrint(" wrong ident %s\n" _C_ ident);
 		}
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "CompletedQuest")) {
+		bool completed_quest = false;
+		LuaCheckArgs(l, 3);
+		CQuest *quest = GetQuest(LuaToString(l, 3));
+		if (std::find(p->CompletedQuests.begin(), p->CompletedQuests.end(), quest) != p->CompletedQuests.end()) {
+			lua_pushboolean(l, true);
+		} else {
+			lua_pushboolean(l, false);
+		}
+		return 1;
+	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
