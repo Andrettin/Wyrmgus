@@ -1614,6 +1614,10 @@ void CUnit::UpdateItemName()
 	}
 	
 	Name = "";
+	if (Prefix == NULL && Work == NULL && Suffix == NULL) {
+		return;
+	}
+	
 	if (Prefix != NULL) {
 		Name += Prefix->Name + " ";
 	}
