@@ -2574,6 +2574,9 @@ void CUnit::UpdatePersonalName()
 {
 	if (this->Character != NULL) {
 		return;
+	} else if (this->Type->BoolFlag[ITEM_INDEX].value) {
+		this->UpdateItemName();
+		return;
 	}
 	
 	int civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
@@ -2584,6 +2587,17 @@ void CUnit::UpdatePersonalName()
 		language = PlayerRaces.GetFactionLanguage(civilization, this->Player->Faction);
 	}
 
+	/*
+	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
+		std::string new_settlement_name = PlayerRaces.TranslateName(this->SettlementName, language);
+		if (!new_settlement_name.empty()) {
+			this->SettlementName = new_settlement_name;
+		} else {
+			this->SettlementName = GenerateName(language, "settlement");
+		}
+	}
+	*/
+	
 	// first see if can translate the current personal name
 	std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
 	if (!new_personal_name.empty()) {
@@ -2593,10 +2607,6 @@ void CUnit::UpdatePersonalName()
 		if (!this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
 			this->Name += " " + this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 		}
-	}
-	
-	if (this->Name.empty() && this->Type->BoolFlag[ITEM_INDEX].value) {
-		this->UpdateItemName();
 	}
 }
 

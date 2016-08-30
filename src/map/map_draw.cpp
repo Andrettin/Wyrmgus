@@ -465,6 +465,16 @@ void CViewport::Draw() const
 		const size_t nmissiles = missiletable.size();
 		ParticleManager.prepareToDraw(*this, particletable);
 		const size_t nparticles = particletable.size();
+		
+		//Wyrmgus start
+		for (size_t i = 0; i != nunits; ++i) {
+			CUnit &unit = *unittable[i];
+			if (unit.IsAliveOnMap() && (ReplayRevealMap || unit.IsVisible(*ThisPlayer) || Map.Info.IsPointOnMap(unit.Seen.tilePos)) && !unit.SettlementName.empty()) {
+				PixelPos label_screenPos = this->MapToScreenPixelPos(unit.GetMapPixelPosTopLeft());
+				CLabel(GetSmallFont()).Draw(label_screenPos.x + (PixelTileSize.x * unit.Type->TileWidth / 2) - (GetSmallFont().Width(unit.SettlementName) / 2), label_screenPos.y + (unit.Type->TileHeight * PixelTileSize.y) + (PixelTileSize.y / 2) - (GetSmallFont().getHeight() / 2), unit.SettlementName);
+			}
+		}
+		//Wyrmgus end
 
 		size_t i = 0;
 		size_t j = 0;

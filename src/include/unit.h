@@ -436,6 +436,7 @@ public:
 	CUnitColors *Colors;    /// Player colors
 	//Wyrmgus start
 	std::string Name;	/// Unit's personal name (if any)
+	std::string SettlementName;	/// Settlement name (for if the unit is a town hall)
 	CCharacter *Character;	/// Pointer to the character represented by this unit
 	CUpgrade *Trait;	/// Unit's trait
 	int Variation;      /// Which of the variations of its unit type this unit has
