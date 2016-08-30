@@ -2099,7 +2099,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			player.UnitTypesAiActiveCount[type.Slot]++;
 		}
 		//Wyrmgus start
-		if (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress") {
+		if (type.BoolFlag[TOWNHALL_INDEX].value) {
 			player.NumTownHalls++;
 		}
 		if (this->Character == NULL) {
@@ -2950,7 +2950,7 @@ void UnitLost(CUnit &unit)
 				player.UnitTypesAiActiveCount[type.Slot]--;
 			}
 			//Wyrmgus start
-			if (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress") {
+			if (type.BoolFlag[TOWNHALL_INDEX].value) {
 				player.NumTownHalls--;
 			}
 			if (unit.Character == NULL) {
@@ -3002,10 +3002,10 @@ void UnitLost(CUnit &unit)
 		}
 		
 		//Wyrmgus start
-		if (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress") {
+		if (type.BoolFlag[TOWNHALL_INDEX].value) {
 			bool lost_town_hall = true;
 			for (int j = 0; j < player.GetUnitCount(); ++j) {
-				if (player.GetUnit(j).Type->Class == "town-hall" || player.GetUnit(j).Type->Class == "stronghold" || player.GetUnit(j).Type->Class == "fortress") {
+				if (player.GetUnit(j).Type->BoolFlag[TOWNHALL_INDEX].value) {
 					lost_town_hall = false;
 				}
 			}
@@ -3102,7 +3102,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	}
 	
 	//Wyrmgus start
-	if (player.LostTownHallTimer != 0 && (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress")) {
+	if (player.LostTownHallTimer != 0 && type.BoolFlag[TOWNHALL_INDEX].value) {
 		player.LostTownHallTimer = 0;
 		player.Revealed = false;
 		for (int j = 0; j < NumPlayers; ++j) {
@@ -3564,7 +3564,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 		newplayer.UnitTypesAiActiveCount[Type->Slot]++;
 	}
 	//Wyrmgus start
-	if (Type->Class == "town-hall" || Type->Class == "stronghold" || Type->Class == "fortress") {
+	if (Type->BoolFlag[TOWNHALL_INDEX].value) {
 		newplayer.NumTownHalls++;
 	}
 	if (this->Character == NULL) {

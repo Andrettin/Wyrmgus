@@ -260,6 +260,7 @@ enum {
 	SIDEATTACK_INDEX,
 	NOFRIENDLYFIRE_INDEX,           /// Unit accepts friendly fire for splash attacks
 	//Wyrmgus start
+	TOWNHALL_INDEX,
 	ITEM_INDEX,
 	POWERUP_INDEX,
 	INVENTORY_INDEX,

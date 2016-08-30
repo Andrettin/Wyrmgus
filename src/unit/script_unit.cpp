@@ -603,7 +603,7 @@ static int CclUnit(lua_State *l)
 					unit->Player->UnitTypesAiActiveCount[type->Slot]--;
 				}
 				//Wyrmgus start
-				if (type->Class == "town-hall" || type->Class == "stronghold" || type->Class == "fortress") {
+				if (type->BoolFlag[TOWNHALL_INDEX].value) {
 					unit->Player->NumTownHalls--;
 				}
 				if (unit->Character == NULL) {

@@ -189,7 +189,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		player.UnitTypesAiActiveCount[type.Slot]++;
 	}
 	//Wyrmgus start
-	if (type.Class == "town-hall" || type.Class == "stronghold" || type.Class == "fortress") {
+	if (type.BoolFlag[TOWNHALL_INDEX].value) {
 		player.NumTownHalls++;
 	}
 	if (unit.Character == NULL) {

@@ -114,6 +114,7 @@ static const char ORGANIC_KEY[] = "organic";
 static const char SIDEATTACK_KEY[] = "SideAttack";
 static const char NOFRIENDLYFIRE_KEY[] = "NoFriendlyFire";
 //Wyrmgus start
+static const char TOWNHALL_KEY[] = "TownHall";
 static const char ITEM_KEY[] = "Item";
 static const char POWERUP_KEY[] = "PowerUp";
 static const char INVENTORY_KEY[] = "Inventory";
@@ -275,7 +276,7 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   //Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
 							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, NOFRIENDLYFIRE_KEY,
-							   ITEM_KEY, POWERUP_KEY, INVENTORY_KEY, TRAP_KEY, BRIDGE_KEY,
+							   TOWNHALL_KEY, ITEM_KEY, POWERUP_KEY, INVENTORY_KEY, TRAP_KEY, BRIDGE_KEY,
 							   MERCENARY_KEY,
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY, GIANT_KEY, DRAGON_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,

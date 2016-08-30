@@ -2103,7 +2103,7 @@ void Convert0ADMap(const std::string &mapname)
 					units_players.push_back(15);
 				}
 				
-				if (!units_unit_types[units_unit_types.size() - 1].empty() && units_unit_types[units_unit_types.size() - 1] != "Tree" && units_unit_types[units_unit_types.size() - 1] != "Rock" && units_unit_types[units_unit_types.size() - 1] != "Gold" && UnitTypes[UnitTypeIdByIdent(units_unit_types[units_unit_types.size() - 1])]->Class == "town-hall" && units_players[units_players.size() - 1] != 15) { //if this is a town hall building not belonging to the neutral player, set its owner's starting position to it
+				if (!units_unit_types[units_unit_types.size() - 1].empty() && units_unit_types[units_unit_types.size() - 1] != "Tree" && units_unit_types[units_unit_types.size() - 1] != "Rock" && units_unit_types[units_unit_types.size() - 1] != "Gold" && UnitTypes[UnitTypeIdByIdent(units_unit_types[units_unit_types.size() - 1])]->BoolFlag[TOWNHALL_INDEX].value && units_players[units_players.size() - 1] != 15) { //if this is a town hall building not belonging to the neutral player, set its owner's starting position to it
 					int start_point_player = units_players[units_players.size() - 1];
 					player_start_points[start_point_player].x = x_position;
 					player_start_points[start_point_player].y = y_position;
