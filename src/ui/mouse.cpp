@@ -1267,6 +1267,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		if (show) {
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
+			//Wyrmgus start
+			UI.StatusLine.Set(Map.Field(tilePos)->Label);
+			//Wyrmgus end
 		}
 		
 		//Wyrmgus start
@@ -1297,6 +1300,9 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		if (Map.Field(tilePos)->playerInfo.IsTeamExplored(*ThisPlayer) || ReplayRevealMap) {
 		//Wyrmgus end
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
+			//Wyrmgus start
+			UI.StatusLine.Set(Map.Field(tilePos)->Label);
+			//Wyrmgus end
 		}
 	}
 

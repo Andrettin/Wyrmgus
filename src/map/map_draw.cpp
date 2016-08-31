@@ -534,44 +534,26 @@ void CViewport::Draw() const
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
 
-		//Wyrmgus start
-		/*
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
-			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
-			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-		} else if (!isMapFieldVisile) {
-			ShowUnitName(*this, CursorScreenPos, NULL, true);
-		}
-		*/
-		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisile || ReplayRevealMap)) {
-			std::string tile_label;
+			//Wyrmgus start
+//			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
+			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
+//			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
+			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
+			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
 			std::string text_color;
-			PixelPos label_screen_pos;
-			
-			if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
-				tile_label = UnitUnderCursor->GetMessageName();
-				label_screen_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
-				if (UnitUnderCursor->Unique || UnitUnderCursor->Character != NULL) {
-					text_color = "fire";
-				} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
-					text_color = "light-blue";
-				}
-			} else if (!Map.Field(tilePos)->Label.empty()) {
-				tile_label = Map.Field(tilePos)->Label;
-				label_screen_pos = Map.TilePosToMapPixelPos_TopLeft(tilePos);
+			if (UnitUnderCursor->Unique || UnitUnderCursor->Character != NULL) {
+				text_color = "fire";
+			} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
+				text_color = "light-blue";
 			}
-			
-			if (!tile_label.empty()) {
-				label_screen_pos = MapToScreenPixelPos(label_screen_pos);
-				DrawGenericPopup(tile_label, label_screen_pos.x, label_screen_pos.y, text_color);
-			}
+			DrawGenericPopup(UnitUnderCursor->GetMessageName(), unit_center_pos.x, unit_center_pos.y, text_color);
 			//Wyrmgus end
 		//Wyrmgus start
 //		} else if (!isMapFieldVisile) {
 //			ShowUnitName(*this, CursorScreenPos, NULL, true);
 		//Wyrmgus end
 		}
-		//Wyrmgus end
 	}
 
 	DrawBorder();
