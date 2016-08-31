@@ -346,50 +346,7 @@ void CViewport::DrawMapBackgroundInViewport() const
 		sy += Map.Info.MapWidth;
 		dy += PixelTileSize.y;
 	}
-	
-	//Wyrmgus start
-	this->DrawMapLabelsInViewport();
-	//Wyrmgus end
 }
-
-//Wyrmgus start
-void CViewport::DrawMapLabelsInViewport() const
-{
-	int ex = this->BottomRightPos.x;
-	int ey = this->BottomRightPos.y;
-	int sy = this->MapPos.y;
-	int dy = this->TopLeftPos.y - this->Offset.y;
-	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
-
-	while (sy  < 0) {
-		sy++;
-		dy += PixelTileSize.y;
-	}
-	sy *=  Map.Info.MapWidth;
-
-	while (dy <= ey && sy  < map_max) {
-		int sx = this->MapPos.x + sy;
-		int dx = this->TopLeftPos.x - this->Offset.x;
-		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
-			if (sx - sy < 0) {
-				++sx;
-				dx += PixelTileSize.x;
-				continue;
-			}
-			const CMapField &mf = Map.Fields[sx];
-			if (ReplayRevealMap || mf.playerInfo.SeenTerrain) { // if we are in replay mode, or the tile has been seen, draw its label
-				if (!mf.Label.empty() && !(mf.Flags & MapFieldBuilding)) { // don't draw labels if the tile was built upon
-					CLabel(GetSmallFont()).Draw(dx + (PixelTileSize.x / 2) - (GetSmallFont().Width(mf.Label) / 2), dy + (PixelTileSize.y / 2) - (GetSmallFont().getHeight() / 2), mf.Label);
-				}
-			}
-			++sx;
-			dx += PixelTileSize.x;
-		}
-		sy += Map.Info.MapWidth;
-		dy += PixelTileSize.y;
-	}
-}
-//Wyrmgus end
 
 /**
 **  Show unit's name under cursor or print the message if territory is invisible.
@@ -466,16 +423,6 @@ void CViewport::Draw() const
 		ParticleManager.prepareToDraw(*this, particletable);
 		const size_t nparticles = particletable.size();
 		
-		//Wyrmgus start
-		for (size_t i = 0; i != nunits; ++i) {
-			CUnit &unit = *unittable[i];
-			if (unit.IsAliveOnMap() && (ReplayRevealMap || unit.IsVisible(*ThisPlayer) || Map.Info.IsPointOnMap(unit.Seen.tilePos)) && !unit.SettlementName.empty()) {
-				PixelPos label_screenPos = this->MapToScreenPixelPos(unit.GetMapPixelPosTopLeft());
-				CLabel(GetSmallFont()).Draw(label_screenPos.x + (PixelTileSize.x * unit.Type->TileWidth / 2) - (GetSmallFont().Width(unit.SettlementName) / 2), label_screenPos.y + (unit.Type->TileHeight * PixelTileSize.y) + (PixelTileSize.y / 2) - (GetSmallFont().getHeight() / 2), unit.SettlementName);
-			}
-		}
-		//Wyrmgus end
-
 		size_t i = 0;
 		size_t j = 0;
 		size_t k = 0;
@@ -587,26 +534,44 @@ void CViewport::Draw() const
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
 		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
 
+		//Wyrmgus start
+		/*
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
-			//Wyrmgus start
-//			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
-			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
-//			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
-			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
-			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
+			&& ((isMapFieldVisile && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap)) {
+			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
+		} else if (!isMapFieldVisile) {
+			ShowUnitName(*this, CursorScreenPos, NULL, true);
+		}
+		*/
+		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisile || ReplayRevealMap)) {
+			std::string tile_label;
 			std::string text_color;
-			if (UnitUnderCursor->Unique || UnitUnderCursor->Character != NULL) {
-				text_color = "fire";
-			} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
-				text_color = "light-blue";
+			PixelPos label_screen_pos;
+			
+			if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
+				tile_label = UnitUnderCursor->GetMessageName();
+				label_screen_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
+				if (UnitUnderCursor->Unique || UnitUnderCursor->Character != NULL) {
+					text_color = "fire";
+				} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
+					text_color = "light-blue";
+				}
+			} else if (!Map.Field(tilePos)->Label.empty()) {
+				tile_label = Map.Field(tilePos)->Label;
+				label_screen_pos = Map.TilePosToMapPixelPos_TopLeft(tilePos);
 			}
-			DrawGenericPopup(UnitUnderCursor->GetMessageName(), unit_center_pos.x, unit_center_pos.y, text_color);
+			
+			if (!tile_label.empty()) {
+				label_screen_pos = MapToScreenPixelPos(label_screen_pos);
+				DrawGenericPopup(tile_label, label_screen_pos.x, label_screen_pos.y, text_color);
+			}
 			//Wyrmgus end
 		//Wyrmgus start
 //		} else if (!isMapFieldVisile) {
 //			ShowUnitName(*this, CursorScreenPos, NULL, true);
 		//Wyrmgus end
 		}
+		//Wyrmgus end
 	}
 
 	DrawBorder();

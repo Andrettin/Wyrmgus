@@ -2587,7 +2587,6 @@ void CUnit::UpdatePersonalName()
 		language = PlayerRaces.GetFactionLanguage(civilization, this->Player->Faction);
 	}
 
-	/*
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
 		std::string new_settlement_name = PlayerRaces.TranslateName(this->SettlementName, language);
 		if (!new_settlement_name.empty()) {
@@ -2596,7 +2595,6 @@ void CUnit::UpdatePersonalName()
 			this->SettlementName = GenerateName(language, "settlement");
 		}
 	}
-	*/
 	
 	// first see if can translate the current personal name
 	std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
