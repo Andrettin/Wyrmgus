@@ -423,7 +423,7 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
 	}
 }
 
-void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y)
+void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y, std::string tile_label)
 {
 	CMapTemplate *map = GetMapTemplate(map_ident);
 	
@@ -447,9 +447,13 @@ void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident,
 	}
 	
 	map->SetTileTerrain(pos, terrain);
+	
+	if (!tile_label.empty()) {
+		map->TileLabels[std::pair<int, int>(pos.x, pos.y)] = TransliterateText(tile_label);
+	}
 }
 
-void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y)
+void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y, std::string tile_label)
 {
 	CMapTemplate *map = GetMapTemplate(map_ident);
 	
@@ -473,6 +477,10 @@ void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x,
 	}
 
 	map->SetTileTerrain(pos, terrain);
+	
+	if (!tile_label.empty()) {
+		map->TileLabels[std::pair<int, int>(pos.x, pos.y)] = TransliterateText(tile_label);
+	}
 }
 
 static int CclSetMapTemplateTileLabel(lua_State *l)
@@ -488,7 +496,7 @@ static int CclSetMapTemplateTileLabel(lua_State *l)
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
-	map_template->TileLabels.push_back(std::tuple<Vec2i, std::string>(ipos, label_string));
+	map_template->TileLabels[std::pair<int, int>(ipos.x, ipos.y)] = TransliterateText(label_string);
 	
 	return 1;
 }
@@ -608,6 +616,15 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 	
+	for (std::map<std::pair<int, int>, std::string>::iterator iterator = map_template->TileLabels.begin(); iterator != map_template->TileLabels.end(); ++iterator) {
+		Vec2i label_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
+		if (!Map.Info.IsPointOnMap(label_pos)) {
+			continue;
+		}
+		
+		Map.Field(label_pos)->Label = iterator->second;
+	}
+	
 	if (!PlayerFaction.empty()) {
 		CFaction *player_faction = PlayerRaces.GetFaction(-1, PlayerFaction);
 		
@@ -692,15 +709,6 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		if (std::get<2>(iterator->second)) {
 			unit->SetUnique(std::get<2>(iterator->second));
 		}
-	}
-	
-	for (size_t i = 0; i < map_template->TileLabels.size(); ++i) {
-		Vec2i label_pos(map_start_pos + std::get<0>(map_template->TileLabels[i]) - template_start_pos);
-		if (!Map.Info.IsPointOnMap(label_pos)) {
-			continue;
-		}
-		
-		Map.Field(label_pos)->Label = std::get<1>(map_template->TileLabels[i]);
 	}
 	
 	for (size_t i = 0; i < map_template->Units.size(); ++i) {

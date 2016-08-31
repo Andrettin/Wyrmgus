@@ -165,7 +165,7 @@ public:
 	std::vector<CTerrainType *> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources, mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, int, int>> Units; /// Units; first value is the tile position, and the last ones are start year and end year
-	std::vector<std::tuple<Vec2i, std::string>> TileLabels; /// labels to appear below certain tiles
+	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 };
 //Wyrmgus end
 
@@ -490,8 +490,8 @@ inline void SetTileTerrain(std::string terrain_ident, int x, int y, int value = 
 	const Vec2i pos(x, y);
 	SetTileTerrain(terrain_ident, pos, value);
 }
-extern void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y);
-extern void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y);
+extern void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y, std::string tile_label = "");
+extern void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y, std::string tile_label = "");
 extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0);
 //Wyrmgus end
 
