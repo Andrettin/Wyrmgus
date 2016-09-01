@@ -204,7 +204,7 @@ static void MenuHandleKeyDown(unsigned key, unsigned keychar)
 					WorldMapOffsetX = WorldMapOffsetX + 1;
 				}
 				GrandStrategyMapWidthIndent += 32;
-			} else if (WorldMapOffsetX == GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64) && GrandStrategyMapWidthIndent == 0) {
+			} else if (WorldMapOffsetX == GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64) && GrandStrategyMapWidthIndent == 0 && (UI.MapArea.EndX - UI.MapArea.X + 1) % 64 == 32) {
 				GrandStrategyMapWidthIndent += 32;
 			}
 			scrolled = true;
@@ -339,7 +339,7 @@ static void MenuHandleKeyRepeat(unsigned key, unsigned keychar)
 					WorldMapOffsetX = WorldMapOffsetX + 1;
 				}
 				GrandStrategyMapWidthIndent += 32;
-			} else if (WorldMapOffsetX == GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64) && GrandStrategyMapWidthIndent == 0) {
+			} else if (WorldMapOffsetX == GetWorldMapWidth() - 1 - ((UI.MapArea.EndX - UI.MapArea.X) / 64) && GrandStrategyMapWidthIndent == 0 && (UI.MapArea.EndX - UI.MapArea.X + 1) % 64 == 32) {
 				GrandStrategyMapWidthIndent += 32;
 			}
 			scrolled = true;
