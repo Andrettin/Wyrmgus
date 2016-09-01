@@ -3343,9 +3343,12 @@ void DisableMod(std::string mod_file)
 					}
 				}
 			}
-			for (size_t j = 0; j < UnitTypes.size(); ++j) { //remove this unit from the "Trains", "Drops" and "AiDrops" vectors of other unit types
+			for (size_t j = 0; j < UnitTypes.size(); ++j) { //remove this unit from the "Trains", "TrainedBy", "Drops" and "AiDrops" vectors of other unit types
 				if (std::find(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), UnitTypes[i]) != UnitTypes[j]->Trains.end()) {
 					UnitTypes[j]->Trains.erase(std::remove(UnitTypes[j]->Trains.begin(), UnitTypes[j]->Trains.end(), UnitTypes[i]), UnitTypes[j]->Trains.end());
+				}
+				if (std::find(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), UnitTypes[i]) != UnitTypes[j]->TrainedBy.end()) {
+					UnitTypes[j]->TrainedBy.erase(std::remove(UnitTypes[j]->TrainedBy.begin(), UnitTypes[j]->TrainedBy.end(), UnitTypes[i]), UnitTypes[j]->TrainedBy.end());
 				}
 				if (std::find(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]) != UnitTypes[j]->Drops.end()) {
 					UnitTypes[j]->Drops.erase(std::remove(UnitTypes[j]->Drops.begin(), UnitTypes[j]->Drops.end(), UnitTypes[i]), UnitTypes[j]->Drops.end());
@@ -3373,6 +3376,10 @@ void DisableMod(std::string mod_file)
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		if (UnitTypes[i]->ModTrains.find(mod_file) != UnitTypes[i]->ModTrains.end()) {
 			UnitTypes[i]->ModTrains.erase(mod_file);
+			UnitTypes[i]->RemoveButtons(-1, mod_file);
+		}
+		if (UnitTypes[i]->ModTrainedBy.find(mod_file) != UnitTypes[i]->ModTrainedBy.end()) {
+			UnitTypes[i]->ModTrainedBy.erase(mod_file);
 			UnitTypes[i]->RemoveButtons(-1, mod_file);
 		}
 		if (UnitTypes[i]->ModAiDrops.find(mod_file) != UnitTypes[i]->ModAiDrops.end()) {

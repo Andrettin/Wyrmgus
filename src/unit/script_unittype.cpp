@@ -783,6 +783,7 @@ static int CclDefineUnitType(lua_State *l)
 			}
 			for (size_t i = 0; i < parent_type->Trains.size(); ++i) {
 				type->Trains.push_back(parent_type->Trains[i]);
+				parent_type->Trains[i]->TrainedBy.push_back(type);
 			}
 			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
 				if (parent_type->VarInfo[var_n]) {
@@ -1270,6 +1271,11 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Trains")) {
 			type->RemoveButtons(ButtonTrain);
 			type->RemoveButtons(ButtonBuild);
+			for (size_t i = 0; i < type->Trains.size(); ++i) {
+				if (std::find(type->Trains[i]->TrainedBy.begin(), type->Trains[i]->TrainedBy.end(), type) != type->Trains[i]->TrainedBy.end()) {
+					type->Trains[i]->TrainedBy.erase(std::remove(type->Trains[i]->TrainedBy.begin(), type->Trains[i]->TrainedBy.end(), type), type->Trains[i]->TrainedBy.end());
+				}
+			}
 			type->Trains.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -1277,6 +1283,7 @@ static int CclDefineUnitType(lua_State *l)
 				CUnitType *trained_unit = UnitTypeByIdent(value);
 				if (trained_unit != NULL) {
 					type->Trains.push_back(trained_unit);
+					trained_unit->TrainedBy.push_back(type);
 				} else {
 					LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);
 				}
@@ -4387,6 +4394,11 @@ static int CclSetModTrains(lua_State *l)
 		LuaError(l, "Unit type doesn't exist.");
 	}
 
+	for (size_t i = 0; i < type->ModTrains[mod_file].size(); ++i) {
+		if (std::find(type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].begin(), type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end(), type) != type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end()) {
+			type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].erase(std::remove(type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].begin(), type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end(), type), type->ModTrains[mod_file][i]->ModTrainedBy[mod_file].end());
+		}
+	}
 	type->ModTrains[mod_file].clear();
 	type->RemoveButtons(-1, mod_file);
 	
@@ -4399,6 +4411,7 @@ static int CclSetModTrains(lua_State *l)
 		CUnitType *trained_unit = UnitTypeByIdent(value);
 		if (trained_unit != NULL) {
 			type->ModTrains[mod_file].push_back(trained_unit);
+			trained_unit->ModTrainedBy[mod_file].push_back(type);
 		} else {
 			LuaError(l, "Unit type \"%s\" doesn't exist." _C_ value);
 		}

@@ -1815,8 +1815,9 @@ void CPlayer::AvailableQuestsChanged()
 void CPlayer::UpdateCurrentQuests()
 {
 	for (int i = ((int) this->CurrentQuests.size() - 1); i >= 0; --i) {
-		if (this->HasFailedQuest(this->CurrentQuests[i])) {
-			this->FailQuest(this->CurrentQuests[i]);
+		std::string failed_quest = this->HasFailedQuest(this->CurrentQuests[i]);
+		if (!failed_quest.empty()) {
+			this->FailQuest(this->CurrentQuests[i], failed_quest);
 		} else if (this->HasCompletedQuest(this->CurrentQuests[i])) {
 			this->CompleteQuest(this->CurrentQuests[i]);
 		}
@@ -1887,7 +1888,7 @@ void CPlayer::CompleteQuest(CQuest *quest)
 	}
 }
 
-void CPlayer::FailQuest(CQuest *quest)
+void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 {
 	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
 	
@@ -1897,18 +1898,6 @@ void CPlayer::FailQuest(CQuest *quest)
 			CclCommand("RemovePlayerObjective(" + std::to_string((long long) this->Index) + ", \"" + quest->Objectives[i] + "\");");
 		}
 
-		std::string fail_reason;
-		if (quest->CurrentCompleted) { // quest already completed by someone else
-			fail_reason = "Another faction has completed the quest before you.";
-		} else {
-			for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
-				if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == true && std::get<1>(this->QuestDestroyUniques[i])->CanDrop()) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
-					fail_reason = "The target no longer exists.";
-					break;
-				}
-			}
-		}
-		
 		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Failed\", \"You have failed the " + quest->Name + " quest! " + fail_reason + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
 	}
 }
@@ -1972,19 +1961,35 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 	return true;
 }
 
-bool CPlayer::HasFailedQuest(CQuest *quest)
+std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for failure (empty if none)
 {
 	if (quest->CurrentCompleted) { // quest already completed by someone else
-		return true;
+		return "Another faction has completed the quest before you.";
 	}
 
-	for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
-		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == true && std::get<1>(this->QuestDestroyUniques[i])->CanDrop()) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
-			return true;
+	for (size_t i = 0; i < this->QuestBuildUnits.size(); ++i) {
+		if (std::get<0>(this->QuestBuildUnits[i]) == quest && std::get<2>(this->QuestBuildUnits[i]) > 0) {
+			bool has_builder = false;
+			CUnitType *type = std::get<1>(this->QuestBuildUnits[i]);
+			for (size_t j = 0; j < type->TrainedBy.size(); ++j) {
+				if (this->UnitTypesCount[type->TrainedBy[j]->Slot] > 0) {
+					has_builder = true;
+					break;
+				}
+			}
+			if (!has_builder) {
+				return "You can no longer produce the required unit.";
+			}
 		}
 	}
 	
-	return false;
+	for (size_t i = 0; i < this->QuestDestroyUniques.size(); ++i) {
+		if (std::get<0>(this->QuestDestroyUniques[i]) == quest && std::get<2>(this->QuestDestroyUniques[i]) == true && std::get<1>(this->QuestDestroyUniques[i])->CanDrop()) { // if is supposed to destroy a unique, but it is nowhere to be found, fail the quest
+			return "The target no longer exists.";
+		}
+	}
+	
+	return "";
 }
 //Wyrmgus end
 

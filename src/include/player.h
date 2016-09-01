@@ -232,10 +232,10 @@ public:
 	void UpdateCurrentQuests();
 	void AcceptQuest(CQuest *quest);
 	void CompleteQuest(CQuest *quest);
-	void FailQuest(CQuest *quest);
+	void FailQuest(CQuest *quest, std::string fail_reason);
 	bool CanAcceptQuest(CQuest *quest);
 	bool HasCompletedQuest(CQuest *quest);
-	bool HasFailedQuest(CQuest *quest);
+	std::string HasFailedQuest(CQuest *quest);
 	//Wyrmgus end
 
 	/// Get a resource of the player

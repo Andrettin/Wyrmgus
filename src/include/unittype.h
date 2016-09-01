@@ -829,7 +829,9 @@ public:
 	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
 	std::vector<CUpgrade *> StartingAbilities;	/// Abilities which the unit starts out with
 	std::vector<CUnitType *> Trains;	/// Units trained by this unit
+	std::vector<CUnitType *> TrainedBy;	/// Units which can train this unit
 	std::map<std::string, std::vector<CUnitType *>> ModTrains;	/// Units trained by this unit (as set in a mod)
+	std::map<std::string, std::vector<CUnitType *>> ModTrainedBy;	/// Units which can train this unit (as set in a mod)
 	std::map<std::string, std::vector<CUnitType *>> ModAiDrops;	/// Units dropped by this unit, if it is AI-controlled (as set in a mod)
 	//Wyrmgus end
 	int Slot;                       /// Type as number
