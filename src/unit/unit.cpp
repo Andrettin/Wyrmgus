@@ -4459,28 +4459,25 @@ bool CUnit::CanEquipItemClass(int item_class) const
 		return false;
 	}
 	
+	if ( //if the item uses the shield (off-hand) slot, but that slot is unavailable for the weapon (because it is two-handed), return false
+		GetItemClassSlot(item_class) == ShieldItemSlot
+		&& Type->WeaponClasses.size() > 0
+		&& (
+			Type->WeaponClasses[0] == BowItemClass
+			// add other two-handed weapons here as necessary
+		)
+	) {
+		return false;
+	}
+	
 	if ( //if the item is a shield and the weapon of this unit's type is incompatible with shields, return false
 		item_class == ShieldItemClass
 		&& (
 			Type->WeaponClasses.size() == 0
 			|| Type->WeaponClasses[0] == DaggerItemClass
-			|| Type->WeaponClasses[0] == BowItemClass
 			|| Type->WeaponClasses[0] == ThrowingAxeItemClass
 			|| Type->WeaponClasses[0] == JavelinItemClass
 			|| Type->BoolFlag[HARVESTER_INDEX].value //workers can't use shields
-		)
-	) {
-		return false;
-	} else if ( // if is a horn, only allow if the weapon is compatible with horns
-		item_class == HornItemClass
-		&& (
-			Type->WeaponClasses.size() == 0
-			|| (
-				Type->WeaponClasses[0] != BowItemClass
-				&& Type->WeaponClasses[0] != ThrowingAxeItemClass
-				&& Type->WeaponClasses[0] != JavelinItemClass
-				&& !Type->BoolFlag[HARVESTER_INDEX].value //workers can use horns
-			)
 		)
 	) {
 		return false;
