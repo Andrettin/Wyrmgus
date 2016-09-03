@@ -511,24 +511,6 @@ extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTer
 /// Load map presentation
 extern void LoadStratagusMapInfo(const std::string &mapname);
 
-//Wyrmgus start
-extern std::string RawTiles[MaxMapWidth][MaxMapHeight];
-
-/// Convert a map from 0 AD
-extern void Convert0ADMap(const std::string &mapname);
-
-extern void Set0ADTemplateUnitTypeEquivalency(const std::string zero_ad_template, const std::string unit_type_ident);
-extern void Set0ADCivilizationEquivalency(const std::string zero_ad_civilization, const std::string civilization);
-extern void Set0ADCivilizationFactionEquivalency(const std::string zero_ad_civilization, const std::string faction);
-
-extern std::string Convert0ADTextureToTileType(const std::string zero_ad_texture);
-extern std::string Convert0ADTemplateToUnitTypeIdent(const std::string zero_ad_template);
-extern std::string Convert0ADCivilizationToCivilization(const std::string zero_ad_civilization);
-extern std::string Convert0ADCivilizationToFaction(const std::string zero_ad_civilization);
-extern void AdjustRawTileMapIrregularities(int map_width, int map_height);
-extern void AdjustRawTileMapTransitions(int map_width, int map_height);
-//Wyrmgus end
-
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
 /// Returns true, if the unit-type can enter the field
