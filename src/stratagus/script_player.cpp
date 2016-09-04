@@ -871,6 +871,18 @@ static int CclDefineCivilization(lua_State *l)
 					LuaError(l, "Month \"%s\" doesn't exist." _C_ month_name.c_str());
 				}
 			}
+		} else if (!strcmp(value, "PersonalNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));
+				if (gender_id == -1) {
+					gender_id = NoGender;
+				} else {
+					++j;
+				}
+				
+				civilization->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1818,6 +1830,18 @@ static int CclDefineFaction(lua_State *l)
 				++j;
 				filler.Y = LuaToNumber(l, -1, j + 1);
 				faction->UIFillers.push_back(filler);
+			}
+		} else if (!strcmp(value, "PersonalNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));
+				if (gender_id == -1) {
+					gender_id = NoGender;
+				} else {
+					++j;
+				}
+				
+				faction->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "HistoricalFactionDerivations")) {
 			if (!lua_istable(l, -1)) {

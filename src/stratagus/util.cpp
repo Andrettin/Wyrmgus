@@ -1143,6 +1143,43 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 			return potential_names[SyncRand(potential_names.size())];
 		}
 	}
+
+	if (type.BoolFlag[ORGANIC_INDEX].value && !type.Civilization.empty()) {
+		int civilization_id = PlayerRaces.GetRaceIndexByName(type.Civilization.c_str());
+		if (civilization_id != -1) {
+			CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
+			CFaction *faction = PlayerRaces.GetFaction(civilization_id, type.Faction);
+			if (faction && (faction->PersonalNames[NoGender].size() > 0 || (gender != -1 && faction->PersonalNames[gender].size() > 0))) {
+				std::vector<std::string> potential_names;
+				for (size_t i = 0; i < faction->PersonalNames[NoGender].size(); ++i) {
+					potential_names.push_back(faction->PersonalNames[NoGender][i]);
+				}
+				if (gender != -1 && gender != NoGender) {
+					for (size_t i = 0; i < faction->PersonalNames[gender].size(); ++i) {
+						potential_names.push_back(faction->PersonalNames[gender][i]);
+					}
+				}
+				if (potential_names.size() > 0) {
+					return potential_names[SyncRand(potential_names.size())];
+				}
+			}
+			
+			if (civilization->PersonalNames[NoGender].size() > 0 || (gender != -1 && civilization->PersonalNames[gender].size() > 0)) {
+				std::vector<std::string> potential_names;
+				for (size_t i = 0; i < civilization->PersonalNames[NoGender].size(); ++i) {
+					potential_names.push_back(civilization->PersonalNames[NoGender][i]);
+				}
+				if (gender != -1 && gender != NoGender) {
+					for (size_t i = 0; i < civilization->PersonalNames[gender].size(); ++i) {
+						potential_names.push_back(civilization->PersonalNames[gender][i]);
+					}
+				}
+				if (potential_names.size() > 0) {
+					return potential_names[SyncRand(potential_names.size())];
+				}
+			}
+		}
+	}
 	
 	if (language != -1 && PlayerRaces.Languages[language]->LanguageWords.size() > 0) {
 		if (type.BoolFlag[FAUNA_INDEX].value && type.Species != NULL) {
