@@ -4273,7 +4273,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	}
 	
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);
-	if (item->Work == NULL && (item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0)) {
+	if (item->Work == NULL && (item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0 || !this->CanEquipItemClass(item->Type->ItemClass))) {
 		return 0;
 	}
 	
