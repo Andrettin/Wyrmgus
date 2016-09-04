@@ -2102,6 +2102,26 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 	}
+	
+	if (type->Species && type->Species->Genus) { // add the personal names to the higher taxonomical classifications
+		for (std::map<int, std::vector<std::string>>::iterator iterator = type->PersonalNames.begin(); iterator != type->PersonalNames.end(); ++iterator) {
+			for (size_t i = 0; i < iterator->second.size(); ++i) {
+				type->Species->Genus->PersonalNames[iterator->first].push_back(iterator->second[i]);				
+				if (type->Species->Genus->Family) {
+					type->Species->Genus->Family->PersonalNames[iterator->first].push_back(iterator->second[i]);
+					if (type->Species->Genus->Family->Order) {
+						type->Species->Genus->Family->Order->PersonalNames[iterator->first].push_back(iterator->second[i]);
+						if (type->Species->Genus->Family->Order->Class) {
+							type->Species->Genus->Family->Order->Class->PersonalNames[iterator->first].push_back(iterator->second[i]);
+							if (type->Species->Genus->Family->Order->Class->Phylum) {
+								type->Species->Genus->Family->Order->Class->Phylum->PersonalNames[iterator->first].push_back(iterator->second[i]);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	//Wyrmgus end
 
 	// If number of directions is not specified, make a guess
