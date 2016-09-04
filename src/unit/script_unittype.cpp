@@ -2010,6 +2010,18 @@ static int CclDefineUnitType(lua_State *l)
 					LuaError(l, "incorrect weapon class");
 				}
 			}
+		} else if (!strcmp(value, "PersonalNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));
+				if (gender_id == -1) {
+					gender_id = NoGender;
+				} else {
+					++j;
+				}
+				
+				type->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
+			}
 		} else if (!strcmp(value, "Mod")) {
 			type->Mod = LuaToString(l, -1);
 		//Wyrmgus end

@@ -1048,7 +1048,7 @@ std::string SeparateCapitalizedStringElements(std::string text)
 */
 std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 {
-	const CUnitType &type = *UnitTypes[unit_type_id];
+	CUnitType &type = *UnitTypes[unit_type_id];
 	std::string personal_name;
 	
 	if (language == -1 && type.Species != NULL) {
@@ -1057,6 +1057,19 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 
 	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
 		personal_name = "";
+	} else if (type.PersonalNames[NoGender].size() > 0 || (gender != -1 && type.PersonalNames[gender].size() > 0)) {
+		std::vector<std::string> potential_names;
+		for (size_t i = 0; i < type.PersonalNames[NoGender].size(); ++i) {
+			potential_names.push_back(type.PersonalNames[NoGender][i]);
+		}
+		if (gender != -1 && gender != NoGender) {
+			for (size_t i = 0; i < type.PersonalNames[gender].size(); ++i) {
+				potential_names.push_back(type.PersonalNames[gender][i]);
+			}
+		}
+		if (potential_names.size() > 0) {
+			personal_name = potential_names[SyncRand(potential_names.size())];
+		}
 	} else if (language != -1 && PlayerRaces.Languages[language]->LanguageWords.size() > 0) {
 		if (type.BoolFlag[FAUNA_INDEX].value && type.Species != NULL) {
 			personal_name = GenerateName(language, "species-" + type.Species->Ident + "-" + GetGenderNameById(gender));

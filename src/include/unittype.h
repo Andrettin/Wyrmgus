@@ -863,6 +863,7 @@ public:
 	CSpecies *Species;
 	CTerrainType *TerrainType;
 	std::vector<int> WeaponClasses;							/// Weapon classes that the unit type can use (if the unit type uses a weapon)
+	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the unit type, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 	//Wyrmgus end
 	PixelPos MissileOffsets[UnitSides][MaxAttackPos];     /// Attack offsets for missiles
 
