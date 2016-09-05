@@ -178,6 +178,8 @@ public:
 	void Release(bool final = false);
 	
 	//Wyrmgus start
+	void SetResourcesHeld(int quantity);
+	void ChangeResourcesHeld(int quantity);
 	void IncreaseLevel(int level_quantity);
 	void Retrain();
 	void HealingItemAutoUse();

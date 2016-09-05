@@ -424,28 +424,40 @@ static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 		if (unit == NULL) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
-			unit->ResourcesHeld = value;
+			//Wyrmgus start
+//			unit->ResourcesHeld = value;
+			unit->SetResourcesHeld(value);
+			//Wyrmgus end
 		}
 
 		unit = MakeUnitAndPlace(tmirrorh, type, &Players[PlayerNumNeutral]);
 		if (unit == NULL) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
-			unit->ResourcesHeld = value;
+			//Wyrmgus start
+//			unit->ResourcesHeld = value;
+			unit->SetResourcesHeld(value);
+			//Wyrmgus end
 		}
 
 		unit = MakeUnitAndPlace(tmirrorv, type, &Players[PlayerNumNeutral]);
 		if (unit == NULL) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
-			unit->ResourcesHeld = value;
+			//Wyrmgus start
+//			unit->ResourcesHeld = value;
+			unit->SetResourcesHeld(value);
+			//Wyrmgus end
 		}
 
 		unit = MakeUnitAndPlace(tmirror, type, &Players[PlayerNumNeutral]);
 		if (unit == NULL) {
 			DebugPrint("Unable to allocate Unit");
 		} else {
-			unit->ResourcesHeld = value;
+			//Wyrmgus start
+//			unit->ResourcesHeld = value;
+			unit->SetResourcesHeld(value);
+			//Wyrmgus end
 		}
 	}
 }

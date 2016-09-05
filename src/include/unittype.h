@@ -153,7 +153,7 @@ class VariationInfo
 {
 public:
 	VariationInfo() : 
-		FrameWidth(0), FrameHeight(0), SkinColor(0), HairColor(0),
+		FrameWidth(0), FrameHeight(0), SkinColor(0), HairColor(0), ResourceMin(0), ResourceMax(0),
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL)
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
@@ -171,6 +171,8 @@ public:
 	int FrameHeight;
 	int SkinColor;
 	int HairColor;
+	int ResourceMin;
+	int ResourceMax;
 	IconConfig Icon;				/// Icon to display for this unit
 	CPlayerColorGraphic *Sprite;	/// The graphic corresponding to File.
 	CGraphic *ShadowSprite;			/// The graphic corresponding to ShadowFile.
@@ -946,8 +948,9 @@ public:
 	std::string ButtonPopup;		/// Popup of this unit's button
 	std::string ButtonHint;			/// Hint of this unit's button
 	std::string ButtonKey;			/// Hotkey of this unit's button
+//	int StartingResources;          /// Amount of Resources on build
+	std::vector<int> StartingResources;          /// Amount of Resources on build
 	//Wyrmgus end
-	int StartingResources;          /// Amount of Resources on build
 	/// originally only visual effect, we do more with this!
 	UnitTypeType UnitType;          /// Land / fly / naval
 	int DecayRate;                  /// Decay rate in 1/6 seconds

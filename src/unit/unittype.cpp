@@ -589,7 +589,7 @@ CUnitType::CUnitType() :
 	AutoBuildRate(0), RandomMovementProbability(0), RandomMovementDistance(1), ClicksToExplode(0),
 	//Wyrmgus start
 //	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), StartingResources(0),
-	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), ButtonLevelForInventory(2), ButtonPos(0), ButtonLevel(0), StartingResources(0),
+	MaxOnBoard(0), BoardSize(1), ButtonLevelForTransporter(0), ButtonLevelForInventory(2), ButtonPos(0), ButtonLevel(0),
 	//Wyrmgus end
 	UnitType(UnitTypeLand), DecayRate(0), AnnoyComputerFactor(0), AiAdjacentRange(-1),
 	MouseAction(0), CanTarget(0),

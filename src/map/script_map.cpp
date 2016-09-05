@@ -700,7 +700,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *std::get<0>(iterator->second));
 		
 		if (std::get<1>(iterator->second)) {
-			unit->ResourcesHeld = std::get<1>(iterator->second);
+			unit->SetResourcesHeld(std::get<1>(iterator->second));
 			unit->Variable[GIVERESOURCE_INDEX].Value = std::get<1>(iterator->second);
 			unit->Variable[GIVERESOURCE_INDEX].Max = std::get<1>(iterator->second);
 			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;

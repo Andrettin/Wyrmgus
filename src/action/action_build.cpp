@@ -397,7 +397,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build, ontop.Type));
 		Assert(b);
 		if (b->ReplaceOnBuild) {
-			build->ResourcesHeld = ontop.ResourcesHeld; // We capture the value of what is beneath.
+			//Wyrmgus start
+//			build->ResourcesHeld = ontop.ResourcesHeld; // We capture the value of what is beneath.
+			build->SetResourcesHeld(ontop.ResourcesHeld); // We capture the value of what is beneath.
+			//Wyrmgus end
 			build->Variable[GIVERESOURCE_INDEX].Value = ontop.Variable[GIVERESOURCE_INDEX].Value;
 			build->Variable[GIVERESOURCE_INDEX].Max = ontop.Variable[GIVERESOURCE_INDEX].Max;
 			build->Variable[GIVERESOURCE_INDEX].Enable = ontop.Variable[GIVERESOURCE_INDEX].Enable;

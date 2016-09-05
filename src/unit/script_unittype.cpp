@@ -693,7 +693,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->ButtonPopup = parent_type->ButtonPopup;
 			type->ButtonHint = parent_type->ButtonHint;
 			type->ButtonKey = parent_type->ButtonKey;
-			type->StartingResources = parent_type->StartingResources;
 			type->BurnPercent = parent_type->BurnPercent;
 			type->BurnDamageRate = parent_type->BurnDamageRate;
 			type->PoisonDrain = parent_type->PoisonDrain;
@@ -785,6 +784,9 @@ static int CclDefineUnitType(lua_State *l)
 				type->Trains.push_back(parent_type->Trains[i]);
 				parent_type->Trains[i]->TrainedBy.push_back(type);
 			}
+			for (size_t i = 0; i < parent_type->StartingResources.size(); ++i) {
+				type->StartingResources.push_back(parent_type->StartingResources[i]);
+			}
 			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
 				if (parent_type->VarInfo[var_n]) {
 					VariationInfo *var = new VariationInfo;
@@ -803,6 +805,8 @@ static int CclDefineUnitType(lua_State *l)
 					var->FrameHeight = parent_type->VarInfo[var_n]->FrameHeight;
 					var->SkinColor = parent_type->VarInfo[var_n]->SkinColor;
 					var->HairColor = parent_type->VarInfo[var_n]->HairColor;
+					var->ResourceMin = parent_type->VarInfo[var_n]->ResourceMin;
+					var->ResourceMax = parent_type->VarInfo[var_n]->ResourceMax;
 					var->Icon.Name = parent_type->VarInfo[var_n]->Icon.Name;
 					var->Icon.Icon = NULL;
 					if (!var->Icon.Name.empty()) {
@@ -1016,6 +1020,10 @@ static int CclDefineUnitType(lua_State *l)
 						} else {
 							LuaError(l, "Terrain type \"%s\" doesn't exist." _C_ terrain_ident.c_str());
 						}
+					} else if (!strcmp(value, "resource-min")) {
+						var->ResourceMin = LuaToNumber(l, -1, k + 1);
+					} else if (!strcmp(value, "resource-max")) {
+						var->ResourceMax = LuaToNumber(l, -1, k + 1);
 					} else {
 						printf("\n%s\n", type->Name.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -1289,8 +1297,16 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		//Wyrmgus end
+		//Wyrmgus start
+//		} else if (!strcmp(value, "StartingResources")) {
+//			type->StartingResources = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartingResources")) {
-			type->StartingResources = LuaToNumber(l, -1);
+			type->StartingResources.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				type->StartingResources.push_back(LuaToNumber(l, -1, j + 1));
+			}
+		//Wyrmgus end
 		} else if (!strcmp(value, "RegenerationRate")) {
 			type->DefaultStat.Variables[HP_INDEX].Increase = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "BurnPercent")) {

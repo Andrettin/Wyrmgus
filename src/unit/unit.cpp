@@ -613,6 +613,21 @@ void CUnit::Release(bool final)
 }
 
 //Wyrmgus start
+void CUnit::SetResourcesHeld(int quantity)
+{
+	this->ResourcesHeld = quantity;
+	
+	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
+	if (varinfo && ((varinfo->ResourceMin && this->ResourcesHeld < varinfo->ResourceMin) || (varinfo->ResourceMax && this->ResourcesHeld > varinfo->ResourceMax))) {
+		this->ChooseVariation();
+	}
+}
+
+void CUnit::ChangeResourcesHeld(int quantity)
+{
+	this->SetResourcesHeld(this->ResourcesHeld + quantity);
+}
+
 void CUnit::IncreaseLevel(int level_quantity)
 {
 	while (level_quantity > 0) {
@@ -911,6 +926,12 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 	for (int i = 0; i < variation_max; ++i) {
 		VariationInfo *varinfo = image_layer == -1 ? new_type != NULL ? new_type->VarInfo[i] : this->Type->VarInfo[i] : (new_type != NULL ? new_type->LayerVarInfo[image_layer][i] : this->Type->LayerVarInfo[image_layer][i]);
 		if (!varinfo) {
+			continue;
+		}
+		if (varinfo->ResourceMin && this->ResourcesHeld < varinfo->ResourceMin) {
+			continue;
+		}
+		if (varinfo->ResourceMax && this->ResourcesHeld > varinfo->ResourceMax) {
 			continue;
 		}
 		if (varinfo->Terrains.size() > 0) {
@@ -1537,7 +1558,7 @@ void CUnit::SetUnique(CUniqueItem *unique)
 		SetSpell(unique->Spell);
 		SetWork(unique->Work);
 		if (unique->ResourcesHeld != 0) {
-			this->ResourcesHeld = unique->ResourcesHeld;
+			this->SetResourcesHeld(unique->ResourcesHeld);
 			this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
 			this->Variable[GIVERESOURCE_INDEX].Max = unique->ResourcesHeld;
 			this->Variable[GIVERESOURCE_INDEX].Enable = 1;
@@ -1998,7 +2019,14 @@ void CUnit::Init(const CUnitType &type)
 	//Wyrmgus end
 
 	// Has StartingResources, Use those
-	this->ResourcesHeld = type.StartingResources;
+	//Wyrmgus start
+//	this->ResourcesHeld = type.StartingResources;
+	if (type.StartingResources.size() > 0) {
+		this->ResourcesHeld = type.StartingResources[SyncRand(type.StartingResources.size())];
+	} else {
+		this->ResourcesHeld = 0;
+	}
+	//Wyrmgus end
 
 	Assert(Orders.empty());
 
@@ -3044,7 +3072,10 @@ void UnitLost(CUnit &unit)
 			if (temp == NULL) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
-				temp->ResourcesHeld = unit.ResourcesHeld;
+				//Wyrmgus start
+//				temp->ResourcesHeld = unit.ResourcesHeld;
+				temp->SetResourcesHeld(unit.ResourcesHeld);
+				//Wyrmgus end
 				temp->Variable[GIVERESOURCE_INDEX].Value = unit.Variable[GIVERESOURCE_INDEX].Value;
 				temp->Variable[GIVERESOURCE_INDEX].Max = unit.Variable[GIVERESOURCE_INDEX].Max;
 				temp->Variable[GIVERESOURCE_INDEX].Enable = unit.Variable[GIVERESOURCE_INDEX].Enable;

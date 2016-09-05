@@ -466,7 +466,10 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 
 		if (it != unitCache.end()) {
 			CUnit &replacedUnit = **it;
-			unit->ResourcesHeld = replacedUnit.ResourcesHeld; // We capture the value of what is beneath.
+			//Wyrmgus start
+//			unit->ResourcesHeld = replacedUnit.ResourcesHeld; // We capture the value of what is beneath.
+			unit->SetResourcesHeld(replacedUnit.ResourcesHeld); // We capture the value of what is beneath.
+			//Wyrmgus end
 			unit->Variable[GIVERESOURCE_INDEX].Value = replacedUnit.Variable[GIVERESOURCE_INDEX].Value;
 			unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
 			unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
@@ -493,12 +496,23 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	}
 	if (unit != NULL) {
 		if (type.GivesResource) {
-			if (type.StartingResources != 0) {
-				unit->ResourcesHeld = type.StartingResources;
-				unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
-				unit->Variable[GIVERESOURCE_INDEX].Max = type.StartingResources;
+			//Wyrmgus start
+//			if (type.StartingResources != 0) {
+			if (type.StartingResources.size() > 0) {
+			//Wyrmgus end
+				//Wyrmgus start
+//				unit->ResourcesHeld = type.StartingResources;
+//				unit->Variable[GIVERESOURCE_INDEX].Value = type.StartingResources;
+//				unit->Variable[GIVERESOURCE_INDEX].Max = type.StartingResources;
+				unit->SetResourcesHeld(type.StartingResources[SyncRand(type.StartingResources.size())]);
+				unit->Variable[GIVERESOURCE_INDEX].Value = unit->ResourcesHeld;
+				unit->Variable[GIVERESOURCE_INDEX].Max = unit->ResourcesHeld;
+				//Wyrmgus end
 			} else {
-				unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
+				//Wyrmgus start
+//				unit->ResourcesHeld = DefaultResourceAmounts[type.GivesResource];
+				unit->SetResourcesHeld(DefaultResourceAmounts[type.GivesResource]);
+				//Wyrmgus end
 				unit->Variable[GIVERESOURCE_INDEX].Value = DefaultResourceAmounts[type.GivesResource];
 				unit->Variable[GIVERESOURCE_INDEX].Max = DefaultResourceAmounts[type.GivesResource];
 			}

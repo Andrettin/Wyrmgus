@@ -870,8 +870,11 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			}
 			mf.Value -= addload;
 			//Wyrmgus end
-			unit.ResourcesHeld += addload;
-
+			//Wyrmgus start
+//			unit.ResourcesHeld += addload;
+			unit.ChangeResourcesHeld(addload);
+			//Wyrmgus end
+			
 			//Wyrmgus start
 //			if (addload && unit.ResourcesHeld == resinfo.ResourceCapacity) {
 			if (mf.Value <= 0) {
@@ -901,8 +904,12 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			if (is_visible) {
 				// Don't load more that there is.
 				addload = std::min(source->ResourcesHeld, addload);
-				unit.ResourcesHeld += addload;
-				source->ResourcesHeld -= addload;
+				//Wyrmgus start
+//				unit.ResourcesHeld += addload;
+//				source->ResourcesHeld -= addload;
+				unit.ChangeResourcesHeld(addload);
+				source->ChangeResourcesHeld(-addload);
+				//Wyrmgus end
 			}
 
 			// End of resource: destroy the resource.
@@ -1241,7 +1248,10 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 	
 	//Wyrmgus end
-	unit.ResourcesHeld = 0;
+	//Wyrmgus start
+//	unit.ResourcesHeld = 0;
+	unit.SetResourcesHeld(0);
+	//Wyrmgus end
 	unit.CurrentResource = 0;
 
 	if (unit.Wait) {
@@ -1385,7 +1395,10 @@ void COrder_Resource::DropResource(CUnit &unit)
 		//fast clean both resource data: pos and mine
 		this->Resource.Mine = NULL;
 		unit.CurrentResource = 0;
-		unit.ResourcesHeld = 0;
+		//Wyrmgus start
+//		unit.ResourcesHeld = 0;
+		unit.SetResourcesHeld(0);
+		//Wyrmgus end
 	}
 }
 
