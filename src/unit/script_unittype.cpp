@@ -254,6 +254,7 @@ static const char TIMEEFFICIENCYBONUS_KEY[] = "TimeEfficiencyBonus";
 static const char DISEMBARKMENTBONUS_KEY[] = "DisembarkmentBonus";
 static const char LEADERSHIPAURA_KEY[] = "LeadershipAura";
 static const char REGENERATIONAURA_KEY[] = "RegenerationAura";
+static const char AVAILABLEQUESTS_KEY[] = "AvailableQuests";
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -323,7 +324,8 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BONUSAGAINSTDRAGONS_KEY,
 							   DAYSIGHTRANGEBONUS_KEY, NIGHTSIGHTRANGEBONUS_KEY, KNOWLEDGEMAGIC_KEY, KNOWLEDGEWARFARE_KEY,
 							   MAGICLEVEL_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY, EVOLUTION_KEY,
-							   STUN_KEY, BLEEDING_KEY, LEADERSHIP_KEY, INSPIRE_KEY, PRECISION_KEY, REGENERATION_KEY, TERROR_KEY, TIMEEFFICIENCYBONUS_KEY, DISEMBARKMENTBONUS_KEY, LEADERSHIPAURA_KEY, REGENERATIONAURA_KEY
+							   STUN_KEY, BLEEDING_KEY, LEADERSHIP_KEY, INSPIRE_KEY, PRECISION_KEY, REGENERATION_KEY, TERROR_KEY, TIMEEFFICIENCYBONUS_KEY, DISEMBARKMENTBONUS_KEY, LEADERSHIPAURA_KEY, REGENERATIONAURA_KEY,
+							   AVAILABLEQUESTS_KEY
 //Wyrmgus end
 							  };
 
@@ -3548,7 +3550,8 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == KNOWLEDGEMAGIC_INDEX || i == KNOWLEDGEWARFARE_INDEX
 			|| i == MAGICLEVEL_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX || i == EVOLUTION_INDEX
 			|| i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == INSPIRE_INDEX || i == PRECISION_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX || i == TIMEEFFICIENCYBONUS_INDEX
-			|| i == DISEMBARKMENTBONUS_INDEX || i == LEADERSHIPAURA_INDEX || i == REGENERATIONAURA_INDEX) {
+			|| i == DISEMBARKMENTBONUS_INDEX || i == LEADERSHIPAURA_INDEX || i == REGENERATIONAURA_INDEX
+			|| i == AVAILABLEQUESTS_INDEX) {
 			//Wyrmgus end
 			continue;
 		}
@@ -3657,6 +3660,14 @@ void UpdateUnitVariables(CUnit &unit)
 	// Player
 	unit.Variable[PLAYER_INDEX].Value = unit.Player->Index;
 	unit.Variable[PLAYER_INDEX].Max = PlayerMax;
+	
+	//Wyrmgus start
+	if (unit.Type->BoolFlag[TOWNHALL_INDEX].value) {
+		unit.Variable[AVAILABLEQUESTS_INDEX].Value = unit.Player->AvailableQuests.size();
+		unit.Variable[AVAILABLEQUESTS_INDEX].Max = unit.Player->AvailableQuests.size();
+		unit.Variable[AVAILABLEQUESTS_INDEX].Enable = (unit.Player->AvailableQuests.size() > 0) ? 1 : 0;
+	}
+	//Wyrmgus end
 
 	for (int i = 0; i < NVARALREADYDEFINED; i++) { // default values
 		unit.Variable[i].Enable &= unit.Variable[i].Max > 0;
