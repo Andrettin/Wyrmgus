@@ -494,49 +494,6 @@ static bool SeekShelter(CUnit &unit)
 }
 
 /**
-**  Evolve (if possible) to another species
-**
-**  @return  true if the unit evolves, false otherwise
-*/
-static bool Evolve(CUnit &unit)
-{
-	if (
-		!unit.Type->BoolFlag[ORGANIC_INDEX].value
-		|| CurrentQuest != NULL || GrandStrategy //only perform evolution in custom games, not in quests or in grand strategy battles
-		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
-		|| unit.Type->Species->EvolvesTo.size() == 0
-		|| unit.Variable[EVOLUTION_INDEX].Value == 0 || unit.Variable[EVOLUTION_INDEX].Value < unit.Variable[EVOLUTION_INDEX].Max
-		|| SyncRand(1000) > (unit.Type->RandomMovementProbability * 10)
-		|| (unit.Removed && !unit.Container)
-	) {
-		return false;
-	}
-
-	if (unit.IndividualUpgrades[CUpgrade::Get(unit.Type->Species->ChildUpgrade)->ID]) { //children can't evolve
-		return false;
-	}
-	
-	const CUnit *firstContainer = unit.Container ? unit.Container : &unit;
-	CTerrainType *terrain = Map.GetTileTopTerrain(firstContainer->tilePos);
-	
-	if (unit.Type->Species->CanEvolveToAUnitType()) {
-		CSpecies *evolved_species = unit.Type->Species->GetRandomEvolution(terrain);
-		
-		while (evolved_species->Type == NULL) {
-			evolved_species = evolved_species->GetRandomEvolution(terrain);
-		}
-
-		CommandTransformIntoType(unit, *evolved_species->Type);
-		
-		unit.Variable[EVOLUTION_INDEX].Value = 0;
-		
-		return true;
-	}
-	
-	return false;
-}
-
-/**
 **  PickUpItem
 **
 **  @return  true if the unit picks up an item, false otherwise
@@ -806,7 +763,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| Feed(unit) || Excrete(unit) || Breed(unit) || SeekShelter(unit) || Evolve(unit) || MoveRandomly(unit) || PickUpItem(unit)) {
+			|| Feed(unit) || Excrete(unit) || Breed(unit) || SeekShelter(unit) || MoveRandomly(unit) || PickUpItem(unit)) {
 			//Wyrmgus end
 		}
 	}
