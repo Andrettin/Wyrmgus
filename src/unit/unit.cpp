@@ -1437,7 +1437,9 @@ void CUnit::ApplyAura(int aura_index)
 		if (table[i]->UnitInside) {
 			CUnit *uins = table[i]->UnitInside;
 			for (int j = 0; j < table[i]->InsideCount; ++j, uins = uins->NextContained) {
-				uins->ApplyAuraEffect(aura_index);
+				if (uins->Player == this->Player || uins->IsAllied(*this->Player)) {
+					uins->ApplyAuraEffect(aura_index);
+				}
 			}
 		}
 	}
