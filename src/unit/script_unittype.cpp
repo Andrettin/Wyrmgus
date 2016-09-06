@@ -788,6 +788,11 @@ static int CclDefineUnitType(lua_State *l)
 			for (size_t i = 0; i < parent_type->StartingResources.size(); ++i) {
 				type->StartingResources.push_back(parent_type->StartingResources[i]);
 			}
+			for (std::map<int, std::vector<std::string>>::iterator iterator = parent_type->PersonalNames.begin(); iterator != parent_type->PersonalNames.end(); ++iterator) {
+				for (size_t i = 0; i < iterator->second.size(); ++i) {
+					type->PersonalNames[iterator->first].push_back(iterator->second[i]);				
+				}
+			}
 			for (unsigned int var_n = 0; var_n < VariationMax; ++var_n) {
 				if (parent_type->VarInfo[var_n]) {
 					VariationInfo *var = new VariationInfo;
@@ -2028,6 +2033,7 @@ static int CclDefineUnitType(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "PersonalNames")) {
+			type->PersonalNames.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));

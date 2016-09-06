@@ -462,6 +462,7 @@ public:
 	std::vector<CQuest *> Quests;	/// quests belonging to this civilization
 	std::map<int, std::string> Months;	/// Month names for the civilization, mapped to the ID of the corresponding month
 	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the civilization, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
+	std::vector<std::string> SettlementNames;	/// Settlement names for the civilization
 };
 
 class CFaction
@@ -499,6 +500,7 @@ public:
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
 	std::map<int, std::vector<std::string>> PersonalNames;				/// Personal names for the faction, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
+	std::vector<std::string> SettlementNames;	/// Settlement names for the civilization
 	std::map<std::tuple<int, int, int>, CCharacter *> HistoricalMinisters;	/// historical ministers of the faction (as well as heads of state and government), mapped to the beginning and end of the rule, and the enum of the title in question
 	std::map<std::string, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 	std::map<int, CFaction *> HistoricalFactionDerivations;				/// cases of this faction deriving technologies/governmental system from another, mapped to the date in which it happened

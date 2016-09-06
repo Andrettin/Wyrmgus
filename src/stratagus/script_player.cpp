@@ -883,6 +883,11 @@ static int CclDefineCivilization(lua_State *l)
 				
 				civilization->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "SettlementNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				civilization->SettlementNames.push_back(LuaToString(l, -1, j + 1));
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1842,6 +1847,11 @@ static int CclDefineFaction(lua_State *l)
 				}
 				
 				faction->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
+			}
+		} else if (!strcmp(value, "SettlementNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				faction->SettlementNames.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "HistoricalFactionDerivations")) {
 			if (!lua_istable(l, -1)) {
