@@ -1074,108 +1074,49 @@ std::string GeneratePersonalName(int language, int unit_type_id, int gender)
 		}
 	}
 	
-	if (type.BoolFlag[FAUNA_INDEX].value && type.Species && type.Species->Genus) { // if is a fauna unit and it hasn't got a name yet, try to use those assigned to its species' higher taxonomical categories
-		std::vector<std::string> potential_names;
-		if (type.Species->Genus->PersonalNames[NoGender].size() > 0 || (gender != -1 && type.Species->Genus->PersonalNames[gender].size() > 0)) {
-			for (size_t i = 0; i < type.Species->Genus->PersonalNames[NoGender].size(); ++i) {
-				potential_names.push_back(type.Species->Genus->PersonalNames[NoGender][i]);
-			}
-			if (gender != -1 && gender != NoGender) {
-				for (size_t i = 0; i < type.Species->Genus->PersonalNames[gender].size(); ++i) {
-					potential_names.push_back(type.Species->Genus->PersonalNames[gender][i]);
-				}
-			}
-		}
-		
-		if (potential_names.size() == 0 && type.Species->Genus->Family) {
-			if (type.Species->Genus->Family->PersonalNames[NoGender].size() > 0 || (gender != -1 && type.Species->Genus->Family->PersonalNames[gender].size() > 0)) {
-				for (size_t i = 0; i < type.Species->Genus->Family->PersonalNames[NoGender].size(); ++i) {
-					potential_names.push_back(type.Species->Genus->Family->PersonalNames[NoGender][i]);
-				}
-				if (gender != -1 && gender != NoGender) {
-					for (size_t i = 0; i < type.Species->Genus->Family->PersonalNames[gender].size(); ++i) {
-						potential_names.push_back(type.Species->Genus->Family->PersonalNames[gender][i]);
-					}
-				}
-			}
-			
-			if (potential_names.size() == 0 && type.Species->Genus->Family->Order) {
-				if (type.Species->Genus->Family->Order->PersonalNames[NoGender].size() > 0 || (gender != -1 && type.Species->Genus->Family->Order->PersonalNames[gender].size() > 0)) {
-					for (size_t i = 0; i < type.Species->Genus->Family->Order->PersonalNames[NoGender].size(); ++i) {
-						potential_names.push_back(type.Species->Genus->Family->Order->PersonalNames[NoGender][i]);
-					}
-					if (gender != -1 && gender != NoGender) {
-						for (size_t i = 0; i < type.Species->Genus->Family->Order->PersonalNames[gender].size(); ++i) {
-							potential_names.push_back(type.Species->Genus->Family->Order->PersonalNames[gender][i]);
-						}
-					}
-				}
-				
-				if (potential_names.size() == 0 && type.Species->Genus->Family->Order->Class) {
-					if (type.Species->Genus->Family->Order->Class->PersonalNames[NoGender].size() > 0 || (gender != -1 && type.Species->Genus->Family->Order->Class->PersonalNames[gender].size() > 0)) {
-						for (size_t i = 0; i < type.Species->Genus->Family->Order->Class->PersonalNames[NoGender].size(); ++i) {
-							potential_names.push_back(type.Species->Genus->Family->Order->Class->PersonalNames[NoGender][i]);
-						}
-						if (gender != -1 && gender != NoGender) {
-							for (size_t i = 0; i < type.Species->Genus->Family->Order->Class->PersonalNames[gender].size(); ++i) {
-								potential_names.push_back(type.Species->Genus->Family->Order->Class->PersonalNames[gender][i]);
-							}
-						}
-					}
-					
-					if (potential_names.size() == 0 && type.Species->Genus->Family->Order->Class->Phylum) {
-						if (type.Species->Genus->Family->Order->Class->Phylum->PersonalNames[NoGender].size() > 0 || (gender != -1 && type.Species->Genus->Family->Order->Class->Phylum->PersonalNames[gender].size() > 0)) {
-							for (size_t i = 0; i < type.Species->Genus->Family->Order->Class->Phylum->PersonalNames[NoGender].size(); ++i) {
-								potential_names.push_back(type.Species->Genus->Family->Order->Class->Phylum->PersonalNames[NoGender][i]);
-							}
-							if (gender != -1 && gender != NoGender) {
-								for (size_t i = 0; i < type.Species->Genus->Family->Order->Class->Phylum->PersonalNames[gender].size(); ++i) {
-									potential_names.push_back(type.Species->Genus->Family->Order->Class->Phylum->PersonalNames[gender][i]);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		if (potential_names.size() > 0) {
-			return potential_names[SyncRand(potential_names.size())];
-		}
-	}
-
-	if (type.BoolFlag[ORGANIC_INDEX].value && !type.Civilization.empty()) {
+	if (!type.Civilization.empty()) {
 		int civilization_id = PlayerRaces.GetRaceIndexByName(type.Civilization.c_str());
 		if (civilization_id != -1) {
 			CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
 			CFaction *faction = PlayerRaces.GetFaction(civilization_id, type.Faction);
-			if (faction && (faction->PersonalNames[NoGender].size() > 0 || (gender != -1 && faction->PersonalNames[gender].size() > 0))) {
-				std::vector<std::string> potential_names;
-				for (size_t i = 0; i < faction->PersonalNames[NoGender].size(); ++i) {
-					potential_names.push_back(faction->PersonalNames[NoGender][i]);
-				}
-				if (gender != -1 && gender != NoGender) {
-					for (size_t i = 0; i < faction->PersonalNames[gender].size(); ++i) {
-						potential_names.push_back(faction->PersonalNames[gender][i]);
-					}
-				}
-				if (potential_names.size() > 0) {
-					return potential_names[SyncRand(potential_names.size())];
-				}
-			}
 			
-			if (civilization->PersonalNames[NoGender].size() > 0 || (gender != -1 && civilization->PersonalNames[gender].size() > 0)) {
-				std::vector<std::string> potential_names;
-				for (size_t i = 0; i < civilization->PersonalNames[NoGender].size(); ++i) {
-					potential_names.push_back(civilization->PersonalNames[NoGender][i]);
-				}
-				if (gender != -1 && gender != NoGender) {
-					for (size_t i = 0; i < civilization->PersonalNames[gender].size(); ++i) {
-						potential_names.push_back(civilization->PersonalNames[gender][i]);
+			if (type.BoolFlag[ORGANIC_INDEX].value) {
+				if (faction && (faction->PersonalNames[NoGender].size() > 0 || (gender != -1 && faction->PersonalNames[gender].size() > 0))) {
+					std::vector<std::string> potential_names;
+					for (size_t i = 0; i < faction->PersonalNames[NoGender].size(); ++i) {
+						potential_names.push_back(faction->PersonalNames[NoGender][i]);
+					}
+					if (gender != -1 && gender != NoGender) {
+						for (size_t i = 0; i < faction->PersonalNames[gender].size(); ++i) {
+							potential_names.push_back(faction->PersonalNames[gender][i]);
+						}
+					}
+					if (potential_names.size() > 0) {
+						return potential_names[SyncRand(potential_names.size())];
 					}
 				}
-				if (potential_names.size() > 0) {
-					return potential_names[SyncRand(potential_names.size())];
+				
+				if (civilization->PersonalNames[NoGender].size() > 0 || (gender != -1 && civilization->PersonalNames[gender].size() > 0)) {
+					std::vector<std::string> potential_names;
+					for (size_t i = 0; i < civilization->PersonalNames[NoGender].size(); ++i) {
+						potential_names.push_back(civilization->PersonalNames[NoGender][i]);
+					}
+					if (gender != -1 && gender != NoGender) {
+						for (size_t i = 0; i < civilization->PersonalNames[gender].size(); ++i) {
+							potential_names.push_back(civilization->PersonalNames[gender][i]);
+						}
+					}
+					if (potential_names.size() > 0) {
+						return potential_names[SyncRand(potential_names.size())];
+					}
+				}
+			} else if (!type.BoolFlag[ORGANIC_INDEX].value && type.UnitType == UnitTypeNaval) { // if is a ship
+				if (faction && faction->ShipNames.size() > 0) {
+					return faction->ShipNames[SyncRand(faction->ShipNames.size())];
+				}
+				
+				if (civilization->ShipNames.size() > 0) {
+					return civilization->ShipNames[SyncRand(civilization->ShipNames.size())];
 				}
 			}
 		}

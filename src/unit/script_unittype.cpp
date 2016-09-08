@@ -702,6 +702,9 @@ static int CclDefineUnitType(lua_State *l)
 			type->Sound = parent_type->Sound;
 			type->NumDirections = parent_type->NumDirections;
 			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
+			type->RandomMovementProbability = parent_type->RandomMovementProbability;
+			type->RandomMovementDistance = parent_type->RandomMovementDistance;
+			type->Excrement = parent_type->Excrement;
 			type->Icon.Name = parent_type->Icon.Name;
 			type->Icon.Icon = NULL;
 			if (!type->Icon.Name.empty()) {
@@ -2121,26 +2124,6 @@ static int CclDefineUnitType(lua_State *l)
 			} else {
 				if (civilization_id != -1 && class_id != -1) {
 					PlayerRaces.CivilizationClassUnitTypes[civilization_id][class_id] = type->Slot;
-				}
-			}
-		}
-	}
-	
-	if (type->Species && type->Species->Genus) { // add the personal names to the higher taxonomical classifications
-		for (std::map<int, std::vector<std::string>>::iterator iterator = type->PersonalNames.begin(); iterator != type->PersonalNames.end(); ++iterator) {
-			for (size_t i = 0; i < iterator->second.size(); ++i) {
-				type->Species->Genus->PersonalNames[iterator->first].push_back(iterator->second[i]);				
-				if (type->Species->Genus->Family) {
-					type->Species->Genus->Family->PersonalNames[iterator->first].push_back(iterator->second[i]);
-					if (type->Species->Genus->Family->Order) {
-						type->Species->Genus->Family->Order->PersonalNames[iterator->first].push_back(iterator->second[i]);
-						if (type->Species->Genus->Family->Order->Class) {
-							type->Species->Genus->Family->Order->Class->PersonalNames[iterator->first].push_back(iterator->second[i]);
-							if (type->Species->Genus->Family->Order->Class->Phylum) {
-								type->Species->Genus->Family->Order->Class->Phylum->PersonalNames[iterator->first].push_back(iterator->second[i]);
-							}
-						}
-					}
 				}
 			}
 		}

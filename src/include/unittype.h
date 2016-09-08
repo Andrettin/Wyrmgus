@@ -676,7 +676,6 @@ public:
 	std::string Kingdom;
 	std::string Subkingdom;
 	std::string Infrakingdom;
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the phylum, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 };	
 
 class CSpeciesClass
@@ -693,7 +692,6 @@ public:
 	std::string Subphylum;
 	std::string Infraphylum;
 	std::string Superclass;
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the class, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 };	
 
 class CSpeciesOrder
@@ -709,7 +707,6 @@ public:
 	CSpeciesClass *Class;
 	std::string Subclass;
 	std::string Infraclass;
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the order, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 };	
 
 class CSpeciesFamily
@@ -726,7 +723,6 @@ public:
 	std::string Suborder;
 	std::string Infraorder;
 	std::string Superfamily;
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the family, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 };	
 
 class CSpeciesGenus
@@ -743,7 +739,6 @@ public:
 	CSpeciesFamily *Family;
 	std::string Subfamily;
 	std::string Tribe;
-	std::map<int, std::vector<std::string>> PersonalNames;	/// Personal names for the genus, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
 };	
 
 class CSpecies
