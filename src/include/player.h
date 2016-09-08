@@ -653,7 +653,6 @@ public:
 	int GetPotentialNameQuantityForType(std::string type);
 	void CalculatePotentialNameQuantityForType(std::string type);
 	void RemoveWord(LanguageWord *word);
-	void AddNameTranslation(std::string translation_from, std::string translation_to);
 	
 	std::string Ident;											/// Ident of the language
 	std::string Name;											/// Name of the language

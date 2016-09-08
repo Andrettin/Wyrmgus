@@ -3531,20 +3531,6 @@ void CLanguage::RemoveWord(LanguageWord *word)
 	}
 }
 
-void CLanguage::AddNameTranslation(std::string translation_from, std::string translation_to)
-{
-	translation_from = TransliterateText(translation_from);
-	translation_to = TransliterateText(translation_to);
-	
-	if (this->NameTranslations.find(translation_from) != this->NameTranslations.end() && std::find(this->NameTranslations[translation_from].begin(), this->NameTranslations[translation_from].end(), translation_to) != this->NameTranslations[translation_from].end()) { //if translation is already present, return
-		return;
-	}
-	
-	this->NameTranslations[translation_from].push_back(translation_to);
-	
-//	fprintf(stdout, "Added name translation to the \"%s\" language: \"%s\" to \"%s\".\n", this->Name.c_str(), translation_from.c_str(), translation_to.c_str());
-}
-
 int LanguageWord::HasNameType(std::string type, int grammatical_number, int grammatical_case, int grammatical_tense)
 {
 	int name_type_count = 0;
@@ -4090,82 +4076,6 @@ void GenerateMissingLanguageData()
 
 			// fill the vector with all the related words for the current relationship depth level
 			for (size_t n = 0; n < related_words[word].size(); ++n) {
-				// add name translations for related words (this will be done in order of relationship, so more distantly related words will be less likely to be used for name translations
-				PlayerRaces.Languages[i]->AddNameTranslation(related_words[word][n]->Word, word->Word);
-						
-				// see if there is any inflected form of the word, and if so, add it to the name translations as well
-				if (related_words[word][n]->Type == WordTypeNoun) {
-					for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
-						for (int p = 0; p < MaxGrammaticalCases; ++p) {
-							for (int q = 0; q < MaxWordJunctionTypes; ++q) {
-								if (related_words[word][n]->GetNounInflection(o, p, q) != related_words[word][n]->Word) {
-									std::string translation_from = related_words[word][n]->GetNounInflection(o, p, q);
-									std::string translation_to;
-									if (word->Type == related_words[word][n]->Type) {
-										translation_to = word->GetNounInflection(o, p, q);
-									} else {
-										translation_to = word->Word;
-									}
-									PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
-								}
-							}
-						}
-					}
-				} else if (related_words[word][n]->Type == WordTypeVerb) {
-					for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
-						for (int p = 0; p < MaxGrammaticalPersons; ++p) {
-							for (int q = 0; q < MaxGrammaticalTenses; ++q) {
-								for (int r = 0; r < MaxGrammaticalMoods; ++r) {
-									if (related_words[word][n]->GetVerbInflection(o, p, q, r) != related_words[word][n]->Word) {
-										std::string translation_from = related_words[word][n]->GetVerbInflection(o, p, q, r);
-										std::string translation_to;
-										if (word->Type == related_words[word][n]->Type) {
-											translation_to = word->GetVerbInflection(o, p, q, r);
-										} else {
-											translation_to = word->Word;
-										}
-										PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
-									}
-								}
-							}
-						}
-					}
-						
-					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
-						if (related_words[word][n]->GetParticiple(o) != related_words[word][n]->Word) {
-							std::string translation_from = related_words[word][n]->GetParticiple(o);
-							std::string translation_to;
-							if (word->Type == related_words[word][n]->Type) {
-								translation_to = word->GetParticiple(o);
-							} else {
-								translation_to = word->Word;
-							}
-							PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
-						}
-					}
-				} else if (related_words[word][n]->Type == WordTypeAdjective) {
-					for (int o = 0; o < MaxComparisonDegrees; ++o) {
-						for (int p = 0; p < MaxArticleTypes; ++p) {
-							for (int q = 0; q < MaxGrammaticalCases; ++q) {
-								for (int r = 0; r < MaxGrammaticalNumbers; ++r) {
-									for (int s = 0; s < MaxGrammaticalGenders; ++s) {
-										if (related_words[word][n]->GetAdjectiveInflection(o, p, q, r, s) != related_words[word][n]->Word) {
-											std::string translation_from = related_words[word][n]->GetAdjectiveInflection(o, p, q, r, s);
-											std::string translation_to;
-											if (word->Type == related_words[word][n]->Type) {
-												translation_to = word->GetAdjectiveInflection(o, p, q, r, s);
-											} else {
-												translation_to = word->Word;
-											}
-											PlayerRaces.Languages[i]->AddNameTranslation(translation_from, translation_to);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				
 				if (
 					related_words[word][n]->DerivesFrom != NULL
 					&& std::find(related_words[word].begin(), related_words[word].end(), related_words[word][n]->DerivesFrom) == related_words[word].end()
