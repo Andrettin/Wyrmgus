@@ -2705,6 +2705,23 @@ void CUnit::MoveToXY(const Vec2i &pos)
 	//  Recalculate the seen count.
 	UnitCountSeen(*this);
 	MapMarkUnitSight(*this);
+	
+	//Wyrmgus start
+	// if there is a trap in the new tile, trigger it
+	if ((this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
+		const CUnitCache &cache = Map.Field(pos)->UnitCache;
+		for (size_t i = 0; i != cache.size(); ++i) {
+			CUnit &unit = *cache[i];
+			if (!&unit) {
+				fprintf(stderr, "Error in CUnit::MoveToXY (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
+			}
+			if (unit.IsAliveOnMap() && unit.Type->BoolFlag[TRAP_INDEX].value) {
+				FireMissile(unit, this, this->tilePos);
+				LetUnitDie(unit);
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 /**

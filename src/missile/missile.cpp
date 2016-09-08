@@ -588,6 +588,10 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 		return true; //always hit if in god mode
 	}
 
+	if (attacker.Type->BoolFlag[TRAP_INDEX].value) { // traps always hit
+		return true;
+	}
+	
 	int accuracy_modifier = 100;
 	if (attacker.Variable[PRECISION_INDEX].Value > 0) {
 		accuracy_modifier += 100;
