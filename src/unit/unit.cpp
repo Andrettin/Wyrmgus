@@ -1715,9 +1715,6 @@ void CUnit::GenerateDrop()
 				if (droppedUnit->Name.empty()) {
 					droppedUnit->Name = GeneratePersonalName(-1, droppedUnit->Type->Slot, droppedUnit->Variable[GENDER_INDEX].Value);
 				}
-				if (!droppedUnit->Name.empty() && droppedUnit->Trait != NULL && droppedUnit->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
-					droppedUnit->Name += " " + droppedUnit->Trait->Epithets[SyncRand(droppedUnit->Trait->Epithets.size())];
-				}
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this);
@@ -2632,7 +2629,7 @@ void CUnit::UpdatePersonalName()
 		this->Name = new_personal_name;
 	} else {
 		this->Name = GeneratePersonalName(language, this->Type->Slot, this->Variable[GENDER_INDEX].Value);
-		if (!this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
+		if (!this->Type->BoolFlag[FAUNA_INDEX].value && !this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
 			this->Name += " " + this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 		}
 	}
