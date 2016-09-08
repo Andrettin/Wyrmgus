@@ -494,6 +494,36 @@ static bool SeekShelter(CUnit &unit)
 }
 
 /**
+**  Check if the unit's container has an adjacent unit owned by another non-neutral player
+**
+**  @return  true if the unit is now sheltered (or if exited a shelter), false otherwise
+*/
+static bool LeaveShelter(CUnit &unit)
+{
+	if (
+		!unit.Container
+		|| (unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value && unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)
+		|| (!unit.Player->AiEnabled && !(unit.Type->BoolFlag[FAUNA_INDEX].value && unit.Player->Type == PlayerNeutral))
+	) {
+		return false;
+	}
+	
+	std::vector<CUnit *> table;
+	if (unit.Type->BoolFlag[FAUNA_INDEX].value) {
+		SelectAroundUnit(*unit.Container, 1, table, HasNotSamePlayerAs(*unit.Player));
+	} else {
+		SelectAroundUnit(*unit.Container, unit.CurrentSightRange, table, MakeAndPredicate(IsEnemyWith(*unit.Player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
+	}
+
+	if (table.size() > 0) {
+		CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands);
+		return true;
+	}
+
+	return false;
+}
+
+/**
 **  PickUpItem
 **
 **  @return  true if the unit picks up an item, false otherwise
@@ -715,8 +745,13 @@ bool AutoAttack(CUnit &unit)
 		//Wyrmgus start
 //		&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
 		&& (unit.Container == NULL || !unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
-			if (unit.Container != NULL && unit.Type->BoolFlag[FAUNA_INDEX].value) { // if is a fauna unit and is removed, see if should leave shelter
-				SeekShelter(unit);
+			if (unit.Container != NULL) {
+				if (
+					!LeaveShelter(unit) // leave shelter if surrounded
+					&& unit.Type->BoolFlag[FAUNA_INDEX].value
+				) {
+					SeekShelter(unit); // if is a fauna unit and is removed, see if should leave shelter
+				}
 			}
 		//Wyrmgus end
 		return ;
