@@ -361,76 +361,6 @@ static bool Excrete(CUnit &unit)
 }
 
 /**
-**  Breed with another animal of same species and opposite gender
-**
-**  @return  true if the unit breeds, false otherwise
-*/
-static bool Breed(CUnit &unit)
-{
-	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
-		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
-		|| Players[PlayerNumNeutral].UnitTypesCount[unit.Type->Slot] >= (((Map.Info.MapWidth * Map.Info.MapHeight) / 1024) / (unit.Type->TileWidth * unit.Type->TileHeight)) //there shouldn't be more than 16 critters of this type in a 128x128 map, if it is to reproduce
-		|| unit.Variable[HUNGER_INDEX].Value > 500 //only breed if not hungry
-		|| SyncRand(100) > unit.Type->RandomMovementProbability
-	) {
-		return false;
-	}
-
-	if (unit.IndividualUpgrades[CUpgrade::Get(unit.Type->Species->ChildUpgrade)->ID]) { //children can't reproduce
-		return false;
-	}
-	
-	if (unit.Variable[GENDER_INDEX].Value == MaleGender || unit.Variable[GENDER_INDEX].Value == FemaleGender) { //if is male or female, check if has a potential mate nearby
-		std::vector<CUnit *> table;
-		SelectAroundUnit(unit, unit.CurrentSightRange, table, HasSamePlayerAndTypeAs(unit));
-		
-		if (table.size() > 6) { // don't reproduce if is in an area already crowded with other members of the species
-			return false;
-		}
-
-		for (size_t i = 0; i != table.size(); ++i) {
-			if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
-				if (table[i]->Variable[GENDER_INDEX].Value != unit.Variable[GENDER_INDEX].Value) {
-					int distance = unit.MapDistanceTo(table[i]->tilePos);
-					int reach = 1;
-					if (table[i]->Type->BoolFlag[DIMINUTIVE_INDEX].value || unit.Type->BoolFlag[DIMINUTIVE_INDEX].value) {
-						reach = 0;
-					}
-					if (reach < distance) { // if isn't adjacent to the potential mate, move next to them
-						if (reach == 0 && !UnitCanBeAt(unit, table[i]->tilePos)) {
-							continue;
-						}
-						CommandMove(unit, table[i]->tilePos, FlushCommands);
-					} else {
-						CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
-						DropOutOnSide(*newUnit, LookingW, &unit);
-						newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
-						newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
-						newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
-						newUnit->Variable[HUNGER_INDEX].Value = 500; //children start off with 50% hunger
-						IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->Species->ChildUpgrade));
-						unit.Variable[HUNGER_INDEX].Value += 250;
-						table[i]->Variable[HUNGER_INDEX].Value += 250;
-					}
-					return true;
-				}
-			}
-		}
-	} else if (unit.Variable[GENDER_INDEX].Value == AsexualGender && SyncRand(1000) == 0) { //if is asexual (like slimes), reproduce endogenously (with a lower chance than normal reproduction
-		CUnit *newUnit = MakeUnit(*unit.Type, unit.Player);
-		DropOutOnSide(*newUnit, LookingW, &unit);
-		newUnit->Variable[BIRTHCYCLE_INDEX].Enable = 1;
-		newUnit->Variable[BIRTHCYCLE_INDEX].Max = GameCycle;
-		newUnit->Variable[BIRTHCYCLE_INDEX].Value = GameCycle;
-		newUnit->Variable[HUNGER_INDEX].Value = 500; //children start off with 50% hunger
-		IndividualUpgradeAcquire(*newUnit, CUpgrade::Get(newUnit->Type->Species->ChildUpgrade));
-		unit.Variable[HUNGER_INDEX].Value += 500;
-		return true;
-	}
-	return false;
-}
-
-/**
 **  Seek shelter at night or 
 **
 **  @return  true if the unit is now sheltered (or if exited a shelter), false otherwise
@@ -798,7 +728,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| Feed(unit) || Excrete(unit) || Breed(unit) || SeekShelter(unit) || MoveRandomly(unit) || PickUpItem(unit)) {
+			|| Feed(unit) || Excrete(unit) || SeekShelter(unit) || MoveRandomly(unit) || PickUpItem(unit)) {
 			//Wyrmgus end
 		}
 	}

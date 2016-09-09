@@ -726,11 +726,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			if (std::get<2>(map_template->Units[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(map_template->Units[i]));
 				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
-					if (Map.Info.IsPointOnMap(std::get<2>(map_template->Units[i])->StartView - template_start_pos)) {
-						player->SetStartView(std::get<2>(map_template->Units[i])->StartView - template_start_pos);
-					} else {
-						player->SetStartView(unit_pos);
-					}
+					player->SetStartView(unit_pos);
 				}
 			} else {
 				player = &Players[PlayerNumNeutral];

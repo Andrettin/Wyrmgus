@@ -1763,8 +1763,6 @@ static int CclDefineFaction(lua_State *l)
 			}
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "StartView")) {
-			CclGetPos(l, &faction->StartView.x, &faction->StartView.y);
 		} else if (!strcmp(value, "DevelopsTo")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
