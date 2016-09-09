@@ -1711,10 +1711,7 @@ void CUnit::GenerateDrop()
 			
 		if (droppedUnit != NULL) {
 			if (droppedUnit->Type->BoolFlag[FAUNA_INDEX].value) {
-				droppedUnit->Name = GeneratePersonalName(PlayerRaces.GetFactionLanguage(dropper_civilization, dropper_faction), droppedUnit->Type->Slot, droppedUnit->Variable[GENDER_INDEX].Value);
-				if (droppedUnit->Name.empty()) {
-					droppedUnit->Name = GeneratePersonalName(-1, droppedUnit->Type->Slot, droppedUnit->Variable[GENDER_INDEX].Value);
-				}
+				droppedUnit->Name = droppedUnit->Type->GeneratePersonalName(NULL, droppedUnit->Variable[GENDER_INDEX].Value);
 			}
 			
 			droppedUnit->GenerateSpecialProperties(this);
@@ -2628,7 +2625,11 @@ void CUnit::UpdatePersonalName()
 	if (!new_personal_name.empty()) {
 		this->Name = new_personal_name;
 	} else {
-		this->Name = GeneratePersonalName(language, this->Type->Slot, this->Variable[GENDER_INDEX].Value);
+		CFaction *faction = NULL;
+		if (this->Player->Race != -1 && this->Player->Faction != -1) {
+			faction = PlayerRaces.Factions[this->Player->Race][this->Player->Faction];
+		}
+		this->Name = this->Type->GeneratePersonalName(faction, this->Variable[GENDER_INDEX].Value);
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && !this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
 			this->Name += " " + this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
 		}

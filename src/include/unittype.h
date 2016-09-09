@@ -809,6 +809,7 @@ public:
 	int GetDefaultSkinColor(CPlayer &player) const;
 	int GetDefaultHairColor(CPlayer &player) const;
 	std::string GetNamePlural() const;
+	std::string GeneratePersonalName(CFaction *faction, int gender) const;
 	//Wyrmgus end
 
 public:

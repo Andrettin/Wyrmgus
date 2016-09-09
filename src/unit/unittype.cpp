@@ -44,6 +44,9 @@
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
 #include "construct.h"
+//Wyrmgus start
+#include "editor.h" //for personal name generation
+//Wyrmgus end
 #include "iolib.h"
 #include "luacallback.h"
 #include "map.h"
@@ -901,6 +904,78 @@ int CUnitType::GetDefaultHairColor(CPlayer &player) const
 std::string CUnitType::GetNamePlural() const
 {
 	return GetPluralForm(this->Name);
+}
+
+std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
+{
+	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
+		return "";
+	}
+	
+	std::vector<std::string> potential_names;
+	
+	if (this->PersonalNames.find(NoGender) != this->PersonalNames.end()) {
+		for (size_t i = 0; i < this->PersonalNames.find(NoGender)->second.size(); ++i) {
+			potential_names.push_back(this->PersonalNames.find(NoGender)->second[i]);
+		}
+	}
+	if (gender != -1 && gender != NoGender && this->PersonalNames.find(gender) != this->PersonalNames.end()) {
+		for (size_t i = 0; i < this->PersonalNames.find(gender)->second.size(); ++i) {
+			potential_names.push_back(this->PersonalNames.find(gender)->second[i]);
+		}
+	}
+	
+	if (potential_names.size() == 0 && !this->Civilization.empty()) {
+		int civilization_id = PlayerRaces.GetRaceIndexByName(this->Civilization.c_str());
+		if (civilization_id != -1) {
+			CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
+			if (!faction || faction->Civilization != civilization_id) {
+				faction = PlayerRaces.GetFaction(civilization_id, this->Faction);
+			}
+			
+			if (this->BoolFlag[ORGANIC_INDEX].value) {
+				if (faction) {
+					if (faction->PersonalNames.find(NoGender) != faction->PersonalNames.end()) {
+						for (size_t i = 0; i < faction->PersonalNames.find(NoGender)->second.size(); ++i) {
+							potential_names.push_back(faction->PersonalNames.find(NoGender)->second[i]);
+						}
+					}
+					if (gender != -1 && gender != NoGender && faction->PersonalNames.find(gender) != faction->PersonalNames.end()) {
+						for (size_t i = 0; i < faction->PersonalNames.find(gender)->second.size(); ++i) {
+							potential_names.push_back(faction->PersonalNames.find(gender)->second[i]);
+						}
+					}
+				}
+				
+				if (potential_names.size() == 0) {
+					if (civilization->PersonalNames.find(NoGender) != civilization->PersonalNames.end()) {
+						for (size_t i = 0; i < civilization->PersonalNames.find(NoGender)->second.size(); ++i) {
+							potential_names.push_back(civilization->PersonalNames.find(NoGender)->second[i]);
+						}
+					}
+					if (gender != -1 && gender != NoGender && civilization->PersonalNames.find(gender) != civilization->PersonalNames.end()) {
+						for (size_t i = 0; i < civilization->PersonalNames.find(gender)->second.size(); ++i) {
+							potential_names.push_back(civilization->PersonalNames.find(gender)->second[i]);
+						}
+					}
+				}
+			} else if (!this->BoolFlag[ORGANIC_INDEX].value && this->UnitType == UnitTypeNaval) { // if is a ship
+				if (faction && faction->ShipNames.size() > 0) {
+					return faction->ShipNames[SyncRand(faction->ShipNames.size())];
+				}
+				
+				if (civilization->ShipNames.size() > 0) {
+					return civilization->ShipNames[SyncRand(civilization->ShipNames.size())];
+				}
+			}
+		}
+	}
+	
+	if (potential_names.size() > 0) {
+		return potential_names[SyncRand(potential_names.size())];
+	}
+
+	return "";
 }
 //Wyrmgus end
 

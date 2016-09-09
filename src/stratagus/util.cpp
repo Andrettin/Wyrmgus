@@ -523,7 +523,6 @@ void PrintOnStdOut(const char *format, ...)
 
 //Wyrmgus start
 #include "character.h" //for personal name generation
-#include "editor.h" //for personal name generation
 #include "iocompat.h" //for getting a file's last modified date
 #include "iolib.h" //for getting a file's last modified date
 #include "player.h" //for personal name generation
@@ -1043,146 +1042,10 @@ std::string SeparateCapitalizedStringElements(std::string text)
 	return text;
 }
 
-/**
-**  Generates a personal name.
-*/
-std::string GeneratePersonalName(int language, int unit_type_id, int gender)
+std::string GeneratePersonalName(std::string unit_type_ident)
 {
-	CUnitType &type = *UnitTypes[unit_type_id];
-	std::string personal_name;
-	
-	if (language == -1 && type.Species != NULL) {
-		language = type.Species->GetRandomNameLanguage(gender);
-	}
-
-	if (Editor.Running == EditorEditing) { // don't set the personal name if in the editor
-		return "";
-	}
-	
-	if (type.PersonalNames[NoGender].size() > 0 || (gender != -1 && type.PersonalNames[gender].size() > 0)) {
-		std::vector<std::string> potential_names;
-		for (size_t i = 0; i < type.PersonalNames[NoGender].size(); ++i) {
-			potential_names.push_back(type.PersonalNames[NoGender][i]);
-		}
-		if (gender != -1 && gender != NoGender) {
-			for (size_t i = 0; i < type.PersonalNames[gender].size(); ++i) {
-				potential_names.push_back(type.PersonalNames[gender][i]);
-			}
-		}
-		if (potential_names.size() > 0) {
-			return potential_names[SyncRand(potential_names.size())];
-		}
-	}
-	
-	if (!type.Civilization.empty()) {
-		int civilization_id = PlayerRaces.GetRaceIndexByName(type.Civilization.c_str());
-		if (civilization_id != -1) {
-			CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
-			CFaction *faction = PlayerRaces.GetFaction(civilization_id, type.Faction);
-			
-			if (type.BoolFlag[ORGANIC_INDEX].value) {
-				if (faction && (faction->PersonalNames[NoGender].size() > 0 || (gender != -1 && faction->PersonalNames[gender].size() > 0))) {
-					std::vector<std::string> potential_names;
-					for (size_t i = 0; i < faction->PersonalNames[NoGender].size(); ++i) {
-						potential_names.push_back(faction->PersonalNames[NoGender][i]);
-					}
-					if (gender != -1 && gender != NoGender) {
-						for (size_t i = 0; i < faction->PersonalNames[gender].size(); ++i) {
-							potential_names.push_back(faction->PersonalNames[gender][i]);
-						}
-					}
-					if (potential_names.size() > 0) {
-						return potential_names[SyncRand(potential_names.size())];
-					}
-				}
-				
-				if (civilization->PersonalNames[NoGender].size() > 0 || (gender != -1 && civilization->PersonalNames[gender].size() > 0)) {
-					std::vector<std::string> potential_names;
-					for (size_t i = 0; i < civilization->PersonalNames[NoGender].size(); ++i) {
-						potential_names.push_back(civilization->PersonalNames[NoGender][i]);
-					}
-					if (gender != -1 && gender != NoGender) {
-						for (size_t i = 0; i < civilization->PersonalNames[gender].size(); ++i) {
-							potential_names.push_back(civilization->PersonalNames[gender][i]);
-						}
-					}
-					if (potential_names.size() > 0) {
-						return potential_names[SyncRand(potential_names.size())];
-					}
-				}
-			} else if (!type.BoolFlag[ORGANIC_INDEX].value && type.UnitType == UnitTypeNaval) { // if is a ship
-				if (faction && faction->ShipNames.size() > 0) {
-					return faction->ShipNames[SyncRand(faction->ShipNames.size())];
-				}
-				
-				if (civilization->ShipNames.size() > 0) {
-					return civilization->ShipNames[SyncRand(civilization->ShipNames.size())];
-				}
-			}
-		}
-	}
-	
-	if (language != -1 && PlayerRaces.Languages[language]->LanguageWords.size() > 0) {
-		if (type.BoolFlag[FAUNA_INDEX].value && type.Species != NULL) {
-			personal_name = GenerateName(language, "species-" + type.Species->Ident + "-" + GetGenderNameById(gender));
-			if (personal_name.empty()) {
-				personal_name = GenerateName(language, "species-" + type.Species->Ident);
-			}
-			
-			if (personal_name.empty() && type.Species->Genus != NULL) {
-				personal_name = GenerateName(language, "species-genus-" + type.Species->Genus->Ident + "-" + GetGenderNameById(gender));
-				if (personal_name.empty()) {
-					personal_name = GenerateName(language, "species-genus-" + type.Species->Genus->Ident);
-				}
-				
-				if (personal_name.empty() && !type.Species->Genus->Subfamily.empty()) {
-					personal_name = GenerateName(language, "species-subfamily-" + type.Species->Genus->Subfamily + "-" + GetGenderNameById(gender));
-					if (personal_name.empty()) {
-						personal_name = GenerateName(language, "species-subfamily-" + type.Species->Genus->Subfamily);
-					}
-				}
-				
-				if (personal_name.empty() && type.Species->Genus->Family != NULL) {
-					personal_name = GenerateName(language, "species-family-" + type.Species->Genus->Family->Ident + "-" + GetGenderNameById(gender));
-					if (personal_name.empty()) {
-						personal_name = GenerateName(language, "species-family-" + type.Species->Genus->Family->Ident);
-					}
-					
-					if (personal_name.empty() && type.Species->Genus->Family->Order != NULL) {
-						personal_name = GenerateName(language, "species-order-" + type.Species->Genus->Family->Order->Ident + "-" + GetGenderNameById(gender));
-						if (personal_name.empty()) {
-							personal_name = GenerateName(language, "species-order-" + type.Species->Genus->Family->Order->Ident);
-						}
-					
-						if (personal_name.empty() && type.Species->Genus->Family->Order->Class != NULL) {
-							personal_name = GenerateName(language, "species-class-" + type.Species->Genus->Family->Order->Class->Ident + "-" + GetGenderNameById(gender));
-							if (personal_name.empty()) {
-								personal_name = GenerateName(language, "species-class-" + type.Species->Genus->Family->Order->Class->Ident);
-							}
-						}
-					}
-				}
-			}
-		} else if (type.BoolFlag[ORGANIC_INDEX].value) {
-			personal_name = GenerateName(language, "person-" + GetGenderNameById(gender));
-			if (personal_name.empty()) {
-				personal_name = GenerateName(language, "person");
-			}
-		} else if (!type.Class.empty()) {
-			personal_name = GenerateName(language, "unit-class-" + type.Class);
-		}
-	}
-	
-	personal_name = TransliterateText(personal_name);
-	
-	return personal_name;
-}
-
-std::string GeneratePersonalName(std::string language_ident, std::string unit_type_ident)
-{
-	int language = PlayerRaces.GetLanguageIndexByIdent(language_ident);
 	int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
-	return GeneratePersonalName(language, unit_type_id, UnitTypes[unit_type_id]->DefaultStat.Variables[GENDER_INDEX].Value);
+	return UnitTypes[unit_type_id]->GeneratePersonalName(NULL, UnitTypes[unit_type_id]->DefaultStat.Variables[GENDER_INDEX].Value);
 }
 
 std::string GenerateName(int language, std::string type, int affix_type)

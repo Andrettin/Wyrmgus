@@ -3975,14 +3975,9 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 		civilization = type_civilization;
 	}
 	
-	int language = PlayerRaces.GetCivilizationLanguage(civilization);
-	if (civilization != -1 && faction != -1) {
-		language = PlayerRaces.GetFactionLanguage(civilization, faction);
-	}
-	
 	int gender = MaleGender;
 	
-	std::string hero_name = GeneratePersonalName(language, unit_type_id, gender);
+	std::string hero_name = UnitTypes[unit_type_id]->GeneratePersonalName(PlayerRaces.Factions[civilization][faction], gender);
 	
 	if (hero_name.empty()) {
 		return NULL; //if civilization can't generate personal names, return
@@ -4031,7 +4026,7 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 	}
 
 	while (GrandStrategyGame.GetHero(hero->GetFullName()) != NULL) { // generate extra given names if this name is already used by an existing hero
-		std::string new_personal_name = GeneratePersonalName(language, unit_type_id, gender);
+		std::string new_personal_name = UnitTypes[unit_type_id]->GeneratePersonalName(PlayerRaces.Factions[civilization][faction], gender);
 		if (hero->ExtraName.empty()) {
 			hero->ExtraName = new_personal_name;
 		} else {
