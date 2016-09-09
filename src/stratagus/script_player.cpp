@@ -888,6 +888,11 @@ static int CclDefineCivilization(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				civilization->SettlementNames.push_back(LuaToString(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "ShipNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				civilization->ShipNames.push_back(LuaToString(l, -1, j + 1));
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -1559,6 +1564,14 @@ static int CclGetCivilizationData(lua_State *l)
 		for (size_t i = 1; i <= civilization->Quests.size(); ++i)
 		{
 			lua_pushstring(l, civilization->Quests[i-1]->Ident.c_str());
+			lua_rawseti(l, -2, i);
+		}
+		return 1;
+	} else if (!strcmp(data, "ShipNames")) {
+		lua_createtable(l, civilization->ShipNames.size(), 0);
+		for (size_t i = 1; i <= civilization->ShipNames.size(); ++i)
+		{
+			lua_pushstring(l, civilization->ShipNames[i-1].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;
