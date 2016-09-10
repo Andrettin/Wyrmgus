@@ -120,6 +120,9 @@ class AiForce
 public:
 	AiForce() :
 		Completed(false), Defending(false), Attacking(false),
+		//Wyrmgus start
+		Scouting(false),
+		//Wyrmgus end
 		Role(AiForceRoleDefault), FormerForce(-1), State(AiForceAttackingState_Free),
 		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
 	{
@@ -177,6 +180,9 @@ public:
 	bool Completed;    /// Flag saying force is complete build
 	bool Defending;    /// Flag saying force is defending
 	bool Attacking;    /// Flag saying force is attacking
+	//Wyrmgus start
+	bool Scouting;	   /// Flag saying force is scouting
+	//Wyrmgus end
 	AiForceRole Role;  /// Role of the force
 
 	std::vector<AiUnitType> UnitTypes; /// Count and types of unit-type

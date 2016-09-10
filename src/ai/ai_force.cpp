@@ -381,9 +381,17 @@ void AiForce::Attack(const Vec2i &pos)
 
 	if (Units.size() == 0) {
 		this->Attacking = false;
+		//Wyrmgus start
+		this->Scouting = false;
+		//Wyrmgus end
 		this->State = AiForceAttackingState_Waiting;
 		return;
 	}
+	//Wyrmgus start
+	if (this->Scouting) {
+		return;
+	}
+	//Wyrmgus end
 	if (!this->Attacking) {
 		// Remember the original force position so we can return there after attack
 		if (this->Role == AiForceRoleDefend
@@ -430,6 +438,7 @@ void AiForce::Attack(const Vec2i &pos)
 			goalPos = enemy->tilePos;
 		//Wyrmgus start
 		} else {
+			this->Scouting = true;
 			return;
 		//Wyrmgus end
 		}
@@ -508,6 +517,9 @@ void AiForce::ReturnToHome()
 	this->GoalPos = invalidPos;
 	this->Defending = false;
 	this->Attacking = false;
+	//Wyrmgus start
+	this->Scouting = false;
+	//Wyrmgus end
 	this->State = AiForceAttackingState_Waiting;
 }
 
@@ -878,6 +890,9 @@ void AiForce::Update()
 	Assert(Defending == false);
 	if (Size() == 0) {
 		Attacking = false;
+		//Wyrmgus start
+		this->Scouting = false;
+		//Wyrmgus end
 		if (!Defending && State > AiForceAttackingState_Waiting) {
 			DebugPrint("%d: Attack force #%lu was destroyed, giving up\n"
 					   _C_ AiPlayer->Player->Index _C_(long unsigned int)(this  - & (AiPlayer->Force[0])));
@@ -885,6 +900,11 @@ void AiForce::Update()
 		}
 		return;
 	}
+	//Wyrmgus start
+	if (this->Scouting) {
+		return;
+	}
+	//Wyrmgus end
 	//Wyrmgus start
 	//if force still has no goal, run its Attack function again to get a target
 	if (Map.Info.IsPointOnMap(GoalPos) == false) {
@@ -1009,6 +1029,7 @@ void AiForce::Update()
 					*/
 					GoalPos.x = -1;
 					GoalPos.y = -1;
+					this->Scouting = true;
 					//Wyrmgus end
 					return;
 				}
@@ -1078,6 +1099,7 @@ void AiForce::Update()
 			*/
 			GoalPos.x = -1;
 			GoalPos.y = -1;
+			this->Scouting = true;
 			//Wyrmgus end
 			return;
 		} else {
@@ -1124,6 +1146,9 @@ void AiForceManager::Update()
 			if (force.Size() == 0) {
 				force.Attacking = false;
 				force.Defending = false;
+				//Wyrmgus start
+				force.Scouting = false;
+				//Wyrmgus end
 				force.State = AiForceAttackingState_Waiting;
 				continue;
 			}

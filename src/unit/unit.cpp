@@ -3020,6 +3020,11 @@ void UnitLost(CUnit &unit)
 			
 			if (player.AiEnabled && player.Ai && std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
 				player.Ai->Scouts.erase(std::remove(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit), player.Ai->Scouts.end());
+				
+				int force = player.Ai->Force.GetForce(unit);
+				if (force != -1 && player.Ai->Force[force].Scouting) { //if a force's scout died, unmark it as "scouting" so that the force can see if it now has a viable target
+					player.Ai->Force[force].Scouting = false;
+				}
 			}
 			//Wyrmgus end
 		}
