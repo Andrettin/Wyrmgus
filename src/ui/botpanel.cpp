@@ -1591,7 +1591,18 @@ static void UpdateButtonPanelSingleUnit(const CUnit &unit, std::vector<ButtonAct
 			&& !strstr(buttonaction.UnitMask.c_str(), unit_ident)) {
 			continue;
 		}
-		int allow = IsButtonAllowed(unit, buttonaction);
+		//Wyrmgus start
+//		int allow = IsButtonAllowed(unit, buttonaction);
+		bool allow = true; // check all selected units, as different units of the same type may have different allowed buttons
+		if (UnitButtonTable[i]->AlwaysShow == false) {
+			for (size_t j = 0; j != Selected.size(); ++j) {
+				if (!IsButtonAllowed(*Selected[j], *UnitButtonTable[i])) {
+					allow = false;
+					break;
+				}
+			}
+		}
+		//Wyrmgus end
 		int pos = buttonaction.Pos;
 
 		// Special case for researches
