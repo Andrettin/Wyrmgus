@@ -190,7 +190,7 @@ enum {
 	CUnit *goal = this->GetGoal();
 
 	// Reached target
-	if (this->State == State_TargetReached || (goal && goal->Container == &unit)) {
+	if (this->State == State_TargetReached || (goal && goal->Container == &unit) || this == unit.CriticalOrder) {
 
 		if (!goal || (!goal->IsVisibleAsGoal(*unit.Player) && goal->Container != &unit)) {
 			DebugPrint("Goal gone\n");

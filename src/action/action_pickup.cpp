@@ -236,12 +236,14 @@ enum {
 			}
 		} else if (
 			goal
-				&& (
-					goal->Type->BoolFlag[POWERUP_INDEX].value
-					|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && IsItemClassConsumable(goal->Type->ItemClass))
-				)
-			) {
-			CommandUse(unit, *goal, FlushCommands);
+			&& (
+				goal->Type->BoolFlag[POWERUP_INDEX].value
+				|| (!unit.HasInventory() && goal->Type->BoolFlag[ITEM_INDEX].value && IsItemClassConsumable(goal->Type->ItemClass))
+			)
+		) {
+			if (!unit.CriticalOrder) {
+				unit.CriticalOrder = COrder::NewActionUse(*goal);
+			}
 		}
 		
 		this->Finished = true;

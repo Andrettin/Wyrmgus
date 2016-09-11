@@ -771,7 +771,9 @@ void CUnit::HealingItemAutoUse()
 		
 		if (uins->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 			if (uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableMax) - this->Variable[HP_INDEX].Value)) {
-				CommandUse(*this, *uins, FlushCommands);
+				if (!this->CriticalOrder) {
+					this->CriticalOrder = COrder::NewActionUse(*uins);
+				}
 				break;
 			}
 		}
@@ -3022,7 +3024,7 @@ void UnitLost(CUnit &unit)
 				player.Ai->Scouts.erase(std::remove(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit), player.Ai->Scouts.end());
 				
 				int force = player.Ai->Force.GetForce(unit);
-				if (force != -1 && player.Ai->Force[force].Scouting) { //if a force's scout died, unmark it as "scouting" so that the force can see if it now has a viable target
+				if (force != -1 && player.Ai->Force[force].Scouting) { //if a force's scout has been lost, unmark it as "scouting" so that the force can see if it now has a viable target
 					player.Ai->Force[force].Scouting = false;
 				}
 			}
