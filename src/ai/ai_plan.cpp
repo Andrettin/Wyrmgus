@@ -494,9 +494,6 @@ static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int s
 			if (!Map.Info.IsPointOnMap(current_pos) || !CanMoveToMask(current_pos, unit.Type->MovementMask)) {
 				continue;
 			}
-			if (!PlaceReachable(unit, current_pos, 1, 1, 0, 1, scout_range * 4)) {
-				continue;
-			}
 
 			// don't give preference to fogged tiles, as that prevents scouts from passing through
 			/*
@@ -756,7 +753,7 @@ void AiSendExplorers()
 			int scout_range = std::max(16, AiPlayer->Scouts[i]->CurrentSightRange * 2);
 			Vec2i target_pos(-1, -1);
 			ChooseRandomPositionForScouting(*AiPlayer->Scouts[i], &target_pos, scout_range);
-			if (Map.Info.IsPointOnMap(target_pos)) {
+			if (Map.Info.IsPointOnMap(target_pos) && PlaceReachable(*AiPlayer->Scouts[i], target_pos, 1, 1, 0, 1, scout_range * 4)) {
 				CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands);
 			}
 		}

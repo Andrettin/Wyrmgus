@@ -438,7 +438,12 @@ void AiForce::Attack(const Vec2i &pos)
 			goalPos = enemy->tilePos;
 		//Wyrmgus start
 		} else {
-			this->Scouting = true;
+			for (size_t i = 0; i != this->Units.size(); ++i) {
+				if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), this->Units[i]) == AiPlayer->Scouts.end()) {
+					AiPlayer->Scouts.push_back(this->Units[i]);
+				}
+			}
+			this->Scouting = true;			
 			return;
 		//Wyrmgus end
 		}
@@ -1029,6 +1034,11 @@ void AiForce::Update()
 					*/
 					GoalPos.x = -1;
 					GoalPos.y = -1;
+					for (size_t i = 0; i != this->Units.size(); ++i) {
+						if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), this->Units[i]) == AiPlayer->Scouts.end()) {
+							AiPlayer->Scouts.push_back(this->Units[i]);
+						}
+					}
 					this->Scouting = true;
 					//Wyrmgus end
 					return;
@@ -1099,6 +1109,11 @@ void AiForce::Update()
 			*/
 			GoalPos.x = -1;
 			GoalPos.y = -1;
+			for (size_t i = 0; i != this->Units.size(); ++i) {
+				if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), this->Units[i]) == AiPlayer->Scouts.end()) {
+					AiPlayer->Scouts.push_back(this->Units[i]);
+				}
+			}
 			this->Scouting = true;
 			//Wyrmgus end
 			return;
