@@ -1193,7 +1193,7 @@ void AiForceManager::Update()
 							unit->Wait = delay;
 							//Wyrmgus start
 //							if (unit->Type->CanAttack) {
-							if (unit->CanAttack()) {
+							if (unit->CanAttack() && unit->IsAgressive()) {
 							//Wyrmgus end
 								CommandAttack(*unit, force.GoalPos, NULL, FlushCommands);
 							} else {
