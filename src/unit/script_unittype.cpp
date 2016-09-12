@@ -2402,6 +2402,12 @@ static int CclDefineUnitStats(lua_State *l)
 */
 CUnitType *CclGetUnitType(lua_State *l)
 {
+	//Wyrmgus start
+	if (lua_isnil(l, -1)) {
+		return NULL;
+	}
+	//Wyrmgus end
+	
 	// Be kind allow also strings or symbols
 	if (lua_isstring(l, -1)) {
 		const char *str = LuaToString(l, -1);

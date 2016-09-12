@@ -655,6 +655,13 @@ static int CclAiDebugPlayer(lua_State *l)
 static int CclAiNeed(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
+	//Wyrmgus start
+	if (lua_isnil(l, 1)) {
+		lua_pushboolean(l, 0);
+		return 1;
+	}
+	//Wyrmgus end
+	
 	InsertUnitTypeRequests(CclGetUnitType(l), 1);
 
 	lua_pushboolean(l, 0);
@@ -671,6 +678,12 @@ static int CclAiNeed(lua_State *l)
 static int CclAiSet(lua_State *l)
 {
 	LuaCheckArgs(l, 2);
+	//Wyrmgus start
+	if (lua_isnil(l, 1)) {
+		lua_pushboolean(l, 0);
+		return 1;
+	}
+	//Wyrmgus end
 	lua_pushvalue(l, 1);
 	CUnitType *type = CclGetUnitType(l);
 	lua_pop(l, 1);
@@ -705,6 +718,12 @@ static int CclAiSet(lua_State *l)
 static int CclAiWait(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
+	//Wyrmgus start
+	if (lua_isnil(l, 1)) {
+		lua_pushboolean(l, 0);
+		return 1;
+	}
+	//Wyrmgus end
 	const CUnitType *type = CclGetUnitType(l);
 	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
 	const AiRequestType *autt = FindInUnitTypeRequests(type);
@@ -1030,6 +1049,12 @@ static int CclAiSleep(lua_State *l)
 static int CclAiResearch(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
+	//Wyrmgus start
+	if (lua_isnil(l, 1)) {
+		lua_pushboolean(l, 0);
+		return 1;
+	}
+	//Wyrmgus end
 	const char *str = LuaToString(l, 1);
 	CUpgrade *upgrade;
 
@@ -1057,6 +1082,12 @@ static int CclAiResearch(lua_State *l)
 static int CclAiUpgradeTo(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
+	//Wyrmgus start
+	if (lua_isnil(l, 1)) {
+		lua_pushboolean(l, 0);
+		return 1;
+	}
+	//Wyrmgus end
 	CUnitType *type = CclGetUnitType(l);
 	InsertUpgradeToRequests(type);
 

@@ -1350,7 +1350,7 @@ void CPlayer::SetName(const std::string &name)
 void CPlayer::SetCivilization(int civilization)
 {
 	if (this->Race != -1 && !GameRunning) {
-		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty()) {
+		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID] == 'R') {
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
 		}
 	}
@@ -1409,7 +1409,7 @@ void CPlayer::SetCivilization(int civilization)
 void CPlayer::SetFaction(const std::string faction_name)
 {
 	if (this->Faction != -1) {
-		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {
+		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade)->ID] == 'R') {
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade)->ID);
 		}
 	}

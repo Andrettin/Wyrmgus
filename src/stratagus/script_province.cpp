@@ -303,13 +303,12 @@ static int CclDefineProvince(lua_State *l)
 				province->CulturalNames[civilization] = TransliterateText(cultural_name);
 
 				int language = PlayerRaces.GetCivilizationLanguage(civilization);
-				if (language == -1) {
-					LuaError(l, "Language doesn't exist.");
+				if (language != -1) {
+					if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
+						PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
+					}
+					PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
 				}
-				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
-					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
-				}
-				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
 				
 				++j;
 				if (j >= subargs) {

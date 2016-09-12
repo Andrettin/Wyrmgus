@@ -107,7 +107,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "FamilyName")) {
 			character->FamilyName = TransliterateText(LuaToString(l, -1));
 			
-			if (PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount.find(family_name_type) == PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount.end()) {
+			if (character->GetLanguage() != -1 && PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount.find(family_name_type) == PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount.end()) {
 				PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount[family_name_type] = 0;
 			}
 			PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount[family_name_type] += 1;
