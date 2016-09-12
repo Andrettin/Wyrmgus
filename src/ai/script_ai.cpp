@@ -724,6 +724,8 @@ static int CclAiWait(lua_State *l)
 		return 1;
 	}
 	//Wyrmgus end
+	//Wyrmgus start
+	/*
 	const CUnitType *type = CclGetUnitType(l);
 	const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
 	const AiRequestType *autt = FindInUnitTypeRequests(type);
@@ -766,6 +768,59 @@ static int CclAiWait(lua_State *l)
 		lua_pushboolean(l, 0);
 		return 1;
 	}
+	*/
+	const char *ident = LuaToString(l, 1);
+	if (!strncmp(ident, "unit-", 5)) {
+		const CUnitType *type = UnitTypeByIdent(ident);
+		const int *unit_types_count = AiPlayer->Player->UnitTypesAiActiveCount;
+		const AiRequestType *autt = FindInUnitTypeRequests(type);
+		if (!autt) {
+			// Look if we have this unit-type.
+			if (unit_types_count[type->Slot]) {
+				lua_pushboolean(l, 0);
+				return 1;
+			}
+
+			// Look if we have equivalent unit-types.
+			if (type->Slot < (int)AiHelpers.Equiv.size()) {
+				for (size_t j = 0; j < AiHelpers.Equiv[type->Slot].size(); ++j) {
+					if (unit_types_count[AiHelpers.Equiv[type->Slot][j]->Slot]) {
+						lua_pushboolean(l, 0);
+						return 1;
+					}
+				}
+			}
+			// Look if we have an upgrade-to request.
+			if (FindInUpgradeToRequests(type)) {
+				lua_pushboolean(l, 1);
+				return 1;
+			}
+			DebugPrint("Broken? waiting on %s which wasn't requested.\n" _C_ type->Ident.c_str());
+			lua_pushboolean(l, 0);
+			return 1;
+		}
+		//
+		// Add equivalent units
+		//
+		unsigned int n = unit_types_count[type->Slot];
+		if (type->Slot < (int)AiHelpers.Equiv.size()) {
+			for (size_t j = 0; j < AiHelpers.Equiv[type->Slot].size(); ++j) {
+				n += unit_types_count[AiHelpers.Equiv[type->Slot][j]->Slot];
+			}
+		}
+		// units available?
+		if (n >= autt->Count) {
+			lua_pushboolean(l, 0);
+			return 1;
+		}
+	} else if (!strncmp(ident, "upgrade-", 8)) {
+		CUpgrade *upgrade = CUpgrade::Get(ident);
+		if (UpgradeIdentAllowed(*AiPlayer->Player, ident) == 'R') {
+			lua_pushboolean(l, 0);
+			return 1;
+		}
+	}
+	//Wyrmgus end
 	lua_pushboolean(l, 1);
 	return 1;
 }

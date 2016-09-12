@@ -219,6 +219,12 @@ public:
 	explicit CUnitTypeFinder(const UnitTypeType t) : unitTypeType(t) {}
 	bool operator()(const CUnit *const unit) const
 	{
+		//Wyrmgus start
+		if (!unit) {
+			fprintf(stderr, "CUnitTypeFinder Error: Unit is NULL.\n");
+			return false;
+		}
+		//Wyrmgus end
 		const CUnitType &type = *unit->Type;
 		//Wyrmgus start
 		if (!&type) {
