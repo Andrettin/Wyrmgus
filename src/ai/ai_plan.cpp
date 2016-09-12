@@ -482,56 +482,6 @@ static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 	return false;
 }
 
-static void ChooseRandomPositionForScouting(const CUnit &unit, Vec2i *pos, int scout_range)
-{
-	std::vector<Vec2i> pos_candidates;
-	bool found_unexplored = false;
-	bool found_fogged = false;
-	for (int off_x = -scout_range; off_x <= scout_range; ++off_x) {
-		for (int off_y = -scout_range; off_y <= scout_range; ++off_y) {
-			Vec2i current_pos(unit.tilePos.x + off_x, unit.tilePos.y + off_y);
-			
-			if (!Map.Info.IsPointOnMap(current_pos) || !CanMoveToMask(current_pos, unit.Type->MovementMask)) {
-				continue;
-			}
-
-			// don't give preference to fogged tiles, as that prevents scouts from passing through
-			/*
-			if (Map.Field(current_pos)->playerInfo.IsVisible(*AiPlayer->Player)) {
-				if (found_fogged) {
-					continue;
-				}
-			} else {
-				if (!found_fogged) {
-					pos_candidates.clear();
-					found_fogged = true;
-				}
-			}
-			*/
-			
-			if (Map.Field(current_pos)->playerInfo.IsTeamExplored(*AiPlayer->Player)) {
-				if (found_unexplored) {
-					continue;
-				}
-			} else {
-				if (!found_unexplored) {
-					pos_candidates.clear();
-					found_unexplored = true;
-					found_fogged = true;
-				}
-			}
-			
-			pos_candidates.push_back(current_pos);
-		}
-	}
-	
-	if (pos_candidates.size() > 0) {
-		Vec2i chosen_pos = pos_candidates[SyncRand(pos_candidates.size())];
-		pos->x = chosen_pos.x;
-		pos->y = chosen_pos.y;
-	}
-}
-
 static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 {
 	// Choose a target, "near"
@@ -751,10 +701,24 @@ void AiSendExplorers()
 		// move AI scouts
 		if (AiPlayer->Scouts[i]->IsIdle()) {
 			int scout_range = std::max(16, AiPlayer->Scouts[i]->CurrentSightRange * 2);
-			Vec2i target_pos(-1, -1);
-			ChooseRandomPositionForScouting(*AiPlayer->Scouts[i], &target_pos, scout_range);
-			if (Map.Info.IsPointOnMap(target_pos) && PlaceReachable(*AiPlayer->Scouts[i], target_pos, 1, 1, 0, 1, scout_range * 4)) {
-				CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands);
+			
+			Vec2i target_pos = AiPlayer->Scouts[i]->tilePos;
+
+			target_pos.x += SyncRand(scout_range * 2 + 1) - scout_range;
+			target_pos.y += SyncRand(scout_range * 2 + 1) - scout_range;
+
+			// restrict to map
+			Map.Clamp(target_pos);
+
+			// move if possible
+			if (target_pos != AiPlayer->Scouts[i]->tilePos) {
+				UnmarkUnitFieldFlags(*AiPlayer->Scouts[i]);
+				if (UnitCanBeAt(*AiPlayer->Scouts[i], target_pos)) {
+					MarkUnitFieldFlags(*AiPlayer->Scouts[i]);
+					CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands);
+					continue;
+				}
+				MarkUnitFieldFlags(*AiPlayer->Scouts[i]);
 			}
 		}
 	}
