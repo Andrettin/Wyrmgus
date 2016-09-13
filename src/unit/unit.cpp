@@ -2606,19 +2606,19 @@ void CUnit::UpdatePersonalName()
 	}
 	
 	int civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
-	int language = PlayerRaces.GetCivilizationLanguage(civilization);
+	int faction = -1;
 	if (civilization != -1 && !this->Type->Faction.empty()) {
-		language = PlayerRaces.GetFactionLanguage(civilization, PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction));
+		faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
 	} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
-		language = PlayerRaces.GetFactionLanguage(civilization, this->Player->Faction);
+		faction = this->Player->Faction;
 	}
+	int language = PlayerRaces.GetFactionLanguage(civilization, faction);
 
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
-		std::string new_settlement_name = PlayerRaces.TranslateName(this->SettlementName, language);
-		if (!new_settlement_name.empty()) {
-			this->SettlementName = new_settlement_name;
-		} else {
-			this->SettlementName = GenerateName(language, "settlement");
+		if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->SettlementNames.size() > 0) {
+			this->SettlementName = PlayerRaces.Factions[civilization][faction]->SettlementNames[SyncRand(PlayerRaces.Factions[civilization][faction]->SettlementNames.size())];
+		} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->SettlementNames.size() > 0) {
+			this->SettlementName = PlayerRaces.Civilizations[civilization]->SettlementNames[SyncRand(PlayerRaces.Civilizations[civilization]->SettlementNames.size())];
 		}
 	}
 	
