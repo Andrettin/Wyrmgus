@@ -151,6 +151,7 @@ enum EString {
 	EString_UnitTrait,			/// Unit Trait
 	EString_UnitSpell,			/// Unit spell
 	EString_UnitQuote,			/// Unit quote
+	EString_UnitSettlementName,	/// Unit Settlement Name
 	EString_TypeName,			/// Unit type's name
 	EString_TypeIdent,			/// Unit type's ident
 	EString_TypeClass,			/// Unit type's class

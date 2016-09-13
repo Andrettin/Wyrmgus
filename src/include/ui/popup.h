@@ -54,7 +54,7 @@ class PopupConditionPanel
 public:
 	PopupConditionPanel() :  HasHint(false), HasDescription(false), HasDependencies(false),
 		//Wyrmgus start
-		Class(false), Description(false), Quote(false), Encyclopedia(false),
+		Class(false), Description(false), Quote(false), Encyclopedia(false), SettlementName(false),
 		Opponent(0), Neutral(0), AutoCast(0), Equipped(0), Equippable(0), Consumable(0), Affixed(0), Spell(0), CanUse(0), Work(0), ReadWork(0), Unique(0), Bound(0), Identified(0), Weapon(0), Shield(0), Boots(0), Arrows(0), Regeneration(0),
 //		ButtonAction(-1), BoolFlags(NULL), Variables(NULL) {}
 		ButtonAction(-1), ItemClass(-1), BoolFlags(NULL), Variables(NULL) {}
@@ -73,6 +73,7 @@ public:
 	bool Description;			/// check if the button's unit type has a description.
 	bool Quote;					/// check if the button's unit type has a quote.
 	bool Encyclopedia;			/// check if the button's unit type has an encyclopedia entry.
+	bool SettlementName;		/// check if the button's unit has a settlement name.
 	//Wyrmgus end
 	int ButtonAction;           /// action type of button
 	//Wyrmgus start

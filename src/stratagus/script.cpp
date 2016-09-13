@@ -881,6 +881,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UnitQuote")) {
 			res->e = EString_UnitQuote;
 			res->D.Unit = CclParseUnitDesc(l);
+		} else if (!strcmp(key, "UnitSettlementName")) {
+			res->e = EString_UnitSettlementName;
+			res->D.Unit = CclParseUnitDesc(l);
 		} else if (!strcmp(key, "TypeName")) {
 			res->e = EString_TypeName;
 			res->D.Type = CclParseTypeDesc(l);
@@ -1215,6 +1218,9 @@ std::string EvalString(const StringDesc *s)
 			} else {
 				return std::string("");
 			}
+		case EString_UnitSettlementName : // name of the unit's settlement
+			unit = EvalUnit(s->D.Unit);
+			return unit->SettlementName;
 		case EString_TypeName : // name of the unit type
 			type = s->D.Type;
 			if (type != NULL) {
@@ -1465,6 +1471,10 @@ void FreeStringDesc(StringDesc *s)
 			delete s->D.Unit;
 			break;
 		case EString_UnitQuote : // Quote of the unit
+			FreeUnitDesc(s->D.Unit);
+			delete s->D.Unit;
+			break;
+		case EString_UnitSettlementName : // Settlement name of the unit
 			FreeUnitDesc(s->D.Unit);
 			delete s->D.Unit;
 			break;
@@ -2040,6 +2050,20 @@ static int CclUnitQuote(lua_State *l)
 }
 
 /**
+**  Return equivalent lua table for UnitSettlementName.
+**  {"UnitSettlementName", {arg1}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUnitSettlementName(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+	return Alias(l, "UnitSettlementName");
+}
+
+/**
 **  Return equivalent lua table for TypeName.
 **  {"TypeName", {}}
 **
@@ -2303,6 +2327,7 @@ static void AliasRegister()
 	lua_register(Lua, "UnitTrait", CclUnitTrait);
 	lua_register(Lua, "UnitSpell", CclUnitSpell);
 	lua_register(Lua, "UnitQuote", CclUnitQuote);
+	lua_register(Lua, "UnitSettlementName", CclUnitSettlementName);
 	lua_register(Lua, "TypeName", CclTypeName);
 	lua_register(Lua, "TypeIdent", CclTypeIdent);
 	lua_register(Lua, "TypeClass", CclTypeClass);

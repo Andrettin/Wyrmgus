@@ -414,6 +414,11 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 	if (condition->Encyclopedia && type && type->Description.empty() && type->Background.empty() && type->Quote.empty() && (!type->BoolFlag[ITEM_INDEX].value || type->ItemClass == -1)) {
 		return false;
 	}
+	
+	if (condition->SettlementName && !(button.Action == ButtonUnit && !UnitManager.GetSlotUnit(button.Value).SettlementName.empty())) {
+		return false;
+	}
+	
 	//Wyrmgus end
 
 	if (condition->ButtonAction != -1 && button.Action != condition->ButtonAction) {
