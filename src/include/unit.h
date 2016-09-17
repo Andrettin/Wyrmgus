@@ -163,6 +163,7 @@ public:
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();
 	void UpdatePersonalName();
+	void UpdateSettlementName();
 	void XPChanged();
 	//Wyrmgus end
 	/// Change owner of unit

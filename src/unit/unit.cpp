@@ -2614,14 +2614,6 @@ void CUnit::UpdatePersonalName()
 	}
 	int language = PlayerRaces.GetFactionLanguage(civilization, faction);
 
-	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
-		if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->SettlementNames.size() > 0) {
-			this->SettlementName = PlayerRaces.Factions[civilization][faction]->SettlementNames[SyncRand(PlayerRaces.Factions[civilization][faction]->SettlementNames.size())];
-		} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->SettlementNames.size() > 0) {
-			this->SettlementName = PlayerRaces.Civilizations[civilization]->SettlementNames[SyncRand(PlayerRaces.Civilizations[civilization]->SettlementNames.size())];
-		}
-	}
-	
 	// first see if can translate the current personal name
 	std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
 	if (!new_personal_name.empty()) {
@@ -2634,6 +2626,66 @@ void CUnit::UpdatePersonalName()
 		this->Name = this->Type->GeneratePersonalName(faction, this->Variable[GENDER_INDEX].Value);
 		if (!this->Type->BoolFlag[FAUNA_INDEX].value && !this->Name.empty() && this->Trait != NULL && this->Trait->Epithets.size() > 0 && SyncRand(4) == 0) { // 25% chance to give the unit an epithet based on their trait
 			this->Name += " " + this->Trait->Epithets[SyncRand(this->Trait->Epithets.size())];
+		}
+	}
+	
+	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && this->SettlementName.empty())) {
+		this->UpdateSettlementName();
+	}
+}
+
+void CUnit::UpdateSettlementName()
+{
+	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
+		std::string old_settlement_name = this->SettlementName;
+		
+		int civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+		int faction = -1;
+		if (civilization != -1 && !this->Type->Faction.empty()) {
+			faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
+		} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
+			faction = this->Player->Faction;
+		}
+		int language = PlayerRaces.GetFactionLanguage(civilization, faction);
+
+		// first see if can translate the current personal name
+		std::string new_settlement_name = PlayerRaces.TranslateName(this->SettlementName, language);
+		if (!new_settlement_name.empty()) {
+			this->SettlementName = new_settlement_name;
+		} else {
+			if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->SettlementNames.size() > 0) {
+				this->SettlementName = PlayerRaces.Factions[civilization][faction]->SettlementNames[SyncRand(PlayerRaces.Factions[civilization][faction]->SettlementNames.size())];
+			} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->SettlementNames.size() > 0) {
+				this->SettlementName = PlayerRaces.Civilizations[civilization]->SettlementNames[SyncRand(PlayerRaces.Civilizations[civilization]->SettlementNames.size())];
+			}
+		}
+		
+		for (int i = 0; i < this->Player->GetUnitCount(); ++i) {
+			CUnit *settlement_unit = &this->Player->GetUnit(i);
+			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
+				continue;
+			}
+			if (!old_settlement_name.empty() && settlement_unit->SettlementName != old_settlement_name) {
+				continue;
+			}
+			settlement_unit->UpdateSettlementName();
+		}
+	} else {
+		CUnit *best_hall = NULL;
+		int best_distance = -1;
+		for (int i = 0; i < this->Player->GetUnitCount(); ++i) {
+			CUnit *settlement_unit = &this->Player->GetUnit(i);
+			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
+				continue;
+			}
+			int distance = this->MapDistanceTo(*settlement_unit);
+			if (!best_hall || distance < best_distance) {
+				best_hall = settlement_unit;
+				best_distance = distance;
+			}
+		}
+		if (best_hall) {
+			this->SettlementName = best_hall->SettlementName;
 		}
 	}
 }
@@ -4896,6 +4948,18 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	//Wyrmgus end
 	
 	MapMarkUnitSight(unit);
+	
+	//Wyrmgus start
+	if (type->BoolFlag[TOWNHALL_INDEX].value) {
+		for (int i = 0; i < unit.Player->GetUnitCount(); ++i) {
+			CUnit *settlement_unit = &unit.Player->GetUnit(i);
+			if (!settlement_unit || !settlement_unit->IsAliveOnMap() || !settlement_unit->Type->BoolFlag[BUILDING_INDEX].value || settlement_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
+				continue;
+			}
+			settlement_unit->UpdateSettlementName();
+		}
+	}
+	//Wyrmgus end
 }
 
 /**
