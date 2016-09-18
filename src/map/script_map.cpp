@@ -625,7 +625,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		Map.Field(label_pos)->Label = iterator->second;
 	}
 	
-	if (!PlayerFaction.empty()) {
+	if (!PlayerFaction.empty() && !map_template->MainTemplate) {
 		CFaction *player_faction = PlayerRaces.GetFaction(-1, PlayerFaction);
 		
 		if (player_faction) {
@@ -636,18 +636,29 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	
 	for (size_t i = 0; i < map_template->Subtemplates.size(); ++i) {
 		Vec2i random_pos(0, 0);
-		Vec2i min_pos(0, 0);
-		Vec2i max_pos(Map.Info.MapWidth - map_template->Subtemplates[i]->Width, Map.Info.MapHeight - map_template->Subtemplates[i]->Height);
+		Vec2i min_pos(map_start_pos);
+		Vec2i max_pos(map_end.x - map_template->Subtemplates[i]->Width, map_end.y - map_template->Subtemplates[i]->Height);
 		int while_count = 0;
-		while (while_count < 100) {
+		while (while_count < 100000) {
 			random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
 			random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 			
-			if (!Map.Info.IsPointOnMap(random_pos)) {
-				continue;
+			bool on_map = Map.Info.IsPointOnMap(random_pos) && Map.Info.IsPointOnMap(Vec2i(random_pos.x + map_template->Subtemplates[i]->Width - 1, random_pos.y + map_template->Subtemplates[i]->Height - 1));
+			
+			bool on_subtemplate_area = false;
+			for (int x = 0; x < map_template->Subtemplates[i]->Width; ++x) {
+				for (int y = 0; y < map_template->Subtemplates[i]->Height; ++y) {
+					if (Map.IsPointInASubtemplateArea(random_pos + Vec2i(x, y))) {
+						on_subtemplate_area = true;
+						break;
+					}
+				}
+				if (on_subtemplate_area) {
+					break;
+				}
 			}
 			
-			if (true) { // add more conditions here later
+			if (on_map && !on_subtemplate_area) {
 				ApplyMapTemplate(map_template->Subtemplates[i]->Ident, 0, 0, random_pos.x, random_pos.y);
 				
 				Map.SubtemplateAreas.push_back(std::pair<Vec2i, Vec2i>(random_pos, Vec2i(random_pos.x + map_template->Subtemplates[i]->Width - 1, random_pos.y + map_template->Subtemplates[i]->Height - 1)));
@@ -684,11 +695,19 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 	
-	Map.AdjustTileMapIrregularities(false);
-	Map.AdjustTileMapIrregularities(true);
-	Map.AdjustTileMapTransitions();
-	Map.AdjustTileMapIrregularities(false);
-	Map.AdjustTileMapIrregularities(true);
+	if (!map_template->MainTemplate) {
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
+		Map.AdjustTileMapTransitions(map_start_pos, map_end);
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
+	} else {
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+	}
 	
 	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::iterator iterator = map_template->Resources.begin(); iterator != map_template->Resources.end(); ++iterator) {
 		Vec2i unit_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
@@ -713,10 +732,10 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	
 	for (size_t i = 0; i < map_template->Units.size(); ++i) {
 		Vec2i unit_raw_pos(std::get<0>(map_template->Units[i]));
-		if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) { // if the unit's coordinates were set to {-1, -1}, then randomly generate its location
-			unit_raw_pos = Map.GenerateUnitLocation(std::get<1>(map_template->Units[i]), std::get<2>(map_template->Units[i]), map_start_pos, map_end - Vec2i(1, 1));
-		}
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) { // if the unit's coordinates were set to {-1, -1}, then randomly generate its location
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(map_template->Units[i]), std::get<2>(map_template->Units[i]), map_start_pos, map_end - Vec2i(1, 1));
+		}
 		if (!Map.Info.IsPointOnMap(unit_pos)) {
 			continue;
 		}

@@ -400,7 +400,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 
 	int while_count = 0;
 	
-	while (while_count < 100) {
+	while (while_count < 100000) {
 		random_pos.x = SyncRand(max_pos.x - (unit_type->TileWidth - 1) - min_pos.x + 1) + min_pos.x;
 		random_pos.y = SyncRand(max_pos.y - (unit_type->TileHeight - 1) - min_pos.y + 1) + min_pos.y;
 		
@@ -1321,13 +1321,13 @@ void CMap::CalculateTileVisibility(const Vec2i &pos)
 	}
 }
 
-void CMap::AdjustTileMapIrregularities(bool overlay)
+void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos)
 {
 	bool no_irregularities_found = false;
 	while (!no_irregularities_found) {
 		no_irregularities_found = true;
-		for (int x = 0; x < this->Info.MapWidth; ++x) {
-			for (int y = 0; y < this->Info.MapHeight; ++y) {
+		for (int x = min_pos.x; x < max_pos.x; ++x) {
+			for (int y = min_pos.y; y < max_pos.y; ++y) {
 				CMapField &mf = *this->Field(x, y);
 				CTerrainType *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
 				if (!terrain) {
@@ -1401,15 +1401,15 @@ void CMap::AdjustTileMapIrregularities(bool overlay)
 	}
 }
 
-void CMap::AdjustTileMapTransitions()
+void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos)
 {
-	for (int x = 0; x < this->Info.MapWidth; ++x) {
-		for (int y = 0; y < this->Info.MapHeight; ++y) {
+	for (int x = min_pos.x; x < max_pos.x; ++x) {
+		for (int y = min_pos.y; y < max_pos.y; ++y) {
 			CMapField &mf = *this->Field(x, y);
 
 			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-					if ((x + sub_x) < 0 || (x + sub_x) >= this->Info.MapWidth || (y + sub_y) < 0 || (y + sub_y) >= this->Info.MapHeight || (sub_x == 0 && sub_y == 0)) {
+					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
 					CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false);
@@ -1422,13 +1422,13 @@ void CMap::AdjustTileMapTransitions()
 		}
 	}
 
-	for (int x = 0; x < this->Info.MapWidth; ++x) {
-		for (int y = 0; y < this->Info.MapHeight; ++y) {
+	for (int x = min_pos.x; x < max_pos.x; ++x) {
+		for (int y = min_pos.y; y < max_pos.y; ++y) {
 			CMapField &mf = *this->Field(x, y);
 
 			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
-					if ((x + sub_x) < 0 || (x + sub_x) >= this->Info.MapWidth || (y + sub_y) < 0 || (y + sub_y) >= this->Info.MapHeight || (sub_x == 0 && sub_y == 0)) {
+					if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
 						continue;
 					}
 					CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false);
