@@ -862,6 +862,20 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	for (size_t i = 0; i < map_template->GeneratedResources.size(); ++i) {
 		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, map_start_pos, map_end - Vec2i(1, 1));
 	}
+	
+	if (!map_template->MainTemplate) {
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
+		Map.AdjustTileMapTransitions(map_start_pos, map_end);
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
+	} else {
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+	}
 }
 //Wyrmgus end
 

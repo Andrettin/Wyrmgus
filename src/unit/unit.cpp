@@ -2630,7 +2630,7 @@ void CUnit::UpdatePersonalName()
 	}
 	
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && this->SettlementName.empty())) {
-		this->UpdateSettlementName();
+//		this->UpdateSettlementName();
 	}
 }
 
@@ -4950,6 +4950,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	MapMarkUnitSight(unit);
 	
 	//Wyrmgus start
+	/*
 	if (type->BoolFlag[TOWNHALL_INDEX].value) {
 		for (int i = 0; i < unit.Player->GetUnitCount(); ++i) {
 			CUnit *settlement_unit = &unit.Player->GetUnit(i);
@@ -4959,6 +4960,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			settlement_unit->UpdateSettlementName();
 		}
 	}
+	*/
 	//Wyrmgus end
 }
 

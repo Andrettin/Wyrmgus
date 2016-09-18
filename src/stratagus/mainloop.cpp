@@ -579,11 +579,11 @@ static void GameLogicLoop()
 
 			//update the sight of all units
 			for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-				CUnit &unit = **it;
-				if (!unit.Destroyed) {
-					MapUnmarkUnitSight(unit);
-					UpdateUnitSightRange(unit);
-					MapMarkUnitSight(unit);
+				CUnit *unit = *it;
+				if (unit && !unit->Destroyed) {
+					MapUnmarkUnitSight(*unit);
+					UpdateUnitSightRange(*unit);
+					MapMarkUnitSight(*unit);
 				}
 			}
 		}
