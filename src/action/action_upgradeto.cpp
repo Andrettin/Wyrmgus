@@ -253,7 +253,16 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	
 	//Wyrmgus start
 	//change personal name if new unit type's civilization is different from old unit type's civilization
-	if (unit.Character == NULL && !oldtype.Civilization.empty() && !newtype.Civilization.empty() && oldtype.Civilization != newtype.Civilization) {
+	if (
+		unit.Character == NULL
+		&& (
+			oldtype.PersonalNames != newtype.PersonalNames
+			|| (
+				!oldtype.Civilization.empty() && !newtype.Civilization.empty() && oldtype.Civilization != newtype.Civilization
+				&& (newtype.BoolFlag[ORGANIC_INDEX].value || (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval))
+			)
+		)
+	) {
 		unit.UpdatePersonalName();
 	}
 	//Wyrmgus end

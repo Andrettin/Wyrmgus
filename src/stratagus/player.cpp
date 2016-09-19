@@ -1428,8 +1428,12 @@ void CPlayer::SetFaction(const std::string faction_name)
 		}
 	}
 	
-	int old_language = PlayerRaces.GetFactionLanguage(this->Race, this->Faction);
-	int new_language = PlayerRaces.GetFactionLanguage(this->Race, faction);
+	bool personal_names_changed = true;
+	bool ship_names_changed = true;
+	if (this->Faction != -1 && faction != -1) {
+		personal_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->PersonalNames != PlayerRaces.Factions[this->Race][faction]->PersonalNames;
+		ship_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->ShipNames != PlayerRaces.Factions[this->Race][faction]->ShipNames;
+	}
 	
 	this->Faction = faction;
 
@@ -1475,8 +1479,8 @@ void CPlayer::SetFaction(const std::string faction_name)
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (new_language != old_language) { //if the language changed, update the names of this player's units
-			if (!unit.Character) {
+		if (!unit.Character && unit.Type->PersonalNames.size() == 0) {
+			if ((unit.Type->BoolFlag[ORGANIC_INDEX].value && personal_names_changed) || (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeNaval) && ship_names_changed) {
 				unit.UpdatePersonalName();
 			}
 		}
