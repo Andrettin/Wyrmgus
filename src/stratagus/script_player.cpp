@@ -911,6 +911,26 @@ static int CclDefineCivilization(lua_State *l)
 				PlayerRaces.ButtonIcons[civilization_id][iterator->first] = iterator->second;
 			}
 		}
+		
+		if (civilization->PersonalNames.size() == 0) {
+			for (std::map<int, std::vector<std::string>>::iterator iterator = PlayerRaces.Civilizations[parent_civilization]->PersonalNames.begin(); iterator != PlayerRaces.Civilizations[parent_civilization]->PersonalNames.end(); ++iterator) {
+				for (size_t i = 0; i < iterator->second.size(); ++i) {
+					civilization->PersonalNames[iterator->first].push_back(iterator->second[i]);				
+				}
+			}
+		}
+				
+		if (civilization->SettlementNames.size() == 0) {
+			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->SettlementNames.size(); ++i) {
+				civilization->SettlementNames.push_back(PlayerRaces.Civilizations[parent_civilization]->SettlementNames[i]);
+			}
+		}
+				
+		if (civilization->ShipNames.size() == 0) {
+			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->ShipNames.size(); ++i) {
+				civilization->ShipNames.push_back(PlayerRaces.Civilizations[parent_civilization]->ShipNames[i]);
+			}
+		}
 	}
 	
 	if (PlayerRaces.ButtonIcons[civilization_id].find(ButtonMove) != PlayerRaces.ButtonIcons[civilization_id].end()) {
@@ -1994,7 +2014,7 @@ static int CclDefineFaction(lua_State *l)
 			}
 			
 			if (faction->Language == -1) {
-				if (faction->PersonalNames.size() == 0 ) {
+				if (faction->PersonalNames.size() == 0) {
 					for (std::map<int, std::vector<std::string>>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->PersonalNames.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->PersonalNames.end(); ++iterator) {
 						for (size_t i = 0; i < iterator->second.size(); ++i) {
 							faction->PersonalNames[iterator->first].push_back(iterator->second[i]);				
@@ -2002,13 +2022,13 @@ static int CclDefineFaction(lua_State *l)
 					}
 				}
 				
-				if (faction->SettlementNames.size() == 0 ) {
+				if (faction->SettlementNames.size() == 0) {
 					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->SettlementNames.size(); ++i) {
 						faction->SettlementNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->SettlementNames[i]);
 					}
 				}
 				
-				if (faction->ShipNames.size() == 0 ) {
+				if (faction->ShipNames.size() == 0) {
 					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->ShipNames.size(); ++i) {
 						faction->ShipNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->ShipNames[i]);
 					}
