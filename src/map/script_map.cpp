@@ -616,6 +616,29 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 	
+	if (map_template->MainTemplate && map_template->SurroundingTerrain) {
+		Vec2i surrounding_start_pos(map_start_pos - Vec2i(1, 1));
+		Vec2i surrounding_end(map_end + Vec2i(1, 1));
+		for (int x = surrounding_start_pos.x; x < surrounding_end.x; ++x) {
+			for (int y = surrounding_start_pos.y; y < surrounding_end.y; y += (surrounding_end.y - surrounding_start_pos.y - 1)) {
+				Vec2i surrounding_pos(x, y);
+				if (!Map.Info.IsPointOnMap(surrounding_pos) || Map.IsPointInASubtemplateArea(surrounding_pos)) {
+					continue;
+				}
+				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos);
+			}
+		}
+		for (int x = surrounding_start_pos.x; x < surrounding_end.x; x += (surrounding_end.x - surrounding_start_pos.x - 1)) {
+			for (int y = surrounding_start_pos.y; y < surrounding_end.y; ++y) {
+				Vec2i surrounding_pos(x, y);
+				if (!Map.Info.IsPointOnMap(surrounding_pos) || Map.IsPointInASubtemplateArea(surrounding_pos)) {
+					continue;
+				}
+				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos);
+			}
+		}
+	}
+	
 	for (std::map<std::pair<int, int>, std::string>::iterator iterator = map_template->TileLabels.begin(); iterator != map_template->TileLabels.end(); ++iterator) {
 		Vec2i label_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
 		if (!Map.Info.IsPointOnMap(label_pos)) {
@@ -639,7 +662,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		Vec2i min_pos(map_start_pos);
 		Vec2i max_pos(map_end.x - map_template->Subtemplates[i]->Width, map_end.y - map_template->Subtemplates[i]->Height);
 		int while_count = 0;
-		while (while_count < 100000) {
+		while (while_count < 1000) {
 			random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
 			random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 			
@@ -1404,6 +1427,12 @@ static int CclDefineMapTemplate(lua_State *l)
 				LuaError(l, "Terrain doesn't exist.");
 			}
 			map->BaseTerrain = terrain;
+		} else if (!strcmp(value, "SurroundingTerrain")) {
+			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
+			if (!terrain) {
+				LuaError(l, "Terrain doesn't exist.");
+			}
+			map->SurroundingTerrain = terrain;
 		} else if (!strcmp(value, "GeneratedTerrains")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");

@@ -2439,12 +2439,12 @@ void PlayersEachMinute(int playerIdx)
 					break;
 				}
 				
-				// generate the new faction's units near a gold deposit
 				CUnit *depot = FindDeposit(*worker_unit, 1000, GoldCost);
 				if (!depot) {
 					break;
 				}
 				
+				// generate the new faction's units near a gold deposit
 				CUnit *deposit = NULL;
 				int resource_range = 0;
 				for (int j = 0; j < 3; ++j) { //search for resources first in a 64 tile radius, then in a 128 tile radius, and then in the whole map

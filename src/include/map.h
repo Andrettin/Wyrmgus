@@ -139,7 +139,7 @@ class CMapTemplate
 public:
 	CMapTemplate() :
 		Width(0), Height(0),
-		MainTemplate(NULL), BaseTerrain(NULL)
+		MainTemplate(NULL), BaseTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
 
@@ -155,6 +155,7 @@ public:
 	int Height;
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CTerrainType *BaseTerrain;
+	CTerrainType *SurroundingTerrain;
 	std::vector<CMapTemplate *> Subtemplates;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
 	std::vector<std::pair<CTerrainType *, int>> PlayerLocationGeneratedTerrains;
