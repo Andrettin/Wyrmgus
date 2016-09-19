@@ -67,7 +67,10 @@ static const int FogTable[16] = {
 	0, 11, 10, 2,  13, 6, 14, 3,  12, 15, 4, 1,  8, 9, 7, 0,
 };
 
-static std::vector<unsigned short> VisibleTable;
+//Wyrmgus start
+//static std::vector<unsigned short> VisibleTable;
+static std::vector<std::vector<unsigned short>> VisibleTable;
+//Wyrmgus end
 
 static SDL_Surface *OnlyFogSurface;
 static CGraphic *AlphaFogG;
@@ -342,7 +345,10 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 **  @param range   Radius to mark.
 **  @param marker  Function to mark or unmark sight
 */
-void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+//Wyrmgus start
+//void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker)
+void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, MapMarkerFunc *marker, int z)
+//Wyrmgus end
 {
 	// Units under construction have no sight range.
 	if (!range) {
@@ -425,10 +431,16 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	for (int offsety = miny; offsety != 0; ++offsety) {
 		const int offsetx = isqrt(square(range + 1) - square(-offsety) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
+		//Wyrmgus start
+//		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
+		const int maxx = std::min(Map.Info.MapWidths[z], pos.x + w + offsetx);
+		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + offsety);
 #ifdef MARKER_ON_INDEX
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		//Wyrmgus start
+//		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		const unsigned int index = mpos.y * Map.Info.MapWidths[z];
+		//Wyrmgus end
 #endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -448,10 +460,16 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 	}
 	for (int offsety = 0; offsety < h; ++offsety) {
 		const int minx = std::max(0, pos.x - range);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
+		//Wyrmgus start
+//		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + range);
+		const int maxx = std::min(Map.Info.MapWidths[z], pos.x + w + range);
+		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + offsety);
 #ifdef MARKER_ON_INDEX
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		//Wyrmgus start
+//		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		const unsigned int index = mpos.y * Map.Info.MapWidths[z];
+		//Wyrmgus end
 #endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -470,14 +488,23 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 		}
 	}
 	// bottom hemi-cycle
-	const int maxy = std::min(range, Map.Info.MapHeight - pos.y - h);
+	//Wyrmgus start
+//	const int maxy = std::min(range, Map.Info.MapHeight - pos.y - h);
+	const int maxy = std::min(range, Map.Info.MapHeights[z] - pos.y - h);
+	//Wyrmgus end
 	for (int offsety = 0; offsety < maxy; ++offsety) {
 		const int offsetx = isqrt(square(range + 1) - square(offsety + 1) - 1);
 		const int minx = std::max(0, pos.x - offsetx);
-		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
+		//Wyrmgus start
+//		const int maxx = std::min(Map.Info.MapWidth, pos.x + w + offsetx);
+		const int maxx = std::min(Map.Info.MapWidths[z], pos.x + w + offsetx);
+		//Wyrmgus end
 		Vec2i mpos(minx, pos.y + h + offsety);
 #ifdef MARKER_ON_INDEX
-		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		//Wyrmgus start
+//		const unsigned int index = mpos.y * Map.Info.MapWidth;
+		const unsigned int index = mpos.y * Map.Info.MapWidths[z];
+		//Wyrmgus end
 #endif
 
 		for (mpos.x = minx; mpos.x < maxx; ++mpos.x) {
@@ -505,6 +532,8 @@ void UpdateFogOfWarChange()
 	DebugPrint("::UpdateFogOfWarChange\n");
 	//  Mark all explored fields as visible again.
 	if (Map.NoFogOfWar) {
+		//Wyrmgus start
+		/*
 		const unsigned int w = Map.Info.MapHeight * Map.Info.MapWidth;
 		for (unsigned int index = 0; index != w; ++index) {
 			CMapField &mf = *Map.Field(index);
@@ -512,6 +541,17 @@ void UpdateFogOfWarChange()
 				Map.MarkSeenTile(mf);
 			}
 		}
+		*/
+		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+			const unsigned int w = Map.Info.MapHeights[z] * Map.Info.MapWidths[z];
+			for (unsigned int index = 0; index != w; ++index) {
+				CMapField &mf = *Map.Field(index, z);
+				if (mf.playerInfo.IsExplored(*ThisPlayer)) {
+					Map.MarkSeenTile(mf);
+				}
+			}
+		}
+		//Wyrmgus end
 	}
 	//  Global seen recount.
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
@@ -566,12 +606,22 @@ void VideoDrawOnlyFog(int x, int y)
 --  Old version correct working but not 100% original
 ----------------------------------------------------------------------------*/
 
-static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
+//Wyrmgus start
+//static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
+static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int z = 0)
+//Wyrmgus end
 {
-#define IsMapFieldExploredTable(index) (VisibleTable[(index)])
-#define IsMapFieldVisibleTable(index) (VisibleTable[(index)] > 1)
+//Wyrmgus start
+//#define IsMapFieldExploredTable(index) (VisibleTable[(index)])
+//#define IsMapFieldVisibleTable(index) (VisibleTable[(index)] > 1)
+#define IsMapFieldExploredTable(index, layer) (VisibleTable[(layer)][(index)])
+#define IsMapFieldVisibleTable(index, layer) (VisibleTable[(layer)][(index)] > 1)
+//Wyrmgus end
 
-	int w = Map.Info.MapWidth;
+	//Wyrmgus start
+//	int w = Map.Info.MapWidth;
+	int w = Map.Info.MapWidths[z];
+	//Wyrmgus end
 	int fogTileIndex = 0;
 	int blackFogTileIndex = 0;
 	int x = sx - sy;
@@ -595,32 +645,53 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
 	//    8 12 4
 
 	if (sy) {
-		unsigned int index = sy - Map.Info.MapWidth;//(y-1) * Map.Info.MapWidth;
+		//Wyrmgus start
+//		unsigned int index = sy - Map.Info.MapWidth;//(y-1) * Map.Info.MapWidth;
+		unsigned int index = sy - Map.Info.MapWidths[z];//(y-1) * Map.Info.MapWidth;
+		//Wyrmgus end
 		if (sx != sy) {
 			//if (!IsMapFieldExploredTable(x - 1, y - 1)) {
-			if (!IsMapFieldExploredTable(x - 1 + index)) {
+			//Wyrmgus start
+//			if (!IsMapFieldExploredTable(x - 1 + index)) {
+			if (!IsMapFieldExploredTable(x - 1 + index, z)) {
+			//Wyrmgus end
 				blackFogTileIndex |= 2;
 				fogTileIndex |= 2;
 				//} else if (!IsMapFieldVisibleTable(x - 1, y - 1)) {
-			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+			//Wyrmgus start
+//			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+			} else if (!IsMapFieldVisibleTable(x - 1 + index, z)) {
+			//Wyrmgus end
 				fogTileIndex |= 2;
 			}
 		}
 		//if (!IsMapFieldExploredTable(x, y - 1)) {
-		if (!IsMapFieldExploredTable(x + index)) {
+		//Wyrmgus start
+//		if (!IsMapFieldExploredTable(x + index)) {
+		if (!IsMapFieldExploredTable(x + index, z)) {
+		//Wyrmgus end
 			blackFogTileIndex |= 3;
 			fogTileIndex |= 3;
 			//} else if (!IsMapFieldVisibleTable(x, y - 1)) {
-		} else if (!IsMapFieldVisibleTable(x + index)) {
+		//Wyrmgus start
+//		} else if (!IsMapFieldVisibleTable(x + index)) {
+		} else if (!IsMapFieldVisibleTable(x + index, z)) {
+		//Wyrmgus end
 			fogTileIndex |= 3;
 		}
 		if (sx != sy + w - 1) {
 			//if (!IsMapFieldExploredTable(x + 1, y - 1)) {
-			if (!IsMapFieldExploredTable(x + 1 + index)) {
+			//Wyrmgus start
+//			if (!IsMapFieldExploredTable(x + 1 + index)) {
+			if (!IsMapFieldExploredTable(x + 1 + index, z)) {
+			//Wyrmgus end
 				blackFogTileIndex |= 1;
 				fogTileIndex |= 1;
 				//} else if (!IsMapFieldVisibleTable(x + 1, y - 1)) {
-			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+			//Wyrmgus start
+//			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+			} else if (!IsMapFieldVisibleTable(x + 1 + index, z)) {
+			//Wyrmgus end
 				fogTileIndex |= 1;
 			}
 		}
@@ -629,53 +700,89 @@ static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
 	if (sx != sy) {
 		unsigned int index = sy;//(y) * Map.Info.MapWidth;
 		//if (!IsMapFieldExploredTable(x - 1, y)) {
-		if (!IsMapFieldExploredTable(x - 1 + index)) {
+		//Wyrmgus start
+//		if (!IsMapFieldExploredTable(x - 1 + index)) {
+		if (!IsMapFieldExploredTable(x - 1 + index, z)) {
+		//Wyrmgus end
 			blackFogTileIndex |= 10;
 			fogTileIndex |= 10;
 			//} else if (!IsMapFieldVisibleTable(x - 1, y)) {
-		} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+		//Wyrmgus start
+//		} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+		} else if (!IsMapFieldVisibleTable(x - 1 + index, z)) {
+		//Wyrmgus end
 			fogTileIndex |= 10;
 		}
 	}
 	if (sx != sy + w - 1) {
 		unsigned int index = sy;//(y) * Map.Info.MapWidth;
 		//if (!IsMapFieldExploredTable(x + 1, y)) {
-		if (!IsMapFieldExploredTable(x + 1 + index)) {
+		//Wyrmgus start
+//		if (!IsMapFieldExploredTable(x + 1 + index)) {
+		if (!IsMapFieldExploredTable(x + 1 + index, z)) {
+		//Wyrmgus end
 			blackFogTileIndex |= 5;
 			fogTileIndex |= 5;
 			//} else if (!IsMapFieldVisibleTable(x + 1, y)) {
-		} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+		//Wyrmgus start
+//		} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+		} else if (!IsMapFieldVisibleTable(x + 1 + index, z)) {
+		//Wyrmgus end
 			fogTileIndex |= 5;
 		}
 	}
 
-	if (sy + w < Map.Info.MapHeight * w) {
-		unsigned int index = sy + Map.Info.MapWidth;//(y+1) * Map.Info.MapWidth;
+	//Wyrmgus start
+//	if (sy + w < Map.Info.MapHeight * w) {
+	if (sy + w < Map.Info.MapHeights[z] * w) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		unsigned int index = sy + Map.Info.MapWidth;//(y+1) * Map.Info.MapWidth;
+		unsigned int index = sy + Map.Info.MapWidths[z];//(y+1) * Map.Info.MapWidth;
+		//Wyrmgus end
 		if (sx != sy) {
 			//if (!IsMapFieldExploredTable(x - 1, y + 1)) {
-			if (!IsMapFieldExploredTable(x - 1 + index)) {
+			//Wyrmgus start
+//			if (!IsMapFieldExploredTable(x - 1 + index)) {
+			if (!IsMapFieldExploredTable(x - 1 + index, z)) {
+			//Wyrmgus end
 				blackFogTileIndex |= 8;
 				fogTileIndex |= 8;
 				//} else if (!IsMapFieldVisibleTable(x - 1, y + 1)) {
-			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+			//Wyrmgus start
+//			} else if (!IsMapFieldVisibleTable(x - 1 + index)) {
+			} else if (!IsMapFieldVisibleTable(x - 1 + index, z)) {
+			//Wyrmgus end
 				fogTileIndex |= 8;
 			}
 		}
 		//if (!IsMapFieldExploredTable(x, y + 1)) {
-		if (!IsMapFieldExploredTable(x + index)) {
+		//Wyrmgus start
+//		if (!IsMapFieldExploredTable(x + index)) {
+		if (!IsMapFieldExploredTable(x + index, z)) {
+		//Wyrmgus end
 			blackFogTileIndex |= 12;
 			fogTileIndex |= 12;
 			//} else if (!IsMapFieldVisibleTable(x, y + 1)) {
-		} else if (!IsMapFieldVisibleTable(x + index)) {
+		//Wyrmgus start
+//		} else if (!IsMapFieldVisibleTable(x + index)) {
+		} else if (!IsMapFieldVisibleTable(x + index, z)) {
+		//Wyrmgus end
 			fogTileIndex |= 12;
 		}
 		if (sx != sy + w - 1) {
 			//if (!IsMapFieldExploredTable(x + 1, y + 1)) {
-			if (!IsMapFieldExploredTable(x + 1 + index)) {
+			//Wyrmgus start
+//			if (!IsMapFieldExploredTable(x + 1 + index)) {
+			if (!IsMapFieldExploredTable(x + 1 + index, z)) {
+			//Wyrmgus end
 				blackFogTileIndex |= 4;
 				fogTileIndex |= 4;
 				//} else if (!IsMapFieldVisibleTable(x + 1, y + 1)) {
-			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+			//Wyrmgus start
+//			} else if (!IsMapFieldVisibleTable(x + 1 + index)) {
+			} else if (!IsMapFieldVisibleTable(x + 1 + index, z)) {
+			//Wyrmgus end
 				fogTileIndex |= 4;
 			}
 		}
@@ -717,9 +824,15 @@ static void DrawFogOfWarTile(int sx, int sy, int dx, int dy)
 	int fogTile = 0;
 	int blackFogTile = 0;
 
-	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
+	//Wyrmgus start
+//	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile);
+	GetFogOfWarTile(sx, sy, &fogTile, &blackFogTile, CurrentMapLayer);
+	//Wyrmgus end
 
-	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
+	//Wyrmgus start
+//	if (IsMapFieldVisibleTable(sx) || ReplayRevealMap) {
+	if (IsMapFieldVisibleTable(sx, CurrentMapLayer) || ReplayRevealMap) {
+	//Wyrmgus end
 		if (fogTile && fogTile != blackFogTile) {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 			if (UseOpenGL) {
@@ -752,22 +865,40 @@ void CViewport::DrawMapFogOfWar() const
 	}
 
 	int sx = std::max<int>(MapPos.x - 1, 0);
-	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
+	//Wyrmgus start
+//	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidth);
+	int ex = std::min<int>(MapPos.x + MapWidth + 1, Map.Info.MapWidths[CurrentMapLayer]);
+	//Wyrmgus end
 	int my = std::max<int>(MapPos.y - 1, 0);
-	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeight);
+	//Wyrmgus start
+//	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeight);
+	int ey = std::min<int>(MapPos.y + MapHeight + 1, Map.Info.MapHeights[CurrentMapLayer]);
+	//Wyrmgus end
 
 	// Update for visibility all tile in viewport
 	// and 1 tile around viewport (for fog-of-war connection display)
 
-	unsigned int my_index = my * Map.Info.MapWidth;
+	//Wyrmgus start
+//	unsigned int my_index = my * Map.Info.MapWidth;
+	unsigned int my_index = my * Map.Info.MapWidths[CurrentMapLayer];
+	//Wyrmgus end
 	for (; my < ey; ++my) {
 		for (int mx = sx; mx < ex; ++mx) {
-			VisibleTable[my_index + mx] = Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*ThisPlayer);
+			//Wyrmgus start
+//			VisibleTable[my_index + mx] = Map.Field(mx + my_index)->playerInfo.TeamVisibilityState(*ThisPlayer);
+			VisibleTable[CurrentMapLayer][my_index + mx] = Map.Field(mx + my_index, CurrentMapLayer)->playerInfo.TeamVisibilityState(*ThisPlayer);
+			//Wyrmgus end
 		}
-		my_index += Map.Info.MapWidth;
+		//Wyrmgus start
+//		my_index += Map.Info.MapWidth;
+		my_index += Map.Info.MapWidths[CurrentMapLayer];
+		//Wyrmgus end
 	}
 	ex = this->BottomRightPos.x;
-	int sy = MapPos.y * Map.Info.MapWidth;
+	//Wyrmgus start
+//	int sy = MapPos.y * Map.Info.MapWidth;
+	int sy = MapPos.y * Map.Info.MapWidths[CurrentMapLayer];
+	//Wyrmgus end
 	int dy = this->TopLeftPos.y - Offset.y;
 	ey = this->BottomRightPos.y;
 
@@ -775,7 +906,10 @@ void CViewport::DrawMapFogOfWar() const
 		sx = MapPos.x + sy;
 		int dx = this->TopLeftPos.x - Offset.x;
 		while (dx <= ex) {
-			if (VisibleTable[sx]) {
+			//Wyrmgus start
+//			if (VisibleTable[sx]) {
+			if (VisibleTable[CurrentMapLayer][sx]) {
+			//Wyrmgus end
 				DrawFogOfWarTile(sx, sy, dx, dy);
 			} else {
 				Video.FillRectangleClip(FogOfWarColorSDL, dx, dy, PixelTileSize.x, PixelTileSize.y);
@@ -783,7 +917,10 @@ void CViewport::DrawMapFogOfWar() const
 			++sx;
 			dx += PixelTileSize.x;
 		}
-		sy += Map.Info.MapWidth;
+		//Wyrmgus start
+//		sy += Map.Info.MapWidth;
+		sy += Map.Info.MapWidths[CurrentMapLayer];
+		//Wyrmgus end
 		dy += PixelTileSize.y;
 	}
 }
@@ -882,8 +1019,15 @@ void CMap::InitFogOfWar()
 		AlphaFogG->UseDisplayFormat();
 	}
 
+	//Wyrmgus start
+//	VisibleTable.clear();
+//	VisibleTable.resize(Info.MapWidth * Info.MapHeight);
 	VisibleTable.clear();
-	VisibleTable.resize(Info.MapWidth * Info.MapHeight);
+	VisibleTable.resize(this->Fields.size());
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		VisibleTable[z].resize(Info.MapWidths[z] * Info.MapHeights[z]);
+	}
+	//Wyrmgus end
 }
 
 /**

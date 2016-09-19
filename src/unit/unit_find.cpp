@@ -175,11 +175,17 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 **  @return            True if wood was found.
 */
 bool FindTerrainType(int movemask, int resmask, int range,
-					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
+					 //Wyrmgus start
+//					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
+					 const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z)
+					 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	//Wyrmgus end
 	terrainTraversal.Init();
 
 	terrainTraversal.PushPos(startPos);
@@ -479,7 +485,7 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						//Wyrmgus start
 //						bool check_usage, const CUnit *deposit)
-						bool check_usage, const CUnit *deposit, bool mine_on_top, bool ignore_exploration, bool only_unsettled_area)
+						bool check_usage, const CUnit *deposit, bool mine_on_top, bool ignore_exploration, bool only_unsettled_area, int z)
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
@@ -488,7 +494,10 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	//Wyrmgus end
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighboor(startUnit);

@@ -64,7 +64,10 @@ extern void SaveAi(CFile &file);     /// Save the AI state
 extern void AiCclRegister();      /// Register ccl features
 
 /// Attack with force at position
-extern void AiAttackWithForceAt(unsigned int force, int x, int y);
+//Wyrmgus start
+//extern void AiAttackWithForceAt(unsigned int force, int x, int y);
+extern void AiAttackWithForceAt(unsigned int force, int x, int y, int z = 0);
+//Wyrmgus end
 /// Attack with force
 extern void AiAttackWithForce(unsigned int force);
 

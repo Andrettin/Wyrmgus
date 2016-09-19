@@ -3624,16 +3624,28 @@ void UpdateUnitVariables(CUnit &unit)
 
 	// Position
 	unit.Variable[POSX_INDEX].Value = unit.tilePos.x;
-	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidth;
+	//Wyrmgus start
+//	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidth;
+	unit.Variable[POSX_INDEX].Max = Map.Info.MapWidths[unit.MapLayer];
+	//Wyrmgus end
 	unit.Variable[POSY_INDEX].Value = unit.tilePos.y;
-	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeight;
+	//Wyrmgus start
+//	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeight;
+	unit.Variable[POSY_INDEX].Max = Map.Info.MapHeights[unit.MapLayer];
+	//Wyrmgus end
 
 	// Target Position
 	const Vec2i goalPos = unit.CurrentOrder()->GetGoalPos();
 	unit.Variable[TARGETPOSX_INDEX].Value = goalPos.x;
-	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidth;
+	//Wyrmgus start
+//	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidth;
+	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidths[unit.MapLayer];
+	//Wyrmgus end
 	unit.Variable[TARGETPOSY_INDEX].Value = goalPos.y;
-	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeight;
+	//Wyrmgus start
+//	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeight;
+	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeights[unit.MapLayer];
+	//Wyrmgus end
 
 	// RadarRange
 	unit.Variable[RADAR_INDEX].Value = unit.Stats->Variables[RADAR_INDEX].Value;

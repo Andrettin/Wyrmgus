@@ -58,14 +58,24 @@ void CMap::Insert(CUnit &unit)
 	int j, i = h;
 
 	do {
-		CMapField *mf = Field(index);
+		//Wyrmgus start
+//		CMapField *mf = Field(index);
+		CMapField *mf = Field(index, unit.MapLayer);
+		//Wyrmgus end
 		j = w;
 		do {
 			mf->UnitCache.Insert(&unit);
 			++mf;
-		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
-		index += Info.MapWidth;
-	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
+		//Wyrmgus start
+//		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
+//		index += Info.MapWidth;
+		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidths[unit.MapLayer]);
+		index += Info.MapWidths[unit.MapLayer];
+		//Wyrmgus end
+	//Wyrmgus start
+//	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
+	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeights[unit.MapLayer]);
+	//Wyrmgus end
 }
 
 /**
@@ -82,19 +92,35 @@ void CMap::Remove(CUnit &unit)
 	int j, i = h;
 
 	do {
-		CMapField *mf = Field(index);
+		//Wyrmgus start
+//		CMapField *mf = Field(index);
+		CMapField *mf = Field(index, unit.MapLayer);
+		//Wyrmgus end
 		j = w;
 		do {
 			mf->UnitCache.Remove(&unit);
 			++mf;
-		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
-		index += Info.MapWidth;
-	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
+		//Wyrmgus start
+//		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidth);
+//		index += Info.MapWidth;
+		} while (--j && unit.tilePos.x + (j - w) < Info.MapWidths[unit.MapLayer]);
+		index += Info.MapWidths[unit.MapLayer];
+		//Wyrmgus end
+	//Wyrmgus start
+//	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeight);
+	} while (--i && unit.tilePos.y + (i - h) < Info.MapHeights[unit.MapLayer]);
+	//Wyrmgus end
 }
 
-
-void CMap::Clamp(Vec2i &pos) const
+//Wyrmgus start
+//void CMap::Clamp(Vec2i &pos) const
+void CMap::Clamp(Vec2i &pos, int z) const
+//Wyrmgus end
 {
-	clamp<short int>(&pos.x, 0, this->Info.MapWidth - 1);
-	clamp<short int>(&pos.y, 0, this->Info.MapHeight - 1);
+	//Wyrmgus start
+//	clamp<short int>(&pos.x, 0, this->Info.MapWidth - 1);
+//	clamp<short int>(&pos.y, 0, this->Info.MapHeight - 1);
+	clamp<short int>(&pos.x, 0, this->Info.MapWidths[z] - 1);
+	clamp<short int>(&pos.y, 0, this->Info.MapHeights[z] - 1);
+	//Wyrmgus end
 }

@@ -168,8 +168,12 @@ void CViewport::Set(const PixelPos &mapPos)
 	y = std::max(y, -UI.MapArea.ScrollPaddingTop);
 
 	const PixelSize pixelSize = this->GetPixelSize();
-	x = std::min(x, Map.Info.MapWidth * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
-	y = std::min(y, Map.Info.MapHeight * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	//Wyrmgus start
+//	x = std::min(x, Map.Info.MapWidth * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+//	y = std::min(y, Map.Info.MapHeight * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	x = std::min(x, (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * PixelTileSize.x - (pixelSize.x) - 1 + UI.MapArea.ScrollPaddingRight);
+	y = std::min(y, (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * PixelTileSize.y - (pixelSize.y) - 1 + UI.MapArea.ScrollPaddingBottom);
+	//Wyrmgus end
 
 	this->MapPos.x = x / PixelTileSize.x;
 	if (x < 0 && x % PixelTileSize.x) {
@@ -245,18 +249,27 @@ void CViewport::DrawMapBackgroundInViewport() const
 	int ey = this->BottomRightPos.y;
 	int sy = this->MapPos.y;
 	int dy = this->TopLeftPos.y - this->Offset.y;
-	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
+	//Wyrmgus start
+//	const int map_max = Map.Info.MapWidth * Map.Info.MapHeight;
+	const int map_max = Map.Info.MapWidths[CurrentMapLayer] * Map.Info.MapHeights[CurrentMapLayer];
+	//Wyrmgus end
 
 	while (sy  < 0) {
 		sy++;
 		dy += PixelTileSize.y;
 	}
-	sy *=  Map.Info.MapWidth;
+	//Wyrmgus start
+//	sy *=  Map.Info.MapWidth;
+	sy *=  Map.Info.MapWidths[CurrentMapLayer];
+	//Wyrmgus end
 
 	while (dy <= ey && sy  < map_max) {
 		int sx = this->MapPos.x + sy;
 		int dx = this->TopLeftPos.x - this->Offset.x;
-		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
+		//Wyrmgus start
+//		while (dx <= ex && (sx - sy < Map.Info.MapWidth)) {
+		while (dx <= ex && (sx - sy < Map.Info.MapWidths[CurrentMapLayer])) {
+		//Wyrmgus end
 			if (sx - sy < 0) {
 				++sx;
 				dx += PixelTileSize.x;
@@ -346,7 +359,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 			++sx;
 			dx += PixelTileSize.x;
 		}
-		sy += Map.Info.MapWidth;
+		//Wyrmgus start
+//		sy += Map.Info.MapWidth;
+		sy += Map.Info.MapWidths[CurrentMapLayer];
+		//Wyrmgus end
 		dy += PixelTileSize.y;
 	}
 }

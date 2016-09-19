@@ -180,14 +180,26 @@ public:
 class CMapInfo
 {
 public:
-	bool IsPointOnMap(int x, int y) const
+	//Wyrmgus start
+//	bool IsPointOnMap(int x, int y) const
+	bool IsPointOnMap(int x, int y, int z = 0) const
+	//Wyrmgus end
 	{
-		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
+		//Wyrmgus start
+//		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
+		return (x >= 0 && y >= 0 && x < MapWidths[z] && y < MapHeights[z]);
+		//Wyrmgus end
 	}
 
-	bool IsPointOnMap(const Vec2i &pos) const
+	//Wyrmgus start
+//	bool IsPointOnMap(const Vec2i &pos) const
+	bool IsPointOnMap(const Vec2i &pos, int z = 0) const
+	//Wyrmgus end
 	{
-		return IsPointOnMap(pos.x, pos.y);
+		//Wyrmgus start
+//		return IsPointOnMap(pos.x, pos.y);
+		return IsPointOnMap(pos.x, pos.y, z);
+		//Wyrmgus end
 	}
 
 	void Clear();
@@ -197,6 +209,10 @@ public:
 	std::string Filename;       /// Map filename
 	int MapWidth;               /// Map width
 	int MapHeight;              /// Map height
+	//Wyrmgus start
+	std::vector<int> MapWidths;	/// Map width for each map layer
+	std::vector<int> MapHeights; /// Map height for each map layer
+	//Wyrmgus end
 	int PlayerType[PlayerMax];  /// Same player->Type
 	int PlayerSide[PlayerMax];  /// Same player->Side
 	unsigned int MapUID;        /// Unique Map ID (hash)
@@ -213,13 +229,25 @@ public:
 	CMap();
 	~CMap();
 
-	unsigned int getIndex(int x, int y) const
+	//Wyrmgus start
+//	unsigned int getIndex(int x, int y) const
+	unsigned int getIndex(int x, int y, int z = 0) const
+	//Wyrmgus end
 	{
-		return x + y * this->Info.MapWidth;
+		//Wyrmgus start
+//		return x + y * this->Info.MapWidth;
+		return x + y * this->Info.MapWidths[z];
+		//Wyrmgus end
 	}
-	unsigned int getIndex(const Vec2i &pos) const
+	//Wyrmgus start
+//	unsigned int getIndex(const Vec2i &pos) const
+	unsigned int getIndex(const Vec2i &pos, int z = 0) const
+	//Wyrmgus end
 	{
-		return getIndex(pos.x, pos.y);
+		//Wyrmgus start
+//		return getIndex(pos.x, pos.y);
+		return getIndex(pos.x, pos.y, z);
+		//Wyrmgus end
 	}
 
 	//Wyrmgus start
@@ -240,7 +268,7 @@ public:
 	{
 		//Wyrmgus start
 //		return &this->Fields[x + y * this->Info.MapWidth];
-		return &this->Fields[z][x + y * this->Info.MapWidth];
+		return &this->Fields[z][x + y * this->Info.MapWidths[z]];
 		//Wyrmgus end
 	}
 	//Wyrmgus start
@@ -266,12 +294,12 @@ public:
 	//Wyrmgus start
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
 	void RemoveTileOverlayTerrain(const Vec2i &pos);
-	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed);
+	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z = 0);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
 	void CalculateTileVisibility(const Vec2i &pos);
-	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos);
-	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos);
+	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
+	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline = false);
 	void GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped = false);
 	//Wyrmgus end
@@ -306,7 +334,10 @@ public:
 	//Wyrmgus end
 
 	/// Regenerate the forest.
-	void RegenerateForest();
+	//Wyrmgus start
+//	void RegenerateForest();
+	void RegenerateForest(int z = 0);
+	//Wyrmgus end
 	/// Reveal the complete map, make everything known.
 	//Wyrmgus start
 //	void Reveal();
@@ -356,16 +387,26 @@ public:
 	/// Remove unit from cache
 	void Remove(CUnit &unit);
 
-	void Clamp(Vec2i &pos) const;
+	//Wyrmgus start
+//	void Clamp(Vec2i &pos) const;
+	void Clamp(Vec2i &pos, int z = 0) const;
+	//Wyrmgus end
 
 	//Warning: we expect typical usage as xmin = x - range
-	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos)
+	//Wyrmgus start
+//	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos)
+	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z = 0)
+	//Wyrmgus end
 	{
 		minpos.x = std::max<short>(0, minpos.x);
 		minpos.y = std::max<short>(0, minpos.y);
 
-		maxpos.x = std::min<short>(maxpos.x, Info.MapWidth - 1);
-		maxpos.y = std::min<short>(maxpos.y, Info.MapHeight - 1);
+		//Wyrmgus start
+//		maxpos.x = std::min<short>(maxpos.x, Info.MapWidth - 1);
+//		maxpos.y = std::min<short>(maxpos.y, Info.MapHeight - 1);
+		maxpos.x = std::min<short>(maxpos.x, Info.MapWidths[z] - 1);
+		maxpos.y = std::min<short>(maxpos.y, Info.MapHeights[z] - 1);
+		//Wyrmgus end
 	}
 
 private:
@@ -382,7 +423,10 @@ private:
 	//Wyrmgus end
 
 	/// Regenerate the forest.
-	void RegenerateForestTile(const Vec2i &pos);
+	//Wyrmgus start
+//	void RegenerateForestTile(const Vec2i &pos);
+	void RegenerateForestTile(const Vec2i &pos, int z = 0);
+	//Wyrmgus end
 
 public:
 	//Wyrmgus start
@@ -465,7 +509,10 @@ extern MapMarkerFunc MapUnmarkTileDetectCloak;
 
 /// Mark sight changes
 extern void MapSight(const CPlayer &player, const Vec2i &pos, int w,
-					 int h, int range, MapMarkerFunc *marker);
+					 //Wyrmgus start
+//					 int h, int range, MapMarkerFunc *marker);
+					 int h, int range, MapMarkerFunc *marker, int z = 0);
+					 //Wyrmgus end
 /// Update fog of war
 extern void UpdateFogOfWarChange();
 
@@ -520,7 +567,7 @@ inline void SetTileTerrain(std::string terrain_ident, int x, int y, int value = 
 }
 extern void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y, std::string tile_label = "");
 extern void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y, std::string tile_label = "");
-extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0);
+extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0, int z = 0);
 //Wyrmgus end
 
 /// register ccl features
@@ -542,7 +589,10 @@ extern void LoadStratagusMapInfo(const std::string &mapname);
 /// Returns true, if the unit-type(mask can enter field with bounds check
 extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
 /// Returns true, if the unit-type can enter the field
-extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos);
+//Wyrmgus start
+//extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos);
+extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z = 0);
+//Wyrmgus end
 /// Returns true, if the unit can enter the field
 extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
 

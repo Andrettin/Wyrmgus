@@ -506,14 +506,22 @@ static void AStarAddToClose(int node)
 #define GetIndex(x, y) (x) + (y) * AStarMapWidth
 
 /* build-in costmoveto code */
-static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
+//Wyrmgus start
+//static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
+static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit, int z = 0)
+//Wyrmgus end
 {
 #ifdef DEBUG
 	{
 		Vec2i pos;
-		pos.y = index / Map.Info.MapWidth;
-		pos.x = index - pos.y * Map.Info.MapWidth;
-		Assert(Map.Info.IsPointOnMap(pos));
+		//Wyrmgus start
+//		pos.y = index / Map.Info.MapWidth;
+//		pos.x = index - pos.y * Map.Info.MapWidth;
+//		Assert(Map.Info.IsPointOnMap(pos));
+		pos.y = index / Map.Info.MapWidths[z];
+		pos.x = index - pos.y * Map.Info.MapWidths[z];
+		Assert(Map.Info.IsPointOnMap(pos, z));
+		//Wyrmgus end
 	}
 #endif
 	int cost = 0;
@@ -524,7 +532,10 @@ static int CostMoveToCallBack_Default(unsigned int index, const CUnit &unit)
 	int h = unit.Type->TileHeight;
 	const int w = unit.Type->TileWidth;
 	do {
-		const CMapField *mf = Map.Field(index);
+		//Wyrmgus start
+//		const CMapField *mf = Map.Field(index);
+		const CMapField *mf = Map.Field(index, z);
+		//Wyrmgus end
 		int i = w;
 		do {
 			//Wyrmgus start

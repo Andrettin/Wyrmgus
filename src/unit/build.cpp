@@ -116,6 +116,9 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 	Vec2i pos2(0, 0);
 	int distance = 0;
 	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
+	//Wyrmgus start
+	int z = builder != NULL ? builder->MapLayer : CurrentMapLayer;
+	//Wyrmgus end
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -123,14 +126,22 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 		|| this->DistanceType == NotEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
+		//Wyrmgus start
+//		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
+//		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
+		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeights[z]);
+		//Wyrmgus end
 		distance = this->Distance;
 	} else if (this->DistanceType == LessThan || this->DistanceType == GreaterThanEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
+		//Wyrmgus start
+//		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
+//		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
+		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeights[z]);
+		//Wyrmgus end
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
@@ -227,6 +238,9 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 	Vec2i pos2(0, 0);
 	int distance = 0;
 	int count = 0;
+	//Wyrmgus start
+	int z = builder != NULL ? builder->MapLayer : CurrentMapLayer;
+	//Wyrmgus end
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -234,15 +248,23 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 		|| this->DistanceType == NotEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance, 0);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
+		//Wyrmgus start
+//		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidth);
+//		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeight);
+		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance, Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance, Map.Info.MapHeights[z]);
+		//Wyrmgus end
 		distance = this->Distance;
 	}
 	else if (this->DistanceType == LessThan || this->DistanceType == GreaterThanEqual) {
 		pos1.x = std::max<int>(pos.x - this->Distance - 1, 0);
 		pos1.y = std::max<int>(pos.y - this->Distance - 1, 0);
-		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
-		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
+		//Wyrmgus start
+//		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidth);
+//		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeight);
+		pos2.x = std::min<int>(pos.x + type.TileWidth + this->Distance + 1, Map.Info.MapWidths[z]);
+		pos2.y = std::min<int>(pos.y + type.TileHeight + this->Distance + 1, Map.Info.MapHeights[z]);
+		//Wyrmgus end
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
@@ -394,13 +416,22 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 **
 **  @return      OnTop, parent unit, builder on true or 1 if unit==NULL, NULL false.
 */
-CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
+//Wyrmgus start
+//CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
+CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z)
+//Wyrmgus end
 {
 	//  Can't build outside the map
-	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
+	//Wyrmgus start
+//	if (pos.x + type.TileWidth > Map.Info.MapWidth) {
+	if (pos.x + type.TileWidth > Map.Info.MapWidths[z]) {
+	//Wyrmgus end
 		return NULL;
 	}
-	if (pos.y + type.TileHeight > Map.Info.MapHeight) {
+	//Wyrmgus start
+//	if (pos.y + type.TileHeight > Map.Info.MapHeight) {
+	if (pos.y + type.TileHeight > Map.Info.MapHeights[z]) {
+	//Wyrmgus end
 		return NULL;
 	}
 
@@ -421,7 +452,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos)
 				}
 				++mf;
 			} while (!success && --w);
-			index += Map.Info.MapWidth;
+			//Wyrmgus start
+//			index += Map.Info.MapWidth;
+			index += Map.Info.MapWidths[z];
+			//Wyrmgus end
 		} while (!success && --h);
 		if (!success) {
 			return NULL;
@@ -498,11 +532,14 @@ bool CanBuildOn(const Vec2i &pos, int mask)
 */
 //Wyrmgus start
 //CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real)
-CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration)
+CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration, int z)
 //Wyrmgus end
 {
 	// Terrain Flags don't matter if building on top of a unit.
-	CUnit *ontop = CanBuildHere(unit, type, pos);
+	//Wyrmgus start
+//	CUnit *ontop = CanBuildHere(unit, type, pos);
+	CUnit *ontop = CanBuildHere(unit, type, pos, z);
+	//Wyrmgus end
 	if (ontop == NULL) {
 		return NULL;
 	}
@@ -524,11 +561,17 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 		player = unit->Player;
 	}
 	int testmask;
-	unsigned int index = pos.y * Map.Info.MapWidth;
+	//Wyrmgus start
+//	unsigned int index = pos.y * Map.Info.MapWidth;
+	unsigned int index = pos.y * Map.Info.MapWidths[z];
+	//Wyrmgus end
 	for (int h = 0; h < type.TileHeight; ++h) {
 		for (int w = type.TileWidth; w--;) {
 			/* first part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
+			//Wyrmgus start
+//			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h)) {
+			if (!Map.Info.IsPointOnMap(pos.x + w, pos.y + h, z)) {
+			//Wyrmgus end
 				h = type.TileHeight;
 				ontop = NULL;
 				break;
@@ -541,7 +584,10 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 				testmask = type.MovementMask;
 			}
 			/*secound part of if (!CanBuildOn(x + w, y + h, testmask)) */
-			const CMapField &mf = *Map.Field(index + pos.x + w);
+			//Wyrmgus start
+//			const CMapField &mf = *Map.Field(index + pos.x + w);
+			const CMapField &mf = *Map.Field(index + pos.x + w, z);
+			//Wyrmgus end
 			if (mf.CheckMask(testmask)) {
 				h = type.TileHeight;
 				ontop = NULL;
@@ -556,7 +602,10 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 				break;
 			}
 		}
-		index += Map.Info.MapWidth;
+		//Wyrmgus start
+//		index += Map.Info.MapWidth;
+		index += Map.Info.MapWidths[z];
+		//Wyrmgus end
 	}
 	if (unit) {
 		MarkUnitFieldFlags(*unit);

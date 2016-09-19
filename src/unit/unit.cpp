@@ -453,6 +453,7 @@ void CUnit::Init()
 	//Wyrmgus start
 	RallyPointPos.x = -1;
 	RallyPointPos.y = -1;
+	MapLayer = 0;
 	//Wyrmgus end
 	Offset = 0;
 	Type = NULL;
@@ -2447,13 +2448,19 @@ void MarkUnitFieldFlags(const CUnit &unit)
 		return ;
 	}
 	do {
-		CMapField *mf = Map.Field(index);
+		//Wyrmgus start
+//		CMapField *mf = Map.Field(index);
+		CMapField *mf = Map.Field(index, unit.MapLayer);
+		//Wyrmgus end
 		int w = width;
 		do {
 			mf->Flags |= flags;
 			++mf;
 		} while (--w);
-		index += Map.Info.MapWidth;
+		//Wyrmgus start
+//		index += Map.Info.MapWidth;
+		index += Map.Info.MapWidths[unit.MapLayer];
+		//Wyrmgus end
 	} while (--h);
 }
 
@@ -2491,7 +2498,10 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 		return ;
 	}
 	do {
-		CMapField *mf = Map.Field(index);
+		//Wyrmgus start
+//		CMapField *mf = Map.Field(index);
+		CMapField *mf = Map.Field(index, unit.MapLayer);
+		//Wyrmgus end
 
 		int w = width;
 		do {
@@ -2501,7 +2511,10 @@ void UnmarkUnitFieldFlags(const CUnit &unit)
 			mf->UnitCache.for_each(funct);
 			++mf;
 		} while (--w);
-		index += Map.Info.MapWidth;
+		//Wyrmgus start
+//		index += Map.Info.MapWidth;
+		index += Map.Info.MapWidths[unit.MapLayer];
+		//Wyrmgus end
 	} while (--h);
 }
 
@@ -3436,7 +3449,10 @@ void UnitCountSeen(CUnit &unit)
 			int y = height;
 			unsigned int index = unit.Offset;
 			do {
-				CMapField *mf = Map.Field(index);
+				//Wyrmgus start
+//				CMapField *mf = Map.Field(index);
+				CMapField *mf = Map.Field(index, unit.MapLayer);
+				//Wyrmgus end
 				int x = width;
 				do {
 					if (unit.Type->BoolFlag[PERMANENTCLOAK_INDEX].value && unit.Player != &Players[p]) {
@@ -3450,7 +3466,10 @@ void UnitCountSeen(CUnit &unit)
 					}
 					++mf;
 				} while (--x);
-				index += Map.Info.MapWidth;
+				//Wyrmgus start
+//				index += Map.Info.MapWidth;
+				index += Map.Info.MapWidths[unit.MapLayer];
+				//Wyrmgus end
 			} while (--y);
 			unit.VisCount[p] = newv;
 		}

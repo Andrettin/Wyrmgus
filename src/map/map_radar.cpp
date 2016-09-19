@@ -83,7 +83,10 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 	unsigned int index = Offset;
 	int j = Type->TileHeight;
 	do {
-		const CMapField *mf = Map.Field(index);
+		//Wyrmgus start
+//		const CMapField *mf = Map.Field(index);
+		const CMapField *mf = Map.Field(index, this->MapLayer);
+		//Wyrmgus end
 		int i = x_max;
 		do {
 			if (IsTileRadarVisible(pradar, *Player, mf->playerInfo) != 0) {
@@ -91,7 +94,10 @@ bool CUnit::IsVisibleOnRadar(const CPlayer &pradar) const
 			}
 			++mf;
 		} while (--i);
-		index += Map.Info.MapWidth;
+		//Wyrmgus start
+//		index += Map.Info.MapWidth;
+		index += Map.Info.MapWidths[this->MapLayer];
+		//Wyrmgus end
 	} while (--j);
 
 	// Can't exit till the end, as we might be be able to see a different tile

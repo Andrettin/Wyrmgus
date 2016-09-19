@@ -353,7 +353,10 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	}
 }
 
-bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
+//Wyrmgus start
+//bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
+bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
+//Wyrmgus end
 {
 	Assert(this->Units.size() > 0);
 	const CUnit &leader = *(this->Units[0]);
@@ -363,7 +366,10 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos)
 
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	//Wyrmgus end
 	terrainTraversal.Init();
 
 	Assert(Map.Info.IsPointOnMap(startPos));
@@ -708,7 +714,10 @@ void AiAssignFreeUnitsToForce(int force)
 **  @param x      X tile map position to be attacked.
 **  @param y      Y tile map position to be attacked.
 */
-void AiAttackWithForceAt(unsigned int force, int x, int y)
+//Wyrmgus start
+//void AiAttackWithForceAt(unsigned int force, int x, int y)
+void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
+//Wyrmgus end
 {
 	const Vec2i pos(x, y);
 
@@ -719,7 +728,10 @@ void AiAttackWithForceAt(unsigned int force, int x, int y)
 
 	if (!Map.Info.IsPointOnMap(pos)) {
 		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ pos.x _C_ pos.y
-				   _C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
+				   //Wyrmgus start
+//				   _C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
+				   _C_ Map.Info.MapWidths[z] _C_ Map.Info.MapHeights[z]);
+				   //Wyrmgus end
 		return ;
 	}
 	AiPlayer->Force[force].Attack(pos);

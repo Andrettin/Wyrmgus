@@ -389,7 +389,7 @@ CUnit *FindUnit_If(const Vec2i &ltPos, const Vec2i &rbPos, Pred pred)
 extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range,
 								//Wyrmgus Start
 //							   int resource, bool check_usage = false, const CUnit *deposit = NULL);
-							   int resource, bool check_usage = false, const CUnit *deposit = NULL, bool mine_on_top = true, bool ignore_exploration = false, bool only_unsettled_area = false);
+							   int resource, bool check_usage = false, const CUnit *deposit = NULL, bool mine_on_top = true, bool ignore_exploration = false, bool only_unsettled_area = false, int z = 0);
 								//Wyrmgus end
 
 /// Find nearest deposit
@@ -399,7 +399,10 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 
 /// Find the neareast piece of terrain with specific flags.
 extern bool FindTerrainType(int movemask, int resmask, int range,
-							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
+							//Wyrmgus start
+//							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
+							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z = 0);
+							//Wyrmgus end
 
 extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);
 

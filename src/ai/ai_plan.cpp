@@ -171,11 +171,17 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	}
 }
 
-static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
+//Wyrmgus start
+//static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
+static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos, int z = 0)
+//Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	//Wyrmgus end
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighboor(unit);
@@ -327,11 +333,14 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 	}
 }
 
-static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos)
+//Wyrmgus start
+//static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos)
+static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos, int z = 0)
+//Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighboor(unit);
@@ -377,7 +386,10 @@ int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 **  @todo transporter are more selective now (flag with unittypeland).
 **         We must manage it.
 */
-int AiForce::PlanAttack()
+//Wyrmgus start
+//int AiForce::PlanAttack()
+int AiForce::PlanAttack(int z)
+//Wyrmgus end
 {
 	CPlayer &player = *AiPlayer->Player;
 	DebugPrint("%d: Planning for force #%lu of player #%d\n" _C_ player.Index
@@ -385,7 +397,10 @@ int AiForce::PlanAttack()
 
 	TerrainTraversal transporterTerrainTraversal;
 
-	transporterTerrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	transporterTerrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	transporterTerrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	//Wyrmgus end
 	transporterTerrainTraversal.Init();
 
 	CUnit *transporter = Units.find(IsAFreeTransporter());

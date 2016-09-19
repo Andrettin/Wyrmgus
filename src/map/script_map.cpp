@@ -99,6 +99,10 @@ static int CclStratagusMap(lua_State *l)
 					}
 					Map.Fields.clear();
 					Map.Fields.push_back(new CMapField[Map.Info.MapWidth * Map.Info.MapHeight]);
+					Map.Info.MapWidths.clear();
+					Map.Info.MapWidths.push_back(Map.Info.MapWidth);
+					Map.Info.MapHeights.clear();
+					Map.Info.MapHeights.push_back(Map.Info.MapHeight);
 					//Wyrmgus end
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
@@ -109,6 +113,27 @@ static int CclStratagusMap(lua_State *l)
 					--k;
 				} else if (!strcmp(value, "filename")) {
 					Map.Info.Filename = LuaToString(l, j + 1, k + 1);
+				//Wyrmgus start
+				} else if (!strcmp(value, "extra-map-layers")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int z = 0; z < subsubargs; ++z) {
+						lua_rawgeti(l, -1, z + 1);
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument");
+						}
+						int map_layer_width = LuaToNumber(l, -1, 1);
+						int map_layer_height = LuaToNumber(l, -1, 2);
+						Map.Info.MapWidths.push_back(map_layer_width);
+						Map.Info.MapHeights.push_back(map_layer_height);
+						Map.Fields.push_back(new CMapField[map_layer_width * map_layer_height]);
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
+				//Wyrmgus end
 				} else if (!strcmp(value, "map-fields")) {
 					//Wyrmgus start
 					/*
@@ -141,7 +166,7 @@ static int CclStratagusMap(lua_State *l)
 							LuaError(l, "incorrect argument");
 						}
 						const int subsubsubargs = lua_rawlen(l, -1);
-						if (subsubsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
+						if (subsubsubargs != Map.Info.MapWidths[z] * Map.Info.MapHeights[z]) {
 							fprintf(stderr, "Wrong tile table length: %d\n", subsubsubargs);
 						}
 						for (int i = 0; i < subsubsubargs; ++i) {
@@ -626,7 +651,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 	return 1;
 }
 
-void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y)
+void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y, int z)
 {
 	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
 	
@@ -640,19 +665,25 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", template_start_pos.x, template_start_pos.y);
 		return;
 	}
+	
+	if (z >= (int) Map.Fields.size()) {
+		Map.Info.MapWidths.push_back(map_template->Width);
+		Map.Info.MapHeights.push_back(map_template->Height);
+		Map.Fields.push_back(new CMapField[map_template->Width * map_template->Height]);
+	}
 
 	Vec2i map_start_pos(map_start_x, map_start_y);
-	Vec2i map_end(std::min(Map.Info.MapWidth, map_start_x + map_template->Width), std::min(Map.Info.MapHeight, map_start_y + map_template->Height));
+	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_x + map_template->Width), std::min(Map.Info.MapHeights[z], map_start_y + map_template->Height));
 	if (!Map.Info.IsPointOnMap(map_start_pos)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", map_start_pos.x, map_start_pos.y);
 		return;
 	}
 	
-	for (int x = 0; x < Map.Info.MapWidth; ++x) {
+	for (int x = 0; x < Map.Info.MapWidths[z]; ++x) {
 		if ((template_start_pos.x + x) >= map_template->Width) {
 			break;
 		}
-		for (int y = 0; y < Map.Info.MapHeight; ++y) {
+		for (int y = 0; y < Map.Info.MapHeights[z]; ++y) {
 			if ((template_start_pos.y + y) >= map_template->Height) {
 				break;
 			}

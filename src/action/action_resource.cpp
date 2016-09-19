@@ -118,11 +118,17 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 }
 
 static bool FindNearestReachableTerrainType(int movemask, int resmask, int range,
-											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
+											//Wyrmgus start
+//											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos)
+											const CPlayer &player, const Vec2i &startPos, Vec2i *terrainPos, int z = 0)
+											//Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	//Wyrmgus end
 	terrainTraversal.Init();
 
 	Assert(Map.Field(startPos)->CheckMask(resmask));

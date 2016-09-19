@@ -162,10 +162,16 @@ public:
 
 	void Attack(const Vec2i &pos);
 	void RemoveDeadUnit();
-	int PlanAttack();
+	//Wyrmgus start
+//	int PlanAttack();
+	int PlanAttack(int z = 0);
+	//Wyrmgus end
 
 	void ReturnToHome();
-	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
+	//Wyrmgus start
+//	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
+	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z = 0);
+	//Wyrmgus end
 	void Insert(CUnit &unit);
 
 private:
@@ -459,7 +465,10 @@ extern bool AiAssignToForce(CUnit &unit);
 /// Assign a free units to a force
 extern void AiAssignFreeUnitsToForce(int force = -1);
 /// Attack with force at position
-extern void AiAttackWithForceAt(unsigned int force, int x, int y);
+//Wyrmgus start
+//extern void AiAttackWithForceAt(unsigned int force, int x, int y);
+extern void AiAttackWithForceAt(unsigned int force, int x, int y, int z);
+//Wyrmgus end
 /// Attack with force
 extern void AiAttackWithForce(unsigned int force);
 /// Attack with forces in array

@@ -1216,6 +1216,8 @@ void CommandSharedVision(int player, bool state, int opponent)
 	if (before && !after) {
 		// Don't share vision anymore. Give each other explored terrain for good-bye.
 
+		//Wyrmgus start
+		/*
 		for (int i = 0; i != Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			CMapField &mf = *Map.Field(i);
 			CMapFieldPlayerInfo &mfp = mf.playerInfo;
@@ -1239,6 +1241,27 @@ void CommandSharedVision(int player, bool state, int opponent)
 				}
 			}
 		}
+		*/
+		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+			for (int i = 0; i != Map.Info.MapWidths[z] * Map.Info.MapHeights[z]; ++i) {
+				CMapField &mf = *Map.Field(i, z);
+				CMapFieldPlayerInfo &mfp = mf.playerInfo;
+
+				if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
+					mfp.Visible[opponent] = 1;
+					if (opponent == ThisPlayer->Index) {
+						Map.MarkSeenTile(mf);
+					}
+				}
+				if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
+					mfp.Visible[player] = 1;
+					if (player == ThisPlayer->Index) {
+						Map.MarkSeenTile(mf);
+					}
+				}
+			}
+		}
+		//Wyrmgus end
 	}
 
 	// Do a real hardcore seen recount. Now we remark EVERYTHING

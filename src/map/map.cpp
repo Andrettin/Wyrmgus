@@ -242,10 +242,12 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 	//rb - GRRRRRRRRRRRR
 	//Wyrmgus start
 //	const unsigned int index = &mf - Map.Fields;
+//	const int y = index / Info.MapWidth;
+//	const int x = index - (y * Info.MapWidth);
 	const unsigned int index = &mf - Map.Fields[z];
+	const int y = index / Info.MapWidths[z];
+	const int x = index - (y * Info.MapWidths[z]);
 	//Wyrmgus end
-	const int y = index / Info.MapWidth;
-	const int x = index - (y * Info.MapWidth);
 	const Vec2i pos = {x, y}
 #endif
 
@@ -303,6 +305,8 @@ void CMap::Reveal(bool only_person_players)
 //Wyrmgus end
 {
 	//  Mark every explored tile as visible. 1 turns into 2.
+	//Wyrmgus start
+	/*
 	for (int i = 0; i != this->Info.MapWidth * this->Info.MapHeight; ++i) {
 		CMapField &mf = *this->Field(i);
 		CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
@@ -316,6 +320,20 @@ void CMap::Reveal(bool only_person_players)
 		}
 		MarkSeenTile(mf);
 	}
+	*/
+	for (size_t z = 0; z < this->Fields.size(); ++z) {
+		for (int i = 0; i != this->Info.MapWidths[z] * this->Info.MapHeights[z]; ++i) {
+			CMapField &mf = *this->Field(i, z);
+			CMapFieldPlayerInfo &playerInfo = mf.playerInfo;
+			for (int p = 0; p < PlayerMax; ++p) {
+				if (Players[p].Type == PlayerPerson || !only_person_players) {
+					playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
+				}
+			}
+			MarkSeenTile(mf);
+		}
+	}
+	//Wyrmgus end
 	//  Global seen recount. Simple and effective.
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
@@ -645,19 +663,34 @@ bool CheckedCanMoveToMask(const Vec2i &pos, int mask)
 **
 **  @return      True if could be entered, false otherwise.
 */
-bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
+//Wyrmgus start
+//bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos)
+bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z)
+//Wyrmgus end
 {
 	const int mask = type.MovementMask;
-	unsigned int index = pos.y * Map.Info.MapWidth;
+	//Wyrmgus start
+//	unsigned int index = pos.y * Map.Info.MapWidth;
+	unsigned int index = pos.y * Map.Info.MapWidths[z];
+	//Wyrmgus end
 
 	for (int addy = 0; addy < type.TileHeight; ++addy) {
 		for (int addx = 0; addx < type.TileWidth; ++addx) {
+			//Wyrmgus start
+			/*
 			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy) == false
 				|| Map.Field(pos.x + addx + index)->CheckMask(mask) == true) {
+			*/
+			if (Map.Info.IsPointOnMap(pos.x + addx, pos.y + addy, z) == false
+				|| Map.Field(pos.x + addx + index, z)->CheckMask(mask) == true) {
+			//Wyrmgus end
 				return false;
 			}
 		}
-		index += Map.Info.MapWidth;
+		//Wyrmgus start
+//		index += Map.Info.MapWidth;
+		index += Map.Info.MapWidths[z];
+		//Wyrmgus end
 	}
 	return true;
 }
@@ -684,6 +717,8 @@ bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos)
 */
 void PreprocessMap()
 {
+	//Wyrmgus start
+	/*
 	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			CMapField &mf = *Map.Field(ix, iy);
@@ -696,6 +731,19 @@ void PreprocessMap()
 			//Wyrmgus end
 		}
 	}
+	*/
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		for (int ix = 0; ix < Map.Info.MapWidths[z]; ++ix) {
+			for (int iy = 0; iy < Map.Info.MapHeights[z]; ++iy) {
+				CMapField &mf = *Map.Field(ix, iy, z);
+				Map.CalculateTileTransitions(Vec2i(ix, iy));
+				Map.CalculateTileTransitions(Vec2i(ix, iy), true);
+				Map.CalculateTileVisibility(Vec2i(ix, iy));
+				mf.UpdateSeenTile();
+			}
+		}
+	}
+	//Wyrmgus end
 	//Wyrmgus start
 	/*
 	// it is required for fixing the wood that all tiles are marked as seen!
@@ -720,6 +768,10 @@ void CMapInfo::Clear()
 	this->Description.clear();
 	this->Filename.clear();
 	this->MapWidth = this->MapHeight = 0;
+	//Wyrmgus start
+	this->MapWidths.clear();
+	this->MapHeights.clear();
+	//Wyrmgus end
 	memset(this->PlayerSide, 0, sizeof(this->PlayerSide));
 	memset(this->PlayerType, 0, sizeof(this->PlayerType));
 	this->MapUID = 0;
@@ -751,6 +803,8 @@ void CMap::Create()
 	//Wyrmgus start
 //	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
 	this->Fields.push_back(new CMapField[this->Info.MapWidth * this->Info.MapHeight]);
+	this->Info.MapWidths.push_back(this->Info.MapWidth);
+	this->Info.MapHeights.push_back(this->Info.MapHeight);
 	//Wyrmgus end
 }
 
@@ -830,6 +884,13 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"size\", {%d, %d},\n", this->Info.MapWidth, this->Info.MapHeight);
 	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 	file.printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
+	//Wyrmgus start
+	file.printf("  \"extra-map-layers\", {\n");
+	for (size_t z = 1; z < this->Fields.size(); ++z) {
+		file.printf("  {%d, %d},\n", this->Info.MapWidths[z], this->Info.MapHeights[z]);
+	}
+	file.printf("  },\n");
+	//Wyrmgus end
 	file.printf("  \"map-fields\", {\n");
 	//Wyrmgus start
 	/*
@@ -849,9 +910,9 @@ void CMap::Save(CFile &file) const
 	*/
 	for (size_t z = 0; z < this->Fields.size(); ++z) {
 		file.printf("  {\n");
-		for (int h = 0; h < this->Info.MapHeight; ++h) {
+		for (int h = 0; h < this->Info.MapHeights[z]; ++h) {
 			file.printf("  -- %d\n", h);
-			for (int w = 0; w < this->Info.MapWidth; ++w) {
+			for (int w = 0; w < this->Info.MapWidths[z]; ++w) {
 				const CMapField &mf = *this->Field(w, h, z);
 
 				mf.Save(file);
@@ -1088,9 +1149,9 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
 	}
 }
 
-void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed)
+void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 {
-	CMapField &mf = *this->Field(pos);
+	CMapField &mf = *this->Field(pos, z);
 	
 	if (!mf.OverlayTerrain || mf.OverlayTerrainDestroyed == destroyed) {
 		return;
@@ -1101,7 +1162,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed)
 	this->CalculateTileTransitions(pos, true);
 	this->CalculateTileVisibility(pos);
 	
-	UI.Minimap.UpdateXY(pos);
+	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		MarkSeenTile(mf);
 	}
@@ -1110,13 +1171,13 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos);
+				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 					this->CalculateTileTransitions(adjacent_pos, true);
 					this->CalculateTileVisibility(adjacent_pos);
 					
-					UI.Minimap.UpdateXY(adjacent_pos);
+					UI.Minimap.UpdateXY(adjacent_pos, z);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 						MarkSeenTile(adjacent_mf);
 					}
@@ -1375,14 +1436,14 @@ void CMap::CalculateTileVisibility(const Vec2i &pos)
 	}
 }
 
-void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos)
+void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z)
 {
 	bool no_irregularities_found = false;
 	while (!no_irregularities_found) {
 		no_irregularities_found = true;
 		for (int x = min_pos.x; x < max_pos.x; ++x) {
 			for (int y = min_pos.y; y < max_pos.y; ++y) {
-				CMapField &mf = *this->Field(x, y);
+				CMapField &mf = *this->Field(x, y, z);
 				CTerrainType *terrain = overlay ? mf.OverlayTerrain : mf.Terrain;
 				if (!terrain) {
 					continue;
@@ -1405,7 +1466,7 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					nw_quadrant_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidth && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x + 1, y), overlay)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x + 1, y), overlay)) == acceptable_adjacent_tile_types.end()) {
 					horizontal_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
@@ -1416,7 +1477,7 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					nw_quadrant_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 				}
-				if ((y + 1) < this->Info.MapHeight && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+				if ((y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), this->GetTileTerrain(Vec2i(x, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
 					vertical_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
@@ -1426,15 +1487,15 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					nw_quadrant_adjacent_tiles += 1;
 					se_quadrant_adjacent_tiles += 1;
 				}
-				if ((x - 1) >= 0 && (y + 1) < this->Info.MapHeight && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x - 1, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+				if ((x - 1) >= 0 && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x - 1, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
 					sw_quadrant_adjacent_tiles += 1;
 					ne_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidth && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y - 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && (y - 1) >= 0 && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y - 1), overlay)) == acceptable_adjacent_tile_types.end()) {
 					ne_quadrant_adjacent_tiles += 1;
 					sw_quadrant_adjacent_tiles += 1;
 				}
-				if ((x + 1) < this->Info.MapWidth && (y + 1) < this->Info.MapHeight && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
+				if ((x + 1) < this->Info.MapWidths[z] && (y + 1) < this->Info.MapHeights[z] && std::find(acceptable_adjacent_tile_types.begin(), acceptable_adjacent_tile_types.end(), GetTileTerrain(Vec2i(x + 1, y + 1), overlay)) == acceptable_adjacent_tile_types.end()) {
 					se_quadrant_adjacent_tiles += 1;
 					nw_quadrant_adjacent_tiles += 1;
 				}
@@ -1455,11 +1516,11 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 	}
 }
 
-void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos)
+void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z)
 {
 	for (int x = min_pos.x; x < max_pos.x; ++x) {
 		for (int y = min_pos.y; y < max_pos.y; ++y) {
-			CMapField &mf = *this->Field(x, y);
+			CMapField &mf = *this->Field(x, y, z);
 
 			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -1478,7 +1539,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos)
 
 	for (int x = min_pos.x; x < max_pos.x; ++x) {
 		for (int y = min_pos.y; y < max_pos.y; ++y) {
-			CMapField &mf = *this->Field(x, y);
+			CMapField &mf = *this->Field(x, y, z);
 
 			for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 				for (int sub_y = -1; sub_y <= 1; ++sub_y) {
@@ -1778,10 +1839,17 @@ void CMap::ClearRockTile(const Vec2i &pos)
 **
 **  @param pos  Map tile pos
 */
-void CMap::RegenerateForestTile(const Vec2i &pos)
+//Wyrmgus start
+//void CMap::RegenerateForestTile(const Vec2i &pos)
+void CMap::RegenerateForestTile(const Vec2i &pos, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
-	CMapField &mf = *this->Field(pos);
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+//	CMapField &mf = *this->Field(pos);
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	CMapField &mf = *this->Field(pos, z);
+	//Wyrmgus end
 
 	//Wyrmgus start
 //	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {
@@ -1834,31 +1902,31 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 	for (int x_offset = -1; x_offset <= 1; x_offset+=2) { //increment by 2 to avoid instances where it is 0
 		for (int y_offset = -1; y_offset <= 1; y_offset+=2) {
 			const Vec2i verticalOffset(0, y_offset);
-			CMapField &verticalMf = *this->Field(pos + verticalOffset);
+			CMapField &verticalMf = *this->Field(pos + verticalOffset, z);
 			const Vec2i horizontalOffset(x_offset, 0);
-			CMapField &horizontalMf = *this->Field(pos + horizontalOffset);
+			CMapField &horizontalMf = *this->Field(pos + horizontalOffset, z);
 			const Vec2i diagonalOffset(x_offset, y_offset);
-			CMapField &diagonalMf = *this->Field(pos + diagonalOffset);
+			CMapField &diagonalMf = *this->Field(pos + diagonalOffset, z);
 			
 			if (
-				this->Info.IsPointOnMap(pos + verticalOffset)
+				this->Info.IsPointOnMap(pos + verticalOffset, z)
 				&& ((verticalMf.OverlayTerrain && std::find(verticalMf.OverlayTerrain->DestroyedTiles.begin(), verticalMf.OverlayTerrain->DestroyedTiles.end(), verticalMf.SolidTile) == verticalMf.OverlayTerrain->DestroyedTiles.end() && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupedFlag)) || (verticalMf.getFlag() & MapFieldForest))
-				&& this->Info.IsPointOnMap(pos + diagonalOffset)
+				&& this->Info.IsPointOnMap(pos + diagonalOffset, z)
 				&& ((diagonalMf.OverlayTerrain && std::find(diagonalMf.OverlayTerrain->DestroyedTiles.begin(), diagonalMf.OverlayTerrain->DestroyedTiles.end(), diagonalMf.SolidTile) == diagonalMf.OverlayTerrain->DestroyedTiles.end() && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupedFlag)) || (diagonalMf.getFlag() & MapFieldForest))
-				&& this->Info.IsPointOnMap(pos + horizontalOffset)
+				&& this->Info.IsPointOnMap(pos + horizontalOffset, z)
 				&& ((horizontalMf.OverlayTerrain && std::find(horizontalMf.OverlayTerrain->DestroyedTiles.begin(), horizontalMf.OverlayTerrain->DestroyedTiles.end(), horizontalMf.SolidTile) == horizontalMf.OverlayTerrain->DestroyedTiles.end() && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupedFlag)) || (horizontalMf.getFlag() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
-				this->SetOverlayTerrainDestroyed(pos + verticalOffset, false);
+				this->SetOverlayTerrainDestroyed(pos + verticalOffset, false, z);
 				verticalMf.Value = DefaultResourceAmounts[WoodCost];
 				
-				this->SetOverlayTerrainDestroyed(pos + diagonalOffset, false);
+				this->SetOverlayTerrainDestroyed(pos + diagonalOffset, false, z);
 				diagonalMf.Value = DefaultResourceAmounts[WoodCost];
 				
-				this->SetOverlayTerrainDestroyed(pos + horizontalOffset, false);
+				this->SetOverlayTerrainDestroyed(pos + horizontalOffset, false, z);
 				horizontalMf.Value = DefaultResourceAmounts[WoodCost];
 				
-				this->SetOverlayTerrainDestroyed(pos, false);
+				this->SetOverlayTerrainDestroyed(pos, false, z);
 				mf.Value = DefaultResourceAmounts[WoodCost];
 				
 				return;
@@ -1902,17 +1970,31 @@ void CMap::RegenerateForestTile(const Vec2i &pos)
 /**
 **  Regenerate forest.
 */
-void CMap::RegenerateForest()
+//Wyrmgus start
+//void CMap::RegenerateForest()
+void CMap::RegenerateForest(int z)
+//Wyrmgus end
 {
 	if (!ForestRegeneration) {
 		return;
 	}
 	Vec2i pos;
+	//Wyrmgus start
+	/*
 	for (pos.y = 0; pos.y < Info.MapHeight; ++pos.y) {
 		for (pos.x = 0; pos.x < Info.MapWidth; ++pos.x) {
 			RegenerateForestTile(pos);
 		}
 	}
+	*/
+	for (size_t z = 0; z < this->Fields.size(); ++z) {
+		for (pos.y = 0; pos.y < Info.MapHeights[z]; ++pos.y) {
+			for (pos.x = 0; pos.x < Info.MapWidths[z]; ++pos.x) {
+				RegenerateForestTile(pos, z);
+			}
+		}
+	}
+	//Wyrmgus end
 }
 
 

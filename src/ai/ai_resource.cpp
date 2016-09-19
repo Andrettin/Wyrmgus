@@ -1414,7 +1414,10 @@ static bool IsReadyToRepair(const CUnit &unit)
 **
 **  @return          True if can repair, false if can't repair..
 */
-static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building)
+//Wyrmgus start
+//static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building)
+static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building, int z = 0)
+//Wyrmgus end
 {
 	if (type.RepairRange == 0) {
 		return false;
@@ -1440,7 +1443,10 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	}
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	//Wyrmgus end
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighboor(building);
