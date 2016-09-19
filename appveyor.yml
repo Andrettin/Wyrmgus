@@ -3,7 +3,7 @@ shallow_clone: true
 configuration:
   - Release
 install:
-  - cmd: git submodule -q update --init
+  - git submodule update --init --recursive
 before_build:
   - mkdir build
   - cd build
