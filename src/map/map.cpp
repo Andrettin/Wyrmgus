@@ -531,6 +531,9 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrai
 			if (!this->Info.IsPointOnMap(adjacent_pos) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
+			if (this->IsPointInASubtemplateArea(pos) && !this->IsPointInASubtemplateArea(adjacent_pos)) {
+				continue;
+			}
 			CTerrainType *top_terrain = GetTileTopTerrain(pos);
 			CTerrainType *adjacent_top_terrain = GetTileTopTerrain(adjacent_pos);
 			if (!new_terrain->Overlay) {
