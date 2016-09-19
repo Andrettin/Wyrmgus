@@ -557,11 +557,18 @@ extern void MapFixWallTile(const Vec2i &pos);
 // in script_map.cpp
 //
 /// Set a tile
-extern void SetTile(unsigned int tile, const Vec2i &pos, int value = 0);
-inline void SetTile(unsigned int tile, int x, int y, int value = 0)
+//Wyrmgus start
+//extern void SetTile(unsigned int tile, const Vec2i &pos, int value = 0);
+//inline void SetTile(unsigned int tile, int x, int y, int value = 0)
+extern void SetTile(unsigned int tile, const Vec2i &pos, int value = 0, int z = 0);
+inline void SetTile(unsigned int tile, int x, int y, int value = 0, int z = 0)
+//Wyrmgus end
 {
 	const Vec2i pos(x, y);
-	SetTile(tile, pos, value);
+	//Wyrmgus start
+//	SetTile(tile, pos, value);
+	SetTile(tile, pos, value, z);
+	//Wyrmgus end
 }
 
 //Wyrmgus start

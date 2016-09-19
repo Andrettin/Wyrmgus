@@ -431,9 +431,15 @@ static int CclSetFogOfWarGraphics(lua_State *l)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
+//Wyrmgus start
+//void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
+void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
+//Wyrmgus end
 {
-	if (!Map.Info.IsPointOnMap(pos)) {
+	//Wyrmgus start
+//	if (!Map.Info.IsPointOnMap(pos)) {
+	if (!Map.Info.IsPointOnMap(pos, z)) {
+	//Wyrmgus end
 		fprintf(stderr, "Invalid map coordonate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}
@@ -456,7 +462,10 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 //	if (Map.Fields) {
 	if (Map.Fields.size() > 0) {
 	//Wyrmgus end
-		CMapField &mf = *Map.Field(pos);
+		//Wyrmgus start
+//		CMapField &mf = *Map.Field(pos);
+		CMapField &mf = *Map.Field(pos, z);
+		//Wyrmgus end
 
 		mf.setTileIndex(*Map.Tileset, tileIndex, value);
 	}
