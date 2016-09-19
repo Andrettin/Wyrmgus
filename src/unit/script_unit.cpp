@@ -385,29 +385,53 @@ static int CclUnit(lua_State *l)
 			unit->Refs = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "host-info")) {
 			lua_rawgeti(l, 2, j + 1);
-			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 4) {
+			//Wyrmgus start
+//			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 4) {
+			if (!lua_istable(l, -1) || lua_rawlen(l, -1) != 5) {
+			//Wyrmgus end
 				LuaError(l, "incorrect argument");
 			}
 			Vec2i pos;
+			//Wyrmgus start
+			int z;
+			//Wyrmgus end
 			int w;
 			int h;
 
-			pos.x = LuaToNumber(l, -1, 1);
-			pos.y = LuaToNumber(l, -1, 2);
-			w = LuaToNumber(l, -1, 3);
-			h = LuaToNumber(l, -1, 4);
-			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
+			//Wyrmgus start
+//			pos.x = LuaToNumber(l, -1, 1);
+//			pos.y = LuaToNumber(l, -1, 2);
+//			w = LuaToNumber(l, -1, 3);
+//			h = LuaToNumber(l, -1, 4);
+//			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight);
+			z = LuaToNumber(l, -1, 1);
+			pos.x = LuaToNumber(l, -1, 2);
+			pos.y = LuaToNumber(l, -1, 3);
+			w = LuaToNumber(l, -1, 4);
+			h = LuaToNumber(l, -1, 5);
+			MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileSight, z);
+			//Wyrmgus end
 			// Detectcloak works in container
 			if (unit->Type->BoolFlag[DETECTCLOAK_INDEX].value) {
-				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
+				//Wyrmgus start
+//				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak);
+				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak, z);
+				//Wyrmgus end
 			}
 			// Radar(Jammer) not.
 			lua_pop(l, 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "map-layer")) {
+			unit->MapLayer = LuaToNumber(l, 2, j + 1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->tilePos.x , &unit->tilePos.y, -1);
 			lua_pop(l, 1);
-			unit->Offset = Map.getIndex(unit->tilePos);
+			//Wyrmgus start
+//			unit->Offset = Map.getIndex(unit->tilePos);
+			unit->Offset = Map.getIndex(unit->tilePos, unit->MapLayer);
+			//Wyrmgus end
 		} else if (!strcmp(value, "seen-tile")) {
 			lua_rawgeti(l, 2, j + 1);
 			CclGetPos(l, &unit->Seen.tilePos.x , &unit->Seen.tilePos.y, -1);

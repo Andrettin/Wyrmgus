@@ -2280,11 +2280,11 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 	*/
 
 	MapSight(*unit.Player, pos, width, height,
-			 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f);
+			 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f, unit.MapLayer);
 
 	if (unit.Type && unit.Type->BoolFlag[DETECTCLOAK_INDEX].value && f2) {
 		MapSight(*unit.Player, pos, width, height,
-				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2);
+				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2, unit.MapLayer);
 	}
 	//Wyrmgus end
 
@@ -2330,11 +2330,17 @@ void MapMarkUnitSight(CUnit &unit)
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
 			MapMarkRadar(*unit.Player, unit.tilePos, unit.Type->TileWidth,
-						 unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
+						 //Wyrmgus start
+//						 unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
+						 unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer);
+						 //Wyrmgus end
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
 			MapMarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileWidth,
-							   unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
+							   //Wyrmgus start
+//							   unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
+							   unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer);
+							   //Wyrmgus end
 		}
 	}
 }
@@ -2360,11 +2366,17 @@ void MapUnmarkUnitSight(CUnit &unit)
 	if (&unit == container && !unit.IsUnusable()) {
 		if (unit.Stats->Variables[RADAR_INDEX].Value) {
 			MapUnmarkRadar(*unit.Player, unit.tilePos, unit.Type->TileWidth,
-						   unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
+						   //Wyrmgus start
+//						   unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value);
+						   unit.Type->TileHeight, unit.Stats->Variables[RADAR_INDEX].Value, unit.MapLayer);
+						   //Wyrmgus end
 		}
 		if (unit.Stats->Variables[RADARJAMMER_INDEX].Value) {
 			MapUnmarkRadarJammer(*unit.Player, unit.tilePos, unit.Type->TileWidth,
-								 unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
+								 //Wyrmgus start
+//								 unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value);
+								 unit.Type->TileHeight, unit.Stats->Variables[RADARJAMMER_INDEX].Value, unit.MapLayer);
+								 //Wyrmgus end
 		}
 	}
 }

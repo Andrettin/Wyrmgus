@@ -230,9 +230,15 @@ static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloa
 **  @param player  Player to mark sight.
 **  @param index   tile to mark.
 */
-void MapMarkTileSight(const CPlayer &player, const unsigned int index)
+//Wyrmgus start
+//void MapMarkTileSight(const CPlayer &player, const unsigned int index)
+void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
+//Wyrmgus end
 {
-	CMapField &mf = *Map.Field(index);
+	//Wyrmgus start
+//	CMapField &mf = *Map.Field(index);
+	CMapField &mf = *Map.Field(index, z);
+	//Wyrmgus end
 	unsigned short *v = &(mf.playerInfo.Visible[player.Index]);
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
@@ -241,7 +247,10 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 		}
 		*v = 2;
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-			Map.MarkSeenTile(mf);
+			//Wyrmgus start
+//			Map.MarkSeenTile(mf);
+			Map.MarkSeenTile(mf, z);
+			//Wyrmgus end
 		}
 		return;
 	}
@@ -249,10 +258,17 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index)
 	++*v;
 }
 
-void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
+//Wyrmgus start
+//void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
+void MapMarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
-	MapMarkTileSight(player, Map.getIndex(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+//	MapMarkTileSight(player, Map.getIndex(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	MapMarkTileSight(player, Map.getIndex(pos, z), z);
+	//Wyrmgus end
 }
 
 /**
@@ -261,9 +277,15 @@ void MapMarkTileSight(const CPlayer &player, const Vec2i &pos)
 **  @param player  Player to mark sight.
 **  @param indexx  tile to mark.
 */
-void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
+//Wyrmgus start
+//void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
+void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
+//Wyrmgus end
 {
-	CMapField &mf = *Map.Field(index);
+	//Wyrmgus start
+//	CMapField &mf = *Map.Field(index);
+	CMapField &mf = *Map.Field(index, z);
+	//Wyrmgus end
 	unsigned short *v = &mf.playerInfo.Visible[player.Index];
 	switch (*v) {
 		case 0:  // Unexplored
@@ -277,7 +299,10 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 			}
 			// Check visible Tile, then deduct...
 			if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-				Map.MarkSeenTile(mf);
+				//Wyrmgus start
+//				Map.MarkSeenTile(mf);
+				Map.MarkSeenTile(mf, z);
+				//Wyrmgus end
 			}
 		default:  // seen -> seen
 			--*v;
@@ -285,10 +310,17 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index)
 	}
 }
 
-void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos)
+//Wyrmgus start
+//void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos)
+void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
-	MapUnmarkTileSight(player, Map.getIndex(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+//	MapUnmarkTileSight(player, Map.getIndex(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	MapUnmarkTileSight(player, Map.getIndex(pos, z), z);
+	//Wyrmgus end
 }
 
 /**
@@ -297,9 +329,15 @@ void MapUnmarkTileSight(const CPlayer &player, const Vec2i &pos)
 **  @param player  Player to mark sight.
 **  @param index   Tile to mark.
 */
-void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index)
+//Wyrmgus start
+//void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index)
+void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index, int z)
+//Wyrmgus end
 {
-	CMapField &mf = *Map.Field(index);
+	//Wyrmgus start
+//	CMapField &mf = *Map.Field(index);
+	CMapField &mf = *Map.Field(index, z);
+	//Wyrmgus end
 	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
 	if (*v == 0) {
 		UnitsOnTileMarkSeen(player, mf, 1);
@@ -308,9 +346,15 @@ void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 	++*v;
 }
 
-void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
+//Wyrmgus start
+//void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
+void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
+//Wyrmgus end
 {
-	MapMarkTileDetectCloak(player, Map.getIndex(pos));
+	//Wyrmgus start
+//	MapMarkTileDetectCloak(player, Map.getIndex(pos));
+	MapMarkTileDetectCloak(player, Map.getIndex(pos, z), z);
+	//Wyrmgus end
 }
 
 /**
@@ -319,9 +363,15 @@ void MapMarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
 **  @param player  Player to mark sight.
 **  @param index   tile to mark.
 */
-void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
+//Wyrmgus start
+//void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
+void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, int z)
+//Wyrmgus end
 {
-	CMapField &mf = *Map.Field(index);
+	//Wyrmgus start
+//	CMapField &mf = *Map.Field(index);
+	CMapField &mf = *Map.Field(index, z);
+	//Wyrmgus end
 	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
 	Assert(*v != 0);
 	if (*v == 1) {
@@ -330,9 +380,15 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index)
 	--*v;
 }
 
-void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
+//Wyrmgus start
+//void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos)
+void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
+//Wyrmgus end
 {
-	MapUnmarkTileDetectCloak(player, Map.getIndex(pos));
+	//Wyrmgus start
+//	MapUnmarkTileDetectCloak(player, Map.getIndex(pos));
+	MapUnmarkTileDetectCloak(player, Map.getIndex(pos, z), z);
+	//Wyrmgus end
 }
 
 /**
@@ -452,9 +508,15 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			*/
 			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
-			marker(player, mpos.x + index);
+			//Wyrmgus start
+//			marker(player, mpos.x + index);
+			marker(player, mpos.x + index, z);
+			//Wyrmgus end
 #else
-			marker(player, mpos);
+			//Wyrmgus start
+//			marker(player, mpos);
+			marker(player, mpos, z);
+			//Wyrmgus end
 #endif
 		}
 	}
@@ -481,9 +543,15 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			*/
 			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
-			marker(player, mpos.x + index);
+			//Wyrmgus start
+//			marker(player, mpos.x + index);
+			marker(player, mpos.x + index, z);
+			//Wyrmgus end
 #else
-			marker(player, mpos);
+			//Wyrmgus start
+//			marker(player, mpos);
+			marker(player, mpos, z);
+			//Wyrmgus end
 #endif
 		}
 	}
@@ -516,9 +584,15 @@ void MapSight(const CPlayer &player, const Vec2i &pos, int w, int h, int range, 
 			*/
 			//Wyrmgus end
 #ifdef MARKER_ON_INDEX
-			marker(player, mpos.x + index);
+			//Wyrmgus start
+//			marker(player, mpos.x + index);
+			marker(player, mpos.x + index, z);
+			//Wyrmgus end
 #else
-			marker(player, mpos);
+			//Wyrmgus start
+//			marker(player, mpos);
+			marker(player, mpos, z);
+			//Wyrmgus end
 #endif
 		}
 	}
@@ -547,7 +621,7 @@ void UpdateFogOfWarChange()
 			for (unsigned int index = 0; index != w; ++index) {
 				CMapField &mf = *Map.Field(index, z);
 				if (mf.playerInfo.IsExplored(*ThisPlayer)) {
-					Map.MarkSeenTile(mf);
+					Map.MarkSeenTile(mf, z);
 				}
 			}
 		}

@@ -330,7 +330,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	//Wyrmgus end
 		//Wyrmgus start
 //		Map.SetWall(unit.tilePos, &type == UnitTypeHumanWall);
-		Map.SetTileTerrain(unit.tilePos, type.TerrainType);
+		Map.SetTileTerrain(unit.tilePos, type.TerrainType, unit.MapLayer);
 		//Wyrmgus end
 		unit.Remove(NULL);
 		UnitLost(unit);

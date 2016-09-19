@@ -136,6 +136,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	file.printf("\"player\", %d,\n  ", unit.Player->Index);
 
+	//Wyrmgus start
+	file.printf("\"map-layer\", %d, ", unit.MapLayer);
+	//Wyrmgus end
 	file.printf("\"tile\", {%d, %d}, ", unit.tilePos.x, unit.tilePos.y);
 	file.printf("\"seen-tile\", {%d, %d}, ", unit.Seen.tilePos.x, unit.Seen.tilePos.y);
 
@@ -227,7 +230,13 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	// so you can load a unit whose Container hasn't been loaded yet.
 	// SEE unit loading code.
 	if (unit.Container && unit.Removed) {
-		file.printf(" \"host-info\", {%d, %d, %d, %d}, ",
+		//Wyrmgus start
+//		file.printf(" \"host-info\", {%d, %d, %d, %d}, ",
+		file.printf(" \"host-info\", {%d, %d, %d, %d, %d}, ",
+		//Wyrmgus end
+					//Wyrmgus start
+					unit.Container->MapLayer,
+					//Wyrmgus end
 					unit.Container->tilePos.x, unit.Container->tilePos.y,
 					unit.Container->Type->TileWidth,
 					unit.Container->Type->TileHeight);

@@ -470,7 +470,7 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 **  @param pos    coordinate
 **  @param value  Value of the tile
 */
-void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
+void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value, int z)
 {
 	if (!Map.Info.IsPointOnMap(pos)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
@@ -492,7 +492,7 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
 //	if (Map.Fields) {
 	if (Map.Fields.size() > 0) {
 	//Wyrmgus end
-		CMapField &mf = *Map.Field(pos);
+		CMapField &mf = *Map.Field(pos, z);
 
 		mf.Value = value;
 		mf.SetTerrain(terrain);
@@ -690,10 +690,10 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			Vec2i pos(template_start_pos.x + x, template_start_pos.y + y);
 			Vec2i real_pos(map_start_pos.x + x, map_start_pos.y + y);
 			if (map_template->GetTileTerrain(pos, false)) {
-				SetTileTerrain(map_template->GetTileTerrain(pos, false)->Ident, real_pos);
+				SetTileTerrain(map_template->GetTileTerrain(pos, false)->Ident, real_pos, z);
 			}
 			if (map_template->GetTileTerrain(pos, true)) {
-				SetTileTerrain(map_template->GetTileTerrain(pos, true)->Ident, real_pos);
+				SetTileTerrain(map_template->GetTileTerrain(pos, true)->Ident, real_pos, z);
 			}
 		}
 	}
@@ -707,7 +707,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 				if (!Map.Info.IsPointOnMap(surrounding_pos) || Map.IsPointInASubtemplateArea(surrounding_pos)) {
 					continue;
 				}
-				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos);
+				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos, z);
 			}
 		}
 		for (int x = surrounding_start_pos.x; x < surrounding_end.x; x += (surrounding_end.x - surrounding_start_pos.x - 1)) {
@@ -716,7 +716,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 				if (!Map.Info.IsPointOnMap(surrounding_pos) || Map.IsPointInASubtemplateArea(surrounding_pos)) {
 					continue;
 				}
-				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos);
+				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos, z);
 			}
 		}
 	}

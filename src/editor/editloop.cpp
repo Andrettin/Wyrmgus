@@ -209,7 +209,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 		value = 100;
 	}
 //	mf.setTileIndex(tileset, tileIndex, 0);
-	Map.SetTileTerrain(pos, terrain);
+	Map.SetTileTerrain(pos, terrain, CurrentMapLayer);
 	if (!terrain->Overlay && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
 		Map.RemoveTileOverlayTerrain(pos);
 	}
@@ -347,7 +347,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 								for (size_t j = 0; j != adjacent_terrain->BorderTerrains.size(); ++j) {
 									CTerrainType *border_terrain = adjacent_terrain->BorderTerrains[j];
 									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
-										Map.SetTileTerrain(adjacent_pos, border_terrain);
+										Map.SetTileTerrain(adjacent_pos, border_terrain, CurrentMapLayer);
 										changed_tiles.push_back(adjacent_pos);
 										break;
 									}
@@ -375,7 +375,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 									if (overlay) {
 										Map.RemoveTileOverlayTerrain(adjacent_pos);
 									} else {
-										Map.SetTileTerrain(adjacent_pos, Map.GetTileTerrain(changed_tiles[i], false));
+										Map.SetTileTerrain(adjacent_pos, Map.GetTileTerrain(changed_tiles[i], false), CurrentMapLayer);
 									}
 									changed_tiles.push_back(adjacent_pos);
 								}

@@ -292,7 +292,10 @@ void CMap::MarkSeenTile(CMapField &mf, int z)
 	//Wyrmgus end
 
 #ifdef MINIMAP_UPDATE
-	UI.Minimap.UpdateXY(pos);
+	//Wyrmgus start
+//	UI.Minimap.UpdateXY(pos);
+	UI.Minimap.UpdateXY(pos, z);
+	//Wyrmgus end
 #endif
 }
 
@@ -330,7 +333,7 @@ void CMap::Reveal(bool only_person_players)
 					playerInfo.Visible[p] = std::max<unsigned short>(1, playerInfo.Visible[p]);
 				}
 			}
-			MarkSeenTile(mf);
+			MarkSeenTile(mf, z);
 		}
 	}
 	//Wyrmgus end
@@ -1061,13 +1064,13 @@ void CMap::FixNeighbors(unsigned short type, int seen, const Vec2i &pos)
 //Wyrmgus end
 
 //Wyrmgus start
-void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
+void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 {
 	if (!terrain) {
 		return;
 	}
 	
-	CMapField &mf = *this->Field(pos);
+	CMapField &mf = *this->Field(pos, z);
 	
 	if (terrain->Overlay)  {
 		if (mf.OverlayTerrain == terrain) {
@@ -1085,25 +1088,25 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
 	this->CalculateTileTransitions(pos, true);
 	this->CalculateTileVisibility(pos);
 	
-	UI.Minimap.UpdateXY(pos);
+	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-		MarkSeenTile(mf);
+		MarkSeenTile(mf, z);
 	}
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos);
+				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 					this->CalculateTileTransitions(adjacent_pos, false);
 					this->CalculateTileTransitions(adjacent_pos, true);
 					this->CalculateTileVisibility(adjacent_pos);
 					
-					UI.Minimap.UpdateXY(adjacent_pos);
+					UI.Minimap.UpdateXY(adjacent_pos, z);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-						MarkSeenTile(adjacent_mf);
+						MarkSeenTile(adjacent_mf, z);
 					}
 				}
 			}
@@ -1111,9 +1114,12 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
 	}
 }
 
-void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
+//Wyrmgus start
+//void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
+void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
+//Wyrmgus end
 {
-	CMapField &mf = *this->Field(pos);
+	CMapField &mf = *this->Field(pos, z);
 	
 	if (!mf.OverlayTerrain) {
 		return;
@@ -1124,24 +1130,24 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos)
 	this->CalculateTileTransitions(pos, true);
 	this->CalculateTileVisibility(pos);
 	
-	UI.Minimap.UpdateXY(pos);
+	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-		MarkSeenTile(mf);
+		MarkSeenTile(mf, z);
 	}
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos);
+				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 					this->CalculateTileTransitions(adjacent_pos, true);
 					this->CalculateTileVisibility(adjacent_pos);
 					
-					UI.Minimap.UpdateXY(adjacent_pos);
+					UI.Minimap.UpdateXY(adjacent_pos, z);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-						MarkSeenTile(adjacent_mf);
+						MarkSeenTile(adjacent_mf, z);
 					}
 				}
 			}
@@ -1164,7 +1170,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	
 	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-		MarkSeenTile(mf);
+		MarkSeenTile(mf, z);
 	}
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
@@ -1179,7 +1185,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 					
 					UI.Minimap.UpdateXY(adjacent_pos, z);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-						MarkSeenTile(adjacent_mf);
+						MarkSeenTile(adjacent_mf, z);
 					}
 				}
 			}
@@ -1187,9 +1193,12 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	}
 }
 
-void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged)
+//Wyrmgus start
+//void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged)
+void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
+//Wyrmgus end
 {
-	CMapField &mf = *this->Field(pos);
+	CMapField &mf = *this->Field(pos, z);
 	
 	if (!mf.OverlayTerrain || mf.OverlayTerrainDestroyed == damaged) {
 		return;
@@ -1199,23 +1208,23 @@ void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged)
 	
 	this->CalculateTileTransitions(pos, true);
 	
-	UI.Minimap.UpdateXY(pos);
+	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-		MarkSeenTile(mf);
+		MarkSeenTile(mf, z);
 	}
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos);
+				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
+					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 					this->CalculateTileTransitions(adjacent_pos, true);
 					
-					UI.Minimap.UpdateXY(adjacent_pos);
+					UI.Minimap.UpdateXY(adjacent_pos, z);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-						MarkSeenTile(adjacent_mf);
+						MarkSeenTile(adjacent_mf, z);
 					}
 				}
 			}

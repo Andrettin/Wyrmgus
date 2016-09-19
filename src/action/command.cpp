@@ -1250,13 +1250,13 @@ void CommandSharedVision(int player, bool state, int opponent)
 				if (mfp.Visible[player] && !mfp.Visible[opponent] && !Players[player].Revealed) {
 					mfp.Visible[opponent] = 1;
 					if (opponent == ThisPlayer->Index) {
-						Map.MarkSeenTile(mf);
+						Map.MarkSeenTile(mf, z);
 					}
 				}
 				if (mfp.Visible[opponent] && !mfp.Visible[player] && !Players[opponent].Revealed) {
 					mfp.Visible[player] = 1;
 					if (player == ThisPlayer->Index) {
-						Map.MarkSeenTile(mf);
+						Map.MarkSeenTile(mf, z);
 					}
 				}
 			}
