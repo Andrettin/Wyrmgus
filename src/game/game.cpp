@@ -905,6 +905,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 
 		if (writeTerrain) {
 			f->printf("-- Tiles Map\n");
+			//Wyrmgus start
+			/*
 			for (int i = 0; i < map.Info.MapHeight; ++i) {
 				for (int j = 0; j < map.Info.MapWidth; ++j) {
 					const CMapField &mf = map.Fields[j + i * map.Info.MapWidth];
@@ -922,6 +924,27 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 					//Wyrmgus end
 				}
 			}
+			*/
+			for (size_t z = 0; z < map.Fields.size(); ++z) {
+				for (int i = 0; i < map.Info.MapHeight; ++i) {
+					for (int j = 0; j < map.Info.MapWidth; ++j) {
+						const CMapField &mf = map.Fields[z][j + i * map.Info.MapWidth];
+						//Wyrmgus start
+	//					const int tile = mf.getGraphicTile();
+	//					const int n = map.Tileset->findTileIndexByTile(tile);
+						//Wyrmgus end
+						const int value = mf.Value;
+						//Wyrmgus start
+	//					f->printf("SetTile(%3d, %d, %d, %d)\n", n, j, i, value);
+						f->printf("SetTileTerrain(\"%s\", %d, %d, %d)\n", mf.Terrain->Ident.c_str(), j, i, 0);
+						if (mf.OverlayTerrain) {
+							f->printf("SetTileTerrain(\"%s\", %d, %d, %d)\n", mf.OverlayTerrain->Ident.c_str(), j, i, value);
+						}
+						//Wyrmgus end
+					}
+				}
+			}
+			//Wyrmgus end
 		}
 			
 		f->printf("\n-- set map default stat and map sound for unit types\n");

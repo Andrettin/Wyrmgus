@@ -2470,19 +2470,34 @@ void CEditor::Init()
 			}
 		}
 
-		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
+		//Wyrmgus start
+//		Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
+		Map.Fields.push_back(new CMapField[Map.Info.MapWidth * Map.Info.MapHeight]);
+		//Wyrmgus end
 
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();
 		//Wyrmgus start
 		const CTileset &tileset = *Map.Tileset;
 		//Wyrmgus end
 
+		//Wyrmgus start
+		/*
 		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
 			//Wyrmgus start
 //			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
 			Map.Fields[i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
 			//Wyrmgus end
 		}
+		*/
+		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+			for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+				//Wyrmgus start
+	//			Map.Fields[i].setTileIndex(*Map.Tileset, defaultTile, 0);
+				Map.Fields[z][i].setTileIndex(*Map.Tileset, tileset.getTileNumber(defaultTile, true, false), 0);
+				//Wyrmgus end
+			}
+		}
+		//Wyrmgus start
 		GameSettings.Resources = SettingsPresetMapDefault;
 		//Wyrmgus start
 //		CreateGame("", &Map);

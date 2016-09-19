@@ -650,18 +650,20 @@ static void DisplayLoop()
 	//Wyrmgus start
 	//do tile animation
 	if (!GamePaused && GameCycle != 0 && GameCycle && GameCycle % (CYCLES_PER_SECOND / 4) == 0) { // same speed as color-cycling
-		for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
-			CMapField &mf = Map.Fields[i];
-			if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
-				mf.AnimationFrame += 1;
-				if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
-					mf.AnimationFrame = 0;
+		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+			for (int i = 0; i < Map.Info.MapWidth * Map.Info.MapHeight; ++i) {
+				CMapField &mf = Map.Fields[z][i];
+				if (mf.Terrain && mf.Terrain->SolidAnimationFrames > 0) {
+					mf.AnimationFrame += 1;
+					if (mf.AnimationFrame >= mf.Terrain->SolidAnimationFrames) {
+						mf.AnimationFrame = 0;
+					}
 				}
-			}
-			if (mf.OverlayTerrain && mf.Terrain->SolidAnimationFrames > 0) {
-				mf.OverlayAnimationFrame += 1;
-				if (mf.OverlayAnimationFrame >= mf.Terrain->SolidAnimationFrames) {
-					mf.OverlayAnimationFrame = 0;
+				if (mf.OverlayTerrain && mf.Terrain->SolidAnimationFrames > 0) {
+					mf.OverlayAnimationFrame += 1;
+					if (mf.OverlayAnimationFrame >= mf.Terrain->SolidAnimationFrames) {
+						mf.OverlayAnimationFrame = 0;
+					}
 				}
 			}
 		}

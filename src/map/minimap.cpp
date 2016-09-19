@@ -215,10 +215,13 @@ void CMinimap::Reload()
 /**
 **  Calculate the tile graphic pixel
 */
-static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp)
+//Wyrmgus start
+//static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp)
+static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int scalex, int scaley, int bpp, int z = 0)
+//Wyrmgus end
 {
 	//Wyrmgus start
-	CTerrainType *terrain = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain ? Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain : Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Terrain;
+	CTerrainType *terrain = Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain ? Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain : Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].Terrain;
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -236,7 +239,10 @@ static inline Uint8 *GetTileGraphicPixel(int xofs, int yofs, int mx, int my, int
 /**
 **  Update a mini-map from the tiles of the map.
 */
-void CMinimap::UpdateTerrain()
+//Wyrmgus start
+//void CMinimap::UpdateTerrain()
+void CMinimap::UpdateTerrain(int z)
+//Wyrmgus end
 {
 	int scalex = MinimapScaleX * SCALE_PRECISION / MINIMAP_FAC;
 	if (!scalex) {
@@ -298,11 +304,11 @@ void CMinimap::UpdateTerrain()
 		for (int mx = XOffset; mx < W - XOffset; ++mx) {
 			//Wyrmgus start
 //			const int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].getGraphicTile();
-			CTerrainType *terrain = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenOverlayTerrain ? Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenOverlayTerrain : Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenTerrain;
-			int tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenOverlayTerrain ? Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenOverlaySolidTile : Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenSolidTile;
+			CTerrainType *terrain = Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenOverlayTerrain ? Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenOverlayTerrain : Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenTerrain;
+			int tile = Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenOverlayTerrain ? Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenOverlaySolidTile : Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].playerInfo.SeenSolidTile;
 			if (!terrain) {
-				terrain = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain ? Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain : Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].Terrain;
-				tile = Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain ? Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].OverlaySolidTile : Map.Fields[Minimap2MapX[mx] + Minimap2MapY[my]].SolidTile;
+				terrain = Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain ? Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain : Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].Terrain;
+				tile = Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].OverlayTerrain ? Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].OverlaySolidTile : Map.Fields[z][Minimap2MapX[mx] + Minimap2MapY[my]].SolidTile;
 			}
 			//Wyrmgus end
 			
@@ -397,7 +403,10 @@ void CMinimap::UpdateTerrain()
 **
 **  @param pos  The map position to update in the minimap
 */
-void CMinimap::UpdateXY(const Vec2i &pos)
+//Wyrmgus start
+//void CMinimap::UpdateXY(const Vec2i &pos)
+void CMinimap::UpdateXY(const Vec2i &pos, int z)
+//Wyrmgus end
 {
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {
@@ -479,11 +488,11 @@ void CMinimap::UpdateXY(const Vec2i &pos)
 				tile = Map.Fields[x + y].getGraphicTile();
 			}
 			*/
-			CTerrainType *terrain = Map.Fields[x + y].playerInfo.SeenOverlayTerrain ? Map.Fields[x + y].playerInfo.SeenOverlayTerrain : Map.Fields[x + y].playerInfo.SeenTerrain;
-			int tile = Map.Fields[x + y].playerInfo.SeenOverlayTerrain ? Map.Fields[x + y].playerInfo.SeenOverlaySolidTile : Map.Fields[x + y].playerInfo.SeenSolidTile;
+			CTerrainType *terrain = Map.Fields[z][x + y].playerInfo.SeenOverlayTerrain ? Map.Fields[z][x + y].playerInfo.SeenOverlayTerrain : Map.Fields[z][x + y].playerInfo.SeenTerrain;
+			int tile = Map.Fields[z][x + y].playerInfo.SeenOverlayTerrain ? Map.Fields[z][x + y].playerInfo.SeenOverlaySolidTile : Map.Fields[z][x + y].playerInfo.SeenSolidTile;
 			if (!terrain) {
-				terrain = Map.Fields[x + y].OverlayTerrain ? Map.Fields[x + y].OverlayTerrain : Map.Fields[x + y].Terrain;
-				tile = Map.Fields[x + y].OverlayTerrain ? Map.Fields[x + y].OverlaySolidTile : Map.Fields[x + y].SolidTile;
+				terrain = Map.Fields[z][x + y].OverlayTerrain ? Map.Fields[z][x + y].OverlayTerrain : Map.Fields[z][x + y].Terrain;
+				tile = Map.Fields[z][x + y].OverlayTerrain ? Map.Fields[z][x + y].OverlaySolidTile : Map.Fields[z][x + y].SolidTile;
 			}
 			//Wyrmgus end
 

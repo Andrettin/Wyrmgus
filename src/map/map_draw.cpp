@@ -262,7 +262,10 @@ void CViewport::DrawMapBackgroundInViewport() const
 				dx += PixelTileSize.x;
 				continue;
 			}
-			const CMapField &mf = Map.Fields[sx];
+			//Wyrmgus start
+//			const CMapField &mf = Map.Fields[sx];
+			const CMapField &mf = Map.Fields[CurrentMapLayer][sx];
+			//Wyrmgus end
 			//Wyrmgus start
 			/*
 			unsigned short int tile;

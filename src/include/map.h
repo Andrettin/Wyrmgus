@@ -222,18 +222,36 @@ public:
 		return getIndex(pos.x, pos.y);
 	}
 
-	CMapField *Field(unsigned int index) const
+	//Wyrmgus start
+//	CMapField *Field(unsigned int index) const
+	CMapField *Field(unsigned int index, int z = 0) const
+	//Wyrmgus end
 	{
-		return &this->Fields[index];
+		//Wyrmgus start
+//		return &this->Fields[index];
+		return &this->Fields[z][index];
+		//Wyrmgus end
 	}
 	/// Get the MapField at location x,y
-	CMapField *Field(int x, int y) const
+	//Wyrmgus start
+//	CMapField *Field(int x, int y) const
+	CMapField *Field(int x, int y, int z = 0) const
+	//Wyrmgus end
 	{
-		return &this->Fields[x + y * this->Info.MapWidth];
+		//Wyrmgus start
+//		return &this->Fields[x + y * this->Info.MapWidth];
+		return &this->Fields[z][x + y * this->Info.MapWidth];
+		//Wyrmgus end
 	}
-	CMapField *Field(const Vec2i &pos) const
+	//Wyrmgus start
+//	CMapField *Field(const Vec2i &pos) const
+	CMapField *Field(const Vec2i &pos, int z = 0) const
+	//Wyrmgus end
 	{
-		return Field(pos.x, pos.y);
+		//Wyrmgus start
+//		return Field(pos.x, pos.y);
+		return Field(pos.x, pos.y, z);
+		//Wyrmgus end
 	}
 
 	/// Alocate and initialise map table.
@@ -282,7 +300,10 @@ public:
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
-	void MarkSeenTile(CMapField &mf);
+	//Wyrmgus start
+//	void MarkSeenTile(CMapField &mf);
+	void MarkSeenTile(CMapField &mf, int z = 0);
+	//Wyrmgus end
 
 	/// Regenerate the forest.
 	void RegenerateForest();
@@ -364,7 +385,10 @@ private:
 	void RegenerateForestTile(const Vec2i &pos);
 
 public:
-	CMapField *Fields;              /// fields on map
+	//Wyrmgus start
+//	CMapField *Fields;              /// fields on map
+	std::vector<CMapField *> Fields;              /// fields on map
+	//Wyrmgus end
 	bool NoFogOfWar;           /// fog of war disabled
 
 	CTileset *Tileset;          /// tileset data
@@ -391,6 +415,9 @@ extern std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
 
 extern CMap Map;  /// The current map
 extern char CurrentMapPath[1024]; /// Path to the current map
+//Wyrmgus start
+extern int CurrentMapLayer;
+//Wyrmgus end
 
 /// Contrast of fog of war
 extern int FogOfWarOpacity;

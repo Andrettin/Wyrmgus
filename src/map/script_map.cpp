@@ -91,8 +91,15 @@ static int CclStratagusMap(lua_State *l)
 					CclGetPos(l, &Map.Info.MapWidth, &Map.Info.MapHeight);
 					lua_pop(l, 1);
 
-					delete[] Map.Fields;
-					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
+					//Wyrmgus start
+//					delete[] Map.Fields;
+//					Map.Fields = new CMapField[Map.Info.MapWidth * Map.Info.MapHeight];
+					for (size_t z = 0; z < Map.Fields.size(); ++z) {
+						delete[] Map.Fields[z];
+					}
+					Map.Fields.clear();
+					Map.Fields.push_back(new CMapField[Map.Info.MapWidth * Map.Info.MapHeight]);
+					//Wyrmgus end
 					// FIXME: this should be CreateMap or InitMap?
 				} else if (!strcmp(value, "fog-of-war")) {
 					Map.NoFogOfWar = false;
@@ -103,6 +110,8 @@ static int CclStratagusMap(lua_State *l)
 				} else if (!strcmp(value, "filename")) {
 					Map.Info.Filename = LuaToString(l, j + 1, k + 1);
 				} else if (!strcmp(value, "map-fields")) {
+					//Wyrmgus start
+					/*
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
 						LuaError(l, "incorrect argument");
@@ -120,6 +129,36 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
+					*/
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int z = 0; z < subsubargs; ++z) {
+						lua_rawgeti(l, -1, z + 1);
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument");
+						}
+						const int subsubsubargs = lua_rawlen(l, -1);
+						if (subsubsubargs != Map.Info.MapWidth * Map.Info.MapHeight) {
+							fprintf(stderr, "Wrong tile table length: %d\n", subsubsubargs);
+						}
+						for (int i = 0; i < subsubsubargs; ++i) {
+							lua_rawgeti(l, -1, i + 1);
+							if (!lua_istable(l, -1)) {
+								LuaError(l, "incorrect argument");
+							}
+							//Wyrmgus start
+	//						Map.Fields[i].parse(l);
+							Map.Fields[z][i].parse(l);
+							//Wyrmgus end
+							lua_pop(l, 1);
+						}
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
+					//Wyrmgus end
 				} else {
 					LuaError(l, "Unsupported tag: %s" _C_ value);
 				}
@@ -141,7 +180,10 @@ static int CclRevealMap(lua_State *l)
 	//Wyrmgus start
 //	LuaCheckArgs(l, 0);
 	//Wyrmgus end
-	if (CclInConfigFile || !Map.Fields) {
+	//Wyrmgus start
+//	if (CclInConfigFile || !Map.Fields) {
+	if (CclInConfigFile || Map.Fields.size() == 0) {
+	//Wyrmgus end
 		FlagRevealMap = 1;
 	} else {
 		//Wyrmgus start
@@ -230,7 +272,10 @@ static int CclSetFogOfWar(lua_State *l)
 {
 	LuaCheckArgs(l, 1);
 	Map.NoFogOfWar = !LuaToBoolean(l, 1);
-	if (!CclInConfigFile && Map.Fields) {
+	//Wyrmgus start
+//	if (!CclInConfigFile && Map.Fields) {
+	if (!CclInConfigFile && Map.Fields.size() > 0) {
+	//Wyrmgus end
 		UpdateFogOfWarChange();
 		// FIXME: save setting in replay log
 		//CommandLog("input", NoUnitP, FlushCommands, -1, -1, NoUnitP, "fow off", -1);
@@ -382,7 +427,10 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value)
 		return;
 	}
 	
-	if (Map.Fields) {
+	//Wyrmgus start
+//	if (Map.Fields) {
+	if (Map.Fields.size() > 0) {
+	//Wyrmgus end
 		CMapField &mf = *Map.Field(pos);
 
 		mf.setTileIndex(*Map.Tileset, tileIndex, value);
@@ -415,7 +463,10 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value)
 		return;
 	}
 	
-	if (Map.Fields) {
+	//Wyrmgus start
+//	if (Map.Fields) {
+	if (Map.Fields.size() > 0) {
+	//Wyrmgus end
 		CMapField &mf = *Map.Field(pos);
 
 		mf.Value = value;

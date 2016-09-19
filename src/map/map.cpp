@@ -71,6 +71,9 @@ std::vector<CMapTemplate *> MapTemplates;
 std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
 //Wyrmgus end
 CMap Map;                   /// The current map
+//Wyrmgus start
+int CurrentMapLayer = 0;
+//Wyrmgus end
 int FlagRevealMap;          /// Flag must reveal the map
 int ReplayRevealMap;        /// Reveal Map is replay
 int ForestRegeneration;     /// Forest regeneration
@@ -213,7 +216,10 @@ CTerrainType *CMapTemplate::GetTileTerrain(const Vec2i &pos, bool overlay)
 **
 **  @param mf  MapField-position.
 */
-void CMap::MarkSeenTile(CMapField &mf)
+//Wyrmgus start
+//void CMap::MarkSeenTile(CMapField &mf)
+void CMap::MarkSeenTile(CMapField &mf, int z)
+//Wyrmgus end
 {
 	//Wyrmgus start
 //	const unsigned int tile = mf.getGraphicTile();
@@ -234,7 +240,10 @@ void CMap::MarkSeenTile(CMapField &mf)
 
 #ifdef MINIMAP_UPDATE
 	//rb - GRRRRRRRRRRRR
-	const unsigned int index = &mf - Map.Fields;
+	//Wyrmgus start
+//	const unsigned int index = &mf - Map.Fields;
+	const unsigned int index = &mf - Map.Fields[z];
+	//Wyrmgus end
 	const int y = index / Info.MapWidth;
 	const int x = index - (y * Info.MapWidth);
 	const Vec2i pos = {x, y}
@@ -716,7 +725,10 @@ void CMapInfo::Clear()
 	this->MapUID = 0;
 }
 
-CMap::CMap() : Fields(NULL), NoFogOfWar(false), TileGraphic(NULL)
+//Wyrmgus start
+//CMap::CMap() : Fields(NULL), NoFogOfWar(false), TileGraphic(NULL)
+CMap::CMap() : NoFogOfWar(false), TileGraphic(NULL)
+//Wyrmgus end
 {
 	Tileset = new CTileset;
 }
@@ -731,9 +743,15 @@ CMap::~CMap()
 */
 void CMap::Create()
 {
-	Assert(!this->Fields);
+	//Wyrmgus start
+//	Assert(!this->Fields);
+	Assert(this->Fields.size() == 0);
+	//Wyrmgus end
 
-	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
+	//Wyrmgus start
+//	this->Fields = new CMapField[this->Info.MapWidth * this->Info.MapHeight];
+	this->Fields.push_back(new CMapField[this->Info.MapWidth * this->Info.MapHeight]);
+	//Wyrmgus end
 }
 
 /**
@@ -750,12 +768,24 @@ void CMap::Init()
 */
 void CMap::Clean()
 {
-	delete[] this->Fields;
+	//Wyrmgus start
+	CurrentMapLayer = 0;
+	//Wyrmgus end
+
+	//Wyrmgus start
+//	delete[] this->Fields;
+	for (size_t z = 0; z < this->Fields.size(); ++z) {
+		delete[] this->Fields[z];
+	}
+	this->Fields.clear();
+	//Wyrmgus end
 
 	// Tileset freed by Tileset?
 
 	this->Info.Clear();
-	this->Fields = NULL;
+	//Wyrmgus start
+//	this->Fields = NULL;
+	//Wyrmgus end
 	this->NoFogOfWar = false;
 	//Wyrmgus start
 	for (size_t i = 0; i != Map.Tileset->solidTerrainTypes.size(); ++i) {
@@ -801,6 +831,8 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"%s\",\n", this->NoFogOfWar ? "no-fog-of-war" : "fog-of-war");
 	file.printf("  \"filename\", \"%s\",\n", this->Info.Filename.c_str());
 	file.printf("  \"map-fields\", {\n");
+	//Wyrmgus start
+	/*
 	for (int h = 0; h < this->Info.MapHeight; ++h) {
 		file.printf("  -- %d\n", h);
 		for (int w = 0; w < this->Info.MapWidth; ++w) {
@@ -814,6 +846,25 @@ void CMap::Save(CFile &file) const
 			}
 		}
 	}
+	*/
+	for (size_t z = 0; z < this->Fields.size(); ++z) {
+		file.printf("  {\n");
+		for (int h = 0; h < this->Info.MapHeight; ++h) {
+			file.printf("  -- %d\n", h);
+			for (int w = 0; w < this->Info.MapWidth; ++w) {
+				const CMapField &mf = *this->Field(w, h, z);
+
+				mf.Save(file);
+				if (w & 1) {
+					file.printf(",\n");
+				} else {
+					file.printf(", ");
+				}
+			}
+		}
+		file.printf("  },\n");
+	}
+	//Wyrmgus end
 	file.printf("}})\n");
 }
 
