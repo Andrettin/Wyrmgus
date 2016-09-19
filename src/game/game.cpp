@@ -345,7 +345,10 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		// Copy GL map surface to pixel array
 		for (int i = 0; i < UI.Minimap.H; ++i) {
 			for (int j = 0; j < UI.Minimap.W; ++j) {
-				Uint32 c = ((Uint32 *)MinimapSurfaceGL)[j + i * UI.Minimap.W];
+				//Wyrmgus start
+//				Uint32 c = ((Uint32 *)MinimapSurfaceGL)[j + i * UI.Minimap.W];
+				Uint32 c = ((Uint32 *)MinimapSurfaceGL[CurrentMapLayer])[j + i * UI.Minimap.W];
+				//Wyrmgus end
 				const int offset = (i * UI.Minimap.W + j) * 3;
 				pixels[offset + 0] = ((c & RMASK) >> RSHIFT);
 				pixels[offset + 1] = ((c & GMASK) >> GSHIFT);
@@ -385,10 +388,16 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 #endif
 	{
 		unsigned char *row = new unsigned char[UI.Minimap.W * 3];
-		const SDL_PixelFormat *fmt = MinimapSurface->format;
+		//Wyrmgus start
+//		const SDL_PixelFormat *fmt = MinimapSurface->format;
+		const SDL_PixelFormat *fmt = MinimapSurface[CurrentMapLayer]->format;
+		//Wyrmgus end
 		SDL_Surface *preview = SDL_CreateRGBSurface(SDL_SWSURFACE,
 													UI.Minimap.W, UI.Minimap.H, 32, fmt->Rmask, fmt->Gmask, fmt->Bmask, 0);
-		SDL_BlitSurface(MinimapSurface, NULL, preview, NULL);
+		//Wyrmgus start
+//		SDL_BlitSurface(MinimapSurface, NULL, preview, NULL);
+		SDL_BlitSurface(MinimapSurface[CurrentMapLayer], NULL, preview, NULL);
+		//Wyrmgus end
 
 		SDL_LockSurface(preview);
 

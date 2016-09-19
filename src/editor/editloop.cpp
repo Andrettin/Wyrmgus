@@ -237,7 +237,10 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	//Wyrmgus end
 
 	UI.Minimap.UpdateSeenXY(pos);
-	UI.Minimap.UpdateXY(pos);
+	//Wyrmgus start
+//	UI.Minimap.UpdateXY(pos);
+	UI.Minimap.UpdateXY(pos, CurrentMapLayer);
+	//Wyrmgus end
 
 	//Wyrmgus start
 //	EditorTileChanged(pos);

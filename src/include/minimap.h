@@ -51,20 +51,23 @@ class CMinimap
 
 	//Wyrmgus start
 //	void UpdateTerrain();
-	void UpdateTerrain(int z = 0);
+	void UpdateTerrain(int z);
 	//Wyrmgus end
 
 	template <const int BPP>
 	void UpdateSeen(void *const pixels, const int pitch);
 
 public:
-	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
+	//Wyrmgus start
+//	CMinimap() : X(0), Y(0), W(0), H(0), XOffset(0), YOffset(0),
+	CMinimap() : X(0), Y(0), W(0), H(0),
+	//Wyrmgus end
 		WithTerrain(false), ShowSelected(false),
 		Transparent(false), UpdateCache(false) {}
 
 	//Wyrmgus start
 //	void UpdateXY(const Vec2i &pos);
-	void UpdateXY(const Vec2i &pos, int z = 0);
+	void UpdateXY(const Vec2i &pos, int z);
 	//Wyrmgus end
 	void UpdateSeenXY(const Vec2i &) {}
 	void Update();
@@ -87,8 +90,12 @@ public:
 	int Y;
 	int W;
 	int H;
-	int XOffset;
-	int YOffset;
+	//Wyrmgus start
+//	int XOffset;
+//	int YOffset;
+	std::vector<int> XOffset;
+	std::vector<int> YOffset;
+	//Wyrmgus end
 	bool WithTerrain;
 	bool ShowSelected;
 	bool Transparent;
@@ -97,15 +104,27 @@ public:
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 // Minimap surface with units (for OpenGL)
-extern unsigned char *MinimapSurfaceGL;
+//Wyrmgus start
+//extern unsigned char *MinimapSurfaceGL;
+extern std::vector<unsigned char *> MinimapSurfaceGL;
+//Wyrmgus end
 // Minimap surface with terrain only (for OpenGL)
-extern unsigned char *MinimapTerrainSurfaceGL;
+//Wyrmgus start
+//extern unsigned char *MinimapTerrainSurfaceGL;
+extern std::vector<unsigned char *> MinimapTerrainSurfaceGL;
+//Wyrmgus end
 #endif
 
 // Minimap surface with units (for software)
-extern SDL_Surface *MinimapSurface;
+//Wyrmgus start
+//extern SDL_Surface *MinimapSurface;
+extern std::vector<SDL_Surface *> MinimapSurface;
+//Wyrmgus end
 // Minimap surface with terrain only (for software)
-extern SDL_Surface *MinimapTerrainSurface;
+//Wyrmgus start
+//extern SDL_Surface *MinimapTerrainSurface;
+extern std::vector<SDL_Surface *> MinimapTerrainSurface;
+//Wyrmgus end
 
 //@}
 
