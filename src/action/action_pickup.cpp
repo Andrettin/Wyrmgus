@@ -133,8 +133,14 @@ enum {
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
+		if (this->GetGoal()->MapLayer != CurrentMapLayer) {
+			return lastScreenPos;
+		}
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
+		if (this->MapLayer != CurrentMapLayer) {
+			return lastScreenPos;
+		}
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 	//Wyrmgus start

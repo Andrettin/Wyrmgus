@@ -143,8 +143,18 @@
 	PixelPos targetPos;
 
 	if (this->ReparableTarget != NULL) {
+		//Wyrmgus start
+		if (this->ReparableTarget->MapLayer != CurrentMapLayer) {
+			return lastScreenPos;
+		}
+		//Wyrmgus end
 		targetPos = vp.MapToScreenPixelPos(this->ReparableTarget->GetMapPixelPosCenter());
 	} else {
+		//Wyrmgus start
+		if (this->MapLayer != CurrentMapLayer) {
+			return lastScreenPos;
+		}
+		//Wyrmgus end
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 //	Video.FillCircleClip(ColorGreen, lastScreenPos, 2);

@@ -392,6 +392,11 @@ static void SaveAiPlayer(CFile &file, int plynr, const PlayerAi &ai)
 		if (queue.Pos.x != -1) {
 			file.printf("\"onpos\", %d, %d, ", queue.Pos.x, queue.Pos.y);
 		}
+		//Wyrmgus start
+		if (queue.MapLayer != -1) {
+			file.printf("\"map-layer\", %d, ", queue.MapLayer);
+		}
+		//Wyrmgus end
 		/* */
 
 		file.printf("\"%s\", %d, %d", queue.Type->Ident.c_str(), queue.Made, queue.Want);

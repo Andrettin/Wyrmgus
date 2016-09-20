@@ -536,7 +536,7 @@ static bool AiFindMiningPlace(const CUnit &worker,
 */
 //Wyrmgus start
 //bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos)
-bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration)
+bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z)
 //Wyrmgus end
 {
 	// Find a good place for a new hall
@@ -549,7 +549,10 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 			   _C_ type.Ident.c_str() _C_ type.GetDefaultName(*worker.Player).c_str());
 			   //Wyrmgus end
 
-	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
+	//Wyrmgus start
+//	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
+	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
+	//Wyrmgus end
 
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {

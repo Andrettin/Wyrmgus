@@ -62,7 +62,10 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
+//Wyrmgus start
+//static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos);
+static int AiMakeUnit(CUnitType &type, const Vec2i &nearPos, int z);
+//Wyrmgus end
 
 /**
 **  Check if the costs are available for the AI.
@@ -267,7 +270,10 @@ static bool IsAlreadyWorking(const CUnit &unit)
 **
 **  @note            We must check if the dependencies are fulfilled.
 */
-static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
+//Wyrmgus start
+//static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos)
+static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec2i &nearPos, int z)
+//Wyrmgus end
 {
 	std::vector<CUnit *> table;
 
@@ -289,20 +295,39 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	}
 
 	CUnit &unit = (num == 1) ? *table[0] : *table[SyncRand() % num];
-
+	
+	if (!Map.Info.IsPointOnMap(nearPos, z)) {
+		z = unit.MapLayer;
+	}
+	
 	Vec2i pos;
 	// Find a place to build.
-	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
-		CommandBuildBuilding(unit, pos, building, FlushCommands);
+	//Wyrmgus start
+//	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
+	if (AiFindBuildingPlace(unit, building, nearPos, &pos, false, z)) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		CommandBuildBuilding(unit, pos, building, FlushCommands);
+		CommandBuildBuilding(unit, pos, building, FlushCommands, z);
+		//Wyrmgus end
 		return 1;
 	} else {
 		//when first worker can't build then rest also won't be able (save CPU)
-		if (Map.Info.IsPointOnMap(nearPos)) {
+		//Wyrmgus start
+//		if (Map.Info.IsPointOnMap(nearPos)) {
+		if (Map.Info.IsPointOnMap(nearPos, z)) {
+		//Wyrmgus end
 			//Crush CPU !!!!!
 			for (int i = 0; i < num && table[i] != &unit; ++i) {
 				// Find a place to build.
-				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos)) {
-					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
+				//Wyrmgus start
+//				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos)) {
+				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos, false, z)) {
+				//Wyrmgus end
+					//Wyrmgus start
+//					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
+					CommandBuildBuilding(*table[i], pos, building, FlushCommands, z);
+					//Wyrmgus end
 					return 1;
 				}
 			}
@@ -365,6 +390,9 @@ void AiNewDepotRequest(CUnit &worker)
 	const int resource = order.GetCurrentResource();
 
 	const Vec2i pos = order.GetHarvestLocation();
+	//Wyrmgus start
+	const int z = order.GetGoalMapLayer();
+	//Wyrmgus end
 	const int range = 15;
 
 	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, range, resource)) {
@@ -416,6 +444,9 @@ void AiNewDepotRequest(CUnit &worker)
 		queue.Want = 1;
 		queue.Made = 0;
 		queue.Pos = pos;
+		//Wyrmgus start
+		queue.MapLayer = z;
+		//Wyrmgus end
 
 		worker.Player->Ai->UnitTypeBuilt.push_back(queue);
 
@@ -568,7 +599,10 @@ static bool AiRequestSupply()
 		if (!cache[0].needmask) {
 			CUnitType &type = *cache[0].type;
 			Vec2i invalidPos(-1, -1);
-			if (AiMakeUnit(type, invalidPos)) {
+			//Wyrmgus start
+//			if (AiMakeUnit(type, invalidPos)) {
+			if (AiMakeUnit(type, invalidPos, AiPlayer->Player->StartMapLayer)) {
+			//Wyrmgus end
 				AiBuildQueue newqueue;
 				newqueue.Type = &type;
 				newqueue.Want = 1;
@@ -658,7 +692,10 @@ static bool AiTrainUnit(const CUnitType &type, CUnitType &what)
 **
 **  @note        We must check if the dependencies are fulfilled.
 */
-static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
+//Wyrmgus start
+//static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
+static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos, int z)
+//Wyrmgus end
 {
 	// Find equivalents unittypes.
 	int usableTypes[UnitTypeMax + 1];
@@ -698,7 +735,10 @@ static int AiMakeUnit(CUnitType &typeToMake, const Vec2i &nearPos)
 			//
 			if (unit_count[table[i]->Slot]) {
 				if (type.Building) {
-					if (AiBuildBuilding(*table[i], type, nearPos)) {
+					//Wyrmgus start
+//					if (AiBuildBuilding(*table[i], type, nearPos)) {
+					if (AiBuildBuilding(*table[i], type, nearPos, z)) {
+					//Wyrmgus end
 						return 1;
 					}
 				} else {
@@ -894,7 +934,10 @@ static void AiCheckingWork()
 			//  resource or other resource need!
 			continue;
 		} else if (queuep->Want > queuep->Made && queuep->Wait <= GameCycle) {
-			if (AiMakeUnit(type, queuep->Pos)) {
+			//Wyrmgus start
+//			if (AiMakeUnit(type, queuep->Pos)) {
+			if (AiMakeUnit(type, queuep->Pos, queuep->MapLayer)) {
+			//Wyrmgus end
 				++queuep->Made;
 				queuep->Wait = 0;
 			} else if (queuep->Type->Building) {
@@ -1004,8 +1047,8 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 		for (int i = 0; i < n; ++i) {
 			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
 
-			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1, false, deposit->MapLayer)) {
+				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands, deposit->MapLayer);
 				return 1;
 			}
 		}
@@ -1022,8 +1065,8 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 				for (int i = 0; i < n; ++i) {
 					CUnitType &type = *AiHelpers.Refinery[c - 1][i];
 
-					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1)) {
-						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands);
+					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1, false, deposit->MapLayer)) {
+						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands, deposit->MapLayer);
 						return 1;
 					}
 				}

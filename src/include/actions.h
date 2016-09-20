@@ -140,7 +140,10 @@ public:
 	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
 	//Wyrmgus end
 	static COrder *NewActionBoard(CUnit &unit);
-	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	//Wyrmgus start
+//	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z);
+	//Wyrmgus end
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);
 	static COrder *NewActionDefend(CUnit &dest);
 	static COrder *NewActionDie();

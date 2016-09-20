@@ -271,9 +271,9 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
 			//Wyrmgus end
 				for (size_t z = 0; z < UnitTypes.size(); ++z) {
-					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1)) {
+					if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
 						dest.Blink = 4;
-						SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush);
+						SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], flush, dest.MapLayer);
 						if (!acknowledged) {
 							PlayUnitSound(unit, VoiceBuild);
 							acknowledged = 1;
@@ -292,8 +292,8 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					SendCommandReturnGoods(unit, depot, flush);
 					//Wyrmgus start
 					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1)) {
-							SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0);
+						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
+							SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0, dest.MapLayer);
 						}
 					}
 					//Wyrmgus end
@@ -1228,10 +1228,16 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				}
 
 				// 0 Test build, don't really build
-				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
+				//Wyrmgus start
+//				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && buildable && (explored || ReplayRevealMap)) {
+				if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0, false, CurrentMapLayer) && buildable && (explored || ReplayRevealMap)) {
+				//Wyrmgus end
 					const int flush = !(KeyModifiers & ModifierShift);
 					for (size_t i = 0; i != Selected.size(); ++i) {
-						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+						//Wyrmgus start
+//						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+						SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush, CurrentMapLayer);
+						//Wyrmgus end
 					}
 					if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 						CancelBuildingMode();
@@ -1983,12 +1989,18 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			bool explored = CanBuildOnArea(*Selected[0], tilePos);
 
 			// 0 Test build, don't really build
-			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
+			//Wyrmgus start
+//			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0) && (explored || ReplayRevealMap)) {
+			if (CanBuildUnitType(Selected[0], *CursorBuilding, tilePos, 0, false, CurrentMapLayer) && (explored || ReplayRevealMap)) {
+			//Wyrmgus end
 				const int flush = !(KeyModifiers & ModifierShift);
 				PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound, MaxSampleVolume);
 				PlayUnitSound(*Selected[0], VoiceBuild);
 				for (size_t i = 0; i != Selected.size(); ++i) {
-					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+					//Wyrmgus start
+//					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush);
+					SendCommandBuildBuilding(*Selected[i], tilePos, *CursorBuilding, flush, CurrentMapLayer);
+					//Wyrmgus end
 				}
 				if (!(KeyModifiers & (ModifierAlt | ModifierShift))) {
 					CancelBuildingMode();

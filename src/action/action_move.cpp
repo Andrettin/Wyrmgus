@@ -106,6 +106,12 @@
 
 /* virtual */ PixelPos COrder_Move::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
+	//Wyrmgus start
+	if (this->MapLayer != CurrentMapLayer) {
+		return lastScreenPos;
+	}
+	//Wyrmgus end
+
 	const PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 
 	//Wyrmgus start

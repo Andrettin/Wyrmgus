@@ -258,7 +258,10 @@ private:
 class AiBuildQueue
 {
 public:
-	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
+	//Wyrmgus start
+//	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0)
+	AiBuildQueue() : Want(0), Made(0), Type(NULL), Wait(0), MapLayer(0)
+	//WYrmgus end
 	{
 		Pos.x = Pos.y = -1;
 	}
@@ -269,6 +272,9 @@ public:
 	CUnitType *Type;    /// unit-type
 	unsigned long Wait; /// wait until this cycle
 	Vec2i Pos;          /// build near pos on map
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 
 /**
@@ -452,7 +458,7 @@ extern CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUn
 /// Find nice building place
 //Wyrmgus start
 //extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos);
-extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration = false);
+extern bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i &nearPos, Vec2i *resultPos, bool ignore_exploration, int z);
 //Wyrmgus end
 
 //

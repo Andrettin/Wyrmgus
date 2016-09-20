@@ -337,11 +337,17 @@ void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 ** @param what    pointer to unit-type of the building.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
+//Wyrmgus start
+//void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
+void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("build", &unit, flush, pos.x, pos.y, NoUnitP, what.Ident.c_str(), -1);
-		CommandBuildBuilding(unit, pos, what, flush);
+		//Wyrmgus start
+//		CommandBuildBuilding(unit, pos, what, flush);
+		CommandBuildBuilding(unit, pos, what, flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandBuild, unit, pos.x, pos.y, NoUnitP, &what, flush);
 	}

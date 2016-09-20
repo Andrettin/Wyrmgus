@@ -1306,6 +1306,9 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 	}
 
 	Vec2i pos(-1, -1);
+	//Wyrmgus start
+	int z = -1;
+	//Wyrmgus end
 
 	const int args = lua_rawlen(l, offset);
 	for (int k = 0; k < args; ++k) {
@@ -1316,6 +1319,10 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			pos.x = LuaToNumber(l, offset, k + 1);
 			++k;
 			pos.y = LuaToNumber(l, offset, k + 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "map-layer")) {
+			z = LuaToNumber(l, offset, k + 1);
+		//Wyrmgus end
 		} else {
 			//ident = LuaToString(l, j + 1, k + 1);
 			//++k;
@@ -1328,10 +1335,16 @@ static void CclParseBuildQueue(lua_State *l, PlayerAi *ai, int offset)
 			queue.Want = want;
 			queue.Made = made;
 			queue.Pos = pos;
+			//Wyrmgus start
+			queue.MapLayer = z;
+			//Wyrmgus end
 
 			ai->UnitTypeBuilt.push_back(queue);
 			pos.x = -1;
 			pos.y = -1;
+			//Wyrmgus start
+			z = -1;
+			//Wyrmgus end
 		}
 	}
 }

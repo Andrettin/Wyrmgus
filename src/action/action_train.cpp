@@ -435,8 +435,8 @@ static void AnimateActionTrain(CUnit &unit)
 					command_found = true;
 				} else if (newUnit->Type->BoolFlag[HARVESTER_INDEX].value && table[j]->Type->GivesResource && newUnit->Type->ResInfo[table[j]->Type->GivesResource] && !table[j]->Type->BoolFlag[CANHARVEST_INDEX].value && (table[j]->Player == newUnit->Player || table[j]->Player->Index == PlayerNumNeutral)) { // see if can build mine on top of deposit
 					for (size_t z = 0; z < UnitTypes.size(); ++z) {
-						if (UnitTypes[z] && UnitTypes[z]->GivesResource == table[j]->Type->GivesResource && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *UnitTypes[z], table[j]->tilePos, 1)) {
-							CommandBuildBuilding(*newUnit, table[j]->tilePos, *UnitTypes[z], FlushCommands);
+						if (UnitTypes[z] && UnitTypes[z]->GivesResource == table[j]->Type->GivesResource && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(newUnit, *UnitTypes[z], table[j]->tilePos, 1, false, table[j]->MapLayer)) {
+							CommandBuildBuilding(*newUnit, table[j]->tilePos, *UnitTypes[z], FlushCommands, table[j]->MapLayer);
 							command_found = true;
 							break;
 						}

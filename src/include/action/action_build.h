@@ -36,7 +36,10 @@
 
 class COrder_Build : public COrder
 {
-	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
+	friend COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z);
+	//Wyrmgus end
 public:
 	//Wyrmgus start
 //	COrder_Build() : COrder(UnitActionBuild), Type(NULL), State(0), Range(0)

@@ -83,13 +83,22 @@ enum {
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building)
+/* static */ COrder *COrder::NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 
 	COrder_Build *order = new COrder_Build;
 
 	order->goalPos = pos;
+	//Wyrmgus start
+	order->MapLayer = z;
+	//Wyrmgus end
 	if (building.BoolFlag[BUILDEROUTSIDE_INDEX].value) {
 		order->Range = builder.Type->RepairRange;
 	} else {
@@ -113,6 +122,9 @@ enum {
 	}
 	file.printf(" \"range\", %d,", this->Range);
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 
 	if (this->BuildingUnit != NULL) {
 		file.printf(" \"building\", \"%s\",", UnitReference(this->BuildingUnit).c_str());
@@ -143,6 +155,11 @@ enum {
 	} else if (!strcmp(value, "type")) {
 		++j;
 		this->Type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -156,6 +173,12 @@ enum {
 
 /* virtual */ PixelPos COrder_Build::Show(const CViewport &vp, const PixelPos &lastScreenPos) const
 {
+	//Wyrmgus start
+	if (this->MapLayer != CurrentMapLayer) {
+		return lastScreenPos;
+	}
+	//Wyrmgus end
+
 	PixelPos targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	targetPos.x += (this->GetUnitType().TileWidth - 1) * PixelTileSize.x / 2;
 	targetPos.y += (this->GetUnitType().TileHeight - 1) * PixelTileSize.y / 2;
@@ -182,7 +205,10 @@ enum {
 	input.SetMaxRange(this->Range);
 
 	const Vec2i tileSize(this->Type->TileWidth, this->Type->TileHeight);
-	input.SetGoal(this->goalPos, tileSize);
+	//Wyrmgus start
+//	input.SetGoal(this->goalPos, tileSize);
+	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+	//Wyrmgus end
 }
 
 /** Called when unit is killed.
@@ -215,7 +241,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE: {
 			//Wyrmgus start
-			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -321,7 +347,10 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 
 	// Check if the building could be built there.
 
-	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1);
+	//Wyrmgus start
+//	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1);
+	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1, false, this->MapLayer);
+	//Wyrmgus end
 
 	if (ontop != NULL) {
 		return ontop;

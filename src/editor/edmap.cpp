@@ -163,7 +163,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 		CUnit *unit = *it;
 
-		if (!CanBuildUnitType(unit, *unit->Type, pos, 1)) {
+		if (!CanBuildUnitType(unit, *unit->Type, pos, 1, false, CurrentMapLayer)) {
 			units_to_remove.push_back(unit);
 		}
 	}

@@ -105,6 +105,11 @@ enum {
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -121,8 +126,18 @@ enum {
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
+		//Wyrmgus start
+		if (this->GetGoal()->MapLayer != CurrentMapLayer) {
+			return lastScreenPos;
+		}
+		//Wyrmgus end
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
+		//Wyrmgus start
+		if (this->MapLayer != CurrentMapLayer) {
+			return lastScreenPos;
+		}
+		//Wyrmgus end
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 	//Wyrmgus start
@@ -148,11 +163,17 @@ enum {
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
-		input.SetGoal(goal->tilePos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(goal->tilePos, tileSize);
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
+		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(this->goalPos, tileSize);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -303,7 +324,7 @@ static void EnterTransporter(CUnit &unit, COrder_Board &order)
 					if (pathRet == PF_UNREACHABLE) {
 						//Wyrmgus start
 						//if is unreachable and is on a raft, see if the raft can move closer to the "transporter"
-						if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+						if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
 							Select(unit.tilePos, unit.tilePos, table);
 							for (size_t i = 0; i != table.size(); ++i) {

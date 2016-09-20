@@ -733,13 +733,16 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 **  @param what   Unit type to build.
 **  @param flush  if true, flush command queue.
 */
-void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
+//Wyrmgus start
+//void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush)
+void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush, int z)
+//Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
@@ -761,7 +764,10 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 			return;
 		}
 	}
-	*order = COrder::NewActionBuild(unit, pos, what);
+	//Wyrmgus start
+//	*order = COrder::NewActionBuild(unit, pos, what);
+	*order = COrder::NewActionBuild(unit, pos, what, z);
+	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 

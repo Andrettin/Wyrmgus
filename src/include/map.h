@@ -187,7 +187,7 @@ public:
 	{
 		//Wyrmgus start
 //		return (x >= 0 && y >= 0 && x < MapWidth && y < MapHeight);
-		return (x >= 0 && y >= 0 && x < MapWidths[z] && y < MapHeights[z]);
+		return (z >= 0 && z < (int) MapWidths.size() && z < (int) MapHeights.size() && x >= 0 && y >= 0 && x < MapWidths[z] && y < MapHeights[z]);
 		//Wyrmgus end
 	}
 

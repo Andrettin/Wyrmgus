@@ -348,8 +348,18 @@ COrder_Resource::~COrder_Resource()
 	PixelPos targetPos;
 
 	if (this->HasGoal()) {
+		//Wyrmgus start
+		if (this->GetGoal()->MapLayer != CurrentMapLayer) {
+			return lastScreenPos;
+		}
+		//Wyrmgus end
 		targetPos = vp.MapToScreenPixelPos(this->GetGoal()->GetMapPixelPosCenter());
 	} else {
+		//Wyrmgus start
+		if (this->MapLayer != CurrentMapLayer) {
+			return lastScreenPos;
+		}
+		//Wyrmgus end
 		targetPos = vp.TilePosToScreen_Center(this->goalPos);
 	}
 	//Wyrmgus start

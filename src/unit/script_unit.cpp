@@ -928,7 +928,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer)
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
+			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0, false, transporter->MapLayer))) {
 			unit->Place(ipos, transporter->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
@@ -999,7 +999,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		return 0;
 	}
 	Vec2i new_pos;
-	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true);
+	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true, worker->MapLayer);
 	
 	if (!Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {
 		new_pos = Players[playerno].StartPos;
@@ -1012,7 +1012,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, new_pos, worker->MapLayer)
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0, true))) {
+			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0, true, worker->MapLayer))) {
 			unit->Place(new_pos, worker->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
