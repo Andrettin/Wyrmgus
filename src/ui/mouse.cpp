@@ -375,7 +375,10 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			PlayUnitSound(unit, VoiceRepairing);
 			acknowledged = 1;
 		}
-		SendCommandRepair(unit, pos, dest, flush);
+		//Wyrmgus start
+//		SendCommandRepair(unit, pos, dest, flush);
+		SendCommandRepair(unit, pos, dest, flush, CurrentMapLayer);
+		//Wyrmgus end
 		return true;
 	}
 	// Harvest
@@ -1445,7 +1448,10 @@ static int SendRepair(const Vec2i &tilePos)
 			if (unit->Type->RepairRange) {
 				const int flush = !(KeyModifiers & ModifierShift);
 
-				SendCommandRepair(*unit, tilePos, dest, flush);
+				//Wyrmgus start
+//				SendCommandRepair(*unit, tilePos, dest, flush);
+				SendCommandRepair(*unit, tilePos, dest, flush, CurrentMapLayer);
+				//Wyrmgus end
 				ret = 1;
 			} else {
 				DebugPrint("Non-worker repairs\n");
@@ -1621,7 +1627,10 @@ static int SendPatrol(const Vec2i &tilePos)
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
-		SendCommandPatrol(unit, tilePos, flush);
+		//Wyrmgus start
+//		SendCommandPatrol(unit, tilePos, flush);
+		SendCommandPatrol(unit, tilePos, flush, CurrentMapLayer);
+		//Wyrmgus end
 	}
 	return Selected.empty() ? 0 : 1;
 }

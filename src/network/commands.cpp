@@ -203,11 +203,17 @@ void SendCommandPickUp(CUnit &unit, CUnit &dest, int flush)
 ** @param dest    Unit to be repaired.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
+//Wyrmgus start
+//void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
+void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("repair", &unit, flush, pos.x, pos.y, dest, NULL, -1);
-		CommandRepair(unit, pos, dest, flush);
+		//Wyrmgus start
+//		CommandRepair(unit, pos, dest, flush);
+		CommandRepair(unit, pos, dest, flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandRepair, unit, pos.x, pos.y, dest, 0, flush);
 	}
@@ -290,11 +296,17 @@ void SendCommandUse(CUnit &unit, CUnit &dest, int flush)
 ** @param pos      map tile position to patrol between.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
+//Wyrmgus start
+//void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("patrol", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandPatrolUnit(unit, pos, flush);
+		//Wyrmgus start
+//		CommandPatrolUnit(unit, pos, flush);
+		CommandPatrolUnit(unit, pos, flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandPatrol, unit, pos.x, pos.y, NoUnitP, 0, flush);
 	}

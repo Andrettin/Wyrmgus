@@ -36,11 +36,14 @@
 
 class COrder_Patrol : public COrder
 {
-	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
+	friend COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
+	//Wyrmgus end
 public:
 	//Wyrmgus start
 //	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0)
-	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0), MapLayer(0)
+	COrder_Patrol() : COrder(UnitActionPatrol), WaitingCycle(0), Range(0), MapLayer(0), WayPointMapLayer(0)
 	//Wyrmgus end
 	{
 		goalPos.x = -1;
@@ -66,6 +69,7 @@ private:
 	Vec2i goalPos;
 	//Wyrmgus start
 	int MapLayer;
+	int WayPointMapLayer;
 	//Wyrmgus end
 };
 

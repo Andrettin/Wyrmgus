@@ -575,7 +575,10 @@ bool AutoRepair(CUnit &unit)
 	}
 
 	//Command* will clear unit.SavedOrder
-	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
+	//Wyrmgus start
+//	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands);
+	CommandRepair(unit, invalidPos, repairedUnit, FlushCommands, repairedUnit->MapLayer);
+	//Wyrmgus end
 	if (savedOrder != NULL) {
 		unit.SavedOrder = savedOrder;
 	}

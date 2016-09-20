@@ -70,6 +70,9 @@
 
 	if (target.Destroyed) {
 		order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
+		//Wyrmgus start
+		order->MapLayer = target.MapLayer;
+		//Wyrmgus end
 	} else {
 		order->SetGoal(&target);
 		order->ReparableTarget = &target;
@@ -77,13 +80,22 @@
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionRepair(const Vec2i &pos)
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionRepair(const Vec2i &pos)
+/* static */ COrder *COrder::NewActionRepair(const Vec2i &pos, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 
 	COrder_Repair *order = new COrder_Repair;
 
 	order->goalPos = pos;
+	//Wyrmgus start
+	order->MapLayer = z;
+	//Wyrmgus end
 	return order;
 }
 
@@ -98,6 +110,9 @@
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 
 	if (this->ReparableTarget != NULL) {
 		file.printf(" \"repair-target\", \"%s\",", UnitReference(this->GetReparableTarget()).c_str());
@@ -127,6 +142,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -179,11 +199,17 @@
 	if (ReparableTarget != NULL) {
 		tileSize.x = ReparableTarget->Type->TileWidth;
 		tileSize.y = ReparableTarget->Type->TileHeight;
-		input.SetGoal(ReparableTarget->tilePos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(ReparableTarget->tilePos, tileSize);
+		input.SetGoal(ReparableTarget->tilePos, tileSize, ReparableTarget->MapLayer);
+		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(this->goalPos, tileSize);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -294,6 +320,9 @@ static void AnimateActionRepair(CUnit &unit)
 					if (!goal->IsVisibleAsGoal(*unit.Player)) {
 						DebugPrint("repair target gone.\n");
 						this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+						//Wyrmgus start
+						this->MapLayer = goal->MapLayer;
+						//Wyrmgus end
 						ReparableTarget = NULL;
 						this->ClearGoal();
 						goal = NULL;
@@ -320,7 +349,7 @@ static void AnimateActionRepair(CUnit &unit)
 					//Wyrmgus start
 					//if is unreachable and is on a raft, see if the raft can move closer
 					if (err == PF_UNREACHABLE) {
-						if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+						if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
 							Select(unit.tilePos, unit.tilePos, table);
 							for (size_t i = 0; i != table.size(); ++i) {
@@ -353,6 +382,9 @@ static void AnimateActionRepair(CUnit &unit)
 				if (!goal->IsVisibleAsGoal(*unit.Player)) {
 					DebugPrint("repair goal is gone\n");
 					this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+					//Wyrmgus start
+					this->MapLayer = goal->MapLayer;
+					//Wyrmgus end
 					// FIXME: should I clear this here?
 					this->ClearGoal();
 					ReparableTarget = NULL;

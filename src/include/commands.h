@@ -87,7 +87,10 @@ extern void CommandPickUp(CUnit &unit, CUnit &dest, int flush);
 extern void CommandQuest(CUnit &unit, CQuest *quest);
 //Wyrmgus end
 /// Prepare command repair
-extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+//Wyrmgus start
+//extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z = 0);
+//Wyrmgus end
 /// Send auto repair command
 extern void CommandAutoRepair(CUnit &unit, int on);
 /// Prepare command attack
@@ -105,7 +108,10 @@ extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z 
 extern void CommandUse(CUnit &unit, CUnit &dest, int flush);
 //Wyrmgus end
 /// Prepare command patrol
-extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+//extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush);
+extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//Wyrmgus end
 /// Prepare command board
 extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command unload
@@ -185,7 +191,10 @@ extern void SendCommandQuest(CUnit &unit, CQuest *quest);
 extern void SendCommandPickUp(CUnit &unit, CUnit &dest, int flush);
 //Wyrmgus end
 /// Send repair command
-extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+//Wyrmgus start
+//extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z = 0);
+//Wyrmgus end
 /// Send auto repair command
 extern void SendCommandAutoRepair(CUnit &unit, int on);
 /// Send attack command
@@ -197,7 +206,10 @@ extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
 extern void SendCommandUse(CUnit &unit, CUnit &dest, int flush);
 //Wyrmgus end
 /// Send patrol command
-extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+//extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush);
+extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//WYrmgus end
 /// Send board command
 extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
 /// Send unload command

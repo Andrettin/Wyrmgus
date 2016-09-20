@@ -424,13 +424,16 @@ void CommandQuest(CUnit &unit, CQuest *quest)
 **  @param dest   or unit to be repaired. FIXME: not supported
 **  @param flush  if true, flush command queue.
 */
-void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
+//Wyrmgus start
+//void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
+void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z)
+//Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
@@ -455,7 +458,10 @@ void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 	if (dest) {
 		*order = COrder::NewActionRepair(unit, *dest);
 	} else {
-		*order = COrder::NewActionRepair(pos);
+		//Wyrmgus start
+//		*order = COrder::NewActionRepair(pos);
+		*order = COrder::NewActionRepair(pos, z);
+		//Wyrmgus end
 	}
 	ClearSavedAction(unit);
 }
@@ -636,15 +642,21 @@ void CommandUse(CUnit &unit, CUnit &dest, int flush)
 **  @param pos    map position to patrol between.
 **  @param flush  if true, flush command queue.
 */
-void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
+//Wyrmgus start
+//void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
+void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
@@ -666,7 +678,10 @@ void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionPatrol(unit.tilePos, pos);
+	//Wyrmgus start
+//	*order = COrder::NewActionPatrol(unit.tilePos, pos);
+	*order = COrder::NewActionPatrol(unit.tilePos, pos, unit.MapLayer, z);
+	//Wyrmgus end
 
 	ClearSavedAction(unit);
 }

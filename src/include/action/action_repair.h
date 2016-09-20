@@ -37,7 +37,10 @@
 class COrder_Repair : public COrder
 {
 	friend COrder *COrder::NewActionRepair(CUnit &unit, CUnit &target);
-	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionRepair(const Vec2i &pos);
+	friend COrder *COrder::NewActionRepair(const Vec2i &pos, int z);
+	//Wyrmgus end
 public:
 	//Wyrmgus start
 //	COrder_Repair() : COrder(UnitActionRepair), State(0), RepairCycle(0)

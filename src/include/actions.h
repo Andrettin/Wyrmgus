@@ -150,14 +150,18 @@ public:
 	static COrder *NewActionFollow(CUnit &dest);
 	//Wyrmgus start
 //	static COrder *NewActionMove(const Vec2i &pos);
+//	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
 	static COrder *NewActionMove(const Vec2i &pos, int z);
+	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z);
 	//Wyrmgus end
-	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
 	//Wyrmgus start
 	static COrder *NewActionPickUp(CUnit &dest);
 	//Wyrmgus end
 	static COrder *NewActionRepair(CUnit &unit, CUnit &target);
-	static COrder *NewActionRepair(const Vec2i &pos);
+	//Wyrmgus start
+//	static COrder *NewActionRepair(const Vec2i &pos);
+	static COrder *NewActionRepair(const Vec2i &pos, int z);
+	//Wyrmgus end
 	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade);
 	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos);
 	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);

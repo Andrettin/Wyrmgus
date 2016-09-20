@@ -1228,7 +1228,10 @@ static int CclOrderUnit(lua_State *l)
 					//Wyrmgus end
 				//Wyrmgus end
 				} else if (!strcmp(order, "patrol")) {
-					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
+					//Wyrmgus start
+//					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
+					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1, unit.MapLayer);
+					//Wyrmgus end
 				//Wyrmgus start
 				} else if (!strcmp(order, "board")) {
 					CUnit &transporter = *TargetOnMap(unit, dpos1, dpos2);

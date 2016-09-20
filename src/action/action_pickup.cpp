@@ -79,6 +79,9 @@ enum {
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
 		order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
+		//Wyrmgus start
+		order->MapLayer = dest.MapLayer;
+		//Wyrmgus end
 	} else {
 		order->SetGoal(&dest);
 		order->Range = 1;
@@ -98,6 +101,9 @@ enum {
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 
 	file.printf(" \"state\", %d", this->State);
 
@@ -117,6 +123,11 @@ enum {
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -166,11 +177,17 @@ enum {
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
-		input.SetGoal(goal->tilePos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(goal->tilePos, tileSize);
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
+		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(this->goalPos, tileSize);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -261,7 +278,7 @@ enum {
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//Wyrmgus start
-			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -344,6 +361,9 @@ enum {
 				}
 			}
 			this->goalPos = goal->tilePos;
+			//Wyrmgus start
+			this->MapLayer = goal->MapLayer;
+			//Wyrmgus end
 			this->State = State_TargetReached;
 		}
 		// FALL THROUGH
@@ -355,6 +375,9 @@ enum {
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+		//Wyrmgus start
+		this->MapLayer = goal->MapLayer;
+		//Wyrmgus end
 		this->ClearGoal();
 		goal = NULL;
 	}

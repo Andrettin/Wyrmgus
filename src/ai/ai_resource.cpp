@@ -1501,7 +1501,10 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 
 	if (terrainTraversal.Run(unitFinder) && unit != NULL) {
 		const Vec2i invalidPos(-1, -1);
-		CommandRepair(*unit, invalidPos, &building, FlushCommands);
+		//Wyrmgus start
+//		CommandRepair(*unit, invalidPos, &building, FlushCommands);
+		CommandRepair(*unit, invalidPos, &building, FlushCommands, building.MapLayer);
+		//Wyrmgus end
 		return true;
 	}
 	return false;

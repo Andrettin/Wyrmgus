@@ -60,15 +60,26 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest)
+/* static */ COrder *COrder::NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest, int current_z, int dest_z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(currentPos));
-	Assert(Map.Info.IsPointOnMap(dest));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(currentPos));
+//	Assert(Map.Info.IsPointOnMap(dest));
+	Assert(Map.Info.IsPointOnMap(currentPos, current_z));
+	Assert(Map.Info.IsPointOnMap(dest, dest_z));
+	//Wyrmgus end
 
 	COrder_Patrol *order = new COrder_Patrol();
 
 	order->goalPos = dest;
 	order->WayPoint = currentPos;
+	//Wyrmgus start
+	order->MapLayer = dest_z;
+	order->WayPointMapLayer = current_z;
+	//Wyrmgus end
 	return order;
 }
 
@@ -81,12 +92,18 @@
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 	file.printf(" \"range\", %d,", this->Range);
 
 	if (this->WaitingCycle != 0) {
 		file.printf(" \"waiting-cycle\", %d,", this->WaitingCycle);
 	}
 	file.printf(" \"patrol\", {%d, %d}", this->WayPoint.x, this->WayPoint.y);
+	//Wyrmgus start
+	file.printf(" \"patrol-map-layer\", %d,", this->WayPointMapLayer);
+	//Wyrmgus end
 	file.printf("}");
 }
 
@@ -97,6 +114,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->WayPoint.x , &this->WayPoint.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "patrol-map-layer")) {
+		++j;
+		this->WayPointMapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else if (!strcmp(value, "waiting-cycle")) {
 		++j;
 		this->WaitingCycle = LuaToNumber(l, -1, j + 1);
@@ -108,6 +130,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -150,7 +177,10 @@
 	input.SetMinRange(0);
 	input.SetMaxRange(this->Range);
 	const Vec2i tileSize(0, 0);
-	input.SetGoal(this->goalPos, tileSize);
+	//Wyrmgus start
+//	input.SetGoal(this->goalPos, tileSize);
+	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+	//Wyrmgus end
 }
 
 
@@ -179,7 +209,7 @@
 			break;
 		case PF_UNREACHABLE:
 			//Wyrmgus start
-			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -202,6 +232,9 @@
 			this->WaitingCycle = 1;
 			this->Range = 0;
 			std::swap(this->WayPoint, this->goalPos);
+			//Wyrmgus start
+			std::swap(this->WayPointMapLayer, this->MapLayer);
+			//Wyrmgus end
 
 			break;
 		case PF_WAIT:
@@ -211,6 +244,9 @@
 				this->WaitingCycle = 0;
 				this->Range = 0;
 				std::swap(this->WayPoint, this->goalPos);
+				//Wyrmgus start
+				std::swap(this->WayPointMapLayer, this->MapLayer);
+				//Wyrmgus end
 
 				unit.pathFinderData->output.Cycles = 0; //moving counter
 			}
