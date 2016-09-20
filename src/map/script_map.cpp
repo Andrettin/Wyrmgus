@@ -903,8 +903,8 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y || Players[i].StartMapLayer != z) {
 			continue;
 		}
-		for (size_t j = 0; j < map_template->PlayerLocationGeneratedResources.size(); ++j) {
-			Map.GenerateResources(map_template->PlayerLocationGeneratedResources[j].first, map_template->PlayerLocationGeneratedResources[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
+		for (size_t j = 0; j < map_template->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
+			Map.GenerateNeutralUnits(map_template->PlayerLocationGeneratedNeutralUnits[j].first, map_template->PlayerLocationGeneratedNeutralUnits[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
 		}
 		for (size_t j = 0; j < map_template->PlayerLocationGeneratedTerrains.size(); ++j) {
 			int map_width = 16;
@@ -973,8 +973,8 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !map_template->TerrainFile.empty(), z);
 	}
 	
-	for (size_t i = 0; i < map_template->GeneratedResources.size(); ++i) {
-		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, map_start_pos, map_end - Vec2i(1, 1), false, z);
+	for (size_t i = 0; i < map_template->GeneratedNeutralUnits.size(); ++i) {
+		Map.GenerateNeutralUnits(map_template->GeneratedNeutralUnits[i].first, map_template->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), false, z);
 	}
 	
 	if (!map_template->MainTemplate) {
@@ -1581,7 +1581,7 @@ static int CclDefineMapTemplate(lua_State *l)
 				
 				map->ExternalGeneratedTerrains.push_back(std::pair<CTerrainType *, int>(terrain, degree_level));
 			}
-		} else if (!strcmp(value, "GeneratedResources")) {
+		} else if (!strcmp(value, "GeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -1595,9 +1595,9 @@ static int CclDefineMapTemplate(lua_State *l)
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
-				map->GeneratedResources.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+				map->GeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
-		} else if (!strcmp(value, "PlayerLocationGeneratedResources")) {
+		} else if (!strcmp(value, "PlayerLocationGeneratedNeutralUnits")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -1611,7 +1611,7 @@ static int CclDefineMapTemplate(lua_State *l)
 				
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
-				map->PlayerLocationGeneratedResources.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
+				map->PlayerLocationGeneratedNeutralUnits.push_back(std::pair<CUnitType *, int>(unit_type, quantity));
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

@@ -160,8 +160,8 @@ public:
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
 	std::vector<std::pair<CTerrainType *, int>> PlayerLocationGeneratedTerrains;
 	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;
-	std::vector<std::pair<CUnitType *, int>> GeneratedResources; /// the first element of the pair is the resource's unit type, and the second is the quantity
-	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedResources;
+	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
+	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources, mapped to the tile position
@@ -301,7 +301,7 @@ public:
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline, int z);
-	void GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
+	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
 	//Wyrmgus start

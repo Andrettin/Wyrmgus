@@ -1732,22 +1732,26 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 	}
 }
 
-void CMap::GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z)
+void CMap::GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z)
 {
 	if (SaveGameLoading) {
 		return;
 	}
 	
-	Vec2i resource_pos(-1, -1);
+	Vec2i unit_pos(-1, -1);
 	
 	for (int i = 0; i < quantity; ++i) {
 		if (i == 0 || !grouped) {
-			resource_pos = GenerateUnitLocation(unit_type, NULL, min_pos, max_pos, z);
+			unit_pos = GenerateUnitLocation(unit_type, NULL, min_pos, max_pos, z);
 		}
-		if (!this->Info.IsPointOnMap(resource_pos, z)) {
+		if (!this->Info.IsPointOnMap(unit_pos, z)) {
 			continue;
 		}
-		CUnit *unit = CreateResourceUnit(resource_pos, *unit_type, z);
+		if (unit_type->GivesResource) {
+			CUnit *unit = CreateResourceUnit(unit_pos, *unit_type, z);
+		} else {
+			CUnit *unit = CreateUnit(unit_pos, *unit_type, &Players[PlayerNumNeutral], z);
+		}
 	}
 }
 //Wyrmgus end
