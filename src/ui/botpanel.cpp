@@ -1694,7 +1694,10 @@ void CButtonPanel::DoClicked_Unload(int button)
 	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitActionStill
 		 && Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
 		|| !Selected[0]->CanMove()) {
-		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
+		//Wyrmgus start
+//		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);
+		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush, Selected[0]->MapLayer);
+		//Wyrmgus end
 		return ;
 	}
 	DoClicked_SelectTarget(button);

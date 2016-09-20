@@ -127,7 +127,7 @@ class CUnit
 public:
 	//Wyrmgus start
 //	CUnit() : tilePos(-1, -1), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
-	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), MapLayer(0), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
+	CUnit() : tilePos(-1, -1), RallyPointPos(-1, -1), MapLayer(0), RallyPointMapLayer(0), pathFinderData(NULL), SavedOrder(NULL), NewOrder(NULL), CriticalOrder(NULL) { Init(); }
 	//Wyrmgus end
 
 	void Init();
@@ -429,6 +429,7 @@ public:
 	//Wyrmgus start
 	Vec2i RallyPointPos;	/// used for storing the rally point position (where units trained by this unit will be sent to)
 	int MapLayer;			/// in which map layer the unit is
+	int RallyPointMapLayer;	/// in which map layer the unit's rally point is
 	//Wyrmgus end
 
 	unsigned int Offset;/// Map position as flat index offset (x + y * w)

@@ -372,7 +372,10 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(Map.Info.IsPointOnMap(startPos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(startPos));
+	Assert(Map.Info.IsPointOnMap(startPos, z));
+	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
 	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, resultPos);
@@ -380,7 +383,10 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 	return terrainTraversal.Run(aiForceRallyPointFinder);
 }
 
-void AiForce::Attack(const Vec2i &pos)
+//Wyrmgus start
+//void AiForce::Attack(const Vec2i &pos)
+void AiForce::Attack(const Vec2i &pos, int z)
+//Wyrmgus end
 {
 	bool isDefenceForce = false;
 	RemoveDeadUnit();
@@ -403,6 +409,9 @@ void AiForce::Attack(const Vec2i &pos)
 		if (this->Role == AiForceRoleDefend
 			|| (this->Role == AiForceRoleAttack && this->State == AiForceAttackingState_Waiting)) {
 			this->HomePos = this->Units[this->Units.size() - 1]->tilePos;
+			//Wyrmgus start
+			this->HomeMapLayer = this->Units[this->Units.size() - 1]->MapLayer;
+			//Wyrmgus end
 		}
 		this->Attacking = true;
 	}
@@ -430,7 +439,10 @@ void AiForce::Attack(const Vec2i &pos)
 			break;
 		}
 	}
-	if (Map.Info.IsPointOnMap(goalPos) == false) {
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(goalPos) == false) {
+	if (Map.Info.IsPointOnMap(goalPos, z) == false) {
+	//Wyrmgus end
 		/* Search in entire map */
 		const CUnit *enemy = NULL;
 		if (isTransporter) {
@@ -442,6 +454,9 @@ void AiForce::Attack(const Vec2i &pos)
 		}
 		if (enemy) {
 			goalPos = enemy->tilePos;
+			//Wyrmgus start
+			z = enemy->MapLayer;
+			//Wyrmgus end
 		//Wyrmgus start
 		} else {
 			for (size_t i = 0; i != this->Units.size(); ++i) {
@@ -465,7 +480,10 @@ void AiForce::Attack(const Vec2i &pos)
 		}
 	}
 	//Wyrmgus end
-	if (Map.Info.IsPointOnMap(goalPos) == false || isTransporter) {
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(goalPos) == false || isTransporter) {
+	if (Map.Info.IsPointOnMap(goalPos, z) == false || isTransporter) {
+	//Wyrmgus end
 		DebugPrint("%d: Need to plan an attack with transporter\n" _C_ AiPlayer->Player->Index);
 		if (State == AiForceAttackingState_Waiting && !PlanAttack()) {
 			DebugPrint("%d: Can't transport\n" _C_ AiPlayer->Player->Index);
@@ -475,11 +493,20 @@ void AiForce::Attack(const Vec2i &pos)
 	}
 	if (this->State == AiForceAttackingState_Waiting && isDefenceForce == false) {
 		Vec2i resultPos;
-		NewRallyPoint(goalPos, &resultPos);
+		//Wyrmgus start
+//		NewRallyPoint(goalPos, &resultPos);
+		NewRallyPoint(goalPos, &resultPos, z);
+		//Wyrmgus end
 		this->GoalPos = resultPos;
+		//Wyrmgus start
+		this->GoalMapLayer = z;
+		//Wyrmgus end
 		this->State = AiForceAttackingState_GoingToRallyPoint;
 	} else {
 		this->GoalPos = goalPos;
+		//Wyrmgus start
+		this->GoalMapLayer = z;
+		//Wyrmgus end
 		this->State = AiForceAttackingState_Attacking;
 	}
 	//  Send all units in the force to enemy.
@@ -502,12 +529,18 @@ void AiForce::Attack(const Vec2i &pos)
 
 			unit->Wait = delay;
 			if (unit->IsAgressive()) {
-				CommandAttack(*unit, this->GoalPos,  NULL, FlushCommands);
+				//Wyrmgus start
+//				CommandAttack(*unit, this->GoalPos,  NULL, FlushCommands);
+				CommandAttack(*unit, this->GoalPos,  NULL, FlushCommands, this->GoalMapLayer);
+				//Wyrmgus end
 			} else {
 				if (leader) {
 					CommandDefend(*unit, *leader, FlushCommands);
 				} else {
-					CommandMove(*unit, this->GoalPos, FlushCommands);
+					//Wyrmgus start
+//					CommandMove(*unit, this->GoalPos, FlushCommands);
+					CommandMove(*unit, this->GoalPos, FlushCommands, this->GoalMapLayer);
+					//Wyrmgus end
 				}
 			}
 		}
@@ -516,16 +549,26 @@ void AiForce::Attack(const Vec2i &pos)
 
 void AiForce::ReturnToHome()
 {
-	if (Map.Info.IsPointOnMap(this->HomePos)) {
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(this->HomePos)) {
+	if (Map.Info.IsPointOnMap(this->HomePos, this->HomeMapLayer)) {
+	//Wyrmgus end
 		for (size_t i = 0; i != this->Units.size(); ++i) {
 			CUnit &unit = *this->Units[i];
-			CommandMove(unit, this->HomePos, FlushCommands);
+			//Wyrmgus start
+//			CommandMove(unit, this->HomePos, FlushCommands);
+			CommandMove(unit, this->HomePos, FlushCommands, this->HomeMapLayer);
+			//Wyrmgus end
 		}
 	}
 	const Vec2i invalidPos(-1, -1);
 
 	this->HomePos = invalidPos;
 	this->GoalPos = invalidPos;
+	//Wyrmgus start
+	this->HomeMapLayer = 0;
+	this->GoalMapLayer = 0;
+	//Wyrmgus end
 	this->Defending = false;
 	this->Attacking = false;
 	//Wyrmgus start
@@ -726,7 +769,10 @@ void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
 		return ;
 	}
 
-	if (!Map.Info.IsPointOnMap(pos)) {
+	//Wyrmgus start
+//	if (!Map.Info.IsPointOnMap(pos)) {
+	if (!Map.Info.IsPointOnMap(pos, z)) {
+	//Wyrmgus end
 		DebugPrint("(%d, %d) not in the map(%d, %d)" _C_ pos.x _C_ pos.y
 				   //Wyrmgus start
 //				   _C_ Map.Info.MapWidth _C_ Map.Info.MapHeight);
@@ -734,7 +780,10 @@ void AiAttackWithForceAt(unsigned int force, int x, int y, int z)
 				   //Wyrmgus end
 		return ;
 	}
-	AiPlayer->Force[force].Attack(pos);
+	//Wyrmgus start
+//	AiPlayer->Force[force].Attack(pos);
+	AiPlayer->Force[force].Attack(pos, z);
+	//Wyrmgus end
 }
 
 /**
@@ -777,7 +826,15 @@ void AiAttackWithForce(unsigned int force)
 	}
 
 	const Vec2i invalidPos(-1, -1);
-	AiPlayer->Force[force].Attack(invalidPos);
+	//Wyrmgus start
+	int z = AiPlayer->Player->StartMapLayer;
+	if (AiPlayer->Force[force].Units.size() > 0) {
+		z = AiPlayer->Force[force].Units[0]->MapLayer;
+	}
+	
+//	AiPlayer->Force[force].Attack(invalidPos);
+	AiPlayer->Force[force].Attack(invalidPos, z);
+	//Wyrmgus end
 }
 
 /**
@@ -817,12 +874,28 @@ void AiAttackWithForces(int *forces)
 			}
 			AiPlayer->Force[force].Reset();
 		} else {
-			AiPlayer->Force[force].Attack(invalidPos);
+			//Wyrmgus start
+			int z = AiPlayer->Player->StartMapLayer;
+			if (AiPlayer->Force[force].Units.size() > 0) {
+				z = AiPlayer->Force[force].Units[0]->MapLayer;
+			}
+			
+//			AiPlayer->Force[force].Attack(invalidPos);
+			AiPlayer->Force[force].Attack(invalidPos, z);
+			//Wyrmgus end
 		}
 	}
 	if (found) {
 		AiPlayer->Force[f].Completed = true;
-		AiPlayer->Force[f].Attack(invalidPos);
+		//Wyrmgus start
+		int z = AiPlayer->Player->StartMapLayer;
+		if (AiPlayer->Force[f].Units.size() > 0) {
+			z = AiPlayer->Force[f].Units[0]->MapLayer;
+		}
+			
+//		AiPlayer->Force[f].Attack(invalidPos);
+		AiPlayer->Force[f].Attack(invalidPos, z);
+		//Wyrmgus end
 	} else {
 		AiPlayer->Force[f].Reset(true);
 	}
@@ -924,9 +997,20 @@ void AiForce::Update()
 	//Wyrmgus end
 	//Wyrmgus start
 	//if force still has no goal, run its Attack function again to get a target
-	if (Map.Info.IsPointOnMap(GoalPos) == false) {
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(GoalPos) == false) {
+	if (Map.Info.IsPointOnMap(GoalPos, GoalMapLayer) == false) {
+	//Wyrmgus end
 		const Vec2i invalidPos(-1, -1);
-		Attack(invalidPos);
+		//Wyrmgus start
+		int z = AiPlayer->Player->StartMapLayer;
+		if (Units.size() > 0) {
+			z = Units[0]->MapLayer;
+		}
+			
+//		Attack(invalidPos);
+		Attack(invalidPos, z);
+		//Wyrmgus end
 		return;
 	}
 	//Wyrmgus end
@@ -994,7 +1078,10 @@ void AiForce::Update()
 				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 				
 				trans.Wait = delay;
-				CommandUnload(trans, this->GoalPos, NULL, FlushCommands);
+				//Wyrmgus start
+//				CommandUnload(trans, this->GoalPos, NULL, FlushCommands);
+				CommandUnload(trans, this->GoalPos, NULL, FlushCommands, this->GoalMapLayer);
+				//Wyrmgus end
 			}
 		}
 		return;
@@ -1013,7 +1100,10 @@ void AiForce::Update()
 //	const int thresholdDist = 5; // Hard coded value
 	const int thresholdDist = std::max(5, (int) Units.size() / 8);
 	//Wyrmgus end
-	Assert(Map.Info.IsPointOnMap(GoalPos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(GoalPos));
+	Assert(Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
+	//Wyrmgus end
 	if (State == AiForceAttackingState_GoingToRallyPoint) {
 		// Check if we are near the goalpos
 		int minDist = Units[0]->MapDistanceTo(this->GoalPos);
@@ -1046,6 +1136,9 @@ void AiForce::Update()
 					*/
 					GoalPos.x = -1;
 					GoalPos.y = -1;
+					//Wyrmgus start
+					GoalMapLayer = 0;
+					//Wyrmgus end
 					for (size_t i = 0; i != this->Units.size(); ++i) {
 						if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), this->Units[i]) == AiPlayer->Scouts.end()) {
 							AiPlayer->Scouts.push_back(this->Units[i]);
@@ -1057,6 +1150,9 @@ void AiForce::Update()
 				}
 			}
 			this->GoalPos = unit->tilePos;
+			//Wyrmgus start
+			this->GoalMapLayer = unit->MapLayer;
+			//Wyrmgus end
 			
 			State = AiForceAttackingState_Attacking;
 			for (size_t i = 0; i != this->Size(); ++i) {
@@ -1065,12 +1161,18 @@ void AiForce::Update()
 
 				aiunit.Wait = delay;
 				if (aiunit.IsAgressive()) {
-					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+					//Wyrmgus start
+//					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands, this->GoalMapLayer);
+					//Wyrmgus end
 				} else {
 					if (leader) {
 						CommandDefend(aiunit, *leader, FlushCommands);
 					} else {
-						CommandMove(aiunit, this->GoalPos, FlushCommands);
+						//Wyrmgus start
+//						CommandMove(aiunit, this->GoalPos, FlushCommands);
+						CommandMove(aiunit, this->GoalPos, FlushCommands, this->GoalMapLayer);
+						//Wyrmgus end
 					}
 				}
 			}
@@ -1121,6 +1223,9 @@ void AiForce::Update()
 			*/
 			GoalPos.x = -1;
 			GoalPos.y = -1;
+			//Wyrmgus start
+			GoalMapLayer = 0;
+			//Wyrmgus end
 			for (size_t i = 0; i != this->Units.size(); ++i) {
 				if (std::find(AiPlayer->Scouts.begin(), AiPlayer->Scouts.end(), this->Units[i]) == AiPlayer->Scouts.end()) {
 					AiPlayer->Scouts.push_back(this->Units[i]);
@@ -1131,8 +1236,14 @@ void AiForce::Update()
 			return;
 		} else {
 			Vec2i resultPos;
-			NewRallyPoint(unit->tilePos, &resultPos);
+			//Wyrmgus start
+//			NewRallyPoint(unit->tilePos, &resultPos);
+			NewRallyPoint(unit->tilePos, &resultPos, unit->MapLayer);
+			//Wyrmgus end
 			this->GoalPos = resultPos;
+			//Wyrmgus start
+			this->GoalMapLayer = unit->MapLayer;
+			//Wyrmgus end
 			this->State = AiForceAttackingState_GoingToRallyPoint;
 		}
 	}
@@ -1149,16 +1260,25 @@ void AiForce::Update()
 					CommandAttack(aiunit, leader->tilePos, NULL, FlushCommands, leader->MapLayer);
 					//Wyrmgus end
 				} else {
-					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+					//Wyrmgus start
+//					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands, this->GoalMapLayer);
+					//Wyrmgus end
 				}
 			} else {
 				CommandDefend(aiunit, *leader, FlushCommands);
 			}
 		} else {
 			if (aiunit.IsAgressive()) {
-				CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+				//Wyrmgus start
+//				CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
+				CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands, this->GoalMapLayer);
+				//Wyrmgus end
 			} else {
-				CommandMove(aiunit, this->GoalPos, FlushCommands);
+				//Wyrmgus start
+//				CommandMove(aiunit, this->GoalPos, FlushCommands);
+				CommandMove(aiunit, this->GoalPos, FlushCommands, this->GoalMapLayer);
+				//Wyrmgus end
 			}
 		}
 	}
@@ -1184,7 +1304,10 @@ void AiForceManager::Update()
 			}
 			const int nearDist = 5;
 
-			if (Map.Info.IsPointOnMap(force.GoalPos) == false) {
+			//Wyrmgus start
+//			if (Map.Info.IsPointOnMap(force.GoalPos) == false) {
+			if (Map.Info.IsPointOnMap(force.GoalPos, force.GoalMapLayer) == false) {
+			//Wyrmgus end
 				force.ReturnToHome();
 			} else {
 				//  Check if some unit from force reached goal point
@@ -1225,9 +1348,15 @@ void AiForceManager::Update()
 //							if (unit->Type->CanAttack) {
 							if (unit->CanAttack() && unit->IsAgressive()) {
 							//Wyrmgus end
-								CommandAttack(*unit, force.GoalPos, NULL, FlushCommands);
+								//Wyrmgus start
+//								CommandAttack(*unit, force.GoalPos, NULL, FlushCommands);
+								CommandAttack(*unit, force.GoalPos, NULL, FlushCommands, force.GoalMapLayer);
+								//Wyrmgus end
 							} else {
-								CommandMove(*unit, force.GoalPos, FlushCommands);
+								//Wyrmgus start
+//								CommandMove(*unit, force.GoalPos, FlushCommands);
+								CommandMove(*unit, force.GoalPos, FlushCommands, force.GoalMapLayer);
+								//Wyrmgus end
 							}
 						}
 					}

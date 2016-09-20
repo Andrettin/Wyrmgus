@@ -418,7 +418,10 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 //		if (dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) {
 		if ((dest->Type->CanMove() == false && !dest->Type->BoolFlag[TELEPORTER_INDEX].value) || dest->Type->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
-			SendCommandMove(unit, pos, flush);
+			//Wyrmgus start
+//			SendCommandMove(unit, pos, flush);
+			SendCommandMove(unit, pos, flush, CurrentMapLayer);
+			//Wyrmgus end
 		} else {
 			SendCommandFollow(unit, *dest, flush);
 		}
@@ -445,7 +448,10 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		PlayUnitSound(unit, VoiceAcknowledging);
 		acknowledged = 1;
 	}
-	SendCommandMove(unit, pos, flush);
+	//Wyrmgus start
+//	SendCommandMove(unit, pos, flush);
+	SendCommandMove(unit, pos, flush, CurrentMapLayer);
+	//Wyrmgus end
 	return true;
 }
 
@@ -501,7 +507,10 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 //		if (!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
 		if ((!dest.Type->CanMove() && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
-			SendCommandMove(unit, pos, flush);
+			//Wyrmgus start
+//			SendCommandMove(unit, pos, flush);
+			SendCommandMove(unit, pos, flush, CurrentMapLayer);
+			//Wyrmgus end
 		} else {
 			SendCommandFollow(unit, dest, flush);
 		}
@@ -540,7 +549,10 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	// empty space
 	if ((KeyModifiers & ModifierControl)) {
 		if (RightButtonAttacks) {
-			SendCommandMove(unit, pos, flush);
+			//Wyrmgus start
+//			SendCommandMove(unit, pos, flush);
+			SendCommandMove(unit, pos, flush, CurrentMapLayer);
+			//Wyrmgus end
 			if (!acknowledged) {
 				PlayUnitSound(unit, VoiceAcknowledging);
 				acknowledged = 1;
@@ -565,7 +577,10 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAcknowledging);
 				acknowledged = 1;
 			}
-			SendCommandMove(unit, pos, flush);
+			//Wyrmgus start
+//			SendCommandMove(unit, pos, flush);
+			SendCommandMove(unit, pos, flush, CurrentMapLayer);
+			//Wyrmgus end
 		}
 	}
 	// FIXME: ALT-RIGHT-CLICK, move but fight back if attacked.
@@ -595,7 +610,10 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 //		if (dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) {
 		if ((dest.Type->CanMove() == false && !dest.Type->BoolFlag[TELEPORTER_INDEX].value) || dest.Type->BoolFlag[BRIDGE_INDEX].value) {
 		//Wyrmgus end
-			SendCommandMove(unit, dest.tilePos, flush);
+			//Wyrmgus start
+//			SendCommandMove(unit, dest.tilePos, flush);
+			SendCommandMove(unit, dest.tilePos, flush, CurrentMapLayer);
+			//Wyrmgus end
 		} else {
 			SendCommandFollow(unit, dest, flush);
 		}
@@ -682,7 +700,7 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 
 	//Wyrmgus start
 	if (action == MouseActionRallyPoint) {
-		SendCommandRallyPoint(unit, pos);
+		SendCommandRallyPoint(unit, pos, CurrentMapLayer);
 		return;
 	}
 	//Wyrmgus end
@@ -727,7 +745,10 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		SendCommandMove(unit, pos, flush);
+		//Wyrmgus start
+//		SendCommandMove(unit, pos, flush);
+		SendCommandMove(unit, pos, flush, CurrentMapLayer);
+		//Wyrmgus end
 		SendCommandStandGround(unit, 0);
 		return;
 	}
@@ -773,7 +794,10 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		PlayUnitSound(unit, VoiceAcknowledging);
 		acknowledged = 1;
 	}
-	SendCommandMove(unit, pos, flush);
+	//Wyrmgus start
+//	SendCommandMove(unit, pos, flush);
+	SendCommandMove(unit, pos, flush, CurrentMapLayer);
+	//Wyrmgus end
 }
 
 /**
@@ -1460,7 +1484,10 @@ static int SendMove(const Vec2i &tilePos)
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit *unit = Selected[i];
 
-			SendCommandMove(*unit, tilePos, flush);
+			//Wyrmgus start
+//			SendCommandMove(*unit, tilePos, flush);
+			SendCommandMove(*unit, tilePos, flush, CurrentMapLayer);
+			//Wyrmgus end
 			SendCommandStandGround(*unit, 0);
 			ret = 1;
 		}
@@ -1492,7 +1519,10 @@ static int SendMove(const Vec2i &tilePos)
 				SendCommandBoard(*unit, *goal, flush);
 				ret = 1;
 			} else {
-				SendCommandMove(*unit, tilePos, flush);
+				//Wyrmgus start
+//				SendCommandMove(*unit, tilePos, flush);
+				SendCommandMove(*unit, tilePos, flush, CurrentMapLayer);
+				//Wyrmgus end
 				ret = 1;
 			}
 		}
@@ -1540,7 +1570,10 @@ static int SendAttack(const Vec2i &tilePos)
 			}
 		} else {
 			if (unit.CanMove()) {
-				SendCommandMove(unit, tilePos, flush);
+				//Wyrmgus start
+//				SendCommandMove(unit, tilePos, flush);
+				SendCommandMove(unit, tilePos, flush, CurrentMapLayer);
+				//Wyrmgus end
 				ret = 1;
 			}
 		}
@@ -1567,7 +1600,10 @@ static int SendAttackGround(const Vec2i &tilePos)
 			SendCommandAttackGround(unit, tilePos, flush);
 			ret = 1;
 		} else {
-			SendCommandMove(unit, tilePos, flush);
+			//Wyrmgus start
+//			SendCommandMove(unit, tilePos, flush);
+			SendCommandMove(unit, tilePos, flush, CurrentMapLayer);
+			//Wyrmgus end
 			ret = 1;
 		}
 	}
@@ -1658,7 +1694,10 @@ static int SendResource(const Vec2i &pos)
 				ret = 1;
 				continue;
 			}
-			SendCommandMove(unit, pos, flush);
+			//Wyrmgus start
+//			SendCommandMove(unit, pos, flush);
+			SendCommandMove(unit, pos, flush, CurrentMapLayer);
+			//Wyrmgus end
 			ret = 1;
 			continue;
 		}
@@ -1677,7 +1716,10 @@ static int SendUnload(const Vec2i &tilePos)
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		// FIXME: not only transporter selected?
-		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush);
+		//Wyrmgus start
+//		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush);
+		SendCommandUnload(*Selected[i], tilePos, NoUnitP, flush, CurrentMapLayer);
+		//Wyrmgus end
 	}
 	return Selected.empty() ? 0 : 1;
 }
@@ -1745,7 +1787,7 @@ static int SendRallyPoint(const Vec2i &tilePos)
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit *unit = Selected[i];
 
-		SendCommandRallyPoint(*unit, tilePos);
+		SendCommandRallyPoint(*unit, tilePos, CurrentMapLayer);
 		ret = 1;
 	}
 	
@@ -2293,7 +2335,10 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 								Assert(uins->Boarded);
 								const int flush = !(KeyModifiers & ModifierShift);
 								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
-									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+									//Wyrmgus start
+//									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+									SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer);
+									//Wyrmgus end
 								}
 						}
 						++j;
@@ -2319,7 +2364,10 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
 									if ((1 << button) == LeftButton) {
 										if  (!uins->Bound) {
-											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+											//Wyrmgus start
+//											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
+											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer);
+											//Wyrmgus end
 										} else {
 											if (Selected[0]->Player == ThisPlayer) {
 												std::string item_name = uins->GetMessageName();

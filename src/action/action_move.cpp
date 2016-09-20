@@ -60,13 +60,22 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionMove(const Vec2i &pos)
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionMove(const Vec2i &pos)
+/* static */ COrder *COrder::NewActionMove(const Vec2i &pos, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 
 	COrder_Move *order = new COrder_Move;
 
 	order->goalPos = pos;
+	//Wyrmgus start
+	order->MapLayer = z;
+	//Wyrmgus end
 	return order;
 }
 
@@ -79,6 +88,9 @@
 	}
 	file.printf(" \"range\", %d,", this->Range);
 	file.printf(" \"tile\", {%d, %d}", this->goalPos.x, this->goalPos.y);
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 
 	file.printf("}");
 }
@@ -93,6 +105,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -130,7 +147,10 @@
 /* virtual */ void COrder_Move::UpdatePathFinderData(PathFinderInput &input)
 {
 	const Vec2i tileSize(0, 0);
-	input.SetGoal(this->goalPos, tileSize);
+	//Wyrmgus start
+//	input.SetGoal(this->goalPos, tileSize);
+	input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+	//Wyrmgus end
 
 	int distance = this->Range;
 	//Wyrmgus start
@@ -163,7 +183,7 @@
 int DoActionMove(CUnit &unit)
 {
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if (unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft, don't move if any unit over it is still moving
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
@@ -242,8 +262,12 @@ int DoActionMove(CUnit &unit)
 		}
 		
 		if (unit.Type->UnitType == UnitTypeNaval) { // Boat (un)docking?
-			const CMapField &mf_cur = *Map.Field(unit.Offset);
-			const CMapField &mf_next = *Map.Field(unit.tilePos + posd);
+			//Wyrmgus start
+//			const CMapField &mf_cur = *Map.Field(unit.Offset);
+//			const CMapField &mf_next = *Map.Field(unit.tilePos + posd);
+			const CMapField &mf_cur = *Map.Field(unit.Offset, unit.MapLayer);
+			const CMapField &mf_next = *Map.Field(unit.tilePos + posd, unit.MapLayer);
+			//Wyrmgus end
 
 			if (mf_cur.WaterOnMap() && mf_next.CoastOnMap()) {
 				PlayUnitSound(unit, VoiceDocking);
@@ -275,7 +299,10 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus end
 
 		// Remove unit from the current selection
-		if (unit.Selected && !Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+		//Wyrmgus start
+//		if (unit.Selected && !Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+		if (unit.Selected && !Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+		//Wyrmgus end
 			if (IsOnlySelected(unit)) { //  Remove building cursor
 				CancelBuildingMode();
 			}
@@ -298,7 +325,7 @@ int DoActionMove(CUnit &unit)
 	unit.pathFinderData->output.Cycles++;// reset have to be manualy controlled by caller.
 	//Wyrmgus start
 //	int move = UnitShowAnimationScaled(unit, unit.Type->Animations->Move, Map.Field(unit.Offset)->getCost());
-	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, Map.Field(unit.Offset)->getCost());
+	int move = UnitShowAnimationScaled(unit, unit.GetAnimations()->Move, Map.Field(unit.Offset, unit.MapLayer)->getCost());
 	//Wyrmgus end
 
 	unit.IX += posd.x * move;
@@ -357,14 +384,14 @@ int DoActionMove(CUnit &unit)
 		case PF_REACHED:
 			//Wyrmgus start
 			if (this->Range >= 1) {
-				if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft
+				if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft
 					std::vector<CUnit *> table;
 					Select(unit.tilePos, unit.tilePos, table);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitActionStill) {
 								CommandStopUnit(*table[i]);
-								CommandMove(*table[i], this->goalPos, FlushCommands);
+								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 							}
 							return;
 						}
@@ -376,7 +403,7 @@ int DoActionMove(CUnit &unit)
 						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitActionStill) {
 								CommandStopUnit(*table[i]);
-								CommandMove(*table[i], this->goalPos, FlushCommands);
+								CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 							}
 							return;
 						}

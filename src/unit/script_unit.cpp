@@ -713,6 +713,8 @@ static int CclUnit(lua_State *l)
 			int rally_point_y = LuaToNumber(l, 2, j + 1);
 			unit->RallyPointPos.x = rally_point_x;
 			unit->RallyPointPos.y = rally_point_y;
+		} else if (!strcmp(value, "rally-point-map-layer")) {
+			unit->RallyPointMapLayer = LuaToNumber(l, 2, j + 1);
 		//Wyrmgus end
 		} else {
 			const int index = UnitTypeVar.VariableNameLookup[value];// User variables
@@ -1207,14 +1209,23 @@ static int CclOrderUnit(lua_State *l)
 			|| unittype == unit.Type) {
 			if (plynr == -1 || plynr == unit.Player->Index) {
 				if (!strcmp(order, "move")) {
-					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
+					//Wyrmgus start
+//					CommandMove(unit, (dpos1 + dpos2) / 2, 1);
+					CommandMove(unit, (dpos1 + dpos2) / 2, 1, unit.MapLayer);
+					//Wyrmgus end
 				} else if (!strcmp(order, "attack")) {
 					CUnit *attack = TargetOnMap(unit, dpos1, dpos2);
 
-					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
+					//Wyrmgus start
+//					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1);
+					CommandAttack(unit, (dpos1 + dpos2) / 2, attack, 1, unit.MapLayer);
+					//Wyrmgus end
 				//Wyrmgus start
 				} else if (!strcmp(order, "attack-ground")) {
-					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1);
+					//Wyrmgus start
+//					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1);
+					CommandAttackGround(unit, (dpos1 + dpos2) / 2, 1, unit.MapLayer);
+					//Wyrmgus end
 				//Wyrmgus end
 				} else if (!strcmp(order, "patrol")) {
 					CommandPatrolUnit(unit, (dpos1 + dpos2) / 2, 1);
@@ -1224,7 +1235,10 @@ static int CclOrderUnit(lua_State *l)
 
 					CommandBoard(unit, transporter, 1);
 				} else if (!strcmp(order, "unload")) {
-					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1);
+					//Wyrmgus start
+//					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1);
+					CommandUnload(unit, (dpos1 + dpos2) / 2, NULL, 1, unit.MapLayer);
+					//Wyrmgus end
 				} else if (!strcmp(order, "stop")) {					
 					CommandStopUnit(unit);
 				//Wyrmgus end

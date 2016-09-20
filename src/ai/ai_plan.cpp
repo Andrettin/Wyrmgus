@@ -733,7 +733,7 @@ void AiSendExplorers()
 				if (UnitCanBeAt(*AiPlayer->Scouts[i], target_pos, AiPlayer->Scouts[i]->MapLayer)) {
 				//Wyrmgus end
 					MarkUnitFieldFlags(*AiPlayer->Scouts[i]);
-					CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands);
+					CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands, AiPlayer->Scouts[i]->MapLayer);
 					continue;
 				}
 				MarkUnitFieldFlags(*AiPlayer->Scouts[i]);

@@ -294,16 +294,22 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 **  @param pos    map position to move to.
 **  @param flush  if true, flush command queue.
 */
-void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
+//Wyrmgus start
+//void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
+void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
-	CMapField &new_mf = *Map.Field(pos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
+	CMapField &new_mf = *Map.Field(pos, z);
 	//if the unit is a land unit over a raft, move the raft instead of the unit
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
@@ -313,7 +319,7 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 				CommandStopUnit(*table[i]); //always stop the raft if a new command is issued
 				if ((new_mf.Flags & MapFieldWaterAllowed) || (new_mf.Flags & MapFieldCoastAllowed) || (mf.Flags & MapFieldWaterAllowed)) { // if is standing on water, tell the raft to go to the nearest coast, even if the ultimate goal is on land
 					CommandStopUnit(unit);
-					CommandMove(*table[i], pos, flush);
+					CommandMove(*table[i], pos, flush, z);
 					return;
 				}
 			}
@@ -331,7 +337,10 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionMove(pos);
+	//Wyrmgus start
+//	*order = COrder::NewActionMove(pos);
+	*order = COrder::NewActionMove(pos, z);
+	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 
@@ -342,14 +351,15 @@ void CommandMove(CUnit &unit, const Vec2i &pos, int flush)
 **  @param unit   pointer to unit.
 **  @param pos    new rally point map position.
 */
-void CommandRallyPoint(CUnit &unit, const Vec2i &pos)
+void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
 	
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	unit.RallyPointPos = pos;
+	unit.RallyPointMapLayer = z;
 }
 
 /**
@@ -711,7 +721,10 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 **  @param what   unit to be unloaded, NULL for all.
 **  @param flush  if true, flush command queue.
 */
-void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
+//Wyrmgus start
+//void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
+void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z)
+//Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -721,7 +734,10 @@ void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
 	if (order == NULL) {
 		return;
 	}
-	*order = COrder::NewActionUnload(pos, what);
+	//Wyrmgus start
+//	*order = COrder::NewActionUnload(pos, what);
+	*order = COrder::NewActionUnload(pos, what, z);
+	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 

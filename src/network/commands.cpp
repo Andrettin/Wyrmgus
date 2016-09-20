@@ -128,11 +128,17 @@ void SendCommandFollow(CUnit &unit, CUnit &dest, int flush)
 ** @param pos     map tile position to move to.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
+//Wyrmgus start
+//void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("move", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandMove(unit, pos, flush);
+		//Wyrmgus start
+//		CommandMove(unit, pos, flush);
+		CommandMove(unit, pos, flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandMove, unit, pos.x, pos.y, NoUnitP, 0, flush);
 	}
@@ -145,11 +151,11 @@ void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush)
 ** @param unit    pointer to unit.
 ** @param pos     map tile position to move to.
 */
-void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos)
+void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z)
 {
 	if (!IsNetworkGame()) {
 		CommandLog("rally-point", &unit, 0, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandRallyPoint(unit, pos);
+		CommandRallyPoint(unit, pos, z);
 	} else {
 		NetworkSendCommand(MessageCommandMove, unit, pos.x, pos.y, NoUnitP, 0, 0);
 	}
@@ -319,11 +325,17 @@ void SendCommandBoard(CUnit &unit, CUnit &dest, int flush)
 ** @param what    Passagier to be unloaded.
 ** @param flush   Flag flush all pending commands.
 */
-void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
+//Wyrmgus start
+//void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush)
+void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("unload", &unit, flush, pos.x, pos.y, what, NULL, -1);
-		CommandUnload(unit, pos, what, flush);
+		//Wyrmgus start
+//		CommandUnload(unit, pos, what, flush);
+		CommandUnload(unit, pos, what, flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandUnload, unit, pos.x, pos.y, what, 0, flush);
 	}

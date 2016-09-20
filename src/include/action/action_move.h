@@ -36,7 +36,10 @@
 
 class COrder_Move : public COrder
 {
-	friend COrder *COrder::NewActionMove(const Vec2i &pos);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionMove(const Vec2i &pos);
+	friend COrder *COrder::NewActionMove(const Vec2i &pos, int z);
+	//Wyrmgus end
 public:
 	//Wyrmgus start
 //	COrder_Move() : COrder(UnitActionMove), Range(0)

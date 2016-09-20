@@ -454,6 +454,7 @@ void CUnit::Init()
 	RallyPointPos.x = -1;
 	RallyPointPos.y = -1;
 	MapLayer = 0;
+	RallyPointMapLayer = 0;
 	//Wyrmgus end
 	Offset = 0;
 	Type = NULL;
@@ -5466,7 +5467,10 @@ void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 	pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
 	Map.Clamp(pos);
 	CommandStopUnit(target);
-	CommandMove(target, pos, 0);
+	//Wyrmgus start
+//	CommandMove(target, pos, 0);
+	CommandMove(target, pos, 0, target.MapLayer);
+	//Wyrmgus end
 }
 
 static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)

@@ -186,7 +186,7 @@
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->goalPos, FlushCommands);
+							CommandMove(*table[i], this->goalPos, FlushCommands, this->MapLayer);
 						}
 						return;
 					}

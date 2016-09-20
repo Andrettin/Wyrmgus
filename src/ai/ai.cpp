@@ -798,8 +798,9 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				aiForce.Defending = true;
 			}
 			aiForce.Scouting = false;
+//			aiForce.Attack(pos);
+			aiForce.Attack(pos, attacker->MapLayer);
 			//Wyrmgus end
-			aiForce.Attack(pos);
 		}
 	}
 	
@@ -1036,7 +1037,10 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 				savedOrder = unit.CurrentOrder()->Clone();
 			}
 		}
-		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
+		//Wyrmgus start
+//		CommandMove(*movableunits[index], movablepos[index], FlushCommands);
+		CommandMove(*movableunits[index], movablepos[index], FlushCommands, movableunits[index]->MapLayer);
+		//Wyrmgus end
 		if (savedOrder != NULL) {
 			unit.SavedOrder = savedOrder;
 		}

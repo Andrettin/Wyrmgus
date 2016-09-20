@@ -252,8 +252,9 @@ static bool MoveRandomly(CUnit &unit)
 					}
 				}
 			}
+//			CommandMove(unit, pos, FlushCommands);
+			CommandMove(unit, pos, FlushCommands, unit.MapLayer);
 			//Wyrmgus end
-			CommandMove(unit, pos, FlushCommands);
 			return true;
 		}
 		MarkUnitFieldFlags(unit);
@@ -296,7 +297,7 @@ static bool Feed(CUnit &unit)
 					if (reach == 0 && !UnitCanBeAt(unit, table[i]->tilePos, table[i]->MapLayer)) {
 						continue;
 					}
-					CommandMove(unit, table[i]->tilePos, FlushCommands);
+					CommandMove(unit, table[i]->tilePos, FlushCommands, table[i]->MapLayer);
 				} else {
 					if (!table[i]->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value && !unit.Type->BoolFlag[DIMINUTIVE_INDEX].value) { //if food is non-indestructible, and isn't too tiny to consume the food, kill the food object
 						if (table[i]->IsAlive()) {
@@ -399,7 +400,7 @@ static bool SeekShelter(CUnit &unit)
 	
 	if (unit.Removed) { // if the unit is removed and should exit its shelter
 		if (unit.Container != NULL) {
-			CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands);
+			CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands, unit.Container->MapLayer);
 			return true;
 		}
 	}
@@ -449,7 +450,7 @@ static bool LeaveShelter(CUnit &unit)
 	}
 
 	if (table.size() > 0) {
-		CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands);
+		CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands, unit.Container->MapLayer);
 		return true;
 	}
 

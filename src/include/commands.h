@@ -74,10 +74,13 @@ extern void CommandDefend(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command follow
 extern void CommandFollow(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command move
-extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+//extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush);
+extern void CommandMove(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//Wyrmgus end
 //Wyrmgus start
 /// Prepare command rally point
-extern void CommandRallyPoint(CUnit &unit, const Vec2i &pos);
+extern void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
 /// Prepare command pick up
 extern void CommandPickUp(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command quest
@@ -106,7 +109,10 @@ extern void CommandPatrolUnit(CUnit &unit, const Vec2i &pos, int flush);
 /// Prepare command board
 extern void CommandBoard(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command unload
-extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
+//Wyrmgus start
+//extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
+extern void CommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0);
+//Wyrmgus end
 /// Prepare command build
 //Wyrmgus start
 //extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int flush);
@@ -166,10 +172,13 @@ extern void SendCommandDefend(CUnit &unit, CUnit &dest, int flush);
 /// Send follow command
 extern void SendCommandFollow(CUnit &unit, CUnit &dest, int flush);
 /// Send move command
-extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+//extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush);
+extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//Wyrmgus end
 //Wyrmgus start
 /// Send rally point command
-extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos);
+extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
 /// Send quest command
 extern void SendCommandQuest(CUnit &unit, CQuest *quest);
 /// Send pick up command
@@ -192,7 +201,10 @@ extern void SendCommandPatrol(CUnit &unit, const Vec2i &pos, int flush);
 /// Send board command
 extern void SendCommandBoard(CUnit &unit, CUnit &dest, int flush);
 /// Send unload command
-extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
+//Wyrmgus start
+//extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush);
+extern void SendCommandUnload(CUnit &unit, const Vec2i &pos, CUnit *what, int flush, int z = 0);
+//Wyrmgus end
 /// Send build building command
 //Wyrmgus start
 //extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int flush);

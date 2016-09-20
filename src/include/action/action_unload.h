@@ -36,7 +36,10 @@
 
 class COrder_Unload : public COrder
 {
-	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
+	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what, int z);
+	//WYrmgus end
 public:
 	//Wyrmgus start
 //	COrder_Unload() : COrder(UnitActionUnload), State(0), Range(0)

@@ -72,6 +72,9 @@ enum {
 
 	if (dest.Destroyed) {
 		order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
+		//Wyrmgus start
+		order->MapLayer = dest.MapLayer;
+		//Wyrmgus end
 	} else {
 		order->SetGoal(&dest);
 		order->Range = 1;
@@ -91,6 +94,9 @@ enum {
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 
 	file.printf(" \"state\", %d", this->State);
 
@@ -110,6 +116,11 @@ enum {
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -163,11 +174,17 @@ enum {
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
-		input.SetGoal(goal->tilePos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(goal->tilePos, tileSize);
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
+		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(this->goalPos, tileSize);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -215,14 +232,14 @@ enum {
 		case PF_UNREACHABLE:
 			//Wyrmgus start
 			//if is unreachable and is on a raft, see if the raft can move closer to the enemy
-			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
 							CommandStopUnit(*table[i]);
-							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands);
+							CommandMove(*table[i], this->HasGoal() ? this->GetGoal()->tilePos : this->goalPos, FlushCommands, this->HasGoal() ? this->GetGoal()->MapLayer : this->MapLayer);
 						}
 						return;
 					}
@@ -240,6 +257,9 @@ enum {
 
 			// Now defend the goal
 			this->goalPos = goal->tilePos;
+			//Wyrmgus start
+			this->MapLayer = goal->MapLayer;
+			//Wyrmgus end
 			this->State = State_Defending;
 		}
 		default:
@@ -250,6 +270,9 @@ enum {
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+		//Wyrmgus start
+		this->MapLayer = goal->MapLayer;
+		//Wyrmgus end
 		this->ClearGoal();
 		goal = NULL;
 		if (this->State == State_Defending) {

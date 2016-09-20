@@ -122,6 +122,8 @@ public:
 		Completed(false), Defending(false), Attacking(false),
 		//Wyrmgus start
 		Scouting(false),
+		HomeMapLayer(0),
+		GoalMapLayer(0),
 		//Wyrmgus end
 		Role(AiForceRoleDefault), FormerForce(-1), State(AiForceAttackingState_Free),
 		WaitOnRallyPoint(AI_WAIT_ON_RALLY_POINT)
@@ -155,12 +157,19 @@ public:
 		Units.for_each(InternalRemoveUnit);
 		Units.clear();
 		HomePos.x = HomePos.y = GoalPos.x = GoalPos.y = -1;
+		//Wyrmgus start
+		HomeMapLayer = 0;
+		GoalMapLayer = 0;
+		//Wyrmgus end
 	}
 	inline size_t Size() const { return Units.size(); }
 
 	inline bool IsAttacking() const { return (!Defending && Attacking); }
 
-	void Attack(const Vec2i &pos);
+	//Wyrmgus start
+//	void Attack(const Vec2i &pos);
+	void Attack(const Vec2i &pos, int z);
+	//Wyrmgus end
 	void RemoveDeadUnit();
 	//Wyrmgus start
 //	int PlanAttack();
@@ -170,7 +179,7 @@ public:
 	void ReturnToHome();
 	//Wyrmgus start
 //	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos);
-	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z = 0);
+	bool NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z);
 	//Wyrmgus end
 	void Insert(CUnit &unit);
 
@@ -199,6 +208,10 @@ public:
 	AiForceAttackingState State; /// Attack state
 	Vec2i GoalPos; /// Attack point tile map position
 	Vec2i HomePos; /// Return after attack tile map position
+	//Wyrmgus start
+	int GoalMapLayer;
+	int HomeMapLayer;
+	//Wyrmgus end
 	int WaitOnRallyPoint; /// Counter for waiting on rally point
 };
 

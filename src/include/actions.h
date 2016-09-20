@@ -148,7 +148,10 @@ public:
 	static COrder *NewActionDefend(CUnit &dest);
 	static COrder *NewActionDie();
 	static COrder *NewActionFollow(CUnit &dest);
-	static COrder *NewActionMove(const Vec2i &pos);
+	//Wyrmgus start
+//	static COrder *NewActionMove(const Vec2i &pos);
+	static COrder *NewActionMove(const Vec2i &pos, int z);
+	//Wyrmgus end
 	static COrder *NewActionPatrol(const Vec2i &currentPos, const Vec2i &dest);
 	//Wyrmgus start
 	static COrder *NewActionPickUp(CUnit &dest);
@@ -167,7 +170,10 @@ public:
 	static COrder *NewActionTrain(CUnit &trainer, CUnitType &type, int player);
 	//Wyrmgus end
 	static COrder *NewActionTransformInto(CUnitType &type);
-	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
+	//Wyrmgus start
+//	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what);
+	static COrder *NewActionUnload(const Vec2i &pos, CUnit *what, int z);
+	//Wyrmgus end
 	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 	//Wyrmgus start
 	static COrder *NewActionUse(CUnit &dest);

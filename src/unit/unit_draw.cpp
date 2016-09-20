@@ -843,7 +843,7 @@ void ShowOrder(const CUnit &unit)
 	
 	//Wyrmgus start
 	//if unit has rally point, show it
-	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1) {
+	if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && unit.RallyPointMapLayer == CurrentMapLayer) {
 		Video.FillCircleClip(ColorGreen, CurrentViewport->TilePosToScreen_Center(unit.RallyPointPos), 3);
 	}
 	//Wyrmgus end
