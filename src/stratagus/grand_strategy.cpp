@@ -8421,12 +8421,13 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 					DebugPrint("Unable to allocate unit");
 					return;
 				} else {
-					if (UnitCanBeAt(*unit, Players[player].StartPos)) {
-						unit->Place(Players[player].StartPos);
+					if (UnitCanBeAt(*unit, Players[player].StartPos, Players[player].StartMapLayer)) {
+						unit->Place(Players[player].StartPos, Players[player].StartMapLayer);
 					} else {
 						const int heading = SyncRand() % 256;
 
 						unit->tilePos = Players[player].StartPos;
+						unit->MapLayer = Players[player].StartMapLayer;
 						DropOutOnSide(*unit, heading, NULL);
 					}
 					UpdateForNewUnit(*unit, 0);

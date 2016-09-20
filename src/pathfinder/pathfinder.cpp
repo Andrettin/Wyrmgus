@@ -57,7 +57,7 @@ extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, in
 						 int tilesizex, int tilesizey, int minrange,
 						 //Wyrmgus start
 //						 int maxrange, char *path, int pathlen, const CUnit &unit);
-						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length);
+						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length, int start_z, int goal_z);
 						 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -195,14 +195,14 @@ void FreePathfinder()
 */
 //Wyrmgus start
 //int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range)
-int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, int max_length)
+int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, int max_length, int z)
 //Wyrmgus end
 {
 	int i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->TileWidth, src.Type->TileHeight,
 						  //Wyrmgus start
 //						  minrange, range, NULL, 0, src);
-						  minrange, range, NULL, 0, src, max_length);
+						  minrange, range, NULL, 0, src, max_length, src.MapLayer, z);
 						  //Wyrmgus end
 
 	switch (i) {
@@ -243,7 +243,10 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 		return 0;
 	}
 	const int depth = PlaceReachable(src, dst.tilePos,
-									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
+									 //Wyrmgus start
+//									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range);
+									 dst.Type->TileWidth, dst.Type->TileHeight, 0, range, 0, dst.MapLayer);
+									 //Wyrmgus end
 	if (depth <= 0) {
 		return 0;
 	}
@@ -254,7 +257,10 @@ int UnitReachable(const CUnit &src, const CUnit &dst, int range)
 --  REAL PATH-FINDER
 ----------------------------------------------------------------------------*/
 
-PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0),
+//Wyrmgus start
+//PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0),
+PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0), MapLayer(0),
+//Wyrmgus end
 	isRecalculatePathNeeded(true)
 {
 	unitSize.x = 0;
@@ -266,6 +272,9 @@ PathFinderInput::PathFinderInput() : unit(NULL), minRange(0), maxRange(0),
 }
 
 const Vec2i &PathFinderInput::GetUnitPos() const { return unit->tilePos; }
+//Wyrmgus start
+const int PathFinderInput::GetUnitMapLayer() const { return unit->MapLayer; }
+//Wyrmgus end
 Vec2i PathFinderInput::GetUnitSize() const
 {
 	const Vec2i tileSize(unit->Type->TileWidth, unit->Type->TileHeight);
@@ -279,25 +288,46 @@ void PathFinderInput::SetUnit(CUnit &_unit)
 	isRecalculatePathNeeded = true;
 }
 
-
-void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size)
+//Wyrmgus start
+//void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size)
+void PathFinderInput::SetGoal(const Vec2i &pos, const Vec2i &size, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 	Assert(unit);
 	Assert(unit->IsAliveOnMap());
 	Vec2i newPos = pos;
 	// Large units may have a goal that goes outside the map, fix it here
+	//Wyrmgus start
+	/*
 	if (newPos.x + unit->Type->TileWidth - 1 >= Map.Info.MapWidth) {
 		newPos.x = Map.Info.MapWidth - unit->Type->TileWidth;
 	}
 	if (newPos.y + unit->Type->TileHeight - 1 >= Map.Info.MapHeight) {
 		newPos.y = Map.Info.MapHeight - unit->Type->TileHeight;
 	}
-	if (goalPos != newPos || goalSize != size) {
+	*/
+	if (newPos.x + unit->Type->TileWidth - 1 >= Map.Info.MapWidths[z]) {
+		newPos.x = Map.Info.MapWidths[z] - unit->Type->TileWidth;
+	}
+	if (newPos.y + unit->Type->TileHeight - 1 >= Map.Info.MapHeights[z]) {
+		newPos.y = Map.Info.MapHeights[z] - unit->Type->TileHeight;
+	}
+	//Wyrmgus end
+	//Wyrmgus start
+//	if (goalPos != newPos || goalSize != size) {
+	if (goalPos != newPos || goalSize != size || MapLayer != z) {
+	//Wyrmgus end
 		isRecalculatePathNeeded = true;
 	}
 	goalPos = newPos;
 	goalSize = size;
+	//Wyrmgus start
+	MapLayer = z;
+	//Wyrmgus end
 }
 
 void PathFinderInput::SetMinRange(int range)
@@ -354,7 +384,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 						  path, PathFinderOutput::MAX_PATH_LENGTH,
 						  //Wyrmgus start
 //						  *input.GetUnit());
-						  *input.GetUnit(), 0);
+						  *input.GetUnit(), 0, input.GetUnitMapLayer(), input.GetGoalMapLayer());
 						  //Wyrmgus end
 	input.PathRacalculated();
 	if (i == PF_FAILED) {
@@ -411,7 +441,10 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 	const Vec2i dir(*pxd, *pyd);
 	int result = output.Length;
 	output.Length--;
-	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
+	//Wyrmgus start
+//	if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
+	if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer)) {
+	//Wyrmgus end
 		// If obstructing unit is moving, wait for a bit.
 		if (output.Fast) {
 			output.Fast--;
@@ -428,7 +461,10 @@ int NextPathElement(CUnit &unit, short int *pxd, short int *pyd)
 			if (result > 0) {
 				*pxd = Heading2X[(int)output.Path[(int)output.Length - 1]];
 				*pyd = Heading2Y[(int)output.Path[(int)output.Length - 1]];
-				if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
+				//Wyrmgus start
+//				if (!UnitCanBeAt(unit, unit.tilePos + dir)) {
+				if (!UnitCanBeAt(unit, unit.tilePos + dir, unit.MapLayer)) {
+				//Wyrmgus end
 					// There may be unit in the way, Astar may allow you to walk onto it.
 					result = PF_UNREACHABLE;
 					*pxd = 0;

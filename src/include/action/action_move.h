@@ -38,7 +38,10 @@ class COrder_Move : public COrder
 {
 	friend COrder *COrder::NewActionMove(const Vec2i &pos);
 public:
-	COrder_Move() : COrder(UnitActionMove), Range(0)
+	//Wyrmgus start
+//	COrder_Move() : COrder(UnitActionMove), Range(0)
+	COrder_Move() : COrder(UnitActionMove), Range(0), MapLayer(0)
+	//Wyrmgus end
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -58,6 +61,9 @@ public:
 private:
 	int Range;
 	Vec2i goalPos;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 
 //@}

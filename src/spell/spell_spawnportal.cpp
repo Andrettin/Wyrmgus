@@ -81,10 +81,16 @@
 
 	DebugPrint("Spawning a portal exit.\n");
 	if (portal && portal->IsAlive()) {
-		portal->MoveToXY(goalPos);
+		//Wyrmgus start
+//		portal->MoveToXY(goalPos);
+		portal->MoveToXY(goalPos, caster.MapLayer);
+		//Wyrmgus end
 	} else {
 		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
-								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
+								  //Wyrmgus start
+//								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
+								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral], caster.MapLayer);
+								  //Wyrmgus end
 		portal->Summoned = 1;
 	}
 	portal->TTL = GameCycle + this->TTL;

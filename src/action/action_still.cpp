@@ -207,12 +207,15 @@ static bool MoveRandomly(CUnit &unit)
 	// move if possible
 	if (pos != unit.tilePos) {
 		UnmarkUnitFieldFlags(unit);
-		if (UnitCanBeAt(unit, pos)) {
+		//Wyrmgus start
+//		if (UnitCanBeAt(unit, pos)) {
+		if (UnitCanBeAt(unit, pos, unit.MapLayer)) {
+		//Wyrmgus end
 			MarkUnitFieldFlags(unit);
 			//Wyrmgus start
 			//prefer terrains which this unit's species is native to; only go to other ones if is already in a non-native terrain type
-			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(unit.tilePos)) != unit.Type->Species->Terrains.end()) {
-				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(pos)) == unit.Type->Species->Terrains.end()) {
+			if (unit.Type->Species && std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(unit.tilePos, false, unit.MapLayer)) != unit.Type->Species->Terrains.end()) {
+				if (std::find(unit.Type->Species->Terrains.begin(), unit.Type->Species->Terrains.end(), Map.GetTileTopTerrain(pos, false, unit.MapLayer)) == unit.Type->Species->Terrains.end()) {
 					return false;
 				}
 			}
@@ -290,7 +293,7 @@ static bool Feed(CUnit &unit)
 					reach = 0;
 				}
 				if (reach < distance) {
-					if (reach == 0 && !UnitCanBeAt(unit, table[i]->tilePos)) {
+					if (reach == 0 && !UnitCanBeAt(unit, table[i]->tilePos, table[i]->MapLayer)) {
 						continue;
 					}
 					CommandMove(unit, table[i]->tilePos, FlushCommands);
@@ -354,7 +357,7 @@ static bool Excrete(CUnit &unit)
 	// restrict to map
 	Map.Clamp(pos);
 	
-	CUnit *newUnit = MakeUnitAndPlace(pos, *UnitTypeByIdent(unit.Type->Excrement), &Players[PlayerNumNeutral]);
+	CUnit *newUnit = MakeUnitAndPlace(pos, *UnitTypeByIdent(unit.Type->Excrement), &Players[PlayerNumNeutral], unit.MapLayer);
 	newUnit->Direction = unit.Direction;
 	UnitUpdateHeading(*newUnit);
 	return true;
@@ -654,12 +657,18 @@ bool AutoAttack(CUnit &unit)
 	COrder *savedOrder = NULL;
 
 	if (unit.CurrentAction() == UnitActionStill) {
-		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
+		//Wyrmgus start
+//		savedOrder = COrder::NewActionAttack(unit, unit.tilePos);
+		savedOrder = COrder::NewActionAttack(unit, unit.tilePos, unit.MapLayer);
+		//Wyrmgus end
 	} else if (unit.CanStoreOrder(unit.CurrentOrder())) {
 		savedOrder = unit.CurrentOrder()->Clone();
 	}
 	// Weak goal, can choose other unit, come back after attack
-	CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
+	//Wyrmgus start
+//	CommandAttack(unit, goal->tilePos, NULL, FlushCommands);
+	CommandAttack(unit, goal->tilePos, NULL, FlushCommands, goal->MapLayer);
+	//Wyrmgus end
 
 	if (savedOrder != NULL) {
 		unit.SavedOrder = savedOrder;

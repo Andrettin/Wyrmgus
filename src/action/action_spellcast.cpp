@@ -216,6 +216,23 @@
 	return invalidPos;
 }
 
+//Wyrmgus start
+/**
+**  Get goal map layer
+*/
+/* virtual */ const int COrder_SpellCast::GetGoalMapLayer() const
+{
+	const Vec2i invalidPos(-1, -1);
+	if (goalPos != invalidPos) {
+		return MapLayer;
+	}
+	if (this->HasGoal()) {
+		return this->GetGoal()->MapLayer;
+	}
+	return 0;
+}
+//Wyrmgus end
+
 /**
 **  Animate unit spell cast
 **

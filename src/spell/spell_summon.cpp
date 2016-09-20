@@ -132,6 +132,9 @@ public:
 		target = MakeUnit(unittype, caster.Player);
 		if (target != NULL) {
 			target->tilePos = pos;
+			//Wyrmgus start
+			target->MapLayer = caster.MapLayer;
+			//Wyrmgus end
 			DropOutOnSide(*target, LookingW, NULL);
 			// To avoid defending summoned unit for AI
 			target->Summoned = 1;

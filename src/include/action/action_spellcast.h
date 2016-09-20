@@ -38,7 +38,10 @@ class COrder_SpellCast : public COrder
 {
 	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast);
 public:
-	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0), isAutocast(autocast)
+	//Wyrmgus start
+//	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0), isAutocast(autocast)
+	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0), MapLayer(0), isAutocast(autocast)
+	//Wyrmgus end
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -58,6 +61,9 @@ public:
 	virtual void OnAnimationAttack(CUnit &unit);
 
 	virtual const Vec2i GetGoalPos() const;
+	//Wyrmgus start
+	virtual const int GetGoalMapLayer() const;
+	//Wyrmgus end
 	const SpellType &GetSpell() const { return *Spell; }
 	void SetSpell(const SpellType &spell) { Spell = &spell; }
 private:
@@ -68,6 +74,9 @@ private:
 	int State;
 	int Range;
 	Vec2i goalPos;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 	bool isAutocast;
 };
 

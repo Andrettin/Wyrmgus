@@ -771,8 +771,14 @@ static int CclMoveUnit(lua_State *l)
 	Vec2i ipos;
 	CclGetPos(l, &ipos.x, &ipos.y, 2);
 
-	if (UnitCanBeAt(*unit, ipos)) {
-		unit->Place(ipos);
+	//Wyrmgus start
+//	if (UnitCanBeAt(*unit, ipos)) {
+	if (UnitCanBeAt(*unit, ipos, unit->MapLayer)) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		unit->Place(ipos);
+		unit->Place(ipos, unit->MapLayer);
+		//Wyrmgus end
 	} else {
 		const int heading = SyncRand() % 256;
 
@@ -851,6 +857,9 @@ static int CclCreateUnit(lua_State *l)
 			const int heading = SyncRand() % 256;
 
 			unit->tilePos = ipos;
+			//Wyrmgus start
+			unit->MapLayer = 0;
+			//Wyrmgus end
 			DropOutOnSide(*unit, heading, NULL);
 		}
 		UpdateForNewUnit(*unit, 0);
@@ -918,13 +927,14 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(*unit, ipos)
+		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer)
 			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
-			unit->Place(ipos);
+			unit->Place(ipos, transporter->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
 
 			unit->tilePos = ipos;
+			unit->MapLayer = transporter->MapLayer;
 			DropOutOnSide(*unit, heading, NULL);
 		}
 
@@ -991,7 +1001,7 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 	Vec2i new_pos;
 	AiFindBuildingPlace(*worker, *unittype, ipos, &new_pos, true);
 	
-	if (!Map.Info.IsPointOnMap(new_pos)) {
+	if (!Map.Info.IsPointOnMap(new_pos, worker->MapLayer)) {
 		new_pos = Players[playerno].StartPos;
 	}
 	
@@ -1001,13 +1011,14 @@ static int CclCreateBuildingAtRandomLocationNear(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(*unit, new_pos)
+		if (UnitCanBeAt(*unit, new_pos, worker->MapLayer)
 			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, new_pos, 0, true))) {
-			unit->Place(new_pos);
+			unit->Place(new_pos, worker->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
 
 			unit->tilePos = new_pos;
+			unit->MapLayer = worker->MapLayer;
 			DropOutOnSide(*unit, heading, NULL);
 		}
 		UpdateForNewUnit(*unit, 0);

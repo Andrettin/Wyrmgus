@@ -887,7 +887,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			//Wyrmgus end
 				//Wyrmgus start
 //				Map.ClearWoodTile(this->goalPos);
-				Map.ClearOverlayTile(this->goalPos);
+				Map.ClearOverlayTile(this->goalPos, this->MapLayer);
 				//Wyrmgus end
 			}
 		} else {

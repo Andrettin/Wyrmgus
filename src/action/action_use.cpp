@@ -327,6 +327,7 @@ enum {
 					goal->Type->TeleportEffectIn->run();
 				}
 				unit.tilePos = goal->Goal->tilePos;
+				unit.MapLayer = goal->Goal->MapLayer;
 				DropOutOnSide(unit, unit.Direction, NULL);
 
 				// FIXME: we must check if the units supports the new order.

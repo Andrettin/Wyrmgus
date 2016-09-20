@@ -800,7 +800,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 						expansion_number = map_width * map_height / 64;
 					}
 					
-					Map.GenerateTerrain(map_template->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !map_template->Subtemplates[i]->TerrainFile.empty());
+					Map.GenerateTerrain(map_template->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !map_template->Subtemplates[i]->TerrainFile.empty(), z);
 				}
 				break;
 			}
@@ -830,7 +830,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 		
 		Vec2i unit_offset((std::get<0>(iterator->second)->TileWidth - 1) / 2, (std::get<0>(iterator->second)->TileHeight - 1) / 2);
-		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *std::get<0>(iterator->second));
+		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *std::get<0>(iterator->second), z);
 		
 		if (std::get<1>(iterator->second)) {
 			unit->SetResourcesHeld(std::get<1>(iterator->second));
@@ -848,7 +848,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		Vec2i unit_raw_pos(std::get<0>(map_template->Units[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
 		if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) { // if the unit's coordinates were set to {-1, -1}, then randomly generate its location
-			unit_pos = Map.GenerateUnitLocation(std::get<1>(map_template->Units[i]), std::get<2>(map_template->Units[i]), map_start_pos, map_end - Vec2i(1, 1));
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(map_template->Units[i]), std::get<2>(map_template->Units[i]), map_start_pos, map_end - Vec2i(1, 1), z);
 		}
 		if (!Map.Info.IsPointOnMap(unit_pos)) {
 			continue;
@@ -859,13 +859,13 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			if (std::get<2>(map_template->Units[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(map_template->Units[i]));
 				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
-					player->SetStartView(unit_pos);
+					player->SetStartView(unit_pos, z);
 				}
 			} else {
 				player = &Players[PlayerNumNeutral];
 			}
 			Vec2i unit_offset((std::get<1>(map_template->Units[i])->TileWidth - 1) / 2, (std::get<1>(map_template->Units[i])->TileHeight - 1) / 2);
-			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(map_template->Units[i]), player);
+			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(map_template->Units[i]), player, z);
 				
 			if (unit->Type->CanStore[GoldCost]) { //if can store gold (i.e. is a town hall), create five worker units around it
 				int civilization = PlayerRaces.GetRaceIndexByName(unit->Type->Civilization.c_str());
@@ -875,7 +875,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 				if (worker_type_id != -1) {
 					Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
 					for (int i = 0; i < 5; ++i) {
-						CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], player);
+						CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], player, z);
 					}
 				}
 			} else if (unit->Type->CanStore[WoodCost] || unit->Type->CanStore[StoneCost]) { //if can store lumber or stone (i.e. is a lumber mill), create two worker units around it
@@ -886,7 +886,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 				if (worker_type_id != -1) {
 					Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
 					for (int i = 0; i < 2; ++i) {
-						CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], player);
+						CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], player, z);
 					}
 				}
 			}
@@ -900,11 +900,11 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		if (Map.IsPointInASubtemplateArea(Players[i].StartPos)) {
 			continue;
 		}
-		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y) {
+		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y || Players[i].StartMapLayer != z) {
 			continue;
 		}
 		for (size_t j = 0; j < map_template->PlayerLocationGeneratedResources.size(); ++j) {
-			Map.GenerateResources(map_template->PlayerLocationGeneratedResources[j].first, map_template->PlayerLocationGeneratedResources[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true);
+			Map.GenerateResources(map_template->PlayerLocationGeneratedResources[j].first, map_template->PlayerLocationGeneratedResources[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
 		}
 		for (size_t j = 0; j < map_template->PlayerLocationGeneratedTerrains.size(); ++j) {
 			int map_width = 16;
@@ -936,7 +936,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			
 			seed_number = std::max(1, seed_number);
 			
-			Map.GenerateTerrain(map_template->PlayerLocationGeneratedTerrains[j].first, seed_number, expansion_number, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), !map_template->TerrainFile.empty());
+			Map.GenerateTerrain(map_template->PlayerLocationGeneratedTerrains[j].first, seed_number, expansion_number, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), !map_template->TerrainFile.empty(), z);
 		}
 	}
 	
@@ -970,11 +970,11 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		
 		seed_number = std::max(1, seed_number);
 		
-		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !map_template->TerrainFile.empty());
+		Map.GenerateTerrain(map_template->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !map_template->TerrainFile.empty(), z);
 	}
 	
 	for (size_t i = 0; i < map_template->GeneratedResources.size(); ++i) {
-		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, map_start_pos, map_end - Vec2i(1, 1));
+		Map.GenerateResources(map_template->GeneratedResources[i].first, map_template->GeneratedResources[i].second, map_start_pos, map_end - Vec2i(1, 1), false, z);
 	}
 	
 	if (!map_template->MainTemplate) {
@@ -1155,7 +1155,7 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
 	*/
-	lua_pushstring(l, Map.GetTileTopTerrain(pos)->Ident.c_str());
+	lua_pushstring(l, Map.GetTileTopTerrain(pos, false)->Ident.c_str());
 	//Wyrmgus end
 	return 1;
 }

@@ -272,6 +272,9 @@ enum {
 					goal->Type->TeleportEffectIn->run();
 				}
 				unit.tilePos = goal->Goal->tilePos;
+				//Wyrmgus start
+				unit.MapLayer = goal->Goal->MapLayer;
+				//Wyrmgus end
 				DropOutOnSide(unit, unit.Direction, NULL);
 
 				// FIXME: we must check if the units supports the new order.
@@ -345,7 +348,10 @@ enum {
 			}
 
 			this->Finished = true;
-			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
+			//Wyrmgus start
+//			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos));
+			unit.Orders.insert(unit.Orders.begin() + 1, COrder::NewActionAttack(unit, target->tilePos, target->MapLayer));
+			//Wyrmgus end
 
 			if (savedOrder != NULL) {
 				unit.SavedOrder = savedOrder;

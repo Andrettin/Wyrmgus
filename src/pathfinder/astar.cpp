@@ -954,10 +954,13 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 				  int tilesizex, int tilesizey, int minrange, int maxrange,
 				  //Wyrmgus start
 //				  char *path, int pathlen, const CUnit &unit)
-				  char *path, int pathlen, const CUnit &unit, int max_length)
+				  char *path, int pathlen, const CUnit &unit, int max_length, int start_z, int goal_z)
 				  //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(startPos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(startPos));
+	Assert(Map.Info.IsPointOnMap(startPos, start_z));
+	//Wyrmgus end
 
 	ProfileBegin("AStarFindPath");
 

@@ -252,7 +252,7 @@ int DoActionMove(CUnit &unit)
 			Select(unit.tilePos, unit.tilePos, table);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
-					table[i]->MoveToXY(pos);
+					table[i]->MoveToXY(pos, table[i]->MapLayer);
 					table[i]->IX = -posd.x * PixelTileSize.x;
 					table[i]->IY = -posd.y * PixelTileSize.y;
 					UnitHeadingFromDeltaXY(*table[i], posd);
@@ -260,7 +260,10 @@ int DoActionMove(CUnit &unit)
 			}
 		}
 		//Wyrmgus end
-		unit.MoveToXY(pos);
+		//Wyrmgus start
+//		unit.MoveToXY(pos);
+		unit.MoveToXY(pos, unit.MapLayer);
+		//Wyrmgus end
 		//Wyrmgus start
 		PlayUnitSound(unit, VoiceStep);			
 		//Wyrmgus end

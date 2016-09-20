@@ -163,7 +163,10 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 	--pos.x;
 	for (int range = 0; range < maxRange; ++range) {
 		for (int i = addy; i--; ++pos.y) {
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, transporter.MapLayer)) {
+			//Wyrmgus end
 				*res = pos;
 				return true;
 			}
@@ -171,7 +174,10 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		++addx;
 
 		for (int i = addx; i--; ++pos.x) {
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, transporter.MapLayer)) {
+			//Wyrmgus end
 				*res = pos;
 				return true;
 			}
@@ -179,7 +185,10 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		++addy;
 
 		for (int i = addy; i--; --pos.y) {
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, transporter.MapLayer)) {
+			//Wyrmgus end
 				*res = pos;
 				return true;
 			}
@@ -187,7 +196,10 @@ static bool FindUnloadPosition(const CUnit &transporter, const CUnit &unit, cons
 		++addx;
 
 		for (int i = addx; i--; --pos.x) {
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, transporter.MapLayer)) {
+			//Wyrmgus end
 				*res = pos;
 				return true;
 			}
@@ -245,7 +257,10 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		unit.Boarded = 0;
 		transporter.BoardCount -= unit.Type->BoardSize;
 	}
-	unit.Place(pos);
+	//Wyrmgus start
+//	unit.Place(pos);
+	unit.Place(pos, transporter.MapLayer);
+	//Wyrmgus end
 
 	if (unit.Type->BoolFlag[ITEM_INDEX].value && !unit.Unique) { //destroy items if they have been on the ground for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
@@ -275,7 +290,10 @@ static bool IsDropZonePossible(const CUnit &transporter, const Vec2i &pos)
 {
 	const int maxUnloadRange = 1;
 
-	if (!UnitCanBeAt(transporter, pos)) {
+	//Wyrmgus start
+//	if (!UnitCanBeAt(transporter, pos)) {
+	if (!UnitCanBeAt(transporter, pos, transporter.MapLayer)) {
+	//Wyrmgus end
 		return false;
 	}
 	Vec2i dummyPos;
@@ -368,7 +386,10 @@ static int ClosestFreeDropZone(CUnit &transporter, const Vec2i &startPos, int ma
 	}
 	const bool res = ClosestFreeDropZone_internal(transporter, startPos, maxRange, resPos);
 	if (!isTransporterRemoved) {
-		transporter.Place(transporter.tilePos);
+		//Wyrmgus start
+//		transporter.Place(transporter.tilePos);
+		transporter.Place(transporter.tilePos, transporter.MapLayer);
+		//Wyrmgus end
 		if (selected) {
 			SelectUnit(transporter);
 			SelectionChanged();

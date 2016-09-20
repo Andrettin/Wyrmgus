@@ -127,7 +127,10 @@ static bool AnimateActionDie(CUnit &unit)
 	unit.Type = &corpseType;
 	unit.Stats = &corpseType.Stats[unit.Player->Index];
 	UpdateUnitSightRange(unit);
-	unit.Place(unit.tilePos);
+	//Wyrmgus start
+//	unit.Place(unit.tilePos);
+	unit.Place(unit.tilePos, unit.MapLayer);
+	//Wyrmgus end
 
 	unit.Frame = 0;
 	UnitUpdateHeading(unit);

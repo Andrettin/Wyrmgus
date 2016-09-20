@@ -37,11 +37,18 @@
 class COrder_Attack : public COrder
 {
 	friend COrder *COrder::NewActionAttack(const CUnit &attacker, CUnit &target);
-	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+//	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	friend COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z);
+	friend COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
+	//Wyrmgus end
 public:
 	explicit COrder_Attack(bool ground) : COrder(ground ? UnitActionAttackGround : UnitActionAttack),
-		State(0), MinRange(0), Range(0), goalPos(-1, -1) {}
+		//Wyrmgus start
+//		State(0), MinRange(0), Range(0), goalPos(-1, -1) {}
+		State(0), MinRange(0), Range(0), goalPos(-1, -1), MapLayer(0) {}
+		//Wyrmgus end
 
 	virtual COrder_Attack *Clone() const { return new COrder_Attack(*this); }
 
@@ -56,6 +63,9 @@ public:
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 	virtual const Vec2i GetGoalPos() const { return goalPos; }
+	//Wyrmgus start
+	virtual const int GetGoalMapLayer() const { return MapLayer; }
+	//Wyrmgus end
 	bool IsWeakTargetSelected() const;
 
 private:
@@ -69,6 +79,9 @@ private:
 	int MinRange;
 	int Range;
 	Vec2i goalPos;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 //@}
 

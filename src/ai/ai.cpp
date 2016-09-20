@@ -747,8 +747,12 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 				}
 
 				if (shouldAttack) {
-					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
-					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
+					//Wyrmgus start
+//					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
+//					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
+					CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+					COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos, attacker->MapLayer);
+					//Wyrmgus end
 
 					if (aiunit.CanStoreOrder(savedOrder) == false) {
 						delete savedOrder;
@@ -826,8 +830,12 @@ void AiHelpMe(const CUnit *attacker, CUnit &defender)
 			}
 
 			if (shouldAttack) {
-				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
-				COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
+				//Wyrmgus start
+//				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands);
+//				COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos);
+				CommandAttack(aiunit, attacker->tilePos, const_cast<CUnit *>(attacker), FlushCommands, attacker->MapLayer);
+				COrder *savedOrder = COrder::NewActionAttack(aiunit, attacker->tilePos, attacker->MapLayer);
+				//Wyrmgus end
 
 				if (aiunit.CanStoreOrder(savedOrder) == false) {
 					delete savedOrder;

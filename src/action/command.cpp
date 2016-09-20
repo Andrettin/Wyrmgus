@@ -472,15 +472,21 @@ void CommandAutoRepair(CUnit &unit, int on)
 **  @param target  or unit to be attacked.
 **  @param flush   if true, flush command queue.
 */
-void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
+//Wyrmgus start
+//void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
+void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
-	CMapField &new_mf = *Map.Field(pos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
+	CMapField &new_mf = *Map.Field(pos, z);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
@@ -509,7 +515,10 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 	if (target && target->IsAlive()) {
 		*order = COrder::NewActionAttack(unit, *target);
 	} else {
-		*order = COrder::NewActionAttack(unit, pos);
+		//Wyrmgus start
+//		*order = COrder::NewActionAttack(unit, pos);
+		*order = COrder::NewActionAttack(unit, pos, z);
+		//Wyrmgus end
 	}
 	ClearSavedAction(unit);
 }
@@ -521,15 +530,21 @@ void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *target, int flush)
 **  @param pos    map position to fire on.
 **  @param flush  if true, flush command queue.
 */
-void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
+//Wyrmgus start
+//void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
+void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
@@ -554,7 +569,10 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionAttackGround(unit, pos);
+	//Wyrmgus start
+//	*order = COrder::NewActionAttackGround(unit, pos);
+	*order = COrder::NewActionAttackGround(unit, pos, z);
+	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 

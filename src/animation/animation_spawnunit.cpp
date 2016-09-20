@@ -59,12 +59,18 @@
 	Assert(type);
 	Vec2i resPos;
 	DebugPrint("Creating a %s\n" _C_ type->Name.c_str());
-	FindNearestDrop(*type, pos, resPos, LookingW);
+	//Wyrmgus start
+//	FindNearestDrop(*type, pos, resPos, LookingW);
+	FindNearestDrop(*type, pos, resPos, LookingW, unit.MapLayer);
+	//Wyrmgus end
 	if (SquareDistance(pos, resPos) <= square(range)) {
 		CUnit *target = MakeUnit(*type, &player);
 		if (target != NULL) {
 			target->tilePos = resPos;
-			target->Place(resPos);
+			//Wyrmgus start
+//			target->Place(resPos);
+			target->Place(resPos, unit.MapLayer);
+			//Wyrmgus end
 			if (flags & SU_Summoned) {
 				target->Summoned = 1;
 			}

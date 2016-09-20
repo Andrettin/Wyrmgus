@@ -42,7 +42,10 @@ class COrder_Resource : public COrder
 
 public:
 	COrder_Resource(CUnit &harvester) : COrder(UnitActionResource), worker(&harvester),
-		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0)
+		//Wyrmgus start
+//		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0)
+		CurrentResource(0), State(0), TimeToHarvest(0), DoneHarvesting(false), Range(0), MapLayer(0)
+		//Wyrmgus end
 	{
 		Resource.Pos.x = Resource.Pos.y = -1;
 		goalPos.x = goalPos.y = -1;
@@ -98,6 +101,9 @@ private:
 #if 1
 	// duplicate of Resource.Pos ?
 	Vec2i goalPos;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 #endif
 };
 

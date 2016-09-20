@@ -17,8 +17,14 @@ class CPlayer
 	string AiName;
 
 	Vec2i StartPos;
+	//Wyrmgus start
+	int StartMapLayer;
+	//Wyrmgus end
 
-	void SetStartView(const Vec2i &pos);
+	//Wyrmgus start
+//	void SetStartView(const Vec2i &pos);
+	void SetStartView(const Vec2i &pos, int z);
+	//Wyrmgus end
 
 	int Resources[MaxCosts];
 	int StoredResources[MaxCosts];

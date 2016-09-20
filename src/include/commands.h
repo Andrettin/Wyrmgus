@@ -88,9 +88,15 @@ extern void CommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush)
 /// Send auto repair command
 extern void CommandAutoRepair(CUnit &unit, int on);
 /// Prepare command attack
-extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+//Wyrmgus start
+//extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+extern void CommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z = 0);
+//Wyrmgus end
 /// Prepare command attack ground
-extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+//extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
+extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//Wyrmgus end
 //Wyrmgus start
 /// Prepare command use
 extern void CommandUse(CUnit &unit, CUnit &dest, int flush);

@@ -143,7 +143,10 @@
 					// Not in circle range
 					continue;
 				} else if (mf.RockOnMap() || mf.ForestOnMap() || mf.isAWall()) {
-					Map.ClearOverlayTile(ipos);
+					//Wyrmgus start
+//					Map.ClearOverlayTile(ipos);
+					Map.ClearOverlayTile(ipos, caster.MapLayer);
+					//Wyrmgus end
 				}
 			}
 		}

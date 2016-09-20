@@ -188,6 +188,10 @@ void CPlayer::Load(lua_State *l)
 			}
 		} else if (!strcmp(value, "start")) {
 			CclGetPos(l, &this->StartPos.x, &this->StartPos.y, j + 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "start-map-layer")) {
+			this->StartMapLayer = LuaToNumber(l, j + 1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

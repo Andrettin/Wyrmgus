@@ -38,7 +38,10 @@ class COrder_PickUp : public COrder
 {
 	friend COrder *COrder::NewActionPickUp(CUnit &dest);
 public:
-	COrder_PickUp() : COrder(UnitActionPickUp), State(0), Range(0)
+	//Wyrmgus start
+//	COrder_PickUp() : COrder(UnitActionPickUp), State(0), Range(0)
+	COrder_PickUp() : COrder(UnitActionPickUp), State(0), Range(0), MapLayer(0)
+	//Wyrmgus end
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -58,6 +61,9 @@ private:
 	unsigned int State;
 	int Range;
 	Vec2i goalPos;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 
 //@}

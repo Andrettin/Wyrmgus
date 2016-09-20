@@ -892,6 +892,9 @@ void CPlayer::Save(CFile &file) const
 		file.printf("%c", (p.SharedVision & (1 << j)) ? 'X' : '_');
 	}
 	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
+	//Wyrmgus start
+	file.printf("\",\n  \"start-map-layer\", %d,\n", p.StartMapLayer);
+	//Wyrmgus end
 
 	// Resources
 	file.printf("  \"resources\", {");
@@ -1598,6 +1601,9 @@ void CPlayer::Clear()
 	SharedVision = 0;
 	StartPos.x = 0;
 	StartPos.y = 0;
+	//Wyrmgus start
+	StartMapLayer = 0;
+	//Wyrmgus end
 	memset(Resources, 0, sizeof(Resources));
 	memset(StoredResources, 0, sizeof(StoredResources));
 	memset(MaxResources, 0, sizeof(MaxResources));
@@ -2465,7 +2471,7 @@ void PlayersEachMinute(int playerIdx)
 					break;
 				}
 				
-				Vec2i splitter_start_pos = Map.GenerateUnitLocation(depot->Type, splitter_faction, deposit->tilePos - Vec2i(depot->Type->TileWidth - 1, depot->Type->TileHeight - 1) - Vec2i(8, 8), deposit->tilePos + Vec2i(deposit->Type->TileWidth - 1, deposit->Type->TileHeight - 1) + Vec2i(8, 8));
+				Vec2i splitter_start_pos = Map.GenerateUnitLocation(depot->Type, splitter_faction, deposit->tilePos - Vec2i(depot->Type->TileWidth - 1, depot->Type->TileHeight - 1) - Vec2i(8, 8), deposit->tilePos + Vec2i(deposit->Type->TileWidth - 1, deposit->Type->TileHeight - 1) + Vec2i(8, 8), deposit->MapLayer);
 				if (!Map.Info.IsPointOnMap(splitter_start_pos)) {
 					break;
 				}
@@ -2497,10 +2503,10 @@ void PlayersEachMinute(int playerIdx)
 					break;
 				}				
 				
-				Players[new_player_id].SetStartView(splitter_start_pos);
-				CUnit *new_depot = CreateUnit(splitter_start_pos, *depot->Type, &Players[new_player_id]); // create town hall for the new tribe
+				Players[new_player_id].SetStartView(splitter_start_pos, deposit->MapLayer);
+				CUnit *new_depot = CreateUnit(splitter_start_pos, *depot->Type, &Players[new_player_id], deposit->MapLayer); // create town hall for the new tribe
 				for (int j = 0; j < 5; ++j) { // create five workers for the new tribe
-					CUnit *new_worker_unit = CreateUnit(splitter_start_pos, *worker_unit->Type, &Players[new_player_id]);
+					CUnit *new_worker_unit = CreateUnit(splitter_start_pos, *worker_unit->Type, &Players[new_player_id], deposit->MapLayer);
 				}
 				
 				//acquire all technologies of the parent player

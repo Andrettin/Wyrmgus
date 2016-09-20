@@ -285,7 +285,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	//now, check if the tiles adjacent to the placed ones need correction
 	//Wyrmgus start
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
-		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay);
+		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, CurrentMapLayer);
 		
 		bool has_transitions = terrain->Overlay ? (Map.Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (Map.Field(changed_tiles[i])->TransitionTiles.size() > 0);
 		bool solid_tile = true;
@@ -298,7 +298,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						if (Map.Info.IsPointOnMap(adjacent_pos)) {
 							CMapField &adjacent_mf = *Map.Field(adjacent_pos);
 									
-							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay);
+							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, CurrentMapLayer);
 							if (tile_terrain->Overlay && adjacent_terrain && Map.Field(adjacent_pos)->OverlayTerrainDestroyed) {
 								adjacent_terrain = NULL;
 							}
@@ -339,17 +339,17 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 					
 					if (Map.Info.IsPointOnMap(adjacent_pos)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
-							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay);
-							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay)) {
+							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);
+							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay, CurrentMapLayer)) {
 								continue;
 							}
 							bool has_transitions = overlay ? (Map.Field(adjacent_pos)->OverlayTransitionTiles.size() > 0) : (Map.Field(adjacent_pos)->TransitionTiles.size() > 0);
 							bool solid_tile = true;
 							
-							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false)) == adjacent_terrain->BorderTerrains.end()) {
+							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false, CurrentMapLayer)) == adjacent_terrain->BorderTerrains.end()) {
 								for (size_t j = 0; j != adjacent_terrain->BorderTerrains.size(); ++j) {
 									CTerrainType *border_terrain = adjacent_terrain->BorderTerrains[j];
-									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
+									if (std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), adjacent_terrain) != border_terrain->BorderTerrains.end() && std::find(border_terrain->BorderTerrains.begin(), border_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false, CurrentMapLayer)) != border_terrain->BorderTerrains.end()) { // found a terrain type that can border both terrains
 										Map.SetTileTerrain(adjacent_pos, border_terrain, CurrentMapLayer);
 										changed_tiles.push_back(adjacent_pos);
 										break;
@@ -361,7 +361,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (Map.Info.IsPointOnMap(sub_adjacent_pos)) {
-												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay);
+												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay, CurrentMapLayer);
 												if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = NULL;
 												}
@@ -378,7 +378,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 									if (overlay) {
 										Map.RemoveTileOverlayTerrain(adjacent_pos);
 									} else {
-										Map.SetTileTerrain(adjacent_pos, Map.GetTileTerrain(changed_tiles[i], false), CurrentMapLayer);
+										Map.SetTileTerrain(adjacent_pos, Map.GetTileTerrain(changed_tiles[i], false, CurrentMapLayer), CurrentMapLayer);
 									}
 									changed_tiles.push_back(adjacent_pos);
 								}
@@ -456,7 +456,10 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 	}
 
 	// FIXME: vladi: should check place when mirror editing is enabled...?
-	CUnit *unit = MakeUnitAndPlace(pos, type, player);
+	//Wyrmgus start
+//	CUnit *unit = MakeUnitAndPlace(pos, type, player);
+	CUnit *unit = MakeUnitAndPlace(pos, type, player, CurrentMapLayer);
+	//Wyrmgus end
 	if (unit == NULL) {
 		DebugPrint("Unable to allocate Unit");
 		return;
@@ -1342,7 +1345,10 @@ static void DrawStartLocations()
 		vp->SetClipping();
 
 		for (int i = 0; i < PlayerMax; i++) {
-			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
+			//Wyrmgus start
+//			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral) {
+			if (Map.Info.PlayerType[i] != PlayerNobody && Map.Info.PlayerType[i] != PlayerNeutral && Players[i].StartMapLayer == CurrentMapLayer) {
+			//Wyrmgus end
 				const PixelPos startScreenPos = vp->TilePosToScreen_TopLeft(Players[i].StartPos);
 
 				if (type) {
@@ -1794,6 +1800,9 @@ static void EditorCallbackButtonDown(unsigned button)
 				}
 			} else if (Editor.State == EditorSetStartLocation) {
 				Players[Editor.SelectedPlayer].StartPos = tilePos;
+				//Wyrmgus start
+				Players[Editor.SelectedPlayer].StartMapLayer = CurrentMapLayer;
+				//Wyrmgus end
 			}
 		} else if (MouseButtons & MiddleButton) {
 			// enter move map mode

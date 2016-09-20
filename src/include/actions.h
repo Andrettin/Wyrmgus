@@ -126,12 +126,19 @@ public:
 	void SetGoal(CUnit *const new_goal);
 	void ClearGoal();
 	virtual const Vec2i GetGoalPos() const;
+	//Wyrmgus start
+	virtual const int GetGoalMapLayer() const;
+	//Wyrmgus end
 
 	virtual bool OnAiHitUnit(CUnit &unit, CUnit *attacker, int /*damage*/);
 
 	static COrder *NewActionAttack(const CUnit &attacker, CUnit &target);
-	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest);
-	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	//Wyrmgus start
+//	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest);
+//	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest);
+	static COrder *NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z);
+	static COrder *NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z);
+	//Wyrmgus end
 	static COrder *NewActionBoard(CUnit &unit);
 	static COrder *NewActionBuild(const CUnit &builder, const Vec2i &pos, CUnitType &building);
 	static COrder *NewActionBuilt(CUnit &builder, CUnit &unit);

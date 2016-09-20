@@ -38,7 +38,10 @@ class COrder_Unload : public COrder
 {
 	friend COrder *COrder::NewActionUnload(const Vec2i &pos, CUnit *what);
 public:
-	COrder_Unload() : COrder(UnitActionUnload), State(0), Range(0)
+	//Wyrmgus start
+//	COrder_Unload() : COrder(UnitActionUnload), State(0), Range(0)
+	COrder_Unload() : COrder(UnitActionUnload), State(0), Range(0), MapLayer(0)
+	//Wyrmgus end
 	{
 		goalPos.x = -1;
 		goalPos.y = -1;
@@ -61,6 +64,9 @@ private:
 	int State;
 	int Range;
 	Vec2i goalPos;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 
 //@}

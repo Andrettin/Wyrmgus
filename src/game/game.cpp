@@ -189,6 +189,7 @@ void StartMap(const std::string &filename, bool clean)
 	//Wyrmgus end
 	
 	//Wyrmgus start
+	CurrentMapLayer = ThisPlayer->StartMapLayer;
 	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos));
 	//Wyrmgus end
 
@@ -357,7 +358,10 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 		}
 		// Add player start spots
 		for (int i = 0; i < PlayerMax - 1; ++i) {
-			if (Players[i].Type != PlayerNobody) {
+			//Wyrmgus start
+//			if (Players[i].Type != PlayerNobody) {
+			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == CurrentMapLayer) {
+			//Wyrmgus end
 				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
 					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
 						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth;
@@ -403,7 +407,10 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 
 		SDL_Rect rect;
 		for (int i = 0; i < PlayerMax - 1; ++i) {
-			if (Players[i].Type != PlayerNobody) {
+			//Wyrmgus start
+//			if (Players[i].Type != PlayerNobody) {
+			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == CurrentMapLayer) {
+			//Wyrmgus end
 				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
 				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight - rectSize / 2;
 				rect.w = rect.h = rectSize;
@@ -1865,6 +1872,9 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 		UI.SelectedViewport = UI.Viewports;
 	}
 #endif
+	//Wyrmgus start
+	CurrentMapLayer = ThisPlayer->StartMapLayer;
+	//Wyrmgus end
 	UI.SelectedViewport->Center(Map.TilePosToMapPixelPos_Center(ThisPlayer->StartPos));
 
 	//

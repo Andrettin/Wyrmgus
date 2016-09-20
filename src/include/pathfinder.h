@@ -70,15 +70,24 @@ public:
 	PathFinderInput();
 	CUnit *GetUnit() const { return unit; }
 	const Vec2i &GetUnitPos() const;
+	//Wyrmgus start
+	const int GetUnitMapLayer() const;
+	//Wyrmgus end
 	Vec2i GetUnitSize() const;
 	const Vec2i &GetGoalPos() const { return goalPos; }
+	//Wyrmgus start
+	const int GetGoalMapLayer() const { return MapLayer; }
+	//Wyrmgus end
 	const Vec2i &GetGoalSize() const { return goalSize; }
 	int GetMinRange() const { return minRange; }
 	int GetMaxRange() const { return maxRange; }
 	bool IsRecalculateNeeded() const { return isRecalculatePathNeeded; }
 
 	void SetUnit(CUnit &_unit);
-	void SetGoal(const Vec2i &pos, const Vec2i &size);
+	//Wyrmgus start
+//	void SetGoal(const Vec2i &pos, const Vec2i &size);
+	void SetGoal(const Vec2i &pos, const Vec2i &size, int z = 0);
+	//Wyrmgus end
 	void SetMinRange(int range);
 	void SetMaxRange(int range);
 
@@ -94,6 +103,9 @@ private:
 	Vec2i goalSize;
 	int minRange;
 	int maxRange;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 	bool isRecalculatePathNeeded;
 };
 
@@ -224,7 +236,7 @@ extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
 extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
 						  //Wyrmgus start
 //						  int minrange, int maxrange);
-						  int minrange, int maxrange, int max_length = 0);
+						  int minrange, int maxrange, int max_length = 0, int z = 0);
 						  //Wyrmgus end
 
 //

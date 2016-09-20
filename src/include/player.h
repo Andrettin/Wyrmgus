@@ -118,8 +118,14 @@ public:
 	int      Team;          /// team of player
 
 	Vec2i StartPos;  /// map tile start position
+	//Wyrmgus start
+	int StartMapLayer;  /// map tile start map layer
+	//Wyrmgus end
 
-	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
+	//Wyrmgus start
+//	inline void SetStartView(const Vec2i &pos) { StartPos = pos; }
+	inline void SetStartView(const Vec2i &pos, int z) { StartPos = pos; StartMapLayer = z; }
+	//Wyrmgus end
 
 	int Resources[MaxCosts];      /// resources in overall store
 	int MaxResources[MaxCosts];   /// max resources can be stored

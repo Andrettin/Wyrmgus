@@ -293,10 +293,10 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		//  Update Possible sight range change
 		UpdateUnitSightRange(unit);
 		if (!container) {
-			if (!UnitTypeCanBeAt(newtype, pos)) {
+			if (!UnitTypeCanBeAt(newtype, pos, unit.MapLayer)) {
 				DropOutNearest(unit, pos, NULL);
 			} else {
-				unit.Place(pos);
+				unit.Place(pos, unit.MapLayer);
 			}
 			RestoreSelection();
 		} else {

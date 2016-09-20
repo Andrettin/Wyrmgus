@@ -226,7 +226,10 @@ static void PlaceUnits()
 		CUnit &unit = **it;
 		if (!unit.Removed) {
 			unit.Removed = 1;
-			unit.Place(unit.tilePos);
+			//Wyrmgus start
+//			unit.Place(unit.tilePos);
+			unit.Place(unit.tilePos, unit.MapLayer);
+			//Wyrmgus end
 		}
 		
 		//Wyrmgus start

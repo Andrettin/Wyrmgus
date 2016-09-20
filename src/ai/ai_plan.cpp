@@ -728,7 +728,10 @@ void AiSendExplorers()
 			// move if possible
 			if (target_pos != AiPlayer->Scouts[i]->tilePos) {
 				UnmarkUnitFieldFlags(*AiPlayer->Scouts[i]);
-				if (UnitCanBeAt(*AiPlayer->Scouts[i], target_pos)) {
+				//Wyrmgus start
+//				if (UnitCanBeAt(*AiPlayer->Scouts[i], target_pos)) {
+				if (UnitCanBeAt(*AiPlayer->Scouts[i], target_pos, AiPlayer->Scouts[i]->MapLayer)) {
+				//Wyrmgus end
 					MarkUnitFieldFlags(*AiPlayer->Scouts[i]);
 					CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands);
 					continue;

@@ -1144,7 +1144,10 @@ void AiForce::Update()
 		if (leader) {
 			if (aiunit.IsAgressive()) {
 				if (State == AiForceAttackingState_Attacking) {
-					CommandAttack(aiunit, leader->tilePos, NULL, FlushCommands);
+					//Wyrmgus start
+//					CommandAttack(aiunit, leader->tilePos, NULL, FlushCommands);
+					CommandAttack(aiunit, leader->tilePos, NULL, FlushCommands, leader->MapLayer);
+					//Wyrmgus end
 				} else {
 					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
 				}

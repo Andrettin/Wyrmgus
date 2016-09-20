@@ -861,7 +861,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	//load items
 	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
-		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, &Players[PlayerNumNeutral]);
+		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, &Players[PlayerNumNeutral], this->MapLayer);
 		if (this->Character->Items[i]->Prefix != NULL) {
 			item->SetPrefix(this->Character->Items[i]->Prefix);
 		}
@@ -944,7 +944,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			bool terrain_check = false;
 			for (int x = 0; x < this->Type->TileWidth; ++x) {
 				for (int y = 0; y < this->Type->TileHeight; ++y) {
-					if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y)) && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y))) != varinfo->Terrains.end()) {
+					if (Map.Info.IsPointOnMap(this->tilePos + Vec2i(x, y), this->MapLayer) && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos + Vec2i(x, y), false, this->MapLayer)) != varinfo->Terrains.end()) {
 						terrain_check = true;
 						break;
 					}
@@ -1706,10 +1706,10 @@ void CUnit::GenerateDrop()
 	if (chosen_drop != NULL) {
 		if ((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
 			Vec2i resPos;
-			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW);
-			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, &Players[PlayerNumNeutral]);
+			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer);
+			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, &Players[PlayerNumNeutral], this->MapLayer);
 		} else {
-			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, &Players[PlayerNumNeutral]);
+			droppedUnit = MakeUnitAndPlace(drop_pos, *chosen_drop, &Players[PlayerNumNeutral], this->MapLayer);
 		}
 			
 		if (droppedUnit != NULL) {
@@ -2751,15 +2751,25 @@ void CUnit::XPChanged()
 **  and after Map.Insert(unit), MapMarkUnitSight(unit)
 **  are often necessary. Check Flag also for Pathfinder.
 */
-static void UnitInXY(CUnit &unit, const Vec2i &pos)
+//Wyrmgus start
+//static void UnitInXY(CUnit &unit, const Vec2i &pos)
+static void UnitInXY(CUnit &unit, const Vec2i &pos, int z)
+//Wyrmgus end
 {
 	CUnit *unit_inside = unit.UnitInside;
 
 	unit.tilePos = pos;
-	unit.Offset = Map.getIndex(pos);
+	//Wyrmgus start
+//	unit.Offset = Map.getIndex(pos);
+	unit.Offset = Map.getIndex(pos, z);
+	unit.MapLayer = z;
+	//Wyrmgus end
 
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
-		UnitInXY(*unit_inside, pos);
+		//Wyrmgus start
+//		UnitInXY(*unit_inside, pos);
+		UnitInXY(*unit_inside, pos, z);
+		//Wyrmgus end
 	}
 }
 
@@ -2770,15 +2780,24 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos)
 **  @param pos  map tile position.
 **
 */
-void CUnit::MoveToXY(const Vec2i &pos)
+//Wyrmgus start
+//void CUnit::MoveToXY(const Vec2i &pos)
+void CUnit::MoveToXY(const Vec2i &pos, int z)
+//Wyrmgus end
 {
 	MapUnmarkUnitSight(*this);
 	Map.Remove(*this);
 	UnmarkUnitFieldFlags(*this);
 
-	Assert(UnitCanBeAt(*this, pos));
+	//Wyrmgus start
+//	Assert(UnitCanBeAt(*this, pos));
+	Assert(UnitCanBeAt(*this, pos, z));
+	//Wyrmgus end
 	// Move the unit.
-	UnitInXY(*this, pos);
+	//Wyrmgus start
+//	UnitInXY(*this, pos);
+	UnitInXY(*this, pos, z);
+	//Wyrmgus end
 
 	Map.Insert(*this);
 	MarkUnitFieldFlags(*this);
@@ -2789,7 +2808,7 @@ void CUnit::MoveToXY(const Vec2i &pos)
 	//Wyrmgus start
 	// if there is a trap in the new tile, trigger it
 	if ((this->Type->UnitType != UnitTypeFly && this->Type->UnitType != UnitTypeFlyLow) || !this->Type->BoolFlag[ORGANIC_INDEX].value) {
-		const CUnitCache &cache = Map.Field(pos)->UnitCache;
+		const CUnitCache &cache = Map.Field(pos, z)->UnitCache;
 		for (size_t i = 0; i != cache.size(); ++i) {
 			CUnit &unit = *cache[i];
 			if (!&unit) {
@@ -2809,7 +2828,10 @@ void CUnit::MoveToXY(const Vec2i &pos)
 **
 **  @param pos  map tile position.
 */
-void CUnit::Place(const Vec2i &pos)
+//Wyrmgus start
+//void CUnit::Place(const Vec2i &pos)
+void CUnit::Place(const Vec2i &pos, int z)
+//Wyrmgus end
 {
 	Assert(Removed);
 
@@ -2821,7 +2843,10 @@ void CUnit::Place(const Vec2i &pos)
 		UpdateUnitSightRange(*this);
 	}
 	Removed = 0;
-	UnitInXY(*this, pos);
+	//Wyrmgus start
+//	UnitInXY(*this, pos);
+	UnitInXY(*this, pos, z);
+	//Wyrmgus end
 	// Pathfinding info.
 	MarkUnitFieldFlags(*this);
 	// Tha cache list.
@@ -2840,7 +2865,7 @@ void CUnit::Place(const Vec2i &pos)
 
 	//Wyrmgus start
 	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
-	if (varinfo && varinfo->Terrains.size() > 0 && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos)) == varinfo->Terrains.end()) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation (this isn't perfect though, since the unit may still be allowed to keep the old variation if it has a tile size greater than 1x1)
+	if (varinfo && varinfo->Terrains.size() > 0 && std::find(varinfo->Terrains.begin(), varinfo->Terrains.end(), Map.GetTileTopTerrain(this->tilePos, false, this->MapLayer)) == varinfo->Terrains.end()) { // if a unit that is on the tile has a terrain-dependent variation that is not compatible with the current variation, repick the unit's variation (this isn't perfect though, since the unit may still be allowed to keep the old variation if it has a tile size greater than 1x1)
 		this->ChooseVariation();
 	}
 	//Wyrmgus end
@@ -2855,12 +2880,18 @@ void CUnit::Place(const Vec2i &pos)
 **
 **  @return        Pointer to created unit.
 */
-CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player)
+//Wyrmgus start
+//CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player)
+CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z)
+//Wyrmgus end
 {
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != NULL) {
-		unit->Place(pos);
+		//Wyrmgus start
+//		unit->Place(pos);
+		unit->Place(pos, z);
+		//Wyrmgus end
 	}
 	return unit;
 }
@@ -2875,23 +2906,26 @@ CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player
 **
 **  @return        Pointer to created unit.
 */
-CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
+CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z)
 {
 	CUnit *unit = MakeUnit(type, player);
 
 	if (unit != NULL) {
 		Vec2i res_pos;
 		const int heading = SyncRand() % 256;
-		FindNearestDrop(type, pos, res_pos, heading);
-		unit->Place(res_pos);
+		//Wyrmgus start
+//		FindNearestDrop(type, pos, res_pos, heading);
+		FindNearestDrop(type, pos, res_pos, heading, z);
+		//Wyrmgus end
+		unit->Place(res_pos, z);
 		UpdateForNewUnit(*unit, 0);
 	}
 	return unit;
 }
 
-CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type)
+CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z)
 {
-	CUnit *unit = CreateUnit(pos, type, &Players[PlayerNumNeutral]);
+	CUnit *unit = CreateUnit(pos, type, &Players[PlayerNumNeutral], z);
 	unit->GenerateSpecialProperties();
 			
 	// create metal rocks near metal resources
@@ -2906,7 +2940,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type)
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileWidth - 1) / 2, (type.TileHeight - 1) / 2);
 		for (int i = 0; i < 9; ++i) {
-			CUnit *metal_rock_unit = CreateUnit(pos + metal_rock_offset, *metal_rock_type, &Players[PlayerNumNeutral]);
+			CUnit *metal_rock_unit = CreateUnit(pos + metal_rock_offset, *metal_rock_type, &Players[PlayerNumNeutral], z);
 		}
 	}
 			
@@ -2922,7 +2956,10 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type)
 **  @param resPos   Holds the nearest point.
 **  @param heading  preferense side to drop out of.
 */
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading)
+//Wyrmgus start
+//void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading)
+void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z)
+//Wyrmgus end
 {
 	int addx = 0;
 	int addy = 0;
@@ -2942,28 +2979,40 @@ void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos,
 	for (;;) {
 startw:
 		for (int i = addy; i--; ++pos.y) {
-			if (UnitTypeCanBeAt(type, pos)) {
+			//Wyrmgus start
+//			if (UnitTypeCanBeAt(type, pos)) {
+			if (UnitTypeCanBeAt(type, pos, z)) {
+			//Wyrmgus end
 				goto found;
 			}
 		}
 		++addx;
 starts:
 		for (int i = addx; i--; ++pos.x) {
-			if (UnitTypeCanBeAt(type, pos)) {
+			//Wyrmgus start
+//			if (UnitTypeCanBeAt(type, pos)) {
+			if (UnitTypeCanBeAt(type, pos, z)) {
+			//Wyrmgus end
 				goto found;
 			}
 		}
 		++addy;
 starte:
 		for (int i = addy; i--; --pos.y) {
-			if (UnitTypeCanBeAt(type, pos)) {
+			//Wyrmgus start
+//			if (UnitTypeCanBeAt(type, pos)) {
+			if (UnitTypeCanBeAt(type, pos, z)) {
+			//Wyrmgus end
 				goto found;
 			}
 		}
 		++addx;
 startn:
 		for (int i = addx; i--; --pos.x) {
-			if (UnitTypeCanBeAt(type, pos)) {
+			//Wyrmgus start
+//			if (UnitTypeCanBeAt(type, pos)) {
+			if (UnitTypeCanBeAt(type, pos, z)) {
+			//Wyrmgus end
 				goto found;
 			}
 		}
@@ -2996,7 +3045,10 @@ void CUnit::Remove(CUnit *host)
 	if (host) {
 		AddInContainer(*host);
 		UpdateUnitSightRange(*this);
-		UnitInXY(*this, host->tilePos);
+		//Wyrmgus start
+//		UnitInXY(*this, host->tilePos);
+		UnitInXY(*this, host->tilePos, host->MapLayer);
+		//Wyrmgus end
 		MapMarkUnitSight(*this);
 	}
 
@@ -3169,7 +3221,10 @@ void UnitLost(CUnit &unit)
 	CBuildRestrictionOnTop *b = OnTopDetails(unit, NULL);
 	if (b != NULL) {
 		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
-			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
+			//Wyrmgus start
+//			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral]);
+			CUnit *temp = MakeUnitAndPlace(unit.tilePos, *b->Parent, &Players[PlayerNumNeutral], unit.MapLayer);
+			//Wyrmgus end
 			if (temp == NULL) {
 				DebugPrint("Unable to allocate Unit");
 			} else {
@@ -4045,6 +4100,9 @@ void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 	Vec2i pos;
 	int addx = 0;
 	int addy = 0;
+	//Wyrmgus start
+	int z;
+	//Wyrmgus end
 
 	if (container) {
 		pos = container->tilePos;
@@ -4052,6 +4110,9 @@ void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 		pos.y -= unit.Type->TileHeight - 1;
 		addx = container->Type->TileWidth + unit.Type->TileWidth - 1;
 		addy = container->Type->TileHeight + unit.Type->TileHeight - 1;
+		//Wyrmgus start
+		z = container->MapLayer;
+		//Wyrmgus end
 
 		if (heading < LookingNE || heading > LookingNW) {
 			pos.x += addx - 1;
@@ -4070,6 +4131,9 @@ void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 		}
 	} else {
 		pos = unit.tilePos;
+		//Wyrmgus start
+		z = unit.MapLayer;
+		//Wyrmgus end
 
 		if (heading < LookingNE || heading > LookingNW) {
 			goto starts;
@@ -4085,28 +4149,40 @@ void DropOutOnSide(CUnit &unit, int heading, const CUnit *container)
 	for (;;) {
 startw:
 		for (int i = addy; i--; ++pos.y) {
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, z)) {
+			//Wyrmgus end
 				goto found;
 			}
 		}
 		++addx;
 starts:
 		for (int i = addx; i--; ++pos.x) {
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, z)) {
+			//Wyrmgus end
 				goto found;
 			}
 		}
 		++addy;
 starte:
 		for (int i = addy; i--; --pos.y) {
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, z)) {
+			//Wyrmgus end
 				goto found;
 			}
 		}
 		++addx;
 startn:
 		for (int i = addx; i--; --pos.x) {
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, z)) {
+			//Wyrmgus end
 				goto found;
 			}
 		}
@@ -4114,7 +4190,10 @@ startn:
 	}
 
 found:
-	unit.Place(pos);
+	//Wyrmgus start
+//	unit.Place(pos);
+	unit.Place(pos, z);
+	//Wyrmgus end
 }
 
 /**
@@ -4132,6 +4211,9 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 	int bestd = 99999;
 	int addx = 0;
 	int addy = 0;
+	//Wyrmgus start
+	int z;
+	//Wyrmgus end
 
 	if (container) {
 		Assert(unit.Removed);
@@ -4141,14 +4223,23 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 		addx = container->Type->TileWidth + unit.Type->TileWidth - 1;
 		addy = container->Type->TileHeight + unit.Type->TileHeight - 1;
 		--pos.x;
+		//Wyrmgus start
+		z = container->MapLayer;
+		//Wyrmgus end
 	} else {
 		pos = unit.tilePos;
+		//Wyrmgus start
+		z = unit.MapLayer;
+		//Wyrmgus end
 	}
 	// FIXME: if we reach the map borders we can go fast up, left, ...
 
 	for (;;) {
 		for (int i = addy; i--; ++pos.y) { // go down
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, z)) {
+			//Wyrmgus end
 				const int n = SquareDistance(goalPos, pos);
 
 				if (n < bestd) {
@@ -4159,7 +4250,10 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 		}
 		++addx;
 		for (int i = addx; i--; ++pos.x) { // go right
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, z)) {
+			//Wyrmgus end
 				const int n = SquareDistance(goalPos, pos);
 
 				if (n < bestd) {
@@ -4170,7 +4264,10 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 		}
 		++addy;
 		for (int i = addy; i--; --pos.y) { // go up
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, z)) {
+			//Wyrmgus end
 				const int n = SquareDistance(goalPos, pos);
 
 				if (n < bestd) {
@@ -4181,7 +4278,10 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 		}
 		++addx;
 		for (int i = addx; i--; --pos.x) { // go left
-			if (UnitCanBeAt(unit, pos)) {
+			//Wyrmgus start
+//			if (UnitCanBeAt(unit, pos)) {
+			if (UnitCanBeAt(unit, pos, z)) {
+			//Wyrmgus end
 				const int n = SquareDistance(goalPos, pos);
 
 				if (n < bestd) {
@@ -4191,7 +4291,10 @@ void DropOutNearest(CUnit &unit, const Vec2i &goalPos, const CUnit *container)
 			}
 		}
 		if (bestd != 99999) {
-			unit.Place(bestPos);
+			//Wyrmgus start
+//			unit.Place(bestPos);
+			unit.Place(bestPos, z);
+			//Wyrmgus end
 			return;
 		}
 		++addy;
@@ -5415,7 +5518,10 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 //	if (best && best != oldgoal && best->Player != target.Player && best->IsAllied(target) == false) {
 	if (best && best != oldgoal && (best->Player != target.Player || target.Player->Type == PlayerNeutral) && best->IsAllied(target) == false) {
 	//Wyrmgus end
-		CommandAttack(target, best->tilePos, best, FlushCommands);
+		//Wyrmgus start
+//		CommandAttack(target, best->tilePos, best, FlushCommands);
+		CommandAttack(target, best->tilePos, best, FlushCommands, best->MapLayer);
+		//Wyrmgus end
 		// Set threshold value only for aggressive units
 		if (best->IsAgressive()) {
 			target.Threshold = threshold;

@@ -153,10 +153,16 @@ public:
 	/// Draw a single unit
 	void Draw(const CViewport &vp) const;
 	/// Place a unit on map
-	void Place(const Vec2i &pos);
+	//Wyrmgus start
+//	void Place(const Vec2i &pos);
+	void Place(const Vec2i &pos, int z = 0);
+	//Wyrmgus end
 
 	/// Move unit to tile(pos). (Do special stuff : vision, cachelist, pathfinding)
-	void MoveToXY(const Vec2i &pos);
+	//Wyrmgus start
+//	void MoveToXY(const Vec2i &pos);
+	void MoveToXY(const Vec2i &pos, int z);
+	//Wyrmgus end
 	/// Add a unit inside a container. Only deal with list stuff.
 	void AddInContainer(CUnit &host);
 	//Wyrmgus start
@@ -637,14 +643,20 @@ void UpdateUnitSightRange(CUnit &unit);
 /// Create a new unit
 extern CUnit *MakeUnit(const CUnitType &type, CPlayer *player);
 /// Create a new unit and place on map
-extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player);
+//Wyrmgus start
+//extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player);
+extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z = 0);
+//Wyrmgus end
 //Wyrmgus start
 /// Create a new unit and place it on the map, and update its player accordingly
-extern CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player);
-extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type);
+extern CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z);
+extern CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z);
 //Wyrmgus end
 /// Find the nearest position at which unit can be placed.
-void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading);
+//Wyrmgus start
+//void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading);
+void FindNearestDrop(const CUnitType &type, const Vec2i &goalPos, Vec2i &resPos, int heading, int z);
+//Wyrmgus end
 /// Handle the loss of a unit (food,...)
 extern void UnitLost(CUnit &unit);
 /// Remove the Orders of a Unit

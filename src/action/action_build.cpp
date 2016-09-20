@@ -432,7 +432,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	UpdateUnitSightRange(*build);
 	// Must place after previous for map flags
-	build->Place(this->goalPos);
+	//Wyrmgus start
+//	build->Place(this->goalPos);
+	build->Place(this->goalPos, this->MapLayer);
+	//Wyrmgus end
 
 	//Wyrmgus start
 	build->Player->NumBuildingsUnderConstruction++;

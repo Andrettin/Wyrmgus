@@ -115,6 +115,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	COrder_Attack *order = new COrder_Attack(false);
 
 	order->goalPos = target.tilePos + target.Type->GetHalfTileSize();
+	//Wyrmgus start
+	order->MapLayer = target.MapLayer;
+	//Wyrmgus end
 	// Removed, Dying handled by action routine.
 	order->SetGoal(&target);
 	//Wyrmgus start
@@ -133,35 +136,49 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest)
+/* static */ COrder *COrder::NewActionAttack(const CUnit &attacker, const Vec2i &dest, int z)
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(dest));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(dest));
+	Assert(Map.Info.IsPointOnMap(dest, z));
+	//Wyrmgus end
 
 	COrder_Attack *order = new COrder_Attack(false);
 
 	//Wyrmgus start
 //	if (Map.WallOnMap(dest) && Map.Field(dest)->playerInfo.IsExplored(*attacker.Player)) {
-	if (Map.WallOnMap(dest) && Map.Field(dest)->playerInfo.IsTeamExplored(*attacker.Player)) {
+	if (Map.WallOnMap(dest) && Map.Field(dest, z)->playerInfo.IsTeamExplored(*attacker.Player)) {
 	//Wyrmgus end
 		// FIXME: look into action_attack.cpp about this ugly problem
 		order->goalPos = dest;
 		//Wyrmgus start
+		order->MapLayer = z;
 //		order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
 		order->Range = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 		//Wyrmgus end
 		order->MinRange = attacker.Type->MinAttackRange;
 	} else {
 		order->goalPos = dest;
+		//Wyrmgus start
+		order->MapLayer = z;
+		//Wyrmgus end
 	}
 	return order;
 }
 
-/* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest)
+/* static */ COrder *COrder::NewActionAttackGround(const CUnit &attacker, const Vec2i &dest, int z)
+//Wyrmgus end
 {
 	COrder_Attack *order = new COrder_Attack(true);
 
 	order->goalPos = dest;
 	//Wyrmgus start
+	order->MapLayer = z;
 //	order->Range = attacker.Stats->Variables[ATTACKRANGE_INDEX].Max;
 	order->Range = attacker.GetModifiedVariable(ATTACKRANGE_INDEX);
 	//Wyrmgus end
@@ -190,6 +207,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 
 	file.printf(" \"state\", %d", this->State);
 	file.printf("}");
@@ -212,6 +232,11 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -224,11 +249,17 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		if (this->HasGoal()) {
 			return this->GetGoal()->IsAliveOnMap();
 		} else {
-			return Map.Info.IsPointOnMap(this->goalPos);
+			//Wyrmgus start
+//			return Map.Info.IsPointOnMap(this->goalPos);
+			return Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
+			//Wyrmgus end
 		}
 	} else {
 		Assert(Action == UnitActionAttackGround);
-		return Map.Info.IsPointOnMap(this->goalPos);
+		//Wyrmgus start
+//		return Map.Info.IsPointOnMap(this->goalPos);
+		return Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -261,11 +292,17 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
-		input.SetGoal(goal->tilePos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(goal->tilePos, tileSize);
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
+		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(this->goalPos, tileSize);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		//Wyrmgus end
 	}
 
 	input.SetMinRange(this->MinRange);
@@ -309,6 +346,9 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 		if (goal->IsAlive() == false) {
 			this->ClearGoal();
 			this->goalPos = goal->tilePos;
+			//Wyrmgus start
+			this->MapLayer = goal->MapLayer;
+			//Wyrmgus end
 			return false;
 		}
 		if (goal == attacker) {
@@ -359,6 +399,9 @@ bool COrder_Attack::CheckForDeadGoal(CUnit &unit)
 	// Goal could be destroyed or unseen
 	// So, cannot use type.
 	this->goalPos = goal->tilePos;
+	//Wyrmgus start
+	this->MapLayer = goal->MapLayer;
+	//Wyrmgus end
 	this->MinRange = 0;
 	this->Range = 0;
 	this->ClearGoal();
@@ -391,7 +434,10 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 		CUnit *goal = AttackUnitsInReactRange(unit);
 
 		if (goal) {
-			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
+			//Wyrmgus start
+//			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
+			COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos, this->MapLayer);
+			//Wyrmgus end
 
 			if (unit.CanStoreOrder(savedOrder) == false) {
 				delete savedOrder;
@@ -406,6 +452,9 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			this->Range = unit.GetModifiedVariable(ATTACKRANGE_INDEX);
 			//Wyrmgus end
 			this->goalPos = goal->tilePos;
+			//Wyrmgus start
+			this->MapLayer = goal->MapLayer;
+			//Wyrmgus end
 			this->State |= WEAK_TARGET; // weak target
 		}
 		// Have a weak target, try a better target.
@@ -423,6 +472,9 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 			}
 			this->SetGoal(newTarget);
 			this->goalPos = newTarget->tilePos;
+			//Wyrmgus start
+			this->MapLayer = newTarget->MapLayer;
+			//Wyrmgus end
 		}
 	}
 
@@ -440,7 +492,10 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	Assert(!unit.Type->BoolFlag[VANISHES_INDEX].value && !unit.Destroyed && !unit.Removed);
 	Assert(unit.CurrentOrder() == this);
 	Assert(unit.CanMove());
-	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
+	//Wyrmgus start
+//	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
+	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	//Wyrmgus end
 
 	//Wyrmgus start
 	//if is on a moving raft and target is now within range, stop the raft
@@ -595,7 +650,10 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 */
 void COrder_Attack::AttackTarget(CUnit &unit)
 {
-	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
+	//Wyrmgus start
+//	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
+	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	//Wyrmgus end
 
 	AnimateActionAttack(unit, *this);
 	if (unit.Anim.Unbreakable) {
@@ -627,7 +685,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 			return;
 		}
 		// Save current command to come back.
-		COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
+		//Wyrmgus start
+//		COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos);
+		COrder *savedOrder = COrder::NewActionAttack(unit, this->goalPos, this->MapLayer);
+		//Wyrmgus end
 
 		if (unit.CanStoreOrder(savedOrder) == false) {
 			delete savedOrder;
@@ -637,6 +698,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		}
 		this->SetGoal(goal);
 		this->goalPos = goal->tilePos;
+		//Wyrmgus start
+		this->MapLayer = goal->MapLayer;
+		//Wyrmgus end
 		this->MinRange = unit.Type->MinAttackRange;
 		//Wyrmgus start
 //		this->Range = unit.Stats->Variables[ATTACKRANGE_INDEX].Max;
@@ -656,6 +720,9 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 				goal = newTarget;
 				this->SetGoal(newTarget);
 				this->goalPos = newTarget->tilePos;
+				//Wyrmgus start
+				this->MapLayer = newTarget->MapLayer;
+				//Wyrmgus end
 				this->MinRange = unit.Type->MinAttackRange;
 				this->State = MOVE_TO_TARGET;
 			}
@@ -677,7 +744,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		if (unit.CanMove()) {
 			if (unit.CanStoreOrder(this)) {
 				if (dead) {
-					unit.SavedOrder = COrder::NewActionAttack(unit, this->goalPos);
+					//Wyrmgus start
+//					unit.SavedOrder = COrder::NewActionAttack(unit, this->goalPos);
+					unit.SavedOrder = COrder::NewActionAttack(unit, this->goalPos, this->MapLayer);
+					//Wyrmgus end
 				} else {
 					unit.SavedOrder = this->Clone();
 				}
@@ -726,7 +796,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 */
 /* virtual */ void COrder_Attack::Execute(CUnit &unit)
 {
-	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
+	//Wyrmgus start
+//	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos));
+	Assert(this->HasGoal() || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
+	//Wyrmgus end
 
 	if (unit.Wait) {
 		if (!unit.Waiting) {

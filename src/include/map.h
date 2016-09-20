@@ -296,16 +296,16 @@ public:
 	void RemoveTileOverlayTerrain(const Vec2i &pos, int z = 0);
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z = 0);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z = 0);
-	void CalculateTileTransitions(const Vec2i &pos, bool overlay = false);
+	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileVisibility(const Vec2i &pos);
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
-	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline = false);
-	void GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped = false);
+	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline, int z);
+	void GenerateResources(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
 
 	//Wyrmgus start
-	void ClearOverlayTile(const Vec2i &pos);
+	void ClearOverlayTile(const Vec2i &pos, int z = 0);
 	/*
 	/// Remove wood from the map.
 	void ClearWoodTile(const Vec2i &pos);
@@ -322,9 +322,9 @@ public:
 	PixelPos TilePosToMapPixelPos_Center(const Vec2i &tilePos) const;
 	
 	//Wyrmgus start
-	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false) const;
-	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen = false) const;
-	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos) const;
+	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay, int z) const;
+	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z = 0) const;
+	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, int z) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
@@ -372,8 +372,8 @@ public:
 	//Wyrmgus end
 	
 	//Wyrmgus start
-	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay = false);
-	bool TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrain);
+	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
+	bool TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrain, int z);
 	bool TileBordersBuilding(const Vec2i &pos);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain);
 	bool IsPointInASubtemplateArea(const Vec2i &pos) const;
@@ -604,10 +604,13 @@ extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
 /// Returns true, if the unit-type can enter the field
 //Wyrmgus start
 //extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos);
-extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z = 0);
+extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z);
 //Wyrmgus end
 /// Returns true, if the unit can enter the field
-extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
+//Wyrmgus start
+//extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
+extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z = 0);
+//Wyrmgus end
 
 /// Preprocess map, for internal use.
 extern void PreprocessMap();
