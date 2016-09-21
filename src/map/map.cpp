@@ -792,7 +792,7 @@ void ChangeCurrentMapLayer(int z)
 		return;
 	}
 	
-	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[CurrentMapLayer] / Map.Info.MapWidths[z], UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[CurrentMapLayer] / Map.Info.MapHeights[z]);
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[z] / Map.Info.MapWidths[CurrentMapLayer], UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[z] / Map.Info.MapHeights[CurrentMapLayer]);
 	
 	CurrentMapLayer = z;
 	UI.Minimap.UpdateCache = true;
