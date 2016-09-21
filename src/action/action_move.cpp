@@ -186,7 +186,7 @@ int DoActionMove(CUnit &unit)
 	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if (unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft, don't move if any unit over it is still moving
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table);
+		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
 				if (table[i]->Moving) {
@@ -198,7 +198,7 @@ int DoActionMove(CUnit &unit)
 		}
 	} else if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft, don't move if the raft is still moving
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table);
+		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->Moving) {
@@ -228,7 +228,7 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus start
 		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table);
+			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
 					table[i]->IX = 0;
@@ -279,7 +279,7 @@ int DoActionMove(CUnit &unit)
 		//Wyrmgus start
 		if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table);
+			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
 					table[i]->MoveToXY(pos, table[i]->MapLayer);
@@ -334,7 +334,7 @@ int DoActionMove(CUnit &unit)
 	//Wyrmgus start
 	if (unit.Type->BoolFlag[BRIDGE_INDEX].value) { // if is a raft, move everything on top of it as it moves
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table);
+		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
 				table[i]->IX += posd.x * move;
@@ -386,7 +386,7 @@ int DoActionMove(CUnit &unit)
 			if (this->Range >= 1) {
 				if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { //if the unit is a land unit over a raft
 					std::vector<CUnit *> table;
-					Select(unit.tilePos, unit.tilePos, table);
+					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitActionStill) {
@@ -398,7 +398,7 @@ int DoActionMove(CUnit &unit)
 					}
 				} else if (unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.CanMove()) { // if is a raft
 					std::vector<CUnit *> table;
-					Select(unit.tilePos, unit.tilePos, table);
+					Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 					for (size_t i = 0; i != table.size(); ++i) {
 						if (!table[i]->Removed && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand && table[i]->CanMove()) {
 							if (table[i]->CurrentAction() == UnitActionStill) {

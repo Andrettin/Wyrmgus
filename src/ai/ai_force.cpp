@@ -324,10 +324,16 @@ void AiForce::RemoveDeadUnit()
 class AiForceRallyPointFinder
 {
 public:
-	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos) :
+	//Wyrmgus start
+//	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos) :
+	AiForceRallyPointFinder(const CUnit &startUnit, int distance, const Vec2i &startPos, Vec2i *resultPos, int z) :
+	//Wyrmgus end
 		startUnit(startUnit), distance(distance), startPos(startPos),
 		movemask(startUnit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit | MapFieldBuilding)),
-		resultPos(resultPos)
+		//Wyrmgus start
+//		resultPos(resultPos)
+		resultPos(resultPos), z(z)
+		//Wyrmgus end
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
@@ -336,17 +342,26 @@ private:
 	const Vec2i startPos;
 	const int movemask;
 	Vec2i *resultPos;
+	//Wyrmgus start
+	const int z;
+	//Wyrmgus end
 };
 
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
 	const int minDist = 15;
-	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist) == false
+	//Wyrmgus start
+//	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist) == false
+	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist, z) == false
+	//Wyrmgus end
 		&& Distance(pos, startPos) <= abs(distance - minDist)) {
 		*resultPos = pos;
 		return VisitResult_Finished;
 	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (CanMoveToMask(pos, movemask, z)) { // reachable
+	//Wyrmgus end
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -381,7 +396,10 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
-	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, resultPos);
+	//Wyrmgus start
+//	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, resultPos);
+	AiForceRallyPointFinder aiForceRallyPointFinder(leader, distance, leader.tilePos, resultPos, z);
+	//Wyrmgus end
 
 	return terrainTraversal.Run(aiForceRallyPointFinder);
 }
@@ -1337,6 +1355,9 @@ void AiForceManager::Update()
 				std::vector<CUnit *> nearGoal;
 				const Vec2i offset(15, 15);
 				Select(force.GoalPos - offset, force.GoalPos + offset, nearGoal,
+						//Wyrmgus start
+						force.GoalMapLayer,
+						//Wyrmgus end
 					   IsAnAlliedUnitOf(*force.Units[0]->Player));
 				if (nearGoal.empty()) {
 					force.ReturnToHome();

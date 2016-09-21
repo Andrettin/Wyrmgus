@@ -145,7 +145,10 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
-	Select(pos1, pos2, table);
+	//Wyrmgus start
+//	Select(pos1, pos2, table);
+	Select(pos1, pos2, table, z);
+	//Wyrmgus end
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		if ((builder != table[i] || this->CheckBuilder) &&
@@ -268,7 +271,10 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 		distance = this->Distance - 1;
 	}
 	std::vector<CUnit *> table;
-	Select(pos1, pos2, table);
+	//Wyrmgus start
+//	Select(pos1, pos2, table);
+	Select(pos1, pos2, table, z);
+	//Wyrmgus end
 
 	for (size_t i = 0; i != table.size(); ++i) {
 		if ((builder != table[i] || this->CheckBuilder) &&
@@ -369,10 +375,20 @@ private:
 
 bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget) const
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+	int z = builder != NULL ? builder->MapLayer : CurrentMapLayer;
+	//Wyrmgus end
+
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 
 	ontoptarget = NULL;
-	CUnitCache &cache = Map.Field(pos)->UnitCache;
+	//Wyrmgus start
+//	CUnitCache &cache = Map.Field(pos)->UnitCache;
+	CUnitCache &cache = Map.Field(pos, z)->UnitCache;
+	//Wyrmgus end
 
 	CUnitCache::iterator it = std::find_if(cache.begin(), cache.end(), AliveConstructedAndSameTypeAs(*this->Parent));
 
@@ -380,7 +396,10 @@ bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, cons
 		CUnit &found = **it;
 		std::vector<CUnit *> table;
 		Vec2i endPos(found.tilePos.x + found.Type->TileWidth - 1, found.tilePos.y + found.Type->TileHeight - 1);
-		Select(found.tilePos, endPos, table);
+		//Wyrmgus start
+//		Select(found.tilePos, endPos, table);
+		Select(found.tilePos, endPos, table, found.MapLayer);
+		//Wyrmgus end
 		for (std::vector<CUnit *>::iterator it2 = table.begin(); it2 != table.end(); ++it2) {
 			if (*it == *it2) {
 				continue;

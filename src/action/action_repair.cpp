@@ -351,7 +351,7 @@ static void AnimateActionRepair(CUnit &unit)
 					if (err == PF_UNREACHABLE) {
 						if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 							std::vector<CUnit *> table;
-							Select(unit.tilePos, unit.tilePos, table);
+							Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 							for (size_t i = 0; i != table.size(); ++i) {
 								if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 									if (table[i]->CurrentAction() == UnitActionStill) {

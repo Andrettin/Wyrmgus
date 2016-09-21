@@ -342,7 +342,10 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 	Vec2i ipos = pos - diag;
 	Vec2i apos = pos + diag;
 
-	Map.FixSelectionArea(ipos, apos);
+	//Wyrmgus start
+//	Map.FixSelectionArea(ipos, apos);
+	Map.FixSelectionArea(ipos, apos, CurrentMapLayer);
+	//Wyrmgus end
 
 	Vec2i itPos;
 	for (itPos.x = ipos.x; itPos.x <= apos.x; ++itPos.x) {

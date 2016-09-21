@@ -107,7 +107,10 @@ VisitResult NearReachableTerrainFinder::Visit(TerrainTraversal &terrainTraversal
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
-	if (CanMoveToMask(pos, movemask)) {
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)) {
+	if (CanMoveToMask(pos, movemask, z)) {
+	//Wyrmgus end
 		if (resPos) {
 			*resPos = from;
 		}
@@ -502,7 +505,7 @@ int COrder_Resource::MoveToResource_Terrain(CUnit &unit)
 			//if is unreachable and is on a raft, see if the raft can move closer
 			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table);
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
@@ -565,7 +568,7 @@ int COrder_Resource::MoveToResource_Unit(CUnit &unit)
 			//if is unreachable and is on a raft, see if the raft can move closer
 			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table);
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
@@ -1228,7 +1231,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 			//if is unreachable and is on a raft, see if the raft can move closer
 			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
-				Select(unit.tilePos, unit.tilePos, table);
+				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 				for (size_t i = 0; i != table.size(); ++i) {
 					if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 						if (table[i]->CurrentAction() == UnitActionStill) {
@@ -1359,7 +1362,10 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 bool COrder_Resource::WaitInDepot(CUnit &unit)
 {
 	const ResourceInfo &resinfo = *unit.Type->ResInfo[this->CurrentResource];
-	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId);
+	//Wyrmgus start
+//	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId);
+	const CUnit *depot = ResourceDepositOnMap(unit.tilePos, resinfo.ResourceId, unit.MapLayer);
+	//Wyrmgus end
 
 	//Assert(depot);
 

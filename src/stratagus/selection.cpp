@@ -428,7 +428,10 @@ int SelectUnitsByType(CUnit &base, bool only_visible)
 		//Wyrmgus end
 	}
 	//Wyrmgus end
-	Select(minPos, maxPos, table, HasSameTypeAs(type));
+	//Wyrmgus start
+//	Select(minPos, maxPos, table, HasSameTypeAs(type));
+	Select(minPos, maxPos, table, CurrentMapLayer, HasSameTypeAs(type));
+	//Wyrmgus end
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	//   different type... idem for tankers
@@ -513,7 +516,10 @@ int ToggleUnitsByType(CUnit &base)
 	const Vec2i maxPos = vp->MapPos + vpSize + offset;
 	std::vector<CUnit *> table;
 
-	Select(minPos, maxPos, table, HasSameTypeAs(type));
+	//Wyrmgus start
+//	Select(minPos, maxPos, table, HasSameTypeAs(type));
+	Select(minPos, maxPos, table, CurrentMapLayer, HasSameTypeAs(type));
+	//Wyrmgus end
 
 	// FIXME: peon/peasant with gold/wood & co are considered from
 	// different type... idem for tankers
@@ -754,7 +760,10 @@ int SelectUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &corne
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
+	//Wyrmgus start
+//	Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table, CurrentMapLayer);
+	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	// 1) search for the player units selectable with rectangle
@@ -831,7 +840,10 @@ int SelectArmy()
 	const Vec2i maxPos(Map.Info.MapWidths[CurrentMapLayer] - 1, Map.Info.MapHeights[CurrentMapLayer] - 1);
 	std::vector<CUnit *> table;
 
-	Select(minPos, maxPos, table);
+	//Wyrmgus start
+//	Select(minPos, maxPos, table);
+	Select(minPos, maxPos, table, CurrentMapLayer);
+	//Wyrmgus end
 
 	unsigned int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
@@ -894,7 +906,10 @@ int AddSelectedUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Select(tilePos0 - range, tilePos1 + range, table);
+	//Wyrmgus start
+//	Select(tilePos0 - range, tilePos1 + range, table);
+	Select(tilePos0 - range, tilePos1 + range, table, CurrentMapLayer);
+	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	// If no unit in rectangle area... do nothing
 	if (table.empty()) {
@@ -940,7 +955,10 @@ int SelectGroundUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos 
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
+	//Wyrmgus start
+//	Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table, CurrentMapLayer);
+	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	unsigned int n = 0;
@@ -990,7 +1008,10 @@ int SelectAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPos &co
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
+	//Wyrmgus start
+//	Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table, CurrentMapLayer);
+	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	unsigned int n = 0;
 	for (size_t i = 0; i != table.size(); ++i) {
@@ -1056,7 +1077,10 @@ int AddSelectedGroundUnitsInRectangle(const PixelPos &corner_topleft, const Pixe
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
+	//Wyrmgus start
+//	Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table, CurrentMapLayer);
+	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 
 	unsigned int n = 0;
@@ -1126,7 +1150,10 @@ int AddSelectedAirUnitsInRectangle(const PixelPos &corner_topleft, const PixelPo
 	const Vec2i range(2, 2);
 	std::vector<CUnit *> table;
 
-	Select(t0 - range, t1 + range, table);
+	//Wyrmgus start
+//	Select(t0 - range, t1 + range, table);
+	Select(t0 - range, t1 + range, table, CurrentMapLayer);
+	//Wyrmgus end
 	SelectSpritesInsideRectangle(corner_topleft, corner_bottomright, table);
 	unsigned int n = 0;
 	for (size_t i = 0; i < table.size(); ++i) {

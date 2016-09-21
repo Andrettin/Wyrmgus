@@ -201,7 +201,10 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 	if (this->Missile->Class == MissileClassDeathCoil) {
 		const Vec2i offset(2, 2);
 		std::vector<CUnit *> table;
-		Select(goalPos - offset, goalPos + offset, table);
+		//Wyrmgus start
+//		Select(goalPos - offset, goalPos + offset, table);
+		Select(goalPos - offset, goalPos + offset, table, z);
+		//Wyrmgus end
 		int count = 0;
 		for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end(); ++it) {
 			CUnit &unit = **it;

@@ -146,7 +146,7 @@ class BuildingPlaceFinder
 public:
 	//Wyrmgus start
 //	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos) :
-	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration = false) :
+	BuildingPlaceFinder(const CUnit &worker, const CUnitType &type, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z) :
 	//Wyrmgus end
 		worker(worker), type(type),
 			movemask(worker.Type->MovementMask 
@@ -156,6 +156,7 @@ public:
 		//Wyrmgus start
 //		resultPos(resultPos)
 		resultPos(resultPos),
+		z(z),
 		IgnoreExploration(ignore_exploration)
 		//Wyrmgus start
 	{
@@ -170,6 +171,7 @@ private:
 	bool checkSurround;
 	Vec2i *resultPos;
 	//Wyrmgus start
+	int z;
 	bool IgnoreExploration;
 	//Wyrmgus end
 };
@@ -184,12 +186,16 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
 		return VisitResult_DeadEnd;
 	}
+//	if (CanBuildUnitType(&worker, type, pos, 1)
+	if (CanBuildUnitType(&worker, type, pos, 1, false, z)
 	//Wyrmgus end
-	if (CanBuildUnitType(&worker, type, pos, 1)
-		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8)) {
+		//Wyrmgus start
+//		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8)) {
+		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8, z)) {
+		//Wyrmgus end
 		bool backupok;
 		if (AiCheckSurrounding(worker, type, pos, backupok) && checkSurround) {
 			*resultPos = pos;
@@ -198,7 +204,10 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 			*resultPos = pos;
 		}
 	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (CanMoveToMask(pos, movemask, z)) { // reachable
+	//Wyrmgus end
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -218,7 +227,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 */
 //Wyrmgus start
 //static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos)
-static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration = false, int z = 0)
+static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, const CUnit *startUnit, bool checkSurround, Vec2i *resultPos, bool ignore_exploration, int z)
 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -232,17 +241,23 @@ static bool AiFindBuildingPlace2(const CUnit &worker, const CUnitType &type, con
 	if (startUnit != NULL) {
 		terrainTraversal.PushUnitPosAndNeighboor(*startUnit);
 	} else {
-		Assert(Map.Info.IsPointOnMap(startPos));
+		//Wyrmgus start
+//		Assert(Map.Info.IsPointOnMap(startPos));
+		Assert(Map.Info.IsPointOnMap(startPos, z));
+		//Wyrmgus end
 		terrainTraversal.PushPos(startPos);
 	}
 
 	//Wyrmgus start
 //	BuildingPlaceFinder buildingPlaceFinder(worker, type, checkSurround, resultPos);
-	BuildingPlaceFinder buildingPlaceFinder(worker, type, checkSurround, resultPos, ignore_exploration);
+	BuildingPlaceFinder buildingPlaceFinder(worker, type, checkSurround, resultPos, ignore_exploration, z);
 	//Wyrmgus end
 
 	terrainTraversal.Run(buildingPlaceFinder);
-	return Map.Info.IsPointOnMap(*resultPos);
+	//Wyrmgus start
+//	return Map.Info.IsPointOnMap(*resultPos);
+	return Map.Info.IsPointOnMap(*resultPos, z);
+	//Wyrmgus end
 }
 
 class HallPlaceFinder
@@ -250,7 +265,7 @@ class HallPlaceFinder
 public:
 	//Wyrmgus start
 //	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
-	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos, bool ignore_exploration = false) :
+	HallPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
 	//Wyrmgus end
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask
@@ -260,7 +275,8 @@ public:
 		//Wyrmgus start
 //		resultPos(resultPos)
 		resultPos(resultPos),
-		IgnoreExploration(ignore_exploration)
+		IgnoreExploration(ignore_exploration),
+		z(z)
 		//Wyrmgus end
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
@@ -274,6 +290,7 @@ private:
 	Vec2i *resultPos;
 	//Wyrmgus start
 	bool IgnoreExploration;
+	int z;
 	//Wyrmgus end
 };
 
@@ -286,7 +303,10 @@ bool HallPlaceFinder::IsAUsableMine(const CUnit &mine) const
 	const Vec2i maxpos = mine.tilePos + typeSize + offset;
 	std::vector<CUnit *> units;
 
-	Select(minpos, maxpos, units);
+	//Wyrmgus start
+//	Select(minpos, maxpos, units);
+	Select(minpos, maxpos, units, mine.MapLayer);
+	//Wyrmgus end
 
 	const size_t nunits = units.size();
 	int buildings = 0;
@@ -326,28 +346,37 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
+	//Wyrmgus start
+//	if (!IgnoreExploration && !Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
+	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
-	CUnit *mine = ResourceOnMap(pos, resource);
+	//Wyrmgus start
+//	CUnit *mine = ResourceOnMap(pos, resource);
+	CUnit *mine = ResourceOnMap(pos, resource, z);
+	//Wyrmgus end
 	if (mine && IsAUsableMine(*mine)) {
 		//Wyrmgus start
 //		if (AiFindBuildingPlace2(worker, type, pos, mine, true, resultPos)) {
-		if (AiFindBuildingPlace2(worker, type, pos, mine, true, resultPos, IgnoreExploration)) {
+		if (AiFindBuildingPlace2(worker, type, pos, mine, true, resultPos, IgnoreExploration, z)) {
 		//Wyrmgus end
 			return VisitResult_Finished;
 		}
 	}
 	//Wyrmgus start
-	CUnit *deposit = ResourceOnMap(pos, resource, false);
+	CUnit *deposit = ResourceOnMap(pos, resource, z, false);
 	if (deposit && IsAUsableMine(*deposit)) {
-		if (AiFindBuildingPlace2(worker, type, pos, deposit, true, resultPos, IgnoreExploration)) {
+		if (AiFindBuildingPlace2(worker, type, pos, deposit, true, resultPos, IgnoreExploration, z)) {
 			return VisitResult_Finished;
 		}
 	}
 	//Wyrmgus end
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (CanMoveToMask(pos, movemask, z)) { // reachable
+	//Wyrmgus end
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -382,7 +411,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 							int resource,
 							//Wyrmgus start
 //							Vec2i *resultPos)
-							Vec2i *resultPos, bool ignore_exploration = false, int z = 0)
+							Vec2i *resultPos, bool ignore_exploration, int z)
 							//Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -398,7 +427,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 
 	//Wyrmgus start
 //	HallPlaceFinder hallPlaceFinder(worker, type, resource, resultPos);
-	HallPlaceFinder hallPlaceFinder(worker, type, resource, resultPos, ignore_exploration);
+	HallPlaceFinder hallPlaceFinder(worker, type, resource, resultPos, ignore_exploration, z);
 	//Wyrmgus end
 
 	if (terrainTraversal.Run(hallPlaceFinder)) {
@@ -406,7 +435,7 @@ static bool AiFindHallPlace(const CUnit &worker,
 	}
 	//Wyrmgus start
 //	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos);
-	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos, ignore_exploration);
+	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos, ignore_exploration, z);
 	//Wyrmgus end
 }
 
@@ -415,7 +444,7 @@ class LumberMillPlaceFinder
 public:
 	//Wyrmgus start
 //	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos) :
-	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos, bool ignore_exploration = false) :
+	LumberMillPlaceFinder(const CUnit &worker, const CUnitType &type, int resource, Vec2i *resultPos, bool ignore_exploration, int z) :
 	//Wyrmgus end
 		worker(worker), type(type),
 		movemask(worker.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
@@ -423,7 +452,8 @@ public:
 		//Wyrmgus start
 //		resultPos(resultPos)
 		resultPos(resultPos),
-		IgnoreExploration(ignore_exploration)
+		IgnoreExploration(ignore_exploration),
+		z(z)
 		//Wyrmgus end
 	{}
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
@@ -435,6 +465,7 @@ private:
 	Vec2i *resultPos;
 	//Wyrmgus start
 	bool IgnoreExploration;
+	int z;
 	//Wyrmgus end
 };
 
@@ -448,19 +479,25 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 	}
 #endif
 	*/
-	if (!IgnoreExploration && !Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player)) {
+	if (!IgnoreExploration && !Map.Field(pos, z)->playerInfo.IsTeamExplored(*worker.Player)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
-	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
+	//Wyrmgus start
+//	if (Map.Field(pos)->IsTerrainResourceOnMap(resource)) {
+	if (Map.Field(pos, z)->IsTerrainResourceOnMap(resource)) {
+	//Wyrmgus end
 		//Wyrmgus start
 //		if (AiFindBuildingPlace2(worker, type, from, NULL, true, resultPos)) {
-		if (AiFindBuildingPlace2(worker, type, from, NULL, true, resultPos, IgnoreExploration)) {
+		if (AiFindBuildingPlace2(worker, type, from, NULL, true, resultPos, IgnoreExploration, z)) {
 		//Wyrmgus end
 			return VisitResult_Finished;
 		}
 	}
-	if (CanMoveToMask(pos, movemask)
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)
+	if (CanMoveToMask(pos, movemask, z)
+	//Wyrmgus end
 		|| (worker.Type->RepairRange == InfiniteRepairRange && type.BoolFlag[BUILDEROUTSIDE_INDEX].value)) { // reachable, or unit can build from outside and anywhere
 		return VisitResult_Ok;
 	} else { // unreachable
@@ -483,7 +520,7 @@ VisitResult LumberMillPlaceFinder::Visit(TerrainTraversal &terrainTraversal, con
 */
 //Wyrmgus start
 //static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, int resource, Vec2i *resultPos)
-static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, int resource, Vec2i *resultPos, bool ignore_exploration = false, int z = 0)
+static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, const Vec2i &startPos, int resource, Vec2i *resultPos, bool ignore_exploration, int z)
 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
@@ -494,12 +531,15 @@ static bool AiFindLumberMillPlace(const CUnit &worker, const CUnitType &type, co
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(Map.Info.IsPointOnMap(startPos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(startPos));
+	Assert(Map.Info.IsPointOnMap(startPos, z));
+	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start
 //	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource, resultPos);
-	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource, resultPos, ignore_exploration);
+	LumberMillPlaceFinder lumberMillPlaceFinder(worker, type, resource, resultPos, ignore_exploration, z);
 	//Wyrmgus end
 
 	return terrainTraversal.Run(lumberMillPlaceFinder);
@@ -511,13 +551,13 @@ static bool AiFindMiningPlace(const CUnit &worker,
 							  int resource,
 							  //Wyrmgus start
 //							  Vec2i *resultPos)
-							  Vec2i *resultPos, bool ignore_exploration = false)
+							  Vec2i *resultPos, bool ignore_exploration, int z)
 							  //Wyrmgus end
 {
 	// look near (mine = ResourceOnMap(pos, resource, false) ?
 	//Wyrmgus start
 //	return AiFindBuildingPlace2(worker, type, startPos, NULL, false, resultPos);
-	return AiFindBuildingPlace2(worker, type, startPos, NULL, false, resultPos, ignore_exploration);
+	return AiFindBuildingPlace2(worker, type, startPos, NULL, false, resultPos, ignore_exploration, z);
 	//Wyrmgus end
 }
 
@@ -565,12 +605,12 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 			//Wyrmgus end
 				//Wyrmgus start
 //				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos);
-				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos, ignore_exploration);
+				return AiFindLumberMillPlace(worker, type, startPos, i, resultPos, ignore_exploration, z);
 				//Wyrmgus end
 			} else {
 				//Wyrmgus start
 //				return AiFindHallPlace(worker, type, startPos, i, resultPos);
-				return AiFindHallPlace(worker, type, startPos, i, resultPos, ignore_exploration);
+				return AiFindHallPlace(worker, type, startPos, i, resultPos, ignore_exploration, z);
 				//Wyrmgus end
 			}
 		} else {
@@ -583,13 +623,13 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 					//Mine have to be build ONTOP resources
 					//Wyrmgus start
 //					return AiFindMiningPlace(worker, type, startPos, i, resultPos);
-					return AiFindMiningPlace(worker, type, startPos, i, resultPos, ignore_exploration);
+					return AiFindMiningPlace(worker, type, startPos, i, resultPos, ignore_exploration, z);
 					//Wyrmgus end
 				} else {
 					//Mine can be build without resource restrictions: solar panels, etc
 					//Wyrmgus start
 //					return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos);
-					return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos, ignore_exploration);
+					return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos, ignore_exploration, z);
 					//Wyrmgus end
 				}
 			}
@@ -597,7 +637,7 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 	}
 	//Wyrmgus start
 //	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos);
-	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos, ignore_exploration);
+	return AiFindBuildingPlace2(worker, type, startPos, NULL, true, resultPos, ignore_exploration, z);
 	//Wyrmgus end
 }
 

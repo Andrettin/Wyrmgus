@@ -109,7 +109,10 @@
 	Vec2i maxpos = caster.tilePos + Vec2i(caster.Type->TileWidth - 1, caster.Type->TileHeight - 1) + offset;
 	//Wyrmgus end
 
-	Map.FixSelectionArea(minpos, maxpos);
+	//Wyrmgus start
+//	Map.FixSelectionArea(minpos, maxpos);
+	Map.FixSelectionArea(minpos, maxpos, z);
+	//Wyrmgus end
 
 	//
 	// Terrain effect of the explosion
@@ -167,7 +170,10 @@
 	if (this->Damage || this->BasicDamage || this->PiercingDamage || this->FireDamage || this->ColdDamage || this->ArcaneDamage || this->LightningDamage || this->AirDamage || this->EarthDamage || this->WaterDamage) {
 	//Wyrmgus end
 		std::vector<CUnit *> table;
-		SelectFixed(minpos, maxpos, table);
+		//Wyrmgus start
+//		SelectFixed(minpos, maxpos, table);
+		SelectFixed(minpos, maxpos, table, z);
+		//Wyrmgus end
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &unit = *table[i];
 			if (unit.Type->UnitType != UnitTypeFly && unit.IsAlive()

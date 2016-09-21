@@ -202,9 +202,9 @@ void DrawUnitSelection(const CViewport &vp, const CUnit &unit)
 	//Wyrmgus start
 	int box_width = type.BoxWidth;
 	int box_height = type.BoxHeight;
-	if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
+	if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand && !unit.Moving) { //if is on a raft, use the raft's box size instead
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table);
+		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove() && table[i]->Type->BoxWidth > box_width && table[i]->Type->BoxHeight > box_height) {
 				box_width = table[i]->Type->BoxWidth;
@@ -1461,7 +1461,10 @@ int FindAndSortUnits(const CViewport &vp, std::vector<CUnit *> &table)
 	const Vec2i minPos = vp.MapPos - offset;
 	const Vec2i maxPos = vp.MapPos + vpSize + offset;
 
-	Select(minPos, maxPos, table);
+	//Wyrmgus start
+//	Select(minPos, maxPos, table);
+	Select(minPos, maxPos, table, CurrentMapLayer);
+	//Wyrmgus end
 
 	size_t n = table.size();
 	for (size_t i = 0; i < table.size(); ++i) {

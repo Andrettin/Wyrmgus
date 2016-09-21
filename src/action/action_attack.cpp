@@ -514,7 +514,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	//if is on a moving raft and target is now within range, stop the raft
 	if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table);
+		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->CurrentAction() == UnitActionMove) {
@@ -628,7 +628,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		//if is unreachable and is on a raft, see if the raft can move closer to the enemy
 		if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 			std::vector<CUnit *> table;
-			Select(unit.tilePos, unit.tilePos, table);
+			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 			for (size_t i = 0; i != table.size(); ++i) {
 				if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 					if (table[i]->CurrentAction() == UnitActionStill) {

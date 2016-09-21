@@ -109,7 +109,10 @@ public:
 		const Vec2i minPos = pos - offset;
 		const Vec2i maxPos = pos + offset;
 
-		CUnit *unit = FindUnit_If(minPos, maxPos, IsDyingAndNotABuilding());
+		//Wyrmgus start
+//		CUnit *unit = FindUnit_If(minPos, maxPos, IsDyingAndNotABuilding());
+		CUnit *unit = FindUnit_If(minPos, maxPos, z, IsDyingAndNotABuilding());
+		//Wyrmgus end
 		cansummon = false;
 
 		if (unit != NULL) { //  Found a corpse. eliminate it and proceed to summoning.

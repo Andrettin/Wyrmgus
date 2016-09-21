@@ -395,7 +395,7 @@ public:
 	//Warning: we expect typical usage as xmin = x - range
 	//Wyrmgus start
 //	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos)
-	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z = 0)
+	void FixSelectionArea(Vec2i &minpos, Vec2i &maxpos, int z)
 	//Wyrmgus end
 	{
 		minpos.x = std::max<short>(0, minpos.x);
@@ -600,7 +600,10 @@ extern int SaveStratagusMap(const std::string &filename, CMap &map, int writeTer
 extern void LoadStratagusMapInfo(const std::string &mapname);
 
 /// Returns true, if the unit-type(mask can enter field with bounds check
-extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
+//Wyrmgus start
+//extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask);
+extern bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z);
+//Wyrmgus end
 /// Returns true, if the unit-type can enter the field
 //Wyrmgus start
 //extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos);
@@ -627,9 +630,15 @@ void MapUnmarkUnitSight(CUnit &unit);
 ----------------------------------------------------------------------------*/
 
 /// Can a unit with 'mask' enter the field
-inline bool CanMoveToMask(const Vec2i &pos, int mask)
+//Wyrmgus start
+//inline bool CanMoveToMask(const Vec2i &pos, int mask)
+inline bool CanMoveToMask(const Vec2i &pos, int mask, int z)
+//Wyrmgus end
 {
-	return !Map.Field(pos)->CheckMask(mask);
+	//Wyrmgus start
+//	return !Map.Field(pos)->CheckMask(mask);
+	return !Map.Field(pos, z)->CheckMask(mask);
+	//Wyrmgus end
 }
 
 /// Handle Marking and Unmarking of radar vision

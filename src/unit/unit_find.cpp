@@ -56,18 +56,24 @@
 
 //Wyrmgus start
 //void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
-void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, bool circle)
+void Select(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle)
 //Wyrmgus end
 {
-	Select(ltPos, rbPos, units, NoFilter());
+	//Wyrmgus start
+//	Select(ltPos, rbPos, units, NoFilter());
+	Select(ltPos, rbPos, units, z, NoFilter());
+	//Wyrmgus end
 }
 
 //Wyrmgus start
 //void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units)
-void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, bool circle)
+void SelectFixed(const Vec2i &ltPos, const Vec2i &rbPos, std::vector<CUnit *> &units, int z, bool circle)
 //Wyrmgus end
 {
-	Select(ltPos, rbPos, units, NoFilter());
+	//Wyrmgus start
+//	Select(ltPos, rbPos, units, NoFilter());
+	Select(ltPos, rbPos, units, z, NoFilter());
+	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -80,7 +86,10 @@ void SelectAroundUnit(const CUnit &unit, int range, std::vector<CUnit *> &around
 
 CUnit *UnitFinder::FindUnitAtPos(const Vec2i &pos) const
 {
-	CUnitCache &cache = Map.Field(pos)->UnitCache;
+	//Wyrmgus start
+//	CUnitCache &cache = Map.Field(pos)->UnitCache;
+	CUnitCache &cache = Map.Field(pos, z)->UnitCache;
+	//Wyrmgus end
 
 	for (CUnitCache::iterator it = cache.begin(); it != cache.end(); ++it) {
 		CUnit *unit = *it;
@@ -96,7 +105,7 @@ VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 {
 	//Wyrmgus start
 //	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
-	if (!Map.Field(pos)->playerInfo.IsTeamExplored(player)) {
+	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
@@ -106,7 +115,10 @@ VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 		*unitP = unit;
 		return VisitResult_Finished;
 	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (CanMoveToMask(pos, movemask, z)) { // reachable
+	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
@@ -156,7 +168,10 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 		}
 		return VisitResult_Finished;
 	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (CanMoveToMask(pos, movemask, z)) { // reachable
+	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
@@ -469,12 +484,15 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 {
 	//Wyrmgus start
 //	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
-	if (!Map.Field(pos)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
+	if (!Map.Field(pos, worker.MapLayer)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 
-	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
+	//Wyrmgus start
+//	CUnit *mine = Map.Field(pos)->UnitCache.find(res_finder);
+	CUnit *mine = Map.Field(pos, worker.MapLayer)->UnitCache.find(res_finder);
+	//Wyrmgus end
 
 	if (mine && mine != *resultMine && MineIsUsable(*mine)) {
 		ResourceUnitFinder::ResourceUnitFinder_Cost cost;
@@ -489,7 +507,10 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 			bestCost = cost;
 		}
 	}
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (CanMoveToMask(pos, movemask, worker.MapLayer)) { // reachable
+	//Wyrmgus end
 		if (terrainTraversal.Get(pos) < maxRange) {
 			return VisitResult_Ok;
 		} else {
@@ -516,13 +537,13 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, int resource,
 						//Wyrmgus start
 //						bool check_usage, const CUnit *deposit)
-						bool check_usage, const CUnit *deposit, bool mine_on_top, bool ignore_exploration, bool only_unsettled_area, int z)
+						bool check_usage, const CUnit *deposit, bool mine_on_top, bool ignore_exploration, bool only_unsettled_area)
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
 		//Wyrmgus start
 //		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource);
-		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource, z);
+		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource, unit.MapLayer);
 		//Wyrmgus end
 	}
 
@@ -530,7 +551,7 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -711,7 +732,10 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 {
 	std::vector<CUnit *> table;
 
-	Select(pos1, pos2, table);
+	//Wyrmgus start
+//	Select(pos1, pos2, table);
+	Select(pos1, pos2, table, source.MapLayer);
+	//Wyrmgus end
 	CUnit *best = NULL;
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
@@ -744,9 +768,15 @@ CUnit *TargetOnMap(const CUnit &source, const Vec2i &pos1, const Vec2i &pos2)
 **
 **  @return          Returns the deposit if found, or NULL.
 */
-CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
+//Wyrmgus start
+//CUnit *ResourceOnMap(const Vec2i &pos, int resource, bool mine_on_top)
+CUnit *ResourceOnMap(const Vec2i &pos, int resource, int z, bool mine_on_top)
+//Wyrmgus end
 {
-	return Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
+	//Wyrmgus start
+//	return Map.Field(pos)->UnitCache.find(CResourceFinder(resource, mine_on_top));
+	return Map.Field(pos, z)->UnitCache.find(CResourceFinder(resource, mine_on_top));
+	//Wyrmgus end
 }
 
 class IsADepositForResource
@@ -769,9 +799,15 @@ private:
 **
 **  @return          Returns the deposit if found, or NULL.
 */
-CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
+//Wyrmgus start
+//CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource)
+CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource, int z)
+//Wyrmgus end
 {
-	return Map.Field(pos)->UnitCache.find(IsADepositForResource(resource));
+	//Wyrmgus start
+//	return Map.Field(pos)->UnitCache.find(IsADepositForResource(resource));
+	return Map.Field(pos, z)->UnitCache.find(IsADepositForResource(resource));
+	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------

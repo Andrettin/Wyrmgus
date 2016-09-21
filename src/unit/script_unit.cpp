@@ -1199,7 +1199,10 @@ static int CclOrderUnit(lua_State *l)
 	//Wyrmgus end
 	const char *order = LuaToString(l, 5);
 	std::vector<CUnit *> table;
-	Select(pos1, pos2, table);
+	//Wyrmgus start
+//	Select(pos1, pos2, table);
+	Select(pos1, pos2, table, 0);
+	//Wyrmgus end
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
 
@@ -1356,7 +1359,10 @@ static int CclKillUnitAt(lua_State *l)
 
 	std::vector<CUnit *> table;
 
-	Select(pos1, pos2, table);
+	//Wyrmgus start
+//	Select(pos1, pos2, table);
+	Select(pos1, pos2, table, 0);
+	//Wyrmgus end
 
 	int s = 0;
 	for (std::vector<CUnit *>::iterator it = table.begin(); it != table.end() && s < q; ++it) {

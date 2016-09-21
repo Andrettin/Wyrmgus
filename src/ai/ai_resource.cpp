@@ -210,19 +210,28 @@ private:
 **  @return       Number of enemy units.
 */
 int AiEnemyUnitsInDistance(const CPlayer &player,
-						   const CUnitType *type, const Vec2i &pos, unsigned range)
+						   //Wyrmgus start
+//						   const CUnitType *type, const Vec2i &pos, unsigned range)
+						   const CUnitType *type, const Vec2i &pos, unsigned range, int z)
+						   //Wyrmgus end
 {
 	const Vec2i offset(range, range);
 	std::vector<CUnit *> units;
 
 	if (type == NULL) {
-		Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
+		//Wyrmgus start
+//		Select(pos - offset, pos + offset, units, IsAEnemyUnitOf(player));
+		Select(pos - offset, pos + offset, units, z, IsAEnemyUnitOf(player));
+		//Wyrmgus end
 		return static_cast<int>(units.size());
 	} else {
 		const Vec2i typeSize(type->TileWidth - 1, type->TileHeight - 1);
 		const IsAEnemyUnitWhichCanCounterAttackOf pred(player, *type);
 
-		Select(pos - offset, pos + typeSize + offset, units, pred);
+		//Wyrmgus start
+//		Select(pos - offset, pos + typeSize + offset, units, pred);
+		Select(pos - offset, pos + typeSize + offset, units, z, pred);
+		//Wyrmgus end
 		return static_cast<int>(units.size());
 	}
 }
@@ -235,9 +244,15 @@ int AiEnemyUnitsInDistance(const CPlayer &player,
 **
 **  @return       Number of enemy units.
 */
-int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
+//Wyrmgus start
+//int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range)
+int AiEnemyUnitsInDistance(const CUnit &unit, unsigned range, int z)
+//Wyrmgus end
 {
-	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range);
+	//Wyrmgus start
+//	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range);
+	return AiEnemyUnitsInDistance(*unit.Player, unit.Type, unit.tilePos, range, z);
+	//Wyrmgus end
 }
 
 static bool IsAlreadyWorking(const CUnit &unit)
@@ -530,7 +545,10 @@ CUnit *AiGetSuitableDepot(const CUnit &worker, const CUnit &oldDepot, CUnit **re
 		if (unit.Refs > tooManyWorkers) {
 			continue;
 		}
-		if (AiEnemyUnitsInDistance(worker, range)) {
+		//Wyrmgus start
+//		if (AiEnemyUnitsInDistance(worker, range)) {
+		if (AiEnemyUnitsInDistance(worker, range, worker.MapLayer)) {
+		//Wyrmgus end
 			continue;
 		}
 		CUnit *res = UnitFindResource(worker, unit, range, resource, unit.Player->AiEnabled);
@@ -1467,7 +1485,7 @@ static bool IsReadyToRepair(const CUnit &unit)
 */
 //Wyrmgus start
 //static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building)
-static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building, int z = 0)
+static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit &building)
 //Wyrmgus end
 {
 	if (type.RepairRange == 0) {
@@ -1496,7 +1514,7 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.MapWidths[building.MapLayer], Map.Info.MapHeights[building.MapLayer]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -1505,7 +1523,10 @@ static bool AiRepairBuilding(const CPlayer &player, const CUnitType &type, CUnit
 	const int maxRange = 15;
 	const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
 	CUnit *unit = NULL;
-	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
+	//Wyrmgus start
+//	UnitFinder unitFinder(player, table, maxRange, movemask, &unit);
+	UnitFinder unitFinder(player, table, maxRange, movemask, &unit, building.MapLayer);
+	//Wyrmgus end
 
 	if (terrainTraversal.Run(unitFinder) && unit != NULL) {
 		const Vec2i invalidPos(-1, -1);
@@ -1599,7 +1620,7 @@ static void AiCheckRepair()
 			//
 			//Wyrmgus start
 //			if (AiEnemyUnitsInDistance(unit, unit.Stats->Variables[SIGHTRANGE_INDEX].Max)) {
-			if (AiEnemyUnitsInDistance(unit, unit.Variable[SIGHTRANGE_INDEX].Max)) {
+			if (AiEnemyUnitsInDistance(unit, unit.Variable[SIGHTRANGE_INDEX].Max, unit.MapLayer)) {
 			//Wyrmgus end
 				continue;
 			}

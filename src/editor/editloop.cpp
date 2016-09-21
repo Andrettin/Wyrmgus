@@ -265,7 +265,10 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	Vec2i minPos = pos;
 	Vec2i maxPos(pos.x + size - 1, pos.y + size - 1);
 
-	Map.FixSelectionArea(minPos, maxPos);
+	//Wyrmgus start
+//	Map.FixSelectionArea(minPos, maxPos);
+	Map.FixSelectionArea(minPos, maxPos, CurrentMapLayer);
+	//Wyrmgus end
 
 	//Wyrmgus start
 	std::vector<Vec2i> changed_tiles;

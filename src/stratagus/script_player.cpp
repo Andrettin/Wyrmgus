@@ -510,7 +510,10 @@ static int CclChangeUnitsOwner(lua_State *l)
 	const int newp = LuaToNumber(l, 4);
 	std::vector<CUnit *> table;
 
-	Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+	//Wyrmgus start
+//	Select(pos1, pos2, table, HasSamePlayerAs(Players[oldp]));
+	Select(pos1, pos2, table, 0, HasSamePlayerAs(Players[oldp]));
+	//Wyrmgus end
 	for (size_t i = 0; i != table.size(); ++i) {
 		table[i]->ChangeOwner(Players[newp]);
 	}

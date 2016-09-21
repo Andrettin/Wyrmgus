@@ -440,9 +440,9 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 		
 		std::vector<CUnit *> table;
 		if (player != NULL) {
-			Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
+			Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
-			Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 		}
 		
 		if (table.size() == 0 && UnitTypeCanBeAt(*unit_type, random_pos, z) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(NULL, *unit_type, random_pos, 0, true, z))) {
@@ -653,9 +653,15 @@ bool CMap::IsPointInASubtemplateArea(const Vec2i &pos) const
 **
 **  @return      True if could be entered, false otherwise.
 */
-bool CheckedCanMoveToMask(const Vec2i &pos, int mask)
+//Wyrmgus start
+//bool CheckedCanMoveToMask(const Vec2i &pos, int mask)
+bool CheckedCanMoveToMask(const Vec2i &pos, int mask, int z)
+//Wyrmgus end
 {
-	return Map.Info.IsPointOnMap(pos) && CanMoveToMask(pos, mask);
+	//Wyrmgus start
+//	return Map.Info.IsPointOnMap(pos) && CanMoveToMask(pos, mask);
+	return Map.Info.IsPointOnMap(pos, z) && CanMoveToMask(pos, mask, z);
+	//Wyrmgus end
 }
 
 /**
@@ -1784,7 +1790,7 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 
 	//remove decorations if a wall, tree or rock was removed from the tile
 	std::vector<CUnit *> table;
-	Select(pos, pos, table);
+	Select(pos, pos, table, z);
 	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->Type->UnitType == UnitTypeLand && table[i]->Type->BoolFlag[DECORATION_INDEX].value) {
 			LetUnitDie(*table[i]);			

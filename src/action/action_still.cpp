@@ -238,7 +238,7 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + std::max(6, unit.Type->RandomMovementDistance);
 					maxpos.y = pos.y + std::max(6, unit.Type->RandomMovementDistance);
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+					Select(minpos, maxpos, second_table, unit.MapLayer, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 
 					if (second_table.size() > 0) {
 						return false;
@@ -251,7 +251,7 @@ static bool MoveRandomly(CUnit &unit)
 					maxpos.x = pos.x + 1;
 					maxpos.y = pos.y + 1;
 					std::vector<CUnit *> second_table;
-					Select(minpos, maxpos, second_table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+					Select(minpos, maxpos, second_table, unit.MapLayer, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 
 					if (second_table.size() > 0) {
 						return false;
@@ -551,7 +551,10 @@ static CUnit *UnitToRepairInRange(const CUnit &unit, int range)
 {
 	const Vec2i offset(range, range);
 
-	return FindUnit_If(unit.tilePos - offset, unit.tilePos + offset, IsAReparableUnitBy(unit));
+	//Wyrmgus start
+//	return FindUnit_If(unit.tilePos - offset, unit.tilePos + offset, IsAReparableUnitBy(unit));
+	return FindUnit_If(unit.tilePos - offset, unit.tilePos + offset, unit.MapLayer, IsAReparableUnitBy(unit));
+	//Wyrmgus end
 }
 
 /**

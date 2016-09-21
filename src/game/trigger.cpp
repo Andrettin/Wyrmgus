@@ -183,7 +183,10 @@ static int CclGetNumUnitsAt(lua_State *l)
 
 	std::vector<CUnit *> units;
 
-	Select(minPos, maxPos, units);
+	//Wyrmgus start
+//	Select(minPos, maxPos, units);
+	Select(minPos, maxPos, units, 0);
+	//Wyrmgus end
 
 	int s = 0;
 	for (size_t i = 0; i != units.size(); ++i) {

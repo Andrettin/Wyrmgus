@@ -4386,7 +4386,7 @@ CUnit *UnitOnScreen(int x, int y)
 			candidate = &unit;
 			//Wyrmgus start
 			std::vector<CUnit *> table;
-			Select(candidate->tilePos, candidate->tilePos, table, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			Select(candidate->tilePos, candidate->tilePos, table, candidate->MapLayer, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
 //			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) {
 			if (IsOnlySelected(*candidate) || candidate->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value || (candidate->Player->Type == PlayerNeutral && table.size()) || !candidate->IsAlive()) { // don't select a neutral unit if there's a player-owned unit there as well; don't selected a dead unit
 			//Wyrmgus end
@@ -5015,7 +5015,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	//if is a raft or bridge, destroy all land units on it
 	if (unit.Type->BoolFlag[BRIDGE_INDEX].value) {
 		std::vector<CUnit *> table;
-		Select(unit.tilePos, unit.tilePos, table);
+		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 		for (size_t i = 0; i != table.size(); ++i) {
 			if (table[i]->IsAliveOnMap() && !table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->Type->UnitType == UnitTypeLand) {
 				table[i]->Variable[HP_INDEX].Value = std::min<int>(0, unit.Variable[HP_INDEX].Value);

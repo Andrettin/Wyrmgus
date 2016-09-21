@@ -263,11 +263,14 @@ VisitResult ReachableTerrainMarker::Visit(TerrainTraversal &terrainTraversal, co
 	}
 #endif
 	*/
-	if (!Map.Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
-	if (CanMoveToMask(pos, movemask)) { // reachable
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask)) { // reachable
+	if (CanMoveToMask(pos, movemask, unit.MapLayer)) { // reachable
+	//Wyrmgus end
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -317,16 +320,22 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 	}
 #endif
 	*/
-	if (!Map.Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
-	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
+	//Wyrmgus start
+//	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
+	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask, unit.MapLayer)) {
+	//Wyrmgus end
 		DebugPrint("Target found %d,%d\n" _C_ pos.x _C_ pos.y);
 		*resultPos = pos;
 		return VisitResult_Finished;
 	}
-	if (CanMoveToMask(pos, movemask) || IsAccessibleForTransporter(pos)) { // reachable
+	//Wyrmgus start
+//	if (CanMoveToMask(pos, movemask) || IsAccessibleForTransporter(pos)) { // reachable
+	if (CanMoveToMask(pos, movemask, unit.MapLayer) || IsAccessibleForTransporter(pos)) { // reachable
+	//Wyrmgus end
 		return VisitResult_Ok;
 	} else { // unreachable
 		return VisitResult_DeadEnd;
@@ -335,12 +344,15 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 
 //Wyrmgus start
 //static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos)
-static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos, int z = 0)
+static bool AiFindTarget(const CUnit &unit, const TerrainTraversal &terrainTransporter, Vec2i *resultPos)
 //Wyrmgus end
 {
 	TerrainTraversal terrainTraversal;
 
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	//Wyrmgus start
+//	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
+	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
+	//Wyrmgus end
 	terrainTraversal.Init();
 
 	terrainTraversal.PushUnitPosAndNeighboor(unit);

@@ -506,7 +506,10 @@ extern int AiFindWall(AiForce *force);
 extern void AiSendExplorers();
 /// Enemy units in distance
 extern int AiEnemyUnitsInDistance(const CPlayer &player, const CUnitType *type,
-								  const Vec2i &pos, unsigned range);
+								  //Wyrmgus start
+//								  const Vec2i &pos, unsigned range);
+								  const Vec2i &pos, unsigned range, int z);
+								  //Wyrmgus end
 
 //
 // Magic

@@ -422,7 +422,7 @@ static void AnimateActionTrain(CUnit &unit)
 		if (unit.RallyPointPos.x != -1 && unit.RallyPointPos.y != -1 && newUnit->CanMove()) {
 			bool command_found = false;
 			std::vector<CUnit *> table;
-			Select(unit.RallyPointPos, unit.RallyPointPos, table);
+			Select(unit.RallyPointPos, unit.RallyPointPos, table, unit.RallyPointMapLayer);
 			for (size_t j = 0; j != table.size(); ++j) {
 				if (!table[j]->IsAliveOnMap() || table[j]->Type->BoolFlag[DECORATION_INDEX].value) {
 					continue;

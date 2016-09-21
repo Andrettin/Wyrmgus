@@ -79,7 +79,10 @@
 	std::vector<CUnit *> units;
 
 	// Get all the units around the unit
-	Select(goalPos - range, goalPos + typeSize + range, units);
+	//Wyrmgus start
+//	Select(goalPos - range, goalPos + typeSize + range, units);
+	Select(goalPos - range, goalPos + typeSize + range, units, z);
+	//Wyrmgus end
 	int hp = this->HP;
 	int mana = this->Mana;
 	int shield = this->Shield;

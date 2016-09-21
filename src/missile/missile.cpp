@@ -1068,11 +1068,17 @@ bool MissileInitMove(Missile &missile)
 
 void MissileHandlePierce(Missile &missile, const Vec2i &pos)
 {
-	if (Map.Info.IsPointOnMap(pos) == false) {
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(pos) == false) {
+	if (Map.Info.IsPointOnMap(pos, missile.MapLayer) == false) {
+	//Wyrmgus end
 		return;
 	}
 	std::vector<CUnit *> units;
-	Select(pos, pos, units);
+	//Wyrmgus start
+//	Select(pos, pos, units);
+	Select(pos, pos, units, missile.MapLayer);
+	//Wyrmgus end
 	for (std::vector<CUnit *>::iterator it = units.begin(); it != units.end(); ++it) {
 		CUnit &unit = **it;
 
@@ -1101,7 +1107,10 @@ bool MissileHandleBlocking(Missile &missile, const PixelPos &position)
 			// search for blocking units
 			std::vector<CUnit *> blockingUnits;
 			const Vec2i missilePos = Map.MapPixelPosToTilePos(position);
-			Select(missilePos, missilePos, blockingUnits);
+			//Wyrmgus start
+//			Select(missilePos, missilePos, blockingUnits);
+			Select(missilePos, missilePos, blockingUnits, missile.MapLayer);
+			//Wyrmgus end
 			for (std::vector<CUnit *>::iterator it = blockingUnits.begin();	it != blockingUnits.end(); ++it) {
 				CUnit &unit = **it;
 				// If land unit shoots at land unit, missile can be blocked by Wall units
@@ -1477,7 +1486,10 @@ void Missile::MissileHit(CUnit *unit)
 		//
 		const Vec2i range(mtype.Range - 1, mtype.Range - 1);
 		std::vector<CUnit *> table;
-		Select(pos - range, pos + range, table);
+		//Wyrmgus start
+//		Select(pos - range, pos + range, table);
+		Select(pos - range, pos + range, table, this->MapLayer);
+		//Wyrmgus end
 		Assert(this->SourceUnit != NULL);
 		for (size_t i = 0; i != table.size(); ++i) {
 			CUnit &goal = *table[i];
