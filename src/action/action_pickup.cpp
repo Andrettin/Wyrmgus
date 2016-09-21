@@ -177,17 +177,11 @@ enum {
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
-		//Wyrmgus start
-//		input.SetGoal(goal->tilePos, tileSize);
 		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
-		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		//Wyrmgus start
-//		input.SetGoal(this->goalPos, tileSize);
 		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
-		//Wyrmgus end
 	}
 }
 

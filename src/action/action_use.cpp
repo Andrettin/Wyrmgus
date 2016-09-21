@@ -79,6 +79,7 @@ enum {
 	// Unit::Refs is used as timeout counter.
 	if (dest.Destroyed) {
 		order->goalPos = dest.tilePos + dest.Type->GetHalfTileSize();
+		order->MapLayer = dest.MapLayer;
 	} else {
 		order->SetGoal(&dest);
 		order->Range = 1;
@@ -98,6 +99,7 @@ enum {
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
 
 	file.printf(" \"state\", %d", this->State);
 
@@ -117,6 +119,9 @@ enum {
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
 	} else {
 		return false;
 	}
@@ -166,11 +171,11 @@ enum {
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
-		input.SetGoal(goal->tilePos, tileSize);
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
 	}
 }
 
@@ -285,7 +290,7 @@ enum {
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
 			//Wyrmgus start
-			if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table);
 				for (size_t i = 0; i != table.size(); ++i) {
@@ -368,6 +373,7 @@ enum {
 				}
 			}
 			this->goalPos = goal->tilePos;
+			this->MapLayer = goal->MapLayer;
 			this->State = State_TargetReached;
 		}
 		// FALL THROUGH
@@ -379,6 +385,7 @@ enum {
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		DebugPrint("Goal gone\n");
 		this->goalPos = goal->tilePos + goal->Type->GetHalfTileSize();
+		this->MapLayer = goal->MapLayer;
 		this->ClearGoal();
 		goal = NULL;
 	}

@@ -86,7 +86,7 @@ public:
 	void SetUnit(CUnit &_unit);
 	//Wyrmgus start
 //	void SetGoal(const Vec2i &pos, const Vec2i &size);
-	void SetGoal(const Vec2i &pos, const Vec2i &size, int z = 0);
+	void SetGoal(const Vec2i &pos, const Vec2i &size, int z);
 	//Wyrmgus end
 	void SetMinRange(int range);
 	void SetMaxRange(int range);

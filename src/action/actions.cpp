@@ -113,8 +113,10 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	input.SetMinRange(0);
 	input.SetMaxRange(0);
 	const Vec2i tileSize(0, 0);
-	input.SetGoal(input.GetUnit()->tilePos, tileSize);
-
+	//Wyrmgus start
+//	input.SetGoal(input.GetUnit()->tilePos, tileSize);
+	input.SetGoal(input.GetUnit()->tilePos, tileSize, input.GetUnit()->MapLayer);
+	//Wyrmgus end
 }
 
 /* virtual */ void COrder::FillSeenValues(CUnit &unit) const
