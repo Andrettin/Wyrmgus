@@ -67,7 +67,10 @@ public:
 	void update(int ticks);
 
 	bool isFinished();
-	bool isVisible(const CViewport &vp, const CPosition &pos);
+	//Wyrmgus start
+//	bool isVisible(const CViewport &vp, const CPosition &pos);
+	bool isVisible(const CViewport &vp, const CPosition &pos, int z);
+	//Wyrmgus end
 	GraphicAnimation *clone();
 };
 
@@ -77,8 +80,14 @@ public:
 class CParticle
 {
 public:
-	CParticle(CPosition position, int drawlevel = 0) :
-		pos(position), destroyed(false), drawLevel(drawlevel)
+	//Wyrmgus start
+//	CParticle(CPosition position, int drawlevel = 0) :
+	CParticle(CPosition position, int z, int drawlevel = 0) :
+	//Wyrmgus end
+		//Wyrmgus start
+//		pos(position), destroyed(false), drawLevel(drawlevel)
+		pos(position), destroyed(false), drawLevel(drawlevel), MapLayer(z)
+		//Wyrmgus end
 	{}
 	virtual ~CParticle() {}
 
@@ -98,13 +107,19 @@ protected:
 	CPosition pos;
 	bool destroyed;
 	int drawLevel;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 
 
 class StaticParticle : public CParticle
 {
 public:
-	StaticParticle(CPosition position, GraphicAnimation *flame, int drawlevel = 0);
+	//Wyrmgus start
+//	StaticParticle(CPosition position, GraphicAnimation *flame, int drawlevel = 0);
+	StaticParticle(CPosition position, int z, GraphicAnimation *flame, int drawlevel = 0);
+	//Wyrmgus end
 	virtual ~StaticParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
@@ -121,7 +136,10 @@ protected:
 class CChunkParticle : public CParticle
 {
 public:
-	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
+	//Wyrmgus start
+//	CChunkParticle(CPosition position, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
+	CChunkParticle(CPosition position, int z, GraphicAnimation *smokeAnimation, GraphicAnimation *debrisAnimation,
+	//Wyrmgus end
 				   GraphicAnimation *destroyAnimation,
 				   int minVelocity = 0, int maxVelocity = 400,
 				   int minTrajectoryAngle = 77, int maxTTL = 0, int drawlevel = 0);
@@ -165,7 +183,10 @@ protected:
 class CSmokeParticle : public CParticle
 {
 public:
-	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
+	//Wyrmgus start
+//	CSmokeParticle(CPosition position, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
+	CSmokeParticle(CPosition position, int z, GraphicAnimation *animation, float speedx = 0, float speedy = -22.0f, int drawlevel = 0);
+	//Wyrmgus end
 	virtual ~CSmokeParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;
@@ -184,7 +205,10 @@ protected:
 class CRadialParticle : public CParticle
 {
 public:
-	CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
+	//Wyrmgus start
+//	CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
+	CRadialParticle(CPosition position, int z, GraphicAnimation *animation, int maxSpeed, int drawlevel = 0);
+	//Wyrmgus end
 	virtual ~CRadialParticle();
 
 	virtual bool isVisible(const CViewport &vp) const;

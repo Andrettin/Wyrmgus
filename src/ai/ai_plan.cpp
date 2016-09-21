@@ -108,12 +108,18 @@ private:
 **
 **  @return        Returns ideal target on map tile.
 */
-static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
+//Wyrmgus start
+//static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos)
+static CUnit *EnemyOnMapTile(const CUnit &source, const Vec2i &pos, int z)
+//Wyrmgus end
 {
 	CUnit *enemy = NULL;
 
 	_EnemyOnMapTile filter(source, pos, &enemy);
-	Map.Field(pos)->UnitCache.for_each(filter);
+	//Wyrmgus start
+//	Map.Field(pos)->UnitCache.for_each(filter);
+	Map.Field(pos, z)->UnitCache.for_each(filter);
+	//Wyrmgus end
 	return enemy;
 }
 
@@ -148,19 +154,25 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	}
 #endif
 	*/
-	if (!Map.Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
 		return VisitResult_DeadEnd;
 	}
 	//Wyrmgus end
 	// Look if found what was required.
-	if (Map.WallOnMap(pos)) {
+	//Wyrmgus start
+//	if (Map.WallOnMap(pos)) {
+	if (Map.WallOnMap(pos, unit.MapLayer)) {
+	//Wyrmgus end
 		DebugPrint("Wall found %d, %d\n" _C_ pos.x _C_ pos.y);
 		if (resultPos) {
 			*resultPos = from;
 		}
 		return VisitResult_Finished;
 	}
-	if (Map.Field(pos)->CheckMask(movemask)) { // reachable
+	//Wyrmgus start
+//	if (Map.Field(pos)->CheckMask(movemask)) { // reachable
+	if (Map.Field(pos, unit.MapLayer)->CheckMask(movemask)) { // reachable
+	//Wyrmgus end
 		if (terrainTraversal.Get(pos) <= maxDist) {
 			return VisitResult_Ok;
 		} else {
@@ -326,7 +338,7 @@ VisitResult EnemyFinderWithTransporter::Visit(TerrainTraversal &terrainTraversal
 	//Wyrmgus end
 	//Wyrmgus start
 //	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask)) {
-	if (EnemyOnMapTile(unit, pos) && CanMoveToMask(from, movemask, unit.MapLayer)) {
+	if (EnemyOnMapTile(unit, pos, unit.MapLayer) && CanMoveToMask(from, movemask, unit.MapLayer)) {
 	//Wyrmgus end
 		DebugPrint("Target found %d,%d\n" _C_ pos.x _C_ pos.y);
 		*resultPos = pos;
@@ -490,6 +502,8 @@ int AiForce::PlanAttack(int z)
 	return 0;
 }
 
+//Wyrmgus start
+/*
 static bool ChooseRandomUnexploredPositionNear(const Vec2i &center, Vec2i *pos)
 {
 	Assert(pos != NULL);
@@ -570,6 +584,8 @@ static CUnit *GetBestExplorer(const AiExplorationRequest &request, Vec2i *pos)
 	}
 	return bestunit;
 }
+*/
+//Wyrmgus end
 
 //Wyrmgus start
 static CUnit *GetBestScout(int unit_type)

@@ -468,10 +468,17 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 **
 **  @return    True if wall, false otherwise.
 */
-bool CMap::WallOnMap(const Vec2i &pos) const
+//Wyrmgus start
+//bool CMap::WallOnMap(const Vec2i &pos) const
+bool CMap::WallOnMap(const Vec2i &pos, int z) const
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
-	return Field(pos)->isAWall();
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+//	return Field(pos)->isAWall();
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	return Field(pos, z)->isAWall();
+	//Wyrmgus end
 }
 
 /**
@@ -596,15 +603,15 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrai
 	return true;
 }
 
-bool CMap::TileBordersBuilding(const Vec2i &pos)
+bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 {
 	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
 		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
 			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
-			if (!this->Info.IsPointOnMap(adjacent_pos) || (sub_x == 0 && sub_y == 0)) {
+			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			CMapField &mf = *Map.Field(adjacent_pos);
+			CMapField &mf = *Map.Field(adjacent_pos, z);
 			
 			const CUnitCache &cache = mf.UnitCache;
 			for (size_t i = 0; i != cache.size(); ++i) {
@@ -621,9 +628,9 @@ bool CMap::TileBordersBuilding(const Vec2i &pos)
 	return false;
 }
 
-bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain)
+bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 {
-	CMapField &mf = *Map.Field(pos);
+	CMapField &mf = *Map.Field(pos, z);
 	
 	const CUnitCache &cache = mf.UnitCache;
 	for (size_t i = 0; i != cache.size(); ++i) {
@@ -1632,8 +1639,8 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 			)
 			&& (!GetTileTopTerrain(random_pos, false, z)->Overlay || GetTileTopTerrain(random_pos, false, z) == terrain)
 			&& (!preserve_coastline || (terrain->Flags & MapFieldWaterAllowed) == (tile_terrain->Flags & MapFieldWaterAllowed))
-			&& !this->TileHasUnitsIncompatibleWithTerrain(random_pos, terrain)
-			&& (!(terrain->Flags & MapFieldUnpassable) || !this->TileBordersBuilding(random_pos)) // if the terrain is unpassable, don't expand to spots adjacent to buildings
+			&& !this->TileHasUnitsIncompatibleWithTerrain(random_pos, terrain, z)
+			&& (!(terrain->Flags & MapFieldUnpassable) || !this->TileBordersBuilding(random_pos, z)) // if the terrain is unpassable, don't expand to spots adjacent to buildings
 		) {
 			std::vector<Vec2i> adjacent_positions;
 			for (int sub_x = -1; sub_x <= 1; sub_x += 2) { // +2 so that only diagonals are used
@@ -1666,8 +1673,8 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						)
 						&& (!GetTileTopTerrain(diagonal_pos, false, z)->Overlay || GetTileTopTerrain(diagonal_pos, false, z) == terrain) && (!GetTileTopTerrain(vertical_pos, false, z)->Overlay || GetTileTopTerrain(vertical_pos, false, z) == terrain) && (!GetTileTopTerrain(horizontal_pos, false, z)->Overlay || GetTileTopTerrain(horizontal_pos, false, z) == terrain)
 						&& (!preserve_coastline || ((terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
-						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
-						&& (!(terrain->Flags & MapFieldUnpassable) || (!this->TileBordersBuilding(diagonal_pos) && !this->TileBordersBuilding(vertical_pos) && !this->TileBordersBuilding(horizontal_pos))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
+						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain, z) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain, z) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain, z)
+						&& (!(terrain->Flags & MapFieldUnpassable) || (!this->TileBordersBuilding(diagonal_pos, z) && !this->TileBordersBuilding(vertical_pos, z) && !this->TileBordersBuilding(horizontal_pos, z))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
 						&& !this->IsPointInASubtemplateArea(diagonal_pos, z) && !this->IsPointInASubtemplateArea(vertical_pos, z) && !this->IsPointInASubtemplateArea(horizontal_pos, z)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
@@ -1677,10 +1684,10 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 			
 			if (adjacent_positions.size() > 0) {
 				Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-				this->Field(random_pos)->SetTerrain(terrain);
-				this->Field(adjacent_pos)->SetTerrain(terrain);
-				this->Field(Vec2i(random_pos.x, adjacent_pos.y))->SetTerrain(terrain);
-				this->Field(Vec2i(adjacent_pos.x, random_pos.y))->SetTerrain(terrain);
+				this->Field(random_pos, z)->SetTerrain(terrain);
+				this->Field(adjacent_pos, z)->SetTerrain(terrain);
+				this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->SetTerrain(terrain);
+				this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->SetTerrain(terrain);
 				count -= 1;
 			}
 		}
@@ -1734,8 +1741,8 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						)
 						&& (!GetTileTopTerrain(diagonal_pos, false, z)->Overlay || GetTileTopTerrain(diagonal_pos, false, z) == terrain) && (!GetTileTopTerrain(vertical_pos, false, z)->Overlay || GetTileTopTerrain(vertical_pos, false, z) == terrain) && (!GetTileTopTerrain(horizontal_pos, false, z)->Overlay || GetTileTopTerrain(horizontal_pos, false, z) == terrain) // don't expand into tiles with overlays
 						&& (!preserve_coastline || ((terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
-						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
-						&& (!(terrain->Flags & MapFieldUnpassable) || (!this->TileBordersBuilding(diagonal_pos) && !this->TileBordersBuilding(vertical_pos) && !this->TileBordersBuilding(horizontal_pos))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
+						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain, z) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain, z) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain, z)
+						&& (!(terrain->Flags & MapFieldUnpassable) || (!this->TileBordersBuilding(diagonal_pos, z) && !this->TileBordersBuilding(vertical_pos, z) && !this->TileBordersBuilding(horizontal_pos, z))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
 						&& (!this->IsPointInASubtemplateArea(diagonal_pos, z) || GetTileTerrain(diagonal_pos, terrain->Overlay, z) == terrain) && (!this->IsPointInASubtemplateArea(vertical_pos, z) || GetTileTerrain(vertical_pos, terrain->Overlay, z) == terrain) && (!this->IsPointInASubtemplateArea(horizontal_pos, z) || GetTileTerrain(horizontal_pos, terrain->Overlay, z) == terrain)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
@@ -1745,9 +1752,9 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 			
 			if (adjacent_positions.size() > 0) {
 				Vec2i adjacent_pos = adjacent_positions[SyncRand(adjacent_positions.size())];
-				this->Field(adjacent_pos)->SetTerrain(terrain);
-				this->Field(Vec2i(random_pos.x, adjacent_pos.y))->SetTerrain(terrain);
-				this->Field(Vec2i(adjacent_pos.x, random_pos.y))->SetTerrain(terrain);
+				this->Field(adjacent_pos, z)->SetTerrain(terrain);
+				this->Field(Vec2i(random_pos.x, adjacent_pos.y), z)->SetTerrain(terrain);
+				this->Field(Vec2i(adjacent_pos.x, random_pos.y), z)->SetTerrain(terrain);
 				count -= 1;
 			}
 		}

@@ -111,7 +111,10 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 	Assert(Map.Info.IsPointOnMap(pos));
 
 	// Change the flags
-	CMapField &mf = *Map.Field(pos);
+	//Wyrmgus start
+//	CMapField &mf = *Map.Field(pos);
+	CMapField &mf = *Map.Field(pos, CurrentMapLayer);
+	//Wyrmgus end
 	int tile = tileIndex;
 	if (TileToolRandom) {
 		int n = 0;
@@ -197,7 +200,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 //Wyrmgus end
 {
 	// Special case 1) Walls.
-	CMapField &mf = *Map.Field(pos);
+	//Wyrmgus start
+//	CMapField &mf = *Map.Field(pos);
+	CMapField &mf = *Map.Field(pos, CurrentMapLayer);
+	//Wyrmgus end
 	
 	//Wyrmgus start
 	//see if the tile's terrain can be here as is, or if it is needed to change surrounding tiles
@@ -211,10 +217,10 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
 					if (Map.Info.IsPointOnMap(adjacent_pos)) {
-						CMapField &adjacent_mf = *Map.Field(adjacent_pos);
+						CMapField &adjacent_mf = *Map.Field(adjacent_pos, CurrentMapLayer);
 							
 						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);
-						if (overlay && adjacent_terrain && Map.Field(adjacent_pos)->OverlayTerrainDestroyed) {
+						if (overlay && adjacent_terrain && Map.Field(adjacent_pos, CurrentMapLayer)->OverlayTerrainDestroyed) {
 							adjacent_terrain = NULL;
 						}
 						if (terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays

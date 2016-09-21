@@ -810,17 +810,17 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	}
 	
 	if (!map_template->IsSubtemplateArea()) {
-		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
-		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
-		Map.AdjustTileMapTransitions(map_start_pos, map_end);
-		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
-		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	} else {
-		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
-		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
-		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
-		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
-		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
 	}
 	
 	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::iterator iterator = map_template->Resources.begin(); iterator != map_template->Resources.end(); ++iterator) {
@@ -978,17 +978,17 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	}
 	
 	if (!map_template->IsSubtemplateArea()) {
-		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
-		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
-		Map.AdjustTileMapTransitions(map_start_pos, map_end);
-		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
-		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
 	} else {
-		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
-		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
-		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
-		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
-		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1));
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
 	}
 }
 //Wyrmgus end
@@ -1199,7 +1199,14 @@ static int CclGetTileTerrainMixedName(lua_State *l)
 */
 static int CclGetTileTerrainHasFlag(lua_State *l)
 {
-	LuaCheckArgs(l, 3);
+	//Wyrmgus start
+//	LuaCheckArgs(l, 3);
+	int z = 0;
+	const int nargs = lua_gettop(l);
+	if (nargs >= 4) {
+		z = LuaToNumber(l, 4);
+	}
+	//Wyrmgus end
 
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
@@ -1247,7 +1254,10 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 		flag = MapFieldForest;
 	}
 
-	const CMapField &mf = *Map.Field(pos);
+	//Wyrmgus start
+//	const CMapField &mf = *Map.Field(pos);
+	const CMapField &mf = *Map.Field(pos, z);
+	//Wyrmgus end
 
 	if (mf.getFlag() & flag) {
 		lua_pushboolean(l, 1);

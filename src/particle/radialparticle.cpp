@@ -34,8 +34,14 @@
 #include "stratagus.h"
 #include "particle.h"
 
-CRadialParticle::CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel) :
-	CParticle(position, drawlevel)
+//Wyrmgus start
+//CRadialParticle::CRadialParticle(CPosition position, GraphicAnimation *animation, int maxSpeed, int drawlevel) :
+CRadialParticle::CRadialParticle(CPosition position, int z, GraphicAnimation *animation, int maxSpeed, int drawlevel) :
+//Wyrmgus end
+	//Wyrmgus start
+//	CParticle(position, drawlevel)
+	CParticle(position, z, drawlevel)
+	//Wyrmgus end
 {
 	Assert(animation);
 	this->animation = animation->clone();
@@ -54,7 +60,10 @@ CRadialParticle::~CRadialParticle()
 
 bool CRadialParticle::isVisible(const CViewport &vp) const
 {
-	return animation && animation->isVisible(vp, pos);
+	//Wyrmgus start
+//	return animation && animation->isVisible(vp, pos);
+	return animation && animation->isVisible(vp, pos, MapLayer);
+	//Wyrmgus end
 }
 
 void CRadialParticle::draw()
@@ -76,7 +85,10 @@ void CRadialParticle::update(int ticks)
 
 CParticle *CRadialParticle::clone()
 {
-	CParticle *p = new CRadialParticle(pos, animation, maxSpeed, drawLevel);
+	//Wyrmgus start
+//	CParticle *p = new CRadialParticle(pos, animation, maxSpeed, drawLevel);
+	CParticle *p = new CRadialParticle(pos, MapLayer, animation, maxSpeed, drawLevel);
+	//Wyrmgus end
 	return p;
 }
 

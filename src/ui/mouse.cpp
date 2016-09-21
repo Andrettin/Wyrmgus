@@ -319,8 +319,9 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 		if (type.ResInfo[res]
 			//Wyrmgus start
 //			&& type.ResInfo[res]->TerrainHarvester
+//			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
+			&& Map.Field(pos, CurrentMapLayer)->IsTerrainResourceOnMap(res)
 			//Wyrmgus end
-			&& Map.Field(pos)->IsTerrainResourceOnMap(res)
 			//Wyrmgus start
 //			&& ((unit.CurrentResource != res)
 //				|| (unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity))) {
@@ -545,8 +546,8 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		}
 	}
 	*/
-	if (Map.WallOnMap(pos)) {
-		if (!Map.Field(pos)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
+	if (Map.WallOnMap(pos, CurrentMapLayer)) {
+		if (!Map.Field(pos, CurrentMapLayer)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
 			SendCommandAttack(unit, pos, NoUnitP, flush);
 			return;
 		}
@@ -1311,7 +1312,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
 			//Wyrmgus start
-			UI.StatusLine.Set(Map.Field(tilePos)->Label);
+			UI.StatusLine.Set(Map.Field(tilePos, CurrentMapLayer)->Label);
 			//Wyrmgus end
 		}
 		
@@ -1325,7 +1326,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					//Wyrmgus start
 //					&& Selected[0]->Type->ResInfo[res]->TerrainHarvester
 					//Wyrmgus end
-					&& Map.Field(tilePos)->IsTerrainResourceOnMap(res)
+					&& Map.Field(tilePos, CurrentMapLayer)->IsTerrainResourceOnMap(res)
 				) {
 					has_terrain_resource = true;
 				}
@@ -1342,9 +1343,12 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 //		if (Map.Field(tilePos)->playerInfo.IsExplored(*ThisPlayer) || ReplayRevealMap) {
 		if (Map.Field(tilePos, CurrentMapLayer)->playerInfo.IsTeamExplored(*ThisPlayer) || ReplayRevealMap) {
 		//Wyrmgus end
-			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 			//Wyrmgus start
-			UI.StatusLine.Set(Map.Field(tilePos)->Label);
+//			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
+			UnitUnderCursor = UnitOnMapTile(tilePos, -1, CurrentMapLayer);
+			//Wyrmgus end
+			//Wyrmgus start
+			UI.StatusLine.Set(Map.Field(tilePos, CurrentMapLayer)->Label);
 			//Wyrmgus end
 		}
 	}
@@ -2111,7 +2115,10 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 			// FIXME: Johns: Perhaps we should use a pixel map coordinates
 			const Vec2i tilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 
-			if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1))
+			//Wyrmgus start
+//			if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1))
+			if (UnitUnderCursor != NULL && (unit = UnitOnMapTile(tilePos, -1, CurrentMapLayer))
+			//Wyrmgus end
 				&& !UnitUnderCursor->Type->BoolFlag[DECORATION_INDEX].value) {
 				unit->Blink = 4;                // if right click on building -- blink
 			} else { // if not not click on building -- green cross
@@ -2731,7 +2738,10 @@ void UIHandleButtonUp(unsigned button)
 			// FIXME: johns: only complete invisibile units
 			const Vec2i cursorTilePos = UI.MouseViewport->ScreenToTilePos(CursorScreenPos);
 			CUnit *unit = NULL;
-			if (ReplayRevealMap || Map.Field(cursorTilePos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			//Wyrmgus start
+//			if (ReplayRevealMap || Map.Field(cursorTilePos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			if (ReplayRevealMap || Map.Field(cursorTilePos, CurrentMapLayer)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			//Wyrmgus end
 				const PixelPos cursorMapPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
 				unit = UnitOnScreen(cursorMapPos.x, cursorMapPos.y);

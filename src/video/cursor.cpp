@@ -330,7 +330,7 @@ void DrawBuildingCursor()
 														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
 																  //Wyrmgus start
 //																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
-																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), CurrentMapLayer)))
+																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), CurrentMapLayer), CurrentMapLayer))
 																  //Wyrmgus end
 				//Wyrmgus start
 //				&& Map.Field(posIt)->playerInfo.IsExplored(*ThisPlayer)) {

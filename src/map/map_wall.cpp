@@ -298,21 +298,28 @@ void CMap::SetWall(const Vec2i &pos, bool humanwall)
 ** @param pos     Map tile-position of wall.
 ** @param damage  Damage done to wall.
 */
-void CMap::HitWall(const Vec2i &pos, unsigned damage)
+//Wyrmgus start
+//void CMap::HitWall(const Vec2i &pos, unsigned damage)
+void CMap::HitWall(const Vec2i &pos, unsigned damage, int z)
+//Wyrmgus end
 {
-	const unsigned v = this->Field(pos)->Value;
+	//Wyrmgus start
+//	const unsigned v = this->Field(pos)->Value;
+	const unsigned v = this->Field(pos, z)->Value;
+	//Wyrmgus end
 
 	if (v <= damage) {
 		//Wyrmgus start
 //		RemoveWall(pos);
-		ClearOverlayTile(pos);
+		ClearOverlayTile(pos, z);
 		//Wyrmgus end
 	} else {
-		this->Field(pos)->Value = v - damage;
 		//Wyrmgus start
+//		this->Field(pos)->Value = v - damage;
+		this->Field(pos, z)->Value = v - damage;
 //		MapFixWallTile(pos);
-		if (this->Field(pos)->OverlayTerrain->UnitType && this->Field(pos)->Value <= this->Field(pos)->Terrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
-			this->SetOverlayTerrainDamaged(pos, true);
+		if (this->Field(pos, z)->OverlayTerrain->UnitType && this->Field(pos, z)->Value <= this->Field(pos, z)->Terrain->UnitType->MapDefaultStat.Variables[HP_INDEX].Max / 2) {
+			this->SetOverlayTerrainDamaged(pos, true, z);
 		}
 		//Wyrmgus end
 	}

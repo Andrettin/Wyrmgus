@@ -32,12 +32,15 @@
 #include "particle.h"
 #include "video.h"
 
-
-
-
-CSmokeParticle::CSmokeParticle(CPosition position, GraphicAnimation *smoke,
+//Wyrmgus start
+//CSmokeParticle::CSmokeParticle(CPosition position, GraphicAnimation *smoke,
+CSmokeParticle::CSmokeParticle(CPosition position, int z, GraphicAnimation *smoke,
+//Wyrmgus end
 							   float speedx, float speedy, int drawlevel) :
-	CParticle(position, drawlevel)
+	//Wyrmgus start
+//	CParticle(position, drawlevel)
+	CParticle(position, z, drawlevel)
+	//Wyrmgus end
 {
 	Assert(smoke);
 	this->puff = smoke->clone();
@@ -53,7 +56,10 @@ CSmokeParticle::~CSmokeParticle()
 
 bool CSmokeParticle::isVisible(const CViewport &vp) const
 {
-	return puff && puff->isVisible(vp, pos);
+	//Wyrmgus start
+//	return puff && puff->isVisible(vp, pos);
+	return puff && puff->isVisible(vp, pos, MapLayer);
+	//Wyrmgus end
 }
 
 void CSmokeParticle::draw()
@@ -77,7 +83,10 @@ void CSmokeParticle::update(int ticks)
 
 CParticle *CSmokeParticle::clone()
 {
-	return new CSmokeParticle(pos, puff, speedVector.x, speedVector.y, drawLevel);
+	//Wyrmgus starrt
+//	return new CSmokeParticle(pos, puff, speedVector.x, speedVector.y, drawLevel);
+	return new CSmokeParticle(pos, MapLayer, puff, speedVector.x, speedVector.y, drawLevel);
+	//Wyrmgus end
 }
 
 //@}

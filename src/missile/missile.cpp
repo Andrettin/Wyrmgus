@@ -715,7 +715,10 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		//Wyrmgus end
 		// No goal, take target coordinates
 		if (!goal) {
-			if (Map.WallOnMap(goalPos)) {
+			//Wyrmgus start
+//			if (Map.WallOnMap(goalPos)) {
+			if (Map.WallOnMap(goalPos, z)) {
+			//Wyrmgus end
 				//Wyrmgus start
 //				if (Map.HumanWallOnMap(goalPos)) {
 				if (Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, NULL) == true) {
@@ -728,7 +731,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 								//Wyrmgus start
 //								CalculateDamageStats(*unit.Stats,
 //													 *Map.Field(goalPos)->OverlayTerrain->UnitType->Stats, unit.Variable[BLOODLUST_INDEX].Value));
-								damage);
+								damage, z);
 								//Wyrmgus end
 				//Wyrmgus start
 				/*
@@ -863,7 +866,10 @@ static int MissileVisibleInViewport(const CViewport &vp, const Missile &missile)
 	Vec2i pos;
 	for (pos.x = boxmin.x; pos.x <= boxmax.x; ++pos.x) {
 		for (pos.y = boxmin.y; pos.y <= boxmax.y; ++pos.y) {
-			if (ReplayRevealMap || Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			//Wyrmgus start
+//			if (ReplayRevealMap || Map.Field(pos)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			if (ReplayRevealMap || Map.Field(pos, missile.MapLayer)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			//Wyrmgus end
 				return 1;
 			}
 		}
@@ -1216,7 +1222,10 @@ bool PointToPointMissile(Missile &missile)
 								(int)pos.y + missile.Type->size.y / 2);
 		const Vec2i tilePos(Map.MapPixelPosToTilePos(position));
 
-		if (Map.Info.IsPointOnMap(tilePos) && MissileHandleBlocking(missile, position)) {
+		//Wyrmgus start
+//		if (Map.Info.IsPointOnMap(tilePos) && MissileHandleBlocking(missile, position)) {
+		if (Map.Info.IsPointOnMap(tilePos, missile.MapLayer) && MissileHandleBlocking(missile, position)) {
+		//Wyrmugs end
 			return true;
 		}
 		if (missile.Type->MissileStopFlags) {
@@ -1224,7 +1233,10 @@ bool PointToPointMissile(Missile &missile)
 				missile.TTL = 0;
 				return false;
 			}
-			const CMapField &mf = *Map.Field(tilePos);
+			//Wyrmgus start
+//			const CMapField &mf = *Map.Field(tilePos);
+			const CMapField &mf = *Map.Field(tilePos, missile.MapLayer);
+			//Wyrmgus end
 			if (missile.Type->MissileStopFlags & mf.Flags) { // incompatible terrain
 				missile.position = position;
 				missile.MissileHit();
@@ -1325,11 +1337,17 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 {
 	CUnitStats *stats; // stat of the wall.
 
-	if (!Map.WallOnMap(tilePos)) {
+	//Wyrmgus start
+//	if (!Map.WallOnMap(tilePos)) {
+	if (!Map.WallOnMap(tilePos, missile.MapLayer)) {
+	//Wyrmgus end
 		return;
 	}
 	if (missile.Damage) {  // direct damage, spells mostly
-		Map.HitWall(tilePos, missile.Damage / splash);
+		//Wyrmgus start
+//		Map.HitWall(tilePos, missile.Damage / splash);
+		Map.HitWall(tilePos, missile.Damage / splash, missile.MapLayer);
+		//Wyrmgus end
 		return;
 	}
 
@@ -1343,7 +1361,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 		stats = UnitTypeOrcWall->Stats;
 	}
 	*/
-	stats = Map.Field(tilePos)->OverlayTerrain->UnitType->Stats;
+	stats = Map.Field(tilePos, missile.MapLayer)->OverlayTerrain->UnitType->Stats;
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -1361,7 +1379,7 @@ static void MissileHitsWall(const Missile &missile, const Vec2i &tilePos, int sp
 
 	//Wyrmgus start
 //	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit->Stats, *stats, 0) / splash);
-	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, NULL, &missile) / splash);
+	Map.HitWall(tilePos, CalculateDamageStats(*missile.SourceUnit, *stats, NULL, &missile) / splash, missile.MapLayer);
 	//Wyrmgus end
 }
 

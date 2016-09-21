@@ -1705,7 +1705,7 @@ void CUnit::GenerateDrop()
 	}
 		
 	if (chosen_drop != NULL) {
-		if ((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
+		if ((chosen_drop->BoolFlag[ITEM_INDEX].value || chosen_drop->BoolFlag[POWERUP_INDEX].value) && (Map.Field(drop_pos, this->MapLayer)->Flags & MapFieldItem)) { //if the dropped unit is an item, and there's already another item there, search for another spot
 			Vec2i resPos;
 			FindNearestDrop(*chosen_drop, drop_pos, resPos, LookingW, this->MapLayer);
 			droppedUnit = MakeUnitAndPlace(resPos, *chosen_drop, &Players[PlayerNumNeutral], this->MapLayer);
@@ -3382,10 +3382,16 @@ void CorrectWallDirections(CUnit &unit)
 		const Vec2i pos = unit.tilePos + configs[i].offset;
 		const int dirFlag = configs[i].dirFlag;
 
-		if (Map.Info.IsPointOnMap(pos) == false) {
+		//Wyrmgus start
+//		if (Map.Info.IsPointOnMap(pos) == false) {
+		if (Map.Info.IsPointOnMap(pos, unit.MapLayer) == false) {
+		//Wyrmgus end
 			flags |= dirFlag;
 		} else {
-			const CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+			//Wyrmgus start
+//			const CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+			const CUnitCache &unitCache = Map.Field(pos, unit.MapLayer)->UnitCache;
+			//Wyrmgus end
 			const CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
 			if (neighboor != NULL) {
@@ -3410,10 +3416,16 @@ void CorrectWallNeighBours(CUnit &unit)
 	for (unsigned int i = 0; i < sizeof(offset) / sizeof(*offset); ++i) {
 		const Vec2i pos = unit.tilePos + offset[i];
 
-		if (Map.Info.IsPointOnMap(pos) == false) {
+		//Wyrmgus start
+//		if (Map.Info.IsPointOnMap(pos) == false) {
+		if (Map.Info.IsPointOnMap(pos, unit.MapLayer) == false) {
+		//Wyrmgus end
 			continue;
 		}
-		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+		//Wyrmgus start
+//		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+		CUnitCache &unitCache = Map.Field(pos, unit.MapLayer)->UnitCache;
+		//Wyrmgus end
 		CUnit *neighboor = unitCache.find(HasSamePlayerAndTypeAs(unit));
 
 		if (neighboor != NULL) {
@@ -5804,8 +5816,17 @@ int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
 **
 **  @return     The distance between the types.
 */
-int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, const CUnitType &dst, const Vec2i &pos2)
+//Wyrmgus start
+//int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, const CUnitType &dst, const Vec2i &pos2)
+int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1, int src_z, const CUnitType &dst, const Vec2i &pos2, int dst_z)
+//Wyrmgus end
 {
+	//Wyrmgus start
+	if (src_z != dst_z) {
+		return 16384;
+	}
+	//Wyrmgus end
+	
 	int dx;
 	int dy;
 

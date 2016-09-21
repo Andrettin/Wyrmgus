@@ -53,12 +53,21 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
+//Wyrmgus start
+//static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
+static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit, int z)
+//Wyrmgus end
 {
-	if (Map.Info.IsPointOnMap(pos) == false) {
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(pos) == false) {
+	if (Map.Info.IsPointOnMap(pos, z) == false) {
+	//Wyrmgus end
 		return false;
 	}
-	const CMapField &mf = *Map.Field(pos);
+	//Wyrmgus start
+//	const CMapField &mf = *Map.Field(pos);
+	const CMapField &mf = *Map.Field(pos, z);
+	//Wyrmgus end
 	const CUnitCache &unitCache = mf.UnitCache;
 	if (std::find(unitCache.begin(), unitCache.end(), &exceptionUnit) != unitCache.end()) {
 		return true;
@@ -85,19 +94,28 @@ static bool IsPosFree(const Vec2i &pos, const CUnit &exceptionUnit)
 **
 **  @note            Can be faster written.
 */
-static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const Vec2i &pos, bool &backupok)
+//Wyrmgus start
+//static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const Vec2i &pos, bool &backupok)
+static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const Vec2i &pos, bool &backupok, int z)
+//Wyrmgus end
 {
 	const int surroundRange = type.AiAdjacentRange != -1 ? type.AiAdjacentRange : 1;
 	const Vec2i pos_topLeft(pos.x - surroundRange, pos.y - surroundRange);
 	const Vec2i pos_bottomRight(pos.x + type.TileWidth + surroundRange - 1,
 								pos.y + type.TileHeight + surroundRange - 1);
 	Vec2i it = pos_topLeft;
-	const bool firstVal = IsPosFree(it, worker);
+	//Wyrmgus start
+//	const bool firstVal = IsPosFree(it, worker);
+	const bool firstVal = IsPosFree(it, worker, z);
+	//Wyrmgus end
 	bool lastval = firstVal;
 	int obstacleCount = 0;
 
 	for (++it.x; it.x < pos_bottomRight.x; ++it.x) {
-		const bool isfree = IsPosFree(it, worker);
+		//Wyrmgus start
+//		const bool isfree = IsPosFree(it, worker);
+		const bool isfree = IsPosFree(it, worker, z);
+		//Wyrmgus end
 
 		if (isfree && !lastval) {
 			++obstacleCount;
@@ -105,7 +123,10 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 		lastval = isfree;
 	}
 	for (; it.y < pos_bottomRight.y; ++it.y) {
-		const bool isfree = IsPosFree(it, worker);
+		//Wyrmgus start
+//		const bool isfree = IsPosFree(it, worker);
+		const bool isfree = IsPosFree(it, worker, z);
+		//Wyrmugs end
 
 		if (isfree && !lastval) {
 			++obstacleCount;
@@ -113,7 +134,10 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 		lastval = isfree;
 	}
 	for (; pos_topLeft.x < it.x; --it.x) {
-		const bool isfree = IsPosFree(it, worker);
+		//Wyrmgus start
+//		const bool isfree = IsPosFree(it, worker);
+		const bool isfree = IsPosFree(it, worker, z);
+		//Wyrmgus end
 
 		if (isfree && !lastval) {
 			++obstacleCount;
@@ -121,7 +145,10 @@ static bool AiCheckSurrounding(const CUnit &worker, const CUnitType &type, const
 		lastval = isfree;
 	}
 	for (; pos_topLeft.y < it.y; --it.y) {
-		const bool isfree = IsPosFree(it, worker);
+		//Wyrmgus start
+//		const bool isfree = IsPosFree(it, worker);
+		const bool isfree = IsPosFree(it, worker, z);
+		//Wyrmgus end
 
 		if (isfree && !lastval) {
 			++obstacleCount;
@@ -197,7 +224,10 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8, z)) {
 		//Wyrmgus end
 		bool backupok;
-		if (AiCheckSurrounding(worker, type, pos, backupok) && checkSurround) {
+		//Wyrmgus start
+//		if (AiCheckSurrounding(worker, type, pos, backupok) && checkSurround) {
+		if (AiCheckSurrounding(worker, type, pos, backupok, z) && checkSurround) {
+		//Wyrmgus end
 			*resultPos = pos;
 			return VisitResult_Finished;
 		} else if (backupok && resultPos->x == -1) {

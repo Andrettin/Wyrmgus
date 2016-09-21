@@ -66,7 +66,10 @@ bool GraphicAnimation::isFinished()
 	return currentFrame >= g->NumFrames;
 }
 
-bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos)
+//Wyrmgus start
+//bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos)
+bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos, int z)
+//Wyrmgus end
 {
 	// invisible graphics always invisible
 	if (!g) {
@@ -78,8 +81,12 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos)
 	PixelPos position(pos.x, pos.y);
 	Vec2i minPos = Map.MapPixelPosToTilePos(position);
 	Vec2i maxPos = Map.MapPixelPosToTilePos(position + graphicSize + margin);
-	Map.Clamp(minPos);
-	Map.Clamp(maxPos);
+	//Wyrmgus start
+//	Map.Clamp(minPos);
+//	Map.Clamp(maxPos);
+	Map.Clamp(minPos, z);
+	Map.Clamp(maxPos, z);
+	//Wyrmgus end
 
 	if (!vp.AnyMapAreaVisibleInViewport(minPos, maxPos)) {
 		return false;
@@ -88,7 +95,10 @@ bool GraphicAnimation::isVisible(const CViewport &vp, const CPosition &pos)
 	Vec2i p;
 	for (p.x = minPos.x; p.x <= maxPos.x; ++p.x) {
 		for (p.y = minPos.y; p.y <= maxPos.y; ++p.y) {
-			if (ReplayRevealMap || Map.Field(p)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			//Wyrmgus start
+//			if (ReplayRevealMap || Map.Field(p)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			if (ReplayRevealMap || Map.Field(p, z)->playerInfo.IsTeamVisible(*ThisPlayer)) {
+			//Wyrmgus end
 				return true;
 			}
 		}

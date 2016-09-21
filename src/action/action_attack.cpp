@@ -150,7 +150,7 @@ void AnimateActionAttack(CUnit &unit, COrder &order)
 
 	//Wyrmgus start
 //	if (Map.WallOnMap(dest) && Map.Field(dest)->playerInfo.IsExplored(*attacker.Player)) {
-	if (Map.WallOnMap(dest) && Map.Field(dest, z)->playerInfo.IsTeamExplored(*attacker.Player)) {
+	if (Map.WallOnMap(dest, z) && Map.Field(dest, z)->playerInfo.IsTeamExplored(*attacker.Player)) {
 	//Wyrmgus end
 		// FIXME: look into action_attack.cpp about this ugly problem
 		order->goalPos = dest;
@@ -443,7 +443,10 @@ bool COrder_Attack::CheckForTargetInRange(CUnit &unit)
 	// No goal: if meeting enemy attack it.
 	if (!this->HasGoal()
 		&& this->Action != UnitActionAttackGround
-		&& !Map.WallOnMap(this->goalPos)) {
+		//Wyrmgus start
+//		&& !Map.WallOnMap(this->goalPos)) {
+		&& !Map.WallOnMap(this->goalPos, this->MapLayer)) {
+		//Wyrmgus end
 		CUnit *goal = AttackUnitsInReactRange(unit);
 
 		if (goal) {
@@ -512,7 +515,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 
 	//Wyrmgus start
 	//if is on a moving raft and target is now within range, stop the raft
-	if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+	if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 		for (size_t i = 0; i != table.size(); ++i) {
@@ -592,7 +595,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		if (((goal && goal->Type && goal->Type->BoolFlag[WALL_INDEX].value)
 			//Wyrmgus start
 //			 || (!goal && (Map.WallOnMap(this->goalPos) || this->Action == UnitActionAttackGround)))
-			 || (!goal && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))))
+			 || (!goal && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos, this->MapLayer))))
 			//Wyrmgus end
 			//Wyrmgus start
 //			&& unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
@@ -626,7 +629,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 	if (err == PF_UNREACHABLE) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the enemy
-		if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+		if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
 			for (size_t i = 0; i != table.size(); ++i) {
@@ -673,7 +676,10 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 		return;
 	}
 
-	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))) {
+	//Wyrmgus start
+//	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos))) {
+	if (!this->HasGoal() && (this->Action == UnitActionAttackGround || Map.WallOnMap(this->goalPos, this->MapLayer))) {
+	//Wyrmgus end
 		return;
 	}
 

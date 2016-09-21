@@ -97,10 +97,16 @@ CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
 /**
 **  Check And Restriction
 */
-bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const
+//Wyrmgus start
+//bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const
+bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const
+//Wyrmgus end
 {
 	for (std::vector<CBuildRestriction *>::const_iterator i = _or_list.begin(); i != _or_list.end(); ++i) {
-		if (!(*i)->Check(builder, type, pos, ontoptarget)) {
+		//Wyrmgus start
+//		if (!(*i)->Check(builder, type, pos, ontoptarget)) {
+		if (!(*i)->Check(builder, type, pos, ontoptarget, z)) {
+		//Wyrmgus end
 			return false;
 		}
 	}
@@ -110,15 +116,15 @@ bool CBuildRestrictionAnd::Check(const CUnit *builder, const CUnitType &type, co
 /**
 **  Check Distance Restriction
 */
-bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
+//Wyrmgus start
+//bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
+bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+//Wyrmgus end
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	int distance = 0;
 	CPlayer* player = builder != NULL ? builder->Player : ThisPlayer;
-	//Wyrmgus start
-	int z = builder != NULL ? builder->MapLayer : CurrentMapLayer;
-	//Wyrmgus end
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -163,23 +169,35 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			switch (this->DistanceType) {
 				case GreaterThan :
 				case GreaterThanEqual :
-					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+					//Wyrmgus start
+//					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer) <= distance) {
+					//Wyrmgus end
 						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
 					}
 					break;
 				case LessThan :
 				case LessThanEqual :
-					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+					//Wyrmgus start
+//					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer) <= distance) {
+					//Wyrmgus end
 						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
 					}
 					break;
 				case Equal :
-					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+					//Wyrmgus start
+//					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer) == distance) {
+					//Wyrmgus end
 						return Diagonal || pos.x == table[i]->tilePos.x || pos.y == table[i]->tilePos.y;
 					}
 					break;
 				case NotEqual :
-					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+					//Wyrmgus start
+//					if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+					if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer) == distance) {
+					//Wyrmgus end
 						return Diagonal ? false : !(pos.x != table[i]->tilePos.x || pos.y != table[i]->tilePos.y);
 					}
 					break;
@@ -194,7 +212,10 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 /**
 **  Check HasUnit Restriction
 */
-bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
+//Wyrmgus start
+//bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
+bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+//Wyrmgus end
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
@@ -235,15 +256,15 @@ bool CBuildRestrictionHasUnit::Check(const CUnit *builder, const CUnitType &type
 /**
 **  Check Surrounded By Restriction
 */
-bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
+//Wyrmgus start
+//bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&) const
+bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&, int z) const
+//Wyrmgus end
 {
 	Vec2i pos1(0, 0);
 	Vec2i pos2(0, 0);
 	int distance = 0;
 	int count = 0;
-	//Wyrmgus start
-	int z = builder != NULL ? builder->MapLayer : CurrentMapLayer;
-	//Wyrmgus end
 
 	if (this->DistanceType == LessThanEqual
 		|| this->DistanceType == GreaterThan
@@ -292,17 +313,26 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 				break;
 			case LessThan:
 			case LessThanEqual:
-				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+				//Wyrmgus start
+//				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) <= distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer) <= distance) {
+				//Wyrmgus end
 					count++;
 				}
 				break;
 			case Equal:
-				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+				//Wyrmgus start
+//				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer) == distance) {
+				//Wyrmgus end
 					count++;
 				}
 				break;
 			case NotEqual:
-				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+				//Wyrmgus start
+//				if (MapDistanceBetweenTypes(type, pos, *table[i]->Type, table[i]->tilePos) == distance) {
+				if (MapDistanceBetweenTypes(type, pos, z, *table[i]->Type, table[i]->tilePos, table[i]->MapLayer) == distance) {
+				//Wyrmgus end
 					count++;
 				}
 				break;
@@ -330,15 +360,24 @@ inline bool CBuildRestrictionAddOn::functor::operator()(const CUnit *const unit)
 /**
 **  Check AddOn Restriction
 */
-bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i &pos, CUnit *&) const
+//Wyrmgus start
+//bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i &pos, CUnit *&) const
+bool CBuildRestrictionAddOn::Check(const CUnit *, const CUnitType &, const Vec2i &pos, CUnit *&, int z) const
+//Wyrmgus end
 {
 	Vec2i pos1 = pos - this->Offset;
 
-	if (Map.Info.IsPointOnMap(pos1) == false) {
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(pos1) == false) {
+	if (Map.Info.IsPointOnMap(pos1, z) == false) {
+	//Wyrmgus end
 		return false;
 	}
 	functor f(Parent, pos1);
-	return (Map.Field(pos1)->UnitCache.find(f) != NULL);
+	//Wyrmgus start
+//	return (Map.Field(pos1)->UnitCache.find(f) != NULL);
+	return (Map.Field(pos1, z)->UnitCache.find(f) != NULL);
+	//Wyrmgus end
 }
 
 /**
@@ -372,13 +411,11 @@ private:
 	const CUnitType *type;
 };
 
-
-bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget) const
+//Wyrmgus start
+//bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget) const
+bool CBuildRestrictionOnTop::Check(const CUnit *builder, const CUnitType &, const Vec2i &pos, CUnit *&ontoptarget, int z) const
+//Wyrmgus end
 {
-	//Wyrmgus start
-	int z = builder != NULL ? builder->MapLayer : CurrentMapLayer;
-	//Wyrmgus end
-
 	//Wyrmgus start
 //	Assert(Map.Info.IsPointOnMap(pos));
 	Assert(Map.Info.IsPointOnMap(pos, z));
@@ -461,9 +498,15 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 		bool success = false;
 
 		// Need at least one coast tile
-		unsigned int index = Map.getIndex(pos);
+		//Wyrmgus start
+//		unsigned int index = Map.getIndex(pos);
+		unsigned int index = Map.getIndex(pos, z);
+		//Wyrmgus end
 		do {
-			const CMapField *mf = Map.Field(index);
+			//Wyrmgus start
+//			const CMapField *mf = Map.Field(index);
+			const CMapField *mf = Map.Field(index, z);
+			//Wyrmgus end
 			int w = width;
 			do {
 				if (mf->CoastOnMap()) {
@@ -490,7 +533,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 			for (unsigned int i = 0; i < count; ++i) {
 				CBuildRestriction *rule = type.AiBuildingRules[i];
 				// All checks processed, did we really have success
-				if (rule->Check(unit, type, pos, ontoptarget)) {
+				//Wyrmgus start
+//				if (rule->Check(unit, type, pos, ontoptarget)) {
+				if (rule->Check(unit, type, pos, ontoptarget, z)) {
+				//Wyrmgus end
 					// We passed a full ruleset
 					aiChecked = true;
 					break;
@@ -510,7 +556,10 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 			CBuildRestriction *rule = type.BuildingRules[i];
 			CUnit *ontoptarget = NULL;
 			// All checks processed, did we really have success
-			if (rule->Check(unit, type, pos, ontoptarget)) {
+			//Wyrmgus start
+//			if (rule->Check(unit, type, pos, ontoptarget)) {
+			if (rule->Check(unit, type, pos, ontoptarget, z)) {
+			//Wyrmgus end
 				// We passed a full ruleset return
 				if (unit == NULL) {
 					return ontoptarget ? ontoptarget : (CUnit *)1;
@@ -533,9 +582,15 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 **
 **  @return true if we can build on this point.
 */
-bool CanBuildOn(const Vec2i &pos, int mask)
+//Wyrmgus start
+//bool CanBuildOn(const Vec2i &pos, int mask)
+bool CanBuildOn(const Vec2i &pos, int mask, int z)
+//Wyrmgus end
 {
-	return (Map.Info.IsPointOnMap(pos) && !Map.Field(pos)->CheckMask(mask));
+	//Wyrmgus start
+//	return (Map.Info.IsPointOnMap(pos) && !Map.Field(pos)->CheckMask(mask));
+	return (Map.Info.IsPointOnMap(pos, z) && !Map.Field(pos, z)->CheckMask(mask));
+	//Wyrmgus end
 }
 
 /**

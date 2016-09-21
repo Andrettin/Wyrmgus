@@ -222,7 +222,7 @@ void CommandDefend(CUnit &unit, CUnit &dest, int flush)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
@@ -261,7 +261,7 @@ void CommandFollow(CUnit &unit, CUnit &dest, int flush)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
@@ -375,7 +375,7 @@ void CommandPickUp(CUnit &unit, CUnit &dest, int flush)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
@@ -606,7 +606,7 @@ void CommandUse(CUnit &unit, CUnit &dest, int flush)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
@@ -702,7 +702,7 @@ void CommandBoard(CUnit &unit, CUnit &dest, int flush)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
@@ -891,7 +891,7 @@ void CommandResource(CUnit &unit, CUnit &dest, int flush)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);

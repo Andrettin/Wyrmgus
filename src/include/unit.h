@@ -97,7 +97,11 @@ extern void SelectedUnitChanged();
 
 /// Returns the map distance between to unittype as locations
 extern int MapDistanceBetweenTypes(const CUnitType &src, const Vec2i &pos1,
-								   const CUnitType &dst, const Vec2i &pos2);
+								   //Wyrmgus start
+								   int src_z,
+//								   const CUnitType &dst, const Vec2i &pos2);
+								   const CUnitType &dst, const Vec2i &pos2, int dst_z);
+								   //Wyrmgus end
 
 /**
 **  Unit/Missile headings.
@@ -343,7 +347,7 @@ public:
 		
 //		return MapDistanceBetweenTypes(*Type, tilePos, *dst.Type, dst.tilePos);
 		const CUnitType *distance_unit_type = Container ? Container->Type : Type;
-		return MapDistanceBetweenTypes(*distance_unit_type, tilePos, *dst.Type, dst.tilePos);
+		return MapDistanceBetweenTypes(*distance_unit_type, tilePos, MapLayer, *dst.Type, dst.tilePos, dst.MapLayer);
 		//Wyrmgus end
 	}
 
@@ -721,7 +725,10 @@ extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *
 extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z = 0);
 //Wyrmgus end
 /// @todo more docu
-extern bool CanBuildOn(const Vec2i &pos, int mask);
+//Wyrmgus start
+//extern bool CanBuildOn(const Vec2i &pos, int mask);
+extern bool CanBuildOn(const Vec2i &pos, int mask, int z);
+//Wyrmgus end
 /// FIXME: more docu
 //Wyrmgus start
 //extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);

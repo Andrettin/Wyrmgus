@@ -451,7 +451,10 @@ extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, 
 /// Find all units of this type of the player
 extern void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::vector<CUnit *> &units, bool ai_active = false);
 /// Return any unit on that map tile
-extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
+//Wyrmgus start
+//extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type);// = -1);
+extern CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z);// = -1);
+//Wyrmgus end
 /// Return possible attack target on that map area
 extern CUnit *TargetOnMap(const CUnit &unit, const Vec2i &pos1, const Vec2i &pos2);
 

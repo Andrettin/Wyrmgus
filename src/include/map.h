@@ -232,7 +232,7 @@ public:
 
 	//Wyrmgus start
 //	unsigned int getIndex(int x, int y) const
-	unsigned int getIndex(int x, int y, int z = 0) const
+	unsigned int getIndex(int x, int y, int z) const
 	//Wyrmgus end
 	{
 		//Wyrmgus start
@@ -242,7 +242,7 @@ public:
 	}
 	//Wyrmgus start
 //	unsigned int getIndex(const Vec2i &pos) const
-	unsigned int getIndex(const Vec2i &pos, int z = 0) const
+	unsigned int getIndex(const Vec2i &pos, int z) const
 	//Wyrmgus end
 	{
 		//Wyrmgus start
@@ -253,7 +253,7 @@ public:
 
 	//Wyrmgus start
 //	CMapField *Field(unsigned int index) const
-	CMapField *Field(unsigned int index, int z = 0) const
+	CMapField *Field(unsigned int index, int z) const
 	//Wyrmgus end
 	{
 		//Wyrmgus start
@@ -264,7 +264,7 @@ public:
 	/// Get the MapField at location x,y
 	//Wyrmgus start
 //	CMapField *Field(int x, int y) const
-	CMapField *Field(int x, int y, int z = 0) const
+	CMapField *Field(int x, int y, int z) const
 	//Wyrmgus end
 	{
 		//Wyrmgus start
@@ -274,7 +274,7 @@ public:
 	}
 	//Wyrmgus start
 //	CMapField *Field(const Vec2i &pos) const
-	CMapField *Field(const Vec2i &pos, int z = 0) const
+	CMapField *Field(const Vec2i &pos, int z) const
 	//Wyrmgus end
 	{
 		//Wyrmgus start
@@ -299,8 +299,8 @@ public:
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z = 0);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileVisibility(const Vec2i &pos, int z);
-	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
-	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
+	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z);
+	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z);
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline, int z);
 	void GenerateNeutralUnits(CUnitType *unit_type, int quantity, const Vec2i &min_pos, const Vec2i &max_pos, bool grouped, int z);
 	//Wyrmgus end
@@ -351,7 +351,10 @@ public:
 	// Wall
 	//
 	/// Wall is hit.
-	void HitWall(const Vec2i &pos, unsigned damage);
+	//Wyrmgus start
+//	void HitWall(const Vec2i &pos, unsigned damage);
+	void HitWall(const Vec2i &pos, unsigned damage, int z);
+	//Wyrmgus end
 	/// Set wall on field.
 	//Wyrmgus start
 	/*
@@ -362,7 +365,10 @@ public:
 	//Wyrmgus end
 
 	/// Returns true, if wall on the map tile field
-	bool WallOnMap(const Vec2i &pos) const;
+	//Wyrmgus start
+//	bool WallOnMap(const Vec2i &pos) const;
+	bool WallOnMap(const Vec2i &pos, int z) const;
+	//Wyrmgus end
 	//Wyrmgus start
 	/*
 	/// Returns true, if human wall on the map tile field
@@ -375,8 +381,8 @@ public:
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrain, int z);
-	bool TileBordersBuilding(const Vec2i &pos);
-	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain);
+	bool TileBordersBuilding(const Vec2i &pos, int z);
+	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, int z) const;
 	//Wyrmgus end
 

@@ -701,9 +701,15 @@ void FindPlayerUnitsByType(const CPlayer &player, const CUnitType &type, std::ve
 **
 **  @return      Returns first found unit on tile.
 */
-CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
+//Wyrmgus start
+//CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
+CUnit *UnitOnMapTile(const unsigned int index, unsigned int type, int z)
+//Wyrmgus end
 {
-	return Map.Field(index)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
+	//Wyrmgus start
+//	return Map.Field(index)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
+	return Map.Field(index, z)->UnitCache.find(CUnitTypeFinder((UnitTypeType)type));
+	//Wyrmgus end
 }
 
 /**
@@ -714,9 +720,15 @@ CUnit *UnitOnMapTile(const unsigned int index, unsigned int type)
 **
 **  @return      Returns first found unit on tile.
 */
-CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
+//Wyrmgus start
+//CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type)
+CUnit *UnitOnMapTile(const Vec2i &pos, unsigned int type, int z)
+//Wyrmgus end
 {
-	return UnitOnMapTile(Map.getIndex(pos), type);
+	//Wyrmgus start
+//	return UnitOnMapTile(Map.getIndex(pos), type);
+	return UnitOnMapTile(Map.getIndex(pos, z), type, z);
+	//Wyrmgus end
 }
 
 /**

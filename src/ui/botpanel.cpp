@@ -1692,7 +1692,10 @@ void CButtonPanel::DoClicked_Unload(int button)
 	//  Unload on coast valid only for sea units
 	//
 	if ((Selected.size() == 1 && Selected[0]->CurrentAction() == UnitActionStill
-		 && Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
+		//Wyrmgus start
+//		 && Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos)->CoastOnMap())
+		 && Selected[0]->Type->UnitType == UnitTypeNaval && Map.Field(Selected[0]->tilePos, Selected[0]->MapLayer)->CoastOnMap())
+		//Wyrmgus end
 		|| !Selected[0]->CanMove()) {
 		//Wyrmgus start
 //		SendCommandUnload(*Selected[0], Selected[0]->tilePos, NoUnitP, flush);

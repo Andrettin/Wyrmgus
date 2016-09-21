@@ -617,7 +617,10 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 			const Vec2i pos = this->goalPos;
 			const CUnitType &type = this->GetUnitType();
 
-			CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
+			//Wyrmgus start
+//			CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos));
+			CUnit *building = AlreadyBuildingFinder(unit, type).Find(Map.Field(pos, this->MapLayer));
+			//Wyrmgus end
 
 			if (building != NULL) {
 				this->HelpBuild(unit, *building);

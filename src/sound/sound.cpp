@@ -161,7 +161,7 @@ static CSample *ChooseSample(CSound *sound, bool selection, Origin &source)
 static CSound *ChooseUnitVoiceSound(const CUnit &unit, UnitVoiceGroup voice)
 {
 	//Wyrmgus start
-	const CMapField &mf = *Map.Field(unit.tilePos);
+	const CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	//Wyrmgus end
 	switch (voice) {
 		case VoiceAcknowledging:

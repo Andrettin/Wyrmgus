@@ -538,7 +538,10 @@ class CBuildRestriction
 public:
 	virtual ~CBuildRestriction() {}
 	virtual void Init() {};
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const = 0;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const = 0;
+	//Wyrmgus end
 };
 
 class CBuildRestrictionAnd : public CBuildRestriction
@@ -559,7 +562,10 @@ public:
 			(*i)->Init();
 		}
 	}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
 
 	void push_back(CBuildRestriction *restriction) { _or_list.push_back(restriction); }
 public:
@@ -581,7 +587,10 @@ public:
 	CBuildRestrictionAddOn() : Offset(0, 0), Parent(NULL) {}
 	virtual ~CBuildRestrictionAddOn() {}
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);}
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
 
 	Vec2i Offset;           /// offset from the main building to place this
 	std::string ParentName; /// building that is unit is an addon too.
@@ -604,7 +613,10 @@ public:
 	CBuildRestrictionOnTop() : Parent(NULL), ReplaceOnDie(0), ReplaceOnBuild(0) {};
 	virtual ~CBuildRestrictionOnTop() {};
 	virtual void Init() {this->Parent = UnitTypeByIdent(this->ParentName);};
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
 
 	std::string ParentName;  /// building that is unit is an addon too.
 	CUnitType *Parent;       /// building that is unit is an addon too.
@@ -618,7 +630,10 @@ public:
 	CBuildRestrictionDistance() : Distance(0), CheckBuilder(false), RestrictType(NULL), Diagonal(true) {};
 	virtual ~CBuildRestrictionDistance() {};
 	virtual void Init() {this->RestrictType = UnitTypeByIdent(this->RestrictTypeName);};
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
 
 	int Distance;        /// distance to build (circle)
 	DistanceTypeType DistanceType;
@@ -635,7 +650,10 @@ public:
 	CBuildRestrictionHasUnit() : Count(0), RestrictType(NULL) {};
 	virtual ~CBuildRestrictionHasUnit() {};
 	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
 	
 	int Count;
 	DistanceTypeType CountType;
@@ -650,7 +668,10 @@ public:
 	CBuildRestrictionSurroundedBy() : Count(0), Distance(0), DistanceType(Equal), CountType(Equal), RestrictType(NULL), CheckBuilder(false) {};
 	virtual ~CBuildRestrictionSurroundedBy() {};
 	virtual void Init() { this->RestrictType = UnitTypeByIdent(this->RestrictTypeName); };
-	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	//Wyrmgus start
+//	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget) const;
+	virtual bool Check(const CUnit *builder, const CUnitType &type, const Vec2i &pos, CUnit *&ontoptarget, int z) const;
+	//Wyrmgus end
 	
 	int Distance;
 	DistanceTypeType DistanceType;

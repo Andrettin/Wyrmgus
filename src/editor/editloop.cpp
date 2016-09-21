@@ -200,8 +200,9 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	//Wyrmgus start
 //	const int baseTileIndex = tileset.findTileIndexByTile(tile);
 //	const int tileIndex = tileset.getTileNumber(baseTileIndex, TileToolRandom, TileToolDecoration);
+//	CMapField &mf = *Map.Field(pos);
+	CMapField &mf = *Map.Field(pos, CurrentMapLayer);
 	//Wyrmgus end
-	CMapField &mf = *Map.Field(pos);
 	
 	//Wyrmgus start
 	int value = 0;
@@ -290,7 +291,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 	for (int i = (((int) changed_tiles.size()) - 1); i >= 0; --i) {
 		CTerrainType *tile_terrain = Map.GetTileTerrain(changed_tiles[i], terrain->Overlay, CurrentMapLayer);
 		
-		bool has_transitions = terrain->Overlay ? (Map.Field(changed_tiles[i])->OverlayTransitionTiles.size() > 0) : (Map.Field(changed_tiles[i])->TransitionTiles.size() > 0);
+		bool has_transitions = terrain->Overlay ? (Map.Field(changed_tiles[i], CurrentMapLayer)->OverlayTransitionTiles.size() > 0) : (Map.Field(changed_tiles[i], CurrentMapLayer)->TransitionTiles.size() > 0);
 		bool solid_tile = true;
 		
 		if (!tile_terrain->AllowSingle) {
@@ -299,10 +300,10 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 					if (x_offset != 0 || y_offset != 0) {
 						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
 						if (Map.Info.IsPointOnMap(adjacent_pos)) {
-							CMapField &adjacent_mf = *Map.Field(adjacent_pos);
+							CMapField &adjacent_mf = *Map.Field(adjacent_pos, CurrentMapLayer);
 									
 							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, CurrentMapLayer);
-							if (tile_terrain->Overlay && adjacent_terrain && Map.Field(adjacent_pos)->OverlayTerrainDestroyed) {
+							if (tile_terrain->Overlay && adjacent_terrain && Map.Field(adjacent_pos, CurrentMapLayer)->OverlayTerrainDestroyed) {
 								adjacent_terrain = NULL;
 							}
 							if (tile_terrain != adjacent_terrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), adjacent_terrain) == tile_terrain->OuterBorderTerrains.end()) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -346,7 +347,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay, CurrentMapLayer)) {
 								continue;
 							}
-							bool has_transitions = overlay ? (Map.Field(adjacent_pos)->OverlayTransitionTiles.size() > 0) : (Map.Field(adjacent_pos)->TransitionTiles.size() > 0);
+							bool has_transitions = overlay ? (Map.Field(adjacent_pos, CurrentMapLayer)->OverlayTransitionTiles.size() > 0) : (Map.Field(adjacent_pos, CurrentMapLayer)->TransitionTiles.size() > 0);
 							bool solid_tile = true;
 							
 							if (!overlay && std::find(adjacent_terrain->BorderTerrains.begin(), adjacent_terrain->BorderTerrains.end(), Map.GetTileTerrain(changed_tiles[i], false, CurrentMapLayer)) == adjacent_terrain->BorderTerrains.end()) {
@@ -365,7 +366,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
 											if (Map.Info.IsPointOnMap(sub_adjacent_pos)) {
 												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay, CurrentMapLayer);
-												if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos)->OverlayTerrainDestroyed) {
+												if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos, CurrentMapLayer)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = NULL;
 												}
 												if (adjacent_terrain != sub_adjacent_terrain && std::find(adjacent_terrain->OuterBorderTerrains.begin(), adjacent_terrain->OuterBorderTerrains.end(), sub_adjacent_terrain) == adjacent_terrain->OuterBorderTerrains.end()) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
@@ -470,7 +471,10 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 
 	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
 	if (b && b->ReplaceOnBuild) {
-		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+		//Wyrmgus start
+//		CUnitCache &unitCache = Map.Field(pos)->UnitCache;
+		CUnitCache &unitCache = Map.Field(pos, CurrentMapLayer)->UnitCache;
+		//Wyrmgus end
 		CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
 
 		if (it != unitCache.end()) {
@@ -600,7 +604,10 @@ static void EditorUndoAction()
 
 	switch (action.Type) {
 		case EditorActionTypePlaceUnit: {
-			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
+			//Wyrmgus start
+//			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
+			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType, CurrentMapLayer);
+			//Wyrmgus end
 			EditorActionRemoveUnit(*unit);
 			break;
 		}
@@ -626,7 +633,10 @@ static void EditorRedoAction()
 			break;
 
 		case EditorActionTypeRemoveUnit: {
-			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
+			//Wyrmgus start
+//			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType);
+			CUnit *unit = UnitOnMapTile(action.tilePos, action.UnitType->UnitType, CurrentMapLayer);
+			//Wyrmgus end
 			EditorActionRemoveUnit(*unit);
 			break;
 		}
@@ -1386,9 +1396,10 @@ static void DrawEditorInfo()
 	snprintf(buf, sizeof(buf), _("Editor (%d %d)"), pos.x, pos.y);
 	//Wyrmgus start
 //	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 16, buf);
+//	const CMapField &mf = *Map.Field(pos);
 	CLabel(GetGameFont()).Draw(UI.StatusLine.TextX + 2, UI.StatusLine.TextY - 12, buf);
+	const CMapField &mf = *Map.Field(pos, CurrentMapLayer);
 	//Wyrmgus end
-	const CMapField &mf = *Map.Field(pos);
 	//
 	// Flags info
 	//

@@ -1006,14 +1006,20 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 			const Vec2i pos = blocker.tilePos + blocker.Type->TileWidth * dirs[r];
 
 			// Out of the map => no !
-			if (!Map.Info.IsPointOnMap(pos)) {
+			//Wyrmgus start
+//			if (!Map.Info.IsPointOnMap(pos)) {
+			if (!Map.Info.IsPointOnMap(pos, unit.MapLayer)) {
+			//Wyrmgus end
 				continue;
 			}
 			// move to blocker ? => no !
 			if (pos == u0) {
 				continue;
 			}
-			if (Map.Field(pos)->UnitCache.size() > 0) {
+			//Wyrmgus start
+//			if (Map.Field(pos)->UnitCache.size() > 0) {
+			if (Map.Field(pos, unit.MapLayer)->UnitCache.size() > 0) {
+			//Wyrmgus end
 				continue;
 			}
 

@@ -551,7 +551,10 @@ void CViewport::Draw() const
 	if (CursorOn == CursorOnMap && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
 	//Wyrmgus end
 		const Vec2i tilePos = this->ScreenToTilePos(CursorScreenPos);
-		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
+		//Wyrmgus start
+//		const bool isMapFieldVisile = Map.Field(tilePos)->playerInfo.IsTeamVisible(*ThisPlayer);
+		const bool isMapFieldVisile = Map.Field(tilePos, CurrentMapLayer)->playerInfo.IsTeamVisible(*ThisPlayer);
+		//Wyrmgus end
 
 		if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
 			//Wyrmgus start

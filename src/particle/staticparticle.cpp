@@ -32,9 +32,14 @@
 #include "stratagus.h"
 #include "particle.h"
 
-
-StaticParticle::StaticParticle(CPosition position, GraphicAnimation *animation, int drawlevel) :
-	CParticle(position, drawlevel)
+//Wyrmgus start
+//StaticParticle::StaticParticle(CPosition position, GraphicAnimation *animation, int drawlevel) :
+StaticParticle::StaticParticle(CPosition position, int z, GraphicAnimation *animation, int drawlevel) :
+//Wyrmgus end
+	//Wyrmgus start
+//	CParticle(position, drawlevel)
+	CParticle(position, z, drawlevel)
+	//Wyrmgus end
 {
 	Assert(animation);
 	this->animation = animation->clone();
@@ -47,7 +52,10 @@ StaticParticle::~StaticParticle()
 
 bool StaticParticle::isVisible(const CViewport &vp) const
 {
-	return animation && animation->isVisible(vp, pos);
+	//Wyrmgus start
+//	return animation && animation->isVisible(vp, pos);
+	return animation && animation->isVisible(vp, pos, MapLayer);
+	//Wyrmgus end
 }
 
 void StaticParticle::draw()
@@ -66,7 +74,10 @@ void StaticParticle::update(int ticks)
 
 CParticle *StaticParticle::clone()
 {
-	CParticle *p = new StaticParticle(pos, animation, drawLevel);
+	//Wyrmgus start
+//	CParticle *p = new StaticParticle(pos, animation, drawLevel);
+	CParticle *p = new StaticParticle(pos, MapLayer, animation, drawLevel);
+	//Wyrmgus end
 	return p;
 }
 
