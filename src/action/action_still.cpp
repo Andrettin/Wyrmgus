@@ -171,7 +171,10 @@ private:
 		return;
 	}
 
-	FireMissile(unit, goal, goal->tilePos);
+	//Wyrmgus start
+//	FireMissile(unit, goal, goal->tilePos);
+	FireMissile(unit, goal, goal->tilePos, goal->MapLayer);
+	//Wyrmgus end
 	UnHideUnit(unit);
 }
 
@@ -288,7 +291,7 @@ static bool Feed(CUnit &unit)
 				unit.CanEat(*table[i])
 				&& (table[i]->Type->BoolFlag[DIMINUTIVE_INDEX].value || table[i]->Type->BoolFlag[DECORATION_INDEX].value || table[i]->Type->BoolFlag[ITEM_INDEX].value || table[i]->Type->BoolFlag[POWERUP_INDEX].value || table[i]->CurrentAction() == UnitActionDie)
 			) {
-				int distance = unit.MapDistanceTo(table[i]->tilePos);
+				int distance = unit.MapDistanceTo(table[i]->tilePos, table[i]->MapLayer);
 				int reach = 1;
 				if (table[i]->Type->BoolFlag[DIMINUTIVE_INDEX].value || unit.Type->BoolFlag[DIMINUTIVE_INDEX].value || table[i]->CurrentAction() == UnitActionDie) {
 					reach = 0;

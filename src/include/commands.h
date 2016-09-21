@@ -127,7 +127,10 @@ extern void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &, int
 /// Prepare command dismiss
 extern void CommandDismiss(CUnit &unit);
 /// Prepare command resource location
-extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+//extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
+extern void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//Wyrmgus end
 /// Prepare command resource
 extern void CommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command return
@@ -150,7 +153,10 @@ extern void CommandResearch(CUnit &unit, CUpgrade &what, int flush);
 /// Prepare command cancel research
 extern void CommandCancelResearch(CUnit &unit);
 /// Prepare command spellcast
-extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast = false);
+//Wyrmgus start
+//extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast = false);
+extern void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, int z = 0, bool isAutocast = false);
+//Wyrmgus end
 /// Prepare command auto spellcast
 extern void CommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Prepare diplomacy command
@@ -225,7 +231,10 @@ extern void SendCommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &w
 /// Send cancel building command
 extern void SendCommandDismiss(CUnit &unit);
 /// Send harvest location command
-extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+//extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush);
+extern void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//Wyrmgus end
 /// Send harvest command
 extern void SendCommandResource(CUnit &unit, CUnit &dest, int flush);
 /// Send return goods command
@@ -250,7 +259,10 @@ extern void SendCommandResearch(CUnit &unit, CUpgrade &what, int flush);
 /// Send cancel research command
 extern void SendCommandCancelResearch(CUnit &unit);
 /// Send spell cast command
-extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush);
+//Wyrmgus start
+//extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush);
+extern void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush, int z = 0);
+//Wyrmgus end
 /// Send auto spell cast command
 extern void SendCommandAutoSpellCast(CUnit &unit, int spellid, int on);
 /// Send diplomacy command

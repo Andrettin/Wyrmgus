@@ -161,11 +161,18 @@ public:
 class OutOfMinRange : public CUnitFilter
 {
 public:
-	explicit OutOfMinRange(const int range, const Vec2i pos) : range(range), pos(pos) {}
-	bool operator()(const CUnit *unit) const { return unit->MapDistanceTo(pos) >= range; }
+	//Wyrmgus start
+//	explicit OutOfMinRange(const int range, const Vec2i pos) : range(range), pos(pos) {}
+//	bool operator()(const CUnit *unit) const { return unit->MapDistanceTo(pos) >= range; }
+	explicit OutOfMinRange(const int range, const Vec2i pos, int z) : range(range), pos(pos), z(z) {}
+	bool operator()(const CUnit *unit) const { return unit->MapDistanceTo(pos, z) >= range; }
+	//Wyrmgus end
 private:
 	int range;
 	Vec2i pos;
+	//Wyrmgus start
+	int z;
+	//Wyrmgus end
 };
 
 
@@ -401,7 +408,7 @@ extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 extern bool FindTerrainType(int movemask, int resmask, int range,
 							//Wyrmgus start
 //							const CPlayer &player, const Vec2i &startPos, Vec2i *pos);
-							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z = 0);
+							const CPlayer &player, const Vec2i &startPos, Vec2i *pos, int z);
 							//Wyrmgus end
 
 extern void FindUnitsByType(const CUnitType &type, std::vector<CUnit *> &units, bool everybody = false);

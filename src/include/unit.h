@@ -337,13 +337,20 @@ public:
 	int MapDistanceTo(const CUnit &dst) const
 	{
 		//Wyrmgus start
+		if (this->MapLayer != dst.MapLayer) {
+			return 16384;
+		}
+		
 //		return MapDistanceBetweenTypes(*Type, tilePos, *dst.Type, dst.tilePos);
 		const CUnitType *distance_unit_type = Container ? Container->Type : Type;
 		return MapDistanceBetweenTypes(*distance_unit_type, tilePos, *dst.Type, dst.tilePos);
 		//Wyrmgus end
 	}
 
-	int MapDistanceTo(const Vec2i &pos) const;
+	//Wyrmgus start
+//	int MapDistanceTo(const Vec2i &pos) const;
+	int MapDistanceTo(const Vec2i &pos, int z) const;
+	//Wyrmgus end
 
 	/**
 	**  Test if unit can move.
@@ -355,7 +362,10 @@ public:
 
 	int GetDrawLevel() const;
 
-	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos);
+	//Wyrmgus start
+//	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos);
+	bool IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z);
+	//Wyrmgus end
 
 	PixelPos GetMapPixelPosTopLeft() const;
 	PixelPos GetMapPixelPosCenter() const;

@@ -84,7 +84,10 @@
 **  @internal: vladi: blizzard differs than original in this way:
 **   original: launches 50 shards at 5 random spots x 10 for 25 mana.
 */
-/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int Spell_AreaBombardment::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	int fields = this->Fields;
 	const int shards = this->Shards;
@@ -100,12 +103,18 @@
 			// find new destination in the map
 			dpos.x = goalPos.x + SyncRand() % 5 - 2;
 			dpos.y = goalPos.y + SyncRand() % 5 - 2;
-		} while (!Map.Info.IsPointOnMap(dpos));
+		//Wyrmgus start
+//		} while (!Map.Info.IsPointOnMap(dpos));
+		} while (!Map.Info.IsPointOnMap(dpos, z));
+		//Wyrmgus end
 
 		const PixelPos dest = Map.TilePosToMapPixelPos_Center(dpos);
 		const PixelPos start = dest + offset;
 		for (int i = 0; i < shards; ++i) {
-			::Missile *mis = MakeMissile(*missile, start, dest);
+			//Wyrmgus start
+//			::Missile *mis = MakeMissile(*missile, start, dest);
+			::Missile *mis = MakeMissile(*missile, start, dest, z);
+			//Wyrmgus end
 			if (mis->Type->BlizzardSpeed) {
 				mis->Delay = i * mis->Type->Sleep * 2 * PixelTileSize.x / mis->Type->BlizzardSpeed;
 			} else if (mis->Type->Speed) {

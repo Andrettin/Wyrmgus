@@ -43,7 +43,10 @@ class Spell_SpawnPortal : public SpellActionType
 public:
 	Spell_SpawnPortal() : PortalType(0), TTL(0), CurrentPlayer(false) {};
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos);
+					 //Wyrmgus start
+//					 CUnit *target, const Vec2i &goalPos);
+					 CUnit *target, const Vec2i &goalPos, int z);
+					 //Wyrmgus end
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:

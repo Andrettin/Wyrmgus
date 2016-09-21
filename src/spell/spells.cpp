@@ -81,7 +81,10 @@ std::vector<SpellType *> SpellTypeTable;
 */
 static Target *NewTargetUnit(CUnit &unit)
 {
-	return new Target(TargetUnit, &unit, unit.tilePos);
+	//Wyrmgus start
+//	return new Target(TargetUnit, &unit, unit.tilePos);
+	return new Target(TargetUnit, &unit, unit.tilePos, unit.MapLayer);
+	//Wyrmgus end
 }
 
 // ****************************************************************************
@@ -100,7 +103,10 @@ static Target *NewTargetUnit(CUnit &unit)
 **  @return            true if passed, false otherwise.
 */
 static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUnit *target,
-						  const Vec2i &goalPos, const ConditionInfo *condition)
+						  //Wyrmgus start
+//						  const Vec2i &goalPos, const ConditionInfo *condition)
+						  const Vec2i &goalPos, const ConditionInfo *condition, int z)
+						  //Wyrmgus end
 {
 	if (caster.Variable[MANA_INDEX].Value < spell.ManaCost) { // Check caster mana.
 		return false;
@@ -294,12 +300,18 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 	}
 	Assert(autocast);
 	const Vec2i &pos = caster.tilePos;
+	//Wyrmgus start
+	int z = caster.MapLayer;
+	//Wyrmgus end
 	int range = autocast->Range;
 	int minRange = autocast->MinRange;
 
 	// Select all units aroung the caster
 	std::vector<CUnit *> table;
-	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos));
+	//Wyrmgus start
+//	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos));
+	SelectAroundUnit(caster, range, table, OutOfMinRange(minRange, caster.tilePos, caster.MapLayer));
+	//Wyrmgus end
 
 	// Check generic conditions. FIXME: a better way to do this?
 	if (autocast->Combat != CONDITION_TRUE) {
@@ -322,8 +334,14 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 
 	switch (spell.Target) {
 		case TargetSelf :
-			if (PassCondition(caster, spell, &caster, pos, spell.Condition)
-				&& PassCondition(caster, spell, &caster, pos, autocast->Condition)) {
+			//Wyrmgus start
+//			if (PassCondition(caster, spell, &caster, pos, spell.Condition)
+			if (PassCondition(caster, spell, &caster, pos, spell.Condition, z)
+			//Wyrmgus end
+				//Wyrmgus start
+//				&& PassCondition(caster, spell, &caster, pos, autocast->Condition)) {
+				&& PassCondition(caster, spell, &caster, pos, autocast->Condition, z)) {
+				//Wyrmgus end
 				return NewTargetUnit(caster);
 			}
 			return NULL;
@@ -346,8 +364,14 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 						continue;
 					}
 					//Wyrmgus end
-					if (PassCondition(caster, spell, table[i], pos, spell.Condition)
-						&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
+					//Wyrmgus start
+//					if (PassCondition(caster, spell, table[i], pos, spell.Condition)
+					if (PassCondition(caster, spell, table[i], pos, spell.Condition, z)
+					//Wyrmgus end
+						//Wyrmgus start
+//						&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
+						&& PassCondition(caster, spell, table[i], pos, autocast->Condition, z)) {
+						//Wyrmgus end
 							table[count++] = table[i];
 					}
 				}
@@ -365,8 +389,14 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 					autocast->PositionAutoCast->pushIntegers(array);
 					autocast->PositionAutoCast->run(2);
 					Vec2i resPos(autocast->PositionAutoCast->popInteger(), autocast->PositionAutoCast->popInteger());
-					if (Map.Info.IsPointOnMap(resPos)) {
-						Target *target = new Target(TargetPosition, NULL, resPos);
+					//Wyrmgus start
+//					if (Map.Info.IsPointOnMap(resPos)) {
+					if (Map.Info.IsPointOnMap(resPos, z)) {
+					//Wyrmgus end
+						//Wyrmgus start
+//						Target *target = new Target(TargetPosition, NULL, resPos);
+						Target *target = new Target(TargetPosition, NULL, resPos, z);
+						//Wyrmgus end
 						return target;
 					}
 				}
@@ -389,7 +419,10 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 						 && table[i]->CurrentAction() != UnitActionAttackGround
 						 && table[i]->CurrentAction() != UnitActionSpellCast)
 						|| table[i]->CurrentOrder()->HasGoal() == false
-						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
+						//Wyrmgus start
+//						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos()) > range) {
+						|| table[i]->MapDistanceTo(table[i]->CurrentOrder()->GetGoalPos(), table[i]->CurrentOrder()->GetGoalMapLayer()) > range) {
+						//Wyrmgus end
 						continue;
 					}
 				}
@@ -414,8 +447,14 @@ static Target *SelectTargetUnitsOfAutoCast(CUnit &caster, const SpellType &spell
 					continue;
 				}
 				//Wyrmgus end
-				if (PassCondition(caster, spell, table[i], pos, spell.Condition)
-					&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
+				//Wyrmgus start
+//				if (PassCondition(caster, spell, table[i], pos, spell.Condition)
+				if (PassCondition(caster, spell, table[i], pos, spell.Condition, z)
+				//Wyrmgus end
+					//Wyrmgus start
+//					&& PassCondition(caster, spell, table[i], pos, autocast->Condition)) {
+					&& PassCondition(caster, spell, table[i], pos, autocast->Condition, z)) {
+					//Wyrmgus end
 					table[n++] = table[i];
 				}
 			}
@@ -510,12 +549,18 @@ bool SpellIsAvailable(const CUnit &unit, int spellid)
 **  @note caster must know the spell, and spell must be researched.
 */
 bool CanCastSpell(const CUnit &caster, const SpellType &spell,
-				  const CUnit *target, const Vec2i &goalPos)
+				  //Wyrmgus start
+//				  const CUnit *target, const Vec2i &goalPos)
+				  const CUnit *target, const Vec2i &goalPos, int z)
+				  //Wyrmgus end
 {
 	if (spell.Target == TargetUnit && target == NULL) {
 		return false;
 	}
-	return PassCondition(caster, spell, target, goalPos, spell.Condition);
+	//Wyrmgus start
+//	return PassCondition(caster, spell, target, goalPos, spell.Condition);
+	return PassCondition(caster, spell, target, goalPos, spell.Condition, z);
+	//Wyrmgus end
 }
 
 /**
@@ -547,7 +592,10 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 			savedOrder = caster.CurrentOrder()->Clone();
 		}
 		// Must move before ?
-		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, true);
+		//Wyrmgus start
+//		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, true);
+		CommandSpellCast(caster, target->targetPos, target->Unit, spell, FlushCommands, target->MapLayer, true);
+		//Wyrmgus end
 		delete target;
 		if (savedOrder != NULL) {
 			caster.SavedOrder = savedOrder;
@@ -566,24 +614,36 @@ int AutoCastSpell(CUnit &caster, const SpellType &spell)
 **
 ** @return          !=0 if spell should/can continue or 0 to stop
 */
-int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+//Wyrmgus start
+//int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	Vec2i pos = goalPos;
 
 	caster.Variable[INVISIBLE_INDEX].Value = 0;// unit is invisible until attacks // FIXME: Must be configurable
 	if (target) {
 		pos = target->tilePos;
+		//Wyrmgus start
+		z = target->MapLayer;
+		//Wyrmgus end
 	}
 	//
 	// For TargetSelf, you target.... YOURSELF
 	//
 	if (spell.Target == TargetSelf) {
 		pos = caster.tilePos;
+		//Wyrmgus start
+		z = caster.MapLayer;
+		//Wyrmgus end
 		target = &caster;
 	}
 	DebugPrint("Spell cast: (%s), %s -> %s (%d,%d)\n" _C_ spell.Ident.c_str() _C_
 			   caster.Type->Name.c_str() _C_ target ? target->Type->Name.c_str() : "none" _C_ pos.x _C_ pos.y);
-	if (CanCastSpell(caster, spell, target, pos)) {
+	//Wyrmgus start
+//	if (CanCastSpell(caster, spell, target, pos)) {
+	if (CanCastSpell(caster, spell, target, pos, z)) {
+	//Wyrmgus end
 		int cont = 1; // Should we recast the spell.
 		bool mustSubtractMana = true; // false if action which have their own calculation is present.
 		//
@@ -612,7 +672,10 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 			if ((*act)->ModifyManaCaster) {
 				mustSubtractMana = false;
 			}
-			cont = cont & (*act)->Cast(caster, spell, target, pos);
+			//Wyrmgus start
+//			cont = cont & (*act)->Cast(caster, spell, target, pos);
+			cont = cont & (*act)->Cast(caster, spell, target, pos, z);
+			//Wyrmgus end
 		}
 		if (mustSubtractMana) {
 			caster.Variable[MANA_INDEX].Value -= spell.ManaCost;
@@ -627,7 +690,10 @@ int SpellCast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i 
 		// anim but fail in this proc.
 		//
 		if (spell.RepeatCast && cont) {
-			return CanCastSpell(caster, spell, target, pos);
+			//Wyrmgus start
+//			return CanCastSpell(caster, spell, target, pos);
+			return CanCastSpell(caster, spell, target, pos, z);
+			//Wyrmgus end
 		}
 	}
 	//

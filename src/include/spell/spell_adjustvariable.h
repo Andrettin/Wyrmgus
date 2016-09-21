@@ -71,7 +71,10 @@ public:
 	Spell_AdjustVariable() : Var(NULL) {};
 	~Spell_AdjustVariable() { delete [](this->Var); };
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos);
+					 //Wyrmgus start
+//					 CUnit *target, const Vec2i &goalPos);
+					 CUnit *target, const Vec2i &goalPos, int z);
+					 //Wyrmgus end
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:

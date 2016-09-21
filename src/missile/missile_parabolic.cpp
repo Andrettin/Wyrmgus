@@ -86,7 +86,10 @@ static bool ParabolicMissile(Missile &missile)
 		if (missile.Type->Smoke.Missile && missile.CurrentStep) {
 			const PixelPos position((int)pos.x + missile.Type->size.x / 2,
 									(int)pos.y + missile.Type->size.y / 2);
-			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			//Wyrmgus start
+//			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position, missile.MapLayer);
+			//Wyrmgus end
 			if (smoke && smoke->Type->NumDirections > 1) {
 				smoke->MissileNewHeadingFromXY(diff);
 			}

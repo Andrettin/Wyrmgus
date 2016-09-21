@@ -56,7 +56,10 @@
 **
 **  @return        =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_LuaCallback::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_LuaCallback::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int Spell_LuaCallback::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	if (this->Func) {
 		this->Func->pushPreamble();

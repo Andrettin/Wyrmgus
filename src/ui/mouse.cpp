@@ -335,7 +335,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 			}
 			*/
 			if (unit.CurrentResource != res || unit.ResourcesHeld < type.ResInfo[res]->ResourceCapacity) {
-				SendCommandResourceLoc(unit, pos, flush);
+				SendCommandResourceLoc(unit, pos, flush, CurrentMapLayer);
 				if (!acknowledged) {
 					PlayUnitSound(unit, VoiceHarvesting);
 					acknowledged = 1;
@@ -348,7 +348,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 						acknowledged = 1;
 					}
 					SendCommandReturnGoods(unit, depot, flush);
-					SendCommandResourceLoc(unit, pos, 0);
+					SendCommandResourceLoc(unit, pos, 0, CurrentMapLayer);
 				}
 			}
 			//Wyrmgus end
@@ -478,7 +478,10 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			size_t spellnum;
 			for (spellnum = 0; !type.CanCastSpell[spellnum] && spellnum < SpellTypeTable.size() ; spellnum++) {
 			}
-			SendCommandSpellCast(unit, pos, &dest, spellnum, flush);
+			//Wyrmgus start
+//			SendCommandSpellCast(unit, pos, &dest, spellnum, flush);
+			SendCommandSpellCast(unit, pos, &dest, spellnum, flush, CurrentMapLayer);
+			//Wyrmgus end
 		} else {
 			if (CanTarget(type, *dest.Type)) {
 				SendCommandAttack(unit, pos, &dest, flush);
@@ -681,7 +684,10 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 			PlayUnitSound(unit, VoiceAcknowledging);
 			acknowledged = 1;
 		}
-		SendCommandResourceLoc(unit, pos, flush);
+		//Wyrmgus start
+//		SendCommandResourceLoc(unit, pos, flush);
+		SendCommandResourceLoc(unit, pos, flush, CurrentMapLayer);
+		//Wyrmgus end
 		return true;
 	}
 	return false;
@@ -1678,7 +1684,10 @@ static int SendResource(const Vec2i &pos)
 						&& mf.IsTerrainResourceOnMap(res)
 						&& unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity
 						&& (unit.CurrentResource != res || unit.ResourcesHeld < unit.Type->ResInfo[res]->ResourceCapacity)) {
-						SendCommandResourceLoc(unit, pos, flush);
+						//Wyrmgus start
+//						SendCommandResourceLoc(unit, pos, flush);
+						SendCommandResourceLoc(unit, pos, flush, CurrentMapLayer);
+						//Wyrmgus end
 						ret = 1;
 						break;
 					}
@@ -1699,7 +1708,10 @@ static int SendResource(const Vec2i &pos)
 //			if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
 			if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
 			//Wyrmgus end
-				SendCommandResourceLoc(unit, pos, flush);
+				//Wyrmgus start
+//				SendCommandResourceLoc(unit, pos, flush);
+				SendCommandResourceLoc(unit, pos, flush, CurrentMapLayer);
+				//Wyrmgus end
 				ret = 1;
 				continue;
 			}
@@ -1774,7 +1786,10 @@ static int SendSpellCast(const Vec2i &tilePos)
 			fprintf(stderr, "unknown spell-id: %d\n", CursorValue);
 			ExitFatal(1);
 		}
-		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? NULL : dest , CursorValue, flush);
+		//Wyrmgus start
+//		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? NULL : dest , CursorValue, flush);
+		SendCommandSpellCast(unit, tilePos, spell->Target == TargetPosition ? NULL : dest , CursorValue, flush, CurrentMapLayer);
+		//Wyrmgus end
 		ret = 1;
 	}
 	return ret;
@@ -1957,7 +1972,10 @@ static void UISelectStateButtonDown(unsigned)
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(CursorScreenPos);
 
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				//Wyrmgus start
+//				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, CurrentMapLayer);
+				//Wyrmgus end
 			}
 			SendCommand(Map.MapPixelPosToTilePos(mapPixelPos));
 		}
@@ -1981,7 +1999,10 @@ static void UISelectStateButtonDown(unsigned)
 			CurrentButtonLevel = 0;
 			UI.ButtonPanel.Update();
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				//Wyrmgus start
+//				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, CurrentMapLayer);
+				//Wyrmgus end
 			}
 			SendCommand(cursorTilePos);
 		} else {
@@ -2090,7 +2111,10 @@ static void UIHandleButtonDown_OnMap(unsigned button)
 				if (!ClickMissile.empty()) {
 					const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
 
-					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+					//Wyrmgus start
+//					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+					MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, CurrentMapLayer);
+					//Wyrmgus end
 				}
 			}
 			const PixelPos mapPixelPos = UI.MouseViewport->ScreenToMapPixelPos(CursorScreenPos);
@@ -2117,7 +2141,10 @@ static void UIHandleButtonDown_OnMinimap(unsigned button)
 		if (!GameObserve && !GamePaused && !GameEstablishing) {
 			const PixelPos mapPixelPos = Map.TilePosToMapPixelPos_Center(cursorTilePos);
 			if (!ClickMissile.empty()) {
-				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				//Wyrmgus start
+//				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos);
+				MakeLocalMissile(*MissileTypeByIdent(ClickMissile), mapPixelPos, mapPixelPos, CurrentMapLayer);
+				//Wyrmgus end
 			}
 			DoRightButton(mapPixelPos);
 		}

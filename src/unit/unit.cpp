@@ -2816,7 +2816,7 @@ void CUnit::MoveToXY(const Vec2i &pos, int z)
 				fprintf(stderr, "Error in CUnit::MoveToXY (pos %d, %d): a unit in the tile's unit cache is NULL.\n", pos.x, pos.y);
 			}
 			if (unit.IsAliveOnMap() && unit.Type->BoolFlag[TRAP_INDEX].value) {
-				FireMissile(unit, this, this->tilePos);
+				FireMissile(unit, this, this->tilePos, this->MapLayer);
 				LetUnitDie(unit);
 			}
 		}
@@ -4743,7 +4743,7 @@ bool CUnit::CanUseItem(CUnit *item) const
 	}
 	
 	if (item->Spell != NULL) {
-		if (!this->HasInventory() || !CanCastSpell(*this, *item->Spell, this, this->tilePos)) {
+		if (!this->HasInventory() || !CanCastSpell(*this, *item->Spell, this, this->tilePos, this->MapLayer)) {
 			return false;
 		}
 	}
@@ -4962,7 +4962,10 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	if (type->ExplodeWhenKilled) {
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
 
-		MakeMissile(*type->Explosion.Missile, pixelPos, pixelPos);
+		//Wyrmgus start
+//		MakeMissile(*type->Explosion.Missile, pixelPos, pixelPos);
+		MakeMissile(*type->Explosion.Missile, pixelPos, pixelPos, unit.MapLayer);
+		//Wyrmgus end
 	}
 	if (type->DeathExplosion) {
 		const PixelPos pixelPos = unit.GetMapPixelPosCenter();
@@ -4980,7 +4983,7 @@ void LetUnitDie(CUnit &unit, bool suicide)
 		
 		//Wyrmgus start
 //		MakeMissile(*type->Missile.Missile, pixelPos, pixelPos);
-		MakeMissile(*unit.GetMissile().Missile, pixelPos, pixelPos);
+		MakeMissile(*unit.GetMissile().Missile, pixelPos, pixelPos, unit.MapLayer);
 		//Wyrmgus end
 	}
 	// Handle Teleporter Destination Removal
@@ -5379,7 +5382,10 @@ static void HitUnit_ShowDamageMissile(const CUnit &target, int damage)
 		const MissileType *mtype = MissileTypeByIdent(DamageMissile);
 		const PixelDiff offset(3, -mtype->Range);
 
-		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
+		//Wyrmgus start
+//		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset)->Damage = -damage;
+		MakeLocalMissile(*mtype, targetPixelCenter, targetPixelCenter + offset, target.MapLayer)->Damage = -damage;
+		//Wyrmgus end
 	}
 }
 
@@ -5390,11 +5396,20 @@ static void HitUnit_ShowImpactMissile(const CUnit &target)
 
 	if (target.Variable[SHIELD_INDEX].Value > 0
 		&& !type.Impact[ANIMATIONS_DEATHTYPES + 1].Name.empty()) { // shield impact
-		MakeMissile(*type.Impact[ANIMATIONS_DEATHTYPES + 1].Missile, targetPixelCenter, targetPixelCenter);
+		//Wyrmgus start
+//		MakeMissile(*type.Impact[ANIMATIONS_DEATHTYPES + 1].Missile, targetPixelCenter, targetPixelCenter);
+		MakeMissile(*type.Impact[ANIMATIONS_DEATHTYPES + 1].Missile, targetPixelCenter, targetPixelCenter, target.MapLayer);
+		//Wyrmgus end
 	} else if (target.DamagedType && !type.Impact[target.DamagedType].Name.empty()) { // specific to damage type impact
-		MakeMissile(*type.Impact[target.DamagedType].Missile, targetPixelCenter, targetPixelCenter);
+		//Wyrmgus start
+//		MakeMissile(*type.Impact[target.DamagedType].Missile, targetPixelCenter, targetPixelCenter);
+		MakeMissile(*type.Impact[target.DamagedType].Missile, targetPixelCenter, targetPixelCenter, target.MapLayer);
+		//Wyrmgus end
 	} else if (!type.Impact[ANIMATIONS_DEATHTYPES].Name.empty()) { // generic impact
-		MakeMissile(*type.Impact[ANIMATIONS_DEATHTYPES].Missile, targetPixelCenter, targetPixelCenter);
+		//Wyrmgus start
+//		MakeMissile(*type.Impact[ANIMATIONS_DEATHTYPES].Missile, targetPixelCenter, targetPixelCenter);
+		MakeMissile(*type.Impact[ANIMATIONS_DEATHTYPES].Missile, targetPixelCenter, targetPixelCenter, target.MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -5445,7 +5460,10 @@ static void HitUnit_Burning(CUnit &target)
 	if (fire) {
 		const PixelPos targetPixelCenter = target.GetMapPixelPosCenter();
 		const PixelDiff offset(0, -PixelTileSize.y);
-		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset);
+		//Wyrmgus start
+//		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset);
+		Missile *missile = MakeMissile(*fire, targetPixelCenter + offset, targetPixelCenter + offset, target.MapLayer);
+		//Wyrmgus end
 
 		missile->SourceUnit = &target;
 		target.Burning = 1;
@@ -5732,8 +5750,17 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
  **
  **  @return      The distance between in tiles.
  */
-int CUnit::MapDistanceTo(const Vec2i &pos) const
+ //Wyrmgus start
+//int CUnit::MapDistanceTo(const Vec2i &pos) const
+int CUnit::MapDistanceTo(const Vec2i &pos, int z) const
+//Wyrmgus end
 {
+	//Wyrmgus start
+	if (z != this->MapLayer) {
+		return 16384;
+	}
+	//Wyrmgus end
+	
 	int dx;
 	int dy;
 
@@ -5815,7 +5842,10 @@ int ViewPointDistanceToUnit(const CUnit &dest)
 	const Vec2i vpSize(vp.MapWidth, vp.MapHeight);
 	const Vec2i midPos = vp.MapPos + vpSize / 2;
 
-	return dest.MapDistanceTo(midPos);
+	//Wyrmgus start
+//	return dest.MapDistanceTo(midPos);
+	return dest.MapDistanceTo(midPos, CurrentMapLayer);
+	//Wyrmgus end
 }
 
 /**
@@ -6100,7 +6130,10 @@ bool CUnit::IsUnusable(bool ignore_built_state) const
 /**
 **  Check if the unit attacking its goal will result in a ranged attack
 */
-bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
+//Wyrmgus start
+//bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
+bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	if (this->Variable[ATTACKRANGE_INDEX].Value <= 1) { //always return false if the units attack range is 1 or lower
 		return false;
@@ -6122,7 +6155,10 @@ bool CUnit::IsAttackRanged(CUnit *goal, const Vec2i &goalPos)
 		return true;
 	}
 	
-	if (!goal && Map.Info.IsPointOnMap(goalPos) && this->MapDistanceTo(goalPos) > 1) {
+	//Wyrmgus start
+//	if (!goal && Map.Info.IsPointOnMap(goalPos) && this->MapDistanceTo(goalPos) > 1) {
+	if (!goal && Map.Info.IsPointOnMap(goalPos, z) && this->MapDistanceTo(goalPos, z) > 1) {
+	//Wyrmgus end
 		return true;
 	}
 	

@@ -451,7 +451,7 @@ static void AnimateActionTrain(CUnit &unit)
 			if (!command_found && Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer)->playerInfo.IsTeamExplored(*newUnit->Player)) { // see if can harvest terrain
 				for (int res = 0; res < MaxCosts; ++res) {
 					if (newUnit->Type->ResInfo[res] && Map.Field(unit.RallyPointPos, unit.RallyPointMapLayer)->IsTerrainResourceOnMap(res)) {
-						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands);
+						CommandResourceLoc(*newUnit, unit.RallyPointPos, FlushCommands, unit.RallyPointMapLayer);
 						command_found = true;
 						break;
 					}

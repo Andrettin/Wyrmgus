@@ -1062,7 +1062,7 @@ void AiCanNotMove(CUnit &unit)
 	AiPlayer = unit.Player->Ai;
 	//Wyrmgus start
 //	if (PlaceReachable(unit, goalPos, gw, gh, 0, 255)) {
-	if (PlaceReachable(unit, goalPos, gw, gh, 0, 511)) {
+	if (PlaceReachable(unit, goalPos, gw, gh, 0, 511, 0, unit.MapLayer)) {
 	//Wyrmgus end
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);

@@ -70,7 +70,10 @@
 --  Functions
 ----------------------------------------------------------------------------*/
 
-/* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast)
+//Wyrmgus start
+///* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast)
+/* static */ COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast)
+//Wyrmgus end
 {
 	COrder_SpellCast *order = new COrder_SpellCast(isAutocast);
 
@@ -84,12 +87,18 @@
 			// FIXME: target->Type is now set to 0. maybe we shouldn't bother.
 			const Vec2i diag(order->Range, order->Range);
 			order->goalPos = target->tilePos /* + target->Type->GetHalfTileSize() */ - diag;
+			//Wyrmgus start
+			order->MapLayer = target->MapLayer;
+			//Wyrmgus end
 			order->Range <<= 1;
 		} else {
 			order->SetGoal(target);
 		}
 	} else {
 		order->goalPos = pos;
+		//Wyrmgus start
+		order->MapLayer = z;
+		//Wyrmgus end
 	}
 	order->SetSpell(spell);
 
@@ -108,6 +117,9 @@
 		file.printf(" \"goal\", \"%s\",", UnitReference(this->GetGoal()).c_str());
 	}
 	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	//Wyrmgus start
+	file.printf(" \"map-layer\", %d,", this->MapLayer);
+	//Wyrmgus end
 
 	file.printf("\"state\", %d,", this->State);
 	file.printf(" \"spell\", \"%s\"", this->Spell->Ident.c_str());
@@ -131,6 +143,11 @@
 		lua_rawgeti(l, -1, j + 1);
 		CclGetPos(l, &this->goalPos.x , &this->goalPos.y);
 		lua_pop(l, 1);
+	//Wyrmgus start
+	} else if (!strcmp(value, "map-layer")) {
+		++j;
+		this->MapLayer = LuaToNumber(l, -1, j + 1);
+	//Wyrmgus end
 	} else {
 		return false;
 	}
@@ -143,7 +160,10 @@
 	if (this->HasGoal()) {
 		return this->GetGoal()->IsAliveOnMap();
 	} else {
-		return Map.Info.IsPointOnMap(this->goalPos);
+		//Wyrmgus start
+//		return Map.Info.IsPointOnMap(this->goalPos);
+		return Map.Info.IsPointOnMap(this->goalPos, this->MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -189,11 +209,17 @@
 		CUnit *goal = this->GetGoal();
 		tileSize.x = goal->Type->TileWidth;
 		tileSize.y = goal->Type->TileHeight;
-		input.SetGoal(goal->tilePos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(goal->tilePos, tileSize);
+		input.SetGoal(goal->tilePos, tileSize, goal->MapLayer);
+		//Wyrmgus end
 	} else {
 		tileSize.x = 0;
 		tileSize.y = 0;
-		input.SetGoal(this->goalPos, tileSize);
+		//Wyrmgus start
+//		input.SetGoal(this->goalPos, tileSize);
+		input.SetGoal(this->goalPos, tileSize, this->MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -207,7 +233,10 @@
 	if (goal && !goal->IsVisibleAsGoal(*unit.Player)) {
 		unit.ReCast = 0;
 	} else {
-		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos);
+		//Wyrmgus start
+//		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos);
+		unit.ReCast = SpellCast(unit, *this->Spell, goal, goalPos, MapLayer);
+		//Wyrmgus end
 	}
 }
 
@@ -291,6 +320,9 @@ bool COrder_SpellCast::CheckForDeadGoal(CUnit &unit)
 	// Goal could be destroyed or unseen
 	// So, cannot use type.
 	this->goalPos = goal->tilePos;
+	//Wyrmgus start
+	this->MapLayer = goal->MapLayer;
+	//Wyrmgus end
 	this->Range = 0;
 	this->ClearGoal();
 
@@ -329,7 +361,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 		//Wyrmgus end
 		this->State++; // cast the spell
 		return false;
-	} else if (!goal && unit.MapDistanceTo(this->goalPos) <= this->Range) {
+	} else if (!goal && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= this->Range) {
 		// there is no goal and target spot is in range
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
 		this->State++; // cast the spell
@@ -337,7 +369,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	} else if (err == PF_UNREACHABLE || !unit.CanMove()) {
 		//Wyrmgus start
 		//if is unreachable and is on a raft, see if the raft can move closer to the target
-		if ((Map.Field(unit.tilePos)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
+		if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 			std::vector<CUnit *> table;
 			Select(unit.tilePos, unit.tilePos, table);
 			for (size_t i = 0; i != table.size(); ++i) {
@@ -382,7 +414,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 	switch (this->State) {
 		case 0:
 			// Check if we can cast the spell.
-			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos)) {
+			//Wyrmgus start
+//			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos)) {
+			if (!CanCastSpell(unit, spell, order.GetGoal(), order.goalPos, order.MapLayer)) {
+			//Wyrmgus end
 				// Notify player about this problem
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
@@ -467,7 +502,10 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (goal && goal != &unit && !goal->IsVisibleAsGoal(*unit.Player)) {
 					unit.ReCast = 0;
 				} else {
-					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos);
+					//Wyrmgus start
+//					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos);
+					unit.ReCast = SpellCast(unit, spell, goal, order.goalPos, order.MapLayer);
+					//Wyrmgus end
 				}
 			}
 
@@ -486,8 +524,14 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 					return;
 				}
 				if (this->isAutocast) {
-					if (order.GetGoal() && order.GetGoal()->tilePos != order.goalPos) {
+					//Wyrmgus start
+//					if (order.GetGoal() && order.GetGoal()->tilePos != order.goalPos) {
+					if (order.GetGoal() && (order.GetGoal()->tilePos != order.goalPos || order.GetGoal()->MapLayer != order.MapLayer)) {
+					//Wyrmgus end
 						order.goalPos = order.GetGoal()->tilePos;
+						//Wyrmgus start
+						order.MapLayer = order.GetGoal()->MapLayer;
+						//Wyrmgus end
 					}
 					if (unit.Player->AiEnabled) {
 						if (!unit.RestoreOrder()) {

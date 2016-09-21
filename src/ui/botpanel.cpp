@@ -1736,7 +1736,10 @@ void CButtonPanel::DoClicked_SpellCast(int button)
 		for (size_t i = 0; i != Selected.size(); ++i) {
 			CUnit &unit = *Selected[i];
 			// CursorValue here holds the spell type id
-			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
+			//Wyrmgus start
+//			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush);
+			SendCommandSpellCast(unit, unit.tilePos, &unit, spellId, flush, unit.MapLayer);
+			//Wyrmgus end
 		}
 		return;
 	}

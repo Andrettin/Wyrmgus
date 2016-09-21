@@ -313,6 +313,10 @@ void PlayUnitSound(const CUnit &unit, UnitVoiceGroup voice)
 		fprintf(stderr, "Error in PlayUnitSound: unit is NULL.\n");
 		return;
 	}
+	
+	if (unit.MapLayer != CurrentMapLayer) {
+		return;
+	}
 	//Wyrmgus end
 	
 	//Wyrmgus start
@@ -369,6 +373,11 @@ void PlayUnitSound(const CUnit &unit, CSound *sound)
 	if (!sound) {
 		return;
 	}
+	//Wyrmgus start
+	if (unit.MapLayer != CurrentMapLayer) {
+		return;
+	}
+	//Wyrmgus end
 	Origin source = {&unit, unsigned(UnitNumber(unit))};
 	//Wyrmgus start
 //	unsigned char volume = CalculateVolume(false, ViewPointDistanceToUnit(unit), sound->Range);

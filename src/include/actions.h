@@ -163,10 +163,16 @@ public:
 	static COrder *NewActionRepair(const Vec2i &pos, int z);
 	//Wyrmgus end
 	static COrder *NewActionResearch(CUnit &unit, CUpgrade &upgrade);
-	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos);
+	//Wyrmgus start
+//	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos);
+	static COrder *NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
+	//Wyrmgus end
 	static COrder *NewActionResource(CUnit &harvester, CUnit &mine);
 	static COrder *NewActionReturnGoods(CUnit &harvester, CUnit *depot);
-	static COrder *NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast = false);
+	//Wyrmgus start
+//	static COrder *NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast = false);
+	static COrder *NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast = false);
+	//Wyrmgus end
 	static COrder *NewActionStandGround();
 	static COrder *NewActionStill();
 	//Wyrmgus start

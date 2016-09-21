@@ -256,6 +256,9 @@ static int CclMissile(lua_State *l)
 	PixelPos position(-1, -1);
 	PixelPos destination(-1, -1);
 	PixelPos source(-1, -1);
+	//Wyrmgus start
+	int z = 0;
+	//Wyrmgus end
 	Missile *missile = NULL;
 
 	DebugPrint("FIXME: not finished\n");
@@ -273,17 +276,30 @@ static int CclMissile(lua_State *l)
 			CclGetPos(l, &source.x, &source.y, j + 1);
 		} else if (!strcmp(value, "goal")) {
 			CclGetPos(l, &destination.x, &destination.y, j + 1);
+		//Wyrmgus start
+		} else if (!strcmp(value, "map-layer")) {
+			z = LuaToNumber(l, j + 1);
+		//Wyrmgus end
 		} else if (!strcmp(value, "local")) {
 			Assert(type);
-			missile = MakeLocalMissile(*type, position, destination);
+			//Wyrmgus start
+//			missile = MakeLocalMissile(*type, position, destination);
+			missile = MakeLocalMissile(*type, position, destination, z);
+			//Wyrmgus end
 			missile->Local = 1;
 			--j;
 		} else if (!strcmp(value, "global")) {
 			Assert(type);
-			missile = MakeMissile(*type, position, destination);
+			//Wyrmgus start
+//			missile = MakeMissile(*type, position, destination);
+			missile = MakeMissile(*type, position, destination, z);
+			//Wyrmgus end
 			missile->position = position;
 			missile->source = source;
 			missile->destination = destination;
+			//Wyrmgus start
+			missile->MapLayer = z;
+			//Wyrmgus end
 			missile->Local = 0;
 			--j;
 		} else if (!strcmp(value, "frame")) {
@@ -340,6 +356,9 @@ static int CclMissile(lua_State *l)
 	missile->position = position;
 	missile->source = source;
 	missile->destination = destination;
+	//Wyrmgus start
+	missile->MapLayer = z;
+	//Wyrmgus end
 	return 0;
 }
 
@@ -417,7 +436,10 @@ static int CclCreateMissile(lua_State *l)
 		}
 	}
 
-	Missile *missile = MakeMissile(*mtype, startpos, endpos);
+	//Wyrmgus start
+//	Missile *missile = MakeMissile(*mtype, startpos, endpos);
+	Missile *missile = MakeMissile(*mtype, startpos, endpos, 0);
+	//Wyrmgus end
 	if (!missile) {
 		return 0;
 	}

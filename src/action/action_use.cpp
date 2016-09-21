@@ -217,7 +217,7 @@ enum {
 				}
 			} else if (unit.CanUseItem(goal)) {
 				if (goal->Spell != NULL) {
-					CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands);
+					CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands, unit.MapLayer);
 				} else if (goal->Work != NULL) {
 					unit.ReadWork(goal->Work);
 					if (unit.Player == ThisPlayer) {

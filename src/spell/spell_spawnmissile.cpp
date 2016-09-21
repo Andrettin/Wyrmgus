@@ -187,7 +187,10 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int Spell_SpawnMissile::Cast(CUnit &caster, const SpellType &, CUnit *target, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	PixelPos startPos;
 	PixelPos endPos;
@@ -215,7 +218,10 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 				if (unit.IsAliveOnMap()) {
 					EvaluateMissileLocation(this->StartPoint, caster, &unit, unit.tilePos, &startPos);
 					EvaluateMissileLocation(this->EndPoint, caster, &unit, unit.tilePos, &endPos);
-					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
+					//Wyrmgus start
+//					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos);
+					::Missile *missile = MakeMissile(*this->Missile, startPos, endPos, z);
+					//Wyrmgus end
 					missile->TTL = this->TTL;
 					missile->Delay = this->Delay;
 					if (it + 1 == table.begin() + count) {
@@ -242,7 +248,7 @@ static void EvaluateMissileLocation(const SpellActionMissileLocation &location,
 		if (mtype->Class == MissileClassNone && this->UseUnitVar) {
 			mtype = caster.GetMissile().Missile;
 		}
-		::Missile *missile = MakeMissile(*mtype, startPos, endPos);
+		::Missile *missile = MakeMissile(*mtype, startPos, endPos, z);
 		//Wyrmgus end
 		missile->TTL = this->TTL;
 		missile->Delay = this->Delay;

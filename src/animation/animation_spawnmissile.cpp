@@ -120,7 +120,10 @@
 		}
 	}
 	Vec2i destTilePos = Map.MapPixelPosToTilePos(dest);
-	const int dist = goal->MapDistanceTo(destTilePos);
+	//Wyrmgus start
+//	const int dist = goal->MapDistanceTo(destTilePos);
+	const int dist = goal->MapDistanceTo(destTilePos, unit.MapLayer);
+	//Wyrmgus end
 	if ((flags & SM_Ranged) && !(flags & SM_Pixel)
 		//Wyrmgus start
 //		&& dist > goal->Stats->Variables[ATTACKRANGE_INDEX].Max
@@ -128,7 +131,10 @@
 		//Wyrmgus end
 		&& dist < goal->Type->MinAttackRange) {
 	} else {
-		Missile *missile = MakeMissile(*mtype, start, dest);
+		//Wyrmgus start
+//		Missile *missile = MakeMissile(*mtype, start, dest);
+		Missile *missile = MakeMissile(*mtype, start, dest, unit.MapLayer);
+		//Wyrmgus end
 		if (flags & SM_SetDirection) {
 			PixelPos posd;
 			posd.x = Heading2X[goal->Direction / NextDirection];

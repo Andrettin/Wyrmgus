@@ -360,7 +360,10 @@ bool AiForce::NewRallyPoint(const Vec2i &startPos, Vec2i *resultPos, int z)
 {
 	Assert(this->Units.size() > 0);
 	const CUnit &leader = *(this->Units[0]);
-	const int distance = leader.MapDistanceTo(startPos);
+	//Wyrmgus start
+//	const int distance = leader.MapDistanceTo(startPos);
+	const int distance = leader.MapDistanceTo(startPos, z);
+	//Wyrmgus end
 
 	WaitOnRallyPoint = AI_WAIT_ON_RALLY_POINT;
 
@@ -1106,11 +1109,17 @@ void AiForce::Update()
 	//Wyrmgus end
 	if (State == AiForceAttackingState_GoingToRallyPoint) {
 		// Check if we are near the goalpos
-		int minDist = Units[0]->MapDistanceTo(this->GoalPos);
+		//Wyrmgus start
+//		int minDist = Units[0]->MapDistanceTo(this->GoalPos);
+		int minDist = Units[0]->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
+		//Wyrmgus end
 		int maxDist = minDist;
 
 		for (size_t i = 0; i != Size(); ++i) {
-			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
+			//Wyrmgus start
+//			const int distance = Units[i]->MapDistanceTo(this->GoalPos);
+			const int distance = Units[i]->MapDistanceTo(this->GoalPos, this->GoalMapLayer);
+			//Wyrmgus end
 			minDist = std::min(minDist, distance);
 			maxDist = std::max(maxDist, distance);
 		}
@@ -1312,7 +1321,10 @@ void AiForceManager::Update()
 			} else {
 				//  Check if some unit from force reached goal point
 				for (unsigned int i = 0; i != force.Size(); ++i) {
-					if (force.Units[i]->MapDistanceTo(force.GoalPos) <= nearDist) {
+					//Wyrmgus start
+//					if (force.Units[i]->MapDistanceTo(force.GoalPos) <= nearDist) {
+					if (force.Units[i]->MapDistanceTo(force.GoalPos, force.GoalMapLayer) <= nearDist) {
+					//Wyrmgus end
 						//  Look if still enemies in attack range.
 						const CUnit *dummy = NULL;
 						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {

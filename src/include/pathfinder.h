@@ -236,7 +236,7 @@ extern int UnitReachable(const CUnit &unit, const CUnit &dst, int range);
 extern int PlaceReachable(const CUnit &src, const Vec2i &pos, int w, int h,
 						  //Wyrmgus start
 //						  int minrange, int maxrange);
-						  int minrange, int maxrange, int max_length = 0, int z = 0);
+						  int minrange, int maxrange, int max_length, int z);
 						  //Wyrmgus end
 
 //

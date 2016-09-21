@@ -70,7 +70,10 @@ public:
 	virtual ~SpellActionType() {};
 
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos) = 0;
+					 //Wyrmgus start
+//					 CUnit *target, const Vec2i &goalPos) = 0;
+					 CUnit *target, const Vec2i &goalPos, int z) = 0;
+					 //Wyrmgus end
 	virtual void Parse(lua_State *l, int startIndex, int endIndex) = 0;
 
 	const int ModifyManaCaster;
@@ -95,12 +98,21 @@ enum TargetType {
 class Target
 {
 public:
-	Target(TargetType type, CUnit *unit, const Vec2i &pos) :
-		Type(type), Unit(unit), targetPos(pos) {}
+	//Wyrmgus start
+//	Target(TargetType type, CUnit *unit, const Vec2i &pos) :
+	Target(TargetType type, CUnit *unit, const Vec2i &pos, int z) :
+	//Wyrmgus end
+		//Wyrmgus start
+//		Type(type), Unit(unit), targetPos(pos) {}
+		Type(type), Unit(unit), targetPos(pos), MapLayer(z) {}
+		//Wyrmgus end
 
 	TargetType Type;                  /// type of target.
 	CUnit *Unit;                      /// Unit target.
 	Vec2i targetPos;
+	//Wyrmgus start
+	int MapLayer;
+	//Wyrmgus end
 };
 
 /*
@@ -291,11 +303,17 @@ extern bool SpellIsAvailable(const CUnit &unit, int SpellId);
 
 /// returns true if spell can be casted (enough mana, valid target)
 extern bool CanCastSpell(const CUnit &caster, const SpellType &spell,
-						 const CUnit *target, const Vec2i &goalPos);
+						 //Wyrmgus start
+//						 const CUnit *target, const Vec2i &goalPos);
+						 const CUnit *target, const Vec2i &goalPos, int z);
+						 //Wyrmgus end
 
 /// cast spell on target unit or place at x,y
 extern int SpellCast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos);
+					 //Wyrmgus start
+//					 CUnit *target, const Vec2i &goalPos);
+					 CUnit *target, const Vec2i &goalPos, int z);
+					 //Wyrmgus end
 
 /// auto cast the spell if possible
 extern int AutoCastSpell(CUnit &caster, const SpellType &spell);

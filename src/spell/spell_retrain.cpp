@@ -60,7 +60,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Retrain::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_Retrain::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int Spell_Retrain::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	caster.Retrain();
 	

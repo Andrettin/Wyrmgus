@@ -374,8 +374,10 @@ int AiGetBuildRequestsCount(const PlayerAi &pai, int (&counter)[UnitTypeMax])
 	return size;
 }
 
-extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource);
-
+//Wyrmgus start
+//extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource);
+extern CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource, int z);
+//Wyrmgus end
 
 void AiNewDepotRequest(CUnit &worker)
 {
@@ -391,11 +393,14 @@ void AiNewDepotRequest(CUnit &worker)
 
 	const Vec2i pos = order.GetHarvestLocation();
 	//Wyrmgus start
-	const int z = order.GetGoalMapLayer();
+	const int z = order.GetHarvestMapLayer();
 	//Wyrmgus end
 	const int range = 15;
 
-	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, range, resource)) {
+	//Wyrmgus start
+//	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, range, resource)) {
+	if (pos.x != -1 && NULL != FindDepositNearLoc(*worker.Player, pos, range, resource, z)) {
+	//Wyrmgus end
 		/*
 		 * New Depot has just be finished and worker just return to old depot
 		 * (far away) from new Deopt.
@@ -978,14 +983,17 @@ static int AiAssignHarvesterFromTerrain(CUnit &unit, int resource, int resource_
 	// Code for terrain harvesters. Search for piece of terrain to mine.
 	//Wyrmgus start
 //	if (FindTerrainType(unit.Type->MovementMask, MapFieldForest, 1000, *unit.Player, unit.tilePos, &forestPos)) {
-	if (resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, resource_range, *unit.Player, unit.tilePos, &forestPos)) {
+	if (resource == WoodCost && FindTerrainType(unit.Type->MovementMask, MapFieldForest, resource_range, *unit.Player, unit.tilePos, &forestPos, unit.MapLayer)) {
 	//Wyrmgus end
-		CommandResourceLoc(unit, forestPos, FlushCommands);
+		//Wyrmgus start
+//		CommandResourceLoc(unit, forestPos, FlushCommands);
+		CommandResourceLoc(unit, forestPos, FlushCommands, unit.MapLayer);
+		//Wyrmgus end
 		return 1;
 	}
 	//Wyrmgus start
-	if (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, resource_range, *unit.Player, unit.tilePos, &rockPos)) {
-		CommandResourceLoc(unit, rockPos, FlushCommands);
+	if (resource == StoneCost && FindTerrainType(unit.Type->MovementMask, MapFieldRocks, resource_range, *unit.Player, unit.tilePos, &rockPos, unit.MapLayer)) {
+		CommandResourceLoc(unit, rockPos, FlushCommands, unit.MapLayer);
 		return 1;
 	}
 	//Wyrmgus end

@@ -74,7 +74,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int Spell_SpawnPortal::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	// FIXME: vladi: cop should be placed only on explored land
 	CUnit *portal = caster.Goal;
@@ -83,13 +86,13 @@
 	if (portal && portal->IsAlive()) {
 		//Wyrmgus start
 //		portal->MoveToXY(goalPos);
-		portal->MoveToXY(goalPos, caster.MapLayer);
+		portal->MoveToXY(goalPos, z);
 		//Wyrmgus end
 	} else {
 		portal = MakeUnitAndPlace(goalPos, *this->PortalType,
 								  //Wyrmgus start
 //								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral]);
-								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral], caster.MapLayer);
+								  CurrentPlayer ? caster.Player : &Players[PlayerNumNeutral], z);
 								  //Wyrmgus end
 		portal->Summoned = 1;
 	}

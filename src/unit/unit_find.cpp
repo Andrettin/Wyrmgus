@@ -120,14 +120,21 @@ VisitResult UnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 class TerrainFinder
 {
 public:
-	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
-		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
+	//Wyrmgus start
+//	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos) :
+//		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos) {}
+	TerrainFinder(const CPlayer &player, int maxDist, int movemask, int resmask, Vec2i *resPos, int z) :
+		player(player), maxDist(maxDist), movemask(movemask), resmask(resmask), resPos(resPos), z(z) {}
+	//Wyrmgus end
 	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
 private:
 	const CPlayer &player;
 	int maxDist;
 	int movemask;
 	int resmask;
+	//Wyrmgus start
+	int z;
+	//Wyrmgus end
 	Vec2i *resPos;
 };
 
@@ -135,12 +142,15 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 {
 	//Wyrmgus start
 //	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
-	if (!Map.Field(pos)->playerInfo.IsTeamExplored(player)) {
+	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 	//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
-	if (Map.Field(pos)->CheckMask(resmask)) {
+	//Wyrmgus start
+//	if (Map.Field(pos)->CheckMask(resmask)) {
+	if (Map.Field(pos, z)->CheckMask(resmask)) {
+	//Wyrmgus end
 		if (resPos) {
 			*resPos = pos;
 		}
@@ -190,7 +200,10 @@ bool FindTerrainType(int movemask, int resmask, int range,
 
 	terrainTraversal.PushPos(startPos);
 
-	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resmask, terrainPos);
+	//Wyrmgus start
+//	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resmask, terrainPos);
+	TerrainFinder terrainFinder(player, range, movemask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit), resmask, terrainPos, z);
+	//Wyrmgus end
 
 	return terrainTraversal.Run(terrainFinder);
 }
@@ -208,7 +221,10 @@ class BestDepotFinder
 			// Unit in range?
 
 			if (NEARLOCATION) {
-				int d = dest->MapDistanceTo(u_near.loc);
+				//Wyrmgus start
+//				int d = dest->MapDistanceTo(u_near.loc);
+				int d = dest->MapDistanceTo(u_near.loc, u_near.layer);
+				//Wyrmgus end
 
 				//
 				// Take this depot?
@@ -262,11 +278,17 @@ public:
 		u_near.worker = &w;
 	}
 
-	BestDepotFinder(const Vec2i &pos, int res, int ran) :
+	//Wyrmgus start
+//	BestDepotFinder(const Vec2i &pos, int res, int ran) :
+	BestDepotFinder(const Vec2i &pos, int res, int ran, int z) :
+	//Wyrmgus end
 		resource(res), range(ran),
 		best_dist(INT_MAX), best_depot(0)
 	{
 		u_near.loc = pos;
+		//Wyrmgus start
+		u_near.layer = z;
+		//Wyrmgus end
 	}
 
 	template <typename ITERATOR>
@@ -287,6 +309,9 @@ private:
 	struct {
 		const CUnit *worker;
 		Vec2i loc;
+		//Wyrmgus start
+		int layer;
+		//Wyrmgus end
 	} u_near;
 	const int resource;
 	const int range;
@@ -295,9 +320,15 @@ public:
 	CUnit *best_depot;
 };
 
-CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
+//Wyrmgus start
+//CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
+CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource, int z)
+//Wyrmgus end
 {
-	BestDepotFinder<true> finder(pos, resource, range);
+	//Wyrmgus start
+//	BestDepotFinder<true> finder(pos, resource, range);
+	BestDepotFinder<true> finder(pos, resource, range, z);
+	//Wyrmgus end
 	std::vector<CUnit *> table;
 	for (std::vector<CUnit *>::iterator it = p.UnitBegin(); it != p.UnitEnd(); ++it) {
 		table.push_back(*it);
@@ -489,7 +520,10 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 						//Wyrmgus end
 {
 	if (!deposit) { // Find the nearest depot
-		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource);
+		//Wyrmgus start
+//		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource);
+		deposit = FindDepositNearLoc(*unit.Player, startUnit.tilePos, range, resource, z);
+		//Wyrmgus end
 	}
 
 	TerrainTraversal terrainTraversal;

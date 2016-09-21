@@ -69,7 +69,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int Spell_AreaAdjustVital::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	const Vec2i range(this->Range, this->Range);
 	const Vec2i typeSize(caster.Type->TileWidth, caster.Type->TileHeight);
@@ -83,7 +86,10 @@
 	for (size_t j = 0; j != units.size(); ++j) {
 		target = units[j];
 		// if (!PassCondition(caster, spell, target, goalPos) {
-		if (!CanCastSpell(caster, spell, target, goalPos)) {
+		//Wyrmgus start
+//		if (!CanCastSpell(caster, spell, target, goalPos)) {
+		if (!CanCastSpell(caster, spell, target, goalPos, z)) {
+		//Wyrmgus end
 			continue;
 		}
 		if (hp < 0) {

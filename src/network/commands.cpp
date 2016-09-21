@@ -400,11 +400,17 @@ void SendCommandDismiss(CUnit &unit)
 ** @param pos      map tile position where to harvest.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
+//Wyrmgus start
+//void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("resource-loc", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandResourceLoc(unit, pos, flush);
+		//Wyrmgus start
+//		CommandResourceLoc(unit, pos, flush);
+		CommandResourceLoc(unit, pos, flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandResourceLoc, unit, pos.x, pos.y, NoUnitP, 0, flush);
 	}
@@ -585,11 +591,17 @@ void SendCommandCancelResearch(CUnit &unit)
 ** @param spellid   Spell type id.
 ** @param flush     Flag flush all pending commands.
 */
-void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush)
+//Wyrmgus start
+//void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush)
+void SendCommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, int spellid, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("spell-cast", &unit, flush, pos.x, pos.y, dest, NULL, spellid);
-		CommandSpellCast(unit, pos, dest, *SpellTypeTable[spellid], flush);
+		//Wyrmgus start
+//		CommandSpellCast(unit, pos, dest, *SpellTypeTable[spellid], flush);
+		CommandSpellCast(unit, pos, dest, *SpellTypeTable[spellid], flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandSpellCast + spellid,
 						   unit, pos.x, pos.y, dest, NULL, flush);

@@ -94,7 +94,10 @@ public:
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Summon::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_Summon::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos)
+/* virtual */ int Spell_Summon::Cast(CUnit &caster, const SpellType &spell, CUnit *target, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	Vec2i pos = goalPos;
 	bool cansummon;
@@ -111,6 +114,9 @@ public:
 
 		if (unit != NULL) { //  Found a corpse. eliminate it and proceed to summoning.
 			pos = unit->tilePos;
+			//Wyrmgus start
+			z = unit->MapLayer;
+			//Wyrmgus end
 			unit->Remove(NULL);
 			unit->Release();
 			cansummon = true;
@@ -133,7 +139,7 @@ public:
 		if (target != NULL) {
 			target->tilePos = pos;
 			//Wyrmgus start
-			target->MapLayer = caster.MapLayer;
+			target->MapLayer = z;
 			//Wyrmgus end
 			DropOutOnSide(*target, LookingW, NULL);
 			// To avoid defending summoned unit for AI

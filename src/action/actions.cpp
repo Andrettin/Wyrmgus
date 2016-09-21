@@ -166,7 +166,10 @@ void COrder::UpdatePathFinderData_NotCalled(PathFinderInput &input)
 	if (goal != NULL) {
 		const Vec2i invalidPos(-1, -1);
 
-		FireMissile(unit, goal, invalidPos);
+		//Wyrmgus start
+//		FireMissile(unit, goal, invalidPos);
+		FireMissile(unit, goal, invalidPos, goal->MapLayer);
+		//Wyrmgus end
 		UnHideUnit(unit); // unit is invisible until attacks
 	}
 	// Fixme : Auto select position to attack ?

@@ -95,7 +95,10 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos)
+/* virtual */ int Spell_Demolish::Cast(CUnit &caster, const SpellType &, CUnit *, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	// Allow error margins. (Lame, I know)
 	const Vec2i offset(this->Range + 2, this->Range + 2);
@@ -135,17 +138,20 @@
 		Vec2i ipos;
 		for (ipos.x = minpos.x; ipos.x <= maxpos.x; ++ipos.x) {
 			for (ipos.y = minpos.y; ipos.y <= maxpos.y; ++ipos.y) {
-				const CMapField &mf = *Map.Field(ipos);
+				//Wyrmgus start
+//				const CMapField &mf = *Map.Field(ipos);
+				const CMapField &mf = *Map.Field(ipos, z);
+				//Wyrmgus end
 				//Wyrmgus start
 //				if (SquareDistance(ipos, caster.tilePos) > square(this->Range)) {
-				if (caster.MapDistanceTo(ipos) > this->Range) {
+				if (caster.MapDistanceTo(ipos, z) > this->Range) {
 				//Wyrmgus end
 					// Not in circle range
 					continue;
 				} else if (mf.RockOnMap() || mf.ForestOnMap() || mf.isAWall()) {
 					//Wyrmgus start
 //					Map.ClearOverlayTile(ipos);
-					Map.ClearOverlayTile(ipos, caster.MapLayer);
+					Map.ClearOverlayTile(ipos, z);
 					//Wyrmgus end
 				}
 			}

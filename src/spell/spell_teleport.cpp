@@ -56,12 +56,21 @@
 **
 **  @return             =!0 if spell should be repeated, 0 if not
 */
-/* virtual */ int Spell_Teleport::Cast(CUnit &caster, const SpellType &spell, CUnit * /*target*/, const Vec2i &goalPos)
+//Wyrmgus start
+///* virtual */ int Spell_Teleport::Cast(CUnit &caster, const SpellType &spell, CUnit * /*target*/, const Vec2i &goalPos)
+/* virtual */ int Spell_Teleport::Cast(CUnit &caster, const SpellType &spell, CUnit * /*target*/, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
-	if (Map.Info.IsPointOnMap(goalPos)) {
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(goalPos)) {
+	if (Map.Info.IsPointOnMap(goalPos, z)) {
+	//Wyrmgus end
 		unsigned int selected = caster.Selected;
 		caster.Remove(NULL);
 		caster.tilePos = goalPos;
+		//Wyrmgus start
+		caster.MapLayer = z;
+		//Wyrmgus end
 		DropOutNearest(caster, goalPos, NULL);
 		if (selected) {
 			SelectUnit(caster);

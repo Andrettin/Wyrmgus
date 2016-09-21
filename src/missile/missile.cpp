@@ -188,7 +188,10 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-/* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
+//Wyrmgus start
+///* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
+/* static */ Missile *Missile::Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+//Wyrmgus end
 {
 	Missile *missile = NULL;
 
@@ -252,6 +255,9 @@ Missile::Missile() :
 	missile->position = startPos - halfSize;
 	missile->destination = destPos - halfSize;
 	missile->source = missile->position;
+	//Wyrmgus start
+	missile->MapLayer = z;
+	//Wyrmgus end
 	missile->Type = &mtype;
 	missile->Wait = mtype.Sleep;
 	missile->Delay = mtype.StartDelay;
@@ -275,9 +281,15 @@ Missile::Missile() :
 **
 **  @return       created missile.
 */
-Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
+//Wyrmgus start
+//Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
+Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+//Wyrmgus end
 {
-	Missile *missile = Missile::Init(mtype, startPos, destPos);
+	//Wyrmgus start
+//	Missile *missile = Missile::Init(mtype, startPos, destPos);
+	Missile *missile = Missile::Init(mtype, startPos, destPos, z);
+	//Wyrmgus end
 
 	GlobalMissiles.push_back(missile);
 	return missile;
@@ -292,9 +304,15 @@ Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const P
 **
 **  @return       created missile.
 */
-Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
+//Wyrmgus start
+//Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos)
+Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z)
+//Wyrmgus end
 {
-	Missile *missile = Missile::Init(mtype, startPos, destPos);
+	//Wyrmgus start
+//	Missile *missile = Missile::Init(mtype, startPos, destPos);
+	Missile *missile = Missile::Init(mtype, startPos, destPos, z);
+	//Wyrmgus end
 
 	missile->Local = 1;
 	LocalMissiles.push_back(missile);
@@ -645,9 +663,15 @@ static bool CalculateHit(const CUnit &attacker, const CUnitStats &goal_stats, co
 **
 **  @param unit  Unit that fires the missile.
 */
-void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
+//Wyrmgus start
+//void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
+void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
+//Wyrmgus end
 {
 	Vec2i newgoalPos = goalPos;
+	//Wyrmgus start
+	int new_z = z;
+	//Wyrmgus end
 	// Goal dead?
 	if (goal) {
 		//Wyrmgus start
@@ -667,6 +691,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			if (unit.GetMissile().Missile->AlwaysFire) {
 			//Wyrmgus end
 				newgoalPos = goal->tilePos;
+				//Wyrmgus start
+				new_z = goal->MapLayer;
+				//Wyrmgus end
 				goal = NULL;
 			} else {
 				return;
@@ -680,7 +707,7 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 //		unit.Type->Missile.Missile->Class == MissileClassNone
 		unit.GetMissile().Missile->Class == MissileClassNone
 //		|| (unit.Type->Animations && unit.Type->Animations->Attack && unit.Type->Animations->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
-		|| (unit.GetAnimations() && unit.GetAnimations()->Attack && unit.GetAnimations()->RangedAttack && !unit.IsAttackRanged(goal, goalPos)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
+		|| (unit.GetAnimations() && unit.GetAnimations()->Attack && unit.GetAnimations()->RangedAttack && !unit.IsAttackRanged(goal, goalPos, z)) // treat melee attacks from units that have both attack and ranged attack animations as having missile class none
 		//Wyrmgus end
 	) {
 		//Wyrmgus start
@@ -691,11 +718,11 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			if (Map.WallOnMap(goalPos)) {
 				//Wyrmgus start
 //				if (Map.HumanWallOnMap(goalPos)) {
-				if (Map.Field(goalPos)->OverlayTerrain->UnitType && CalculateHit(unit, *Map.Field(goalPos)->OverlayTerrain->UnitType->Stats, NULL) == true) {
+				if (Map.Field(goalPos, z)->OverlayTerrain->UnitType && CalculateHit(unit, *Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, NULL) == true) {
 				//Wyrmgus end
 					//Wyrmgus start
 					PlayUnitSound(unit, VoiceHit);
-					damage = CalculateDamageStats(unit, *Map.Field(goalPos)->OverlayTerrain->UnitType->Stats, NULL);
+					damage = CalculateDamageStats(unit, *Map.Field(goalPos, z)->OverlayTerrain->UnitType->Stats, NULL);
 					//Wyrmgus end
 					Map.HitWall(goalPos,
 								//Wyrmgus start
@@ -767,16 +794,22 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos)
 			NearestOfUnit(*goal, GetFirstContainer(unit)->tilePos, &dpos);
 		} else {
 			dpos = goal->tilePos + goal->Type->GetHalfTileSize();
+			//Wyrmgus start
+			z = goal->MapLayer;
+			//Wyrmgus end
 		}
 	} else {
 		dpos = newgoalPos;
 		// FIXME: Can this be too near??
+		//Wyrmgus start
+		z = new_z;
+		//Wyrmgus end
 	}
 
 	PixelPos destPixelPos = Map.TilePosToMapPixelPos_Center(dpos);
 	//Wyrmgus start
 //	Missile *missile = MakeMissile(*unit.Type->Missile.Missile, startPixelPos, destPixelPos);
-	Missile *missile = MakeMissile(*unit.GetMissile().Missile, startPixelPos, destPixelPos);
+	Missile *missile = MakeMissile(*unit.GetMissile().Missile, startPixelPos, destPixelPos, z);
 	//Wyrmgus end
 	//
 	// Damage of missile
@@ -1139,7 +1172,10 @@ bool PointToPointMissile(Missile &missile)
 								(int)pos.y + missile.Type->size.y / 2);
 
 		if (missile.Type->Smoke.Missile && (missile.CurrentStep || missile.State > 1)) {
-			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			//Wyrmgus start
+//			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position);
+			Missile *smoke = MakeMissile(*missile.Type->Smoke.Missile, position, position, missile.MapLayer);
+			//Wyrmgus end
 			if (smoke && smoke->Type->NumDirections > 1) {
 				smoke->MissileNewHeadingFromXY(diff);
 			}
@@ -1355,7 +1391,10 @@ void Missile::MissileHit(CUnit *unit)
 	if (mtype.Impact.empty() == false) {
 		for (std::vector<MissileConfig *>::const_iterator it = mtype.Impact.begin(); it != mtype.Impact.end(); ++it) {
 			const MissileConfig &mc = **it;
-			Missile *impact = MakeMissile(*mc.Missile, pixelPos, pixelPos);
+			//Wyrmgus start
+//			Missile *impact = MakeMissile(*mc.Missile, pixelPos, pixelPos);
+			Missile *impact = MakeMissile(*mc.Missile, pixelPos, pixelPos, this->MapLayer);
+			//Wyrmgus end
 			if (impact && impact->Type->Damage) {
 				impact->SourceUnit = this->SourceUnit;
 			}
@@ -1481,7 +1520,10 @@ void Missile::MissileHit(CUnit *unit)
 					}
 				}
 				if (shouldHit) {
-					int splash = goal.MapDistanceTo(pos);
+					//Wyrmgus start
+//					int splash = goal.MapDistanceTo(pos);
+					int splash = goal.MapDistanceTo(pos, this->MapLayer);
+					//Wyrmgus end
 
 					if (splash) {
 						splash *= mtype.SplashFactor;

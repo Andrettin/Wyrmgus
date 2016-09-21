@@ -424,7 +424,10 @@ protected:
 public:
 	virtual ~Missile();
 
-	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
+	//Wyrmgus start
+//	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
+	static Missile *Init(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+	//Wyrmgus end
 
 	virtual void Action() = 0;
 
@@ -446,6 +449,9 @@ public:
 	int AnimWait;     /// Animation wait.
 	int Wait;         /// delay between frames
 	int Delay;        /// delay to show up
+	//Wyrmgus start
+	int MapLayer;	  /// map layer the missile is in
+	//Wyrmgus end
 
 	CUnitPtr SourceUnit;  /// unit that fires (could be killed)
 	CUnitPtr TargetUnit;  /// target unit, used for spells
@@ -609,9 +615,15 @@ extern MissileType *NewMissileTypeSlot(const std::string &ident);
 /// Get missile-type by ident
 extern MissileType *MissileTypeByIdent(const std::string &ident);
 /// create a missile
-extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
+//Wyrmgus start
+//extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
+extern Missile *MakeMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+//Wyrmgus end
 /// create a local missile
-extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
+//Wyrmgus start
+//extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos);
+extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &startPos, const PixelPos &destPos, int z);
+//Wyrmgus end
 
 /// Calculates damage done to goal by attacker using formula
 //Wyrmgus start
@@ -619,7 +631,10 @@ extern Missile *MakeLocalMissile(const MissileType &mtype, const PixelPos &start
 extern int CalculateDamage(const CUnit &attacker, const CUnit &goal, const NumberDesc *formula, const Missile *missile = NULL);
 //Wyrmgus end
 /// fire a missile
-extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
+//Wyrmgus start
+//extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos);
+extern void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z);
+//Wyrmgus end
 
 extern void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table);
 

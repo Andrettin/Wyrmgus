@@ -36,7 +36,10 @@
 
 class COrder_SpellCast : public COrder
 {
-	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, bool isAutocast);
+	friend COrder *COrder::NewActionSpellCast(const SpellType &spell, const Vec2i &pos, CUnit *target, int z, bool isAutocast);
+	//Wyrmgus end
 public:
 	//Wyrmgus start
 //	COrder_SpellCast(bool autocast = false) : COrder(UnitActionSpellCast), Spell(NULL), State(0), Range(0), isAutocast(autocast)

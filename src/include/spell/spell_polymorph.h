@@ -46,7 +46,10 @@ public:
 	Spell_Polymorph() : SpellActionType(1), NewForm(NULL), PlayerNeutral(0), Civilization(-1), Faction(-1), Detachment(false) {};
 	//Wyrmgus end
 	virtual int Cast(CUnit &caster, const SpellType &spell,
-					 CUnit *target, const Vec2i &goalPos);
+					 //Wyrmgus start
+//					 CUnit *target, const Vec2i &goalPos);
+					 CUnit *target, const Vec2i &goalPos, int z);
+					 //Wyrmgus end
 	virtual void Parse(lua_State *l, int startIndex, int endIndex);
 
 private:

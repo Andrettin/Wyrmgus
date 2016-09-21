@@ -786,7 +786,10 @@ void CommandBuildBuilding(CUnit &unit, const Vec2i &pos, CUnitType &what, int fl
 	//Wyrmgus end
 	COrderPtr *order;
 
-	if (unit.Type->Building && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
+	//Wyrmgus start
+//	if (unit.Type->Building && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos) > unit.Type->RepairRange) {
+	if (unit.Type->Building && !what.BoolFlag[BUILDEROUTSIDE_INDEX].value && unit.MapDistanceTo(pos, z) > unit.Type->RepairRange) {
+	//Wyrmgus end
 		ClearNewAction(unit);
 		order = &unit.NewOrder;
 	} else {
@@ -826,7 +829,10 @@ void CommandDismiss(CUnit &unit)
 **  @param pos    map position for harvest.
 **  @param flush  if true, flush command queue.
 */
-void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
+//Wyrmgus start
+//void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
+void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush, int z)
+//Wyrmgus end
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
@@ -836,7 +842,7 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
@@ -858,7 +864,10 @@ void CommandResourceLoc(CUnit &unit, const Vec2i &pos, int flush)
 			return;
 		}
 	}
-	*order = COrder::NewActionResource(unit, pos);
+	//Wyrmgus start
+//	*order = COrder::NewActionResource(unit, pos);
+	*order = COrder::NewActionResource(unit, pos, z);
+	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 
@@ -1170,18 +1179,24 @@ void CommandCancelResearch(CUnit &unit)
 **  @param spell  Spell type pointer.
 **  @param flush  If true, flush command queue.
 */
-void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast)
+//Wyrmgus start
+//void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, bool isAutocast)
+void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellType &spell, int flush, int z, bool isAutocast)
+//Wyrmgus end
 {
 	DebugPrint(": %d casts %s at %d %d on %d\n" _C_
 			   UnitNumber(unit) _C_ spell.Ident.c_str() _C_ pos.x _C_ pos.y _C_ dest ? UnitNumber(*dest) : 0);
 	Assert(unit.Type->CanCastSpell[spell.Slot]);
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
-	CMapField &mf = *Map.Field(unit.tilePos);
+	CMapField &mf = *Map.Field(unit.tilePos, unit.MapLayer);
 	if ((mf.Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) { 
 		std::vector<CUnit *> table;
 		Select(unit.tilePos, unit.tilePos, table);
@@ -1198,7 +1213,10 @@ void CommandSpellCast(CUnit &unit, const Vec2i &pos, CUnit *dest, const SpellTyp
 		return;
 	}
 
-	*order = COrder::NewActionSpellCast(spell, pos, dest, true);
+	//Wyrmgus start
+//	*order = COrder::NewActionSpellCast(spell, pos, dest, true);
+	*order = COrder::NewActionSpellCast(spell, pos, dest, z, true);
+	//Wyrmgus end
 	ClearSavedAction(unit);
 }
 

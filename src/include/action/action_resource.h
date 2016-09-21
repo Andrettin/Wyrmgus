@@ -36,7 +36,10 @@
 
 class COrder_Resource : public COrder
 {
-	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
+	//Wyrmgus start
+//	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos);
+	friend COrder *COrder::NewActionResource(CUnit &harvester, const Vec2i &pos, int z);
+	//Wyrmgus end
 	friend COrder *COrder::NewActionResource(CUnit &harvester, CUnit &mine);
 	friend COrder *COrder::NewActionReturnGoods(CUnit &harvester, CUnit *depot);
 
@@ -49,6 +52,9 @@ public:
 	{
 		Resource.Pos.x = Resource.Pos.y = -1;
 		goalPos.x = goalPos.y = -1;
+		//Wyrmgus start
+		Resource.MapLayer = -1;
+		//Wyrmgus end
 	}
 
 	~COrder_Resource();
@@ -68,6 +74,9 @@ public:
 
 	int GetCurrentResource() const { return CurrentResource; }
 	Vec2i GetHarvestLocation() const;
+	//Wyrmgus start
+	int GetHarvestMapLayer() const;
+	//Wyrmgus end
 	bool IsGatheringStarted() const;
 	bool IsGatheringFinished() const;
 	bool IsGatheringWaiting() const;
@@ -91,6 +100,9 @@ private:
 	unsigned char CurrentResource;
 	struct {
 		Vec2i Pos; /// position for terrain resource.
+		//Wyrmgus start
+		int MapLayer;
+		//Wyrmgus end
 		CUnitPtr Mine;
 	} Resource;
 	CUnitPtr Depot;
