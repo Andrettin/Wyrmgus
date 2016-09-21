@@ -1741,7 +1741,7 @@ void CPlayer::UpdateLevelUpUnits()
 
 void CPlayer::UpdateHeroPool()
 {
-	if (CurrentQuest != NULL || GrandStrategy) { // no hero recruitment while playing scenarios or a grand strategy game
+	if (CurrentQuest != NULL || GrandStrategy || IsNetworkGame()) { // no hero recruitment while playing scenarios or a grand strategy game
 		return;
 	}
 	
@@ -1766,7 +1766,7 @@ void CPlayer::UpdateHeroPool()
 
 void CPlayer::UpdateQuestPool()
 {
-	if (CurrentQuest != NULL || GrandStrategy) { // no in-game quests while playing scenarios or a grand strategy game
+	if (CurrentQuest != NULL || GrandStrategy || IsNetworkGame()) { // no in-game quests while playing scenarios or a grand strategy game
 		return;
 	}
 	
@@ -2427,7 +2427,7 @@ void PlayersEachMinute(int playerIdx)
 	player.UpdateQuestPool(); // every minute, update the quest pool
 	
 	// split off factions
-	if (GameCycle >= CYCLES_PER_MINUTE && player.Faction != -1 && CurrentQuest == NULL && !GrandStrategy) { // only do this after the first minute has passed
+	if (GameCycle >= CYCLES_PER_MINUTE && player.Faction != -1 && CurrentQuest == NULL && !GrandStrategy && !IsNetworkGame()) { // only do this after the first minute has passed
 		CFaction *faction = PlayerRaces.Factions[player.Race][player.Faction];
 		for (size_t i = 0; i < faction->SplitsTo.size(); ++i) {
 			int splitter_faction_id = PlayerRaces.GetFactionIndexByName(player.Race, faction->SplitsTo[i]);

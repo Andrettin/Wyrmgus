@@ -145,6 +145,7 @@ public:
 
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
 	void ParseTerrainFile(bool overlay = false);
+	bool IsSubtemplateArea();
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false);
 	
 	std::string Name;
@@ -376,7 +377,7 @@ public:
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrain, int z);
 	bool TileBordersBuilding(const Vec2i &pos);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain);
-	bool IsPointInASubtemplateArea(const Vec2i &pos) const;
+	bool IsPointInASubtemplateArea(const Vec2i &pos, int z) const;
 	//Wyrmgus end
 
 	//UnitCache
@@ -441,7 +442,7 @@ public:
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 	//Wyrmgus start
 	CGraphic *SolidTileGraphics[16];   /// separate graphics for solid tiles
-	std::vector<std::pair<Vec2i, Vec2i>> SubtemplateAreas;
+	std::map<int, std::vector<std::pair<Vec2i, Vec2i>>> SubtemplateAreas;
 	//Wyrmgus end
 
 	CMapInfo Info;             /// descriptive information
@@ -617,6 +618,10 @@ extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z = 0);
 
 /// Preprocess map, for internal use.
 extern void PreprocessMap();
+
+//Wyrmgus start
+extern void ChangeCurrentMapLayer(int z);
+//Wyrmgus end
 
 // in unit.c
 

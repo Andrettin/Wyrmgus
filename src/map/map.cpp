@@ -193,6 +193,11 @@ void CMapTemplate::ParseTerrainFile(bool overlay)
 	}  
 }
 
+bool CMapTemplate::IsSubtemplateArea()
+{
+	return this->MainTemplate != NULL;
+}
+
 CTerrainType *CMapTemplate::GetTileTerrain(const Vec2i &pos, bool overlay)
 {
 	int index = pos.x + pos.y * this->Width;
@@ -434,7 +439,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 		random_pos.x = SyncRand(max_pos.x - (unit_type->TileWidth - 1) - min_pos.x + 1) + min_pos.x;
 		random_pos.y = SyncRand(max_pos.y - (unit_type->TileHeight - 1) - min_pos.y + 1) + min_pos.y;
 		
-		if (!this->Info.IsPointOnMap(random_pos, z) || this->IsPointInASubtemplateArea(random_pos)) {
+		if (!this->Info.IsPointOnMap(random_pos, z) || this->IsPointInASubtemplateArea(random_pos, z)) {
 			continue;
 		}
 		
@@ -561,7 +566,7 @@ bool CMap::TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrai
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
 			}
-			if (this->IsPointInASubtemplateArea(pos) && !this->IsPointInASubtemplateArea(adjacent_pos)) {
+			if (this->IsPointInASubtemplateArea(pos, z) && !this->IsPointInASubtemplateArea(adjacent_pos, z)) {
 				continue;
 			}
 			CTerrainType *top_terrain = GetTileTopTerrain(pos, false, z);
@@ -631,11 +636,15 @@ bool CMap::TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *t
 	return false;
 }
 
-bool CMap::IsPointInASubtemplateArea(const Vec2i &pos) const
+bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, int z) const
 {
-	for (size_t i = 0; i < this->SubtemplateAreas.size(); ++i) {
-		Vec2i min_pos = this->SubtemplateAreas[i].first;
-		Vec2i max_pos = this->SubtemplateAreas[i].second;
+	if (this->SubtemplateAreas.find(z) == this->SubtemplateAreas.end()) {
+		return false;
+	}
+	
+	for (size_t i = 0; i < this->SubtemplateAreas.find(z)->second.size(); ++i) {
+		Vec2i min_pos = this->SubtemplateAreas.find(z)->second[i].first;
+		Vec2i max_pos = this->SubtemplateAreas.find(z)->second[i].second;
 		if (pos.x >= min_pos.x && pos.y >= min_pos.y && pos.x <= max_pos.x && pos.y <= max_pos.y) {
 			return true;
 		}
@@ -774,6 +783,21 @@ void PreprocessMap()
 	*/
 	//Wyrmgus end
 }
+
+//Wyrmgus start
+void ChangeCurrentMapLayer(int z)
+{
+	if (z < 0 || z >= (int) Map.Fields.size()) {
+		return;
+	}
+	
+	Vec2i new_viewport_map_pos(UI.SelectedViewport->MapPos.x * Map.Info.MapWidths[CurrentMapLayer] / Map.Info.MapWidths[z], UI.SelectedViewport->MapPos.y * Map.Info.MapHeights[CurrentMapLayer] / Map.Info.MapHeights[z]);
+	
+	CurrentMapLayer = z;
+	UI.Minimap.UpdateCache = true;
+	UI.SelectedViewport->Set(new_viewport_map_pos, PixelTileSize / 2);
+}
+//Wyrmgus end
 
 /**
 **  Clear CMapInfo.
@@ -1598,7 +1622,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 		random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
 		random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 		
-		if (!this->Info.IsPointOnMap(random_pos, z) || this->IsPointInASubtemplateArea(random_pos)) {
+		if (!this->Info.IsPointOnMap(random_pos, z) || this->IsPointInASubtemplateArea(random_pos, z)) {
 			continue;
 		}
 		
@@ -1650,7 +1674,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						&& (!preserve_coastline || ((terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
 						&& (!(terrain->Flags & MapFieldUnpassable) || (!this->TileBordersBuilding(diagonal_pos) && !this->TileBordersBuilding(vertical_pos) && !this->TileBordersBuilding(horizontal_pos))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
-						&& !this->IsPointInASubtemplateArea(diagonal_pos) && !this->IsPointInASubtemplateArea(vertical_pos) && !this->IsPointInASubtemplateArea(horizontal_pos)
+						&& !this->IsPointInASubtemplateArea(diagonal_pos, z) && !this->IsPointInASubtemplateArea(vertical_pos, z) && !this->IsPointInASubtemplateArea(horizontal_pos, z)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
 					}
@@ -1718,7 +1742,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 						&& (!preserve_coastline || ((terrain->Flags & MapFieldWaterAllowed) == (diagonal_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (vertical_tile_terrain->Flags & MapFieldWaterAllowed) && (terrain->Flags & MapFieldWaterAllowed) == (horizontal_tile_terrain->Flags & MapFieldWaterAllowed)))
 						&& !this->TileHasUnitsIncompatibleWithTerrain(diagonal_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(vertical_pos, terrain) && !this->TileHasUnitsIncompatibleWithTerrain(horizontal_pos, terrain)
 						&& (!(terrain->Flags & MapFieldUnpassable) || (!this->TileBordersBuilding(diagonal_pos) && !this->TileBordersBuilding(vertical_pos) && !this->TileBordersBuilding(horizontal_pos))) // if the terrain is unpassable, don't expand to spots adjacent to buildings
-						&& (!this->IsPointInASubtemplateArea(diagonal_pos) || GetTileTerrain(diagonal_pos, terrain->Overlay, z) == terrain) && (!this->IsPointInASubtemplateArea(vertical_pos) || GetTileTerrain(vertical_pos, terrain->Overlay, z) == terrain) && (!this->IsPointInASubtemplateArea(horizontal_pos) || GetTileTerrain(horizontal_pos, terrain->Overlay, z) == terrain)
+						&& (!this->IsPointInASubtemplateArea(diagonal_pos, z) || GetTileTerrain(diagonal_pos, terrain->Overlay, z) == terrain) && (!this->IsPointInASubtemplateArea(vertical_pos, z) || GetTileTerrain(vertical_pos, terrain->Overlay, z) == terrain) && (!this->IsPointInASubtemplateArea(horizontal_pos, z) || GetTileTerrain(horizontal_pos, terrain->Overlay, z) == terrain)
 					) {
 						adjacent_positions.push_back(diagonal_pos);
 					}

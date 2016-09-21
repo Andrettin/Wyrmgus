@@ -683,7 +683,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 
 	Vec2i map_start_pos(map_start_x, map_start_y);
 	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_x + map_template->Width), std::min(Map.Info.MapHeights[z], map_start_y + map_template->Height));
-	if (!Map.Info.IsPointOnMap(map_start_pos)) {
+	if (!Map.Info.IsPointOnMap(map_start_pos, z)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", map_start_pos.x, map_start_pos.y);
 		return;
 	}
@@ -707,13 +707,13 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 	
-	if (map_template->MainTemplate && map_template->SurroundingTerrain) {
+	if (map_template->IsSubtemplateArea() && map_template->SurroundingTerrain) {
 		Vec2i surrounding_start_pos(map_start_pos - Vec2i(1, 1));
 		Vec2i surrounding_end(map_end + Vec2i(1, 1));
 		for (int x = surrounding_start_pos.x; x < surrounding_end.x; ++x) {
 			for (int y = surrounding_start_pos.y; y < surrounding_end.y; y += (surrounding_end.y - surrounding_start_pos.y - 1)) {
 				Vec2i surrounding_pos(x, y);
-				if (!Map.Info.IsPointOnMap(surrounding_pos) || Map.IsPointInASubtemplateArea(surrounding_pos)) {
+				if (!Map.Info.IsPointOnMap(surrounding_pos, z) || Map.IsPointInASubtemplateArea(surrounding_pos, z)) {
 					continue;
 				}
 				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos, z);
@@ -722,7 +722,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		for (int x = surrounding_start_pos.x; x < surrounding_end.x; x += (surrounding_end.x - surrounding_start_pos.x - 1)) {
 			for (int y = surrounding_start_pos.y; y < surrounding_end.y; ++y) {
 				Vec2i surrounding_pos(x, y);
-				if (!Map.Info.IsPointOnMap(surrounding_pos) || Map.IsPointInASubtemplateArea(surrounding_pos)) {
+				if (!Map.Info.IsPointOnMap(surrounding_pos, z) || Map.IsPointInASubtemplateArea(surrounding_pos, z)) {
 					continue;
 				}
 				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos, z);
@@ -732,14 +732,14 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	
 	for (std::map<std::pair<int, int>, std::string>::iterator iterator = map_template->TileLabels.begin(); iterator != map_template->TileLabels.end(); ++iterator) {
 		Vec2i label_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
-		if (!Map.Info.IsPointOnMap(label_pos)) {
+		if (!Map.Info.IsPointOnMap(label_pos, z)) {
 			continue;
 		}
 		
-		Map.Field(label_pos)->Label = iterator->second;
+		Map.Field(label_pos, z)->Label = iterator->second;
 	}
 	
-	if (!PlayerFaction.empty() && !map_template->MainTemplate) {
+	if (!PlayerFaction.empty() && !map_template->IsSubtemplateArea()) {
 		CFaction *player_faction = PlayerRaces.GetFaction(-1, PlayerFaction);
 		
 		if (player_faction) {
@@ -757,12 +757,12 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
 			random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 			
-			bool on_map = Map.Info.IsPointOnMap(random_pos) && Map.Info.IsPointOnMap(Vec2i(random_pos.x + map_template->Subtemplates[i]->Width - 1, random_pos.y + map_template->Subtemplates[i]->Height - 1));
+			bool on_map = Map.Info.IsPointOnMap(random_pos, z) && Map.Info.IsPointOnMap(Vec2i(random_pos.x + map_template->Subtemplates[i]->Width - 1, random_pos.y + map_template->Subtemplates[i]->Height - 1), z);
 			
 			bool on_subtemplate_area = false;
 			for (int x = 0; x < map_template->Subtemplates[i]->Width; ++x) {
 				for (int y = 0; y < map_template->Subtemplates[i]->Height; ++y) {
-					if (Map.IsPointInASubtemplateArea(random_pos + Vec2i(x, y))) {
+					if (Map.IsPointInASubtemplateArea(random_pos + Vec2i(x, y), z)) {
 						on_subtemplate_area = true;
 						break;
 					}
@@ -775,7 +775,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			if (on_map && !on_subtemplate_area) {
 				ApplyMapTemplate(map_template->Subtemplates[i]->Ident, 0, 0, random_pos.x, random_pos.y);
 				
-				Map.SubtemplateAreas.push_back(std::pair<Vec2i, Vec2i>(random_pos, Vec2i(random_pos.x + map_template->Subtemplates[i]->Width - 1, random_pos.y + map_template->Subtemplates[i]->Height - 1)));
+				Map.SubtemplateAreas[z].push_back(std::pair<Vec2i, Vec2i>(random_pos, Vec2i(random_pos.x + map_template->Subtemplates[i]->Width - 1, random_pos.y + map_template->Subtemplates[i]->Height - 1)));
 				
 				for (size_t j = 0; j < map_template->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
 					Vec2i external_start_pos(random_pos.x - (map_template->Subtemplates[i]->Width / 2), random_pos.y - (map_template->Subtemplates[i]->Height / 2));
@@ -809,7 +809,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 	
-	if (!map_template->MainTemplate) {
+	if (!map_template->IsSubtemplateArea()) {
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
 		Map.AdjustTileMapTransitions(map_start_pos, map_end);
@@ -825,7 +825,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 	
 	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::iterator iterator = map_template->Resources.begin(); iterator != map_template->Resources.end(); ++iterator) {
 		Vec2i unit_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
-		if (!Map.Info.IsPointOnMap(unit_pos)) {
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
 			continue;
 		}
 		
@@ -850,7 +850,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) { // if the unit's coordinates were set to {-1, -1}, then randomly generate its location
 			unit_pos = Map.GenerateUnitLocation(std::get<1>(map_template->Units[i]), std::get<2>(map_template->Units[i]), map_start_pos, map_end - Vec2i(1, 1), z);
 		}
-		if (!Map.Info.IsPointOnMap(unit_pos)) {
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
 			continue;
 		}
 		
@@ -897,7 +897,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer && Players[i].Type != PlayerRescueActive) {
 			continue;
 		}
-		if (Map.IsPointInASubtemplateArea(Players[i].StartPos)) {
+		if (Map.IsPointInASubtemplateArea(Players[i].StartPos, z)) {
 			continue;
 		}
 		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y || Players[i].StartMapLayer != z) {
@@ -977,7 +977,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		Map.GenerateNeutralUnits(map_template->GeneratedNeutralUnits[i].first, map_template->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), false, z);
 	}
 	
-	if (!map_template->MainTemplate) {
+	if (!map_template->IsSubtemplateArea()) {
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end);
 		Map.AdjustTileMapTransitions(map_start_pos, map_end);
