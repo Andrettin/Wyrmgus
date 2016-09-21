@@ -519,7 +519,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			if (!table[i]->Removed && table[i]->Type->BoolFlag[BRIDGE_INDEX].value && table[i]->CanMove()) {
 				if (table[i]->CurrentAction() == UnitActionMove) {
 					if ((this->GetGoal() && unit.MapDistanceTo(*this->GetGoal()) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) || (!this->HasGoal() && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX))) {
-						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+						if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest, MapLayer))) {
 							CommandStopUnit(*table[i]);
 						}
 					}
@@ -544,7 +544,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		//Wyrmgus end
 			//Wyrmgus start
 //			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest, MapLayer))) {
 			//Wyrmgus end
 				err = PF_REACHED;
 			}
@@ -565,7 +565,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 		//Wyrmgus end
 			//Wyrmgus start
 //			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest, MapLayer))) {
 			//Wyrmgus end
 				// Reached another unit, now attacking it
 				unsigned char oldDir = unit.Direction;
@@ -600,7 +600,7 @@ void COrder_Attack::MoveToTarget(CUnit &unit)
 			//Wyrmgus end
 			//Wyrmgus start
 //			if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+			if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest, MapLayer))) {
 			//Wyrmgus end
 				// Reached wall or ground, now attacking it
 				unsigned char oldDir = unit.Direction;
@@ -750,8 +750,8 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 	//Wyrmgus end
 		//Wyrmgus start
 //		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
-		|| CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldAirUnpassable) == false
-		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest) == false)) {
+		|| CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldAirUnpassable, MapLayer) == false
+		|| (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, goal->tilePos, MapFieldRocks | MapFieldForest, MapLayer) == false)) {
 		//Wyrmgus end
 		// towers don't chase after goal
 		if (unit.CanMove()) {
@@ -856,7 +856,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 					//Wyrmgus end
 					//Wyrmgus start
 //					if (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest)) {
-					if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+					if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest, MapLayer))) {
 					//Wyrmgus end
 						//Wyrmgus start
 //						const Vec2i dir = goal.tilePos + goal.Type->GetHalfTileSize() - unit.tilePos;
@@ -885,7 +885,7 @@ void COrder_Attack::AttackTarget(CUnit &unit)
 //			} else if (this->Action == UnitActionAttackGround && unit.MapDistanceTo(this->goalPos) <= unit.Stats->Variables[ATTACKRANGE_INDEX].Max) {
 			} else if (this->Action == UnitActionAttackGround && unit.MapDistanceTo(this->goalPos, this->MapLayer) <= unit.GetModifiedVariable(ATTACKRANGE_INDEX)) {
 			//Wyrmgus end
-				if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest))) {
+				if (CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldAirUnpassable, MapLayer) && (!GameSettings.Inside || CheckObstaclesBetweenTiles(unit.tilePos, goalPos, MapFieldRocks | MapFieldForest, MapLayer))) {
 					// Reached wall or ground, now attacking it
 					unsigned char oldDir = unit.Direction;
 					UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);

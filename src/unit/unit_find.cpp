@@ -1230,7 +1230,7 @@ struct CompareUnitDistance {
 */
 //Wyrmgus start
 //bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance)
-bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int *distance)
+bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int *distance)
 //Wyrmgus end
 {
 	const Vec2i delta(abs(goalPos.x - unitPos.x), abs(goalPos.y - unitPos.y));
@@ -1250,11 +1250,14 @@ bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsi
 			pos.y += sign.y;
 		}
 
-		if (Map.Info.IsPointOnMap(pos) == false) {
+		//Wyrmgus start
+//		if (Map.Info.IsPointOnMap(pos) == false) {
+		if (Map.Info.IsPointOnMap(pos, z) == false) {
+		//Wyrmgus end
 			DebugPrint("outside of map\n");
 		//Wyrmgus start
 //		} else if (Map.Field(pos)->Flags & flags) {
-		} else if ((Map.Field(pos)->Flags & flags) && pos != goalPos) { // the goal's tile itself shouldn't be checked for an obstacle
+		} else if ((Map.Field(pos, z)->Flags & flags) && pos != goalPos) { // the goal's tile itself shouldn't be checked for an obstacle
 		//Wyrmgus end
 			if (distance) {
 				*distance = Distance(unitPos, pos);

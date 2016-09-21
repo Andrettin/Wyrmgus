@@ -205,7 +205,10 @@ static bool MoveRandomly(CUnit &unit)
 	pos.y += SyncRand(unit.Type->RandomMovementDistance * 2 + 1) - unit.Type->RandomMovementDistance;
 
 	// restrict to map
-	Map.Clamp(pos);
+	//Wyrmgus start
+//	Map.Clamp(pos);
+	Map.Clamp(pos, unit.MapLayer);
+	//Wyrmgus end
 
 	// move if possible
 	if (pos != unit.tilePos) {
@@ -359,7 +362,7 @@ static bool Excrete(CUnit &unit)
 	*/
 
 	// restrict to map
-	Map.Clamp(pos);
+	Map.Clamp(pos, unit.MapLayer);
 	
 	CUnit *newUnit = MakeUnitAndPlace(pos, *UnitTypeByIdent(unit.Type->Excrement), &Players[PlayerNumNeutral], unit.MapLayer);
 	newUnit->Direction = unit.Direction;
@@ -616,7 +619,7 @@ bool COrder_Still::AutoAttackStand(CUnit &unit)
 	}
 	//Wyrmgus start
 //	if (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false) {
-	if (CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable) == false || (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest) == false)) {
+	if (CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldAirUnpassable, autoAttackUnit->MapLayer) == false || (GameSettings.Inside && CheckObstaclesBetweenTiles(unit.tilePos, autoAttackUnit->tilePos, MapFieldRocks | MapFieldForest, autoAttackUnit->MapLayer) == false)) {
 	//Wyrmgus end
 		return false;
 	}

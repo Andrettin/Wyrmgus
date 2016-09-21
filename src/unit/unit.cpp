@@ -5483,7 +5483,10 @@ void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 	}
 	pos.x = target.tilePos.x + (pos.x * 5) / d + (SyncRand() & 3);
 	pos.y = target.tilePos.y + (pos.y * 5) / d + (SyncRand() & 3);
-	Map.Clamp(pos);
+	//Wyrmgus start
+//	Map.Clamp(pos);
+	Map.Clamp(pos, target.MapLayer);
+	//Wyrmgus end
 	CommandStopUnit(target);
 	//Wyrmgus start
 //	CommandMove(target, pos, 0);

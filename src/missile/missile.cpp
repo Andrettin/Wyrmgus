@@ -835,8 +835,12 @@ static void GetMissileMapArea(const Missile &missile, Vec2i &boxMin, Vec2i &boxM
 	PixelDiff margin(PixelTileSize.x - 1, PixelTileSize.y - 1);
 	boxMin = Map.MapPixelPosToTilePos(missile.position);
 	boxMax = Map.MapPixelPosToTilePos(missile.position + missileSize + margin);
-	Map.Clamp(boxMin);
-	Map.Clamp(boxMax);
+	//Wyrmgus start
+//	Map.Clamp(boxMin);
+//	Map.Clamp(boxMax);
+	Map.Clamp(boxMin, missile.MapLayer);
+	Map.Clamp(boxMax, missile.MapLayer);
+	//Wyrmgus end
 }
 
 /**

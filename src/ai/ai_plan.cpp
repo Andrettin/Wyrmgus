@@ -723,7 +723,7 @@ void AiSendExplorers()
 			target_pos.y += SyncRand(scout_range * 2 + 1) - scout_range;
 
 			// restrict to map
-			Map.Clamp(target_pos);
+			Map.Clamp(target_pos, AiPlayer->Scouts[i]->MapLayer);
 
 			// move if possible
 			if (target_pos != AiPlayer->Scouts[i]->tilePos) {

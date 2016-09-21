@@ -428,7 +428,7 @@ extern CUnit *ResourceDepositOnMap(const Vec2i &pos, int resource);
 /// Check map for obstacles in a line between 2 tiles
 //Wyrmgus start
 //extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned short flags, int *distance = NULL);
-extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int *distance = NULL);
+extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPos, unsigned long flags, int z, int *distance = NULL);
 //Wyrmgus end
 /// Find best enemy in numeric range to attack
 //Wyrmgus start
