@@ -481,7 +481,7 @@ void SetTile(unsigned int tileIndex, const Vec2i &pos, int value, int z)
 */
 void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value, int z)
 {
-	if (!Map.Info.IsPointOnMap(pos)) {
+	if (!Map.Info.IsPointOnMap(pos, z)) {
 		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
 		return;
 	}

@@ -364,8 +364,12 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 			//Wyrmgus end
 				for (int j = -rectSize / 2; j <= rectSize / 2; ++j) {
 					for (int k = -rectSize / 2; k <= rectSize / 2; ++k) {
-						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth;
-						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight;
+						//Wyrmgus start
+//						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth;
+//						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight;
+						const int miniMapX = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[CurrentMapLayer];
+						const int miniMapY = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[CurrentMapLayer];
+						//Wyrmgus end
 						if (miniMapX + j < 0 || miniMapX + j >= UI.Minimap.W) {
 							continue;
 						}
@@ -411,8 +415,12 @@ static void WriteMapPreview(const char *mapname, CMap &map)
 //			if (Players[i].Type != PlayerNobody) {
 			if (Players[i].Type != PlayerNobody && Players[i].StartMapLayer == CurrentMapLayer) {
 			//Wyrmgus end
-				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
-				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight - rectSize / 2;
+				//Wyrmgus start
+//				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidth - rectSize / 2;
+//				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeight - rectSize / 2;
+				rect.x = Players[i].StartPos.x * UI.Minimap.W / map.Info.MapWidths[CurrentMapLayer] - rectSize / 2;
+				rect.y = Players[i].StartPos.y * UI.Minimap.H / map.Info.MapHeights[CurrentMapLayer] - rectSize / 2;
+				//Wyrmgus end
 				rect.w = rect.h = rectSize;
 				SDL_FillRect(preview, &rect, Players[i].Color);
 			}
@@ -942,10 +950,17 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			}
 			*/
 			for (size_t z = 0; z < map.Fields.size(); ++z) {
-				for (int i = 0; i < map.Info.MapHeight; ++i) {
-					for (int j = 0; j < map.Info.MapWidth; ++j) {
-						const CMapField &mf = map.Fields[z][j + i * map.Info.MapWidth];
+				//Wyrmgus start
+//				for (int i = 0; i < map.Info.MapHeight; ++i) {
+				for (int i = 0; i < map.Info.MapHeights[z]; ++i) {
+				//Wyrmgus end
+					//Wyrmgus start
+//					for (int j = 0; j < map.Info.MapWidth; ++j) {
+					for (int j = 0; j < map.Info.MapWidths[z]; ++j) {
+					//Wyrmgus end
 						//Wyrmgus start
+//						const CMapField &mf = map.Fields[z][j + i * map.Info.MapWidth];
+						const CMapField &mf = map.Fields[z][j + i * map.Info.MapWidths[z]];
 	//					const int tile = mf.getGraphicTile();
 	//					const int n = map.Tileset->findTileIndexByTile(tile);
 						//Wyrmgus end
