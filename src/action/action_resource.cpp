@@ -1376,7 +1376,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	//Wyrmgus end
 		Vec2i pos = this->Resource.Pos;
 		//Wyrmgus start
-		int z = this->Resource.MapLayer;
+		int z = this->Resource.MapLayer = unit.MapLayer;
 		//Wyrmgus end
 
 		//Wyrmgus start
