@@ -3601,6 +3601,12 @@ bool CUnit::IsVisible(const CPlayer &player) const
 */
 bool CUnit::IsVisibleOnMinimap() const
 {
+	//Wyrmgus start
+	if (this->MapLayer != CurrentMapLayer) {
+		return false;
+	}
+	//Wyrmgus end
+
 	// Invisible units.
 	if (IsInvisibile(*ThisPlayer)) {
 		return false;

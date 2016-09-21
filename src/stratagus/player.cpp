@@ -1760,7 +1760,8 @@ void CPlayer::UpdateHeroPool()
 			break;
 		}
 		this->AvailableHeroes.push_back(potential_heroes[SyncRand(potential_heroes.size())]);
-		potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), this->AvailableHeroes[this->AvailableHeroes.size() - 1]), potential_heroes.end());
+		int available_hero_quantity = this->AvailableHeroes.size();
+		potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), this->AvailableHeroes[available_hero_quantity - 1]), potential_heroes.end());
 	}
 }
 
@@ -1785,10 +1786,20 @@ void CPlayer::UpdateQuestPool()
 			break;
 		}
 		this->AvailableQuests.push_back(potential_quests[SyncRand(potential_quests.size())]);
-		potential_quests.erase(std::remove(potential_quests.begin(), potential_quests.end(), this->AvailableQuests[this->AvailableQuests.size() - 1]), potential_quests.end());
+		int available_quest_quantity = this->AvailableQuests.size();
+		potential_quests.erase(std::remove(potential_quests.begin(), potential_quests.end(), this->AvailableQuests[available_quest_quantity - 1]), potential_quests.end());
 	}
 	
 	this->AvailableQuestsChanged();
+	
+	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
+		int available_quest_quantity = this->AvailableQuests.size();
+		for (int i = (available_quest_quantity  - 1); i >= 0; --i) {
+			if (this->CanAcceptQuest(this->AvailableQuests[i])) { // something may have changed, so recheck if the player is able to accept the quest
+				this->AcceptQuest(this->AvailableQuests[i]);
+			}
+		}
+	}
 }
 
 void CPlayer::AvailableQuestsChanged()
@@ -1809,14 +1820,6 @@ void CPlayer::AvailableQuestsChanged()
 			}
 			if (!this->AvailableQuests[UnitButtonTable[i]->Value]->Hint.empty()) {
 				UnitButtonTable[i]->Description += "\n \nHint: " + this->AvailableQuests[UnitButtonTable[i]->Value]->Hint;
-			}
-		}
-	}
-	
-	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
-		for (int i = ((int) this->AvailableQuests.size() - 1); i >= 0; --i) {
-			if (this->CanAcceptQuest(this->AvailableQuests[i])) { // something may have changed, so recheck if the player is able to accept the quest
-				this->AcceptQuest(this->AvailableQuests[i]);
 			}
 		}
 	}

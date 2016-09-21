@@ -699,10 +699,10 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			Vec2i pos(template_start_pos.x + x, template_start_pos.y + y);
 			Vec2i real_pos(map_start_pos.x + x, map_start_pos.y + y);
 			if (map_template->GetTileTerrain(pos, false)) {
-				SetTileTerrain(map_template->GetTileTerrain(pos, false)->Ident, real_pos, z);
+				SetTileTerrain(map_template->GetTileTerrain(pos, false)->Ident, real_pos, 0, z);
 			}
 			if (map_template->GetTileTerrain(pos, true)) {
-				SetTileTerrain(map_template->GetTileTerrain(pos, true)->Ident, real_pos, z);
+				SetTileTerrain(map_template->GetTileTerrain(pos, true)->Ident, real_pos, 0, z);
 			}
 		}
 	}
@@ -716,7 +716,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 				if (!Map.Info.IsPointOnMap(surrounding_pos, z) || Map.IsPointInASubtemplateArea(surrounding_pos, z)) {
 					continue;
 				}
-				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos, z);
+				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos, 0, z);
 			}
 		}
 		for (int x = surrounding_start_pos.x; x < surrounding_end.x; x += (surrounding_end.x - surrounding_start_pos.x - 1)) {
@@ -725,7 +725,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 				if (!Map.Info.IsPointOnMap(surrounding_pos, z) || Map.IsPointInASubtemplateArea(surrounding_pos, z)) {
 					continue;
 				}
-				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos, z);
+				SetTileTerrain(map_template->SurroundingTerrain->Ident, surrounding_pos, 0, z);
 			}
 		}
 	}
