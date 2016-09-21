@@ -746,13 +746,7 @@ void PreprocessMap()
 	for (int ix = 0; ix < Map.Info.MapWidth; ++ix) {
 		for (int iy = 0; iy < Map.Info.MapHeight; ++iy) {
 			CMapField &mf = *Map.Field(ix, iy);
-			//Wyrmgus start
-			Map.CalculateTileTransitions(Vec2i(ix, iy));
-			Map.CalculateTileTransitions(Vec2i(ix, iy), true);
-			Map.CalculateTileVisibility(Vec2i(ix, iy));
-//			mf.playerInfo.SeenTile = mf.getGraphicTile();
-			mf.UpdateSeenTile();
-			//Wyrmgus end
+			mf.playerInfo.SeenTile = mf.getGraphicTile();
 		}
 	}
 	*/
@@ -762,7 +756,7 @@ void PreprocessMap()
 				CMapField &mf = *Map.Field(ix, iy, z);
 				Map.CalculateTileTransitions(Vec2i(ix, iy), false, z);
 				Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
-				Map.CalculateTileVisibility(Vec2i(ix, iy));
+				Map.CalculateTileVisibility(Vec2i(ix, iy), z);
 				mf.UpdateSeenTile();
 			}
 		}
@@ -1122,7 +1116,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 	
 	this->CalculateTileTransitions(pos, false, z); //recalculate both, since one may have changed the other
 	this->CalculateTileTransitions(pos, true, z);
-	this->CalculateTileVisibility(pos);
+	this->CalculateTileVisibility(pos, z);
 	
 	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -1138,7 +1132,7 @@ void CMap::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z)
 						
 					this->CalculateTileTransitions(adjacent_pos, false, z);
 					this->CalculateTileTransitions(adjacent_pos, true, z);
-					this->CalculateTileVisibility(adjacent_pos);
+					this->CalculateTileVisibility(adjacent_pos, z);
 					
 					UI.Minimap.UpdateXY(adjacent_pos, z);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -1164,7 +1158,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 	mf.RemoveOverlayTerrain();
 	
 	this->CalculateTileTransitions(pos, true, z);
-	this->CalculateTileVisibility(pos);
+	this->CalculateTileVisibility(pos, z);
 	
 	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -1179,7 +1173,7 @@ void CMap::RemoveTileOverlayTerrain(const Vec2i &pos, int z)
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 					this->CalculateTileTransitions(adjacent_pos, true, z);
-					this->CalculateTileVisibility(adjacent_pos);
+					this->CalculateTileVisibility(adjacent_pos, z);
 					
 					UI.Minimap.UpdateXY(adjacent_pos, z);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -1202,7 +1196,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 	mf.SetOverlayTerrainDestroyed(destroyed);
 	
 	this->CalculateTileTransitions(pos, true, z);
-	this->CalculateTileVisibility(pos);
+	this->CalculateTileVisibility(pos, z);
 	
 	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -1217,7 +1211,7 @@ void CMap::SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z)
 					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
 						
 					this->CalculateTileTransitions(adjacent_pos, true, z);
-					this->CalculateTileVisibility(adjacent_pos);
+					this->CalculateTileVisibility(adjacent_pos, z);
 					
 					UI.Minimap.UpdateXY(adjacent_pos, z);
 					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -1459,19 +1453,19 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 	}
 }
 
-void CMap::CalculateTileVisibility(const Vec2i &pos)
+void CMap::CalculateTileVisibility(const Vec2i &pos, int z)
 {
-	if (!this->Info.IsPointOnMap(pos)) {
+	if (!this->Info.IsPointOnMap(pos, z)) {
 		return;
 	}
 	
-	CMapField &mf = *this->Field(pos);
+	CMapField &mf = *this->Field(pos, z);
 	
 	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos) && (this->Field(adjacent_pos)->Flags & MapFieldAirUnpassable)) {
+				if (Map.Info.IsPointOnMap(adjacent_pos, z) && (this->Field(adjacent_pos, z)->Flags & MapFieldAirUnpassable)) {
 					mf.Visible[GetDirectionFromOffset(x_offset, y_offset)] = false;
 				} else {
 					mf.Visible[GetDirectionFromOffset(x_offset, y_offset)] = true;

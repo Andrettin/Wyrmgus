@@ -298,7 +298,7 @@ public:
 	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z = 0);
 	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z = 0);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
-	void CalculateTileVisibility(const Vec2i &pos);
+	void CalculateTileVisibility(const Vec2i &pos, int z);
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
 	void AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, int z = 0);
 	void GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion_number, const Vec2i &min_pos, const Vec2i &max_pos, bool preserve_coastline, int z);
@@ -331,7 +331,7 @@ public:
 	/// Mark a tile as seen by the player.
 	//Wyrmgus start
 //	void MarkSeenTile(CMapField &mf);
-	void MarkSeenTile(CMapField &mf, int z = 0);
+	void MarkSeenTile(CMapField &mf, int z);
 	//Wyrmgus end
 
 	/// Regenerate the forest.
@@ -503,8 +503,12 @@ typedef void MapMarkerFunc(const CPlayer &player, const unsigned int index, int 
 #endif
 
 /// Filter map flags through fog
-extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask);
-extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask);
+//Wyrmgus start
+//extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask);
+//extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask);
+extern int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z);
+extern int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z);
+//Wyrmgus end
 /// Mark a tile for normal sight
 extern MapMarkerFunc MapMarkTileSight;
 /// Unmark a tile for normal sight

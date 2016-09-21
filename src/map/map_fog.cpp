@@ -107,19 +107,34 @@ private:
 **
 **  @return        Filtered mask after taking fog into account
 */
-int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask)
+//Wyrmgus start
+//int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask)
+int MapFogFilterFlags(CPlayer &player, const unsigned int index, int mask, int z)
+//Wyrmgus end
 {
 	int fogMask = mask;
 
 	_filter_flags filter(player, &fogMask);
-	Map.Field(index)->UnitCache.for_each(filter);
+	//Wyrmgus start
+//	Map.Field(index)->UnitCache.for_each(filter);
+	Map.Field(index, z)->UnitCache.for_each(filter);
+	//Wyrmgus end
 	return fogMask;
 }
 
-int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask)
+//Wyrmgus start
+//int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask)
+int MapFogFilterFlags(CPlayer &player, const Vec2i &pos, int mask, int z)
+//Wyrmgus end
 {
-	if (Map.Info.IsPointOnMap(pos)) {
-		return MapFogFilterFlags(player, Map.getIndex(pos), mask);
+	//Wyrmgus start
+//	if (Map.Info.IsPointOnMap(pos)) {
+	if (Map.Info.IsPointOnMap(pos, z)) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		return MapFogFilterFlags(player, Map.getIndex(pos), mask);
+		return MapFogFilterFlags(player, Map.getIndex(pos, z), mask, z);
+		//Wyrmgus end
 	}
 	return mask;
 }
@@ -682,7 +697,7 @@ void VideoDrawOnlyFog(int x, int y)
 
 //Wyrmgus start
 //static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile)
-static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int z = 0)
+static void GetFogOfWarTile(int sx, int sy, int *fogTile, int *blackFogTile, int z)
 //Wyrmgus end
 {
 //Wyrmgus start

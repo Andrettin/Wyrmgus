@@ -598,7 +598,10 @@ CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &p
 			if (player && !real) {
 				//testmask = MapFogFilterFlags(player, x + w, y + h, type.MovementMask);
 				testmask = MapFogFilterFlags(*player,
-											 index + pos.x + w, type.MovementMask);
+											 //Wyrmgus start
+//											 index + pos.x + w, type.MovementMask);
+											 index + pos.x + w, type.MovementMask, z);
+											 //Wyrmgus end
 			} else {
 				testmask = type.MovementMask;
 			}

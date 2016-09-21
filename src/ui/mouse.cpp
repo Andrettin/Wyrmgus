@@ -123,7 +123,7 @@ static bool CanBuildOnArea(const CUnit &unit, const Vec2i &pos)
 			const Vec2i tempPos(i, j);
 			//Wyrmgus start
 //			if (!Map.Field(pos + tempPos)->playerInfo.IsExplored(*ThisPlayer)) {
-			if (!Map.Field(pos + tempPos)->playerInfo.IsTeamExplored(*ThisPlayer)) {
+			if (!Map.Field(pos + tempPos, CurrentMapLayer)->playerInfo.IsTeamExplored(*ThisPlayer)) {
 			//Wyrmgus end
 				return false;
 			}
@@ -309,7 +309,7 @@ static bool DoRightButton_Harvest_Pos(CUnit &unit, const Vec2i &pos, int flush, 
 {
 	//Wyrmgus start
 //	if (!Map.Field(pos)->playerInfo.IsExplored(*unit.Player)) {
-	if (!Map.Field(pos)->playerInfo.IsTeamExplored(*unit.Player)) {
+	if (!Map.Field(pos, CurrentMapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
 	//Wyrmgus end
 		return false;
 	}
@@ -675,9 +675,10 @@ static bool DoRightButton_NewOrder(CUnit &unit, CUnit *dest, const Vec2i &pos, i
 		return true;
 	}
 	// FIXME: support harvesting more types of terrain.
-	const CMapField &mf = *Map.Field(pos);
 	//Wyrmgus start
+//	const CMapField &mf = *Map.Field(pos);
 //	if (mf.playerInfo.IsExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
+	const CMapField &mf = *Map.Field(pos, CurrentMapLayer);
 	if (mf.playerInfo.IsTeamExplored(*unit.Player) && mf.IsTerrainResourceOnMap()) {
 	//Wyrmgus end
 		if (!acknowledged) {
@@ -1287,7 +1288,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 		bool show = ReplayRevealMap ? true : false;
 		if (show == false) {
-			CMapField &mf = *Map.Field(tilePos);
+			//Wyrmgus start
+//			CMapField &mf = *Map.Field(tilePos);
+			CMapField &mf = *Map.Field(tilePos, CurrentMapLayer);
+			//Wyrmgus end
 			for (int i = 0; i < PlayerMax; ++i) {
 				//Wyrmgus start
 //				if (mf.playerInfo.IsExplored(Players[i])
@@ -1336,7 +1340,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 
 		//Wyrmgus start
 //		if (Map.Field(tilePos)->playerInfo.IsExplored(*ThisPlayer) || ReplayRevealMap) {
-		if (Map.Field(tilePos)->playerInfo.IsTeamExplored(*ThisPlayer) || ReplayRevealMap) {
+		if (Map.Field(tilePos, CurrentMapLayer)->playerInfo.IsTeamExplored(*ThisPlayer) || ReplayRevealMap) {
 		//Wyrmgus end
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 			//Wyrmgus start
@@ -1654,7 +1658,10 @@ static int SendResource(const Vec2i &pos)
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 	const int flush = !(KeyModifiers & ModifierShift);
-	const CMapField &mf = *Map.Field(pos);
+	//Wyrmgus start
+//	const CMapField &mf = *Map.Field(pos);
+	const CMapField &mf = *Map.Field(pos, CurrentMapLayer);
+	//Wyrmgus end
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];

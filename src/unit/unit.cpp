@@ -3621,7 +3621,7 @@ bool CUnit::IsVisibleOnMinimap() const
 			   && !(Seen.Destroyed & (1 << ThisPlayer->Index))
 			   && !Destroyed
 			   && Map.Info.IsPointOnMap(this->tilePos)
-			   && Map.Field(this->tilePos)->playerInfo.IsTeamExplored(*ThisPlayer);
+			   && Map.Field(this->tilePos, this->MapLayer)->playerInfo.IsTeamExplored(*ThisPlayer);
 			   //Wyrmgus end
 	}
 }

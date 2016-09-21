@@ -328,10 +328,13 @@ void DrawBuildingCursor()
 			if (f && (ontop ||
 					  CanBuildOn(posIt, MapFogFilterFlags(*ThisPlayer, posIt,
 														  mask & ((!Selected.empty() && Selected[0]->tilePos == posIt) ?
-																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
+																  //Wyrmgus start
+//																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1))))
+																  ~(MapFieldLandUnit | MapFieldSeaUnit) : -1), CurrentMapLayer)))
+																  //Wyrmgus end
 				//Wyrmgus start
 //				&& Map.Field(posIt)->playerInfo.IsExplored(*ThisPlayer)) {
-				&& Map.Field(posIt)->playerInfo.IsTeamExplored(*ThisPlayer)) {
+				&& Map.Field(posIt, CurrentMapLayer)->playerInfo.IsTeamExplored(*ThisPlayer)) {
 				//Wyrmgus end
 				color = ColorGreen;
 			} else {
