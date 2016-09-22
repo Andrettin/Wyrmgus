@@ -2314,6 +2314,9 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			if (ButtonUnderCursor == 0 && Selected.size() == 1) {
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				if ((1 << button) == LeftButton) {
+					if (Selected[0]->MapLayer != CurrentMapLayer) {
+						ChangeCurrentMapLayer(Selected[0]->MapLayer);
+					}
 					UI.SelectedViewport->Center(Selected[0]->GetMapPixelPosCenter());
 				} else if ((1 << button) == RightButton) {
 					std::string encyclopedia_ident = Selected[0]->Type->Ident;

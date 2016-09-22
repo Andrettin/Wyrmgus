@@ -222,9 +222,33 @@ static void UiCenterOnGroup(unsigned group, GroupSelectionMode mode = SELECTABLE
 	const std::vector<CUnit *> &units = GetUnitsOfGroup(group);
 	PixelPos pos(-1, -1);
 
-	// FIXME: what should we do with the removed units? ignore?
+	//Wyrmgus start
+	int best_map_layer = CurrentMapLayer;
+	std::vector<int> map_layer_count;
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		map_layer_count.push_back(0);
+	}
 	for (size_t i = 0; i != units.size(); ++i) {
 		if (units[i]->Type && units[i]->Type->CanSelect(mode)) {
+			map_layer_count[units[i]->MapLayer] += 1;
+		}
+	}
+	for (size_t i = 0; i < map_layer_count.size(); ++i) {
+		if (map_layer_count[i] > map_layer_count[best_map_layer]) {
+			best_map_layer = i;
+		}
+	}
+	if (best_map_layer != CurrentMapLayer) {
+		ChangeCurrentMapLayer(best_map_layer);
+	}
+	//Wyrmgus end
+	
+	// FIXME: what should we do with the removed units? ignore?
+	for (size_t i = 0; i != units.size(); ++i) {
+		//Wyrmgus start
+//		if (units[i]->Type && units[i]->Type->CanSelect(mode)) {
+		if (units[i]->Type && units[i]->Type->CanSelect(mode) && units[i]->MapLayer == CurrentMapLayer) {
+		//Wyrmgus end
 			if (pos.x != -1) {
 				pos += (units[i]->GetMapPixelPosCenter() - pos) / 2;
 			} else {
@@ -471,6 +495,25 @@ static void UiCenterOnSelected()
 
 	PixelPos pos;
 
+	//Wyrmgus start
+	int best_map_layer = CurrentMapLayer;
+	std::vector<int> map_layer_count;
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		map_layer_count.push_back(0);
+	}
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		map_layer_count[Selected[i]->MapLayer] += 1;
+	}
+	for (size_t i = 0; i < map_layer_count.size(); ++i) {
+		if (map_layer_count[i] > map_layer_count[best_map_layer]) {
+			best_map_layer = i;
+		}
+	}
+	if (best_map_layer != CurrentMapLayer) {
+		ChangeCurrentMapLayer(best_map_layer);
+	}
+	//Wyrmgus end
+
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		pos += Selected[i]->GetMapPixelPosCenter();
 	}
@@ -540,6 +583,11 @@ void UiFindIdleWorker()
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
+		//Wyrmgus start
+		if (unit->MapLayer != CurrentMapLayer) {
+			ChangeCurrentMapLayer(unit->MapLayer);
+		}
+		//Wyrmgus end
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
 }
@@ -574,6 +622,11 @@ void UiFindLevelUpUnit()
 		CurrentButtonLevel = 0;
 		PlayUnitSound(*Selected[0], VoiceSelected);
 		SelectionChanged();
+		//Wyrmgus start
+		if (unit->MapLayer != CurrentMapLayer) {
+			ChangeCurrentMapLayer(unit->MapLayer);
+		}
+		//Wyrmgus end
 		UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 	}
 }
@@ -594,6 +647,11 @@ void UiFindCustomHeroUnit()
 	CurrentButtonLevel = 0;
 	PlayUnitSound(*Selected[0], VoiceSelected);
 	SelectionChanged();
+	//Wyrmgus start
+	if (unit->MapLayer != CurrentMapLayer) {
+		ChangeCurrentMapLayer(unit->MapLayer);
+	}
+	//Wyrmgus end
 	UI.SelectedViewport->Center(unit->GetMapPixelPosCenter());
 }
 //Wyrmgus end
