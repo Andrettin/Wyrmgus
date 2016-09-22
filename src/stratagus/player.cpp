@@ -1771,6 +1771,8 @@ void CPlayer::UpdateQuestPool()
 		return;
 	}
 	
+	bool exausted_available_quests = (this->AvailableQuests.size() == 0);
+	
 	this->AvailableQuests.clear();
 	
 	std::vector<CQuest *> potential_quests;
@@ -1791,8 +1793,9 @@ void CPlayer::UpdateQuestPool()
 	}
 	
 	this->AvailableQuestsChanged();
-	
-	if (this == ThisPlayer && GameCycle >= CYCLES_PER_MINUTE && this->AvailableQuests.size() > 0) {
+
+	// notify the player when new quests are available (but only if the player has already exausted the quests available to him, so that they aren't bothered if they choose not to engage with the quest system)
+	if (this == ThisPlayer && GameCycle >= CYCLES_PER_MINUTE && this->AvailableQuests.size() > 0 && exausted_available_quests) {
 		ThisPlayer->Notify("%s", _("New quests available"));
 	}
 	
