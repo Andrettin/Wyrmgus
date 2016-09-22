@@ -1792,6 +1792,10 @@ void CPlayer::UpdateQuestPool()
 	
 	this->AvailableQuestsChanged();
 	
+	if (this == ThisPlayer && GameCycle >= CYCLES_PER_MINUTE && this->AvailableQuests.size() > 0) {
+		ThisPlayer->Notify("%s", _("New quests available"));
+	}
+	
 	if (this->AiEnabled) { // if is an AI player, accept all quests that it can
 		int available_quest_quantity = this->AvailableQuests.size();
 		for (int i = (available_quest_quantity  - 1); i >= 0; --i) {
