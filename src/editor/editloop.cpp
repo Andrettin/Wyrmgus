@@ -194,7 +194,10 @@ static EditorSliderListener *editorSliderListener;
 static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, CurrentMapLayer));
+	//Wyrmgus end
 	
 	const CTileset &tileset = *Map.Tileset;
 	//Wyrmgus start
@@ -212,7 +215,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 //	mf.setTileIndex(tileset, tileIndex, 0);
 	Map.SetTileTerrain(pos, terrain, CurrentMapLayer);
 	if (!terrain->Overlay && !(KeyModifiers & ModifierShift)) { // don't remove overlay terrains if holding shift
-		Map.RemoveTileOverlayTerrain(pos);
+		Map.RemoveTileOverlayTerrain(pos, CurrentMapLayer);
 	}
 	mf.Value = value;
 //	mf.playerInfo.SeenTile = mf.getGraphicTile();
@@ -299,7 +302,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 				for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 					if (x_offset != 0 || y_offset != 0) {
 						Vec2i adjacent_pos(changed_tiles[i].x + x_offset, changed_tiles[i].y + y_offset);
-						if (Map.Info.IsPointOnMap(adjacent_pos)) {
+						if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
 							CMapField &adjacent_mf = *Map.Field(adjacent_pos, CurrentMapLayer);
 									
 							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, tile_terrain->Overlay, CurrentMapLayer);
@@ -319,7 +322,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 				for (int x_offset = -1; x_offset <= 1; ++x_offset) {
 					for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 						if (x_offset != 0 || y_offset != 0) {
-							if (Map.Info.IsPointOnMap(changed_tiles[i] + Vec2i(x_offset, y_offset))) {
+							if (Map.Info.IsPointOnMap(changed_tiles[i] + Vec2i(x_offset, y_offset), CurrentMapLayer)) {
 								EditTile(changed_tiles[i] + Vec2i(x_offset, y_offset), terrain);
 								changed_tiles.push_back(changed_tiles[i] + Vec2i(x_offset, y_offset));
 							}
@@ -341,7 +344,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 						continue;
 					}
 					
-					if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
 						for (int overlay = 1; overlay >= 0; --overlay) {
 							CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);
 							if (!adjacent_terrain || adjacent_terrain == Map.GetTileTerrain(changed_tiles[i], overlay, CurrentMapLayer)) {
@@ -364,7 +367,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 									for (int sub_y_offset = -1; sub_y_offset <= 1; ++sub_y_offset) {
 										if (sub_x_offset != 0 || sub_y_offset != 0) {
 											Vec2i sub_adjacent_pos(adjacent_pos.x + sub_x_offset, adjacent_pos.y + sub_y_offset);
-											if (Map.Info.IsPointOnMap(sub_adjacent_pos)) {
+											if (Map.Info.IsPointOnMap(sub_adjacent_pos, CurrentMapLayer)) {
 												CTerrainType *sub_adjacent_terrain = Map.GetTileTerrain(sub_adjacent_pos, overlay, CurrentMapLayer);
 												if (adjacent_terrain->Overlay && sub_adjacent_terrain && Map.Field(sub_adjacent_pos, CurrentMapLayer)->OverlayTerrainDestroyed) {
 													sub_adjacent_terrain = NULL;
@@ -380,7 +383,7 @@ static void EditTilesInternal(const Vec2i &pos, CTerrainType *terrain, int size)
 									
 								if (!solid_tile && !has_transitions) {
 									if (overlay) {
-										Map.RemoveTileOverlayTerrain(adjacent_pos);
+										Map.RemoveTileOverlayTerrain(adjacent_pos, CurrentMapLayer);
 									} else {
 										Map.SetTileTerrain(adjacent_pos, Map.GetTileTerrain(changed_tiles[i], false, CurrentMapLayer), CurrentMapLayer);
 									}
@@ -416,7 +419,10 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 	if (!MirrorEdit) {
 		return;
 	}
-	const Vec2i mpos(Map.Info.MapWidth - size, Map.Info.MapHeight - size);
+	//Wyrmgus start
+//	const Vec2i mpos(Map.Info.MapWidth - size, Map.Info.MapHeight - size);
+	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer] - size, Map.Info.MapHeights[CurrentMapLayer] - size);
+	//Wyrmgus end
 	const Vec2i mirror = mpos - pos;
 	const Vec2i mirrorv(mirror.x, pos.y);
 
@@ -453,7 +459,10 @@ static void EditTiles(const Vec2i &pos, CTerrainType *terrain, int size)
 */
 static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player)
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, CurrentMapLayer));
+	//Wyrmgus end
 
 	if (type.Neutral) {
 		player = &Players[PlayerNumNeutral];

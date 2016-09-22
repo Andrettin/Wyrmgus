@@ -159,7 +159,7 @@ public:
 	/// Place a unit on map
 	//Wyrmgus start
 //	void Place(const Vec2i &pos);
-	void Place(const Vec2i &pos, int z = 0);
+	void Place(const Vec2i &pos, int z);
 	//Wyrmgus end
 
 	/// Move unit to tile(pos). (Do special stuff : vision, cachelist, pathfinding)
@@ -660,7 +660,7 @@ extern CUnit *MakeUnit(const CUnitType &type, CPlayer *player);
 /// Create a new unit and place on map
 //Wyrmgus start
 //extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player);
-extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z = 0);
+extern CUnit *MakeUnitAndPlace(const Vec2i &pos, const CUnitType &type, CPlayer *player, int z);
 //Wyrmgus end
 //Wyrmgus start
 /// Create a new unit and place it on the map, and update its player accordingly
@@ -722,7 +722,7 @@ extern CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *
 /// @todo more docu
 //Wyrmgus start
 //extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos);
-extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z = 0);
+extern CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int z);
 //Wyrmgus end
 /// @todo more docu
 //Wyrmgus start
@@ -732,7 +732,7 @@ extern bool CanBuildOn(const Vec2i &pos, int mask, int z);
 /// FIXME: more docu
 //Wyrmgus start
 //extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real);
-extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration = false, int z = 0);
+extern CUnit *CanBuildUnitType(const CUnit *unit, const CUnitType &type, const Vec2i &pos, int real, bool ignore_exploration, int z);
 //Wyrmgus end
 /// Get the suitable animation frame depends of unit's damaged type.
 extern int ExtraDeathIndex(const char *death);

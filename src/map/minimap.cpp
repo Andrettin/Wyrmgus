@@ -1297,8 +1297,16 @@ void CMinimap::DrawViewportArea(const CViewport &viewport) const
 **
 **  @param pos  Map tile position
 */
-void CMinimap::AddEvent(const Vec2i &pos, Uint32 color)
+//Wyrmgus start
+//void CMinimap::AddEvent(const Vec2i &pos, Uint32 color)
+void CMinimap::AddEvent(const Vec2i &pos, int z, Uint32 color)
+//Wyrmgus end
 {
+	//Wyrmgus start
+	if (z != CurrentMapLayer) {
+		return;
+	}
+	//Wyrmgus end
 	if (NumMinimapEvents == MAX_MINIMAP_EVENTS) {
 		return;
 	}

@@ -1648,7 +1648,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 					Vec2i diagonal_pos(random_pos.x + sub_x, random_pos.y + sub_y);
 					Vec2i vertical_pos(random_pos.x, random_pos.y + sub_y);
 					Vec2i horizontal_pos(random_pos.x + sub_x, random_pos.y);
-					if (!this->Info.IsPointOnMap(diagonal_pos)) {
+					if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
 						continue;
 					}
 					
@@ -1704,7 +1704,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 		random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
 		
 		if (
-			this->Info.IsPointOnMap(random_pos)
+			this->Info.IsPointOnMap(random_pos, z)
 			&& GetTileTerrain(random_pos, terrain->Overlay, z) == terrain
 			&& (!terrain->Overlay || this->TileBordersOnlySameTerrain(random_pos, terrain, z))
 		) {
@@ -1714,7 +1714,7 @@ void CMap::GenerateTerrain(CTerrainType *terrain, int seed_number, int expansion
 					Vec2i diagonal_pos(random_pos.x + sub_x, random_pos.y + sub_y);
 					Vec2i vertical_pos(random_pos.x, random_pos.y + sub_y);
 					Vec2i horizontal_pos(random_pos.x + sub_x, random_pos.y);
-					if (!this->Info.IsPointOnMap(diagonal_pos)) {
+					if (!this->Info.IsPointOnMap(diagonal_pos, z)) {
 						continue;
 					}
 					
@@ -2020,10 +2020,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos, int z)
 /**
 **  Regenerate forest.
 */
-//Wyrmgus start
-//void CMap::RegenerateForest()
-void CMap::RegenerateForest(int z)
-//Wyrmgus end
+void CMap::RegenerateForest()
 {
 	if (!ForestRegeneration) {
 		return;

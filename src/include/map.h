@@ -183,7 +183,7 @@ class CMapInfo
 public:
 	//Wyrmgus start
 //	bool IsPointOnMap(int x, int y) const
-	bool IsPointOnMap(int x, int y, int z = 0) const
+	bool IsPointOnMap(int x, int y, int z) const
 	//Wyrmgus end
 	{
 		//Wyrmgus start
@@ -194,7 +194,7 @@ public:
 
 	//Wyrmgus start
 //	bool IsPointOnMap(const Vec2i &pos) const
-	bool IsPointOnMap(const Vec2i &pos, int z = 0) const
+	bool IsPointOnMap(const Vec2i &pos, int z) const
 	//Wyrmgus end
 	{
 		//Wyrmgus start
@@ -294,9 +294,9 @@ public:
 	
 	//Wyrmgus start
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
-	void RemoveTileOverlayTerrain(const Vec2i &pos, int z = 0);
-	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z = 0);
-	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z = 0);
+	void RemoveTileOverlayTerrain(const Vec2i &pos, int z);
+	void SetOverlayTerrainDestroyed(const Vec2i &pos, bool destroyed, int z);
+	void SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z);
 	void CalculateTileTransitions(const Vec2i &pos, bool overlay, int z);
 	void CalculateTileVisibility(const Vec2i &pos, int z);
 	void AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const Vec2i &max_pos, int z);
@@ -306,7 +306,7 @@ public:
 	//Wyrmgus end
 
 	//Wyrmgus start
-	void ClearOverlayTile(const Vec2i &pos, int z = 0);
+	void ClearOverlayTile(const Vec2i &pos, int z);
 	/*
 	/// Remove wood from the map.
 	void ClearWoodTile(const Vec2i &pos);
@@ -324,7 +324,7 @@ public:
 	
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay, int z) const;
-	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z = 0) const;
+	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const;
 	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, int z) const;
 	//Wyrmgus end
 
@@ -335,10 +335,7 @@ public:
 	//Wyrmgus end
 
 	/// Regenerate the forest.
-	//Wyrmgus start
-//	void RegenerateForest();
-	void RegenerateForest(int z = 0);
-	//Wyrmgus end
+	void RegenerateForest();
 	/// Reveal the complete map, make everything known.
 	//Wyrmgus start
 //	void Reveal();
@@ -396,7 +393,7 @@ public:
 
 	//Wyrmgus start
 //	void Clamp(Vec2i &pos) const;
-	void Clamp(Vec2i &pos, int z = 0) const;
+	void Clamp(Vec2i &pos, int z) const;
 	//Wyrmgus end
 
 	//Warning: we expect typical usage as xmin = x - range
@@ -432,7 +429,7 @@ private:
 	/// Regenerate the forest.
 	//Wyrmgus start
 //	void RegenerateForestTile(const Vec2i &pos);
-	void RegenerateForestTile(const Vec2i &pos, int z = 0);
+	void RegenerateForestTile(const Vec2i &pos, int z);
 	//Wyrmgus end
 
 public:
@@ -623,7 +620,7 @@ extern bool UnitTypeCanBeAt(const CUnitType &type, const Vec2i &pos, int z);
 /// Returns true, if the unit can enter the field
 //Wyrmgus start
 //extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos);
-extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z = 0);
+extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
 //Wyrmgus end
 
 /// Preprocess map, for internal use.

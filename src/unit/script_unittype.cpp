@@ -3639,12 +3639,12 @@ void UpdateUnitVariables(CUnit &unit)
 	unit.Variable[TARGETPOSX_INDEX].Value = goalPos.x;
 	//Wyrmgus start
 //	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidth;
-	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidths[unit.MapLayer];
+	unit.Variable[TARGETPOSX_INDEX].Max = Map.Info.MapWidths[unit.CurrentOrder()->GetGoalMapLayer()];
 	//Wyrmgus end
 	unit.Variable[TARGETPOSY_INDEX].Value = goalPos.y;
 	//Wyrmgus start
 //	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeight;
-	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeights[unit.MapLayer];
+	unit.Variable[TARGETPOSY_INDEX].Max = Map.Info.MapHeights[unit.CurrentOrder()->GetGoalMapLayer()];
 	//Wyrmgus end
 
 	// RadarRange

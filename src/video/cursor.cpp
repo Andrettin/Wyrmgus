@@ -301,12 +301,18 @@ void DrawBuildingCursor()
 	if (!Selected.empty()) {
 		f = 1;
 		for (size_t i = 0; f && i < Selected.size(); ++i) {
-			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != NULL);
+			//Wyrmgus start
+//			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos)) != NULL);
+			f = ((ontop = CanBuildHere(Selected[i], *CursorBuilding, mpos, CurrentMapLayer)) != NULL);
+			//Wyrmgus end
 			// Assign ontop or NULL
 			ontop = (ontop == Selected[i] ? NULL : ontop);
 		}
 	} else {
-		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos)) != NULL);
+		//Wyrmgus start
+//		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos)) != NULL);
+		f = ((ontop = CanBuildHere(NoUnitP, *CursorBuilding, mpos, CurrentMapLayer)) != NULL);
+		//Wyrmgus end
 		if (!Editor.Running || ontop == (CUnit *)1) {
 			ontop = NULL;
 		}

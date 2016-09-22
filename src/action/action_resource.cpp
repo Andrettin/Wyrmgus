@@ -888,7 +888,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 	if (this->DoneHarvesting) {
 		//Wyrmgus start
 //		Assert(resinfo.HarvestFromOutside || resinfo.TerrainHarvester);
-		Assert(harvest_from_outside || Map.Info.IsPointOnMap(this->goalPos));
+		Assert(harvest_from_outside || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer));
 		//Wyrmgus end
 		return !unit.Anim.Unbreakable;
 	}
@@ -1026,7 +1026,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 						//Wyrmgus end
 							//Wyrmgus start
 //							unit.Player->Notify(NotifyYellow, source->tilePos, _("%s has collapsed!"), source->Type->Name.c_str());
-							unit.Player->Notify(NotifyYellow, source->tilePos, _("Our %s has been depleted!"), source->Type->Name.c_str());
+							unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer, _("Our %s has been depleted!"), source->Type->Name.c_str());
 							//Wyrmgus end
 					}
 					LetUnitDie(*source);
@@ -1120,7 +1120,7 @@ int COrder_Resource::StopGathering(CUnit &unit)
 			//Wyrmgus end
 				//Wyrmgus start
 //				unit.Player->Notify(NotifyYellow, source->tilePos, _("%s is running low!"), source->Type->Name.c_str());
-				unit.Player->Notify(NotifyYellow, source->tilePos, _("Our %s is nearing depletion!"), source->Type->Name.c_str());
+				unit.Player->Notify(NotifyYellow, source->tilePos, source->MapLayer, _("Our %s is nearing depletion!"), source->Type->Name.c_str());
 				//Wyrmgus end
 				source->MineLow = 1;
 		}

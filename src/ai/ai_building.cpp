@@ -452,7 +452,10 @@ static bool AiFindHallPlace(const CUnit &worker,
 	//Wyrmgus end
 	terrainTraversal.Init();
 
-	Assert(Map.Info.IsPointOnMap(startPos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(startPos));
+	Assert(Map.Info.IsPointOnMap(startPos, z));
+	//Wyrmgus end
 	terrainTraversal.PushPos(startPos);
 
 	//Wyrmgus start

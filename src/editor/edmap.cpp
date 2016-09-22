@@ -108,7 +108,10 @@ static unsigned QuadFromTile(const Vec2i &pos)
 void EditorChangeTile(const Vec2i &pos, int tileIndex)
 //Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, CurrentMapLayer));
+	//Wyrmgus end
 
 	// Change the flags
 	//Wyrmgus start
@@ -149,7 +152,7 @@ void EditorChangeTile(const Vec2i &pos, int tileIndex)
 		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 			if (x_offset != 0 || y_offset != 0) {
 				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos)) {
+				if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
 					Map.CalculateTileTransitions(adjacent_pos, false, CurrentMapLayer);
 					Map.CalculateTileTransitions(adjacent_pos, true, CurrentMapLayer);
 					Map.CalculateTileVisibility(adjacent_pos, CurrentMapLayer);
@@ -216,7 +219,7 @@ static void EditorChangeSurrounding(const Vec2i &pos, int tile)
 			for (int y_offset = -1; y_offset <= 1; ++y_offset) {
 				if (x_offset != 0 || y_offset != 0) {
 					Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-					if (Map.Info.IsPointOnMap(adjacent_pos)) {
+					if (Map.Info.IsPointOnMap(adjacent_pos, CurrentMapLayer)) {
 						CMapField &adjacent_mf = *Map.Field(adjacent_pos, CurrentMapLayer);
 							
 						CTerrainType *adjacent_terrain = Map.GetTileTerrain(adjacent_pos, overlay, CurrentMapLayer);
@@ -373,7 +376,10 @@ static void TileFill(const Vec2i &pos, int tile, int size)
 */
 static void EditorRandomizeTile(int tile, int count, int max_size)
 {
-	const Vec2i mpos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
+	//Wyrmgus start
+//	const Vec2i mpos(Map.Info.MapWidth - 1, Map.Info.MapHeight - 1);
+	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer] - 1, Map.Info.MapHeights[CurrentMapLayer] - 1);
+	//Wyrmgus end
 
 	for (int i = 0; i < count; ++i) {
 		const Vec2i rpos(rand() % ((1 + mpos.x) / 2), rand() % ((1 + mpos.y) / 2));
@@ -404,7 +410,10 @@ static void EditorRandomizeTile(int tile, int count, int max_size)
 */
 static void EditorRandomizeUnit(const char *unit_type, int count, int value)
 {
-	const Vec2i mpos(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	const Vec2i mpos(Map.Info.MapWidth, Map.Info.MapHeight);
+	const Vec2i mpos(Map.Info.MapWidths[CurrentMapLayer], Map.Info.MapHeights[CurrentMapLayer]);
+	//Wyrmgus end
 	CUnitType *typeptr = UnitTypeByIdent(unit_type);
 
 	if (!typeptr) { // Error
@@ -506,7 +515,10 @@ static void EditorDestroyAllUnits()
 */
 void CEditor::CreateRandomMap() const
 {
-	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
+	//Wyrmgus start
+//	const int mz = std::max(Map.Info.MapHeight, Map.Info.MapWidth);
+	const int mz = std::max(Map.Info.MapHeights[CurrentMapLayer], Map.Info.MapWidths[CurrentMapLayer]);
+	//Wyrmgus end
 
 	// make water-base
 	const Vec2i zeros(0, 0);

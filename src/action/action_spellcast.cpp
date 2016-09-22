@@ -422,6 +422,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				if (unit.Variable[MANA_INDEX].Value < spell.ManaCost) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										//Wyrmgus start
+										unit.MapLayer,
 //										_("%s: not enough mana for spell: %s"),
 										_("%s does not have enough mana to use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
@@ -430,6 +431,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				} else if (unit.SpellCoolDownTimers[spell.Slot]) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										//Wyrmgus start
+										unit.MapLayer,
 //										_("%s: spell is not ready yet: %s"),
 										_("%s's ability %s is not ready yet."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
@@ -438,6 +440,7 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 				} else if (unit.Player->CheckCosts(spell.Costs, false)) {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										//Wyrmgus start
+										unit.MapLayer,
 //										_("%s: not enough resources to cast spell: %s"),
 										_("You do not have enough resources for %s to use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());
@@ -445,13 +448,14 @@ bool COrder_SpellCast::SpellMoveToTarget(CUnit &unit)
 										//Wyrmgus end
 				//Wyrmgus start
 				} else if (spell.Target == TargetUnit && order.GetGoal() == NULL) {
-					unit.Player->Notify(NotifyYellow, unit.tilePos,
+					unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer,
 										_("%s needs a target to use the %s ability."),
 										unit.GetMessageName().c_str(), spell.Name.c_str());
 				//Wyrmgus end
 				} else {
 					unit.Player->Notify(NotifyYellow, unit.tilePos,
 										//Wyrmgus start
+										unit.MapLayer,
 //										_("%s: can't cast spell: %s"),
 										_("%s cannot use the %s ability."),
 //										unit.Type->Name.c_str(), spell.Name.c_str());

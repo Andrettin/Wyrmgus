@@ -47,7 +47,10 @@
 //astar.cpp
 
 /// Init the a* data structures
-extern void InitAStar(int mapWidth, int mapHeight);
+//Wyrmgus start
+//extern void InitAStar(int mapWidth, int mapHeight);
+extern void InitAStar();
+//Wyrmgus end
 
 /// free the a* data structures
 extern void FreeAStar();
@@ -57,7 +60,7 @@ extern int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, in
 						 int tilesizex, int tilesizey, int minrange,
 						 //Wyrmgus start
 //						 int maxrange, char *path, int pathlen, const CUnit &unit);
-						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length, int start_z, int goal_z);
+						 int maxrange, char *path, int pathlen, const CUnit &unit, int max_length, int z);
 						 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -166,7 +169,10 @@ void TerrainTraversal::Set(const Vec2i &pos, TerrainTraversal::dataType value)
 */
 void InitPathfinder()
 {
-	InitAStar(Map.Info.MapWidth, Map.Info.MapHeight);
+	//Wyrmgus start
+//	InitAStar(Map.Info.MapWidth, Map.Info.MapHeight);
+	InitAStar();
+	//Wyrmgus end
 }
 
 /**
@@ -198,11 +204,17 @@ void FreePathfinder()
 int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int minrange, int range, int max_length, int z)
 //Wyrmgus end
 {
+	//Wyrmgus start
+	if (src.MapLayer != z) {
+		return false;
+	}
+	//Wyrmgus end
+	
 	int i = AStarFindPath(src.tilePos, goalPos, w, h,
 						  src.Type->TileWidth, src.Type->TileHeight,
 						  //Wyrmgus start
 //						  minrange, range, NULL, 0, src);
-						  minrange, range, NULL, 0, src, max_length, src.MapLayer, z);
+						  minrange, range, NULL, 0, src, max_length, z);
 						  //Wyrmgus end
 
 	switch (i) {
@@ -384,7 +396,7 @@ static int NewPath(PathFinderInput &input, PathFinderOutput &output)
 						  path, PathFinderOutput::MAX_PATH_LENGTH,
 						  //Wyrmgus start
 //						  *input.GetUnit());
-						  *input.GetUnit(), 0, input.GetUnitMapLayer(), input.GetGoalMapLayer());
+						  *input.GetUnit(), 0, input.GetGoalMapLayer());
 						  //Wyrmgus end
 	input.PathRacalculated();
 	if (i == PF_FAILED) {

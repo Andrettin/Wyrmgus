@@ -108,7 +108,10 @@ bool CViewport::IsInsideMapArea(const PixelPos &screenPixelPos) const
 {
 	const Vec2i tilePos = ScreenToTilePos(screenPixelPos);
 
-	return Map.Info.IsPointOnMap(tilePos);
+	//Wyrmgus start
+//	return Map.Info.IsPointOnMap(tilePos);
+	return Map.Info.IsPointOnMap(tilePos, CurrentMapLayer);
+	//Wyrmgus end
 }
 
 // Convert viewport coordinates into map pixel coordinates

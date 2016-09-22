@@ -183,16 +183,13 @@ VisitResult WallFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &p
 	}
 }
 
-//Wyrmgus start
-//static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
-static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos, int z = 0)
-//Wyrmgus end
+static bool FindWall(const CUnit &unit, int range, Vec2i *wallPos)
 {
 	TerrainTraversal terrainTraversal;
 
 	//Wyrmgus start
 //	terrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	terrainTraversal.SetSize(Map.Info.MapWidths[unit.MapLayer], Map.Info.MapHeights[unit.MapLayer]);
 	//Wyrmgus end
 	terrainTraversal.Init();
 
@@ -410,10 +407,7 @@ int GetTotalBoardCapacity(ITERATOR begin, ITERATOR end)
 **  @todo transporter are more selective now (flag with unittypeland).
 **         We must manage it.
 */
-//Wyrmgus start
-//int AiForce::PlanAttack()
-int AiForce::PlanAttack(int z)
-//Wyrmgus end
+int AiForce::PlanAttack()
 {
 	CPlayer &player = *AiPlayer->Player;
 	DebugPrint("%d: Planning for force #%lu of player #%d\n" _C_ player.Index
@@ -423,7 +417,7 @@ int AiForce::PlanAttack(int z)
 
 	//Wyrmgus start
 //	transporterTerrainTraversal.SetSize(Map.Info.MapWidth, Map.Info.MapHeight);
-	transporterTerrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+	transporterTerrainTraversal.SetSize(Map.Info.MapWidths[this->GoalMapLayer], Map.Info.MapHeights[this->GoalMapLayer]);
 	//Wyrmgus end
 	transporterTerrainTraversal.Init();
 
@@ -609,7 +603,10 @@ static CUnit *GetBestScout(int unit_type)
 		}
 		if (unit.GroupId != 0) { //don't scout with units that are parts of forces that have a goal
 			int force = AiPlayer->Force.GetForce(unit);
-			if (force != -1 && Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos)) {
+			//Wyrmgus start
+//			if (force != -1 && Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos)) {
+			if (force != -1 && Map.Info.IsPointOnMap(AiPlayer->Force[force].GoalPos, AiPlayer->Force[force].GoalMapLayer)) {
+			//Wyrmgus end
 				continue;
 			}
 		}

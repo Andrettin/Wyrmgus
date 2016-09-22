@@ -554,8 +554,12 @@ static void FinishViewportModeConfiguration(CViewport new_vps[], int num_vps)
 static void ClipViewport(CViewport &vp, int ClipX, int ClipY)
 {
 	// begin with maximum possible viewport size
-	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * PixelTileSize.x - 1;
-	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * PixelTileSize.y - 1;
+	//Wyrmgus start
+//	vp.BottomRightPos.x = vp.TopLeftPos.x + Map.Info.MapWidth * PixelTileSize.x - 1;
+//	vp.BottomRightPos.y = vp.TopLeftPos.y + Map.Info.MapHeight * PixelTileSize.y - 1;
+	vp.BottomRightPos.x = vp.TopLeftPos.x + (Map.Info.MapWidths.size() ? Map.Info.MapWidths[CurrentMapLayer] : Map.Info.MapWidth) * PixelTileSize.x - 1;
+	vp.BottomRightPos.y = vp.TopLeftPos.y + (Map.Info.MapHeights.size() ? Map.Info.MapHeights[CurrentMapLayer] : Map.Info.MapHeight) * PixelTileSize.y - 1;
+	//Wyrmgus end
 
 	// first clip it to MapArea size if necessary
 	vp.BottomRightPos.x = std::min<int>(vp.BottomRightPos.x, ClipX);

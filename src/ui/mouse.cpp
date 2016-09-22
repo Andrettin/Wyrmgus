@@ -2414,17 +2414,14 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 								if (ThisPlayer->IsTeamed(*Selected[0]) || uins->Player == ThisPlayer) {
 									if ((1 << button) == LeftButton) {
 										if  (!uins->Bound) {
-											//Wyrmgus start
-//											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush);
 											SendCommandUnload(*Selected[0], Selected[0]->tilePos, uins, flush, Selected[0]->MapLayer);
-											//Wyrmgus end
 										} else {
 											if (Selected[0]->Player == ThisPlayer) {
 												std::string item_name = uins->GetMessageName();
 												if (!uins->Unique) {
 													item_name = "the " + item_name;
 												}
-												Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
+												Selected[0]->Player->Notify(NotifyRed, Selected[0]->tilePos, Selected[0]->MapLayer, _("%s cannot drop %s."), Selected[0]->GetMessageName().c_str(), item_name.c_str());
 											}
 										}
 									} else if ((1 << button) == RightButton) {

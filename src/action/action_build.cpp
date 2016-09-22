@@ -265,7 +265,7 @@ bool COrder_Build::MoveToLocation(CUnit &unit)
 
 			//Wyrmgus start
 //			unit.Player->Notify(NotifyYellow, unit.tilePos, "%s", _("You cannot reach building place"));
-			unit.Player->Notify(NotifyYellow, unit.tilePos, _("%s cannot reach building place"), unit.GetMessageName().c_str());
+			unit.Player->Notify(NotifyYellow, unit.tilePos, unit.MapLayer, _("%s cannot reach building place"), unit.GetMessageName().c_str());
 			//Wyrmgus end
 			if (unit.Player->AiEnabled) {
 				AiCanNotReach(unit, this->GetUnitType());
@@ -292,6 +292,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 		// FIXME: Better tell what is missing?
 		player.Notify(NotifyYellow, unit.tilePos,
 					  //Wyrmgus start
+					  unit.MapLayer,
 //					  _("Not enough resources to build %s"), type.Name.c_str());
 					  _("Not enough resources to build %s"), type.GetDefaultName(Players[player.Index]).c_str());
 					  //Wyrmgus end
@@ -302,6 +303,7 @@ static bool CheckLimit(const CUnit &unit, const CUnitType &type)
 	if (player.CheckLimits(type) < 0) {
 		player.Notify(NotifyYellow, unit.tilePos,
 					  //Wyrmgus start
+					  unit.MapLayer,
 //					  _("Can't build more units %s"), type.Name.c_str());
 					  _("Can't build more units %s"), type.GetDefaultName(Players[player.Index]).c_str());
 					  //Wyrmgus end
@@ -408,6 +410,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 		// FIXME: Should we retry this?
 		unit.Player->Notify(NotifyYellow, unit.tilePos,
 							//Wyrmgus start
+							unit.MapLayer,
 //							_("Unable to create building %s"), type.Name.c_str());
 							_("Unable to create building %s"), type.GetDefaultName(*unit.Player).c_str());
 							//Wyrmgus end
@@ -638,6 +641,7 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 	if (this->State == State_StartBuilding_Failed) {
 		unit.Player->Notify(NotifyYellow, unit.tilePos,
 							//Wyrmgus start
+							unit.MapLayer,
 //							_("You cannot build %s here"), type.Name.c_str());
 							_("You cannot build %s here"), type.GetDefaultName(*unit.Player).c_str());
 							//Wyrmgus end

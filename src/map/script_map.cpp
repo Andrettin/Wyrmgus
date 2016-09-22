@@ -1141,7 +1141,14 @@ static int CclGetCurrentTileset(lua_State *l)
 */
 static int CclGetTileTerrainName(lua_State *l)
 {
-	LuaCheckArgs(l, 2);
+	//Wyrmgus start
+//	LuaCheckArgs(l, 2);
+	int z = 0;
+	const int nargs = lua_gettop(l);
+	if (nargs >= 3) {
+		z = LuaToNumber(l, 3);
+	}
+	//Wyrmgus end
 
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
@@ -1155,7 +1162,7 @@ static int CclGetTileTerrainName(lua_State *l)
 
 	lua_pushstring(l, tileset.getTerrainName(baseTerrainIdx).c_str());
 	*/
-	lua_pushstring(l, Map.GetTileTopTerrain(pos, false)->Ident.c_str());
+	lua_pushstring(l, Map.GetTileTopTerrain(pos, false, z)->Ident.c_str());
 	//Wyrmgus end
 	return 1;
 }
@@ -1211,7 +1218,7 @@ static int CclGetTileTerrainHasFlag(lua_State *l)
 	const Vec2i pos(LuaToNumber(l, 1), LuaToNumber(l, 2));
 
 	//Wyrmgus start
-	if (pos.x < 0 || pos.x >= Map.Info.MapWidth || pos.y < 0 || pos.y >= Map.Info.MapHeight) {
+	if (pos.x < 0 || pos.x >= Map.Info.MapWidths[z] || pos.y < 0 || pos.y >= Map.Info.MapHeights[z]) {
 		lua_pushboolean(l, 0);
 		return 1;
 	}

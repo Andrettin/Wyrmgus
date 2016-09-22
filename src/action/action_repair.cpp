@@ -226,6 +226,7 @@ bool SubRepairCosts(const CUnit &unit, CPlayer &player, CUnit &goal)
 		if (!player.CheckResource(i, RepairCosts[i])) {
 			player.Notify(NotifyYellow, unit.tilePos,
 						  //Wyrmgus start
+						  unit.MapLayer,
 //						  _("We need more %s for repair!"), DefaultResourceNames[i].c_str());
 						  _("We need more %s to repair!"), DefaultResourceNames[i].c_str());
 						  //Wyrmgus end

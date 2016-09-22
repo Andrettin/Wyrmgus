@@ -79,7 +79,10 @@ public:
 	void Destroy();
 	void Draw() const;
 	void DrawViewportArea(const CViewport &viewport) const;
-	void AddEvent(const Vec2i &pos, IntColor color);
+	//Wyrmgus start
+//	void AddEvent(const Vec2i &pos, IntColor color);
+	void AddEvent(const Vec2i &pos, int z, IntColor color);
+	//Wyrmgus end
 
 	Vec2i ScreenToTilePos(const PixelPos &screenPos) const;
 	PixelPos TilePosToScreenPos(const Vec2i &tilePos) const;

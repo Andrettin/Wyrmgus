@@ -142,10 +142,13 @@
 		if (upgrade.Name.empty()) {
 			//Wyrmgus start
 //			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.Name.c_str());
-			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), type.GetDefaultName(player).c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s: research complete"), type.GetDefaultName(player).c_str());
 			//Wyrmgus end
 		} else {
-			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), upgrade.Name.c_str());
+			//Wyrmgus start
+//			player.Notify(NotifyGreen, unit.tilePos, _("%s: research complete"), upgrade.Name.c_str());
+			player.Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s: research complete"), upgrade.Name.c_str());
+			//Wyrmgus end
 		}
 		if (&player == ThisPlayer) {
 			CSound *sound = GameSounds.ResearchComplete[player.Race].Sound;

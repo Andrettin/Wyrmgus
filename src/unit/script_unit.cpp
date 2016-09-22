@@ -823,7 +823,18 @@ static int CclRemoveUnit(lua_State *l)
 */
 static int CclCreateUnit(lua_State *l)
 {
-	LuaCheckArgs(l, 3);
+	//Wyrmgus start
+//	LuaCheckArgs(l, 3);
+	const int nargs = lua_gettop(l);
+	if (nargs < 3 || nargs > 4) {
+		LuaError(l, "incorrect argument\n");
+	}
+	
+	int z = 0;
+	if (nargs >= 4) {
+		z = LuaToNumber(l, 4);
+	}
+	//Wyrmgus end
 
 	lua_pushvalue(l, 1);
 	CUnitType *unittype = CclGetUnitType(l);
@@ -852,15 +863,22 @@ static int CclCreateUnit(lua_State *l)
 		DebugPrint("Unable to allocate unit");
 		return 0;
 	} else {
-		if (UnitCanBeAt(*unit, ipos)
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
-			unit->Place(ipos);
+		//Wyrmgus start
+//		if (UnitCanBeAt(*unit, ipos)
+		if (UnitCanBeAt(*unit, ipos, z)
+		//Wyrmgus end
+			//Wyrmgus start
+//			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0))) {
+//			unit->Place(ipos);
+			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0, true, z))) {
+			unit->Place(ipos, z);
+			//Wyrmgus end
 		} else {
 			const int heading = SyncRand() % 256;
 
 			unit->tilePos = ipos;
 			//Wyrmgus start
-			unit->MapLayer = 0;
+			unit->MapLayer = z;
 			//Wyrmgus end
 			DropOutOnSide(*unit, heading, NULL);
 		}

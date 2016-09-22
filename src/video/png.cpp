@@ -438,8 +438,12 @@ void SaveMapPNG(const char *name)
 		return;
 	}
 
-	const size_t imageWidth = Map.Info.MapWidth * PixelTileSize.x;
-	const size_t imageHeight = Map.Info.MapHeight * PixelTileSize.y;
+	//Wyrmgus start
+//	const size_t imageWidth = Map.Info.MapWidth * PixelTileSize.x;
+//	const size_t imageHeight = Map.Info.MapHeight * PixelTileSize.y;
+	const size_t imageWidth = Map.Info.MapWidths[CurrentMapLayer] * PixelTileSize.x;
+	const size_t imageHeight = Map.Info.MapHeights[CurrentMapLayer] * PixelTileSize.y;
+	//Wyrmgus end
 
 	/* set up the output control if you are using standard C streams */
 	png_init_io(png_ptr, fp);
@@ -453,9 +457,18 @@ void SaveMapPNG(const char *name)
 	SDL_Surface *mapImage = SDL_CreateRGBSurface(SDL_SWSURFACE,
 		imageWidth, imageHeight, 32, RMASK, GMASK, BMASK, 0);
 
-	for (int i = 0; i < Map.Info.MapHeight; ++i) {
-		for (int j = 0; j < Map.Info.MapWidth; ++j) {
-			const CMapField &mf = *Map.Field(i, j);
+	//Wyrmgus start
+//	for (int i = 0; i < Map.Info.MapHeight; ++i) {
+	for (int i = 0; i < Map.Info.MapHeights[CurrentMapLayer]; ++i) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		for (int j = 0; j < Map.Info.MapWidth; ++j) {
+		for (int j = 0; j < Map.Info.MapWidths[CurrentMapLayer]; ++j) {
+		//Wyrmgus end
+			//Wyrmgus start
+//			const CMapField &mf = *Map.Field(i, j);
+			const CMapField &mf = *Map.Field(i, j, CurrentMapLayer);
+			//Wyrmgus end
 			SDL_Rect srcRect, dstRect;
 			//Wyrmgus start
 			/*

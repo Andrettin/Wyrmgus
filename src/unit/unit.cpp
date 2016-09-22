@@ -750,7 +750,7 @@ void CUnit::Retrain()
 	}
 	
 	if (this->Player == ThisPlayer) {
-		this->Player->Notify(NotifyGreen, this->tilePos, _("%s's level-up choices have been reset."), unit_name.c_str());
+		this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer, _("%s's level-up choices have been reset."), unit_name.c_str());
 	}
 }
 
@@ -939,7 +939,7 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 			continue;
 		}
 		if (varinfo->Terrains.size() > 0) {
-			if (!Map.Info.IsPointOnMap(this->tilePos)) {
+			if (!Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)) {
 				continue;
 			}
 			bool terrain_check = false;
@@ -1591,7 +1591,7 @@ void CUnit::Identify()
 	this->Identified = true;
 	
 	if (this->Container != NULL && this->Container->Player == ThisPlayer) {
-		this->Container->Player->Notify(NotifyGreen, this->Container->tilePos, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
+		this->Container->Player->Notify(NotifyGreen, this->Container->tilePos, this->Container->MapLayer, _("%s has identified the %s!"), this->Container->GetMessageName().c_str(), this->GetMessageName().c_str());
 	}
 }
 
@@ -2139,7 +2139,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			player.Heroes.push_back(this->Character->GetFullName());
 		}
 		
-		if (player.AiEnabled && player.Ai && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(this->tilePos) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+		if (player.AiEnabled && player.Ai && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 			player.Ai->Scouts.push_back(this);
 		}
 		//Wyrmgus end
@@ -2730,7 +2730,7 @@ void CUnit::XPChanged()
 		this->Variable[XP_INDEX].Max -= this->Variable[XPREQUIRED_INDEX].Max;
 		this->Variable[XP_INDEX].Value -= this->Variable[XPREQUIRED_INDEX].Value;
 		if (this->Player == ThisPlayer) {
-			this->Player->Notify(NotifyGreen, this->tilePos, _("%s has leveled up!"), GetMessageName().c_str());
+			this->Player->Notify(NotifyGreen, this->tilePos, this->MapLayer, _("%s has leveled up!"), GetMessageName().c_str());
 		}
 		this->IncreaseLevel(1);
 	}
@@ -3367,7 +3367,10 @@ void CorrectWallDirections(CUnit &unit)
 	Assert(unit.Type->NumDirections == 16);
 	Assert(!unit.Type->Flip);
 
-	if (!Map.Info.IsPointOnMap(unit.tilePos)) {
+	//Wyrmgus start
+//	if (!Map.Info.IsPointOnMap(unit.tilePos)) {
+	if (!Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer)) {
+	//Wyrmgus end
 		return ;
 	}
 	const struct {
@@ -3632,7 +3635,7 @@ bool CUnit::IsVisibleOnMinimap() const
 //			   && !(Seen.Destroyed & (1 << ThisPlayer->Index));
 			   && !(Seen.Destroyed & (1 << ThisPlayer->Index))
 			   && !Destroyed
-			   && Map.Info.IsPointOnMap(this->tilePos)
+			   && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer)
 			   && Map.Field(this->tilePos, this->MapLayer)->playerInfo.IsTeamExplored(*ThisPlayer);
 			   //Wyrmgus end
 	}
@@ -3796,7 +3799,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 		newplayer.Heroes.push_back(this->Character->GetFullName());
 	}
 	
-	if (newplayer.AiEnabled && newplayer.Ai && this->Type->BoolFlag[COWARD_INDEX].value && !this->Type->BoolFlag[HARVESTER_INDEX].value && !this->Type->CanTransport() && !this->Type->CanCastSpell && Map.Info.IsPointOnMap(this->tilePos) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
+	if (newplayer.AiEnabled && newplayer.Ai && this->Type->BoolFlag[COWARD_INDEX].value && !this->Type->BoolFlag[HARVESTER_INDEX].value && !this->Type->CanTransport() && !this->Type->CanCastSpell && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
 		newplayer.Ai->Scouts.push_back(this);
 	}
 	//Wyrmgus end
@@ -5228,7 +5231,7 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 				PlayUnitSound(target, VoiceHelpMe);
 				//Wyrmgus start
 				//attacked messages now only appear if the "help" sound would be played too
-				target.Player->Notify(NotifyRed, target.tilePos, _("%s attacked"), target.GetMessageName().c_str());
+				target.Player->Notify(NotifyRed, target.tilePos, target.MapLayer, _("%s attacked"), target.GetMessageName().c_str());
 				//Wyrmgus end
 			}
 		}
@@ -5994,7 +5997,7 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 	if (picker.HasInventory() && unit.Type->BoolFlag[ITEM_INDEX].value && picker.InsideCount >= ((int) UI.InventoryButtons.size())) { // full
 		if (picker.Player == ThisPlayer) {
 			std::string picker_name = picker.Name + "'s (" + picker.GetTypeName() + ")";
-			picker.Player->Notify(NotifyRed, picker.tilePos, _("%s inventory is full."), picker_name.c_str());
+			picker.Player->Notify(NotifyRed, picker.tilePos, picker.MapLayer, _("%s inventory is full."), picker_name.c_str());
 		}
 		return false;
 	}

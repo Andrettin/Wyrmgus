@@ -413,7 +413,10 @@ extern void DrawDayTime();
 /// Set message to display
 extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 /// Set message to display with event point
-extern void SetMessageEvent(const Vec2i &pos, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(2, 3);
+//Wyrmgus start
+//extern void SetMessageEvent(const Vec2i &pos, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(2, 3);
+extern void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(2, 3);
+//Wyrmgus end
 //Wyrmgus start
 /// Set objective to display
 extern void SetObjective(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);

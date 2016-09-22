@@ -365,7 +365,7 @@ static void AnimateActionTrain(CUnit &unit)
 		if (newUnit == NULL) { // No more memory :/
 			//Wyrmgus start
 	//		player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.Name.c_str());
-			player.Notify(NotifyYellow, unit.tilePos, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
+			player.Notify(NotifyYellow, unit.tilePos, unit.MapLayer, _("Unable to train %s"), nType.GetDefaultName(player).c_str());
 			//Wyrmgus end
 			unit.Wait = CYCLES_PER_SECOND / 6;
 			return ;

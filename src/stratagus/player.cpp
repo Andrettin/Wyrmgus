@@ -2475,7 +2475,7 @@ void PlayersEachMinute(int playerIdx)
 				}
 				
 				Vec2i splitter_start_pos = Map.GenerateUnitLocation(depot->Type, splitter_faction, deposit->tilePos - Vec2i(depot->Type->TileWidth - 1, depot->Type->TileHeight - 1) - Vec2i(8, 8), deposit->tilePos + Vec2i(deposit->Type->TileWidth - 1, deposit->Type->TileHeight - 1) + Vec2i(8, 8), deposit->MapLayer);
-				if (!Map.Info.IsPointOnMap(splitter_start_pos)) {
+				if (!Map.Info.IsPointOnMap(splitter_start_pos, deposit->MapLayer)) {
 					break;
 				}
 				
@@ -2655,9 +2655,15 @@ void DebugPlayers()
 **
 **  @todo FIXME: We must also notfiy allied players.
 */
-void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
+//Wyrmgus start
+//void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
+void CPlayer::Notify(int type, const Vec2i &pos, int z, const char *fmt, ...) const
+//Wyrmgus end
 {
-	Assert(Map.Info.IsPointOnMap(pos));
+	//Wyrmgus start
+//	Assert(Map.Info.IsPointOnMap(pos));
+	Assert(Map.Info.IsPointOnMap(pos, z));
+	//Wyrmgus end
 	char temp[128];
 	Uint32 color;
 	va_list va;
@@ -2683,11 +2689,20 @@ void CPlayer::Notify(int type, const Vec2i &pos, const char *fmt, ...) const
 			break;
 		default: color = ColorWhite;
 	}
-	UI.Minimap.AddEvent(pos, color);
+	//Wyrmgus start
+//	UI.Minimap.AddEvent(pos, color);
+	UI.Minimap.AddEvent(pos, z, color);
+	//Wyrmgus end
 	if (this == ThisPlayer) {
-		SetMessageEvent(pos, "%s", temp);
+		//Wyrmgus start
+//		SetMessageEvent(pos, "%s", temp);
+		SetMessageEvent(pos, z, "%s", temp);
+		//Wyrmgus end
 	} else {
-		SetMessageEvent(pos, "(%s): %s", Name.c_str(), temp);
+		//Wyrmgus start
+//		SetMessageEvent(pos, "(%s): %s", Name.c_str(), temp);
+		SetMessageEvent(pos, z, "(%s): %s", Name.c_str(), temp);
+		//Wyrmgus end
 	}
 }
 

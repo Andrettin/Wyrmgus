@@ -171,10 +171,7 @@ public:
 	void Attack(const Vec2i &pos, int z);
 	//Wyrmgus end
 	void RemoveDeadUnit();
-	//Wyrmgus start
-//	int PlanAttack();
-	int PlanAttack(int z = 0);
-	//Wyrmgus end
+	int PlanAttack();
 
 	void ReturnToHome();
 	//Wyrmgus start

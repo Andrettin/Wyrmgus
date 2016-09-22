@@ -1229,7 +1229,10 @@ bool PointToPointMissile(Missile &missile)
 			return true;
 		}
 		if (missile.Type->MissileStopFlags) {
-			if (!Map.Info.IsPointOnMap(tilePos)) { // gone outside
+			//Wyrmgus start
+//			if (!Map.Info.IsPointOnMap(tilePos)) { // gone outside
+			if (!Map.Info.IsPointOnMap(tilePos, missile.MapLayer)) { // gone outside
+			//Wyrmgus end
 				missile.TTL = 0;
 				return false;
 			}
@@ -1444,7 +1447,10 @@ void Missile::MissileHit(CUnit *unit)
 
 	const Vec2i pos = Map.MapPixelPosToTilePos(pixelPos);
 
-	if (!Map.Info.IsPointOnMap(pos)) {
+	//Wyrmgus start
+//	if (!Map.Info.IsPointOnMap(pos)) {
+	if (!Map.Info.IsPointOnMap(pos, this->MapLayer)) {
+	//Wyrmgus end
 		// FIXME: this should handled by caller?
 		DebugPrint("Missile gone outside of map!\n");
 		return;  // outside the map.
@@ -1582,7 +1588,10 @@ void Missile::MissileHit(CUnit *unit)
 		for (int j = mtype.Range * 2; --j;) {
 			const Vec2i posIt(posmin.x + i, posmin.y + j);
 
-			if (Map.Info.IsPointOnMap(posIt)) {
+			//Wyrmgus start
+//			if (Map.Info.IsPointOnMap(posIt)) {
+			if (Map.Info.IsPointOnMap(posIt, this->MapLayer)) {
+			//Wyrmgus end
 				int d = Distance(pos, posIt);
 				d *= mtype.SplashFactor;
 				if (d == 0) {

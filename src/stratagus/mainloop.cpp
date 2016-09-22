@@ -749,7 +749,7 @@ void GameMainLoop()
 		if (!IsNetworkGame() && ThisPlayer && CurrentCustomHero != NULL) {
 			Vec2i resPos;
 			FindNearestDrop(*CurrentCustomHero->Type, ThisPlayer->StartPos, resPos, LookingW, ThisPlayer->StartMapLayer);
-			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer);
+			CUnit *custom_hero = MakeUnitAndPlace(resPos, *CurrentCustomHero->Type, ThisPlayer, ThisPlayer->StartMapLayer);
 			custom_hero->SetCharacter(CurrentCustomHero->GetFullName(), true);	
 		}
 		
