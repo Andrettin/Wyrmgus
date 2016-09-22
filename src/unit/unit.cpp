@@ -772,7 +772,10 @@ void CUnit::HealingItemAutoUse()
 		}
 		
 		if (uins->Variable[HITPOINTHEALING_INDEX].Value > 0) {
-			if (uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableMax) - this->Variable[HP_INDEX].Value)) {
+			if (
+				uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableMax) - this->Variable[HP_INDEX].Value)
+				|| (this->Variable[HP_INDEX].Value * 100 / this->GetModifiedVariable(HP_INDEX, VariableMax)) <= 10
+			) {
 				if (!this->CriticalOrder) {
 					this->CriticalOrder = COrder::NewActionUse(*uins);
 				}
