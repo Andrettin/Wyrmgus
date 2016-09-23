@@ -114,9 +114,6 @@ std::string PlayerFaction;
 
 unsigned long GameCycle;             /// Game simulation cycle counter
 unsigned long FastForwardCycle;      /// Cycle to fastforward to in a replay
-//Wyrmgus start
-int GameTimeOfDay;					/// which time of the day the game is in (dusk, night, etc.)
-//Wyrmgus end
 
 bool UseHPForXp = false;              /// true if gain XP by dealing damage, false if by killing.
 
@@ -1720,13 +1717,6 @@ void CreateGame(const std::string &filename, CMap *map, bool is_mod)
 
 	GameCycle = 0;
 	FastForwardCycle = 0;
-	//Wyrmgus start
-	if (!GameSettings.Inside && Editor.Running == EditorNotRunning && !GameSettings.NoTimeOfDay) {
-		GameTimeOfDay = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
-	} else {
-		GameTimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
-	}
-	//Wyrmgus end
 	SyncHash = 0;
 	InitSyncRand();
 

@@ -391,11 +391,11 @@ static bool SeekShelter(CUnit &unit)
 		seek_shelter = true;
 	}
 	if (unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value > 0 || unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value < 0) { // if the unit can see better at night than during the day, then it is a nocturnal creature
-		if (GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) { // nocturnal creatures should seek shelter if daylight is shining
+		if (Map.TimeOfDay[unit.MapLayer] == MorningTimeOfDay || Map.TimeOfDay[unit.MapLayer] == MiddayTimeOfDay || Map.TimeOfDay[unit.MapLayer] == AfternoonTimeOfDay) { // nocturnal creatures should seek shelter if daylight is shining
 			seek_shelter = true;
 		}
 	} else { // for diurnal creatures, seek shelter when the sky is dark
-		if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
+		if (Map.TimeOfDay[unit.MapLayer] == FirstWatchTimeOfDay || Map.TimeOfDay[unit.MapLayer] == MidnightTimeOfDay || Map.TimeOfDay[unit.MapLayer] == SecondWatchTimeOfDay) {
 			seek_shelter = true;
 		}
 	}

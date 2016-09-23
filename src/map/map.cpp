@@ -798,6 +798,11 @@ void ChangeCurrentMapLayer(int z)
 	UI.Minimap.UpdateCache = true;
 	UI.SelectedViewport->Set(new_viewport_map_pos, PixelTileSize / 2);
 }
+
+void SetTimeOfDay(int time_of_day, int z)
+{
+	Map.TimeOfDay[z] = time_of_day;
+}
 //Wyrmgus end
 
 /**
@@ -845,6 +850,12 @@ void CMap::Create()
 	this->Fields.push_back(new CMapField[this->Info.MapWidth * this->Info.MapHeight]);
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
+	this->TimeOfDaySeconds.push_back(DefaultTimeOfDaySeconds);
+	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
+		this->TimeOfDay.push_back(SyncRand(MaxTimesOfDay - 1) + 1); // begin at a random time of day
+	} else {
+		this->TimeOfDay.push_back(NoTimeOfDay); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
+	}
 	//Wyrmgus end
 }
 
@@ -872,6 +883,8 @@ void CMap::Clean()
 		delete[] this->Fields[z];
 	}
 	this->Fields.clear();
+	this->TimeOfDaySeconds.clear();
+	this->TimeOfDay.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?
@@ -928,6 +941,11 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"extra-map-layers\", {\n");
 	for (size_t z = 1; z < this->Fields.size(); ++z) {
 		file.printf("  {%d, %d},\n", this->Info.MapWidths[z], this->Info.MapHeights[z]);
+	}
+	file.printf("  },\n");
+	file.printf("  \"time-of-day\", {\n");
+	for (size_t z = 0; z < this->TimeOfDaySeconds.size(); ++z) {
+		file.printf("  {%d, %d},\n", this->TimeOfDaySeconds[z], this->TimeOfDay[z]);
 	}
 	file.printf("  },\n");
 	//Wyrmgus end

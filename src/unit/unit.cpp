@@ -2413,9 +2413,9 @@ void UpdateUnitSightRange(CUnit &unit)
 	// FIXME : these values must be configurable.
 	//Wyrmgus start
 	int unit_sight_range = unit.Variable[SIGHTRANGE_INDEX].Max;
-	if (GameTimeOfDay == MorningTimeOfDay || GameTimeOfDay == MiddayTimeOfDay || GameTimeOfDay == AfternoonTimeOfDay) {
+	if (Map.TimeOfDay[unit.MapLayer] == MorningTimeOfDay || Map.TimeOfDay[unit.MapLayer] == MiddayTimeOfDay || Map.TimeOfDay[unit.MapLayer] == AfternoonTimeOfDay) {
 		unit_sight_range += unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value;
-	} else if (GameTimeOfDay == FirstWatchTimeOfDay || GameTimeOfDay == MidnightTimeOfDay || GameTimeOfDay == SecondWatchTimeOfDay) {
+	} else if (Map.TimeOfDay[unit.MapLayer] == FirstWatchTimeOfDay || Map.TimeOfDay[unit.MapLayer] == MidnightTimeOfDay || Map.TimeOfDay[unit.MapLayer] == SecondWatchTimeOfDay) {
 		unit_sight_range += unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value;
 	}
 	unit_sight_range = std::max<int>(1, unit_sight_range);
@@ -2760,6 +2760,10 @@ void CUnit::XPChanged()
 static void UnitInXY(CUnit &unit, const Vec2i &pos, int z)
 //Wyrmgus end
 {
+	//Wyrmgus start
+	int old_z = unit.MapLayer;
+	//Wyrmgus end
+	
 	CUnit *unit_inside = unit.UnitInside;
 
 	unit.tilePos = pos;
@@ -2767,6 +2771,10 @@ static void UnitInXY(CUnit &unit, const Vec2i &pos, int z)
 //	unit.Offset = Map.getIndex(pos);
 	unit.Offset = Map.getIndex(pos, z);
 	unit.MapLayer = z;
+	
+	if (!SaveGameLoading && old_z != z) {
+		UpdateUnitSightRange(unit);
+	}
 	//Wyrmgus end
 
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {

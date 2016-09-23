@@ -488,7 +488,7 @@ static void GameLogicLoop()
 #ifdef USE_OAML
 	if (enableOAML && oaml) {
 		// Time of day can change our main music loop, if the current playing track is set for this
-		SetMusicCondition(OAML_CONDID_MAIN_LOOP, GameTimeOfDay);
+		SetMusicCondition(OAML_CONDID_MAIN_LOOP, Map.TimeOfDay[CurrentMapLayer]);
 	}
 #endif
 
@@ -559,31 +559,33 @@ static void GameLogicLoop()
 		//Wyrmgus end
 		
 		//Wyrmgus start
-		if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * 10 * 3) == 0) { // every 10 seconds of gameplay = 1 hour for time of day calculations, change time of day every three hours
-			if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) { // only change the time of the day if outdoors
-				GameTimeOfDay += 1;
-				if (GameTimeOfDay == MaxTimesOfDay) {
-					GameTimeOfDay = 1;
-				}
-			} else {
+		for (size_t z = 0; z < Map.Fields.size(); ++z) {
+			if (GameSettings.Inside || GameSettings.NoTimeOfDay || !Map.TimeOfDaySeconds[z]) {
 				// indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
-				GameTimeOfDay = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day"
+				Map.TimeOfDay[z] = NoTimeOfDay; // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day"
+				continue;
 			}
+			if (GameCycle > 0 && GameCycle % (CYCLES_PER_SECOND * Map.TimeOfDaySeconds[z]) == 0) { 
+				Map.TimeOfDay[z] += 1;
+				if (Map.TimeOfDay[z] == MaxTimesOfDay) {
+					Map.TimeOfDay[z] = 1;
+				}
 
 #ifdef USE_OAML
-			if (enableOAML && oaml) {
-				// Time of day can change our main music loop, if the current playing track is set for this
-				SetMusicCondition(OAML_CONDID_MAIN_LOOP, GameTimeOfDay);
-			}
+				if (enableOAML && oaml && z == CurrentMapLayer) {
+					// Time of day can change our main music loop, if the current playing track is set for this
+					SetMusicCondition(OAML_CONDID_MAIN_LOOP, Map.TimeOfDay[z]);
+				}
 #endif
 
-			//update the sight of all units
-			for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-				CUnit *unit = *it;
-				if (unit && !unit->Destroyed) {
-					MapUnmarkUnitSight(*unit);
-					UpdateUnitSightRange(*unit);
-					MapMarkUnitSight(*unit);
+				//update the sight of all units
+				for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+					CUnit *unit = *it;
+					if (unit && !unit->Destroyed && unit->MapLayer == z) {
+						MapUnmarkUnitSight(*unit);
+						UpdateUnitSightRange(*unit);
+						MapMarkUnitSight(*unit);
+					}
 				}
 			}
 		}
@@ -778,9 +780,6 @@ void GameMainLoop()
 	EndReplayLog();
 
 	GameCycle = 0;//????
-	//Wyrmgus start
-	GameTimeOfDay = NoTimeOfDay;
-	//Wyrmgus end
 	CParticleManager::exit();
 	FlagRevealMap = 0;
 	ReplayRevealMap = 0;

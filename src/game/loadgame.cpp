@@ -148,9 +148,6 @@ void InitModules()
 {
 	GameCycle = 0;
 	FastForwardCycle = 0;
-	//Wyrmgus start
-	GameTimeOfDay = NoTimeOfDay;
-	//Wyrmgus end
 	SyncHash = 0;
 
 	CallbackMusicOn();
@@ -280,9 +277,6 @@ void LoadGame(const std::string &filename)
 	PlaceUnits();
 
 	const unsigned long game_cycle = GameCycle;
-	//Wyrmgus start
-	const int game_time_of_day = GameTimeOfDay;
-	//Wyrmgus end
 	const unsigned syncrand = SyncRandSeed;
 	const unsigned synchash = SyncHash;
 
@@ -290,9 +284,6 @@ void LoadGame(const std::string &filename)
 	LoadModules();
 
 	GameCycle = game_cycle;
-	//Wyrmgus start
-	GameTimeOfDay = game_time_of_day;
-	//Wyrmgus end
 	SyncRandSeed = syncrand;
 	SyncHash = synchash;
 	SelectionChanged();

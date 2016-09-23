@@ -875,7 +875,7 @@ void DrawResources()
 **  Draw the day time.
 */
 void DrawDayTime() {
-	if (GameTimeOfDay == NoTimeOfDay || GameTimeOfDay >= MaxTimesOfDay) {
+	if (Map.TimeOfDay[CurrentMapLayer] == NoTimeOfDay || Map.TimeOfDay[CurrentMapLayer] >= MaxTimesOfDay) {
 		return;
 	}
 
@@ -893,7 +893,7 @@ void DrawDayTime() {
 	CLabel label(GetGameFont());
 
 	// TODO: Instead of a simple text here we could use an icon per time of day
-	label.Draw(UI.TimePanel.X, UI.TimePanel.Y, timesText[GameTimeOfDay]);
+	label.Draw(UI.TimePanel.X, UI.TimePanel.Y, timesText[Map.TimeOfDay[CurrentMapLayer]]);
 }
 
 /*----------------------------------------------------------------------------

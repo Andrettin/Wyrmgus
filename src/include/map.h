@@ -118,6 +118,7 @@ class CUniqueItem;
 //#define MaxMapHeight 256  /// max map height supported
 #define MaxMapWidth  512  /// max map width supported
 #define MaxMapHeight 512  /// max map height supported
+#define DefaultTimeOfDaySeconds (10 * 3) // every 10 seconds of gameplay = 1 hour for time of day calculations, change time of day every three hours
 //Wyrmgus end
 
 //Wyrmgus start
@@ -138,7 +139,7 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0),
+		Width(0), Height(0), TimeOfDaySeconds(DefaultTimeOfDaySeconds),
 		MainTemplate(NULL), BaseTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
@@ -154,6 +155,7 @@ public:
 	std::string OverlayTerrainFile;
 	int Width;
 	int Height;
+	int TimeOfDaySeconds;
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CTerrainType *BaseTerrain;
 	CTerrainType *SurroundingTerrain;
@@ -445,6 +447,8 @@ public:
 	static CGraphic *FogGraphic;      /// graphic for fog of war
 	//Wyrmgus start
 	CGraphic *SolidTileGraphics[16];   /// separate graphics for solid tiles
+	std::vector<int> TimeOfDaySeconds;		/// how many seconds it takes to change the time of day, for each map layer
+	std::vector<int> TimeOfDay;				/// the time of day for each map layer
 	std::map<int, std::vector<std::pair<Vec2i, Vec2i>>> SubtemplateAreas;
 	//Wyrmgus end
 
@@ -628,6 +632,7 @@ extern void PreprocessMap();
 
 //Wyrmgus start
 extern void ChangeCurrentMapLayer(int z);
+extern void SetTimeOfDay(int time_of_day, int z = 0);
 //Wyrmgus end
 
 // in unit.c

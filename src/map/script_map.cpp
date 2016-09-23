@@ -39,6 +39,9 @@
 
 #include "iolib.h"
 #include "script.h"
+//Wyrmgus start
+#include "settings.h"
+//Wyrmgus end
 #include "tileset.h"
 #include "translate.h"
 #include "ui.h"
@@ -130,6 +133,26 @@ static int CclStratagusMap(lua_State *l)
 						Map.Info.MapWidths.push_back(map_layer_width);
 						Map.Info.MapHeights.push_back(map_layer_height);
 						Map.Fields.push_back(new CMapField[map_layer_width * map_layer_height]);
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "time-of-day")) {
+					Map.TimeOfDaySeconds.clear();
+					Map.TimeOfDay.clear();
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int z = 0; z < subsubargs; ++z) {
+						lua_rawgeti(l, -1, z + 1);
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument");
+						}
+						int time_of_day_seconds = LuaToNumber(l, -1, 1);
+						int time_of_day = LuaToNumber(l, -1, 2);
+						Map.TimeOfDaySeconds.push_back(time_of_day_seconds);
+						Map.TimeOfDay.push_back(time_of_day);
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -679,8 +702,18 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		Map.Info.MapWidths.push_back(map_template->Width);
 		Map.Info.MapHeights.push_back(map_template->Height);
 		Map.Fields.push_back(new CMapField[map_template->Width * map_template->Height]);
+		Map.TimeOfDaySeconds.push_back(map_template->TimeOfDaySeconds);
+		Map.TimeOfDay.push_back(NoTimeOfDay);
+	} else {
+		if (!map_template->IsSubtemplateArea()) {
+			Map.TimeOfDaySeconds[z] = map_template->TimeOfDaySeconds;
+		}
 	}
 
+	if (map_template->TimeOfDaySeconds && !GameSettings.Inside && !GameSettings.NoTimeOfDay && !map_template->IsSubtemplateArea()) {
+		Map.TimeOfDay[z] = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
+	}
+	
 	Vec2i map_start_pos(map_start_x, map_start_y);
 	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_x + map_template->Width), std::min(Map.Info.MapHeights[z], map_start_y + map_template->Height));
 	if (!Map.Info.IsPointOnMap(map_start_pos, z)) {
@@ -1522,6 +1555,8 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->Width = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {
 			map->Height = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "TimeOfDaySeconds")) {
+			map->TimeOfDaySeconds = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MainTemplate")) {
 			CMapTemplate *main_template = GetMapTemplate(LuaToString(l, -1));
 			if (!main_template) {

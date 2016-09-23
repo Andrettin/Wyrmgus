@@ -27,6 +27,7 @@ extern CMap Map;
 
 //Wyrmgus start
 extern void ChangeCurrentMapLayer(int z);
+extern void SetTimeOfDay(int time_of_day, int z = 0);
 //void SetTile(int tile, int w, int h, int value = 0);
 void SetTile(int tile, int w, int h, int value = 0, int z = 0);
 void SetTileTerrain(std::string terrain_ident, int w, int h, int value = 0, int z = 0);

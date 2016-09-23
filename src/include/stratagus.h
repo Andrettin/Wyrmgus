@@ -194,9 +194,6 @@ extern std::string PlayerFaction;
 
 extern unsigned long GameCycle;             /// Game simulation cycle counter
 extern unsigned long FastForwardCycle;      /// Game Replay Fast Forward Counter
-//Wyrmgus start
-extern int GameTimeOfDay;					/// Current time of day
-//Wyrmgus end
 
 extern void Exit(int err);                  /// Exit
 extern void ExitFatal(int err);             /// Exit with fatal error
