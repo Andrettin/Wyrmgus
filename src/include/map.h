@@ -107,6 +107,8 @@ class CUnitType;
 //Wyrmgus start
 class CFaction;
 class CUniqueItem;
+class CWorld;
+class CPlane;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -140,7 +142,7 @@ class CMapTemplate
 public:
 	CMapTemplate() :
 		Width(0), Height(0), TimeOfDaySeconds(DefaultTimeOfDaySeconds),
-		MainTemplate(NULL), BaseTerrain(NULL), SurroundingTerrain(NULL)
+		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
 
@@ -157,6 +159,8 @@ public:
 	int Height;
 	int TimeOfDaySeconds;
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
+	CPlane *Plane;
+	CWorld *World;
 	CTerrainType *BaseTerrain;
 	CTerrainType *SurroundingTerrain;
 	std::vector<CMapTemplate *> Subtemplates;

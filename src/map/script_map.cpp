@@ -38,6 +38,9 @@
 #include "map.h"
 
 #include "iolib.h"
+//Wyrmgus start
+#include "province.h"
+//Wyrmgus end
 #include "script.h"
 //Wyrmgus start
 #include "settings.h"
@@ -1547,6 +1550,18 @@ static int CclDefineMapTemplate(lua_State *l)
 		
 		if (!strcmp(value, "Name")) {
 			map->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Plane")) {
+			CPlane *plane = GetPlane(LuaToString(l, -1));
+			if (!plane) {
+				LuaError(l, "Plane doesn't exist.");
+			}
+			map->Plane = plane;
+		} else if (!strcmp(value, "World")) {
+			CWorld *world = GetWorld(LuaToString(l, -1));
+			if (!world) {
+				LuaError(l, "World doesn't exist.");
+			}
+			map->World = world;
 		} else if (!strcmp(value, "TerrainFile")) {
 			map->TerrainFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainFile")) {
