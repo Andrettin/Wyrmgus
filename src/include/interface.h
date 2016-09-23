@@ -415,7 +415,7 @@ extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 /// Set message to display with event point
 //Wyrmgus start
 //extern void SetMessageEvent(const Vec2i &pos, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(2, 3);
-extern void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(2, 3);
+extern void SetMessageEvent(const Vec2i &pos, int z, const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(3, 4);
 //Wyrmgus end
 //Wyrmgus start
 /// Set objective to display
