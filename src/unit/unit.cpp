@@ -470,6 +470,7 @@ void CUnit::Init()
 	Unique = NULL;
 	Bound = false;
 	Identified = true;
+	ConnectingDestination = NULL;
 	//Wyrmgus end
 	CurrentSightRange = 0;
 
@@ -595,6 +596,7 @@ void CUnit::Release(bool final)
 	Unique = NULL;
 	Bound = false;
 	Identified = true;
+	ConnectingDestination = NULL;
 	
 	for (int i = 0; i < MaxItemSlots; ++i) {
 		EquippedItems[i].clear();
@@ -4766,6 +4768,10 @@ bool CUnit::CanEquipItemClass(int item_class) const
 
 bool CUnit::CanUseItem(CUnit *item) const
 {
+	if (item->ConnectingDestination != NULL && (this->Player == item->Player || this->Player->IsAllied(*item->Player) || item->Player->Type == PlayerNeutral)) {
+		return true;
+	}
+	
 	if (!item->Type->BoolFlag[ITEM_INDEX].value && !item->Type->BoolFlag[POWERUP_INDEX].value) {
 		return false;
 	}

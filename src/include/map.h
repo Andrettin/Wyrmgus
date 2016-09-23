@@ -141,7 +141,7 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0), TimeOfDaySeconds(DefaultTimeOfDaySeconds),
+		Width(0), Height(0), TimeOfDaySeconds(DefaultTimeOfDaySeconds), Layer(0),
 		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
@@ -158,6 +158,7 @@ public:
 	int Width;
 	int Height;
 	int TimeOfDaySeconds;
+	int Layer;													/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CPlane *Plane;
 	CWorld *World;
@@ -171,8 +172,11 @@ public:
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
 	std::vector<CTerrainType *> TileTerrains;
 	std::vector<CTerrainType *> TileOverlayTerrains;
-	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources, mapped to the tile position
+	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, int, int>> Units; /// Units; first value is the tile position, and the last ones are start year and end year
+	std::vector<std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
+	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> LayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
 };
 //Wyrmgus end
@@ -453,6 +457,10 @@ public:
 	CGraphic *SolidTileGraphics[16];   /// separate graphics for solid tiles
 	std::vector<int> TimeOfDaySeconds;		/// how many seconds it takes to change the time of day, for each map layer
 	std::vector<int> TimeOfDay;				/// the time of day for each map layer
+	std::vector<CPlane *> Planes;			/// the plane pointer (if any) for each map layer
+	std::vector<CWorld *> Worlds;			/// the world pointer (if any) for each map layer
+	std::vector<int> Layers;				/// the surface layer (if any) for each map layer
+	std::vector<std::vector<CUnit *>> LayerConnectors;	/// connectors in a layer that lead to other layers
 	std::map<int, std::vector<std::pair<Vec2i, Vec2i>>> SubtemplateAreas;
 	//Wyrmgus end
 

@@ -37,6 +37,9 @@
 
 #include "map.h"
 
+//Wyrmgus start
+#include "game.h"
+//Wyrmgus end
 #include "iolib.h"
 //Wyrmgus start
 #include "province.h"
@@ -85,7 +88,10 @@ static int CclStratagusMap(lua_State *l)
 			Map.Info.Description = LuaToString(l, j + 1);
 		} else if (!strcmp(value, "the-map")) {
 			if (!lua_istable(l, j + 1)) {
-				LuaError(l, "incorrect argument");
+				//Wyrmgus start
+//				LuaError(l, "incorrect argument");
+				LuaError(l, "incorrect argument for \"the-map\"");
+				//Wyrmgus end
 			}
 			int subargs = lua_rawlen(l, j + 1);
 			for (int k = 0; k < subargs; ++k) {
@@ -123,7 +129,7 @@ static int CclStratagusMap(lua_State *l)
 				} else if (!strcmp(value, "extra-map-layers")) {
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
+						LuaError(l, "incorrect argument for \"extra-map-layers\"");
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					for (int z = 0; z < subsubargs; ++z) {
@@ -144,18 +150,39 @@ static int CclStratagusMap(lua_State *l)
 					Map.TimeOfDay.clear();
 					lua_rawgeti(l, j + 1, k + 1);
 					if (!lua_istable(l, -1)) {
-						LuaError(l, "incorrect argument");
+						LuaError(l, "incorrect argument for \"time-of-day\"");
 					}
 					const int subsubargs = lua_rawlen(l, -1);
 					for (int z = 0; z < subsubargs; ++z) {
-						lua_rawgeti(l, -1, z + 1);
 						if (!lua_istable(l, -1)) {
-							LuaError(l, "incorrect argument");
+							LuaError(l, "incorrect argument for \"time-of-day\"");
 						}
+						lua_rawgeti(l, -1, z + 1);
 						int time_of_day_seconds = LuaToNumber(l, -1, 1);
 						int time_of_day = LuaToNumber(l, -1, 2);
 						Map.TimeOfDaySeconds.push_back(time_of_day_seconds);
 						Map.TimeOfDay.push_back(time_of_day);
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "layer-references")) {
+					Map.Planes.clear();
+					Map.Worlds.clear();
+					Map.Layers.clear();
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument for \"layer-references\"");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int z = 0; z < subsubargs; ++z) {
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument for \"layer-references\"");
+						}
+						lua_rawgeti(l, -1, z + 1);
+						Map.Planes.push_back(GetPlane(LuaToString(l, -1, 1)));
+						Map.Worlds.push_back(GetWorld(LuaToString(l, -1, 2)));
+						Map.Layers.push_back(LuaToNumber(l, -1, 3));
+						Map.LayerConnectors.resize(z + 1);
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
@@ -686,8 +713,58 @@ static int CclSetMapTemplateUnit(lua_State *l)
 	return 1;
 }
 
+static int CclSetMapTemplateLayerConnector(lua_State *l)
+{
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template doesn't exist.\n");
+	}
+
+	lua_pushvalue(l, 2);
+	CUnitType *unittype = CclGetUnitType(l);
+	if (unittype == NULL) {
+		LuaError(l, "Bad unittype");
+	}
+	lua_pop(l, 1);
+	Vec2i ipos;
+	CclGetPos(l, &ipos.x, &ipos.y, 3);
+
+	CUniqueItem *unique = NULL;
+	
+	const int nargs = lua_gettop(l);
+	if (nargs >= 5) {
+		unique = GetUniqueItem(LuaToString(l, 5));
+		if (!unique) {
+			LuaError(l, "Unique item doesn't exist.\n");
+		}
+	}
+	
+	if (lua_isstring(l, 4)) {
+		std::string realm = LuaToString(l, 4);
+		if (GetWorld(realm)) {
+			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>(ipos, unittype, GetWorld(realm), unique));
+		} else if (GetPlane(realm)) {
+			map_template->PlaneConnectors.push_back(std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>(ipos, unittype, GetPlane(realm), unique));
+		} else {
+			LuaError(l, "incorrect argument");
+		}
+	} else if (lua_isnumber(l, 4)) {
+		int layer = LuaToNumber(l, 4);
+		map_template->LayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
+	} else {
+		LuaError(l, "incorrect argument");
+	}
+	
+	return 1;
+}
+
 void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int template_start_y, int map_start_x, int map_start_y, int z)
 {
+	if (SaveGameLoading) {
+		return;
+	}
+	
 	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
 	
 	if (!map_template) {
@@ -707,9 +784,16 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		Map.Fields.push_back(new CMapField[map_template->Width * map_template->Height]);
 		Map.TimeOfDaySeconds.push_back(map_template->TimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
+		Map.Planes.push_back(map_template->Plane);
+		Map.Worlds.push_back(map_template->World);
+		Map.Layers.push_back(map_template->Layer);
+		Map.LayerConnectors.resize(z + 1);
 	} else {
 		if (!map_template->IsSubtemplateArea()) {
 			Map.TimeOfDaySeconds[z] = map_template->TimeOfDaySeconds;
+			Map.Planes[z] = map_template->Plane;
+			Map.Worlds[z] = map_template->World;
+			Map.Layers[z] = map_template->Layer;
 		}
 	}
 
@@ -877,6 +961,96 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		
 		if (std::get<2>(iterator->second)) {
 			unit->SetUnique(std::get<2>(iterator->second));
+		}
+	}
+
+	for (size_t i = 0; i < map_template->PlaneConnectors.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(map_template->PlaneConnectors[i]));
+		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) { // if the unit's coordinates were set to {-1, -1}, then randomly generate its location
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(map_template->PlaneConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
+		}
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		Vec2i unit_offset((std::get<1>(map_template->PlaneConnectors[i])->TileWidth - 1) / 2, (std::get<1>(map_template->PlaneConnectors[i])->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(map_template->PlaneConnectors[i]), &Players[PlayerNumNeutral], z);
+		Map.LayerConnectors[z].push_back(unit);
+		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+			bool found_other_connector = false;
+			if (Map.Planes[second_z] == std::get<2>(map_template->PlaneConnectors[i])) {
+				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
+					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
+						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+						found_other_connector = true;
+						break;
+					}
+				}
+			}
+			if (found_other_connector) {
+				break;
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < map_template->WorldConnectors.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(map_template->WorldConnectors[i]));
+		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) { // if the unit's coordinates were set to {-1, -1}, then randomly generate its location
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(map_template->WorldConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
+		}
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		Vec2i unit_offset((std::get<1>(map_template->WorldConnectors[i])->TileWidth - 1) / 2, (std::get<1>(map_template->WorldConnectors[i])->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(map_template->WorldConnectors[i]), &Players[PlayerNumNeutral], z);
+		Map.LayerConnectors[z].push_back(unit);
+		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+			bool found_other_connector = false;
+			if (Map.Worlds[second_z] == std::get<2>(map_template->WorldConnectors[i])) {
+				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
+					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
+						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+						found_other_connector = true;
+						break;
+					}
+				}
+			}
+			if (found_other_connector) {
+				break;
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < map_template->LayerConnectors.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(map_template->LayerConnectors[i]));
+		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		if (unit_raw_pos.x == -1 && unit_raw_pos.y == -1) { // if the unit's coordinates were set to {-1, -1}, then randomly generate its location
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(map_template->LayerConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
+		}
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		Vec2i unit_offset((std::get<1>(map_template->LayerConnectors[i])->TileWidth - 1) / 2, (std::get<1>(map_template->LayerConnectors[i])->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(map_template->LayerConnectors[i]), &Players[PlayerNumNeutral], z);
+		Map.LayerConnectors[z].push_back(unit);
+		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+			bool found_other_connector = false;
+			if (Map.Layers[second_z] == std::get<2>(map_template->LayerConnectors[i])) {
+				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
+					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
+						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+						found_other_connector = true;
+						break;
+					}
+				}
+			}
+			if (found_other_connector) {
+				break;
+			}
 		}
 	}
 	
@@ -1740,6 +1914,7 @@ void MapCclRegister()
 	lua_register(Lua, "SetMapTemplateTileLabel", CclSetMapTemplateTileLabel);
 	lua_register(Lua, "SetMapTemplateResource", CclSetMapTemplateResource);
 	lua_register(Lua, "SetMapTemplateUnit", CclSetMapTemplateUnit);
+	lua_register(Lua, "SetMapTemplateLayerConnector", CclSetMapTemplateLayerConnector);
 	//Wyrmgus end
 }
 

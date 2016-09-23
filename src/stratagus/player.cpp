@@ -893,7 +893,7 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
 	//Wyrmgus start
-	file.printf("\",\n  \"start-map-layer\", %d,\n", p.StartMapLayer);
+	file.printf("  \"start-map-layer\", %d,\n", p.StartMapLayer);
 	//Wyrmgus end
 
 	// Resources

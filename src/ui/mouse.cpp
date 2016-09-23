@@ -406,6 +406,17 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 		SendCommandPickUp(unit, *dest, flush);
 		return true;
 	}
+	
+	// Go through a connector
+	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && unit.CanUseItem(dest)) {
+		dest->Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandUse(unit, *dest, flush);
+		return true;
+	}
 	//Wyrmgus end
 	// Follow another unit
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
@@ -501,6 +512,17 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			acknowledged = 1;
 		}
 		SendCommandPickUp(unit, dest, flush);
+		return true;
+	}
+	
+	// Go through a connector
+	if (&dest != &unit && unit.CanUseItem(&dest)) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandUse(unit, dest, flush);
 		return true;
 	}
 	//Wyrmgus end
@@ -604,6 +626,17 @@ static bool DoRightButton_Follow(CUnit &unit, CUnit &dest, int flush, int &ackno
 			acknowledged = 1;
 		}
 		SendCommandPickUp(unit, dest, flush);
+		return true;
+	}
+	
+	// Go through a connector
+	if (unit.CanUseItem(&dest)) {
+		dest.Blink = 4;
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		SendCommandUse(unit, dest, flush);
 		return true;
 	}
 	//Wyrmgus end

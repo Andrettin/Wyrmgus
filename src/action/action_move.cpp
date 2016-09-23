@@ -87,9 +87,10 @@
 		file.printf(" \"finished\", ");
 	}
 	file.printf(" \"range\", %d,", this->Range);
-	file.printf(" \"tile\", {%d, %d}", this->goalPos.x, this->goalPos.y);
 	//Wyrmgus start
-	file.printf(" \"map-layer\", %d,", this->MapLayer);
+//	file.printf(" \"tile\", {%d, %d}", this->goalPos.x, this->goalPos.y);
+	file.printf(" \"tile\", {%d, %d},", this->goalPos.x, this->goalPos.y);
+	file.printf(" \"map-layer\", %d", this->MapLayer);
 	//Wyrmgus end
 
 	file.printf("}");

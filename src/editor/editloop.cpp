@@ -2516,6 +2516,10 @@ void CEditor::Init()
 		Map.Fields.push_back(new CMapField[Map.Info.MapWidth * Map.Info.MapHeight]);
 		Map.TimeOfDaySeconds.push_back(DefaultTimeOfDaySeconds);
 		Map.TimeOfDay.push_back(NoTimeOfDay);
+		Map.Planes.push_back(NULL);
+		Map.Worlds.push_back(NULL);
+		Map.Layers.push_back(0);
+		Map.LayerConnectors.resize(1);
 		//Wyrmgus end
 
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();

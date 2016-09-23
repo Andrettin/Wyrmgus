@@ -47,6 +47,7 @@
 //Wyrmgus end
 #include "player.h"
 //Wyrmgus start
+#include "province.h"
 #include "settings.h"
 //Wyrmgus end
 #include "tileset.h"
@@ -788,7 +789,7 @@ void PreprocessMap()
 //Wyrmgus start
 void ChangeCurrentMapLayer(int z)
 {
-	if (z < 0 || z >= (int) Map.Fields.size()) {
+	if (z < 0 || z >= (int) Map.Fields.size() || CurrentMapLayer == z) {
 		return;
 	}
 	
@@ -856,6 +857,10 @@ void CMap::Create()
 	} else {
 		this->TimeOfDay.push_back(NoTimeOfDay); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
 	}
+	this->Planes.push_back(NULL);
+	this->Worlds.push_back(NULL);
+	this->Layers.push_back(0);
+	this->LayerConnectors.resize(1);
 	//Wyrmgus end
 }
 
@@ -885,6 +890,10 @@ void CMap::Clean()
 	this->Fields.clear();
 	this->TimeOfDaySeconds.clear();
 	this->TimeOfDay.clear();
+	this->Planes.clear();
+	this->Worlds.clear();
+	this->Layers.clear();
+	this->LayerConnectors.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?
@@ -946,6 +955,11 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"time-of-day\", {\n");
 	for (size_t z = 0; z < this->TimeOfDaySeconds.size(); ++z) {
 		file.printf("  {%d, %d},\n", this->TimeOfDaySeconds[z], this->TimeOfDay[z]);
+	}
+	file.printf("  },\n");
+	file.printf("  \"layer-references\", {\n");
+	for (size_t z = 0; z < this->Fields.size(); ++z) {
+		file.printf("  {\"%s\", \"%s\", %d},\n", this->Planes[z] ? this->Planes[z]->Name.c_str() : "", this->Worlds[z] ? this->Worlds[z]->Name.c_str() : "", this->Layers[z]);
 	}
 	file.printf("  },\n");
 	//Wyrmgus end

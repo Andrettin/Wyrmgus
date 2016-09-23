@@ -100,9 +100,10 @@
 	if (this->WaitingCycle != 0) {
 		file.printf(" \"waiting-cycle\", %d,", this->WaitingCycle);
 	}
-	file.printf(" \"patrol\", {%d, %d}", this->WayPoint.x, this->WayPoint.y);
 	//Wyrmgus start
-	file.printf(" \"patrol-map-layer\", %d,", this->WayPointMapLayer);
+//	file.printf(" \"patrol\", {%d, %d}", this->WayPoint.x, this->WayPoint.y);
+	file.printf(" \"patrol\", {%d, %d},", this->WayPoint.x, this->WayPoint.y);
+	file.printf(" \"patrol-map-layer\", %d", this->WayPointMapLayer);
 	//Wyrmgus end
 	file.printf("}");
 }

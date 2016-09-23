@@ -209,7 +209,7 @@ enum {
 			return ;
 		}
 
-		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value)) {
+		if (goal && (goal->Type->BoolFlag[ITEM_INDEX].value || goal->Type->BoolFlag[POWERUP_INDEX].value || goal->ConnectingDestination != NULL)) {
 			std::string goal_name = goal->GetMessageName();
 			if (!goal->Unique) {
 				goal_name = "the " + goal_name;
@@ -221,7 +221,16 @@ enum {
 					unit.DeequipItem(*goal);
 				}
 			} else if (unit.CanUseItem(goal)) {
-				if (goal->Spell != NULL) {
+				if (goal->ConnectingDestination != NULL) {
+					SaveSelection();
+					unit.Remove(NULL);
+					DropOutOnSide(unit, unit.Direction, goal->ConnectingDestination);
+					RestoreSelection();
+					if (unit.Player == ThisPlayer && Selected.size() > 0 && &unit == Selected[0]) {
+						ChangeCurrentMapLayer(unit.MapLayer);
+						UI.SelectedViewport->Center(unit.GetMapPixelPosCenter());
+					}
+				} else if (goal->Spell != NULL) {
 					CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands, unit.MapLayer);
 				} else if (goal->Work != NULL) {
 					unit.ReadWork(goal->Work);

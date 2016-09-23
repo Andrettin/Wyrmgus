@@ -473,6 +473,7 @@ public:
 	CUniqueItem *Unique;		/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified
+	CUnit *ConnectingDestination;	/// Which connector this unit connects to (if any)
 	std::map<int, CIcon *> ButtonIcons;				/// icons for button actions
 	//Wyrmgus end
 	bool IndividualUpgrades[UpgradeMax];      /// individual upgrades which the unit has
