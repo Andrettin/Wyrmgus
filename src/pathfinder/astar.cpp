@@ -364,24 +364,30 @@ void FreeAStar()
 		AStarMatrix[z] = NULL;
 	}
 	AStarMatrix.clear();
+	AStarMatrixSize.clear();
+	Threshold.clear();
 	for (size_t z = 0; z < CloseSet.size(); ++z) {
 		delete[] CloseSet[z];
 		CloseSet[z] = NULL;
 	}
 	CloseSet.clear();
 	CloseSetSize.clear();
-	OpenSetMaxSize.clear();
 	for (size_t z = 0; z < OpenSet.size(); ++z) {
 		delete[] OpenSet[z];
 		OpenSet[z] = NULL;
 	}
 	OpenSet.clear();
 	OpenSetSize.clear();
+	OpenSetMaxSize.clear();
 	for (size_t z = 0; z < CostMoveToCache.size(); ++z) {
 		delete[] CostMoveToCache[z];
 		CostMoveToCache[z] = NULL;
 	}
 	CostMoveToCache.clear();
+	
+	for (int i = 0; i < 9; ++i) {
+		Heading2O[i].clear();
+	}
 	//Wyrmgus end
 
 	ProfilePrint();
