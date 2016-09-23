@@ -1296,6 +1296,10 @@ int AStarFindPath(const Vec2i &startPos, const Vec2i &goalPos, int gw, int gh,
 	//Wyrmgus start
 //	Assert(Map.Info.IsPointOnMap(startPos));
 	Assert(Map.Info.IsPointOnMap(startPos, z));
+	
+	if (unit.MapLayer != z) {
+		return PF_UNREACHABLE;
+	}
 	//Wyrmgus end
 
 	ProfileBegin("AStarFindPath");

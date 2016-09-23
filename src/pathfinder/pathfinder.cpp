@@ -206,7 +206,7 @@ int PlaceReachable(const CUnit &src, const Vec2i &goalPos, int w, int h, int min
 {
 	//Wyrmgus start
 	if (src.MapLayer != z) {
-		return false;
+		return 0;
 	}
 	//Wyrmgus end
 	

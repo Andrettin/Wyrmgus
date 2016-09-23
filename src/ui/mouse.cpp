@@ -740,12 +740,28 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	const CUnitType &type = *unit.Type;
 	const int action = type.MouseAction;
 	//  Right mouse with SHIFT appends command to old commands.
-	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus start
+//	const int flush = !(KeyModifiers & ModifierShift);
+	int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
 
 	//Wyrmgus start
 	if (action == MouseActionRallyPoint) {
 		SendCommandRallyPoint(unit, pos, CurrentMapLayer);
 		return;
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (unit.MapLayer != CurrentMapLayer) { // if the selected unit's map layer is different from the current map layer, instruct it to use a layer connector (if any) to get to the correct layer to be able to perform its order
+		for (size_t i = 0; i != Map.LayerConnectors[CurrentMapLayer].size(); ++i) {
+			CUnit *connector_destination = Map.LayerConnectors[CurrentMapLayer][i]->ConnectingDestination;
+			if (connector_destination->MapLayer == unit.MapLayer && unit.CanUseItem(connector_destination) && connector_destination->IsVisibleAsGoal(*ThisPlayer)) {
+				SendCommandUse(unit, *connector_destination, flush);
+				flush = 0;
+				break;
+			}
+		}
 	}
 	//Wyrmgus end
 	
@@ -1477,7 +1493,10 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 **
 **  @param tilePos  tile map position.
 */
-static int SendRepair(const Vec2i &tilePos)
+//Wyrmgus start
+//static int SendRepair(const Vec2i &tilePos)
+static int SendRepair(const Vec2i &tilePos, int flush)
+//Wyrmgus end
 {
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
@@ -1493,7 +1512,9 @@ static int SendRepair(const Vec2i &tilePos)
 			CUnit *unit = Selected[i];
 
 			if (unit->Type->RepairRange) {
-				const int flush = !(KeyModifiers & ModifierShift);
+				//Wyrmgus start
+//				const int flush = !(KeyModifiers & ModifierShift);
+				//Wyrmgus end
 
 				//Wyrmgus start
 //				SendCommandRepair(*unit, tilePos, dest, flush);
@@ -1516,11 +1537,16 @@ static int SendRepair(const Vec2i &tilePos)
 **  @todo To reduce the CPU load for pathfinder, we should check if
 **        the destination is reachable and handle nice group movements.
 */
-static int SendMove(const Vec2i &tilePos)
+//Wyrmgus start
+//static int SendMove(const Vec2i &tilePos)
+static int SendMove(const Vec2i &tilePos, int flush)
+//Wyrmgus end
 {
 	CUnit *goal = UnitUnderCursor;
 	int ret = 0;
-	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus start
+//	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
 
 	// Alt makes unit to defend goal
 	if (goal && (KeyModifiers & ModifierAlt)) {
@@ -1598,9 +1624,14 @@ static int SendMove(const Vec2i &tilePos)
 **
 **  @see Selected
 */
-static int SendAttack(const Vec2i &tilePos)
+//Wyrmgus start
+//static int SendAttack(const Vec2i &tilePos)
+static int SendAttack(const Vec2i &tilePos, int flush)
+//Wyrmgus end
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus start
+//	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
@@ -1639,9 +1670,14 @@ static int SendAttack(const Vec2i &tilePos)
 **
 **  @param tilePos  tile map position.
 */
-static int SendAttackGround(const Vec2i &tilePos)
+//Wyrmgus start
+//static int SendAttackGround(const Vec2i &tilePos)
+static int SendAttackGround(const Vec2i &tilePos, int flush)
+//Wyrmgus end
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus start
+//	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
 	int ret = 0;
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
@@ -1668,9 +1704,14 @@ static int SendAttackGround(const Vec2i &tilePos)
 **
 **  @param tilePos  tile map position.
 */
-static int SendPatrol(const Vec2i &tilePos)
+//Wyrmgus start
+//static int SendPatrol(const Vec2i &tilePos)
+static int SendPatrol(const Vec2i &tilePos, int flush)
+//Wyrmgus end
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus start
+//	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		CUnit &unit = *Selected[i];
@@ -1689,12 +1730,17 @@ static int SendPatrol(const Vec2i &tilePos)
 **
 **  @see Selected
 */
-static int SendResource(const Vec2i &pos)
+//Wyrmgus start
+//static int SendResource(const Vec2i &pos)
+static int SendResource(const Vec2i &pos, int flush)
+//Wyrmgus end
 {
 	int res;
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
-	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus start
+//	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
 	//Wyrmgus start
 //	const CMapField &mf = *Map.Field(pos);
 	const CMapField &mf = *Map.Field(pos, CurrentMapLayer);
@@ -1775,9 +1821,14 @@ static int SendResource(const Vec2i &pos)
 **
 **  @param tilePos  tile map position.
 */
-static int SendUnload(const Vec2i &tilePos)
+//Wyrmgus start
+//static int SendUnload(const Vec2i &tilePos)
+static int SendUnload(const Vec2i &tilePos, int flush)
+//Wyrmgus emd
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus start
+//	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
 
 	for (size_t i = 0; i != Selected.size(); ++i) {
 		// FIXME: not only transporter selected?
@@ -1800,9 +1851,14 @@ static int SendUnload(const Vec2i &tilePos)
 **
 **  @see Selected
 */
-static int SendSpellCast(const Vec2i &tilePos)
+//Wyrmgus start
+//static int SendSpellCast(const Vec2i &tilePos)
+static int SendSpellCast(const Vec2i &tilePos, int flush)
+//Wyrmgus end
 {
-	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus start
+//	const int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
 	CUnit *dest = UnitUnderCursor;
 	int ret = 0;
 
@@ -1874,30 +1930,76 @@ static void SendCommand(const Vec2i &tilePos)
 
 	CurrentButtonLevel = 0;
 	UI.ButtonPanel.Update();
+	
+	//Wyrmgus start
+	int flush = !(KeyModifiers & ModifierShift);
+	//Wyrmgus end
+	
+	if (CursorAction != ButtonRallyPoint) {
+		for (size_t i = 0; i != Selected.size(); ++i) {
+			CUnit &unit = *Selected[i];
+			if (unit.MapLayer != CurrentMapLayer) { // if the selected unit's map layer is different from the current map layer, instruct it to use a layer connector (if any) to get to the correct layer to be able to perform its order
+				for (size_t j = 0; j != Map.LayerConnectors[CurrentMapLayer].size(); ++j) {
+					CUnit *connector_destination = Map.LayerConnectors[CurrentMapLayer][j]->ConnectingDestination;
+					if (connector_destination->MapLayer == unit.MapLayer && unit.CanUseItem(connector_destination) && connector_destination->IsVisibleAsGoal(*ThisPlayer)) {
+						SendCommandUse(unit, *connector_destination, flush);
+						flush = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
+	//Wyrmgus end
+	
 	switch (CursorAction) {
 		case ButtonMove:
-			ret = SendMove(tilePos);
+			//Wyrmgus start
+//			ret = SendMove(tilePos);
+			ret = SendMove(tilePos, flush);
+			//Wyrmgus end
 			break;
 		case ButtonRepair:
-			ret = SendRepair(tilePos);
+			//Wyrmgus start
+//			ret = SendRepair(tilePos);
+			ret = SendRepair(tilePos, flush);
+			//Wyrmgus end
 			break;
 		case ButtonAttack:
-			ret = SendAttack(tilePos);
+			//Wyrmgus start
+//			ret = SendAttack(tilePos);
+			ret = SendAttack(tilePos, flush);
+			//Wyrmgus end
 			break;
 		case ButtonAttackGround:
-			ret = SendAttackGround(tilePos);
+			//Wyrmgus start
+//			ret = SendAttackGround(tilePos);
+			ret = SendAttackGround(tilePos, flush);
+			//Wyrmgus end
 			break;
 		case ButtonPatrol:
-			ret = SendPatrol(tilePos);
+			//Wyrmgus start
+//			ret = SendPatrol(tilePos);
+			ret = SendPatrol(tilePos, flush);
+			//Wyrmgus end
 			break;
 		case ButtonHarvest:
-			ret = SendResource(tilePos);
+			//Wyrmgus start
+//			ret = SendResource(tilePos);
+			ret = SendResource(tilePos, flush);
+			//Wyrmgus end
 			break;
 		case ButtonUnload:
-			ret = SendUnload(tilePos);
+			//Wyrmgus start
+//			ret = SendUnload(tilePos);
+			ret = SendUnload(tilePos, flush);
+			//Wyrmgus end
 			break;
 		case ButtonSpellCast:
-			ret = SendSpellCast(tilePos);
+			//Wyrmgus start
+//			ret = SendSpellCast(tilePos);
+			ret = SendSpellCast(tilePos, flush);
+			//Wyrmgus end
 			break;
 		//Wyrmgus start
 		case ButtonRallyPoint:

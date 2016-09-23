@@ -222,11 +222,12 @@ enum {
 				}
 			} else if (unit.CanUseItem(goal)) {
 				if (goal->ConnectingDestination != NULL) {
+					int old_z = unit.MapLayer;
 					SaveSelection();
 					unit.Remove(NULL);
 					DropOutOnSide(unit, unit.Direction, goal->ConnectingDestination);
 					RestoreSelection();
-					if (unit.Player == ThisPlayer && Selected.size() > 0 && &unit == Selected[0]) {
+					if (unit.Player == ThisPlayer && Selected.size() > 0 && &unit == Selected[0] && old_z == CurrentMapLayer) {
 						ChangeCurrentMapLayer(unit.MapLayer);
 						UI.SelectedViewport->Center(unit.GetMapPixelPosCenter());
 					}
