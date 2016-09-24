@@ -1530,7 +1530,16 @@ static void InfoPanel_draw_no_selection()
 
 		GetDefaultTextColors(nc, rc);
 		for (int i = 0; i < PlayerMax - 1; ++i) {
-			if (Players[i].Type != PlayerNobody) {
+			//Wyrmgus start
+//			if (Players[i].Type != PlayerNobody) {
+			if (
+				Players[i].Type != PlayerNobody
+				&& (
+					Players[i].StartMapLayer == ThisPlayer->StartMapLayer
+					|| (Map.Worlds[Players[i].StartMapLayer] == Map.Worlds[ThisPlayer->StartMapLayer] && Map.Planes[Players[i].StartMapLayer] == Map.Planes[ThisPlayer->StartMapLayer])
+				)
+			) {
+			//Wyrmgus end
 				if (ThisPlayer->IsAllied(Players[i])) {
 					label.SetNormalColor(FontGreen);
 				} else if (ThisPlayer->IsEnemy(Players[i])) {
@@ -1538,7 +1547,10 @@ static void InfoPanel_draw_no_selection()
 				} else {
 					label.SetNormalColor(nc);
 				}
-				label.Draw(x + 15, y, i);
+				//Wyrmgus start
+//				label.Draw(x + 15, y, i);
+				label.Draw(x + 15, y, i + 1);
+				//Wyrmgus end
 
 				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
 				Video.FillRectangleClip(Players[i].Color, x + 1, y + 1, 10, 10);

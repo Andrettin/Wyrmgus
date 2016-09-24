@@ -4384,6 +4384,11 @@ CUnit *UnitOnScreen(int x, int y)
 	CUnit *candidate = NULL;
 	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 		CUnit &unit = **it;
+		//Wyrmgus start
+		if (unit.MapLayer != CurrentMapLayer) {
+			continue;
+		}
+		//Wyrmgus end
 		if (!ReplayRevealMap && !unit.IsVisibleAsGoal(*ThisPlayer)) {
 			continue;
 		}

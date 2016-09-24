@@ -893,7 +893,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			}
 			
 			if (on_map && !on_subtemplate_area) {
-				ApplyMapTemplate(map_template->Subtemplates[i]->Ident, 0, 0, random_pos.x, random_pos.y);
+				ApplyMapTemplate(map_template->Subtemplates[i]->Ident, 0, 0, random_pos.x, random_pos.y, z);
 				
 				Map.SubtemplateAreas[z].push_back(std::pair<Vec2i, Vec2i>(random_pos, Vec2i(random_pos.x + map_template->Subtemplates[i]->Width - 1, random_pos.y + map_template->Subtemplates[i]->Height - 1)));
 				
