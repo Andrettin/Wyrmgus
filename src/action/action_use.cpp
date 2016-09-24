@@ -231,6 +231,7 @@ enum {
 						ChangeCurrentMapLayer(unit.MapLayer);
 						UI.SelectedViewport->Center(unit.GetMapPixelPosCenter());
 					}
+					PlayUnitSound(*goal->ConnectingDestination, VoiceUsed);
 				} else if (goal->Spell != NULL) {
 					CommandSpellCast(unit, unit.tilePos, NULL, *SpellTypeTable[goal->Spell->Slot], FlushCommands, unit.MapLayer);
 				} else if (goal->Work != NULL) {
