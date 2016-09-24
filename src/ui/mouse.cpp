@@ -740,28 +740,12 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 	const CUnitType &type = *unit.Type;
 	const int action = type.MouseAction;
 	//  Right mouse with SHIFT appends command to old commands.
-	//Wyrmgus start
-//	const int flush = !(KeyModifiers & ModifierShift);
-	int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
+	const int flush = !(KeyModifiers & ModifierShift);
 
 	//Wyrmgus start
 	if (action == MouseActionRallyPoint) {
 		SendCommandRallyPoint(unit, pos, CurrentMapLayer);
 		return;
-	}
-	//Wyrmgus end
-	
-	//Wyrmgus start
-	if (unit.MapLayer != CurrentMapLayer) { // if the selected unit's map layer is different from the current map layer, instruct it to use a layer connector (if any) to get to the correct layer to be able to perform its order
-		for (size_t i = 0; i != Map.LayerConnectors[CurrentMapLayer].size(); ++i) {
-			CUnit *connector_destination = Map.LayerConnectors[CurrentMapLayer][i]->ConnectingDestination;
-			if (connector_destination->MapLayer == unit.MapLayer && unit.CanUseItem(connector_destination) && connector_destination->IsVisibleAsGoal(*ThisPlayer)) {
-				SendCommandUse(unit, *connector_destination, flush);
-				flush = 0;
-				break;
-			}
-		}
 	}
 	//Wyrmgus end
 	
@@ -1932,24 +1916,7 @@ static void SendCommand(const Vec2i &tilePos)
 	UI.ButtonPanel.Update();
 	
 	//Wyrmgus start
-	int flush = !(KeyModifiers & ModifierShift);
-	//Wyrmgus end
-	
-	if (CursorAction != ButtonRallyPoint) {
-		for (size_t i = 0; i != Selected.size(); ++i) {
-			CUnit &unit = *Selected[i];
-			if (unit.MapLayer != CurrentMapLayer) { // if the selected unit's map layer is different from the current map layer, instruct it to use a layer connector (if any) to get to the correct layer to be able to perform its order
-				for (size_t j = 0; j != Map.LayerConnectors[CurrentMapLayer].size(); ++j) {
-					CUnit *connector_destination = Map.LayerConnectors[CurrentMapLayer][j]->ConnectingDestination;
-					if (connector_destination->MapLayer == unit.MapLayer && unit.CanUseItem(connector_destination) && connector_destination->IsVisibleAsGoal(*ThisPlayer)) {
-						SendCommandUse(unit, *connector_destination, flush);
-						flush = 0;
-						break;
-					}
-				}
-			}
-		}
-	}
+	const int flush = !(KeyModifiers & ModifierShift);
 	//Wyrmgus end
 	
 	switch (CursorAction) {
