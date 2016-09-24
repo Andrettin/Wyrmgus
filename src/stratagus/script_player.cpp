@@ -890,10 +890,20 @@ static int CclDefineCivilization(lua_State *l)
 				
 				civilization->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "FamilyNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				civilization->FamilyNames.push_back(LuaToString(l, -1, j + 1));
+			}
 		} else if (!strcmp(value, "SettlementNames")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				civilization->SettlementNames.push_back(LuaToString(l, -1, j + 1));
+			}
+		} else if (!strcmp(value, "ProvinceNames")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				civilization->ProvinceNames.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "ShipNames")) {
 			const int args = lua_rawlen(l, -1);
@@ -926,13 +936,25 @@ static int CclDefineCivilization(lua_State *l)
 				}
 			}
 		}
-				
+
+		if (civilization->FamilyNames.size() == 0) {
+			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->FamilyNames.size(); ++i) {
+				civilization->FamilyNames.push_back(PlayerRaces.Civilizations[parent_civilization]->FamilyNames[i]);
+			}
+		}
+
 		if (civilization->SettlementNames.size() == 0) {
 			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->SettlementNames.size(); ++i) {
 				civilization->SettlementNames.push_back(PlayerRaces.Civilizations[parent_civilization]->SettlementNames[i]);
 			}
 		}
-				
+
+		if (civilization->ProvinceNames.size() == 0) {
+			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->ProvinceNames.size(); ++i) {
+				civilization->ProvinceNames.push_back(PlayerRaces.Civilizations[parent_civilization]->ProvinceNames[i]);
+			}
+		}
+
 		if (civilization->ShipNames.size() == 0) {
 			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->ShipNames.size(); ++i) {
 				civilization->ShipNames.push_back(PlayerRaces.Civilizations[parent_civilization]->ShipNames[i]);
@@ -1887,11 +1909,23 @@ static int CclDefineFaction(lua_State *l)
 				
 				faction->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "FamilyNames")) {
+			faction->FamilyNames.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				faction->FamilyNames.push_back(LuaToString(l, -1, j + 1));
+			}
 		} else if (!strcmp(value, "SettlementNames")) {
 			faction->SettlementNames.clear();
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				faction->SettlementNames.push_back(LuaToString(l, -1, j + 1));
+			}
+		} else if (!strcmp(value, "ProvinceNames")) {
+			faction->ProvinceNames.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				faction->ProvinceNames.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "ShipNames")) {
 			faction->ShipNames.clear();
@@ -2028,13 +2062,25 @@ static int CclDefineFaction(lua_State *l)
 						}
 					}
 				}
-				
+
+				if (faction->FamilyNames.size() == 0) {
+					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->FamilyNames.size(); ++i) {
+						faction->FamilyNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->FamilyNames[i]);
+					}
+				}
+
 				if (faction->SettlementNames.size() == 0) {
 					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->SettlementNames.size(); ++i) {
 						faction->SettlementNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->SettlementNames[i]);
 					}
 				}
-				
+
+				if (faction->ProvinceNames.size() == 0) {
+					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->ProvinceNames.size(); ++i) {
+						faction->ProvinceNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->ProvinceNames[i]);
+					}
+				}
+
 				if (faction->ShipNames.size() == 0) {
 					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->ShipNames.size(); ++i) {
 						faction->ShipNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->ShipNames[i]);
