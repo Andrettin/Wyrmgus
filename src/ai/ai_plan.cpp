@@ -752,11 +752,24 @@ void AiSendExplorers()
 
 			// move if possible
 			if (target_pos != AiPlayer->Scouts[i]->tilePos) {
+				// if the tile the scout is moving to happens to have a layer connector, use it
+				bool found_connector = false;
+				CUnitCache &unitcache = Map.Field(target_pos, AiPlayer->Scouts[i]->MapLayer)->UnitCache;
+				for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
+					CUnit *connector = *it;
+
+					if (connector->ConnectingDestination != NULL && AiPlayer->Scouts[i]->CanUseItem(connector)) {
+						CommandUse(*AiPlayer->Scouts[i], *connector, FlushCommands);
+						found_connector = true;
+						break;
+					}
+				}
+				if (found_connector) {
+					continue;
+				}
+				
 				UnmarkUnitFieldFlags(*AiPlayer->Scouts[i]);
-				//Wyrmgus start
-//				if (UnitCanBeAt(*AiPlayer->Scouts[i], target_pos)) {
 				if (UnitCanBeAt(*AiPlayer->Scouts[i], target_pos, AiPlayer->Scouts[i]->MapLayer)) {
-				//Wyrmgus end
 					MarkUnitFieldFlags(*AiPlayer->Scouts[i]);
 					CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands, AiPlayer->Scouts[i]->MapLayer);
 					continue;
