@@ -105,7 +105,7 @@ extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z 
 //Wyrmgus end
 //Wyrmgus start
 /// Prepare command use
-extern void CommandUse(CUnit &unit, CUnit &dest, int flush);
+extern void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer = true);
 //Wyrmgus end
 /// Prepare command patrol
 //Wyrmgus start

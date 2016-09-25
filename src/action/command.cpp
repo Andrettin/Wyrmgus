@@ -179,18 +179,46 @@ static void StopRaft(CUnit &unit)
 	}
 }
 
-static void ReachGoalLayer(CUnit &unit, int z, int &flush)
+static std::vector<CUnit *> GetLayerConnectorPath(CUnit &unit, int old_z, int new_z, std::vector<CUnit *> &checked_connectors)
 {
-	if (unit.MapLayer == z) { // already on the correct layer
+	for (size_t i = 0; i != Map.LayerConnectors[old_z].size(); ++i) {
+		CUnit *connector = Map.LayerConnectors[old_z][i];
+		CUnit *connector_destination = connector->ConnectingDestination;
+		std::vector<CUnit *> connector_path;
+		if (std::find(checked_connectors.begin(), checked_connectors.end(), connector) == checked_connectors.end() && unit.CanUseItem(connector) && connector->IsVisibleAsGoal(*unit.Player)) {
+			connector_path.push_back(connector);
+			checked_connectors.push_back(connector);
+			checked_connectors.push_back(connector_destination);
+			if (connector_destination->MapLayer == new_z) {
+				return connector_path;
+			} else {
+				std::vector<CUnit *> next_connector_path = GetLayerConnectorPath(unit, connector_destination->MapLayer, new_z, checked_connectors);
+				if (next_connector_path.size() > 0) {
+					for (size_t j = 0; j != next_connector_path.size(); ++j) {
+						connector_path.push_back(next_connector_path[j]);
+					}
+					return connector_path;
+				}
+			}
+		}
+	}
+	
+	std::vector<CUnit *> empty_connector_path;
+	return empty_connector_path;
+}
+
+static void ReachGoalLayer(CUnit &unit, int new_z, int &flush)
+{
+	if (unit.MapLayer == new_z) { // already on the correct layer
 		return;
 	}
 	
-	for (size_t i = 0; i != Map.LayerConnectors[z].size(); ++i) {
-		CUnit *connector_destination = Map.LayerConnectors[z][i]->ConnectingDestination;
-		if (connector_destination->MapLayer == unit.MapLayer && unit.CanUseItem(connector_destination) && connector_destination->IsVisibleAsGoal(*unit.Player)) {
-			CommandUse(unit, *connector_destination, flush);
+	std::vector<CUnit *> checked_connectors;
+	std::vector<CUnit *> connector_path = GetLayerConnectorPath(unit, unit.MapLayer, new_z, checked_connectors);
+	if (connector_path.size() > 0) {
+		for (size_t i = 0; i < connector_path.size(); ++i) {
+			CommandUse(unit, *connector_path[i], flush, false);
 			flush = 0;
-			return;
 		}
 	}
 }
@@ -595,14 +623,16 @@ void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
 **  @param dest   unit to be used
 **  @param flush  if true, flush command queue.
 */
-void CommandUse(CUnit &unit, CUnit &dest, int flush)
+void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 {
 	if (IsUnitValidForNetwork(unit) == false) {
 		return ;
 	}
 	//Wyrmgus start
 	StopRaft(unit);
-	ReachGoalLayer(unit, dest.MapLayer, flush);
+	if (reach_layer) {
+		ReachGoalLayer(unit, dest.MapLayer, flush);
+	}
 	//Wyrmgus end
 	COrderPtr *order;
 
