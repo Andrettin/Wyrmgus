@@ -1532,13 +1532,7 @@ static void InfoPanel_draw_no_selection()
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			//Wyrmgus start
 //			if (Players[i].Type != PlayerNobody) {
-			if (
-				Players[i].Type != PlayerNobody
-				&& (
-					Players[i].StartMapLayer == ThisPlayer->StartMapLayer
-					|| (Map.Worlds[Players[i].StartMapLayer] == Map.Worlds[ThisPlayer->StartMapLayer] && Map.Planes[Players[i].StartMapLayer] == Map.Planes[ThisPlayer->StartMapLayer])
-				)
-			) {
+			if (Players[i].Type != PlayerNobody && ThisPlayer->HasContactWith(Players[i])) {
 			//Wyrmgus end
 				if (ThisPlayer->IsAllied(Players[i])) {
 					label.SetNormalColor(FontGreen);

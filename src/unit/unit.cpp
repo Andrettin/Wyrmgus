@@ -3212,7 +3212,7 @@ void UnitLost(CUnit &unit)
 					lost_town_hall = false;
 				}
 			}
-			if (lost_town_hall) {
+			if (lost_town_hall && ThisPlayer->HasContactWith(player)) {
 				player.LostTownHallTimer = GameCycle + (30 * CYCLES_PER_SECOND); //30 seconds until being revealed
 				for (int j = 0; j < NumPlayers; ++j) {
 					if (player.Index != j && Players[j].Type != PlayerNobody) {
@@ -3311,7 +3311,7 @@ void UpdateForNewUnit(const CUnit &unit, int upgrade)
 	}
 	
 	//Wyrmgus start
-	if (player.LostTownHallTimer != 0 && type.BoolFlag[TOWNHALL_INDEX].value) {
+	if (player.LostTownHallTimer != 0 && type.BoolFlag[TOWNHALL_INDEX].value && ThisPlayer->HasContactWith(player)) {
 		player.LostTownHallTimer = 0;
 		player.Revealed = false;
 		for (int j = 0; j < NumPlayers; ++j) {

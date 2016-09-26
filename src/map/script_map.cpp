@@ -38,6 +38,7 @@
 #include "map.h"
 
 //Wyrmgus start
+#include "editor.h"
 #include "game.h"
 //Wyrmgus end
 #include "iolib.h"
@@ -797,7 +798,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		}
 	}
 
-	if (map_template->TimeOfDaySeconds && !GameSettings.Inside && !GameSettings.NoTimeOfDay && !map_template->IsSubtemplateArea()) {
+	if (map_template->TimeOfDaySeconds && !GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning && !map_template->IsSubtemplateArea()) {
 		Map.TimeOfDay[z] = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
 	}
 	

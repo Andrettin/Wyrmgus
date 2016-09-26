@@ -2379,7 +2379,7 @@ void PlayersEachCycle()
 		CPlayer &p = Players[player];
 		
 		//Wyrmgus start
-		if (p.LostTownHallTimer && !p.Revealed && p.LostTownHallTimer < ((int) GameCycle)) {
+		if (p.LostTownHallTimer && !p.Revealed && p.LostTownHallTimer < ((int) GameCycle) && ThisPlayer->HasContactWith(p)) {
 			p.Revealed = true;
 			for (int j = 0; j < NumPlayers; ++j) {
 				if (player != j && Players[j].Type != PlayerNobody) {
@@ -2866,6 +2866,14 @@ bool CPlayer::IsTeamed(const CUnit &unit) const
 }
 
 //Wyrmgus start
+/**
+**  Check if the player has contact with another (used for determining which players show up in the player list and etc.)
+*/
+bool CPlayer::HasContactWith(const CPlayer &player) const
+{
+	return player.StartMapLayer == this->StartMapLayer || (Map.Worlds[player.StartMapLayer] == Map.Worlds[this->StartMapLayer] && Map.Planes[player.StartMapLayer] == Map.Planes[this->StartMapLayer]);
+}
+
 void SetCivilizationStringToIndex(std::string civilization_name, int civilization_id)
 {
 	CivilizationStringToIndex[civilization_name] = civilization_id;

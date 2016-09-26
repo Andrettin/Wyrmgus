@@ -309,6 +309,9 @@ public:
 	bool IsBothSharedVision(const CUnit &unit) const;
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
+	//Wyrmgus start
+	bool HasContactWith(const CPlayer &player) const;
+	//Wyrmgus end
 
 	void SetDiplomacyNeutralWith(const CPlayer &player);
 	void SetDiplomacyAlliedWith(const CPlayer &player);
