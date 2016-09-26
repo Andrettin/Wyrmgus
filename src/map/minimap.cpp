@@ -796,7 +796,10 @@ static void DrawUnitOn(CUnit &unit, int red_phase)
 	//Wyrmgus end
 
 	Uint32 color;
-	if (unit.Player->Index == PlayerNumNeutral) {
+	//Wyrmgus start
+//	if (unit.Player->Index == PlayerNumNeutral) {
+	if (unit.GetDisplayPlayer() == PlayerNumNeutral) {
+	//Wyrmgus end
 		color = Video.MapRGB(TheScreen->format, type->NeutralMinimapColorRGB);
 	} else if (unit.Player == ThisPlayer && !Editor.Running) {
 		if (unit.Attacked && unit.Attacked + ATTACK_BLINK_DURATION > GameCycle &&

@@ -381,6 +381,7 @@ public:
 	int GetItemSlotQuantity(int item_slot) const;
 	int GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
+	int GetDisplayPlayer() const;
 	int GetSkinColor() const;
 	int GetHairColor() const;
 	bool CanAttack(bool count_inside = false) const;

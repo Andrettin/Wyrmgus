@@ -85,7 +85,10 @@ public:
 		if (!CanTarget(*source->Type, type)) {
 			return;
 		}
-		if (!source->Player->IsEnemy(*unit)) { // a friend or neutral
+		//Wyrmgus start
+//		if (!source->Player->IsEnemy(*unit)) { // a friend or neutral
+		if (!source->IsEnemy(*unit)) { // a friend or neutral
+		//Wyrmgus end
 			return;
 		}
 		// Choose the best target.

@@ -164,7 +164,10 @@ bool CBuildRestrictionDistance::Check(const CUnit *builder, const CUnitType &typ
 			(this->RestrictTypeOwner.size() == 0 ||
 			 (!this->RestrictTypeOwner.compare("self") && player == table[i]->Player) ||
 			 (!this->RestrictTypeOwner.compare("allied") && (player == table[i]->Player || player->IsAllied(*table[i]->Player))) ||
-			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i]->Player)))) {
+			 //Wyrmgus start
+//			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i]->Player)))) {
+			 (!this->RestrictTypeOwner.compare("enemy") && player->IsEnemy(*table[i])))) {
+			 //Wyrmgus end
 
 			switch (this->DistanceType) {
 				case GreaterThan :
@@ -305,7 +308,10 @@ bool CBuildRestrictionSurroundedBy::Check(const CUnit *builder, const CUnitType 
 			(this->RestrictTypeOwner.size() == 0 ||
 				(!this->RestrictTypeOwner.compare("self") && builder->Player == table[i]->Player) ||
 				(!this->RestrictTypeOwner.compare("allied") && (builder->Player == table[i]->Player || builder->Player->IsAllied(*table[i]->Player))) ||
-				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*table[i]->Player)))) {
+				//Wyrmgus start
+//				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*table[i]->Player)))) {
+				(!this->RestrictTypeOwner.compare("enemy") && builder->Player->IsEnemy(*table[i])))) {
+				//Wyrmgus end
 
 			switch (this->DistanceType) {
 			case GreaterThan:

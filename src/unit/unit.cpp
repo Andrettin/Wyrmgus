@@ -4638,6 +4638,15 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	return value;
 }
 
+int CUnit::GetDisplayPlayer() const
+{
+	if (this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->Player != ThisPlayer) {
+		return PlayerNumNeutral;
+	} else {
+		return this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
+	}
+}
+
 int CUnit::GetSkinColor() const
 {
 	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
@@ -6035,6 +6044,12 @@ bool CanPickUp(const CUnit &picker, const CUnit &unit)
 */
 bool CUnit::IsEnemy(const CPlayer &player) const
 {
+	//Wyrmgus start
+	if (this->Player->Index != player.Index && player.Type != PlayerNeutral && this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) {
+		return true;
+	}
+	//Wyrmgus end
+	
 	return this->Player->IsEnemy(player);
 }
 
@@ -6089,6 +6104,15 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 		return true;
 	}
 	
+	//Wyrmgus start
+	if (
+		this->Player != unit.Player && this->Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral
+		&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
+	) {
+		return true;
+	}
+	//Wyrmgus end
+
 	return IsEnemy(*unit.Player);
 	//Wyrmgus end
 }

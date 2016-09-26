@@ -2791,6 +2791,12 @@ bool CPlayer::IsEnemy(const CPlayer &player) const
 */
 bool CPlayer::IsEnemy(const CUnit &unit) const
 {
+	//Wyrmgus start
+	if (unit.Player->Index != this->Index && this->Type != PlayerNeutral && unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()) {
+		return true;
+	}
+	//Wyrmgus end
+	
 	return IsEnemy(*unit.Player);
 }
 

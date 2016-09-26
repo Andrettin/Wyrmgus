@@ -512,7 +512,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
 			//Wyrmgus start
 //			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index, unit.GetSkinColor(), unit.GetHairColor());
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer(), unit.GetSkinColor(), unit.GetHairColor());
 			//Wyrmgus end
 		}
 	} else {
@@ -536,7 +536,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					//Wyrmgus start
 					flag |= IconCommandButton;
 //					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index, unit.GetSkinColor(), unit.GetHairColor());
+					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.GetDisplayPlayer(), unit.GetSkinColor(), unit.GetHairColor());
 					//Wyrmgus end
 				}
 			}
@@ -580,7 +580,7 @@ static void DrawUnitInfo_portrait(const CUnit &unit)
 
 		//Wyrmgus start
 //		type.Icon.Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index, unit.GetSkinColor(), unit.GetHairColor());
+		unit.GetIcon().Icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", unit.GetDisplayPlayer(), unit.GetSkinColor(), unit.GetHairColor());
 		//Wyrmgus end
 	}
 }
@@ -616,7 +616,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				//Wyrmgus start
 				flag |= IconCommandButton;
 //				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index, unit.GetSkinColor(), unit.GetHairColor());
+				icon.DrawUnitIcon(*UI.UpgradingButton->Style, flag, pos, "", unit.GetDisplayPlayer(), unit.GetSkinColor(), unit.GetHairColor());
 				//Wyrmgus end
 			}
 			return true;
@@ -639,7 +639,7 @@ static bool DrawUnitInfo_single_selection(const CUnit &unit)
 				//Wyrmgus start
 				flag |= IconCommandButton;
 //				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index, unit.GetSkinColor(), unit.GetHairColor());
+				icon.DrawUnitIcon(*UI.ResearchingButton->Style, flag, pos, "", unit.GetDisplayPlayer(), unit.GetSkinColor(), unit.GetHairColor());
 				//Wyrmgus end
 			}
 			return true;
@@ -671,7 +671,7 @@ static void DrawUnitInfo_transporter(CUnit &unit)
 		const PixelPos pos(UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index);
-		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->RescuedFrom ? uins->RescuedFrom->Index : uins->Player->Index, uins->GetSkinColor(), uins->GetHairColor());
+		uins->GetIcon().Icon->DrawUnitIcon(*UI.TransportingButtons[j].Style, flag, pos, "", uins->GetDisplayPlayer(), uins->GetSkinColor(), uins->GetHairColor());
 		//Wyrmgus end
 		UiDrawLifeBar(*uins, pos.x, pos.y);
 		//Wyrmgus start
@@ -1640,7 +1640,7 @@ static void InfoPanel_draw_multiple_selection()
 						  (IconActive | (MouseButtons & LeftButton)) : 0,
 						  //Wyrmgus start
 //						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index);
-						  pos, "", Selected[i]->RescuedFrom ? Selected[i]->RescuedFrom->Index : Selected[i]->Player->Index, Selected[i]->GetSkinColor(), Selected[i]->GetHairColor());
+						  pos, "", Selected[i]->GetDisplayPlayer(), Selected[i]->GetSkinColor(), Selected[i]->GetHairColor());
 						  //Wyrmgus end
 
 		UiDrawLifeBar(*Selected[i], UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);

@@ -281,7 +281,7 @@ static const CUnit *GetUnitRef(const CUnit &unit, EnumUnit e)
 		//Wyrmgus end
 			//Wyrmgus start
 //			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index);
-			unitToDraw->RescuedFrom ? unitToDraw->RescuedFrom->Index : unitToDraw->Player->Index, unitToDraw->GetSkinColor(), unitToDraw->GetHairColor());
+			unitToDraw->GetDisplayPlayer(), unitToDraw->GetSkinColor(), unitToDraw->GetHairColor());
 			//Wyrmgus end
 	}
 }

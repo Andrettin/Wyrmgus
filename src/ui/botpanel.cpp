@@ -1236,8 +1236,10 @@ void CButtonPanel::Draw()
 			int hair_color = 0;
 			//Wyrmgus end
 			if (Selected.empty() == false && Selected[0]->IsAlive()) {
-				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
 				//Wyrmgus start
+//				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
+				player = Selected[0]->GetDisplayPlayer();
+
 				//if unit is neutral, set color to that of the person player
 				if (Players[player].Type == PlayerNeutral) {
 					player = ThisPlayer->Index;

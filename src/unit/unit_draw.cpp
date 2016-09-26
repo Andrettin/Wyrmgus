@@ -1130,7 +1130,10 @@ void CUnit::Draw(const CViewport &vp) const
 	// Those should have been filtered. Check doesn't make sense with ReplayRevealMap
 	Assert(ReplayRevealMap || this->Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value || IsVisible);
 
-	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
+	//Wyrmgus start
+//	int player = this->RescuedFrom ? this->RescuedFrom->Index : this->Player->Index;
+	int player = this->GetDisplayPlayer();
+	//Wyrmgus end
 	int action = this->CurrentAction();
 	PixelPos screenPos;
 	if (ReplayRevealMap || IsVisible) {
