@@ -39,6 +39,7 @@
 #include "map.h"
 
 //Wyrmgus start
+#include "editor.h"
 #include "game.h" // for the SaveGameLoading variable
 //Wyrmgus end
 #include "iolib.h"
@@ -852,7 +853,7 @@ void CMap::Create()
 	this->Info.MapWidths.push_back(this->Info.MapWidth);
 	this->Info.MapHeights.push_back(this->Info.MapHeight);
 	this->TimeOfDaySeconds.push_back(DefaultTimeOfDaySeconds);
-	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay) {
+	if (!GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning) {
 		this->TimeOfDay.push_back(SyncRand(MaxTimesOfDay - 1) + 1); // begin at a random time of day
 	} else {
 		this->TimeOfDay.push_back(NoTimeOfDay); // make indoors have no time of day setting until it is possible to make light sources change their surrounding "time of day" // indoors it is always dark (maybe would be better to allow a special setting to have bright indoor places?
