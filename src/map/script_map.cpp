@@ -44,6 +44,7 @@
 #include "iolib.h"
 //Wyrmgus start
 #include "province.h"
+#include "quest.h"
 //Wyrmgus end
 #include "script.h"
 //Wyrmgus start
@@ -860,13 +861,9 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 		Map.Field(label_pos, z)->Label = iterator->second;
 	}
 	
-	if (!PlayerFaction.empty() && !map_template->IsSubtemplateArea()) {
-		CFaction *player_faction = PlayerRaces.GetFaction(-1, PlayerFaction);
-		
-		if (player_faction) {
-			ThisPlayer->SetCivilization(player_faction->Civilization);
-			ThisPlayer->SetFaction(player_faction->Name);
-		}
+	if (CurrentCampaign && CurrentCampaign->Faction && !map_template->IsSubtemplateArea()) {
+		ThisPlayer->SetCivilization(CurrentCampaign->Faction->Civilization);
+		ThisPlayer->SetFaction(CurrentCampaign->Faction->Name);
 	}
 	
 	for (size_t i = 0; i < map_template->Subtemplates.size(); ++i) {

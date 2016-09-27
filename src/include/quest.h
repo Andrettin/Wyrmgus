@@ -109,6 +109,28 @@ public:
 	std::vector<std::tuple<int, int>> GatherResources;	/// Gather resources objective vector, containing resource ID and quantity
 };
 
+class CCampaign
+{
+public:
+	CCampaign() :
+		ID(-1), Civilization(-1), Year(0),
+		Hidden(false),
+		Faction(NULL), StartEffects(NULL)
+	{
+	}
+	~CCampaign();
+	
+	std::string Ident;				/// Ident of the campaign
+	std::string Name;				/// Name of the campaign
+	std::string Description;		/// Description of the campaign
+	int ID;
+	int Civilization;				/// Which civilization the campaign belongs to
+	int Year;						/// The starting year of the campaign
+	bool Hidden;					/// Whether the campaign is hidden
+	CFaction *Faction;				/// Which faction the player plays as in the campaign
+	LuaCallback *StartEffects;		/// The effects at game start to set up the campaign
+};
+
 class CAchievement
 {
 public:
@@ -182,6 +204,8 @@ public:
 
 extern std::vector<CQuest *> Quests;
 extern CQuest *CurrentQuest;
+extern std::vector<CCampaign *> Campaigns;
+extern CCampaign *CurrentCampaign;
 extern std::vector<CAchievement *> Achievements;
 extern std::vector<CDialogue *> Dialogues;
 
@@ -194,11 +218,14 @@ extern void CleanDialogues();
 extern void SaveQuestCompletion();
 extern void CheckAchievements();
 extern CQuest *GetQuest(std::string quest_ident);
+extern CCampaign *GetCampaign(std::string campaign_ident);
 extern CAchievement *GetAchievement(std::string achievement_ident);
 extern CDialogue *GetDialogue(std::string dialogue_ident);
 
 extern void SetCurrentQuest(std::string quest_ident);
 extern std::string GetCurrentQuest();
+extern void SetCurrentCampaign(std::string campaign_ident);
+extern std::string GetCurrentCampaign();
 extern void SetQuestCompleted(std::string quest_ident, int difficulty = 2, bool save = true);
 extern void SetQuestCompleted(std::string quest_ident, bool save);
 extern void SetAchievementObtained(std::string achievement_ident, bool save = true, bool display = true);

@@ -1543,7 +1543,6 @@ static void InfoPanel_draw_no_selection()
 				}
 				//Wyrmgus start
 //				label.Draw(x + 15, y, i);
-				label.Draw(x + 15, y, i + 1);
 				//Wyrmgus end
 
 				Video.DrawRectangleClip(ColorWhite, x, y, 12, 12);
@@ -1551,7 +1550,7 @@ static void InfoPanel_draw_no_selection()
 
 				//Wyrmgus start
 //				label.Draw(x + 27, y, Players[i].Name);
-				label.Draw(x + 27, y, _(Players[i].Name.c_str()));
+				label.Draw(x + 15, y, _(Players[i].Name.c_str()));
 				//the score was appearing on top of the faction name
 //				label.Draw(x + 117, y, Players[i].Score);
 				//Wyrmgus end

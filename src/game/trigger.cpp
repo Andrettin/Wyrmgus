@@ -764,6 +764,9 @@ void SaveTriggers(CFile &file)
 	if (CurrentQuest != NULL) {
 		file.printf("SetCurrentQuest(\"%s\")\n", CurrentQuest->Ident.c_str());
 	}
+	if (CurrentCampaign != NULL) {
+		file.printf("SetCurrentCampaign(\"%s\")\n", CurrentCampaign->Ident.c_str());
+	}
 	//Wyrmgus end
 }
 

@@ -205,7 +205,7 @@ static int CclDefineQuest(lua_State *l)
 				std::string faction_ident = LuaToString(l, -1, j + 1);
 				CFaction *faction = PlayerRaces.GetFaction(-1, faction_ident);
 				if (!faction && !faction_ident.empty()) {
-				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
+					LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
 				}
 				++j;
 				
@@ -371,6 +371,114 @@ static int CclGetQuestData(lua_State *l)
 			lua_pushstring(l, quest->BriefingSounds[i-1].c_str());
 			lua_rawseti(l, -2, i);
 		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+/**
+**  Define a campaign.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineCampaign(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string campaign_ident = LuaToString(l, 1);
+	CCampaign *campaign = GetCampaign(campaign_ident);
+	if (!campaign) {
+		campaign = new CCampaign;
+		campaign->ID = Campaigns.size();
+		Campaigns.push_back(campaign);
+		campaign->Ident = campaign_ident;
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			campaign->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Description")) {
+			campaign->Description = LuaToString(l, -1);
+		} else if (!strcmp(value, "Civilization")) {
+			campaign->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+		} else if (!strcmp(value, "Faction")) {
+			campaign->Faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1));
+		} else if (!strcmp(value, "Hidden")) {
+			campaign->Hidden = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Year")) {
+			campaign->Year = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "StartEffects")) {
+			campaign->StartEffects = new LuaCallback(l, -1);
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	return 0;
+}
+
+static int CclGetCampaigns(lua_State *l)
+{
+	lua_createtable(l, Campaigns.size(), 0);
+	for (size_t i = 1; i <= Campaigns.size(); ++i)
+	{
+		lua_pushstring(l, Campaigns[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
+
+/**
+**  Get campaign data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetCampaignData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string campaign_ident = LuaToString(l, 1);
+	const CCampaign *campaign = GetCampaign(campaign_ident);
+	if (!campaign) {
+		LuaError(l, "Campaign \"%s\" doesn't exist." _C_ campaign_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, campaign->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
+		lua_pushstring(l, campaign->Description.c_str());
+		return 1;
+	} else if (!strcmp(data, "Year")) {
+		lua_pushnumber(l, campaign->Year);
+		return 1;
+	} else if (!strcmp(data, "Civilization")) {
+		if (campaign->Civilization != -1) {
+			lua_pushstring(l, PlayerRaces.Name[campaign->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Faction")) {
+		if (campaign->Faction) {
+			lua_pushstring(l, campaign->Faction->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Hidden")) {
+		lua_pushboolean(l, campaign->Hidden);
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
@@ -625,6 +733,9 @@ void QuestCclRegister()
 	lua_register(Lua, "DefineQuest", CclDefineQuest);
 	lua_register(Lua, "GetQuests", CclGetQuests);
 	lua_register(Lua, "GetQuestData", CclGetQuestData);
+	lua_register(Lua, "DefineCampaign", CclDefineCampaign);
+	lua_register(Lua, "GetCampaigns", CclGetCampaigns);
+	lua_register(Lua, "GetCampaignData", CclGetCampaignData);
 	lua_register(Lua, "DefineAchievement", CclDefineAchievement);
 	lua_register(Lua, "GetAchievements", CclGetAchievements);
 	lua_register(Lua, "GetAchievementData", CclGetAchievementData);

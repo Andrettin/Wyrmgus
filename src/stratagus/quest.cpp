@@ -57,6 +57,8 @@
 
 std::vector<CQuest *> Quests;
 CQuest *CurrentQuest = NULL;
+std::vector<CCampaign *> Campaigns;
+CCampaign *CurrentCampaign = NULL;
 std::vector<CAchievement *> Achievements;
 std::vector<CDialogue *> Dialogues;
 
@@ -70,6 +72,11 @@ void CleanQuests()
 		delete Quests[i];
 	}
 	Quests.clear();
+	
+	for (size_t i = 0; i < Campaigns.size(); ++i) {
+		delete Campaigns[i];
+	}
+	Campaigns.clear();
 	
 	for (size_t i = 0; i < Achievements.size(); ++i) {
 		delete Achievements[i];
@@ -149,6 +156,17 @@ CQuest *GetQuest(std::string quest_ident)
 	return NULL;
 }
 
+CCampaign *GetCampaign(std::string campaign_ident)
+{
+	for (size_t i = 0; i < Campaigns.size(); ++i) {
+		if (campaign_ident == Campaigns[i]->Ident) {
+			return Campaigns[i];
+		}
+	}
+	
+	return NULL;
+}
+
 CAchievement *GetAchievement(std::string achievement_ident)
 {
 	for (size_t i = 0; i < Achievements.size(); ++i) {
@@ -174,6 +192,11 @@ CQuest::~CQuest()
 {
 	delete Conditions;
 	delete CompletionEffects;
+}
+
+CCampaign::~CCampaign()
+{
+	delete StartEffects;
 }
 
 void CAchievement::Obtain(bool save, bool display)
@@ -333,6 +356,24 @@ std::string GetCurrentQuest()
 		return "";
 	} else {
 		return CurrentQuest->Ident;
+	}
+}
+
+void SetCurrentCampaign(std::string campaign_ident)
+{
+	if (campaign_ident.empty()) {
+		CurrentCampaign = NULL;
+	} else {
+		CurrentCampaign = GetCampaign(campaign_ident);
+	}
+}
+
+std::string GetCurrentCampaign()
+{
+	if (!CurrentCampaign) {
+		return "";
+	} else {
+		return CurrentCampaign->Ident;
 	}
 }
 

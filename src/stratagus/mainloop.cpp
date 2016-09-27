@@ -47,6 +47,7 @@
 //Wyrmgus start
 #include "grand_strategy.h"
 #include "interface.h"
+#include "luacallback.h"
 //Wyrmgus end
 #include "map.h"
 #include "missile.h"
@@ -741,6 +742,11 @@ void GameMainLoop()
 	
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
+		if (CurrentCampaign != NULL && CurrentCampaign->StartEffects) {
+			CurrentCampaign->StartEffects->pushPreamble();
+			CurrentCampaign->StartEffects->run();
+		}
+		
 		//if the person player has no faction, bring up the faction choice interface
 		if (!GrandStrategy && ThisPlayer && ThisPlayer->Faction == -1) {
 			char buf[256];
