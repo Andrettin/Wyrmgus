@@ -1062,7 +1062,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 			continue;
 		}
 		
-//		if ((std::get<3>(map_template->Units[i]) == 0 || GrandStrategyYear >= std::get<3>(map_template->Units[i])) && (std::get<4>(map_template->Units[i]) == 0 || GrandStrategyYear < std::get<4>(map_template->Units[i]))) {
+		if ((!CurrentCampaign || std::get<3>(map_template->Units[i]) == 0 || CurrentCampaign->Year >= std::get<3>(map_template->Units[i])) && (std::get<4>(map_template->Units[i]) == 0 || CurrentCampaign->Year < std::get<4>(map_template->Units[i]))) {
 			CPlayer *player = NULL;
 			if (std::get<2>(map_template->Units[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(map_template->Units[i]));
@@ -1098,7 +1098,7 @@ void ApplyMapTemplate(std::string map_template_ident, int template_start_x, int 
 					}
 				}
 			}
-//		}
+		}
 	}
 	
 	for (int i = 0; i < PlayerMax; ++i) {
