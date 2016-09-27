@@ -217,7 +217,7 @@ VisitResult BuildingPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const
 		return VisitResult_DeadEnd;
 	}
 //	if (CanBuildUnitType(&worker, type, pos, 1)
-	if (CanBuildUnitType(&worker, type, pos, 1, false, z)
+	if (CanBuildUnitType(&worker, type, pos, 1, IgnoreExploration, z)
 	//Wyrmgus end
 		//Wyrmgus start
 //		&& !AiEnemyUnitsInDistance(*worker.Player, NULL, pos, 8)) {

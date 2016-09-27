@@ -351,7 +351,8 @@ CUnit *COrder_Build::CheckCanBuild(CUnit &unit) const
 
 	//Wyrmgus start
 //	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1);
-	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1, false, this->MapLayer);
+	bool ignore_exploration = unit.Player->AiEnabled;
+	CUnit *ontop = CanBuildUnitType(&unit, type, pos, 1, ignore_exploration, this->MapLayer);
 	//Wyrmgus end
 
 	if (ontop != NULL) {

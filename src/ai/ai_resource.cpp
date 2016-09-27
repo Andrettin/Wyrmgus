@@ -319,7 +319,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	// Find a place to build.
 	//Wyrmgus start
 //	if (AiFindBuildingPlace(unit, building, nearPos, &pos)) {
-	if (AiFindBuildingPlace(unit, building, nearPos, &pos, false, z)) {
+	if (AiFindBuildingPlace(unit, building, nearPos, &pos, true, z)) {
 	//Wyrmgus end
 		//Wyrmgus start
 //		CommandBuildBuilding(unit, pos, building, FlushCommands);
@@ -337,7 +337,7 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 				// Find a place to build.
 				//Wyrmgus start
 //				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos)) {
-				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos, false, z)) {
+				if (AiFindBuildingPlace(*table[i], building, nearPos, &pos, true, z)) {
 				//Wyrmgus end
 					//Wyrmgus start
 //					CommandBuildBuilding(*table[i], pos, building, FlushCommands);
@@ -1073,7 +1073,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 		for (int i = 0; i < n; ++i) {
 			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
 
-			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1, false, deposit->MapLayer)) {
+			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1, true, deposit->MapLayer)) {
 				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands, deposit->MapLayer);
 				return 1;
 			}
@@ -1091,7 +1091,7 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 				for (int i = 0; i < n; ++i) {
 					CUnitType &type = *AiHelpers.Refinery[c - 1][i];
 
-					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1, false, deposit->MapLayer)) {
+					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1, true, deposit->MapLayer)) {
 						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands, deposit->MapLayer);
 						return 1;
 					}

@@ -230,7 +230,7 @@ static void EditTile(const Vec2i &pos, CTerrainType *terrain)
 	for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
 		CUnit *unit = *it;
 
-		if (!CanBuildUnitType(unit, *unit->Type, pos, 1, false, CurrentMapLayer)) {
+		if (!CanBuildUnitType(unit, *unit->Type, pos, 1, true, CurrentMapLayer)) {
 			units_to_remove.push_back(unit);
 		}
 	}
@@ -1811,7 +1811,7 @@ static void EditorCallbackButtonDown(unsigned button)
 				if (!UnitPlacedThisPress && CursorBuilding) {
 					//Wyrmgus start
 //					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
-					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1, false, CurrentMapLayer)) {
+					if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1, true, CurrentMapLayer)) {
 					//Wyrmgus end
 						PlayGameSound(GameSounds.PlacementSuccess[ThisPlayer->Race].Sound,
 									  MaxSampleVolume);
@@ -2278,7 +2278,7 @@ static void EditorCallbackMouse(const PixelPos &pos)
 			if (!UnitPlacedThisPress) {
 				//Wyrmgus start
 //				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1)) {
-				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1, false, CurrentMapLayer)) {
+				if (CanBuildUnitType(NULL, *CursorBuilding, tilePos, 1, true, CurrentMapLayer)) {
 				//Wyrmgus end
 					EditorPlaceUnit(tilePos, *CursorBuilding, Players + Editor.SelectedPlayer);
 					UnitPlacedThisPress = true;

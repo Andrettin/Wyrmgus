@@ -951,7 +951,7 @@ static int CclCreateUnitInTransporter(lua_State *l)
 		return 0;
 	} else {
 		if (UnitCanBeAt(*unit, ipos, transporter->MapLayer)
-			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0, false, transporter->MapLayer))) {
+			|| (unit->Type->Building && CanBuildUnitType(NULL, *unit->Type, ipos, 0, true, transporter->MapLayer))) {
 			unit->Place(ipos, transporter->MapLayer);
 		} else {
 			const int heading = SyncRand() % 256;
