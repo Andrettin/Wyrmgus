@@ -294,31 +294,6 @@ void CViewport::DrawMapBackgroundInViewport() const
 			//Wyrmgus end
 			//Wyrmgus start
 //			Map.TileGraphic->DrawFrameClip(tile, dx, dy);
-			/*
-			int underlay_terrain;
-			if ((std::find(Map.Tileset->removedTreeTiles.begin(), Map.Tileset->removedTreeTiles.end(), tile) != Map.Tileset->removedTreeTiles.end() && (mf.getFlag() & MapFieldStumps)) || (mf.getFlag() & MapFieldForest)) { //wood tile, draw grass (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for stump tiles or regrown trees
-				underlay_terrain = Map.Tileset->TreeUnderlayTerrain;
-			} else if ((std::find(Map.Tileset->removedRockTiles.begin(), Map.Tileset->removedRockTiles.end(), tile) != Map.Tileset->removedRockTiles.end() && (mf.getFlag() & MapFieldGravel)) || (mf.getFlag() & MapFieldRocks)) { //rock tile, draw dirt (or equivalent) beneath; necessary to do it in a separate manner so that they are drawn correctly for removed tiles
-				underlay_terrain = Map.Tileset->RockUnderlayTerrain;
-			} else {
-				underlay_terrain = Map.Tileset->tiles[mf.getTileIndex()].tileinfo.MixTerrain;
-			}
-			
-			if (underlay_terrain) {
-				//draw the underlay terrain's base tile first (the transition tile itself can have a transparent background)
-				if (!Map.Tileset->solidTerrainTypes[underlay_terrain].ImageFile.empty()) {
-					Map.SolidTileGraphics[underlay_terrain]->DrawFrameClip(Map.Tileset->tiles[Map.Tileset->solidTerrainTypes[underlay_terrain].DefaultTileIndex].tile, dx, dy, false);
-				} else {
-					Map.TileGraphic->DrawFrameClip(Map.Tileset->tiles[Map.Tileset->solidTerrainTypes[underlay_terrain].DefaultTileIndex].tile, dx, dy, false);
-				}
-			}
-
-			if (!Map.Tileset->solidTerrainTypes[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain].ImageFile.empty()) {
-				Map.SolidTileGraphics[Map.Tileset->tiles[mf.getTileIndex()].tileinfo.BaseTerrain]->DrawFrameClip(tile + mf.AnimationFrame, dx, dy, false);
-			} else {
-				Map.TileGraphic->DrawFrameClip(tile + mf.AnimationFrame, dx, dy, false);
-			}
-			*/
 			if (ReplayRevealMap) {
 				if (mf.Terrain && mf.Terrain->Graphics) {
 					mf.Terrain->Graphics->DrawFrameClip(mf.SolidTile + (mf.Terrain == mf.Terrain ? mf.AnimationFrame : 0), dx, dy, false);
