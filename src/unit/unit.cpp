@@ -776,7 +776,7 @@ void CUnit::HealingItemAutoUse()
 		if (uins->Variable[HITPOINTHEALING_INDEX].Value > 0) {
 			if (
 				uins->Variable[HITPOINTHEALING_INDEX].Value <= (this->GetModifiedVariable(HP_INDEX, VariableMax) - this->Variable[HP_INDEX].Value)
-				|| (this->Variable[HP_INDEX].Value * 100 / this->GetModifiedVariable(HP_INDEX, VariableMax)) <= 10
+				|| (this->Variable[HP_INDEX].Value * 100 / this->GetModifiedVariable(HP_INDEX, VariableMax)) <= 20 // use a healing item if has less than 20% health
 			) {
 				if (!this->CriticalOrder) {
 					this->CriticalOrder = COrder::NewActionUse(*uins);

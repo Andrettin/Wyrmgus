@@ -512,7 +512,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 			const PixelPos pos(UI.SingleTrainingButton->X, UI.SingleTrainingButton->Y);
 			//Wyrmgus start
 //			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer(), unit.GetSkinColor(), unit.GetHairColor());
+			icon.DrawUnitIcon(*UI.SingleTrainingButton->Style, flags, pos, "", unit.GetDisplayPlayer(), order.GetUnitType().SkinColor, order.GetUnitType().HairColor);
 			//Wyrmgus end
 		}
 	} else {
@@ -536,7 +536,7 @@ static void DrawUnitInfo_Training(const CUnit &unit)
 					//Wyrmgus start
 					flag |= IconCommandButton;
 //					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.RescuedFrom ? unit.RescuedFrom->Index : unit.Player->Index);
-					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.GetDisplayPlayer(), unit.GetSkinColor(), unit.GetHairColor());
+					icon.DrawUnitIcon(*UI.TrainingButtons[i].Style, flag, pos, "", unit.GetDisplayPlayer(), order.GetUnitType().SkinColor, order.GetUnitType().HairColor);
 					//Wyrmgus end
 				}
 			}
