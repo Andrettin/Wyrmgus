@@ -552,10 +552,7 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value, int 
 		return;
 	}
 	
-	//Wyrmgus start
-//	if (Map.Fields) {
 	if (Map.Fields.size() > 0) {
-	//Wyrmgus end
 		CMapField &mf = *Map.Field(pos, z);
 
 		mf.Value = value;
