@@ -1341,6 +1341,11 @@ static int CclDefineMapTemplate(lua_State *l)
 				LuaError(l, "World doesn't exist.");
 			}
 			map->World = world;
+		} else if (!strcmp(value, "Layer")) {
+			map->Layer = LuaToNumber(l, -1);
+			if (map->Layer > 0) {
+				map->TimeOfDaySeconds = 0; // no time of day for underground maps
+			}
 		} else if (!strcmp(value, "TerrainFile")) {
 			map->TerrainFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainFile")) {
@@ -1364,6 +1369,12 @@ static int CclDefineMapTemplate(lua_State *l)
 				LuaError(l, "Terrain doesn't exist.");
 			}
 			map->BaseTerrain = terrain;
+		} else if (!strcmp(value, "BorderTerrain")) {
+			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
+			if (!terrain) {
+				LuaError(l, "Terrain doesn't exist.");
+			}
+			map->BorderTerrain = terrain;
 		} else if (!strcmp(value, "SurroundingTerrain")) {
 			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
 			if (!terrain) {
@@ -1445,9 +1456,15 @@ static int CclDefineMapTemplate(lua_State *l)
 		}
 	}
 	
-	for (int i = 0; i < map->Width * map->Height; ++i) {
-		map->TileTerrains.push_back(map->BaseTerrain);
-		map->TileOverlayTerrains.push_back(NULL);
+	for (int x = 0; x < map->Width; ++x) {
+		for (int y = 0; y < map->Height; ++y) {
+			if (map->BorderTerrain && (x == 0 || x == (map->Width - 1) || y == 0 || y == (map->Height - 1))) {
+				map->TileTerrains.push_back(map->BorderTerrain);
+			} else {
+				map->TileTerrains.push_back(map->BaseTerrain);
+			}
+			map->TileOverlayTerrains.push_back(NULL);
+		}
 	}
 	
 	map->ParseTerrainFile(false);

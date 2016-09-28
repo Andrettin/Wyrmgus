@@ -143,7 +143,7 @@ class CMapTemplate
 public:
 	CMapTemplate() :
 		Width(0), Height(0), TimeOfDaySeconds(DefaultTimeOfDaySeconds), Layer(0),
-		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), SurroundingTerrain(NULL)
+		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), BorderTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
 
@@ -166,6 +166,7 @@ public:
 	CPlane *Plane;
 	CWorld *World;
 	CTerrainType *BaseTerrain;
+	CTerrainType *BorderTerrain;
 	CTerrainType *SurroundingTerrain;
 	std::vector<CMapTemplate *> Subtemplates;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
