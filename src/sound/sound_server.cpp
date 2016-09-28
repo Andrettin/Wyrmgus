@@ -425,7 +425,12 @@ static void ChannelFinished(int channel)
 		Channels[channel].FinishedCallback(channel);
 	}
 
-	delete Channels[channel].Unit;
+	//Wyrmgus start
+//	delete Channels[channel].Unit;
+	if (Channels[channel].Unit) {
+		delete Channels[channel].Unit;
+	}
+	//Wyrmgus end
 	Channels[channel].Unit = NULL;
 	
 	//Wyrmgus start
