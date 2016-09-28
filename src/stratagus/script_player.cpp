@@ -3075,8 +3075,16 @@ static int CclGetPlayerData(lua_State *l)
 		}
 		return 1;
 	//Wyrmgus start
+	} else if (!strcmp(data, "HasQuest")) {
+		LuaCheckArgs(l, 3);
+		CQuest *quest = GetQuest(LuaToString(l, 3));
+		if (std::find(p->CurrentQuests.begin(), p->CurrentQuests.end(), quest) != p->CurrentQuests.end()) {
+			lua_pushboolean(l, true);
+		} else {
+			lua_pushboolean(l, false);
+		}
+		return 1;
 	} else if (!strcmp(data, "CompletedQuest")) {
-		bool completed_quest = false;
 		LuaCheckArgs(l, 3);
 		CQuest *quest = GetQuest(LuaToString(l, 3));
 		if (std::find(p->CompletedQuests.begin(), p->CompletedQuests.end(), quest) != p->CompletedQuests.end()) {
@@ -3227,6 +3235,13 @@ static int CclSetPlayerData(lua_State *l)
 		} else {
 			LuaError(l, " wrong ident %s\n" _C_ ident);
 		}
+	//Wyrmgus start
+	} else if (!strcmp(data, "AcceptQuest")) {
+		CQuest *quest = GetQuest(LuaToString(l, 3));
+		if (quest) {
+			p->AcceptQuest(quest);
+		}
+	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}

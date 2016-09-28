@@ -460,6 +460,7 @@ void CallDialogueNodeOptionEffect(std::string dialogue_ident, int node, int opti
 		return;
 	}
 	
+	CclCommand("trigger_player = " + std::to_string((long long) player) + ";");
 	dialogue->Nodes[node]->OptionEffect(option, player);
 }
 

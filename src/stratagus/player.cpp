@@ -1846,6 +1846,10 @@ void CPlayer::UpdateCurrentQuests()
 
 void CPlayer::AcceptQuest(CQuest *quest)
 {
+	if (!quest) {
+		return;
+	}
+	
 	this->AvailableQuests.erase(std::remove(this->AvailableQuests.begin(), this->AvailableQuests.end(), quest), this->AvailableQuests.end());
 	this->CurrentQuests.push_back(quest);
 	
@@ -1924,11 +1928,7 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 
 bool CPlayer::CanAcceptQuest(CQuest *quest)
 {
-	if (quest->Hidden) {
-		return false;
-	}
-	
-	if (quest->CurrentCompleted) {
+	if (quest->Hidden || quest->CurrentCompleted || quest->Unobtainable) {
 		return false;
 	}
 	
