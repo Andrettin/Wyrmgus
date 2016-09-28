@@ -195,6 +195,7 @@ public:
 	std::string Text;
 	CDialogue *Dialogue;
 	LuaCallback *Conditions;
+	std::vector<std::string> Options;
 	std::vector<LuaCallback *> OptionEffects;
 };
 

@@ -699,6 +699,13 @@ static int CclDefineDialogue(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						node->Conditions = new LuaCallback(l, -1);
 						lua_pop(l, 1);
+					} else if (!strcmp(value, "options")) {
+						lua_rawgeti(l, -1, k + 1);
+						const int subsubargs = lua_rawlen(l, -1);
+						for (int n = 0; n < subsubargs; ++n) {
+							node->Options.push_back(LuaToString(l, -1, n + 1));
+						}
+						lua_pop(l, 1);
 					} else if (!strcmp(value, "option-effects")) {
 						lua_rawgeti(l, -1, k + 1);
 						const int subsubargs = lua_rawlen(l, -1);

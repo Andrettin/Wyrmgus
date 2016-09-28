@@ -313,17 +313,41 @@ void CDialogueNode::Call(int player)
 	lua_command += "\"" + this->Text + "\", ";
 	lua_command += std::to_string((long long) player) + ", ";
 	
-	lua_command += "{\"";
-	if ((this->ID + 1) < (int) this->Dialogue->Nodes.size()) {
-		lua_command += "~!Continue";
+	lua_command += "{";
+	if (this->Options.size() > 0) {
+		bool first = true;
+		for (size_t i = 0; i < this->Options.size(); ++i) {
+			if (!first) {
+				lua_command += ", ";
+			} else {
+				first = false;
+			}
+			lua_command += "\"" + this->Options[i] + "\"";
+		}
 	} else {
-		lua_command += "~!OK";
+		lua_command += "\"~!Continue\"";
 	}
-	lua_command += "\"}, ";
+	lua_command += "}, ";
 	
-	lua_command += "{function(s) ";
-	lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
-	lua_command += " end}";
+	lua_command += "{";
+	if (this->Options.size() > 0) {
+		bool first = true;
+		for (size_t i = 0; i < this->Options.size(); ++i) {
+			if (!first) {
+				lua_command += ", ";
+			} else {
+				first = false;
+			}
+			lua_command += "function(s) ";
+			lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) i) + ", " + std::to_string((long long) player) + ");";
+			lua_command += " end";
+		}
+	} else {
+		lua_command += "function(s) ";
+		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
+		lua_command += " end";
+	}
+	lua_command += "}";
 	
 	lua_command += ")";
 	

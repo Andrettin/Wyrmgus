@@ -49,6 +49,7 @@
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
+#include "quest.h"
 #include "settings.h"
 //Wyrmgus end
 #include "tileset.h"
@@ -193,6 +194,456 @@ void CMapTemplate::ParseTerrainFile(bool overlay)
 		
 		y += 1;
 	}  
+}
+
+void CMapTemplate::Apply(Vec2i &template_start_pos, Vec2i &map_start_pos, int z)
+{
+	if (SaveGameLoading) {
+		return;
+	}
+	
+	if (template_start_pos.x < 0 || template_start_pos.x >= this->Width || template_start_pos.y < 0 || template_start_pos.y >= this->Height) {
+		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", template_start_pos.x, template_start_pos.y);
+		return;
+	}
+	
+	if (z >= (int) Map.Fields.size()) {
+		Map.Info.MapWidths.push_back(this->Width);
+		Map.Info.MapHeights.push_back(this->Height);
+		Map.Fields.push_back(new CMapField[this->Width * this->Height]);
+		Map.TimeOfDaySeconds.push_back(this->TimeOfDaySeconds);
+		Map.TimeOfDay.push_back(NoTimeOfDay);
+		Map.Planes.push_back(this->Plane);
+		Map.Worlds.push_back(this->World);
+		Map.Layers.push_back(this->Layer);
+		Map.LayerConnectors.resize(z + 1);
+	} else {
+		if (!this->IsSubtemplateArea()) {
+			Map.TimeOfDaySeconds[z] = this->TimeOfDaySeconds;
+			Map.Planes[z] = this->Plane;
+			Map.Worlds[z] = this->World;
+			Map.Layers[z] = this->Layer;
+		}
+	}
+
+	if (this->TimeOfDaySeconds && !GameSettings.Inside && !GameSettings.NoTimeOfDay && Editor.Running == EditorNotRunning && !this->IsSubtemplateArea()) {
+		Map.TimeOfDay[z] = SyncRand(MaxTimesOfDay - 1) + 1; // begin at a random time of day
+	}
+	
+	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+	if (!Map.Info.IsPointOnMap(map_start_pos, z)) {
+		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", map_start_pos.x, map_start_pos.y);
+		return;
+	}
+	
+	for (int x = 0; x < Map.Info.MapWidths[z]; ++x) {
+		if ((template_start_pos.x + x) >= this->Width) {
+			break;
+		}
+		for (int y = 0; y < Map.Info.MapHeights[z]; ++y) {
+			if ((template_start_pos.y + y) >= this->Height) {
+				break;
+			}
+			Vec2i pos(template_start_pos.x + x, template_start_pos.y + y);
+			Vec2i real_pos(map_start_pos.x + x, map_start_pos.y + y);
+			if (this->GetTileTerrain(pos, false)) {
+				Map.Field(real_pos, z)->SetTerrain(this->GetTileTerrain(pos, false));
+			}
+			if (this->GetTileTerrain(pos, true)) {
+				Map.Field(real_pos, z)->SetTerrain(this->GetTileTerrain(pos, true));
+			}
+		}
+	}
+	
+	if (this->IsSubtemplateArea() && this->SurroundingTerrain) {
+		Vec2i surrounding_start_pos(map_start_pos - Vec2i(1, 1));
+		Vec2i surrounding_end(map_end + Vec2i(1, 1));
+		for (int x = surrounding_start_pos.x; x < surrounding_end.x; ++x) {
+			for (int y = surrounding_start_pos.y; y < surrounding_end.y; y += (surrounding_end.y - surrounding_start_pos.y - 1)) {
+				Vec2i surrounding_pos(x, y);
+				if (!Map.Info.IsPointOnMap(surrounding_pos, z) || Map.IsPointInASubtemplateArea(surrounding_pos, z)) {
+					continue;
+				}
+				Map.Field(surrounding_pos, z)->SetTerrain(this->SurroundingTerrain);
+			}
+		}
+		for (int x = surrounding_start_pos.x; x < surrounding_end.x; x += (surrounding_end.x - surrounding_start_pos.x - 1)) {
+			for (int y = surrounding_start_pos.y; y < surrounding_end.y; ++y) {
+				Vec2i surrounding_pos(x, y);
+				if (!Map.Info.IsPointOnMap(surrounding_pos, z) || Map.IsPointInASubtemplateArea(surrounding_pos, z)) {
+					continue;
+				}
+				Map.Field(surrounding_pos, z)->SetTerrain(this->SurroundingTerrain);
+			}
+		}
+	}
+	
+	for (std::map<std::pair<int, int>, std::string>::iterator iterator = this->TileLabels.begin(); iterator != this->TileLabels.end(); ++iterator) {
+		Vec2i label_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
+		if (!Map.Info.IsPointOnMap(label_pos, z)) {
+			continue;
+		}
+		
+		Map.Field(label_pos, z)->Label = iterator->second;
+	}
+	
+	if (CurrentCampaign && CurrentCampaign->Faction && !this->IsSubtemplateArea()) {
+		ThisPlayer->SetCivilization(CurrentCampaign->Faction->Civilization);
+		ThisPlayer->SetFaction(CurrentCampaign->Faction->Name);
+	}
+	
+	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {
+		Vec2i random_pos(0, 0);
+		Vec2i min_pos(map_start_pos);
+		Vec2i max_pos(map_end.x - this->Subtemplates[i]->Width, map_end.y - this->Subtemplates[i]->Height);
+		int while_count = 0;
+		while (while_count < 1000) {
+			random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
+			random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
+			
+			bool on_map = Map.Info.IsPointOnMap(random_pos, z) && Map.Info.IsPointOnMap(Vec2i(random_pos.x + this->Subtemplates[i]->Width - 1, random_pos.y + this->Subtemplates[i]->Height - 1), z);
+			
+			bool on_subtemplate_area = false;
+			for (int x = 0; x < this->Subtemplates[i]->Width; ++x) {
+				for (int y = 0; y < this->Subtemplates[i]->Height; ++y) {
+					if (Map.IsPointInASubtemplateArea(random_pos + Vec2i(x, y), z)) {
+						on_subtemplate_area = true;
+						break;
+					}
+				}
+				if (on_subtemplate_area) {
+					break;
+				}
+			}
+			
+			if (on_map && !on_subtemplate_area) {
+				this->Subtemplates[i]->Apply(Vec2i(0, 0), random_pos, z);
+				
+				Map.SubtemplateAreas[z].push_back(std::pair<Vec2i, Vec2i>(random_pos, Vec2i(random_pos.x + this->Subtemplates[i]->Width - 1, random_pos.y + this->Subtemplates[i]->Height - 1)));
+				
+				for (size_t j = 0; j < this->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
+					Vec2i external_start_pos(random_pos.x - (this->Subtemplates[i]->Width / 2), random_pos.y - (this->Subtemplates[i]->Height / 2));
+					Vec2i external_end(random_pos.x + this->Subtemplates[i]->Width + (this->Subtemplates[i]->Width / 2), random_pos.y + this->Subtemplates[i]->Height + (this->Subtemplates[i]->Height / 2));
+					int map_width = (external_end.x - external_start_pos.x);
+					int map_height = (external_end.y - external_start_pos.y);
+					int expansion_number = 0;
+					
+					int degree_level = this->Subtemplates[i]->ExternalGeneratedTerrains[j].second;
+					
+					if (degree_level == ExtremelyHighDegreeLevel) {
+						expansion_number = map_width * map_height / 2;
+					} else if (degree_level == VeryHighDegreeLevel) {
+						expansion_number = map_width * map_height / 4;
+					} else if (degree_level == HighDegreeLevel) {
+						expansion_number = map_width * map_height / 8;
+					} else if (degree_level == MediumDegreeLevel) {
+						expansion_number = map_width * map_height / 16;
+					} else if (degree_level == LowDegreeLevel) {
+						expansion_number = map_width * map_height / 32;
+					} else if (degree_level == VeryLowDegreeLevel) {
+						expansion_number = map_width * map_height / 64;
+					}
+					
+					Map.GenerateTerrain(this->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !this->Subtemplates[i]->TerrainFile.empty(), z);
+				}
+				break;
+			}
+			
+			while_count += 1;
+		}
+	}
+	
+	if (!this->IsSubtemplateArea()) {
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+	} else {
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+	}
+	
+	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
+		Vec2i unit_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		
+		Vec2i unit_offset((std::get<0>(iterator->second)->TileWidth - 1) / 2, (std::get<0>(iterator->second)->TileHeight - 1) / 2);
+		CUnit *unit = CreateResourceUnit(unit_pos - unit_offset, *std::get<0>(iterator->second), z);
+		
+		if (std::get<1>(iterator->second)) {
+			unit->SetResourcesHeld(std::get<1>(iterator->second));
+			unit->Variable[GIVERESOURCE_INDEX].Value = std::get<1>(iterator->second);
+			unit->Variable[GIVERESOURCE_INDEX].Max = std::get<1>(iterator->second);
+			unit->Variable[GIVERESOURCE_INDEX].Enable = 1;
+		}
+		
+		if (std::get<2>(iterator->second)) {
+			unit->SetUnique(std::get<2>(iterator->second));
+		}
+	}
+
+	this->ApplyUnits(template_start_pos, map_start_pos, z);
+	
+	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
+		int map_width = (map_end.x - map_start_pos.x);
+		int map_height = (map_end.y - map_start_pos.y);
+		int seed_number = map_width * map_height / 1024;
+		int expansion_number = 0;
+		
+		int degree_level = this->GeneratedTerrains[i].second;
+		
+		if (degree_level == ExtremelyHighDegreeLevel) {
+			expansion_number = map_width * map_height / 2;
+			seed_number = map_width * map_height / 256;
+		} else if (degree_level == VeryHighDegreeLevel) {
+			expansion_number = map_width * map_height / 4;
+			seed_number = map_width * map_height / 512;
+		} else if (degree_level == HighDegreeLevel) {
+			expansion_number = map_width * map_height / 8;
+			seed_number = map_width * map_height / 1024;
+		} else if (degree_level == MediumDegreeLevel) {
+			expansion_number = map_width * map_height / 16;
+			seed_number = map_width * map_height / 2048;
+		} else if (degree_level == LowDegreeLevel) {
+			expansion_number = map_width * map_height / 32;
+			seed_number = map_width * map_height / 4096;
+		} else if (degree_level == VeryLowDegreeLevel) {
+			expansion_number = map_width * map_height / 64;
+			seed_number = map_width * map_height / 8192;
+		}
+		
+		seed_number = std::max(1, seed_number);
+		
+		Map.GenerateTerrain(this->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !this->TerrainFile.empty(), z);
+	}
+	
+	if (!this->IsSubtemplateArea()) {
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+		Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
+	} else {
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
+	}
+
+	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})
+	this->ApplyUnits(template_start_pos, map_start_pos, z, true);
+
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (Players[i].Type != PlayerPerson && Players[i].Type != PlayerComputer && Players[i].Type != PlayerRescueActive) {
+			continue;
+		}
+		if (Map.IsPointInASubtemplateArea(Players[i].StartPos, z)) {
+			continue;
+		}
+		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y || Players[i].StartMapLayer != z) {
+			continue;
+		}
+		for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
+			Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
+		}
+	}
+	
+	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
+		Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), false, z);
+	}
+}
+
+void CMapTemplate::ApplyUnits(Vec2i &template_start_pos, Vec2i &map_start_pos, int z, bool random)
+{
+	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+
+	for (size_t i = 0; i < this->PlaneConnectors.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(this->PlaneConnectors[i]));
+		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		if (random) {
+			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
+				continue;
+			}
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->PlaneConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
+		}
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		Vec2i unit_offset((std::get<1>(this->PlaneConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->PlaneConnectors[i])->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->PlaneConnectors[i]), &Players[PlayerNumNeutral], z);
+		Map.LayerConnectors[z].push_back(unit);
+		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+			bool found_other_connector = false;
+			if (Map.Planes[second_z] == std::get<2>(this->PlaneConnectors[i])) {
+				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
+					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
+						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+						found_other_connector = true;
+						break;
+					}
+				}
+			}
+			if (found_other_connector) {
+				break;
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < this->WorldConnectors.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(this->WorldConnectors[i]));
+		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		if (random) {
+			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
+				continue;
+			}
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->WorldConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
+		}
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		Vec2i unit_offset((std::get<1>(this->WorldConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->WorldConnectors[i])->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->WorldConnectors[i]), &Players[PlayerNumNeutral], z);
+		Map.LayerConnectors[z].push_back(unit);
+		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+			bool found_other_connector = false;
+			if (Map.Worlds[second_z] == std::get<2>(this->WorldConnectors[i])) {
+				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
+					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
+						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+						found_other_connector = true;
+						break;
+					}
+				}
+			}
+			if (found_other_connector) {
+				break;
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < this->LayerConnectors.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(this->LayerConnectors[i]));
+		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		if (random) {
+			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
+				continue;
+			}
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->LayerConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
+		}
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		Vec2i unit_offset((std::get<1>(this->LayerConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->LayerConnectors[i])->TileHeight - 1) / 2);
+		CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->LayerConnectors[i]), &Players[PlayerNumNeutral], z);
+		Map.LayerConnectors[z].push_back(unit);
+		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
+			bool found_other_connector = false;
+			if (Map.Layers[second_z] == std::get<2>(this->LayerConnectors[i])) {
+				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
+					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
+						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;
+						unit->ConnectingDestination = Map.LayerConnectors[second_z][j];
+						found_other_connector = true;
+						break;
+					}
+				}
+			}
+			if (found_other_connector) {
+				break;
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < this->Units.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(this->Units[i]));
+		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		if (random) {
+			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
+				continue;
+			}
+			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->Units[i]), std::get<2>(this->Units[i]), map_start_pos, map_end - Vec2i(1, 1), z);
+		}
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		
+		if ((!CurrentCampaign || std::get<3>(this->Units[i]) == 0 || CurrentCampaign->Year >= std::get<3>(this->Units[i])) && (std::get<4>(this->Units[i]) == 0 || CurrentCampaign->Year < std::get<4>(this->Units[i]))) {
+			CPlayer *player = NULL;
+			if (std::get<2>(this->Units[i])) {
+				player = GetOrAddFactionPlayer(std::get<2>(this->Units[i]));
+				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
+					player->SetStartView(unit_pos, z);
+				}
+			} else {
+				player = &Players[PlayerNumNeutral];
+			}
+			Vec2i unit_offset((std::get<1>(this->Units[i])->TileWidth - 1) / 2, (std::get<1>(this->Units[i])->TileHeight - 1) / 2);
+			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z);
+				
+			if (unit->Type->CanStore[GoldCost]) { //if can store gold (i.e. is a town hall), create five worker units around it
+				int civilization = PlayerRaces.GetRaceIndexByName(unit->Type->Civilization.c_str());
+				int faction = PlayerRaces.GetFactionIndexByName(civilization, unit->Type->Faction.c_str());
+				int worker_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker"));
+					
+				if (worker_type_id != -1) {
+					Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
+					for (int i = 0; i < 5; ++i) {
+						CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], player, z);
+					}
+				}
+			} else if (unit->Type->CanStore[WoodCost] || unit->Type->CanStore[StoneCost]) { //if can store lumber or stone (i.e. is a lumber mill), create two worker units around it
+				int civilization = PlayerRaces.GetRaceIndexByName(unit->Type->Civilization.c_str());
+				int faction = PlayerRaces.GetFactionIndexByName(civilization, unit->Type->Faction.c_str());
+				int worker_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker"));
+					
+				if (worker_type_id != -1) {
+					Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
+					for (int i = 0; i < 2; ++i) {
+						CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], player, z);
+					}
+				}
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < this->Heroes.size(); ++i) {
+		Vec2i unit_raw_pos(std::get<0>(this->Heroes[i]));
+		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		CCharacter *hero = std::get<1>(this->Heroes[i]);
+		if (random) {
+			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
+				continue;
+			}
+			unit_pos = Map.GenerateUnitLocation(hero->Type, std::get<2>(this->Heroes[i]), map_start_pos, map_end - Vec2i(1, 1), z);
+		}
+		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+			continue;
+		}
+		
+		if ((!CurrentCampaign || std::get<3>(this->Heroes[i]) == 0 || CurrentCampaign->Year >= std::get<3>(this->Heroes[i])) && (std::get<4>(this->Heroes[i]) == 0 || CurrentCampaign->Year < std::get<4>(this->Heroes[i]))) {
+			CPlayer *player = NULL;
+			if (std::get<2>(this->Heroes[i])) {
+				player = GetOrAddFactionPlayer(std::get<2>(this->Heroes[i]));
+				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
+					player->SetStartView(unit_pos, z);
+				}
+			} else {
+				player = &Players[PlayerNumNeutral];
+			}
+			Vec2i unit_offset((hero->Type->TileWidth - 1) / 2, (hero->Type->TileHeight - 1) / 2);
+			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
+			unit->SetCharacter(hero->GetFullName());
+		}
+	}
 }
 
 bool CMapTemplate::IsSubtemplateArea()
@@ -425,13 +876,17 @@ CTerrainType *CMap::GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const
 	}
 }
 
-Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, int z) const
+Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, Vec2i min_pos, Vec2i max_pos, int z) const
 {
 	if (SaveGameLoading) {
 		return Vec2i(-1, -1);
 	}
 	
 	CPlayer *player = GetFactionPlayer(faction);
+	if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && player != NULL && player->StartMapLayer == z && player->StartPos.x >= min_pos.x && player->StartPos.x <= max_pos.x && player->StartPos.y >= min_pos.y && player->StartPos.y <= max_pos.y) {
+		min_pos = player->StartPos - Vec2i(8, 8);
+		max_pos = player->StartPos + Vec2i(8, 8);
+	}
 	
 	Vec2i random_pos(-1, -1);
 

@@ -106,6 +106,7 @@ class CUnit;
 class CUnitType;
 //Wyrmgus start
 class CFaction;
+class CCharacter;
 class CUniqueItem;
 class CWorld;
 class CPlane;
@@ -148,6 +149,8 @@ public:
 
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
 	void ParseTerrainFile(bool overlay = false);
+	void Apply(Vec2i &template_start_pos, Vec2i &map_start_pos, int z);
+	void ApplyUnits(Vec2i &template_start_pos, Vec2i &map_start_pos, int z, bool random = false);
 	bool IsSubtemplateArea();
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false);
 	
@@ -166,7 +169,6 @@ public:
 	CTerrainType *SurroundingTerrain;
 	std::vector<CMapTemplate *> Subtemplates;
 	std::vector<std::pair<CTerrainType *, int>> GeneratedTerrains;
-	std::vector<std::pair<CTerrainType *, int>> PlayerLocationGeneratedTerrains;
 	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
@@ -174,6 +176,7 @@ public:
 	std::vector<CTerrainType *> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, int, int>> Units; /// Units; first value is the tile position, and the last ones are start year and end year
+	std::vector<std::tuple<Vec2i, CCharacter *, CFaction *, int, int>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
 	std::vector<std::tuple<Vec2i, CUnitType *, CPlane *, CUniqueItem *>> PlaneConnectors; /// Layer connectors (with unit type, plane pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> LayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
@@ -335,7 +338,7 @@ public:
 	//Wyrmgus start
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay, int z) const;
 	CTerrainType *GetTileTopTerrain(const Vec2i &pos, bool seen, int z) const;
-	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, const Vec2i &min_pos, const Vec2i &max_pos, int z) const;
+	Vec2i GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, Vec2i min_pos, Vec2i max_pos, int z) const;
 	//Wyrmgus end
 
 	/// Mark a tile as seen by the player.
