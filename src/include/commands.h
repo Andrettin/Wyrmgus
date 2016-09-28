@@ -204,9 +204,15 @@ extern void SendCommandRepair(CUnit &unit, const Vec2i &pos, CUnit *dest, int fl
 /// Send auto repair command
 extern void SendCommandAutoRepair(CUnit &unit, int on);
 /// Send attack command
-extern void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+//Wyrmgus start
+//extern void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush);
+extern void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *dest, int flush, int z = 0);
+//Wyrmgus end
 /// Send attack ground command
-extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
+//Wyrmgus start
+//extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush);
+extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z = 0);
+//Wyrmgus end
 //Wyrmgus start
 /// Send use command
 extern void SendCommandUse(CUnit &unit, CUnit &dest, int flush);

@@ -238,9 +238,15 @@ int AiFindWall(AiForce *force)
 //			if (aiunit.Type->CanAttack) {
 			if (aiunit.CanAttack()) {
 			//Wyrmgus end
-				CommandAttack(aiunit, wallPos, NULL, FlushCommands);
+				//Wyrmgus start
+//				CommandAttack(aiunit, wallPos, NULL, FlushCommands);
+				CommandAttack(aiunit, wallPos, NULL, FlushCommands, aiunit.MapLayer);
+				//Wyrmgus end
 			} else {
-				CommandMove(aiunit, wallPos, FlushCommands);
+				//Wyrmgus start
+//				CommandMove(aiunit, wallPos, FlushCommands);
+				CommandMove(aiunit, wallPos, FlushCommands, aiunit.MapLayer);
+				//Wyrmgus end
 			}
 		}
 		return 1;

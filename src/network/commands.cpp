@@ -243,11 +243,17 @@ void SendCommandAutoRepair(CUnit &unit, int on)
 ** @param attack   or !=NoUnitP unit to be attacked.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
+//Wyrmgus start
+//void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
+void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("attack", &unit, flush, pos.x, pos.y, attack, NULL, -1);
-		CommandAttack(unit, pos, attack, flush);
+		//Wyrmgus start
+//		CommandAttack(unit, pos, attack, flush);
+		CommandAttack(unit, pos, attack, flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandAttack, unit, pos.x, pos.y, attack, 0, flush);
 	}
@@ -260,11 +266,17 @@ void SendCommandAttack(CUnit &unit, const Vec2i &pos, CUnit *attack, int flush)
 ** @param pos      map tile position to fire on.
 ** @param flush    Flag flush all pending commands.
 */
-void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
+//Wyrmgus start
+//void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush)
+void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z)
+//Wyrmgus end
 {
 	if (!IsNetworkGame()) {
 		CommandLog("attack-ground", &unit, flush, pos.x, pos.y, NoUnitP, NULL, -1);
-		CommandAttackGround(unit, pos, flush);
+		//Wyrmgus start
+//		CommandAttackGround(unit, pos, flush);
+		CommandAttackGround(unit, pos, flush, z);
+		//Wyrmgus end
 	} else {
 		NetworkSendCommand(MessageCommandGround, unit, pos.x, pos.y, NoUnitP, 0, flush);
 	}

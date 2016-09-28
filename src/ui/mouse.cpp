@@ -451,9 +451,15 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 			acknowledged = 1;
 		}
 		if (CanTarget(type, *dest->Type)) {
-			SendCommandAttack(unit, pos, dest, flush);
+			//Wyrmgus start
+//			SendCommandAttack(unit, pos, dest, flush);
+			SendCommandAttack(unit, pos, dest, flush, CurrentMapLayer);
+			//Wyrmgus end
 		} else { // No valid target
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			//Wyrmgus start
+//			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, NoUnitP, flush, CurrentMapLayer);
+			//Wyrmgus end
 		}
 		return true;
 	}
@@ -496,9 +502,15 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 			//Wyrmgus end
 		} else {
 			if (CanTarget(type, *dest.Type)) {
-				SendCommandAttack(unit, pos, &dest, flush);
+				//Wyrmgus start
+//				SendCommandAttack(unit, pos, &dest, flush);
+				SendCommandAttack(unit, pos, &dest, flush, CurrentMapLayer);
+				//Wyrmgus end
 			} else { // No valid target
-				SendCommandAttack(unit, pos, NoUnitP, flush);
+				//Wyrmgus start
+//				SendCommandAttack(unit, pos, NoUnitP, flush);
+				SendCommandAttack(unit, pos, NoUnitP, flush, CurrentMapLayer);
+				//Wyrmgus end
 			}
 		}
 		return true;
@@ -570,7 +582,7 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	*/
 	if (Map.WallOnMap(pos, CurrentMapLayer)) {
 		if (!Map.Field(pos, CurrentMapLayer)->OverlayTerrain->UnitType->BoolFlag[INDESTRUCTIBLE_INDEX].value) {
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, NoUnitP, flush, CurrentMapLayer);
 			return;
 		}
 	}
@@ -591,7 +603,10 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
 			}
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			//Wyrmgus start
+//			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, NoUnitP, flush, CurrentMapLayer);
+			//Wyrmgus end
 		}
 	} else {
 		if (RightButtonAttacks) {
@@ -599,7 +614,10 @@ static void DoRightButton_Attack(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
 			}
-			SendCommandAttack(unit, pos, NoUnitP, flush);
+			//Wyrmgus start
+//			SendCommandAttack(unit, pos, NoUnitP, flush);
+			SendCommandAttack(unit, pos, NoUnitP, flush, CurrentMapLayer);
+			//Wyrmgus end
 		} else {
 			// Note: move is correct here, right default is move
 			if (!acknowledged) {
@@ -756,7 +774,10 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 				PlayUnitSound(unit, VoiceAttack);
 				acknowledged = 1;
 			}
-			SendCommandAttackGround(unit, pos, flush);
+			//Wyrmgus start
+//			SendCommandAttackGround(unit, pos, flush);
+			SendCommandAttackGround(unit, pos, flush, CurrentMapLayer);
+			//Wyrmgus end
 			return;
 		}
 	}
@@ -1633,7 +1654,10 @@ static int SendAttack(const Vec2i &tilePos, int flush)
 				if (dest) {
 					dest->Blink = 4;
 				}
-				SendCommandAttack(unit, tilePos, dest, flush);
+				//Wyrmgus start
+//				SendCommandAttack(unit, tilePos, dest, flush);
+				SendCommandAttack(unit, tilePos, dest, flush, CurrentMapLayer);
+				//Wyrmgus end
 				ret = 1;
 			}
 		} else {
@@ -1670,7 +1694,10 @@ static int SendAttackGround(const Vec2i &tilePos, int flush)
 //		if (unit.Type->CanAttack) {
 		if (unit.CanAttack(true)) {
 		//Wyrmgus end
-			SendCommandAttackGround(unit, tilePos, flush);
+			//Wyrmgus start
+//			SendCommandAttackGround(unit, tilePos, flush);
+			SendCommandAttackGround(unit, tilePos, flush, CurrentMapLayer);
+			//Wyrmgus end
 			ret = 1;
 		} else {
 			//Wyrmgus start
