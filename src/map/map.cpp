@@ -456,7 +456,8 @@ void CMapTemplate::Apply(Vec2i &template_start_pos, Vec2i &map_start_pos, int z)
 	}
 	
 	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
-		Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), false, z);
+		bool grouped = this->GeneratedNeutralUnits[i].first->GivesResource && this->GeneratedNeutralUnits[i].first->TileWidth == 1 && this->GeneratedNeutralUnits[i].first->TileHeight == 1; // group small resources
+		Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
 	}
 }
 
