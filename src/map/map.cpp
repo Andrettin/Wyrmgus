@@ -1879,11 +1879,6 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(adjacent_terrain, adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(adjacent_terrain->AdjacentTransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
 						found_transition = true;
 					}
-					
-					if ((mf.Flags & MapFieldWaterAllowed) && !(adjacent_terrain->Flags & MapFieldWaterAllowed)) { //if this is a water tile adjacent to a non-water tile, replace the water flag with a coast one
-						mf.Flags &= ~(MapFieldWaterAllowed);
-						mf.Flags |= MapFieldCoastAllowed;
-					}
 				} else {
 					if (terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
 						mf.TransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
@@ -1905,6 +1900,11 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 					if (terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size() > 0) {
 						mf.OverlayTransitionTiles.push_back(std::pair<CTerrainType *, int>(terrain, terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)][SyncRand(terrain->TransitionTiles[std::tuple<int, int>(-1, transition_type)].size())]));
 					}
+				}
+				
+				if ((mf.Flags & MapFieldWaterAllowed) && (!adjacent_terrain || !(adjacent_terrain->Flags & MapFieldWaterAllowed))) { //if this is a water tile adjacent to a non-water tile, replace the water flag with a coast one
+					mf.Flags &= ~(MapFieldWaterAllowed);
+					mf.Flags |= MapFieldCoastAllowed;
 				}
 			}
 			

@@ -127,13 +127,16 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		}
 		if (this->Terrain) {
 			this->Flags &= ~(this->Terrain->Flags);
-			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
 	}
 	
 	if (terrain->Overlay) {
 		if (!this->Terrain || std::find(terrain->BaseTerrains.begin(), terrain->BaseTerrains.end(), this->Terrain) == terrain->BaseTerrains.end()) {
 			this->SetTerrain(terrain->BaseTerrains[0]);
+		}
+		if (terrain->Flags & MapFieldWaterAllowed) {
+			this->Flags &= ~(this->Terrain->Flags); // if the overlay is water, remove all flags from the base terrain
+			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 		}
 		this->OverlayTerrain = terrain;
 		if (terrain->SolidTiles.size() > 0) {
@@ -146,6 +149,7 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		}
 		if (this->OverlayTerrain && std::find(this->OverlayTerrain->BaseTerrains.begin(), this->OverlayTerrain->BaseTerrains.end(), terrain) == this->OverlayTerrain->BaseTerrains.end()) { //if the overlay terrain is incompatible with the new base terrain, remove the overlay
 			this->Flags &= ~(this->OverlayTerrain->Flags);
+			this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 			this->OverlayTerrain = NULL;
 			this->OverlayTransitionTiles.clear();
 		}
@@ -202,6 +206,7 @@ void CMapField::RemoveOverlayTerrain()
 	
 	this->Value = 0;
 	this->Flags &= ~(this->OverlayTerrain->Flags);
+	this->Flags &= ~(MapFieldCoastAllowed); // need to do this manually, since MapFieldCoast is added dynamically
 	this->OverlayTerrain = NULL;
 	this->OverlayTransitionTiles.clear();
 	
@@ -292,7 +297,7 @@ void CMapField::setTileIndex(const CTileset &tileset, unsigned int tileIndex, in
 	if (terrain->Overlay) {
 		if (terrain->Flags & MapFieldForest) {
 			this->SetTerrain(GetTerrainType(tileset.solidTerrainTypes[3].TerrainName));
-		} else if (terrain->Flags & MapFieldRocks) {
+		} else if (terrain->Flags & MapFieldRocks || terrain->Flags & MapFieldWaterAllowed) {
 			this->SetTerrain(GetTerrainType(tileset.solidTerrainTypes[2].TerrainName));
 		}
 	}
