@@ -455,6 +455,9 @@ static int FillChannel(CSample *sample, unsigned char volume, char stereo, Origi
 	Channels[NextFreeChannel].Sample = sample;
 	Channels[NextFreeChannel].Stereo = stereo;
 	Channels[NextFreeChannel].FinishedCallback = NULL;
+	//Wyrmgus start
+	Channels[NextFreeChannel].Unit = NULL;
+	//Wyrmgus end
 	if (origin && origin->Base) {
 		Origin *source = new Origin;
 		source->Base = origin->Base;
