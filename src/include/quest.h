@@ -115,7 +115,7 @@ class CCampaign
 public:
 	CCampaign() :
 		ID(-1), Civilization(-1), Year(0),
-		Hidden(false),
+		Hidden(false), Sandbox(false),
 		Faction(NULL), StartEffects(NULL)
 	{
 	}
@@ -128,6 +128,7 @@ public:
 	int Civilization;				/// Which civilization the campaign belongs to
 	int Year;						/// The starting year of the campaign
 	bool Hidden;					/// Whether the campaign is hidden
+	bool Sandbox;					/// Whether the campaign is a sandbox one
 	CFaction *Faction;				/// Which faction the player plays as in the campaign
 	LuaCallback *StartEffects;		/// The effects at game start to set up the campaign
 };

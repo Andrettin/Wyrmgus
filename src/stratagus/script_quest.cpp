@@ -416,6 +416,8 @@ static int CclDefineCampaign(lua_State *l)
 			campaign->Faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
 			campaign->Hidden = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Sandbox")) {
+			campaign->Sandbox = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Year")) {
 			campaign->Year = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "StartEffects")) {
@@ -481,6 +483,9 @@ static int CclGetCampaignData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Hidden")) {
 		lua_pushboolean(l, campaign->Hidden);
+		return 1;
+	} else if (!strcmp(data, "Sandbox")) {
+		lua_pushboolean(l, campaign->Sandbox);
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
