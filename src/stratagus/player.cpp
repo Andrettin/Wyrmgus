@@ -1908,7 +1908,11 @@ void CPlayer::CompleteQuest(CQuest *quest)
 	if (this == ThisPlayer) {
 		SetQuestCompleted(quest->Ident, GameSettings.Difficulty);
 		SaveQuestCompletion();
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\nRewards: " + quest->Rewards + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
+		std::string rewards_string;
+		if (!quest->Rewards.empty()) {
+			rewards_string = "Rewards: " + quest->Rewards;
+		}
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
 	}
 }
 
