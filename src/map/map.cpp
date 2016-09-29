@@ -196,7 +196,7 @@ void CMapTemplate::ParseTerrainFile(bool overlay)
 	}  
 }
 
-void CMapTemplate::Apply(Vec2i &template_start_pos, Vec2i &map_start_pos, int z)
+void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 {
 	if (SaveGameLoading) {
 		return;
@@ -461,7 +461,7 @@ void CMapTemplate::Apply(Vec2i &template_start_pos, Vec2i &map_start_pos, int z)
 	}
 }
 
-void CMapTemplate::ApplyUnits(Vec2i &template_start_pos, Vec2i &map_start_pos, int z, bool random)
+void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random)
 {
 	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
 

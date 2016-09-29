@@ -149,8 +149,8 @@ public:
 
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
 	void ParseTerrainFile(bool overlay = false);
-	void Apply(Vec2i &template_start_pos, Vec2i &map_start_pos, int z);
-	void ApplyUnits(Vec2i &template_start_pos, Vec2i &map_start_pos, int z, bool random = false);
+	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);
+	void ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
 	bool IsSubtemplateArea();
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false);
 	
