@@ -3075,6 +3075,11 @@ static int CclGetPlayerData(lua_State *l)
 		}
 		return 1;
 	//Wyrmgus start
+	} else if (!strcmp(data, "HasContactWith")) {
+		LuaCheckArgs(l, 3);
+		int second_player = LuaToNumber(l, 3);
+		lua_pushboolean(l, p->HasContactWith(Players[second_player]));
+		return 1;
 	} else if (!strcmp(data, "HasQuest")) {
 		LuaCheckArgs(l, 3);
 		CQuest *quest = GetQuest(LuaToString(l, 3));
