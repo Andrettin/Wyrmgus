@@ -77,14 +77,20 @@ public:
 
 	bool found() const { return *enemy != NULL; }
 
-	bool operator()(const CUnit *const unit) const
+	//Wyrmgus start
+//	bool operator()(const CUnit *const unit) const
+	bool operator()(const CUnit *const unit)
+	//Wyrmgus end
 	{
 		//Wyrmgus start
 //		if (unit->Type->CanAttack == false) {
-		if (unit->CanAttack() == false) {
+		if (unit->CanAttack() == false || std::find(CheckedTypes.begin(), CheckedTypes.end(), unit->Type) != CheckedTypes.end()) { // don't check for multiple units of the same type, since the result will be the same in almost all cases, so we save performance
 		//Wyrmgus end
 			return *enemy == NULL;
 		}
+		//Wyrmgus start
+		CheckedTypes.push_back(unit->Type);
+		//Wyrmgus end
 		if (FIND_TYPE == AIATTACK_RANGE) {
 			*enemy = AttackUnitsInReactRange(*unit);
 		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
@@ -112,6 +118,9 @@ public:
 	}
 private:
 	const CUnit **enemy;
+	//Wyrmgus start
+	std::vector<const CUnitType *> CheckedTypes;
+	//Wyrmgus end
 };
 
 class IsAnAlliedUnitOf

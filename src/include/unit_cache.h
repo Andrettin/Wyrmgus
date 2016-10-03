@@ -118,7 +118,10 @@ public:
 	 *  If @p functor return false then loop is exited.
 	 */
 	template<typename _T>
-	int for_each_if(const _T &functor)
+	//Wyrmgus start
+//	int for_each_if(const _T &functor)
+	int for_each_if(_T &functor)
+	//Wyrmgus end
 	{
 		const size_t size = Units.size();
 
