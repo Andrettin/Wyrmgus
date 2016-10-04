@@ -485,7 +485,8 @@ class CFaction
 public:
 	CFaction() : 
 		ID(-1), Civilization(-1), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1), Language(-1),
-		Playable(true) //factions are playable by default
+		Playable(true), //factions are playable by default
+		DefaultAI("land-attack")
 	{
 	}
 	
@@ -497,6 +498,7 @@ public:
 	std::string Background;												/// faction background
 	std::string Type;													/// faction type (tribe or polity)
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
+	std::string DefaultAI;
 	int ID;																/// faction ID
 	int Civilization;													/// faction civilization
 	int DefaultTier;													/// default faction tier

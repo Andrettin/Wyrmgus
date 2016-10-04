@@ -1796,6 +1796,8 @@ static int CclDefineFaction(lua_State *l)
 			} else {
 				LuaError(l, "Government type \"%s\" doesn't exist." _C_ government_type_name.c_str());
 			}
+		} else if (!strcmp(value, "DefaultAI")) {
+			faction->DefaultAI = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentFaction")) {
 			parent_faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Language")) {

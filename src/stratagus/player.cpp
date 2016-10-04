@@ -1159,7 +1159,7 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 			Players[i].SetCivilization(faction->Civilization);
 			Players[i].SetFaction(faction->Name);
 			Players[i].AiEnabled = true;
-			Players[i].AiName = "land-attack";
+			Players[i].AiName = faction->DefaultAI;
 			Players[i].Team = 1;
 			Players[i].Resources[GoldCost] = 1000; // give the new player enough resources to start up
 			Players[i].Resources[WoodCost] = 1000;
@@ -2494,7 +2494,7 @@ void PlayersEachMinute(int playerIdx)
 						Players[j].SetCivilization(splitter_faction->Civilization);
 						Players[j].SetFaction(splitter_faction->Name);
 						Players[j].AiEnabled = true;
-						Players[j].AiName = "land-attack";
+						Players[j].AiName = faction->DefaultAI;
 						Players[j].Team = 1;
 						Players[j].Resources[GoldCost] = 5000; // give the new player enough resources to start up
 						Players[j].Resources[WoodCost] = 5000;
