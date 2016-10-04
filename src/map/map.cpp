@@ -548,7 +548,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 		Map.LayerConnectors[z].push_back(unit);
 		for (size_t second_z = 0; second_z < Map.LayerConnectors.size(); ++second_z) {
 			bool found_other_connector = false;
-			if (Map.Layers[second_z] == std::get<2>(this->LayerConnectors[i])) {
+			if (Map.Layers[second_z] == std::get<2>(this->LayerConnectors[i]) && Map.Worlds[second_z] == this->World && Map.Planes[second_z] == this->Plane) {
 				for (size_t j = 0; j < Map.LayerConnectors[second_z].size(); ++j) {
 					if (Map.LayerConnectors[second_z][j]->Type == unit->Type && Map.LayerConnectors[second_z][j]->Unique == unit->Unique && Map.LayerConnectors[second_z][j]->ConnectingDestination == NULL) {
 						Map.LayerConnectors[second_z][j]->ConnectingDestination = unit;

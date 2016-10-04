@@ -776,7 +776,10 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		}
 	}
 	
-	if (lua_isstring(l, 4)) {
+	if (lua_isnumber(l, 4)) {
+		int layer = LuaToNumber(l, 4);
+		map_template->LayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
+	} else if (lua_isstring(l, 4)) {
 		std::string realm = LuaToString(l, 4);
 		if (GetWorld(realm)) {
 			map_template->WorldConnectors.push_back(std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>(ipos, unittype, GetWorld(realm), unique));
@@ -785,9 +788,6 @@ static int CclSetMapTemplateLayerConnector(lua_State *l)
 		} else {
 			LuaError(l, "incorrect argument");
 		}
-	} else if (lua_isnumber(l, 4)) {
-		int layer = LuaToNumber(l, 4);
-		map_template->LayerConnectors.push_back(std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>(ipos, unittype, layer, unique));
 	} else {
 		LuaError(l, "incorrect argument");
 	}
