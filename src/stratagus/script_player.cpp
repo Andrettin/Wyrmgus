@@ -2244,6 +2244,11 @@ static int CclDefineDeity(lua_State *l)
 				LuaError(l, "Plane doesn't exist.");
 			}
 			deity->HomePlane = plane;
+		} else if (!strcmp(value, "Icon")) {
+			deity->Icon.Name = LuaToString(l, -1);
+			deity->Icon.Icon = NULL;
+			deity->Icon.Load();
+			deity->Icon.Icon->Load();
 		} else if (!strcmp(value, "Civilizations")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");

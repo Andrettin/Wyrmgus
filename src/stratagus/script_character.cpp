@@ -246,6 +246,19 @@ static int CclDefineCharacter(lua_State *l)
 			character->Level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
 			character->ExperiencePercent = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "Deity")) {
+			int deity_id = PlayerRaces.GetDeityIndexByIdent(LuaToString(l, -1));
+			if (deity_id != -1) {
+				CDeity *deity = PlayerRaces.Deities[deity_id];
+				character->Deity = deity;
+				if (character->Icon.Name.empty() && !deity->Icon.Name.empty()) {
+					character->Icon.Name = deity->Icon.Name;
+					character->Icon.Icon = NULL;
+					character->Icon.Load();
+				}
+			} else {
+				LuaError(l, "Deity doesn't exist.");
+			}
 		} else if (!strcmp(value, "Abilities")) {
 			character->Abilities.clear();
 			const int args = lua_rawlen(l, -1);
@@ -973,6 +986,13 @@ static int CclGetCharacterData(lua_State *l)
 	} else if (!strcmp(data, "Trait")) {
 		if (character->Trait != NULL) {
 			lua_pushstring(l, character->Trait->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Deity")) {
+		if (character->Deity != NULL) {
+			lua_pushstring(l, character->Deity->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

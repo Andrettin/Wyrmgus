@@ -578,6 +578,7 @@ public:
 	std::string Background;
 	std::string Quote;
 	CPlane *HomePlane;			/// The home plane of the deity
+	IconConfig Icon;			/// Deity's icon
 	std::vector<int> Civilizations;	/// Civilizations which may worship the deity
 	std::vector<CReligion *> Religions;	/// Religions for which this deity is available
 	std::vector<std::string> Feasts;

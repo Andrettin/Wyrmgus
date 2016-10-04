@@ -51,6 +51,7 @@
 --  Declarations
 ----------------------------------------------------------------------------*/
 
+class CDeity;
 class CFaction;
 class CItem;
 class CProvince;
@@ -105,7 +106,7 @@ public:
 	CCharacter() :
 		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
 		ViolentDeath(false), Noble(false), Persistent(false), Custom(false), Defined(false),
-		Type(NULL), Trait(NULL),
+		Type(NULL), Trait(NULL), Deity(NULL),
 		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL)
 	{
 		memset(Attributes, 0, sizeof(Attributes));
@@ -149,6 +150,7 @@ public:
 	IconConfig HeroicIcon;				/// Character's heroic icon (level 3 and upper)
 	CUnitType *Type;
 	CUpgrade *Trait;
+	CDeity *Deity;						/// The deity which the character is (if it is a deity)
 	CCharacter *Father;					/// Character's father
 	CCharacter *Mother;					/// Character's mother
 	CCharacter *DateReferenceCharacter;	/// Character used as a date reference for this character; i.e. if a dwarf was the contemporary of a human hero in a saga, make the hero a date reference for the dwarf, so that the dwarf will be generated in a similar date in Nidavellir
