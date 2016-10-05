@@ -478,15 +478,19 @@ extern bool CheckObstaclesBetweenTiles(const Vec2i &unitPos, const Vec2i &goalPo
 //Wyrmgus start
 //extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred);
 //extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range);
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool circle = false);
-extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle = false);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, CUnitFilter pred, bool circle = false, bool include_neutral = false);
+extern CUnit *AttackUnitsInDistance(const CUnit &unit, int range, bool circle = false, bool include_neutral = false);
 //Wyrmgus end
 /// Find best enemy in attack range to attack
 extern CUnit *AttackUnitsInRange(const CUnit &unit, CUnitFilter pred);
 extern CUnit *AttackUnitsInRange(const CUnit &unit);
 /// Find best enemy in reaction range to attack
-extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred);
-extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
+//Wyrmgus start
+//extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred);
+//extern CUnit *AttackUnitsInReactRange(const CUnit &unit);
+extern CUnit *AttackUnitsInReactRange(const CUnit &unit, CUnitFilter pred, bool include_neutral = false);
+extern CUnit *AttackUnitsInReactRange(const CUnit &unit, bool include_neutral = false);
+//Wyrmgus end
 
 
 

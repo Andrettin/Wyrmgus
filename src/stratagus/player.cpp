@@ -2742,34 +2742,70 @@ void CPlayer::SetDiplomacyNeutralWith(const CPlayer &player)
 {
 	this->Enemy &= ~(1 << player.Index);
 	this->Allied &= ~(1 << player.Index);
+	
+	//Wyrmgus start
+	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
+		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Neutral"), _(this->Name.c_str()));
+	}
+	//Wyrmgus end
 }
 
 void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 {
 	this->Enemy &= ~(1 << player.Index);
 	this->Allied |= 1 << player.Index;
+	
+	//Wyrmgus start
+	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
+		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Ally"), _(this->Name.c_str()));
+	}
+	//Wyrmgus end
 }
 
 void CPlayer::SetDiplomacyEnemyWith(const CPlayer &player)
 {
 	this->Enemy |= 1 << player.Index;
 	this->Allied &= ~(1 << player.Index);
+	
+	//Wyrmgus start
+	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
+		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
+	}
+	//Wyrmgus end
 }
 
 void CPlayer::SetDiplomacyCrazyWith(const CPlayer &player)
 {
 	this->Enemy |= 1 << player.Index;
 	this->Allied |= 1 << player.Index;
+	
+	//Wyrmgus start
+	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
+		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Crazy"), _(this->Name.c_str()));
+	}
+	//Wyrmgus end
 }
 
 void CPlayer::ShareVisionWith(const CPlayer &player)
 {
 	this->SharedVision |= (1 << player.Index);
+	
+	//Wyrmgus start
+	if (player.Index == ThisPlayer->Index) {
+		ThisPlayer->Notify(_("%s is now sharing vision with us"), _(this->Name.c_str()));
+	}
+	//Wyrmgus end
 }
 
 void CPlayer::UnshareVisionWith(const CPlayer &player)
 {
 	this->SharedVision &= ~(1 << player.Index);
+	
+	//Wyrmgus start
+	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
+		ThisPlayer->Notify(_("%s is no longer sharing vision with us"), _(this->Name.c_str()));
+	}
+	//Wyrmgus end
 }
 
 

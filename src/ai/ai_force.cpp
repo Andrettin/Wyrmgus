@@ -61,14 +61,20 @@ template <const int FIND_TYPE>
 class AiForceEnemyFinder
 {
 public:
-	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
+	//Wyrmgus start
+//	AiForceEnemyFinder(int force, const CUnit **enemy) : enemy(enemy)
+	AiForceEnemyFinder(int force, const CUnit **enemy, const bool include_neutral) : enemy(enemy), IncludeNeutral(include_neutral)
+	//Wyrmgus end
 	{
 		Assert(enemy != NULL);
 		*enemy = NULL;
 		AiPlayer->Force[force].Units.for_each_if(*this);
 	}
 
-	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
+	//Wyrmgus start
+//	AiForceEnemyFinder(AiForce &force, const CUnit **enemy) : enemy(enemy)
+	AiForceEnemyFinder(AiForce &force, const CUnit **enemy, const bool include_neutral) : enemy(enemy), IncludeNeutral(include_neutral)
+	//Wyrmgus end
 	{
 		Assert(enemy != NULL);
 		*enemy = NULL;
@@ -92,26 +98,44 @@ public:
 		CheckedTypes.push_back(unit->Type);
 		//Wyrmgus end
 		if (FIND_TYPE == AIATTACK_RANGE) {
-			*enemy = AttackUnitsInReactRange(*unit);
+			//Wyrmgus start
+//			*enemy = AttackUnitsInReactRange(*unit);
+			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(Players[PlayerNumNeutral]), IncludeNeutral);
+			//Wyrmgus end
 		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+			//Wyrmgus start
+//			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
+			//Wyrmgus end
 		} else if (FIND_TYPE == AIATTACK_BUILDING) {
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
+			//Wyrmgus start
+//			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsBuildingType());
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsBuildingType()), false, IncludeNeutral);
+			//Wyrmgus end
 			//Wyrmgus start
 			//why make sure the enemy is NULL?
 //			Assert(!*enemy);
 			//Wyrmgus end
 			if (*enemy == NULL || !(*enemy)->Type->Building) {
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+				//Wyrmgus start
+//				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
+				//Wyrmgus end
 			}
 		} else if (FIND_TYPE == AIATTACK_AGRESSIVE) {
-			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
+			//Wyrmgus start
+//			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, IsAggresiveUnit());
+			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, MakeAndPredicate(HasNotSamePlayerAs(Players[PlayerNumNeutral]), IsAggresiveUnit()), false, IncludeNeutral);
+			//Wyrmgus end
 			//Wyrmgus start
 			//why ask that the enemy be NULL?
 //			Assert(!*enemy || (*enemy)->IsAgressive());
 			//Wyrmgus end
 			if (*enemy == NULL) {
-				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+				//Wyrmgus start
+//				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
+				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
+				//Wyrmgus end
 			}
 		}
 		return *enemy == NULL;
@@ -119,6 +143,7 @@ public:
 private:
 	const CUnit **enemy;
 	//Wyrmgus start
+	const bool IncludeNeutral;
 	std::vector<const CUnitType *> CheckedTypes;
 	//Wyrmgus end
 };
@@ -433,6 +458,7 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	if (this->Scouting) {
 		return;
 	}
+	bool include_neutral = true;
 	//Wyrmgus end
 	if (!this->Attacking) {
 		// Remember the original force position so we can return there after attack
@@ -476,16 +502,28 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		/* Search in entire map */
 		const CUnit *enemy = NULL;
 		if (isTransporter) {
-			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy);
+			//Wyrmgus start
+//			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy);
+			AiForceEnemyFinder<AIATTACK_AGRESSIVE>(*this, &enemy, include_neutral);
+			//Wyrmgus end
 		} else if (isNaval) {
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy);
+			//Wyrmgus start
+//			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy);
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &enemy, include_neutral);
+			//Wyrmgus end
 		} else {
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
+			//Wyrmgus start
+//			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &enemy, include_neutral);
+			//Wyrmgus end
 		}
 		if (enemy) {
 			goalPos = enemy->tilePos;
 			//Wyrmgus start
 			z = enemy->MapLayer;
+			if (!AiPlayer->Player->IsEnemy(*enemy->Player) && enemy->Player->Type != PlayerNeutral) {
+				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy->Player);
+			}
 			//Wyrmgus end
 		//Wyrmgus start
 		} else {
@@ -1024,6 +1062,7 @@ void AiForce::Update()
 	if (this->Scouting) {
 		return;
 	}
+	bool include_neutral = true;
 	//Wyrmgus end
 	//Wyrmgus start
 	//if force still has no goal, run its Attack function again to get a target
@@ -1157,9 +1196,15 @@ void AiForce::Update()
 		if (maxDist <= thresholdDist || !WaitOnRallyPoint) {
 			const CUnit *unit = NULL;
 
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
+			//Wyrmgus start
+//			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, include_neutral);
+			//Wyrmgus end
 			if (!unit) {
-				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
+				//Wyrmgus start
+//				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
+				AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral);
+				//Wyrmgus end
 				if (!unit) {
 					//Wyrmgus start
 					/*
@@ -1188,6 +1233,9 @@ void AiForce::Update()
 			this->GoalPos = unit->tilePos;
 			//Wyrmgus start
 			this->GoalMapLayer = unit->MapLayer;
+			if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
+				AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
+			}
 			//Wyrmgus end
 			
 			State = AiForceAttackingState_Attacking;
@@ -1243,9 +1291,15 @@ void AiForce::Update()
 			}
 		}
 		if (isNaval) {
-			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
+			//Wyrmgus start
+//			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit);
+			AiForceEnemyFinder<AIATTACK_ALLMAP>(*this, &unit, include_neutral);
+			//Wyrmgus end
 		} else {
-			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
+			//Wyrmgus start
+//			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit);
+			AiForceEnemyFinder<AIATTACK_BUILDING>(*this, &unit, include_neutral);
+			//Wyrmgus end
 		}
 		if (!unit) {
 			//Wyrmgus start
@@ -1279,6 +1333,9 @@ void AiForce::Update()
 			this->GoalPos = resultPos;
 			//Wyrmgus start
 			this->GoalMapLayer = unit->MapLayer;
+			if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
+				AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
+			}
 			//Wyrmgus end
 			this->State = AiForceAttackingState_GoingToRallyPoint;
 		}
@@ -1354,7 +1411,10 @@ void AiForceManager::Update()
 					//Wyrmgus end
 						//  Look if still enemies in attack range.
 						const CUnit *dummy = NULL;
-						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
+						//Wyrmgus start
+//						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy).found()) {
+						if (!AiForceEnemyFinder<AIATTACK_RANGE>(force, &dummy, false).found()) {
+						//Wyrmgus end
 							force.ReturnToHome();
 						}
 					}
