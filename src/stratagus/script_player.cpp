@@ -2326,7 +2326,7 @@ static int CclDefineDeity(lua_State *l)
 				++j;
 				
 				std::string cultural_name = LuaToString(l, -1, j + 1);
-				deity->CulturalNames[civilization] = TransliterateText(cultural_name);
+				deity->CulturalNames[civilization] = cultural_name;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
