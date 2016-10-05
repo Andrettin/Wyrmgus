@@ -2946,8 +2946,6 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 					
 					if (!first_element) {
 						effect_element_string += ", ";
-					} else {
-						first_element = false;
 					}
 					
 					effect_element_string += UnitTypes[unit_type_id]->Name;
