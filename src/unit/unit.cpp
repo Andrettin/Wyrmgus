@@ -4951,8 +4951,25 @@ CPlayerColorGraphic *CUnit::GetLayerSprite(int image_layer) const
 	}
 }
 
+std::string CUnit::GetName() const
+{
+	if (this->Character && this->Character->Deity) {
+		if (this->Character->Deity->CulturalNames.find(ThisPlayer->Race) != this->Character->Deity->CulturalNames.end()) {
+			return this->Character->Deity->CulturalNames.find(ThisPlayer->Race)->second;
+		} else {
+			return this->Character->Deity->Name;
+		}
+	}
+	
+	return this->Name;
+}
+
 std::string CUnit::GetTypeName() const
 {
+	if (this->Character && this->Character->Deity) {
+		return "Deity";
+	}
+	
 	VariationInfo *varinfo = Type->VarInfo[Variation];
 	if (varinfo && !varinfo->TypeName.empty()) {
 		return varinfo->TypeName;
@@ -4963,7 +4980,8 @@ std::string CUnit::GetTypeName() const
 
 std::string CUnit::GetMessageName() const
 {
-	if (Name.empty()) {
+	std::string name = GetName();
+	if (name.empty()) {
 		return GetTypeName();
 	}
 	
@@ -4972,10 +4990,10 @@ std::string CUnit::GetMessageName() const
 	}
 	
 	if (!this->Unique && this->Work == NULL && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {
-		return Name;
+		return name;
 	}
 	
-	return Name + " (" + GetTypeName() + ")";
+	return name + " (" + GetTypeName() + ")";
 }
 //Wyrmgus end
 
