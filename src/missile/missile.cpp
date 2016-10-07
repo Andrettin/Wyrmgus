@@ -1004,7 +1004,10 @@ void FindAndSortMissiles(const CViewport &vp, std::vector<Missile *> &table)
 
 	for (MissilePtrConstiterator i = LocalMissiles.begin(); i != LocalMissiles.end(); ++i) {
 		Missile &missile = *(*i);
-		if (missile.Delay || missile.Hidden) {
+		//Wyrmgus start
+//		if (missile.Delay || missile.Hidden) {
+		if (missile.Delay || missile.Hidden || missile.MapLayer != CurrentMapLayer) {
+		//Wyrmgus end
 			continue;  // delayed or hidden -> aren't shown
 		}
 		// Local missile are visible.
