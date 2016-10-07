@@ -965,7 +965,7 @@ void CGrandStrategyGame::DoTurn()
 				}
 			} else {
 				for (int k = 0; k < MaxCharacterTitles; ++k) {
-					if (this->Factions[i][j]->Ministers[k] != NULL && !(k == CharacterTitleHeadOfState && PlayerRaces.Factions[i][j]->Type != "tribe" && this->Factions[i][j]->GovernmentType == GovernmentTypeMonarchy)) {
+					if (this->Factions[i][j]->Ministers[k] != NULL && !(k == CharacterTitleHeadOfState && PlayerRaces.Factions[i][j]->Type != FactionTypeTribe && this->Factions[i][j]->GovernmentType == GovernmentTypeMonarchy)) {
 						this->Factions[i][j]->SetMinister(k, ""); //"dead" factions should have no ministers, unless it is a head of state title and the faction is a monarchical polity
 					}
 				}
@@ -3867,7 +3867,7 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 	}
 		
 	if (type == "head-of-state") {
-		if (PlayerRaces.Factions[this->Owner->Civilization][this->Owner->Faction]->Type == "tribe" || this->Owner->GovernmentType != GovernmentTypeTheocracy) { //exclude priests from ruling non-theocracies
+		if (PlayerRaces.Factions[this->Owner->Civilization][this->Owner->Faction]->Type == FactionTypeTribe || this->Owner->GovernmentType != GovernmentTypeTheocracy) { //exclude priests from ruling non-theocracies
 			if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")) != -1) {
 				potential_hero_unit_types.push_back(PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("heroic-infantry")));
 			} else if (PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("veteran-infantry")) != -1) {
@@ -4251,7 +4251,7 @@ void CGrandStrategyFaction::CalculateProvincesReachableThroughWater()
 
 void CGrandStrategyFaction::CheckSplitOffFactions()
 {
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type != "tribe") { // factions can only split off from tribes
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type != FactionTypeTribe) { // factions can only split off from tribes
 		return;
 	}
 	
@@ -4398,7 +4398,7 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 	GrandStrategyGame.Factions[new_civilization][new_faction]->CalculateIncomes();
 
 	//if the faction is civilizing, grant 10 prestige
-	if (PlayerRaces.Factions[old_civilization][old_faction]->Type == "tribe" && PlayerRaces.Factions[new_civilization][new_faction]->Type == "polity") {
+	if (PlayerRaces.Factions[old_civilization][old_faction]->Type == FactionTypeTribe && PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypePolity) {
 		GrandStrategyGame.Factions[new_civilization][new_faction]->Resources[PrestigeCost] += 10;
 	}
 		
@@ -4416,13 +4416,13 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		PlayMusicByGroupAndFactionRandom("map", PlayerRaces.Name[new_civilization], PlayerRaces.Factions[new_civilization][new_faction]->Name);
 			
 		std::string dialog_tooltip = "Our faction becomes the " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName();
-		if (PlayerRaces.Factions[old_civilization][old_faction]->Type == "tribe" && PlayerRaces.Factions[new_civilization][new_faction]->Type == "polity") {
+		if (PlayerRaces.Factions[old_civilization][old_faction]->Type == FactionTypeTribe && PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypePolity) {
 			dialog_tooltip += ", +10 Prestige";
 		}
 		std::string dialog_text;
-		if (PlayerRaces.Factions[new_civilization][new_faction]->Type == "polity") {
+		if (PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypePolity) {
 			dialog_text = "From the halls of our capital the formation of a new realm has been declared, the ";
-		} else if (PlayerRaces.Factions[new_civilization][new_faction]->Type == "tribe") {
+		} else if (PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypeTribe) {
 			dialog_text = "Our council of elders has declared the formation of a new tribe, the ";
 		}
 		dialog_text += GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName() + "!";
@@ -4554,7 +4554,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 {
 	if (
 		this->Ministers[title] != NULL
-		&& (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType == GovernmentTypeMonarchy)
+		&& (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe || this->GovernmentType == GovernmentTypeMonarchy)
 		&& title == CharacterTitleHeadOfState
 	) { //if is a tribe or a monarchical polity, try to perform ruler succession by descent
 		for (size_t i = 0; i < this->Ministers[title]->Children.size(); ++i) {
@@ -4680,11 +4680,11 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 {
 	bool civilized = this->HasTechnologyClass("writing") && this->HasTechnologyClass("masonry");
 	
-	if ((PlayerRaces.Factions[civilization][faction]->Type == "polity") != civilized) {
+	if ((PlayerRaces.Factions[civilization][faction]->Type == FactionTypePolity) != civilized) {
 		return false;
 	}
 	
-	if (this->FactionTier > GrandStrategyGame.Factions[civilization][faction]->FactionTier && !(PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && civilized)) { //only form factions of the same tier or higher, unless is civilizing
+	if (this->FactionTier > GrandStrategyGame.Factions[civilization][faction]->FactionTier && !(PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe && civilized)) { //only form factions of the same tier or higher, unless is civilizing
 		return false;
 	}
 	
@@ -4707,7 +4707,7 @@ bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)
 
 bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 {
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" && title != CharacterTitleHeadOfState) {
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe && title != CharacterTitleHeadOfState) {
 		return false;
 	}
 	
@@ -4724,7 +4724,7 @@ bool CGrandStrategyFaction::HasGovernmentPosition(int title)
 
 bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance)
 {
-	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe" || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
+	if (!this->IsAlive() && (title != CharacterTitleHeadOfState || !family_inheritance || PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe || this->GovernmentType != GovernmentTypeMonarchy)) { // head of state titles can be inherited even if their respective factions have no provinces, but if the line dies out then the title becomes extinct; tribal titles cannot be titular-only
 		return false;
 	}
 	
@@ -4733,7 +4733,7 @@ bool CGrandStrategyFaction::CanHaveSuccession(int title, bool family_inheritance
 
 bool CGrandStrategyFaction::IsConquestDesirable(CGrandStrategyProvince *province)
 {
-	if (this->OwnedProvinces.size() == 1 && province->Owner == NULL && PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+	if (this->OwnedProvinces.size() == 1 && province->Owner == NULL && PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
 		if (province->GetDesirabilityRating() <= GrandStrategyGame.Provinces[this->OwnedProvinces[0]]->GetDesirabilityRating()) { // if conquering the province would trigger a migration, the conquest is only desirable if the province is worth more
 			return false;
 		}
@@ -4787,7 +4787,7 @@ int CGrandStrategyFaction::GetRevoltRiskModifier()
 {
 	int modifier = 0;
 	
-//	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+//	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
 //		modifier += this->OwnedProvinces.size() - 1; // tribal factions get +1% revolt risk per province owned beyond the first one
 //	}
 	
@@ -4837,9 +4837,9 @@ int CGrandStrategyFaction::GetDiplomacyStateProposal(CGrandStrategyFaction *fact
 
 std::string CGrandStrategyFaction::GetFullName()
 {
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
 		return PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
-	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
+	} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
 		return this->GetTitle() + " of " + PlayerRaces.Factions[this->Civilization][this->Faction]->Name;
 	}
 	
@@ -4850,7 +4850,7 @@ std::string CGrandStrategyFaction::GetTitle()
 {
 	std::string faction_title;
 	
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
 		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType][this->FactionTier].empty()) {
 			faction_title = PlayerRaces.Factions[this->Civilization][this->Faction]->Titles[this->GovernmentType][this->FactionTier];
 		} else {
@@ -4881,7 +4881,7 @@ std::string CGrandStrategyFaction::GetTitle()
 
 std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 {
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
+	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
 		if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][this->FactionTier].empty()) {
 			return PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][gender][this->GovernmentType][this->FactionTier];
 		} else if (!PlayerRaces.Factions[this->Civilization][this->Faction]->MinisterTitles[title_type][NoGender][this->GovernmentType][this->FactionTier].empty()) {
@@ -4902,13 +4902,13 @@ std::string CGrandStrategyFaction::GetCharacterTitle(int title_type, int gender)
 	}
 
 	if (title_type == CharacterTitleHeadOfState) {
-		if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "tribe") {
+		if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypeTribe) {
 			if (gender != FemaleGender) {
 				return "Chieftain";
 			} else {
 				return "Chieftess";
 			}
-		} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == "polity") {
+		} else if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type == FactionTypePolity) {
 			std::string faction_title = this->GetTitle();
 			
 			if (faction_title == "Barony") {
@@ -8752,7 +8752,7 @@ std::string GetGrandStrategyHeroTooltip(std::string hero_full_name)
 			
 			for (size_t i = 0; i < hero->Titles.size(); ++i) {
 				hero_tooltip += "\n" + hero->Titles[i].second->GetCharacterTitle(hero->Titles[i].first, hero->Gender) + " of ";
-				if (PlayerRaces.Factions[hero->Titles[i].second->Civilization][hero->Titles[i].second->Faction]->Type == "tribe") {
+				if (PlayerRaces.Factions[hero->Titles[i].second->Civilization][hero->Titles[i].second->Faction]->Type == FactionTypeTribe) {
 					hero_tooltip += "the ";
 				}
 				hero_tooltip += PlayerRaces.Factions[hero->Titles[i].second->Civilization][hero->Titles[i].second->Faction]->Name;

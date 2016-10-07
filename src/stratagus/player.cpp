@@ -1512,7 +1512,7 @@ void CPlayer::SetRandomFaction()
 				}
 				if (
 					!faction_used
-					&& ((PlayerRaces.Factions[this->Race][faction_id]->Type == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][faction_id]->Type == "polity" && this->HasUpgradeClass("writing"))))
+					&& ((PlayerRaces.Factions[this->Race][faction_id]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][faction_id]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
 					&& PlayerRaces.Factions[this->Race][faction_id]->Playable
 				) {
 					local_factions[faction_count] = faction_id;
@@ -1532,7 +1532,7 @@ void CPlayer::SetRandomFaction()
 			}
 			if (
 				!faction_used
-				&& ((PlayerRaces.Factions[this->Race][i]->Type == "tribe" && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == "polity" && this->HasUpgradeClass("writing"))))
+				&& ((PlayerRaces.Factions[this->Race][i]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
 				&& PlayerRaces.Factions[this->Race][i]->Playable
 			) {
 				local_factions[faction_count] = i;
@@ -3130,6 +3130,40 @@ int GetHairColorIndexByName(std::string hair_color_name)
 		}
 	}
 	return 0;
+}
+
+std::string GetFactionTypeNameById(int faction_type)
+{
+	if (faction_type == FactionTypeNoFactionType) {
+		return "no-faction-type";
+	} else if (faction_type == FactionTypeTribe) {
+		return "tribe";
+	} else if (faction_type == FactionTypePolity) {
+		return "polity";
+	} else if (faction_type == FactionTypeMercenaryCompany) {
+		return "mercenary-company";
+	} else if (faction_type == FactionTypeHolyOrder) {
+		return "holy-order";
+	}
+
+	return "";
+}
+
+int GetFactionTypeIdByName(std::string faction_type)
+{
+	if (faction_type == "no-faction-type") {
+		return FactionTypeNoFactionType;
+	} else if (faction_type == "tribe") {
+		return FactionTypeTribe;
+	} else if (faction_type == "polity") {
+		return FactionTypePolity;
+	} else if (faction_type == "mercenary-company") {
+		return FactionTypeMercenaryCompany;
+	} else if (faction_type == "holy-order") {
+		return FactionTypeHolyOrder;
+	}
+
+	return -1;
 }
 
 std::string GetGovernmentTypeNameById(int government_type)

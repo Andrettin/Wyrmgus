@@ -434,7 +434,7 @@ void UpdateDisplay()
 							if (
 								province->Owner == NULL
 								&& GrandStrategyGame.SelectedProvince->Owner->OwnedProvinces.size() == 1
-								&& PlayerRaces.Factions[GrandStrategyGame.SelectedProvince->Owner->Civilization][GrandStrategyGame.SelectedProvince->Owner->Faction]->Type == "tribe"
+								&& PlayerRaces.Factions[GrandStrategyGame.SelectedProvince->Owner->Civilization][GrandStrategyGame.SelectedProvince->Owner->Faction]->Type == FactionTypeTribe
 							) {
 								tooltip += "Migrate to ";
 							} else {

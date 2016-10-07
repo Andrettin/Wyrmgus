@@ -342,6 +342,16 @@ enum GovernmentTypes {
 	MaxGovernmentTypes
 };
 
+enum FactionTypes {
+	FactionTypeNoFactionType,
+	FactionTypeTribe,
+	FactionTypePolity,
+	FactionTypeMercenaryCompany,
+	FactionTypeHolyOrder,
+	
+	MaxFactionTypes
+};
+
 enum FactionTiers {
 	FactionTierNoFactionTier,
 	FactionTierBarony,
@@ -484,7 +494,7 @@ class CFaction
 {
 public:
 	CFaction() : 
-		ID(-1), Civilization(-1), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1), Language(-1),
+		ID(-1), Civilization(-1), Type(FactionTypeNoFactionType), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1), Language(-1),
 		Playable(true), //factions are playable by default
 		DefaultAI("land-attack")
 	{
@@ -496,11 +506,11 @@ public:
 	std::string Description;											/// faction description
 	std::string Quote;													/// faction quote
 	std::string Background;												/// faction background
-	std::string Type;													/// faction type (tribe or polity)
 	std::string FactionUpgrade;											/// faction upgrade applied when the faction is set
 	std::string DefaultAI;
 	int ID;																/// faction ID
 	int Civilization;													/// faction civilization
+	int Type;															/// faction type (i.e. tribe or polity)
 	int DefaultTier;													/// default faction tier
 	int DefaultGovernmentType;											/// default government type
 	int ParentFaction;													/// parent faction of this faction
@@ -915,6 +925,8 @@ extern std::string GetFactionEffectsString(std::string civilization_name, std::s
 extern int GetPlayerColorIndexByName(std::string player_color_name);
 extern int GetSkinColorIndexByName(std::string skin_color_name);
 extern int GetHairColorIndexByName(std::string hair_color_name);
+extern std::string GetFactionTypeNameById(int faction_type);
+extern int GetFactionTypeIdByName(std::string faction_type);
 extern std::string GetGovernmentTypeNameById(int government_type);
 extern int GetGovernmentTypeIdByName(std::string government_type);
 extern std::string GetWordTypeNameById(int word_type);

@@ -640,8 +640,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				
 				f->printf("DefineFaction(\"%s\", {\n", PlayerRaces.Factions[i][j]->Name.c_str());
 				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
-				if (!PlayerRaces.Factions[i][j]->Type.empty()) {
-					f->printf("\tType = \"%s\",\n", PlayerRaces.Factions[i][j]->Type.c_str());
+				if (PlayerRaces.Factions[i][j]->Type != FactionTypeNoFactionType) {
+					f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(PlayerRaces.Factions[i][j]->Type).c_str());
 				}
 				if (PlayerRaces.Factions[i][j]->ParentFaction != -1) {
 					f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[i][PlayerRaces.Factions[i][j]->ParentFaction]->Name.c_str());

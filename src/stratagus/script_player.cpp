@@ -1764,7 +1764,13 @@ static int CclDefineFaction(lua_State *l)
 		} else if (!strcmp(value, "Background")) {
 			faction->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "Type")) {
-			faction->Type = LuaToString(l, -1);
+			std::string faction_type_name = LuaToString(l, -1);
+			int faction_type = GetFactionTypeIdByName(faction_type_name);
+			if (faction_type != -1) {
+				faction->Type = faction_type;
+			} else {
+				LuaError(l, "Faction type \"%s\" doesn't exist." _C_ faction_type_name.c_str());
+			}
 		} else if (!strcmp(value, "Colors")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
@@ -2622,7 +2628,7 @@ static int CclGetFactionData(lua_State *l)
 		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Background.c_str());
 		return 1;
 	} else if (!strcmp(data, "Type")) {
-		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Type.c_str());
+		lua_pushstring(l, GetFactionTypeNameById(PlayerRaces.Factions[civilization][faction]->Type).c_str());
 		return 1;
 	} else if (!strcmp(data, "Color")) {
 		if (PlayerRaces.Factions[civilization][faction]->Colors.size() > 0) {

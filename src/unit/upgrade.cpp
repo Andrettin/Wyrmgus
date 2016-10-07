@@ -2260,7 +2260,7 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 	
 	//Wyrmgus start
 	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
-	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == "tribe")) {
+	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeTribe)) {
 		if (!GrandStrategy && Editor.Running == EditorNotRunning) {
 			int old_faction = player.Faction;
 			if (ThisPlayer && ThisPlayer->Index == player.Index) {
