@@ -2995,7 +2995,7 @@ startw:
 		for (int i = addy; i--; ++pos.y) {
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (UnitTypeCanBeAt(type, pos, z)) {
+			if (UnitTypeCanBeAt(type, pos, z) && (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)) {
 			//Wyrmgus end
 				goto found;
 			}
@@ -3005,7 +3005,7 @@ starts:
 		for (int i = addx; i--; ++pos.x) {
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (UnitTypeCanBeAt(type, pos, z)) {
+			if (UnitTypeCanBeAt(type, pos, z) && (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)) {
 			//Wyrmgus end
 				goto found;
 			}
@@ -3015,7 +3015,7 @@ starte:
 		for (int i = addy; i--; --pos.y) {
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (UnitTypeCanBeAt(type, pos, z)) {
+			if (UnitTypeCanBeAt(type, pos, z) && (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)) {
 			//Wyrmgus end
 				goto found;
 			}
@@ -3025,7 +3025,7 @@ startn:
 		for (int i = addx; i--; --pos.x) {
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (UnitTypeCanBeAt(type, pos, z)) {
+			if (UnitTypeCanBeAt(type, pos, z) && (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)) {
 			//Wyrmgus end
 				goto found;
 			}
