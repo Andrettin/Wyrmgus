@@ -1003,7 +1003,7 @@ void DrawGenericPopup(std::string popup_text, int x, int y, std::string text_col
 {
 	const CFont &font = GetGameFont();
 	
-	int MaxWidth = 0;
+	int MaxWidth = std::max(256, Video.Width / 5);
 
 	int i;
 		
@@ -1063,7 +1063,7 @@ void DrawGenericPopup(std::string popup_text, int x, int y, std::string text_col
 	popupWidth += MARGIN_X;
 	popupHeight += MARGIN_Y;
 	
-	popupWidth = std::max(popupWidth, MaxWidth);
+	popupWidth = std::min(popupWidth, MaxWidth);
 	popupHeight = std::max(popupHeight, 0);
 
 	x = std::min<int>(x, Video.Width - 1 - popupWidth);
