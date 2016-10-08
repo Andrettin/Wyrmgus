@@ -1442,7 +1442,11 @@ void CUnit::ApplyAura(int aura_index)
 	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), true);
 	for (size_t i = 0; i != table.size(); ++i) {
 		table[i]->ApplyAuraEffect(aura_index);
-		
+	}
+	
+	table.clear();
+	SelectAroundUnit(*this, aura_range, table, MakeOrPredicate(MakeOrPredicate(HasSamePlayerAs(*this->Player), IsAlliedWith(*this->Player)), HasSamePlayerAs(Players[PlayerNumNeutral])), true);
+	for (size_t i = 0; i != table.size(); ++i) {
 		if (table[i]->UnitInside) {
 			CUnit *uins = table[i]->UnitInside;
 			for (int j = 0; j < table[i]->InsideCount; ++j, uins = uins->NextContained) {
