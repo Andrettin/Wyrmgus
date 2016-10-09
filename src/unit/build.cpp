@@ -41,6 +41,9 @@
 #include "actions.h"
 #include "map.h"
 #include "player.h"
+//Wyrmgus start
+#include "tileset.h"
+//Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
 
@@ -496,6 +499,18 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	//Wyrmgus end
 		return NULL;
 	}
+	
+	//Wyrmgus start
+	if (GameCycle == 0 && type.TileWidth > 1 && type.TileHeight > 1) { // if the game is starting, only place buildings with a certain space from other buildings
+		for (int x = pos.x - 1; x < pos.x + type.TileWidth + 1; ++x) {
+			for (int y = pos.y - 1; y < pos.y + type.TileHeight + 1; ++y) {
+				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {
+					return NULL;
+				}
+			}
+		}
+	}
+	//Wyrmgus end
 
 	// Must be checked before oil!
 	if (type.BoolFlag[SHOREBUILDING_INDEX].value) {
