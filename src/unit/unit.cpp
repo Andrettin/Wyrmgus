@@ -2958,7 +2958,7 @@ CUnit *CreateResourceUnit(const Vec2i &pos, const CUnitType &type, int z)
 	if (metal_rock_type) {
 		Vec2i metal_rock_offset((type.TileWidth - 1) / 2, (type.TileHeight - 1) / 2);
 		for (int i = 0; i < 9; ++i) {
-			CUnit *metal_rock_unit = CreateUnit(pos + metal_rock_offset, *metal_rock_type, &Players[PlayerNumNeutral], z);
+			CUnit *metal_rock_unit = CreateUnit(unit->tilePos + metal_rock_offset, *metal_rock_type, &Players[PlayerNumNeutral], z);
 		}
 	}
 			

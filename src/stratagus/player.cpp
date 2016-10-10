@@ -1164,6 +1164,18 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 			Players[i].Resources[GoldCost] = 1000; // give the new player enough resources to start up
 			Players[i].Resources[WoodCost] = 1000;
 			Players[i].Resources[StoneCost] = 1000;
+			if (CurrentCampaign != NULL && CurrentCampaign->Year) {
+				for (std::map<std::string, int>::iterator iterator = faction->HistoricalTechnologies.begin(); iterator != faction->HistoricalTechnologies.end(); ++iterator) {
+					if (iterator->second == 0 || CurrentCampaign->Year >= iterator->second) {
+						int upgrade_id = UpgradeIdByIdent(iterator->first);
+						if (upgrade_id != -1) {
+							UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
+						} else {
+							fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+						}
+					}
+				}
+			}
 			return &Players[i];
 		}
 	}
