@@ -313,6 +313,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	unit.UpdateXPRequired();
 	
 	unit.UpdateButtonIcons();
+	
+	unit.UpdateSoldUnits();
 	//Wyrmgus end
 	
 	//Wyrmgus start

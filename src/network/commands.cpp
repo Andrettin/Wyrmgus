@@ -178,6 +178,22 @@ void SendCommandQuest(CUnit &unit, CQuest *quest)
 }
 
 /**
+** Send command: Buy an item from a building.
+**
+** @param unit    pointer to unit.
+** @param pos     map tile position to move to.
+*/
+void SendCommandBuy(CUnit &unit, CUnit *sold_unit)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("buy", &unit, 0, -1, -1, sold_unit, NULL, -1);
+		CommandBuy(unit, sold_unit);
+	} else {
+		NetworkSendCommand(MessageCommandBuy, unit, 0, 0, sold_unit, 0, 0);
+	}
+}
+
+/**
 ** Send command: Pick up item.
 **
 ** @param unit    pointer to unit.
@@ -958,6 +974,15 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 		case MessageCommandQuest: {
 			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, Quests[arg1]->Ident.c_str(), -1);
 			CommandQuest(unit, Quests[arg1]);
+			break;
+		}
+		case MessageCommandBuy: {
+			if (dstnr != (unsigned short)0xFFFF) {
+				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				Assert(dest.Type);
+				CommandLog("buy", &unit, 0, -1, -1, &dest, NULL, -1);
+				CommandBuy(unit, &dest);
+			}
 			break;
 		}
 		//Wyrmgus end

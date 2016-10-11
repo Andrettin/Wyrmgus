@@ -626,6 +626,21 @@ static void UnitActionsEachCycle(UNITP_ITERATOR begin, UNITP_ITERATOR end)
 	}
 }
 
+//Wyrmgus start
+template <typename UNITP_ITERATOR>
+static void UnitActionsEachMinute(UNITP_ITERATOR begin, UNITP_ITERATOR end)
+{
+	for (UNITP_ITERATOR it = begin; it != end; ++it) {
+		CUnit &unit = **it;
+
+		if (unit.Destroyed) {
+			continue;
+		}
+
+		unit.UpdateSoldUnits();
+	}
+}
+//Wyrmgus end
 
 /**
 **  Update the actions of all units each game cycle/second.
@@ -642,6 +657,12 @@ void UnitActions()
 	}
 	// Do all actions
 	UnitActionsEachCycle(table.begin(), table.end());
+	
+	//Wyrmgus start
+	if ((GameCycle % CYCLES_PER_MINUTE) == 0) {
+		UnitActionsEachMinute(table.begin(), table.end());
+	}
+	//Wyrmgus end
 }
 
 //@}

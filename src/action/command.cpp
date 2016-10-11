@@ -451,6 +451,20 @@ void CommandQuest(CUnit &unit, CQuest *quest)
 	}
 	unit.Player->AcceptQuest(quest);
 }
+
+/**
+**  Buy an item
+**
+**  @param unit   pointer to unit to buy from.
+**  @param sold_unit  pointer to bought unit.
+*/
+void CommandBuy(CUnit &unit, CUnit *sold_unit)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	unit.SellUnit(sold_unit);
+}
 //Wyrmgus end
 
 /**

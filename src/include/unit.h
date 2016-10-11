@@ -220,6 +220,8 @@ public:
 	void GenerateSpell(CUnit *dropper);
 	void GenerateWork(CUnit *dropper);
 	void GenerateUnique(CUnit *dropper);
+	void UpdateSoldUnits();
+	void SellUnit(CUnit *sold_unit);
 	//Wyrmgus end
 	
 	bool RestoreOrder();
@@ -384,6 +386,7 @@ public:
 	int GetDisplayPlayer() const;
 	int GetSkinColor() const;
 	int GetHairColor() const;
+	int GetCost(int resource) const;
 	bool CanAttack(bool count_inside = false) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
@@ -439,6 +442,7 @@ public:
 
 	//Wyrmgus start
 	std::vector<CUnit *> EquippedItems[MaxItemSlots];	/// Pointer to unit's equipped items, per slot
+	std::vector<CUnit *> SoldUnits;						/// units available for sale at this unit
 	//Wyrmgus end
 	
 	Vec2i tilePos; /// Map position X

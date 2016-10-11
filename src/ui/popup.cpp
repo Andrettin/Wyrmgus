@@ -186,7 +186,7 @@
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
-	if (button.Action != ButtonUnit) {
+	if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
 		TriggerData.Type = UnitTypes[button.Value];
 	} else {
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
@@ -228,7 +228,7 @@
 {
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
-	if (button.Action != ButtonUnit) {
+	if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
 		TriggerData.Type = UnitTypes[button.Value];
 	} else {
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
@@ -253,7 +253,7 @@
 {
 	const CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
-	if (button.Action != ButtonUnit) {
+	if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
 		TriggerData.Type = UnitTypes[button.Value];
 	} else {
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
@@ -468,7 +468,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	CFont &font = this->Font ? *this->Font : GetSmallFont();
 	//Wyrmgus start
 //	TriggerData.Type = UnitTypes[button.Value];
-	if (button.Action != ButtonUnit) {
+	if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
 		TriggerData.Type = UnitTypes[button.Value];
 	} else {
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
@@ -501,7 +501,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	if (this->Text) {
 		//Wyrmgus start
 //		TriggerData.Type = UnitTypes[button.Value];
-		if (button.Action != ButtonUnit) {
+		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
 			TriggerData.Type = UnitTypes[button.Value];
 		} else {
 			TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
@@ -536,7 +536,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		}
 		*/
 		int value;
-		if (button.Action != ButtonUnit) {
+		if (button.Action != ButtonUnit && button.Action != ButtonBuy) {
 			value = UnitTypes[button.Value]->Stats[ThisPlayer->Index].Variables[this->Index].Value;
 		} else {
 			if (

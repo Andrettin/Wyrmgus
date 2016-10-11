@@ -845,6 +845,7 @@ public:
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
 	std::string Excrement;			/// Excrement unit for this unit type
+	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
 	std::vector<CUpgrade *> DropAffixes;	/// Affixes which can be applied to dropped items

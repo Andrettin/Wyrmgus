@@ -407,7 +407,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->Quote.empty() && !(button.Action == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !(button.Action == ButtonUnit && UnitManager.GetSlotUnit(button.Value).Work != NULL && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty())) {
+	if (condition->Quote && type && type->Quote.empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != NULL && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty())) {
 		return false;
 	}
 	
@@ -435,7 +435,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 
 	//Wyrmgus start
 //	if (condition->Variables && type) {
-	if (condition->Variables && type && button.Action != ButtonUnit) {
+	if (condition->Variables && type && button.Action != ButtonUnit && button.Action != ButtonBuy) {
 	//Wyrmgus end
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
@@ -445,7 +445,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 		}
 	//Wyrmgus start
-	} else if (condition->Variables && button.Action == ButtonUnit) {
+	} else if (condition->Variables && (button.Action == ButtonUnit || button.Action == ButtonBuy)) {
 		for (unsigned int i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
 			if (condition->Variables[i] != CONDITION_TRUE) {
 //				if ((condition->Variables[i] == CONDITION_ONLY) ^ UnitManager.GetSlotUnit(button.Value).Variable[i].Enable) {
@@ -485,7 +485,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 		
-	if (button.Action == ButtonUnit) {
+	if (button.Action == ButtonUnit || button.Action == ButtonBuy) {
 		CUnit &unit = UnitManager.GetSlotUnit(button.Value);
 		if (unit.Type->BoolFlag[ITEM_INDEX].value && unit.Container != NULL && unit.Container->HasInventory()) {
 			if (condition->Equipped != CONDITION_TRUE) {
@@ -627,8 +627,8 @@ static void GetPopupSize(const CPopup &popup, const ButtonAction &button,
 		//Wyrmgus start
 //		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 		if (
-			(button.Action != ButtonUnit && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
-			|| (button.Action == ButtonUnit && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
+			(button.Action != ButtonUnit && button.Action != ButtonBuy && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
+			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
 		) {
 		//Wyrmgus end
 			// Automatically write the calculated coordinates.
@@ -821,6 +821,11 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			}
 			//Wyrmgus end
 			break;
+		//Wyrmgus start
+		case ButtonBuy:
+			Costs[GoldCost] = UnitManager.GetSlotUnit(button.Value).GetCost(GoldCost);
+			break;
+		//Wyrmgus end
 		default:
 			break;
 	}
@@ -853,8 +858,8 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		//Wyrmgus start
 //		if (CanShowPopupContent(content.Condition, button, UnitTypes[button.Value])) {
 		if (
-			(button.Action != ButtonUnit && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
-			|| (button.Action == ButtonUnit && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
+			(button.Action != ButtonUnit && button.Action != ButtonBuy && CanShowPopupContent(content.Condition, button, UnitTypes[button.Value]))
+			|| ((button.Action == ButtonUnit || button.Action == ButtonBuy) && CanShowPopupContent(content.Condition, button, UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot]))
 		) {
 		//Wyrmgus end
 			content.Draw(x + content.pos.x, y + content.pos.y, *popup, popupWidth, button, Costs);
@@ -1215,6 +1220,8 @@ void CButtonPanel::Draw()
 			button_icon = UnitTypes[buttons[i].Value]->GetDefaultVariation(*ThisPlayer)->Icon.Icon;
 		} else if ((buttons[i].Action == ButtonTrain || buttons[i].Action == ButtonBuild || buttons[i].Action == ButtonUpgradeTo || buttons[i].Action == ButtonExperienceUpgradeTo) && buttons[i].Icon.Name.empty() && !UnitTypes[buttons[i].Value]->Icon.Name.empty()) {
 			button_icon = UnitTypes[buttons[i].Value]->Icon.Icon;
+		} else if (buttons[i].Action == ButtonBuy) {
+			button_icon = UnitManager.GetSlotUnit(buttons[i].Value).GetIcon().Icon;
 		}
 		//Wyrmgus end
 		
@@ -1489,6 +1496,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonQuest:
 			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->CanAcceptQuest(unit.Player->AvailableQuests[buttonaction.Value]);
 			break;
+		case ButtonBuy:
+			res = buttonaction.Value != -1;
+			break;
 		//Wyrmgus end
 	}
 #if 0
@@ -1648,6 +1658,24 @@ void CButtonPanel::Update()
 		CurrentButtons.clear();
 		return;
 	}
+	
+	//Wyrmgus start
+	//update the sold item buttons
+	unsigned int sold_unit_count = 0;
+	for (int i = 0; i < (int) UnitButtonTable.size(); ++i) {
+		if (UnitButtonTable[i]->Action != ButtonBuy) {
+			continue;
+		}
+		
+		if (sold_unit_count >= unit.SoldUnits.size()) {
+			UnitButtonTable[i]->Value = -1;
+		} else {
+			UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
+			UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+		}
+		sold_unit_count += 1;
+	}
+	//Wyrmgus end
 
 	bool sameType = true;
 	// multiple selected
@@ -2024,6 +2052,19 @@ void CButtonPanel::DoClicked_Quest(int button)
 		SelectedUnitChanged();
 	}
 }
+
+void CButtonPanel::DoClicked_Buy(int button)
+{
+	int buy_costs[MaxCosts];
+	memset(buy_costs, 0, sizeof(buy_costs));
+	buy_costs[GoldCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetCost(GoldCost);
+	if (!Selected[0]->Player->CheckCosts(buy_costs)) {
+		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value));
+		if (Selected[0]->Player == ThisPlayer) {
+			SelectedUnitChanged();
+		}
+	}
+}
 //Wyrmgus end
 
 void CButtonPanel::DoClicked_CallbackAction(int button)
@@ -2096,6 +2137,7 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonLearnAbility: { DoClicked_LearnAbility(button); break; }
 		case ButtonExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
 		case ButtonQuest: { DoClicked_Quest(button); break; }
+		case ButtonBuy: { DoClicked_Buy(button); break; }
 		//Wyrmgus end
 	}
 }

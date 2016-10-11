@@ -635,6 +635,7 @@ CUnitType::~CUnitType()
 	delete TeleportEffectOut;
 
 	//Wyrmgus start
+	SoldUnits.clear();
 	Drops.clear();
 	AiDrops.clear();
 	DropAffixes.clear();

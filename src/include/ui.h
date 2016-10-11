@@ -314,6 +314,7 @@ private:
 	void DoClicked_ExperienceUpgradeTo(int button);
 	void DoClicked_RallyPoint(int button);
 	void DoClicked_Quest(int button);
+	void DoClicked_Buy(int button);
 	//Wyrmgus end
 
 

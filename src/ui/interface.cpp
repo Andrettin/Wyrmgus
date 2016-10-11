@@ -1885,6 +1885,8 @@ std::string GetButtonActionNameById(int button_action)
 		return "rally-point";
 	} else if (button_action == ButtonQuest) {
 		return "quest";
+	} else if (button_action == ButtonBuy) {
+		return "buy";
 	} else if (button_action == ButtonUnit) {
 		return "unit";
 	} else if (button_action == ButtonEditorUnit) {
@@ -1944,6 +1946,8 @@ int GetButtonActionIdByName(std::string button_action)
 		return ButtonRallyPoint;
 	} else if (button_action == "quest") {
 		return ButtonQuest;
+	} else if (button_action == "buy") {
+		return ButtonBuy;
 	} else if (button_action == "unit") {
 		return ButtonUnit;
 	} else if (button_action == "editor-unit") {

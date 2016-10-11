@@ -85,6 +85,8 @@ extern void CommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
 extern void CommandPickUp(CUnit &unit, CUnit &dest, int flush);
 /// Prepare command quest
 extern void CommandQuest(CUnit &unit, CQuest *quest);
+/// Prepare command buy
+extern void CommandBuy(CUnit &unit, CUnit *sold_unit);
 //Wyrmgus end
 /// Prepare command repair
 //Wyrmgus start
@@ -193,6 +195,8 @@ extern void SendCommandMove(CUnit &unit, const Vec2i &pos, int flush, int z = 0)
 extern void SendCommandRallyPoint(CUnit &unit, const Vec2i &pos, int z = 0);
 /// Send quest command
 extern void SendCommandQuest(CUnit &unit, CQuest *quest);
+/// Send buy command
+extern void SendCommandBuy(CUnit &unit, CUnit *sold_unit);
 /// Send pick up command
 extern void SendCommandPickUp(CUnit &unit, CUnit &dest, int flush);
 //Wyrmgus end

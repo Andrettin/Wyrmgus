@@ -375,6 +375,11 @@ static int CclUnit(lua_State *l)
 			if (is_equipped && unit->Container != NULL) {
 				unit->Container->EquippedItems[GetItemClassSlot(unit->Type->ItemClass)].push_back(unit);
 			}
+		} else if (!strcmp(value, "sold-unit")) {
+			bool is_sold = LuaToBoolean(l, 2, j + 1);
+			if (is_sold && unit->Container != NULL) {
+				unit->Container->SoldUnits.push_back(unit);
+			}
 		} else if (!strcmp(value, "connecting-destination")) {
 			unit->ConnectingDestination = &UnitManager.GetSlotUnit(LuaToNumber(l, 2, j + 1));
 			Map.LayerConnectors[unit->MapLayer].push_back(unit);

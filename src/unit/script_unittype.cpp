@@ -762,6 +762,9 @@ static int CclDefineUnitType(lua_State *l)
 			for (size_t i = 0; i < parent_type->WeaponClasses.size(); ++i) {
 				type->WeaponClasses.push_back(parent_type->WeaponClasses[i]);
 			}
+			for (size_t i = 0; i < parent_type->SoldUnits.size(); ++i) {
+				type->SoldUnits.push_back(parent_type->SoldUnits[i]);
+			}
 			for (size_t i = 0; i < parent_type->Drops.size(); ++i) {
 				type->Drops.push_back(parent_type->Drops[i]);
 			}
@@ -1929,6 +1932,16 @@ static int CclDefineUnitType(lua_State *l)
 			type->Upkeep = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Excrement")) {
 			type->Excrement = LuaToString(l, -1);
+		} else if (!strcmp(value, "SoldUnits")) {
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				int sold_unit_type_id = UnitTypeIdByIdent(LuaToString(l, -1, j + 1));
+				if (sold_unit_type_id != -1) {
+					type->SoldUnits.push_back(UnitTypes[sold_unit_type_id]);
+				} else { // Error
+					LuaError(l, "incorrect sold unit unit-type");
+				}
+			}
 		} else if (!strcmp(value, "Drops")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {

@@ -446,6 +446,7 @@ void CUnit::Init()
 	for (int i = 0; i < MaxItemSlots; ++i) {
 		EquippedItems[i].clear();
 	}
+	SoldUnits.clear();
 	//Wyrmgus end
 
 	tilePos.x = 0;
@@ -601,6 +602,7 @@ void CUnit::Release(bool final)
 	for (int i = 0; i < MaxItemSlots; ++i) {
 		EquippedItems[i].clear();
 	}
+	SoldUnits.clear();
 	//Wyrmgus end
 
 	delete pathFinderData;
@@ -1650,7 +1652,7 @@ void CUnit::UpdateItemName()
 	}
 	
 	Name = "";
-	if (Prefix == NULL && Work == NULL && Suffix == NULL) {
+	if (Prefix == NULL && Spell == NULL && Work == NULL && Suffix == NULL) {
 		return;
 	}
 	
@@ -1922,6 +1924,45 @@ void CUnit::GenerateUnique(CUnit *dropper)
 	if (potential_uniques.size() > 0) {
 		CUniqueItem *chosen_unique = potential_uniques[SyncRand(potential_uniques.size())];
 		SetUnique(chosen_unique);
+	}
+}
+
+void CUnit::UpdateSoldUnits()
+{
+	for (size_t i = 0; i < this->SoldUnits.size(); ++i) {
+		DestroyAllInside(*this->SoldUnits[i]);
+		LetUnitDie(*this->SoldUnits[i]);
+	}
+	this->SoldUnits.clear();
+	
+	if (this->Type->SoldUnits.size() == 0) {
+		return;
+	}
+	
+	int sold_unit_max = 3;
+	for (int i = 0; i < sold_unit_max; ++i) {
+		CUnitType *chosen_unit_type = this->Type->SoldUnits[SyncRand(this->Type->SoldUnits.size())];
+		CUnit *new_unit = MakeUnit(*chosen_unit_type, &Players[PlayerNumNeutral]);
+		new_unit->GenerateSpecialProperties(this);
+		new_unit->Identified = true;
+		new_unit->Remove(this);
+		this->SoldUnits.push_back(new_unit);
+	}
+	if (IsOnlySelected(*this)) {
+		UI.ButtonPanel.Update();
+	}
+}
+
+void CUnit::SellUnit(CUnit *sold_unit)
+{
+	this->SoldUnits.erase(std::remove(this->SoldUnits.begin(), this->SoldUnits.end(), sold_unit), this->SoldUnits.end());
+	DropOutOnSide(*sold_unit, sold_unit->Direction, this);
+	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
+		sold_unit->ChangeOwner(*this->Player);
+	}
+	this->Player->ChangeResource(GoldCost, -sold_unit->GetCost(GoldCost), true);
+	if (IsOnlySelected(*this)) {
+		UI.ButtonPanel.Update();
 	}
 }
 //Wyrmgus end
@@ -2196,6 +2237,8 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	if (this->Character == NULL) {
 		this->UpdatePersonalName();
 	}
+	
+	this->UpdateSoldUnits();
 	//Wyrmgus end
 }
 
@@ -4671,6 +4714,28 @@ int CUnit::GetHairColor() const
 	} else {
 		return this->Type->HairColor;
 	}
+}
+
+int CUnit::GetCost(int resource) const
+{
+	int cost = this->Type->Stats[this->Player->Index].Costs[resource];
+
+	if (resource == GoldCost) {
+		if (this->Prefix != NULL) {
+			cost += this->Prefix->MagicLevel * 1000;
+		}
+		if (this->Suffix != NULL) {
+			cost += this->Suffix->MagicLevel * 1000;
+		}
+		if (this->Spell != NULL) {
+			cost += 1000;
+		}
+		if (this->Work != NULL) {
+			cost += 1000;
+		}
+	}
+	
+	return cost;
 }
 
 bool CUnit::CanAttack(bool count_inside) const

@@ -964,6 +964,8 @@ static void DoNextReplay()
 		SendCommandRallyPoint(*unit, pos);
 	} else if (!strcmp(action, "quest")) {
 		SendCommandQuest(*unit, GetQuest(val));
+	} else if (!strcmp(action, "buy")) {
+		SendCommandBuy(*unit, dunit);
 	//Wyrmgus end
 	} else if (!strcmp(action, "diplomacy")) {
 		int state;

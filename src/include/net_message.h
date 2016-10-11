@@ -320,6 +320,7 @@ enum _message_type_ {
 	MessageCommandCancelResearch,  /// Unit command cancel research
 	//Wyrmgus start
 	MessageCommandQuest,           /// Unit command quest
+	MessageCommandBuy,			   /// Unit command buy
 	//Wyrmgus end
 
 	MessageExtendedCommand,        /// Command is the next byte
