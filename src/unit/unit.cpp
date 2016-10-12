@@ -4731,7 +4731,11 @@ int CUnit::GetCost(int resource) const
 			cost += 1000;
 		}
 		if (this->Work != NULL) {
-			cost += 1000;
+			if (this->Type->ItemClass == BookItemClass) {
+				cost += 3000;
+			} else {
+				cost += 1000;
+			}
 		}
 	}
 	
