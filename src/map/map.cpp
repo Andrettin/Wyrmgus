@@ -450,6 +450,15 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y || Players[i].StartMapLayer != z) {
 			continue;
 		}
+		// add five workers at the player's starting location
+		int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Race, Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
+		if (worker_type_id != -1) {
+			Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
+			for (int j = 0; j < 5; ++j) {
+				CUnit *worker_unit = CreateUnit(Players[i].StartPos, *UnitTypes[worker_type_id], &Players[i], Players[i].StartMapLayer);
+			}
+		}
+		
 		for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
 			Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
 		}
@@ -589,30 +598,6 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 			Vec2i unit_offset((std::get<1>(this->Units[i])->TileWidth - 1) / 2, (std::get<1>(this->Units[i])->TileHeight - 1) / 2);
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z);
-				
-			if (unit->Type->CanStore[GoldCost]) { //if can store gold (i.e. is a town hall), create five worker units around it
-				int civilization = PlayerRaces.GetRaceIndexByName(unit->Type->Civilization.c_str());
-				int faction = PlayerRaces.GetFactionIndexByName(civilization, unit->Type->Faction.c_str());
-				int worker_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker"));
-					
-				if (worker_type_id != -1) {
-					Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
-					for (int i = 0; i < 5; ++i) {
-						CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], player, z);
-					}
-				}
-			} else if (unit->Type->CanStore[WoodCost] || unit->Type->CanStore[StoneCost]) { //if can store lumber or stone (i.e. is a lumber mill), create two worker units around it
-				int civilization = PlayerRaces.GetRaceIndexByName(unit->Type->Civilization.c_str());
-				int faction = PlayerRaces.GetFactionIndexByName(civilization, unit->Type->Faction.c_str());
-				int worker_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, GetUnitTypeClassIndexByName("worker"));
-					
-				if (worker_type_id != -1) {
-					Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
-					for (int i = 0; i < 2; ++i) {
-						CUnit *worker_unit = CreateUnit(unit_pos - worker_unit_offset, *UnitTypes[worker_type_id], player, z);
-					}
-				}
-			}
 		}
 	}
 	
