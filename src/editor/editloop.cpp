@@ -755,7 +755,13 @@ static void DrawPlayers()
 	int y = UI.InfoPanel.Y + 4 + IconHeight + 10;
 
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (i == PlayerMax / 2) {
+		//Wyrmgus start
+		if (i >= 15 && i < PlayerNumNeutral) {
+			continue;
+		}
+//		if (i == PlayerMax / 2) {
+		if ((i % 8) == 0) {
+		//Wyrmgus end
 			y += 20;
 		}
 		if (i == Editor.CursorPlayer && Map.Info.PlayerType[i] != PlayerNobody) {
@@ -770,7 +776,10 @@ static void DrawPlayers()
 		if (i == Editor.SelectedPlayer) {
 			Video.DrawRectangle(ColorGreen, x + 1 + i % 8 * 20, y + 1, 17, 17);
 		}
-		sprintf(buf, "%d", i);
+		//Wyrmgus start
+//		sprintf(buf, "%d", i);
+		sprintf(buf, "%d", (i == PlayerNumNeutral) ? 16 : i + 1);
+		//Wyrmgus end
 		label.DrawCentered(x + i % 8 * 20 + 10, y + 7, buf);
 	}
 
@@ -785,7 +794,7 @@ static void DrawPlayers()
 //				 PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str());
 		std::string civ_str = PlayerRaces.Name[Players[Editor.SelectedPlayer].Race].c_str();
 		civ_str[0] = toupper(civ_str[0]);
-		snprintf(buf, sizeof(buf), "Player %d %s ", Editor.SelectedPlayer, civ_str.c_str());
+		snprintf(buf, sizeof(buf), "Player %d %s ", (Editor.SelectedPlayer == PlayerNumNeutral) ? 16 : Editor.SelectedPlayer + 1, civ_str.c_str());
 		//Wyrmgus end
 		// Players[SelectedPlayer].RaceName);
 
@@ -1492,7 +1501,7 @@ static void ShowUnitInfo(const CUnit &unit)
 	//Wyrmgus end
 					//Wyrmgus start
 //					unit.Type->Name.c_str(), unit.Player->Index,
-					unit.GetTypeName().c_str(), unit.Player->Index,
+					unit.GetTypeName().c_str(), (unit.Player->Index == PlayerNumNeutral) ? 16 : unit.Player->Index + 1,
 					//Wyrmgus end
 					unit.Active ? "active" : "passive");
 	if (unit.Type->GivesResource) {
@@ -2047,7 +2056,13 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 	//Wyrmgus end
 	int by = UI.InfoPanel.Y + 4 + IconHeight + 10;
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (i == PlayerMax / 2) {
+		//Wyrmgus start
+		if (i >= 15 && i < PlayerNumNeutral) {
+			continue;
+		}
+//		if (i == PlayerMax / 2) {
+		if ((i % 8) == 0) {
+		//Wyrmgus end
 			//Wyrmgus start
 //			bx = UI.InfoPanel.X + 8;
 			bx = UI.InfoPanel.X + 26;
@@ -2057,7 +2072,10 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 		if (bx < screenPos.x && screenPos.x < bx + 20 && by < screenPos.y && screenPos.y < by + 20) {
 			if (Map.Info.PlayerType[i] != PlayerNobody) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), _("Select player #%d"), i);
+				//Wyrmgus start
+//				snprintf(buf, sizeof(buf), _("Select player #%d"), i);
+				snprintf(buf, sizeof(buf), _("Select player #%d"), (i == PlayerNumNeutral) ? 16 : i + 1);
+				//Wyrmgus end
 				UI.StatusLine.Set(buf);
 			} else {
 				UI.StatusLine.Clear();

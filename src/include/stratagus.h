@@ -154,7 +154,10 @@ extern const char NameLine[];
 --  Some limits
 ----------------------------------------------------------------------------*/
 
-#define PlayerMax    16                 /// How many players are supported
+//Wyrmgus start
+//#define PlayerMax    16                 /// How many players are supported
+#define PlayerMax    32                 /// How many players are supported
+//Wyrmgus end
 #define UnitTypeMax  2048                /// How many unit types supported
 #define UpgradeMax   2048                /// How many upgrades supported
 //Wyrmgus start

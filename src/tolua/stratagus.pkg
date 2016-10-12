@@ -74,7 +74,10 @@ $]
 #define ManaResCost MaxCosts + 2
 #define FreeWorkersCount MaxCosts + 3
 #define MaxResourceInfo MaxCosts + 4
-#define PlayerMax 16
+//Wyrmgus start
+//#define PlayerMax 16
+#define PlayerMax 32
+//Wyrmgus end
 #define PlayerNumNeutral (PlayerMax - 1)
 #define InfiniteRepairRange 0x7FFFFFFF
 
@@ -84,10 +87,6 @@ $]
 #define RightButton 8
 #define UpButton 16
 #define DownButton 32
-
-//Wyrmgus start
-#define MaxItemClasses 19
-//Wyrmgus end
 
 $using std::string;
 $using std::vector;

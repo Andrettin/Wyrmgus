@@ -20,8 +20,6 @@ class CUpgrade
 	bool MagicPrefix;
 	bool MagicSuffix;
 	bool RunicAffix;
-	bool ItemPrefix[MaxItemClasses];
-	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];
 	CUnitType *Item;
 	int ID;
