@@ -541,6 +541,8 @@ static void GameLogicLoop()
 			case 6: // overtaking units
 				RescueUnits();
 				break;
+			//Wyrmgus start
+			/*
 			default: {
 				// FIXME: assume that NumPlayers < (CYCLES_PER_SECOND - 7)
 				int player = (GameCycle % CYCLES_PER_SECOND) - 7;
@@ -549,10 +551,21 @@ static void GameLogicLoop()
 					PlayersEachSecond(player);
 				}
 			}
+			*/
+			//Wyrmgus end
 		}
 		
 		//Wyrmgus start
-		int player = (GameCycle - 1) % CYCLES_PER_MINUTE;
+		int player = (GameCycle - 1) % CYCLES_PER_SECOND;
+		Assert(player >= 0);
+		if (player < NumPlayers) {
+			PlayersEachSecond(player);
+			if ((player + CYCLES_PER_SECOND) < NumPlayers) {
+				PlayersEachSecond(player + CYCLES_PER_SECOND);
+			}
+		}
+		
+		player = (GameCycle - 1) % CYCLES_PER_MINUTE;
 		Assert(player >= 0);
 		if (player < NumPlayers) {
 			PlayersEachMinute(player);
