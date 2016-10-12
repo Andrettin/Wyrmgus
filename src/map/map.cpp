@@ -591,7 +591,12 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			if (std::get<2>(this->Units[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(this->Units[i]));
 				if (player->StartPos.x == 0 && player->StartPos.y == 0) {
-					player->SetStartView(unit_pos, z);
+					if (std::get<2>(this->Units[i])->DefaultStartPos.x != -1 && std::get<2>(this->Units[i])->DefaultStartPos.y != -1) {
+						Vec2i default_pos(map_start_pos + std::get<2>(this->Units[i])->DefaultStartPos - template_start_pos);
+						player->SetStartView(default_pos, z);
+					} else {
+						player->SetStartView(unit_pos, z);
+					}
 				}
 			} else {
 				player = &Players[PlayerNumNeutral];
