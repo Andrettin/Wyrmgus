@@ -910,6 +910,17 @@ static int CclDefineCivilization(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				civilization->ShipNames.push_back(LuaToString(l, -1, j + 1));
 			}
+		} else if (!strcmp(value, "HistoricalTechnologies")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				std::string technology_ident = LuaToString(l, -1, j + 1);
+				++j;
+				int year = LuaToNumber(l, -1, j + 1);
+				civilization->HistoricalTechnologies[technology_ident] = year;
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -958,6 +969,12 @@ static int CclDefineCivilization(lua_State *l)
 		if (civilization->ShipNames.size() == 0) {
 			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->ShipNames.size(); ++i) {
 				civilization->ShipNames.push_back(PlayerRaces.Civilizations[parent_civilization]->ShipNames[i]);
+			}
+		}
+		
+		for (std::map<std::string, int>::iterator iterator = PlayerRaces.Civilizations[parent_civilization]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Civilizations[parent_civilization]->HistoricalTechnologies.end(); ++iterator) {
+			if (civilization->HistoricalTechnologies.find(iterator->first) == civilization->HistoricalTechnologies.end()) {
+				civilization->HistoricalTechnologies[iterator->first] = iterator->second;
 			}
 		}
 	}
@@ -2095,6 +2112,12 @@ static int CclDefineFaction(lua_State *l)
 					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->ShipNames.size(); ++i) {
 						faction->ShipNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->ShipNames[i]);
 					}
+				}
+			}
+			
+			for (std::map<std::string, int>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalTechnologies.end(); ++iterator) {
+				if (faction->HistoricalTechnologies.find(iterator->first) == faction->HistoricalTechnologies.end()) {
+					faction->HistoricalTechnologies[iterator->first] = iterator->second;
 				}
 			}
 		}

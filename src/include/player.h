@@ -488,6 +488,7 @@ public:
 	std::vector<std::string> SettlementNames;	/// Settlement names for the civilization
 	std::vector<std::string> ProvinceNames;		/// Province names for the civilization
 	std::vector<std::string> ShipNames;			/// Ship names for the civilization
+	std::map<std::string, int> HistoricalTechnologies;					/// historical technologies of the civilization, with the year of discovery
 };
 
 class CFaction

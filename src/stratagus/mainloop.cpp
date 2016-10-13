@@ -72,6 +72,7 @@
 #include "unit.h"
 //Wyrmgus start
 #include "unit_manager.h"
+#include "upgrade.h"
 //Wyrmgus end
 #include "video.h"
 
@@ -755,9 +756,40 @@ void GameMainLoop()
 	
 	//Wyrmgus start
 	if (GameCycle == 0) { // so that these don't trigger when loading a saved game
-		if (CurrentCampaign != NULL && CurrentCampaign->StartEffects) {
-			CurrentCampaign->StartEffects->pushPreamble();
-			CurrentCampaign->StartEffects->run();
+		if (CurrentCampaign != NULL) {
+			for (int i = 0; i < NumPlayers; ++i) {
+				if (Players[i].Type != PlayerNobody && Players[i].Race != 0 && Players[i].Faction != -1) {
+					if (CurrentCampaign->Year) {
+						CCivilization *civilization = PlayerRaces.Civilizations[Players[i].Race];
+						CFaction *faction = PlayerRaces.Factions[Players[i].Race][Players[i].Faction];
+						for (std::map<std::string, int>::iterator iterator = civilization->HistoricalTechnologies.begin(); iterator != civilization->HistoricalTechnologies.end(); ++iterator) {
+							if (iterator->second == 0 || CurrentCampaign->Year >= iterator->second) {
+								int upgrade_id = UpgradeIdByIdent(iterator->first);
+								if (upgrade_id != -1 && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
+									UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
+								} else {
+									fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+								}
+							}
+						}
+						for (std::map<std::string, int>::iterator iterator = faction->HistoricalTechnologies.begin(); iterator != faction->HistoricalTechnologies.end(); ++iterator) {
+							if (iterator->second == 0 || CurrentCampaign->Year >= iterator->second) {
+								int upgrade_id = UpgradeIdByIdent(iterator->first);
+								if (upgrade_id != -1 && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
+									UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
+								} else {
+									fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+								}
+							}
+						}
+					}
+				}
+			}
+	
+			if (CurrentCampaign->StartEffects) {
+				CurrentCampaign->StartEffects->pushPreamble();
+				CurrentCampaign->StartEffects->run();
+			}
 		}
 		
 		//if the person player has no faction, bring up the faction choice interface
