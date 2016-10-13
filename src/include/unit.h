@@ -386,7 +386,7 @@ public:
 	int GetDisplayPlayer() const;
 	int GetSkinColor() const;
 	int GetHairColor() const;
-	int GetCost(int resource) const;
+	int GetPrice() const;
 	bool CanAttack(bool count_inside = false) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;

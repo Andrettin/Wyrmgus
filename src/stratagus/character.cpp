@@ -128,7 +128,18 @@ bool CCharacter::IsItemEquipped(const CItem *item) const
 	return false;
 }
 
-std::string CCharacter::GetFullName()
+bool CCharacter::CanAppear() const
+{
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (std::find(Players[i].Heroes.begin(), Players[i].Heroes.end(), this->GetFullName()) != Players[i].Heroes.end()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+std::string CCharacter::GetFullName() const
 {
 	std::string full_name = this->Name;
 	if (!this->ExtraName.empty()) {

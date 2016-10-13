@@ -823,7 +823,8 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 			break;
 		//Wyrmgus start
 		case ButtonBuy:
-			Costs[GoldCost] = UnitManager.GetSlotUnit(button.Value).GetCost(GoldCost);
+			Costs[FoodCost] = UnitManager.GetSlotUnit(button.Value).Type->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
+			Costs[GoldCost] = UnitManager.GetSlotUnit(button.Value).GetPrice();
 			break;
 		//Wyrmgus end
 		default:
@@ -1666,12 +1667,21 @@ void CButtonPanel::Update()
 		if (UnitButtonTable[i]->Action != ButtonBuy) {
 			continue;
 		}
+		char unit_ident[128];
+		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
+		if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
+			continue;
+		}
 		
 		if (sold_unit_count >= unit.SoldUnits.size()) {
 			UnitButtonTable[i]->Value = -1;
 		} else {
 			UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
-			UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+			if (unit.SoldUnits[sold_unit_count]->Character != NULL) {
+				UnitButtonTable[i]->Hint = "Hire " + unit.SoldUnits[sold_unit_count]->GetName();
+			} else {
+				UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
+			}
 		}
 		sold_unit_count += 1;
 	}
@@ -2057,11 +2067,15 @@ void CButtonPanel::DoClicked_Buy(int button)
 {
 	int buy_costs[MaxCosts];
 	memset(buy_costs, 0, sizeof(buy_costs));
-	buy_costs[GoldCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetCost(GoldCost);
-	if (!Selected[0]->Player->CheckCosts(buy_costs)) {
+	buy_costs[GoldCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetPrice();
+	if (!Selected[0]->Player->CheckCosts(buy_costs) && ThisPlayer->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) >= 0) {
 		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value));
 		if (Selected[0]->Player == ThisPlayer) {
 			SelectedUnitChanged();
+		}
+	} else if (ThisPlayer->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) == -3) {
+		if (GameSounds.NotEnoughFood[ThisPlayer->Race].Sound) {
+			PlayGameSound(GameSounds.NotEnoughFood[ThisPlayer->Race].Sound, MaxSampleVolume);
 		}
 	}
 }

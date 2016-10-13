@@ -120,7 +120,8 @@ public:
 	bool IsChildOf(std::string parent_full_name);
 	bool IsSiblingOf(std::string sibling_full_name);
 	bool IsItemEquipped(const CItem *item) const;
-	std::string GetFullName();
+	bool CanAppear() const;
+	std::string GetFullName() const;
 	IconConfig GetIcon();
 	CItem *GetItem(CUnit &item);
 	void GenerateMissingData();

@@ -1935,18 +1935,45 @@ void CUnit::UpdateSoldUnits()
 	}
 	this->SoldUnits.clear();
 	
-	if (this->Type->SoldUnits.size() == 0) {
+	std::vector<CCharacter *> potential_heroes;
+	if (this->Type->BoolFlag[TOWNHALL_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL && !GrandStrategy) { // allow heroes to be recruited at town halls
+		int civilization_id = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+		for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
+			if (iterator->second->Persistent && iterator->second->Deity == NULL && iterator->second->Civilization == civilization_id && iterator->second->CanAppear()) {
+				potential_heroes.push_back(iterator->second);
+			}
+		}
+		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+			if (iterator->second->Civilization == civilization_id && iterator->second->CanAppear()) {
+				potential_heroes.push_back(iterator->second);
+			}
+		}
+	}
+	
+	if (this->Type->SoldUnits.empty() && potential_heroes.empty()) {
 		return;
 	}
 	
+	
 	int sold_unit_max = 3;
 	for (int i = 0; i < sold_unit_max; ++i) {
-		CUnitType *chosen_unit_type = this->Type->SoldUnits[SyncRand(this->Type->SoldUnits.size())];
-		CUnit *new_unit = MakeUnit(*chosen_unit_type, &Players[PlayerNumNeutral]);
-		new_unit->GenerateSpecialProperties(this);
-		new_unit->Identified = true;
+		CUnit *new_unit = NULL;
+		if (!potential_heroes.empty()) {
+			CCharacter *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
+			new_unit = MakeUnit(*chosen_hero->Type, &Players[PlayerNumNeutral]);
+			new_unit->SetCharacter(chosen_hero->GetFullName(), chosen_hero->Custom);
+			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
+		} else {
+			CUnitType *chosen_unit_type = this->Type->SoldUnits[SyncRand(this->Type->SoldUnits.size())];
+			new_unit = MakeUnit(*chosen_unit_type, &Players[PlayerNumNeutral]);
+			new_unit->GenerateSpecialProperties(this);
+			new_unit->Identified = true;
+		}
 		new_unit->Remove(this);
 		this->SoldUnits.push_back(new_unit);
+		if (potential_heroes.empty() && this->Type->SoldUnits.empty()) {
+			break;
+		}
 	}
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
@@ -1960,7 +1987,7 @@ void CUnit::SellUnit(CUnit *sold_unit)
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(*this->Player);
 	}
-	this->Player->ChangeResource(GoldCost, -sold_unit->GetCost(GoldCost), true);
+	this->Player->ChangeResource(GoldCost, -sold_unit->GetPrice(), true);
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
 	}
@@ -4716,27 +4743,38 @@ int CUnit::GetHairColor() const
 	}
 }
 
-int CUnit::GetCost(int resource) const
+int CUnit::GetPrice() const
 {
-	int cost = this->Type->Stats[this->Player->Index].Costs[resource];
+	int cost = 0;
 
-	if (resource == GoldCost) {
-		if (this->Prefix != NULL) {
-			cost += this->Prefix->MagicLevel * 1000;
-		}
-		if (this->Suffix != NULL) {
-			cost += this->Suffix->MagicLevel * 1000;
-		}
-		if (this->Spell != NULL) {
-			cost += 1000;
-		}
-		if (this->Work != NULL) {
-			if (this->Type->ItemClass == BookItemClass) {
-				cost += 3000;
+	for (int i = 1; i < MaxCosts; ++i) {
+		if (this->Type->Stats[this->Player->Index].Costs[i] > 0) {
+			if (i == GoldCost) {
+				cost += this->Type->Stats[this->Player->Index].Costs[i];
 			} else {
-				cost += 1000;
+				cost += this->Type->Stats[this->Player->Index].Costs[i] * DefaultResourcePrices[i] / 100;
 			}
 		}
+	}
+
+	if (this->Prefix != NULL) {
+		cost += this->Prefix->MagicLevel * 1000;
+	}
+	if (this->Suffix != NULL) {
+		cost += this->Suffix->MagicLevel * 1000;
+	}
+	if (this->Spell != NULL) {
+		cost += 1000;
+	}
+	if (this->Work != NULL) {
+		if (this->Type->ItemClass == BookItemClass) {
+			cost += 3000;
+		} else {
+			cost += 1000;
+		}
+	}
+	if (this->Character) {
+		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) * 1000;
 	}
 	
 	return cost;
