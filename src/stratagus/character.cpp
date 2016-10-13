@@ -66,6 +66,13 @@ CCharacter *CurrentCustomHero = NULL;
 --  Functions
 ----------------------------------------------------------------------------*/
 
+CCharacter::~CCharacter()
+{
+	if (this->Conditions) {
+		delete Conditions;
+	}
+}
+
 int CCharacter::GetMartialAttribute()
 {
 	if (this->Type->Class == "thief" || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {

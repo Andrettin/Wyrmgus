@@ -190,8 +190,12 @@ CDialogue *GetDialogue(std::string dialogue_ident)
 
 CQuest::~CQuest()
 {
-	delete Conditions;
-	delete CompletionEffects;
+	if (this->Conditions) {
+		delete Conditions;
+	}
+	if (this->CompletionEffects) {
+		delete CompletionEffects;
+	}
 }
 
 CCampaign::~CCampaign()
@@ -272,7 +276,9 @@ void CDialogue::Call(int player)
 
 CDialogueNode::~CDialogueNode()
 {
-	delete Conditions;
+	if (this->Conditions) {
+		delete Conditions;
+	}
 	
 	for (size_t i = 0; i < this->OptionEffects.size(); ++i) {
 		delete this->OptionEffects[i];

@@ -1939,7 +1939,15 @@ void CUnit::UpdateSoldUnits()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL && !GrandStrategy) { // allow heroes to be recruited at town halls
 		int civilization_id = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
 		for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-			if (iterator->second->Persistent && iterator->second->Deity == NULL && iterator->second->Civilization == civilization_id && iterator->second->CanAppear()) {
+			if (iterator->second->Persistent && iterator->second->Deity == NULL && iterator->second->Civilization == civilization_id && CheckDependByType(*this->Player, *iterator->second->Type, true) && iterator->second->CanAppear()) {
+				if (iterator->second->Conditions) {
+					CclCommand("trigger_player = " + std::to_string((long long) this->Player->Index) + ";");
+					iterator->second->Conditions->pushPreamble();
+					iterator->second->Conditions->run(1);
+					if (iterator->second->Conditions->popBoolean() == false) {
+						continue;
+					}
+				}
 				potential_heroes.push_back(iterator->second);
 			}
 		}

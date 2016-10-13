@@ -59,6 +59,7 @@ class CQuest;
 class CUnitType;
 class CUnit;
 class CUpgrade;
+class LuaCallback;
 
 /**
 **  Indexes into gender array.
@@ -107,11 +108,13 @@ public:
 		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
 		ViolentDeath(false), Noble(false), Persistent(false), Custom(false), Defined(false),
 		Type(NULL), Trait(NULL), Deity(NULL),
-		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL)
+		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL),
+		Conditions(NULL)
 	{
 		memset(Attributes, 0, sizeof(Attributes));
 		memset(ForbiddenUpgrades, 0, sizeof(ForbiddenUpgrades));
 	}
+	~CCharacter();
 	
 	int GetMartialAttribute();
 	int GetAttributeModifier(int attribute);
@@ -155,6 +158,7 @@ public:
 	CCharacter *Father;					/// Character's father
 	CCharacter *Mother;					/// Character's mother
 	CCharacter *DateReferenceCharacter;	/// Character used as a date reference for this character; i.e. if a dwarf was the contemporary of a human hero in a saga, make the hero a date reference for the dwarf, so that the dwarf will be generated in a similar date in Nidavellir
+	LuaCallback *Conditions;
 	std::vector<CItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character

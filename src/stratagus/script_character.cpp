@@ -259,6 +259,8 @@ static int CclDefineCharacter(lua_State *l)
 			} else {
 				LuaError(l, "Deity doesn't exist.");
 			}
+		} else if (!strcmp(value, "Conditions")) {
+			character->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Abilities")) {
 			character->Abilities.clear();
 			const int args = lua_rawlen(l, -1);
