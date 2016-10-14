@@ -1951,9 +1951,11 @@ void CUnit::UpdateSoldUnits()
 				potential_heroes.push_back(iterator->second);
 			}
 		}
-		for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-			if (iterator->second->Civilization == civilization_id && iterator->second->CanAppear()) {
-				potential_heroes.push_back(iterator->second);
+		if (this->Player == ThisPlayer) {
+			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
+				if (iterator->second->Civilization == civilization_id && iterator->second->CanAppear()) {
+					potential_heroes.push_back(iterator->second);
+				}
 			}
 		}
 	}
@@ -1964,6 +1966,7 @@ void CUnit::UpdateSoldUnits()
 	
 	
 	int sold_unit_max = 3;
+	
 	for (int i = 0; i < sold_unit_max; ++i) {
 		CUnit *new_unit = NULL;
 		if (!potential_heroes.empty()) {
