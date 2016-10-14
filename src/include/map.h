@@ -173,8 +173,8 @@ public:
 	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
-	std::vector<CTerrainType *> TileTerrains;
-	std::vector<CTerrainType *> TileOverlayTerrains;
+	std::vector<char> TileTerrains;
+	std::vector<char> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, int, int>> Units; /// Units; first value is the tile position, and the last ones are start year and end year
 	std::vector<std::tuple<Vec2i, CCharacter *, CFaction *, int, int>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year

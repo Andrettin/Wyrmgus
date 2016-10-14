@@ -349,12 +349,6 @@ COrder_Resource::~COrder_Resource()
 		++j;
 		lua_rawgeti(l, -1, j + 1);
 		this->Resource.Mine = CclGetUnitFromRef(l);
-		//Wyrmgus start
-		if (this->Resource.Mine->Type == NULL) {
-			fprintf(stderr, "COrder_Resource::ParseSpecificData() error: the unit type of Resource.Mine (ID %d) is NULL.\n", UnitNumber(*this->Resource.Mine));
-			this->Resource.Mine = NULL;
-		}
-		//Wyrmgus end
 		lua_pop(l, 1);
 	} else if (!strcmp(value, "res-pos")) {
 		++j;

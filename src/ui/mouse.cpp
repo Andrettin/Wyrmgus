@@ -1365,9 +1365,6 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 		if (show) {
 			const PixelPos mapPixelPos = vp.ScreenToMapPixelPos(cursorPos);
 			UnitUnderCursor = UnitOnScreen(mapPixelPos.x, mapPixelPos.y);
-			//Wyrmgus start
-			UI.StatusLine.Set(Map.Field(tilePos, CurrentMapLayer)->Label);
-			//Wyrmgus end
 		}
 		
 		//Wyrmgus start
@@ -1400,9 +1397,6 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 			//Wyrmgus start
 //			UnitUnderCursor = UnitOnMapTile(tilePos, -1);
 			UnitUnderCursor = UnitOnMapTile(tilePos, -1, CurrentMapLayer);
-			//Wyrmgus end
-			//Wyrmgus start
-			UI.StatusLine.Set(Map.Field(tilePos, CurrentMapLayer)->Label);
 			//Wyrmgus end
 		}
 	}

@@ -193,10 +193,10 @@ public:
 //	unsigned short SeenTile;              /// last seen tile (FOW)
 	CTerrainType *SeenTerrain;
 	CTerrainType *SeenOverlayTerrain;
-	int SeenSolidTile;
-	int SeenOverlaySolidTile;
-	std::vector<std::pair<CTerrainType *, int>> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
-	std::vector<std::pair<CTerrainType *, int>> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
+	short SeenSolidTile;
+	short SeenOverlaySolidTile;
+	std::vector<std::pair<CTerrainType *, short>> SeenTransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<CTerrainType *, short>> SeenOverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
@@ -279,18 +279,17 @@ public:
 	//Wyrmgus start
 //	unsigned short Flags;      /// field flags
 	unsigned long Flags;      /// field flags
-	int AnimationFrame;		/// current frame of the tile's animation
-	int OverlayAnimationFrame;		/// current frame of the overlay tile's animation
+	unsigned char AnimationFrame;		/// current frame of the tile's animation
+	unsigned char OverlayAnimationFrame;		/// current frame of the overlay tile's animation
 	CTerrainType *Terrain;
 	CTerrainType *OverlayTerrain;
-	int SolidTile;
-	int OverlaySolidTile;
+	short SolidTile;
+	short OverlaySolidTile;
 	bool Visible[MaxDirections];			/// whether the tile is visible from a particular direction
 	bool OverlayTerrainDestroyed;
 	bool OverlayTerrainDamaged;
-	std::string Label;						/// a label to be drawn below the tile
-	std::vector<std::pair<CTerrainType *, int>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
-	std::vector<std::pair<CTerrainType *, int>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<CTerrainType *, short>> TransitionTiles;			/// Transition tiles; the pair contains the terrain type and the tile index
+	std::vector<std::pair<CTerrainType *, short>> OverlayTransitionTiles;		/// Overlay transition tiles; the pair contains the terrain type and the tile index
 	//Wyrmgus end
 private:
 	unsigned char cost;        /// unit cost to move in this tile

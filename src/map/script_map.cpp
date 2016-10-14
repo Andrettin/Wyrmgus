@@ -1456,19 +1456,14 @@ static int CclDefineMapTemplate(lua_State *l)
 		}
 	}
 	
-	for (int x = 0; x < map->Width; ++x) {
-		for (int y = 0; y < map->Height; ++y) {
-			if (map->BorderTerrain && (x == 0 || x == (map->Width - 1) || y == 0 || y == (map->Height - 1))) {
-				map->TileTerrains.push_back(map->BorderTerrain);
-			} else {
-				map->TileTerrains.push_back(map->BaseTerrain);
-			}
-			map->TileOverlayTerrains.push_back(NULL);
-		}
+	if (!map->TerrainFile.empty()) {
+		map->TileTerrains.resize(map->Width * map->Height);
+		map->ParseTerrainFile(false);
 	}
-	
-	map->ParseTerrainFile(false);
-	map->ParseTerrainFile(true);
+	if (!map->OverlayTerrainFile.empty()) {
+		map->TileOverlayTerrains.resize(map->Width * map->Height);
+		map->ParseTerrainFile(true);
+	}
 	
 	return 0;
 }

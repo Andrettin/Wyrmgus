@@ -194,8 +194,6 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	} else if (terrain->Flags & MapFieldRocks) {
 		this->Value = DefaultResourceAmounts[StoneCost];
 	}
-	
-	this->Label.clear(); //remove label if terrain changes
 }
 
 void CMapField::RemoveOverlayTerrain()
@@ -220,8 +218,6 @@ void CMapField::RemoveOverlayTerrain()
 			this->Flags |= MapFieldAirUnpassable;
 		}
 	}
-	
-	this->Label.clear(); //remove label if terrain changes
 }
 
 void CMapField::SetOverlayTerrainDestroyed(bool destroyed)

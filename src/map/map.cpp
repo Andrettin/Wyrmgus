@@ -139,12 +139,20 @@ int GetDegreeLevelIdByName(std::string degree_level)
 
 void CMapTemplate::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
 {
-	int index = pos.x + pos.y * this->Width;
+	unsigned int index = pos.x + pos.y * this->Width;
 	
-	if (terrain->Overlay) {
-		this->TileOverlayTerrains[index] = terrain;
+	if (terrain->Overlay && !(terrain->Flags & MapFieldWaterAllowed)) {
+		if (index >= this->TileOverlayTerrains.size()) {
+			this->TileOverlayTerrains.resize(index + 1);
+			std::fill(this->TileOverlayTerrains.begin(), this->TileOverlayTerrains.end(), -1);
+		}
+		this->TileOverlayTerrains[index] = terrain->ID;
 	} else {
-		this->TileTerrains[index] = terrain;
+		if (index >= this->TileTerrains.size()) {
+			this->TileTerrains.resize(index + 1);
+			std::fill(this->TileTerrains.begin(), this->TileTerrains.end(), -1);
+		}
+		this->TileTerrains[index] = terrain->ID;
 	}
 }
 
@@ -179,12 +187,12 @@ void CMapTemplate::ParseTerrainFile(bool overlay)
 		size_t previous_pos = pos;
 		while ((pos = line_str.find(",", pos)) != std::string::npos) {
 			int terrain_id_length = pos - previous_pos - 1;
-			int terrain_id = atoi(line_str.substr(pos - terrain_id_length, terrain_id_length).c_str());
+			char terrain_id = atoi(line_str.substr(pos - terrain_id_length, terrain_id_length).c_str());
 			if (terrain_id != -1) {
 				if (overlay) {
-					this->TileOverlayTerrains[x + y * this->Width] = TerrainTypes[terrain_id];
+					this->TileOverlayTerrains[x + y * this->Width] = terrain_id;
 				} else {
-					this->TileTerrains[x + y * this->Width] = TerrainTypes[terrain_id];
+					this->TileTerrains[x + y * this->Width] = terrain_id;
 				}
 			}
 			previous_pos = pos;
@@ -276,15 +284,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 				Map.Field(surrounding_pos, z)->SetTerrain(this->SurroundingTerrain);
 			}
 		}
-	}
-	
-	for (std::map<std::pair<int, int>, std::string>::iterator iterator = this->TileLabels.begin(); iterator != this->TileLabels.end(); ++iterator) {
-		Vec2i label_pos(map_start_pos.x + iterator->first.first - template_start_pos.x, map_start_pos.y + iterator->first.second - template_start_pos.y);
-		if (!Map.Info.IsPointOnMap(label_pos, z)) {
-			continue;
-		}
-		
-		Map.Field(label_pos, z)->Label = iterator->second;
 	}
 	
 	if (CurrentCampaign && CurrentCampaign->Faction && !this->IsSubtemplateArea() && ThisPlayer->Faction != CurrentCampaign->Faction->ID) {
@@ -644,12 +643,20 @@ bool CMapTemplate::IsSubtemplateArea()
 
 CTerrainType *CMapTemplate::GetTileTerrain(const Vec2i &pos, bool overlay)
 {
-	int index = pos.x + pos.y * this->Width;
+	unsigned int index = pos.x + pos.y * this->Width;
 	
 	if (overlay) {
-		return this->TileOverlayTerrains[index];
+		if (index < this->TileOverlayTerrains.size() && this->TileOverlayTerrains[index] != -1) {
+			return TerrainTypes[this->TileOverlayTerrains[index]];
+		}
 	} else {
-		return this->TileTerrains[index];
+		if (index < this->TileTerrains.size() && this->TileTerrains[index] != -1) {
+			return TerrainTypes[this->TileTerrains[index]];
+		} else if (this->BorderTerrain && (pos.x == 0 || pos.x == (this->Width - 1) || pos.y == 0 || pos.y == (this->Height - 1))) {
+			return this->BorderTerrain;
+		} else if (this->BaseTerrain) {
+			return this->BaseTerrain;
+		}
 	}
 	
 	return NULL;
