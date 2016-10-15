@@ -307,7 +307,7 @@ void CGrandStrategyGame::DrawMap()
 	for (int x = WorldMapOffsetX; x <= (WorldMapOffsetX + (grand_strategy_map_width / 64) + 1) && x < GetWorldMapWidth(); ++x) {
 		for (int y = WorldMapOffsetY; y <= (WorldMapOffsetY + (grand_strategy_map_height / 64) + 1) && y < GetWorldMapHeight(); ++y) {
 			if (this->WorldMapTiles[x][y]->Terrain != -1) {
-				int player_color = this->WorldMapTiles[x][y]->Province != NULL && this->WorldMapTiles[x][y]->Province->Owner != NULL ? PlayerRaces.Factions[this->WorldMapTiles[x][y]->Province->Owner->Civilization][this->WorldMapTiles[x][y]->Province->Owner->Faction]->Colors[0] : 15;
+				int player_color = this->WorldMapTiles[x][y]->Province != NULL && this->WorldMapTiles[x][y]->Province->Owner != NULL ? PlayerRaces.Factions[this->WorldMapTiles[x][y]->Province->Owner->Civilization][this->WorldMapTiles[x][y]->Province->Owner->Faction]->Colors[0] : PlayerNumNeutral;
 				
 				CGrandStrategyProvince *province = this->WorldMapTiles[x][y]->Province;
 				
@@ -412,7 +412,7 @@ void CGrandStrategyGame::DrawMap()
 							if (province->Owner != NULL) {
 								player_color = PlayerRaces.Factions[province->Owner->Civilization][province->Owner->Faction]->Colors[0];
 							} else {
-								player_color = 15;
+								player_color = PlayerNumNeutral;
 							}
 										
 							this->NationalBorderGraphics[i]->DrawPlayerColorFrameClip(player_color, 0, 64 * (x - WorldMapOffsetX) + width_indent - 10, 16 + 64 * (y - WorldMapOffsetY) + height_indent - 10, true);
@@ -7529,6 +7529,17 @@ void FinalizeGrandStrategyInitialization()
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGameLoading == false) {
 				// add historical technologies that should have been discovered at the game's start date; do this here instead of together with the other faction initialization finalization elements because it can affect the food productivity used to determine some province settings below
+				for (std::map<std::string, int>::iterator iterator = PlayerRaces.Civilizations[i]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Civilizations[i]->HistoricalTechnologies.end(); ++iterator) {
+					if (GrandStrategyYear >= iterator->second) {
+						int upgrade_id = UpgradeIdByIdent(iterator->first);
+						if (upgrade_id != -1) {
+							GrandStrategyGame.Factions[i][j]->SetTechnology(upgrade_id, true);
+							GrandStrategyGame.Factions[i][j]->HistoricalTechnologies[AllUpgrades[upgrade_id]] = iterator->second;
+						} else {
+							fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+						}
+					}
+				}
 				for (std::map<std::string, int>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalTechnologies.end(); ++iterator) {
 					if (GrandStrategyYear >= iterator->second) {
 						int upgrade_id = UpgradeIdByIdent(iterator->first);
