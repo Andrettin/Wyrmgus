@@ -2071,7 +2071,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 	int buy_costs[MaxCosts];
 	memset(buy_costs, 0, sizeof(buy_costs));
 	buy_costs[GoldCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetPrice();
-	if (!Selected[0]->Player->CheckCosts(buy_costs) && ThisPlayer->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) >= 0) {
+	if (!ThisPlayer->CheckCosts(buy_costs) && ThisPlayer->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) >= 0) {
 		if (!UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type->BoolFlag[ITEM_INDEX].value) {
 			SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), ThisPlayer->Index);
 		} else {
