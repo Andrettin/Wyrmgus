@@ -1936,10 +1936,24 @@ void CUnit::UpdateSoldUnits()
 	this->SoldUnits.clear();
 	
 	std::vector<CCharacter *> potential_heroes;
-	if (this->Type->BoolFlag[TOWNHALL_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL && !GrandStrategy) { // allow heroes to be recruited at town halls
+	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL && !GrandStrategy) { // allow heroes to be recruited at town halls
 		int civilization_id = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
 		for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-			if (iterator->second->Persistent && iterator->second->Deity == NULL && iterator->second->Civilization == civilization_id && CheckDependByType(*this->Player, *iterator->second->Type, true) && iterator->second->CanAppear()) {
+			if (!iterator->second->Persistent || iterator->second->Deity != NULL) {
+				continue;
+			}
+			bool hero_allowed = false;
+			if (this->Player->Index == PlayerNumNeutral) { // if this is a neutral building (i.e. a mercenary camp), see if any player present can have this hero
+				for (int p = 0; p < PlayerMax; ++p) {
+					if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && iterator->second->Civilization == Players[p].Race && CheckDependByType(Players[p], *iterator->second->Type, true)) {
+						hero_allowed = true;
+						break;
+					}
+				}
+			} else {
+				hero_allowed = (iterator->second->Civilization == civilization_id && CheckDependByType(*this->Player, *iterator->second->Type, true));
+			}
+			if (hero_allowed && iterator->second->CanAppear()) {
 				if (iterator->second->Conditions) {
 					CclCommand("trigger_player = " + std::to_string((long long) this->Player->Index) + ";");
 					iterator->second->Conditions->pushPreamble();
@@ -1991,14 +2005,14 @@ void CUnit::UpdateSoldUnits()
 	}
 }
 
-void CUnit::SellUnit(CUnit *sold_unit)
+void CUnit::SellUnit(CUnit *sold_unit, int player)
 {
 	this->SoldUnits.erase(std::remove(this->SoldUnits.begin(), this->SoldUnits.end(), sold_unit), this->SoldUnits.end());
 	DropOutOnSide(*sold_unit, sold_unit->Direction, this);
-	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
-		sold_unit->ChangeOwner(*this->Player);
+	if (player != PlayerNumNeutral) {
+		sold_unit->ChangeOwner(Players[player]);
 	}
-	this->Player->ChangeResource(GoldCost, -sold_unit->GetPrice(), true);
+	Players[player].ChangeResource(GoldCost, -sold_unit->GetPrice(), true);
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
 	}
@@ -4785,7 +4799,7 @@ int CUnit::GetPrice() const
 		}
 	}
 	if (this->Character) {
-		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) * 1000;
+		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) * 250;
 	}
 	
 	return cost;

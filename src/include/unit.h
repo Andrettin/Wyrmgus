@@ -221,7 +221,7 @@ public:
 	void GenerateWork(CUnit *dropper);
 	void GenerateUnique(CUnit *dropper);
 	void UpdateSoldUnits();
-	void SellUnit(CUnit *sold_unit);
+	void SellUnit(CUnit *sold_unit, int player);
 	//Wyrmgus end
 	
 	bool RestoreOrder();

@@ -183,13 +183,13 @@ void SendCommandQuest(CUnit &unit, CQuest *quest)
 ** @param unit    pointer to unit.
 ** @param pos     map tile position to move to.
 */
-void SendCommandBuy(CUnit &unit, CUnit *sold_unit)
+void SendCommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 {
 	if (!IsNetworkGame()) {
-		CommandLog("buy", &unit, 0, -1, -1, sold_unit, NULL, -1);
-		CommandBuy(unit, sold_unit);
+		CommandLog("buy", &unit, 0, -1, -1, sold_unit, NULL, player);
+		CommandBuy(unit, sold_unit, player);
 	} else {
-		NetworkSendCommand(MessageCommandBuy, unit, 0, 0, sold_unit, 0, 0);
+		NetworkSendCommand(MessageCommandBuy, unit, player, 0, sold_unit, 0, 0);
 	}
 }
 
@@ -980,8 +980,8 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			if (dstnr != (unsigned short)0xFFFF) {
 				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
 				Assert(dest.Type);
-				CommandLog("buy", &unit, 0, -1, -1, &dest, NULL, -1);
-				CommandBuy(unit, &dest);
+				CommandLog("buy", &unit, 0, -1, -1, &dest, NULL, arg1);
+				CommandBuy(unit, &dest, arg1);
 			}
 			break;
 		}

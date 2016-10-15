@@ -1163,7 +1163,7 @@ void CButtonPanel::Draw()
 		Assert(buttons[i].Pos == i + 1);
 		//Wyrmgus start
 		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
-		if (Selected[0]->Player != ThisPlayer && !ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type == PlayerNeutral && buttons[i].Action != ButtonTrain && buttons[i].Action != ButtonCancelTrain) {
+		if (Selected[0]->Player != ThisPlayer && !ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type == PlayerNeutral && buttons[i].Action != ButtonTrain && buttons[i].Action != ButtonCancelTrain && buttons[i].Action != ButtonBuy) {
 			continue;
 		}
 		//Wyrmgus end
@@ -1681,7 +1681,7 @@ void CButtonPanel::Update()
 		} else {
 			UnitButtonTable[i]->Value = UnitNumber(*unit.SoldUnits[sold_unit_count]);
 			if (unit.SoldUnits[sold_unit_count]->Character != NULL) {
-				UnitButtonTable[i]->Hint = "Hire " + unit.SoldUnits[sold_unit_count]->GetName();
+				UnitButtonTable[i]->Hint = "Recruit " + unit.SoldUnits[sold_unit_count]->GetName();
 			} else {
 				UnitButtonTable[i]->Hint = "Buy " + unit.SoldUnits[sold_unit_count]->GetName();
 			}
@@ -2072,8 +2072,12 @@ void CButtonPanel::DoClicked_Buy(int button)
 	memset(buy_costs, 0, sizeof(buy_costs));
 	buy_costs[GoldCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetPrice();
 	if (!Selected[0]->Player->CheckCosts(buy_costs) && ThisPlayer->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) >= 0) {
-		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value));
-		if (Selected[0]->Player == ThisPlayer) {
+		if (!UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type->BoolFlag[ITEM_INDEX].value) {
+			SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), ThisPlayer->Index);
+		} else {
+			SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), PlayerNumNeutral);
+		}
+		if (IsOnlySelected(*Selected[0])) {
 			SelectedUnitChanged();
 		}
 	} else if (ThisPlayer->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) == -3) {
@@ -2113,7 +2117,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type != PlayerNeutral) || (Selected[0]->Player->Type == PlayerNeutral && CurrentButtons[button].Action != ButtonTrain && CurrentButtons[button].Action != ButtonCancelTrain)) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type != PlayerNeutral) || (Selected[0]->Player->Type == PlayerNeutral && CurrentButtons[button].Action != ButtonTrain && CurrentButtons[button].Action != ButtonCancelTrain && CurrentButtons[button].Action != ButtonBuy)) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}
