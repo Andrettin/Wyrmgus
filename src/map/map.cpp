@@ -288,7 +288,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	
 	if (CurrentCampaign && CurrentCampaign->Faction && !this->IsSubtemplateArea() && ThisPlayer->Faction != CurrentCampaign->Faction->ID) {
 		ThisPlayer->SetCivilization(CurrentCampaign->Faction->Civilization);
-		ThisPlayer->SetFaction(CurrentCampaign->Faction->Name);
+		ThisPlayer->SetFaction(CurrentCampaign->Faction->Ident);
 	}
 	
 	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {

@@ -958,7 +958,7 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (character->Faction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[character->Civilization][character->Faction]->Name.c_str());
+			lua_pushstring(l, PlayerRaces.Factions[character->Civilization][character->Faction]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

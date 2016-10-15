@@ -1614,7 +1614,7 @@ static int CclGetCivilizationData(lua_State *l)
 		for (size_t i = 0; i < PlayerRaces.Factions[civilization_id].size(); ++i)
 		{
 			if (!is_mod || PlayerRaces.Factions[civilization_id][i]->Mod == mod_file) {
-				factions.push_back(PlayerRaces.Factions[civilization_id][i]->Name);
+				factions.push_back(PlayerRaces.Factions[civilization_id][i]->Ident);
 			}
 		}
 		
@@ -1750,7 +1750,7 @@ static int CclDefineFaction(lua_State *l)
 			faction = const_cast<CFaction *>(&(*PlayerRaces.Factions[i][faction_id]));
 			civilization = faction->Civilization;
 			if (faction->ParentFaction != -1) {
-				parent_faction = PlayerRaces.Factions[i][faction->ParentFaction]->Name;
+				parent_faction = PlayerRaces.Factions[i][faction->ParentFaction]->Ident;
 			}
 			break;
 		}
@@ -1758,7 +1758,7 @@ static int CclDefineFaction(lua_State *l)
 	
 	if (faction_id == -1) {
 		faction = new CFaction;
-		faction->Name = faction_name;
+		faction->Ident = faction_name;
 	}
 	
 	//  Parse the list:
@@ -1771,9 +1771,11 @@ static int CclDefineFaction(lua_State *l)
 				
 				faction->ID = PlayerRaces.Factions[civilization].size();
 				PlayerRaces.Factions[civilization].push_back(faction);
-				SetFactionStringToIndex(civilization, faction->Name, faction->ID);
+				SetFactionStringToIndex(civilization, faction->Ident, faction->ID);
 				faction->Civilization = civilization;
 			}
+		} else if (!strcmp(value, "Name")) {
+			faction->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			faction->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
@@ -2553,7 +2555,7 @@ static int CclGetCivilizationFactionNames(lua_State *l)
 	lua_createtable(l, PlayerRaces.Factions[civilization].size(), 0);
 	for (size_t i = 1; i <= PlayerRaces.Factions[civilization].size(); ++i)
 	{
-		lua_pushstring(l, PlayerRaces.Factions[civilization][i-1]->Name.c_str());
+		lua_pushstring(l, PlayerRaces.Factions[civilization][i-1]->Ident.c_str());
 		lua_rawseti(l, -2, i);
 	}
 	
@@ -2576,14 +2578,14 @@ static int CclGetFactions(lua_State *l)
 	if (civilization != -1) {
 		for (size_t i = 0; i < PlayerRaces.Factions[civilization].size(); ++i)
 		{
-			factions.push_back(PlayerRaces.Factions[civilization][i]->Name);
+			factions.push_back(PlayerRaces.Factions[civilization][i]->Ident);
 		}
 	} else {
 		for (int i = 0; i < MAX_RACES; ++i)
 		{
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j)
 			{
-				factions.push_back(PlayerRaces.Factions[i][j]->Name);
+				factions.push_back(PlayerRaces.Factions[i][j]->Ident);
 			}
 		}
 	}
@@ -2643,7 +2645,10 @@ static int CclGetFactionData(lua_State *l)
 	
 	const char *data = LuaToString(l, 3);
 
-	if (!strcmp(data, "Description")) {
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, PlayerRaces.Factions[civilization][faction]->Description.c_str());
 		return 1;
 	} else if (!strcmp(data, "Quote")) {
@@ -2678,7 +2683,7 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "ParentFaction")) {
 		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[civilization][PlayerRaces.Factions[civilization][faction]->ParentFaction]->Name.c_str());
+			lua_pushstring(l, PlayerRaces.Factions[civilization][PlayerRaces.Factions[civilization][faction]->ParentFaction]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2921,7 +2926,7 @@ static int CclGetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		if (p->Race != -1 && p->Faction != -1) {
-			lua_pushstring(l, PlayerRaces.Factions[p->Race][p->Faction]->Name.c_str());
+			lua_pushstring(l, PlayerRaces.Factions[p->Race][p->Faction]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -3185,7 +3190,7 @@ static int CclSetPlayerData(lua_State *l)
 	//Wyrmgus start
 	} else if (!strcmp(data, "Faction")) {
 		std::string faction_name = LuaToString(l, 3);
-		if (faction_name == "Random") {
+		if (faction_name == "random") {
 			p->SetRandomFaction();
 		} else {
 			p->SetFaction(faction_name);

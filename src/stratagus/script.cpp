@@ -2875,19 +2875,19 @@ void SaveGrandStrategyGame(const std::string &filename)
 					fprintf(fd, "SetWorldMapTileCulturalSettlementName(%d, %d, \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first].c_str(), iterator->second[0].c_str()); //save tile cultural settlement name
 				}
 				for (std::map<CFaction *, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileFactionCulturalSettlementName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first->Civilization].c_str(), iterator->first->Name.c_str(), iterator->second[0].c_str()); //save tile faction cultural settlement name
+					fprintf(fd, "SetWorldMapTileFactionCulturalSettlementName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, PlayerRaces.Name[iterator->first->Civilization].c_str(), iterator->first->Ident.c_str(), iterator->second[0].c_str()); //save tile faction cultural settlement name
 				}
 				for (std::map<std::pair<int,int>, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalTerrainNames.end(); ++iterator) {
 					fprintf(fd, "SetWorldMapTileCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second].c_str(), iterator->second[0].c_str());
 				}
 				for (std::map<std::pair<int,CFaction *>, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalTerrainNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileFactionCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second[0].c_str());
+					fprintf(fd, "SetWorldMapTileFactionCulturalTerrainName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, WorldMapTerrainTypes[iterator->first.first]->Name.c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Ident.c_str(), iterator->second[0].c_str());
 				}
 				for (std::map<std::pair<int,int>, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->CulturalResourceNames.end(); ++iterator) {
 					fprintf(fd, "SetWorldMapTileCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second].c_str(), iterator->second[0].c_str());
 				}
 				for (std::map<std::pair<int,CFaction *>, std::vector<std::string>>::iterator iterator = GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.begin(); iterator != GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalResourceNames.end(); ++iterator) {
-					fprintf(fd, "SetWorldMapTileFactionCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Name.c_str(), iterator->second[0].c_str());
+					fprintf(fd, "SetWorldMapTileFactionCulturalResourceName(%d, %d, \"%s\", \"%s\", \"%s\", \"%s\")\n", x, y, DefaultResourceNames[iterator->first.first].c_str(), PlayerRaces.Name[iterator->first.second->Civilization].c_str(), iterator->first.second->Ident.c_str(), iterator->second[0].c_str());
 				}
 				for (int i = 0; i < MaxDirections; ++i) {
 					std::string direction_name = GetDirectionNameById(i);
@@ -2933,7 +2933,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
 					if (GrandStrategyGame.Rivers[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != GrandStrategyGame.Rivers[i]->FactionCulturalNames.end()) {
-						fprintf(fd, "SetRiverFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Name.c_str(), GrandStrategyGame.Rivers[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]].c_str());
+						fprintf(fd, "SetRiverFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Rivers[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Ident.c_str(), GrandStrategyGame.Rivers[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]].c_str());
 					}
 				}
 			}
@@ -2954,10 +2954,10 @@ void SaveGrandStrategyGame(const std::string &filename)
 				fprintf(fd, "SetProvinceCivilization(\"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Civilization].c_str()); //save the province's civilization
 			}
 			if (GrandStrategyGame.Provinces[i]->Owner != NULL) {
-				fprintf(fd, "SetProvinceOwner(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Owner->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Name.c_str()); //save province owner
+				fprintf(fd, "SetProvinceOwner(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Owner->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Ident.c_str()); //save province owner
 			}
 			if (GrandStrategyGame.Provinces[i]->AttackedBy != NULL) {
-				fprintf(fd, "SetProvinceAttackedBy(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->AttackedBy->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->AttackedBy->Civilization][GrandStrategyGame.Provinces[i]->AttackedBy->Faction]->Name.c_str()); //save attacked by
+				fprintf(fd, "SetProvinceAttackedBy(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->AttackedBy->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->AttackedBy->Civilization][GrandStrategyGame.Provinces[i]->AttackedBy->Faction]->Ident.c_str()); //save attacked by
 			}
 			if (GrandStrategyGame.Provinces[i]->SettlementLocation.x != -1 && GrandStrategyGame.Provinces[i]->SettlementLocation.y != -1) {
 				fprintf(fd, "SetProvinceSettlementLocation(\"%s\", %d, %d)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->SettlementLocation.x, GrandStrategyGame.Provinces[i]->SettlementLocation.y); //save province settlement location
@@ -2989,7 +2989,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 				fprintf(fd, "SetGrandStrategyProvinceData(\"%s\", \"Modifier\", \"%s\", true)\n", GrandStrategyGame.Provinces[i]->Name.c_str(), GrandStrategyGame.Provinces[i]->Modifiers[j]->Ident.c_str());
 			}
 			for (size_t j = 0; j < GrandStrategyGame.Provinces[i]->Claims.size(); ++j) {
-				fprintf(fd, "AddProvinceClaim(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Name.c_str());
+				fprintf(fd, "AddProvinceClaim(\"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Ident.c_str());
 			}
 			for (int j = 0; j < MAX_RACES; ++j) {
 				if (GrandStrategyGame.Provinces[i]->CulturalNames.find(j) != GrandStrategyGame.Provinces[i]->CulturalNames.end()) {
@@ -2997,7 +2997,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 				}
 				for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
 					if (GrandStrategyGame.Provinces[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != GrandStrategyGame.Provinces[i]->FactionCulturalNames.end()) {
-						fprintf(fd, "SetProvinceFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Name.c_str(), GrandStrategyGame.Provinces[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]].c_str());
+						fprintf(fd, "SetProvinceFactionCulturalName(\"%s\", \"%s\", \"%s\", \"%s\")\n", GrandStrategyGame.Provinces[i]->Name.c_str(), PlayerRaces.Name[j].c_str(), PlayerRaces.Factions[j][k]->Ident.c_str(), GrandStrategyGame.Provinces[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]].c_str());
 					}
 				}
 			}
@@ -3006,36 +3006,36 @@ void SaveGrandStrategyGame(const std::string &filename)
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 				if (GrandStrategyGame.Factions[i][j]->Capital != NULL) {
-					fprintf(fd, "SetGrandStrategyFactionData(\"%s\", \"%s\", \"Capital\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GrandStrategyGame.Factions[i][j]->Capital->Name.c_str());
+					fprintf(fd, "SetGrandStrategyFactionData(\"%s\", \"%s\", \"Capital\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), GrandStrategyGame.Factions[i][j]->Capital->Name.c_str());
 				}
 				if (GrandStrategyGame.Factions[i][j]->GovernmentType != -1) {
 					std::string government_type_name = GetGovernmentTypeNameById(GrandStrategyGame.Factions[i][j]->GovernmentType);
-					fprintf(fd, "SetFactionGovernmentType(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), government_type_name.c_str());
+					fprintf(fd, "SetFactionGovernmentType(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), government_type_name.c_str());
 				}
 				if (GrandStrategyGame.Factions[i][j]->FactionTier != -1) {
 					std::string faction_tier_name = GetFactionTierNameById(GrandStrategyGame.Factions[i][j]->FactionTier);
-					fprintf(fd, "SetFactionTier(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), faction_tier_name.c_str());
+					fprintf(fd, "SetFactionTier(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), faction_tier_name.c_str());
 				}
 				if (GrandStrategyGame.Factions[i][j]->CurrentResearch != -1) {
-					fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
+					fprintf(fd, "SetFactionCurrentResearch(\"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), AllUpgrades[GrandStrategyGame.Factions[i][j]->CurrentResearch]->Ident.c_str()); //save faction current research
 				}
 				for (size_t k = 0; k < AllUpgrades.size(); ++k) {
 					if (GrandStrategyGame.Factions[i][j]->Technologies[k] != false) {
-						fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
+						fprintf(fd, "SetFactionTechnology(\"%s\", \"%s\", \"%s\", %s)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), AllUpgrades[k]->Ident.c_str(), "true"); //save faction technology data
 					}
 				}
 				for (int k = 0; k < MaxCosts; ++k) {
 					if (GrandStrategyGame.Factions[i][j]->Resources[k] != 0) {
-						fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
+						fprintf(fd, "SetFactionResource(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Resources[k]); //save faction resource data
 					}
 					if (GrandStrategyGame.Factions[i][j]->Trade[k] != 0) {
-						fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
+						fprintf(fd, "SetFactionCommodityTrade(\"%s\", \"%s\", \"%s\", %d)\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), DefaultResourceNames[k].c_str(), GrandStrategyGame.Factions[i][j]->Trade[k]); //save faction trade data
 					}
 				}
 				for (int k = i; k < MAX_RACES; ++k) { //the function sets the state for both parties, so we only need to do it once for one of them
 					for (size_t n = j + 1; n < PlayerRaces.Factions[k].size(); ++n) {
 						if (GrandStrategyGame.Factions[k][n] && GrandStrategyGame.Factions[i][j]->GetDiplomacyState(GrandStrategyGame.Factions[k][n]) != DiplomacyStatePeace) {
-							fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Name.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->GetDiplomacyState(GrandStrategyGame.Factions[k][n])).c_str()); //save faction trade data
+							fprintf(fd, "SetFactionDiplomacyState(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), PlayerRaces.Name[k].c_str(), PlayerRaces.Factions[k][n]->Ident.c_str(), GetDiplomacyStateNameById(GrandStrategyGame.Factions[i][j]->GetDiplomacyState(GrandStrategyGame.Factions[k][n])).c_str()); //save faction trade data
 						}
 					}
 				}
@@ -3113,7 +3113,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 				for (int k = 0; k < MaxCharacterTitles; ++k) {
 					if (GrandStrategyGame.Factions[i][j]->Ministers[k] != NULL) {
-						fprintf(fd, "SetFactionMinister(\"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Name.c_str(), GetCharacterTitleNameById(k).c_str(), GrandStrategyGame.Factions[i][j]->Ministers[k]->GetFullName().c_str()); //save faction ministers
+						fprintf(fd, "SetFactionMinister(\"%s\", \"%s\", \"%s\", \"%s\")\n", PlayerRaces.Name[i].c_str(), PlayerRaces.Factions[i][j]->Ident.c_str(), GetCharacterTitleNameById(k).c_str(), GrandStrategyGame.Factions[i][j]->Ministers[k]->GetFullName().c_str()); //save faction ministers
 					}
 				}
 			}
@@ -3135,7 +3135,7 @@ void SaveGrandStrategyGame(const std::string &filename)
 			fprintf(fd, "MakeGrandStrategyEventAvailable(\"%s\")\n", GrandStrategyGame.AvailableEvents[i]->Name.c_str()); // save which grand strategy events are available
 		}
 		
-		fprintf(fd, "SetPlayerFaction(\"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.PlayerFaction->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Name.c_str());
+		fprintf(fd, "SetPlayerFaction(\"%s\", \"%s\")\n", PlayerRaces.Name[GrandStrategyGame.PlayerFaction->Civilization].c_str(), PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Ident.c_str());
 	
 		for (size_t i = 0; i < GrandStrategyGame.Heroes.size(); ++i) {
 			if (GrandStrategyGame.Heroes[i]->State != 0) {
@@ -3339,7 +3339,7 @@ void DeleteModFaction(std::string civilization_name, std::string faction_name)
 		faction = PlayerRaces.GetFactionIndexByName(civilization, faction_name);
 	}
 	if (faction != -1 && !PlayerRaces.Factions[civilization][faction]->Mod.empty()) {
-		FactionStringToIndex[civilization].erase(PlayerRaces.Factions[civilization][faction]->Name);
+		FactionStringToIndex[civilization].erase(PlayerRaces.Factions[civilization][faction]->Ident);
 		delete PlayerRaces.Factions[civilization][faction];
 		PlayerRaces.Factions[civilization].erase(std::remove(PlayerRaces.Factions[civilization].begin(), PlayerRaces.Factions[civilization].end(), PlayerRaces.Factions[civilization][faction]), PlayerRaces.Factions[civilization].end());
 	}
@@ -3419,7 +3419,7 @@ void DisableMod(std::string mod_file)
 		int factions_size = PlayerRaces.Factions[i].size();
 		for (int j = (factions_size - 1); j >= 0; --j) {
 			if (PlayerRaces.Factions[i][j]->Mod == mod_file) {
-				FactionStringToIndex[i].erase(PlayerRaces.Factions[i][j]->Name);
+				FactionStringToIndex[i].erase(PlayerRaces.Factions[i][j]->Ident);
 				delete PlayerRaces.Factions[i][j];
 				PlayerRaces.Factions[i].erase(std::remove(PlayerRaces.Factions[i].begin(), PlayerRaces.Factions[i].end(), PlayerRaces.Factions[i][j]), PlayerRaces.Factions[i].end());
 			}

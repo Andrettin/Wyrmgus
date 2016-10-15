@@ -638,13 +638,14 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 					continue;
 				}
 				
-				f->printf("DefineFaction(\"%s\", {\n", PlayerRaces.Factions[i][j]->Name.c_str());
+				f->printf("DefineFaction(\"%s\", {\n", PlayerRaces.Factions[i][j]->Ident.c_str());
+				f->printf("\tName = \"%s\",\n", PlayerRaces.Factions[i][j]->Name.c_str());
 				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[i].c_str());
 				if (PlayerRaces.Factions[i][j]->Type != FactionTypeNoFactionType) {
 					f->printf("\tType = \"%s\",\n", GetFactionTypeNameById(PlayerRaces.Factions[i][j]->Type).c_str());
 				}
 				if (PlayerRaces.Factions[i][j]->ParentFaction != -1) {
-					f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[i][PlayerRaces.Factions[i][j]->ParentFaction]->Name.c_str());
+					f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[i][PlayerRaces.Factions[i][j]->ParentFaction]->Ident.c_str());
 				}
 				if (PlayerRaces.Factions[i][j]->Language != -1) {
 					f->printf("\tLanguage = \"%s\",\n", PlayerRaces.Languages[PlayerRaces.Factions[i][j]->Language]->Ident.c_str());
@@ -912,7 +913,7 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, PlayerRaces.Name[Players[i].Race].c_str());
 				if (Players[i].Faction != -1) {
 					f->printf("SetPlayerData(%d, \"Faction\", \"%s\")\n",
-							  i, PlayerRaces.Factions[Players[i].Race][Players[i].Faction]->Name.c_str());
+							  i, PlayerRaces.Factions[Players[i].Race][Players[i].Faction]->Ident.c_str());
 				}
 				f->printf("SetAiType(%d, \"%s\")\n",
 						  i, Players[i].AiName.c_str());

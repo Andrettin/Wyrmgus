@@ -494,7 +494,7 @@ static int CclGetCampaignData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (campaign->Faction) {
-			lua_pushstring(l, campaign->Faction->Name.c_str());
+			lua_pushstring(l, campaign->Faction->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

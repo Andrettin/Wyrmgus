@@ -1064,7 +1064,7 @@ void CPlayer::Save(CFile &file) const
 		file.printf("\"%s\",", std::get<0>(p.QuestDestroyUnits[j])->Ident.c_str());
 		file.printf("\"%s\",", std::get<1>(p.QuestDestroyUnits[j])->Ident.c_str());
 		if (std::get<2>(p.QuestDestroyUnits[j])) {
-			file.printf("\"%s\",", std::get<2>(p.QuestDestroyUnits[j])->Name.c_str());
+			file.printf("\"%s\",", std::get<2>(p.QuestDestroyUnits[j])->Ident.c_str());
 		} else {
 			file.printf("\"%s\",", "");
 		}
@@ -1157,7 +1157,7 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 		if (Players[i].Type == PlayerNobody) {
 			Players[i].Type = PlayerComputer;
 			Players[i].SetCivilization(faction->Civilization);
-			Players[i].SetFaction(faction->Name);
+			Players[i].SetFaction(faction->Ident);
 			Players[i].AiEnabled = true;
 			Players[i].AiName = faction->DefaultAI;
 			Players[i].Team = 1;
@@ -1388,7 +1388,7 @@ void CPlayer::SetCivilization(int civilization)
 		if (ThisPlayer && ThisPlayer->Index == this->Index) {
 			if (GameCycle != 0) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Name.c_str() : "");
+				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Ident.c_str() : "");
 				CclCommand(buf);
 			}
 		} else if (this->AiEnabled) {
@@ -1446,7 +1446,7 @@ void CPlayer::SetFaction(const std::string faction_name)
 	}
 	
 	if (!IsNetworkGame()) { //only set the faction's name as the player's name if this is a single player game
-		this->SetName(faction_name);
+		this->SetName(PlayerRaces.Factions[this->Race][this->Faction]->Name);
 	}
 	if (this->Faction != -1) {
 		int color = -1;
@@ -1506,7 +1506,7 @@ void CPlayer::SetRandomFaction()
 			if (faction_id != -1) {
 				bool faction_used = false;
 				for (int j = 0; j < PlayerMax; ++j) {
-					if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][faction_id]->Name) {
+					if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][faction_id]->Ident) {
 						faction_used = true;
 					}		
 				}
@@ -1526,7 +1526,7 @@ void CPlayer::SetRandomFaction()
 		for (size_t i = 0; i < PlayerRaces.Factions[this->Race].size(); ++i) {
 			bool faction_used = false;
 			for (int j = 0; j < PlayerMax; ++j) {
-				if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
+				if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Ident) {
 					faction_used = true;
 				}		
 			}
@@ -1543,7 +1543,7 @@ void CPlayer::SetRandomFaction()
 	
 	if (faction_count > 0) {
 		int chosen_faction = local_factions[SyncRand(faction_count)];
-		this->SetFaction(PlayerRaces.Factions[this->Race][chosen_faction]->Name);
+		this->SetFaction(PlayerRaces.Factions[this->Race][chosen_faction]->Ident);
 	} else {
 		this->SetFaction("");
 	}
@@ -2492,7 +2492,7 @@ void PlayersEachMinute(int playerIdx)
 					if (Players[j].Type == PlayerNobody) {
 						Players[j].Type = PlayerComputer;
 						Players[j].SetCivilization(splitter_faction->Civilization);
-						Players[j].SetFaction(splitter_faction->Name);
+						Players[j].SetFaction(splitter_faction->Ident);
 						Players[j].AiEnabled = true;
 						Players[j].AiName = faction->DefaultAI;
 						Players[j].Team = 1;

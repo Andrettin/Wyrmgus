@@ -130,6 +130,7 @@ extern std::string StratagusLibPath;
 
 //Wyrmgus start
 extern std::string GetPluralForm(std::string name);
+extern std::string NameToIdent(std::string text);
 
 extern std::string GetMonthNameById(int month);
 

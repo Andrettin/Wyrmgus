@@ -2266,7 +2266,7 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 			if (ThisPlayer && ThisPlayer->Index == player.Index) {
 				if (GameCycle != 0) {
 					char buf[256];
-					snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", player.Race != -1 ? PlayerRaces.Name[player.Race].c_str() : "", (player.Race != -1 && old_faction != -1) ? PlayerRaces.Factions[player.Race][old_faction]->Name.c_str() : "");
+					snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", player.Race != -1 ? PlayerRaces.Name[player.Race].c_str() : "", (player.Race != -1 && old_faction != -1) ? PlayerRaces.Factions[player.Race][old_faction]->Ident.c_str() : "");
 					CclCommand(buf);
 				}
 			} else if (player.AiEnabled) {

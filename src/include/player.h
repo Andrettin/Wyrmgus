@@ -504,7 +504,8 @@ public:
 	
 	~CFaction();
 
-	std::string Name;													/// faction name
+	std::string Ident;													/// faction name
+	std::string Name;
 	std::string Description;											/// faction description
 	std::string Quote;													/// faction quote
 	std::string Background;												/// faction background

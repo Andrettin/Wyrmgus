@@ -1007,7 +1007,7 @@ void CGrandStrategyGame::DoTurn()
 							this->Provinces[i]->Claims[j]->Civilization == this->Provinces[i]->Civilization
 							&& PlayerRaces.Factions[this->Provinces[i]->Civilization][this->Provinces[i]->Claims[j]->Faction]->Type == PlayerRaces.Factions[this->Provinces[i]->Owner->Civilization][this->Provinces[i]->Owner->Faction]->Type
 							&& !(this->Provinces[i]->Claims[j] == this->Provinces[i]->Owner)
-							&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Name != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Name // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
+							&& PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Claims[j]->Civilization][GrandStrategyGame.Provinces[i]->Claims[j]->Faction]->Ident != PlayerRaces.Factions[GrandStrategyGame.Provinces[i]->Owner->Civilization][GrandStrategyGame.Provinces[i]->Owner->Faction]->Ident // they can't have the same name (this is needed because some of the Lua code identifies factions by name)
 						) { //if faction which has a claim on this province has the same civilization as the province, and if it is of the same faction type as the province's owner
 							possible_revolters[possible_revolter_count] = this->Provinces[i]->Claims[j]->Faction;
 							possible_revolter_count += 1;
@@ -1450,7 +1450,7 @@ void CGrandStrategyGame::DoEvents()
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGame.Factions[i][j]->IsAlive()) {
 				for (size_t k = 0; k < GrandStrategyGame.AvailableEvents.size(); ++k) {
-					CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[i][j]->Name + "\");");
+					CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[i][j]->Ident + "\");");
 					if (GrandStrategyGame.AvailableEvents[k]->CanTrigger(GrandStrategyGame.Factions[i][j])) {
 						GrandStrategyGame.AvailableEvents[k]->Trigger(GrandStrategyGame.Factions[i][j]);
 					}
@@ -4299,7 +4299,7 @@ void CGrandStrategyFaction::SplitOffFaction(CGrandStrategyFaction *faction)
 		CGrandStrategyProvince *province = potential_provinces[SyncRand(potential_provinces.size())];
 		
 		faction->AcquireFactionTechnologies(this->Civilization, this->Faction);
-		CclCommand("AcquireProvince(GetProvinceFromName(\"" + province->Name + "\"), \"" + PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name + "\");");
+		CclCommand("AcquireProvince(GetProvinceFromName(\"" + province->Name + "\"), \"" + PlayerRaces.Factions[faction->Civilization][faction->Faction]->Ident + "\");");
 		province->SetCivilization(this->Civilization);
 		province->SetSettlementBuilding(province->GetClassUnitType(GetUnitTypeClassIndexByName("town-hall")), true);
 		faction->CalculateIncomes();
@@ -4340,7 +4340,7 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 			snprintf(
 				buf, sizeof(buf), "AcquireProvince(GetProvinceFromName(\"%s\"), \"%s\");",
 				(GrandStrategyGame.Provinces[province_id]->Name).c_str(),
-				(PlayerRaces.Factions[new_civilization][new_faction]->Name).c_str()
+				(PlayerRaces.Factions[new_civilization][new_faction]->Ident).c_str()
 			);
 			CclCommand(buf);
 			
@@ -4408,12 +4408,12 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 		char buf[256];
 		snprintf(
 			buf, sizeof(buf), "GrandStrategyFaction = GetFactionFromName(\"%s\");",
-			(PlayerRaces.Factions[new_civilization][new_faction]->Name).c_str()
+			(PlayerRaces.Factions[new_civilization][new_faction]->Ident).c_str()
 		);
 		CclCommand(buf);
 		
 		StopMusic();
-		PlayMusicByGroupAndFactionRandom("map", PlayerRaces.Name[new_civilization], PlayerRaces.Factions[new_civilization][new_faction]->Name);
+		PlayMusicByGroupAndFactionRandom("map", PlayerRaces.Name[new_civilization], PlayerRaces.Factions[new_civilization][new_faction]->Ident);
 			
 		std::string dialog_tooltip = "Our faction becomes the " + GrandStrategyGame.Factions[new_civilization][new_faction]->GetFullName();
 		if (PlayerRaces.Factions[old_civilization][old_faction]->Type == FactionTypeTribe && PlayerRaces.Factions[new_civilization][new_faction]->Type == FactionTypePolity) {
@@ -4631,7 +4631,7 @@ void CGrandStrategyFaction::MinisterSuccession(int title)
 void CGrandStrategyFaction::GenerateMinister(int title, bool child_of_current_minister)
 {
 	if (!this->IsAlive()) {
-		fprintf(stderr, "Faction \"%s\" is generating a \"%s\", but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Name.c_str(), GetCharacterTitleNameById(title).c_str());
+		fprintf(stderr, "Faction \"%s\" is generating a \"%s\", but has no provinces.\n", PlayerRaces.Factions[this->Civilization][this->Faction]->Ident.c_str(), GetCharacterTitleNameById(title).c_str());
 	}
 	
 	CGrandStrategyProvince *province = NULL;
@@ -5483,7 +5483,7 @@ void CGrandStrategyEvent::Trigger(CGrandStrategyFaction *faction)
 {
 //	fprintf(stderr, "Triggering event \"%s\" for faction %s.\n", this->Name.c_str(), PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name.c_str());	
 	
-	CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[faction->Civilization][faction->Faction]->Name + "\");");
+	CclCommand("EventFaction = GetFactionFromName(\"" + PlayerRaces.Factions[faction->Civilization][faction->Faction]->Ident + "\");");
 	CclCommand("GrandStrategyEvent(EventFaction, \"" + this->Name + "\");");
 	CclCommand("EventFaction = nil;");
 	CclCommand("EventProvince = nil;");
@@ -6456,7 +6456,7 @@ std::string GetProvinceAttackedBy(std::string province_name)
 	
 	if (province_id != -1 && GrandStrategyGame.Provinces[province_id]) {
 		if (GrandStrategyGame.Provinces[province_id]->AttackedBy != NULL) {
-			return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->AttackedBy->Civilization][GrandStrategyGame.Provinces[province_id]->AttackedBy->Faction]->Name;
+			return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->AttackedBy->Civilization][GrandStrategyGame.Provinces[province_id]->AttackedBy->Faction]->Ident;
 		}
 	}
 	
@@ -8015,7 +8015,7 @@ std::string GetProvinceOwner(std::string province_name)
 		return "";
 	}
 	
-	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Name;
+	return PlayerRaces.Factions[GrandStrategyGame.Provinces[province_id]->Owner->Civilization][GrandStrategyGame.Provinces[province_id]->Owner->Faction]->Ident;
 }
 
 int GetProvinceFoodCapacity(std::string province_name, bool subtract_non_food)
@@ -8048,7 +8048,7 @@ void SetPlayerFaction(std::string civilization_name, std::string faction_name)
 std::string GetPlayerFactionName()
 {
 	if (GrandStrategyGame.PlayerFaction != NULL) {
-		return PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Name;
+		return PlayerRaces.Factions[GrandStrategyGame.PlayerFaction->Civilization][GrandStrategyGame.PlayerFaction->Faction]->Ident;
 	} else {
 		return "";
 	}
