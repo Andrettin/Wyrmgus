@@ -449,6 +449,9 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		if (Players[i].StartPos.x < map_start_pos.x || Players[i].StartPos.y < map_start_pos.y || Players[i].StartPos.x >= map_end.x || Players[i].StartPos.y >= map_end.y || Players[i].StartMapLayer != z) {
 			continue;
 		}
+		if (Players[i].StartPos.x == 0 && Players[i].StartPos.y == 0) {
+			continue;
+		}
 		// add five workers at the player's starting location
 		int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Race, Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
 		if (worker_type_id != -1) {
