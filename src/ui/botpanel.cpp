@@ -1275,7 +1275,7 @@ void CButtonPanel::Draw()
 			
 			//draw the quantity in stock for unit "training" cases which have it
 			if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) {
-				std::string stock_string = std::to_string((long long) Selected[0]->UnitStock[buttons[i].Value]) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value]);
+				std::string stock_string = std::to_string((long long) Selected[0]->GetUnitStock(buttons[i].Value)) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value]);
 				std::string oldnc;
 				std::string oldrc;
 				GetDefaultTextColors(oldnc, oldrc);

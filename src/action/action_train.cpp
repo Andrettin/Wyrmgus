@@ -349,7 +349,7 @@ static void AnimateActionTrain(CUnit &unit)
 	for (int i = 0; i < (this->Type->TrainQuantity ? this->Type->TrainQuantity : 1); ++i) {
 		//Wyrmgus start
 		if (unit.Type->Stats[unit.Player->Index].UnitStock[nType.Slot] != 0) {
-			if (unit.UnitStock[nType.Slot] > 0) {
+			if (unit.GetUnitStock(nType.Slot) > 0) {
 				unit.UnitStock[nType.Slot] -= 1;
 			} else {
 				continue; //don't create the unit if no further stock of it is available

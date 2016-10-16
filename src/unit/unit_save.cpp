@@ -393,11 +393,11 @@ void SaveUnit(const CUnit &unit, CFile &file)
 		}
 	}
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (unit.UnitStock[i] != 0) {
-			file.printf(",\n  \"unit-stock\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.UnitStock[i]);
+		if (unit.GetUnitStock(i) != 0) {
+			file.printf(",\n  \"unit-stock\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.GetUnitStock(i));
 		}
-		if (unit.UnitStockReplenishmentTimers[i] != 0) {
-			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.UnitStockReplenishmentTimers[i]);
+		if (unit.GetUnitStockReplenishmentTimer(i) != 0) {
+			file.printf(",\n  \"unit-stock-replenishment-timer\", \"%s\", %d", UnitTypes[i]->Ident.c_str(), unit.GetUnitStockReplenishmentTimer(i));
 		}
 	}
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {

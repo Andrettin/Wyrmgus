@@ -223,8 +223,11 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 	//Wyrmgus start
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
 		if (newstats.UnitStock[i] != oldstats.UnitStock[i]) {
+			if (unit.UnitStock.find(i) == unit.UnitStock.end()) {
+				unit.UnitStock[i] = 0;
+			}
 			unit.UnitStock[i] += newstats.UnitStock[i] - oldstats.UnitStock[i];
-			unit.UnitStock[i] = std::max(unit.UnitStock[i], 0);
+			unit.UnitStock[i] = std::max(unit.GetUnitStock(i), 0);
 		}
 	}
 	//Wyrmgus end

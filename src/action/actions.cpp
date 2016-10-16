@@ -350,15 +350,18 @@ static void HandleBuffsEachCycle(CUnit &unit)
 
 	//Wyrmgus start
 	for (size_t i = 0; i < UnitTypes.size(); ++i) {
-		if (unit.UnitStockReplenishmentTimers[i] > 0) {
+		if (unit.GetUnitStockReplenishmentTimer(i) > 0) {
 			--unit.UnitStockReplenishmentTimers[i];
-			if (unit.UnitStockReplenishmentTimers[i] == 0 && unit.UnitStock[i] < unit.Type->Stats[unit.Player->Index].UnitStock[i]) { //if timer reached 0, replenish 1 of the stock
+			if (unit.GetUnitStockReplenishmentTimer(i) == 0 && unit.GetUnitStock(i) < unit.Type->Stats[unit.Player->Index].UnitStock[i]) { //if timer reached 0, replenish 1 of the stock
+				if (unit.UnitStock.find(i) == unit.UnitStock.end()) {
+					unit.UnitStock[i] = 0;
+				}
 				unit.UnitStock[i] += 1;
 			}
 		}
 			
 		//if the unit still has less stock than its max, re-init the unit stock timer
-		if (unit.UnitStockReplenishmentTimers[i] == 0 && unit.UnitStock[i] < unit.Type->Stats[unit.Player->Index].UnitStock[i]) {
+		if (unit.GetUnitStockReplenishmentTimer(i) == 0 && unit.GetUnitStock(i) < unit.Type->Stats[unit.Player->Index].UnitStock[i]) {
 			unit.UnitStockReplenishmentTimers[i] = 1000;
 		}
 	}

@@ -533,10 +533,6 @@ void CUnit::Init()
 	AutoRepair = 0;
 	Goal = NULL;
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
-	//Wyrmgus start
-	memset(UnitStock, 0, sizeof(UnitStock));
-	memset(UnitStockReplenishmentTimers, 0, sizeof(UnitStockReplenishmentTimers));
-	//Wyrmgus end
 }
 
 /**
@@ -2084,9 +2080,6 @@ void CUnit::Init(const CUnitType &type)
 	}
 
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades));
-	//Wyrmgus start
-	memset(UnitStockReplenishmentTimers, 0, sizeof(UnitStockReplenishmentTimers));
-	//Wyrmgus end
 
 	// Set a heading for the unit if it Handles Directions
 	// Don't set a building heading, as only 1 construction direction
@@ -2272,9 +2265,6 @@ void CUnit::AssignToPlayer(CPlayer &player)
 			Assert(Stats->Variables);
 			memcpy(Variable, Stats->Variables, UnitTypeVar.GetNumberVariable() * sizeof(*Variable));
 		}
-		//Wyrmgus start
-		memset(UnitStock, 0, sizeof(UnitStock));
-		//Wyrmgus end
 	}
 	
 	//Wyrmgus start
@@ -4803,6 +4793,24 @@ int CUnit::GetPrice() const
 	}
 	
 	return cost;
+}
+
+int CUnit::GetUnitStock(int unit_type_id) const
+{
+	if (this->UnitStock.find(unit_type_id) != this->UnitStock.end()) {
+		return this->UnitStock.find(unit_type_id)->second;
+	} else {
+		return 0;
+	}
+}
+
+int CUnit::GetUnitStockReplenishmentTimer(int unit_type_id) const
+{
+	if (this->UnitStockReplenishmentTimers.find(unit_type_id) != this->UnitStockReplenishmentTimers.end()) {
+		return this->UnitStockReplenishmentTimers.find(unit_type_id)->second;
+	} else {
+		return 0;
+	}
 }
 
 bool CUnit::CanAttack(bool count_inside) const

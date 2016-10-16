@@ -387,6 +387,8 @@ public:
 	int GetSkinColor() const;
 	int GetHairColor() const;
 	int GetPrice() const;
+	int GetUnitStock(int unit_type_id) const;
+	int GetUnitStockReplenishmentTimer(int unit_type_id) const;
 	bool CanAttack(bool count_inside = false) const;
 	bool IsItemEquipped(const CUnit *item) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
@@ -490,8 +492,8 @@ public:
 	unsigned char CurrentResource;
 	int ResourcesHeld;      /// Resources Held by a unit
 	//Wyrmgus start
-	int UnitStock[UnitTypeMax]; /// How many of each unit type this unit has stocked
-	int UnitStockReplenishmentTimers[UnitTypeMax]; /// Replenishment timer for each unit type stock
+	std::map<int, int> UnitStock; 						/// How many of each unit type this unit has stocked
+	std::map<int, int> UnitStockReplenishmentTimers; 	/// Replenishment timer for each unit type stock
 	//Wyrmgus end
 
 	unsigned char DamagedType;   /// Index of damage type of unit which damaged this unit

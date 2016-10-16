@@ -978,7 +978,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 		return;
 	}
 	//Wyrmgus start
-	if (unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0 && unit.UnitStock[type.Slot] <= 0) {
+	if (unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0 && unit.GetUnitStock(type.Slot) <= 0) {
 		if (player == ThisPlayer->Index) {
 			ThisPlayer->Notify(NotifyYellow, unit.tilePos, unit.MapLayer, "%s", _("The stock is empty, wait until it is replenished."));
 		}
