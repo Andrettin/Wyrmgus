@@ -1949,6 +1949,10 @@ bool CPlayer::CanAcceptQuest(CQuest *quest)
 
 bool CPlayer::HasCompletedQuest(CQuest *quest)
 {
+	if (quest->Uncompleteable) {
+		return false;
+	}
+	
 	for (size_t i = 0; i < this->QuestBuildUnits.size(); ++i) {
 		if (std::get<0>(this->QuestBuildUnits[i]) == quest && std::get<2>(this->QuestBuildUnits[i]) > 0) {
 			return false;

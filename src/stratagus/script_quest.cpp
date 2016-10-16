@@ -135,6 +135,8 @@ static int CclDefineQuest(lua_State *l)
 			quest->Competitive = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Unobtainable")) {
 			quest->Unobtainable = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Uncompleteable")) {
+			quest->Uncompleteable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Icon")) {
 			quest->Icon.Name = LuaToString(l, -1);
 			quest->Icon.Icon = NULL;
