@@ -1532,7 +1532,7 @@ static void InfoPanel_draw_no_selection()
 		for (int i = 0; i < PlayerMax - 1; ++i) {
 			//Wyrmgus start
 //			if (Players[i].Type != PlayerNobody) {
-			if (Players[i].Type != PlayerNobody && ThisPlayer->HasContactWith(Players[i])) {
+			if (Players[i].Type != PlayerNobody && ThisPlayer->HasContactWith(Players[i]) && Players[i].GetUnitCount() > 0) {
 			//Wyrmgus end
 				if (ThisPlayer->IsAllied(Players[i])) {
 					label.SetNormalColor(FontGreen);
@@ -1555,6 +1555,12 @@ static void InfoPanel_draw_no_selection()
 //				label.Draw(x + 117, y, Players[i].Score);
 				//Wyrmgus end
 				y += 14;
+				
+				//Wyrmgus start
+				if ((y + 12) > Video.Height)  { // if the square would overflow the screen, don't draw the player
+					break;
+				}
+				//Wyrmgus end
 			}
 		}
 	}
