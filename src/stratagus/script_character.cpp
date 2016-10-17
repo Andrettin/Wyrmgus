@@ -133,9 +133,11 @@ static int CclDefineCharacter(lua_State *l)
 			std::string unit_type_ident = LuaToString(l, -1);
 			int unit_type_id = UnitTypeIdByIdent(unit_type_ident);
 			if (unit_type_id != -1) {
-				character->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
-				if (character->Level < character->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
-					character->Level = character->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
+				if (character->Type == NULL || character->Type == UnitTypes[unit_type_id] || character->Type->CanExperienceUpgradeTo(UnitTypes[unit_type_id])) {
+					character->Type = const_cast<CUnitType *>(&(*UnitTypes[unit_type_id]));
+					if (character->Level < character->Type->DefaultStat.Variables[LEVEL_INDEX].Value) {
+						character->Level = character->Type->DefaultStat.Variables[LEVEL_INDEX].Value;
+					}
 				}
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());

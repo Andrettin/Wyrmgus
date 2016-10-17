@@ -902,6 +902,19 @@ int CUnitType::GetDefaultHairColor(CPlayer &player) const
 	}
 }
 
+bool CUnitType::CanExperienceUpgradeTo(CUnitType *type) const
+{
+	if (((int) AiHelpers.ExperienceUpgrades.size()) > this->Slot) {
+		for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[this->Slot].size(); ++i) {
+			if (type == AiHelpers.ExperienceUpgrades[this->Slot][i] || AiHelpers.ExperienceUpgrades[this->Slot][i]->CanExperienceUpgradeTo(type)) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
 std::string CUnitType::GetNamePlural() const
 {
 	return GetPluralForm(this->Name);

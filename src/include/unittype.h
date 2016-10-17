@@ -830,6 +830,7 @@ public:
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
 	int GetDefaultSkinColor(CPlayer &player) const;
 	int GetDefaultHairColor(CPlayer &player) const;
+	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
 	std::string GeneratePersonalName(CFaction *faction, int gender) const;
 	//Wyrmgus end
