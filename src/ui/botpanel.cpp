@@ -1440,6 +1440,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			if (!EnableTrainingQueue && unit.CurrentAction() == UnitActionTrain) {
 				break;
 			}
+			if (unit.Player->Index == PlayerNumNeutral && !unit.CanHireMercenary(UnitTypes[buttonaction.Value])) {
+				break;
+			}
 		// FALL THROUGH
 		case ButtonUpgradeTo:
 		case ButtonResearch:

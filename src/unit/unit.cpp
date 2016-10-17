@@ -1940,12 +1940,7 @@ void CUnit::UpdateSoldUnits()
 			}
 			bool hero_allowed = false;
 			if (this->Player->Index == PlayerNumNeutral) { // if this is a neutral building (i.e. a mercenary camp), see if any player present can have this hero
-				for (int p = 0; p < PlayerMax; ++p) {
-					if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && iterator->second->Civilization == Players[p].Race && CheckDependByType(Players[p], *iterator->second->Type, true)) {
-						hero_allowed = true;
-						break;
-					}
-				}
+				hero_allowed = this->CanHireMercenary(iterator->second->Type, iterator->second->Civilization);
 			} else {
 				hero_allowed = (iterator->second->Civilization == civilization_id && CheckDependByType(*this->Player, *iterator->second->Type, true));
 			}
@@ -1973,7 +1968,6 @@ void CUnit::UpdateSoldUnits()
 	if (this->Type->SoldUnits.empty() && potential_heroes.empty()) {
 		return;
 	}
-	
 	
 	int sold_unit_max = 3;
 	
@@ -4991,6 +4985,20 @@ bool CUnit::CanLearnAbility(CUpgrade *ability) const
 	}
 
 	return true;
+}
+
+bool CUnit::CanHireMercenary(CUnitType *type, int civilization_id) const
+{
+	if (civilization_id == -1) {
+		civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
+	}
+	for (int p = 0; p < PlayerMax; ++p) {
+		if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && civilization_id == Players[p].Race && CheckDependByType(Players[p], *type, true) && Players[p].StartMapLayer == this->MapLayer) {
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 bool CUnit::CanEat(const CUnit &unit) const

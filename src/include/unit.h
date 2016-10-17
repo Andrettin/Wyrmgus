@@ -397,6 +397,7 @@ public:
 	bool CanUseItem(CUnit *item) const;
 	bool HasInventory() const;
 	bool CanLearnAbility(CUpgrade *ability) const;
+	bool CanHireMercenary(CUnitType *type, int civilization_id = -1) const;
 	bool CanEat(const CUnit &unit) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
