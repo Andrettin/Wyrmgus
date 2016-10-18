@@ -39,6 +39,9 @@
 #include "unittype.h"
 
 #include "actions.h"
+//Wyrmgus start
+#include "editor.h"
+//Wyrmgus end
 #include "map.h"
 #include "player.h"
 //Wyrmgus start
@@ -501,7 +504,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	}
 	
 	//Wyrmgus start
-	if (GameCycle == 0 && type.TileWidth > 1 && type.TileHeight > 1) { // if the game is starting, only place buildings with a certain space from other buildings
+	if (GameCycle == 0 && Editor.Running == EditorNotRunning && type.TileWidth > 1 && type.TileHeight > 1) { // if the game is starting, only place buildings with a certain space from other buildings
 		for (int x = pos.x - 1; x < pos.x + type.TileWidth + 1; ++x) {
 			for (int y = pos.y - 1; y < pos.y + type.TileHeight + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {

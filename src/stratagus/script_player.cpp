@@ -3294,6 +3294,11 @@ static int CclSetPlayerData(lua_State *l)
 		if (quest) {
 			p->CompleteQuest(quest);
 		}
+	} else if (!strcmp(data, "FailQuest")) {
+		CQuest *quest = GetQuest(LuaToString(l, 3));
+		if (quest) {
+			p->FailQuest(quest);
+		}
 	//Wyrmgus end
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
