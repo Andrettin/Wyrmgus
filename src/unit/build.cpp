@@ -536,6 +536,11 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 				if (mf->CoastOnMap()) {
 					success = true;
 				}
+				//Wyrmgus start
+				if (GameCycle == 0 && mf->WaterOnMap() && Map.TileBordersFlag(pos, z, MapFieldWaterAllowed, true)) { // if the game hasn't started, it is possible that coast map fields haven't been applied yet, so we have to check if the tile is a water tile with an adjacent non-water tile (which is what a coastal tile is)
+					success = true;
+				}
+				//Wyrmgus end
 				++mf;
 			} while (!success && --w);
 			//Wyrmgus start

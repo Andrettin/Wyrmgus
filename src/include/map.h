@@ -392,6 +392,7 @@ public:
 	//Wyrmgus start
 	bool CurrentTerrainCanBeAt(const Vec2i &pos, bool overlay, int z);
 	bool TileBordersOnlySameTerrain(const Vec2i &pos, CTerrainType *new_terrain, int z);
+	bool TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse = false); // reverse means that it returns true if the tile borders one tile without the flag
 	bool TileBordersBuilding(const Vec2i &pos, int z);
 	bool TileHasUnitsIncompatibleWithTerrain(const Vec2i &pos, CTerrainType *terrain, int z);
 	bool IsPointInASubtemplateArea(const Vec2i &pos, int z) const;
