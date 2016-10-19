@@ -231,6 +231,18 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.RescuedFrom) {
 		file.printf(" \"rescued-from\", %d,", unit.RescuedFrom->Index);
 	}
+	
+	//Wyrmgus start
+	// have variables before the host-info, since the latter maps ethereal vision sight
+	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+		if (unit.Variable[i] != unit.Type->DefaultStat.Variables[i]) {
+			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
+						UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
+						unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
+		}
+	}
+	//Wyrmgus end
+	
 	// n0b0dy: How is this useful?
 	// mr-russ: You can't always load units in order, it saved the information
 	// so you can load a unit whose Container hasn't been loaded yet.
@@ -275,13 +287,15 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	file.printf("\"ttl\", %lu,\n  ", unit.TTL);
 	file.printf("\"threshold\", %d,\n  ", unit.Threshold);
 
-	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
-		if (unit.Variable[i] != unit.Type->DefaultStat.Variables[i]) {
-			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
-						UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
-						unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
-		}
-	}
+	//Wyrmgus start
+//	for (size_t i = 0; i < UnitTypeVar.GetNumberVariable(); ++i) {
+//		if (unit.Variable[i] != unit.Type->DefaultStat.Variables[i]) {
+//			file.printf("\"%s\", {Value = %d, Max = %d, Increase = %d, Enable = %s},\n  ",
+//						UnitTypeVar.VariableNameLookup[i], unit.Variable[i].Value, unit.Variable[i].Max,
+//						unit.Variable[i].Increase, unit.Variable[i].Enable ? "true" : "false");
+//		}
+//	}
+	//Wyrmgus end
 
 	file.printf("\"group-id\", %d,\n  ", unit.GroupId);
 	file.printf("\"last-group\", %d,\n  ", unit.LastGroup);

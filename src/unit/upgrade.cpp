@@ -2577,7 +2577,7 @@ bool IsPercentageVariable(int var)
 
 bool IsBooleanVariable(int var)
 {
-	return var == DISEMBARKMENTBONUS_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX;
+	return var == DISEMBARKMENTBONUS_INDEX || var == LEADERSHIPAURA_INDEX || var == REGENERATIONAURA_INDEX || var == ETHEREALVISION_INDEX;
 }
 
 bool IsKnowledgeVariable(int var)

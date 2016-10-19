@@ -2354,7 +2354,10 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 **  @param f2        Function to (un)mark for cloaking vision.
 */
 static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, int height,
-								MapMarkerFunc *f, MapMarkerFunc *f2)
+								//Wyrmgus start
+//								MapMarkerFunc *f, MapMarkerFunc *f2)
+								MapMarkerFunc *f, MapMarkerFunc *f2, MapMarkerFunc *f3)
+								//Wyrmgus end
 {
 	Assert(f);
 	//Wyrmgus start
@@ -2375,11 +2378,19 @@ static void MapMarkUnitSightRec(const CUnit &unit, const Vec2i &pos, int width, 
 		MapSight(*unit.Player, pos, width, height,
 				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f2, unit.MapLayer);
 	}
+	
+	if (unit.Variable[ETHEREALVISION_INDEX].Value && f3) {
+		MapSight(*unit.Player, pos, width, height,
+				 unit.Container && unit.Container->CurrentSightRange >= unit.CurrentSightRange ? unit.Container->CurrentSightRange : unit.CurrentSightRange, f3, unit.MapLayer);
+	}
 	//Wyrmgus end
 
 	CUnit *unit_inside = unit.UnitInside;
 	for (int i = unit.InsideCount; i--; unit_inside = unit_inside->NextContained) {
-		MapMarkUnitSightRec(*unit_inside, pos, width, height, f, f2);
+		//Wyrmgus start
+//		MapMarkUnitSightRec(*unit_inside, pos, width, height, f, f2);
+		MapMarkUnitSightRec(*unit_inside, pos, width, height, f, f2, f3);
+		//Wyrmgus end
 	}
 }
 
@@ -2413,7 +2424,10 @@ void MapMarkUnitSight(CUnit &unit)
 	Assert(container->Type);
 
 	MapMarkUnitSightRec(unit, container->tilePos, container->Type->TileWidth, container->Type->TileHeight,
-						MapMarkTileSight, MapMarkTileDetectCloak);
+						//Wyrmgus start
+//						MapMarkTileSight, MapMarkTileDetectCloak);
+						MapMarkTileSight, MapMarkTileDetectCloak, MapMarkTileDetectEthereal);
+						//Wyrmgus end
 
 	// Never mark radar, except if the top unit, and unit is usable
 	if (&unit == container && !unit.IsUnusable()) {
@@ -2449,7 +2463,10 @@ void MapUnmarkUnitSight(CUnit &unit)
 	Assert(container->Type);
 	MapMarkUnitSightRec(unit,
 						container->tilePos, container->Type->TileWidth, container->Type->TileHeight,
-						MapUnmarkTileSight, MapUnmarkTileDetectCloak);
+						//Wyrmgus start
+//						MapUnmarkTileSight, MapUnmarkTileDetectCloak);
+						MapUnmarkTileSight, MapUnmarkTileDetectCloak, MapUnmarkTileDetectEthereal);
+						//Wyrmgus end
 
 	// Never mark radar, except if the top unit?
 	if (&unit == container && !unit.IsUnusable()) {
@@ -3638,6 +3655,12 @@ void UnitCountSeen(CUnit &unit)
 						if (mf->playerInfo.VisCloak[p]) {
 							newv++;
 						}
+					//Wyrmgus start
+					} else if (unit.Type->BoolFlag[ETHEREAL_INDEX].value && unit.Player != &Players[p]) {
+						if (mf->playerInfo.VisEthereal[p]) {
+							newv++;
+						}
+					//Wyrmgus end
 					} else {
 						if (mf->playerInfo.IsVisible(Players[p])) {
 							newv++;
@@ -4920,8 +4943,14 @@ bool CUnit::CanEquipItemClass(int item_class) const
 
 bool CUnit::CanUseItem(CUnit *item) const
 {
-	if (item->ConnectingDestination != NULL && (this->Player == item->Player || this->Player->IsAllied(*item->Player) || item->Player->Type == PlayerNeutral)) {
-		return true;
+	if (item->ConnectingDestination != NULL) {
+		if (item->Type->BoolFlag[ETHEREAL_INDEX].value && !this->Variable[ETHEREALVISION_INDEX].Value) {
+			return false;
+		}
+		
+		if (this->Player == item->Player || this->Player->IsAllied(*item->Player) || item->Player->Type == PlayerNeutral) {
+			return true;
+		}
 	}
 	
 	if (!item->Type->BoolFlag[ITEM_INDEX].value && !item->Type->BoolFlag[POWERUP_INDEX].value) {

@@ -165,6 +165,7 @@ public:
 	{
 		memset(Visible, 0, sizeof(Visible));
 		memset(VisCloak, 0, sizeof(VisCloak));
+		memset(VisEthereal, 0, sizeof(VisEthereal));
 		memset(Radar, 0, sizeof(Radar));
 		memset(RadarJammer, 0, sizeof(RadarJammer));
 	}
@@ -200,6 +201,7 @@ public:
 	//Wyrmgus end
 	unsigned short Visible[PlayerMax];    /// Seen counter 0 unexplored
 	unsigned char VisCloak[PlayerMax];    /// Visiblity for cloaking.
+	unsigned char VisEthereal[PlayerMax];    /// Visiblity for ethereal.
 	unsigned char Radar[PlayerMax];       /// Visiblity for radar.
 	unsigned char RadarJammer[PlayerMax]; /// Jamming capabilities.
 };

@@ -540,6 +540,12 @@ extern MapMarkerFunc MapUnmarkTileSight;
 extern MapMarkerFunc MapMarkTileDetectCloak;
 /// Unmark a tile for cloak detection
 extern MapMarkerFunc MapUnmarkTileDetectCloak;
+//Wyrmgus start
+/// Mark a tile for ethereal detection
+extern MapMarkerFunc MapMarkTileDetectEthereal;
+/// Unmark a tile for ethereal detection
+extern MapMarkerFunc MapUnmarkTileDetectEthereal;
+//Wyrmgus end
 
 /// Mark sight changes
 extern void MapSight(const CPlayer &player, const Vec2i &pos, int w,

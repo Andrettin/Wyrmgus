@@ -143,7 +143,10 @@ template<bool MARK>
 class _TileSeen
 {
 public:
-	_TileSeen(const CPlayer &p , int c) : player(&p), cloak(c)
+	//Wyrmgus start
+//	_TileSeen(const CPlayer &p , int c) : player(&p), cloak(c)
+	_TileSeen(const CPlayer &p , int c, int e) : player(&p), cloak(c), ethereal(e)
+	//Wyrmgus end
 	{}
 
 	void operator()(CUnit *const unit) const
@@ -154,7 +157,10 @@ public:
 			return;
 		}
 		//Wyrmgus end
-		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
+		//Wyrmgus start
+//		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value) {
+		if (cloak != (int)unit->Type->BoolFlag[PERMANENTCLOAK_INDEX].value || ethereal != (int)unit->Type->BoolFlag[ETHEREAL_INDEX].value) {
+		//Wyrmgus end
 			return ;
 		}
 		const int p = player->Index;
@@ -210,6 +216,9 @@ public:
 private:
 	const CPlayer *player;
 	int cloak;
+	//Wyrmgus start
+	int ethereal;
+	//Wyrmgus end
 };
 
 /**
@@ -219,9 +228,15 @@ private:
 **  @param mf      field location to check
 **  @param cloak   If we mark cloaked units too.
 */
-static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak)
+//Wyrmgus start
+//static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak)
+static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak, int ethereal)
+//Wyrmgus end
 {
-	_TileSeen<true> seen(player, cloak);
+	//Wyrmgus start
+//	_TileSeen<true> seen(player, cloak);
+	_TileSeen<true> seen(player, cloak, ethereal);
+	//Wyrmgus end
 	mf.UnitCache.for_each(seen);
 }
 
@@ -232,9 +247,15 @@ static void UnitsOnTileMarkSeen(const CPlayer &player, CMapField &mf, int cloak)
 **  @param mf        field to check if building is on, and mark as seen
 **  @param cloak     If this is for cloaked units.
 */
-static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloak)
+//Wyrmgus start
+//static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloak)
+static void UnitsOnTileUnmarkSeen(const CPlayer &player, CMapField &mf, int cloak, int ethereal)
+//Wyrmgus end
 {
-	_TileSeen<false> seen(player, cloak);
+	//Wyrmgus start
+//	_TileSeen<false> seen(player, cloak);
+	_TileSeen<false> seen(player, cloak, ethereal);
+	//Wyrmgus end
 	mf.UnitCache.for_each(seen);
 }
 
@@ -258,7 +279,10 @@ void MapMarkTileSight(const CPlayer &player, const unsigned int index, int z)
 	if (*v == 0 || *v == 1) { // Unexplored or unseen
 		// When there is no fog only unexplored tiles are marked.
 		if (!Map.NoFogOfWar || *v == 0) {
-			UnitsOnTileMarkSeen(player, mf, 0);
+			//Wyrmgus start
+//			UnitsOnTileMarkSeen(player, mf, 0);
+			UnitsOnTileMarkSeen(player, mf, 0, 0);
+			//Wyrmgus end
 		}
 		*v = 2;
 		if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -310,7 +334,10 @@ void MapUnmarkTileSight(const CPlayer &player, const unsigned int index, int z)
 		case 2:
 			// When there is NoFogOfWar units never get unmarked.
 			if (!Map.NoFogOfWar) {
-				UnitsOnTileUnmarkSeen(player, mf, 0);
+				//Wyrmgus start
+//				UnitsOnTileUnmarkSeen(player, mf, 0);
+				UnitsOnTileUnmarkSeen(player, mf, 0, 0);
+				//Wyrmgus end
 			}
 			// Check visible Tile, then deduct...
 			if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
@@ -355,7 +382,10 @@ void MapMarkTileDetectCloak(const CPlayer &player, const unsigned int index, int
 	//Wyrmgus end
 	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
 	if (*v == 0) {
-		UnitsOnTileMarkSeen(player, mf, 1);
+		//Wyrmgus start
+//		UnitsOnTileMarkSeen(player, mf, 1);
+		UnitsOnTileMarkSeen(player, mf, 1, 0);
+		//Wyrmgus end
 	}
 	Assert(*v != 255);
 	++*v;
@@ -390,7 +420,10 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const unsigned int index, i
 	unsigned char *v = &mf.playerInfo.VisCloak[player.Index];
 	Assert(*v != 0);
 	if (*v == 1) {
-		UnitsOnTileUnmarkSeen(player, mf, 1);
+		//Wyrmgus start
+//		UnitsOnTileUnmarkSeen(player, mf, 1);
+		UnitsOnTileUnmarkSeen(player, mf, 1, 0);
+		//Wyrmgus end
 	}
 	--*v;
 }
@@ -405,6 +438,52 @@ void MapUnmarkTileDetectCloak(const CPlayer &player, const Vec2i &pos, int z)
 	MapUnmarkTileDetectCloak(player, Map.getIndex(pos, z), z);
 	//Wyrmgus end
 }
+
+//Wyrmgus start
+/**
+**  Mark a tile for ethereal detection.
+**
+**  @param player  Player to mark sight.
+**  @param index   Tile to mark.
+*/
+void MapMarkTileDetectEthereal(const CPlayer &player, const unsigned int index, int z)
+{
+	CMapField &mf = *Map.Field(index, z);
+	unsigned char *v = &mf.playerInfo.VisEthereal[player.Index];
+	if (*v == 0) {
+		UnitsOnTileMarkSeen(player, mf, 0, 1);
+	}
+	Assert(*v != 255);
+	++*v;
+}
+
+void MapMarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
+{
+	MapMarkTileDetectEthereal(player, Map.getIndex(pos, z), z);
+}
+
+/**
+**  Unmark a tile for ethereal detection.
+**
+**  @param player  Player to mark sight.
+**  @param index   tile to mark.
+*/
+void MapUnmarkTileDetectEthereal(const CPlayer &player, const unsigned int index, int z)
+{
+	CMapField &mf = *Map.Field(index, z);
+	unsigned char *v = &mf.playerInfo.VisEthereal[player.Index];
+	Assert(*v != 0);
+	if (*v == 1) {
+		UnitsOnTileUnmarkSeen(player, mf, 0, 1);
+	}
+	--*v;
+}
+
+void MapUnmarkTileDetectEthereal(const CPlayer &player, const Vec2i &pos, int z)
+{
+	MapUnmarkTileDetectEthereal(player, Map.getIndex(pos, z), z);
+}
+//Wyrmgus end
 
 /**
 **  Mark the sight of unit. (Explore and make visible.)

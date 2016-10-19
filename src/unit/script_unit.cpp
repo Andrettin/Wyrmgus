@@ -426,6 +426,11 @@ static int CclUnit(lua_State *l)
 				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectCloak, z);
 				//Wyrmgus end
 			}
+			//Wyrmgus start
+			if (unit->Variable[ETHEREALVISION_INDEX].Value) {
+				MapSight(*player, pos, w, h, unit->CurrentSightRange, MapMarkTileDetectEthereal, z);
+			}
+			//Wyrmgus end
 			// Radar(Jammer) not.
 			lua_pop(l, 1);
 		//Wyrmgus start
