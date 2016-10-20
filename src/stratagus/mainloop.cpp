@@ -742,6 +742,9 @@ void GameMainLoop()
 
 	SetVideoSync();
 	GameCursor = UI.Point.Cursor;
+	//Wyrmgus start
+	GameEstablishing = false;
+	//Wyrmgus end
 	GameRunning = true;
 
 	CParticleManager::init();

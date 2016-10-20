@@ -175,6 +175,9 @@ void StartMap(const std::string &filename, bool clean)
 	}
 	GetDefaultTextColors(nc, rc);
 
+	//Wyrmgus start
+	GameEstablishing = true;
+	//Wyrmgus end
 	CreateGame(filename, &Map);
 
 	//Wyrmgus start

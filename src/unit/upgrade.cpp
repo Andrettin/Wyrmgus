@@ -2006,6 +2006,11 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 */
 void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 {
+	//Wyrmgus start
+	if (!GameRunning && !GameEstablishing) {
+		return;
+	}
+	//Wyrmgus end
 	int id = upgrade->ID;
 	player.UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	AllowUpgradeId(player, id, 'R');  // research done
@@ -2040,6 +2045,11 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 */
 void UpgradeLost(CPlayer &player, int id)
 {
+	//Wyrmgus start
+	if (!GameRunning && !GameEstablishing) {
+		return;
+	}
+	//Wyrmgus end
 	player.UpgradeTimers.Upgrades[id] = 0;
 	//Wyrmgus start
 	AllowUpgradeId(player, id, 'A'); // research is lost i.e. available
@@ -2186,6 +2196,11 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 
 void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
+	//Wyrmgus start
+	if (!GameRunning && !GameEstablishing) {
+		return;
+	}
+	//Wyrmgus end
 	int id = upgrade->ID;
 	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	unit.IndividualUpgrades[id] = true;
@@ -2215,6 +2230,11 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 
 void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 {
+	//Wyrmgus start
+	if (!GameRunning && !GameEstablishing) {
+		return;
+	}
+	//Wyrmgus end
 	int id = upgrade->ID;
 	unit.Player->UpgradeTimers.Upgrades[id] = 0;
 	unit.IndividualUpgrades[id] = false;

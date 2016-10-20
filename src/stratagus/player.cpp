@@ -1349,7 +1349,7 @@ void CPlayer::SetName(const std::string &name)
 //Wyrmgus start
 void CPlayer::SetCivilization(int civilization)
 {
-	if (this->Race != -1 && !GameRunning) {
+	if (this->Race != -1 && !GameRunning && GameEstablishing) {
 		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID] == 'R') {
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race])->ID);
 		}
