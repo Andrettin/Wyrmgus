@@ -1647,7 +1647,7 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 void CUnit::UpdateItemName()
 {
 	if (this->Unique) {
-		Name = this->Unique->Name;
+		Name = _(this->Unique->Name);
 		return;
 	}
 	
@@ -1657,17 +1657,22 @@ void CUnit::UpdateItemName()
 	}
 	
 	if (Prefix != NULL) {
-		Name += Prefix->Name + " ";
+		Name += _(Prefix->Name);
+		Name += " ";
 	}
 	if (Work != NULL) {
-		Name += Work->Name;
+		Name += _(Work->Name);
 	} else {
 		Name += GetTypeName();
 	}
 	if (Suffix != NULL) {
-		Name += " " + Suffix->Name;
+		Name += " ";
+		Name += _(Suffix->Name);
 	} else if (Spell != NULL) {
-		Name += " of " + Spell->Name;
+		Name += " ";
+		Name += _("of");
+		Name += " ";
+		Name += _(Spell->Name);
 	}
 }
 
@@ -5152,14 +5157,14 @@ std::string CUnit::GetName() const
 std::string CUnit::GetTypeName() const
 {
 	if (this->Character && this->Character->Deity) {
-		return "Deity";
+		return _("Deity");
 	}
 	
 	VariationInfo *varinfo = Type->VarInfo[Variation];
 	if (varinfo && !varinfo->TypeName.empty()) {
-		return varinfo->TypeName;
+		return _(varinfo->TypeName);
 	} else {
-		return Type->Name;
+		return _(Type->Name);
 	}
 }
 
@@ -5171,7 +5176,7 @@ std::string CUnit::GetMessageName() const
 	}
 	
 	if (!this->Identified) {
-		return GetTypeName() + " (Unidentified)";
+		return GetTypeName() + " (" + _("Unidentified") + ")";
 	}
 	
 	if (!this->Unique && this->Work == NULL && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {

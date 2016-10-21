@@ -38,6 +38,9 @@
 
 /// Translate a string
 extern const char *Translate(const char *str);
+//Wyrmgus start
+extern const char *Translate(std::string str);
+//Wyrmgus end
 /// Add a translation
 extern void AddTranslation(const char *str1, const char *str2);
 /// Load a .po file
