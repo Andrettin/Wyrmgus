@@ -844,6 +844,10 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		TraitAcquire(*this, this->Character->Trait);
 	}
 	
+	if (this->Character->Deity != NULL && this->Character->Deity->CharacterUpgrade != NULL) {
+		IndividualUpgradeAcquire(*this, this->Character->Deity->CharacterUpgrade);
+	}
+	
 	this->Variable[LEVEL_INDEX].Max = 100000; // because the code above sets the max level to the unit type stats' Level variable (which is the same as its value)
 	if (this->Variable[LEVEL_INDEX].Value < this->Character->Level) {
 		this->IncreaseLevel(this->Character->Level - this->Variable[LEVEL_INDEX].Value);

@@ -578,7 +578,7 @@ class CDeity
 {
 public:
 	CDeity() :
-		Gender(0), Major(false), HomePlane(NULL)
+		Gender(0), Major(false), HomePlane(NULL), DeityUpgrade(NULL), CharacterUpgrade(NULL)
 	{
 	}
 	
@@ -592,6 +592,8 @@ public:
 	std::string Background;
 	std::string Quote;
 	CPlane *HomePlane;			/// The home plane of the deity
+	CUpgrade *DeityUpgrade;		/// The deity's upgrade applied to a player that worships it
+	CUpgrade *CharacterUpgrade;	/// The deity's upgrade applied to its character as an individual upgrade
 	IconConfig Icon;			/// Deity's icon
 	std::vector<int> Civilizations;	/// Civilizations which may worship the deity
 	std::vector<CReligion *> Religions;	/// Religions for which this deity is available

@@ -2277,6 +2277,18 @@ static int CclDefineDeity(lua_State *l)
 				LuaError(l, "Plane doesn't exist.");
 			}
 			deity->HomePlane = plane;
+		} else if (!strcmp(value, "DeityUpgrade")) {
+			CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1));
+			if (!upgrade) {
+				LuaError(l, "Upgrade doesn't exist.");
+			}
+			deity->DeityUpgrade = upgrade;
+		} else if (!strcmp(value, "CharacterUpgrade")) {
+			CUpgrade *upgrade = CUpgrade::Get(LuaToString(l, -1));
+			if (!upgrade) {
+				LuaError(l, "Upgrade doesn't exist.");
+			}
+			deity->CharacterUpgrade = upgrade;
 		} else if (!strcmp(value, "Icon")) {
 			deity->Icon.Name = LuaToString(l, -1);
 			deity->Icon.Icon = NULL;
