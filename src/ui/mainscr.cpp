@@ -893,7 +893,7 @@ void DrawDayTime() {
 	CLabel label(GetGameFont());
 
 	// TODO: Instead of a simple text here we could use an icon per time of day
-	label.Draw(UI.TimePanel.X, UI.TimePanel.Y, timesText[Map.TimeOfDay[CurrentMapLayer]]);
+	label.Draw(UI.TimePanel.X, UI.TimePanel.Y, _(timesText[Map.TimeOfDay[CurrentMapLayer]]));
 }
 
 /*----------------------------------------------------------------------------
