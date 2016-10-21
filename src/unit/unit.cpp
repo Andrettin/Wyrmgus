@@ -1647,7 +1647,7 @@ void CUnit::CheckKnowledgeChange(int variable, int change) // this happens after
 void CUnit::UpdateItemName()
 {
 	if (this->Unique) {
-		Name = _(this->Unique->Name);
+		Name = _(this->Unique->Name.c_str());
 		return;
 	}
 	
@@ -1657,22 +1657,22 @@ void CUnit::UpdateItemName()
 	}
 	
 	if (Prefix != NULL) {
-		Name += _(Prefix->Name);
+		Name += _(Prefix->Name.c_str());
 		Name += " ";
 	}
 	if (Work != NULL) {
-		Name += _(Work->Name);
+		Name += _(Work->Name.c_str());
 	} else {
 		Name += GetTypeName();
 	}
 	if (Suffix != NULL) {
 		Name += " ";
-		Name += _(Suffix->Name);
+		Name += _(Suffix->Name.c_str());
 	} else if (Spell != NULL) {
 		Name += " ";
 		Name += _("of");
 		Name += " ";
-		Name += _(Spell->Name);
+		Name += _(Spell->Name.c_str());
 	}
 }
 
@@ -5162,9 +5162,9 @@ std::string CUnit::GetTypeName() const
 	
 	VariationInfo *varinfo = Type->VarInfo[Variation];
 	if (varinfo && !varinfo->TypeName.empty()) {
-		return _(varinfo->TypeName);
+		return _(varinfo->TypeName.c_str());
 	} else {
-		return _(Type->Name);
+		return _(Type->Name.c_str());
 	}
 }
 

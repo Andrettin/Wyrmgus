@@ -1190,7 +1190,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_UnitTrait : // name of the unit's trait
 			unit = EvalUnit(s->D.Unit);
 			if (unit != NULL && unit->Trait != NULL) {
-				return unit->Trait->Name;
+				return _(unit->Trait->Name.c_str());
 			} else {
 				return std::string("");
 			}
@@ -1250,7 +1250,7 @@ std::string EvalString(const StringDesc *s)
 					str.replace(loc, 1, " ");
 					str[loc + 1] = toupper(str[loc + 1]);
 				}
-				return str;
+				return _(str.c_str());
 			} else { // ERROR.
 				return std::string("");
 			}

@@ -66,16 +66,6 @@ const char *Translate(const char *str)
 	}
 }
 
-//Wyrmgus start
-/**
-**  Translate a string
-*/
-const char *Translate(std::string str)
-{
-	return Translate(str.c_str());
-}
-//Wyrmgus end
-
 /**
 **  Add a translation
 */

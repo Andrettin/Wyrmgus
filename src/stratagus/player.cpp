@@ -2956,7 +2956,7 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 					effect_element_string += " (";
 					
 					if (UnitTypes[unit_type_id]->Name != UnitTypes[base_unit_type_id]->Name) {
-						effect_element_string += FullyCapitalizeString(FindAndReplaceString(UnitTypes[unit_type_id]->Class, "-", " "));
+						effect_element_string += _(FullyCapitalizeString(FindAndReplaceString(UnitTypes[unit_type_id]->Class, "-", " ")).c_str());
 						effect_element_string += ", ";
 						changed_stats = true;
 					}
@@ -2977,7 +2977,8 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 							int variable_difference = UnitTypes[unit_type_id]->DefaultStat.Variables[j].Value - UnitTypes[base_unit_type_id]->DefaultStat.Variables[j].Value;
 							
 							if (IsBooleanVariable(j) && variable_difference < 0) {
-								effect_element_string += "Lose ";
+								effect_element_string += _("Lose");
+								effect_element_string += " ";
 							}
 							
 							if (!IsBooleanVariable(j)) {
@@ -3027,7 +3028,7 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 									first_element = false;
 								}
 									
-								effect_element_string += UnitTypes[i]->Name;
+								effect_element_string += _(UnitTypes[i]->Name.c_str());
 								effect_element_string += " (";
 
 								bool first_var = true;
@@ -3044,7 +3045,8 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 										}
 											
 										if (IsBooleanVariable(j) && AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.Variables[j].Value < 0) {
-											effect_element_string += "Lose ";
+											effect_element_string += _("Lose");
+											effect_element_string += " ";
 										}
 										
 										if (!IsBooleanVariable(j)) {
@@ -3077,8 +3079,9 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 										effect_element_string += std::to_string((long long) AllUpgrades[faction_upgrade_id]->UpgradeModifiers[z]->Modifier.ImproveIncomes[j]);
 										effect_element_string += "%";
 										effect_element_string += " ";
-										effect_element_string += CapitalizeString(DefaultResourceNames[j]);
-										effect_element_string += " Processing";
+										effect_element_string += _(CapitalizeString(DefaultResourceNames[j]).c_str());
+										effect_element_string += " ";
+										effect_element_string += _("Processing");
 										changed_stats = true;
 									}
 								}

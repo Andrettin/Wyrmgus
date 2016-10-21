@@ -70,6 +70,7 @@
 //Wyrmgus start
 #include "settings.h"
 #include "tileset.h"
+#include "translate.h"
 //Wyrmgus end
 #include "unit.h"
 #include "unit_find.h"
@@ -2628,7 +2629,7 @@ std::string GetVariableDisplayName(int var, bool increase)
 	variable_name = FindAndReplaceString(variable_name, "Knowledge Magic", "Knowledge (Magic)");
 	variable_name = FindAndReplaceString(variable_name, "Knowledge Warfare", "Knowledge (Warfare)");
 
-	return variable_name;
+	return _(variable_name.c_str());
 }
 //Wyrmgus end
 

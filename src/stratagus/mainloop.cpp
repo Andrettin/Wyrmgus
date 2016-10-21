@@ -270,7 +270,7 @@ void UpdateDisplay()
 				}
 				
 				if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
-					std::string idle_worker_tooltip = "Find Idle Worker (~!.)";
+					std::string idle_worker_tooltip = _("Find Idle Worker (~!.)");
 					if (!Preference.NoStatusLineTooltips) {
 						CLabel label(GetGameFont());
 						label.Draw(2 + 16, Video.Height + 2 - 16, idle_worker_tooltip);
@@ -288,7 +288,7 @@ void UpdateDisplay()
 			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->LevelUpUnits[0]->GetSkinColor(), ThisPlayer->LevelUpUnits[0]->GetHairColor());
 				
 			if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
-				std::string level_up_unit_tooltip = "Find Unit with Available Level Up";
+				std::string level_up_unit_tooltip = _("Find Unit with Available Level Up");
 				if (!Preference.NoStatusLineTooltips) {
 					CLabel label(GetGameFont());
 					label.Draw(2 + 16, Video.Height + 2 - 16, level_up_unit_tooltip);
@@ -305,7 +305,8 @@ void UpdateDisplay()
 			ThisPlayer->CustomHeroUnit->GetIcon().Icon->DrawUnitIcon(*UI.CustomHeroUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->CustomHeroUnit->GetSkinColor(), ThisPlayer->CustomHeroUnit->GetHairColor());
 				
 			if (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
-				std::string custom_hero_unit_tooltip = "Find " + ThisPlayer->CustomHeroUnit->GetMessageName();
+				std::string custom_hero_unit_tooltip = _("Find");
+				custom_hero_unit_tooltip += " " + ThisPlayer->CustomHeroUnit->GetMessageName();
 				if (!Preference.NoStatusLineTooltips) {
 					CLabel label(GetGameFont());
 					label.Draw(2 + 16, Video.Height + 2 - 16, custom_hero_unit_tooltip);

@@ -41,6 +41,9 @@
 #include "font.h"
 #include "player.h"
 #include "spells.h"
+//Wyrmgus start
+#include "translate.h"
+//Wyrmgus end
 #include "trigger.h"
 #include "ui.h"
 //Wyrmgus start
@@ -132,7 +135,7 @@
 		case PopupButtonInfo_Hint:
 			//Wyrmgus start
 //			draw = button.Hint;
-			draw = button.GetHint();
+			draw = _(button.GetHint().c_str());
 			//Wyrmgus end
 			break;
 		case PopupButtonInfo_Description:
