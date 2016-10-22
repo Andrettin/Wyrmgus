@@ -1161,9 +1161,9 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 			Players[i].AiEnabled = true;
 			Players[i].AiName = faction->DefaultAI;
 			Players[i].Team = 1;
-			Players[i].Resources[GoldCost] = 1000; // give the new player enough resources to start up
-			Players[i].Resources[WoodCost] = 1000;
-			Players[i].Resources[StoneCost] = 1000;
+			Players[i].Resources[GoldCost] = 2500; // give the new player enough resources to start up
+			Players[i].Resources[WoodCost] = 2500;
+			Players[i].Resources[StoneCost] = 2500;
 			return &Players[i];
 		}
 	}

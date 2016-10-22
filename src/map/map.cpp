@@ -289,6 +289,9 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	if (CurrentCampaign && CurrentCampaign->Faction && !this->IsSubtemplateArea() && ThisPlayer->Faction != CurrentCampaign->Faction->ID) {
 		ThisPlayer->SetCivilization(CurrentCampaign->Faction->Civilization);
 		ThisPlayer->SetFaction(CurrentCampaign->Faction->Ident);
+		ThisPlayer->Resources[GoldCost] = 2500; // give the player enough resources to start up
+		ThisPlayer->Resources[WoodCost] = 2500;
+		ThisPlayer->Resources[StoneCost] = 2500;
 	}
 	
 	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {
