@@ -2016,6 +2016,17 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 	
 	return "";
 }
+
+bool CPlayer::AtPeace() const
+{
+	for (int i = 0; i < PlayerNumNeutral; ++i) {
+		if (this->IsEnemy(Players[i]) && this->HasContactWith(Players[i]) && Players[i].GetUnitCount() > 0) {
+			return false;
+		}
+	}
+	
+	return true;
+}
 //Wyrmgus end
 
 std::vector<CUnit *>::const_iterator CPlayer::UnitBegin() const

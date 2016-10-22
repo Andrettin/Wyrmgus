@@ -1314,7 +1314,13 @@ void CButtonPanel::Draw()
 				continue;
 			}
 			if (static_cast<size_t>(ButtonUnderCursor) == j) {
-				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y);
+				std::string text_color;
+				if (uins->Unique || uins->Character != NULL) {
+					text_color = "fire";
+				} else if (uins->Prefix != NULL || uins->Suffix != NULL) {
+					text_color = "light-blue";
+				}
+				DrawGenericPopup(uins->GetMessageName(), UI.TransportingButtons[j].X, UI.TransportingButtons[j].Y, text_color);
 			}
 			++j;
 		}

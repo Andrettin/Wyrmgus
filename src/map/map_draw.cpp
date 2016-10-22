@@ -547,7 +547,16 @@ void CViewport::Draw() const
 			} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
 				text_color = "light-blue";
 			}
-			DrawGenericPopup(UnitUnderCursor->GetMessageName(), unit_center_pos.x, unit_center_pos.y, text_color);
+			std::string unit_name;
+			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
+				unit_name = UnitUnderCursor->GetName();
+			} else {
+				unit_name = UnitUnderCursor->GetTypeName();
+			}
+			if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
+				unit_name += " (" + UnitUnderCursor->Player->Name + ")";
+			}
+			DrawGenericPopup(unit_name, unit_center_pos.x, unit_center_pos.y, text_color);
 			//Wyrmgus end
 		//Wyrmgus start
 //		} else if (!isMapFieldVisile) {

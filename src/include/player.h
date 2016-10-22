@@ -242,6 +242,7 @@ public:
 	bool CanAcceptQuest(CQuest *quest);
 	bool HasCompletedQuest(CQuest *quest);
 	std::string HasFailedQuest(CQuest *quest);
+	bool AtPeace() const;
 	//Wyrmgus end
 
 	/// Get a resource of the player

@@ -458,7 +458,6 @@ void AiForce::Attack(const Vec2i &pos, int z)
 	if (this->Scouting) {
 		return;
 	}
-	bool include_neutral = true;
 	//Wyrmgus end
 	if (!this->Attacking) {
 		// Remember the original force position so we can return there after attack
@@ -499,6 +498,9 @@ void AiForce::Attack(const Vec2i &pos, int z)
 //	if (Map.Info.IsPointOnMap(goalPos) == false) {
 	if (Map.Info.IsPointOnMap(goalPos, z) == false) {
 	//Wyrmgus end
+		//Wyrmgus start
+		bool include_neutral = AiPlayer->Player->AtPeace();
+		//Wyrmgus end
 		/* Search in entire map */
 		const CUnit *enemy = NULL;
 		if (isTransporter) {
@@ -1062,7 +1064,6 @@ void AiForce::Update()
 	if (this->Scouting) {
 		return;
 	}
-	bool include_neutral = true;
 	//Wyrmgus end
 	//Wyrmgus start
 	//if force still has no goal, run its Attack function again to get a target
@@ -1172,6 +1173,7 @@ void AiForce::Update()
 	//Wyrmgus start
 //	Assert(Map.Info.IsPointOnMap(GoalPos));
 	Assert(Map.Info.IsPointOnMap(GoalPos, GoalMapLayer));
+	bool include_neutral = AiPlayer->Player->AtPeace();
 	//Wyrmgus end
 	if (State == AiForceAttackingState_GoingToRallyPoint) {
 		// Check if we are near the goalpos

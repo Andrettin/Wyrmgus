@@ -1652,11 +1652,17 @@ static void InfoPanel_draw_multiple_selection()
 
 		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == (int) i) {
 			//Wyrmgus start
+			std::string text_color;
+			if (Selected[i]->Unique || Selected[i]->Character != NULL) {
+				text_color = "fire";
+			} else if (Selected[i]->Prefix != NULL || Selected[i]->Suffix != NULL) {
+				text_color = "light-blue";
+			}
 //			UI.StatusLine.Set(Selected[i]->Type->Name);
 			if (!Preference.NoStatusLineTooltips) {
 				UI.StatusLine.Set(Selected[i]->GetMessageName());
 			}
-			DrawGenericPopup(Selected[i]->GetMessageName(), UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y);
+			DrawGenericPopup(Selected[i]->GetMessageName(), UI.SelectedButtons[i].X, UI.SelectedButtons[i].Y, text_color);
 			//Wyrmgus end
 		}
 	}
