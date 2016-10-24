@@ -3036,10 +3036,41 @@ CUnit *CreateUnit(const Vec2i &pos, const CUnitType &type, CPlayer *player, int 
 	if (unit != NULL) {
 		Vec2i res_pos;
 		const int heading = SyncRand() % 256;
-		//Wyrmgus start
-//		FindNearestDrop(type, pos, res_pos, heading);
 		FindNearestDrop(type, pos, res_pos, heading, z);
-		//Wyrmgus end
+		
+		if (type.BoolFlag[BUILDING_INDEX].value) {
+			CBuildRestrictionOnTop *b = OnTopDetails(type, NULL);
+			if (b && b->ReplaceOnBuild) {
+				CUnitCache &unitCache = Map.Field(res_pos, z)->UnitCache;
+				CUnitCache::iterator it = std::find_if(unitCache.begin(), unitCache.end(), HasSameTypeAs(*b->Parent));
+
+				if (it != unitCache.end()) {
+					CUnit &replacedUnit = **it;
+					unit->SetResourcesHeld(replacedUnit.ResourcesHeld);
+					unit->Variable[GIVERESOURCE_INDEX].Value = replacedUnit.Variable[GIVERESOURCE_INDEX].Value;
+					unit->Variable[GIVERESOURCE_INDEX].Max = replacedUnit.Variable[GIVERESOURCE_INDEX].Max;
+					unit->Variable[GIVERESOURCE_INDEX].Enable = replacedUnit.Variable[GIVERESOURCE_INDEX].Enable;
+					if (replacedUnit.Unique != NULL) {
+						unit->SetUnique(replacedUnit.Unique);
+					} else {
+						if (replacedUnit.Prefix != NULL) {
+							unit->SetPrefix(replacedUnit.Prefix);
+						}
+						if (replacedUnit.Suffix != NULL) {
+							unit->SetSuffix(replacedUnit.Suffix);
+						}
+						if (replacedUnit.Spell != NULL) {
+							unit->SetSpell(replacedUnit.Spell);
+						}
+					}
+					replacedUnit.Remove(NULL);
+					UnitLost(replacedUnit);
+					UnitClearOrders(replacedUnit);
+					replacedUnit.Release();
+				}
+			}
+		}
+		
 		unit->Place(res_pos, z);
 		UpdateForNewUnit(*unit, 0);
 	}
@@ -3104,7 +3135,10 @@ startw:
 		for (int i = addy; i--; ++pos.y) {
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (UnitTypeCanBeAt(type, pos, z) && (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)) {
+			if (
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)
+			) {
 			//Wyrmgus end
 				goto found;
 			}
@@ -3114,7 +3148,10 @@ starts:
 		for (int i = addx; i--; ++pos.x) {
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (UnitTypeCanBeAt(type, pos, z) && (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)) {
+			if (
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)
+			) {
 			//Wyrmgus end
 				goto found;
 			}
@@ -3124,7 +3161,10 @@ starte:
 		for (int i = addy; i--; --pos.y) {
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (UnitTypeCanBeAt(type, pos, z) && (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)) {
+			if (
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)
+			) {
 			//Wyrmgus end
 				goto found;
 			}
@@ -3134,7 +3174,10 @@ startn:
 		for (int i = addx; i--; --pos.x) {
 			//Wyrmgus start
 //			if (UnitTypeCanBeAt(type, pos)) {
-			if (UnitTypeCanBeAt(type, pos, z) && (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)) {
+			if (
+				(UnitTypeCanBeAt(type, pos, z) || (type.BoolFlag[BUILDING_INDEX].value && OnTopDetails(type, NULL)))
+				&& (!type.BoolFlag[BUILDING_INDEX].value || CanBuildHere(NULL, type, pos, z) != NULL)
+			) {
 			//Wyrmgus end
 				goto found;
 			}
@@ -3341,7 +3384,10 @@ void UnitLost(CUnit &unit)
 	DebugPrint("%d: Lost %s(%d)\n" _C_ player.Index _C_ type.Ident.c_str() _C_ UnitNumber(unit));
 
 	// Destroy resource-platform, must re-make resource patch.
-	CBuildRestrictionOnTop *b = OnTopDetails(unit, NULL);
+	//Wyrmgus start
+//	CBuildRestrictionOnTop *b = OnTopDetails(unit, NULL);
+	CBuildRestrictionOnTop *b = OnTopDetails(*unit.Type, NULL);
+	//Wyrmgus end
 	if (b != NULL) {
 		if (b->ReplaceOnDie && (type.GivesResource && unit.ResourcesHeld != 0)) {
 			//Wyrmgus start

@@ -478,7 +478,10 @@ static void EditorActionPlaceUnit(const Vec2i &pos, const CUnitType &type, CPlay
 		return;
 	}
 
-	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
+	//Wyrmgus start
+//	CBuildRestrictionOnTop *b = OnTopDetails(*unit, NULL);
+	CBuildRestrictionOnTop *b = OnTopDetails(*unit->Type, NULL);
+	//Wyrmgus end
 	if (b && b->ReplaceOnBuild) {
 		//Wyrmgus start
 //		CUnitCache &unitCache = Map.Field(pos)->UnitCache;

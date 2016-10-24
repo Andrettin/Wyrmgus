@@ -63,11 +63,19 @@
 **
 **  @return        the BuildingRestrictionDetails
 */
-CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
+//Wyrmgus start
+//CBuildRestrictionOnTop *OnTopDetails(const CUnit &unit, const CUnitType *parent)
+CBuildRestrictionOnTop *OnTopDetails(const CUnitType &type, const CUnitType *parent)
+//Wyrmgus end
 {
-
-	for (std::vector<CBuildRestriction *>::const_iterator i = unit.Type->BuildingRules.begin();
-		 i != unit.Type->BuildingRules.end(); ++i) {
+	//Wyrmgus start
+//	for (std::vector<CBuildRestriction *>::const_iterator i = unit.Type->BuildingRules.begin();
+	for (std::vector<CBuildRestriction *>::const_iterator i = type.BuildingRules.begin();
+	//Wyrmgus end
+		//Wyrmgus start
+//		 i != unit.Type->BuildingRules.end(); ++i) {
+		i != type.BuildingRules.end(); ++i) {
+		//Wyrmgus end
 		CBuildRestrictionOnTop *ontopb = dynamic_cast<CBuildRestrictionOnTop *>(*i);
 
 		if (ontopb) {
@@ -504,7 +512,7 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	}
 	
 	//Wyrmgus start
-	if (GameCycle == 0 && Editor.Running == EditorNotRunning && type.TileWidth > 1 && type.TileHeight > 1) { // if the game is starting, only place buildings with a certain space from other buildings
+	if (GameCycle == 0 && Editor.Running == EditorNotRunning && type.TileWidth > 1 && type.TileHeight > 1 && !OnTopDetails(type, NULL)) { // if the game is starting, only place buildings with a certain space from other buildings
 		for (int x = pos.x - 1; x < pos.x + type.TileWidth + 1; ++x) {
 			for (int y = pos.y - 1; y < pos.y + type.TileHeight + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {

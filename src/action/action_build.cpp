@@ -427,7 +427,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	if (&ontop != &unit) {
 		CBuildRestrictionOnTop *b;
 
-		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build, ontop.Type));
+		//Wyrmgus start
+//		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build, ontop.Type));
+		b = static_cast<CBuildRestrictionOnTop *>(OnTopDetails(*build->Type, ontop.Type));
+		//Wyrmgus end
 		Assert(b);
 		if (b->ReplaceOnBuild) {
 			//Wyrmgus start
