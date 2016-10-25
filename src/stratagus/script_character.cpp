@@ -1021,6 +1021,9 @@ static int CclGetCharacterData(lua_State *l)
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, character->GetIcon().Name.c_str());
 		return 1;
+	} else if (!strcmp(data, "HairVariation")) {
+		lua_pushstring(l, character->HairVariation.c_str());
+		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
 	}
