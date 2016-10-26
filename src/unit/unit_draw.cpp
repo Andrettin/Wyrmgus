@@ -1222,6 +1222,8 @@ void CUnit::Draw(const CViewport &vp) const
 	//Wyrmgus end
 	
 	//Wyrmgus start
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(MountImageLayer), player, frame, screenPos); // draw the mount just before the body
+	
 	//draw the backpack before everything but the shadow if facing south (or the still frame, since that also faces south), southeast or southwest
 	if (this->Direction == LookingS || frame == type->StillFrame || this->Direction == LookingSE || this->Direction == LookingSW) {
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player, frame, screenPos);
@@ -1246,7 +1248,7 @@ void CUnit::Draw(const CViewport &vp) const
 
 		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player, frame, screenPos, skin_color, hair_color);
 	}
-		
+	
 	//draw the right arm before the body if facing north, or if facing southeast/southwest and the arms are inverted for that direction
 	if (
 		(this->Direction == LookingN && this->CurrentAction() != UnitActionDie)

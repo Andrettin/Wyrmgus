@@ -237,6 +237,8 @@ void DrawBuildingCursor()
 	//Wyrmgus start
 	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, BackpackImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
 
+	DrawPlayerColorOverlay(*CursorBuilding, CursorBuilding->GetDefaultLayerSprite(*ThisPlayer, MountImageLayer), ThisPlayer->Index, CursorBuilding->StillFrame, screenPos);
+
 //	DrawUnitType(*CursorBuilding, CursorBuilding->Sprite, ThisPlayer->Index,
 //				 CursorBuilding->StillFrame, screenPos);
 	// get the first variation which has the proper upgrades for this player (to have the proper appearance of buildings drawn in the cursor, according to the upgrades)

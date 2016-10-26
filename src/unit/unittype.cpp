@@ -2252,6 +2252,8 @@ std::string GetImageLayerNameById(int image_layer)
 		return "helmet";
 	} else if (image_layer == BackpackImageLayer) {
 		return "backpack";
+	} else if (image_layer == MountImageLayer) {
+		return "mount";
 	}
 
 	return "";
@@ -2285,6 +2287,8 @@ int GetImageLayerIdByName(std::string image_layer)
 		return HelmetImageLayer;
 	} else if (image_layer == "backpack") {
 		return BackpackImageLayer;
+	} else if (image_layer == "mount") {
+		return MountImageLayer;
 	}
 
 	return -1;

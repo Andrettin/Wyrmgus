@@ -108,6 +108,7 @@ enum ImageLayers {
 	ShieldImageLayer,
 	HelmetImageLayer,
 	BackpackImageLayer,
+	MountImageLayer,
 	
 	MaxImageLayers
 };
