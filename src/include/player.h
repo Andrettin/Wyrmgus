@@ -860,8 +860,10 @@ extern std::vector<int> ConversiblePlayerColors; 			/// Conversible player color
 
 extern std::string SkinColorNames[SkinColorMax];  /// Skin color names
 extern std::vector<CColor> SkinColorsRGB[SkinColorMax]; /// Skin colors
+extern std::vector<int> ConversibleSkinColors; 			/// Conversible skin colors
 extern std::string HairColorNames[HairColorMax];  /// Hair color names
 extern std::vector<CColor> HairColorsRGB[HairColorMax]; /// Hair colors
+extern std::vector<int> ConversibleHairColors; 			/// Conversible hair colors
 
 extern std::map<std::string, int> CivilizationStringToIndex;
 extern std::map<std::string, int> FactionStringToIndex[MAX_RACES];

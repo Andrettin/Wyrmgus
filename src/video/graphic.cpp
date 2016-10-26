@@ -586,24 +586,24 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 				int blue = pal.colors[i].b;
 				
 				if (skin_color != 0 && !this->Grayscale) {
-					for (int k = 1; k < SkinColorMax; ++k) {
+					for (size_t k = 0; k < ConversibleSkinColors.size(); ++k) {
 						if (SkinColorNames[k].empty()) {
 							break;
 						}
-						if (k == skin_color) {
+						if (ConversibleSkinColors[k] == skin_color) {
 							continue;
 						}
 							
-						for (size_t z = 0; z < SkinColorsRGB[k].size(); ++z) {
-							if (pal.colors[i].r == SkinColorsRGB[k][z].R && pal.colors[i].g == SkinColorsRGB[k][z].G && pal.colors[i].b == SkinColorsRGB[k][z].B) {
+						for (size_t z = 0; z < SkinColorsRGB[ConversibleSkinColors[k]].size(); ++z) {
+							if (pal.colors[i].r == SkinColorsRGB[ConversibleSkinColors[k]][z].R && pal.colors[i].g == SkinColorsRGB[ConversibleSkinColors[k]][z].G && pal.colors[i].b == SkinColorsRGB[ConversibleSkinColors[k]][z].B) {
 								red = SkinColorsRGB[skin_color][z].R;
 								green = SkinColorsRGB[skin_color][z].G;
 								blue = SkinColorsRGB[skin_color][z].B;
 								
 								if (found_skin_color == -1) {
-									found_skin_color = k;
-								} else if (found_skin_color != k) {
-									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" skin colors.\n", this->File.c_str(), SkinColorNames[k].c_str(), SkinColorNames[found_skin_color].c_str());
+									found_skin_color = ConversibleSkinColors[k];
+								} else if (found_skin_color != ConversibleSkinColors[k]) {
+									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" skin colors.\n", this->File.c_str(), SkinColorNames[ConversibleSkinColors[k]].c_str(), SkinColorNames[found_skin_color].c_str());
 								}
 							}
 						}
@@ -611,24 +611,24 @@ void CPlayerColorGraphic::MakePlayerColorSurface(int player_color, bool flipped,
 				}
 					
 				if (hair_color != 0 && !this->Grayscale) {
-					for (int k = 1; k < HairColorMax; ++k) {
+					for (size_t k = 0; k < ConversibleHairColors.size(); ++k) {
 						if (HairColorNames[k].empty()) {
 							break;
 						}
-						if (k == hair_color) {
+						if (ConversibleHairColors[k] == hair_color) {
 							continue;
 						}
 							
-						for (size_t z = 0; z < HairColorsRGB[k].size(); ++z) {
-							if (pal.colors[i].r == HairColorsRGB[k][z].R && pal.colors[i].g == HairColorsRGB[k][z].G && pal.colors[i].b == HairColorsRGB[k][z].B) {
+						for (size_t z = 0; z < HairColorsRGB[ConversibleHairColors[k]].size(); ++z) {
+							if (pal.colors[i].r == HairColorsRGB[ConversibleHairColors[k]][z].R && pal.colors[i].g == HairColorsRGB[ConversibleHairColors[k]][z].G && pal.colors[i].b == HairColorsRGB[ConversibleHairColors[k]][z].B) {
 								red = HairColorsRGB[hair_color][z].R;
 								green = HairColorsRGB[hair_color][z].G;
 								blue = HairColorsRGB[hair_color][z].B;
 								
 								if (found_hair_color == -1) {
-									found_hair_color = k;
-								} else if (found_hair_color != k) {
-									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" hair colors.\n", this->File.c_str(), HairColorNames[k].c_str(), HairColorNames[found_hair_color].c_str());
+									found_hair_color = ConversibleHairColors[k];
+								} else if (found_hair_color != ConversibleHairColors[k]) {
+									fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" hair colors.\n", this->File.c_str(), HairColorNames[ConversibleHairColors[k]].c_str(), HairColorNames[found_hair_color].c_str());
 								}
 							}
 						}
@@ -2229,24 +2229,24 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					int blue = p.b;
 					
 					if (skin_color != 0 && !g->Grayscale) {
-						for (int k = 1; k < SkinColorMax; ++k) {
+						for (size_t k = 0; k < ConversibleSkinColors.size(); ++k) {
 							if (SkinColorNames[k].empty()) {
 								break;
 							}
-							if (k == skin_color) {
+							if (ConversibleSkinColors[k] == skin_color) {
 								continue;
 							}
 							
-							for (size_t z = 0; z < SkinColorsRGB[k].size(); ++z) {
-								if (p.r == SkinColorsRGB[k][z].R && p.g == SkinColorsRGB[k][z].G && p.b == SkinColorsRGB[k][z].B) {
+							for (size_t z = 0; z < SkinColorsRGB[ConversibleSkinColors[k]].size(); ++z) {
+								if (p.r == SkinColorsRGB[ConversibleSkinColors[k]][z].R && p.g == SkinColorsRGB[ConversibleSkinColors[k]][z].G && p.b == SkinColorsRGB[ConversibleSkinColors[k]][z].B) {
 									red = SkinColorsRGB[skin_color][z].R;
 									green = SkinColorsRGB[skin_color][z].G;
 									blue = SkinColorsRGB[skin_color][z].B;
 									
 									if (found_skin_color == -1) {
-										found_skin_color = k;
-									} else if (found_skin_color != k) {
-										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" skin colors.\n", g->File.c_str(), SkinColorNames[k].c_str(), SkinColorNames[found_skin_color].c_str());
+										found_skin_color = ConversibleSkinColors[k];
+									} else if (found_skin_color != ConversibleSkinColors[k]) {
+										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" skin colors.\n", g->File.c_str(), SkinColorNames[ConversibleSkinColors[k]].c_str(), SkinColorNames[found_skin_color].c_str());
 									}
 								}
 							}
@@ -2254,24 +2254,24 @@ void MakeTextures2(CGraphic *g, GLuint texture, CUnitColors *colors,
 					}
 					
 					if (hair_color != 0 && !g->Grayscale) {
-						for (int k = 1; k < HairColorMax; ++k) {
+						for (size_t k = 0; k < ConversibleHairColors.size(); ++k) {
 							if (HairColorNames[k].empty()) {
 								break;
 							}
-							if (k == hair_color) {
+							if (ConversibleHairColors[k] == hair_color) {
 								continue;
 							}
 							
-							for (size_t z = 0; z < HairColorsRGB[k].size(); ++z) {
-								if (p.r == HairColorsRGB[k][z].R && p.g == HairColorsRGB[k][z].G && p.b == HairColorsRGB[k][z].B) {
+							for (size_t z = 0; z < HairColorsRGB[ConversibleHairColors[k]].size(); ++z) {
+								if (p.r == HairColorsRGB[ConversibleHairColors[k]][z].R && p.g == HairColorsRGB[ConversibleHairColors[k]][z].G && p.b == HairColorsRGB[ConversibleHairColors[k]][z].B) {
 									red = HairColorsRGB[hair_color][z].R;
 									green = HairColorsRGB[hair_color][z].G;
 									blue = HairColorsRGB[hair_color][z].B;
 									
 									if (found_hair_color == -1) {
-										found_hair_color = k;
-									} else if (found_hair_color != k) {
-										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" hair colors.\n", g->File.c_str(), HairColorNames[k].c_str(), HairColorNames[found_hair_color].c_str());
+										found_hair_color = ConversibleHairColors[k];
+									} else if (found_hair_color != ConversibleHairColors[k]) {
+										fprintf(stderr, "\"%s\" contains tones of both \"%s\" and \"%s\" hair colors.\n", g->File.c_str(), HairColorNames[ConversibleHairColors[k]].c_str(), HairColorNames[found_hair_color].c_str());
 									}
 								}
 							}

@@ -350,8 +350,10 @@ std::vector<int> ConversiblePlayerColors;
 
 std::vector<CColor> SkinColorsRGB[SkinColorMax];
 std::string SkinColorNames[SkinColorMax];
+std::vector<int> ConversibleSkinColors;
 std::vector<CColor> HairColorsRGB[HairColorMax];
 std::string HairColorNames[HairColorMax];
+std::vector<int> ConversibleHairColors;
 //Wyrmgus end
 
 /**

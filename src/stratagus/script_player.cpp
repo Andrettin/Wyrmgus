@@ -2872,6 +2872,29 @@ static int CclDefineSkinColors(lua_State *l)
 }
 
 /**
+**  Define conversible skin colors.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineConversibleSkinColors(lua_State *l)
+{
+	ConversibleSkinColors.clear();
+	
+	const unsigned int args = lua_gettop(l);
+	for (unsigned int i = 0; i < args; ++i) {
+		std::string skin_color_name = LuaToString(l, i + 1);
+		int skin_color = GetSkinColorIndexByName(skin_color_name);
+		if (skin_color != -1) {
+			ConversibleSkinColors.push_back(skin_color);
+		} else {
+			LuaError(l, "Skin color \"%s\" doesn't exist." _C_ skin_color_name.c_str());
+		}
+	}
+	
+	return 0;
+}
+
+/**
 **  Define hair colors
 **
 **  @param l  Lua state.
@@ -2911,6 +2934,29 @@ static int CclDefineHairColors(lua_State *l)
 		}
 	}
 
+	return 0;
+}
+
+/**
+**  Define conversible hair colors.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineConversibleHairColors(lua_State *l)
+{
+	ConversibleHairColors.clear();
+	
+	const unsigned int args = lua_gettop(l);
+	for (unsigned int i = 0; i < args; ++i) {
+		std::string hair_color_name = LuaToString(l, i + 1);
+		int hair_color = GetHairColorIndexByName(hair_color_name);
+		if (hair_color != -1) {
+			ConversibleHairColors.push_back(hair_color);
+		} else {
+			LuaError(l, "Hair color \"%s\" doesn't exist." _C_ hair_color_name.c_str());
+		}
+	}
+	
 	return 0;
 }
 //Wyrmgus end
@@ -3802,7 +3848,9 @@ void PlayerCclRegister()
 	lua_register(Lua, "DefineConversiblePlayerColors", CclDefineConversiblePlayerColors);
 	
 	lua_register(Lua, "DefineSkinColors", CclDefineSkinColors);
+	lua_register(Lua, "DefineConversibleSkinColors", CclDefineConversibleSkinColors);
 	lua_register(Lua, "DefineHairColors", CclDefineHairColors);
+	lua_register(Lua, "DefineConversibleHairColors", CclDefineConversibleHairColors);
 	//Wyrmgus end
 	
 	// player member access functions
