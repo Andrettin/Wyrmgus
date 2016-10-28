@@ -271,7 +271,6 @@ enum {
 	}
 	switch (DoActionMove(unit)) { // reached end-point?
 		case PF_UNREACHABLE:
-			//Wyrmgus start
 			if ((Map.Field(unit.tilePos, unit.MapLayer)->Flags & MapFieldBridge) && !unit.Type->BoolFlag[BRIDGE_INDEX].value && unit.Type->UnitType == UnitTypeLand) {
 				std::vector<CUnit *> table;
 				Select(unit.tilePos, unit.tilePos, table, unit.MapLayer);
@@ -285,10 +284,8 @@ enum {
 					}
 				}
 			}
-			//Wyrmgus end
-			// Some tries to reach the goal
-			this->Range++;
-			break;
+			this->Finished = true;
+			return ;
 		case PF_REACHED: {
 			if (!goal) { // goal has died
 				this->Finished = true;
