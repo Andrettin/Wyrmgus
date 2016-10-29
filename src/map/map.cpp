@@ -456,11 +456,13 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			continue;
 		}
 		// add five workers at the player's starting location
-		int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Race, Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
-		if (worker_type_id != -1) {
-			Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
-			for (int j = 0; j < 5; ++j) {
-				CUnit *worker_unit = CreateUnit(Players[i].StartPos, *UnitTypes[worker_type_id], &Players[i], Players[i].StartMapLayer);
+		if (Players[i].NumTownHalls > 0) {
+			int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Race, Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
+			if (worker_type_id != -1) {
+				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
+				for (int j = 0; j < 5; ++j) {
+					CUnit *worker_unit = CreateUnit(Players[i].StartPos, *UnitTypes[worker_type_id], &Players[i], Players[i].StartMapLayer);
+				}
 			}
 		}
 		
@@ -581,11 +583,12 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 	for (size_t i = 0; i < this->Units.size(); ++i) {
 		Vec2i unit_raw_pos(std::get<0>(this->Units[i]));
 		Vec2i unit_pos(map_start_pos + unit_raw_pos - template_start_pos);
+		const CUnitType *type = std::get<1>(this->Units[i]);
 		if (random) {
 			if (unit_raw_pos.x != -1 || unit_raw_pos.y != -1) {
 				continue;
 			}
-			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->Units[i]), std::get<2>(this->Units[i]), map_start_pos, map_end - Vec2i(1, 1), z);
+			unit_pos = Map.GenerateUnitLocation(type, std::get<2>(this->Units[i]), map_start_pos, map_end - Vec2i(1, 1), z);
 		}
 		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
 			continue;
@@ -606,8 +609,11 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			} else {
 				player = &Players[PlayerNumNeutral];
 			}
-			Vec2i unit_offset((std::get<1>(this->Units[i])->TileWidth - 1) / 2, (std::get<1>(this->Units[i])->TileHeight - 1) / 2);
+			Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z);
+			if (!type->BoolFlag[BUILDING_INDEX].value) { // make non-building units not have an active AI
+				unit->Active = 0;
+			}
 		}
 	}
 	

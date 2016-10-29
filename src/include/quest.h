@@ -61,7 +61,7 @@ class CQuest
 public:
 	CQuest() :
 		ID(-1), Civilization(-1), TechnologyPoints(0), PlayerColor(0), SkinColor(0), HairColor(0), HighestCompletedDifficulty(-1),
-		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false), Unobtainable(false), Uncompleteable(false),
+		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false), Unobtainable(false), Uncompleteable(false), Unfailable(false),
 		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionEffects(NULL)
 	{
 	}
@@ -99,6 +99,7 @@ public:
 	bool Competitive;				/// Whether a player completing the quest causes it to fail for others
 	bool Unobtainable;				/// Whether the quest can be obtained normally (or only through triggers)
 	bool Uncompleteable;			/// Whether the quest can be completed normally (or only through triggers)
+	bool Unfailable;				/// Whether the quest can fail normally
 	IconConfig Icon;				/// Quest's icon
 	CCharacter *QuestGiver;			/// Quest giver
 	CDialogue *IntroductionDialogue;

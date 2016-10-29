@@ -45,6 +45,7 @@
 #include "ai.h"
 //Wyrmgus start
 #include "commands.h" //for faction setting
+#include "depend.h"
 #include "editor.h"
 #include "font.h"
 #include "game.h"
@@ -1990,6 +1991,10 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 
 std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for failure (empty if none)
 {
+	if (quest->Unfailable) {
+		return "";
+	}
+
 	if (quest->CurrentCompleted) { // quest already completed by someone else
 		return "Another faction has completed the quest before you.";
 	}
@@ -2004,7 +2009,7 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 					break;
 				}
 			}
-			if (!has_builder) {
+			if (!has_builder || !CheckDependByType(*this, *type)) {
 				return "You can no longer produce the required unit.";
 			}
 		}

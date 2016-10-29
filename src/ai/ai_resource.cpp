@@ -1224,7 +1224,10 @@ static void AiCollectResources()
 	const int n = AiPlayer->Player->GetUnitCount();
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+		//Wyrmgus start
+//		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value) {
+		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value || !unit.Active) {
+		//Wyrmgus end
 			continue;
 		}
 
