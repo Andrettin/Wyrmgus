@@ -1795,7 +1795,7 @@ void CPlayer::UpdateQuestPool()
 	this->AvailableQuestsChanged();
 
 	// notify the player when new quests are available (but only if the player has already exausted the quests available to him, so that they aren't bothered if they choose not to engage with the quest system)
-	if (this == ThisPlayer && GameCycle >= CYCLES_PER_MINUTE && this->AvailableQuests.size() > 0 && exausted_available_quests) {
+	if (this == ThisPlayer && GameCycle >= CYCLES_PER_MINUTE && this->AvailableQuests.size() > 0 && exausted_available_quests && this->NumTownHalls > 0) {
 		ThisPlayer->Notify("%s", _("New quests available"));
 	}
 	
@@ -1912,7 +1912,7 @@ void CPlayer::CompleteQuest(CQuest *quest)
 		if (!quest->Rewards.empty()) {
 			rewards_string = "Rewards: " + quest->Rewards;
 		}
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", \"" + SkinColorNames[quest->SkinColor] + "\", \"" + HairColorNames[quest->HairColor] + "\") end;");
 	}
 }
 

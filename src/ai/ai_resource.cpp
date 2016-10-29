@@ -299,6 +299,12 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	// Remove all workers on the way building something
 	for (size_t i = 0; i != table.size(); ++i) {
 		CUnit &unit = *table[i];
+		
+		//Wyrmgus start
+		if (!unit.Active) {
+			continue;
+		}
+		//Wyrmgus end
 
 		if (IsAlreadyWorking(unit) == false) {
 			table[num++] = &unit;
