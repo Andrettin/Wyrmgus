@@ -2279,7 +2279,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 	}
 	
 	//generate a personal name for the unit, if applicable
-	if (this->Character == NULL) {
+	if (!SaveGameLoading && this->Character == NULL) {
 		this->UpdatePersonalName();
 	}
 	
