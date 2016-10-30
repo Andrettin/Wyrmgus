@@ -54,6 +54,7 @@
 #include "depend.h"
 //Wyrmgus start
 #include "editor.h"
+#include "game.h"
 #include "grand_strategy.h"
 //Wyrmgus end
 #include "interface.h"
@@ -2198,7 +2199,7 @@ void TraitAcquire(CUnit &unit, const CUpgrade *upgrade)
 void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 {
 	//Wyrmgus start
-	if (!GameRunning && !GameEstablishing) {
+	if (!GameRunning && !GameEstablishing && !SaveGameLoading) {
 		return;
 	}
 	//Wyrmgus end
@@ -2232,7 +2233,7 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 {
 	//Wyrmgus start
-	if (!GameRunning && !GameEstablishing) {
+	if (!GameRunning && !GameEstablishing && !SaveGameLoading) {
 		return;
 	}
 	//Wyrmgus end

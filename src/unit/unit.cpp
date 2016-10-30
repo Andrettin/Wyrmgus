@@ -2008,7 +2008,7 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 {
 	this->SoldUnits.erase(std::remove(this->SoldUnits.begin(), this->SoldUnits.end(), sold_unit), this->SoldUnits.end());
 	DropOutOnSide(*sold_unit, sold_unit->Direction, this);
-	if (player != PlayerNumNeutral) {
+	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(Players[player]);
 	}
 	Players[player].ChangeResource(GoldCost, -sold_unit->GetPrice(), true);
