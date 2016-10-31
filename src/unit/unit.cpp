@@ -835,6 +835,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	}
 	
 	memset(IndividualUpgrades, 0, sizeof(IndividualUpgrades)); //reset the individual upgrades and then apply the character's
+	this->Trait = NULL;
 
 	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
 		IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
