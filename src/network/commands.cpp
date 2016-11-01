@@ -725,9 +725,9 @@ void SendCommandSetFaction(int player, int faction)
 	if (!IsNetworkGame()) {
 		//FIXME: should add log of faction change here
 		if (faction != -1) {
-			Players[player].SetFaction(PlayerRaces.Factions[Players[player].Race][faction]->Ident);
+			Players[player].SetFaction(PlayerRaces.Factions[Players[player].Race][faction]);
 		} else {
-			Players[player].SetFaction("");
+			Players[player].SetFaction(NULL);
 		}
 	} else {
 		NetworkSendExtendedCommand(ExtendedMessageSetFaction, -1, player, faction, 0, 0);
@@ -1047,7 +1047,7 @@ void ExecExtendedCommand(unsigned char type, int status,
 		//Wyrmgus start
 		case ExtendedMessageSetFaction: {
 			//FIXME: should add log for faction change here
-			Players[arg2].SetFaction(PlayerRaces.Factions[Players[arg2].Race][arg3]->Ident);
+			Players[arg2].SetFaction(PlayerRaces.Factions[Players[arg2].Race][arg3]);
 			break;
 		}
 		//Wyrmgus end

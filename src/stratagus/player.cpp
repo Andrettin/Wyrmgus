@@ -1160,7 +1160,7 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 		if (Players[i].Type == PlayerNobody) {
 			Players[i].Type = PlayerComputer;
 			Players[i].SetCivilization(faction->Civilization);
-			Players[i].SetFaction(faction->Ident);
+			Players[i].SetFaction(faction);
 			Players[i].AiEnabled = true;
 			Players[i].AiName = faction->DefaultAI;
 			Players[i].Team = 1;
@@ -1362,7 +1362,7 @@ void CPlayer::SetCivilization(int civilization)
 	int old_faction = this->Faction;
 
 	if (GameRunning) {
-		this->SetFaction("");
+		this->SetFaction(NULL);
 	} else {
 		this->Faction = -1;
 	}
@@ -1409,7 +1409,7 @@ void CPlayer::SetCivilization(int civilization)
 **
 **  @param faction    New faction.
 */
-void CPlayer::SetFaction(const std::string faction_name)
+void CPlayer::SetFaction(CFaction *faction)
 {
 	if (this->Faction != -1) {
 		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade)->ID] == 'R') {
@@ -1417,15 +1417,15 @@ void CPlayer::SetFaction(const std::string faction_name)
 		}
 	}
 
-	int faction = PlayerRaces.GetFactionIndexByName(this->Race, faction_name);
+	int faction_id = PlayerRaces.GetFactionIndexByName(this->Race, faction ? faction->Ident : "");
 	
 	for (size_t i = 0; i < UpgradeClasses.size(); ++i) {
-		if (PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i) != PlayerRaces.GetFactionClassUpgrade(this->Race, faction, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
+		if (PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i) != PlayerRaces.GetFactionClassUpgrade(this->Race, faction_id, i)) { //if the upgrade for a certain class is different for the new faction than the old faction (and it has been acquired), remove the modifiers of the old upgrade and apply the modifiers of the new
 			if (PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i) != -1 && this->Allow.Upgrades[PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i)] == 'R') {
 				UpgradeLost(*this, PlayerRaces.GetFactionClassUpgrade(this->Race, this->Faction, i));
 
-				if (PlayerRaces.GetFactionClassUpgrade(this->Race, faction, i) != -1) {
-					UpgradeAcquire(*this, AllUpgrades[PlayerRaces.GetFactionClassUpgrade(this->Race, faction, i)]);
+				if (PlayerRaces.GetFactionClassUpgrade(this->Race, faction_id, i) != -1) {
+					UpgradeAcquire(*this, AllUpgrades[PlayerRaces.GetFactionClassUpgrade(this->Race, faction_id, i)]);
 				}
 			}
 		}
@@ -1433,12 +1433,12 @@ void CPlayer::SetFaction(const std::string faction_name)
 	
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
-	if (this->Faction != -1 && faction != -1) {
-		personal_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->PersonalNames != PlayerRaces.Factions[this->Race][faction]->PersonalNames;
-		ship_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->ShipNames != PlayerRaces.Factions[this->Race][faction]->ShipNames;
+	if (this->Faction != -1 && faction_id != -1) {
+		personal_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->PersonalNames != PlayerRaces.Factions[this->Race][faction_id]->PersonalNames;
+		ship_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->ShipNames != PlayerRaces.Factions[this->Race][faction_id]->ShipNames;
 	}
 	
-	this->Faction = faction;
+	this->Faction = faction_id;
 
 	if (this->Index == ThisPlayer->Index) {
 		UI.Load();
@@ -1453,9 +1453,9 @@ void CPlayer::SetFaction(const std::string faction_name)
 	}
 	if (this->Faction != -1) {
 		int color = -1;
-		for (size_t i = 0; i < PlayerRaces.Factions[this->Race][faction]->Colors.size(); ++i) {
-			if (!IsPlayerColorUsed(PlayerRaces.Factions[this->Race][faction]->Colors[i])) {
-				color = PlayerRaces.Factions[this->Race][faction]->Colors[i];
+		for (size_t i = 0; i < PlayerRaces.Factions[this->Race][faction_id]->Colors.size(); ++i) {
+			if (!IsPlayerColorUsed(PlayerRaces.Factions[this->Race][faction_id]->Colors[i])) {
+				color = PlayerRaces.Factions[this->Race][faction_id]->Colors[i];
 				break;
 			}
 		}
@@ -1477,7 +1477,7 @@ void CPlayer::SetFaction(const std::string faction_name)
 			UpgradeAcquire(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade));
 		}
 	} else {
-		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction_name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
+		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->Name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());
 	}
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
@@ -1546,9 +1546,9 @@ void CPlayer::SetRandomFaction()
 	
 	if (faction_count > 0) {
 		int chosen_faction = local_factions[SyncRand(faction_count)];
-		this->SetFaction(PlayerRaces.Factions[this->Race][chosen_faction]->Ident);
+		this->SetFaction(PlayerRaces.Factions[this->Race][chosen_faction]);
 	} else {
-		this->SetFaction("");
+		this->SetFaction(NULL);
 	}
 }
 
@@ -2514,7 +2514,7 @@ void PlayersEachMinute(int playerIdx)
 					if (Players[j].Type == PlayerNobody) {
 						Players[j].Type = PlayerComputer;
 						Players[j].SetCivilization(splitter_faction->Civilization);
-						Players[j].SetFaction(splitter_faction->Ident);
+						Players[j].SetFaction(splitter_faction);
 						Players[j].AiEnabled = true;
 						Players[j].AiName = faction->DefaultAI;
 						Players[j].Team = 1;

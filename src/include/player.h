@@ -210,7 +210,7 @@ public:
 	
 	//Wyrmgus start
 	void SetCivilization(int civilization);
-	void SetFaction(const std::string faction_name);
+	void SetFaction(CFaction *faction);
 	void SetRandomFaction();
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(std::string upgrade_class_name);

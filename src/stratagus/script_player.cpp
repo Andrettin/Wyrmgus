@@ -3233,7 +3233,7 @@ static int CclSetPlayerData(lua_State *l)
 		p->SetName(LuaToString(l, 3));
 	} else if (!strcmp(data, "RaceName")) {
 		if (GameRunning) {
-			p->SetFaction("");
+			p->SetFaction(NULL);
 		}
 
 		const char *racename = LuaToString(l, 3);
@@ -3251,7 +3251,7 @@ static int CclSetPlayerData(lua_State *l)
 		if (faction_name == "random") {
 			p->SetRandomFaction();
 		} else {
-			p->SetFaction(faction_name);
+			p->SetFaction(PlayerRaces.GetFaction(-1, faction_name));
 		}
 	//Wyrmgus end
 	} else if (!strcmp(data, "Resources")) {
