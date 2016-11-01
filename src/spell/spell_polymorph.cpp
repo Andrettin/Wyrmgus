@@ -121,10 +121,10 @@
 	if (this->NewForm == NULL) {
 		int new_unit_type = -1;
 		if (this->Civilization != -1 && this->Faction != -1 && this->Civilization == target->Type->Civilization) { //get faction equivalent, if is of the same civilization
-			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, GetUnitTypeClassIndexByName(target->Type->Class));
+			new_unit_type = PlayerRaces.GetFactionClassUnitType(this->Civilization, this->Faction, target->Type->Class);
 		}
 		if (this->Detachment && target->Type->Civilization != -1 && target->Type->Faction != -1) {
-			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(target->Type->Civilization, GetUnitTypeClassIndexByName(target->Type->Class));
+			new_unit_type = PlayerRaces.GetCivilizationClassUnitType(target->Type->Civilization, target->Type->Class);
 		}
 		if (new_unit_type != -1) {
 			type = UnitTypes[new_unit_type];

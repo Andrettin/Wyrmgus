@@ -2973,8 +2973,8 @@ std::string GetFactionEffectsString(std::string civilization_name, std::string f
 					effect_element_string += UnitTypes[unit_type_id]->Name;
 					effect_element_string += " (";
 					
-					if (UnitTypes[unit_type_id]->Name != UnitTypes[base_unit_type_id]->Name) {
-						effect_element_string += _(FullyCapitalizeString(FindAndReplaceString(UnitTypes[unit_type_id]->Class, "-", " ")).c_str());
+					if (UnitTypes[unit_type_id]->Name != UnitTypes[base_unit_type_id]->Name && UnitTypes[unit_type_id]->Class != -1) {
+						effect_element_string += _(FullyCapitalizeString(FindAndReplaceString(UnitTypeClasses[UnitTypes[unit_type_id]->Class], "-", " ")).c_str());
 						effect_element_string += ", ";
 						changed_stats = true;
 					}

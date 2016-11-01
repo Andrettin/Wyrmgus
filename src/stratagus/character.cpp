@@ -75,7 +75,7 @@ CCharacter::~CCharacter()
 
 int CCharacter::GetMartialAttribute()
 {
-	if (this->Type->Class == "thief" || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
+	if ((this->Type->Class != -1 && UnitTypeClasses[this->Type->Class] == "thief") || this->Type->DefaultStat.Variables[ATTACKRANGE_INDEX].Value > 1) {
 		return DexterityAttribute;
 	} else {
 		return StrengthAttribute;
@@ -658,7 +658,7 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 			
 			//now, update the hero
 			hero->Civilization = civilization;
-			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization, GetUnitTypeClassIndexByName(hero->Type->Class));
+			int new_unit_type_id = PlayerRaces.GetCivilizationClassUnitType(hero->Civilization, hero->Type->Class);
 			if (new_unit_type_id != -1) {
 				hero->Type = const_cast<CUnitType *>(&(*UnitTypes[new_unit_type_id]));
 				hero->Name = new_hero_name;

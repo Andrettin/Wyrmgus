@@ -1239,10 +1239,10 @@ std::string EvalString(const StringDesc *s)
 			type = s->D.Type;
 			if (type != NULL) {
 				std::string str;
-				if (!(**type).BoolFlag[ITEM_INDEX].value) {
-					str = (**type).Class.c_str();
-				} else {
+				if ((**type).BoolFlag[ITEM_INDEX].value) {
 					str = GetItemClassNameById((**type).ItemClass).c_str();
+				} else if ((**type).Class != -1) {
+					str = UnitTypeClasses[(**type).Class].c_str();
 				}
 				str[0] = toupper(str[0]);
 				size_t loc = str.find("-");

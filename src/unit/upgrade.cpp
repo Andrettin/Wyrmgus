@@ -169,7 +169,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Class(-1), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -372,7 +372,16 @@ static int CclDefineUpgrade(lua_State *l)
 				LuaError(l, "Icon doesn't exist.");
 			}
 		} else if (!strcmp(value, "Class")) {
-			upgrade->Class = LuaToString(l, -1);
+			std::string class_name = LuaToString(l, -1);
+			
+			int class_id = GetUpgradeClassIndexByName(class_name);
+			if (class_id == -1) {
+				SetUpgradeClassStringToIndex(class_name, UpgradeClasses.size());
+				class_id = UpgradeClasses.size();
+				UpgradeClasses.push_back(class_name);
+			}
+			
+			upgrade->Class = class_id;
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			upgrade->Civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -576,13 +585,8 @@ static int CclDefineUpgrade(lua_State *l)
 	}
 	
 	//set the upgrade's civilization and class here
-	if (!upgrade->Class.empty()) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
-		int class_id = GetUpgradeClassIndexByName(upgrade->Class);
-		if (class_id == -1) {
-			SetUpgradeClassStringToIndex(upgrade->Class, UpgradeClasses.size());
-			class_id = UpgradeClasses.size();
-			UpgradeClasses.push_back(upgrade->Class);
-		}
+	if (upgrade->Class != -1) { //if class is defined, then use this upgrade to help build the classes table, and add this upgrade to the civilization class table (if the civilization is defined)
+		int class_id = upgrade->Class;
 		if (upgrade->Civilization != -1) {
 			int civilization_id = upgrade->Civilization;
 			
@@ -969,7 +973,11 @@ static int CclGetUpgradeData(lua_State *l)
 		lua_pushstring(l, upgrade->Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
-		lua_pushstring(l, upgrade->Class.c_str());
+		if (upgrade->Class != -1) {
+			lua_pushstring(l, UpgradeClasses[upgrade->Class].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (upgrade->Civilization != -1) {
@@ -2315,7 +2323,7 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 	
 	//Wyrmgus start
 	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
-	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeTribe)) {
+	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class != -1 && UpgradeClasses[AllUpgrades[id]->Class] == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeTribe)) {
 		if (!GrandStrategy && Editor.Running == EditorNotRunning) {
 			int old_faction = player.Faction;
 			if (ThisPlayer && ThisPlayer->Index == player.Index) {
@@ -2577,7 +2585,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 				upgrade_effects_string += "Revolt Risk";
 			}
 			
-			if (upgrade->Class == "writing") {
+			if (upgrade->Class != -1 && UpgradeClasses[upgrade->Class] == "writing") {
 				if (!first_element) {
 					upgrade_effects_string += padding_string;
 				} else {
@@ -2585,7 +2593,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 				}
 				
 				upgrade_effects_string += "Transforms faction from tribe to polity (with Masonry)";
-			} else if (upgrade->Class == "masonry") {
+			} else if (upgrade->Class != -1 && UpgradeClasses[upgrade->Class] == "masonry") {
 				if (!first_element) {
 					upgrade_effects_string += padding_string;
 				} else {

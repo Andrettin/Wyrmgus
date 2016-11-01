@@ -89,8 +89,8 @@ static int CclDefineUniqueItem(lua_State *l)
 			if (item->Type != NULL) {
 				if (item->Type->ItemClass != -1) {
 					ParseNameElements(l, "item-" + GetItemClassNameById(item->Type->ItemClass));
-				} else {
-					ParseNameElements(l, "unit-class-" + item->Type->Class);
+				} else if (item->Type->Class != -1) {
+					ParseNameElements(l, "unit-class-" + UnitTypeClasses[item->Type->Class]);
 				}
 			} else {
 				LuaError(l, "Unique item has no type.");

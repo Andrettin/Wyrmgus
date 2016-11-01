@@ -5,7 +5,6 @@ class CUpgrade
 
 	std::string Name;
 	//Wyrmgus start
-	std::string Class;
 	std::string Description;
 	std::string Quote;
 	std::string Background;

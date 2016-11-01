@@ -1905,7 +1905,16 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		//Wyrmgus start
 		} else if (!strcmp(value, "Class")) {
-			type->Class = LuaToString(l, -1);
+			std::string class_name = LuaToString(l, -1);
+			
+			int class_id = GetUnitTypeClassIndexByName(class_name);
+			if (class_id == -1) {
+				SetUnitTypeClassStringToIndex(class_name, UnitTypeClasses.size());
+				class_id = UnitTypeClasses.size();
+				UnitTypeClasses.push_back(class_name);
+			}
+		
+			type->Class = class_id;
 		} else if (!strcmp(value, "Civilization")) {
 			std::string civilization_name = LuaToString(l, -1);
 			type->Civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
@@ -2105,14 +2114,9 @@ static int CclDefineUnitType(lua_State *l)
 	}
 	
 	//Wyrmgus start
-	if (!type->Class.empty()) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
-		int class_id = GetUnitTypeClassIndexByName(type->Class);
-		if (class_id == -1) {
-			SetUnitTypeClassStringToIndex(type->Class, UnitTypeClasses.size());
-			class_id = UnitTypeClasses.size();
-			UnitTypeClasses.push_back(type->Class);
-		}
-		
+	if (type->Class != -1) { //if class is defined, then use this unit type to help build the classes table, and add this unit to the civilization class table (if the civilization is defined)
+		int class_id = type->Class;
+
 		//see if this unit type is set as the civilization class unit type or the faction class unit type of any civilization/class (or faction/class) combination, and remove it from there (to not create problems with redefinitions)
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (std::map<int, int>::reverse_iterator iterator = PlayerRaces.CivilizationClassUnitTypes[i].rbegin(); iterator != PlayerRaces.CivilizationClassUnitTypes[i].rend(); ++iterator) {
@@ -2566,10 +2570,12 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->Parent.c_str());
 		return 1;
 	} else if (!strcmp(data, "Class")) {
-		if (type->ItemClass == -1) {
-			lua_pushstring(l, type->Class.c_str());
-		} else {
+		if (type->ItemClass != -1) {
 			lua_pushstring(l, GetItemClassNameById(type->ItemClass).c_str());
+		} else if (type->Class != -1) {
+			lua_pushstring(l, UnitTypeClasses[type->Class].c_str());
+		} else {
+			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
