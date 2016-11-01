@@ -1509,7 +1509,7 @@ void CPlayer::SetRandomFaction()
 			if (faction_id != -1) {
 				bool faction_used = false;
 				for (int j = 0; j < PlayerMax; ++j) {
-					if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][faction_id]->Ident) {
+					if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][faction_id]->Name) {
 						faction_used = true;
 					}		
 				}
@@ -1529,7 +1529,7 @@ void CPlayer::SetRandomFaction()
 		for (size_t i = 0; i < PlayerRaces.Factions[this->Race].size(); ++i) {
 			bool faction_used = false;
 			for (int j = 0; j < PlayerMax; ++j) {
-				if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Ident) {
+				if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
 					faction_used = true;
 				}		
 			}
