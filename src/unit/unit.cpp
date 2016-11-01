@@ -1167,7 +1167,7 @@ void CUnit::ChooseButtonIcon(int button_action)
 	
 	if (this->Type->Civilization != -1) {
 		int civilization = this->Type->Civilization;
-		int faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
+		int faction = this->Type->Faction;
 		
 		if (faction == -1 && this->Player->Race == civilization) {
 			faction = this->Player->Faction;
@@ -1692,8 +1692,8 @@ void CUnit::GenerateDrop()
 	
 	int dropper_civilization = this->Type->Civilization;
 	int dropper_faction = -1;
-	if (dropper_civilization != -1 && !this->Type->Faction.empty()) {
-		dropper_faction = PlayerRaces.GetFactionIndexByName(dropper_civilization, this->Type->Faction);
+	if (dropper_civilization != -1 && this->Type->Faction != -1) {
+		dropper_faction = this->Type->Faction;
 	} else if (dropper_civilization != -1 && this->Player->Race == dropper_civilization && this->Player->Faction != -1) {
 		dropper_faction = this->Player->Faction;
 	}
@@ -2748,8 +2748,8 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	
 	int civilization = this->Type->Civilization;
 	int faction = -1;
-	if (civilization != -1 && !this->Type->Faction.empty()) {
-		faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
+	if (civilization != -1 && this->Type->Faction != -1) {
+		faction = this->Type->Faction;
 	} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
 		faction = this->Player->Faction;
 	}
@@ -2786,8 +2786,8 @@ void CUnit::UpdateSettlementName()
 		
 		int civilization = this->Type->Civilization;
 		int faction = -1;
-		if (civilization != -1 && !this->Type->Faction.empty()) {
-			faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
+		if (civilization != -1 && this->Type->Faction != -1) {
+			faction = this->Type->Faction;
 		} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
 			faction = this->Player->Faction;
 		}

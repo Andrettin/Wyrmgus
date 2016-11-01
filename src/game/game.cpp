@@ -686,8 +686,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 			if (type.Civilization != -1) {
 				f->printf("\tCivilization = \"%s\",\n", PlayerRaces.Name[type.Civilization].c_str());
 			}
-			if (!type.Faction.empty()) {
-				f->printf("\tFaction = \"%s\",\n", type.Faction.c_str());
+			if (type.Faction != -1) {
+				f->printf("\tFaction = \"%s\",\n", PlayerRaces.Factions[type.Civilization][type.Faction]->Ident.c_str());
 			}
 			f->printf("\tClass = \"%s\",\n", type.Class.c_str());
 			if (!type.File.empty() && (parent_type == NULL || type.File != parent_type->File)) {

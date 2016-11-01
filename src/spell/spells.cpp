@@ -238,7 +238,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		}
 	}
 	if (condition->FactionUnit != CONDITION_TRUE) {
-		if ((condition->FactionUnit == CONDITION_ONLY) ^ (!caster.Type->Faction.empty())) {
+		if ((condition->FactionUnit == CONDITION_ONLY) ^ (caster.Type->Faction != -1)) {
 			return false;
 		}
 	}

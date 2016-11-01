@@ -578,7 +578,7 @@ CUnitType::CUnitType() :
 	ShadowWidth(0), ShadowHeight(0), ShadowOffsetX(0), ShadowOffsetY(0),
 	//Wyrmgus start
 	TechnologyPointCost(0), Upkeep(0), TrainQuantity(0), ItemClass(-1), SkinColor(0), HairColor(0),
-	Civilization(-1), Species(NULL), TerrainType(NULL),
+	Civilization(-1), Faction(-1), Species(NULL), TerrainType(NULL),
 	//Wyrmgus end
 	Animations(NULL), StillFrame(0),
 	DeathExplosion(NULL), OnHit(NULL), OnEachCycle(NULL), OnEachSecond(NULL), OnInit(NULL),
@@ -945,8 +945,8 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 		int civilization_id = this->Civilization;
 		if (civilization_id != -1) {
 			CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
-			if (!faction || faction->Civilization != civilization_id) {
-				faction = PlayerRaces.GetFaction(civilization_id, this->Faction);
+			if (this->Faction != -1 && (!faction || faction->Civilization != civilization_id)) {
+				faction = PlayerRaces.Factions[civilization_id][this->Faction];
 			}
 			
 			if (this->BoolFlag[ORGANIC_INDEX].value) {

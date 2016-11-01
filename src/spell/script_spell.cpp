@@ -198,7 +198,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 				value = LuaToString(l, -1, j + 1);
 				int faction = PlayerRaces.GetFactionIndexByName(civilization, value);
 				if (faction != -1) {
-					condition->FactionEquivalent = const_cast<CFaction *>(&(*PlayerRaces.Factions[civilization][faction]));;
+					condition->FactionEquivalent = const_cast<CFaction *>(&(*PlayerRaces.Factions[civilization][faction]));
 				} else {
 					fprintf(stderr, "Faction %s doesn't exist.\n", value);
 				}

@@ -2535,7 +2535,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					IsGrandStrategyUnit(*UnitTypes[i])
 					&& !UnitTypes[i]->Class.empty()
 					&& UnitTypes[i]->Civilization != -1
-					&& !UnitTypes[i]->Faction.empty()
+					&& UnitTypes[i]->Faction != -1
 					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
 					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
 					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))
@@ -2544,7 +2544,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					this->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
 					this->SetUnitQuantity(i, 0);
 					this->UnderConstructionUnits[i] = 0;
-				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1 && !UnitTypes[i]->Faction.empty()) {
+				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1 && UnitTypes[i]->Faction != -1) {
 					if (this->SettlementBuildings[i] && PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
 						this->SetSettlementBuilding(i, false); // remove building from other civilization
 						if (PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
@@ -2612,7 +2612,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					IsGrandStrategyUnit(*UnitTypes[i])
 					&& !UnitTypes[i]->Class.empty()
 					&& UnitTypes[i]->Civilization != -1
-					&& UnitTypes[i]->Faction.empty()
+					&& UnitTypes[i]->Faction == -1
 					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
 					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
 					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))
@@ -2621,7 +2621,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					this->UnderConstructionUnits[PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
 					this->SetUnitQuantity(i, 0);
 					this->UnderConstructionUnits[i] = 0;
-				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1 && UnitTypes[i]->Faction.empty()) {
+				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1 && UnitTypes[i]->Faction == -1) {
 					if (this->SettlementBuildings[i] && this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
 						this->SetSettlementBuilding(i, false); // remove building from other civilization
 						if (this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {

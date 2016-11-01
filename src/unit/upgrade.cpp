@@ -169,7 +169,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Civilization(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Civilization(-1), Faction(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -380,7 +380,13 @@ static int CclDefineUpgrade(lua_State *l)
 				LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
 			}
 		} else if (!strcmp(value, "Faction")) {
-			upgrade->Faction = LuaToString(l, -1);
+			std::string faction_name = LuaToString(l, -1);
+			CFaction *faction = PlayerRaces.GetFaction(-1, faction_name);
+			if (faction) {
+				upgrade->Faction = faction->ID;
+			} else {
+				LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
+			}
 		} else if (!strcmp(value, "Description")) {
 			upgrade->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Quote")) {
@@ -580,8 +586,8 @@ static int CclDefineUpgrade(lua_State *l)
 		if (upgrade->Civilization != -1) {
 			int civilization_id = upgrade->Civilization;
 			
-			if (!upgrade->Faction.empty()) {
-				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, upgrade->Faction);
+			if (upgrade->Faction != -1) {
+				int faction_id = upgrade->Faction;
 				if (civilization_id != -1 && faction_id != -1 && class_id != -1) {
 					PlayerRaces.Factions[civilization_id][faction_id]->ClassUpgrades[class_id] = upgrade->ID;
 				}
@@ -968,6 +974,13 @@ static int CclGetUpgradeData(lua_State *l)
 	} else if (!strcmp(data, "Civilization")) {
 		if (upgrade->Civilization != -1) {
 			lua_pushstring(l, PlayerRaces.Name[upgrade->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Faction")) {
+		if (upgrade->Faction != -1) {
+			lua_pushstring(l, PlayerRaces.Factions[upgrade->Civilization][upgrade->Faction]->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
@@ -2584,7 +2597,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 				upgrade_effects_string += "Allows building of Roads";
 				
 				int civilization_id = upgrade->Civilization;
-				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, upgrade->Faction);
+				int faction_id = upgrade->Faction;
 				int stronghold_id = PlayerRaces.GetFactionClassUnitType(civilization_id, faction_id, GetUnitTypeClassIndexByName("stronghold"));
 				if (stronghold_id != -1) {
 					upgrade_effects_string += padding_string;
