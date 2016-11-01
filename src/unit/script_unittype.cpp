@@ -738,8 +738,6 @@ static int CclDefineUnitType(lua_State *l)
 					res->ResourceId = i;
 					type->ResInfo[i] = res;
 					res->ResourceStep = parent_type->ResInfo[i]->ResourceStep;
-					res->FinalResource = parent_type->ResInfo[i]->FinalResource;
-					res->FinalResourceConversionRate = parent_type->ResInfo[i]->FinalResourceConversionRate;
 					res->WaitAtResource = parent_type->ResInfo[i]->WaitAtResource;
 					res->WaitAtDepot = parent_type->ResInfo[i]->WaitAtDepot;
 					res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
@@ -1658,13 +1656,11 @@ static int CclDefineUnitType(lua_State *l)
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "resource-step")) {
 						res->ResourceStep = LuaToNumber(l, -1, k + 1);
-					} else if (!strcmp(value, "final-resource")) {
-						lua_rawgeti(l, -1, k + 1);
-						res->FinalResource = CclGetResourceByName(l);
-						lua_pop(l, 1);
 					//Wyrmgus start
-					} else if (!strcmp(value, "final-resource-conversion-rate")) {
-						res->FinalResourceConversionRate = LuaToNumber(l, -1, k + 1);
+//					} else if (!strcmp(value, "final-resource")) {
+//						lua_rawgeti(l, -1, k + 1);
+//						res->FinalResource = CclGetResourceByName(l);
+//						lua_pop(l, 1);
 					//Wyrmgus end
 					} else if (!strcmp(value, "wait-at-resource")) {
 						res->WaitAtResource = LuaToNumber(l, -1, k + 1);
@@ -1701,13 +1697,10 @@ static int CclDefineUnitType(lua_State *l)
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
-				if (!res->FinalResource) {
-					res->FinalResource = res->ResourceId;
-				}
 				//Wyrmgus start
-				if (!res->FinalResourceConversionRate) {
-					res->FinalResourceConversionRate = 100;
-				}
+//				if (!res->FinalResource) {
+//					res->FinalResource = res->ResourceId;
+//				}
 				//Wyrmgus end
 				Assert(res->ResourceId);
 				lua_pop(l, 1);

@@ -2231,6 +2231,8 @@ static int CclDefineDefaultResourceNames(lua_State *l)
 	//Wyrmgus start
 	//initialize these variables here, for lack of a better place
 	for (int i = 0; i < MaxCosts; ++i) {
+		DefaultResourceFinalResources[i] = i;
+		DefaultResourceFinalResourceConversionRates[i] = 100;
 		ResourceGrandStrategyBuildingVariations[i] = 0;
 	}
 	for (int i = 0; i < MaxCosts; ++i) {
@@ -2383,6 +2385,31 @@ static int CclSavedGameInfo(lua_State *l)
 	}
 	return 0;
 }
+
+//Wyrmgus start
+void SetResourceFinalResource(std::string resource_name, std::string final_resource_name)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	int final_resource = GetResourceIdByName(final_resource_name.c_str());
+	
+	if (resource == -1 || final_resource == -1) {
+		return;
+	}
+	
+	DefaultResourceFinalResources[resource] = final_resource;
+}
+
+void SetResourceFinalResourceConversionRate(std::string resource_name, int conversion_rate)
+{
+	int resource = GetResourceIdByName(resource_name.c_str());
+	
+	if (resource == -1) {
+		return;
+	}
+	
+	DefaultResourceFinalResourceConversionRates[resource] = conversion_rate;
+}
+//Wyrmgus end
 
 void LuaRegisterModules()
 {

@@ -385,7 +385,7 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 	//Wyrmgus end
 	//Wyrmgus start
 //	CUnit *mine = ResourceOnMap(pos, resource);
-	CUnit *mine = ResourceOnMap(pos, resource, z);
+	CUnit *mine = ResourceOnMap(pos, resource, z, false);
 	//Wyrmgus end
 	if (mine && IsAUsableMine(*mine)) {
 		//Wyrmgus start
@@ -395,14 +395,6 @@ VisitResult HallPlaceFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 			return VisitResult_Finished;
 		}
 	}
-	//Wyrmgus start
-	CUnit *deposit = ResourceOnMap(pos, resource, z, false);
-	if (deposit && IsAUsableMine(*deposit)) {
-		if (AiFindBuildingPlace2(worker, type, pos, deposit, true, resultPos, IgnoreExploration, z)) {
-			return VisitResult_Finished;
-		}
-	}
-	//Wyrmgus end
 	//Wyrmgus start
 //	if (CanMoveToMask(pos, movemask)) { // reachable
 	if (CanMoveToMask(pos, movemask, z)) { // reachable

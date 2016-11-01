@@ -41,4 +41,7 @@ class CUpgrade
 extern int GetResourceIdByName(const char *resourceName);
 extern std::string GetResourceNameById(int resource_id);
 extern std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strategy = false, bool multiline = false);
+
+extern void SetResourceFinalResource(std::string resource_name, std::string final_resource_name);
+extern void SetResourceFinalResourceConversionRate(std::string resource_name, int conversion_rate);
 //Wyrmgus end

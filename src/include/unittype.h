@@ -118,10 +118,11 @@ class ResourceInfo
 {
 public:
 	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
-		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
 		//Wyrmgus start
+//		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
+		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0),
 //		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
-		FinalResourceConversionRate(0), LoseResources(0),
+		LoseResources(0),
 		//Wyrmgus end
 		SpriteWhenLoaded(NULL), SpriteWhenEmpty(NULL)
 	{}
@@ -133,10 +134,11 @@ public:
 	int      ResourceCapacity;      /// Max amount of resources to carry.
 	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
-	unsigned FinalResource;         /// Convert resource when delivered.
+	//Wyrmgus start
+//	unsigned FinalResource;         /// Convert resource when delivered.
+	//Wyrmgus end
 	//Wyrmgus start
 //	unsigned char TerrainHarvester;    /// Unit will harvest terrain(wood only for now).
-	unsigned FinalResourceConversionRate;         /// Rate at which the resource is converted when delivered.
 	//Wyrmgus end
 	unsigned char LoseResources;       /// The unit will lose it's resource when distracted.
 	//Wyrmgus start

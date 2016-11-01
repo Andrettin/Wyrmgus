@@ -1301,11 +1301,12 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	}
 
 	// Update resource.
-	const int rindex = resinfo.FinalResource;
 	//Wyrmgus start
+//	const int rindex = resinfo.FinalResource;
 //	player.ChangeResource(rindex, (unit.ResourcesHeld * player.Incomes[rindex]) / 100, true);
 //	player.TotalResources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
-	int resource_change = unit.ResourcesHeld * resinfo.FinalResourceConversionRate / 100;
+	const int rindex = DefaultResourceFinalResources[this->CurrentResource];
+	int resource_change = unit.ResourcesHeld * DefaultResourceFinalResourceConversionRates[this->CurrentResource] / 100;
 	player.ChangeResource(rindex, (resource_change * player.Incomes[rindex]) / 100, true);
 	player.TotalResources[rindex] += (resource_change * player.Incomes[rindex]) / 100;
 	

@@ -406,6 +406,10 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 
 	CUnit *build = MakeUnit(const_cast<CUnitType &>(type), unit.Player);
 	
+	//Wyrmgus start
+	build->Name.clear(); // under construction buildings should have no proper name
+	//Wyrmgus end
+	
 	// If unable to make unit, stop, and report message
 	if (build == NULL) {
 		// FIXME: Should we retry this?

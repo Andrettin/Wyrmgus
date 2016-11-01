@@ -208,6 +208,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		}
 	}
 	//Wyrmgus end
+	
 	unit.Constructed = 0;
 	if (unit.Frame < 0) {
 		unit.Frame = -1;
@@ -361,6 +362,9 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	UpdateUnitSightRange(unit);
 	//Wyrmgus end
 	MapMarkUnitSight(unit);
+	//Wyrmgus start
+	unit.UpdatePersonalName();
+	//Wyrmgus end
 	order.Finished = true;
 }
 

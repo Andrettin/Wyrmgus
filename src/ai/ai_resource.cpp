@@ -1049,64 +1049,31 @@ static int AiAssignHarvesterFromUnit(CUnit &unit, int resource, int resource_ran
 	// Find a resource to harvest from.
 	//Wyrmgus start
 //	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, 1000, resource, true);
-	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true);
+	CUnit *mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, NULL, false);
 	//Wyrmgus end
 
 	if (mine) {
-		CommandResource(unit, *mine, FlushCommands);
-		return 1;
-	}
-	
-	//Wyrmgus start
-	//didn't find anything? see if there are resources which convert to this one
-	for (int c = 0; c < MaxCosts; ++c) {
-		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
-			mine = UnitFindResource(unit, depot ? *depot : unit, resource_range, c, true);
+		//Wyrmgus start
+//		CommandResource(unit, *mine, FlushCommands);
+//		return 1;
+		if (mine->Type->BoolFlag[CANHARVEST_INDEX].value) {
+			CommandResource(unit, *mine, FlushCommands);
+			return 1;
+		} else { // if the resource isn't readily harvestable (but is a deposit), build a mine there
+			const int n = AiHelpers.Refinery[resource - 1].size();
 
-			if (mine) {
-				CommandResource(unit, *mine, FlushCommands);
-				return 1;
-			}
-		}
-	}
-		
-	//if no readily-harvestable resources are available, search for deposits instead
-	CUnit *deposit = UnitFindResource(unit, depot ? *depot : unit, resource_range, resource, true, NULL, false);
-		
-	if (deposit) {
-		const int n = AiHelpers.Refinery[resource - 1].size();
+			for (int i = 0; i < n; ++i) {
+				CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
 
-		for (int i = 0; i < n; ++i) {
-			CUnitType &type = *AiHelpers.Refinery[resource - 1][i];
-
-			if (CanBuildUnitType(&unit, type, deposit->tilePos, 1, true, deposit->MapLayer)) {
-				CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands, deposit->MapLayer);
-				return 1;
-			}
-		}
-	}
-		
-	//didn't find anything? see if there are resource deposits which convert to this one
-	for (int c = 0; c < MaxCosts; ++c) {
-		if (unit.Type->ResInfo[c] && unit.Type->ResInfo[c]->FinalResource && unit.Type->ResInfo[c]->FinalResource == resource) {
-			deposit = UnitFindResource(unit, depot ? *depot : unit, resource_range, c, true, NULL, false);
-				
-			if (deposit) {
-				const int n = AiHelpers.Refinery[c - 1].size();
-
-				for (int i = 0; i < n; ++i) {
-					CUnitType &type = *AiHelpers.Refinery[c - 1][i];
-
-					if (CanBuildUnitType(&unit, type, deposit->tilePos, 1, true, deposit->MapLayer)) {
-						CommandBuildBuilding(unit, deposit->tilePos, type, FlushCommands, deposit->MapLayer);
-						return 1;
-					}
+				if (CanBuildUnitType(&unit, type, mine->tilePos, 1, true, mine->MapLayer)) {
+					CommandBuildBuilding(unit, mine->tilePos, type, FlushCommands, mine->MapLayer);
+					return 1;
 				}
 			}
 		}
+		//Wyrmgus end
 	}
-	//Wyrmgus end
-
+	
 	//Wyrmgus start
 	/*
 	int exploremask = 0;

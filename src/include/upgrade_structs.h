@@ -144,6 +144,8 @@ extern int DefaultResourceAmounts[MaxCosts];
 extern int DefaultResourceMaxAmounts[MaxCosts];
 
 //Wyrmgus start
+extern int DefaultResourceFinalResources[MaxCosts];
+extern int DefaultResourceFinalResourceConversionRates[MaxCosts];
 extern int DefaultResourcePrices[MaxCosts];
 extern int DefaultResourceLaborInputs[MaxCosts];
 extern int DefaultResourceOutputs[MaxCosts];
@@ -155,6 +157,9 @@ extern int GetResourceIdByName(const char *resourceName);
 extern int GetResourceIdByName(lua_State *l, const char *resourceName);
 //Wyrmgus start
 extern std::string GetResourceNameById(int resource_id);
+
+extern void SetResourceFinalResource(std::string resource_name, std::string final_resource_name);
+extern void SetResourceFinalResourceConversionRate(std::string resource_name, int conversion_rate);
 //Wyrmgus end
 
 /**
