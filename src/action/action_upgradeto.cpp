@@ -261,7 +261,7 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 		&& (
 			oldtype.PersonalNames != newtype.PersonalNames
 			|| (
-				!oldtype.Civilization.empty() && !newtype.Civilization.empty() && oldtype.Civilization != newtype.Civilization
+				oldtype.Civilization != -1 && newtype.Civilization != -1 && oldtype.Civilization != newtype.Civilization
 				&& (newtype.BoolFlag[ORGANIC_INDEX].value || (newtype.PersonalNames.size() == 0 && !newtype.BoolFlag[ORGANIC_INDEX].value && newtype.UnitType == UnitTypeNaval))
 			)
 		)

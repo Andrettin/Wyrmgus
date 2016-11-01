@@ -1907,7 +1907,11 @@ static int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Class")) {
 			type->Class = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			type->Civilization = LuaToString(l, -1);
+			std::string civilization_name = LuaToString(l, -1);
+			type->Civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+			if (type->Civilization == -1) {
+				LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
+			}
 		} else if (!strcmp(value, "Faction")) {
 			type->Faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -2121,8 +2125,8 @@ static int CclDefineUnitType(lua_State *l)
 			}
 		}
 		
-		if (!type->Civilization.empty()) {
-			int civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
+		if (type->Civilization != -1) {
+			int civilization_id = type->Civilization;
 			
 			if (!type->Faction.empty()) {
 				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, type->Faction);
@@ -2563,7 +2567,11 @@ static int CclGetUnitTypeData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		lua_pushstring(l, type->Civilization.c_str());
+		if (type->Civilization != -1) {
+			lua_pushstring(l, PlayerRaces.Name[type->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		lua_pushstring(l, type->Faction.c_str());

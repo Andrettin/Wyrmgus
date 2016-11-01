@@ -169,7 +169,7 @@ bool CUnitStats::operator != (const CUnitStats &rhs) const
 CUpgrade::CUpgrade(const std::string &ident) :
 	//Wyrmgus start
 //	Ident(ident), ID(0)
-	Ident(ident), ID(0), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
+	Ident(ident), ID(0), Civilization(-1), Ability(false), Weapon(false), Shield(false), Boots(false), Arrows(false), MagicPrefix(false), MagicSuffix(false), RunicAffix(false),UniqueOnly(false), Work(-1), Icon(NULL), Item(NULL), RevoltRiskModifier(0), AdministrativeEfficiencyModifier(0), MagicLevel(0), Year(0), Author(NULL)
 	//Wyrmgus end
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
@@ -374,7 +374,11 @@ static int CclDefineUpgrade(lua_State *l)
 		} else if (!strcmp(value, "Class")) {
 			upgrade->Class = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
-			upgrade->Civilization = LuaToString(l, -1);
+			std::string civilization_name = LuaToString(l, -1);
+			upgrade->Civilization = PlayerRaces.GetRaceIndexByName(civilization_name.c_str());
+			if (upgrade->Civilization == -1) {
+				LuaError(l, "Civilization \"%s\" doesn't exist." _C_ civilization_name.c_str());
+			}
 		} else if (!strcmp(value, "Faction")) {
 			upgrade->Faction = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
@@ -573,8 +577,8 @@ static int CclDefineUpgrade(lua_State *l)
 			class_id = UpgradeClasses.size();
 			UpgradeClasses.push_back(upgrade->Class);
 		}
-		if (!upgrade->Civilization.empty()) {
-			int civilization_id = PlayerRaces.GetRaceIndexByName(upgrade->Civilization.c_str());
+		if (upgrade->Civilization != -1) {
+			int civilization_id = upgrade->Civilization;
 			
 			if (!upgrade->Faction.empty()) {
 				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, upgrade->Faction);
@@ -589,8 +593,8 @@ static int CclDefineUpgrade(lua_State *l)
 		}
 	}
 	
-	if (upgrade->Work != -1 && !upgrade->Civilization.empty()) {
-		int civilization_id = PlayerRaces.GetRaceIndexByName(upgrade->Civilization.c_str());
+	if (upgrade->Work != -1 && upgrade->Civilization != -1) {
+		int civilization_id = upgrade->Civilization;
 		if (std::find(PlayerRaces.LiteraryWorks[civilization_id].begin(), PlayerRaces.LiteraryWorks[civilization_id].end(), upgrade) == PlayerRaces.LiteraryWorks[civilization_id].end()) {
 			PlayerRaces.LiteraryWorks[civilization_id].push_back(upgrade);
 		}
@@ -962,7 +966,11 @@ static int CclGetUpgradeData(lua_State *l)
 		lua_pushstring(l, upgrade->Class.c_str());
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
-		lua_pushstring(l, upgrade->Civilization.c_str());
+		if (upgrade->Civilization != -1) {
+			lua_pushstring(l, PlayerRaces.Name[upgrade->Civilization].c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 		return 1;
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, upgrade->Description.c_str());
@@ -1541,8 +1549,8 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		player.SpeedResearch -= um->SpeedResearch;
 	}
 	//Wyrmgus start
-	if (um->ChangeCivilizationTo != -1 && GameRunning && PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str()) != player.Race) {
-		player.SetCivilization(PlayerRaces.GetRaceIndexByName(AllUpgrades[um->UpgradeId]->Civilization.c_str())); // restore old civilization
+	if (um->ChangeCivilizationTo != -1 && GameRunning && AllUpgrades[um->UpgradeId]->Civilization != player.Race) {
+		player.SetCivilization(AllUpgrades[um->UpgradeId]->Civilization); // restore old civilization
 	}
 	//Wyrmgus end
 
@@ -2575,7 +2583,7 @@ std::string GetUpgradeEffectsString(std::string upgrade_ident, bool grand_strate
 				upgrade_effects_string += padding_string;
 				upgrade_effects_string += "Allows building of Roads";
 				
-				int civilization_id = PlayerRaces.GetRaceIndexByName(upgrade->Civilization.c_str());
+				int civilization_id = upgrade->Civilization;
 				int faction_id = PlayerRaces.GetFactionIndexByName(civilization_id, upgrade->Faction);
 				int stronghold_id = PlayerRaces.GetFactionClassUnitType(civilization_id, faction_id, GetUnitTypeClassIndexByName("stronghold"));
 				if (stronghold_id != -1) {

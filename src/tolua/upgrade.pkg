@@ -6,7 +6,6 @@ class CUpgrade
 	std::string Name;
 	//Wyrmgus start
 	std::string Class;
-	std::string Civilization;
 	std::string Faction;
 	std::string Description;
 	std::string Quote;

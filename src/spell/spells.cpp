@@ -243,7 +243,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		}
 	}
 	if (condition->FactionEquivalent != NULL) {
-		if (caster.Type->Civilization.empty() || caster.Type->Civilization != PlayerRaces.Name[condition->FactionEquivalent->Civilization] || PlayerRaces.GetFactionClassUnitType(condition->FactionEquivalent->Civilization, condition->FactionEquivalent->ID, GetUnitTypeClassIndexByName(caster.Type->Class)) == -1) {
+		if (caster.Type->Civilization == -1 || caster.Type->Civilization != condition->FactionEquivalent->Civilization || PlayerRaces.GetFactionClassUnitType(condition->FactionEquivalent->Civilization, condition->FactionEquivalent->ID, GetUnitTypeClassIndexByName(caster.Type->Class)) == -1) {
 			return false;
 		}
 	}

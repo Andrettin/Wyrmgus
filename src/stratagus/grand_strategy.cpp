@@ -1191,7 +1191,7 @@ void CGrandStrategyGame::DoTurn()
 			continue;
 		}
 		
-		int civilization = PlayerRaces.GetRaceIndexByName(this->UnpublishedWorks[i]->Civilization.c_str());
+		int civilization = this->UnpublishedWorks[i]->Civilization;
 		if (
 			(author != NULL && author->ProvinceOfOrigin != NULL)
 			|| (civilization != -1 && this->CultureProvinces.find(civilization) != this->CultureProvinces.end() && this->CultureProvinces[civilization].size() > 0)
@@ -2534,7 +2534,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				if (
 					IsGrandStrategyUnit(*UnitTypes[i])
 					&& !UnitTypes[i]->Class.empty()
-					&& !UnitTypes[i]->Civilization.empty()
+					&& UnitTypes[i]->Civilization != -1
 					&& !UnitTypes[i]->Faction.empty()
 					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
 					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
@@ -2544,7 +2544,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					this->UnderConstructionUnits[PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
 					this->SetUnitQuantity(i, 0);
 					this->UnderConstructionUnits[i] = 0;
-				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && !UnitTypes[i]->Civilization.empty() && !UnitTypes[i]->Faction.empty()) {
+				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1 && !UnitTypes[i]->Faction.empty()) {
 					if (this->SettlementBuildings[i] && PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
 						this->SetSettlementBuilding(i, false); // remove building from other civilization
 						if (PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
@@ -2574,7 +2574,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				this->OffensiveMilitaryScore += this->Units[i] * new_owner_military_score_bonus - old_owner_military_score_bonus;
 			}
 		} else if (UnitTypes[i]->Class == "worker") {
-			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(PlayerRaces.GetRaceIndexByName(UnitTypes[i]->Civilization.c_str()), GetUnitTypeClassIndexByName("militia"));
+			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(UnitTypes[i]->Civilization, GetUnitTypeClassIndexByName("militia"));
 			if (militia_unit_type != -1) {
 				int old_owner_military_score_bonus = (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0);
 				int new_owner_military_score_bonus = (faction_id != -1 ? GrandStrategyGame.Factions[civilization_id][faction_id]->MilitaryScoreBonus[militia_unit_type] : 0);
@@ -2611,7 +2611,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				if (
 					IsGrandStrategyUnit(*UnitTypes[i])
 					&& !UnitTypes[i]->Class.empty()
-					&& !UnitTypes[i]->Civilization.empty()
+					&& UnitTypes[i]->Civilization != -1
 					&& UnitTypes[i]->Faction.empty()
 					&& PlayerRaces.GetCivilizationClassUnitType(this->Civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
 					&& PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
@@ -2621,7 +2621,7 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 					this->UnderConstructionUnits[PlayerRaces.GetFactionClassUnitType(this->Owner->Civilization, this->Owner->Faction, GetUnitTypeClassIndexByName(UnitTypes[i]->Class))] += this->UnderConstructionUnits[i];
 					this->SetUnitQuantity(i, 0);
 					this->UnderConstructionUnits[i] = 0;
-				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && !UnitTypes[i]->Civilization.empty() && UnitTypes[i]->Faction.empty()) {
+				} else if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1 && UnitTypes[i]->Faction.empty()) {
 					if (this->SettlementBuildings[i] && this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
 						this->SetSettlementBuilding(i, false); // remove building from other civilization
 						if (this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
@@ -2769,7 +2769,7 @@ void CGrandStrategyProvince::SetCivilization(int civilization)
 		
 		for (size_t i = 0; i < UnitTypes.size(); ++i) {
 			// replace existent buildings from other civilizations with buildings of the new civilization
-			if (IsGrandStrategyBuilding(*UnitTypes[i]) && !UnitTypes[i]->Civilization.empty()) {
+			if (IsGrandStrategyBuilding(*UnitTypes[i]) && UnitTypes[i]->Civilization != -1) {
 				if (this->SettlementBuildings[i] && this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != i) {
 					this->SetSettlementBuilding(i, false); // remove building from other civilization
 					if (this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1) {
@@ -2780,7 +2780,7 @@ void CGrandStrategyProvince::SetCivilization(int civilization)
 			} else if (
 				IsGrandStrategyUnit(*UnitTypes[i])
 				&& !UnitTypes[i]->Class.empty()
-				&& !UnitTypes[i]->Civilization.empty()
+				&& UnitTypes[i]->Civilization != -1
 				&& PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) == i
 				&& this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != -1
 				&& this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[i]->Class)) // don't replace if both civilizations use the same unit type
@@ -2816,7 +2816,7 @@ void CGrandStrategyProvince::SetSettlementBuilding(int building_id, bool has_set
 	}
 	
 	//if this province has an equivalent building for its civilization/faction, use that instead
-	if (!UnitTypes[building_id]->Civilization.empty()) {
+	if (UnitTypes[building_id]->Civilization != -1) {
 		if (this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[building_id]->Class)) != building_id && this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[building_id]->Class)) != -1) {
 			building_id = this->GetClassUnitType(GetUnitTypeClassIndexByName(UnitTypes[building_id]->Class));
 		}
@@ -2963,7 +2963,7 @@ void CGrandStrategyProvince::SetUnitQuantity(int unit_type_id, int quantity)
 		this->TotalWorkers += change;
 		
 		//if this unit's civilization can change workers into militia, add half of the militia's points to the military score (one in every two workers becomes a militia when the province is attacked)
-		int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(PlayerRaces.GetRaceIndexByName(UnitTypes[unit_type_id]->Civilization.c_str()), GetUnitTypeClassIndexByName("militia"));
+		int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(UnitTypes[unit_type_id]->Civilization, GetUnitTypeClassIndexByName("militia"));
 		if (militia_unit_type != -1) {
 			this->MilitaryScore += change * ((UnitTypes[militia_unit_type]->DefaultStat.Variables[POINTS_INDEX].Value + (this->Owner != NULL ? this->Owner->MilitaryScoreBonus[militia_unit_type] : 0)) / 2);
 		}
@@ -3970,7 +3970,7 @@ CGrandStrategyHero *CGrandStrategyProvince::GenerateHero(std::string type, CGran
 		return NULL;
 	}
 	
-	int type_civilization = PlayerRaces.GetRaceIndexByName(UnitTypes[unit_type_id]->Civilization.c_str());
+	int type_civilization = UnitTypes[unit_type_id]->Civilization;
 	if (type_civilization != civilization && PlayerRaces.Species[type_civilization] != PlayerRaces.Species[civilization]) { // if the type civilization and the civilization have different species, use the type civilization instead
 		civilization = type_civilization;
 	}
@@ -4349,10 +4349,10 @@ void CGrandStrategyFaction::FormFaction(int civilization, int faction)
 				for (size_t j = 0; j < UnitTypes.size(); ++j) {
 					if (
 						!UnitTypes[j]->Class.empty()
-						&& !UnitTypes[j]->Civilization.empty()
+						&& UnitTypes[j]->Civilization != -1
 						&& !UnitTypes[j]->BoolFlag[BUILDING_INDEX].value
 						&& UnitTypes[j]->DefaultStat.Variables[DEMAND_INDEX].Value > 0
-						&& UnitTypes[j]->Civilization == PlayerRaces.Name[old_civilization]
+						&& UnitTypes[j]->Civilization == old_civilization
 						&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != -1
 						&& PlayerRaces.GetCivilizationClassUnitType(new_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) != PlayerRaces.GetCivilizationClassUnitType(old_civilization, GetUnitTypeClassIndexByName(UnitTypes[j]->Class)) // don't replace if both civilizations use the same unit type
 					) {
@@ -8415,9 +8415,9 @@ void CreateProvinceUnits(std::string province_name, int player, int divisor, boo
 				units_to_be_created = GrandStrategyGame.Provinces[province_id]->GetAttackingUnitQuantity(i) / divisor;
 				GrandStrategyGame.Provinces[province_id]->ChangeAttackingUnitQuantity(i, - units_to_be_created);
 			}
-		} else if (!attacking_units && UnitTypes[i]->Class == "worker" && !ignore_militia && !UnitTypes[i]->Civilization.empty()) { // create militia in the province depending on the amount of workers
+		} else if (!attacking_units && UnitTypes[i]->Class == "worker" && !ignore_militia && UnitTypes[i]->Civilization != -1) { // create militia in the province depending on the amount of workers
 			
-			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(PlayerRaces.GetRaceIndexByName(UnitTypes[i]->Civilization.c_str()), GetUnitTypeClassIndexByName("militia"));
+			int militia_unit_type = PlayerRaces.GetCivilizationClassUnitType(UnitTypes[i]->Civilization, GetUnitTypeClassIndexByName("militia"));
 			
 			if (militia_unit_type != -1) {
 				units_to_be_created = GrandStrategyGame.Provinces[province_id]->Units[militia_unit_type] / 2 / divisor; //half of the worker population as militia

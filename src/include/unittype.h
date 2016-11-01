@@ -846,7 +846,7 @@ public:
 	//Wyrmgus start
 	std::string Parent;				/// Parent unit type
 	std::string Class;				/// Class identifier (i.e. infantry, archer, etc.)
-	std::string Civilization;		/// Which civilization this unit belongs to, if any
+	int Civilization;				/// Which civilization this unit belongs to, if any
 	std::string Faction;			/// Which faction this unit belongs to, if any
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type

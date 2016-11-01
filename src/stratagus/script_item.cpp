@@ -251,7 +251,7 @@ static int CclGetUniqueItemData(lua_State *l)
 				std::find(UnitTypes[i]->Drops.begin(), UnitTypes[i]->Drops.end(), item->Type) != UnitTypes[i]->Drops.end()
 				|| std::find(UnitTypes[i]->AiDrops.begin(), UnitTypes[i]->AiDrops.end(), item->Type) != UnitTypes[i]->AiDrops.end()
 			) {
-				int dropper_civilization = PlayerRaces.GetRaceIndexByName(UnitTypes[i]->Civilization.c_str());
+				int dropper_civilization = UnitTypes[i]->Civilization;
 				if (
 					(item->Prefix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Prefix) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Prefix) != item->Type->Affixes.end())
 					&& (item->Suffix == NULL || std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), item->Suffix) != UnitTypes[i]->DropAffixes.end() || std::find(item->Type->Affixes.begin(), item->Type->Affixes.end(), item->Suffix) != item->Type->Affixes.end())

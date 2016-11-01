@@ -1165,8 +1165,8 @@ void CUnit::ChooseButtonIcon(int button_action)
 		return;
 	}
 	
-	if (!this->Type->Civilization.empty()) {
-		int civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+	if (this->Type->Civilization != -1) {
+		int civilization = this->Type->Civilization;
 		int faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
 		
 		if (faction == -1 && this->Player->Race == civilization) {
@@ -1690,7 +1690,7 @@ void CUnit::GenerateDrop()
 		return;
 	}
 	
-	int dropper_civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+	int dropper_civilization = this->Type->Civilization;
 	int dropper_faction = -1;
 	if (dropper_civilization != -1 && !this->Type->Faction.empty()) {
 		dropper_faction = PlayerRaces.GetFactionIndexByName(dropper_civilization, this->Type->Faction);
@@ -1878,7 +1878,7 @@ void CUnit::GenerateWork(CUnit *dropper)
 			}
 		}
 		
-		int dropper_civilization = PlayerRaces.GetRaceIndexByName(dropper->Type->Civilization.c_str());
+		int dropper_civilization = dropper->Type->Civilization;
 		if (dropper_civilization != -1) {
 			for (size_t i = 0; i < PlayerRaces.LiteraryWorks[dropper_civilization].size(); ++i) {
 				if (this->Type->ItemClass != -1 && PlayerRaces.LiteraryWorks[dropper_civilization][i]->Work == this->Type->ItemClass && !PlayerRaces.LiteraryWorks[dropper_civilization][i]->UniqueOnly) {
@@ -1895,7 +1895,7 @@ void CUnit::GenerateWork(CUnit *dropper)
 
 void CUnit::GenerateUnique(CUnit *dropper)
 {
-	int dropper_civilization = dropper != NULL ? PlayerRaces.GetRaceIndexByName(dropper->Type->Civilization.c_str()) : -1;
+	int dropper_civilization = dropper != NULL ? dropper->Type->Civilization : -1;
 	
 	std::vector<CUniqueItem *> potential_uniques;
 	for (size_t i = 0; i < UniqueItems.size(); ++i) {
@@ -1943,7 +1943,7 @@ void CUnit::UpdateSoldUnits()
 	
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL && !GrandStrategy) { // allow heroes to be recruited at town halls
-		int civilization_id = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+		int civilization_id = this->Type->Civilization;
 		for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 			if (!iterator->second->Persistent || iterator->second->Deity != NULL) {
 				continue;
@@ -2746,7 +2746,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 		return;
 	}
 	
-	int civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+	int civilization = this->Type->Civilization;
 	int faction = -1;
 	if (civilization != -1 && !this->Type->Faction.empty()) {
 		faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
@@ -2784,7 +2784,7 @@ void CUnit::UpdateSettlementName()
 	if (this->Type->BoolFlag[TOWNHALL_INDEX].value) {
 		std::string old_settlement_name = this->SettlementName;
 		
-		int civilization = PlayerRaces.GetRaceIndexByName(this->Type->Civilization.c_str());
+		int civilization = this->Type->Civilization;
 		int faction = -1;
 		if (civilization != -1 && !this->Type->Faction.empty()) {
 			faction = PlayerRaces.GetFactionIndexByName(civilization, this->Type->Faction);
@@ -5083,7 +5083,7 @@ bool CUnit::CanLearnAbility(CUpgrade *ability) const
 bool CUnit::CanHireMercenary(CUnitType *type, int civilization_id) const
 {
 	if (civilization_id == -1) {
-		civilization_id = PlayerRaces.GetRaceIndexByName(type->Civilization.c_str());
+		civilization_id = type->Civilization;
 	}
 	for (int p = 0; p < PlayerMax; ++p) {
 		if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && civilization_id == Players[p].Race && CheckDependByType(Players[p], *type, true) && Players[p].StartMapLayer == this->MapLayer) {
