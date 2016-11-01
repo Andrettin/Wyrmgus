@@ -266,7 +266,8 @@ int TransformUnitIntoType(CUnit &unit, const CUnitType &newtype)
 			)
 		)
 	) {
-		unit.UpdatePersonalName();
+		bool update_settlement_name = oldtype.Civilization != newtype.Civilization || oldtype.Faction != newtype.Faction;
+		unit.UpdatePersonalName(update_settlement_name);
 	}
 	//Wyrmgus end
 

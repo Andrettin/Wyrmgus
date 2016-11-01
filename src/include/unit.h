@@ -172,7 +172,7 @@ public:
 	//Wyrmgus start
 	void UpdateContainerAttackRange();
 	void UpdateXPRequired();
-	void UpdatePersonalName();
+	void UpdatePersonalName(bool update_settlement_name = true);
 	void UpdateSettlementName();
 	void XPChanged();
 	//Wyrmgus end

@@ -2737,7 +2737,7 @@ void CUnit::UpdateXPRequired()
 	this->Variable[XP_INDEX].Enable = 1;
 }
 
-void CUnit::UpdatePersonalName()
+void CUnit::UpdatePersonalName(bool update_settlement_name)
 {
 	if (this->Character != NULL) {
 		return;
@@ -2770,7 +2770,7 @@ void CUnit::UpdatePersonalName()
 		}
 	}
 	
-	if (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && this->SettlementName.empty())) {
+	if (update_settlement_name && (this->Type->BoolFlag[TOWNHALL_INDEX].value || (this->Type->BoolFlag[BUILDING_INDEX].value && this->SettlementName.empty()))) {
 		this->UpdateSettlementName();
 	}
 }
@@ -2992,7 +2992,7 @@ void CUnit::Place(const Vec2i &pos, int z)
 	}
 
 	//Wyrmgus start
-	if (this->Type->BoolFlag[BUILDING_INDEX].value && (!this->Type->BoolFlag[TOWNHALL_INDEX].value || !this->Constructed)) {
+	if (this->Type->BoolFlag[BUILDING_INDEX].value && (!this->Type->BoolFlag[TOWNHALL_INDEX].value || (!this->Constructed && this->SettlementName.empty()))) {
 		this->UpdateSettlementName(); // update the settlement name of a building when placing it
 	}
 	
@@ -5403,7 +5403,6 @@ void LetUnitDie(CUnit &unit, bool suicide)
 	MapMarkUnitSight(unit);
 	
 	//Wyrmgus start
-	/*
 	if (type->BoolFlag[TOWNHALL_INDEX].value) {
 		for (int i = 0; i < unit.Player->GetUnitCount(); ++i) {
 			CUnit *settlement_unit = &unit.Player->GetUnit(i);
@@ -5413,7 +5412,6 @@ void LetUnitDie(CUnit &unit, bool suicide)
 			settlement_unit->UpdateSettlementName();
 		}
 	}
-	*/
 	//Wyrmgus end
 }
 
