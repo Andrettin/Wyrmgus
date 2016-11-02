@@ -244,7 +244,6 @@ static const char MAGICLEVEL_KEY[] = "MagicLevel";
 static const char TRANSPARENCY_KEY[] = "Transparency";
 static const char GENDER_KEY[] = "Gender";
 static const char BIRTHCYCLE_KEY[] = "BirthCycle";
-static const char HUNGER_KEY[] = "Hunger";
 static const char STUN_KEY[] = "Stun";
 static const char BLEEDING_KEY[] = "Bleeding";
 static const char LEADERSHIP_KEY[] = "Leadership";
@@ -325,7 +324,7 @@ CUnitTypeVar::CVariableKeys::CVariableKeys()
 							   BACKSTAB_KEY, BONUSAGAINSTMOUNTED_KEY, BONUSAGAINSTBUILDINGS_KEY, BONUSAGAINSTAIR_KEY, BONUSAGAINSTGIANTS_KEY,
 							   BONUSAGAINSTDRAGONS_KEY,
 							   DAYSIGHTRANGEBONUS_KEY, NIGHTSIGHTRANGEBONUS_KEY, KNOWLEDGEMAGIC_KEY, KNOWLEDGEWARFARE_KEY,
-							   MAGICLEVEL_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY, HUNGER_KEY,
+							   MAGICLEVEL_KEY, TRANSPARENCY_KEY, GENDER_KEY, BIRTHCYCLE_KEY,
 							   STUN_KEY, BLEEDING_KEY, LEADERSHIP_KEY, INSPIRE_KEY, PRECISION_KEY, REGENERATION_KEY, TERROR_KEY, TIMEEFFICIENCYBONUS_KEY, DISEMBARKMENTBONUS_KEY, LEADERSHIPAURA_KEY, REGENERATIONAURA_KEY, ETHEREALVISION_KEY
 //Wyrmgus end
 							  };
@@ -706,7 +705,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
 			type->RandomMovementProbability = parent_type->RandomMovementProbability;
 			type->RandomMovementDistance = parent_type->RandomMovementDistance;
-			type->Excrement = parent_type->Excrement;
 			type->Icon.Name = parent_type->Icon.Name;
 			type->Icon.Icon = NULL;
 			if (!type->Icon.Name.empty()) {
@@ -1945,8 +1943,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->TrainQuantity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Upkeep")) {
 			type->Upkeep = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Excrement")) {
-			type->Excrement = LuaToString(l, -1);
 		} else if (!strcmp(value, "SoldUnits")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -2664,9 +2660,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.UnitStock[unit_type_id]);
 		}
-		return 1;
-	} else if (!strcmp(data, "Excrement")) {
-		lua_pushstring(l, type->Excrement.c_str());
 		return 1;
 	} else if (!strcmp(data, "TechnologyPointCost")) {
 		lua_pushnumber(l, type->TechnologyPointCost);
@@ -3574,7 +3567,7 @@ void UpdateUnitVariables(CUnit &unit)
 			|| i == BACKSTAB_INDEX || i == BONUSAGAINSTMOUNTED_INDEX || i == BONUSAGAINSTBUILDINGS_INDEX || i == BONUSAGAINSTAIR_INDEX || i == BONUSAGAINSTGIANTS_INDEX || i == BONUSAGAINSTDRAGONS_INDEX
 			|| i == DAYSIGHTRANGEBONUS_INDEX || i == NIGHTSIGHTRANGEBONUS_INDEX
 			|| i == KNOWLEDGEMAGIC_INDEX || i == KNOWLEDGEWARFARE_INDEX
-			|| i == MAGICLEVEL_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX || i == HUNGER_INDEX
+			|| i == MAGICLEVEL_INDEX || i == TRANSPARENCY_INDEX || i == GENDER_INDEX || i == BIRTHCYCLE_INDEX
 			|| i == STUN_INDEX || i == BLEEDING_INDEX || i == LEADERSHIP_INDEX || i == INSPIRE_INDEX || i == PRECISION_INDEX || i == REGENERATION_INDEX || i == TERROR_INDEX || i == TIMEEFFICIENCYBONUS_INDEX
 			|| i == DISEMBARKMENTBONUS_INDEX || i == LEADERSHIPAURA_INDEX || i == REGENERATIONAURA_INDEX || i == ETHEREALVISION_INDEX) {
 			//Wyrmgus end
@@ -3604,12 +3597,6 @@ void UpdateUnitVariables(CUnit &unit)
 	if (unit.Variable[BIRTHCYCLE_INDEX].Value && (GameCycle - unit.Variable[BIRTHCYCLE_INDEX].Value) > 1000 && unit.Type->Species != NULL && !unit.Type->Species->ChildUpgrade.empty()) { // 1000 cycles until maturation, for all species (should change this to have different maturation times for different species)
 		unit.Variable[BIRTHCYCLE_INDEX].Value = 0;
 		IndividualUpgradeLost(unit, CUpgrade::Get(unit.Type->Species->ChildUpgrade));
-	}
-
-	if (unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->BoolFlag[FAUNA_INDEX].value) { // only fauna can have a hunger value
-		unit.Variable[HUNGER_INDEX].Enable = 1;
-		unit.Variable[HUNGER_INDEX].Max = 1000;
-		unit.Variable[HUNGER_INDEX].Increase = 1;
 	}
 	//Wyrmgus end
 

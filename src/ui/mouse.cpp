@@ -422,7 +422,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit
 		//Wyrmgus start
 //		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || dest->Player->Index == PlayerNumNeutral)) {
-		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || (dest->Player->Index == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value && !dest->Type->BoolFlag[FAUNA_INDEX].value))) {
+		&& (dest->Player == unit.Player || unit.IsAllied(*dest) || (dest->Player->Index == PlayerNumNeutral && !unit.IsEnemy(*dest) && !dest->Type->BoolFlag[OBSTACLE_INDEX].value))) {
 		//Wyrmgus end
 		dest->Blink = 4;
 		if (!acknowledged) {
@@ -444,7 +444,7 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	}
 	//Wyrmgus start
 	// make workers attack enemy units if those are right-clicked upon
-	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value || dest->Type->BoolFlag[FAUNA_INDEX].value)) { //fauna is attacked as the default right-click action
+	if (UnitUnderCursor != NULL && dest != NULL && dest != &unit && unit.CurrentAction() != UnitActionBuilt && (unit.IsEnemy(*dest) || dest->Type->BoolFlag[OBSTACLE_INDEX].value)) {
 		dest->Blink = 4;
 		if (!acknowledged) {
 			PlayUnitSound(unit, VoiceAttack);
@@ -483,7 +483,7 @@ static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos,
 
 	//Wyrmgus start
 //	if (action == MouseActionSpellCast || unit.IsEnemy(dest)) {
-	if (action == MouseActionSpellCast || unit.IsEnemy(dest) || dest.Type->BoolFlag[OBSTACLE_INDEX].value || dest.Type->BoolFlag[FAUNA_INDEX].value) { //fauna is attacked as the default right-click action
+	if (action == MouseActionSpellCast || unit.IsEnemy(dest) || dest.Type->BoolFlag[OBSTACLE_INDEX].value) {
 	//Wyrmgus end
 		dest.Blink = 4;
 		if (!acknowledged) {
@@ -1428,7 +1428,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 					}
 				//Wyrmgus start
 //				} else if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
-				} else if (ThisPlayer->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value || UnitUnderCursor->Type->BoolFlag[FAUNA_INDEX].value) {
+				} else if (ThisPlayer->IsEnemy(*UnitUnderCursor) || (UnitUnderCursor->Player->Type == PlayerNeutral && UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value) {
 				//Wyrmgus end
 					if (CustomCursor.length() && CursorByIdent(CustomCursor)) {
 						GameCursor = CursorByIdent(CustomCursor);
@@ -1459,7 +1459,7 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 //			GameCursor = UI.Glass.Cursor;
 			if (
 				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer && UnitUnderCursor->Player != ThisPlayer
-				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value || UnitUnderCursor->Type->BoolFlag[FAUNA_INDEX].value) && (UnitUnderCursor->Player->Index != PlayerNumNeutral || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value || UnitUnderCursor->Type->BoolFlag[FAUNA_INDEX].value)
+				&& (Selected[0]->IsEnemy(*UnitUnderCursor) || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value || (UnitUnderCursor->Player->Type == PlayerNeutral && UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value)) && (UnitUnderCursor->Player->Index != PlayerNumNeutral || UnitUnderCursor->Type->BoolFlag[PREDATOR_INDEX].value || UnitUnderCursor->Type->BoolFlag[OBSTACLE_INDEX].value)
 			) {
 				GameCursor = UI.RedHair.Cursor;
 			} else if (

@@ -270,170 +270,6 @@ static bool MoveRandomly(CUnit &unit)
 
 //Wyrmgus start
 /**
-**  Feed
-**
-**  @return  true if the unit feeds, false otherwise
-*/
-static bool Feed(CUnit &unit)
-{
-	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
-		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value //only for fauna
-		|| unit.Variable[HUNGER_INDEX].Value < 250 //don't feed if not hungry enough
-		|| SyncRand(100) > unit.Type->RandomMovementProbability
-	) {
-		return false;
-	}
-
-	// look for nearby food
-	std::vector<CUnit *> table;
-	SelectAroundUnit(unit, unit.CurrentSightRange, table);
-
-	for (size_t i = 0; i != table.size(); ++i) {
-		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
-			if (
-				unit.CanEat(*table[i])
-				&& (table[i]->Type->BoolFlag[DIMINUTIVE_INDEX].value || table[i]->Type->BoolFlag[DECORATION_INDEX].value || table[i]->Type->BoolFlag[ITEM_INDEX].value || table[i]->Type->BoolFlag[POWERUP_INDEX].value || table[i]->CurrentAction() == UnitActionDie)
-			) {
-				int distance = unit.MapDistanceTo(table[i]->tilePos, table[i]->MapLayer);
-				int reach = 1;
-				if (table[i]->Type->BoolFlag[DIMINUTIVE_INDEX].value || unit.Type->BoolFlag[DIMINUTIVE_INDEX].value || table[i]->CurrentAction() == UnitActionDie) {
-					reach = 0;
-				}
-				if (reach < distance) {
-					if (reach == 0 && !UnitCanBeAt(unit, table[i]->tilePos, table[i]->MapLayer)) {
-						continue;
-					}
-					CommandMove(unit, table[i]->tilePos, FlushCommands, table[i]->MapLayer);
-				} else {
-					if (!table[i]->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value && !unit.Type->BoolFlag[DIMINUTIVE_INDEX].value) { //if food is non-indestructible, and isn't too tiny to consume the food, kill the food object
-						if (table[i]->IsAlive()) {
-							LetUnitDie(*table[i]);
-						}
-					}
-					unit.Variable[HUNGER_INDEX].Value = 0;
-				}
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-/**
-**  Excrete
-**
-**  @return  true if the unit excretes, false otherwise
-*/
-static bool Excrete(CUnit &unit)
-{
-	if (!unit.Type->BoolFlag[ORGANIC_INDEX].value
-		|| unit.Type->Excrement.empty()
-		|| unit.Variable[HUNGER_INDEX].Value > 100 //only excrete if well-fed
-		|| ((SyncRand() % 500) >= 1)
-		|| (unit.Player->Type != PlayerNeutral && (SyncRand() % 10) >= 1) //since non-fauna units (i.e. cavalry) don't get hungry, there needs to be an extra limitation, to make them not excrete too often
-	) {
-		return false;
-	}
-
-	Vec2i pos = unit.tilePos;
-
-	/*
-	if (unit.Direction == LookingN) {
-		pos.y += 1;
-	} else if (unit.Direction == LookingNE) {
-		pos.x -= 1;
-		pos.y += 1;
-	} else if (unit.Direction == LookingE) {
-		pos.x -= 1;
-	} else if (unit.Direction == LookingSE) {
-		pos.x -= 1;
-		pos.y -= 1;
-	} else if (unit.Direction == LookingS) {
-		pos.y -= 1;
-	} else if (unit.Direction == LookingSW) {
-		pos.x += 1;
-		pos.y -= 1;
-	} else if (unit.Direction == LookingW) {
-		pos.x += 1;
-	} else if (unit.Direction == LookingNW) {
-		pos.x += 1;
-		pos.y += 1;
-	}
-	*/
-
-	// restrict to map
-	Map.Clamp(pos, unit.MapLayer);
-	
-	CUnit *newUnit = MakeUnitAndPlace(pos, *UnitTypeByIdent(unit.Type->Excrement), &Players[PlayerNumNeutral], unit.MapLayer);
-	newUnit->Direction = unit.Direction;
-	UnitUpdateHeading(*newUnit);
-	return true;
-}
-
-/**
-**  Seek shelter at night or 
-**
-**  @return  true if the unit is now sheltered (or if exited a shelter), false otherwise
-*/
-static bool SeekShelter(CUnit &unit)
-{
-	if (
-		!unit.Type->BoolFlag[ORGANIC_INDEX].value
-		|| unit.Player->Type != PlayerNeutral || !unit.Type->BoolFlag[FAUNA_INDEX].value || unit.Type->Species == NULL //only for fauna
-		|| SyncRand(100) > unit.Type->RandomMovementProbability
-	) {
-		return false;
-	}
-	
-	bool seek_shelter = false;
-	
-	if (unit.Variable[HUNGER_INDEX].Value < 500) { // seek shelter if not hungry
-		seek_shelter = true;
-	}
-	if (unit.Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value > 0 || unit.Variable[DAYSIGHTRANGEBONUS_INDEX].Value < 0) { // if the unit can see better at night than during the day, then it is a nocturnal creature
-		if (Map.TimeOfDay[unit.MapLayer] == MorningTimeOfDay || Map.TimeOfDay[unit.MapLayer] == MiddayTimeOfDay || Map.TimeOfDay[unit.MapLayer] == AfternoonTimeOfDay) { // nocturnal creatures should seek shelter if daylight is shining
-			seek_shelter = true;
-		}
-	} else { // for diurnal creatures, seek shelter when the sky is dark
-		if (Map.TimeOfDay[unit.MapLayer] == FirstWatchTimeOfDay || Map.TimeOfDay[unit.MapLayer] == MidnightTimeOfDay || Map.TimeOfDay[unit.MapLayer] == SecondWatchTimeOfDay) {
-			seek_shelter = true;
-		}
-	}
-	
-	if (seek_shelter == (unit.Removed)) {
-		return false; // if unit is seeking shelter it is already sheltered, or if isn't seeking shelter is already outside
-	}
-	
-	if (unit.Removed) { // if the unit is removed and should exit its shelter
-		if (unit.Container != NULL) {
-			CommandUnload(*unit.Container, unit.Container->tilePos, &unit, FlushCommands, unit.Container->MapLayer);
-			return true;
-		}
-	}
-
-	std::vector<CUnit *> table;
-	SelectAroundUnit(unit, unit.CurrentSightRange, table, HasSamePlayerAs(*unit.Player));
-
-	for (size_t i = 0; i != table.size(); ++i) {
-		if (!table[i]->Removed && UnitReachable(unit, *table[i], unit.CurrentSightRange)) {
-			if (CanTransport(*table[i], unit)) {
-				std::vector<CUnit *> second_table;
-				SelectAroundUnit(*table[i], 3, second_table, HasNotSamePlayerAs(*unit.Player));
-
-				if (second_table.size() > 0) { // don't enter the shelter if there's a person nearby
-					continue;
-				}
-				
-				CommandBoard(unit, *table[i], FlushCommands);
-				return true;
-			}
-		}
-	}
-	
-	return false;
-}
-
-/**
 **  Check if the unit's container has an adjacent unit owned by another non-neutral player
 **
 **  @return  true if the unit is now sheltered (or if exited a shelter), false otherwise
@@ -698,12 +534,7 @@ bool AutoAttack(CUnit &unit)
 //		&& (unit.Container == NULL || unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value == false)) {
 		&& (unit.Container == NULL || !unit.Container->Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value || !unit.Type->BoolFlag[ATTACKFROMTRANSPORTER_INDEX].value)) { // make both the unit and the transporter have the tag be necessary for the attack to be possible
 			if (unit.Container != NULL) {
-				if (
-					!LeaveShelter(unit) // leave shelter if surrounded
-					&& unit.Type->BoolFlag[FAUNA_INDEX].value
-				) {
-					SeekShelter(unit); // if is a fauna unit and is removed, see if should leave shelter
-				}
+				LeaveShelter(unit); // leave shelter if surrounded
 			}
 		//Wyrmgus end
 		return ;
@@ -748,7 +579,7 @@ bool AutoAttack(CUnit &unit)
 			|| AutoRepair(unit)
 			//Wyrmgus start
 //			|| MoveRandomly(unit)) {
-			|| Feed(unit) || Excrete(unit) || SeekShelter(unit) || MoveRandomly(unit) || PickUpItem(unit)) {
+			|| MoveRandomly(unit) || PickUpItem(unit)) {
 			//Wyrmgus end
 		}
 	}

@@ -398,7 +398,6 @@ enum {
 	TRANSPARENCY_INDEX,
 	GENDER_INDEX,
 	BIRTHCYCLE_INDEX,
-	HUNGER_INDEX,
 	STUN_INDEX,
 	BLEEDING_INDEX,
 	LEADERSHIP_INDEX,
@@ -851,7 +850,6 @@ public:
 	std::string Description;		/// Description of the unit type
 	std::string Quote;				/// Quote of the unit type
 	std::string Background;			/// Encyclopedia entry for the unit type
-	std::string Excrement;			/// Excrement unit for this unit type
 	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.

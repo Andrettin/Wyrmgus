@@ -5117,10 +5117,6 @@ bool CUnit::CanEat(const CUnit &unit) const
 	) {
 		return true;
 	}
-	
-	if ((this->Type->BoolFlag[CARNIVORE_INDEX].value || this->Type->BoolFlag[HERBIVORE_INDEX].value || this->Type->BoolFlag[INSECTIVORE_INDEX].value || this->Type->BoolFlag[DETRITIVORE_INDEX].value) && unit.Type->BoolFlag[DAIRY_INDEX].value && this->Variable[HUNGER_INDEX].Value >= 900) { //animals will only eat cheese when very hungry
-		return true;
-	}
 		
 	return false;
 }
@@ -5977,11 +5973,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 			}
 		}
 		LetUnitDie(target);
-		//Wyrmgus start
-		if (attacker && attacker->Type->BoolFlag[PREDATOR_INDEX].value) { //stop predators so that they can consume the corpse
-			CommandStopUnit(*attacker);
-		}
-		//Wyrmgus end
 		return;
 	}
 
@@ -6322,7 +6313,6 @@ bool CUnit::IsEnemy(const CPlayer &player) const
 bool CUnit::IsEnemy(const CUnit &unit) const
 {
 	//Wyrmgus start
-//	return IsEnemy(*unit.Player);
 	if (
 		this->Player->Type == PlayerNeutral
 		&& this->Type->BoolFlag[FAUNA_INDEX].value
@@ -6331,8 +6321,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 		&& this->Type->Slot != unit.Type->Slot
 	) {
 		if (
-			this->Variable[HUNGER_INDEX].Value > 250
-			&& this->Type->BoolFlag[PREDATOR_INDEX].value
+			this->Type->BoolFlag[PREDATOR_INDEX].value
 			&& !unit.Type->BoolFlag[PREDATOR_INDEX].value
 			&& this->CanEat(unit)
 		) {
@@ -6345,18 +6334,17 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 		) {
 			return true;
 		}
-	} else if (
+	}
+		
+	if (
 		unit.Player->Type == PlayerNeutral
-		&& unit.Type->BoolFlag[FAUNA_INDEX].value
-		&& unit.Type->BoolFlag[ORGANIC_INDEX].value
 		&& unit.Type->BoolFlag[PREDATOR_INDEX].value
-		&& !this->Type->BoolFlag[FAUNA_INDEX].value
-		&& !this->Type->BoolFlag[PREDATOR_INDEX].value
 		&& this->Player->Type != PlayerNeutral
-		&& this->Type->Slot != unit.Type->Slot
 	) {
 		return true;
-	} else if (
+	}
+	
+	if (
 		this->Player != unit.Player
 		&& unit.CurrentAction() == UnitActionAttack
 		&& unit.CurrentOrder()->HasGoal()
@@ -6365,14 +6353,12 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 		return true;
 	}
 	
-	//Wyrmgus start
 	if (
 		this->Player != unit.Player && this->Player->Type != PlayerNeutral && unit.Player->Type != PlayerNeutral
 		&& ((this->Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && this->IsAgressive()) || (unit.Type->BoolFlag[HIDDENOWNERSHIP_INDEX].value && unit.IsAgressive()))
 	) {
 		return true;
 	}
-	//Wyrmgus end
 
 	return IsEnemy(*unit.Player);
 	//Wyrmgus end
