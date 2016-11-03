@@ -344,6 +344,8 @@ static int CclUnit(lua_State *l)
 			unit->Spell = SpellTypeByIdent(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "work")) {
 			unit->Work = CUpgrade::Get(LuaToString(l, 2, j + 1));
+		} else if (!strcmp(value, "elixir")) {
+			unit->Elixir = CUpgrade::Get(LuaToString(l, 2, j + 1));
 		} else if (!strcmp(value, "unique")) {
 			CUniqueItem *unique_item = GetUniqueItem(LuaToString(l, 2, j + 1));
 			unit->Unique = unique_item;
@@ -364,6 +366,9 @@ static int CclUnit(lua_State *l)
 				}
 				if (unique_item->Work != NULL) {
 					unit->Work = unique_item->Work;
+				}
+				if (unique_item->Elixir != NULL) {
+					unit->Elixir = unique_item->Elixir;
 				}
 			}
 		} else if (!strcmp(value, "bound")) {
@@ -1711,6 +1716,12 @@ static int CclGetUnitVariable(lua_State *l)
 		} else {
 			lua_pushstring(l, "");
 		}
+	} else if (!strcmp(value, "Elixir")) {
+		if (unit->Elixir != NULL) {
+			lua_pushstring(l, unit->Elixir->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
 	} else if (!strcmp(value, "Icon")) {
 		lua_pushstring(l, unit->GetIcon().Name.c_str());
 		return 1;
@@ -1922,6 +1933,16 @@ static int CclSetUnitVariable(lua_State *l)
 			unit->SetWork(NULL);
 		} else if (CUpgrade::Get(upgrade_ident)) {
 			unit->SetWork(CUpgrade::Get(upgrade_ident));
+		} else {
+			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+		}
+	} else if (!strcmp(name, "Elixir")) { //add an elixir property to the unit
+		LuaCheckArgs(l, 3);
+		std::string upgrade_ident = LuaToString(l, 3);
+		if (upgrade_ident.empty()) {
+			unit->SetElixir(NULL);
+		} else if (CUpgrade::Get(upgrade_ident)) {
+			unit->SetElixir(CUpgrade::Get(upgrade_ident));
 		} else {
 			LuaError(l, "Upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 		}

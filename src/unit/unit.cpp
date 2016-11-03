@@ -468,6 +468,7 @@ void CUnit::Init()
 	Suffix = NULL;
 	Spell = NULL;
 	Work = NULL;
+	Elixir = NULL;
 	Unique = NULL;
 	Bound = false;
 	Identified = true;
@@ -590,6 +591,7 @@ void CUnit::Release(bool final)
 	Suffix = NULL;
 	Spell = NULL;
 	Work = NULL;
+	Elixir = NULL;
 	Unique = NULL;
 	Bound = false;
 	Identified = true;
@@ -868,6 +870,11 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		ReadWork(this->Character->ReadWorks[i], false);
 	}
 	
+	//load consumed elixirs
+	for (size_t i = 0; i < this->Character->ConsumedElixirs.size(); ++i) {
+		ConsumeElixir(this->Character->ConsumedElixirs[i], false);
+	}
+	
 	//load items
 	for (size_t i = 0; i < this->Character->Items.size(); ++i) {
 		CUnit *item = MakeUnitAndPlace(this->tilePos, *this->Character->Items[i]->Type, &Players[PlayerNumNeutral], this->MapLayer);
@@ -882,6 +889,9 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		}
 		if (this->Character->Items[i]->Work != NULL) {
 			item->SetWork(this->Character->Items[i]->Work);
+		}
+		if (this->Character->Items[i]->Elixir != NULL) {
+			item->SetElixir(this->Character->Items[i]->Elixir);
 		}
 		item->Unique = this->Character->Items[i]->Unique;
 		if (!this->Character->Items[i]->Name.empty()) {
@@ -1435,6 +1445,18 @@ void CUnit::ReadWork(CUpgrade *work, bool affect_character)
 	}
 }
 
+void CUnit::ConsumeElixir(CUpgrade *elixir, bool affect_character)
+{
+	IndividualUpgradeAcquire(*this, elixir);
+	
+	if (!IsNetworkGame() && Character && Character->Persistent && this->Player->AiEnabled == false && affect_character) {
+		if (std::find(Character->ConsumedElixirs.begin(), Character->ConsumedElixirs.end(), elixir) == Character->ConsumedElixirs.end()) {
+			Character->ConsumedElixirs.push_back(elixir);
+			SaveHero(Character);
+		}
+	}
+}
+
 void CUnit::ApplyAura(int aura_index)
 {
 	this->ApplyAuraEffect(aura_index);
@@ -1568,6 +1590,28 @@ void CUnit::SetWork(CUpgrade *work)
 	this->UpdateItemName();
 }
 
+void CUnit::SetElixir(CUpgrade *elixir)
+{
+	if (this->Elixir != NULL) {
+		this->Variable[MAGICLEVEL_INDEX].Value -= this->Elixir->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max -= this->Elixir->MagicLevel;
+	}
+	
+	if (!IsNetworkGame() && Container && Container->Character && Container->Character->Persistent && Container->Player->AiEnabled == false && Container->Character->GetItem(*this) != NULL && Container->Character->GetItem(*this)->Elixir != elixir) { //update the persistent item, if applicable and if it hasn't been updated yet
+		Container->Character->GetItem(*this)->Elixir = elixir;
+		SaveHero(Container->Character);
+	}
+	
+	Elixir = elixir;
+	
+	if (this->Elixir != NULL) {
+		this->Variable[MAGICLEVEL_INDEX].Value += this->Elixir->MagicLevel;
+		this->Variable[MAGICLEVEL_INDEX].Max += this->Elixir->MagicLevel;
+	}
+	
+	this->UpdateItemName();
+}
+
 void CUnit::SetUnique(CUniqueItem *unique)
 {
 	if (unique != NULL) {
@@ -1575,6 +1619,7 @@ void CUnit::SetUnique(CUniqueItem *unique)
 		SetSuffix(unique->Suffix);
 		SetSpell(unique->Spell);
 		SetWork(unique->Work);
+		SetElixir(unique->Elixir);
 		if (unique->ResourcesHeld != 0) {
 			this->SetResourcesHeld(unique->ResourcesHeld);
 			this->Variable[GIVERESOURCE_INDEX].Value = unique->ResourcesHeld;
@@ -1590,6 +1635,7 @@ void CUnit::SetUnique(CUniqueItem *unique)
 		SetSuffix(NULL);
 		SetSpell(NULL);
 		SetWork(NULL);
+		SetElixir(NULL);
 	}
 }
 
@@ -1653,7 +1699,7 @@ void CUnit::UpdateItemName()
 	}
 	
 	Name = "";
-	if (Prefix == NULL && Spell == NULL && Work == NULL && Suffix == NULL) {
+	if (Prefix == NULL && Spell == NULL && Work == NULL && Elixir == NULL && Suffix == NULL) {
 		return;
 	}
 	
@@ -1663,6 +1709,8 @@ void CUnit::UpdateItemName()
 	}
 	if (Work != NULL) {
 		Name += _(Work->Name.c_str());
+	} else if (Elixir != NULL) {
+		Name += _(Elixir->Name.c_str());
 	} else {
 		Name += GetTypeName();
 	}
@@ -1739,7 +1787,7 @@ void CUnit::GenerateDrop()
 			
 			if (droppedUnit->Type->BoolFlag[ITEM_INDEX].value && !droppedUnit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 				int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-				if (droppedUnit->Prefix != NULL || droppedUnit->Suffix != NULL || droppedUnit->Spell != NULL || droppedUnit->Work != NULL) {
+				if (droppedUnit->Prefix != NULL || droppedUnit->Suffix != NULL || droppedUnit->Spell != NULL || droppedUnit->Work != NULL || droppedUnit->Elixir != NULL) {
 					ttl_cycles *= 4;
 				}
 				droppedUnit->TTL = GameCycle + ttl_cycles;
@@ -1782,7 +1830,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 	if (SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GenerateSuffix(dropper);
 	}
-	if (this->Prefix == NULL && this->Suffix == NULL && this->Work == NULL && SyncRand(100) >= (100 - magic_affix_chance)) {
+	if (this->Prefix == NULL && this->Suffix == NULL && this->Work == NULL && this->Elixir == NULL && SyncRand(100) >= (100 - magic_affix_chance)) {
 		this->GenerateSpell(dropper);
 	}
 	if (SyncRand(1000) >= (1000 - unique_chance)) {
@@ -1794,7 +1842,7 @@ void CUnit::GenerateSpecialProperties(CUnit *dropper)
 	}
 	
 	if (
-		this->Prefix == NULL && this->Suffix == NULL && this->Spell == NULL && this->Work == NULL
+		this->Prefix == NULL && this->Suffix == NULL && this->Spell == NULL && this->Work == NULL && this->Elixir == NULL
 		&& (this->Type->ItemClass == ScrollItemClass || this->Type->ItemClass == BookItemClass || this->Type->ItemClass == RingItemClass || this->Type->ItemClass == AmuletItemClass || this->Type->ItemClass == HornItemClass)
 	) { //scrolls, books, jewelry and horns must always have a property
 		this->GenerateSpecialProperties(dropper);
@@ -4522,7 +4570,7 @@ void DropOutAll(const CUnit &source)
 	//Wyrmgus start
 	if (unit->Type->BoolFlag[ITEM_INDEX].value && !unit->Unique) { //save the initial cycle items were placed in the ground to destroy them if they have been there for too long
 		int ttl_cycles = (5 * 60 * CYCLES_PER_SECOND);
-		if (unit->Prefix != NULL || unit->Suffix != NULL || unit->Spell != NULL || unit->Work != NULL) {
+		if (unit->Prefix != NULL || unit->Suffix != NULL || unit->Spell != NULL || unit->Work != NULL || unit->Elixir != NULL) {
 			ttl_cycles *= 4;
 		}
 		unit->TTL = GameCycle + ttl_cycles;
@@ -4724,7 +4772,7 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 	}
 	
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);
-	if (item->Work == NULL && (item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0 || !this->CanEquipItemClass(item->Type->ItemClass))) {
+	if (item->Work == NULL && item->Elixir == NULL && (item_slot == -1 || this->GetItemSlotQuantity(item_slot) == 0 || !this->CanEquipItemClass(item->Type->ItemClass))) {
 		return 0;
 	}
 	
@@ -4736,6 +4784,16 @@ int CUnit::GetItemVariableChange(const CUnit *item, int variable_index, bool inc
 					value += item->Work->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
 				} else {
 					value += item->Work->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
+				}
+			}
+		}
+	} else if (item->Elixir != NULL) {
+		if (this->IndividualUpgrades[item->Elixir->ID] == false) {
+			for (size_t z = 0; z < item->Elixir->UpgradeModifiers.size(); ++z) {
+				if (!increase) {
+					value += item->Elixir->UpgradeModifiers[z]->Modifier.Variables[variable_index].Value;
+				} else {
+					value += item->Elixir->UpgradeModifiers[z]->Modifier.Variables[variable_index].Increase;
 				}
 			}
 		}
@@ -4868,6 +4926,9 @@ int CUnit::GetPrice() const
 		} else {
 			cost += 1000;
 		}
+	}
+	if (this->Elixir != NULL) {
+		cost += this->Elixir->MagicLevel * 1000;
 	}
 	if (this->Character) {
 		cost += (this->Variable[LEVEL_INDEX].Value - this->Type->Stats[this->Player->Index].Variables[LEVEL_INDEX].Value) * 250;
@@ -5037,7 +5098,13 @@ bool CUnit::CanUseItem(CUnit *item) const
 		}
 	}
 	
-	if (item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableMax)) {
+	if (item->Elixir != NULL) {
+		if (!this->HasInventory() || this->IndividualUpgrades[item->Elixir->ID]) {
+			return false;
+		}
+	}
+	
+	if (item->Elixir == NULL && item->Variable[HITPOINTHEALING_INDEX].Value > 0 && this->Variable[HP_INDEX].Value >= this->GetModifiedVariable(HP_INDEX, VariableMax)) {
 		return false;
 	}
 	
@@ -5230,7 +5297,7 @@ std::string CUnit::GetMessageName() const
 		return GetTypeName() + " (" + _("Unidentified") + ")";
 	}
 	
-	if (!this->Unique && this->Work == NULL && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {
+	if (!this->Unique && this->Work == NULL && this->Elixir == NULL && (this->Prefix != NULL || this->Suffix != NULL || this->Spell != NULL)) {
 		return name;
 	}
 	

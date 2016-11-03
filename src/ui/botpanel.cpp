@@ -407,7 +407,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		return false;
 	}
 	
-	if (condition->Quote && type && type->Quote.empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != NULL && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty())) {
+	if (condition->Quote && type && type->Quote.empty() && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Unique && !UnitManager.GetSlotUnit(button.Value).Unique->Quote.empty()) && !((button.Action == ButtonUnit || button.Action == ButtonBuy) && UnitManager.GetSlotUnit(button.Value).Work != NULL && !UnitManager.GetSlotUnit(button.Value).Work->Quote.empty() && UnitManager.GetSlotUnit(button.Value).Elixir != NULL && !UnitManager.GetSlotUnit(button.Value).Elixir->Quote.empty())) {
 		return false;
 	}
 	
@@ -515,6 +515,16 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			}
 			if (condition->ReadWork != CONDITION_TRUE) {
 				if ((condition->ReadWork == CONDITION_ONLY) ^ (unit.Work != NULL && unit.Container->IndividualUpgrades[unit.Work->ID])) {
+					return false;
+				}
+			}
+			if (condition->Elixir != CONDITION_TRUE) {
+				if ((condition->Elixir == CONDITION_ONLY) ^ (unit.Elixir != NULL)) {
+					return false;
+				}
+			}
+			if (condition->ConsumedElixir != CONDITION_TRUE) {
+				if ((condition->ConsumedElixir == CONDITION_ONLY) ^ (unit.Elixir != NULL && unit.Container->IndividualUpgrades[unit.Elixir->ID])) {
 					return false;
 				}
 			}

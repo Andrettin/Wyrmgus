@@ -125,12 +125,20 @@ static int CclDefineUniqueItem(lua_State *l)
 				LuaError(l, "Spell \"%s\" doesn't exist." _C_ spell_ident.c_str());
 			}
 		} else if (!strcmp(value, "Work")) {
-			std::string affix_ident = LuaToString(l, -1);
-			int upgrade_id = UpgradeIdByIdent(affix_ident);
+			std::string upgrade_ident = LuaToString(l, -1);
+			int upgrade_id = UpgradeIdByIdent(upgrade_ident);
 			if (upgrade_id != -1) {
 				item->Work = AllUpgrades[upgrade_id];
 			} else {
-				LuaError(l, "Literary work upgrade \"%s\" doesn't exist." _C_ affix_ident.c_str());
+				LuaError(l, "Literary work upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
+			}
+		} else if (!strcmp(value, "Elixir")) {
+			std::string upgrade_ident = LuaToString(l, -1);
+			int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+			if (upgrade_id != -1) {
+				item->Elixir = AllUpgrades[upgrade_id];
+			} else {
+				LuaError(l, "Elixir upgrade \"%s\" doesn't exist." _C_ upgrade_ident.c_str());
 			}
 		} else if (!strcmp(value, "Description")) {
 			item->Description = LuaToString(l, -1);
@@ -240,6 +248,13 @@ static int CclGetUniqueItemData(lua_State *l)
 	} else if (!strcmp(data, "Work")) {
 		if (item->Work != NULL) {
 			lua_pushstring(l, item->Work->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "Elixir")) {
+		if (item->Elixir != NULL) {
+			lua_pushstring(l, item->Elixir->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

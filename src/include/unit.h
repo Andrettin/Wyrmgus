@@ -202,12 +202,14 @@ public:
 	void EquipItem(CUnit &item, bool affect_character = true);
 	void DeequipItem(CUnit &item, bool affect_character = true);
 	void ReadWork(CUpgrade *work, bool affect_character = true);
+	void ConsumeElixir(CUpgrade *elixir, bool affect_character = true);
 	void ApplyAura(int aura_index);
 	void ApplyAuraEffect(int aura_index);
 	void SetPrefix(CUpgrade *prefix);
 	void SetSuffix(CUpgrade *suffix);
 	void SetSpell(SpellType *spell);
 	void SetWork(CUpgrade *work);
+	void SetElixir(CUpgrade *elixir);
 	void SetUnique(CUniqueItem *unique);
 	void Identify();
 	void CheckIdentification();
@@ -479,6 +481,7 @@ public:
 	CUpgrade *Suffix;	/// Item unit's suffix
 	SpellType *Spell;	/// Item unit's spell
 	CUpgrade *Work;		/// Item unit's literary work
+	CUpgrade *Elixir;	/// Item unit's elixir
 	CUniqueItem *Unique;		/// Whether the item is unique
 	bool Bound;			/// Whether the item is bound to its owner
 	bool Identified;	/// Whether the item has been identified

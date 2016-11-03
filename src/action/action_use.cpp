@@ -239,6 +239,11 @@ enum {
 					if (unit.Player == ThisPlayer) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s read %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Work->Ident).c_str());
 					}
+				} else if (goal->Elixir != NULL) {
+					unit.ConsumeElixir(goal->Elixir);
+					if (unit.Player == ThisPlayer) {
+						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("%s consumed %s: %s"), unit.GetMessageName().c_str(), goal_name.c_str(), GetUpgradeEffectsString(goal->Elixir->Ident).c_str());
+					}
 				} else if (goal->Type->GivesResource && goal->ResourcesHeld > 0) {
 					if (unit.Player == ThisPlayer) {
 						unit.Player->Notify(NotifyGreen, unit.tilePos, unit.MapLayer, _("Gained %d %s"), goal->ResourcesHeld, DefaultResourceNames[goal->Type->GivesResource].c_str());

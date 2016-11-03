@@ -165,6 +165,7 @@ public:
 	std::vector<CCharacter *> DateReferredCharacters;	/// Characters who use this character as a date reference
 	std::vector<CUpgrade *> Abilities;
 	std::vector<CUpgrade *> ReadWorks;
+	std::vector<CUpgrade *> ConsumedElixirs;
 	std::vector<CUpgrade *> AuthoredWorks;	/// Literary works of which this character is the author
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
 	std::vector<CQuest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters

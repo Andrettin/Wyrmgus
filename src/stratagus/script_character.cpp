@@ -313,6 +313,18 @@ static int CclDefineCharacter(lua_State *l)
 					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "ConsumedElixirs")) {
+			character->ConsumedElixirs.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string elixir_ident = LuaToString(l, -1, j + 1);
+				int elixir_id = UpgradeIdByIdent(elixir_ident);
+				if (elixir_id != -1) {
+					character->ConsumedElixirs.push_back(AllUpgrades[elixir_id]);
+				} else {
+					fprintf(stderr, "Elixir \"%s\" doesn't exist.", elixir_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Items")) {
 			character->Items.clear();
 			const int args = lua_rawlen(l, -1);
@@ -370,6 +382,14 @@ static int CclDefineCharacter(lua_State *l)
 						} else {
 							fprintf(stderr, "Literary work \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
+					} else if (!strcmp(value, "elixir")) {
+						std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+						if (upgrade_id != -1) {
+							item->Elixir = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						} else {
+							fprintf(stderr, "Elixir \"%s\" doesn't exist.", upgrade_ident.c_str());
+						}
 					} else if (!strcmp(value, "name")) {
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
@@ -383,18 +403,11 @@ static int CclDefineCharacter(lua_State *l)
 							} else {
 								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
 							}
-							if (unique_item->Prefix != NULL) {
-								item->Prefix = unique_item->Prefix;
-							}
-							if (unique_item->Suffix != NULL) {
-								item->Suffix = unique_item->Suffix;
-							}
-							if (unique_item->Spell != NULL) {
-								item->Spell = unique_item->Spell;
-							}
-							if (unique_item->Work != NULL) {
-								item->Work = unique_item->Work;
-							}
+							item->Prefix = unique_item->Prefix;
+							item->Suffix = unique_item->Suffix;
+							item->Spell = unique_item->Spell;
+							item->Work = unique_item->Work;
+							item->Elixir = unique_item->Elixir;
 						} else {
 							fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", unique_ident.c_str());
 						}
@@ -618,6 +631,18 @@ static int CclDefineCustomHero(lua_State *l)
 					fprintf(stderr, "Work \"%s\" doesn't exist.", work_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "ConsumedElixirs")) {
+			hero->ConsumedElixirs.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string elixir_ident = LuaToString(l, -1, j + 1);
+				int elixir_id = UpgradeIdByIdent(elixir_ident);
+				if (elixir_id != -1) {
+					hero->ConsumedElixirs.push_back(AllUpgrades[elixir_id]);
+				} else {
+					fprintf(stderr, "Elixir \"%s\" doesn't exist.", elixir_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "Items")) {
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
@@ -674,6 +699,14 @@ static int CclDefineCustomHero(lua_State *l)
 						} else {
 							fprintf(stderr, "Literary work \"%s\" doesn't exist.", upgrade_ident.c_str());
 						}
+					} else if (!strcmp(value, "elixir")) {
+						std::string upgrade_ident = LuaToString(l, -1, k + 1);
+						int upgrade_id = UpgradeIdByIdent(upgrade_ident);
+						if (upgrade_id != -1) {
+							item->Elixir = const_cast<CUpgrade *>(&(*AllUpgrades[upgrade_id]));
+						} else {
+							fprintf(stderr, "Elixir \"%s\" doesn't exist.", upgrade_ident.c_str());
+						}
 					} else if (!strcmp(value, "name")) {
 						item->Name = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "unique")) {
@@ -687,18 +720,11 @@ static int CclDefineCustomHero(lua_State *l)
 							} else {
 								fprintf(stderr, "Unique item \"%s\" has no type.\n", item->Name.c_str());
 							}
-							if (unique_item->Prefix != NULL) {
-								item->Prefix = unique_item->Prefix;
-							}
-							if (unique_item->Suffix != NULL) {
-								item->Suffix = unique_item->Suffix;
-							}
-							if (unique_item->Spell != NULL) {
-								item->Spell = unique_item->Spell;
-							}
-							if (unique_item->Work != NULL) {
-								item->Work = unique_item->Work;
-							}
+							item->Prefix = unique_item->Prefix;
+							item->Suffix = unique_item->Suffix;
+							item->Spell = unique_item->Spell;
+							item->Work = unique_item->Work;
+							item->Elixir = unique_item->Elixir;
 						} else {
 							fprintf(stderr, "Unique item \"%s\" doesn't exist.\n", unique_ident.c_str());
 						}

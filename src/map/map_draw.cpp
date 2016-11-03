@@ -548,7 +548,7 @@ void CViewport::Draw() const
 				text_color = "light-blue";
 			}
 			std::string unit_name;
-			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
+			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
 				unit_name = UnitUnderCursor->GetName();
 			} else {
 				unit_name = UnitUnderCursor->GetTypeName();

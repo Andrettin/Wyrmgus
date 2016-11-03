@@ -235,6 +235,9 @@ enum {
 				if (goal->Work != NULL) {
 					item->Work = goal->Work;
 				}
+				if (goal->Elixir != NULL) {
+					item->Elixir = goal->Elixir;
+				}
 				if (goal->Unique) {
 					item->Name = goal->Name;
 					item->Unique = goal->Unique;

@@ -187,6 +187,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	if (unit.Work != NULL) {
 		file.printf("\"work\", \"%s\", ", unit.Work->Ident.c_str());
 	}
+	if (unit.Elixir != NULL) {
+		file.printf("\"elixir\", \"%s\", ", unit.Elixir->Ident.c_str());
+	}
 	if (unit.Unique) {
 		file.printf("\"unique\", \"%s\", ", unit.Unique->Ident.c_str());
 	}

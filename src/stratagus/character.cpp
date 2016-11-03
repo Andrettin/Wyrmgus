@@ -174,7 +174,7 @@ IconConfig CCharacter::GetIcon()
 CItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
-		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->Items[i]->Identified == item.Identified && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
+		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Elixir == item.Elixir && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->Items[i]->Identified == item.Identified && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
 			if (this->Items[i]->Name.empty() || this->Items[i]->Name == item.Name) {
 				return this->Items[i];
 			}
@@ -466,6 +466,16 @@ void SaveHero(CCharacter *hero)
 		}
 		fprintf(fd, "},\n");
 	}
+	if (hero->ConsumedElixirs.size() > 0) {
+		fprintf(fd, "\tConsumedElixirs = {");
+		for (size_t j = 0; j < hero->ConsumedElixirs.size(); ++j) {
+			fprintf(fd, "\"%s\"", hero->ConsumedElixirs[j]->Ident.c_str());
+			if (j < (hero->ConsumedElixirs.size() - 1)) {
+				fprintf(fd, ", ");
+			}
+		}
+		fprintf(fd, "},\n");
+	}
 	if (hero->Items.size() > 0) {
 		fprintf(fd, "\tItems = {");
 		for (size_t j = 0; j < hero->Items.size(); ++j) {
@@ -482,6 +492,9 @@ void SaveHero(CCharacter *hero)
 			}
 			if (hero->Items[j]->Work != NULL) {
 				fprintf(fd, "\n\t\t\t\"work\", \"%s\",", hero->Items[j]->Work->Ident.c_str());
+			}
+			if (hero->Items[j]->Elixir != NULL) {
+				fprintf(fd, "\n\t\t\t\"elixir\", \"%s\",", hero->Items[j]->Elixir->Ident.c_str());
 			}
 			if (!hero->Items[j]->Name.empty()) {
 				fprintf(fd, "\n\t\t\t\"name\", \"%s\",", hero->Items[j]->Name.c_str());

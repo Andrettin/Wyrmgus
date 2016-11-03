@@ -397,7 +397,7 @@ std::string GetUniqueItemEffectsString(std::string item_ident)
 			
 			int variable_value = 0;
 			int variable_increase = 0;
-			if (item->Type->BoolFlag[ITEM_INDEX].value) {
+			if (item->Type->BoolFlag[ITEM_INDEX].value && item->Work == NULL && item->Elixir == NULL) {
 				variable_value = item->Type->DefaultStat.Variables[var].Value;
 				variable_increase = item->Type->DefaultStat.Variables[var].Increase;
 			}
@@ -411,13 +411,14 @@ std::string GetUniqueItemEffectsString(std::string item_ident)
 					(item->Prefix != NULL && UpgradeModifiers[z]->UpgradeId == item->Prefix->ID)
 					|| (item->Suffix != NULL && UpgradeModifiers[z]->UpgradeId == item->Suffix->ID)
 					|| (item->Work != NULL && UpgradeModifiers[z]->UpgradeId == item->Work->ID)
+					|| (item->Elixir != NULL && UpgradeModifiers[z]->UpgradeId == item->Elixir->ID)
 				) {
 					variable_value += UpgradeModifiers[z]->Modifier.Variables[var].Value;
 					variable_increase += UpgradeModifiers[z]->Modifier.Variables[var].Increase;
 				}
 			}
 						
-			if ((item->Type->BoolFlag[ITEM_INDEX].value && item->Type->DefaultStat.Variables[var].Enable) || variable_value != 0) {
+			if ((item->Type->BoolFlag[ITEM_INDEX].value && item->Type->DefaultStat.Variables[var].Enable && item->Work == NULL && item->Elixir == NULL) || variable_value != 0) {
 				if (!first_var) {
 					item_effects_string += ", ";
 				} else {

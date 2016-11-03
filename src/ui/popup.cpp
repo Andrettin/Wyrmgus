@@ -546,7 +546,7 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 				UnitManager.GetSlotUnit(button.Value).Type->BoolFlag[ITEM_INDEX].value
 				&& this->Index != HITPOINTHEALING_INDEX
 				&& UnitManager.GetSlotUnit(button.Value).Container
-				&& (UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != NULL)
+				&& (UnitManager.GetSlotUnit(button.Value).Container->CanEquipItem(&UnitManager.GetSlotUnit(button.Value)) || UnitManager.GetSlotUnit(button.Value).Work != NULL || UnitManager.GetSlotUnit(button.Value).Elixir != NULL)
 			) {
 				value = UnitManager.GetSlotUnit(button.Value).Container->GetItemVariableChange(&UnitManager.GetSlotUnit(button.Value), this->Index);
 				if (value >= 0) {
@@ -706,6 +706,10 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Work = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "ReadWork")) {
 			condition->ReadWork = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "Elixir")) {
+			condition->Elixir = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "ConsumedElixir")) {
+			condition->ConsumedElixir = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Unique")) {
 			condition->Unique = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Bound")) {
