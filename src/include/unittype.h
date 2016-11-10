@@ -184,6 +184,8 @@ public:
 
 	std::string UpgradesRequired[VariationMax];	/// Upgrades required by variation
 	std::string UpgradesForbidden[VariationMax];	/// If player has one of these upgrades, unit can't have this variation
+	std::vector<int> ItemClassesEquipped;
+	std::vector<int> ItemClassesNotEquipped;
 	std::vector<CUnitType *> ItemsEquipped;
 	std::vector<CUnitType *> ItemsNotEquipped;
 	std::vector<CTerrainType *> Terrains;

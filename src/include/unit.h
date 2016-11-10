@@ -393,6 +393,7 @@ public:
 	int GetUnitStockReplenishmentTimer(int unit_type_id) const;
 	bool CanAttack(bool count_inside = false) const;
 	bool IsItemEquipped(const CUnit *item) const;
+	bool IsItemClassEquipped(int item_class) const;
 	bool IsItemTypeEquipped(CUnitType *item_type) const;
 	bool CanEquipItem(CUnit *item) const;
 	bool CanEquipItemClass(int item_class) const;

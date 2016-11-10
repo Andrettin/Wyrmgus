@@ -830,6 +830,12 @@ static int CclDefineUnitType(lua_State *l)
 						var->UpgradesRequired[u] = parent_type->VarInfo[var_n]->UpgradesRequired[u];
 						var->UpgradesForbidden[u] = parent_type->VarInfo[var_n]->UpgradesForbidden[u];
 					}
+					for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemClassesEquipped.size(); ++i) {
+						var->ItemClassesEquipped.push_back(parent_type->VarInfo[var_n]->ItemClassesEquipped[i]);
+					}
+					for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemClassesNotEquipped.size(); ++i) {
+						var->ItemClassesNotEquipped.push_back(parent_type->VarInfo[var_n]->ItemClassesNotEquipped[i]);
+					}
 					for (size_t i = 0; i < parent_type->VarInfo[var_n]->ItemsEquipped.size(); ++i) {
 						var->ItemsEquipped.push_back(parent_type->VarInfo[var_n]->ItemsEquipped[i]);
 					}
@@ -867,6 +873,12 @@ static int CclDefineUnitType(lua_State *l)
 					for (int u = 0; u < VariationMax; ++u) {
 						var->UpgradesRequired[u] = parent_type->LayerVarInfo[i][j]->UpgradesRequired[u];
 						var->UpgradesForbidden[u] = parent_type->LayerVarInfo[i][j]->UpgradesForbidden[u];
+					}
+					for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemClassesEquipped.size(); ++u) {
+						var->ItemClassesEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemClassesEquipped[u]);
+					}
+					for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemClassesNotEquipped.size(); ++u) {
+						var->ItemClassesNotEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemClassesNotEquipped[u]);
 					}
 					for (size_t u = 0; u < parent_type->LayerVarInfo[i][j]->ItemsEquipped.size(); ++u) {
 						var->ItemsEquipped.push_back(parent_type->LayerVarInfo[i][j]->ItemsEquipped[u]);
@@ -1005,6 +1017,22 @@ static int CclDefineUnitType(lua_State *l)
 								var->UpgradesForbidden[u] = LuaToString(l, -1, k + 1);
 								break;
 							}
+						}
+					} else if (!strcmp(value, "item-class-equipped")) {
+						std::string item_class_ident = LuaToString(l, -1, k + 1);
+						int item_class = GetItemClassIdByName(item_class_ident);
+						if (item_class != -1) {
+							var->ItemClassesEquipped.push_back(item_class);
+						} else {
+							LuaError(l, "Item class \"%s\" does not exist." _C_ item_class_ident.c_str());
+						}
+					} else if (!strcmp(value, "item-class-not-equipped")) {
+						std::string item_class_ident = LuaToString(l, -1, k + 1);
+						int item_class = GetItemClassIdByName(item_class_ident);
+						if (item_class != -1) {
+							var->ItemClassesNotEquipped.push_back(item_class);
+						} else {
+							LuaError(l, "Item class \"%s\" does not exist." _C_ item_class_ident.c_str());
 						}
 					} else if (!strcmp(value, "item-equipped")) {
 						std::string type_ident = LuaToString(l, -1, k + 1);

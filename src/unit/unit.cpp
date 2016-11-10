@@ -1003,6 +1003,12 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 				break;
 			}
 		}
+		for (size_t j = 0; j < varinfo->ItemClassesNotEquipped.size(); ++j) {
+			if (IsItemClassEquipped(varinfo->ItemClassesNotEquipped[j])) {
+				upgrades_check = false;
+				break;
+			}
+		}
 		for (size_t j = 0; j < varinfo->ItemsNotEquipped.size(); ++j) {
 			if (IsItemTypeEquipped(varinfo->ItemsNotEquipped[j])) {
 				upgrades_check = false;
@@ -1011,6 +1017,19 @@ void CUnit::ChooseVariation(const CUnitType *new_type, bool ignore_old_variation
 		}
 		if (upgrades_check == false) {
 			continue;
+		}
+		for (size_t j = 0; j < varinfo->ItemClassesEquipped.size(); ++j) {
+			if (GetItemClassSlot(varinfo->ItemClassesEquipped[j]) == WeaponItemSlot) {
+				requires_weapon = true;
+				if (IsItemClassEquipped(varinfo->ItemClassesEquipped[j])) {
+					found_weapon = true;
+				}
+			} else if (GetItemClassSlot(varinfo->ItemClassesEquipped[j]) == ShieldItemSlot) {
+				requires_shield = true;
+				if (IsItemClassEquipped(varinfo->ItemClassesEquipped[j])) {
+					found_shield = true;
+				}
+			}
 		}
 		for (size_t j = 0; j < varinfo->ItemsEquipped.size(); ++j) {
 			if (GetItemClassSlot(varinfo->ItemsEquipped[j]->ItemClass) == WeaponItemSlot) {
@@ -1264,7 +1283,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	
 	//change variation, if the current one has become forbidden
 	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end()) {
+	if (varinfo && (std::find(varinfo->ItemClassesNotEquipped.begin(), varinfo->ItemClassesNotEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesNotEquipped.end() || std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end())) {
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
@@ -1272,7 +1291,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 			continue;
 		}
 		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
-		if (std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end()) {
+		if (std::find(varinfo->ItemClassesNotEquipped.begin(), varinfo->ItemClassesNotEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesNotEquipped.end() || std::find(varinfo->ItemsNotEquipped.begin(), varinfo->ItemsNotEquipped.end(), item.Type) != varinfo->ItemsNotEquipped.end()) {
 			ChooseVariation(NULL, false, i);
 		}
 	}
@@ -1409,7 +1428,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	
 	//change variation, if the current one has become forbidden
 	VariationInfo *varinfo = Type->VarInfo[Variation];
-	if (varinfo && std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end()) {
+	if (varinfo && (std::find(varinfo->ItemClassesEquipped.begin(), varinfo->ItemClassesEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesEquipped.end() || std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end())) {
 		ChooseVariation(); //choose a new variation now
 	}
 	for (int i = 0; i < MaxImageLayers; ++i) {
@@ -1417,7 +1436,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 			continue;
 		}
 		VariationInfo *varinfo = Type->LayerVarInfo[i][this->LayerVariation[i]];
-		if (std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end()) {
+		if (std::find(varinfo->ItemClassesEquipped.begin(), varinfo->ItemClassesEquipped.end(), item.Type->ItemClass) != varinfo->ItemClassesEquipped.end() || std::find(varinfo->ItemsEquipped.begin(), varinfo->ItemsEquipped.end(), item.Type) != varinfo->ItemsEquipped.end()) {
 			ChooseVariation(NULL, false, i);
 		}
 	}
@@ -2028,6 +2047,9 @@ void CUnit::UpdateSoldUnits()
 	}
 	
 	int sold_unit_max = 3;
+	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value) {
+		sold_unit_max = 1;
+	}
 	
 	for (int i = 0; i < sold_unit_max; ++i) {
 		CUnit *new_unit = NULL;
@@ -4982,6 +5004,23 @@ bool CUnit::IsItemEquipped(const CUnit *item) const
 	
 	if (std::find(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), item) != EquippedItems[item_slot].end()) {
 		return true;
+	}
+	
+	return false;
+}
+
+bool CUnit::IsItemClassEquipped(int item_class) const
+{
+	int item_slot = GetItemClassSlot(item_class);
+	
+	if (item_slot == -1) {
+		return false;
+	}
+	
+	for (size_t i = 0; i < EquippedItems[item_slot].size(); ++i) {
+		if (EquippedItems[item_slot][i]->Type->ItemClass == item_class) {
+			return true;
+		}
 	}
 	
 	return false;
