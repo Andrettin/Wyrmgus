@@ -597,7 +597,13 @@ static void GameLogicLoop()
 				//update the sight of all units
 				for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
 					CUnit *unit = *it;
-					if (unit && !unit->Destroyed && unit->MapLayer == z) {
+					if (
+						unit && !unit->Destroyed && unit->MapLayer == z &&
+						(
+							((Map.TimeOfDay[z] == MorningTimeOfDay || Map.TimeOfDay[z] == DuskTimeOfDay) && unit->Variable[DAYSIGHTRANGEBONUS_INDEX].Value != 0) // if has day sight bonus and is entering or exiting day
+							|| ((Map.TimeOfDay[z] == FirstWatchTimeOfDay || Map.TimeOfDay[z] == DawnTimeOfDay) && unit->Variable[NIGHTSIGHTRANGEBONUS_INDEX].Value != 0) // if has night sight bonus and is entering or exiting night
+						)
+					) {
 						MapUnmarkUnitSight(*unit);
 						UpdateUnitSightRange(*unit);
 						MapMarkUnitSight(*unit);

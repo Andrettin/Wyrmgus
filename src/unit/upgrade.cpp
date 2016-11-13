@@ -1427,7 +1427,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 
 				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
-				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+				//Wyrmgus start
+//				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+				if (stat.Variables[j].Max > 0) {
+					clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+				}
+				//Wyrmgus end
 			}
 
 			// And now modify ingame units
@@ -1709,7 +1714,12 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				}
 
 				stat.Variables[j].Max = std::max(stat.Variables[j].Max, 0);
-				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+				//Wyrmgus start
+//				clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+				if (stat.Variables[j].Max > 0) {
+					clamp(&stat.Variables[j].Value, 0, stat.Variables[j].Max);
+				}
+				//Wyrmgus end
 			}
 
 			//Wyrmgus start
@@ -1760,7 +1770,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 						//Wyrmgus start
 //						clamp(&unit.Variable[j].Value, 0, unit.Variable[j].Max);
-						clamp(&unit.Variable[j].Value, 0, unit.GetModifiedVariable(j, VariableMax));
+						if (unit.Variable[j].Max > 0) {
+							clamp(&unit.Variable[j].Value, 0, unit.GetModifiedVariable(j, VariableMax));
+						}
 						//Wyrmgus end
 						//Wyrmgus start
 						if (j == ATTACKRANGE_INDEX && unit.Container) {
@@ -2634,6 +2646,11 @@ bool IsBooleanVariable(int var)
 bool IsKnowledgeVariable(int var)
 {
 	return var == KNOWLEDGEMAGIC_INDEX || var == KNOWLEDGEWARFARE_INDEX;
+}
+
+bool IsPotentiallyNegativeVariable(int var)
+{
+	return var == DAYSIGHTRANGEBONUS_INDEX || var == NIGHTSIGHTRANGEBONUS_INDEX;
 }
 
 std::string GetVariableDisplayName(int var, bool increase)
