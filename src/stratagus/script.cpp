@@ -2841,7 +2841,11 @@ void SaveGrandStrategyGame(const std::string &filename)
 			path += "/";
 			path += GameName;
 		}
-		path += "/save/grand_strategy/";
+		path += "/save/";
+		if (stat(path.c_str(), &tmp) < 0) {
+			makedir(path.c_str(), 0777);
+		}
+		path += "grand_strategy/";
 		if (stat(path.c_str(), &tmp) < 0) {
 			makedir(path.c_str(), 0777);
 		}
