@@ -466,8 +466,10 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			}
 		}
 		
-		for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
-			Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
+		if (Players[i].NumTownHalls > 0 || Players[i].Index == ThisPlayer->Index) {
+			for (size_t j = 0; j < this->PlayerLocationGeneratedNeutralUnits.size(); ++j) {
+				Map.GenerateNeutralUnits(this->PlayerLocationGeneratedNeutralUnits[j].first, this->PlayerLocationGeneratedNeutralUnits[j].second, Players[i].StartPos - Vec2i(8, 8), Players[i].StartPos + Vec2i(8, 8), true, z);
+			}
 		}
 	}
 	

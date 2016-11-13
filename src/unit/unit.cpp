@@ -3965,7 +3965,10 @@ bool CUnit::IsVisibleInViewport(const CViewport &vp) const
 **
 **  @param newplayer  New owning player.
 */
-void CUnit::ChangeOwner(CPlayer &newplayer)
+//Wyrmgus start
+//void CUnit::ChangeOwner(CPlayer &newplayer)
+void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
+//Wyrmgus end
 {
 	CPlayer *oldplayer = Player;
 
@@ -4077,6 +4080,13 @@ void CUnit::ChangeOwner(CPlayer &newplayer)
 	}
 
 	UpdateForNewUnit(*this, 1);
+	
+	//Wyrmgus start
+	if (newplayer.Index == ThisPlayer->Index && show_change) {
+		this->Blink = 5;
+		PlayGameSound(GameSounds.Rescue[newplayer.Race].Sound, MaxSampleVolume);
+	}
+	//Wyrmgus end
 }
 
 static bool IsMineAssignedBy(const CUnit &mine, const CUnit &worker)
@@ -4219,9 +4229,12 @@ void RescueUnits()
 							break;
 						}
 						unit.RescuedFrom = unit.Player;
-						unit.ChangeOwner(*around[i]->Player);
-						unit.Blink = 5;
-						PlayGameSound(GameSounds.Rescue[unit.Player->Race].Sound, MaxSampleVolume);
+						//Wyrmgus start
+//						unit.ChangeOwner(*around[i]->Player);
+						unit.ChangeOwner(*around[i]->Player, true);
+//						unit.Blink = 5;
+//						PlayGameSound(GameSounds.Rescue[unit.Player->Race].Sound, MaxSampleVolume);
+						//Wyrmgus end
 						break;
 					}
 				}
@@ -5225,6 +5238,15 @@ bool CUnit::CanEat(const CUnit &unit) const
 	}
 		
 	return false;
+}
+
+bool CUnit::LevelCheck(const int level) const
+{
+	if (this->Variable[LEVEL_INDEX].Value == 0) {
+		return false;
+	}
+	
+	return SyncRand(this->Variable[LEVEL_INDEX].Value + 1) >= level;
 }
 
 CAnimations *CUnit::GetAnimations() const

@@ -1436,7 +1436,7 @@ static int CclChangeUnitOwner(lua_State *l)
 	CUnit *unit = CclGetUnit(l);
 	lua_pop(l, 1);
 	const int value = LuaToNumber(l, 2);
-	unit->ChangeOwner(Players[value]);
+	unit->ChangeOwner(Players[value], true);
 
 	return 0;
 }
@@ -1489,6 +1489,27 @@ static int CclIncreaseUnitLevel(lua_State *l)
 	unit->IncreaseLevel(value);
 
 	return 0;
+}
+
+/**
+**  Perform a level check for a unit
+**
+**  @param l  Lua state.
+*/
+static int CclUnitLevelCheck(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+
+	if (lua_isnil(l, 1)) {
+		return 1;
+	}
+
+	lua_pushvalue(l, 1);
+	CUnit *unit = CclGetUnit(l);
+	lua_pop(l, 1);
+	const int level = LuaToNumber(l, 2);
+	lua_pushboolean(l, unit->LevelCheck(level));
+	return 1;
 }
 //Wyrmgus end
 
@@ -2110,6 +2131,7 @@ void UnitCclRegister()
 	lua_register(Lua, "ChangeUnitOwner", CclChangeUnitOwner);
 	lua_register(Lua, "ConvertUnit", CclConvertUnit);
 	lua_register(Lua, "IncreaseUnitLevel", CclIncreaseUnitLevel);
+	lua_register(Lua, "UnitLevelCheck", CclUnitLevelCheck);
 	//Wyrmgus end
 
 	lua_register(Lua, "GetUnits", CclGetUnits);

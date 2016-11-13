@@ -177,7 +177,10 @@ public:
 	void XPChanged();
 	//Wyrmgus end
 	/// Change owner of unit
-	void ChangeOwner(CPlayer &newplayer);
+	//Wyrmgus start
+//	void ChangeOwner(CPlayer &newplayer);
+	void ChangeOwner(CPlayer &newplayer, bool show_change = false);
+	//Wyrmgus end
 
 	/// Remove unit from map/groups/...
 	void Remove(CUnit *host);
@@ -402,6 +405,7 @@ public:
 	bool CanLearnAbility(CUpgrade *ability) const;
 	bool CanHireMercenary(CUnitType *type, int civilization_id = -1) const;
 	bool CanEat(const CUnit &unit) const;
+	bool LevelCheck(const int level) const;
 	CAnimations *GetAnimations() const;
 	CConstruction *GetConstruction() const;
 	IconConfig GetIcon() const;

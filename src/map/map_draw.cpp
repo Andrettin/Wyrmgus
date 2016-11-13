@@ -41,6 +41,7 @@
 #include "player.h"
 //Wyrmgus start
 #include "tileset.h"
+#include "translate.h"
 //Wyrmgus end
 #include "unit.h"
 #include "unittype.h"
@@ -549,7 +550,11 @@ void CViewport::Draw() const
 			}
 			std::string unit_name;
 			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
-				unit_name = UnitUnderCursor->GetName();
+				if (!UnitUnderCursor->Identified) {
+					unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
+				} else {
+					unit_name = UnitUnderCursor->GetName();
+				}
 			} else {
 				unit_name = UnitUnderCursor->GetTypeName();
 			}
