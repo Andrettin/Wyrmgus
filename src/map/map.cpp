@@ -615,6 +615,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *std::get<1>(this->Units[i]), player, z);
 			if (!type->BoolFlag[BUILDING_INDEX].value) { // make non-building units not have an active AI
 				unit->Active = 0;
+				player->UnitTypesAiActiveCount[type->Slot]--;
 			}
 		}
 	}
@@ -647,6 +648,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
 			unit->SetCharacter(hero->GetFullName());
 			unit->Active = 0;
+			player->UnitTypesAiActiveCount[hero->Type->Slot]--;
 		}
 	}
 }
