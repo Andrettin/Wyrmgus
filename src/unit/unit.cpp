@@ -5246,7 +5246,7 @@ bool CUnit::LevelCheck(const int level) const
 		return false;
 	}
 	
-	return SyncRand(this->Variable[LEVEL_INDEX].Value + 1) >= level;
+	return SyncRand((this->Variable[LEVEL_INDEX].Value * 2) + 1) >= level;
 }
 
 CAnimations *CUnit::GetAnimations() const
