@@ -120,7 +120,7 @@ public:
 	ResourceInfo() : WaitAtResource(0), ResourceStep(0),
 		//Wyrmgus start
 //		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0), FinalResource(0),
-		ResourceCapacity(0), WaitAtDepot(0), ResourceId(0),
+		ResourceCapacity(0), WaitAtDepot(0), GatheringModifier(0), ResourceId(0),
 //		TerrainHarvester(0), LoseResources(0), HarvestFromOutside(0),
 		LoseResources(0),
 		//Wyrmgus end
@@ -133,6 +133,9 @@ public:
 	unsigned ResourceStep;          /// Resources the unit gains per mining cycle.
 	int      ResourceCapacity;      /// Max amount of resources to carry.
 	unsigned WaitAtDepot;           /// Cycles the unit waits while returning.
+	//Wyrmgus start
+	int GatheringModifier;
+	//Wyrmgus end
 	unsigned ResourceId;            /// Id of the resource harvested. Redundant.
 	//Wyrmgus start
 //	unsigned FinalResource;         /// Convert resource when delivered.

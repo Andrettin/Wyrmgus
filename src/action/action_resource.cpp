@@ -657,7 +657,10 @@ int COrder_Resource::StartGathering(CUnit &unit)
 #endif
 		UnitHeadingFromDeltaXY(unit, this->goalPos - unit.tilePos);
 		if (resinfo.WaitAtResource) {
-			this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+			//Wyrmgus start
+//			this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
+			this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] + resinfo.GatheringModifier));
+			//Wyrmgus end
 		} else {
 			this->TimeToHarvest = 1;
 		}
@@ -743,7 +746,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
 			wait_at_resource = resinfo.WaitAtResource * 100 / resinfo.ResourceStep;
 		}
-		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
+		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] + resinfo.GatheringModifier + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
 		//Wyrmgus end
 	} else {
 		this->TimeToHarvest = 1;
@@ -909,7 +912,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			// Wyrmgus start
 //			this->TimeToHarvest += std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 			int wait_at_resource = resinfo.WaitAtResource;
-			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo.ResourceId];
+			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] + resinfo.GatheringModifier;
 			if (!Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
 				wait_at_resource = resinfo.WaitAtResource * 100 / resinfo.ResourceStep;
 			}
