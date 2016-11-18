@@ -1506,7 +1506,7 @@ void CUnit::ApplyAuraEffect(int aura_index)
 {
 	int effect_index = -1;
 	if (aura_index == LEADERSHIPAURA_INDEX) {
-		if (this->Type->BoolFlag[BUILDING_INDEX].value) {
+		if (this->Type->BoolFlag[BUILDING_INDEX].value || !this->IsInCombat()) {
 			return;
 		}
 		effect_index = LEADERSHIP_INDEX;
@@ -5005,6 +5005,28 @@ bool CUnit::CanAttack(bool count_inside) const
 	}
 	
 	return this->Type->BoolFlag[CANATTACK_INDEX].value;
+}
+
+bool CUnit::IsInCombat() const
+{
+	// Select all units around the unit
+	std::vector<CUnit *> table;
+	SelectAroundUnit(*this, 6, table, HasNotSamePlayerAs(*this->Player));
+
+	// Check each unit if it is hostile.
+	bool inCombat = false;
+	for (size_t i = 0; i < table.size(); ++i) {
+		const CUnit &target = *table[i];
+
+		// Note that CanTarget doesn't take into account (offensive) spells...
+		if (target.IsVisibleAsGoal(*this->Player) && this->IsEnemy(target)
+			&& (CanTarget(*this->Type, *target.Type) || CanTarget(*target.Type, *this->Type))) {
+			inCombat = true;
+			break;
+		}
+	}
+		
+	return inCombat;
 }
 
 bool CUnit::IsItemEquipped(const CUnit *item) const
