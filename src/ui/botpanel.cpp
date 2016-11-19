@@ -834,7 +834,7 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		//Wyrmgus start
 		case ButtonBuy:
 			Costs[FoodCost] = UnitManager.GetSlotUnit(button.Value).Type->Stats[ThisPlayer->Index].Variables[DEMAND_INDEX].Value;
-			Costs[GoldCost] = UnitManager.GetSlotUnit(button.Value).GetPrice();
+			Costs[MetalCost] = UnitManager.GetSlotUnit(button.Value).GetPrice();
 			break;
 		//Wyrmgus end
 		default:
@@ -915,7 +915,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 		case ButtonSpellCast: {
 			CLabel label(font, "white", "red");
 			// FIXME: hardcoded image!!!
-			const int IconID = GoldCost;
+			//Wyrmgus start
+//			const int IconID = GoldCost;
+			const int IconID = MetalCost;
+			//Wyrmgus end
 			//SetCosts(SpellTypeTable[button->Value]->ManaCost, 0, NULL);
 			const CGraphic *G = UI.Resources[IconID].G;
 			const SpellType *spell = SpellTypeTable[button->Value];
@@ -2091,7 +2094,7 @@ void CButtonPanel::DoClicked_Buy(int button)
 {
 	int buy_costs[MaxCosts];
 	memset(buy_costs, 0, sizeof(buy_costs));
-	buy_costs[GoldCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetPrice();
+	buy_costs[MetalCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetPrice();
 	if (!ThisPlayer->CheckCosts(buy_costs) && ThisPlayer->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) >= 0) {
 		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), ThisPlayer->Index);
 		if (IsOnlySelected(*Selected[0])) {

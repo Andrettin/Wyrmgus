@@ -535,7 +535,7 @@ void CGrandStrategyGame::DrawInterface()
 {
 	if (this->PlayerFaction != NULL && this->PlayerFaction->OwnedProvinces.size() > 0) { //draw resource bar
 		std::vector<int> stored_resources;
-		stored_resources.push_back(GoldCost);
+		stored_resources.push_back(MetalCost);
 		stored_resources.push_back(WoodCost);
 		stored_resources.push_back(StoneCost);
 		stored_resources.push_back(ResearchCost);
@@ -550,7 +550,7 @@ void CGrandStrategyGame::DrawInterface()
 			
 			int quantity_stored = this->PlayerFaction->Resources[stored_resources[i]];
 			int income = 0;
-			if (stored_resources[i] == GoldCost) {
+			if (stored_resources[i] == MetalCost) {
 				income = this->PlayerFaction->Income[stored_resources[i]] - this->PlayerFaction->Upkeep;
 			} else if (stored_resources[i] == ResearchCost || stored_resources[i] == LeadershipCost) {
 				income = this->PlayerFaction->Income[stored_resources[i]] / this->PlayerFaction->OwnedProvinces.size();
@@ -948,7 +948,7 @@ void CGrandStrategyGame::DoTurn()
 			if (this->Factions[i][j]->IsAlive()) {
 				//faction income
 				for (int k = 0; k < MaxCosts; ++k) {
-					if (GrandStrategyGame.IsFoodResource(k) || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and silver and copper are converted to gold
+					if (GrandStrategyGame.IsFoodResource(k) || k == GoldCost || k == SilverCost || k == CopperCost) { //food resources are not added to the faction's storage, being stored at the province level instead, and gold, silver and copper are converted to metal
 						continue;
 					} else if (k == ResearchCost || k == LeadershipCost) {
 						this->Factions[i][j]->Resources[k] += this->Factions[i][j]->Income[k] / this->Factions[i][j]->OwnedProvinces.size();
@@ -1244,13 +1244,13 @@ void CGrandStrategyGame::DoTrade()
 				for (size_t k = 0; k < this->Factions[i][j]->OwnedProvinces.size(); ++k) {
 					int province_id = this->Factions[i][j]->OwnedProvinces[k];
 					for (int res = 0; res < MaxCosts; ++res) {
-						if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+						if (res == MetalCost || res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 							continue;
 						}
 							
 						if (province_consumed_commodity[res][province_id] == false && this->Factions[i][j]->Trade[res] >= this->Provinces[province_id]->GetResourceDemand(res) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
 							this->Factions[i][j]->Resources[res] -= this->Provinces[province_id]->GetResourceDemand(res);
-							this->Factions[i][j]->Resources[GoldCost] += this->Provinces[province_id]->GetResourceDemand(res) * this->CommodityPrices[res] / 100;
+							this->Factions[i][j]->Resources[MetalCost] += this->Provinces[province_id]->GetResourceDemand(res) * this->CommodityPrices[res] / 100;
 							this->Factions[i][j]->Trade[res] -= this->Provinces[province_id]->GetResourceDemand(res);
 							province_consumed_commodity[res][province_id] = true;
 						}
@@ -1292,7 +1292,7 @@ void CGrandStrategyGame::DoTrade()
 	for (int i = 0; i < factions_by_prestige_count; ++i) {
 		if (factions_by_prestige[i]) {
 			for (int res = 0; res < MaxCosts; ++res) {
-				if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+				if (res == MetalCost || res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 					continue;
 				}
 				
@@ -1332,13 +1332,13 @@ void CGrandStrategyGame::DoTrade()
 						int province_id = factions_by_prestige[j]->OwnedProvinces[k];
 						
 						for (int res = 0; res < MaxCosts; ++res) {
-							if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+							if (res == MetalCost || res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 								continue;
 							}
 							
 							if (province_consumed_commodity[res][province_id] == false && factions_by_prestige[i]->Trade[res] >= this->Provinces[province_id]->GetResourceDemand(res) && this->Provinces[province_id]->HasBuildingClass("town-hall")) {
 								factions_by_prestige[i]->Resources[res] -= this->Provinces[province_id]->GetResourceDemand(res);
-								factions_by_prestige[i]->Resources[GoldCost] += this->Provinces[province_id]->GetResourceDemand(res) * this->CommodityPrices[res] / 100;
+								factions_by_prestige[i]->Resources[MetalCost] += this->Provinces[province_id]->GetResourceDemand(res) * this->CommodityPrices[res] / 100;
 								factions_by_prestige[i]->Trade[res] -= this->Provinces[province_id]->GetResourceDemand(res);
 								province_consumed_commodity[res][province_id] = true;
 							}
@@ -1357,7 +1357,7 @@ void CGrandStrategyGame::DoTrade()
 	int remaining_wanted_trade[MaxCosts];
 	memset(remaining_wanted_trade, 0, sizeof(remaining_wanted_trade));
 	for (int res = 0; res < MaxCosts; ++res) {
-		if (res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
+		if (res == MetalCost || res == GoldCost || res == SilverCost || res == CopperCost || res == ResearchCost || res == PrestigeCost || res == LaborCost || GrandStrategyGame.IsFoodResource(res) || res == LeadershipCost) {
 			continue;
 		}
 		
@@ -1387,16 +1387,16 @@ void CGrandStrategyGame::DoTrade()
 	//now restore the human player's trade settings
 	if (this->PlayerFaction != NULL) {
 		for (int i = 0; i < MaxCosts; ++i) {
-			if (i == GoldCost || i == SilverCost || i == CopperCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || GrandStrategyGame.IsFoodResource(i) || i == LeadershipCost) {
+			if (i == MetalCost || i == GoldCost || i == SilverCost || i == CopperCost || i == ResearchCost || i == PrestigeCost || i == LaborCost || GrandStrategyGame.IsFoodResource(i) || i == LeadershipCost) {
 				continue;
 			}
 		
 			if (player_trade_preferences[i] > 0 && this->PlayerFaction->Resources[i] < player_trade_preferences[i]) {
 				player_trade_preferences[i] = this->PlayerFaction->Resources[i];
-			} else if (player_trade_preferences[i] < 0 && this->PlayerFaction->Resources[GoldCost] < 0) {
+			} else if (player_trade_preferences[i] < 0 && this->PlayerFaction->Resources[MetalCost] < 0) {
 				player_trade_preferences[i] = 0;
-			} else if (player_trade_preferences[i] < 0 && this->PlayerFaction->Resources[GoldCost] < (player_trade_preferences[i] * -1 * this->CommodityPrices[i] / 100)) {
-				player_trade_preferences[i] = (this->PlayerFaction->Resources[GoldCost] / this->CommodityPrices[i] * 100) * -1;
+			} else if (player_trade_preferences[i] < 0 && this->PlayerFaction->Resources[MetalCost] < (player_trade_preferences[i] * -1 * this->CommodityPrices[i] / 100)) {
+				player_trade_preferences[i] = (this->PlayerFaction->Resources[MetalCost] / this->CommodityPrices[i] * 100) * -1;
 			}
 			this->PlayerFaction->Trade[i] = player_trade_preferences[i];
 		}
@@ -1521,8 +1521,8 @@ void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, C
 		importer_faction.Resources[resource] += exporter_faction.Trade[resource];
 		exporter_faction.Resources[resource] -= exporter_faction.Trade[resource];
 
-		importer_faction.Resources[GoldCost] -= exporter_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
-		exporter_faction.Resources[GoldCost] += exporter_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
+		importer_faction.Resources[MetalCost] -= exporter_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
+		exporter_faction.Resources[MetalCost] += exporter_faction.Trade[resource] * this->CommodityPrices[resource] / 100;
 		
 		importer_faction.Trade[resource] += exporter_faction.Trade[resource];
 		exporter_faction.Trade[resource] = 0;
@@ -1530,8 +1530,8 @@ void CGrandStrategyGame::PerformTrade(CGrandStrategyFaction &importer_faction, C
 		importer_faction.Resources[resource] += abs(importer_faction.Trade[resource]);
 		exporter_faction.Resources[resource] -= abs(importer_faction.Trade[resource]);
 
-		importer_faction.Resources[GoldCost] -= abs(importer_faction.Trade[resource]) * this->CommodityPrices[resource] / 100;
-		exporter_faction.Resources[GoldCost] += abs(importer_faction.Trade[resource]) * this->CommodityPrices[resource] / 100;
+		importer_faction.Resources[MetalCost] -= abs(importer_faction.Trade[resource]) * this->CommodityPrices[resource] / 100;
+		exporter_faction.Resources[MetalCost] += abs(importer_faction.Trade[resource]) * this->CommodityPrices[resource] / 100;
 		
 		exporter_faction.Trade[resource] += importer_faction.Trade[resource];
 		importer_faction.Trade[resource] = 0;
@@ -1605,7 +1605,7 @@ bool CGrandStrategyGame::IsPointOnMap(int x, int y)
 
 bool CGrandStrategyGame::IsTileResource(int resource)
 {
-	return resource == GoldCost || resource == SilverCost || resource == CopperCost || resource == WoodCost || resource == StoneCost || resource == GrainCost || resource == MushroomCost;
+	return resource == MetalCost || resource == GoldCost || resource == SilverCost || resource == CopperCost || resource == WoodCost || resource == StoneCost || resource == GrainCost || resource == MushroomCost;
 }
 
 bool CGrandStrategyGame::IsFoodResource(int resource)
@@ -1910,7 +1910,7 @@ void GrandStrategyWorldMapTile::BuildPathway(int pathway, int direction)
 	}
 	
 	if (pathway == PathwayRoad) {
-		this->Province->Owner->Resources[GoldCost] -= 200 * change;
+		this->Province->Owner->Resources[MetalCost] -= 200 * change;
 		this->Province->Owner->Resources[WoodCost] -= 200 * change;
 	}
 }
@@ -3115,9 +3115,10 @@ void CGrandStrategyProvince::AllocateLabor()
 	resources_by_priority.push_back(FishCost);
 	resources_by_priority.push_back(GoldCost);
 	resources_by_priority.push_back(SilverCost);
+	resources_by_priority.push_back(CopperCost);
+	resources_by_priority.push_back(MetalCost);
 	resources_by_priority.push_back(WoodCost);
 	resources_by_priority.push_back(StoneCost);
-	resources_by_priority.push_back(CopperCost);
 
 	for (size_t i = 0; i < resources_by_priority.size(); ++i) {
 		this->AllocateLaborToResource(resources_by_priority[i]);
@@ -3201,10 +3202,12 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 	}
 	
 	this->Owner->Income[resource] -= this->Income[resource]; //first, remove the old income from the owner's income
-	if (resource == SilverCost) { //silver and copper are converted to gold
-		this->Owner->Income[GoldCost] -= this->Income[resource] / 2;
+	if (resource == GoldCost) { //gold, silver and copper are converted to metal
+		this->Owner->Income[MetalCost] -= this->Income[resource] * 2;
+	} else if (resource == SilverCost) {
+		this->Owner->Income[MetalCost] -= this->Income[resource] * 150 / 100;
 	} else if (resource == CopperCost) {
-		this->Owner->Income[GoldCost] -= this->Income[resource] / 4;
+		this->Owner->Income[MetalCost] -= this->Income[resource];
 	}
 	
 	int income = 0;
@@ -3259,10 +3262,12 @@ void CGrandStrategyProvince::CalculateIncome(int resource)
 	this->Income[resource] = income;
 	
 	this->Owner->Income[resource] += this->Income[resource]; //add the new income to the owner's income
-	if (resource == SilverCost) { //silver and copper are converted to gold
-		this->Owner->Income[GoldCost] += this->Income[resource] / 2;
+	if (resource == GoldCost) { //gold, silver and copper are converted to metal
+		this->Owner->Income[MetalCost] += this->Income[resource] * 2;
+	} else if (resource == SilverCost) {
+		this->Owner->Income[MetalCost] += this->Income[resource] * 150 / 100;
 	} else if (resource == CopperCost) {
-		this->Owner->Income[GoldCost] += this->Income[resource] / 4;
+		this->Owner->Income[MetalCost] += this->Income[resource];
 	}
 }
 
@@ -3680,6 +3685,7 @@ int CGrandStrategyProvince::GetFoodCapacity(bool subtract_non_food)
 		food_capacity -= this->ProductionCapacity[GoldCost] * FoodConsumptionPerWorker;
 		food_capacity -= this->ProductionCapacity[SilverCost] * FoodConsumptionPerWorker;
 		food_capacity -= this->ProductionCapacity[CopperCost] * FoodConsumptionPerWorker;
+		food_capacity -= this->ProductionCapacity[MetalCost] * FoodConsumptionPerWorker;
 		food_capacity -= this->ProductionCapacity[WoodCost] * FoodConsumptionPerWorker;
 		food_capacity -= this->ProductionCapacity[StoneCost] * FoodConsumptionPerWorker;
 	}
@@ -3701,6 +3707,7 @@ int CGrandStrategyProvince::GetDesirabilityRating()
 	}
 	
 	std::vector<int> resources;
+	resources.push_back(MetalCost);
 	resources.push_back(GoldCost);
 	resources.push_back(SilverCost);
 	resources.push_back(CopperCost);
@@ -4749,7 +4756,7 @@ bool CGrandStrategyFaction::CanBuildPathway(int pathway, bool check_costs)
 	}
 	
 	if (check_costs) {
-		if (pathway == PathwayRoad && (this->Resources[GoldCost] < 200 || this->Resources[WoodCost] < 200)) {
+		if (pathway == PathwayRoad && (this->Resources[MetalCost] < 200 || this->Resources[WoodCost] < 200)) {
 			return false;
 		}
 	}

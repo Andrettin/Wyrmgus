@@ -1314,7 +1314,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	player.TotalResources[rindex] += (resource_change * player.Incomes[rindex]) / 100;
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
-	int xp_gained = resource_change;
+	int xp_gained = unit.ResourcesHeld;
 	xp_gained /= 20;
 	unit.Variable[XP_INDEX].Max += xp_gained;
 	unit.Variable[XP_INDEX].Value = unit.Variable[XP_INDEX].Max;

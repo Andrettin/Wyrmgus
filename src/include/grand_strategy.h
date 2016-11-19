@@ -283,7 +283,7 @@ public:
 	int GovernmentType;													/// Government type of the faction (-1 = none).
 	int FactionTier;													/// What is the tier of this faction (barony, etc.).
 	int CurrentResearch;												/// Currently researched technology (upgrade index).
-	int Upkeep;															/// How much gold this faction has to pay per turn
+	int Upkeep;															/// How much metal this faction has to pay per turn
 	CGrandStrategyProvince *Capital;									/// Capital province of this faction
 	bool Technologies[UpgradeMax];										/// Whether a faction has a particular technology or not
 	std::vector<int> OwnedProvinces;									/// Provinces owned by this faction

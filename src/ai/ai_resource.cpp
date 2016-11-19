@@ -655,8 +655,14 @@ static bool AiRequestSupply()
 		if (cache[0].needmask & (1 << i)) {
 			needed += ":";
 			switch (i) {
-				case GoldCost:
-					needed += "Gold<";
+				//Wyrmgus start
+//				case GoldCost:
+				case MetalCost:
+				//Wyrmgus end
+					//Wyrmgus start
+//					needed += "Gold<";
+					needed += "Metal<";
+					//Wyrmgus end
 					break;
 				case WoodCost:
 					needed += "Wood<";

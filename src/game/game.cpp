@@ -904,8 +904,8 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 						  i, DefaultResourceNames[WoodCost].c_str(),
 						  Players[i].Resources[WoodCost]);
 				f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
-						  i, DefaultResourceNames[GoldCost].c_str(),
-						  Players[i].Resources[GoldCost]);
+						  i, DefaultResourceNames[MetalCost].c_str(),
+						  Players[i].Resources[MetalCost]);
 				if (Players[i].Resources[OilCost]) {
 					f->printf("SetPlayerData(%d, \"Resources\", \"%s\", %d)\n",
 							  i, DefaultResourceNames[OilCost].c_str(),

@@ -66,7 +66,10 @@ enum CostType {
 	TimeCost,                               /// time in game cycles
 
 	// standard
-	GoldCost,                               /// gold  resource
+	//Wyrmgus start
+//	GoldCost,                               /// gold  resource
+	MetalCost,                              /// metal resource
+	//Wyrmgus end
 	WoodCost,                               /// wood  resource
 	OilCost,                                /// oil   resource
 	// extensions
@@ -81,6 +84,7 @@ enum CostType {
 	ResearchCost,							/// research resource
 	PrestigeCost,							/// prestige resource
 	Cost9,									/// resource 9 (timber in Wyrmsun)
+	GoldCost,                               /// gold resource
 	SilverCost,								/// silver resource
 	CopperCost,								/// copper resource
 	GrainCost,								/// grain resource

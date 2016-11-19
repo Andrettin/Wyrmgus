@@ -2082,7 +2082,7 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	if (!sold_unit->Type->BoolFlag[ITEM_INDEX].value) {
 		sold_unit->ChangeOwner(Players[player]);
 	}
-	Players[player].ChangeResource(GoldCost, -sold_unit->GetPrice(), true);
+	Players[player].ChangeResource(MetalCost, -sold_unit->GetPrice(), true);
 	if (IsOnlySelected(*this)) {
 		UI.ButtonPanel.Update();
 	}
@@ -4224,7 +4224,10 @@ void RescueUnits()
 						//  City center converts complete race
 						//  NOTE: I use a trick here, centers could
 						//        store gold. FIXME!!!
-						if (unit.Type->CanStore[GoldCost]) {
+						//Wyrmgus start
+//						if (unit.Type->CanStore[GoldCost]) {
+						if (unit.Type->CanStore[MetalCost]) {
+						//Wyrmgus end
 							ChangePlayerOwner(*p, *around[i]->Player);
 							break;
 						}
@@ -4938,7 +4941,7 @@ int CUnit::GetPrice() const
 
 	for (int i = 1; i < MaxCosts; ++i) {
 		if (this->Type->Stats[this->Player->Index].Costs[i] > 0) {
-			if (i == GoldCost) {
+			if (i == MetalCost) {
 				cost += this->Type->Stats[this->Player->Index].Costs[i];
 			} else {
 				cost += this->Type->Stats[this->Player->Index].Costs[i] * DefaultResourcePrices[i] / 100;
