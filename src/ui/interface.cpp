@@ -63,13 +63,25 @@
 ----------------------------------------------------------------------------*/
 
 /// Scrolling area (<= 15 y)
-#define SCROLL_UP     15
+//Wyrmgus start
+//#define SCROLL_UP     15
+#define SCROLL_UP     7
+//Wyrmgus end
 /// Scrolling area (>= VideoHeight - 16 y)
-#define SCROLL_DOWN   (Video.Height - 16)
+//Wyrmgus start
+//#define SCROLL_DOWN   (Video.Height - 16)
+#define SCROLL_DOWN   (Video.Height - 8)
+//Wyrmgus end
 /// Scrolling area (<= 15 y)
-#define SCROLL_LEFT   15
+//Wyrmgus start
+//#define SCROLL_LEFT   15
+#define SCROLL_LEFT   7
+//Wyrmgus end
 /// Scrolling area (>= VideoWidth - 16 x)
-#define SCROLL_RIGHT  (Video.Width - 16)
+//Wyrmgus start
+//#define SCROLL_RIGHT  (Video.Width - 16)
+#define SCROLL_RIGHT  (Video.Width - 7)
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Variables

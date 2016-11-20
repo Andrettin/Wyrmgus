@@ -411,6 +411,10 @@ extern void DrawMessages();
 extern void DrawResources();
 /// Draw the time of day
 extern void DrawDayTime();
+//Wyrmgus start
+/// Draw certain popups if something is being hovered over
+extern void DrawPopups();
+//Wyrmgus end
 /// Set message to display
 extern void SetMessage(const char *fmt, ...) PRINTF_VAARG_ATTRIBUTE(1, 2);
 /// Set message to display with event point

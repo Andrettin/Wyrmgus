@@ -268,15 +268,6 @@ void UpdateDisplay()
 				} else {
 					type.Icon.Icon->DrawUnitIcon(*UI.IdleWorkerButton->Style, flag, pos, ".", ThisPlayer->Index, type.GetDefaultSkinColor(*ThisPlayer), type.GetDefaultHairColor(*ThisPlayer));
 				}
-				
-				if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
-					std::string idle_worker_tooltip = _("Find Idle Worker (~!.)");
-					if (!Preference.NoStatusLineTooltips) {
-						CLabel label(GetGameFont());
-						label.Draw(2 + 16, Video.Height + 2 - 16, idle_worker_tooltip);
-					}
-					DrawGenericPopup(idle_worker_tooltip, UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
-				}
 			}
 		}
 		
@@ -286,15 +277,6 @@ void UpdateDisplay()
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
 			ThisPlayer->LevelUpUnits[0]->GetIcon().Icon->DrawUnitIcon(*UI.LevelUpUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->LevelUpUnits[0]->GetSkinColor(), ThisPlayer->LevelUpUnits[0]->GetHairColor());
-				
-			if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
-				std::string level_up_unit_tooltip = _("Find Unit with Available Level Up");
-				if (!Preference.NoStatusLineTooltips) {
-					CLabel label(GetGameFont());
-					label.Draw(2 + 16, Video.Height + 2 - 16, level_up_unit_tooltip);
-				}
-				DrawGenericPopup(level_up_unit_tooltip, UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
-			}
 		}
 		
 		//draw icon if the player has a custom hero
@@ -303,17 +285,9 @@ void UpdateDisplay()
 			const int flag = (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
 								 
 			ThisPlayer->CustomHeroUnit->GetIcon().Icon->DrawUnitIcon(*UI.CustomHeroUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->CustomHeroUnit->GetSkinColor(), ThisPlayer->CustomHeroUnit->GetHairColor());
-				
-			if (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
-				std::string custom_hero_unit_tooltip = _("Find");
-				custom_hero_unit_tooltip += " " + ThisPlayer->CustomHeroUnit->GetMessageName();
-				if (!Preference.NoStatusLineTooltips) {
-					CLabel label(GetGameFont());
-					label.Draw(2 + 16, Video.Height + 2 - 16, custom_hero_unit_tooltip);
-				}
-				DrawGenericPopup(custom_hero_unit_tooltip, UI.CustomHeroUnitButton->X, UI.CustomHeroUnitButton->Y);
-			}
 		}
+		
+		DrawPopups();
 		//Wyrmgus end
 	//Wyrmgus start
 	} else if (GrandStrategy && !GameRunning && GameResult == GameNoResult) { //grand strategy mode

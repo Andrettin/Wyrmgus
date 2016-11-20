@@ -2811,7 +2811,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 {
 	if (this->Character != NULL) {
 		return;
-	} else if (this->Type->BoolFlag[ITEM_INDEX].value) {
+	} else if (this->Type->BoolFlag[ITEM_INDEX].value || this->Unique || this->Prefix || this->Suffix) {
 		this->UpdateItemName();
 		return;
 	}

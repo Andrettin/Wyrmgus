@@ -896,6 +896,66 @@ void DrawDayTime() {
 	label.Draw(UI.TimePanel.X, UI.TimePanel.Y, _(timesText[Map.TimeOfDay[CurrentMapLayer]]));
 }
 
+//Wyrmgus start
+/**
+**  Draw certain popups if something is being hovered over
+*/
+void DrawPopups()
+{
+	if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
+		int worker_unit_type_id = PlayerRaces.GetFactionClassUnitType(ThisPlayer->Race, ThisPlayer->Faction, GetUnitTypeClassIndexByName("worker"));
+		if (worker_unit_type_id != -1) {
+			if (ButtonAreaUnderCursor == ButtonAreaIdleWorker && ButtonUnderCursor == 0) { //if the mouse is hovering over the idle worker button, draw a tooltip
+				std::string idle_worker_tooltip = _("Find Idle Worker (~!.)");
+				if (!Preference.NoStatusLineTooltips) {
+					CLabel label(GetGameFont());
+					label.Draw(2 + 16, Video.Height + 2 - 16, idle_worker_tooltip);
+				}
+				DrawGenericPopup(idle_worker_tooltip, UI.IdleWorkerButton->X, UI.IdleWorkerButton->Y);
+			}
+		}
+	}
+		
+	if (UI.LevelUpUnitButton && !ThisPlayer->LevelUpUnits.empty()) {
+		if (ButtonAreaUnderCursor == ButtonAreaLevelUpUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
+			std::string level_up_unit_tooltip = _("Find Unit with Available Level Up");
+			if (!Preference.NoStatusLineTooltips) {
+				CLabel label(GetGameFont());
+				label.Draw(2 + 16, Video.Height + 2 - 16, level_up_unit_tooltip);
+			}
+			DrawGenericPopup(level_up_unit_tooltip, UI.LevelUpUnitButton->X, UI.LevelUpUnitButton->Y);
+		}
+	}
+
+	if (UI.CustomHeroUnitButton && ThisPlayer->CustomHeroUnit) {
+		if (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
+			std::string custom_hero_unit_tooltip = _("Find");
+			custom_hero_unit_tooltip += " " + ThisPlayer->CustomHeroUnit->GetMessageName();
+			if (!Preference.NoStatusLineTooltips) {
+				CLabel label(GetGameFont());
+				label.Draw(2 + 16, Video.Height + 2 - 16, custom_hero_unit_tooltip);
+			}
+			DrawGenericPopup(custom_hero_unit_tooltip, UI.CustomHeroUnitButton->X, UI.CustomHeroUnitButton->Y);
+		}
+	}
+		
+	//draw a popup when hovering over a resource icon
+	for (int i = 0; i < MaxCosts; ++i) {
+		if (UI.Resources[i].G && CursorScreenPos.x >= UI.Resources[i].IconX && CursorScreenPos.x < (UI.Resources[i].IconX + UI.Resources[i].G->Width) && CursorScreenPos.y >= UI.Resources[i].IconY && CursorScreenPos.y < (UI.Resources[i].IconY + UI.Resources[i].G->Height)) {
+			DrawGenericPopup(CapitalizeString(DefaultResourceNames[i]), UI.Resources[i].IconX, UI.Resources[i].IconY);
+		}
+	}
+	
+	if (UI.Resources[FoodCost].G && CursorScreenPos.x >= UI.Resources[FoodCost].IconX && CursorScreenPos.x < (UI.Resources[FoodCost].IconX + UI.Resources[FoodCost].G->Width) && CursorScreenPos.y >= UI.Resources[FoodCost].IconY && CursorScreenPos.y < (UI.Resources[FoodCost].IconY + UI.Resources[FoodCost].G->Height)) {
+		DrawGenericPopup("Food", UI.Resources[FoodCost].IconX, UI.Resources[FoodCost].IconY);
+	}
+	
+	if (UI.Resources[ScoreCost].G && CursorScreenPos.x >= UI.Resources[ScoreCost].IconX && CursorScreenPos.x < (UI.Resources[ScoreCost].IconX + UI.Resources[ScoreCost].G->Width) && CursorScreenPos.y >= UI.Resources[ScoreCost].IconY && CursorScreenPos.y < (UI.Resources[ScoreCost].IconY + UI.Resources[ScoreCost].G->Height)) {
+		DrawGenericPopup("Score", UI.Resources[ScoreCost].IconX, UI.Resources[ScoreCost].IconY);
+	}
+}
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  MESSAGE
 ----------------------------------------------------------------------------*/
