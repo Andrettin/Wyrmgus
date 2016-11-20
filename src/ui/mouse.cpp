@@ -278,6 +278,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 							PlayUnitSound(unit, VoiceBuild);
 							acknowledged = 1;
 						}
+						break;
 					}
 				}
 				return true;
@@ -294,6 +295,7 @@ static bool DoRightButton_Harvest_Unit(CUnit &unit, CUnit &dest, int flush, int 
 					for (size_t z = 0; z < UnitTypes.size(); ++z) {
 						if (UnitTypes[z] && UnitTypes[z]->GivesResource == res && UnitTypes[z]->BoolFlag[CANHARVEST_INDEX].value && CanBuildUnitType(&unit, *UnitTypes[z], dest.tilePos, 1, false, dest.MapLayer)) {
 							SendCommandBuildBuilding(unit, dest.tilePos, *UnitTypes[z], 0, dest.MapLayer);
+							break;
 						}
 					}
 					//Wyrmgus end
