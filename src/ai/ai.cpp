@@ -503,7 +503,7 @@ void AiInit(CPlayer &player)
 	//Wyrmgus start
 //	pai->Collect[GoldCost] = 50;
 //	pai->Collect[WoodCost] = 50;
-	pai->Collect[MetalCost] = 45;
+	pai->Collect[CopperCost] = 45;
 	pai->Collect[WoodCost] = 45;
 	//Wyrmgus end
 	pai->Collect[OilCost] = 0;

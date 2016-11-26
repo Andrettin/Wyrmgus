@@ -1319,7 +1319,7 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 		// add/remove allowed units
 
 		//Wyrmgus start
-		if (stat.Variables == NULL) { // unit types stats not initialized
+		if (stat.Variables == NULL) { // unit type's stats not initialized
 			break;
 		}
 		//Wyrmgus end

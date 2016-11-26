@@ -657,11 +657,11 @@ static bool AiRequestSupply()
 			switch (i) {
 				//Wyrmgus start
 //				case GoldCost:
-				case MetalCost:
+				case CopperCost:
 				//Wyrmgus end
 					//Wyrmgus start
 //					needed += "Gold<";
-					needed += "Metal<";
+					needed += "Copper<";
 					//Wyrmgus end
 					break;
 				case WoodCost:

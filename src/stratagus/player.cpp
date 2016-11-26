@@ -1164,7 +1164,7 @@ CPlayer *GetOrAddFactionPlayer(CFaction *faction)
 			Players[i].AiEnabled = true;
 			Players[i].AiName = faction->DefaultAI;
 			Players[i].Team = 1;
-			Players[i].Resources[MetalCost] = 2500; // give the new player enough resources to start up
+			Players[i].Resources[CopperCost] = 2500; // give the new player enough resources to start up
 			Players[i].Resources[WoodCost] = 2500;
 			Players[i].Resources[StoneCost] = 2500;
 			return &Players[i];
@@ -2482,7 +2482,7 @@ void PlayersEachMinute(int playerIdx)
 					break;
 				}
 				
-				CUnit *depot = FindDeposit(*worker_unit, 1000, MetalCost);
+				CUnit *depot = FindDeposit(*worker_unit, 1000, CopperCost);
 				if (!depot) {
 					break;
 				}
@@ -2495,7 +2495,7 @@ void PlayersEachMinute(int playerIdx)
 					if (j == 2) {
 						resource_range = 1000;
 					}
-					deposit = UnitFindResource(*worker_unit, depot ? *depot : *worker_unit, resource_range, MetalCost, true, NULL, false, true, true);
+					deposit = UnitFindResource(*worker_unit, depot ? *depot : *worker_unit, resource_range, CopperCost, true, NULL, false, true, true);
 					if (deposit) {
 						break; // found deposit
 					}
@@ -2518,7 +2518,7 @@ void PlayersEachMinute(int playerIdx)
 						Players[j].AiEnabled = true;
 						Players[j].AiName = faction->DefaultAI;
 						Players[j].Team = 1;
-						Players[j].Resources[MetalCost] = 5000; // give the new player enough resources to start up
+						Players[j].Resources[CopperCost] = 5000; // give the new player enough resources to start up
 						Players[j].Resources[WoodCost] = 5000;
 						Players[j].Resources[StoneCost] = 5000;
 						AiInit(Players[j]);

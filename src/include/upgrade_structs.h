@@ -68,7 +68,7 @@ enum CostType {
 	// standard
 	//Wyrmgus start
 //	GoldCost,                               /// gold  resource
-	MetalCost,                              /// metal resource
+	CopperCost,                             /// copper resource
 	//Wyrmgus end
 	WoodCost,                               /// wood  resource
 	OilCost,                                /// oil   resource
@@ -86,7 +86,6 @@ enum CostType {
 	Cost9,									/// resource 9 (timber in Wyrmsun)
 	GoldCost,                               /// gold resource
 	SilverCost,								/// silver resource
-	CopperCost,								/// copper resource
 	GrainCost,								/// grain resource
 	MushroomCost,							/// mushroom resource
 	LaborCost,								/// labor resource

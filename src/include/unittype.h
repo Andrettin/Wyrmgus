@@ -891,7 +891,7 @@ public:
 	//Wyrmgus start
 	int TechnologyPointCost;								/// Technology point cost
 	int TrainQuantity;										/// Quantity to be trained
-	int Upkeep;												/// Metal upkeep (for grand strategy mode)
+	int Upkeep;												/// Copper upkeep (for grand strategy mode)
 	int SkinColor;											/// Skin color of the unit type (used for color conversion)
 	int HairColor;											/// Hair color of the unit type (used for color conversion)
 	int ItemClass;											/// Item class (if the unit type is an item)
