@@ -1733,7 +1733,7 @@ void CPlayer::UpdateLevelUpUnits()
 
 	for (int i = 0; i < nunits; ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (unit.IsAlive() && unit.Variable[LEVELUP_INDEX].Value >= 1 && !unit.Removed) {
+		if (unit.IsAlive() && unit.Variable[LEVELUP_INDEX].Value >= 1) {
 			LevelUpUnits.push_back(&unit);
 		}
 	}

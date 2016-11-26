@@ -695,6 +695,8 @@ void CUnit::IncreaseLevel(int level_quantity)
 		}
 	}
 	
+	this->Variable[LEVELUP_INDEX].Enable = 1;
+	
 	Player->UpdateLevelUpUnits();
 }
 
