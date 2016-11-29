@@ -1759,7 +1759,7 @@ void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
 {
 	CMapField &mf = *this->Field(pos, z);
 	
-	if (!mf.OverlayTerrain || mf.OverlayTerrainDestroyed == damaged) {
+	if (!mf.OverlayTerrain || mf.OverlayTerrainDamaged == damaged) {
 		return;
 	}
 	
@@ -1770,24 +1770,6 @@ void CMap::SetOverlayTerrainDamaged(const Vec2i &pos, bool damaged, int z)
 	UI.Minimap.UpdateXY(pos, z);
 	if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
 		MarkSeenTile(mf, z);
-	}
-	
-	for (int x_offset = -1; x_offset <= 1; ++x_offset) {
-		for (int y_offset = -1; y_offset <= 1; ++y_offset) {
-			if (x_offset != 0 || y_offset != 0) {
-				Vec2i adjacent_pos(pos.x + x_offset, pos.y + y_offset);
-				if (Map.Info.IsPointOnMap(adjacent_pos, z)) {
-					CMapField &adjacent_mf = *this->Field(adjacent_pos, z);
-						
-					this->CalculateTileTransitions(adjacent_pos, true, z);
-					
-					UI.Minimap.UpdateXY(adjacent_pos, z);
-					if (adjacent_mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
-						MarkSeenTile(adjacent_mf, z);
-					}
-				}
-			}
-		}
 	}
 }
 
