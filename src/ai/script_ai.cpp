@@ -1195,6 +1195,8 @@ static int CclAiSetReserve(lua_State *l)
 */
 static int CclAiSetCollect(lua_State *l)
 {
+	//Wyrmgus start
+	/*
 	LuaCheckArgs(l, 1);
 	if (!lua_istable(l, 1)) {
 		LuaError(l, "incorrect argument");
@@ -1202,6 +1204,20 @@ static int CclAiSetCollect(lua_State *l)
 	for (int i = 0; i < MaxCosts; ++i) {
 		AiPlayer->Collect[i] = LuaToNumber(l, 1, i + 1);
 	}
+	*/
+	const unsigned int args = lua_gettop(l);
+
+	if (args & 1) {
+		LuaError(l, "incorrect argument");
+	}
+	for (unsigned int j = 0; j < args; ++j) {
+		const std::string resource = LuaToString(l, j + 1);
+		const int resId = GetResourceIdByName(l, resource.c_str());
+
+		++j;
+		AiPlayer->Collect[resId] = LuaToNumber(l, j + 1);
+	}
+	//Wyrmgus end
 	return 0;
 }
 
