@@ -6501,6 +6501,7 @@ bool CUnit::IsEnemy(const CUnit &unit) const
 	
 	if (
 		this->Player != unit.Player
+		&& this->Player->Type != PlayerNeutral
 		&& unit.CurrentAction() == UnitActionAttack
 		&& unit.CurrentOrder()->HasGoal()
 		&& unit.CurrentOrder()->GetGoal()->Player == this->Player
