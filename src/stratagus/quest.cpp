@@ -196,6 +196,9 @@ CQuest::~CQuest()
 	if (this->CompletionEffects) {
 		delete CompletionEffects;
 	}
+	if (this->FailEffects) {
+		delete FailEffects;
+	}
 }
 
 CCampaign::~CCampaign()

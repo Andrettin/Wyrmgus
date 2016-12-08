@@ -162,6 +162,8 @@ static int CclDefineQuest(lua_State *l)
 			quest->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "CompletionEffects")) {
 			quest->CompletionEffects = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "FailEffects")) {
+			quest->FailEffects = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "Objectives")) {
 			quest->Objectives.clear();
 			const int args = lua_rawlen(l, -1);
@@ -227,7 +229,7 @@ static int CclDefineQuest(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				CUniqueItem *unique = GetUniqueItem(LuaToString(l, -1, j + 1));
 				if (!unique) {
-					LuaError(l, "Unit type doesn't exist.");
+					LuaError(l, "Unique item doesn't exist.");
 				}
 				quest->DestroyUniques.push_back(unique);
 			}
@@ -244,6 +246,16 @@ static int CclDefineQuest(lua_State *l)
 				int quantity = LuaToNumber(l, -1, j + 1);
 				
 				quest->GatherResources.push_back(std::tuple<int, int>(resource, quantity));
+			}
+		} else if (!strcmp(value, "HeroesMustSurvive")) {
+			quest->HeroesMustSurvive.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				CCharacter *hero = GetCharacter(LuaToString(l, -1, j + 1));
+				if (!hero) {
+					LuaError(l, "Hero doesn't exist.");
+				}
+				quest->HeroesMustSurvive.push_back(hero);
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);

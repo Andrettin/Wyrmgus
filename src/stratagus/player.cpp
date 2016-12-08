@@ -1920,6 +1920,13 @@ void CPlayer::FailQuest(CQuest *quest, std::string fail_reason)
 {
 	this->CurrentQuests.erase(std::remove(this->CurrentQuests.begin(), this->CurrentQuests.end(), quest), this->CurrentQuests.end());
 	
+	CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+	
+	if (quest->FailEffects) {
+		quest->FailEffects->pushPreamble();
+		quest->FailEffects->run();
+	}
+	
 	if (this == ThisPlayer) {
 		for (size_t i = 0; i < quest->Objectives.size(); ++i) {
 //			SetObjective(quest->Objectives[i].c_str());
@@ -1991,6 +1998,12 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 
 std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for failure (empty if none)
 {
+	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) { // put it here, because "unfailable" quests should also fail when a hero which should survive dies
+		if (std::find(this->Heroes.begin(), this->Heroes.end(), quest->HeroesMustSurvive[i]->GetFullName()) == this->Heroes.end()) {
+			return "A hero necessary for the quest has died.";
+		}
+	}
+	
 	if (quest->Unfailable) {
 		return "";
 	}

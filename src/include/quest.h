@@ -62,7 +62,7 @@ public:
 	CQuest() :
 		ID(-1), Civilization(-1), PlayerColor(0), SkinColor(0), HairColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false), Unobtainable(false), Uncompleteable(false), Unfailable(false),
-		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionEffects(NULL)
+		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionEffects(NULL), FailEffects(NULL)
 	{
 	}
 	~CQuest();
@@ -104,6 +104,7 @@ public:
 	CDialogue *IntroductionDialogue;
 	LuaCallback *Conditions;
 	LuaCallback *CompletionEffects;
+	LuaCallback *FailEffects;
 	std::vector<std::string> Objectives;	/// The objectives of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<std::tuple<CUnitType *, int>> BuildUnits;	/// Build units objective vector, containing unit type and quantity
@@ -111,6 +112,7 @@ public:
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 	std::vector<CUniqueItem *> DestroyUniques;
 	std::vector<std::tuple<int, int>> GatherResources;	/// Gather resources objective vector, containing resource ID and quantity
+	std::vector<CCharacter *> HeroesMustSurvive;	/// Which heroes must survive or this quest fails
 };
 
 class CCampaign
