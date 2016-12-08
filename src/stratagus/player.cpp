@@ -1834,12 +1834,14 @@ void CPlayer::AvailableQuestsChanged()
 
 void CPlayer::UpdateCurrentQuests()
 {
-	for (int i = ((int) this->CurrentQuests.size() - 1); i >= 0; --i) {
+	for (size_t i = 0; i < this->CurrentQuests.size();) {
 		std::string failed_quest = this->HasFailedQuest(this->CurrentQuests[i]);
 		if (!failed_quest.empty()) {
 			this->FailQuest(this->CurrentQuests[i], failed_quest);
 		} else if (this->HasCompletedQuest(this->CurrentQuests[i])) {
 			this->CompleteQuest(this->CurrentQuests[i]);
+		} else {
+			++i;
 		}
 	}
 }
