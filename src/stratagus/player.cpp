@@ -2538,7 +2538,7 @@ void PlayersEachMinute(int playerIdx)
 				
 				//acquire all technologies of the parent player
 				for (size_t j = 0; j < AllUpgrades.size(); ++j) {
-					if (UpgradeIdentAllowed(player, AllUpgrades[j]->Ident) == 'R') {
+					if (UpgradeIdentAllowed(player, AllUpgrades[j]->Ident) == 'R' && AllUpgrades[j]->Ident != faction->FactionUpgrade) {
 						UpgradeAcquire(Players[new_player_id], AllUpgrades[j]);
 					}
 				}

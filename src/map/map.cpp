@@ -492,7 +492,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->PlaneConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
 		}
-		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
 		Vec2i unit_offset((std::get<1>(this->PlaneConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->PlaneConnectors[i])->TileHeight - 1) / 2);
@@ -525,7 +525,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->WorldConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
 		}
-		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
 		Vec2i unit_offset((std::get<1>(this->WorldConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->WorldConnectors[i])->TileHeight - 1) / 2);
@@ -558,7 +558,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 			unit_pos = Map.GenerateUnitLocation(std::get<1>(this->LayerConnectors[i]), NULL, map_start_pos, map_end - Vec2i(1, 1), z);
 		}
-		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
 		Vec2i unit_offset((std::get<1>(this->LayerConnectors[i])->TileWidth - 1) / 2, (std::get<1>(this->LayerConnectors[i])->TileHeight - 1) / 2);
@@ -592,7 +592,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 			unit_pos = Map.GenerateUnitLocation(type, std::get<2>(this->Units[i]), map_start_pos, map_end - Vec2i(1, 1), z);
 		}
-		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
 		
@@ -630,7 +630,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 			unit_pos = Map.GenerateUnitLocation(hero->Type, std::get<2>(this->Heroes[i]), map_start_pos, map_end - Vec2i(1, 1), z);
 		}
-		if (!Map.Info.IsPointOnMap(unit_pos, z)) {
+		if (!Map.Info.IsPointOnMap(unit_pos, z) || unit_pos.x < map_start_pos.x || unit_pos.y < map_start_pos.y) {
 			continue;
 		}
 		
@@ -899,8 +899,10 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 	
 	CPlayer *player = GetFactionPlayer(faction);
 	if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && player != NULL && player->StartMapLayer == z && player->StartPos.x >= min_pos.x && player->StartPos.x <= max_pos.x && player->StartPos.y >= min_pos.y && player->StartPos.y <= max_pos.y) {
-		min_pos = player->StartPos - Vec2i(8, 8);
-		max_pos = player->StartPos + Vec2i(8, 8);
+		min_pos.x = std::max<int>(min_pos.x, player->StartPos.x - 8);
+		min_pos.y = std::max<int>(min_pos.y, player->StartPos.y - 8);
+		max_pos.x = std::min<int>(max_pos.x, player->StartPos.x + 8);
+		max_pos.y = std::min<int>(max_pos.y, player->StartPos.y + 8);
 	}
 	
 	Vec2i random_pos(-1, -1);
@@ -919,7 +921,11 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 		if (player != NULL) {
 			Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(16, 16), table, z, MakeAndPredicate(HasNotSamePlayerAs(*player), HasNotSamePlayerAs(Players[PlayerNumNeutral])));
 		} else if (!unit_type->GivesResource) {
-			Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(16, 16), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			if (unit_type->BoolFlag[PREDATOR_INDEX].value || (unit_type->BoolFlag[PEOPLEAVERSION_INDEX].value && unit_type->UnitType == UnitTypeFly)) {
+				Select(random_pos - Vec2i(16, 16), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(16, 16), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			} else {
+				Select(random_pos - Vec2i(8, 8), random_pos + Vec2i(unit_type->TileWidth - 1, unit_type->TileHeight - 1) + Vec2i(8, 8), table, z, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+			}
 		}
 		
 		if (table.size() == 0 && UnitTypeCanBeAt(*unit_type, random_pos, z) && (!unit_type->BoolFlag[BUILDING_INDEX].value || CanBuildUnitType(NULL, *unit_type, random_pos, 0, true, z))) {
