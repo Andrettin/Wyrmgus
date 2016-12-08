@@ -245,7 +245,6 @@ public:
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];	/// Production modifier for a particular resource for grand strategy mode
 	int RevoltRiskModifier;			/// Revolt risk modifier (for the grand strategy mode)
 	int AdministrativeEfficiencyModifier;	/// Administrative efficiency modifier (for the grand strategy mode)
-	int TechnologyPointCost;		/// Technology point cost
 	int MagicLevel;					/// Magic level of an affix
 	int Work;						/// Form in which was inscribed (i.e. scroll or book), if is a literary work
 	int Year;						/// Year of publication, if is a literary work

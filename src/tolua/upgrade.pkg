@@ -27,7 +27,6 @@ class CUpgrade
 	int GrandStrategyProductionModifier[MaxCosts];
 	int GrandStrategyProductionEfficiencyModifier[MaxCosts];
 	int RevoltRiskModifier;
-	int TechnologyPointCost;
 	int Work;
 	int Year;
 	//Wyrmgus end

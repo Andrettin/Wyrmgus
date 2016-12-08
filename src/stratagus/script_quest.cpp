@@ -115,8 +115,6 @@ static int CclDefineQuest(lua_State *l)
 			quest->Hint = LuaToString(l, -1);
 		} else if (!strcmp(value, "Civilization")) {
 			quest->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
-		} else if (!strcmp(value, "TechnologyPoints")) {
-			quest->TechnologyPoints = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "PlayerColor")) {
 			std::string color_name = LuaToString(l, -1);
 			int color = GetPlayerColorIndexByName(color_name);
@@ -341,9 +339,6 @@ static int CclGetQuestData(lua_State *l)
 		} else {
 			lua_pushstring(l, "");
 		}
-		return 1;
-	} else if (!strcmp(data, "TechnologyPoints")) {
-		lua_pushnumber(l, quest->TechnologyPoints);
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
 		lua_pushstring(l, PlayerColorNames[quest->PlayerColor].c_str());

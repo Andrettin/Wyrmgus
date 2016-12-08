@@ -344,7 +344,6 @@ static int CclDefineUpgrade(lua_State *l)
 				}
 				upgrade->RevoltRiskModifier = parent_upgrade->RevoltRiskModifier;
 				upgrade->AdministrativeEfficiencyModifier = parent_upgrade->AdministrativeEfficiencyModifier;
-				upgrade->TechnologyPointCost = parent_upgrade->TechnologyPointCost;
 				upgrade->MagicLevel = parent_upgrade->MagicLevel;
 				upgrade->Ability = parent_upgrade->Ability;
 				upgrade->Weapon = parent_upgrade->Weapon;
@@ -408,8 +407,6 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->RevoltRiskModifier = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "AdministrativeEfficiencyModifier")) {
 			upgrade->AdministrativeEfficiencyModifier = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "TechnologyPointCost")) {
-			upgrade->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "MagicLevel")) {
 			upgrade->MagicLevel = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Year")) {

@@ -671,7 +671,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[PRIORITY_INDEX].Value = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Value;
 			type->DefaultStat.Variables[PRIORITY_INDEX].Max  = parent_type->DefaultStat.Variables[PRIORITY_INDEX].Max;
 			type->AnnoyComputerFactor = parent_type->AnnoyComputerFactor;
-			type->TechnologyPointCost = parent_type->TechnologyPointCost;
 			type->TrainQuantity = parent_type->TrainQuantity;
 			type->Upkeep = parent_type->Upkeep;
 			type->ItemClass = parent_type->ItemClass;
@@ -1968,8 +1967,6 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
-		} else if (!strcmp(value, "TechnologyPointCost")) {
-			type->TechnologyPointCost = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
 			type->TrainQuantity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Upkeep")) {
@@ -2691,9 +2688,6 @@ static int CclGetUnitTypeData(lua_State *l)
 		} else {
 			lua_pushnumber(l, type->MapDefaultStat.UnitStock[unit_type_id]);
 		}
-		return 1;
-	} else if (!strcmp(data, "TechnologyPointCost")) {
-		lua_pushnumber(l, type->TechnologyPointCost);
 		return 1;
 	} else if (!strcmp(data, "TrainQuantity")) {
 		lua_pushnumber(l, type->TrainQuantity);

@@ -60,7 +60,7 @@ class CQuest
 {
 public:
 	CQuest() :
-		ID(-1), Civilization(-1), TechnologyPoints(0), PlayerColor(0), SkinColor(0), HairColor(0), HighestCompletedDifficulty(-1),
+		ID(-1), Civilization(-1), PlayerColor(0), SkinColor(0), HairColor(0), HighestCompletedDifficulty(-1),
 		Hidden(false), Completed(false), CurrentCompleted(false), Competitive(false), Unobtainable(false), Uncompleteable(false), Unfailable(false),
 		QuestGiver(NULL), IntroductionDialogue(NULL), Conditions(NULL), CompletionEffects(NULL)
 	{
@@ -88,7 +88,6 @@ public:
 	std::string Hint;				/// Quest hint
 	int ID;
 	int Civilization;				/// Which civilization the quest belongs to
-	int TechnologyPoints;			/// How many technology points the quest gives as a reward
 	int PlayerColor;				/// Player color used for the quest's icon
 	int SkinColor;					/// Skin color used for the quest's icon
 	int HairColor;					/// Hair color used for the quest's icon
