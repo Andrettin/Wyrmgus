@@ -738,7 +738,6 @@ static int CclDefineUnitType(lua_State *l)
 					res->WaitAtResource = parent_type->ResInfo[i]->WaitAtResource;
 					res->WaitAtDepot = parent_type->ResInfo[i]->WaitAtDepot;
 					res->ResourceCapacity = parent_type->ResInfo[i]->ResourceCapacity;
-					res->GatheringModifier = parent_type->ResInfo[i]->GatheringModifier;
 					res->LoseResources = parent_type->ResInfo[i]->LoseResources;
 					res->RefineryHarvester = parent_type->ResInfo[i]->RefineryHarvester;
 					res->FileWhenEmpty = parent_type->ResInfo[i]->FileWhenEmpty;
@@ -1695,8 +1694,6 @@ static int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "resource-capacity")) {
 						res->ResourceCapacity = LuaToNumber(l, -1, k + 1);
 					//Wyrmgus start
-					} else if (!strcmp(value, "gathering-modifier")) {
-						res->GatheringModifier = LuaToNumber(l, -1, k + 1);
 					/*
 					} else if (!strcmp(value, "terrain-harvester")) {
 						res->TerrainHarvester = 1;
