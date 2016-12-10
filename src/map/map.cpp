@@ -1283,6 +1283,21 @@ void PreprocessMap()
 }
 
 //Wyrmgus start
+int GetMapLayer(std::string plane_name, std::string world_name, int surface_layer)
+{
+	CPlane *plane = GetPlane(plane_name);
+	CWorld *world = GetWorld(world_name);
+
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		if (Map.Planes[z] == plane && Map.Worlds[z] == world && Map.Layers[z] == surface_layer) {
+			return z;
+		}
+	}
+	
+	return 0;
+}
+
+
 void ChangeCurrentMapLayer(int z)
 {
 	if (z < 0 || z >= (int) Map.Fields.size() || CurrentMapLayer == z) {

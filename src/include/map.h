@@ -654,6 +654,7 @@ extern bool UnitCanBeAt(const CUnit &unit, const Vec2i &pos, int z);
 extern void PreprocessMap();
 
 //Wyrmgus start
+extern int GetMapLayer(std::string plane_name = "", std::string world_name = "", int surface_layer = 0);
 extern void ChangeCurrentMapLayer(int z);
 extern void SetTimeOfDay(int time_of_day, int z = 0);
 //Wyrmgus end

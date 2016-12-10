@@ -169,7 +169,13 @@ static CompareFunction GetCompareFunction(const char *op)
 */
 static int CclGetNumUnitsAt(lua_State *l)
 {
-	LuaCheckArgs(l, 4);
+	//Wyrmgus start
+//	LuaCheckArgs(l, 4);
+	const int nargs = lua_gettop(l);
+	if (nargs < 4 || nargs > 5) {
+		LuaError(l, "incorrect argument\n");
+	}
+	//Wyrmgus end
 
 	int plynr = LuaToNumber(l, 1);
 	lua_pushvalue(l, 2);
@@ -184,8 +190,13 @@ static int CclGetNumUnitsAt(lua_State *l)
 	std::vector<CUnit *> units;
 
 	//Wyrmgus start
+	int z = 0;
+	if (nargs >= 5) {
+		z = LuaToNumber(l, 5);
+	}
+	
 //	Select(minPos, maxPos, units);
-	Select(minPos, maxPos, units, 0);
+	Select(minPos, maxPos, units, z);
 	//Wyrmgus end
 
 	int s = 0;
@@ -199,7 +210,10 @@ static int CclGetNumUnitsAt(lua_State *l)
 			|| (unittype == unit.Type && !unit.Constructed)) {
 
 			// Check the player
-			if (plynr == -1 || plynr == unit.Player->Index) {
+			//Wyrmgus start
+//			if (plynr == -1 || plynr == unit.Player->Index) {
+			if (plynr == -1 || plynr == unit.Player->Index || (plynr == -2 && unit.Player->Type != PlayerNeutral)) { // -2 can now be used for the player field to mean any non-neutral player
+			//Wyrmgus end
 				if (unit.IsAlive()) {
 					++s;
 				}
