@@ -395,29 +395,29 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
 		int map_width = (map_end.x - map_start_pos.x);
 		int map_height = (map_end.y - map_start_pos.y);
-		int seed_number = map_width * map_height / 1024;
+		int seed_number = 0;
 		int expansion_number = 0;
 		
 		int degree_level = this->GeneratedTerrains[i].second;
 		
 		if (degree_level == ExtremelyHighDegreeLevel) {
 			expansion_number = map_width * map_height / 2;
-			seed_number = map_width * map_height / 256;
+			seed_number = map_width * map_height / 128;
 		} else if (degree_level == VeryHighDegreeLevel) {
 			expansion_number = map_width * map_height / 4;
-			seed_number = map_width * map_height / 512;
+			seed_number = map_width * map_height / 256;
 		} else if (degree_level == HighDegreeLevel) {
 			expansion_number = map_width * map_height / 8;
-			seed_number = map_width * map_height / 1024;
+			seed_number = map_width * map_height / 512;
 		} else if (degree_level == MediumDegreeLevel) {
 			expansion_number = map_width * map_height / 16;
-			seed_number = map_width * map_height / 2048;
+			seed_number = map_width * map_height / 1024;
 		} else if (degree_level == LowDegreeLevel) {
 			expansion_number = map_width * map_height / 32;
-			seed_number = map_width * map_height / 4096;
+			seed_number = map_width * map_height / 2048;
 		} else if (degree_level == VeryLowDegreeLevel) {
 			expansion_number = map_width * map_height / 64;
-			seed_number = map_width * map_height / 8192;
+			seed_number = map_width * map_height / 4096;
 		}
 		
 		seed_number = std::max(1, seed_number);
