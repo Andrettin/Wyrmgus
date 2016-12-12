@@ -710,9 +710,8 @@ static LONG WINAPI CreateDumpFile(EXCEPTION_POINTERS *ExceptionInfo)
 	fprintf(stderr, "A mini dump file \"crash.dmp\" has been created in the Stratagus folder.\n");
 	//Wyrmgus start
 //	fprintf(stderr, "Please send it to our bug tracker: https://github.com/Wargus/stratagus/issues\n");
-	fprintf(stderr, "Please send it to our bug tracker: https://github.com/Andrettin/Wyrmgus/issues\n");
+//	fprintf(stderr, "and tell us what caused this bug to occur.\n");
 	//Wyrmgus end
-	fprintf(stderr, "and tell us what caused this bug to occur.\n");
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 #endif
