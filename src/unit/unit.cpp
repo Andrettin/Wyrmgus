@@ -767,7 +767,7 @@ void CUnit::HealingItemAutoUse()
 	CUnit *uins = this->UnitInside;
 	
 	for (int i = 0; i < this->InsideCount; ++i, uins = uins->NextContained) {
-		if (!uins->Type->BoolFlag[ITEM_INDEX].value) {
+		if (!uins->Type->BoolFlag[ITEM_INDEX].value || uins->Elixir) {
 			continue;
 		}
 		
