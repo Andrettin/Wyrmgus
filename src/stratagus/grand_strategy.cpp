@@ -1102,9 +1102,6 @@ void CGrandStrategyGame::DoTurn()
 					this->Factions[i][j]->CurrentResearch = -1;
 				}
 					
-				//see if a faction can split off from this one
-				this->Factions[i][j]->CheckSplitOffFactions();
-				
 				//see if this faction can form a faction
 				this->Factions[i][j]->CheckFormableFactions(i);
 			}
@@ -4249,24 +4246,6 @@ void CGrandStrategyFaction::CalculateProvincesReachableThroughWater()
 	}
 }
 
-void CGrandStrategyFaction::CheckSplitOffFactions()
-{
-	if (PlayerRaces.Factions[this->Civilization][this->Faction]->Type != FactionTypeTribe) { // factions can only split off from tribes
-		return;
-	}
-	
-	for (size_t i = 0; i < PlayerRaces.Factions[this->Civilization][this->Faction]->SplitsTo.size(); ++i) {
-		int faction = PlayerRaces.GetFactionIndexByName(this->Civilization, PlayerRaces.Factions[this->Civilization][this->Faction]->SplitsTo[i]);
-		if (faction != -1 && GrandStrategyGame.Factions[this->Civilization][faction]) {
-			if (GrandStrategyGame.Factions[this->Civilization][faction] != this && !GrandStrategyGame.Factions[this->Civilization][faction]->IsAlive()) {
-				if (this->CanSplitOffFaction(GrandStrategyGame.Factions[this->Civilization][faction])) {
-					this->SplitOffFaction(GrandStrategyGame.Factions[this->Civilization][faction]);
-				}
-			}
-		}
-	}
-}
-
 void CGrandStrategyFaction::CheckFormableFactions(int civilization)
 {
 	for (size_t i = 0; i < PlayerRaces.Factions[this->Civilization][this->Faction]->DevelopsTo.size(); ++i) {
@@ -4277,36 +4256,6 @@ void CGrandStrategyFaction::CheckFormableFactions(int civilization)
 					this->FormFaction(civilization, faction);
 				}
 			}
-		}
-	}
-}
-
-void CGrandStrategyFaction::SplitOffFaction(CGrandStrategyFaction *faction)
-{
-	std::vector<CGrandStrategyProvince *> potential_provinces;
-	// check for empty provinces adjacent
-	for (size_t i = 0; i < faction->Claims.size(); ++i) {
-		CGrandStrategyProvince *province = faction->Claims[i];
-		if (province->Owner != NULL) {
-			continue;
-		}
-		if (province->BordersFaction(this->Civilization, this->Faction, true)) {
-			potential_provinces.push_back(province);
-		}
-	}
-	
-	if (potential_provinces.size() > 0) {
-		CGrandStrategyProvince *province = potential_provinces[SyncRand(potential_provinces.size())];
-		
-		faction->AcquireFactionTechnologies(this->Civilization, this->Faction);
-		CclCommand("AcquireProvince(GetProvinceFromName(\"" + province->Name + "\"), \"" + PlayerRaces.Factions[faction->Civilization][faction->Faction]->Ident + "\");");
-		province->SetCivilization(this->Civilization);
-		province->SetSettlementBuilding(province->GetClassUnitType(GetUnitTypeClassIndexByName("town-hall")), true);
-		faction->CalculateIncomes();
-
-		if (this == GrandStrategyGame.PlayerFaction) {
-			std::string dialog_text = "The " + faction->GetFullName() + " has split off from our people, settling in " + province->GetCulturalName() + "!";
-			CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"The " + faction->GetFullName() + "\", \"" + dialog_text + "\") end;");
 		}
 	}
 }
@@ -4669,11 +4618,6 @@ bool CGrandStrategyFaction::HasTechnologyClass(std::string technology_class_name
 	}
 
 	return false;
-}
-
-bool CGrandStrategyFaction::CanSplitOffFaction(CGrandStrategyFaction *faction)
-{
-	return SyncRand(10) == 0; // 10% chance a given faction will split off in a turn
 }
 
 bool CGrandStrategyFaction::CanFormFaction(int civilization, int faction)

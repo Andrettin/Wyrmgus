@@ -248,9 +248,7 @@ public:
 	void CalculateUpkeep();
 	void CalculateTileTransportLevels();
 	void CalculateProvincesReachableThroughWater();
-	void CheckSplitOffFactions();
 	void CheckFormableFactions(int civilization);
-	void SplitOffFaction(CGrandStrategyFaction *faction);
 	void FormFaction(int civilization, int faction);
 	void AcquireFactionTechnologies(int civilization, int faction, int year = 0);
 	void SetCapital(CGrandStrategyProvince *province);
@@ -260,7 +258,6 @@ public:
 	void GenerateMinister(int title, bool child_of_current_minister = false);
 	bool IsAlive();
 	bool HasTechnologyClass(std::string technology_class_name);
-	bool CanSplitOffFaction(CGrandStrategyFaction *faction);
 	bool CanFormFaction(int civilization, int faction);
 	bool HasGovernmentPosition(int title);
 	bool CanHaveSuccession(int title, bool family_inheritance);

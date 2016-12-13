@@ -70,7 +70,6 @@
 #include "unittype.h"
 #include "unit.h"
 //Wyrmgus start
-#include "unit_find.h" // for faction splitters
 #include "upgrade.h"
 //Wyrmgus end
 #include "ui.h"
@@ -2473,98 +2472,6 @@ void PlayersEachMinute(int playerIdx)
 
 //	player.UpdateHeroPool();
 	player.UpdateQuestPool(); // every minute, update the quest pool
-	
-	// split off factions
-	if (GameCycle >= CYCLES_PER_MINUTE && player.Faction != -1 && CurrentCampaign != NULL) { // only do this after the first minute has passed, and only for the campaign mode
-		CFaction *faction = PlayerRaces.Factions[player.Race][player.Faction];
-		for (size_t i = 0; i < faction->SplitsTo.size(); ++i) {
-			int splitter_faction_id = PlayerRaces.GetFactionIndexByName(player.Race, faction->SplitsTo[i]);
-			if (splitter_faction_id == -1) {
-				continue;
-			}
-			CFaction *splitter_faction = PlayerRaces.Factions[player.Race][splitter_faction_id];
-			if (GetFactionPlayer(splitter_faction) == NULL && SyncRand(10) == 0) { // 10% chance a particular faction will split off in a given minute
-				CUnit *worker_unit = NULL;
-				const int nunits = player.GetUnitCount();
-				for (int j = 0; j < nunits; ++j) {
-					CUnit &unit = player.GetUnit(j);
-					if (unit.IsAliveOnMap() && unit.Type->BoolFlag[HARVESTER_INDEX].value) {
-						worker_unit = &unit;
-						break;
-					}
-				}
-				if (!worker_unit) { // no worker unit that can be used to check a path to a deposit from
-					break;
-				}
-				
-				CUnit *depot = FindDeposit(*worker_unit, 1000, CopperCost);
-				if (!depot) {
-					break;
-				}
-				
-				// generate the new faction's units near a gold deposit
-				CUnit *deposit = NULL;
-				int resource_range = 0;
-				for (int j = 0; j < 3; ++j) { //search for resources first in a 64 tile radius, then in a 128 tile radius, and then in the whole map
-					resource_range += 64;
-					if (j == 2) {
-						resource_range = 1000;
-					}
-					deposit = UnitFindResource(*worker_unit, depot ? *depot : *worker_unit, resource_range, CopperCost, true, NULL, false, true, true);
-					if (deposit) {
-						break; // found deposit
-					}
-				}
-				if (!deposit) { // no gold deposit available
-					break;
-				}
-				
-				Vec2i splitter_start_pos = Map.GenerateUnitLocation(depot->Type, splitter_faction, deposit->tilePos - Vec2i(depot->Type->TileWidth - 1, depot->Type->TileHeight - 1) - Vec2i(8, 8), deposit->tilePos + Vec2i(deposit->Type->TileWidth - 1, deposit->Type->TileHeight - 1) + Vec2i(8, 8), deposit->MapLayer);
-				if (!Map.Info.IsPointOnMap(splitter_start_pos, deposit->MapLayer)) {
-					break;
-				}
-				
-				int new_player_id = -1;
-				for (int j = 0; j < NumPlayers; ++j) {
-					if (Players[j].Type == PlayerNobody) {
-						Players[j].Type = PlayerComputer;
-						Players[j].SetCivilization(splitter_faction->Civilization);
-						Players[j].SetFaction(splitter_faction);
-						Players[j].AiEnabled = true;
-						Players[j].AiName = faction->DefaultAI;
-						Players[j].Team = 1;
-						Players[j].Resources[CopperCost] = 5000; // give the new player enough resources to start up
-						Players[j].Resources[WoodCost] = 5000;
-						Players[j].Resources[StoneCost] = 5000;
-						AiInit(Players[j]);
-						new_player_id = j;
-						break;
-					}
-				}
-				if (new_player_id == -1) { // no player slot left
-					break;
-				}				
-				
-				Players[new_player_id].SetStartView(splitter_start_pos, deposit->MapLayer);
-				CUnit *new_depot = CreateUnit(splitter_start_pos, *depot->Type, &Players[new_player_id], deposit->MapLayer); // create town hall for the new tribe
-				for (int j = 0; j < 5; ++j) { // create five workers for the new tribe
-					CUnit *new_worker_unit = CreateUnit(splitter_start_pos, *worker_unit->Type, &Players[new_player_id], deposit->MapLayer);
-				}
-				
-				//acquire all technologies of the parent player
-				for (size_t j = 0; j < AllUpgrades.size(); ++j) {
-					if (UpgradeIdentAllowed(player, AllUpgrades[j]->Ident) == 'R' && AllUpgrades[j]->Ident != faction->FactionUpgrade) {
-						UpgradeAcquire(Players[new_player_id], AllUpgrades[j]);
-					}
-				}
-				
-				if (&player == ThisPlayer) {
-					std::string dialog_text = "The " + splitter_faction->Name + " has split off from our people, settling in new lands!";
-					CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"The " + splitter_faction->Name + "\", \"" + dialog_text + "\") end;");
-				}
-			}
-		}
-	}
 }
 //Wyrmgus end
 
