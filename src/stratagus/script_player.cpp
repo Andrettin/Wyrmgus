@@ -1244,7 +1244,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				++j;
 
-				word->NumberCaseInflections[grammatical_number][grammatical_case] = LuaToString(l, -1, j + 1);
+				word->NumberCaseInflections[std::tuple<int, int>(grammatical_number, grammatical_case)] = LuaToString(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "NumberPersonTenseMoodInflections")) {
 			if (!lua_istable(l, -1)) {
@@ -1280,7 +1280,7 @@ static int CclDefineLanguageWord(lua_State *l)
 				}
 				++j;
 
-				word->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood] = LuaToString(l, -1, j + 1);
+				word->NumberPersonTenseMoodInflections[std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood)] = LuaToString(l, -1, j + 1);
 			}
 		} else if (!strcmp(value, "ComparisonDegreeCaseInflections")) {
 			if (!lua_istable(l, -1)) {

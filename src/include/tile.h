@@ -299,7 +299,7 @@ public:
 	// FIXME: Value should be removed, walls and regeneration can be handled differently.
 	//Wyrmgus start
 //	unsigned char Value;       /// HP for walls/ Wood Regeneration
-	int Value;       /// HP for walls/ Wood Regeneration
+	short Value;       /// HP for walls/ Wood Regeneration
 	//Wyrmgus end
 	CUnitCache UnitCache;      /// A unit on the map field.
 

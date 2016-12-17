@@ -3665,8 +3665,8 @@ bool LanguageWord::HasMeaning(std::string meaning)
 
 std::string LanguageWord::GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type)
 {
-	if (!this->NumberCaseInflections[grammatical_number][grammatical_case].empty()) {
-		return this->NumberCaseInflections[grammatical_number][grammatical_case];
+	if (this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case)) != this->NumberCaseInflections.end()) {
+		return this->NumberCaseInflections.find(std::tuple<int, int>(grammatical_number, grammatical_case))->second;
 	}
 	
 	return this->Word + PlayerRaces.Languages[this->Language]->GetNounEnding(grammatical_number, grammatical_case, word_junction_type);
@@ -3674,10 +3674,10 @@ std::string LanguageWord::GetNounInflection(int grammatical_number, int grammati
 
 std::string LanguageWord::GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood)
 {
-	if (!this->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood].empty()) {
-		return this->NumberPersonTenseMoodInflections[grammatical_number][grammatical_person][grammatical_tense][grammatical_mood];
+	if (this->NumberPersonTenseMoodInflections.find(std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood)) != this->NumberPersonTenseMoodInflections.end()) {
+		return this->NumberPersonTenseMoodInflections.find(std::tuple<int, int, int, int>(grammatical_number, grammatical_person, grammatical_tense, grammatical_mood))->second;
 	}
-	
+
 	return this->Word;
 }
 
@@ -4330,32 +4330,20 @@ void CreateLanguageCache()
 			
 			if (word->Type == WordTypeNoun) {
 				fprintf(fd, "\tNumberCaseInflections = {");
-				for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
-					for (int n = 0; n < MaxGrammaticalCases; ++n) {
-						if (!word->NumberCaseInflections[k][n].empty()) {
-							fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(k).c_str());
-							fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(n).c_str());
-							fprintf(fd, "\"%s\", ", word->NumberCaseInflections[k][n].c_str());
-						}
-					}
+				for (std::map<std::tuple<int, int>, std::string>::iterator iterator = word->NumberCaseInflections.begin(); iterator != word->NumberCaseInflections.end(); ++iterator) {
+					fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(std::get<0>(iterator->first)).c_str());
+					fprintf(fd, "\"%s\", ", GetGrammaticalCaseNameById(std::get<1>(iterator->first)).c_str());
+					fprintf(fd, "\"%s\", ", iterator->second.c_str());
 				}
 				fprintf(fd, "},\n");
 			} else if (word->Type == WordTypeVerb) {
 				fprintf(fd, "\tNumberPersonTenseMoodInflections = {");
-				for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
-					for (int n = 0; n < MaxGrammaticalPersons; ++n) {
-						for (int o = 0; o < MaxGrammaticalTenses; ++o) {
-							for (int p = 0; p < MaxGrammaticalMoods; ++p) {
-								if (!word->NumberPersonTenseMoodInflections[k][n][o][p].empty()) {
-									fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(k).c_str());
-									fprintf(fd, "\"%s\", ", GetGrammaticalPersonNameById(n).c_str());
-									fprintf(fd, "\"%s\", ", GetGrammaticalTenseNameById(o).c_str());
-									fprintf(fd, "\"%s\", ", GetGrammaticalMoodNameById(p).c_str());
-									fprintf(fd, "\"%s\", ", word->NumberPersonTenseMoodInflections[k][n][o][p].c_str());
-								}
-							}
-						}
-					}
+				for (std::map<std::tuple<int, int, int, int>, std::string>::iterator iterator = word->NumberPersonTenseMoodInflections.begin(); iterator != word->NumberPersonTenseMoodInflections.end(); ++iterator) {
+					fprintf(fd, "\"%s\", ", GetGrammaticalNumberNameById(std::get<0>(iterator->first)).c_str());
+					fprintf(fd, "\"%s\", ", GetGrammaticalPersonNameById(std::get<1>(iterator->first)).c_str());
+					fprintf(fd, "\"%s\", ", GetGrammaticalTenseNameById(std::get<2>(iterator->first)).c_str());
+					fprintf(fd, "\"%s\", ", GetGrammaticalMoodNameById(std::get<3>(iterator->first)).c_str());
+					fprintf(fd, "\"%s\", ", iterator->second.c_str());
 				}
 				fprintf(fd, "},\n");
 				

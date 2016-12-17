@@ -639,8 +639,8 @@ public:
 	int Gender;											/// What is the gender of the noun or article (Masculine, Feminine or Neuter)
 	int GrammaticalNumber;								/// Grammatical number (i.e. whether the word is necessarily plural or not)
 	bool Archaic;										/// Whether the word is archaic (whether it is used in current speech)
-	std::string NumberCaseInflections[MaxGrammaticalNumbers][MaxGrammaticalCases];	/// For nouns
-	std::string NumberPersonTenseMoodInflections[MaxGrammaticalNumbers][MaxGrammaticalPersons][MaxGrammaticalTenses][MaxGrammaticalMoods];	/// For verbs
+	std::map<std::tuple<int, int>, std::string> NumberCaseInflections;	/// For nouns, mapped to grammatical number and grammatical case
+	std::map<std::tuple<int, int, int, int>, std::string> NumberPersonTenseMoodInflections;	/// For verbs, mapped to grammatical number, grammatical person, grammatical tense and grammatical mood
 	std::string ComparisonDegreeCaseInflections[MaxComparisonDegrees][MaxGrammaticalCases];	/// For adjectives
 	std::string Participles[MaxGrammaticalTenses];		/// For verbs
 	std::vector<std::string> Meanings;					/// Meanings of the word in English.
