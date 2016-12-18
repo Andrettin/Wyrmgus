@@ -89,13 +89,6 @@ static int CclDefineCharacter(lua_State *l)
 		name_type = "person-" + GetGenderNameById(character->Gender);
 	}
 	
-	std::string family_name_type;
-	if (character->Noble) {
-		family_name_type = "noble-family";
-	} else {
-		family_name_type = "family";
-	}
-	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
@@ -106,19 +99,6 @@ static int CclDefineCharacter(lua_State *l)
 			character->ExtraName = TransliterateText(LuaToString(l, -1));
 		} else if (!strcmp(value, "FamilyName")) {
 			character->FamilyName = TransliterateText(LuaToString(l, -1));
-			
-			if (character->GetLanguage() != -1 && PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount.find(family_name_type) == PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount.end()) {
-				PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount[family_name_type] = 0;
-			}
-			PlayerRaces.Languages[character->GetLanguage()]->TypeNameCount[family_name_type] += 1;
-		} else if (!strcmp(value, "NameElements")) {
-			ParseNameElements(l, name_type);
-		} else if (!strcmp(value, "FamilyNameElements")) {
-			ParseNameElements(l, family_name_type);
-		} else if (!strcmp(value, "FamilyNamePredicateElements")) {
-			ParseNameElements(l, "family-predicate");
-		} else if (!strcmp(value, "NobleFamilyNamePredicateElements")) {
-			ParseNameElements(l, "noble-family-predicate");
 		} else if (!strcmp(value, "Description")) {
 			character->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
@@ -156,13 +136,6 @@ static int CclDefineCharacter(lua_State *l)
 			character->DeathYear = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ViolentDeath")) {
 			character->ViolentDeath = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Noble")) {
-			character->Noble = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "PlaceNameDerivedFamilyName")) {
-			bool place_name_derived_family_name = LuaToBoolean(l, -1);
-			if (character->Noble) {
-				PlayerRaces.Languages[character->GetLanguage()]->PlaceNameDerivedNobleFamilyNameCount += 1;
-			}
 		} else if (!strcmp(value, "Civilization")) {
 			character->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {

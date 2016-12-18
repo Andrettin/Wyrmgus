@@ -343,7 +343,6 @@ extern void LoadCcl(const std::string &filename, const std::string &luaArgStr = 
 extern void SavePreferences();        /// Save user preferences
 //Wyrmgus start
 extern void SaveGrandStrategyGame(const std::string &filename);        /// Save extra user preferences
-extern void ParseNameElements(lua_State *l, std::string type);
 extern void DeleteModFaction(std::string civilization_name, std::string faction_name);
 extern void DisableMod(std::string mod_file);
 extern void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file);

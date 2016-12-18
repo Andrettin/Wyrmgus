@@ -85,16 +85,6 @@ static int CclDefineUniqueItem(lua_State *l)
 			} else {
 				LuaError(l, "Unit type \"%s\" doesn't exist." _C_ unit_type_ident.c_str());
 			}
-		} else if (!strcmp(value, "NameElements")) {
-			if (item->Type != NULL) {
-				if (item->Type->ItemClass != -1) {
-					ParseNameElements(l, "item-" + GetItemClassNameById(item->Type->ItemClass));
-				} else if (item->Type->Class != -1) {
-					ParseNameElements(l, "unit-class-" + UnitTypeClasses[item->Type->Class]);
-				}
-			} else {
-				LuaError(l, "Unique item has no type.");
-			}
 		} else if (!strcmp(value, "Icon")) {
 			item->Icon.Name = LuaToString(l, -1);
 			item->Icon.Icon = NULL;

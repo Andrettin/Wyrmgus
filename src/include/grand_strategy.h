@@ -91,8 +91,6 @@ public:
 	void SetPort(bool has_port);
 	void SetTransportLevel(int transport_level);
 	void LinkToTransportNetwork(int direction_from = -1);
-	void GenerateCulturalName(int old_civilization_id = -1, int civilization_id = -1);
-	void GenerateFactionCulturalName(int civilization_id = -1, int faction_id = -1);
 	int GetResourceIncome(bool ignore_transport_level = false);
 	bool AiBuildPathway(int pathway, bool secondary_setting = false);	/// Tells the AI to try to build a pathway in the tile, returns true if succeeded, false if didn't
 	bool IsWater();
@@ -187,7 +185,6 @@ public:
 	int GetDesirabilityRating();
 	int GetConnectionTransportLevel(CGrandStrategyProvince *province);
 	std::string GetCulturalName();										/// Get the province's cultural name.
-	std::string GenerateProvinceName(int civilization, int faction = -1);
 	std::string GenerateWorkName();
 	CGrandStrategyHero *GenerateHero(std::string type, CGrandStrategyHero *parent = NULL);
 	CGrandStrategyHero *GetRandomAuthor();
@@ -335,7 +332,6 @@ public:
 	int GetTitleScore(int title, CGrandStrategyProvince *province = NULL);
 	std::string GetMinisterEffectsString(int title);
 	std::string GetBestDisplayTitle();
-	std::string GenerateNobleFamilyName();
 	CGrandStrategyFaction *GetFaction();
 	
 	int State;			/// 0 = hero isn't in the province, 1 = hero is moving to the province, 2 = hero is in the province, 3 = hero is attacking the province, 4 = hero is in the province but not defending it

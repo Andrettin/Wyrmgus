@@ -1347,98 +1347,6 @@ static int CclDefineLanguageWord(lua_State *l)
 		} else if (!strcmp(value, "Number")) {
 			word->Number = LuaToNumber(l, -1);
 		//type name variables
-		} else if (!strcmp(value, "NameTypes")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				int grammatical_number = GrammaticalNumberSingular;
-				if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
-					std::string grammatical_number_name = LuaToString(l, -1, j + 1);
-					grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
-					if (grammatical_number == -1) {
-						LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
-					}
-					++j;
-				}
-				
-				int grammatical_case = GrammaticalCaseNominative;
-				if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
-					std::string grammatical_case_name = LuaToString(l, -1, j + 1);
-					grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
-					if (grammatical_case == -1) {
-						LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
-					}
-					++j;
-				}
-				
-				int grammatical_tense = GrammaticalTenseNoTense;
-				if (GetGrammaticalTenseIdByName(LuaToString(l, -1, j + 1)) != -1) {
-					std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
-					grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
-					if (grammatical_tense == -1) {
-						LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
-					}
-					++j;
-				}
-				
-				std::string type = LuaToString(l, -1, j + 1);
-				word->IncreaseNameType(type, grammatical_number, grammatical_case, grammatical_tense);
-			}
-		} else if (!strcmp(value, "AffixNameTypes")) {
-			if (!lua_istable(l, -1)) {
-				LuaError(l, "incorrect argument");
-			}
-			const int subargs = lua_rawlen(l, -1);
-			for (int j = 0; j < subargs; ++j) {
-				std::string word_junction_type_name = LuaToString(l, -1, j + 1);
-				int word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
-				if (word_junction_type == -1) {
-					LuaError(l, "Word junction type \"%s\" doesn't exist." _C_ word_junction_type_name.c_str());
-				}
-				++j;
-				
-				std::string affix_type_name = LuaToString(l, -1, j + 1);
-				int affix_type = GetAffixTypeIdByName(affix_type_name);
-				if (affix_type == -1) {
-					LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
-				}
-				++j;
-				
-				int grammatical_number = GrammaticalNumberSingular;
-				if (GetGrammaticalNumberIdByName(LuaToString(l, -1, j + 1)) != -1) {
-					std::string grammatical_number_name = LuaToString(l, -1, j + 1);
-					grammatical_number = GetGrammaticalNumberIdByName(grammatical_number_name);
-					if (grammatical_number == -1) {
-						LuaError(l, "Grammatical number \"%s\" doesn't exist." _C_ grammatical_number_name.c_str());
-					}
-					++j;
-				}
-				
-				int grammatical_case = GrammaticalCaseNominative;
-				if (GetGrammaticalCaseIdByName(LuaToString(l, -1, j + 1)) != -1) {
-					std::string grammatical_case_name = LuaToString(l, -1, j + 1);
-					grammatical_case = GetGrammaticalCaseIdByName(grammatical_case_name);
-					if (grammatical_case == -1) {
-						LuaError(l, "Grammatical case \"%s\" doesn't exist." _C_ grammatical_case_name.c_str());
-					}
-					++j;
-				}
-				
-				int grammatical_tense = GrammaticalTenseNoTense;
-				if (GetGrammaticalTenseIdByName(LuaToString(l, -1, j + 1)) != -1) {
-					std::string grammatical_tense_name = LuaToString(l, -1, j + 1);
-					grammatical_tense = GetGrammaticalTenseIdByName(grammatical_tense_name);
-					if (grammatical_tense == -1) {
-						LuaError(l, "Grammatical tense \"%s\" doesn't exist." _C_ grammatical_tense_name.c_str());
-					}
-					++j;
-				}
-				
-				std::string type = LuaToString(l, -1, j + 1);
-				word->IncreaseAffixNameType(type, word_junction_type, affix_type, grammatical_number, grammatical_case, grammatical_tense);
-			}
 		} else if (!strcmp(value, "Mod")) {
 			word->Mod = LuaToString(l, -1);
 		} else if (!strcmp(value, "MapWord")) { //to keep backwards compatibility
@@ -1454,34 +1362,6 @@ static int CclDefineLanguageWord(lua_State *l)
 	
 	if (word->Type == -1) {
 		LuaError(l, "Word \"%s\" has no type" _C_ word->Word.c_str());
-	}
-	
-	for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
-		for (int j = 0; j < MaxGrammaticalCases; ++j) {
-			for (int k = 0; k < MaxGrammaticalTenses; ++k) {
-				for (std::map<std::string, int>::iterator iterator = word->NameTypes[i][j][k].begin(); iterator != word->NameTypes[i][j][k].end(); ++iterator) {
-					if (iterator->second > 0) {
-						word->AddToLanguageNameTypes(iterator->first);
-					}
-				}
-			}
-		}
-	}
-						
-	for (int i = 0; i < MaxWordJunctionTypes; ++i) {
-		for (int j = 0; j < MaxAffixTypes; ++j) {
-			for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
-				for (int n = 0; n < MaxGrammaticalCases; ++n) {
-					for (int o = 0; o < MaxGrammaticalTenses; ++o) {
-						for (std::map<std::string, int>::iterator iterator = word->AffixNameTypes[i][j][k][n][o].begin(); iterator != word->AffixNameTypes[i][j][k][n][o].end(); ++iterator) {
-							if (iterator->second > 0) {
-								word->AddToLanguageAffixNameTypes(iterator->first, i, j);
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 	
 	if (replaces != NULL) {
@@ -2413,10 +2293,6 @@ static int CclDefineLanguage(lua_State *l)
 			language->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Family")) {
 			language->Family = LuaToString(l, -1);
-		} else if (!strcmp(value, "GenerateMissingWords")) {
-			language->GenerateMissingWords = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "SkipNameTypeInheritance")) {
-			language->SkipNameTypeInheritance = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DialectOf")) {
 			int parent_language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			if (parent_language != -1) {
@@ -3479,70 +3355,6 @@ static int CclGetLanguageWordData(lua_State *l)
 			lua_pushstring(l, GetGrammaticalGenderNameById(word->Gender).c_str());
 		} else {
 			lua_pushstring(l, "");
-		}
-		return 1;
-	} else if (!strcmp(data, "NameTypes")) {
-		std::vector<std::string> name_types;
-		
-		for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
-			for (int j = 0; j < MaxGrammaticalCases; ++j) {
-				for (int k = 0; k < MaxGrammaticalTenses; ++k) {
-					for (std::map<std::string, int>::iterator iterator = word->NameTypes[i][j][k].begin(); iterator != word->NameTypes[i][j][k].end(); ++iterator) {
-						if (iterator->second > 0) {
-							if (std::find(name_types.begin(), name_types.end(), iterator->first) == name_types.end()) {
-								name_types.push_back(iterator->first);
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		lua_createtable(l, name_types.size(), 0);
-		for (size_t i = 1; i <= name_types.size(); ++i)
-		{
-			lua_pushstring(l, name_types[i-1].c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "AffixNameTypes")) {
-		if (lua_gettop(l) < 5) {
-			LuaError(l, "incorrect argument");
-		}
-		
-		std::string word_junction_type_name = LuaToString(l, 4);
-		int word_junction_type = GetWordJunctionTypeIdByName(word_junction_type_name);
-		if (word_junction_type == -1) {
-			LuaError(l, "Word junction type \"%s\" doesn't exist." _C_ word_junction_type_name.c_str());
-		}
-				
-		std::string affix_type_name = LuaToString(l, 5);
-		int affix_type = GetAffixTypeIdByName(affix_type_name);
-		if (affix_type == -1) {
-			LuaError(l, "Affix type \"%s\" doesn't exist." _C_ affix_type_name.c_str());
-		}
-		
-		std::vector<std::string> name_types;
-		
-		for (int i = 0; i < MaxGrammaticalNumbers; ++i) {
-			for (int j = 0; j < MaxGrammaticalCases; ++j) {
-				for (int k = 0; k < MaxGrammaticalTenses; ++k) {
-					for (std::map<std::string, int>::iterator iterator = word->AffixNameTypes[word_junction_type][affix_type][i][j][k].begin(); iterator != word->AffixNameTypes[word_junction_type][affix_type][i][j][k].end(); ++iterator) {
-						if (iterator->second > 0) {
-							if (std::find(name_types.begin(), name_types.end(), iterator->first) == name_types.end()) {
-								name_types.push_back(iterator->first);
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		lua_createtable(l, name_types.size(), 0);
-		for (size_t i = 1; i <= name_types.size(); ++i)
-		{
-			lua_pushstring(l, name_types[i-1].c_str());
-			lua_rawseti(l, -2, i);
 		}
 		return 1;
 	} else {

@@ -161,7 +161,6 @@ extern std::string IdentToName(std::string text);					/// Make the ident string 
 extern std::string NameToIdent(std::string text);					/// Make the name be formatted like an ident string
 extern std::string SeparateCapitalizedStringElements(std::string text);	/// Make the string's capitalized elements become separated
 extern std::string GeneratePersonalName(std::string unit_type_ident);
-extern std::string GenerateName(int language, std::string type, int affix_type = -1);	/// Generates a name
 //Wyrmgus end
 
 #endif /* __UTIL_H__ */

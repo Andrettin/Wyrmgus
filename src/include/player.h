@@ -616,21 +616,11 @@ public:
 	{
 	}
 	
-	int HasNameType(std::string type, int grammatical_number = -1, int grammatical_case = -1, int grammatical_tense = -1); /// returns the quantity of times a certain type name been assigned to the word
-	int HasAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number = -1, int grammatical_case = -1, int grammatical_tense = -1); /// returns the quantity of times a certain type name been assigned to the word (for using the word as an affix in name type generation)
 	bool HasMeaning(std::string meaning);
 	std::string GetNounInflection(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetVerbInflection(int grammatical_number, int grammatical_person, int grammatical_tense, int grammatical_mood);
 	std::string GetAdjectiveInflection(int comparison_degree, int article_type = -1, int grammatical_case = -1, int grammatical_number = -1, int grammatical_gender = -1);
 	std::string GetParticiple(int grammatical_tense);
-	int GetAffixGrammaticalNumber(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type);
-	std::string GetAffixForm(LanguageWord *prefix, LanguageWord *infix, LanguageWord *suffix, std::string type, int word_junction_type, int affix_type, int affix_grammatical_numbers[MaxAffixTypes]);
-	void AddNameTypeGenerationFromWord(LanguageWord *word, std::string type);
-	void AddToLanguageNameTypes(std::string type);
-	void AddToLanguageAffixNameTypes(std::string type, int word_junction_type, int affix_type);
-	void IncreaseNameType(std::string type, int grammatical_number, int grammatical_case, int grammatical_tense);
-	void IncreaseAffixNameType(std::string type, int word_junction_type, int affix_type, int grammatical_number, int grammatical_case, int grammatical_tense);
-	void StripNameTypeGeneration(std::string type);
 	void RemoveFromVector(std::vector<LanguageWord *>& word_vector);
 
 	std::string Word;									/// Word name / ID.
@@ -648,8 +638,6 @@ public:
 	std::vector<LanguageWord *> DerivesTo;				/// Which words derive from this word
 	LanguageWord *CompoundElements[MaxAffixTypes];    	/// From which compound elements is this word formed
 	std::vector<LanguageWord *> CompoundElementOf[MaxAffixTypes];	/// Which words are formed from this word as a compound element
-	std::map<std::string, int> NameTypes[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxGrammaticalTenses];
-	std::map<std::string, int> AffixNameTypes[MaxWordJunctionTypes][MaxAffixTypes][MaxGrammaticalNumbers][MaxGrammaticalCases][MaxGrammaticalTenses];
 	
 	// noun-specific variables
 	bool Uncountable;				/// Whether the noun is uncountable or not.
@@ -673,8 +661,7 @@ class CLanguage
 {
 public:
 	CLanguage() :
-		GenerateMissingWords(false), UsedByCivilizationOrFaction(false), SkipNameTypeInheritance(false),
-		SettlementDerivedProvinceNameCount(0), PlaceNameDerivedNobleFamilyNameCount(0),
+		UsedByCivilizationOrFaction(false),
 		DialectOf(NULL)
 	{
 	}
@@ -683,8 +670,6 @@ public:
 	std::string GetArticle(int gender, int grammatical_case, int article_type, int grammatical_number);
 	std::string GetNounEnding(int grammatical_number, int grammatical_case, int word_junction_type = -1);
 	std::string GetAdjectiveEnding(int article_type, int grammatical_case, int grammatical_number, int grammatical_gender);
-	int GetPotentialNameQuantityForType(std::string type);
-	void CalculatePotentialNameQuantityForType(std::string type);
 	void RemoveWord(LanguageWord *word);
 	
 	std::string Ident;											/// Ident of the language
@@ -692,19 +677,11 @@ public:
 	std::string Family;											/// Family of the language
 	std::string NounEndings[MaxGrammaticalNumbers][MaxGrammaticalCases][MaxWordJunctionTypes];
 	std::string AdjectiveEndings[MaxArticleTypes][MaxGrammaticalCases][MaxGrammaticalNumbers][MaxGrammaticalGenders];
-	bool GenerateMissingWords;									/// Whether "missing" words (missing equivalents to English words) should be generated for this language
 	bool UsedByCivilizationOrFaction;
-	bool SkipNameTypeInheritance;
-	int SettlementDerivedProvinceNameCount;
-	int PlaceNameDerivedNobleFamilyNameCount;
 	CLanguage *DialectOf;										/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<CLanguage *> Dialects;							/// Dialects of this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
 	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
-	std::map<std::string, std::vector<LanguageWord *>> NameTypeWords;	/// Words which can be used as names for particular name types
-	std::map<std::string, std::vector<LanguageWord *>> NameTypeAffixes[MaxWordJunctionTypes][MaxAffixTypes];	/// Affixes which can form particular name types
-	std::map<std::string, int> TypeNameCount;
-	std::map<std::string, int> PotentialNameQuantityForType;
 };
 //Wyrmgus end
 
@@ -958,8 +935,6 @@ extern std::string GetAffixTypeNameById(int affix_type);
 extern int GetAffixTypeIdByName(std::string affix_type);
 extern std::string GetWordJunctionTypeNameById(int word_junction_type);
 extern int GetWordJunctionTypeIdByName(std::string word_junction_type);
-extern void GenerateMissingLanguageData();
-extern void CreateLanguageCache();
 extern bool IsNameValidForWord(std::string word_name);
 //Wyrmgus end
 

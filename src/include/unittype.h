@@ -780,7 +780,6 @@ public:
 	}
 	
 	bool CanEvolveToAUnitType(CTerrainType *terrain = NULL, bool sapient_only = false);
-	int GetRandomNameLanguage(int gender);
 	CSpecies *GetRandomEvolution(CTerrainType *terrain);
 	
 	int Era;						/// Era ID

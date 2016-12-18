@@ -4058,12 +4058,6 @@ static int CclDefineSpecies(lua_State *l)
 					LuaError(l, "Species \"%s\" doesn't exist." _C_ evolves_from_ident.c_str());
 				}
 			}
-		} else if (!strcmp(value, "PersonalNameElements")) {
-			ParseNameElements(l, "species-" + species_ident);
-		} else if (!strcmp(value, "MalePersonalNameElements")) {
-			ParseNameElements(l, "species-" + species_ident + "-male");
-		} else if (!strcmp(value, "FemalePersonalNameElements")) {
-			ParseNameElements(l, "species-" + species_ident + "-female");
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
