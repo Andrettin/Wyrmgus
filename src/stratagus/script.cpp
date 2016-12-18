@@ -3431,8 +3431,6 @@ void DisableMod(std::string mod_file)
 			}
 		}
 	}
-	
-	CleanLanguageModWords(mod_file);
 }
 
 void SetDLCFileEquivalency(const std::string dlc_file, const std::string replacement_file)

@@ -1235,7 +1235,7 @@ std::string GenerateName(int language, std::string type, int affix_type)
 				prefix = prefix_word->GetAffixForm(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypePrefix, affix_grammatical_numbers);
 				suffix = suffix_word->GetAffixForm(prefix_word, NULL, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix, affix_grammatical_numbers);
 				
-				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && type.find("terrain-") == std::string::npos && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+				if (suffix_word->Type == WordTypeNoun && type != "province" && type.find("terrain-") == std::string::npos && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
 					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]);
 					name += " ";
 				}
@@ -1276,7 +1276,7 @@ std::string GenerateName(int language, std::string type, int affix_type)
 				infix = infix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeInfix, affix_grammatical_numbers);
 				suffix = suffix_word->GetAffixForm(prefix_word, infix_word, suffix_word, type, WordJunctionTypeSeparate, AffixTypeSuffix, affix_grammatical_numbers);
 
-				if (suffix_word->Type == WordTypeNoun && type != "province" && type != "settlement" && type.find("terrain-") == std::string::npos && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
+				if (suffix_word->Type == WordTypeNoun && type != "province" && type.find("terrain-") == std::string::npos && !PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]).empty()) { //if type is neither a province nor a settlement, add an article at the beginning
 					name += PlayerRaces.Languages[language]->GetArticle(suffix_word->Gender, GrammaticalCaseNominative, ArticleTypeDefinite, affix_grammatical_numbers[AffixTypeSuffix]);
 					name += " ";
 				}

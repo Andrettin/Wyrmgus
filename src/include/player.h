@@ -700,7 +700,6 @@ public:
 	CLanguage *DialectOf;										/// Of which language this is a dialect of (if at all); dialects inherit the words from the parent language unless specified otherwise
 	std::vector<CLanguage *> Dialects;							/// Dialects of this language
 	std::vector<LanguageWord *> LanguageWords;					/// Words of the language
-	std::vector<LanguageWord *> ModWords;						/// Words of the language
 	std::map<std::string, std::vector<std::string>> NameTranslations;	/// Name translations; possible translations mapped to the name to be translated
 	std::map<std::string, std::vector<LanguageWord *>> NameTypeWords;	/// Words which can be used as names for particular name types
 	std::map<std::string, std::vector<LanguageWord *>> NameTypeAffixes[MaxWordJunctionTypes][MaxAffixTypes];	/// Affixes which can form particular name types
@@ -961,8 +960,6 @@ extern std::string GetWordJunctionTypeNameById(int word_junction_type);
 extern int GetWordJunctionTypeIdByName(std::string word_junction_type);
 extern void GenerateMissingLanguageData();
 extern void CreateLanguageCache();
-extern void DeleteModWord(std::string language_name, std::string word_name);
-extern void CleanLanguageModWords(std::string mod_file);
 extern bool IsNameValidForWord(std::string word_name);
 //Wyrmgus end
 

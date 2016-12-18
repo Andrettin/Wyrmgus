@@ -1488,12 +1488,6 @@ static int CclDefineLanguageWord(lua_State *l)
 		PlayerRaces.Languages[word->Language]->RemoveWord(replaces);
 	}
 	
-	if (!word->Mod.empty()) { //put the word in the language's ModWords vector if it is a mod word
-		if (std::find(PlayerRaces.Languages[word->Language]->ModWords.begin(), PlayerRaces.Languages[word->Language]->ModWords.end(), word) == PlayerRaces.Languages[word->Language]->ModWords.end()) {
-			PlayerRaces.Languages[word->Language]->ModWords.push_back(word);
-		}
-	}
-	
 	return 0;
 }
 
@@ -3431,28 +3425,6 @@ static int CclGetLanguageData(lua_State *l)
 		for (size_t i = 1; i <= language->LanguageWords.size(); ++i)
 		{
 			lua_pushstring(l, language->LanguageWords[i-1]->Word.c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
-	} else if (!strcmp(data, "ModWords")) {
-		if (lua_gettop(l) < 3) {
-			LuaError(l, "incorrect argument");
-		}
-		
-		std::string mod_file = LuaToString(l, 3);
-		
-		std::vector<std::string> mod_words;
-		for (size_t i = 0; i < language->ModWords.size(); ++i)
-		{
-			if (language->ModWords[i]->Mod == mod_file) {
-				mod_words.push_back(language->ModWords[i]->Word);
-			}
-		}
-		
-		lua_createtable(l, mod_words.size(), 0);
-		for (size_t i = 1; i <= mod_words.size(); ++i)
-		{
-			lua_pushstring(l, mod_words[i-1].c_str());
 			lua_rawseti(l, -2, i);
 		}
 		return 1;

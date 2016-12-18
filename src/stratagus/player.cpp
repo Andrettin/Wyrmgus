@@ -389,7 +389,6 @@ void PlayerRace::Clean()
 				delete this->Languages[i]->LanguageWords[j];
 			}
 			this->Languages[i]->LanguageWords.clear();
-			this->Languages[i]->ModWords.clear();
 			
 			this->Languages[i]->NameTranslations.clear();
 		}
@@ -4434,32 +4433,6 @@ void CreateLanguageCache()
 	}
 	
 	fclose(fd);
-}
-
-void DeleteModWord(std::string language_name, std::string word_name)
-{
-	int language = PlayerRaces.GetLanguageIndexByIdent(language_name.c_str());
-	std::vector<std::string> meanings;
-	LanguageWord *word = PlayerRaces.Languages[language]->GetWord(word_name, -1, meanings);
-	if (word != NULL && !word->Mod.empty()) {
-		PlayerRaces.Languages[language]->RemoveWord(word);
-		delete word;
-		PlayerRaces.Languages[language]->ModWords.erase(std::remove(PlayerRaces.Languages[language]->ModWords.begin(), PlayerRaces.Languages[language]->ModWords.end(), word), PlayerRaces.Languages[language]->ModWords.end());
-	}
-}
-
-void CleanLanguageModWords(std::string mod_file)
-{
-	for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-		int mod_words_size = PlayerRaces.Languages[i]->ModWords.size();
-		for (int j = (mod_words_size - 1); j >= 0; --j) {
-			if (mod_file == PlayerRaces.Languages[i]->ModWords[j]->Mod) {
-				PlayerRaces.Languages[i]->RemoveWord(PlayerRaces.Languages[i]->ModWords[j]);
-				delete PlayerRaces.Languages[i]->ModWords[j];
-				PlayerRaces.Languages[i]->ModWords.erase(std::remove(PlayerRaces.Languages[i]->ModWords.begin(), PlayerRaces.Languages[i]->ModWords.end(), PlayerRaces.Languages[i]->ModWords[j]), PlayerRaces.Languages[i]->ModWords.end());
-			}
-		}
-	}
 }
 
 bool IsNameValidForWord(std::string word_name)

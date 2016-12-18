@@ -577,64 +577,6 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 		std::string mod_file(mapSetup);
 		mod_file = FindAndReplaceStringBeginning(mod_file, StratagusLibPath + "/", "");
 		
-		for (size_t i = 0; i < PlayerRaces.Languages.size(); ++i) {
-			for (size_t j = 0; j < PlayerRaces.Languages[i]->ModWords.size(); ++j) {
-				if (PlayerRaces.Languages[i]->ModWords[j]->Mod != Map.Info.Filename) {
-					continue;
-				}
-				
-				f->printf("DefineLanguageWord(\"%s\", {\n", PlayerRaces.Languages[i]->ModWords[j]->Word.c_str());
-				f->printf("\tLanguage = \"%s\",\n", PlayerRaces.Languages[i]->Ident.c_str());
-				if (PlayerRaces.Languages[i]->ModWords[j]->Type != -1) {
-					f->printf("\tType = \"%s\",\n", GetWordTypeNameById(PlayerRaces.Languages[i]->ModWords[j]->Type).c_str());
-				}
-				if (PlayerRaces.Languages[i]->ModWords[j]->Gender != -1) {
-					f->printf("\tGender = \"%s\",\n", GetGrammaticalGenderNameById(PlayerRaces.Languages[i]->ModWords[j]->Gender).c_str());
-				}
-				
-				f->printf("\tMeanings = {");
-				for (size_t k = 0; k < PlayerRaces.Languages[i]->ModWords[j]->Meanings.size(); ++k) {
-					f->printf("\"%s\", ", PlayerRaces.Languages[i]->ModWords[j]->Meanings[k].c_str());
-				}
-				f->printf("},\n");
-				
-				f->printf("\tNameTypes = {");
-				for (int k = 0; k < MaxGrammaticalNumbers; ++k) {
-					for (int n = 0; n < MaxGrammaticalCases; ++n) {
-						for (int o = 0; o < MaxGrammaticalTenses; ++o) {
-							for (std::map<std::string, int>::iterator iterator = PlayerRaces.Languages[i]->ModWords[j]->NameTypes[k][n][o].begin(); iterator != PlayerRaces.Languages[i]->ModWords[j]->NameTypes[k][n][o].end(); ++iterator) {
-								if (iterator->second > 0) {
-									f->printf("\"%s\", ", iterator->first.c_str());
-								}
-							}
-						}
-					}
-				}
-				f->printf("},\n");
-				f->printf("\tAffixNameTypes = {");
-				for (int k = 0; k < MaxWordJunctionTypes; ++k) {
-					for (int n = 0; n < MaxAffixTypes; ++n) {
-						for (int o = 0; o < MaxGrammaticalNumbers; ++o) {
-							for (int p = 0; p < MaxGrammaticalCases; ++p) {
-								for (int q = 0; q < MaxGrammaticalTenses; ++q) {
-									for (std::map<std::string, int>::iterator iterator = PlayerRaces.Languages[i]->ModWords[j]->AffixNameTypes[k][n][o][p][q].begin(); iterator != PlayerRaces.Languages[i]->ModWords[j]->AffixNameTypes[k][n][o][p][q].end(); ++iterator) {
-										if (iterator->second > 0) {
-											f->printf("\"%s\", ", GetWordJunctionTypeNameById(k).c_str());
-											f->printf("\"%s\", ", GetAffixTypeNameById(n).c_str());
-											f->printf("\"%s\", ", iterator->first.c_str());
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				f->printf("},\n");
-				f->printf("\tMod = \"%s\"\n", mod_file.c_str());
-				f->printf("})\n\n");
-			}
-		}
-		
 		for (int i = 0; i < MAX_RACES; ++i) {
 			for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 				if (PlayerRaces.Factions[i][j]->Mod != Map.Info.Filename) {

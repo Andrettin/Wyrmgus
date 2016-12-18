@@ -803,8 +803,6 @@ static int CclDefineWorldMapTile(lua_State *l)
 				}
 			}
 		} else if (!strcmp(value, "CulturalSettlementNames")) {
-			std::string name_type = "settlement";
-
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
 			}
@@ -820,36 +818,8 @@ static int CclDefineWorldMapTile(lua_State *l)
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
 				tile->CulturalSettlementNames[civilization].push_back(TransliterateText(cultural_name));
-				
-				int language = PlayerRaces.GetCivilizationLanguage(civilization);
-				if (language == -1) {
-					LuaError(l, "Language doesn't exist.");
-				}
-				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
-					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
-				}
-				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
-				
-				++j;
-				if (j >= subargs) {
-					break;
-				}
-				
-				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-elements") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameElements(l, name_type);
-					}
-					lua_pop(l, 1);
-				} else {
-					--j;
-				}
 			}
 		} else if (!strcmp(value, "FactionCulturalSettlementNames")) {
-			std::string name_type = "settlement";
-
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
 			}
@@ -870,32 +840,6 @@ static int CclDefineWorldMapTile(lua_State *l)
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
 				tile->FactionCulturalSettlementNames[PlayerRaces.Factions[civilization][faction]].push_back(TransliterateText(cultural_name));
-				
-				int language = PlayerRaces.GetFactionLanguage(civilization, faction);
-				if (language == -1) {
-					LuaError(l, "Language doesn't exist.");
-				}
-				if (PlayerRaces.Languages[language]->TypeNameCount.find(name_type) == PlayerRaces.Languages[language]->TypeNameCount.end()) {
-					PlayerRaces.Languages[language]->TypeNameCount[name_type] = 0;
-				}
-				PlayerRaces.Languages[language]->TypeNameCount[name_type] += 1;
-				
-				++j;
-				if (j >= subargs) {
-					break;
-				}
-				
-				std::string next_element = LuaToString(l, -1, j + 1);
-				if (next_element == "name-elements") {
-					++j;
-					lua_rawgeti(l, -1, j + 1);
-					if (lua_istable(l, -1)) {
-						ParseNameElements(l, name_type);
-					}
-					lua_pop(l, 1);
-				} else {
-					--j;
-				}
 			}
 		} else if (!strcmp(value, "Claims")) {
 			if (!lua_istable(l, -1)) {
