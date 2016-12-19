@@ -245,7 +245,10 @@ static bool FindNearestReachableTerrainType(int movemask, int resmask, int range
 
 Vec2i COrder_Resource::GetHarvestLocation() const
 {
-	if (this->Resource.Mine != NULL) {
+	//Wyrmgus start
+//	if (this->Resource.Mine != NULL) {
+	if (this->Resource.Mine != NULL && this->Resource.Mine->Type != NULL) {
+	//Wyrmgus end
 		return this->Resource.Mine->tilePos;
 	} else {
 		return this->Resource.Pos;
@@ -255,7 +258,10 @@ Vec2i COrder_Resource::GetHarvestLocation() const
 //Wyrmgus start
 int COrder_Resource::GetHarvestMapLayer() const
 {
-	if (this->Resource.Mine != NULL) {
+	//Wyrmgus start
+//	if (this->Resource.Mine != NULL) {
+	if (this->Resource.Mine != NULL && this->Resource.Mine->Type != NULL) {
+	//Wyrmgus end
 		return this->Resource.Mine->MapLayer;
 	} else {
 		return this->Resource.MapLayer;
@@ -319,7 +325,10 @@ COrder_Resource::~COrder_Resource()
 	//Wyrmgus start
 	file.printf(" \"res-map-layer\", %d,", this->Resource.MapLayer);
 	//Wyrmgus end
-	if (this->Resource.Mine != NULL) {
+	//Wyrmgus start
+//	if (this->Resource.Mine != NULL) {
+	if (this->Resource.Mine != NULL && this->Resource.Mine->Type != NULL) {
+	//Wyrmgus end
 		file.printf(" \"res-mine\", \"%s\",", UnitReference(this->Resource.Mine).c_str());
 	}
 	if (this->Depot != NULL) {
@@ -350,6 +359,11 @@ COrder_Resource::~COrder_Resource()
 		lua_rawgeti(l, -1, j + 1);
 		this->Resource.Mine = CclGetUnitFromRef(l);
 		lua_pop(l, 1);
+		//Wyrmgus start
+		if (this->Resource.Mine->Type == NULL) {
+			this->Resource.Mine = NULL;
+		}
+		//Wyrmgus end
 	} else if (!strcmp(value, "res-pos")) {
 		++j;
 		lua_rawgeti(l, -1, j + 1);
@@ -1363,7 +1377,7 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 	// Range hardcoded. don't stray too far though
 	//Wyrmgus start
 //	if (resinfo.TerrainHarvester) {
-	if (!this->Resource.Mine) {
+	if (!this->Resource.Mine || this->Resource.Mine->Type == NULL) {
 	//Wyrmgus end
 		Vec2i pos = this->Resource.Pos;
 		//Wyrmgus start
@@ -1402,7 +1416,10 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 		//Wyrmgus end
 			// If the depot is overused, we need first to try to switch into another depot
 			// Use depot's ref counter for that
-			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
+			//Wyrmgus start
+//			if (longWay || !mine || (depot->Refs > tooManyWorkers)) {
+			if (longWay || !mine || mine->Type == NULL || (depot->Refs > tooManyWorkers)) {
+			//Wyrmgus end
 				newdepot = AiGetSuitableDepot(unit, *depot, &goal);
 				if (newdepot == NULL && longWay) {
 					// We need a new depot
@@ -1413,7 +1430,10 @@ bool COrder_Resource::WaitInDepot(CUnit &unit)
 
 		// If goal is not NULL, then we got it in AiGetSuitableDepot
 		if (!goal) {
-			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
+			//Wyrmgus start
+//			goal = UnitFindResource(unit, newdepot ? *newdepot : (mine ? *mine : unit), mine ? range : 1000,
+			goal = UnitFindResource(unit, newdepot ? *newdepot : ((mine && mine->Type) ? *mine : unit), (mine && mine->Type) ? range : 1000,
+			//Wyrmgus end
 									this->CurrentResource, unit.Player->AiEnabled, newdepot ? newdepot : depot);
 		}
 
@@ -1507,7 +1527,10 @@ bool COrder_Resource::FindAnotherResource(CUnit &unit)
 	//		if (!resinfo.TerrainHarvester) {
 			if (!Map.Info.IsPointOnMap(this->goalPos, this->MapLayer)) {
 			//Wyrmgus end
-				CUnit *newGoal = UnitFindResource(unit, this->Resource.Mine ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
+				//Wyrmgus start
+//				CUnit *newGoal = UnitFindResource(unit, this->Resource.Mine ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
+				CUnit *newGoal = UnitFindResource(unit, (this->Resource.Mine && this->Resource.Mine->Type) ? *this->Resource.Mine : unit, 8, this->CurrentResource, 1);
+				//Wyrmgus end
 
 				if (newGoal) {
 					CUnit *mine = this->Resource.Mine;
