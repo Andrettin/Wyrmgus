@@ -362,6 +362,10 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		int settlement_y = map_start_pos.y + std::get<1>(iterator->first) - template_start_pos.y;
 		int settlement_civilization = std::get<2>(iterator->first);
 		
+		if (!Map.Info.IsPointOnMap(Vec2i(settlement_x, settlement_y), z)) {
+			continue;
+		}
+
 		Map.CulturalSettlementNames[z][std::tuple<int, int, int>(settlement_x, settlement_y, settlement_civilization)] = iterator->second;
 	}
 	
@@ -370,6 +374,10 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		int settlement_y = map_start_pos.y + std::get<1>(iterator->first) - template_start_pos.y;
 		CFaction *settlement_faction = std::get<2>(iterator->first);
 		
+		if (!Map.Info.IsPointOnMap(Vec2i(settlement_x, settlement_y), z)) {
+			continue;
+		}
+
 		Map.FactionCulturalSettlementNames[z][std::tuple<int, int, CFaction *>(settlement_x, settlement_y, settlement_faction)] = iterator->second;
 	}
 	
