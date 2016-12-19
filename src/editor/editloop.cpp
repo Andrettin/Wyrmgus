@@ -2546,6 +2546,8 @@ void CEditor::Init()
 		Map.Worlds.push_back(NULL);
 		Map.Layers.push_back(0);
 		Map.LayerConnectors.resize(1);
+		Map.CulturalSettlementNames.resize(1);
+		Map.FactionCulturalSettlementNames.resize(1);
 		//Wyrmgus end
 
 		const int defaultTile = Map.Tileset->getDefaultTileIndex();

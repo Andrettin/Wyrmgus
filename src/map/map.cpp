@@ -225,6 +225,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.Worlds.push_back(this->World);
 		Map.Layers.push_back(this->Layer);
 		Map.LayerConnectors.resize(z + 1);
+		Map.CulturalSettlementNames.resize(z + 1);
+		Map.FactionCulturalSettlementNames.resize(z + 1);
 	} else {
 		if (!this->IsSubtemplateArea()) {
 			Map.TimeOfDaySeconds[z] = this->TimeOfDaySeconds;
@@ -353,6 +355,22 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			
 			while_count += 1;
 		}
+	}
+	
+	for (std::map<std::tuple<int, int, int>, std::string>::iterator iterator = this->CulturalSettlementNames.begin(); iterator != this->CulturalSettlementNames.end(); ++iterator) {
+		int settlement_x = map_start_pos.x + std::get<0>(iterator->first) - template_start_pos.x;
+		int settlement_y = map_start_pos.y + std::get<1>(iterator->first) - template_start_pos.y;
+		int settlement_civilization = std::get<2>(iterator->first);
+		
+		Map.CulturalSettlementNames[z][std::tuple<int, int, int>(settlement_x, settlement_y, settlement_civilization)] = iterator->second;
+	}
+	
+	for (std::map<std::tuple<int, int, CFaction *>, std::string>::iterator iterator = this->FactionCulturalSettlementNames.begin(); iterator != this->FactionCulturalSettlementNames.end(); ++iterator) {
+		int settlement_x = map_start_pos.x + std::get<0>(iterator->first) - template_start_pos.x;
+		int settlement_y = map_start_pos.y + std::get<1>(iterator->first) - template_start_pos.y;
+		CFaction *settlement_faction = std::get<2>(iterator->first);
+		
+		Map.FactionCulturalSettlementNames[z][std::tuple<int, int, CFaction *>(settlement_x, settlement_y, settlement_faction)] = iterator->second;
 	}
 	
 	if (!this->IsSubtemplateArea()) {
@@ -937,6 +955,50 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 	
 	return Vec2i(-1, -1);
 }
+
+std::string CMap::GetSettlementName(const Vec2i &pos, int z, const Vec2i &tile_size, int civilization, int faction) const
+{
+	int settlement_x = pos.x + ((tile_size.x - 1) / 2);
+	int settlement_y = pos.y + ((tile_size.y - 1) / 2);
+
+	if (civilization != -1 && faction != -1 && this->FactionCulturalSettlementNames[z].find(std::tuple<int, int, CFaction *>(settlement_x, settlement_y, PlayerRaces.Factions[civilization][faction])) != this->FactionCulturalSettlementNames[z].end()) {
+		return this->FactionCulturalSettlementNames[z].find(std::tuple<int, int, CFaction *>(settlement_x, settlement_y, PlayerRaces.Factions[civilization][faction]))->second;
+	}
+
+	// if didn't find a faction cultural settlement name for the exact tile, try for any of the tiles the town hall occupies
+	for (int x_offset = 0; x_offset < tile_size.x; ++x_offset) {
+		for (int y_offset = 0; y_offset < tile_size.y; ++y_offset) {
+			int second_settlement_x = pos.x + x_offset;
+			int second_settlement_y = pos.y + y_offset;
+			
+			if (civilization != -1 && faction != -1 && this->FactionCulturalSettlementNames[z].find(std::tuple<int, int, CFaction *>(second_settlement_x, second_settlement_y, PlayerRaces.Factions[civilization][faction])) != this->FactionCulturalSettlementNames[z].end()) {
+				return this->FactionCulturalSettlementNames[z].find(std::tuple<int, int, CFaction *>(second_settlement_x, second_settlement_y, PlayerRaces.Factions[civilization][faction]))->second;
+			}
+		}
+	}
+	
+	if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
+		return this->GetSettlementName(pos, z, tile_size, civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction);
+	}
+		
+	if (civilization != -1 && this->CulturalSettlementNames[z].find(std::tuple<int, int, int>(settlement_x, settlement_y, civilization)) != this->CulturalSettlementNames[z].end()) {
+		return this->CulturalSettlementNames[z].find(std::tuple<int, int, int>(settlement_x, settlement_y, civilization))->second;
+	}
+	
+	// if didn't find a cultural settlement name for the exact tile, try for any of the tiles the town hall occupies
+	for (int x_offset = 0; x_offset < tile_size.x; ++x_offset) {
+		for (int y_offset = 0; y_offset < tile_size.y; ++y_offset) {
+			int second_settlement_x = pos.x + x_offset;
+			int second_settlement_y = pos.y + y_offset;
+			
+			if (civilization != -1 && this->CulturalSettlementNames[z].find(std::tuple<int, int, int>(second_settlement_x, second_settlement_y, civilization)) != this->CulturalSettlementNames[z].end()) {
+				return this->CulturalSettlementNames[z].find(std::tuple<int, int, int>(second_settlement_x, second_settlement_y, civilization))->second;
+			}
+		}
+	}
+
+	return "";
+}
 //Wyrmgus end
 
 /**
@@ -1372,6 +1434,8 @@ void CMap::Create()
 	this->Worlds.push_back(NULL);
 	this->Layers.push_back(0);
 	this->LayerConnectors.resize(1);
+	this->CulturalSettlementNames.resize(1);
+	this->FactionCulturalSettlementNames.resize(1);
 	//Wyrmgus end
 }
 
@@ -1405,6 +1469,8 @@ void CMap::Clean()
 	this->Worlds.clear();
 	this->Layers.clear();
 	this->LayerConnectors.clear();
+	this->CulturalSettlementNames.clear();
+	this->FactionCulturalSettlementNames.clear();
 	//Wyrmgus end
 
 	// Tileset freed by Tileset?
@@ -1471,6 +1537,26 @@ void CMap::Save(CFile &file) const
 	file.printf("  \"layer-references\", {\n");
 	for (size_t z = 0; z < this->Fields.size(); ++z) {
 		file.printf("  {\"%s\", \"%s\", %d},\n", this->Planes[z] ? this->Planes[z]->Name.c_str() : "", this->Worlds[z] ? this->Worlds[z]->Name.c_str() : "", this->Layers[z]);
+	}
+	file.printf("  },\n");
+	
+	file.printf("  \"cultural-settlement-names\", {\n");
+	for (size_t z = 0; z < this->CulturalSettlementNames.size(); ++z) {
+		file.printf("  {\n");
+		for (std::map<std::tuple<int, int, int>, std::string>::const_iterator iterator = this->CulturalSettlementNames[z].begin(); iterator != this->CulturalSettlementNames[z].end(); ++iterator) {
+			file.printf("    \"%s\", %d, %d, \"%s\",\n", iterator->second.c_str(), std::get<0>(iterator->first), std::get<1>(iterator->first), PlayerRaces.Name[std::get<2>(iterator->first)].c_str());
+		}
+		file.printf("  },\n");
+	}
+	file.printf("  },\n");
+	
+	file.printf("  \"faction-cultural-settlement-names\", {\n");
+	for (size_t z = 0; z < this->FactionCulturalSettlementNames.size(); ++z) {
+		file.printf("  {\n");
+		for (std::map<std::tuple<int, int, CFaction *>, std::string>::const_iterator iterator = this->FactionCulturalSettlementNames[z].begin(); iterator != this->FactionCulturalSettlementNames[z].end(); ++iterator) {
+			file.printf("    \"%s\", %d, %d, \"%s\",\n", iterator->second.c_str(), std::get<0>(iterator->first), std::get<1>(iterator->first), std::get<2>(iterator->first)->Ident.c_str());
+		}
+		file.printf("  },\n");
 	}
 	file.printf("  },\n");
 	//Wyrmgus end

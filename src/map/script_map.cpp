@@ -188,6 +188,62 @@ static int CclStratagusMap(lua_State *l)
 						lua_pop(l, 1);
 					}
 					lua_pop(l, 1);
+				} else if (!strcmp(value, "cultural-settlement-names")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument for \"cultural-settlement-names\"");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int z = 0; z < subsubargs; ++z) {
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument for \"cultural-settlement-names\"");
+						}
+						Map.CulturalSettlementNames.resize(z + 1);
+						lua_rawgeti(l, -1, z + 1);
+						const int subsubsubargs = lua_rawlen(l, -1);
+						for (int n = 0; n < subsubsubargs; ++n) {
+							std::string settlement_name = LuaToString(l, -1, n + 1);
+							++n;
+							int settlement_x = LuaToNumber(l, -1, n + 1);
+							++n;
+							int settlement_y = LuaToNumber(l, -1, n + 1);
+							++n;
+							int settlement_civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, n + 1));
+							if (settlement_civilization != -1) {
+								Map.CulturalSettlementNames[z][std::tuple<int, int, int>(settlement_x, settlement_y, settlement_civilization)] = settlement_name;
+							}
+						}
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
+				} else if (!strcmp(value, "faction-cultural-settlement-names")) {
+					lua_rawgeti(l, j + 1, k + 1);
+					if (!lua_istable(l, -1)) {
+						LuaError(l, "incorrect argument for \"faction-cultural-settlement-names\"");
+					}
+					const int subsubargs = lua_rawlen(l, -1);
+					for (int z = 0; z < subsubargs; ++z) {
+						if (!lua_istable(l, -1)) {
+							LuaError(l, "incorrect argument for \"faction-cultural-settlement-names\"");
+						}
+						Map.FactionCulturalSettlementNames.resize(z + 1);
+						lua_rawgeti(l, -1, z + 1);
+						const int subsubsubargs = lua_rawlen(l, -1);
+						for (int n = 0; n < subsubsubargs; ++n) {
+							std::string settlement_name = LuaToString(l, -1, n + 1);
+							++n;
+							int settlement_x = LuaToNumber(l, -1, n + 1);
+							++n;
+							int settlement_y = LuaToNumber(l, -1, n + 1);
+							++n;
+							CFaction *settlement_faction = PlayerRaces.GetFaction(-1, LuaToString(l, -1, n + 1));
+							if (settlement_faction != NULL) {
+								Map.FactionCulturalSettlementNames[z][std::tuple<int, int, CFaction *>(settlement_x, settlement_y, settlement_faction)] = settlement_name;
+							}
+						}
+						lua_pop(l, 1);
+					}
+					lua_pop(l, 1);
 				//Wyrmgus end
 				} else if (!strcmp(value, "map-fields")) {
 					//Wyrmgus start
@@ -634,6 +690,56 @@ static int CclSetMapTemplateTileLabel(lua_State *l)
 	CclGetPos(l, &ipos.x, &ipos.y, 3);
 
 	map_template->TileLabels[std::pair<int, int>(ipos.x, ipos.y)] = TransliterateText(label_string);
+	
+	return 1;
+}
+
+static int CclSetMapTemplateCulturalSettlementName(lua_State *l)
+{
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template doesn't exist.\n");
+	}
+
+	std::string settlement_name = LuaToString(l, 2);
+	
+	Vec2i ipos;
+	CclGetPos(l, &ipos.x, &ipos.y, 3);
+
+	std::string civilization_ident = LuaToString(l, 4);
+	int civilization = PlayerRaces.GetRaceIndexByName(civilization_ident.c_str());
+	if (civilization == -1) {
+		LuaError(l, "Civilization \"%s\" doesn't exist.\n" _C_ civilization_ident.c_str());
+	}
+
+	map_template->CulturalSettlementNames[std::tuple<int, int, int>(ipos.x, ipos.y, civilization)] = settlement_name;
+	PlayerRaces.Civilizations[civilization]->SettlementNames.push_back(settlement_name);
+	
+	return 1;
+}
+
+static int CclSetMapTemplateFactionCulturalSettlementName(lua_State *l)
+{
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template doesn't exist.\n");
+	}
+
+	std::string settlement_name = LuaToString(l, 2);
+	
+	Vec2i ipos;
+	CclGetPos(l, &ipos.x, &ipos.y, 3);
+
+	std::string faction_ident = LuaToString(l, 4);
+	CFaction *faction = PlayerRaces.GetFaction(-1, faction_ident);
+	if (!faction) {
+		LuaError(l, "Faction \"%s\" doesn't exist.\n" _C_ faction_ident.c_str());
+	}
+
+	map_template->FactionCulturalSettlementNames[std::tuple<int, int, CFaction *>(ipos.x, ipos.y, faction)] = settlement_name;
+	faction->SettlementNames.push_back(settlement_name);
 	
 	return 1;
 }
@@ -1510,6 +1616,8 @@ void MapCclRegister()
 	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
 	lua_register(Lua, "SetMapTemplateTileLabel", CclSetMapTemplateTileLabel);
+	lua_register(Lua, "SetMapTemplateCulturalSettlementName", CclSetMapTemplateCulturalSettlementName);
+	lua_register(Lua, "SetMapTemplateFactionCulturalSettlementName", CclSetMapTemplateFactionCulturalSettlementName);
 	lua_register(Lua, "SetMapTemplateResource", CclSetMapTemplateResource);
 	lua_register(Lua, "SetMapTemplateUnit", CclSetMapTemplateUnit);
 	lua_register(Lua, "SetMapTemplateHero", CclSetMapTemplateHero);

@@ -2870,7 +2870,10 @@ void CUnit::UpdateSettlementName()
 		if (!new_settlement_name.empty()) {
 			this->SettlementName = new_settlement_name;
 		} else {
-			if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->SettlementNames.size() > 0) {
+			new_settlement_name = Map.GetSettlementName(this->tilePos, this->MapLayer, Vec2i(this->Type->TileWidth, this->Type->TileHeight), civilization, faction);
+			if (!new_settlement_name.empty()) {
+				this->SettlementName = new_settlement_name;
+			} else if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->SettlementNames.size() > 0) {
 				this->SettlementName = PlayerRaces.Factions[civilization][faction]->SettlementNames[SyncRand(PlayerRaces.Factions[civilization][faction]->SettlementNames.size())];
 			} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->SettlementNames.size() > 0) {
 				this->SettlementName = PlayerRaces.Civilizations[civilization]->SettlementNames[SyncRand(PlayerRaces.Civilizations[civilization]->SettlementNames.size())];

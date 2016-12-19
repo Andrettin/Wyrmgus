@@ -2083,6 +2083,8 @@ std::string GrandStrategyWorldMapTile::GenerateSettlementName(int civilization, 
 	} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->SettlementNames.size() > 0) {
 		return PlayerRaces.Civilizations[civilization]->SettlementNames[SyncRand(PlayerRaces.Civilizations[civilization]->SettlementNames.size())];
 	}
+	
+	return "";
 }
 
 int GrandStrategyWorldMapTile::GetResourceIncome(bool ignore_transport_level)
