@@ -925,10 +925,7 @@ Vec2i CMap::GenerateUnitLocation(const CUnitType *unit_type, CFaction *faction, 
 	
 	CPlayer *player = GetFactionPlayer(faction);
 	if (!unit_type->BoolFlag[TOWNHALL_INDEX].value && player != NULL && player->StartMapLayer == z && player->StartPos.x >= min_pos.x && player->StartPos.x <= max_pos.x && player->StartPos.y >= min_pos.y && player->StartPos.y <= max_pos.y) {
-		min_pos.x = std::max<int>(min_pos.x, player->StartPos.x - 8);
-		min_pos.y = std::max<int>(min_pos.y, player->StartPos.y - 8);
-		max_pos.x = std::min<int>(max_pos.x, player->StartPos.x + 8);
-		max_pos.y = std::min<int>(max_pos.y, player->StartPos.y + 8);
+		return player->StartPos;
 	}
 	
 	Vec2i random_pos(-1, -1);
