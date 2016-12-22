@@ -561,6 +561,9 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		//Wyrmgus start
 //		NewRallyPoint(goalPos, &resultPos);
 		NewRallyPoint(goalPos, &resultPos, z);
+		if (resultPos.x == 0 && resultPos.y == 0) {
+			resultPos = goalPos;
+		}
 		//Wyrmgus end
 		this->GoalPos = resultPos;
 		//Wyrmgus start
@@ -1316,6 +1319,9 @@ void AiForce::Update()
 			//Wyrmgus start
 //			NewRallyPoint(unit->tilePos, &resultPos);
 			NewRallyPoint(unit->tilePos, &resultPos, unit->MapLayer);
+			if (resultPos.x == 0 && resultPos.y == 0) {
+				resultPos = unit->tilePos;
+			}
 			//Wyrmgus end
 			this->GoalPos = resultPos;
 			//Wyrmgus start
