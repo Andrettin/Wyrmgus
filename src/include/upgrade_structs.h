@@ -219,6 +219,7 @@ public:
 	std::string Description;		/// Description of the upgrade
 	std::string Quote;				/// Quote of the upgrade
 	std::string Background;			/// Encyclopedia entry for the upgrade
+	std::string EffectsString;		/// Effect string of the upgrade
 	std::string ModifierGraphicFile;
 	bool Ability;
 	bool Weapon;

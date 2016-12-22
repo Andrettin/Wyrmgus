@@ -905,7 +905,6 @@ inline bool CanSelectMultipleUnits(const CPlayer &player) { return &player == Th
 extern void SetCivilizationStringToIndex(std::string civilization_name, int civilization_id);
 extern void SetFactionStringToIndex(int civilization, std::string faction_name, int faction_id);
 extern void NetworkSetFaction(int player, std::string faction_name);
-extern std::string GetFactionEffectsString(std::string civilization_name, std::string faction_name);
 extern int GetPlayerColorIndexByName(std::string player_color_name);
 extern int GetSkinColorIndexByName(std::string skin_color_name);
 extern int GetHairColorIndexByName(std::string hair_color_name);
