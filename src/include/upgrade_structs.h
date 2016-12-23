@@ -230,6 +230,7 @@ public:
 	bool MagicSuffix;
 	bool RunicAffix;
 	bool UniqueOnly;						/// Whether (if this is a literary work) this should appear only on unique items (used, for instance, if a book has no copies of its text)
+	bool RequiresDeity;						/// Whether this upgrade requires a deity which has a domain containing the upgrade
 	bool ItemPrefix[MaxItemClasses];
 	bool ItemSuffix[MaxItemClasses];
 	bool IncompatibleAffixes[UpgradeMax];

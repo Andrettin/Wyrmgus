@@ -545,6 +545,19 @@ public:
 	std::string Mod;													/// To which mod (or map), if any, this faction belongs
 };
 
+class CDeityDomain
+{
+public:
+	CDeityDomain() :
+		Ident("")
+	{
+	}
+	
+	std::string Ident;			/// Ident of the domain
+	std::string Name;			/// Name of the domain
+	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this domain
+};
+
 class CReligion
 {
 public:
@@ -559,19 +572,7 @@ public:
 	std::string Background;
 	std::string Quote;
 	bool CulturalDeities;		/// Whether the religion's deities (or equivalent) must belong to the civilization that has the religion; for instance: the deities under paganism must belong to the civilization of the player, but under hinduism they musn't (meaning that a Teuton player which has hinduism as a religion can select Hindu deities, but an Indian pagan cannot select Teuton pagan deities)
-};
-
-class CDeityDomain
-{
-public:
-	CDeityDomain() :
-		Ident("")
-	{
-	}
-	
-	std::string Ident;			/// Ident of the domain
-	std::string Name;			/// Name of the domain
-	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this domain
+	std::vector<CDeityDomain *> Domains;
 };
 
 class CDeity

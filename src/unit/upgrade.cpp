@@ -328,6 +328,7 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->Background = parent_upgrade->Background;
 				upgrade->EffectsString = parent_upgrade->EffectsString;
 				upgrade->ModifierGraphicFile = parent_upgrade->ModifierGraphicFile;
+				upgrade->RequiresDeity = parent_upgrade->RequiresDeity;
 				for (int i = 0; i < MaxCosts; ++i) {
 					upgrade->Costs[i] = parent_upgrade->Costs[i];
 					upgrade->GrandStrategyCosts[i] = parent_upgrade->GrandStrategyCosts[i];
@@ -425,6 +426,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->RunicAffix = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "UniqueOnly")) {
 			upgrade->UniqueOnly = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "RequiresDeity")) {
+			upgrade->RequiresDeity = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Work")) {
 			int work_type = GetItemClassIdByName(LuaToString(l, -1));
 			if (work_type != -1) {

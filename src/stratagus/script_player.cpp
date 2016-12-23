@@ -2034,6 +2034,19 @@ static int CclDefineReligion(lua_State *l)
 			religion->Quote = LuaToString(l, -1);
 		} else if (!strcmp(value, "CulturalDeities")) {
 			religion->CulturalDeities = LuaToBoolean(l, -1);
+		} else if (!strcmp(value, "Domains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int domain_id = PlayerRaces.GetDeityDomainIndexByIdent(LuaToString(l, -1, j + 1));
+				if (domain_id == -1) {
+					LuaError(l, "Domain doesn't exist.");
+				}
+
+				religion->Domains.push_back(PlayerRaces.DeityDomains[domain_id]);
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
