@@ -1553,17 +1553,39 @@ static void UpdateButtonPanelMultipleUnits(std::vector<ButtonAction> *buttonActi
 		(*buttonActions)[z].Pos = -1;
 	}
 	char unit_ident[128];
+	//Wyrmgus start
+	char individual_unit_ident[36][128]; // the 36 there is the max selectable quantity; not nice to hardcode it like this, should be changed in the future
+	//Wyrmgus end
 
 	sprintf(unit_ident, ",%s-group,", PlayerRaces.Name[ThisPlayer->Race].c_str());
+	
+	//Wyrmgus start
+	for (size_t i = 0; i != Selected.size(); ++i) {
+		sprintf(individual_unit_ident[i], ",%s,", Selected[i]->Type->Ident.c_str());
+	}
+	//Wyrmgus end
 
 	for (size_t z = 0; z < UnitButtonTable.size(); ++z) {
 		if (UnitButtonTable[z]->Level != CurrentButtonLevel) {
 			continue;
 		}
 
+		//Wyrmgus start
+		bool used_by_all = true;
+		for (size_t i = 0; i != Selected.size(); ++i) {
+			if (!strstr(UnitButtonTable[z]->UnitMask.c_str(), individual_unit_ident[i])) {
+				used_by_all = false;
+				break;
+			}
+		}
+		//Wyrmgus end
+		
 		// any unit or unit in list
 		if (UnitButtonTable[z]->UnitMask[0] != '*'
-			&& !strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident)) {
+			//Wyrmgus start
+//			&& !strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident)) {
+			&& !strstr(UnitButtonTable[z]->UnitMask.c_str(), unit_ident) && !used_by_all) {
+			//Wyrmgus end
 			continue;
 		}
 
