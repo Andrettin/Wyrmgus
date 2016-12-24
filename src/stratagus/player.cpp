@@ -75,6 +75,10 @@
 #include "ui.h"
 #include "video.h"
 
+//Wyrmgus start
+#include "../ai/ai_local.h"
+//Wyrmgus end
+
 /*----------------------------------------------------------------------------
 --  Documentation
 ----------------------------------------------------------------------------*/
@@ -2016,8 +2020,8 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 		if (std::get<0>(this->QuestBuildUnits[i]) == quest && std::get<2>(this->QuestBuildUnits[i]) > 0) {
 			bool has_builder = false;
 			CUnitType *type = std::get<1>(this->QuestBuildUnits[i]);
-			for (size_t j = 0; j < type->TrainedBy.size(); ++j) {
-				if (this->UnitTypesCount[type->TrainedBy[j]->Slot] > 0) {
+			for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
+				if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
 					has_builder = true;
 					break;
 				}
