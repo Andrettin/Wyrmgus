@@ -660,9 +660,16 @@ bool COrder_Build::BuildFromOutside(CUnit &unit) const
 		return ;
 	}
 	if (this->State == State_BuildFromOutside) {
-		if (this->BuildFromOutside(unit)) {
+		//Wyrmgus start
+//		if (this->BuildFromOutside(unit)) {
+//			this->Finished = true;
+//		}
+		if (this->BuildingUnit != NULL) {
+			this->HelpBuild(unit, *this->BuildingUnit);
+		} else {
 			this->Finished = true;
 		}
+		//Wyrmgus end
 	}
 }
 

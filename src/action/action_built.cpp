@@ -73,12 +73,9 @@ extern void AiReduceMadeInBuilt(PlayerAi &pai, const CUnitType &type);
 	}
 	order->UpdateConstructionFrame(unit);
 
-	//Wyrmgus start
-	//workers building from outside shouldn't be treated differently in this instance
-//	if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
+	if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
 		order->Worker = &builder;
-//	}
-	//Wyrmgus end
+	}
 	return order;
 }
 
@@ -157,12 +154,7 @@ static void CancelBuilt(COrder_Built &order, CUnit &unit)
 	if (worker != NULL) {
 		worker->ClearAction();
 
-		//Wyrmgus start
-//		DropOutOnSide(*worker, LookingW, &unit);
-		if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
-			DropOutOnSide(*worker, LookingW, &unit);
-		}
-		//Wyrmgus end
+		DropOutOnSide(*worker, LookingW, &unit);
 	}
 	// Player gets back 75% of the original cost for a building.
 	unit.Player->AddCostsFactor(unit.Stats->Costs, CancelBuildingCostsFactor);
@@ -216,8 +208,35 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		unit.Frame = 0;
 	}
 	CUnit *worker = order.GetWorkerPtr();
+	
+	//Wyrmgus start
+	int worker_count = 0;
+	//count workers that are helping build the building, and make them harvest/return goods to it, if applicable
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, 2, table);
+	for (size_t i = 0; i != table.size(); ++i) {
+		if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+			// If we can harvest from the new building, do it.
+			if (table[i]->Type->ResInfo[type.GivesResource]) {
+				CommandResource(*table[i], unit, 0);
+			}
+			// If we can reurn goods to a new depot, do it.
+			if (table[i]->CurrentResource && table[i]->ResourcesHeld > 0 && type.CanStore[table[i]->CurrentResource]) {
+				CommandReturnGoods(*table[i], &unit, 0);
+			}
+			worker_count += 1;
+		}
+	}
+	
+	//give builders experience for the construction of the structure
+	int xp_gained = type.Stats[unit.Player->Index].Costs[TimeCost] / 10;
+	//Wyrmgus end
 
 	if (worker != NULL) {
+		//Wyrmgus start
+		worker_count += 1;
+		//Wyrmgus end
+		
 		if (type.BoolFlag[BUILDERLOST_INDEX].value) {
 			// Bye bye worker.
 			LetUnitDie(*worker);
@@ -225,12 +244,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		} else { // Drop out the worker.
 			worker->ClearAction();
 
-			//Wyrmgus start
-//			DropOutOnSide(*worker, LookingW, &unit);
-			if (unit.Type->BoolFlag[BUILDEROUTSIDE_INDEX].value == false) {
-				DropOutOnSide(*worker, LookingW, &unit);
-			}
-			//Wyrmgus end
+			DropOutOnSide(*worker, LookingW, &unit);
 
 			// If we can harvest from the new building, do it.
 			if (worker->Type->ResInfo[type.GivesResource]) {
@@ -242,45 +256,23 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			}
 			
 			//Wyrmgus start
-			int worker_count = 1;
-			
-			//make workers that are helping build the building also harvest/return goods to it, if applicable
-			std::vector<CUnit *> table;
-			SelectAroundUnit(unit, 2, table);
-			for (size_t i = 0; i != table.size(); ++i) {
-				if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
-					// If we can harvest from the new building, do it.
-					if (table[i]->Type->ResInfo[type.GivesResource]) {
-						CommandResource(*table[i], unit, 0);
-					}
-					// If we can reurn goods to a new depot, do it.
-					if (table[i]->CurrentResource && table[i]->ResourcesHeld > 0 && type.CanStore[table[i]->CurrentResource]) {
-						CommandReturnGoods(*table[i], &unit, 0);
-					}
-					worker_count += 1;
-				}
-			}
-			
-			//give builders experience for the construction of the structure
-			int xp_gained = type.Stats[unit.Player->Index].Costs[TimeCost] / 10;
-			
 			// give experience to the builder
 			worker->Variable[XP_INDEX].Max += xp_gained / worker_count;
 			worker->Variable[XP_INDEX].Value = worker->Variable[XP_INDEX].Max;
 			worker->XPChanged();
-			
-			for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
-				if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
-					table[i]->Variable[XP_INDEX].Max += xp_gained / worker_count;
-					table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
-					table[i]->XPChanged();
-				}
-			}
 			//Wyrmgus end
 		}
 	}
 
 	//Wyrmgus start
+	for (size_t i = 0; i != table.size(); ++i) { // also give experience to all other workers who helped build the structure
+		if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+			table[i]->Variable[XP_INDEX].Max += xp_gained / worker_count;
+			table[i]->Variable[XP_INDEX].Value = table[i]->Variable[XP_INDEX].Max;
+			table[i]->XPChanged();
+		}
+	}
+			
 //	if (type.GivesResource && type.StartingResources != 0) {
 	if (type.GivesResource && type.StartingResources.size() > 0) {
 	//Wyrmgus end
@@ -309,11 +301,17 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		if (worker) {
 			PlayUnitSound(*worker, VoiceWorkCompleted);
 		//Wyrmgus end
-		//Wyrmgus start
-		// why play the under-construction sound if the building has just been completed?
-//		} else {
+		} else {
+			//Wyrmgus start
+			// why play the under-construction sound if the building has just been completed?
 //			PlayUnitSound(unit, VoiceBuilding);
-		//Wyrmgus end
+			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is NULL
+				if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
+					PlayUnitSound(*table[i], VoiceWorkCompleted);
+					break;
+				}
+			}
+			//Wyrmgus end
 		}
 	}
 

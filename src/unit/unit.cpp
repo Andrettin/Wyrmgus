@@ -380,7 +380,10 @@
 ----------------------------------------------------------------------------*/
 
 bool EnableTrainingQueue;                 /// Config: training queues enabled
-bool EnableBuildingCapture;               /// Config: capture buildings enabled
+//Wyrmgus start
+//bool EnableBuildingCapture;               /// Config: capture buildings enabled
+bool EnableBuildingCapture = false;               /// Config: capture buildings enabled
+//Wyrmgus end
 bool RevealAttacker;                      /// Config: reveal attacker enabled
 int ResourcesMultiBuildersMultiplier = 0; /// Config: spend resources for building with multiple workers
 
