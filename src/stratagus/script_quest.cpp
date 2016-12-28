@@ -783,6 +783,13 @@ static int CclDefineDialogue(lua_State *l)
 							lua_pop(l, 1);
 						}
 						lua_pop(l, 1);
+					} else if (!strcmp(value, "option-tooltips")) {
+						lua_rawgeti(l, -1, k + 1);
+						const int subsubargs = lua_rawlen(l, -1);
+						for (int n = 0; n < subsubargs; ++n) {
+							node->OptionTooltips.push_back(LuaToString(l, -1, n + 1));
+						}
+						lua_pop(l, 1);
 					} else {
 						printf("\n%s\n", dialogue->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);

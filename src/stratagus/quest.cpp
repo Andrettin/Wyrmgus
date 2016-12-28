@@ -356,6 +356,24 @@ void CDialogueNode::Call(int player)
 		lua_command += "CallDialogueNodeOptionEffect(\"" + this->Dialogue->Ident + "\", " + std::to_string((long long) this->ID) + ", " + std::to_string((long long) 0) + ", " + std::to_string((long long) player) + ");";
 		lua_command += " end";
 	}
+	lua_command += "}, ";
+
+	lua_command += "nil, nil, nil, ";
+	
+	lua_command += "{";
+	if (this->OptionTooltips.size() > 0) {
+		lua_command += "OptionTooltips = {";
+		bool first = true;
+		for (size_t i = 0; i < this->OptionTooltips.size(); ++i) {
+			if (!first) {
+				lua_command += ", ";
+			} else {
+				first = false;
+			}
+			lua_command += "\"" + this->OptionTooltips[i] + "\"";
+		}
+		lua_command += "}";
+	}
 	lua_command += "}";
 	
 	lua_command += ")";

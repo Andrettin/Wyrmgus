@@ -207,6 +207,7 @@ public:
 	LuaCallback *Conditions;
 	std::vector<std::string> Options;
 	std::vector<LuaCallback *> OptionEffects;
+	std::vector<std::string> OptionTooltips;
 };
 
 /*----------------------------------------------------------------------------
