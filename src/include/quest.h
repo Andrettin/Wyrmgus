@@ -108,6 +108,7 @@ public:
 	std::vector<std::string> Objectives;	/// The objectives of this quest
 	std::vector<std::string> BriefingSounds;	/// The briefing sounds of this quest
 	std::vector<std::tuple<CUnitType *, int>> BuildUnits;	/// Build units objective vector, containing unit type and quantity
+	std::vector<std::tuple<int, int>> BuildUnitsOfClass;	/// Build units objective vector, containing class id and quantity
 	std::vector<CUpgrade *> ResearchUpgrades;
 	std::vector<std::tuple<CUnitType *, CFaction *, int>> DestroyUnits;	/// Destroy units objective vector, containing unit type, faction and quantity
 	std::vector<CUniqueItem *> DestroyUniques;

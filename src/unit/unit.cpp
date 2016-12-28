@@ -2287,10 +2287,17 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				}
 			} else {
 				player.TotalUnits++;
+				
 				//Wyrmgus start
 				for (size_t i = 0; i < player.QuestBuildUnits.size(); ++i) { // buildings get subtracted from the BuildUnits array in action_built
 					if (std::get<1>(player.QuestBuildUnits[i]) == &type) {
 						std::get<2>(player.QuestBuildUnits[i]) -= 1;
+					}
+				}
+				
+				for (size_t i = 0; i < player.QuestBuildUnitsOfClass.size(); ++i) { // buildings get subtracted from the BuildUnits array in action_built
+					if (std::get<1>(player.QuestBuildUnitsOfClass[i]) == type.Class) {
+						std::get<2>(player.QuestBuildUnitsOfClass[i]) -= 1;
 					}
 				}
 				//Wyrmgus end

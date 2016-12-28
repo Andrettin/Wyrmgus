@@ -1051,6 +1051,17 @@ void CPlayer::Save(CFile &file) const
 	}
 	file.printf("},");
 	
+	file.printf("\n  \"quest-build-units-of-class\", {");
+	for (size_t j = 0; j < p.QuestBuildUnitsOfClass.size(); ++j) {
+		if (j) {
+			file.printf(" ");
+		}
+		file.printf("\"%s\",", std::get<0>(p.QuestBuildUnitsOfClass[j])->Ident.c_str());
+		file.printf("\"%s\",", UnitTypeClasses[std::get<1>(p.QuestBuildUnitsOfClass[j])].c_str());
+		file.printf("%d,", std::get<2>(p.QuestBuildUnitsOfClass[j]));
+	}
+	file.printf("},");
+	
 	file.printf("\n  \"quest-research-upgrades\", {");
 	for (size_t j = 0; j < p.QuestResearchUpgrades.size(); ++j) {
 		if (j) {
@@ -1623,6 +1634,7 @@ void CPlayer::Clear()
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
 	this->QuestBuildUnits.clear();
+	this->QuestBuildUnitsOfClass.clear();
 	this->QuestResearchUpgrades.clear();
 	this->QuestDestroyUnits.clear();
 	this->QuestDestroyUniques.clear();
@@ -1861,6 +1873,10 @@ void CPlayer::AcceptQuest(CQuest *quest)
 		this->QuestBuildUnits.push_back(std::tuple<CQuest *, CUnitType *, int>(quest, std::get<0>(quest->BuildUnits[i]), std::get<1>(quest->BuildUnits[i])));
 	}
 	
+	for (size_t i = 0; i < quest->BuildUnitsOfClass.size(); ++i) {
+		this->QuestBuildUnitsOfClass.push_back(std::tuple<CQuest *, int, int>(quest, std::get<0>(quest->BuildUnitsOfClass[i]), std::get<1>(quest->BuildUnitsOfClass[i])));
+	}
+	
 	for (size_t i = 0; i < quest->ResearchUpgrades.size(); ++i) {
 		this->QuestResearchUpgrades.push_back(std::tuple<CQuest *, CUpgrade *>(quest, quest->ResearchUpgrades[i]));
 	}
@@ -1973,6 +1989,12 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 		}
 	}
 	
+	for (size_t i = 0; i < this->QuestBuildUnitsOfClass.size(); ++i) {
+		if (std::get<0>(this->QuestBuildUnitsOfClass[i]) == quest && std::get<2>(this->QuestBuildUnitsOfClass[i]) > 0) {
+			return false;
+		}
+	}
+	
 	for (size_t i = 0; i < this->QuestResearchUpgrades.size(); ++i) {
 		if (std::get<0>(this->QuestResearchUpgrades[i]) == quest && UpgradeIdentAllowed(*this, std::get<1>(this->QuestResearchUpgrades[i])->Ident) != 'R') {
 			return false;
@@ -2028,6 +2050,28 @@ std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for fai
 			}
 			if (!has_builder || !CheckDependByType(*this, *type)) {
 				return "You can no longer produce the required unit.";
+			}
+		}
+	}
+	
+	for (size_t i = 0; i < this->QuestBuildUnitsOfClass.size(); ++i) {
+		if (std::get<0>(this->QuestBuildUnitsOfClass[i]) == quest && std::get<2>(this->QuestBuildUnitsOfClass[i]) > 0) {
+			bool has_builder = false;
+			int unit_type_id = PlayerRaces.GetFactionClassUnitType(this->Race, this->Faction, std::get<1>(this->QuestBuildUnitsOfClass[i]));
+			
+			if (unit_type_id == -1) {
+				return "You cannot longer produce the required unit.";
+			}
+			
+			CUnitType *type = UnitTypes[unit_type_id];
+			for (size_t j = 0; j < AiHelpers.Build[type->Slot].size(); ++j) {
+				if (this->UnitTypesCount[AiHelpers.Build[type->Slot][j]->Slot] > 0) {
+					has_builder = true;
+					break;
+				}
+			}
+			if (!has_builder || !CheckDependByType(*this, *type)) {
+				return "You cannot longer produce the required unit.";
 			}
 		}
 	}

@@ -409,6 +409,21 @@ void CPlayer::Load(lua_State *l)
 					this->QuestBuildUnits.push_back(std::tuple<CQuest *, CUnitType *, int>(quest, unit_type, quantity));
 				}
 			}
+		} else if (!strcmp(value, "quest-build-units-of-class")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				CQuest *quest = GetQuest(LuaToString(l, j + 1, k + 1));
+				++k;
+				int class_id = GetUnitTypeClassIndexByName(LuaToString(l, j + 1, k + 1));
+				++k;
+				int quantity = LuaToNumber(l, j + 1, k + 1);
+				if (quest) {
+					this->QuestBuildUnitsOfClass.push_back(std::tuple<CQuest *, int, int>(quest, class_id, quantity));
+				}
+			}
 		} else if (!strcmp(value, "quest-research-upgrades")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");

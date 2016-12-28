@@ -1332,7 +1332,7 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 	unit.XPChanged();
 	
 	//update quests
-	for (size_t i = 0; i < player.QuestGatherResources.size(); ++i) { // buildings get subtracted from the BuildUnits array in action_built
+	for (size_t i = 0; i < player.QuestGatherResources.size(); ++i) {
 		if (std::get<1>(player.QuestGatherResources[i]) == rindex) {
 			std::get<2>(player.QuestGatherResources[i]) -= resource_change;
 		}
