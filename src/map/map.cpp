@@ -643,6 +643,9 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 				unit->Active = 0;
 				player->UnitTypesAiActiveCount[type->Slot]--;
 			}
+			if (std::get<5>(this->Units[i])) {
+				unit->SetUnique(std::get<5>(this->Units[i]));
+			}
 		}
 	}
 	

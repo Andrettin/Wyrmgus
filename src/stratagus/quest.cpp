@@ -319,7 +319,7 @@ void CDialogueNode::Call(int player)
 		lua_command += "), ";
 	}
 	
-	lua_command += "\"" + this->Text + "\", ";
+	lua_command += "\"" + FindAndReplaceString(FindAndReplaceString(this->Text, "\"", "\\\""), "\n", "\\n") + "\", ";
 	lua_command += std::to_string((long long) player) + ", ";
 	
 	lua_command += "{";

@@ -805,6 +805,7 @@ static int CclSetMapTemplateUnit(lua_State *l)
 
 	int start_year = 0;
 	int end_year = 0;
+	CUniqueItem *unique = NULL;
 	const int nargs = lua_gettop(l);
 	if (nargs >= 5) {
 		start_year = LuaToNumber(l, 5);
@@ -812,8 +813,14 @@ static int CclSetMapTemplateUnit(lua_State *l)
 	if (nargs >= 6) {
 		end_year = LuaToNumber(l, 6);
 	}
+	if (nargs >= 7) {
+		unique = GetUniqueItem(LuaToString(l, 7));
+		if (!unique) {
+			LuaError(l, "Unique item doesn't exist.\n");
+		}
+	}
 	
-	map_template->Units.push_back(std::tuple<Vec2i, CUnitType *, CFaction *, int, int>(ipos, unittype, faction, start_year, end_year));
+	map_template->Units.push_back(std::tuple<Vec2i, CUnitType *, CFaction *, int, int, CUniqueItem *>(ipos, unittype, faction, start_year, end_year, unique));
 	
 	return 1;
 }
