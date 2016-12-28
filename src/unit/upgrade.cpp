@@ -1865,6 +1865,12 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 			MapMarkUnitSight(unit);
 		}
 	}
+	
+	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
+		if (unit.IsAlive()) {
+			unit.Player->Supply += um->Modifier.Variables[SUPPLY_INDEX].Value;
+		}
+	}
 
 	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
@@ -1966,6 +1972,12 @@ void RemoveIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 		}
 	}
 
+	if (um->Modifier.Variables[SUPPLY_INDEX].Value) {
+		if (unit.IsAlive()) {
+			unit.Player->Supply -= um->Modifier.Variables[SUPPLY_INDEX].Value;
+		}
+	}
+	
 	for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
 		unit.Variable[j].Enable |= um->Modifier.Variables[j].Enable;
 		if (um->ModifyPercent[j]) {
