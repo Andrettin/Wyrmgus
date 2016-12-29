@@ -660,12 +660,30 @@ void CUnit::IncreaseLevel(int level_quantity)
 	
 	UpdateXPRequired();
 	
-	if (Player->AiEnabled) {
-		bool upgrade_found = true;
-		while (this->Variable[LEVELUP_INDEX].Value > 0 && upgrade_found) {
-			upgrade_found = false;
-			if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
-				std::vector<CUnitType *> potential_upgrades;
+	bool upgrade_found = true;
+	while (this->Variable[LEVELUP_INDEX].Value > 0 && upgrade_found) {
+		upgrade_found = false;
+
+		if (((int) AiHelpers.ExperienceUpgrades.size()) > Type->Slot) {
+			std::vector<CUnitType *> potential_upgrades;
+			
+			if ((Player->AiEnabled || this->Character == NULL) && this->Type->BoolFlag[HARVESTER_INDEX].value && this->CurrentResource && AiHelpers.ExperienceUpgrades[Type->Slot].size() > 1) {
+				//if is a harvester who is currently gathering, try to upgrade to a unit type which is best for harvesting the current resource
+				unsigned int best_gathering_rate = 0;
+				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
+					if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
+						if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
+							if (AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource] && AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource]->ResourceStep >= best_gathering_rate) {
+								if (AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource]->ResourceStep > best_gathering_rate) {
+									best_gathering_rate = AiHelpers.ExperienceUpgrades[Type->Slot][i]->ResInfo[this->CurrentResource]->ResourceStep;
+									potential_upgrades.clear();
+								}
+								potential_upgrades.push_back(AiHelpers.ExperienceUpgrades[Type->Slot][i]);
+							}
+						}
+					}
+				}
+			} else if (Player->AiEnabled || (this->Character == NULL && AiHelpers.ExperienceUpgrades[Type->Slot].size() == 1)) {
 				for (size_t i = 0; i != AiHelpers.ExperienceUpgrades[Type->Slot].size(); ++i) {
 					if (CheckDependByType(*Player, *AiHelpers.ExperienceUpgrades[Type->Slot][i], true)) {
 						if (Character == NULL || !Character->ForbiddenUpgrades[AiHelpers.ExperienceUpgrades[Type->Slot][i]->Slot]) {
@@ -673,26 +691,27 @@ void CUnit::IncreaseLevel(int level_quantity)
 						}
 					}
 				}
-				if (potential_upgrades.size() > 0) {
-					this->Variable[LEVELUP_INDEX].Value -= 1;
-					this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
-					TransformUnitIntoType(*this, *potential_upgrades[SyncRand(potential_upgrades.size())]);
-					upgrade_found = true;
-				}
 			}
 			
-			if (this->Variable[LEVELUP_INDEX].Value) {
-				if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
-					std::vector<CUpgrade *> potential_abilities;
-					for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
-						if (CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
-							potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
-						}
+			if (potential_upgrades.size() > 0) {
+				this->Variable[LEVELUP_INDEX].Value -= 1;
+				this->Variable[LEVELUP_INDEX].Max = this->Variable[LEVELUP_INDEX].Value;
+				TransformUnitIntoType(*this, *potential_upgrades[SyncRand(potential_upgrades.size())]);
+				upgrade_found = true;
+			}
+		}
+			
+		if (this->Variable[LEVELUP_INDEX].Value && Player->AiEnabled) {
+			if (((int) AiHelpers.LearnableAbilities.size()) > Type->Slot) {
+				std::vector<CUpgrade *> potential_abilities;
+				for (size_t i = 0; i != AiHelpers.LearnableAbilities[Type->Slot].size(); ++i) {
+					if (CanLearnAbility(AiHelpers.LearnableAbilities[Type->Slot][i])) {
+						potential_abilities.push_back(AiHelpers.LearnableAbilities[Type->Slot][i]);
 					}
-					if (potential_abilities.size() > 0) {
-						AbilityAcquire(*this, potential_abilities[SyncRand(potential_abilities.size())]);
-						upgrade_found = true;
-					}
+				}
+				if (potential_abilities.size() > 0) {
+					AbilityAcquire(*this, potential_abilities[SyncRand(potential_abilities.size())]);
+					upgrade_found = true;
 				}
 			}
 		}
