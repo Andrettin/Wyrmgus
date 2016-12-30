@@ -183,11 +183,12 @@ void CMapTemplate::ParseTerrainFile(bool overlay)
 	{
 		int x = 0;
 		
-		size_t pos = 0;
-		size_t previous_pos = pos;
-		while ((pos = line_str.find(",", pos)) != std::string::npos) {
-			int terrain_id_length = pos - previous_pos - 1;
-			char terrain_id = atoi(line_str.substr(pos - terrain_id_length, terrain_id_length).c_str());
+		for (unsigned int i = 0; i < line_str.length(); ++i) {
+			std::string terrain_character = line_str.substr(i, 1);
+			char terrain_id = -1;
+			if (TerrainTypeCharacterToIndex.find(terrain_character) != TerrainTypeCharacterToIndex.end()) {
+				terrain_id = TerrainTypeCharacterToIndex.find(terrain_character)->second;
+			}
 			if (terrain_id != -1) {
 				if (overlay) {
 					this->TileOverlayTerrains[x + y * this->Width] = terrain_id;
@@ -195,8 +196,6 @@ void CMapTemplate::ParseTerrainFile(bool overlay)
 					this->TileTerrains[x + y * this->Width] = terrain_id;
 				}
 			}
-			previous_pos = pos;
-			pos += 1;
 			x += 1;
 		}
 		

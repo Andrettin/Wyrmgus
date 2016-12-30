@@ -1527,7 +1527,7 @@ static void ApplySepiaScale(SDL_Surface *Surface, int Width, int Height)
 }
 
 /*
-static int map_terrains[8192][4096];
+static std::string map_terrains[8192][4096];
 
 static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 {
@@ -1543,23 +1543,23 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 
 			Video.GetRGBA(c, Surface->format, &r, &g, &b, &a);
 			if (a >= 128) {
-				map_terrains[i][j] = 0;
+				map_terrains[i][j] = "d";
 			} else {
-				map_terrains[i][j] = 6;
+				map_terrains[i][j] = "w";
 			}
 		}
 	}
 	SDL_UnlockSurface(Surface);
 	
 	FileWriter *fw = NULL;
-	std::string map_filename = "scripts/map_templates/earth.map";
+	std::string map_filename = "scripts/map_templates/nidavellir.map";
 
 	try {
 		fw = CreateFileWriter(map_filename);
 
 		for (int y = 0; y < Height; ++y) {
 			for (int x = 0; x < Width; ++x) {
-				fw->printf("%d,", map_terrains[x][y]);
+				fw->printf("%s", map_terrains[x][y].c_str());
 			}
 			fw->printf("\n");
 		}
@@ -1627,6 +1627,12 @@ void CGraphic::Load(bool grayscale)
 		}
 		//Wyrmgus end
 	}
+	
+	/*
+	if (Width == 984) {
+		ConvertImageToMap(Surface, Width, Height);
+	}
+	*/
 	
 #if defined(USE_OPENGL) || defined(USE_GLES)
 	if (UseOpenGL) {

@@ -1234,10 +1234,10 @@ static int CclDefineTerrainType(lua_State *l)
 			terrain->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "Character")) {
 			terrain->Character = LuaToString(l, -1);
-			if (TerrainTypeCharacterToPointer.find(terrain->Character) != TerrainTypeCharacterToPointer.end()) {
+			if (TerrainTypeCharacterToIndex.find(terrain->Character) != TerrainTypeCharacterToIndex.end()) {
 				LuaError(l, "Character \"%s\" is already used by another terrain type." _C_ terrain->Character.c_str());
 			}
-			TerrainTypeCharacterToPointer[terrain->Character] = terrain;
+			TerrainTypeCharacterToIndex[terrain->Character] = terrain->ID;
 		} else if (!strcmp(value, "Overlay")) {
 			terrain->Overlay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Buildable")) {

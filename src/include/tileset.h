@@ -362,7 +362,7 @@ private:
 
 extern std::vector<CTerrainType *>  TerrainTypes;
 extern std::map<std::string, int> TerrainTypeStringToIndex;
-extern std::map<std::string, CTerrainType *> TerrainTypeCharacterToPointer;
+extern std::map<std::string, int> TerrainTypeCharacterToIndex;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
