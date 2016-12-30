@@ -1469,6 +1469,8 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->Height = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "TimeOfDaySeconds")) {
 			map->TimeOfDaySeconds = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "SubtemplatePosition")) {
+			CclGetPos(l, &map->SubtemplatePosition.x, &map->SubtemplatePosition.y);
 		} else if (!strcmp(value, "MainTemplate")) {
 			CMapTemplate *main_template = GetMapTemplate(LuaToString(l, -1));
 			if (!main_template) {

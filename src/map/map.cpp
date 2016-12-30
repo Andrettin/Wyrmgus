@@ -294,43 +294,62 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {
-		Vec2i random_pos(0, 0);
-		Vec2i min_pos(map_start_pos);
-		Vec2i max_pos(map_end.x - this->Subtemplates[i]->Width, map_end.y - this->Subtemplates[i]->Height);
-		int while_count = 0;
-		while (while_count < 1000) {
-			random_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
-			random_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
-			
-			bool on_map = Map.Info.IsPointOnMap(random_pos, z) && Map.Info.IsPointOnMap(Vec2i(random_pos.x + this->Subtemplates[i]->Width - 1, random_pos.y + this->Subtemplates[i]->Height - 1), z);
-			
-			bool on_subtemplate_area = false;
-			for (int x = 0; x < this->Subtemplates[i]->Width; ++x) {
-				for (int y = 0; y < this->Subtemplates[i]->Height; ++y) {
-					if (Map.IsPointInASubtemplateArea(random_pos + Vec2i(x, y), z)) {
-						on_subtemplate_area = true;
+		Vec2i subtemplate_pos(this->Subtemplates[i]->SubtemplatePosition);
+		bool found_location = false;
+		
+		if (subtemplate_pos.x < 0 || subtemplate_pos.y < 0) {
+			Vec2i min_pos(map_start_pos);
+			Vec2i max_pos(map_end.x - this->Subtemplates[i]->Width, map_end.y - this->Subtemplates[i]->Height);
+			int while_count = 0;
+			while (while_count < 1000) {
+				subtemplate_pos.x = SyncRand(max_pos.x - min_pos.x + 1) + min_pos.x;
+				subtemplate_pos.y = SyncRand(max_pos.y - min_pos.y + 1) + min_pos.y;
+				
+				bool on_map = Map.Info.IsPointOnMap(subtemplate_pos, z) && Map.Info.IsPointOnMap(Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), z);
+				
+				bool on_subtemplate_area = false;
+				for (int x = 0; x < this->Subtemplates[i]->Width; ++x) {
+					for (int y = 0; y < this->Subtemplates[i]->Height; ++y) {
+						if (Map.IsPointInASubtemplateArea(subtemplate_pos + Vec2i(x, y), z)) {
+							on_subtemplate_area = true;
+							break;
+						}
+					}
+					if (on_subtemplate_area) {
 						break;
 					}
 				}
-				if (on_subtemplate_area) {
+				
+				if (on_map && !on_subtemplate_area) {
+					found_location = true;
 					break;
 				}
+				
+				while_count += 1;
 			}
-			
-			if (on_map && !on_subtemplate_area) {
-				this->Subtemplates[i]->Apply(Vec2i(0, 0), random_pos, z);
+		} else {
+			subtemplate_pos.x = map_start_pos.x + subtemplate_pos.x - template_start_pos.x;
+			subtemplate_pos.y = map_start_pos.y + subtemplate_pos.y - template_start_pos.y;
+			found_location = true;
+		}
+		
+		if (found_location) {
+			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
+				this->Subtemplates[i]->Apply(Vec2i(0, 0), subtemplate_pos, z);
+			}
 				
-				Map.SubtemplateAreas[z].push_back(std::pair<Vec2i, Vec2i>(random_pos, Vec2i(random_pos.x + this->Subtemplates[i]->Width - 1, random_pos.y + this->Subtemplates[i]->Height - 1)));
+			Map.SubtemplateAreas[z].push_back(std::pair<Vec2i, Vec2i>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1)));
 				
+			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
 				for (size_t j = 0; j < this->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
-					Vec2i external_start_pos(random_pos.x - (this->Subtemplates[i]->Width / 2), random_pos.y - (this->Subtemplates[i]->Height / 2));
-					Vec2i external_end(random_pos.x + this->Subtemplates[i]->Width + (this->Subtemplates[i]->Width / 2), random_pos.y + this->Subtemplates[i]->Height + (this->Subtemplates[i]->Height / 2));
+					Vec2i external_start_pos(subtemplate_pos.x - (this->Subtemplates[i]->Width / 2), subtemplate_pos.y - (this->Subtemplates[i]->Height / 2));
+					Vec2i external_end(subtemplate_pos.x + this->Subtemplates[i]->Width + (this->Subtemplates[i]->Width / 2), subtemplate_pos.y + this->Subtemplates[i]->Height + (this->Subtemplates[i]->Height / 2));
 					int map_width = (external_end.x - external_start_pos.x);
 					int map_height = (external_end.y - external_start_pos.y);
 					int expansion_number = 0;
-					
+						
 					int degree_level = this->Subtemplates[i]->ExternalGeneratedTerrains[j].second;
-					
+						
 					if (degree_level == ExtremelyHighDegreeLevel) {
 						expansion_number = map_width * map_height / 2;
 					} else if (degree_level == VeryHighDegreeLevel) {
@@ -344,13 +363,10 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 					} else if (degree_level == VeryLowDegreeLevel) {
 						expansion_number = map_width * map_height / 64;
 					}
-					
+						
 					Map.GenerateTerrain(this->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !this->Subtemplates[i]->TerrainFile.empty(), z);
 				}
-				break;
 			}
-			
-			while_count += 1;
 		}
 	}
 	
@@ -2167,7 +2183,26 @@ void CMap::AdjustTileMapIrregularities(bool overlay, const Vec2i &min_pos, const
 					if (overlay) {
 						mf.RemoveOverlayTerrain();
 					} else {
-						if (terrain->InnerBorderTerrains.size() > 0) {
+						bool changed_terrain = false;
+						for (int sub_x = -1; sub_x <= 1; ++sub_x) {
+							for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+								if ((x + sub_x) < min_pos.x || (x + sub_x) >= max_pos.x || (y + sub_y) < min_pos.y || (y + sub_y) >= max_pos.y || (sub_x == 0 && sub_y == 0)) {
+									continue;
+								}
+								CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
+								if (mf.Terrain != tile_terrain) {
+									if (std::find(mf.Terrain->InnerBorderTerrains.begin(), mf.Terrain->InnerBorderTerrains.end(), tile_terrain) != mf.Terrain->InnerBorderTerrains.end()) {
+										mf.SetTerrain(tile_terrain);
+										changed_terrain = true;
+										break;
+									}
+								}
+							}
+							if (changed_terrain) {
+								break;
+							}
+						}
+						if (!changed_terrain && terrain->InnerBorderTerrains.size() > 0) {
 							mf.SetTerrain(terrain->InnerBorderTerrains[0]);
 						}
 					}

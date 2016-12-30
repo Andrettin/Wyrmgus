@@ -142,7 +142,7 @@ class CMapTemplate
 {
 public:
 	CMapTemplate() :
-		Width(0), Height(0), TimeOfDaySeconds(DefaultTimeOfDaySeconds), Layer(0),
+		Width(0), Height(0), TimeOfDaySeconds(DefaultTimeOfDaySeconds), Layer(0), SubtemplatePosition(-1, -1),
 		MainTemplate(NULL), Plane(NULL), World(NULL), BaseTerrain(NULL), BorderTerrain(NULL), SurroundingTerrain(NULL)
 	{
 	}
@@ -162,6 +162,7 @@ public:
 	int Height;
 	int TimeOfDaySeconds;
 	int Layer;													/// Surface layer of the map template (0 for surface, 1 and above for underground layers in succession)
+	Vec2i SubtemplatePosition;
 	CMapTemplate *MainTemplate;									/// Main template in which this one is located
 	CPlane *Plane;
 	CWorld *World;

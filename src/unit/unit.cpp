@@ -828,6 +828,8 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 		if (this == this->Player->CustomHeroUnit) {
 			this->Player->CustomHeroUnit = NULL;
 		}
+		
+		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
 	}
 	
 	CCharacter *character = NULL;
@@ -941,6 +943,8 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			this->Player->CustomHeroUnit = this;
 		}
 	}
+
+	this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 1;
 	
 	this->ChooseVariation(); //choose a new variation now
 	for (int i = 0; i < MaxImageLayers; ++i) {
