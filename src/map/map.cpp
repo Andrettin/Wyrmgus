@@ -294,7 +294,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	}
 	
 	for (size_t i = 0; i < this->Subtemplates.size(); ++i) {
-		Vec2i subtemplate_pos(this->Subtemplates[i]->SubtemplatePosition);
+		Vec2i subtemplate_pos(this->Subtemplates[i]->SubtemplatePosition - Vec2i((this->Subtemplates[i]->Width - 1) / 2, (this->Subtemplates[i]->Height - 1) / 2));
 		bool found_location = false;
 		
 		if (subtemplate_pos.x < 0 || subtemplate_pos.y < 0) {
