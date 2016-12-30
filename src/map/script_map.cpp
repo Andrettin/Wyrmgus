@@ -799,9 +799,6 @@ static int CclSetMapTemplateUnit(lua_State *l)
 
 	std::string faction_name = LuaToString(l, 3);
 	CFaction *faction = PlayerRaces.GetFaction(-1, faction_name);
-	if (!faction) {
-		LuaError(l, "Faction doesn't exist.\n");
-	}
 
 	int start_year = 0;
 	int end_year = 0;
