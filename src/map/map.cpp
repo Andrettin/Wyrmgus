@@ -400,12 +400,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
-	} else {
-		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
-		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
-		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
-		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
-		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
 	}
 	
 	for (std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>>::iterator iterator = this->Resources.begin(); iterator != this->Resources.end(); ++iterator) {
@@ -470,12 +464,6 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		Map.AdjustTileMapTransitions(map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(false, map_start_pos, map_end, z);
 		Map.AdjustTileMapIrregularities(true, map_start_pos, map_end, z);
-	} else {
-		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
-		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
-		Map.AdjustTileMapTransitions(map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
-		Map.AdjustTileMapIrregularities(false, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
-		Map.AdjustTileMapIrregularities(true, map_start_pos + Vec2i(1, 1), map_end - Vec2i(1, 1), z);
 	}
 
 	// now, generate the units and heroes that were set to be generated at a random position (by having their position set to {-1, -1})
@@ -2226,7 +2214,7 @@ void CMap::AdjustTileMapTransitions(const Vec2i &min_pos, const Vec2i &max_pos, 
 					}
 					CTerrainType *tile_terrain = GetTileTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
 					CTerrainType *tile_top_terrain = GetTileTopTerrain(Vec2i(x + sub_x, y + sub_y), false, z);
-					if (mf.Terrain != tile_terrain && tile_top_terrain->Overlay && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), mf.Terrain) == tile_terrain->OuterBorderTerrains.end() && std::find(tile_top_terrain->BaseTerrains.begin(), tile_top_terrain->BaseTerrains.end(), mf.Terrain) == tile_top_terrain->BaseTerrains.end()) {
+					if (mf.Terrain != tile_terrain && tile_top_terrain->Overlay && tile_top_terrain != mf.OverlayTerrain && std::find(tile_terrain->OuterBorderTerrains.begin(), tile_terrain->OuterBorderTerrains.end(), mf.Terrain) == tile_terrain->OuterBorderTerrains.end() && std::find(tile_top_terrain->BaseTerrains.begin(), tile_top_terrain->BaseTerrains.end(), mf.Terrain) == tile_top_terrain->BaseTerrains.end()) {
 						mf.SetTerrain(tile_terrain);
 					}
 				}
