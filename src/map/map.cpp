@@ -189,12 +189,10 @@ void CMapTemplate::ParseTerrainFile(bool overlay)
 			if (TerrainTypeCharacterToIndex.find(terrain_character) != TerrainTypeCharacterToIndex.end()) {
 				terrain_id = TerrainTypeCharacterToIndex.find(terrain_character)->second;
 			}
-			if (terrain_id != -1) {
-				if (overlay) {
-					this->TileOverlayTerrains[x + y * this->Width] = terrain_id;
-				} else {
-					this->TileTerrains[x + y * this->Width] = terrain_id;
-				}
+			if (overlay) {
+				this->TileOverlayTerrains[x + y * this->Width] = terrain_id;
+			} else {
+				this->TileTerrains[x + y * this->Width] = terrain_id;
 			}
 			x += 1;
 		}
