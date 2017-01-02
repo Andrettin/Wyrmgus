@@ -2971,6 +2971,9 @@ static int CclGetPlayerData(lua_State *l)
 	} else if (!strcmp(data, "NumBuildingsUnderConstruction")) {
 		lua_pushnumber(l, p->NumBuildingsUnderConstruction);
 		return 1;
+	} else if (!strcmp(data, "NumTownHalls")) {
+		lua_pushnumber(l, p->NumTownHalls);
+		return 1;
 	//Wyrmgus end
 	} else if (!strcmp(data, "Supply")) {
 		lua_pushnumber(l, p->Supply);
