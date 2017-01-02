@@ -628,7 +628,7 @@ static void DrawDecoration(const CUnit &unit, const CUnitType &type, const Pixel
 			  || (var.ShowOnlySelected && !unit.Selected)
 			  || (unit.Player->Type == PlayerNeutral && var.HideNeutral)
 			  //Wyrmgus start
-			  || (!ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && var.HideNeutral)
+			  || (unit.Player != ThisPlayer && !ThisPlayer->IsEnemy(unit) && !ThisPlayer->IsAllied(unit) && var.HideNeutral)
 			  //Wyrmgus end
 			  || (ThisPlayer->IsEnemy(unit) && !var.ShowOpponent)
 			  || (ThisPlayer->IsAllied(unit) && (unit.Player != ThisPlayer) && var.HideAllied)
