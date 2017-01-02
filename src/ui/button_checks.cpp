@@ -415,7 +415,7 @@ bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button)
 */
 bool ButtonCheckHasInventory(const CUnit &unit, const ButtonAction &button)
 {
-	return unit.HasInventory();
+	return Selected.size() == 1 && unit.HasInventory();
 }
 //Wyrmgus end
 
