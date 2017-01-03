@@ -1782,6 +1782,9 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Removed")) {
 		lua_pushboolean(l, unit->Removed);
 		return 1;
+	} else if (!strcmp(value, "Built")) {
+		lua_pushboolean(l, unit->CurrentAction() != UnitActionBuilt);
+		return 1;
 	} else if (!strcmp(value, "Container")) {
 		if (unit->Container != NULL) {
 			lua_pushnumber(l, UnitNumber(*unit->Container));
