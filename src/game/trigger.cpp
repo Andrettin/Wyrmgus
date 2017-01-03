@@ -186,6 +186,11 @@ static int CclGetNumUnitsAt(lua_State *l)
 	Vec2i maxPos;
 	CclGetPos(l, &minPos.x, &minPos.y, 3);
 	CclGetPos(l, &maxPos.x, &maxPos.y, 4);
+	
+	//Wyrmgus start
+	minPos.x = std::max<int>(minPos.x, 0);
+	minPos.y = std::max<int>(minPos.y, 0);
+	//Wyrmgus end
 
 	std::vector<CUnit *> units;
 
@@ -193,6 +198,14 @@ static int CclGetNumUnitsAt(lua_State *l)
 	int z = 0;
 	if (nargs >= 5) {
 		z = LuaToNumber(l, 5);
+	}
+	
+	maxPos.x = std::min<int>(maxPos.x, Map.Info.MapWidths[z] - 1);
+	maxPos.y = std::min<int>(maxPos.y, Map.Info.MapHeights[z] - 1);
+	
+	if (!Map.Info.IsPointOnMap(minPos, z) || !Map.Info.IsPointOnMap(maxPos, z)) {
+		lua_pushnumber(l, 0);
+		return 1;
 	}
 	
 //	Select(minPos, maxPos, units);
