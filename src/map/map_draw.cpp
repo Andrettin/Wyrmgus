@@ -542,12 +542,6 @@ void CViewport::Draw() const
 //			ShowUnitName(*this, CursorScreenPos, UnitUnderCursor);
 			PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
 			unit_center_pos = MapToScreenPixelPos(unit_center_pos);
-			std::string text_color;
-			if (UnitUnderCursor->Unique || UnitUnderCursor->Character != NULL) {
-				text_color = "fire";
-			} else if (UnitUnderCursor->Prefix != NULL || UnitUnderCursor->Suffix != NULL) {
-				text_color = "light-blue";
-			}
 			std::string unit_name;
 			if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
 				if (!UnitUnderCursor->Identified) {
@@ -561,7 +555,15 @@ void CViewport::Draw() const
 			if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
 				unit_name += " (" + UnitUnderCursor->Player->Name + ")";
 			}
-			DrawGenericPopup(unit_name, unit_center_pos.x, unit_center_pos.y, text_color);
+			//hackish way to make the popup appear correctly for the unit under cursor
+			ButtonAction *ba = new ButtonAction;
+			ba->Hint = unit_name;
+			ba->Action = ButtonUnit;
+			ba->Value = UnitNumber(*UnitUnderCursor);
+			ba->Popup = "popup-unit-under-cursor";
+			DrawPopup(*ba, *UI.SingleSelectedButton, unit_center_pos.x, unit_center_pos.y);
+			delete ba;
+			LastDrawnButtonPopup = NULL;
 			//Wyrmgus end
 		//Wyrmgus start
 //		} else if (!isMapFieldVisile) {
