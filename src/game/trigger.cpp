@@ -203,7 +203,7 @@ static int CclGetNumUnitsAt(lua_State *l)
 	maxPos.x = std::min<int>(maxPos.x, Map.Info.MapWidths[z] - 1);
 	maxPos.y = std::min<int>(maxPos.y, Map.Info.MapHeights[z] - 1);
 	
-	if (!Map.Info.IsPointOnMap(minPos, z) || !Map.Info.IsPointOnMap(maxPos, z)) {
+	if (z == -1 || !Map.Info.IsPointOnMap(minPos, z) || !Map.Info.IsPointOnMap(maxPos, z)) {
 		lua_pushnumber(l, 0);
 		return 1;
 	}

@@ -1365,7 +1365,7 @@ int GetMapLayer(std::string plane_name, std::string world_name, int surface_laye
 		}
 	}
 	
-	return 0;
+	return -1;
 }
 
 

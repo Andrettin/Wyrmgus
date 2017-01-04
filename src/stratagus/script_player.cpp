@@ -1583,14 +1583,26 @@ static int CclGetCivilizationClassUnitType(lua_State *l)
 */
 static int CclGetFactionClassUnitType(lua_State *l)
 {
-	LuaCheckArgs(l, 3);
 	std::string class_name = LuaToString(l, 1);
 	int class_id = GetUnitTypeClassIndexByName(class_name);
-	int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
-	int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, 3));
+	int civilization = -1;
+	int faction_id = -1;
+	CFaction *faction = NULL;
+	const int nargs = lua_gettop(l);
+	if (nargs == 2) {
+		faction = PlayerRaces.GetFaction(-1, LuaToString(l, 2));
+		civilization = faction->Civilization;
+		faction_id = faction->ID;
+	} else if (nargs == 3) {
+		civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
+		faction = PlayerRaces.GetFaction(civilization, LuaToString(l, 3));
+		if (faction) {
+			faction_id = faction->ID;
+		}
+	}
 	std::string unit_type_ident;
 	if (civilization != -1 && class_id != -1) {
-		int unit_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction, class_id);
+		int unit_type_id = PlayerRaces.GetFactionClassUnitType(civilization, faction_id, class_id);
 		if (unit_type_id != -1) {
 			unit_type_ident = UnitTypes[unit_type_id]->Ident;
 		}
@@ -1599,7 +1611,7 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	if (unit_type_ident.empty()) { //if wasn't found, see if it is an upgrade class instead
 		class_id = GetUpgradeClassIndexByName(class_name);
 		if (civilization != -1 && class_id != -1) {
-			int upgrade_id = PlayerRaces.GetFactionClassUpgrade(civilization, faction, class_id);
+			int upgrade_id = PlayerRaces.GetFactionClassUpgrade(civilization, faction_id, class_id);
 			if (upgrade_id != -1) {
 				unit_type_ident = AllUpgrades[upgrade_id]->Ident;
 			}
