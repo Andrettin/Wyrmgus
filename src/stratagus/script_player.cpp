@@ -1591,8 +1591,10 @@ static int CclGetFactionClassUnitType(lua_State *l)
 	const int nargs = lua_gettop(l);
 	if (nargs == 2) {
 		faction = PlayerRaces.GetFaction(-1, LuaToString(l, 2));
-		civilization = faction->Civilization;
-		faction_id = faction->ID;
+		if (faction) {
+			civilization = faction->Civilization;
+			faction_id = faction->ID;
+		}
 	} else if (nargs == 3) {
 		civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, 2));
 		faction = PlayerRaces.GetFaction(civilization, LuaToString(l, 3));
