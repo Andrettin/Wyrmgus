@@ -61,9 +61,9 @@ class LuaCallback;
 **  Indexes into diplomacy state array.
 */
 enum DiplomacyStates {
+	DiplomacyStateAlliance,
 	DiplomacyStatePeace,
 	DiplomacyStateWar,
-	DiplomacyStateAlliance,
 	DiplomacyStateVassal,
 	DiplomacyStateSovereign,
 	

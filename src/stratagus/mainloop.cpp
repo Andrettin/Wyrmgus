@@ -38,6 +38,7 @@
 #include "actions.h"
 //Wyrmgus start
 #include "character.h"
+#include "commands.h"
 //Wyrmgus end
 #include "editor.h"
 //Wyrmgus start
@@ -746,6 +747,7 @@ void GameMainLoop()
 					if (CurrentCampaign->Year) {
 						CCivilization *civilization = PlayerRaces.Civilizations[Players[i].Race];
 						CFaction *faction = PlayerRaces.Factions[Players[i].Race][Players[i].Faction];
+						
 						for (std::map<std::string, int>::iterator iterator = civilization->HistoricalTechnologies.begin(); iterator != civilization->HistoricalTechnologies.end(); ++iterator) {
 							if (iterator->second == 0 || CurrentCampaign->Year >= iterator->second) {
 								int upgrade_id = UpgradeIdByIdent(iterator->first);
@@ -763,6 +765,16 @@ void GameMainLoop()
 									UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
 								} else {
 									fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+								}
+							}
+						}
+
+						for (std::map<std::pair<int, CFaction *>, int>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
+							if (iterator->second == 0 || CurrentCampaign->Year >= iterator->first.first) {
+								CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
+								if (diplomacy_state_player) {
+									CommandDiplomacy(i, iterator->second, diplomacy_state_player->Index);
+									CommandDiplomacy(diplomacy_state_player->Index, iterator->second, i);
 								}
 							}
 						}
