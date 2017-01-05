@@ -7266,7 +7266,11 @@ void FinalizeGrandStrategyInitialization()
 						int diplomacy_state_civilization = iterator->first.second->Civilization;
 						int diplomacy_state_faction = iterator->first.second->ID;
 						if (GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction]->IsAlive()) {
-							GrandStrategyGame.Factions[i][j]->SetDiplomacyState(GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction], iterator->second);
+							if (iterator->second == DiplomacyStateAlliance) {
+								GrandStrategyGame.Factions[i][j]->SetDiplomacyState(GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction], DiplomacyStatePeace);
+							} else {
+								GrandStrategyGame.Factions[i][j]->SetDiplomacyState(GrandStrategyGame.Factions[diplomacy_state_civilization][diplomacy_state_faction], iterator->second);
+							}
 						}
 					}
 				}
@@ -8622,14 +8626,13 @@ int GetDiplomacyStateIdByName(std::string diplomacy_state)
 	} else if (diplomacy_state == "war") {
 		return DiplomacyStateWar;
 	} else if (diplomacy_state == "alliance") {
-//		return DiplomacyStateAlliance; //deactivated for now until this diplomacy state is properly implemented
-		return DiplomacyStatePeace;
+		return DiplomacyStateAlliance;
 	} else if (diplomacy_state == "vassal") {
 //		return DiplomacyStateVassal;
-		return DiplomacyStatePeace;
+		return DiplomacyStateAlliance;
 	} else if (diplomacy_state == "sovereign") {
 //		return DiplomacyStateSovereign;
-		return DiplomacyStatePeace;
+		return DiplomacyStateAlliance;
 	}
 
 	return -1;

@@ -525,6 +525,9 @@ void AiForce::Attack(const Vec2i &pos, int z)
 			z = enemy->MapLayer;
 			if (!AiPlayer->Player->IsEnemy(*enemy->Player) && enemy->Player->Type != PlayerNeutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*enemy->Player);
+				if (AiPlayer->Player->IsSharedVision(*enemy->Player)) {
+					CommandSharedVision(AiPlayer->Player->Index, false, enemy->Player->Index);
+				}
 			}
 			//Wyrmgus end
 		//Wyrmgus start
@@ -1230,6 +1233,9 @@ void AiForce::Update()
 			this->GoalMapLayer = unit->MapLayer;
 			if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
+				if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
+					CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
+				}
 			}
 			//Wyrmgus end
 			
@@ -1328,6 +1334,9 @@ void AiForce::Update()
 			this->GoalMapLayer = unit->MapLayer;
 			if (!AiPlayer->Player->IsEnemy(*unit->Player) && unit->Player->Type != PlayerNeutral) {
 				AiPlayer->Player->SetDiplomacyEnemyWith(*unit->Player);
+				if (AiPlayer->Player->IsSharedVision(*unit->Player)) {
+					CommandSharedVision(AiPlayer->Player->Index, false, unit->Player->Index);
+				}
 			}
 			//Wyrmgus end
 			this->State = AiForceAttackingState_GoingToRallyPoint;

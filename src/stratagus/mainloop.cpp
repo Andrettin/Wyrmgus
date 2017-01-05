@@ -775,6 +775,10 @@ void GameMainLoop()
 								if (diplomacy_state_player) {
 									CommandDiplomacy(i, iterator->second, diplomacy_state_player->Index);
 									CommandDiplomacy(diplomacy_state_player->Index, iterator->second, i);
+									if (iterator->second == DiplomacyAllied) {
+										CommandSharedVision(i, true, diplomacy_state_player->Index);
+										CommandSharedVision(diplomacy_state_player->Index, true, i);
+									}
 								}
 							}
 						}
