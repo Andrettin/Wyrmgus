@@ -1333,6 +1333,10 @@ void PreprocessMap()
 				Map.CalculateTileTransitions(Vec2i(ix, iy), true, z);
 				Map.CalculateTileVisibility(Vec2i(ix, iy), z);
 				mf.UpdateSeenTile();
+				UI.Minimap.UpdateXY(Vec2i(ix, iy), z);
+				if (mf.playerInfo.IsTeamVisible(*ThisPlayer)) {
+					Map.MarkSeenTile(mf, z);
+				}
 			}
 		}
 	}
