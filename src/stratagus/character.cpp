@@ -414,8 +414,14 @@ void SaveHero(CCharacter *hero)
 	if (stat(path.c_str(), &tmp) < 0) {
 		makedir(path.c_str(), 0777);
 	}
+	std::string old_path = path;
 	path += hero->Ident;
 	path += ".lua";
+	old_path += hero->GetFullName();
+	old_path += ".lua";
+	if (CanAccessFile(old_path.c_str())) {
+		unlink(old_path.c_str());
+	}
 
 	FILE *fd = fopen(path.c_str(), "w");
 	if (!fd) {

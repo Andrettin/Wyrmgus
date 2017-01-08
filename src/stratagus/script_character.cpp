@@ -144,8 +144,8 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "ProvinceOfOrigin")) {
 			character->ProvinceOfOriginName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Father")) {
-			std::string father_name = TransliterateText(LuaToString(l, -1));
-			CCharacter *father = GetCharacter(father_name);
+			std::string father_ident = LuaToString(l, -1);
+			CCharacter *father = GetCharacter(father_ident);
 			if (father) {
 				if (father->Gender == MaleGender) {
 					character->Father = const_cast<CCharacter *>(&(*father));
@@ -164,14 +164,14 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					}
 				} else {
-					LuaError(l, "Character \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_name.c_str() _C_ character_ident.c_str());
+					LuaError(l, "Character \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_ident.c_str() _C_ character_ident.c_str());
 				}
 			} else {
-				LuaError(l, "Character \"%s\" doesn't exist." _C_ father_name.c_str());
+				LuaError(l, "Character \"%s\" doesn't exist." _C_ father_ident.c_str());
 			}
 		} else if (!strcmp(value, "Mother")) {
-			std::string mother_name = TransliterateText(LuaToString(l, -1));
-			CCharacter *mother = GetCharacter(mother_name);
+			std::string mother_ident = LuaToString(l, -1);
+			CCharacter *mother = GetCharacter(mother_ident);
 			if (mother) {
 				if (mother->Gender == FemaleGender) {
 					character->Mother = const_cast<CCharacter *>(&(*mother));
@@ -190,10 +190,10 @@ static int CclDefineCharacter(lua_State *l)
 						}
 					}
 				} else {
-					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female (gender is \"%s\")." _C_ mother_name.c_str() _C_ character_ident.c_str() _C_ GetGenderNameById(mother->Gender).c_str());
+					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female (gender is \"%s\")." _C_ mother_ident.c_str() _C_ character_ident.c_str() _C_ GetGenderNameById(mother->Gender).c_str());
 				}
 			} else {
-				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_name.c_str());
+				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_ident.c_str());
 			}
 		} else if (!strcmp(value, "DateReferenceCharacter")) {
 			std::string reference_character_ident = LuaToString(l, -1);
