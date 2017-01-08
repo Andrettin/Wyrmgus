@@ -2546,7 +2546,7 @@ void CMap::RegenerateForestTile(const Vec2i &pos, int z)
 
 	//Wyrmgus start
 //	if (mf.getGraphicTile() != this->Tileset->getRemovedTreeTile()) {
-	if ((mf.OverlayTerrain && std::find(mf.OverlayTerrain->DestroyedTiles.begin(), mf.OverlayTerrain->DestroyedTiles.end(), mf.SolidTile) == mf.OverlayTerrain->DestroyedTiles.end()) || !(mf.getFlag() & MapFieldStumps)) {
+	if ((mf.OverlayTerrain && !mf.OverlayTerrainDestroyed) || !(mf.getFlag() & MapFieldStumps)) {
 	//Wyrmgus end
 		return;
 	}
@@ -2603,23 +2603,31 @@ void CMap::RegenerateForestTile(const Vec2i &pos, int z)
 			
 			if (
 				this->Info.IsPointOnMap(pos + verticalOffset, z)
-				&& ((verticalMf.OverlayTerrain && std::find(verticalMf.OverlayTerrain->DestroyedTiles.begin(), verticalMf.OverlayTerrain->DestroyedTiles.end(), verticalMf.SolidTile) == verticalMf.OverlayTerrain->DestroyedTiles.end() && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupedFlag)) || (verticalMf.getFlag() & MapFieldForest))
+				&& ((verticalMf.OverlayTerrain && verticalMf.OverlayTerrainDestroyed && (verticalMf.getFlag() & MapFieldStumps) && verticalMf.Value >= ForestRegeneration && !(verticalMf.Flags & occupedFlag)) || (verticalMf.getFlag() & MapFieldForest))
 				&& this->Info.IsPointOnMap(pos + diagonalOffset, z)
-				&& ((diagonalMf.OverlayTerrain && std::find(diagonalMf.OverlayTerrain->DestroyedTiles.begin(), diagonalMf.OverlayTerrain->DestroyedTiles.end(), diagonalMf.SolidTile) == diagonalMf.OverlayTerrain->DestroyedTiles.end() && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupedFlag)) || (diagonalMf.getFlag() & MapFieldForest))
+				&& ((diagonalMf.OverlayTerrain && diagonalMf.OverlayTerrainDestroyed && (diagonalMf.getFlag() & MapFieldStumps) && diagonalMf.Value >= ForestRegeneration && !(diagonalMf.Flags & occupedFlag)) || (diagonalMf.getFlag() & MapFieldForest))
 				&& this->Info.IsPointOnMap(pos + horizontalOffset, z)
-				&& ((horizontalMf.OverlayTerrain && std::find(horizontalMf.OverlayTerrain->DestroyedTiles.begin(), horizontalMf.OverlayTerrain->DestroyedTiles.end(), horizontalMf.SolidTile) == horizontalMf.OverlayTerrain->DestroyedTiles.end() && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupedFlag)) || (horizontalMf.getFlag() & MapFieldForest))
+				&& ((horizontalMf.OverlayTerrain && horizontalMf.OverlayTerrainDestroyed && (horizontalMf.getFlag() & MapFieldStumps) && horizontalMf.Value >= ForestRegeneration && !(horizontalMf.Flags & occupedFlag)) || (horizontalMf.getFlag() & MapFieldForest))
 			) {
 				DebugPrint("Real place wood\n");
 				this->SetOverlayTerrainDestroyed(pos + verticalOffset, false, z);
+				verticalMf.Flags &= ~(MapFieldStumps);
+				verticalMf.Flags |= MapFieldForest | MapFieldUnpassable;
 				verticalMf.Value = DefaultResourceAmounts[WoodCost];
 				
 				this->SetOverlayTerrainDestroyed(pos + diagonalOffset, false, z);
+				diagonalMf.Flags &= ~(MapFieldStumps);
+				diagonalMf.Flags |= MapFieldForest | MapFieldUnpassable;
 				diagonalMf.Value = DefaultResourceAmounts[WoodCost];
 				
 				this->SetOverlayTerrainDestroyed(pos + horizontalOffset, false, z);
+				horizontalMf.Flags &= ~(MapFieldStumps);
+				horizontalMf.Flags |= MapFieldForest | MapFieldUnpassable;
 				horizontalMf.Value = DefaultResourceAmounts[WoodCost];
 				
 				this->SetOverlayTerrainDestroyed(pos, false, z);
+				mf.Flags &= ~(MapFieldStumps);
+				mf.Flags |= MapFieldForest | MapFieldUnpassable;
 				mf.Value = DefaultResourceAmounts[WoodCost];
 				
 				return;
