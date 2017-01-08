@@ -120,10 +120,13 @@ class CCampaign
 {
 public:
 	CCampaign() :
-		ID(-1), Civilization(-1), Year(0),
+		ID(-1), Civilization(-1),
 		Hidden(false), Sandbox(false),
 		Faction(NULL), StartEffects(NULL)
 	{
+		Date.year = 0;
+		Date.month = 1;
+		Date.day = 1;
 	}
 	~CCampaign();
 	
@@ -132,7 +135,7 @@ public:
 	std::string Description;		/// Description of the campaign
 	int ID;
 	int Civilization;				/// Which civilization the campaign belongs to
-	int Year;						/// The starting year of the campaign
+	Date Date;						/// The starting year of the campaign
 	bool Hidden;					/// Whether the campaign is hidden
 	bool Sandbox;					/// Whether the campaign is a sandbox one
 	CFaction *Faction;				/// Which faction the player plays as in the campaign

@@ -744,12 +744,12 @@ void GameMainLoop()
 		if (CurrentCampaign != NULL) {
 			for (int i = 0; i < NumPlayers; ++i) {
 				if (Players[i].Type != PlayerNobody && Players[i].Race != 0 && Players[i].Faction != -1) {
-					if (CurrentCampaign->Year) {
+					if (CurrentCampaign->Date.year) {
 						CCivilization *civilization = PlayerRaces.Civilizations[Players[i].Race];
 						CFaction *faction = PlayerRaces.Factions[Players[i].Race][Players[i].Faction];
 						
 						for (std::map<std::string, int>::iterator iterator = civilization->HistoricalTechnologies.begin(); iterator != civilization->HistoricalTechnologies.end(); ++iterator) {
-							if (iterator->second == 0 || CurrentCampaign->Year >= iterator->second) {
+							if (iterator->second == 0 || CurrentCampaign->Date.year >= iterator->second) {
 								int upgrade_id = UpgradeIdByIdent(iterator->first);
 								if (upgrade_id != -1 && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
 									UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
@@ -759,7 +759,7 @@ void GameMainLoop()
 							}
 						}
 						for (std::map<std::string, int>::iterator iterator = faction->HistoricalTechnologies.begin(); iterator != faction->HistoricalTechnologies.end(); ++iterator) {
-							if (iterator->second == 0 || CurrentCampaign->Year >= iterator->second) {
+							if (iterator->second == 0 || CurrentCampaign->Date.year >= iterator->second) {
 								int upgrade_id = UpgradeIdByIdent(iterator->first);
 								if (upgrade_id != -1 && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
 									UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
@@ -770,7 +770,7 @@ void GameMainLoop()
 						}
 
 						for (std::map<std::pair<int, CFaction *>, int>::iterator iterator = faction->HistoricalDiplomacyStates.begin(); iterator != faction->HistoricalDiplomacyStates.end(); ++iterator) { //set the appropriate historical diplomacy states to other factions
-							if (iterator->second == 0 || CurrentCampaign->Year >= iterator->first.first) {
+							if (iterator->second == 0 || CurrentCampaign->Date.year >= iterator->first.first) {
 								CPlayer *diplomacy_state_player = GetFactionPlayer(iterator->first.second);
 								if (diplomacy_state_player) {
 									CommandDiplomacy(i, iterator->second, diplomacy_state_player->Index);

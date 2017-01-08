@@ -251,6 +251,72 @@ enum Months {
 	MaxMonths
 };
 
+struct Date {
+	int year;
+	char month;
+	char day;
+	
+	bool operator <(const Date& rhs) {
+		if (year < rhs.year) {
+			return true;
+        } else if (year == rhs.year) {
+			if (month < rhs.month) {
+				return true;
+			} else if (month == rhs.month) {
+				return day < rhs.day;
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator <=(const Date& rhs) {
+		if (year < rhs.year) {
+			return true;
+        } else if (year == rhs.year) {
+			if (month < rhs.month) {
+				return true;
+			} else if (month == rhs.month) {
+				return day <= rhs.day;
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator >(const Date& rhs) {
+		if (year > rhs.year) {
+			return true;
+        } else if (year == rhs.year) {
+			if (month > rhs.month) {
+				return true;
+			} else if (month == rhs.month) {
+				return day > rhs.day;
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator >=(const Date& rhs) {
+		if (year > rhs.year) {
+			return true;
+        } else if (year == rhs.year) {
+			if (month > rhs.month) {
+				return true;
+			} else if (month == rhs.month) {
+				return day >= rhs.day;
+			}
+		}
+
+		return false;
+	}
+	
+	bool operator ==(const Date& rhs) {
+		return year == rhs.year && month == rhs.month && day == rhs.day;
+	}
+};
+
 #include <vec2i.h>
 
 extern std::string GetMonthNameById(int month);
