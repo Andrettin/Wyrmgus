@@ -676,7 +676,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			}
 			Vec2i unit_offset((hero->Type->TileWidth - 1) / 2, (hero->Type->TileHeight - 1) / 2);
 			CUnit *unit = CreateUnit(unit_pos - unit_offset, *hero->Type, player, z);
-			unit->SetCharacter(hero->GetFullName());
+			unit->SetCharacter(hero->Ident);
 			unit->Active = 0;
 			player->UnitTypesAiActiveCount[hero->Type->Slot]--;
 		}

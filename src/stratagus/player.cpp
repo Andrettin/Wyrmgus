@@ -2025,7 +2025,7 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for failure (empty if none)
 {
 	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) { // put it here, because "unfailable" quests should also fail when a hero which should survive dies
-		if (std::find(this->Heroes.begin(), this->Heroes.end(), quest->HeroesMustSurvive[i]->GetFullName()) == this->Heroes.end()) {
+		if (std::find(this->Heroes.begin(), this->Heroes.end(), quest->HeroesMustSurvive[i]->Ident) == this->Heroes.end()) {
 			return "A hero necessary for the quest has died.";
 		}
 	}

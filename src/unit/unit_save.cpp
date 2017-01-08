@@ -428,9 +428,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 	}
 	if (unit.Character != NULL && unit.CurrentAction() != UnitActionDie) {
 		if (!unit.Character->Custom) {
-			file.printf(",\n  \"character\", \"%s\"", unit.Character->GetFullName().c_str());
+			file.printf(",\n  \"character\", \"%s\"", unit.Character->Ident.c_str());
 		} else {
-			file.printf(",\n  \"custom-hero\", \"%s\"", unit.Character->GetFullName().c_str());
+			file.printf(",\n  \"custom-hero\", \"%s\"", unit.Character->Ident.c_str());
 		}
 	}
 	//Wyrmgus end

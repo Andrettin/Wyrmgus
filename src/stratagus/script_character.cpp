@@ -68,13 +68,14 @@ static int CclDefineCharacter(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string character_full_name = TransliterateText(LuaToString(l, 1));
-	CCharacter *character = GetCharacter(character_full_name);
+	std::string character_ident = LuaToString(l, 1);
+	CCharacter *character = GetCharacter(character_ident);
 	if (!character) {
 		character = new CCharacter;
-		Characters[character_full_name] = character;
+		character->Ident = character_ident;
+		Characters[character_ident] = character;
 	} else if (!character->Persistent && character->Defined) { //asks if the type is NULL because every character is defined in the Lua code first only with some data like gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
-		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_full_name.c_str());
+		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_ident.c_str());
 	}
 	
 	std::string faction_name;
@@ -148,22 +149,22 @@ static int CclDefineCharacter(lua_State *l)
 			if (father) {
 				if (father->Gender == MaleGender) {
 					character->Father = const_cast<CCharacter *>(&(*father));
-					if (!father->IsParentOf(character_full_name)) { //check whether the character has already been set as a child of the father
+					if (!father->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the father
 						father->Children.push_back(character);
 					}
 					// see if the father's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
 					for (size_t i = 0; i < father->Children.size(); ++i) {
-						if (father->Children[i]->GetFullName() != character_full_name) {
-							if (!character->IsSiblingOf(father->Children[i]->GetFullName())) {
+						if (father->Children[i]->Ident != character_ident) {
+							if (!character->IsSiblingOf(father->Children[i]->Ident)) {
 								character->Siblings.push_back(father->Children[i]);
 							}
-							if (!father->Children[i]->IsSiblingOf(character_full_name)) {
+							if (!father->Children[i]->IsSiblingOf(character_ident)) {
 								father->Children[i]->Siblings.push_back(character);
 							}
 						}
 					}
 				} else {
-					LuaError(l, "Character \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_name.c_str() _C_ character_full_name.c_str());
+					LuaError(l, "Character \"%s\" set to be the biological father of \"%s\", but isn't male." _C_ father_name.c_str() _C_ character_ident.c_str());
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ father_name.c_str());
@@ -174,34 +175,34 @@ static int CclDefineCharacter(lua_State *l)
 			if (mother) {
 				if (mother->Gender == FemaleGender) {
 					character->Mother = const_cast<CCharacter *>(&(*mother));
-					if (!mother->IsParentOf(character_full_name)) { //check whether the character has already been set as a child of the mother
+					if (!mother->IsParentOf(character_ident)) { //check whether the character has already been set as a child of the mother
 						mother->Children.push_back(character);
 					}
 					// see if the mother's other children aren't already included in the character's siblings, and if they aren't, add them (and add the character to the siblings' sibling list, of course)
 					for (size_t i = 0; i < mother->Children.size(); ++i) {
-						if (mother->Children[i]->GetFullName() != character_full_name) {
-							if (!character->IsSiblingOf(mother->Children[i]->GetFullName())) {
+						if (mother->Children[i]->Ident != character_ident) {
+							if (!character->IsSiblingOf(mother->Children[i]->Ident)) {
 								character->Siblings.push_back(mother->Children[i]);
 							}
-							if (!mother->Children[i]->IsSiblingOf(character_full_name)) {
+							if (!mother->Children[i]->IsSiblingOf(character_ident)) {
 								mother->Children[i]->Siblings.push_back(character);
 							}
 						}
 					}
 				} else {
-					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female (gender is \"%s\")." _C_ mother_name.c_str() _C_ character_full_name.c_str() _C_ GetGenderNameById(mother->Gender).c_str());
+					LuaError(l, "Character \"%s\" set to be the biological mother of \"%s\", but isn't female (gender is \"%s\")." _C_ mother_name.c_str() _C_ character_ident.c_str() _C_ GetGenderNameById(mother->Gender).c_str());
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_name.c_str());
 			}
 		} else if (!strcmp(value, "DateReferenceCharacter")) {
-			std::string reference_character_name = TransliterateText(LuaToString(l, -1));
-			CCharacter *reference_character = GetCharacter(reference_character_name);
+			std::string reference_character_ident = LuaToString(l, -1);
+			CCharacter *reference_character = GetCharacter(reference_character_ident);
 			if (reference_character) {
 				character->DateReferenceCharacter = const_cast<CCharacter *>(&(*reference_character));
 				reference_character->DateReferredCharacters.push_back(character);
 			} else {
-				LuaError(l, "Character \"%s\" doesn't exist." _C_ reference_character_name.c_str());
+				LuaError(l, "Character \"%s\" doesn't exist." _C_ reference_character_ident.c_str());
 			}
 		} else if (!strcmp(value, "Gender")) {
 			character->Gender = GetGenderIdByName(LuaToString(l, -1));
@@ -394,7 +395,7 @@ static int CclDefineCharacter(lua_State *l)
 							character->EquippedItems[GetItemClassSlot(item->Type->ItemClass)].push_back(item);
 						}
 					} else {
-						printf("\n%s\n", character->GetFullName().c_str());
+						printf("\n%s\n", character->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -482,10 +483,6 @@ static int CclDefineCharacter(lua_State *l)
 			}
 		}
 		
-		if (character->GetFullName() != character_full_name) { // if the character's full name (built from its defined elements) is different from the name used to initialize the character, something went wrong
-			LuaError(l, "Character name \"%s\" doesn't match the defined name \"%s\"." _C_ character->GetFullName().c_str() _C_ character_full_name.c_str());
-		}
-		
 		//check if the abilities are correct for this character's unit type
 		if (character->Type != NULL && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
 			int ability_count = (int) character->Abilities.size();
@@ -524,13 +521,14 @@ static int CclDefineCustomHero(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string hero_full_name = LuaToString(l, 1);
-	CCharacter *hero = GetCustomHero(hero_full_name);
+	std::string hero_ident = LuaToString(l, 1);
+	CCharacter *hero = GetCustomHero(hero_ident);
 	if (!hero) {
 		hero = new CCharacter;
-		CustomHeroes[hero_full_name] = hero;
+		hero->Ident = hero_ident;
+		CustomHeroes[hero_ident] = hero;
 	} else {
-		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_full_name.c_str());
+		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_ident.c_str());
 	}
 	hero->Custom = true;
 	hero->Persistent = true;
@@ -711,7 +709,7 @@ static int CclDefineCustomHero(lua_State *l)
 							hero->EquippedItems[GetItemClassSlot(item->Type->ItemClass)].push_back(item);
 						}
 					} else {
-						printf("\n%s\n", hero->GetFullName().c_str());
+						printf("\n%s\n", hero->Ident.c_str());
 						LuaError(l, "Unsupported tag: %s" _C_ value);
 					}
 				}
@@ -770,10 +768,6 @@ static int CclDefineCustomHero(lua_State *l)
 		if (hero->Type != NULL && hero->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
 			hero->Gender = hero->Type->DefaultStat.Variables[GENDER_INDEX].Value;
 		}
-	}
-	
-	if (hero->GetFullName() != hero_full_name) { // if the hero's full name (built from its defined elements) is different from the name used to initialize the hero, something went wrong
-		LuaError(l, "Custom hero name \"%s\" doesn't match the defined name \"%s\"." _C_ hero->GetFullName().c_str() _C_ hero_full_name.c_str());
 	}
 	
 	//check if the abilities are correct for this hero's unit type
@@ -856,8 +850,8 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 					}
 					// see if the father's other children aren't already included in the hero's siblings, and if they aren't, add them (and add the hero to the siblings' sibling list, of course)
 					for (size_t i = 0; i < father->Children.size(); ++i) {
-						if (father->Children[i]->GetFullName() != hero_full_name) {
-							if (!hero->IsSiblingOf(father->Children[i]->GetFullName())) {
+						if (father->Children[i]->Ident != hero_full_name) {
+							if (!hero->IsSiblingOf(father->Children[i]->Ident)) {
 								hero->Siblings.push_back(father->Children[i]);
 							}
 							if (!father->Children[i]->IsSiblingOf(hero_full_name)) {
@@ -882,8 +876,8 @@ static int CclDefineGrandStrategyHero(lua_State *l)
 					}
 					// see if the mother's other children aren't already included in the hero's siblings, and if they aren't, add them (and add the hero to the siblings' sibling list, of course)
 					for (size_t i = 0; i < mother->Children.size(); ++i) {
-						if (mother->Children[i]->GetFullName() != hero_full_name) {
-							if (!hero->IsSiblingOf(mother->Children[i]->GetFullName())) {
+						if (mother->Children[i]->Ident != hero_full_name) {
+							if (!hero->IsSiblingOf(mother->Children[i]->Ident)) {
 								hero->Siblings.push_back(mother->Children[i]);
 							}
 							if (!mother->Children[i]->IsSiblingOf(hero_full_name)) {
@@ -1002,14 +996,14 @@ static int CclGetCharacterData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Father")) {
 		if (character->Father != NULL) {
-			lua_pushstring(l, character->Father->GetFullName().c_str());
+			lua_pushstring(l, character->Father->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}
 		return 1;
 	} else if (!strcmp(data, "Mother")) {
 		if (character->Mother != NULL) {
-			lua_pushstring(l, character->Mother->GetFullName().c_str());
+			lua_pushstring(l, character->Mother->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

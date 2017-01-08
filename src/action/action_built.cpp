@@ -187,7 +187,7 @@ static void Finish(COrder_Built &order, CUnit &unit)
 	if (unit.Character == NULL) {
 		player.UnitTypesNonHeroCount[type.Slot]++;
 	} else {
-		player.Heroes.push_back(unit.Character->GetFullName());
+		player.Heroes.push_back(unit.Character->Ident);
 	}
 	
 	if (player.AiEnabled && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(unit.tilePos, unit.MapLayer) && unit.CanMove() && unit.Active && unit.GroupId != 0 && unit.Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts

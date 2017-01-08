@@ -142,6 +142,7 @@ public:
 	bool Persistent;			/// Whether this character's levels and abilities are persistent
 	bool Custom;				/// Whether this character is a custom hero
 	bool Defined;				/// Whether this character has been fully defined
+	std::string Ident;			/// Ident of the character
 	std::string Name;			/// Given name of the character
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
 	std::string FamilyName;		/// Name of the character's family

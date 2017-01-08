@@ -92,28 +92,28 @@ int CCharacter::GetLanguage()
 	return PlayerRaces.GetFactionLanguage(this->Civilization, this->Faction);
 }
 
-bool CCharacter::IsParentOf(std::string child_full_name)
+bool CCharacter::IsParentOf(std::string child_ident)
 {
 	for (size_t i = 0; i < this->Children.size(); ++i) {
-		if (this->Children[i]->GetFullName() == child_full_name) {
+		if (this->Children[i]->Ident == child_ident) {
 			return true;
 		}
 	}
 	return false;
 }
 
-bool CCharacter::IsChildOf(std::string parent_full_name)
+bool CCharacter::IsChildOf(std::string parent_ident)
 {
-	if ((this->Father != NULL && this->Father->GetFullName() == parent_full_name) || (this->Mother != NULL && this->Mother->GetFullName() == parent_full_name)) {
+	if ((this->Father != NULL && this->Father->Ident == parent_ident) || (this->Mother != NULL && this->Mother->Ident == parent_ident)) {
 		return true;
 	}
 	return false;
 }
 
-bool CCharacter::IsSiblingOf(std::string sibling_full_name)
+bool CCharacter::IsSiblingOf(std::string sibling_ident)
 {
 	for (size_t i = 0; i < this->Siblings.size(); ++i) {
-		if (this->Siblings[i]->GetFullName() == sibling_full_name) {
+		if (this->Siblings[i]->Ident == sibling_ident) {
 			return true;
 		}
 	}
@@ -138,7 +138,7 @@ bool CCharacter::IsItemEquipped(const CItem *item) const
 bool CCharacter::CanAppear() const
 {
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (std::find(Players[i].Heroes.begin(), Players[i].Heroes.end(), this->GetFullName()) != Players[i].Heroes.end()) {
+		if (std::find(Players[i].Heroes.begin(), Players[i].Heroes.end(), this->Ident) != Players[i].Heroes.end()) {
 			return false;
 		}
 	}
@@ -332,22 +332,34 @@ void CleanCharacters()
 	CustomHeroes.clear();
 }
 
-CCharacter *GetCharacter(std::string character_full_name)
+CCharacter *GetCharacter(std::string character_ident)
 {
-	if (Characters.find(character_full_name) != Characters.end()) {
-		return Characters[character_full_name];
-	} else {
-		return NULL;
+	if (Characters.find(character_ident) != Characters.end()) {
+		return Characters[character_ident];
 	}
+	
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) { // for backwards compatibility
+		if (iterator->second->GetFullName() == character_ident) {
+			return iterator->second;
+		}
+	}
+
+	return NULL;
 }
 
-CCharacter *GetCustomHero(std::string hero_full_name)
+CCharacter *GetCustomHero(std::string hero_ident)
 {
-	if (CustomHeroes.find(hero_full_name) != CustomHeroes.end()) {
-		return CustomHeroes[hero_full_name];
-	} else {
-		return NULL;
+	if (CustomHeroes.find(hero_ident) != CustomHeroes.end()) {
+		return CustomHeroes[hero_ident];
 	}
+	
+	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { // for backwards compatibility
+		if (iterator->second->GetFullName() == hero_ident) {
+			return iterator->second;
+		}
+	}
+	
+	return NULL;
 }
 
 /**
@@ -402,7 +414,7 @@ void SaveHero(CCharacter *hero)
 	if (stat(path.c_str(), &tmp) < 0) {
 		makedir(path.c_str(), 0777);
 	}
-	path += hero->GetFullName();
+	path += hero->Ident;
 	path += ".lua";
 
 	FILE *fd = fopen(path.c_str(), "w");
@@ -412,9 +424,9 @@ void SaveHero(CCharacter *hero)
 	}
 
 	if (!hero->Custom) {
-		fprintf(fd, "DefineCharacter(\"%s\", {\n", hero->GetFullName().c_str());
+		fprintf(fd, "DefineCharacter(\"%s\", {\n", hero->Ident.c_str());
 	} else {
-		fprintf(fd, "DefineCustomHero(\"%s\", {\n", hero->GetFullName().c_str());
+		fprintf(fd, "DefineCustomHero(\"%s\", {\n", hero->Ident.c_str());
 		fprintf(fd, "\tName = \"%s\",\n", hero->Name.c_str());
 		if (!hero->ExtraName.empty()) {
 			fprintf(fd, "\tExtraName = \"%s\",\n", hero->ExtraName.c_str());
@@ -609,7 +621,7 @@ void DeleteCustomHero(std::string hero_full_name)
 	if (hero->Custom) {
 		path += "custom/";
 	}
-	path += hero->GetFullName();
+	path += hero->Ident;
 	path += ".lua";	
 	if (CanAccessFile(path.c_str())) {
 		unlink(path.c_str());
@@ -636,7 +648,7 @@ void SetCurrentCustomHero(std::string hero_full_name)
 std::string GetCurrentCustomHero()
 {
 	if (CurrentCustomHero != NULL) {
-		return CurrentCustomHero->GetFullName();
+		return CurrentCustomHero->Ident;
 	} else {
 		return "";
 	}
@@ -663,7 +675,7 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 			if (hero->Custom) {
 				path += "custom/";
 			}
-			path += hero->GetFullName();
+			path += hero->Ident;
 			path += ".lua";	
 			if (CanAccessFile(path.c_str())) {
 				unlink(path.c_str());
@@ -679,7 +691,7 @@ void ChangeCustomHeroCivilization(std::string hero_full_name, std::string civili
 				SaveHero(hero);
 				
 				CustomHeroes.erase(hero_full_name);
-				CustomHeroes[hero->GetFullName()] = hero;
+				CustomHeroes[hero->Ident] = hero;
 			}
 		}
 	}

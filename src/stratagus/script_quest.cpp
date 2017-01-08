@@ -399,7 +399,7 @@ static int CclGetQuestData(lua_State *l)
 		lua_pushstring(l, quest->Icon.Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "QuestGiver")) {
-		lua_pushstring(l, quest->QuestGiver->GetFullName().c_str());
+		lua_pushstring(l, quest->QuestGiver->Ident.c_str());
 		return 1;
 	} else if (!strcmp(data, "Objectives")) {
 		lua_createtable(l, quest->Objectives.size(), 0);
@@ -679,7 +679,7 @@ static int CclGetAchievementData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Character")) {
 		if (achievement->Character) {
-			lua_pushstring(l, achievement->Character->GetFullName().c_str());
+			lua_pushstring(l, achievement->Character->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

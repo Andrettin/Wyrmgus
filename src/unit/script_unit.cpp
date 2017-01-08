@@ -654,7 +654,7 @@ static int CclUnit(lua_State *l)
 						unit->Player->UnitTypesStartingNonHeroCount[type->Slot]--;
 					}
 				} else {
-					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit->Character->GetFullName()), unit->Player->Heroes.end());
+					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit->Character->Ident), unit->Player->Heroes.end());
 				}
 				//Wyrmgus end
 			}
@@ -1691,7 +1691,7 @@ static int CclGetUnitVariable(lua_State *l)
 		lua_pushstring(l, unit->GetName().c_str());
 	} else if (!strcmp(value, "Character")) {
 		if (unit->Character != NULL) {
-			lua_pushstring(l, unit->Character->GetFullName().c_str());
+			lua_pushstring(l, unit->Character->Ident.c_str());
 		} else {
 			lua_pushstring(l, "");
 		}

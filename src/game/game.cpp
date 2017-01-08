@@ -1074,9 +1074,9 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				}
 				if (unit.Character != NULL) {
 					if (!unit.Character->Custom) {
-						f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit.Character->GetFullName().c_str());
+						f->printf("SetUnitVariable(unit, \"Character\", \"%s\")\n", unit.Character->Ident.c_str());
 					} else {
-						f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit.Character->GetFullName().c_str());
+						f->printf("SetUnitVariable(unit, \"CustomHero\", \"%s\")\n", unit.Character->Ident.c_str());
 					}
 				} else {
 					if (!unit.Name.empty()) {

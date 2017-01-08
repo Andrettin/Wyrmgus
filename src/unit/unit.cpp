@@ -823,7 +823,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			this->Player->UnitTypesStartingNonHeroCount[this->Type->Slot]--;
 		}
 	} else {
-		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this->Character->GetFullName()), this->Player->Heroes.end());
+		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this->Character->Ident), this->Player->Heroes.end());
 		
 		if (this == this->Player->CustomHeroUnit) {
 			this->Player->CustomHeroUnit = NULL;
@@ -937,7 +937,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			this->Player->UnitTypesStartingNonHeroCount[this->Type->Slot]++;
 		}
 	} else {
-		this->Player->Heroes.push_back(this->Character->GetFullName());
+		this->Player->Heroes.push_back(this->Character->Ident);
 		
 		if (this->Character->Custom) {
 			this->Player->CustomHeroUnit = this;
@@ -1301,10 +1301,10 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 				Character->EquippedItems[item_slot].push_back(Character->GetItem(item));
 				SaveHero(Character);
 			} else {
-				fprintf(stderr, "Item is not equipped by character %s's unit, but is equipped by the character itself.\n", Character->GetFullName().c_str());
+				fprintf(stderr, "Item is not equipped by character \"%s\"'s unit, but is equipped by the character itself.\n", Character->Ident.c_str());
 			}
 		} else {
-			fprintf(stderr, "Item is present in the inventory of the character %s's unit, but not in the character's inventory itself.\n", Character->GetFullName().c_str());
+			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", Character->Ident.c_str());
 		}
 	}
 	EquippedItems[item_slot].push_back(&item);
@@ -1409,10 +1409,10 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 				Character->EquippedItems[item_slot].erase(std::remove(Character->EquippedItems[item_slot].begin(), Character->EquippedItems[item_slot].end(), Character->GetItem(item)), Character->EquippedItems[item_slot].end());
 				SaveHero(Character);
 			} else {
-				fprintf(stderr, "Item is equipped by character %s's unit, but not by the character itself.\n", Character->GetFullName().c_str());
+				fprintf(stderr, "Item is equipped by character \"%s\"'s unit, but not by the character itself.\n", Character->Ident.c_str());
 			}
 		} else {
-			fprintf(stderr, "Item is present in the inventory of the character %s's unit, but not in the character's inventory itself.\n", Character->GetFullName().c_str());
+			fprintf(stderr, "Item is present in the inventory of the character \"%s\"'s unit, but not in the character's inventory itself.\n", Character->Ident.c_str());
 		}
 	}
 	EquippedItems[item_slot].erase(std::remove(EquippedItems[item_slot].begin(), EquippedItems[item_slot].end(), &item), EquippedItems[item_slot].end());
@@ -2084,7 +2084,7 @@ void CUnit::UpdateSoldUnits()
 		if (!potential_heroes.empty()) {
 			CCharacter *chosen_hero = potential_heroes[SyncRand(potential_heroes.size())];
 			new_unit = MakeUnit(*chosen_hero->Type, &Players[PlayerNumNeutral]);
-			new_unit->SetCharacter(chosen_hero->GetFullName(), chosen_hero->Custom);
+			new_unit->SetCharacter(chosen_hero->Ident, chosen_hero->Custom);
 			potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), chosen_hero), potential_heroes.end());
 		} else {
 			CUnitType *chosen_unit_type = this->Type->SoldUnits[SyncRand(this->Type->SoldUnits.size())];
@@ -2340,7 +2340,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				player.UnitTypesStartingNonHeroCount[type.Slot]++;
 			}
 		} else {
-			player.Heroes.push_back(this->Character->GetFullName());
+			player.Heroes.push_back(this->Character->Ident);
 		}
 		
 		if (player.AiEnabled && player.Ai && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
@@ -3426,7 +3426,7 @@ void UnitLost(CUnit &unit)
 					player.UnitTypesStartingNonHeroCount[type.Slot]--;
 				}
 			} else {
-				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), unit.Character->GetFullName()), player.Heroes.end());
+				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), unit.Character->Ident), player.Heroes.end());
 				if (&unit == ThisPlayer->CustomHeroUnit) {
 					ThisPlayer->CustomHeroUnit = NULL;
 				}
@@ -4090,7 +4090,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 			newplayer.UnitTypesStartingNonHeroCount[Type->Slot]++;
 		}
 	} else {
-		newplayer.Heroes.push_back(this->Character->GetFullName());
+		newplayer.Heroes.push_back(this->Character->Ident);
 	}
 	
 	if (newplayer.AiEnabled && newplayer.Ai && this->Type->BoolFlag[COWARD_INDEX].value && !this->Type->BoolFlag[HARVESTER_INDEX].value && !this->Type->CanTransport() && !this->Type->CanCastSpell && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
