@@ -53,7 +53,7 @@
 
 class CDeity;
 class CFaction;
-class CItem;
+class CPersistentItem;
 class CProvince;
 class CQuest;
 class CUnitType;
@@ -106,7 +106,7 @@ class CCharacter
 public:
 	CCharacter() :
 		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
-		ViolentDeath(false), Noble(false), Persistent(false), Custom(false), Defined(false),
+		ViolentDeath(false), Noble(false), Custom(false), Defined(false),
 		Type(NULL), Trait(NULL), Deity(NULL),
 		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL),
 		Conditions(NULL)
@@ -122,11 +122,11 @@ public:
 	bool IsParentOf(std::string child_full_name);
 	bool IsChildOf(std::string parent_full_name);
 	bool IsSiblingOf(std::string sibling_full_name);
-	bool IsItemEquipped(const CItem *item) const;
+	bool IsItemEquipped(const CPersistentItem *item) const;
 	bool CanAppear() const;
 	std::string GetFullName() const;
 	IconConfig GetIcon();
-	CItem *GetItem(CUnit &item);
+	CPersistentItem *GetItem(CUnit &item);
 	void GenerateMissingData();
 	void UpdateAttributes();
 
@@ -139,7 +139,6 @@ public:
 	int ExperiencePercent;		/// Character's experience, as a percentage of the experience required to level up
 	bool ViolentDeath;			/// If historical death was violent
 	bool Noble;
-	bool Persistent;			/// Whether this character's levels and abilities are persistent
 	bool Custom;				/// Whether this character is a custom hero
 	bool Defined;				/// Whether this character has been fully defined
 	std::string Ident;			/// Ident of the character
@@ -160,7 +159,7 @@ public:
 	CCharacter *Mother;					/// Character's mother
 	CCharacter *DateReferenceCharacter;	/// Character used as a date reference for this character; i.e. if a dwarf was the contemporary of a human hero in a saga, make the hero a date reference for the dwarf, so that the dwarf will be generated in a similar date in Nidavellir
 	LuaCallback *Conditions;
-	std::vector<CItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
+	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character
 	std::vector<CCharacter *> Siblings;	/// Siblings of the character
 	std::vector<CCharacter *> DateReferredCharacters;	/// Characters who use this character as a date reference
@@ -171,7 +170,7 @@ public:
 	std::vector<CUpgrade *> LiteraryAppearances;	/// Literary works in which this character appears
 	std::vector<CQuest *> QuestsInProgress;	/// Quests in progress, only for playable, custom characters
 	std::vector<CQuest *> QuestsCompleted;	/// Quests completed, only for playable, custom characters
-	std::vector<CItem *> Items;
+	std::vector<CPersistentItem *> Items;
 	int Attributes[MaxAttributes];
 	bool ForbiddenUpgrades[UnitTypeMax];	/// which unit types this character is forbidden to upgrade to
 	std::vector<std::tuple<int, int, CFaction *, int>> HistoricalTitles;	/// historical titles of the character, the first element is the beginning year of the term, the second one the end year, the third the faction it pertains to (if any, if not then it is NULL), and the fourth is the character title itself (from the character title enums)

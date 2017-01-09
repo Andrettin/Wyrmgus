@@ -3561,6 +3561,9 @@ static int CclGetDeityData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
+	} else if (!strcmp(data, "Icon")) {
+		lua_pushstring(l, deity->Icon.Name.c_str());
+		return 1;
 	} else if (!strcmp(data, "Civilizations")) {
 		lua_createtable(l, deity->Civilizations.size(), 0);
 		for (size_t i = 1; i <= deity->Civilizations.size(); ++i)

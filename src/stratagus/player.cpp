@@ -1764,9 +1764,7 @@ void CPlayer::UpdateHeroPool()
 	std::vector<CCharacter *> potential_heroes;
 	
 	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		if (iterator->second->Persistent) {
-			potential_heroes.push_back(iterator->second);
-		}
+		potential_heroes.push_back(iterator->second);
 	}
 	
 	for (int i = 0; i < 1; ++i) { // fill the hero pool with up to one hero

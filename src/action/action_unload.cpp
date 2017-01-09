@@ -261,8 +261,8 @@ static int UnloadUnit(CUnit &transporter, CUnit &unit)
 		transporter.DeequipItem(unit);
 	}
 	
-	if (!IsNetworkGame() && transporter.Character && transporter.Character->Persistent && transporter.Player->AiEnabled == false && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
-		CItem *item = transporter.Character->GetItem(unit);
+	if (!IsNetworkGame() && transporter.Character && transporter.Player->AiEnabled == false && unit.Type->BoolFlag[ITEM_INDEX].value) { //if the transporter has a character and the unit is an item, remove it from the character's item list
+		CPersistentItem *item = transporter.Character->GetItem(unit);
 		transporter.Character->Items.erase(std::remove(transporter.Character->Items.begin(), transporter.Character->Items.end(), item), transporter.Character->Items.end());
 		delete item;
 		SaveHero(transporter.Character);

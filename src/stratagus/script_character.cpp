@@ -74,21 +74,9 @@ static int CclDefineCharacter(lua_State *l)
 		character = new CCharacter;
 		character->Ident = character_ident;
 		Characters[character_ident] = character;
-	} else if (!character->Persistent && character->Defined) { //asks if the type is NULL because every character is defined in the Lua code first only with some data like gender (because the latter is needed to parse the personal name's elements), and afterwards with everything else
-		fprintf(stderr, "Character \"%s\" is being redefined.\n", character_ident.c_str());
 	}
 	
 	std::string faction_name;
-	
-	std::string name_type;
-	if (character->Type != NULL && character->Type->Species != NULL) {
-		name_type = "species-" + character->Type->Species->Ident;
-		if (character->Gender != NoGender) {
-			name_type += "-" + GetGenderNameById(character->Gender);
-		}
-	} else {
-		name_type = "person-" + GetGenderNameById(character->Gender);
-	}
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -216,8 +204,6 @@ static int CclDefineCharacter(lua_State *l)
 			character->HeroicIcon.Icon = NULL;
 			character->HeroicIcon.Load();
 			character->HeroicIcon.Icon->Load();
-		} else if (!strcmp(value, "Persistent")) {
-			character->Persistent = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Level")) {
 			character->Level = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "ExperiencePercent")) {
@@ -304,7 +290,7 @@ static int CclDefineCharacter(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CItem *item = new CItem;
+				CPersistentItem *item = new CPersistentItem;
 				character->Items.push_back(item);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
@@ -531,7 +517,6 @@ static int CclDefineCustomHero(lua_State *l)
 		fprintf(stderr, "Custom hero \"%s\" is being redefined.\n", hero_ident.c_str());
 	}
 	hero->Custom = true;
-	hero->Persistent = true;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
@@ -618,7 +603,7 @@ static int CclDefineCustomHero(lua_State *l)
 			const int args = lua_rawlen(l, -1);
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
-				CItem *item = new CItem;
+				CPersistentItem *item = new CPersistentItem;
 				hero->Items.push_back(item);
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for items)");
@@ -1008,11 +993,11 @@ static int CclGetCharacterData(lua_State *l)
 			lua_pushstring(l, "");
 		}
 		return 1;
-	} else if (!strcmp(data, "Persistent")) {
-		lua_pushboolean(l, character->Persistent);
-		return 1;
 	} else if (!strcmp(data, "Icon")) {
 		lua_pushstring(l, character->GetIcon().Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "BaseIcon")) {
+		lua_pushstring(l, character->Icon.Name.c_str());
 		return 1;
 	} else if (!strcmp(data, "HairVariation")) {
 		lua_pushstring(l, character->HairVariation.c_str());

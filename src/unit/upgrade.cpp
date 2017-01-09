@@ -1221,7 +1221,7 @@ static void ConvertUnitTypeTo(CPlayer &player, const CUnitType &src, CUnitType &
 		//  Convert already existing units to this type.
 		//Wyrmgus start
 //		if (unit.Type == &src) {
-		if (unit.Type == &src && (!unit.Character || !unit.Character->Persistent)) { //don't do this for persistent characters
+		if (unit.Type == &src && !unit.Character) { //don't do this for persistent characters
 		//Wyrmgus end
 			CommandTransformIntoType(unit, dst);
 			//  Convert trained units to this type.
@@ -1948,7 +1948,7 @@ void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 	if (um->ConvertTo) {
 		//Wyrmgus start
 		//CommandTransformIntoType(unit, *um->ConvertTo);
-		if (!unit.Character || !unit.Character->Persistent) { //don't do this for persistent characters
+		if (!unit.Character) { //don't do this for persistent characters
 			CommandTransformIntoType(unit, *um->ConvertTo);
 		}
 		//Wyrmgus end
@@ -2177,7 +2177,7 @@ void AbilityAcquire(CUnit &unit, CUpgrade *upgrade)
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	if (!IsNetworkGame() && unit.Character != NULL) {
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) == unit.Character->Abilities.end()) {
-			if (unit.Character->Persistent && unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
+			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.Character->Abilities.push_back(upgrade);
 				SaveHero(unit.Character);
 			}
@@ -2206,7 +2206,7 @@ void AbilityLost(CUnit &unit, CUpgrade *upgrade)
 	unit.Variable[LEVELUP_INDEX].Max = unit.Variable[LEVELUP_INDEX].Value;
 	if (!IsNetworkGame() && unit.Character != NULL) {
 		if (std::find(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade) != unit.Character->Abilities.end()) {
-			if (unit.Character->Persistent && unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
+			if (unit.Player->AiEnabled == false) { //save ability learning, if unit has a character and it is persistent, and the character doesn't have the ability yet
 				unit.Character->Abilities.erase(std::remove(unit.Character->Abilities.begin(), unit.Character->Abilities.end(), upgrade), unit.Character->Abilities.end());
 				SaveHero(unit.Character);
 			}

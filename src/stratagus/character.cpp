@@ -120,7 +120,7 @@ bool CCharacter::IsSiblingOf(std::string sibling_ident)
 	return false;
 }
 
-bool CCharacter::IsItemEquipped(const CItem *item) const
+bool CCharacter::IsItemEquipped(const CPersistentItem *item) const
 {
 	int item_slot = GetItemClassSlot(item->Type->ItemClass);
 	
@@ -137,6 +137,10 @@ bool CCharacter::IsItemEquipped(const CItem *item) const
 
 bool CCharacter::CanAppear() const
 {
+	if (this->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0 && this->Gender != this->Type->DefaultStat.Variables[GENDER_INDEX].Value) {
+		return false; // hero not usable if their unit type has a set gender which is different from the hero's (this is because this means that the unit type lacks appropriate graphics for that gender)
+	}
+	
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (std::find(Players[i].Heroes.begin(), Players[i].Heroes.end(), this->Ident) != Players[i].Heroes.end()) {
 			return false;
@@ -171,7 +175,7 @@ IconConfig CCharacter::GetIcon()
 	}
 }
 
-CItem *CCharacter::GetItem(CUnit &item)
+CPersistentItem *CCharacter::GetItem(CUnit &item)
 {
 	for (size_t i = 0; i < this->Items.size(); ++i) {
 		if (this->Items[i]->Type == item.Type && this->Items[i]->Prefix == item.Prefix && this->Items[i]->Suffix == item.Suffix && this->Items[i]->Spell == item.Spell && this->Items[i]->Work == item.Work && this->Items[i]->Elixir == item.Elixir && this->Items[i]->Unique == item.Unique && this->Items[i]->Bound == item.Bound && this->Items[i]->Identified == item.Identified && this->IsItemEquipped(this->Items[i]) == item.Container->IsItemEquipped(&item)) {
@@ -367,16 +371,12 @@ CCharacter *GetCustomHero(std::string hero_ident)
 */
 void SaveHeroes()
 {
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) { //save persistent characters
-		if (iterator->second->Persistent) {
-			SaveHero(iterator->second);
-		}
+	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) { //save characters
+		SaveHero(iterator->second);
 	}
 
 	for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) { //save custom heroes
-		if (iterator->second->Persistent) {
-			SaveHero(iterator->second);
-		}
+		SaveHero(iterator->second);
 	}
 			
 	//see if the old heroes.lua save file is present, and if so, delete it

@@ -2043,7 +2043,7 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 				Selected[i]->Variable[LEVELUP_INDEX].Max = Selected[i]->Variable[LEVELUP_INDEX].Value;
 				if (!IsNetworkGame() && Selected[i]->Character != NULL) {	//save the unit-type experience upgrade for persistent characters
 					if (Selected[i]->Character->Type->Slot != type.Slot) {
-						if (Selected[i]->Character->Persistent && Selected[i]->Player->AiEnabled == false) {
+						if (Selected[i]->Player->AiEnabled == false) {
 							Selected[i]->Character->Type = UnitTypes[CurrentButtons[button].Value];
 							SaveHero(Selected[i]->Character);
 							CheckAchievements();

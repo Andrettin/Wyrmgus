@@ -126,10 +126,10 @@ public:
 	CUpgrade *Elixir;
 };
 
-class CItem
+class CPersistentItem
 {
 public:
-	CItem() :
+	CPersistentItem() :
 		Bound(false), Identified(true),
 		Type(NULL), Prefix(NULL), Suffix(NULL), Spell(NULL), Work(NULL), Elixir(NULL), Unique(NULL)
 	{

@@ -2446,7 +2446,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 				} else if ((1 << button) == RightButton) {
 					std::string encyclopedia_ident = Selected[0]->Type->Ident;
 					std::string encyclopedia_state = "units";
-					if (Selected[0]->Character != NULL && Selected[0]->Character->Persistent && !Selected[0]->Character->Custom) {
+					if (Selected[0]->Character != NULL && !Selected[0]->Character->Icon.Name.empty() && !Selected[0]->Character->Custom) {
 						encyclopedia_ident = Selected[0]->Character->Ident;
 						encyclopedia_state = "heroes";
 					} else if (Selected[0]->Unique != NULL) {

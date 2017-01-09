@@ -224,7 +224,7 @@
 //	UnitClearOrders(*target);
 //	target->Release();
 	if (!IsNetworkGame() && target->Character != NULL && &caster == target) { //save persistent data
-		if (target->Character->Persistent && target->Player->AiEnabled == false) {
+		if (target->Player->AiEnabled == false) {
 			target->Character->Type = type;
 			SaveHero(target->Character);
 		}
