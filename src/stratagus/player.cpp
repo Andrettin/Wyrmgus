@@ -2803,7 +2803,10 @@ void CPlayer::UnshareVisionWith(const CPlayer &player)
 */
 bool CPlayer::IsEnemy(const CPlayer &player) const
 {
-	return IsEnemy(player.Index);
+	//Wyrmgus start
+//	return IsEnemy(player.Index);
+	return IsEnemy(player.Index) || player.IsEnemy(this->Index); // be hostile to the other player if they are hostile, even if the diplomatic stance hasn't been changed
+	//Wyrmgus end
 }
 
 /**
