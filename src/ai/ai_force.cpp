@@ -57,6 +57,76 @@
 #define AIATTACK_BUILDING 2
 #define AIATTACK_AGRESSIVE 3
 
+//Wyrmgus start
+class EnemyUnitFinder
+{
+public:
+	EnemyUnitFinder(const CUnit &unit, CUnit **result_unit, int find_type, bool include_neutral) :
+	//Wyrmgus end
+		unit(unit),
+		movemask(unit.Type->MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit)),
+		attackrange(unit.GetModifiedVariable(ATTACKRANGE_INDEX)),
+		find_type(find_type),
+		include_neutral(include_neutral),
+		result_unit(result_unit)
+	{
+		*result_unit = NULL;
+	}
+	VisitResult Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from);
+private:
+	const CUnit &unit;
+	unsigned int movemask;
+	const int attackrange;
+	const int find_type;
+	bool include_neutral;
+	CUnit **result_unit;
+};
+
+VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
+{
+	if (!Map.Field(pos, unit.MapLayer)->playerInfo.IsTeamExplored(*unit.Player)) {
+		return VisitResult_DeadEnd;
+	}
+	
+	if (!CanMoveToMask(pos, movemask, unit.MapLayer)) { // unreachable
+		return VisitResult_DeadEnd;
+	}
+
+	std::vector<CUnit *> table;
+	Vec2i minpos = pos - Vec2i(attackrange, attackrange);
+	Vec2i maxpos = pos + Vec2i(unit.Type->TileWidth - 1 + attackrange, unit.Type->TileHeight - 1 + attackrange);
+	Select(minpos, maxpos, table, unit.MapLayer, HasNotSamePlayerAs(Players[PlayerNumNeutral]));
+	for (size_t i = 0; i != table.size(); ++i) {
+		CUnit *dest = table[i];
+		const CUnitType &dtype = *dest->Type;
+
+		if (
+			(
+				!unit.IsEnemy(*dest) // a friend or neutral
+				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->Index == dest->Player->Index)
+			)
+			|| !CanTarget(*unit.Type, dtype)
+		) {
+			continue;
+		}
+
+		// Don't attack invulnerable units
+		if (dtype.BoolFlag[INDESTRUCTIBLE_INDEX].value || dest->Variable[UNHOLYARMOR_INDEX].Value) {
+			continue;
+		}
+		
+		if ((find_type != AIATTACK_BUILDING || dtype.BoolFlag[BUILDING_INDEX].value) && (find_type != AIATTACK_AGRESSIVE || dest->IsAgressive())) {
+			*result_unit = dest;
+			return VisitResult_Finished;
+		} else if (*result_unit == NULL) { // if trying to search for buildings or aggressive units specifically, still put the first found unit (even if it doesn't fit those parameters) as the result unit, so that it can be returned if no unit with the specified parameters is found
+			*result_unit = dest;
+		}
+	}
+
+	return VisitResult_Ok;
+}
+//Wyrmgus end
+
 template <const int FIND_TYPE>
 class AiForceEnemyFinder
 {
@@ -102,8 +172,25 @@ public:
 //			*enemy = AttackUnitsInReactRange(*unit);
 			*enemy = AttackUnitsInReactRange(*unit, HasNotSamePlayerAs(Players[PlayerNumNeutral]), IncludeNeutral);
 			//Wyrmgus end
+		//Wyrmgus start
+		} else {
+			TerrainTraversal terrainTraversal;
+
+			terrainTraversal.SetSize(Map.Info.MapWidths[unit->MapLayer], Map.Info.MapHeights[unit->MapLayer]);
+			terrainTraversal.Init();
+
+			terrainTraversal.PushUnitPosAndNeighboor(*unit);
+
+			CUnit *result_unit = NULL;
+
+			EnemyUnitFinder enemyUnitFinder(*unit, &result_unit, FIND_TYPE, IncludeNeutral);
+
+			terrainTraversal.Run(enemyUnitFinder);
+			*enemy = result_unit;
+		//Wyrmgus end
+		//Wyrmgus start
+		/*
 		} else if (FIND_TYPE == AIATTACK_ALLMAP) {
-			//Wyrmgus start
 //			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth);
 			*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
 			//Wyrmgus end
@@ -137,6 +224,8 @@ public:
 				*enemy = AttackUnitsInDistance(*unit, MaxMapWidth, HasNotSamePlayerAs(Players[PlayerNumNeutral]), false, IncludeNeutral);
 				//Wyrmgus end
 			}
+		*/
+		//Wyrmgus end
 		}
 		return *enemy == NULL;
 	}
