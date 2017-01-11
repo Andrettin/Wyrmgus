@@ -155,6 +155,9 @@
 #include "player.h"
 #include "script.h"
 #include "unit.h"
+//Wyrmgus start
+#include "unit_find.h"
+//Wyrmgus end
 #include "unit_manager.h"
 #include "unittype.h"
 #include "upgrade.h"
@@ -957,12 +960,25 @@ static void AiMoveUnitInTheWay(CUnit &unit)
 	movablenb = 0;
 
 	// Try to make some unit moves around it
-	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
-		CUnit &blocker = **it;
+	//Wyrmgus start
+	std::vector<CUnit *> table;
+	SelectAroundUnit(unit, 1, table);
+//	for (CUnitManager::Iterator it = UnitManager.begin(); it != UnitManager.end(); ++it) {
+	for (size_t i = 0; i != table.size(); ++i) {
+	//Wyrmgus end
+		//Wyrmgus start
+//		CUnit &blocker = **it;
+		CUnit &blocker = *table[i];
+		//Wyrmgus end
 
 		if (blocker.IsUnusable()) {
 			continue;
 		}
+		//Wyrmgus start
+		if (!blocker.IsIdle()) { // don't move units that aren't idle, as that will stop their current orders
+			continue;
+		}
+		//Wyrmgus end
 		if (!blocker.CanMove() || blocker.Moving) {
 			continue;
 		}
@@ -1067,16 +1083,15 @@ void AiCanNotMove(CUnit &unit)
 
 	AiPlayer = unit.Player->Ai;
 	//Wyrmgus start
-	/*
-	//Wyrmgus start
 //	if (PlaceReachable(unit, goalPos, gw, gh, 0, 255)) {
 	if (PlaceReachable(unit, goalPos, gw, gh, 0, 511, 0, unit.MapLayer)) {
 	//Wyrmgus end
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
+		//Wyrmgus start
+		unit.Wait = 10; // wait a bit before trying to move the unit again
+		//Wyrmgus end
 	}
-	*/
-	//Wyrmgus end
 }
 
 /**

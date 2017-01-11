@@ -383,15 +383,39 @@ private:
 
 VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i &pos, const Vec2i &from)
 {
+	//Wyrmgus start
+	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(*startUnit.Player)) { // don't pick unexplored positions
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
+	
+	//Wyrmgus start
+	if (!CanMoveToMask(pos, movemask, z)) { // unreachable, put this at the beginning to improve performance
+		return VisitResult_DeadEnd;
+	}
+	//Wyrmgus end
+	
 	const int minDist = 15;
 	//Wyrmgus start
 //	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist) == false
-	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist, z) == false
-	//Wyrmgus end
-		&& Distance(pos, startPos) <= abs(distance - minDist)) {
+//		&& Distance(pos, startPos) <= abs(distance - minDist)) {
+//		*resultPos = pos;
+//		return VisitResult_Finished;
+//	}
+	
+	if (AiEnemyUnitsInDistance(*startUnit.Player, NULL, pos, minDist, z) > 0) { // if there are enemies within the minimum distance here, then it is a dead end
+		return VisitResult_DeadEnd;
+	}
+	
+	if (Distance(pos, startPos) <= abs(distance - minDist)) {
 		*resultPos = pos;
 		return VisitResult_Finished;
 	}
+	//Wyrmgus end
+	
+	
+	//Wyrmgus start
+	/*
 	//Wyrmgus start
 //	if (CanMoveToMask(pos, movemask)) { // reachable
 	if (CanMoveToMask(pos, movemask, z)) { // reachable
@@ -400,6 +424,10 @@ VisitResult AiForceRallyPointFinder::Visit(TerrainTraversal &terrainTraversal, c
 	} else { // unreachable
 		return VisitResult_DeadEnd;
 	}
+	*/
+	
+	return VisitResult_Ok;
+	//Wyrmgus end
 }
 
 //Wyrmgus start
@@ -598,7 +626,10 @@ void AiForce::Attack(const Vec2i &pos, int z)
 		if (unit->Container == NULL) {
 			const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
-			unit->Wait = delay;
+			//Wyrmgus start
+//			unit->Wait = delay;
+			unit->Wait += delay;
+			//Wyrmgus end
 			if (unit->IsAgressive()) {
 				//Wyrmgus start
 //				CommandAttack(*unit, this->GoalPos,  NULL, FlushCommands);
@@ -1148,7 +1179,10 @@ void AiForce::Update()
 				CUnit &trans = *transporters[i];
 				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 				
-				trans.Wait = delay;
+				//Wyrmgus start
+//				trans.Wait = delay;
+				trans.Wait += delay;
+				//Wyrmgus end
 				//Wyrmgus start
 //				CommandUnload(trans, this->GoalPos, NULL, FlushCommands);
 				CommandUnload(trans, this->GoalPos, NULL, FlushCommands, this->GoalMapLayer);
@@ -1244,7 +1278,10 @@ void AiForce::Update()
 				CUnit &aiunit = *this->Units[i];
 				const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
-				aiunit.Wait = delay;
+				//Wyrmgus start
+//				aiunit.Wait = delay;
+				aiunit.Wait += delay;
+				//Wyrmgus end
 				if (aiunit.IsAgressive()) {
 					//Wyrmgus start
 //					CommandAttack(aiunit, this->GoalPos, NULL, FlushCommands);
@@ -1346,7 +1383,10 @@ void AiForce::Update()
 		CUnit &aiunit = *idleUnits[i];
 		const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
-		aiunit.Wait = delay;
+		//Wyrmgus start
+//		aiunit.Wait = delay;
+		aiunit.Wait += delay;
+		//Wyrmgus end
 		if (leader) {
 			if (aiunit.IsAgressive()) {
 				if (State == AiForceAttackingState_Attacking) {
@@ -1447,7 +1487,10 @@ void AiForceManager::Update()
 						if (unit->Container == NULL) {
 							const int delay = i / 5; // To avoid lot of CPU consuption, send them with a small time difference.
 
-							unit->Wait = delay;
+							//Wyrmgus start
+//							unit->Wait = delay;
+							unit->Wait += delay;
+							//Wyrmgus end
 							//Wyrmgus start
 //							if (unit->Type->CanAttack) {
 							if (unit->CanAttack() && unit->IsAgressive()) {
