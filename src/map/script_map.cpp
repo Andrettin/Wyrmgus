@@ -844,8 +844,8 @@ static int CclSetMapTemplateHero(lua_State *l)
 		LuaError(l, "Faction doesn't exist.\n");
 	}
 
-	Date start_date;
-	Date end_date;
+	CDate start_date;
+	CDate end_date;
 	start_date.year = 0;
 	start_date.month = 1;
 	start_date.day = 1;
@@ -872,7 +872,7 @@ static int CclSetMapTemplateHero(lua_State *l)
 		}
 	}
 	
-	map_template->Heroes.push_back(std::tuple<Vec2i, CCharacter *, CFaction *, Date, Date>(ipos, hero, faction, start_date, end_date));
+	map_template->Heroes.push_back(std::tuple<Vec2i, CCharacter *, CFaction *, CDate, CDate>(ipos, hero, faction, start_date, end_date));
 	
 	return 1;
 }

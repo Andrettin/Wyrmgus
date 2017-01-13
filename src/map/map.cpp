@@ -623,7 +623,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			continue;
 		}
 		
-		if ((!CurrentCampaign || std::get<3>(this->Units[i]) == 0 || CurrentCampaign->Date.year >= std::get<3>(this->Units[i])) && (std::get<4>(this->Units[i]) == 0 || CurrentCampaign->Date.year < std::get<4>(this->Units[i]))) {
+		if ((!CurrentCampaign || std::get<3>(this->Units[i]) == 0 || CurrentCampaign->StartDate.year >= std::get<3>(this->Units[i])) && (std::get<4>(this->Units[i]) == 0 || CurrentCampaign->StartDate.year < std::get<4>(this->Units[i]))) {
 			CPlayer *player = NULL;
 			if (std::get<2>(this->Units[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(this->Units[i]));
@@ -664,7 +664,7 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 			continue;
 		}
 		
-		if ((!CurrentCampaign || std::get<3>(this->Heroes[i]).year == 0 || CurrentCampaign->Date >= std::get<3>(this->Heroes[i])) && (std::get<4>(this->Heroes[i]).year == 0 || CurrentCampaign->Date < std::get<4>(this->Heroes[i]))) {
+		if ((!CurrentCampaign || std::get<3>(this->Heroes[i]).year == 0 || CurrentCampaign->StartDate >= std::get<3>(this->Heroes[i])) && (std::get<4>(this->Heroes[i]).year == 0 || CurrentCampaign->StartDate < std::get<4>(this->Heroes[i]))) {
 			CPlayer *player = NULL;
 			if (std::get<2>(this->Heroes[i])) {
 				player = GetOrAddFactionPlayer(std::get<2>(this->Heroes[i]));

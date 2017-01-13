@@ -251,12 +251,12 @@ enum Months {
 	MaxMonths
 };
 
-struct Date {
+struct CDate {
 	int year;
 	char month;
 	char day;
 	
-	bool operator <(const Date& rhs) {
+	bool operator <(const CDate& rhs) {
 		if (year < rhs.year) {
 			return true;
         } else if (year == rhs.year) {
@@ -270,7 +270,7 @@ struct Date {
 		return false;
 	}
 	
-	bool operator <=(const Date& rhs) {
+	bool operator <=(const CDate& rhs) {
 		if (year < rhs.year) {
 			return true;
         } else if (year == rhs.year) {
@@ -284,7 +284,7 @@ struct Date {
 		return false;
 	}
 	
-	bool operator >(const Date& rhs) {
+	bool operator >(const CDate& rhs) {
 		if (year > rhs.year) {
 			return true;
         } else if (year == rhs.year) {
@@ -298,7 +298,7 @@ struct Date {
 		return false;
 	}
 	
-	bool operator >=(const Date& rhs) {
+	bool operator >=(const CDate& rhs) {
 		if (year > rhs.year) {
 			return true;
         } else if (year == rhs.year) {
@@ -312,7 +312,7 @@ struct Date {
 		return false;
 	}
 	
-	bool operator ==(const Date& rhs) {
+	bool operator ==(const CDate& rhs) {
 		return year == rhs.year && month == rhs.month && day == rhs.day;
 	}
 };

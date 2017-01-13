@@ -461,12 +461,12 @@ static int CclDefineCampaign(lua_State *l)
 			campaign->Hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Sandbox")) {
 			campaign->Sandbox = LuaToBoolean(l, -1);
-		} else if (!strcmp(value, "Year")) {
-			campaign->Date.year = LuaToNumber(l, -1);
-		} else if (!strcmp(value, "Date")) {
-			campaign->Date.year = LuaToNumber(l, -1, 1);
-			campaign->Date.month = LuaToNumber(l, -1, 2);
-			campaign->Date.day = LuaToNumber(l, -1, 2);
+		} else if (!strcmp(value, "StartYear")) {
+			campaign->StartDate.year = LuaToNumber(l, -1);
+		} else if (!strcmp(value, "StartDate")) {
+			campaign->StartDate.year = LuaToNumber(l, -1, 1);
+			campaign->StartDate.month = LuaToNumber(l, -1, 2);
+			campaign->StartDate.day = LuaToNumber(l, -1, 2);
 		} else if (!strcmp(value, "StartEffects")) {
 			campaign->StartEffects = new LuaCallback(l, -1);
 		} else {
@@ -511,8 +511,8 @@ static int CclGetCampaignData(lua_State *l)
 	} else if (!strcmp(data, "Description")) {
 		lua_pushstring(l, campaign->Description.c_str());
 		return 1;
-	} else if (!strcmp(data, "Year")) {
-		lua_pushnumber(l, campaign->Date.year);
+	} else if (!strcmp(data, "StartYear")) {
+		lua_pushnumber(l, campaign->StartDate.year);
 		return 1;
 	} else if (!strcmp(data, "Civilization")) {
 		if (campaign->Civilization != -1) {
