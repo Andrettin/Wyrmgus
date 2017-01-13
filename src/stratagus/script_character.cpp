@@ -70,24 +70,27 @@ static int CclDefineCharacter(lua_State *l)
 
 	std::string character_ident = LuaToString(l, 1);
 	CCharacter *character = GetCharacter(character_ident);
+	bool redefinition = false;
 	if (!character) {
 		character = new CCharacter;
 		character->Ident = character_ident;
 		Characters[character_ident] = character;
+	} else {
+		redefinition = true;
 	}
 	
-	std::string faction_name;
+	std::string faction_ident;
 	
 	//  Parse the list:
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Name")) {
-			character->Name = TransliterateText(LuaToString(l, -1));
+			character->Name = LuaToString(l, -1);
 		} else if (!strcmp(value, "ExtraName")) {
-			character->ExtraName = TransliterateText(LuaToString(l, -1));
+			character->ExtraName = LuaToString(l, -1);
 		} else if (!strcmp(value, "FamilyName")) {
-			character->FamilyName = TransliterateText(LuaToString(l, -1));
+			character->FamilyName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Description")) {
 			character->Description = LuaToString(l, -1);
 		} else if (!strcmp(value, "Background")) {
@@ -128,7 +131,7 @@ static int CclDefineCharacter(lua_State *l)
 		} else if (!strcmp(value, "Civilization")) {
 			character->Civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Faction")) {
-			faction_name = LuaToString(l, -1);
+			faction_ident = LuaToString(l, -1);
 		} else if (!strcmp(value, "ProvinceOfOrigin")) {
 			character->ProvinceOfOriginName = LuaToString(l, -1);
 		} else if (!strcmp(value, "Father")) {
@@ -182,15 +185,6 @@ static int CclDefineCharacter(lua_State *l)
 				}
 			} else {
 				LuaError(l, "Character \"%s\" doesn't exist." _C_ mother_ident.c_str());
-			}
-		} else if (!strcmp(value, "DateReferenceCharacter")) {
-			std::string reference_character_ident = LuaToString(l, -1);
-			CCharacter *reference_character = GetCharacter(reference_character_ident);
-			if (reference_character) {
-				character->DateReferenceCharacter = const_cast<CCharacter *>(&(*reference_character));
-				reference_character->DateReferredCharacters.push_back(character);
-			} else {
-				LuaError(l, "Character \"%s\" doesn't exist." _C_ reference_character_ident.c_str());
 			}
 		} else if (!strcmp(value, "Gender")) {
 			character->Gender = GetGenderIdByName(LuaToString(l, -1));
@@ -440,57 +434,60 @@ static int CclDefineCharacter(lua_State *l)
 					character->HistoricalProvinceTitles.push_back(std::tuple<int, int, CProvince *, int>(start_year, end_year, title_province, title));
 				}
 			}
-		} else if (!strcmp(value, "Defined")) {
-			character->Defined = LuaToBoolean(l, -1);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
 	}
 	
-	if (character->Civilization != -1 && !faction_name.empty()) { //we have to set the faction here, because Lua tables are in an arbitrary order, and the character needs its civilization to have been set before it can find its faction
-		int faction = PlayerRaces.GetFactionIndexByName(character->Civilization, faction_name);
+	if (character->Civilization != -1 && !faction_ident.empty()) { //we have to set the faction here, because Lua tables are in an arbitrary order, and the character needs its civilization to have been set before it can find its faction
+		int faction = PlayerRaces.GetFactionIndexByName(character->Civilization, faction_ident);
 		if (faction != -1) {
 			character->Faction = faction;
 		} else {
-			LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_name.c_str());
+			LuaError(l, "Faction \"%s\" doesn't exist." _C_ faction_ident.c_str());
 		}
 	}
 	
-	if (character->Defined) { // only do the finalization of the character if it has been fully defined
-		if (character->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
-			if (character->Type != NULL && character->Type->Traits.size() == 1) {
-				character->Trait = character->Type->Traits[0];
-			}
-		}
-		
-		if (character->Gender == NoGender) { //if no gender was set, have the character be the same gender as the unit type (if the unit type has it predefined)
-			if (character->Type != NULL && character->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
-				character->Gender = character->Type->DefaultStat.Variables[GENDER_INDEX].Value;
-			}
-		}
-		
-		//check if the abilities are correct for this character's unit type
-		if (character->Type != NULL && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
-			int ability_count = (int) character->Abilities.size();
-			for (int i = (ability_count - 1); i >= 0; --i) {
-				if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
-					character->Abilities.erase(std::remove(character->Abilities.begin(), character->Abilities.end(), character->Abilities[i]), character->Abilities.end());
+	if (!redefinition) {
+		if (character->Type->BoolFlag[FAUNA_INDEX].value) {
+			character->Type->PersonalNames[character->Gender].push_back(character->Name);
+		} else if (character->Civilization != -1) {
+			int language = character->GetLanguage();
+			if (language == PlayerRaces.GetCivilizationLanguage(character->Civilization)) {
+				PlayerRaces.Civilizations[character->Civilization]->PersonalNames[character->Gender].push_back(character->Name);
+			} else if (character->Faction != -1) {
+				int base_faction = character->Faction;
+				while (PlayerRaces.Factions[character->Civilization][base_faction]->ParentFaction != -1) {
+					base_faction = PlayerRaces.Factions[character->Civilization][base_faction]->ParentFaction;
 				}
+				PlayerRaces.Factions[character->Civilization][base_faction]->PersonalNames[character->Gender].push_back(character->Name);
 			}
 		}
-
-		character->GenerateMissingData();
-			
-		// command to generate missing data for the parents, since those are defined before this character, and thus if this character has both dates set and nothing to estimate, otherwise the parents' dates wouldn't be affected
-		if (character->Father != NULL) {
-			character->Father->GenerateMissingData();
-		}
-		if (character->Mother != NULL) {
-			character->Mother->GenerateMissingData();
-		}
-		
-		character->UpdateAttributes();
 	}
+	
+	if (character->Trait == NULL) { //if no trait was set, have the character be the same trait as the unit type (if the unit type has a single one predefined)
+		if (character->Type != NULL && character->Type->Traits.size() == 1) {
+			character->Trait = character->Type->Traits[0];
+		}
+	}
+		
+	if (character->Gender == NoGender) { //if no gender was set, have the character be the same gender as the unit type (if the unit type has it predefined)
+		if (character->Type != NULL && character->Type->DefaultStat.Variables[GENDER_INDEX].Value != 0) {
+			character->Gender = character->Type->DefaultStat.Variables[GENDER_INDEX].Value;
+		}
+	}
+		
+	//check if the abilities are correct for this character's unit type
+	if (character->Type != NULL && character->Abilities.size() > 0 && ((int) AiHelpers.LearnableAbilities.size()) > character->Type->Slot) {
+		int ability_count = (int) character->Abilities.size();
+		for (int i = (ability_count - 1); i >= 0; --i) {
+			if (std::find(AiHelpers.LearnableAbilities[character->Type->Slot].begin(), AiHelpers.LearnableAbilities[character->Type->Slot].end(), character->Abilities[i]) == AiHelpers.LearnableAbilities[character->Type->Slot].end()) {
+				character->Abilities.erase(std::remove(character->Abilities.begin(), character->Abilities.end(), character->Abilities[i]), character->Abilities.end());
+			}
+		}
+	}
+
+	character->UpdateAttributes();
 	
 	return 0;
 }

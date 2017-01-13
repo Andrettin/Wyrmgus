@@ -505,6 +505,10 @@ public:
 	}
 	
 	~CFaction();
+	
+	std::map<int, std::vector<std::string>> &GetPersonalNames();
+	std::vector<std::string> &GetSettlementNames();
+	std::vector<std::string> &GetShipNames();
 
 	std::string Ident;													/// faction name
 	std::string Name;

@@ -2078,8 +2078,8 @@ std::string GrandStrategyWorldMapTile::GenerateSettlementName(int civilization, 
 		return this->FactionCulturalTerrainNames[std::pair<int,CFaction *>(this->Terrain, PlayerRaces.Factions[civilization][faction])][0];
 	}
 	
-	if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->SettlementNames.size() > 0) {
-		return PlayerRaces.Factions[civilization][faction]->SettlementNames[SyncRand(PlayerRaces.Factions[civilization][faction]->SettlementNames.size())];
+	if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size() > 0) {
+		return PlayerRaces.Factions[civilization][faction]->GetSettlementNames()[SyncRand(PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size())];
 	} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->SettlementNames.size() > 0) {
 		return PlayerRaces.Civilizations[civilization]->SettlementNames[SyncRand(PlayerRaces.Civilizations[civilization]->SettlementNames.size())];
 	}

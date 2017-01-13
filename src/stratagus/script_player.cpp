@@ -1978,40 +1978,6 @@ static int CclDefineFaction(lua_State *l)
 				}
 			}
 			
-			if (faction->Language == -1) {
-				if (faction->PersonalNames.size() == 0) {
-					for (std::map<int, std::vector<std::string>>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->PersonalNames.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->PersonalNames.end(); ++iterator) {
-						for (size_t i = 0; i < iterator->second.size(); ++i) {
-							faction->PersonalNames[iterator->first].push_back(iterator->second[i]);				
-						}
-					}
-				}
-
-				if (faction->FamilyNames.size() == 0) {
-					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->FamilyNames.size(); ++i) {
-						faction->FamilyNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->FamilyNames[i]);
-					}
-				}
-
-				if (faction->SettlementNames.size() == 0) {
-					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->SettlementNames.size(); ++i) {
-						faction->SettlementNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->SettlementNames[i]);
-					}
-				}
-
-				if (faction->ProvinceNames.size() == 0) {
-					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->ProvinceNames.size(); ++i) {
-						faction->ProvinceNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->ProvinceNames[i]);
-					}
-				}
-
-				if (faction->ShipNames.size() == 0) {
-					for (size_t i = 0; i < PlayerRaces.Factions[civilization][faction->ParentFaction]->ShipNames.size(); ++i) {
-						faction->ShipNames.push_back(PlayerRaces.Factions[civilization][faction->ParentFaction]->ShipNames[i]);
-					}
-				}
-			}
-			
 			for (std::map<std::string, int>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalTechnologies.end(); ++iterator) {
 				if (faction->HistoricalTechnologies.find(iterator->first) == faction->HistoricalTechnologies.end()) {
 					faction->HistoricalTechnologies[iterator->first] = iterator->second;

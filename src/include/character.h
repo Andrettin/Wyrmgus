@@ -106,9 +106,9 @@ class CCharacter
 public:
 	CCharacter() :
 		Year(0), DeathYear(0), Civilization(-1), Faction(-1), Gender(0), Level(0), ExperiencePercent(0),
-		ViolentDeath(false), Noble(false), Custom(false), Defined(false),
+		ViolentDeath(false), Custom(false),
 		Type(NULL), Trait(NULL), Deity(NULL),
-		Father(NULL), Mother(NULL), DateReferenceCharacter(NULL),
+		Father(NULL), Mother(NULL),
 		Conditions(NULL)
 	{
 		memset(Attributes, 0, sizeof(Attributes));
@@ -127,7 +127,6 @@ public:
 	std::string GetFullName() const;
 	IconConfig GetIcon();
 	CPersistentItem *GetItem(CUnit &item);
-	void GenerateMissingData();
 	void UpdateAttributes();
 
 	int Year;					/// Year in which the character historically starts being active
@@ -138,9 +137,7 @@ public:
 	int Level;					/// Character's level
 	int ExperiencePercent;		/// Character's experience, as a percentage of the experience required to level up
 	bool ViolentDeath;			/// If historical death was violent
-	bool Noble;
 	bool Custom;				/// Whether this character is a custom hero
-	bool Defined;				/// Whether this character has been fully defined
 	std::string Ident;			/// Ident of the character
 	std::string Name;			/// Given name of the character
 	std::string ExtraName;		/// Extra given names of the character (used if necessary to differentiate from existing heroes)
@@ -157,7 +154,6 @@ public:
 	CDeity *Deity;						/// The deity which the character is (if it is a deity)
 	CCharacter *Father;					/// Character's father
 	CCharacter *Mother;					/// Character's mother
-	CCharacter *DateReferenceCharacter;	/// Character used as a date reference for this character; i.e. if a dwarf was the contemporary of a human hero in a saga, make the hero a date reference for the dwarf, so that the dwarf will be generated in a similar date in Nidavellir
 	LuaCallback *Conditions;
 	std::vector<CPersistentItem *> EquippedItems[MaxItemSlots];	/// Equipped items of the character, per slot
 	std::vector<CCharacter *> Children;	/// Children of the character

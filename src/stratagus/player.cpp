@@ -773,6 +773,45 @@ CFaction::~CFaction()
 {
 	this->UIFillers.clear();
 }
+
+std::map<int, std::vector<std::string>> &CFaction::GetPersonalNames()
+{
+	if (this->PersonalNames.size() > 0) {
+		return this->PersonalNames;
+	}
+	
+	if (this->ParentFaction != -1 && this->Language == -1) {
+		return PlayerRaces.Factions[this->Civilization][this->ParentFaction]->GetPersonalNames();
+	}
+	
+	return this->PersonalNames;
+}
+
+std::vector<std::string> &CFaction::GetSettlementNames()
+{
+	if (this->SettlementNames.size() > 0) {
+		return this->SettlementNames;
+	}
+	
+	if (this->ParentFaction != -1 && this->Language == -1) {
+		return PlayerRaces.Factions[this->Civilization][this->ParentFaction]->GetSettlementNames();
+	}
+	
+	return this->SettlementNames;
+}
+
+std::vector<std::string> &CFaction::GetShipNames()
+{
+	if (this->ShipNames.size() > 0) {
+		return this->ShipNames;
+	}
+	
+	if (this->ParentFaction != -1 && this->Language == -1) {
+		return PlayerRaces.Factions[this->Civilization][this->ParentFaction]->GetShipNames();
+	}
+	
+	return this->ShipNames;
+}
 //Wyrmgus end
 
 /**
@@ -1447,8 +1486,8 @@ void CPlayer::SetFaction(CFaction *faction)
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
 	if (this->Faction != -1 && faction_id != -1) {
-		personal_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->PersonalNames != PlayerRaces.Factions[this->Race][faction_id]->PersonalNames;
-		ship_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->ShipNames != PlayerRaces.Factions[this->Race][faction_id]->ShipNames;
+		personal_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetPersonalNames() != PlayerRaces.Factions[this->Race][faction_id]->GetPersonalNames();
+		ship_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetShipNames() != PlayerRaces.Factions[this->Race][faction_id]->GetShipNames();
 	}
 	
 	this->Faction = faction_id;
