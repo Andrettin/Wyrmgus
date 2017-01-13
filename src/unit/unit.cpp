@@ -2074,7 +2074,7 @@ void CUnit::UpdateSoldUnits()
 		return;
 	}
 	
-	int sold_unit_max = 3;
+	int sold_unit_max = 4;
 	
 	for (int i = 0; i < sold_unit_max; ++i) {
 		CUnit *new_unit = NULL;
