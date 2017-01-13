@@ -2080,8 +2080,8 @@ std::string GrandStrategyWorldMapTile::GenerateSettlementName(int civilization, 
 	
 	if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size() > 0) {
 		return PlayerRaces.Factions[civilization][faction]->GetSettlementNames()[SyncRand(PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size())];
-	} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->SettlementNames.size() > 0) {
-		return PlayerRaces.Civilizations[civilization]->SettlementNames[SyncRand(PlayerRaces.Civilizations[civilization]->SettlementNames.size())];
+	} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->GetSettlementNames().size() > 0) {
+		return PlayerRaces.Civilizations[civilization]->GetSettlementNames()[SyncRand(PlayerRaces.Civilizations[civilization]->GetSettlementNames().size())];
 	}
 	
 	return "";
@@ -6424,15 +6424,15 @@ void InitializeGrandStrategyGame(bool show_loading)
 		settlement_graphics_file += ".png";
 		
 		int file_civilization = i;
-		while (!CanAccessFile(settlement_graphics_file.c_str()) && PlayerRaces.ParentCivilization[file_civilization] != -1) {
-			settlement_graphics_file = FindAndReplaceString(settlement_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.ParentCivilization[file_civilization]]);
-			file_civilization = PlayerRaces.ParentCivilization[file_civilization];
+		while (!CanAccessFile(settlement_graphics_file.c_str()) && PlayerRaces.Civilizations[file_civilization]->ParentCivilization != -1) {
+			settlement_graphics_file = FindAndReplaceString(settlement_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.Civilizations[file_civilization]->ParentCivilization]);
+			file_civilization = PlayerRaces.Civilizations[file_civilization]->ParentCivilization;
 		}
 		
 		file_civilization = i;
-		while (!CanAccessFile(settlement_masonry_graphics_file.c_str()) && PlayerRaces.ParentCivilization[file_civilization] != -1) {
-			settlement_masonry_graphics_file = FindAndReplaceString(settlement_masonry_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.ParentCivilization[file_civilization]]);
-			file_civilization = PlayerRaces.ParentCivilization[file_civilization];
+		while (!CanAccessFile(settlement_masonry_graphics_file.c_str()) && PlayerRaces.Civilizations[file_civilization]->ParentCivilization != -1) {
+			settlement_masonry_graphics_file = FindAndReplaceString(settlement_masonry_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.Civilizations[file_civilization]->ParentCivilization]);
+			file_civilization = PlayerRaces.Civilizations[file_civilization]->ParentCivilization;
 		}
 		
 		if (CanAccessFile(settlement_graphics_file.c_str())) {
@@ -6455,9 +6455,9 @@ void InitializeGrandStrategyGame(bool show_loading)
 		barracks_graphics_file += "_barracks.png";
 		
 		file_civilization = i;
-		while (!CanAccessFile(barracks_graphics_file.c_str()) && PlayerRaces.ParentCivilization[file_civilization] != -1) {
-			barracks_graphics_file = FindAndReplaceString(barracks_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.ParentCivilization[file_civilization]]);
-			file_civilization = PlayerRaces.ParentCivilization[file_civilization];
+		while (!CanAccessFile(barracks_graphics_file.c_str()) && PlayerRaces.Civilizations[file_civilization]->ParentCivilization != -1) {
+			barracks_graphics_file = FindAndReplaceString(barracks_graphics_file, PlayerRaces.Name[file_civilization], PlayerRaces.Name[PlayerRaces.Civilizations[file_civilization]->ParentCivilization]);
+			file_civilization = PlayerRaces.Civilizations[file_civilization]->ParentCivilization;
 		}
 		
 		if (CanAccessFile(barracks_graphics_file.c_str())) {

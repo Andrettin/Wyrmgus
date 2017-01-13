@@ -2905,8 +2905,8 @@ void CUnit::UpdateSettlementName()
 				this->SettlementName = new_settlement_name;
 			} else if (civilization != -1 && faction != -1 && PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size() > 0) {
 				this->SettlementName = PlayerRaces.Factions[civilization][faction]->GetSettlementNames()[SyncRand(PlayerRaces.Factions[civilization][faction]->GetSettlementNames().size())];
-			} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->SettlementNames.size() > 0) {
-				this->SettlementName = PlayerRaces.Civilizations[civilization]->SettlementNames[SyncRand(PlayerRaces.Civilizations[civilization]->SettlementNames.size())];
+			} else if (civilization != -1 && PlayerRaces.Civilizations[civilization]->GetSettlementNames().size() > 0) {
+				this->SettlementName = PlayerRaces.Civilizations[civilization]->GetSettlementNames()[SyncRand(PlayerRaces.Civilizations[civilization]->GetSettlementNames().size())];
 			}
 		}
 		

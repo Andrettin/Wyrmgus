@@ -812,7 +812,7 @@ static int CclDefineCivilization(lua_State *l)
 		} else if (!strcmp(value, "Species")) {
 			PlayerRaces.Species[civilization_id] = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentCivilization")) {
-			PlayerRaces.ParentCivilization[civilization_id] = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
+			civilization->ParentCivilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Language")) {
 			int language = PlayerRaces.GetLanguageIndexByIdent(LuaToString(l, -1));
 			if (language != -1) {
@@ -941,8 +941,8 @@ static int CclDefineCivilization(lua_State *l)
 		}
 	}
 	
-	if (PlayerRaces.ParentCivilization[civilization_id] != -1) {
-		int parent_civilization = PlayerRaces.ParentCivilization[civilization_id];
+	if (civilization->ParentCivilization != -1) {
+		int parent_civilization = civilization->ParentCivilization;
 
 		if (PlayerRaces.CivilizationUpgrades[civilization_id].empty() && !PlayerRaces.CivilizationUpgrades[parent_civilization].empty()) { //if the civilization has no civilization upgrade, inherit that of its parent civilization
 			PlayerRaces.CivilizationUpgrades[civilization_id] = PlayerRaces.CivilizationUpgrades[parent_civilization];
@@ -952,38 +952,6 @@ static int CclDefineCivilization(lua_State *l)
 		for (std::map<int, IconConfig>::iterator iterator = PlayerRaces.ButtonIcons[parent_civilization].begin(); iterator != PlayerRaces.ButtonIcons[parent_civilization].end(); ++iterator) {
 			if (PlayerRaces.ButtonIcons[civilization_id].find(iterator->first) == PlayerRaces.ButtonIcons[civilization_id].end()) {
 				PlayerRaces.ButtonIcons[civilization_id][iterator->first] = iterator->second;
-			}
-		}
-		
-		if (civilization->PersonalNames.size() == 0) {
-			for (std::map<int, std::vector<std::string>>::iterator iterator = PlayerRaces.Civilizations[parent_civilization]->PersonalNames.begin(); iterator != PlayerRaces.Civilizations[parent_civilization]->PersonalNames.end(); ++iterator) {
-				for (size_t i = 0; i < iterator->second.size(); ++i) {
-					civilization->PersonalNames[iterator->first].push_back(iterator->second[i]);				
-				}
-			}
-		}
-
-		if (civilization->FamilyNames.size() == 0) {
-			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->FamilyNames.size(); ++i) {
-				civilization->FamilyNames.push_back(PlayerRaces.Civilizations[parent_civilization]->FamilyNames[i]);
-			}
-		}
-
-		if (civilization->SettlementNames.size() == 0) {
-			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->SettlementNames.size(); ++i) {
-				civilization->SettlementNames.push_back(PlayerRaces.Civilizations[parent_civilization]->SettlementNames[i]);
-			}
-		}
-
-		if (civilization->ProvinceNames.size() == 0) {
-			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->ProvinceNames.size(); ++i) {
-				civilization->ProvinceNames.push_back(PlayerRaces.Civilizations[parent_civilization]->ProvinceNames[i]);
-			}
-		}
-
-		if (civilization->ShipNames.size() == 0) {
-			for (size_t i = 0; i < PlayerRaces.Civilizations[parent_civilization]->ShipNames.size(); ++i) {
-				civilization->ShipNames.push_back(PlayerRaces.Civilizations[parent_civilization]->ShipNames[i]);
 			}
 		}
 		
@@ -1440,7 +1408,7 @@ static int CclGetCivilizationData(lua_State *l)
 		lua_pushstring(l, PlayerRaces.Species[civilization_id].c_str());
 		return 1;
 	} else if (!strcmp(data, "ParentCivilization")) {
-		int parent_civilization = PlayerRaces.ParentCivilization[civilization_id];
+		int parent_civilization = civilization->ParentCivilization;
 		if (parent_civilization != -1) {
 			lua_pushstring(l, PlayerRaces.Name[parent_civilization].c_str());
 		} else {

@@ -944,8 +944,14 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 	if (potential_names.size() == 0 && this->Civilization != -1) {
 		int civilization_id = this->Civilization;
 		if (civilization_id != -1) {
+			if (faction && civilization_id != faction->Civilization && PlayerRaces.Species[civilization_id] == PlayerRaces.Species[faction->Civilization]) {
+				civilization_id = faction->Civilization;
+			}
 			CCivilization *civilization = PlayerRaces.Civilizations[civilization_id];
-			if (this->Faction != -1 && (!faction || faction->Civilization != civilization_id)) {
+			if (faction && faction->Civilization != civilization_id) {
+				faction = NULL;
+			}
+			if (this->Faction != -1 && !faction) {
 				faction = PlayerRaces.Factions[civilization_id][this->Faction];
 			}
 			
@@ -964,14 +970,14 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 				}
 				
 				if (potential_names.size() == 0) {
-					if (civilization->PersonalNames.find(NoGender) != civilization->PersonalNames.end()) {
-						for (size_t i = 0; i < civilization->PersonalNames.find(NoGender)->second.size(); ++i) {
-							potential_names.push_back(civilization->PersonalNames.find(NoGender)->second[i]);
+					if (civilization->GetPersonalNames().find(NoGender) != civilization->GetPersonalNames().end()) {
+						for (size_t i = 0; i < civilization->GetPersonalNames().find(NoGender)->second.size(); ++i) {
+							potential_names.push_back(civilization->GetPersonalNames().find(NoGender)->second[i]);
 						}
 					}
-					if (gender != -1 && gender != NoGender && civilization->PersonalNames.find(gender) != civilization->PersonalNames.end()) {
-						for (size_t i = 0; i < civilization->PersonalNames.find(gender)->second.size(); ++i) {
-							potential_names.push_back(civilization->PersonalNames.find(gender)->second[i]);
+					if (gender != -1 && gender != NoGender && civilization->GetPersonalNames().find(gender) != civilization->GetPersonalNames().end()) {
+						for (size_t i = 0; i < civilization->GetPersonalNames().find(gender)->second.size(); ++i) {
+							potential_names.push_back(civilization->GetPersonalNames().find(gender)->second[i]);
 						}
 					}
 				}
@@ -980,8 +986,8 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 					return faction->GetShipNames()[SyncRand(faction->GetShipNames().size())];
 				}
 				
-				if (civilization->ShipNames.size() > 0) {
-					return civilization->ShipNames[SyncRand(civilization->ShipNames.size())];
+				if (civilization->GetShipNames().size() > 0) {
+					return civilization->GetShipNames()[SyncRand(civilization->GetShipNames().size())];
 				}
 			}
 		}

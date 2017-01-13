@@ -863,7 +863,7 @@ void PlayMusicByGroupAndFactionRandom(const std::string &group, const std::strin
 			int parent_civilization = -1;
 			if (civilization != -1) {
 				while (true) {
-					parent_civilization = PlayerRaces.ParentCivilization[civilization];
+					parent_civilization = PlayerRaces.Civilizations[civilization]->ParentCivilization;
 					if (parent_civilization == -1) {
 						break;
 					}

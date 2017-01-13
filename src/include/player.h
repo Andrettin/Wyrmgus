@@ -468,13 +468,17 @@ class CCivilization
 {
 public:
 	CCivilization() :
-		ID(-1), CalendarStartingYear(0)
+		ID(-1), ParentCivilization(-1), CalendarStartingYear(0)
 	{
 	}
 	
 	std::string GetMonthName(int month);
+	std::map<int, std::vector<std::string>> &GetPersonalNames();
+	std::vector<std::string> &GetSettlementNames();
+	std::vector<std::string> &GetShipNames();
 	
 	int ID;
+	int ParentCivilization;
 	int CalendarStartingYear;
 	std::string Ident;			/// Ident of the civilization
 	std::string Description;	/// civilization description
@@ -702,9 +706,6 @@ public:
 	{
 		memset(Visible, 0, sizeof(Visible));
 		//Wyrmgus start
-		for (int i = 0; i < MAX_RACES; ++i) {
-			ParentCivilization[i] = -1;
-		}
 		memset(Playable, 0, sizeof(Playable));
 		memset(CivilizationLanguage, -1, sizeof(CivilizationLanguage));
 		//Wyrmgus end
@@ -739,7 +740,6 @@ public:
 	std::string Species[MAX_RACES];										/// civilization's species (i.e. human)
 	std::string DefaultColor[MAX_RACES];								/// name of the civilization's default color (used for the encyclopedia, tech tree, etc.)
 	std::string CivilizationUpgrades[MAX_RACES];
-	int ParentCivilization[MAX_RACES];									/// civilization's parent civilization, if any
 	std::map<int, int> CivilizationClassUnitTypes[MAX_RACES];			/// the unit type slot of a particular class for a particular civilization
 	std::map<int, int> CivilizationClassUpgrades[MAX_RACES];			/// the upgrade slot of a particular class for a particular civilization
 	std::map<int, IconConfig> ButtonIcons[MAX_RACES];					/// icons for button actions

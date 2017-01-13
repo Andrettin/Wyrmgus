@@ -421,7 +421,6 @@ void PlayerRace::Clean()
 		this->Playable[i] = false;
 		this->Species[i].clear();
 		this->DefaultColor[i].clear();
-		this->ParentCivilization[i] = -1;
 		this->CivilizationLanguage[i] = -1;
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			delete this->Factions[i][j];
@@ -564,8 +563,8 @@ int PlayerRace::GetCivilizationClassUnitType(int civilization, int class_id)
 		return CivilizationClassUnitTypes[civilization][class_id];
 	}
 	
-	if (PlayerRaces.ParentCivilization[civilization] != -1) {
-		return GetCivilizationClassUnitType(PlayerRaces.ParentCivilization[civilization], class_id);
+	if (PlayerRaces.Civilizations[civilization]->ParentCivilization != -1) {
+		return GetCivilizationClassUnitType(PlayerRaces.Civilizations[civilization]->ParentCivilization, class_id);
 	}
 	
 	return -1;
@@ -581,8 +580,8 @@ int PlayerRace::GetCivilizationClassUpgrade(int civilization, int class_id)
 		return CivilizationClassUpgrades[civilization][class_id];
 	}
 	
-	if (PlayerRaces.ParentCivilization[civilization] != -1) {
-		return GetCivilizationClassUpgrade(PlayerRaces.ParentCivilization[civilization], class_id);
+	if (PlayerRaces.Civilizations[civilization]->ParentCivilization != -1) {
+		return GetCivilizationClassUpgrade(PlayerRaces.Civilizations[civilization]->ParentCivilization, class_id);
 	}
 	
 	return -1;
@@ -636,8 +635,8 @@ int PlayerRace::GetCivilizationLanguage(int civilization)
 		return CivilizationLanguage[civilization];
 	}
 	
-	if (PlayerRaces.ParentCivilization[civilization] != -1) {
-		return GetCivilizationLanguage(PlayerRaces.ParentCivilization[civilization]);
+	if (PlayerRaces.Civilizations[civilization]->ParentCivilization != -1) {
+		return GetCivilizationLanguage(PlayerRaces.Civilizations[civilization]->ParentCivilization);
 	}
 	
 	return -1;
@@ -672,8 +671,8 @@ std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
 		return CivilizationUIFillers[civilization];
 	}
 	
-	if (PlayerRaces.ParentCivilization[civilization] != -1) {
-		return GetCivilizationUIFillers(PlayerRaces.ParentCivilization[civilization]);
+	if (PlayerRaces.Civilizations[civilization]->ParentCivilization != -1) {
+		return GetCivilizationUIFillers(PlayerRaces.Civilizations[civilization]->ParentCivilization);
 	}
 	
 	return std::vector<CFiller>();
@@ -769,6 +768,45 @@ std::string CCivilization::GetMonthName(int month)
 	return CapitalizeString(GetMonthNameById(month));
 }
 
+std::map<int, std::vector<std::string>> &CCivilization::GetPersonalNames()
+{
+	if (this->PersonalNames.size() > 0) {
+		return this->PersonalNames;
+	}
+	
+	if (this->ParentCivilization != -1) {
+		return PlayerRaces.Civilizations[this->ParentCivilization]->GetPersonalNames();
+	}
+	
+	return this->PersonalNames;
+}
+
+std::vector<std::string> &CCivilization::GetSettlementNames()
+{
+	if (this->SettlementNames.size() > 0) {
+		return this->SettlementNames;
+	}
+	
+	if (this->ParentCivilization != -1) {
+		return PlayerRaces.Civilizations[this->ParentCivilization]->GetSettlementNames();
+	}
+	
+	return this->SettlementNames;
+}
+
+std::vector<std::string> &CCivilization::GetShipNames()
+{
+	if (this->ShipNames.size() > 0) {
+		return this->ShipNames;
+	}
+	
+	if (this->ParentCivilization != -1) {
+		return PlayerRaces.Civilizations[this->ParentCivilization]->GetShipNames();
+	}
+	
+	return this->ShipNames;
+}
+
 CFaction::~CFaction()
 {
 	this->UIFillers.clear();
@@ -780,9 +818,11 @@ std::map<int, std::vector<std::string>> &CFaction::GetPersonalNames()
 		return this->PersonalNames;
 	}
 	
-	if (this->ParentFaction != -1 && this->Language == -1) {
+	if (this->ParentFaction != -1) {
 		return PlayerRaces.Factions[this->Civilization][this->ParentFaction]->GetPersonalNames();
 	}
+	
+	return PlayerRaces.Civilizations[this->Civilization]->GetPersonalNames();
 	
 	return this->PersonalNames;
 }
@@ -793,11 +833,11 @@ std::vector<std::string> &CFaction::GetSettlementNames()
 		return this->SettlementNames;
 	}
 	
-	if (this->ParentFaction != -1 && this->Language == -1) {
+	if (this->ParentFaction != -1) {
 		return PlayerRaces.Factions[this->Civilization][this->ParentFaction]->GetSettlementNames();
 	}
 	
-	return this->SettlementNames;
+	return PlayerRaces.Civilizations[this->Civilization]->GetSettlementNames();
 }
 
 std::vector<std::string> &CFaction::GetShipNames()
@@ -806,11 +846,11 @@ std::vector<std::string> &CFaction::GetShipNames()
 		return this->ShipNames;
 	}
 	
-	if (this->ParentFaction != -1 && this->Language == -1) {
+	if (this->ParentFaction != -1) {
 		return PlayerRaces.Factions[this->Civilization][this->ParentFaction]->GetShipNames();
 	}
 	
-	return this->ShipNames;
+	return PlayerRaces.Civilizations[this->Civilization]->GetShipNames();
 }
 //Wyrmgus end
 
@@ -1485,9 +1525,11 @@ void CPlayer::SetFaction(CFaction *faction)
 	
 	bool personal_names_changed = true;
 	bool ship_names_changed = true;
+	bool settlement_names_changed = true;
 	if (this->Faction != -1 && faction_id != -1) {
 		personal_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetPersonalNames() != PlayerRaces.Factions[this->Race][faction_id]->GetPersonalNames();
 		ship_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetShipNames() != PlayerRaces.Factions[this->Race][faction_id]->GetShipNames();
+		settlement_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetSettlementNames() != PlayerRaces.Factions[this->Race][faction_id]->GetSettlementNames();
 	}
 	
 	this->Faction = faction_id;
@@ -1534,10 +1576,13 @@ void CPlayer::SetFaction(CFaction *faction)
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (!unit.Character && unit.Type->PersonalNames.size() == 0) {
+		if (!unit.Character && !unit.Unique && unit.Type->PersonalNames.size() == 0) {
 			if ((unit.Type->BoolFlag[ORGANIC_INDEX].value && personal_names_changed) || (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeNaval) && ship_names_changed) {
 				unit.UpdatePersonalName();
 			}
+		}
+		if (unit.Type->BoolFlag[TOWNHALL_INDEX].value && !unit.Unique) {
+			unit.UpdateSettlementName();
 		}
 		unit.UpdateButtonIcons();
 	}
