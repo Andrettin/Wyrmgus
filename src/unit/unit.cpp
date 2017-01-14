@@ -871,6 +871,8 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	
 	if (this->Character->Trait != NULL) { //set trait
 		TraitAcquire(*this, this->Character->Trait);
+	} else if (Editor.Running == EditorNotRunning && this->Type->Traits.size() > 0) {
+		TraitAcquire(*this, this->Type->Traits[SyncRand(this->Type->Traits.size())]);
 	}
 	
 	if (this->Character->Deity != NULL && this->Character->Deity->CharacterUpgrade != NULL) {
