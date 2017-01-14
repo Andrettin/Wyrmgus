@@ -1118,11 +1118,13 @@ static void HandleMouseOn(const PixelPos screenPos)
 		return;
 	}
 	
-	if (UI.CustomHeroUnitButton && UI.CustomHeroUnitButton->Contains(screenPos) && ThisPlayer->CustomHeroUnit) {
-		ButtonAreaUnderCursor = ButtonAreaCustomHeroUnit;
-		ButtonUnderCursor = 0;
-		CursorOn = CursorOnButton;
-		return;
+	for (int i = 0; i < PlayerHeroMax; ++i) {
+		if (UI.HeroUnitButtons[i] && UI.HeroUnitButtons[i]->Contains(screenPos) && (int) ThisPlayer->Heroes.size() > i) {
+			ButtonAreaUnderCursor = ButtonAreaHeroUnit;
+			ButtonUnderCursor = i;
+			CursorOn = CursorOnButton;
+			return;
+		}
 	}
 	//Wyrmgus end
 	
@@ -2580,11 +2582,9 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
 				UiFindLevelUpUnit();
 			}
-		} else if (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit) {
-			if (ButtonUnderCursor == 0) {
-				PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
-				UiFindCustomHeroUnit();
-			}
+		} else if (ButtonAreaUnderCursor == ButtonAreaHeroUnit) {
+			PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);
+			UiFindHeroUnit(ButtonUnderCursor);
 		//Wyrmgus end
 		}
 	}

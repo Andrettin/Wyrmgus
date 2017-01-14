@@ -493,7 +493,7 @@ bool COrder_Build::StartBuilding(CUnit &unit, CUnit &ontop)
 	if (build->Character == NULL) {
 		build->Player->UnitTypesNonHeroCount[type.Slot]--;
 	} else {
-		build->Player->Heroes.erase(std::remove(build->Player->Heroes.begin(), build->Player->Heroes.end(), build->Character->Ident), build->Player->Heroes.end());
+		build->Player->Heroes.erase(std::remove(build->Player->Heroes.begin(), build->Player->Heroes.end(), build), build->Player->Heroes.end());
 	}
 	
 	if (build->Player->AiEnabled && build->Player->Ai && std::find(build->Player->Ai->Scouts.begin(), build->Player->Ai->Scouts.end(), build) != build->Player->Ai->Scouts.end()) {

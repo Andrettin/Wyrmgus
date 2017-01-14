@@ -1713,7 +1713,6 @@ void CPlayer::Clear()
 	memset(UnitTypesNonHeroCount, 0, sizeof(UnitTypesNonHeroCount));
 	memset(UnitTypesStartingNonHeroCount, 0, sizeof(UnitTypesStartingNonHeroCount));
 	this->Heroes.clear();
-	this->AvailableHeroes.clear();
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();
@@ -1756,9 +1755,6 @@ void CPlayer::Clear()
 	LostTownHallTimer = 0;
 	//Wyrmgus end
 	Color = 0;
-	//Wyrmgus start
-	CustomHeroUnit = NULL;
-	//Wyrmgus end
 	UpgradeTimers.Clear();
 	for (int i = 0; i < MaxCosts; ++i) {
 		SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
@@ -1834,30 +1830,6 @@ void CPlayer::UpdateLevelUpUnits()
 		if (unit.IsAlive() && unit.Variable[LEVELUP_INDEX].Value >= 1) {
 			LevelUpUnits.push_back(&unit);
 		}
-	}
-}
-
-void CPlayer::UpdateHeroPool()
-{
-	if (CurrentCampaign == NULL) { // hero recruitment only while playing the campaign mode
-		return;
-	}
-	
-	this->AvailableHeroes.clear();
-	
-	std::vector<CCharacter *> potential_heroes;
-	
-	for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
-		potential_heroes.push_back(iterator->second);
-	}
-	
-	for (int i = 0; i < 1; ++i) { // fill the hero pool with up to one hero
-		if (potential_heroes.size() == 0) {
-			break;
-		}
-		this->AvailableHeroes.push_back(potential_heroes[SyncRand(potential_heroes.size())]);
-		int available_hero_quantity = this->AvailableHeroes.size();
-		potential_heroes.erase(std::remove(potential_heroes.begin(), potential_heroes.end(), this->AvailableHeroes[available_hero_quantity - 1]), potential_heroes.end());
 	}
 }
 
@@ -2107,7 +2079,7 @@ bool CPlayer::HasCompletedQuest(CQuest *quest)
 std::string CPlayer::HasFailedQuest(CQuest *quest) // returns the reason for failure (empty if none)
 {
 	for (size_t i = 0; i < quest->HeroesMustSurvive.size(); ++i) { // put it here, because "unfailable" quests should also fail when a hero which should survive dies
-		if (std::find(this->Heroes.begin(), this->Heroes.end(), quest->HeroesMustSurvive[i]->Ident) == this->Heroes.end()) {
+		if (!this->HasHero(quest->HeroesMustSurvive[i])) {
 			return "A hero necessary for the quest has died.";
 		}
 	}
@@ -2599,7 +2571,6 @@ void PlayersEachMinute(int playerIdx)
 {
 	CPlayer &player = Players[playerIdx];
 
-//	player.UpdateHeroPool();
 	player.UpdateQuestPool(); // every minute, update the quest pool
 }
 //Wyrmgus end
@@ -2985,6 +2956,17 @@ bool CPlayer::IsTeamed(const CUnit &unit) const
 bool CPlayer::HasContactWith(const CPlayer &player) const
 {
 	return player.StartMapLayer == this->StartMapLayer || (Map.Worlds[player.StartMapLayer] == Map.Worlds[this->StartMapLayer] && Map.Planes[player.StartMapLayer] == Map.Planes[this->StartMapLayer]);
+}
+
+bool CPlayer::HasHero(const CCharacter *hero) const
+{
+	for (size_t i = 0; i < this->Heroes.size(); ++i) {
+		if (this->Heroes[i]->Character == hero) {
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 void SetCivilizationStringToIndex(std::string civilization_name, int civilization_id)

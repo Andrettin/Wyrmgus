@@ -144,7 +144,7 @@ CUserInterface::CUserInterface() :
 	SingleTrainingFont(NULL), SingleTrainingTextX(0), SingleTrainingTextY(0),
 	TrainingFont(NULL), TrainingTextX(0), TrainingTextY(0),
 	//Wyrmgus start
-	IdleWorkerButton(NULL), LevelUpUnitButton(NULL), CustomHeroUnitButton(NULL),
+	IdleWorkerButton(NULL), LevelUpUnitButton(NULL),
 	//Wyrmgus end
 	CompletedBarColor(0), CompletedBarShadow(0),
 	ViewportMode(VIEWPORT_SINGLE), MouseViewport(NULL),
@@ -174,6 +174,10 @@ CUserInterface::CUserInterface() :
 
 	NormalFontColor = "light-blue";
 	ReverseFontColor = "yellow";
+	
+	//Wyrmgus start
+	memset(HeroUnitButtons, 0, sizeof(HeroUnitButtons));
+	//Wyrmgus end
 }
 
 /**
@@ -424,7 +428,9 @@ void CleanUserInterface()
 	//Wyrmgus start
 	delete UI.IdleWorkerButton;
 	delete UI.LevelUpUnitButton;
-	delete UI.CustomHeroUnitButton;
+	for (int i = 0; i < PlayerHeroMax; ++i) {
+		delete UI.HeroUnitButtons[i];
+	}
 	UI.InventoryButtons.clear();
 	//Wyrmgus end
 	UI.UserButtons.clear();

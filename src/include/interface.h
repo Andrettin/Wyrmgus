@@ -144,7 +144,7 @@ enum _button_area_ {
 	//Wyrmgus start
 	ButtonAreaIdleWorker,	 /// Idle worker button
 	ButtonAreaLevelUpUnit,	 /// Level up unit button
-	ButtonAreaCustomHeroUnit,	 /// Custom hero unit button
+	ButtonAreaHeroUnit,		 /// Hero unit button
 	ButtonAreaInventory,  /// Transporting button
 	//Wyrmgus end
 	ButtonAreaUser           /// User buttons
@@ -378,7 +378,7 @@ extern void UiFindIdleWorker();
 /// Find the next level up unit
 extern void UiFindLevelUpUnit();
 /// Find custom hero
-extern void UiFindCustomHeroUnit();
+extern void UiFindHeroUnit(int hero_index);
 //Wyrmgus end
 /// Track unit, the viewport follows the unit.
 extern void UiTrackUnit();

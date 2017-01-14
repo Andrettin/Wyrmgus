@@ -927,15 +927,17 @@ void DrawPopups()
 		}
 	}
 
-	if (UI.CustomHeroUnitButton && ThisPlayer->CustomHeroUnit) {
-		if (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit && ButtonUnderCursor == 0) { //if the mouse is hovering over the level up unit button, draw a tooltip
-			std::string custom_hero_unit_tooltip = _("Find");
-			custom_hero_unit_tooltip += " " + ThisPlayer->CustomHeroUnit->GetMessageName();
-			if (!Preference.NoStatusLineTooltips) {
-				CLabel label(GetGameFont());
-				label.Draw(2 + 16, Video.Height + 2 - 16, custom_hero_unit_tooltip);
+	for (int i = 0; i < PlayerHeroMax; ++i) {
+		if (UI.HeroUnitButtons[i] && (int) ThisPlayer->Heroes.size() > i) {
+			if (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) { //if the mouse is hovering over the level up unit button, draw a tooltip
+				std::string custom_hero_unit_tooltip = _("Select");
+				custom_hero_unit_tooltip += " " + ThisPlayer->Heroes[i]->GetMessageName();
+				if (!Preference.NoStatusLineTooltips) {
+					CLabel label(GetGameFont());
+					label.Draw(2 + 16, Video.Height + 2 - 16, custom_hero_unit_tooltip);
+				}
+				DrawGenericPopup(custom_hero_unit_tooltip, UI.HeroUnitButtons[i]->X, UI.HeroUnitButtons[i]->Y);
 			}
-			DrawGenericPopup(custom_hero_unit_tooltip, UI.CustomHeroUnitButton->X, UI.CustomHeroUnitButton->Y);
 		}
 	}
 		

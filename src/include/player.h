@@ -147,8 +147,7 @@ public:
 	//Wyrmgus start
 	int UnitTypesNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character
 	int UnitTypesStartingNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character and which are starting units
-	std::vector<std::string> Heroes;			/// characters owned by this player
-	std::vector<CCharacter *> AvailableHeroes;		/// heroes available to this player
+	std::vector<CUnit *> Heroes;					/// hero units owned by this player
 	std::vector<CQuest *> AvailableQuests;		/// quests available to this player
 	std::vector<CQuest *> CurrentQuests;		/// quests being pursued by this player
 	std::vector<CQuest *> CompletedQuests;		/// quests completed by this player
@@ -199,7 +198,6 @@ public:
 	std::vector<CUnit *> FreeWorkers;	/// Container for free workers
 	//Wyrmgus start
 	std::vector<CUnit *> LevelUpUnits;	/// Container for units with available level up upgrades
-	CUnit *CustomHeroUnit;
 	//Wyrmgus end
 
 	// Upgrades/Allows:
@@ -233,7 +231,6 @@ public:
 	void UpdateFreeWorkers();
 	//Wyrmgus start
 	void UpdateLevelUpUnits();
-	void UpdateHeroPool();
 	void UpdateQuestPool();
 	void AvailableQuestsChanged();
 	void UpdateCurrentQuests();
@@ -313,6 +310,7 @@ public:
 	bool IsTeamed(const CUnit &unit) const;
 	//Wyrmgus start
 	bool HasContactWith(const CPlayer &player) const;
+	bool HasHero(const CCharacter *hero) const;
 	//Wyrmgus end
 
 	void SetDiplomacyNeutralWith(const CPlayer &player);

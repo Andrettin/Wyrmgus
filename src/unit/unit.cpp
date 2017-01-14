@@ -823,11 +823,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			this->Player->UnitTypesStartingNonHeroCount[this->Type->Slot]--;
 		}
 	} else {
-		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this->Character->Ident), this->Player->Heroes.end());
-		
-		if (this == this->Player->CustomHeroUnit) {
-			this->Player->CustomHeroUnit = NULL;
-		}
+		this->Player->Heroes.erase(std::remove(this->Player->Heroes.begin(), this->Player->Heroes.end(), this), this->Player->Heroes.end());
 		
 		this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 0;
 	}
@@ -939,11 +935,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 			this->Player->UnitTypesStartingNonHeroCount[this->Type->Slot]++;
 		}
 	} else {
-		this->Player->Heroes.push_back(this->Character->Ident);
-		
-		if (this->Character->Custom) {
-			this->Player->CustomHeroUnit = this;
-		}
+		this->Player->Heroes.push_back(this);
 	}
 
 	this->Variable[HERO_INDEX].Max = this->Variable[HERO_INDEX].Value = this->Variable[HERO_INDEX].Enable = 1;
@@ -2339,7 +2331,7 @@ void CUnit::AssignToPlayer(CPlayer &player)
 				player.UnitTypesStartingNonHeroCount[type.Slot]++;
 			}
 		} else {
-			player.Heroes.push_back(this->Character->Ident);
+			player.Heroes.push_back(this);
 		}
 		
 		if (player.AiEnabled && player.Ai && type.BoolFlag[COWARD_INDEX].value && !type.BoolFlag[HARVESTER_INDEX].value && !type.CanTransport() && !type.CanCastSpell && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts
@@ -3425,10 +3417,7 @@ void UnitLost(CUnit &unit)
 					player.UnitTypesStartingNonHeroCount[type.Slot]--;
 				}
 			} else {
-				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), unit.Character->Ident), player.Heroes.end());
-				if (&unit == ThisPlayer->CustomHeroUnit) {
-					ThisPlayer->CustomHeroUnit = NULL;
-				}
+				player.Heroes.erase(std::remove(player.Heroes.begin(), player.Heroes.end(), &unit), player.Heroes.end());
 			}
 			
 			if (player.AiEnabled && player.Ai && std::find(player.Ai->Scouts.begin(), player.Ai->Scouts.end(), &unit) != player.Ai->Scouts.end()) {
@@ -4089,7 +4078,7 @@ void CUnit::ChangeOwner(CPlayer &newplayer, bool show_change)
 			newplayer.UnitTypesStartingNonHeroCount[Type->Slot]++;
 		}
 	} else {
-		newplayer.Heroes.push_back(this->Character->Ident);
+		newplayer.Heroes.push_back(this);
 	}
 	
 	if (newplayer.AiEnabled && newplayer.Ai && this->Type->BoolFlag[COWARD_INDEX].value && !this->Type->BoolFlag[HARVESTER_INDEX].value && !this->Type->CanTransport() && !this->Type->CanCastSpell && Map.Info.IsPointOnMap(this->tilePos, this->MapLayer) && this->CanMove() && this->Active && this->GroupId != 0 && this->Variable[SIGHTRANGE_INDEX].Value > 0) { //assign coward, non-worker, non-transporter, non-spellcaster units to be scouts

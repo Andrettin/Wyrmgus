@@ -281,11 +281,13 @@ void UpdateDisplay()
 		}
 		
 		//draw icon if the player has a custom hero
-		if (UI.CustomHeroUnitButton && ThisPlayer->CustomHeroUnit) {
-			const PixelPos pos(UI.CustomHeroUnitButton->X, UI.CustomHeroUnitButton->Y);
-			const int flag = (ButtonAreaUnderCursor == ButtonAreaCustomHeroUnit && ButtonUnderCursor == 0) ? (IconActive | (MouseButtons & LeftButton)) : 0;
-								 
-			ThisPlayer->CustomHeroUnit->GetIcon().Icon->DrawUnitIcon(*UI.CustomHeroUnitButton->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->CustomHeroUnit->GetSkinColor(), ThisPlayer->CustomHeroUnit->GetHairColor());
+		for (int i = 0; i < PlayerHeroMax; ++i) {
+			if (UI.HeroUnitButtons[i] && (int) ThisPlayer->Heroes.size() > i) {
+				const PixelPos pos(UI.HeroUnitButtons[i]->X, UI.HeroUnitButtons[i]->Y);
+				const int flag = (ButtonAreaUnderCursor == ButtonAreaHeroUnit && ButtonUnderCursor == i) ? (IconActive | (MouseButtons & LeftButton)) : 0;
+									 
+				ThisPlayer->Heroes[i]->GetIcon().Icon->DrawUnitIcon(*UI.HeroUnitButtons[i]->Style, flag, pos, "", ThisPlayer->Index, ThisPlayer->Heroes[i]->GetSkinColor(), ThisPlayer->Heroes[i]->GetHairColor());
+			}
 		}
 		
 		DrawPopups();

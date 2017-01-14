@@ -454,7 +454,7 @@ public:
 	//Wyrmgus start
 	CUIButton *IdleWorkerButton;		/// Button for the idle worker notification
 	CUIButton *LevelUpUnitButton;		/// Button for the level up unit notification
-	CUIButton *CustomHeroUnitButton;	/// Button for the custom hero unit notification
+	CUIButton *HeroUnitButtons[PlayerHeroMax];	/// Button for the hero unit notifications
 	std::vector<CUIButton> InventoryButtons;	/// Button info for inventory items
 	//Wyrmgus end
 	

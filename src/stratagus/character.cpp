@@ -142,7 +142,7 @@ bool CCharacter::CanAppear() const
 	}
 	
 	for (int i = 0; i < PlayerMax; ++i) {
-		if (std::find(Players[i].Heroes.begin(), Players[i].Heroes.end(), this->Ident) != Players[i].Heroes.end()) {
+		if (Players[i].HasHero(this)) {
 			return false;
 		}
 	}

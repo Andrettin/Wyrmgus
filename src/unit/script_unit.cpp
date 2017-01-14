@@ -654,7 +654,7 @@ static int CclUnit(lua_State *l)
 						unit->Player->UnitTypesStartingNonHeroCount[type->Slot]--;
 					}
 				} else {
-					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit->Character->Ident), unit->Player->Heroes.end());
+					unit->Player->Heroes.erase(std::remove(unit->Player->Heroes.begin(), unit->Player->Heroes.end(), unit), unit->Player->Heroes.end());
 				}
 				//Wyrmgus end
 			}

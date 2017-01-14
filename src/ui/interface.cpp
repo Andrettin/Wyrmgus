@@ -646,12 +646,12 @@ void UiFindLevelUpUnit()
 /**
 **  Find the next level up unit, select it, and center on it
 */
-void UiFindCustomHeroUnit()
+void UiFindHeroUnit(int hero_index)
 {
-	if (!ThisPlayer->CustomHeroUnit) {
+	if ((int) ThisPlayer->Heroes.size() <= hero_index) {
 		return;
 	}
-	CUnit *unit = ThisPlayer->CustomHeroUnit;
+	CUnit *unit = ThisPlayer->Heroes[hero_index];
 
 	SelectSingleUnit(*unit);
 	UI.StatusLine.Clear();

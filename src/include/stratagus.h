@@ -175,6 +175,7 @@ extern const char NameLine[];
 #define WorldMapResourceMax 2048	/// Maximum quantity of resources of a given type which can exist on the world map.
 
 #define AuraRange 6					/// Range of auras
+#define PlayerHeroMax 3				/// Maximum heroes per player
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)

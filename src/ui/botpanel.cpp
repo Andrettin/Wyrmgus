@@ -1524,7 +1524,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonBuy:
 			res = buttonaction.Value != -1;
 			if (res && UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
-				res = ThisPlayer->Heroes.size() < 3;
+				res = ThisPlayer->Heroes.size() < PlayerHeroMax;
 			}
 			break;
 		//Wyrmgus end
