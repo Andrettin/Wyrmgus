@@ -2057,7 +2057,7 @@ void CUnit::UpdateSoldUnits()
 		}
 		if (this->Player == ThisPlayer) {
 			for (std::map<std::string, CCharacter *>::iterator iterator = CustomHeroes.begin(); iterator != CustomHeroes.end(); ++iterator) {
-				if (iterator->second->Civilization == civilization_id && iterator->second->CanAppear()) {
+				if (iterator->second->Civilization == civilization_id && CheckDependByType(*this->Player, *iterator->second->Type, true) && iterator->second->CanAppear()) {
 					potential_heroes.push_back(iterator->second);
 				}
 			}
