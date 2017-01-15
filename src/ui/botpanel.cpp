@@ -1522,7 +1522,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = buttonaction.Value < (int) unit.Player->AvailableQuests.size() && unit.Player->CanAcceptQuest(unit.Player->AvailableQuests[buttonaction.Value]);
 			break;
 		case ButtonBuy:
-			res = buttonaction.Value != -1;
+			res = (buttonaction.Value != -1) && (&UnitManager.GetSlotUnit(buttonaction.Value) != NULL);
 			if (res && UnitManager.GetSlotUnit(buttonaction.Value).Character != NULL) {
 				res = ThisPlayer->Heroes.size() < PlayerHeroMax;
 			}
