@@ -179,6 +179,7 @@ public:
 extern std::map<std::string, CCharacter *> Characters;
 extern std::map<std::string, CCharacter *> CustomHeroes;
 extern CCharacter *CurrentCustomHero;
+extern bool LoadingPersistentHeroes;
 
 /*----------------------------------------------------------------------------
 -- Functions

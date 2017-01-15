@@ -149,6 +149,8 @@ extern std::string GetItemEffectsString(std::string item_ident);
 extern std::string GetUniqueItemEffectsString(std::string item_ident);
 extern void SaveHeroes();
 
+extern bool LoadingPersistentHeroes;
+
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 
 extern void DeleteModFaction(std::string civilization_name, std::string faction_name);

@@ -61,6 +61,7 @@
 std::map<std::string, CCharacter *> Characters;
 std::map<std::string, CCharacter *> CustomHeroes;
 CCharacter *CurrentCustomHero = NULL;
+bool LoadingPersistentHeroes = false;
 
 /*----------------------------------------------------------------------------
 --  Functions

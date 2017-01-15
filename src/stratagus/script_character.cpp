@@ -72,11 +72,18 @@ static int CclDefineCharacter(lua_State *l)
 	CCharacter *character = GetCharacter(character_ident);
 	bool redefinition = false;
 	if (!character) {
+		if (LoadingPersistentHeroes) {
+			fprintf(stderr, "Character \"%s\" has persistent data, but doesn't exist.", character_ident.c_str());
+			return 0;
+		}
 		character = new CCharacter;
 		character->Ident = character_ident;
 		Characters[character_ident] = character;
 	} else {
 		redefinition = true;
+		if (!LoadingPersistentHeroes) {
+			fprintf(stderr, "Character \"%s\" is being redefined.", character_ident.c_str());
+		}
 	}
 	
 	std::string faction_ident;
