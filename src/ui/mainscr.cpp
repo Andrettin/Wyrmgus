@@ -719,33 +719,6 @@ static void DrawUnitInfo_inventory(CUnit &unit)
 		}
 		const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
 		uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", unit.Player->Index, uins->GetSkinColor(), uins->GetHairColor());
-		if (ButtonAreaUnderCursor == ButtonAreaInventory
-			&& static_cast<size_t>(ButtonUnderCursor) == j) {
-			//Wyrmgus start
-//			UI.StatusLine.Set(uins->Type->Name);
-			if (!Preference.NoStatusLineTooltips) {
-				UI.StatusLine.Set(uins->GetTypeName());
-			}
-			//hackish way to make the popup appear correctly for the inventory item
-			ButtonAction *ba = new ButtonAction;
-			if (!uins->Name.empty() && uins->Identified) {
-				ba->Hint = uins->Name;
-			} else {
-				ba->Hint = uins->GetTypeName();
-				if (!uins->Identified) {
-					ba->Hint += " (Unidentified)";
-				}
-			}
-			ba->Pos = j;
-			ba->Level = unit.Type->ButtonLevelForInventory;
-			ba->Action = ButtonUnit;
-			ba->Value = UnitNumber(*uins);
-			ba->Popup = "popup-item-inventory";
-			DrawPopup(*ba, UI.InventoryButtons[j], UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
-			delete ba;
-			LastDrawnButtonPopup = NULL;
-			//Wyrmgus end
-		}
 		++j;
 	}
 }
@@ -902,6 +875,130 @@ void DrawDayTime() {
 */
 void DrawPopups()
 {
+	//
+	// Draw unit under the cursor's name popup
+	//
+	if (CursorOn == CursorOnMap && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
+		CViewport *vp = GetViewport(CursorScreenPos);
+		if (vp) {
+			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
+			const bool isMapFieldVisible = Map.Field(tilePos, CurrentMapLayer)->playerInfo.IsTeamVisible(*ThisPlayer);
+
+			if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
+				&& ((isMapFieldVisible && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
+				PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
+				unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
+				std::string unit_name;
+				if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
+					if (!UnitUnderCursor->Identified) {
+						unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
+					} else {
+						unit_name = UnitUnderCursor->GetName();
+					}
+				} else {
+					unit_name = UnitUnderCursor->GetTypeName();
+				}
+				if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
+					unit_name += " (" + UnitUnderCursor->Player->Name + ")";
+				}
+				//hackish way to make the popup appear correctly for the unit under cursor
+				ButtonAction *ba = new ButtonAction;
+				ba->Hint = unit_name;
+				ba->Action = ButtonUnit;
+				ba->Value = UnitNumber(*UnitUnderCursor);
+				ba->Popup = "popup-unit-under-cursor";
+				DrawPopup(*ba, *UI.SingleSelectedButton, unit_center_pos.x, unit_center_pos.y);
+				delete ba;
+				LastDrawnButtonPopup = NULL;
+			}
+		}
+	}
+	
+	if (Selected.size() == 1) {
+		if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
+			if (!Preference.NoStatusLineTooltips) {
+				UI.StatusLine.Set(Selected[0]->GetMessageName());
+			}
+			
+			//hackish way to make the popup appear correctly for the single selected unit
+			ButtonAction *ba = new ButtonAction;
+			ba->Hint = Selected[0]->GetMessageName();
+			ba->Action = ButtonUnit;
+			ba->Value = UnitNumber(*Selected[0]);
+			ba->Popup = "popup-unit";
+			DrawPopup(*ba, *UI.SingleSelectedButton, UI.SingleSelectedButton->X, UI.SingleSelectedButton->Y);
+			delete ba;
+			LastDrawnButtonPopup = NULL;
+		}
+		
+		if (!(Selected[0]->Player != ThisPlayer && !ThisPlayer->IsAllied(*Selected[0]->Player) && Selected[0]->Player->Type != PlayerNeutral) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForInventory) {
+		CUnit *uins = Selected[0]->UnitInside;
+		size_t j = 0;
+
+			for (int i = 0; i < Selected[0]->InsideCount; ++i, uins = uins->NextContained) {
+				if (!uins->Type->BoolFlag[ITEM_INDEX].value || j >= UI.InventoryButtons.size()) {
+					continue;
+				}
+				CIcon &icon = *uins->GetIcon().Icon;
+				
+				int flag = (ButtonAreaUnderCursor == ButtonAreaInventory && static_cast<size_t>(ButtonUnderCursor) == j) ?
+						   IconActive : 0;
+				if (flag && ((MouseButtons & LeftButton) || (MouseButtons & RightButton))) {
+					flag |= IconClicked;
+				}
+				flag |= IconCommandButton;
+				if (Selected[0]->IsItemEquipped(uins)) {
+					flag |= IconSelected;
+				}
+				const PixelPos pos(UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
+				uins->GetIcon().Icon->DrawUnitIcon(*UI.InventoryButtons[j].Style, flag, pos, "", Selected[0]->Player->Index, uins->GetSkinColor(), uins->GetHairColor());
+				if (ButtonAreaUnderCursor == ButtonAreaInventory
+					&& static_cast<size_t>(ButtonUnderCursor) == j) {
+					if (!Preference.NoStatusLineTooltips) {
+						UI.StatusLine.Set(uins->GetTypeName());
+					}
+					//hackish way to make the popup appear correctly for the inventory item
+					ButtonAction *ba = new ButtonAction;
+					if (!uins->Name.empty() && uins->Identified) {
+						ba->Hint = uins->Name;
+					} else {
+						ba->Hint = uins->GetTypeName();
+						if (!uins->Identified) {
+							ba->Hint += " (Unidentified)";
+						}
+					}
+					ba->Pos = j;
+					ba->Level = Selected[0]->Type->ButtonLevelForInventory;
+					ba->Action = ButtonUnit;
+					ba->Value = UnitNumber(*uins);
+					ba->Popup = "popup-item-inventory";
+					DrawPopup(*ba, UI.InventoryButtons[j], UI.InventoryButtons[j].X, UI.InventoryButtons[j].Y);
+					delete ba;
+					LastDrawnButtonPopup = NULL;
+				}
+				++j;
+			}
+		}
+	}
+	
+	//
+	//  Update status line for this button and draw popups
+	//
+	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
+		if (ButtonAreaUnderCursor == ButtonAreaButton &&
+			//Wyrmgus start
+//			ButtonUnderCursor == i && KeyState != KeyStateInput) {
+			ButtonUnderCursor == i && KeyState != KeyStateInput
+			&& CurrentButtons[i].Level == CurrentButtonLevel) {
+			//Wyrmgus end
+				if (!Preference.NoStatusLineTooltips) {
+					UpdateStatusLineForButton(CurrentButtons[i]);
+				}
+				DrawPopup(CurrentButtons[i], UI.ButtonPanel.Buttons[i], UI.ButtonPanel.Buttons[i].X,
+					UI.ButtonPanel.Buttons[i].Y);
+		}
+	}
+	
 	if (UI.IdleWorkerButton && !ThisPlayer->FreeWorkers.empty()) {
 		int worker_unit_type_id = PlayerRaces.GetFactionClassUnitType(ThisPlayer->Race, ThisPlayer->Faction, GetUnitTypeClassIndexByName("worker"));
 		if (worker_unit_type_id != -1) {
@@ -1670,6 +1767,8 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 	}
 	//Wyrmgus end	
 	DrawUnitInfo(unit);
+	//Wyrmgus start
+	/*
 	if (ButtonAreaUnderCursor == ButtonAreaSelected && ButtonUnderCursor == 0) {
 		//Wyrmgus start
 //		UI.StatusLine.Set(unit.Type->Name);
@@ -1688,6 +1787,8 @@ static void InfoPanel_draw_single_selection(CUnit *selUnit)
 		LastDrawnButtonPopup = NULL;
 		//Wyrmgus end
 	}
+	*/
+	//Wyrmgus end
 }
 
 static void InfoPanel_draw_multiple_selection()

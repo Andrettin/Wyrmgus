@@ -526,6 +526,8 @@ void CViewport::Draw() const
 	// Draw unit's name popup
 	//
 	//Wyrmgus start
+	/*
+	//Wyrmgus start
 //	if (CursorOn == CursorOnMap && Preference.ShowNameDelay && (ShowNameDelay < GameCycle) && (GameCycle < ShowNameTime)) {
 	if (CursorOn == CursorOnMap && (!Preference.ShowNameDelay || ShowNameDelay < GameCycle) && (!Preference.ShowNameTime || GameCycle < ShowNameTime)) {
 	//Wyrmgus end
@@ -571,6 +573,8 @@ void CViewport::Draw() const
 		//Wyrmgus end
 		}
 	}
+	*/
+	//Wyrmgus end
 
 	DrawBorder();
 	PopClipping();

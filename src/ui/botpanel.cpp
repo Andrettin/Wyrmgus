@@ -1304,6 +1304,8 @@ void CButtonPanel::Draw()
 	//
 	//  Update status line for this button and draw popups
 	//
+	//Wyrmgus start
+	/*
 	for (int i = 0; i < (int) UI.ButtonPanel.Buttons.size(); ++i) {
 		if (ButtonAreaUnderCursor == ButtonAreaButton &&
 			//Wyrmgus start
@@ -1318,6 +1320,8 @@ void CButtonPanel::Draw()
 					UI.ButtonPanel.Buttons[i].Y);
 		}
 	}
+	*/
+	//Wyrmgus end
 	
 	//Wyrmgus start
 	if (ButtonAreaUnderCursor == ButtonAreaTransporting) {
