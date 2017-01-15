@@ -2039,19 +2039,34 @@ void CUnit::UpdateSoldUnits()
 			}
 			bool hero_allowed = false;
 			if (this->Player->Index == PlayerNumNeutral) { // if this is a neutral building (i.e. a mercenary camp), see if any player present can have this hero
-				hero_allowed = this->CanHireMercenary(iterator->second->Type, iterator->second->Civilization);
+				for (int p = 0; p < PlayerMax; ++p) {
+					if (Players[p].Type != PlayerNobody && Players[p].Type != PlayerNeutral && iterator->second->Civilization == Players[p].Race && CheckDependByType(Players[p], *iterator->second->Type, true) && Players[p].StartMapLayer == this->MapLayer) {
+						if (iterator->second->Conditions) {
+							CclCommand("trigger_player = " + std::to_string((long long) this->Player->Index) + ";");
+							iterator->second->Conditions->pushPreamble();
+							iterator->second->Conditions->run(1);
+							if (iterator->second->Conditions->popBoolean()) {
+								hero_allowed = true;
+								break;
+							}
+						} else {
+							hero_allowed = true;
+							break;
+						}
+					}
+				}
 			} else {
 				hero_allowed = (iterator->second->Civilization == civilization_id && CheckDependByType(*this->Player, *iterator->second->Type, true));
-			}
-			if (hero_allowed && iterator->second->CanAppear()) {
 				if (iterator->second->Conditions) {
 					CclCommand("trigger_player = " + std::to_string((long long) this->Player->Index) + ";");
 					iterator->second->Conditions->pushPreamble();
 					iterator->second->Conditions->run(1);
 					if (iterator->second->Conditions->popBoolean() == false) {
-						continue;
+						hero_allowed = false;
 					}
 				}
+			}
+			if (hero_allowed && iterator->second->CanAppear()) {
 				potential_heroes.push_back(iterator->second);
 			}
 		}
