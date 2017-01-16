@@ -459,21 +459,7 @@ static int CclDefineCharacter(lua_State *l)
 		if (character->Type->BoolFlag[FAUNA_INDEX].value) {
 			character->Type->PersonalNames[character->Gender].push_back(character->Name);
 		} else if (character->Civilization != -1) {
-			int base_faction = character->Faction;
-			if (character->Faction != -1) {
-				while (PlayerRaces.Factions[character->Civilization][base_faction]->ParentFaction != -1) {
-					if (PlayerRaces.Factions[character->Civilization][base_faction]->Language != -1) {
-						break;
-					}
-					base_faction = PlayerRaces.Factions[character->Civilization][base_faction]->ParentFaction;
-				}
-			}
-			
-			if (base_faction != -1 && PlayerRaces.Factions[character->Civilization][base_faction]->Language != -1 && PlayerRaces.Factions[character->Civilization][base_faction]->Language != PlayerRaces.CivilizationLanguage[character->Civilization]) {
-				PlayerRaces.Factions[character->Civilization][base_faction]->PersonalNames[character->Gender].push_back(character->Name);
-			} else {
-				PlayerRaces.Civilizations[character->Civilization]->PersonalNames[character->Gender].push_back(character->Name);
-			}
+			PlayerRaces.Civilizations[character->Civilization]->PersonalNames[character->Gender].push_back(character->Name);
 		}
 	}
 	

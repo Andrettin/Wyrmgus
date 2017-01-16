@@ -1584,6 +1584,7 @@ void CPlayer::SetFaction(CFaction *faction)
 		if (unit.Type->BoolFlag[TOWNHALL_INDEX].value && !unit.Unique) {
 			unit.UpdateSettlementName();
 		}
+		unit.UpdateSoldUnits();
 		unit.UpdateButtonIcons();
 	}
 }
