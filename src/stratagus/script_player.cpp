@@ -1696,18 +1696,6 @@ static int CclDefineFaction(lua_State *l)
 			faction->DefaultAI = LuaToString(l, -1);
 		} else if (!strcmp(value, "ParentFaction")) {
 			parent_faction = LuaToString(l, -1);
-		} else if (!strcmp(value, "Language")) {
-			std::string language_name = LuaToString(l, -1);
-			int language = PlayerRaces.GetLanguageIndexByIdent(language_name);
-			
-			if (language != -1) {
-				faction->Language = language;
-				PlayerRaces.Languages[language]->UsedByCivilizationOrFaction = true;
-			} else if (language_name.empty()) {
-				faction->Language = language; // to allow redefinitions to remove the language setting
-			} else {
-				LuaError(l, "Language \"%s\" not found." _C_ language_name.c_str());
-			}
 		} else if (!strcmp(value, "Playable")) {
 			faction->Playable = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "DefaultStartPos")) {
@@ -2493,14 +2481,6 @@ static int CclGetFactionData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Playable")) {
 		lua_pushboolean(l, faction->Playable);
-		return 1;
-	} else if (!strcmp(data, "Language")) {
-		int language = PlayerRaces.GetFactionLanguage(faction->Civilization, faction->ID);
-		if (language != -1) {
-			lua_pushstring(l, PlayerRaces.Languages[language]->Ident.c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
 		return 1;
 	} else if (!strcmp(data, "FactionUpgrade")) {
 		lua_pushstring(l, faction->FactionUpgrade.c_str());

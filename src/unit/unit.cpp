@@ -2864,7 +2864,7 @@ void CUnit::UpdatePersonalName(bool update_settlement_name)
 	} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
 		faction = this->Player->Faction;
 	}
-	int language = PlayerRaces.GetFactionLanguage(civilization, faction);
+	int language = PlayerRaces.GetCivilizationLanguage(civilization);
 
 	// first see if can translate the current personal name
 	std::string new_personal_name = PlayerRaces.TranslateName(this->Name, language);
@@ -2902,7 +2902,7 @@ void CUnit::UpdateSettlementName()
 		} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
 			faction = this->Player->Faction;
 		}
-		int language = PlayerRaces.GetFactionLanguage(civilization, faction);
+		int language = PlayerRaces.GetCivilizationLanguage(civilization);
 
 		// first see if can translate the current personal name
 		std::string new_settlement_name = PlayerRaces.TranslateName(this->SettlementName, language);

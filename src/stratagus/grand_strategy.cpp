@@ -2399,55 +2399,6 @@ void CGrandStrategyProvince::SetOwner(int civilization_id, int faction_id)
 				}
 			}
 		}
-		
-		// if the province's new owner is a faction that has a language different from that of its civilization, generate a faction-specific name for the province
-		if (PlayerRaces.GetFactionLanguage(civilization_id, faction_id) != -1 && PlayerRaces.GetFactionLanguage(civilization_id, faction_id) != PlayerRaces.GetCivilizationLanguage(civilization_id)) {
-			if (this->FactionCulturalNames.find(PlayerRaces.Factions[civilization_id][faction_id]) == this->FactionCulturalNames.end()) {
-				std::string new_province_name = "";
-				// if the parent faction of the new owner already has a name for the province, and shares the same language as the owner, then use that
-				if (
-					PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction != -1
-					&& PlayerRaces.GetFactionLanguage(civilization_id, faction_id) == PlayerRaces.GetFactionLanguage(civilization_id, PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction)
-					&& this->FactionCulturalNames.find(PlayerRaces.Factions[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction]) != this->FactionCulturalNames.end()
-				) {
-					new_province_name = this->FactionCulturalNames[PlayerRaces.Factions[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction]];
-				}
-				
-				// see if can translate the province's current cultural name
-				if (new_province_name == "") {
-					new_province_name = PlayerRaces.TranslateName(this->GetCulturalName(), PlayerRaces.GetFactionLanguage(civilization_id, faction_id));
-				}
-				if (new_province_name == "") { // try to translate any cultural name
-					for (int i = 0; i < MAX_RACES; ++i) {
-						if (this->CulturalNames.find(i) != this->CulturalNames.end()) {
-							new_province_name = PlayerRaces.TranslateName(this->CulturalNames[i], PlayerRaces.GetFactionLanguage(civilization_id, faction_id)); 
-							if (!new_province_name.empty()) {
-								break;
-							}
-						}
-					}
-				}
-				if (new_province_name == "") { // try to translate any faction cultural name
-					for (std::map<CFaction *, std::string>::iterator iterator = this->FactionCulturalNames.begin(); iterator != this->FactionCulturalNames.end(); ++iterator) {
-						new_province_name = PlayerRaces.TranslateName(iterator->second, PlayerRaces.GetFactionLanguage(civilization_id, faction_id)); 
-						if (!new_province_name.empty()) {
-							break;
-						}
-					}
-				}
-				if (!new_province_name.empty()) {
-					this->FactionCulturalNames[PlayerRaces.Factions[civilization_id][faction_id]] = new_province_name;
-					
-					if ( //use the same name for the parent faction too, to spread it to all factions with the same language
-						PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction != -1
-						&& PlayerRaces.GetFactionLanguage(civilization_id, faction_id) == PlayerRaces.GetFactionLanguage(civilization_id, PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction)
-						&& this->FactionCulturalNames.find(PlayerRaces.Factions[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction]) == this->FactionCulturalNames.end()
-					) {
-						this->FactionCulturalNames[PlayerRaces.Factions[civilization_id][PlayerRaces.Factions[civilization_id][faction_id]->ParentFaction]] = new_province_name;
-					}
-				}
-			}
-		}
 	} else {
 		this->Owner = NULL;
 		this->SetCivilization(-1); //if there is no owner, change the civilization to none
@@ -3404,11 +3355,7 @@ int CGrandStrategyProvince::GetClassUnitType(int class_id)
 
 int CGrandStrategyProvince::GetLanguage()
 {
-	if (this->Owner != NULL && this->Civilization == this->Owner->Civilization) {
-		return PlayerRaces.GetFactionLanguage(this->Owner->Civilization, this->Owner->Faction);
-	} else {
-		return PlayerRaces.GetCivilizationLanguage(this->Civilization);
-	}
+	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
 }
 
 int CGrandStrategyProvince::GetFoodCapacity(bool subtract_non_food)
@@ -4935,11 +4882,7 @@ int CGrandStrategyHero::GetTroopCostModifier()
 
 int CGrandStrategyHero::GetLanguage()
 {
-	int language = PlayerRaces.GetCivilizationLanguage(this->Civilization);
-	if (this->GetFaction()->Civilization == this->Civilization) {
-		language = PlayerRaces.GetFactionLanguage(this->Civilization, this->GetFaction()->Faction);
-	}
-	return language;
+	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
 }
 
 int CGrandStrategyHero::GetTitleScore(int title, CGrandStrategyProvince *province)

@@ -90,7 +90,7 @@ int CCharacter::GetAttributeModifier(int attribute)
 
 int CCharacter::GetLanguage()
 {
-	return PlayerRaces.GetFactionLanguage(this->Civilization, this->Faction);
+	return PlayerRaces.GetCivilizationLanguage(this->Civilization);
 }
 
 bool CCharacter::IsParentOf(std::string child_ident)

@@ -499,7 +499,7 @@ class CFaction
 {
 public:
 	CFaction() : 
-		ID(-1), Civilization(-1), Type(FactionTypeNoFactionType), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1), Language(-1),
+		ID(-1), Civilization(-1), Type(FactionTypeNoFactionType), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1),
 		Playable(true), //factions are playable by default
 		DefaultStartPos(-1, -1),
 		DefaultAI("land-attack")
@@ -524,7 +524,6 @@ public:
 	int DefaultTier;													/// default faction tier
 	int DefaultGovernmentType;											/// default government type
 	int ParentFaction;													/// parent faction of this faction
-	int Language;
 	bool Playable;														/// faction playability
 	Vec2i DefaultStartPos;
 	std::vector<int> Colors;											/// faction colors
@@ -720,7 +719,6 @@ public:
 	int GetFactionClassUnitType(int civilization, int faction, int class_id);
 	int GetFactionClassUpgrade(int civilization, int faction, int class_id);
 	int GetCivilizationLanguage(int civilization);
-	int GetFactionLanguage(int civilization, int faction);
 	std::vector<CFiller> GetCivilizationUIFillers(int civilization);
 	std::vector<CFiller> GetFactionUIFillers(int civilization, int faction);
 	std::string TranslateName(std::string name, int language);

@@ -592,9 +592,6 @@ int WriteMapSetup(const char *mapSetup, CMap &map, int writeTerrain, bool is_mod
 				if (PlayerRaces.Factions[i][j]->ParentFaction != -1) {
 					f->printf("\tParentFaction = \"%s\",\n", PlayerRaces.Factions[i][PlayerRaces.Factions[i][j]->ParentFaction]->Ident.c_str());
 				}
-				if (PlayerRaces.Factions[i][j]->Language != -1) {
-					f->printf("\tLanguage = \"%s\",\n", PlayerRaces.Languages[PlayerRaces.Factions[i][j]->Language]->Ident.c_str());
-				}
 				if (PlayerRaces.Factions[i][j]->Colors.size() > 0) {
 					f->printf("\tColors = {");
 					for (size_t k = 0; k < PlayerRaces.Factions[i][j]->Colors.size(); ++k) {

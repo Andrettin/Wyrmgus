@@ -642,25 +642,6 @@ int PlayerRace::GetCivilizationLanguage(int civilization)
 	return -1;
 }
 
-int PlayerRace::GetFactionLanguage(int civilization, int faction)
-{
-	if (civilization == -1) {
-		return -1;
-	}
-	
-	if (faction != -1) {
-		if (Factions[civilization][faction]->Language != -1) {
-			return Factions[civilization][faction]->Language;
-		}
-		
-		if (PlayerRaces.Factions[civilization][faction]->ParentFaction != -1) {
-			return GetFactionLanguage(civilization, PlayerRaces.Factions[civilization][faction]->ParentFaction);
-		}
-	}
-	
-	return GetCivilizationLanguage(civilization);
-}
-
 std::vector<CFiller> PlayerRace::GetCivilizationUIFillers(int civilization)
 {
 	if (civilization == -1) {
