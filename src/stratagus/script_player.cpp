@@ -1788,25 +1788,6 @@ static int CclDefineFaction(lua_State *l)
 				filler.Y = LuaToNumber(l, -1, j + 1);
 				faction->UIFillers.push_back(filler);
 			}
-		} else if (!strcmp(value, "PersonalNames")) {
-			faction->PersonalNames.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				int gender_id = GetGenderIdByName(LuaToString(l, -1, j + 1));
-				if (gender_id == -1) {
-					gender_id = NoGender;
-				} else {
-					++j;
-				}
-				
-				faction->PersonalNames[gender_id].push_back(LuaToString(l, -1, j + 1));
-			}
-		} else if (!strcmp(value, "FamilyNames")) {
-			faction->FamilyNames.clear();
-			const int args = lua_rawlen(l, -1);
-			for (int j = 0; j < args; ++j) {
-				faction->FamilyNames.push_back(LuaToString(l, -1, j + 1));
-			}
 		} else if (!strcmp(value, "SettlementNames")) {
 			faction->SettlementNames.clear();
 			const int args = lua_rawlen(l, -1);

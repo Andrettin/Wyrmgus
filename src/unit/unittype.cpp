@@ -956,29 +956,14 @@ std::string CUnitType::GeneratePersonalName(CFaction *faction, int gender) const
 			}
 			
 			if (this->BoolFlag[ORGANIC_INDEX].value) {
-				if (faction) {
-					if (faction->GetPersonalNames().find(NoGender) != faction->GetPersonalNames().end()) {
-						for (size_t i = 0; i < faction->GetPersonalNames().find(NoGender)->second.size(); ++i) {
-							potential_names.push_back(faction->GetPersonalNames().find(NoGender)->second[i]);
-						}
-					}
-					if (gender != -1 && gender != NoGender && faction->GetPersonalNames().find(gender) != faction->GetPersonalNames().end()) {
-						for (size_t i = 0; i < faction->GetPersonalNames().find(gender)->second.size(); ++i) {
-							potential_names.push_back(faction->GetPersonalNames().find(gender)->second[i]);
-						}
+				if (civilization->GetPersonalNames().find(NoGender) != civilization->GetPersonalNames().end()) {
+					for (size_t i = 0; i < civilization->GetPersonalNames().find(NoGender)->second.size(); ++i) {
+						potential_names.push_back(civilization->GetPersonalNames().find(NoGender)->second[i]);
 					}
 				}
-				
-				if (potential_names.size() == 0) {
-					if (civilization->GetPersonalNames().find(NoGender) != civilization->GetPersonalNames().end()) {
-						for (size_t i = 0; i < civilization->GetPersonalNames().find(NoGender)->second.size(); ++i) {
-							potential_names.push_back(civilization->GetPersonalNames().find(NoGender)->second[i]);
-						}
-					}
-					if (gender != -1 && gender != NoGender && civilization->GetPersonalNames().find(gender) != civilization->GetPersonalNames().end()) {
-						for (size_t i = 0; i < civilization->GetPersonalNames().find(gender)->second.size(); ++i) {
-							potential_names.push_back(civilization->GetPersonalNames().find(gender)->second[i]);
-						}
+				if (gender != -1 && gender != NoGender && civilization->GetPersonalNames().find(gender) != civilization->GetPersonalNames().end()) {
+					for (size_t i = 0; i < civilization->GetPersonalNames().find(gender)->second.size(); ++i) {
+						potential_names.push_back(civilization->GetPersonalNames().find(gender)->second[i]);
 					}
 				}
 			} else if (!this->BoolFlag[ORGANIC_INDEX].value && this->UnitType == UnitTypeNaval) { // if is a ship

@@ -508,7 +508,6 @@ public:
 	
 	~CFaction();
 	
-	std::map<int, std::vector<std::string>> &GetPersonalNames();
 	std::vector<std::string> &GetSettlementNames();
 	std::vector<std::string> &GetShipNames();
 
@@ -535,8 +534,6 @@ public:
 	std::map<int, IconConfig> ButtonIcons;								/// icons for button actions
 	std::map<int, int> ClassUnitTypes;									/// the unit type slot of a particular class for a particular faction
 	std::map<int, int> ClassUpgrades;									/// the upgrade slot of a particular class for a particular faction
-	std::map<int, std::vector<std::string>> PersonalNames;				/// Personal names for the faction, mapped to the gender they pertain to (use NoGender for names which should be available for both genders)
-	std::vector<std::string> FamilyNames;								/// Family names for the faction
 	std::vector<std::string> SettlementNames;							/// Settlement names for the faction
 	std::vector<std::string> ProvinceNames;								/// Province names for the faction
 	std::vector<std::string> ShipNames;									/// Ship names for the faction

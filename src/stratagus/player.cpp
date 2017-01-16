@@ -812,21 +812,6 @@ CFaction::~CFaction()
 	this->UIFillers.clear();
 }
 
-std::map<int, std::vector<std::string>> &CFaction::GetPersonalNames()
-{
-	if (this->PersonalNames.size() > 0) {
-		return this->PersonalNames;
-	}
-	
-	if (this->ParentFaction != -1) {
-		return PlayerRaces.Factions[this->Civilization][this->ParentFaction]->GetPersonalNames();
-	}
-	
-	return PlayerRaces.Civilizations[this->Civilization]->GetPersonalNames();
-	
-	return this->PersonalNames;
-}
-
 std::vector<std::string> &CFaction::GetSettlementNames()
 {
 	if (this->SettlementNames.size() > 0) {
@@ -1527,7 +1512,6 @@ void CPlayer::SetFaction(CFaction *faction)
 	bool ship_names_changed = true;
 	bool settlement_names_changed = true;
 	if (this->Faction != -1 && faction_id != -1) {
-		personal_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetPersonalNames() != PlayerRaces.Factions[this->Race][faction_id]->GetPersonalNames();
 		ship_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetShipNames() != PlayerRaces.Factions[this->Race][faction_id]->GetShipNames();
 		settlement_names_changed = PlayerRaces.Factions[this->Race][this->Faction]->GetSettlementNames() != PlayerRaces.Factions[this->Race][faction_id]->GetSettlementNames();
 	}
@@ -1576,8 +1560,8 @@ void CPlayer::SetFaction(CFaction *faction)
 	
 	for (int i = 0; i < this->GetUnitCount(); ++i) {
 		CUnit &unit = this->GetUnit(i);
-		if (!unit.Character && !unit.Unique && unit.Type->PersonalNames.size() == 0) {
-			if ((unit.Type->BoolFlag[ORGANIC_INDEX].value && personal_names_changed) || (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeNaval) && ship_names_changed) {
+		if (!unit.Unique && unit.Type->PersonalNames.size() == 0) {
+			if (!unit.Type->BoolFlag[ORGANIC_INDEX].value && unit.Type->UnitType == UnitTypeNaval && ship_names_changed) {
 				unit.UpdatePersonalName();
 			}
 		}
