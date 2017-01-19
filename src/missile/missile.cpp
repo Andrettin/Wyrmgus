@@ -752,6 +752,9 @@ void FireMissile(CUnit &unit, CUnit *goal, const Vec2i &goalPos, int z)
 		if (CalculateHit(unit, *goal->Stats, goal) == true) {
 			damage = CalculateDamage(unit, *goal, Damage);
 			HitUnit(&unit, *goal, damage);
+			if (goal->IsAlive()) {
+				HitUnit_NormalHitSpecialDamageEffects(unit, *goal);
+			}
 			PlayUnitSound(unit, VoiceHit);
 			
 			//apply Thorns damage if attacker is at melee range
@@ -1317,6 +1320,11 @@ static void MissileHitsGoal(const Missile &missile, CUnit &goal, int splash)
 		}
 
 		HitUnit(missile.SourceUnit, goal, damage, &missile);
+		//Wyrmgus start
+		if (missile.Type->Damage == 0 && missile.Damage == 00 && goal.IsAlive()) {
+			HitUnit_NormalHitSpecialDamageEffects(*missile.SourceUnit, goal);
+		}
+		//Wyrmgus end
 		
 		//Wyrmgus start
 		//apply Thorns damage if attacker is at melee range

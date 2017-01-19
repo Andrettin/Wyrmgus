@@ -5974,6 +5974,40 @@ static void HitUnit_Burning(CUnit &target)
 }
 
 //Wyrmgus start
+void HitUnit_NormalHitSpecialDamageEffects(CUnit &attacker, CUnit &target)
+{
+	if (attacker.Variable[FIREDAMAGE_INDEX].Value > 0 && attacker.Variable[FIREDAMAGE_INDEX].Value >= attacker.Variable[COLDDAMAGE_INDEX].Value) { // apply only either the fire damage or cold damage effects, but not both at the same time; apply the one with greater value, but if both are equal fire damage takes precedence
+		HitUnit_SpecialDamageEffect(target, FIREDAMAGE_INDEX);
+	} else if (attacker.Variable[COLDDAMAGE_INDEX].Value > 0) {
+		HitUnit_SpecialDamageEffect(target, COLDDAMAGE_INDEX);
+	}
+	
+	if (attacker.Variable[LIGHTNINGDAMAGE_INDEX].Value > 0) {
+		HitUnit_SpecialDamageEffect(target, LIGHTNINGDAMAGE_INDEX);
+	}
+}
+
+void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var)
+{
+	if (dmg_var == COLDDAMAGE_INDEX && target.Variable[COLDRESISTANCE_INDEX].Value < 100 && target.Type->BoolFlag[ORGANIC_INDEX].value) { //if resistance to cold is 100%, the effect has no chance of being applied
+		int rand_max = 100 * 100 / (100 - target.Variable[COLDRESISTANCE_INDEX].Value);
+		if (SyncRand(rand_max) == 0) {
+			target.Variable[SLOW_INDEX].Enable = 1;
+			target.Variable[SLOW_INDEX].Value = std::max(200, target.Variable[SLOW_INDEX].Value);
+			target.Variable[SLOW_INDEX].Max = 1000;
+		}
+	} else if (dmg_var == LIGHTNINGDAMAGE_INDEX && target.Variable[LIGHTNINGRESISTANCE_INDEX].Value < 100 && target.Type->BoolFlag[ORGANIC_INDEX].value) {
+		int rand_max = 100 * 100 / (100 - target.Variable[LIGHTNINGRESISTANCE_INDEX].Value);
+		if (SyncRand(rand_max) == 0) {
+			target.Variable[STUN_INDEX].Enable = 1;
+			target.Variable[STUN_INDEX].Value = std::max(200, target.Variable[STUN_INDEX].Value);
+			target.Variable[STUN_INDEX].Max = 1000;
+		}
+	}
+}
+//Wyrmgus end
+
+//Wyrmgus start
 //static void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 void HitUnit_RunAway(CUnit &target, const CUnit &attacker)
 //Wyrmgus end
@@ -6187,6 +6221,7 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}
+	//Wyrmgus end
 
 	/* Target Reaction on Hit */
 	if (target.Player->AiEnabled) {
