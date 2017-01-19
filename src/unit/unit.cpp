@@ -6000,7 +6000,7 @@ void HitUnit_SpecialDamageEffect(CUnit &target, int dmg_var)
 		int rand_max = 100 * 100 / (100 - target.Variable[LIGHTNINGRESISTANCE_INDEX].Value);
 		if (SyncRand(rand_max) == 0) {
 			target.Variable[STUN_INDEX].Enable = 1;
-			target.Variable[STUN_INDEX].Value = std::max(200, target.Variable[STUN_INDEX].Value);
+			target.Variable[STUN_INDEX].Value = std::max(50, target.Variable[STUN_INDEX].Value);
 			target.Variable[STUN_INDEX].Max = 1000;
 		}
 	}
