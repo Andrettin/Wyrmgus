@@ -6221,7 +6221,6 @@ void HitUnit(CUnit *attacker, CUnit &target, int damage, const Missile *missile,
 	//Wyrmgus end
 		HitUnit_Burning(target);
 	}
-	//Wyrmgus end
 
 	/* Target Reaction on Hit */
 	if (target.Player->AiEnabled) {
