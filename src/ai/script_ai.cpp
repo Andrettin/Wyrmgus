@@ -241,6 +241,20 @@ static std::vector<CUnitType *> getRefineryUnits()
 */
 static void InitAiHelper(AiHelper &aiHelper)
 {
+	//Wyrmgus start
+	//free AI helper (except for equivs) before initializing, in case this is a re-definition
+	AiHelpers.Train.clear();
+	AiHelpers.Build.clear();
+	AiHelpers.Upgrade.clear();
+	AiHelpers.Research.clear();
+	AiHelpers.Repair.clear();
+	AiHelpers.UnitLimit.clear();
+	AiHelpers.Refinery.clear();
+	AiHelpers.Depots.clear();
+	AiHelpers.ExperienceUpgrades.clear();
+	AiHelpers.LearnableAbilities.clear();
+	//Wyrmgus end
+	
 	extern std::vector<ButtonAction *> UnitButtonTable;
 
 	std::vector<CUnitType *> reparableUnits = getReparableUnits();
