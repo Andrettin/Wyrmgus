@@ -197,7 +197,7 @@ class CDialogueNode
 {
 public:
 	CDialogueNode() :
-		ID(-1), Dialogue(NULL), Conditions(NULL)
+		ID(-1), Dialogue(NULL), Conditions(NULL), ImmediateEffects(NULL)
 	{
 	}
 	
@@ -213,6 +213,7 @@ public:
 	std::string Text;
 	CDialogue *Dialogue;
 	LuaCallback *Conditions;
+	LuaCallback *ImmediateEffects;
 	std::vector<std::string> Options;
 	std::vector<LuaCallback *> OptionEffects;
 	std::vector<std::string> OptionTooltips;

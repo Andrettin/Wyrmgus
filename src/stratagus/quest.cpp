@@ -283,6 +283,10 @@ CDialogueNode::~CDialogueNode()
 		delete Conditions;
 	}
 	
+	if (this->ImmediateEffects) {
+		delete ImmediateEffects;
+	}
+	
 	for (size_t i = 0; i < this->OptionEffects.size(); ++i) {
 		delete this->OptionEffects[i];
 	}
@@ -299,6 +303,11 @@ void CDialogueNode::Call(int player)
 			}
 			return;
 		}
+	}
+	
+	if (this->ImmediateEffects) {
+		this->ImmediateEffects->pushPreamble();
+		this->ImmediateEffects->run();
 	}
 	
 	std::string lua_command = "Event(";

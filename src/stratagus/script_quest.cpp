@@ -801,6 +801,10 @@ static int CclDefineDialogue(lua_State *l)
 						lua_rawgeti(l, -1, k + 1);
 						node->Conditions = new LuaCallback(l, -1);
 						lua_pop(l, 1);
+					} else if (!strcmp(value, "immediate-effects")) {
+						lua_rawgeti(l, -1, k + 1);
+						node->ImmediateEffects = new LuaCallback(l, -1);
+						lua_pop(l, 1);
 					} else if (!strcmp(value, "options")) {
 						lua_rawgeti(l, -1, k + 1);
 						const int subsubargs = lua_rawlen(l, -1);
