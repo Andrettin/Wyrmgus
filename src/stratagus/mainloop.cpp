@@ -784,6 +784,12 @@ void GameMainLoop()
 								}
 							}
 						}
+
+						for (std::map<std::pair<CDate, int>, int>::iterator iterator = faction->HistoricalResources.begin(); iterator != faction->HistoricalResources.end(); ++iterator) { //set the appropriate historical resource quantities
+							if (iterator->second == 0 || CurrentCampaign->StartDate >= iterator->first.first) {
+								Players[i].SetResource(iterator->first.second, iterator->second);
+							}
+						}
 					}
 				}
 			}

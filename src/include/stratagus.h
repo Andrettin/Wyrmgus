@@ -257,7 +257,7 @@ struct CDate {
 	char month;
 	char day;
 	
-	bool operator <(const CDate& rhs) {
+	bool operator <(const CDate& rhs) const {
 		if (year < rhs.year) {
 			return true;
         } else if (year == rhs.year) {
@@ -271,7 +271,7 @@ struct CDate {
 		return false;
 	}
 	
-	bool operator <=(const CDate& rhs) {
+	bool operator <=(const CDate& rhs) const {
 		if (year < rhs.year) {
 			return true;
         } else if (year == rhs.year) {
@@ -285,7 +285,7 @@ struct CDate {
 		return false;
 	}
 	
-	bool operator >(const CDate& rhs) {
+	bool operator >(const CDate& rhs) const {
 		if (year > rhs.year) {
 			return true;
         } else if (year == rhs.year) {
@@ -299,7 +299,7 @@ struct CDate {
 		return false;
 	}
 	
-	bool operator >=(const CDate& rhs) {
+	bool operator >=(const CDate& rhs) const {
 		if (year > rhs.year) {
 			return true;
         } else if (year == rhs.year) {
@@ -313,7 +313,7 @@ struct CDate {
 		return false;
 	}
 	
-	bool operator ==(const CDate& rhs) {
+	bool operator ==(const CDate& rhs) const {
 		return year == rhs.year && month == rhs.month && day == rhs.day;
 	}
 };

@@ -1876,6 +1876,36 @@ static int CclDefineFaction(lua_State *l)
 				}
 				faction->HistoricalDiplomacyStates[std::pair<int, CFaction *>(year, diplomacy_state_faction)] = diplomacy_state;
 			}
+		} else if (!strcmp(value, "HistoricalResources")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CDate date;
+				date.year = 0;
+				date.month = 1;
+				date.day = 1;
+				lua_rawgeti(l, -1, j + 1);
+				if (!lua_istable(l, -1)) {
+					date.year = LuaToNumber(l, -1);
+				} else {
+					date.year = LuaToNumber(l, -1, 1);
+					date.month = LuaToNumber(l, -1, 2);
+					date.day = LuaToNumber(l, -1, 3);
+				}
+				lua_pop(l, 1);
+				++j;
+				
+				std::string resource_ident = LuaToString(l, -1, j + 1);
+				int resource = GetResourceIdByName(l, resource_ident.c_str());
+				if (resource == -1) {
+					LuaError(l, "Resource \"%s\" doesn't exist." _C_ resource_ident.c_str());
+				}
+				++j;
+
+				faction->HistoricalResources[std::pair<CDate, int>(date, resource)] = LuaToNumber(l, -1, j + 1);
+			}
 		} else if (!strcmp(value, "HistoricalCapitals")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
