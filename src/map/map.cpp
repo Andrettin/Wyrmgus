@@ -142,15 +142,13 @@ void CMapTemplate::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
 	unsigned int index = pos.x + pos.y * this->Width;
 	
 	if (terrain->Overlay && !(terrain->Flags & MapFieldWaterAllowed)) {
-		if (index >= this->TileOverlayTerrains.size()) {
-			this->TileOverlayTerrains.resize(index + 1);
-			std::fill(this->TileOverlayTerrains.begin(), this->TileOverlayTerrains.end(), -1);
+		while (index >= this->TileOverlayTerrains.size()) {
+			this->TileOverlayTerrains.push_back(-1);
 		}
 		this->TileOverlayTerrains[index] = terrain->ID;
 	} else {
-		if (index >= this->TileTerrains.size()) {
-			this->TileTerrains.resize(index + 1);
-			std::fill(this->TileTerrains.begin(), this->TileTerrains.end(), -1);
+		while (index >= this->TileTerrains.size()) {
+			this->TileTerrains.push_back(-1);
 		}
 		this->TileTerrains[index] = terrain->ID;
 	}

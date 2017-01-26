@@ -1303,6 +1303,18 @@ static int CclDefineTerrainType(lua_State *l)
 				border_terrain->InnerBorderTerrains.push_back(terrain);
 				border_terrain->BorderTerrains.push_back(terrain);
 			}
+		} else if (!strcmp(value, "OverlayTerrains")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CTerrainType *overlay_terrain = GetTerrainType(LuaToString(l, -1, j + 1));
+				if (overlay_terrain == NULL) {
+					LuaError(l, "Terrain doesn't exist.");
+				}
+				overlay_terrain->BaseTerrains.push_back(terrain);
+			}
 		} else if (!strcmp(value, "Flags")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
