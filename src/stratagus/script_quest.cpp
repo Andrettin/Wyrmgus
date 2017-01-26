@@ -469,6 +469,17 @@ static int CclDefineCampaign(lua_State *l)
 			campaign->StartDate.day = LuaToNumber(l, -1, 2);
 		} else if (!strcmp(value, "StartEffects")) {
 			campaign->StartEffects = new LuaCallback(l, -1);
+		} else if (!strcmp(value, "MapTemplate")) {
+			std::string map_template_ident = LuaToString(l, -1);
+			CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+			if (!map_template) {
+				LuaError(l, "Map template \"%s\" doesn't exist." _C_ map_template_ident.c_str());
+			}
+			campaign->MapTemplate = map_template;
+		} else if (!strcmp(value, "MapSize")) {
+			CclGetPos(l, &campaign->MapSize.x, &campaign->MapSize.y);
+		} else if (!strcmp(value, "MapTemplateStartPos")) {
+			CclGetPos(l, &campaign->MapTemplateStartPos.x, &campaign->MapTemplateStartPos.y);
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}
@@ -533,6 +544,25 @@ static int CclGetCampaignData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Sandbox")) {
 		lua_pushboolean(l, campaign->Sandbox);
+		return 1;
+	} else if (!strcmp(data, "MapTemplate")) {
+		if (campaign->MapTemplate) {
+			lua_pushstring(l, campaign->MapTemplate->Ident.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else if (!strcmp(data, "MapWidth")) {
+		lua_pushnumber(l, campaign->MapSize.x);
+		return 1;
+	} else if (!strcmp(data, "MapHeight")) {
+		lua_pushnumber(l, campaign->MapSize.y);
+		return 1;
+	} else if (!strcmp(data, "MapTemplateStartPosX")) {
+		lua_pushnumber(l, campaign->MapTemplateStartPos.x);
+		return 1;
+	} else if (!strcmp(data, "MapTemplateStartPosY")) {
+		lua_pushnumber(l, campaign->MapTemplateStartPos.y);
 		return 1;
 	} else {
 		LuaError(l, "Invalid field: %s" _C_ data);
