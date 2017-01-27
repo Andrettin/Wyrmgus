@@ -5,11 +5,12 @@ configuration:
 #install:
 #  - git submodule update --init --recursive
 before_build:
-  - git submodule update --init --recursive
   - mkdir build
   - cd build
   - appveyor DownloadFile https://github.com/Wargus/win32-stratagus-dependencies/releases/download/master-builds/dependencies.zip
   - 7z x dependencies.zip
+  - appveyor DownloadFile https://github.com/oamldev/oaml/archive/v1.2.zip
+  - 7z x v1.2.zip
   - appveyor DownloadFile https://github.com/jimpark/unsis/releases/download/2.50.0/nsis-2.50.0-Unicode-setup.exe
   - nsis-2.50.0-Unicode-setup.exe /S /D=C:\Program Files (x86)\NSIS
   - cmake -G "Visual Studio 14 2015" -DCMAKE_PREFIX_PATH="%cd%\\dependencies" -DENABLE_NSIS=ON -DENABLE_STDIO_REDIRECT=ON ..
