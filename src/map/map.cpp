@@ -1933,7 +1933,7 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 							}
 						}
 					}
-					if (terrain != adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
+					if (!adjacent_terrain) { // also happens if terrain is NULL, so that i.e. tree transitions display correctly when adjacent to tiles without overlays
 						adjacent_terrain_directions[TerrainTypes.size()].push_back(GetDirectionFromOffset(x_offset, y_offset));
 					}
 				}

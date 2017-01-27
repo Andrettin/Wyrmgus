@@ -5,6 +5,7 @@ configuration:
 #install:
 #  - git submodule update --init --recursive
 before_build:
+  - git submodule update --init --recursive
   - mkdir build
   - cd build
   - appveyor DownloadFile https://github.com/Wargus/win32-stratagus-dependencies/releases/download/master-builds/dependencies.zip
