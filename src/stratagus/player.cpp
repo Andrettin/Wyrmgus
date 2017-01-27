@@ -790,6 +790,10 @@ std::vector<std::string> &CCivilization::GetShipNames()
 
 CFaction::~CFaction()
 {
+	if (this->Conditions) {
+		delete Conditions;
+	}
+
 	this->UIFillers.clear();
 }
 
@@ -1444,19 +1448,6 @@ void CPlayer::SetCivilization(int civilization)
 		}
 	}
 		
-	// set new faction from new civilization
-	if (GameRunning && !GrandStrategy && Editor.Running == EditorNotRunning) {
-		if (ThisPlayer && ThisPlayer->Index == this->Index) {
-			if (GameCycle != 0) {
-				char buf[256];
-				snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", old_civilization != -1 ? PlayerRaces.Name[old_civilization].c_str() : "", (old_civilization != -1 && old_faction != -1) ? PlayerRaces.Factions[old_civilization][old_faction]->Ident.c_str() : "");
-				CclCommand(buf);
-			}
-		} else if (this->AiEnabled) {
-			this->SetRandomFaction();
-		}
-	}
-		
 	if (GrandStrategy && ThisPlayer) {
 		this->SetRandomFaction();
 	}
@@ -1533,7 +1524,10 @@ void CPlayer::SetFaction(CFaction *faction)
 		}
 	
 		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {
-			UpgradeAcquire(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade));
+			CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade);
+			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
+				UpgradeAcquire(*this, faction_upgrade);
+			}
 		}
 	} else {
 		fprintf(stderr, "Invalid faction \"%s\" tried to be set for player %d of civilization \"%s\".\n", faction->Name.c_str(), this->Index, PlayerRaces.Name[this->Race].c_str());

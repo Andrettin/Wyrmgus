@@ -146,10 +146,14 @@
 #include "action/action_attack.h"
 #include "commands.h"
 //Wyrmgus start
+#include "depend.h"
 #include "editor.h"
 //Wyrmgus end
 #include "grand_strategy.h"
 #include "iolib.h"
+//Wyrmgus start
+#include "luacallback.h"
+//Wyrmgus end
 #include "map.h"
 #include "pathfinder.h"
 #include "player.h"
@@ -255,6 +259,69 @@ static void AiCheckUnits()
 			AiAddResearchRequest(AiPlayer->ResearchRequests[i]);
 		}
 	}
+	
+	//Wyrmgus start
+	//check if any factions can be founded, and if so, pick one randomly
+	std::vector<CUpgrade *> potential_faction_upgrades;
+	for (int i = 0; i < MAX_RACES; ++i) {
+		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
+			if (i == AiPlayer->Player->Race && j == AiPlayer->Player->Faction) {
+				continue;
+			}
+
+			CFaction *possible_faction = PlayerRaces.Factions[i][j];
+			
+			if (possible_faction->FactionUpgrade.empty() || !CheckDependByIdent(*AiPlayer->Player, possible_faction->FactionUpgrade)) {
+				continue;
+			}
+			
+			if (possible_faction->Conditions) {
+				CclCommand("trigger_player = " + std::to_string((long long) AiPlayer->Player->Index) + ";");
+				possible_faction->Conditions->pushPreamble();
+				possible_faction->Conditions->run(1);
+				if (possible_faction->Conditions->popBoolean() == false) {
+					continue;
+				}
+			}
+			
+			CUpgrade *faction_upgrade = CUpgrade::Get(possible_faction->FactionUpgrade);
+			
+			if (!faction_upgrade) {
+				continue;
+			}
+			
+			n = AiHelpers.Research.size();
+			std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
+
+			if (faction_upgrade->ID > n) { // Oops not known.
+				continue;
+			}
+			std::vector<CUnitType *> &table = tablep[faction_upgrade->ID];
+			if (table.empty()) { // Oops not known.
+				continue;
+			}
+
+			const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+			bool has_researcher = false;
+			for (unsigned int k = 0; k < table.size(); ++k) {
+				// The type is available
+				if (unit_count[table[k]->Slot]) {
+					has_researcher = true;
+					break;
+				}
+			}
+			if (!has_researcher) {
+				continue;
+			}
+			
+			potential_faction_upgrades.push_back(faction_upgrade);
+		}
+	}
+	
+	if (potential_faction_upgrades.size() > 0) {
+		UpgradeAcquire(*AiPlayer->Player, potential_faction_upgrades[SyncRand(potential_faction_upgrades.size())]);
+	}
+	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------
@@ -462,13 +529,6 @@ void AiInit(CPlayer &player)
 	DebugPrint("%d - looking for class %s\n" _C_ player.Index _C_ player.AiName.c_str());
 	//MAPTODO print the player name (player->Name) instead of the pointer
 
-	//Wyrmgus start
-	//if doesn't have a faction, set a random one for the AI
-	if (player.Faction == -1 && !GrandStrategy && Editor.Running == EditorNotRunning) {
-		player.SetRandomFaction();
-	}
-	//Wyrmgus end
-	
 	//  Search correct AI type.
 	if (AiTypes.empty()) {
 		DebugPrint("AI: Got no scripts at all! You need at least one dummy fallback script.\n");

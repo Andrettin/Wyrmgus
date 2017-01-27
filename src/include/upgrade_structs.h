@@ -56,6 +56,7 @@ class CIcon;
 //Wyrmgus start
 class CCharacter;
 class CUpgradeModifier;
+class CFaction;
 //Wyrmgus end
 struct lua_State;
 
@@ -272,7 +273,7 @@ class CUpgradeModifier
 public:
 	//Wyrmgus start
 //	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL)
-	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL), ChangeCivilizationTo(-1)
+	CUpgradeModifier() : UpgradeId(0), ModifyPercent(NULL), SpeedResearch(0), ConvertTo(NULL), ChangeCivilizationTo(-1), ChangeFactionTo(NULL)
 	//Wyrmgus end
 	{
 		memset(ChangeUnits, 0, sizeof(ChangeUnits));
@@ -306,6 +307,7 @@ public:
 
 	//Wyrmgus start
 	int ChangeCivilizationTo;			/// changes the player's civilization to this one
+	CFaction *ChangeFactionTo;			/// changes the player's faction to this one
 	//Wyrmgus end
 };
 

@@ -190,6 +190,14 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 			condition->ThrustingWeapon = Ccl2Condition(l, LuaToString(l, -1, j + 1));
 		} else if (!strcmp(value, "faction-unit")) {
 			condition->FactionUnit = Ccl2Condition(l, LuaToString(l, -1, j + 1));
+		} else if (!strcmp(value, "civilization-equivalent")) {
+			value = LuaToString(l, -1, j + 1);
+			int civilization = PlayerRaces.GetRaceIndexByName(value);
+			if (civilization != -1) {
+				condition->CivilizationEquivalent = civilization;
+			} else {
+				fprintf(stderr, "Civilization \"%s\" doesn't exist.\n", value);
+			}
 		} else if (!strcmp(value, "faction-equivalent")) {
 			value = LuaToString(l, -1, j + 1);
 			int civilization = PlayerRaces.GetRaceIndexByName(value);
@@ -200,10 +208,10 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 				if (faction != -1) {
 					condition->FactionEquivalent = const_cast<CFaction *>(&(*PlayerRaces.Factions[civilization][faction]));
 				} else {
-					fprintf(stderr, "Faction %s doesn't exist.\n", value);
+					fprintf(stderr, "Faction \"%s\" doesn't exist.\n", value);
 				}
 			} else {
-				fprintf(stderr, "Civilization %s doesn't exist.\n", value);
+				fprintf(stderr, "Civilization \"%s\" doesn't exist.\n", value);
 			}
 		//Wyrmgus end
 		} else {

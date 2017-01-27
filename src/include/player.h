@@ -86,6 +86,7 @@ class PlayerAi;
 class CFile;
 //Wyrmgus start
 class CFiller;
+class LuaCallback;
 //Wyrmgus end
 struct lua_State;
 
@@ -502,7 +503,8 @@ public:
 		ID(-1), Civilization(-1), Type(FactionTypeNoFactionType), DefaultTier(FactionTierBarony), DefaultGovernmentType(GovernmentTypeMonarchy), ParentFaction(-1),
 		Playable(true), //factions are playable by default
 		DefaultStartPos(-1, -1),
-		DefaultAI("land-attack")
+		DefaultAI("land-attack"),
+		Conditions(NULL)
 	{
 	}
 	
@@ -526,6 +528,7 @@ public:
 	int ParentFaction;													/// parent faction of this faction
 	bool Playable;														/// faction playability
 	Vec2i DefaultStartPos;
+	LuaCallback *Conditions;
 	std::vector<int> Colors;											/// faction colors
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
 	std::string Titles[MaxGovernmentTypes][MaxFactionTiers];			/// this faction's title for each government type and faction tier

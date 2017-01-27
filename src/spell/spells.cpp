@@ -242,8 +242,13 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 			return false;
 		}
 	}
+	if (condition->CivilizationEquivalent != NULL) {
+		if (caster.Type->Civilization == -1 || caster.Type->Civilization == condition->CivilizationEquivalent || PlayerRaces.Species[caster.Type->Civilization] != PlayerRaces.Species[condition->CivilizationEquivalent] || PlayerRaces.GetCivilizationClassUnitType(condition->CivilizationEquivalent, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+			return false;
+		}
+	}
 	if (condition->FactionEquivalent != NULL) {
-		if (caster.Type->Civilization == -1 || caster.Type->Civilization != condition->FactionEquivalent->Civilization || PlayerRaces.GetFactionClassUnitType(condition->FactionEquivalent->Civilization, condition->FactionEquivalent->ID, caster.Type->Class) == -1) {
+		if (caster.Type->Civilization == -1 || caster.Type->Civilization != condition->FactionEquivalent->Civilization || PlayerRaces.GetFactionClassUnitType(condition->FactionEquivalent->Civilization, condition->FactionEquivalent->ID, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}

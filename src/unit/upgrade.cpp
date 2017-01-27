@@ -722,11 +722,18 @@ static int CclDefineModifier(lua_State *l)
 		} else if (!strcmp(key, "research-speed")) {
 			um->SpeedResearch = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "change-civilization-to")) {
-			const char *civilization_name = LuaToString(l, j + 1, 2);
-			um->ChangeCivilizationTo = PlayerRaces.GetRaceIndexByName(civilization_name);
+			const char *civilization_ident = LuaToString(l, j + 1, 2);
+			um->ChangeCivilizationTo = PlayerRaces.GetRaceIndexByName(civilization_ident);
 			
 			if (um->ChangeCivilizationTo == -1) {
-				LuaError(l, "invalid civilization name '%s'" _C_ civilization_name);
+				LuaError(l, "invalid civilization name '%s'" _C_ civilization_ident);
+			}
+		} else if (!strcmp(key, "change-faction-to")) {
+			std::string faction_ident = LuaToString(l, j + 1, 2);
+			um->ChangeFactionTo = PlayerRaces.GetFaction(-1, faction_ident);
+			
+			if (um->ChangeFactionTo == NULL) {
+				LuaError(l, "Faction \"%s\" doesn't exist.'" _C_ faction_ident.c_str());
 			}
 		//Wyrmgus end
 		} else {
@@ -1292,6 +1299,12 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->ChangeCivilizationTo != -1 && GameRunning && um->ChangeCivilizationTo != player.Race) {
 		player.SetCivilization(um->ChangeCivilizationTo);
 	}
+	if (um->ChangeFactionTo != NULL && GameRunning && (um->ChangeFactionTo->Civilization != player.Race || um->ChangeFactionTo->ID != player.Faction)) {
+		if (um->ChangeFactionTo->Civilization != player.Race) {
+			player.SetCivilization(um->ChangeFactionTo->Civilization);
+		}
+		player.SetFaction(um->ChangeFactionTo);
+	}
 	//Wyrmgus end
 
 	for (int z = 0; z < UpgradeMax; ++z) {
@@ -1573,11 +1586,6 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 	if (um->SpeedResearch != 0) {
 		player.SpeedResearch -= um->SpeedResearch;
 	}
-	//Wyrmgus start
-	if (um->ChangeCivilizationTo != -1 && GameRunning && AllUpgrades[um->UpgradeId]->Civilization != player.Race) {
-		player.SetCivilization(AllUpgrades[um->UpgradeId]->Civilization); // restore old civilization
-	}
-	//Wyrmgus end
 
 	for (int z = 0; z < UpgradeMax; ++z) {
 		// allow/forbid upgrades for player.  only if upgrade is not acquired
@@ -2343,24 +2351,6 @@ void AllowUpgradeId(CPlayer &player, int id, char af)
 {
 	Assert(af == 'A' || af == 'F' || af == 'R');
 	player.Allow.Upgrades[id] = af;
-	
-	//Wyrmgus start
-	//if the upgrade is a writing upgrade, and has been set to researched, set a new random faction for the player, if the current faction is a tribe (this happens only outside grand strategy mode)
-	if (!GrandStrategy && af == 'R' && AllUpgrades[id]->Class != -1 && UpgradeClasses[AllUpgrades[id]->Class] == "writing" && (player.Faction == -1 || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeTribe)) {
-		if (!GrandStrategy && Editor.Running == EditorNotRunning) {
-			int old_faction = player.Faction;
-			if (ThisPlayer && ThisPlayer->Index == player.Index) {
-				if (GameCycle != 0) {
-					char buf[256];
-					snprintf(buf, sizeof(buf), "if (ChooseFaction ~= nil) then ChooseFaction(\"%s\", \"%s\") end", player.Race != -1 ? PlayerRaces.Name[player.Race].c_str() : "", (player.Race != -1 && old_faction != -1) ? PlayerRaces.Factions[player.Race][old_faction]->Ident.c_str() : "");
-					CclCommand(buf);
-				}
-			} else if (player.AiEnabled) {
-				player.SetRandomFaction();
-			}
-		}
-	}
-	//Wyrmgus end
 }
 
 /**

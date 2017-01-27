@@ -48,6 +48,7 @@
 #include "font.h"
 #include "grand_strategy.h"
 #include "item.h"
+#include "luacallback.h"
 //Wyrmgus end
 #include "map.h"
 //Wyrmgus start
@@ -1776,6 +1777,8 @@ static int CclDefineFaction(lua_State *l)
 				filler.Y = LuaToNumber(l, -1, j + 1);
 				faction->UIFillers.push_back(filler);
 			}
+		} else if (!strcmp(value, "Conditions")) {
+			faction->Conditions = new LuaCallback(l, -1);
 		} else if (!strcmp(value, "SettlementNames")) {
 			faction->SettlementNames.clear();
 			const int args = lua_rawlen(l, -1);
