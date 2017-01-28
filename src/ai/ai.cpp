@@ -271,10 +271,21 @@ static void AiCheckUnits()
 
 			CFaction *possible_faction = PlayerRaces.Factions[i][j];
 			
-			if (possible_faction->FactionUpgrade.empty() || !CheckDependByIdent(*AiPlayer->Player, possible_faction->FactionUpgrade)) {
+			if (possible_faction->FactionUpgrade.empty()) {
 				continue;
 			}
 			
+			CUpgrade *faction_upgrade = CUpgrade::Get(possible_faction->FactionUpgrade);
+			
+			if (!faction_upgrade) {
+				fprintf(stderr, "Faction upgrade \"%s\" doesn't exist.\n", possible_faction->FactionUpgrade.c_str());
+				continue;
+			}
+			
+			if (!CheckDependByIdent(*AiPlayer->Player, possible_faction->FactionUpgrade)) {
+				continue;
+			}
+						
 			if (possible_faction->Conditions) {
 				CclCommand("trigger_player = " + std::to_string((long long) AiPlayer->Player->Index) + ";");
 				possible_faction->Conditions->pushPreamble();
@@ -282,12 +293,6 @@ static void AiCheckUnits()
 				if (possible_faction->Conditions->popBoolean() == false) {
 					continue;
 				}
-			}
-			
-			CUpgrade *faction_upgrade = CUpgrade::Get(possible_faction->FactionUpgrade);
-			
-			if (!faction_upgrade) {
-				continue;
 			}
 			
 			n = AiHelpers.Research.size();

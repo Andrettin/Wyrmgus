@@ -76,10 +76,20 @@ static void AddDependency(const std::string &target, const std::string &required
 		// target string refers to unit-xxx
 		rule.Type = DependRuleUnitType;
 		rule.Kind.UnitType = UnitTypeByIdent(target);
+		//Wyrmgus start
+		if (!rule.Kind.UnitType) {
+			fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", target.c_str());
+		}
+		//Wyrmgus end
 	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
 		rule.Type = DependRuleUpgrade;
 		rule.Kind.Upgrade = CUpgrade::Get(target);
+		//Wyrmgus start
+		if (!rule.Kind.Upgrade) {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", target.c_str());
+		}
+		//Wyrmgus end
 	} else {
 		DebugPrint("dependency target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return;
@@ -129,10 +139,20 @@ static void AddDependency(const std::string &target, const std::string &required
 		// required string refers to unit-xxx
 		temp->Type = DependRuleUnitType;
 		temp->Kind.UnitType = UnitTypeByIdent(required);
+		//Wyrmgus start
+		if (!temp->Kind.UnitType) {
+			fprintf(stderr, "Unit type \"%s\" doesn't exist.\n", required.c_str());
+		}
+		//Wyrmgus end
 	} else if (!strncmp(required.c_str(), "upgrade-", 8)) {
 		// required string refers to upgrade-XXX
 		temp->Type = DependRuleUpgrade;
 		temp->Kind.Upgrade = CUpgrade::Get(required);
+		//Wyrmgus start
+		if (!temp->Kind.Upgrade) {
+			fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", required.c_str());
+		}
+		//Wyrmgus end
 	} else {
 		DebugPrint("dependency required '%s' should be unit-type or upgrade\n" _C_ required.c_str());
 		delete temp;

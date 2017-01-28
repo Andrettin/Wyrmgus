@@ -1442,9 +1442,10 @@ void CPlayer::SetCivilization(int civilization)
 		SetDefaultTextColors(UI.NormalFontColor, UI.ReverseFontColor);
 	}
 	
-	if (this->Race != -1 && !GameRunning) {
-		if (!PlayerRaces.CivilizationUpgrades[this->Race].empty()) {
-			UpgradeAcquire(*this, CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race]));
+	if (this->Race != -1) {
+		CUpgrade *civilization_upgrade = CUpgrade::Get(PlayerRaces.CivilizationUpgrades[this->Race]);
+		if (civilization_upgrade && this->Allow.Upgrades[civilization_upgrade->ID] != 'R') {
+			UpgradeAcquire(*this, civilization_upgrade);
 		}
 	}
 		
