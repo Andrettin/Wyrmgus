@@ -492,6 +492,8 @@ extern bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &but
 //Wyrmgus start
 /// Check if the unit has an inventory
 extern bool ButtonCheckHasInventory(const CUnit &unit, const ButtonAction &button);
+/// Check if the unit has buttons for the desired level
+extern bool ButtonCheckHasSubButtons(const CUnit &unit, const ButtonAction &button);
 //Wyrmgus end
 
 //

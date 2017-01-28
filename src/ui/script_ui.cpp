@@ -1071,6 +1071,8 @@ static int CclDefineButton(lua_State *l)
 			//Wyrmgus start
 			} else if (!strcmp(value, "check-has-inventory")) {
 				ba.Allowed = ButtonCheckHasInventory;
+			} else if (!strcmp(value, "check-has-sub-buttons")) {
+				ba.Allowed = ButtonCheckHasSubButtons;
 			//Wyrmgus end
 			} else {
 				LuaError(l, "Unsupported action: %s" _C_ value);

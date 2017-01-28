@@ -417,6 +417,41 @@ bool ButtonCheckHasInventory(const CUnit &unit, const ButtonAction &button)
 {
 	return Selected.size() == 1 && unit.HasInventory();
 }
+
+/**
+**  Check for button enabled, if the button level it leads to has any sub buttons.
+**
+**  @param unit    Pointer to unit for button.
+**  @param button  Pointer to button to check/enable.
+**
+**  @return        True if enabled.
+*/
+bool ButtonCheckHasSubButtons(const CUnit &unit, const ButtonAction &button)
+{
+	for (size_t i = 0; i < UnitButtonTable.size(); ++i) {
+		if (UnitButtonTable[i]->Level != button.Value) {
+			continue;
+		}
+		
+		if (UnitButtonTable[i]->Action == ButtonButton && UnitButtonTable[i]->Value == button.Level) { //don't count buttons to return to the level where this button is
+			continue;
+		}
+
+		char unit_ident[128];
+		sprintf(unit_ident, ",%s,", unit.Type->Ident.c_str());
+		if (UnitButtonTable[i]->UnitMask[0] != '*' && !strstr(UnitButtonTable[i]->UnitMask.c_str(), unit_ident)) {
+			continue;
+		}
+		
+		if (!UnitButtonTable[i]->AlwaysShow && !IsButtonAllowed(unit, *UnitButtonTable[i])) {
+			continue;
+		}
+		
+		return true;
+	}
+	
+	return false;
+}
 //Wyrmgus end
 
 //@}
