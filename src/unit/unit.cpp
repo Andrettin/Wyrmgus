@@ -2899,7 +2899,8 @@ void CUnit::UpdateSettlementName()
 		int faction = -1;
 		if (civilization != -1 && this->Type->Faction != -1) {
 			faction = this->Type->Faction;
-		} else if (civilization != -1 && this->Player->Race == civilization && this->Player->Faction != -1) {
+		} else if (civilization != -1 && this->Player->Faction != -1 && (this->Player->Race == civilization || this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class))) {
+			civilization = this->Player->Race;
 			faction = this->Player->Faction;
 		}
 		int language = PlayerRaces.GetCivilizationLanguage(civilization);

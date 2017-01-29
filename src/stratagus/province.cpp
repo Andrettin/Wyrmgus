@@ -73,6 +73,11 @@ void CleanWorlds()
 	}
 	MapTemplates.clear();
 	
+	for (size_t i = 0; i < Settlements.size(); ++i) {
+		delete Settlements[i];
+	}
+	Settlements.clear();
+	
 	for (size_t i = 0; i < WorldMapTerrainTypes.size(); ++i) {
 		delete WorldMapTerrainTypes[i];
 	}

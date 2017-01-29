@@ -110,6 +110,7 @@ class CCharacter;
 class CUniqueItem;
 class CWorld;
 class CPlane;
+class CSettlement;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -150,6 +151,7 @@ public:
 	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
 	void ParseTerrainFile(bool overlay = false);
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);
+	void ApplySettlements(Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
 	bool IsSubtemplateArea();
 	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false);
@@ -183,8 +185,29 @@ public:
 	std::vector<std::tuple<Vec2i, CUnitType *, CWorld *, CUniqueItem *>> WorldConnectors; /// Layer connectors (with unit type, world pointer, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, int, CUniqueItem *>> LayerConnectors; /// Layer connectors (with unit type, surface/underground layer, and unique item pointer), mapped to the tile position
 	std::map<std::pair<int, int>, std::string> TileLabels; /// labels to appear for certain tiles
+	std::map<std::pair<int, int>, CSettlement *> Settlements;
 	std::map<std::tuple<int, int, int>, std::string> CulturalSettlementNames;
 	std::map<std::tuple<int, int, CFaction *>, std::string> FactionCulturalSettlementNames;
+};
+
+class CSettlement
+{
+public:
+	CSettlement() :
+		Position(-1, -1),
+		MapTemplate(NULL)
+	{
+	}
+
+	std::string Ident;
+	std::string Name;
+	Vec2i Position;												/// Position of the settlement in its map template
+	CMapTemplate *MapTemplate;									/// Map template where this settlement is located
+	std::map<int, std::string> CulturalNames;					/// Names for the settlement for each different culture/civilization
+	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the settlement
+	std::map<CDate, int> HistoricalPopulation;					/// Historical population
+	std::map<CDate, int> HistoricalGarrison;					/// Historical quantity of soldiers garrisoned in the settlement
+	std::vector<std::tuple<CDate, CDate, CUnitType *, CUniqueItem *>> HistoricalBuildings; /// Historical buildings, with start and end date
 };
 //Wyrmgus end
 
@@ -486,6 +509,8 @@ public:
 //Wyrmgus start
 extern std::vector<CMapTemplate *>  MapTemplates;
 extern std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
+extern std::vector<CSettlement *>  Settlements;
+extern std::map<std::string, CSettlement *> SettlementIdentToPointer;
 //Wyrmgus end
 
 extern CMap Map;  /// The current map
@@ -511,6 +536,7 @@ extern int ReplayRevealMap;
 
 //Wyrmgus start
 extern CMapTemplate *GetMapTemplate(std::string map_ident);
+extern CSettlement *GetSettlement(std::string settlement_ident);
 extern std::string GetDegreeLevelNameById(int degree_level);
 extern int GetDegreeLevelIdByName(std::string degree_level);
 //Wyrmgus end

@@ -1541,7 +1541,7 @@ void CPlayer::SetFaction(CFaction *faction)
 				unit.UpdatePersonalName();
 			}
 		}
-		if (unit.Type->BoolFlag[TOWNHALL_INDEX].value && !unit.Unique) {
+		if (settlement_names_changed && unit.Type->BoolFlag[TOWNHALL_INDEX].value && !unit.Unique) {
 			unit.UpdateSettlementName();
 		}
 		unit.UpdateSoldUnits();

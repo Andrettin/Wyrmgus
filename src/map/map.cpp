@@ -72,6 +72,8 @@
 //Wyrmgus start
 std::vector<CMapTemplate *> MapTemplates;
 std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
+std::vector<CSettlement *> Settlements;
+std::map<std::string, CSettlement *> SettlementIdentToPointer;
 //Wyrmgus end
 CMap Map;                   /// The current map
 //Wyrmgus start
@@ -99,7 +101,22 @@ CMapTemplate *GetMapTemplate(std::string map_ident)
 	return NULL;
 }
 
-//Wyrmgus start
+/**
+**  Get a settlement
+*/
+CSettlement *GetSettlement(std::string settlement_ident)
+{
+	if (settlement_ident.empty()) {
+		return NULL;
+	}
+	
+	if (SettlementIdentToPointer.find(settlement_ident) != SettlementIdentToPointer.end()) {
+		return SettlementIdentToPointer[settlement_ident];
+	}
+	
+	return NULL;
+}
+
 std::string GetDegreeLevelNameById(int degree_level)
 {
 	if (degree_level == ExtremelyHighDegreeLevel) {
@@ -421,6 +438,9 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		}
 	}
 
+	if (CurrentCampaign != NULL) {
+		this->ApplySettlements(template_start_pos, map_start_pos, z);
+	}
 	this->ApplyUnits(template_start_pos, map_start_pos, z);
 	
 	for (size_t i = 0; i < this->GeneratedTerrains.size(); ++i) {
@@ -501,6 +521,60 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 	for (size_t i = 0; i < this->GeneratedNeutralUnits.size(); ++i) {
 		bool grouped = this->GeneratedNeutralUnits[i].first->GivesResource && this->GeneratedNeutralUnits[i].first->TileWidth == 1 && this->GeneratedNeutralUnits[i].first->TileHeight == 1; // group small resources
 		Map.GenerateNeutralUnits(this->GeneratedNeutralUnits[i].first, this->GeneratedNeutralUnits[i].second, map_start_pos, map_end - Vec2i(1, 1), grouped, z);
+	}
+}
+
+void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_pos, int z)
+{
+	Vec2i map_end(std::min(Map.Info.MapWidths[z], map_start_pos.x + this->Width), std::min(Map.Info.MapHeights[z], map_start_pos.y + this->Height));
+
+	for (std::map<std::pair<int, int>, CSettlement *>::iterator settlement_iterator = this->Settlements.begin(); settlement_iterator != this->Settlements.end(); ++settlement_iterator) {
+		Vec2i settlement_raw_pos(settlement_iterator->second->Position);
+		Vec2i settlement_pos(map_start_pos + settlement_raw_pos - template_start_pos);
+
+		if (!Map.Info.IsPointOnMap(settlement_pos, z) || settlement_pos.x < map_start_pos.x || settlement_pos.y < map_start_pos.y) {
+			continue;
+		}
+
+		for (std::map<int, std::string>::iterator cultural_name_iterator = settlement_iterator->second->CulturalNames.begin(); cultural_name_iterator != settlement_iterator->second->CulturalNames.end(); ++cultural_name_iterator) {
+			Map.CulturalSettlementNames[z][std::tuple<int, int, int>(settlement_pos.x, settlement_pos.y, cultural_name_iterator->first)] = cultural_name_iterator->second;
+		}
+		
+		CFaction *settlement_owner = NULL;
+		for (std::map<CDate, CFaction *>::reverse_iterator owner_iterator = settlement_iterator->second->HistoricalOwners.rbegin(); owner_iterator != settlement_iterator->second->HistoricalOwners.rend(); ++owner_iterator) {
+			if (CurrentCampaign->StartDate >= owner_iterator->first) { // set the owner to the latest historical owner given the scenario's start date
+				settlement_owner = owner_iterator->second;
+				break;
+			}
+		}
+		
+		if (!settlement_owner) {
+			continue;
+		}
+		
+		CPlayer *player = player = GetOrAddFactionPlayer(settlement_owner);
+		if (player->StartPos.x == 0 && player->StartPos.y == 0) {
+			Vec2i default_pos(map_start_pos + settlement_owner->DefaultStartPos - template_start_pos);
+			if (settlement_owner->DefaultStartPos.x != -1 && settlement_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
+				player->SetStartView(default_pos, z);
+			} else {
+				player->SetStartView(settlement_pos, z);
+			}
+		}
+		
+		for (size_t j = 0; j < settlement_iterator->second->HistoricalBuildings.size(); ++j) {
+			if (
+				CurrentCampaign->StartDate >= std::get<0>(settlement_iterator->second->HistoricalBuildings[j])
+				&& (CurrentCampaign->StartDate < std::get<1>(settlement_iterator->second->HistoricalBuildings[j]) || std::get<1>(settlement_iterator->second->HistoricalBuildings[j]).year == 0)
+			) {
+				const CUnitType *type = std::get<2>(settlement_iterator->second->HistoricalBuildings[j]);
+				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
+				CUnit *unit = CreateUnit(settlement_pos - unit_offset, *type, player, z);
+				if (std::get<3>(settlement_iterator->second->HistoricalBuildings[j])) {
+					unit->SetUnique(std::get<3>(settlement_iterator->second->HistoricalBuildings[j]));
+				}
+			}
+		}
 	}
 }
 
