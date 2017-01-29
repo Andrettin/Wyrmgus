@@ -202,11 +202,11 @@ static int CclDefineRegion(lua_State *l)
 		LuaError(l, "incorrect argument (expected table)");
 	}
 
-	std::string region_name = LuaToString(l, 1);
-	CRegion *region = GetRegion(region_name);
+	std::string region_ident = LuaToString(l, 1);
+	CRegion *region = GetRegion(region_ident);
 	if (!region) {
 		region = new CRegion;
-		region->Name = region_name;
+		region->Ident = region_ident;
 		region->ID = Regions.size();
 		Regions.push_back(region);
 	}
@@ -215,7 +215,9 @@ static int CclDefineRegion(lua_State *l)
 	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
 		const char *value = LuaToString(l, -2);
 		
-		if (!strcmp(value, "HistoricalPopulation")) {
+		if (!strcmp(value, "Name")) {
+			region->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "HistoricalPopulation")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}

@@ -131,10 +131,10 @@ CWorld *GetWorld(std::string world_name)
 	return NULL;
 }
 
-CRegion *GetRegion(std::string region_name)
+CRegion *GetRegion(std::string region_ident)
 {
 	for (size_t i = 0; i < Regions.size(); ++i) {
-		if (region_name == Regions[i]->Name) {
+		if (region_ident == Regions[i]->Ident) {
 			return Regions[i];
 		}
 	}

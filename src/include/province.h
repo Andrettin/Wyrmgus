@@ -55,6 +55,7 @@ class CCharacter;
 class CSpecies;
 class WorldMapTile;
 class CGraphic;
+class CSettlement;
 
 /**
 **  Indexes into era array.
@@ -150,9 +151,11 @@ public:
 	{
 	}
 	
+	std::string Ident;
 	std::string Name;
 	int ID;																/// ID of this province
 	std::vector<CProvince *> Provinces;									/// Provinces which belong to this region
+	std::vector<CSettlement *> Settlements;								/// Settlements which belong to this region
 	std::map<int, int> HistoricalPopulation;							/// Historical population, mapped to the year
 };
 

@@ -1747,6 +1747,19 @@ static int CclDefineSettlement(lua_State *l)
 				lua_pop(l, 1);
 				settlement->HistoricalBuildings.push_back(std::tuple<CDate, CDate, CUnitType *, CUniqueItem *>(start_date, end_date, building_unit_type, unique));
 			}
+		} else if (!strcmp(value, "Regions")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CRegion *region = GetRegion(LuaToString(l, -1, j + 1));
+				if (region == NULL) {
+					LuaError(l, "Region doesn't exist.");
+				}
+				settlement->Regions.push_back(region);
+				region->Settlements.push_back(settlement);
+			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
 		}

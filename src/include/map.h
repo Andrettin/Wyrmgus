@@ -111,6 +111,7 @@ class CUniqueItem;
 class CWorld;
 class CPlane;
 class CSettlement;
+class CRegion;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -203,6 +204,7 @@ public:
 	std::string Name;
 	Vec2i Position;												/// Position of the settlement in its map template
 	CMapTemplate *MapTemplate;									/// Map template where this settlement is located
+	std::vector<CRegion *> Regions;								/// Regions where this settlement is located
 	std::map<int, std::string> CulturalNames;					/// Names for the settlement for each different culture/civilization
 	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the settlement
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
