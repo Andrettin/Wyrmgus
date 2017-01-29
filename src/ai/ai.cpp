@@ -286,13 +286,8 @@ static void AiCheckUnits()
 				continue;
 			}
 						
-			if (possible_faction->Conditions) {
-				CclCommand("trigger_player = " + std::to_string((long long) AiPlayer->Player->Index) + ";");
-				possible_faction->Conditions->pushPreamble();
-				possible_faction->Conditions->run(1);
-				if (possible_faction->Conditions->popBoolean() == false) {
-					continue;
-				}
+			if (!AiPlayer->Player->CanFoundFaction(possible_faction)) {
+				continue;
 			}
 			
 			n = AiHelpers.Research.size();

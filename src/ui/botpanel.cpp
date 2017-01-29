@@ -1475,6 +1475,14 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
+				//Wyrmgus start
+				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
+					CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
+					if (upgrade_faction) {
+						res = unit.Player->CanFoundFaction(upgrade_faction);
+					}
+				}
+				//Wyrmgus end
 			}
 			break;
 		//Wyrmgus start

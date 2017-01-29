@@ -1648,6 +1648,7 @@ static int CclDefineSettlement(lua_State *l)
 				std::string cultural_name = LuaToString(l, -1, j + 1);
 				
 				settlement->CulturalNames[civilization] = cultural_name;
+				PlayerRaces.Civilizations[civilization]->SettlementNames.push_back(cultural_name);
 			}
 		} else if (!strcmp(value, "HistoricalOwners")) {
 			if (!lua_istable(l, -1)) {

@@ -1565,14 +1565,8 @@ void CPlayer::SetRandomFaction()
 		for (size_t i = 0; i < PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo.size(); ++i) {
 			int faction_id = PlayerRaces.GetFactionIndexByName(this->Race, PlayerRaces.Factions[this->Race][this->Faction]->DevelopsTo[i]);
 			if (faction_id != -1) {
-				bool faction_used = false;
-				for (int j = 0; j < PlayerMax; ++j) {
-					if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][faction_id]->Name) {
-						faction_used = true;
-					}		
-				}
 				if (
-					!faction_used
+					this->CanFoundFaction(PlayerRaces.Factions[this->Race][faction_id])
 					&& ((PlayerRaces.Factions[this->Race][faction_id]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][faction_id]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
 					&& PlayerRaces.Factions[this->Race][faction_id]->Playable
 				) {
@@ -1585,14 +1579,8 @@ void CPlayer::SetRandomFaction()
 	
 	if (faction_count == 0) {
 		for (size_t i = 0; i < PlayerRaces.Factions[this->Race].size(); ++i) {
-			bool faction_used = false;
-			for (int j = 0; j < PlayerMax; ++j) {
-				if (this->Index != j && Players[j].Type != PlayerNobody && Players[j].Name == PlayerRaces.Factions[this->Race][i]->Name) {
-					faction_used = true;
-				}		
-			}
 			if (
-				!faction_used
+				this->CanFoundFaction(PlayerRaces.Factions[this->Race][i])
 				&& ((PlayerRaces.Factions[this->Race][i]->Type == FactionTypeTribe && !this->HasUpgradeClass("writing")) || ((PlayerRaces.Factions[this->Race][i]->Type == FactionTypePolity && this->HasUpgradeClass("writing"))))
 				&& PlayerRaces.Factions[this->Race][i]->Playable
 			) {
@@ -1634,6 +1622,32 @@ bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
 	}
 
 	return false;
+}
+
+/**
+**  Check if the player can found a particular faction.
+**
+**  @param faction    New faction.
+*/
+bool CPlayer::CanFoundFaction(CFaction *faction)
+{
+	for (int i = 0; i < PlayerMax; ++i) {
+		if (this->Index != i && Players[i].Type != PlayerNobody && Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
+			// faction is already in use
+			return false;
+		}		
+	}
+	
+	if (faction->Conditions) {
+		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+		faction->Conditions->pushPreamble();
+		faction->Conditions->run(1);
+		if (faction->Conditions->popBoolean() == false) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 //Wyrmgus end
 
