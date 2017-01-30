@@ -1543,16 +1543,28 @@ static void ConvertImageToMap(SDL_Surface *Surface, int Width, int Height)
 
 			Video.GetRGBA(c, Surface->format, &r, &g, &b, &a);
 			if (a >= 128) {
-				map_terrains[i][j] = "d";
+				if (r == 235 && g == 235 && b == 235) {
+					map_terrains[i][j] = "s";
+				} else if (r == 138 && g == 11 && b == 26) {
+					map_terrains[i][j] = "r";
+				} else if (r == 69 && g == 91 && b == 186) {
+					map_terrains[i][j] = "w";
+				} else if (r == 178 && g == 34 && b == 34) {
+					map_terrains[i][j] = "m";
+				} else if (r == 0 && g == 255 && b == 255) {
+					map_terrains[i][j] = "e";
+				} else {
+					map_terrains[i][j] = "d";
+				}
 			} else {
-				map_terrains[i][j] = "w";
+				map_terrains[i][j] = "0";
 			}
 		}
 	}
 	SDL_UnlockSurface(Surface);
 	
 	FileWriter *fw = NULL;
-	std::string map_filename = "scripts/map_templates/nidavellir.map";
+	std::string map_filename = "scripts/map_templates/new.map";
 
 	try {
 		fw = CreateFileWriter(map_filename);
@@ -1629,7 +1641,7 @@ void CGraphic::Load(bool grayscale)
 	}
 	
 	/*
-	if (Width == 984) {
+	if (Width == 1792) {
 		ConvertImageToMap(Surface, Width, Height);
 	}
 	*/

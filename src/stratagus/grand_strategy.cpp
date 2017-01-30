@@ -4066,8 +4066,8 @@ void CGrandStrategyFaction::SetDiplomacyState(CGrandStrategyFaction *faction, in
 {
 	int second_diplomacy_state_id; // usually the second diplomacy state is the same as the first, but there are asymmetrical diplomacy states (such as vassal/sovereign relationships)
 	if (diplomacy_state_id == DiplomacyStateVassal) {
-		second_diplomacy_state_id = DiplomacyStateSovereign;
-	} else if (diplomacy_state_id == DiplomacyStateSovereign) {
+		second_diplomacy_state_id = DiplomacyStateOverlord;
+	} else if (diplomacy_state_id == DiplomacyStateOverlord) {
 		second_diplomacy_state_id = DiplomacyStateVassal;
 	} else {
 		second_diplomacy_state_id = diplomacy_state_id;
@@ -8553,8 +8553,8 @@ std::string GetDiplomacyStateNameById(int diplomacy_state)
 		return "alliance";
 	} else if (diplomacy_state == DiplomacyStateVassal) {
 		return "vassal";
-	} else if (diplomacy_state == DiplomacyStateSovereign) {
-		return "sovereign";
+	} else if (diplomacy_state == DiplomacyStateOverlord) {
+		return "overlord";
 	} else if (diplomacy_state == -1) {
 		return "";
 	}
@@ -8573,8 +8573,8 @@ int GetDiplomacyStateIdByName(std::string diplomacy_state)
 	} else if (diplomacy_state == "vassal") {
 //		return DiplomacyStateVassal;
 		return DiplomacyStateAlliance;
-	} else if (diplomacy_state == "sovereign") {
-//		return DiplomacyStateSovereign;
+	} else if (diplomacy_state == "overlord") {
+//		return DiplomacyStateOverlord;
 		return DiplomacyStateAlliance;
 	}
 
