@@ -353,7 +353,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 				this->Subtemplates[i]->Apply(Vec2i(0, 0), subtemplate_pos, z);
 			}
 				
-			Map.SubtemplateAreas[z].push_back(std::pair<Vec2i, Vec2i>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1)));
+			Map.SubtemplateAreas[z].push_back(std::tuple<Vec2i, Vec2i, CMapTemplate *>(subtemplate_pos, Vec2i(subtemplate_pos.x + this->Subtemplates[i]->Width - 1, subtemplate_pos.y + this->Subtemplates[i]->Height - 1), this->Subtemplates[i]));
 				
 			if (subtemplate_pos.x >= 0 && subtemplate_pos.y >= 0) {
 				for (size_t j = 0; j < this->Subtemplates[i]->ExternalGeneratedTerrains.size(); ++j) {
@@ -1290,8 +1290,8 @@ bool CMap::IsPointInASubtemplateArea(const Vec2i &pos, int z) const
 	}
 	
 	for (size_t i = 0; i < this->SubtemplateAreas.find(z)->second.size(); ++i) {
-		Vec2i min_pos = this->SubtemplateAreas.find(z)->second[i].first;
-		Vec2i max_pos = this->SubtemplateAreas.find(z)->second[i].second;
+		Vec2i min_pos = std::get<0>(this->SubtemplateAreas.find(z)->second[i]);
+		Vec2i max_pos = std::get<1>(this->SubtemplateAreas.find(z)->second[i]);
 		if (pos.x >= min_pos.x && pos.y >= min_pos.y && pos.x <= max_pos.x && pos.y <= max_pos.y) {
 			return true;
 		}
@@ -1444,6 +1444,51 @@ int GetMapLayer(std::string plane_name, std::string world_name, int surface_laye
 	return -1;
 }
 
+int GetSubtemplateStartX(std::string subtemplate_ident)
+{
+	CMapTemplate *subtemplate = GetMapTemplate(subtemplate_ident);
+	
+	if (!subtemplate) {
+		return -1;
+	}
+
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		if (Map.SubtemplateAreas.find(z) == Map.SubtemplateAreas.end()) {
+			continue;
+		}
+		for (size_t i = 0; i < Map.SubtemplateAreas.find(z)->second.size(); ++i) {
+			Vec2i min_pos = std::get<0>(Map.SubtemplateAreas.find(z)->second[i]);
+			if (subtemplate == std::get<2>(Map.SubtemplateAreas.find(z)->second[i])) {
+				return min_pos.x;
+			}
+		}
+	}
+
+	return -1;
+}
+
+int GetSubtemplateStartY(std::string subtemplate_ident)
+{
+	CMapTemplate *subtemplate = GetMapTemplate(subtemplate_ident);
+	
+	if (!subtemplate) {
+		return -1;
+	}
+
+	for (size_t z = 0; z < Map.Fields.size(); ++z) {
+		if (Map.SubtemplateAreas.find(z) == Map.SubtemplateAreas.end()) {
+			continue;
+		}
+		for (size_t i = 0; i < Map.SubtemplateAreas.find(z)->second.size(); ++i) {
+			Vec2i min_pos = std::get<0>(Map.SubtemplateAreas.find(z)->second[i]);
+			if (subtemplate == std::get<2>(Map.SubtemplateAreas.find(z)->second[i])) {
+				return min_pos.y;
+			}
+		}
+	}
+
+	return -1;
+}
 
 void ChangeCurrentMapLayer(int z)
 {

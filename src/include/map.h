@@ -497,7 +497,7 @@ public:
 	std::vector<std::vector<CUnit *>> LayerConnectors;	/// connectors in a layer that lead to other layers
 	std::vector<std::map<std::tuple<int, int, int>, std::string>> CulturalSettlementNames;
 	std::vector<std::map<std::tuple<int, int, CFaction *>, std::string>> FactionCulturalSettlementNames;
-	std::map<int, std::vector<std::pair<Vec2i, Vec2i>>> SubtemplateAreas;
+	std::map<int, std::vector<std::tuple<Vec2i, Vec2i, CMapTemplate *>>> SubtemplateAreas;
 	//Wyrmgus end
 
 	CMapInfo Info;             /// descriptive information
@@ -689,6 +689,8 @@ extern void PreprocessMap();
 
 //Wyrmgus start
 extern int GetMapLayer(std::string plane_name = "", std::string world_name = "", int surface_layer = 0);
+extern int GetSubtemplateStartX(std::string subtemplate_ident);
+extern int GetSubtemplateStartY(std::string subtemplate_ident);
 extern void ChangeCurrentMapLayer(int z);
 extern void SetTimeOfDay(int time_of_day, int z = 0);
 //Wyrmgus end

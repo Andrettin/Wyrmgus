@@ -27,6 +27,8 @@ extern CMap Map;
 
 //Wyrmgus start
 extern int GetMapLayer(std::string plane_name = "", std::string world_name = "", int surface_layer = 0);
+extern int GetSubtemplateStartX(std::string subtemplate_ident);
+extern int GetSubtemplateStartY(std::string subtemplate_ident);
 extern void ChangeCurrentMapLayer(int z);
 extern void SetTimeOfDay(int time_of_day, int z = 0);
 //void SetTile(int tile, int w, int h, int value = 0);
