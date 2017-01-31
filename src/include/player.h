@@ -98,6 +98,10 @@ enum _diplomacy_ {
 	DiplomacyAllied,   /// Ally with opponent
 	DiplomacyNeutral,  /// Don't attack be neutral
 	DiplomacyEnemy,    /// Attack opponent
+	//Wyrmgus start
+	DiplomacyOverlord,	/// Become overlord to other player
+	DiplomacyVassal,	/// Become vassal to other player
+	//Wyrmgus end
 	DiplomacyCrazy     /// Ally and attack opponent
 }; /// Diplomacy states for CommandDiplomacy
 
@@ -121,6 +125,9 @@ public:
 	Vec2i StartPos;  /// map tile start position
 	//Wyrmgus start
 	int StartMapLayer;  /// map tile start map layer
+	
+	CPlayer *Overlord;	/// overlord of this player
+	std::vector<CPlayer *> Vassals;	/// vassals of this player
 	//Wyrmgus end
 
 	//Wyrmgus start
@@ -311,17 +318,26 @@ public:
 	bool IsTeamed(const CPlayer &player) const;
 	bool IsTeamed(const CUnit &unit) const;
 	//Wyrmgus start
+	bool IsOverlordOf(const CPlayer &player, bool include_indirect = false) const;
+	bool IsVassalOf(const CPlayer &player, bool include_indirect = false) const;
 	bool HasContactWith(const CPlayer &player) const;
 	bool HasHero(const CCharacter *hero) const;
 	//Wyrmgus end
 
 	void SetDiplomacyNeutralWith(const CPlayer &player);
 	void SetDiplomacyAlliedWith(const CPlayer &player);
-	void SetDiplomacyEnemyWith(const CPlayer &player);
+	//Wyrmgus start
+//	void SetDiplomacyEnemyWith(const CPlayer &player);
+	void SetDiplomacyEnemyWith(CPlayer &player);
+	//Wyrmgus end
 	void SetDiplomacyCrazyWith(const CPlayer &player);
 
 	void ShareVisionWith(const CPlayer &player);
 	void UnshareVisionWith(const CPlayer &player);
+	
+	//Wyrmgus start
+	void SetOverlord(CPlayer *player);
+	//Wyrmgus end
 
 	void Init(/* PlayerTypes */ int type);
 	void Save(CFile &file) const;

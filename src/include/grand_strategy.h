@@ -64,8 +64,8 @@ enum DiplomacyStates {
 	DiplomacyStateAlliance,
 	DiplomacyStatePeace,
 	DiplomacyStateWar,
-	DiplomacyStateVassal,
 	DiplomacyStateOverlord,
+	DiplomacyStateVassal,
 	
 	MaxDiplomacyStates
 };

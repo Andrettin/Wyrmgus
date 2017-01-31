@@ -1299,6 +1299,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Race = 0;
 	//Wyrmgus start
 	this->Faction = -1;
+	this->Overlord = NULL;
 	//Wyrmgus end
 	this->Team = team;
 	this->Enemy = 0;
@@ -1665,6 +1666,8 @@ void CPlayer::Clear()
 	Race = 0;
 	//Wyrmgus start
 	Faction = -1;
+	Overlord = NULL;
+	Vassals.clear();
 	//Wyrmgus end
 	AiName.clear();
 	Team = 0;
@@ -2781,7 +2784,10 @@ void CPlayer::SetDiplomacyAlliedWith(const CPlayer &player)
 	//Wyrmgus end
 }
 
-void CPlayer::SetDiplomacyEnemyWith(const CPlayer &player)
+//Wyrmgus start
+//void CPlayer::SetDiplomacyEnemyWith(const CPlayer &player)
+void CPlayer::SetDiplomacyEnemyWith(CPlayer &player)
+//Wyrmgus end
 {
 	this->Enemy |= 1 << player.Index;
 	this->Allied &= ~(1 << player.Index);
@@ -2789,6 +2795,13 @@ void CPlayer::SetDiplomacyEnemyWith(const CPlayer &player)
 	//Wyrmgus start
 	if (GameCycle > 0 && player.Index == ThisPlayer->Index) {
 		ThisPlayer->Notify(_("%s changed their diplomatic stance with us to Enemy"), _(this->Name.c_str()));
+	}
+	
+	// if either player is the overlord of another (indirect or otherwise), break the vassalage bond after the declaration of war
+	if (this->IsOverlordOf(player, true)) {
+		player.SetOverlord(NULL);
+	} else if (player.IsOverlordOf(*this, true)) {
+		this->SetOverlord(NULL);
 	}
 	//Wyrmgus end
 }
@@ -2827,6 +2840,26 @@ void CPlayer::UnshareVisionWith(const CPlayer &player)
 	//Wyrmgus end
 }
 
+//Wyrmgus start
+void CPlayer::SetOverlord(CPlayer *player)
+{
+	if (this->Overlord) {
+		this->Overlord->Vassals.erase(std::remove(this->Overlord->Vassals.begin(), this->Overlord->Vassals.end(), this), this->Overlord->Vassals.end());
+	}
+
+	this->Overlord = player;
+	
+	if (this->Overlord) {
+		this->Overlord->Vassals.push_back(this);
+		this->SetDiplomacyAlliedWith(*this->Overlord);
+		this->Overlord->SetDiplomacyAlliedWith(*this);
+		CommandDiplomacy(this->Index, DiplomacyAllied, this->Overlord->Index);
+		CommandDiplomacy(this->Overlord->Index, DiplomacyAllied, this->Index);
+		CommandSharedVision(this->Index, true, this->Overlord->Index);
+		CommandSharedVision(this->Overlord->Index, true, this->Index);
+	}
+}
+//Wyrmgus end
 
 /**
 **  Check if the player is an enemy
@@ -2925,6 +2958,52 @@ bool CPlayer::IsTeamed(const CUnit &unit) const
 }
 
 //Wyrmgus start
+/**
+**  Check if the player is the overlord of another
+*/
+bool CPlayer::IsOverlordOf(const CPlayer &player, bool include_indirect) const
+{
+	if (!player.Overlord) {
+		return false;
+	}
+	
+	if (this == player.Overlord) {
+		return true;
+	}
+
+	if (include_indirect) { //if include_indirect is true, search this player's other vassals to see if the player is an indirect overlord of the other
+		for (size_t i = 0; i < this->Vassals.size(); ++i) {
+			if (this->Vassals[i]->IsOverlordOf(player, include_indirect)) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+/**
+**  Check if the player is the vassal of another
+*/
+bool CPlayer::IsVassalOf(const CPlayer &player, bool include_indirect) const
+{
+	if (!this->Overlord) {
+		return false;
+	}
+	
+	if (this->Overlord == &player) {
+		return true;
+	}
+
+	if (include_indirect) { //if include_indirect is true, search this player's other vassals to see if the player is an indirect overlord of the other
+		if (this->Overlord->IsVassalOf(player, include_indirect)) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 /**
 **  Check if the player has contact with another (used for determining which players show up in the player list and etc.)
 */

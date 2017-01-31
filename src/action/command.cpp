@@ -1250,6 +1250,14 @@ void CommandDiplomacy(int player, int state, int opponent)
 		case DiplomacyEnemy:
 			Players[player].SetDiplomacyEnemyWith(Players[opponent]);
 			break;
+		//Wyrmgus start
+		case DiplomacyOverlord:
+			Players[opponent].SetOverlord(&Players[player]);
+			break;
+		case DiplomacyVassal:
+			Players[player].SetOverlord(&Players[opponent]);
+			break;
+		//Wyrmgus end
 		case DiplomacyCrazy:
 			Players[player].SetDiplomacyCrazyWith(Players[opponent]);
 			break;

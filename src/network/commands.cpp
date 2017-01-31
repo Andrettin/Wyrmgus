@@ -677,6 +677,16 @@ void SendCommandDiplomacy(int player, int state, int opponent)
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "enemy", -1);
 				break;
+			//Wyrmgus start
+			case DiplomacyOverlord:
+				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
+						   NoUnitP, "overlord", -1);
+				break;
+			case DiplomacyVassal:
+				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
+						   NoUnitP, "vassal", -1);
+				break;
+			//Wyrmgus end
 			case DiplomacyCrazy:
 				CommandLog("diplomacy", NoUnitP, 0, player, opponent,
 						   NoUnitP, "crazy", -1);

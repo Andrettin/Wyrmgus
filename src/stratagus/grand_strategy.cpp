@@ -8571,11 +8571,9 @@ int GetDiplomacyStateIdByName(std::string diplomacy_state)
 	} else if (diplomacy_state == "alliance") {
 		return DiplomacyStateAlliance;
 	} else if (diplomacy_state == "vassal") {
-//		return DiplomacyStateVassal;
-		return DiplomacyStateAlliance;
+		return DiplomacyStateVassal;
 	} else if (diplomacy_state == "overlord") {
-//		return DiplomacyStateOverlord;
-		return DiplomacyStateAlliance;
+		return DiplomacyStateOverlord;
 	}
 
 	return -1;

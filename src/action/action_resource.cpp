@@ -1321,8 +1321,16 @@ int COrder_Resource::MoveToDepot(CUnit &unit)
 //	player.TotalResources[rindex] += (unit.ResourcesHeld * player.Incomes[rindex]) / 100;
 	const int rindex = DefaultResourceFinalResources[this->CurrentResource];
 	int resource_change = unit.ResourcesHeld * DefaultResourceFinalResourceConversionRates[this->CurrentResource] / 100;
-	player.ChangeResource(rindex, (resource_change * player.Incomes[rindex]) / 100, true);
-	player.TotalResources[rindex] += (resource_change * player.Incomes[rindex]) / 100;
+	int processed_resource_change = (resource_change * player.Incomes[rindex]) / 100;
+	if (!player.Overlord) {
+		player.ChangeResource(rindex, processed_resource_change, true);
+		player.TotalResources[rindex] += processed_resource_change;
+	} else { // if the player has an overlord, give 10% of the resources gathered to them
+		player.ChangeResource(rindex, processed_resource_change * 90 / 100, true);
+		player.TotalResources[rindex] += processed_resource_change * 90 / 100;
+		player.Overlord->ChangeResource(rindex, processed_resource_change / 10, true);
+		player.Overlord->TotalResources[rindex] += processed_resource_change / 10;
+	}
 	
 	//give XP to the worker according to how much was gathered, based on their base price in relation to gold
 	int xp_gained = unit.ResourcesHeld;

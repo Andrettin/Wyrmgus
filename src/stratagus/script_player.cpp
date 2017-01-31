@@ -664,6 +664,12 @@ static int CclSetDiplomacy(lua_State *l)
 		SendCommandDiplomacy(base, DiplomacyCrazy, plynr);
 	} else if (!strcmp(state, "enemy")) {
 		SendCommandDiplomacy(base, DiplomacyEnemy, plynr);
+	//Wyrmgus start
+	} else if (!strcmp(state, "overlord")) {
+		SendCommandDiplomacy(base, DiplomacyOverlord, plynr);
+	} else if (!strcmp(state, "vassal")) {
+		SendCommandDiplomacy(base, DiplomacyVassal, plynr);
+	//Wyrmgus end
 	}
 	return 0;
 }
