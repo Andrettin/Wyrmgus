@@ -3030,6 +3030,27 @@ bool CPlayer::HasContactWith(const CPlayer &player) const
 	return player.StartMapLayer == this->StartMapLayer || (Map.Worlds[player.StartMapLayer] == Map.Worlds[this->StartMapLayer] && Map.Planes[player.StartMapLayer] == Map.Planes[this->StartMapLayer]);
 }
 
+/**
+**  Check if the player can use the buildings of another, for neutral building functions (i.e. unit training)
+*/
+bool CPlayer::HasBuildingAccess(const CPlayer &player) const
+{
+	if (player.Type == PlayerNeutral) {
+		return true;
+	}
+	
+	if (
+		player.Race != -1
+		&& player.Faction != -1
+		&& (PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeMercenaryCompany || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeHolyOrder || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeTradingCompany)
+		&& player.Overlord == NULL || this->IsOverlordOf(player, true)
+	) {
+		return true;
+	}
+
+	return false;
+}
+
 bool CPlayer::HasHero(const CCharacter *hero) const
 {
 	for (size_t i = 0; i < this->Heroes.size(); ++i) {

@@ -2348,7 +2348,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
 					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
@@ -2379,7 +2379,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 			//  for transporter
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->IsAllied(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->IsAllied(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
@@ -2406,7 +2406,7 @@ static void UIHandleButtonDown_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
@@ -2469,7 +2469,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaTraining) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				if (static_cast<size_t>(ButtonUnderCursor) < Selected[0]->Orders.size()
 					&& Selected[0]->Orders[ButtonUnderCursor]->Action == UnitActionTrain) {
@@ -2500,7 +2500,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 			//  for transporter
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->IsAllied(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->IsAllied(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				if (Selected[0]->BoardCount >= ButtonUnderCursor) {
 					CUnit *uins = Selected[0]->UnitInside;
@@ -2567,7 +2567,7 @@ static void UIHandleButtonUp_OnButton(unsigned button)
 		} else if (ButtonAreaUnderCursor == ButtonAreaButton) {
 			//Wyrmgus start
 //			if (!GameObserve && !GamePaused && !GameEstablishing && ThisPlayer->IsTeamed(*Selected[0])) {
-			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+			if (!GameObserve && !GamePaused && !GameEstablishing && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 			//Wyrmgus end
 				OldButtonUnderCursor = ButtonUnderCursor;
 			}
@@ -2789,7 +2789,7 @@ void UIHandleButtonUp(unsigned button)
 		}
 		//Wyrmgus start
 //		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && ThisPlayer->IsTeamed(*Selected[0])) {
-		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (ThisPlayer->IsTeamed(*Selected[0]) || Selected[0]->Player->Type == PlayerNeutral)) {
+		if (!GameObserve && !GamePaused && !GameEstablishing && Selected.empty() == false && (ThisPlayer->IsTeamed(*Selected[0]) || ThisPlayer->HasBuildingAccess(*Selected[0]->Player))) {
 		//Wyrmgus end
 			if (OldButtonUnderCursor != -1 && OldButtonUnderCursor == ButtonUnderCursor) {
 				UI.ButtonPanel.DoClicked(ButtonUnderCursor);
@@ -2932,7 +2932,7 @@ void UIHandleButtonUp(unsigned button)
 					// FIXME: use GameSounds.Burning
 					PlayGameSound(SoundForName("burning"), MaxSampleVolume);
 				} else if (Selected[0]->Player == ThisPlayer || ThisPlayer->IsTeamed(*Selected[0])
-						   || Selected[0]->Player->Type == PlayerNeutral) {
+						   || ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) {
 					PlayUnitSound(*Selected[0], VoiceSelected);
 				} else {
 					PlayGameSound(GameSounds.Click.Sound, MaxSampleVolume);

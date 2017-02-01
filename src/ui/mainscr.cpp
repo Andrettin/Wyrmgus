@@ -752,7 +752,7 @@ static void DrawUnitInfo(CUnit &unit)
 
 	//Wyrmgus start
 //	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player)) {
-	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player) && unit.Player->Type != PlayerNeutral) {
+	if (unit.Player != ThisPlayer && !ThisPlayer->IsAllied(*unit.Player) && !ThisPlayer->HasBuildingAccess(*unit.Player)) {
 	//Wyrmgus end
 		return;
 	}
@@ -931,7 +931,7 @@ void DrawPopups()
 			LastDrawnButtonPopup = NULL;
 		}
 		
-		if (!(Selected[0]->Player != ThisPlayer && !ThisPlayer->IsAllied(*Selected[0]->Player) && Selected[0]->Player->Type != PlayerNeutral) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForInventory) {
+		if (!(Selected[0]->Player != ThisPlayer && !ThisPlayer->IsAllied(*Selected[0]->Player) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) && Selected[0]->HasInventory() && Selected[0]->InsideCount && CurrentButtonLevel == Selected[0]->Type->ButtonLevelForInventory) {
 		CUnit *uins = Selected[0]->UnitInside;
 		size_t j = 0;
 

@@ -321,6 +321,7 @@ public:
 	bool IsOverlordOf(const CPlayer &player, bool include_indirect = false) const;
 	bool IsVassalOf(const CPlayer &player, bool include_indirect = false) const;
 	bool HasContactWith(const CPlayer &player) const;
+	bool HasBuildingAccess(const CPlayer &player) const;
 	bool HasHero(const CCharacter *hero) const;
 	//Wyrmgus end
 

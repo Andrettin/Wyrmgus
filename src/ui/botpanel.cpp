@@ -1176,7 +1176,12 @@ void CButtonPanel::Draw()
 		Assert(buttons[i].Pos == i + 1);
 		//Wyrmgus start
 		//for neutral units, don't draw buttons that aren't training buttons (in other words, only draw buttons which are usable by neutral buildings)
-		if (Selected[0]->Player != ThisPlayer && !ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type == PlayerNeutral && buttons[i].Action != ButtonTrain && buttons[i].Action != ButtonCancelTrain && buttons[i].Action != ButtonBuy) {
+		if (
+			Selected[0]->Player != ThisPlayer
+			&& !ThisPlayer->IsTeamed(*Selected[0])
+			&& ThisPlayer->HasBuildingAccess(*Selected[0]->Player)
+			&& buttons[i].Action != ButtonTrain && buttons[i].Action != ButtonCancelTrain && buttons[i].Action != ButtonBuy
+		) {
 			continue;
 		}
 		//Wyrmgus end
@@ -1263,8 +1268,8 @@ void CButtonPanel::Draw()
 //				player = Selected[0]->RescuedFrom ? Selected[0]->RescuedFrom->Index : Selected[0]->Player->Index;
 				player = Selected[0]->GetDisplayPlayer();
 
-				//if unit is neutral, set color to that of the person player
-				if (Players[player].Type == PlayerNeutral) {
+				//if is accessing a building of another player, set color to that of the person player (i.e. for training buttons)
+				if (ThisPlayer->HasBuildingAccess(Players[player])) {
 					player = ThisPlayer->Index;
 				}
 				
@@ -1715,7 +1720,7 @@ void CButtonPanel::Update()
 	// foreign unit
 	//Wyrmgus start
 //	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit)) {
-	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit) && unit.Player->Type != PlayerNeutral) {
+	if (unit.Player != ThisPlayer && !ThisPlayer->IsTeamed(unit) && !ThisPlayer->HasBuildingAccess(*unit.Player)) {
 	//Wyrmgus end
 		CurrentButtons.clear();
 		return;
@@ -2171,7 +2176,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && Selected[0]->Player->Type != PlayerNeutral) || (Selected[0]->Player->Type == PlayerNeutral && CurrentButtons[button].Action != ButtonTrain && CurrentButtons[button].Action != ButtonCancelTrain && CurrentButtons[button].Action != ButtonBuy)) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) || (ThisPlayer->HasBuildingAccess(*Selected[0]->Player) && CurrentButtons[button].Action != ButtonTrain && CurrentButtons[button].Action != ButtonCancelTrain && CurrentButtons[button].Action != ButtonBuy)) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}
