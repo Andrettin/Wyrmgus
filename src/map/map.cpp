@@ -552,7 +552,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			continue;
 		}
 		
-		CPlayer *player = player = GetOrAddFactionPlayer(settlement_owner);
+		CPlayer *player = GetOrAddFactionPlayer(settlement_owner);
 		if (player->StartPos.x == 0 && player->StartPos.y == 0) {
 			Vec2i default_pos(map_start_pos + settlement_owner->DefaultStartPos - template_start_pos);
 			if (settlement_owner->DefaultStartPos.x != -1 && settlement_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
@@ -569,7 +569,22 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			) {
 				const CUnitType *type = std::get<2>(settlement_iterator->second->HistoricalBuildings[j]);
 				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
-				CUnit *unit = CreateUnit(settlement_pos - unit_offset, *type, player, z);
+				CUnit *unit = NULL;
+				CFaction *building_owner = std::get<4>(settlement_iterator->second->HistoricalBuildings[j]);
+				if (building_owner) {
+					CPlayer *building_player = GetOrAddFactionPlayer(building_owner);
+					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {
+						Vec2i default_pos(map_start_pos + building_owner->DefaultStartPos - template_start_pos);
+						if (building_owner->DefaultStartPos.x != -1 && building_owner->DefaultStartPos.y != -1 && Map.Info.IsPointOnMap(default_pos, z)) {
+							building_player->SetStartView(default_pos, z);
+						} else {
+							building_player->SetStartView(settlement_pos - unit_offset, z);
+						}
+					}
+					unit = CreateUnit(settlement_pos - unit_offset, *type, building_player, z);
+				} else {
+					unit = CreateUnit(settlement_pos - unit_offset, *type, player, z);
+				}
 				if (std::get<3>(settlement_iterator->second->HistoricalBuildings[j])) {
 					unit->SetUnique(std::get<3>(settlement_iterator->second->HistoricalBuildings[j]));
 				}

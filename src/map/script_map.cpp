@@ -1794,18 +1794,30 @@ static int CclDefineSettlement(lua_State *l)
 					LuaError(l, "Unit type doesn't exist.");
 				}
 				++j;
+				
 				CUniqueItem *unique = NULL;
 				lua_rawgeti(l, -1, j + 1);
-				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1) && GetUniqueItem(LuaToString(l, -1)) != NULL) {
 					unique = GetUniqueItem(LuaToString(l, -1));
-					if (!unique) {
-						LuaError(l, "Unique item doesn't exist.\n");
+				} else {
+					--j;
+				}
+				lua_pop(l, 1);
+				++j;
+				
+				CFaction *building_owner = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
+					building_owner = PlayerRaces.GetFaction(-1, LuaToString(l, -1));
+					if (!building_owner) {
+						LuaError(l, "Building owner faction doesn't exist.\n");
 					}
 				} else {
 					--j;
 				}
 				lua_pop(l, 1);
-				settlement->HistoricalBuildings.push_back(std::tuple<CDate, CDate, CUnitType *, CUniqueItem *>(start_date, end_date, building_unit_type, unique));
+
+				settlement->HistoricalBuildings.push_back(std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, CFaction *>(start_date, end_date, building_unit_type, unique, building_owner));
 			}
 		} else if (!strcmp(value, "Regions")) {
 			if (!lua_istable(l, -1)) {

@@ -965,7 +965,7 @@ void CGrandStrategyGame::DoTurn()
 				}
 			} else {
 				for (int k = 0; k < MaxCharacterTitles; ++k) {
-					if (this->Factions[i][j]->Ministers[k] != NULL && !(k == CharacterTitleHeadOfState && PlayerRaces.Factions[i][j]->Type != FactionTypeTribe && this->Factions[i][j]->GovernmentType == GovernmentTypeMonarchy)) {
+					if (this->Factions[i][j]->Ministers[k] != NULL && !(k == CharacterTitleHeadOfState && PlayerRaces.Factions[i][j]->Type == FactionTypePolity && this->Factions[i][j]->GovernmentType == GovernmentTypeMonarchy)) {
 						this->Factions[i][j]->SetMinister(k, ""); //"dead" factions should have no ministers, unless it is a head of state title and the faction is a monarchical polity
 					}
 				}

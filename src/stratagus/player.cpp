@@ -1466,6 +1466,11 @@ void CPlayer::SetFaction(CFaction *faction)
 		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty() && this->Allow.Upgrades[CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade)->ID] == 'R') {
 			UpgradeLost(*this, CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade)->ID);
 		}
+
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(PlayerRaces.Factions[this->Race][this->Faction]->Type));
+		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] == 'R') {
+			UpgradeLost(*this, faction_type_upgrade_id);
+		}
 	}
 
 	int faction_id = PlayerRaces.GetFactionIndexByName(this->Race, faction ? faction->Ident : "");
@@ -1528,7 +1533,20 @@ void CPlayer::SetFaction(CFaction *faction)
 		if (!PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade.empty()) {
 			CUpgrade *faction_upgrade = CUpgrade::Get(PlayerRaces.Factions[this->Race][this->Faction]->FactionUpgrade);
 			if (faction_upgrade && this->Allow.Upgrades[faction_upgrade->ID] != 'R') {
-				UpgradeAcquire(*this, faction_upgrade);
+				if (GameEstablishing) {
+					AllowUpgradeId(*this, faction_upgrade->ID, 'R');
+				} else {
+					UpgradeAcquire(*this, faction_upgrade);
+				}
+			}
+		}
+		
+		int faction_type_upgrade_id = UpgradeIdByIdent("upgrade-" + GetFactionTypeNameById(PlayerRaces.Factions[this->Race][this->Faction]->Type));
+		if (faction_type_upgrade_id != -1 && this->Allow.Upgrades[faction_type_upgrade_id] != 'R') {
+			if (GameEstablishing) {
+				AllowUpgradeId(*this, faction_type_upgrade_id, 'R');
+			} else {
+				UpgradeAcquire(*this, AllUpgrades[faction_type_upgrade_id]);
 			}
 		}
 	} else {
@@ -3087,6 +3105,8 @@ std::string GetFactionTypeNameById(int faction_type)
 		return "mercenary-company";
 	} else if (faction_type == FactionTypeHolyOrder) {
 		return "holy-order";
+	} else if (faction_type == FactionTypeTradingCompany) {
+		return "trading-company";
 	}
 
 	return "";
@@ -3104,6 +3124,8 @@ int GetFactionTypeIdByName(std::string faction_type)
 		return FactionTypeMercenaryCompany;
 	} else if (faction_type == "holy-order") {
 		return FactionTypeHolyOrder;
+	} else if (faction_type == "trading-company") {
+		return FactionTypeTradingCompany;
 	}
 
 	return -1;

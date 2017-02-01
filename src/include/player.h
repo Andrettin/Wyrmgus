@@ -366,6 +366,7 @@ enum FactionTypes {
 	FactionTypePolity,
 	FactionTypeMercenaryCompany,
 	FactionTypeHolyOrder,
+	FactionTypeTradingCompany,
 	
 	MaxFactionTypes
 };

@@ -209,7 +209,7 @@ public:
 	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the settlement
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
 	std::map<CDate, int> HistoricalGarrison;					/// Historical quantity of soldiers garrisoned in the settlement
-	std::vector<std::tuple<CDate, CDate, CUnitType *, CUniqueItem *>> HistoricalBuildings; /// Historical buildings, with start and end date
+	std::vector<std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 };
 //Wyrmgus end
 
