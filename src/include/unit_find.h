@@ -436,6 +436,10 @@ extern CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int ra
 
 /// Find nearest deposit
 extern CUnit *FindDeposit(const CUnit &unit, int range, int resource);
+//Wyrmgus start
+/// Find nearest home market
+extern CUnit *FindHomeMarket(const CUnit &unit, int range);
+//Wyrmgus end
 /// Find the next idle worker
 extern CUnit *FindIdleWorker(const CPlayer &player, const CUnit *last);
 

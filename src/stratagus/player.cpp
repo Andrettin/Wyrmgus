@@ -1650,6 +1650,10 @@ bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
 */
 bool CPlayer::CanFoundFaction(CFaction *faction)
 {
+	if (CurrentQuest != NULL || GrandStrategy) {
+		return false;
+	}
+	
 	for (int i = 0; i < PlayerMax; ++i) {
 		if (this->Index != i && Players[i].Type != PlayerNobody && Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
 			// faction is already in use

@@ -79,6 +79,9 @@ set(action_SRCS
 	src/action/action_resource.cpp
 	src/action/action_spellcast.cpp
 	src/action/action_still.cpp
+	#Wyrmgus start
+	src/action/action_trade.cpp
+	#Wyrmgus end
 	src/action/action_train.cpp
 	src/action/action_unload.cpp
 	src/action/action_upgradeto.cpp
@@ -515,6 +518,9 @@ set(stratagus_action_HDRS
 	src/include/action/action_resource.h
 	src/include/action/action_spellcast.h
 	src/include/action/action_still.h
+	#Wyrmgus start
+	src/include/action/action_trade.h
+	#Wyrmgus end
 	src/include/action/action_train.h
 	src/include/action/action_unload.h
 	src/include/action/action_upgradeto.h

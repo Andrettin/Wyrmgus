@@ -919,6 +919,8 @@ static void DoNextReplay()
 	//Wyrmgus start
 	} else if (!strcmp(action, "use")) {
 		SendCommandUse(*unit, *dunit, flags);
+	} else if (!strcmp(action, "trade")) {
+		SendCommandTrade(*unit, *dunit, flags);
 	//Wyrmgus end
 	} else if (!strcmp(action, "patrol")) {
 		SendCommandPatrol(*unit, pos, flags);

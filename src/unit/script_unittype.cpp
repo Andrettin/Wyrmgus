@@ -115,6 +115,7 @@ static const char SIDEATTACK_KEY[] = "SideAttack";
 static const char NOFRIENDLYFIRE_KEY[] = "NoFriendlyFire";
 //Wyrmgus start
 static const char TOWNHALL_KEY[] = "TownHall";
+static const char MARKET_KEY[] = "Market";
 static const char RECRUITHEROES_KEY[] = "RecruitHeroes";
 static const char ITEM_KEY[] = "Item";
 static const char POWERUP_KEY[] = "PowerUp";
@@ -122,6 +123,7 @@ static const char INVENTORY_KEY[] = "Inventory";
 static const char TRAP_KEY[] = "Trap";
 static const char BRIDGE_KEY[] = "Bridge";
 static const char MERCENARY_KEY[] = "Mercenary";
+static const char TRADER_KEY[] = "Trader";
 static const char FAUNA_KEY[] = "Fauna";
 static const char PREDATOR_KEY[] = "Predator";
 static const char SLIME_KEY[] = "Slime";
@@ -279,8 +281,8 @@ CUnitTypeVar::CBoolKeys::CBoolKeys()
 							   //Wyrmgus start
 //							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY
 							   SAVECARGO_KEY, NONSOLID_KEY, WALL_KEY, NORANDOMPLACING_KEY, ORGANIC_KEY, SIDEATTACK_KEY, NOFRIENDLYFIRE_KEY,
-							   TOWNHALL_KEY, RECRUITHEROES_KEY, ITEM_KEY, POWERUP_KEY, INVENTORY_KEY, TRAP_KEY, BRIDGE_KEY,
-							   MERCENARY_KEY,
+							   TOWNHALL_KEY, MARKET_KEY, RECRUITHEROES_KEY, ITEM_KEY, POWERUP_KEY, INVENTORY_KEY, TRAP_KEY, BRIDGE_KEY,
+							   MERCENARY_KEY, TRADER_KEY,
 							   FAUNA_KEY, PREDATOR_KEY, SLIME_KEY, PEOPLEAVERSION_KEY, MOUNTED_KEY, DIMINUTIVE_KEY, GIANT_KEY, DRAGON_KEY,
 							   DETRITUS_KEY, FLESH_KEY, VEGETABLE_KEY, INSECT_KEY, DAIRY_KEY,
 							   DETRITIVORE_KEY, CARNIVORE_KEY, HERBIVORE_KEY, INSECTIVORE_KEY,
@@ -1522,6 +1524,8 @@ static int CclDefineUnitType(lua_State *l)
 			//Wyrmgus start
 			} else if (!strcmp(value, "rally-point")) {
 				type->MouseAction = MouseActionRallyPoint;
+			} else if (!strcmp(value, "trade")) {
+				type->MouseAction = MouseActionTrade;
 			//Wyrmgus end
 			} else {
 				LuaError(l, "Unsupported RightMouseAction: %s" _C_ value);

@@ -59,6 +59,7 @@ enum UnitAction {
 	//Wyrmgus start
 	UnitActionPickUp,		/// unit picks up an item
 	UnitActionUse,			/// unit uses another unit (i.e. an item)
+	UnitActionTrade,		/// unit trades with another unit (i.e. a merchant or caravan trades with a market)
 	//Wyrmgus end
 	UnitActionDie,          /// unit dies
 
@@ -187,6 +188,7 @@ public:
 	static COrder *NewActionUpgradeTo(CUnit &unit, CUnitType &type);
 	//Wyrmgus start
 	static COrder *NewActionUse(CUnit &dest);
+	static COrder *NewActionTrade(CUnit &dest, CUnit &home_market);
 	//Wyrmgus end
 
 protected:

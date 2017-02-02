@@ -57,6 +57,9 @@
 #include "action/action_resource.h"
 #include "action/action_spellcast.h"
 #include "action/action_still.h"
+//Wyrmgus start
+#include "action/action_trade.h"
+//Wyrmgus end
 #include "action/action_train.h"
 #include "action/action_unload.h"
 #include "action/action_upgradeto.h"
@@ -260,6 +263,8 @@ void CclParseOrder(lua_State *l, CUnit &unit, COrderPtr *orderPtr)
 	//Wyrmgus start
 	} else if (!strcmp(actiontype, "action-use")) {
 		*orderPtr = new COrder_Use;
+	} else if (!strcmp(actiontype, "action-trade")) {
+		*orderPtr = new COrder_Trade;
 	//Wyrmgus end
 	} else {
 		LuaError(l, "ParseOrder: Unsupported type: %s" _C_ actiontype);

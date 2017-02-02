@@ -662,6 +662,46 @@ void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
 	*order = COrder::NewActionUse(dest);
 	ClearSavedAction(unit);
 }
+
+/**
+**  Trade with unit
+**
+**  @param unit   pointer to unit.
+**  @param dest   unit to be traded with
+**  @param flush  if true, flush command queue.
+*/
+void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+
+	CUnit *home_market = FindHomeMarket(unit, 1000);
+
+	if (!home_market) {
+		return; // no home market, cannot trade
+	}
+	
+	StopRaft(unit);
+	if (reach_layer) {
+		ReachGoalLayer(unit, dest.MapLayer, flush);
+	}
+	
+	COrderPtr *order;
+
+	if (!unit.CanMove()) {
+		ClearNewAction(unit);
+		order = &unit.NewOrder;
+	} else {
+		order = GetNextOrder(unit, flush);
+		if (order == NULL) {
+			return;
+		}
+	}
+	
+	*order = COrder::NewActionTrade(dest, *home_market);
+	ClearSavedAction(unit);
+}
 //Wyrmgus end
 
 /**

@@ -336,6 +336,109 @@ public:
 };
 
 //Wyrmgus start
+template <const bool NEARLOCATION>
+class BestHomeMarketFinder
+{
+	inline void operator()(CUnit *const dest)
+	{
+		/* Only markets */
+		if (
+			dest->Type->BoolFlag[MARKET_INDEX].value
+			&& dest->IsAliveOnMap()
+			&& dest->CurrentAction() != UnitActionBuilt) {
+			// Unit in range?
+
+			if (NEARLOCATION) {
+				int d = dest->MapDistanceTo(u_near.loc, u_near.layer);
+
+				//
+				// Take this market?
+				//
+				if (d <= range && d < best_dist) {
+					best_market = dest;
+					best_dist = d;
+				}
+			} else {
+				int d;
+				const CUnit *worker = u_near.worker;
+				if (!worker->Container) {
+					d = worker->MapDistanceTo(*dest);
+				} else {
+					d = worker->Container->MapDistanceTo(*dest);
+				}
+
+				// Use Circle, not square :)
+				if (d > range) {
+					return;
+				}
+
+				if (best_dist == INT_MAX) {
+					best_market = dest;
+				}
+				
+				// calck real travel distance
+				if (worker->Container) {
+					UnmarkUnitFieldFlags(*worker->Container);
+				}
+				d = UnitReachable(*worker, *dest, 1);
+				if (worker->Container) {
+					MarkUnitFieldFlags(*worker->Container);
+				}
+				//
+				// Take this market?
+				//
+				if (d && d < best_dist) {
+					best_market = dest;
+					best_dist = d;
+				}
+			}
+		}
+	}
+
+public:
+	BestHomeMarketFinder(const CUnit &w, int ran) :
+		range(ran),
+		best_dist(INT_MAX), best_market(0)
+	{
+		u_near.worker = &w;
+	}
+
+	BestHomeMarketFinder(const Vec2i &pos, int res, int z) :
+		range(ran),
+		best_dist(INT_MAX), best_market(0)
+	{
+		u_near.loc = pos;
+		u_near.layer = z;
+	}
+
+	template <typename ITERATOR>
+	CUnit *Find(ITERATOR begin, ITERATOR end)
+	{
+		for (ITERATOR it = begin; it != end; ++it) {
+			this->operator()(*it);
+		}
+		return best_market;
+	}
+
+	CUnit *Find(CUnitCache &cache)
+	{
+		cache.for_each(*this);
+		return best_depot;
+	}
+private:
+	struct {
+		const CUnit *worker;
+		Vec2i loc;
+		int layer;
+	} u_near;
+	const int range;
+	int best_dist;
+public:
+	CUnit *best_market;
+};
+//Wyrmgus end
+
+//Wyrmgus start
 //CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource)
 CUnit *FindDepositNearLoc(CPlayer &p, const Vec2i &pos, int range, int resource, int z)
 //Wyrmgus end
@@ -587,10 +690,10 @@ CUnit *UnitFindResource(const CUnit &unit, const CUnit &startUnit, int range, in
 }
 
 /**
-**  Find deposit. This will find a deposit for a resource
+**  Find "deposit". This will find a depot for a resource
 **
 **  @param unit        The unit that wants to find a resource.
-**  @param range       Maximum distance to the deposit.
+**  @param range       Maximum distance to the depot.
 **  @param resource    Resource to find deposit from.
 **
 **  @note This will return a reachable allied depot.
@@ -613,6 +716,28 @@ CUnit *FindDeposit(const CUnit &unit, int range, int resource)
 	}
 	return finder.Find(table.begin(), table.end());
 }
+
+//Wyrmgus start
+/**
+**  Find home market. This will find a home market
+**
+**  @param unit        The unit that wants to find a resource.
+**  @param range       Maximum distance to the market.
+**
+**  @note This will return a reachable self-owned market.
+**
+**  @return            NULL or market unit
+*/
+CUnit *FindHomeMarket(const CUnit &unit, int range)
+{
+	BestHomeMarketFinder<false> finder(unit, range);
+	std::vector<CUnit *> table;
+	for (std::vector<CUnit *>::iterator it = unit.Player->UnitBegin(); it != unit.Player->UnitEnd(); ++it) {
+		table.push_back(*it);
+	}
+	return finder.Find(table.begin(), table.end());
+}
+//Wyrmgus end
 
 /**
 **  Find the next idle worker

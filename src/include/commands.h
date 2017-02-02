@@ -108,6 +108,8 @@ extern void CommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, int z 
 //Wyrmgus start
 /// Prepare command use
 extern void CommandUse(CUnit &unit, CUnit &dest, int flush, bool reach_layer = true);
+/// Prepare command trade
+extern void CommandTrade(CUnit &unit, CUnit &dest, int flush, bool reach_layer = true);
 //Wyrmgus end
 /// Prepare command patrol
 //Wyrmgus start
@@ -220,6 +222,8 @@ extern void SendCommandAttackGround(CUnit &unit, const Vec2i &pos, int flush, in
 //Wyrmgus start
 /// Send use command
 extern void SendCommandUse(CUnit &unit, CUnit &dest, int flush);
+/// Send trade command
+extern void SendCommandTrade(CUnit &unit, CUnit &dest, int flush);
 //Wyrmgus end
 /// Send patrol command
 //Wyrmgus start

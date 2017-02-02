@@ -315,6 +315,23 @@ void SendCommandUse(CUnit &unit, CUnit &dest, int flush)
 		NetworkSendCommand(MessageCommandUse, unit, 0, 0, &dest, 0, flush);
 	}
 }
+
+/**
+** Send command: Trade with a unit.
+**
+** @param unit    pointer to unit.
+** @param dest    trade with this unit.
+** @param flush   Flag flush all pending commands.
+*/
+void SendCommandTrade(CUnit &unit, CUnit &dest, int flush)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("use", &unit, flush, -1, -1, &dest, NULL, -1);
+		CommandTrade(unit, dest, flush);
+	} else {
+		NetworkSendCommand(MessageCommandTrade, unit, 0, 0, &dest, 0, flush);
+	}
+}
 //Wyrmgus end
 
 /**
@@ -875,6 +892,15 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				Assert(dest.Type);
 				CommandLog("use", &unit, status, -1, -1, &dest, NULL, -1);
 				CommandUse(unit, dest, status);
+			}
+			break;
+		}
+		case MessageCommandTrade: {
+			if (dstnr != (unsigned short)0xFFFF) {
+				CUnit &dest = UnitManager.GetSlotUnit(dstnr);
+				Assert(dest.Type);
+				CommandLog("trade", &unit, status, -1, -1, &dest, NULL, -1);
+				CommandTrade(unit, dest, status);
 			}
 			break;
 		}

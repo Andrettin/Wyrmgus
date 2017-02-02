@@ -268,6 +268,7 @@ enum {
 	NOFRIENDLYFIRE_INDEX,           /// Unit accepts friendly fire for splash attacks
 	//Wyrmgus start
 	TOWNHALL_INDEX,
+	MARKET_INDEX,
 	RECRUITHEROES_INDEX,
 	ITEM_INDEX,
 	POWERUP_INDEX,
@@ -275,6 +276,7 @@ enum {
 	TRAP_INDEX,
 	BRIDGE_INDEX,
 	MERCENARY_INDEX,
+	TRADER_INDEX,
 	FAUNA_INDEX,
 	PREDATOR_INDEX,
 	SLIME_INDEX,
@@ -990,6 +992,7 @@ public:
 #define MouseActionSail      6      /// Sail
 //Wyrmgus start
 #define MouseActionRallyPoint 7		/// Rally point
+#define MouseActionTrade      8		/// Trade
 //Wyrmgus end
 	int CanTarget;                  /// Which units can it attack
 #define CanTargetLand 1             /// Can attack land units

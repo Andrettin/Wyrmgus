@@ -303,6 +303,7 @@ enum _message_type_ {
 	MessageCommandGround,          /// Unit command attack ground
 	//Wyrmgus start
 	MessageCommandUse,			   /// Unit command use
+	MessageCommandTrade,		   /// Unit command trade
 	//Wyrmgus end
 	MessageCommandPatrol,          /// Unit command patrol
 	MessageCommandBoard,           /// Unit command board

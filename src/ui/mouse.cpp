@@ -478,6 +478,25 @@ static bool DoRightButton_Worker(CUnit &unit, CUnit *dest, const Vec2i &pos, int
 	return true;
 }
 
+//Wyrmgus start
+static bool DoRightButton_Trade(CUnit &unit, CUnit &dest, int flush, int &acknowledged)
+{
+	// Go and trade with a unit
+	
+	const CUnitType &type = *unit.Type;
+	if (type.BoolFlag[TRADER_INDEX].value && dest.Type->BoolFlag[MARKET_INDEX].value) {
+		dest.Blink = 4;
+		SendCommandTrade(unit, dest, flush);
+		if (!acknowledged) {
+			PlayUnitSound(unit, VoiceAcknowledging);
+			acknowledged = 1;
+		}
+		return true;
+	}
+	return false;
+}
+//Wyrmgus end
+
 static bool DoRightButton_AttackUnit(CUnit &unit, CUnit &dest, const Vec2i &pos, int flush, int &acknowledged)
 {
 	const CUnitType &type = *unit.Type;
@@ -830,6 +849,14 @@ static void DoRightButton_ForSelectedUnit(CUnit &unit, CUnit *dest, const Vec2i 
 		DoRightButton_Worker(unit, dest, pos, flush, acknowledged);
 		return;
 	}
+	
+	//Wyrmgus start
+	//  Handle traders.
+	if (action == MouseActionTrade && dest) {
+		DoRightButton_Trade(unit, *dest, flush, acknowledged);
+		return;
+	}
+	//Wyrmgus end
 
 	//  Fighters
 	if (action == MouseActionSpellCast || action == MouseActionAttack) {
