@@ -2492,6 +2492,22 @@ static int CclDebugPrint(lua_State *l)
 	return 1;
 }
 
+//Wyrmgus start
+/**
+**  Print message to sdout.txt
+**
+**  @param l  Lua state.
+*/
+static int CclStdOutPrint(lua_State *l)
+{
+	LuaCheckArgs(l, 1);
+
+	fprintf(stdout, "%s", LuaToString(l, 1));
+
+	return 1;
+}
+//Wyrmgus end
+
 /*............................................................................
 ..  Commands
 ............................................................................*/
@@ -3299,6 +3315,9 @@ void ScriptRegister()
 	lua_register(Lua, "LoadBuffer", CclLoadBuffer);
 
 	lua_register(Lua, "DebugPrint", CclDebugPrint);
+	//Wyrmgus start
+	lua_register(Lua, "StdOutPrint", CclStdOutPrint);
+	//Wyrmgus end
 }
 
 //@}
