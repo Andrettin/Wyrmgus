@@ -640,7 +640,6 @@ CUnitType::~CUnitType()
 	SoldUnits.clear();
 	Drops.clear();
 	AiDrops.clear();
-	DropAffixes.clear();
 	DropSpells.clear();
 	Affixes.clear();
 	Traits.clear();

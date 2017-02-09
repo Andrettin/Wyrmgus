@@ -1899,9 +1899,9 @@ void CUnit::GeneratePrefix(CUnit *dropper)
 		}
 	}
 	if (dropper != NULL) {
-		for (size_t i = 0; i < dropper->Type->DropAffixes.size(); ++i) {
-			if (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->ItemPrefix[Type->ItemClass]) {
-				potential_prefixes.push_back(dropper->Type->DropAffixes[i]);
+		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemPrefix[Type->ItemClass] && CheckDependByIdent(*dropper->Player, AllUpgrades[i]->Ident)) {
+				potential_prefixes.push_back(AllUpgrades[i]);
 			}
 		}
 	}
@@ -1922,10 +1922,10 @@ void CUnit::GenerateSuffix(CUnit *dropper)
 		}
 	}
 	if (dropper != NULL) {
-		for (size_t i = 0; i < dropper->Type->DropAffixes.size(); ++i) {
-			if (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->ItemSuffix[Type->ItemClass]) {
-				if (Prefix == NULL || !dropper->Type->DropAffixes[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
-					potential_suffixes.push_back(dropper->Type->DropAffixes[i]);
+		for (size_t i = 0; i < AllUpgrades.size(); ++i) {
+			if (this->Type->ItemClass != -1 && AllUpgrades[i]->ItemSuffix[Type->ItemClass] && CheckDependByIdent(*dropper->Player, AllUpgrades[i]->Ident)) {
+				if (Prefix == NULL || !AllUpgrades[i]->IncompatibleAffixes[Prefix->ID]) { //don't allow a suffix incompatible with the prefix to appear
+					potential_suffixes.push_back(AllUpgrades[i]);
 				}
 			}
 		}
@@ -1961,12 +1961,6 @@ void CUnit::GenerateWork(CUnit *dropper)
 		}
 	}
 	if (dropper != NULL) {
-		for (size_t i = 0; i < dropper->Type->DropAffixes.size(); ++i) {
-			if (this->Type->ItemClass != -1 && dropper->Type->DropAffixes[i]->Work == this->Type->ItemClass && !dropper->Type->DropAffixes[i]->UniqueOnly) {
-				potential_works.push_back(dropper->Type->DropAffixes[i]);
-			}
-		}
-		
 		int dropper_civilization = dropper->Type->Civilization;
 		if (dropper_civilization != -1) {
 			for (size_t i = 0; i < PlayerRaces.LiteraryWorks[dropper_civilization].size(); ++i) {
@@ -1992,12 +1986,12 @@ void CUnit::GenerateUnique(CUnit *dropper)
 			Type == UniqueItems[i]->Type
 			&& ( //the dropper unit must be capable of generating this unique item's prefix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Prefix == NULL
-				|| (dropper != NULL && std::find(dropper->Type->DropAffixes.begin(), dropper->Type->DropAffixes.end(), UniqueItems[i]->Prefix) != dropper->Type->DropAffixes.end())
+				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Prefix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Prefix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's suffix to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Suffix == NULL
-				|| (dropper != NULL && std::find(dropper->Type->DropAffixes.begin(), dropper->Type->DropAffixes.end(), UniqueItems[i]->Suffix) != dropper->Type->DropAffixes.end())
+				|| (dropper != NULL && CheckDependByIdent(*dropper->Player, UniqueItems[i]->Suffix->Ident))
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Suffix) != this->Type->Affixes.end()
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's spell to drop the item
@@ -2006,7 +2000,6 @@ void CUnit::GenerateUnique(CUnit *dropper)
 			)
 			&& ( //the dropper unit must be capable of generating this unique item's work to drop the item, or else the unit must be capable of generating it on its own
 				UniqueItems[i]->Work == NULL
-				|| (dropper != NULL && std::find(dropper->Type->DropAffixes.begin(), dropper->Type->DropAffixes.end(), UniqueItems[i]->Work) != dropper->Type->DropAffixes.end())
 				|| std::find(this->Type->Affixes.begin(), this->Type->Affixes.end(), UniqueItems[i]->Work) != this->Type->Affixes.end()
 				|| (dropper_civilization != -1 && std::find(PlayerRaces.LiteraryWorks[dropper_civilization].begin(), PlayerRaces.LiteraryWorks[dropper_civilization].end(), UniqueItems[i]->Work) != PlayerRaces.LiteraryWorks[dropper_civilization].end())
 			)

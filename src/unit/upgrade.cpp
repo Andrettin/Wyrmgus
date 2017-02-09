@@ -1046,25 +1046,6 @@ static int CclGetUpgradeData(lua_State *l)
 			lua_pushboolean(l, upgrade->ItemSuffix[item_class]);
 			return 1;
 		}
-	} else if (!strcmp(data, "Droppers")) { //the unit types which can drop this affix
-		std::vector<CUnitType *> droppers;
-		for (size_t i = 0; i < UnitTypes.size(); ++i) {
-			if (UnitTypes[i]->Ident.find("template") != std::string::npos) { //if is a template, continue
-				continue;
-			}
-
-			if (std::find(UnitTypes[i]->DropAffixes.begin(), UnitTypes[i]->DropAffixes.end(), upgrade) != UnitTypes[i]->DropAffixes.end()) {
-				droppers.push_back(UnitTypes[i]);
-			}
-		}
-		
-		lua_createtable(l, droppers.size(), 0);
-		for (size_t i = 1; i <= droppers.size(); ++i)
-		{
-			lua_pushstring(l, droppers[i-1]->Ident.c_str());
-			lua_rawseti(l, -2, i);
-		}
-		return 1;
 	} else if (!strcmp(data, "AppliesTo")) { //to which unit types or item classes this upgrade applies
 		std::vector<std::string> applies_to;
 		for (int i = 0; i < MaxItemClasses; ++i) {

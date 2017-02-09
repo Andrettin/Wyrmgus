@@ -857,7 +857,6 @@ public:
 	std::vector<CUnitType *> SoldUnits;		/// Units which this unit can sell.
 	std::vector<CUnitType *> Drops;			/// Units which can spawn upon death (i.e. items).
 	std::vector<CUnitType *> AiDrops;		/// Units which can spawn upon death (i.e. items), only for AI-controlled units.
-	std::vector<CUpgrade *> DropAffixes;	/// Affixes which can be applied to dropped items
 	std::vector<SpellType *> DropSpells;	/// Spells which can be applied to dropped items
 	std::vector<CUpgrade *> Affixes;	/// Affixes which can be generated for this unit type
 	std::vector<CUpgrade *> Traits;	/// Which traits this unit type can have
