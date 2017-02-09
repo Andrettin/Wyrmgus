@@ -862,7 +862,9 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	this->Trait = NULL;
 
 	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
-		IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
+		if (CheckDependByIdent(*this->Player, this->Type->StartingAbilities[i]->Ident)) {
+			IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
+		}
 	}
 	
 	if (this->Character->Trait != NULL) { //set trait
@@ -2428,7 +2430,9 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	}
 	
 	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
+		if (CheckDependByIdent(*unit->Player, unit->Type->StartingAbilities[i]->Ident)) {
+			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
+		}
 	}
 	//Wyrmgus end
 	

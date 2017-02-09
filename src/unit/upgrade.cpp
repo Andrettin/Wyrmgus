@@ -1509,6 +1509,16 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				if (unit.Player->Index != player.Index) {
 					continue;
 				}
+				
+				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
+				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
+					if (!unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && CheckDependByIdent(*unit.Player, unit.Type->StartingAbilities[i]->Ident)) {
+						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
+					} else if (unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && !CheckDependByIdent(*unit.Player, unit.Type->StartingAbilities[i]->Ident)) {
+						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
+					}
+				}
+				
 				//change variation if current one becomes forbidden
 				VariationInfo *current_varinfo = UnitTypes[z]->VarInfo[unit.Variation];
 				if (current_varinfo) {
@@ -1793,6 +1803,15 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 
 				if (unit.Player->Index != player.Index) {
 					continue;
+				}
+				
+				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
+				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
+					if (!unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && CheckDependByIdent(*unit.Player, unit.Type->StartingAbilities[i]->Ident)) {
+						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
+					} else if (unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && !CheckDependByIdent(*unit.Player, unit.Type->StartingAbilities[i]->Ident)) {
+						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
+					}
 				}
 				
 				//change variation if current one becomes forbidden
