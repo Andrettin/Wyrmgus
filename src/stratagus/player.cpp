@@ -543,6 +543,16 @@ int PlayerRace::GetDeityIndexByIdent(std::string deity_ident) const
 	return -1;
 }
 
+CDeity *PlayerRace::GetDeity(std::string deity_ident) const
+{
+	for (size_t i = 0; i < this->Deities.size(); ++i) {
+		if (deity_ident == this->Deities[i]->Ident) {
+			return this->Deities[i];
+		}
+	}
+	return NULL;
+}
+
 int PlayerRace::GetLanguageIndexByIdent(std::string language_ident) const
 {
 	for (size_t i = 0; i < this->Languages.size(); ++i) {

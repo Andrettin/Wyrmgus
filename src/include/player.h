@@ -736,6 +736,7 @@ public:
 	int GetReligionIndexByIdent(std::string religion_ident) const;
 	int GetDeityDomainIndexByIdent(std::string deity_domain_ident) const;
 	int GetDeityIndexByIdent(std::string deity_ident) const;
+	CDeity *GetDeity(std::string deity_ident) const;
 	int GetLanguageIndexByIdent(std::string language_ident) const;
 	int GetCivilizationClassUnitType(int civilization, int class_id);
 	int GetCivilizationClassUpgrade(int civilization, int class_id);

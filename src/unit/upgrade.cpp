@@ -2059,6 +2059,20 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 	AllowUpgradeId(player, id, 'R');  // research done
 
 	//Wyrmgus start
+	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
+		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
+		if (upgrade_deity) {
+			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
+				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
+				if (player.Allow.Upgrades[domain_upgrade->ID] != 'R') {
+					UpgradeAcquire(player, domain_upgrade);
+				}
+			}
+		} else {
+			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
+		}
+	}
+	
 	/*
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {
