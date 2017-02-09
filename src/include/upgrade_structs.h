@@ -308,6 +308,8 @@ public:
 	//Wyrmgus start
 	int ChangeCivilizationTo;			/// changes the player's civilization to this one
 	CFaction *ChangeFactionTo;			/// changes the player's faction to this one
+	
+	std::vector<CUpgrade *> RemoveUpgrades;	/// Upgrades to be removed when this upgrade modifier is implented
 	//Wyrmgus end
 };
 

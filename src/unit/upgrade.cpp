@@ -712,6 +712,20 @@ static int CclDefineModifier(lua_State *l)
 			} else {
 				LuaError(l, "upgrade expected");
 			}
+		//Wyrmgus start
+		} else if (!strcmp(key, "remove-upgrade")) {
+			const char *value = LuaToString(l, j + 1, 2);
+			if (!strncmp(value, "upgrade-", 8)) {
+				CUpgrade *removed_upgrade = CUpgrade::Get(value);
+				if (removed_upgrade) {
+					um->RemoveUpgrades.push_back(removed_upgrade);
+				} else {
+					LuaError(l, "Upgrade \"%s\" doesn't exist.'" _C_ value);
+				}
+			} else {
+				LuaError(l, "upgrade expected");
+			}
+		//Wyrmgus end
 		} else if (!strcmp(key, "apply-to")) {
 			const char *value = LuaToString(l, j + 1, 2);
 			um->ApplyTo[UnitTypeIdByIdent(value)] = 'X';
@@ -1306,6 +1320,14 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 			}
 		}
 	}
+	
+	//Wyrmgus start
+	for (size_t i = 0; i < um->RemoveUpgrades.size(); ++i) {
+		if (player.Allow.Upgrades[um->RemoveUpgrades[i]->ID] == 'R') {
+			UpgradeLost(player, um->RemoveUpgrades[i]->ID);
+		}
+	}
+	//Wyrmgus end
 
 	for (size_t z = 0; z < UnitTypes.size(); ++z) {
 		CUnitStats &stat = UnitTypes[z]->Stats[pn];
