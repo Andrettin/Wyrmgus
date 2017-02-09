@@ -156,6 +156,7 @@ public:
 	int UnitTypesNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character
 	int UnitTypesStartingNonHeroCount[UnitTypeMax];		/// total units of unit-type that isn't associated to a character and which are starting units
 	std::vector<CUnit *> Heroes;					/// hero units owned by this player
+	std::vector<CDeity *> Deities;					/// deities chosen by this player
 	std::vector<CQuest *> AvailableQuests;		/// quests available to this player
 	std::vector<CQuest *> CurrentQuests;		/// quests being pursued by this player
 	std::vector<CQuest *> CompletedQuests;		/// quests completed by this player

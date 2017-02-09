@@ -176,6 +176,7 @@ extern const char NameLine[];
 
 #define AuraRange 6					/// Range of auras
 #define PlayerHeroMax 3				/// Maximum heroes per player
+#define PlayerMinorDeityMax 3		/// Maximum minor deities per player
 //Wyrmgus end
 
 /// Frames per second to display (original 30-40)

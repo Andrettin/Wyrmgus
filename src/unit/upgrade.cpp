@@ -2109,6 +2109,7 @@ void UpgradeAcquire(CPlayer &player, const CUpgrade *upgrade)
 					UpgradeAcquire(player, domain_upgrade);
 				}
 			}
+			player.Deities.push_back(upgrade_deity);
 		} else {
 			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
 		}
@@ -2154,6 +2155,22 @@ void UpgradeLost(CPlayer &player, int id)
 	//Wyrmgus end
 	
 	//Wyrmgus start
+	CUpgrade *upgrade = AllUpgrades[id];
+	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
+		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
+		if (upgrade_deity) {
+			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
+				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
+				if (player.Allow.Upgrades[domain_upgrade->ID] == 'R') {
+					UpgradeLost(player, domain_upgrade->ID);
+				}
+			}
+			player.Deities.erase(std::remove(player.Deities.begin(), player.Deities.end(), upgrade_deity), player.Deities.end());
+		} else {
+			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
+		}
+	}
+
 	/*
 	for (int z = 0; z < NumUpgradeModifiers; ++z) {
 		if (UpgradeModifiers[z]->UpgradeId == id) {

@@ -1385,6 +1385,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	memset(this->UnitTypesNonHeroCount, 0, sizeof(this->UnitTypesNonHeroCount));
 	memset(this->UnitTypesStartingNonHeroCount, 0, sizeof(this->UnitTypesStartingNonHeroCount));
 	this->Heroes.clear();
+	this->Deities.clear();
 	//Wyrmgus end
 
 	this->Supply = 0;
@@ -1723,6 +1724,7 @@ void CPlayer::Clear()
 	memset(UnitTypesNonHeroCount, 0, sizeof(UnitTypesNonHeroCount));
 	memset(UnitTypesStartingNonHeroCount, 0, sizeof(UnitTypesStartingNonHeroCount));
 	this->Heroes.clear();
+	this->Deities.clear();
 	this->AvailableQuests.clear();
 	this->CurrentQuests.clear();
 	this->CompletedQuests.clear();

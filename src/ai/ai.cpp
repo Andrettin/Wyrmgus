@@ -321,6 +321,63 @@ static void AiCheckUnits()
 	if (potential_faction_upgrades.size() > 0) {
 		UpgradeAcquire(*AiPlayer->Player, potential_faction_upgrades[SyncRand(potential_faction_upgrades.size())]);
 	}
+	
+	//check if any deities can be chosen, and if so, pick one randomly
+	if (AiPlayer->Player->Deities.size() == 0 || AiPlayer->Player->Deities[0]->Religions[0]->Domains.size() == 0) { // if the player has no major deity, pick one; or if has a polytheistic faith, see if can get a monotheistic one
+		std::vector<CUpgrade *> potential_deity_upgrades;
+		for (size_t i = 0; i < PlayerRaces.Deities.size(); ++i) {
+			if (!PlayerRaces.Deities[i]->Major) { //minor deities aren't supported yet
+				continue;
+			}
+			
+			if (std::find(PlayerRaces.Deities[i]->Civilizations.begin(), PlayerRaces.Deities[i]->Civilizations.end(), AiPlayer->Player->Race) == PlayerRaces.Deities[i]->Civilizations.end()) {
+				continue;
+			}
+			
+			CUpgrade *deity_upgrade = CUpgrade::Get("upgrade-deity-" + PlayerRaces.Deities[i]->Ident);
+			if (!deity_upgrade) { //deity has no upgrade, is in the database but is not obtainable
+				continue;
+			}
+			
+			if (AiPlayer->Player->Deities.size() > 0 && AiPlayer->Player->Deities[0]->Religions[0]->Domains.size() == 0 && PlayerRaces.Deities[i]->Religions[0]->Domains.size() == 0) { //if is looking for a monotheistic religion, don't count pagan deities
+				continue;
+			}
+			
+			if (!CheckDependByIdent(*AiPlayer->Player, deity_upgrade->Ident)) {
+				continue;
+			}
+			
+			n = AiHelpers.Research.size();
+			std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Research;
+
+			if (deity_upgrade->ID > n) { // Oops not known.
+				continue;
+			}
+			std::vector<CUnitType *> &table = tablep[deity_upgrade->ID];
+			if (table.empty()) { // Oops not known.
+				continue;
+			}
+
+			const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+			bool has_researcher = false;
+			for (unsigned int k = 0; k < table.size(); ++k) {
+				// The type is available
+				if (unit_count[table[k]->Slot]) {
+					has_researcher = true;
+					break;
+				}
+			}
+			if (!has_researcher) {
+				continue;
+			}
+			
+			potential_deity_upgrades.push_back(deity_upgrade);
+		}
+		
+		if (potential_deity_upgrades.size() > 0) {
+			UpgradeAcquire(*AiPlayer->Player, potential_deity_upgrades[SyncRand(potential_deity_upgrades.size())]); //acquire instantly, for simplicity's sake
+		}
+	}
 	//Wyrmgus end
 }
 
