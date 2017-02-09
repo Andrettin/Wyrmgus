@@ -403,7 +403,7 @@ public:
 		u_near.worker = &w;
 	}
 
-	BestHomeMarketFinder(const Vec2i &pos, int res, int z) :
+	BestHomeMarketFinder(const Vec2i &pos, int ran, int z) :
 		range(ran),
 		best_dist(INT_MAX), best_market(0)
 	{
@@ -423,7 +423,7 @@ public:
 	CUnit *Find(CUnitCache &cache)
 	{
 		cache.for_each(*this);
-		return best_depot;
+		return best_market;
 	}
 private:
 	struct {
