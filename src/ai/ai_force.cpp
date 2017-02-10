@@ -103,7 +103,7 @@ VisitResult EnemyUnitFinder::Visit(TerrainTraversal &terrainTraversal, const Vec
 		if (
 			(
 				!unit.IsEnemy(*dest) // a friend or neutral
-				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->Index == dest->Player->Index)
+				&& (!include_neutral || unit.IsAllied(*dest) || unit.Player->Index == dest->Player->Index || unit.Player->HasBuildingAccess(*dest->Player))
 			)
 			|| !CanTarget(*unit.Type, dtype)
 		) {
