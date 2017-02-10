@@ -957,6 +957,10 @@ static void DoNextReplay()
 		SendCommandResearch(*unit, *CUpgrade::Get(val), flags);
 	} else if (!strcmp(action, "cancel-research")) {
 		SendCommandCancelResearch(*unit);
+	//Wyrmgus start
+	} else if (!strcmp(action, "learn-ability")) {
+		SendCommandLearnAbility(*unit, *CUpgrade::Get(val));
+	//Wyrmgus end
 	} else if (!strcmp(action, "spell-cast")) {
 		SendCommandSpellCast(*unit, pos, dunit, num, flags);
 	} else if (!strcmp(action, "auto-spell-cast")) {

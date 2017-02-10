@@ -320,6 +320,7 @@ enum _message_type_ {
 	MessageCommandResearch,        /// Unit command research
 	MessageCommandCancelResearch,  /// Unit command cancel research
 	//Wyrmgus start
+	MessageCommandLearnAbility,    /// Unit command learn ability
 	MessageCommandQuest,           /// Unit command quest
 	MessageCommandBuy,			   /// Unit command buy
 	//Wyrmgus end

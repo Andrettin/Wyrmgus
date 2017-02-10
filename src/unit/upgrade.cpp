@@ -1479,6 +1479,10 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 					) { //if the unit already has an item equipped of the same equipment type as this upgrade, don't apply the modifier to it
 						continue;
 					}
+					
+					if (unit.Character && !strncmp(AllUpgrades[um->UpgradeId]->Ident.c_str(), "upgrade-deity-", 14)) { //heroes choose their own deities
+						continue;
+					}
 					//Wyrmgus end
 					
 					for (unsigned int j = 0; j < UnitTypeVar.GetNumberVariable(); j++) {
@@ -1534,9 +1538,9 @@ static void ApplyUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
-					if (!unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && CheckDependByIdent(*unit.Player, unit.Type->StartingAbilities[i]->Ident)) {
+					if (!unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
-					} else if (unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && !CheckDependByIdent(*unit.Player, unit.Type->StartingAbilities[i]->Ident)) {
+					} else if (unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && !CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
 					}
 				}
@@ -1829,9 +1833,9 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 				
 				//add or remove starting abilities from the unit if the upgrade enabled/disabled them
 				for (size_t i = 0; i < unit.Type->StartingAbilities.size(); ++i) {
-					if (!unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && CheckDependByIdent(*unit.Player, unit.Type->StartingAbilities[i]->Ident)) {
+					if (!unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeAcquire(unit, unit.Type->StartingAbilities[i]);
-					} else if (unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && !CheckDependByIdent(*unit.Player, unit.Type->StartingAbilities[i]->Ident)) {
+					} else if (unit.IndividualUpgrades[unit.Type->StartingAbilities[i]->ID] && !CheckDependByIdent(unit, unit.Type->StartingAbilities[i]->Ident)) {
 						IndividualUpgradeLost(unit, unit.Type->StartingAbilities[i]);
 					}
 				}
@@ -1885,6 +1889,12 @@ static void RemoveUpgradeModifier(CPlayer &player, const CUpgradeModifier *um)
 void ApplyIndividualUpgradeModifier(CUnit &unit, const CUpgradeModifier *um)
 {
 	Assert(um);
+
+	for (size_t i = 0; i < um->RemoveUpgrades.size(); ++i) {
+		if (unit.IndividualUpgrades[um->RemoveUpgrades[i]->ID]) {
+			IndividualUpgradeLost(unit, um->RemoveUpgrades[i]);
+		}
+	}
 
 	if (um->Modifier.Variables[SIGHTRANGE_INDEX].Value) {
 		if (!unit.Removed) {
@@ -2317,8 +2327,24 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	}
 	//Wyrmgus end
 	int id = upgrade->ID;
-	unit.Player->UpgradeTimers.Upgrades[id] = upgrade->Costs[TimeCost];
 	unit.IndividualUpgrades[id] = true;
+	
+	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
+		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
+		if (upgrade_deity) {
+			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
+				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
+				if (!unit.IndividualUpgrades[domain_upgrade->ID]) {
+					IndividualUpgradeAcquire(unit, domain_upgrade);
+				}
+			}
+			if (unit.Character && std::find(unit.Character->Deities.begin(), unit.Character->Deities.end(), upgrade_deity) == unit.Character->Deities.end()) {
+				unit.Character->Deities.push_back(upgrade_deity);
+			}
+		} else {
+			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
+		}
+	}
 
 	//Wyrmgus start
 	/*
@@ -2330,7 +2356,20 @@ void IndividualUpgradeAcquire(CUnit &unit, const CUpgrade *upgrade)
 	*/
 	if (!(upgrade->Ability && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-			ApplyIndividualUpgradeModifier(unit, upgrade->UpgradeModifiers[z]);
+			bool applies_to_this = false;
+			bool applies_to_any_unit_types = false;
+			for (size_t i = 0; i < UnitTypes.size(); ++i) {
+				if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+					applies_to_any_unit_types = true;
+					if (i == unit.Type->Slot) {
+						applies_to_this = true;
+						break;
+					}
+				}
+			}
+			if (applies_to_this || !applies_to_any_unit_types) { //if the modifier isn't designated as being for a specific unit type, or is designated for this unit's unit type, apply it
+				ApplyIndividualUpgradeModifier(unit, upgrade->UpgradeModifiers[z]);
+			}
 		}
 	}
 	//Wyrmgus end
@@ -2351,15 +2390,42 @@ void IndividualUpgradeLost(CUnit &unit, const CUpgrade *upgrade)
 	}
 	//Wyrmgus end
 	int id = upgrade->ID;
-	unit.Player->UpgradeTimers.Upgrades[id] = 0;
 	unit.IndividualUpgrades[id] = false;
 
+	if (!strncmp(upgrade->Ident.c_str(), "upgrade-deity-", 14) && strncmp(upgrade->Ident.c_str(), "upgrade-deity-domain-", 21)) { // if is a deity upgrade, but isn't a deity domain upgrade
+		CDeity *upgrade_deity = PlayerRaces.GetDeity(FindAndReplaceString(upgrade->Ident, "upgrade-deity-", ""));
+		if (upgrade_deity) {
+			for (size_t i = 0; i < upgrade_deity->Domains.size(); ++i) {
+				CUpgrade *domain_upgrade = CUpgrade::Get("upgrade-deity-domain-" + upgrade_deity->Domains[i]->Ident);
+				if (unit.IndividualUpgrades[domain_upgrade->ID]) {
+					IndividualUpgradeLost(unit, domain_upgrade);
+				}
+			}
+			if (unit.Character) {
+				unit.Character->Deities.erase(std::remove(unit.Character->Deities.begin(), unit.Character->Deities.end(), upgrade_deity), unit.Character->Deities.end());
+			}
+		} else {
+			fprintf(stderr, "Deity \"%s\" has an upgrade, but doesn't exist.\n", upgrade->Ident.c_str());
+		}
+	}
+
 	//Wyrmgus start
-	/*
-	*/
 	if (!(upgrade->Ability && upgrade->WeaponClasses.size() > 0 && std::find(upgrade->WeaponClasses.begin(), upgrade->WeaponClasses.end(), unit.GetCurrentWeaponClass()) == upgrade->WeaponClasses.end())) {
 		for (size_t z = 0; z < upgrade->UpgradeModifiers.size(); ++z) {
-			RemoveIndividualUpgradeModifier(unit, upgrade->UpgradeModifiers[z]);
+			bool applies_to_this = false;
+			bool applies_to_any_unit_types = false;
+			for (size_t i = 0; i < UnitTypes.size(); ++i) {
+				if (upgrade->UpgradeModifiers[z]->ApplyTo[i] == 'X') {
+					applies_to_any_unit_types = true;
+					if (i == unit.Type->Slot) {
+						applies_to_this = true;
+						break;
+					}
+				}
+			}
+			if (applies_to_this || !applies_to_any_unit_types) { //if the modifier isn't designated as being for a specific unit type, or is designated for this unit's unit type, remove it
+				RemoveIndividualUpgradeModifier(unit, upgrade->UpgradeModifiers[z]);
+			}
 		}
 	}
 	//Wyrmgus end

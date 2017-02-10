@@ -236,6 +236,18 @@ static int CclDefineCharacter(lua_State *l)
 					fprintf(stderr, "Ability \"%s\" doesn't exist.", ability_ident.c_str());
 				}
 			}
+		} else if (!strcmp(value, "Deities")) {
+			character->Deities.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string deity_ident = LuaToString(l, -1, j + 1);
+				CDeity *deity = PlayerRaces.GetDeity(deity_ident);
+				if (deity) {
+					character->Deities.push_back(deity);
+				} else {
+					fprintf(stderr, "Deity \"%s\" doesn't exist.", deity_ident.c_str());
+				}
+			}
 		} else if (!strcmp(value, "ReadWorks")) {
 			character->ReadWorks.clear();
 			const int args = lua_rawlen(l, -1);
@@ -568,6 +580,18 @@ static int CclDefineCustomHero(lua_State *l)
 					hero->Abilities.push_back(AllUpgrades[ability_id]);
 				} else {
 					fprintf(stderr, "Ability \"%s\" doesn't exist.", ability_ident.c_str());
+				}
+			}
+		} else if (!strcmp(value, "Deities")) {
+			hero->Deities.clear();
+			const int args = lua_rawlen(l, -1);
+			for (int j = 0; j < args; ++j) {
+				std::string deity_ident = LuaToString(l, -1, j + 1);
+				CDeity *deity = PlayerRaces.GetDeity(deity_ident);
+				if (deity) {
+					hero->Deities.push_back(deity);
+				} else {
+					fprintf(stderr, "Deity \"%s\" doesn't exist.", deity_ident.c_str());
 				}
 			}
 		} else if (!strcmp(value, "ReadWorks")) {

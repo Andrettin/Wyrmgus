@@ -94,6 +94,9 @@
 
 class CPlayer;
 class CUnitType;
+//Wyrmgus start
+class CUnit;
+//Wyrmgus end
 class CUpgrade;
 class ButtonAction;
 
@@ -133,6 +136,7 @@ extern std::string PrintDependencies(const CPlayer &player, const ButtonAction &
 //Wyrmgus start
 //extern bool CheckDependByIdent(const CPlayer &player, const std::string &target);
 extern bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units = false);
+extern bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignore_units = false);
 //Wyrmgus end
 /// Check a dependency by unit type
 //Wyrmgus start

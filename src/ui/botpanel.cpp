@@ -1501,7 +1501,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			}
 			break;
 		case ButtonLearnAbility:
-			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr)) && unit.Variable[LEVELUP_INDEX].Value >= 1;
+			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr)) && (unit.Variable[LEVELUP_INDEX].Value >= 1 || !CUpgrade::Get(buttonaction.ValueStr)->Ability);
 			break;
 		//Wyrmgus end
 		case ButtonSpellCast:
@@ -2106,14 +2106,11 @@ void CButtonPanel::DoClicked_Research(int button)
 void CButtonPanel::DoClicked_LearnAbility(int button)
 {
 	const int index = CurrentButtons[button].Value;
-	if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
-		//PlayerSubCosts(player,Upgrades[i].Costs);
-		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
-		UI.StatusLine.Clear();
-		UI.StatusLine.ClearCosts();
-	}
+	SendCommandLearnAbility(*Selected[0], *AllUpgrades[index]);
+	UI.StatusLine.Clear();
+	UI.StatusLine.ClearCosts();
 	
-	if (Selected[0]->Variable[LEVELUP_INDEX].Value == 0) {
+	if (AllUpgrades[index]->Ability && Selected[0]->Variable[LEVELUP_INDEX].Value == 0) {
 		CurrentButtonLevel = 0;
 		LastDrawnButtonPopup = NULL;
 		UI.ButtonPanel.Update();

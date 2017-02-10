@@ -384,6 +384,16 @@ void SaveHero(CCharacter *hero)
 		}
 		fprintf(fd, "},\n");
 	}
+	if (hero->Custom && hero->Deities.size() > 0) {
+		fprintf(fd, "\tDeities = {");
+		for (size_t j = 0; j < hero->Deities.size(); ++j) {
+			fprintf(fd, "\"%s\"", hero->Deities[j]->Ident.c_str());
+			if (j < (hero->Deities.size() - 1)) {
+				fprintf(fd, ", ");
+			}
+		}
+		fprintf(fd, "},\n");
+	}
 	if (hero->ReadWorks.size() > 0) {
 		fprintf(fd, "\tReadWorks = {");
 		for (size_t j = 0; j < hero->ReadWorks.size(); ++j) {

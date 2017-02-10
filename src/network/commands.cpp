@@ -627,6 +627,25 @@ void SendCommandCancelResearch(CUnit &unit)
 	}
 }
 
+//Wyrmgus start
+/**
+** Send command: Unit learn ability.
+**
+** @param unit     pointer to unit.
+** @param what     upgrade-type of the ability.
+*/
+void SendCommandLearnAbility(CUnit &unit, CUpgrade &what)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("learn-ability", &unit, 0, -1, -1, NoUnitP, what.Ident.c_str(), -1);
+		CommandLearnAbility(unit, what);
+	} else {
+		NetworkSendCommand(MessageCommandLearnAbility, unit,
+						   what.ID, 0, NoUnitP, NULL, 0);
+	}
+}
+//Wyrmgus end
+
 /**
 ** Send command: Unit spell cast on position/unit.
 **
@@ -1007,6 +1026,11 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 			CommandCancelResearch(unit);
 			break;
 		//Wyrmgus start
+		case MessageCommandLearnAbility:
+			CommandLog("learn-ability", &unit, 0, -1, -1, NoUnitP,
+					   AllUpgrades[arg1]->Ident.c_str(), -1);
+			CommandLearnAbility(unit, *AllUpgrades[arg1]);
+			break;
 		case MessageCommandQuest: {
 			CommandLog("quest", &unit, 0, 0, 0, NoUnitP, Quests[arg1]->Ident.c_str(), -1);
 			CommandQuest(unit, Quests[arg1]);

@@ -1213,6 +1213,28 @@ void CommandCancelResearch(CUnit &unit)
 	ClearSavedAction(unit);
 }
 
+//Wyrmgus start
+/**
+**  Unit starts learning an ability.
+**
+**  @param unit   pointer to unit.
+**  @param what   what to learn.
+**  @param flush  if true, flush command queue.
+*/
+void CommandLearnAbility(CUnit &unit, CUpgrade &what)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	
+	if (what.Ability) {
+		AbilityAcquire(unit, &what);
+	} else { //an individual upgrade of some other kind (i.e. a deity choice)
+		IndividualUpgradeAcquire(unit, &what);
+	}
+}
+//Wyrmgus end
+
 /**
 **  Cast a spell at position or unit.
 **

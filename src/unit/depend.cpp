@@ -258,6 +258,65 @@ try_or:
 	return false;  // no rule matches
 }
 
+//Wyrmgus start
+/**
+**  Check if this upgrade or unit is available.
+**
+**  @param unit  For this unit available.
+**  @param rule  .
+**
+**  @return        True if available, false otherwise.
+*/
+static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_units)
+{
+	//  Find rule
+	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
+	const DependRule *node = DependHash[i];
+
+	if (node) {  // find correct entry
+		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
+			if (!node->Next) {  // end of list
+				return true;
+			}
+			node = node->Next;
+		}
+	} else {
+		return true;
+	}
+
+	//  Prove the rules
+	node = node->Rule;
+
+	while (node) {
+		const DependRule *temp = node;
+		while (temp) {
+			switch (temp->Type) {
+				case DependRuleUnitType:
+					if (!ignore_units) {
+						i = unit.Player->HaveUnitTypeByType(*temp->Kind.UnitType);
+						if (temp->Count ? i < temp->Count : i) {
+							goto try_or;
+						}
+					}
+					break;
+				case DependRuleUpgrade:
+					i = UpgradeIdAllowed(*unit.Player, temp->Kind.Upgrade->ID) != 'R' && !unit.IndividualUpgrades[temp->Kind.Upgrade->ID];
+					if (temp->Count ? i : !i) {
+						goto try_or;
+					}
+					break;
+			}
+			temp = temp->Rule;
+		}
+		return true;  // all rules matches.
+
+try_or:
+		node = node->Next;
+	}
+	return false;  // no rule matches
+}
+//Wyrmgus end
+
 /**
 **  Check if this upgrade or unit is available.
 **
@@ -389,6 +448,43 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 	return CheckDependByRule(player, rule, ignore_units);
 	//Wyrmgus end
 }
+
+//Wyrmgus start
+/**
+**  Check if this upgrade or unit is available for a particular unit.
+**
+**  @param unit	   Whether it is available for this unit.
+**  @param target  Unit or Upgrade.
+**
+**  @return        True if available, false otherwise.
+*/
+bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignore_units)
+{
+	DependRule rule;
+
+	//
+	//  first have to check, if target is allowed itself
+	//
+	if (!strncmp(target.c_str(), "unit-", 5)) {
+		// target string refers to unit-XXX
+		rule.Kind.UnitType = UnitTypeByIdent(target);
+		if (UnitIdAllowed(*unit.Player, rule.Kind.UnitType->Slot) == 0) {
+			return false;
+		}
+		rule.Type = DependRuleUnitType;
+	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
+		rule.Kind.Upgrade = CUpgrade::Get(target);
+		if (UpgradeIdAllowed(*unit.Player, rule.Kind.Upgrade->ID) == 'F') {
+			return false;
+		}
+		rule.Type = DependRuleUpgrade;
+	} else {
+		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
+		return false;
+	}
+	return CheckDependByRule(unit, rule, ignore_units);
+}
+//Wyrmgus end
 
 /**
 **  Check if this upgrade or unit is available.

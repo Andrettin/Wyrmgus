@@ -726,8 +726,12 @@ void CUnit::Retrain()
 {
 	//lose all abilities (the AbilityLost function also returns the level-ups to the unit)
 	for (size_t i = 0; i < AllUpgrades.size(); ++i) {
-		if (this->IndividualUpgrades[AllUpgrades[i]->ID] && AllUpgrades[i]->Ability && std::find(this->Type->StartingAbilities.begin(), this->Type->StartingAbilities.end(), AllUpgrades[i]) == this->Type->StartingAbilities.end()) {
-			AbilityLost(*this, AllUpgrades[i]);
+		if (this->IndividualUpgrades[AllUpgrades[i]->ID]) {
+			if (AllUpgrades[i]->Ability && std::find(this->Type->StartingAbilities.begin(), this->Type->StartingAbilities.end(), AllUpgrades[i]) == this->Type->StartingAbilities.end()) {
+				AbilityLost(*this, AllUpgrades[i]);
+			} else if (!strncmp(AllUpgrades[i]->Ident.c_str(), "upgrade-deity-", 14) && strncmp(AllUpgrades[i]->Ident.c_str(), "upgrade-deity-domain-", 21) && this->Character && this->Character->Custom) { //allow changing the deity for custom heroes
+				IndividualUpgradeLost(*this, AllUpgrades[i]);
+			}
 		}
 	}
 	
@@ -862,7 +866,7 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	this->Trait = NULL;
 
 	for (size_t i = 0; i < this->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependByIdent(*this->Player, this->Type->StartingAbilities[i]->Ident)) {
+		if (CheckDependByIdent(*this, this->Type->StartingAbilities[i]->Ident)) {
 			IndividualUpgradeAcquire(*this, this->Type->StartingAbilities[i]);
 		}
 	}
@@ -889,6 +893,14 @@ void CUnit::SetCharacter(std::string character_full_name, bool custom_hero)
 	//load learned abilities
 	for (size_t i = 0; i < this->Character->Abilities.size(); ++i) {
 		AbilityAcquire(*this, this->Character->Abilities[i]);
+	}
+	
+	//load worshipped deities
+	for (size_t i = 0; i < this->Character->Deities.size(); ++i) {
+		CUpgrade *deity_upgrade = CUpgrade::Get("upgrade-deity-" + this->Character->Deities[i]->Ident);
+		if (deity_upgrade) {
+			IndividualUpgradeAcquire(*this, deity_upgrade);
+		}
 	}
 	
 	//load read works
@@ -2430,7 +2442,7 @@ CUnit *MakeUnit(const CUnitType &type, CPlayer *player)
 	}
 	
 	for (size_t i = 0; i < unit->Type->StartingAbilities.size(); ++i) {
-		if (CheckDependByIdent(*unit->Player, unit->Type->StartingAbilities[i]->Ident)) {
+		if (CheckDependByIdent(*unit, unit->Type->StartingAbilities[i]->Ident)) {
 			IndividualUpgradeAcquire(*unit, unit->Type->StartingAbilities[i]);
 		}
 	}
@@ -5242,15 +5254,15 @@ bool CUnit::HasInventory() const
 
 bool CUnit::CanLearnAbility(CUpgrade *ability) const
 {
+	if (!strncmp(ability->Ident.c_str(), "upgrade-deity-", 14) && (!this->Character || !this->Character->Custom || this->Character->Deities.size() > 0)) { //if is a deity choice "ability", only allow for custom heroes, and only allow if doesn't have a deity already
+		return false;
+	}
+	
 	if (IndividualUpgrades[ability->ID]) { // already learned
 		return false;
 	}
 	
-	if (!CheckDependByIdent(*Player, ability->Ident)) {
-		return false;
-	}
-	
-	if (UpgradeIdAllowed(*Player, ability->ID) != 'A') {
+	if (!CheckDependByIdent(*this, ability->Ident)) {
 		return false;
 	}
 	
