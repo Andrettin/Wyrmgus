@@ -505,8 +505,34 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 			int worker_type_id = PlayerRaces.GetFactionClassUnitType(Players[i].Race, Players[i].Faction, GetUnitTypeClassIndexByName("worker"));			
 			if (worker_type_id != -1) {
 				Vec2i worker_unit_offset((UnitTypes[worker_type_id]->TileWidth - 1) / 2, (UnitTypes[worker_type_id]->TileHeight - 1) / 2);
+				
+				Vec2i worker_pos(Players[i].StartPos);
+
+				bool start_pos_has_town_hall = false;
+				std::vector<CUnit *> table;
+				Select(worker_pos - Vec2i(4, 4), worker_pos + Vec2i(4, 4), table, z, HasSamePlayerAs(Players[i]));
+				for (size_t j = 0; j < table.size(); ++j) {
+					if (table[j]->Type->BoolFlag[TOWNHALL_INDEX].value) {
+						start_pos_has_town_hall = true;
+						break;
+					}
+				}
+				
+				if (!start_pos_has_town_hall) { //if the start pos doesn't have a town hall, create the workers in the position of a town hall the player has
+					for (int j = 0; j < Players[i].GetUnitCount(); ++j) {
+						CUnit *town_hall_unit = &Players[i].GetUnit(j);
+						if (!town_hall_unit->Type->BoolFlag[TOWNHALL_INDEX].value) {
+							continue;
+						}
+						if (town_hall_unit->MapLayer != z) {
+							continue;
+						}
+						worker_pos = town_hall_unit->tilePos;
+					}
+				}
+				
 				for (int j = 0; j < 5; ++j) {
-					CUnit *worker_unit = CreateUnit(Players[i].StartPos, *UnitTypes[worker_type_id], &Players[i], Players[i].StartMapLayer);
+					CUnit *worker_unit = CreateUnit(worker_pos, *UnitTypes[worker_type_id], &Players[i], Players[i].StartMapLayer);
 				}
 			}
 		}
