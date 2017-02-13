@@ -2040,6 +2040,10 @@ void CUnit::UpdateSoldUnits()
 	std::vector<CCharacter *> potential_heroes;
 	if (this->Type->BoolFlag[RECRUITHEROES_INDEX].value && !IsNetworkGame() && CurrentQuest == NULL && !GrandStrategy) { // allow heroes to be recruited at town halls
 		int civilization_id = this->Type->Civilization;
+		if (civilization_id != -1 && civilization_id != this->Player->Race && this->Player->Race != -1 && this->Player->Faction != -1 && this->Type->Slot == PlayerRaces.GetFactionClassUnitType(this->Player->Race, this->Player->Faction, this->Type->Class)) {
+			civilization_id = this->Player->Race;
+		}
+		
 		for (std::map<std::string, CCharacter *>::iterator iterator = Characters.begin(); iterator != Characters.end(); ++iterator) {
 			if (iterator->second->Deity != NULL) {
 				continue;
