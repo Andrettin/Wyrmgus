@@ -154,24 +154,7 @@ int GetDegreeLevelIdByName(std::string degree_level)
 	}
 }
 
-void CMapTemplate::SetTileTerrain(const Vec2i &pos, CTerrainType *terrain)
-{
-	unsigned int index = pos.x + pos.y * this->Width;
-	
-	if (terrain->Overlay && !(terrain->Flags & MapFieldWaterAllowed)) {
-		while (index >= this->TileOverlayTerrains.size()) {
-			this->TileOverlayTerrains.push_back(-1);
-		}
-		this->TileOverlayTerrains[index] = terrain->ID;
-	} else {
-		while (index >= this->TileTerrains.size()) {
-			this->TileTerrains.push_back(-1);
-		}
-		this->TileTerrains[index] = terrain->ID;
-	}
-}
-
-void CMapTemplate::ParseTerrainFile(bool overlay)
+void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z)
 {
 	std::string terrain_file;
 	if (overlay) {
@@ -196,18 +179,25 @@ void CMapTemplate::ParseTerrainFile(bool overlay)
 	int y = 0;
 	while (std::getline(is_map, line_str))
 	{
+		if (y < template_start_pos.y || y >= (template_start_pos.y + Map.Info.MapHeights[z])) {
+			y += 1;
+			continue;
+		}
 		int x = 0;
 		
 		for (unsigned int i = 0; i < line_str.length(); ++i) {
+			if (x < template_start_pos.x || x >= (template_start_pos.x + Map.Info.MapWidths[z])) {
+				x += 1;
+				continue;
+			}
 			std::string terrain_character = line_str.substr(i, 1);
 			char terrain_id = -1;
 			if (TerrainTypeCharacterToIndex.find(terrain_character) != TerrainTypeCharacterToIndex.end()) {
 				terrain_id = TerrainTypeCharacterToIndex.find(terrain_character)->second;
 			}
-			if (overlay) {
-				this->TileOverlayTerrains[x + y * this->Width] = terrain_id;
-			} else {
-				this->TileTerrains[x + y * this->Width] = terrain_id;
+			if (terrain_id != -1) {
+				Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
+				Map.Field(real_pos, z)->SetTerrain(TerrainTypes[terrain_id]);
 			}
 			x += 1;
 		}
@@ -258,22 +248,17 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		return;
 	}
 	
-	for (int x = 0; x < Map.Info.MapWidths[z]; ++x) {
-		if ((template_start_pos.x + x) >= this->Width) {
-			break;
+	this->ApplyTerrainFile(false, template_start_pos, map_start_pos, z);
+	this->ApplyTerrainFile(true, template_start_pos, map_start_pos, z);
+
+	for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
+		Vec2i history_pos = std::get<0>(HistoricalTerrains[i]);
+		if (history_pos.x < template_start_pos.x || history_pos.x >= (template_start_pos.x + Map.Info.MapWidths[z]) || history_pos.y < template_start_pos.y || history_pos.y >= (template_start_pos.y + Map.Info.MapHeights[z])) {
+			continue;
 		}
-		for (int y = 0; y < Map.Info.MapHeights[z]; ++y) {
-			if ((template_start_pos.y + y) >= this->Height) {
-				break;
-			}
-			Vec2i pos(template_start_pos.x + x, template_start_pos.y + y);
-			Vec2i real_pos(map_start_pos.x + x, map_start_pos.y + y);
-			if (this->GetTileTerrain(pos, false)) {
-				Map.Field(real_pos, z)->SetTerrain(this->GetTileTerrain(pos, false));
-			}
-			if (this->GetTileTerrain(pos, true)) {
-				Map.Field(real_pos, z)->SetTerrain(this->GetTileTerrain(pos, true));
-			}
+		if (CurrentCampaign->StartDate >= std::get<2>(HistoricalTerrains[i]) || std::get<2>(HistoricalTerrains[i]).year == 0) {
+			Vec2i real_pos(map_start_pos.x + history_pos.x - template_start_pos.x, map_start_pos.y + history_pos.y - template_start_pos.y);
+			Map.Field(real_pos, z)->SetTerrain(std::get<1>(HistoricalTerrains[i]));
 		}
 	}
 	
@@ -799,27 +784,6 @@ void CMapTemplate::ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int
 bool CMapTemplate::IsSubtemplateArea()
 {
 	return this->MainTemplate != NULL;
-}
-
-CTerrainType *CMapTemplate::GetTileTerrain(const Vec2i &pos, bool overlay)
-{
-	unsigned int index = pos.x + pos.y * this->Width;
-	
-	if (overlay) {
-		if (index < this->TileOverlayTerrains.size() && this->TileOverlayTerrains[index] != -1) {
-			return TerrainTypes[this->TileOverlayTerrains[index]];
-		}
-	} else {
-		if (index < this->TileTerrains.size() && this->TileTerrains[index] != -1) {
-			return TerrainTypes[this->TileTerrains[index]];
-		} else if (this->BorderTerrain && (pos.x == 0 || pos.x == (this->Width - 1) || pos.y == 0 || pos.y == (this->Height - 1))) {
-			return this->BorderTerrain;
-		} else if (this->BaseTerrain) {
-			return this->BaseTerrain;
-		}
-	}
-	
-	return NULL;
 }
 //Wyrmgus end
 

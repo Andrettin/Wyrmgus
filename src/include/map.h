@@ -149,13 +149,11 @@ public:
 	{
 	}
 
-	void SetTileTerrain(const Vec2i &pos, CTerrainType *terrain);
-	void ParseTerrainFile(bool overlay = false);
+	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplySettlements(Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
 	bool IsSubtemplateArea();
-	CTerrainType *GetTileTerrain(const Vec2i &pos, bool overlay = false);
 	
 	std::string Name;
 	std::string Ident;
@@ -177,8 +175,6 @@ public:
 	std::vector<std::pair<CTerrainType *, int>> ExternalGeneratedTerrains;
 	std::vector<std::pair<CUnitType *, int>> GeneratedNeutralUnits; /// the first element of the pair is the resource's unit type, and the second is the quantity
 	std::vector<std::pair<CUnitType *, int>> PlayerLocationGeneratedNeutralUnits;
-	std::vector<char> TileTerrains;
-	std::vector<char> TileOverlayTerrains;
 	std::map<std::pair<int, int>, std::tuple<CUnitType *, int, CUniqueItem *>> Resources; /// Resources (with unit type, resources held, and unique item pointer), mapped to the tile position
 	std::vector<std::tuple<Vec2i, CUnitType *, CFaction *, int, int, CUniqueItem *>> Units; /// Units; first value is the tile position, and the last ones are start year and end year
 	std::vector<std::tuple<Vec2i, CCharacter *, CFaction *, CDate, CDate>> Heroes; /// Heroes; first value is the tile position, and the last ones are start year and end year
@@ -189,6 +185,7 @@ public:
 	std::map<std::pair<int, int>, CSettlement *> Settlements;
 	std::map<std::tuple<int, int, int>, std::string> CulturalSettlementNames;
 	std::map<std::tuple<int, int, CFaction *>, std::string> FactionCulturalSettlementNames;
+	std::vector<std::tuple<Vec2i, CTerrainType *, CDate>> HistoricalTerrains;	/// Terrain changes
 };
 
 class CSettlement
@@ -647,8 +644,6 @@ inline void SetTileTerrain(std::string terrain_ident, int x, int y, int value = 
 	const Vec2i pos(x, y);
 	SetTileTerrain(terrain_ident, pos, value, z);
 }
-extern void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y, std::string tile_label = "");
-extern void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y, std::string tile_label = "");
 extern void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0, int z = 0);
 //Wyrmgus end
 

@@ -616,64 +616,42 @@ void SetTileTerrain(std::string terrain_ident, const Vec2i &pos, int value, int 
 	}
 }
 
-void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y, std::string tile_label)
+static int CclSetMapTemplateTileTerrain(lua_State *l)
 {
-	CMapTemplate *map = GetMapTemplate(map_ident);
-	
-	if (!map) {
-		fprintf(stderr, "Map template \"%s\" doesn't exist.\n", map_ident.c_str());
-		return;
-	}
-	
-	Vec2i pos(x, y);
-	
-	if (pos.x < 0 || pos.x >= map->Width || pos.y < 0 || pos.y >= map->Height) {
-		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
-		return;
-	}
-	
-	CTerrainType *terrain = GetTerrainType(terrain_ident);
-	
-	if (!terrain) {
-		fprintf(stderr, "Terrain \"%s\" doesn't exist.\n", terrain_ident.c_str());
-		return;
-	}
-	
-	map->SetTileTerrain(pos, terrain);
-	
-	if (!tile_label.empty()) {
-		map->TileLabels[std::pair<int, int>(pos.x, pos.y)] = TransliterateText(tile_label);
-	}
-}
-
-void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y, std::string tile_label)
-{
-	CMapTemplate *map = GetMapTemplate(map_ident);
-	
-	if (!map) {
-		fprintf(stderr, "Map template \"%s\" doesn't exist.\n", map_ident.c_str());
-		return;
-	}
-	
-	Vec2i pos(x, y);
-	
-	if (pos.x < 0 || pos.x >= map->Width || pos.y < 0 || pos.y >= map->Height) {
-		fprintf(stderr, "Invalid map coordinate : (%d, %d)\n", pos.x, pos.y);
-		return;
-	}
-	
-	CTerrainType *terrain = TerrainTypes[terrain_id];
-	
-	if (!terrain) {
-		fprintf(stderr, "Terrain doesn't exist.\n");
-		return;
+	std::string map_template_ident = LuaToString(l, 1);
+	CMapTemplate *map_template = GetMapTemplate(map_template_ident);
+	if (!map_template) {
+		LuaError(l, "Map template doesn't exist.\n");
 	}
 
-	map->SetTileTerrain(pos, terrain);
-	
-	if (!tile_label.empty()) {
-		map->TileLabels[std::pair<int, int>(pos.x, pos.y)] = TransliterateText(tile_label);
+	CTerrainType *terrain = GetTerrainType(LuaToString(l, 2));
+	if (!terrain) {
+		LuaError(l, "Terrain doesn't exist");
 	}
+
+	Vec2i pos;
+	CclGetPos(l, &pos.x, &pos.y, 3);
+	
+	if (pos.x < 0 || pos.x >= map_template->Width || pos.y < 0 || pos.y >= map_template->Height) {
+		LuaError(l, "Invalid map coordinate : (%d, %d)" _C_ pos.x _C_ pos.y);
+	}
+
+	CDate date;
+	date.year = 0;
+	date.month = 1;
+	date.day = 1;
+	const int nargs = lua_gettop(l);
+	if (nargs >= 4) {
+		CclGetDate(l, &date, 4);
+	}
+	
+	map_template->HistoricalTerrains.push_back(std::tuple<Vec2i, CTerrainType *, CDate>(pos, terrain, date));
+
+	if (nargs >= 5) {
+		map_template->TileLabels[std::pair<int, int>(pos.x, pos.y)] = LuaToString(l, 5);
+	}
+	
+	return 1;
 }
 
 static int CclSetMapTemplateTileLabel(lua_State *l)
@@ -1646,15 +1624,6 @@ static int CclDefineMapTemplate(lua_State *l)
 		}
 	}
 	
-	if (!map->TerrainFile.empty()) {
-		map->TileTerrains.resize(map->Width * map->Height);
-		map->ParseTerrainFile(false);
-	}
-	if (!map->OverlayTerrainFile.empty()) {
-		map->TileOverlayTerrains.resize(map->Width * map->Height);
-		map->ParseTerrainFile(true);
-	}
-	
 	return 0;
 }
 
@@ -1889,6 +1858,7 @@ void MapCclRegister()
 	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
 	lua_register(Lua, "DefineSettlement", CclDefineSettlement);
+	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);
 	lua_register(Lua, "SetMapTemplateTileLabel", CclSetMapTemplateTileLabel);
 	lua_register(Lua, "SetMapTemplateCulturalSettlementName", CclSetMapTemplateCulturalSettlementName);
 	lua_register(Lua, "SetMapTemplateFactionCulturalSettlementName", CclSetMapTemplateFactionCulturalSettlementName);

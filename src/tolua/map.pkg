@@ -34,7 +34,5 @@ extern void SetTimeOfDay(int time_of_day, int z = 0);
 //void SetTile(int tile, int w, int h, int value = 0);
 void SetTile(int tile, int w, int h, int value = 0, int z = 0);
 void SetTileTerrain(std::string terrain_ident, int w, int h, int value = 0, int z = 0);
-void SetMapTemplateTileTerrain(std::string map_ident, std::string terrain_ident, int x, int y, std::string tile_label = "");
-void SetMapTemplateTileTerrainByID(std::string map_ident, int terrain_id, int x, int y, std::string tile_label = "");
 void ApplyMapTemplate(std::string map_template_ident, int start_x = 0, int start_y = 0, int map_start_x = 0, int map_start_y = 0, int z = 0);
 //Wyrmgus end
