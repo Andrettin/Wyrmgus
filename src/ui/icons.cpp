@@ -142,13 +142,13 @@ void CIcon::Load()
 */
 //Wyrmgus start
 //void CIcon::DrawIcon(const PixelPos &pos, const int player) const
-void CIcon::DrawIcon(const PixelPos &pos, const int player, int skin_color, int hair_color) const
+void CIcon::DrawIcon(const PixelPos &pos, const int player, int hair_color) const
 //Wyrmgus end
 {
 	if (player != -1 ) {
 		//Wyrmgus start
 //		this->G->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y);
-		this->G->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y, true, skin_color, hair_color);
+		this->G->DrawPlayerColorFrameClip(player, this->Frame, pos.x, pos.y, true, hair_color);
 		//Wyrmgus end
 	} else {
 		this->G->DrawFrameClip(this->Frame, pos.x, pos.y);
@@ -202,7 +202,7 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 						 //Wyrmgus start
 //						 const PixelPos &pos, const std::string &text, int player) const
-						 const PixelPos &pos, const std::string &text, int player, int skin_color, int hair_color) const
+						 const PixelPos &pos, const std::string &text, int player, int hair_color) const
 						 //Wyrmgus end
 {
 	ButtonStyle s(style);
@@ -226,11 +226,11 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		Video.FillRectangle(ColorBlack, pos.x, pos.y, 46, 38);
 		if (flags & IconActive) { // Code to make a border appear around the icon when the mouse hovers over it.
 //			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
-			DrawUIButton(&s, flags, pos.x, pos.y, text, player, skin_color, hair_color);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color);
 		}
 
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
-			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, skin_color, hair_color);
+			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, hair_color);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 48, 40);
 			} else if (flags & IconAutoCast) {
@@ -243,7 +243,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			}
 //			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 		} else {
-			DrawUIButton(&s, flags, pos.x, pos.y, text, player, skin_color, hair_color);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color);
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46, 38);
 			} else if (flags & IconAutoCast) {
@@ -279,14 +279,14 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 			Video.DrawRectangle(ColorGray, pos.x - 4, pos.y - 4, 54, 46);
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
-			DrawUIButton(&s, flags, pos.x, pos.y, text, player, skin_color, hair_color);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color);
 			//Wyrmgus end
 		}
 
 		if (flags & IconClicked) { // Shift the icon a bit to make it look like it's been pressed.
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player);
-			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, skin_color, hair_color);
+			DrawUIButton(&s, flags, pos.x + 1, pos.y + 1, text, player, hair_color);
 			//Wyrmgus end
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x + 1, pos.y + 1, 46, 38);
@@ -300,7 +300,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 		} else {
 			//Wyrmgus start
 //			DrawUIButton(&s, flags, pos.x, pos.y, text, player);
-			DrawUIButton(&s, flags, pos.x, pos.y, text, player, skin_color, hair_color);
+			DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color);
 			//Wyrmgus end
 			if (flags & IconSelected) {
 				Video.DrawRectangle(ColorGreen, pos.x, pos.y, 46, 38);
@@ -309,7 +309,7 @@ void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 	} else {
 		//Wyrmgus start
 //		DrawUIButton(&s, flags, pos.x, pos.y, text, player);
-		DrawUIButton(&s, flags, pos.x, pos.y, text, player, skin_color, hair_color);
+		DrawUIButton(&s, flags, pos.x, pos.y, text, player, hair_color);
 		//Wyrmgus end
 	}
 }

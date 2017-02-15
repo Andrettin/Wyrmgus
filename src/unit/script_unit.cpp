@@ -1746,13 +1746,6 @@ static int CclGetUnitVariable(lua_State *l)
 	} else if (!strcmp(value, "Icon")) {
 		lua_pushstring(l, unit->GetIcon().Name.c_str());
 		return 1;
-	} else if (!strcmp(value, "SkinColor")) {
-		if (unit->GetSkinColor() != 0) {
-			lua_pushstring(l, SkinColorNames[unit->GetSkinColor()].c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
 	} else if (!strcmp(value, "HairColor")) {
 		if (unit->GetHairColor() != 0) {
 			lua_pushstring(l, HairColorNames[unit->GetHairColor()].c_str());

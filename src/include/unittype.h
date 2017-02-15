@@ -156,7 +156,7 @@ class VariationInfo
 {
 public:
 	VariationInfo() : 
-		FrameWidth(0), FrameHeight(0), SkinColor(0), HairColor(0), ResourceMin(0), ResourceMax(0),
+		FrameWidth(0), FrameHeight(0), HairColor(0), ResourceMin(0), ResourceMax(0),
 		Animations(NULL), Construction(NULL), Sprite(NULL), ShadowSprite(NULL)
 	{
 		memset(LayerSprites, 0, sizeof(LayerSprites));
@@ -172,7 +172,6 @@ public:
 	std::string ShadowFile;			/// Variation's shadow graphics.
 	int FrameWidth;
 	int FrameHeight;
-	int SkinColor;
 	int HairColor;
 	int ResourceMin;
 	int ResourceMax;
@@ -836,7 +835,6 @@ public:
 	std::string GetRandomVariationIdent(int image_layer = -1) const;
 	std::string GetDefaultName(CPlayer &player) const;
 	CPlayerColorGraphic *GetDefaultLayerSprite(CPlayer &player, int image_layer) const;
-	int GetDefaultSkinColor(CPlayer &player) const;
 	int GetDefaultHairColor(CPlayer &player) const;
 	bool CanExperienceUpgradeTo(CUnitType *type) const;
 	std::string GetNamePlural() const;
@@ -889,7 +887,6 @@ public:
 	//Wyrmgus start
 	int TrainQuantity;										/// Quantity to be trained
 	int Upkeep;												/// Copper upkeep (for grand strategy mode)
-	int SkinColor;											/// Skin color of the unit type (used for color conversion)
 	int HairColor;											/// Hair color of the unit type (used for color conversion)
 	int ItemClass;											/// Item class (if the unit type is an item)
 	CSpecies *Species;
@@ -1240,7 +1237,7 @@ extern CUnitType *NewUnitTypeSlot(const std::string &ident);/// Allocate an empt
 extern void DrawUnitType(const CUnitType &type, CPlayerColorGraphic *sprite,
 						 //Wyrmgus start
 //						 int player, int frame, const PixelPos &screenPos);
-						 int player, int frame, const PixelPos &screenPos, int skin_color = 0, int hair_color = 0);
+						 int player, int frame, const PixelPos &screenPos, int hair_color = 0);
 						 //Wyrmgus end
 
 extern void InitUnitTypes(int reset_player_stats);   /// Init unit-type table

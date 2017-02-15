@@ -352,9 +352,6 @@ std::vector<IntColor> PlayerColors[PlayerColorMax];
 std::string PlayerColorNames[PlayerColorMax];
 std::vector<int> ConversiblePlayerColors;
 
-std::vector<CColor> SkinColorsRGB[SkinColorMax];
-std::string SkinColorNames[SkinColorMax];
-std::vector<int> ConversibleSkinColors;
 std::vector<CColor> HairColorsRGB[HairColorMax];
 std::string HairColorNames[HairColorMax];
 std::vector<int> ConversibleHairColors;
@@ -1998,7 +1995,7 @@ void CPlayer::CompleteQuest(CQuest *quest)
 		if (!quest->Rewards.empty()) {
 			rewards_string = "Rewards: " + quest->Rewards;
 		}
-		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", \"" + SkinColorNames[quest->SkinColor] + "\", \"" + HairColorNames[quest->HairColor] + "\") end;");
+		CclCommand("if (GenericDialog ~= nil) then GenericDialog(\"Quest Completed\", \"You have completed the " + quest->Name + " quest!\\n\\n" + rewards_string + "\", nil, \"" + quest->Icon.Name + "\", \"" + PlayerColorNames[quest->PlayerColor] + "\", \"" + HairColorNames[quest->HairColor] + "\") end;");
 	}
 }
 
@@ -3102,19 +3099,6 @@ int GetPlayerColorIndexByName(std::string player_color_name)
 		}
 	}
 	return -1;
-}
-
-int GetSkinColorIndexByName(std::string skin_color_name)
-{
-	for (int c = 1; c < SkinColorMax; ++c) {
-		if (SkinColorNames[c].empty()) {
-			break;
-		}
-		if (SkinColorNames[c] == skin_color_name) {
-			return c;
-		}
-	}
-	return 0;
 }
 
 int GetHairColorIndexByName(std::string hair_color_name)

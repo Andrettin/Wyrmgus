@@ -4968,16 +4968,6 @@ int CUnit::GetDisplayPlayer() const
 	}
 }
 
-int CUnit::GetSkinColor() const
-{
-	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];
-	if (varinfo && varinfo->SkinColor) {
-		return varinfo->SkinColor;
-	} else {
-		return this->Type->SkinColor;
-	}
-}
-
 int CUnit::GetHairColor() const
 {
 	VariationInfo *varinfo = this->Type->VarInfo[this->Variation];

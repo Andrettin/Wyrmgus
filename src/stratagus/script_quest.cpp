@@ -123,8 +123,6 @@ static int CclDefineQuest(lua_State *l)
 			} else {
 				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
 			}
-		} else if (!strcmp(value, "SkinColor")) {
-			quest->SkinColor = GetSkinColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "HairColor")) {
 			quest->HairColor = GetHairColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "Hidden")) {
@@ -369,13 +367,6 @@ static int CclGetQuestData(lua_State *l)
 	} else if (!strcmp(data, "PlayerColor")) {
 		lua_pushstring(l, PlayerColorNames[quest->PlayerColor].c_str());
 		return 1;
-	} else if (!strcmp(data, "SkinColor")) {
-		if (quest->SkinColor != 0) {
-			lua_pushstring(l, SkinColorNames[quest->SkinColor].c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
-		return 1;
 	} else if (!strcmp(data, "HairColor")) {
 		if (quest->HairColor != 0) {
 			lua_pushstring(l, HairColorNames[quest->HairColor].c_str());
@@ -607,8 +598,6 @@ static int CclDefineAchievement(lua_State *l)
 			} else {
 				LuaError(l, "Player color \"%s\" doesn't exist." _C_ color_name.c_str());
 			}
-		} else if (!strcmp(value, "SkinColor")) {
-			achievement->SkinColor = GetSkinColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "HairColor")) {
 			achievement->HairColor = GetHairColorIndexByName(LuaToString(l, -1));
 		} else if (!strcmp(value, "CharacterLevel")) {
@@ -696,13 +685,6 @@ static int CclGetAchievementData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "PlayerColor")) {
 		lua_pushstring(l, PlayerColorNames[achievement->PlayerColor].c_str());
-		return 1;
-	} else if (!strcmp(data, "SkinColor")) {
-		if (achievement->SkinColor != 0) {
-			lua_pushstring(l, SkinColorNames[achievement->SkinColor].c_str());
-		} else {
-			lua_pushstring(l, "");
-		}
 		return 1;
 	} else if (!strcmp(data, "HairColor")) {
 		if (achievement->HairColor != 0) {

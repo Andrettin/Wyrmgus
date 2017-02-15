@@ -145,7 +145,7 @@ namespace gcn
                                 int srcY, int dstX, int dstY,
 								//Wyrmgus start
 //                                int width, int height)
-                                int width, int height, int player, int skin_color, int hair_color, unsigned int transparency)
+                                int width, int height, int player, int hair_color, unsigned int transparency)
 								//Wyrmgus end
     {
         ClipRectangle top = mClipStack.top();
@@ -160,7 +160,7 @@ namespace gcn
 
 		//Wyrmgus start
 //        SDL_Surface* srcImage = (SDL_Surface*)image->_getData();
-        SDL_Surface* srcImage = (SDL_Surface*)image->_getData(player, skin_color, hair_color);
+        SDL_Surface* srcImage = (SDL_Surface*)image->_getData(player, hair_color);
 
 		int old_alpha;
 		

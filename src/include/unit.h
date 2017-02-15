@@ -389,7 +389,6 @@ public:
 	int GetCurrentWeaponClass() const;
 	int GetItemVariableChange(const CUnit *item, int variable_index, bool increase = false) const;
 	int GetDisplayPlayer() const;
-	int GetSkinColor() const;
 	int GetHairColor() const;
 	int GetPrice() const;
 	int GetUnitStock(int unit_type_id) const;
@@ -835,7 +834,7 @@ extern void DrawShadow(const CUnitType &type, CGraphic *sprite, int frame, const
 //Wyrmgus end
 //Wyrmgus start
 /// Draw unit's overlay
-extern void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, int skin_color = 0, int hair_color = 0);
+extern void DrawPlayerColorOverlay(const CUnitType &type, CPlayerColorGraphic *sprite, int player, int frame, const PixelPos &screenPos, int hair_color = 0);
 extern void DrawOverlay(const CUnitType &type, CGraphic *sprite, int player, int frame, const PixelPos &screenPos);
 //Wyrmgus end
 /// Draw all units visible on map in viewport

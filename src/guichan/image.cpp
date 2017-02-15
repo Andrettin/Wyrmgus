@@ -112,7 +112,7 @@ namespace gcn
 
 	//Wyrmgus start
 //    void* Image::_getData() const
-    void* Image::_getData(int player_color, int skin_color, int hair_color)
+    void* Image::_getData(int player_color, int hair_color)
 	//Wyrmgus end
     {
         return mData;

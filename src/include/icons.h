@@ -124,7 +124,7 @@ public:
 	/// Draw icon
 	//Wyrmgus start
 //	void DrawIcon(const PixelPos &pos, const int player = -1) const;
-	void DrawIcon(const PixelPos &pos, const int player = -1, int skin_color = 0, int hair_color = 0) const;
+	void DrawIcon(const PixelPos &pos, const int player = -1, int hair_color = 0) const;
 	//Wyrmgus end
 	/// Draw grayscale icon
 	void DrawGrayscaleIcon(const PixelPos &pos, const int player = -1) const;
@@ -134,7 +134,7 @@ public:
 	void DrawUnitIcon(const ButtonStyle &style,
 					  //Wyrmgus start
 //					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1) const;
-					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, int skin_color = 0, int hair_color = 0) const;
+					  unsigned flags, const PixelPos &pos, const std::string &text, const int player = -1, int hair_color = 0) const;
 					  //Wyrmgus end
 
 	const std::string &GetIdent() const { return this->Ident; }

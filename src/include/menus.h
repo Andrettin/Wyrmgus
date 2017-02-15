@@ -49,7 +49,7 @@ class ButtonStyle;
 extern void DrawUIButton(ButtonStyle *style, unsigned flags,
 						 //Wyrmgus start
 //						 int x, int y, const std::string &text, int player = -1);
-						 int x, int y, const std::string &text, int player = -1, int skin_color = 0, int hair_color = 0);
+						 int x, int y, const std::string &text, int player = -1, int hair_color = 0);
 						 //Wyrmgus end
 
 /// Pre menu setup

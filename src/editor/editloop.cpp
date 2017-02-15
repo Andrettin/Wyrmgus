@@ -864,7 +864,6 @@ static void DrawUnitIcons()
 		//Wyrmgus start
 //		CIcon &icon = *Editor.ShownUnitTypes[i]->Icon.Icon;
 		CIcon &icon = (i != (int) Editor.ShownUnitTypes.size()) ? *Editor.ShownUnitTypes[i]->Icon.Icon : *CIcon::Get("icon-level-up");
-		int skin_color = (i != (int) Editor.ShownUnitTypes.size()) ? Editor.ShownUnitTypes[i]->SkinColor : 0;
 		int hair_color = (i != (int) Editor.ShownUnitTypes.size()) ? Editor.ShownUnitTypes[i]->HairColor : 0;
 		//Wyrmgus end
 		const PixelPos pos(x, y);
@@ -884,7 +883,7 @@ static void DrawUnitIcons()
 
 		//Wyrmgus start
 //		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index);
-		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index, skin_color, hair_color);
+		icon.DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Players[Editor.SelectedPlayer].Index, hair_color);
 		//Wyrmgus end
 
 		//Wyrmgus start
@@ -1212,7 +1211,7 @@ static void DrawEditorPanel_StartIcon()
 		
 		//Wyrmgus start
 //		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer);
-		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer, Editor.StartUnit->SkinColor, Editor.StartUnit->HairColor);
+		icon->DrawUnitIcon(*UI.SingleSelectedButton->Style, flag, pos, "", Editor.SelectedPlayer, Editor.StartUnit->HairColor);
 		//Wyrmgus end
 	} else {
 		//  No unit specified : draw a cross.
@@ -1388,7 +1387,7 @@ static void DrawStartLocations()
 				if (type) {
 					//Wyrmgus start
 //					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos);
-					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, type->SkinColor, type->HairColor);
+					DrawUnitType(*type, type->Sprite, i, 0, startScreenPos, type->HairColor);
 					//Wyrmgus end
 				} else { // Draw a cross
 					DrawCross(startScreenPos, PixelTileSize, Players[i].Color);
