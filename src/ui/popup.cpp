@@ -195,9 +195,13 @@
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
 		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
 	}
+	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
+		TriggerData.Upgrade = AllUpgrades[button.Value];
+	}
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	TriggerData.Unit = NULL;
+	TriggerData.Upgrade = NULL;
 	//Wyrmgus end
 	
 	//Wyrmgus start
@@ -237,9 +241,13 @@
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
 		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
 	}
+	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
+		TriggerData.Upgrade = AllUpgrades[button.Value];
+	}
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	TriggerData.Unit = NULL;
+	TriggerData.Upgrade = NULL;
 	//Wyrmgus end
 	int height = 0;
 	int i = 1;
@@ -262,9 +270,13 @@
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
 		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
 	}
+	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
+		TriggerData.Upgrade = AllUpgrades[button.Value];
+	}
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	TriggerData.Unit = NULL;
+	TriggerData.Upgrade = NULL;
 	//Wyrmgus end
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string sub;
@@ -477,11 +489,15 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
 		TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
 	}
+	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
+		TriggerData.Upgrade = AllUpgrades[button.Value];
+	}
 	//Wyrmgus end
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	//Wyrmgus start
 	TriggerData.Unit = NULL;
+	TriggerData.Upgrade = NULL;
 	//Wyrmgus end
 	return font.getWidth(text);
 }
@@ -510,11 +526,15 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 			TriggerData.Type = UnitTypes[UnitManager.GetSlotUnit(button.Value).Type->Slot];
 			TriggerData.Unit = &UnitManager.GetSlotUnit(button.Value);
 		}
+		if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
+			TriggerData.Upgrade = AllUpgrades[button.Value];
+		}
 		//Wyrmgus end
 		text = EvalString(this->Text);
 		TriggerData.Type = NULL;
 		//Wyrmgus start
 		TriggerData.Unit = NULL;
+		TriggerData.Upgrade = NULL;
 		//Wyrmgus end
 		if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);
@@ -728,6 +748,8 @@ static PopupConditionPanel *ParsePopupConditions(lua_State *l)
 			condition->Arrows = Ccl2Condition(l, LuaToString(l, -1));
 		} else if (!strcmp(key, "Regeneration")) {
 			condition->Regeneration = Ccl2Condition(l, LuaToString(l, -1));
+		} else if (!strcmp(key, "FactionUpgrade")) {
+			condition->FactionUpgrade = Ccl2Condition(l, LuaToString(l, -1));
 		//Wyrmgus end
 		} else {
 			int index = UnitTypeVar.BoolFlagNameLookup[key];

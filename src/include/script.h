@@ -56,6 +56,9 @@ extern "C" {
 
 class CUnit;
 class CUnitType;
+//Wyrmgus start
+class CUpgrade;
+//Wyrmgus end
 class CFile;
 class CFont;
 
@@ -157,6 +160,9 @@ enum EString {
 	EString_TypeClass,			/// Unit type's class
 	EString_TypeDescription,	/// Unit type's description
 	EString_TypeQuote,			/// Unit type's quote
+	EString_UpgradeCivilization,	/// Upgrade's civilization
+	EString_UpgradeFactionType,		/// Upgrade's faction's type
+	EString_UpgradeEffectsString,	/// Upgrade's effects string
 	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.
@@ -233,6 +239,7 @@ struct NumberDesc {
 		NumberDesc *N; /// Other number.
 		//Wyrmgus start
 		CUnitType **Type;           /// Which unit type.
+		CUpgrade **Upgrade;         /// Which upgrade.
 		//Wyrmgus end
 		BinOp binOp;   /// For binary operand.
 		struct {
@@ -295,6 +302,7 @@ struct StringDesc {
 		UnitDesc *Unit;      /// Unit desciption.
 		//Wyrmgus start
 		CUnitType **Type;           /// Which unit type.
+		CUpgrade **Upgrade;         /// Which upgrade.
 		//Wyrmgus end
 		struct {
 			NumberDesc *Cond;  /// Branch condition.
@@ -399,6 +407,9 @@ extern EnumVariable Str2EnumVariable(lua_State *l, const char *s);
 extern NumberDesc *CclParseNumberDesc(lua_State *l); /// Parse a number description.
 extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit description.
 extern CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
+//Wyrmgus start
+extern CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
+//Wyrmgus end
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 
 extern int EvalNumber(const NumberDesc *numberdesc); /// Evaluate the number.

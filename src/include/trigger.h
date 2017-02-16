@@ -47,6 +47,9 @@
 
 class CUnit;
 class CUnitType;
+//Wyrmgus start
+class CUpgrade;
+//Wyrmgus end
 struct lua_State;
 class CFile;
 //Wyrmgus start
@@ -110,6 +113,9 @@ struct TriggerDataType {
 	CUnit *Unit;	  /// Unit used in trigger
 	//Wyrmgus end
 	CUnitType *Type;  /// Type used in trigger;
+	//Wyrmgus start
+	CUpgrade *Upgrade; /// Upgrade used in trigger
+	//Wyrmgus end
 };
 
 /*----------------------------------------------------------------------------
