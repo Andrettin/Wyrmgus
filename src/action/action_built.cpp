@@ -385,6 +385,11 @@ static void Finish(COrder_Built &order, CUnit &unit)
 		// this->Data.Worker->Type->BuilderSpeedFactor;
 		amount = 100;
 	}
+	//Wyrmgus start
+	if (!amount && unit.Player->Race != -1 && unit.Player->Faction != -1 && (PlayerRaces.Factions[unit.Player->Race][unit.Player->Faction]->Type == FactionTypeMercenaryCompany || PlayerRaces.Factions[unit.Player->Race][unit.Player->Faction]->Type == FactionTypeHolyOrder || PlayerRaces.Factions[unit.Player->Race][unit.Player->Faction]->Type == FactionTypeTradingCompany)) { //trading companies and etc. get their buildings constructed automatically, since they aren't supposed to have workers
+		amount = 100;
+	}
+	//Wyrmgus end
 	this->Progress(unit, amount);
 
 	// Check if construction should be canceled...
