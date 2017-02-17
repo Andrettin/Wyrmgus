@@ -365,11 +365,16 @@ static int FillThread(void *)
 {
 	while (Audio.Running == true) {
 		int status = SDL_LockMutex(Audio.Lock);
+//Wyrmgus start
+/*
 #ifdef USE_WIN32
 		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 1000) == 0) {
 #else
 		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 100) == 0) {
 #endif
+*/
+		if (SDL_CondWaitTimeout(Audio.Cond, Audio.Lock, 1000) == 0) {
+//Wyrmgus end
 			MixIntoBuffer(Audio.Buffer, Audio.Format.samples * Audio.Format.channels);
 		}
 		SDL_UnlockMutex(Audio.Lock);
