@@ -1720,7 +1720,7 @@ static int CclDefineSettlement(lua_State *l)
 				++j;
 				settlement->HistoricalPopulation[date] = LuaToNumber(l, -1, j + 1);
 			}
-		} else if (!strcmp(value, "HistoricalGarrison")) {
+		} else if (!strcmp(value, "HistoricalUnits")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
@@ -1734,7 +1734,29 @@ static int CclDefineSettlement(lua_State *l)
 				CclGetDate(l, &date);
 				lua_pop(l, 1);
 				++j;
-				settlement->HistoricalGarrison[date] = LuaToNumber(l, -1, j + 1);
+				
+				CUnitType *unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (!unit_type) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+				++j;
+				
+				int unit_quantity = LuaToNumber(l, -1, j + 1);
+				++j;
+				
+				CFaction *unit_owner = NULL;
+				lua_rawgeti(l, -1, j + 1);
+				if (lua_isstring(l, -1) && !lua_isnumber(l, -1)) {
+					unit_owner = PlayerRaces.GetFaction(-1, LuaToString(l, -1));
+					if (!unit_owner) {
+						LuaError(l, "Unit owner faction doesn't exist.\n");
+					}
+				} else {
+					--j;
+				}
+				lua_pop(l, 1);
+
+				settlement->HistoricalUnits[unit_type][date] = std::pair<int, CFaction *>(unit_quantity, unit_owner);
 			}
 		} else if (!strcmp(value, "HistoricalBuildings")) {
 			if (!lua_istable(l, -1)) {

@@ -205,7 +205,7 @@ public:
 	std::map<int, std::string> CulturalNames;					/// Names for the settlement for each different culture/civilization
 	std::map<CDate, CFaction *> HistoricalOwners;				/// Historical owners of the settlement
 	std::map<CDate, int> HistoricalPopulation;					/// Historical population
-	std::map<CDate, int> HistoricalGarrison;					/// Historical quantity of soldiers garrisoned in the settlement
+	std::map<CUnitType *, std::map<CDate, std::pair<int, CFaction *>>> HistoricalUnits;	/// Historical quantity of a particular unit type (number of people for units representing a person)
 	std::vector<std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, CFaction *>> HistoricalBuildings; /// Historical buildings, with start and end date
 };
 //Wyrmgus end

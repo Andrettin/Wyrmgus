@@ -6049,7 +6049,10 @@ static void HitUnit_AttackBack(CUnit &attacker, CUnit &target)
 			if (order.IsWeakTargetSelected() == false) {
 				return;
 			}
-		} else {
+		//Wyrmgus start
+//		} else {
+		} else if (target.CurrentAction() != UnitActionStill) {
+		//Wyrmgus end
 			return;
 		}
 	}
