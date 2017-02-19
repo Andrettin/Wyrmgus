@@ -1287,8 +1287,12 @@ public:
 				}
 			}
 
-			const int x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
-			const int y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
+			//Wyrmgus start
+//			const int x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
+//			const int y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
+			const int x = abs(dest->tilePos.x - attacker->tilePos.x) + (size / 2);
+			const int y = abs(dest->tilePos.y - attacker->tilePos.y) + (size / 2);
+			//Wyrmgus end
 			Assert(x >= 0 && y >= 0);
 
 			// Mark the good/bad array...
@@ -1377,8 +1381,12 @@ private:
 		int sgood = 0;
 		
 		// cost map is relative to attacker position
-		x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
-		y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
+		//Wyrmgus start
+//		x = dest->tilePos.x - attacker->tilePos.x + (size / 2);
+//		y = dest->tilePos.y - attacker->tilePos.y + (size / 2);
+		x = abs(dest->tilePos.x - attacker->tilePos.x) + (size / 2);
+		y = abs(dest->tilePos.y - attacker->tilePos.y) + (size / 2);
+		//Wyrmgus end
 		Assert(x >= 0 && y >= 0);
 		
 		// calculate the costs:
