@@ -51,6 +51,9 @@
 #include "player.h" // for playing faction music
 //Wyrmgus end
 #include "unit.h"
+//Wyrmgus start
+#include "unit_manager.h"
+//Wyrmgus end
 
 #include "SDL.h"
 
@@ -270,6 +273,11 @@ static int MixChannelsToStereo32(int *buffer, int size)
 
 	for (int channel = 0; channel < MaxChannels; ++channel) {
 		if (Channels[channel].Playing && Channels[channel].Sample) {
+			//Wyrmgus start
+			if ((Channels[channel].Point & 1)) {
+				fprintf(stderr, "Sound effect error; Index: %d, Voice: %d, Origin: \"%s\"\n", Channels[channel].Point, Channels[channel].Voice, (Channels[channel].Unit && Channels[channel].Unit->Base) ? UnitManager.GetSlotUnit(Channels[channel].Unit->Id).Type->Ident.c_str() : "");
+			}
+			//Wyrmgus end
 			int i = MixSampleToStereo32(Channels[channel].Sample,
 										Channels[channel].Point, Channels[channel].Volume,
 										Channels[channel].Stereo, buffer, size);
@@ -407,6 +415,7 @@ bool UnitSoundIsPlaying(Origin *origin)
 			//Wyrmgus start
 //			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing) {
 			&& origin->Id == Channels[i].Unit->Id && Channels[i].Playing
+			&& origin->Base && Channels[i].Unit->Base
 			&& Channels[i].Voice != -1
 			&& Channels[i].Voice != VoiceHit && Channels[i].Voice != VoiceMiss && Channels[i].Voice != VoiceStep) {
 			//Wyrmgus end
