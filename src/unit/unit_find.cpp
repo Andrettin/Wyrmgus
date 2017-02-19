@@ -156,6 +156,11 @@ VisitResult TerrainFinder::Visit(TerrainTraversal &terrainTraversal, const Vec2i
 //	if (!player.AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(player)) {
 	if (!Map.Field(pos, z)->playerInfo.IsTeamExplored(player)) {
 	//Wyrmgus end
+		//Wyrmgus start
+		if (player.AiEnabled) {
+			return VisitResult_Ok; //for the AI, allow finding resources that are seen, but separated by unexplored areas
+		}
+		//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 	// Look if found what was required.
@@ -607,6 +612,11 @@ VisitResult ResourceUnitFinder::Visit(TerrainTraversal &terrainTraversal, const 
 //	if (!worker.Player->AiEnabled && !Map.Field(pos)->playerInfo.IsExplored(*worker.Player)) {
 	if (!Map.Field(pos, worker.MapLayer)->playerInfo.IsTeamExplored(*worker.Player) && !ignore_exploration) {
 	//Wyrmgus end
+		//Wyrmgus start
+		if (worker.Player->AiEnabled) {
+			return VisitResult_Ok; //for the AI, allow finding resources that are seen, but separated by unexplored areas
+		}
+		//Wyrmgus end
 		return VisitResult_DeadEnd;
 	}
 
