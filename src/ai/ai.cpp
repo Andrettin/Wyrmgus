@@ -1206,7 +1206,7 @@ void AiCanNotMove(CUnit &unit)
 		// Path probably closed by unit here
 		AiMoveUnitInTheWay(unit);
 		//Wyrmgus start
-		unit.Wait = 10; // wait a bit before trying to move the unit again
+		unit.Wait = CYCLES_PER_SECOND * 10; // wait a bit before trying to move the unit again
 		//Wyrmgus end
 	}
 }

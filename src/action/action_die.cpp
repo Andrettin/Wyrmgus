@@ -112,6 +112,9 @@ static bool AnimateActionDie(CUnit &unit)
 	// Die sequence terminated, generate corpse.
 	if (type.CorpseType == NULL) {
 		unit.Remove(NULL);
+		//Wyrmgus start
+		UnitClearOrders(unit);
+		//Wyrmgus end
 		unit.Release();
 		return ;
 	}
