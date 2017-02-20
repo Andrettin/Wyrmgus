@@ -550,6 +550,11 @@ void CUnit::Release(bool final)
 		DebugPrint("unit already free\n");
 		return;
 	}
+	//Wyrmgus start
+	if (Orders.size() != 1) {
+		fprintf(stderr, "Unit to be released has more than 1 order; Unit Type: \"%s\", Orders: %d, First Order Type: %d.\n", this->Type->Ident.c_str(), Orders.size(), this->CurrentAction());
+	}
+	//Wyrmgus end
 	Assert(Orders.size() == 1);
 	// Must be removed before here
 	Assert(Removed);
