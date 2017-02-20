@@ -227,6 +227,7 @@ public:
 	void GenerateUnique(CUnit *dropper);
 	void UpdateSoldUnits();
 	void SellUnit(CUnit *sold_unit, int player);
+	void Scout();
 	//Wyrmgus end
 	
 	bool RestoreOrder();

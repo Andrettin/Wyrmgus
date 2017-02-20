@@ -749,42 +749,7 @@ void AiSendExplorers()
 	for (size_t i = 0; i != AiPlayer->Scouts.size(); ++i) {
 		// move AI scouts
 		if (AiPlayer->Scouts[i]->IsIdle()) {
-			int scout_range = std::max(16, AiPlayer->Scouts[i]->CurrentSightRange * 2);
-			
-			Vec2i target_pos = AiPlayer->Scouts[i]->tilePos;
-
-			target_pos.x += SyncRand(scout_range * 2 + 1) - scout_range;
-			target_pos.y += SyncRand(scout_range * 2 + 1) - scout_range;
-
-			// restrict to map
-			Map.Clamp(target_pos, AiPlayer->Scouts[i]->MapLayer);
-
-			// move if possible
-			if (target_pos != AiPlayer->Scouts[i]->tilePos) {
-				// if the tile the scout is moving to happens to have a layer connector, use it
-				bool found_connector = false;
-				CUnitCache &unitcache = Map.Field(target_pos, AiPlayer->Scouts[i]->MapLayer)->UnitCache;
-				for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
-					CUnit *connector = *it;
-
-					if (connector->ConnectingDestination != NULL && AiPlayer->Scouts[i]->CanUseItem(connector)) {
-						CommandUse(*AiPlayer->Scouts[i], *connector, FlushCommands);
-						found_connector = true;
-						break;
-					}
-				}
-				if (found_connector) {
-					continue;
-				}
-				
-				UnmarkUnitFieldFlags(*AiPlayer->Scouts[i]);
-				if (UnitCanBeAt(*AiPlayer->Scouts[i], target_pos, AiPlayer->Scouts[i]->MapLayer)) {
-					MarkUnitFieldFlags(*AiPlayer->Scouts[i]);
-					CommandMove(*AiPlayer->Scouts[i], target_pos, FlushCommands, AiPlayer->Scouts[i]->MapLayer);
-					continue;
-				}
-				MarkUnitFieldFlags(*AiPlayer->Scouts[i]);
-			}
+			AiPlayer->Scouts[i]->Scout();
 		}
 	}
 	//Wyrmgus end

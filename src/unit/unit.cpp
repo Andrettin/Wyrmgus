@@ -2137,6 +2137,46 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 		UI.ButtonPanel.Update();
 	}
 }
+
+void CUnit::Scout()
+{
+	int scout_range = std::max(16, this->CurrentSightRange * 2);
+			
+	Vec2i target_pos = this->tilePos;
+
+	target_pos.x += SyncRand(scout_range * 2 + 1) - scout_range;
+	target_pos.y += SyncRand(scout_range * 2 + 1) - scout_range;
+
+	// restrict to map
+	Map.Clamp(target_pos, this->MapLayer);
+
+	// move if possible
+	if (target_pos != this->tilePos) {
+		// if the tile the scout is moving to happens to have a layer connector, use it
+		bool found_connector = false;
+		CUnitCache &unitcache = Map.Field(target_pos, this->MapLayer)->UnitCache;
+		for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
+			CUnit *connector = *it;
+
+			if (connector->ConnectingDestination != NULL && this->CanUseItem(connector)) {
+				CommandUse(*this, *connector, FlushCommands);
+				found_connector = true;
+				break;
+			}
+		}
+		if (found_connector) {
+			return;
+		}
+				
+		UnmarkUnitFieldFlags(*this);
+		if (UnitCanBeAt(*this, target_pos, this->MapLayer)) {
+			MarkUnitFieldFlags(*this);
+			CommandMove(*this, target_pos, FlushCommands, this->MapLayer);
+			return;
+		}
+		MarkUnitFieldFlags(*this);
+	}
+}
 //Wyrmgus end
 
 unsigned int CUnit::CurrentAction() const
@@ -5739,7 +5779,6 @@ static void HitUnit_LastAttack(const CUnit *attacker, CUnit &target)
 			target.Player->AiEnabled
 			&& !attacker->Type->BoolFlag[INDESTRUCTIBLE_INDEX].value // don't attack indestructible units back
 		) {
-
 		//Wyrmgus end
 			AiHelpMe(attacker, target);
 		}

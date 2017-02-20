@@ -1430,6 +1430,22 @@ static void AiCollectResources()
 			}
 		}
 	} while (unit);
+	
+	//Wyrmgus start
+	//explore with the workers that are still idle (as that means they haven't gotten something to harvest)
+	for (int i = 0; i < n; ++i) {
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
+		if (!unit.Type->BoolFlag[HARVESTER_INDEX].value || !unit.Active) {
+			continue;
+		}
+
+		if (!unit.IsIdle()) {
+			continue;
+		}
+		
+		unit.Scout();
+	}
+	//Wyrmgus end
 
 	// Unassigned units there can't be assigned ( ie : they can't move to ressource )
 	// IDEA : use transporter here.
