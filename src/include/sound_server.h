@@ -66,6 +66,9 @@ public:
 	unsigned char *Buffer;        /// sample buffer
 	int Pos;                      /// buffer position
 	int Len;                      /// length of filled buffer
+	//Wyrmgus start
+	std::string File;			  /// for debugging
+	//Wyrmgus end
 };
 
 /**

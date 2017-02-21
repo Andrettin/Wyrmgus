@@ -241,6 +241,9 @@ CSample *LoadMikMod(const char *name, int flags)
 	sample->SampleSize = 16;
 	sample->Frequency = 44100;
 	sample->Pos = 0;
+	//Wyrmgus start
+	sample->File = name;
+	//Wyrmgus end
 
 	if (flags & PlayAudioStream) {
 		sample->Len = 0;

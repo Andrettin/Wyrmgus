@@ -331,6 +331,9 @@ CSample *LoadWav(const char *name, int flags)
 	sample->BitsPerSample = wavfmt.BitsPerSample;
 	sample->Len = 0;
 	sample->Pos = 0;
+	//Wyrmgus start
+	sample->File = name;
+	//Wyrmgus end
 
 	if (flags & PlayAudioStream) {
 		data->ChunkRem = 0;
