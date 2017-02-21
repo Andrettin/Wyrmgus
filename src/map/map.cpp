@@ -579,10 +579,19 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 				CurrentCampaign->StartDate >= std::get<0>(settlement_iterator->second->HistoricalBuildings[j])
 				&& (CurrentCampaign->StartDate < std::get<1>(settlement_iterator->second->HistoricalBuildings[j]) || std::get<1>(settlement_iterator->second->HistoricalBuildings[j]).year == 0)
 			) {
-				const CUnitType *type = std::get<2>(settlement_iterator->second->HistoricalBuildings[j]);
+				CFaction *building_owner = std::get<4>(settlement_iterator->second->HistoricalBuildings[j]);
+				int unit_type_id = -1;
+				if (building_owner) {
+					unit_type_id = PlayerRaces.GetFactionClassUnitType(building_owner->Civilization, building_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
+				} else {
+					unit_type_id = PlayerRaces.GetFactionClassUnitType(settlement_owner->Civilization, settlement_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
+				}
+				if (unit_type_id == -1) {
+					continue;
+				}
+				const CUnitType *type = UnitTypes[unit_type_id];
 				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
 				CUnit *unit = NULL;
-				CFaction *building_owner = std::get<4>(settlement_iterator->second->HistoricalBuildings[j]);
 				if (building_owner) {
 					CPlayer *building_player = GetOrAddFactionPlayer(building_owner);
 					if (building_player->StartPos.x == 0 && building_player->StartPos.y == 0) {

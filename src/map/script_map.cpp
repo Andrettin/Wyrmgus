@@ -1780,9 +1780,9 @@ static int CclDefineSettlement(lua_State *l)
 				CclGetDate(l, &end_date);
 				lua_pop(l, 1);
 				++j;
-				CUnitType *building_unit_type = UnitTypeByIdent(LuaToString(l, -1, j + 1));
-				if (!building_unit_type) {
-					LuaError(l, "Unit type doesn't exist.");
+				int building_class_id = GetUnitTypeClassIndexByName(LuaToString(l, -1, j + 1));
+				if (building_class_id == -1) {
+					LuaError(l, "Building class doesn't exist.");
 				}
 				++j;
 				
@@ -1808,7 +1808,7 @@ static int CclDefineSettlement(lua_State *l)
 				}
 				lua_pop(l, 1);
 
-				settlement->HistoricalBuildings.push_back(std::tuple<CDate, CDate, CUnitType *, CUniqueItem *, CFaction *>(start_date, end_date, building_unit_type, unique, building_owner));
+				settlement->HistoricalBuildings.push_back(std::tuple<CDate, CDate, int, CUniqueItem *, CFaction *>(start_date, end_date, building_class_id, unique, building_owner));
 			}
 		} else if (!strcmp(value, "Regions")) {
 			if (!lua_istable(l, -1)) {
