@@ -7064,30 +7064,6 @@ void FinalizeGrandStrategyInitialization()
 	for (int i = 0; i < MAX_RACES; ++i) {
 		for (size_t j = 0; j < PlayerRaces.Factions[i].size(); ++j) {
 			if (GrandStrategyGameLoading == false) {
-				// add historical technologies that should have been discovered at the game's start date; do this here instead of together with the other faction initialization finalization elements because it can affect the food productivity used to determine some province settings below
-				for (std::map<std::string, int>::iterator iterator = PlayerRaces.Civilizations[i]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Civilizations[i]->HistoricalTechnologies.end(); ++iterator) {
-					if (GrandStrategyYear >= iterator->second) {
-						int upgrade_id = UpgradeIdByIdent(iterator->first);
-						if (upgrade_id != -1) {
-							GrandStrategyGame.Factions[i][j]->SetTechnology(upgrade_id, true);
-							GrandStrategyGame.Factions[i][j]->HistoricalTechnologies[AllUpgrades[upgrade_id]] = iterator->second;
-						} else {
-							fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
-						}
-					}
-				}
-				for (std::map<std::string, int>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalTechnologies.end(); ++iterator) {
-					if (GrandStrategyYear >= iterator->second) {
-						int upgrade_id = UpgradeIdByIdent(iterator->first);
-						if (upgrade_id != -1) {
-							GrandStrategyGame.Factions[i][j]->SetTechnology(upgrade_id, true);
-							GrandStrategyGame.Factions[i][j]->HistoricalTechnologies[AllUpgrades[upgrade_id]] = iterator->second;
-						} else {
-							fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
-						}
-					}
-				}
-				
 				// inherit technologies from other factions, as appropriate (i.e. when tribes split off from their parent tribe)
 				for (std::map<int, CFaction *>::iterator iterator = PlayerRaces.Factions[i][j]->HistoricalFactionDerivations.begin(); iterator != PlayerRaces.Factions[i][j]->HistoricalFactionDerivations.end(); ++iterator) {
 					if (GrandStrategyYear >= iterator->first) {

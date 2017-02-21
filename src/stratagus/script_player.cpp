@@ -932,16 +932,27 @@ static int CclDefineCivilization(lua_State *l)
 			for (int j = 0; j < args; ++j) {
 				civilization->ShipNames.push_back(LuaToString(l, -1, j + 1));
 			}
-		} else if (!strcmp(value, "HistoricalTechnologies")) {
+		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
+				CDate date;
+				date.year = 0;
+				date.month = 1;
+				date.day = 1;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &date);
+				lua_pop(l, 1);
+				++j;
+
 				std::string technology_ident = LuaToString(l, -1, j + 1);
 				++j;
-				int year = LuaToNumber(l, -1, j + 1);
-				civilization->HistoricalTechnologies[technology_ident] = year;
+				
+				bool has_upgrade = LuaToBoolean(l, -1, j + 1);
+
+				civilization->HistoricalUpgrades[technology_ident][date] = has_upgrade;
 			}
 		} else {
 			LuaError(l, "Unsupported tag: %s" _C_ value);
@@ -962,9 +973,9 @@ static int CclDefineCivilization(lua_State *l)
 			}
 		}
 		
-		for (std::map<std::string, int>::iterator iterator = PlayerRaces.Civilizations[parent_civilization]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Civilizations[parent_civilization]->HistoricalTechnologies.end(); ++iterator) {
-			if (civilization->HistoricalTechnologies.find(iterator->first) == civilization->HistoricalTechnologies.end()) {
-				civilization->HistoricalTechnologies[iterator->first] = iterator->second;
+		for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = PlayerRaces.Civilizations[parent_civilization]->HistoricalUpgrades.begin(); iterator != PlayerRaces.Civilizations[parent_civilization]->HistoricalUpgrades.end(); ++iterator) {
+			if (civilization->HistoricalUpgrades.find(iterator->first) == civilization->HistoricalUpgrades.end()) {
+				civilization->HistoricalUpgrades[iterator->first] = iterator->second;
 			}
 		}
 	}
@@ -1821,16 +1832,27 @@ static int CclDefineFaction(lua_State *l)
 				}
 				faction->HistoricalFactionDerivations[year] = PlayerRaces.Factions[predecessor_civilization][predecessor_faction];
 			}
-		} else if (!strcmp(value, "HistoricalTechnologies")) {
+		} else if (!strcmp(value, "HistoricalUpgrades")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
 			const int subargs = lua_rawlen(l, -1);
 			for (int j = 0; j < subargs; ++j) {
+				CDate date;
+				date.year = 0;
+				date.month = 1;
+				date.day = 1;
+				lua_rawgeti(l, -1, j + 1);
+				CclGetDate(l, &date);
+				lua_pop(l, 1);
+				++j;
+
 				std::string technology_ident = LuaToString(l, -1, j + 1);
 				++j;
-				int year = LuaToNumber(l, -1, j + 1);
-				faction->HistoricalTechnologies[technology_ident] = year;
+				
+				bool has_upgrade = LuaToBoolean(l, -1, j + 1);
+
+				faction->HistoricalUpgrades[technology_ident][date] = has_upgrade;
 			}
 		} else if (!strcmp(value, "HistoricalTiers")) {
 			if (!lua_istable(l, -1)) {
@@ -1951,9 +1973,9 @@ static int CclDefineFaction(lua_State *l)
 				}
 			}
 			
-			for (std::map<std::string, int>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalTechnologies.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalTechnologies.end(); ++iterator) {
-				if (faction->HistoricalTechnologies.find(iterator->first) == faction->HistoricalTechnologies.end()) {
-					faction->HistoricalTechnologies[iterator->first] = iterator->second;
+			for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalUpgrades.begin(); iterator != PlayerRaces.Factions[civilization][faction->ParentFaction]->HistoricalUpgrades.end(); ++iterator) {
+				if (faction->HistoricalUpgrades.find(iterator->first) == faction->HistoricalUpgrades.end()) {
+					faction->HistoricalUpgrades[iterator->first] = iterator->second;
 				}
 			}
 		}

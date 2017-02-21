@@ -750,27 +750,36 @@ void GameMainLoop()
 						CCivilization *civilization = PlayerRaces.Civilizations[Players[i].Race];
 						CFaction *faction = PlayerRaces.Factions[Players[i].Race][Players[i].Faction];
 						
-						for (std::map<std::string, int>::iterator iterator = civilization->HistoricalTechnologies.begin(); iterator != civilization->HistoricalTechnologies.end(); ++iterator) {
-							if (iterator->second == 0 || CurrentCampaign->StartDate.year >= iterator->second) {
-								int upgrade_id = UpgradeIdByIdent(iterator->first);
-								if (upgrade_id != -1) {
-									if (UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
+						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = civilization->HistoricalUpgrades.begin(); iterator != civilization->HistoricalUpgrades.end(); ++iterator) {
+							int upgrade_id = UpgradeIdByIdent(iterator->first);
+							if (upgrade_id == -1) {
+								fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+								continue;
+							}
+							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+								if (second_iterator->first.year == 0 || CurrentCampaign->StartDate >= second_iterator->first) {
+									if (second_iterator->second && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
 										UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
+									} else if (!second_iterator->second) {
+										break;
 									}
-								} else {
-									fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
 								}
 							}
 						}
-						for (std::map<std::string, int>::iterator iterator = faction->HistoricalTechnologies.begin(); iterator != faction->HistoricalTechnologies.end(); ++iterator) {
-							if (iterator->second == 0 || CurrentCampaign->StartDate.year >= iterator->second) {
-								int upgrade_id = UpgradeIdByIdent(iterator->first);
-								if (upgrade_id != -1) {
-									if (UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
+						
+						for (std::map<std::string, std::map<CDate, bool>>::iterator iterator = faction->HistoricalUpgrades.begin(); iterator != faction->HistoricalUpgrades.end(); ++iterator) {
+							int upgrade_id = UpgradeIdByIdent(iterator->first);
+							if (upgrade_id == -1) {
+								fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
+								continue;
+							}
+							for (std::map<CDate, bool>::reverse_iterator second_iterator = iterator->second.rbegin(); second_iterator != iterator->second.rend(); ++second_iterator) {
+								if (second_iterator->first.year == 0 || CurrentCampaign->StartDate >= second_iterator->first) {
+									if (second_iterator->second && UpgradeIdentAllowed(Players[i], iterator->first.c_str()) != 'R') {
 										UpgradeAcquire(Players[i], AllUpgrades[upgrade_id]);
+									} else if (!second_iterator->second) {
+										break;
 									}
-								} else {
-									fprintf(stderr, "Upgrade \"%s\" doesn't exist.\n", iterator->first.c_str());
 								}
 							}
 						}
