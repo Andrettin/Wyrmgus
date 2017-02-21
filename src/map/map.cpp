@@ -573,6 +573,7 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			}
 		}
 		
+		bool first_building = true;
 		for (size_t j = 0; j < settlement_iterator->second->HistoricalBuildings.size(); ++j) {
 			if (
 				CurrentCampaign->StartDate >= std::get<0>(settlement_iterator->second->HistoricalBuildings[j])
@@ -598,6 +599,12 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 				}
 				if (std::get<3>(settlement_iterator->second->HistoricalBuildings[j])) {
 					unit->SetUnique(std::get<3>(settlement_iterator->second->HistoricalBuildings[j]));
+				}
+				if (first_building) {
+					if (!type->BoolFlag[TOWNHALL_INDEX].value && !unit->Unique && (!building_owner || building_owner == settlement_owner) && settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization) != settlement_iterator->second->CulturalNames.end()) { //if one building is representing a minor settlement, make it have the settlement's name
+						unit->Name = settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization)->second;
+					}
+					first_building = false;
 				}
 			}
 		}
