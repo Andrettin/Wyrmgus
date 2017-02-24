@@ -404,7 +404,7 @@ static void AnimateActionTrain(CUnit &unit)
 		if (&player == ThisPlayer) {
 			PlayUnitSound(*newUnit, VoiceReady);
 		}
-		if (unit.Player->AiEnabled) {
+		if (unit.Player->AiEnabled && unit.Player->Index == newUnit->Player->Index) {
 			AiTrainingComplete(unit, *newUnit);
 		}
 
