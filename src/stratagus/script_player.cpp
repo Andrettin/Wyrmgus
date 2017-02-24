@@ -2202,6 +2202,20 @@ static int CclDefineDeity(lua_State *l)
 
 				deity->Domains.push_back(PlayerRaces.DeityDomains[domain_id]);
 			}
+		} else if (!strcmp(value, "HolyOrders")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CFaction *holy_order = PlayerRaces.GetFaction(-1, LuaToString(l, -1, j + 1));
+				if (!holy_order) {
+					LuaError(l, "Holy order doesn't exist.");
+				}
+
+				deity->HolyOrders.push_back(holy_order);
+				holy_order->HolyOrderDeity = deity;
+			}
 		} else if (!strcmp(value, "Abilities")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");

@@ -1025,7 +1025,7 @@ void CommandTrainUnit(CUnit &unit, CUnitType &type, int player, int)
 		return;
 	}
 
-	if (type.Stats[unit.Player->Index].Costs[TimeCost] == 0) { //if the time cost to train is 0, train this unit before any currently trained ones
+	if (unit.Type->Stats[unit.Player->Index].UnitStock[type.Slot] != 0) { //if the trainer unit/building has a stock of the unit type to be trained, do this as a critical order
 		if (unit.CriticalOrder && unit.CriticalOrder->Action == UnitActionTrain) {
 			return;
 		}

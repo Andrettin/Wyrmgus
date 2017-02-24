@@ -3063,7 +3063,9 @@ bool CPlayer::HasBuildingAccess(const CPlayer &player) const
 		&& (PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeMercenaryCompany || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeHolyOrder || PlayerRaces.Factions[player.Race][player.Faction]->Type == FactionTypeTradingCompany)
 		&& player.Overlord == NULL || this->IsOverlordOf(player, true)
 	) {
-		return true;
+		if (PlayerRaces.Factions[player.Race][player.Faction]->Type != FactionTypeHolyOrder || std::find(this->Deities.begin(), this->Deities.end(), PlayerRaces.Factions[player.Race][player.Faction]->HolyOrderDeity) != this->Deities.end()) { //if the faction is a holy order, the player must have chosen its respective deity
+			return true;
+		}
 	}
 
 	return false;

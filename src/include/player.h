@@ -524,7 +524,7 @@ public:
 		Playable(true), //factions are playable by default
 		DefaultStartPos(-1, -1),
 		DefaultAI("land-attack"),
-		Conditions(NULL)
+		HolyOrderDeity(NULL), Conditions(NULL)
 	{
 	}
 	
@@ -548,6 +548,7 @@ public:
 	int ParentFaction;													/// parent faction of this faction
 	bool Playable;														/// faction playability
 	Vec2i DefaultStartPos;
+	CDeity *HolyOrderDeity;												/// deity this faction belongs to, if it is a holy order
 	LuaCallback *Conditions;
 	std::vector<int> Colors;											/// faction colors
 	std::vector<std::string> DevelopsTo;								/// to which factions this faction can develop
@@ -627,6 +628,7 @@ public:
 	std::vector<CReligion *> Religions;	/// Religions for which this deity is available
 	std::vector<std::string> Feasts;
 	std::vector<CDeityDomain *> Domains;
+	std::vector<CFaction *> HolyOrders;	/// Holy orders of this deity
 	std::vector<CUpgrade *> Abilities;	/// Abilities linked to this deity
 	std::map<int, std::string> CulturalNames;	/// Names of the deity in different cultures (for example, Odin is known as Hroptatyr by the dwarves)
 };
