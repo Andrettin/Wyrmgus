@@ -45,6 +45,9 @@
 #include "missile.h"
 #include "parameters.h"
 #include "player.h"
+//Wyrmgus start
+#include "quest.h" // for saving campaigns
+//Wyrmgus end
 #include "replay.h"
 #include "spells.h"
 #include "trigger.h"
@@ -136,6 +139,9 @@ int SaveGame(const std::string &filename)
 	//Wyrmgus start
 //	file.printf("function SetTile() end\n");
 	file.printf("function SetTileTerrain() end\n");
+	if (CurrentCampaign != NULL) {
+		file.printf("SetCurrentCampaign(\"%s\")\n", CurrentCampaign->Ident.c_str());
+	}
 	//Wyrmgus end
 	file.printf("Load(\"%s\")\n", Map.Info.Filename.c_str());
 	file.printf("CreateUnit = oldCreateUnit\n");

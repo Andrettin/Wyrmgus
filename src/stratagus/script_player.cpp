@@ -192,6 +192,9 @@ void CPlayer::Load(lua_State *l)
 		//Wyrmgus start
 		} else if (!strcmp(value, "start-map-layer")) {
 			this->StartMapLayer = LuaToNumber(l, j + 1);
+		} else if (!strcmp(value, "overlord")) {
+			int overlord_id = LuaToNumber(l, j + 1);
+			this->SetOverlord(&Players[overlord_id]);
 		//Wyrmgus end
 		} else if (!strcmp(value, "resources")) {
 			if (!lua_istable(l, j + 1)) {

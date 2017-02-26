@@ -955,6 +955,9 @@ void CPlayer::Save(CFile &file) const
 	file.printf("\",\n  \"start\", {%d, %d},\n", p.StartPos.x, p.StartPos.y);
 	//Wyrmgus start
 	file.printf("  \"start-map-layer\", %d,\n", p.StartMapLayer);
+	if (p.Overlord) {
+		file.printf("  \"overlord\", %d,\n", p.Overlord->Index);
+	}
 	//Wyrmgus end
 
 	// Resources
@@ -1306,6 +1309,7 @@ void CPlayer::Init(/* PlayerTypes */ int type)
 	this->Race = 0;
 	//Wyrmgus start
 	this->Faction = -1;
+	this->Religion = NULL;
 	this->Overlord = NULL;
 	//Wyrmgus end
 	this->Team = team;
@@ -1700,6 +1704,7 @@ void CPlayer::Clear()
 	Race = 0;
 	//Wyrmgus start
 	Faction = -1;
+	Religion = NULL;
 	Overlord = NULL;
 	Vassals.clear();
 	//Wyrmgus end
@@ -2891,12 +2896,14 @@ void CPlayer::SetOverlord(CPlayer *player)
 	
 	if (this->Overlord) {
 		this->Overlord->Vassals.push_back(this);
-		this->SetDiplomacyAlliedWith(*this->Overlord);
-		this->Overlord->SetDiplomacyAlliedWith(*this);
-		CommandDiplomacy(this->Index, DiplomacyAllied, this->Overlord->Index);
-		CommandDiplomacy(this->Overlord->Index, DiplomacyAllied, this->Index);
-		CommandSharedVision(this->Index, true, this->Overlord->Index);
-		CommandSharedVision(this->Overlord->Index, true, this->Index);
+		if (!SaveGameLoading) {
+			this->SetDiplomacyAlliedWith(*this->Overlord);
+			this->Overlord->SetDiplomacyAlliedWith(*this);
+			CommandDiplomacy(this->Index, DiplomacyAllied, this->Overlord->Index);
+			CommandDiplomacy(this->Overlord->Index, DiplomacyAllied, this->Index);
+			CommandSharedVision(this->Index, true, this->Overlord->Index);
+			CommandSharedVision(this->Overlord->Index, true, this->Index);
+		}
 	}
 }
 //Wyrmgus end

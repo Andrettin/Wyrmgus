@@ -65,6 +65,7 @@ class CCharacter;
 class CProvince;
 class CPlane;
 class CQuest;
+class CReligion;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------
@@ -115,7 +116,8 @@ public:
 	int   Type;         /// type of player (human,computer,...)
 	int   Race;         /// race of player (orc,human,...)
 	//Wyrmgus start
-	int Faction;		/// faction of player
+	int Faction;		/// faction of the player
+	CReligion *Religion;	/// religion of the player
 	//Wyrmgus end
 	std::string AiName; /// AI for computer
 
