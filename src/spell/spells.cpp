@@ -243,7 +243,7 @@ static bool PassCondition(const CUnit &caster, const SpellType &spell, const CUn
 		}
 	}
 	if (condition->CivilizationEquivalent != -1) {
-		if (caster.Type->Civilization == -1 || caster.Type->Civilization == condition->CivilizationEquivalent || PlayerRaces.Species[caster.Type->Civilization] != PlayerRaces.Species[condition->CivilizationEquivalent] || PlayerRaces.GetCivilizationClassUnitType(condition->CivilizationEquivalent, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
+		if (caster.Type->Civilization == -1 || (caster.Type->Civilization == condition->CivilizationEquivalent && (!caster.Character || caster.Character->Civilization == condition->CivilizationEquivalent)) || PlayerRaces.Species[caster.Type->Civilization] != PlayerRaces.Species[condition->CivilizationEquivalent] || PlayerRaces.GetCivilizationClassUnitType(condition->CivilizationEquivalent, caster.Type->Class) == -1 || (caster.Character && !caster.Character->Custom)) {
 			return false;
 		}
 	}

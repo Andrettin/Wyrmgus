@@ -132,6 +132,10 @@
 			type = UnitTypes[new_unit_type];
 		}
 	}
+	if (target->Character && target->Character->Custom && this->Civilization != -1 && this->Civilization != target->Character->Civilization) {
+		target->Character->Civilization = this->Civilization;
+		SaveHero(target->Character);
+	}
 	if (type == NULL) {
 		return 0;
 	}
