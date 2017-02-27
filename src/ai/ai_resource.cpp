@@ -1444,6 +1444,7 @@ static void AiCollectResources()
 		}
 		
 		unit.Scout();
+		break; //only do this with one at a time to not strain performance too much
 	}
 	//Wyrmgus end
 
