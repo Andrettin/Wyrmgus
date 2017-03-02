@@ -54,6 +54,10 @@
 
 /// All dependencies hash
 static DependRule *DependHash[101];
+//Wyrmgus start
+/// All predependencies hash (predependencies are checked to see whether a button should be displayed at all)
+static DependRule *PredependHash[101];
+//Wyrmgus end
 
 /*----------------------------------------------------------------------------
 --  Functions
@@ -67,7 +71,10 @@ static DependRule *DependHash[101];
 **  @param count     Amount of the required needed.
 **  @param or_flag   Start of or rule.
 */
-static void AddDependency(const std::string &target, const std::string &required, int count, int or_flag)
+//Wyrmgus start
+//static void AddDependency(const std::string &target, const std::string &required, int count, int or_flag)
+static void AddDependency(const std::string &target, const std::string &required, int count, int or_flag, bool is_predependency)
+//Wyrmgus end
 {
 	DependRule rule;
 
@@ -96,9 +103,17 @@ static void AddDependency(const std::string &target, const std::string &required
 	}
 
 	int hash = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
+	//Wyrmgus start
+	if (is_predependency) {
+		hash = (int)((intptr_t)rule.Kind.UnitType % (sizeof(PredependHash) / sizeof(*PredependHash)));
+	}
+	//Wyrmgus end
 
 	//  Find correct hash slot.
-	DependRule *node = DependHash[hash];
+	//Wyrmgus start
+//	DependRule *node = DependHash[hash];
+	DependRule *node = is_predependency ? PredependHash[hash] : DependHash[hash];
+	//Wyrmgus end
 
 	if (node) {  // find correct entry
 		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
@@ -120,7 +135,14 @@ static void AddDependency(const std::string &target, const std::string &required
 		node->Rule = NULL;
 		node->Type = rule.Type;
 		node->Kind = rule.Kind;
-		DependHash[hash] = node;
+		//Wyrmgus start
+//		DependHash[hash] = node;
+		if (is_predependency) {
+			PredependHash[hash] = node;
+		} else {
+			DependHash[hash] = node;
+		}
+		//Wyrmgus end
 	}
 
 	//  Adjust count.
@@ -200,12 +222,25 @@ static void AddDependency(const std::string &target, const std::string &required
 */
 //Wyrmgus start
 //static bool CheckDependByRule(const CPlayer &player, DependRule &rule)
-static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool ignore_units)
+static bool CheckDependByRule(const CPlayer &player, DependRule &rule, bool ignore_units, bool is_predependency)
 //Wyrmgus end
 {
+	//Wyrmgus start
+	//if is making a normal dependency check, do a predependency check first
+	if (!is_predependency && !CheckDependByRule(player, rule, ignore_units, true)) {
+		return false;
+	}
+	//Wyrmgus end
+	
 	//  Find rule
 	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	const DependRule *node = DependHash[i];
+	//Wyrmgus start
+	if (is_predependency) {
+		i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(PredependHash) / sizeof(*PredependHash)));
+	}
+//	const DependRule *node = DependHash[i];
+	const DependRule *node = is_predependency ? PredependHash[i] : DependHash[i];
+	//Wyrmgus end
 
 	if (node) {  // find correct entry
 		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
@@ -267,12 +302,20 @@ try_or:
 **
 **  @return        True if available, false otherwise.
 */
-static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_units)
+static bool CheckDependByRule(const CUnit &unit, DependRule &rule, bool ignore_units, bool is_predependency)
 {
+	//if is making a normal dependency check, do a predependency check first
+	if (!is_predependency && !CheckDependByRule(unit, rule, ignore_units, true)) {
+		return false;
+	}
+	
 	//  Find rule
 	int i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(DependHash) / sizeof(*DependHash)));
-	const DependRule *node = DependHash[i];
-
+	if (is_predependency) {
+		i = (int)((intptr_t)rule.Kind.UnitType % (sizeof(PredependHash) / sizeof(*PredependHash)));
+	}
+	const DependRule *node = is_predependency ? PredependHash[i] : DependHash[i];
+	
 	if (node) {  // find correct entry
 		while (node->Type != rule.Type || node->Kind.Upgrade != rule.Kind.Upgrade) {
 			if (!node->Next) {  // end of list
@@ -417,7 +460,7 @@ std::string PrintDependencies(const CPlayer &player, const ButtonAction &button)
 */
 //Wyrmgus start
 //bool CheckDependByIdent(const CPlayer &player, const std::string &target)
-bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units)
+bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool ignore_units, bool is_predependency)
 //Wyrmgus end
 {
 	DependRule rule;
@@ -445,7 +488,7 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 	}
 	//Wyrmgus start
 //	return CheckDependByRule(player, rule);
-	return CheckDependByRule(player, rule, ignore_units);
+	return CheckDependByRule(player, rule, ignore_units, is_predependency);
 	//Wyrmgus end
 }
 
@@ -458,7 +501,7 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 **
 **  @return        True if available, false otherwise.
 */
-bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignore_units)
+bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignore_units, bool is_predependency)
 {
 	DependRule rule;
 
@@ -482,7 +525,7 @@ bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignor
 		DebugPrint("target '%s' should be unit-type or upgrade\n" _C_ target.c_str());
 		return false;
 	}
-	return CheckDependByRule(unit, rule, ignore_units);
+	return CheckDependByRule(unit, rule, ignore_units, is_predependency);
 }
 //Wyrmgus end
 
@@ -496,7 +539,7 @@ bool CheckDependByIdent(const CUnit &unit, const std::string &target, bool ignor
 */
 //Wyrmgus start
 //bool CheckDependByType(const CPlayer &player, const CUnitType &type)
-bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore_units)
+bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore_units, bool is_predependency)
 //Wyrmgus end
 {
 	if (UnitIdAllowed(player, type.Slot) == 0) {
@@ -508,7 +551,7 @@ bool CheckDependByType(const CPlayer &player, const CUnitType &type, bool ignore
 	rule.Type = DependRuleUnitType;
 	//Wyrmgus start
 //	return CheckDependByRule(player, rule);
-	return CheckDependByRule(player, rule, ignore_units);
+	return CheckDependByRule(player, rule, ignore_units, is_predependency);
 	//Wyrmgus end
 }
 
@@ -551,6 +594,34 @@ void CleanDependencies()
 		}
 		DependHash[u] = NULL;
 	}
+	
+	//Wyrmgus start
+	for (unsigned int u = 0; u < sizeof(PredependHash) / sizeof(*PredependHash); ++u) {
+		DependRule *node = PredependHash[u];
+		while (node) {  // all hash links
+			// All or cases
+
+			DependRule *rule = node->Rule;
+			while (rule) {
+				if (rule) {
+					DependRule *temp = rule->Rule;
+					while (temp) {
+						DependRule *next = temp;
+						temp = temp->Rule;
+						delete next;
+					}
+				}
+				DependRule *temp = rule;
+				rule = rule->Next;
+				delete temp;
+			}
+			DependRule *temp = node;
+			node = node->Next;
+			delete temp;
+		}
+		PredependHash[u] = NULL;
+	}
+	//Wyrmgus end
 }
 
 /*----------------------------------------------------------------------------
@@ -586,7 +657,10 @@ static int CclDefineDependency(lua_State *l)
 				}
 				lua_pop(l, 1);
 			}
-			AddDependency(target, required, count, or_flag);
+			//Wyrmgus start
+//			AddDependency(target, required, count, or_flag);
+			AddDependency(target, required, count, or_flag, false);
+			//Wyrmgus end
 			or_flag = 0;
 		}
 		if (j + 1 < args) {
@@ -601,6 +675,48 @@ static int CclDefineDependency(lua_State *l)
 	}
 	return 0;
 }
+
+//Wyrmgus start
+static int CclDefinePredependency(lua_State *l)
+{
+	const int args = lua_gettop(l);
+	const char *target = LuaToString(l, 1);
+
+	//  All or rules.
+	int or_flag = 0;
+	for (int j = 1; j < args; ++j) {
+		if (!lua_istable(l, j + 1)) {
+			LuaError(l, "incorrect argument");
+		}
+		const int subargs = lua_rawlen(l, j + 1);
+
+		for (int k = 0; k < subargs; ++k) {
+			const char *required = LuaToString(l, j + 1, k + 1);
+			int count = 1;
+			if (k + 1 < subargs) {
+				lua_rawgeti(l, j + 1, k + 2);
+				if (lua_isnumber(l, -1)) {
+					count = LuaToNumber(l, -1);
+					++k;
+				}
+				lua_pop(l, 1);
+			}
+			AddDependency(target, required, count, or_flag, true);
+			or_flag = 0;
+		}
+		if (j + 1 < args) {
+			++j;
+			const char *value = LuaToString(l, j + 1);
+			if (strcmp(value, "or")) {
+				LuaError(l, "not or symbol: %s" _C_ value);
+				return 0;
+			}
+			or_flag = 1;
+		}
+	}
+	return 0;
+}
+//Wyrmgus end
 
 /**
 **  Get the dependency.
@@ -646,6 +762,9 @@ static int CclCheckDependency(lua_State *l)
 void DependenciesCclRegister()
 {
 	lua_register(Lua, "DefineDependency", CclDefineDependency);
+	//Wyrmgus start
+	lua_register(Lua, "DefinePredependency", CclDefinePredependency);
+	//Wyrmgus end
 	lua_register(Lua, "GetDependency", CclGetDependency);
 	lua_register(Lua, "CheckDependency", CclCheckDependency);
 }
