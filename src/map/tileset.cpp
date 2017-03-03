@@ -202,6 +202,7 @@ PixelSize PixelTileSize(32, 32);
 std::vector<CTerrainType *> TerrainTypes;
 std::map<std::string, int> TerrainTypeStringToIndex;
 std::map<std::string, int> TerrainTypeCharacterToIndex;
+std::map<std::tuple<int, int, int>, int> TerrainTypeColorToIndex;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------

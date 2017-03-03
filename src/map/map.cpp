@@ -39,13 +39,14 @@
 #include "map.h"
 
 //Wyrmgus start
+#include <fstream>
+//Wyrmgus end
+
+//Wyrmgus start
 #include "editor.h"
 #include "game.h" // for the SaveGameLoading variable
 //Wyrmgus end
 #include "iolib.h"
-//Wyrmgus start
-#include <fstream> //for the 0 AD map conversion
-//Wyrmgus end
 #include "player.h"
 //Wyrmgus start
 #include "province.h"
@@ -203,7 +204,70 @@ void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 		}
 		
 		y += 1;
-	}  
+	}
+	
+//	std::string filename = this->Ident + ".png";
+//	SaveMapTemplatePNG(filename.c_str(), this, overlay);
+}
+
+void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z)
+{
+	std::string terrain_file;
+	if (overlay) {
+		terrain_file = this->OverlayTerrainImage;
+	} else {
+		terrain_file = this->TerrainImage;
+	}
+	
+	if (terrain_file.empty()) {
+		ApplyTerrainFile(overlay, template_start_pos, map_start_pos, z);
+		return;
+	}
+	
+	const std::string terrain_filename = LibraryFileName(terrain_file.c_str());
+		
+	if (!CanAccessFile(terrain_filename.c_str())) {
+		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
+	}
+	
+	CGraphic *terrain_image = CGraphic::New(terrain_filename);
+	terrain_image->Load();
+	
+	SDL_LockSurface(terrain_image->Surface);
+	const SDL_PixelFormat *f = terrain_image->Surface->format;
+	const int bpp = terrain_image->Surface->format->BytesPerPixel;
+	Uint8 r, g, b;
+
+	for (int y = 0; y < terrain_image->Height; ++y) {
+		if (y < template_start_pos.y || y >= (template_start_pos.y + Map.Info.MapHeights[z])) {
+			continue;
+		}
+		
+		for (int x = 0; x < terrain_image->Width; ++x) {
+			if (x < template_start_pos.x || x >= (template_start_pos.x + Map.Info.MapWidths[z])) {
+				continue;
+			}
+
+			Uint32 c = *reinterpret_cast<Uint32 *>(&reinterpret_cast<Uint8 *>(terrain_image->Surface->pixels)[x * 4 + y * terrain_image->Surface->pitch]);
+			Uint8 a;
+
+			Video.GetRGBA(c, terrain_image->Surface->format, &r, &g, &b, &a);
+
+			char terrain_id = -1;
+			if (TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b)) != TerrainTypeColorToIndex.end()) {
+				terrain_id = TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b))->second;
+			}
+			if (terrain_id != -1) {
+				Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
+				Map.Field(real_pos, z)->SetTerrain(TerrainTypes[terrain_id]);
+			} else {
+				fprintf(stderr, "Invalid map terrain: (%d, %d)\n", x, y);
+			}
+		}
+	}
+	SDL_UnlockSurface(terrain_image->Surface);
+	
+	CGraphic::Free(terrain_image);
 }
 
 void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
@@ -248,8 +312,8 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		return;
 	}
 	
-	this->ApplyTerrainFile(false, template_start_pos, map_start_pos, z);
-	this->ApplyTerrainFile(true, template_start_pos, map_start_pos, z);
+	this->ApplyTerrainImage(false, template_start_pos, map_start_pos, z);
+	this->ApplyTerrainImage(true, template_start_pos, map_start_pos, z);
 
 	for (size_t i = 0; i < HistoricalTerrains.size(); ++i) {
 		Vec2i history_pos = std::get<0>(HistoricalTerrains[i]);
@@ -364,7 +428,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 						expansion_number = map_width * map_height / 64;
 					}
 						
-					Map.GenerateTerrain(this->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !this->Subtemplates[i]->TerrainFile.empty(), z);
+					Map.GenerateTerrain(this->Subtemplates[i]->ExternalGeneratedTerrains[j].first, 0, expansion_number, external_start_pos, external_end - Vec2i(1, 1), !this->Subtemplates[i]->TerrainFile.empty() || !this->Subtemplates[i]->TerrainImage.empty(), z);
 				}
 			}
 		}
@@ -458,7 +522,7 @@ void CMapTemplate::Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z)
 		
 		seed_number = std::max(1, seed_number);
 		
-		Map.GenerateTerrain(this->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !this->TerrainFile.empty(), z);
+		Map.GenerateTerrain(this->GeneratedTerrains[i].first, seed_number, expansion_number, map_start_pos, map_end - Vec2i(1, 1), !this->TerrainFile.empty() || !this->TerrainImage.empty(), z);
 	}
 	
 	if (!this->IsSubtemplateArea()) {

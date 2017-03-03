@@ -150,6 +150,7 @@ public:
 	}
 
 	void ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
+	void ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void Apply(Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplySettlements(Vec2i template_start_pos, Vec2i map_start_pos, int z);
 	void ApplyUnits(Vec2i template_start_pos, Vec2i map_start_pos, int z, bool random = false);
@@ -159,6 +160,8 @@ public:
 	std::string Ident;
 	std::string TerrainFile;
 	std::string OverlayTerrainFile;
+	std::string TerrainImage;
+	std::string OverlayTerrainImage;
 	int Width;
 	int Height;
 	int TimeOfDaySeconds;

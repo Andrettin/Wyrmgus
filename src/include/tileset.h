@@ -41,6 +41,8 @@
 //Wyrmgus start
 #include <map>
 #include <tuple>
+
+#include "color.h"
 //Wyrmgus end
 
 struct lua_State;
@@ -174,11 +176,16 @@ public:
 		Overlay(false), Buildable(false), AllowSingle(false),
 		UnitType(NULL), Graphics(NULL)
 	{
+		Color.R = 0;
+		Color.G = 0;
+		Color.B = 0;
+		Color.A = 0;
 	}
 
 	std::string Name;
 	std::string Ident;
 	std::string Character;
+	CColor Color;
 	int ID;
 	int SolidAnimationFrames;
 	unsigned int Flags;
@@ -376,6 +383,7 @@ private:
 extern std::vector<CTerrainType *>  TerrainTypes;
 extern std::map<std::string, int> TerrainTypeStringToIndex;
 extern std::map<std::string, int> TerrainTypeCharacterToIndex;
+extern std::map<std::tuple<int, int, int>, int> TerrainTypeColorToIndex;
 //Wyrmgus end
 
 /*----------------------------------------------------------------------------

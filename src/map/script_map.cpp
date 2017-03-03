@@ -1279,6 +1279,17 @@ static int CclDefineTerrainType(lua_State *l)
 				LuaError(l, "Character \"%s\" is already used by another terrain type." _C_ terrain->Character.c_str());
 			}
 			TerrainTypeCharacterToIndex[terrain->Character] = terrain->ID;
+		} else if (!strcmp(value, "Color")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			terrain->Color.R = LuaToNumber(l, -1, 1);
+			terrain->Color.G = LuaToNumber(l, -1, 2);
+			terrain->Color.B = LuaToNumber(l, -1, 3);
+			if (TerrainTypeColorToIndex.find(std::tuple<int, int, int>(terrain->Color.R, terrain->Color.G, terrain->Color.B)) != TerrainTypeColorToIndex.end()) {
+				LuaError(l, "Color is already used by another terrain type.");
+			}
+			TerrainTypeColorToIndex[std::tuple<int, int, int>(terrain->Color.R, terrain->Color.G, terrain->Color.B)] = terrain->ID;
 		} else if (!strcmp(value, "Overlay")) {
 			terrain->Overlay = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "Buildable")) {
@@ -1516,6 +1527,10 @@ static int CclDefineMapTemplate(lua_State *l)
 			map->TerrainFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "OverlayTerrainFile")) {
 			map->OverlayTerrainFile = LuaToString(l, -1);
+		} else if (!strcmp(value, "TerrainImage")) {
+			map->TerrainImage = LuaToString(l, -1);
+		} else if (!strcmp(value, "OverlayTerrainImage")) {
+			map->OverlayTerrainImage = LuaToString(l, -1);
 		} else if (!strcmp(value, "Width")) {
 			map->Width = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Height")) {

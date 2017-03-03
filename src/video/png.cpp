@@ -35,6 +35,10 @@
 
 #include <png.h>
 
+//Wyrmgus start
+#include <fstream>
+//Wyrmgus end
+
 #include "stratagus.h"
 #include "map.h"
 //Wyrmgus start
@@ -517,4 +521,112 @@ void SaveMapPNG(const char *name)
 	fclose(fp);
 }
 
+//Wyrmgus start
+/**
+**  Convert a map template's terrain file to a PNG one.
+**
+**  @param name  PNG filename to save.
+*/
+void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overlay)
+{
+	std::string terrain_file;
+	if (overlay) {
+		terrain_file = map_template->OverlayTerrainFile;
+	} else {
+		terrain_file = map_template->TerrainFile;
+	}
+	
+	if (terrain_file.empty()) {
+		return;
+	}
+	
+	FILE *fp = fopen(name, "wb");
+	if (fp == NULL) {
+		return;
+	}
+
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (png_ptr == NULL) {
+		fclose(fp);
+		return;
+	}
+
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == NULL) {
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr, NULL);
+		return;
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		/* If we get here, we had a problem reading the file */
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		return;
+	}
+
+	const size_t imageWidth = map_template->Width;
+	const size_t imageHeight = map_template->Height;
+
+	/* set up the output control if you are using standard C streams */
+	png_init_io(png_ptr, fp);
+
+	png_set_IHDR(png_ptr, info_ptr, imageWidth, imageHeight, 8,
+		PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+		PNG_FILTER_TYPE_DEFAULT);
+
+	png_write_info(png_ptr, info_ptr);
+
+	const std::string terrain_filename = LibraryFileName(terrain_file.c_str());
+		
+	if (!CanAccessFile(terrain_filename.c_str())) {
+		fprintf(stderr, "File \"%s\" not found.\n", terrain_filename.c_str());
+	}
+	
+	unsigned char *row = new unsigned char[imageWidth * 3];
+	
+	std::ifstream is_map(terrain_filename);
+	
+	std::string line_str;
+	int y = 0;
+	while (std::getline(is_map, line_str))
+	{
+		int x = 0;
+		
+		for (unsigned int i = 0; i < line_str.length(); ++i) {
+			std::string terrain_character = line_str.substr(i, 1);
+			char terrain_id = -1;
+			if (TerrainTypeCharacterToIndex.find(terrain_character) != TerrainTypeCharacterToIndex.end()) {
+				terrain_id = TerrainTypeCharacterToIndex.find(terrain_character)->second;
+			}
+			Uint8 red = 0;
+			Uint8 green = 0;
+			Uint8 blue = 0;
+			if (terrain_id != -1) {
+				red = TerrainTypes[terrain_id]->Color.R;
+				green = TerrainTypes[terrain_id]->Color.G;
+				blue = TerrainTypes[terrain_id]->Color.B;
+			}
+			
+			row[x * 3 + 0] = red;
+			row[x * 3 + 1] = green;
+			row[x * 3 + 2] = blue;
+
+			x += 1;
+		}
+		
+		png_write_row(png_ptr, row);
+		
+		y += 1;
+	}
+	delete[] row;
+
+	png_write_end(png_ptr, info_ptr);
+
+	/* clean up after the write, and free any memory allocated */
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	fclose(fp);
+}
+//Wyrmgus end
 //@}

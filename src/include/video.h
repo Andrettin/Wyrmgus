@@ -53,6 +53,9 @@
 #include "vec2i.h"
 
 class CFont;
+//Wyrmgus start
+class CMapTemplate;
+//Wyrmgus end
 
 #if defined(USE_OPENGL) || defined(USE_GLES)
 extern char ForceUseOpenGL;
@@ -606,6 +609,11 @@ extern void SaveScreenshotPNG(const char *name);
 
 /// Save a screenshot to a PNG file
 extern void SaveMapPNG(const char *name);
+
+//Wyrmgus start
+/// Save a map template's terrain to a PNG file
+extern void SaveMapTemplatePNG(const char *name, CMapTemplate *map_template, bool overlay);
+//Wyrmgus end
 
 /// Set the current callbacks
 extern void SetCallbacks(const EventCallback *callbacks);
