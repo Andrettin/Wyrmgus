@@ -205,8 +205,12 @@ void CMapTemplate::ApplyTerrainFile(bool overlay, Vec2i template_start_pos, Vec2
 		
 		y += 1;
 	}
-	
-//	std::string filename = this->Ident + ".png";
+
+//	std::string filename = this->Ident;
+//	if (overlay) {
+//		filename += "-overlay";
+//	}
+//	filename += ".png";
 //	SaveMapTemplatePNG(filename.c_str(), this, overlay);
 }
 
@@ -261,7 +265,9 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 				Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
 				Map.Field(real_pos, z)->SetTerrain(TerrainTypes[terrain_id]);
 			} else {
-				fprintf(stderr, "Invalid map terrain: (%d, %d)\n", x, y);
+				if (!overlay) {
+					fprintf(stderr, "Invalid map terrain: (%d, %d)\n", x, y);
+				}
 			}
 		}
 	}
