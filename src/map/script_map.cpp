@@ -1289,6 +1289,9 @@ static int CclDefineTerrainType(lua_State *l)
 			if (TerrainTypeColorToIndex.find(std::tuple<int, int, int>(terrain->Color.R, terrain->Color.G, terrain->Color.B)) != TerrainTypeColorToIndex.end()) {
 				LuaError(l, "Color is already used by another terrain type.");
 			}
+			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(terrain->Color.R, terrain->Color.G, terrain->Color.B)) != TerrainFeatureColorToIndex.end()) {
+				LuaError(l, "Color is already used by a terrain feature.");
+			}
 			TerrainTypeColorToIndex[std::tuple<int, int, int>(terrain->Color.R, terrain->Color.G, terrain->Color.B)] = terrain->ID;
 		} else if (!strcmp(value, "Overlay")) {
 			terrain->Overlay = LuaToBoolean(l, -1);
@@ -1852,6 +1855,156 @@ static int CclDefineSettlement(lua_State *l)
 	
 	return 0;
 }
+
+/**
+**  Define a terrain feature.
+**
+**  @param l  Lua state.
+*/
+static int CclDefineTerrainFeature(lua_State *l)
+{
+	LuaCheckArgs(l, 2);
+	if (!lua_istable(l, 2)) {
+		LuaError(l, "incorrect argument (expected table)");
+	}
+
+	std::string terrain_feature_ident = LuaToString(l, 1);
+	CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_feature_ident);
+	if (!terrain_feature) {
+		terrain_feature = new CTerrainFeature;
+		terrain_feature->Ident = terrain_feature_ident;
+		terrain_feature->ID = TerrainFeatures.size();
+		TerrainFeatures.push_back(terrain_feature);
+	}
+	
+	//  Parse the list:
+	for (lua_pushnil(l); lua_next(l, 2); lua_pop(l, 1)) {
+		const char *value = LuaToString(l, -2);
+		
+		if (!strcmp(value, "Name")) {
+			terrain_feature->Name = LuaToString(l, -1);
+		} else if (!strcmp(value, "Color")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument");
+			}
+			terrain_feature->Color.R = LuaToNumber(l, -1, 1);
+			terrain_feature->Color.G = LuaToNumber(l, -1, 2);
+			terrain_feature->Color.B = LuaToNumber(l, -1, 3);
+			if (TerrainTypeColorToIndex.find(std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)) != TerrainTypeColorToIndex.end()) {
+				LuaError(l, "Color is already used by a terrain type.");
+			}
+			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)) != TerrainFeatureColorToIndex.end()) {
+				LuaError(l, "Color is already used by another terrain feature.");
+			}
+			TerrainFeatureColorToIndex[std::tuple<int, int, int>(terrain_feature->Color.R, terrain_feature->Color.G, terrain_feature->Color.B)] = terrain_feature->ID;
+		} else if (!strcmp(value, "TerrainType")) {
+			CTerrainType *terrain = GetTerrainType(LuaToString(l, -1));
+			if (!terrain) {
+				LuaError(l, "Terrain doesn't exist.");
+			}
+			terrain_feature->TerrainType = terrain;
+		} else if (!strcmp(value, "World")) {
+			CWorld *world = GetWorld(LuaToString(l, -1));
+			if (world != NULL) {
+				terrain_feature->World = world;
+				world->TerrainFeatures.push_back(terrain_feature);
+			} else {
+				LuaError(l, "World doesn't exist.");
+			}
+		} else if (!strcmp(value, "CulturalNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				
+				terrain_feature->CulturalNames[civilization] = cultural_name;
+			}
+		} else if (!strcmp(value, "FactionCulturalNames")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int civilization = PlayerRaces.GetRaceIndexByName(LuaToString(l, -1, j + 1));
+				if (civilization == -1) {
+					LuaError(l, "Civilization doesn't exist.");
+				}
+				++j;
+				
+				int faction = PlayerRaces.GetFactionIndexByName(civilization, LuaToString(l, -1, j + 1));
+				if (faction == -1) {
+					LuaError(l, "Faction doesn't exist.");
+				}
+				++j;
+				
+				std::string cultural_name = LuaToString(l, -1, j + 1);
+				
+				terrain_feature->FactionCulturalNames[PlayerRaces.Factions[civilization][faction]] = cultural_name;
+			}
+		} else {
+			LuaError(l, "Unsupported tag: %s" _C_ value);
+		}
+	}
+	
+	if (terrain_feature->World == NULL) {
+		LuaError(l, "Terrain feature \"%s\" is not assigned to any world." _C_ terrain_feature->Ident.c_str());
+	}
+	
+	return 0;
+}
+
+/**
+**  Get terrain feature data.
+**
+**  @param l  Lua state.
+*/
+static int CclGetTerrainFeatureData(lua_State *l)
+{
+	if (lua_gettop(l) < 2) {
+		LuaError(l, "incorrect argument");
+	}
+	std::string terrain_feature_ident = LuaToString(l, 1);
+	CTerrainFeature *terrain_feature = GetTerrainFeature(terrain_feature_ident);
+	if (!terrain_feature) {
+		LuaError(l, "TerrainFeature \"%s\" doesn't exist." _C_ terrain_feature_ident.c_str());
+	}
+	const char *data = LuaToString(l, 2);
+
+	if (!strcmp(data, "Name")) {
+		lua_pushstring(l, terrain_feature->Name.c_str());
+		return 1;
+	} else if (!strcmp(data, "World")) {
+		if (terrain_feature->World != NULL) {
+			lua_pushstring(l, terrain_feature->World->Name.c_str());
+		} else {
+			lua_pushstring(l, "");
+		}
+		return 1;
+	} else {
+		LuaError(l, "Invalid field: %s" _C_ data);
+	}
+
+	return 0;
+}
+
+static int CclGetTerrainFeatures(lua_State *l)
+{
+	lua_createtable(l, TerrainFeatures.size(), 0);
+	for (size_t i = 1; i <= TerrainFeatures.size(); ++i)
+	{
+		lua_pushstring(l, TerrainFeatures[i-1]->Ident.c_str());
+		lua_rawseti(l, -2, i);
+	}
+	return 1;
+}
 //Wyrmgus end
 
 /**
@@ -1895,6 +2048,9 @@ void MapCclRegister()
 	lua_register(Lua, "DefineTerrainType", CclDefineTerrainType);
 	lua_register(Lua, "DefineMapTemplate", CclDefineMapTemplate);
 	lua_register(Lua, "DefineSettlement", CclDefineSettlement);
+	lua_register(Lua, "DefineTerrainFeature", CclDefineTerrainFeature);
+	lua_register(Lua, "GetTerrainFeatureData", CclGetTerrainFeatureData);
+	lua_register(Lua, "GetTerrainFeatures", CclGetTerrainFeatures);
 	lua_register(Lua, "SetMapTemplateTileTerrain", CclSetMapTemplateTileTerrain);
 	lua_register(Lua, "SetMapTemplateTileLabel", CclSetMapTemplateTileLabel);
 	lua_register(Lua, "SetMapTemplateCulturalSettlementName", CclSetMapTemplateCulturalSettlementName);

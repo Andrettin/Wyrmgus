@@ -64,6 +64,7 @@ CMapField::CMapField() :
 	AnimationFrame(0),
 	OverlayAnimationFrame(0),
 	Terrain(NULL), OverlayTerrain(NULL),
+	TerrainFeature(NULL),
 	SolidTile(0), OverlaySolidTile(0),
 	OverlayTerrainDestroyed(false),
 	OverlayTerrainDamaged(false),
@@ -194,6 +195,10 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 	} else if (terrain->Flags & MapFieldRocks) {
 		this->Value = DefaultResourceAmounts[StoneCost];
 	}
+	
+	if (this->TerrainFeature) {
+		this->TerrainFeature = NULL;
+	}
 }
 
 void CMapField::RemoveOverlayTerrain()
@@ -217,6 +222,10 @@ void CMapField::RemoveOverlayTerrain()
 			this->Flags |= MapFieldUnpassable;
 			this->Flags |= MapFieldAirUnpassable;
 		}
+	}
+	
+	if (this->TerrainFeature) {
+		this->TerrainFeature = NULL;
 	}
 }
 

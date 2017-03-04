@@ -140,6 +140,24 @@ enum DegreeLevels {
 //Wyrmgus end
 
 //Wyrmgus start
+class CTerrainFeature
+{
+public:
+	CTerrainFeature() :
+		ID(-1), TerrainType(NULL), World(NULL)
+	{
+	}
+	
+	int ID;
+	std::string Ident;
+	std::string Name;
+	CColor Color;
+	CTerrainType *TerrainType;
+	CWorld *World;
+	std::map<int, std::string> CulturalNames;							/// Names for the terrain feature for each different culture/civilization
+	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the terrain feature for each different faction
+};
+
 class CMapTemplate
 {
 public:
@@ -513,6 +531,9 @@ extern std::vector<CMapTemplate *>  MapTemplates;
 extern std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
 extern std::vector<CSettlement *>  Settlements;
 extern std::map<std::string, CSettlement *> SettlementIdentToPointer;
+extern std::vector<CTerrainFeature *> TerrainFeatures;
+extern std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
+extern std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
 
 extern CMap Map;  /// The current map
@@ -539,6 +560,7 @@ extern int ReplayRevealMap;
 //Wyrmgus start
 extern CMapTemplate *GetMapTemplate(std::string map_ident);
 extern CSettlement *GetSettlement(std::string settlement_ident);
+extern CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident);
 extern std::string GetDegreeLevelNameById(int degree_level);
 extern int GetDegreeLevelIdByName(std::string degree_level);
 //Wyrmgus end

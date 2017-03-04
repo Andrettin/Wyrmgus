@@ -6884,28 +6884,6 @@ void InitializeGrandStrategyWorldMap()
 			GrandStrategyGame.WorldMapTiles[x][y]->FactionCulturalSettlementNames = world->Tiles[i]->FactionCulturalSettlementNames;
 		}
 	}
-	
-	for (size_t i = 0; i < Rivers.size(); ++i) {
-		if (Rivers[i]->World->Name != GrandStrategyWorld && GrandStrategyWorld != "Random") {
-			continue;
-		}
-		CGrandStrategyRiver *river = new CGrandStrategyRiver;
-		river->ID = GrandStrategyGame.Rivers.size();
-		GrandStrategyGame.Rivers.push_back(river);
-		river->Name = Rivers[i]->Name;
-		river->World = Rivers[i]->World;
-		for (int j = 0; j < MAX_RACES; ++j) {
-			if (Rivers[i]->CulturalNames.find(j) != Rivers[i]->CulturalNames.end()) {
-				river->CulturalNames[j] = Rivers[i]->CulturalNames[j];
-			}
-			
-			for (size_t k = 0; k < PlayerRaces.Factions[j].size(); ++k) {
-				if (Rivers[i]->FactionCulturalNames.find(PlayerRaces.Factions[j][k]) != Rivers[i]->FactionCulturalNames.end()) {
-					river->FactionCulturalNames[PlayerRaces.Factions[j][k]] = Rivers[i]->FactionCulturalNames[PlayerRaces.Factions[j][k]];
-				}
-			}
-		}
-	}	
 }
 
 void InitializeGrandStrategyProvinces()

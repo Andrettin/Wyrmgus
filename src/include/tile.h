@@ -148,6 +148,7 @@ class CTileset;
 //Wyrmgus start
 class CTerrainType;
 class CGraphic;
+class CTerrainFeature;
 //Wyrmgus end
 struct lua_State;
 
@@ -285,6 +286,7 @@ public:
 	unsigned char OverlayAnimationFrame;		/// current frame of the overlay tile's animation
 	CTerrainType *Terrain;
 	CTerrainType *OverlayTerrain;
+	CTerrainFeature *TerrainFeature;
 	short SolidTile;
 	short OverlaySolidTile;
 	bool Visible[MaxDirections];			/// whether the tile is visible from a particular direction

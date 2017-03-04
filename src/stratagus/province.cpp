@@ -53,7 +53,6 @@ std::vector<CPlane *> Planes;
 std::vector<CWorld *> Worlds;
 std::vector<CRegion *> Regions;
 std::vector<CProvince *> Provinces;
-std::vector<CRiver *> Rivers;
 std::vector<CWorldMapTerrainType *> WorldMapTerrainTypes;
 std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
@@ -78,6 +77,11 @@ void CleanWorlds()
 	}
 	Settlements.clear();
 	
+	for (size_t i = 0; i < TerrainFeatures.size(); ++i) {
+		delete TerrainFeatures[i];
+	}
+	TerrainFeatures.clear();
+	
 	for (size_t i = 0; i < WorldMapTerrainTypes.size(); ++i) {
 		delete WorldMapTerrainTypes[i];
 	}
@@ -97,11 +101,6 @@ void CleanWorlds()
 			delete Worlds[i]->Provinces[j];
 		}
 		Worlds[i]->Provinces.clear();
-		
-		for (size_t j = 0; j < Worlds[i]->Rivers.size(); ++j) {
-			delete Worlds[i]->Rivers[j];
-		}
-		Worlds[i]->Rivers.clear();
 		
 		delete Worlds[i];
 	}
@@ -146,16 +145,6 @@ CProvince *GetProvince(std::string province_name)
 	for (size_t i = 0; i < Provinces.size(); ++i) {
 		if (province_name == Provinces[i]->Name) {
 			return Provinces[i];
-		}
-	}
-	return NULL;
-}
-
-CRiver *GetRiver(std::string river_name)
-{
-	for (size_t i = 0; i < Rivers.size(); ++i) {
-		if (river_name == Rivers[i]->Name) {
-			return Rivers[i];
 		}
 	}
 	return NULL;

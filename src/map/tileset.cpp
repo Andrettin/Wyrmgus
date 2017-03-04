@@ -871,6 +871,14 @@ std::string GetTransitionTypeNameById(int transition_type)
 		return "west-east";
 	} else if (transition_type == NorthwestNortheastSouthwestSoutheastInnerTransitionType) {
 		return "northwest-northeast-southwest-southeast-inner";
+	} else if (transition_type == NorthwestNortheastInnerTransitionType) {
+		return "northwest-northeast-inner";
+	} else if (transition_type == SouthwestSoutheastInnerTransitionType) {
+		return "southwest-southeast-inner";
+	} else if (transition_type == NorthwestSouthwestInnerTransitionType) {
+		return "northwest-southwest-inner";
+	} else if (transition_type == NortheastSoutheastInnerTransitionType) {
+		return "northeast-southeast-inner";
 	} else if (transition_type == NorthSouthwestInnerSoutheastInnerTransitionType) {
 		return "north-southwest-inner-southeast-inner";
 	} else if (transition_type == NorthSouthwestInnerTransitionType) {
@@ -953,6 +961,14 @@ int GetTransitionTypeIdByName(std::string transition_type)
 		return WestEastTransitionType;
 	} else if (transition_type == "northwest-northeast-southwest-southeast-inner") {
 		return NorthwestNortheastSouthwestSoutheastInnerTransitionType;
+	} else if (transition_type == "northwest-northeast-inner") {
+		return NorthwestNortheastInnerTransitionType;
+	} else if (transition_type == "southwest-southeast-inner") {
+		return SouthwestSoutheastInnerTransitionType;
+	} else if (transition_type == "northwest-southwest-inner") {
+		return NorthwestSouthwestInnerTransitionType;
+	} else if (transition_type == "northeast-southeast-inner") {
+		return NortheastSoutheastInnerTransitionType;
 	} else if (transition_type == "north-southwest-inner-southeast-inner") {
 		return NorthSouthwestInnerSoutheastInnerTransitionType;
 	} else if (transition_type == "north-southwest-inner") {

@@ -75,6 +75,9 @@ std::vector<CMapTemplate *> MapTemplates;
 std::map<std::string, CMapTemplate *> MapTemplateIdentToPointer;
 std::vector<CSettlement *> Settlements;
 std::map<std::string, CSettlement *> SettlementIdentToPointer;
+std::vector<CTerrainFeature *> TerrainFeatures;
+std::map<std::string, CTerrainFeature *> TerrainFeatureIdentToPointer;
+std::map<std::tuple<int, int, int>, int> TerrainFeatureColorToIndex;
 //Wyrmgus end
 CMap Map;                   /// The current map
 //Wyrmgus start
@@ -113,6 +116,22 @@ CSettlement *GetSettlement(std::string settlement_ident)
 	
 	if (SettlementIdentToPointer.find(settlement_ident) != SettlementIdentToPointer.end()) {
 		return SettlementIdentToPointer[settlement_ident];
+	}
+	
+	return NULL;
+}
+
+/**
+**  Get a terrain feature
+*/
+CTerrainFeature *GetTerrainFeature(std::string terrain_feature_ident)
+{
+	if (terrain_feature_ident.empty()) {
+		return NULL;
+	}
+	
+	if (TerrainFeatureIdentToPointer.find(terrain_feature_ident) != TerrainFeatureIdentToPointer.end()) {
+		return TerrainFeatureIdentToPointer[terrain_feature_ident];
 	}
 	
 	return NULL;
@@ -258,12 +277,20 @@ void CMapTemplate::ApplyTerrainImage(bool overlay, Vec2i template_start_pos, Vec
 			Video.GetRGBA(c, terrain_image->Surface->format, &r, &g, &b, &a);
 
 			char terrain_id = -1;
-			if (TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b)) != TerrainTypeColorToIndex.end()) {
+			short terrain_feature_id = -1;
+			if (TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(r, g, b)) != TerrainFeatureColorToIndex.end()) {
+				terrain_feature_id = TerrainFeatureColorToIndex.find(std::tuple<int, int, int>(r, g, b))->second;
+				terrain_id = TerrainFeatures[terrain_feature_id]->TerrainType->ID;
+			} else if (TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b)) != TerrainTypeColorToIndex.end()) {
 				terrain_id = TerrainTypeColorToIndex.find(std::tuple<int, int, int>(r, g, b))->second;
 			}
 			if (terrain_id != -1) {
 				Vec2i real_pos(map_start_pos.x + x - template_start_pos.x, map_start_pos.y + y - template_start_pos.y);
 				Map.Field(real_pos, z)->SetTerrain(TerrainTypes[terrain_id]);
+				
+				if (terrain_feature_id != -1) {
+					Map.Field(real_pos, z)->TerrainFeature = TerrainFeatures[terrain_feature_id];
+				}
 			} else {
 				if (!overlay) {
 					fprintf(stderr, "Invalid map terrain: (%d, %d)\n", x, y);
@@ -2262,6 +2289,14 @@ void CMap::CalculateTileTransitions(const Vec2i &pos, bool overlay, int z)
 			transition_type = SoutheastOuterTransitionType;
 		} else if (terrain->AllowSingle && std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
 			transition_type = NorthwestNortheastSouthwestSoutheastInnerTransitionType;
+		} else if (terrain->AllowSingle && std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
+			transition_type = NorthwestNortheastInnerTransitionType;
+		} else if (terrain->AllowSingle && std::find(iterator->second.begin(), iterator->second.end(), Northwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
+			transition_type = SouthwestSoutheastInnerTransitionType;
+		} else if (terrain->AllowSingle && std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
+			transition_type = NorthwestSouthwestInnerTransitionType;
+		} else if (terrain->AllowSingle && std::find(iterator->second.begin(), iterator->second.end(), Northwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
+			transition_type = NortheastSoutheastInnerTransitionType;
 		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {
 			transition_type = NorthwestSoutheastInnerTransitionType;
 		} else if (std::find(iterator->second.begin(), iterator->second.end(), Northeast) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southwest) != iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Northwest) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), Southeast) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), North) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), South) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), West) == iterator->second.end() && std::find(iterator->second.begin(), iterator->second.end(), East) == iterator->second.end()) {

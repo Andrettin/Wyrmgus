@@ -38,6 +38,7 @@
 
 #include <vector>
 
+#include "map.h"
 #include "province.h"
 #include "character.h"
 #include "vec2i.h"
@@ -296,10 +297,10 @@ public:
 	std::map<CUpgrade *, int> HistoricalTechnologies;					/// historical technologies of the faction, with the year of discovery
 };
 
-class CGrandStrategyRiver : public CRiver
+class CGrandStrategyRiver : public CTerrainFeature
 {
 public:
-	CGrandStrategyRiver() : CRiver()
+	CGrandStrategyRiver() : CTerrainFeature()
 	{
 	}
 	

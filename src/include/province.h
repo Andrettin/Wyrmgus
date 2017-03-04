@@ -50,7 +50,7 @@ class CUnitType;
 class CUpgrade;
 class CFaction;
 class CProvince;
-class CRiver;
+class CTerrainFeature;
 class CCharacter;
 class CSpecies;
 class WorldMapTile;
@@ -138,7 +138,7 @@ public:
 	CWorldMapTerrainType *BaseTerrain;									/// Base terrain for the world
 	CPlane *Plane;
 	std::vector<CProvince *> Provinces;									/// Provinces in this world
-	std::vector<CRiver *> Rivers;										/// Rivers in this world
+	std::vector<CTerrainFeature *> TerrainFeatures;						/// Terrain features in this world
 	std::vector<WorldMapTile *> Tiles;									/// Tiles in the world
 	std::vector<CSpecies *> Species;									/// Species in this world
 };
@@ -220,21 +220,6 @@ public:
 	std::map<int, CFaction *> HistoricalClaims;							/// Historical claims over the tile, mapped to the year
 };
 
-class CRiver
-{
-public:
-	CRiver() :
-		ID(-1), World(NULL)
-	{
-	}
-	
-	int ID;
-	std::string Name;
-	CWorld *World;
-	std::map<int, std::string> CulturalNames;							/// Names for the river for each different culture/civilization
-	std::map<CFaction *, std::string> FactionCulturalNames;				/// Names for the river for each different faction
-};
-
 /*----------------------------------------------------------------------------
 -- Variables
 ----------------------------------------------------------------------------*/
@@ -243,7 +228,6 @@ extern std::vector<CPlane *> Planes;
 extern std::vector<CWorld *> Worlds;
 extern std::vector<CRegion *> Regions;
 extern std::vector<CProvince *> Provinces;
-extern std::vector<CRiver *> Rivers;
 extern std::vector<CWorldMapTerrainType *>  WorldMapTerrainTypes;
 extern std::map<std::string, int> WorldMapTerrainTypeStringToIndex;
 
@@ -256,7 +240,6 @@ extern CPlane *GetPlane(std::string plane_name);
 extern CWorld *GetWorld(std::string world_name);
 extern CRegion *GetRegion(std::string region_name);
 extern CProvince *GetProvince(std::string province_name);
-extern CRiver *GetRiver(std::string river_name);
 extern int GetWorldMapTerrainTypeId(std::string terrain_type_name);
 extern std::string GetEraNameById(int era);
 extern int GetEraIdByName(std::string era);

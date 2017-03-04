@@ -885,34 +885,44 @@ void DrawPopups()
 		CViewport *vp = GetViewport(CursorScreenPos);
 		if (vp) {
 			const Vec2i tilePos = vp->ScreenToTilePos(CursorScreenPos);
-			const bool isMapFieldVisible = Map.Field(tilePos, CurrentMapLayer)->playerInfo.IsTeamVisible(*ThisPlayer);
+			CMapField &mf = *Map.Field(tilePos, CurrentMapLayer);
+			const bool isMapFieldVisible = mf.playerInfo.IsTeamVisible(*ThisPlayer);
 
-			if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && UnitUnderCursor
-				&& ((isMapFieldVisible && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value) || ReplayRevealMap) && UnitUnderCursor->IsAliveOnMap()) {
-				PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
-				unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
-				std::string unit_name;
-				if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
-					if (!UnitUnderCursor->Identified) {
-						unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
+			if (UI.MouseViewport->IsInsideMapArea(CursorScreenPos) && (isMapFieldVisible || ReplayRevealMap)) {
+				if (UnitUnderCursor && !UnitUnderCursor->Type->BoolFlag[ISNOTSELECTABLE_INDEX].value && UnitUnderCursor->IsAliveOnMap()) {
+					PixelPos unit_center_pos = Map.TilePosToMapPixelPos_TopLeft(UnitUnderCursor->tilePos);
+					unit_center_pos = vp->MapToScreenPixelPos(unit_center_pos);
+					std::string unit_name;
+					if (UnitUnderCursor->Unique || UnitUnderCursor->Prefix || UnitUnderCursor->Suffix || UnitUnderCursor->Work || UnitUnderCursor->Elixir || UnitUnderCursor->Spell || UnitUnderCursor->Character != NULL) {
+						if (!UnitUnderCursor->Identified) {
+							unit_name = UnitUnderCursor->GetTypeName() + " (" + _("Unidentified") + ")";
+						} else {
+							unit_name = UnitUnderCursor->GetName();
+						}
 					} else {
-						unit_name = UnitUnderCursor->GetName();
+						unit_name = UnitUnderCursor->GetTypeName();
 					}
-				} else {
-					unit_name = UnitUnderCursor->GetTypeName();
+					if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
+						unit_name += " (" + UnitUnderCursor->Player->Name + ")";
+					}
+					//hackish way to make the popup appear correctly for the unit under cursor
+					ButtonAction *ba = new ButtonAction;
+					ba->Hint = unit_name;
+					ba->Action = ButtonUnit;
+					ba->Value = UnitNumber(*UnitUnderCursor);
+					ba->Popup = "popup-unit-under-cursor";
+					DrawPopup(*ba, *UI.SingleSelectedButton, unit_center_pos.x, unit_center_pos.y);
+					delete ba;
+					LastDrawnButtonPopup = NULL;
+				} else if (mf.TerrainFeature) {
+					PixelPos tile_center_pos = Map.TilePosToMapPixelPos_TopLeft(tilePos);
+					tile_center_pos = vp->MapToScreenPixelPos(tile_center_pos);
+					if (!Preference.NoStatusLineTooltips) {
+						CLabel label(GetGameFont());
+						label.Draw(2 + 16, Video.Height + 2 - 16, mf.TerrainFeature->Name);
+					}
+					DrawGenericPopup(mf.TerrainFeature->Name, tile_center_pos.x, tile_center_pos.y);
 				}
-				if (UnitUnderCursor->Player->Index != PlayerNumNeutral) {
-					unit_name += " (" + UnitUnderCursor->Player->Name + ")";
-				}
-				//hackish way to make the popup appear correctly for the unit under cursor
-				ButtonAction *ba = new ButtonAction;
-				ba->Hint = unit_name;
-				ba->Action = ButtonUnit;
-				ba->Value = UnitNumber(*UnitUnderCursor);
-				ba->Popup = "popup-unit-under-cursor";
-				DrawPopup(*ba, *UI.SingleSelectedButton, unit_center_pos.x, unit_center_pos.y);
-				delete ba;
-				LastDrawnButtonPopup = NULL;
 			}
 		}
 	}
