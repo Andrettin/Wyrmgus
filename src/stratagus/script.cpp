@@ -946,6 +946,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "TypeQuote")) {
 			res->e = EString_TypeQuote;
 			res->D.Type = CclParseTypeDesc(l);
+		} else if (!strcmp(key, "TypeRequirementsString")) {
+			res->e = EString_TypeRequirementsString;
+			res->D.Type = CclParseTypeDesc(l);
 		} else if (!strcmp(key, "UpgradeCivilization")) {
 			res->e = EString_UpgradeCivilization;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
@@ -954,6 +957,9 @@ StringDesc *CclParseStringDesc(lua_State *l)
 			res->D.Upgrade = CclParseUpgradeDesc(l);
 		} else if (!strcmp(key, "UpgradeEffectsString")) {
 			res->e = EString_UpgradeEffectsString;
+			res->D.Upgrade = CclParseUpgradeDesc(l);
+		} else if (!strcmp(key, "UpgradeRequirementsString")) {
+			res->e = EString_UpgradeRequirementsString;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
 		//Wyrmgus end
 		} else if (!strcmp(key, "If")) {
@@ -1327,6 +1333,13 @@ std::string EvalString(const StringDesc *s)
 			} else { // ERROR.
 				return std::string("");
 			}
+		case EString_TypeRequirementsString : // name of the unit type's quote
+			type = s->D.Type;
+			if (type != NULL) {
+				return (**type).RequirementsString;
+			} else { // ERROR.
+				return std::string("");
+			}
 		case EString_UpgradeCivilization : // name of the upgrade's civilization
 			upgrade = s->D.Upgrade;
 			if (upgrade != NULL) {
@@ -1363,6 +1376,13 @@ std::string EvalString(const StringDesc *s)
 			upgrade = s->D.Upgrade;
 			if (upgrade != NULL) {
 				return (**upgrade).EffectsString;
+			} else { // ERROR.
+				return std::string("");
+			}
+		case EString_UpgradeRequirementsString : // upgrade's effects string
+			upgrade = s->D.Upgrade;
+			if (upgrade != NULL) {
+				return (**upgrade).RequirementsString;
 			} else { // ERROR.
 				return std::string("");
 			}
@@ -1591,6 +1611,9 @@ void FreeStringDesc(StringDesc *s)
 		case EString_TypeQuote : // Quote of the unit type
 			delete *s->D.Type;
 			break;
+		case EString_TypeRequirementsString : // Quote of the unit type
+			delete *s->D.Type;
+			break;
 		case EString_UpgradeCivilization : // Civilization of the upgrade
 			delete *s->D.Upgrade;
 			break;
@@ -1598,6 +1621,9 @@ void FreeStringDesc(StringDesc *s)
 			delete *s->D.Upgrade;
 			break;
 		case EString_UpgradeEffectsString : // Effects string of the upgrade
+			delete *s->D.Upgrade;
+			break;
+		case EString_UpgradeRequirementsString : // Requirements string of the upgrade
 			delete *s->D.Upgrade;
 			break;
 		//Wyrmgus end
@@ -2235,6 +2261,11 @@ static int CclTypeQuote(lua_State *l)
 	return Alias(l, "TypeQuote");
 }
 
+static int CclTypeRequirementsString(lua_State *l)
+{
+	return Alias(l, "TypeRequirementsString");
+}
+
 static int CclTypeTrainQuantity(lua_State *l)
 {
 	return Alias(l, "TypeTrainQuantity");
@@ -2278,7 +2309,21 @@ static int CclUpgradeEffectsString(lua_State *l)
 {
 	return Alias(l, "UpgradeEffectsString");
 }
+
+/**
+**  Return equivalent lua table for UpgradeRequirementsString.
+**  {"UpgradeRequirementsString", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclUpgradeRequirementsString(lua_State *l)
+{
+	return Alias(l, "UpgradeRequirementsString");
+}
 //Wyrmgus end
+
 /**
 **  Return equivalent lua table for If.
 **  {"If", {arg1}}
@@ -2479,10 +2524,12 @@ static void AliasRegister()
 	lua_register(Lua, "TypeClass", CclTypeClass);
 	lua_register(Lua, "TypeDescription", CclTypeDescription);
 	lua_register(Lua, "TypeQuote", CclTypeQuote);
+	lua_register(Lua, "TypeRequirementsString", CclTypeRequirementsString);
 	lua_register(Lua, "TypeTrainQuantity", CclTypeTrainQuantity);
 	lua_register(Lua, "UpgradeCivilization", CclUpgradeCivilization);
 	lua_register(Lua, "UpgradeFactionType", CclUpgradeFactionType);
 	lua_register(Lua, "UpgradeEffectsString", CclUpgradeEffectsString);
+	lua_register(Lua, "UpgradeRequirementsString", CclUpgradeRequirementsString);
 	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);

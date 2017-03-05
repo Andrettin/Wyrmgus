@@ -327,6 +327,7 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->Quote = parent_upgrade->Quote;
 				upgrade->Background = parent_upgrade->Background;
 				upgrade->EffectsString = parent_upgrade->EffectsString;
+				upgrade->RequirementsString = parent_upgrade->RequirementsString;
 				upgrade->ModifierGraphicFile = parent_upgrade->ModifierGraphicFile;
 				upgrade->RequiresDeity = parent_upgrade->RequiresDeity;
 				for (int i = 0; i < MaxCosts; ++i) {
@@ -398,6 +399,8 @@ static int CclDefineUpgrade(lua_State *l)
 			upgrade->Background = LuaToString(l, -1);
 		} else if (!strcmp(value, "EffectsString")) {
 			upgrade->EffectsString = LuaToString(l, -1);
+		} else if (!strcmp(value, "RequirementsString")) {
+			upgrade->RequirementsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "ModifierGraphicFile")) {
 			upgrade->ModifierGraphicFile = LuaToString(l, -1);
 		} else if (!strcmp(value, "RevoltRiskModifier")) {
@@ -1021,6 +1024,9 @@ static int CclGetUpgradeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "EffectsString")) {
 		lua_pushstring(l, upgrade->EffectsString.c_str());
+		return 1;
+	} else if (!strcmp(data, "RequirementsString")) {
+		lua_pushstring(l, upgrade->RequirementsString.c_str());
 		return 1;
 	} else if (!strcmp(data, "ItemPrefix")) {
 		if (nargs == 2) { //check if the upgrade is a prefix for any item type

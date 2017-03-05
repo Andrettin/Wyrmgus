@@ -1664,7 +1664,7 @@ bool CPlayer::HasUpgradeClass(std::string upgrade_class_name)
 **
 **  @param faction    New faction.
 */
-bool CPlayer::CanFoundFaction(CFaction *faction)
+bool CPlayer::CanFoundFaction(CFaction *faction, bool pre)
 {
 	if (CurrentQuest != NULL || GrandStrategy) {
 		return false;
@@ -1674,15 +1674,17 @@ bool CPlayer::CanFoundFaction(CFaction *faction)
 		if (this->Index != i && Players[i].Type != PlayerNobody && Players[i].Race == faction->Civilization && Players[i].Faction == faction->ID) {
 			// faction is already in use
 			return false;
-		}		
+		}
 	}
 	
-	if (faction->Conditions) {
-		CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
-		faction->Conditions->pushPreamble();
-		faction->Conditions->run(1);
-		if (faction->Conditions->popBoolean() == false) {
-			return false;
+	if (!pre) {
+		if (faction->Conditions) {
+			CclCommand("trigger_player = " + std::to_string((long long) this->Index) + ";");
+			faction->Conditions->pushPreamble();
+			faction->Conditions->run(1);
+			if (faction->Conditions->popBoolean() == false) {
+				return false;
+			}
 		}
 	}
 	

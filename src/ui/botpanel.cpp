@@ -424,6 +424,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			return false;
 		}
 	}
+	
+	if (condition->RequirementsString != CONDITION_TRUE) {
+		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonExperienceUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility) && !AllUpgrades[button.Value]->RequirementsString.empty())))) {
+			return false;
+		}
+	}
 	//Wyrmgus end
 
 	if (condition->ButtonAction != -1 && button.Action != condition->ButtonAction) {
@@ -1291,9 +1297,15 @@ void CButtonPanel::Draw()
 											   pos, buf, player);
 			*/
 			
-			button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
-											   GetButtonStatus(buttons[i], ButtonUnderCursor),
-											   pos, buf, player, hair_color);
+			if (IsButtonUsable(*Selected[0], buttons[i])) {
+				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+												   GetButtonStatus(buttons[i], ButtonUnderCursor),
+												   pos, buf, player, hair_color);
+			} else {
+				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+												   GetButtonStatus(buttons[i], ButtonUnderCursor),
+												   pos, buf, player, hair_color, true);
+			}
 			
 			//draw the quantity in stock for unit "training" cases which have it
 			if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) {
@@ -1479,14 +1491,17 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonUpgradeTo:
 		case ButtonResearch:
 		case ButtonBuild:
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
+			//Wyrmgus start
+//			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr);
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, true);
+			//Wyrmgus end
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
 				//Wyrmgus start
 				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
 					CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
 					if (upgrade_faction) {
-						res = unit.Player->CanFoundFaction(upgrade_faction);
+						res = unit.Player->CanFoundFaction(upgrade_faction, true);
 					}
 				}
 				//Wyrmgus end
@@ -1494,7 +1509,7 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			break;
 		//Wyrmgus start
 		case ButtonExperienceUpgradeTo:
-			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, true);
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, true, true);
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
 				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' && unit.Variable[LEVELUP_INDEX].Value >= 1;
 			}
@@ -1556,6 +1571,85 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 #endif
 	return res;
 }
+
+//Wyrmgus start
+/**
+**  Check if the button is usable for the unit.
+**
+**  @param unit          unit which checks for allow.
+**  @param buttonaction  button to check if it is usable.
+**
+**  @return 1 if button is usable, 0 else.
+*/
+bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
+{
+	if (!IsButtonAllowed(unit, buttonaction)) {
+		return false;
+	}
+	
+	bool res = false;
+	if (buttonaction.Allowed) {
+		res = buttonaction.Allowed(unit, buttonaction);
+		if (!res) {
+			return false;
+		} else {
+			res = false;
+		}
+	}
+
+	// Check button-specific cases
+	switch (buttonaction.Action) {
+		case ButtonStop:
+		case ButtonStandGround:
+		case ButtonButton:
+		case ButtonMove:
+		case ButtonCallbackAction:
+		case ButtonRallyPoint:
+		case ButtonUnit:
+		case ButtonEditorUnit:
+		case ButtonRepair:
+		case ButtonPatrol:
+		case ButtonHarvest:
+		case ButtonReturn:
+		case ButtonAttack:
+		case ButtonAttackGround:
+			res = true;
+			break;
+		case ButtonTrain:
+		case ButtonUpgradeTo:
+		case ButtonResearch:
+		case ButtonBuild:
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, false);
+			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
+				CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
+				if (upgrade_faction) {
+					res = unit.Player->CanFoundFaction(upgrade_faction, false);
+				}
+			}
+			break;
+		case ButtonExperienceUpgradeTo:
+			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, true, false);
+			break;
+		case ButtonLearnAbility:
+			res = unit.CanLearnAbility(CUpgrade::Get(buttonaction.ValueStr));
+			break;
+		case ButtonSpellCast:
+			res = SpellIsAvailable(unit, buttonaction.Value);
+			break;
+		case ButtonUnload:
+		case ButtonCancel:
+		case ButtonCancelUpgrade:
+		case ButtonCancelTrain:
+		case ButtonCancelBuild:
+		case ButtonQuest:
+		case ButtonBuy:
+			res = true;
+			break;
+	}
+
+	return res;
+}
+//Wyrmgus end
 
 /**
 **  Update bottom panel for multiple units.
@@ -2183,6 +2277,12 @@ void CButtonPanel::DoClicked(int button)
 	if (CurrentButtons[button].CommentSound.Sound) {
 		PlayGameSound(CurrentButtons[button].CommentSound.Sound, MaxSampleVolume);
 	}
+	
+	//Wyrmgus start
+	if (!IsButtonUsable(*Selected[0], CurrentButtons[button])) {
+		return;
+	}
+	//Wyrmgus end
 
 	//  Handle action on button.
 	switch (CurrentButtons[button].Action) {

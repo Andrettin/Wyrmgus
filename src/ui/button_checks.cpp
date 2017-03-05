@@ -376,7 +376,10 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 	}
 
 	// check if allowed
-	if (!CheckDependByIdent(*unit.Player, button.ValueStr)) {
+	//Wyrmgus start
+//	if (!CheckDependByIdent(*unit.Player, button.ValueStr)) {
+	if (!CheckDependByIdent(*unit.Player, button.ValueStr, false, true)) {
+	//Wyrmgus end
 		return false;
 	}
 	if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)

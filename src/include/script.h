@@ -160,9 +160,11 @@ enum EString {
 	EString_TypeClass,			/// Unit type's class
 	EString_TypeDescription,	/// Unit type's description
 	EString_TypeQuote,			/// Unit type's quote
+	EString_TypeRequirementsString,	/// Unit type's requirements string
 	EString_UpgradeCivilization,	/// Upgrade's civilization
 	EString_UpgradeFactionType,		/// Upgrade's faction's type
 	EString_UpgradeEffectsString,	/// Upgrade's effects string
+	EString_UpgradeRequirementsString,	/// Upgrade's requirements string
 	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.

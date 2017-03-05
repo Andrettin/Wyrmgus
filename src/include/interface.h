@@ -310,6 +310,11 @@ extern int AddButton(int pos, int level, const std::string &IconIdent,
 // Check if the button is allowed for the unit.
 extern bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction);
 
+//Wyrmgus start
+// Check if the button is usable for the unit.
+extern bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction);
+//Wyrmgus end
+
 //
 // in mouse.cpp
 //

@@ -60,7 +60,7 @@
 void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 				  //Wyrmgus start
 //				  const std::string &text, int player)
-				  const std::string &text, int player, int hair_color)
+				  const std::string &text, int player, int hair_color, bool transparent)
 				  //Wyrmgus end
 {
 	ButtonStyleProperties *p;
@@ -94,7 +94,11 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 		if (colorGraphic && player != -1) {
 			//Wyrmgus start
 //			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y);
-			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y, true, hair_color);
+			if (transparent) {
+				colorGraphic->DrawPlayerColorFrameClipTrans(player, pimage->Frame, x, y, 128, true, hair_color);
+			} else {
+				colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y, true, hair_color);
+			}
 			//Wyrmgus end
 		} else {
 			pimage->Sprite->DrawFrame(pimage->Frame, x, y);

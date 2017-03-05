@@ -1002,7 +1002,7 @@ void DrawPopups()
 			//Wyrmgus start
 //			ButtonUnderCursor == i && KeyState != KeyStateInput) {
 			ButtonUnderCursor == i && KeyState != KeyStateInput
-			&& CurrentButtons[i].Level == CurrentButtonLevel) {
+			&& CurrentButtons[i].Level == CurrentButtonLevel && IsButtonAllowed(*Selected[0], CurrentButtons[i])) {
 			//Wyrmgus end
 				if (!Preference.NoStatusLineTooltips) {
 					UpdateStatusLineForButton(CurrentButtons[i]);

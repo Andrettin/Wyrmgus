@@ -706,6 +706,7 @@ static int CclDefineUnitType(lua_State *l)
 			type->NeutralMinimapColorRGB = parent_type->NeutralMinimapColorRGB;
 			type->RandomMovementProbability = parent_type->RandomMovementProbability;
 			type->RandomMovementDistance = parent_type->RandomMovementDistance;
+			type->RequirementsString = parent_type->RequirementsString;
 			type->Icon.Name = parent_type->Icon.Name;
 			type->Icon.Icon = NULL;
 			if (!type->Icon.Name.empty()) {
@@ -1956,6 +1957,8 @@ static int CclDefineUnitType(lua_State *l)
 			type->DefaultStat.Variables[GENDER_INDEX].Max = type->DefaultStat.Variables[GENDER_INDEX].Value;
 		} else if (!strcmp(value, "Background")) {
 			type->Background = LuaToString(l, -1);
+		} else if (!strcmp(value, "RequirementsString")) {
+			type->RequirementsString = LuaToString(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
 			type->TrainQuantity = LuaToNumber(l, -1);
 		} else if (!strcmp(value, "Upkeep")) {
@@ -2600,6 +2603,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "Background")) {
 		lua_pushstring(l, type->Background.c_str());
+		return 1;
+	} else if (!strcmp(data, "RequirementsString")) {
+		lua_pushstring(l, type->RequirementsString.c_str());
 		return 1;
 	} else if (!strcmp(data, "Image")) {
 		lua_pushstring(l, type->File.c_str());

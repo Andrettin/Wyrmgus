@@ -224,7 +224,7 @@ public:
 	void SetRandomFaction();
 	bool IsPlayerColorUsed(int color);
 	bool HasUpgradeClass(std::string upgrade_class_name);
-	bool CanFoundFaction(CFaction *faction);
+	bool CanFoundFaction(CFaction *faction, bool pre = false);
 	//Wyrmgus end
 
 	/// Clear turn related player data
