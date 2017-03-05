@@ -95,7 +95,7 @@ void DrawUIButton(ButtonStyle *style, unsigned flags, int x, int y,
 			//Wyrmgus start
 //			colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y);
 			if (transparent) {
-				colorGraphic->DrawPlayerColorFrameClipTrans(player, pimage->Frame, x, y, 128, true, hair_color);
+				colorGraphic->DrawPlayerColorFrameClipTrans(player, pimage->Frame, x, y, 64, true, hair_color);
 			} else {
 				colorGraphic->DrawPlayerColorFrameClip(player, pimage->Frame, x, y, true, hair_color);
 			}
