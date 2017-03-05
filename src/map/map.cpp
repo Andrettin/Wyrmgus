@@ -1405,8 +1405,8 @@ bool CMap::TileBordersFlag(const Vec2i &pos, int z, int flag, bool reverse)
 
 bool CMap::TileBordersBuilding(const Vec2i &pos, int z)
 {
-	for (int sub_x = -1; sub_x <= 1; ++sub_x) {
-		for (int sub_y = -1; sub_y <= 1; ++sub_y) {
+	for (int sub_x = -2; sub_x <= 2; ++sub_x) {
+		for (int sub_y = -2; sub_y <= 2; ++sub_y) {
 			Vec2i adjacent_pos(pos.x + sub_x, pos.y + sub_y);
 			if (!this->Info.IsPointOnMap(adjacent_pos, z) || (sub_x == 0 && sub_y == 0)) {
 				continue;
