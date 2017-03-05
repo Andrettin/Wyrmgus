@@ -45,6 +45,7 @@
 #include "map.h"
 #include "player.h"
 //Wyrmgus start
+#include "quest.h"
 #include "tileset.h"
 //Wyrmgus end
 #include "unit.h"
@@ -512,9 +513,9 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	}
 	
 	//Wyrmgus start
-	if (GameCycle == 0 && Editor.Running == EditorNotRunning && type.TileWidth > 1 && type.TileHeight > 1 && !OnTopDetails(type, NULL)) { // if the game is starting, only place buildings with a certain space from other buildings
-		for (int x = pos.x - 1; x < pos.x + type.TileWidth + 1; ++x) {
-			for (int y = pos.y - 1; y < pos.y + type.TileHeight + 1; ++y) {
+	if (CurrentCampaign != NULL && GameCycle == 0 && Editor.Running == EditorNotRunning && type.TileWidth > 1 && type.TileHeight > 1 && !OnTopDetails(type, NULL)) { // if a campaign game is starting, only place buildings with a certain space from other buildings
+		for (int x = pos.x - 2; x < pos.x + type.TileWidth + 2; ++x) {
+			for (int y = pos.y - 2; y < pos.y + type.TileHeight + 2; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {
 					return NULL;
 				}
