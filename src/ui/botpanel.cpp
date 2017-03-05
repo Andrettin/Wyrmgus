@@ -2280,6 +2280,7 @@ void CButtonPanel::DoClicked(int button)
 	
 	//Wyrmgus start
 	if (!IsButtonUsable(*Selected[0], CurrentButtons[button])) {
+		ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The requirements have not been fulfilled"));
 		return;
 	}
 	//Wyrmgus end
