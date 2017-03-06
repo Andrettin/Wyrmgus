@@ -514,26 +514,9 @@ CUnit *CanBuildHere(const CUnit *unit, const CUnitType &type, const Vec2i &pos, 
 	
 	//Wyrmgus start
 	if (CurrentCampaign != NULL && GameCycle == 0 && Editor.Running == EditorNotRunning && type.TileWidth > 1 && type.TileHeight > 1 && !OnTopDetails(type, NULL)) { // if a campaign game is starting, only place buildings with a certain space from other buildings
-		for (int x = pos.x - 2; x < pos.x + type.TileWidth + 2; ++x) {
-			for (int y = pos.y - 2; y < pos.y + type.TileHeight + 2; ++y) {
+		for (int x = pos.x - 1; x < pos.x + type.TileWidth + 1; ++x) {
+			for (int y = pos.y - 1; y < pos.y + type.TileHeight + 1; ++y) {
 				if (Map.Info.IsPointOnMap(x, y, z) && (Map.Field(x, y, z)->Flags & MapFieldBuilding)) {
-					//if both are small (2x2) buildings, then there's no need for distance between them
-					if (type.TileWidth <= 2 && type.TileHeight <= 2) {
-						bool both_small_buildings = false;
-						CUnitCache &unitcache = Map.Field(x, y, z)->UnitCache;
-						for (CUnitCache::iterator it = unitcache.begin(); it != unitcache.end(); ++it) {
-							CUnit *tile_building = *it;
-
-							if (tile_building->Type->BoolFlag[BUILDING_INDEX].value && tile_building->Type->TileWidth <= 2 && tile_building->Type->TileHeight <= 2) {
-								both_small_buildings = true;
-								break;
-							}
-						}
-						if (both_small_buildings) {
-							continue;
-						}
-					}
-					
 					return NULL;
 				}
 			}
