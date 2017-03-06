@@ -143,6 +143,8 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		if (terrain->SolidTiles.size() > 0) {
 			this->OverlaySolidTile = terrain->SolidTiles[SyncRand(terrain->SolidTiles.size())];
 		}
+		this->OverlayTerrainDestroyed = false;
+		this->OverlayTerrainDamaged = false;
 	} else {
 		this->Terrain = terrain;
 		if (terrain->SolidTiles.size() > 0) {
@@ -187,7 +189,13 @@ void CMapField::SetTerrain(CTerrainType *terrain)
 		}
 	}
 
-	this->cost = 8; // default speed
+	if (this->Flags & MapFieldRailroad) {
+		this->cost = 4;
+	} else if (this->Flags & MapFieldRoad) {
+		this->cost = 6;
+	} else {
+		this->cost = 8; // default speed
+	}
 	
 	//wood and rock tiles must always begin with the default value for their respective resource types
 	if (terrain->Flags & MapFieldForest) {
@@ -222,6 +230,14 @@ void CMapField::RemoveOverlayTerrain()
 			this->Flags |= MapFieldUnpassable;
 			this->Flags |= MapFieldAirUnpassable;
 		}
+	}
+	
+	if (this->Flags & MapFieldRailroad) {
+		this->cost = 4;
+	} else if (this->Flags & MapFieldRoad) {
+		this->cost = 6;
+	} else {
+		this->cost = 8; // default speed
 	}
 	
 	if (this->TerrainFeature) {
@@ -400,6 +416,12 @@ void CMapField::Save(CFile &file) const
 	if (Flags & MapFieldMud) {
 		file.printf(", \"mud\"");
 	}
+	if (Flags & MapFieldRailroad) {
+		file.printf(", \"railroad\"");
+	}
+	if (Flags & MapFieldRoad) {
+		file.printf(", \"road\"");
+	}
 	if (Flags & MapFieldStoneFloor) {
 		file.printf(", \"stone-floor\"");
 	}
@@ -550,6 +572,10 @@ void CMapField::parse(lua_State *l)
 			this->Flags |= MapFieldGravel;
 		} else if (!strcmp(value, "mud")) {
 			this->Flags |= MapFieldMud;
+		} else if (!strcmp(value, "railroad")) {
+			this->Flags |= MapFieldRailroad;
+		} else if (!strcmp(value, "road")) {
+			this->Flags |= MapFieldRoad;
 		} else if (!strcmp(value, "stone-floor")) {
 			this->Flags |= MapFieldStoneFloor;
 		} else if (!strcmp(value, "stumps")) {

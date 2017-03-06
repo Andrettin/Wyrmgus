@@ -103,6 +103,9 @@ class CUnitType;
 #define MapFieldGravel 0x00200000			/// Used for playing gravel step sounds
 #define MapFieldStumps 0x00400000			/// Used for playing stumps step sounds
 #define MapFieldBridge 0x00800000			/// Bridge or raft
+
+#define MapFieldRoad 0x01000000				/// Road (moves faster)
+#define MapFieldRailroad 0x02000000			/// Railroad (moves faster, even faster than with the road)
 //Wyrmgus end
 
 /**
