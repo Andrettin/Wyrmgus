@@ -1226,6 +1226,14 @@ void UpdateUnitStats(CUnitType &type, int reset)
 		type.MovementMask |= MapFieldNoBuilding;
 		//Wyrmgus start
 		type.MovementMask |= MapFieldItem;
+		if (type.TerrainType) {
+			if ((type.TerrainType->Flags & MapFieldRailroad) || (type.TerrainType->Flags & MapFieldRoad)) {
+				type.MovementMask |= MapFieldRailroad;
+			}
+			if (type.TerrainType->Flags & MapFieldRoad) {
+				type.MovementMask |= MapFieldRoad;
+			}
+		}
 		//Wyrmgus end
 		//
 		// A little chaos, buildings without HP can be entered.
