@@ -425,6 +425,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
+	if (condition->ResearchedUpgrade != CONDITION_TRUE) {
+		if ((condition->ResearchedUpgrade == CONDITION_ONLY) ^ (((button.Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, button.ValueStr) == 'R') || (button.Action == ButtonLearnAbility && Selected[0]->IndividualUpgrades[button.Value])))) {
+			return false;
+		}
+	}
+	
 	if (condition->RequirementsString != CONDITION_TRUE) {
 		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonExperienceUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility) && !AllUpgrades[button.Value]->RequirementsString.empty())))) {
 			return false;
@@ -1301,6 +1307,10 @@ void CButtonPanel::Draw()
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
 												   pos, buf, player, hair_color);
+			} else if (buttons[i].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, buttons[i].ValueStr) == 'R') { //draw researched technologies grayed
+				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
+												   GetButtonStatus(buttons[i], ButtonUnderCursor),
+												   pos, buf, player, hair_color, false, true);
 			} else {
 				button_icon->DrawUnitIcon(*UI.ButtonPanel.Buttons[i].Style,
 												   GetButtonStatus(buttons[i], ButtonUnderCursor),
@@ -1496,8 +1506,9 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, true);
 			//Wyrmgus end
 			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
-				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
 				//Wyrmgus start
+//				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
+				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A' || UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'R';
 				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
 					CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
 					if (upgrade_faction) {
@@ -1620,10 +1631,13 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonResearch:
 		case ButtonBuild:
 			res = CheckDependByIdent(*unit.Player, buttonaction.ValueStr, false, false);
-			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
-				CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
-				if (upgrade_faction) {
-					res = unit.Player->CanFoundFaction(upgrade_faction, false);
+			if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-", 8)) {
+				res = UpgradeIdentAllowed(*unit.Player, buttonaction.ValueStr) == 'A';
+				if (res && !strncmp(buttonaction.ValueStr.c_str(), "upgrade-faction-", 16)) {
+					CFaction *upgrade_faction = PlayerRaces.GetFaction(-1, FindAndReplaceString(buttonaction.ValueStr, "upgrade-faction-", ""));
+					if (upgrade_faction) {
+						res = unit.Player->CanFoundFaction(upgrade_faction, false);
+					}
 				}
 			}
 			break;
@@ -2195,6 +2209,12 @@ void CButtonPanel::DoClicked_Research(int button)
 		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
 		UI.StatusLine.Clear();
 		UI.StatusLine.ClearCosts();
+		//Wyrmgus start
+		LastDrawnButtonPopup = NULL;
+		ButtonUnderCursor = -1;
+		OldButtonUnderCursor = -1;
+		UI.ButtonPanel.Update();
+		//Wyrmgus end
 	}
 }
 
@@ -2209,6 +2229,8 @@ void CButtonPanel::DoClicked_LearnAbility(int button)
 	if (AllUpgrades[index]->Ability && Selected[0]->Variable[LEVELUP_INDEX].Value == 0) {
 		CurrentButtonLevel = 0;
 		LastDrawnButtonPopup = NULL;
+		ButtonUnderCursor = -1;
+		OldButtonUnderCursor = -1;
 		UI.ButtonPanel.Update();
 	}
 }
@@ -2217,6 +2239,8 @@ void CButtonPanel::DoClicked_Quest(int button)
 {
 	const int index = CurrentButtons[button].Value;
 	SendCommandQuest(*Selected[0], Selected[0]->Player->AvailableQuests[index]);
+	ButtonUnderCursor = -1;
+	OldButtonUnderCursor = -1;
 	if (Selected[0]->Player == ThisPlayer) {
 		SelectedUnitChanged();
 	}
@@ -2229,6 +2253,8 @@ void CButtonPanel::DoClicked_Buy(int button)
 	buy_costs[CopperCost] = UnitManager.GetSlotUnit(CurrentButtons[button].Value).GetPrice();
 	if (!ThisPlayer->CheckCosts(buy_costs) && ThisPlayer->CheckLimits(*UnitManager.GetSlotUnit(CurrentButtons[button].Value).Type) >= 0) {
 		SendCommandBuy(*Selected[0], &UnitManager.GetSlotUnit(CurrentButtons[button].Value), ThisPlayer->Index);
+		ButtonUnderCursor = -1;
+		OldButtonUnderCursor = -1;
 		if (IsOnlySelected(*Selected[0])) {
 			SelectedUnitChanged();
 		}
@@ -2280,7 +2306,11 @@ void CButtonPanel::DoClicked(int button)
 	
 	//Wyrmgus start
 	if (!IsButtonUsable(*Selected[0], CurrentButtons[button])) {
-		ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The requirements have not been fulfilled"));
+		if (CurrentButtons[button].Action == ButtonResearch && UpgradeIdentAllowed(*ThisPlayer, CurrentButtons[button].ValueStr) == 'R') {
+			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The upgrade has already been acquired"));
+		} else {
+			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The requirements have not been fulfilled"));
+		}
 		return;
 	}
 	//Wyrmgus end

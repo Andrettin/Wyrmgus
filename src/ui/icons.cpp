@@ -202,12 +202,19 @@ void CIcon::DrawCooldownSpellIcon(const PixelPos &pos, const int percent) const
 void CIcon::DrawUnitIcon(const ButtonStyle &style, unsigned flags,
 						 //Wyrmgus start
 //						 const PixelPos &pos, const std::string &text, int player) const
-						 const PixelPos &pos, const std::string &text, int player, int hair_color, bool transparent) const
+						 const PixelPos &pos, const std::string &text, int player, int hair_color, bool transparent, bool grayscale) const
 						 //Wyrmgus end
 {
 	ButtonStyle s(style);
 
-	s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
+	//Wyrmgus start
+//	s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
+	if (grayscale) {
+		s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->GScale;
+	} else {
+		s.Default.Sprite = s.Hover.Sprite = s.Clicked.Sprite = this->G;
+	}
+	//Wyrmgus end
 	s.Default.Frame = s.Hover.Frame = s.Clicked.Frame = this->Frame;
 	if (!(flags & IconSelected) && (flags & IconAutoCast)) {
 		s.Default.BorderColorRGB = UI.ButtonPanel.AutoCastBorderColorRGB;

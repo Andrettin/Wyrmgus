@@ -383,7 +383,10 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 		return false;
 	}
 	if (!strncmp(button.ValueStr.c_str(), "upgrade-", 8)
-		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A') {
+		//Wyrmgus start
+//		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A') {
+		&& UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'A' && UpgradeIdentAllowed(*unit.Player, button.ValueStr) != 'R') {
+		//Wyrmgus end
 		return false;
 	}
 	return true;
@@ -401,7 +404,11 @@ bool ButtonCheckResearch(const CUnit &unit, const ButtonAction &button)
 bool ButtonCheckSingleResearch(const CUnit &unit, const ButtonAction &button)
 {
 	if (ButtonCheckResearch(unit, button)
-		&& !unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)]) {
+		//Wyrmgus start
+//		&& !unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)]) {
+		&& (!unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] || unit.Player->UpgradeTimers.Upgrades[UpgradeIdByIdent(button.ValueStr)] == AllUpgrades[UpgradeIdByIdent(button.ValueStr)]->Costs[TimeCost])
+	) {
+		//Wyrmgus end
 		return true;
 	}
 	return false;

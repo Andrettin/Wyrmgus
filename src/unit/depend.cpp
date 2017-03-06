@@ -478,7 +478,7 @@ bool CheckDependByIdent(const CPlayer &player, const std::string &target, bool i
 	} else if (!strncmp(target.c_str(), "upgrade-", 8)) {
 		// target string refers to upgrade-XXX
 		rule.Kind.Upgrade = CUpgrade::Get(target);
-		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A') {
+		if (UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) != 'A' && !(is_predependency && UpgradeIdAllowed(player, rule.Kind.Upgrade->ID) == 'R')) {
 			return false;
 		}
 		rule.Type = DependRuleUpgrade;
