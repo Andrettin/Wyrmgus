@@ -818,10 +818,7 @@ void DrawResources()
 	}
 	if (UI.Resources[FoodCost].TextX != -1) {
 		char tmp[256];
-		//Wyrmgus start
-//		snprintf(tmp, sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
-		snprintf(tmp, sizeof(tmp), "%d/%d", ThisPlayer->Demand, std::min(ThisPlayer->Supply, ThisPlayer->UnitLimit));
-		//Wyrmgus end
+		snprintf(tmp, sizeof(tmp), "%d/%d", ThisPlayer->Demand, ThisPlayer->Supply);
 		label.SetFont(GetGameFont());
 		if (ThisPlayer->Supply < ThisPlayer->Demand) {
 			label.DrawReverse(UI.Resources[FoodCost].TextX, UI.Resources[FoodCost].TextY, tmp);
