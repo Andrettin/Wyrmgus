@@ -409,6 +409,7 @@ enum {
 	REGENERATION_INDEX,
 	TERROR_INDEX,
 	TIMEEFFICIENCYBONUS_INDEX,
+	SPEEDBONUS_INDEX, // dummy variable for terrain types that increase movement speed, so that their bonus shows up correctly in the interface
 	DISEMBARKMENTBONUS_INDEX,
 	LEADERSHIPAURA_INDEX,
 	REGENERATIONAURA_INDEX,
