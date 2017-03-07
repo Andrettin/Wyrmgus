@@ -224,7 +224,9 @@ void CMinimap::Create()
 
 	UpdateTerrain();
 	*/
+#if defined(USE_OPENGL) || defined(USE_GLES)
 	MinimapTexture.resize(Map.Fields.size());
+#endif
 	for (size_t z = 0; z < Map.Fields.size(); ++z) {
 		// Scale to biggest value.
 		const int n = std::max(std::max(Map.Info.MapWidths[z], Map.Info.MapHeights[z]), 32);
