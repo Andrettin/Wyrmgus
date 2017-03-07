@@ -2799,7 +2799,6 @@ void CMap::ClearOverlayTile(const Vec2i &pos, int z)
 	} else if (mf.OverlayTerrain->Flags & MapFieldRocks) {
 		mf.Flags &= ~(MapFieldRocks | MapFieldUnpassable);
 		mf.Flags |= MapFieldGravel;
-		mf.Flags |= MapFieldNoBuilding;
 	} else if (mf.OverlayTerrain->Flags & MapFieldWall) {
 		mf.Flags &= ~(MapFieldHuman | MapFieldWall | MapFieldUnpassable);
 		if (GameSettings.Inside) {
