@@ -316,6 +316,8 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 	}
 	
 	//Wyrmgus start
+	table.resize(num);	
+	
 	CUnit *near_unit = NULL;
 	if (building.TerrainType) { //terrain type units have a particular place to be built, so we need to find the worker with a terrain traversal
 		TerrainTraversal terrainTraversal;
