@@ -1606,12 +1606,24 @@ static void AiCheckRepair()
 	int k = 0;
 
 	// Selector for next unit
+	//Wyrmgus start
+	/*
 	for (int i = n - 1; i >= 0; --i) {
 		const CUnit &unit = AiPlayer->Player->GetUnit(i);
 		if (UnitNumber(unit) == AiPlayer->LastRepairBuilding) {
 			k = i + 1;
 		}
 	}
+	*/
+	if (AiPlayer->LastRepairBuilding) {
+		for (int i = n - 1; i >= 0; --i) {
+			const CUnit &unit = AiPlayer->Player->GetUnit(i);
+			if (UnitNumber(unit) == AiPlayer->LastRepairBuilding) {
+				k = i + 1;
+			}
+		}
+	}
+	//Wyrmgus end
 
 	for (int i = k; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);
@@ -1742,10 +1754,12 @@ static void AiCheckPathwayConstruction()
 	int k = 0;
 
 	// Selector for next unit
-	for (int i = n - 1; i >= 0; --i) {
-		const CUnit &unit = AiPlayer->Player->GetUnit(i);
-		if (UnitNumber(unit) == AiPlayer->LastPathwayConstructionBuilding) {
-			k = i + 1;
+	if (AiPlayer->LastPathwayConstructionBuilding) {
+		for (int i = n - 1; i >= 0; --i) {
+			const CUnit &unit = AiPlayer->Player->GetUnit(i);
+			if (UnitNumber(unit) == AiPlayer->LastPathwayConstructionBuilding) {
+				k = i + 1;
+			}
 		}
 	}
 
