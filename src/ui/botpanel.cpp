@@ -2311,6 +2311,7 @@ void CButtonPanel::DoClicked(int button)
 		} else {
 			ThisPlayer->Notify(NotifyYellow, Selected[0]->tilePos, Selected[0]->MapLayer, "%s", _("The requirements have not been fulfilled"));
 		}
+		PlayGameSound(GameSounds.PlacementError[ThisPlayer->Race].Sound, MaxSampleVolume);
 		return;
 	}
 	//Wyrmgus end
