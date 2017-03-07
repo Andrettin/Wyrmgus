@@ -305,7 +305,9 @@ static void Finish(COrder_Built &order, CUnit &unit)
 			PlayUnitSound(unit, VoiceReady);
 		}
 		if (worker) {
-			PlayUnitSound(*worker, VoiceWorkCompleted);
+			if (!type.TerrainType || worker->Orders.size() == 1 || worker->Orders[1]->Action != UnitActionBuild) {
+				PlayUnitSound(*worker, VoiceWorkCompleted);
+			}
 		//Wyrmgus end
 		} else {
 			//Wyrmgus start
@@ -313,8 +315,10 @@ static void Finish(COrder_Built &order, CUnit &unit)
 //			PlayUnitSound(unit, VoiceBuilding);
 			for (size_t i = 0; i != table.size(); ++i) { // see if there is a builder/repairer available to give the work completed voice, if the "worker" pointer is NULL
 				if (table[i]->CurrentAction() == UnitActionRepair && table[i]->CurrentOrder()->GetGoal() == &unit) {
-					PlayUnitSound(*table[i], VoiceWorkCompleted);
-					break;
+					if (!type.TerrainType || table[i]->Orders.size() == 1 || table[i]->Orders[1]->Action != UnitActionBuild) { //don't play the work complete sound if building a tile unit and the worker has further build orders, to prevent the voice from repetitively being played after each tile in a series is constructed
+						PlayUnitSound(*table[i], VoiceWorkCompleted);
+						break;
+					}
 				}
 			}
 			//Wyrmgus end
