@@ -670,6 +670,26 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 			}
 		}
 		
+		CUnitType *pathway_type = NULL;
+		for (size_t j = 0; j < settlement_iterator->second->HistoricalBuildings.size(); ++j) {
+			if (
+				CurrentCampaign->StartDate >= std::get<0>(settlement_iterator->second->HistoricalBuildings[j])
+				&& (CurrentCampaign->StartDate < std::get<1>(settlement_iterator->second->HistoricalBuildings[j]) || std::get<1>(settlement_iterator->second->HistoricalBuildings[j]).year == 0)
+			) {
+				int unit_type_id = -1;
+				unit_type_id = PlayerRaces.GetFactionClassUnitType(settlement_owner->Civilization, settlement_owner->ID, std::get<2>(settlement_iterator->second->HistoricalBuildings[j]));
+				if (unit_type_id == -1) {
+					continue;
+				}
+				const CUnitType *type = UnitTypes[unit_type_id];
+				if (type->TerrainType) {
+					if ((type->TerrainType->Flags & MapFieldRoad) || (type->TerrainType->Flags & MapFieldRailroad)) {
+						pathway_type = UnitTypes[unit_type_id];
+					}
+				}
+			}
+		}
+		
 		bool first_building = true;
 		for (size_t j = 0; j < settlement_iterator->second->HistoricalBuildings.size(); ++j) {
 			if (
@@ -687,6 +707,9 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 					continue;
 				}
 				const CUnitType *type = UnitTypes[unit_type_id];
+				if (type->TerrainType) {
+					continue;
+				}
 				Vec2i unit_offset((type->TileWidth - 1) / 2, (type->TileHeight - 1) / 2);
 				CUnit *unit = NULL;
 				if (building_owner) {
@@ -711,6 +734,25 @@ void CMapTemplate::ApplySettlements(Vec2i template_start_pos, Vec2i map_start_po
 						unit->Name = settlement_iterator->second->CulturalNames.find(settlement_owner->Civilization)->second;
 					}
 					first_building = false;
+				}
+				if (pathway_type) {
+					for (int x = unit->tilePos.x - 1; x < unit->tilePos.x + unit->Type->TileWidth + 1; ++x) {
+						for (int y = unit->tilePos.y - 1; y < unit->tilePos.y + unit->Type->TileHeight + 1; ++y) {
+							if (!Map.Info.IsPointOnMap(x, y, unit->MapLayer)) {
+								continue;
+							}
+							CMapField &mf = *Map.Field(x, y, unit->MapLayer);
+							if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+								continue;
+							}
+							Vec2i pathway_pos(x, y);
+							if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit->MapLayer)) {
+								continue;
+							}
+							
+							mf.SetTerrain(pathway_type->TerrainType);
+						}
+					}
 				}
 			}
 		}
