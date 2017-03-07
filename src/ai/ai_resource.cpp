@@ -314,8 +314,33 @@ static int AiBuildBuilding(const CUnitType &type, CUnitType &building, const Vec
 		// No workers available to build
 		return 0;
 	}
+	
+	//Wyrmgus start
+	CUnit *near_unit = NULL;
+	if (building.TerrainType) { //terrain type units have a particular place to be built, so we need to find the worker with a terrain traversal
+		TerrainTraversal terrainTraversal;
 
-	CUnit &unit = (num == 1) ? *table[0] : *table[SyncRand() % num];
+		terrainTraversal.SetSize(Map.Info.MapWidths[z], Map.Info.MapHeights[z]);
+		terrainTraversal.Init();
+
+		terrainTraversal.PushPos(nearPos);
+
+		const int maxRange = 15;
+		const int movemask = type.MovementMask & ~(MapFieldLandUnit | MapFieldAirUnit | MapFieldSeaUnit);
+		UnitFinder unitFinder(*AiPlayer->Player, table, maxRange, movemask, &near_unit, z);
+
+		terrainTraversal.Run(unitFinder);
+		
+		if (!near_unit) {
+			return 0;
+		}
+	}
+	//Wyrmgus end
+
+	//Wyrmgus start
+//	CUnit &unit = (num == 1) ? *table[0] : *table[SyncRand() % num];
+	CUnit &unit = near_unit ? *near_unit : ((num == 1) ? *table[0] : *table[SyncRand() % num]);
+	//Wyrmgus end
 	
 	if (!Map.Info.IsPointOnMap(nearPos, z)) {
 		z = unit.MapLayer;
@@ -1675,6 +1700,128 @@ static void AiCheckRepair()
 	AiPlayer->LastRepairBuilding = 0;
 }
 
+//Wyrmgus start
+/**
+**  Check if there's a building that should have pathways around it, but doesn't.
+*/
+static void AiCheckPathwayConstruction()
+{
+	CUnitType *pathway_type = NULL;
+	
+	for (size_t i = 0; i != UnitTypes.size(); ++i) {
+		CUnitType *type = UnitTypes[i];
+
+		if (!type || !type->TerrainType || !CheckDependByType(*AiPlayer->Player, *type)) {
+			continue;
+		}
+		
+		if ((type->TerrainType->Flags & MapFieldRailroad) && (!pathway_type || !(pathway_type->TerrainType->Flags & MapFieldRailroad))) {
+			pathway_type = type;
+		} else if ((type->TerrainType->Flags & MapFieldRoad) && !pathway_type) {
+			pathway_type = type;
+		}
+	}
+	
+	if (!pathway_type) {
+		return;
+	}
+	
+	int n_t = AiHelpers.Build.size();
+	std::vector<std::vector<CUnitType *> > &tablep = AiHelpers.Build;
+	if (pathway_type->Slot > n_t) { // Oops not known.
+		DebugPrint("%d: AiCheckPathwayConstruction I: Nothing known about '%s'\n"
+				   _C_ AiPlayer->Player->Index _C_ pathway_type->Ident.c_str());
+		return;
+	}
+	
+	std::vector<CUnitType *> &table = tablep[pathway_type->Slot];
+	if (table.empty()) { // Oops not known.
+		DebugPrint("%d: AiCheckPathwayConstruction II: Nothing known about '%s'\n"
+				   _C_ AiPlayer->Player->Index _C_ pathway_type->Ident.c_str());
+		return;
+	}
+	
+	bool built_pathway = false;
+	const int n = AiPlayer->Player->GetUnitCount();
+	int k = 0;
+
+	// Selector for next unit
+	for (int i = n - 1; i >= 0; --i) {
+		const CUnit &unit = AiPlayer->Player->GetUnit(i);
+		if (UnitNumber(unit) == AiPlayer->LastPathwayConstructionBuilding) {
+			k = i + 1;
+		}
+	}
+
+	for (int i = k; i < n; ++i) {
+		CUnit &unit = AiPlayer->Player->GetUnit(i);
+
+		if (!unit.IsAliveOnMap()) {
+			continue;
+		}
+
+		// Building should have pathways but doesn't?
+		if (
+			unit.Type->BoolFlag[BUILDING_INDEX].value
+			&& unit.CurrentAction() != UnitActionBuilt //only build pathways for buildings that have already been constructed
+		) {
+			//
+			// FIXME: Construct pathways only for buildings under control
+			//
+			if (AiEnemyUnitsInDistance(unit, unit.Variable[SIGHTRANGE_INDEX].Max, unit.MapLayer)) {
+				continue;
+			}
+			
+			for (int x = unit.tilePos.x - 1; x < unit.tilePos.x + unit.Type->TileWidth + 1; ++x) {
+				for (int y = unit.tilePos.y - 1; y < unit.tilePos.y + unit.Type->TileHeight + 1; ++y) {
+					if (!Map.Info.IsPointOnMap(x, y, unit.MapLayer)) {
+						continue;
+					}
+					CMapField &mf = *Map.Field(x, y, unit.MapLayer);
+					if (mf.Flags & MapFieldBuilding) { //this is a tile where the building itself is located, continue
+						continue;
+					}
+					if ((!(mf.Flags & MapFieldRailroad) && (pathway_type->TerrainType->Flags & MapFieldRailroad)) || (!(mf.Flags & MapFieldRoad) && !(mf.Flags & MapFieldRailroad) && (pathway_type->TerrainType->Flags & MapFieldRoad))) {
+						Vec2i pathway_pos(x, y);
+						if (!UnitTypeCanBeAt(*pathway_type, pathway_pos, unit.MapLayer)) {
+							continue;
+						}
+						
+						const int resourceNeeded = AiCheckUnitTypeCosts(*pathway_type);
+						if (resourceNeeded) {
+							AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+							return;
+						}
+						
+						//
+						// Find a free worker, who can build pathways for this building
+						//
+						const int *unit_count = AiPlayer->Player->UnitTypesAiActiveCount;
+						for (unsigned int j = 0; j < table.size(); ++j) {
+							//
+							// The type is available
+							//
+							if (unit_count[table[j]->Slot]) {
+								if (AiBuildBuilding(*table[j], *pathway_type, pathway_pos, unit.MapLayer)) {
+									built_pathway = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if (built_pathway) {
+				AiPlayer->LastPathwayConstructionBuilding = UnitNumber(unit);
+				return;
+			}
+		}
+	}
+	AiPlayer->LastPathwayConstructionBuilding = 0;
+}
+//Wyrmgus end
+
 /**
 **  Add unit-type request to resource manager.
 **
@@ -1735,6 +1882,10 @@ void AiResourceManager()
 
 	// Check repair.
 	AiCheckRepair();
+	
+	//Wyrmgus start
+	AiCheckPathwayConstruction();
+	//Wyrmgus end
 
 	AiPlayer->NeededMask = 0;
 }

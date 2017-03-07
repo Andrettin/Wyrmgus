@@ -3173,10 +3173,10 @@ void CUnit::Place(const Vec2i &pos, int z)
 	if (this->Type->BoolFlag[BUILDING_INDEX].value && !this->Type->TerrainType) {
 		for (int x = this->tilePos.x; x < this->tilePos.x + this->Type->TileWidth; ++x) {
 			for (int y = this->tilePos.y; y < this->tilePos.y + this->Type->TileHeight; ++y) {
-				CMapField &mf = *Map.Field(x, y, this->MapLayer);
 				if (!Map.Info.IsPointOnMap(x, y, this->MapLayer)) {
 					continue;
 				}
+				CMapField &mf = *Map.Field(x, y, this->MapLayer);
 				if ((mf.Flags & MapFieldRoad) || (mf.Flags & MapFieldRailroad)) {
 					Map.RemoveTileOverlayTerrain(Vec2i(x, y), this->MapLayer);
 				}

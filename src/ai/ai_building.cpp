@@ -615,10 +615,17 @@ bool AiFindBuildingPlace(const CUnit &worker, const CUnitType &type, const Vec2i
 			   //Wyrmgus end
 
 	//Wyrmgus start
+	if (type.TerrainType) { //if the building is actually a terrain type, then the "nearPos" is already the correct position
+		*resultPos = nearPos;
+		return true;
+	}
+	//Wyrmgus end
+
+	//Wyrmgus start
 //	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos) ? nearPos : worker.tilePos;
 	const Vec2i &startPos = Map.Info.IsPointOnMap(nearPos, z) ? nearPos : worker.tilePos;
 	//Wyrmgus end
-
+	
 	//Mines and Depots
 	for (int i = 1; i < MaxCosts; ++i) {
 		ResourceInfo *resinfo = worker.Type->ResInfo[i];

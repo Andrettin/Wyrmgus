@@ -309,7 +309,10 @@ public:
 	PlayerAi() : Player(NULL), AiType(NULL),
 		SleepCycles(0), NeededMask(0), NeedSupply(false),
 		ScriptDebug(false), BuildDepots(true), LastExplorationGameCycle(0),
-		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
+		//Wyrmgus start
+//		LastCanNotMoveGameCycle(0), LastRepairBuilding(0)
+		LastCanNotMoveGameCycle(0), LastRepairBuilding(0), LastPathwayConstructionBuilding(0)
+		//Wyrmgus end
 	{
 		memset(Reserve, 0, sizeof(Reserve));
 		memset(Used, 0, sizeof(Used));
@@ -345,6 +348,7 @@ public:
 	std::vector<AiBuildQueue> UnitTypeBuilt;      /// What the resource manager should build
 	int LastRepairBuilding;                       /// Last building checked for repair in this turn
 	//Wyrmgus start
+	int LastPathwayConstructionBuilding;		/// Last building checked for pathway construction in this turn
 	std::vector<CUnit *> Scouts;				/// AI scouting units
 	//Wyrmgus end
 };

@@ -1620,6 +1620,8 @@ static int CclDefineAiPlayer(lua_State *l)
 		} else if (!strcmp(value, "repair-building")) {
 			ai->LastRepairBuilding = LuaToNumber(l, j + 1);
 		//Wyrmgus start
+		} else if (!strcmp(value, "pathway-construction-building")) {
+			ai->LastPathwayConstructionBuilding = LuaToNumber(l, j + 1);
 		} else if (!strcmp(value, "scouts")) {
 			if (!lua_istable(l, j + 1)) {
 				LuaError(l, "incorrect argument");
