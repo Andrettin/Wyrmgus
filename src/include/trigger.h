@@ -115,6 +115,7 @@ struct TriggerDataType {
 	CUnitType *Type;  /// Type used in trigger;
 	//Wyrmgus start
 	CUpgrade *Upgrade; /// Upgrade used in trigger
+	int *Resource;		/// Resource used in trigger
 	//Wyrmgus end
 };
 

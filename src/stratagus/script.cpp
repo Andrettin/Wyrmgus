@@ -533,6 +533,30 @@ static CUpgrade **Str2UpgradeRef(lua_State *l, const char *s)
 	Assert(res); // Must check for error.
 	return res;
 }
+
+/**
+**  Convert the string to the corresponding index (which is a resource index).
+**
+**  @param l   lua state.
+**  @param s   Ident.
+**
+**  @return    The index of the resource.
+**
+**  @todo better check for error (restrict param).
+*/
+static int **Str2ResourceRef(lua_State *l, const char *s)
+{
+	int **res = NULL; // Result.
+
+	Assert(l);
+	if (!strcmp(s, "Resource")) {
+		res = &TriggerData.Resource;
+	} else {
+		LuaError(l, "Invalid type reference '%s'\n" _C_ s);
+	}
+	Assert(res); // Must check for error.
+	return res;
+}
 //Wyrmgus end
 
 /**
@@ -593,7 +617,27 @@ CUpgrade **CclParseUpgradeDesc(lua_State *l)
 		res = Str2UpgradeRef(l, LuaToString(l, -1));
 		lua_pop(l, 1);
 	} else {
-		LuaError(l, "Parse Error in ParseUnit\n");
+		LuaError(l, "Parse Error in ParseUpgrade\n");
+	}
+	return res;
+}
+
+/**
+**  Return resource index.
+**
+**  @param l  lua state.
+**
+**  @return   resource index.
+*/
+int **CclParseResourceDesc(lua_State *l)
+{
+	int **res = NULL;
+
+	if (lua_isstring(l, -1)) {
+		res = Str2ResourceRef(l, LuaToString(l, -1));
+		lua_pop(l, 1);
+	} else {
+		LuaError(l, "Parse Error in ParseResource\n");
 	}
 	return res;
 }
@@ -961,6 +1005,12 @@ StringDesc *CclParseStringDesc(lua_State *l)
 		} else if (!strcmp(key, "UpgradeRequirementsString")) {
 			res->e = EString_UpgradeRequirementsString;
 			res->D.Upgrade = CclParseUpgradeDesc(l);
+		} else if (!strcmp(key, "ResourceIdent")) {
+			res->e = EString_ResourceIdent;
+			res->D.Resource = CclParseResourceDesc(l);
+		} else if (!strcmp(key, "ResourceName")) {
+			res->e = EString_ResourceName;
+			res->D.Resource = CclParseResourceDesc(l);
 		//Wyrmgus end
 		} else if (!strcmp(key, "If")) {
 			res->e = EString_If;
@@ -1202,6 +1252,7 @@ std::string EvalString(const StringDesc *s)
 	//Wyrmgus start
 	CUnitType **type;	// Temporary unit type
 	CUpgrade **upgrade;	// Temporary upgrade
+	int **resource;		// Temporary resource
 	//Wyrmgus end
 
 	Assert(s);
@@ -1383,6 +1434,20 @@ std::string EvalString(const StringDesc *s)
 			upgrade = s->D.Upgrade;
 			if (upgrade != NULL) {
 				return (**upgrade).RequirementsString;
+			} else { // ERROR.
+				return std::string("");
+			}
+		case EString_ResourceIdent : // resource ident
+			resource = s->D.Resource;
+			if (resource != NULL) {
+				return DefaultResourceNames[(**resource)];
+			} else { // ERROR.
+				return std::string("");
+			}
+		case EString_ResourceName : // resource ident
+			resource = s->D.Resource;
+			if (resource != NULL) {
+				return IdentToName(DefaultResourceNames[(**resource)]);
 			} else { // ERROR.
 				return std::string("");
 			}
@@ -1625,6 +1690,12 @@ void FreeStringDesc(StringDesc *s)
 			break;
 		case EString_UpgradeRequirementsString : // Requirements string of the upgrade
 			delete *s->D.Upgrade;
+			break;
+		case EString_ResourceIdent : // Ident of the resource
+			delete *s->D.Resource;
+			break;
+		case EString_ResourceName : // Name of the resource
+			delete *s->D.Resource;
 			break;
 		//Wyrmgus end
 		case EString_If : // cond ? True : False;
@@ -2322,6 +2393,32 @@ static int CclUpgradeRequirementsString(lua_State *l)
 {
 	return Alias(l, "UpgradeRequirementsString");
 }
+
+/**
+**  Return equivalent lua table for ResourceIdent.
+**  {"ResourceIdent", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclResourceIdent(lua_State *l)
+{
+	return Alias(l, "ResourceIdent");
+}
+
+/**
+**  Return equivalent lua table for ResourceName.
+**  {"ResourceName", {}}
+**
+**  @param l  Lua state.
+**
+**  @return   equivalent lua table.
+*/
+static int CclResourceName(lua_State *l)
+{
+	return Alias(l, "ResourceName");
+}
 //Wyrmgus end
 
 /**
@@ -2530,6 +2627,8 @@ static void AliasRegister()
 	lua_register(Lua, "UpgradeFactionType", CclUpgradeFactionType);
 	lua_register(Lua, "UpgradeEffectsString", CclUpgradeEffectsString);
 	lua_register(Lua, "UpgradeRequirementsString", CclUpgradeRequirementsString);
+	lua_register(Lua, "ResourceIdent", CclResourceIdent);
+	lua_register(Lua, "ResourceName", CclResourceName);
 	//Wyrmgus end
 	lua_register(Lua, "SubString", CclSubString);
 	lua_register(Lua, "Line", CclLine);

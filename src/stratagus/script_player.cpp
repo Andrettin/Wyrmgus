@@ -265,6 +265,20 @@ void CPlayer::Load(lua_State *l)
 				const int resId = GetResourceIdByName(l, value);
 				this->Revenue[resId] = LuaToNumber(l, j + 1, k + 1);
 			}
+		//Wyrmgus start
+		} else if (!strcmp(value, "prices")) {
+			if (!lua_istable(l, j + 1)) {
+				LuaError(l, "incorrect argument");
+			}
+			const int subargs = lua_rawlen(l, j + 1);
+			for (int k = 0; k < subargs; ++k) {
+				value = LuaToString(l, j + 1, k + 1);
+				++k;
+
+				const int resId = GetResourceIdByName(l, value);
+				this->Prices[resId] = LuaToNumber(l, j + 1, k + 1);
+			}
+		//Wyrmgus end
 		} else if (!strcmp(value, "ai-enabled")) {
 			this->AiEnabled = true;
 			--j;
@@ -2833,6 +2847,15 @@ static int CclGetPlayerData(lua_State *l)
 		const int resId = GetResourceIdByName(l, res.c_str());
 		lua_pushnumber(l, p->MaxResources[resId]);
 		return 1;
+	//Wyrmgus start
+	} else if (!strcmp(data, "Prices")) {
+		LuaCheckArgs(l, 3);
+
+		const std::string res = LuaToString(l, 3);
+		const int resId = GetResourceIdByName(l, res.c_str());
+		lua_pushnumber(l, p->Prices[resId]);
+		return 1;
+	//Wyrmgus end
 	} else if (!strcmp(data, "UnitTypesCount")) {
 		LuaCheckArgs(l, 3);
 		CUnitType *type = CclGetUnitType(l);

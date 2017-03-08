@@ -323,6 +323,8 @@ enum _message_type_ {
 	MessageCommandLearnAbility,    /// Unit command learn ability
 	MessageCommandQuest,           /// Unit command quest
 	MessageCommandBuy,			   /// Unit command buy
+	MessageCommandSellResource,	   /// Unit command sell resource
+	MessageCommandBuyResource,	   /// Unit command buy resource
 	//Wyrmgus end
 
 	MessageExtendedCommand,        /// Command is the next byte

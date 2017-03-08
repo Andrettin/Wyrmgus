@@ -81,6 +81,8 @@ enum ButtonCmd {
 	ButtonRallyPoint,		/// set rally point
 	ButtonQuest,			/// receive quest
 	ButtonBuy,				/// buy item
+	ButtonSellResource,		/// sell a resource
+	ButtonBuyResource,		/// buy a resource
 	ButtonUnit,				/// used to display popups for inventory items and for units in transporters
 	ButtonEditorUnit,		/// used to display popups for editor unit type buttons
 	//Wyrmgus end

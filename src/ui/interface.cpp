@@ -1899,6 +1899,10 @@ std::string GetButtonActionNameById(int button_action)
 		return "quest";
 	} else if (button_action == ButtonBuy) {
 		return "buy";
+	} else if (button_action == ButtonSellResource) {
+		return "sell-resource";
+	} else if (button_action == ButtonBuyResource) {
+		return "buy-resource";
 	} else if (button_action == ButtonUnit) {
 		return "unit";
 	} else if (button_action == ButtonEditorUnit) {
@@ -1960,6 +1964,10 @@ int GetButtonActionIdByName(std::string button_action)
 		return ButtonQuest;
 	} else if (button_action == "buy") {
 		return ButtonBuy;
+	} else if (button_action == "sell-resource") {
+		return ButtonSellResource;
+	} else if (button_action == "buy-resource") {
+		return ButtonBuyResource;
 	} else if (button_action == "unit") {
 		return ButtonUnit;
 	} else if (button_action == "editor-unit") {

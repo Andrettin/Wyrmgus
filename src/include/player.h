@@ -143,6 +143,9 @@ public:
 	int LastResources[MaxCosts];  /// last values for revenue
 	int Incomes[MaxCosts];        /// income of the resources
 	int Revenue[MaxCosts];        /// income rate of the resources
+	//Wyrmgus start
+	int Prices[MaxCosts];		  /// price of each resource
+	//Wyrmgus end
 
 	int SpeedResourcesHarvest[MaxCosts]; /// speed factor for harvesting resources
 	int SpeedResourcesReturn[MaxCosts];  /// speed factor for returning resources
@@ -263,7 +266,7 @@ public:
 	void SetResource(const int resource, const int value, const int type = STORE_OVERALL);
 	/// Check, if there enough resources for action.
 	bool CheckResource(const int resource, const int value);
-
+	
 	/// Returns count of specified unittype
 	int GetUnitTotalCount(const CUnitType &type) const;
 	/// Check if the unit-type didn't break any unit limits and supply/demand

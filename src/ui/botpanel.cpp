@@ -177,6 +177,14 @@ int AddButton(int pos, int level, const std::string &icon_ident,
 			case ButtonBuild:
 				ba->Value = UnitTypeIdByIdent(value);
 				break;
+			//Wyrmgus start
+			case ButtonSellResource:
+				ba->Value = GetResourceIdByName(value.c_str());
+				break;
+			case ButtonBuyResource:
+				ba->Value = GetResourceIdByName(value.c_str());
+				break;
+			//Wyrmgus end
 			default:
 				ba->Value = atoi(value.c_str());
 				break;
@@ -1197,7 +1205,7 @@ void CButtonPanel::Draw()
 			Selected[0]->Player != ThisPlayer
 			&& !ThisPlayer->IsTeamed(*Selected[0])
 			&& ThisPlayer->HasBuildingAccess(*Selected[0]->Player)
-			&& buttons[i].Action != ButtonTrain && buttons[i].Action != ButtonCancelTrain && buttons[i].Action != ButtonBuy
+			&& buttons[i].Action != ButtonTrain && buttons[i].Action != ButtonCancelTrain && buttons[i].Action != ButtonBuy && buttons[i].Action != ButtonSellResource && buttons[i].Action != ButtonBuyResource
 		) {
 			continue;
 		}
@@ -1317,15 +1325,25 @@ void CButtonPanel::Draw()
 												   pos, buf, player, hair_color, true);
 			}
 			
-			//draw the quantity in stock for unit "training" cases which have it
-			if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) {
-				std::string stock_string = std::to_string((long long) Selected[0]->GetUnitStock(buttons[i].Value)) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value]);
+			//draw a number over the button in special circumstances
+			if (
+				(buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0)
+				|| buttons[i].Action == ButtonSellResource || buttons[i].Action == ButtonBuyResource
+			) {
+				std::string number_string;
+				if (buttons[i].Action == ButtonTrain && Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value] != 0) { //draw the quantity in stock for unit "training" cases which have it
+					number_string = std::to_string((long long) Selected[0]->GetUnitStock(buttons[i].Value)) + "/" + std::to_string((long long) Selected[0]->Type->Stats[Selected[0]->Player->Index].UnitStock[buttons[i].Value]);
+				} else if (buttons[i].Action == ButtonSellResource) {
+					number_string = std::to_string((long long) Selected[0]->Player->Prices[buttons[i].Value] * Selected[0]->Variable[TRADEEFFICIENCY_INDEX].Value / 100);
+				} else if (buttons[i].Action == ButtonBuyResource) {
+					number_string = std::to_string((long long) 100 * 100 / Selected[0]->Player->Prices[buttons[i].Value] * Selected[0]->Variable[TRADEEFFICIENCY_INDEX].Value / 100);
+				}
 				std::string oldnc;
 				std::string oldrc;
 				GetDefaultTextColors(oldnc, oldrc);
 				CLabel label(GetGameFont(), oldnc, oldrc);
 
-				label.Draw(pos.x + 46 - GetGameFont().Width(stock_string), pos.y + 0, stock_string);
+				label.Draw(pos.x + 46 - GetGameFont().Width(number_string), pos.y + 0, number_string);
 			}
 			//Wyrmgus end
 		}
@@ -1456,6 +1474,8 @@ bool IsButtonAllowed(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonRallyPoint:
 		case ButtonUnit:
 		case ButtonEditorUnit:
+		case ButtonSellResource:
+		case ButtonBuyResource:
 		//Wyrmgus end
 			res = true;
 			break;
@@ -1657,6 +1677,8 @@ bool IsButtonUsable(const CUnit &unit, const ButtonAction &buttonaction)
 		case ButtonCancelBuild:
 		case ButtonQuest:
 		case ButtonBuy:
+		case ButtonSellResource:
+		case ButtonBuyResource:
 			res = true;
 			break;
 	}
@@ -2264,6 +2286,28 @@ void CButtonPanel::DoClicked_Buy(int button)
 		}
 	}
 }
+
+void CButtonPanel::DoClicked_SellResource(int button)
+{
+	const int resource = CurrentButtons[button].Value;
+	int sell_resource_costs[MaxCosts];
+	memset(sell_resource_costs, 0, sizeof(sell_resource_costs));
+	sell_resource_costs[resource] = 100;
+	if (!ThisPlayer->CheckCosts(sell_resource_costs)) {
+		SendCommandSellResource(*Selected[0], resource, ThisPlayer->Index);
+	}
+}
+
+void CButtonPanel::DoClicked_BuyResource(int button)
+{
+	const int resource = CurrentButtons[button].Value;
+	int buy_resource_costs[MaxCosts];
+	memset(buy_resource_costs, 0, sizeof(buy_resource_costs));
+	buy_resource_costs[CopperCost] = 100;
+	if (!ThisPlayer->CheckCosts(buy_resource_costs)) {
+		SendCommandBuyResource(*Selected[0], resource, ThisPlayer->Index);
+	}
+}
 //Wyrmgus end
 
 void CButtonPanel::DoClicked_CallbackAction(int button)
@@ -2295,7 +2339,7 @@ void CButtonPanel::DoClicked(int button)
 	//
 	//Wyrmgus start
 //	if (CurrentButtons[button].Pos == -1 || !ThisPlayer->IsTeamed(*Selected[0])) {
-	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) || (!ThisPlayer->IsTeamed(*Selected[0]) && ThisPlayer->HasBuildingAccess(*Selected[0]->Player) && CurrentButtons[button].Action != ButtonTrain && CurrentButtons[button].Action != ButtonCancelTrain && CurrentButtons[button].Action != ButtonBuy)) { //allow neutral units to be used (but only for training or as transporters)
+	if (CurrentButtons[button].Pos == -1 || (!ThisPlayer->IsTeamed(*Selected[0]) && !ThisPlayer->HasBuildingAccess(*Selected[0]->Player)) || (!ThisPlayer->IsTeamed(*Selected[0]) && ThisPlayer->HasBuildingAccess(*Selected[0]->Player) && CurrentButtons[button].Action != ButtonTrain && CurrentButtons[button].Action != ButtonCancelTrain && CurrentButtons[button].Action != ButtonBuy && CurrentButtons[button].Action != ButtonSellResource && CurrentButtons[button].Action != ButtonBuyResource)) { //allow neutral units to be used (but only for training or as transporters)
 	//Wyrmgus end
 		return;
 	}
@@ -2349,6 +2393,8 @@ void CButtonPanel::DoClicked(int button)
 		case ButtonExperienceUpgradeTo: { DoClicked_ExperienceUpgradeTo(button); break; }
 		case ButtonQuest: { DoClicked_Quest(button); break; }
 		case ButtonBuy: { DoClicked_Buy(button); break; }
+		case ButtonSellResource: { DoClicked_SellResource(button); break; }
+		case ButtonBuyResource: { DoClicked_BuyResource(button); break; }
 		//Wyrmgus end
 	}
 }

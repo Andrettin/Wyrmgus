@@ -165,6 +165,8 @@ enum EString {
 	EString_UpgradeFactionType,		/// Upgrade's faction's type
 	EString_UpgradeEffectsString,	/// Upgrade's effects string
 	EString_UpgradeRequirementsString,	/// Upgrade's requirements string
+	EString_ResourceIdent,	/// Resource's ident
+	EString_ResourceName,	/// Resource's name
 	//Wyrmgus end
 	EString_SubString,    /// SubString.
 	EString_Line,         /// line n of the string.
@@ -242,6 +244,7 @@ struct NumberDesc {
 		//Wyrmgus start
 		CUnitType **Type;           /// Which unit type.
 		CUpgrade **Upgrade;         /// Which upgrade.
+		int **Resource;				/// Which resource
 		//Wyrmgus end
 		BinOp binOp;   /// For binary operand.
 		struct {
@@ -305,6 +308,7 @@ struct StringDesc {
 		//Wyrmgus start
 		CUnitType **Type;           /// Which unit type.
 		CUpgrade **Upgrade;         /// Which upgrade.
+		int **Resource;				/// Which resource
 		//Wyrmgus end
 		struct {
 			NumberDesc *Cond;  /// Branch condition.
@@ -411,6 +415,7 @@ extern UnitDesc *CclParseUnitDesc(lua_State *l);     /// Parse a unit descriptio
 extern CUnitType **CclParseTypeDesc(lua_State *l);   /// Parse a unit type description.
 //Wyrmgus start
 extern CUpgrade **CclParseUpgradeDesc(lua_State *l);   /// Parse an upgrade description.
+extern int **CclParseResourceDesc(lua_State *l);   /// Parse an upgrade description.
 //Wyrmgus end
 StringDesc *CclParseStringDesc(lua_State *l);        /// Parse a string description.
 

@@ -198,10 +198,15 @@
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[button.Value];
 	}
+	int resource = button.Value;
+	if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	TriggerData.Unit = NULL;
 	TriggerData.Upgrade = NULL;
+	TriggerData.Resource = NULL;
 	//Wyrmgus end
 	
 	//Wyrmgus start
@@ -244,10 +249,15 @@
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[button.Value];
 	}
+	int resource = button.Value;
+	if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	TriggerData.Unit = NULL;
 	TriggerData.Upgrade = NULL;
+	TriggerData.Resource = NULL;
 	//Wyrmgus end
 	int height = 0;
 	int i = 1;
@@ -273,10 +283,15 @@
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[button.Value];
 	}
+	int resource = button.Value;
+	if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	TriggerData.Unit = NULL;
 	TriggerData.Upgrade = NULL;
+	TriggerData.Resource = NULL;
 	//Wyrmgus end
 	CLabel label(font, this->TextColor, this->HighlightColor);
 	std::string sub;
@@ -492,12 +507,17 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 	if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 		TriggerData.Upgrade = AllUpgrades[button.Value];
 	}
+	int resource = button.Value;
+	if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+		TriggerData.Resource = &resource;
+	}
 	//Wyrmgus end
 	std::string text = EvalString(this->Text);
 	TriggerData.Type = NULL;
 	//Wyrmgus start
 	TriggerData.Unit = NULL;
 	TriggerData.Upgrade = NULL;
+	TriggerData.Resource = NULL;
 	//Wyrmgus end
 	return font.getWidth(text);
 }
@@ -529,12 +549,17 @@ CPopupContentTypeLine::CPopupContentTypeLine() : Color(ColorWhite), Width(0), He
 		if (button.Action == ButtonResearch || button.Action == ButtonLearnAbility) {
 			TriggerData.Upgrade = AllUpgrades[button.Value];
 		}
+		int resource = button.Value;
+		if (button.Action == ButtonSellResource || button.Action == ButtonBuyResource) {
+			TriggerData.Resource = &resource;
+		}
 		//Wyrmgus end
 		text = EvalString(this->Text);
 		TriggerData.Type = NULL;
 		//Wyrmgus start
 		TriggerData.Unit = NULL;
 		TriggerData.Upgrade = NULL;
+		TriggerData.Resource = NULL;
 		//Wyrmgus end
 		if (this->Centered) {
 			x += (label.DrawCentered(x, y, text) * 2);

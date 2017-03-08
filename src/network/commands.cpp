@@ -194,6 +194,32 @@ void SendCommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 }
 
 /**
+** Send command: Sell a resource for copper.
+*/
+void SendCommandSellResource(CUnit &unit, int resource, int player)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("sell-resource", &unit, 0, resource, -1, NoUnitP, NULL, player);
+		CommandSellResource(unit, resource, player);
+	} else {
+		NetworkSendCommand(MessageCommandSellResource, unit, resource, player, NoUnitP, NULL, 0);
+	}
+}
+
+/**
+** Send command: Buy a resource with copper.
+*/
+void SendCommandBuyResource(CUnit &unit, int resource, int player)
+{
+	if (!IsNetworkGame()) {
+		CommandLog("buy-resource", &unit, 0, resource, -1, NoUnitP, NULL, player);
+		CommandBuyResource(unit, resource, player);
+	} else {
+		NetworkSendCommand(MessageCommandBuyResource, unit, resource, player, NoUnitP, NULL, 0);
+	}
+}
+
+/**
 ** Send command: Pick up item.
 **
 ** @param unit    pointer to unit.
@@ -1043,6 +1069,16 @@ void ExecCommand(unsigned char msgnr, UnitRef unum,
 				CommandLog("buy", &unit, 0, -1, -1, &dest, NULL, arg1);
 				CommandBuy(unit, &dest, arg1);
 			}
+			break;
+		}
+		case MessageCommandSellResource: {
+			CommandLog("sell-resource", &unit, 0, arg1, -1, NoUnitP, NULL, arg2);
+			CommandSellResource(unit, arg1, arg2);
+			break;
+		}
+		case MessageCommandBuyResource: {
+			CommandLog("buy-resource", &unit, 0, arg1, -1, NoUnitP, NULL, arg2);
+			CommandBuyResource(unit, arg1, arg2);
 			break;
 		}
 		//Wyrmgus end

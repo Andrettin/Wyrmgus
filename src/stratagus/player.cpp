@@ -1004,6 +1004,13 @@ void CPlayer::Save(CFile &file) const
 		}
 		file.printf("\"%s\", %d,", DefaultResourceNames[j].c_str(), p.Revenue[j]);
 	}
+	
+	//Wyrmgus start
+	file.printf("},\n  \"prices\", {");
+	for (int j = 0; j < MaxCosts; ++j) {
+		file.printf("\"%s\", %d, ", DefaultResourceNames[j].c_str(), p.Prices[j]);
+	}
+	//Wyrmgus end
 
 	// UnitTypesCount done by load units.
 
@@ -1779,6 +1786,9 @@ void CPlayer::Clear()
 	for (int i = 0; i < MaxCosts; ++i) {
 		SpeedResourcesHarvest[i] = SPEEDUP_FACTOR;
 		SpeedResourcesReturn[i] = SPEEDUP_FACTOR;
+		//Wyrmgus start
+		Prices[i] = DefaultResourcePrices[i];
+		//Wyrmgus end
 	}
 	SpeedBuild = SPEEDUP_FACTOR;
 	SpeedTrain = SPEEDUP_FACTOR;
@@ -2296,7 +2306,6 @@ bool CPlayer::CheckResource(const int resource, const int value)
 	}
 	return result < value ? false : true;
 }
-
 
 int CPlayer::GetUnitTotalCount(const CUnitType &type) const
 {

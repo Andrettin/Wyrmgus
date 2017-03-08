@@ -2138,6 +2138,33 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 	}
 }
 
+/**
+**  Sells 100 of a resource for copper
+**
+**  @param resource  Resource to be sold.
+*/
+void CUnit::SellResource(const int resource, const int player)
+{
+	Players[player].ChangeResource(resource, -100, true);
+	Players[player].ChangeResource(CopperCost, this->Player->Prices[resource] * this->Variable[TRADEEFFICIENCY_INDEX].Value / 100, true);
+	
+	this->Player->Prices[resource] -= 1;
+	this->Player->Prices[resource] = std::max(1, this->Player->Prices[resource]);
+}
+
+/**
+**  Buy a resource for copper
+**
+**  @param resource  Resource to be bought.
+*/
+void CUnit::BuyResource(const int resource, const int player)
+{
+	Players[player].ChangeResource(CopperCost, -100, true);
+	Players[player].ChangeResource(resource, 100 * 100 / this->Player->Prices[resource] * this->Variable[TRADEEFFICIENCY_INDEX].Value / 100, true);
+	
+	this->Player->Prices[resource] += 1;
+}
+
 void CUnit::Scout()
 {
 	int scout_range = std::max(16, this->CurrentSightRange * 2);

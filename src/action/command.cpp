@@ -465,6 +465,34 @@ void CommandBuy(CUnit &unit, CUnit *sold_unit, int player)
 	}
 	unit.SellUnit(sold_unit, player);
 }
+
+/**
+**  Sell a resource for copper
+**
+**  @param unit   pointer to unit to buy from.
+**  @param sold_unit  pointer to bought unit.
+*/
+void CommandSellResource(CUnit &unit, int resource, int player)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	unit.SellResource(resource, player);
+}
+
+/**
+**  Buy a resource with copper
+**
+**  @param unit   pointer to unit to buy from.
+**  @param sold_unit  pointer to bought unit.
+*/
+void CommandBuyResource(CUnit &unit, int resource, int player)
+{
+	if (IsUnitValidForNetwork(unit) == false) {
+		return ;
+	}
+	unit.BuyResource(resource, player);
+}
 //Wyrmgus end
 
 /**

@@ -227,6 +227,8 @@ public:
 	void GenerateUnique(CUnit *dropper);
 	void UpdateSoldUnits();
 	void SellUnit(CUnit *sold_unit, int player);
+	void SellResource(const int resource, const int player);
+	void BuyResource(const int resource, const int player);
 	void Scout();
 	//Wyrmgus end
 	
