@@ -333,7 +333,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				int resource = GetResourceIdByName(button.ValueStr.c_str());
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.SellMarkets, resource, **j);
+					AiHelperInsert(aiHelper.SellMarkets, resource - 1, **j);
 				}
 				break;
 			}
@@ -341,7 +341,7 @@ static void InitAiHelper(AiHelper &aiHelper)
 				int resource = GetResourceIdByName(button.ValueStr.c_str());
 
 				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
-					AiHelperInsert(aiHelper.BuyMarkets, resource, **j);
+					AiHelperInsert(aiHelper.BuyMarkets, resource - 1, **j);
 				}
 				break;
 			}
