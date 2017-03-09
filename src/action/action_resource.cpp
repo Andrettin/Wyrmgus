@@ -758,7 +758,7 @@ int COrder_Resource::StartGathering(CUnit &unit)
 //		this->TimeToHarvest = std::max<int>(1, resinfo.WaitAtResource * SPEEDUP_FACTOR / unit.Player->SpeedResourcesHarvest[resinfo.ResourceId]);
 		int wait_at_resource = resinfo.WaitAtResource;
 		if (!goal->Type->BoolFlag[HARVESTFROMOUTSIDE_INDEX].value) {
-			wait_at_resource = resinfo.WaitAtResource * 100 / resinfo.ResourceStep;
+			wait_at_resource = resinfo.WaitAtResource * 100 / (resinfo.ResourceStep + unit.Variable[GATHERINGBONUS_INDEX].Value);
 		}
 		this->TimeToHarvest = std::max<int>(1, wait_at_resource * SPEEDUP_FACTOR / (unit.Player->SpeedResourcesHarvest[resinfo.ResourceId] + goal->Variable[TIMEEFFICIENCYBONUS_INDEX].Value));
 		//Wyrmgus end
@@ -928,7 +928,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 			int wait_at_resource = resinfo.WaitAtResource;
 			int resource_harvest_speed = unit.Player->SpeedResourcesHarvest[resinfo.ResourceId];
 			if (!Map.Info.IsPointOnMap(this->goalPos, this->MapLayer) && !harvest_from_outside) {
-				wait_at_resource = resinfo.WaitAtResource * 100 / resinfo.ResourceStep;
+				wait_at_resource = resinfo.WaitAtResource * 100 / (resinfo.ResourceStep + unit.Variable[GATHERINGBONUS_INDEX].Value);
 			}
 			if (this->GetGoal()) {
 				resource_harvest_speed += this->GetGoal()->Variable[TIMEEFFICIENCYBONUS_INDEX].Value;
@@ -944,7 +944,7 @@ int COrder_Resource::GatherResource(CUnit &unit)
 //		if (resinfo.ResourceStep) {
 		if (resinfo.ResourceStep && (harvest_from_outside || Map.Info.IsPointOnMap(this->goalPos, this->MapLayer))) {
 		//Wyrmgus end
-			addload = resinfo.ResourceStep;
+			addload = resinfo.ResourceStep + unit.Variable[GATHERINGBONUS_INDEX].Value;
 		} else {
 			addload = resinfo.ResourceCapacity;
 		}

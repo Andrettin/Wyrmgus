@@ -835,7 +835,10 @@ void DrawPopup(const ButtonAction &button, const CUIButton &uibutton, int x, int
 
 	switch (button.Action) {
 		case ButtonResearch:
-			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
+			//Wyrmgus start
+//			memcpy(Costs, AllUpgrades[button.Value]->Costs, sizeof(AllUpgrades[button.Value]->Costs));
+			ThisPlayer->GetUpgradeCosts(AllUpgrades[button.Value], Costs);
+			//Wyrmgus end
 			break;
 		case ButtonSpellCast:
 			memcpy(Costs, SpellTypeTable[button.Value]->Costs, sizeof(SpellTypeTable[button.Value]->Costs));
@@ -2226,7 +2229,12 @@ void CButtonPanel::DoClicked_ExperienceUpgradeTo(int button)
 void CButtonPanel::DoClicked_Research(int button)
 {
 	const int index = CurrentButtons[button].Value;
-	if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
+	//Wyrmgus start
+	int upgrade_costs[MaxCosts];
+	Selected[0]->Player->GetUpgradeCosts(AllUpgrades[index], upgrade_costs);
+//	if (!Selected[0]->Player->CheckCosts(AllUpgrades[index]->Costs)) {
+	if (!Selected[0]->Player->CheckCosts(upgrade_costs)) {
+	//Wyrmgus end
 		//PlayerSubCosts(player,Upgrades[i].Costs);
 		SendCommandResearch(*Selected[0], *AllUpgrades[index], !(KeyModifiers & ModifierShift));
 		UI.StatusLine.Clear();

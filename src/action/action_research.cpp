@@ -63,7 +63,12 @@
 	COrder_Research *order = new COrder_Research();
 
 	// FIXME: if you give quick an other order, the resources are lost!
-	unit.Player->SubCosts(upgrade.Costs);
+	//Wyrmgus start
+//	unit.Player->SubCosts(upgrade.Costs);
+	int upgrade_costs[MaxCosts];
+	unit.Player->GetUpgradeCosts(&upgrade, upgrade_costs);
+	unit.Player->SubCosts(upgrade_costs);
+	//Wyrmgus end
 
 	order->SetUpgrade(upgrade);
 	return order;

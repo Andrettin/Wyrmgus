@@ -848,7 +848,12 @@ static bool AiResearchUpgrade(const CUnitType &type, CUpgrade &what)
 void AiAddResearchRequest(CUpgrade *upgrade)
 {
 	// Check if resources are available.
-	const int costNeeded = AiCheckCosts(upgrade->Costs);
+	//Wyrmgus start
+//	const int costNeeded = AiCheckCosts(upgrade->Costs);
+	int upgrade_costs[MaxCosts];
+	AiPlayer->Player->GetUpgradeCosts(upgrade, upgrade_costs);
+	const int costNeeded = AiCheckCosts(upgrade_costs);
+	//Wyrmgus end
 
 	if (costNeeded) {
 		AiPlayer->NeededMask |= costNeeded;

@@ -289,6 +289,10 @@ public:
 	void SubUnitType(const CUnitType &type);
 	/// Remove a factor of costs from the resources
 	void SubCostsFactor(const int *costs, int factor);
+	
+	//Wyrmgus start
+	void GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs);
+	//Wyrmgus end
 
 	/// Does the player have units of that type
 	int HaveUnitTypeByType(const CUnitType &type) const;

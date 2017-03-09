@@ -174,6 +174,7 @@ CUpgrade::CUpgrade(const std::string &ident) :
 {
 	memset(this->Costs, 0, sizeof(this->Costs));
 	//Wyrmgus start
+	memset(this->ScaledCosts, 0, sizeof(this->ScaledCosts));
 	memset(this->GrandStrategyCosts, 0, sizeof(this->GrandStrategyCosts));
 	memset(this->GrandStrategyProductionModifier, 0, sizeof(this->GrandStrategyProductionModifier));
 	memset(this->GrandStrategyProductionEfficiencyModifier, 0, sizeof(this->GrandStrategyProductionEfficiencyModifier));
@@ -332,6 +333,7 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->RequiresDeity = parent_upgrade->RequiresDeity;
 				for (int i = 0; i < MaxCosts; ++i) {
 					upgrade->Costs[i] = parent_upgrade->Costs[i];
+					upgrade->ScaledCosts[i] = parent_upgrade->ScaledCosts[i];
 					upgrade->GrandStrategyCosts[i] = parent_upgrade->GrandStrategyCosts[i];
 					upgrade->GrandStrategyProductionModifier[i] = parent_upgrade->GrandStrategyProductionModifier[i];
 					upgrade->GrandStrategyProductionEfficiencyModifier[i] = parent_upgrade->GrandStrategyProductionEfficiencyModifier[i];
@@ -354,6 +356,9 @@ static int CclDefineUpgrade(lua_State *l)
 				upgrade->RunicAffix = parent_upgrade->RunicAffix;
 				upgrade->Work = parent_upgrade->Work;
 				upgrade->UniqueOnly = parent_upgrade->UniqueOnly;
+				for (size_t i = 0; i < parent_upgrade->ScaledCostUnits.size(); ++i) {
+					upgrade->ScaledCostUnits.push_back(parent_upgrade->ScaledCostUnits[i]);
+				}
 			} else {
 				LuaError(l, "Parent upgrade doesn't exist.");
 			}
@@ -459,6 +464,20 @@ static int CclDefineUpgrade(lua_State *l)
 				
 				upgrade->Costs[resource] = LuaToNumber(l, -1, j + 1);
 			}
+		} else if (!strcmp(value, "ScaledCosts")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				int resource = GetResourceIdByName(LuaToString(l, -1, j + 1));
+				if (resource == -1) {
+					LuaError(l, "Resource doesn't exist.");
+				}
+				++j;
+				
+				upgrade->ScaledCosts[resource] = LuaToNumber(l, -1, j + 1);
+			}
 		} else if (!strcmp(value, "GrandStrategyCosts")) {
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument (expected table)");
@@ -541,6 +560,19 @@ static int CclDefineUpgrade(lua_State *l)
 				}
 
 				upgrade->IncompatibleAffixes[affix_id] = true;
+			}
+		} else if (!strcmp(value, "ScaledCostUnits")) {
+			if (!lua_istable(l, -1)) {
+				LuaError(l, "incorrect argument (expected table)");
+			}
+			const int subargs = lua_rawlen(l, -1);
+			for (int j = 0; j < subargs; ++j) {
+				CUnitType *scaled_cost_unit = UnitTypeByIdent(LuaToString(l, -1, j + 1));
+				if (scaled_cost_unit == NULL) {
+					LuaError(l, "Unit type doesn't exist.");
+				}
+
+				upgrade->ScaledCostUnits.push_back(scaled_cost_unit);
 			}
 		} else if (!strcmp(value, "RequiredAbilities")) {
 			if (!lua_istable(l, -1)) {
@@ -674,12 +706,21 @@ static int CclDefineModifier(lua_State *l)
 		if (!strcmp(key, "regeneration-rate")) {
 			um->Modifier.Variables[HP_INDEX].Increase = LuaToNumber(l, j + 1, 2);
 		} else if (!strcmp(key, "cost")) {
-			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
+			//Wyrmgus start
+//			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
+			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 3) {
+			//Wyrmgus end
 				LuaError(l, "incorrect argument");
 			}
-			const char *value = LuaToString(l, j + 1, 1);
+			//Wyrmgus start
+//			const char *value = LuaToString(l, j + 1, 1);
+			const char *value = LuaToString(l, j + 1, 2);
+			//Wyrmgus end
 			const int resId = GetResourceIdByName(l, value);
-			um->Modifier.Costs[resId] = LuaToNumber(l, j + 1, 2);
+			//Wyrmgus start
+//			um->Modifier.Costs[resId] = LuaToNumber(l, j + 1, 2);
+			um->Modifier.Costs[resId] = LuaToNumber(l, j + 1, 3);
+			//Wyrmgus end
 		} else if (!strcmp(key, "storing")) {
 			if (!lua_istable(l, j + 1) || lua_rawlen(l, j + 1) != 2) {
 				LuaError(l, "incorrect argument");

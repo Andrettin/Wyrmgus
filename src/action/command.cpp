@@ -1212,7 +1212,12 @@ void CommandResearch(CUnit &unit, CUpgrade &what, int flush)
 	//Wyrmgus end
 	
 	// Check if enough resources remains? (NETWORK!)
-	if (unit.Player->CheckCosts(what.Costs)) {
+	//Wyrmgus start
+//	if (unit.Player->CheckCosts(what.Costs)) {
+	int upgrade_costs[MaxCosts];
+	unit.Player->GetUpgradeCosts(&what, upgrade_costs);
+	if (unit.Player->CheckCosts(upgrade_costs)) {
+	//Wyrmgus end
 		return;
 	}
 	COrderPtr *order = GetNextOrder(unit, flush);

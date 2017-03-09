@@ -2504,6 +2504,21 @@ void CPlayer::SubCostsFactor(const int *costs, int factor)
 	}
 }
 
+//Wyrmgus start
+/**
+**  Gives the cost of an upgrade for the player
+*/
+void CPlayer::GetUpgradeCosts(const CUpgrade *upgrade, int *upgrade_costs)
+{
+	for (int i = 0; i < MaxCosts; ++i) {
+		upgrade_costs[i] = upgrade->Costs[i];
+		for (size_t j = 0; j < upgrade->ScaledCostUnits.size(); ++j) {
+			upgrade_costs[i] += upgrade->ScaledCosts[i] * this->UnitTypesCount[upgrade->ScaledCostUnits[j]->Slot];
+		}
+	}
+}
+//Wyrmgus end
+
 /**
 **  Have unit of type.
 **

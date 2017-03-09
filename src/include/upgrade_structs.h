@@ -243,6 +243,7 @@ public:
 	//Wyrmgus end
 	int   ID;                         /// numerical id
 	int   Costs[MaxCosts];            /// costs for the upgrade
+	int   ScaledCosts[MaxCosts];      /// scaled costs for the upgrade
 	//Wyrmgus start
 	int GrandStrategyCosts[MaxCosts];	/// Costs for the upgrade for grand strategy mode
 	int GrandStrategyProductionModifier[MaxCosts];	/// Production modifier (absolute increase) for a particular resource for grand strategy mode
@@ -254,6 +255,7 @@ public:
 	int Year;						/// Year of publication, if is a literary work
 	CCharacter *Author;				/// Author of this literary work (if it is one)
 	std::vector<CUpgradeModifier *> UpgradeModifiers;	/// Upgrade modifiers for this upgrade
+	std::vector<CUnitType *> ScaledCostUnits;	/// Units for which the upgrade's costs are scaled
 	std::vector<CCharacter *> Characters;	/// Characters who appear in this literary work (if it is one)
 	//Wyrmgus end
 	// TODO: not used by buttons
