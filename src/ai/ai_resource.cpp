@@ -1208,6 +1208,21 @@ static bool CmpWorkers(const CUnit *lhs, const CUnit *rhs)
 	return lhs->ResourcesHeld < rhs->ResourcesHeld;
 }
 
+//Wyrmgus start
+static bool AiCanSellResource(int resource)
+{
+	if ((AiPlayer->Player->Resources[resource] + AiPlayer->Player->StoredResources[resource]) <= (AiPlayer->Collect[resource] * 100)) {
+		return false;
+	}
+	
+	if ((AiPlayer->NeededMask & (1 << resource))) {
+		return false;
+	}
+	
+	return true;
+}
+//Wyrmgus end
+
 /**
 **  Assign workers to collect resources.
 **
@@ -1464,6 +1479,37 @@ static void AiCollectResources()
 	} while (unit);
 	
 	//Wyrmgus start
+	//buy resources
+	for (int c = 1; c < MaxCosts; ++c) {
+		if (percent[c] == 0 || num_units_assigned[c] > 0 || c == CopperCost) { //don't buy a resource if the AI isn't instructed to collect that resource, or if there are already workers assigned to harvesting it
+			continue;
+		}
+		
+		if (!AiCanSellResource(CopperCost)) {
+			break;
+		}
+		
+		if (AiCanSellResource(c)) { //if there's enough of the resource stored to sell, then there's no need to buy it
+			continue;
+		}
+		
+		const int n_m = AiHelpers.BuyMarkets[c - 1].size();
+
+		for (int i = 0; i < n_m; ++i) {
+			CUnitType &market_type = *AiHelpers.BuyMarkets[c - 1][i];
+
+			const int *market_count = AiPlayer->Player->UnitTypesAiActiveCount;
+			if (market_count[market_type.Slot]) {
+				std::vector<CUnit *> market_table;
+				FindPlayerUnitsByType(*AiPlayer->Player, market_type, market_table, true);
+
+				CUnit &market_unit = *market_table[SyncRand() % market_table.size()];
+				CommandBuyResource(market_unit, c, AiPlayer->Player->Index);
+				break;
+			}
+		}
+	}
+	
 	//explore with the workers that are still idle (as that means they haven't gotten something to harvest)
 	for (int i = 0; i < n; ++i) {
 		CUnit &unit = AiPlayer->Player->GetUnit(i);

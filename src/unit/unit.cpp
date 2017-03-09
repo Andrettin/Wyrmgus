@@ -2145,6 +2145,10 @@ void CUnit::SellUnit(CUnit *sold_unit, int player)
 */
 void CUnit::SellResource(const int resource, const int player)
 {
+	if ((Players[player].Resources[resource] + Players[player].StoredResources[resource]) < 100) {
+		return;
+	}
+
 	Players[player].ChangeResource(resource, -100, true);
 	Players[player].ChangeResource(CopperCost, this->Player->Prices[resource] * this->Variable[TRADEEFFICIENCY_INDEX].Value / 100, true);
 	
@@ -2159,6 +2163,10 @@ void CUnit::SellResource(const int resource, const int player)
 */
 void CUnit::BuyResource(const int resource, const int player)
 {
+	if ((Players[player].Resources[CopperCost] + Players[player].StoredResources[CopperCost]) < 100) {
+		return;
+	}
+
 	Players[player].ChangeResource(CopperCost, -100, true);
 	Players[player].ChangeResource(resource, 100 * 100 / this->Player->Prices[resource] * this->Variable[TRADEEFFICIENCY_INDEX].Value / 100, true);
 	

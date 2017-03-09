@@ -413,6 +413,18 @@ public:
 	
 	//Wyrmgus start
 	/**
+	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
+	** units/buildings/mines which can sell this resource.
+	*/
+	std::vector<std::vector<CUnitType *> > SellMarkets;
+	
+	/**
+	** The index is the resource id - 1 (we can't trade TIME), giving a table of all
+	** units/buildings/mines which can buy this resource.
+	*/
+	std::vector<std::vector<CUnitType *> > BuyMarkets;
+
+	/**
 	** The index is the unit that should acquire an experience upgrade, giving a table of all
 	** possible upgrades for it.
 	*/

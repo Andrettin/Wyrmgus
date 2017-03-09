@@ -251,6 +251,8 @@ static void InitAiHelper(AiHelper &aiHelper)
 	AiHelpers.UnitLimit.clear();
 	AiHelpers.Refinery.clear();
 	AiHelpers.Depots.clear();
+	AiHelpers.SellMarkets.clear();
+	AiHelpers.BuyMarkets.clear();
 	AiHelpers.ExperienceUpgrades.clear();
 	AiHelpers.LearnableAbilities.clear();
 	//Wyrmgus end
@@ -327,6 +329,22 @@ static void InitAiHelper(AiHelper &aiHelper)
 				break;
 			}
 			//Wyrmgus start
+			case ButtonSellResource : {
+				int resource = GetResourceIdByName(button.ValueStr.c_str());
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.SellMarkets, resource, **j);
+				}
+				break;
+			}
+			case ButtonBuyResource : {
+				int resource = GetResourceIdByName(button.ValueStr.c_str());
+
+				for (std::vector<CUnitType *>::const_iterator j = unitmask.begin(); j != unitmask.end(); ++j) {
+					AiHelperInsert(aiHelper.BuyMarkets, resource, **j);
+				}
+				break;
+			}
 			case ButtonExperienceUpgradeTo : {
 				CUnitType *upgradeToType = UnitTypeByIdent(button.ValueStr);
 

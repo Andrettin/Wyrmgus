@@ -552,7 +552,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	if (UseOpenGL) {
 		//Wyrmgus start
 //		if (!MinimapTerrainSurfaceGL) {
-		if (!MinimapTerrainSurfaceGL[z]) {
+		if (z >= (int) MinimapTerrainSurfaceGL.size() || !MinimapTerrainSurfaceGL[z]) {
 		//Wyrmgus end
 			return;
 		}
@@ -561,7 +561,7 @@ void CMinimap::UpdateXY(const Vec2i &pos, int z)
 	{
 		//Wyrmgus start
 //		if (!MinimapTerrainSurface) {
-		if (!MinimapTerrainSurface[z]) {
+		if (z >= (int) MinimapTerrainSurface.size() || !MinimapTerrainSurface[z]) {
 		//Wyrmgus end
 			return;
 		}
