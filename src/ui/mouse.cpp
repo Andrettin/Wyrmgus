@@ -1507,7 +1507,12 @@ void UIHandleMouseMove(const PixelPos &cursorPos)
 				GameCursor = UI.RedHair.Cursor;
 			} else if (
 				Selected.size() >= 1 && Selected[0]->Player == ThisPlayer &&
-				((UnitUnderCursor->GivesResource && Selected[0]->Type->ResInfo[UnitUnderCursor->GivesResource] && (UnitUnderCursor->Player == ThisPlayer || (UnitUnderCursor->Player->IsAllied(*ThisPlayer) && ThisPlayer->IsAllied(*UnitUnderCursor->Player)) || UnitUnderCursor->Player->Index == PlayerNumNeutral)))
+				(
+					UnitUnderCursor->GivesResource
+					&& Selected[0]->Type->ResInfo[UnitUnderCursor->GivesResource]
+					&& (!Selected[0]->CurrentResource || !UnitUnderCursor->Type->CanStore[Selected[0]->CurrentResource])
+					&& (UnitUnderCursor->Player == ThisPlayer || (UnitUnderCursor->Player->IsAllied(*ThisPlayer) && ThisPlayer->IsAllied(*UnitUnderCursor->Player)) || UnitUnderCursor->Player->Index == PlayerNumNeutral)
+				)
 			) {
 				GameCursor = UI.YellowHair.Cursor;
 			} else {
