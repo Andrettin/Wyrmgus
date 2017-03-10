@@ -148,6 +148,7 @@ extern int DefaultResourceAmounts[MaxCosts];
 extern int DefaultResourceMaxAmounts[MaxCosts];
 
 //Wyrmgus start
+extern bool LuxuryResources[MaxCosts];
 extern int DefaultResourceFinalResources[MaxCosts];
 extern int DefaultResourceFinalResourceConversionRates[MaxCosts];
 extern int DefaultResourceInputResources[MaxCosts];

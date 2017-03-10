@@ -454,6 +454,12 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 		}
 	}
 	
+	if (condition->LuxuryResource != CONDITION_TRUE) {
+		if ((condition->LuxuryResource == CONDITION_ONLY) ^ (button.Action == ButtonProduceResource && LuxuryResources[button.Value])) {
+			return false;
+		}
+	}
+	
 	if (condition->RequirementsString != CONDITION_TRUE) {
 		if ((condition->RequirementsString == CONDITION_ONLY) ^ ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility || button.Action == ButtonTrain || button.Action == ButtonBuild || button.Action == ButtonUpgradeTo || button.Action == ButtonExperienceUpgradeTo || button.Action == ButtonBuy) && !IsButtonUsable(*Selected[0], button) && ((type && !type->RequirementsString.empty()) ||  ((button.Action == ButtonResearch || button.Action == ButtonLearnAbility) && !AllUpgrades[button.Value]->RequirementsString.empty())))) {
 			return false;
